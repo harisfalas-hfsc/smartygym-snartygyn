@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { ServiceCard } from "@/components/ServiceCard";
 import { Button } from "@/components/ui/button";
 import {
@@ -12,7 +12,7 @@ import {
 import smartyGymLogo from "@/assets/smarty-gym-logo.png";
 
 const Index = () => {
-  const [selectedService, setSelectedService] = useState<string | null>(null);
+  const navigate = useNavigate();
 
   const services = [
     {
@@ -54,9 +54,12 @@ const Index = () => {
   ];
 
   const handleServiceSelect = (serviceId: string) => {
-    setSelectedService(serviceId);
-    // TODO: Navigate to service flow
-    console.log("Selected service:", serviceId);
+    if (serviceId === "workout") {
+      navigate("/workout");
+    } else {
+      // TODO: Add other service routes
+      console.log("Service not yet implemented:", serviceId);
+    }
   };
 
   return (
