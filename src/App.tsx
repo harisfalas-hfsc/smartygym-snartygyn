@@ -29,12 +29,14 @@ const App = () => (
           <Route path="/" element={<Index />} />
           <Route path="/auth" element={<Auth />} />
           
+          {/* Public workout and plan flows - anyone can explore */}
+          <Route path="/workout" element={<WorkoutFlow />} />
+          <Route path="/training-program" element={<TrainingProgramFlow />} />
+          <Route path="/diet-plan" element={<DietPlanFlow />} />
+          
           {/* Authenticated routes with motivational banner */}
           <Route element={<ProtectedRoute><AuthenticatedLayout /></ProtectedRoute>}>
             <Route path="/dashboard" element={<Dashboard />} />
-            <Route path="/workout" element={<WorkoutFlow />} />
-            <Route path="/training-program" element={<TrainingProgramFlow />} />
-            <Route path="/diet-plan" element={<DietPlanFlow />} />
             <Route path="/community" element={<Community />} />
           </Route>
           
