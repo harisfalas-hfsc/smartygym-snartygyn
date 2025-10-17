@@ -12,6 +12,7 @@ import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { StravaTrackingDialog } from "@/components/StravaTrackingDialog";
 import { WorkoutVideoPlayer } from "@/components/WorkoutVideoPlayer";
+import { SubscriptionGate } from "@/components/SubscriptionGate";
 import smartyGymLogo from "@/assets/smarty-gym-logo.png";
 
 interface WorkoutFormData {
@@ -33,6 +34,8 @@ const WorkoutFlow = () => {
   const [savedWorkoutId, setSavedWorkoutId] = useState<string | null>(null);
   const [showStravaDialog, setShowStravaDialog] = useState(false);
   const [exercises, setExercises] = useState<Array<{ name: string; video_id: string; video_url: string }>>([]);
+  const [showSubscriptionGate, setShowSubscriptionGate] = useState(false);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [formData, setFormData] = useState<WorkoutFormData>({
     age: "",
     height: "",
@@ -86,10 +89,26 @@ const WorkoutFlow = () => {
   const handleSubmit = async () => {
     setLoading(true);
     try {
-      // Get current user
+      // Check if user is authenticated
       const { data: { user } } = await supabase.auth.getUser();
+      
       if (!user) {
-        throw new Error("You must be logged in to generate a workout");
+        setIsAuthenticated(false);
+        setShowSubscriptionGate(true);
+        setLoading(false);
+        return;
+      }
+
+      // Check if user has active subscription
+      // TODO: Add subscription check when implemented
+      // For now, let authenticated users proceed
+      const hasSubscription = true; // Replace with actual subscription check
+
+      if (!hasSubscription) {
+        setIsAuthenticated(true);
+        setShowSubscriptionGate(true);
+        setLoading(false);
+        return;
       }
 
       const response = await fetch(
@@ -439,6 +458,12 @@ const WorkoutFlow = () => {
           </Card>
         </div>
       </main>
+
+      <SubscriptionGate
+        open={showSubscriptionGate}
+        onOpenChange={setShowSubscriptionGate}
+        isAuthenticated={isAuthenticated}
+      />
     </div>
   );
 };

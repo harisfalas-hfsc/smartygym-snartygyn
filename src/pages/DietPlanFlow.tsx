@@ -8,6 +8,8 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { ArrowLeft, ArrowRight, Loader2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { supabase } from "@/integrations/supabase/client";
+import { SubscriptionGate } from "@/components/SubscriptionGate";
 
 const DietPlanFlow = () => {
   const navigate = useNavigate();
@@ -15,6 +17,8 @@ const DietPlanFlow = () => {
   const [step, setStep] = useState(1);
   const [loading, setLoading] = useState(false);
   const [generatedPlan, setGeneratedPlan] = useState("");
+  const [showSubscriptionGate, setShowSubscriptionGate] = useState(false);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [formData, setFormData] = useState({
     age: "",
     height: "",
@@ -78,6 +82,28 @@ const DietPlanFlow = () => {
   const handleSubmit = async () => {
     setLoading(true);
     try {
+      // Check if user is authenticated
+      const { data: { user } } = await supabase.auth.getUser();
+      
+      if (!user) {
+        setIsAuthenticated(false);
+        setShowSubscriptionGate(true);
+        setLoading(false);
+        return;
+      }
+
+      // Check if user has active subscription
+      // TODO: Add subscription check when implemented
+      // For now, let authenticated users proceed
+      const hasSubscription = true; // Replace with actual subscription check
+
+      if (!hasSubscription) {
+        setIsAuthenticated(true);
+        setShowSubscriptionGate(true);
+        setLoading(false);
+        return;
+      }
+
       const response = await fetch(
         `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/generate-fitness-plan`,
         {
@@ -98,16 +124,38 @@ const DietPlanFlow = () => {
 
       const data = await response.json();
       setGeneratedPlan(data.plan);
+      
+      // Save to database
+      const { data: savedPlan, error: saveError } = await supabase
+        .from('saved_diet_plans')
+        .insert({
+          user_id: user.id,
+          name: `${formData.goal} Diet Plan - ${new Date().toLocaleDateString()}`,
+          content: data.plan,
+          status: 'not-started'
+        })
+        .select()
+        .single();
+
+      if (saveError) {
+        console.error("Error saving diet plan:", saveError);
+        toast({
+          title: "Warning",
+          description: "Diet plan generated but failed to save to dashboard.",
+          variant: "destructive",
+        });
+      }
+
       setStep(5);
       toast({
         title: "Success!",
-        description: "Your diet plan has been generated.",
+        description: "Your diet plan has been generated and saved to your dashboard.",
       });
     } catch (error) {
       console.error("Error generating diet plan:", error);
       toast({
         title: "Error",
-        description: "Failed to generate diet plan. Please try again.",
+        description: error instanceof Error ? error.message : "Failed to generate diet plan. Please try again.",
         variant: "destructive",
       });
     } finally {
@@ -507,6 +555,12 @@ const DietPlanFlow = () => {
           </CardContent>
         </Card>
       </div>
+
+      <SubscriptionGate
+        open={showSubscriptionGate}
+        onOpenChange={setShowSubscriptionGate}
+        isAuthenticated={isAuthenticated}
+      />
     </div>
   );
 };
