@@ -8,7 +8,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
 import { useToast } from "@/hooks/use-toast";
-import { Dumbbell } from "lucide-react";
+import { ArrowLeft } from "lucide-react";
+import smartyGymLogo from "@/assets/smarty-gym-logo.png";
 
 export default function Auth() {
   const navigate = useNavigate();
@@ -159,16 +160,24 @@ export default function Auth() {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-background p-4">
-      <Card className="w-full max-w-md">
-        <CardHeader className="space-y-1 flex flex-col items-center">
-          <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mb-2">
-            <Dumbbell className="w-8 h-8 text-primary" />
-          </div>
-          <CardTitle className="text-2xl font-bold text-center">Welcome to Smarty Gym</CardTitle>
-          <CardDescription className="text-center">
-            Create an account or sign in to continue
-          </CardDescription>
-        </CardHeader>
+      <div className="w-full max-w-md">
+        <Button 
+          variant="ghost" 
+          onClick={() => navigate("/")}
+          className="mb-4"
+        >
+          <ArrowLeft className="mr-2 h-4 w-4" />
+          Back to Home
+        </Button>
+        
+        <Card className="w-full">
+          <CardHeader className="space-y-1 flex flex-col items-center">
+            <img src={smartyGymLogo} alt="Smarty Gym" className="h-20 w-auto mb-2" />
+            <CardTitle className="text-2xl font-bold text-center">Welcome to Smarty Gym</CardTitle>
+            <CardDescription className="text-center">
+              Create an account or sign in to continue
+            </CardDescription>
+          </CardHeader>
         <CardContent>
           <Tabs defaultValue="login" className="w-full">
             <TabsList className="grid w-full grid-cols-2">
@@ -273,6 +282,7 @@ export default function Auth() {
           </Tabs>
         </CardContent>
       </Card>
+      </div>
     </div>
   );
 }
