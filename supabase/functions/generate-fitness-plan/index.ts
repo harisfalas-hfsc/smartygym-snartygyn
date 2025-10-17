@@ -32,8 +32,22 @@ serve(async (req) => {
       console.error('Error fetching exercises:', exercisesError);
     }
     
-    const exerciseList = exercises?.map(e => e.name).join(', ') || '';
-    console.log(`Available exercises (${exercises?.length || 0}):`, exerciseList);
+    // Fallback exercises if database is empty
+    const fallbackExercises = [
+      'Push-ups', 'Pull-ups', 'Squats', 'Lunges', 'Planks', 'Mountain Climbers',
+      'Burpees', 'Jumping Jacks', 'High Knees', 'Dumbbell Rows', 'Bench Press',
+      'Shoulder Press', 'Bicep Curls', 'Tricep Dips', 'Leg Press', 'Deadlifts',
+      'Romanian Deadlifts', 'Hip Thrusts', 'Calf Raises', 'Lat Pulldowns',
+      'Chest Flyes', 'Lateral Raises', 'Front Raises', 'Russian Twists',
+      'Bicycle Crunches', 'Leg Raises', 'Superman', 'Bird Dog', 'Glute Bridges',
+      'Wall Sits', 'Step-ups', 'Box Jumps', 'Kettlebell Swings', 'Farmer Walks'
+    ];
+    
+    const exerciseList = exercises && exercises.length > 0 
+      ? exercises.map(e => e.name).join(', ')
+      : fallbackExercises.join(', ');
+    
+    console.log(`Available exercises (${exercises?.length || fallbackExercises.length}):`, exerciseList);
 
     let systemPrompt = '';
     let userPrompt = '';
