@@ -1,10 +1,41 @@
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { ServiceCard } from "@/components/ServiceCard";
 import { Button } from "@/components/ui/button";
-import { Dumbbell, Calendar, Utensils, Calculator, Activity, Flame } from "lucide-react";
+import { Dumbbell, Calendar, Utensils, Calculator, Activity, Flame, User, LogOut } from "lucide-react";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { supabase } from "@/integrations/supabase/client";
+import { User as SupabaseUser } from "@supabase/supabase-js";
+import { useToast } from "@/hooks/use-toast";
 import smartyGymLogo from "@/assets/smarty-gym-logo.png";
 const Index = () => {
   const navigate = useNavigate();
+  const { toast } = useToast();
+  const [user, setUser] = useState<SupabaseUser | null>(null);
+
+  useEffect(() => {
+    // Check current session
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setUser(session?.user ?? null);
+    });
+
+    // Listen for auth changes
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((_event, session) => {
+      setUser(session?.user ?? null);
+    });
+
+    return () => subscription.unsubscribe();
+  }, []);
+
+  const handleLogout = async () => {
+    await supabase.auth.signOut();
+    toast({
+      title: "Logged out",
+      description: "You have been logged out successfully",
+    });
+  };
   const services = [{
     id: "workout",
     icon: Dumbbell,
@@ -55,6 +86,44 @@ const Index = () => {
       {/* Hero Section */}
       <header className="py-8 px-4 border-b border-border">
         <div className="container mx-auto max-w-6xl">
+          <div className="flex justify-between items-start mb-6">
+            <div className="flex-1"></div>
+            <div className="flex gap-2">
+              {user ? (
+                <>
+                  <Button variant="outline" onClick={() => navigate("/dashboard")}>
+                    Dashboard
+                  </Button>
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button variant="outline" size="icon">
+                        <User className="h-4 w-4" />
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end">
+                      <DropdownMenuItem onClick={() => navigate("/dashboard")}>
+                        <User className="mr-2 h-4 w-4" />
+                        Dashboard
+                      </DropdownMenuItem>
+                      <DropdownMenuItem onClick={handleLogout}>
+                        <LogOut className="mr-2 h-4 w-4" />
+                        Logout
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                </>
+              ) : (
+                <>
+                  <Button variant="outline" onClick={() => navigate("/auth")}>
+                    Login
+                  </Button>
+                  <Button onClick={() => navigate("/auth")}>
+                    Sign Up
+                  </Button>
+                </>
+              )}
+            </div>
+          </div>
           <div className="flex flex-col items-center space-y-4">
             <img src={smartyGymLogo} alt="Smarty Gym" className="h-24 md:h-32 w-auto" />
             <div className="text-center">
