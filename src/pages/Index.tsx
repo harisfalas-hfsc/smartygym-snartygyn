@@ -84,23 +84,22 @@ const Index = () => {
   };
   return <div className="min-h-screen bg-background">
       {/* Hero Section */}
-      <header className="py-8 px-4 border-b border-border">
+      <header className="py-6 px-4 border-b border-border">
         <div className="container mx-auto max-w-6xl">
-          <div className="flex justify-between items-start mb-6">
-            <div className="flex-1"></div>
-            <div className="flex gap-2">
+          <div className="flex justify-end items-center mb-6">
+            <div className="flex gap-2 flex-wrap">
               {user ? (
                 <>
-                  <Button variant="outline" onClick={() => navigate("/dashboard")}>
+                  <Button variant="outline" size="sm" onClick={() => navigate("/dashboard")} className="text-xs sm:text-sm">
                     Dashboard
                   </Button>
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
-                      <Button variant="outline" size="icon">
+                      <Button variant="outline" size="icon" className="h-9 w-9">
                         <User className="h-4 w-4" />
                       </Button>
                     </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end">
+                    <DropdownMenuContent align="end" className="bg-card z-50">
                       <DropdownMenuItem onClick={() => navigate("/dashboard")}>
                         <User className="mr-2 h-4 w-4" />
                         Dashboard
@@ -114,10 +113,10 @@ const Index = () => {
                 </>
               ) : (
                 <>
-                  <Button variant="outline" onClick={() => navigate("/auth")}>
+                  <Button variant="outline" size="sm" onClick={() => navigate("/auth")} className="text-xs sm:text-sm">
                     Login
                   </Button>
-                  <Button onClick={() => navigate("/auth")}>
+                  <Button size="sm" onClick={() => navigate("/auth")} className="text-xs sm:text-sm">
                     Sign Up
                   </Button>
                 </>
@@ -125,12 +124,12 @@ const Index = () => {
             </div>
           </div>
           <div className="flex flex-col items-center space-y-4">
-            <img src={smartyGymLogo} alt="Smarty Gym" className="h-24 md:h-32 w-auto" />
-            <div className="text-center">
-              <h1 className="text-3xl md:text-4xl font-bold mb-2">
+            <img src={smartyGymLogo} alt="Smarty Gym" className="h-20 sm:h-24 md:h-32 w-auto" />
+            <div className="text-center px-4">
+              <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-2">
                 Your Smart Gym in Your Pocket
               </h1>
-              <p className="text-muted-foreground text-lg">Tailor Made workouts, Training Programs, Nutrition Plans and Tools</p>
+              <p className="text-muted-foreground text-sm sm:text-base md:text-lg">Tailor Made workouts, Training Programs, Nutrition Plans and Tools</p>
             </div>
             {/* Social Media Links */}
             <div className="flex items-center gap-3">
@@ -138,28 +137,28 @@ const Index = () => {
                 href="https://www.instagram.com/thesmartygym/"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="p-2 rounded-full bg-muted hover:bg-primary hover:text-primary-foreground transition-colors"
+                className="p-2.5 sm:p-3 rounded-full bg-muted hover:bg-primary hover:text-primary-foreground transition-colors"
                 aria-label="Instagram"
               >
-                <Instagram className="h-4 w-4" />
+                <Instagram className="h-5 w-5 sm:h-6 sm:w-6" />
               </a>
               <a
                 href="https://www.facebook.com/profile.php?id=61579302997368"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="p-2 rounded-full bg-muted hover:bg-primary hover:text-primary-foreground transition-colors"
+                className="p-2.5 sm:p-3 rounded-full bg-muted hover:bg-primary hover:text-primary-foreground transition-colors"
                 aria-label="Facebook"
               >
-                <Facebook className="h-4 w-4" />
+                <Facebook className="h-5 w-5 sm:h-6 sm:w-6" />
               </a>
               <a
                 href="https://www.tiktok.com/@thesmartygym?lang=en"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="p-2 rounded-full bg-muted hover:bg-primary hover:text-primary-foreground transition-colors"
+                className="p-2.5 sm:p-3 rounded-full bg-muted hover:bg-primary hover:text-primary-foreground transition-colors"
                 aria-label="TikTok"
               >
-                <svg className="h-4 w-4" viewBox="0 0 24 24" fill="currentColor">
+                <svg className="h-5 w-5 sm:h-6 sm:w-6" viewBox="0 0 24 24" fill="currentColor">
                   <path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-5.2 1.74 2.89 2.89 0 0 1 2.31-4.64 2.93 2.93 0 0 1 .88.13V9.4a6.84 6.84 0 0 0-1-.05A6.33 6.33 0 0 0 5 20.1a6.34 6.34 0 0 0 10.86-4.43v-7a8.16 8.16 0 0 0 4.77 1.52v-3.4a4.85 4.85 0 0 1-1-.1z"/>
                 </svg>
               </a>
@@ -169,13 +168,13 @@ const Index = () => {
       </header>
 
       {/* Main Content */}
-      <main className="py-12 px-4">
+      <main className="py-8 sm:py-12 px-4">
         <div className="container mx-auto max-w-6xl">
-          <div className="text-center mb-12">
-            <h2 className="text-2xl md:text-3xl font-bold mb-4">
+          <div className="text-center mb-8 sm:mb-12 px-4">
+            <h2 className="text-xl sm:text-2xl md:text-3xl font-bold mb-3 sm:mb-4">
               I Want To...
             </h2>
-            <p className="text-muted-foreground">Choose a service to get started with your personalized fitness journey</p>
+            <p className="text-muted-foreground text-sm sm:text-base">Choose a service to get started with your personalized fitness journey</p>
           </div>
 
           {/* Services Grid */}
@@ -184,30 +183,30 @@ const Index = () => {
           </div>
 
           {/* CTA Section */}
-          <div className="bg-card border border-border rounded-xl p-8 shadow-soft text-center">
-            <h3 className="text-2xl font-bold mb-4">
+          <div className="bg-card border border-border rounded-xl p-4 sm:p-6 md:p-8 shadow-soft text-center">
+            <h3 className="text-xl sm:text-2xl font-bold mb-3 sm:mb-4">
               Ready to Transform Your Fitness?
             </h3>
-            <p className="text-muted-foreground mb-6 max-w-2xl mx-auto">
+            <p className="text-muted-foreground text-sm sm:text-base mb-4 sm:mb-6 max-w-2xl mx-auto px-2">
               Subscribe to unlock all features and get access to unlimited personalized
               workouts, training programs, and diet plans designed by AI.
             </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-              <div className="bg-muted rounded-lg p-6 flex-1 max-w-xs">
-                <div className="text-primary font-bold text-xl mb-2">GOLD</div>
-                <div className="text-3xl font-bold mb-2">€9.99</div>
-                <div className="text-sm text-muted-foreground mb-4">per month</div>
+            <div className="flex flex-col sm:flex-row gap-4 justify-center items-stretch sm:items-center">
+              <div className="bg-muted rounded-lg p-4 sm:p-6 flex-1 w-full sm:max-w-xs">
+                <div className="text-primary font-bold text-lg sm:text-xl mb-2">GOLD</div>
+                <div className="text-2xl sm:text-3xl font-bold mb-2">€9.99</div>
+                <div className="text-sm text-muted-foreground mb-3 sm:mb-4">per month</div>
                 <Button variant="default" className="w-full">
                   Get Started
                 </Button>
               </div>
-              <div className="bg-primary/10 border-2 border-primary rounded-lg p-6 flex-1 max-w-xs relative">
-                <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-primary text-primary-foreground text-xs font-bold px-3 py-1 rounded-full">
+              <div className="bg-primary/10 border-2 border-primary rounded-lg p-4 sm:p-6 flex-1 w-full sm:max-w-xs relative">
+                <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-primary text-primary-foreground text-xs font-bold px-3 py-1 rounded-full whitespace-nowrap">
                   BEST VALUE
                 </div>
-                <div className="text-primary font-bold text-xl mb-2">PLATINUM</div>
-                <div className="text-3xl font-bold mb-2">€89.99</div>
-                <div className="text-sm text-muted-foreground mb-4">per year</div>
+                <div className="text-primary font-bold text-lg sm:text-xl mb-2">PLATINUM</div>
+                <div className="text-2xl sm:text-3xl font-bold mb-2">€89.99</div>
+                <div className="text-sm text-muted-foreground mb-3 sm:mb-4">per year</div>
                 <Button variant="default" className="w-full">
                   Get Started
                 </Button>

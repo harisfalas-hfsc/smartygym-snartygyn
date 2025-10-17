@@ -431,20 +431,25 @@ export default function Dashboard() {
   return (
     <div className="min-h-screen bg-background">
       {/* Header */}
-      <header className="border-b border-border py-4 px-4">
-        <div className="container mx-auto max-w-7xl flex justify-between items-center">
-          <div className="flex items-center gap-4">
-            <img src={smartyGymLogo} alt="Smarty Gym" className="h-12 w-auto" />
-            <h1 className="text-2xl font-bold">Dashboard</h1>
-          </div>
-          <div className="flex gap-2">
-            <Button variant="outline" onClick={() => navigate("/")}>
-              <ArrowLeft className="mr-2 h-4 w-4" />
-              Home
-            </Button>
-            <Button variant="outline" onClick={handleLogout}>
-              Logout
-            </Button>
+      <header className="border-b border-border py-3 sm:py-4 px-4">
+        <div className="container mx-auto max-w-7xl">
+          <div className="flex justify-between items-center gap-2">
+            <div className="flex items-center gap-2 sm:gap-4 min-w-0">
+              <img src={smartyGymLogo} alt="Smarty Gym" className="h-10 sm:h-12 w-auto flex-shrink-0" />
+              <h1 className="text-lg sm:text-2xl font-bold truncate">Dashboard</h1>
+            </div>
+            <div className="flex gap-2 flex-shrink-0">
+              <Button variant="outline" size="sm" onClick={() => navigate("/")} className="hidden sm:flex">
+                <ArrowLeft className="mr-2 h-4 w-4" />
+                Home
+              </Button>
+              <Button variant="outline" size="sm" onClick={() => navigate("/")} className="sm:hidden">
+                <ArrowLeft className="h-4 w-4" />
+              </Button>
+              <Button variant="outline" size="sm" onClick={handleLogout}>
+                Logout
+              </Button>
+            </div>
           </div>
         </div>
       </header>
@@ -459,34 +464,34 @@ export default function Dashboard() {
         </div>
 
         <Tabs defaultValue="favorites" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-3 lg:grid-cols-7">
-            <TabsTrigger value="favorites">
-              <Heart className="mr-2 h-4 w-4" />
-              Favorites
+          <TabsList className="grid w-full grid-cols-2 sm:grid-cols-3 lg:grid-cols-7 gap-1">
+            <TabsTrigger value="favorites" className="text-xs sm:text-sm">
+              <Heart className="mr-0 sm:mr-2 h-4 w-4" />
+              <span className="hidden sm:inline">Favorites</span>
             </TabsTrigger>
-            <TabsTrigger value="workouts">
-              <Dumbbell className="mr-2 h-4 w-4" />
-              Workouts
+            <TabsTrigger value="workouts" className="text-xs sm:text-sm">
+              <Dumbbell className="mr-0 sm:mr-2 h-4 w-4" />
+              <span className="hidden sm:inline">Workouts</span>
             </TabsTrigger>
-            <TabsTrigger value="programs">
-              <Calendar className="mr-2 h-4 w-4" />
-              Programs
+            <TabsTrigger value="programs" className="text-xs sm:text-sm">
+              <Calendar className="mr-0 sm:mr-2 h-4 w-4" />
+              <span className="hidden sm:inline">Programs</span>
             </TabsTrigger>
-            <TabsTrigger value="calculators">
-              <Calculator className="mr-2 h-4 w-4" />
-              Calculators
+            <TabsTrigger value="calculators" className="text-xs sm:text-sm">
+              <Calculator className="mr-0 sm:mr-2 h-4 w-4" />
+              <span className="hidden sm:inline">Calculators</span>
             </TabsTrigger>
-            <TabsTrigger value="strava">
-              <Bike className="mr-2 h-4 w-4" />
-              Strava
+            <TabsTrigger value="strava" className="text-xs sm:text-sm">
+              <Bike className="mr-0 sm:mr-2 h-4 w-4" />
+              <span className="hidden sm:inline">Strava</span>
             </TabsTrigger>
-            <TabsTrigger value="community">
-              <Users className="mr-2 h-4 w-4" />
-              Community
+            <TabsTrigger value="community" className="text-xs sm:text-sm">
+              <Users className="mr-0 sm:mr-2 h-4 w-4" />
+              <span className="hidden sm:inline">Community</span>
             </TabsTrigger>
-            <TabsTrigger value="settings">
-              <Settings className="mr-2 h-4 w-4" />
-              Settings
+            <TabsTrigger value="settings" className="text-xs sm:text-sm">
+              <Settings className="mr-0 sm:mr-2 h-4 w-4" />
+              <span className="hidden sm:inline">Settings</span>
             </TabsTrigger>
           </TabsList>
 

@@ -138,24 +138,25 @@ export default function Community() {
   return (
     <div className="min-h-screen bg-background flex flex-col">
       {/* Header */}
-      <header className="border-b border-border py-4 px-4 bg-card">
+      <header className="border-b border-border py-3 sm:py-4 px-4 bg-card">
         <div className="container mx-auto max-w-4xl">
-          <div className="flex justify-between items-center mb-3">
-            <div className="flex items-center gap-4">
-              <img src={smartyGymLogo} alt="Smarty Gym" className="h-12 w-auto" />
+          <div className="flex flex-col sm:flex-row justify-between items-center gap-3 mb-3">
+            <div className="flex items-center gap-2 sm:gap-4">
+              <img src={smartyGymLogo} alt="Smarty Gym" className="h-10 sm:h-12 w-auto" />
               <div>
-                <h1 className="text-2xl font-bold flex items-center gap-2">
-                  <Users className="h-6 w-6 text-primary" />
+                <h1 className="text-lg sm:text-2xl font-bold flex items-center gap-2">
+                  <Users className="h-5 w-5 sm:h-6 sm:w-6 text-primary" />
                   Community Forum
                 </h1>
               </div>
             </div>
-            <div className="flex gap-2">
-              <Button variant="outline" onClick={() => navigate("/dashboard")}>
-                <ArrowLeft className="mr-2 h-4 w-4" />
-                Dashboard
+            <div className="flex gap-2 w-full sm:w-auto">
+              <Button variant="outline" size="sm" onClick={() => navigate("/dashboard")} className="flex-1 sm:flex-initial text-xs sm:text-sm">
+                <ArrowLeft className="mr-1 sm:mr-2 h-4 w-4" />
+                <span className="hidden sm:inline">Dashboard</span>
+                <span className="sm:hidden">Back</span>
               </Button>
-              <Button variant="outline" onClick={handleLogout}>
+              <Button variant="outline" size="sm" onClick={handleLogout} className="flex-1 sm:flex-initial text-xs sm:text-sm">
                 Logout
               </Button>
             </div>

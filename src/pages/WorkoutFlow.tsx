@@ -178,20 +178,20 @@ const WorkoutFlow = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      <header className="py-6 px-4 border-b border-border">
+      <header className="py-4 sm:py-6 px-4 border-b border-border">
         <div className="container mx-auto max-w-4xl">
-          <div className="flex items-center justify-between">
-            <Button variant="ghost" onClick={handleBack}>
-              <ChevronLeft className="w-4 h-4 mr-2" />
-              Back
+          <div className="flex items-center justify-between gap-2">
+            <Button variant="ghost" size="sm" onClick={handleBack} className="flex-shrink-0">
+              <ChevronLeft className="w-4 h-4 mr-1 sm:mr-2" />
+              <span className="text-xs sm:text-sm">Back</span>
             </Button>
-            <img src={smartyGymLogo} alt="Smarty Gym" className="h-12" />
-            <div className="w-20" />
+            <img src={smartyGymLogo} alt="Smarty Gym" className="h-10 sm:h-12 flex-shrink-0" />
+            <div className="w-16 sm:w-20 flex-shrink-0" />
           </div>
         </div>
       </header>
 
-      <main className="py-8 px-4">
+      <main className="py-6 sm:py-8 px-4">
         <div className="container mx-auto max-w-2xl">
           {step < 5 && (
             <div className="mb-8">
@@ -211,12 +211,12 @@ const WorkoutFlow = () => {
             </div>
           )}
 
-          <Card className="p-8">
+          <Card className="p-4 sm:p-6 md:p-8">
             {step === 1 && (
               <div className="space-y-6">
-                <div className="text-center mb-8">
-                  <h2 className="text-2xl font-bold mb-2">Personal Information</h2>
-                  <p className="text-muted-foreground">
+                <div className="text-center mb-6 sm:mb-8">
+                  <h2 className="text-xl sm:text-2xl font-bold mb-2">Personal Information</h2>
+                  <p className="text-muted-foreground text-sm sm:text-base">
                     Help us understand your starting point
                   </p>
                 </div>
