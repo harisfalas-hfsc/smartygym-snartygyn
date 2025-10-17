@@ -274,6 +274,15 @@ export default function Dashboard() {
     return { value: change.toFixed(1), improved: change > 0 };
   };
 
+  const isNewUser = () => {
+    if (!user?.created_at) return false;
+    const createdAt = new Date(user.created_at);
+    const now = new Date();
+    const hoursSinceCreation = (now.getTime() - createdAt.getTime()) / (1000 * 60 * 60);
+    // Consider user as "new" if account was created within the last 24 hours
+    return hoursSinceCreation < 24;
+  };
+
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString("en-US", {
       month: "short",
@@ -458,9 +467,11 @@ export default function Dashboard() {
       <main className="container mx-auto max-w-7xl p-4 py-8">
         <div className="mb-8">
           <h2 className="text-3xl font-bold mb-2">
-            Welcome back, {user?.user_metadata?.full_name || "User"}!
+            {isNewUser() ? `Welcome to Smarty Gym, ${user?.user_metadata?.full_name || "User"}!` : `Welcome back, ${user?.user_metadata?.full_name || "User"}!`}
           </h2>
-          <p className="text-muted-foreground">Here's your fitness overview</p>
+          <p className="text-muted-foreground">
+            {isNewUser() ? "We're excited to have you here! Let's start your fitness journey." : "Here's your fitness overview"}
+          </p>
         </div>
 
         <Tabs defaultValue="favorites" className="space-y-6">
