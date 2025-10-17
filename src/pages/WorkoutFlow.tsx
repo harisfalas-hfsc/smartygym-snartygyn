@@ -86,6 +86,12 @@ const WorkoutFlow = () => {
   const handleSubmit = async () => {
     setLoading(true);
     try {
+      // Get current user
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) {
+        throw new Error("You must be logged in to generate a workout");
+      }
+
       const response = await fetch(
         `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/generate-fitness-plan`,
         {
@@ -110,16 +116,40 @@ const WorkoutFlow = () => {
       const data = await response.json();
       setGeneratedPlan(data.plan);
       setExercises(data.exercises || []);
+      
+      // Save to database
+      const { data: savedWorkout, error: saveError } = await supabase
+        .from('saved_workouts')
+        .insert({
+          user_id: user.id,
+          name: `${formData.goal} Workout - ${new Date().toLocaleDateString()}`,
+          content: data.plan,
+          status: 'not-started'
+        })
+        .select()
+        .single();
+
+      if (saveError) {
+        console.error("Error saving workout:", saveError);
+        toast({
+          title: "Warning",
+          description: "Workout generated but failed to save to dashboard.",
+          variant: "destructive",
+        });
+      } else {
+        setSavedWorkoutId(savedWorkout.id);
+      }
+
       setStep(5);
       toast({
         title: "Success!",
-        description: "Your workout plan has been generated.",
+        description: "Your workout plan has been generated and saved to your dashboard.",
       });
     } catch (error) {
       console.error("Error generating workout:", error);
       toast({
         title: "Error",
-        description: "Failed to generate workout plan. Please try again.",
+        description: error instanceof Error ? error.message : "Failed to generate workout plan. Please try again.",
         variant: "destructive",
       });
     } finally {

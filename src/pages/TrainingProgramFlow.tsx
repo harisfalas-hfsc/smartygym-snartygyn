@@ -62,6 +62,12 @@ const TrainingProgramFlow = () => {
   const handleSubmit = async () => {
     setLoading(true);
     try {
+      // Get current user
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) {
+        throw new Error("You must be logged in to generate a training program");
+      }
+
       const response = await fetch(
         `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/generate-fitness-plan`,
         {
@@ -83,16 +89,41 @@ const TrainingProgramFlow = () => {
       const data = await response.json();
       setGeneratedProgram(data.plan);
       setExercises(data.exercises || []);
+      
+      // Save to database
+      const { data: savedProgram, error: saveError } = await supabase
+        .from('saved_training_programs')
+        .insert({
+          user_id: user.id,
+          name: `${formData.goal} Program - ${new Date().toLocaleDateString()}`,
+          content: data.plan,
+          duration: `${formData.programLength} weeks`,
+          status: 'not-started'
+        })
+        .select()
+        .single();
+
+      if (saveError) {
+        console.error("Error saving program:", saveError);
+        toast({
+          title: "Warning",
+          description: "Program generated but failed to save to dashboard.",
+          variant: "destructive",
+        });
+      } else {
+        setSavedProgramId(savedProgram.id);
+      }
+
       setStep(5);
       toast({
         title: "Success!",
-        description: "Your training program has been generated.",
+        description: "Your training program has been generated and saved to your dashboard.",
       });
     } catch (error) {
       console.error("Error generating program:", error);
       toast({
         title: "Error",
-        description: "Failed to generate training program. Please try again.",
+        description: error instanceof Error ? error.message : "Failed to generate training program. Please try again.",
         variant: "destructive",
       });
     } finally {
