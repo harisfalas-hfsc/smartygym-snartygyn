@@ -82,6 +82,37 @@ const Index = () => {
       navigate(routes[serviceId]);
     }
   };
+
+  const handleSubscribe = async (plan: 'gold' | 'platinum') => {
+    if (!user) {
+      navigate('/auth');
+      return;
+    }
+
+    const priceIds = {
+      gold: 'price_1SJ9q1IxQYg9inGKZzxxqPbD',
+      platinum: 'price_1SJ9qGIxQYg9inGKFbgqVRjj'
+    };
+
+    try {
+      const { data, error } = await supabase.functions.invoke('create-checkout', {
+        body: { priceId: priceIds[plan] }
+      });
+
+      if (error) throw error;
+
+      if (data?.url) {
+        window.open(data.url, '_blank');
+      }
+    } catch (error) {
+      console.error('Error creating checkout:', error);
+      toast({
+        title: "Error",
+        description: "Failed to start checkout process. Please try again.",
+        variant: "destructive",
+      });
+    }
+  };
   return <div className="min-h-screen bg-background">
       {/* Hero Section */}
       <header className="py-6 px-4 border-b border-border">
@@ -200,7 +231,11 @@ const Index = () => {
                 <div className="text-primary font-bold text-lg sm:text-xl mb-2">GOLD</div>
                 <div className="text-2xl sm:text-3xl font-bold mb-2">€9.99</div>
                 <div className="text-sm text-muted-foreground mb-3 sm:mb-4">per month</div>
-                <Button variant="default" className="w-full">
+                <Button 
+                  variant="default" 
+                  className="w-full"
+                  onClick={() => handleSubscribe('gold')}
+                >
                   Get Started
                 </Button>
               </div>
@@ -211,7 +246,11 @@ const Index = () => {
                 <div className="text-primary font-bold text-lg sm:text-xl mb-2">PLATINUM</div>
                 <div className="text-2xl sm:text-3xl font-bold mb-2">€89.99</div>
                 <div className="text-sm text-muted-foreground mb-3 sm:mb-4">per year</div>
-                <Button variant="default" className="w-full">
+                <Button 
+                  variant="default" 
+                  className="w-full"
+                  onClick={() => handleSubscribe('platinum')}
+                >
                   Get Started
                 </Button>
               </div>
