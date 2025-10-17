@@ -492,6 +492,27 @@ export default function Dashboard() {
 
           {/* Favorites Tab */}
           <TabsContent value="favorites" className="space-y-6">
+            {/* Quick Actions */}
+            <Card className="bg-gradient-to-r from-primary/10 to-primary/5 border-primary/20">
+              <CardContent className="flex items-center justify-between p-6">
+                <div className="flex items-center gap-4">
+                  <div className="p-3 bg-primary/10 rounded-full">
+                    <Users className="h-8 w-8 text-primary" />
+                  </div>
+                  <div>
+                    <h3 className="text-xl font-bold mb-1">Join the Community Forum</h3>
+                    <p className="text-sm text-muted-foreground">
+                      Connect, share experiences, and motivate each other!
+                    </p>
+                  </div>
+                </div>
+                <Button size="lg" onClick={() => navigate("/community")}>
+                  <Users className="mr-2 h-5 w-5" />
+                  Go to Forum
+                </Button>
+              </CardContent>
+            </Card>
+
             <div className="grid gap-6 md:grid-cols-3">
               {/* Favorite Workouts */}
               <Card>
