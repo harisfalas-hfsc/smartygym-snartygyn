@@ -1,16 +1,29 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, Save } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/hooks/use-toast";
+import { User } from "@supabase/supabase-js";
 
 const OneRMCalculator = () => {
   const navigate = useNavigate();
+  const { toast } = useToast();
   const [weight, setWeight] = useState("");
   const [reps, setReps] = useState("");
+  const [exerciseName, setExerciseName] = useState("");
   const [result, setResult] = useState<number | null>(null);
+  const [user, setUser] = useState<User | null>(null);
+  const [saving, setSaving] = useState(false);
+
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setUser(session?.user ?? null);
+    });
+  }, []);
 
   const calculateOneRM = () => {
     const w = parseFloat(weight);
@@ -23,6 +36,36 @@ const OneRMCalculator = () => {
     // Using Brzycki formula: 1RM = weight × (36 / (37 - reps))
     const oneRM = w * (36 / (37 - r));
     setResult(Math.round(oneRM * 10) / 10);
+  };
+
+  const saveToHistory = async () => {
+    if (!user || !result) return;
+
+    setSaving(true);
+    try {
+      const { error } = await supabase.from("onerm_history").insert({
+        user_id: user.id,
+        weight_lifted: parseFloat(weight),
+        reps: parseInt(reps),
+        one_rm_result: result,
+        exercise_name: exerciseName || null,
+      });
+
+      if (error) throw error;
+
+      toast({
+        title: "Saved!",
+        description: "Calculation saved to your history",
+      });
+    } catch (error: any) {
+      toast({
+        title: "Error",
+        description: error.message,
+        variant: "destructive",
+      });
+    } finally {
+      setSaving(false);
+    }
   };
 
   const getPercentages = () => {
@@ -56,6 +99,17 @@ const OneRMCalculator = () => {
         <Card>
           <CardContent className="p-6 space-y-6">
             <div className="space-y-4">
+              <div>
+                <Label htmlFor="exerciseName">Exercise Name (Optional)</Label>
+                <Input
+                  id="exerciseName"
+                  type="text"
+                  value={exerciseName}
+                  onChange={(e) => setExerciseName(e.target.value)}
+                  placeholder="e.g., Bench Press, Squat"
+                />
+              </div>
+
               <div>
                 <Label htmlFor="weight">Weight Lifted (kg)</Label>
                 <Input
@@ -92,6 +146,13 @@ const OneRMCalculator = () => {
                   <h2 className="text-lg font-semibold mb-2">Your Estimated 1RM</h2>
                   <p className="text-4xl font-bold text-primary">{result} kg</p>
                 </div>
+
+                {user && (
+                  <Button onClick={saveToHistory} disabled={saving} className="w-full" variant="outline">
+                    <Save className="mr-2 h-4 w-4" />
+                    {saving ? "Saving..." : "Save to History"}
+                  </Button>
+                )}
 
                 <div>
                   <h3 className="text-lg font-semibold mb-3">Training Percentages</h3>

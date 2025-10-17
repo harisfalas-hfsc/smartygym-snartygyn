@@ -1,14 +1,18 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, Save } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/hooks/use-toast";
+import { User } from "@supabase/supabase-js";
 
 const CalorieCalculator = () => {
   const navigate = useNavigate();
+  const { toast } = useToast();
   const [age, setAge] = useState("");
   const [weight, setWeight] = useState("");
   const [height, setHeight] = useState("");
@@ -20,6 +24,14 @@ const CalorieCalculator = () => {
     lose: number;
     gain: number;
   } | null>(null);
+  const [user, setUser] = useState<User | null>(null);
+  const [saving, setSaving] = useState(false);
+
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setUser(session?.user ?? null);
+    });
+  }, []);
 
   const calculateCalories = () => {
     const w = parseFloat(weight);
@@ -54,6 +66,42 @@ const CalorieCalculator = () => {
       lose: Math.round(tdee - 500), // 500 cal deficit for ~0.5kg/week loss
       gain: Math.round(tdee + 500), // 500 cal surplus for ~0.5kg/week gain
     });
+  };
+
+  const saveToHistory = async () => {
+    if (!user || !result || !goal) return;
+
+    const targetCalories = goal === "lose" ? result.lose : goal === "gain" ? result.gain : result.maintain;
+
+    setSaving(true);
+    try {
+      const { error } = await supabase.from("calorie_history").insert({
+        user_id: user.id,
+        age: parseInt(age),
+        weight: parseFloat(weight),
+        height: parseFloat(height),
+        gender,
+        activity_level: activityLevel,
+        goal,
+        maintenance_calories: result.maintain,
+        target_calories: targetCalories,
+      });
+
+      if (error) throw error;
+
+      toast({
+        title: "Saved!",
+        description: "Calculation saved to your history",
+      });
+    } catch (error: any) {
+      toast({
+        title: "Error",
+        description: error.message,
+        variant: "destructive",
+      });
+    } finally {
+      setSaving(false);
+    }
   };
 
   const getMacros = (calories: number) => {
@@ -201,6 +249,13 @@ const CalorieCalculator = () => {
                     <p className="text-xs text-muted-foreground">cal/day</p>
                   </div>
                 </div>
+
+                {user && (
+                  <Button onClick={saveToHistory} disabled={saving || !goal} className="w-full" variant="outline">
+                    <Save className="mr-2 h-4 w-4" />
+                    {saving ? "Saving..." : "Save to History"}
+                  </Button>
+                )}
 
                 {goal && (() => {
                   const targetCalories = goal === "lose" ? result.lose : goal === "gain" ? result.gain : result.maintain;

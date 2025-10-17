@@ -14,6 +14,111 @@ export type Database = {
   }
   public: {
     Tables: {
+      bmr_history: {
+        Row: {
+          age: number
+          bmr_result: number
+          created_at: string
+          gender: string
+          height: number
+          id: string
+          user_id: string
+          weight: number
+        }
+        Insert: {
+          age: number
+          bmr_result: number
+          created_at?: string
+          gender: string
+          height: number
+          id?: string
+          user_id: string
+          weight: number
+        }
+        Update: {
+          age?: number
+          bmr_result?: number
+          created_at?: string
+          gender?: string
+          height?: number
+          id?: string
+          user_id?: string
+          weight?: number
+        }
+        Relationships: []
+      }
+      calorie_history: {
+        Row: {
+          activity_level: string
+          age: number
+          created_at: string
+          gender: string
+          goal: string
+          height: number
+          id: string
+          maintenance_calories: number
+          target_calories: number
+          user_id: string
+          weight: number
+        }
+        Insert: {
+          activity_level: string
+          age: number
+          created_at?: string
+          gender: string
+          goal: string
+          height: number
+          id?: string
+          maintenance_calories: number
+          target_calories: number
+          user_id: string
+          weight: number
+        }
+        Update: {
+          activity_level?: string
+          age?: number
+          created_at?: string
+          gender?: string
+          goal?: string
+          height?: number
+          id?: string
+          maintenance_calories?: number
+          target_calories?: number
+          user_id?: string
+          weight?: number
+        }
+        Relationships: []
+      }
+      onerm_history: {
+        Row: {
+          created_at: string
+          exercise_name: string | null
+          id: string
+          one_rm_result: number
+          reps: number
+          user_id: string
+          weight_lifted: number
+        }
+        Insert: {
+          created_at?: string
+          exercise_name?: string | null
+          id?: string
+          one_rm_result: number
+          reps: number
+          user_id: string
+          weight_lifted: number
+        }
+        Update: {
+          created_at?: string
+          exercise_name?: string | null
+          id?: string
+          one_rm_result?: number
+          reps?: number
+          user_id?: string
+          weight_lifted?: number
+        }
+        Relationships: []
+      }
       plan_generation_usage: {
         Row: {
           generated_at: string

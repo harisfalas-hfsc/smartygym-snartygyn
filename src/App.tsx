@@ -6,6 +6,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { ProtectedRoute } from "./components/ProtectedRoute";
 import Index from "./pages/Index";
 import Auth from "./pages/Auth";
+import Dashboard from "./pages/Dashboard";
 import WorkoutFlow from "./pages/WorkoutFlow";
 import TrainingProgramFlow from "./pages/TrainingProgramFlow";
 import DietPlanFlow from "./pages/DietPlanFlow";
@@ -25,6 +26,7 @@ const App = () => (
         <Routes>
           <Route path="/" element={<Index />} />
           <Route path="/auth" element={<Auth />} />
+          <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
           <Route path="/workout" element={<ProtectedRoute><WorkoutFlow /></ProtectedRoute>} />
           <Route path="/training-program" element={<ProtectedRoute><TrainingProgramFlow /></ProtectedRoute>} />
           <Route path="/diet-plan" element={<ProtectedRoute><DietPlanFlow /></ProtectedRoute>} />
