@@ -14,7 +14,186 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      profiles: {
+        Row: {
+          created_at: string
+          full_name: string | null
+          id: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          full_name?: string | null
+          id?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          full_name?: string | null
+          id?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      progress_logs: {
+        Row: {
+          created_at: string
+          id: string
+          log_date: string
+          notes: string | null
+          photos_url: string | null
+          plan_id: string
+          plan_type: string
+          user_id: string
+          weight: number | null
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          log_date?: string
+          notes?: string | null
+          photos_url?: string | null
+          plan_id: string
+          plan_type: string
+          user_id: string
+          weight?: number | null
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          log_date?: string
+          notes?: string | null
+          photos_url?: string | null
+          plan_id?: string
+          plan_type?: string
+          user_id?: string
+          weight?: number | null
+        }
+        Relationships: []
+      }
+      saved_diet_plans: {
+        Row: {
+          comment: string | null
+          content: string
+          created_at: string
+          id: string
+          is_favorite: boolean | null
+          name: string
+          rating: number | null
+          status: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          comment?: string | null
+          content: string
+          created_at?: string
+          id?: string
+          is_favorite?: boolean | null
+          name: string
+          rating?: number | null
+          status?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          comment?: string | null
+          content?: string
+          created_at?: string
+          id?: string
+          is_favorite?: boolean | null
+          name?: string
+          rating?: number | null
+          status?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      saved_training_programs: {
+        Row: {
+          comment: string | null
+          content: string
+          created_at: string
+          duration: string
+          id: string
+          is_favorite: boolean | null
+          name: string
+          rating: number | null
+          status: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          comment?: string | null
+          content: string
+          created_at?: string
+          duration: string
+          id?: string
+          is_favorite?: boolean | null
+          name: string
+          rating?: number | null
+          status?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          comment?: string | null
+          content?: string
+          created_at?: string
+          duration?: string
+          id?: string
+          is_favorite?: boolean | null
+          name?: string
+          rating?: number | null
+          status?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      saved_workouts: {
+        Row: {
+          comment: string | null
+          content: string
+          created_at: string
+          id: string
+          is_favorite: boolean | null
+          name: string
+          rating: number | null
+          status: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          comment?: string | null
+          content: string
+          created_at?: string
+          id?: string
+          is_favorite?: boolean | null
+          name: string
+          rating?: number | null
+          status?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          comment?: string | null
+          content?: string
+          created_at?: string
+          id?: string
+          is_favorite?: boolean | null
+          name?: string
+          rating?: number | null
+          status?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
