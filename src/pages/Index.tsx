@@ -115,23 +115,24 @@ const Index = () => {
     }
   };
   return <div className="min-h-screen bg-background">
-      {/* Hero Section */}
-      <header className="py-6 px-4 border-b border-border">
+      {/* Sticky Header with Logo */}
+      <header className="sticky top-0 z-50 bg-background border-b border-border py-3 px-4">
         <div className="container mx-auto max-w-6xl">
-          <div className="flex justify-end items-center mb-6">
-            <div className="flex gap-2 flex-wrap">
+          <div className="flex justify-between items-center">
+            <img src={smartyGymLogo} alt="Smarty Gym" className="h-10 sm:h-12 w-auto" />
+            <div className="flex gap-2 items-center">
               <Button variant="outline" size="sm" onClick={() => navigate("/community")} className="text-xs sm:text-sm">
-                <Users className="h-4 w-4 mr-1" />
-                Community
+                <Users className="h-4 w-4 sm:mr-1" />
+                <span className="hidden sm:inline">Community</span>
               </Button>
               {user ? (
                 <>
-                  <Button variant="outline" size="sm" onClick={() => navigate("/dashboard")} className="text-xs sm:text-sm">
+                  <Button variant="outline" size="sm" onClick={() => navigate("/dashboard")} className="text-xs sm:text-sm hidden sm:flex">
                     Dashboard
                   </Button>
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
-                      <Button variant="outline" size="icon" className="h-9 w-9">
+                      <Button variant="outline" size="icon" className="h-8 w-8">
                         <User className="h-4 w-4" />
                       </Button>
                     </DropdownMenuTrigger>
@@ -155,11 +156,17 @@ const Index = () => {
                   <Button size="sm" onClick={() => navigate("/auth")} className="text-xs sm:text-sm">
                     Sign Up
                   </Button>
+                  <ThemeToggle />
                 </>
               )}
-              <ThemeToggle />
             </div>
           </div>
+        </div>
+      </header>
+
+      {/* Hero Section */}
+      <section className="py-6 px-4 border-b border-border">
+        <div className="container mx-auto max-w-6xl">
           <div className="flex flex-col items-center space-y-3 sm:space-y-4">
             <img src={smartyGymLogo} alt="Smarty Gym" className="h-16 sm:h-24 md:h-32 w-auto" />
             <div className="text-center px-4 max-w-3xl">
@@ -204,7 +211,7 @@ const Index = () => {
             </div>
           </div>
         </div>
-      </header>
+      </section>
 
       {/* Main Content */}
       <main className="py-8 sm:py-12 px-4">
