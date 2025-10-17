@@ -1,5 +1,3 @@
-project_id = "cvccrvyimyzrxcwzmxwk"
-
 [functions.generate-fitness-plan]
 verify_jwt = false
 
@@ -11,3 +9,6 @@ verify_jwt = true
 
 [functions.strava-disconnect]
 verify_jwt = true
+
+[functions.sync-youtube-exercises]
+verify_jwt = false

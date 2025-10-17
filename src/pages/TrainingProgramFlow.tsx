@@ -10,6 +10,7 @@ import { ArrowLeft, ArrowRight, Loader2, Play } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { StravaTrackingDialog } from "@/components/StravaTrackingDialog";
+import { WorkoutVideoPlayer } from "@/components/WorkoutVideoPlayer";
 
 const TrainingProgramFlow = () => {
   const navigate = useNavigate();
@@ -19,6 +20,7 @@ const TrainingProgramFlow = () => {
   const [generatedProgram, setGeneratedProgram] = useState("");
   const [savedProgramId, setSavedProgramId] = useState<string | null>(null);
   const [showStravaDialog, setShowStravaDialog] = useState(false);
+  const [exercises, setExercises] = useState<Array<{ name: string; video_id: string; video_url: string }>>([]);
   const [formData, setFormData] = useState({
     age: "",
     height: "",
@@ -80,6 +82,7 @@ const TrainingProgramFlow = () => {
 
       const data = await response.json();
       setGeneratedProgram(data.plan);
+      setExercises(data.exercises || []);
       setStep(5);
       toast({
         title: "Success!",
@@ -329,6 +332,9 @@ const TrainingProgramFlow = () => {
                 <h2 className="text-2xl font-semibold mb-4">
                   {formData.userName}, here is your taylor-made training program!
                 </h2>
+                <p className="text-muted-foreground mb-4">
+                  Click on exercises to view demonstrations
+                </p>
                 
                 <div className="flex gap-2 mb-4">
                   <Button variant={filterView === "all" ? "default" : "outline"} size="sm" onClick={() => setFilterView("all")}>
@@ -342,9 +348,10 @@ const TrainingProgramFlow = () => {
                   </Button>
                 </div>
 
-                <div className="bg-muted p-6 rounded-lg whitespace-pre-wrap">
-                  {generatedProgram}
-                </div>
+                <WorkoutVideoPlayer 
+                  exercises={exercises}
+                  planContent={generatedProgram}
+                />
 
                 <div className="space-y-4 pt-4">
                   <div>
@@ -395,7 +402,7 @@ const TrainingProgramFlow = () => {
                   className="w-full"
                 >
                   <Play className="mr-2 h-5 w-5" />
-                  Start Now
+                  Track with Strava
                 </Button>
 
                 <div className="flex justify-between gap-4 pt-4">

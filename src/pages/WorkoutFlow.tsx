@@ -11,6 +11,7 @@ import { ChevronLeft, ChevronRight, Loader2, Play } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { StravaTrackingDialog } from "@/components/StravaTrackingDialog";
+import { WorkoutVideoPlayer } from "@/components/WorkoutVideoPlayer";
 import smartyGymLogo from "@/assets/smarty-gym-logo.png";
 
 interface WorkoutFormData {
@@ -31,6 +32,7 @@ const WorkoutFlow = () => {
   const [generatedPlan, setGeneratedPlan] = useState("");
   const [savedWorkoutId, setSavedWorkoutId] = useState<string | null>(null);
   const [showStravaDialog, setShowStravaDialog] = useState(false);
+  const [exercises, setExercises] = useState<Array<{ name: string; video_id: string; video_url: string }>>([]);
   const [formData, setFormData] = useState<WorkoutFormData>({
     age: "",
     height: "",
@@ -107,6 +109,7 @@ const WorkoutFlow = () => {
 
       const data = await response.json();
       setGeneratedPlan(data.plan);
+      setExercises(data.exercises || []);
       setStep(5);
       toast({
         title: "Success!",
@@ -318,17 +321,19 @@ const WorkoutFlow = () => {
               </div>
             )}
 
+            {step === 5 && (
               <div className="space-y-6">
                 <div className="text-center mb-8">
                   <h2 className="text-2xl font-bold mb-2">Your Workout Plan</h2>
                   <p className="text-muted-foreground">
-                    Here's your personalized workout
+                    Click on exercises to view demonstrations
                   </p>
                 </div>
 
-                <div className="bg-muted p-6 rounded-lg whitespace-pre-wrap max-h-[500px] overflow-y-auto">
-                  {generatedPlan}
-                </div>
+                <WorkoutVideoPlayer 
+                  exercises={exercises}
+                  planContent={generatedPlan}
+                />
 
                 <div className="flex flex-col gap-4 pt-4">
                   <Button 
@@ -337,7 +342,7 @@ const WorkoutFlow = () => {
                     className="w-full"
                   >
                     <Play className="mr-2 h-5 w-5" />
-                    Start Now
+                    Track with Strava
                   </Button>
                   
                   <div className="flex justify-between gap-4">
@@ -349,6 +354,7 @@ const WorkoutFlow = () => {
                         setStep(1);
                         setGeneratedPlan("");
                         setSavedWorkoutId(null);
+                        setExercises([]);
                         setFormData({
                           age: "",
                           height: "",
@@ -372,6 +378,7 @@ const WorkoutFlow = () => {
                   planType="workout"
                 />
               </div>
+            )}
 
             {step < 5 && (
               <div className="flex justify-between mt-8">

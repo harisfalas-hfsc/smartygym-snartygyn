@@ -1,5 +1,6 @@
 import "https://deno.land/x/xhr@0.1.0/mod.ts";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.75.0';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -14,18 +15,44 @@ serve(async (req) => {
   try {
     const { type, data } = await req.json();
     const LOVABLE_API_KEY = Deno.env.get('LOVABLE_API_KEY');
+    const SUPABASE_URL = Deno.env.get('SUPABASE_URL');
+    const SUPABASE_ANON_KEY = Deno.env.get('SUPABASE_ANON_KEY');
     
     if (!LOVABLE_API_KEY) {
       throw new Error('LOVABLE_API_KEY is not configured');
     }
 
+    // Fetch available exercises from database
+    const supabase = createClient(SUPABASE_URL!, SUPABASE_ANON_KEY!);
+    const { data: exercises, error: exercisesError } = await supabase
+      .from('exercises')
+      .select('name, video_id, video_url');
+    
+    if (exercisesError) {
+      console.error('Error fetching exercises:', exercisesError);
+    }
+    
+    const exerciseList = exercises?.map(e => e.name).join(', ') || '';
+    console.log(`Available exercises (${exercises?.length || 0}):`, exerciseList);
+
     let systemPrompt = '';
     let userPrompt = '';
 
     if (type === 'workout') {
-      systemPrompt = `You are an expert fitness coach. Create a detailed workout plan based on the user's information. 
-      Format the response as a structured workout plan with exercises, sets, reps, and rest periods.
-      Include warm-up and cool-down sections. Be specific and actionable.`;
+      systemPrompt = `You are an expert fitness coach. Create a detailed workout plan using ONLY the exercises from this list:
+${exerciseList}
+
+CRITICAL RULES:
+1. You MUST ONLY use exercises from the list above
+2. Format each exercise name EXACTLY as it appears in the list
+3. Do NOT suggest any exercises not in the list
+4. If the list doesn't have enough exercises for the goal, use available exercises creatively
+
+Format the response as a structured workout plan with:
+- Warm-up section
+- Main workout with sets, reps, and rest periods
+- Cool-down section
+- Each exercise name must match the list EXACTLY (will be auto-linked to demonstration videos)`;
       
       userPrompt = `Create a workout plan for:
       - Age: ${data.age}
@@ -34,11 +61,23 @@ serve(async (req) => {
       - Goal: ${data.goal}
       - Available time: ${data.timeAvailable} minutes
       - Equipment: ${data.equipment}
-      ${data.limitations ? `- Physical limitations: ${data.limitations}` : ''}`;
+      ${data.limitations ? `- Physical limitations: ${data.limitations}` : ''}
+      
+Available exercises: ${exerciseList}`;
     } else if (type === 'training-program') {
-      systemPrompt = `You are an expert fitness coach. Create a detailed multi-week training program based on the user's information.
-      Include progressive overload principles, weekly structure, and clear progression guidelines.
-      Format as a comprehensive program with weekly breakdowns.`;
+      systemPrompt = `You are an expert fitness coach. Create a detailed multi-week training program using ONLY the exercises from this list:
+${exerciseList}
+
+CRITICAL RULES:
+1. You MUST ONLY use exercises from the list above
+2. Format each exercise name EXACTLY as it appears in the list
+3. Do NOT suggest any exercises not in the list
+4. If the list doesn't have enough exercises, use available exercises creatively with progressive overload
+
+Format as a comprehensive program with:
+- Weekly breakdowns
+- Progressive overload principles
+- Each exercise name must match the list EXACTLY (will be auto-linked to demonstration videos)`;
       
       userPrompt = `Create a training program for:
        - Age: ${data.age}
@@ -49,7 +88,9 @@ serve(async (req) => {
        - Training days per week: ${data.daysPerWeek}
        - Experience level: ${data.experienceLevel}
        - Equipment: ${Array.isArray(data.equipment) ? data.equipment.join(", ") : data.equipment}
-       ${data.limitations ? `- Physical limitations: ${data.limitations}` : ''}`;
+       ${data.limitations ? `- Physical limitations: ${data.limitations}` : ''}
+       
+Available exercises: ${exerciseList}`;
     } else if (type === 'diet') {
       // Calculate protein needs based on goal
       let proteinPerKg = 1.6; // default
@@ -122,7 +163,11 @@ serve(async (req) => {
     const aiData = await response.json();
     const generatedPlan = aiData.choices[0].message.content;
 
-    return new Response(JSON.stringify({ plan: generatedPlan }), {
+    // Return plan with exercises data for video linking
+    return new Response(JSON.stringify({ 
+      plan: generatedPlan,
+      exercises: exercises || []
+    }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     });
   } catch (error) {

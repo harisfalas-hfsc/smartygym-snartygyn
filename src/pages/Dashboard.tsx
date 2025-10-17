@@ -20,7 +20,10 @@ import {
   CheckCircle,
   Clock,
   Link as LinkIcon,
-  Bike
+  Bike,
+  Settings,
+  RefreshCw,
+  Youtube
 } from "lucide-react";
 import smartyGymLogo from "@/assets/smarty-gym-logo.png";
 
@@ -115,6 +118,7 @@ export default function Dashboard() {
   const [stravaConnection, setStravaConnection] = useState<StravaConnection | null>(null);
   const [stravaActivities, setStravaActivities] = useState<StravaActivity[]>([]);
   const [loadingStrava, setLoadingStrava] = useState(false);
+  const [syncingExercises, setSyncingExercises] = useState(false);
 
   useEffect(() => {
     checkAuth();
@@ -341,6 +345,29 @@ export default function Dashboard() {
     return hours > 0 ? `${hours}h ${minutes}m` : `${minutes}m`;
   };
 
+  const handleSyncExercises = async () => {
+    setSyncingExercises(true);
+    try {
+      const { data, error } = await supabase.functions.invoke("sync-youtube-exercises");
+
+      if (error) throw error;
+
+      toast({
+        title: "Success!",
+        description: `Synced ${data?.count || 0} exercises from YouTube playlist`,
+      });
+    } catch (error) {
+      console.error("Error syncing exercises:", error);
+      toast({
+        title: "Error",
+        description: "Failed to sync exercises from YouTube",
+        variant: "destructive",
+      });
+    } finally {
+      setSyncingExercises(false);
+    }
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -392,6 +419,10 @@ export default function Dashboard() {
             <TabsTrigger value="strava">
               <Bike className="mr-2 h-4 w-4" />
               Strava
+            </TabsTrigger>
+            <TabsTrigger value="settings">
+              <Settings className="mr-2 h-4 w-4" />
+              Settings
             </TabsTrigger>
           </TabsList>
 
@@ -764,6 +795,54 @@ export default function Dashboard() {
                     ))}
                   </div>
                 )}
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          {/* Settings Tab */}
+          <TabsContent value="settings" className="space-y-6">
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Youtube className="h-5 w-5 text-primary" />
+                  Exercise Library Management
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="space-y-2">
+                  <p className="text-sm text-muted-foreground">
+                    Sync exercises from your YouTube playlist to use in workouts and training programs.
+                  </p>
+                  <p className="text-xs text-muted-foreground">
+                    Playlist: PLT3yfwvL9SV72Hm_8XHZ8ovkuFFv9L5l2
+                  </p>
+                </div>
+                <Button 
+                  onClick={handleSyncExercises}
+                  disabled={syncingExercises}
+                  className="w-full sm:w-auto"
+                >
+                  {syncingExercises ? (
+                    <>
+                      <RefreshCw className="mr-2 h-4 w-4 animate-spin" />
+                      Syncing...
+                    </>
+                  ) : (
+                    <>
+                      <RefreshCw className="mr-2 h-4 w-4" />
+                      Sync Exercise Library
+                    </>
+                  )}
+                </Button>
+                <div className="bg-muted p-4 rounded-lg text-sm">
+                  <p className="font-medium mb-2">How it works:</p>
+                  <ul className="space-y-1 text-muted-foreground list-disc list-inside">
+                    <li>Click "Sync Exercise Library" to fetch all videos from your YouTube playlist</li>
+                    <li>Exercises will be used in all generated workouts and training programs</li>
+                    <li>Each exercise name will link to its video demonstration</li>
+                    <li>Click on exercise names during workouts to view demonstrations</li>
+                  </ul>
+                </div>
               </CardContent>
             </Card>
           </TabsContent>
