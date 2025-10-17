@@ -41,29 +41,44 @@ serve(async (req) => {
       Format as a comprehensive program with weekly breakdowns.`;
       
       userPrompt = `Create a training program for:
-      - Age: ${data.age}
-      - Height: ${data.height} cm
-      - Weight: ${data.weight} kg
-      - Goal: ${data.goal}
-      - Duration: ${data.programLength} weeks
-      - Training days per week: ${data.daysPerWeek}
-      - Experience level: ${data.experienceLevel}
-      - Equipment: ${data.equipment}
-      ${data.limitations ? `- Physical limitations: ${data.limitations}` : ''}`;
+       - Age: ${data.age}
+       - Height: ${data.height} cm
+       - Weight: ${data.weight} kg
+       - Goal: ${data.goal}
+       - Duration: ${data.programLength} weeks
+       - Training days per week: ${data.daysPerWeek}
+       - Experience level: ${data.experienceLevel}
+       - Equipment: ${Array.isArray(data.equipment) ? data.equipment.join(", ") : data.equipment}
+       ${data.limitations ? `- Physical limitations: ${data.limitations}` : ''}`;
     } else if (type === 'diet') {
+      // Calculate protein needs based on goal
+      let proteinPerKg = 1.6; // default
+      if (data.goal === "Muscle gain" || data.goal === "Bulking") {
+        proteinPerKg = 2.0; // 2g per kg for muscle gain
+      } else if (data.goal === "Weight loss" || data.goal === "Cutting") {
+        proteinPerKg = 1.8;
+      }
+
+      const proteinGrams = Math.round(parseFloat(data.weight) * proteinPerKg);
+
       systemPrompt = `You are an expert nutritionist. Create a detailed diet plan based on the user's information.
       Include meal timing, macronutrient breakdown, specific food suggestions, and hydration guidelines.
-      Format as a comprehensive daily meal plan with portions and nutritional information.`;
+      Format as a comprehensive daily meal plan with portions and nutritional information.
+      CRITICAL: For muscle gain goals, ensure protein intake is at least 2g per kg of body weight (${proteinGrams}g daily for this user).`;
       
       userPrompt = `Create a diet plan for:
-      - Age: ${data.age}
-      - Height: ${data.height} cm
-      - Weight: ${data.weight} kg
-      - Goal: ${data.goal}
-      - Activity level: ${data.activityLevel}
-      - Meals per day: ${data.mealsPerDay}
-      - Dietary restrictions: ${data.dietaryRestrictions || 'None'}
-      ${data.allergies ? `- Allergies: ${data.allergies}` : ''}`;
+       - Age: ${data.age}
+       - Height: ${data.height} cm
+       - Weight: ${data.weight} kg
+       - Goal: ${data.goal}
+       - Activity level: ${data.activityLevel}
+       - Meals per day: ${data.mealsPerDay}
+       - Diet Method: ${data.dietMethod}
+       ${data.dietMethod === "Custom" ? `- Custom Macros - Protein: ${data.customMacros.protein}%, Carbs: ${data.customMacros.carbs}%, Fats: ${data.customMacros.fats}%` : ''}
+       - Dietary restrictions: ${Array.isArray(data.dietaryRestrictions) ? data.dietaryRestrictions.join(", ") : 'None'}
+       ${data.allergies && Array.isArray(data.allergies) && data.allergies.length > 0 ? `- Allergies: ${data.allergies.join(", ")}` : ''}
+       
+       IMPORTANT: Ensure protein is at least ${proteinGrams}g per day for optimal results with this goal.`;
     }
 
     console.log('Generating plan for type:', type);

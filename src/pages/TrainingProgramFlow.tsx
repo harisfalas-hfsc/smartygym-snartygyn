@@ -23,12 +23,26 @@ const TrainingProgramFlow = () => {
     programLength: "",
     daysPerWeek: "",
     experienceLevel: "",
-    equipment: "",
+    equipment: [] as string[],
     limitations: "",
+    userName: "",
   });
+  const [rating, setRating] = useState(0);
+  const [status, setStatus] = useState<"not-started" | "in-progress" | "completed">("not-started");
+  const [comment, setComment] = useState("");
+  const [filterView, setFilterView] = useState<"all" | "day" | "week">("all");
 
-  const handleInputChange = (field: string, value: string) => {
+  const handleInputChange = (field: string, value: string | string[]) => {
     setFormData({ ...formData, [field]: value });
+  };
+
+  const handleEquipmentToggle = (equipment: string) => {
+    const current = formData.equipment as string[];
+    if (current.includes(equipment)) {
+      handleInputChange("equipment", current.filter(e => e !== equipment));
+    } else {
+      handleInputChange("equipment", [...current, equipment]);
+    }
   };
 
   const handleNext = () => {
@@ -99,6 +113,15 @@ const TrainingProgramFlow = () => {
               <div className="space-y-4">
                 <h2 className="text-2xl font-semibold mb-4">Basic Information</h2>
                 <div>
+                  <Label htmlFor="userName">Your Name</Label>
+                  <Input
+                    id="userName"
+                    value={formData.userName}
+                    onChange={(e) => handleInputChange("userName", e.target.value)}
+                    placeholder="Enter your name"
+                  />
+                </div>
+                <div>
                   <Label htmlFor="age">Age</Label>
                   <Input
                     id="age"
@@ -142,12 +165,18 @@ const TrainingProgramFlow = () => {
                 <h2 className="text-2xl font-semibold mb-4">Program Details</h2>
                 <div>
                   <Label htmlFor="goal">Training Goal</Label>
-                  <Input
-                    id="goal"
-                    value={formData.goal}
-                    onChange={(e) => handleInputChange("goal", e.target.value)}
-                    placeholder="e.g., Build muscle, Lose weight, Increase strength"
-                  />
+                  <Select value={formData.goal} onValueChange={(value) => handleInputChange("goal", value)}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select your goal" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="Build muscle">Build muscle</SelectItem>
+                      <SelectItem value="Lose weight">Lose weight</SelectItem>
+                      <SelectItem value="Increase strength">Increase strength</SelectItem>
+                      <SelectItem value="Improve endurance">Improve endurance</SelectItem>
+                      <SelectItem value="General fitness">General fitness</SelectItem>
+                    </SelectContent>
+                  </Select>
                 </div>
                 <div>
                   <Label htmlFor="programLength">Program Length (weeks)</Label>
@@ -157,9 +186,8 @@ const TrainingProgramFlow = () => {
                     </SelectTrigger>
                     <SelectContent>
                       <SelectItem value="4">4 weeks</SelectItem>
+                      <SelectItem value="6">6 weeks</SelectItem>
                       <SelectItem value="8">8 weeks</SelectItem>
-                      <SelectItem value="12">12 weeks</SelectItem>
-                      <SelectItem value="16">16 weeks</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
@@ -207,13 +235,20 @@ const TrainingProgramFlow = () => {
               <div className="space-y-4">
                 <h2 className="text-2xl font-semibold mb-4">Equipment & Limitations</h2>
                 <div>
-                  <Label htmlFor="equipment">Available Equipment</Label>
-                  <Input
-                    id="equipment"
-                    value={formData.equipment}
-                    onChange={(e) => handleInputChange("equipment", e.target.value)}
-                    placeholder="e.g., Full gym, Dumbbells only, Bodyweight"
-                  />
+                  <Label>Available Equipment (select all that apply)</Label>
+                  <div className="grid grid-cols-2 gap-3 mt-2">
+                    {["Barbell", "Dumbbells", "Kettlebell", "Resistance Bands", "Pull-up Bar", "Bench", "Squat Rack", "Cable Machine", "Bodyweight Only"].map((eq) => (
+                      <Button
+                        key={eq}
+                        type="button"
+                        variant={formData.equipment.includes(eq) ? "default" : "outline"}
+                        onClick={() => handleEquipmentToggle(eq)}
+                        className="justify-start"
+                      >
+                        {eq}
+                      </Button>
+                    ))}
+                  </div>
                 </div>
                 <div>
                   <Label htmlFor="limitations">Physical Limitations (Optional)</Label>
@@ -250,7 +285,7 @@ const TrainingProgramFlow = () => {
                   <p><strong>Program Length:</strong> {formData.programLength} weeks</p>
                   <p><strong>Training Days:</strong> {formData.daysPerWeek} per week</p>
                   <p><strong>Experience:</strong> {formData.experienceLevel}</p>
-                  <p><strong>Equipment:</strong> {formData.equipment}</p>
+                  <p><strong>Equipment:</strong> {formData.equipment.join(", ")}</p>
                   {formData.limitations && <p><strong>Limitations:</strong> {formData.limitations}</p>}
                 </div>
 
@@ -287,33 +322,121 @@ const TrainingProgramFlow = () => {
 
             {step === 5 && (
               <div className="space-y-4">
-                <h2 className="text-2xl font-semibold mb-4">Your Training Program</h2>
+                <h2 className="text-2xl font-semibold mb-4">
+                  {formData.userName}, here is your taylor-made training program!
+                </h2>
                 
+                <div className="flex gap-2 mb-4">
+                  <Button variant={filterView === "all" ? "default" : "outline"} size="sm" onClick={() => setFilterView("all")}>
+                    View All
+                  </Button>
+                  <Button variant={filterView === "week" ? "default" : "outline"} size="sm" onClick={() => setFilterView("week")}>
+                    By Week
+                  </Button>
+                  <Button variant={filterView === "day" ? "default" : "outline"} size="sm" onClick={() => setFilterView("day")}>
+                    By Day
+                  </Button>
+                </div>
+
                 <div className="bg-muted p-6 rounded-lg whitespace-pre-wrap">
                   {generatedProgram}
                 </div>
 
+                <div className="space-y-4 pt-4">
+                  <div>
+                    <Label>Rate this program</Label>
+                    <div className="flex gap-2 mt-2">
+                      {[1, 2, 3, 4, 5].map((star) => (
+                        <Button
+                          key={star}
+                          variant={rating >= star ? "default" : "outline"}
+                          size="sm"
+                          onClick={() => setRating(star)}
+                        >
+                          ⭐
+                        </Button>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div>
+                    <Label>Program Status</Label>
+                    <Select value={status} onValueChange={(value: any) => setStatus(value)}>
+                      <SelectTrigger>
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="not-started">Not Started</SelectItem>
+                        <SelectItem value="in-progress">In Progress</SelectItem>
+                        <SelectItem value="completed">Completed</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  <div>
+                    <Label htmlFor="comment">Leave a comment</Label>
+                    <Textarea
+                      id="comment"
+                      value={comment}
+                      onChange={(e) => setComment(e.target.value)}
+                      placeholder="Share your thoughts about this program..."
+                      rows={3}
+                    />
+                  </div>
+                </div>
+
                 <div className="flex justify-between gap-4 pt-4">
-                  <Button onClick={() => navigate("/")} variant="outline">
-                    Back to Home
-                  </Button>
-                  <Button onClick={() => {
-                    setStep(1);
-                    setGeneratedProgram("");
-                    setFormData({
-                      age: "",
-                      height: "",
-                      weight: "",
-                      goal: "",
-                      programLength: "",
-                      daysPerWeek: "",
-                      experienceLevel: "",
-                      equipment: "",
-                      limitations: "",
-                    });
-                  }}>
-                    Create Another Program
-                  </Button>
+                  <div className="flex gap-2">
+                    <Button onClick={() => window.print()} variant="outline">
+                      Print
+                    </Button>
+                    <Button onClick={() => {
+                      const blob = new Blob([generatedProgram], { type: 'text/plain' });
+                      const url = URL.createObjectURL(blob);
+                      const a = document.createElement('a');
+                      a.href = url;
+                      a.download = 'training-program.txt';
+                      a.click();
+                    }} variant="outline">
+                      Download
+                    </Button>
+                    <Button onClick={() => {
+                      if (navigator.share) {
+                        navigator.share({
+                          title: 'My Training Program',
+                          text: generatedProgram
+                        });
+                      }
+                    }} variant="outline">
+                      Share
+                    </Button>
+                  </div>
+                  <div className="flex gap-2">
+                    <Button onClick={() => navigate("/")} variant="outline">
+                      Back to Home
+                    </Button>
+                    <Button onClick={() => {
+                      setStep(1);
+                      setGeneratedProgram("");
+                      setRating(0);
+                      setStatus("not-started");
+                      setComment("");
+                      setFormData({
+                        age: "",
+                        height: "",
+                        weight: "",
+                        goal: "",
+                        programLength: "",
+                        daysPerWeek: "",
+                        experienceLevel: "",
+                        equipment: [],
+                        limitations: "",
+                        userName: "",
+                      });
+                    }}>
+                      Create Another Program
+                    </Button>
+                  </div>
                 </div>
               </div>
             )}
