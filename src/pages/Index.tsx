@@ -61,7 +61,7 @@ const Index = () => {
               <h1 className="text-3xl md:text-4xl font-bold mb-2">
                 Your Smart Gym in Your Pocket
               </h1>
-              <p className="text-muted-foreground text-lg">Tailor Made workouts, Training Programs, Nutrition Plans and Tolls</p>
+              <p className="text-muted-foreground text-lg">Tailor Made workouts, Training Programs, Nutrition Plans and Tools</p>
             </div>
           </div>
         </div>
