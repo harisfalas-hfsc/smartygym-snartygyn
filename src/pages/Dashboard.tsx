@@ -5,6 +5,7 @@ import { User } from "@supabase/supabase-js";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
 import { 
   Heart, 
@@ -23,7 +24,10 @@ import {
   Bike,
   Settings,
   RefreshCw,
-  Youtube
+  Youtube,
+  Filter,
+  Star,
+  Users
 } from "lucide-react";
 import smartyGymLogo from "@/assets/smarty-gym-logo.png";
 
@@ -109,6 +113,14 @@ export default function Dashboard() {
   const [favoritePrograms, setFavoritePrograms] = useState<FavoriteProgram[]>([]);
   const [favoriteDiets, setFavoriteDiets] = useState<FavoriteDiet[]>([]);
 
+  // All Plans with filtering
+  const [allWorkouts, setAllWorkouts] = useState<FavoriteWorkout[]>([]);
+  const [allPrograms, setAllPrograms] = useState<FavoriteProgram[]>([]);
+  const [workoutStatusFilter, setWorkoutStatusFilter] = useState<string>("all");
+  const [workoutRatingFilter, setWorkoutRatingFilter] = useState<string>("all");
+  const [programStatusFilter, setProgramStatusFilter] = useState<string>("all");
+  const [programRatingFilter, setProgramRatingFilter] = useState<string>("all");
+
   // Calculator History
   const [oneRMHistory, setOneRMHistory] = useState<OneRMRecord[]>([]);
   const [bmrHistory, setBMRHistory] = useState<BMRRecord[]>([]);
@@ -138,6 +150,8 @@ export default function Dashboard() {
   const fetchAllData = async (userId: string) => {
     await Promise.all([
       fetchFavorites(userId),
+      fetchAllWorkouts(userId),
+      fetchAllPrograms(userId),
       fetchCalculatorHistory(userId),
       fetchStravaData(userId)
     ]);
@@ -171,6 +185,44 @@ export default function Dashboard() {
     if (workouts) setFavoriteWorkouts(workouts);
     if (programs) setFavoritePrograms(programs);
     if (diets) setFavoriteDiets(diets);
+  };
+
+  const fetchAllWorkouts = async (userId: string) => {
+    const { data } = await supabase
+      .from("saved_workouts")
+      .select("id, name, created_at, status, rating")
+      .eq("user_id", userId)
+      .order("created_at", { ascending: false });
+
+    if (data) setAllWorkouts(data);
+  };
+
+  const fetchAllPrograms = async (userId: string) => {
+    const { data } = await supabase
+      .from("saved_training_programs")
+      .select("id, name, duration, created_at, status, rating")
+      .eq("user_id", userId)
+      .order("created_at", { ascending: false });
+
+    if (data) setAllPrograms(data);
+  };
+
+  const getFilteredWorkouts = () => {
+    return allWorkouts.filter((workout) => {
+      const statusMatch = workoutStatusFilter === "all" || workout.status === workoutStatusFilter;
+      const ratingMatch = workoutRatingFilter === "all" || 
+        (workout as any).rating >= parseInt(workoutRatingFilter);
+      return statusMatch && ratingMatch;
+    });
+  };
+
+  const getFilteredPrograms = () => {
+    return allPrograms.filter((program) => {
+      const statusMatch = programStatusFilter === "all" || program.status === programStatusFilter;
+      const ratingMatch = programRatingFilter === "all" || 
+        (program as any).rating >= parseInt(programRatingFilter);
+      return statusMatch && ratingMatch;
+    });
   };
 
   const fetchCalculatorHistory = async (userId: string) => {
@@ -407,18 +459,30 @@ export default function Dashboard() {
         </div>
 
         <Tabs defaultValue="favorites" className="space-y-6">
-          <TabsList>
+          <TabsList className="grid w-full grid-cols-3 lg:grid-cols-7">
             <TabsTrigger value="favorites">
               <Heart className="mr-2 h-4 w-4" />
               Favorites
             </TabsTrigger>
+            <TabsTrigger value="workouts">
+              <Dumbbell className="mr-2 h-4 w-4" />
+              Workouts
+            </TabsTrigger>
+            <TabsTrigger value="programs">
+              <Calendar className="mr-2 h-4 w-4" />
+              Programs
+            </TabsTrigger>
             <TabsTrigger value="calculators">
               <Calculator className="mr-2 h-4 w-4" />
-              Calculator History
+              Calculators
             </TabsTrigger>
             <TabsTrigger value="strava">
               <Bike className="mr-2 h-4 w-4" />
               Strava
+            </TabsTrigger>
+            <TabsTrigger value="community">
+              <Users className="mr-2 h-4 w-4" />
+              Community
             </TabsTrigger>
             <TabsTrigger value="settings">
               <Settings className="mr-2 h-4 w-4" />
@@ -546,6 +610,173 @@ export default function Dashboard() {
                 </CardContent>
               </Card>
             </div>
+          </TabsContent>
+
+          {/* All Workouts Tab */}
+          <TabsContent value="workouts" className="space-y-6">
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center justify-between flex-wrap gap-4">
+                  <div className="flex items-center gap-2">
+                    <Dumbbell className="h-5 w-5 text-primary" />
+                    All Workouts
+                  </div>
+                  <div className="flex gap-2 flex-wrap">
+                    <Select value={workoutStatusFilter} onValueChange={setWorkoutStatusFilter}>
+                      <SelectTrigger className="w-[150px]">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="all">All Status</SelectItem>
+                        <SelectItem value="not-started">Not Started</SelectItem>
+                        <SelectItem value="in-progress">In Progress</SelectItem>
+                        <SelectItem value="Completed">Completed</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <Select value={workoutRatingFilter} onValueChange={setWorkoutRatingFilter}>
+                      <SelectTrigger className="w-[150px]">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="all">All Ratings</SelectItem>
+                        <SelectItem value="5">5 Stars</SelectItem>
+                        <SelectItem value="4">4+ Stars</SelectItem>
+                        <SelectItem value="3">3+ Stars</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                {getFilteredWorkouts().length === 0 ? (
+                  <p className="text-sm text-muted-foreground">No workouts found with current filters</p>
+                ) : (
+                  <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+                    {getFilteredWorkouts().map((workout) => (
+                      <div
+                        key={workout.id}
+                        className="p-4 bg-muted rounded-lg cursor-pointer hover:bg-muted/80 transition-colors"
+                        onClick={() => navigate(`/workout/${workout.id}`)}
+                      >
+                        <div className="flex items-start justify-between mb-2">
+                          <p className="font-medium">{workout.name}</p>
+                          {workout.status === "Completed" ? (
+                            <CheckCircle className="h-5 w-5 text-green-500 shrink-0" />
+                          ) : (
+                            <Clock className="h-5 w-5 text-muted-foreground shrink-0" />
+                          )}
+                        </div>
+                        <p className="text-xs text-muted-foreground mb-2">
+                          {formatDate(workout.created_at)}
+                        </p>
+                        {(workout as any).rating && (
+                          <div className="flex gap-1">
+                            {Array.from({ length: (workout as any).rating }).map((_, i) => (
+                              <Star key={i} className="h-3 w-3 fill-primary text-primary" />
+                            ))}
+                          </div>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          {/* All Programs Tab */}
+          <TabsContent value="programs" className="space-y-6">
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center justify-between flex-wrap gap-4">
+                  <div className="flex items-center gap-2">
+                    <Calendar className="h-5 w-5 text-primary" />
+                    All Training Programs
+                  </div>
+                  <div className="flex gap-2 flex-wrap">
+                    <Select value={programStatusFilter} onValueChange={setProgramStatusFilter}>
+                      <SelectTrigger className="w-[150px]">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="all">All Status</SelectItem>
+                        <SelectItem value="not-started">Not Started</SelectItem>
+                        <SelectItem value="in-progress">In Progress</SelectItem>
+                        <SelectItem value="Completed">Completed</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <Select value={programRatingFilter} onValueChange={setProgramRatingFilter}>
+                      <SelectTrigger className="w-[150px]">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="all">All Ratings</SelectItem>
+                        <SelectItem value="5">5 Stars</SelectItem>
+                        <SelectItem value="4">4+ Stars</SelectItem>
+                        <SelectItem value="3">3+ Stars</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                {getFilteredPrograms().length === 0 ? (
+                  <p className="text-sm text-muted-foreground">No programs found with current filters</p>
+                ) : (
+                  <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+                    {getFilteredPrograms().map((program) => (
+                      <div
+                        key={program.id}
+                        className="p-4 bg-muted rounded-lg cursor-pointer hover:bg-muted/80 transition-colors"
+                        onClick={() => navigate(`/training-program/${program.id}`)}
+                      >
+                        <div className="flex items-start justify-between mb-2">
+                          <p className="font-medium">{program.name}</p>
+                          {program.status === "Completed" ? (
+                            <CheckCircle className="h-5 w-5 text-green-500 shrink-0" />
+                          ) : (
+                            <Clock className="h-5 w-5 text-muted-foreground shrink-0" />
+                          )}
+                        </div>
+                        <p className="text-xs text-muted-foreground mb-2">
+                          {program.duration} • {formatDate(program.created_at)}
+                        </p>
+                        {(program as any).rating && (
+                          <div className="flex gap-1">
+                            {Array.from({ length: (program as any).rating }).map((_, i) => (
+                              <Star key={i} className="h-3 w-3 fill-primary text-primary" />
+                            ))}
+                          </div>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          {/* Community Tab */}
+          <TabsContent value="community" className="space-y-6">
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Users className="h-5 w-5 text-primary" />
+                  Community Forum
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="text-center py-12">
+                <Users className="h-16 w-16 text-primary mx-auto mb-4" />
+                <h3 className="text-xl font-bold mb-2">Join the Smarty Gym Community!</h3>
+                <p className="text-muted-foreground mb-6">
+                  Connect with other fitness enthusiasts, share experiences, and stay motivated together.
+                </p>
+                <Button size="lg" onClick={() => navigate("/community")}>
+                  <Users className="mr-2 h-5 w-5" />
+                  Go to Community Forum
+                </Button>
+              </CardContent>
+            </Card>
           </TabsContent>
 
           {/* Calculator History Tab */}

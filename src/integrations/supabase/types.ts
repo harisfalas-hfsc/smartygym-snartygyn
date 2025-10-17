@@ -89,6 +89,33 @@ export type Database = {
         }
         Relationships: []
       }
+      community_messages: {
+        Row: {
+          created_at: string
+          id: string
+          message: string
+          updated_at: string
+          user_id: string
+          user_name: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          message: string
+          updated_at?: string
+          user_id: string
+          user_name: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          message?: string
+          updated_at?: string
+          user_id?: string
+          user_name?: string
+        }
+        Relationships: []
+      }
       exercises: {
         Row: {
           created_at: string

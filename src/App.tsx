@@ -5,6 +5,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { ProtectedRoute } from "./components/ProtectedRoute";
 import { AuthenticatedLayout } from "./components/AuthenticatedLayout";
+import Community from "./pages/Community";
 import Index from "./pages/Index";
 import Auth from "./pages/Auth";
 import Dashboard from "./pages/Dashboard";
@@ -34,6 +35,7 @@ const App = () => (
             <Route path="/workout" element={<WorkoutFlow />} />
             <Route path="/training-program" element={<TrainingProgramFlow />} />
             <Route path="/diet-plan" element={<DietPlanFlow />} />
+            <Route path="/community" element={<Community />} />
           </Route>
           
           {/* Public calculator routes */}
