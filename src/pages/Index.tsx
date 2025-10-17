@@ -8,6 +8,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { User as SupabaseUser } from "@supabase/supabase-js";
 import { useToast } from "@/hooks/use-toast";
 import smartyGymLogo from "@/assets/smarty-gym-logo.png";
+import { ThemeToggle } from "@/components/ThemeToggle";
 const Index = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
@@ -156,6 +157,7 @@ const Index = () => {
                   </Button>
                 </>
               )}
+              <ThemeToggle />
             </div>
           </div>
           <div className="flex flex-col items-center space-y-3 sm:space-y-4">
