@@ -207,7 +207,7 @@ export default function Community() {
             rel="noopener noreferrer"
             className="group"
           >
-            <Card className="h-full transition-all hover:shadow-lg hover:scale-105 bg-gradient-to-br from-purple-500/10 via-pink-500/10 to-orange-500/10 border-pink-200 dark:border-pink-800">
+            <Card className="h-full flex flex-col transition-all hover:shadow-lg hover:scale-105 bg-gradient-to-br from-purple-500/10 via-pink-500/10 to-orange-500/10 border-pink-200 dark:border-pink-800">
               <CardHeader>
                 <CardTitle className="flex items-center gap-3">
                   <div className="p-2 rounded-full bg-gradient-to-br from-purple-500 to-pink-500">
@@ -219,8 +219,8 @@ export default function Community() {
                   </div>
                 </CardTitle>
               </CardHeader>
-              <CardContent>
-                <p className="text-sm text-muted-foreground mb-4">
+              <CardContent className="flex-1 flex flex-col">
+                <p className="text-sm text-muted-foreground mb-4 flex-1">
                   Follow us for daily workout tips, motivation, and fitness inspiration!
                 </p>
                 <Button variant="outline" className="w-full group-hover:bg-primary group-hover:text-primary-foreground">
@@ -237,7 +237,7 @@ export default function Community() {
             rel="noopener noreferrer"
             className="group"
           >
-            <Card className="h-full transition-all hover:shadow-lg hover:scale-105 bg-gradient-to-br from-blue-500/10 to-blue-600/10 border-blue-200 dark:border-blue-800">
+            <Card className="h-full flex flex-col transition-all hover:shadow-lg hover:scale-105 bg-gradient-to-br from-blue-500/10 to-blue-600/10 border-blue-200 dark:border-blue-800">
               <CardHeader>
                 <CardTitle className="flex items-center gap-3">
                   <div className="p-2 rounded-full bg-blue-600">
@@ -249,8 +249,8 @@ export default function Community() {
                   </div>
                 </CardTitle>
               </CardHeader>
-              <CardContent>
-                <p className="text-sm text-muted-foreground mb-4">
+              <CardContent className="flex-1 flex flex-col">
+                <p className="text-sm text-muted-foreground mb-4 flex-1">
                   Join our community for fitness updates, events, and success stories!
                 </p>
                 <Button variant="outline" className="w-full group-hover:bg-primary group-hover:text-primary-foreground">
@@ -267,7 +267,7 @@ export default function Community() {
             rel="noopener noreferrer"
             className="group"
           >
-            <Card className="h-full transition-all hover:shadow-lg hover:scale-105 bg-gradient-to-br from-gray-800/10 to-gray-900/10 border-gray-200 dark:border-gray-700">
+            <Card className="h-full flex flex-col transition-all hover:shadow-lg hover:scale-105 bg-gradient-to-br from-gray-800/10 to-gray-900/10 border-gray-200 dark:border-gray-700">
               <CardHeader>
                 <CardTitle className="flex items-center gap-3">
                   <div className="p-2 rounded-full bg-black dark:bg-white">
@@ -281,8 +281,8 @@ export default function Community() {
                   </div>
                 </CardTitle>
               </CardHeader>
-              <CardContent>
-                <p className="text-sm text-muted-foreground mb-4">
+              <CardContent className="flex-1 flex flex-col">
+                <p className="text-sm text-muted-foreground mb-4 flex-1">
                   Watch quick workout videos, fitness hacks, and trending challenges!
                 </p>
                 <Button variant="outline" className="w-full group-hover:bg-primary group-hover:text-primary-foreground">
