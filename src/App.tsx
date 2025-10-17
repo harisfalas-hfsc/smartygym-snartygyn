@@ -34,10 +34,12 @@ const App = () => (
           <Route path="/training-program" element={<TrainingProgramFlow />} />
           <Route path="/diet-plan" element={<DietPlanFlow />} />
           
+          {/* Public community page */}
+          <Route path="/community" element={<Community />} />
+          
           {/* Authenticated routes with motivational banner */}
           <Route element={<ProtectedRoute><AuthenticatedLayout /></ProtectedRoute>}>
             <Route path="/dashboard" element={<Dashboard />} />
-            <Route path="/community" element={<Community />} />
           </Route>
           
           {/* Public calculator routes */}

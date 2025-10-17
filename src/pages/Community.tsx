@@ -90,7 +90,17 @@ export default function Community() {
   const handleSendMessage = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!newMessage.trim() || !user) return;
+    if (!newMessage.trim()) return;
+    
+    if (!user) {
+      toast({
+        title: "Authentication required",
+        description: "Please login to post messages",
+        variant: "destructive",
+      });
+      navigate('/auth');
+      return;
+    }
 
     setLoading(true);
     try {
@@ -178,14 +188,25 @@ export default function Community() {
               </div>
             </div>
             <div className="flex gap-2 w-full sm:w-auto">
-              <Button variant="outline" size="sm" onClick={() => navigate("/dashboard")} className="flex-1 sm:flex-initial text-xs sm:text-sm">
+              <Button variant="outline" size="sm" onClick={() => navigate("/")} className="flex-1 sm:flex-initial text-xs sm:text-sm">
                 <ArrowLeft className="mr-1 sm:mr-2 h-4 w-4" />
-                <span className="hidden sm:inline">Dashboard</span>
+                <span className="hidden sm:inline">Home</span>
                 <span className="sm:hidden">Back</span>
               </Button>
-              <Button variant="outline" size="sm" onClick={handleLogout} className="flex-1 sm:flex-initial text-xs sm:text-sm">
-                Logout
-              </Button>
+              {user ? (
+                <>
+                  <Button variant="outline" size="sm" onClick={() => navigate("/dashboard")} className="flex-1 sm:flex-initial text-xs sm:text-sm">
+                    Dashboard
+                  </Button>
+                  <Button variant="outline" size="sm" onClick={handleLogout} className="flex-1 sm:flex-initial text-xs sm:text-sm">
+                    Logout
+                  </Button>
+                </>
+              ) : (
+                <Button size="sm" onClick={() => navigate("/auth")} className="flex-1 sm:flex-initial text-xs sm:text-sm">
+                  Login
+                </Button>
+              )}
             </div>
           </div>
 
@@ -287,23 +308,34 @@ export default function Community() {
                   <div ref={messagesEndRef} />
                 </div>
 
-                <form onSubmit={handleSendMessage} className="p-4 border-t">
-                  <div className="flex gap-2">
-                    <Input
-                      value={newMessage}
-                      onChange={(e) => setNewMessage(e.target.value)}
-                      placeholder="Share your thoughts..."
-                      maxLength={500}
-                      disabled={loading}
-                    />
-                    <Button type="submit" disabled={loading || !newMessage.trim()}>
-                      <Send className="h-4 w-4" />
+                {user ? (
+                  <form onSubmit={handleSendMessage} className="p-4 border-t">
+                    <div className="flex gap-2">
+                      <Input
+                        value={newMessage}
+                        onChange={(e) => setNewMessage(e.target.value)}
+                        placeholder="Share your thoughts..."
+                        maxLength={500}
+                        disabled={loading}
+                      />
+                      <Button type="submit" disabled={loading || !newMessage.trim()}>
+                        <Send className="h-4 w-4" />
+                      </Button>
+                    </div>
+                    <p className="text-xs text-muted-foreground mt-2">
+                      {newMessage.length}/500 characters
+                    </p>
+                  </form>
+                ) : (
+                  <div className="p-4 border-t text-center bg-muted/50">
+                    <p className="text-sm text-muted-foreground mb-3">
+                      Join the conversation! Login to share your fitness journey.
+                    </p>
+                    <Button onClick={() => navigate('/auth')} size="sm" className="w-full sm:w-auto">
+                      Login to Post
                     </Button>
                   </div>
-                  <p className="text-xs text-muted-foreground mt-2">
-                    {newMessage.length}/500 characters
-                  </p>
-                </form>
+                )}
               </CardContent>
             </Card>
           </TabsContent>

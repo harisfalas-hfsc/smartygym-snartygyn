@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { ServiceCard } from "@/components/ServiceCard";
 import { Button } from "@/components/ui/button";
-import { Dumbbell, Calendar, Utensils, Calculator, Activity, Flame, User, LogOut, Instagram, Facebook } from "lucide-react";
+import { Dumbbell, Calendar, Utensils, Calculator, Activity, Flame, User, LogOut, Instagram, Facebook, Users } from "lucide-react";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { supabase } from "@/integrations/supabase/client";
 import { User as SupabaseUser } from "@supabase/supabase-js";
@@ -88,6 +88,10 @@ const Index = () => {
         <div className="container mx-auto max-w-6xl">
           <div className="flex justify-end items-center mb-6">
             <div className="flex gap-2 flex-wrap">
+              <Button variant="outline" size="sm" onClick={() => navigate("/community")} className="text-xs sm:text-sm">
+                <Users className="h-4 w-4 mr-1" />
+                Community
+              </Button>
               {user ? (
                 <>
                   <Button variant="outline" size="sm" onClick={() => navigate("/dashboard")} className="text-xs sm:text-sm">
