@@ -10,11 +10,14 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { useToast } from "@/hooks/use-toast";
 import { ArrowLeft } from "lucide-react";
 import smartyGymLogo from "@/assets/smarty-gym-logo.png";
+import { AvatarSetupDialog } from "@/components/AvatarSetupDialog";
 
 export default function Auth() {
   const navigate = useNavigate();
   const { toast } = useToast();
   const [loading, setLoading] = useState(false);
+  const [showAvatarSetup, setShowAvatarSetup] = useState(false);
+  const [newUserId, setNewUserId] = useState<string | null>(null);
 
   // Check if user is already authenticated
   useEffect(() => {
@@ -73,7 +76,7 @@ export default function Auth() {
     setLoading(true);
 
     try {
-      const { error } = await supabase.auth.signUp({
+      const { data, error } = await supabase.auth.signUp({
         email: signUpData.email,
         password: signUpData.password,
         options: {
@@ -99,11 +102,12 @@ export default function Auth() {
           });
         }
       } else {
+        setNewUserId(data.user?.id || null);
         toast({
           title: "Success!",
-          description: "Account created successfully. Redirecting...",
+          description: "Account created successfully!",
         });
-        setTimeout(() => navigate("/dashboard"), 1500);
+        setShowAvatarSetup(true);
       }
     } catch (error: any) {
       toast({
@@ -160,6 +164,20 @@ export default function Auth() {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-background p-4">
+      {showAvatarSetup && newUserId && (
+        <AvatarSetupDialog
+          open={showAvatarSetup}
+          onOpenChange={(open) => {
+            setShowAvatarSetup(open);
+            if (!open) {
+              setTimeout(() => navigate("/dashboard"), 500);
+            }
+          }}
+          userId={newUserId}
+          userName={signUpData.fullName}
+        />
+      )}
+
       <div className="w-full max-w-md">
         <Button 
           variant="ghost" 

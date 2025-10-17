@@ -30,6 +30,7 @@ import {
   Users
 } from "lucide-react";
 import smartyGymLogo from "@/assets/smarty-gym-logo.png";
+import { AvatarUpload } from "@/components/AvatarUpload";
 
 interface FavoriteWorkout {
   id: string;
@@ -131,6 +132,7 @@ export default function Dashboard() {
   const [stravaActivities, setStravaActivities] = useState<StravaActivity[]>([]);
   const [loadingStrava, setLoadingStrava] = useState(false);
   const [syncingExercises, setSyncingExercises] = useState(false);
+  const [profileAvatarUrl, setProfileAvatarUrl] = useState<string | null>(null);
 
   useEffect(() => {
     checkAuth();
@@ -143,6 +145,18 @@ export default function Dashboard() {
       return;
     }
     setUser(session.user);
+    
+    // Fetch user profile for avatar
+    const { data: profile } = await supabase
+      .from('profiles')
+      .select('avatar_url')
+      .eq('user_id', session.user.id)
+      .maybeSingle();
+    
+    if (profile) {
+      setProfileAvatarUrl(profile.avatar_url);
+    }
+    
     await fetchAllData(session.user.id);
     setLoading(false);
   };
@@ -1069,6 +1083,25 @@ export default function Dashboard() {
 
           {/* Settings Tab */}
           <TabsContent value="settings" className="space-y-6">
+            <Card>
+              <CardHeader>
+                <CardTitle>Profile Settings</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-6">
+                <div>
+                  <h3 className="text-lg font-semibold mb-4">Avatar</h3>
+                  {user && (
+                    <AvatarUpload 
+                      userId={user.id}
+                      currentAvatarUrl={profileAvatarUrl}
+                      userName={user.user_metadata?.full_name}
+                      onAvatarUpdate={(url) => setProfileAvatarUrl(url)}
+                    />
+                  )}
+                </div>
+              </CardContent>
+            </Card>
+
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">

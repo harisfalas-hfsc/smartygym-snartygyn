@@ -116,6 +116,36 @@ export type Database = {
         }
         Relationships: []
       }
+      direct_messages: {
+        Row: {
+          created_at: string | null
+          id: string
+          message: string
+          read: boolean | null
+          receiver_id: string
+          sender_id: string
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          message: string
+          read?: boolean | null
+          receiver_id: string
+          sender_id: string
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          message?: string
+          read?: boolean | null
+          receiver_id?: string
+          sender_id?: string
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       exercises: {
         Row: {
           created_at: string
@@ -202,6 +232,7 @@ export type Database = {
       }
       profiles: {
         Row: {
+          avatar_url: string | null
           created_at: string
           full_name: string | null
           id: string
@@ -209,6 +240,7 @@ export type Database = {
           user_id: string
         }
         Insert: {
+          avatar_url?: string | null
           created_at?: string
           full_name?: string | null
           id?: string
@@ -216,6 +248,7 @@ export type Database = {
           user_id: string
         }
         Update: {
+          avatar_url?: string | null
           created_at?: string
           full_name?: string | null
           id?: string
