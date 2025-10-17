@@ -197,7 +197,103 @@ export default function Community() {
       </header>
 
       {/* Main Content */}
-      <main className="flex-1 container mx-auto max-w-4xl p-4 flex flex-col">
+      <main className="flex-1 container mx-auto max-w-4xl p-4 flex flex-col gap-4">
+        {/* Social Media Cards Section */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          {/* Instagram Card */}
+          <a
+            href="https://www.instagram.com/thesmartygym/"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="group"
+          >
+            <Card className="h-full transition-all hover:shadow-lg hover:scale-105 bg-gradient-to-br from-purple-500/10 via-pink-500/10 to-orange-500/10 border-pink-200 dark:border-pink-800">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-3">
+                  <div className="p-2 rounded-full bg-gradient-to-br from-purple-500 to-pink-500">
+                    <Instagram className="h-5 w-5 text-white" />
+                  </div>
+                  <div>
+                    <div className="text-lg font-bold">Instagram</div>
+                    <div className="text-xs text-muted-foreground font-normal">@thesmartygym</div>
+                  </div>
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-sm text-muted-foreground mb-4">
+                  Follow us for daily workout tips, motivation, and fitness inspiration!
+                </p>
+                <Button variant="outline" className="w-full group-hover:bg-primary group-hover:text-primary-foreground">
+                  Follow on Instagram
+                </Button>
+              </CardContent>
+            </Card>
+          </a>
+
+          {/* Facebook Card */}
+          <a
+            href="https://www.facebook.com/profile.php?id=61579302997368"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="group"
+          >
+            <Card className="h-full transition-all hover:shadow-lg hover:scale-105 bg-gradient-to-br from-blue-500/10 to-blue-600/10 border-blue-200 dark:border-blue-800">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-3">
+                  <div className="p-2 rounded-full bg-blue-600">
+                    <Facebook className="h-5 w-5 text-white" />
+                  </div>
+                  <div>
+                    <div className="text-lg font-bold">Facebook</div>
+                    <div className="text-xs text-muted-foreground font-normal">Smarty Gym</div>
+                  </div>
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-sm text-muted-foreground mb-4">
+                  Join our community for fitness updates, events, and success stories!
+                </p>
+                <Button variant="outline" className="w-full group-hover:bg-primary group-hover:text-primary-foreground">
+                  Like on Facebook
+                </Button>
+              </CardContent>
+            </Card>
+          </a>
+
+          {/* TikTok Card */}
+          <a
+            href="https://www.tiktok.com/@thesmartygym?lang=en"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="group"
+          >
+            <Card className="h-full transition-all hover:shadow-lg hover:scale-105 bg-gradient-to-br from-gray-800/10 to-gray-900/10 border-gray-200 dark:border-gray-700">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-3">
+                  <div className="p-2 rounded-full bg-black dark:bg-white">
+                    <svg className="h-5 w-5 text-white dark:text-black" viewBox="0 0 24 24" fill="currentColor">
+                      <path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-5.2 1.74 2.89 2.89 0 0 1 2.31-4.64 2.93 2.93 0 0 1 .88.13V9.4a6.84 6.84 0 0 0-1-.05A6.33 6.33 0 0 0 5 20.1a6.34 6.34 0 0 0 10.86-4.43v-7a8.16 8.16 0 0 0 4.77 1.52v-3.4a4.85 4.85 0 0 1-1-.1z"/>
+                    </svg>
+                  </div>
+                  <div>
+                    <div className="text-lg font-bold">TikTok</div>
+                    <div className="text-xs text-muted-foreground font-normal">@thesmartygym</div>
+                  </div>
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-sm text-muted-foreground mb-4">
+                  Watch quick workout videos, fitness hacks, and trending challenges!
+                </p>
+                <Button variant="outline" className="w-full group-hover:bg-primary group-hover:text-primary-foreground">
+                  Follow on TikTok
+                </Button>
+              </CardContent>
+            </Card>
+          </a>
+        </div>
+
+        {/* Community Messages Card */}
         <Card className="flex-1 flex flex-col">
           <CardHeader className="bg-gradient-to-r from-primary/10 to-primary/5">
             <CardTitle className="flex items-center gap-2">
