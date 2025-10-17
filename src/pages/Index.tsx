@@ -1,91 +1,67 @@
 import { useNavigate } from "react-router-dom";
 import { ServiceCard } from "@/components/ServiceCard";
 import { Button } from "@/components/ui/button";
-import {
-  Dumbbell,
-  Calendar,
-  Utensils,
-  Calculator,
-  Activity,
-  Flame,
-} from "lucide-react";
+import { Dumbbell, Calendar, Utensils, Calculator, Activity, Flame } from "lucide-react";
 import smartyGymLogo from "@/assets/smarty-gym-logo.png";
-
 const Index = () => {
   const navigate = useNavigate();
-
-  const services = [
-    {
-      id: "workout",
-      icon: Dumbbell,
-      title: "Workout",
-      description: "Get a standalone workout plan tailored to your goals",
-    },
-    {
-      id: "training-program",
-      icon: Calendar,
-      title: "Training Program",
-      description: "4-8 week comprehensive training programs",
-    },
-    {
-      id: "diet-plan",
-      icon: Utensils,
-      title: "Diet Plan",
-      description: "Personalized nutrition plans for your goals",
-    },
-    {
-      id: "1rm-calculator",
-      icon: Calculator,
-      title: "1RM Calculator",
-      description: "Calculate your one-rep maximum",
-    },
-    {
-      id: "bmr-calculator",
-      icon: Activity,
-      title: "BMR Calculator",
-      description: "Calculate your basal metabolic rate",
-    },
-    {
-      id: "calorie-calculator",
-      icon: Flame,
-      title: "Calorie Calculator",
-      description: "Track your daily calorie consumption",
-    },
-  ];
-
+  const services = [{
+    id: "workout",
+    icon: Dumbbell,
+    title: "Workout",
+    description: "Get a standalone workout plan tailored to your goals"
+  }, {
+    id: "training-program",
+    icon: Calendar,
+    title: "Training Program",
+    description: "4-8 week comprehensive training programs"
+  }, {
+    id: "diet-plan",
+    icon: Utensils,
+    title: "Diet Plan",
+    description: "Personalized nutrition plans for your goals"
+  }, {
+    id: "1rm-calculator",
+    icon: Calculator,
+    title: "1RM Calculator",
+    description: "Calculate your one-rep maximum"
+  }, {
+    id: "bmr-calculator",
+    icon: Activity,
+    title: "BMR Calculator",
+    description: "Calculate your basal metabolic rate"
+  }, {
+    id: "calorie-calculator",
+    icon: Flame,
+    title: "Calorie Calculator",
+    description: "Track your daily calorie consumption"
+  }];
   const handleServiceSelect = (serviceId: string) => {
-    const routes: { [key: string]: string } = {
+    const routes: {
+      [key: string]: string;
+    } = {
       "workout": "/workout",
       "training-program": "/training-program",
       "diet-plan": "/diet-plan",
       "1rm-calculator": "/1rm-calculator",
       "bmr-calculator": "/bmr-calculator",
-      "calorie-calculator": "/calorie-calculator",
+      "calorie-calculator": "/calorie-calculator"
     };
-    
     if (routes[serviceId]) {
       navigate(routes[serviceId]);
     }
   };
-
-  return (
-    <div className="min-h-screen bg-background">
+  return <div className="min-h-screen bg-background">
       {/* Hero Section */}
       <header className="py-8 px-4 border-b border-border">
         <div className="container mx-auto max-w-6xl">
           <div className="flex flex-col items-center space-y-4">
-            <img
-              src={smartyGymLogo}
-              alt="Smarty Gym"
-              className="h-24 md:h-32 w-auto"
-            />
+            <img src={smartyGymLogo} alt="Smarty Gym" className="h-24 md:h-32 w-auto" />
             <div className="text-center">
               <h1 className="text-3xl md:text-4xl font-bold mb-2">
                 Your Smart Gym in Your Pocket
               </h1>
-              <p className="text-muted-foreground text-lg">
-                AI-powered workouts, training programs, and nutrition plans
-              </p>
+              <p className="text-muted-foreground text-lg">Tailor Made workouts, Training Programs, Nutrition Plans and Tolls</p>
             </div>
           </div>
         </div>
@@ -98,22 +74,12 @@ const Index = () => {
             <h2 className="text-2xl md:text-3xl font-bold mb-4">
               I Want To...
             </h2>
-            <p className="text-muted-foreground">
-              Choose a service to get started with your personalized fitness journey
-            </p>
+            <p className="text-muted-foreground">Choose a service to get started with your personalized fitness journey</p>
           </div>
 
           {/* Services Grid */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
-            {services.map((service) => (
-              <ServiceCard
-                key={service.id}
-                icon={service.icon}
-                title={service.title}
-                description={service.description}
-                onClick={() => handleServiceSelect(service.id)}
-              />
-            ))}
+            {services.map(service => <ServiceCard key={service.id} icon={service.icon} title={service.title} description={service.description} onClick={() => handleServiceSelect(service.id)} />)}
           </div>
 
           {/* CTA Section */}
@@ -156,8 +122,6 @@ const Index = () => {
           <p>© 2025 Smarty Gym. Your intelligent fitness companion.</p>
         </div>
       </footer>
-    </div>
-  );
+    </div>;
 };
-
 export default Index;
