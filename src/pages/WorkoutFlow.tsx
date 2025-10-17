@@ -7,7 +7,8 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Textarea } from "@/components/ui/textarea";
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import { ChevronLeft, ChevronRight, Loader2 } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
 import smartyGymLogo from "@/assets/smarty-gym-logo.png";
 
 interface WorkoutFormData {
@@ -22,7 +23,10 @@ interface WorkoutFormData {
 
 const WorkoutFlow = () => {
   const navigate = useNavigate();
+  const { toast } = useToast();
   const [step, setStep] = useState(1);
+  const [loading, setLoading] = useState(false);
+  const [generatedPlan, setGeneratedPlan] = useState("");
   const [formData, setFormData] = useState<WorkoutFormData>({
     age: "",
     height: "",
@@ -73,9 +77,47 @@ const WorkoutFlow = () => {
     else navigate("/");
   };
 
-  const handleSubmit = () => {
-    // TODO: Generate workout with AI
-    console.log("Form submitted:", formData);
+  const handleSubmit = async () => {
+    setLoading(true);
+    try {
+      const response = await fetch(
+        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/generate-fitness-plan`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            type: "workout",
+            data: {
+              ...formData,
+              equipment: formData.equipment.join(", "),
+            },
+          }),
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error("Failed to generate workout plan");
+      }
+
+      const data = await response.json();
+      setGeneratedPlan(data.plan);
+      setStep(5);
+      toast({
+        title: "Success!",
+        description: "Your workout plan has been generated.",
+      });
+    } catch (error) {
+      console.error("Error generating workout:", error);
+      toast({
+        title: "Error",
+        description: "Failed to generate workout plan. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -95,21 +137,23 @@ const WorkoutFlow = () => {
 
       <main className="py-8 px-4">
         <div className="container mx-auto max-w-2xl">
-          <div className="mb-8">
-            <div className="flex justify-between items-center mb-4">
-              {[1, 2, 3, 4].map((s) => (
-                <div
-                  key={s}
-                  className={`flex-1 h-2 rounded-full mx-1 transition-colors ${
-                    s <= step ? "bg-primary" : "bg-muted"
-                  }`}
-                />
-              ))}
+          {step < 5 && (
+            <div className="mb-8">
+              <div className="flex justify-between items-center mb-4">
+                {[1, 2, 3, 4].map((s) => (
+                  <div
+                    key={s}
+                    className={`flex-1 h-2 rounded-full mx-1 transition-colors ${
+                      s <= step ? "bg-primary" : "bg-muted"
+                    }`}
+                  />
+                ))}
+              </div>
+              <p className="text-center text-sm text-muted-foreground">
+                Step {step} of 4
+              </p>
             </div>
-            <p className="text-center text-sm text-muted-foreground">
-              Step {step} of 4
-            </p>
-          </div>
+          )}
 
           <Card className="p-8">
             {step === 1 && (
@@ -270,23 +314,70 @@ const WorkoutFlow = () => {
               </div>
             )}
 
-            <div className="flex justify-between mt-8">
-              <Button variant="outline" onClick={handleBack}>
-                <ChevronLeft className="w-4 h-4 mr-2" />
-                {step === 1 ? "Cancel" : "Back"}
-              </Button>
+            {step === 5 && (
+              <div className="space-y-6">
+                <div className="text-center mb-8">
+                  <h2 className="text-2xl font-bold mb-2">Your Workout Plan</h2>
+                  <p className="text-muted-foreground">
+                    Here's your personalized workout
+                  </p>
+                </div>
 
-              {step < 4 ? (
-                <Button onClick={handleNext}>
-                  Next
-                  <ChevronRight className="w-4 h-4 ml-2" />
+                <div className="bg-muted p-6 rounded-lg whitespace-pre-wrap max-h-[500px] overflow-y-auto">
+                  {generatedPlan}
+                </div>
+
+                <div className="flex justify-between gap-4 pt-4">
+                  <Button onClick={() => navigate("/")} variant="outline">
+                    Back to Home
+                  </Button>
+                  <Button
+                    onClick={() => {
+                      setStep(1);
+                      setGeneratedPlan("");
+                      setFormData({
+                        age: "",
+                        height: "",
+                        weight: "",
+                        goal: "",
+                        timeAvailable: "",
+                        equipment: [],
+                        limitations: "",
+                      });
+                    }}
+                  >
+                    Create Another Plan
+                  </Button>
+                </div>
+              </div>
+            )}
+
+            {step < 5 && (
+              <div className="flex justify-between mt-8">
+                <Button variant="outline" onClick={handleBack}>
+                  <ChevronLeft className="w-4 h-4 mr-2" />
+                  {step === 1 ? "Cancel" : "Back"}
                 </Button>
-              ) : (
-                <Button onClick={handleSubmit}>
-                  Generate My Workout
-                </Button>
-              )}
-            </div>
+
+                {step < 4 ? (
+                  <Button onClick={handleNext}>
+                    Next
+                    <ChevronRight className="w-4 h-4 ml-2" />
+                  </Button>
+                ) : (
+                  <Button onClick={handleSubmit} disabled={loading}>
+                    {loading ? (
+                      <>
+                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                        Generating...
+                      </>
+                    ) : (
+                      "Generate My Workout"
+                    )}
+                  </Button>
+                )}
+              </div>
+            )}
           </Card>
         </div>
       </main>

@@ -54,11 +54,17 @@ const Index = () => {
   ];
 
   const handleServiceSelect = (serviceId: string) => {
-    if (serviceId === "workout") {
-      navigate("/workout");
-    } else {
-      // TODO: Add other service routes
-      console.log("Service not yet implemented:", serviceId);
+    const routes: { [key: string]: string } = {
+      "workout": "/workout",
+      "training-program": "/training-program",
+      "diet-plan": "/diet-plan",
+      "1rm-calculator": "/1rm-calculator",
+      "bmr-calculator": "/bmr-calculator",
+      "calorie-calculator": "/calorie-calculator",
+    };
+    
+    if (routes[serviceId]) {
+      navigate(routes[serviceId]);
     }
   };
 
