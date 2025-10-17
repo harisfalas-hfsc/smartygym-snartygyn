@@ -40,11 +40,27 @@ export default function Community() {
   } | null>(null);
   const [timeFilter, setTimeFilter] = useState<string>("all");
   const [selectedDate, setSelectedDate] = useState<Date | undefined>(undefined);
+  const [hasActiveSubscription, setHasActiveSubscription] = useState(false);
 
   useEffect(() => {
     const checkAuth = async () => {
       const { data: { session } } = await supabase.auth.getSession();
-      if (session) setUser(session.user);
+      if (session) {
+        setUser(session.user);
+        
+        // Check if user has active subscription
+        const { data: subscription } = await supabase
+          .from('user_subscriptions')
+          .select('plan_type, status')
+          .eq('user_id', session.user.id)
+          .single();
+        
+        const isSubscribed = subscription && 
+          subscription.status === 'active' && 
+          subscription.plan_type !== 'free';
+        
+        setHasActiveSubscription(isSubscribed || false);
+      }
     };
     checkAuth();
 
@@ -108,6 +124,15 @@ export default function Community() {
       return;
     }
 
+    if (!hasActiveSubscription) {
+      toast({
+        title: "Subscription required",
+        description: "Only subscribers can post messages in the community forum",
+        variant: "destructive",
+      });
+      return;
+    }
+
     setLoading(true);
     try {
       const userName = user.user_metadata?.full_name || user.email?.split('@')[0] || 'User';
@@ -123,6 +148,10 @@ export default function Community() {
       if (error) throw error;
 
       setNewMessage("");
+      toast({
+        title: "Message posted",
+        description: "Your message has been shared with the community",
+      });
     } catch (error) {
       console.error('Error sending message:', error);
       toast({
@@ -462,7 +491,7 @@ export default function Community() {
                   <div ref={messagesEndRef} />
                 </div>
 
-                {user ? (
+                {user && hasActiveSubscription ? (
                   <form onSubmit={handleSendMessage} className="p-4 border-t">
                     <div className="flex gap-2">
                       <Input
@@ -480,13 +509,22 @@ export default function Community() {
                       {newMessage.length}/500 characters
                     </p>
                   </form>
+                ) : user && !hasActiveSubscription ? (
+                  <div className="p-4 border-t text-center bg-muted/50">
+                    <p className="text-sm text-muted-foreground mb-3">
+                      Subscribe to join the conversation and share your fitness journey!
+                    </p>
+                    <Button onClick={() => navigate('/')} size="sm" className="w-full sm:w-auto">
+                      View Subscription Plans
+                    </Button>
+                  </div>
                 ) : (
                   <div className="p-4 border-t text-center bg-muted/50">
                     <p className="text-sm text-muted-foreground mb-3">
-                      Join the conversation! Login to share your fitness journey.
+                      Login and subscribe to share your fitness journey!
                     </p>
                     <Button onClick={() => navigate('/auth')} size="sm" className="w-full sm:w-auto">
-                      Login to Post
+                      Login to Get Started
                     </Button>
                   </div>
                 )}
