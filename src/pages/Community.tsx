@@ -6,11 +6,15 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
-import { ArrowLeft, Send, Users, MessageCircle, Instagram, Facebook } from "lucide-react";
+import { ArrowLeft, Send, Users, MessageCircle, Instagram, Facebook, Calendar as CalendarIcon, Clock, Filter } from "lucide-react";
 import smartyGymLogo from "@/assets/smarty-gym-logo.png";
 import { DirectMessaging } from "@/components/DirectMessaging";
 import { SubscribedMembers } from "@/components/SubscribedMembers";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Calendar } from "@/components/ui/calendar";
+import { format } from "date-fns";
+import { cn } from "@/lib/utils";
 
 interface Message {
   id: string;
@@ -34,6 +38,8 @@ export default function Community() {
     name: string;
     avatar?: string;
   } | null>(null);
+  const [timeFilter, setTimeFilter] = useState<string>("all");
+  const [selectedDate, setSelectedDate] = useState<Date | undefined>(undefined);
 
   useEffect(() => {
     const checkAuth = async () => {
@@ -159,6 +165,32 @@ export default function Community() {
     setShowDirectMessage(true);
   };
 
+  const filterMessages = () => {
+    const now = new Date();
+    let filtered = [...messages];
+
+    if (selectedDate) {
+      // Filter by specific date
+      filtered = filtered.filter((msg) => {
+        const msgDate = new Date(msg.created_at);
+        return (
+          msgDate.getFullYear() === selectedDate.getFullYear() &&
+          msgDate.getMonth() === selectedDate.getMonth() &&
+          msgDate.getDate() === selectedDate.getDate()
+        );
+      });
+    } else if (timeFilter !== "all") {
+      // Filter by time period
+      const hours = parseInt(timeFilter);
+      const cutoffTime = new Date(now.getTime() - hours * 60 * 60 * 1000);
+      filtered = filtered.filter((msg) => new Date(msg.created_at) >= cutoffTime);
+    }
+
+    return filtered;
+  };
+
+  const filteredMessages = filterMessages();
+
   return (
     <div className="min-h-screen bg-background flex flex-col">
       {showDirectMessage && selectedRecipient && user && (
@@ -256,28 +288,125 @@ export default function Community() {
           </TabsList>
 
           <TabsContent value="forum" className="mt-4">
-            <Card className="flex flex-col h-[600px]">
-              <CardHeader className="bg-gradient-to-r from-primary/10 to-primary/5">
-                <CardTitle className="flex items-center gap-2">
+            <Card className="flex flex-col">
+              <CardHeader className="bg-gradient-to-r from-primary/10 to-primary/5 pb-3">
+                <CardTitle className="flex items-center gap-2 mb-3">
                   <MessageCircle className="h-5 w-5 text-primary" />
                   Community Forum
                 </CardTitle>
+                
+                {/* Time Filters */}
+                <div className="flex flex-wrap gap-2 items-center">
+                  <Filter className="h-4 w-4 text-muted-foreground" />
+                  <div className="flex flex-wrap gap-2">
+                    <Button
+                      variant={timeFilter === "all" && !selectedDate ? "default" : "outline"}
+                      size="sm"
+                      onClick={() => {
+                        setTimeFilter("all");
+                        setSelectedDate(undefined);
+                      }}
+                      className="text-xs h-7"
+                    >
+                      All
+                    </Button>
+                    <Button
+                      variant={timeFilter === "1" ? "default" : "outline"}
+                      size="sm"
+                      onClick={() => {
+                        setTimeFilter("1");
+                        setSelectedDate(undefined);
+                      }}
+                      className="text-xs h-7"
+                    >
+                      <Clock className="h-3 w-3 mr-1" />
+                      1h
+                    </Button>
+                    <Button
+                      variant={timeFilter === "3" ? "default" : "outline"}
+                      size="sm"
+                      onClick={() => {
+                        setTimeFilter("3");
+                        setSelectedDate(undefined);
+                      }}
+                      className="text-xs h-7"
+                    >
+                      <Clock className="h-3 w-3 mr-1" />
+                      3h
+                    </Button>
+                    <Button
+                      variant={timeFilter === "6" ? "default" : "outline"}
+                      size="sm"
+                      onClick={() => {
+                        setTimeFilter("6");
+                        setSelectedDate(undefined);
+                      }}
+                      className="text-xs h-7"
+                    >
+                      <Clock className="h-3 w-3 mr-1" />
+                      6h
+                    </Button>
+                    <Button
+                      variant={timeFilter === "12" ? "default" : "outline"}
+                      size="sm"
+                      onClick={() => {
+                        setTimeFilter("12");
+                        setSelectedDate(undefined);
+                      }}
+                      className="text-xs h-7"
+                    >
+                      <Clock className="h-3 w-3 mr-1" />
+                      12h
+                    </Button>
+                    
+                    {/* Date Picker */}
+                    <Popover>
+                      <PopoverTrigger asChild>
+                        <Button
+                          variant={selectedDate ? "default" : "outline"}
+                          size="sm"
+                          className="text-xs h-7"
+                        >
+                          <CalendarIcon className="h-3 w-3 mr-1" />
+                          {selectedDate ? format(selectedDate, "MMM d") : "Date"}
+                        </Button>
+                      </PopoverTrigger>
+                      <PopoverContent className="w-auto p-0" align="start">
+                        <Calendar
+                          mode="single"
+                          selected={selectedDate}
+                          onSelect={(date) => {
+                            setSelectedDate(date);
+                            setTimeFilter("all");
+                          }}
+                          disabled={(date) => date > new Date()}
+                          initialFocus
+                          className={cn("p-3 pointer-events-auto")}
+                        />
+                      </PopoverContent>
+                    </Popover>
+                  </div>
+                </div>
               </CardHeader>
               
-              <CardContent className="flex-1 flex flex-col p-0">
-                <div className="flex-1 overflow-y-auto p-4 space-y-4">
-                  {messages.length === 0 ? (
+              <CardContent className="flex flex-col p-0">
+                <div className="h-[50vh] overflow-y-auto p-4 space-y-4">
+                  {filteredMessages.length === 0 ? (
                     <div className="text-center py-12">
                       <Users className="h-16 w-16 text-muted-foreground mx-auto mb-4 opacity-50" />
                       <p className="text-lg font-medium text-muted-foreground">
-                        No messages yet
+                        {selectedDate || timeFilter !== "all" 
+                          ? "No messages in this time period" 
+                          : "No messages yet"}
                       </p>
                       <p className="text-sm text-muted-foreground mt-2">
-                        Be the first to share something!
+                        {selectedDate || timeFilter !== "all"
+                          ? "Try selecting a different time filter"
+                          : "Be the first to share something!"}
                       </p>
                     </div>
                   ) : (
-                    messages.map((msg) => {
+                    filteredMessages.map((msg) => {
                       const isCurrentUser = msg.user_id === user?.id;
                       return (
                         <div
