@@ -524,20 +524,20 @@ export default function Dashboard() {
           <TabsContent value="favorites" className="space-y-6">
             {/* Quick Actions */}
             <Card className="bg-gradient-to-r from-primary/10 to-primary/5 border-primary/20">
-              <CardContent className="flex items-center justify-between p-6">
-                <div className="flex items-center gap-4">
-                  <div className="p-3 bg-primary/10 rounded-full">
-                    <Users className="h-8 w-8 text-primary" />
+              <CardContent className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 p-4 sm:p-6">
+                <div className="flex items-start sm:items-center gap-3 sm:gap-4 flex-1">
+                  <div className="p-2 sm:p-3 bg-primary/10 rounded-full flex-shrink-0">
+                    <Users className="h-6 w-6 sm:h-8 sm:w-8 text-primary" />
                   </div>
-                  <div>
-                    <h3 className="text-xl font-bold mb-1">Join the Community Forum</h3>
-                    <p className="text-sm text-muted-foreground">
+                  <div className="flex-1 min-w-0">
+                    <h3 className="text-base sm:text-xl font-bold mb-1">Join the Community Forum</h3>
+                    <p className="text-xs sm:text-sm text-muted-foreground">
                       Connect, share experiences, and motivate each other!
                     </p>
                   </div>
                 </div>
-                <Button size="lg" onClick={() => navigate("/community")}>
-                  <Users className="mr-2 h-5 w-5" />
+                <Button size="default" onClick={() => navigate("/community")} className="w-full sm:w-auto flex-shrink-0">
+                  <Users className="mr-2 h-4 w-4 sm:h-5 sm:w-5" />
                   Go to Forum
                 </Button>
               </CardContent>
@@ -816,14 +816,14 @@ export default function Dashboard() {
                   Community Forum
                 </CardTitle>
               </CardHeader>
-              <CardContent className="text-center py-12">
-                <Users className="h-16 w-16 text-primary mx-auto mb-4" />
-                <h3 className="text-xl font-bold mb-2">Join the Smarty Gym Community!</h3>
-                <p className="text-muted-foreground mb-6">
+              <CardContent className="text-center py-8 sm:py-12 px-4">
+                <Users className="h-12 w-12 sm:h-16 sm:w-16 text-primary mx-auto mb-3 sm:mb-4" />
+                <h3 className="text-lg sm:text-xl font-bold mb-2">Join the Smarty Gym Community!</h3>
+                <p className="text-sm sm:text-base text-muted-foreground mb-4 sm:mb-6 max-w-md mx-auto">
                   Connect with other fitness enthusiasts, share experiences, and stay motivated together.
                 </p>
-                <Button size="lg" onClick={() => navigate("/community")}>
-                  <Users className="mr-2 h-5 w-5" />
+                <Button size="default" onClick={() => navigate("/community")} className="w-full sm:w-auto">
+                  <Users className="mr-2 h-4 w-4 sm:h-5 sm:w-5" />
                   Go to Community Forum
                 </Button>
               </CardContent>

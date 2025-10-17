@@ -122,42 +122,41 @@ export const MotivationalBanner = ({ userName }: MotivationalBannerProps) => {
       <div className="absolute inset-0 bg-gradient-to-r from-transparent via-primary/20 to-transparent animate-shimmer" 
            style={{ animation: 'shimmer 3s infinite' }} />
       
-      <div className="container mx-auto max-w-7xl px-4 py-4 relative z-10">
+      <div className="container mx-auto max-w-7xl px-3 py-3 sm:py-4 relative z-10">
         <div
-          className={`flex flex-col sm:flex-row items-center justify-center gap-4 transition-all duration-300 ${
+          className={`flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-4 transition-all duration-300 ${
             isVisible ? "opacity-100 translate-y-0" : "opacity-0 -translate-y-2"
           }`}
         >
-          <div className="flex items-center justify-center gap-3 text-center">
-            <div className="relative">
-              <Zap className="h-7 w-7 text-primary animate-bounce drop-shadow-[0_0_10px_rgba(212,175,55,0.6)]" />
-              <Zap className="h-7 w-7 text-amber-400 absolute inset-0 animate-ping opacity-75" />
+          <div className="flex items-center justify-center gap-2 sm:gap-3 text-center max-w-full px-2">
+            <div className="relative flex-shrink-0 hidden sm:block">
+              <Zap className="h-5 w-5 sm:h-7 sm:w-7 text-primary animate-bounce drop-shadow-[0_0_10px_rgba(212,175,55,0.6)]" />
+              <Zap className="h-5 w-5 sm:h-7 sm:w-7 text-amber-400 absolute inset-0 animate-ping opacity-75" />
             </div>
             <p
-              className="text-base sm:text-xl font-bold bg-gradient-to-r from-primary via-amber-500 to-primary bg-clip-text text-transparent animate-gradient-x drop-shadow-lg hover:scale-105 transition-transform cursor-default"
+              className="text-xs sm:text-base md:text-xl font-bold bg-gradient-to-r from-primary via-amber-500 to-primary bg-clip-text text-transparent leading-tight sm:leading-normal"
               style={{ 
                 fontFamily: 'Helvetica Neue, Helvetica, Arial, sans-serif',
                 backgroundSize: '200% auto',
-                animation: 'gradient-x 3s ease infinite, pulse 2s ease-in-out infinite'
               }}
             >
               {currentMessage.text}
             </p>
-            <div className="relative">
-              <Zap className="h-7 w-7 text-primary animate-bounce drop-shadow-[0_0_10px_rgba(212,175,55,0.6)]" style={{ animationDelay: '0.2s' }} />
-              <Zap className="h-7 w-7 text-amber-400 absolute inset-0 animate-ping opacity-75" style={{ animationDelay: '0.2s' }} />
+            <div className="relative flex-shrink-0 hidden sm:block">
+              <Zap className="h-5 w-5 sm:h-7 sm:w-7 text-primary animate-bounce drop-shadow-[0_0_10px_rgba(212,175,55,0.6)]" style={{ animationDelay: '0.2s' }} />
+              <Zap className="h-5 w-5 sm:h-7 sm:w-7 text-amber-400 absolute inset-0 animate-ping opacity-75" style={{ animationDelay: '0.2s' }} />
             </div>
           </div>
           
           {currentMessage.action && (
-            <div className="mt-2">
+            <div className="mt-1 sm:mt-0">
               <Button
                 onClick={() => navigate(currentMessage.action!.route)}
                 variant="default"
-                size="lg"
-                className="shadow-gold animate-scale-in hover:scale-110 transition-all duration-300 bg-gradient-to-r from-primary to-amber-500 hover:shadow-[0_0_20px_rgba(212,175,55,0.8)] font-bold text-base px-8"
+                size="sm"
+                className="shadow-gold hover:scale-105 transition-all duration-300 bg-gradient-to-r from-primary to-amber-500 font-bold text-xs sm:text-base px-4 sm:px-8"
               >
-                <currentMessage.action.icon className="mr-2 h-5 w-5 animate-pulse" />
+                <currentMessage.action.icon className="mr-1 sm:mr-2 h-4 w-4 sm:h-5 sm:w-5" />
                 {currentMessage.action.label}
               </Button>
             </div>
