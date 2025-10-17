@@ -7,8 +7,10 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Textarea } from "@/components/ui/textarea";
-import { ChevronLeft, ChevronRight, Loader2 } from "lucide-react";
+import { ChevronLeft, ChevronRight, Loader2, Play } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { supabase } from "@/integrations/supabase/client";
+import { StravaTrackingDialog } from "@/components/StravaTrackingDialog";
 import smartyGymLogo from "@/assets/smarty-gym-logo.png";
 
 interface WorkoutFormData {
@@ -27,6 +29,8 @@ const WorkoutFlow = () => {
   const [step, setStep] = useState(1);
   const [loading, setLoading] = useState(false);
   const [generatedPlan, setGeneratedPlan] = useState("");
+  const [savedWorkoutId, setSavedWorkoutId] = useState<string | null>(null);
+  const [showStravaDialog, setShowStravaDialog] = useState(false);
   const [formData, setFormData] = useState<WorkoutFormData>({
     age: "",
     height: "",
@@ -314,7 +318,6 @@ const WorkoutFlow = () => {
               </div>
             )}
 
-            {step === 5 && (
               <div className="space-y-6">
                 <div className="text-center mb-8">
                   <h2 className="text-2xl font-bold mb-2">Your Workout Plan</h2>
@@ -327,30 +330,48 @@ const WorkoutFlow = () => {
                   {generatedPlan}
                 </div>
 
-                <div className="flex justify-between gap-4 pt-4">
-                  <Button onClick={() => navigate("/")} variant="outline">
-                    Back to Home
-                  </Button>
-                  <Button
-                    onClick={() => {
-                      setStep(1);
-                      setGeneratedPlan("");
-                      setFormData({
-                        age: "",
-                        height: "",
-                        weight: "",
-                        goal: "",
-                        timeAvailable: "",
-                        equipment: [],
-                        limitations: "",
-                      });
-                    }}
+                <div className="flex flex-col gap-4 pt-4">
+                  <Button 
+                    onClick={() => setShowStravaDialog(true)}
+                    size="lg"
+                    className="w-full"
                   >
-                    Create Another Plan
+                    <Play className="mr-2 h-5 w-5" />
+                    Start Now
                   </Button>
+                  
+                  <div className="flex justify-between gap-4">
+                    <Button onClick={() => navigate("/")} variant="outline">
+                      Back to Home
+                    </Button>
+                    <Button
+                      onClick={() => {
+                        setStep(1);
+                        setGeneratedPlan("");
+                        setSavedWorkoutId(null);
+                        setFormData({
+                          age: "",
+                          height: "",
+                          weight: "",
+                          goal: "",
+                          timeAvailable: "",
+                          equipment: [],
+                          limitations: "",
+                        });
+                      }}
+                    >
+                      Create Another Plan
+                    </Button>
+                  </div>
                 </div>
+
+                <StravaTrackingDialog
+                  open={showStravaDialog}
+                  onOpenChange={setShowStravaDialog}
+                  planName={`${formData.goal} Workout`}
+                  planType="workout"
+                />
               </div>
-            )}
 
             {step < 5 && (
               <div className="flex justify-between mt-8">

@@ -6,8 +6,10 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { ArrowLeft, ArrowRight, Loader2 } from "lucide-react";
+import { ArrowLeft, ArrowRight, Loader2, Play } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { supabase } from "@/integrations/supabase/client";
+import { StravaTrackingDialog } from "@/components/StravaTrackingDialog";
 
 const TrainingProgramFlow = () => {
   const navigate = useNavigate();
@@ -15,6 +17,8 @@ const TrainingProgramFlow = () => {
   const [step, setStep] = useState(1);
   const [loading, setLoading] = useState(false);
   const [generatedProgram, setGeneratedProgram] = useState("");
+  const [savedProgramId, setSavedProgramId] = useState<string | null>(null);
+  const [showStravaDialog, setShowStravaDialog] = useState(false);
   const [formData, setFormData] = useState({
     age: "",
     height: "",
@@ -385,6 +389,15 @@ const TrainingProgramFlow = () => {
                   </div>
                 </div>
 
+                <Button 
+                  onClick={() => setShowStravaDialog(true)}
+                  size="lg"
+                  className="w-full"
+                >
+                  <Play className="mr-2 h-5 w-5" />
+                  Start Now
+                </Button>
+
                 <div className="flex justify-between gap-4 pt-4">
                   <div className="flex gap-2">
                     <Button onClick={() => window.print()} variant="outline">
@@ -438,6 +451,13 @@ const TrainingProgramFlow = () => {
                     </Button>
                   </div>
                 </div>
+
+                <StravaTrackingDialog
+                  open={showStravaDialog}
+                  onOpenChange={setShowStravaDialog}
+                  planName={`${formData.programLength} Week ${formData.goal} Program`}
+                  planType="program"
+                />
               </div>
             )}
           </CardContent>
