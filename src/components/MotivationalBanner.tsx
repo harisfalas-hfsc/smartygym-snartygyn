@@ -84,18 +84,62 @@ export const MotivationalBanner = ({ userName }: MotivationalBannerProps) => {
   const currentMessage = messages[currentMessageIndex];
 
   return (
-    <div className="bg-gradient-to-r from-primary/10 via-primary/5 to-primary/10 border-b border-primary/20">
-      <div className="container mx-auto max-w-7xl px-4 py-4">
+    <div className="relative overflow-hidden border-b border-primary/30 bg-gradient-to-r from-primary/5 via-amber-500/10 to-primary/5 animate-gradient-xy">
+      <style>{`
+        @keyframes gradient-x {
+          0%, 100% {
+            background-position: 0% 50%;
+          }
+          50% {
+            background-position: 100% 50%;
+          }
+        }
+        @keyframes gradient-xy {
+          0%, 100% {
+            background-position: 0% 50%;
+          }
+          25% {
+            background-position: 100% 50%;
+          }
+          50% {
+            background-position: 100% 100%;
+          }
+          75% {
+            background-position: 0% 100%;
+          }
+        }
+        @keyframes shimmer {
+          0% {
+            transform: translateX(-100%);
+          }
+          100% {
+            transform: translateX(100%);
+          }
+        }
+      `}</style>
+      
+      {/* Animated background overlay */}
+      <div className="absolute inset-0 bg-gradient-to-r from-transparent via-primary/20 to-transparent animate-shimmer" 
+           style={{ animation: 'shimmer 3s infinite' }} />
+      
+      <div className="container mx-auto max-w-7xl px-4 py-4 relative z-10">
         <div
           className={`flex flex-col sm:flex-row items-center justify-between gap-4 transition-all duration-300 ${
             isVisible ? "opacity-100 translate-y-0" : "opacity-0 -translate-y-2"
           }`}
         >
           <div className="flex items-center gap-3 flex-1">
-            <Zap className="h-6 w-6 text-primary animate-pulse" />
+            <div className="relative">
+              <Zap className="h-7 w-7 text-primary animate-bounce drop-shadow-[0_0_10px_rgba(212,175,55,0.6)]" />
+              <Zap className="h-7 w-7 text-amber-400 absolute inset-0 animate-ping opacity-75" />
+            </div>
             <p
-              className="text-base sm:text-lg font-medium"
-              style={{ fontFamily: 'Helvetica Neue, Helvetica, Arial, sans-serif' }}
+              className="text-base sm:text-lg font-bold bg-gradient-to-r from-primary via-amber-500 to-primary bg-clip-text text-transparent animate-gradient-x drop-shadow-lg"
+              style={{ 
+                fontFamily: 'Helvetica Neue, Helvetica, Arial, sans-serif',
+                backgroundSize: '200% auto',
+                animation: 'gradient-x 3s ease infinite, pulse 2s ease-in-out infinite'
+              }}
             >
               {currentMessage.text}
             </p>
@@ -105,9 +149,9 @@ export const MotivationalBanner = ({ userName }: MotivationalBannerProps) => {
             <Button
               onClick={() => navigate(currentMessage.action!.route)}
               variant="default"
-              className="shadow-gold animate-scale-in"
+              className="shadow-gold animate-scale-in hover:scale-110 transition-all duration-300 bg-gradient-to-r from-primary to-amber-500 hover:shadow-[0_0_20px_rgba(212,175,55,0.8)] font-bold"
             >
-              <currentMessage.action.icon className="mr-2 h-4 w-4" />
+              <currentMessage.action.icon className="mr-2 h-4 w-4 animate-pulse" />
               {currentMessage.action.label}
             </Button>
           )}
