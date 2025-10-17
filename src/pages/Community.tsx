@@ -291,13 +291,38 @@ export default function Community() {
                                 : 'bg-muted'
                             }`}
                           >
-                            <div className="flex items-baseline gap-2 mb-1">
-                              <span className="font-semibold text-sm">
-                                {isCurrentUser ? 'You' : msg.user_name}
-                              </span>
-                              <span className="text-xs opacity-70">
-                                {formatTime(msg.created_at)}
-                              </span>
+                            <div className="flex items-center justify-between gap-2 mb-1">
+                              <div className="flex items-baseline gap-2">
+                                <button
+                                  onClick={() => {
+                                    if (!isCurrentUser && user) {
+                                      handleMessageUser(msg.user_id, msg.user_name);
+                                    }
+                                  }}
+                                  className={`font-semibold text-sm ${
+                                    !isCurrentUser && user
+                                      ? 'hover:underline cursor-pointer'
+                                      : ''
+                                  }`}
+                                  disabled={isCurrentUser || !user}
+                                >
+                                  {isCurrentUser ? 'You' : msg.user_name}
+                                </button>
+                                <span className="text-xs opacity-70">
+                                  {formatTime(msg.created_at)}
+                                </span>
+                              </div>
+                              {!isCurrentUser && user && (
+                                <Button
+                                  variant="ghost"
+                                  size="sm"
+                                  className="h-6 px-2 text-xs"
+                                  onClick={() => handleMessageUser(msg.user_id, msg.user_name)}
+                                >
+                                  <MessageCircle className="h-3 w-3 mr-1" />
+                                  Message
+                                </Button>
+                              )}
                             </div>
                             <p className="text-sm break-words">{msg.message}</p>
                           </div>
