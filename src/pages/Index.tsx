@@ -3,8 +3,8 @@ import { useNavigate } from "react-router-dom";
 import { ServiceCard } from "@/components/ServiceCard";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { Dumbbell, Calendar, Utensils, Calculator, Activity, Flame, User, LogOut, Instagram, Facebook, Users, Youtube } from "lucide-react";
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { Dumbbell, Calendar, BookOpen, Calculator, Activity, Flame, Instagram, Facebook, Youtube } from "lucide-react";
+
 import { supabase } from "@/integrations/supabase/client";
 import { User as SupabaseUser } from "@supabase/supabase-js";
 import { useToast } from "@/hooks/use-toast";
@@ -54,10 +54,10 @@ const Index = () => {
     title: "Training Program",
     description: "4-8 week comprehensive training programs"
   }, {
-    id: "diet-plan",
-    icon: Utensils,
-    title: "Diet Plan",
-    description: "Personalized nutrition plans for your goals"
+    id: "exercise-library",
+    icon: BookOpen,
+    title: "Exercise Library",
+    description: "Browse comprehensive exercise database"
   }, {
     id: "1rm-calculator",
     icon: Calculator,
@@ -80,7 +80,7 @@ const Index = () => {
     } = {
       "workout": "/workout",
       "training-program": "/training-program",
-      "diet-plan": "/diet-plan",
+      "exercise-library": "/exercise-library",
       "1rm-calculator": "/1rm-calculator",
       "bmr-calculator": "/bmr-calculator",
       "calorie-calculator": "/calorie-calculator"
@@ -126,31 +126,10 @@ const Index = () => {
         <div className="container mx-auto max-w-6xl">
           <div className="flex justify-center items-center">
             <div className="flex gap-2 items-center">
-              <Button variant="outline" size="sm" onClick={() => navigate("/community")} className="text-xs sm:text-sm">
-                <Users className="h-4 w-4 sm:mr-1" />
-                <span className="hidden sm:inline">Community</span>
-              </Button>
               {user ? <>
-                  <Button variant="outline" size="sm" onClick={() => navigate("/dashboard")} className="text-xs sm:text-sm hidden sm:flex">
-                    Dashboard
+                  <Button variant="outline" size="sm" onClick={handleLogout} className="text-xs sm:text-sm">
+                    Logout
                   </Button>
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <Button variant="outline" size="icon" className="h-8 w-8">
-                        <User className="h-4 w-4" />
-                      </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end" className="bg-card z-50">
-                      <DropdownMenuItem onClick={() => navigate("/dashboard")}>
-                        <User className="mr-2 h-4 w-4" />
-                        Dashboard
-                      </DropdownMenuItem>
-                      <DropdownMenuItem onClick={handleLogout}>
-                        <LogOut className="mr-2 h-4 w-4" />
-                        Logout
-                      </DropdownMenuItem>
-                    </DropdownMenuContent>
-                  </DropdownMenu>
                 </> : <>
                   <Button variant="outline" size="sm" onClick={() => navigate("/auth")} className="text-xs sm:text-sm">
                     Login
