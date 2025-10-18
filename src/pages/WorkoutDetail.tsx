@@ -215,6 +215,7 @@ const WorkoutDetail = () => {
             <Card
               key={workout.id}
               className="overflow-hidden cursor-pointer transition-all duration-300 hover:scale-105 hover:shadow-gold bg-card border-border"
+              onClick={() => navigate(`/workout/${type}/${workout.id}`)}
             >
               <div className="relative h-48 w-full overflow-hidden">
                 <img 
