@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -11,10 +11,12 @@ import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { WorkoutDisplay } from "@/components/WorkoutDisplay";
 import { SubscriptionGate } from "@/components/SubscriptionGate";
+import { useProfileData } from "@/hooks/useProfileData";
 
 const DietPlanFlow = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { profileData, loading: profileLoading } = useProfileData();
   const [step, setStep] = useState(1);
   const [loading, setLoading] = useState(false);
   const [generatedPlan, setGeneratedPlan] = useState("");
@@ -40,6 +42,18 @@ const DietPlanFlow = () => {
   const [rating, setRating] = useState(0);
   const [status, setStatus] = useState<"not-started" | "in-progress" | "completed">("not-started");
   const [comment, setComment] = useState("");
+
+  // Pre-fill form with profile data when it loads
+  useEffect(() => {
+    if (profileData && !profileLoading) {
+      setFormData(prev => ({
+        ...prev,
+        age: profileData.age || prev.age,
+        height: profileData.height || prev.height,
+        weight: profileData.weight || prev.weight,
+      }));
+    }
+  }, [profileData, profileLoading]);
 
   const handleInputChange = (field: string, value: any) => {
     setFormData({ ...formData, [field]: value });

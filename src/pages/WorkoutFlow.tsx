@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -14,6 +14,7 @@ import { StravaTrackingDialog } from "@/components/StravaTrackingDialog";
 import { WorkoutDisplay } from "@/components/WorkoutDisplay";
 import { SubscriptionGate } from "@/components/SubscriptionGate";
 import smartyGymLogo from "@/assets/smarty-gym-logo.png";
+import { useProfileData } from "@/hooks/useProfileData";
 
 interface WorkoutFormData {
   age: string;
@@ -28,6 +29,7 @@ interface WorkoutFormData {
 const WorkoutFlow = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { profileData, loading: profileLoading } = useProfileData();
   const [step, setStep] = useState(1);
   const [loading, setLoading] = useState(false);
   const [generatedPlan, setGeneratedPlan] = useState("");
@@ -45,6 +47,19 @@ const WorkoutFlow = () => {
     equipment: [],
     limitations: "",
   });
+
+  // Pre-fill form with profile data when it loads
+  useEffect(() => {
+    if (profileData && !profileLoading) {
+      setFormData(prev => ({
+        ...prev,
+        age: profileData.age || prev.age,
+        height: profileData.height || prev.height,
+        weight: profileData.weight || prev.weight,
+        equipment: profileData.equipment_preferences.length > 0 ? profileData.equipment_preferences : prev.equipment,
+      }));
+    }
+  }, [profileData, profileLoading]);
 
   const goals = [
     "Strength",

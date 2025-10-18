@@ -13,6 +13,7 @@ import Dashboard from "./pages/Dashboard";
 import WorkoutFlow from "./pages/WorkoutFlow";
 import TrainingProgramFlow from "./pages/TrainingProgramFlow";
 import DietPlanFlow from "./pages/DietPlanFlow";
+import ProfileSettings from "./pages/ProfileSettings";
 import OneRMCalculator from "./pages/OneRMCalculator";
 import BMRCalculator from "./pages/BMRCalculator";
 import CalorieCalculator from "./pages/CalorieCalculator";
@@ -42,6 +43,7 @@ const App = () => (
           {/* Authenticated routes with motivational banner */}
           <Route element={<ProtectedRoute><AuthenticatedLayout /></ProtectedRoute>}>
             <Route path="/dashboard" element={<Dashboard />} />
+            <Route path="/profile-settings" element={<ProfileSettings />} />
           </Route>
           
           {/* Public calculator routes */}
