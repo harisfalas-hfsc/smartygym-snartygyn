@@ -169,8 +169,8 @@ const Index = () => {
         <div className="container mx-auto max-w-6xl">
           {/* Hero Card in same grid as service cards */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 mb-6">
-            <div className="md:col-start-1 lg:col-start-2">
-              <Card className="p-6 bg-card border-border shadow-sm">
+            <div className="md:col-span-1 lg:col-start-2 lg:col-span-1">
+              <Card className="p-6 bg-card border-border shadow-sm h-full">
                 <div className="flex flex-col items-center text-center space-y-4">
                   <div className="flex items-center justify-center">
                     <img src={smartyGymLogo} alt="Smarty Gym" className="h-40 w-auto" />
