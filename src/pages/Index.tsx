@@ -168,21 +168,23 @@ const Index = () => {
       <section className="py-6 px-4 border-b border-border">
         <div className="container mx-auto max-w-6xl">
           <div className="flex flex-col items-center space-y-6">
-            {/* Hero Card matching ServiceCard style */}
-            <div className="w-full max-w-md">
-              <Card className="p-6 bg-card border-border shadow-sm">
-                <div className="flex flex-col items-center text-center space-y-4">
-                  <div className="flex items-center justify-center">
-                    <img src={smartyGymLogo} alt="Smarty Gym" className="h-40 w-auto" />
+            {/* Hero Card matching ServiceCard style and width */}
+            <div className="w-full grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+              <div className="md:col-start-1 lg:col-start-2">
+                <Card className="p-6 bg-card border-border shadow-sm">
+                  <div className="flex flex-col items-center text-center space-y-4">
+                    <div className="flex items-center justify-center">
+                      <img src={smartyGymLogo} alt="Smarty Gym" className="h-40 w-auto" />
+                    </div>
+                    <div>
+                      <h1 className="font-semibold text-lg mb-2">SMARTY GYM</h1>
+                      <p className="text-sm text-muted-foreground">
+                        Your gym, reimagined. Anytime. Anywhere. All in your pocket.
+                      </p>
+                    </div>
                   </div>
-                  <div>
-                    <h1 className="font-semibold text-lg mb-2">SMARTY GYM</h1>
-                    <p className="text-sm text-muted-foreground">
-                      Your gym, reimagined. Anytime. Anywhere. All in your pocket.
-                    </p>
-                  </div>
-                </div>
-              </Card>
+                </Card>
+              </div>
             </div>
 
             {/* Social Media Links */}
