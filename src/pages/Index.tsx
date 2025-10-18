@@ -173,7 +173,7 @@ const Index = () => {
               <Card className="p-6 bg-card border-border shadow-sm">
                 <div className="flex flex-col items-center text-center space-y-4">
                   <div className="flex items-center justify-center">
-                    <img src={smartyGymLogo} alt="Smarty Gym" className="h-20 w-auto" />
+                    <img src={smartyGymLogo} alt="Smarty Gym" className="h-40 w-auto" />
                   </div>
                   <div>
                     <h1 className="font-semibold text-lg mb-2">SMARTY GYM</h1>
