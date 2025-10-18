@@ -170,13 +170,12 @@ const Index = () => {
           {/* Hero Card in same grid as service cards */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 mb-6">
             <div className="md:col-span-1 lg:col-start-2 lg:col-span-1">
-              <Card className="p-6 bg-card border-border shadow-sm h-full">
+              <Card className="p-6 bg-card border-border shadow-sm transition-all duration-300 hover:scale-105 hover:shadow-gold">
                 <div className="flex flex-col items-center text-center space-y-4">
-                  <div className="flex items-center justify-center">
-                    <img src={smartyGymLogo} alt="Smarty Gym" className="h-40 w-auto" />
+                  <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center">
+                    <img src={smartyGymLogo} alt="Smarty Gym" className="w-12 h-12 object-contain" />
                   </div>
                   <div>
-                    <h1 className="font-semibold text-lg mb-2">SMARTY GYM</h1>
                     <p className="text-sm text-muted-foreground">
                       Your gym, reimagined. Anytime. Anywhere. All in your pocket.
                     </p>
