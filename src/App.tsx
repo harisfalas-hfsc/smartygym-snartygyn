@@ -13,6 +13,7 @@ import Dashboard from "./pages/Dashboard";
 import WorkoutFlow from "./pages/WorkoutFlow";
 import WorkoutDetail from "./pages/WorkoutDetail";
 import TrainingProgramFlow from "./pages/TrainingProgramFlow";
+import TrainingProgramDetail from "./pages/TrainingProgramDetail";
 import DietPlanFlow from "./pages/DietPlanFlow";
 import ProfileSettings from "./pages/ProfileSettings";
 import OneRMCalculator from "./pages/OneRMCalculator";
@@ -38,6 +39,7 @@ const App = () => (
           <Route path="/workout" element={<WorkoutFlow />} />
           <Route path="/workout/:type" element={<WorkoutDetail />} />
           <Route path="/training-program" element={<TrainingProgramFlow />} />
+          <Route path="/training-program/:type" element={<TrainingProgramDetail />} />
           <Route path="/diet-plan" element={<DietPlanFlow />} />
           <Route path="/exercise-library" element={<ExerciseLibrary />} />
           
