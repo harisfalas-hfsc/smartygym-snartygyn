@@ -1,7 +1,7 @@
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { ArrowLeft, Heart, Dumbbell, TrendingUp, Flame, Shield, Compass } from "lucide-react";
+import { ArrowLeft, Heart, Dumbbell, Activity, Flame, User, Move, Scale } from "lucide-react";
 
 const TrainingProgramFlow = () => {
   const navigate = useNavigate();
@@ -21,25 +21,25 @@ const TrainingProgramFlow = () => {
     },
     {
       id: "muscle-hypertrophy",
-      icon: TrendingUp,
+      icon: Activity,
       title: "Muscle Hypertrophy",
       description: "Maximize muscle growth with progressive overload"
     },
     {
       id: "weight-loss",
-      icon: Flame,
+      icon: Scale,
       title: "Weight Loss",
       description: "Burn fat and achieve your ideal body composition"
     },
     {
       id: "low-back-pain",
-      icon: Shield,
+      icon: User,
       title: "Low Back Pain",
       description: "Strengthen and rehabilitate your lower back"
     },
     {
       id: "mobility-stability",
-      icon: Compass,
+      icon: Move,
       title: "Mobility & Stability",
       description: "Enhance flexibility, balance, and joint health"
     }

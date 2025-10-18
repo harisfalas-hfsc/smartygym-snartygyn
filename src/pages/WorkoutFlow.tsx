@@ -1,7 +1,7 @@
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { ArrowLeft, Dumbbell, Flame, Zap, Heart, Compass, Trophy } from "lucide-react";
+import { ArrowLeft, Dumbbell, Flame, Zap, Heart, Move, Activity } from "lucide-react";
 
 const WorkoutFlow = () => {
   const navigate = useNavigate();
@@ -33,13 +33,13 @@ const WorkoutFlow = () => {
     },
     {
       id: "mobility",
-      icon: Compass,
+      icon: Move,
       title: "Mobility & Stability",
       description: "Enhance flexibility, balance, and joint health"
     },
     {
       id: "challenge",
-      icon: Trophy,
+      icon: Activity,
       title: "Challenge",
       description: "Push your limits with advanced workout challenges"
     }
