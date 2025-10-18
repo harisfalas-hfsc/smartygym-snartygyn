@@ -168,16 +168,18 @@ const Index = () => {
         <div className="container mx-auto max-w-6xl">
           <div className="flex flex-col items-center space-y-3 sm:space-y-4">
             <img src={smartyGymLogo} alt="Smarty Gym" className="h-32 sm:h-40 md:h-48 lg:h-56 w-auto" />
-            <div className="text-center px-4 max-w-3xl">
-              <h1 className="text-xl sm:text-3xl md:text-4xl lg:text-5xl font-bold mb-2 leading-tight">
-                SMARTY GYM
-              </h1>
-              <p className="text-muted-foreground text-base sm:text-lg md:text-xl lg:text-2xl font-medium mb-1">
-                Your gym, reimagined. Anytime. Anywhere.
-              </p>
-              <p className="text-muted-foreground text-base sm:text-lg md:text-xl lg:text-2xl font-medium">
-                All in your pocket.
-              </p>
+            <div className="text-center px-4 sm:px-6 md:px-8 max-w-3xl w-full">
+              <div className="bg-muted/90 backdrop-blur-md border border-border rounded-2xl p-6 sm:p-8 md:p-10 shadow-xl">
+                <h1 className="text-xl sm:text-3xl md:text-4xl lg:text-5xl font-bold mb-4 leading-tight">
+                  SMARTY GYM
+                </h1>
+                <p className="text-muted-foreground text-base sm:text-lg md:text-xl lg:text-2xl font-medium mb-2">
+                  Your gym, reimagined. Anytime. Anywhere.
+                </p>
+                <p className="text-muted-foreground text-base sm:text-lg md:text-xl lg:text-2xl font-medium">
+                  All in your pocket.
+                </p>
+              </div>
             </div>
             {/* Social Media Links */}
             <div className="flex items-center gap-2 sm:gap-3">
