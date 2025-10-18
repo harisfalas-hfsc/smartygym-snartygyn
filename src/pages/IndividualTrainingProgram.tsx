@@ -82,6 +82,259 @@ Rest Days: Built into the program for optimal recovery
 
 This program requires completion of the PAR-Q+ assessment before beginning. Always listen to your body and adjust the program as needed based on your recovery and performance.`;
 
+  // Get specific program details based on program type and ID
+  const getProgramWeeks = (programType: string, programId: string) => {
+    // CARDIO PROGRAMS
+    if (programId === "cardio-free") {
+      return [
+        {
+          week: 1,
+          focus: "Building Base",
+          days: [
+            {
+              day: "Day 1: Easy Run",
+              exercises: [
+                { name: "Warm-up Walk", sets: "1", reps: "5 min", intensity: "Light", rest: "0", notes: "Gradually increase pace" },
+                { name: "Easy Jog", sets: "1", reps: "15 min", intensity: "60-65% HR max", rest: "0", notes: "Conversational pace" },
+                { name: "Cool Down", sets: "1", reps: "5 min", intensity: "Light", rest: "0" }
+              ]
+            },
+            {
+              day: "Day 3: Interval Introduction",
+              exercises: [
+                { name: "Warm-up", sets: "1", reps: "10 min", intensity: "Easy", rest: "0" },
+                { name: "Run Intervals", sets: "6", reps: "1 min hard / 2 min easy", intensity: "75-80% / 60%", rest: "2 min", notes: "Focus on form" },
+                { name: "Cool Down", sets: "1", reps: "5 min", intensity: "Easy", rest: "0" }
+              ]
+            },
+            {
+              day: "Day 5: Steady State",
+              exercises: [
+                { name: "Steady Run", sets: "1", reps: "20 min", intensity: "65-70% HR max", rest: "0", notes: "Maintain consistent pace" }
+              ]
+            }
+          ]
+        },
+        {
+          week: 2,
+          focus: "Increasing Volume",
+          days: [
+            {
+              day: "Day 1: Easy Run",
+              exercises: [
+                { name: "Easy Jog", sets: "1", reps: "20 min", intensity: "60-65% HR max", rest: "0" }
+              ]
+            },
+            {
+              day: "Day 3: Intervals",
+              exercises: [
+                { name: "Warm-up", sets: "1", reps: "10 min", intensity: "Easy", rest: "0" },
+                { name: "Run Intervals", sets: "8", reps: "1 min hard / 2 min easy", intensity: "75-80% / 60%", rest: "2 min" },
+                { name: "Cool Down", sets: "1", reps: "5 min", intensity: "Easy", rest: "0" }
+              ]
+            },
+            {
+              day: "Day 5: Long Run",
+              exercises: [
+                { name: "Long Steady Run", sets: "1", reps: "25 min", intensity: "65-70% HR max", rest: "0" }
+              ]
+            }
+          ]
+        },
+        {
+          week: 3,
+          focus: "Building Intensity",
+          days: [
+            {
+              day: "Day 1: Tempo Run",
+              exercises: [
+                { name: "Warm-up", sets: "1", reps: "10 min", intensity: "Easy", rest: "0" },
+                { name: "Tempo Run", sets: "1", reps: "15 min", intensity: "80-85% HR max", rest: "0", notes: "Comfortably hard pace" },
+                { name: "Cool Down", sets: "1", reps: "5 min", intensity: "Easy", rest: "0" }
+              ]
+            },
+            {
+              day: "Day 3: Hill Repeats",
+              exercises: [
+                { name: "Warm-up", sets: "1", reps: "10 min", intensity: "Easy", rest: "0" },
+                { name: "Hill Sprints", sets: "6", reps: "30s uphill / walk down", intensity: "85-90%", rest: "walk down", notes: "Find moderate grade" },
+                { name: "Cool Down", sets: "1", reps: "5 min", intensity: "Easy", rest: "0" }
+              ]
+            },
+            {
+              day: "Day 5: Long Run",
+              exercises: [
+                { name: "Long Run", sets: "1", reps: "30 min", intensity: "65-70% HR max", rest: "0" }
+              ]
+            }
+          ]
+        },
+        {
+          week: 4,
+          focus: "Recovery Week",
+          days: [
+            {
+              day: "Day 1: Easy Run",
+              exercises: [
+                { name: "Easy Jog", sets: "1", reps: "20 min", intensity: "60-65% HR max", rest: "0", notes: "Focus on recovery" }
+              ]
+            },
+            {
+              day: "Day 3: Light Intervals",
+              exercises: [
+                { name: "Easy Intervals", sets: "4", reps: "1 min / 3 min", intensity: "70-75%", rest: "3 min", notes: "Reduced volume for recovery" }
+              ]
+            },
+            {
+              day: "Day 5: Easy Run",
+              exercises: [
+                { name: "Recovery Run", sets: "1", reps: "20 min", intensity: "60% HR max", rest: "0" }
+              ]
+            }
+          ]
+        }
+      ];
+    }
+
+    if (programId === "1" && programType === "cardio") {
+      return [
+        {
+          week: 1,
+          focus: "Endurance Foundation",
+          days: [
+            {
+              day: "Day 1: Easy Run + Strength",
+              exercises: [
+                { name: "Easy Run", sets: "1", reps: "25 min", intensity: "65% HR max", rest: "0" },
+                { name: "Bodyweight Circuit", sets: "3", reps: "Squats, Push-ups, Lunges x10 each", intensity: "Moderate", rest: "90s" }
+              ]
+            },
+            {
+              day: "Day 3: Tempo Run",
+              exercises: [
+                { name: "Warm-up", sets: "1", reps: "15 min", intensity: "Easy", rest: "0" },
+                { name: "Tempo Run", sets: "1", reps: "20 min", intensity: "80-85% HR max", rest: "0" },
+                { name: "Cool Down", sets: "1", reps: "10 min", intensity: "Easy", rest: "0" }
+              ]
+            },
+            {
+              day: "Day 5: Intervals",
+              exercises: [
+                { name: "Warm-up", sets: "1", reps: "15 min", intensity: "Easy", rest: "0" },
+                { name: "Speed Intervals", sets: "10", reps: "400m hard / 400m easy", intensity: "85-90%", rest: "400m jog" }
+              ]
+            },
+            {
+              day: "Day 7: Long Run",
+              exercises: [
+                { name: "Long Steady Run", sets: "1", reps: "40 min", intensity: "65-70% HR max", rest: "0" }
+              ]
+            }
+          ]
+        },
+        {
+          week: 2,
+          focus: "Volume Increase",
+          days: [
+            {
+              day: "Day 1: Easy Run + Strength",
+              exercises: [
+                { name: "Easy Run", sets: "1", reps: "30 min", intensity: "65% HR max", rest: "0" },
+                { name: "Bodyweight Circuit", sets: "4", reps: "Squats, Push-ups, Lunges x12 each", intensity: "Moderate", rest: "90s" }
+              ]
+            },
+            {
+              day: "Day 3: Tempo Run",
+              exercises: [
+                { name: "Tempo Run", sets: "1", reps: "25 min", intensity: "80-85% HR max", rest: "0" }
+              ]
+            },
+            {
+              day: "Day 5: Intervals",
+              exercises: [
+                { name: "Speed Intervals", sets: "12", reps: "400m hard / 400m easy", intensity: "85-90%", rest: "400m jog" }
+              ]
+            },
+            {
+              day: "Day 7: Long Run",
+              exercises: [
+                { name: "Long Run", sets: "1", reps: "50 min", intensity: "65-70% HR max", rest: "0" }
+              ]
+            }
+          ]
+        }
+      ];
+    }
+
+    // MUSCLE HYPERTROPHY PROGRAMS
+    if (programId === "muscle-hypertrophy-free") {
+      return [
+        {
+          week: 1,
+          focus: "Adaptation Phase",
+          days: [
+            {
+              day: "Day 1: Upper Body",
+              exercises: [
+                { name: "Push-ups", sets: "3", reps: "12-15", intensity: "Bodyweight", rest: "90s", notes: "Controlled tempo" },
+                { name: "Pull-ups (assisted if needed)", sets: "3", reps: "8-10", intensity: "Bodyweight", rest: "90s" },
+                { name: "Pike Push-ups", sets: "3", reps: "10-12", intensity: "Bodyweight", rest: "60s" },
+                { name: "Dips (on chairs)", sets: "3", reps: "10-12", intensity: "Bodyweight", rest: "90s" }
+              ]
+            },
+            {
+              day: "Day 3: Lower Body",
+              exercises: [
+                { name: "Squats", sets: "4", reps: "15-20", intensity: "Bodyweight", rest: "90s", notes: "Full depth" },
+                { name: "Bulgarian Split Squats", sets: "3", reps: "12 each", intensity: "Bodyweight", rest: "90s" },
+                { name: "Nordic Curls (assisted)", sets: "3", reps: "6-8", intensity: "Bodyweight", rest: "2 min" },
+                { name: "Calf Raises", sets: "4", reps: "20", intensity: "Bodyweight", rest: "60s" }
+              ]
+            },
+            {
+              day: "Day 5: Full Body",
+              exercises: [
+                { name: "Archer Push-ups", sets: "3", reps: "8 each side", intensity: "Bodyweight", rest: "90s" },
+                { name: "Pistol Squats (assisted)", sets: "3", reps: "6 each leg", intensity: "Bodyweight", rest: "2 min" },
+                { name: "Inverted Rows", sets: "3", reps: "12-15", intensity: "Bodyweight", rest: "90s" },
+                { name: "Plank to Push-up", sets: "3", reps: "10", intensity: "Bodyweight", rest: "60s" }
+              ]
+            }
+          ]
+        },
+        {
+          week: 2,
+          focus: "Volume Increase",
+          days: [
+            {
+              day: "Day 1: Upper Body",
+              exercises: [
+                { name: "Push-ups", sets: "4", reps: "12-15", intensity: "Bodyweight", rest: "90s" },
+                { name: "Pull-ups", sets: "4", reps: "8-10", intensity: "Bodyweight", rest: "90s" },
+                { name: "Pike Push-ups", sets: "4", reps: "10-12", intensity: "Bodyweight", rest: "60s" },
+                { name: "Dips", sets: "4", reps: "10-12", intensity: "Bodyweight", rest: "90s" }
+              ]
+            },
+            {
+              day: "Day 3: Lower Body",
+              exercises: [
+                { name: "Squats", sets: "5", reps: "15-20", intensity: "Bodyweight", rest: "90s" },
+                { name: "Bulgarian Split Squats", sets: "4", reps: "12 each", intensity: "Bodyweight", rest: "90s" },
+                { name: "Nordic Curls", sets: "4", reps: "6-8", intensity: "Bodyweight", rest: "2 min" },
+                { name: "Calf Raises", sets: "5", reps: "20", intensity: "Bodyweight", rest: "60s" }
+              ]
+            }
+          ]
+        }
+      ];
+    }
+
+    // Default - will add more programs gradually
+    return [];
+  };
+
+  const programWeeks = getProgramWeeks(type || "", id || "");
+
   const content = (
     <>
       <ProgramInteractions
@@ -96,6 +349,7 @@ This program requires completion of the PAR-Q+ assessment before beginning. Alwa
         title={programInfo.name}
         serial={programInfo.serial}
         difficulty={programInfo.difficulty}
+        programWeeks={programWeeks}
       />
     </>
   );

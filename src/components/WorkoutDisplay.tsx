@@ -17,6 +17,22 @@ interface Exercise {
   notes?: string;
 }
 
+interface WeekPlan {
+  week: number;
+  focus: string;
+  days: Array<{
+    day: string;
+    exercises: Array<{
+      name: string;
+      sets: string;
+      reps: string;
+      intensity: string;
+      rest: string;
+      notes?: string;
+    }>;
+  }>;
+}
+
 interface WorkoutDisplayProps {
   exercises: Exercise[];
   planContent: string;
@@ -32,9 +48,10 @@ interface WorkoutDisplayProps {
       notes?: string;
     }>;
   };
+  programWeeks?: WeekPlan[];
 }
 
-export const WorkoutDisplay = ({ exercises, planContent, title = "Workout", serial = "001", difficulty = 3, workoutDetails }: WorkoutDisplayProps) => {
+export const WorkoutDisplay = ({ exercises, planContent, title = "Workout", serial = "001", difficulty = 3, workoutDetails, programWeeks }: WorkoutDisplayProps) => {
   const [currentVideoId, setCurrentVideoId] = useState<string>(exercises[0]?.video_id || "");
   const [workTime, setWorkTime] = useState(20);
   const [restTime, setRestTime] = useState(10);
@@ -331,7 +348,7 @@ export const WorkoutDisplay = ({ exercises, planContent, title = "Workout", seri
 
       {/* Workout Content */}
       <div className="space-y-6 mt-8">
-        {/* Detailed Workout Plan */}
+        {/* Detailed Workout Plan (for single workouts) */}
         {workoutDetails && (
           <Card>
             <CardHeader>
@@ -360,6 +377,56 @@ export const WorkoutDisplay = ({ exercises, planContent, title = "Workout", seri
                         💡 {exercise.notes}
                       </p>
                     )}
+                  </div>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+        )}
+
+        {/* Week-by-Week Training Program Plan */}
+        {programWeeks && (
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2 text-2xl">
+                📅 Week-by-Week Training Plan
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-6">
+                {programWeeks.map((week, weekIndex) => (
+                  <div key={weekIndex} className="border-2 border-primary/20 rounded-lg p-4">
+                    <div className="flex items-center justify-between mb-4">
+                      <h3 className="font-bold text-xl">Week {week.week}</h3>
+                      <span className="text-sm font-semibold text-primary bg-primary/10 px-3 py-1 rounded-full">
+                        {week.focus}
+                      </span>
+                    </div>
+                    <div className="space-y-4">
+                      {week.days.map((day, dayIndex) => (
+                        <div key={dayIndex} className="bg-muted/50 rounded-lg p-4">
+                          <h4 className="font-bold text-lg mb-3 text-primary">{day.day}</h4>
+                          <div className="space-y-3">
+                            {day.exercises.map((exercise, exIndex) => (
+                              <div key={exIndex} className="border-l-2 border-primary/50 pl-3">
+                                <p className="font-semibold mb-1">{exercise.name}</p>
+                                <div className="grid grid-cols-2 md:grid-cols-4 gap-2 text-sm text-muted-foreground">
+                                  <span><strong>Sets:</strong> {exercise.sets}</span>
+                                  <span><strong>Reps:</strong> {exercise.reps}</span>
+                                  <span><strong>Intensity:</strong> {exercise.intensity}</span>
+                                  <span><strong>Rest:</strong> {exercise.rest}</span>
+                                </div>
+                                {exercise.notes && (
+                                  <p className="text-xs text-muted-foreground mt-1 italic">
+                                    💡 {exercise.notes}
+                                  </p>
+                                )}
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
                   </div>
                 ))}
               </div>
