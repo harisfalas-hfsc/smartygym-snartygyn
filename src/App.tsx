@@ -11,6 +11,7 @@ import Index from "./pages/Index";
 import Auth from "./pages/Auth";
 import Dashboard from "./pages/Dashboard";
 import WorkoutFlow from "./pages/WorkoutFlow";
+import WorkoutDetail from "./pages/WorkoutDetail";
 import TrainingProgramFlow from "./pages/TrainingProgramFlow";
 import DietPlanFlow from "./pages/DietPlanFlow";
 import ProfileSettings from "./pages/ProfileSettings";
@@ -35,6 +36,7 @@ const App = () => (
           
           {/* Public workout and plan flows - anyone can explore */}
           <Route path="/workout" element={<WorkoutFlow />} />
+          <Route path="/workout/:type" element={<WorkoutDetail />} />
           <Route path="/training-program" element={<TrainingProgramFlow />} />
           <Route path="/diet-plan" element={<DietPlanFlow />} />
           <Route path="/exercise-library" element={<ExerciseLibrary />} />

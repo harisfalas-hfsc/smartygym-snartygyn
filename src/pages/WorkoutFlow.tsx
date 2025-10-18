@@ -46,8 +46,7 @@ const WorkoutFlow = () => {
   ];
 
   const handleWorkoutSelect = (workoutId: string) => {
-    // TODO: Navigate to specific workout type
-    console.log("Selected workout:", workoutId);
+    navigate(`/workout/${workoutId}`);
   };
 
   return (
