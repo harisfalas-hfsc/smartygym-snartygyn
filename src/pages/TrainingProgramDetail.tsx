@@ -16,6 +16,7 @@ interface TrainingProgram {
   equipment: "bodyweight" | "equipment";
   level: "beginner" | "intermediate" | "advanced";
   imageUrl: string;
+  isFree?: boolean;
 }
 
 const TrainingProgramDetail = () => {
@@ -36,6 +37,7 @@ const TrainingProgramDetail = () => {
 
   const programData: { [key: string]: TrainingProgram[] } = {
     "cardio": [
+      { id: "cardio-free", name: "Cardio Starter Program", description: "Free 4-week cardio program to build your endurance", duration: "4", equipment: "bodyweight", level: "beginner", imageUrl: "https://images.unsplash.com/photo-1476480862126-209bfaa8edc8?w=400&h=300&fit=crop", isFree: true },
       { id: "1", name: "Heart Foundation", description: "Build your cardio base with walking and light jogging", duration: "4", equipment: "bodyweight", level: "beginner", imageUrl: "https://images.unsplash.com/photo-1476480862126-209bfaa8edc8?w=400&h=300&fit=crop" },
       { id: "2", name: "Beginner's Endurance", description: "Progressive running program for newcomers", duration: "6", equipment: "bodyweight", level: "beginner", imageUrl: "https://images.unsplash.com/photo-1483721310020-03333e577078?w=400&h=300&fit=crop" },
       { id: "3", name: "5K Runner's Plan", description: "Train for your first 5K race", duration: "6", equipment: "bodyweight", level: "intermediate", imageUrl: "https://images.unsplash.com/photo-1594737626072-90dc274bc2bd?w=400&h=300&fit=crop" },
@@ -50,6 +52,7 @@ const TrainingProgramDetail = () => {
       { id: "12", name: "Cardio Domination", description: "Peak cardiovascular performance", duration: "6", equipment: "equipment", level: "advanced", imageUrl: "https://images.unsplash.com/photo-1476480862126-209bfaa8edc8?w=400&h=300&fit=crop" },
     ],
     "functional-strength": [
+      { id: "functional-strength-free", name: "Functional Basics", description: "Free 4-week functional strength program", duration: "4", equipment: "bodyweight", level: "beginner", imageUrl: "https://images.unsplash.com/photo-1598971861713-54ad16a5c72e?w=400&h=300&fit=crop", isFree: true },
       { id: "1", name: "Daily Movement", description: "Functional patterns for everyday life", duration: "4", equipment: "bodyweight", level: "beginner", imageUrl: "https://images.unsplash.com/photo-1598971861713-54ad16a5c72e?w=400&h=300&fit=crop" },
       { id: "2", name: "Foundation Strength", description: "Build basic functional strength", duration: "6", equipment: "bodyweight", level: "beginner", imageUrl: "https://images.unsplash.com/photo-1599058917212-d750089bc07e?w=400&h=300&fit=crop" },
       { id: "3", name: "Athletic Performance", description: "Sport-specific functional training", duration: "6", equipment: "bodyweight", level: "intermediate", imageUrl: "https://images.unsplash.com/photo-1517836357463-d25dfeac3438?w=400&h=300&fit=crop" },
@@ -64,6 +67,7 @@ const TrainingProgramDetail = () => {
       { id: "12", name: "CrossFit Foundation", description: "Functional fitness at its finest", duration: "6", equipment: "equipment", level: "advanced", imageUrl: "https://images.unsplash.com/photo-1571902943202-507ec2618e8f?w=400&h=300&fit=crop" },
     ],
     "muscle-hypertrophy": [
+      { id: "muscle-hypertrophy-free", name: "Muscle Building Basics", description: "Free 4-week muscle building program", duration: "4", equipment: "bodyweight", level: "beginner", imageUrl: "https://images.unsplash.com/photo-1598971861713-54ad16a5c72e?w=400&h=300&fit=crop", isFree: true },
       { id: "1", name: "Muscle Builder Basics", description: "Start building muscle with bodyweight", duration: "4", equipment: "bodyweight", level: "beginner", imageUrl: "https://images.unsplash.com/photo-1598971861713-54ad16a5c72e?w=400&h=300&fit=crop" },
       { id: "2", name: "Calisthenics Growth", description: "Progressive muscle building", duration: "6", equipment: "bodyweight", level: "beginner", imageUrl: "https://images.unsplash.com/photo-1599058917212-d750089bc07e?w=400&h=300&fit=crop" },
       { id: "3", name: "Volume Training", description: "Increase training volume for growth", duration: "6", equipment: "bodyweight", level: "intermediate", imageUrl: "https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?w=400&h=300&fit=crop" },
@@ -78,6 +82,7 @@ const TrainingProgramDetail = () => {
       { id: "12", name: "Mass Monster", description: "Maximum muscle hypertrophy", duration: "6", equipment: "equipment", level: "advanced", imageUrl: "https://images.unsplash.com/photo-1526506118085-60ce8714f8c5?w=400&h=300&fit=crop" },
     ],
     "weight-loss": [
+      { id: "weight-loss-free", name: "Weight Loss Starter", description: "Free 4-week weight loss program", duration: "4", equipment: "bodyweight", level: "beginner", imageUrl: "https://images.unsplash.com/photo-1476480862126-209bfaa8edc8?w=400&h=300&fit=crop", isFree: true },
       { id: "1", name: "Fat Loss Kickstart", description: "Begin your weight loss journey", duration: "4", equipment: "bodyweight", level: "beginner", imageUrl: "https://images.unsplash.com/photo-1476480862126-209bfaa8edc8?w=400&h=300&fit=crop" },
       { id: "2", name: "Calorie Burn Plan", description: "Progressive fat-burning program", duration: "6", equipment: "bodyweight", level: "beginner", imageUrl: "https://images.unsplash.com/photo-1594737626072-90dc274bc2bd?w=400&h=300&fit=crop" },
       { id: "3", name: "HIIT Fat Burn", description: "High-intensity weight loss", duration: "6", equipment: "bodyweight", level: "intermediate", imageUrl: "https://images.unsplash.com/photo-1517836357463-d25dfeac3438?w=400&h=300&fit=crop" },
@@ -92,6 +97,7 @@ const TrainingProgramDetail = () => {
       { id: "12", name: "Ultimate Shred", description: "Maximum fat loss program", duration: "6", equipment: "equipment", level: "advanced", imageUrl: "https://images.unsplash.com/photo-1517438476312-10d79c077509?w=400&h=300&fit=crop" },
     ],
     "low-back-pain": [
+      { id: "low-back-pain-free", name: "Back Care Essentials", description: "Free 4-week back pain relief program", duration: "4", equipment: "bodyweight", level: "beginner", imageUrl: "https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?w=400&h=300&fit=crop", isFree: true },
       { id: "1", name: "Back Pain Relief", description: "Gentle movements for pain management", duration: "4", equipment: "bodyweight", level: "beginner", imageUrl: "https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?w=400&h=300&fit=crop" },
       { id: "2", name: "Core Foundation", description: "Build core strength for back health", duration: "6", equipment: "bodyweight", level: "beginner", imageUrl: "https://images.unsplash.com/photo-1506126613408-eca07ce68773?w=400&h=300&fit=crop" },
       { id: "3", name: "Back Rehabilitation", description: "Progressive back strengthening", duration: "6", equipment: "bodyweight", level: "intermediate", imageUrl: "https://images.unsplash.com/photo-1599447292171-1fc69bde54c7?w=400&h=300&fit=crop" },
@@ -106,6 +112,7 @@ const TrainingProgramDetail = () => {
       { id: "12", name: "Athletic Back", description: "Performance-level back training", duration: "6", equipment: "equipment", level: "advanced", imageUrl: "https://images.unsplash.com/photo-1605296867304-46d5465a13f1?w=400&h=300&fit=crop" },
     ],
     "mobility-stability": [
+      { id: "mobility-stability-free", name: "Mobility Basics", description: "Free 4-week mobility and stability program", duration: "4", equipment: "bodyweight", level: "beginner", imageUrl: "https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?w=400&h=300&fit=crop", isFree: true },
       { id: "1", name: "Flexibility Start", description: "Basic stretching and mobility", duration: "4", equipment: "bodyweight", level: "beginner", imageUrl: "https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?w=400&h=300&fit=crop" },
       { id: "2", name: "Joint Health", description: "Improve range of motion safely", duration: "6", equipment: "bodyweight", level: "beginner", imageUrl: "https://images.unsplash.com/photo-1506126613408-eca07ce68773?w=400&h=300&fit=crop" },
       { id: "3", name: "Dynamic Mobility", description: "Active flexibility training", duration: "6", equipment: "bodyweight", level: "intermediate", imageUrl: "https://images.unsplash.com/photo-1599447292171-1fc69bde54c7?w=400&h=300&fit=crop" },
@@ -265,6 +272,11 @@ const TrainingProgramDetail = () => {
                   <Calendar className="w-3 h-3" />
                   <span>{program.duration} weeks</span>
                 </div>
+                {program.isFree && (
+                  <div className="absolute top-2 left-2 bg-primary text-primary-foreground px-3 py-1 rounded-full text-xs font-semibold">
+                    FREE
+                  </div>
+                )}
               </div>
               <div className="p-4 space-y-2">
                 <h3 className="font-semibold text-lg">{program.name}</h3>

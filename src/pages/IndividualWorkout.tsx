@@ -8,8 +8,7 @@ import { WorkoutInteractions } from "@/components/WorkoutInteractions";
 const IndividualWorkout = () => {
   const navigate = useNavigate();
   const { type, id } = useParams();
-  const workoutId = id || "1";
-  const isFreeWorkout = workoutId.includes("-free") || type?.includes("-free");
+  const isFreeWorkout = id?.includes("-free") || id === "strength-free" || id === "calorie-burning-free" || id === "metabolic-free" || id === "cardio-free" || id === "mobility-free" || id === "challenge-free";
 
   // Sample workout names based on type and id
   const workoutNames: { [key: string]: { [key: string]: { name: string; difficulty: number; serial: string } } } = {

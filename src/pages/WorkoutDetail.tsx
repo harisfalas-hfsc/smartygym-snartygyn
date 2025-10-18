@@ -15,6 +15,7 @@ interface Workout {
   equipment: "bodyweight" | "equipment";
   level: "beginner" | "intermediate" | "advanced";
   imageUrl: string;
+  isFree?: boolean;
 }
 
 const WorkoutDetail = () => {
@@ -34,6 +35,7 @@ const WorkoutDetail = () => {
 
   const workoutData: { [key: string]: Workout[] } = {
     "strength": [
+      { id: "strength-free", name: "Beginner Strength Basics", description: "Start your strength journey with this free workout", duration: "25 min", equipment: "bodyweight", level: "beginner", imageUrl: "https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?w=400&h=300&fit=crop", isFree: true },
       { id: "1", name: "Foundation Builder", description: "Master the basics with push-ups, squats, and planks", duration: "25 min", equipment: "bodyweight", level: "beginner", imageUrl: "https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?w=400&h=300&fit=crop" },
       { id: "2", name: "Core Starter", description: "Build core strength with fundamental movements", duration: "20 min", equipment: "bodyweight", level: "beginner", imageUrl: "https://images.unsplash.com/photo-1599058917212-d750089bc07e?w=400&h=300&fit=crop" },
       { id: "3", name: "Power Push", description: "Advance your push-up game with variations", duration: "30 min", equipment: "bodyweight", level: "intermediate", imageUrl: "https://images.unsplash.com/photo-1598971861713-54ad16a5c72e?w=400&h=300&fit=crop" },
@@ -48,6 +50,7 @@ const WorkoutDetail = () => {
       { id: "12", name: "Beast Mode", description: "Advanced techniques like drop sets and supersets", duration: "55 min", equipment: "equipment", level: "advanced", imageUrl: "https://images.unsplash.com/photo-1526506118085-60ce8714f8c5?w=400&h=300&fit=crop" },
     ],
     "calorie-burning": [
+      { id: "calorie-burning-free", name: "Fat Burn Starter", description: "Start your fat-burning journey with this free workout", duration: "20 min", equipment: "bodyweight", level: "beginner", imageUrl: "https://images.unsplash.com/photo-1476480862126-209bfaa8edc8?w=400&h=300&fit=crop", isFree: true },
       { id: "1", name: "Fat Torch Starter", description: "Simple movements to get your heart pumping", duration: "20 min", equipment: "bodyweight", level: "beginner", imageUrl: "https://images.unsplash.com/photo-1476480862126-209bfaa8edc8?w=400&h=300&fit=crop" },
       { id: "2", name: "Cardio Kickstart", description: "Low-impact movements for calorie burn", duration: "25 min", equipment: "bodyweight", level: "beginner", imageUrl: "https://images.unsplash.com/photo-1594737626072-90dc274bc2bd?w=400&h=300&fit=crop" },
       { id: "3", name: "Burpee Blaster", description: "High-intensity intervals with bodyweight exercises", duration: "30 min", equipment: "bodyweight", level: "intermediate", imageUrl: "https://images.unsplash.com/photo-1517836357463-d25dfeac3438?w=400&h=300&fit=crop" },
@@ -62,6 +65,7 @@ const WorkoutDetail = () => {
       { id: "12", name: "Complex Crusher", description: "Advanced equipment complexes for elite burn", duration: "50 min", equipment: "equipment", level: "advanced", imageUrl: "https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?w=400&h=300&fit=crop" },
     ],
     "metabolic": [
+      { id: "metabolic-free", name: "Metabolic Basics", description: "Free metabolic training to boost your metabolism", duration: "20 min", equipment: "bodyweight", level: "beginner", imageUrl: "https://images.unsplash.com/photo-1483721310020-03333e577078?w=400&h=300&fit=crop", isFree: true },
       { id: "1", name: "Metabolism Spark", description: "Wake up your metabolism with simple circuits", duration: "20 min", equipment: "bodyweight", level: "beginner", imageUrl: "https://images.unsplash.com/photo-1483721310020-03333e577078?w=400&h=300&fit=crop" },
       { id: "2", name: "Tempo Trainer", description: "Control your pace for metabolic adaptation", duration: "25 min", equipment: "bodyweight", level: "beginner", imageUrl: "https://images.unsplash.com/photo-1598971861713-54ad16a5c72e?w=400&h=300&fit=crop" },
       { id: "3", name: "HIIT Hurricane", description: "High-intensity intervals for metabolic boost", duration: "30 min", equipment: "bodyweight", level: "intermediate", imageUrl: "https://images.unsplash.com/photo-1549576490-b0b4831ef60a?w=400&h=300&fit=crop" },
@@ -76,6 +80,7 @@ const WorkoutDetail = () => {
       { id: "12", name: "Conditioning Crown", description: "Ultimate metabolic challenge with all equipment", duration: "50 min", equipment: "equipment", level: "advanced", imageUrl: "https://images.unsplash.com/photo-1605296867304-46d5465a13f1?w=400&h=300&fit=crop" },
     ],
     "cardio": [
+      { id: "cardio-free", name: "Cardio Foundation", description: "Free cardio workout to build your endurance", duration: "20 min", equipment: "bodyweight", level: "beginner", imageUrl: "https://images.unsplash.com/photo-1476480862126-209bfaa8edc8?w=400&h=300&fit=crop", isFree: true },
       { id: "1", name: "Heart Starter", description: "Easy movements to build cardiovascular base", duration: "20 min", equipment: "bodyweight", level: "beginner", imageUrl: "https://images.unsplash.com/photo-1476480862126-209bfaa8edc8?w=400&h=300&fit=crop" },
       { id: "2", name: "Steady Steps", description: "Low-impact cardio for endurance building", duration: "25 min", equipment: "bodyweight", level: "beginner", imageUrl: "https://images.unsplash.com/photo-1483721310020-03333e577078?w=400&h=300&fit=crop" },
       { id: "3", name: "Cardio Climber", description: "Step up your cardio with bodyweight intervals", duration: "35 min", equipment: "bodyweight", level: "intermediate", imageUrl: "https://images.unsplash.com/photo-1594737626072-90dc274bc2bd?w=400&h=300&fit=crop" },
@@ -90,6 +95,7 @@ const WorkoutDetail = () => {
       { id: "12", name: "Cardio Champion", description: "Competition-level cardiovascular training", duration: "55 min", equipment: "equipment", level: "advanced", imageUrl: "https://images.unsplash.com/photo-1517438476312-10d79c077509?w=400&h=300&fit=crop" },
     ],
     "mobility": [
+      { id: "mobility-free", name: "Flexibility Fundamentals", description: "Free mobility workout to improve your flexibility", duration: "20 min", equipment: "bodyweight", level: "beginner", imageUrl: "https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?w=400&h=300&fit=crop", isFree: true },
       { id: "1", name: "Flexibility Foundation", description: "Basic stretches for improved range of motion", duration: "20 min", equipment: "bodyweight", level: "beginner", imageUrl: "https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?w=400&h=300&fit=crop" },
       { id: "2", name: "Joint Journey", description: "Gentle movements for joint health", duration: "25 min", equipment: "bodyweight", level: "beginner", imageUrl: "https://images.unsplash.com/photo-1506126613408-eca07ce68773?w=400&h=300&fit=crop" },
       { id: "3", name: "Flow State", description: "Dynamic stretching sequences for mobility", duration: "30 min", equipment: "bodyweight", level: "intermediate", imageUrl: "https://images.unsplash.com/photo-1599447292171-1fc69bde54c7?w=400&h=300&fit=crop" },
@@ -104,6 +110,7 @@ const WorkoutDetail = () => {
       { id: "12", name: "Flexibility Elite", description: "Advanced equipment-assisted stretching", duration: "40 min", equipment: "equipment", level: "advanced", imageUrl: "https://images.unsplash.com/photo-1599447292171-1fc69bde54c7?w=400&h=300&fit=crop" },
     ],
     "challenge": [
+      { id: "challenge-free", name: "Challenge Starter", description: "Free challenge workout to test your limits", duration: "25 min", equipment: "bodyweight", level: "beginner", imageUrl: "https://images.unsplash.com/photo-1517836357463-d25dfeac3438?w=400&h=300&fit=crop", isFree: true },
       { id: "1", name: "30-Day Starter", description: "Progressive bodyweight challenge for beginners", duration: "25 min", equipment: "bodyweight", level: "beginner", imageUrl: "https://images.unsplash.com/photo-1517836357463-d25dfeac3438?w=400&h=300&fit=crop" },
       { id: "2", name: "Push-up Progression", description: "Challenge yourself to 100 push-ups", duration: "20 min", equipment: "bodyweight", level: "beginner", imageUrl: "https://images.unsplash.com/photo-1598971861713-54ad16a5c72e?w=400&h=300&fit=crop" },
       { id: "3", name: "The Murph Lite", description: "Modified version of the classic CrossFit challenge", duration: "40 min", equipment: "bodyweight", level: "intermediate", imageUrl: "https://images.unsplash.com/photo-1538805060514-97d9cc17730c?w=400&h=300&fit=crop" },
@@ -214,7 +221,7 @@ const WorkoutDetail = () => {
           {filteredWorkouts.map((workout) => (
             <Card
               key={workout.id}
-              className="overflow-hidden cursor-pointer transition-all duration-300 hover:scale-105 hover:shadow-gold bg-card border-border"
+              className="overflow-hidden cursor-pointer transition-all duration-300 hover:scale-105 hover:shadow-gold bg-card border-border relative"
               onClick={() => navigate(`/workout/${type}/${workout.id}`)}
             >
               <div className="relative h-48 w-full overflow-hidden">
@@ -226,6 +233,11 @@ const WorkoutDetail = () => {
                 <div className="absolute top-2 right-2 bg-primary text-primary-foreground text-xs px-2 py-1 rounded">
                   {workout.duration}
                 </div>
+                {workout.isFree && (
+                  <div className="absolute top-2 left-2 bg-primary text-primary-foreground px-3 py-1 rounded-full text-xs font-semibold">
+                    FREE
+                  </div>
+                )}
               </div>
               <div className="p-4 space-y-2">
                 <h3 className="font-semibold text-lg">{workout.name}</h3>

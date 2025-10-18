@@ -8,8 +8,7 @@ import { ProgramInteractions } from "@/components/ProgramInteractions";
 const IndividualTrainingProgram = () => {
   const navigate = useNavigate();
   const { type, id } = useParams();
-  const programId = id || "1";
-  const isFreeProgram = programId.includes("-free") || type?.includes("-free");
+  const isFreeProgram = id?.includes("-free") || id === "cardio-free" || id === "functional-strength-free" || id === "muscle-hypertrophy-free" || id === "weight-loss-free" || id === "low-back-pain-free" || id === "mobility-stability-free";
 
   // Sample program names based on type and id
   const programNames: { [key: string]: { [key: string]: { name: string; difficulty: number; serial: string } } } = {
