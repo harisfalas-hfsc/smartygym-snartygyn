@@ -3,18 +3,19 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Play, Pause, RotateCcw, Star, AlertTriangle, ExternalLink } from "lucide-react";
-import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Play, Pause, RotateCcw, Star } from "lucide-react";
 import workoutHero from "@/assets/workout-hero.jpg";
-import logo from "@/assets/smarty-gym-logo.png";
+import { ParQQuestionnaire } from "@/components/ParQQuestionnaire";
 
 interface WorkoutDisplayProps {
   exercises: Array<{ name: string; video_id: string; video_url: string }>;
   planContent: string;
   title?: string;
+  serial?: string;
+  difficulty?: number;
 }
 
-export const WorkoutDisplay = ({ exercises, planContent, title = "Workout" }: WorkoutDisplayProps) => {
+export const WorkoutDisplay = ({ exercises, planContent, title = "Workout", serial = "001", difficulty = 3 }: WorkoutDisplayProps) => {
   const [currentVideoId, setCurrentVideoId] = useState<string>(exercises[0]?.video_id || "");
   const [workTime, setWorkTime] = useState(20);
   const [restTime, setRestTime] = useState(10);
@@ -110,13 +111,13 @@ export const WorkoutDisplay = ({ exercises, planContent, title = "Workout" }: Wo
           <div className="flex flex-wrap items-center gap-6 text-sm">
             <div className="flex items-center gap-2">
               <span className="font-semibold">Serial:</span>
-              <span>001</span>
+              <span className="font-mono">{serial}</span>
             </div>
             <div className="flex items-center gap-2">
               <span className="font-semibold">Difficulty:</span>
               <div className="flex">
                 {[1, 2, 3, 4, 5].map((i) => (
-                  <Star key={i} className={`w-4 h-4 ${i <= 3 ? 'fill-yellow-500 text-yellow-500' : 'text-gray-300'}`} />
+                  <Star key={i} className={`w-4 h-4 ${i <= difficulty ? 'fill-yellow-500 text-yellow-500' : 'text-gray-300'}`} />
                 ))}
               </div>
             </div>
@@ -359,58 +360,8 @@ export const WorkoutDisplay = ({ exercises, planContent, title = "Workout" }: Wo
           </CardContent>
         </Card>
 
-        {/* Disclaimer */}
-        <Alert variant="destructive" className="border-2">
-          <AlertTriangle className="h-5 w-5" />
-          <AlertDescription className="space-y-4">
-            <div className="font-bold text-lg">⚠️ DISCLAIMER & RELEASE OF LIABILITY</div>
-            
-            <div className="space-y-3 text-sm">
-              <p className="font-semibold">
-                This workout program is provided for informational purposes only and is NOT medical advice.
-              </p>
-              
-              <p>
-                <strong>IMPORTANT:</strong> Before starting this or any exercise program, you MUST complete the 
-                PAR-Q+ (Physical Activity Readiness Questionnaire) to ensure it is safe for you to exercise.
-              </p>
-
-              <div className="bg-background/50 p-4 rounded-lg border border-destructive/30">
-                <div className="flex items-center gap-3 mb-3">
-                  <img src={logo} alt="Smarty Gym" className="h-10 w-10 object-contain" />
-                  <p className="font-semibold">Complete your PAR-Q+ Assessment:</p>
-                </div>
-                <a 
-                  href="https://eparmedx.com/" 
-                  target="_blank" 
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center gap-2 px-4 py-2 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-colors font-medium"
-                >
-                  Open PAR-Q+ Questionnaire
-                  <ExternalLink className="h-4 w-4" />
-                </a>
-              </div>
-
-              <div className="space-y-2">
-                <p className="font-semibold">By using this workout program, you acknowledge that:</p>
-                <ul className="space-y-1 ml-4 list-disc">
-                  <li>You are participating in physical exercise at your own risk</li>
-                  <li>You have consulted with a healthcare provider if you have any medical conditions</li>
-                  <li>You have completed the PAR-Q+ or similar pre-exercise screening</li>
-                  <li>If the PAR-Q+ indicates you should consult a physician, you have done so before starting</li>
-                  <li>You will stop exercising immediately if you experience any pain, dizziness, or discomfort</li>
-                  <li>Smarty Gym and its affiliates are not liable for any injuries or health issues that may occur</li>
-                </ul>
-              </div>
-
-              <p className="font-bold text-base">
-                If you have not completed the PAR-Q+ assessment or if you answered "YES" to any questions 
-                without medical clearance, DO NOT proceed with this workout. Seek professional medical 
-                advice first.
-              </p>
-            </div>
-          </AlertDescription>
-        </Alert>
+        {/* PAR-Q+ Questionnaire */}
+        <ParQQuestionnaire />
       </div>
     </div>
   );

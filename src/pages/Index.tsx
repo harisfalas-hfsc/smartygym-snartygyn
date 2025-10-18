@@ -46,7 +46,7 @@ const Index = () => {
   const services = [{
     id: "workout",
     icon: Dumbbell,
-    title: "Workout",
+    title: "Workouts",
     description: "Get a standalone workout plan tailored to your goals"
   }, {
     id: "training-program",

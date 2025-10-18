@@ -7,6 +7,44 @@ const IndividualTrainingProgram = () => {
   const navigate = useNavigate();
   const { type, id } = useParams();
 
+  // Sample program names based on type and id
+  const programNames: { [key: string]: { [key: string]: { name: string; difficulty: number; serial: string } } } = {
+    cardio: {
+      "1": { name: "Cardio Endurance Builder", difficulty: 1, serial: "CP-001" },
+      "2": { name: "Elite Cardio Performance", difficulty: 3, serial: "CP-002" },
+    },
+    functional: {
+      "1": { name: "Functional Fitness Foundation", difficulty: 1, serial: "FP-001" },
+      "2": { name: "Functional Athlete Program", difficulty: 3, serial: "FP-002" },
+    },
+    strength: {
+      "1": { name: "Strength Development Program", difficulty: 2, serial: "SP-001" },
+      "2": { name: "Maximum Strength Protocol", difficulty: 3, serial: "SP-002" },
+    },
+    hypertrophy: {
+      "1": { name: "Muscle Growth Foundation", difficulty: 2, serial: "HP-001" },
+      "2": { name: "Advanced Mass Building", difficulty: 3, serial: "HP-002" },
+    },
+    weightloss: {
+      "1": { name: "Weight Loss Transformation", difficulty: 1, serial: "WP-001" },
+      "2": { name: "Advanced Fat Loss Program", difficulty: 3, serial: "WP-002" },
+    },
+    lowbackpain: {
+      "1": { name: "Back Pain Relief Program", difficulty: 1, serial: "LP-001" },
+      "2": { name: "Spine Health Advanced", difficulty: 2, serial: "LP-002" },
+    },
+    mobility: {
+      "1": { name: "Mobility Enhancement Program", difficulty: 1, serial: "MP-001" },
+      "2": { name: "Elite Mobility & Stability", difficulty: 3, serial: "MP-002" },
+    },
+  };
+
+  const programInfo = programNames[type || "cardio"]?.[id || "1"] || { 
+    name: "Training Program", 
+    difficulty: 2,
+    serial: "TP-001"
+  };
+
   // Sample exercises data - would come from database
   const exercises = [
     {
@@ -56,7 +94,9 @@ This program requires completion of the PAR-Q+ assessment before beginning. Alwa
         <WorkoutDisplay
           exercises={exercises}
           planContent={planContent}
-          title={`Training Program #${id}`}
+          title={programInfo.name}
+          serial={programInfo.serial}
+          difficulty={programInfo.difficulty}
         />
       </div>
     </div>
