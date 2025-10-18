@@ -199,6 +199,9 @@ export const WorkoutDisplay = ({ exercises, planContent, title = "Workout" }: Wo
             </div>
 
             <div className="text-center py-2">
+              <div className="text-4xl font-bold text-yellow-600 dark:text-yellow-500 mb-2">
+                {timeLeft}s
+              </div>
               <div className="text-lg font-bold">
                 {isRunning 
                   ? (isWorking ? 'Work' : 'Rest')
