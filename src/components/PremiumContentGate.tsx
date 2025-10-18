@@ -88,23 +88,28 @@ export const PremiumContentGate = ({ children }: PremiumContentGateProps) => {
                 <Lock className="w-12 h-12 text-primary" />
               </div>
             </div>
-            <h2 className="text-2xl font-bold">Premium Content</h2>
+            <h2 className="text-2xl font-bold">
+              {isLoading ? "Checking Access..." : "Premium Content"}
+            </h2>
             <p className="text-muted-foreground">
-              This workout/program is available exclusively to Gold and Platinum subscribers.
-              Subscribe now to unlock all premium workouts and training programs!
+              {isLoading 
+                ? "Please wait while we verify your subscription..."
+                : "This workout/program is available exclusively to Gold and Platinum subscribers. Subscribe now to unlock all premium workouts and training programs!"}
             </p>
-            <div className="space-y-2 pt-4">
-              <Button onClick={handleSubscribe} className="w-full" size="lg">
-                View Subscription Plans
-              </Button>
-              <Button 
-                onClick={() => navigate("/")} 
-                variant="outline" 
-                className="w-full"
-              >
-                Back to Home
-              </Button>
-            </div>
+            {!isLoading && (
+              <div className="space-y-2 pt-4">
+                <Button onClick={handleSubscribe} className="w-full" size="lg">
+                  View Subscription Plans
+                </Button>
+                <Button 
+                  onClick={() => navigate("/")} 
+                  variant="outline" 
+                  className="w-full"
+                >
+                  Back to Home
+                </Button>
+              </div>
+            )}
           </CardContent>
         </Card>
       </div>

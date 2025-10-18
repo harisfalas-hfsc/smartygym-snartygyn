@@ -4,43 +4,37 @@ import { ServiceCard } from "@/components/ServiceCard";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Dumbbell, Calendar, BookOpen, Calculator, Activity, Flame, Instagram, Facebook, Youtube } from "lucide-react";
-
 import { supabase } from "@/integrations/supabase/client";
 import { User as SupabaseUser } from "@supabase/supabase-js";
 import { useToast } from "@/hooks/use-toast";
 import smartyGymLogo from "@/assets/smarty-gym-logo.png";
-import { ThemeToggle } from "@/components/ThemeToggle";
+import { Navigation } from "@/components/Navigation";
+
 const Index = () => {
   const navigate = useNavigate();
-  const {
-    toast
-  } = useToast();
+  const { toast } = useToast();
   const [user, setUser] = useState<SupabaseUser | null>(null);
+
   useEffect(() => {
     // Check current session
-    supabase.auth.getSession().then(({
-      data: {
-        session
-      }
-    }) => {
+    supabase.auth.getSession().then(({ data: { session } }) => {
       setUser(session?.user ?? null);
     });
 
     // Listen for auth changes
     const {
-      data: {
-        subscription
-      }
+      data: { subscription },
     } = supabase.auth.onAuthStateChange((_event, session) => {
       setUser(session?.user ?? null);
     });
+
     return () => subscription.unsubscribe();
   }, []);
   const handleLogout = async () => {
     await supabase.auth.signOut();
     toast({
       title: "Logged out",
-      description: "You have been logged out successfully"
+      description: "You have been logged out successfully",
     });
   };
   const services = [{
@@ -120,29 +114,9 @@ const Index = () => {
       });
     }
   };
-  return <div className="min-h-screen bg-background">
-      {/* Sticky Header with Logo */}
-      <header className="sticky top-0 z-50 bg-background border-b border-border py-3 px-4">
-        <div className="container mx-auto max-w-6xl">
-          <div className="flex justify-center items-center">
-            <div className="flex gap-2 items-center">
-              {user ? <>
-                  <Button variant="outline" size="sm" onClick={handleLogout} className="text-xs sm:text-sm">
-                    Logout
-                  </Button>
-                </> : <>
-                  <Button variant="outline" size="sm" onClick={() => navigate("/auth")} className="text-xs sm:text-sm">
-                    Login
-                  </Button>
-                  <Button size="sm" onClick={() => navigate("/auth")} className="text-xs sm:text-sm">
-                    Sign Up
-                  </Button>
-                  <ThemeToggle />
-                </>}
-            </div>
-          </div>
-        </div>
-      </header>
+  return (
+    <div className="min-h-screen bg-background">
+      <Navigation />
 
       {/* Hero Section */}
       <section className="py-6 px-4 border-b border-border">
@@ -268,6 +242,8 @@ const Index = () => {
           </div>
         </div>
       </footer>
-    </div>;
+    </div>
+  );
 };
+
 export default Index;

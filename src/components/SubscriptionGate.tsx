@@ -18,16 +18,20 @@ export const SubscriptionGate = ({ open, onOpenChange, isAuthenticated }: Subscr
         <DialogHeader>
           <div className="flex justify-center mb-4">
             <div className="p-3 rounded-full bg-primary/10">
-              <Crown className="w-8 h-8 text-primary" />
+              {isAuthenticated ? (
+                <Crown className="w-8 h-8 text-primary" />
+              ) : (
+                <Lock className="w-8 h-8 text-primary" />
+              )}
             </div>
           </div>
           <DialogTitle className="text-center text-2xl">
-            {isAuthenticated ? "Upgrade to Premium" : "Sign In Required"}
+            {isAuthenticated ? "Upgrade to Premium" : "Log In or Sign Up"}
           </DialogTitle>
           <DialogDescription className="text-center">
             {isAuthenticated 
-              ? "Get unlimited access to expertly designed fitness plans"
-              : "Create an account to unlock personalized fitness plans designed by professional trainers"
+              ? "Subscribe to access premium workouts and training programs"
+              : "Log in or create an account to access this workout and training program"
             }
           </DialogDescription>
         </DialogHeader>

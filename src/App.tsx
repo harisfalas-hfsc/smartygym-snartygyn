@@ -10,6 +10,7 @@ import Community from "./pages/Community";
 import Index from "./pages/Index";
 import Auth from "./pages/Auth";
 import Dashboard from "./pages/Dashboard";
+import UserDashboard from "./pages/UserDashboard";
 import WorkoutFlow from "./pages/WorkoutFlow";
 import WorkoutDetail from "./pages/WorkoutDetail";
 import IndividualWorkout from "./pages/IndividualWorkout";
@@ -53,6 +54,7 @@ const App = () => (
           {/* Authenticated routes with motivational banner */}
           <Route element={<ProtectedRoute><AuthenticatedLayout /></ProtectedRoute>}>
             <Route path="/dashboard" element={<Dashboard />} />
+            <Route path="/user-dashboard" element={<UserDashboard />} />
             <Route path="/profile-settings" element={<ProfileSettings />} />
           </Route>
           
