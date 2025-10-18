@@ -17,6 +17,7 @@ import ProfileSettings from "./pages/ProfileSettings";
 import OneRMCalculator from "./pages/OneRMCalculator";
 import BMRCalculator from "./pages/BMRCalculator";
 import CalorieCalculator from "./pages/CalorieCalculator";
+import ExerciseLibrary from "./pages/ExerciseLibrary";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -36,6 +37,7 @@ const App = () => (
           <Route path="/workout" element={<WorkoutFlow />} />
           <Route path="/training-program" element={<TrainingProgramFlow />} />
           <Route path="/diet-plan" element={<DietPlanFlow />} />
+          <Route path="/exercise-library" element={<ExerciseLibrary />} />
           
           {/* Public community page */}
           <Route path="/community" element={<Community />} />

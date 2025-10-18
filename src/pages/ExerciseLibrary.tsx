@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { ArrowLeft } from "lucide-react";
 
-const TrainingProgramFlow = () => {
+const ExerciseLibrary = () => {
   const navigate = useNavigate();
 
   return (
@@ -19,7 +19,7 @@ const TrainingProgramFlow = () => {
           <span className="text-xs sm:text-sm">Back to Home</span>
         </Button>
         
-        <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-center mb-6 sm:mb-8">Training Program</h1>
+        <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-center mb-6 sm:mb-8">Exercise Library</h1>
         
         <Card>
           <CardContent className="p-6">
@@ -31,4 +31,4 @@ const TrainingProgramFlow = () => {
   );
 };
 
-export default TrainingProgramFlow;
+export default ExerciseLibrary;
