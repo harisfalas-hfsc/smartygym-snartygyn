@@ -62,7 +62,7 @@ const WorkoutFlow = () => {
           <span className="text-xs sm:text-sm">Back to Home</span>
         </Button>
         
-        <h1 className="text-3xl sm:text-4xl font-bold text-center mb-2">Workout</h1>
+        <h1 className="text-3xl sm:text-4xl font-bold text-center mb-2">Workouts</h1>
         <p className="text-center text-muted-foreground mb-8">Choose your workout type</p>
         
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
