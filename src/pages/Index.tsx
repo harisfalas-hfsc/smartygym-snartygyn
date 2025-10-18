@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { ServiceCard } from "@/components/ServiceCard";
 import { Button } from "@/components/ui/button";
-import { Dumbbell, Calendar, Utensils, Calculator, Activity, Flame, User, LogOut, Instagram, Facebook, Users } from "lucide-react";
+import { Dumbbell, Calendar, Utensils, Calculator, Activity, Flame, User, LogOut, Instagram, Facebook, Users, Youtube } from "lucide-react";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { supabase } from "@/integrations/supabase/client";
 import { User as SupabaseUser } from "@supabase/supabase-js";
@@ -169,24 +169,18 @@ const Index = () => {
           <div className="flex flex-col items-center space-y-3 sm:space-y-4">
             <img src={smartyGymLogo} alt="Smarty Gym" className="h-32 sm:h-40 md:h-48 lg:h-56 w-auto" />
             <div className="text-center px-4 max-w-3xl">
-              <h1 className="text-xl sm:text-3xl md:text-4xl font-bold mb-2 leading-tight">
-                Your Smart Gym in Your Pocket
+              <h1 className="text-xl sm:text-3xl md:text-4xl lg:text-5xl font-bold mb-2 leading-tight">
+                SMARTY GYM
               </h1>
-              <p className="text-muted-foreground text-xs sm:text-base md:text-lg leading-relaxed">
-                Tailor Made workouts, Training Programs, Nutrition Plans and Tools
+              <p className="text-muted-foreground text-base sm:text-lg md:text-xl lg:text-2xl font-medium mb-1">
+                Your gym, reimagined. Anytime. Anywhere.
+              </p>
+              <p className="text-muted-foreground text-base sm:text-lg md:text-xl lg:text-2xl font-medium">
+                All in your pocket.
               </p>
             </div>
             {/* Social Media Links */}
             <div className="flex items-center gap-2 sm:gap-3">
-              <a
-                href="https://www.instagram.com/thesmartygym/"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="p-2 sm:p-3 rounded-full bg-muted hover:bg-primary hover:text-primary-foreground transition-colors"
-                aria-label="Instagram"
-              >
-                <Instagram className="h-4 w-4 sm:h-6 sm:w-6" />
-              </a>
               <a
                 href="https://www.facebook.com/profile.php?id=61579302997368"
                 target="_blank"
@@ -195,6 +189,15 @@ const Index = () => {
                 aria-label="Facebook"
               >
                 <Facebook className="h-4 w-4 sm:h-6 sm:w-6" />
+              </a>
+              <a
+                href="https://www.instagram.com/thesmartygym/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="p-2 sm:p-3 rounded-full bg-muted hover:bg-primary hover:text-primary-foreground transition-colors"
+                aria-label="Instagram"
+              >
+                <Instagram className="h-4 w-4 sm:h-6 sm:w-6" />
               </a>
               <a
                 href="https://www.tiktok.com/@thesmartygym?lang=en"
@@ -206,6 +209,15 @@ const Index = () => {
                 <svg className="h-4 w-4 sm:h-6 sm:w-6" viewBox="0 0 24 24" fill="currentColor">
                   <path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-5.2 1.74 2.89 2.89 0 0 1 2.31-4.64 2.93 2.93 0 0 1 .88.13V9.4a6.84 6.84 0 0 0-1-.05A6.33 6.33 0 0 0 5 20.1a6.34 6.34 0 0 0 10.86-4.43v-7a8.16 8.16 0 0 0 4.77 1.52v-3.4a4.85 4.85 0 0 1-1-.1z"/>
                 </svg>
+              </a>
+              <a
+                href="https://www.youtube.com/@TheSmartyGym"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="p-2 sm:p-3 rounded-full bg-muted hover:bg-primary hover:text-primary-foreground transition-colors"
+                aria-label="YouTube"
+              >
+                <Youtube className="h-4 w-4 sm:h-6 sm:w-6" />
               </a>
             </div>
           </div>
@@ -278,15 +290,6 @@ const Index = () => {
             {/* Social Media Links */}
             <div className="flex items-center gap-4">
               <a
-                href="https://www.instagram.com/thesmartygym/"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="p-2 rounded-full bg-muted hover:bg-primary hover:text-primary-foreground transition-colors"
-                aria-label="Instagram"
-              >
-                <Instagram className="h-5 w-5" />
-              </a>
-              <a
                 href="https://www.facebook.com/profile.php?id=61579302997368"
                 target="_blank"
                 rel="noopener noreferrer"
@@ -294,6 +297,15 @@ const Index = () => {
                 aria-label="Facebook"
               >
                 <Facebook className="h-5 w-5" />
+              </a>
+              <a
+                href="https://www.instagram.com/thesmartygym/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="p-2 rounded-full bg-muted hover:bg-primary hover:text-primary-foreground transition-colors"
+                aria-label="Instagram"
+              >
+                <Instagram className="h-5 w-5" />
               </a>
               <a
                 href="https://www.tiktok.com/@thesmartygym?lang=en"
@@ -305,6 +317,15 @@ const Index = () => {
                 <svg className="h-5 w-5" viewBox="0 0 24 24" fill="currentColor">
                   <path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-5.2 1.74 2.89 2.89 0 0 1 2.31-4.64 2.93 2.93 0 0 1 .88.13V9.4a6.84 6.84 0 0 0-1-.05A6.33 6.33 0 0 0 5 20.1a6.34 6.34 0 0 0 10.86-4.43v-7a8.16 8.16 0 0 0 4.77 1.52v-3.4a4.85 4.85 0 0 1-1-.1z"/>
                 </svg>
+              </a>
+              <a
+                href="https://www.youtube.com/@TheSmartyGym"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="p-2 rounded-full bg-muted hover:bg-primary hover:text-primary-foreground transition-colors"
+                aria-label="YouTube"
+              >
+                <Youtube className="h-5 w-5" />
               </a>
             </div>
             {/* Copyright */}
