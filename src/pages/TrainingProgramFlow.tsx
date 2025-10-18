@@ -8,10 +8,24 @@ const TrainingProgramFlow = () => {
 
   const programTypes = [
     {
+      id: "cardio-free",
+      icon: Heart,
+      title: "Cardio",
+      description: "Improve cardiovascular endurance and heart health",
+      isFree: true
+    },
+    {
       id: "cardio",
       icon: Heart,
       title: "Cardio",
       description: "Improve cardiovascular endurance and heart health"
+    },
+    {
+      id: "functional-strength-free",
+      icon: Dumbbell,
+      title: "Functional Strength",
+      description: "Build strength for everyday movements and activities",
+      isFree: true
     },
     {
       id: "functional-strength",
@@ -20,10 +34,24 @@ const TrainingProgramFlow = () => {
       description: "Build strength for everyday movements and activities"
     },
     {
+      id: "muscle-hypertrophy-free",
+      icon: Activity,
+      title: "Muscle Hypertrophy",
+      description: "Maximize muscle growth with progressive overload",
+      isFree: true
+    },
+    {
       id: "muscle-hypertrophy",
       icon: Activity,
       title: "Muscle Hypertrophy",
       description: "Maximize muscle growth with progressive overload"
+    },
+    {
+      id: "weight-loss-free",
+      icon: Scale,
+      title: "Weight Loss",
+      description: "Burn fat and achieve your ideal body composition",
+      isFree: true
     },
     {
       id: "weight-loss",
@@ -32,10 +60,24 @@ const TrainingProgramFlow = () => {
       description: "Burn fat and achieve your ideal body composition"
     },
     {
+      id: "low-back-pain-free",
+      icon: User,
+      title: "Low Back Pain",
+      description: "Strengthen and rehabilitate your lower back",
+      isFree: true
+    },
+    {
       id: "low-back-pain",
       icon: User,
       title: "Low Back Pain",
       description: "Strengthen and rehabilitate your lower back"
+    },
+    {
+      id: "mobility-stability-free",
+      icon: Move,
+      title: "Mobility & Stability",
+      description: "Enhance flexibility, balance, and joint health",
+      isFree: true
     },
     {
       id: "mobility-stability",
@@ -72,8 +114,13 @@ const TrainingProgramFlow = () => {
               <Card
                 key={program.id}
                 onClick={() => handleProgramSelect(program.id)}
-                className="p-6 cursor-pointer transition-all duration-300 hover:scale-105 hover:shadow-gold bg-card border-border"
+                className="p-6 cursor-pointer transition-all duration-300 hover:scale-105 hover:shadow-gold bg-card border-border relative"
               >
+                {program.isFree && (
+                  <div className="absolute top-3 right-3 bg-primary text-primary-foreground px-3 py-1 rounded-full text-xs font-semibold">
+                    FREE
+                  </div>
+                )}
                 <div className="flex flex-col items-center text-center space-y-4">
                   <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center">
                     <Icon className="w-8 h-8 text-primary" />

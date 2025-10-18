@@ -8,6 +8,8 @@ import { WorkoutInteractions } from "@/components/WorkoutInteractions";
 const IndividualWorkout = () => {
   const navigate = useNavigate();
   const { type, id } = useParams();
+  const workoutId = id || "1";
+  const isFreeWorkout = workoutId.includes("-free") || type?.includes("-free");
 
   // Sample workout names based on type and id
   const workoutNames: { [key: string]: { [key: string]: { name: string; difficulty: number; serial: string } } } = {
@@ -77,33 +79,37 @@ Intensity: Adjustable based on your fitness level
 
 This program is suitable for individuals who have completed their PAR-Q+ assessment and received clearance to exercise. The workout can be modified to match your current fitness level by adjusting work and rest periods, rounds, and exercise intensity.`;
 
+  const content = (
+    <>
+      <WorkoutInteractions
+        workoutId={`${type}-${id}`}
+        workoutType={type || 'cardio'}
+        workoutName={workoutInfo.name}
+      />
+      
+      <WorkoutDisplay
+        exercises={exercises}
+        planContent={planContent}
+        title={workoutInfo.name}
+        serial={workoutInfo.serial}
+        difficulty={workoutInfo.difficulty}
+      />
+    </>
+  );
+
   return (
     <div className="min-h-screen bg-background">
       <div className="container mx-auto px-4 py-8">
         <Button
-          onClick={() => navigate(`/workout/${type}`)}
+          onClick={() => navigate('/workout')}
           variant="outline"
           className="mb-6"
         >
           <ArrowLeft className="w-4 h-4 mr-2" />
-          Back to {type} Workouts
+          Back to Workouts
         </Button>
 
-        <PremiumContentGate>
-          <WorkoutInteractions
-            workoutId={`${type}-${id}`}
-            workoutType={type || 'cardio'}
-            workoutName={workoutInfo.name}
-          />
-          
-          <WorkoutDisplay
-            exercises={exercises}
-            planContent={planContent}
-            title={workoutInfo.name}
-            serial={workoutInfo.serial}
-            difficulty={workoutInfo.difficulty}
-          />
-        </PremiumContentGate>
+        {isFreeWorkout ? content : <PremiumContentGate>{content}</PremiumContentGate>}
       </div>
     </div>
   );

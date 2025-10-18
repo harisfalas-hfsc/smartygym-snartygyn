@@ -8,10 +8,24 @@ const WorkoutFlow = () => {
 
   const workoutTypes = [
     {
+      id: "strength-free",
+      icon: Dumbbell,
+      title: "Strength",
+      description: "Build muscle and increase power with resistance training",
+      isFree: true
+    },
+    {
       id: "strength",
       icon: Dumbbell,
       title: "Strength",
       description: "Build muscle and increase power with resistance training"
+    },
+    {
+      id: "calorie-burning-free",
+      icon: Flame,
+      title: "Calorie Burning",
+      description: "High-intensity workouts to maximize calorie expenditure",
+      isFree: true
     },
     {
       id: "calorie-burning",
@@ -20,10 +34,24 @@ const WorkoutFlow = () => {
       description: "High-intensity workouts to maximize calorie expenditure"
     },
     {
+      id: "metabolic-free",
+      icon: Zap,
+      title: "Metabolic",
+      description: "Boost your metabolism with interval-based training",
+      isFree: true
+    },
+    {
       id: "metabolic",
       icon: Zap,
       title: "Metabolic",
       description: "Boost your metabolism with interval-based training"
+    },
+    {
+      id: "cardio-free",
+      icon: Heart,
+      title: "Cardio",
+      description: "Improve cardiovascular health and endurance",
+      isFree: true
     },
     {
       id: "cardio",
@@ -32,10 +60,24 @@ const WorkoutFlow = () => {
       description: "Improve cardiovascular health and endurance"
     },
     {
+      id: "mobility-free",
+      icon: Move,
+      title: "Mobility & Stability",
+      description: "Enhance flexibility, balance, and joint health",
+      isFree: true
+    },
+    {
       id: "mobility",
       icon: Move,
       title: "Mobility & Stability",
       description: "Enhance flexibility, balance, and joint health"
+    },
+    {
+      id: "challenge-free",
+      icon: Activity,
+      title: "Challenge",
+      description: "Push your limits with advanced workout challenges",
+      isFree: true
     },
     {
       id: "challenge",
@@ -72,8 +114,13 @@ const WorkoutFlow = () => {
               <Card
                 key={workout.id}
                 onClick={() => handleWorkoutSelect(workout.id)}
-                className="p-6 cursor-pointer transition-all duration-300 hover:scale-105 hover:shadow-gold bg-card border-border"
+                className="p-6 cursor-pointer transition-all duration-300 hover:scale-105 hover:shadow-gold bg-card border-border relative"
               >
+                {workout.isFree && (
+                  <div className="absolute top-3 right-3 bg-primary text-primary-foreground px-3 py-1 rounded-full text-xs font-semibold">
+                    FREE
+                  </div>
+                )}
                 <div className="flex flex-col items-center text-center space-y-4">
                   <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center">
                     <Icon className="w-8 h-8 text-primary" />

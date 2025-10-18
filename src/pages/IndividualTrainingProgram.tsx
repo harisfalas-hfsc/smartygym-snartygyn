@@ -8,6 +8,8 @@ import { ProgramInteractions } from "@/components/ProgramInteractions";
 const IndividualTrainingProgram = () => {
   const navigate = useNavigate();
   const { type, id } = useParams();
+  const programId = id || "1";
+  const isFreeProgram = programId.includes("-free") || type?.includes("-free");
 
   // Sample program names based on type and id
   const programNames: { [key: string]: { [key: string]: { name: string; difficulty: number; serial: string } } } = {
@@ -81,33 +83,37 @@ Rest Days: Built into the program for optimal recovery
 
 This program requires completion of the PAR-Q+ assessment before beginning. Always listen to your body and adjust the program as needed based on your recovery and performance.`;
 
+  const content = (
+    <>
+      <ProgramInteractions
+        programId={`${type}-${id}`}
+        programType={type || 'cardio'}
+        programName={programInfo.name}
+      />
+      
+      <WorkoutDisplay
+        exercises={exercises}
+        planContent={planContent}
+        title={programInfo.name}
+        serial={programInfo.serial}
+        difficulty={programInfo.difficulty}
+      />
+    </>
+  );
+
   return (
     <div className="min-h-screen bg-background">
       <div className="container mx-auto px-4 py-8">
         <Button
-          onClick={() => navigate(`/training-program/${type}`)}
+          onClick={() => navigate('/training-program')}
           variant="outline"
           className="mb-6"
         >
           <ArrowLeft className="w-4 h-4 mr-2" />
-          Back to {type} Programs
+          Back to Training Programs
         </Button>
 
-        <PremiumContentGate>
-          <ProgramInteractions
-            programId={`${type}-${id}`}
-            programType={type || 'cardio'}
-            programName={programInfo.name}
-          />
-          
-          <WorkoutDisplay
-            exercises={exercises}
-            planContent={planContent}
-            title={programInfo.name}
-            serial={programInfo.serial}
-            difficulty={programInfo.difficulty}
-          />
-        </PremiumContentGate>
+        {isFreeProgram ? content : <PremiumContentGate>{content}</PremiumContentGate>}
       </div>
     </div>
   );
