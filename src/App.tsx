@@ -6,6 +6,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { ThemeProvider } from "next-themes";
 import { ProtectedRoute } from "./components/ProtectedRoute";
 import { AuthenticatedLayout } from "./components/AuthenticatedLayout";
+import { Navigation } from "./components/Navigation";
 import Community from "./pages/Community";
 import Index from "./pages/Index";
 import Auth from "./pages/Auth";
@@ -34,7 +35,8 @@ const App = () => (
         <Toaster />
         <Sonner />
         <BrowserRouter>
-        <Routes>
+          <Navigation />
+          <Routes>
           <Route path="/" element={<Index />} />
           <Route path="/auth" element={<Auth />} />
           

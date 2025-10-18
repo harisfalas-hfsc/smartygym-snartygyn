@@ -8,7 +8,6 @@ import { supabase } from "@/integrations/supabase/client";
 import { User as SupabaseUser } from "@supabase/supabase-js";
 import { useToast } from "@/hooks/use-toast";
 import smartyGymLogo from "@/assets/smarty-gym-logo.png";
-import { Navigation } from "@/components/Navigation";
 
 const Index = () => {
   const navigate = useNavigate();
@@ -116,8 +115,6 @@ const Index = () => {
   };
   return (
     <div className="min-h-screen bg-background">
-      <Navigation />
-
       {/* Hero Section */}
       <section className="py-6 px-4 border-b border-border">
         <div className="container mx-auto max-w-6xl">
