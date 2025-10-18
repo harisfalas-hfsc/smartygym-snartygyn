@@ -12,30 +12,35 @@ import smartyGymLogo from "@/assets/smarty-gym-logo.png";
 import { ThemeToggle } from "@/components/ThemeToggle";
 const Index = () => {
   const navigate = useNavigate();
-  const { toast } = useToast();
+  const {
+    toast
+  } = useToast();
   const [user, setUser] = useState<SupabaseUser | null>(null);
-
   useEffect(() => {
     // Check current session
-    supabase.auth.getSession().then(({ data: { session } }) => {
+    supabase.auth.getSession().then(({
+      data: {
+        session
+      }
+    }) => {
       setUser(session?.user ?? null);
     });
 
     // Listen for auth changes
     const {
-      data: { subscription },
+      data: {
+        subscription
+      }
     } = supabase.auth.onAuthStateChange((_event, session) => {
       setUser(session?.user ?? null);
     });
-
     return () => subscription.unsubscribe();
   }, []);
-
   const handleLogout = async () => {
     await supabase.auth.signOut();
     toast({
       title: "Logged out",
-      description: "You have been logged out successfully",
+      description: "You have been logged out successfully"
     });
   };
   const services = [{
@@ -84,25 +89,25 @@ const Index = () => {
       navigate(routes[serviceId]);
     }
   };
-
   const handleSubscribe = async (plan: 'gold' | 'platinum') => {
     if (!user) {
       navigate('/auth');
       return;
     }
-
     const priceIds = {
       gold: 'price_1SJ9q1IxQYg9inGKZzxxqPbD',
       platinum: 'price_1SJ9qGIxQYg9inGKFbgqVRjj'
     };
-
     try {
-      const { data, error } = await supabase.functions.invoke('create-checkout', {
-        body: { priceId: priceIds[plan] }
+      const {
+        data,
+        error
+      } = await supabase.functions.invoke('create-checkout', {
+        body: {
+          priceId: priceIds[plan]
+        }
       });
-
       if (error) throw error;
-
       if (data?.url) {
         window.open(data.url, '_blank');
       }
@@ -111,7 +116,7 @@ const Index = () => {
       toast({
         title: "Error",
         description: "Failed to start checkout process. Please try again.",
-        variant: "destructive",
+        variant: "destructive"
       });
     }
   };
@@ -125,8 +130,7 @@ const Index = () => {
                 <Users className="h-4 w-4 sm:mr-1" />
                 <span className="hidden sm:inline">Community</span>
               </Button>
-              {user ? (
-                <>
+              {user ? <>
                   <Button variant="outline" size="sm" onClick={() => navigate("/dashboard")} className="text-xs sm:text-sm hidden sm:flex">
                     Dashboard
                   </Button>
@@ -147,9 +151,7 @@ const Index = () => {
                       </DropdownMenuItem>
                     </DropdownMenuContent>
                   </DropdownMenu>
-                </>
-              ) : (
-                <>
+                </> : <>
                   <Button variant="outline" size="sm" onClick={() => navigate("/auth")} className="text-xs sm:text-sm">
                     Login
                   </Button>
@@ -157,8 +159,7 @@ const Index = () => {
                     Sign Up
                   </Button>
                   <ThemeToggle />
-                </>
-              )}
+                </>}
             </div>
           </div>
         </div>
@@ -194,42 +195,18 @@ const Index = () => {
           {/* Social Media Links */}
           <div className="flex justify-center">
             <div className="flex items-center gap-2 sm:gap-3">
-              <a
-                href="https://www.facebook.com/profile.php?id=61579302997368"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="p-2 sm:p-3 rounded-full bg-muted hover:bg-primary hover:text-primary-foreground transition-colors"
-                aria-label="Facebook"
-              >
+              <a href="https://www.facebook.com/profile.php?id=61579302997368" target="_blank" rel="noopener noreferrer" className="p-2 sm:p-3 rounded-full bg-muted hover:bg-primary hover:text-primary-foreground transition-colors" aria-label="Facebook">
                 <Facebook className="h-4 w-4 sm:h-6 sm:w-6" />
               </a>
-              <a
-                href="https://www.instagram.com/thesmartygym/"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="p-2 sm:p-3 rounded-full bg-muted hover:bg-primary hover:text-primary-foreground transition-colors"
-                aria-label="Instagram"
-              >
+              <a href="https://www.instagram.com/thesmartygym/" target="_blank" rel="noopener noreferrer" className="p-2 sm:p-3 rounded-full bg-muted hover:bg-primary hover:text-primary-foreground transition-colors" aria-label="Instagram">
                 <Instagram className="h-4 w-4 sm:h-6 sm:w-6" />
               </a>
-              <a
-                href="https://www.tiktok.com/@thesmartygym?lang=en"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="p-2 sm:p-3 rounded-full bg-muted hover:bg-primary hover:text-primary-foreground transition-colors"
-                aria-label="TikTok"
-              >
+              <a href="https://www.tiktok.com/@thesmartygym?lang=en" target="_blank" rel="noopener noreferrer" className="p-2 sm:p-3 rounded-full bg-muted hover:bg-primary hover:text-primary-foreground transition-colors" aria-label="TikTok">
                 <svg className="h-4 w-4 sm:h-6 sm:w-6" viewBox="0 0 24 24" fill="currentColor">
-                  <path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-5.2 1.74 2.89 2.89 0 0 1 2.31-4.64 2.93 2.93 0 0 1 .88.13V9.4a6.84 6.84 0 0 0-1-.05A6.33 6.33 0 0 0 5 20.1a6.34 6.34 0 0 0 10.86-4.43v-7a8.16 8.16 0 0 0 4.77 1.52v-3.4a4.85 4.85 0 0 1-1-.1z"/>
+                  <path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-5.2 1.74 2.89 2.89 0 0 1 2.31-4.64 2.93 2.93 0 0 1 .88.13V9.4a6.84 6.84 0 0 0-1-.05A6.33 6.33 0 0 0 5 20.1a6.34 6.34 0 0 0 10.86-4.43v-7a8.16 8.16 0 0 0 4.77 1.52v-3.4a4.85 4.85 0 0 1-1-.1z" />
                 </svg>
               </a>
-              <a
-                href="https://www.youtube.com/@TheSmartyGym"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="p-2 sm:p-3 rounded-full bg-muted hover:bg-primary hover:text-primary-foreground transition-colors"
-                aria-label="YouTube"
-              >
+              <a href="https://www.youtube.com/@TheSmartyGym" target="_blank" rel="noopener noreferrer" className="p-2 sm:p-3 rounded-full bg-muted hover:bg-primary hover:text-primary-foreground transition-colors" aria-label="YouTube">
                 <Youtube className="h-4 w-4 sm:h-6 sm:w-6" />
               </a>
             </div>
@@ -241,12 +218,8 @@ const Index = () => {
       <main className="py-8 sm:py-12 px-4">
         <div className="container mx-auto max-w-6xl">
           <div className="text-center mb-6 sm:mb-12 px-4">
-            <h2 className="text-lg sm:text-2xl md:text-3xl font-bold mb-2 sm:mb-4">
-              I Want To...
-            </h2>
-            <p className="text-muted-foreground text-xs sm:text-base leading-relaxed">
-              Choose a service to get started with your personalized fitness journey
-            </p>
+            
+            
           </div>
 
           {/* Services Grid */}
@@ -268,11 +241,7 @@ const Index = () => {
                 <div className="text-primary font-bold text-base sm:text-xl mb-1 sm:mb-2">GOLD</div>
                 <div className="text-xl sm:text-3xl font-bold mb-1 sm:mb-2">€9.99</div>
                 <div className="text-xs sm:text-sm text-muted-foreground mb-3 sm:mb-4">per month</div>
-                <Button 
-                  variant="default" 
-                  className="w-full text-sm sm:text-base"
-                  onClick={() => handleSubscribe('gold')}
-                >
+                <Button variant="default" className="w-full text-sm sm:text-base" onClick={() => handleSubscribe('gold')}>
                   Get Started
                 </Button>
               </div>
@@ -283,11 +252,7 @@ const Index = () => {
                 <div className="text-primary font-bold text-base sm:text-xl mb-1 sm:mb-2">PLATINUM</div>
                 <div className="text-xl sm:text-3xl font-bold mb-1 sm:mb-2">€89.99</div>
                 <div className="text-xs sm:text-sm text-muted-foreground mb-3 sm:mb-4">per year</div>
-                <Button 
-                  variant="default" 
-                  className="w-full text-sm sm:text-base"
-                  onClick={() => handleSubscribe('platinum')}
-                >
+                <Button variant="default" className="w-full text-sm sm:text-base" onClick={() => handleSubscribe('platinum')}>
                   Get Started
                 </Button>
               </div>
@@ -302,42 +267,18 @@ const Index = () => {
           <div className="flex flex-col items-center gap-6">
             {/* Social Media Links */}
             <div className="flex items-center gap-4">
-              <a
-                href="https://www.facebook.com/profile.php?id=61579302997368"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="p-2 rounded-full bg-muted hover:bg-primary hover:text-primary-foreground transition-colors"
-                aria-label="Facebook"
-              >
+              <a href="https://www.facebook.com/profile.php?id=61579302997368" target="_blank" rel="noopener noreferrer" className="p-2 rounded-full bg-muted hover:bg-primary hover:text-primary-foreground transition-colors" aria-label="Facebook">
                 <Facebook className="h-5 w-5" />
               </a>
-              <a
-                href="https://www.instagram.com/thesmartygym/"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="p-2 rounded-full bg-muted hover:bg-primary hover:text-primary-foreground transition-colors"
-                aria-label="Instagram"
-              >
+              <a href="https://www.instagram.com/thesmartygym/" target="_blank" rel="noopener noreferrer" className="p-2 rounded-full bg-muted hover:bg-primary hover:text-primary-foreground transition-colors" aria-label="Instagram">
                 <Instagram className="h-5 w-5" />
               </a>
-              <a
-                href="https://www.tiktok.com/@thesmartygym?lang=en"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="p-2 rounded-full bg-muted hover:bg-primary hover:text-primary-foreground transition-colors"
-                aria-label="TikTok"
-              >
+              <a href="https://www.tiktok.com/@thesmartygym?lang=en" target="_blank" rel="noopener noreferrer" className="p-2 rounded-full bg-muted hover:bg-primary hover:text-primary-foreground transition-colors" aria-label="TikTok">
                 <svg className="h-5 w-5" viewBox="0 0 24 24" fill="currentColor">
-                  <path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-5.2 1.74 2.89 2.89 0 0 1 2.31-4.64 2.93 2.93 0 0 1 .88.13V9.4a6.84 6.84 0 0 0-1-.05A6.33 6.33 0 0 0 5 20.1a6.34 6.34 0 0 0 10.86-4.43v-7a8.16 8.16 0 0 0 4.77 1.52v-3.4a4.85 4.85 0 0 1-1-.1z"/>
+                  <path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-5.2 1.74 2.89 2.89 0 0 1 2.31-4.64 2.93 2.93 0 0 1 .88.13V9.4a6.84 6.84 0 0 0-1-.05A6.33 6.33 0 0 0 5 20.1a6.34 6.34 0 0 0 10.86-4.43v-7a8.16 8.16 0 0 0 4.77 1.52v-3.4a4.85 4.85 0 0 1-1-.1z" />
                 </svg>
               </a>
-              <a
-                href="https://www.youtube.com/@TheSmartyGym"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="p-2 rounded-full bg-muted hover:bg-primary hover:text-primary-foreground transition-colors"
-                aria-label="YouTube"
-              >
+              <a href="https://www.youtube.com/@TheSmartyGym" target="_blank" rel="noopener noreferrer" className="p-2 rounded-full bg-muted hover:bg-primary hover:text-primary-foreground transition-colors" aria-label="YouTube">
                 <Youtube className="h-5 w-5" />
               </a>
             </div>
