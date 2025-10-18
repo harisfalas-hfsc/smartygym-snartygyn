@@ -7,15 +7,34 @@ import { Play, Pause, RotateCcw, Star } from "lucide-react";
 import workoutHero from "@/assets/workout-hero.jpg";
 import { ParQQuestionnaire } from "@/components/ParQQuestionnaire";
 
+interface Exercise {
+  name: string;
+  video_id: string;
+  video_url: string;
+  sets?: number;
+  reps?: string;
+  rest?: string;
+  notes?: string;
+}
+
 interface WorkoutDisplayProps {
-  exercises: Array<{ name: string; video_id: string; video_url: string }>;
+  exercises: Exercise[];
   planContent: string;
   title?: string;
   serial?: string;
   difficulty?: number;
+  workoutDetails?: {
+    exercises: Array<{
+      name: string;
+      sets: string;
+      reps: string;
+      rest: string;
+      notes?: string;
+    }>;
+  };
 }
 
-export const WorkoutDisplay = ({ exercises, planContent, title = "Workout", serial = "001", difficulty = 3 }: WorkoutDisplayProps) => {
+export const WorkoutDisplay = ({ exercises, planContent, title = "Workout", serial = "001", difficulty = 3, workoutDetails }: WorkoutDisplayProps) => {
   const [currentVideoId, setCurrentVideoId] = useState<string>(exercises[0]?.video_id || "");
   const [workTime, setWorkTime] = useState(20);
   const [restTime, setRestTime] = useState(10);
@@ -312,6 +331,42 @@ export const WorkoutDisplay = ({ exercises, planContent, title = "Workout", seri
 
       {/* Workout Content */}
       <div className="space-y-6 mt-8">
+        {/* Detailed Workout Plan */}
+        {workoutDetails && (
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2 text-2xl">
+                🏋️ Workout Plan
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                {workoutDetails.exercises.map((exercise, index) => (
+                  <div key={index} className="border-l-4 border-primary pl-4 py-2">
+                    <h3 className="font-bold text-lg mb-2">{exercise.name}</h3>
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-2 text-sm">
+                      <div>
+                        <span className="font-semibold text-primary">Sets:</span> {exercise.sets}
+                      </div>
+                      <div>
+                        <span className="font-semibold text-primary">Reps:</span> {exercise.reps}
+                      </div>
+                      <div>
+                        <span className="font-semibold text-primary">Rest:</span> {exercise.rest}
+                      </div>
+                    </div>
+                    {exercise.notes && (
+                      <p className="text-sm text-muted-foreground mt-2 italic">
+                        💡 {exercise.notes}
+                      </p>
+                    )}
+                  </div>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+        )}
+
         {/* Program Description */}
         <Card>
           <CardHeader>

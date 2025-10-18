@@ -78,6 +78,87 @@ Intensity: Adjustable based on your fitness level
 
 This program is suitable for individuals who have completed their PAR-Q+ assessment and received clearance to exercise. The workout can be modified to match your current fitness level by adjusting work and rest periods, rounds, and exercise intensity.`;
 
+  // Get specific workout details based on workout ID
+  const getWorkoutDetails = (workoutType: string, workoutId: string) => {
+    if (workoutId === "strength-free") {
+      return {
+        exercises: [
+          {
+            name: "Push-Ups",
+            sets: "3",
+            reps: "10-12",
+            rest: "60s",
+            notes: "Keep your core tight and lower until chest nearly touches ground. Modify on knees if needed."
+          },
+          {
+            name: "Bodyweight Squats",
+            sets: "3",
+            reps: "15-20",
+            rest: "60s",
+            notes: "Keep knees tracking over toes, chest up, and lower until thighs are parallel to ground."
+          },
+          {
+            name: "Plank Hold",
+            sets: "3",
+            reps: "30-45s",
+            rest: "45s",
+            notes: "Maintain straight line from head to heels. Don't let hips sag or pike up."
+          },
+          {
+            name: "Lunges (Alternating)",
+            sets: "3",
+            reps: "10 each leg",
+            rest: "60s",
+            notes: "Step forward and lower back knee toward ground. Keep front knee at 90 degrees."
+          },
+          {
+            name: "Pike Push-Ups",
+            sets: "3",
+            reps: "8-10",
+            rest: "60s",
+            notes: "Start in downward dog position and perform push-ups. Great for shoulders."
+          },
+          {
+            name: "Glute Bridges",
+            sets: "3",
+            reps: "15-20",
+            rest: "45s",
+            notes: "Squeeze glutes at the top and hold for 1 second. Keep core engaged."
+          }
+        ]
+      };
+    }
+    
+    // Default workout structure for other workouts
+    return {
+      exercises: [
+        {
+          name: "Exercise 1",
+          sets: "3-4",
+          reps: "10-12",
+          rest: "60-90s",
+          notes: "Focus on proper form and controlled movement."
+        },
+        {
+          name: "Exercise 2",
+          sets: "3-4",
+          reps: "10-12",
+          rest: "60-90s",
+          notes: "Maintain consistent tempo throughout."
+        },
+        {
+          name: "Exercise 3",
+          sets: "3-4",
+          reps: "12-15",
+          rest: "45-60s",
+          notes: "Challenge yourself while maintaining good form."
+        }
+      ]
+    };
+  };
+
+  const workoutDetails = getWorkoutDetails(type || "", id || "");
+
   const content = (
     <>
       <WorkoutInteractions
@@ -92,6 +173,7 @@ This program is suitable for individuals who have completed their PAR-Q+ assessm
         title={workoutInfo.name}
         serial={workoutInfo.serial}
         difficulty={workoutInfo.difficulty}
+        workoutDetails={workoutDetails}
       />
     </>
   );
