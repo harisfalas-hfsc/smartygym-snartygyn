@@ -21,7 +21,6 @@ import {
   CheckCircle,
   Clock,
   Link as LinkIcon,
-  Bike,
   Settings,
   RefreshCw,
   Youtube,
@@ -86,23 +85,6 @@ interface CalorieRecord {
   created_at: string;
 }
 
-interface StravaConnection {
-  id: string;
-  athlete_id: number;
-  created_at: string;
-}
-
-interface StravaActivity {
-  id: string;
-  strava_activity_id: number;
-  name: string;
-  type: string;
-  distance: number | null;
-  moving_time: number | null;
-  start_date: string;
-  calories: number | null;
-}
-
 export default function Dashboard() {
   const navigate = useNavigate();
   const { toast } = useToast();
@@ -127,10 +109,6 @@ export default function Dashboard() {
   const [bmrHistory, setBMRHistory] = useState<BMRRecord[]>([]);
   const [calorieHistory, setCalorieHistory] = useState<CalorieRecord[]>([]);
 
-  // Strava
-  const [stravaConnection, setStravaConnection] = useState<StravaConnection | null>(null);
-  const [stravaActivities, setStravaActivities] = useState<StravaActivity[]>([]);
-  const [loadingStrava, setLoadingStrava] = useState(false);
   const [syncingExercises, setSyncingExercises] = useState(false);
   const [profileAvatarUrl, setProfileAvatarUrl] = useState<string | null>(null);
 
@@ -166,8 +144,7 @@ export default function Dashboard() {
       fetchFavorites(userId),
       fetchAllWorkouts(userId),
       fetchAllPrograms(userId),
-      fetchCalculatorHistory(userId),
-      fetchStravaData(userId)
+      fetchCalculatorHistory(userId)
     ]);
   };
 
@@ -305,121 +282,6 @@ export default function Dashboard() {
     });
   };
 
-  const fetchStravaData = async (userId: string) => {
-    const { data: connection } = await supabase
-      .from("strava_connections")
-      .select("*")
-      .eq("user_id", userId)
-      .maybeSingle();
-
-    if (connection) {
-      setStravaConnection(connection);
-
-      const { data: activities } = await supabase
-        .from("strava_activities")
-        .select("*")
-        .eq("user_id", userId)
-        .order("start_date", { ascending: false })
-        .limit(10);
-
-      if (activities) setStravaActivities(activities);
-    }
-  };
-
-  const handleStravaConnect = async () => {
-    const clientId = "140946";
-    const redirectUri = `https://cvccrvyimyzrxcwzmxwk.supabase.co/functions/v1/strava-oauth-callback`;
-    const scope = "activity:read_all";
-    
-    const authUrl = `https://www.strava.com/oauth/authorize?client_id=${clientId}&redirect_uri=${redirectUri}&response_type=code&scope=${scope}`;
-    
-    window.open(authUrl, "_blank", "width=600,height=800");
-    
-    toast({
-      title: "Connecting to Strava",
-      description: "Complete the authorization in the popup window",
-    });
-  };
-
-  const handleStravaSync = async () => {
-    if (!user) return;
-    
-    setLoadingStrava(true);
-    try {
-      const { data: { session } } = await supabase.auth.getSession();
-      if (!session) return;
-
-      const { error } = await supabase.functions.invoke("strava-fetch-activities", {
-        headers: {
-          Authorization: `Bearer ${session.access_token}`,
-        },
-      });
-
-      if (error) throw error;
-
-      await fetchStravaData(user.id);
-      toast({
-        title: "Activities synced",
-        description: "Your Strava activities have been updated",
-      });
-    } catch (error) {
-      console.error("Strava sync error:", error);
-      toast({
-        title: "Sync failed",
-        description: "Failed to sync Strava activities",
-        variant: "destructive",
-      });
-    } finally {
-      setLoadingStrava(false);
-    }
-  };
-
-  const handleStravaDisconnect = async () => {
-    if (!user) return;
-    
-    setLoadingStrava(true);
-    try {
-      const { data: { session } } = await supabase.auth.getSession();
-      if (!session) return;
-
-      const { error } = await supabase.functions.invoke("strava-disconnect", {
-        headers: {
-          Authorization: `Bearer ${session.access_token}`,
-        },
-      });
-
-      if (error) throw error;
-
-      setStravaConnection(null);
-      setStravaActivities([]);
-      toast({
-        title: "Disconnected",
-        description: "Strava has been disconnected",
-      });
-    } catch (error) {
-      console.error("Strava disconnect error:", error);
-      toast({
-        title: "Disconnect failed",
-        description: "Failed to disconnect Strava",
-        variant: "destructive",
-      });
-    } finally {
-      setLoadingStrava(false);
-    }
-  };
-
-  const formatDistance = (meters: number | null) => {
-    if (!meters) return "N/A";
-    return (meters / 1000).toFixed(2) + " km";
-  };
-
-  const formatDuration = (seconds: number | null) => {
-    if (!seconds) return "N/A";
-    const hours = Math.floor(seconds / 3600);
-    const minutes = Math.floor((seconds % 3600) / 60);
-    return hours > 0 ? `${hours}h ${minutes}m` : `${minutes}m`;
-  };
-
   const handleSyncExercises = async () => {
     setSyncingExercises(true);
     try {
@@ -512,10 +374,6 @@ export default function Dashboard() {
             <TabsTrigger value="calculators" className="text-xs sm:text-sm">
               <Calculator className="mr-0 sm:mr-2 h-4 w-4" />
               <span className="hidden sm:inline">Calculators</span>
-            </TabsTrigger>
-            <TabsTrigger value="strava" className="text-xs sm:text-sm">
-              <Bike className="mr-0 sm:mr-2 h-4 w-4" />
-              <span className="hidden sm:inline">Strava</span>
             </TabsTrigger>
             <TabsTrigger value="community" className="text-xs sm:text-sm">
               <Users className="mr-0 sm:mr-2 h-4 w-4" />
@@ -1034,85 +892,6 @@ export default function Dashboard() {
                               (Maintenance: {record.maintenance_calories})
                             </p>
                           </div>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </CardContent>
-            </Card>
-          </TabsContent>
-
-          {/* Strava Tab */}
-          <TabsContent value="strava" className="space-y-6">
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <Bike className="h-5 w-5 text-primary" />
-                    Strava Integration
-                  </div>
-                  {stravaConnection ? (
-                    <div className="flex gap-2">
-                      <Button 
-                        size="sm" 
-                        onClick={handleStravaSync}
-                        disabled={loadingStrava}
-                      >
-                        {loadingStrava ? "Syncing..." : "Sync Activities"}
-                      </Button>
-                      <Button 
-                        size="sm" 
-                        variant="outline"
-                        onClick={handleStravaDisconnect}
-                        disabled={loadingStrava}
-                      >
-                        Disconnect
-                      </Button>
-                    </div>
-                  ) : (
-                    <Button size="sm" onClick={handleStravaConnect}>
-                      <LinkIcon className="mr-2 h-4 w-4" />
-                      Connect Strava
-                    </Button>
-                  )}
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                {!stravaConnection ? (
-                  <div className="text-center py-8">
-                    <Bike className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-                    <h3 className="text-lg font-semibold mb-2">Connect Your Strava Account</h3>
-                    <p className="text-sm text-muted-foreground mb-4">
-                      Sync your activities from Strava to track your fitness progress
-                    </p>
-                  </div>
-                ) : stravaActivities.length === 0 ? (
-                  <div className="text-center py-8">
-                    <p className="text-sm text-muted-foreground">
-                      No activities found. Click "Sync Activities" to fetch your latest workouts.
-                    </p>
-                  </div>
-                ) : (
-                  <div className="space-y-3">
-                    {stravaActivities.map((activity) => (
-                      <div key={activity.id} className="p-4 bg-muted rounded-lg">
-                        <div className="flex justify-between items-start">
-                          <div className="flex-1">
-                            <p className="font-medium">{activity.name}</p>
-                            <p className="text-sm text-muted-foreground mt-1">
-                              {activity.type} • {formatDistance(activity.distance)} • {formatDuration(activity.moving_time)}
-                            </p>
-                            <p className="text-xs text-muted-foreground mt-1">
-                              {formatDate(activity.start_date)}
-                            </p>
-                          </div>
-                          {activity.calories && (
-                            <div className="text-right">
-                              <p className="text-lg font-bold text-primary">{activity.calories}</p>
-                              <p className="text-xs text-muted-foreground">calories</p>
-                            </div>
-                          )}
                         </div>
                       </div>
                     ))}

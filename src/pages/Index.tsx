@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { ServiceCard } from "@/components/ServiceCard";
 import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
 import { Dumbbell, Calendar, Utensils, Calculator, Activity, Flame, User, LogOut, Instagram, Facebook, Users, Youtube } from "lucide-react";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { supabase } from "@/integrations/supabase/client";
@@ -166,21 +167,24 @@ const Index = () => {
       {/* Hero Section */}
       <section className="py-6 px-4 border-b border-border">
         <div className="container mx-auto max-w-6xl">
-          <div className="flex flex-col items-center space-y-3 sm:space-y-4">
-            <img src={smartyGymLogo} alt="Smarty Gym" className="h-32 sm:h-40 md:h-48 lg:h-56 w-auto" />
-            <div className="text-center px-4 sm:px-6 md:px-8 max-w-3xl w-full">
-              <div className="bg-muted/90 backdrop-blur-md border border-border rounded-2xl p-6 sm:p-8 md:p-10 shadow-xl">
-                <h1 className="text-xl sm:text-3xl md:text-4xl lg:text-5xl font-bold mb-4 leading-tight">
-                  SMARTY GYM
-                </h1>
-                <p className="text-muted-foreground text-base sm:text-lg md:text-xl lg:text-2xl font-medium mb-2">
-                  Your gym, reimagined. Anytime. Anywhere.
-                </p>
-                <p className="text-muted-foreground text-base sm:text-lg md:text-xl lg:text-2xl font-medium">
-                  All in your pocket.
-                </p>
-              </div>
+          <div className="flex flex-col items-center space-y-6">
+            {/* Hero Card matching ServiceCard style */}
+            <div className="w-full max-w-md">
+              <Card className="p-6 bg-card border-border shadow-sm">
+                <div className="flex flex-col items-center text-center space-y-4">
+                  <div className="flex items-center justify-center">
+                    <img src={smartyGymLogo} alt="Smarty Gym" className="h-20 w-auto" />
+                  </div>
+                  <div>
+                    <h1 className="font-semibold text-lg mb-2">SMARTY GYM</h1>
+                    <p className="text-sm text-muted-foreground">
+                      Your gym, reimagined. Anytime. Anywhere. All in your pocket.
+                    </p>
+                  </div>
+                </div>
+              </Card>
             </div>
+
             {/* Social Media Links */}
             <div className="flex items-center gap-2 sm:gap-3">
               <a

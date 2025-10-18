@@ -10,7 +10,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { ChevronLeft, ChevronRight, Loader2, Play } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
-import { StravaTrackingDialog } from "@/components/StravaTrackingDialog";
+
 import { WorkoutDisplay } from "@/components/WorkoutDisplay";
 import { SubscriptionGate } from "@/components/SubscriptionGate";
 import smartyGymLogo from "@/assets/smarty-gym-logo.png";
@@ -34,7 +34,6 @@ const WorkoutFlow = () => {
   const [loading, setLoading] = useState(false);
   const [generatedPlan, setGeneratedPlan] = useState("");
   const [savedWorkoutId, setSavedWorkoutId] = useState<string | null>(null);
-  const [showStravaDialog, setShowStravaDialog] = useState(false);
   const [exercises, setExercises] = useState<Array<{ name: string; video_id: string; video_url: string }>>([]);
   const [showSubscriptionGate, setShowSubscriptionGate] = useState(false);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -393,48 +392,30 @@ const WorkoutFlow = () => {
                   title={`${formData.goal} Workout`}
                 />
 
-                <div className="flex flex-col gap-4 pt-4">
-                  <Button 
-                    onClick={() => setShowStravaDialog(true)}
-                    size="lg"
-                    className="w-full"
-                  >
-                    <Play className="mr-2 h-5 w-5" />
-                    Track with Strava
+                <div className="flex justify-between gap-4 pt-4">
+                  <Button onClick={() => navigate("/")} variant="outline">
+                    Back to Home
                   </Button>
-                  
-                  <div className="flex justify-between gap-4">
-                    <Button onClick={() => navigate("/")} variant="outline">
-                      Back to Home
-                    </Button>
-                    <Button
-                      onClick={() => {
-                        setStep(1);
-                        setGeneratedPlan("");
-                        setSavedWorkoutId(null);
-                        setExercises([]);
-                        setFormData({
-                          age: "",
-                          height: "",
-                          weight: "",
-                          goal: "",
-                          timeAvailable: "",
-                          equipment: [],
-                          limitations: "",
-                        });
-                      }}
-                    >
-                      Create Another Plan
-                    </Button>
-                  </div>
+                  <Button
+                    onClick={() => {
+                      setStep(1);
+                      setGeneratedPlan("");
+                      setSavedWorkoutId(null);
+                      setExercises([]);
+                      setFormData({
+                        age: "",
+                        height: "",
+                        weight: "",
+                        goal: "",
+                        timeAvailable: "",
+                        equipment: [],
+                        limitations: "",
+                      });
+                    }}
+                  >
+                    Create Another Plan
+                  </Button>
                 </div>
-
-                <StravaTrackingDialog
-                  open={showStravaDialog}
-                  onOpenChange={setShowStravaDialog}
-                  planName={`${formData.goal} Workout`}
-                  planType="workout"
-                />
               </div>
             )}
 
