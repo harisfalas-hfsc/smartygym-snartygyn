@@ -281,6 +281,48 @@ export type Database = {
         }
         Relationships: []
       }
+      program_interactions: {
+        Row: {
+          created_at: string | null
+          has_viewed: boolean | null
+          id: string
+          is_completed: boolean | null
+          is_favorite: boolean | null
+          program_id: string
+          program_name: string
+          program_type: string
+          rating: number | null
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          has_viewed?: boolean | null
+          id?: string
+          is_completed?: boolean | null
+          is_favorite?: boolean | null
+          program_id: string
+          program_name: string
+          program_type: string
+          rating?: number | null
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          has_viewed?: boolean | null
+          id?: string
+          is_completed?: boolean | null
+          is_favorite?: boolean | null
+          program_id?: string
+          program_name?: string
+          program_type?: string
+          rating?: number | null
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       progress_logs: {
         Row: {
           created_at: string
@@ -560,6 +602,48 @@ export type Database = {
           stripe_subscription_id?: string | null
           updated_at?: string
           user_id?: string
+        }
+        Relationships: []
+      }
+      workout_interactions: {
+        Row: {
+          created_at: string | null
+          has_viewed: boolean | null
+          id: string
+          is_completed: boolean | null
+          is_favorite: boolean | null
+          rating: number | null
+          updated_at: string | null
+          user_id: string
+          workout_id: string
+          workout_name: string
+          workout_type: string
+        }
+        Insert: {
+          created_at?: string | null
+          has_viewed?: boolean | null
+          id?: string
+          is_completed?: boolean | null
+          is_favorite?: boolean | null
+          rating?: number | null
+          updated_at?: string | null
+          user_id: string
+          workout_id: string
+          workout_name: string
+          workout_type: string
+        }
+        Update: {
+          created_at?: string | null
+          has_viewed?: boolean | null
+          id?: string
+          is_completed?: boolean | null
+          is_favorite?: boolean | null
+          rating?: number | null
+          updated_at?: string | null
+          user_id?: string
+          workout_id?: string
+          workout_name?: string
+          workout_type?: string
         }
         Relationships: []
       }

@@ -2,6 +2,8 @@ import { useNavigate, useParams } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft } from "lucide-react";
 import { WorkoutDisplay } from "@/components/WorkoutDisplay";
+import { PremiumContentGate } from "@/components/PremiumContentGate";
+import { WorkoutInteractions } from "@/components/WorkoutInteractions";
 
 const IndividualWorkout = () => {
   const navigate = useNavigate();
@@ -87,13 +89,21 @@ This program is suitable for individuals who have completed their PAR-Q+ assessm
           Back to {type} Workouts
         </Button>
 
-        <WorkoutDisplay
-          exercises={exercises}
-          planContent={planContent}
-          title={workoutInfo.name}
-          serial={workoutInfo.serial}
-          difficulty={workoutInfo.difficulty}
-        />
+        <PremiumContentGate>
+          <WorkoutInteractions
+            workoutId={`${type}-${id}`}
+            workoutType={type || 'cardio'}
+            workoutName={workoutInfo.name}
+          />
+          
+          <WorkoutDisplay
+            exercises={exercises}
+            planContent={planContent}
+            title={workoutInfo.name}
+            serial={workoutInfo.serial}
+            difficulty={workoutInfo.difficulty}
+          />
+        </PremiumContentGate>
       </div>
     </div>
   );

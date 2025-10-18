@@ -2,6 +2,8 @@ import { useNavigate, useParams } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft } from "lucide-react";
 import { WorkoutDisplay } from "@/components/WorkoutDisplay";
+import { PremiumContentGate } from "@/components/PremiumContentGate";
+import { ProgramInteractions } from "@/components/ProgramInteractions";
 
 const IndividualTrainingProgram = () => {
   const navigate = useNavigate();
@@ -91,13 +93,21 @@ This program requires completion of the PAR-Q+ assessment before beginning. Alwa
           Back to {type} Programs
         </Button>
 
-        <WorkoutDisplay
-          exercises={exercises}
-          planContent={planContent}
-          title={programInfo.name}
-          serial={programInfo.serial}
-          difficulty={programInfo.difficulty}
-        />
+        <PremiumContentGate>
+          <ProgramInteractions
+            programId={`${type}-${id}`}
+            programType={type || 'cardio'}
+            programName={programInfo.name}
+          />
+          
+          <WorkoutDisplay
+            exercises={exercises}
+            planContent={planContent}
+            title={programInfo.name}
+            serial={programInfo.serial}
+            difficulty={programInfo.difficulty}
+          />
+        </PremiumContentGate>
       </div>
     </div>
   );
