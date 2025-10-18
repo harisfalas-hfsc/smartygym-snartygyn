@@ -118,8 +118,7 @@ const Index = () => {
       {/* Sticky Header with Logo */}
       <header className="sticky top-0 z-50 bg-background border-b border-border py-3 px-4">
         <div className="container mx-auto max-w-6xl">
-          <div className="flex justify-between items-center">
-            <img src={smartyGymLogo} alt="Smarty Gym" className="h-10 sm:h-12 w-auto" />
+          <div className="flex justify-center items-center">
             <div className="flex gap-2 items-center">
               <Button variant="outline" size="sm" onClick={() => navigate("/community")} className="text-xs sm:text-sm">
                 <Users className="h-4 w-4 sm:mr-1" />
@@ -168,7 +167,7 @@ const Index = () => {
       <section className="py-6 px-4 border-b border-border">
         <div className="container mx-auto max-w-6xl">
           <div className="flex flex-col items-center space-y-3 sm:space-y-4">
-            <img src={smartyGymLogo} alt="Smarty Gym" className="h-16 sm:h-24 md:h-32 w-auto" />
+            <img src={smartyGymLogo} alt="Smarty Gym" className="h-32 sm:h-40 md:h-48 lg:h-56 w-auto" />
             <div className="text-center px-4 max-w-3xl">
               <h1 className="text-xl sm:text-3xl md:text-4xl font-bold mb-2 leading-tight">
                 Your Smart Gym in Your Pocket
