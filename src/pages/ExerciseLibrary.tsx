@@ -11,7 +11,7 @@ interface Exercise {
   equipment: "bodyweight" | "equipment";
   videoId: string;
   bodyRegion: "upper" | "lower" | "full";
-  movementType: "push" | "pull" | "linear" | "rotational" | "isometric";
+  movementType: "push" | "pull" | "linear" | "rotational" | "isometric" | "hinge" | "squat" | "lunge" | "gait";
   targetMuscle: string;
 }
 
@@ -27,46 +27,46 @@ const ExerciseLibrary = () => {
   // 100 exercises list with comprehensive categorization
   const exercises: Exercise[] = [
     // Bodyweight exercises
-    { id: 1, name: "Air Squats", equipment: "bodyweight", bodyRegion: "lower", movementType: "linear", videoId: "", targetMuscle: "Quadriceps" },
+    { id: 1, name: "Air Squats", equipment: "bodyweight", bodyRegion: "lower", movementType: "squat", videoId: "", targetMuscle: "Quadriceps" },
     { id: 2, name: "Burpees", equipment: "bodyweight", bodyRegion: "full", movementType: "linear", videoId: "", targetMuscle: "Full Body" },
-    { id: 3, name: "Bridge", equipment: "bodyweight", bodyRegion: "lower", movementType: "linear", videoId: "", targetMuscle: "Glutes" },
+    { id: 3, name: "Bridge", equipment: "bodyweight", bodyRegion: "lower", movementType: "hinge", videoId: "", targetMuscle: "Glutes" },
     { id: 4, name: "Bicycle Crunches", equipment: "bodyweight", bodyRegion: "upper", movementType: "rotational", videoId: "", targetMuscle: "Abs" },
-    { id: 5, name: "Bear Crawl", equipment: "bodyweight", bodyRegion: "full", movementType: "linear", videoId: "", targetMuscle: "Core" },
+    { id: 5, name: "Bear Crawl", equipment: "bodyweight", bodyRegion: "full", movementType: "gait", videoId: "", targetMuscle: "Core" },
     { id: 6, name: "Calf Raises", equipment: "bodyweight", bodyRegion: "lower", movementType: "linear", videoId: "", targetMuscle: "Calves" },
     { id: 7, name: "Crunches", equipment: "bodyweight", bodyRegion: "upper", movementType: "linear", videoId: "", targetMuscle: "Abs" },
     { id: 8, name: "Chair Dips", equipment: "bodyweight", bodyRegion: "upper", movementType: "push", videoId: "", targetMuscle: "Triceps" },
     { id: 9, name: "Crow Pose", equipment: "bodyweight", bodyRegion: "upper", movementType: "isometric", videoId: "", targetMuscle: "Core" },
     { id: 10, name: "Decline Push-ups", equipment: "bodyweight", bodyRegion: "upper", movementType: "push", videoId: "", targetMuscle: "Chest" },
     { id: 11, name: "Diamond Push-ups", equipment: "bodyweight", bodyRegion: "upper", movementType: "push", videoId: "", targetMuscle: "Triceps" },
-    { id: 12, name: "Donkey Kicks", equipment: "bodyweight", bodyRegion: "lower", movementType: "linear", videoId: "", targetMuscle: "Glutes" },
+    { id: 12, name: "Donkey Kicks", equipment: "bodyweight", bodyRegion: "lower", movementType: "hinge", videoId: "", targetMuscle: "Glutes" },
     { id: 13, name: "Flutter Kicks", equipment: "bodyweight", bodyRegion: "upper", movementType: "linear", videoId: "", targetMuscle: "Abs" },
-    { id: 14, name: "Forward Lunges", equipment: "bodyweight", bodyRegion: "lower", movementType: "linear", videoId: "", targetMuscle: "Quadriceps" },
-    { id: 15, name: "Frog Jumps", equipment: "bodyweight", bodyRegion: "lower", movementType: "linear", videoId: "", targetMuscle: "Quadriceps" },
-    { id: 16, name: "Glute Bridges", equipment: "bodyweight", bodyRegion: "lower", movementType: "linear", videoId: "", targetMuscle: "Glutes" },
-    { id: 17, name: "High Knees", equipment: "bodyweight", bodyRegion: "full", movementType: "linear", videoId: "", targetMuscle: "Legs" },
+    { id: 14, name: "Forward Lunges", equipment: "bodyweight", bodyRegion: "lower", movementType: "lunge", videoId: "", targetMuscle: "Quadriceps" },
+    { id: 15, name: "Frog Jumps", equipment: "bodyweight", bodyRegion: "lower", movementType: "squat", videoId: "", targetMuscle: "Quadriceps" },
+    { id: 16, name: "Glute Bridges", equipment: "bodyweight", bodyRegion: "lower", movementType: "hinge", videoId: "", targetMuscle: "Glutes" },
+    { id: 17, name: "High Knees", equipment: "bodyweight", bodyRegion: "full", movementType: "gait", videoId: "", targetMuscle: "Legs" },
     { id: 18, name: "Handstand Push-ups", equipment: "bodyweight", bodyRegion: "upper", movementType: "push", videoId: "", targetMuscle: "Shoulders" },
-    { id: 19, name: "Hip Thrusts", equipment: "bodyweight", bodyRegion: "lower", movementType: "linear", videoId: "", targetMuscle: "Glutes" },
-    { id: 20, name: "Inchworms", equipment: "bodyweight", bodyRegion: "full", movementType: "linear", videoId: "", targetMuscle: "Core" },
+    { id: 19, name: "Hip Thrusts", equipment: "bodyweight", bodyRegion: "lower", movementType: "hinge", videoId: "", targetMuscle: "Glutes" },
+    { id: 20, name: "Inchworms", equipment: "bodyweight", bodyRegion: "full", movementType: "gait", videoId: "", targetMuscle: "Core" },
     { id: 21, name: "Jumping Jacks", equipment: "bodyweight", bodyRegion: "full", movementType: "linear", videoId: "", targetMuscle: "Full Body" },
-    { id: 22, name: "Jump Squats", equipment: "bodyweight", bodyRegion: "lower", movementType: "linear", videoId: "", targetMuscle: "Quadriceps" },
+    { id: 22, name: "Jump Squats", equipment: "bodyweight", bodyRegion: "lower", movementType: "squat", videoId: "", targetMuscle: "Quadriceps" },
     { id: 23, name: "Knee Push-ups", equipment: "bodyweight", bodyRegion: "upper", movementType: "push", videoId: "", targetMuscle: "Chest" },
     { id: 24, name: "Leg Raises", equipment: "bodyweight", bodyRegion: "upper", movementType: "linear", videoId: "", targetMuscle: "Abs" },
-    { id: 25, name: "Lunges", equipment: "bodyweight", bodyRegion: "lower", movementType: "linear", videoId: "", targetMuscle: "Quadriceps" },
+    { id: 25, name: "Lunges", equipment: "bodyweight", bodyRegion: "lower", movementType: "lunge", videoId: "", targetMuscle: "Quadriceps" },
     { id: 26, name: "Mountain Climbers", equipment: "bodyweight", bodyRegion: "full", movementType: "linear", videoId: "", targetMuscle: "Core" },
     { id: 27, name: "Neutral Grip Pull-ups", equipment: "bodyweight", bodyRegion: "upper", movementType: "pull", videoId: "", targetMuscle: "Back" },
     { id: 28, name: "Nose to Wall Handstand", equipment: "bodyweight", bodyRegion: "upper", movementType: "isometric", videoId: "", targetMuscle: "Shoulders" },
-    { id: 29, name: "One Leg Squats", equipment: "bodyweight", bodyRegion: "lower", movementType: "linear", videoId: "", targetMuscle: "Quadriceps" },
+    { id: 29, name: "One Leg Squats", equipment: "bodyweight", bodyRegion: "lower", movementType: "squat", videoId: "", targetMuscle: "Quadriceps" },
     { id: 30, name: "Plank", equipment: "bodyweight", bodyRegion: "upper", movementType: "isometric", videoId: "", targetMuscle: "Core" },
     { id: 31, name: "Pike Push-ups", equipment: "bodyweight", bodyRegion: "upper", movementType: "push", videoId: "", targetMuscle: "Shoulders" },
     { id: 32, name: "Push-ups", equipment: "bodyweight", bodyRegion: "upper", movementType: "push", videoId: "", targetMuscle: "Chest" },
     { id: 33, name: "Pull-ups", equipment: "bodyweight", bodyRegion: "upper", movementType: "pull", videoId: "", targetMuscle: "Back" },
     { id: 34, name: "Russian Twists", equipment: "bodyweight", bodyRegion: "upper", movementType: "rotational", videoId: "", targetMuscle: "Abs" },
-    { id: 35, name: "Reverse Lunges", equipment: "bodyweight", bodyRegion: "lower", movementType: "linear", videoId: "", targetMuscle: "Quadriceps" },
+    { id: 35, name: "Reverse Lunges", equipment: "bodyweight", bodyRegion: "lower", movementType: "lunge", videoId: "", targetMuscle: "Quadriceps" },
     { id: 36, name: "Side Plank", equipment: "bodyweight", bodyRegion: "upper", movementType: "isometric", videoId: "", targetMuscle: "Core" },
     { id: 37, name: "Sit-ups", equipment: "bodyweight", bodyRegion: "upper", movementType: "linear", videoId: "", targetMuscle: "Abs" },
     { id: 38, name: "Superman", equipment: "bodyweight", bodyRegion: "upper", movementType: "isometric", videoId: "", targetMuscle: "Back" },
-    { id: 39, name: "Step-ups", equipment: "bodyweight", bodyRegion: "lower", movementType: "linear", videoId: "", targetMuscle: "Quadriceps" },
-    { id: 40, name: "Tuck Jumps", equipment: "bodyweight", bodyRegion: "lower", movementType: "linear", videoId: "", targetMuscle: "Quadriceps" },
+    { id: 39, name: "Step-ups", equipment: "bodyweight", bodyRegion: "lower", movementType: "lunge", videoId: "", targetMuscle: "Quadriceps" },
+    { id: 40, name: "Tuck Jumps", equipment: "bodyweight", bodyRegion: "lower", movementType: "squat", videoId: "", targetMuscle: "Quadriceps" },
     { id: 41, name: "Tricep Dips", equipment: "bodyweight", bodyRegion: "upper", movementType: "push", videoId: "", targetMuscle: "Triceps" },
     { id: 42, name: "V-ups", equipment: "bodyweight", bodyRegion: "upper", movementType: "linear", videoId: "", targetMuscle: "Abs" },
     { id: 43, name: "Wall Sits", equipment: "bodyweight", bodyRegion: "lower", movementType: "isometric", videoId: "", targetMuscle: "Quadriceps" },
@@ -74,9 +74,9 @@ const ExerciseLibrary = () => {
     { id: 45, name: "Yoga Push-ups", equipment: "bodyweight", bodyRegion: "full", movementType: "push", videoId: "", targetMuscle: "Full Body" },
     
     // Equipment-based exercises
-    { id: 46, name: "Barbell Back Squats", equipment: "equipment", bodyRegion: "lower", movementType: "linear", videoId: "", targetMuscle: "Quadriceps" },
+    { id: 46, name: "Barbell Back Squats", equipment: "equipment", bodyRegion: "lower", movementType: "squat", videoId: "", targetMuscle: "Quadriceps" },
     { id: 47, name: "Barbell Bench Press", equipment: "equipment", bodyRegion: "upper", movementType: "push", videoId: "", targetMuscle: "Chest" },
-    { id: 48, name: "Barbell Deadlifts", equipment: "equipment", bodyRegion: "full", movementType: "pull", videoId: "", targetMuscle: "Back" },
+    { id: 48, name: "Barbell Deadlifts", equipment: "equipment", bodyRegion: "full", movementType: "hinge", videoId: "", targetMuscle: "Back" },
     { id: 49, name: "Barbell Rows", equipment: "equipment", bodyRegion: "upper", movementType: "pull", videoId: "", targetMuscle: "Back" },
     { id: 50, name: "Barbell Curls", equipment: "equipment", bodyRegion: "upper", movementType: "pull", videoId: "", targetMuscle: "Biceps" },
     { id: 51, name: "Barbell Overhead Press", equipment: "equipment", bodyRegion: "upper", movementType: "push", videoId: "", targetMuscle: "Shoulders" },
@@ -88,47 +88,47 @@ const ExerciseLibrary = () => {
     { id: 57, name: "Dumbbell Bicep Curls", equipment: "equipment", bodyRegion: "upper", movementType: "pull", videoId: "", targetMuscle: "Biceps" },
     { id: 58, name: "Dumbbell Chest Flyes", equipment: "equipment", bodyRegion: "upper", movementType: "push", videoId: "", targetMuscle: "Chest" },
     { id: 59, name: "Dumbbell Front Raises", equipment: "equipment", bodyRegion: "upper", movementType: "push", videoId: "", targetMuscle: "Shoulders" },
-    { id: 60, name: "Dumbbell Goblet Squats", equipment: "equipment", bodyRegion: "lower", movementType: "linear", videoId: "", targetMuscle: "Quadriceps" },
+    { id: 60, name: "Dumbbell Goblet Squats", equipment: "equipment", bodyRegion: "lower", movementType: "squat", videoId: "", targetMuscle: "Quadriceps" },
     { id: 61, name: "Dumbbell Hammer Curls", equipment: "equipment", bodyRegion: "upper", movementType: "pull", videoId: "", targetMuscle: "Biceps" },
     { id: 62, name: "Dumbbell Incline Press", equipment: "equipment", bodyRegion: "upper", movementType: "push", videoId: "", targetMuscle: "Chest" },
     { id: 63, name: "Dumbbell Lateral Raises", equipment: "equipment", bodyRegion: "upper", movementType: "push", videoId: "", targetMuscle: "Shoulders" },
-    { id: 64, name: "Dumbbell Lunges", equipment: "equipment", bodyRegion: "lower", movementType: "linear", videoId: "", targetMuscle: "Quadriceps" },
-    { id: 65, name: "Dumbbell Romanian Deadlifts", equipment: "equipment", bodyRegion: "lower", movementType: "pull", videoId: "", targetMuscle: "Hamstrings" },
+    { id: 64, name: "Dumbbell Lunges", equipment: "equipment", bodyRegion: "lower", movementType: "lunge", videoId: "", targetMuscle: "Quadriceps" },
+    { id: 65, name: "Dumbbell Romanian Deadlifts", equipment: "equipment", bodyRegion: "lower", movementType: "hinge", videoId: "", targetMuscle: "Hamstrings" },
     { id: 66, name: "Dumbbell Rows", equipment: "equipment", bodyRegion: "upper", movementType: "pull", videoId: "", targetMuscle: "Back" },
     { id: 67, name: "Dumbbell Shrugs", equipment: "equipment", bodyRegion: "upper", movementType: "linear", videoId: "", targetMuscle: "Traps" },
     { id: 68, name: "Dumbbell Shoulder Press", equipment: "equipment", bodyRegion: "upper", movementType: "push", videoId: "", targetMuscle: "Shoulders" },
     { id: 69, name: "Dumbbell Tricep Extensions", equipment: "equipment", bodyRegion: "upper", movementType: "push", videoId: "", targetMuscle: "Triceps" },
     { id: 70, name: "EZ Bar Curls", equipment: "equipment", bodyRegion: "upper", movementType: "pull", videoId: "", targetMuscle: "Biceps" },
     { id: 71, name: "Face Pulls", equipment: "equipment", bodyRegion: "upper", movementType: "pull", videoId: "", targetMuscle: "Shoulders" },
-    { id: 72, name: "Farmer's Walk", equipment: "equipment", bodyRegion: "full", movementType: "linear", videoId: "", targetMuscle: "Full Body" },
-    { id: 73, name: "Goblet Squats", equipment: "equipment", bodyRegion: "lower", movementType: "linear", videoId: "", targetMuscle: "Quadriceps" },
-    { id: 74, name: "Hack Squats", equipment: "equipment", bodyRegion: "lower", movementType: "linear", videoId: "", targetMuscle: "Quadriceps" },
+    { id: 72, name: "Farmer's Walk", equipment: "equipment", bodyRegion: "full", movementType: "gait", videoId: "", targetMuscle: "Full Body" },
+    { id: 73, name: "Goblet Squats", equipment: "equipment", bodyRegion: "lower", movementType: "squat", videoId: "", targetMuscle: "Quadriceps" },
+    { id: 74, name: "Hack Squats", equipment: "equipment", bodyRegion: "lower", movementType: "squat", videoId: "", targetMuscle: "Quadriceps" },
     { id: 75, name: "Hammer Strength Press", equipment: "equipment", bodyRegion: "upper", movementType: "push", videoId: "", targetMuscle: "Chest" },
     { id: 76, name: "Incline Dumbbell Curls", equipment: "equipment", bodyRegion: "upper", movementType: "pull", videoId: "", targetMuscle: "Biceps" },
-    { id: 77, name: "Kettlebell Swings", equipment: "equipment", bodyRegion: "full", movementType: "linear", videoId: "", targetMuscle: "Glutes" },
-    { id: 78, name: "Kettlebell Goblet Squats", equipment: "equipment", bodyRegion: "lower", movementType: "linear", videoId: "", targetMuscle: "Quadriceps" },
+    { id: 77, name: "Kettlebell Swings", equipment: "equipment", bodyRegion: "full", movementType: "hinge", videoId: "", targetMuscle: "Glutes" },
+    { id: 78, name: "Kettlebell Goblet Squats", equipment: "equipment", bodyRegion: "lower", movementType: "squat", videoId: "", targetMuscle: "Quadriceps" },
     { id: 79, name: "Lat Pulldowns", equipment: "equipment", bodyRegion: "upper", movementType: "pull", videoId: "", targetMuscle: "Back" },
     { id: 80, name: "Leg Press", equipment: "equipment", bodyRegion: "lower", movementType: "push", videoId: "", targetMuscle: "Quadriceps" },
     { id: 81, name: "Leg Curls", equipment: "equipment", bodyRegion: "lower", movementType: "pull", videoId: "", targetMuscle: "Hamstrings" },
     { id: 82, name: "Leg Extensions", equipment: "equipment", bodyRegion: "lower", movementType: "push", videoId: "", targetMuscle: "Quadriceps" },
     { id: 83, name: "Machine Chest Press", equipment: "equipment", bodyRegion: "upper", movementType: "push", videoId: "", targetMuscle: "Chest" },
     { id: 84, name: "Machine Shoulder Press", equipment: "equipment", bodyRegion: "upper", movementType: "push", videoId: "", targetMuscle: "Shoulders" },
-    { id: 85, name: "Nordic Curls", equipment: "equipment", bodyRegion: "lower", movementType: "pull", videoId: "", targetMuscle: "Hamstrings" },
+    { id: 85, name: "Nordic Curls", equipment: "equipment", bodyRegion: "lower", movementType: "hinge", videoId: "", targetMuscle: "Hamstrings" },
     { id: 86, name: "Overhead Tricep Extensions", equipment: "equipment", bodyRegion: "upper", movementType: "push", videoId: "", targetMuscle: "Triceps" },
     { id: 87, name: "Pec Deck Flyes", equipment: "equipment", bodyRegion: "upper", movementType: "push", videoId: "", targetMuscle: "Chest" },
     { id: 88, name: "Preacher Curls", equipment: "equipment", bodyRegion: "upper", movementType: "pull", videoId: "", targetMuscle: "Biceps" },
     { id: 89, name: "Reverse Flyes", equipment: "equipment", bodyRegion: "upper", movementType: "pull", videoId: "", targetMuscle: "Shoulders" },
-    { id: 90, name: "Romanian Deadlifts", equipment: "equipment", bodyRegion: "lower", movementType: "pull", videoId: "", targetMuscle: "Hamstrings" },
+    { id: 90, name: "Romanian Deadlifts", equipment: "equipment", bodyRegion: "lower", movementType: "hinge", videoId: "", targetMuscle: "Hamstrings" },
     { id: 91, name: "Seated Cable Rows", equipment: "equipment", bodyRegion: "upper", movementType: "pull", videoId: "", targetMuscle: "Back" },
     { id: 92, name: "Seated Calf Raises", equipment: "equipment", bodyRegion: "lower", movementType: "linear", videoId: "", targetMuscle: "Calves" },
-    { id: 93, name: "Smith Machine Squats", equipment: "equipment", bodyRegion: "lower", movementType: "linear", videoId: "", targetMuscle: "Quadriceps" },
+    { id: 93, name: "Smith Machine Squats", equipment: "equipment", bodyRegion: "lower", movementType: "squat", videoId: "", targetMuscle: "Quadriceps" },
     { id: 94, name: "T-Bar Rows", equipment: "equipment", bodyRegion: "upper", movementType: "pull", videoId: "", targetMuscle: "Back" },
-    { id: 95, name: "Trap Bar Deadlifts", equipment: "equipment", bodyRegion: "full", movementType: "pull", videoId: "", targetMuscle: "Full Body" },
+    { id: 95, name: "Trap Bar Deadlifts", equipment: "equipment", bodyRegion: "full", movementType: "hinge", videoId: "", targetMuscle: "Full Body" },
     { id: 96, name: "Tricep Kickbacks", equipment: "equipment", bodyRegion: "upper", movementType: "push", videoId: "", targetMuscle: "Triceps" },
     { id: 97, name: "Upright Rows", equipment: "equipment", bodyRegion: "upper", movementType: "pull", videoId: "", targetMuscle: "Shoulders" },
-    { id: 98, name: "Walking Lunges", equipment: "equipment", bodyRegion: "lower", movementType: "linear", videoId: "", targetMuscle: "Quadriceps" },
+    { id: 98, name: "Walking Lunges", equipment: "equipment", bodyRegion: "lower", movementType: "lunge", videoId: "", targetMuscle: "Quadriceps" },
     { id: 99, name: "Weighted Dips", equipment: "equipment", bodyRegion: "upper", movementType: "push", videoId: "", targetMuscle: "Triceps" },
-    { id: 100, name: "Zercher Squats", equipment: "equipment", bodyRegion: "lower", movementType: "linear", videoId: "", targetMuscle: "Quadriceps" },
+    { id: 100, name: "Zercher Squats", equipment: "equipment", bodyRegion: "lower", movementType: "squat", videoId: "", targetMuscle: "Quadriceps" },
   ];
 
   const alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("");
@@ -232,6 +232,10 @@ const ExerciseLibrary = () => {
                     <SelectItem value="all">All Movements</SelectItem>
                     <SelectItem value="push">Push</SelectItem>
                     <SelectItem value="pull">Pull</SelectItem>
+                    <SelectItem value="hinge">Hinge</SelectItem>
+                    <SelectItem value="squat">Squat</SelectItem>
+                    <SelectItem value="lunge">Lunge</SelectItem>
+                    <SelectItem value="gait">Gait</SelectItem>
                     <SelectItem value="linear">Linear</SelectItem>
                     <SelectItem value="rotational">Rotational</SelectItem>
                     <SelectItem value="isometric">Isometric</SelectItem>
