@@ -22,6 +22,15 @@ export const PremiumContentGate = ({ children }: PremiumContentGateProps) => {
 
   const checkSubscription = async () => {
     try {
+      // Testing bypass - check localStorage
+      const testingMode = localStorage.getItem('testing_mode') === 'true';
+      if (testingMode) {
+        console.log('Testing mode enabled - bypassing premium gate');
+        setIsSubscribed(true);
+        setIsLoading(false);
+        return;
+      }
+
       const { data: { session } } = await supabase.auth.getSession();
       
       if (!session) {
