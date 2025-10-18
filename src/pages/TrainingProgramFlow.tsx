@@ -10,7 +10,7 @@ import { ArrowLeft, ArrowRight, Loader2, Play } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { StravaTrackingDialog } from "@/components/StravaTrackingDialog";
-import { PlanDisplay } from "@/components/PlanDisplay";
+import { WorkoutDisplay } from "@/components/WorkoutDisplay";
 import { SubscriptionGate } from "@/components/SubscriptionGate";
 
 const TrainingProgramFlow = () => {
@@ -21,6 +21,7 @@ const TrainingProgramFlow = () => {
   const [generatedProgram, setGeneratedProgram] = useState("");
   const [savedProgramId, setSavedProgramId] = useState<string | null>(null);
   const [showStravaDialog, setShowStravaDialog] = useState(false);
+  const [exercises, setExercises] = useState<Array<{ name: string; video_id: string; video_url: string }>>([]);
   const [showSubscriptionGate, setShowSubscriptionGate] = useState(false);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [formData, setFormData] = useState({
@@ -105,6 +106,7 @@ const TrainingProgramFlow = () => {
 
       const data = await response.json();
       setGeneratedProgram(data.plan);
+      setExercises(data.exercises || []);
       
       // Save to database
       const { data: savedProgram, error: saveError } = await supabase
@@ -377,16 +379,10 @@ const TrainingProgramFlow = () => {
 
             {step === 5 && (
               <div className="space-y-4">
-                <h2 className="text-2xl font-semibold mb-4">
-                  {formData.userName}, here is your taylor-made training program!
-                </h2>
-                <p className="text-muted-foreground mb-4">
-                  Review your personalized training program below
-                </p>
-                
-                <PlanDisplay 
+                <WorkoutDisplay 
+                  exercises={exercises}
                   planContent={generatedProgram}
-                  title="Your Training Program"
+                  title={`${formData.userName ? formData.userName + "'s " : ""}${formData.goal} Training Program`}
                 />
 
                 <div className="space-y-4 pt-4">
