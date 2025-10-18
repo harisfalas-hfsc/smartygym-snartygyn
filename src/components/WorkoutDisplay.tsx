@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Play, Pause, RotateCcw, Volume2, Star } from "lucide-react";
+import workoutHero from "@/assets/workout-hero.jpg";
 
 interface WorkoutDisplayProps {
   exercises: Array<{ name: string; video_id: string; video_url: string }>;
@@ -100,7 +101,38 @@ export const WorkoutDisplay = ({ exercises, planContent, title = "Workout" }: Wo
 
   return (
     <div className="space-y-6">
-      {/* Top Row: Three Utility Cards */}
+      {/* Workout Header */}
+      <div className="space-y-6">
+        <div>
+          <h1 className="text-4xl font-bold mb-4">{title}</h1>
+          <div className="flex flex-wrap items-center gap-6 text-sm">
+            <div className="flex items-center gap-2">
+              <span className="font-semibold">Serial:</span>
+              <span>001</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <span className="font-semibold">Difficulty:</span>
+              <div className="flex">
+                {[1, 2, 3, 4, 5].map((i) => (
+                  <Star key={i} className={`w-4 h-4 ${i <= 3 ? 'fill-yellow-500 text-yellow-500' : 'text-gray-300'}`} />
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Hero Banner Image */}
+        <div className="relative w-full h-[300px] lg:h-[400px] rounded-2xl overflow-hidden shadow-2xl">
+          <img
+            src={workoutHero}
+            alt="Workout inspiration"
+            className="w-full h-full object-cover brightness-110"
+          />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent" />
+        </div>
+      </div>
+
+      {/* Utility Cards with Sticky Timer and Calculator */}
       <div className={`grid grid-cols-1 gap-4 ${exercises.length > 0 ? 'lg:grid-cols-3' : 'lg:grid-cols-2'}`}>
         {/* Workout Videos - Only show if exercises available */}
         {exercises.length > 0 && (
@@ -131,217 +163,191 @@ export const WorkoutDisplay = ({ exercises, planContent, title = "Workout" }: Wo
           </Card>
         )}
 
-        {/* Workout Timer */}
-        <Card className="border-2 border-yellow-500/60">
-          <CardHeader className="pb-3">
-            <CardTitle className="text-center text-yellow-600 dark:text-yellow-500">Workout Timer</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-3">
-            <div className="grid grid-cols-2 gap-3">
-              <div>
-                <Label className="text-xs">Work</Label>
-                <div className="flex items-center gap-1">
-                  <Input
-                    type="number"
-                    value={workTime}
-                    onChange={(e) => setWorkTime(parseInt(e.target.value) || 20)}
-                    disabled={isRunning}
-                    className="h-8 text-center"
-                  />
-                  <span className="text-xs">s</span>
+        {/* Workout Timer - Sticky */}
+        <div className="sticky top-4 h-fit">
+          <Card className="border-2 border-yellow-500/60">
+            <CardHeader className="pb-3">
+              <CardTitle className="text-center text-yellow-600 dark:text-yellow-500">Workout Timer</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-3">
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <Label className="text-xs">Work</Label>
+                  <div className="flex items-center gap-1">
+                    <Input
+                      type="number"
+                      value={workTime}
+                      onChange={(e) => setWorkTime(parseInt(e.target.value) || 20)}
+                      disabled={isRunning}
+                      className="h-8 text-center"
+                    />
+                    <span className="text-xs">s</span>
+                  </div>
+                </div>
+                <div>
+                  <Label className="text-xs">Rest</Label>
+                  <div className="flex items-center gap-1">
+                    <Input
+                      type="number"
+                      value={restTime}
+                      onChange={(e) => setRestTime(parseInt(e.target.value) || 10)}
+                      disabled={isRunning}
+                      className="h-8 text-center"
+                    />
+                    <span className="text-xs">s</span>
+                  </div>
                 </div>
               </div>
+
               <div>
-                <Label className="text-xs">Rest</Label>
-                <div className="flex items-center gap-1">
-                  <Input
-                    type="number"
-                    value={restTime}
-                    onChange={(e) => setRestTime(parseInt(e.target.value) || 10)}
-                    disabled={isRunning}
-                    className="h-8 text-center"
-                  />
-                  <span className="text-xs">s</span>
-                </div>
-              </div>
-            </div>
-
-            <div>
-              <Label className="text-xs">Rounds</Label>
-              <Input
-                type="number"
-                value={rounds}
-                onChange={(e) => setRounds(parseInt(e.target.value) || 8)}
-                disabled={isRunning}
-                className="h-8 text-center"
-              />
-            </div>
-
-            <div className="flex items-center gap-2">
-              <Label className="text-xs">Volume:</Label>
-              <Button 
-                size="sm" 
-                variant="outline" 
-                className="h-6 w-6 p-0"
-                onClick={() => setVolume(Math.max(0, volume - 0.1))}
-              >
-                -
-              </Button>
-              <span className="text-sm">{volume.toFixed(1)}</span>
-              <Button 
-                size="sm" 
-                variant="outline" 
-                className="h-6 w-6 p-0"
-                onClick={() => setVolume(Math.min(1, volume + 0.1))}
-              >
-                +
-              </Button>
-            </div>
-
-            <div className="text-center py-2">
-              <div className="text-4xl font-bold text-yellow-600 dark:text-yellow-500 mb-2">
-                {timeLeft}s
-              </div>
-              <div className="text-lg font-bold">
-                {isRunning 
-                  ? (isWorking ? 'Work' : 'Rest')
-                  : 'Ready'
-                }
-              </div>
-              <div className="text-sm text-yellow-600 dark:text-yellow-500">
-                Rounds: {currentRound} / {totalRounds}
-              </div>
-            </div>
-
-            <div className="flex gap-2">
-              <Button 
-                onClick={handleStartStop}
-                className="flex-1 bg-yellow-600 hover:bg-yellow-700"
-              >
-                {isRunning ? <><Pause className="w-4 h-4 mr-1" /> Stop</> : <><Play className="w-4 h-4 mr-1" /> Start</>}
-              </Button>
-              <Button onClick={handleReset} variant="outline">
-                <RotateCcw className="w-4 h-4" />
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* 1RM Calculator */}
-        <Card className="border-2 border-yellow-500/60">
-          <CardHeader className="pb-3">
-            <CardTitle className="text-center text-yellow-600 dark:text-yellow-500">1RM Calculator</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-3">
-            <div>
-              <Label className="text-xs">Weight</Label>
-              <div className="flex items-center gap-1">
+                <Label className="text-xs">Rounds</Label>
                 <Input
                   type="number"
-                  value={weight}
-                  onChange={(e) => setWeight(parseInt(e.target.value) || 100)}
+                  value={rounds}
+                  onChange={(e) => setRounds(parseInt(e.target.value) || 8)}
+                  disabled={isRunning}
                   className="h-8 text-center"
                 />
-                <span className="text-xs">kg</span>
               </div>
-            </div>
 
-            <div>
-              <Label className="text-xs">Reps</Label>
-              <Input
-                type="number"
-                value={reps}
-                onChange={(e) => setReps(parseInt(e.target.value) || 8)}
-                className="h-8 text-center"
-              />
-            </div>
-
-            <Button 
-              onClick={calculate1RM}
-              className="w-full bg-yellow-600 hover:bg-yellow-700"
-            >
-              Calculate 1RM
-            </Button>
-
-            {oneRM && (
-              <div className="text-center p-4 bg-muted rounded-lg">
-                <div className="text-sm text-muted-foreground">Your 1RM</div>
-                <div className="text-2xl font-bold">{oneRM} kg</div>
+              <div className="flex items-center gap-2">
+                <Label className="text-xs">Volume:</Label>
+                <Button 
+                  size="sm" 
+                  variant="outline" 
+                  className="h-6 w-6 p-0"
+                  onClick={() => setVolume(Math.max(0, volume - 0.1))}
+                >
+                  -
+                </Button>
+                <span className="text-sm">{volume.toFixed(1)}</span>
+                <Button 
+                  size="sm" 
+                  variant="outline" 
+                  className="h-6 w-6 p-0"
+                  onClick={() => setVolume(Math.min(1, volume + 0.1))}
+                >
+                  +
+                </Button>
               </div>
-            )}
-          </CardContent>
-        </Card>
+
+              <div className="text-center py-2">
+                <div className="text-4xl font-bold text-yellow-600 dark:text-yellow-500 mb-2">
+                  {timeLeft}s
+                </div>
+                <div className="text-lg font-bold">
+                  {isRunning 
+                    ? (isWorking ? 'Work' : 'Rest')
+                    : 'Ready'
+                  }
+                </div>
+                <div className="text-sm text-yellow-600 dark:text-yellow-500">
+                  Rounds: {currentRound} / {totalRounds}
+                </div>
+              </div>
+
+              <div className="flex gap-2">
+                <Button 
+                  onClick={handleStartStop}
+                  className="flex-1 bg-yellow-600 hover:bg-yellow-700"
+                >
+                  {isRunning ? <><Pause className="w-4 h-4 mr-1" /> Stop</> : <><Play className="w-4 h-4 mr-1" /> Start</>}
+                </Button>
+                <Button onClick={handleReset} variant="outline">
+                  <RotateCcw className="w-4 h-4" />
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* 1RM Calculator - Sticky */}
+        <div className="sticky top-4 h-fit">
+          <Card className="border-2 border-yellow-500/60">
+            <CardHeader className="pb-3">
+              <CardTitle className="text-center text-yellow-600 dark:text-yellow-500">1RM Calculator</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-3">
+              <div>
+                <Label className="text-xs">Weight</Label>
+                <div className="flex items-center gap-1">
+                  <Input
+                    type="number"
+                    value={weight}
+                    onChange={(e) => setWeight(parseInt(e.target.value) || 100)}
+                    className="h-8 text-center"
+                  />
+                  <span className="text-xs">kg</span>
+                </div>
+              </div>
+
+              <div>
+                <Label className="text-xs">Reps</Label>
+                <Input
+                  type="number"
+                  value={reps}
+                  onChange={(e) => setReps(parseInt(e.target.value) || 8)}
+                  className="h-8 text-center"
+                />
+              </div>
+
+              <Button 
+                onClick={calculate1RM}
+                className="w-full bg-yellow-600 hover:bg-yellow-700"
+              >
+                Calculate 1RM
+              </Button>
+
+              {oneRM && (
+                <div className="text-center p-4 bg-muted rounded-lg">
+                  <div className="text-sm text-muted-foreground">Your 1RM</div>
+                  <div className="text-2xl font-bold">{oneRM} kg</div>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        </div>
       </div>
 
       {/* Workout Content */}
-      <div className="grid lg:grid-cols-3 gap-6">
-        <div className="lg:col-span-2 space-y-6">
-          <div>
-            <h1 className="text-3xl font-bold mb-4">{title}</h1>
-            <div className="space-y-2 text-sm">
-              <div className="flex items-center gap-2">
-                <span className="font-semibold">Serial:</span>
-                <span>001</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <span className="font-semibold">Difficulty:</span>
-                <div className="flex">
-                  {[1, 2, 3, 4, 5].map((i) => (
-                    <Star key={i} className={`w-4 h-4 ${i <= 3 ? 'fill-yellow-500 text-yellow-500' : 'text-gray-300'}`} />
-                  ))}
-                </div>
-              </div>
-            </div>
-          </div>
+      <div className="space-y-6">
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              🔍 Description
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="prose prose-sm max-w-none whitespace-pre-wrap">
+            {planContent}
+          </CardContent>
+        </Card>
 
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                🔍 Description
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="prose prose-sm max-w-none whitespace-pre-wrap">
-              {planContent}
-            </CardContent>
-          </Card>
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              📋 Instructions
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="prose prose-sm max-w-none">
+            <p>Follow the workout plan as described. Adjust intensity based on your fitness level.</p>
+          </CardContent>
+        </Card>
 
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                📋 Instructions
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="prose prose-sm max-w-none">
-              <p>Follow the workout plan as described. Adjust intensity based on your fitness level.</p>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                ⚠️ Tips
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="prose prose-sm max-w-none">
-              <ul>
-                <li>Stay hydrated throughout your workout</li>
-                <li>Focus on proper form over speed</li>
-                <li>Listen to your body and rest when needed</li>
-                <li>Warm up before starting and cool down after</li>
-              </ul>
-            </CardContent>
-          </Card>
-        </div>
-
-        <div className="lg:col-span-1">
-          <div className="sticky top-4">
-            <img
-              src="https://images.unsplash.com/photo-1517836357463-d25dfeac3438"
-              alt="Workout"
-              className="w-full h-auto rounded-lg object-cover"
-            />
-          </div>
-        </div>
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              ⚠️ Tips
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="prose prose-sm max-w-none">
+            <ul>
+              <li>Stay hydrated throughout your workout</li>
+              <li>Focus on proper form over speed</li>
+              <li>Listen to your body and rest when needed</li>
+              <li>Warm up before starting and cool down after</li>
+            </ul>
+          </CardContent>
+        </Card>
       </div>
     </div>
   );
