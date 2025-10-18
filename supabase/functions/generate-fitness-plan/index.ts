@@ -161,21 +161,21 @@ Available exercises: ${exerciseList}`;
         });
       }
       if (response.status === 402) {
-        return new Response(JSON.stringify({ error: "Payment required, please add funds to your Lovable AI workspace." }), {
+        return new Response(JSON.stringify({ error: "Service unavailable. Please contact support." }), {
           status: 402,
           headers: { ...corsHeaders, "Content-Type": "application/json" },
         });
       }
       const errorText = await response.text();
-      console.error('AI gateway error:', response.status, errorText);
-      return new Response(JSON.stringify({ error: "AI gateway error" }), {
+      console.error('Service gateway error:', response.status, errorText);
+      return new Response(JSON.stringify({ error: "Service temporarily unavailable. Please try again." }), {
         status: 500,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
 
-    const aiData = await response.json();
-    const generatedPlan = aiData.choices[0].message.content;
+    const planData = await response.json();
+    const generatedPlan = planData.choices[0].message.content;
 
     // Return plan with exercises data for video linking
     return new Response(JSON.stringify({ 

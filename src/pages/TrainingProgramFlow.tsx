@@ -347,7 +347,7 @@ const TrainingProgramFlow = () => {
                 <div className="bg-yellow-50 border border-yellow-200 p-4 rounded-lg">
                   <h3 className="font-semibold mb-2">Important Disclaimer</h3>
                   <p className="text-sm text-muted-foreground">
-                    This training program is AI-generated and should not replace professional medical or fitness advice. 
+                    This training program is designed based on proven fitness methodologies and should not replace professional medical advice. 
                     Consult with a healthcare provider before starting any new exercise program, especially if you have 
                     any health concerns or medical conditions.
                   </p>

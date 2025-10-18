@@ -250,7 +250,7 @@ const Index = () => {
             </h3>
             <p className="text-muted-foreground text-xs sm:text-base mb-4 sm:mb-6 max-w-2xl mx-auto leading-relaxed">
               Subscribe to unlock all features and get access to unlimited personalized
-              workouts, training programs, and diet plans designed by AI.
+              workouts, training programs, and diet plans designed by expert fitness coaches.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center items-stretch sm:items-center">
               <div className="bg-muted rounded-lg p-4 sm:p-6 flex-1 w-full sm:max-w-xs">

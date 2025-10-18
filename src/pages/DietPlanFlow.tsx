@@ -413,7 +413,7 @@ const DietPlanFlow = () => {
                 <div className="bg-yellow-50 border border-yellow-200 p-4 rounded-lg">
                   <h3 className="font-semibold mb-2">Important Disclaimer</h3>
                   <p className="text-sm text-muted-foreground">
-                    This diet plan is AI-generated and should not replace professional nutritional or medical advice. 
+                    This diet plan is designed based on expert nutritional principles and should not replace professional medical advice. 
                     Consult with a registered dietitian or healthcare provider before making significant dietary changes, 
                     especially if you have any health concerns or medical conditions.
                   </p>

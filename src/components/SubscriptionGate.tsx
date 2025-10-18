@@ -26,8 +26,8 @@ export const SubscriptionGate = ({ open, onOpenChange, isAuthenticated }: Subscr
           </DialogTitle>
           <DialogDescription className="text-center">
             {isAuthenticated 
-              ? "Get unlimited access to AI-generated fitness plans"
-              : "Create an account to unlock AI-generated personalized fitness plans"
+              ? "Get unlimited access to expertly designed fitness plans"
+              : "Create an account to unlock personalized fitness plans designed by professional trainers"
             }
           </DialogDescription>
         </DialogHeader>
@@ -37,7 +37,7 @@ export const SubscriptionGate = ({ open, onOpenChange, isAuthenticated }: Subscr
             <CheckCircle className="w-5 h-5 text-green-500 mt-0.5 flex-shrink-0" />
             <div>
               <p className="font-semibold">Personalized Workout Plans</p>
-              <p className="text-sm text-muted-foreground">AI-generated routines tailored to your goals</p>
+              <p className="text-sm text-muted-foreground">Expert-designed routines tailored to your goals</p>
             </div>
           </div>
           <div className="flex items-start gap-3">
