@@ -11,7 +11,7 @@ import { ChevronLeft, ChevronRight, Loader2, Play } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { StravaTrackingDialog } from "@/components/StravaTrackingDialog";
-import { WorkoutVideoPlayer } from "@/components/WorkoutVideoPlayer";
+import { PlanDisplay } from "@/components/PlanDisplay";
 import { SubscriptionGate } from "@/components/SubscriptionGate";
 import smartyGymLogo from "@/assets/smarty-gym-logo.png";
 
@@ -33,7 +33,6 @@ const WorkoutFlow = () => {
   const [generatedPlan, setGeneratedPlan] = useState("");
   const [savedWorkoutId, setSavedWorkoutId] = useState<string | null>(null);
   const [showStravaDialog, setShowStravaDialog] = useState(false);
-  const [exercises, setExercises] = useState<Array<{ name: string; video_id: string; video_url: string }>>([]);
   const [showSubscriptionGate, setShowSubscriptionGate] = useState(false);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [formData, setFormData] = useState<WorkoutFormData>({
@@ -134,7 +133,6 @@ const WorkoutFlow = () => {
 
       const data = await response.json();
       setGeneratedPlan(data.plan);
-      setExercises(data.exercises || []);
       
       // Save to database
       const { data: savedWorkout, error: saveError } = await supabase
@@ -375,13 +373,13 @@ const WorkoutFlow = () => {
                 <div className="text-center mb-8">
                   <h2 className="text-2xl font-bold mb-2">Your Workout Plan</h2>
                   <p className="text-muted-foreground">
-                    Click on exercises to view demonstrations
+                    Save this plan to your dashboard and start training!
                   </p>
                 </div>
 
-                <WorkoutVideoPlayer 
-                  exercises={exercises}
+                <PlanDisplay 
                   planContent={generatedPlan}
+                  title="Your Personalized Workout"
                 />
 
                 <div className="flex flex-col gap-4 pt-4">
@@ -403,7 +401,6 @@ const WorkoutFlow = () => {
                         setStep(1);
                         setGeneratedPlan("");
                         setSavedWorkoutId(null);
-                        setExercises([]);
                         setFormData({
                           age: "",
                           height: "",

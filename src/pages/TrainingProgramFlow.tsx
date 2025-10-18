@@ -10,7 +10,7 @@ import { ArrowLeft, ArrowRight, Loader2, Play } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { StravaTrackingDialog } from "@/components/StravaTrackingDialog";
-import { WorkoutVideoPlayer } from "@/components/WorkoutVideoPlayer";
+import { PlanDisplay } from "@/components/PlanDisplay";
 import { SubscriptionGate } from "@/components/SubscriptionGate";
 
 const TrainingProgramFlow = () => {
@@ -21,7 +21,6 @@ const TrainingProgramFlow = () => {
   const [generatedProgram, setGeneratedProgram] = useState("");
   const [savedProgramId, setSavedProgramId] = useState<string | null>(null);
   const [showStravaDialog, setShowStravaDialog] = useState(false);
-  const [exercises, setExercises] = useState<Array<{ name: string; video_id: string; video_url: string }>>([]);
   const [showSubscriptionGate, setShowSubscriptionGate] = useState(false);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [formData, setFormData] = useState({
@@ -39,7 +38,6 @@ const TrainingProgramFlow = () => {
   const [rating, setRating] = useState(0);
   const [status, setStatus] = useState<"not-started" | "in-progress" | "completed">("not-started");
   const [comment, setComment] = useState("");
-  const [filterView, setFilterView] = useState<"all" | "day" | "week">("all");
 
   const handleInputChange = (field: string, value: string | string[]) => {
     setFormData({ ...formData, [field]: value });
@@ -107,7 +105,6 @@ const TrainingProgramFlow = () => {
 
       const data = await response.json();
       setGeneratedProgram(data.plan);
-      setExercises(data.exercises || []);
       
       // Save to database
       const { data: savedProgram, error: saveError } = await supabase
@@ -384,24 +381,12 @@ const TrainingProgramFlow = () => {
                   {formData.userName}, here is your taylor-made training program!
                 </h2>
                 <p className="text-muted-foreground mb-4">
-                  Click on exercises to view demonstrations
+                  Review your personalized training program below
                 </p>
                 
-                <div className="flex gap-2 mb-4">
-                  <Button variant={filterView === "all" ? "default" : "outline"} size="sm" onClick={() => setFilterView("all")}>
-                    View All
-                  </Button>
-                  <Button variant={filterView === "week" ? "default" : "outline"} size="sm" onClick={() => setFilterView("week")}>
-                    By Week
-                  </Button>
-                  <Button variant={filterView === "day" ? "default" : "outline"} size="sm" onClick={() => setFilterView("day")}>
-                    By Day
-                  </Button>
-                </div>
-
-                <WorkoutVideoPlayer 
-                  exercises={exercises}
+                <PlanDisplay 
                   planContent={generatedProgram}
+                  title="Your Training Program"
                 />
 
                 <div className="space-y-4 pt-4">

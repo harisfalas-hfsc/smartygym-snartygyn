@@ -9,6 +9,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { ArrowLeft, ArrowRight, Loader2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
+import { PlanDisplay } from "@/components/PlanDisplay";
 import { SubscriptionGate } from "@/components/SubscriptionGate";
 
 const DietPlanFlow = () => {
@@ -446,9 +447,10 @@ const DietPlanFlow = () => {
                   {formData.userName}, here is your taylor-made diet plan!
                 </h2>
                 
-                <div className="bg-muted p-6 rounded-lg whitespace-pre-wrap">
-                  {generatedPlan}
-                </div>
+                <PlanDisplay 
+                  planContent={generatedPlan}
+                  title="Your Diet Plan"
+                />
 
                 <div className="space-y-4 pt-4">
                   <div>
