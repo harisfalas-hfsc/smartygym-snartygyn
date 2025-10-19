@@ -24,6 +24,8 @@ import OneRMCalculator from "./pages/OneRMCalculator";
 import BMRCalculator from "./pages/BMRCalculator";
 import CalorieCalculator from "./pages/CalorieCalculator";
 import ExerciseLibrary from "./pages/ExerciseLibrary";
+import About from "./pages/About";
+import Tools from "./pages/Tools";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -61,6 +63,8 @@ const App = () => (
           </Route>
           
           {/* Public calculator routes */}
+          <Route path="/about" element={<About />} />
+          <Route path="/tools" element={<Tools />} />
           <Route path="/1rm-calculator" element={<OneRMCalculator />} />
           <Route path="/bmr-calculator" element={<BMRCalculator />} />
           <Route path="/calorie-calculator" element={<CalorieCalculator />} />

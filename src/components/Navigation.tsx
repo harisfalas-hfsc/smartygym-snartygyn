@@ -111,19 +111,17 @@ export const Navigation = () => {
         <div className="flex justify-between items-center gap-4">
           {/* Logo */}
           <div 
-            className="flex items-center gap-2 cursor-pointer"
+            className="flex items-center cursor-pointer"
             onClick={() => navigate("/")}
           >
-            <img src={smartyGymLogo} alt="Smarty Gym" className="h-10 w-auto" />
-            <span className="font-bold text-lg hidden sm:inline">Smarty Gym</span>
+            <img src={smartyGymLogo} alt="Smarty Gym" className="h-14 w-auto" />
           </div>
 
           {/* Navigation Links */}
           <nav className="hidden md:flex items-center gap-4 flex-1 justify-center">
-            <Button variant="ghost" size="sm" onClick={() => navigate("/")}>About</Button>
-            <Button variant="ghost" size="sm" onClick={() => navigate("/workout")}>Free Workouts</Button>
-            <Button variant="ghost" size="sm" onClick={() => navigate("/training-program")}>Programs</Button>
-            <Button variant="ghost" size="sm" onClick={() => navigate("/1rm-calculator")}>Tools</Button>
+            <Button variant="ghost" size="sm" onClick={() => navigate("/about")}>About</Button>
+            <Button variant="ghost" size="sm" onClick={() => navigate("/workout")}>Free Workouts & Programs</Button>
+            <Button variant="ghost" size="sm" onClick={() => navigate("/tools")}>Tools</Button>
             <Button variant="ghost" size="sm" onClick={() => navigate("/community")}>Blog</Button>
             <Button variant="ghost" size="sm" onClick={() => navigate("/")}>Contact</Button>
           </nav>
