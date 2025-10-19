@@ -115,6 +115,31 @@ const Index = () => {
   };
   return (
     <div className="min-h-screen bg-background">
+      {/* Hero Micro-Banner */}
+      <section className="relative py-12 px-4 border-b border-border bg-gradient-to-br from-background to-muted/30">
+        <div className="container mx-auto max-w-4xl text-center space-y-4">
+          <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold">
+            Your Smart Gym — Anywhere, Anytime
+          </h1>
+          <p className="text-base sm:text-lg text-muted-foreground max-w-2xl mx-auto">
+            Functional, science-based workouts by Haris Falas — Train smarter, move better.
+          </p>
+          <div className="flex flex-col sm:flex-row gap-3 justify-center items-center pt-2">
+            <Button size="lg" onClick={() => navigate("/workout")}>Start Free Workout</Button>
+            <Button size="lg" variant="outline" onClick={() => navigate("/auth")}>Join Premium</Button>
+          </div>
+        </div>
+      </section>
+
+      {/* Brand Blurb */}
+      <section className="py-6 px-4 bg-muted/20">
+        <div className="container mx-auto max-w-3xl text-center">
+          <p className="text-sm sm:text-base text-muted-foreground leading-relaxed">
+            Smarty Gym delivers simple, evidence-based training for busy adults. Free workouts, structured programs, and smart tools — built by sports scientist Haris Falas.
+          </p>
+        </div>
+      </section>
+
       {/* Hero Section */}
       <section className="py-6 px-4 border-b border-border">
         <div className="container mx-auto max-w-6xl">
@@ -214,6 +239,33 @@ const Index = () => {
       {/* Footer */}
       <footer className="py-8 px-4 border-t border-border mt-12">
         <div className="container mx-auto max-w-6xl">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-8">
+            {/* About Haris Card */}
+            <Card className="p-6">
+              <h3 className="font-semibold text-lg mb-2">About Haris</h3>
+              <p className="text-sm text-muted-foreground mb-4">
+                Haris Falas — Sports Scientist & S&C Coach. Founder HFSC & SMARTY GYM.
+              </p>
+              <Button variant="outline" size="sm" onClick={() => navigate("/")}>Read full bio</Button>
+            </Card>
+            
+            {/* Email Capture Widget */}
+            <Card className="p-6 md:col-span-2">
+              <h3 className="font-semibold text-lg mb-2">Get a free workout weekly</h3>
+              <p className="text-sm text-muted-foreground mb-4">
+                Subscribe to receive expert workouts and fitness tips directly to your inbox.
+              </p>
+              <div className="flex gap-2">
+                <input 
+                  type="email" 
+                  placeholder="Your email address" 
+                  className="flex-1 px-3 py-2 rounded-md border border-border bg-background text-sm"
+                />
+                <Button size="sm">Subscribe</Button>
+              </div>
+            </Card>
+          </div>
+
           <div className="flex flex-col items-center gap-6">
             {/* Social Media Links */}
             <div className="flex items-center gap-4">

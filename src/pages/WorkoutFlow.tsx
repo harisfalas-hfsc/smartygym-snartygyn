@@ -62,8 +62,18 @@ const WorkoutFlow = () => {
           <span className="text-xs sm:text-sm">Back to Home</span>
         </Button>
         
-        <h1 className="text-3xl sm:text-4xl font-bold text-center mb-2">Workouts</h1>
-        <p className="text-center text-muted-foreground mb-8">Choose your workout type</p>
+        <h1 className="text-3xl sm:text-4xl font-bold text-center mb-2">Free Workouts</h1>
+        <p className="text-center text-muted-foreground mb-4">Choose your workout type</p>
+        
+        {/* Info Ribbon */}
+        <div className="bg-primary/10 border border-primary/20 rounded-lg p-4 mb-8 text-center">
+          <p className="text-sm text-muted-foreground mb-2">
+            Try these workouts for free — no login required. Want all programs?
+          </p>
+          <Button variant="default" size="sm" onClick={() => navigate("/auth")}>
+            Join Premium
+          </Button>
+        </div>
         
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
           {workoutTypes.map((workout) => {
@@ -80,7 +90,20 @@ const WorkoutFlow = () => {
                   </div>
                   <div>
                     <h3 className="font-semibold text-lg mb-2">{workout.title}</h3>
-                    <p className="text-sm text-muted-foreground">{workout.description}</p>
+                    <p className="text-sm text-muted-foreground mb-3">{workout.description}</p>
+                    
+                    {/* Metadata Labels */}
+                    <div className="flex flex-wrap gap-2 justify-center text-xs text-muted-foreground">
+                      <span className="flex items-center gap-1 bg-muted px-2 py-1 rounded">
+                        ⏱️ 30-45 min
+                      </span>
+                      <span className="flex items-center gap-1 bg-muted px-2 py-1 rounded">
+                        📊 {workout.id === 'strength' || workout.id === 'challenge' ? 'Advanced' : workout.id === 'mobility' ? 'Beginner' : 'Intermediate'}
+                      </span>
+                      <span className="flex items-center gap-1 bg-muted px-2 py-1 rounded">
+                        {workout.id === 'cardio' || workout.id === 'mobility' ? '🤸 Bodyweight' : '🏋️ Equipment'}
+                      </span>
+                    </div>
                   </div>
                 </div>
               </Card>

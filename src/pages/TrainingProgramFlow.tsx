@@ -63,7 +63,9 @@ const TrainingProgramFlow = () => {
         </Button>
         
         <h1 className="text-3xl sm:text-4xl font-bold text-center mb-2">Training Programs</h1>
-        <p className="text-center text-muted-foreground mb-8">Choose your training program type</p>
+        <p className="text-center text-muted-foreground mb-4">
+          Structured 6–8 week programs designed by Sports Scientist Haris Falas — progressions for strength, fat loss and mobility.
+        </p>
         
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
           {programTypes.map((program) => {

@@ -4,6 +4,7 @@ import { ArrowLeft } from "lucide-react";
 import { WorkoutDisplay } from "@/components/WorkoutDisplay";
 import { PremiumContentGate } from "@/components/PremiumContentGate";
 import { WorkoutInteractions } from "@/components/WorkoutInteractions";
+import { ShareButtons } from "@/components/ShareButtons";
 
 const IndividualWorkout = () => {
   const navigate = useNavigate();
@@ -629,6 +630,24 @@ This program is suitable for individuals who have completed their PAR-Q+ assessm
 
   const content = (
     <>
+      {/* Quick Info Bar */}
+      <div className="bg-muted/30 rounded-lg p-4 mb-6 flex flex-wrap gap-4 justify-center text-sm">
+        <span className="flex items-center gap-2">
+          <strong>Duration:</strong> 30-45 minutes
+        </span>
+        <span className="flex items-center gap-2">
+          <strong>Difficulty:</strong> {workoutInfo.difficulty === 1 ? 'Beginner' : workoutInfo.difficulty === 2 ? 'Intermediate' : 'Advanced'}
+        </span>
+        <span className="flex items-center gap-2">
+          <strong>Equipment:</strong> {type?.includes('strength') ? 'Dumbbells/Bands' : type?.includes('cardio') ? 'None' : 'Varies'}
+        </span>
+      </div>
+
+      <ShareButtons 
+        title={workoutInfo.name} 
+        url={window.location.href}
+      />
+
       <WorkoutInteractions
         workoutId={`${type}-${id}`}
         workoutType={type || 'cardio'}
@@ -643,6 +662,19 @@ This program is suitable for individuals who have completed their PAR-Q+ assessm
         difficulty={workoutInfo.difficulty}
         workoutDetails={workoutDetails}
       />
+
+      {/* Upsell Banner for Free Workouts */}
+      {isFreeWorkout && (
+        <div className="mt-8 bg-primary/10 border-2 border-primary/30 rounded-lg p-6 text-center">
+          <h3 className="text-xl font-semibold mb-2">Want more?</h3>
+          <p className="text-muted-foreground mb-4">
+            Unlock 100+ workouts and tools — Join Premium.
+          </p>
+          <Button size="lg" onClick={() => navigate('/auth')}>
+            Unlock Premium
+          </Button>
+        </div>
+      )}
     </>
   );
 

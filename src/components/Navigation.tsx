@@ -108,7 +108,7 @@ export const Navigation = () => {
   return (
     <header className="sticky top-0 z-50 bg-background border-b border-border py-3 px-4">
       <div className="container mx-auto max-w-7xl">
-        <div className="flex justify-between items-center">
+        <div className="flex justify-between items-center gap-4">
           {/* Logo */}
           <div 
             className="flex items-center gap-2 cursor-pointer"
@@ -118,8 +118,26 @@ export const Navigation = () => {
             <span className="font-bold text-lg hidden sm:inline">Smarty Gym</span>
           </div>
 
+          {/* Navigation Links */}
+          <nav className="hidden md:flex items-center gap-4 flex-1 justify-center">
+            <Button variant="ghost" size="sm" onClick={() => navigate("/")}>About</Button>
+            <Button variant="ghost" size="sm" onClick={() => navigate("/workout")}>Free Workouts</Button>
+            <Button variant="ghost" size="sm" onClick={() => navigate("/training-program")}>Programs</Button>
+            <Button variant="ghost" size="sm" onClick={() => navigate("/1rm-calculator")}>Tools</Button>
+            <Button variant="ghost" size="sm" onClick={() => navigate("/community")}>Blog</Button>
+            <Button variant="ghost" size="sm" onClick={() => navigate("/")}>Contact</Button>
+          </nav>
+
           {/* Right Side - Auth */}
           <div className="flex items-center gap-2">
+            <Button 
+              variant="default" 
+              size="sm" 
+              onClick={() => navigate("/auth")}
+              className="hidden md:inline-flex"
+            >
+              Join Premium
+            </Button>
             <ThemeToggle />
             
             {user ? (
