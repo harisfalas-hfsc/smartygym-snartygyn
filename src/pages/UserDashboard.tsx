@@ -306,18 +306,24 @@ export default function UserDashboard() {
             </CardHeader>
             <CardContent>
               <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-                <div>
+                <div className="flex-1">
                   <p className="text-2xl font-bold mb-1">
                     {getPlanName(subscriptionInfo.product_id)} Plan
                   </p>
                   {subscriptionInfo.subscribed && subscriptionInfo.subscription_end ? (
                     <>
-                      <p className="text-sm text-muted-foreground">
-                        Active until {formatDate(subscriptionInfo.subscription_end)}
+                      <p className="text-sm text-muted-foreground mb-2">
+                        Renews on {formatDate(subscriptionInfo.subscription_end)}
                       </p>
-                      <p className="text-xs text-muted-foreground mt-1">
-                        Auto-renews • Cancel anytime
-                      </p>
+                      <div className="flex flex-wrap gap-2 text-xs text-muted-foreground">
+                        <Badge variant="outline" className="text-xs">
+                          Active Subscription
+                        </Badge>
+                        <span>•</span>
+                        <span>Recurring billing</span>
+                        <span>•</span>
+                        <span>Cancel anytime</span>
+                      </div>
                     </>
                   ) : (
                     <p className="text-sm text-muted-foreground">
@@ -325,17 +331,22 @@ export default function UserDashboard() {
                     </p>
                   )}
                 </div>
-                <div className="flex gap-2">
+                <div className="flex flex-col gap-2 sm:items-end">
                   {subscriptionInfo.subscribed ? (
-                    <Button 
-                      onClick={handleManageSubscription}
-                      disabled={managingSubscription}
-                      variant="outline"
-                    >
-                      {managingSubscription ? "Opening..." : "Manage Subscription"}
-                    </Button>
+                    <>
+                      <Button 
+                        onClick={handleManageSubscription}
+                        disabled={managingSubscription}
+                        className="w-full sm:w-auto"
+                      >
+                        {managingSubscription ? "Opening..." : "Manage Subscription"}
+                      </Button>
+                      <p className="text-xs text-muted-foreground text-center sm:text-right">
+                        Cancel, update payment, or view billing
+                      </p>
+                    </>
                   ) : (
-                    <Button onClick={() => navigate("/premium-benefits")}>
+                    <Button onClick={() => navigate("/premium-benefits")} className="w-full sm:w-auto">
                       Upgrade Now
                     </Button>
                   )}
