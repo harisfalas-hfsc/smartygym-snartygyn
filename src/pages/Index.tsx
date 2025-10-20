@@ -8,6 +8,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { User as SupabaseUser } from "@supabase/supabase-js";
 import { useToast } from "@/hooks/use-toast";
 import smartyGymLogo from "@/assets/smarty-gym-logo.png";
+import { BackToTop } from "@/components/BackToTop";
+import { PWAInstallPrompt } from "@/components/PWAInstallPrompt";
 
 const Index = () => {
   const navigate = useNavigate();
@@ -115,6 +117,8 @@ const Index = () => {
   };
   return (
     <div className="min-h-screen bg-background">
+      <BackToTop />
+      <PWAInstallPrompt />
       {/* Hero Micro-Banner */}
       <section className="relative py-12 px-4 border-b border-border bg-gradient-to-br from-background to-muted/30">
         <div className="container mx-auto max-w-4xl text-center space-y-4">
@@ -133,9 +137,36 @@ const Index = () => {
 
       {/* Brand Blurb */}
       <section className="py-6 px-4 bg-muted/20">
-        <div className="container mx-auto max-w-3xl text-center">
+        <div className="container mx-auto max-w-3xl text-center space-y-4">
           <p className="text-sm sm:text-base text-muted-foreground leading-relaxed">
             Smarty Gym delivers simple, evidence-based training for busy adults. Free workouts, structured programs, and smart tools — built by sports scientist Haris Falas.
+          </p>
+          <p className="text-xs text-muted-foreground font-semibold">
+            Created by Haris Falas – Sports Scientist & Strength and Conditioning Coach
+          </p>
+        </div>
+      </section>
+
+      {/* Testimonials Section */}
+      <section className="py-12 px-4 bg-background">
+        <div className="container mx-auto max-w-4xl">
+          <h2 className="text-2xl font-bold text-center mb-8">What Our Community Says</h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <Card className="p-6">
+              <p className="text-sm text-muted-foreground mb-4 italic">
+                "Smarty Gym has transformed how I approach fitness. The workouts are challenging but doable, and I love that I can do them anywhere!"
+              </p>
+              <p className="font-semibold text-sm">— Alex M., London</p>
+            </Card>
+            <Card className="p-6">
+              <p className="text-sm text-muted-foreground mb-4 italic">
+                "Finally, a fitness platform that actually understands real people's needs. No gimmicks, just solid training."
+              </p>
+              <p className="font-semibold text-sm">— Maria S., Berlin</p>
+            </Card>
+          </div>
+          <p className="text-center text-sm text-muted-foreground mt-6 font-semibold">
+            Trusted by hundreds of athletes and everyday movers worldwide
           </p>
         </div>
       </section>
@@ -162,6 +193,9 @@ const Index = () => {
             <p className="text-muted-foreground text-xs sm:text-base mb-4 sm:mb-6 max-w-2xl mx-auto leading-relaxed">
               Subscribe to unlock all features and get access to unlimited personalized
               workouts, training programs, and diet plans designed by expert fitness coaches.
+            </p>
+            <p className="text-xs text-muted-foreground mb-4">
+              Available worldwide – All prices in Euro (€)
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center items-stretch sm:items-center">
               <div className="bg-muted rounded-lg p-4 sm:p-6 flex-1 w-full sm:max-w-xs">

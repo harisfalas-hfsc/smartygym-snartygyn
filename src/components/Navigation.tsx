@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { User } from "@supabase/supabase-js";
 import { Button } from "@/components/ui/button";
+import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -12,7 +13,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { User as UserIcon, Settings, LogOut, LayoutDashboard, Crown } from "lucide-react";
+import { User as UserIcon, Settings, LogOut, LayoutDashboard, Crown, Menu } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import smartyGymLogo from "@/assets/smarty-gym-logo.png";
 import { ThemeToggle } from "@/components/ThemeToggle";
@@ -29,6 +30,7 @@ export const Navigation = () => {
   const [user, setUser] = useState<User | null>(null);
   const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
   const [subscriptionInfo, setSubscriptionInfo] = useState<SubscriptionInfo | null>(null);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   useEffect(() => {
     // Check current session
@@ -105,6 +107,11 @@ export const Navigation = () => {
     return "Premium";
   };
 
+  const handleNavigate = (path: string) => {
+    navigate(path);
+    setMobileMenuOpen(false);
+  };
+
   return (
     <header className="sticky top-0 z-50 bg-background border-b border-border py-3 px-4">
       <div className="container mx-auto max-w-7xl">
@@ -117,7 +124,7 @@ export const Navigation = () => {
             <img src={smartyGymLogo} alt="Smarty Gym" className="h-14 w-auto" />
           </div>
 
-          {/* Navigation Links */}
+          {/* Desktop Navigation Links */}
           <nav className="hidden md:flex items-center gap-4 flex-1 justify-center">
             <Button variant="ghost" size="sm" onClick={() => navigate("/about")}>About</Button>
             <Button variant="ghost" size="sm" onClick={() => navigate("/workout")}>Free Workouts & Programs</Button>
@@ -125,6 +132,44 @@ export const Navigation = () => {
             <Button variant="ghost" size="sm" onClick={() => navigate("/community")}>Blog</Button>
             <Button variant="ghost" size="sm" onClick={() => navigate("/")}>Contact</Button>
           </nav>
+
+          {/* Mobile Menu */}
+          <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
+            <SheetTrigger asChild className="md:hidden">
+              <Button variant="ghost" size="icon">
+                <Menu className="h-6 w-6" />
+              </Button>
+            </SheetTrigger>
+            <SheetContent side="right" className="w-64">
+              <nav className="flex flex-col gap-4 mt-8">
+                <Button variant="ghost" size="lg" onClick={() => handleNavigate("/about")} className="justify-start">
+                  About
+                </Button>
+                <Button variant="ghost" size="lg" onClick={() => handleNavigate("/workout")} className="justify-start">
+                  Free Workouts & Programs
+                </Button>
+                <Button variant="ghost" size="lg" onClick={() => handleNavigate("/tools")} className="justify-start">
+                  Tools
+                </Button>
+                <Button variant="ghost" size="lg" onClick={() => handleNavigate("/community")} className="justify-start">
+                  Blog
+                </Button>
+                <Button variant="ghost" size="lg" onClick={() => handleNavigate("/")} className="justify-start">
+                  Contact
+                </Button>
+                <div className="border-t pt-4 mt-4">
+                  <Button 
+                    variant="default" 
+                    size="lg" 
+                    onClick={() => handleNavigate("/auth")}
+                    className="w-full"
+                  >
+                    Join Premium
+                  </Button>
+                </div>
+              </nav>
+            </SheetContent>
+          </Sheet>
 
           {/* Right Side - Auth */}
           <div className="flex items-center gap-2">

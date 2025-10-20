@@ -2,6 +2,9 @@ import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { ArrowLeft, Dumbbell, Flame, Zap, Heart, Move, Activity } from "lucide-react";
+import { EmailCaptureBox } from "@/components/EmailCaptureBox";
+import { PremiumPopup } from "@/components/PremiumPopup";
+import { BackToTop } from "@/components/BackToTop";
 
 const WorkoutFlow = () => {
   const navigate = useNavigate();
@@ -51,6 +54,8 @@ const WorkoutFlow = () => {
 
   return (
     <div className="min-h-screen bg-background">
+      <PremiumPopup />
+      <BackToTop />
       <div className="container mx-auto max-w-6xl px-4 py-8">
         <Button
           variant="ghost"
@@ -63,7 +68,9 @@ const WorkoutFlow = () => {
         </Button>
         
         <h1 className="text-3xl sm:text-4xl font-bold text-center mb-2">Free Workouts</h1>
-        <p className="text-center text-muted-foreground mb-4">Choose your workout type</p>
+        <p className="text-center text-muted-foreground mb-4">
+          Filter by your goal and start training today. No login required.
+        </p>
         
         {/* Info Ribbon */}
         <div className="bg-primary/10 border border-primary/20 rounded-lg p-4 mb-8 text-center">
@@ -109,6 +116,22 @@ const WorkoutFlow = () => {
               </Card>
             );
           })}
+        </div>
+
+        {/* Email Capture */}
+        <div className="mt-12">
+          <EmailCaptureBox />
+        </div>
+
+        {/* Bottom Premium Banner */}
+        <div className="bg-card border border-border rounded-xl p-6 mt-8 text-center shadow-soft">
+          <h3 className="text-xl font-semibold mb-2">Want full access?</h3>
+          <p className="text-muted-foreground mb-4">
+            Get all programs, workouts, and tools with Smarty Gym Premium.
+          </p>
+          <Button size="lg" onClick={() => navigate("/auth")}>
+            Join Premium
+          </Button>
         </div>
       </div>
     </div>

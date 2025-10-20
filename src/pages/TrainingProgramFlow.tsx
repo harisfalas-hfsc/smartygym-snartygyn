@@ -2,6 +2,7 @@ import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { ArrowLeft, Heart, Dumbbell, Activity, Flame, User, Move, Scale } from "lucide-react";
+import { BackToTop } from "@/components/BackToTop";
 
 const TrainingProgramFlow = () => {
   const navigate = useNavigate();
@@ -51,6 +52,7 @@ const TrainingProgramFlow = () => {
 
   return (
     <div className="min-h-screen bg-background">
+      <BackToTop />
       <div className="container mx-auto max-w-6xl px-4 py-8">
         <Button
           variant="ghost"
@@ -81,6 +83,9 @@ const TrainingProgramFlow = () => {
                     <Icon className="w-8 h-8 text-primary" />
                   </div>
                   <div>
+                    <p className="text-xs text-muted-foreground mb-2">
+                      Designed by Haris Falas — 6–8 week results-based training plan
+                    </p>
                     <h3 className="font-semibold text-lg mb-2">{program.title}</h3>
                     <p className="text-sm text-muted-foreground">{program.description}</p>
                   </div>
@@ -88,6 +93,17 @@ const TrainingProgramFlow = () => {
               </Card>
             );
           })}
+        </div>
+
+        {/* Bottom Premium Banner */}
+        <div className="bg-card border border-border rounded-xl p-6 mt-12 text-center shadow-soft">
+          <h3 className="text-xl font-semibold mb-2">Want full access?</h3>
+          <p className="text-muted-foreground mb-4">
+            Get all programs, workouts, and tools with Smarty Gym Premium.
+          </p>
+          <Button size="lg" onClick={() => navigate("/auth")}>
+            Join Premium
+          </Button>
         </div>
       </div>
     </div>

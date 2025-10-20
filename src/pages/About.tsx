@@ -3,12 +3,14 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { ArrowLeft, Award, Heart, Users, Target } from "lucide-react";
+import { BackToTop } from "@/components/BackToTop";
 
 const About = () => {
   const navigate = useNavigate();
 
   return (
     <div className="min-h-screen bg-background">
+      <BackToTop />
       <div className="container mx-auto max-w-6xl px-4 py-8">
         <Button
           variant="ghost"
@@ -29,12 +31,21 @@ const About = () => {
         {/* Mission Statement */}
         <Card className="mb-12">
           <CardContent className="p-8">
+            <p className="text-sm text-muted-foreground mb-4 text-center">
+              Created by Haris Falas – Sports Scientist & Strength and Conditioning Coach
+            </p>
             <h2 className="text-3xl font-bold mb-4 text-center">Our Mission</h2>
-            <p className="text-lg text-muted-foreground leading-relaxed text-center max-w-3xl mx-auto">
+            <p className="text-lg text-muted-foreground leading-relaxed text-center max-w-3xl mx-auto mb-6">
               At Smarty Gym our mission is simple: to provide functional, science-based fitness solutions that fit into your real life. 
               Our workouts and programs are built for real life — whether you're training at home, in the gym, or on the go. 
               No complicated equipment, no expensive memberships, just effective training that works.
             </p>
+            <div className="bg-primary/10 p-6 rounded-lg max-w-2xl mx-auto">
+              <p className="text-base font-semibold text-center">
+                At Smarty Gym, we bring science-based functional training to everyone, everywhere. 
+                Train smarter. Move better. Live stronger.
+              </p>
+            </div>
           </CardContent>
         </Card>
 
