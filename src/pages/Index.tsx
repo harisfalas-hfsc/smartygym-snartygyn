@@ -46,27 +46,27 @@ const Index = () => {
     title: "Workouts",
     description: "Standalone sessions designed to challenge, motivate, and make you sweat"
   }, {
-    id: "training-program",
+    id: "trainingprogram",
     icon: Calendar,
     title: "Training Programs",
     description: "Structured 6-8 week programs designed by Sports Scientist Haris Falas"
   }, {
-    id: "exercise-library",
+    id: "exerciselibrary",
     icon: BookOpen,
     title: "Exercise Library",
     description: "Browse comprehensive exercise database"
   }, {
-    id: "1rm-calculator",
+    id: "1rmcalculator",
     icon: Calculator,
     title: "1RM Calculator",
     description: "Calculate your one-rep maximum"
   }, {
-    id: "bmr-calculator",
+    id: "bmrcalculator",
     icon: Activity,
     title: "BMR Calculator",
     description: "Calculate your basal metabolic rate"
   }, {
-    id: "macro-calculator",
+    id: "macrocalculator",
     icon: Flame,
     title: "Macro Calculator",
     description: "Get personalized nutrition recommendations"
