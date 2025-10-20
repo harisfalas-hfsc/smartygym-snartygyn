@@ -72,7 +72,7 @@ const Tools = () => {
           <p className="text-sm text-muted-foreground mb-2">
             Use these tools for free — no login required. Want personalized programs?
           </p>
-          <Button variant="default" size="sm" onClick={() => navigate("/auth")}>
+          <Button variant="default" size="sm" onClick={() => navigate("/join-premium")}>
             Join Premium
           </Button>
         </div>

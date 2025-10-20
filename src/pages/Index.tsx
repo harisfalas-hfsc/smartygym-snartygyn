@@ -187,7 +187,7 @@ const Index = () => {
               <Button size="lg" onClick={() => navigate("/workout")} aria-label="Start free workout with Smarty Gym">
                 Start Free Workout
               </Button>
-              <Button size="lg" variant="outline" onClick={() => navigate("/auth")} aria-label="Join Smarty Gym premium membership">
+              <Button size="lg" variant="outline" onClick={() => navigate("/join-premium")} aria-label="Join Smarty Gym premium membership">
                 Join Premium
               </Button>
             </div>

@@ -670,7 +670,7 @@ This program is suitable for individuals who have completed their PAR-Q+ assessm
           <p className="text-muted-foreground mb-4">
             Unlock 100+ workouts and tools — Join Premium.
           </p>
-          <Button size="lg" onClick={() => navigate('/auth')}>
+          <Button size="lg" onClick={() => navigate('/join-premium')}>
             Unlock Premium
           </Button>
         </div>

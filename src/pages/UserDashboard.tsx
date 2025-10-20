@@ -209,7 +209,7 @@ export default function UserDashboard() {
                   )}
                 </div>
                 {!subscriptionInfo.subscribed && (
-                  <Button onClick={() => navigate("/")}>
+                  <Button onClick={() => navigate("/join-premium")}>
                     Upgrade Now
                   </Button>
                 )}
@@ -217,6 +217,14 @@ export default function UserDashboard() {
             </CardContent>
           </Card>
         )}
+
+        {/* Fitness Overview */}
+        <div className="mb-8">
+          <h2 className="text-2xl font-bold mb-4">Your Fitness Overview</h2>
+          <p className="text-muted-foreground mb-4">
+            Track your workout progress and achievements
+          </p>
+        </div>
 
         <Tabs defaultValue="workouts" className="space-y-6">
           <TabsList className="grid w-full grid-cols-2">
