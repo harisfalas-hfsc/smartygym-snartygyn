@@ -8,6 +8,7 @@ import { ProtectedRoute } from "./components/ProtectedRoute";
 import { AuthenticatedLayout } from "./components/AuthenticatedLayout";
 import { Navigation } from "./components/Navigation";
 import Community from "./pages/Community";
+import { ArticleDetail } from "./pages/ArticleDetail";
 import Index from "./pages/Index";
 import Auth from "./pages/Auth";
 import Dashboard from "./pages/Dashboard";
@@ -58,6 +59,7 @@ const App = () => (
           
           {/* Public community page */}
           <Route path="/community" element={<Community />} />
+          <Route path="/article/:id" element={<ArticleDetail />} />
           
           {/* Authenticated routes with motivational banner */}
           <Route element={<ProtectedRoute><AuthenticatedLayout /></ProtectedRoute>}>

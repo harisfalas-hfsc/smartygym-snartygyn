@@ -18,145 +18,145 @@ interface Article {
 
 const fitnessArticles: Article[] = [
   {
-    id: "fitness-1",
-    title: "5 Compound Movements Every Athlete Should Master",
-    excerpt: "Discover the fundamental exercises that build real-world strength and functional fitness for everyday life.",
-    image: "https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=800&q=80",
-    readTime: "5 min read",
-    date: "2025-01-15",
-    category: "fitness"
+    id: "1",
+    title: "Building Muscle: The Complete Guide",
+    excerpt: "Everything you need to know about gaining muscle mass effectively",
+    image: "https://images.unsplash.com/photo-1581009146145-b5ef050c2e1e?auto=format&fit=crop&q=80&w=800",
+    readTime: "8 min read",
+    date: "March 15, 2024",
+    category: "Fitness"
   },
   {
-    id: "fitness-2",
-    title: "Progressive Overload: The Science of Getting Stronger",
-    excerpt: "Learn how to systematically increase training stimulus to achieve continuous gains in strength and muscle.",
-    image: "https://images.unsplash.com/photo-1581009146145-b5ef050c2e1e?w=800&q=80",
+    id: "2",
+    title: "HIIT vs Steady State Cardio",
+    excerpt: "Which cardio method is best for your fitness goals?",
+    image: "https://images.unsplash.com/photo-1538805060514-97d9cc17730c?auto=format&fit=crop&q=80&w=800",
     readTime: "6 min read",
-    date: "2025-01-12",
-    category: "fitness"
+    date: "March 12, 2024",
+    category: "Fitness"
   },
   {
-    id: "fitness-3",
-    title: "Mobility vs Flexibility: What's the Difference?",
-    excerpt: "Understanding the distinction between mobility and flexibility can transform your training approach.",
-    image: "https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?w=800&q=80",
-    readTime: "4 min read",
-    date: "2025-01-10",
-    category: "fitness"
+    id: "3",
+    title: "Perfect Form: Squat Technique",
+    excerpt: "Master the king of all exercises with proper technique",
+    image: "https://images.unsplash.com/photo-1574680096145-d05b474e2155?auto=format&fit=crop&q=80&w=800",
+    readTime: "7 min read",
+    date: "March 10, 2024",
+    category: "Fitness"
   },
   {
-    id: "fitness-4",
-    title: "Training Through Fatigue: When to Push, When to Rest",
-    excerpt: "Master the art of listening to your body while maintaining consistent progress in your training.",
-    image: "https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?w=800&q=80",
-    readTime: "5 min read",
-    date: "2025-01-08",
-    category: "fitness"
+    id: "4",
+    title: "Recovery Strategies for Athletes",
+    excerpt: "Optimize your recovery to maximize performance gains",
+    image: "https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?auto=format&fit=crop&q=80&w=800",
+    readTime: "9 min read",
+    date: "March 8, 2024",
+    category: "Fitness"
   },
   {
-    id: "fitness-5",
-    title: "Functional Training: Beyond the Gym",
-    excerpt: "How to build strength that translates to real-life movements and daily activities.",
-    image: "https://images.unsplash.com/photo-1517836357463-d25dfeac3438?w=800&q=80",
+    id: "5",
+    title: "Mobility Work: Why It Matters",
+    excerpt: "Improve movement quality and prevent injuries",
+    image: "https://images.unsplash.com/photo-1599901860904-17e6ed7083a0?auto=format&fit=crop&q=80&w=800",
     readTime: "6 min read",
-    date: "2025-01-05",
-    category: "fitness"
+    date: "March 5, 2024",
+    category: "Fitness"
   }
 ];
 
 const nutritionArticles: Article[] = [
   {
-    id: "nutrition-1",
-    title: "Protein Timing: Does It Really Matter?",
-    excerpt: "Examining the science behind protein timing and what actually matters for muscle growth and recovery.",
-    image: "https://images.unsplash.com/photo-1490645935967-10de6ba17061?w=800&q=80",
-    readTime: "5 min read",
-    date: "2025-01-14",
-    category: "nutrition"
-  },
-  {
-    id: "nutrition-2",
-    title: "Carbs Aren't the Enemy: Understanding Energy Systems",
-    excerpt: "Why carbohydrates are essential for performance and how to fuel your training properly.",
-    image: "https://images.unsplash.com/photo-1482049016688-2d3e1b311543?w=800&q=80",
-    readTime: "6 min read",
-    date: "2025-01-11",
-    category: "nutrition"
-  },
-  {
-    id: "nutrition-3",
-    title: "Hydration for Performance: Beyond Water",
-    excerpt: "The role of electrolytes, timing, and proper hydration strategies for optimal training.",
-    image: "https://images.unsplash.com/photo-1559827260-dc66d52bef19?w=800&q=80",
-    readTime: "4 min read",
-    date: "2025-01-09",
-    category: "nutrition"
-  },
-  {
-    id: "nutrition-4",
-    title: "Meal Prep Made Simple: A Beginner's Guide",
-    excerpt: "Practical strategies for planning and preparing nutritious meals that support your fitness goals.",
-    image: "https://images.unsplash.com/photo-1547592166-23ac45744acd?w=800&q=80",
-    readTime: "7 min read",
-    date: "2025-01-07",
-    category: "nutrition"
-  },
-  {
-    id: "nutrition-5",
-    title: "Supplements: What Works, What Doesn't",
-    excerpt: "A science-based look at the most popular fitness supplements and their actual effectiveness.",
-    image: "https://images.unsplash.com/photo-1505576399279-565b52d4ac71?w=800&q=80",
+    id: "6",
+    title: "Meal Prep for Busy People",
+    excerpt: "Save time and eat healthy with strategic meal preparation",
+    image: "https://images.unsplash.com/photo-1490645935967-10de6ba17061?auto=format&fit=crop&q=80&w=800",
     readTime: "8 min read",
-    date: "2025-01-04",
-    category: "nutrition"
+    date: "March 14, 2024",
+    category: "Nutrition"
+  },
+  {
+    id: "7",
+    title: "Macro Tracking Made Simple",
+    excerpt: "Learn how to track macronutrients effectively",
+    image: "https://images.unsplash.com/photo-1506368249639-73a05d6f6488?auto=format&fit=crop&q=80&w=800",
+    readTime: "7 min read",
+    date: "March 11, 2024",
+    category: "Nutrition"
+  },
+  {
+    id: "8",
+    title: "Pre and Post Workout Nutrition",
+    excerpt: "Fuel your workouts and optimize recovery with proper timing",
+    image: "https://images.unsplash.com/photo-1547496502-affa22d38842?auto=format&fit=crop&q=80&w=800",
+    readTime: "6 min read",
+    date: "March 9, 2024",
+    category: "Nutrition"
+  },
+  {
+    id: "9",
+    title: "Healthy Fats: The Complete Guide",
+    excerpt: "Understanding the role of fats in your diet",
+    image: "https://images.unsplash.com/photo-1447078806655-40579c2520d6?auto=format&fit=crop&q=80&w=800",
+    readTime: "7 min read",
+    date: "March 6, 2024",
+    category: "Nutrition"
+  },
+  {
+    id: "10",
+    title: "Hydration: Beyond Water",
+    excerpt: "Optimize your hydration strategy for peak performance",
+    image: "https://images.unsplash.com/photo-1627308595171-d1b5d67129c4?auto=format&fit=crop&q=80&w=800",
+    readTime: "6 min read",
+    date: "March 3, 2024",
+    category: "Nutrition"
   }
 ];
 
 const wellnessArticles: Article[] = [
   {
-    id: "wellness-1",
-    title: "Sleep and Recovery: The Missing Link in Training",
-    excerpt: "Why quality sleep is just as important as your workout routine for achieving fitness goals.",
-    image: "https://images.unsplash.com/photo-1541781774459-bb2af2f05b55?w=800&q=80",
-    readTime: "5 min read",
-    date: "2025-01-13",
-    category: "wellness"
+    id: "11",
+    title: "Managing Stress for Better Health",
+    excerpt: "Understanding the mind-body connection in fitness",
+    image: "https://images.unsplash.com/photo-1506126613408-eca07ce68773?auto=format&fit=crop&q=80&w=800",
+    readTime: "8 min read",
+    date: "March 13, 2024",
+    category: "Wellness"
   },
   {
-    id: "wellness-2",
-    title: "Managing Stress for Better Performance",
-    excerpt: "Understanding the cortisol-performance connection and practical stress management techniques.",
-    image: "https://images.unsplash.com/photo-1506126613408-eca07ce68773?w=800&q=80",
-    readTime: "6 min read",
-    date: "2025-01-10",
-    category: "wellness"
+    id: "12",
+    title: "Sleep Optimization for Athletes",
+    excerpt: "Maximize recovery and performance through better sleep",
+    image: "https://images.unsplash.com/photo-1541781774459-bb2af2f05b55?auto=format&fit=crop&q=80&w=800",
+    readTime: "9 min read",
+    date: "March 7, 2024",
+    category: "Wellness"
   },
   {
-    id: "wellness-3",
-    title: "The Mind-Muscle Connection: Training Your Brain",
-    excerpt: "How mental focus and awareness can significantly improve your training results.",
-    image: "https://images.unsplash.com/photo-1499209974431-9dddcece7f88?w=800&q=80",
-    readTime: "5 min read",
-    date: "2025-01-08",
-    category: "wellness"
-  },
-  {
-    id: "wellness-4",
-    title: "Injury Prevention: Small Changes, Big Impact",
-    excerpt: "Simple daily habits that can dramatically reduce your risk of training-related injuries.",
-    image: "https://images.unsplash.com/photo-1545205597-3d9d02c29597?w=800&q=80",
-    readTime: "6 min read",
-    date: "2025-01-06",
-    category: "wellness"
-  },
-  {
-    id: "wellness-5",
+    id: "13",
     title: "Building Sustainable Fitness Habits",
-    excerpt: "The psychology of habit formation and how to make fitness a natural part of your lifestyle.",
-    image: "https://images.unsplash.com/photo-1507120410856-1f35574c3b45?w=800&q=80",
+    excerpt: "Create lasting change with habit-focused strategies",
+    image: "https://images.unsplash.com/photo-1533681904393-9ab6eee7e408?auto=format&fit=crop&q=80&w=800",
     readTime: "7 min read",
-    date: "2025-01-03",
-    category: "wellness"
+    date: "March 4, 2024",
+    category: "Wellness"
+  },
+  {
+    id: "14",
+    title: "Injury Prevention Strategies",
+    excerpt: "Stay healthy and train consistently with smart prevention",
+    image: "https://images.unsplash.com/photo-1571902943202-507ec2618e8f?auto=format&fit=crop&q=80&w=800",
+    readTime: "8 min read",
+    date: "March 2, 2024",
+    category: "Wellness"
+  },
+  {
+    id: "15",
+    title: "The Mind-Muscle Connection",
+    excerpt: "Enhance your workouts through focused intention",
+    image: "https://images.unsplash.com/photo-1518611012118-696072aa579a?auto=format&fit=crop&q=80&w=800",
+    readTime: "6 min read",
+    date: "March 1, 2024",
+    category: "Wellness"
   }
 ];
 
@@ -255,7 +255,11 @@ export default function Community() {
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {selectedCategoryData?.articles.map((article) => (
-                <Card key={article.id} className="overflow-hidden hover:shadow-lg transition-all duration-300 hover:scale-105 flex flex-col h-full">
+                <Card 
+                  key={article.id} 
+                  className="overflow-hidden hover:shadow-lg transition-all duration-300 hover:scale-105 flex flex-col h-full cursor-pointer"
+                  onClick={() => navigate(`/article/${article.id}`)}
+                >
                   <div className="aspect-video w-full overflow-hidden">
                     <img 
                       src={article.image} 
@@ -273,13 +277,13 @@ export default function Community() {
                       </span>
                       <span className="flex items-center gap-1">
                         <Calendar className="h-3 w-3" />
-                        {new Date(article.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+                        {article.date}
                       </span>
                     </div>
-                    <div className="mt-auto">
+                    <div className="mt-auto" onClick={(e) => e.stopPropagation()}>
                       <ShareButtons 
                         title={article.title} 
-                        url={`${window.location.origin}/blog/${article.id}`} 
+                        url={`${window.location.origin}/article/${article.id}`} 
                       />
                     </div>
                   </div>
