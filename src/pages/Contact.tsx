@@ -74,15 +74,40 @@ const Contact = () => {
   return (
     <>
       <Helmet>
-        <title>Contact Us - Smarty Gym | Get in Touch with Haris Falas</title>
-        <meta name="description" content="Contact Smarty Gym and reach out to Haris Falas directly. Get support, ask questions about our training programs, or discuss your fitness goals." />
-        <meta name="keywords" content="contact smarty gym, fitness support, personal training inquiry, Haris Falas contact" />
+        <title>Contact Smarty Gym | Get in Touch with Haris Falas | Cyprus Online Fitness</title>
+        <meta name="description" content="Contact Smarty Gym (smartygym.com) and reach out to Haris Falas directly. Get expert Cyprus online fitness support, ask questions about our training programs, or discuss your fitness goals with our Sports Scientist." />
+        <meta name="keywords" content="contact smarty gym, smartygym contact, smartygym.com, Cyprus fitness support, online fitness inquiry, Haris Falas contact, Cyprus online fitness coach, fitness consultation Cyprus" />
         
-        <meta property="og:title" content="Contact Smarty Gym - Get Expert Fitness Support" />
-        <meta property="og:description" content="Reach out to our team for personalized fitness guidance and support." />
+        <meta property="og:title" content="Contact Smarty Gym - Get Expert Cyprus Fitness Support" />
+        <meta property="og:description" content="Reach out to Haris Falas and the Smarty Gym team for personalized fitness guidance and support from Cyprus online fitness experts." />
         <meta property="og:type" content="website" />
+        <meta property="og:url" content="https://smartygym.com/contact" />
         
-        <link rel="canonical" href={window.location.href} />
+        <meta property="twitter:card" content="summary" />
+        <meta property="twitter:title" content="Contact Smarty Gym Cyprus" />
+        
+        <link rel="canonical" href="https://smartygym.com/contact" />
+        
+        {/* Structured Data - ContactPage */}
+        <script type="application/ld+json">
+          {JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "ContactPage",
+            "name": "Contact Smarty Gym",
+            "description": "Get in touch with Haris Falas and the Smarty Gym team for Cyprus online fitness support and training inquiries",
+            "url": "https://smartygym.com/contact",
+            "mainEntity": {
+              "@type": "Organization",
+              "name": "Smarty Gym",
+              "url": "https://smartygym.com",
+              "email": "admin@smartygym.com",
+              "founder": {
+                "@type": "Person",
+                "name": "Haris Falas"
+              }
+            }
+          })}
+        </script>
       </Helmet>
       
       <div className="min-h-screen bg-background">
@@ -100,9 +125,10 @@ const Contact = () => {
 
           {/* Hero Section */}
           <header className="text-center mb-12">
-            <h1 className="text-4xl sm:text-5xl font-bold mb-4">Get in Touch</h1>
+            <h1 className="text-4xl sm:text-5xl font-bold mb-4">Contact Smarty Gym - Cyprus Online Fitness</h1>
             <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-              Have questions? Need support? Want to discuss your fitness goals? We're here to help.
+              Have questions? Need Cyprus online fitness support? Want to discuss your fitness goals with <strong>Haris Falas</strong>? 
+              We're here to help at <strong>smartygym.com</strong>.
             </p>
           </header>
 
@@ -203,22 +229,25 @@ const Contact = () => {
                 </CardHeader>
                 <CardContent>
                   <p className="text-sm text-muted-foreground mb-2">
-                    For general inquiries and support
+                    For general inquiries and Cyprus online fitness support
                   </p>
-                  <a href="mailto:info@smartygym.com" className="text-primary hover:underline">
-                    info@smartygym.com
+                  <a href="mailto:admin@smartygym.com" className="text-primary hover:underline font-semibold">
+                    admin@smartygym.com
                   </a>
+                  <p className="text-xs text-muted-foreground mt-2">
+                    Direct contact with <strong>Haris Falas</strong> and the Smarty Gym team
+                  </p>
                 </CardContent>
               </Card>
 
               <Card className="bg-gradient-to-br from-primary/5 to-accent/10 border-primary/20">
                 <CardHeader>
-                  <CardTitle className="text-lg">Direct Access to Your Coach</CardTitle>
+                  <CardTitle className="text-lg">Direct Access to Your Cyprus Fitness Coach</CardTitle>
                 </CardHeader>
                 <CardContent>
                   <p className="text-sm text-muted-foreground">
-                    As a Premium member, you can reach out directly to Haris Falas and the coaching team. 
-                    No robots, no automated responses — just real human support when you need it.
+                    As a Premium member at <strong>smartygym.com</strong>, you can reach out directly to <strong>Haris Falas</strong> and the coaching team. 
+                    No robots, no automated responses — just real human support from Cyprus online fitness experts when you need it.
                   </p>
                 </CardContent>
               </Card>

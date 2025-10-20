@@ -7,9 +7,14 @@ const Disclaimer = () => {
   return (
     <>
       <Helmet>
-        <title>Disclaimer | Smarty Gym</title>
-        <meta name="description" content="Health and fitness disclaimer for Smarty Gym. Important information about exercise risks and liability." />
-        <meta name="keywords" content="disclaimer, health disclaimer, fitness disclaimer, Smarty Gym" />
+        <title>Disclaimer | Smarty Gym Cyprus Online Fitness | smartygym.com</title>
+        <meta name="description" content="Health and fitness disclaimer for Smarty Gym (smartygym.com) - Cyprus online fitness platform by Haris Falas. Important information about exercise risks and liability for online fitness training." />
+        <meta name="keywords" content="smartygym disclaimer, smartygym.com health disclaimer, Cyprus online fitness disclaimer, Haris Falas, fitness training risks, online fitness legal" />
+        
+        <meta property="og:title" content="Disclaimer - Smarty Gym Cyprus" />
+        <meta property="og:description" content="Important health and safety information for Smarty Gym online fitness platform" />
+        
+        <link rel="canonical" href="https://smartygym.com/disclaimer" />
       </Helmet>
 
       <div className="min-h-screen bg-background">
@@ -17,7 +22,7 @@ const Disclaimer = () => {
         <div className="container mx-auto px-4 py-16 max-w-4xl">
           <div className="flex items-center gap-3 mb-8">
             <AlertTriangle className="h-10 w-10 text-primary" />
-            <h1 className="text-4xl font-bold">Disclaimer</h1>
+            <h1 className="text-4xl font-bold">Disclaimer - Smarty Gym Cyprus</h1>
           </div>
 
           <Card className="p-8 space-y-8">
@@ -29,8 +34,8 @@ const Disclaimer = () => {
               </div>
 
               <p className="text-lg text-muted-foreground">
-                The information provided on <strong>Smarty Gym</strong> (the "Website" and mobile applications) is intended 
-                solely for <strong>general educational and informational purposes</strong>. While every effort has been made 
+                The information provided on <strong>Smarty Gym</strong> (smartygym.com), founded by <strong>Haris Falas</strong> in Cyprus (the "Website" and mobile applications) is intended 
+                solely for <strong>general educational and informational purposes</strong>. While every effort has been made by our <strong>Cyprus online fitness</strong> experts 
                 to provide safe and effective guidance, <strong>Smarty Gym is not a substitute for professional medical 
                 advice, diagnosis, or treatment</strong>.
               </p>

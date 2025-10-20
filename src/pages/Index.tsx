@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { Helmet } from "react-helmet";
 import { ServiceCard } from "@/components/ServiceCard";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -117,36 +118,88 @@ const Index = () => {
     }
   };
   return (
-    <div className="min-h-screen bg-background">
-      <BackToTop />
-      <PWAInstallPrompt />
-      {/* Hero Micro-Banner */}
-      <section className="relative py-12 px-4 border-b border-border bg-gradient-to-br from-background to-muted/30">
-        <div className="container mx-auto max-w-4xl text-center space-y-4">
-          <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold">
-            Your Smart Gym — Anywhere, Anytime
-          </h1>
-          <p className="text-base sm:text-lg text-muted-foreground max-w-2xl mx-auto">
-            Functional, science-based workouts by Haris Falas — Train smarter, move better.
-          </p>
-          <div className="flex flex-col sm:flex-row gap-3 justify-center items-center pt-2">
-            <Button size="lg" onClick={() => navigate("/workout")}>Start Free Workout</Button>
-            <Button size="lg" variant="outline" onClick={() => navigate("/auth")}>Join Premium</Button>
+    <>
+      <Helmet>
+        <title>Smarty Gym | Cyprus Online Fitness by Haris Falas - smartygym.com</title>
+        <meta name="description" content="Smarty Gym (smartygym.com) - Cyprus's premier online fitness platform. Human-designed workouts by Haris Falas, Sports Scientist & Strength Coach. Cyprus fitness, online fitness training, functional training." />
+        <meta name="keywords" content="smartygym, smarty gym, smartygym.com, Haris Falas, Cyprus fitness, Cyprus online fitness, online fitness, functional training Cyprus, strength training online, sports scientist Cyprus" />
+        
+        {/* Open Graph / Facebook */}
+        <meta property="og:type" content="website" />
+        <meta property="og:url" content="https://smartygym.com/" />
+        <meta property="og:title" content="Smarty Gym | Cyprus Online Fitness by Haris Falas" />
+        <meta property="og:description" content="Cyprus's premier online fitness platform. Human-designed workouts by Haris Falas, Sports Scientist. Train smarter with evidence-based programs." />
+        <meta property="og:image" content={smartyGymLogo} />
+        
+        {/* Twitter */}
+        <meta property="twitter:card" content="summary_large_image" />
+        <meta property="twitter:title" content="Smarty Gym | Cyprus Online Fitness" />
+        <meta property="twitter:description" content="Evidence-based fitness training by Haris Falas. Cyprus online fitness platform." />
+        
+        <link rel="canonical" href="https://smartygym.com/" />
+        
+        {/* Structured Data - Organization */}
+        <script type="application/ld+json">
+          {JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "SportsActivityLocation",
+            "name": "Smarty Gym",
+            "alternateName": "smartygym.com",
+            "url": "https://smartygym.com",
+            "logo": smartyGymLogo,
+            "description": "Cyprus online fitness platform offering human-designed workout programs by Sports Scientist Haris Falas",
+            "address": {
+              "@type": "PostalAddress",
+              "addressCountry": "CY",
+              "addressLocality": "Cyprus"
+            },
+            "founder": {
+              "@type": "Person",
+              "name": "Haris Falas",
+              "jobTitle": "Sports Scientist & Strength and Conditioning Coach"
+            },
+            "areaServed": ["Cyprus", "International"],
+            "availableLanguage": ["English"]
+          })}
+        </script>
+      </Helmet>
+      
+      <div className="min-h-screen bg-background">
+        <BackToTop />
+        <PWAInstallPrompt />
+        
+        {/* Hero Section */}
+        <section className="relative py-12 px-4 border-b border-border bg-gradient-to-br from-background to-muted/30">
+          <div className="container mx-auto max-w-4xl text-center space-y-4">
+            <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold">
+              Smarty Gym - Cyprus Online Fitness Platform
+            </h1>
+            <p className="text-base sm:text-lg text-muted-foreground max-w-2xl mx-auto">
+              Functional, science-based workouts by Haris Falas — Train smarter, move better with Cyprus's premier online fitness coach at smartygym.com
+            </p>
+            <div className="flex flex-col sm:flex-row gap-3 justify-center items-center pt-2">
+              <Button size="lg" onClick={() => navigate("/workout")} aria-label="Start free workout with Smarty Gym">
+                Start Free Workout
+              </Button>
+              <Button size="lg" variant="outline" onClick={() => navigate("/auth")} aria-label="Join Smarty Gym premium membership">
+                Join Premium
+              </Button>
+            </div>
           </div>
-        </div>
-      </section>
+        </section>
 
-      {/* Brand Blurb */}
-      <section className="py-6 px-4 bg-muted/20">
-        <div className="container mx-auto max-w-3xl text-center space-y-4">
-          <p className="text-sm sm:text-base text-muted-foreground leading-relaxed">
-            Smarty Gym delivers simple, evidence-based training for busy adults. Free workouts, structured programs, and smart tools — built by sports scientist Haris Falas.
-          </p>
-          <p className="text-xs text-muted-foreground font-semibold">
-            Created by Haris Falas – Sports Scientist & Strength and Conditioning Coach
-          </p>
-        </div>
-      </section>
+        {/* Brand Description */}
+        <section className="py-6 px-4 bg-muted/20">
+          <div className="container mx-auto max-w-3xl text-center space-y-4">
+            <p className="text-sm sm:text-base text-muted-foreground leading-relaxed">
+              <strong>Smarty Gym</strong> (smartygym.com) delivers Cyprus online fitness training with evidence-based workouts for busy adults. 
+              Free workouts, structured programs, and smart fitness tools — all designed by <strong>Haris Falas</strong>, Sports Scientist & Strength and Conditioning Coach.
+            </p>
+            <p className="text-xs text-muted-foreground font-semibold">
+              Created by <strong>Haris Falas</strong> – Sports Scientist & Strength and Conditioning Coach | Cyprus Fitness Expert
+            </p>
+          </div>
+        </section>
 
       {/* Testimonials Section */}
       <section className="py-12 px-4 bg-background">
@@ -299,6 +352,7 @@ const Index = () => {
         </div>
       </footer>
     </div>
+    </>
   );
 };
 

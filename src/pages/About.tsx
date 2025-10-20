@@ -12,15 +12,43 @@ const About = () => {
   return (
     <>
       <Helmet>
-        <title>About Smarty Gym - Human-Crafted Fitness Programs by Haris Falas</title>
-        <meta name="description" content="Meet the team behind Smarty Gym. Every workout is personally designed by Haris Falas, Sports Scientist & S&C Coach - never by AI. Real expertise, real results." />
-        <meta name="keywords" content="Haris Falas, sports scientist, strength conditioning coach, human-designed workouts, no AI fitness, personalized training" />
+        <title>About Smarty Gym - Haris Falas | Cyprus Online Fitness Expert | smartygym.com</title>
+        <meta name="description" content="Meet Haris Falas, founder of Smarty Gym (smartygym.com) - Cyprus's leading online fitness platform. Sports Scientist & Strength Conditioning Coach offering human-crafted, evidence-based workout programs. No AI, just real expertise from Cyprus fitness experts." />
+        <meta name="keywords" content="Haris Falas, Smarty Gym, smartygym, smartygym.com, Cyprus fitness, Cyprus online fitness, sports scientist Cyprus, strength conditioning coach, human-designed workouts, no AI fitness, online fitness Cyprus" />
         
-        <meta property="og:title" content="About Smarty Gym - Human-Crafted Fitness Programs" />
-        <meta property="og:description" content="Every workout is personally designed by Haris Falas - never by AI. Real expertise, real results." />
+        <meta property="og:title" content="About Smarty Gym & Haris Falas - Cyprus Online Fitness" />
+        <meta property="og:description" content="Every workout is personally designed by Haris Falas, Sports Scientist - never by AI. Cyprus online fitness expert delivering real results." />
         <meta property="og:type" content="website" />
+        <meta property="og:url" content="https://smartygym.com/about" />
         
-        <link rel="canonical" href={window.location.href} />
+        {/* Twitter */}
+        <meta property="twitter:card" content="summary_large_image" />
+        <meta property="twitter:title" content="About Smarty Gym & Haris Falas" />
+        <meta property="twitter:description" content="Cyprus online fitness platform with human-designed programs by Sports Scientist Haris Falas" />
+        
+        <link rel="canonical" href="https://smartygym.com/about" />
+        
+        {/* Structured Data - Person & Organization */}
+        <script type="application/ld+json">
+          {JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "Person",
+            "name": "Haris Falas",
+            "jobTitle": "Sports Scientist & Strength and Conditioning Coach",
+            "worksFor": {
+              "@type": "Organization",
+              "name": "Smarty Gym",
+              "url": "https://smartygym.com",
+              "alternateName": "smartygym.com"
+            },
+            "description": "Sports Scientist and Strength and Conditioning Coach specializing in functional fitness and evidence-based training in Cyprus",
+            "knowsAbout": ["Fitness Training", "Sports Science", "Strength and Conditioning", "Functional Training", "Online Fitness Coaching"],
+            "address": {
+              "@type": "PostalAddress",
+              "addressCountry": "CY"
+            }
+          })}
+        </script>
       </Helmet>
       
       <div className="min-h-screen bg-background">
@@ -38,10 +66,10 @@ const About = () => {
 
         {/* Hero Section */}
         <header className="text-center mb-16">
-          <h1 className="text-4xl sm:text-5xl font-bold mb-4">Welcome to Smarty Gym</h1>
-          <p className="text-xl text-muted-foreground mb-2">Fitness Without the Chains</p>
+          <h1 className="text-4xl sm:text-5xl font-bold mb-4">About Smarty Gym - Cyprus Online Fitness</h1>
+          <p className="text-xl text-muted-foreground mb-2">Fitness Without the Chains | smartygym.com</p>
           <p className="text-sm text-muted-foreground">
-            Created by Haris Falas – Sports Scientist & Strength and Conditioning Coach
+            Founded by <strong>Haris Falas</strong> – Sports Scientist & Strength and Conditioning Coach | Cyprus Fitness Expert
           </p>
         </header>
 
@@ -68,17 +96,17 @@ const About = () => {
               
               <div className="max-w-3xl mx-auto space-y-4 text-center mb-8">
                 <p className="text-lg font-semibold text-foreground">
-                  Our workouts and programs are built to fit YOUR life.
+                  Smarty Gym workouts and programs are built to fit YOUR life.
                 </p>
                 <p className="text-base leading-relaxed text-muted-foreground">
-                  That's why they work — safe and efficient design, crafted by hand with care to deliver effective results, <strong className="text-foreground">NOT by AI</strong>.
+                  That's why they work — safe and efficient design by <strong>Haris Falas</strong>, crafted by hand with care to deliver effective results at <strong>smartygym.com</strong>, <strong className="text-foreground">NOT by AI</strong>.
                 </p>
                 <div className="bg-background/80 backdrop-blur-sm p-6 rounded-lg border-2 border-primary/30 mt-6">
                   <p className="text-lg font-bold text-primary mb-2">
-                    Every program is evidence-based and personally created by Haris Falas.
+                    Every program is evidence-based and personally created by Haris Falas in Cyprus.
                   </p>
                   <p className="text-base text-muted-foreground">
-                    Never by AI. Never by algorithms. Always by a real human expert who understands YOUR needs.
+                    Never by AI. Never by algorithms. Always by a real human expert who understands YOUR needs. <strong>Cyprus online fitness</strong> excellence since day one.
                   </p>
                 </div>
               </div>

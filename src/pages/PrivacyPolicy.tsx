@@ -7,9 +7,14 @@ const PrivacyPolicy = () => {
   return (
     <>
       <Helmet>
-        <title>Privacy Policy | Smarty Gym</title>
-        <meta name="description" content="Privacy Policy for Smarty Gym. Learn how we collect, use, and protect your personal data in compliance with GDPR and Cyprus law." />
-        <meta name="keywords" content="privacy policy, data protection, GDPR, Smarty Gym, Cyprus" />
+        <title>Privacy Policy | Smarty Gym Cyprus Online Fitness | smartygym.com</title>
+        <meta name="description" content="Smarty Gym (smartygym.com) Privacy Policy - Learn how Cyprus online fitness platform protects your personal data. Founded by Haris Falas. GDPR compliant and Cyprus law adherent data protection for online fitness members." />
+        <meta name="keywords" content="smartygym privacy, smartygym.com privacy policy, Cyprus online fitness privacy, Haris Falas, data protection Cyprus, GDPR fitness platform, online fitness security" />
+        
+        <meta property="og:title" content="Privacy Policy - Smarty Gym Cyprus" />
+        <meta property="og:description" content="How Smarty Gym protects your data - GDPR compliant Cyprus online fitness platform" />
+        
+        <link rel="canonical" href="https://smartygym.com/privacy-policy" />
       </Helmet>
 
       <div className="min-h-screen bg-background">
@@ -17,14 +22,14 @@ const PrivacyPolicy = () => {
         <div className="container mx-auto px-4 py-16 max-w-4xl">
           <div className="flex items-center gap-3 mb-8">
             <Shield className="h-10 w-10 text-primary" />
-            <h1 className="text-4xl font-bold">Privacy Policy</h1>
+            <h1 className="text-4xl font-bold">Privacy Policy - Smarty Gym Cyprus</h1>
           </div>
 
           <Card className="p-8 space-y-8">
             <div className="prose dark:prose-invert max-w-none">
               <p className="text-lg text-muted-foreground">
-                At <strong>Smarty Gym</strong>, we value your privacy and are committed to protecting your personal data. 
-                This Privacy Policy explains how we collect, use, store, and protect your information when you visit our 
+                At <strong>Smarty Gym</strong> (smartygym.com), founded by <strong>Haris Falas</strong>, we value your privacy and are committed to protecting your personal data. 
+                This Privacy Policy explains how our <strong>Cyprus online fitness</strong> platform collects, uses, stores, and protects your information when you visit our 
                 website or use our services. Our practices comply with the General Data Protection Regulation (GDPR) 
                 (EU) 2016/679 and applicable Cyprus data protection laws.
               </p>
