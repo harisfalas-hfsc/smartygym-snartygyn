@@ -26,6 +26,7 @@ import MacroTrackingCalculator from "./pages/MacroTrackingCalculator";
 import ExerciseLibrary from "./pages/ExerciseLibrary";
 import About from "./pages/About";
 import Tools from "./pages/Tools";
+import FreeContent from "./pages/FreeContent";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -41,6 +42,9 @@ const App = () => (
           <Routes>
           <Route path="/" element={<Index />} />
           <Route path="/auth" element={<Auth />} />
+          
+          {/* Public free content page */}
+          <Route path="/free-content" element={<FreeContent />} />
           
           {/* Public workout and plan flows - anyone can explore */}
           <Route path="/workout" element={<WorkoutFlow />} />

@@ -127,7 +127,7 @@ export const Navigation = () => {
           {/* Desktop Navigation Links */}
           <nav className="hidden md:flex items-center gap-4 flex-1 justify-center">
             <Button variant="ghost" size="sm" onClick={() => navigate("/about")}>About</Button>
-            <Button variant="ghost" size="sm" onClick={() => navigate("/workout")}>Free Workouts & Programs</Button>
+            <Button variant="ghost" size="sm" onClick={() => navigate("/free-content")}>Free Workouts & Programs</Button>
             <Button variant="ghost" size="sm" onClick={() => navigate("/tools")}>Tools</Button>
             <Button variant="ghost" size="sm" onClick={() => navigate("/community")}>Blog</Button>
             <Button variant="ghost" size="sm" onClick={() => navigate("/")}>Contact</Button>
@@ -145,7 +145,7 @@ export const Navigation = () => {
                 <Button variant="ghost" size="lg" onClick={() => handleNavigate("/about")} className="justify-start">
                   About
                 </Button>
-                <Button variant="ghost" size="lg" onClick={() => handleNavigate("/workout")} className="justify-start">
+                <Button variant="ghost" size="lg" onClick={() => handleNavigate("/free-content")} className="justify-start">
                   Free Workouts & Programs
                 </Button>
                 <Button variant="ghost" size="lg" onClick={() => handleNavigate("/tools")} className="justify-start">

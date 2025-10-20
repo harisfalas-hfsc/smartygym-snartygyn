@@ -1,620 +1,309 @@
-import { useState, useEffect, useRef } from "react";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { supabase } from "@/integrations/supabase/client";
-import { User } from "@supabase/supabase-js";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { useToast } from "@/hooks/use-toast";
-import { ArrowLeft, Send, Users, MessageCircle, Instagram, Facebook, Calendar as CalendarIcon, Clock, Filter } from "lucide-react";
-import smartyGymLogo from "@/assets/smarty-gym-logo.png";
-import { DirectMessaging } from "@/components/DirectMessaging";
-import { SubscribedMembers } from "@/components/SubscribedMembers";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { Calendar } from "@/components/ui/calendar";
-import { format } from "date-fns";
-import { cn } from "@/lib/utils";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { ArrowLeft, Dumbbell, Apple, Heart, Clock, Calendar } from "lucide-react";
+import { BackToTop } from "@/components/BackToTop";
+import { ShareButtons } from "@/components/ShareButtons";
 
-interface Message {
+interface Article {
   id: string;
-  user_id: string;
-  user_name: string;
-  message: string;
-  created_at: string;
+  title: string;
+  excerpt: string;
+  image: string;
+  readTime: string;
+  date: string;
+  category: string;
 }
+
+const fitnessArticles: Article[] = [
+  {
+    id: "fitness-1",
+    title: "5 Compound Movements Every Athlete Should Master",
+    excerpt: "Discover the fundamental exercises that build real-world strength and functional fitness for everyday life.",
+    image: "https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=800&q=80",
+    readTime: "5 min read",
+    date: "2025-01-15",
+    category: "fitness"
+  },
+  {
+    id: "fitness-2",
+    title: "Progressive Overload: The Science of Getting Stronger",
+    excerpt: "Learn how to systematically increase training stimulus to achieve continuous gains in strength and muscle.",
+    image: "https://images.unsplash.com/photo-1581009146145-b5ef050c2e1e?w=800&q=80",
+    readTime: "6 min read",
+    date: "2025-01-12",
+    category: "fitness"
+  },
+  {
+    id: "fitness-3",
+    title: "Mobility vs Flexibility: What's the Difference?",
+    excerpt: "Understanding the distinction between mobility and flexibility can transform your training approach.",
+    image: "https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?w=800&q=80",
+    readTime: "4 min read",
+    date: "2025-01-10",
+    category: "fitness"
+  },
+  {
+    id: "fitness-4",
+    title: "Training Through Fatigue: When to Push, When to Rest",
+    excerpt: "Master the art of listening to your body while maintaining consistent progress in your training.",
+    image: "https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?w=800&q=80",
+    readTime: "5 min read",
+    date: "2025-01-08",
+    category: "fitness"
+  },
+  {
+    id: "fitness-5",
+    title: "Functional Training: Beyond the Gym",
+    excerpt: "How to build strength that translates to real-life movements and daily activities.",
+    image: "https://images.unsplash.com/photo-1517836357463-d25dfeac3438?w=800&q=80",
+    readTime: "6 min read",
+    date: "2025-01-05",
+    category: "fitness"
+  }
+];
+
+const nutritionArticles: Article[] = [
+  {
+    id: "nutrition-1",
+    title: "Protein Timing: Does It Really Matter?",
+    excerpt: "Examining the science behind protein timing and what actually matters for muscle growth and recovery.",
+    image: "https://images.unsplash.com/photo-1490645935967-10de6ba17061?w=800&q=80",
+    readTime: "5 min read",
+    date: "2025-01-14",
+    category: "nutrition"
+  },
+  {
+    id: "nutrition-2",
+    title: "Carbs Aren't the Enemy: Understanding Energy Systems",
+    excerpt: "Why carbohydrates are essential for performance and how to fuel your training properly.",
+    image: "https://images.unsplash.com/photo-1482049016688-2d3e1b311543?w=800&q=80",
+    readTime: "6 min read",
+    date: "2025-01-11",
+    category: "nutrition"
+  },
+  {
+    id: "nutrition-3",
+    title: "Hydration for Performance: Beyond Water",
+    excerpt: "The role of electrolytes, timing, and proper hydration strategies for optimal training.",
+    image: "https://images.unsplash.com/photo-1559827260-dc66d52bef19?w=800&q=80",
+    readTime: "4 min read",
+    date: "2025-01-09",
+    category: "nutrition"
+  },
+  {
+    id: "nutrition-4",
+    title: "Meal Prep Made Simple: A Beginner's Guide",
+    excerpt: "Practical strategies for planning and preparing nutritious meals that support your fitness goals.",
+    image: "https://images.unsplash.com/photo-1547592166-23ac45744acd?w=800&q=80",
+    readTime: "7 min read",
+    date: "2025-01-07",
+    category: "nutrition"
+  },
+  {
+    id: "nutrition-5",
+    title: "Supplements: What Works, What Doesn't",
+    excerpt: "A science-based look at the most popular fitness supplements and their actual effectiveness.",
+    image: "https://images.unsplash.com/photo-1505576399279-565b52d4ac71?w=800&q=80",
+    readTime: "8 min read",
+    date: "2025-01-04",
+    category: "nutrition"
+  }
+];
+
+const wellnessArticles: Article[] = [
+  {
+    id: "wellness-1",
+    title: "Sleep and Recovery: The Missing Link in Training",
+    excerpt: "Why quality sleep is just as important as your workout routine for achieving fitness goals.",
+    image: "https://images.unsplash.com/photo-1541781774459-bb2af2f05b55?w=800&q=80",
+    readTime: "5 min read",
+    date: "2025-01-13",
+    category: "wellness"
+  },
+  {
+    id: "wellness-2",
+    title: "Managing Stress for Better Performance",
+    excerpt: "Understanding the cortisol-performance connection and practical stress management techniques.",
+    image: "https://images.unsplash.com/photo-1506126613408-eca07ce68773?w=800&q=80",
+    readTime: "6 min read",
+    date: "2025-01-10",
+    category: "wellness"
+  },
+  {
+    id: "wellness-3",
+    title: "The Mind-Muscle Connection: Training Your Brain",
+    excerpt: "How mental focus and awareness can significantly improve your training results.",
+    image: "https://images.unsplash.com/photo-1499209974431-9dddcece7f88?w=800&q=80",
+    readTime: "5 min read",
+    date: "2025-01-08",
+    category: "wellness"
+  },
+  {
+    id: "wellness-4",
+    title: "Injury Prevention: Small Changes, Big Impact",
+    excerpt: "Simple daily habits that can dramatically reduce your risk of training-related injuries.",
+    image: "https://images.unsplash.com/photo-1545205597-3d9d02c29597?w=800&q=80",
+    readTime: "6 min read",
+    date: "2025-01-06",
+    category: "wellness"
+  },
+  {
+    id: "wellness-5",
+    title: "Building Sustainable Fitness Habits",
+    excerpt: "The psychology of habit formation and how to make fitness a natural part of your lifestyle.",
+    image: "https://images.unsplash.com/photo-1507120410856-1f35574c3b45?w=800&q=80",
+    readTime: "7 min read",
+    date: "2025-01-03",
+    category: "wellness"
+  }
+];
 
 export default function Community() {
   const navigate = useNavigate();
-  const { toast } = useToast();
-  const [user, setUser] = useState<User | null>(null);
-  const [messages, setMessages] = useState<Message[]>([]);
-  const [newMessage, setNewMessage] = useState("");
-  const [loading, setLoading] = useState(false);
-  const messagesEndRef = useRef<HTMLDivElement>(null);
-  const [showDirectMessage, setShowDirectMessage] = useState(false);
-  const [selectedRecipient, setSelectedRecipient] = useState<{
-    id: string;
-    name: string;
-    avatar?: string;
-  } | null>(null);
-  const [timeFilter, setTimeFilter] = useState<string>("all");
-  const [selectedDate, setSelectedDate] = useState<Date | undefined>(undefined);
-  const [hasActiveSubscription, setHasActiveSubscription] = useState(false);
+  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
 
-  useEffect(() => {
-    const checkAuth = async () => {
-      const { data: { session } } = await supabase.auth.getSession();
-      if (session) {
-        setUser(session.user);
-        
-        // Check if user has active subscription
-        const { data: subscription } = await supabase
-          .from('user_subscriptions')
-          .select('plan_type, status')
-          .eq('user_id', session.user.id)
-          .single();
-        
-        const isSubscribed = subscription && 
-          subscription.status === 'active' && 
-          subscription.plan_type !== 'free';
-        
-        setHasActiveSubscription(isSubscribed || false);
-      }
-    };
-    checkAuth();
-
-    fetchMessages();
-
-    const channel = supabase
-      .channel('community_messages')
-      .on(
-        'postgres_changes',
-        {
-          event: '*',
-          schema: 'public',
-          table: 'community_messages'
-        },
-        (payload) => {
-          console.log('Realtime update:', payload);
-          if (payload.eventType === 'INSERT') {
-            setMessages((prev) => [...prev, payload.new as Message]);
-          } else if (payload.eventType === 'DELETE') {
-            setMessages((prev) => prev.filter((m) => m.id !== payload.old.id));
-          }
-        }
-      )
-      .subscribe();
-
-    return () => {
-      supabase.removeChannel(channel);
-    };
-  }, []);
-
-  useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, [messages]);
-
-  const fetchMessages = async () => {
-    const { data, error } = await supabase
-      .from('community_messages')
-      .select('*')
-      .order('created_at', { ascending: true })
-      .limit(100);
-
-    if (error) {
-      console.error('Error fetching messages:', error);
-    } else if (data) {
-      setMessages(data);
+  const categories = [
+    {
+      id: "fitness",
+      title: "Fitness",
+      description: "Training, workouts, and strength building",
+      icon: Dumbbell,
+      articles: fitnessArticles
+    },
+    {
+      id: "nutrition",
+      title: "Nutrition",
+      description: "Diet plans, meal prep, and nutrition tips",
+      icon: Apple,
+      articles: nutritionArticles
+    },
+    {
+      id: "wellness",
+      title: "Wellness",
+      description: "Health news, recovery, and lifestyle",
+      icon: Heart,
+      articles: wellnessArticles
     }
-  };
+  ];
 
-  const handleSendMessage = async (e: React.FormEvent) => {
-    e.preventDefault();
-    
-    if (!newMessage.trim()) return;
-    
-    if (!user) {
-      toast({
-        title: "Authentication required",
-        description: "Please login to post messages",
-        variant: "destructive",
-      });
-      navigate('/auth');
-      return;
-    }
-
-    if (!hasActiveSubscription) {
-      toast({
-        title: "Subscription required",
-        description: "Only subscribers can post messages in the community forum",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    setLoading(true);
-    try {
-      const userName = user.user_metadata?.full_name || user.email?.split('@')[0] || 'User';
-      
-      const { error } = await supabase
-        .from('community_messages')
-        .insert({
-          user_id: user.id,
-          user_name: userName,
-          message: newMessage.trim(),
-        });
-
-      if (error) throw error;
-
-      setNewMessage("");
-      toast({
-        title: "Message posted",
-        description: "Your message has been shared with the community",
-      });
-    } catch (error) {
-      console.error('Error sending message:', error);
-      toast({
-        title: "Error",
-        description: "Failed to send message",
-        variant: "destructive",
-      });
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleLogout = async () => {
-    await supabase.auth.signOut();
-    navigate("/");
-  };
-
-  const formatTime = (dateString: string) => {
-    const date = new Date(dateString);
-    const now = new Date();
-    const diffMs = now.getTime() - date.getTime();
-    const diffMins = Math.floor(diffMs / 60000);
-
-    if (diffMins < 1) return 'Just now';
-    if (diffMins < 60) return `${diffMins}m ago`;
-    
-    const diffHours = Math.floor(diffMins / 60);
-    if (diffHours < 24) return `${diffHours}h ago`;
-    
-    const diffDays = Math.floor(diffHours / 24);
-    return `${diffDays}d ago`;
-  };
-
-  const handleMessageUser = (userId: string, userName: string, avatarUrl?: string) => {
-    setSelectedRecipient({
-      id: userId,
-      name: userName,
-      avatar: avatarUrl,
-    });
-    setShowDirectMessage(true);
-  };
-
-  const filterMessages = () => {
-    const now = new Date();
-    let filtered = [...messages];
-
-    if (selectedDate) {
-      // Filter by specific date
-      filtered = filtered.filter((msg) => {
-        const msgDate = new Date(msg.created_at);
-        return (
-          msgDate.getFullYear() === selectedDate.getFullYear() &&
-          msgDate.getMonth() === selectedDate.getMonth() &&
-          msgDate.getDate() === selectedDate.getDate()
-        );
-      });
-    } else if (timeFilter !== "all") {
-      // Filter by time period
-      const hours = parseInt(timeFilter);
-      const cutoffTime = new Date(now.getTime() - hours * 60 * 60 * 1000);
-      filtered = filtered.filter((msg) => new Date(msg.created_at) >= cutoffTime);
-    }
-
-    return filtered;
-  };
-
-  const filteredMessages = filterMessages();
+  const selectedCategoryData = categories.find(cat => cat.id === selectedCategory);
 
   return (
-    <div className="min-h-screen bg-background flex flex-col">
-      {showDirectMessage && selectedRecipient && user && (
-        <DirectMessaging
-          currentUser={user}
-          recipientId={selectedRecipient.id}
-          recipientName={selectedRecipient.name}
-          recipientAvatar={selectedRecipient.avatar}
-          onClose={() => {
-            setShowDirectMessage(false);
-            setSelectedRecipient(null);
-          }}
-        />
-      )}
-
-      {/* Header */}
-      <header className="border-b border-border py-3 sm:py-4 px-4 bg-card">
-        <div className="container mx-auto max-w-4xl">
-          <div className="flex flex-col sm:flex-row justify-between items-center gap-3 mb-3">
-            <div className="flex items-center gap-2 sm:gap-4">
-              <img src={smartyGymLogo} alt="Smarty Gym" className="h-10 sm:h-12 w-auto" />
-              <div>
-                <h1 className="text-lg sm:text-2xl font-bold flex items-center gap-2">
-                  <Users className="h-5 w-5 sm:h-6 sm:w-6 text-primary" />
-                  Community
-                </h1>
-              </div>
+    <div className="min-h-screen bg-background">
+      <BackToTop />
+      <div className="container mx-auto max-w-6xl px-4 py-8">
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={() => selectedCategory ? setSelectedCategory(null) : navigate("/")}
+          className="mb-6"
+        >
+          <ArrowLeft className="mr-2 h-4 w-4" />
+          <span className="text-xs sm:text-sm">{selectedCategory ? "Back to Categories" : "Back to Home"}</span>
+        </Button>
+        
+        {!selectedCategory ? (
+          <>
+            <h1 className="text-3xl sm:text-4xl font-bold text-center mb-2">Smarty Gym Blog</h1>
+            <p className="text-center text-muted-foreground mb-8">
+              Expert insights on fitness, nutrition, and wellness from our team
+            </p>
+            
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              {categories.map((category) => {
+                const Icon = category.icon;
+                return (
+                  <Card
+                    key={category.id}
+                    onClick={() => setSelectedCategory(category.id)}
+                    className="p-6 cursor-pointer transition-all duration-300 hover:scale-105 hover:shadow-gold bg-card border-border"
+                  >
+                    <div className="flex flex-col items-center text-center space-y-4">
+                      <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center">
+                        <Icon className="w-8 h-8 text-primary" />
+                      </div>
+                      <div>
+                        <h3 className="font-semibold text-xl mb-2">{category.title}</h3>
+                        <p className="text-sm text-muted-foreground">{category.description}</p>
+                        <p className="text-xs text-muted-foreground mt-3">
+                          {category.articles.length} articles
+                        </p>
+                      </div>
+                    </div>
+                  </Card>
+                );
+              })}
             </div>
-            <div className="flex gap-2 w-full sm:w-auto">
-              <Button variant="outline" size="sm" onClick={() => navigate("/")} className="flex-1 sm:flex-initial text-xs sm:text-sm">
-                <ArrowLeft className="mr-1 sm:mr-2 h-4 w-4" />
-                <span className="hidden sm:inline">Home</span>
-                <span className="sm:hidden">Back</span>
-              </Button>
-              {user ? (
+          </>
+        ) : (
+          <>
+            <div className="flex items-center gap-3 mb-6">
+              {selectedCategoryData && (
                 <>
-                  <Button variant="outline" size="sm" onClick={() => navigate("/dashboard")} className="flex-1 sm:flex-initial text-xs sm:text-sm">
-                    Dashboard
-                  </Button>
-                  <Button variant="outline" size="sm" onClick={handleLogout} className="flex-1 sm:flex-initial text-xs sm:text-sm">
-                    Logout
-                  </Button>
+                  <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center">
+                    <selectedCategoryData.icon className="w-6 h-6 text-primary" />
+                  </div>
+                  <div>
+                    <h1 className="text-2xl sm:text-3xl font-bold">{selectedCategoryData.title}</h1>
+                    <p className="text-sm text-muted-foreground">{selectedCategoryData.description}</p>
+                  </div>
                 </>
-              ) : (
-                <Button size="sm" onClick={() => navigate("/auth")} className="flex-1 sm:flex-initial text-xs sm:text-sm">
-                  Login
-                </Button>
               )}
             </div>
-          </div>
 
-          {/* Social Media Links */}
-          <div className="flex items-center justify-center gap-3 pt-2">
-            <span className="text-sm text-muted-foreground">Follow us:</span>
-            <a
-              href="https://www.instagram.com/thesmartygym/"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="p-2 rounded-full bg-muted hover:bg-primary hover:text-primary-foreground transition-colors"
-              aria-label="Instagram"
-            >
-              <Instagram className="h-4 w-4" />
-            </a>
-            <a
-              href="https://www.facebook.com/profile.php?id=61579302997368"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="p-2 rounded-full bg-muted hover:bg-primary hover:text-primary-foreground transition-colors"
-              aria-label="Facebook"
-            >
-              <Facebook className="h-4 w-4" />
-            </a>
-            <a
-              href="https://www.tiktok.com/@thesmartygym?lang=en"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="p-2 rounded-full bg-muted hover:bg-primary hover:text-primary-foreground transition-colors"
-              aria-label="TikTok"
-            >
-              <svg className="h-4 w-4" viewBox="0 0 24 24" fill="currentColor">
-                <path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-5.2 1.74 2.89 2.89 0 0 1 2.31-4.64 2.93 2.93 0 0 1 .88.13V9.4a6.84 6.84 0 0 0-1-.05A6.33 6.33 0 0 0 5 20.1a6.34 6.34 0 0 0 10.86-4.43v-7a8.16 8.16 0 0 0 4.77 1.52v-3.4a4.85 4.85 0 0 1-1-.1z"/>
-              </svg>
-            </a>
-          </div>
-        </div>
-      </header>
-
-      {/* Main Content */}
-      <main className="flex-1 container mx-auto max-w-4xl p-4">
-        <Tabs defaultValue="forum" className="w-full">
-          <TabsList className="grid w-full grid-cols-3">
-            <TabsTrigger value="forum">Forum</TabsTrigger>
-            <TabsTrigger value="members">Members</TabsTrigger>
-            <TabsTrigger value="social">Social</TabsTrigger>
-          </TabsList>
-
-          <TabsContent value="forum" className="mt-4">
-            <Card className="flex flex-col">
-              <CardHeader className="bg-gradient-to-r from-primary/10 to-primary/5 pb-3">
-                <CardTitle className="flex items-center gap-2 mb-3">
-                  <MessageCircle className="h-5 w-5 text-primary" />
-                  Community Forum
-                </CardTitle>
-                
-                {/* Time Filters */}
-                <div className="flex flex-wrap gap-2 items-center">
-                  <Filter className="h-4 w-4 text-muted-foreground" />
-                  <div className="flex flex-wrap gap-2">
-                    <Button
-                      variant={timeFilter === "all" && !selectedDate ? "default" : "outline"}
-                      size="sm"
-                      onClick={() => {
-                        setTimeFilter("all");
-                        setSelectedDate(undefined);
-                      }}
-                      className="text-xs h-7"
-                    >
-                      All
-                    </Button>
-                    <Button
-                      variant={timeFilter === "1" ? "default" : "outline"}
-                      size="sm"
-                      onClick={() => {
-                        setTimeFilter("1");
-                        setSelectedDate(undefined);
-                      }}
-                      className="text-xs h-7"
-                    >
-                      <Clock className="h-3 w-3 mr-1" />
-                      1h
-                    </Button>
-                    <Button
-                      variant={timeFilter === "3" ? "default" : "outline"}
-                      size="sm"
-                      onClick={() => {
-                        setTimeFilter("3");
-                        setSelectedDate(undefined);
-                      }}
-                      className="text-xs h-7"
-                    >
-                      <Clock className="h-3 w-3 mr-1" />
-                      3h
-                    </Button>
-                    <Button
-                      variant={timeFilter === "6" ? "default" : "outline"}
-                      size="sm"
-                      onClick={() => {
-                        setTimeFilter("6");
-                        setSelectedDate(undefined);
-                      }}
-                      className="text-xs h-7"
-                    >
-                      <Clock className="h-3 w-3 mr-1" />
-                      6h
-                    </Button>
-                    <Button
-                      variant={timeFilter === "12" ? "default" : "outline"}
-                      size="sm"
-                      onClick={() => {
-                        setTimeFilter("12");
-                        setSelectedDate(undefined);
-                      }}
-                      className="text-xs h-7"
-                    >
-                      <Clock className="h-3 w-3 mr-1" />
-                      12h
-                    </Button>
-                    
-                    {/* Date Picker */}
-                    <Popover>
-                      <PopoverTrigger asChild>
-                        <Button
-                          variant={selectedDate ? "default" : "outline"}
-                          size="sm"
-                          className="text-xs h-7"
-                        >
-                          <CalendarIcon className="h-3 w-3 mr-1" />
-                          {selectedDate ? format(selectedDate, "MMM d") : "Date"}
-                        </Button>
-                      </PopoverTrigger>
-                      <PopoverContent className="w-auto p-0" align="start">
-                        <Calendar
-                          mode="single"
-                          selected={selectedDate}
-                          onSelect={(date) => {
-                            setSelectedDate(date);
-                            setTimeFilter("all");
-                          }}
-                          disabled={(date) => date > new Date()}
-                          initialFocus
-                          className={cn("p-3 pointer-events-auto")}
-                        />
-                      </PopoverContent>
-                    </Popover>
-                  </div>
-                </div>
-              </CardHeader>
-              
-              <CardContent className="flex flex-col p-0">
-                <div className="h-[50vh] overflow-y-auto p-4 space-y-4">
-                  {filteredMessages.length === 0 ? (
-                    <div className="text-center py-12">
-                      <Users className="h-16 w-16 text-muted-foreground mx-auto mb-4 opacity-50" />
-                      <p className="text-lg font-medium text-muted-foreground">
-                        {selectedDate || timeFilter !== "all" 
-                          ? "No messages in this time period" 
-                          : "No messages yet"}
-                      </p>
-                      <p className="text-sm text-muted-foreground mt-2">
-                        {selectedDate || timeFilter !== "all"
-                          ? "Try selecting a different time filter"
-                          : "Be the first to share something!"}
-                      </p>
-                    </div>
-                  ) : (
-                    filteredMessages.map((msg) => {
-                      const isCurrentUser = msg.user_id === user?.id;
-                      return (
-                        <div
-                          key={msg.id}
-                          className={`flex ${isCurrentUser ? 'justify-end' : 'justify-start'}`}
-                        >
-                          <div
-                            className={`max-w-[80%] rounded-lg p-3 ${
-                              isCurrentUser
-                                ? 'bg-primary text-primary-foreground'
-                                : 'bg-muted'
-                            }`}
-                          >
-                            <div className="flex items-center justify-between gap-2 mb-1">
-                              <div className="flex items-baseline gap-2">
-                                <button
-                                  onClick={() => {
-                                    if (!isCurrentUser && user) {
-                                      handleMessageUser(msg.user_id, msg.user_name);
-                                    }
-                                  }}
-                                  className={`font-semibold text-sm ${
-                                    !isCurrentUser && user
-                                      ? 'hover:underline cursor-pointer'
-                                      : ''
-                                  }`}
-                                  disabled={isCurrentUser || !user}
-                                >
-                                  {isCurrentUser ? 'You' : msg.user_name}
-                                </button>
-                                <span className="text-xs opacity-70">
-                                  {formatTime(msg.created_at)}
-                                </span>
-                              </div>
-                              {!isCurrentUser && user && (
-                                <Button
-                                  variant="ghost"
-                                  size="sm"
-                                  className="h-6 px-2 text-xs"
-                                  onClick={() => handleMessageUser(msg.user_id, msg.user_name)}
-                                >
-                                  <MessageCircle className="h-3 w-3 mr-1" />
-                                  Message
-                                </Button>
-                              )}
-                            </div>
-                            <p className="text-sm break-words">{msg.message}</p>
-                          </div>
-                        </div>
-                      );
-                    })
-                  )}
-                  <div ref={messagesEndRef} />
-                </div>
-
-                {user && hasActiveSubscription ? (
-                  <form onSubmit={handleSendMessage} className="p-4 border-t">
-                    <div className="flex gap-2">
-                      <Input
-                        value={newMessage}
-                        onChange={(e) => setNewMessage(e.target.value)}
-                        placeholder="Share your thoughts..."
-                        maxLength={500}
-                        disabled={loading}
+            <div className="grid grid-cols-1 gap-6">
+              {selectedCategoryData?.articles.map((article) => (
+                <Card key={article.id} className="overflow-hidden bg-card border-border">
+                  <div className="grid md:grid-cols-[300px,1fr] gap-0">
+                    <div className="relative h-48 md:h-full">
+                      <img
+                        src={article.image}
+                        alt={article.title}
+                        className="w-full h-full object-cover"
                       />
-                      <Button type="submit" disabled={loading || !newMessage.trim()}>
-                        <Send className="h-4 w-4" />
-                      </Button>
                     </div>
-                    <p className="text-xs text-muted-foreground mt-2">
-                      {newMessage.length}/500 characters
-                    </p>
-                  </form>
-                ) : user && !hasActiveSubscription ? (
-                  <div className="p-4 border-t text-center bg-muted/50">
-                    <p className="text-sm text-muted-foreground mb-3">
-                      Subscribe to join the conversation and share your fitness journey!
-                    </p>
-                    <Button onClick={() => navigate('/')} size="sm" className="w-full sm:w-auto">
-                      View Subscription Plans
-                    </Button>
+                    <div className="p-6">
+                      <CardHeader className="p-0 mb-4">
+                        <CardTitle className="text-xl mb-2">{article.title}</CardTitle>
+                        <CardDescription>{article.excerpt}</CardDescription>
+                      </CardHeader>
+                      <CardContent className="p-0">
+                        <div className="flex flex-wrap items-center gap-4 text-xs text-muted-foreground mb-4">
+                          <span className="flex items-center gap-1">
+                            <Clock className="h-3 w-3" />
+                            {article.readTime}
+                          </span>
+                          <span className="flex items-center gap-1">
+                            <Calendar className="h-3 w-3" />
+                            {new Date(article.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+                          </span>
+                        </div>
+                        <ShareButtons 
+                          title={article.title} 
+                          url={`${window.location.origin}/blog/${article.id}`} 
+                        />
+                      </CardContent>
+                    </div>
                   </div>
-                ) : (
-                  <div className="p-4 border-t text-center bg-muted/50">
-                    <p className="text-sm text-muted-foreground mb-3">
-                      Login and subscribe to share your fitness journey!
-                    </p>
-                    <Button onClick={() => navigate('/auth')} size="sm" className="w-full sm:w-auto">
-                      Login to Get Started
-                    </Button>
-                  </div>
-                )}
-              </CardContent>
-            </Card>
-          </TabsContent>
-
-          <TabsContent value="members" className="mt-4">
-            <SubscribedMembers onMessageUser={handleMessageUser} />
-          </TabsContent>
-
-          <TabsContent value="social" className="mt-4">
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <a href="https://www.instagram.com/thesmartygym/" target="_blank" rel="noopener noreferrer" className="group">
-                <Card className="h-full transition-all hover:shadow-lg hover:scale-105 bg-gradient-to-br from-purple-500/10 via-pink-500/10 to-orange-500/10 border-pink-200 dark:border-pink-800">
-                  <CardHeader>
-                    <CardTitle className="flex items-center gap-3">
-                      <div className="p-2 rounded-full bg-gradient-to-br from-purple-500 to-pink-500">
-                        <Instagram className="h-5 w-5 text-white" />
-                      </div>
-                      <div>
-                        <div className="text-lg font-bold">Instagram</div>
-                        <div className="text-xs text-muted-foreground font-normal">@thesmartygym</div>
-                      </div>
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <p className="text-sm text-muted-foreground mb-4">
-                      Daily workout tips and motivation!
-                    </p>
-                    <Button variant="outline" className="w-full group-hover:bg-primary group-hover:text-primary-foreground">
-                      Follow
-                    </Button>
-                  </CardContent>
                 </Card>
-              </a>
-
-              <a href="https://www.facebook.com/profile.php?id=61579302997368" target="_blank" rel="noopener noreferrer" className="group">
-                <Card className="h-full transition-all hover:shadow-lg hover:scale-105 bg-gradient-to-br from-blue-500/10 to-blue-600/10 border-blue-200 dark:border-blue-800">
-                  <CardHeader>
-                    <CardTitle className="flex items-center gap-3">
-                      <div className="p-2 rounded-full bg-blue-600">
-                        <Facebook className="h-5 w-5 text-white" />
-                      </div>
-                      <div>
-                        <div className="text-lg font-bold">Facebook</div>
-                        <div className="text-xs text-muted-foreground font-normal">Smarty Gym</div>
-                      </div>
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <p className="text-sm text-muted-foreground mb-4">
-                      Join our fitness community!
-                    </p>
-                    <Button variant="outline" className="w-full group-hover:bg-primary group-hover:text-primary-foreground">
-                      Like
-                    </Button>
-                  </CardContent>
-                </Card>
-              </a>
-
-              <a href="https://www.tiktok.com/@thesmartygym?lang=en" target="_blank" rel="noopener noreferrer" className="group">
-                <Card className="h-full transition-all hover:shadow-lg hover:scale-105 bg-gradient-to-br from-gray-800/10 to-gray-900/10 border-gray-200 dark:border-gray-700">
-                  <CardHeader>
-                    <CardTitle className="flex items-center gap-3">
-                      <div className="p-2 rounded-full bg-black dark:bg-white">
-                        <svg className="h-5 w-5 text-white dark:text-black" viewBox="0 0 24 24" fill="currentColor">
-                          <path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-5.2 1.74 2.89 2.89 0 0 1 2.31-4.64 2.93 2.93 0 0 1 .88.13V9.4a6.84 6.84 0 0 0-1-.05A6.33 6.33 0 0 0 5 20.1a6.34 6.34 0 0 0 10.86-4.43v-7a8.16 8.16 0 0 0 4.77 1.52v-3.4a4.85 4.85 0 0 1-1-.1z"/>
-                        </svg>
-                      </div>
-                      <div>
-                        <div className="text-lg font-bold">TikTok</div>
-                        <div className="text-xs text-muted-foreground font-normal">@thesmartygym</div>
-                      </div>
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <p className="text-sm text-muted-foreground mb-4">
-                      Quick workout videos & challenges!
-                    </p>
-                    <Button variant="outline" className="w-full group-hover:bg-primary group-hover:text-primary-foreground">
-                      Follow
-                    </Button>
-                  </CardContent>
-                </Card>
-              </a>
+              ))}
             </div>
-          </TabsContent>
-        </Tabs>
-      </main>
+          </>
+        )}
+
+        {/* Bottom CTA */}
+        <div className="bg-card border border-border rounded-xl p-6 mt-12 text-center shadow-soft">
+          <h3 className="text-xl font-semibold mb-2">Train smarter with us</h3>
+          <p className="text-muted-foreground mb-4">
+            Join Smarty Gym Premium for personalized programs and expert guidance
+          </p>
+          <Button size="lg" onClick={() => navigate("/auth")}>
+            Join Premium
+          </Button>
+        </div>
+      </div>
     </div>
   );
 }
