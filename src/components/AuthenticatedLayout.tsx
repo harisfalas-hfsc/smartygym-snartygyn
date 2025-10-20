@@ -2,7 +2,6 @@ import { useEffect, useState } from "react";
 import { Outlet, useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { User } from "@supabase/supabase-js";
-import { MotivationalBanner } from "@/components/MotivationalBanner";
 import { ProfileSetupDialog } from "@/components/ProfileSetupDialog";
 
 export const AuthenticatedLayout = () => {
@@ -65,13 +64,8 @@ export const AuthenticatedLayout = () => {
     );
   }
 
-  const userName = user?.user_metadata?.full_name?.split(' ')[0] || 
-                   user?.email?.split('@')[0] || 
-                   "Champion";
-
   return (
     <div className="min-h-screen bg-background">
-      <MotivationalBanner userName={userName} />
       <Outlet />
       {hasCheckedProfile && (
         <ProfileSetupDialog 

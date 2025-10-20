@@ -155,6 +155,20 @@ export default function UserDashboard() {
 
   return (
     <div className="min-h-screen bg-background">
+      {/* Hero Section */}
+      <div className="bg-gradient-to-br from-primary/5 via-background to-primary/10 border-b">
+        <div className="container mx-auto max-w-7xl px-4 py-12">
+          <div className="text-center space-y-4">
+            <h1 className="text-4xl sm:text-5xl font-bold bg-gradient-to-r from-primary via-amber-500 to-primary bg-clip-text text-transparent">
+              My Dashboard
+            </h1>
+            <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+              Track your fitness journey, monitor your progress, and stay on top of your goals. Your personalized hub for workouts, programs, and achievements.
+            </p>
+          </div>
+        </div>
+      </div>
+
       {/* Main Content */}
       <main className="container mx-auto max-w-7xl p-4 py-8">
         <div className="mb-8 flex items-center justify-between">
