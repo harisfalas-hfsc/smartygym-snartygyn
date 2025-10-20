@@ -13,21 +13,21 @@ const Tools = () => {
       icon: Calculator,
       title: "1RM Calculator",
       description: "Calculate your one-rep maximum for any exercise",
-      route: "/1rm-calculator"
+      route: "/1rmcalculator"
     },
     {
       id: "bmr-calculator",
       icon: Activity,
       title: "BMR Calculator",
       description: "Calculate your basal metabolic rate",
-      route: "/bmr-calculator"
+      route: "/bmrcalculator"
     },
     {
       id: "macro-calculator",
       icon: Flame,
       title: "Macro Tracking Calculator",
       description: "Get personalized nutrition and macro recommendations",
-      route: "/macro-calculator"
+      route: "/macrocalculator"
     }
   ];
 
