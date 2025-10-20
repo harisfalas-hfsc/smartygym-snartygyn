@@ -276,9 +276,19 @@ export default function Community() {
           <>
             <header className="text-center mb-8">
               <h1 className="text-3xl sm:text-4xl font-bold mb-2">Blog</h1>
-              <p className="text-muted-foreground">
+              <p className="text-center text-muted-foreground mb-4">
                 Expert insights on fitness, nutrition, and wellness from our team
               </p>
+              
+              {/* Info Ribbon */}
+              <div className="bg-primary/10 border border-primary/20 rounded-lg p-4 mb-8 text-center">
+                <p className="text-sm text-muted-foreground mb-2">
+                  Read free articles and insights — want personalized coaching and programs?
+                </p>
+                <Button variant="default" size="sm" onClick={() => navigate("/auth")}>
+                  Join Premium
+                </Button>
+              </div>
             </header>
             
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">

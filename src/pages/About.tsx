@@ -65,12 +65,18 @@ const About = () => {
         </Button>
 
         {/* Hero Section */}
-        <header className="text-center mb-16">
-          <h1 className="text-3xl sm:text-4xl font-bold mb-4">About</h1>
-          <p className="text-xl text-muted-foreground mb-2">Fitness Without the Chains | smartygym.com</p>
-          <p className="text-sm text-muted-foreground">
-            Founded by <strong>Haris Falas</strong> – Sports Scientist & Strength and Conditioning Coach | Cyprus Fitness Expert
+        <header className="text-center mb-8">
+          <h1 className="text-3xl sm:text-4xl font-bold mb-2">About</h1>
+          <p className="text-center text-muted-foreground mb-4">
+            Fitness Without the Chains | smartygym.com
           </p>
+          
+          {/* Info Ribbon */}
+          <div className="bg-primary/10 border border-primary/20 rounded-lg p-4 mb-8 text-center max-w-3xl mx-auto">
+            <p className="text-sm text-muted-foreground">
+              Founded by <strong>Haris Falas</strong> — Sports Scientist & Strength and Conditioning Coach | Cyprus Fitness Expert
+            </p>
+          </div>
         </header>
 
         {/* NO AI Section - Main Differentiator */}

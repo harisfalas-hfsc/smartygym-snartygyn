@@ -43,9 +43,19 @@ const Tools = () => {
           Back to Home
         </Button>
 
-        <div className="text-center mb-8">
-          <h1 className="text-3xl sm:text-4xl font-bold mb-2">Smart Tools</h1>
-          <p className="text-muted-foreground">Free fitness calculators to support your training</p>
+        <h1 className="text-3xl sm:text-4xl font-bold text-center mb-2">Smart Tools</h1>
+        <p className="text-center text-muted-foreground mb-4">
+          Free fitness calculators to support your training
+        </p>
+        
+        {/* Info Ribbon */}
+        <div className="bg-primary/10 border border-primary/20 rounded-lg p-4 mb-8 text-center">
+          <p className="text-sm text-muted-foreground mb-2">
+            Use these tools for free — no login required. Want personalized programs?
+          </p>
+          <Button variant="default" size="sm" onClick={() => navigate("/auth")}>
+            Join Premium
+          </Button>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">

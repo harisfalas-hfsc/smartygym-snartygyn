@@ -124,14 +124,18 @@ const Contact = () => {
           </Button>
 
           {/* Hero Section */}
-          <header className="text-center mb-12">
-            <h1 className="text-3xl sm:text-4xl font-bold mb-4">Contact</h1>
-            <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
+          <header className="text-center mb-8">
+            <h1 className="text-3xl sm:text-4xl font-bold mb-2">Contact</h1>
+            <p className="text-center text-muted-foreground mb-4">
               Have questions? Need support? Want to discuss your fitness goals?
             </p>
-            <p className="text-sm text-muted-foreground mt-2">
-              Get in touch with <strong>Haris Falas</strong> and the Smarty Gym team
-            </p>
+            
+            {/* Info Ribbon */}
+            <div className="bg-primary/10 border border-primary/20 rounded-lg p-4 mb-8 text-center max-w-3xl mx-auto">
+              <p className="text-sm text-muted-foreground">
+                Get in touch with <strong>Haris Falas</strong> and the Smarty Gym team
+              </p>
+            </div>
           </header>
 
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
