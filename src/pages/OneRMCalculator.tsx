@@ -107,11 +107,11 @@ const OneRMCalculator = () => {
         <Button
           variant="ghost"
           size="sm"
-          onClick={() => navigate("/")}
+          onClick={() => navigate(-1)}
           className="mb-4"
         >
           <ArrowLeft className="mr-2 h-4 w-4" />
-          <span className="text-xs sm:text-sm">Back to Home</span>
+          <span className="text-xs sm:text-sm">Back</span>
         </Button>
         
         <div className="text-center mb-6">

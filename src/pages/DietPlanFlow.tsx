@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { Helmet } from "react-helmet";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -179,16 +180,22 @@ const DietPlanFlow = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background p-4">
+    <>
+      <Helmet>
+        <title>Diet Plan Generator | Smarty Gym</title>
+        <meta name="description" content="Generate your personalized diet plan based on your goals and preferences" />
+      </Helmet>
+      
+      <div className="min-h-screen bg-background p-4">
       <div className="max-w-2xl mx-auto py-4 sm:py-8">
         <Button
           variant="ghost"
           size="sm"
-          onClick={() => navigate("/")}
+          onClick={() => navigate(-1)}
           className="mb-4"
         >
           <ArrowLeft className="mr-2 h-4 w-4" />
-          <span className="text-xs sm:text-sm">Back to Home</span>
+          <span className="text-xs sm:text-sm">Back</span>
         </Button>
         
         <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-center mb-6 sm:mb-8 px-2">Diet Plan Generator</h1>
@@ -537,8 +544,8 @@ const DietPlanFlow = () => {
                     </Button>
                   </div>
                   <div className="flex gap-2">
-                    <Button onClick={() => navigate("/")} variant="outline">
-                      Back to Home
+                    <Button onClick={() => navigate(-1)} variant="outline">
+                      Back
                     </Button>
                     <Button onClick={() => {
                       setStep(1);
@@ -579,7 +586,8 @@ const DietPlanFlow = () => {
         onOpenChange={setShowSubscriptionGate}
         isAuthenticated={isAuthenticated}
       />
-    </div>
+      </div>
+    </>
   );
 };
 

@@ -179,13 +179,13 @@ export default function Auth() {
       )}
 
       <div className="w-full max-w-md">
-        <Button 
-          variant="ghost" 
-          onClick={() => navigate("/")}
+        <Button
+          variant="ghost"
+          onClick={() => navigate(-1)}
           className="mb-4"
         >
           <ArrowLeft className="mr-2 h-4 w-4" />
-          Back to Home
+          Back
         </Button>
         
         <Card className="w-full">

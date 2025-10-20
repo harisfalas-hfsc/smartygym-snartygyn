@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { Helmet } from "react-helmet";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -147,16 +148,22 @@ const ProfileSettings = () => {
   }
 
   return (
-    <div className="min-h-screen bg-background p-4">
+    <>
+      <Helmet>
+        <title>Profile Settings | Smarty Gym</title>
+        <meta name="description" content="Update your fitness profile and preferences" />
+      </Helmet>
+      
+      <div className="min-h-screen bg-background p-4">
       <div className="max-w-3xl mx-auto py-8">
         <Button
           variant="ghost"
           size="sm"
-          onClick={() => navigate("/dashboard")}
+          onClick={() => navigate(-1)}
           className="mb-6"
         >
           <ArrowLeft className="mr-2 h-4 w-4" />
-          Back to Dashboard
+          Back
         </Button>
 
         <Card>
@@ -319,7 +326,8 @@ const ProfileSettings = () => {
           </CardContent>
         </Card>
       </div>
-    </div>
+      </div>
+    </>
   );
 };
 

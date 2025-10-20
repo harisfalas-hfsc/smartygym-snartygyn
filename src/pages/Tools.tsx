@@ -55,11 +55,11 @@ const Tools = () => {
         <Button
           variant="ghost"
           size="sm"
-          onClick={() => navigate("/")}
+          onClick={() => navigate(-1)}
           className="mb-6"
         >
           <ArrowLeft className="mr-2 h-4 w-4" />
-          Back to Home
+          Back
         </Button>
 
         <h1 className="text-3xl sm:text-4xl font-bold text-center mb-2">Smart Tools</h1>

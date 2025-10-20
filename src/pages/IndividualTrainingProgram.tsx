@@ -1,4 +1,5 @@
 import { useNavigate, useParams } from "react-router-dom";
+import { Helmet } from "react-helmet";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft } from "lucide-react";
 import { WorkoutDisplay } from "@/components/WorkoutDisplay";
@@ -355,20 +356,27 @@ This program requires completion of the PAR-Q+ assessment before beginning. Alwa
   );
 
   return (
-    <div className="min-h-screen bg-background">
+    <>
+      <Helmet>
+        <title>{programInfo.name} | Smarty Gym</title>
+        <meta name="description" content={`${programInfo.name} - Program #${programInfo.serial}`} />
+      </Helmet>
+      
+      <div className="min-h-screen bg-background">
       <div className="container mx-auto px-4 py-8">
         <Button
-          onClick={() => navigate('/training-program')}
+          onClick={() => navigate(-1)}
           variant="outline"
           className="mb-6"
         >
           <ArrowLeft className="w-4 h-4 mr-2" />
-          Back to Training Programs
+          Back
         </Button>
 
         {isFreeProgram ? content : <PremiumContentGate>{content}</PremiumContentGate>}
       </div>
-    </div>
+      </div>
+    </>
   );
 };
 

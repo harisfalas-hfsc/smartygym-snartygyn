@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
+import { Helmet } from "react-helmet";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { ArrowLeft } from "lucide-react";
@@ -136,7 +137,13 @@ const WorkoutDetail = () => {
   );
 
   return (
-    <div className="min-h-screen bg-background">
+    <>
+      <Helmet>
+        <title>{title} | Smarty Gym</title>
+        <meta name="description" content={`Browse ${title.toLowerCase()} workouts - bodyweight and equipment-based options`} />
+      </Helmet>
+      
+      <div className="min-h-screen bg-background">
       <div className="container mx-auto max-w-6xl px-4 py-8">
         <Button
           variant="ghost"
@@ -145,7 +152,7 @@ const WorkoutDetail = () => {
           className="mb-6"
         >
           <ArrowLeft className="mr-2 h-4 w-4" />
-          <span className="text-xs sm:text-sm">Back to Workouts</span>
+          <span className="text-xs sm:text-sm">Back</span>
         </Button>
         
         <h1 className="text-3xl sm:text-4xl font-bold text-center mb-8">{title}</h1>
@@ -255,7 +262,8 @@ const WorkoutDetail = () => {
           </Card>
         )}
       </div>
-    </div>
+      </div>
+    </>
   );
 };
 
