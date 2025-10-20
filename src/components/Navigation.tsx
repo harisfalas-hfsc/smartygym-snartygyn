@@ -13,7 +13,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { User as UserIcon, Settings, LogOut, LayoutDashboard, Crown, Menu, ArrowLeft, Home } from "lucide-react";
+import { User as UserIcon, Settings, LogOut, LayoutDashboard, Crown, Menu } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import smartyGymLogo from "@/assets/smarty-gym-logo.png";
 import { ThemeToggle } from "@/components/ThemeToggle";
@@ -32,7 +32,6 @@ export const Navigation = () => {
   const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
   const [subscriptionInfo, setSubscriptionInfo] = useState<SubscriptionInfo | null>(null);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [canGoBack, setCanGoBack] = useState(false);
 
   useEffect(() => {
     // Check current session
@@ -60,12 +59,6 @@ export const Navigation = () => {
 
     return () => subscription.unsubscribe();
   }, []);
-
-  useEffect(() => {
-    // Check if we can go back in history
-    // If we're on the home page or there's no history, show home button
-    setCanGoBack(location.pathname !== "/" && window.history.length > 1);
-  }, [location]);
 
   const loadUserData = async (userId: string) => {
     const { data: profile } = await supabase
@@ -122,41 +115,19 @@ export const Navigation = () => {
     setTimeout(() => window.scrollTo(0, 0), 0);
   };
 
-  const handleBackOrHome = () => {
-    if (canGoBack) {
-      navigate(-1);
-    } else {
-      navigate("/");
-    }
-    // Scroll to top after navigation
-    setTimeout(() => window.scrollTo(0, 0), 0);
-  };
-
   return (
     <header className="sticky top-0 z-50 bg-background border-b border-border py-3 px-4">
       <div className="container mx-auto max-w-7xl">
         <div className="flex justify-between items-center gap-4">
-          {/* Back/Home Button */}
-          <Button 
-            variant="ghost" 
-            size="icon"
-            onClick={handleBackOrHome}
-            className="flex-shrink-0"
-            aria-label={canGoBack ? "Go back" : "Go to home"}
-          >
-            {canGoBack ? (
-              <ArrowLeft className="h-5 w-5" />
-            ) : (
-              <Home className="h-5 w-5" />
-            )}
-          </Button>
-
-          {/* Logo */}
+          {/* Logo - Clickable to go home */}
           <div 
-            className="flex items-center cursor-pointer"
-            onClick={() => navigate("/")}
+            className="flex items-center cursor-pointer py-1"
+            onClick={() => {
+              navigate("/");
+              setTimeout(() => window.scrollTo(0, 0), 0);
+            }}
           >
-            <img src={smartyGymLogo} alt="Smarty Gym" className="h-16 w-auto" />
+            <img src={smartyGymLogo} alt="Smarty Gym - Home" className="h-32 w-auto" />
           </div>
 
           {/* Desktop Navigation Links */}
