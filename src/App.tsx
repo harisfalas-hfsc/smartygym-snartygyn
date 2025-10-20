@@ -36,6 +36,7 @@ import Disclaimer from "./pages/Disclaimer";
 import NotFound from "./pages/NotFound";
 import JoinPremium from "./pages/JoinPremium";
 import PremiumBenefits from "./pages/PremiumBenefits";
+import TakeTour from "./pages/TakeTour";
 
 const queryClient = new QueryClient();
 
@@ -81,6 +82,7 @@ const App = () => (
                 
                 {/* Public calculator routes */}
                 <Route path="/about" element={<About />} />
+                <Route path="/take-tour" element={<TakeTour />} />
                 <Route path="/contact" element={<Contact />} />
                 <Route path="/privacy-policy" element={<PrivacyPolicy />} />
                 <Route path="/terms-of-service" element={<TermsOfService />} />

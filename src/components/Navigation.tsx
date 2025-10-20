@@ -127,6 +127,7 @@ export const Navigation = () => {
           {/* Desktop Navigation Links */}
           <nav className="hidden md:flex items-center gap-4 flex-1 justify-center">
             <Button variant="ghost" size="sm" onClick={() => navigate("/about")}>About</Button>
+            <Button variant="ghost" size="sm" onClick={() => navigate("/take-tour")}>Take a Tour</Button>
             <Button variant="ghost" size="sm" onClick={() => navigate("/workout")}>Workouts</Button>
             <Button variant="ghost" size="sm" onClick={() => navigate("/training-program")}>Programs</Button>
             <Button variant="ghost" size="sm" onClick={() => navigate("/tools")}>Tools</Button>
@@ -146,6 +147,9 @@ export const Navigation = () => {
               <nav className="flex flex-col gap-4 mt-8">
                 <Button variant="ghost" size="lg" onClick={() => handleNavigate("/about")} className="justify-start">
                   About
+                </Button>
+                <Button variant="ghost" size="lg" onClick={() => handleNavigate("/take-tour")} className="justify-start">
+                  Take a Tour
                 </Button>
                 <Button variant="ghost" size="lg" onClick={() => handleNavigate("/workout")} className="justify-start">
                   Workouts
