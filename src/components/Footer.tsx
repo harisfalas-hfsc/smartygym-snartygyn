@@ -14,7 +14,7 @@ export const Footer = () => {
               href="https://www.facebook.com/profile.php?id=61579302997368" 
               target="_blank" 
               rel="noopener noreferrer" 
-              className="p-2 rounded-full bg-muted hover:bg-primary hover:text-primary-foreground transition-colors" 
+              className="p-2 rounded-full border-2 border-primary text-primary hover:bg-primary hover:text-primary-foreground transition-colors" 
               aria-label="Facebook"
             >
               <Facebook className="h-5 w-5" />
@@ -23,7 +23,7 @@ export const Footer = () => {
               href="https://www.instagram.com/thesmartygym/" 
               target="_blank" 
               rel="noopener noreferrer" 
-              className="p-2 rounded-full bg-muted hover:bg-primary hover:text-primary-foreground transition-colors" 
+              className="p-2 rounded-full border-2 border-primary text-primary hover:bg-primary hover:text-primary-foreground transition-colors" 
               aria-label="Instagram"
             >
               <Instagram className="h-5 w-5" />
@@ -32,7 +32,7 @@ export const Footer = () => {
               href="https://www.tiktok.com/@thesmartygym?lang=en" 
               target="_blank" 
               rel="noopener noreferrer" 
-              className="p-2 rounded-full bg-muted hover:bg-primary hover:text-primary-foreground transition-colors" 
+              className="p-2 rounded-full border-2 border-primary text-primary hover:bg-primary hover:text-primary-foreground transition-colors" 
               aria-label="TikTok"
             >
               <svg className="h-5 w-5" viewBox="0 0 24 24" fill="currentColor">
@@ -43,7 +43,7 @@ export const Footer = () => {
               href="https://www.youtube.com/@TheSmartyGym" 
               target="_blank" 
               rel="noopener noreferrer" 
-              className="p-2 rounded-full bg-muted hover:bg-primary hover:text-primary-foreground transition-colors" 
+              className="p-2 rounded-full border-2 border-primary text-primary hover:bg-primary hover:text-primary-foreground transition-colors" 
               aria-label="YouTube"
             >
               <Youtube className="h-5 w-5" />
