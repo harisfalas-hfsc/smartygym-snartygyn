@@ -169,7 +169,7 @@ export const Navigation = () => {
                   <Button 
                     variant="default" 
                     size="lg" 
-                    onClick={() => handleNavigate("/join-premium")}
+                    onClick={() => handleNavigate("/premium-benefits")}
                     className="w-full"
                   >
                     Join Premium
@@ -184,7 +184,7 @@ export const Navigation = () => {
             <Button 
               variant="default" 
               size="sm" 
-              onClick={() => navigate("/join-premium")}
+              onClick={() => navigate("/premium-benefits")}
               className="hidden md:inline-flex"
             >
               Join Premium

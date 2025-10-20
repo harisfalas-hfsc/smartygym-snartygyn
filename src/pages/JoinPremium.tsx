@@ -115,9 +115,21 @@ export default function JoinPremium() {
           {/* Info Ribbon */}
           <div className="bg-primary/10 border border-primary/20 rounded-lg p-4 mb-8 text-center">
             <p className="text-sm text-muted-foreground">
-              Choose the plan that fits your goals. All prices in Euro (€). Cancel anytime.
+              <strong>Recurring subscriptions save you money!</strong> Choose between monthly or yearly plans. All prices in Euro (€). Cancel anytime.
             </p>
           </div>
+
+          {/* Subscription Benefits Banner */}
+          <Card className="mb-8 bg-gradient-to-r from-green-50 to-emerald-50 dark:from-green-950/20 dark:to-emerald-950/20 border-green-200 dark:border-green-800">
+            <CardContent className="p-6 text-center">
+              <h3 className="text-lg font-bold mb-2 text-green-700 dark:text-green-400">
+                💰 Smart Investment: Lock in Recurring Payments & Save!
+              </h3>
+              <p className="text-sm text-green-600 dark:text-green-300">
+                Choose a subscription plan that auto-renews and you'll save compared to one-time purchases. The yearly plan saves you 25% - that's €29.89 in your pocket!
+              </p>
+            </CardContent>
+          </Card>
 
           {/* Premium Features */}
           <Card className="mb-8">
@@ -142,17 +154,26 @@ export default function JoinPremium() {
           </Card>
 
           {/* Pricing Plans */}
+          <div className="mb-4 text-center">
+            <Badge className="bg-amber-600 text-white text-sm py-2 px-4">
+              ✨ All plans are recurring subscriptions - better value for committed members!
+            </Badge>
+          </div>
+          
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-4xl mx-auto mb-8">
             {/* Gold Plan */}
             <Card className="relative">
               <CardHeader>
                 <div className="flex items-center justify-between mb-2">
                   <Badge variant="outline" className="text-primary border-primary">
-                    GOLD
+                    MONTHLY SUBSCRIPTION
                   </Badge>
                 </div>
                 <CardTitle className="text-3xl font-bold">€9.99</CardTitle>
-                <p className="text-sm text-muted-foreground">per month</p>
+                <p className="text-sm text-muted-foreground">per month (billed monthly)</p>
+                <p className="text-xs text-amber-600 dark:text-amber-400 font-semibold mt-1">
+                  🔄 Auto-renews monthly
+                </p>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="space-y-2">
@@ -162,11 +183,11 @@ export default function JoinPremium() {
                   </div>
                   <div className="flex items-start gap-2">
                     <Check className="h-5 w-5 text-green-500 shrink-0 mt-0.5" />
-                    <span className="text-sm">Monthly billing</span>
+                    <span className="text-sm">Flexible monthly billing</span>
                   </div>
                   <div className="flex items-start gap-2">
                     <Check className="h-5 w-5 text-green-500 shrink-0 mt-0.5" />
-                    <span className="text-sm">Cancel anytime</span>
+                    <span className="text-sm">Cancel anytime (subscription-based)</span>
                   </div>
                 </div>
                 <Button 
@@ -174,27 +195,37 @@ export default function JoinPremium() {
                   onClick={() => handleSubscribe('gold')}
                   disabled={loading}
                 >
-                  {loading ? "Processing..." : "Get Gold Plan"}
+                  {loading ? "Processing..." : "Start Monthly Plan"}
                 </Button>
+                <p className="text-xs text-center text-muted-foreground">
+                  Renews automatically each month
+                </p>
               </CardContent>
             </Card>
 
             {/* Platinum Plan */}
-            <Card className="relative border-2 border-primary">
+            <Card className="relative border-2 border-primary shadow-lg">
               <div className="absolute -top-3 left-1/2 -translate-x-1/2">
-                <Badge className="bg-primary text-primary-foreground px-3 py-1">
-                  BEST VALUE
+                <Badge className="bg-primary text-primary-foreground px-4 py-1.5 text-sm">
+                  🏆 BEST VALUE - SAVE 25%
                 </Badge>
               </div>
               <CardHeader>
                 <div className="flex items-center justify-between mb-2">
                   <Badge className="bg-primary text-primary-foreground">
-                    PLATINUM
+                    YEARLY SUBSCRIPTION
                   </Badge>
                 </div>
                 <CardTitle className="text-3xl font-bold">€89.99</CardTitle>
-                <p className="text-sm text-muted-foreground">per year</p>
-                <p className="text-xs text-green-600 font-semibold">Save €29.89 (25% off)</p>
+                <p className="text-sm text-muted-foreground">per year (billed annually)</p>
+                <div className="mt-2 space-y-1">
+                  <p className="text-sm text-green-600 font-semibold">
+                    Just €7.50/month - Save €29.89!
+                  </p>
+                  <p className="text-xs text-amber-600 dark:text-amber-400 font-semibold">
+                    🔄 Auto-renews yearly
+                  </p>
+                </div>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="space-y-2">
@@ -204,24 +235,27 @@ export default function JoinPremium() {
                   </div>
                   <div className="flex items-start gap-2">
                     <Check className="h-5 w-5 text-green-500 shrink-0 mt-0.5" />
-                    <span className="text-sm">Annual billing (best value)</span>
+                    <span className="text-sm"><strong>25% savings</strong> vs monthly plan</span>
                   </div>
                   <div className="flex items-start gap-2">
                     <Check className="h-5 w-5 text-green-500 shrink-0 mt-0.5" />
-                    <span className="text-sm">Priority support</span>
+                    <span className="text-sm">Lock in your rate for 12 months</span>
                   </div>
                   <div className="flex items-start gap-2">
                     <Check className="h-5 w-5 text-green-500 shrink-0 mt-0.5" />
-                    <span className="text-sm">Cancel anytime</span>
+                    <span className="text-sm">Cancel anytime (subscription-based)</span>
                   </div>
                 </div>
                 <Button 
-                  className="w-full" 
+                  className="w-full text-lg py-6" 
                   onClick={() => handleSubscribe('platinum')}
                   disabled={loading}
                 >
-                  {loading ? "Processing..." : "Get Platinum Plan"}
+                  {loading ? "Processing..." : "Start Yearly Plan - SAVE 25%"}
                 </Button>
+                <p className="text-xs text-center text-muted-foreground">
+                  Renews automatically each year • Best value for committed members
+                </p>
               </CardContent>
             </Card>
           </div>
@@ -229,13 +263,19 @@ export default function JoinPremium() {
           {/* FAQ / Additional Info */}
           <Card>
             <CardHeader>
-              <CardTitle>Frequently Asked Questions</CardTitle>
+              <CardTitle>Subscription Details & FAQ</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               <div>
+                <h3 className="font-semibold mb-1">Why choose a recurring subscription?</h3>
+                <p className="text-sm text-muted-foreground">
+                  Subscriptions give you uninterrupted access and better value. The yearly plan offers 25% savings - that's €29.89 you save compared to paying monthly!
+                </p>
+              </div>
+              <div>
                 <h3 className="font-semibold mb-1">Can I cancel anytime?</h3>
                 <p className="text-sm text-muted-foreground">
-                  Yes! You can cancel your subscription at any time from your account settings. You'll continue to have access until the end of your billing period.
+                  Yes! You can cancel your subscription at any time from your account settings. You'll continue to have access until the end of your current billing period.
                 </p>
               </div>
               <div>
@@ -245,9 +285,15 @@ export default function JoinPremium() {
                 </p>
               </div>
               <div>
-                <h3 className="font-semibold mb-1">Is there a free trial?</h3>
+                <h3 className="font-semibold mb-1">How do recurring payments work?</h3>
                 <p className="text-sm text-muted-foreground">
-                  We offer free workouts and tools without requiring a subscription. Try them out before upgrading to premium!
+                  Your subscription automatically renews at the end of each billing cycle (monthly or yearly). This ensures uninterrupted access to all premium features. You'll receive a reminder before each renewal.
+                </p>
+              </div>
+              <div className="bg-amber-50 dark:bg-amber-950/20 border border-amber-200 dark:border-amber-800 rounded-lg p-4">
+                <h3 className="font-semibold mb-1 text-amber-700 dark:text-amber-400">💡 Pro Tip: Choose Yearly!</h3>
+                <p className="text-sm text-amber-600 dark:text-amber-300">
+                  Our yearly plan is the smart choice for committed fitness enthusiasts. At just €7.50/month, you save 25% and lock in your rate for a full year. It's the best value for your fitness journey!
                 </p>
               </div>
             </CardContent>

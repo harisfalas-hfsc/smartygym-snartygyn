@@ -35,6 +35,7 @@ import TermsOfService from "./pages/TermsOfService";
 import Disclaimer from "./pages/Disclaimer";
 import NotFound from "./pages/NotFound";
 import JoinPremium from "./pages/JoinPremium";
+import PremiumBenefits from "./pages/PremiumBenefits";
 
 const queryClient = new QueryClient();
 
@@ -52,6 +53,7 @@ const App = () => (
                 <Route path="/" element={<Index />} />
                 <Route path="/auth" element={<Auth />} />
                 <Route path="/join-premium" element={<JoinPremium />} />
+                <Route path="/premium-benefits" element={<PremiumBenefits />} />
                 
                 {/* Public free content page */}
                 <Route path="/free-content" element={<FreeContent />} />

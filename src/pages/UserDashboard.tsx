@@ -234,6 +234,8 @@ export default function UserDashboard() {
   const viewedPrograms = programInteractions.filter(p => p.has_viewed);
   const ratedPrograms = programInteractions.filter(p => p.rating && p.rating > 0);
 
+  const hasActivePlan = subscriptionInfo?.subscribed && subscriptionInfo?.product_id;
+
   return (
     <div className="min-h-screen bg-background">
       <main className="container mx-auto max-w-7xl p-4 py-8">
@@ -290,7 +292,7 @@ export default function UserDashboard() {
                   )}
                 </div>
                 {!subscriptionInfo.subscribed && (
-                  <Button onClick={() => navigate("/join-premium")}>
+                  <Button onClick={() => navigate("/premium-benefits")}>
                     Upgrade Now
                   </Button>
                 )}
@@ -329,7 +331,22 @@ export default function UserDashboard() {
 
           {/* Workouts Tab */}
           <TabsContent value="workouts" className="space-y-6">
-            <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
+            {!hasActivePlan ? (
+              <Card className="border-primary/50 bg-gradient-to-r from-primary/5 to-primary/10">
+                <CardContent className="text-center py-12">
+                  <Crown className="h-12 w-12 text-primary mx-auto mb-4" />
+                  <h3 className="text-xl font-bold mb-2">Premium Feature</h3>
+                  <p className="text-muted-foreground mb-6">
+                    Track your workouts, mark favorites, and monitor your progress with a Gold or Platinum plan.
+                  </p>
+                  <Button onClick={() => navigate("/premium-benefits")}>
+                    Upgrade to Premium
+                  </Button>
+                </CardContent>
+              </Card>
+            ) : (
+              <>
+                <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
               <Card>
                 <CardHeader className="pb-3">
                   <CardTitle className="text-sm font-medium flex items-center gap-2">
@@ -465,11 +482,28 @@ export default function UserDashboard() {
                 </CardContent>
               </Card>
             </div>
+            </>
+            )}
           </TabsContent>
 
           {/* Programs Tab */}
           <TabsContent value="programs" className="space-y-6">
-            <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
+            {!hasActivePlan ? (
+              <Card className="border-primary/50 bg-gradient-to-r from-primary/5 to-primary/10">
+                <CardContent className="text-center py-12">
+                  <Crown className="h-12 w-12 text-primary mx-auto mb-4" />
+                  <h3 className="text-xl font-bold mb-2">Premium Feature</h3>
+                  <p className="text-muted-foreground mb-6">
+                    Access structured training programs, track your progress, and achieve your fitness goals with a Gold or Platinum plan.
+                  </p>
+                  <Button onClick={() => navigate("/premium-benefits")}>
+                    Upgrade to Premium
+                  </Button>
+                </CardContent>
+              </Card>
+            ) : (
+              <>
+                <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
               <Card>
                 <CardHeader className="pb-3">
                   <CardTitle className="text-sm font-medium flex items-center gap-2">
@@ -605,11 +639,27 @@ export default function UserDashboard() {
                 </CardContent>
               </Card>
             </div>
+            </>
+            )}
           </TabsContent>
 
           {/* Exercises Tab */}
           <TabsContent value="exercises" className="space-y-6">
-            <Card>
+            {!hasActivePlan ? (
+              <Card className="border-primary/50 bg-gradient-to-r from-primary/5 to-primary/10">
+                <CardContent className="text-center py-12">
+                  <Crown className="h-12 w-12 text-primary mx-auto mb-4" />
+                  <h3 className="text-xl font-bold mb-2">Premium Feature</h3>
+                  <p className="text-muted-foreground mb-6">
+                    Save your favorite exercises and build your personalized library with a Gold or Platinum plan.
+                  </p>
+                  <Button onClick={() => navigate("/premium-benefits")}>
+                    Upgrade to Premium
+                  </Button>
+                </CardContent>
+              </Card>
+            ) : (
+              <Card>
               <CardHeader>
                 <CardTitle>My Favorite Exercises</CardTitle>
               </CardHeader>
@@ -643,6 +693,7 @@ export default function UserDashboard() {
                 )}
               </CardContent>
             </Card>
+            )}
           </TabsContent>
 
           {/* Calculators Tab */}

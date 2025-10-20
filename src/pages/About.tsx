@@ -448,7 +448,7 @@ const About = () => {
                 <Target className="w-5 h-5" />
                 Try Free Workouts
               </Button>
-              <Button size="lg" variant="outline" onClick={() => navigate("/join-premium")} className="gap-2">
+              <Button size="lg" variant="outline" onClick={() => navigate("/premium-benefits")} className="gap-2">
                 <UserCheck className="w-5 h-5" />
                 Join Premium
               </Button>

@@ -154,7 +154,7 @@ export default function Community() {
               <p className="text-sm text-muted-foreground mb-2">
                 Join our growing community of satisfied members — start your fitness journey today
               </p>
-              <Button variant="default" size="sm" onClick={() => navigate("/join-premium")}>
+              <Button variant="default" size="sm" onClick={() => navigate("/premium-benefits")}>
                 Join Premium
               </Button>
             </div>
@@ -201,7 +201,7 @@ export default function Community() {
               <Button size="lg" onClick={() => navigate("/workout")}>
                 Try Free Workout
               </Button>
-              <Button size="lg" variant="outline" onClick={() => navigate("/join-premium")}>
+              <Button size="lg" variant="outline" onClick={() => navigate("/premium-benefits")}>
                 Join Premium
               </Button>
             </div>
