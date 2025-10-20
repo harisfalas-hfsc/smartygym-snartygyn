@@ -44,12 +44,12 @@ const Index = () => {
     id: "workout",
     icon: Dumbbell,
     title: "Workouts",
-    description: "Get a standalone workout plan tailored to your goals"
+    description: "Standalone sessions designed to challenge, motivate, and make you sweat"
   }, {
     id: "training-program",
     icon: Calendar,
-    title: "Training Program",
-    description: "4-8 week comprehensive training programs"
+    title: "Training Programs",
+    description: "Structured 6-8 week programs designed by Sports Scientist Haris Falas"
   }, {
     id: "exercise-library",
     icon: BookOpen,

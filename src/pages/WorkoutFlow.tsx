@@ -67,9 +67,9 @@ const WorkoutFlow = () => {
           <span className="text-xs sm:text-sm">Back to Home</span>
         </Button>
         
-        <h1 className="text-3xl sm:text-4xl font-bold text-center mb-2">Free Workouts</h1>
+        <h1 className="text-3xl sm:text-4xl font-bold text-center mb-2">Workouts</h1>
         <p className="text-center text-muted-foreground mb-4">
-          Filter by your goal and start training today. No login required.
+          Standalone workout sessions designed to challenge you, motivate you, and make you sweat — crafted by Sports Scientist Haris Falas.
         </p>
         
         {/* Info Ribbon */}
