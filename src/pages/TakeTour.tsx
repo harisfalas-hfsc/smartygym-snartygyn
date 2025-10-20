@@ -95,7 +95,7 @@ const TakeTour = () => {
               onClick={() => navigate("/workout")}
               className="w-full sm:w-auto"
             >
-              <Play className="mr-2 h-5 w-5" />
+              <Play className="mr-2 h-5 w-5 text-primary" />
               Start Your Fitness Experience
             </Button>
             <Button 
@@ -103,7 +103,7 @@ const TakeTour = () => {
               onClick={() => navigate("/premiumbenefits")}
               className="w-full sm:w-auto"
             >
-              <Crown className="mr-2 h-5 w-5" />
+              <Crown className="mr-2 h-5 w-5 text-primary" />
               Unlock Premium
             </Button>
           </div>
