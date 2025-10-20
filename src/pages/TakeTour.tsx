@@ -91,18 +91,17 @@ const TakeTour = () => {
         <div className="container mx-auto max-w-6xl px-4 py-3">
           <div className="flex flex-col sm:flex-row gap-3 justify-center items-center">
             <Button 
-              size="lg" 
+              variant="premium"
               onClick={() => navigate("/workout")}
-              className="w-full sm:w-auto animate-pulse hover:animate-none"
+              className="w-full sm:w-auto"
             >
               <Play className="mr-2 h-5 w-5" />
               Start Your Fitness Experience
             </Button>
             <Button 
-              size="lg" 
-              variant="default"
+              variant="premium"
               onClick={() => navigate("/premiumbenefits")}
-              className="w-full sm:w-auto bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70"
+              className="w-full sm:w-auto"
             >
               <Crown className="mr-2 h-5 w-5" />
               Unlock Premium
