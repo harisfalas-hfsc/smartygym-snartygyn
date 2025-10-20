@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { User } from "@supabase/supabase-js";
 import { Button } from "@/components/ui/button";
@@ -13,7 +13,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { User as UserIcon, Settings, LogOut, LayoutDashboard, Crown, Menu } from "lucide-react";
+import { User as UserIcon, Settings, LogOut, LayoutDashboard, Crown, Menu, ArrowLeft, Home } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import smartyGymLogo from "@/assets/smarty-gym-logo.png";
 import { ThemeToggle } from "@/components/ThemeToggle";
@@ -26,11 +26,13 @@ interface SubscriptionInfo {
 
 export const Navigation = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const { toast } = useToast();
   const [user, setUser] = useState<User | null>(null);
   const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
   const [subscriptionInfo, setSubscriptionInfo] = useState<SubscriptionInfo | null>(null);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [canGoBack, setCanGoBack] = useState(false);
 
   useEffect(() => {
     // Check current session
@@ -58,6 +60,12 @@ export const Navigation = () => {
 
     return () => subscription.unsubscribe();
   }, []);
+
+  useEffect(() => {
+    // Check if we can go back in history
+    // If we're on the home page or there's no history, show home button
+    setCanGoBack(location.pathname !== "/" && window.history.length > 1);
+  }, [location]);
 
   const loadUserData = async (userId: string) => {
     const { data: profile } = await supabase
@@ -112,10 +120,33 @@ export const Navigation = () => {
     setMobileMenuOpen(false);
   };
 
+  const handleBackOrHome = () => {
+    if (canGoBack) {
+      navigate(-1);
+    } else {
+      navigate("/");
+    }
+  };
+
   return (
     <header className="sticky top-0 z-50 bg-background border-b border-border py-3 px-4">
       <div className="container mx-auto max-w-7xl">
         <div className="flex justify-between items-center gap-4">
+          {/* Back/Home Button */}
+          <Button 
+            variant="ghost" 
+            size="icon"
+            onClick={handleBackOrHome}
+            className="flex-shrink-0"
+            aria-label={canGoBack ? "Go back" : "Go to home"}
+          >
+            {canGoBack ? (
+              <ArrowLeft className="h-5 w-5" />
+            ) : (
+              <Home className="h-5 w-5" />
+            )}
+          </Button>
+
           {/* Logo */}
           <div 
             className="flex items-center cursor-pointer"
