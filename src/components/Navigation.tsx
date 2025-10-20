@@ -116,18 +116,22 @@ export const Navigation = () => {
   };
 
   return (
-    <header className="sticky top-0 z-50 bg-background border-b border-border py-3 px-4">
+    <header className="sticky top-0 z-50 bg-background border-b border-border py-2 px-4">
       <div className="container mx-auto max-w-7xl">
         <div className="flex justify-between items-center gap-4">
           {/* Logo - Clickable to go home */}
           <div 
-            className="flex items-center cursor-pointer py-1"
+            className="flex items-center cursor-pointer flex-shrink-0"
             onClick={() => {
               navigate("/");
               setTimeout(() => window.scrollTo(0, 0), 0);
             }}
           >
-            <img src={smartyGymLogo} alt="Smarty Gym - Home" className="h-32 w-auto" />
+            <img 
+              src={smartyGymLogo} 
+              alt="Smarty Gym - Home" 
+              className="h-20 sm:h-24 md:h-28 lg:h-32 w-auto object-contain"
+            />
           </div>
 
           {/* Desktop Navigation Links */}
