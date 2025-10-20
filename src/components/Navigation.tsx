@@ -127,10 +127,11 @@ export const Navigation = () => {
           {/* Desktop Navigation Links */}
           <nav className="hidden md:flex items-center gap-4 flex-1 justify-center">
             <Button variant="ghost" size="sm" onClick={() => navigate("/about")}>About</Button>
-            <Button variant="ghost" size="sm" onClick={() => navigate("/free-content")}>Free Workouts & Programs</Button>
+            <Button variant="ghost" size="sm" onClick={() => navigate("/workout")}>Workouts</Button>
+            <Button variant="ghost" size="sm" onClick={() => navigate("/training-program")}>Programs</Button>
             <Button variant="ghost" size="sm" onClick={() => navigate("/tools")}>Tools</Button>
             <Button variant="ghost" size="sm" onClick={() => navigate("/community")}>Blog</Button>
-            <Button variant="ghost" size="sm" onClick={() => navigate("/")}>Contact</Button>
+            <Button variant="ghost" size="sm" onClick={() => navigate("/contact")}>Contact</Button>
           </nav>
 
           {/* Mobile Menu */}
@@ -145,8 +146,11 @@ export const Navigation = () => {
                 <Button variant="ghost" size="lg" onClick={() => handleNavigate("/about")} className="justify-start">
                   About
                 </Button>
-                <Button variant="ghost" size="lg" onClick={() => handleNavigate("/free-content")} className="justify-start">
-                  Free Workouts & Programs
+                <Button variant="ghost" size="lg" onClick={() => handleNavigate("/workout")} className="justify-start">
+                  Workouts
+                </Button>
+                <Button variant="ghost" size="lg" onClick={() => handleNavigate("/training-program")} className="justify-start">
+                  Programs
                 </Button>
                 <Button variant="ghost" size="lg" onClick={() => handleNavigate("/tools")} className="justify-start">
                   Tools
@@ -154,7 +158,7 @@ export const Navigation = () => {
                 <Button variant="ghost" size="lg" onClick={() => handleNavigate("/community")} className="justify-start">
                   Blog
                 </Button>
-                <Button variant="ghost" size="lg" onClick={() => handleNavigate("/")} className="justify-start">
+                <Button variant="ghost" size="lg" onClick={() => handleNavigate("/contact")} className="justify-start">
                   Contact
                 </Button>
                 <div className="border-t pt-4 mt-4">

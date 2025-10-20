@@ -7,6 +7,7 @@ import { ThemeProvider } from "next-themes";
 import { ProtectedRoute } from "./components/ProtectedRoute";
 import { AuthenticatedLayout } from "./components/AuthenticatedLayout";
 import { Navigation } from "./components/Navigation";
+import { Footer } from "./components/Footer";
 import Community from "./pages/Community";
 import { ArticleDetail } from "./pages/ArticleDetail";
 import Index from "./pages/Index";
@@ -43,51 +44,56 @@ const App = () => (
         <Toaster />
         <Sonner />
         <BrowserRouter>
-          <Navigation />
-          <Routes>
-          <Route path="/" element={<Index />} />
-          <Route path="/auth" element={<Auth />} />
-          
-          {/* Public free content page */}
-          <Route path="/free-content" element={<FreeContent />} />
-          
-          {/* Public workout and plan flows - anyone can explore */}
-          <Route path="/workout" element={<WorkoutFlow />} />
-          <Route path="/workout/:type" element={<WorkoutDetail />} />
-          <Route path="/workout/:type/:id" element={<IndividualWorkout />} />
-          <Route path="/training-program" element={<TrainingProgramFlow />} />
-          <Route path="/training-program/:type" element={<TrainingProgramDetail />} />
-          <Route path="/training-program/:type/:id" element={<IndividualTrainingProgram />} />
-          <Route path="/diet-plan" element={<DietPlanFlow />} />
-          <Route path="/exercise-library" element={<ExerciseLibrary />} />
-          
-          {/* Public community page */}
-          <Route path="/community" element={<Community />} />
-          <Route path="/article/:id" element={<ArticleDetail />} />
-          
-          {/* Authenticated routes with motivational banner */}
-          <Route element={<ProtectedRoute><AuthenticatedLayout /></ProtectedRoute>}>
-            <Route path="/dashboard" element={<Dashboard />} />
-            <Route path="/user-dashboard" element={<UserDashboard />} />
-            <Route path="/profile-settings" element={<ProfileSettings />} />
-          </Route>
-          
-          {/* Public calculator routes */}
-          <Route path="/about" element={<About />} />
-          <Route path="/contact" element={<Contact />} />
-          <Route path="/privacy-policy" element={<PrivacyPolicy />} />
-          <Route path="/terms-of-service" element={<TermsOfService />} />
-          <Route path="/disclaimer" element={<Disclaimer />} />
-          <Route path="/tools" element={<Tools />} />
-          <Route path="/1rm-calculator" element={<OneRMCalculator />} />
-          <Route path="/bmr-calculator" element={<BMRCalculator />} />
-          <Route path="/macro-calculator" element={<MacroTrackingCalculator />} />
-          <Route path="/calorie-calculator" element={<MacroTrackingCalculator />} /> {/* Redirect old URL */}
-          
-          {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-          <Route path="*" element={<NotFound />} />
-        </Routes>
-      </BrowserRouter>
+          <div className="flex flex-col min-h-screen">
+            <Navigation />
+            <div className="flex-1">
+              <Routes>
+                <Route path="/" element={<Index />} />
+                <Route path="/auth" element={<Auth />} />
+                
+                {/* Public free content page */}
+                <Route path="/free-content" element={<FreeContent />} />
+                
+                {/* Public workout and plan flows - anyone can explore */}
+                <Route path="/workout" element={<WorkoutFlow />} />
+                <Route path="/workout/:type" element={<WorkoutDetail />} />
+                <Route path="/workout/:type/:id" element={<IndividualWorkout />} />
+                <Route path="/training-program" element={<TrainingProgramFlow />} />
+                <Route path="/training-program/:type" element={<TrainingProgramDetail />} />
+                <Route path="/training-program/:type/:id" element={<IndividualTrainingProgram />} />
+                <Route path="/diet-plan" element={<DietPlanFlow />} />
+                <Route path="/exercise-library" element={<ExerciseLibrary />} />
+                
+                {/* Public community page */}
+                <Route path="/community" element={<Community />} />
+                <Route path="/article/:id" element={<ArticleDetail />} />
+                
+                {/* Authenticated routes with motivational banner */}
+                <Route element={<ProtectedRoute><AuthenticatedLayout /></ProtectedRoute>}>
+                  <Route path="/dashboard" element={<Dashboard />} />
+                  <Route path="/user-dashboard" element={<UserDashboard />} />
+                  <Route path="/profile-settings" element={<ProfileSettings />} />
+                </Route>
+                
+                {/* Public calculator routes */}
+                <Route path="/about" element={<About />} />
+                <Route path="/contact" element={<Contact />} />
+                <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+                <Route path="/terms-of-service" element={<TermsOfService />} />
+                <Route path="/disclaimer" element={<Disclaimer />} />
+                <Route path="/tools" element={<Tools />} />
+                <Route path="/1rm-calculator" element={<OneRMCalculator />} />
+                <Route path="/bmr-calculator" element={<BMRCalculator />} />
+                <Route path="/macro-calculator" element={<MacroTrackingCalculator />} />
+                <Route path="/calorie-calculator" element={<MacroTrackingCalculator />} /> {/* Redirect old URL */}
+                
+                {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+                <Route path="*" element={<NotFound />} />
+              </Routes>
+            </div>
+            <Footer />
+          </div>
+        </BrowserRouter>
       </TooltipProvider>
     </ThemeProvider>
   </QueryClientProvider>
