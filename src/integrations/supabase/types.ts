@@ -260,7 +260,7 @@ export type Database = {
           avatar_url: string | null
           created_at: string
           equipment_preferences: string[] | null
-          fitness_goal: string | null
+          fitness_goals: string[] | null
           fitness_level: string | null
           full_name: string | null
           gender: string | null
@@ -276,7 +276,7 @@ export type Database = {
           avatar_url?: string | null
           created_at?: string
           equipment_preferences?: string[] | null
-          fitness_goal?: string | null
+          fitness_goals?: string[] | null
           fitness_level?: string | null
           full_name?: string | null
           gender?: string | null
@@ -292,7 +292,7 @@ export type Database = {
           avatar_url?: string | null
           created_at?: string
           equipment_preferences?: string[] | null
-          fitness_goal?: string | null
+          fitness_goals?: string[] | null
           fitness_level?: string | null
           full_name?: string | null
           gender?: string | null

@@ -7,7 +7,7 @@ interface ProfileData {
   age: string;
   gender: string;
   fitness_level: string;
-  fitness_goal: string;
+  fitness_goals: string[];
   equipment_preferences: string[];
 }
 
@@ -26,7 +26,7 @@ export const useProfileData = () => {
 
         const { data: profile } = await supabase
           .from("profiles")
-          .select("weight, height, age, gender, fitness_level, fitness_goal, equipment_preferences")
+          .select("weight, height, age, gender, fitness_level, fitness_goals, equipment_preferences")
           .eq("user_id", user.id)
           .single();
 
@@ -37,7 +37,7 @@ export const useProfileData = () => {
             age: profile.age?.toString() || "",
             gender: profile.gender || "",
             fitness_level: profile.fitness_level || "",
-            fitness_goal: profile.fitness_goal || "",
+            fitness_goals: profile.fitness_goals || [],
             equipment_preferences: profile.equipment_preferences || []
           });
         }

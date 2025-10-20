@@ -11,6 +11,17 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { useProfileData } from "@/hooks/useProfileData";
 
+const fitnessGoalOptions = [
+  "Build Strength",
+  "Build Muscle (Hypertrophy)",
+  "Lose Weight / Burn Calories",
+  "Improve Cardiovascular Health",
+  "Improve Mobility & Flexibility",
+  "Manage Lower Back Pain",
+  "Boost Metabolism",
+  "General Fitness Challenge"
+];
+
 const equipmentOptions = [
   "Dumbbells",
   "Barbells",
@@ -36,7 +47,7 @@ const ProfileSettings = () => {
     age: "",
     gender: "",
     fitness_level: "",
-    fitness_goal: "",
+    fitness_goals: [] as string[],
     equipment_preferences: [] as string[]
   });
 
@@ -48,11 +59,20 @@ const ProfileSettings = () => {
         age: profileData.age || "",
         gender: profileData.gender || "",
         fitness_level: profileData.fitness_level || "",
-        fitness_goal: profileData.fitness_goal || "",
+        fitness_goals: profileData.fitness_goals || [],
         equipment_preferences: profileData.equipment_preferences || []
       });
     }
   }, [profileData, profileLoading]);
+
+  const handleFitnessGoalToggle = (goal: string) => {
+    setFormData(prev => ({
+      ...prev,
+      fitness_goals: prev.fitness_goals.includes(goal)
+        ? prev.fitness_goals.filter(g => g !== goal)
+        : [...prev.fitness_goals, goal]
+    }));
+  };
 
   const handleEquipmentToggle = (equipment: string) => {
     setFormData(prev => ({
@@ -82,7 +102,7 @@ const ProfileSettings = () => {
           age: parseInt(formData.age),
           gender: formData.gender,
           fitness_level: formData.fitness_level,
-          fitness_goal: formData.fitness_goal,
+          fitness_goals: formData.fitness_goals,
           equipment_preferences: formData.equipment_preferences,
         })
         .eq("user_id", user.id);
@@ -200,13 +220,25 @@ const ProfileSettings = () => {
               </div>
 
               <div>
-                <Label htmlFor="fitness_goal">Fitness Goal</Label>
-                <Input
-                  id="fitness_goal"
-                  value={formData.fitness_goal}
-                  onChange={(e) => setFormData({ ...formData, fitness_goal: e.target.value })}
-                  placeholder="e.g., Lose weight, Build muscle, Improve endurance"
-                />
+                <Label>Fitness Goals (Select all that apply)</Label>
+                <p className="text-sm text-muted-foreground mb-3">Choose one or more goals</p>
+                <div className="grid grid-cols-2 gap-3 max-h-[300px] overflow-y-auto border border-border rounded-lg p-3">
+                  {fitnessGoalOptions.map((goal) => (
+                    <div key={goal} className="flex items-center space-x-2">
+                      <Checkbox
+                        id={`goal-${goal}`}
+                        checked={formData.fitness_goals.includes(goal)}
+                        onCheckedChange={() => handleFitnessGoalToggle(goal)}
+                      />
+                      <Label
+                        htmlFor={`goal-${goal}`}
+                        className="text-sm font-normal cursor-pointer"
+                      >
+                        {goal}
+                      </Label>
+                    </div>
+                  ))}
+                </div>
               </div>
             </div>
 

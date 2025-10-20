@@ -13,6 +13,17 @@ interface ProfileSetupDialogProps {
   onComplete: () => void;
 }
 
+const fitnessGoalOptions = [
+  "Build Strength",
+  "Build Muscle (Hypertrophy)",
+  "Lose Weight / Burn Calories",
+  "Improve Cardiovascular Health",
+  "Improve Mobility & Flexibility",
+  "Manage Lower Back Pain",
+  "Boost Metabolism",
+  "General Fitness Challenge"
+];
+
 const equipmentOptions = [
   "Dumbbells",
   "Barbells",
@@ -36,10 +47,19 @@ export const ProfileSetupDialog = ({ open, onComplete }: ProfileSetupDialogProps
     age: "",
     gender: "",
     fitness_level: "",
-    fitness_goal: "",
+    fitness_goals: [] as string[],
     equipment_preferences: [] as string[]
   });
   const [loading, setLoading] = useState(false);
+
+  const handleFitnessGoalToggle = (goal: string) => {
+    setFormData(prev => ({
+      ...prev,
+      fitness_goals: prev.fitness_goals.includes(goal)
+        ? prev.fitness_goals.filter(g => g !== goal)
+        : [...prev.fitness_goals, goal]
+    }));
+  };
 
   const handleEquipmentToggle = (equipment: string) => {
     setFormData(prev => ({
@@ -58,8 +78,8 @@ export const ProfileSetupDialog = ({ open, onComplete }: ProfileSetupDialogProps
       }
     }
     if (step === 2) {
-      if (!formData.fitness_level || !formData.fitness_goal) {
-        toast.error("Please select your fitness level and goal");
+      if (!formData.fitness_level || formData.fitness_goals.length === 0) {
+        toast.error("Please select your fitness level and at least one fitness goal");
         return;
       }
     }
@@ -85,7 +105,7 @@ export const ProfileSetupDialog = ({ open, onComplete }: ProfileSetupDialogProps
           age: parseInt(formData.age),
           gender: formData.gender,
           fitness_level: formData.fitness_level,
-          fitness_goal: formData.fitness_goal,
+          fitness_goals: formData.fitness_goals,
           equipment_preferences: formData.equipment_preferences,
           has_completed_profile: true
         })
@@ -179,7 +199,7 @@ export const ProfileSetupDialog = ({ open, onComplete }: ProfileSetupDialogProps
                   <SelectTrigger>
                     <SelectValue placeholder="Select your level" />
                   </SelectTrigger>
-                  <SelectContent>
+                  <SelectContent className="bg-background border-border z-50">
                     <SelectItem value="beginner">Beginner</SelectItem>
                     <SelectItem value="intermediate">Intermediate</SelectItem>
                     <SelectItem value="advanced">Advanced</SelectItem>
@@ -188,13 +208,25 @@ export const ProfileSetupDialog = ({ open, onComplete }: ProfileSetupDialogProps
               </div>
 
               <div>
-                <Label htmlFor="fitness_goal">Fitness Goal</Label>
-                <Input
-                  id="fitness_goal"
-                  value={formData.fitness_goal}
-                  onChange={(e) => setFormData({ ...formData, fitness_goal: e.target.value })}
-                  placeholder="e.g., Lose weight, Build muscle, Improve endurance"
-                />
+                <Label>Fitness Goals (Select all that apply)</Label>
+                <p className="text-sm text-muted-foreground mb-3">Choose one or more goals</p>
+                <div className="grid grid-cols-1 gap-3 max-h-[200px] overflow-y-auto border border-border rounded-lg p-3">
+                  {fitnessGoalOptions.map((goal) => (
+                    <div key={goal} className="flex items-center space-x-2">
+                      <Checkbox
+                        id={goal}
+                        checked={formData.fitness_goals.includes(goal)}
+                        onCheckedChange={() => handleFitnessGoalToggle(goal)}
+                      />
+                      <Label
+                        htmlFor={goal}
+                        className="text-sm font-normal cursor-pointer"
+                      >
+                        {goal}
+                      </Label>
+                    </div>
+                  ))}
+                </div>
               </div>
             </div>
           )}
