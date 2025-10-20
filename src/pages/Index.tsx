@@ -62,10 +62,10 @@ const Index = () => {
     title: "BMR Calculator",
     description: "Calculate your basal metabolic rate"
   }, {
-    id: "calorie-calculator",
+    id: "macro-calculator",
     icon: Flame,
-    title: "Calorie Calculator",
-    description: "Track your daily calorie consumption"
+    title: "Macro Calculator",
+    description: "Get personalized nutrition recommendations"
   }];
   const handleServiceSelect = (serviceId: string) => {
     const routes: {
@@ -76,7 +76,7 @@ const Index = () => {
       "exercise-library": "/exercise-library",
       "1rm-calculator": "/1rm-calculator",
       "bmr-calculator": "/bmr-calculator",
-      "calorie-calculator": "/calorie-calculator"
+      "macro-calculator": "/macro-calculator"
     };
     if (routes[serviceId]) {
       navigate(routes[serviceId]);

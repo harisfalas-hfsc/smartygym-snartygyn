@@ -22,11 +22,11 @@ const Tools = () => {
       route: "/bmr-calculator"
     },
     {
-      id: "calorie-calculator",
+      id: "macro-calculator",
       icon: Flame,
-      title: "Calorie Calculator",
-      description: "Calculate your daily calorie needs based on activity",
-      route: "/calorie-calculator"
+      title: "Macro Tracking Calculator",
+      description: "Get personalized nutrition and macro recommendations",
+      route: "/macro-calculator"
     }
   ];
 
@@ -94,9 +94,9 @@ const Tools = () => {
                   </p>
                 </div>
                 <div>
-                  <h3 className="font-semibold text-foreground mb-2">Calorie Calculator</h3>
+                  <h3 className="font-semibold text-foreground mb-2">Macro Tracking Calculator</h3>
                   <p className="text-sm">
-                    Combines BMR with activity level to determine your total daily energy expenditure (TDEE).
+                    Get complete nutrition recommendations including calories, macros, fiber, water, and meal frequency.
                   </p>
                 </div>
               </div>

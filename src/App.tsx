@@ -22,7 +22,7 @@ import DietPlanFlow from "./pages/DietPlanFlow";
 import ProfileSettings from "./pages/ProfileSettings";
 import OneRMCalculator from "./pages/OneRMCalculator";
 import BMRCalculator from "./pages/BMRCalculator";
-import CalorieCalculator from "./pages/CalorieCalculator";
+import MacroTrackingCalculator from "./pages/MacroTrackingCalculator";
 import ExerciseLibrary from "./pages/ExerciseLibrary";
 import About from "./pages/About";
 import Tools from "./pages/Tools";
@@ -67,7 +67,8 @@ const App = () => (
           <Route path="/tools" element={<Tools />} />
           <Route path="/1rm-calculator" element={<OneRMCalculator />} />
           <Route path="/bmr-calculator" element={<BMRCalculator />} />
-          <Route path="/calorie-calculator" element={<CalorieCalculator />} />
+          <Route path="/macro-calculator" element={<MacroTrackingCalculator />} />
+          <Route path="/calorie-calculator" element={<MacroTrackingCalculator />} /> {/* Redirect old URL */}
           
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
