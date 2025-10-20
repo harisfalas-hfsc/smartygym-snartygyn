@@ -1,181 +1,229 @@
-import { useNavigate } from "react-router-dom";
 import { Helmet } from "react-helmet";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
-import { ArrowLeft, FileText } from "lucide-react";
+import { Card } from "@/components/ui/card";
+import { FileText, UserCheck, CreditCard, Shield, AlertTriangle, Scale } from "lucide-react";
 import { BackToTop } from "@/components/BackToTop";
 
 const TermsOfService = () => {
-  const navigate = useNavigate();
-
   return (
     <>
       <Helmet>
-        <title>Terms of Service - Smarty Gym</title>
-        <meta name="description" content="Smarty Gym terms of service. Read our terms and conditions for using our fitness platform and services." />
-        <link rel="canonical" href={window.location.href} />
+        <title>Terms of Service | Smarty Gym</title>
+        <meta name="description" content="Terms and Conditions for Smarty Gym. Read our terms of service for using our fitness programs and website." />
+        <meta name="keywords" content="terms of service, terms and conditions, legal, Smarty Gym, Cyprus" />
       </Helmet>
-      
+
       <div className="min-h-screen bg-background">
         <BackToTop />
-        <div className="container mx-auto max-w-4xl px-4 py-8">
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => navigate("/")}
-            className="mb-6"
-          >
-            <ArrowLeft className="mr-2 h-4 w-4" />
-            Back to Home
-          </Button>
+        <div className="container mx-auto px-4 py-16 max-w-4xl">
+          <div className="flex items-center gap-3 mb-8">
+            <FileText className="h-10 w-10 text-primary" />
+            <h1 className="text-4xl font-bold">Terms & Conditions</h1>
+          </div>
 
-          <header className="text-center mb-12">
-            <div className="flex items-center justify-center gap-3 mb-4">
-              <FileText className="w-12 h-12 text-primary" />
-            </div>
-            <h1 className="text-4xl sm:text-5xl font-bold mb-4">Terms of Service</h1>
-            <p className="text-muted-foreground">Last updated: January 2025</p>
-          </header>
+          <Card className="p-8 space-y-8">
+            <div className="prose dark:prose-invert max-w-none">
+              <div className="bg-muted/50 p-4 rounded-lg mb-6">
+                <p className="text-sm text-muted-foreground mb-2"><strong>Effective Date:</strong> August 15, 2025</p>
+                <p className="text-sm text-muted-foreground mb-2"><strong>Website:</strong> www.smartygym.com</p>
+                <p className="text-sm text-muted-foreground"><strong>Company:</strong> Smarty Gym</p>
+              </div>
 
-          <Card>
-            <CardContent className="p-8 space-y-8">
-              <section>
-                <h2 className="text-2xl font-bold mb-4">Agreement to Terms</h2>
-                <p className="text-muted-foreground leading-relaxed">
-                  By accessing or using Smarty Gym, you agree to be bound by these Terms of Service. 
-                  If you disagree with any part of these terms, you may not access our services.
-                </p>
-              </section>
+              <p className="text-lg text-muted-foreground">
+                Welcome to Smarty Gym! By accessing or using our Website, services, and subscription-based fitness programs, 
+                you agree to comply with and be bound by the following Terms & Conditions. Please read them carefully before 
+                using our services.
+              </p>
 
-              <section>
-                <h2 className="text-2xl font-bold mb-4">Services</h2>
-                <p className="text-muted-foreground leading-relaxed">
-                  Smarty Gym provides online fitness services including workout programs, training plans, 
-                  nutrition guidance, and fitness tools. We reserve the right to modify, suspend, or 
-                  discontinue any part of our services at any time.
-                </p>
-              </section>
-
-              <section>
-                <h2 className="text-2xl font-bold mb-4">User Accounts</h2>
-                <div className="space-y-4 text-muted-foreground">
-                  <p className="leading-relaxed">
-                    To access certain features, you must create an account. You are responsible for:
+              <div className="flex items-start gap-3 mt-6">
+                <UserCheck className="h-6 w-6 text-primary mt-1 flex-shrink-0" />
+                <div>
+                  <h2 className="text-2xl font-bold mb-3">1. Acceptance of Terms</h2>
+                  <p className="text-muted-foreground">
+                    By accessing or using Smarty Gym, you confirm that you have read, understood, and agree to these 
+                    Terms & Conditions. If you do not agree, please do not use our Website or services.
                   </p>
-                  <ul className="list-disc list-inside space-y-2">
-                    <li>Maintaining the confidentiality of your account credentials</li>
-                    <li>All activities that occur under your account</li>
-                    <li>Notifying us immediately of any unauthorized access</li>
-                    <li>Providing accurate and complete information</li>
+                </div>
+              </div>
+
+              <div className="flex items-start gap-3">
+                <UserCheck className="h-6 w-6 text-primary mt-1 flex-shrink-0" />
+                <div>
+                  <h2 className="text-2xl font-bold mb-3">2. Eligibility</h2>
+                  <p className="text-muted-foreground">
+                    You must be at least 18 years old to use our services. By creating an account, you confirm that you 
+                    are legally capable of entering into binding contracts under Cyprus and EU law.
+                  </p>
+                </div>
+              </div>
+
+              <div className="flex items-start gap-3">
+                <FileText className="h-6 w-6 text-primary mt-1 flex-shrink-0" />
+                <div>
+                  <h2 className="text-2xl font-bold mb-3">3. Services Provided</h2>
+                  <p className="text-muted-foreground mb-3">
+                    Smarty Gym provides online fitness programs, workout plans, and related digital content.
+                  </p>
+                  <ul className="space-y-2 text-muted-foreground">
+                    <li>Our programs are <strong>professionally designed by certified trainers</strong>, not generated by artificial intelligence.</li>
+                    <li>The services are intended for <strong>personal fitness and wellness purposes only</strong> and are not a substitute for medical advice.</li>
                   </ul>
                 </div>
-              </section>
+              </div>
 
-              <section>
-                <h2 className="text-2xl font-bold mb-4">Subscriptions and Payments</h2>
-                <div className="space-y-4">
-                  <div>
-                    <h3 className="text-lg font-semibold mb-2">Billing</h3>
-                    <p className="text-muted-foreground leading-relaxed">
-                      Subscriptions are billed in advance on a monthly or annual basis. You authorize us to 
-                      charge the payment method you provide for all fees incurred.
-                    </p>
-                  </div>
-                  <div>
-                    <h3 className="text-lg font-semibold mb-2">Cancellation</h3>
-                    <p className="text-muted-foreground leading-relaxed">
-                      You may cancel your subscription at any time. Cancellations take effect at the end of 
-                      the current billing period. No refunds are provided for partial periods.
-                    </p>
-                  </div>
-                  <div>
-                    <h3 className="text-lg font-semibold mb-2">Price Changes</h3>
-                    <p className="text-muted-foreground leading-relaxed">
-                      We reserve the right to modify subscription prices. We will provide advance notice of 
-                      any price changes.
-                    </p>
-                  </div>
+              <div className="flex items-start gap-3">
+                <UserCheck className="h-6 w-6 text-primary mt-1 flex-shrink-0" />
+                <div>
+                  <h2 className="text-2xl font-bold mb-3">4. Account Registration</h2>
+                  <p className="text-muted-foreground mb-3">
+                    To access certain features, you must create an account and provide accurate, complete, and up-to-date information.
+                  </p>
+                  <ul className="space-y-2 text-muted-foreground">
+                    <li>You are responsible for maintaining the confidentiality of your login details.</li>
+                    <li>You agree not to share your account with others.</li>
+                    <li>Any unauthorized use of your account must be reported immediately.</li>
+                  </ul>
                 </div>
-              </section>
+              </div>
 
-              <section>
-                <h2 className="text-2xl font-bold mb-4">User Content</h2>
-                <p className="text-muted-foreground leading-relaxed mb-4">
-                  You may be able to post, upload, or submit content. You retain ownership of your content, 
-                  but grant us a license to use, display, and distribute it as necessary to provide our services.
-                </p>
-                <p className="text-muted-foreground leading-relaxed">
-                  You agree not to post content that is illegal, offensive, defamatory, or violates any 
-                  third-party rights.
-                </p>
-              </section>
+              <div className="flex items-start gap-3">
+                <CreditCard className="h-6 w-6 text-primary mt-1 flex-shrink-0" />
+                <div>
+                  <h2 className="text-2xl font-bold mb-3">5. Subscription & Payments</h2>
+                  <ul className="space-y-2 text-muted-foreground">
+                    <li>Smarty Gym operates on a subscription model (e.g., monthly, yearly).</li>
+                    <li>Payments are processed securely via third-party providers.</li>
+                    <li>All fees are stated in Euros (€) and include VAT where applicable.</li>
+                    <li>Subscriptions automatically renew unless cancelled prior to the renewal date.</li>
+                  </ul>
+                </div>
+              </div>
 
-              <section>
-                <h2 className="text-2xl font-bold mb-4">Health and Safety Disclaimer</h2>
-                <p className="text-muted-foreground leading-relaxed mb-4">
-                  Smarty Gym provides fitness information and programs, but we are not a substitute for 
-                  professional medical advice. You should:
-                </p>
-                <ul className="list-disc list-inside space-y-2 text-muted-foreground">
-                  <li>Consult a physician before starting any exercise program</li>
-                  <li>Stop exercising if you experience pain or discomfort</li>
-                  <li>Use proper form and equipment to prevent injury</li>
-                  <li>Recognize that results may vary</li>
-                </ul>
-              </section>
+              <div className="flex items-start gap-3">
+                <CreditCard className="h-6 w-6 text-primary mt-1 flex-shrink-0" />
+                <div>
+                  <h2 className="text-2xl font-bold mb-3">6. Cancellation & Refunds</h2>
+                  <ul className="space-y-2 text-muted-foreground">
+                    <li>You may cancel your subscription anytime via your account settings.</li>
+                    <li>No refunds will be provided for partial subscription periods.</li>
+                    <li>If required by Cyprus consumer law, you may have a <strong>14-day right of withdrawal</strong> for digital services that have not yet started.</li>
+                  </ul>
+                </div>
+              </div>
 
-              <section>
-                <h2 className="text-2xl font-bold mb-4">Intellectual Property</h2>
-                <p className="text-muted-foreground leading-relaxed">
-                  All content on Smarty Gym, including text, graphics, logos, images, and software, is our 
-                  property or that of our licensors. You may not reproduce, distribute, or create derivative 
-                  works without our written permission.
-                </p>
-              </section>
+              <div className="flex items-start gap-3">
+                <AlertTriangle className="h-6 w-6 text-primary mt-1 flex-shrink-0" />
+                <div>
+                  <h2 className="text-2xl font-bold mb-3">7. Health Disclaimer</h2>
+                  <ul className="space-y-2 text-muted-foreground">
+                    <li>All workouts and programs are designed for general fitness purposes.</li>
+                    <li>Always consult a medical professional before beginning any new exercise program.</li>
+                    <li>Smarty Gym is not responsible for injuries, health issues, or adverse effects resulting from misuse of our programs.</li>
+                    <li>Participation is at your own risk.</li>
+                  </ul>
+                </div>
+              </div>
 
-              <section>
-                <h2 className="text-2xl font-bold mb-4">Limitation of Liability</h2>
-                <p className="text-muted-foreground leading-relaxed">
-                  To the maximum extent permitted by law, Smarty Gym shall not be liable for any indirect, 
-                  incidental, special, consequential, or punitive damages resulting from your use of our services.
-                </p>
-              </section>
+              <div className="flex items-start gap-3">
+                <Shield className="h-6 w-6 text-primary mt-1 flex-shrink-0" />
+                <div>
+                  <h2 className="text-2xl font-bold mb-3">8. Intellectual Property</h2>
+                  <ul className="space-y-2 text-muted-foreground">
+                    <li>All content on the Website (programs, videos, graphics, text, and logos) is the property of Smarty Gym.</li>
+                    <li>Content may not be copied, distributed, or reproduced without prior written permission.</li>
+                    <li>Users are granted a limited, personal, non-transferable license to access the content for personal use only.</li>
+                  </ul>
+                </div>
+              </div>
 
-              <section>
-                <h2 className="text-2xl font-bold mb-4">Termination</h2>
-                <p className="text-muted-foreground leading-relaxed">
-                  We reserve the right to terminate or suspend your account at our discretion, without notice, 
-                  for conduct that we believe violates these Terms or is harmful to other users or our business.
-                </p>
-              </section>
+              <div className="flex items-start gap-3">
+                <FileText className="h-6 w-6 text-primary mt-1 flex-shrink-0" />
+                <div>
+                  <h2 className="text-2xl font-bold mb-3">9. User Conduct</h2>
+                  <p className="text-muted-foreground mb-3">You agree not to:</p>
+                  <ul className="space-y-2 text-muted-foreground">
+                    <li>Misuse the Website or interfere with its functionality.</li>
+                    <li>Share, sell, or distribute content without authorization.</li>
+                    <li>Use the Website for unlawful or harmful activities.</li>
+                  </ul>
+                </div>
+              </div>
 
-              <section>
-                <h2 className="text-2xl font-bold mb-4">Governing Law</h2>
-                <p className="text-muted-foreground leading-relaxed">
-                  These Terms shall be governed by and construed in accordance with applicable laws, without 
-                  regard to conflict of law provisions.
-                </p>
-              </section>
+              <div className="flex items-start gap-3">
+                <Shield className="h-6 w-6 text-primary mt-1 flex-shrink-0" />
+                <div>
+                  <h2 className="text-2xl font-bold mb-3">10. Limitation of Liability</h2>
+                  <ul className="space-y-2 text-muted-foreground">
+                    <li>Smarty Gym provides fitness programs "as is" and makes no warranties regarding results.</li>
+                    <li>To the maximum extent permitted by law, Smarty Gym shall not be liable for any direct, indirect, incidental, or consequential damages.</li>
+                  </ul>
+                </div>
+              </div>
 
-              <section>
-                <h2 className="text-2xl font-bold mb-4">Changes to Terms</h2>
-                <p className="text-muted-foreground leading-relaxed">
-                  We may revise these Terms at any time. Continued use of our services after changes constitutes 
-                  acceptance of the revised Terms.
-                </p>
-              </section>
+              <div className="flex items-start gap-3">
+                <Shield className="h-6 w-6 text-primary mt-1 flex-shrink-0" />
+                <div>
+                  <h2 className="text-2xl font-bold mb-3">11. Privacy & Data Protection</h2>
+                  <p className="text-muted-foreground">
+                    Your privacy is important to us. Please review our <strong>Privacy Policy</strong>, which explains 
+                    how we collect, use, and protect your personal data in line with the <strong>GDPR</strong> and Cyprus law.
+                  </p>
+                </div>
+              </div>
 
-              <section>
-                <h2 className="text-2xl font-bold mb-4">Contact Information</h2>
-                <p className="text-muted-foreground leading-relaxed">
-                  For questions about these Terms, please contact us at{" "}
-                  <a href="mailto:info@smartygym.com" className="text-primary hover:underline">
-                    info@smartygym.com
-                  </a>
-                </p>
-              </section>
-            </CardContent>
+              <div className="flex items-start gap-3">
+                <FileText className="h-6 w-6 text-primary mt-1 flex-shrink-0" />
+                <div>
+                  <h2 className="text-2xl font-bold mb-3">12. Third-Party Services</h2>
+                  <p className="text-muted-foreground">
+                    Smarty Gym may integrate with third-party services (such as payment processors or video platforms). 
+                    We are not responsible for their actions, policies, or services.
+                  </p>
+                </div>
+              </div>
+
+              <div className="flex items-start gap-3">
+                <FileText className="h-6 w-6 text-primary mt-1 flex-shrink-0" />
+                <div>
+                  <h2 className="text-2xl font-bold mb-3">13. Changes to Terms</h2>
+                  <p className="text-muted-foreground">
+                    Smarty Gym reserves the right to update or change these Terms & Conditions at any time. Updates will 
+                    be posted on the Website with a revised effective date. Continued use of the Website constitutes 
+                    acceptance of changes.
+                  </p>
+                </div>
+              </div>
+
+              <div className="flex items-start gap-3">
+                <Scale className="h-6 w-6 text-primary mt-1 flex-shrink-0" />
+                <div>
+                  <h2 className="text-2xl font-bold mb-3">14. Governing Law & Jurisdiction</h2>
+                  <p className="text-muted-foreground mb-3">
+                    These Terms & Conditions are governed by the laws of Cyprus and applicable EU regulations.
+                  </p>
+                  <ul className="space-y-2 text-muted-foreground">
+                    <li>Any disputes shall be subject to the exclusive jurisdiction of the courts of Cyprus.</li>
+                  </ul>
+                </div>
+              </div>
+
+              <div className="flex items-start gap-3">
+                <FileText className="h-6 w-6 text-primary mt-1 flex-shrink-0" />
+                <div>
+                  <h2 className="text-2xl font-bold mb-3">15. Contact Us</h2>
+                  <p className="text-muted-foreground mb-3">
+                    If you have questions about these Terms & Conditions, please contact us:
+                  </p>
+                  <p className="text-muted-foreground">
+                    📩 Email: <a href="mailto:admin@smartygym.com" className="text-primary hover:underline">admin@smartygym.com</a>
+                  </p>
+                </div>
+              </div>
+            </div>
           </Card>
+
+          <p className="text-center text-sm text-muted-foreground mt-8">
+            Effective Date: August 15, 2025
+          </p>
         </div>
       </div>
     </>

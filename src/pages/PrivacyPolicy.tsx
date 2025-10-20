@@ -1,155 +1,160 @@
-import { useNavigate } from "react-router-dom";
 import { Helmet } from "react-helmet";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
-import { ArrowLeft, Shield } from "lucide-react";
+import { Card } from "@/components/ui/card";
+import { Shield, Lock, Eye, FileText, Users, AlertCircle } from "lucide-react";
 import { BackToTop } from "@/components/BackToTop";
 
 const PrivacyPolicy = () => {
-  const navigate = useNavigate();
-
   return (
     <>
       <Helmet>
-        <title>Privacy Policy - Smarty Gym</title>
-        <meta name="description" content="Smarty Gym privacy policy. Learn how we collect, use, and protect your personal information." />
-        <link rel="canonical" href={window.location.href} />
+        <title>Privacy Policy | Smarty Gym</title>
+        <meta name="description" content="Privacy Policy for Smarty Gym. Learn how we collect, use, and protect your personal data in compliance with GDPR and Cyprus law." />
+        <meta name="keywords" content="privacy policy, data protection, GDPR, Smarty Gym, Cyprus" />
       </Helmet>
-      
+
       <div className="min-h-screen bg-background">
         <BackToTop />
-        <div className="container mx-auto max-w-4xl px-4 py-8">
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => navigate("/")}
-            className="mb-6"
-          >
-            <ArrowLeft className="mr-2 h-4 w-4" />
-            Back to Home
-          </Button>
+        <div className="container mx-auto px-4 py-16 max-w-4xl">
+          <div className="flex items-center gap-3 mb-8">
+            <Shield className="h-10 w-10 text-primary" />
+            <h1 className="text-4xl font-bold">Privacy Policy</h1>
+          </div>
 
-          <header className="text-center mb-12">
-            <div className="flex items-center justify-center gap-3 mb-4">
-              <Shield className="w-12 h-12 text-primary" />
-            </div>
-            <h1 className="text-4xl sm:text-5xl font-bold mb-4">Privacy Policy</h1>
-            <p className="text-muted-foreground">Last updated: January 2025</p>
-          </header>
+          <Card className="p-8 space-y-8">
+            <div className="prose dark:prose-invert max-w-none">
+              <p className="text-lg text-muted-foreground">
+                At <strong>Smarty Gym</strong>, we value your privacy and are committed to protecting your personal data. 
+                This Privacy Policy explains how we collect, use, store, and protect your information when you visit our 
+                website or use our services. Our practices comply with the General Data Protection Regulation (GDPR) 
+                (EU) 2016/679 and applicable Cyprus data protection laws.
+              </p>
 
-          <Card>
-            <CardContent className="p-8 space-y-8">
-              <section>
-                <h2 className="text-2xl font-bold mb-4">Introduction</h2>
-                <p className="text-muted-foreground leading-relaxed">
-                  At Smarty Gym, we take your privacy seriously. This Privacy Policy explains how we collect, 
-                  use, disclose, and safeguard your information when you use our website and services.
-                </p>
-              </section>
+              <div className="flex items-start gap-3 mt-6">
+                <FileText className="h-6 w-6 text-primary mt-1 flex-shrink-0" />
+                <div>
+                  <h2 className="text-2xl font-bold mb-3">1. Data We Collect</h2>
+                  <p className="text-muted-foreground mb-3">We may collect the following types of personal information:</p>
+                  <ul className="space-y-2 text-muted-foreground">
+                    <li>Name, email address, phone number, and billing information when you sign up for our services or subscriptions.</li>
+                    <li>Information related to your fitness goals, training preferences, and progress (if you provide it voluntarily).</li>
+                    <li>Technical data such as IP address, browser type, device type, and cookies when you visit our website.</li>
+                  </ul>
+                </div>
+              </div>
 
-              <section>
-                <h2 className="text-2xl font-bold mb-4">Information We Collect</h2>
-                <div className="space-y-4">
-                  <div>
-                    <h3 className="text-lg font-semibold mb-2">Personal Information</h3>
-                    <p className="text-muted-foreground leading-relaxed">
-                      We collect information that you provide directly to us, including name, email address, 
-                      payment information, and fitness-related data you choose to share.
-                    </p>
-                  </div>
-                  <div>
-                    <h3 className="text-lg font-semibold mb-2">Usage Data</h3>
-                    <p className="text-muted-foreground leading-relaxed">
-                      We automatically collect certain information about your device and how you interact with 
-                      our services, including browser type, pages visited, and time spent on pages.
-                    </p>
+              <div className="flex items-start gap-3">
+                <Eye className="h-6 w-6 text-primary mt-1 flex-shrink-0" />
+                <div>
+                  <h2 className="text-2xl font-bold mb-3">2. How We Use Your Data</h2>
+                  <p className="text-muted-foreground mb-3">Your personal data may be used to:</p>
+                  <ul className="space-y-2 text-muted-foreground">
+                    <li>Provide you with access to our programs and services.</li>
+                    <li>Process payments and subscriptions.</li>
+                    <li>Communicate with you regarding updates, offers, or support.</li>
+                    <li>Improve our website, services, and customer experience.</li>
+                    <li>Ensure legal compliance and security.</li>
+                  </ul>
+                  <p className="text-muted-foreground mt-3 font-semibold">We will never sell or rent your data to third parties.</p>
+                </div>
+              </div>
+
+              <div className="flex items-start gap-3">
+                <FileText className="h-6 w-6 text-primary mt-1 flex-shrink-0" />
+                <div>
+                  <h2 className="text-2xl font-bold mb-3">3. Legal Basis for Processing</h2>
+                  <p className="text-muted-foreground mb-3">We process your personal data based on:</p>
+                  <ul className="space-y-2 text-muted-foreground">
+                    <li>Your consent (e.g., when signing up for newsletters).</li>
+                    <li>Contractual necessity (e.g., when you subscribe to a program).</li>
+                    <li>Legal obligations (e.g., tax or accounting requirements).</li>
+                    <li>Legitimate interests (e.g., improving our services).</li>
+                  </ul>
+                </div>
+              </div>
+
+              <div className="flex items-start gap-3">
+                <Users className="h-6 w-6 text-primary mt-1 flex-shrink-0" />
+                <div>
+                  <h2 className="text-2xl font-bold mb-3">4. Data Sharing</h2>
+                  <p className="text-muted-foreground mb-3">Your personal data may be shared only with:</p>
+                  <ul className="space-y-2 text-muted-foreground">
+                    <li>Trusted service providers (e.g., payment processors, IT providers).</li>
+                    <li>Legal authorities if required by law.</li>
+                  </ul>
+                  <p className="text-muted-foreground mt-3">All third-party providers are required to comply with GDPR standards.</p>
+                </div>
+              </div>
+
+              <div className="flex items-start gap-3">
+                <FileText className="h-6 w-6 text-primary mt-1 flex-shrink-0" />
+                <div>
+                  <h2 className="text-2xl font-bold mb-3">5. Data Retention</h2>
+                  <p className="text-muted-foreground">
+                    We will keep your personal data only for as long as necessary to fulfill the purposes outlined 
+                    in this Privacy Policy, unless a longer retention period is required by law.
+                  </p>
+                </div>
+              </div>
+
+              <div className="flex items-start gap-3">
+                <Shield className="h-6 w-6 text-primary mt-1 flex-shrink-0" />
+                <div>
+                  <h2 className="text-2xl font-bold mb-3">6. Your Rights</h2>
+                  <p className="text-muted-foreground mb-3">Under GDPR and Cyprus law, you have the right to:</p>
+                  <ul className="space-y-2 text-muted-foreground">
+                    <li>Access your personal data.</li>
+                    <li>Request correction or deletion of your data.</li>
+                    <li>Restrict or object to data processing.</li>
+                    <li>Withdraw consent at any time.</li>
+                    <li>Request data portability.</li>
+                  </ul>
+                  <p className="text-muted-foreground mt-3">
+                    To exercise your rights, please contact us at <strong>admin@smartygym.com</strong>.
+                  </p>
+                </div>
+              </div>
+
+              <div className="flex items-start gap-3">
+                <Lock className="h-6 w-6 text-primary mt-1 flex-shrink-0" />
+                <div>
+                  <h2 className="text-2xl font-bold mb-3">7. Security</h2>
+                  <p className="text-muted-foreground">
+                    We implement technical and organizational measures to safeguard your personal data against 
+                    unauthorized access, loss, or misuse.
+                  </p>
+                </div>
+              </div>
+
+              <div className="flex items-start gap-3">
+                <AlertCircle className="h-6 w-6 text-primary mt-1 flex-shrink-0" />
+                <div>
+                  <h2 className="text-2xl font-bold mb-3">8. Cookies</h2>
+                  <p className="text-muted-foreground">
+                    Our website uses cookies to enhance user experience. You can manage or disable cookies in your 
+                    browser settings.
+                  </p>
+                </div>
+              </div>
+
+              <div className="flex items-start gap-3">
+                <FileText className="h-6 w-6 text-primary mt-1 flex-shrink-0" />
+                <div>
+                  <h2 className="text-2xl font-bold mb-3">9. Contact Us</h2>
+                  <p className="text-muted-foreground mb-3">
+                    If you have any questions about this Privacy Policy or how we handle your data, please contact us:
+                  </p>
+                  <div className="text-muted-foreground space-y-1">
+                    <p><strong>Smarty Gym</strong></p>
+                    <p>Email: <a href="mailto:admin@smartygym.com" className="text-primary hover:underline">admin@smartygym.com</a></p>
                   </div>
                 </div>
-              </section>
-
-              <section>
-                <h2 className="text-2xl font-bold mb-4">How We Use Your Information</h2>
-                <ul className="list-disc list-inside space-y-2 text-muted-foreground">
-                  <li>To provide and maintain our services</li>
-                  <li>To process your transactions and manage your subscription</li>
-                  <li>To send you updates, newsletters, and marketing communications</li>
-                  <li>To respond to your inquiries and provide customer support</li>
-                  <li>To improve our services and develop new features</li>
-                  <li>To protect against fraud and ensure security</li>
-                </ul>
-              </section>
-
-              <section>
-                <h2 className="text-2xl font-bold mb-4">Information Sharing</h2>
-                <p className="text-muted-foreground leading-relaxed mb-4">
-                  We do not sell your personal information. We may share your information with:
-                </p>
-                <ul className="list-disc list-inside space-y-2 text-muted-foreground">
-                  <li>Service providers who assist in operating our platform</li>
-                  <li>Payment processors to handle transactions</li>
-                  <li>Legal authorities when required by law</li>
-                </ul>
-              </section>
-
-              <section>
-                <h2 className="text-2xl font-bold mb-4">Data Security</h2>
-                <p className="text-muted-foreground leading-relaxed">
-                  We implement appropriate technical and organizational measures to protect your personal 
-                  information. However, no method of transmission over the internet is 100% secure, and we 
-                  cannot guarantee absolute security.
-                </p>
-              </section>
-
-              <section>
-                <h2 className="text-2xl font-bold mb-4">Your Rights</h2>
-                <p className="text-muted-foreground leading-relaxed mb-4">
-                  You have the right to:
-                </p>
-                <ul className="list-disc list-inside space-y-2 text-muted-foreground">
-                  <li>Access the personal information we hold about you</li>
-                  <li>Request correction of inaccurate information</li>
-                  <li>Request deletion of your personal information</li>
-                  <li>Opt-out of marketing communications</li>
-                  <li>Export your data</li>
-                </ul>
-              </section>
-
-              <section>
-                <h2 className="text-2xl font-bold mb-4">Cookies</h2>
-                <p className="text-muted-foreground leading-relaxed">
-                  We use cookies and similar tracking technologies to track activity on our service and store 
-                  certain information. You can instruct your browser to refuse all cookies or to indicate when 
-                  a cookie is being sent.
-                </p>
-              </section>
-
-              <section>
-                <h2 className="text-2xl font-bold mb-4">Children's Privacy</h2>
-                <p className="text-muted-foreground leading-relaxed">
-                  Our services are not intended for individuals under the age of 18. We do not knowingly 
-                  collect personal information from children under 18.
-                </p>
-              </section>
-
-              <section>
-                <h2 className="text-2xl font-bold mb-4">Changes to This Policy</h2>
-                <p className="text-muted-foreground leading-relaxed">
-                  We may update this Privacy Policy from time to time. We will notify you of any changes by 
-                  posting the new Privacy Policy on this page and updating the "Last updated" date.
-                </p>
-              </section>
-
-              <section>
-                <h2 className="text-2xl font-bold mb-4">Contact Us</h2>
-                <p className="text-muted-foreground leading-relaxed">
-                  If you have questions about this Privacy Policy, please contact us at{" "}
-                  <a href="mailto:info@smartygym.com" className="text-primary hover:underline">
-                    info@smartygym.com
-                  </a>
-                </p>
-              </section>
-            </CardContent>
+              </div>
+            </div>
           </Card>
+
+          <p className="text-center text-sm text-muted-foreground mt-8">
+            Last updated: January 2025
+          </p>
         </div>
       </div>
     </>
