@@ -267,7 +267,7 @@ const TrainingProgramDetail = () => {
             <Card
               key={program.id}
               className="overflow-hidden cursor-pointer transition-all duration-300 hover:scale-105 hover:shadow-gold bg-card border-border"
-              onClick={() => navigate(`/training-program/${type}/${program.id}`)}
+              onClick={() => navigate(`/trainingprogram/${type}/${program.id}`)}
             >
               <div className="relative h-48 w-full overflow-hidden">
                 <img 

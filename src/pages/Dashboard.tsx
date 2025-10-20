@@ -460,7 +460,7 @@ export default function Dashboard() {
                         <div
                           key={workout.id}
                           className="p-3 bg-muted rounded-lg cursor-pointer hover:bg-muted/80 transition-colors"
-                          onClick={() => navigate(`/workout-view/${workout.id}`)}
+                          onClick={() => navigate(`/workout`)}
                         >
                           <div className="flex items-start justify-between">
                             <div className="flex-1">
@@ -499,7 +499,7 @@ export default function Dashboard() {
                         <div
                           key={program.id}
                           className="p-3 bg-muted rounded-lg cursor-pointer hover:bg-muted/80 transition-colors"
-                          onClick={() => navigate(`/program-view/${program.id}`)}
+                          onClick={() => navigate(`/trainingprogram`)}
                         >
                           <div className="flex items-start justify-between">
                             <div className="flex-1">
@@ -678,7 +678,7 @@ export default function Dashboard() {
                       <div
                         key={program.id}
                         className="p-4 bg-muted rounded-lg cursor-pointer hover:bg-muted/80 transition-colors"
-                        onClick={() => navigate(`/training-program/${program.id}`)}
+                        onClick={() => navigate(`/trainingprogram`)}
                       >
                         <div className="flex items-start justify-between mb-2">
                           <p className="font-medium">{program.name}</p>

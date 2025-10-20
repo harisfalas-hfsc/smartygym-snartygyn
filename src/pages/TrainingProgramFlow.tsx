@@ -48,7 +48,7 @@ const TrainingProgramFlow = () => {
   ];
 
   const handleProgramSelect = (programId: string) => {
-    navigate(`/training-program/${programId}`);
+    navigate(`/trainingprogram/${programId}`);
   };
 
   return (

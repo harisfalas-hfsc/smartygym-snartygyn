@@ -214,7 +214,7 @@ export default function UserDashboard() {
   };
 
   const handleNavigateToProgram = (programType: string, programId: string) => {
-    navigate(`/training-program/${programType}/${programId}`);
+    navigate(`/trainingprogram/${programType}/${programId}`);
   };
 
   const handleManageSubscription = async () => {

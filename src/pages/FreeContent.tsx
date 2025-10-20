@@ -119,7 +119,7 @@ const FreeContent = () => {
   };
 
   const handleProgramSelect = (programId: string) => {
-    navigate(`/training-program/${programId}`);
+    navigate(`/trainingprogram/${programId}`);
   };
 
   return (
