@@ -53,14 +53,14 @@ export const Footer = () => {
           {/* Legal Links */}
           <div className="flex flex-wrap items-center justify-center gap-4 text-sm text-muted-foreground">
             <button 
-              onClick={() => navigate("/privacy-policy")} 
+              onClick={() => navigate("/privacypolicy")} 
               className="hover:text-primary transition-colors"
             >
               Privacy Policy
             </button>
             <span>•</span>
             <button 
-              onClick={() => navigate("/terms-of-service")} 
+              onClick={() => navigate("/termsofservice")} 
               className="hover:text-primary transition-colors"
             >
               Terms of Service

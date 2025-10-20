@@ -70,8 +70,20 @@ const TakeTour = () => {
   return (
     <>
       <Helmet>
-        <title>Take a Tour - Discover Smarty Gym | smartygym.com</title>
-        <meta name="description" content="Explore how Smarty Gym can transform your fitness journey. See what's free, what's premium, and how our platform works." />
+        <title>Take a Tour - Discover Smarty Gym | Your Fitness Reimagined by Haris Falas</title>
+        <meta name="description" content="Explore smartygym.com - convenient & flexible online fitness reimagined by Haris Falas. See how our gym works anywhere, anytime. Free workouts, premium programs & tools." />
+        <meta name="keywords" content="smartygym tour, smarty gym demo, smartygym.com features, Haris Falas, gym reimagined, convenient fitness, flexible online gym, fitness anywhere anytime, online fitness tour" />
+        
+        <meta property="og:title" content="Take a Tour - Smarty Gym Features" />
+        <meta property="og:description" content="Discover how Smarty Gym reimagines fitness - convenient, flexible training anywhere, anytime by Haris Falas" />
+        <meta property="og:type" content="website" />
+        <meta property="og:url" content="https://smartygym.com/takeatour" />
+        
+        <meta property="twitter:card" content="summary_large_image" />
+        <meta property="twitter:title" content="Take a Tour - Smarty Gym" />
+        <meta property="twitter:description" content="Explore smartygym.com features - fitness reimagined for convenience & flexibility" />
+        
+        <link rel="canonical" href="https://smartygym.com/takeatour" />
       </Helmet>
 
       {/* Sticky CTA Bar */}
@@ -89,7 +101,7 @@ const TakeTour = () => {
             <Button 
               size="lg" 
               variant="default"
-              onClick={() => navigate("/premium-benefits")}
+              onClick={() => navigate("/premiumbenefits")}
               className="w-full sm:w-auto bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70"
             >
               <Crown className="mr-2 h-5 w-5" />

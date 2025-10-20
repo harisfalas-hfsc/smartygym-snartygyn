@@ -48,7 +48,7 @@ export const MotivationalBanner = ({ userName }: MotivationalBannerProps) => {
       text: `${userName}, it's time to level up! How about a complete training program? 🎯`,
       action: {
         label: "Start Program",
-        route: "/training-program",
+        route: "/trainingprogram",
         icon: Target,
       },
     },

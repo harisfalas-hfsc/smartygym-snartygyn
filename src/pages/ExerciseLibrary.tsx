@@ -256,20 +256,20 @@ const ExerciseLibrary = () => {
   return (
     <>
       <Helmet>
-        <title>Exercise Library - Smarty Gym | 100+ Free Exercise Videos | smartygym.com</title>
-        <meta name="description" content="Browse 100+ exercises with video demonstrations. Filter by equipment, body region, movement type, and muscle group. Free exercise library by Haris Falas, Cyprus Sports Scientist." />
-        <meta name="keywords" content="exercise library Cyprus, workout exercises, bodyweight exercises, equipment exercises, exercise videos, smartygym exercises" />
+        <title>Exercise Library - Smarty Gym | 100+ Video Exercises by Haris Falas</title>
+        <meta name="description" content="Browse 100+ exercise videos at smartygym.com by Haris Falas. Convenient & flexible exercise library - filter by equipment, body region, muscle group. Gym reimagined for anywhere, anytime training." />
+        <meta name="keywords" content="smartygym exercises, smarty gym, smartygym.com, Haris Falas, exercise library, workout exercises, bodyweight exercises, exercise videos, convenient fitness, gym reimagined, flexible training" />
         
-        <meta property="og:title" content="Exercise Library - Smarty Gym" />
-        <meta property="og:description" content="100+ exercises with video demonstrations and detailed instructions" />
+        <meta property="og:title" content="Exercise Library - Smarty Gym | 100+ Exercise Videos" />
+        <meta property="og:description" content="100+ exercises with video demonstrations by Haris Falas - convenient library for flexible training anywhere" />
         <meta property="og:type" content="website" />
-        <meta property="og:url" content="https://smartygym.com/exercise-library" />
+        <meta property="og:url" content="https://smartygym.com/exerciselibrary" />
         
         <meta name="twitter:card" content="summary_large_image" />
         <meta name="twitter:title" content="Exercise Library - Smarty Gym" />
-        <meta name="twitter:description" content="100+ exercises with video demonstrations and detailed instructions" />
+        <meta name="twitter:description" content="100+ exercise videos at smartygym.com for convenient training" />
         
-        <link rel="canonical" href="https://smartygym.com/exercise-library" />
+        <link rel="canonical" href="https://smartygym.com/exerciselibrary" />
       </Helmet>
       
       <div className="min-h-screen bg-background p-4">

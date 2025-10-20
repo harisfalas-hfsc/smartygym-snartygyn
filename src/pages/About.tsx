@@ -12,19 +12,19 @@ const About = () => {
   return (
     <>
       <Helmet>
-        <title>About Smarty Gym - Haris Falas | Cyprus Online Fitness Expert | smartygym.com</title>
-        <meta name="description" content="Meet Haris Falas, founder of Smarty Gym (smartygym.com) - Cyprus's leading online fitness platform. Sports Scientist & Strength Conditioning Coach offering human-crafted, evidence-based workout programs. No AI, just real expertise from Cyprus fitness experts." />
-        <meta name="keywords" content="Haris Falas, Smarty Gym, smartygym, smartygym.com, Cyprus fitness, Cyprus online fitness, sports scientist Cyprus, strength conditioning coach, human-designed workouts, no AI fitness, online fitness Cyprus" />
+        <title>About Smarty Gym - Haris Falas | Gym Reimagined for Convenient & Flexible Fitness</title>
+        <meta name="description" content="Meet Haris Falas, founder of Smarty Gym (smartygym.com) - convenient & flexible online fitness reimagined. Sports Scientist delivering human-crafted, evidence-based programs anywhere, anytime." />
+        <meta name="keywords" content="Haris Falas, Smarty Gym, smartygym, smartygym.com, gym reimagined, convenient fitness, flexible online gym, sports scientist, strength conditioning coach, fitness anywhere anytime, human-designed workouts" />
         
-        <meta property="og:title" content="About Smarty Gym & Haris Falas - Cyprus Online Fitness" />
-        <meta property="og:description" content="Every workout is personally designed by Haris Falas, Sports Scientist - never by AI. Cyprus online fitness expert delivering real results." />
+        <meta property="og:title" content="About Smarty Gym & Haris Falas - Fitness Reimagined" />
+        <meta property="og:description" content="Every workout personally designed by Haris Falas, Sports Scientist. Convenient & flexible gym reimagined for anywhere, anytime training." />
         <meta property="og:type" content="website" />
         <meta property="og:url" content="https://smartygym.com/about" />
         
         {/* Twitter */}
         <meta property="twitter:card" content="summary_large_image" />
         <meta property="twitter:title" content="About Smarty Gym & Haris Falas" />
-        <meta property="twitter:description" content="Cyprus online fitness platform with human-designed programs by Sports Scientist Haris Falas" />
+        <meta property="twitter:description" content="Smarty Gym - convenient & flexible fitness by Sports Scientist Haris Falas at smartygym.com" />
         
         <link rel="canonical" href="https://smartygym.com/about" />
         
@@ -448,7 +448,7 @@ const About = () => {
                 <Target className="w-5 h-5" />
                 Try Free Workouts
               </Button>
-              <Button size="lg" variant="outline" onClick={() => navigate("/premium-benefits")} className="gap-2">
+              <Button size="lg" variant="outline" onClick={() => navigate("/premiumbenefits")} className="gap-2">
                 <UserCheck className="w-5 h-5" />
                 Join Premium
               </Button>

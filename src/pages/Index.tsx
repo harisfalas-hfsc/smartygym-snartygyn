@@ -76,11 +76,11 @@ const Index = () => {
       [key: string]: string;
     } = {
       "workout": "/workout",
-      "training-program": "/training-program",
-      "exercise-library": "/exercise-library",
-      "1rm-calculator": "/1rm-calculator",
-      "bmr-calculator": "/bmr-calculator",
-      "macro-calculator": "/macro-calculator"
+      "trainingprogram": "/trainingprogram",
+      "exerciselibrary": "/exerciselibrary",
+      "1rmcalculator": "/1rmcalculator",
+      "bmrcalculator": "/bmrcalculator",
+      "macrocalculator": "/macrocalculator"
     };
     if (routes[serviceId]) {
       navigate(routes[serviceId]);
@@ -120,21 +120,21 @@ const Index = () => {
   return (
     <>
       <Helmet>
-        <title>Smarty Gym | Cyprus Online Fitness by Haris Falas - smartygym.com</title>
-        <meta name="description" content="Smarty Gym (smartygym.com) - Cyprus's premier online fitness platform. Human-designed workouts by Haris Falas, Sports Scientist & Strength Coach. Cyprus fitness, online fitness training, functional training." />
-        <meta name="keywords" content="smartygym, smarty gym, smartygym.com, Haris Falas, Cyprus fitness, Cyprus online fitness, online fitness, functional training Cyprus, strength training online, sports scientist Cyprus" />
+        <title>Smarty Gym - Your Fitness Reimagined Anywhere, Anytime | Online Gym by Haris Falas</title>
+        <meta name="description" content="Smarty Gym (smartygym.com) - Cyprus online fitness platform by Haris Falas. Convenient, flexible gym reimagined for anywhere, anytime training. Human-designed workouts, training programs & fitness tools." />
+        <meta name="keywords" content="smartygym, smarty gym, smartygym.com, Haris Falas, gym reimagined, fitness reimagined, convenient fitness, flexible gym, online fitness Cyprus, anywhere anytime fitness, functional training, strength training online" />
         
         {/* Open Graph / Facebook */}
         <meta property="og:type" content="website" />
         <meta property="og:url" content="https://smartygym.com/" />
-        <meta property="og:title" content="Smarty Gym | Cyprus Online Fitness by Haris Falas" />
-        <meta property="og:description" content="Cyprus's premier online fitness platform. Human-designed workouts by Haris Falas, Sports Scientist. Train smarter with evidence-based programs." />
+        <meta property="og:title" content="Smarty Gym - Your Fitness Reimagined Anywhere, Anytime" />
+        <meta property="og:description" content="Convenient & flexible online fitness by Haris Falas. Gym reimagined for the modern lifestyle - train anywhere, anytime with human-designed programs." />
         <meta property="og:image" content={smartyGymLogo} />
         
         {/* Twitter */}
         <meta property="twitter:card" content="summary_large_image" />
-        <meta property="twitter:title" content="Smarty Gym | Cyprus Online Fitness" />
-        <meta property="twitter:description" content="Evidence-based fitness training by Haris Falas. Cyprus online fitness platform." />
+        <meta property="twitter:title" content="Smarty Gym - Fitness Reimagined" />
+        <meta property="twitter:description" content="Convenient & flexible gym by Haris Falas. Train anywhere, anytime with smartygym.com" />
         
         <link rel="canonical" href="https://smartygym.com/" />
         
@@ -187,7 +187,7 @@ const Index = () => {
               <Button size="lg" onClick={() => navigate("/workout")} aria-label="Start free workout with Smarty Gym">
                 Start Free Workout
               </Button>
-              <Button size="lg" variant="outline" onClick={() => navigate("/premium-benefits")} aria-label="Join Smarty Gym premium membership">
+              <Button size="lg" variant="outline" onClick={() => navigate("/premiumbenefits")} aria-label="Join Smarty Gym premium membership">
                 Join Premium
               </Button>
             </div>

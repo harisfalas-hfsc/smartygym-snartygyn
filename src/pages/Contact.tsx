@@ -74,17 +74,18 @@ const Contact = () => {
   return (
     <>
       <Helmet>
-        <title>Contact Smarty Gym | Get in Touch with Haris Falas | Cyprus Online Fitness</title>
-        <meta name="description" content="Contact Smarty Gym (smartygym.com) and reach out to Haris Falas directly. Get expert Cyprus online fitness support, ask questions about our training programs, or discuss your fitness goals with our Sports Scientist." />
-        <meta name="keywords" content="contact smarty gym, smartygym contact, smartygym.com, Cyprus fitness support, online fitness inquiry, Haris Falas contact, Cyprus online fitness coach, fitness consultation Cyprus" />
+        <title>Contact Smarty Gym | Get in Touch with Haris Falas | smartygym.com</title>
+        <meta name="description" content="Contact Smarty Gym (smartygym.com) and reach Haris Falas. Get expert support for convenient & flexible fitness training. Ask about our gym reimagined for anywhere, anytime workouts." />
+        <meta name="keywords" content="contact smarty gym, smartygym contact, smartygym.com, Haris Falas contact, gym reimagined, convenient fitness, flexible online gym, fitness support, online fitness inquiry" />
         
-        <meta property="og:title" content="Contact Smarty Gym - Get Expert Cyprus Fitness Support" />
-        <meta property="og:description" content="Reach out to Haris Falas and the Smarty Gym team for personalized fitness guidance and support from Cyprus online fitness experts." />
+        <meta property="og:title" content="Contact Smarty Gym - Reach Haris Falas" />
+        <meta property="og:description" content="Get in touch with Haris Falas and the Smarty Gym team for personalized fitness guidance" />
         <meta property="og:type" content="website" />
         <meta property="og:url" content="https://smartygym.com/contact" />
         
         <meta property="twitter:card" content="summary" />
-        <meta property="twitter:title" content="Contact Smarty Gym Cyprus" />
+        <meta property="twitter:title" content="Contact Smarty Gym" />
+        <meta property="twitter:description" content="Reach out to Haris Falas at smartygym.com for fitness support" />
         
         <link rel="canonical" href="https://smartygym.com/contact" />
         

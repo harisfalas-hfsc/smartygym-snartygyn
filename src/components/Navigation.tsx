@@ -137,11 +137,11 @@ export const Navigation = () => {
           {/* Desktop Navigation Links */}
           <nav className="hidden md:flex items-center gap-4 flex-1 justify-center">
             <Button variant="ghost" size="sm" onClick={() => navigate("/about")}>About</Button>
-            <Button variant="ghost" size="sm" onClick={() => navigate("/take-tour")}>Take a Tour</Button>
+            <Button variant="ghost" size="sm" onClick={() => navigate("/takeatour")}>Take a Tour</Button>
             <Button variant="ghost" size="sm" onClick={() => navigate("/workout")}>Workouts</Button>
-            <Button variant="ghost" size="sm" onClick={() => navigate("/training-program")}>Programs</Button>
+            <Button variant="ghost" size="sm" onClick={() => navigate("/trainingprogram")}>Programs</Button>
             <Button variant="ghost" size="sm" onClick={() => navigate("/tools")}>Tools</Button>
-            <Button variant="ghost" size="sm" onClick={() => navigate("/exercise-library")}>Exercise Library</Button>
+            <Button variant="ghost" size="sm" onClick={() => navigate("/exerciselibrary")}>Exercise Library</Button>
             <Button variant="ghost" size="sm" onClick={() => navigate("/community")}>Community</Button>
             <Button variant="ghost" size="sm" onClick={() => navigate("/contact")}>Contact</Button>
           </nav>
@@ -158,19 +158,19 @@ export const Navigation = () => {
                 <Button variant="ghost" size="lg" onClick={() => handleNavigate("/about")} className="justify-start">
                   About
                 </Button>
-                <Button variant="ghost" size="lg" onClick={() => handleNavigate("/take-tour")} className="justify-start">
+                <Button variant="ghost" size="lg" onClick={() => handleNavigate("/takeatour")} className="justify-start">
                   Take a Tour
                 </Button>
                 <Button variant="ghost" size="lg" onClick={() => handleNavigate("/workout")} className="justify-start">
                   Workouts
                 </Button>
-                <Button variant="ghost" size="lg" onClick={() => handleNavigate("/training-program")} className="justify-start">
+                <Button variant="ghost" size="lg" onClick={() => handleNavigate("/trainingprogram")} className="justify-start">
                   Programs
                 </Button>
                 <Button variant="ghost" size="lg" onClick={() => handleNavigate("/tools")} className="justify-start">
                   Tools
                 </Button>
-                <Button variant="ghost" size="lg" onClick={() => handleNavigate("/exercise-library")} className="justify-start">
+                <Button variant="ghost" size="lg" onClick={() => handleNavigate("/exerciselibrary")} className="justify-start">
                   Exercise Library
                 </Button>
                 <Button variant="ghost" size="lg" onClick={() => handleNavigate("/community")} className="justify-start">
@@ -183,7 +183,7 @@ export const Navigation = () => {
                   <Button 
                     variant="default" 
                     size="lg" 
-                    onClick={() => handleNavigate("/premium-benefits")}
+                    onClick={() => handleNavigate("/premiumbenefits")}
                     className="w-full"
                   >
                     Join Premium
@@ -198,7 +198,7 @@ export const Navigation = () => {
             <Button 
               variant="default" 
               size="sm" 
-              onClick={() => navigate("/premium-benefits")}
+              onClick={() => navigate("/premiumbenefits")}
               className="hidden md:inline-flex"
             >
               Join Premium
@@ -251,11 +251,11 @@ export const Navigation = () => {
                     </>
                   )}
                   
-                  <DropdownMenuItem onClick={() => navigate("/user-dashboard")}>
+                  <DropdownMenuItem onClick={() => navigate("/userdashboard")}>
                     <LayoutDashboard className="mr-2 h-4 w-4" />
                     <span>My Dashboard</span>
                   </DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => navigate("/profile-settings")}>
+                  <DropdownMenuItem onClick={() => navigate("/profilesettings")}>
                     <Settings className="mr-2 h-4 w-4" />
                     <span>Settings</span>
                   </DropdownMenuItem>

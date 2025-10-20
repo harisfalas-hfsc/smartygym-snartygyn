@@ -55,21 +55,21 @@ const App = () => (
               <Routes>
                 <Route path="/" element={<Index />} />
                 <Route path="/auth" element={<Auth />} />
-                <Route path="/join-premium" element={<JoinPremium />} />
-                <Route path="/premium-benefits" element={<PremiumBenefits />} />
+                <Route path="/joinpremium" element={<JoinPremium />} />
+                <Route path="/premiumbenefits" element={<PremiumBenefits />} />
                 
                 {/* Public free content page */}
-                <Route path="/free-content" element={<FreeContent />} />
+                <Route path="/freecontent" element={<FreeContent />} />
                 
                 {/* Public workout and plan flows - anyone can explore */}
                 <Route path="/workout" element={<WorkoutFlow />} />
                 <Route path="/workout/:type" element={<WorkoutDetail />} />
                 <Route path="/workout/:type/:id" element={<IndividualWorkout />} />
-                <Route path="/training-program" element={<TrainingProgramFlow />} />
-                <Route path="/training-program/:type" element={<TrainingProgramDetail />} />
-                <Route path="/training-program/:type/:id" element={<IndividualTrainingProgram />} />
-                <Route path="/diet-plan" element={<DietPlanFlow />} />
-                <Route path="/exercise-library" element={<ExerciseLibrary />} />
+                <Route path="/trainingprogram" element={<TrainingProgramFlow />} />
+                <Route path="/trainingprogram/:type" element={<TrainingProgramDetail />} />
+                <Route path="/trainingprogram/:type/:id" element={<IndividualTrainingProgram />} />
+                <Route path="/dietplan" element={<DietPlanFlow />} />
+                <Route path="/exerciselibrary" element={<ExerciseLibrary />} />
                 
                 {/* Public community page */}
                 <Route path="/community" element={<Community />} />
@@ -78,22 +78,22 @@ const App = () => (
                 {/* Authenticated routes with motivational banner */}
                 <Route element={<ProtectedRoute><AuthenticatedLayout /></ProtectedRoute>}>
                   <Route path="/dashboard" element={<Dashboard />} />
-                  <Route path="/user-dashboard" element={<UserDashboard />} />
-                  <Route path="/profile-settings" element={<ProfileSettings />} />
+                  <Route path="/userdashboard" element={<UserDashboard />} />
+                  <Route path="/profilesettings" element={<ProfileSettings />} />
                 </Route>
                 
                 {/* Public calculator routes */}
                 <Route path="/about" element={<About />} />
-                <Route path="/take-tour" element={<TakeTour />} />
+                <Route path="/takeatour" element={<TakeTour />} />
                 <Route path="/contact" element={<Contact />} />
-                <Route path="/privacy-policy" element={<PrivacyPolicy />} />
-                <Route path="/terms-of-service" element={<TermsOfService />} />
+                <Route path="/privacypolicy" element={<PrivacyPolicy />} />
+                <Route path="/termsofservice" element={<TermsOfService />} />
                 <Route path="/disclaimer" element={<Disclaimer />} />
                 <Route path="/tools" element={<Tools />} />
-                <Route path="/1rm-calculator" element={<OneRMCalculator />} />
-                <Route path="/bmr-calculator" element={<BMRCalculator />} />
-                <Route path="/macro-calculator" element={<MacroTrackingCalculator />} />
-                <Route path="/calorie-calculator" element={<MacroTrackingCalculator />} /> {/* Redirect old URL */}
+                <Route path="/1rmcalculator" element={<OneRMCalculator />} />
+                <Route path="/bmrcalculator" element={<BMRCalculator />} />
+                <Route path="/macrocalculator" element={<MacroTrackingCalculator />} />
+                <Route path="/caloriecalculator" element={<MacroTrackingCalculator />} /> {/* Redirect old URL */}
                 
                 {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
                 <Route path="*" element={<NotFound />} />

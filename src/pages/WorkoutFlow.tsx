@@ -56,18 +56,18 @@ const WorkoutFlow = () => {
   return (
     <>
       <Helmet>
-        <title>Workouts - Smarty Gym | Free Online Workouts Cyprus | smartygym.com</title>
-        <meta name="description" content="Free online workouts by Haris Falas. Choose from strength, cardio, metabolic, mobility, and challenge workouts. Science-based training programs from Cyprus's premier online fitness platform." />
-        <meta name="keywords" content="free workouts, online workouts Cyprus, strength training, cardio workouts, metabolic training, mobility workouts, smartygym workouts" />
+        <title>Workouts - Smarty Gym | Convenient & Flexible Training by Haris Falas</title>
+        <meta name="description" content="Free online workouts by Haris Falas at smartygym.com - convenient & flexible gym reimagined. Strength, cardio, metabolic, mobility training anywhere, anytime." />
+        <meta name="keywords" content="smartygym workouts, smarty gym, smartygym.com, Haris Falas, free workouts, convenient fitness, flexible training, gym reimagined, online workouts, strength training, cardio workouts" />
         
-        <meta property="og:title" content="Workouts - Smarty Gym Cyprus Online Fitness" />
-        <meta property="og:description" content="Free science-based workouts designed by Sports Scientist Haris Falas" />
+        <meta property="og:title" content="Workouts - Smarty Gym | Fitness Reimagined" />
+        <meta property="og:description" content="Convenient & flexible workouts designed by Sports Scientist Haris Falas - train anywhere, anytime" />
         <meta property="og:type" content="website" />
         <meta property="og:url" content="https://smartygym.com/workout" />
         
         <meta name="twitter:card" content="summary_large_image" />
         <meta name="twitter:title" content="Workouts - Smarty Gym" />
-        <meta name="twitter:description" content="Free science-based workouts designed by Sports Scientist Haris Falas" />
+        <meta name="twitter:description" content="Convenient & flexible workouts by Haris Falas at smartygym.com" />
         
         <link rel="canonical" href="https://smartygym.com/workout" />
       </Helmet>

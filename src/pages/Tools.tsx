@@ -34,18 +34,18 @@ const Tools = () => {
   return (
     <>
       <Helmet>
-        <title>Fitness Tools - Smarty Gym | Free Calculators Cyprus | smartygym.com</title>
-        <meta name="description" content="Free fitness calculators: 1RM Calculator, BMR Calculator, Macro Tracking Calculator. Science-based tools by Haris Falas for Cyprus and worldwide fitness enthusiasts." />
-        <meta name="keywords" content="1rm calculator, bmr calculator, macro calculator, fitness tools Cyprus, workout calculators, smartygym tools" />
+        <title>Fitness Tools - Smarty Gym | Free Calculators by Haris Falas | smartygym.com</title>
+        <meta name="description" content="Free fitness calculators at smartygym.com: 1RM Calculator, BMR Calculator, Macro Tracking. Convenient & flexible tools by Haris Falas for anywhere, anytime fitness planning." />
+        <meta name="keywords" content="smartygym tools, smarty gym, smartygym.com, Haris Falas, 1rm calculator, bmr calculator, macro calculator, fitness tools, convenient fitness, gym reimagined, workout calculators" />
         
-        <meta property="og:title" content="Fitness Tools - Smarty Gym Cyprus" />
-        <meta property="og:description" content="Free fitness calculators to support your training journey" />
+        <meta property="og:title" content="Fitness Tools - Smarty Gym | Free Calculators" />
+        <meta property="og:description" content="Free fitness calculators by Haris Falas - convenient tools for flexible training anywhere" />
         <meta property="og:type" content="website" />
         <meta property="og:url" content="https://smartygym.com/tools" />
         
         <meta name="twitter:card" content="summary_large_image" />
         <meta name="twitter:title" content="Fitness Tools - Smarty Gym" />
-        <meta name="twitter:description" content="Free fitness calculators to support your training journey" />
+        <meta name="twitter:description" content="Free fitness calculators at smartygym.com for convenient training planning" />
         
         <link rel="canonical" href="https://smartygym.com/tools" />
       </Helmet>
