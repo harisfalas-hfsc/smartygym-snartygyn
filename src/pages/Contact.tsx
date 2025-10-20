@@ -125,10 +125,12 @@ const Contact = () => {
 
           {/* Hero Section */}
           <header className="text-center mb-12">
-            <h1 className="text-4xl sm:text-5xl font-bold mb-4">Contact Smarty Gym - Cyprus Online Fitness</h1>
+            <h1 className="text-4xl sm:text-5xl font-bold mb-4">Contact</h1>
             <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-              Have questions? Need Cyprus online fitness support? Want to discuss your fitness goals with <strong>Haris Falas</strong>? 
-              We're here to help at <strong>smartygym.com</strong>.
+              Have questions? Need support? Want to discuss your fitness goals?
+            </p>
+            <p className="text-sm text-muted-foreground mt-2">
+              Get in touch with <strong>Haris Falas</strong> and the Smarty Gym team
             </p>
           </header>
 
@@ -137,10 +139,7 @@ const Contact = () => {
             <div className="lg:col-span-2">
               <Card>
                 <CardHeader>
-                  <CardTitle className="text-2xl flex items-center gap-2">
-                    <MessageSquare className="w-6 h-6 text-primary" />
-                    Send Us a Message
-                  </CardTitle>
+                  <CardTitle className="text-2xl">Send Us a Message</CardTitle>
                   <CardDescription>
                     Fill out the form below and we'll get back to you within 24 hours
                   </CardDescription>
@@ -222,32 +221,29 @@ const Contact = () => {
             <div className="space-y-6">
               <Card>
                 <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <Mail className="w-5 h-5 text-primary" />
-                    Email Us
-                  </CardTitle>
+                  <CardTitle>Email Us</CardTitle>
                 </CardHeader>
                 <CardContent>
                   <p className="text-sm text-muted-foreground mb-2">
-                    For general inquiries and Cyprus online fitness support
+                    For general inquiries and support
                   </p>
                   <a href="mailto:admin@smartygym.com" className="text-primary hover:underline font-semibold">
                     admin@smartygym.com
                   </a>
                   <p className="text-xs text-muted-foreground mt-2">
-                    Direct contact with <strong>Haris Falas</strong> and the Smarty Gym team
+                    Direct contact with <strong>Haris Falas</strong> and the team
                   </p>
                 </CardContent>
               </Card>
 
               <Card className="bg-gradient-to-br from-primary/5 to-accent/10 border-primary/20">
                 <CardHeader>
-                  <CardTitle className="text-lg">Direct Access to Your Cyprus Fitness Coach</CardTitle>
+                  <CardTitle className="text-lg">Direct Access to Your Coach</CardTitle>
                 </CardHeader>
                 <CardContent>
                   <p className="text-sm text-muted-foreground">
-                    As a Premium member at <strong>smartygym.com</strong>, you can reach out directly to <strong>Haris Falas</strong> and the coaching team. 
-                    No robots, no automated responses — just real human support from Cyprus online fitness experts when you need it.
+                    As a Premium member, you can reach out directly to <strong>Haris Falas</strong> and the coaching team. 
+                    No robots, no automated responses — just real human support when you need it.
                   </p>
                 </CardContent>
               </Card>
