@@ -275,8 +275,11 @@ export default function JoinPremium() {
               </div>
               <div>
                 <h3 className="font-semibold mb-1">Can I cancel anytime?</h3>
-                <p className="text-sm text-muted-foreground">
-                  Yes! You can cancel your subscription at any time from your account settings. You'll continue to have access until the end of your current billing period.
+                <p className="text-sm text-muted-foreground mb-2">
+                  Yes! You can cancel your subscription at any time. You'll continue to have access until the end of your current billing period.
+                </p>
+                <p className="text-sm font-medium text-primary">
+                  How to cancel: Go to your Dashboard → Click "Manage Subscription" → Cancel your plan
                 </p>
               </div>
               <div>

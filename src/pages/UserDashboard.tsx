@@ -93,6 +93,7 @@ export default function UserDashboard() {
   const { toast } = useToast();
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
+  const [managingSubscription, setManagingSubscription] = useState(false);
   const [workoutInteractions, setWorkoutInteractions] = useState<WorkoutInteraction[]>([]);
   const [programInteractions, setProgramInteractions] = useState<ProgramInteraction[]>([]);
   const [subscriptionInfo, setSubscriptionInfo] = useState<SubscriptionInfo | null>(null);
@@ -216,6 +217,34 @@ export default function UserDashboard() {
     navigate(`/training-program/${programType}/${programId}`);
   };
 
+  const handleManageSubscription = async () => {
+    if (!user) return;
+    
+    setManagingSubscription(true);
+    try {
+      const { data, error } = await supabase.functions.invoke('customer-portal');
+      
+      if (error) throw error;
+      
+      if (data?.url) {
+        window.open(data.url, '_blank');
+        toast({
+          title: "Opening subscription portal",
+          description: "Manage your subscription in the new tab",
+        });
+      }
+    } catch (error) {
+      console.error('Error opening customer portal:', error);
+      toast({
+        title: "Error",
+        description: "Failed to open subscription management. Please try again.",
+        variant: "destructive"
+      });
+    } finally {
+      setManagingSubscription(false);
+    }
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -282,20 +311,35 @@ export default function UserDashboard() {
                     {getPlanName(subscriptionInfo.product_id)} Plan
                   </p>
                   {subscriptionInfo.subscribed && subscriptionInfo.subscription_end ? (
-                    <p className="text-sm text-muted-foreground">
-                      Active until {formatDate(subscriptionInfo.subscription_end)}
-                    </p>
+                    <>
+                      <p className="text-sm text-muted-foreground">
+                        Active until {formatDate(subscriptionInfo.subscription_end)}
+                      </p>
+                      <p className="text-xs text-muted-foreground mt-1">
+                        Auto-renews • Cancel anytime
+                      </p>
+                    </>
                   ) : (
                     <p className="text-sm text-muted-foreground">
                       Upgrade to access premium content
                     </p>
                   )}
                 </div>
-                {!subscriptionInfo.subscribed && (
-                  <Button onClick={() => navigate("/premium-benefits")}>
-                    Upgrade Now
-                  </Button>
-                )}
+                <div className="flex gap-2">
+                  {subscriptionInfo.subscribed ? (
+                    <Button 
+                      onClick={handleManageSubscription}
+                      disabled={managingSubscription}
+                      variant="outline"
+                    >
+                      {managingSubscription ? "Opening..." : "Manage Subscription"}
+                    </Button>
+                  ) : (
+                    <Button onClick={() => navigate("/premium-benefits")}>
+                      Upgrade Now
+                    </Button>
+                  )}
+                </div>
               </div>
             </CardContent>
           </Card>
