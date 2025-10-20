@@ -15,7 +15,8 @@ import {
   Dumbbell,
   Calendar,
   Crown,
-  ArrowLeft
+  ArrowLeft,
+  Calculator
 } from "lucide-react";
 
 interface WorkoutInteraction {
@@ -44,6 +45,43 @@ interface ProgramInteraction {
   updated_at: string;
 }
 
+interface FavoriteExercise {
+  id: string;
+  exercise_name: string;
+  created_at: string;
+}
+
+interface CalculatorRecord {
+  id: string;
+  created_at: string;
+}
+
+interface OneRMRecord extends CalculatorRecord {
+  weight_lifted: number;
+  reps: number;
+  one_rm_result: number;
+  exercise_name: string | null;
+}
+
+interface BMRRecord extends CalculatorRecord {
+  age: number;
+  weight: number;
+  height: number;
+  gender: string;
+  bmr_result: number;
+}
+
+interface CalorieRecord extends CalculatorRecord {
+  age: number;
+  weight: number;
+  height: number;
+  gender: string;
+  activity_level: string;
+  goal: string;
+  maintenance_calories: number;
+  target_calories: number;
+}
+
 interface SubscriptionInfo {
   subscribed: boolean;
   product_id: string | null;
@@ -58,6 +96,10 @@ export default function UserDashboard() {
   const [workoutInteractions, setWorkoutInteractions] = useState<WorkoutInteraction[]>([]);
   const [programInteractions, setProgramInteractions] = useState<ProgramInteraction[]>([]);
   const [subscriptionInfo, setSubscriptionInfo] = useState<SubscriptionInfo | null>(null);
+  const [favoriteExercises, setFavoriteExercises] = useState<FavoriteExercise[]>([]);
+  const [oneRMHistory, setOneRMHistory] = useState<OneRMRecord[]>([]);
+  const [bmrHistory, setBMRHistory] = useState<BMRRecord[]>([]);
+  const [calorieHistory, setCalorieHistory] = useState<CalorieRecord[]>([]);
 
   useEffect(() => {
     checkAuth();
@@ -79,6 +121,8 @@ export default function UserDashboard() {
     await Promise.all([
       fetchWorkoutInteractions(userId),
       fetchProgramInteractions(userId),
+      fetchFavoriteExercises(userId),
+      fetchCalculatorHistory(userId),
     ]);
   };
 
@@ -100,6 +144,43 @@ export default function UserDashboard() {
       .order("updated_at", { ascending: false });
 
     if (data) setProgramInteractions(data);
+  };
+
+  const fetchFavoriteExercises = async (userId: string) => {
+    const { data } = await supabase
+      .from("favorite_exercises")
+      .select("*")
+      .eq("user_id", userId)
+      .order("created_at", { ascending: false });
+
+    if (data) setFavoriteExercises(data);
+  };
+
+  const fetchCalculatorHistory = async (userId: string) => {
+    const { data: onerm } = await supabase
+      .from("onerm_history")
+      .select("*")
+      .eq("user_id", userId)
+      .order("created_at", { ascending: false })
+      .limit(5);
+
+    const { data: bmr } = await supabase
+      .from("bmr_history")
+      .select("*")
+      .eq("user_id", userId)
+      .order("created_at", { ascending: false })
+      .limit(5);
+
+    const { data: calorie } = await supabase
+      .from("calorie_history")
+      .select("*")
+      .eq("user_id", userId)
+      .order("created_at", { ascending: false })
+      .limit(5);
+
+    if (onerm) setOneRMHistory(onerm);
+    if (bmr) setBMRHistory(bmr);
+    if (calorie) setCalorieHistory(calorie);
   };
 
   const checkSubscription = async () => {
@@ -227,7 +308,7 @@ export default function UserDashboard() {
         </div>
 
         <Tabs defaultValue="workouts" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-2">
+          <TabsList className="grid w-full grid-cols-2 sm:grid-cols-4">
             <TabsTrigger value="workouts">
               <Dumbbell className="mr-2 h-4 w-4" />
               Workouts
@@ -235,6 +316,14 @@ export default function UserDashboard() {
             <TabsTrigger value="programs">
               <Calendar className="mr-2 h-4 w-4" />
               Programs
+            </TabsTrigger>
+            <TabsTrigger value="exercises">
+              <Heart className="mr-2 h-4 w-4" />
+              Exercises
+            </TabsTrigger>
+            <TabsTrigger value="calculators">
+              <Calculator className="mr-2 h-4 w-4" />
+              My Calculators
             </TabsTrigger>
           </TabsList>
 
@@ -511,6 +600,175 @@ export default function UserDashboard() {
                           </div>
                         </div>
                       ))}
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+            </div>
+          </TabsContent>
+
+          {/* Exercises Tab */}
+          <TabsContent value="exercises" className="space-y-6">
+            <Card>
+              <CardHeader>
+                <CardTitle>My Favorite Exercises</CardTitle>
+              </CardHeader>
+              <CardContent>
+                {favoriteExercises.length === 0 ? (
+                  <div className="text-center py-8">
+                    <p className="text-sm text-muted-foreground mb-4">No favorite exercises yet</p>
+                    <Button onClick={() => navigate("/exercise-library")}>
+                      Browse Exercise Library
+                    </Button>
+                  </div>
+                ) : (
+                  <div className="space-y-2">
+                    {favoriteExercises.map((exercise) => (
+                      <div
+                        key={exercise.id}
+                        className="p-3 bg-muted rounded-lg"
+                      >
+                        <div className="flex items-center justify-between">
+                          <div className="flex-1">
+                            <p className="font-medium text-sm">{exercise.exercise_name}</p>
+                            <p className="text-xs text-muted-foreground mt-1">
+                              Added {formatDate(exercise.created_at)}
+                            </p>
+                          </div>
+                          <Heart className="h-4 w-4 fill-red-500 text-red-500 ml-2" />
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          {/* Calculators Tab */}
+          <TabsContent value="calculators" className="space-y-6">
+            <div className="grid gap-6 md:grid-cols-3">
+              {/* 1RM Calculator History */}
+              <Card>
+                <CardHeader>
+                  <CardTitle className="text-sm font-medium">1RM Calculator</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  {oneRMHistory.length === 0 ? (
+                    <div className="text-center py-4">
+                      <p className="text-xs text-muted-foreground mb-2">No history yet</p>
+                      <Button size="sm" variant="outline" onClick={() => navigate("/1rm-calculator")}>
+                        Calculate Now
+                      </Button>
+                    </div>
+                  ) : (
+                    <div className="space-y-2">
+                      {oneRMHistory.map((record) => (
+                        <div key={record.id} className="p-2 bg-muted rounded text-xs">
+                          <div className="font-semibold">{record.one_rm_result.toFixed(1)} kg</div>
+                          {record.exercise_name && (
+                            <div className="text-muted-foreground">{record.exercise_name}</div>
+                          )}
+                          <div className="text-muted-foreground">
+                            {record.weight_lifted}kg × {record.reps} reps
+                          </div>
+                          <div className="text-muted-foreground mt-1">
+                            {formatDate(record.created_at)}
+                          </div>
+                        </div>
+                      ))}
+                      <Button 
+                        size="sm" 
+                        variant="outline" 
+                        className="w-full mt-2"
+                        onClick={() => navigate("/1rm-calculator")}
+                      >
+                        View All / Add New
+                      </Button>
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+
+              {/* BMR Calculator History */}
+              <Card>
+                <CardHeader>
+                  <CardTitle className="text-sm font-medium">BMR Calculator</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  {bmrHistory.length === 0 ? (
+                    <div className="text-center py-4">
+                      <p className="text-xs text-muted-foreground mb-2">No history yet</p>
+                      <Button size="sm" variant="outline" onClick={() => navigate("/bmr-calculator")}>
+                        Calculate Now
+                      </Button>
+                    </div>
+                  ) : (
+                    <div className="space-y-2">
+                      {bmrHistory.map((record) => (
+                        <div key={record.id} className="p-2 bg-muted rounded text-xs">
+                          <div className="font-semibold">{record.bmr_result} cal/day</div>
+                          <div className="text-muted-foreground">
+                            {record.age}y • {record.weight}kg • {record.height}cm
+                          </div>
+                          <div className="text-muted-foreground capitalize">
+                            {record.gender}
+                          </div>
+                          <div className="text-muted-foreground mt-1">
+                            {formatDate(record.created_at)}
+                          </div>
+                        </div>
+                      ))}
+                      <Button 
+                        size="sm" 
+                        variant="outline" 
+                        className="w-full mt-2"
+                        onClick={() => navigate("/bmr-calculator")}
+                      >
+                        View All / Add New
+                      </Button>
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+
+              {/* Macro Tracking Calculator History */}
+              <Card>
+                <CardHeader>
+                  <CardTitle className="text-sm font-medium">Macro Calculator</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  {calorieHistory.length === 0 ? (
+                    <div className="text-center py-4">
+                      <p className="text-xs text-muted-foreground mb-2">No history yet</p>
+                      <Button size="sm" variant="outline" onClick={() => navigate("/macro-calculator")}>
+                        Calculate Now
+                      </Button>
+                    </div>
+                  ) : (
+                    <div className="space-y-2">
+                      {calorieHistory.map((record) => (
+                        <div key={record.id} className="p-2 bg-muted rounded text-xs">
+                          <div className="font-semibold">{record.target_calories} cal/day</div>
+                          <div className="text-muted-foreground capitalize">
+                            Goal: {record.goal.replace('_', ' ')}
+                          </div>
+                          <div className="text-muted-foreground">
+                            Maintenance: {record.maintenance_calories} cal
+                          </div>
+                          <div className="text-muted-foreground mt-1">
+                            {formatDate(record.created_at)}
+                          </div>
+                        </div>
+                      ))}
+                      <Button 
+                        size="sm" 
+                        variant="outline" 
+                        className="w-full mt-2"
+                        onClick={() => navigate("/macro-calculator")}
+                      >
+                        View All / Add New
+                      </Button>
                     </div>
                   )}
                 </CardContent>

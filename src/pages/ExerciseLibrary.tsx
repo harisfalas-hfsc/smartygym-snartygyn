@@ -1,10 +1,13 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Helmet } from "react-helmet";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { ArrowLeft, Play, Pause, Square } from "lucide-react";
+import { ArrowLeft, Play, Pause, Square, Heart } from "lucide-react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/hooks/use-toast";
+import { User } from "@supabase/supabase-js";
 
 interface Exercise {
   id: number;
@@ -18,12 +21,106 @@ interface Exercise {
 
 const ExerciseLibrary = () => {
   const navigate = useNavigate();
+  const { toast } = useToast();
   const [equipmentFilter, setEquipmentFilter] = useState<"all" | "bodyweight" | "equipment">("all");
   const [bodyRegionFilter, setBodyRegionFilter] = useState<string>("all");
   const [movementTypeFilter, setMovementTypeFilter] = useState<string>("all");
   const [muscleGroupFilter, setMuscleGroupFilter] = useState<string>("all");
   const [letterFilter, setLetterFilter] = useState<string>("all");
   const [currentVideoId, setCurrentVideoId] = useState<string>("");
+  const [user, setUser] = useState<User | null>(null);
+  const [favoriteExercises, setFavoriteExercises] = useState<string[]>([]);
+
+  useEffect(() => {
+    // Check current session
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setUser(session?.user ?? null);
+      if (session?.user) {
+        loadFavorites(session.user.id);
+      }
+    });
+
+    // Listen for auth changes
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      setUser(session?.user ?? null);
+      if (session?.user) {
+        loadFavorites(session.user.id);
+      } else {
+        setFavoriteExercises([]);
+      }
+    });
+
+    return () => subscription.unsubscribe();
+  }, []);
+
+  const loadFavorites = async (userId: string) => {
+    const { data } = await supabase
+      .from("favorite_exercises")
+      .select("exercise_name")
+      .eq("user_id", userId);
+    
+    if (data) {
+      setFavoriteExercises(data.map(d => d.exercise_name));
+    }
+  };
+
+  const toggleFavorite = async (exerciseName: string) => {
+    if (!user) {
+      toast({
+        title: "Login required",
+        description: "Please log in to favorite exercises",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    const isFavorite = favoriteExercises.includes(exerciseName);
+
+    if (isFavorite) {
+      // Remove from favorites
+      const { error } = await supabase
+        .from("favorite_exercises")
+        .delete()
+        .eq("user_id", user.id)
+        .eq("exercise_name", exerciseName);
+
+      if (error) {
+        toast({
+          title: "Error",
+          description: "Failed to remove from favorites",
+          variant: "destructive"
+        });
+      } else {
+        setFavoriteExercises(prev => prev.filter(name => name !== exerciseName));
+        toast({
+          title: "Removed from favorites",
+          description: `${exerciseName} has been removed from your favorites`
+        });
+      }
+    } else {
+      // Add to favorites
+      const { error } = await supabase
+        .from("favorite_exercises")
+        .insert({
+          user_id: user.id,
+          exercise_name: exerciseName
+        });
+
+      if (error) {
+        toast({
+          title: "Error",
+          description: "Failed to add to favorites",
+          variant: "destructive"
+        });
+      } else {
+        setFavoriteExercises(prev => [...prev, exerciseName]);
+        toast({
+          title: "Added to favorites",
+          description: `${exerciseName} has been added to your favorites`
+        });
+      }
+    }
+  };
 
   // 100 exercises list with comprehensive categorization
   const exercises: Exercise[] = [
@@ -367,6 +464,15 @@ const ExerciseLibrary = () => {
                     </div>
                   </div>
                   <div className="flex gap-2">
+                    <Button
+                      size="sm"
+                      variant={favoriteExercises.includes(exercise.name) ? "default" : "outline"}
+                      onClick={() => toggleFavorite(exercise.name)}
+                      className="h-8 w-8 p-0"
+                      title={favoriteExercises.includes(exercise.name) ? "Remove from favorites" : "Add to favorites"}
+                    >
+                      <Heart className={`h-4 w-4 ${favoriteExercises.includes(exercise.name) ? 'fill-current' : ''}`} />
+                    </Button>
                     <Button
                       size="sm"
                       variant="outline"
