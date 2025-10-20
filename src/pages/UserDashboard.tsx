@@ -155,35 +155,32 @@ export default function UserDashboard() {
 
   return (
     <div className="min-h-screen bg-background">
-      {/* Hero Section */}
-      <div className="bg-gradient-to-br from-primary/5 via-background to-primary/10 border-b">
-        <div className="container mx-auto max-w-7xl px-4 py-12">
-          <div className="text-center space-y-4">
-            <h1 className="text-4xl sm:text-5xl font-bold bg-gradient-to-r from-primary via-amber-500 to-primary bg-clip-text text-transparent">
-              My Dashboard
-            </h1>
-            <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-              Track your fitness journey, monitor your progress, and stay on top of your goals. Your personalized hub for workouts, programs, and achievements.
-            </p>
-          </div>
-        </div>
-      </div>
-
-      {/* Main Content */}
       <main className="container mx-auto max-w-7xl p-4 py-8">
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={() => navigate("/")}
+          className="mb-6"
+        >
+          <ArrowLeft className="mr-2 h-4 w-4" />
+          <span className="text-xs sm:text-sm">Back to Home</span>
+        </Button>
+        
+        <h1 className="text-3xl sm:text-4xl font-bold text-center mb-2">My Dashboard</h1>
+        <p className="text-center text-muted-foreground mb-4">
+          Track your fitness journey, monitor your progress, and stay on top of your goals.
+        </p>
+        
+        {/* Info Ribbon */}
+        <div className="bg-primary/10 border border-primary/20 rounded-lg p-4 mb-8 text-center">
+          <p className="text-sm text-muted-foreground">
+            Your personalized hub for workouts, programs, and achievements. Keep pushing forward!
+          </p>
+        </div>
+
         <div className="mb-8 flex items-center justify-between">
           <div>
-            <h2 className="text-3xl font-bold mb-2">
-              My Dashboard
-            </h2>
-            <p className="text-muted-foreground">
-              Track your fitness journey
-            </p>
           </div>
-          <Button variant="outline" onClick={() => navigate("/")}>
-            <ArrowLeft className="mr-2 h-4 w-4" />
-            Home
-          </Button>
         </div>
 
         {/* Subscription Info */}
