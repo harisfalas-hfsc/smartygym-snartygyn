@@ -28,6 +28,10 @@ import ExerciseLibrary from "./pages/ExerciseLibrary";
 import About from "./pages/About";
 import Tools from "./pages/Tools";
 import FreeContent from "./pages/FreeContent";
+import Contact from "./pages/Contact";
+import PrivacyPolicy from "./pages/PrivacyPolicy";
+import TermsOfService from "./pages/TermsOfService";
+import Disclaimer from "./pages/Disclaimer";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -70,6 +74,10 @@ const App = () => (
           
           {/* Public calculator routes */}
           <Route path="/about" element={<About />} />
+          <Route path="/contact" element={<Contact />} />
+          <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+          <Route path="/terms-of-service" element={<TermsOfService />} />
+          <Route path="/disclaimer" element={<Disclaimer />} />
           <Route path="/tools" element={<Tools />} />
           <Route path="/1rm-calculator" element={<OneRMCalculator />} />
           <Route path="/bmr-calculator" element={<BMRCalculator />} />

@@ -271,6 +271,26 @@ const Index = () => {
                 <Youtube className="h-5 w-5" />
               </a>
             </div>
+            
+            {/* Legal Links */}
+            <div className="flex flex-wrap items-center justify-center gap-4 text-sm text-muted-foreground">
+              <button onClick={() => navigate("/privacy-policy")} className="hover:text-primary transition-colors">
+                Privacy Policy
+              </button>
+              <span>•</span>
+              <button onClick={() => navigate("/terms-of-service")} className="hover:text-primary transition-colors">
+                Terms of Service
+              </button>
+              <span>•</span>
+              <button onClick={() => navigate("/disclaimer")} className="hover:text-primary transition-colors">
+                Disclaimer
+              </button>
+              <span>•</span>
+              <button onClick={() => navigate("/contact")} className="hover:text-primary transition-colors">
+                Contact
+              </button>
+            </div>
+            
             {/* Copyright */}
             <p className="text-center text-sm text-muted-foreground">
               © 2025 Smarty Gym. Your intelligent fitness companion.
