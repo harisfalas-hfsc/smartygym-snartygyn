@@ -253,38 +253,34 @@ export default function Community() {
               )}
             </div>
 
-            <div className="grid grid-cols-1 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {selectedCategoryData?.articles.map((article) => (
-                <Card key={article.id} className="overflow-hidden bg-card border-border">
-                  <div className="grid md:grid-cols-[300px,1fr] gap-0">
-                    <div className="relative h-48 md:h-full">
-                      <img
-                        src={article.image}
-                        alt={article.title}
-                        className="w-full h-full object-cover"
-                      />
+                <Card key={article.id} className="overflow-hidden hover:shadow-lg transition-all duration-300 hover:scale-105 flex flex-col h-full">
+                  <div className="aspect-video w-full overflow-hidden">
+                    <img 
+                      src={article.image} 
+                      alt={article.title}
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
+                  <div className="p-6 flex flex-col flex-grow">
+                    <h3 className="font-semibold text-lg mb-2 line-clamp-2">{article.title}</h3>
+                    <p className="text-sm text-muted-foreground mb-4 flex-grow line-clamp-3">{article.excerpt}</p>
+                    <div className="flex flex-wrap items-center gap-3 text-xs text-muted-foreground mb-4">
+                      <span className="flex items-center gap-1">
+                        <Clock className="h-3 w-3" />
+                        {article.readTime}
+                      </span>
+                      <span className="flex items-center gap-1">
+                        <Calendar className="h-3 w-3" />
+                        {new Date(article.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+                      </span>
                     </div>
-                    <div className="p-6">
-                      <CardHeader className="p-0 mb-4">
-                        <CardTitle className="text-xl mb-2">{article.title}</CardTitle>
-                        <CardDescription>{article.excerpt}</CardDescription>
-                      </CardHeader>
-                      <CardContent className="p-0">
-                        <div className="flex flex-wrap items-center gap-4 text-xs text-muted-foreground mb-4">
-                          <span className="flex items-center gap-1">
-                            <Clock className="h-3 w-3" />
-                            {article.readTime}
-                          </span>
-                          <span className="flex items-center gap-1">
-                            <Calendar className="h-3 w-3" />
-                            {new Date(article.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
-                          </span>
-                        </div>
-                        <ShareButtons 
-                          title={article.title} 
-                          url={`${window.location.origin}/blog/${article.id}`} 
-                        />
-                      </CardContent>
+                    <div className="mt-auto">
+                      <ShareButtons 
+                        title={article.title} 
+                        url={`${window.location.origin}/blog/${article.id}`} 
+                      />
                     </div>
                   </div>
                 </Card>
