@@ -17,7 +17,6 @@ import {
   Crown,
   ArrowLeft
 } from "lucide-react";
-import { Navigation } from "@/components/Navigation";
 
 interface WorkoutInteraction {
   id: string;
@@ -156,8 +155,6 @@ export default function UserDashboard() {
 
   return (
     <div className="min-h-screen bg-background">
-      <Navigation />
-
       {/* Main Content */}
       <main className="container mx-auto max-w-7xl p-4 py-8">
         <div className="mb-8 flex items-center justify-between">

@@ -34,7 +34,8 @@ const equipmentOptions = [
   "Rowing Machine",
   "Jump Rope",
   "Yoga Mat",
-  "Bodyweight Only"
+  "Bodyweight Only",
+  "Other"
 ];
 
 const ProfileSettings = () => {
@@ -48,11 +49,17 @@ const ProfileSettings = () => {
     gender: "",
     fitness_level: "",
     fitness_goals: [] as string[],
-    equipment_preferences: [] as string[]
+    equipment_preferences: [] as string[],
+    other_equipment: ""
   });
 
   useEffect(() => {
     if (profileData && !profileLoading) {
+      // Extract "Other: description" from equipment preferences if it exists
+      const otherEquipment = profileData.equipment_preferences?.find(eq => eq.startsWith("Other: "));
+      const otherDescription = otherEquipment ? otherEquipment.substring(7) : "";
+      const filteredEquipment = profileData.equipment_preferences?.filter(eq => !eq.startsWith("Other: ")) || [];
+      
       setFormData({
         weight: profileData.weight || "",
         height: profileData.height || "",
@@ -60,7 +67,8 @@ const ProfileSettings = () => {
         gender: profileData.gender || "",
         fitness_level: profileData.fitness_level || "",
         fitness_goals: profileData.fitness_goals || [],
-        equipment_preferences: profileData.equipment_preferences || []
+        equipment_preferences: otherDescription ? [...filteredEquipment, "Other"] : filteredEquipment,
+        other_equipment: otherDescription
       });
     }
   }, [profileData, profileLoading]);
@@ -89,10 +97,22 @@ const ProfileSettings = () => {
       return;
     }
 
+    // Validate "Other" equipment
+    if (formData.equipment_preferences.includes("Other") && !formData.other_equipment.trim()) {
+      toast.error("Please describe the other equipment");
+      return;
+    }
+
     setLoading(true);
     try {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error("Not authenticated");
+
+      // Process equipment preferences
+      let equipmentToSave = formData.equipment_preferences.filter(eq => eq !== "Other");
+      if (formData.equipment_preferences.includes("Other") && formData.other_equipment.trim()) {
+        equipmentToSave.push(`Other: ${formData.other_equipment.trim()}`);
+      }
 
       const { error } = await supabase
         .from("profiles")
@@ -103,7 +123,7 @@ const ProfileSettings = () => {
           gender: formData.gender,
           fitness_level: formData.fitness_level,
           fitness_goals: formData.fitness_goals,
-          equipment_preferences: formData.equipment_preferences,
+          equipment_preferences: equipmentToSave,
         })
         .eq("user_id", user.id);
 
@@ -247,7 +267,7 @@ const ProfileSettings = () => {
               <h3 className="font-semibold text-lg">Available Equipment</h3>
               <p className="text-sm text-muted-foreground">Select all equipment you have access to</p>
               
-              <div className="grid grid-cols-2 gap-3 max-h-[300px] overflow-y-auto">
+              <div className="grid grid-cols-2 gap-3 max-h-[300px] overflow-y-auto border border-border rounded-lg p-3">
                 {equipmentOptions.map((equipment) => (
                   <div key={equipment} className="flex items-center space-x-2">
                     <Checkbox
@@ -264,6 +284,21 @@ const ProfileSettings = () => {
                   </div>
                 ))}
               </div>
+
+              {/* Other Equipment Text Input */}
+              {formData.equipment_preferences.includes("Other") && (
+                <div>
+                  <Label htmlFor="other_equipment">Describe Other Equipment *</Label>
+                  <Input
+                    id="other_equipment"
+                    type="text"
+                    value={formData.other_equipment}
+                    onChange={(e) => setFormData({ ...formData, other_equipment: e.target.value })}
+                    placeholder="e.g., Suspension trainer, foam roller, etc."
+                    className="mt-2"
+                  />
+                </div>
+              )}
             </div>
 
             <div className="flex gap-4 pt-4">
