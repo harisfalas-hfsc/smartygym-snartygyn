@@ -17,9 +17,11 @@ import {
   Heart,
   Target
 } from "lucide-react";
+import { useShowBackButton } from "@/hooks/useShowBackButton";
 
 export default function PremiumBenefits() {
   const navigate = useNavigate();
+  const { canGoBack, goBack } = useShowBackButton();
 
   const benefits = [
     { icon: Dumbbell, title: "Unlimited Workouts", description: "Access to all personalized workout plans" },
@@ -50,15 +52,17 @@ export default function PremiumBenefits() {
 
       <div className="min-h-screen bg-background">
         <main className="container mx-auto max-w-7xl p-4 py-8">
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => navigate(-1)}
-            className="mb-6"
-          >
-            <ArrowLeft className="mr-2 h-4 w-4" />
-            <span className="text-xs sm:text-sm">Back</span>
-          </Button>
+          {canGoBack && (
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={goBack}
+              className="mb-6"
+            >
+              <ArrowLeft className="mr-2 h-4 w-4" />
+              <span className="text-xs sm:text-sm">Back</span>
+            </Button>
+          )}
 
           <div className="text-center mb-8">
             <Crown className="h-16 w-16 text-primary mx-auto mb-4" />

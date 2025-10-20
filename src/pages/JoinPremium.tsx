@@ -18,10 +18,12 @@ import {
 import { supabase } from "@/integrations/supabase/client";
 import { User } from "@supabase/supabase-js";
 import { useToast } from "@/hooks/use-toast";
+import { useShowBackButton } from "@/hooks/useShowBackButton";
 
 export default function JoinPremium() {
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { canGoBack, goBack } = useShowBackButton();
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(false);
 
@@ -97,15 +99,17 @@ export default function JoinPremium() {
 
       <div className="min-h-screen bg-background">
         <main className="container mx-auto max-w-7xl p-4 py-8">
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => navigate(-1)}
-            className="mb-6"
-          >
-            <ArrowLeft className="mr-2 h-4 w-4" />
-            <span className="text-xs sm:text-sm">Back</span>
-          </Button>
+          {canGoBack && (
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={goBack}
+              className="mb-6"
+            >
+              <ArrowLeft className="mr-2 h-4 w-4" />
+              <span className="text-xs sm:text-sm">Back</span>
+            </Button>
+          )}
 
           <h1 className="text-3xl sm:text-4xl font-bold text-center mb-2">Join Premium</h1>
           <p className="text-center text-muted-foreground mb-4">

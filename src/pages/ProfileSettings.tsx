@@ -11,6 +11,7 @@ import { ArrowLeft, Loader2, Save } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { useProfileData } from "@/hooks/useProfileData";
+import { useShowBackButton } from "@/hooks/useShowBackButton";
 
 const fitnessGoalOptions = [
   "Build Strength",
@@ -42,6 +43,7 @@ const equipmentOptions = [
 const ProfileSettings = () => {
   const navigate = useNavigate();
   const { profileData, loading: profileLoading } = useProfileData();
+  const { canGoBack, goBack } = useShowBackButton();
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
     weight: "",
@@ -156,15 +158,17 @@ const ProfileSettings = () => {
       
       <div className="min-h-screen bg-background p-4">
       <div className="max-w-3xl mx-auto py-8">
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={() => navigate(-1)}
-          className="mb-6"
-        >
-          <ArrowLeft className="mr-2 h-4 w-4" />
-          Back
-        </Button>
+        {canGoBack && (
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={goBack}
+            className="mb-6"
+          >
+            <ArrowLeft className="mr-2 h-4 w-4" />
+            Back
+          </Button>
+        )}
 
         <Card>
           <CardHeader>

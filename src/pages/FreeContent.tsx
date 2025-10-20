@@ -6,9 +6,11 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { EmailCaptureBox } from "@/components/EmailCaptureBox";
 import { PremiumPopup } from "@/components/PremiumPopup";
 import { BackToTop } from "@/components/BackToTop";
+import { useShowBackButton } from "@/hooks/useShowBackButton";
 
 const FreeContent = () => {
   const navigate = useNavigate();
+  const { canGoBack, goBack } = useShowBackButton();
 
   const workoutTypes = [
     {
@@ -125,15 +127,17 @@ const FreeContent = () => {
       <PremiumPopup />
       <BackToTop />
       <div className="container mx-auto max-w-6xl px-4 py-8">
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={() => navigate(-1)}
-          className="mb-6"
-        >
-          <ArrowLeft className="mr-2 h-4 w-4" />
-          <span className="text-xs sm:text-sm">Back</span>
-        </Button>
+        {canGoBack && (
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={goBack}
+            className="mb-6"
+          >
+            <ArrowLeft className="mr-2 h-4 w-4" />
+            <span className="text-xs sm:text-sm">Back</span>
+          </Button>
+        )}
         
         <h1 className="text-3xl sm:text-4xl font-bold text-center mb-2">Free Workouts & Programs</h1>
         <p className="text-center text-muted-foreground mb-8">

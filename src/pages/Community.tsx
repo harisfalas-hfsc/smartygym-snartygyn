@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { ArrowLeft, Star } from "lucide-react";
 import { BackToTop } from "@/components/BackToTop";
+import { useShowBackButton } from "@/hooks/useShowBackButton";
 
 interface Review {
   id: string;
@@ -109,6 +110,7 @@ const reviews: Review[] = [
 
 export default function Community() {
   const navigate = useNavigate();
+  const { canGoBack, goBack } = useShowBackButton();
 
   return (
     <>
@@ -133,15 +135,17 @@ export default function Community() {
         <BackToTop />
         
         <div className="container mx-auto max-w-6xl px-4 py-8">
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => navigate(-1)}
-            className="mb-6"
-          >
-            <ArrowLeft className="mr-2 h-4 w-4" />
-            <span className="text-xs sm:text-sm">Back</span>
-          </Button>
+          {canGoBack && (
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={goBack}
+              className="mb-6"
+            >
+              <ArrowLeft className="mr-2 h-4 w-4" />
+              <span className="text-xs sm:text-sm">Back</span>
+            </Button>
+          )}
           
           <header className="text-center mb-8">
             <h1 className="text-3xl sm:text-4xl font-bold mb-2">What Our Community Says</h1>

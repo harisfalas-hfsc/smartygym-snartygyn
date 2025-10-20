@@ -1,5 +1,4 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
 import { Helmet } from "react-helmet";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -10,6 +9,8 @@ import { ArrowLeft, Mail, MessageSquare, Send, MapPin, Phone } from "lucide-reac
 import { BackToTop } from "@/components/BackToTop";
 import { useToast } from "@/hooks/use-toast";
 import { z } from "zod";
+import { useShowBackButton } from "@/hooks/useShowBackButton";
+import { useNavigate } from "react-router-dom";
 
 const contactSchema = z.object({
   name: z.string().trim().min(1, { message: "Name is required" }).max(100, { message: "Name must be less than 100 characters" }),
@@ -21,6 +22,7 @@ const contactSchema = z.object({
 const Contact = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { canGoBack, goBack } = useShowBackButton();
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -114,15 +116,17 @@ const Contact = () => {
       <div className="min-h-screen bg-background">
         <BackToTop />
         <div className="container mx-auto max-w-6xl px-4 py-8">
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => navigate(-1)}
-            className="mb-6"
-          >
-            <ArrowLeft className="mr-2 h-4 w-4" />
-            Back
-          </Button>
+          {canGoBack && (
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={goBack}
+              className="mb-6"
+            >
+              <ArrowLeft className="mr-2 h-4 w-4" />
+              Back
+            </Button>
+          )}
 
           {/* Hero Section */}
           <header className="text-center mb-8">
