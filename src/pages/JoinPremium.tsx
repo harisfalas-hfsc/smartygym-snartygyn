@@ -154,12 +154,6 @@ export default function JoinPremium() {
           </Card>
 
           {/* Pricing Plans */}
-          <div className="mb-4 text-center">
-            <Badge className="bg-amber-600 text-white text-sm py-2 px-4">
-              ✨ All plans are recurring subscriptions - better value for committed members!
-            </Badge>
-          </div>
-          
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-4xl mx-auto mb-8">
             {/* Gold Plan */}
             <Card className="relative">
@@ -258,6 +252,13 @@ export default function JoinPremium() {
                 </p>
               </CardContent>
             </Card>
+          </div>
+
+          {/* Subscription Notice */}
+          <div className="text-center mb-8">
+            <p className="text-xs text-muted-foreground">
+              🔄 All plans are recurring subscriptions
+            </p>
           </div>
 
           {/* FAQ / Additional Info */}
