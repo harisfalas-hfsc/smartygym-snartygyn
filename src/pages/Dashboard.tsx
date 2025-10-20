@@ -324,11 +324,11 @@ export default function Dashboard() {
               <h1 className="text-lg sm:text-2xl font-bold truncate">Dashboard</h1>
             </div>
             <div className="flex gap-2 flex-shrink-0">
-              <Button variant="outline" size="sm" onClick={() => navigate("/profile-settings")} className="hidden lg:flex">
+              <Button variant="outline" size="sm" onClick={() => navigate("/profilesettings")} className="hidden lg:flex">
                 <Settings className="mr-2 h-4 w-4" />
                 Profile Settings
               </Button>
-              <Button variant="outline" size="sm" onClick={() => navigate("/profile-settings")} className="lg:hidden" title="Profile Settings">
+              <Button variant="outline" size="sm" onClick={() => navigate("/profilesettings")} className="lg:hidden" title="Profile Settings">
                 <Settings className="h-4 w-4" />
               </Button>
               <Button variant="outline" size="sm" onClick={() => navigate("/")} className="hidden sm:flex">
@@ -739,7 +739,7 @@ export default function Dashboard() {
                     <Calculator className="h-5 w-5 text-primary" />
                     1RM Calculator History
                   </div>
-                  <Button size="sm" onClick={() => navigate("/1rm-calculator")}>
+                  <Button size="sm" onClick={() => navigate("/1rmcalculator")}>
                     Use Calculator
                   </Button>
                 </CardTitle>
@@ -800,7 +800,7 @@ export default function Dashboard() {
                     <Activity className="h-5 w-5 text-primary" />
                     BMR Calculator History
                   </div>
-                  <Button size="sm" onClick={() => navigate("/bmr-calculator")}>
+                  <Button size="sm" onClick={() => navigate("/bmrcalculator")}>
                     Use Calculator
                   </Button>
                 </CardTitle>
@@ -861,7 +861,7 @@ export default function Dashboard() {
                     <Flame className="h-5 w-5 text-primary" />
                     Calorie Calculator History
                   </div>
-                  <Button size="sm" onClick={() => navigate("/calorie-calculator")}>
+                  <Button size="sm" onClick={() => navigate("/macrocalculator")}>
                     Use Calculator
                   </Button>
                 </CardTitle>

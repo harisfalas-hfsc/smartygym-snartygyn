@@ -151,7 +151,7 @@ const TrainingProgramDetail = () => {
         <Button
           variant="ghost"
           size="sm"
-          onClick={() => navigate("/training-program")}
+          onClick={() => navigate("/trainingprogram")}
           className="mb-6"
         >
           <ArrowLeft className="mr-2 h-4 w-4" />

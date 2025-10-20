@@ -346,7 +346,7 @@ export default function UserDashboard() {
                       </p>
                     </>
                   ) : (
-                    <Button onClick={() => navigate("/premium-benefits")} className="w-full sm:w-auto">
+                    <Button onClick={() => navigate("/premiumbenefits")} className="w-full sm:w-auto">
                       Upgrade Now
                     </Button>
                   )}
@@ -394,7 +394,7 @@ export default function UserDashboard() {
                   <p className="text-muted-foreground mb-6">
                     Track your workouts, mark favorites, and monitor your progress with a Gold or Platinum plan.
                   </p>
-                  <Button onClick={() => navigate("/premium-benefits")}>
+                  <Button onClick={() => navigate("/premiumbenefits")}>
                     Upgrade to Premium
                   </Button>
                 </CardContent>
@@ -551,7 +551,7 @@ export default function UserDashboard() {
                   <p className="text-muted-foreground mb-6">
                     Access structured training programs, track your progress, and achieve your fitness goals with a Gold or Platinum plan.
                   </p>
-                  <Button onClick={() => navigate("/premium-benefits")}>
+                  <Button onClick={() => navigate("/premiumbenefits")}>
                     Upgrade to Premium
                   </Button>
                 </CardContent>
@@ -708,7 +708,7 @@ export default function UserDashboard() {
                   <p className="text-muted-foreground mb-6">
                     Save your favorite exercises and build your personalized library with a Gold or Platinum plan.
                   </p>
-                  <Button onClick={() => navigate("/premium-benefits")}>
+                  <Button onClick={() => navigate("/premiumbenefits")}>
                     Upgrade to Premium
                   </Button>
                 </CardContent>
@@ -722,7 +722,7 @@ export default function UserDashboard() {
                 {favoriteExercises.length === 0 ? (
                   <div className="text-center py-8">
                     <p className="text-sm text-muted-foreground mb-4">No favorite exercises yet</p>
-                    <Button onClick={() => navigate("/exercise-library")}>
+                    <Button onClick={() => navigate("/exerciselibrary")}>
                       Browse Exercise Library
                     </Button>
                   </div>
@@ -763,7 +763,7 @@ export default function UserDashboard() {
                   {oneRMHistory.length === 0 ? (
                     <div className="text-center py-4">
                       <p className="text-xs text-muted-foreground mb-2">No history yet</p>
-                      <Button size="sm" variant="outline" onClick={() => navigate("/1rm-calculator")}>
+                      <Button size="sm" variant="outline" onClick={() => navigate("/1rmcalculator")}>
                         Calculate Now
                       </Button>
                     </div>
@@ -787,7 +787,7 @@ export default function UserDashboard() {
                         size="sm" 
                         variant="outline" 
                         className="w-full mt-2"
-                        onClick={() => navigate("/1rm-calculator")}
+                        onClick={() => navigate("/1rmcalculator")}
                       >
                         View All / Add New
                       </Button>
@@ -805,7 +805,7 @@ export default function UserDashboard() {
                   {bmrHistory.length === 0 ? (
                     <div className="text-center py-4">
                       <p className="text-xs text-muted-foreground mb-2">No history yet</p>
-                      <Button size="sm" variant="outline" onClick={() => navigate("/bmr-calculator")}>
+                      <Button size="sm" variant="outline" onClick={() => navigate("/bmrcalculator")}>
                         Calculate Now
                       </Button>
                     </div>
@@ -829,7 +829,7 @@ export default function UserDashboard() {
                         size="sm" 
                         variant="outline" 
                         className="w-full mt-2"
-                        onClick={() => navigate("/bmr-calculator")}
+                        onClick={() => navigate("/bmrcalculator")}
                       >
                         View All / Add New
                       </Button>
@@ -847,7 +847,7 @@ export default function UserDashboard() {
                   {calorieHistory.length === 0 ? (
                     <div className="text-center py-4">
                       <p className="text-xs text-muted-foreground mb-2">No history yet</p>
-                      <Button size="sm" variant="outline" onClick={() => navigate("/macro-calculator")}>
+                      <Button size="sm" variant="outline" onClick={() => navigate("/macrocalculator")}>
                         Calculate Now
                       </Button>
                     </div>
@@ -871,7 +871,7 @@ export default function UserDashboard() {
                         size="sm" 
                         variant="outline" 
                         className="w-full mt-2"
-                        onClick={() => navigate("/macro-calculator")}
+                        onClick={() => navigate("/macrocalculator")}
                       >
                         View All / Add New
                       </Button>

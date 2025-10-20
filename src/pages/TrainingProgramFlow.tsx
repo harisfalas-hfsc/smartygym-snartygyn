@@ -93,7 +93,7 @@ const TrainingProgramFlow = () => {
           <p className="text-sm text-muted-foreground mb-2">
             Explore our structured programs — want full access to all programs and workouts?
           </p>
-          <Button variant="default" size="sm" onClick={() => navigate("/premium-benefits")}>
+          <Button variant="default" size="sm" onClick={() => navigate("/premiumbenefits")}>
             Join Premium
           </Button>
         </div>
@@ -130,7 +130,7 @@ const TrainingProgramFlow = () => {
           <p className="text-muted-foreground mb-4">
             Get all programs, workouts, and tools with Smarty Gym Premium.
           </p>
-          <Button size="lg" onClick={() => navigate("/premium-benefits")}>
+          <Button size="lg" onClick={() => navigate("/premiumbenefits")}>
             Join Premium
           </Button>
         </div>

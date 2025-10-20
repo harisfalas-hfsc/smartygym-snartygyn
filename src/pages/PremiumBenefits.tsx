@@ -143,7 +143,7 @@ export default function PremiumBenefits() {
             <Button 
               size="lg" 
               className="w-full max-w-md text-lg py-6"
-              onClick={() => navigate("/join-premium")}
+              onClick={() => navigate("/joinpremium")}
             >
               <Crown className="mr-2 h-5 w-5" />
               Choose Your Plan

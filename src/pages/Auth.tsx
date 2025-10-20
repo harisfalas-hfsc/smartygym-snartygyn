@@ -23,7 +23,7 @@ export default function Auth() {
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
       if (session) {
-        navigate("/user-dashboard");
+        navigate("/userdashboard");
       }
     });
   }, [navigate]);
@@ -149,7 +149,7 @@ export default function Auth() {
           title: "Success!",
           description: "Logged in successfully. Redirecting...",
         });
-        setTimeout(() => navigate("/user-dashboard"), 1500);
+        setTimeout(() => navigate("/userdashboard"), 1500);
       }
     } catch (error: any) {
       toast({
@@ -170,7 +170,7 @@ export default function Auth() {
           onOpenChange={(open) => {
             setShowAvatarSetup(open);
             if (!open) {
-              setTimeout(() => navigate("/user-dashboard"), 500);
+              setTimeout(() => navigate("/userdashboard"), 500);
             }
           }}
           userId={newUserId}
