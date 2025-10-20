@@ -10,6 +10,7 @@ import { useToast } from "@/hooks/use-toast";
 import smartyGymLogo from "@/assets/smarty-gym-logo.png";
 import { BackToTop } from "@/components/BackToTop";
 import { PWAInstallPrompt } from "@/components/PWAInstallPrompt";
+import { NotificationPrompt } from "@/components/NotificationPrompt";
 
 const Index = () => {
   const navigate = useNavigate();
