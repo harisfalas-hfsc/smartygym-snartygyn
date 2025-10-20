@@ -233,7 +233,7 @@ const Index = () => {
               <p className="text-sm text-muted-foreground mb-4">
                 Haris Falas — Sports Scientist & S&C Coach. Founder HFSC & SMARTY GYM.
               </p>
-              <Button variant="outline" size="sm" onClick={() => navigate("/")}>Read full bio</Button>
+              <Button variant="outline" size="sm" onClick={() => navigate("/about")}>Read full bio</Button>
             </Card>
             
             {/* Email Capture Widget */}
