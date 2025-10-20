@@ -118,6 +118,8 @@ export const Navigation = () => {
   const handleNavigate = (path: string) => {
     navigate(path);
     setMobileMenuOpen(false);
+    // Scroll to top after navigation
+    setTimeout(() => window.scrollTo(0, 0), 0);
   };
 
   const handleBackOrHome = () => {
@@ -126,6 +128,8 @@ export const Navigation = () => {
     } else {
       navigate("/");
     }
+    // Scroll to top after navigation
+    setTimeout(() => window.scrollTo(0, 0), 0);
   };
 
   return (

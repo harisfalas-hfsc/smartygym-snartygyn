@@ -9,10 +9,10 @@ import {
   Crown, 
   Sparkles, 
   TrendingUp, 
-  Users, 
   Target,
   CheckCircle,
-  Play
+  Play,
+  BarChart
 } from "lucide-react";
 
 const TakeTour = () => {
@@ -22,13 +22,13 @@ const TakeTour = () => {
     {
       icon: Dumbbell,
       title: "Free Workouts",
-      description: "Access standalone workout sessions designed to challenge and motivate you",
+      description: "Access standalone workout sessions without logging in",
       color: "text-blue-500"
     },
     {
       icon: Calendar,
-      title: "Sample Programs",
-      description: "Preview our structured training programs",
+      title: "Free Training Programs",
+      description: "Explore sample training programs to get started",
       color: "text-purple-500"
     },
     {
@@ -52,13 +52,13 @@ const TakeTour = () => {
     },
     {
       icon: TrendingUp,
-      title: "Progress Tracking",
-      description: "Advanced analytics and performance insights"
+      title: "Save Favorites",
+      description: "Save your favorite workouts and exercises for quick access"
     },
     {
-      icon: Users,
-      title: "Community Access",
-      description: "Join our exclusive community of fitness enthusiasts"
+      icon: BarChart,
+      title: "Personal Dashboard",
+      description: "Access your personalized dashboard with progress tracking"
     },
     {
       icon: Target,
@@ -101,12 +101,12 @@ const TakeTour = () => {
 
       <div className="min-h-screen bg-background pb-24">
         {/* Hero Section */}
-        <section className="relative py-16 px-4 bg-gradient-to-br from-primary/10 via-background to-primary/5 border-b border-border">
+        <section className="relative py-12 px-4 bg-gradient-to-br from-primary/10 via-background to-primary/5 border-b border-border">
           <div className="container mx-auto max-w-4xl text-center space-y-6 animate-fade-in">
-            <h1 className="text-4xl sm:text-5xl font-bold mb-4">
-              Welcome to <span className="text-primary">Smarty Gym</span>
+            <h1 className="text-3xl sm:text-4xl font-bold mb-4">
+              Welcome to <span className="text-primary">SmartyGym</span>
             </h1>
-            <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
+            <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
               Your fitness reimagined - Anywhere, anytime. Let's show you around!
             </p>
             <div className="inline-block bg-primary/20 border border-primary/30 rounded-full px-6 py-2">
@@ -118,7 +118,7 @@ const TakeTour = () => {
         {/* How It Works - Step by Step */}
         <section className="py-16 px-4">
           <div className="container mx-auto max-w-6xl">
-            <h2 className="text-3xl font-bold text-center mb-12">How Smarty Gym Works</h2>
+            <h2 className="text-2xl sm:text-3xl font-bold text-center mb-12">How SmartyGym Works</h2>
             
             {/* Step 1: Start Free */}
             <div className="mb-16 animate-fade-in">
@@ -156,29 +156,25 @@ const TakeTour = () => {
                 <div className="bg-primary text-primary-foreground rounded-full w-12 h-12 flex items-center justify-center text-xl font-bold">
                   2
                 </div>
-                <h3 className="text-2xl font-bold">Create Your Free Account</h3>
+                <h3 className="text-xl sm:text-2xl font-bold">Create Your Free Account</h3>
               </div>
               
               <Card className="p-8 bg-gradient-to-br from-purple-500/10 to-background border-2 border-purple-500/20">
                 <div className="flex flex-col md:flex-row items-center gap-8">
                   <div className="flex-1 space-y-4">
-                    <h4 className="text-xl font-semibold">Track Your Progress</h4>
+                    <h4 className="text-lg sm:text-xl font-semibold">Track Your Journey</h4>
                     <ul className="space-y-3">
                       <li className="flex items-start gap-3">
                         <CheckCircle className="h-5 w-5 text-primary mt-0.5 flex-shrink-0" />
-                        <span>Save your favorite workouts and exercises</span>
+                        <span>Access all free workouts and programs</span>
                       </li>
                       <li className="flex items-start gap-3">
                         <CheckCircle className="h-5 w-5 text-primary mt-0.5 flex-shrink-0" />
-                        <span>Access your personalized dashboard</span>
+                        <span>Use all fitness calculators and tools</span>
                       </li>
                       <li className="flex items-start gap-3">
                         <CheckCircle className="h-5 w-5 text-primary mt-0.5 flex-shrink-0" />
-                        <span>Join the Smarty Gym community</span>
-                      </li>
-                      <li className="flex items-start gap-3">
-                        <CheckCircle className="h-5 w-5 text-primary mt-0.5 flex-shrink-0" />
-                        <span>Still access all free features</span>
+                        <span>Explore the exercise library</span>
                       </li>
                     </ul>
                     <Button onClick={() => navigate("/auth")} className="mt-4">
@@ -187,32 +183,32 @@ const TakeTour = () => {
                   </div>
                   <div className="flex-1">
                     <div className="bg-muted rounded-lg p-6 border-2 border-primary/20">
-                      <div className="text-sm text-muted-foreground mb-2">Your Dashboard</div>
+                      <div className="text-sm text-muted-foreground mb-2">Free Access</div>
                       <div className="space-y-3">
                         <div className="bg-background rounded p-3 border border-border">
                           <div className="flex items-center gap-3">
                             <Dumbbell className="h-5 w-5 text-primary" />
                             <div>
-                              <div className="font-semibold text-sm">Saved Workouts</div>
-                              <div className="text-xs text-muted-foreground">Quick access anytime</div>
+                              <div className="font-semibold text-sm">Free Workouts</div>
+                              <div className="text-xs text-muted-foreground">No subscription needed</div>
                             </div>
                           </div>
                         </div>
                         <div className="bg-background rounded p-3 border border-border">
                           <div className="flex items-center gap-3">
-                            <Target className="h-5 w-5 text-primary" />
+                            <Calendar className="h-5 w-5 text-primary" />
                             <div>
-                              <div className="font-semibold text-sm">Your Goals</div>
-                              <div className="text-xs text-muted-foreground">Track your progress</div>
+                              <div className="font-semibold text-sm">Free Programs</div>
+                              <div className="text-xs text-muted-foreground">Sample training plans</div>
                             </div>
                           </div>
                         </div>
                         <div className="bg-background rounded p-3 border border-border">
                           <div className="flex items-center gap-3">
-                            <Users className="h-5 w-5 text-primary" />
+                            <Calculator className="h-5 w-5 text-primary" />
                             <div>
-                              <div className="font-semibold text-sm">Community</div>
-                              <div className="text-xs text-muted-foreground">Connect with others</div>
+                              <div className="font-semibold text-sm">All Tools</div>
+                              <div className="text-xs text-muted-foreground">Calculators & resources</div>
                             </div>
                           </div>
                         </div>
@@ -229,7 +225,7 @@ const TakeTour = () => {
                 <div className="bg-gradient-to-r from-primary to-primary/80 text-primary-foreground rounded-full w-12 h-12 flex items-center justify-center text-xl font-bold shadow-lg">
                   3
                 </div>
-                <h3 className="text-2xl font-bold">Unlock Your Full Potential</h3>
+                <h3 className="text-xl sm:text-2xl font-bold">Unlock Your Full Potential</h3>
               </div>
               
               <Card className="p-8 bg-gradient-to-br from-primary/10 via-background to-primary/5 border-2 border-primary/30 relative overflow-hidden">
@@ -240,9 +236,9 @@ const TakeTour = () => {
                 </div>
                 
                 <div className="mb-8">
-                  <h4 className="text-2xl font-bold mb-4">What You Get With Premium</h4>
+                  <h4 className="text-xl sm:text-2xl font-bold mb-4">What You Get With Premium</h4>
                   <p className="text-muted-foreground mb-6">
-                    Transform your fitness journey with unlimited access to everything Smarty Gym offers
+                    Transform your fitness journey with unlimited access to everything SmartyGym offers
                   </p>
                 </div>
 
@@ -282,7 +278,7 @@ const TakeTour = () => {
         {/* Why Choose Smarty Gym */}
         <section className="py-16 px-4 bg-muted/30">
           <div className="container mx-auto max-w-6xl">
-            <h2 className="text-3xl font-bold text-center mb-12">Why Smarty Gym?</h2>
+            <h2 className="text-2xl sm:text-3xl font-bold text-center mb-12">Why SmartyGym?</h2>
             
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
               <Card className="p-6 hover-scale">
@@ -323,11 +319,11 @@ const TakeTour = () => {
         {/* Final CTA Section */}
         <section className="py-16 px-4">
           <div className="container mx-auto max-w-4xl text-center">
-            <h2 className="text-3xl sm:text-4xl font-bold mb-6">
+            <h2 className="text-2xl sm:text-3xl font-bold mb-6">
               Ready to Start Your Journey?
             </h2>
-            <p className="text-xl text-muted-foreground mb-8 max-w-2xl mx-auto">
-              Join thousands of people worldwide who are transforming their fitness with Smarty Gym
+            <p className="text-lg text-muted-foreground mb-8 max-w-2xl mx-auto">
+              Join thousands of people worldwide who are transforming their fitness with SmartyGym
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
               <Button size="lg" onClick={() => navigate("/workout")} className="w-full sm:w-auto">
