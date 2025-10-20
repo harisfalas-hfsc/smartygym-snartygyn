@@ -1,5 +1,6 @@
 import { useParams, useNavigate } from "react-router-dom";
-import { ArrowLeft, Clock, Calendar, Share2 } from "lucide-react";
+import { Helmet } from "react-helmet";
+import { ArrowLeft, Clock, Calendar } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ShareButtons } from "@/components/ShareButtons";
 import { Card } from "@/components/ui/card";
@@ -449,33 +450,96 @@ export const ArticleDetail = () => {
 
   if (!article) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-center">
-          <h1 className="text-2xl font-bold mb-4">Article not found</h1>
-          <Button onClick={() => navigate("/community")}>
-            <ArrowLeft className="mr-2 h-4 w-4" />
-            Back to Community
-          </Button>
+      <>
+        <Helmet>
+          <title>Article Not Found - Smarty Gym</title>
+          <meta name="robots" content="noindex" />
+        </Helmet>
+        <div className="min-h-screen flex items-center justify-center">
+          <div className="text-center">
+            <h1 className="text-2xl font-bold mb-4">Article Not Found</h1>
+            <Button onClick={() => navigate("/community")}>
+              <ArrowLeft className="mr-2 h-4 w-4" />
+              Back to Community
+            </Button>
+          </div>
         </div>
-      </div>
+      </>
     );
   }
 
+  // Generate structured data for SEO
+  const structuredData = {
+    "@context": "https://schema.org",
+    "@type": "Article",
+    "headline": article.title,
+    "description": article.excerpt,
+    "image": article.image,
+    "datePublished": new Date(article.date).toISOString(),
+    "dateModified": new Date(article.date).toISOString(),
+    "author": {
+      "@type": "Organization",
+      "name": "Smarty Gym"
+    },
+    "publisher": {
+      "@type": "Organization",
+      "name": "Smarty Gym",
+      "logo": {
+        "@type": "ImageObject",
+        "url": `${window.location.origin}/smarty-gym-logo.png`
+      }
+    },
+    "articleSection": article.category,
+    "wordCount": article.content.join(" ").split(" ").length
+  };
+
   return (
-    <div className="min-h-screen bg-gradient-to-b from-background to-accent/20">
-      {/* Header */}
-      <div className="container mx-auto px-4 py-8">
+    <>
+      <Helmet>
+        <title>{article.title} - Smarty Gym Blog</title>
+        <meta name="description" content={article.excerpt} />
+        <meta name="keywords" content={`${article.category}, fitness, workout, training, health, ${article.title.toLowerCase()}`} />
+        
+        {/* Open Graph tags */}
+        <meta property="og:title" content={article.title} />
+        <meta property="og:description" content={article.excerpt} />
+        <meta property="og:type" content="article" />
+        <meta property="og:url" content={window.location.href} />
+        <meta property="og:image" content={article.image} />
+        <meta property="og:site_name" content="Smarty Gym" />
+        <meta property="article:published_time" content={new Date(article.date).toISOString()} />
+        <meta property="article:section" content={article.category} />
+        
+        {/* Twitter Card tags */}
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content={article.title} />
+        <meta name="twitter:description" content={article.excerpt} />
+        <meta name="twitter:image" content={article.image} />
+        
+        {/* Canonical URL */}
+        <link rel="canonical" href={window.location.href} />
+        
+        {/* Structured Data */}
+        <script type="application/ld+json">
+          {JSON.stringify(structuredData)}
+        </script>
+      </Helmet>
+      
+      <article className="min-h-screen bg-gradient-to-b from-background to-accent/20">
+        {/* Header */}
+        <div className="container mx-auto px-4 py-8">
         <Button
           variant="ghost"
           onClick={() => navigate("/community")}
           className="mb-6"
+          aria-label="Back to Community page"
         >
-          <ArrowLeft className="mr-2 h-4 w-4" />
+          <ArrowLeft className="mr-2 h-4 w-4" aria-hidden="true" />
           Back to Community
         </Button>
 
         {/* Article Header */}
-        <div className="max-w-4xl mx-auto">
+        <header className="max-w-4xl mx-auto">
           <div className="mb-6">
             <span className="inline-block px-3 py-1 bg-primary/10 text-primary rounded-full text-sm font-medium mb-4">
               {article.category}
@@ -485,34 +549,37 @@ export const ArticleDetail = () => {
             </h1>
             <div className="flex flex-wrap items-center gap-4 text-muted-foreground mb-6">
               <div className="flex items-center gap-2">
-                <Clock className="h-4 w-4" />
-                <span>{article.readTime}</span>
+                <Clock className="h-4 w-4" aria-hidden="true" />
+                <time>{article.readTime}</time>
               </div>
               <div className="flex items-center gap-2">
-                <Calendar className="h-4 w-4" />
-                <span>{article.date}</span>
+                <Calendar className="h-4 w-4" aria-hidden="true" />
+                <time dateTime={new Date(article.date).toISOString()}>{article.date}</time>
               </div>
             </div>
           </div>
 
           {/* Article Image */}
-          <div className="aspect-video mb-8 rounded-lg overflow-hidden">
+          <figure className="aspect-video mb-8 rounded-lg overflow-hidden">
             <img
               src={article.image}
-              alt={article.title}
+              alt={`${article.title} - Comprehensive guide featuring ${article.category.toLowerCase()} strategies and expert advice`}
               className="w-full h-full object-cover"
+              loading="eager"
             />
-          </div>
+          </figure>
 
           {/* Share Button */}
-          <div className="mb-8">
+          <nav className="mb-8" aria-label="Article actions">
             <ShareButtons
               title={article.title}
               url={window.location.href}
             />
-          </div>
+          </nav>
+        </header>
 
-          {/* Article Content */}
+        {/* Article Content */}
+        <main className="max-w-4xl mx-auto">
           <Card className="p-8">
             <div className="prose prose-lg max-w-none dark:prose-invert">
               {article.content.map((paragraph, index) => {
@@ -533,21 +600,22 @@ export const ArticleDetail = () => {
           </Card>
 
           {/* Bottom CTA */}
-          <div className="mt-12 text-center">
+          <aside className="mt-12 text-center">
             <Card className="p-8 bg-primary/5">
-              <h3 className="text-2xl font-bold mb-4">
+              <h2 className="text-2xl font-bold mb-4">
                 Ready to Transform Your Fitness Journey?
-              </h3>
+              </h2>
               <p className="text-muted-foreground mb-6">
                 Get personalized workout plans, nutrition guidance, and expert support
               </p>
-              <Button size="lg" onClick={() => navigate("/auth")}>
+              <Button size="lg" onClick={() => navigate("/auth")} aria-label="Start your free trial with Smarty Gym">
                 Start Your Free Trial
               </Button>
             </Card>
-          </div>
-        </div>
+          </aside>
+        </main>
       </div>
-    </div>
+      </article>
+    </>
   );
 };

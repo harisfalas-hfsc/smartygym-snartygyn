@@ -1,10 +1,18 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
+import { Helmet } from "react-helmet";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { ArrowLeft, Dumbbell, Apple, Heart, Clock, Calendar } from "lucide-react";
+import { ArrowLeft, Dumbbell, Apple, Heart, Clock, Calendar, Filter } from "lucide-react";
 import { BackToTop } from "@/components/BackToTop";
 import { ShareButtons } from "@/components/ShareButtons";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 interface Article {
   id: string;
@@ -163,6 +171,7 @@ const wellnessArticles: Article[] = [
 export default function Community() {
   const navigate = useNavigate();
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+  const [sortOrder, setSortOrder] = useState<string>("newest");
 
   const categories = [
     {
@@ -190,9 +199,68 @@ export default function Community() {
 
   const selectedCategoryData = categories.find(cat => cat.id === selectedCategory);
 
+  // Sort articles based on selected order
+  const sortedArticles = useMemo(() => {
+    if (!selectedCategoryData) return [];
+    
+    const articles = [...selectedCategoryData.articles];
+    
+    switch (sortOrder) {
+      case "newest":
+        return articles.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+      case "oldest":
+        return articles.sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
+      case "shortest":
+        return articles.sort((a, b) => {
+          const aTime = parseInt(a.readTime);
+          const bTime = parseInt(b.readTime);
+          return aTime - bTime;
+        });
+      case "longest":
+        return articles.sort((a, b) => {
+          const aTime = parseInt(a.readTime);
+          const bTime = parseInt(b.readTime);
+          return bTime - aTime;
+        });
+      default:
+        return articles;
+    }
+  }, [selectedCategoryData, sortOrder]);
+
+  // SEO metadata
+  const pageTitle = selectedCategory 
+    ? `${selectedCategoryData?.title} Articles - Smarty Gym Blog`
+    : "Smarty Gym Blog - Fitness, Nutrition & Wellness Articles";
+  
+  const pageDescription = selectedCategory
+    ? `Explore expert ${selectedCategoryData?.title.toLowerCase()} articles covering ${selectedCategoryData?.description.toLowerCase()}. Get professional insights and tips from Smarty Gym.`
+    : "Expert insights on fitness training, nutrition plans, and wellness strategies from Smarty Gym. Read our comprehensive guides to achieve your health and fitness goals.";
+
   return (
-    <div className="min-h-screen bg-background">
-      <BackToTop />
+    <>
+      <Helmet>
+        <title>{pageTitle}</title>
+        <meta name="description" content={pageDescription} />
+        <meta name="keywords" content="fitness blog, workout articles, nutrition tips, wellness guides, training programs, exercise library, health advice" />
+        
+        {/* Open Graph tags for social sharing */}
+        <meta property="og:title" content={pageTitle} />
+        <meta property="og:description" content={pageDescription} />
+        <meta property="og:type" content="website" />
+        <meta property="og:url" content={window.location.href} />
+        <meta property="og:site_name" content="Smarty Gym" />
+        
+        {/* Twitter Card tags */}
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content={pageTitle} />
+        <meta name="twitter:description" content={pageDescription} />
+        
+        {/* Canonical URL */}
+        <link rel="canonical" href={window.location.href} />
+      </Helmet>
+      
+      <div className="min-h-screen bg-background">
+        <BackToTop />
       <div className="container mx-auto max-w-6xl px-4 py-8">
         <Button
           variant="ghost"
@@ -206,10 +274,12 @@ export default function Community() {
         
         {!selectedCategory ? (
           <>
-            <h1 className="text-3xl sm:text-4xl font-bold text-center mb-2">Smarty Gym Blog</h1>
-            <p className="text-center text-muted-foreground mb-8">
-              Expert insights on fitness, nutrition, and wellness from our team
-            </p>
+            <header className="text-center mb-8">
+              <h1 className="text-3xl sm:text-4xl font-bold mb-2">Smarty Gym Blog</h1>
+              <p className="text-muted-foreground">
+                Expert insights on fitness, nutrition, and wellness from our team
+              </p>
+            </header>
             
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               {categories.map((category) => {
@@ -217,15 +287,21 @@ export default function Community() {
                 return (
                   <Card
                     key={category.id}
-                    onClick={() => setSelectedCategory(category.id)}
+                    onClick={() => {
+                      setSelectedCategory(category.id);
+                      setSortOrder("newest");
+                    }}
                     className="p-6 cursor-pointer transition-all duration-300 hover:scale-105 hover:shadow-gold bg-card border-border"
+                    role="button"
+                    tabIndex={0}
+                    aria-label={`View ${category.title} articles`}
                   >
                     <div className="flex flex-col items-center text-center space-y-4">
-                      <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center">
+                      <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center" aria-hidden="true">
                         <Icon className="w-8 h-8 text-primary" />
                       </div>
                       <div>
-                        <h3 className="font-semibold text-xl mb-2">{category.title}</h3>
+                        <h2 className="font-semibold text-xl mb-2">{category.title}</h2>
                         <p className="text-sm text-muted-foreground">{category.description}</p>
                         <p className="text-xs text-muted-foreground mt-3">
                           {category.articles.length} articles
@@ -239,71 +315,100 @@ export default function Community() {
           </>
         ) : (
           <>
-            <div className="flex items-center gap-3 mb-6">
-              {selectedCategoryData && (
-                <>
-                  <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center">
-                    <selectedCategoryData.icon className="w-6 h-6 text-primary" />
-                  </div>
-                  <div>
-                    <h1 className="text-2xl sm:text-3xl font-bold">{selectedCategoryData.title}</h1>
-                    <p className="text-sm text-muted-foreground">{selectedCategoryData.description}</p>
-                  </div>
-                </>
-              )}
-            </div>
+            <header className="mb-6">
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
+                <div className="flex items-center gap-3">
+                  {selectedCategoryData && (
+                    <>
+                      <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center" aria-hidden="true">
+                        <selectedCategoryData.icon className="w-6 h-6 text-primary" />
+                      </div>
+                      <div>
+                        <h1 className="text-2xl sm:text-3xl font-bold">{selectedCategoryData.title} Articles</h1>
+                        <p className="text-sm text-muted-foreground">{selectedCategoryData.description}</p>
+                      </div>
+                    </>
+                  )}
+                </div>
+                
+                {/* Filter Dropdown */}
+                <div className="flex items-center gap-2">
+                  <Filter className="h-4 w-4 text-muted-foreground" aria-hidden="true" />
+                  <Select value={sortOrder} onValueChange={setSortOrder}>
+                    <SelectTrigger className="w-[180px]" aria-label="Sort articles">
+                      <SelectValue placeholder="Sort by" />
+                    </SelectTrigger>
+                    <SelectContent className="bg-background border-border z-50">
+                      <SelectItem value="newest">Newest First</SelectItem>
+                      <SelectItem value="oldest">Oldest First</SelectItem>
+                      <SelectItem value="shortest">Shortest Read</SelectItem>
+                      <SelectItem value="longest">Longest Read</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+            </header>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {selectedCategoryData?.articles.map((article) => (
-                <Card 
-                  key={article.id} 
-                  className="overflow-hidden hover:shadow-lg transition-all duration-300 hover:scale-105 flex flex-col h-full cursor-pointer"
-                  onClick={() => navigate(`/article/${article.id}`)}
+            <section className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" aria-label={`${selectedCategoryData?.title} articles`}>
+              {sortedArticles.map((article) => (
+                <article 
+                  key={article.id}
+                  className="group"
                 >
-                  <div className="aspect-video w-full overflow-hidden">
-                    <img 
-                      src={article.image} 
-                      alt={article.title}
-                      className="w-full h-full object-cover"
-                    />
-                  </div>
-                  <div className="p-6 flex flex-col flex-grow">
-                    <h3 className="font-semibold text-lg mb-2 line-clamp-2">{article.title}</h3>
-                    <p className="text-sm text-muted-foreground mb-4 flex-grow line-clamp-3">{article.excerpt}</p>
-                    <div className="flex flex-wrap items-center gap-3 text-xs text-muted-foreground mb-4">
-                      <span className="flex items-center gap-1">
-                        <Clock className="h-3 w-3" />
-                        {article.readTime}
-                      </span>
-                      <span className="flex items-center gap-1">
-                        <Calendar className="h-3 w-3" />
-                        {article.date}
-                      </span>
-                    </div>
-                    <div className="mt-auto" onClick={(e) => e.stopPropagation()}>
-                      <ShareButtons 
-                        title={article.title} 
-                        url={`${window.location.origin}/article/${article.id}`} 
+                  <Card 
+                    className="overflow-hidden hover:shadow-lg transition-all duration-300 hover:scale-105 flex flex-col h-full cursor-pointer"
+                    onClick={() => navigate(`/article/${article.id}`)}
+                    role="button"
+                    tabIndex={0}
+                    aria-label={`Read article: ${article.title}`}
+                  >
+                    <div className="aspect-video w-full overflow-hidden">
+                      <img 
+                        src={article.image} 
+                        alt={`${article.title} - ${article.category} article illustration showing ${article.excerpt}`}
+                        className="w-full h-full object-cover"
+                        loading="lazy"
                       />
                     </div>
-                  </div>
-                </Card>
+                    <div className="p-6 flex flex-col flex-grow">
+                      <h3 className="font-semibold text-lg mb-2 line-clamp-2">{article.title}</h3>
+                      <p className="text-sm text-muted-foreground mb-4 flex-grow line-clamp-3">{article.excerpt}</p>
+                      <div className="flex flex-wrap items-center gap-3 text-xs text-muted-foreground mb-4">
+                        <span className="flex items-center gap-1">
+                          <Clock className="h-3 w-3" aria-hidden="true" />
+                          <time>{article.readTime}</time>
+                        </span>
+                        <span className="flex items-center gap-1">
+                          <Calendar className="h-3 w-3" aria-hidden="true" />
+                          <time dateTime={article.date}>{article.date}</time>
+                        </span>
+                      </div>
+                      <div className="mt-auto" onClick={(e) => e.stopPropagation()}>
+                        <ShareButtons 
+                          title={article.title} 
+                          url={`${window.location.origin}/article/${article.id}`} 
+                        />
+                      </div>
+                    </div>
+                  </Card>
+                </article>
               ))}
-            </div>
+            </section>
           </>
         )}
 
         {/* Bottom CTA */}
-        <div className="bg-card border border-border rounded-xl p-6 mt-12 text-center shadow-soft">
-          <h3 className="text-xl font-semibold mb-2">Train smarter with us</h3>
+        <aside className="bg-card border border-border rounded-xl p-6 mt-12 text-center shadow-soft">
+          <h2 className="text-xl font-semibold mb-2">Train Smarter With Us</h2>
           <p className="text-muted-foreground mb-4">
             Join Smarty Gym Premium for personalized programs and expert guidance
           </p>
-          <Button size="lg" onClick={() => navigate("/auth")}>
+          <Button size="lg" onClick={() => navigate("/auth")} aria-label="Join Smarty Gym Premium">
             Join Premium
           </Button>
-        </div>
+        </aside>
       </div>
     </div>
+    </>
   );
 }
