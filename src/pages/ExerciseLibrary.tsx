@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { Helmet } from "react-helmet";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { ArrowLeft, Play, Pause, Square } from "lucide-react";
@@ -156,7 +157,25 @@ const ExerciseLibrary = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background p-4">
+    <>
+      <Helmet>
+        <title>Exercise Library - Smarty Gym | 100+ Free Exercise Videos | smartygym.com</title>
+        <meta name="description" content="Browse 100+ exercises with video demonstrations. Filter by equipment, body region, movement type, and muscle group. Free exercise library by Haris Falas, Cyprus Sports Scientist." />
+        <meta name="keywords" content="exercise library Cyprus, workout exercises, bodyweight exercises, equipment exercises, exercise videos, smartygym exercises" />
+        
+        <meta property="og:title" content="Exercise Library - Smarty Gym" />
+        <meta property="og:description" content="100+ exercises with video demonstrations and detailed instructions" />
+        <meta property="og:type" content="website" />
+        <meta property="og:url" content="https://smartygym.com/exercise-library" />
+        
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content="Exercise Library - Smarty Gym" />
+        <meta name="twitter:description" content="100+ exercises with video demonstrations and detailed instructions" />
+        
+        <link rel="canonical" href="https://smartygym.com/exercise-library" />
+      </Helmet>
+      
+      <div className="min-h-screen bg-background p-4">
       <div className="max-w-7xl mx-auto py-4 sm:py-8">
         <Button
           variant="ghost"
@@ -382,7 +401,8 @@ const ExerciseLibrary = () => {
           </CardContent>
         </Card>
       </div>
-    </div>
+      </div>
+    </>
   );
 };
 

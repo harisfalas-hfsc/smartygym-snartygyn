@@ -1,4 +1,5 @@
 import { useNavigate } from "react-router-dom";
+import { Helmet } from "react-helmet";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { ArrowLeft, Dumbbell, Flame, Zap, Heart, Move, Activity } from "lucide-react";
@@ -53,7 +54,25 @@ const WorkoutFlow = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background">
+    <>
+      <Helmet>
+        <title>Workouts - Smarty Gym | Free Online Workouts Cyprus | smartygym.com</title>
+        <meta name="description" content="Free online workouts by Haris Falas. Choose from strength, cardio, metabolic, mobility, and challenge workouts. Science-based training programs from Cyprus's premier online fitness platform." />
+        <meta name="keywords" content="free workouts, online workouts Cyprus, strength training, cardio workouts, metabolic training, mobility workouts, smartygym workouts" />
+        
+        <meta property="og:title" content="Workouts - Smarty Gym Cyprus Online Fitness" />
+        <meta property="og:description" content="Free science-based workouts designed by Sports Scientist Haris Falas" />
+        <meta property="og:type" content="website" />
+        <meta property="og:url" content="https://smartygym.com/workout" />
+        
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content="Workouts - Smarty Gym" />
+        <meta name="twitter:description" content="Free science-based workouts designed by Sports Scientist Haris Falas" />
+        
+        <link rel="canonical" href="https://smartygym.com/workout" />
+      </Helmet>
+      
+      <div className="min-h-screen bg-background">
       <PremiumPopup />
       <BackToTop />
       <div className="container mx-auto max-w-6xl px-4 py-8">
@@ -134,7 +153,8 @@ const WorkoutFlow = () => {
           </Button>
         </div>
       </div>
-    </div>
+      </div>
+    </>
   );
 };
 

@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { Helmet } from "react-helmet";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -83,7 +84,25 @@ const OneRMCalculator = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background p-4">
+    <>
+      <Helmet>
+        <title>1RM Calculator - Smarty Gym | Free One Rep Max Calculator | smartygym.com</title>
+        <meta name="description" content="Free 1RM Calculator using Brzycki formula. Calculate your one-rep maximum for any exercise. Science-based fitness tool by Haris Falas, Cyprus Sports Scientist." />
+        <meta name="keywords" content="1rm calculator, one rep max calculator, brzycki formula, strength calculator Cyprus, smartygym calculator" />
+        
+        <meta property="og:title" content="1RM Calculator - Smarty Gym" />
+        <meta property="og:description" content="Free one-rep maximum calculator using Brzycki formula" />
+        <meta property="og:type" content="website" />
+        <meta property="og:url" content="https://smartygym.com/1rm-calculator" />
+        
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content="1RM Calculator - Smarty Gym" />
+        <meta name="twitter:description" content="Free one-rep maximum calculator using Brzycki formula" />
+        
+        <link rel="canonical" href="https://smartygym.com/1rm-calculator" />
+      </Helmet>
+      
+      <div className="min-h-screen bg-background p-4">
       <div className="max-w-2xl mx-auto py-4 sm:py-8">
         <Button
           variant="ghost"
@@ -181,7 +200,8 @@ const OneRMCalculator = () => {
           </CardContent>
         </Card>
       </div>
-    </div>
+      </div>
+    </>
   );
 };
 

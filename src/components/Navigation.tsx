@@ -121,7 +121,7 @@ export const Navigation = () => {
             className="flex items-center cursor-pointer"
             onClick={() => navigate("/")}
           >
-            <img src={smartyGymLogo} alt="Smarty Gym" className="h-14 w-auto" />
+            <img src={smartyGymLogo} alt="Smarty Gym" className="h-16 w-auto" />
           </div>
 
           {/* Desktop Navigation Links */}
@@ -130,7 +130,7 @@ export const Navigation = () => {
             <Button variant="ghost" size="sm" onClick={() => navigate("/workout")}>Workouts</Button>
             <Button variant="ghost" size="sm" onClick={() => navigate("/training-program")}>Programs</Button>
             <Button variant="ghost" size="sm" onClick={() => navigate("/tools")}>Tools</Button>
-            <Button variant="ghost" size="sm" onClick={() => navigate("/community")}>Blog</Button>
+            <Button variant="ghost" size="sm" onClick={() => navigate("/community")}>Community</Button>
             <Button variant="ghost" size="sm" onClick={() => navigate("/contact")}>Contact</Button>
           </nav>
 
@@ -156,7 +156,7 @@ export const Navigation = () => {
                   Tools
                 </Button>
                 <Button variant="ghost" size="lg" onClick={() => handleNavigate("/community")} className="justify-start">
-                  Blog
+                  Community
                 </Button>
                 <Button variant="ghost" size="lg" onClick={() => handleNavigate("/contact")} className="justify-start">
                   Contact

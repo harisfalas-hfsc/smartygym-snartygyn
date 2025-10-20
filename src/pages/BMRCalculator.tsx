@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { Helmet } from "react-helmet";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -90,7 +91,25 @@ const BMRCalculator = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background p-4">
+    <>
+      <Helmet>
+        <title>BMR Calculator - Smarty Gym | Free Basal Metabolic Rate Calculator | smartygym.com</title>
+        <meta name="description" content="Free BMR Calculator using Mifflin-St Jeor equation. Calculate your basal metabolic rate and daily calorie needs. Science-based tool by Haris Falas, Cyprus Sports Scientist." />
+        <meta name="keywords" content="bmr calculator, basal metabolic rate, tdee calculator, calorie calculator Cyprus, smartygym bmr" />
+        
+        <meta property="og:title" content="BMR Calculator - Smarty Gym" />
+        <meta property="og:description" content="Free basal metabolic rate calculator using Mifflin-St Jeor equation" />
+        <meta property="og:type" content="website" />
+        <meta property="og:url" content="https://smartygym.com/bmr-calculator" />
+        
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content="BMR Calculator - Smarty Gym" />
+        <meta name="twitter:description" content="Free basal metabolic rate calculator using Mifflin-St Jeor equation" />
+        
+        <link rel="canonical" href="https://smartygym.com/bmr-calculator" />
+      </Helmet>
+      
+      <div className="min-h-screen bg-background p-4">
       <div className="max-w-2xl mx-auto py-4 sm:py-8">
         <Button
           variant="ghost"
@@ -203,7 +222,8 @@ const BMRCalculator = () => {
           </CardContent>
         </Card>
       </div>
-    </div>
+      </div>
+    </>
   );
 };
 

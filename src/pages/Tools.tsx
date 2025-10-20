@@ -1,4 +1,5 @@
 import { useNavigate } from "react-router-dom";
+import { Helmet } from "react-helmet";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { ArrowLeft, Calculator, Activity, Flame } from "lucide-react";
@@ -31,7 +32,25 @@ const Tools = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-background">
+    <>
+      <Helmet>
+        <title>Fitness Tools - Smarty Gym | Free Calculators Cyprus | smartygym.com</title>
+        <meta name="description" content="Free fitness calculators: 1RM Calculator, BMR Calculator, Macro Tracking Calculator. Science-based tools by Haris Falas for Cyprus and worldwide fitness enthusiasts." />
+        <meta name="keywords" content="1rm calculator, bmr calculator, macro calculator, fitness tools Cyprus, workout calculators, smartygym tools" />
+        
+        <meta property="og:title" content="Fitness Tools - Smarty Gym Cyprus" />
+        <meta property="og:description" content="Free fitness calculators to support your training journey" />
+        <meta property="og:type" content="website" />
+        <meta property="og:url" content="https://smartygym.com/tools" />
+        
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content="Fitness Tools - Smarty Gym" />
+        <meta name="twitter:description" content="Free fitness calculators to support your training journey" />
+        
+        <link rel="canonical" href="https://smartygym.com/tools" />
+      </Helmet>
+      
+      <div className="min-h-screen bg-background">
       <div className="container mx-auto max-w-6xl px-4 py-8">
         <Button
           variant="ghost"
@@ -114,7 +133,8 @@ const Tools = () => {
           </div>
         </Card>
       </div>
-    </div>
+      </div>
+    </>
   );
 };
 

@@ -1,4 +1,5 @@
 import { useNavigate } from "react-router-dom";
+import { Helmet } from "react-helmet";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { ArrowLeft, Heart, Dumbbell, Activity, Flame, User, Move, Scale } from "lucide-react";
@@ -51,7 +52,25 @@ const TrainingProgramFlow = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background">
+    <>
+      <Helmet>
+        <title>Training Programs - Smarty Gym | 6-8 Week Programs Cyprus | smartygym.com</title>
+        <meta name="description" content="Structured 6-8 week training programs by Sports Scientist Haris Falas. Cardio, strength, hypertrophy, weight loss, mobility programs. Cyprus online fitness expertise." />
+        <meta name="keywords" content="training programs Cyprus, workout programs, 6 week programs, 8 week programs, strength programs, weight loss programs, smartygym programs" />
+        
+        <meta property="og:title" content="Training Programs - Smarty Gym Cyprus" />
+        <meta property="og:description" content="Structured training programs designed by Sports Scientist Haris Falas" />
+        <meta property="og:type" content="website" />
+        <meta property="og:url" content="https://smartygym.com/training-program" />
+        
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content="Training Programs - Smarty Gym" />
+        <meta name="twitter:description" content="Structured training programs designed by Sports Scientist Haris Falas" />
+        
+        <link rel="canonical" href="https://smartygym.com/training-program" />
+      </Helmet>
+      
+      <div className="min-h-screen bg-background">
       <BackToTop />
       <div className="container mx-auto max-w-6xl px-4 py-8">
         <Button
@@ -116,7 +135,8 @@ const TrainingProgramFlow = () => {
           </Button>
         </div>
       </div>
-    </div>
+      </div>
+    </>
   );
 };
 

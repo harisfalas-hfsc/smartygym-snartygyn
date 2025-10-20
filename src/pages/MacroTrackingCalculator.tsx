@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { Helmet } from "react-helmet";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -157,7 +158,25 @@ const MacroTrackingCalculator = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background p-4">
+    <>
+      <Helmet>
+        <title>Macro Calculator - Smarty Gym | Free Macro Tracking Calculator | smartygym.com</title>
+        <meta name="description" content="Free Macro Tracking Calculator. Get personalized protein, carbs, and fat recommendations based on your goals. Science-based nutrition tool by Haris Falas, Cyprus Sports Scientist." />
+        <meta name="keywords" content="macro calculator, macronutrient calculator, protein calculator, nutrition calculator Cyprus, calorie tracker, smartygym macro" />
+        
+        <meta property="og:title" content="Macro Calculator - Smarty Gym" />
+        <meta property="og:description" content="Free macronutrient calculator for personalized nutrition recommendations" />
+        <meta property="og:type" content="website" />
+        <meta property="og:url" content="https://smartygym.com/macro-calculator" />
+        
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content="Macro Calculator - Smarty Gym" />
+        <meta name="twitter:description" content="Free macronutrient calculator for personalized nutrition recommendations" />
+        
+        <link rel="canonical" href="https://smartygym.com/macro-calculator" />
+      </Helmet>
+      
+      <div className="min-h-screen bg-background p-4">
       <div className="max-w-2xl mx-auto py-4 sm:py-8">
         <Button
           variant="ghost"
@@ -335,7 +354,8 @@ const MacroTrackingCalculator = () => {
           </CardContent>
         </Card>
       </div>
-    </div>
+      </div>
+    </>
   );
 };
 
