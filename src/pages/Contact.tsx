@@ -125,7 +125,7 @@ const Contact = () => {
 
           {/* Hero Section */}
           <header className="text-center mb-12">
-            <h1 className="text-4xl sm:text-5xl font-bold mb-4">Contact</h1>
+            <h1 className="text-3xl sm:text-4xl font-bold mb-4">Contact</h1>
             <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
               Have questions? Need support? Want to discuss your fitness goals?
             </p>

@@ -66,7 +66,7 @@ const About = () => {
 
         {/* Hero Section */}
         <header className="text-center mb-16">
-          <h1 className="text-4xl sm:text-5xl font-bold mb-4">About Smarty Gym - Cyprus Online Fitness</h1>
+          <h1 className="text-3xl sm:text-4xl font-bold mb-4">About</h1>
           <p className="text-xl text-muted-foreground mb-2">Fitness Without the Chains | smartygym.com</p>
           <p className="text-sm text-muted-foreground">
             Founded by <strong>Haris Falas</strong> – Sports Scientist & Strength and Conditioning Coach | Cyprus Fitness Expert

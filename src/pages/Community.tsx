@@ -275,7 +275,7 @@ export default function Community() {
         {!selectedCategory ? (
           <>
             <header className="text-center mb-8">
-              <h1 className="text-3xl sm:text-4xl font-bold mb-2">Smarty Gym Blog</h1>
+              <h1 className="text-3xl sm:text-4xl font-bold mb-2">Blog</h1>
               <p className="text-muted-foreground">
                 Expert insights on fitness, nutrition, and wellness from our team
               </p>
