@@ -197,24 +197,36 @@ const Index = () => {
       {/* Testimonials Section */}
       <section className="py-12 px-4 bg-background">
         <div className="container mx-auto max-w-4xl">
-          <h2 className="text-2xl font-bold text-center mb-8">What Our Community Says</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <Card className="p-6">
-              <p className="text-sm text-muted-foreground mb-4 italic">
-                "Smarty Gym has transformed how I approach fitness. The workouts are challenging but doable, and I love that I can do them anywhere!"
+          <div className="bg-primary/10 border border-primary/20 rounded-lg p-6">
+            <h2 className="text-2xl font-bold text-center mb-6">What Our Community Says</h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+              <Card className="p-6">
+                <p className="text-sm text-muted-foreground mb-4 italic">
+                  "Smarty Gym has transformed how I approach fitness. The workouts are challenging but doable, and I love that I can do them anywhere!"
+                </p>
+                <p className="font-semibold text-sm">— Alex M., London</p>
+              </Card>
+              <Card className="p-6">
+                <p className="text-sm text-muted-foreground mb-4 italic">
+                  "Finally, a fitness platform that actually understands real people's needs. No gimmicks, just solid training."
+                </p>
+                <p className="font-semibold text-sm">— Maria S., Berlin</p>
+              </Card>
+            </div>
+            <div className="text-center">
+              <p className="text-sm text-muted-foreground mb-4 font-semibold">
+                Trusted by hundreds of athletes and everyday movers worldwide
               </p>
-              <p className="font-semibold text-sm">— Alex M., London</p>
-            </Card>
-            <Card className="p-6">
-              <p className="text-sm text-muted-foreground mb-4 italic">
-                "Finally, a fitness platform that actually understands real people's needs. No gimmicks, just solid training."
-              </p>
-              <p className="font-semibold text-sm">— Maria S., Berlin</p>
-            </Card>
+              <Button 
+                variant="default" 
+                size="sm" 
+                onClick={() => navigate("/community")}
+                aria-label="See more customer reviews"
+              >
+                See More Reviews
+              </Button>
+            </div>
           </div>
-          <p className="text-center text-sm text-muted-foreground mt-6 font-semibold">
-            Trusted by hundreds of athletes and everyday movers worldwide
-          </p>
         </div>
       </section>
 
