@@ -1,17 +1,31 @@
 import { useNavigate } from "react-router-dom";
+import { Helmet } from "react-helmet";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
-import { ArrowLeft, Award, Heart, Users, Target } from "lucide-react";
+import { ArrowLeft, Award, Heart, Users, Target, UserCheck, Brain, Shield, Sparkles, Ban, CheckCircle2 } from "lucide-react";
 import { BackToTop } from "@/components/BackToTop";
 
 const About = () => {
   const navigate = useNavigate();
 
   return (
-    <div className="min-h-screen bg-background">
-      <BackToTop />
-      <div className="container mx-auto max-w-6xl px-4 py-8">
+    <>
+      <Helmet>
+        <title>About Smarty Gym - Human-Crafted Fitness Programs by Haris Falas</title>
+        <meta name="description" content="Meet the team behind Smarty Gym. Every workout is personally designed by Haris Falas, Sports Scientist & S&C Coach - never by AI. Real expertise, real results." />
+        <meta name="keywords" content="Haris Falas, sports scientist, strength conditioning coach, human-designed workouts, no AI fitness, personalized training" />
+        
+        <meta property="og:title" content="About Smarty Gym - Human-Crafted Fitness Programs" />
+        <meta property="og:description" content="Every workout is personally designed by Haris Falas - never by AI. Real expertise, real results." />
+        <meta property="og:type" content="website" />
+        
+        <link rel="canonical" href={window.location.href} />
+      </Helmet>
+      
+      <div className="min-h-screen bg-background">
+        <BackToTop />
+        <div className="container mx-auto max-w-6xl px-4 py-8">
         <Button
           variant="ghost"
           size="sm"
@@ -23,79 +37,212 @@ const About = () => {
         </Button>
 
         {/* Hero Section */}
-        <section className="text-center mb-12">
+        <header className="text-center mb-16">
           <h1 className="text-4xl sm:text-5xl font-bold mb-4">Welcome to Smarty Gym</h1>
-          <p className="text-xl text-muted-foreground">Fitness without the chains</p>
+          <p className="text-xl text-muted-foreground mb-2">Fitness Without the Chains</p>
+          <p className="text-sm text-muted-foreground">
+            Created by Haris Falas – Sports Scientist & Strength and Conditioning Coach
+          </p>
+        </header>
+
+        {/* NO AI Section - Main Differentiator */}
+        <section className="mb-16">
+          <Card className="border-2 border-primary bg-gradient-to-br from-primary/5 to-accent/10 overflow-hidden relative">
+            <div className="absolute top-0 right-0 w-32 h-32 bg-primary/10 rounded-full -mr-16 -mt-16" aria-hidden="true"></div>
+            <div className="absolute bottom-0 left-0 w-24 h-24 bg-accent/20 rounded-full -ml-12 -mb-12" aria-hidden="true"></div>
+            
+            <CardContent className="p-8 md:p-12 relative">
+              <div className="flex items-center justify-center gap-3 mb-6">
+                <div className="w-16 h-16 rounded-full bg-primary/20 flex items-center justify-center">
+                  <UserCheck className="w-8 h-8 text-primary" />
+                </div>
+                <Ban className="w-12 h-12 text-destructive" />
+                <div className="w-16 h-16 rounded-full bg-destructive/10 flex items-center justify-center">
+                  <Brain className="w-8 h-8 text-destructive" />
+                </div>
+              </div>
+              
+              <h2 className="text-3xl md:text-4xl font-bold mb-6 text-center">
+                100% Human. 0% AI.
+              </h2>
+              
+              <div className="max-w-3xl mx-auto space-y-4 text-center mb-8">
+                <p className="text-lg font-semibold text-foreground">
+                  Our workouts and programs are built to fit YOUR life.
+                </p>
+                <p className="text-base leading-relaxed text-muted-foreground">
+                  That's why they work — safe and efficient design, crafted by hand with care to deliver effective results, <strong className="text-foreground">NOT by AI</strong>.
+                </p>
+                <div className="bg-background/80 backdrop-blur-sm p-6 rounded-lg border-2 border-primary/30 mt-6">
+                  <p className="text-lg font-bold text-primary mb-2">
+                    Every program is evidence-based and personally created by Haris Falas.
+                  </p>
+                  <p className="text-base text-muted-foreground">
+                    Never by AI. Never by algorithms. Always by a real human expert who understands YOUR needs.
+                  </p>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 max-w-4xl mx-auto">
+                <div className="flex items-start gap-3 p-4 bg-background/50 rounded-lg border border-primary/20">
+                  <CheckCircle2 className="w-5 h-5 text-primary flex-shrink-0 mt-1" />
+                  <div>
+                    <p className="font-semibold text-sm mb-1">Real Expertise</p>
+                    <p className="text-xs text-muted-foreground">Sports science degree & years of coaching experience</p>
+                  </div>
+                </div>
+                <div className="flex items-start gap-3 p-4 bg-background/50 rounded-lg border border-primary/20">
+                  <CheckCircle2 className="w-5 h-5 text-primary flex-shrink-0 mt-1" />
+                  <div>
+                    <p className="font-semibold text-sm mb-1">Personal Touch</p>
+                    <p className="text-xs text-muted-foreground">Direct access to Haris and the team anytime</p>
+                  </div>
+                </div>
+                <div className="flex items-start gap-3 p-4 bg-background/50 rounded-lg border border-primary/20">
+                  <CheckCircle2 className="w-5 h-5 text-primary flex-shrink-0 mt-1" />
+                  <div>
+                    <p className="font-semibold text-sm mb-1">Not a Robot</p>
+                    <p className="text-xs text-muted-foreground">Real people who care about your progress</p>
+                  </div>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
         </section>
 
-        {/* Mission Statement */}
-        <Card className="mb-12">
-          <CardContent className="p-8">
-            <p className="text-sm text-muted-foreground mb-4 text-center">
-              Created by Haris Falas – Sports Scientist & Strength and Conditioning Coach
+        {/* Mission Statement with Cards */}
+        <section className="mb-16">
+          <div className="text-center mb-10">
+            <h2 className="text-3xl md:text-4xl font-bold mb-4">Our Mission</h2>
+            <p className="text-lg text-muted-foreground max-w-3xl mx-auto">
+              At Smarty Gym, our mission is simple: to provide functional, science-based fitness solutions that fit into your real life.
             </p>
-            <h2 className="text-3xl font-bold mb-4 text-center">Our Mission</h2>
-            <p className="text-lg text-muted-foreground leading-relaxed text-center max-w-3xl mx-auto mb-6">
-              At Smarty Gym our mission is simple: to provide functional, science-based fitness solutions that fit into your real life. 
-              Our workouts and programs are built for real life — whether you're training at home, in the gym, or on the go. 
-              No complicated equipment, no expensive memberships, just effective training that works.
-            </p>
-            <div className="bg-primary/10 p-6 rounded-lg max-w-2xl mx-auto">
-              <p className="text-base font-semibold text-center">
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+            <Card className="hover:shadow-lg transition-shadow">
+              <CardHeader>
+                <div className="w-14 h-14 rounded-full bg-primary/10 flex items-center justify-center mb-4">
+                  <Target className="w-7 h-7 text-primary" />
+                </div>
+                <CardTitle className="text-xl">Built for Real Life</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <CardDescription className="text-base">
+                  Our workouts and programs are built for real life — whether you're training at home, in the gym, or on the go. 
+                  No complicated equipment, no expensive memberships, just effective training that works.
+                </CardDescription>
+              </CardContent>
+            </Card>
+
+            <Card className="hover:shadow-lg transition-shadow">
+              <CardHeader>
+                <div className="w-14 h-14 rounded-full bg-primary/10 flex items-center justify-center mb-4">
+                  <Brain className="w-7 h-7 text-primary" />
+                </div>
+                <CardTitle className="text-xl">Science-Based Approach</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <CardDescription className="text-base">
+                  Every workout is grounded in sports science and designed with evidence-based training principles. 
+                  We don't follow trends — we follow what actually works.
+                </CardDescription>
+              </CardContent>
+            </Card>
+
+            <Card className="hover:shadow-lg transition-shadow">
+              <CardHeader>
+                <div className="w-14 h-14 rounded-full bg-primary/10 flex items-center justify-center mb-4">
+                  <Users className="w-7 h-7 text-primary" />
+                </div>
+                <CardTitle className="text-xl">Accessible to Everyone</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <CardDescription className="text-base">
+                  Fitness for everyone, anywhere. Train smarter, move better, live stronger — 
+                  no matter your starting point or available equipment.
+                </CardDescription>
+              </CardContent>
+            </Card>
+
+            <Card className="hover:shadow-lg transition-shadow">
+              <CardHeader>
+                <div className="w-14 h-14 rounded-full bg-primary/10 flex items-center justify-center mb-4">
+                  <Shield className="w-7 h-7 text-primary" />
+                </div>
+                <CardTitle className="text-xl">Safe & Effective</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <CardDescription className="text-base">
+                  Crafted by hand with care to deliver results safely. Every exercise, every progression, 
+                  every program is designed with your wellbeing in mind.
+                </CardDescription>
+              </CardContent>
+            </Card>
+          </div>
+
+          <Card className="bg-gradient-to-r from-primary/10 to-accent/10 border-2 border-primary/20">
+            <CardContent className="p-8">
+              <div className="flex items-center justify-center gap-3 mb-4">
+                <Sparkles className="w-6 h-6 text-primary" />
+                <h3 className="text-xl font-bold text-center">The Smarty Gym Promise</h3>
+                <Sparkles className="w-6 h-6 text-primary" />
+              </div>
+              <p className="text-base font-semibold text-center max-w-3xl mx-auto">
                 At Smarty Gym, we bring science-based functional training to everyone, everywhere. 
                 Train smarter. Move better. Live stronger.
               </p>
-            </div>
-          </CardContent>
-        </Card>
+            </CardContent>
+          </Card>
+        </section>
 
         {/* Core Values */}
-        <section className="mb-12">
+        <section className="mb-16">
           <h2 className="text-3xl font-bold mb-8 text-center">What We Stand For</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            <Card className="text-center">
+            <Card className="text-center hover:shadow-lg transition-all hover:-translate-y-1">
               <CardHeader>
                 <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-4">
                   <Award className="w-8 h-8 text-primary" />
                 </div>
-                <CardTitle>Science-Based</CardTitle>
+                <CardTitle>Evidence-Based</CardTitle>
               </CardHeader>
               <CardContent>
                 <p className="text-sm text-muted-foreground">
-                  Every workout is designed using proven training principles and sports science.
+                  Every workout is designed using proven training principles and sports science research.
                 </p>
               </CardContent>
             </Card>
 
-            <Card className="text-center">
+            <Card className="text-center hover:shadow-lg transition-all hover:-translate-y-1">
               <CardHeader>
                 <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-4">
                   <Heart className="w-8 h-8 text-primary" />
                 </div>
-                <CardTitle>Functional</CardTitle>
+                <CardTitle>Functional Training</CardTitle>
               </CardHeader>
               <CardContent>
                 <p className="text-sm text-muted-foreground">
-                  Train for real-life movements that improve your daily performance.
+                  Train for real-life movements that improve your daily performance and quality of life.
                 </p>
               </CardContent>
             </Card>
 
-            <Card className="text-center">
+            <Card className="text-center hover:shadow-lg transition-all hover:-translate-y-1">
               <CardHeader>
                 <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-4">
-                  <Users className="w-8 h-8 text-primary" />
+                  <UserCheck className="w-8 h-8 text-primary" />
                 </div>
-                <CardTitle>Accessible</CardTitle>
+                <CardTitle>Human Connection</CardTitle>
               </CardHeader>
               <CardContent>
                 <p className="text-sm text-muted-foreground">
-                  Fitness for everyone, anywhere — no gym required, no chains attached.
+                  Real coaches, real support, real results — know who's behind your program and reach them anytime.
                 </p>
               </CardContent>
             </Card>
 
-            <Card className="text-center">
+            <Card className="text-center hover:shadow-lg transition-all hover:-translate-y-1">
               <CardHeader>
                 <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-4">
                   <Target className="w-8 h-8 text-primary" />
@@ -104,7 +251,7 @@ const About = () => {
               </CardHeader>
               <CardContent>
                 <p className="text-sm text-muted-foreground">
-                  Focused on measurable progress and sustainable fitness habits.
+                  Focused on measurable progress and sustainable fitness habits that last.
                 </p>
               </CardContent>
             </Card>
@@ -112,30 +259,60 @@ const About = () => {
         </section>
 
         {/* Message from Head Coach */}
-        <Card className="mb-12 bg-primary/5">
-          <CardHeader>
-            <CardTitle className="text-2xl">Message from the Head Coach</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <p className="text-lg leading-relaxed">
-              <strong>Haris Falas - Sports Scientist & Strength & Conditioning Coach</strong>
-            </p>
-            <p className="text-muted-foreground leading-relaxed">
-              Welcome to Smarty Gym! As a sports scientist and S&C coach, I've spent years studying what truly works in fitness. 
-              I created Smarty Gym because I believe everyone deserves access to quality, evidence-based training — 
-              without the need for expensive gym memberships or complicated equipment.
-            </p>
-            <p className="text-muted-foreground leading-relaxed">
-              Our programs are designed to be practical, effective, and sustainable. Whether you're just starting your fitness journey 
-              or you're an experienced athlete looking to optimize your training, Smarty Gym has something for you.
-            </p>
-            <p className="text-muted-foreground leading-relaxed">
-              My goal is to help you build a stronger, healthier body that serves you in everyday life. 
-              Let's train smarter together.
-            </p>
-            <p className="font-semibold">- Haris Falas, Founder HFSC & SMARTY GYM</p>
-          </CardContent>
-        </Card>
+        <section className="mb-16">
+          <Card className="bg-gradient-to-br from-primary/5 to-accent/5 border-2 border-primary/20 overflow-hidden relative">
+            <div className="absolute top-0 right-0 w-40 h-40 bg-primary/5 rounded-full -mr-20 -mt-20" aria-hidden="true"></div>
+            
+            <CardHeader className="relative">
+              <div className="flex items-center gap-4 mb-4">
+                <div className="w-20 h-20 rounded-full bg-primary/20 flex items-center justify-center">
+                  <UserCheck className="w-10 h-10 text-primary" />
+                </div>
+                <div>
+                  <CardTitle className="text-2xl md:text-3xl">Meet the Founder</CardTitle>
+                  <p className="text-muted-foreground">Your Personal Coach & Program Designer</p>
+                </div>
+              </div>
+            </CardHeader>
+            
+            <CardContent className="space-y-4 relative">
+              <div className="bg-background/80 backdrop-blur-sm p-4 rounded-lg border border-primary/20">
+                <p className="text-lg font-bold mb-1">Haris Falas</p>
+                <p className="text-sm text-muted-foreground">Sports Scientist & Strength & Conditioning Coach</p>
+              </div>
+              
+              <p className="text-base leading-relaxed">
+                Welcome to Smarty Gym! As a sports scientist and S&C coach, I've spent years studying what truly works in fitness. 
+                I created Smarty Gym because I believe everyone deserves access to quality, evidence-based training — 
+                without the need for expensive gym memberships or complicated equipment.
+              </p>
+              
+              <div className="bg-primary/10 p-4 rounded-lg border-l-4 border-primary">
+                <p className="text-base leading-relaxed font-medium">
+                  Every single program you see here? I designed it myself. No AI. No automation. No copy-paste templates. 
+                  Just years of education, experience, and a genuine commitment to YOUR success.
+                </p>
+              </div>
+              
+              <p className="text-base leading-relaxed">
+                Our programs are designed to be practical, effective, and sustainable. Whether you're just starting your fitness journey 
+                or you're an experienced athlete looking to optimize your training, Smarty Gym has something for you.
+              </p>
+              
+              <p className="text-base leading-relaxed">
+                My goal is to help you build a stronger, healthier body that serves you in everyday life. 
+                And unlike AI-generated programs, you can reach out to me directly anytime you need guidance or support.
+              </p>
+              
+              <div className="flex items-center gap-3 pt-4">
+                <div className="h-px flex-grow bg-border"></div>
+                <p className="font-bold text-primary">Haris Falas</p>
+                <div className="h-px flex-grow bg-border"></div>
+              </div>
+              <p className="text-center text-sm text-muted-foreground">Founder, HFSC & SMARTY GYM</p>
+            </CardContent>
+          </Card>
+        </section>
 
         {/* FAQ Section */}
         <section className="mb-12">
@@ -164,8 +341,9 @@ const About = () => {
                 <AccordionItem value="item-3">
                   <AccordionTrigger>What makes Smarty Gym different?</AccordionTrigger>
                   <AccordionContent>
-                    Smarty Gym combines sports science with practical functionality. Every workout is designed by 
-                    qualified professionals with your real-life needs in mind. We focus on sustainable progress, 
+                    <strong>We're 100% human, 0% AI.</strong> Every workout is personally designed by Haris Falas, 
+                    a qualified Sports Scientist and S&C Coach — never by algorithms or AI. You get real expertise, 
+                    real support, and direct access to the person who created your program. We focus on sustainable progress, 
                     not quick fixes or unrealistic promises.
                   </AccordionContent>
                 </AccordionItem>
@@ -207,7 +385,9 @@ const About = () => {
                   <AccordionTrigger>Who created Smarty Gym?</AccordionTrigger>
                   <AccordionContent>
                     Smarty Gym was founded by Haris Falas, a certified Sports Scientist and Strength & Conditioning Coach. 
-                    All programs are designed using evidence-based training principles and years of coaching experience.
+                    <strong>Every single program is personally designed by Haris himself — never by AI.</strong> All programs 
+                    are created using evidence-based training principles and years of hands-on coaching experience. You know 
+                    exactly who's behind your training, and you can reach out to him directly anytime.
                   </AccordionContent>
                 </AccordionItem>
               </Accordion>
@@ -216,18 +396,26 @@ const About = () => {
         </section>
 
         {/* CTA Section */}
-        <Card className="bg-primary/10 border-primary/20">
-          <CardContent className="p-8 text-center">
-            <h3 className="text-2xl font-bold mb-4">Ready to Start Your Journey?</h3>
-            <p className="text-muted-foreground mb-6 max-w-2xl mx-auto">
-              Join thousands of people who are training smarter with Smarty Gym. 
-              Start with free workouts or unlock everything with Premium.
+        <Card className="bg-gradient-to-r from-primary/10 to-accent/10 border-2 border-primary/20">
+          <CardContent className="p-8 md:p-12 text-center">
+            <div className="flex items-center justify-center gap-2 mb-4">
+              <Sparkles className="w-6 h-6 text-primary" />
+              <h2 className="text-2xl md:text-3xl font-bold">Ready to Start Your Journey?</h2>
+              <Sparkles className="w-6 h-6 text-primary" />
+            </div>
+            <p className="text-base md:text-lg text-muted-foreground mb-2 max-w-2xl mx-auto">
+              Join thousands of people who are training smarter with Smarty Gym.
+            </p>
+            <p className="text-sm font-semibold text-primary mb-6 max-w-2xl mx-auto">
+              Work with a real coach who designed every program personally — not an AI.
             </p>
             <div className="flex gap-4 justify-center flex-wrap">
-              <Button size="lg" onClick={() => navigate("/workout")}>
+              <Button size="lg" onClick={() => navigate("/workout")} className="gap-2">
+                <Target className="w-5 h-5" />
                 Try Free Workouts
               </Button>
-              <Button size="lg" variant="outline" onClick={() => navigate("/auth")}>
+              <Button size="lg" variant="outline" onClick={() => navigate("/auth")} className="gap-2">
+                <UserCheck className="w-5 h-5" />
                 Join Premium
               </Button>
             </div>
@@ -235,6 +423,7 @@ const About = () => {
         </Card>
       </div>
     </div>
+    </>
   );
 };
 
