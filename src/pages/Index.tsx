@@ -195,7 +195,7 @@ const Index = () => {
         </section>
 
       {/* Testimonials Section */}
-      <section className="py-12 px-4 bg-background">
+      <section className="py-8 px-4 bg-background">
         <div className="container mx-auto max-w-4xl">
           <div className="bg-primary/10 border border-primary/20 rounded-lg p-6">
             <h2 className="text-2xl font-bold text-center mb-6">What Our Community Says</h2>
@@ -232,15 +232,15 @@ const Index = () => {
 
 
       {/* Main Content */}
-      <main className="py-8 sm:py-12 px-4">
+      <main className="py-8 px-4">
         <div className="container mx-auto max-w-6xl">
-          <div className="text-center mb-6 sm:mb-12 px-4">
+          <div className="text-center mb-8 px-4">
             
             
           </div>
 
           {/* Services Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 mb-8 sm:mb-12">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 mb-8">
             {services.map(service => <ServiceCard key={service.id} icon={service.icon} title={service.title} description={service.description} onClick={() => handleServiceSelect(service.id)} />)}
           </div>
 
@@ -282,7 +282,7 @@ const Index = () => {
       </main>
 
       {/* Footer */}
-      <footer className="py-8 px-4 border-t border-border mt-12">
+      <footer className="py-8 px-4 border-t border-border mt-8">
         <div className="container mx-auto max-w-6xl">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-8">
             {/* About Haris Card */}
