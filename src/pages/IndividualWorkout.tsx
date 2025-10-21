@@ -89,16 +89,39 @@ const IndividualWorkout = () => {
     }
   ];
 
-  const planContent = `This comprehensive workout is designed to help you achieve your fitness goals through a structured and progressive approach.
+  // Get specific workout details and descriptions based on workout ID
+  const getWorkoutDescription = (workoutId: string) => {
+    if (workoutId === "iron-core-003") {
+      return `A strength-focused workout targeting major muscle groups. Builds raw power, muscular endurance, and structural integrity. Ideal for intermediate to advanced clients.
 
-The workout combines cardiovascular exercises, strength training, and mobility work to create a well-rounded fitness program. Each exercise has been carefully selected to maximize effectiveness while minimizing risk of injury.
+🏋️‍♂️ Format: Traditional Sets & Reps
+Structure: 3 Sets per exercise
+Rest Between Sets: 60–90s
 
-Duration: 30-45 minutes
-Equipment: As specified in the workout type
-Target Areas: Full body conditioning
-Intensity: Adjustable based on your fitness level
+Exercises:
+• Barbell Deadlifts – 8 reps
+• Dumbbell Bench Press – 10 reps
+• Barbell Squats – 8 reps
+• Dumbbell Shoulder Press – 10 reps
+• Weighted Plank Hold – 30s
 
-This program is suitable for individuals who have completed their PAR-Q+ assessment and received clearance to exercise. The workout can be modified to match your current fitness level by adjusting work and rest periods, rounds, and exercise intensity.`;
+Warm-Up & Mobility: 10 mins
+Main Strength Block: 40 mins
+Cool-Down & Stretch: 10 mins
+
+📋 Instructions
+Warm up thoroughly. Use progressive overload. Maintain strict form.
+
+⚠️ Tips
+• Never compromise form for heavier weights.
+• Use a spotter for bench press if needed.
+• Engage glutes and core during squats and deadlifts.`;
+    }
+    
+    return `This comprehensive workout is designed to help you achieve your fitness goals through a structured and progressive approach.`;
+  };
+
+  const planContent = getWorkoutDescription(id || "");
 
   // Get specific workout details based on workout ID
   const getWorkoutDetails = (workoutType: string, workoutId: string) => {

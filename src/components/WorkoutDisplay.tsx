@@ -3,8 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
-import { Play, Pause, RotateCcw, Star, ChevronDown } from "lucide-react";
+import { Play, Pause, RotateCcw, Star } from "lucide-react";
 import workoutHero from "@/assets/workout-hero.jpg";
 import { ParQQuestionnaire } from "@/components/ParQQuestionnaire";
 
@@ -371,7 +370,21 @@ export const WorkoutDisplay = ({ exercises, planContent, title = "Workout", seri
 
       {/* Workout Content */}
       <div className="space-y-6 mt-8">
-        {/* Detailed Workout Plan (for single workouts) */}
+        {/* Description (if provided) */}
+        {planContent && (
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2 text-2xl">
+                🔍 Description
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="prose prose-sm max-w-none">
+              <p className="text-base leading-relaxed whitespace-pre-wrap">{planContent}</p>
+            </CardContent>
+          </Card>
+        )}
+
+        {/* Detailed Workout Plan (for single workouts) - Only user-provided content */}
         {workoutDetails && (
           <Card>
             <CardHeader>
@@ -380,81 +393,27 @@ export const WorkoutDisplay = ({ exercises, planContent, title = "Workout", seri
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
-              {/* Warm-Up Section */}
-              <Collapsible defaultOpen>
-                <CollapsibleTrigger className="flex items-center justify-between w-full p-4 bg-muted/50 rounded-lg hover:bg-muted">
-                  <h3 className="font-bold text-lg">🔥 Warm-Up</h3>
-                  <ChevronDown className="h-5 w-5 transition-transform" />
-                </CollapsibleTrigger>
-                <CollapsibleContent className="p-4">
-                  <ul className="space-y-2 text-sm list-disc list-inside">
-                    <li>5-10 minutes light cardio (jogging, jumping jacks, or cycling)</li>
-                    <li>Dynamic stretches focusing on major muscle groups</li>
-                    <li>Joint mobility exercises (arm circles, leg swings)</li>
-                  </ul>
-                </CollapsibleContent>
-              </Collapsible>
-
-              {/* Main Workout Section */}
-              <Collapsible defaultOpen>
-                <CollapsibleTrigger className="flex items-center justify-between w-full p-4 bg-primary/10 rounded-lg hover:bg-primary/20">
-                  <h3 className="font-bold text-lg">💪 Main Workout</h3>
-                  <ChevronDown className="h-5 w-5 transition-transform" />
-                </CollapsibleTrigger>
-                <CollapsibleContent className="p-4 space-y-4">
-                  {workoutDetails.exercises.map((exercise, index) => (
-                    <div key={index} className="border-l-4 border-primary pl-4 py-2">
-                      <h4 className="font-bold text-lg mb-2">{exercise.name}</h4>
-                      <div className="grid grid-cols-1 md:grid-cols-3 gap-2 text-sm">
-                        <div>
-                          <span className="font-semibold text-primary">Sets:</span> {exercise.sets}
-                        </div>
-                        <div>
-                          <span className="font-semibold text-primary">Reps:</span> {exercise.reps}
-                        </div>
-                        <div>
-                          <span className="font-semibold text-primary">Rest:</span> {exercise.rest}
-                        </div>
-                      </div>
-                      {exercise.notes && (
-                        <p className="text-sm text-muted-foreground mt-2 italic">
-                          💡 {exercise.notes}
-                        </p>
-                      )}
+              {workoutDetails.exercises.map((exercise, index) => (
+                <div key={index} className="border-l-4 border-primary pl-4 py-2">
+                  <h4 className="font-bold text-lg mb-2">{exercise.name}</h4>
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-2 text-sm">
+                    <div>
+                      <span className="font-semibold text-primary">Sets:</span> {exercise.sets}
                     </div>
-                  ))}
-                </CollapsibleContent>
-              </Collapsible>
-
-              {/* Complementary Circuit Section */}
-              <Collapsible defaultOpen>
-                <CollapsibleTrigger className="flex items-center justify-between w-full p-4 bg-muted/50 rounded-lg hover:bg-muted">
-                  <h3 className="font-bold text-lg">⚡ Complementary Circuit</h3>
-                  <ChevronDown className="h-5 w-5 transition-transform" />
-                </CollapsibleTrigger>
-                <CollapsibleContent className="p-4">
-                  <p className="text-sm mb-2">Complete one of the following:</p>
-                  <ul className="space-y-2 text-sm list-disc list-inside">
-                    <li><strong>AMRAP (10 min):</strong> As many rounds as possible of a mini-circuit</li>
-                    <li><strong>Tabata (4 min):</strong> 8 rounds of 20s work / 10s rest</li>
-                  </ul>
-                </CollapsibleContent>
-              </Collapsible>
-
-              {/* Cool-Down Section */}
-              <Collapsible defaultOpen>
-                <CollapsibleTrigger className="flex items-center justify-between w-full p-4 bg-muted/50 rounded-lg hover:bg-muted">
-                  <h3 className="font-bold text-lg">🧘 Cool-Down</h3>
-                  <ChevronDown className="h-5 w-5 transition-transform" />
-                </CollapsibleTrigger>
-                <CollapsibleContent className="p-4">
-                  <ul className="space-y-2 text-sm list-disc list-inside">
-                    <li>5-10 minutes light cardio to bring heart rate down</li>
-                    <li>Static stretches holding each for 20-30 seconds</li>
-                    <li>Deep breathing exercises for recovery</li>
-                  </ul>
-                </CollapsibleContent>
-              </Collapsible>
+                    <div>
+                      <span className="font-semibold text-primary">Reps:</span> {exercise.reps}
+                    </div>
+                    <div>
+                      <span className="font-semibold text-primary">Rest:</span> {exercise.rest}
+                    </div>
+                  </div>
+                  {exercise.notes && (
+                    <p className="text-sm text-muted-foreground mt-2 italic">
+                      💡 {exercise.notes}
+                    </p>
+                  )}
+                </div>
+              ))}
             </CardContent>
           </Card>
         )}
@@ -508,54 +467,6 @@ export const WorkoutDisplay = ({ exercises, planContent, title = "Workout", seri
             </CardContent>
           </Card>
         )}
-
-        {/* Program Description */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2 text-2xl">
-              📋 Program Description
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="prose prose-sm max-w-none">
-            <p className="text-base leading-relaxed whitespace-pre-wrap">{planContent}</p>
-          </CardContent>
-        </Card>
-
-        {/* Execution Tips */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2 text-2xl">
-              💡 Execution Tips & Safety
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="prose prose-sm max-w-none">
-            <div className="space-y-3 text-base">
-              <p className="font-semibold text-primary">What to Focus On:</p>
-              <ul className="space-y-2 ml-4">
-                <li>Maintain proper form throughout each exercise - quality over quantity</li>
-                <li>Control your breathing: exhale during exertion, inhale during the easier phase</li>
-                <li>Warm up for 5-10 minutes before starting this workout</li>
-                <li>Stay hydrated - drink water before, during, and after your session</li>
-              </ul>
-              
-              <p className="font-semibold text-primary mt-4">What to Avoid:</p>
-              <ul className="space-y-2 ml-4">
-                <li>Don't rush through movements - maintain controlled tempo</li>
-                <li>Avoid exercising if you're feeling unwell or experiencing pain</li>
-                <li>Don't skip rest days - recovery is essential for progress</li>
-                <li>Never exercise immediately after eating a large meal</li>
-              </ul>
-
-              <p className="font-semibold text-primary mt-4">Important Considerations:</p>
-              <ul className="space-y-2 ml-4">
-                <li>Listen to your body and adjust intensity as needed</li>
-                <li>If you feel sharp pain (not muscle fatigue), stop immediately</li>
-                <li>Progress gradually - don't increase intensity too quickly</li>
-                <li>Cool down and stretch after completing the workout</li>
-              </ul>
-            </div>
-          </CardContent>
-        </Card>
 
         {/* PAR-Q+ Questionnaire */}
         <ParQQuestionnaire />
