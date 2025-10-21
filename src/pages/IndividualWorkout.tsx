@@ -10,7 +10,7 @@ import { ShareButtons } from "@/components/ShareButtons";
 const IndividualWorkout = () => {
   const navigate = useNavigate();
   const { type, id } = useParams();
-  const isFreeWorkout = id?.includes("-free") || id === "strength-free" || id === "calorie-burning-free" || id === "metabolic-free" || id === "cardio-free" || id === "mobility-free" || id === "challenge-free";
+  const isFreeWorkout = id?.includes("-free");
 
   // Sample workout names based on type and id
   const workoutNames: { [key: string]: { [key: string]: { name: string; difficulty: number; serial: string } } } = {
@@ -408,6 +408,55 @@ This program is suitable for individuals who have completed their PAR-Q+ assessm
       };
     }
 
+    if (workoutId === "pulse-igniter-001") {
+      return {
+        exercises: [
+          {
+            name: "Tabata Block 1: Jump Rope",
+            sets: "8 rounds",
+            reps: "20s work / 10s rest",
+            rest: "1 min after block",
+            notes: "Complete 8 rounds (4 mins total). Work: 20s max effort. Rest: 10s. Use timer app for precision."
+          },
+          {
+            name: "Tabata Block 2: High Knees",
+            sets: "8 rounds",
+            reps: "20s work / 10s rest",
+            rest: "1 min after block",
+            notes: "Drive knees to hip level. Maintain intensity throughout all 8 rounds."
+          },
+          {
+            name: "Tabata Block 3: Mountain Climbers",
+            sets: "8 rounds",
+            reps: "20s work / 10s rest",
+            rest: "1 min after block",
+            notes: "Keep core engaged and hips level. Fast alternating knee drives."
+          },
+          {
+            name: "Tabata Block 4: Burpees",
+            sets: "8 rounds",
+            reps: "20s work / 10s rest",
+            rest: "1 min after block",
+            notes: "Full burpees with jump. Modify by stepping back if needed."
+          },
+          {
+            name: "Tabata Block 5: Jumping Jacks",
+            sets: "8 rounds",
+            reps: "20s work / 10s rest",
+            rest: "1 min after block",
+            notes: "Keep steady rhythm. Focus on controlled landing."
+          },
+          {
+            name: "Tabata Block 6: Skater Hops",
+            sets: "8 rounds",
+            reps: "20s work / 10s rest",
+            rest: "Complete",
+            notes: "Lateral jumps side to side. Land softly and avoid locking knees."
+          }
+        ]
+      };
+    }
+
     if (workoutId === "1" && workoutType === "cardio") {
       return {
         exercises: [
@@ -445,6 +494,241 @@ This program is suitable for individuals who have completed their PAR-Q+ assessm
             reps: "5 minutes",
             rest: "0s",
             notes: "Walk and static stretching for major muscle groups."
+          }
+        ]
+      };
+    }
+
+    // CALORIE BURNING - FAT FURNACE
+    if (workoutId === "fat-furnace-002") {
+      return {
+        exercises: [
+          {
+            name: "Warm-Up",
+            sets: "1",
+            reps: "5 minutes",
+            rest: "0s",
+            notes: "Dynamic movements to prepare body for high-intensity work."
+          },
+          {
+            name: "AMRAP Round 1: Dumbbell Thrusters",
+            sets: "AMRAP 30 mins",
+            reps: "12 reps",
+            rest: "minimal",
+            notes: "Squat to overhead press. Use moderate weight. Part of continuous circuit."
+          },
+          {
+            name: "AMRAP Round 1: Jump Squats",
+            sets: "continue",
+            reps: "15 reps",
+            rest: "minimal",
+            notes: "Explosive power. Land softly and immediately go into next rep."
+          },
+          {
+            name: "AMRAP Round 1: Dumbbell Renegade Rows",
+            sets: "continue",
+            reps: "10 reps/side",
+            rest: "minimal",
+            notes: "In plank position with dumbbells. Row one side then the other. Keep hips stable."
+          },
+          {
+            name: "AMRAP Round 1: Jump Lunges",
+            sets: "continue",
+            reps: "12 reps/leg",
+            rest: "minimal",
+            notes: "Switch legs mid-air. Focus on controlled landing."
+          },
+          {
+            name: "AMRAP Round 1: Plank to Push-Up",
+            sets: "continue",
+            reps: "10 reps",
+            rest: "as needed",
+            notes: "From forearm plank to high plank. Complete as many full rounds as possible in 30 mins."
+          },
+          {
+            name: "Challenge Finisher: 100 Jumping Jacks",
+            sets: "1",
+            reps: "100 total",
+            rest: "as needed",
+            notes: "Break into sets if needed. Complete all 100."
+          },
+          {
+            name: "Challenge Finisher: 50 Mountain Climbers",
+            sets: "1",
+            reps: "50 total",
+            rest: "as needed",
+            notes: "Count each knee drive. Total of 50."
+          },
+          {
+            name: "Challenge Finisher: 25 Burpees",
+            sets: "1",
+            reps: "25 total",
+            rest: "Complete",
+            notes: "Final push. Complete all 25 burpees to finish."
+          },
+          {
+            name: "Cool Down",
+            sets: "1",
+            reps: "5 minutes",
+            rest: "0s",
+            notes: "Light stretching and breathing exercises."
+          }
+        ]
+      };
+    }
+
+    // STRENGTH - IRON CORE
+    if (workoutId === "iron-core-003") {
+      return {
+        exercises: [
+          {
+            name: "Warm-Up & Mobility",
+            sets: "1",
+            reps: "10 minutes",
+            rest: "0s",
+            notes: "Dynamic stretches, joint rotations, and activation exercises. Prepare for heavy loads."
+          },
+          {
+            name: "Barbell Deadlifts",
+            sets: "3",
+            reps: "8 reps",
+            rest: "60-90s",
+            notes: "Keep bar close to body. Engage glutes and core. Maintain neutral spine throughout."
+          },
+          {
+            name: "Dumbbell Bench Press",
+            sets: "3",
+            reps: "10 reps",
+            rest: "60-90s",
+            notes: "Control the weight. Lower until elbows at 90 degrees. Press up explosively."
+          },
+          {
+            name: "Barbell Squats",
+            sets: "3",
+            reps: "8 reps",
+            rest: "60-90s",
+            notes: "Bar on upper back. Squat to parallel or below. Drive through heels."
+          },
+          {
+            name: "Dumbbell Shoulder Press",
+            sets: "3",
+            reps: "10 reps",
+            rest: "60-90s",
+            notes: "Press overhead while keeping core tight. Control the descent."
+          },
+          {
+            name: "Weighted Plank Hold",
+            sets: "3",
+            reps: "30s hold",
+            rest: "60s",
+            notes: "Place weight plate on back. Maintain straight line from head to heels."
+          },
+          {
+            name: "Cool-Down & Stretch",
+            sets: "1",
+            reps: "10 minutes",
+            rest: "0s",
+            notes: "Static stretches for all major muscle groups worked. Focus on breathing."
+          }
+        ]
+      };
+    }
+
+    // METABOLIC - METABOSHOCK
+    if (workoutId === "metaboshock-004") {
+      return {
+        exercises: [
+          {
+            name: "Minute 1: Kettlebell Swings",
+            sets: "Repeat 3x",
+            reps: "20 reps",
+            rest: "remainder of minute",
+            notes: "Hip-driven movement. Power from hips, not arms. Complete reps then rest until next minute."
+          },
+          {
+            name: "Minute 2: TRX Rows",
+            sets: "Repeat 3x",
+            reps: "15 reps",
+            rest: "remainder of minute",
+            notes: "Adjust straps for proper tension. Pull chest to handles. Control descent."
+          },
+          {
+            name: "Minute 3: Jump Squats",
+            sets: "Repeat 3x",
+            reps: "20 reps",
+            rest: "remainder of minute",
+            notes: "Explosive jump from squat. Land softly with controlled descent."
+          },
+          {
+            name: "Minute 4: TRX Push-Ups",
+            sets: "Repeat 3x",
+            reps: "15 reps",
+            rest: "remainder of minute",
+            notes: "Hands in TRX straps. Engage core for stability. Press up explosively."
+          },
+          {
+            name: "Minute 5: Strategic Recovery",
+            sets: "Repeat 3x",
+            reps: "Full minute",
+            rest: "60s",
+            notes: "Complete rest. Breathe deeply. Prepare for next cycle. Total: 3 full cycles (15 mins)."
+          }
+        ]
+      };
+    }
+
+    // STRENGTH - POWER SURGE
+    if (workoutId === "power-surge-005") {
+      return {
+        exercises: [
+          {
+            name: "Warm-Up",
+            sets: "1",
+            reps: "5 minutes",
+            rest: "0s",
+            notes: "Dynamic movements and joint mobility. Prepare for explosive work."
+          },
+          {
+            name: "Circuit Round 1: Medicine Ball Slams",
+            sets: "5 rounds",
+            reps: "15 reps",
+            rest: "30s",
+            notes: "Explosive overhead slam. Pick up and repeat. 30s work / 30s rest format."
+          },
+          {
+            name: "Circuit Round 1: Band-Resisted Sprints",
+            sets: "continue",
+            reps: "20m x 3",
+            rest: "30s",
+            notes: "Attach band around waist. Sprint against resistance for 20m. Walk back. Repeat 3x."
+          },
+          {
+            name: "Circuit Round 1: Wall Ball Throws",
+            sets: "continue",
+            reps: "12 reps",
+            rest: "30s",
+            notes: "Squat and explosively throw ball to wall target. Catch and repeat."
+          },
+          {
+            name: "Circuit Round 1: Broad Jumps",
+            sets: "continue",
+            reps: "6 reps",
+            rest: "30s",
+            notes: "Maximum distance jump. Land softly. Reset and repeat."
+          },
+          {
+            name: "Circuit Round 1: Plyo Push-Ups",
+            sets: "continue",
+            reps: "10 reps",
+            rest: "30s then next round",
+            notes: "Explosive push-up. Hands leave ground. Complete 5 full rounds of all exercises."
+          },
+          {
+            name: "Cool Down",
+            sets: "1",
+            reps: "5 minutes",
+            rest: "0s",
+            notes: "Light movement and stretching."
           }
         ]
       };
@@ -495,6 +779,69 @@ This program is suitable for individuals who have completed their PAR-Q+ assessm
             reps: "8 reps",
             rest: "30s",
             notes: "Flow between positions. Stretches spine, hips, and shoulders."
+          }
+        ]
+      };
+    }
+
+    if (workoutId === "flowforge-006") {
+      return {
+        exercises: [
+          {
+            name: "Warm-Up & Breathwork",
+            sets: "1",
+            reps: "10 minutes",
+            rest: "0s",
+            notes: "Deep breathing exercises and light movement to prepare body and mind."
+          },
+          {
+            name: "Round 1: Band Shoulder Dislocates",
+            sets: "2 rounds",
+            reps: "10 reps",
+            rest: "minimal",
+            notes: "Wide grip on band. Pass over head and behind back. Improves shoulder mobility."
+          },
+          {
+            name: "Round 1: Fit Ball Hip Bridges",
+            sets: "continue",
+            reps: "12 reps",
+            rest: "minimal",
+            notes: "Feet on ball. Lift hips. Squeeze glutes at top. Control descent."
+          },
+          {
+            name: "Round 1: Bird-Dog",
+            sets: "continue",
+            reps: "10 reps/side",
+            rest: "minimal",
+            notes: "On hands and knees. Extend opposite arm and leg. Hold 2s. Return. Switch."
+          },
+          {
+            name: "Round 1: Deep Squat Hold",
+            sets: "continue",
+            reps: "45s hold",
+            rest: "minimal",
+            notes: "Bodyweight squat as deep as possible. Hold position. Focus on breathing."
+          },
+          {
+            name: "Round 1: Side Plank with Reach",
+            sets: "continue",
+            reps: "30s/side",
+            rest: "minimal",
+            notes: "Hold side plank. Thread top arm under body then reach up. Repeat."
+          },
+          {
+            name: "Round 1: Cat-Cow Flow",
+            sets: "continue",
+            reps: "60s",
+            rest: "2 min then repeat",
+            notes: "Slow alternating spinal flexion and extension. Complete 2 full rounds."
+          },
+          {
+            name: "Stretch & Recovery",
+            sets: "1",
+            reps: "10 minutes",
+            rest: "0s",
+            notes: "Extended static stretches for all major muscle groups. Focus on breath and relaxation."
           }
         ]
       };
