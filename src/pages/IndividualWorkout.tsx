@@ -98,17 +98,6 @@ const IndividualWorkout = () => {
 Structure: 3 Sets per exercise
 Rest Between Sets: 60–90s
 
-Exercises:
-• Barbell Deadlifts – 8 reps
-• Dumbbell Bench Press – 10 reps
-• Barbell Squats – 8 reps
-• Dumbbell Shoulder Press – 10 reps
-• Weighted Plank Hold – 30s
-
-Warm-Up & Mobility: 10 mins
-Main Strength Block: 40 mins
-Cool-Down & Stretch: 10 mins
-
 📋 Instructions
 Warm up thoroughly. Use progressive overload. Maintain strict form.
 
