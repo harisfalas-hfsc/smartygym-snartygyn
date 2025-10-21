@@ -38,22 +38,22 @@ const TrainingProgramDetail = () => {
 
   const programData: { [key: string]: TrainingProgram[] } = {
     "cardio": [
-      { id: "cardio-free", name: "Cardio Starter Program", description: "Free 4-week cardio program to build your endurance", duration: "4", equipment: "bodyweight", level: "beginner", imageUrl: "https://images.unsplash.com/photo-1538805060514-97d9cc17730c?w=800&h=600&fit=crop", isFree: true },
+      { id: "cardio-001", name: "Cardio Endurance Builder", description: "4-week progressive cardio program", duration: "4", equipment: "bodyweight", level: "beginner", imageUrl: "https://images.unsplash.com/photo-1538805060514-97d9cc17730c?w=800&h=600&fit=crop", isFree: true },
     ],
     "functional-strength": [
-      { id: "functional-strength-free", name: "Functional Basics", description: "Free 4-week functional strength program", duration: "4", equipment: "bodyweight", level: "beginner", imageUrl: "https://images.unsplash.com/photo-1598971861713-54ad16a5c72e?w=800&h=600&fit=crop", isFree: true },
+      { id: "functional-001", name: "Functional Power Program", description: "6-week functional strength development", duration: "6", equipment: "equipment", level: "intermediate", imageUrl: "https://images.unsplash.com/photo-1598971861713-54ad16a5c72e?w=800&h=600&fit=crop", isFree: true },
     ],
     "muscle-hypertrophy": [
-      { id: "muscle-hypertrophy-free", name: "Muscle Building Basics", description: "Free 4-week muscle building program", duration: "4", equipment: "bodyweight", level: "beginner", imageUrl: "https://images.unsplash.com/photo-1581009146145-b5ef050c2e1e?w=800&h=600&fit=crop", isFree: true },
+      { id: "hypertrophy-001", name: "Mass Builder Program", description: "8-week muscle growth program", duration: "8", equipment: "equipment", level: "intermediate", imageUrl: "https://images.unsplash.com/photo-1581009146145-b5ef050c2e1e?w=800&h=600&fit=crop", isFree: true },
     ],
     "weight-loss": [
-      { id: "weight-loss-free", name: "Weight Loss Starter", description: "Free 4-week weight loss program", duration: "4", equipment: "bodyweight", level: "beginner", imageUrl: "https://images.unsplash.com/photo-1571902943202-507ec2618e8f?w=800&h=600&fit=crop", isFree: true },
+      { id: "weightloss-001", name: "Fat Loss Transform", description: "6-week weight loss program", duration: "6", equipment: "bodyweight", level: "beginner", imageUrl: "https://images.unsplash.com/photo-1571902943202-507ec2618e8f?w=800&h=600&fit=crop", isFree: true },
     ],
     "low-back-pain": [
-      { id: "low-back-pain-free", name: "Back Care Essentials", description: "Free 4-week back pain relief program", duration: "4", equipment: "bodyweight", level: "beginner", imageUrl: "https://images.unsplash.com/photo-1599901860904-17e6ed7083a0?w=800&h=600&fit=crop", isFree: true },
+      { id: "backcare-001", name: "Back Rehabilitation Program", description: "4-week back pain relief program", duration: "4", equipment: "bodyweight", level: "beginner", imageUrl: "https://images.unsplash.com/photo-1599901860904-17e6ed7083a0?w=800&h=600&fit=crop", isFree: true },
     ],
     "mobility-stability": [
-      { id: "mobility-stability-free", name: "Mobility Basics", description: "Free 4-week mobility and stability program", duration: "4", equipment: "bodyweight", level: "beginner", imageUrl: "https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?w=800&h=600&fit=crop", isFree: true },
+      { id: "mobility-001", name: "Mobility Mastery Program", description: "4-week mobility enhancement program", duration: "4", equipment: "bodyweight", level: "beginner", imageUrl: "https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?w=800&h=600&fit=crop", isFree: true },
     ],
   };
 

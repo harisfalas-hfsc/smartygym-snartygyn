@@ -1,471 +1,617 @@
 import { useNavigate, useParams } from "react-router-dom";
 import { Helmet } from "react-helmet";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft } from "lucide-react";
-import { WorkoutDisplay } from "@/components/WorkoutDisplay";
-import { AccessGate } from "@/components/AccessGate";
-import { ProgramInteractions } from "@/components/ProgramInteractions";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { ArrowLeft, Clock, Dumbbell, TrendingUp, Calendar } from "lucide-react";
+import { ShareButtons } from "@/components/ShareButtons";
+import { ParQQuestionnaire } from "@/components/ParQQuestionnaire";
 
 const IndividualTrainingProgram = () => {
   const navigate = useNavigate();
   const { type, id } = useParams();
-  const isFreeProgram = id?.includes("-free");
 
-  // Program images mapping - matches TrainingProgramDetail.tsx
-  const programImages: { [key: string]: string } = {
-    "cardio-free": "https://images.unsplash.com/photo-1538805060514-97d9cc17730c?w=800&h=600&fit=crop",
-    "functional-strength-free": "https://images.unsplash.com/photo-1598971861713-54ad16a5c72e?w=800&h=600&fit=crop",
-    "muscle-hypertrophy-free": "https://images.unsplash.com/photo-1581009146145-b5ef050c2e1e?w=800&h=600&fit=crop",
-    "weight-loss-free": "https://images.unsplash.com/photo-1571902943202-507ec2618e8f?w=800&h=600&fit=crop",
-    "low-back-pain-free": "https://images.unsplash.com/photo-1599901860904-17e6ed7083a0?w=800&h=600&fit=crop",
-    "mobility-stability-free": "https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?w=800&h=600&fit=crop",
-  };
+  const isFreeProgram = true;
 
-  // Sample program names based on type and id
-  const programNames: { [key: string]: { [key: string]: { name: string; difficulty: number; serial: string } } } = {
-    cardio: {
-      "cardio-free": { name: "Cardio Starter Program", difficulty: 1, serial: "CP-FREE" },
-      "1": { name: "Cardio Endurance Builder", difficulty: 1, serial: "CP-001" },
-      "2": { name: "Elite Cardio Performance", difficulty: 3, serial: "CP-002" },
-    },
-    "functional-strength": {
-      "functional-strength-free": { name: "Functional Basics", difficulty: 1, serial: "FP-FREE" },
-      "1": { name: "Functional Fitness Foundation", difficulty: 1, serial: "FP-001" },
-      "2": { name: "Functional Athlete Program", difficulty: 3, serial: "FP-002" },
-    },
-    "muscle-hypertrophy": {
-      "muscle-hypertrophy-free": { name: "Muscle Building Basics", difficulty: 1, serial: "HP-FREE" },
-      "1": { name: "Muscle Growth Foundation", difficulty: 2, serial: "HP-001" },
-      "2": { name: "Advanced Mass Building", difficulty: 3, serial: "HP-002" },
-    },
-    "weight-loss": {
-      "weight-loss-free": { name: "Weight Loss Starter", difficulty: 1, serial: "WP-FREE" },
-      "1": { name: "Weight Loss Transformation", difficulty: 1, serial: "WP-001" },
-      "2": { name: "Advanced Fat Loss Program", difficulty: 3, serial: "WP-002" },
-    },
-    "low-back-pain": {
-      "low-back-pain-free": { name: "Back Care Essentials", difficulty: 1, serial: "LP-FREE" },
-      "1": { name: "Back Pain Relief Program", difficulty: 1, serial: "LP-001" },
-      "2": { name: "Spine Health Advanced", difficulty: 2, serial: "LP-002" },
-    },
-    "mobility-stability": {
-      "mobility-stability-free": { name: "Mobility Basics", difficulty: 1, serial: "MP-FREE" },
-      "1": { name: "Mobility Enhancement Program", difficulty: 1, serial: "MP-001" },
-      "2": { name: "Elite Mobility & Stability", difficulty: 3, serial: "MP-002" },
-    },
-  };
-
-  const programInfo = programNames[type || "cardio"]?.[id || "1"] || { 
-    name: "Training Program", 
-    difficulty: 2,
-    serial: "TP-001"
-  };
-
-  // Sample exercises data - would come from database
-  const exercises = [
-    {
-      name: "Exercise 1",
-      video_id: "iSSAk4XCsRA",
-      video_url: "https://www.youtube.com/watch?v=iSSAk4XCsRA"
-    },
-    {
-      name: "Exercise 2",
-      video_id: "IODxDxX7oi4",
-      video_url: "https://www.youtube.com/watch?v=IODxDxX7oi4"
-    }
-  ];
-
-  const planContent = `This training program is a structured, multi-week approach designed to help you progressively build strength, endurance, and overall fitness.
-
-Program Overview:
-The program is divided into weekly phases, each building upon the previous week's work. You'll follow a carefully designed progression that allows your body to adapt and grow stronger while minimizing the risk of overtraining or injury.
-
-Week-by-Week Structure:
-- Week 1-2: Foundation phase - Building base fitness and proper movement patterns
-- Week 3-4: Development phase - Increasing intensity and volume
-- Week 5-6: Progressive phase - Peak intensity and performance
-- Week 7-8: Consolidation phase - Maintaining gains and preparing for the next cycle
-
-Training Schedule:
-Follow the prescribed training days with adequate rest between sessions. Each week includes 3-5 training days depending on your experience level and the program requirements.
-
-Equipment Requirements: As specified in the program type
-Time Commitment: 30-60 minutes per session
-Rest Days: Built into the program for optimal recovery
-
-This program requires completion of the PAR-Q+ assessment before beginning. Always listen to your body and adjust the program as needed based on your recovery and performance.`;
-
-  // Get specific program details based on program type and ID
-  const getProgramWeeks = (programType: string, programId: string) => {
-    // CARDIO PROGRAMS
-    if (programId === "cardio-free") {
-      return [
-        {
-          week: 1,
-          focus: "Building Base",
-          days: [
-            {
-              day: "Day 1: Easy Run",
-              exercises: [
-                { name: "Warm-up Walk", sets: "1", reps: "5 min", intensity: "Light", rest: "0", notes: "Gradually increase pace" },
-                { name: "Easy Jog", sets: "1", reps: "15 min", intensity: "60-65% HR max", rest: "0", notes: "Conversational pace" },
-                { name: "Cool Down", sets: "1", reps: "5 min", intensity: "Light", rest: "0" }
-              ]
-            },
-            {
-              day: "Day 3: Interval Introduction",
-              exercises: [
-                { name: "Warm-up", sets: "1", reps: "10 min", intensity: "Easy", rest: "0" },
-                { name: "Run Intervals", sets: "6", reps: "1 min hard / 2 min easy", intensity: "75-80% / 60%", rest: "2 min", notes: "Focus on form" },
-                { name: "Cool Down", sets: "1", reps: "5 min", intensity: "Easy", rest: "0" }
-              ]
-            },
-            {
-              day: "Day 5: Steady State",
-              exercises: [
-                { name: "Steady Run", sets: "1", reps: "20 min", intensity: "65-70% HR max", rest: "0", notes: "Maintain consistent pace" }
-              ]
-            }
-          ]
-        },
-        {
-          week: 2,
-          focus: "Increasing Volume",
-          days: [
-            {
-              day: "Day 1: Easy Run",
-              exercises: [
-                { name: "Easy Jog", sets: "1", reps: "20 min", intensity: "60-65% HR max", rest: "0" }
-              ]
-            },
-            {
-              day: "Day 3: Intervals",
-              exercises: [
-                { name: "Warm-up", sets: "1", reps: "10 min", intensity: "Easy", rest: "0" },
-                { name: "Run Intervals", sets: "8", reps: "1 min hard / 2 min easy", intensity: "75-80% / 60%", rest: "2 min" },
-                { name: "Cool Down", sets: "1", reps: "5 min", intensity: "Easy", rest: "0" }
-              ]
-            },
-            {
-              day: "Day 5: Long Run",
-              exercises: [
-                { name: "Long Steady Run", sets: "1", reps: "25 min", intensity: "65-70% HR max", rest: "0" }
-              ]
-            }
-          ]
-        },
-        {
-          week: 3,
-          focus: "Building Intensity",
-          days: [
-            {
-              day: "Day 1: Tempo Run",
-              exercises: [
-                { name: "Warm-up", sets: "1", reps: "10 min", intensity: "Easy", rest: "0" },
-                { name: "Tempo Run", sets: "1", reps: "15 min", intensity: "80-85% HR max", rest: "0", notes: "Comfortably hard pace" },
-                { name: "Cool Down", sets: "1", reps: "5 min", intensity: "Easy", rest: "0" }
-              ]
-            },
-            {
-              day: "Day 3: Hill Repeats",
-              exercises: [
-                { name: "Warm-up", sets: "1", reps: "10 min", intensity: "Easy", rest: "0" },
-                { name: "Hill Sprints", sets: "6", reps: "30s uphill / walk down", intensity: "85-90%", rest: "walk down", notes: "Find moderate grade" },
-                { name: "Cool Down", sets: "1", reps: "5 min", intensity: "Easy", rest: "0" }
-              ]
-            },
-            {
-              day: "Day 5: Long Run",
-              exercises: [
-                { name: "Long Run", sets: "1", reps: "30 min", intensity: "65-70% HR max", rest: "0" }
-              ]
-            }
-          ]
-        },
-        {
-          week: 4,
-          focus: "Recovery Week",
-          days: [
-            {
-              day: "Day 1: Easy Run",
-              exercises: [
-                { name: "Easy Jog", sets: "1", reps: "20 min", intensity: "60-65% HR max", rest: "0", notes: "Focus on recovery" }
-              ]
-            },
-            {
-              day: "Day 3: Light Intervals",
-              exercises: [
-                { name: "Easy Intervals", sets: "4", reps: "1 min / 3 min", intensity: "70-75%", rest: "3 min", notes: "Reduced volume for recovery" }
-              ]
-            },
-            {
-              day: "Day 5: Easy Run",
-              exercises: [
-                { name: "Recovery Run", sets: "1", reps: "20 min", intensity: "60% HR max", rest: "0" }
-              ]
-            }
-          ]
-        }
-      ];
-    }
-
-    if (programId === "1" && programType === "cardio") {
-      return [
-        {
-          week: 1,
-          focus: "Endurance Foundation",
-          days: [
-            {
-              day: "Day 1: Easy Run + Strength",
-              exercises: [
-                { name: "Easy Run", sets: "1", reps: "25 min", intensity: "65% HR max", rest: "0" },
-                { name: "Bodyweight Circuit", sets: "3", reps: "Squats, Push-ups, Lunges x10 each", intensity: "Moderate", rest: "90s" }
-              ]
-            },
-            {
-              day: "Day 3: Tempo Run",
-              exercises: [
-                { name: "Warm-up", sets: "1", reps: "15 min", intensity: "Easy", rest: "0" },
-                { name: "Tempo Run", sets: "1", reps: "20 min", intensity: "80-85% HR max", rest: "0" },
-                { name: "Cool Down", sets: "1", reps: "10 min", intensity: "Easy", rest: "0" }
-              ]
-            },
-            {
-              day: "Day 5: Intervals",
-              exercises: [
-                { name: "Warm-up", sets: "1", reps: "15 min", intensity: "Easy", rest: "0" },
-                { name: "Speed Intervals", sets: "10", reps: "400m hard / 400m easy", intensity: "85-90%", rest: "400m jog" }
-              ]
-            },
-            {
-              day: "Day 7: Long Run",
-              exercises: [
-                { name: "Long Steady Run", sets: "1", reps: "40 min", intensity: "65-70% HR max", rest: "0" }
-              ]
-            }
-          ]
-        },
-        {
-          week: 2,
-          focus: "Volume Increase",
-          days: [
-            {
-              day: "Day 1: Easy Run + Strength",
-              exercises: [
-                { name: "Easy Run", sets: "1", reps: "30 min", intensity: "65% HR max", rest: "0" },
-                { name: "Bodyweight Circuit", sets: "4", reps: "Squats, Push-ups, Lunges x12 each", intensity: "Moderate", rest: "90s" }
-              ]
-            },
-            {
-              day: "Day 3: Tempo Run",
-              exercises: [
-                { name: "Tempo Run", sets: "1", reps: "25 min", intensity: "80-85% HR max", rest: "0" }
-              ]
-            },
-            {
-              day: "Day 5: Intervals",
-              exercises: [
-                { name: "Speed Intervals", sets: "12", reps: "400m hard / 400m easy", intensity: "85-90%", rest: "400m jog" }
-              ]
-            },
-            {
-              day: "Day 7: Long Run",
-              exercises: [
-                { name: "Long Run", sets: "1", reps: "50 min", intensity: "65-70% HR max", rest: "0" }
-              ]
-            }
-          ]
-        }
-      ];
-    }
-
-    // MUSCLE HYPERTROPHY PROGRAMS
-    if (programId === "muscle-hypertrophy-free") {
-      return [
-        {
-          week: 1,
-          focus: "Adaptation Phase",
-          days: [
-            {
-              day: "Day 1: Upper Body",
-              exercises: [
-                { name: "Push-ups", sets: "3", reps: "12-15", intensity: "Bodyweight", rest: "90s", notes: "Controlled tempo" },
-                { name: "Pull-ups (assisted if needed)", sets: "3", reps: "8-10", intensity: "Bodyweight", rest: "90s" },
-                { name: "Pike Push-ups", sets: "3", reps: "10-12", intensity: "Bodyweight", rest: "60s" },
-                { name: "Dips (on chairs)", sets: "3", reps: "10-12", intensity: "Bodyweight", rest: "90s" }
-              ]
-            },
-            {
-              day: "Day 3: Lower Body",
-              exercises: [
-                { name: "Squats", sets: "4", reps: "15-20", intensity: "Bodyweight", rest: "90s", notes: "Full depth" },
-                { name: "Bulgarian Split Squats", sets: "3", reps: "12 each", intensity: "Bodyweight", rest: "90s" },
-                { name: "Nordic Curls (assisted)", sets: "3", reps: "6-8", intensity: "Bodyweight", rest: "2 min" },
-                { name: "Calf Raises", sets: "4", reps: "20", intensity: "Bodyweight", rest: "60s" }
-              ]
-            },
-            {
-              day: "Day 5: Full Body",
-              exercises: [
-                { name: "Archer Push-ups", sets: "3", reps: "8 each side", intensity: "Bodyweight", rest: "90s" },
-                { name: "Pistol Squats (assisted)", sets: "3", reps: "6 each leg", intensity: "Bodyweight", rest: "2 min" },
-                { name: "Inverted Rows", sets: "3", reps: "12-15", intensity: "Bodyweight", rest: "90s" },
-                { name: "Plank to Push-up", sets: "3", reps: "10", intensity: "Bodyweight", rest: "60s" }
-              ]
-            }
-          ]
-        },
-        {
-          week: 2,
-          focus: "Volume Increase",
-          days: [
-            {
-              day: "Day 1: Upper Body",
-              exercises: [
-                { name: "Push-ups", sets: "4", reps: "12-15", intensity: "Bodyweight", rest: "90s" },
-                { name: "Pull-ups", sets: "4", reps: "8-10", intensity: "Bodyweight", rest: "90s" },
-                { name: "Pike Push-ups", sets: "4", reps: "10-12", intensity: "Bodyweight", rest: "60s" },
-                { name: "Dips", sets: "4", reps: "10-12", intensity: "Bodyweight", rest: "90s" }
-              ]
-            },
-            {
-              day: "Day 3: Lower Body",
-              exercises: [
-                { name: "Squats", sets: "5", reps: "15-20", intensity: "Bodyweight", rest: "90s" },
-                { name: "Bulgarian Split Squats", sets: "4", reps: "12 each", intensity: "Bodyweight", rest: "90s" },
-                { name: "Nordic Curls", sets: "4", reps: "6-8", intensity: "Bodyweight", rest: "2 min" },
-                { name: "Calf Raises", sets: "5", reps: "20", intensity: "Bodyweight", rest: "60s" }
-              ]
-            }
-          ]
-        }
-      ];
-    }
-
-    // Default - will add more programs gradually
-    return [];
-  };
-
-  const programWeeks = getProgramWeeks(type || "", id || "");
-  const programImage = programImages[id || ""] || "https://images.unsplash.com/photo-1538805060514-97d9cc17730c?w=800&h=600&fit=crop";
-
-  // Get program content sections
-  const getProgramContent = (programId: string) => {
-    if (programId === "cardio-free") {
-      return {
-        description: "A structured 4-week cardio program designed to build your aerobic base and improve cardiovascular endurance progressively.",
-        format: `Progressive Weekly Structure
-Week 1-2: Foundation phase - Building base fitness
-Week 3-4: Development phase - Increasing intensity
-
-Training Days: 3-4 days per week
-Session Duration: 20-30 minutes
-Intensity: 60-75% max heart rate`,
-        instructions: "Follow the prescribed training days with adequate rest between sessions. Progress gradually from easy to moderate intensity.",
-        tips: `• Start at a comfortable pace you can maintain.
-• Focus on consistency over intensity in Week 1-2.
-• Increase pace gradually in Week 3-4.
-• Stay hydrated throughout sessions.`
-      };
-    }
-    
-    return {
-      description: "",
-      format: "",
-      instructions: "",
-      tips: ""
+  const programData: {
+    [key: string]: {
+      name: string;
+      serialNumber: string;
+      difficulty: string;
+      duration: string;
+      equipment: string;
+      imageUrl: string;
+      description: string;
+      format: string;
+      instructions: string;
+      exercises: Array<{
+        week: string;
+        day: string;
+        workout: string;
+        details: string;
+      }>;
+      tips: string[];
     };
+  } = {
+    "cardio-001": {
+      name: "Cardio Endurance Builder",
+      serialNumber: "CP-001",
+      difficulty: "Beginner",
+      duration: "4 weeks",
+      equipment: "No Equipment Required",
+      imageUrl: "https://images.unsplash.com/photo-1538805060514-97d9cc17730c?w=800&h=600&fit=crop",
+      description:
+        "A progressive 4-week cardio program designed to build cardiovascular endurance from the ground up. Perfect for beginners looking to establish a solid aerobic base and improve overall fitness.",
+      format: `Progressive Cardio Training
+Structure: 4 weeks, 4 sessions per week
+Intensity: Gradually increasing from 60% to 75% max HR
+Duration: 20-40 minutes per session
+
+Week 1-2: Foundation building
+Week 3-4: Endurance development`,
+      instructions:
+        "Start each session with a 5-minute warm-up. Monitor your heart rate to stay within target zones. Progress gradually and listen to your body. Rest days are crucial for recovery.",
+      exercises: [
+        {
+          week: "Week 1",
+          day: "Day 1",
+          workout: "Easy Pace Cardio",
+          details: "20 min at 60% max HR - Walking or light jogging",
+        },
+        {
+          week: "Week 1",
+          day: "Day 2",
+          workout: "Interval Introduction",
+          details: "5 rounds: 2 min moderate / 2 min easy",
+        },
+        {
+          week: "Week 1",
+          day: "Day 3",
+          workout: "Steady State",
+          details: "25 min at 65% max HR - Consistent pace",
+        },
+        {
+          week: "Week 1",
+          day: "Day 4",
+          workout: "Recovery Cardio",
+          details: "20 min at 60% max HR - Easy movement",
+        },
+        {
+          week: "Week 2",
+          day: "Day 1",
+          workout: "Moderate Pace",
+          details: "25 min at 65% max HR - Comfortable pace",
+        },
+        {
+          week: "Week 2",
+          day: "Day 2",
+          workout: "Interval Training",
+          details: "6 rounds: 2 min moderate / 1.5 min easy",
+        },
+        {
+          week: "Week 2",
+          day: "Day 3",
+          workout: "Steady State",
+          details: "30 min at 65% max HR - Maintain rhythm",
+        },
+        {
+          week: "Week 2",
+          day: "Day 4",
+          workout: "Active Recovery",
+          details: "25 min at 60% max HR - Light activity",
+        },
+        {
+          week: "Week 3",
+          day: "Day 1",
+          workout: "Tempo Run",
+          details: "30 min at 70% max HR - Challenging but sustainable",
+        },
+        {
+          week: "Week 3",
+          day: "Day 2",
+          workout: "Interval Training",
+          details: "8 rounds: 2 min hard / 1 min easy",
+        },
+        {
+          week: "Week 3",
+          day: "Day 3",
+          workout: "Long Steady State",
+          details: "35 min at 65-70% max HR - Build endurance",
+        },
+        {
+          week: "Week 3",
+          day: "Day 4",
+          workout: "Recovery Session",
+          details: "25 min at 60% max HR - Easy pace",
+        },
+        {
+          week: "Week 4",
+          day: "Day 1",
+          workout: "Tempo Challenge",
+          details: "35 min at 70-75% max HR - Push your limits",
+        },
+        {
+          week: "Week 4",
+          day: "Day 2",
+          workout: "Peak Intervals",
+          details: "10 rounds: 2 min hard / 1 min easy",
+        },
+        {
+          week: "Week 4",
+          day: "Day 3",
+          workout: "Endurance Test",
+          details: "40 min at 70% max HR - Longest session",
+        },
+        {
+          week: "Week 4",
+          day: "Day 4",
+          workout: "Cool Down Week",
+          details: "30 min at 65% max HR - Celebrate progress",
+        },
+      ],
+      tips: [
+        "Always warm up for 5 minutes before starting",
+        "Stay hydrated throughout your training",
+        "Monitor your heart rate to ensure proper intensity",
+        "Take rest days seriously for optimal recovery",
+        "Progress gradually - don't rush the process",
+        "Listen to your body and adjust as needed",
+        "Maintain consistent training schedule",
+      ],
+    },
+    "functional-001": {
+      name: "Functional Power Program",
+      serialNumber: "FP-001",
+      difficulty: "Intermediate",
+      duration: "6 weeks",
+      equipment: "Equipment Required",
+      imageUrl: "https://images.unsplash.com/photo-1598971861713-54ad16a5c72e?w=800&h=600&fit=crop",
+      description:
+        "A comprehensive 6-week program focused on building functional strength through compound movements and athletic exercises. Develops power, coordination, and real-world strength.",
+      format: `Functional Strength Training
+Structure: 6 weeks, 4 sessions per week
+Focus: Compound movements, power development
+Equipment: Barbells, dumbbells, kettlebells
+
+Week 1-2: Foundation and technique
+Week 3-4: Power development
+Week 5-6: Peak performance`,
+      instructions:
+        "Focus on movement quality over weight. Master the technique before adding load. Rest 2-3 minutes between sets for optimal power output.",
+      exercises: [
+        {
+          week: "Week 1",
+          day: "Day 1",
+          workout: "Lower Body Power",
+          details: "Squats 4x8, Deadlifts 3x6, Lunges 3x10 each leg",
+        },
+        {
+          week: "Week 1",
+          day: "Day 2",
+          workout: "Upper Body Push",
+          details: "Bench Press 4x8, Overhead Press 3x8, Dips 3x10",
+        },
+        {
+          week: "Week 1",
+          day: "Day 3",
+          workout: "Full Body Power",
+          details: "Power Cleans 5x5, Front Squats 3x6, Push Press 3x8",
+        },
+        {
+          week: "Week 1",
+          day: "Day 4",
+          workout: "Upper Body Pull",
+          details: "Pull-ups 4x8, Rows 4x8, Face Pulls 3x12",
+        },
+      ],
+      tips: [
+        "Master technique before increasing weight",
+        "Focus on explosive movements with control",
+        "Maintain proper breathing throughout",
+        "Use appropriate weight for prescribed reps",
+        "Rest adequately between training days",
+        "Track your progress weekly",
+      ],
+    },
+    "hypertrophy-001": {
+      name: "Mass Builder Program",
+      serialNumber: "MH-001",
+      difficulty: "Intermediate",
+      duration: "8 weeks",
+      equipment: "Equipment Required",
+      imageUrl: "https://images.unsplash.com/photo-1581009146145-b5ef050c2e1e?w=800&h=600&fit=crop",
+      description:
+        "An intensive 8-week muscle hypertrophy program designed to maximize muscle growth through progressive overload and volume training. Structured for serious muscle building.",
+      format: `Hypertrophy Training Protocol
+Structure: 8 weeks, 5 sessions per week
+Volume: High volume with moderate intensity
+Rest: 60-90 seconds between sets
+
+Week 1-3: Volume accumulation
+Week 4: Deload
+Week 5-7: Intensification
+Week 8: Peak`,
+      instructions:
+        "Focus on time under tension and muscle contraction. Control the eccentric phase and squeeze at peak contraction. Nutrition and recovery are crucial for growth.",
+      exercises: [
+        {
+          week: "Week 1",
+          day: "Day 1",
+          workout: "Chest & Triceps",
+          details: "Bench Press 4x10, Incline DB Press 4x12, Cable Flyes 3x15, Tricep Extensions 4x12",
+        },
+        {
+          week: "Week 1",
+          day: "Day 2",
+          workout: "Back & Biceps",
+          details: "Deadlifts 4x8, Pull-ups 4x10, Rows 4x12, Bicep Curls 4x12",
+        },
+        {
+          week: "Week 1",
+          day: "Day 3",
+          workout: "Legs",
+          details: "Squats 4x10, Leg Press 4x12, Leg Curls 4x12, Calf Raises 4x15",
+        },
+        {
+          week: "Week 1",
+          day: "Day 4",
+          workout: "Shoulders & Abs",
+          details: "Overhead Press 4x10, Lateral Raises 4x12, Rear Delts 4x12, Ab Circuit",
+        },
+        {
+          week: "Week 1",
+          day: "Day 5",
+          workout: "Full Body Pump",
+          details: "Compound movements 3x12 each, focus on muscle connection",
+        },
+      ],
+      tips: [
+        "Eat in a caloric surplus for muscle growth",
+        "Get 7-9 hours of sleep nightly",
+        "Focus on progressive overload",
+        "Maintain strict form throughout",
+        "Stay consistent with training schedule",
+        "Track your lifts and measurements",
+        "Consider supplementation if needed",
+      ],
+    },
+    "weightloss-001": {
+      name: "Fat Loss Transform",
+      serialNumber: "WL-001",
+      difficulty: "Beginner",
+      duration: "6 weeks",
+      equipment: "No Equipment Required",
+      imageUrl: "https://images.unsplash.com/photo-1571902943202-507ec2618e8f?w=800&h=600&fit=crop",
+      description:
+        "A 6-week fat loss program combining cardio and bodyweight strength training. Designed to create a caloric deficit while preserving muscle mass through strategic exercise selection.",
+      format: `Fat Loss Training Protocol
+Structure: 6 weeks, 5 sessions per week
+Mix: Cardio + Strength circuits
+Intensity: Moderate to high
+
+Week 1-2: Adaptation phase
+Week 3-4: Acceleration phase
+Week 5-6: Transformation phase`,
+      instructions:
+        "Combine this program with a moderate caloric deficit. Stay consistent with training and nutrition. Track your progress weekly through measurements and photos.",
+      exercises: [
+        {
+          week: "Week 1",
+          day: "Day 1",
+          workout: "Full Body Circuit",
+          details: "4 rounds: Squats, Push-ups, Lunges, Plank - 45s each",
+        },
+        {
+          week: "Week 1",
+          day: "Day 2",
+          workout: "Cardio Intervals",
+          details: "30 min: 2 min moderate / 1 min high intensity",
+        },
+        {
+          week: "Week 1",
+          day: "Day 3",
+          workout: "Lower Body Focus",
+          details: "Jump Squats, Lunges, Glute Bridges - 4 sets each",
+        },
+        {
+          week: "Week 1",
+          day: "Day 4",
+          workout: "HIIT Session",
+          details: "20 min: Burpees, Mountain Climbers, High Knees",
+        },
+        {
+          week: "Week 1",
+          day: "Day 5",
+          workout: "Active Recovery",
+          details: "30 min steady state cardio + stretching",
+        },
+      ],
+      tips: [
+        "Maintain a moderate caloric deficit",
+        "Prioritize protein intake",
+        "Stay hydrated throughout the day",
+        "Get adequate sleep for recovery",
+        "Track your food intake",
+        "Be patient with the process",
+        "Combine with healthy nutrition",
+      ],
+    },
+    "backcare-001": {
+      name: "Back Rehabilitation Program",
+      serialNumber: "BC-001",
+      difficulty: "Beginner",
+      duration: "4 weeks",
+      equipment: "No Equipment Required",
+      imageUrl: "https://images.unsplash.com/photo-1599901860904-17e6ed7083a0?w=800&h=600&fit=crop",
+      description:
+        "A gentle 4-week program designed to alleviate low back pain through targeted exercises, stretches, and core strengthening. Focus on proper movement patterns and pain-free mobility.",
+      format: `Therapeutic Exercise Program
+Structure: 4 weeks, daily practice
+Duration: 15-20 minutes per session
+Focus: Pain relief, mobility, core stability
+
+Week 1: Pain management
+Week 2-3: Mobility restoration
+Week 4: Strength building`,
+      instructions:
+        "Never push through sharp pain. All movements should be pain-free or cause only mild discomfort. Progress slowly and consistently. Consult healthcare provider if pain persists.",
+      exercises: [
+        {
+          week: "Week 1",
+          day: "Daily",
+          workout: "Gentle Mobility",
+          details: "Cat-Cow 2x10, Knee to Chest 2x30s each, Pelvic Tilts 2x15",
+        },
+        {
+          week: "Week 2",
+          day: "Daily",
+          workout: "Core Activation",
+          details: "Dead Bug 3x10, Bird Dog 3x10 each, Bridges 3x12",
+        },
+        {
+          week: "Week 3",
+          day: "Daily",
+          workout: "Strength Building",
+          details: "Planks 3x20s, Side Planks 3x15s each, Superman 3x10",
+        },
+        {
+          week: "Week 4",
+          day: "Daily",
+          workout: "Integration",
+          details: "Full routine combining all previous exercises",
+        },
+      ],
+      tips: [
+        "Never force movements that cause pain",
+        "Practice daily for best results",
+        "Focus on quality over quantity",
+        "Breathe deeply throughout exercises",
+        "Maintain neutral spine position",
+        "Progress gradually and patiently",
+        "Consult doctor if pain worsens",
+      ],
+    },
+    "mobility-001": {
+      name: "Mobility Mastery Program",
+      serialNumber: "MM-001",
+      difficulty: "Beginner",
+      duration: "4 weeks",
+      equipment: "No Equipment Required",
+      imageUrl: "https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?w=800&h=600&fit=crop",
+      description:
+        "A 4-week progressive mobility program to enhance flexibility, joint health, and movement quality. Suitable for all fitness levels looking to improve range of motion and reduce stiffness.",
+      format: `Mobility Enhancement Protocol
+Structure: 4 weeks, 5 sessions per week
+Duration: 20-30 minutes per session
+Focus: Joint mobility, flexibility, movement quality
+
+Week 1: Foundation
+Week 2-3: Development
+Week 4: Mastery`,
+      instructions:
+        "Move slowly and mindfully through each position. Focus on breathing and relaxation. Never force stretches. Consistency is key for lasting improvements.",
+      exercises: [
+        {
+          week: "Week 1",
+          day: "Day 1-5",
+          workout: "Full Body Flow",
+          details: "Cat-Cow, World's Greatest Stretch, Hip Circles, Shoulder Rolls",
+        },
+        {
+          week: "Week 2",
+          day: "Day 1-5",
+          workout: "Lower Body Focus",
+          details: "Deep Squat Holds, Hip Flexor Stretches, Hamstring Flows",
+        },
+        {
+          week: "Week 3",
+          day: "Day 1-5",
+          workout: "Upper Body Focus",
+          details: "Shoulder Mobility, Thoracic Rotations, Neck Stretches",
+        },
+        {
+          week: "Week 4",
+          day: "Day 1-5",
+          workout: "Integration Flow",
+          details: "Complete mobility sequence combining all movements",
+        },
+      ],
+      tips: [
+        "Practice consistently for best results",
+        "Never stretch to the point of pain",
+        "Breathe deeply throughout",
+        "Move slowly and with control",
+        "Be patient with progress",
+        "Listen to your body",
+        "Make it a daily habit",
+      ],
+    },
   };
 
-  const programContent = getProgramContent(id || "");
+  const program = programData[id || ""];
 
-  // Program data for duration and equipment info
-  const programDataLocal: { [key: string]: Array<{ id: string; duration: string; equipment: string }> } = {
-    "cardio": [
-      { id: "cardio-free", duration: "4", equipment: "bodyweight" },
-    ],
-    "functional-strength": [
-      { id: "functional-strength-free", duration: "4", equipment: "bodyweight" },
-    ],
-    "muscle-hypertrophy": [
-      { id: "muscle-hypertrophy-free", duration: "4", equipment: "bodyweight" },
-    ],
-    "weight-loss": [
-      { id: "weight-loss-free", duration: "4", equipment: "bodyweight" },
-    ],
-    "low-back-pain": [
-      { id: "low-back-pain-free", duration: "4", equipment: "bodyweight" },
-    ],
-    "mobility-stability": [
-      { id: "mobility-stability-free", duration: "4", equipment: "bodyweight" },
-    ],
-  };
-
-  // Get duration and equipment for program
-  const getProgramDuration = () => {
-    const programs = programDataLocal[type || "cardio"] || [];
-    const program = programs.find(p => p.id === id);
-    return program ? `${program.duration} weeks` : '4 weeks';
-  };
-
-  const getProgramEquipment = () => {
-    const programs = programDataLocal[type || "cardio"] || [];
-    const program = programs.find(p => p.id === id);
-    return program?.equipment === 'bodyweight' ? 'None (Bodyweight)' : 'Varies by Week';
-  };
-
-  const content = (
-    <>
-      <ProgramInteractions
-        programId={`${type}-${id}`}
-        programType={type || 'cardio'}
-        programName={programInfo.name}
-      />
-      
-      <WorkoutDisplay
-        exercises={exercises}
-        planContent=""
-        title={programInfo.name}
-        serial={programInfo.serial}
-        difficulty={programInfo.difficulty}
-        programWeeks={programWeeks}
-        imageUrl={programImage}
-        duration={getProgramDuration()}
-        equipment={getProgramEquipment()}
-        description={programContent.description}
-        format={programContent.format}
-        instructions={programContent.instructions}
-        tips={programContent.tips}
-      />
-    </>
-  );
+  if (!program) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <Card className="p-8">
+          <p className="text-center">Training program not found</p>
+          <Button onClick={() => navigate("/trainingprogram")} className="mt-4">
+            Back to Programs
+          </Button>
+        </Card>
+      </div>
+    );
+  }
 
   return (
     <>
       <Helmet>
-        <title>{programInfo.name} | Smarty Gym</title>
-        <meta name="description" content={`${programInfo.name} - Program #${programInfo.serial}`} />
+        <title>{program.name} | Smarty Gym</title>
+        <meta name="description" content={program.description} />
       </Helmet>
-      
-      <div className="min-h-screen bg-background">
-      <div className="container mx-auto px-4 py-8">
-        <Button
-          onClick={() => navigate(-1)}
-          variant="outline"
-          className="mb-6"
-        >
-          <ArrowLeft className="w-4 h-4 mr-2" />
-          Back
-        </Button>
 
-        <AccessGate 
-          requireAuth={!isFreeProgram} 
-          requirePremium={!isFreeProgram}
-          contentType="program"
-        >
-          {content}
-        </AccessGate>
-      </div>
+      <div className="min-h-screen bg-background">
+        <div className="container mx-auto max-w-4xl px-4 py-8">
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => navigate(`/trainingprogram/${type}`)}
+            className="mb-6"
+          >
+            <ArrowLeft className="mr-2 h-4 w-4" />
+            <span className="text-xs sm:text-sm">Back</span>
+          </Button>
+
+          <h1 className="text-4xl font-bold text-center mb-6">{program.name}</h1>
+
+          <div className="flex flex-wrap justify-center gap-4 mb-8">
+            <div className="flex items-center gap-2 px-4 py-2 bg-card rounded-lg border">
+              <span className="text-sm font-medium">Serial:</span>
+              <span className="text-sm text-muted-foreground">{program.serialNumber}</span>
+            </div>
+            <div className="flex items-center gap-2 px-4 py-2 bg-card rounded-lg border">
+              <TrendingUp className="w-4 h-4" />
+              <span className="text-sm text-muted-foreground">{program.difficulty}</span>
+            </div>
+            <div className="flex items-center gap-2 px-4 py-2 bg-card rounded-lg border">
+              <Calendar className="w-4 h-4" />
+              <span className="text-sm text-muted-foreground">{program.duration}</span>
+            </div>
+            <div className="flex items-center gap-2 px-4 py-2 bg-card rounded-lg border">
+              <Dumbbell className="w-4 h-4" />
+              <span className="text-sm text-muted-foreground">{program.equipment}</span>
+            </div>
+          </div>
+
+          <div className="mb-8 rounded-lg overflow-hidden">
+            <img
+              src={program.imageUrl}
+              alt={program.name}
+              className="w-full h-64 object-cover"
+            />
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
+            <Card className="cursor-pointer hover:shadow-lg transition-shadow">
+              <CardHeader>
+                <CardTitle className="text-center text-sm">Video Guide</CardTitle>
+              </CardHeader>
+              <CardContent className="text-center text-muted-foreground text-xs">
+                Watch tutorial
+              </CardContent>
+            </Card>
+            <Card className="cursor-pointer hover:shadow-lg transition-shadow">
+              <CardHeader>
+                <CardTitle className="text-center text-sm">Workout Timer</CardTitle>
+              </CardHeader>
+              <CardContent className="text-center text-muted-foreground text-xs">
+                Time your sets
+              </CardContent>
+            </Card>
+            <Card className="cursor-pointer hover:shadow-lg transition-shadow">
+              <CardHeader>
+                <CardTitle className="text-center text-sm">1RM Calculator</CardTitle>
+              </CardHeader>
+              <CardContent className="text-center text-muted-foreground text-xs">
+                Calculate max
+              </CardContent>
+            </Card>
+          </div>
+
+          <Card className="mb-8">
+            <CardHeader>
+              <CardTitle>Description</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p className="text-muted-foreground">{program.description}</p>
+            </CardContent>
+          </Card>
+
+          <Card className="mb-8">
+            <CardHeader>
+              <CardTitle>Format & Instructions</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div>
+                <h3 className="font-semibold mb-2">Format:</h3>
+                <pre className="text-sm text-muted-foreground whitespace-pre-wrap font-sans">
+                  {program.format}
+                </pre>
+              </div>
+              <div>
+                <h3 className="font-semibold mb-2">Instructions:</h3>
+                <p className="text-sm text-muted-foreground">{program.instructions}</p>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className="mb-8">
+            <CardHeader>
+              <CardTitle>Program Schedule</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-6">
+                {program.exercises.map((exercise, index) => (
+                  <div key={index} className="border-b pb-4 last:border-b-0">
+                    <div className="flex items-center gap-2 mb-2">
+                      <span className="font-semibold text-primary">{exercise.week}</span>
+                      <span className="text-muted-foreground">•</span>
+                      <span className="font-medium">{exercise.day}</span>
+                    </div>
+                    <h3 className="font-semibold text-lg mb-2">{exercise.workout}</h3>
+                    <p className="text-sm text-muted-foreground">{exercise.details}</p>
+                  </div>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className="mb-8">
+            <CardHeader>
+              <CardTitle>Tips & Safety</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <ul className="space-y-2">
+                {program.tips.map((tip, index) => (
+                  <li key={index} className="flex items-start gap-2">
+                    <span className="text-primary mt-1">•</span>
+                    <span className="text-sm text-muted-foreground">{tip}</span>
+                  </li>
+                ))}
+              </ul>
+            </CardContent>
+          </Card>
+
+          <div className="mb-8">
+            <ParQQuestionnaire />
+          </div>
+
+          <div className="mt-8">
+            <ShareButtons
+              url={window.location.href}
+              title={`Check out ${program.name} on Smarty Gym!`}
+            />
+          </div>
+        </div>
       </div>
     </>
   );

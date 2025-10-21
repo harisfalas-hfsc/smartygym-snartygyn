@@ -1,1254 +1,610 @@
 import { useNavigate, useParams } from "react-router-dom";
 import { Helmet } from "react-helmet";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft } from "lucide-react";
-import { WorkoutDisplay } from "@/components/WorkoutDisplay";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { ArrowLeft, Clock, Dumbbell, TrendingUp } from "lucide-react";
 import { AccessGate } from "@/components/AccessGate";
-import { WorkoutInteractions } from "@/components/WorkoutInteractions";
 import { ShareButtons } from "@/components/ShareButtons";
+import { ParQQuestionnaire } from "@/components/ParQQuestionnaire";
 
 const IndividualWorkout = () => {
   const navigate = useNavigate();
   const { type, id } = useParams();
-  const isFreeWorkout = id?.includes("-free") || 
-    id === "iron-core-003" || 
-    id === "fat-furnace-002" || 
-    id === "metaboshock-004" || 
-    id === "pulse-igniter-001" || 
-    id === "flowforge-006" ||
-    id === "power-surge-005";
 
-  // Workout images mapping - matches WorkoutDetail.tsx
-  const workoutImages: { [key: string]: string } = {
-    "strength-free": "https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?w=800&h=600&fit=crop",
-    "iron-core-003": "https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=800&h=600&fit=crop",
-    "power-surge-005": "https://images.unsplash.com/photo-1517836357463-d25dfeac3438?w=800&h=600&fit=crop",
-    "calorie-burning-free": "https://images.unsplash.com/photo-1476480862126-209bfaa8edc8?w=800&h=600&fit=crop",
-    "fat-furnace-002": "https://images.unsplash.com/photo-1549060279-7e168fcee0c2?w=800&h=600&fit=crop",
-    "metabolic-free": "https://images.unsplash.com/photo-1483721310020-03333e577078?w=800&h=600&fit=crop",
-    "metaboshock-004": "https://images.unsplash.com/photo-1517836357463-d25dfeac3438?w=800&h=600&fit=crop",
-    "cardio-free": "https://images.unsplash.com/photo-1538805060514-97d9cc17730c?w=800&h=600&fit=crop",
-    "pulse-igniter-001": "https://images.unsplash.com/photo-1515524738708-327f6b0037a7?w=800&h=600&fit=crop",
-    "mobility-free": "https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?w=800&h=600&fit=crop",
-    "flowforge-006": "https://images.unsplash.com/photo-1599901860904-17e6ed7083a0?w=800&h=600&fit=crop",
-    "challenge-free": "https://images.unsplash.com/photo-1517836357463-d25dfeac3438?w=800&h=600&fit=crop",
-  };
+  // All workouts are free
+  const isFreeWorkout = true;
 
-  // Sample workout names based on type and id
-  const workoutNames: { [key: string]: { [key: string]: { name: string; difficulty: number; serial: string } } } = {
-    cardio: {
-      "cardio-free": { name: "Cardio Foundation", difficulty: 1, serial: "CD-FREE" },
-      "pulse-igniter-001": { name: "Pulse Igniter", difficulty: 3, serial: "001" },
-      "1": { name: "HIIT Foundation", difficulty: 1, serial: "CD-001" },
-      "2": { name: "Cardio Blast Advanced", difficulty: 3, serial: "CD-002" },
-    },
-    strength: {
-      "strength-free": { name: "Beginner Strength Basics", difficulty: 1, serial: "ST-FREE" },
-      "iron-core-003": { name: "Iron Core", difficulty: 5, serial: "003" },
-      "power-surge-005": { name: "Power Surge", difficulty: 4, serial: "005" },
-      "1": { name: "Upper Body Power", difficulty: 2, serial: "ST-001" },
-      "2": { name: "Full Body Strength", difficulty: 3, serial: "ST-002" },
-    },
-    "calorie-burning": {
-      "calorie-burning-free": { name: "Fat Burn Starter", difficulty: 1, serial: "CB-FREE" },
-      "fat-furnace-002": { name: "Fat Furnace", difficulty: 4, serial: "002" },
-    },
-    metabolic: {
-      "metabolic-free": { name: "Metabolic Basics", difficulty: 1, serial: "MB-FREE" },
-      "metaboshock-004": { name: "MetaboShock", difficulty: 4, serial: "004" },
-      "1": { name: "Metabolic Circuit", difficulty: 2, serial: "MB-001" },
-    },
-    mobility: {
-      "mobility-free": { name: "Flexibility Fundamentals", difficulty: 1, serial: "MO-FREE" },
-      "flowforge-006": { name: "FlowForge", difficulty: 2, serial: "006" },
-      "1": { name: "Flexibility Foundation", difficulty: 1, serial: "MB-001" },
-      "2": { name: "Advanced Mobility Flow", difficulty: 3, serial: "MB-002" },
-    },
-    challenge: {
-      "challenge-free": { name: "Challenge Starter", difficulty: 1, serial: "CH-FREE" },
-      "1": { name: "Ultimate Challenge", difficulty: 5, serial: "CH-001" },
-    },
-  };
-
-  const workoutInfo = workoutNames[type || "cardio"]?.[id || "1"] || { 
-    name: "Workout Session", 
-    difficulty: 2,
-    serial: "WO-001"
-  };
-
-  // Sample exercises data - would come from database
-  const exercises = [
-    {
-      name: "Jumping Jacks",
-      video_id: "iSSAk4XCsRA",
-      video_url: "https://www.youtube.com/watch?v=iSSAk4XCsRA"
-    },
-    {
-      name: "Push-ups",
-      video_id: "IODxDxX7oi4",
-      video_url: "https://www.youtube.com/watch?v=IODxDxX7oi4"
-    },
-    {
-      name: "Burpees",
-      video_id: "JZQA08SlJnM",
-      video_url: "https://www.youtube.com/watch?v=JZQA08SlJnM"
-    }
-  ];
-
-  // Get workout content sections
-  const getWorkoutContent = (workoutId: string) => {
-    // PULSE IGNITER - 001
-    if (workoutId === "pulse-igniter-001") {
-      return {
-        description: "A high-energy cardio blast designed to elevate heart rate, improve endurance, and boost cardiovascular health. Perfect for clients seeking a sweat-heavy session that's short, sharp, and effective.",
-        format: `Tabata Circuit
-Structure: 6 Tabata blocks (4 mins each)
-Work:Rest Ratio: 20s work / 10s rest x 8 rounds per block
-
-Blocks:
-1. Jump Rope
-2. High Knees
-3. Mountain Climbers
-4. Burpees
-5. Jumping Jacks
-6. Skater Hops`,
-        instructions: "Complete each Tabata block before moving to the next. Rest 1 minute between blocks.",
-        tips: `• Use a timer app for precision.
-• Keep your core engaged during high-impact moves.
-• Avoid locking knees during jumps.
-• Hydrate and pace yourself.`
-      };
-    }
-
-    // FAT FURNACE - 002
-    if (workoutId === "fat-furnace-002") {
-      return {
-        description: "A metabolic conditioning circuit that torches calories and keeps the burn going post-workout. Combines compound strength moves with dynamic cardio bursts.",
-        format: `AMRAP + Challenge Finisher
-
-Main Block (30 mins):
-Complete as many rounds as possible:
-• Dumbbell Thrusters – 12 reps
-• Jump Squats – 15 reps
-• Dumbbell Renegade Rows – 10 reps/side
-• Jump Lunges – 12 reps/leg
-• Plank to Push-Up – 10 reps
-
-Finisher (10 mins):
-Challenge:
-• 100 Jumping Jacks
-• 50 Mountain Climbers
-• 25 Burpees
-
-Warm-Up & Cool-Down: 5 mins total`,
-        instructions: "Use moderate dumbbells. Push for consistent pace. Track rounds completed.",
-        tips: `• Choose weights that challenge but don't compromise form.
-• Avoid arching your back during rows.
-• Focus on breathing and posture.`
-      };
-    }
-
-    // IRON CORE - 003
-    if (workoutId === "iron-core-003") {
-      return {
-        description: "A strength-focused workout targeting major muscle groups. Builds raw power, muscular endurance, and structural integrity. Ideal for intermediate to advanced clients.",
-        format: `Traditional Sets & Reps
-Structure: 3 Sets per exercise
-Rest Between Sets: 60–90s
-
-Warm-Up & Mobility: 10 mins
-Main Strength Block: 40 mins
-Cool-Down & Stretch: 10 mins`,
-        instructions: "Warm up thoroughly. Use progressive overload. Maintain strict form.",
-        tips: `• Never compromise form for heavier weights.
-• Use a spotter for bench press if needed.
-• Engage glutes and core during squats and deadlifts.`
-      };
-    }
-
-    // METABOSHOCK - 004
-    if (workoutId === "metaboshock-004") {
-      return {
-        description: "A hybrid metabolic workout blending resistance and cardio to spike metabolism and improve energy systems. Fast-paced and functional.",
-        format: `EMOM (Every Minute on the Minute)
-Structure: 15 mins
-
-Cycle:
-• Minute 1: Kettlebell Swings – 20 reps
-• Minute 2: TRX Rows – 15 reps
-• Minute 3: Jump Squats – 20 reps
-• Minute 4: TRX Push-Ups – 15 reps
-• Minute 5: Rest
-
-Repeat 3 cycles`,
-        instructions: "Start each minute with the prescribed reps. Rest until the next minute begins.",
-        tips: `• Keep kettlebell swings hip-driven.
-• Adjust TRX straps for proper tension.
-• Don't skip the rest minute—it's strategic recovery.`
-      };
-    }
-
-    // POWER SURGE - 005
-    if (workoutId === "power-surge-005") {
-      return {
-        description: "Designed to develop explosive strength and fast-twitch muscle activation. Ideal for athletes or clients wanting to improve speed, agility, and reactive power.",
-        format: `Circuit for Time
-Structure: 5 Rounds
-Work:Rest Ratio: 30s work / 30s rest
-
-Exercises:
-• Medicine Ball Slams – 15 reps
-• Band-Resisted Sprints – 20m x 3
-• Wall Ball Throws – 12 reps
-• Broad Jumps – 6 reps
-• Plyo Push-Ups – 10 reps
-
-Warm-Up & Cool-Down: 5 mins each`,
-        instructions: "Focus on maximum effort during work intervals. Rest fully between exercises.",
-        tips: `• Warm up joints thoroughly.
-• Land softly during jumps.
-• Use a stable wall for throws.`
-      };
-    }
-
-    // FLOWFORGE - 006
-    if (workoutId === "flowforge-006") {
-      return {
-        description: "A low-impact mobility and stability workout that enhances joint health, posture, and movement control. Ideal for recovery days or as a supplement to intense training.",
-        format: `Controlled Flow + Static Holds
-Structure: 2 Rounds
-Hold Time: 30–60s per move
-
-Exercises:
-• Band Shoulder Dislocates – 10 reps
-• Fit Ball Hip Bridges – 12 reps
-• Bird-Dog – 10 reps/side
-• Deep Squat Hold – 45s
-• Side Plank with Reach – 30s/side
-• Cat-Cow Flow – 60s
-
-Warm-Up & Breathwork: 10 mins
-Main Flow: 40 mins
-Stretch & Recovery: 10 mins`,
-        instructions: "Move slowly and intentionally. Focus on breath and control. Use bands for gentle resistance.",
-        tips: `• Avoid rushing through stretches.
-• Keep spine neutral during core work.
-• Listen to your body—this is about control, not intensity.`
-      };
-    }
-    
-    return {
-      description: "",
-      format: "",
-      instructions: "",
-      tips: ""
+  // Workout data structure
+  const workoutData: {
+    [key: string]: {
+      name: string;
+      serialNumber: string;
+      difficulty: string;
+      duration: string;
+      equipment: string;
+      imageUrl: string;
+      description: string;
+      format: string;
+      instructions: string;
+      exercises: Array<{
+        name: string;
+        sets: string;
+        reps: string;
+        rest: string;
+        notes: string;
+      }>;
+      tips: string[];
     };
-  };
+  } = {
+    "strength-001": {
+      name: "Power Foundation",
+      serialNumber: "ST-001",
+      difficulty: "Intermediate",
+      duration: "45 min",
+      equipment: "Equipment Required",
+      imageUrl: "https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=800&h=600&fit=crop",
+      description:
+        "Build your strength base with compound movements targeting major muscle groups. This workout focuses on developing raw power through progressive overload with barbells and dumbbells.",
+      format: `Traditional Strength Training
+Structure: 5 exercises, 4 sets each
+Rest Between Sets: 2-3 minutes
+Tempo: Controlled eccentric, explosive concentric
 
-  const workoutContent = getWorkoutContent(id || "");
-
-  // Get specific workout details based on workout ID
-  const getWorkoutDetails = (workoutType: string, workoutId: string) => {
-    // STRENGTH WORKOUTS
-    if (workoutId === "strength-free") {
-      return {
-        exercises: [
-          {
-            name: "Push-Ups",
-            sets: "3",
-            reps: "10-12",
-            rest: "60s",
-            notes: "Keep your core tight and lower until chest nearly touches ground. Modify on knees if needed."
-          },
-          {
-            name: "Bodyweight Squats",
-            sets: "3",
-            reps: "15-20",
-            rest: "60s",
-            notes: "Keep knees tracking over toes, chest up, and lower until thighs are parallel to ground."
-          },
-          {
-            name: "Plank Hold",
-            sets: "3",
-            reps: "30-45s",
-            rest: "45s",
-            notes: "Maintain straight line from head to heels. Don't let hips sag or pike up."
-          },
-          {
-            name: "Lunges (Alternating)",
-            sets: "3",
-            reps: "10 each leg",
-            rest: "60s",
-            notes: "Step forward and lower back knee toward ground. Keep front knee at 90 degrees."
-          },
-          {
-            name: "Pike Push-Ups",
-            sets: "3",
-            reps: "8-10",
-            rest: "60s",
-            notes: "Start in downward dog position and perform push-ups. Great for shoulders."
-          },
-          {
-            name: "Glute Bridges",
-            sets: "3",
-            reps: "15-20",
-            rest: "45s",
-            notes: "Squeeze glutes at the top and hold for 1 second. Keep core engaged."
-          }
-        ]
-      };
-    }
-    
-    if (workoutId === "1" && workoutType === "strength") {
-      return {
-        exercises: [
-          {
-            name: "Diamond Push-Ups",
-            sets: "4",
-            reps: "8-12",
-            rest: "90s",
-            notes: "Hands form diamond shape. Focuses on triceps. Modify on knees if needed."
-          },
-          {
-            name: "Bulgarian Split Squats",
-            sets: "4",
-            reps: "10 each leg",
-            rest: "90s",
-            notes: "Back foot elevated on bench. Increases single-leg strength and stability."
-          },
-          {
-            name: "Decline Push-Ups",
-            sets: "3",
-            reps: "12-15",
-            rest: "60s",
-            notes: "Feet elevated on bench or chair. Increases upper chest activation."
-          },
-          {
-            name: "Jump Squats",
-            sets: "3",
-            reps: "12-15",
-            rest: "90s",
-            notes: "Explosive power exercise. Land softly with controlled descent."
-          },
-          {
-            name: "Side Plank (each side)",
-            sets: "3",
-            reps: "30-45s",
-            rest: "45s",
-            notes: "Works obliques and lateral core stability. Keep hips elevated."
-          },
-          {
-            name: "Single-Leg Glute Bridges",
-            sets: "3",
-            reps: "12 each leg",
-            rest: "60s",
-            notes: "Increases difficulty and hip stability. Squeeze glutes hard at top."
-          }
-        ]
-      };
-    }
-
-    // CALORIE BURNING WORKOUTS
-    if (workoutId === "calorie-burning-free") {
-      return {
-        exercises: [
-          {
-            name: "Jumping Jacks",
-            sets: "4",
-            reps: "30s",
-            rest: "30s",
-            notes: "Full body warm-up exercise. Keep steady rhythm and breathe consistently."
-          },
-          {
-            name: "High Knees",
-            sets: "4",
-            reps: "30s",
-            rest: "30s",
-            notes: "Drive knees up to hip level. Pump arms vigorously for maximum calorie burn."
-          },
-          {
-            name: "Butt Kicks",
-            sets: "4",
-            reps: "30s",
-            rest: "30s",
-            notes: "Kick heels to glutes. Maintains heart rate elevation."
-          },
-          {
-            name: "Mountain Climbers",
-            sets: "4",
-            reps: "30s",
-            rest: "30s",
-            notes: "Drive knees to chest alternately. Keep core tight and hips level."
-          },
-          {
-            name: "Burpees (Modified)",
-            sets: "3",
-            reps: "20s",
-            rest: "40s",
-            notes: "Step back instead of jump if needed. Full body exercise for maximum burn."
-          },
-          {
-            name: "Skater Hops",
-            sets: "3",
-            reps: "30s",
-            rest: "30s",
-            notes: "Lateral jumps side to side. Great for leg power and cardio."
-          }
-        ]
-      };
-    }
-
-    if (workoutId === "1" && workoutType === "calorie-burning") {
-      return {
-        exercises: [
-          {
-            name: "Burpees",
-            sets: "5",
-            reps: "30s",
-            rest: "30s",
-            notes: "Full burpee with jump. Maximum calorie expenditure exercise."
-          },
-          {
-            name: "Jump Squats",
-            sets: "5",
-            reps: "30s",
-            rest: "30s",
-            notes: "Explosive squats. Land softly and immediately go into next rep."
-          },
-          {
-            name: "High Knees Sprint",
-            sets: "5",
-            reps: "30s",
-            rest: "30s",
-            notes: "Maximum intensity. Drive knees as high as possible."
-          },
-          {
-            name: "Plank Jacks",
-            sets: "4",
-            reps: "30s",
-            rest: "30s",
-            notes: "In plank position, jump feet out and in. Core + cardio combo."
-          },
-          {
-            name: "Tuck Jumps",
-            sets: "4",
-            reps: "20s",
-            rest: "40s",
-            notes: "Jump and bring knees to chest. High intensity plyometric move."
-          },
-          {
-            name: "Speed Skaters",
-            sets: "4",
-            reps: "30s",
-            rest: "30s",
-            notes: "Fast lateral bounds. Touch ground with opposite hand for balance."
-          }
-        ]
-      };
-    }
-
-    // METABOLIC WORKOUTS
-    if (workoutId === "metabolic-free") {
-      return {
-        exercises: [
-          {
-            name: "Circuit Round 1: Jump Rope (or imaginary)",
-            sets: "3 rounds",
-            reps: "45s",
-            rest: "15s",
-            notes: "Maintain steady pace. Can do imaginary jump rope if no rope available."
-          },
-          {
-            name: "Circuit Round 1: Push-Ups",
-            sets: "continue",
-            reps: "45s",
-            rest: "15s",
-            notes: "As many as possible in 45s with good form."
-          },
-          {
-            name: "Circuit Round 1: Squats",
-            sets: "continue",
-            reps: "45s",
-            rest: "90s",
-            notes: "Finish round with bodyweight squats. Rest 90s before next round."
-          },
-          {
-            name: "Circuit Round 2: Mountain Climbers",
-            sets: "3 rounds",
-            reps: "45s",
-            rest: "15s",
-            notes: "Increase intensity from previous round if possible."
-          },
-          {
-            name: "Circuit Round 2: Dips (on chair)",
-            sets: "continue",
-            reps: "45s",
-            rest: "15s",
-            notes: "Use sturdy chair or bench. Lower until elbows at 90 degrees."
-          },
-          {
-            name: "Circuit Round 2: Lunges",
-            sets: "continue",
-            reps: "45s",
-            rest: "90s",
-            notes: "Alternating lunges. Complete 3 full rounds."
-          }
-        ]
-      };
-    }
-
-    if (workoutId === "1" && workoutType === "metabolic") {
-      return {
-        exercises: [
-          {
-            name: "EMOM (Every Minute On the Minute) Block 1",
-            sets: "10 minutes",
-            reps: "10 Burpees at start of each minute",
-            rest: "remainder of minute",
-            notes: "Start burpees at 0:00, 1:00, 2:00, etc. Rest is what's left of each minute."
-          },
-          {
-            name: "Rest",
-            sets: "1",
-            reps: "2 minutes",
-            rest: "2 min",
-            notes: "Active recovery - walk around, shake out muscles."
-          },
-          {
-            name: "Tabata Block: Jump Squats",
-            sets: "8 rounds",
-            reps: "20s work / 10s rest",
-            rest: "10s between",
-            notes: "20 seconds max effort, 10 seconds rest. Repeat 8 times (4 minutes total)."
-          },
-          {
-            name: "Rest",
-            sets: "1",
-            reps: "1 minute",
-            rest: "1 min",
-            notes: "Prepare for final block."
-          },
-          {
-            name: "AMRAP (As Many Rounds As Possible) - 5 minutes",
-            sets: "AMRAP",
-            reps: "10 Push-ups + 15 Mountain Climbers + 20 High Knees",
-            rest: "minimal",
-            notes: "Complete as many full rounds as possible in 5 minutes."
-          }
-        ]
-      };
-    }
-
-    // CARDIO WORKOUTS  
-    if (workoutId === "cardio-free") {
-      return {
-        exercises: [
-          {
-            name: "Warm-Up Walk/Jog",
-            sets: "1",
-            reps: "5 minutes",
-            rest: "0s",
-            notes: "Start easy, gradually increase pace to get heart rate up."
-          },
-          {
-            name: "Easy Pace Jog",
-            sets: "1",
-            reps: "10 minutes",
-            rest: "0s",
-            notes: "Maintain conversational pace. Should be able to talk in full sentences."
-          },
-          {
-            name: "Interval Block: Moderate Pace",
-            sets: "5",
-            reps: "1 min",
-            rest: "1 min walk",
-            notes: "Slightly faster than easy pace. Alternate with 1 min walking recovery."
-          },
-          {
-            name: "Cool Down",
-            sets: "1",
-            reps: "5 minutes",
-            rest: "0s",
-            notes: "Gradually decrease pace to walking. Focus on breathing."
-          }
-        ]
-      };
-    }
-
-    if (workoutId === "pulse-igniter-001") {
-      return {
-        exercises: [
-          {
-            name: "Tabata Block 1: Jump Rope",
-            sets: "8 rounds",
-            reps: "20s work / 10s rest",
-            rest: "1 min after block",
-            notes: "Complete 8 rounds (4 mins total). Work: 20s max effort. Rest: 10s. Use timer app for precision."
-          },
-          {
-            name: "Tabata Block 2: High Knees",
-            sets: "8 rounds",
-            reps: "20s work / 10s rest",
-            rest: "1 min after block",
-            notes: "Drive knees to hip level. Maintain intensity throughout all 8 rounds."
-          },
-          {
-            name: "Tabata Block 3: Mountain Climbers",
-            sets: "8 rounds",
-            reps: "20s work / 10s rest",
-            rest: "1 min after block",
-            notes: "Keep core engaged and hips level. Fast alternating knee drives."
-          },
-          {
-            name: "Tabata Block 4: Burpees",
-            sets: "8 rounds",
-            reps: "20s work / 10s rest",
-            rest: "1 min after block",
-            notes: "Full burpees with jump. Modify by stepping back if needed."
-          },
-          {
-            name: "Tabata Block 5: Jumping Jacks",
-            sets: "8 rounds",
-            reps: "20s work / 10s rest",
-            rest: "1 min after block",
-            notes: "Keep steady rhythm. Focus on controlled landing."
-          },
-          {
-            name: "Tabata Block 6: Skater Hops",
-            sets: "8 rounds",
-            reps: "20s work / 10s rest",
-            rest: "Complete",
-            notes: "Lateral jumps side to side. Land softly and avoid locking knees."
-          }
-        ]
-      };
-    }
-
-    if (workoutId === "1" && workoutType === "cardio") {
-      return {
-        exercises: [
-          {
-            name: "Warm-Up",
-            sets: "1",
-            reps: "5 minutes",
-            rest: "0s",
-            notes: "Dynamic stretches and light jogging."
-          },
-          {
-            name: "Steady State Run",
-            sets: "1",
-            reps: "15 minutes",
-            rest: "0s",
-            notes: "Maintain 65-75% max heart rate. Conversational pace."
-          },
-          {
-            name: "Speed Intervals",
-            sets: "6",
-            reps: "90s hard / 90s easy",
-            rest: "90s between",
-            notes: "Push to 85% effort for 90s, recover at easy pace for 90s."
-          },
-          {
-            name: "Recovery Jog",
-            sets: "1",
-            reps: "5 minutes",
-            rest: "0s",
-            notes: "Easy pace to bring heart rate down gradually."
-          },
-          {
-            name: "Cool Down & Stretch",
-            sets: "1",
-            reps: "5 minutes",
-            rest: "0s",
-            notes: "Walk and static stretching for major muscle groups."
-          }
-        ]
-      };
-    }
-
-    // CALORIE BURNING - FAT FURNACE
-    if (workoutId === "fat-furnace-002") {
-      return {
-        exercises: [
-          {
-            name: "Warm-Up",
-            sets: "1",
-            reps: "5 minutes",
-            rest: "0s",
-            notes: "Dynamic movements to prepare body for high-intensity work."
-          },
-          {
-            name: "AMRAP Round 1: Dumbbell Thrusters",
-            sets: "AMRAP 30 mins",
-            reps: "12 reps",
-            rest: "minimal",
-            notes: "Squat to overhead press. Use moderate weight. Part of continuous circuit."
-          },
-          {
-            name: "AMRAP Round 1: Jump Squats",
-            sets: "continue",
-            reps: "15 reps",
-            rest: "minimal",
-            notes: "Explosive power. Land softly and immediately go into next rep."
-          },
-          {
-            name: "AMRAP Round 1: Dumbbell Renegade Rows",
-            sets: "continue",
-            reps: "10 reps/side",
-            rest: "minimal",
-            notes: "In plank position with dumbbells. Row one side then the other. Keep hips stable."
-          },
-          {
-            name: "AMRAP Round 1: Jump Lunges",
-            sets: "continue",
-            reps: "12 reps/leg",
-            rest: "minimal",
-            notes: "Switch legs mid-air. Focus on controlled landing."
-          },
-          {
-            name: "AMRAP Round 1: Plank to Push-Up",
-            sets: "continue",
-            reps: "10 reps",
-            rest: "as needed",
-            notes: "From forearm plank to high plank. Complete as many full rounds as possible in 30 mins."
-          },
-          {
-            name: "Challenge Finisher: 100 Jumping Jacks",
-            sets: "1",
-            reps: "100 total",
-            rest: "as needed",
-            notes: "Break into sets if needed. Complete all 100."
-          },
-          {
-            name: "Challenge Finisher: 50 Mountain Climbers",
-            sets: "1",
-            reps: "50 total",
-            rest: "as needed",
-            notes: "Count each knee drive. Total of 50."
-          },
-          {
-            name: "Challenge Finisher: 25 Burpees",
-            sets: "1",
-            reps: "25 total",
-            rest: "Complete",
-            notes: "Final push. Complete all 25 burpees to finish."
-          },
-          {
-            name: "Cool Down",
-            sets: "1",
-            reps: "5 minutes",
-            rest: "0s",
-            notes: "Light stretching and breathing exercises."
-          }
-        ]
-      };
-    }
-
-    // STRENGTH - IRON CORE
-    if (workoutId === "iron-core-003") {
-      return {
-        exercises: [
-          {
-            name: "Warm-Up & Mobility",
-            sets: "1",
-            reps: "10 minutes",
-            rest: "0s",
-            notes: "Dynamic stretches, joint rotations, and activation exercises. Prepare for heavy loads."
-          },
-          {
-            name: "Barbell Deadlifts",
-            sets: "3",
-            reps: "8 reps",
-            rest: "60-90s",
-            notes: "Keep bar close to body. Engage glutes and core. Maintain neutral spine throughout."
-          },
-          {
-            name: "Dumbbell Bench Press",
-            sets: "3",
-            reps: "10 reps",
-            rest: "60-90s",
-            notes: "Control the weight. Lower until elbows at 90 degrees. Press up explosively."
-          },
-          {
-            name: "Barbell Squats",
-            sets: "3",
-            reps: "8 reps",
-            rest: "60-90s",
-            notes: "Bar on upper back. Squat to parallel or below. Drive through heels."
-          },
-          {
-            name: "Dumbbell Shoulder Press",
-            sets: "3",
-            reps: "10 reps",
-            rest: "60-90s",
-            notes: "Press overhead while keeping core tight. Control the descent."
-          },
-          {
-            name: "Weighted Plank Hold",
-            sets: "3",
-            reps: "30s hold",
-            rest: "60s",
-            notes: "Place weight plate on back. Maintain straight line from head to heels."
-          },
-          {
-            name: "Cool-Down & Stretch",
-            sets: "1",
-            reps: "10 minutes",
-            rest: "0s",
-            notes: "Static stretches for all major muscle groups worked. Focus on breathing."
-          }
-        ]
-      };
-    }
-
-    // METABOLIC - METABOSHOCK
-    if (workoutId === "metaboshock-004") {
-      return {
-        exercises: [
-          {
-            name: "Minute 1: Kettlebell Swings",
-            sets: "Repeat 3x",
-            reps: "20 reps",
-            rest: "remainder of minute",
-            notes: "Hip-driven movement. Power from hips, not arms. Complete reps then rest until next minute."
-          },
-          {
-            name: "Minute 2: TRX Rows",
-            sets: "Repeat 3x",
-            reps: "15 reps",
-            rest: "remainder of minute",
-            notes: "Adjust straps for proper tension. Pull chest to handles. Control descent."
-          },
-          {
-            name: "Minute 3: Jump Squats",
-            sets: "Repeat 3x",
-            reps: "20 reps",
-            rest: "remainder of minute",
-            notes: "Explosive jump from squat. Land softly with controlled descent."
-          },
-          {
-            name: "Minute 4: TRX Push-Ups",
-            sets: "Repeat 3x",
-            reps: "15 reps",
-            rest: "remainder of minute",
-            notes: "Hands in TRX straps. Engage core for stability. Press up explosively."
-          },
-          {
-            name: "Minute 5: Strategic Recovery",
-            sets: "Repeat 3x",
-            reps: "Full minute",
-            rest: "60s",
-            notes: "Complete rest. Breathe deeply. Prepare for next cycle. Total: 3 full cycles (15 mins)."
-          }
-        ]
-      };
-    }
-
-    // STRENGTH - POWER SURGE
-    if (workoutId === "power-surge-005") {
-      return {
-        exercises: [
-          {
-            name: "Warm-Up",
-            sets: "1",
-            reps: "5 minutes",
-            rest: "0s",
-            notes: "Dynamic movements and joint mobility. Prepare for explosive work."
-          },
-          {
-            name: "Circuit Round 1: Medicine Ball Slams",
-            sets: "5 rounds",
-            reps: "15 reps",
-            rest: "30s",
-            notes: "Explosive overhead slam. Pick up and repeat. 30s work / 30s rest format."
-          },
-          {
-            name: "Circuit Round 1: Band-Resisted Sprints",
-            sets: "continue",
-            reps: "20m x 3",
-            rest: "30s",
-            notes: "Attach band around waist. Sprint against resistance for 20m. Walk back. Repeat 3x."
-          },
-          {
-            name: "Circuit Round 1: Wall Ball Throws",
-            sets: "continue",
-            reps: "12 reps",
-            rest: "30s",
-            notes: "Squat and explosively throw ball to wall target. Catch and repeat."
-          },
-          {
-            name: "Circuit Round 1: Broad Jumps",
-            sets: "continue",
-            reps: "6 reps",
-            rest: "30s",
-            notes: "Maximum distance jump. Land softly. Reset and repeat."
-          },
-          {
-            name: "Circuit Round 1: Plyo Push-Ups",
-            sets: "continue",
-            reps: "10 reps",
-            rest: "30s then next round",
-            notes: "Explosive push-up. Hands leave ground. Complete 5 full rounds of all exercises."
-          },
-          {
-            name: "Cool Down",
-            sets: "1",
-            reps: "5 minutes",
-            rest: "0s",
-            notes: "Light movement and stretching."
-          }
-        ]
-      };
-    }
-
-    // MOBILITY WORKOUTS
-    if (workoutId === "mobility-free") {
-      return {
-        exercises: [
-          {
-            name: "Cat-Cow Stretch",
-            sets: "3",
-            reps: "10 reps",
-            rest: "30s",
-            notes: "On hands and knees. Alternate between arching and rounding spine slowly."
-          },
-          {
-            name: "World's Greatest Stretch",
-            sets: "3",
-            reps: "5 each side",
-            rest: "30s",
-            notes: "Lunge position with twist. Opens hips, hamstrings, and thoracic spine."
-          },
-          {
-            name: "Hip Circles",
-            sets: "3",
-            reps: "10 each direction",
-            rest: "30s",
-            notes: "Standing, make large circles with hips. Both clockwise and counter-clockwise."
-          },
-          {
-            name: "Shoulder Dislocations (with band or towel)",
-            sets: "3",
-            reps: "10 reps",
-            rest: "30s",
-            notes: "Wide grip, pass over head and behind back. Improves shoulder mobility."
-          },
-          {
-            name: "90/90 Hip Stretch",
-            sets: "3",
-            reps: "45s each side",
-            rest: "30s",
-            notes: "Seated position. One leg in front at 90°, one behind at 90°. Lean forward."
-          },
-          {
-            name: "Child's Pose to Upward Dog",
-            sets: "3",
-            reps: "8 reps",
-            rest: "30s",
-            notes: "Flow between positions. Stretches spine, hips, and shoulders."
-          }
-        ]
-      };
-    }
-
-    if (workoutId === "flowforge-006") {
-      return {
-        exercises: [
-          {
-            name: "Warm-Up & Breathwork",
-            sets: "1",
-            reps: "10 minutes",
-            rest: "0s",
-            notes: "Deep breathing exercises and light movement to prepare body and mind."
-          },
-          {
-            name: "Round 1: Band Shoulder Dislocates",
-            sets: "2 rounds",
-            reps: "10 reps",
-            rest: "minimal",
-            notes: "Wide grip on band. Pass over head and behind back. Improves shoulder mobility."
-          },
-          {
-            name: "Round 1: Fit Ball Hip Bridges",
-            sets: "continue",
-            reps: "12 reps",
-            rest: "minimal",
-            notes: "Feet on ball. Lift hips. Squeeze glutes at top. Control descent."
-          },
-          {
-            name: "Round 1: Bird-Dog",
-            sets: "continue",
-            reps: "10 reps/side",
-            rest: "minimal",
-            notes: "On hands and knees. Extend opposite arm and leg. Hold 2s. Return. Switch."
-          },
-          {
-            name: "Round 1: Deep Squat Hold",
-            sets: "continue",
-            reps: "45s hold",
-            rest: "minimal",
-            notes: "Bodyweight squat as deep as possible. Hold position. Focus on breathing."
-          },
-          {
-            name: "Round 1: Side Plank with Reach",
-            sets: "continue",
-            reps: "30s/side",
-            rest: "minimal",
-            notes: "Hold side plank. Thread top arm under body then reach up. Repeat."
-          },
-          {
-            name: "Round 1: Cat-Cow Flow",
-            sets: "continue",
-            reps: "60s",
-            rest: "2 min then repeat",
-            notes: "Slow alternating spinal flexion and extension. Complete 2 full rounds."
-          },
-          {
-            name: "Stretch & Recovery",
-            sets: "1",
-            reps: "10 minutes",
-            rest: "0s",
-            notes: "Extended static stretches for all major muscle groups. Focus on breath and relaxation."
-          }
-        ]
-      };
-    }
-
-    if (workoutId === "1" && workoutType === "mobility") {
-      return {
-        exercises: [
-          {
-            name: "Dynamic Warm-Up Flow",
-            sets: "2",
-            reps: "5 min",
-            rest: "60s",
-            notes: "Arm circles, leg swings, torso twists, neck rolls."
-          },
-          {
-            name: "Deep Squat Hold",
-            sets: "3",
-            reps: "60s",
-            rest: "45s",
-            notes: "Sit in bottom of squat. Use hands for balance if needed. Opens hips and ankles."
-          },
-          {
-            name: "Thoracic Bridge",
-            sets: "3",
-            reps: "10 reps",
-            rest: "45s",
-            notes: "On hands and feet, lift hips high. Excellent for spine extension."
-          },
-          {
-            name: "Cossack Squats",
-            sets: "3",
-            reps: "8 each side",
-            rest: "60s",
-            notes: "Side-to-side shifting squats. Improves hip and adductor mobility."
-          },
-          {
-            name: "Thread the Needle",
-            sets: "3",
-            reps: "10 each side",
-            rest: "45s",
-            notes: "On hands and knees, thread arm under body. Rotates thoracic spine."
-          },
-          {
-            name: "Lizard Pose with Rotation",
-            sets: "3",
-            reps: "8 each side",
-            rest: "45s",
-            notes: "Low lunge with rotation. Opens hips and improves spinal mobility."
-          }
-        ]
-      };
-    }
-
-    // CHALLENGE WORKOUTS
-    if (workoutId === "challenge-free") {
-      return {
-        exercises: [
-          {
-            name: "100 Push-Up Challenge (can break into sets)",
-            sets: "As needed",
-            reps: "100 total",
-            rest: "as needed",
-            notes: "Break into manageable sets. Example: 10 sets of 10, or 5 sets of 20."
-          },
-          {
-            name: "100 Squat Challenge",
-            sets: "As needed",
-            reps: "100 total",
-            rest: "as needed",
-            notes: "Bodyweight squats. Focus on full range of motion for all reps."
-          },
-          {
-            name: "3-Minute Plank Hold (total cumulative time)",
-            sets: "As needed",
-            reps: "3 min total",
-            rest: "as needed",
-            notes: "Can break into multiple holds. Track total time to reach 3 minutes."
-          },
-          {
-            name: "50 Burpee Challenge",
-            sets: "As needed",
-            reps: "50 total",
-            rest: "minimal",
-            notes: "Complete as fast as possible with good form. Time yourself!"
-          }
-        ]
-      };
-    }
-
-    if (workoutId === "1" && workoutType === "challenge") {
-      return {
-        exercises: [
-          {
-            name: "The Spartan 300 Challenge",
-            sets: "1",
-            reps: "Complete all 300 reps",
-            rest: "minimal",
-            notes: "25 Pull-ups, 50 Deadlifts, 50 Push-ups, 50 Box Jumps, 50 Floor Wipers, 50 Kettlebell Clean & Press, 25 Pull-ups. Modify as needed."
-          },
-          {
-            name: "Rest",
-            sets: "1",
-            reps: "5 minutes",
-            rest: "5 min",
-            notes: "You'll need it after that! Hydrate well."
-          },
-          {
-            name: "Bonus Round: Max Effort",
-            sets: "1",
-            reps: "AMRAP - 5 minutes",
-            rest: "minimal",
-            notes: "5 Burpees + 10 Push-ups + 15 Squats. As many rounds as possible in 5 minutes."
-          }
-        ]
-      };
-    }
-    
-    // Default workout structure for other workouts not yet detailed
-    return {
+Warm-Up: 10 minutes dynamic stretching
+Main Block: 30 minutes strength work
+Cool-Down: 5 minutes static stretching`,
+      instructions:
+        "Start with a thorough warm-up. Use weights that challenge you for the prescribed reps while maintaining perfect form. Focus on progressive overload by gradually increasing weight week by week.",
       exercises: [
         {
-          name: "Exercise 1",
-          sets: "3-4",
-          reps: "10-12",
-          rest: "60-90s",
-          notes: "Detailed workout plan coming soon! This workout will have specific exercises, sets, reps, and rest periods."
-        }
-      ]
-    };
+          name: "Barbell Back Squat",
+          sets: "4",
+          reps: "6-8",
+          rest: "3 min",
+          notes: "Bar on upper traps, descend below parallel, drive through heels",
+        },
+        {
+          name: "Barbell Bench Press",
+          sets: "4",
+          reps: "6-8",
+          rest: "3 min",
+          notes: "Retract shoulder blades, lower to chest, press explosively",
+        },
+        {
+          name: "Barbell Deadlift",
+          sets: "4",
+          reps: "5-6",
+          rest: "3 min",
+          notes: "Neutral spine, hinge at hips, drive through full foot",
+        },
+        {
+          name: "Barbell Overhead Press",
+          sets: "4",
+          reps: "8-10",
+          rest: "2 min",
+          notes: "Tight core, press straight up, lock out overhead",
+        },
+        {
+          name: "Barbell Row",
+          sets: "4",
+          reps: "8-10",
+          rest: "2 min",
+          notes: "Hinged position, pull to lower chest, squeeze shoulder blades",
+        },
+      ],
+      tips: [
+        "Always warm up thoroughly before heavy lifting",
+        "Never compromise form for heavier weight",
+        "Use a spotter for bench press and squats",
+        "Engage core throughout all movements",
+        "Rest adequately between sets for full recovery",
+        "Breathe properly: exhale on exertion, inhale on return",
+      ],
+    },
+    "calorie-001": {
+      name: "Metabolic Burn",
+      serialNumber: "CB-001",
+      difficulty: "Beginner",
+      duration: "30 min",
+      equipment: "No Equipment Required",
+      imageUrl: "https://images.unsplash.com/photo-1549060279-7e168fcee0c2?w=800&h=600&fit=crop",
+      description:
+        "High-intensity bodyweight workout designed to maximize calorie burn. This workout combines cardio bursts with bodyweight exercises to keep your heart rate elevated throughout.",
+      format: `Circuit Training
+Structure: 6 exercises, 4 rounds
+Work:Rest Ratio: 40s work / 20s rest
+Total Circuits: 4 rounds
+
+Warm-Up: 5 minutes light cardio
+Main Block: 24 minutes circuit work
+Cool-Down: 1 minute stretching`,
+      instructions:
+        "Move quickly between exercises with minimal rest. Focus on maintaining intensity while keeping proper form. Modify exercises as needed by reducing range of motion or intensity.",
+      exercises: [
+        {
+          name: "Jumping Jacks",
+          sets: "4 rounds",
+          reps: "40s",
+          rest: "20s",
+          notes: "Full range of motion, steady rhythm, land softly",
+        },
+        {
+          name: "Burpees",
+          sets: "4 rounds",
+          reps: "40s",
+          rest: "20s",
+          notes: "Drop down, kick back, push-up, jump up, hands overhead",
+        },
+        {
+          name: "High Knees",
+          sets: "4 rounds",
+          reps: "40s",
+          rest: "20s",
+          notes: "Drive knees to hip level, pump arms vigorously",
+        },
+        {
+          name: "Mountain Climbers",
+          sets: "4 rounds",
+          reps: "40s",
+          rest: "20s",
+          notes: "Plank position, drive knees to chest alternately",
+        },
+        {
+          name: "Jump Squats",
+          sets: "4 rounds",
+          reps: "40s",
+          rest: "20s",
+          notes: "Squat down, explode up, land softly, repeat",
+        },
+        {
+          name: "Plank Jacks",
+          sets: "4 rounds",
+          reps: "40s",
+          rest: "90s",
+          notes: "Plank position, jump feet out and in, keep core tight",
+        },
+      ],
+      tips: [
+        "Stay hydrated throughout the workout",
+        "Land softly on all jumping movements",
+        "Maintain core engagement during all exercises",
+        "Modify intensity based on fitness level",
+        "Focus on consistent pace over maximum speed",
+        "Listen to your body and rest if needed",
+      ],
+    },
+    "metabolic-001": {
+      name: "Metabolic Ignition",
+      serialNumber: "MB-001",
+      difficulty: "Intermediate",
+      duration: "35 min",
+      equipment: "Equipment Required",
+      imageUrl: "https://images.unsplash.com/photo-1517836357463-d25dfeac3438?w=800&h=600&fit=crop",
+      description:
+        "An explosive metabolic workout that combines strength and cardio elements. Using kettlebells and dumbbells, this workout spikes your metabolism and burns calories long after you finish.",
+      format: `EMOM (Every Minute on the Minute)
+Structure: 5 exercises, 7 rounds
+Work Pattern: Complete reps, rest remainder of minute
+
+Warm-Up: 5 minutes dynamic movement
+Main Block: 25 minutes EMOM
+Cool-Down: 5 minutes recovery`,
+      instructions:
+        "Start each minute with the prescribed exercise. Complete the reps, then rest for the remainder of that minute. Move immediately to the next exercise when the next minute starts.",
+      exercises: [
+        {
+          name: "Kettlebell Swings",
+          sets: "7 rounds",
+          reps: "15",
+          rest: "remainder of minute",
+          notes: "Hip hinge movement, explosive hip drive, bell to shoulder height",
+        },
+        {
+          name: "Dumbbell Thrusters",
+          sets: "7 rounds",
+          reps: "12",
+          rest: "remainder of minute",
+          notes: "Front squat to overhead press in one motion",
+        },
+        {
+          name: "Kettlebell Goblet Squats",
+          sets: "7 rounds",
+          reps: "15",
+          rest: "remainder of minute",
+          notes: "Hold bell at chest, squat deep, drive through heels",
+        },
+        {
+          name: "Dumbbell Push Press",
+          sets: "7 rounds",
+          reps: "10",
+          rest: "remainder of minute",
+          notes: "Slight dip, explosive drive, press overhead",
+        },
+        {
+          name: "Kettlebell Romanian Deadlift",
+          sets: "7 rounds",
+          reps: "12",
+          rest: "60s after round",
+          notes: "Hinge at hips, slight knee bend, feel hamstring stretch",
+        },
+      ],
+      tips: [
+        "Choose weights that allow you to maintain form throughout",
+        "Use hip power for kettlebell swings, not arms",
+        "Maintain tight core during all movements",
+        "Focus on explosive movements with control",
+        "Adjust rest by finishing reps faster or slower",
+        "Keep good posture throughout the workout",
+      ],
+    },
+    "cardio-001": {
+      name: "Cardio Blast",
+      serialNumber: "CD-001",
+      difficulty: "Beginner",
+      duration: "40 min",
+      equipment: "No Equipment Required",
+      imageUrl: "https://images.unsplash.com/photo-1538805060514-97d9cc17730c?w=800&h=600&fit=crop",
+      description:
+        "Build cardiovascular endurance with this progressive cardio workout. Combining steady-state work with interval training to improve your aerobic capacity and stamina.",
+      format: `Mixed Cardio Protocol
+Structure: Warm-up, intervals, steady state, cool-down
+Intensity Zones: 60-85% max heart rate
+
+Warm-Up: 5 minutes easy pace
+Intervals: 20 minutes alternating intensity
+Steady State: 10 minutes moderate pace
+Cool-Down: 5 minutes easy pace`,
+      instructions:
+        "Monitor your heart rate and maintain prescribed intensity zones. During intervals, push to 80-85% max HR, recover to 60-65% during rest periods.",
+      exercises: [
+        {
+          name: "Warm-Up March",
+          sets: "1",
+          reps: "5 min",
+          rest: "0",
+          notes: "Easy pace, gradually increase heart rate, arm swings",
+        },
+        {
+          name: "High Intensity Intervals",
+          sets: "10",
+          reps: "1 min work / 1 min rest",
+          rest: "1 min between",
+          notes: "Alternate: High Knees, Butt Kicks, Jumping Jacks, Skaters, repeat",
+        },
+        {
+          name: "Steady State Cardio",
+          sets: "1",
+          reps: "10 min",
+          rest: "0",
+          notes: "Jogging in place or step-ups, maintain 70% max HR",
+        },
+        {
+          name: "Cool-Down Walk",
+          sets: "1",
+          reps: "5 min",
+          rest: "0",
+          notes: "Gradually lower heart rate, deep breathing",
+        },
+      ],
+      tips: [
+        "Monitor your heart rate to stay in target zones",
+        "Start at lower intensity if you're new to cardio",
+        "Focus on breathing rhythm throughout",
+        "Stay hydrated before, during, and after",
+        "Land softly on all jumping movements",
+        "Progress gradually by increasing work intervals",
+      ],
+    },
+    "mobility-001": {
+      name: "Flow & Mobility",
+      serialNumber: "MO-001",
+      difficulty: "Beginner",
+      duration: "30 min",
+      equipment: "No Equipment Required",
+      imageUrl: "https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?w=800&h=600&fit=crop",
+      description:
+        "Improve flexibility, joint health, and movement quality. This mobility-focused session enhances range of motion and helps prevent injury through controlled movements and stretches.",
+      format: `Mobility Flow Sequence
+Structure: Progressive mobility drills
+Hold Time: 30-60 seconds per position
+Flow Style: Continuous movement
+
+Breathing: 5 minutes breathwork
+Main Flow: 20 minutes mobility sequence
+Relaxation: 5 minutes final stretches`,
+      instructions:
+        "Move slowly and deliberately through each position. Focus on breath and control rather than pushing into pain. Hold stretches at comfortable tension, never force.",
+      exercises: [
+        {
+          name: "Cat-Cow Flow",
+          sets: "3",
+          reps: "60s",
+          rest: "0",
+          notes: "Hands and knees, alternate between arching and rounding spine",
+        },
+        {
+          name: "World's Greatest Stretch",
+          sets: "3",
+          reps: "45s each side",
+          rest: "0",
+          notes: "Lunge position, rotate torso, reach up, hold and breathe",
+        },
+        {
+          name: "Hip Circles",
+          sets: "2",
+          reps: "30s each direction",
+          rest: "0",
+          notes: "Standing or hands/knees, make large circles with hips",
+        },
+        {
+          name: "Thread the Needle",
+          sets: "2",
+          reps: "45s each side",
+          rest: "0",
+          notes: "On all fours, reach arm under body, feel shoulder stretch",
+        },
+        {
+          name: "Deep Squat Hold",
+          sets: "3",
+          reps: "60s",
+          rest: "30s",
+          notes: "Feet shoulder width, sink into deep squat, hands at chest",
+        },
+        {
+          name: "Cobra to Child's Pose",
+          sets: "3",
+          reps: "60s",
+          rest: "0",
+          notes: "Flow between cobra stretch and child's pose",
+        },
+      ],
+      tips: [
+        "Never stretch to the point of pain",
+        "Breathe deeply and consistently throughout",
+        "Move slowly and with control",
+        "Listen to your body and respect its limits",
+        "Practice regularly for best results",
+        "Focus on relaxation, not forcing positions",
+      ],
+    },
+    "challenge-001": {
+      name: "Ultimate Challenge",
+      serialNumber: "CH-001",
+      difficulty: "Advanced",
+      duration: "50 min",
+      equipment: "Equipment Required",
+      imageUrl: "https://images.unsplash.com/photo-1517836357463-d25dfeac3438?w=800&h=600&fit=crop",
+      description:
+        "The ultimate test of strength, endurance, and mental toughness. This advanced workout combines heavy lifting, high-intensity cardio, and bodyweight challenges to push you to your limits.",
+      format: `Multi-Modal Challenge
+Structure: 3 phases with increasing difficulty
+Work:Rest: Minimal rest between exercises
+
+Phase 1: Strength (20 min)
+Phase 2: Metabolic (20 min)
+Phase 3: Finisher (10 min)`,
+      instructions:
+        "This is an advanced workout requiring excellent form and fitness. Take rest as needed but challenge yourself to minimize breaks. Focus on perfect form even when fatigued.",
+      exercises: [
+        {
+          name: "Phase 1: Heavy Barbell Complex",
+          sets: "5",
+          reps: "5 reps each: Deadlift, Clean, Front Squat, Press, Back Squat",
+          rest: "3 min",
+          notes: "Complete all 5 movements without dropping bar",
+        },
+        {
+          name: "Phase 2: Chipper",
+          sets: "1",
+          reps: "For Time",
+          rest: "minimal",
+          notes: "50 Burpees, 40 KB Swings, 30 Box Jumps, 20 Pull-ups, 10 Thrusters",
+        },
+        {
+          name: "Phase 3: AMRAP 10 Minutes",
+          sets: "As many rounds",
+          reps: "10 min",
+          rest: "minimal",
+          notes: "5 Muscle-ups, 10 Pistol Squats, 15 Handstand Push-ups",
+        },
+      ],
+      tips: [
+        "This is for advanced athletes only",
+        "Warm up thoroughly before attempting",
+        "Have a spotter available for heavy lifts",
+        "Scale movements if needed to maintain form",
+        "Stay mentally focused throughout",
+        "Recovery is crucial after this workout",
+        "Hydrate well and monitor your body",
+      ],
+    },
   };
 
-  const workoutDetails = getWorkoutDetails(type || "", id || "");
+  const workout = workoutData[id || ""];
 
-  const workoutImage = workoutImages[id || ""] || "https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?w=800&h=600&fit=crop";
-
-  // Get equipment info based on type
-  const getEquipmentInfo = () => {
-    if (type?.includes('strength') || id === 'iron-core-003' || id === 'power-surge-005') {
-      return 'Dumbbells, Barbells, Equipment';
-    }
-    if (id === 'fat-furnace-002') {
-      return 'Dumbbells, Mat';
-    }
-    if (id === 'metaboshock-004') {
-      return 'Kettlebells, TRX, Mat';
-    }
-    if (id === 'pulse-igniter-001') {
-      return 'Jump Rope, Mat';
-    }
-    if (id === 'flowforge-006') {
-      return 'Fit Ball, Bands, Mat';
-    }
-    if (type?.includes('cardio') || type?.includes('mobility') || id?.includes('free')) {
-      return 'None (Bodyweight)';
-    }
-    return 'Varies';
-  };
-
-  // Get duration info
-  const getDurationInfo = () => {
-    if (id === 'iron-core-003' || id === 'flowforge-006') return '60 minutes';
-    if (id === 'fat-furnace-002') return '45 minutes';
-    if (id === 'pulse-igniter-001' || id === 'power-surge-005') return '30 minutes';
-    if (id?.includes('free')) return '20-25 minutes';
-    if (id === 'metaboshock-004') return '15 minutes';
-    return '30-45 minutes';
-  };
-
-  const content = (
-    <>
-      <ShareButtons 
-        title={workoutInfo.name} 
-        url={window.location.href}
-      />
-
-      <WorkoutInteractions
-        workoutId={`${type}-${id}`}
-        workoutType={type || 'cardio'}
-        workoutName={workoutInfo.name}
-      />
-      
-      <WorkoutDisplay
-        exercises={exercises}
-        planContent=""
-        title={workoutInfo.name}
-        serial={workoutInfo.serial}
-        difficulty={workoutInfo.difficulty}
-        workoutDetails={workoutDetails}
-        imageUrl={workoutImage}
-        duration={getDurationInfo()}
-        equipment={getEquipmentInfo()}
-        description={workoutContent.description}
-        format={workoutContent.format}
-        instructions={workoutContent.instructions}
-        tips={workoutContent.tips}
-      />
-
-      {/* Upsell Banner for Free Workouts */}
-      {isFreeWorkout && (
-        <div className="mt-8 bg-primary/10 border-2 border-primary/30 rounded-lg p-6 text-center">
-          <h3 className="text-xl font-semibold mb-2">Want more?</h3>
-          <p className="text-muted-foreground mb-4">
-            Unlock 100+ workouts and tools — Join Premium.
-          </p>
-          <Button size="lg" onClick={() => navigate('/premiumbenefits')}>
-            Unlock Premium
+  if (!workout) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <Card className="p-8">
+          <p className="text-center">Workout not found</p>
+          <Button onClick={() => navigate("/workout")} className="mt-4">
+            Back to Workouts
           </Button>
-        </div>
-      )}
-    </>
-  );
+        </Card>
+      </div>
+    );
+  }
 
   return (
     <>
       <Helmet>
-        <title>{workoutInfo.name} | Smarty Gym</title>
-        <meta name="description" content={`${workoutInfo.name} - Workout #${workoutInfo.serial}`} />
+        <title>{workout.name} | Smarty Gym</title>
+        <meta name="description" content={workout.description} />
       </Helmet>
-      
-      <div className="min-h-screen bg-background">
-      <div className="container mx-auto px-4 py-8">
-        <Button
-          onClick={() => navigate(-1)}
-          variant="outline"
-          className="mb-6"
-        >
-          <ArrowLeft className="w-4 h-4 mr-2" />
-          Back
-        </Button>
 
-        <AccessGate 
-          requireAuth={!isFreeWorkout} 
-          requirePremium={!isFreeWorkout}
-          contentType="workout"
-        >
-          {content}
-        </AccessGate>
-      </div>
-      </div>
+      <div className="min-h-screen bg-background">
+          <div className="container mx-auto max-w-4xl px-4 py-8">
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => navigate(`/workout/${type}`)}
+              className="mb-6"
+            >
+              <ArrowLeft className="mr-2 h-4 w-4" />
+              <span className="text-xs sm:text-sm">Back</span>
+            </Button>
+
+            {/* Workout Name */}
+            <h1 className="text-4xl font-bold text-center mb-6">{workout.name}</h1>
+
+            {/* Serial Number, Difficulty, Duration, Equipment */}
+            <div className="flex flex-wrap justify-center gap-4 mb-8">
+              <div className="flex items-center gap-2 px-4 py-2 bg-card rounded-lg border">
+                <span className="text-sm font-medium">Serial:</span>
+                <span className="text-sm text-muted-foreground">{workout.serialNumber}</span>
+              </div>
+              <div className="flex items-center gap-2 px-4 py-2 bg-card rounded-lg border">
+                <TrendingUp className="w-4 h-4" />
+                <span className="text-sm text-muted-foreground">{workout.difficulty}</span>
+              </div>
+              <div className="flex items-center gap-2 px-4 py-2 bg-card rounded-lg border">
+                <Clock className="w-4 h-4" />
+                <span className="text-sm text-muted-foreground">{workout.duration}</span>
+              </div>
+              <div className="flex items-center gap-2 px-4 py-2 bg-card rounded-lg border">
+                <Dumbbell className="w-4 h-4" />
+                <span className="text-sm text-muted-foreground">{workout.equipment}</span>
+              </div>
+            </div>
+
+            {/* Workout Image */}
+            <div className="mb-8 rounded-lg overflow-hidden">
+              <img
+                src={workout.imageUrl}
+                alt={workout.name}
+                className="w-full h-64 object-cover"
+              />
+            </div>
+
+            {/* Three Cards: Video, Timer, Calculator */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
+              <Card className="cursor-pointer hover:shadow-lg transition-shadow">
+                <CardHeader>
+                  <CardTitle className="text-center text-sm">Video Guide</CardTitle>
+                </CardHeader>
+                <CardContent className="text-center text-muted-foreground text-xs">
+                  Watch tutorial
+                </CardContent>
+              </Card>
+              <Card className="cursor-pointer hover:shadow-lg transition-shadow">
+                <CardHeader>
+                  <CardTitle className="text-center text-sm">Workout Timer</CardTitle>
+                </CardHeader>
+                <CardContent className="text-center text-muted-foreground text-xs">
+                  Time your sets
+                </CardContent>
+              </Card>
+              <Card className="cursor-pointer hover:shadow-lg transition-shadow">
+                <CardHeader>
+                  <CardTitle className="text-center text-sm">1RM Calculator</CardTitle>
+                </CardHeader>
+                <CardContent className="text-center text-muted-foreground text-xs">
+                  Calculate max
+                </CardContent>
+              </Card>
+            </div>
+
+            {/* Description Card */}
+            <Card className="mb-8">
+              <CardHeader>
+                <CardTitle>Description</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-muted-foreground">{workout.description}</p>
+              </CardContent>
+            </Card>
+
+            {/* Format and Instructions Card */}
+            <Card className="mb-8">
+              <CardHeader>
+                <CardTitle>Format & Instructions</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div>
+                  <h3 className="font-semibold mb-2">Format:</h3>
+                  <pre className="text-sm text-muted-foreground whitespace-pre-wrap font-sans">
+                    {workout.format}
+                  </pre>
+                </div>
+                <div>
+                  <h3 className="font-semibold mb-2">Instructions:</h3>
+                  <p className="text-sm text-muted-foreground">{workout.instructions}</p>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Exercises Card */}
+            <Card className="mb-8">
+              <CardHeader>
+                <CardTitle>Exercises</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-6">
+                  {workout.exercises.map((exercise, index) => (
+                    <div key={index} className="border-b pb-4 last:border-b-0">
+                      <h3 className="font-semibold text-lg mb-2">{exercise.name}</h3>
+                      <div className="grid grid-cols-3 gap-4 mb-2 text-sm">
+                        <div>
+                          <span className="text-muted-foreground">Sets:</span>{" "}
+                          <span className="font-medium">{exercise.sets}</span>
+                        </div>
+                        <div>
+                          <span className="text-muted-foreground">Reps:</span>{" "}
+                          <span className="font-medium">{exercise.reps}</span>
+                        </div>
+                        <div>
+                          <span className="text-muted-foreground">Rest:</span>{" "}
+                          <span className="font-medium">{exercise.rest}</span>
+                        </div>
+                      </div>
+                      <p className="text-sm text-muted-foreground italic">{exercise.notes}</p>
+                    </div>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Tips and Safety Card */}
+            <Card className="mb-8">
+              <CardHeader>
+                <CardTitle>Tips & Safety</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <ul className="space-y-2">
+                  {workout.tips.map((tip, index) => (
+                    <li key={index} className="flex items-start gap-2">
+                      <span className="text-primary mt-1">•</span>
+                      <span className="text-sm text-muted-foreground">{tip}</span>
+                    </li>
+                  ))}
+                </ul>
+              </CardContent>
+            </Card>
+
+            {/* ParQ Questionnaire */}
+            <div className="mb-8">
+              <ParQQuestionnaire />
+            </div>
+
+            {/* Share Buttons */}
+            <div className="mt-8">
+              <ShareButtons
+                url={window.location.href}
+                title={`Check out ${workout.name} workout on Smarty Gym!`}
+              />
+            </div>
+          </div>
+        </div>
     </>
   );
 };
