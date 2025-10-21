@@ -122,7 +122,6 @@ export const WorkoutDisplay = ({
           } else {
             if (currentRound < rounds) {
               setCurrentRound((r) => r + 1);
-              setTotalRounds((t) => t + 1);
               setIsWorking(true);
               return workTime;
             } else {
@@ -141,7 +140,6 @@ export const WorkoutDisplay = ({
   const handleStartStop = () => {
     if (!isRunning && currentRound === 0) {
       setCurrentRound(1);
-      setTotalRounds(1);
     }
     setIsRunning(!isRunning);
   };
@@ -149,7 +147,6 @@ export const WorkoutDisplay = ({
   const handleReset = () => {
     setIsRunning(false);
     setCurrentRound(0);
-    setTotalRounds(0);
     setIsWorking(true);
     setTimeLeft(workTime);
   };
@@ -232,7 +229,7 @@ export const WorkoutDisplay = ({
                     value={workTime}
                     onChange={(e) => setWorkTime(parseInt(e.target.value) || 20)}
                     disabled={isRunning}
-                    className="h-9 text-center"
+                    className="h-9 text-center border-2 border-primary/40"
                   />
                   <span className="text-xs">s</span>
                 </div>
@@ -245,7 +242,7 @@ export const WorkoutDisplay = ({
                     value={restTime}
                     onChange={(e) => setRestTime(parseInt(e.target.value) || 10)}
                     disabled={isRunning}
-                    className="h-9 text-center"
+                    className="h-9 text-center border-2 border-primary/40"
                   />
                   <span className="text-xs">s</span>
                 </div>
@@ -259,7 +256,7 @@ export const WorkoutDisplay = ({
                 value={rounds}
                 onChange={(e) => setRounds(parseInt(e.target.value) || 8)}
                 disabled={isRunning}
-                className="h-9 text-center"
+                className="h-9 text-center border-2 border-primary/40"
               />
             </div>
 
@@ -268,18 +265,18 @@ export const WorkoutDisplay = ({
                 {timeLeft}s
               </div>
               <div className="text-sm font-semibold">
-                {isRunning ? (isWorking ? 'Work' : 'Rest') : 'Ready'} • Round {currentRound}/{totalRounds}
+                {isRunning ? (isWorking ? 'Work' : 'Rest') : 'Ready'} • Round {currentRound}/{rounds}
               </div>
             </div>
 
             <div className="flex gap-2">
               <Button 
                 onClick={handleStartStop}
-                className="flex-1"
+                className="flex-1 h-10"
               >
                 {isRunning ? <><Pause className="w-4 h-4 mr-2" /> Stop</> : <><Play className="w-4 h-4 mr-2" /> Start</>}
               </Button>
-              <Button onClick={handleReset} variant="outline">
+              <Button onClick={handleReset} variant="outline" className="h-10 px-4">
                 <RotateCcw className="w-4 h-4" />
               </Button>
             </div>
@@ -299,7 +296,7 @@ export const WorkoutDisplay = ({
                   type="number"
                   value={weight}
                   onChange={(e) => setWeight(parseInt(e.target.value) || 100)}
-                  className="h-9 text-center"
+                  className="h-9 text-center border-2 border-primary/40"
                 />
                 <span className="text-xs font-medium">kg</span>
               </div>
@@ -311,13 +308,13 @@ export const WorkoutDisplay = ({
                 type="number"
                 value={reps}
                 onChange={(e) => setReps(parseInt(e.target.value) || 8)}
-                className="h-9 text-center"
+                className="h-9 text-center border-2 border-primary/40"
               />
             </div>
 
             <Button 
               onClick={calculate1RM}
-              className="w-full"
+              className="w-full h-10"
             >
               Calculate 1RM
             </Button>
