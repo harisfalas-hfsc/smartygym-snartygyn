@@ -33,6 +33,12 @@ import stabilityCircuitImg from "@/assets/stability-circuit-workout.jpg";
 import mobilityMasteryImg from "@/assets/mobility-mastery-workout.jpg";
 import balanceForgeImg from "@/assets/balance-forge-workout.jpg";
 import ultimateChallengeImg from "@/assets/ultimate-challenge-workout.jpg";
+import powerPrimerImg from "@/assets/power-primer-workout.jpg";
+import explosiveStartImg from "@/assets/explosive-start-workout.jpg";
+import bodyBlastImg from "@/assets/body-blast-workout.jpg";
+import powerCircuitProImg from "@/assets/power-circuit-pro-workout.jpg";
+import explosiveEngineImg from "@/assets/explosive-engine-workout.jpg";
+import powerSurgeEliteImg from "@/assets/power-surge-elite-workout.jpg";
 import starterGauntletImg from "@/assets/starter-gauntlet-workout.jpg";
 import challengePrepImg from "@/assets/challenge-prep-workout.jpg";
 import bodyweightBlitzImg from "@/assets/bodyweight-blitz-workout.jpg";
@@ -75,6 +81,7 @@ const WorkoutDetail = () => {
     "metabolic": "Metabolic Workout",
     "cardio": "Cardio Workout",
     "mobility": "Mobility & Stability Workout",
+    "power": "Power Workout",
     "challenge": "Challenge Workout"
   };
 
@@ -122,6 +129,14 @@ const WorkoutDetail = () => {
       { id: "mobility-006", name: "Stability Circuit", description: "Full-body stability circuit using fit ball, bands, and mat work to challenge balance and joint control", duration: "45 min", equipment: "equipment", level: "intermediate", format: "circuit", imageUrl: stabilityCircuitImg, isFree: true },
       { id: "mobility-007", name: "Mobility Mastery", description: "Advanced mobility and stability workout using high-intensity intervals and deep holds to challenge control and flexibility", duration: "60 min", equipment: "bodyweight", level: "advanced", format: "mix", imageUrl: mobilityMasteryImg, isFree: true },
       { id: "mobility-008", name: "Balance Forge", description: "Precision-based mobility workout using fit ball, bands, and mat work to develop elite control and joint integrity", duration: "60 min", equipment: "equipment", level: "advanced", format: "reps & sets", imageUrl: balanceForgeImg, isFree: true },
+    ],
+    "power": [
+      { id: "power-002", name: "Power Primer", description: "Beginner-friendly circuit focused on basic explosive movements and coordination", duration: "30 min", equipment: "bodyweight", level: "beginner", format: "circuit", imageUrl: powerPrimerImg, isFree: true },
+      { id: "power-003", name: "Explosive Start", description: "Light resistance workout introducing explosive movement patterns safely", duration: "30 min", equipment: "equipment", level: "beginner", format: "reps & sets", imageUrl: explosiveStartImg, isFree: true },
+      { id: "power-004", name: "Body Blast", description: "High-intensity bodyweight using plyometrics to build explosive power", duration: "45 min", equipment: "bodyweight", level: "intermediate", format: "circuit", imageUrl: bodyBlastImg, isFree: true },
+      { id: "power-005", name: "Power Circuit Pro", description: "Full-body power circuit building explosive strength and reactive control", duration: "45 min", equipment: "equipment", level: "intermediate", format: "circuit", imageUrl: powerCircuitProImg, isFree: true },
+      { id: "power-006", name: "Explosive Engine", description: "Advanced bodyweight challenge for explosive strength and elite performance", duration: "60 min", equipment: "bodyweight", level: "advanced", format: "for time", imageUrl: explosiveEngineImg, isFree: true },
+      { id: "power-007", name: "Power Surge Elite", description: "Hybrid power workout developing explosive strength and fast-twitch activation", duration: "60 min", equipment: "equipment", level: "advanced", format: "mix", imageUrl: powerSurgeEliteImg, isFree: true },
     ],
     "challenge": [
       { id: "challenge-002", name: "Starter Gauntlet", description: "A simple but motivating challenge workout using bodyweight movements in a round-based format", duration: "30 min", equipment: "bodyweight", level: "beginner", format: "for time", imageUrl: starterGauntletImg, isFree: true },
