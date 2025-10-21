@@ -2,7 +2,7 @@ import { useNavigate } from "react-router-dom";
 import { Helmet } from "react-helmet";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { ArrowLeft, Dumbbell, Flame, Zap, Heart, Move, Activity } from "lucide-react";
+import { ArrowLeft, Dumbbell, Flame, Zap, Heart, Move, Activity, TrendingUp } from "lucide-react";
 import { EmailCaptureBox } from "@/components/EmailCaptureBox";
 import { PremiumPopup } from "@/components/PremiumPopup";
 import { BackToTop } from "@/components/BackToTop";
@@ -40,6 +40,12 @@ const WorkoutFlow = () => {
       icon: Move,
       title: "Mobility & Stability",
       description: "Enhance flexibility, balance, and joint health"
+    },
+    {
+      id: "power",
+      icon: TrendingUp,
+      title: "Power",
+      description: "Develop explosive strength and fast-twitch muscle activation"
     },
     {
       id: "challenge",
