@@ -32,8 +32,13 @@ import coreFlowImg from "@/assets/core-flow-workout.jpg";
 import stabilityCircuitImg from "@/assets/stability-circuit-workout.jpg";
 import mobilityMasteryImg from "@/assets/mobility-mastery-workout.jpg";
 import balanceForgeImg from "@/assets/balance-forge-workout.jpg";
-import powerSurgeImg from "@/assets/power-surge-workout.jpg";
 import ultimateChallengeImg from "@/assets/ultimate-challenge-workout.jpg";
+import starterGauntletImg from "@/assets/starter-gauntlet-workout.jpg";
+import challengePrepImg from "@/assets/challenge-prep-workout.jpg";
+import bodyweightBlitzImg from "@/assets/bodyweight-blitz-workout.jpg";
+import challengeCircuitProImg from "@/assets/challenge-circuit-pro-workout.jpg";
+import finalFormImg from "@/assets/final-form-workout.jpg";
+import eliteGauntletImg from "@/assets/elite-gauntlet-workout.jpg";
 import metaboLiteImg from "@/assets/metabo-lite-workout.jpg";
 import metaboStartImg from "@/assets/metabo-start-workout.jpg";
 import metaboFlowImg from "@/assets/metabo-flow-workout.jpg";
@@ -70,7 +75,6 @@ const WorkoutDetail = () => {
     "metabolic": "Metabolic Workout",
     "cardio": "Cardio Workout",
     "mobility": "Mobility & Stability Workout",
-    "power": "Power Workout",
     "challenge": "Challenge Workout"
   };
 
@@ -120,10 +124,13 @@ const WorkoutDetail = () => {
       { id: "mobility-008", name: "Balance Forge", description: "Precision-based mobility workout using fit ball, bands, and mat work to develop elite control and joint integrity", duration: "60 min", equipment: "equipment", level: "advanced", format: "reps & sets", imageUrl: balanceForgeImg, isFree: true },
     ],
     "challenge": [
+      { id: "challenge-002", name: "Starter Gauntlet", description: "A simple but motivating challenge workout using bodyweight movements in a round-based format", duration: "30 min", equipment: "bodyweight", level: "beginner", format: "for time", imageUrl: starterGauntletImg, isFree: true },
+      { id: "challenge-003", name: "Challenge Prep", description: "A light challenge-style circuit using dumbbells and bands to build strength and stamina in a timed format", duration: "30 min", equipment: "equipment", level: "beginner", format: "circuit", imageUrl: challengePrepImg, isFree: true },
+      { id: "challenge-004", name: "Bodyweight Blitz", description: "A fast-paced bodyweight challenge designed to push endurance and mental grit", duration: "45 min", equipment: "bodyweight", level: "intermediate", format: "amrap", imageUrl: bodyweightBlitzImg, isFree: true },
+      { id: "challenge-005", name: "Challenge Circuit Pro", description: "A high-intensity challenge using dumbbells, kettlebells, and jump rope to push strength and cardio limits", duration: "45 min", equipment: "equipment", level: "intermediate", format: "circuit", imageUrl: challengeCircuitProImg, isFree: true },
+      { id: "challenge-006", name: "Final Form", description: "A brutal bodyweight challenge designed to test endurance, strength, and mental toughness", duration: "60 min", equipment: "bodyweight", level: "advanced", format: "for time", imageUrl: finalFormImg, isFree: true },
+      { id: "challenge-007", name: "Elite Gauntlet", description: "An elite challenge using medicine balls, wall balls, and bands in a Tabata format", duration: "60 min", equipment: "equipment", level: "advanced", format: "tabata", imageUrl: eliteGauntletImg, isFree: true },
       { id: "challenge-001", name: "Ultimate Challenge", description: "Push your limits with this intense workout", duration: "50 min", equipment: "equipment", level: "advanced", format: "mix", imageUrl: ultimateChallengeImg, isFree: true },
-    ],
-    "power": [
-      { id: "power-001", name: "Power Surge", description: "Develops explosive strength and fast-twitch activation", duration: "30 min", equipment: "equipment", level: "advanced", format: "circuit", imageUrl: powerSurgeImg, isFree: true },
     ],
   };
 

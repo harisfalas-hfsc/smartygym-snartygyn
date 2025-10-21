@@ -41,6 +41,12 @@ import metaboFlowImg from "@/assets/metabo-flow-workout.jpg";
 import metaboChargeImg from "@/assets/metabo-charge-workout.jpg";
 import metaboInfernoImg from "@/assets/metabo-inferno-workout.jpg";
 import metaboSurgeImg from "@/assets/metabo-surge-workout.jpg";
+import starterGauntletImg from "@/assets/starter-gauntlet-workout.jpg";
+import challengePrepImg from "@/assets/challenge-prep-workout.jpg";
+import bodyweightBlitzImg from "@/assets/bodyweight-blitz-workout.jpg";
+import challengeCircuitProImg from "@/assets/challenge-circuit-pro-workout.jpg";
+import finalFormImg from "@/assets/final-form-workout.jpg";
+import eliteGauntletImg from "@/assets/elite-gauntlet-workout.jpg";
 
 const IndividualWorkout = () => {
   const navigate = useNavigate();
@@ -825,6 +831,7 @@ Hold Time: 45–60s`,
       imageUrl: ultimateChallengeImg,
       description:
         "The ultimate test of strength, endurance, and mental toughness. This advanced workout combines heavy lifting, high-intensity cardio, and bodyweight challenges to push you to your limits.",
+      workoutType: "MIX",
       format: `Multi-Modal Challenge
 Structure: 3 phases with increasing difficulty
 Work:Rest: Minimal rest between exercises
@@ -865,6 +872,405 @@ Phase 3: Finisher (10 min)`,
         "Stay mentally focused throughout",
         "Recovery is crucial after this workout",
         "Hydrate well and monitor your body",
+      ],
+    },
+    "challenge-002": {
+      name: "Starter Gauntlet",
+      serialNumber: "CHA-BBW-031",
+      difficulty: "Beginner",
+      duration: "30 min",
+      equipment: "No Equipment Required",
+      imageUrl: starterGauntletImg,
+      description:
+        "A simple but motivating challenge workout using bodyweight movements in a round-based format. Designed to build confidence and consistency.",
+      workoutType: "FOR TIME",
+      format: `3 rounds
+Work at your own pace`,
+      instructions:
+        "Complete all exercises in order. Rest 1 minute between rounds. Track your time for each round.",
+      exercises: [
+        {
+          name: "Bodyweight Squats",
+          sets: "3 rounds",
+          reps: "20",
+          rest: "60s between rounds",
+          notes: "Full depth, controlled movement",
+        },
+        {
+          name: "Incline Push-Ups",
+          sets: "3 rounds",
+          reps: "15",
+          rest: "0",
+          notes: "Hands elevated, maintain straight line",
+        },
+        {
+          name: "Glute Bridges",
+          sets: "3 rounds",
+          reps: "20",
+          rest: "0",
+          notes: "Squeeze at top, controlled descent",
+        },
+        {
+          name: "Bird-Dog",
+          sets: "3 rounds",
+          reps: "10/side",
+          rest: "0",
+          notes: "Extend opposite limbs with control",
+        },
+        {
+          name: "Wall Sit",
+          sets: "3 rounds",
+          reps: "30s",
+          rest: "60s",
+          notes: "Back against wall, thighs parallel to ground",
+        },
+      ],
+      tips: [
+        "Focus on clean reps",
+        "Don't rush transitions",
+        "Use breath to manage effort",
+      ],
+    },
+    "challenge-003": {
+      name: "Challenge Prep",
+      serialNumber: "CHA-EQ-032",
+      difficulty: "Beginner",
+      duration: "30 min",
+      equipment: "Equipment Required",
+      imageUrl: challengePrepImg,
+      description:
+        "A light challenge-style circuit using dumbbells and bands to build strength and stamina in a timed format.",
+      workoutType: "CIRCUIT",
+      format: `Circuit – 3 rounds
+Work: 40s / Rest: 20s`,
+      instructions:
+        "Perform each move for 40 seconds. Rest 20 seconds between exercises. Rest 1 minute between rounds.",
+      exercises: [
+        {
+          name: "Dumbbell Goblet Squat",
+          sets: "3 rounds",
+          reps: "40s",
+          rest: "20s",
+          notes: "Hold dumbbell at chest, squat deep",
+        },
+        {
+          name: "Band Row",
+          sets: "3 rounds",
+          reps: "40s",
+          rest: "20s",
+          notes: "Pull band to chest, squeeze shoulder blades",
+        },
+        {
+          name: "Dumbbell Shoulder Press",
+          sets: "3 rounds",
+          reps: "40s",
+          rest: "20s",
+          notes: "Press overhead, control descent",
+        },
+        {
+          name: "Band Lateral Walks",
+          sets: "3 rounds",
+          reps: "40s",
+          rest: "20s",
+          notes: "Band around thighs, maintain tension",
+        },
+        {
+          name: "Plank Hold",
+          sets: "3 rounds",
+          reps: "30s",
+          rest: "60s",
+          notes: "Maintain straight line from head to heels",
+        },
+      ],
+      tips: [
+        "Choose light weights",
+        "Keep band tension consistent",
+        "Don't sacrifice form for speed",
+      ],
+    },
+    "challenge-004": {
+      name: "Bodyweight Blitz",
+      serialNumber: "CHA-BBW-033",
+      difficulty: "Intermediate",
+      duration: "45 min",
+      equipment: "No Equipment Required",
+      imageUrl: bodyweightBlitzImg,
+      description:
+        "A fast-paced bodyweight challenge designed to push endurance and mental grit. Complete as many rounds as possible.",
+      workoutType: "AMRAP",
+      format: `AMRAP – 30 mins
+Finisher – 10 mins
+Warm-Up & Cool-Down – 5 mins`,
+      instructions:
+        "Complete as many rounds as possible. Rest only when needed. Finish with a challenge block.",
+      exercises: [
+        {
+          name: "Jump Squats",
+          sets: "AMRAP 30 min",
+          reps: "15",
+          rest: "as needed",
+          notes: "Explosive jump, soft landing",
+        },
+        {
+          name: "Push-Ups",
+          sets: "AMRAP 30 min",
+          reps: "12",
+          rest: "as needed",
+          notes: "Chest to ground, full extension",
+        },
+        {
+          name: "Reverse Lunges",
+          sets: "AMRAP 30 min",
+          reps: "10/leg",
+          rest: "as needed",
+          notes: "Step back, drop knee, drive up",
+        },
+        {
+          name: "Plank Shoulder Taps",
+          sets: "AMRAP 30 min",
+          reps: "20",
+          rest: "as needed",
+          notes: "Minimize hip rotation, controlled taps",
+        },
+        {
+          name: "Burpees",
+          sets: "AMRAP 30 min",
+          reps: "8",
+          rest: "as needed",
+          notes: "Full sequence, maintain pace",
+        },
+        {
+          name: "Finisher: High Knees",
+          sets: "1",
+          reps: "100",
+          rest: "0",
+          notes: "Continuous movement",
+        },
+        {
+          name: "Finisher: Mountain Climbers",
+          sets: "1",
+          reps: "50",
+          rest: "0",
+          notes: "Fast pace, knees to chest",
+        },
+        {
+          name: "Finisher: Jumping Jacks",
+          sets: "1",
+          reps: "25",
+          rest: "0",
+          notes: "Full range of motion",
+        },
+      ],
+      tips: [
+        "Pace yourself early",
+        "Use full range of motion",
+        "Stay consistent across rounds",
+      ],
+    },
+    "challenge-005": {
+      name: "Challenge Circuit Pro",
+      serialNumber: "CHA-EQ-034",
+      difficulty: "Intermediate",
+      duration: "45 min",
+      equipment: "Equipment Required",
+      imageUrl: challengeCircuitProImg,
+      description:
+        "A high-intensity challenge using dumbbells, kettlebells, and jump rope to push strength and cardio limits.",
+      workoutType: "CIRCUIT",
+      format: `HIIT – 4 rounds
+Work: 45s / Rest: 15s`,
+      instructions:
+        "Push max effort during work intervals. Rest 1 minute between rounds.",
+      exercises: [
+        {
+          name: "Jump Rope",
+          sets: "4 rounds",
+          reps: "45s",
+          rest: "15s",
+          notes: "Maintain steady rhythm",
+        },
+        {
+          name: "Dumbbell Thrusters",
+          sets: "4 rounds",
+          reps: "45s",
+          rest: "15s",
+          notes: "Squat to overhead press in one motion",
+        },
+        {
+          name: "Kettlebell Swings",
+          sets: "4 rounds",
+          reps: "45s",
+          rest: "15s",
+          notes: "Hip drive, bell to shoulder height",
+        },
+        {
+          name: "Dumbbell Renegade Rows",
+          sets: "4 rounds",
+          reps: "45s",
+          rest: "15s",
+          notes: "Plank position, row alternating sides",
+        },
+        {
+          name: "Burpees",
+          sets: "4 rounds",
+          reps: "45s",
+          rest: "60s",
+          notes: "Full sequence, explosive movement",
+        },
+      ],
+      tips: [
+        "Keep jump rope rhythm steady",
+        "Choose weights that challenge you",
+        "Don't sacrifice form for speed",
+      ],
+    },
+    "challenge-006": {
+      name: "Final Form",
+      serialNumber: "CHA-BBW-035",
+      difficulty: "Advanced",
+      duration: "60 min",
+      equipment: "No Equipment Required",
+      imageUrl: finalFormImg,
+      description:
+        "A brutal bodyweight challenge designed to test endurance, strength, and mental toughness. Complete the full workout as fast as possible.",
+      workoutType: "FOR TIME",
+      format: `For Time – 3 blocks
+Rest: 2 mins between blocks`,
+      instructions:
+        "Complete each block as fast as possible. Rest only as needed.",
+      exercises: [
+        {
+          name: "Block 1: Jump Squats",
+          sets: "15 min block",
+          reps: "20",
+          rest: "as needed",
+          notes: "Explosive jump, controlled landing",
+        },
+        {
+          name: "Block 1: Push-Ups",
+          sets: "15 min block",
+          reps: "15",
+          rest: "as needed",
+          notes: "Chest to ground, full extension",
+        },
+        {
+          name: "Block 1: Burpees",
+          sets: "15 min block",
+          reps: "10",
+          rest: "120s after block",
+          notes: "Complete sequence, maintain form",
+        },
+        {
+          name: "Block 2: Mountain Climbers",
+          sets: "15 min block",
+          reps: "20",
+          rest: "as needed",
+          notes: "Drive knees to chest",
+        },
+        {
+          name: "Block 2: Jump Lunges",
+          sets: "15 min block",
+          reps: "15",
+          rest: "as needed",
+          notes: "Explosive switch, soft landing",
+        },
+        {
+          name: "Block 2: Plank Jacks",
+          sets: "15 min block",
+          reps: "10",
+          rest: "120s after block",
+          notes: "Jump feet out and in, maintain plank",
+        },
+        {
+          name: "Block 3: High Knees",
+          sets: "15 min block",
+          reps: "20",
+          rest: "as needed",
+          notes: "Drive knees high, fast pace",
+        },
+        {
+          name: "Block 3: Tuck Jumps",
+          sets: "15 min block",
+          reps: "15",
+          rest: "as needed",
+          notes: "Pull knees to chest, explosive",
+        },
+        {
+          name: "Block 3: Push-Up to Pike",
+          sets: "15 min block",
+          reps: "10",
+          rest: "0",
+          notes: "Push-up then pike hips up",
+        },
+      ],
+      tips: [
+        "Explode through jumps",
+        "Keep transitions tight",
+        "Hydrate between blocks",
+      ],
+    },
+    "challenge-007": {
+      name: "Elite Gauntlet",
+      serialNumber: "CHA-EQ-036",
+      difficulty: "Advanced",
+      duration: "60 min",
+      equipment: "Equipment Required",
+      imageUrl: eliteGauntletImg,
+      description:
+        "An elite challenge using medicine balls, wall balls, and bands in a Tabata format. Built for explosive power and endurance.",
+      workoutType: "TABATA",
+      format: `Tabata – 6 blocks
+Work: 20s / Rest: 10s x 8 rounds per block`,
+      instructions:
+        "Complete each Tabata block before moving to the next. Rest 1 minute between blocks.",
+      exercises: [
+        {
+          name: "Block 1: Medicine Ball Slams",
+          sets: "1 block (8 rounds)",
+          reps: "20s work / 10s rest",
+          rest: "60s after block",
+          notes: "Explosive slam, catch on bounce",
+        },
+        {
+          name: "Block 2: Wall Ball Throws",
+          sets: "1 block (8 rounds)",
+          reps: "20s work / 10s rest",
+          rest: "60s after block",
+          notes: "Squat to overhead throw, hit target",
+        },
+        {
+          name: "Block 3: Band Sprints",
+          sets: "1 block (8 rounds)",
+          reps: "20s work / 10s rest",
+          rest: "60s after block",
+          notes: "Band around waist, sprint against resistance",
+        },
+        {
+          name: "Block 4: Jump Lunges",
+          sets: "1 block (8 rounds)",
+          reps: "20s work / 10s rest",
+          rest: "60s after block",
+          notes: "Explosive switch, soft landing",
+        },
+        {
+          name: "Block 5: Plyo Push-Ups",
+          sets: "1 block (8 rounds)",
+          reps: "20s work / 10s rest",
+          rest: "60s after block",
+          notes: "Explosive push, hands leave ground",
+        },
+        {
+          name: "Block 6: Plank Rows",
+          sets: "1 block (8 rounds)",
+          reps: "20s work / 10s rest",
+          rest: "0",
+          notes: "Alternating arm rows in plank position",
+        },
+      ],
+      tips: [
+        "Use explosive power",
+        "Keep band tension consistent",
+        "Don't skip rest intervals",
       ],
     },
     "cardio-002": {
