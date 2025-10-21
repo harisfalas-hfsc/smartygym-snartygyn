@@ -37,6 +37,7 @@ import metaboSurgeImg from "@/assets/metabo-surge-workout.jpg";
 
 type EquipmentFilter = "all" | "bodyweight" | "equipment";
 type LevelFilter = "all" | "beginner" | "intermediate" | "advanced";
+type FormatFilter = "all" | "circuit" | "amrap" | "for time" | "tabata" | "reps & sets" | "mix";
 
 interface Workout {
   id: string;
@@ -45,6 +46,7 @@ interface Workout {
   duration: string;
   equipment: "bodyweight" | "equipment";
   level: "beginner" | "intermediate" | "advanced";
+  format: "circuit" | "amrap" | "for time" | "tabata" | "reps & sets" | "mix";
   imageUrl: string;
   isFree?: boolean;
 }
@@ -54,6 +56,7 @@ const WorkoutDetail = () => {
   const { type } = useParams();
   const [equipmentFilter, setEquipmentFilter] = useState<EquipmentFilter>("all");
   const [levelFilter, setLevelFilter] = useState<LevelFilter>("all");
+  const [formatFilter, setFormatFilter] = useState<FormatFilter>("all");
 
   const workoutTitles: { [key: string]: string } = {
     "strength": "Strength Workout",
@@ -67,48 +70,48 @@ const WorkoutDetail = () => {
 
   const workoutData: { [key: string]: Workout[] } = {
     "strength": [
-      { id: "strength-001", name: "Power Foundation", description: "Build your strength base with compound movements", duration: "45 min", equipment: "equipment", level: "intermediate", imageUrl: powerFoundationImg, isFree: true },
-      { id: "strength-002", name: "Iron Core", description: "Advanced strength targeting major muscle groups with raw power", duration: "60 min", equipment: "equipment", level: "advanced", imageUrl: ironCoreImg, isFree: true },
-      { id: "strength-003", name: "Core Builder", description: "Foundational bodyweight strength for major muscle groups", duration: "30 min", equipment: "bodyweight", level: "beginner", imageUrl: coreBuilderImg, isFree: true },
-      { id: "strength-004", name: "Starter Strength", description: "Gentle intro to resistance training with light weights", duration: "30 min", equipment: "equipment", level: "beginner", imageUrl: starterStrengthImg, isFree: true },
-      { id: "strength-005", name: "Gravity Grind", description: "Bodyweight strength using tempo and holds", duration: "45 min", equipment: "bodyweight", level: "intermediate", imageUrl: gravityGrindImg, isFree: true },
-      { id: "strength-006", name: "Iron Circuit", description: "Full-body circuit with dumbbells and kettlebells", duration: "45 min", equipment: "equipment", level: "intermediate", imageUrl: ironCircuitImg, isFree: true },
-      { id: "strength-007", name: "Bodyweight Beast", description: "High-intensity bodyweight with advanced variations", duration: "60 min", equipment: "bodyweight", level: "advanced", imageUrl: bodyweightBeastImg, isFree: true },
-      { id: "strength-008", name: "Iron Engine", description: "Heavy strength workout for serious lifters", duration: "60 min", equipment: "equipment", level: "advanced", imageUrl: ironEngineImg, isFree: true },
+      { id: "strength-001", name: "Power Foundation", description: "Build your strength base with compound movements", duration: "45 min", equipment: "equipment", level: "intermediate", format: "reps & sets", imageUrl: powerFoundationImg, isFree: true },
+      { id: "strength-002", name: "Iron Core", description: "Advanced strength targeting major muscle groups with raw power", duration: "60 min", equipment: "equipment", level: "advanced", format: "reps & sets", imageUrl: ironCoreImg, isFree: true },
+      { id: "strength-003", name: "Core Builder", description: "Foundational bodyweight strength for major muscle groups", duration: "30 min", equipment: "bodyweight", level: "beginner", format: "reps & sets", imageUrl: coreBuilderImg, isFree: true },
+      { id: "strength-004", name: "Starter Strength", description: "Gentle intro to resistance training with light weights", duration: "30 min", equipment: "equipment", level: "beginner", format: "reps & sets", imageUrl: starterStrengthImg, isFree: true },
+      { id: "strength-005", name: "Gravity Grind", description: "Bodyweight strength using tempo and holds", duration: "45 min", equipment: "bodyweight", level: "intermediate", format: "reps & sets", imageUrl: gravityGrindImg, isFree: true },
+      { id: "strength-006", name: "Iron Circuit", description: "Full-body circuit with dumbbells and kettlebells", duration: "45 min", equipment: "equipment", level: "intermediate", format: "circuit", imageUrl: ironCircuitImg, isFree: true },
+      { id: "strength-007", name: "Bodyweight Beast", description: "High-intensity bodyweight with advanced variations", duration: "60 min", equipment: "bodyweight", level: "advanced", format: "circuit", imageUrl: bodyweightBeastImg, isFree: true },
+      { id: "strength-008", name: "Iron Engine", description: "Heavy strength workout for serious lifters", duration: "60 min", equipment: "equipment", level: "advanced", format: "reps & sets", imageUrl: ironEngineImg, isFree: true },
     ],
     "calorie-burning": [
-      { id: "calorie-001", name: "Metabolic Burn", description: "High-intensity fat-burning session", duration: "30 min", equipment: "bodyweight", level: "beginner", imageUrl: metabolicBurnImg, isFree: true },
-      { id: "calorie-002", name: "Fat Furnace", description: "Metabolic conditioning that torches calories", duration: "45 min", equipment: "equipment", level: "advanced", imageUrl: fatFurnaceImg, isFree: true },
-      { id: "calorie-007", name: "Burn Start", description: "Low-impact cardio circuit to kickstart fat loss", duration: "30 min", equipment: "bodyweight", level: "beginner", imageUrl: burnStartImg, isFree: true },
-      { id: "calorie-008", name: "Sweat Circuit", description: "Light equipment circuit boosting metabolism", duration: "30 min", equipment: "equipment", level: "beginner", imageUrl: sweatCircuitImg, isFree: true },
-      { id: "calorie-009", name: "Body Burnout", description: "Fast-paced bodyweight AMRAP for max calorie burn", duration: "45 min", equipment: "bodyweight", level: "intermediate", imageUrl: bodyBurnoutImg, isFree: true },
-      { id: "calorie-010", name: "Sweat Storm", description: "High-energy circuit with dumbbells and jump rope", duration: "45 min", equipment: "equipment", level: "intermediate", imageUrl: sweatStormImg, isFree: true },
-      { id: "calorie-011", name: "Inferno Flow", description: "Relentless bodyweight plyometric challenge", duration: "60 min", equipment: "bodyweight", level: "advanced", imageUrl: infernoFlowImg, isFree: true },
-      { id: "calorie-012", name: "Calorie Crusher", description: "Full-body calorie incinerator with kettlebells", duration: "60 min", equipment: "equipment", level: "advanced", imageUrl: calorieCrusherImg, isFree: true },
+      { id: "calorie-001", name: "Metabolic Burn", description: "High-intensity fat-burning session", duration: "30 min", equipment: "bodyweight", level: "beginner", format: "circuit", imageUrl: metabolicBurnImg, isFree: true },
+      { id: "calorie-002", name: "Fat Furnace", description: "Metabolic conditioning that torches calories", duration: "45 min", equipment: "equipment", level: "advanced", format: "circuit", imageUrl: fatFurnaceImg, isFree: true },
+      { id: "calorie-007", name: "Burn Start", description: "Low-impact cardio circuit to kickstart fat loss", duration: "30 min", equipment: "bodyweight", level: "beginner", format: "circuit", imageUrl: burnStartImg, isFree: true },
+      { id: "calorie-008", name: "Sweat Circuit", description: "Light equipment circuit boosting metabolism", duration: "30 min", equipment: "equipment", level: "beginner", format: "circuit", imageUrl: sweatCircuitImg, isFree: true },
+      { id: "calorie-009", name: "Body Burnout", description: "Fast-paced bodyweight AMRAP for max calorie burn", duration: "45 min", equipment: "bodyweight", level: "intermediate", format: "amrap", imageUrl: bodyBurnoutImg, isFree: true },
+      { id: "calorie-010", name: "Sweat Storm", description: "High-energy circuit with dumbbells and jump rope", duration: "45 min", equipment: "equipment", level: "intermediate", format: "circuit", imageUrl: sweatStormImg, isFree: true },
+      { id: "calorie-011", name: "Inferno Flow", description: "Relentless bodyweight plyometric challenge", duration: "60 min", equipment: "bodyweight", level: "advanced", format: "circuit", imageUrl: infernoFlowImg, isFree: true },
+      { id: "calorie-012", name: "Calorie Crusher", description: "Full-body calorie incinerator with kettlebells", duration: "60 min", equipment: "equipment", level: "advanced", format: "circuit", imageUrl: calorieCrusherImg, isFree: true },
     ],
     "metabolic": [
-      { id: "metabolic-013", name: "Metabo Lite", description: "Beginner-friendly metabolic circuit to build stamina", duration: "30 min", equipment: "bodyweight", level: "beginner", imageUrl: metaboLiteImg, isFree: true },
-      { id: "metabolic-014", name: "Metabo Start", description: "Light metabolic circuit with bands and dumbbells", duration: "30 min", equipment: "equipment", level: "beginner", imageUrl: metaboStartImg, isFree: true },
-      { id: "metabolic-015", name: "Metabo Flow", description: "Dynamic bodyweight workout to spike metabolism", duration: "45 min", equipment: "bodyweight", level: "intermediate", imageUrl: metaboFlowImg, isFree: true },
-      { id: "metabolic-016", name: "Metabo Charge", description: "High-intensity metabolic workout with kettlebells and TRX", duration: "45 min", equipment: "equipment", level: "intermediate", imageUrl: metaboChargeImg, isFree: true },
-      { id: "metabolic-001", name: "Metabolic Ignition", description: "Boost your metabolism with this explosive workout", duration: "35 min", equipment: "equipment", level: "intermediate", imageUrl: metabolicIgnitionImg, isFree: true },
-      { id: "metabolic-002", name: "MetaboShock", description: "Hybrid metabolic blending resistance and cardio", duration: "15 min", equipment: "equipment", level: "intermediate", imageUrl: metaboShockImg, isFree: true },
-      { id: "metabolic-017", name: "Metabo Inferno", description: "Relentless bodyweight metabolic challenge", duration: "60 min", equipment: "bodyweight", level: "advanced", imageUrl: metaboInfernoImg, isFree: true },
-      { id: "metabolic-018", name: "Metabo Surge", description: "Full-body metabolic blast for elite conditioning", duration: "60 min", equipment: "equipment", level: "advanced", imageUrl: metaboSurgeImg, isFree: true },
+      { id: "metabolic-013", name: "Metabo Lite", description: "Beginner-friendly metabolic circuit to build stamina", duration: "30 min", equipment: "bodyweight", level: "beginner", format: "circuit", imageUrl: metaboLiteImg, isFree: true },
+      { id: "metabolic-014", name: "Metabo Start", description: "Light metabolic circuit with bands and dumbbells", duration: "30 min", equipment: "equipment", level: "beginner", format: "circuit", imageUrl: metaboStartImg, isFree: true },
+      { id: "metabolic-015", name: "Metabo Flow", description: "Dynamic bodyweight workout to spike metabolism", duration: "45 min", equipment: "bodyweight", level: "intermediate", format: "amrap", imageUrl: metaboFlowImg, isFree: true },
+      { id: "metabolic-016", name: "Metabo Charge", description: "High-intensity metabolic workout with kettlebells and TRX", duration: "45 min", equipment: "equipment", level: "intermediate", format: "circuit", imageUrl: metaboChargeImg, isFree: true },
+      { id: "metabolic-001", name: "Metabolic Ignition", description: "Boost your metabolism with this explosive workout", duration: "35 min", equipment: "equipment", level: "intermediate", format: "circuit", imageUrl: metabolicIgnitionImg, isFree: true },
+      { id: "metabolic-002", name: "MetaboShock", description: "Hybrid metabolic blending resistance and cardio", duration: "15 min", equipment: "equipment", level: "intermediate", format: "circuit", imageUrl: metaboShockImg, isFree: true },
+      { id: "metabolic-017", name: "Metabo Inferno", description: "Relentless bodyweight metabolic challenge", duration: "60 min", equipment: "bodyweight", level: "advanced", format: "for time", imageUrl: metaboInfernoImg, isFree: true },
+      { id: "metabolic-018", name: "Metabo Surge", description: "Full-body metabolic blast for elite conditioning", duration: "60 min", equipment: "equipment", level: "advanced", format: "mix", imageUrl: metaboSurgeImg, isFree: true },
     ],
     "cardio": [
-      { id: "cardio-001", name: "Cardio Blast", description: "Elevate your heart rate and build endurance", duration: "40 min", equipment: "bodyweight", level: "beginner", imageUrl: cardioBlastImg, isFree: true },
-      { id: "cardio-002", name: "Pulse Igniter", description: "High-energy cardio to elevate heart rate", duration: "30 min", equipment: "bodyweight", level: "intermediate", imageUrl: pulseIgniterImg, isFree: true },
+      { id: "cardio-001", name: "Cardio Blast", description: "Elevate your heart rate and build endurance", duration: "40 min", equipment: "bodyweight", level: "beginner", format: "mix", imageUrl: cardioBlastImg, isFree: true },
+      { id: "cardio-002", name: "Pulse Igniter", description: "High-energy cardio to elevate heart rate", duration: "30 min", equipment: "bodyweight", level: "intermediate", format: "circuit", imageUrl: pulseIgniterImg, isFree: true },
     ],
     "mobility": [
-      { id: "mobility-001", name: "Flow & Mobility", description: "Enhance flexibility and joint health", duration: "30 min", equipment: "bodyweight", level: "beginner", imageUrl: flowMobilityImg, isFree: true },
-      { id: "mobility-002", name: "FlowForge", description: "Low-impact mobility and stability workout", duration: "60 min", equipment: "equipment", level: "beginner", imageUrl: flowForgeImg, isFree: true },
+      { id: "mobility-001", name: "Flow & Mobility", description: "Enhance flexibility and joint health", duration: "30 min", equipment: "bodyweight", level: "beginner", format: "circuit", imageUrl: flowMobilityImg, isFree: true },
+      { id: "mobility-002", name: "FlowForge", description: "Low-impact mobility and stability workout", duration: "60 min", equipment: "equipment", level: "beginner", format: "circuit", imageUrl: flowForgeImg, isFree: true },
     ],
     "challenge": [
-      { id: "challenge-001", name: "Ultimate Challenge", description: "Push your limits with this intense workout", duration: "50 min", equipment: "equipment", level: "advanced", imageUrl: ultimateChallengeImg, isFree: true },
+      { id: "challenge-001", name: "Ultimate Challenge", description: "Push your limits with this intense workout", duration: "50 min", equipment: "equipment", level: "advanced", format: "mix", imageUrl: ultimateChallengeImg, isFree: true },
     ],
     "power": [
-      { id: "power-001", name: "Power Surge", description: "Develops explosive strength and fast-twitch activation", duration: "30 min", equipment: "equipment", level: "advanced", imageUrl: powerSurgeImg, isFree: true },
+      { id: "power-001", name: "Power Surge", description: "Develops explosive strength and fast-twitch activation", duration: "30 min", equipment: "equipment", level: "advanced", format: "circuit", imageUrl: powerSurgeImg, isFree: true },
     ],
   };
 
@@ -118,7 +121,8 @@ const WorkoutDetail = () => {
   const filteredWorkouts = workouts.filter(
     workout => 
       (equipmentFilter === "all" || workout.equipment === equipmentFilter) &&
-      (levelFilter === "all" || workout.level === levelFilter)
+      (levelFilter === "all" || workout.level === levelFilter) &&
+      (formatFilter === "all" || workout.format === formatFilter)
   );
 
   return (
@@ -203,6 +207,62 @@ const WorkoutDetail = () => {
                 size="sm"
               >
                 Advanced
+              </Button>
+            </div>
+          </div>
+
+          {/* Format Filter */}
+          <div>
+            <p className="text-sm font-medium mb-2">Workout Format</p>
+            <div className="flex gap-2 flex-wrap">
+              <Button
+                variant={formatFilter === "all" ? "default" : "outline"}
+                onClick={() => setFormatFilter("all")}
+                size="sm"
+              >
+                All
+              </Button>
+              <Button
+                variant={formatFilter === "circuit" ? "default" : "outline"}
+                onClick={() => setFormatFilter("circuit")}
+                size="sm"
+              >
+                Circuit
+              </Button>
+              <Button
+                variant={formatFilter === "amrap" ? "default" : "outline"}
+                onClick={() => setFormatFilter("amrap")}
+                size="sm"
+              >
+                AMRAP
+              </Button>
+              <Button
+                variant={formatFilter === "for time" ? "default" : "outline"}
+                onClick={() => setFormatFilter("for time")}
+                size="sm"
+              >
+                For Time
+              </Button>
+              <Button
+                variant={formatFilter === "tabata" ? "default" : "outline"}
+                onClick={() => setFormatFilter("tabata")}
+                size="sm"
+              >
+                Tabata
+              </Button>
+              <Button
+                variant={formatFilter === "reps & sets" ? "default" : "outline"}
+                onClick={() => setFormatFilter("reps & sets")}
+                size="sm"
+              >
+                Reps & Sets
+              </Button>
+              <Button
+                variant={formatFilter === "mix" ? "default" : "outline"}
+                onClick={() => setFormatFilter("mix")}
+                size="sm"
+              >
+                Mix
               </Button>
             </div>
           </div>
