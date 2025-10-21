@@ -38,23 +38,23 @@ const WorkoutDetail = () => {
     "strength": [
       { id: "strength-free", name: "Beginner Strength Basics", description: "Start your strength journey with this free workout", duration: "25 min", equipment: "bodyweight", level: "beginner", imageUrl: "https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?w=800&h=600&fit=crop", isFree: true },
       { id: "iron-core-003", name: "Iron Core", description: "A strength-focused workout targeting major muscle groups", duration: "60 min", equipment: "equipment", level: "advanced", imageUrl: "https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=800&h=600&fit=crop", isFree: true },
-      { id: "power-surge-005", name: "Power Surge", description: "Develop explosive strength and fast-twitch muscle activation", duration: "30 min", equipment: "equipment", level: "intermediate", imageUrl: "https://images.unsplash.com/photo-1517836357463-d25dfeac3438?w=800&h=600&fit=crop" },
+      { id: "power-surge-005", name: "Power Surge", description: "Develop explosive strength and fast-twitch muscle activation", duration: "30 min", equipment: "equipment", level: "intermediate", imageUrl: "https://images.unsplash.com/photo-1517836357463-d25dfeac3438?w=800&h=600&fit=crop", isFree: true },
     ],
     "calorie-burning": [
       { id: "calorie-burning-free", name: "Fat Burn Starter", description: "Start your fat-burning journey with this free workout", duration: "20 min", equipment: "bodyweight", level: "beginner", imageUrl: "https://images.unsplash.com/photo-1476480862126-209bfaa8edc8?w=800&h=600&fit=crop", isFree: true },
-      { id: "fat-furnace-002", name: "Fat Furnace", description: "A metabolic conditioning circuit that torches calories", duration: "45 min", equipment: "equipment", level: "intermediate", imageUrl: "https://images.unsplash.com/photo-1549060279-7e168fcee0c2?w=800&h=600&fit=crop" },
+      { id: "fat-furnace-002", name: "Fat Furnace", description: "A metabolic conditioning circuit that torches calories", duration: "45 min", equipment: "equipment", level: "intermediate", imageUrl: "https://images.unsplash.com/photo-1549060279-7e168fcee0c2?w=800&h=600&fit=crop", isFree: true },
     ],
     "metabolic": [
       { id: "metabolic-free", name: "Metabolic Basics", description: "Free metabolic training to boost your metabolism", duration: "20 min", equipment: "bodyweight", level: "beginner", imageUrl: "https://images.unsplash.com/photo-1483721310020-03333e577078?w=800&h=600&fit=crop", isFree: true },
-      { id: "metaboshock-004", name: "MetaboShock", description: "A hybrid metabolic workout blending resistance and cardio", duration: "15 min", equipment: "equipment", level: "intermediate", imageUrl: "https://images.unsplash.com/photo-1517836357463-d25dfeac3438?w=800&h=600&fit=crop" },
+      { id: "metaboshock-004", name: "MetaboShock", description: "A hybrid metabolic workout blending resistance and cardio", duration: "15 min", equipment: "equipment", level: "intermediate", imageUrl: "https://images.unsplash.com/photo-1517836357463-d25dfeac3438?w=800&h=600&fit=crop", isFree: true },
     ],
     "cardio": [
       { id: "cardio-free", name: "Cardio Foundation", description: "Free cardio workout to build your endurance", duration: "20 min", equipment: "bodyweight", level: "beginner", imageUrl: "https://images.unsplash.com/photo-1538805060514-97d9cc17730c?w=800&h=600&fit=crop", isFree: true },
-      { id: "pulse-igniter-001", name: "Pulse Igniter", description: "A high-energy cardio blast designed to elevate heart rate", duration: "30 min", equipment: "equipment", level: "intermediate", imageUrl: "https://images.unsplash.com/photo-1515524738708-327f6b0037a7?w=800&h=600&fit=crop" },
+      { id: "pulse-igniter-001", name: "Pulse Igniter", description: "A high-energy cardio blast designed to elevate heart rate", duration: "30 min", equipment: "equipment", level: "intermediate", imageUrl: "https://images.unsplash.com/photo-1515524738708-327f6b0037a7?w=800&h=600&fit=crop", isFree: true },
     ],
     "mobility": [
       { id: "mobility-free", name: "Flexibility Fundamentals", description: "Free mobility workout to improve your flexibility", duration: "20 min", equipment: "bodyweight", level: "beginner", imageUrl: "https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?w=800&h=600&fit=crop", isFree: true },
-      { id: "flowforge-006", name: "FlowForge", description: "A low-impact mobility and stability workout that enhances joint health", duration: "60 min", equipment: "equipment", level: "beginner", imageUrl: "https://images.unsplash.com/photo-1599901860904-17e6ed7083a0?w=800&h=600&fit=crop" },
+      { id: "flowforge-006", name: "FlowForge", description: "A low-impact mobility and stability workout that enhances joint health", duration: "60 min", equipment: "equipment", level: "beginner", imageUrl: "https://images.unsplash.com/photo-1599901860904-17e6ed7083a0?w=800&h=600&fit=crop", isFree: true },
     ],
     "challenge": [
       { id: "challenge-free", name: "Challenge Starter", description: "Free challenge workout to test your limits", duration: "25 min", equipment: "bodyweight", level: "beginner", imageUrl: "https://images.unsplash.com/photo-1517836357463-d25dfeac3438?w=800&h=600&fit=crop", isFree: true },
