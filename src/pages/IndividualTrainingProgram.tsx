@@ -1,10 +1,10 @@
 import { useNavigate, useParams } from "react-router-dom";
 import { Helmet } from "react-helmet";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { ArrowLeft, Clock, Dumbbell, TrendingUp, Calendar } from "lucide-react";
+import { Card } from "@/components/ui/card";
+import { ArrowLeft } from "lucide-react";
+import { WorkoutDisplay } from "@/components/WorkoutDisplay";
 import { ShareButtons } from "@/components/ShareButtons";
-import { ParQQuestionnaire } from "@/components/ParQQuestionnaire";
 
 const IndividualTrainingProgram = () => {
   const navigate = useNavigate();
@@ -481,130 +481,39 @@ Week 4: Mastery`,
             <span className="text-xs sm:text-sm">Back</span>
           </Button>
 
-          <h1 className="text-4xl font-bold text-center mb-6">{program.name}</h1>
+          {/* Use WorkoutDisplay component with all functionality */}
+          <WorkoutDisplay
+            exercises={[
+              { name: "Exercise Demo", video_id: "dQw4w9WgXcQ", video_url: "https://www.youtube.com/watch?v=dQw4w9WgXcQ" }
+            ]}
+            planContent=""
+            title={program.name}
+            serial={program.serialNumber}
+            difficulty={program.difficulty === "Beginner" ? 1 : program.difficulty === "Intermediate" ? 3 : 5}
+            imageUrl={program.imageUrl}
+            duration={program.duration}
+            equipment={program.equipment}
+            description={program.description}
+            format={program.format}
+            instructions={program.instructions}
+            tips={program.tips.join('\n')}
+            programWeeks={[{
+              week: 1,
+              focus: "Training Program",
+              days: program.exercises.map(ex => ({
+                day: `${ex.week} - ${ex.day}`,
+                exercises: [{
+                  name: ex.workout,
+                  sets: "See details",
+                  reps: ex.details,
+                  intensity: "As prescribed",
+                  rest: "As needed"
+                }]
+              }))
+            }]}
+          />
 
-          <div className="flex flex-wrap justify-center gap-4 mb-8">
-            <div className="flex items-center gap-2 px-4 py-2 bg-card rounded-lg border">
-              <span className="text-sm font-medium">Serial:</span>
-              <span className="text-sm text-muted-foreground">{program.serialNumber}</span>
-            </div>
-            <div className="flex items-center gap-2 px-4 py-2 bg-card rounded-lg border">
-              <TrendingUp className="w-4 h-4" />
-              <span className="text-sm text-muted-foreground">{program.difficulty}</span>
-            </div>
-            <div className="flex items-center gap-2 px-4 py-2 bg-card rounded-lg border">
-              <Calendar className="w-4 h-4" />
-              <span className="text-sm text-muted-foreground">{program.duration}</span>
-            </div>
-            <div className="flex items-center gap-2 px-4 py-2 bg-card rounded-lg border">
-              <Dumbbell className="w-4 h-4" />
-              <span className="text-sm text-muted-foreground">{program.equipment}</span>
-            </div>
-          </div>
-
-          <div className="mb-8 rounded-lg overflow-hidden">
-            <img
-              src={program.imageUrl}
-              alt={program.name}
-              className="w-full h-64 object-cover"
-            />
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
-            <Card className="cursor-pointer hover:shadow-lg transition-shadow">
-              <CardHeader>
-                <CardTitle className="text-center text-sm">Video Guide</CardTitle>
-              </CardHeader>
-              <CardContent className="text-center text-muted-foreground text-xs">
-                Watch tutorial
-              </CardContent>
-            </Card>
-            <Card className="cursor-pointer hover:shadow-lg transition-shadow">
-              <CardHeader>
-                <CardTitle className="text-center text-sm">Workout Timer</CardTitle>
-              </CardHeader>
-              <CardContent className="text-center text-muted-foreground text-xs">
-                Time your sets
-              </CardContent>
-            </Card>
-            <Card className="cursor-pointer hover:shadow-lg transition-shadow">
-              <CardHeader>
-                <CardTitle className="text-center text-sm">1RM Calculator</CardTitle>
-              </CardHeader>
-              <CardContent className="text-center text-muted-foreground text-xs">
-                Calculate max
-              </CardContent>
-            </Card>
-          </div>
-
-          <Card className="mb-8">
-            <CardHeader>
-              <CardTitle>Description</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-muted-foreground">{program.description}</p>
-            </CardContent>
-          </Card>
-
-          <Card className="mb-8">
-            <CardHeader>
-              <CardTitle>Format & Instructions</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div>
-                <h3 className="font-semibold mb-2">Format:</h3>
-                <pre className="text-sm text-muted-foreground whitespace-pre-wrap font-sans">
-                  {program.format}
-                </pre>
-              </div>
-              <div>
-                <h3 className="font-semibold mb-2">Instructions:</h3>
-                <p className="text-sm text-muted-foreground">{program.instructions}</p>
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card className="mb-8">
-            <CardHeader>
-              <CardTitle>Program Schedule</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-6">
-                {program.exercises.map((exercise, index) => (
-                  <div key={index} className="border-b pb-4 last:border-b-0">
-                    <div className="flex items-center gap-2 mb-2">
-                      <span className="font-semibold text-primary">{exercise.week}</span>
-                      <span className="text-muted-foreground">•</span>
-                      <span className="font-medium">{exercise.day}</span>
-                    </div>
-                    <h3 className="font-semibold text-lg mb-2">{exercise.workout}</h3>
-                    <p className="text-sm text-muted-foreground">{exercise.details}</p>
-                  </div>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card className="mb-8">
-            <CardHeader>
-              <CardTitle>Tips & Safety</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <ul className="space-y-2">
-                {program.tips.map((tip, index) => (
-                  <li key={index} className="flex items-start gap-2">
-                    <span className="text-primary mt-1">•</span>
-                    <span className="text-sm text-muted-foreground">{tip}</span>
-                  </li>
-                ))}
-              </ul>
-            </CardContent>
-          </Card>
-
-          <div className="mb-8">
-            <ParQQuestionnaire />
-          </div>
-
+          {/* Share Buttons */}
           <div className="mt-8">
             <ShareButtons
               url={window.location.href}
