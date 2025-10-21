@@ -26,6 +26,12 @@ import cardioBlastImg from "@/assets/cardio-blast-workout.jpg";
 import pulseIgniterImg from "@/assets/pulse-igniter-workout.jpg";
 import flowMobilityImg from "@/assets/flow-mobility-workout.jpg";
 import flowForgeImg from "@/assets/flowforge-workout.jpg";
+import flowStarterImg from "@/assets/flow-starter-workout.jpg";
+import bandBalanceImg from "@/assets/band-balance-workout.jpg";
+import coreFlowImg from "@/assets/core-flow-workout.jpg";
+import stabilityCircuitImg from "@/assets/stability-circuit-workout.jpg";
+import mobilityMasteryImg from "@/assets/mobility-mastery-workout.jpg";
+import balanceForgeImg from "@/assets/balance-forge-workout.jpg";
 import powerSurgeImg from "@/assets/power-surge-workout.jpg";
 import ultimateChallengeImg from "@/assets/ultimate-challenge-workout.jpg";
 import metaboLiteImg from "@/assets/metabo-lite-workout.jpg";
@@ -104,8 +110,14 @@ const WorkoutDetail = () => {
       { id: "cardio-002", name: "Pulse Igniter", description: "High-energy cardio to elevate heart rate", duration: "30 min", equipment: "bodyweight", level: "intermediate", format: "circuit", imageUrl: pulseIgniterImg, isFree: true },
     ],
     "mobility": [
+      { id: "mobility-003", name: "Flow Starter", description: "A gentle mobility circuit designed to improve joint range, posture, and control", duration: "30 min", equipment: "bodyweight", level: "beginner", format: "circuit", imageUrl: flowStarterImg, isFree: true },
+      { id: "mobility-004", name: "Band Balance", description: "Beginner-friendly workout using bands and a fit ball to enhance joint mobility and core stability", duration: "30 min", equipment: "equipment", level: "beginner", format: "reps & sets", imageUrl: bandBalanceImg, isFree: true },
       { id: "mobility-001", name: "Flow & Mobility", description: "Enhance flexibility and joint health", duration: "30 min", equipment: "bodyweight", level: "beginner", format: "circuit", imageUrl: flowMobilityImg, isFree: true },
       { id: "mobility-002", name: "FlowForge", description: "Low-impact mobility and stability workout", duration: "60 min", equipment: "equipment", level: "beginner", format: "circuit", imageUrl: flowForgeImg, isFree: true },
+      { id: "mobility-005", name: "Core Flow", description: "A dynamic blend of mobility and core stability using bodyweight flows and static holds", duration: "45 min", equipment: "bodyweight", level: "intermediate", format: "mix", imageUrl: coreFlowImg, isFree: true },
+      { id: "mobility-006", name: "Stability Circuit", description: "Full-body stability circuit using fit ball, bands, and mat work to challenge balance and joint control", duration: "45 min", equipment: "equipment", level: "intermediate", format: "circuit", imageUrl: stabilityCircuitImg, isFree: true },
+      { id: "mobility-007", name: "Mobility Mastery", description: "Advanced mobility and stability workout using high-intensity intervals and deep holds to challenge control and flexibility", duration: "60 min", equipment: "bodyweight", level: "advanced", format: "mix", imageUrl: mobilityMasteryImg, isFree: true },
+      { id: "mobility-008", name: "Balance Forge", description: "Precision-based mobility workout using fit ball, bands, and mat work to develop elite control and joint integrity", duration: "60 min", equipment: "equipment", level: "advanced", format: "reps & sets", imageUrl: balanceForgeImg, isFree: true },
     ],
     "challenge": [
       { id: "challenge-001", name: "Ultimate Challenge", description: "Push your limits with this intense workout", duration: "50 min", equipment: "equipment", level: "advanced", format: "mix", imageUrl: ultimateChallengeImg, isFree: true },
