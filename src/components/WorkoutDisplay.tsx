@@ -160,26 +160,48 @@ export const WorkoutDisplay = ({
     setOneRM(Math.round(calculated * 10) / 10);
   };
 
+  const getDifficultyText = (diff: number) => {
+    if (diff <= 2) return 'Beginner';
+    if (diff <= 4) return 'Intermediate';
+    return 'Advanced';
+  };
+
   return (
     <div className="space-y-6">
       {/* Workout Header */}
       <div className="space-y-6">
-        <div>
-          <h1 className="text-4xl font-bold mb-4">{title}</h1>
-          <div className="flex flex-wrap items-center gap-6 text-sm">
+        {/* Title */}
+        <h1 className="text-4xl font-bold mb-6">{title}</h1>
+
+        {/* Info Bar: Serial, Difficulty with Stars, Duration, Equipment - ABOVE IMAGE */}
+        <div className="flex flex-wrap items-center gap-6 text-sm mb-6">
+          <div className="flex items-center gap-2">
+            <span className="font-semibold">Serial:</span>
+            <span className="font-mono">{serial}</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <span className="font-semibold">Difficulty:</span>
             <div className="flex items-center gap-2">
-              <span className="font-semibold">Serial:</span>
-              <span className="font-mono">{serial}</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <span className="font-semibold">Difficulty:</span>
               <div className="flex">
                 {[1, 2, 3, 4, 5].map((i) => (
-                  <Star key={i} className={`w-4 h-4 ${i <= difficulty ? 'fill-yellow-500 text-yellow-500' : 'text-gray-300'}`} />
+                  <Star key={i} className={`w-4 h-4 ${i <= difficulty ? 'fill-primary text-primary' : 'text-gray-300'}`} />
                 ))}
               </div>
+              <span className="font-medium">{getDifficultyText(difficulty)}</span>
             </div>
           </div>
+          {duration && (
+            <div className="flex items-center gap-2">
+              <span className="font-semibold">Duration:</span>
+              <span>{duration}</span>
+            </div>
+          )}
+          {equipment && (
+            <div className="flex items-center gap-2">
+              <span className="font-semibold">Equipment:</span>
+              <span>{equipment}</span>
+            </div>
+          )}
         </div>
 
         {/* Hero Banner Image */}
@@ -191,25 +213,6 @@ export const WorkoutDisplay = ({
           />
           <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent" />
         </div>
-
-        {/* Quick Info Bar below image */}
-        {(duration || equipment) && (
-          <div className="bg-muted/30 rounded-lg p-4 flex flex-wrap gap-4 justify-center text-sm">
-            {duration && (
-              <span className="flex items-center gap-2">
-                <strong>Duration:</strong> {duration}
-              </span>
-            )}
-            <span className="flex items-center gap-2">
-              <strong>Difficulty:</strong> {difficulty === 1 ? 'Beginner' : difficulty === 2 ? 'Intermediate' : 'Advanced'}
-            </span>
-            {equipment && (
-              <span className="flex items-center gap-2">
-                <strong>Equipment:</strong> {equipment}
-              </span>
-            )}
-          </div>
-        )}
       </div>
 
       {/* Utility Cards - Three Equal Cards */}
