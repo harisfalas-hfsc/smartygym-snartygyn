@@ -100,7 +100,7 @@ const WorkoutFlow = () => {
         {/* Info Ribbon */}
         <div className="bg-primary/10 border border-primary/20 rounded-lg p-4 mb-8 text-center">
           <p className="text-sm text-muted-foreground mb-2">
-            Try these workouts for free — no login required. Want all programs?
+            Free workouts included. Join premium to unlock everything.
           </p>
           <Button variant="default" size="sm" onClick={() => navigate("/premiumbenefits")}>
             Join Premium
