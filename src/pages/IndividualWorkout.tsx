@@ -453,38 +453,6 @@ Phase 3: Finisher (10 min)`,
               <span className="text-xs sm:text-sm">Back</span>
             </Button>
 
-            {/* Workout Name */}
-            <h1 className="text-4xl font-bold text-center mb-6">{workout.name}</h1>
-
-            {/* Serial Number, Difficulty, Duration, Equipment */}
-            <div className="flex flex-wrap justify-center gap-4 mb-8">
-              <div className="flex items-center gap-2 px-4 py-2 bg-card rounded-lg border">
-                <span className="text-sm font-medium">Serial:</span>
-                <span className="text-sm text-muted-foreground">{workout.serialNumber}</span>
-              </div>
-              <div className="flex items-center gap-2 px-4 py-2 bg-card rounded-lg border">
-                <TrendingUp className="w-4 h-4" />
-                <span className="text-sm text-muted-foreground">{workout.difficulty}</span>
-              </div>
-              <div className="flex items-center gap-2 px-4 py-2 bg-card rounded-lg border">
-                <Clock className="w-4 h-4" />
-                <span className="text-sm text-muted-foreground">{workout.duration}</span>
-              </div>
-              <div className="flex items-center gap-2 px-4 py-2 bg-card rounded-lg border">
-                <Dumbbell className="w-4 h-4" />
-                <span className="text-sm text-muted-foreground">{workout.equipment}</span>
-              </div>
-            </div>
-
-            {/* Workout Image */}
-            <div className="mb-8 rounded-lg overflow-hidden">
-              <img
-                src={workout.imageUrl}
-                alt={workout.name}
-                className="w-full h-64 object-cover"
-              />
-            </div>
-
             {/* Use WorkoutDisplay component with all functionality */}
             <WorkoutDisplay
               exercises={[

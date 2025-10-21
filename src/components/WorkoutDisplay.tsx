@@ -391,8 +391,8 @@ export const WorkoutDisplay = ({
       <div className="space-y-6 mt-8">
         {/* Description Card */}
         {description && (
-          <Card>
-            <CardHeader>
+          <Card className="border-2 border-primary/30">
+            <CardHeader className="bg-primary/5">
               <CardTitle className="flex items-center gap-2 text-2xl font-bold">
                 🔍 Description
               </CardTitle>
@@ -407,8 +407,8 @@ export const WorkoutDisplay = ({
 
         {/* Format Card */}
         {format && (
-          <Card>
-            <CardHeader>
+          <Card className="border-2 border-primary/30">
+            <CardHeader className="bg-primary/5">
               <CardTitle className="flex items-center gap-2 text-2xl font-bold">
                 🏋️‍♂️ Format
               </CardTitle>
@@ -423,8 +423,8 @@ export const WorkoutDisplay = ({
 
         {/* Instructions Card */}
         {instructions && (
-          <Card>
-            <CardHeader>
+          <Card className="border-2 border-primary/30">
+            <CardHeader className="bg-primary/5">
               <CardTitle className="flex items-center gap-2 text-2xl font-bold">
                 📋 Instructions
               </CardTitle>
@@ -439,8 +439,8 @@ export const WorkoutDisplay = ({
 
         {/* Tips Card */}
         {tips && (
-          <Card>
-            <CardHeader>
+          <Card className="border-2 border-primary/30">
+            <CardHeader className="bg-primary/5">
               <CardTitle className="flex items-center gap-2 text-2xl font-bold">
                 ⚠️ Tips
               </CardTitle>
@@ -455,8 +455,8 @@ export const WorkoutDisplay = ({
 
         {/* Workout Plan Card */}
         {workoutDetails && (
-          <Card>
-            <CardHeader>
+          <Card className="border-2 border-primary/30">
+            <CardHeader className="bg-primary/5">
               <CardTitle className="flex items-center gap-2 text-2xl font-bold">
                 💪 Workout Plan
               </CardTitle>
@@ -489,8 +489,8 @@ export const WorkoutDisplay = ({
 
         {/* Week-by-Week Training Program Plan */}
         {programWeeks && (
-          <Card>
-            <CardHeader>
+          <Card className="border-2 border-primary/30">
+            <CardHeader className="bg-primary/5">
               <CardTitle className="flex items-center gap-2 text-2xl">
                 📅 Week-by-Week Training Plan
               </CardTitle>
