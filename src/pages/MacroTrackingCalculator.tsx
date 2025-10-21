@@ -161,19 +161,19 @@ const MacroTrackingCalculator = () => {
     <>
       <Helmet>
         <title>Macro Calculator - Smarty Gym | Free Macro Tracking Calculator | smartygym.com</title>
-        <meta name="description" content="Free Macro Tracking Calculator. Get personalized protein, carbs, and fat recommendations based on your goals. Science-based nutrition tool by Haris Falas, Cyprus Sports Scientist." />
-        <meta name="keywords" content="macro calculator, macronutrient calculator, protein calculator, nutrition calculator Cyprus, calorie tracker, smartygym macro" />
+        <meta name="description" content="Free Macro Tracking Calculator at smartygym.com. Get personalized protein, carbs, and fat recommendations based on your goals - convenient nutrition tool by Haris Falas." />
+        <meta name="keywords" content="smartygym, smarty gym, smartygym.com, Haris Falas, macro calculator, macronutrient calculator, protein calculator, nutrition calculator, calorie tracker, convenient fitness, gym reimagined, flexible nutrition" />
         
         <meta property="og:title" content="Macro Calculator - Smarty Gym" />
-        <meta property="og:description" content="Free macronutrient calculator for personalized nutrition recommendations" />
+        <meta property="og:description" content="Free macronutrient calculator - convenient nutrition tool at smartygym.com" />
         <meta property="og:type" content="website" />
-        <meta property="og:url" content="https://smartygym.com/macro-calculator" />
+        <meta property="og:url" content="https://smartygym.com/macrocalculator" />
         
         <meta name="twitter:card" content="summary_large_image" />
         <meta name="twitter:title" content="Macro Calculator - Smarty Gym" />
-        <meta name="twitter:description" content="Free macronutrient calculator for personalized nutrition recommendations" />
+        <meta name="twitter:description" content="Free macro calculator at smartygym.com for personalized nutrition" />
         
-        <link rel="canonical" href="https://smartygym.com/macro-calculator" />
+        <link rel="canonical" href="https://smartygym.com/macrocalculator" />
       </Helmet>
       
       <div className="min-h-screen bg-background p-4">

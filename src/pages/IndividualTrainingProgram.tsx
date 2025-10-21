@@ -680,8 +680,44 @@ Rest: 60–90 sec between sets`,
   return (
     <>
       <Helmet>
-        <title>{program.name} | Smarty Gym</title>
-        <meta name="description" content={program.description} />
+        <title>{program.name} - Smarty Gym | {program.duration} Program by Haris Falas</title>
+        <meta name="description" content={`${program.description} - ${program.duration} ${program.focus} training program by Haris Falas at smartygym.com. Convenient & flexible gym reimagined for anywhere, anytime fitness.`} />
+        <meta name="keywords" content={`smartygym, smarty gym, smartygym.com, Haris Falas, ${program.name}, ${program.focus} program, ${program.duration} program, ${program.equipment}, ${program.difficulty} program, training program, convenient fitness, gym reimagined, flexible training`} />
+        
+        <meta property="og:title" content={`${program.name} - ${program.duration} Training Program`} />
+        <meta property="og:description" content={`${program.description} - Structured ${program.focus} program by Haris Falas`} />
+        <meta property="og:type" content="article" />
+        <meta property="og:url" content={`https://smartygym.com/trainingprogram/${type}/${id}`} />
+        <meta property="og:image" content={program.imageUrl} />
+        
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content={`${program.name} - Smarty Gym`} />
+        <meta name="twitter:description" content={`${program.duration} ${program.focus} program by Haris Falas at smartygym.com`} />
+        
+        <link rel="canonical" href={`https://smartygym.com/trainingprogram/${type}/${id}`} />
+        
+        {/* Structured Data - Exercise Program */}
+        <script type="application/ld+json">
+          {JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "ExercisePlan",
+            "name": program.name,
+            "description": program.description,
+            "image": program.imageUrl,
+            "duration": program.duration,
+            "exerciseType": program.focus,
+            "author": {
+              "@type": "Person",
+              "name": "Haris Falas",
+              "jobTitle": "Sports Scientist & Strength and Conditioning Coach"
+            },
+            "provider": {
+              "@type": "Organization",
+              "name": "Smarty Gym",
+              "url": "https://smartygym.com"
+            }
+          })}
+        </script>
       </Helmet>
 
       <div className="min-h-screen bg-background">

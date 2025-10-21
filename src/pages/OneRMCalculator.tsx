@@ -87,19 +87,19 @@ const OneRMCalculator = () => {
     <>
       <Helmet>
         <title>1RM Calculator - Smarty Gym | Free One Rep Max Calculator | smartygym.com</title>
-        <meta name="description" content="Free 1RM Calculator using Brzycki formula. Calculate your one-rep maximum for any exercise. Science-based fitness tool by Haris Falas, Cyprus Sports Scientist." />
-        <meta name="keywords" content="1rm calculator, one rep max calculator, brzycki formula, strength calculator Cyprus, smartygym calculator" />
+        <meta name="description" content="Free 1RM Calculator using Brzycki formula. Calculate your one-rep maximum for any exercise at smartygym.com - convenient & flexible fitness tools by Haris Falas." />
+        <meta name="keywords" content="smartygym, smarty gym, smartygym.com, Haris Falas, 1rm calculator, one rep max calculator, brzycki formula, strength calculator, convenient fitness, gym reimagined, flexible training tools" />
         
         <meta property="og:title" content="1RM Calculator - Smarty Gym" />
-        <meta property="og:description" content="Free one-rep maximum calculator using Brzycki formula" />
+        <meta property="og:description" content="Free one-rep maximum calculator - convenient fitness tool at smartygym.com" />
         <meta property="og:type" content="website" />
-        <meta property="og:url" content="https://smartygym.com/1rm-calculator" />
+        <meta property="og:url" content="https://smartygym.com/1rmcalculator" />
         
         <meta name="twitter:card" content="summary_large_image" />
         <meta name="twitter:title" content="1RM Calculator - Smarty Gym" />
-        <meta name="twitter:description" content="Free one-rep maximum calculator using Brzycki formula" />
+        <meta name="twitter:description" content="Free one-rep maximum calculator at smartygym.com" />
         
-        <link rel="canonical" href="https://smartygym.com/1rm-calculator" />
+        <link rel="canonical" href="https://smartygym.com/1rmcalculator" />
       </Helmet>
       
       <div className="min-h-screen bg-background p-4">

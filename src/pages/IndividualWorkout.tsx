@@ -2993,8 +2993,44 @@ Finisher: 3 rounds`,
   return (
     <>
       <Helmet>
-        <title>{workout.name} | Smarty Gym</title>
-        <meta name="description" content={workout.description} />
+        <title>{workout.name} - Smarty Gym | Workout by Haris Falas | smartygym.com</title>
+        <meta name="description" content={`${workout.description} - ${workout.duration} ${getFocusLabel(type)} workout by Haris Falas. Convenient & flexible training at smartygym.com for anywhere, anytime fitness.`} />
+        <meta name="keywords" content={`smartygym, smarty gym, smartygym.com, Haris Falas, ${workout.name}, ${getFocusLabel(type)} workout, ${workout.equipment} workout, ${workout.difficulty} workout, convenient fitness, gym reimagined, flexible training, ${workout.format} workout`} />
+        
+        <meta property="og:title" content={`${workout.name} - Smarty Gym Workout`} />
+        <meta property="og:description" content={`${workout.description} - Convenient & flexible ${getFocusLabel(type)} workout by Haris Falas`} />
+        <meta property="og:type" content="article" />
+        <meta property="og:url" content={`https://smartygym.com/workout/${type}/${id}`} />
+        <meta property="og:image" content={workout.imageUrl} />
+        
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content={`${workout.name} - Smarty Gym`} />
+        <meta name="twitter:description" content={`${workout.description} by Haris Falas at smartygym.com`} />
+        
+        <link rel="canonical" href={`https://smartygym.com/workout/${type}/${id}`} />
+        
+        {/* Structured Data - Exercise/Workout */}
+        <script type="application/ld+json">
+          {JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "ExercisePlan",
+            "name": workout.name,
+            "description": workout.description,
+            "image": workout.imageUrl,
+            "duration": workout.duration,
+            "exerciseType": getFocusLabel(type),
+            "author": {
+              "@type": "Person",
+              "name": "Haris Falas",
+              "jobTitle": "Sports Scientist & Strength and Conditioning Coach"
+            },
+            "provider": {
+              "@type": "Organization",
+              "name": "Smarty Gym",
+              "url": "https://smartygym.com"
+            }
+          })}
+        </script>
       </Helmet>
 
       <div className="min-h-screen bg-background">
