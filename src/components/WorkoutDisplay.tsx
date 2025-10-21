@@ -378,8 +378,10 @@ export const WorkoutDisplay = ({ exercises, planContent, title = "Workout", seri
                 🔍 Description
               </CardTitle>
             </CardHeader>
-            <CardContent className="prose prose-sm max-w-none">
-              <p className="text-base leading-relaxed whitespace-pre-wrap">{planContent}</p>
+            <CardContent>
+              <div className="border-l-4 border-primary pl-4 py-2">
+                <p className="text-base leading-relaxed whitespace-pre-wrap">{planContent}</p>
+              </div>
             </CardContent>
           </Card>
         )}
