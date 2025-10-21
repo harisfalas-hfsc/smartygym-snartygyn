@@ -12,6 +12,23 @@ const IndividualTrainingProgram = () => {
 
   const isFreeProgram = true;
 
+  // Helper function to format focus label
+  const getFocusLabel = (type: string | undefined): string => {
+    const focusMap: { [key: string]: string } = {
+      'cardio': 'Cardio',
+      'functional': 'Functional Training',
+      'hypertrophy': 'Hypertrophy',
+      'weightloss': 'Weight Loss',
+      'weight-loss': 'Weight Loss',
+      'backcare': 'Back Care',
+      'back-care': 'Back Care',
+      'mobility': 'Mobility & Stability',
+      'strength': 'Strength',
+      'endurance': 'Endurance'
+    };
+    return focusMap[type || ''] || 'General Training';
+  };
+
   const programData: {
     [key: string]: {
       name: string;
@@ -489,6 +506,7 @@ Week 4: Mastery`,
             planContent=""
             title={program.name}
             serial={program.serialNumber}
+            focus={getFocusLabel(type)}
             difficulty={program.difficulty === "Beginner" ? 1 : program.difficulty === "Intermediate" ? 3 : 5}
             imageUrl={program.imageUrl}
             duration={program.duration}

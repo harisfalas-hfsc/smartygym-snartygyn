@@ -38,6 +38,7 @@ interface WorkoutDisplayProps {
   planContent: string;
   title?: string;
   serial?: string;
+  focus?: string;
   difficulty?: number;
   workoutDetails?: {
     exercises: Array<{
@@ -62,7 +63,8 @@ export const WorkoutDisplay = ({
   exercises, 
   planContent, 
   title = "Workout", 
-  serial = "001", 
+  serial = "001",
+  focus,
   difficulty = 3, 
   workoutDetails, 
   programWeeks, 
@@ -170,12 +172,18 @@ export const WorkoutDisplay = ({
         {/* Title */}
         <h1 className="text-4xl font-bold mb-6">{title}</h1>
 
-        {/* Info Bar: Serial, Difficulty with Stars, Duration, Equipment - ABOVE IMAGE */}
+        {/* Info Bar: Serial, Focus, Difficulty with Stars, Duration, Equipment - ABOVE IMAGE */}
         <div className="flex flex-wrap items-center gap-6 text-sm mb-6">
           <div className="flex items-center gap-2">
             <span className="font-semibold">Serial:</span>
             <span className="font-mono">{serial}</span>
           </div>
+          {focus && (
+            <div className="flex items-center gap-2">
+              <span className="font-semibold">Focus:</span>
+              <span className="bg-primary/10 text-primary px-3 py-1 rounded-full font-medium">{focus}</span>
+            </div>
+          )}
           <div className="flex items-center gap-2">
             <span className="font-semibold">Difficulty:</span>
             <div className="flex items-center gap-2">

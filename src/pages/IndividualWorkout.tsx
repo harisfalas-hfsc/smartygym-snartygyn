@@ -13,6 +13,20 @@ const IndividualWorkout = () => {
   // All workouts are free
   const isFreeWorkout = true;
 
+  // Helper function to format focus label
+  const getFocusLabel = (type: string | undefined): string => {
+    const focusMap: { [key: string]: string } = {
+      'strength': 'Strength',
+      'calorie': 'Calorie Burning',
+      'calorie-burning': 'Calorie Burning',
+      'metabolic': 'Metabolic',
+      'cardio': 'Cardio',
+      'mobility': 'Mobility & Stability',
+      'challenge': 'Challenge'
+    };
+    return focusMap[type || ''] || 'General Fitness';
+  };
+
   // Workout data structure
   const workoutData: {
     [key: string]: {
@@ -461,6 +475,7 @@ Phase 3: Finisher (10 min)`,
               planContent=""
               title={workout.name}
               serial={workout.serialNumber}
+              focus={getFocusLabel(type)}
               difficulty={workout.difficulty === "Beginner" ? 1 : workout.difficulty === "Intermediate" ? 3 : 5}
               imageUrl={workout.imageUrl}
               duration={workout.duration}
