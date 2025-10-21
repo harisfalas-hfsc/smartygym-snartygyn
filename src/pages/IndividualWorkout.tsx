@@ -10,7 +10,7 @@ import { ShareButtons } from "@/components/ShareButtons";
 const IndividualWorkout = () => {
   const navigate = useNavigate();
   const { type, id } = useParams();
-  const isFreeWorkout = id?.includes("-free");
+  const isFreeWorkout = id?.includes("-free") || id === "iron-core-003";
 
   // Workout images mapping - matches WorkoutDetail.tsx
   const workoutImages: { [key: string]: string } = {
