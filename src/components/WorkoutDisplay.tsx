@@ -52,9 +52,28 @@ interface WorkoutDisplayProps {
   imageUrl?: string;
   duration?: string;
   equipment?: string;
+  description?: string;
+  format?: string;
+  instructions?: string;
+  tips?: string;
 }
 
-export const WorkoutDisplay = ({ exercises, planContent, title = "Workout", serial = "001", difficulty = 3, workoutDetails, programWeeks, imageUrl, duration, equipment }: WorkoutDisplayProps) => {
+export const WorkoutDisplay = ({ 
+  exercises, 
+  planContent, 
+  title = "Workout", 
+  serial = "001", 
+  difficulty = 3, 
+  workoutDetails, 
+  programWeeks, 
+  imageUrl, 
+  duration, 
+  equipment,
+  description,
+  format,
+  instructions,
+  tips
+}: WorkoutDisplayProps) => {
   const [currentVideoId, setCurrentVideoId] = useState<string>(exercises[0]?.video_id || "");
   const [workTime, setWorkTime] = useState(20);
   const [restTime, setRestTime] = useState(10);
@@ -370,28 +389,76 @@ export const WorkoutDisplay = ({ exercises, planContent, title = "Workout", seri
 
       {/* Workout Content */}
       <div className="space-y-6 mt-8">
-        {/* Description (if provided) */}
-        {planContent && (
+        {/* Description Card */}
+        {description && (
           <Card>
             <CardHeader>
-              <CardTitle className="flex items-center gap-2 text-2xl">
+              <CardTitle className="flex items-center gap-2 text-2xl font-bold">
                 🔍 Description
               </CardTitle>
             </CardHeader>
             <CardContent>
               <div className="border-l-4 border-primary pl-4 py-2">
-                <p className="text-base leading-relaxed whitespace-pre-wrap">{planContent}</p>
+                <p className="text-base leading-relaxed whitespace-pre-wrap">{description}</p>
               </div>
             </CardContent>
           </Card>
         )}
 
-        {/* Detailed Workout Plan (for single workouts) - Only user-provided content */}
+        {/* Format Card */}
+        {format && (
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2 text-2xl font-bold">
+                🏋️‍♂️ Format
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="border-l-4 border-primary pl-4 py-2">
+                <p className="text-base leading-relaxed whitespace-pre-wrap">{format}</p>
+              </div>
+            </CardContent>
+          </Card>
+        )}
+
+        {/* Instructions Card */}
+        {instructions && (
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2 text-2xl font-bold">
+                📋 Instructions
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="border-l-4 border-primary pl-4 py-2">
+                <p className="text-base leading-relaxed whitespace-pre-wrap">{instructions}</p>
+              </div>
+            </CardContent>
+          </Card>
+        )}
+
+        {/* Tips Card */}
+        {tips && (
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2 text-2xl font-bold">
+                ⚠️ Tips
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="border-l-4 border-primary pl-4 py-2">
+                <p className="text-base leading-relaxed whitespace-pre-wrap">{tips}</p>
+              </div>
+            </CardContent>
+          </Card>
+        )}
+
+        {/* Workout Plan Card */}
         {workoutDetails && (
           <Card>
             <CardHeader>
-              <CardTitle className="flex items-center gap-2 text-2xl">
-                🏋️ Workout Plan
+              <CardTitle className="flex items-center gap-2 text-2xl font-bold">
+                💪 Workout Plan
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
