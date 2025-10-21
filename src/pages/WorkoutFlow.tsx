@@ -121,21 +121,11 @@ const WorkoutFlow = () => {
                     <Icon className="w-8 h-8 text-primary" />
                   </div>
                   <div>
+                    <p className="text-xs text-muted-foreground mb-2">
+                      Designed by Haris Falas — Results-based training plan
+                    </p>
                     <h3 className="font-semibold text-lg mb-2">{workout.title}</h3>
-                    <p className="text-sm text-muted-foreground mb-3">{workout.description}</p>
-                    
-                    {/* Metadata Labels */}
-                    <div className="flex flex-wrap gap-2 justify-center text-xs text-muted-foreground">
-                      <span className="flex items-center gap-1 bg-muted px-2 py-1 rounded">
-                        ⏱️ 30-45 min
-                      </span>
-                      <span className="flex items-center gap-1 bg-muted px-2 py-1 rounded">
-                        📊 {workout.id === 'strength' || workout.id === 'challenge' ? 'Advanced' : workout.id === 'mobility' ? 'Beginner' : 'Intermediate'}
-                      </span>
-                      <span className="flex items-center gap-1 bg-muted px-2 py-1 rounded">
-                        {workout.id === 'cardio' || workout.id === 'mobility' ? '🤸 Bodyweight' : '🏋️ Equipment'}
-                      </span>
-                    </div>
+                    <p className="text-sm text-muted-foreground">{workout.description}</p>
                   </div>
                 </div>
               </Card>

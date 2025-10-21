@@ -301,18 +301,18 @@ const WorkoutDetail = () => {
                   alt={workout.name}
                   className="w-full h-full object-cover"
                 />
+                <div className="absolute top-2 right-2 bg-primary text-primary-foreground text-xs px-2 py-1 rounded">
+                  {workout.duration}
+                </div>
                 {workout.isFree && (
                   <div className="absolute top-2 left-2 bg-primary text-primary-foreground px-3 py-1 rounded-full text-xs font-semibold">
                     FREE
                   </div>
                 )}
               </div>
-              <div className="p-6">
-                <p className="text-xs text-muted-foreground mb-2">
-                  Designed by Haris Falas — Results-based training plan
-                </p>
-                <h3 className="font-semibold text-lg mb-2">{workout.name}</h3>
-                <p className="text-sm text-muted-foreground">{workout.description}</p>
+              <div className="p-4 space-y-2">
+                <h3 className="font-semibold text-lg">{workout.name}</h3>
+                <p className="text-sm text-muted-foreground line-clamp-2">{workout.description}</p>
               </div>
             </Card>
           ))}
