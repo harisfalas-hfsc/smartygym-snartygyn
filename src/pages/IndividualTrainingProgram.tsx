@@ -24,30 +24,32 @@ const IndividualTrainingProgram = () => {
   // Sample program names based on type and id
   const programNames: { [key: string]: { [key: string]: { name: string; difficulty: number; serial: string } } } = {
     cardio: {
+      "cardio-free": { name: "Cardio Starter Program", difficulty: 1, serial: "CP-FREE" },
       "1": { name: "Cardio Endurance Builder", difficulty: 1, serial: "CP-001" },
       "2": { name: "Elite Cardio Performance", difficulty: 3, serial: "CP-002" },
     },
-    functional: {
+    "functional-strength": {
+      "functional-strength-free": { name: "Functional Basics", difficulty: 1, serial: "FP-FREE" },
       "1": { name: "Functional Fitness Foundation", difficulty: 1, serial: "FP-001" },
       "2": { name: "Functional Athlete Program", difficulty: 3, serial: "FP-002" },
     },
-    strength: {
-      "1": { name: "Strength Development Program", difficulty: 2, serial: "SP-001" },
-      "2": { name: "Maximum Strength Protocol", difficulty: 3, serial: "SP-002" },
-    },
-    hypertrophy: {
+    "muscle-hypertrophy": {
+      "muscle-hypertrophy-free": { name: "Muscle Building Basics", difficulty: 1, serial: "HP-FREE" },
       "1": { name: "Muscle Growth Foundation", difficulty: 2, serial: "HP-001" },
       "2": { name: "Advanced Mass Building", difficulty: 3, serial: "HP-002" },
     },
-    weightloss: {
+    "weight-loss": {
+      "weight-loss-free": { name: "Weight Loss Starter", difficulty: 1, serial: "WP-FREE" },
       "1": { name: "Weight Loss Transformation", difficulty: 1, serial: "WP-001" },
       "2": { name: "Advanced Fat Loss Program", difficulty: 3, serial: "WP-002" },
     },
-    lowbackpain: {
+    "low-back-pain": {
+      "low-back-pain-free": { name: "Back Care Essentials", difficulty: 1, serial: "LP-FREE" },
       "1": { name: "Back Pain Relief Program", difficulty: 1, serial: "LP-001" },
       "2": { name: "Spine Health Advanced", difficulty: 2, serial: "LP-002" },
     },
-    mobility: {
+    "mobility-stability": {
+      "mobility-stability-free": { name: "Mobility Basics", difficulty: 1, serial: "MP-FREE" },
       "1": { name: "Mobility Enhancement Program", difficulty: 1, serial: "MP-001" },
       "2": { name: "Elite Mobility & Stability", difficulty: 3, serial: "MP-002" },
     },

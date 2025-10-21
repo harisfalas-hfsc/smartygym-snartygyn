@@ -31,32 +31,36 @@ const IndividualWorkout = () => {
   // Sample workout names based on type and id
   const workoutNames: { [key: string]: { [key: string]: { name: string; difficulty: number; serial: string } } } = {
     cardio: {
+      "cardio-free": { name: "Cardio Foundation", difficulty: 1, serial: "CD-FREE" },
+      "pulse-igniter-001": { name: "Pulse Igniter", difficulty: 3, serial: "001" },
       "1": { name: "HIIT Foundation", difficulty: 1, serial: "CD-001" },
       "2": { name: "Cardio Blast Advanced", difficulty: 3, serial: "CD-002" },
     },
     strength: {
+      "strength-free": { name: "Beginner Strength Basics", difficulty: 1, serial: "ST-FREE" },
+      "iron-core-003": { name: "Iron Core", difficulty: 5, serial: "003" },
+      "power-surge-005": { name: "Power Surge", difficulty: 4, serial: "005" },
       "1": { name: "Upper Body Power", difficulty: 2, serial: "ST-001" },
       "2": { name: "Full Body Strength", difficulty: 3, serial: "ST-002" },
     },
-    functional: {
-      "1": { name: "Functional Movement Basics", difficulty: 1, serial: "FN-001" },
-      "2": { name: "Athletic Performance", difficulty: 3, serial: "FN-002" },
+    "calorie-burning": {
+      "calorie-burning-free": { name: "Fat Burn Starter", difficulty: 1, serial: "CB-FREE" },
+      "fat-furnace-002": { name: "Fat Furnace", difficulty: 4, serial: "002" },
     },
-    hypertrophy: {
-      "1": { name: "Muscle Building Fundamentals", difficulty: 2, serial: "HY-001" },
-      "2": { name: "Hypertrophy Advanced", difficulty: 3, serial: "HY-002" },
-    },
-    weightloss: {
-      "1": { name: "Fat Burn Beginner", difficulty: 1, serial: "WL-001" },
-      "2": { name: "Metabolic Accelerator", difficulty: 3, serial: "WL-002" },
-    },
-    lowbackpain: {
-      "1": { name: "Back Care Essentials", difficulty: 1, serial: "LB-001" },
-      "2": { name: "Spine Strengthening", difficulty: 2, serial: "LB-002" },
+    metabolic: {
+      "metabolic-free": { name: "Metabolic Basics", difficulty: 1, serial: "MB-FREE" },
+      "metaboshock-004": { name: "MetaboShock", difficulty: 4, serial: "004" },
+      "1": { name: "Metabolic Circuit", difficulty: 2, serial: "MB-001" },
     },
     mobility: {
+      "mobility-free": { name: "Flexibility Fundamentals", difficulty: 1, serial: "MO-FREE" },
+      "flowforge-006": { name: "FlowForge", difficulty: 2, serial: "006" },
       "1": { name: "Flexibility Foundation", difficulty: 1, serial: "MB-001" },
       "2": { name: "Advanced Mobility Flow", difficulty: 3, serial: "MB-002" },
+    },
+    challenge: {
+      "challenge-free": { name: "Challenge Starter", difficulty: 1, serial: "CH-FREE" },
+      "1": { name: "Ultimate Challenge", difficulty: 5, serial: "CH-001" },
     },
   };
 
