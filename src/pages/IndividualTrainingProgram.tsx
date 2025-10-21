@@ -5,6 +5,9 @@ import { Card } from "@/components/ui/card";
 import { ArrowLeft } from "lucide-react";
 import { WorkoutDisplay } from "@/components/WorkoutDisplay";
 import { ShareButtons } from "@/components/ShareButtons";
+import cardioEnduranceImg from "@/assets/cardio-endurance-program.jpg";
+import functionalStrengthImg from "@/assets/functional-strength-program.jpg";
+import muscleHypertrophyImg from "@/assets/muscle-hypertrophy-program.jpg";
 
 const IndividualTrainingProgram = () => {
   const navigate = useNavigate();
@@ -460,6 +463,191 @@ Week 4: Mastery`,
         "Be patient with progress",
         "Listen to your body",
         "Make it a daily habit",
+      ],
+    },
+    "cardio-cg-001": {
+      name: "Cardio Endurance & Heart Longevity",
+      serialNumber: "CG-001",
+      difficulty: "Beginner to Intermediate",
+      duration: "6 weeks",
+      equipment: "Optional (jump rope, treadmill, bike, mat, timer)",
+      imageUrl: cardioEnduranceImg,
+      description:
+        "A progressive cardio plan designed to improve aerobic capacity, heart health, and stamina through steady-state, interval, and tempo-based training.",
+      format: `Progressive Cardio Training
+Structure: 4 training days/week
+Intensity: RPE-based (Rate of Perceived Exertion)
+Weekly progression in duration and intensity
+
+RPE 6–7 = moderate effort
+RPE 8–9 = high effort`,
+      instructions:
+        "Warm-up and cooldown are mandatory. Use a timer for intervals. RPE 6–7 = moderate effort, RPE 8–9 = high effort. Track heart rate if possible.",
+      exercises: [
+        {
+          week: "Week 1–2",
+          day: "Day 1",
+          workout: "Steady-State Cardio",
+          details: "5-min warm-up • 20-min continuous cardio @ RPE 6 • 5-min cooldown",
+        },
+        {
+          week: "Week 1–2",
+          day: "Day 2",
+          workout: "Intervals",
+          details: "5-min warm-up • 4 rounds: 2 min @ RPE 6, 1 min @ RPE 8 • 5-min cooldown",
+        },
+        {
+          week: "Week 1–2",
+          day: "Day 4",
+          workout: "Cardio Circuit",
+          details: "3 rounds: 30s mountain climbers, 30s jumping jacks, 30s rest • Plank Hold 3×30s • Dead Bug 3×10 per side",
+        },
+        {
+          week: "Week 1–2",
+          day: "Day 5",
+          workout: "Tempo Cardio",
+          details: "5-min warm-up • 25-min cardio @ RPE 7 • 5-min cooldown",
+        },
+        {
+          week: "Week 3–4",
+          day: "Progression",
+          workout: "Increased Duration",
+          details: "Increase duration by 5–10 min • Add 1–2 rounds to intervals • RPE 7–8",
+        },
+        {
+          week: "Week 5–6",
+          day: "Progression",
+          workout: "Increased Intensity",
+          details: "Increase intensity (RPE 8–9) • Add sprint intervals or incline work • Maintain recovery strategies",
+        },
+      ],
+      tips: [
+        "Choose cardio modes you enjoy",
+        "Track heart rate if possible",
+        "Stay hydrated and wear breathable gear",
+        "Warm-up and cooldown are mandatory",
+        "Progress gradually each week",
+        "Rest and recovery are essential",
+      ],
+    },
+    "functional-fs-002": {
+      name: "Functional Strength & Movement Control",
+      serialNumber: "FS-002",
+      difficulty: "Intermediate",
+      duration: "6 weeks",
+      equipment: "Required (barbell, dumbbells, kettlebell, bench, pull-up bar, bands)",
+      imageUrl: functionalStrengthImg,
+      description:
+        "A strength-focused plan using compound lifts and movement patterns that enhance real-life performance, stability, and injury prevention.",
+      format: `Full-Body Functional Training
+Structure: 3 training days/week
+Progressive overload every 2 weeks
+Tempo: 2 sec up / 3 sec down
+Rest: 90–120 sec between sets`,
+      instructions:
+        "Use %1RM for compound lifts. Tempo: 2 sec up / 3 sec down. Rest: 90–120 sec between sets. Prioritize form and control over weight.",
+      exercises: [
+        {
+          week: "Week 1–2",
+          day: "Day 1",
+          workout: "Lower Body Function (65–70% 1RM, 10 reps)",
+          details: "Back Squat 4×10 • Bulgarian Split Squat 3×12 each leg • Kettlebell Swing 3×15 • Plank Hold 3×30s",
+        },
+        {
+          week: "Week 1–2",
+          day: "Day 2",
+          workout: "Upper Body Function (65–70% 1RM, 10 reps)",
+          details: "Pull-Ups 4 sets to near-failure • Dumbbell Overhead Press 3×12 • Bent Over Row 3×10 • Dead Bug 3×10 per side",
+        },
+        {
+          week: "Week 1–2",
+          day: "Day 3",
+          workout: "Full Body Circuit",
+          details: "Goblet Squat 3×12 • Dumbbell Bench Press 3×12 • One-Leg RDL 3×10 each leg • Band Face Pulls 3×15 • Mobility Flow 10 min",
+        },
+        {
+          week: "Week 3–4",
+          day: "Progression",
+          workout: "Increased Load (75–80% 1RM, 8 reps)",
+          details: "Add 1 set to compound lifts • Increase load • Rest: 90–120 sec",
+        },
+        {
+          week: "Week 5–6",
+          day: "Progression",
+          workout: "Peak Strength (85% 1RM, 6 reps)",
+          details: "Focus on tempo (3 sec eccentric) • Maintain volume • Rest: 120 sec",
+        },
+      ],
+      tips: [
+        "Use mirrors or video to check technique",
+        "Warm up joints before heavy lifts",
+        "Focus on breathing and bracing",
+        "Prioritize form over load",
+        "Progress gradually every 2 weeks",
+        "Full range of motion is key",
+      ],
+    },
+    "hypertrophy-mh-003": {
+      name: "Muscle Hypertrophy Builder",
+      serialNumber: "MH-003",
+      difficulty: "Intermediate to Advanced",
+      duration: "6 weeks",
+      equipment: "Required (barbell, dumbbells, bench, pull-up bar, bands)",
+      imageUrl: muscleHypertrophyImg,
+      description:
+        "A hypertrophy-focused plan designed to stimulate muscle growth through volume, intensity, and controlled tempo across all major muscle groups.",
+      format: `Push/Pull/Lower/Full Body Split
+Structure: 4 training days/week
+Progressive overload every 2 weeks
+Tempo: 2 sec up / 3 sec down
+Rest: 60–90 sec between sets`,
+      instructions:
+        "Use %1RM for compound lifts. Tempo: 2 sec up / 3 sec down. Rest: 60–90 sec between sets. Leave 1–2 reps in reserve (RIR).",
+      exercises: [
+        {
+          week: "Week 1–2",
+          day: "Day 1",
+          workout: "Push Focus (65–70% 1RM, 12 reps)",
+          details: "Bench Press 4×12 • Incline Dumbbell Press 3×12 • Overhead Press 3×12 • Tricep Dips 3 sets to near-failure",
+        },
+        {
+          week: "Week 1–2",
+          day: "Day 2",
+          workout: "Pull Focus (65–70% 1RM, 12 reps)",
+          details: "Pull-Ups 4 sets to near-failure • Bent Over Row 4×12 • Upright Row 3×12 • Bicep Curls 3×15",
+        },
+        {
+          week: "Week 1–2",
+          day: "Day 4",
+          workout: "Lower Body Hypertrophy (65–70% 1RM, 12 reps)",
+          details: "Back Squat 4×12 • Romanian Deadlift 3×12 • Bulgarian Split Squat 3×12 • Glute Bridge 3×15",
+        },
+        {
+          week: "Week 1–2",
+          day: "Day 5",
+          workout: "Full Body Blend",
+          details: "Deadlift 4×10 • Dumbbell Bench Press 3×12 • One-Leg RDL 3×10 • Hip Thrust 3×15 • Plank Hold 3×45s",
+        },
+        {
+          week: "Week 3–4",
+          day: "Progression",
+          workout: "Increased Load (75–80% 1RM, 10 reps)",
+          details: "Add 1 set to compound lifts • Increase load • Rest: 90 sec",
+        },
+        {
+          week: "Week 5–6",
+          day: "Progression",
+          workout: "Peak Volume (80–85% 1RM, 8 reps)",
+          details: "Focus on tempo • Maintain volume • Rest: 90–120 sec",
+        },
+      ],
+      tips: [
+        "Track weights and reps weekly",
+        "Use full range of motion",
+        "Prioritize recovery and sleep",
+        "Leave 1-2 reps in reserve",
+        "Focus on muscle contraction",
+        "Eat in a slight caloric surplus",
       ],
     },
   };
