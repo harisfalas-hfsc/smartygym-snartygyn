@@ -10,6 +10,14 @@ import bodyBurnoutImg from "@/assets/body-burnout-workout.jpg";
 import sweatStormImg from "@/assets/sweat-storm-workout.jpg";
 import infernoFlowImg from "@/assets/inferno-flow-workout.jpg";
 import calorieCrusherImg from "@/assets/calorie-crusher-workout.jpg";
+import powerFoundationImg from "@/assets/power-foundation-workout.jpg";
+import ironCoreImg from "@/assets/iron-core-workout.jpg";
+import coreBuilderImg from "@/assets/core-builder-workout.jpg";
+import starterStrengthImg from "@/assets/starter-strength-workout.jpg";
+import gravityGrindImg from "@/assets/gravity-grind-workout.jpg";
+import ironCircuitImg from "@/assets/iron-circuit-workout.jpg";
+import bodyweightBeastImg from "@/assets/bodyweight-beast-workout.jpg";
+import ironEngineImg from "@/assets/iron-engine-workout.jpg";
 
 type EquipmentFilter = "all" | "bodyweight" | "equipment";
 type LevelFilter = "all" | "beginner" | "intermediate" | "advanced";
@@ -43,14 +51,14 @@ const WorkoutDetail = () => {
 
   const workoutData: { [key: string]: Workout[] } = {
     "strength": [
-      { id: "strength-001", name: "Power Foundation", description: "Build your strength base with compound movements", duration: "45 min", equipment: "equipment", level: "intermediate", imageUrl: "https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=800&h=600&fit=crop", isFree: true },
-      { id: "strength-002", name: "Iron Core", description: "Advanced strength targeting major muscle groups with raw power", duration: "60 min", equipment: "equipment", level: "advanced", imageUrl: "https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=800&h=600&fit=crop", isFree: true },
-      { id: "strength-003", name: "Core Builder", description: "Foundational bodyweight strength for major muscle groups", duration: "30 min", equipment: "bodyweight", level: "beginner", imageUrl: "https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=800&h=600&fit=crop", isFree: true },
-      { id: "strength-004", name: "Starter Strength", description: "Gentle intro to resistance training with light weights", duration: "30 min", equipment: "equipment", level: "beginner", imageUrl: "https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=800&h=600&fit=crop", isFree: true },
-      { id: "strength-005", name: "Gravity Grind", description: "Bodyweight strength using tempo and holds", duration: "45 min", equipment: "bodyweight", level: "intermediate", imageUrl: "https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=800&h=600&fit=crop", isFree: true },
-      { id: "strength-006", name: "Iron Circuit", description: "Full-body circuit with dumbbells and kettlebells", duration: "45 min", equipment: "equipment", level: "intermediate", imageUrl: "https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=800&h=600&fit=crop", isFree: true },
-      { id: "strength-007", name: "Bodyweight Beast", description: "High-intensity bodyweight with advanced variations", duration: "60 min", equipment: "bodyweight", level: "advanced", imageUrl: "https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=800&h=600&fit=crop", isFree: true },
-      { id: "strength-008", name: "Iron Engine", description: "Heavy strength workout for serious lifters", duration: "60 min", equipment: "equipment", level: "advanced", imageUrl: "https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=800&h=600&fit=crop", isFree: true },
+      { id: "strength-001", name: "Power Foundation", description: "Build your strength base with compound movements", duration: "45 min", equipment: "equipment", level: "intermediate", imageUrl: powerFoundationImg, isFree: true },
+      { id: "strength-002", name: "Iron Core", description: "Advanced strength targeting major muscle groups with raw power", duration: "60 min", equipment: "equipment", level: "advanced", imageUrl: ironCoreImg, isFree: true },
+      { id: "strength-003", name: "Core Builder", description: "Foundational bodyweight strength for major muscle groups", duration: "30 min", equipment: "bodyweight", level: "beginner", imageUrl: coreBuilderImg, isFree: true },
+      { id: "strength-004", name: "Starter Strength", description: "Gentle intro to resistance training with light weights", duration: "30 min", equipment: "equipment", level: "beginner", imageUrl: starterStrengthImg, isFree: true },
+      { id: "strength-005", name: "Gravity Grind", description: "Bodyweight strength using tempo and holds", duration: "45 min", equipment: "bodyweight", level: "intermediate", imageUrl: gravityGrindImg, isFree: true },
+      { id: "strength-006", name: "Iron Circuit", description: "Full-body circuit with dumbbells and kettlebells", duration: "45 min", equipment: "equipment", level: "intermediate", imageUrl: ironCircuitImg, isFree: true },
+      { id: "strength-007", name: "Bodyweight Beast", description: "High-intensity bodyweight with advanced variations", duration: "60 min", equipment: "bodyweight", level: "advanced", imageUrl: bodyweightBeastImg, isFree: true },
+      { id: "strength-008", name: "Iron Engine", description: "Heavy strength workout for serious lifters", duration: "60 min", equipment: "equipment", level: "advanced", imageUrl: ironEngineImg, isFree: true },
     ],
     "calorie-burning": [
       { id: "calorie-001", name: "Metabolic Burn", description: "High-intensity fat-burning session", duration: "30 min", equipment: "bodyweight", level: "beginner", imageUrl: "https://images.unsplash.com/photo-1549060279-7e168fcee0c2?w=800&h=600&fit=crop", isFree: true },

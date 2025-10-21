@@ -11,6 +11,14 @@ import bodyBurnoutImg from "@/assets/body-burnout-workout.jpg";
 import sweatStormImg from "@/assets/sweat-storm-workout.jpg";
 import infernoFlowImg from "@/assets/inferno-flow-workout.jpg";
 import calorieCrusherImg from "@/assets/calorie-crusher-workout.jpg";
+import powerFoundationImg from "@/assets/power-foundation-workout.jpg";
+import ironCoreImg from "@/assets/iron-core-workout.jpg";
+import coreBuilderImg from "@/assets/core-builder-workout.jpg";
+import starterStrengthImg from "@/assets/starter-strength-workout.jpg";
+import gravityGrindImg from "@/assets/gravity-grind-workout.jpg";
+import ironCircuitImg from "@/assets/iron-circuit-workout.jpg";
+import bodyweightBeastImg from "@/assets/bodyweight-beast-workout.jpg";
+import ironEngineImg from "@/assets/iron-engine-workout.jpg";
 
 const IndividualWorkout = () => {
   const navigate = useNavigate();
@@ -62,7 +70,7 @@ const IndividualWorkout = () => {
       difficulty: "Intermediate",
       duration: "45 min",
       equipment: "Equipment Required",
-      imageUrl: "https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=800&h=600&fit=crop",
+      imageUrl: powerFoundationImg,
       description:
         "Build your strength base with compound movements targeting major muscle groups. This workout focuses on developing raw power through progressive overload with barbells and dumbbells.",
       format: `Traditional Strength Training
@@ -1016,7 +1024,7 @@ Circuit: 3 rounds`,
       difficulty: "Advanced",
       duration: "60 minutes",
       equipment: "Bars & Weight Plates, Dumbbells, Mat",
-      imageUrl: "https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=800&h=600&fit=crop",
+      imageUrl: ironCoreImg,
       description:
         "Iron Core is a strength-focused workout targeting major muscle groups. It builds raw power, muscular endurance, and structural integrity. Ideal for intermediate to advanced clients.",
       format: `Traditional Sets & Reps
@@ -1073,7 +1081,7 @@ Rest: 60–90s between sets`,
       difficulty: "Beginner",
       duration: "30 minutes",
       equipment: "Bodyweight only",
-      imageUrl: "https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=800&h=600&fit=crop",
+      imageUrl: coreBuilderImg,
       description:
         "A foundational strength workout using only bodyweight. Targets major muscle groups with controlled tempo and safe movement patterns.",
       format: `Circuit – 3 rounds
@@ -1129,7 +1137,7 @@ Tempo: Controlled (3010 or 2011)`,
       difficulty: "Beginner",
       duration: "30 minutes",
       equipment: "Dumbbells, Bands, Mat",
-      imageUrl: "https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=800&h=600&fit=crop",
+      imageUrl: starterStrengthImg,
       description:
         "Gentle intro to resistance training using light dumbbells and bands. Builds strength safely and progressively.",
       format: `Circuit – 3 rounds
@@ -1185,7 +1193,7 @@ Tempo: Moderate (2011)`,
       difficulty: "Intermediate",
       duration: "45 minutes",
       equipment: "Bodyweight only",
-      imageUrl: "https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=800&h=600&fit=crop",
+      imageUrl: gravityGrindImg,
       description:
         "A bodyweight strength workout using tempo and holds to challenge muscles and build endurance.",
       format: `Superset + Static Holds
@@ -1248,7 +1256,7 @@ Tempo: Slow (3010)`,
       difficulty: "Intermediate",
       duration: "45 minutes",
       equipment: "Dumbbells, Kettlebells, Mat",
-      imageUrl: "https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=800&h=600&fit=crop",
+      imageUrl: ironCircuitImg,
       description:
         "A full-body strength circuit using dumbbells and kettlebells. Builds muscle and improves movement control.",
       format: `Circuit – 4 rounds
@@ -1304,7 +1312,7 @@ Tempo: Moderate (2011)`,
       difficulty: "Advanced",
       duration: "60 minutes",
       equipment: "Bodyweight only",
-      imageUrl: "https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=800&h=600&fit=crop",
+      imageUrl: bodyweightBeastImg,
       description:
         "A high-intensity bodyweight strength workout using advanced variations and isometric holds.",
       format: `EMOM + Static Holds
@@ -1381,7 +1389,7 @@ Tempo: Controlled (3010)`,
       difficulty: "Advanced",
       duration: "60 minutes",
       equipment: "Barbell, Dumbbells, Weight Plates, Mat",
-      imageUrl: "https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=800&h=600&fit=crop",
+      imageUrl: ironEngineImg,
       description:
         "A heavy strength workout using barbells, dumbbells, and weighted holds. Designed for serious lifters.",
       format: `Traditional Sets & Reps
