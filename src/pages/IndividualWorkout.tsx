@@ -22,6 +22,7 @@ const IndividualWorkout = () => {
       'metabolic': 'Metabolic',
       'cardio': 'Cardio',
       'mobility': 'Mobility & Stability',
+      'power': 'Power',
       'challenge': 'Challenge'
     };
     return focusMap[type || ''] || 'General Fitness';
@@ -429,6 +430,383 @@ Phase 3: Finisher (10 min)`,
         "Stay mentally focused throughout",
         "Recovery is crucial after this workout",
         "Hydrate well and monitor your body",
+      ],
+    },
+    "cardio-002": {
+      name: "Pulse Igniter",
+      serialNumber: "001",
+      difficulty: "Intermediate",
+      duration: "30 minutes",
+      equipment: "Jump Rope, Mat",
+      imageUrl: "https://images.unsplash.com/photo-1538805060514-97d9cc17730c?w=800&h=600&fit=crop",
+      description:
+        "Pulse Igniter is a high-energy cardio workout designed to elevate heart rate, improve endurance, and boost cardiovascular health. It's ideal for clients looking for a sweat-heavy session that's short, sharp, and effective.",
+      format: `Tabata Circuit – 6 blocks of 4 minutes each
+Work: 20s / Rest: 10s x 8 rounds per block`,
+      instructions:
+        "Complete each Tabata block before moving to the next. Rest 1 minute between blocks. Use a timer app for accuracy.",
+      exercises: [
+        {
+          name: "Block 1: Jump Rope",
+          sets: "1 block",
+          reps: "8 rounds",
+          rest: "10s between rounds, 1 min after block",
+          notes: "Each block = 4 minutes (20s on / 10s off x 8)",
+        },
+        {
+          name: "Block 2: High Knees",
+          sets: "1 block",
+          reps: "8 rounds",
+          rest: "10s between rounds, 1 min after block",
+          notes: "Each block = 4 minutes (20s on / 10s off x 8)",
+        },
+        {
+          name: "Block 3: Mountain Climbers",
+          sets: "1 block",
+          reps: "8 rounds",
+          rest: "10s between rounds, 1 min after block",
+          notes: "Each block = 4 minutes (20s on / 10s off x 8)",
+        },
+        {
+          name: "Block 4: Burpees",
+          sets: "1 block",
+          reps: "8 rounds",
+          rest: "10s between rounds, 1 min after block",
+          notes: "Each block = 4 minutes (20s on / 10s off x 8)",
+        },
+        {
+          name: "Block 5: Jumping Jacks",
+          sets: "1 block",
+          reps: "8 rounds",
+          rest: "10s between rounds, 1 min after block",
+          notes: "Each block = 4 minutes (20s on / 10s off x 8)",
+        },
+        {
+          name: "Block 6: Skater Hops",
+          sets: "1 block",
+          reps: "8 rounds",
+          rest: "10s between rounds",
+          notes: "Each block = 4 minutes (20s on / 10s off x 8)",
+        },
+      ],
+      tips: [
+        "Engage your core during high-impact moves",
+        "Avoid locking knees during jumps",
+        "Hydrate and pace yourself across rounds",
+      ],
+    },
+    "calorie-002": {
+      name: "Fat Furnace",
+      serialNumber: "002",
+      difficulty: "Advanced",
+      duration: "45 minutes",
+      equipment: "Dumbbells, Mat",
+      imageUrl: "https://images.unsplash.com/photo-1549060279-7e168fcee0c2?w=800&h=600&fit=crop",
+      description:
+        "Fat Furnace is a metabolic conditioning workout that torches calories and keeps the burn going post-session. It blends compound strength moves with dynamic cardio bursts for maximum fat loss.",
+      format: `AMRAP + Challenge Finisher
+Main Block: 30 mins AMRAP
+Finisher: 10 mins challenge
+Warm-Up & Cool-Down: 5 mins`,
+      instructions:
+        "Use moderate dumbbells. Push for consistent pace. Track rounds completed. Rest only when needed.",
+      exercises: [
+        {
+          name: "Dumbbell Thrusters",
+          sets: "AMRAP 30 min",
+          reps: "12",
+          rest: "as needed",
+          notes: "Main Block Exercise 1",
+        },
+        {
+          name: "Jump Squats",
+          sets: "AMRAP 30 min",
+          reps: "15",
+          rest: "as needed",
+          notes: "Main Block Exercise 2",
+        },
+        {
+          name: "Dumbbell Renegade Rows",
+          sets: "AMRAP 30 min",
+          reps: "10/side",
+          rest: "as needed",
+          notes: "Main Block Exercise 3",
+        },
+        {
+          name: "Jump Lunges",
+          sets: "AMRAP 30 min",
+          reps: "12/leg",
+          rest: "as needed",
+          notes: "Main Block Exercise 4",
+        },
+        {
+          name: "Plank to Push-Up",
+          sets: "AMRAP 30 min",
+          reps: "10",
+          rest: "as needed",
+          notes: "Main Block Exercise 5",
+        },
+        {
+          name: "Finisher: 100 Jumping Jacks",
+          sets: "1",
+          reps: "100",
+          rest: "0",
+          notes: "Complete in 10 mins",
+        },
+        {
+          name: "Finisher: 50 Mountain Climbers",
+          sets: "1",
+          reps: "50",
+          rest: "0",
+          notes: "Complete in 10 mins",
+        },
+        {
+          name: "Finisher: 25 Burpees",
+          sets: "1",
+          reps: "25",
+          rest: "0",
+          notes: "Complete in 10 mins",
+        },
+      ],
+      tips: [
+        "Choose weights that challenge without compromising form",
+        "Avoid arching your back during rows",
+        "Focus on breathing and posture",
+      ],
+    },
+    "strength-002": {
+      name: "Iron Core",
+      serialNumber: "003",
+      difficulty: "Advanced",
+      duration: "60 minutes",
+      equipment: "Bars & Weight Plates, Dumbbells, Mat",
+      imageUrl: "https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=800&h=600&fit=crop",
+      description:
+        "Iron Core is a strength-focused workout targeting major muscle groups. It builds raw power, muscular endurance, and structural integrity. Ideal for intermediate to advanced clients.",
+      format: `Traditional Sets & Reps
+3 sets per exercise
+Rest: 60–90s between sets`,
+      instructions:
+        "Warm up thoroughly. Use progressive overload. Maintain strict form and full range of motion.",
+      exercises: [
+        {
+          name: "Barbell Deadlifts",
+          sets: "3",
+          reps: "8",
+          rest: "60-90s",
+          notes: "@ 3010 tempo",
+        },
+        {
+          name: "Dumbbell Bench Press",
+          sets: "3",
+          reps: "10",
+          rest: "60-90s",
+          notes: "@ 2011 tempo",
+        },
+        {
+          name: "Barbell Squats",
+          sets: "3",
+          reps: "8",
+          rest: "60-90s",
+          notes: "@ 3010 tempo",
+        },
+        {
+          name: "Dumbbell Shoulder Press",
+          sets: "3",
+          reps: "10",
+          rest: "60-90s",
+          notes: "@ 2011 tempo",
+        },
+        {
+          name: "Weighted Plank Hold",
+          sets: "3",
+          reps: "30s",
+          rest: "60-90s",
+          notes: "Maintain strict form",
+        },
+      ],
+      tips: [
+        "Never compromise form for heavier weights",
+        "Use a spotter for bench press if needed",
+        "Engage glutes and core during squats and deadlifts",
+      ],
+    },
+    "metabolic-002": {
+      name: "MetaboShock",
+      serialNumber: "004",
+      difficulty: "Intermediate",
+      duration: "15 minutes",
+      equipment: "Kettlebells, TRX, Mat",
+      imageUrl: "https://images.unsplash.com/photo-1517836357463-d25dfeac3438?w=800&h=600&fit=crop",
+      description:
+        "MetaboShock is a hybrid metabolic workout blending resistance and cardio to spike metabolism and improve energy systems. Fast-paced and functional.",
+      format: `EMOM (Every Minute on the Minute)
+Cycle: 5 minutes
+Repeat: 3 rounds`,
+      instructions:
+        "Start each minute with the prescribed reps. Rest until the next minute begins. Maintain intensity.",
+      exercises: [
+        {
+          name: "Kettlebell Swings",
+          sets: "3 cycles",
+          reps: "20",
+          rest: "remainder of minute",
+          notes: "Minute 1 of each cycle",
+        },
+        {
+          name: "TRX Rows",
+          sets: "3 cycles",
+          reps: "15",
+          rest: "remainder of minute",
+          notes: "Minute 2 of each cycle",
+        },
+        {
+          name: "Jump Squats",
+          sets: "3 cycles",
+          reps: "20",
+          rest: "remainder of minute",
+          notes: "Minute 3 of each cycle",
+        },
+        {
+          name: "TRX Push-Ups",
+          sets: "3 cycles",
+          reps: "15",
+          rest: "remainder of minute",
+          notes: "Minute 4 of each cycle",
+        },
+        {
+          name: "Rest",
+          sets: "3 cycles",
+          reps: "Full minute",
+          rest: "60s",
+          notes: "Minute 5 of each cycle - strategic recovery",
+        },
+      ],
+      tips: [
+        "Keep kettlebell swings hip-driven",
+        "Adjust TRX straps for proper tension",
+        "Don't skip the rest minute—it's strategic recovery",
+      ],
+    },
+    "power-001": {
+      name: "Power Surge",
+      serialNumber: "005",
+      difficulty: "Advanced",
+      duration: "30 minutes",
+      equipment: "Medicine Balls, Wall Balls, Bands",
+      imageUrl: "https://images.unsplash.com/photo-1517836357463-d25dfeac3438?w=800&h=600&fit=crop",
+      description:
+        "Power Surge develops explosive strength and fast-twitch muscle activation. Ideal for athletes or clients wanting to improve speed, agility, and reactive power.",
+      format: `Circuit for Time
+5 rounds
+Work: 30s / Rest: 30s`,
+      instructions:
+        "Focus on maximum effort during work intervals. Rest fully between exercises to maintain explosive output.",
+      exercises: [
+        {
+          name: "Medicine Ball Slams",
+          sets: "5 rounds",
+          reps: "30s",
+          rest: "30s",
+          notes: "@ max effort",
+        },
+        {
+          name: "Band-Resisted Sprints",
+          sets: "5 rounds",
+          reps: "3 x 20m",
+          rest: "30s",
+          notes: "Explosive acceleration",
+        },
+        {
+          name: "Wall Ball Throws",
+          sets: "5 rounds",
+          reps: "12",
+          rest: "30s",
+          notes: "Use stable wall",
+        },
+        {
+          name: "Broad Jumps",
+          sets: "5 rounds",
+          reps: "6",
+          rest: "30s",
+          notes: "Land softly",
+        },
+        {
+          name: "Plyo Push-Ups",
+          sets: "5 rounds",
+          reps: "10",
+          rest: "30s",
+          notes: "Explosive power",
+        },
+      ],
+      tips: [
+        "Warm up joints thoroughly",
+        "Land softly during jumps",
+        "Use a stable wall for throws",
+      ],
+    },
+    "mobility-002": {
+      name: "FlowForge",
+      serialNumber: "006",
+      difficulty: "Beginner",
+      duration: "60 minutes",
+      equipment: "Fit Ball, Bands, Mat",
+      imageUrl: "https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?w=800&h=600&fit=crop",
+      description:
+        "FlowForge is a low-impact mobility and stability workout that enhances joint health, posture, and movement control. Ideal for recovery days or as a supplement to intense training.",
+      format: `Controlled Flow + Static Holds
+2 rounds
+Hold Time: 30–60s per move`,
+      instructions:
+        "Move slowly and intentionally. Focus on breath and control. Use bands for gentle resistance.",
+      exercises: [
+        {
+          name: "Band Shoulder Dislocates",
+          sets: "2 rounds",
+          reps: "10",
+          rest: "0",
+          notes: "Controlled movement",
+        },
+        {
+          name: "Fit Ball Hip Bridges",
+          sets: "2 rounds",
+          reps: "12",
+          rest: "0",
+          notes: "Squeeze glutes at top",
+        },
+        {
+          name: "Bird-Dog",
+          sets: "2 rounds",
+          reps: "10/side",
+          rest: "0",
+          notes: "Focus on balance",
+        },
+        {
+          name: "Deep Squat Hold",
+          sets: "2 rounds",
+          reps: "45s",
+          rest: "0",
+          notes: "Breathe deeply",
+        },
+        {
+          name: "Side Plank with Reach",
+          sets: "2 rounds",
+          reps: "30s/side",
+          rest: "0",
+          notes: "Control through core",
+        },
+        {
+          name: "Cat-Cow Flow",
+          sets: "2 rounds",
+          reps: "60s",
+          rest: "0",
+          notes: "Spinal mobility",
+        },
+      ],
+      tips: [
+        "Avoid rushing through stretches",
+        "Keep spine neutral during core work",
+        "Listen to your body—this is about control, not intensity",
       ],
     },
   };
