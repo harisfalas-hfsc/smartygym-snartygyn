@@ -50,9 +50,12 @@ interface WorkoutDisplayProps {
     }>;
   };
   programWeeks?: WeekPlan[];
+  imageUrl?: string;
+  duration?: string;
+  equipment?: string;
 }
 
-export const WorkoutDisplay = ({ exercises, planContent, title = "Workout", serial = "001", difficulty = 3, workoutDetails, programWeeks }: WorkoutDisplayProps) => {
+export const WorkoutDisplay = ({ exercises, planContent, title = "Workout", serial = "001", difficulty = 3, workoutDetails, programWeeks, imageUrl, duration, equipment }: WorkoutDisplayProps) => {
   const [currentVideoId, setCurrentVideoId] = useState<string>(exercises[0]?.video_id || "");
   const [workTime, setWorkTime] = useState(20);
   const [restTime, setRestTime] = useState(10);
@@ -164,12 +167,31 @@ export const WorkoutDisplay = ({ exercises, planContent, title = "Workout", seri
         {/* Hero Banner Image */}
         <div className="relative w-full h-[300px] lg:h-[400px] rounded-2xl overflow-hidden shadow-2xl">
           <img
-            src={workoutHero}
-            alt="Workout inspiration"
+            src={imageUrl || workoutHero}
+            alt={title}
             className="w-full h-full object-cover brightness-110"
           />
           <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent" />
         </div>
+
+        {/* Quick Info Bar below image */}
+        {(duration || equipment) && (
+          <div className="bg-muted/30 rounded-lg p-4 flex flex-wrap gap-4 justify-center text-sm">
+            {duration && (
+              <span className="flex items-center gap-2">
+                <strong>Duration:</strong> {duration}
+              </span>
+            )}
+            <span className="flex items-center gap-2">
+              <strong>Difficulty:</strong> {difficulty === 1 ? 'Beginner' : difficulty === 2 ? 'Intermediate' : 'Advanced'}
+            </span>
+            {equipment && (
+              <span className="flex items-center gap-2">
+                <strong>Equipment:</strong> {equipment}
+              </span>
+            )}
+          </div>
+        )}
       </div>
 
       {/* Utility Cards - Three Equal Cards */}

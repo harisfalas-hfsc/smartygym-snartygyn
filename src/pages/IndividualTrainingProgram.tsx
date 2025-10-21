@@ -347,23 +347,43 @@ This program requires completion of the PAR-Q+ assessment before beginning. Alwa
   const programWeeks = getProgramWeeks(type || "", id || "");
   const programImage = programImages[id || ""] || "https://images.unsplash.com/photo-1538805060514-97d9cc17730c?w=800&h=600&fit=crop";
 
+  // Program data for duration and equipment info
+  const programDataLocal: { [key: string]: Array<{ id: string; duration: string; equipment: string }> } = {
+    "cardio": [
+      { id: "cardio-free", duration: "4", equipment: "bodyweight" },
+    ],
+    "functional-strength": [
+      { id: "functional-strength-free", duration: "4", equipment: "bodyweight" },
+    ],
+    "muscle-hypertrophy": [
+      { id: "muscle-hypertrophy-free", duration: "4", equipment: "bodyweight" },
+    ],
+    "weight-loss": [
+      { id: "weight-loss-free", duration: "4", equipment: "bodyweight" },
+    ],
+    "low-back-pain": [
+      { id: "low-back-pain-free", duration: "4", equipment: "bodyweight" },
+    ],
+    "mobility-stability": [
+      { id: "mobility-stability-free", duration: "4", equipment: "bodyweight" },
+    ],
+  };
+
+  // Get duration and equipment for program
+  const getProgramDuration = () => {
+    const programs = programDataLocal[type || "cardio"] || [];
+    const program = programs.find(p => p.id === id);
+    return program ? `${program.duration} weeks` : '4 weeks';
+  };
+
+  const getProgramEquipment = () => {
+    const programs = programDataLocal[type || "cardio"] || [];
+    const program = programs.find(p => p.id === id);
+    return program?.equipment === 'bodyweight' ? 'None (Bodyweight)' : 'Varies by Week';
+  };
+
   const content = (
     <>
-      {/* Hero Image */}
-      <div className="relative w-full h-64 md:h-80 rounded-xl overflow-hidden mb-6">
-        <img 
-          src={programImage} 
-          alt={programInfo.name}
-          className="w-full h-full object-cover"
-        />
-        <div className="absolute inset-0 bg-gradient-to-t from-background/90 via-background/50 to-transparent flex items-end">
-          <div className="p-6 w-full">
-            <h1 className="text-3xl md:text-4xl font-bold mb-2">{programInfo.name}</h1>
-            <p className="text-sm text-muted-foreground">Serial: {programInfo.serial}</p>
-          </div>
-        </div>
-      </div>
-
       <ProgramInteractions
         programId={`${type}-${id}`}
         programType={type || 'cardio'}
@@ -377,6 +397,9 @@ This program requires completion of the PAR-Q+ assessment before beginning. Alwa
         serial={programInfo.serial}
         difficulty={programInfo.difficulty}
         programWeeks={programWeeks}
+        imageUrl={programImage}
+        duration={getProgramDuration()}
+        equipment={getProgramEquipment()}
       />
     </>
   );

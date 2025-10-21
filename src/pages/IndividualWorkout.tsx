@@ -994,36 +994,41 @@ This program is suitable for individuals who have completed their PAR-Q+ assessm
 
   const workoutImage = workoutImages[id || ""] || "https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?w=800&h=600&fit=crop";
 
+  // Get equipment info based on type
+  const getEquipmentInfo = () => {
+    if (type?.includes('strength') || id === 'iron-core-003' || id === 'power-surge-005') {
+      return 'Dumbbells, Barbells, Equipment';
+    }
+    if (id === 'fat-furnace-002') {
+      return 'Dumbbells, Mat';
+    }
+    if (id === 'metaboshock-004') {
+      return 'Kettlebells, TRX, Mat';
+    }
+    if (id === 'pulse-igniter-001') {
+      return 'Jump Rope, Mat';
+    }
+    if (id === 'flowforge-006') {
+      return 'Fit Ball, Bands, Mat';
+    }
+    if (type?.includes('cardio') || type?.includes('mobility') || id?.includes('free')) {
+      return 'None (Bodyweight)';
+    }
+    return 'Varies';
+  };
+
+  // Get duration info
+  const getDurationInfo = () => {
+    if (id === 'iron-core-003' || id === 'flowforge-006') return '60 minutes';
+    if (id === 'fat-furnace-002') return '45 minutes';
+    if (id === 'pulse-igniter-001' || id === 'power-surge-005') return '30 minutes';
+    if (id?.includes('free')) return '20-25 minutes';
+    if (id === 'metaboshock-004') return '15 minutes';
+    return '30-45 minutes';
+  };
+
   const content = (
     <>
-      {/* Hero Image */}
-      <div className="relative w-full h-64 md:h-80 rounded-xl overflow-hidden mb-6">
-        <img 
-          src={workoutImage} 
-          alt={workoutInfo.name}
-          className="w-full h-full object-cover"
-        />
-        <div className="absolute inset-0 bg-gradient-to-t from-background/90 via-background/50 to-transparent flex items-end">
-          <div className="p-6 w-full">
-            <h1 className="text-3xl md:text-4xl font-bold mb-2">{workoutInfo.name}</h1>
-            <p className="text-sm text-muted-foreground">Serial: {workoutInfo.serial}</p>
-          </div>
-        </div>
-      </div>
-
-      {/* Quick Info Bar */}
-      <div className="bg-muted/30 rounded-lg p-4 mb-6 flex flex-wrap gap-4 justify-center text-sm">
-        <span className="flex items-center gap-2">
-          <strong>Duration:</strong> 30-45 minutes
-        </span>
-        <span className="flex items-center gap-2">
-          <strong>Difficulty:</strong> {workoutInfo.difficulty === 1 ? 'Beginner' : workoutInfo.difficulty === 2 ? 'Intermediate' : 'Advanced'}
-        </span>
-        <span className="flex items-center gap-2">
-          <strong>Equipment:</strong> {type?.includes('strength') ? 'Dumbbells/Bands' : type?.includes('cardio') ? 'None' : 'Varies'}
-        </span>
-      </div>
-
       <ShareButtons 
         title={workoutInfo.name} 
         url={window.location.href}
@@ -1042,6 +1047,9 @@ This program is suitable for individuals who have completed their PAR-Q+ assessm
         serial={workoutInfo.serial}
         difficulty={workoutInfo.difficulty}
         workoutDetails={workoutDetails}
+        imageUrl={workoutImage}
+        duration={getDurationInfo()}
+        equipment={getEquipmentInfo()}
       />
 
       {/* Upsell Banner for Free Workouts */}
