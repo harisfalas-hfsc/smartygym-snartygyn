@@ -3,7 +3,7 @@ import { Helmet } from "react-helmet";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft } from "lucide-react";
 import { WorkoutDisplay } from "@/components/WorkoutDisplay";
-import { PremiumContentGate } from "@/components/PremiumContentGate";
+import { AccessGate } from "@/components/AccessGate";
 import { ProgramInteractions } from "@/components/ProgramInteractions";
 
 const IndividualTrainingProgram = () => {
@@ -458,7 +458,13 @@ Intensity: 60-75% max heart rate`,
           Back
         </Button>
 
-        {isFreeProgram ? content : <PremiumContentGate>{content}</PremiumContentGate>}
+        <AccessGate 
+          requireAuth={!isFreeProgram} 
+          requirePremium={!isFreeProgram}
+          contentType="program"
+        >
+          {content}
+        </AccessGate>
       </div>
       </div>
     </>

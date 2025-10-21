@@ -38,6 +38,7 @@ import NotFound from "./pages/NotFound";
 import JoinPremium from "./pages/JoinPremium";
 import PremiumBenefits from "./pages/PremiumBenefits";
 import TakeTour from "./pages/TakeTour";
+import { AccessGate } from "./components/AccessGate";
 
 const queryClient = new QueryClient();
 
@@ -61,7 +62,7 @@ const App = () => (
                 {/* Public free content page */}
                 <Route path="/freecontent" element={<FreeContent />} />
                 
-                {/* Public workout and plan flows - anyone can explore */}
+                {/* Public workout and plan flows - anyone can browse */}
                 <Route path="/workout" element={<WorkoutFlow />} />
                 <Route path="/workout/:type" element={<WorkoutDetail />} />
                 <Route path="/workout/:type/:id" element={<IndividualWorkout />} />
@@ -69,10 +70,18 @@ const App = () => (
                 <Route path="/trainingprogram/:type" element={<TrainingProgramDetail />} />
                 <Route path="/trainingprogram/:type/:id" element={<IndividualTrainingProgram />} />
                 <Route path="/dietplan" element={<DietPlanFlow />} />
-                <Route path="/exerciselibrary" element={<ExerciseLibrary />} />
                 
-                {/* Public community page */}
-                <Route path="/community" element={<Community />} />
+                {/* Exercise library and community - require authentication */}
+                <Route path="/exerciselibrary" element={
+                  <AccessGate requireAuth={true} contentType="feature">
+                    <ExerciseLibrary />
+                  </AccessGate>
+                } />
+                <Route path="/community" element={
+                  <AccessGate requireAuth={true} contentType="feature">
+                    <Community />
+                  </AccessGate>
+                } />
                 <Route path="/article/:id" element={<ArticleDetail />} />
                 
                 {/* Authenticated routes with motivational banner */}

@@ -1,8 +1,10 @@
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
-import { Heart, Star, CheckCircle2 } from "lucide-react";
+import { Heart, Star, CheckCircle2, Crown } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { useAccessControl } from "@/hooks/useAccessControl";
+import { useNavigate } from "react-router-dom";
 
 interface ProgramInteractionsProps {
   programId: string;
@@ -16,6 +18,8 @@ export const ProgramInteractions = ({ programId, programType, programName }: Pro
   const [rating, setRating] = useState<number>(0);
   const [isLoading, setIsLoading] = useState(true);
   const { toast } = useToast();
+  const { userTier } = useAccessControl();
+  const navigate = useNavigate();
 
   useEffect(() => {
     loadInteractions();
@@ -73,7 +77,25 @@ export const ProgramInteractions = ({ programId, programType, programName }: Pro
     }
   };
 
+  const showUpgradePrompt = () => {
+    toast({
+      title: "Premium Feature",
+      description: "Upgrade to Premium to favorite, rate, and track programs!",
+      action: (
+        <Button size="sm" onClick={() => navigate("/")}>
+          <Crown className="w-4 h-4 mr-2" />
+          Upgrade
+        </Button>
+      ),
+    });
+  };
+
   const toggleFavorite = async () => {
+    if (userTier !== "premium") {
+      showUpgradePrompt();
+      return;
+    }
+
     try {
       const { data: { session } } = await supabase.auth.getSession();
       if (!session) return;
@@ -108,6 +130,11 @@ export const ProgramInteractions = ({ programId, programType, programName }: Pro
   };
 
   const toggleCompleted = async () => {
+    if (userTier !== "premium") {
+      showUpgradePrompt();
+      return;
+    }
+
     try {
       const { data: { session } } = await supabase.auth.getSession();
       if (!session) return;
@@ -142,6 +169,11 @@ export const ProgramInteractions = ({ programId, programType, programName }: Pro
   };
 
   const handleRating = async (newRating: number) => {
+    if (userTier !== "premium") {
+      showUpgradePrompt();
+      return;
+    }
+
     try {
       const { data: { session } } = await supabase.auth.getSession();
       if (!session) return;
@@ -175,6 +207,22 @@ export const ProgramInteractions = ({ programId, programType, programName }: Pro
 
   if (isLoading) {
     return null;
+  }
+
+  // Don't show interactions for guests or subscribers
+  if (userTier === "guest" || userTier === "subscriber") {
+    return (
+      <div className="p-4 bg-muted/50 rounded-lg border-2 border-dashed border-primary/30 text-center">
+        <Crown className="w-8 h-8 text-primary mx-auto mb-2" />
+        <p className="text-sm font-semibold mb-1">Premium Feature</p>
+        <p className="text-xs text-muted-foreground mb-3">
+          Upgrade to track, favorite, and rate programs
+        </p>
+        <Button size="sm" onClick={() => navigate("/")}>
+          View Plans
+        </Button>
+      </div>
+    );
   }
 
   return (

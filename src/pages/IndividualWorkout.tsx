@@ -3,7 +3,7 @@ import { Helmet } from "react-helmet";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft } from "lucide-react";
 import { WorkoutDisplay } from "@/components/WorkoutDisplay";
-import { PremiumContentGate } from "@/components/PremiumContentGate";
+import { AccessGate } from "@/components/AccessGate";
 import { WorkoutInteractions } from "@/components/WorkoutInteractions";
 import { ShareButtons } from "@/components/ShareButtons";
 
@@ -1234,7 +1234,13 @@ Stretch & Recovery: 10 mins`,
           Back
         </Button>
 
-        {isFreeWorkout ? content : <PremiumContentGate>{content}</PremiumContentGate>}
+        <AccessGate 
+          requireAuth={!isFreeWorkout} 
+          requirePremium={!isFreeWorkout}
+          contentType="workout"
+        >
+          {content}
+        </AccessGate>
       </div>
       </div>
     </>
