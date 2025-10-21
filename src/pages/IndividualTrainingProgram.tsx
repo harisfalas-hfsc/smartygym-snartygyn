@@ -349,6 +349,36 @@ This program requires completion of the PAR-Q+ assessment before beginning. Alwa
   const programWeeks = getProgramWeeks(type || "", id || "");
   const programImage = programImages[id || ""] || "https://images.unsplash.com/photo-1538805060514-97d9cc17730c?w=800&h=600&fit=crop";
 
+  // Get program content sections
+  const getProgramContent = (programId: string) => {
+    if (programId === "cardio-free") {
+      return {
+        description: "A structured 4-week cardio program designed to build your aerobic base and improve cardiovascular endurance progressively.",
+        format: `Progressive Weekly Structure
+Week 1-2: Foundation phase - Building base fitness
+Week 3-4: Development phase - Increasing intensity
+
+Training Days: 3-4 days per week
+Session Duration: 20-30 minutes
+Intensity: 60-75% max heart rate`,
+        instructions: "Follow the prescribed training days with adequate rest between sessions. Progress gradually from easy to moderate intensity.",
+        tips: `• Start at a comfortable pace you can maintain.
+• Focus on consistency over intensity in Week 1-2.
+• Increase pace gradually in Week 3-4.
+• Stay hydrated throughout sessions.`
+      };
+    }
+    
+    return {
+      description: "",
+      format: "",
+      instructions: "",
+      tips: ""
+    };
+  };
+
+  const programContent = getProgramContent(id || "");
+
   // Program data for duration and equipment info
   const programDataLocal: { [key: string]: Array<{ id: string; duration: string; equipment: string }> } = {
     "cardio": [
@@ -394,7 +424,7 @@ This program requires completion of the PAR-Q+ assessment before beginning. Alwa
       
       <WorkoutDisplay
         exercises={exercises}
-        planContent={planContent}
+        planContent=""
         title={programInfo.name}
         serial={programInfo.serial}
         difficulty={programInfo.difficulty}
@@ -402,6 +432,10 @@ This program requires completion of the PAR-Q+ assessment before beginning. Alwa
         imageUrl={programImage}
         duration={getProgramDuration()}
         equipment={getProgramEquipment()}
+        description={programContent.description}
+        format={programContent.format}
+        instructions={programContent.instructions}
+        tips={programContent.tips}
       />
     </>
   );

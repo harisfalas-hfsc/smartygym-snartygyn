@@ -91,6 +91,58 @@ const IndividualWorkout = () => {
 
   // Get workout content sections
   const getWorkoutContent = (workoutId: string) => {
+    // PULSE IGNITER - 001
+    if (workoutId === "pulse-igniter-001") {
+      return {
+        description: "A high-energy cardio blast designed to elevate heart rate, improve endurance, and boost cardiovascular health. Perfect for clients seeking a sweat-heavy session that's short, sharp, and effective.",
+        format: `Tabata Circuit
+Structure: 6 Tabata blocks (4 mins each)
+Work:Rest Ratio: 20s work / 10s rest x 8 rounds per block
+
+Blocks:
+1. Jump Rope
+2. High Knees
+3. Mountain Climbers
+4. Burpees
+5. Jumping Jacks
+6. Skater Hops`,
+        instructions: "Complete each Tabata block before moving to the next. Rest 1 minute between blocks.",
+        tips: `• Use a timer app for precision.
+• Keep your core engaged during high-impact moves.
+• Avoid locking knees during jumps.
+• Hydrate and pace yourself.`
+      };
+    }
+
+    // FAT FURNACE - 002
+    if (workoutId === "fat-furnace-002") {
+      return {
+        description: "A metabolic conditioning circuit that torches calories and keeps the burn going post-workout. Combines compound strength moves with dynamic cardio bursts.",
+        format: `AMRAP + Challenge Finisher
+
+Main Block (30 mins):
+Complete as many rounds as possible:
+• Dumbbell Thrusters – 12 reps
+• Jump Squats – 15 reps
+• Dumbbell Renegade Rows – 10 reps/side
+• Jump Lunges – 12 reps/leg
+• Plank to Push-Up – 10 reps
+
+Finisher (10 mins):
+Challenge:
+• 100 Jumping Jacks
+• 50 Mountain Climbers
+• 25 Burpees
+
+Warm-Up & Cool-Down: 5 mins total`,
+        instructions: "Use moderate dumbbells. Push for consistent pace. Track rounds completed.",
+        tips: `• Choose weights that challenge but don't compromise form.
+• Avoid arching your back during rows.
+• Focus on breathing and posture.`
+      };
+    }
+
+    // IRON CORE - 003
     if (workoutId === "iron-core-003") {
       return {
         description: "A strength-focused workout targeting major muscle groups. Builds raw power, muscular endurance, and structural integrity. Ideal for intermediate to advanced clients.",
@@ -105,6 +157,77 @@ Cool-Down & Stretch: 10 mins`,
         tips: `• Never compromise form for heavier weights.
 • Use a spotter for bench press if needed.
 • Engage glutes and core during squats and deadlifts.`
+      };
+    }
+
+    // METABOSHOCK - 004
+    if (workoutId === "metaboshock-004") {
+      return {
+        description: "A hybrid metabolic workout blending resistance and cardio to spike metabolism and improve energy systems. Fast-paced and functional.",
+        format: `EMOM (Every Minute on the Minute)
+Structure: 15 mins
+
+Cycle:
+• Minute 1: Kettlebell Swings – 20 reps
+• Minute 2: TRX Rows – 15 reps
+• Minute 3: Jump Squats – 20 reps
+• Minute 4: TRX Push-Ups – 15 reps
+• Minute 5: Rest
+
+Repeat 3 cycles`,
+        instructions: "Start each minute with the prescribed reps. Rest until the next minute begins.",
+        tips: `• Keep kettlebell swings hip-driven.
+• Adjust TRX straps for proper tension.
+• Don't skip the rest minute—it's strategic recovery.`
+      };
+    }
+
+    // POWER SURGE - 005
+    if (workoutId === "power-surge-005") {
+      return {
+        description: "Designed to develop explosive strength and fast-twitch muscle activation. Ideal for athletes or clients wanting to improve speed, agility, and reactive power.",
+        format: `Circuit for Time
+Structure: 5 Rounds
+Work:Rest Ratio: 30s work / 30s rest
+
+Exercises:
+• Medicine Ball Slams – 15 reps
+• Band-Resisted Sprints – 20m x 3
+• Wall Ball Throws – 12 reps
+• Broad Jumps – 6 reps
+• Plyo Push-Ups – 10 reps
+
+Warm-Up & Cool-Down: 5 mins each`,
+        instructions: "Focus on maximum effort during work intervals. Rest fully between exercises.",
+        tips: `• Warm up joints thoroughly.
+• Land softly during jumps.
+• Use a stable wall for throws.`
+      };
+    }
+
+    // FLOWFORGE - 006
+    if (workoutId === "flowforge-006") {
+      return {
+        description: "A low-impact mobility and stability workout that enhances joint health, posture, and movement control. Ideal for recovery days or as a supplement to intense training.",
+        format: `Controlled Flow + Static Holds
+Structure: 2 Rounds
+Hold Time: 30–60s per move
+
+Exercises:
+• Band Shoulder Dislocates – 10 reps
+• Fit Ball Hip Bridges – 12 reps
+• Bird-Dog – 10 reps/side
+• Deep Squat Hold – 45s
+• Side Plank with Reach – 30s/side
+• Cat-Cow Flow – 60s
+
+Warm-Up & Breathwork: 10 mins
+Main Flow: 40 mins
+Stretch & Recovery: 10 mins`,
+        instructions: "Move slowly and intentionally. Focus on breath and control. Use bands for gentle resistance.",
+        tips: `• Avoid rushing through stretches.
+• Keep spine neutral during core work.
+• Listen to your body—this is about control, not intensity.`
       };
     }
     
