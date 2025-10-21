@@ -12,6 +12,22 @@ const IndividualWorkout = () => {
   const { type, id } = useParams();
   const isFreeWorkout = id?.includes("-free");
 
+  // Workout images mapping - matches WorkoutDetail.tsx
+  const workoutImages: { [key: string]: string } = {
+    "strength-free": "https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?w=800&h=600&fit=crop",
+    "iron-core-003": "https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=800&h=600&fit=crop",
+    "power-surge-005": "https://images.unsplash.com/photo-1517836357463-d25dfeac3438?w=800&h=600&fit=crop",
+    "calorie-burning-free": "https://images.unsplash.com/photo-1476480862126-209bfaa8edc8?w=800&h=600&fit=crop",
+    "fat-furnace-002": "https://images.unsplash.com/photo-1549060279-7e168fcee0c2?w=800&h=600&fit=crop",
+    "metabolic-free": "https://images.unsplash.com/photo-1483721310020-03333e577078?w=800&h=600&fit=crop",
+    "metaboshock-004": "https://images.unsplash.com/photo-1517836357463-d25dfeac3438?w=800&h=600&fit=crop",
+    "cardio-free": "https://images.unsplash.com/photo-1538805060514-97d9cc17730c?w=800&h=600&fit=crop",
+    "pulse-igniter-001": "https://images.unsplash.com/photo-1515524738708-327f6b0037a7?w=800&h=600&fit=crop",
+    "mobility-free": "https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?w=800&h=600&fit=crop",
+    "flowforge-006": "https://images.unsplash.com/photo-1599901860904-17e6ed7083a0?w=800&h=600&fit=crop",
+    "challenge-free": "https://images.unsplash.com/photo-1517836357463-d25dfeac3438?w=800&h=600&fit=crop",
+  };
+
   // Sample workout names based on type and id
   const workoutNames: { [key: string]: { [key: string]: { name: string; difficulty: number; serial: string } } } = {
     cardio: {
@@ -976,8 +992,25 @@ This program is suitable for individuals who have completed their PAR-Q+ assessm
 
   const workoutDetails = getWorkoutDetails(type || "", id || "");
 
+  const workoutImage = workoutImages[id || ""] || "https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?w=800&h=600&fit=crop";
+
   const content = (
     <>
+      {/* Hero Image */}
+      <div className="relative w-full h-64 md:h-80 rounded-xl overflow-hidden mb-6">
+        <img 
+          src={workoutImage} 
+          alt={workoutInfo.name}
+          className="w-full h-full object-cover"
+        />
+        <div className="absolute inset-0 bg-gradient-to-t from-background/90 via-background/50 to-transparent flex items-end">
+          <div className="p-6 w-full">
+            <h1 className="text-3xl md:text-4xl font-bold mb-2">{workoutInfo.name}</h1>
+            <p className="text-sm text-muted-foreground">Serial: {workoutInfo.serial}</p>
+          </div>
+        </div>
+      </div>
+
       {/* Quick Info Bar */}
       <div className="bg-muted/30 rounded-lg p-4 mb-6 flex flex-wrap gap-4 justify-center text-sm">
         <span className="flex items-center gap-2">

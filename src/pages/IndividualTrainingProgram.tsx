@@ -9,7 +9,17 @@ import { ProgramInteractions } from "@/components/ProgramInteractions";
 const IndividualTrainingProgram = () => {
   const navigate = useNavigate();
   const { type, id } = useParams();
-  const isFreeProgram = id?.includes("-free") || id === "cardio-free" || id === "functional-strength-free" || id === "muscle-hypertrophy-free" || id === "weight-loss-free" || id === "low-back-pain-free" || id === "mobility-stability-free";
+  const isFreeProgram = id?.includes("-free");
+
+  // Program images mapping - matches TrainingProgramDetail.tsx
+  const programImages: { [key: string]: string } = {
+    "cardio-free": "https://images.unsplash.com/photo-1538805060514-97d9cc17730c?w=800&h=600&fit=crop",
+    "functional-strength-free": "https://images.unsplash.com/photo-1598971861713-54ad16a5c72e?w=800&h=600&fit=crop",
+    "muscle-hypertrophy-free": "https://images.unsplash.com/photo-1581009146145-b5ef050c2e1e?w=800&h=600&fit=crop",
+    "weight-loss-free": "https://images.unsplash.com/photo-1571902943202-507ec2618e8f?w=800&h=600&fit=crop",
+    "low-back-pain-free": "https://images.unsplash.com/photo-1599901860904-17e6ed7083a0?w=800&h=600&fit=crop",
+    "mobility-stability-free": "https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?w=800&h=600&fit=crop",
+  };
 
   // Sample program names based on type and id
   const programNames: { [key: string]: { [key: string]: { name: string; difficulty: number; serial: string } } } = {
@@ -335,9 +345,25 @@ This program requires completion of the PAR-Q+ assessment before beginning. Alwa
   };
 
   const programWeeks = getProgramWeeks(type || "", id || "");
+  const programImage = programImages[id || ""] || "https://images.unsplash.com/photo-1538805060514-97d9cc17730c?w=800&h=600&fit=crop";
 
   const content = (
     <>
+      {/* Hero Image */}
+      <div className="relative w-full h-64 md:h-80 rounded-xl overflow-hidden mb-6">
+        <img 
+          src={programImage} 
+          alt={programInfo.name}
+          className="w-full h-full object-cover"
+        />
+        <div className="absolute inset-0 bg-gradient-to-t from-background/90 via-background/50 to-transparent flex items-end">
+          <div className="p-6 w-full">
+            <h1 className="text-3xl md:text-4xl font-bold mb-2">{programInfo.name}</h1>
+            <p className="text-sm text-muted-foreground">Serial: {programInfo.serial}</p>
+          </div>
+        </div>
+      </div>
+
       <ProgramInteractions
         programId={`${type}-${id}`}
         programType={type || 'cardio'}
