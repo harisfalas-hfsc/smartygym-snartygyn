@@ -18,6 +18,16 @@ import gravityGrindImg from "@/assets/gravity-grind-workout.jpg";
 import ironCircuitImg from "@/assets/iron-circuit-workout.jpg";
 import bodyweightBeastImg from "@/assets/bodyweight-beast-workout.jpg";
 import ironEngineImg from "@/assets/iron-engine-workout.jpg";
+import metabolicBurnImg from "@/assets/metabolic-burn-workout.jpg";
+import fatFurnaceImg from "@/assets/fat-furnace-workout.jpg";
+import metabolicIgnitionImg from "@/assets/metabolic-ignition-workout.jpg";
+import metaboShockImg from "@/assets/metaboshock-workout.jpg";
+import cardioBlastImg from "@/assets/cardio-blast-workout.jpg";
+import pulseIgniterImg from "@/assets/pulse-igniter-workout.jpg";
+import flowMobilityImg from "@/assets/flow-mobility-workout.jpg";
+import flowForgeImg from "@/assets/flowforge-workout.jpg";
+import powerSurgeImg from "@/assets/power-surge-workout.jpg";
+import ultimateChallengeImg from "@/assets/ultimate-challenge-workout.jpg";
 
 type EquipmentFilter = "all" | "bodyweight" | "equipment";
 type LevelFilter = "all" | "beginner" | "intermediate" | "advanced";
@@ -61,8 +71,8 @@ const WorkoutDetail = () => {
       { id: "strength-008", name: "Iron Engine", description: "Heavy strength workout for serious lifters", duration: "60 min", equipment: "equipment", level: "advanced", imageUrl: ironEngineImg, isFree: true },
     ],
     "calorie-burning": [
-      { id: "calorie-001", name: "Metabolic Burn", description: "High-intensity fat-burning session", duration: "30 min", equipment: "bodyweight", level: "beginner", imageUrl: "https://images.unsplash.com/photo-1549060279-7e168fcee0c2?w=800&h=600&fit=crop", isFree: true },
-      { id: "calorie-002", name: "Fat Furnace", description: "Metabolic conditioning that torches calories", duration: "45 min", equipment: "equipment", level: "advanced", imageUrl: "https://images.unsplash.com/photo-1549060279-7e168fcee0c2?w=800&h=600&fit=crop", isFree: true },
+      { id: "calorie-001", name: "Metabolic Burn", description: "High-intensity fat-burning session", duration: "30 min", equipment: "bodyweight", level: "beginner", imageUrl: metabolicBurnImg, isFree: true },
+      { id: "calorie-002", name: "Fat Furnace", description: "Metabolic conditioning that torches calories", duration: "45 min", equipment: "equipment", level: "advanced", imageUrl: fatFurnaceImg, isFree: true },
       { id: "calorie-007", name: "Burn Start", description: "Low-impact cardio circuit to kickstart fat loss", duration: "30 min", equipment: "bodyweight", level: "beginner", imageUrl: burnStartImg, isFree: true },
       { id: "calorie-008", name: "Sweat Circuit", description: "Light equipment circuit boosting metabolism", duration: "30 min", equipment: "equipment", level: "beginner", imageUrl: sweatCircuitImg, isFree: true },
       { id: "calorie-009", name: "Body Burnout", description: "Fast-paced bodyweight AMRAP for max calorie burn", duration: "45 min", equipment: "bodyweight", level: "intermediate", imageUrl: bodyBurnoutImg, isFree: true },
@@ -71,22 +81,22 @@ const WorkoutDetail = () => {
       { id: "calorie-012", name: "Calorie Crusher", description: "Full-body calorie incinerator with kettlebells", duration: "60 min", equipment: "equipment", level: "advanced", imageUrl: calorieCrusherImg, isFree: true },
     ],
     "metabolic": [
-      { id: "metabolic-001", name: "Metabolic Ignition", description: "Boost your metabolism with this explosive workout", duration: "35 min", equipment: "equipment", level: "intermediate", imageUrl: "https://images.unsplash.com/photo-1517836357463-d25dfeac3438?w=800&h=600&fit=crop", isFree: true },
-      { id: "metabolic-002", name: "MetaboShock", description: "Hybrid metabolic blending resistance and cardio", duration: "15 min", equipment: "equipment", level: "intermediate", imageUrl: "https://images.unsplash.com/photo-1517836357463-d25dfeac3438?w=800&h=600&fit=crop", isFree: true },
+      { id: "metabolic-001", name: "Metabolic Ignition", description: "Boost your metabolism with this explosive workout", duration: "35 min", equipment: "equipment", level: "intermediate", imageUrl: metabolicIgnitionImg, isFree: true },
+      { id: "metabolic-002", name: "MetaboShock", description: "Hybrid metabolic blending resistance and cardio", duration: "15 min", equipment: "equipment", level: "intermediate", imageUrl: metaboShockImg, isFree: true },
     ],
     "cardio": [
-      { id: "cardio-001", name: "Cardio Blast", description: "Elevate your heart rate and build endurance", duration: "40 min", equipment: "bodyweight", level: "beginner", imageUrl: "https://images.unsplash.com/photo-1538805060514-97d9cc17730c?w=800&h=600&fit=crop", isFree: true },
-      { id: "cardio-002", name: "Pulse Igniter", description: "High-energy cardio to elevate heart rate", duration: "30 min", equipment: "bodyweight", level: "intermediate", imageUrl: "https://images.unsplash.com/photo-1538805060514-97d9cc17730c?w=800&h=600&fit=crop", isFree: true },
+      { id: "cardio-001", name: "Cardio Blast", description: "Elevate your heart rate and build endurance", duration: "40 min", equipment: "bodyweight", level: "beginner", imageUrl: cardioBlastImg, isFree: true },
+      { id: "cardio-002", name: "Pulse Igniter", description: "High-energy cardio to elevate heart rate", duration: "30 min", equipment: "bodyweight", level: "intermediate", imageUrl: pulseIgniterImg, isFree: true },
     ],
     "mobility": [
-      { id: "mobility-001", name: "Flow & Mobility", description: "Enhance flexibility and joint health", duration: "30 min", equipment: "bodyweight", level: "beginner", imageUrl: "https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?w=800&h=600&fit=crop", isFree: true },
-      { id: "mobility-002", name: "FlowForge", description: "Low-impact mobility and stability workout", duration: "60 min", equipment: "equipment", level: "beginner", imageUrl: "https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?w=800&h=600&fit=crop", isFree: true },
+      { id: "mobility-001", name: "Flow & Mobility", description: "Enhance flexibility and joint health", duration: "30 min", equipment: "bodyweight", level: "beginner", imageUrl: flowMobilityImg, isFree: true },
+      { id: "mobility-002", name: "FlowForge", description: "Low-impact mobility and stability workout", duration: "60 min", equipment: "equipment", level: "beginner", imageUrl: flowForgeImg, isFree: true },
     ],
     "challenge": [
-      { id: "challenge-001", name: "Ultimate Challenge", description: "Push your limits with this intense workout", duration: "50 min", equipment: "equipment", level: "advanced", imageUrl: "https://images.unsplash.com/photo-1517836357463-d25dfeac3438?w=800&h=600&fit=crop", isFree: true },
+      { id: "challenge-001", name: "Ultimate Challenge", description: "Push your limits with this intense workout", duration: "50 min", equipment: "equipment", level: "advanced", imageUrl: ultimateChallengeImg, isFree: true },
     ],
     "power": [
-      { id: "power-001", name: "Power Surge", description: "Develops explosive strength and fast-twitch activation", duration: "30 min", equipment: "equipment", level: "advanced", imageUrl: "https://images.unsplash.com/photo-1517836357463-d25dfeac3438?w=800&h=600&fit=crop", isFree: true },
+      { id: "power-001", name: "Power Surge", description: "Develops explosive strength and fast-twitch activation", duration: "30 min", equipment: "equipment", level: "advanced", imageUrl: powerSurgeImg, isFree: true },
     ],
   };
 

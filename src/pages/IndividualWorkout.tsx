@@ -19,6 +19,16 @@ import gravityGrindImg from "@/assets/gravity-grind-workout.jpg";
 import ironCircuitImg from "@/assets/iron-circuit-workout.jpg";
 import bodyweightBeastImg from "@/assets/bodyweight-beast-workout.jpg";
 import ironEngineImg from "@/assets/iron-engine-workout.jpg";
+import metabolicBurnImg from "@/assets/metabolic-burn-workout.jpg";
+import fatFurnaceImg from "@/assets/fat-furnace-workout.jpg";
+import metabolicIgnitionImg from "@/assets/metabolic-ignition-workout.jpg";
+import metaboShockImg from "@/assets/metaboshock-workout.jpg";
+import cardioBlastImg from "@/assets/cardio-blast-workout.jpg";
+import pulseIgniterImg from "@/assets/pulse-igniter-workout.jpg";
+import flowMobilityImg from "@/assets/flow-mobility-workout.jpg";
+import flowForgeImg from "@/assets/flowforge-workout.jpg";
+import powerSurgeImg from "@/assets/power-surge-workout.jpg";
+import ultimateChallengeImg from "@/assets/ultimate-challenge-workout.jpg";
 
 const IndividualWorkout = () => {
   const navigate = useNavigate();
@@ -135,7 +145,7 @@ Cool-Down: 5 minutes static stretching`,
       difficulty: "Beginner",
       duration: "30 min",
       equipment: "No Equipment Required",
-      imageUrl: "https://images.unsplash.com/photo-1549060279-7e168fcee0c2?w=800&h=600&fit=crop",
+      imageUrl: metabolicBurnImg,
       description:
         "High-intensity bodyweight workout designed to maximize calorie burn. This workout combines cardio bursts with bodyweight exercises to keep your heart rate elevated throughout.",
       format: `Circuit Training
@@ -207,7 +217,7 @@ Cool-Down: 1 minute stretching`,
       difficulty: "Intermediate",
       duration: "35 min",
       equipment: "Equipment Required",
-      imageUrl: "https://images.unsplash.com/photo-1517836357463-d25dfeac3438?w=800&h=600&fit=crop",
+      imageUrl: metabolicIgnitionImg,
       description:
         "An explosive metabolic workout that combines strength and cardio elements. Using kettlebells and dumbbells, this workout spikes your metabolism and burns calories long after you finish.",
       format: `EMOM (Every Minute on the Minute)
@@ -271,7 +281,7 @@ Cool-Down: 5 minutes recovery`,
       difficulty: "Beginner",
       duration: "40 min",
       equipment: "No Equipment Required",
-      imageUrl: "https://images.unsplash.com/photo-1538805060514-97d9cc17730c?w=800&h=600&fit=crop",
+      imageUrl: cardioBlastImg,
       description:
         "Build cardiovascular endurance with this progressive cardio workout. Combining steady-state work with interval training to improve your aerobic capacity and stamina.",
       format: `Mixed Cardio Protocol
@@ -329,7 +339,7 @@ Cool-Down: 5 minutes easy pace`,
       difficulty: "Beginner",
       duration: "30 min",
       equipment: "No Equipment Required",
-      imageUrl: "https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?w=800&h=600&fit=crop",
+      imageUrl: flowMobilityImg,
       description:
         "Improve flexibility, joint health, and movement quality. This mobility-focused session enhances range of motion and helps prevent injury through controlled movements and stretches.",
       format: `Mobility Flow Sequence
@@ -401,7 +411,7 @@ Relaxation: 5 minutes final stretches`,
       difficulty: "Advanced",
       duration: "50 min",
       equipment: "Equipment Required",
-      imageUrl: "https://images.unsplash.com/photo-1517836357463-d25dfeac3438?w=800&h=600&fit=crop",
+      imageUrl: ultimateChallengeImg,
       description:
         "The ultimate test of strength, endurance, and mental toughness. This advanced workout combines heavy lifting, high-intensity cardio, and bodyweight challenges to push you to your limits.",
       format: `Multi-Modal Challenge
@@ -452,7 +462,7 @@ Phase 3: Finisher (10 min)`,
       difficulty: "Intermediate",
       duration: "30 minutes",
       equipment: "Jump Rope, Mat",
-      imageUrl: "https://images.unsplash.com/photo-1538805060514-97d9cc17730c?w=800&h=600&fit=crop",
+      imageUrl: pulseIgniterImg,
       description:
         "Pulse Igniter is a high-energy cardio workout designed to elevate heart rate, improve endurance, and boost cardiovascular health. It's ideal for clients looking for a sweat-heavy session that's short, sharp, and effective.",
       format: `Tabata Circuit – 6 blocks of 4 minutes each
@@ -515,7 +525,7 @@ Work: 20s / Rest: 10s x 8 rounds per block`,
       difficulty: "Advanced",
       duration: "45 minutes",
       equipment: "Dumbbells, Mat",
-      imageUrl: "https://images.unsplash.com/photo-1549060279-7e168fcee0c2?w=800&h=600&fit=crop",
+      imageUrl: fatFurnaceImg,
       description:
         "Fat Furnace is a metabolic conditioning workout that torches calories and keeps the burn going post-session. It blends compound strength moves with dynamic cardio bursts for maximum fat loss.",
       format: `AMRAP + Challenge Finisher
@@ -1445,7 +1455,7 @@ Tempo: Controlled (3010)`,
       difficulty: "Intermediate",
       duration: "15 minutes",
       equipment: "Kettlebells, TRX, Mat",
-      imageUrl: "https://images.unsplash.com/photo-1517836357463-d25dfeac3438?w=800&h=600&fit=crop",
+      imageUrl: metaboShockImg,
       description:
         "MetaboShock is a hybrid metabolic workout blending resistance and cardio to spike metabolism and improve energy systems. Fast-paced and functional.",
       format: `EMOM (Every Minute on the Minute)
@@ -1502,7 +1512,7 @@ Repeat: 3 rounds`,
       difficulty: "Advanced",
       duration: "30 minutes",
       equipment: "Medicine Balls, Wall Balls, Bands",
-      imageUrl: "https://images.unsplash.com/photo-1517836357463-d25dfeac3438?w=800&h=600&fit=crop",
+      imageUrl: powerSurgeImg,
       description:
         "Power Surge develops explosive strength and fast-twitch muscle activation. Ideal for athletes or clients wanting to improve speed, agility, and reactive power.",
       format: `Circuit for Time
@@ -1559,7 +1569,7 @@ Work: 30s / Rest: 30s`,
       difficulty: "Beginner",
       duration: "60 minutes",
       equipment: "Fit Ball, Bands, Mat",
-      imageUrl: "https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?w=800&h=600&fit=crop",
+      imageUrl: flowForgeImg,
       description:
         "FlowForge is a low-impact mobility and stability workout that enhances joint health, posture, and movement control. Ideal for recovery days or as a supplement to intense training.",
       format: `Controlled Flow + Static Holds
