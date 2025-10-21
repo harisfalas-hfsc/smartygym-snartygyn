@@ -215,43 +215,14 @@ export const WorkoutDisplay = ({
         </div>
       </div>
 
-      {/* Utility Cards - Three Equal Cards */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Workout Videos */}
-        {exercises.length > 0 && (
-          <Card className="border-2 border-primary/30 h-fit">
-            <CardHeader className="pb-3 bg-primary/5">
-              <CardTitle className="text-center text-primary">Workout Videos</CardTitle>
-            </CardHeader>
-            <CardContent className="pt-4">
-              <div className="aspect-video bg-muted rounded-lg overflow-hidden">
-                {currentVideoId ? (
-                  <iframe
-                    width="100%"
-                    height="100%"
-                    src={`https://www.youtube.com/embed/${currentVideoId}`}
-                    title="Exercise demonstration"
-                    frameBorder="0"
-                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                    allowFullScreen
-                    className="w-full h-full"
-                  />
-                ) : (
-                  <div className="w-full h-full flex items-center justify-center text-muted-foreground">
-                    <Play className="w-12 h-12 opacity-50" />
-                  </div>
-                )}
-              </div>
-            </CardContent>
-          </Card>
-        )}
-
+      {/* Utility Cards - Two Equal Cards */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Workout Timer */}
-        <Card className="border-2 border-primary/30 h-fit">
+        <Card className="border-2 border-primary/30">
           <CardHeader className="pb-3 bg-primary/5">
             <CardTitle className="text-center text-primary">Workout Timer</CardTitle>
           </CardHeader>
-          <CardContent className="pt-4 space-y-4">
+          <CardContent className="pt-4 space-y-3">
             <div className="grid grid-cols-2 gap-3">
               <div>
                 <Label className="text-xs font-semibold">Work</Label>
@@ -292,39 +263,12 @@ export const WorkoutDisplay = ({
               />
             </div>
 
-            <div className="flex items-center justify-center gap-2">
-              <Label className="text-xs font-semibold">Volume:</Label>
-              <Button 
-                size="sm" 
-                variant="outline" 
-                className="h-7 w-7 p-0"
-                onClick={() => setVolume(Math.max(0, volume - 0.1))}
-              >
-                -
-              </Button>
-              <span className="text-sm font-medium min-w-[2rem] text-center">{volume.toFixed(1)}</span>
-              <Button 
-                size="sm" 
-                variant="outline" 
-                className="h-7 w-7 p-0"
-                onClick={() => setVolume(Math.min(1, volume + 0.1))}
-              >
-                +
-              </Button>
-            </div>
-
-            <div className="text-center py-4 bg-muted rounded-lg">
-              <div className="text-5xl font-bold text-primary mb-1">
+            <div className="text-center py-3 bg-muted rounded-lg">
+              <div className="text-3xl font-bold text-primary mb-1">
                 {timeLeft}s
               </div>
-              <div className="text-xl font-bold mb-1">
-                {isRunning 
-                  ? (isWorking ? 'Work' : 'Rest')
-                  : 'Ready'
-                }
-              </div>
-              <div className="text-sm font-semibold text-primary">
-                Rounds: {currentRound} / {totalRounds}
+              <div className="text-sm font-semibold">
+                {isRunning ? (isWorking ? 'Work' : 'Rest') : 'Ready'} • Round {currentRound}/{totalRounds}
               </div>
             </div>
 
@@ -332,11 +276,10 @@ export const WorkoutDisplay = ({
               <Button 
                 onClick={handleStartStop}
                 className="flex-1"
-                size="lg"
               >
                 {isRunning ? <><Pause className="w-4 h-4 mr-2" /> Stop</> : <><Play className="w-4 h-4 mr-2" /> Start</>}
               </Button>
-              <Button onClick={handleReset} variant="outline" size="lg">
+              <Button onClick={handleReset} variant="outline">
                 <RotateCcw className="w-4 h-4" />
               </Button>
             </div>
@@ -344,11 +287,11 @@ export const WorkoutDisplay = ({
         </Card>
 
         {/* 1RM Calculator */}
-        <Card className="border-2 border-primary/30 h-fit">
+        <Card className="border-2 border-primary/30">
           <CardHeader className="pb-3 bg-primary/5">
             <CardTitle className="text-center text-primary">1RM Calculator</CardTitle>
           </CardHeader>
-          <CardContent className="pt-4 space-y-4">
+          <CardContent className="pt-4 space-y-3">
             <div>
               <Label className="text-xs font-semibold">Weight</Label>
               <div className="flex items-center gap-1">
@@ -375,15 +318,18 @@ export const WorkoutDisplay = ({
             <Button 
               onClick={calculate1RM}
               className="w-full"
-              size="lg"
             >
               Calculate 1RM
             </Button>
 
-            {oneRM && (
-              <div className="text-center p-6 bg-muted rounded-lg">
+            {oneRM ? (
+              <div className="text-center py-3 bg-muted rounded-lg">
                 <div className="text-sm text-muted-foreground mb-1">Your 1RM</div>
                 <div className="text-3xl font-bold text-primary">{oneRM} kg</div>
+              </div>
+            ) : (
+              <div className="text-center py-3 bg-muted rounded-lg">
+                <div className="text-sm text-muted-foreground">Enter values to calculate</div>
               </div>
             )}
           </CardContent>
