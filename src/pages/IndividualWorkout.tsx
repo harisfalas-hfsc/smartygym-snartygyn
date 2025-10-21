@@ -5,6 +5,12 @@ import { Card, CardContent } from "@/components/ui/card";
 import { ArrowLeft, Clock, Dumbbell, TrendingUp } from "lucide-react";
 import { WorkoutDisplay } from "@/components/WorkoutDisplay";
 import { ShareButtons } from "@/components/ShareButtons";
+import burnStartImg from "@/assets/burn-start-workout.jpg";
+import sweatCircuitImg from "@/assets/sweat-circuit-workout.jpg";
+import bodyBurnoutImg from "@/assets/body-burnout-workout.jpg";
+import sweatStormImg from "@/assets/sweat-storm-workout.jpg";
+import infernoFlowImg from "@/assets/inferno-flow-workout.jpg";
+import calorieCrusherImg from "@/assets/calorie-crusher-workout.jpg";
 
 const IndividualWorkout = () => {
   const navigate = useNavigate();
@@ -572,6 +578,436 @@ Warm-Up & Cool-Down: 5 mins`,
         "Choose weights that challenge without compromising form",
         "Avoid arching your back during rows",
         "Focus on breathing and posture",
+      ],
+    },
+    "calorie-007": {
+      name: "Burn Start",
+      serialNumber: "CAL-BBW-007",
+      difficulty: "Beginner",
+      duration: "30 minutes",
+      equipment: "Bodyweight only",
+      imageUrl: burnStartImg,
+      description:
+        "A low-impact, high-effort bodyweight circuit designed to elevate heart rate and kickstart fat loss. Perfect for beginners easing into cardio-based training.",
+      format: `Circuit – 3 rounds
+Work: 30s / Rest: 30s`,
+      instructions:
+        "Perform each exercise for 30 seconds, rest 30 seconds, then move to the next. Rest 1 minute between rounds.",
+      exercises: [
+        {
+          name: "March in Place",
+          sets: "3",
+          reps: "30s",
+          rest: "30s",
+          notes: "Keep steady pace",
+        },
+        {
+          name: "Bodyweight Squats",
+          sets: "3",
+          reps: "30s",
+          rest: "30s",
+          notes: "Full range of motion",
+        },
+        {
+          name: "Step-Back Lunges",
+          sets: "3",
+          reps: "30s",
+          rest: "30s",
+          notes: "Alternate legs",
+        },
+        {
+          name: "Arm Circles",
+          sets: "3",
+          reps: "30s",
+          rest: "30s",
+          notes: "Forward and backward",
+        },
+        {
+          name: "Standing Knee Raises",
+          sets: "3",
+          reps: "30s",
+          rest: "30s",
+          notes: "Raise knees to hip level",
+        },
+        {
+          name: "Wall Sit",
+          sets: "3",
+          reps: "30s",
+          rest: "1 min",
+          notes: "Hold position",
+        },
+      ],
+      tips: [
+        "Keep a steady pace",
+        "Focus on breathing",
+        "Modify jumps to steps if needed",
+      ],
+    },
+    "calorie-008": {
+      name: "Sweat Circuit",
+      serialNumber: "CAL-EQ-008",
+      difficulty: "Beginner",
+      duration: "30 minutes",
+      equipment: "Jump Rope, Dumbbells, Mat",
+      imageUrl: sweatCircuitImg,
+      description:
+        "A light equipment-based circuit that blends cardio and resistance to boost metabolism and burn calories.",
+      format: `Circuit – 3 rounds
+Work: 40s / Rest: 20s`,
+      instructions:
+        "Use light weights. Perform each move for 40 seconds, rest 20 seconds. Rest 1 minute between rounds.",
+      exercises: [
+        {
+          name: "Jump Rope",
+          sets: "3",
+          reps: "40s",
+          rest: "20s",
+          notes: "Keep low to ground",
+        },
+        {
+          name: "Dumbbell Squat to Press",
+          sets: "3",
+          reps: "40s",
+          rest: "20s",
+          notes: "Fluid movement",
+        },
+        {
+          name: "Dumbbell Bent-Over Row",
+          sets: "3",
+          reps: "40s",
+          rest: "20s",
+          notes: "Squeeze shoulder blades",
+        },
+        {
+          name: "Jumping Jacks",
+          sets: "3",
+          reps: "40s",
+          rest: "20s",
+          notes: "Full extension",
+        },
+        {
+          name: "Dumbbell Deadlift",
+          sets: "3",
+          reps: "40s",
+          rest: "20s",
+          notes: "Hip hinge movement",
+        },
+        {
+          name: "Plank Hold",
+          sets: "3",
+          reps: "30s",
+          rest: "1 min",
+          notes: "Maintain straight line",
+        },
+      ],
+      tips: [
+        "Keep jump rope low to the ground",
+        "Don't rush dumbbell movements",
+        "Stay light on your feet",
+      ],
+    },
+    "calorie-009": {
+      name: "Body Burnout",
+      serialNumber: "CAL-BBW-009",
+      difficulty: "Intermediate",
+      duration: "45 minutes",
+      equipment: "Bodyweight only",
+      imageUrl: bodyBurnoutImg,
+      description:
+        "A fast-paced bodyweight workout using compound movements and short rest to maximize calorie burn.",
+      format: `AMRAP – 30 mins
+Finisher – 10 mins
+Warm-Up & Cool-Down – 5 mins`,
+      instructions:
+        "Complete as many rounds as possible in 30 minutes. Finish with a 10-minute challenge.",
+      exercises: [
+        {
+          name: "Jump Squats",
+          sets: "AMRAP 30 min",
+          reps: "15",
+          rest: "minimal",
+          notes: "Main Block Exercise 1",
+        },
+        {
+          name: "Push-Ups",
+          sets: "AMRAP 30 min",
+          reps: "12",
+          rest: "minimal",
+          notes: "Main Block Exercise 2",
+        },
+        {
+          name: "Reverse Lunges",
+          sets: "AMRAP 30 min",
+          reps: "10/leg",
+          rest: "minimal",
+          notes: "Main Block Exercise 3",
+        },
+        {
+          name: "Plank Shoulder Taps",
+          sets: "AMRAP 30 min",
+          reps: "20",
+          rest: "minimal",
+          notes: "Main Block Exercise 4",
+        },
+        {
+          name: "Burpees",
+          sets: "AMRAP 30 min",
+          reps: "8",
+          rest: "minimal",
+          notes: "Main Block Exercise 5",
+        },
+        {
+          name: "Finisher: 100 High Knees",
+          sets: "1",
+          reps: "100",
+          rest: "0",
+          notes: "Complete in 10 mins",
+        },
+        {
+          name: "Finisher: 50 Mountain Climbers",
+          sets: "1",
+          reps: "50",
+          rest: "0",
+          notes: "Complete in 10 mins",
+        },
+        {
+          name: "Finisher: 25 Jumping Jacks",
+          sets: "1",
+          reps: "25",
+          rest: "0",
+          notes: "Complete in 10 mins",
+        },
+      ],
+      tips: [
+        "Pace yourself early",
+        "Use full range of motion",
+        "Stay consistent across rounds",
+      ],
+    },
+    "calorie-010": {
+      name: "Sweat Storm",
+      serialNumber: "CAL-EQ-010",
+      difficulty: "Intermediate",
+      duration: "45 minutes",
+      equipment: "Dumbbells, Jump Rope, Mat",
+      imageUrl: sweatStormImg,
+      description:
+        "A high-energy circuit using dumbbells and jump rope to spike heart rate and burn serious calories.",
+      format: `Circuit – 4 rounds
+Work: 45s / Rest: 15s`,
+      instructions:
+        "Push hard during work intervals. Rest 1 minute between rounds.",
+      exercises: [
+        {
+          name: "Jump Rope",
+          sets: "4",
+          reps: "45s",
+          rest: "15s",
+          notes: "Steady rhythm",
+        },
+        {
+          name: "Dumbbell Thrusters",
+          sets: "4",
+          reps: "45s",
+          rest: "15s",
+          notes: "Fluid squat to press",
+        },
+        {
+          name: "Dumbbell Renegade Rows",
+          sets: "4",
+          reps: "45s",
+          rest: "15s",
+          notes: "Keep hips stable",
+        },
+        {
+          name: "Jump Lunges",
+          sets: "4",
+          reps: "45s",
+          rest: "15s",
+          notes: "Explosive switches",
+        },
+        {
+          name: "Dumbbell Swings",
+          sets: "4",
+          reps: "45s",
+          rest: "15s",
+          notes: "Hip driven",
+        },
+        {
+          name: "Plank to Push-Up",
+          sets: "4",
+          reps: "45s",
+          rest: "1 min",
+          notes: "Alternate leads",
+        },
+      ],
+      tips: [
+        "Keep jump rope rhythm steady",
+        "Choose weights that challenge you",
+        "Don't sacrifice form for speed",
+      ],
+    },
+    "calorie-011": {
+      name: "Inferno Flow",
+      serialNumber: "CAL-BBW-011",
+      difficulty: "Advanced",
+      duration: "60 minutes",
+      equipment: "Bodyweight only",
+      imageUrl: infernoFlowImg,
+      description:
+        "A relentless bodyweight challenge that combines plyometrics, core, and cardio for maximum fat burn.",
+      format: `For Time – 3 blocks
+Each block = 15 mins
+Rest: 2 mins between blocks`,
+      instructions:
+        "Complete each block as fast as possible. Rest only as needed.",
+      exercises: [
+        {
+          name: "Block 1: Jump Squats",
+          sets: "15 min block",
+          reps: "20",
+          rest: "as needed",
+          notes: "Repeat for 15 mins",
+        },
+        {
+          name: "Block 1: Push-Ups",
+          sets: "15 min block",
+          reps: "15",
+          rest: "as needed",
+          notes: "Repeat for 15 mins",
+        },
+        {
+          name: "Block 1: Burpees",
+          sets: "15 min block",
+          reps: "10",
+          rest: "2 min after block",
+          notes: "Repeat for 15 mins",
+        },
+        {
+          name: "Block 2: Mountain Climbers",
+          sets: "15 min block",
+          reps: "20",
+          rest: "as needed",
+          notes: "Repeat for 15 mins",
+        },
+        {
+          name: "Block 2: Jump Lunges",
+          sets: "15 min block",
+          reps: "15",
+          rest: "as needed",
+          notes: "Repeat for 15 mins",
+        },
+        {
+          name: "Block 2: Plank Jacks",
+          sets: "15 min block",
+          reps: "10",
+          rest: "2 min after block",
+          notes: "Repeat for 15 mins",
+        },
+        {
+          name: "Block 3: High Knees",
+          sets: "15 min block",
+          reps: "20",
+          rest: "as needed",
+          notes: "Repeat for 15 mins",
+        },
+        {
+          name: "Block 3: Tuck Jumps",
+          sets: "15 min block",
+          reps: "15",
+          rest: "as needed",
+          notes: "Repeat for 15 mins",
+        },
+        {
+          name: "Block 3: Push-Up to Pike",
+          sets: "15 min block",
+          reps: "10",
+          rest: "0",
+          notes: "Repeat for 15 mins",
+        },
+      ],
+      tips: [
+        "Explode through jumps",
+        "Keep transitions tight",
+        "Hydrate between blocks",
+      ],
+    },
+    "calorie-012": {
+      name: "Calorie Crusher",
+      serialNumber: "CAL-EQ-012",
+      difficulty: "Advanced",
+      duration: "60 minutes",
+      equipment: "Kettlebells, Dumbbells, Jump Rope, Mat",
+      imageUrl: calorieCrusherImg,
+      description:
+        "A full-body calorie incinerator using kettlebells, dumbbells, and jump rope. Built for intensity and endurance.",
+      format: `EMOM + Circuit
+EMOM: 20 mins
+Circuit: 3 rounds`,
+      instructions:
+        "Alternate EMOM and circuit blocks. Push max effort during EMOM.",
+      exercises: [
+        {
+          name: "EMOM - Jump Rope",
+          sets: "4 cycles",
+          reps: "60s",
+          rest: "remainder of minute",
+          notes: "Minute 1 of each cycle",
+        },
+        {
+          name: "EMOM - Kettlebell Swings",
+          sets: "4 cycles",
+          reps: "20",
+          rest: "remainder of minute",
+          notes: "Minute 2 of each cycle",
+        },
+        {
+          name: "EMOM - Dumbbell Snatch",
+          sets: "4 cycles",
+          reps: "10/arm",
+          rest: "remainder of minute",
+          notes: "Minute 3 of each cycle",
+        },
+        {
+          name: "EMOM - Burpees",
+          sets: "4 cycles",
+          reps: "12",
+          rest: "remainder of minute",
+          notes: "Minute 4 of each cycle",
+        },
+        {
+          name: "EMOM - Rest",
+          sets: "4 cycles",
+          reps: "Full minute",
+          rest: "60s",
+          notes: "Minute 5 of each cycle",
+        },
+        {
+          name: "Circuit - Dumbbell Thrusters",
+          sets: "3",
+          reps: "15",
+          rest: "30s",
+          notes: "After EMOM complete 3 rounds",
+        },
+        {
+          name: "Circuit - Jump Lunges",
+          sets: "3",
+          reps: "20",
+          rest: "30s",
+          notes: "After EMOM complete 3 rounds",
+        },
+        {
+          name: "Circuit - Plank Rows",
+          sets: "3",
+          reps: "10/side",
+          rest: "1 min",
+          notes: "After EMOM complete 3 rounds",
+        },
+      ],
+      tips: [
+        "Use explosive hip drive",
+        "Control weights on descent",
+        "Keep jump rope low and fast",
       ],
     },
     "strength-002": {

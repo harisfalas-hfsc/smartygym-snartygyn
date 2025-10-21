@@ -4,6 +4,12 @@ import { Helmet } from "react-helmet";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { ArrowLeft } from "lucide-react";
+import burnStartImg from "@/assets/burn-start-workout.jpg";
+import sweatCircuitImg from "@/assets/sweat-circuit-workout.jpg";
+import bodyBurnoutImg from "@/assets/body-burnout-workout.jpg";
+import sweatStormImg from "@/assets/sweat-storm-workout.jpg";
+import infernoFlowImg from "@/assets/inferno-flow-workout.jpg";
+import calorieCrusherImg from "@/assets/calorie-crusher-workout.jpg";
 
 type EquipmentFilter = "all" | "bodyweight" | "equipment";
 type LevelFilter = "all" | "beginner" | "intermediate" | "advanced";
@@ -49,6 +55,12 @@ const WorkoutDetail = () => {
     "calorie-burning": [
       { id: "calorie-001", name: "Metabolic Burn", description: "High-intensity fat-burning session", duration: "30 min", equipment: "bodyweight", level: "beginner", imageUrl: "https://images.unsplash.com/photo-1549060279-7e168fcee0c2?w=800&h=600&fit=crop", isFree: true },
       { id: "calorie-002", name: "Fat Furnace", description: "Metabolic conditioning that torches calories", duration: "45 min", equipment: "equipment", level: "advanced", imageUrl: "https://images.unsplash.com/photo-1549060279-7e168fcee0c2?w=800&h=600&fit=crop", isFree: true },
+      { id: "calorie-007", name: "Burn Start", description: "Low-impact cardio circuit to kickstart fat loss", duration: "30 min", equipment: "bodyweight", level: "beginner", imageUrl: burnStartImg, isFree: true },
+      { id: "calorie-008", name: "Sweat Circuit", description: "Light equipment circuit boosting metabolism", duration: "30 min", equipment: "equipment", level: "beginner", imageUrl: sweatCircuitImg, isFree: true },
+      { id: "calorie-009", name: "Body Burnout", description: "Fast-paced bodyweight AMRAP for max calorie burn", duration: "45 min", equipment: "bodyweight", level: "intermediate", imageUrl: bodyBurnoutImg, isFree: true },
+      { id: "calorie-010", name: "Sweat Storm", description: "High-energy circuit with dumbbells and jump rope", duration: "45 min", equipment: "equipment", level: "intermediate", imageUrl: sweatStormImg, isFree: true },
+      { id: "calorie-011", name: "Inferno Flow", description: "Relentless bodyweight plyometric challenge", duration: "60 min", equipment: "bodyweight", level: "advanced", imageUrl: infernoFlowImg, isFree: true },
+      { id: "calorie-012", name: "Calorie Crusher", description: "Full-body calorie incinerator with kettlebells", duration: "60 min", equipment: "equipment", level: "advanced", imageUrl: calorieCrusherImg, isFree: true },
     ],
     "metabolic": [
       { id: "metabolic-001", name: "Metabolic Ignition", description: "Boost your metabolism with this explosive workout", duration: "35 min", equipment: "equipment", level: "intermediate", imageUrl: "https://images.unsplash.com/photo-1517836357463-d25dfeac3438?w=800&h=600&fit=crop", isFree: true },
