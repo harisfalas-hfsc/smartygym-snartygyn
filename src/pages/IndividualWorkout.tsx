@@ -74,6 +74,7 @@ const IndividualWorkout = () => {
       equipment: string;
       imageUrl: string;
       description: string;
+      workoutType?: string;
       format: string;
       instructions: string;
       exercises: Array<{
@@ -95,6 +96,7 @@ const IndividualWorkout = () => {
       imageUrl: powerFoundationImg,
       description:
         "Build your strength base with compound movements targeting major muscle groups. This workout focuses on developing raw power through progressive overload with barbells and dumbbells.",
+      workoutType: "REPS & SETS",
       format: `Traditional Strength Training
 Structure: 5 exercises, 4 sets each
 Rest Between Sets: 2-3 minutes
@@ -354,6 +356,7 @@ Cool-Down: 5 minutes easy pace`,
       imageUrl: flowMobilityImg,
       description:
         "Improve flexibility, joint health, and movement quality. This mobility-focused session enhances range of motion and helps prevent injury through controlled movements and stretches.",
+      workoutType: "CIRCUIT",
       format: `Mobility Flow Sequence
 Structure: Progressive mobility drills
 Hold Time: 30-60 seconds per position
@@ -426,6 +429,7 @@ Relaxation: 5 minutes final stretches`,
       imageUrl: flowForgeImg,
       description:
         "Low-impact mobility and stability workout combining controlled movements with equipment assistance for enhanced joint health and movement quality.",
+      workoutType: "MIX",
       format: `Mixed Format
 Structure: Flow + Holds
 Equipment: Bands, Fit Ball
@@ -470,6 +474,7 @@ Total Duration: 60 minutes`,
       imageUrl: flowStarterImg,
       description:
         "A gentle mobility circuit designed to improve joint range, posture, and control. Ideal for beginners or recovery days.",
+      workoutType: "CIRCUIT",
       format: `Circuit – 2 rounds
 Hold Time: 30–60s per move`,
       instructions:
@@ -526,6 +531,7 @@ Hold Time: 30–60s per move`,
       imageUrl: bandBalanceImg,
       description:
         "A beginner-friendly workout using bands and a fit ball to enhance joint mobility and core stability.",
+      workoutType: "REPS & SETS",
       format: `3 sets per exercise
 Hold Time: 30–45s`,
       instructions:
@@ -582,6 +588,7 @@ Hold Time: 30–45s`,
       imageUrl: coreFlowImg,
       description:
         "A dynamic blend of mobility and core stability using bodyweight flows and static holds. Great for posture and control.",
+      workoutType: "MIX",
       format: `Flow + Static Holds
 2 rounds
 Hold Time: 30–60s`,
@@ -639,6 +646,7 @@ Hold Time: 30–60s`,
       imageUrl: stabilityCircuitImg,
       description:
         "A full-body stability circuit using fit ball, bands, and mat work to challenge balance and joint control.",
+      workoutType: "CIRCUIT",
       format: `Circuit – 3 rounds
 Hold Time: 30–60s`,
       instructions:
@@ -695,6 +703,7 @@ Hold Time: 30–60s`,
       imageUrl: mobilityMasteryImg,
       description:
         "An advanced mobility and stability workout using high-intensity intervals and deep holds to challenge control and flexibility.",
+      workoutType: "MIX",
       format: `HIIT – 5 blocks
 Work: 45s / Rest: 15s
 Static Holds: 60s`,
@@ -752,6 +761,7 @@ Static Holds: 60s`,
       imageUrl: balanceForgeImg,
       description:
         "A precision-based mobility workout using fit ball, bands, and mat work to develop elite control and joint integrity.",
+      workoutType: "REPS & SETS",
       format: `3 sets per exercise
 Hold Time: 45–60s`,
       instructions:
@@ -2440,6 +2450,7 @@ Work: 30s / Rest: 30s`,
               serial={workout.serialNumber}
               focus={getFocusLabel(type)}
               difficulty={workout.difficulty === "Beginner" ? 1 : workout.difficulty === "Intermediate" ? 3 : 5}
+              workoutType={workout.workoutType}
               imageUrl={workout.imageUrl}
               duration={workout.duration}
               equipment={workout.equipment}
