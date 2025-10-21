@@ -1,11 +1,10 @@
 import { useNavigate, useParams } from "react-router-dom";
 import { Helmet } from "react-helmet";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { ArrowLeft, Clock, Dumbbell, TrendingUp } from "lucide-react";
-import { AccessGate } from "@/components/AccessGate";
+import { WorkoutDisplay } from "@/components/WorkoutDisplay";
 import { ShareButtons } from "@/components/ShareButtons";
-import { ParQQuestionnaire } from "@/components/ParQQuestionnaire";
 
 const IndividualWorkout = () => {
   const navigate = useNavigate();
@@ -486,115 +485,24 @@ Phase 3: Finisher (10 min)`,
               />
             </div>
 
-            {/* Three Cards: Video, Timer, Calculator */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
-              <Card className="cursor-pointer hover:shadow-lg transition-shadow">
-                <CardHeader>
-                  <CardTitle className="text-center text-sm">Video Guide</CardTitle>
-                </CardHeader>
-                <CardContent className="text-center text-muted-foreground text-xs">
-                  Watch tutorial
-                </CardContent>
-              </Card>
-              <Card className="cursor-pointer hover:shadow-lg transition-shadow">
-                <CardHeader>
-                  <CardTitle className="text-center text-sm">Workout Timer</CardTitle>
-                </CardHeader>
-                <CardContent className="text-center text-muted-foreground text-xs">
-                  Time your sets
-                </CardContent>
-              </Card>
-              <Card className="cursor-pointer hover:shadow-lg transition-shadow">
-                <CardHeader>
-                  <CardTitle className="text-center text-sm">1RM Calculator</CardTitle>
-                </CardHeader>
-                <CardContent className="text-center text-muted-foreground text-xs">
-                  Calculate max
-                </CardContent>
-              </Card>
-            </div>
-
-            {/* Description Card */}
-            <Card className="mb-8">
-              <CardHeader>
-                <CardTitle>Description</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className="text-muted-foreground">{workout.description}</p>
-              </CardContent>
-            </Card>
-
-            {/* Format and Instructions Card */}
-            <Card className="mb-8">
-              <CardHeader>
-                <CardTitle>Format & Instructions</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div>
-                  <h3 className="font-semibold mb-2">Format:</h3>
-                  <pre className="text-sm text-muted-foreground whitespace-pre-wrap font-sans">
-                    {workout.format}
-                  </pre>
-                </div>
-                <div>
-                  <h3 className="font-semibold mb-2">Instructions:</h3>
-                  <p className="text-sm text-muted-foreground">{workout.instructions}</p>
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* Exercises Card */}
-            <Card className="mb-8">
-              <CardHeader>
-                <CardTitle>Exercises</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-6">
-                  {workout.exercises.map((exercise, index) => (
-                    <div key={index} className="border-b pb-4 last:border-b-0">
-                      <h3 className="font-semibold text-lg mb-2">{exercise.name}</h3>
-                      <div className="grid grid-cols-3 gap-4 mb-2 text-sm">
-                        <div>
-                          <span className="text-muted-foreground">Sets:</span>{" "}
-                          <span className="font-medium">{exercise.sets}</span>
-                        </div>
-                        <div>
-                          <span className="text-muted-foreground">Reps:</span>{" "}
-                          <span className="font-medium">{exercise.reps}</span>
-                        </div>
-                        <div>
-                          <span className="text-muted-foreground">Rest:</span>{" "}
-                          <span className="font-medium">{exercise.rest}</span>
-                        </div>
-                      </div>
-                      <p className="text-sm text-muted-foreground italic">{exercise.notes}</p>
-                    </div>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* Tips and Safety Card */}
-            <Card className="mb-8">
-              <CardHeader>
-                <CardTitle>Tips & Safety</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <ul className="space-y-2">
-                  {workout.tips.map((tip, index) => (
-                    <li key={index} className="flex items-start gap-2">
-                      <span className="text-primary mt-1">•</span>
-                      <span className="text-sm text-muted-foreground">{tip}</span>
-                    </li>
-                  ))}
-                </ul>
-              </CardContent>
-            </Card>
-
-            {/* ParQ Questionnaire */}
-            <div className="mb-8">
-              <ParQQuestionnaire />
-            </div>
+            {/* Use WorkoutDisplay component with all functionality */}
+            <WorkoutDisplay
+              exercises={[
+                { name: "Exercise Demo", video_id: "dQw4w9WgXcQ", video_url: "https://www.youtube.com/watch?v=dQw4w9WgXcQ" }
+              ]}
+              planContent=""
+              title={workout.name}
+              serial={workout.serialNumber}
+              difficulty={workout.difficulty === "Beginner" ? 1 : workout.difficulty === "Intermediate" ? 3 : 5}
+              imageUrl={workout.imageUrl}
+              duration={workout.duration}
+              equipment={workout.equipment}
+              description={workout.description}
+              format={workout.format}
+              instructions={workout.instructions}
+              tips={workout.tips.join('\n')}
+              workoutDetails={{ exercises: workout.exercises }}
+            />
 
             {/* Share Buttons */}
             <div className="mt-8">
