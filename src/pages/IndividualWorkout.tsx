@@ -29,6 +29,12 @@ import flowMobilityImg from "@/assets/flow-mobility-workout.jpg";
 import flowForgeImg from "@/assets/flowforge-workout.jpg";
 import powerSurgeImg from "@/assets/power-surge-workout.jpg";
 import ultimateChallengeImg from "@/assets/ultimate-challenge-workout.jpg";
+import metaboLiteImg from "@/assets/metabo-lite-workout.jpg";
+import metaboStartImg from "@/assets/metabo-start-workout.jpg";
+import metaboFlowImg from "@/assets/metabo-flow-workout.jpg";
+import metaboChargeImg from "@/assets/metabo-charge-workout.jpg";
+import metaboInfernoImg from "@/assets/metabo-inferno-workout.jpg";
+import metaboSurgeImg from "@/assets/metabo-surge-workout.jpg";
 
 const IndividualWorkout = () => {
   const navigate = useNavigate();
@@ -1504,6 +1510,436 @@ Repeat: 3 rounds`,
         "Keep kettlebell swings hip-driven",
         "Adjust TRX straps for proper tension",
         "Don't skip the rest minute—it's strategic recovery",
+      ],
+    },
+    "metabolic-013": {
+      name: "Metabo Lite",
+      serialNumber: "MET-BBW-013",
+      difficulty: "Beginner",
+      duration: "30 minutes",
+      equipment: "No Equipment Required",
+      imageUrl: metaboLiteImg,
+      description:
+        "A beginner-friendly metabolic circuit using bodyweight moves to elevate heart rate and improve energy output. Great for building stamina and movement efficiency.",
+      format: `Circuit – 3 rounds
+Work: 30s / Rest: 30s`,
+      instructions:
+        "Perform each move for 30 seconds. Rest 30 seconds between exercises. Rest 1 minute between rounds.",
+      exercises: [
+        {
+          name: "Bodyweight Squats",
+          sets: "3 rounds",
+          reps: "30s",
+          rest: "30s",
+          notes: "Focus on form and controlled movement",
+        },
+        {
+          name: "March in Place",
+          sets: "3 rounds",
+          reps: "30s",
+          rest: "30s",
+          notes: "Keep a steady pace and bring knees up",
+        },
+        {
+          name: "Push-Ups (knees if needed)",
+          sets: "3 rounds",
+          reps: "30s",
+          rest: "30s",
+          notes: "Maintain a straight body line",
+        },
+        {
+          name: "Glute Bridges",
+          sets: "3 rounds",
+          reps: "30s",
+          rest: "30s",
+          notes: "Squeeze glutes at the top",
+        },
+        {
+          name: "Plank Hold",
+          sets: "3 rounds",
+          reps: "30s",
+          rest: "60s",
+          notes: "Keep core tight and hips level",
+        },
+      ],
+      tips: [
+        "Focus on breathing rhythm",
+        "Keep transitions smooth",
+        "Modify jumps if needed",
+      ],
+    },
+    "metabolic-014": {
+      name: "Metabo Start",
+      serialNumber: "MET-EQ-014",
+      difficulty: "Beginner",
+      duration: "30 minutes",
+      equipment: "Bands, Dumbbells, Mat",
+      imageUrl: metaboStartImg,
+      description:
+        "A light metabolic circuit using bands and dumbbells to combine resistance and cardio. Designed for safe intensity and metabolic activation.",
+      format: `Circuit – 3 rounds
+Work: 40s / Rest: 20s`,
+      instructions:
+        "Use light resistance. Perform each move for 40 seconds, rest 20 seconds. Rest 1 minute between rounds.",
+      exercises: [
+        {
+          name: "Band Squat to Row",
+          sets: "3 rounds",
+          reps: "40s",
+          rest: "20s",
+          notes: "Maintain band tension throughout the movement",
+        },
+        {
+          name: "Dumbbell Curl to Press",
+          sets: "3 rounds",
+          reps: "40s",
+          rest: "20s",
+          notes: "Smooth transition from curl to press",
+        },
+        {
+          name: "Band Lateral Walks",
+          sets: "3 rounds",
+          reps: "40s",
+          rest: "20s",
+          notes: "Keep tension on the band and stay low",
+        },
+        {
+          name: "Dumbbell Deadlift",
+          sets: "3 rounds",
+          reps: "40s",
+          rest: "20s",
+          notes: "Hinge at hips with neutral spine",
+        },
+        {
+          name: "Plank with Band Pull",
+          sets: "3 rounds",
+          reps: "40s",
+          rest: "60s",
+          notes: "Maintain plank position while pulling band",
+        },
+      ],
+      tips: [
+        "Don't rush reps",
+        "Keep band tension consistent",
+        "Breathe through transitions",
+      ],
+    },
+    "metabolic-015": {
+      name: "Metabo Flow",
+      serialNumber: "MET-BBW-015",
+      difficulty: "Intermediate",
+      duration: "45 minutes",
+      equipment: "No Equipment Required",
+      imageUrl: metaboFlowImg,
+      description:
+        "A dynamic bodyweight workout using compound movements and short rest to spike metabolism and build endurance.",
+      format: `AMRAP – 30 mins
+Finisher – 10 mins
+Warm-Up & Cool-Down – 5 mins`,
+      instructions:
+        "Complete as many rounds as possible. Push consistent effort. Finish with a challenge block.",
+      exercises: [
+        {
+          name: "Jump Squats",
+          sets: "AMRAP 30 min",
+          reps: "15",
+          rest: "minimal",
+          notes: "Main Block Exercise 1",
+        },
+        {
+          name: "Push-Ups",
+          sets: "AMRAP 30 min",
+          reps: "12",
+          rest: "minimal",
+          notes: "Main Block Exercise 2",
+        },
+        {
+          name: "Reverse Lunges",
+          sets: "AMRAP 30 min",
+          reps: "10/leg",
+          rest: "minimal",
+          notes: "Main Block Exercise 3",
+        },
+        {
+          name: "Plank Shoulder Taps",
+          sets: "AMRAP 30 min",
+          reps: "20",
+          rest: "minimal",
+          notes: "Main Block Exercise 4",
+        },
+        {
+          name: "Burpees",
+          sets: "AMRAP 30 min",
+          reps: "8",
+          rest: "minimal",
+          notes: "Main Block Exercise 5",
+        },
+        {
+          name: "Finisher: 100 High Knees",
+          sets: "1",
+          reps: "100",
+          rest: "0",
+          notes: "Complete in 10 mins",
+        },
+        {
+          name: "Finisher: 50 Mountain Climbers",
+          sets: "1",
+          reps: "50",
+          rest: "0",
+          notes: "Complete in 10 mins",
+        },
+        {
+          name: "Finisher: 25 Jumping Jacks",
+          sets: "1",
+          reps: "25",
+          rest: "0",
+          notes: "Complete in 10 mins",
+        },
+      ],
+      tips: [
+        "Keep transitions tight",
+        "Use full range of motion",
+        "Hydrate between blocks",
+      ],
+    },
+    "metabolic-016": {
+      name: "Metabo Charge",
+      serialNumber: "MET-EQ-016",
+      difficulty: "Intermediate",
+      duration: "45 minutes",
+      equipment: "Kettlebells, TRX, Mat",
+      imageUrl: metaboChargeImg,
+      description:
+        "A high-intensity metabolic workout using kettlebells and TRX to blend resistance and cardio for maximum metabolic output.",
+      format: `EMOM – 20 mins
+Circuit – 3 rounds`,
+      instructions:
+        "Start each minute with reps. Rest until next minute. Push hard during circuits.",
+      exercises: [
+        {
+          name: "Kettlebell Swings",
+          sets: "4 cycles",
+          reps: "20",
+          rest: "remainder of minute",
+          notes: "Minute 1 of each cycle",
+        },
+        {
+          name: "TRX Rows",
+          sets: "4 cycles",
+          reps: "15",
+          rest: "remainder of minute",
+          notes: "Minute 2 of each cycle",
+        },
+        {
+          name: "Jump Squats",
+          sets: "4 cycles",
+          reps: "20",
+          rest: "remainder of minute",
+          notes: "Minute 3 of each cycle",
+        },
+        {
+          name: "TRX Push-Ups",
+          sets: "4 cycles",
+          reps: "15",
+          rest: "remainder of minute",
+          notes: "Minute 4 of each cycle",
+        },
+        {
+          name: "Rest",
+          sets: "4 cycles",
+          reps: "Full minute",
+          rest: "60s",
+          notes: "Minute 5 of each cycle",
+        },
+        {
+          name: "Kettlebell Goblet Squat",
+          sets: "3 rounds",
+          reps: "15",
+          rest: "minimal",
+          notes: "Circuit Exercise 1",
+        },
+        {
+          name: "TRX Mountain Climbers",
+          sets: "3 rounds",
+          reps: "20",
+          rest: "minimal",
+          notes: "Circuit Exercise 2",
+        },
+        {
+          name: "Plank Hold",
+          sets: "3 rounds",
+          reps: "45s",
+          rest: "60s",
+          notes: "Circuit Exercise 3",
+        },
+      ],
+      tips: [
+        "Keep kettlebell swings hip-driven",
+        "Adjust TRX straps properly",
+        "Don't skip rest minutes",
+      ],
+    },
+    "metabolic-017": {
+      name: "Metabo Inferno",
+      serialNumber: "MET-BBW-017",
+      difficulty: "Advanced",
+      duration: "60 minutes",
+      equipment: "No Equipment Required",
+      imageUrl: metaboInfernoImg,
+      description:
+        "A relentless bodyweight metabolic workout using plyometrics, core, and compound moves to push energy systems to the limit.",
+      format: `For Time – 3 blocks
+Each block = 15 mins
+Rest: 2 mins between blocks`,
+      instructions:
+        "Complete each block as fast as possible. Rest only as needed.",
+      exercises: [
+        {
+          name: "Block 1: Jump Squats",
+          sets: "Repeat for 15 mins",
+          reps: "20",
+          rest: "as needed",
+          notes: "Block 1 Exercise 1",
+        },
+        {
+          name: "Block 1: Push-Ups",
+          sets: "Repeat for 15 mins",
+          reps: "15",
+          rest: "as needed",
+          notes: "Block 1 Exercise 2",
+        },
+        {
+          name: "Block 1: Burpees",
+          sets: "Repeat for 15 mins",
+          reps: "10",
+          rest: "2 min after block",
+          notes: "Block 1 Exercise 3",
+        },
+        {
+          name: "Block 2: Mountain Climbers",
+          sets: "Repeat for 15 mins",
+          reps: "20",
+          rest: "as needed",
+          notes: "Block 2 Exercise 1",
+        },
+        {
+          name: "Block 2: Jump Lunges",
+          sets: "Repeat for 15 mins",
+          reps: "15",
+          rest: "as needed",
+          notes: "Block 2 Exercise 2",
+        },
+        {
+          name: "Block 2: Plank Jacks",
+          sets: "Repeat for 15 mins",
+          reps: "10",
+          rest: "2 min after block",
+          notes: "Block 2 Exercise 3",
+        },
+        {
+          name: "Block 3: High Knees",
+          sets: "Repeat for 15 mins",
+          reps: "20",
+          rest: "as needed",
+          notes: "Block 3 Exercise 1",
+        },
+        {
+          name: "Block 3: Tuck Jumps",
+          sets: "Repeat for 15 mins",
+          reps: "15",
+          rest: "as needed",
+          notes: "Block 3 Exercise 2",
+        },
+        {
+          name: "Block 3: Push-Up to Pike",
+          sets: "Repeat for 15 mins",
+          reps: "10",
+          rest: "0",
+          notes: "Block 3 Exercise 3",
+        },
+      ],
+      tips: [
+        "Explode through jumps",
+        "Keep transitions tight",
+        "Hydrate between blocks",
+      ],
+    },
+    "metabolic-018": {
+      name: "Metabo Surge",
+      serialNumber: "MET-EQ-018",
+      difficulty: "Advanced",
+      duration: "60 minutes",
+      equipment: "Dumbbells, Kettlebells, TRX, Mat",
+      imageUrl: metaboSurgeImg,
+      description:
+        "A full-body metabolic blast using dumbbells, kettlebells, and TRX. Designed for elite conditioning and fat burn.",
+      format: `EMOM + Circuit
+EMOM: 20 mins
+Circuit: 3 rounds`,
+      instructions:
+        "Alternate EMOM and circuit blocks. Push max effort during EMOM.",
+      exercises: [
+        {
+          name: "Dumbbell Thrusters",
+          sets: "4 cycles",
+          reps: "15",
+          rest: "remainder of minute",
+          notes: "Minute 1 of each cycle",
+        },
+        {
+          name: "Kettlebell Swings",
+          sets: "4 cycles",
+          reps: "20",
+          rest: "remainder of minute",
+          notes: "Minute 2 of each cycle",
+        },
+        {
+          name: "TRX Rows",
+          sets: "4 cycles",
+          reps: "15",
+          rest: "remainder of minute",
+          notes: "Minute 3 of each cycle",
+        },
+        {
+          name: "Burpees",
+          sets: "4 cycles",
+          reps: "12",
+          rest: "remainder of minute",
+          notes: "Minute 4 of each cycle",
+        },
+        {
+          name: "Rest",
+          sets: "4 cycles",
+          reps: "Full minute",
+          rest: "60s",
+          notes: "Minute 5 of each cycle",
+        },
+        {
+          name: "Dumbbell Snatch",
+          sets: "3 rounds",
+          reps: "10/arm",
+          rest: "minimal",
+          notes: "Circuit Exercise 1",
+        },
+        {
+          name: "Jump Lunges",
+          sets: "3 rounds",
+          reps: "20",
+          rest: "minimal",
+          notes: "Circuit Exercise 2",
+        },
+        {
+          name: "Plank Rows",
+          sets: "3 rounds",
+          reps: "10/side",
+          rest: "60s",
+          notes: "Circuit Exercise 3",
+        },
+      ],
+      tips: [
+        "Use explosive hip drive",
+        "Control weights on descent",
+        "Keep TRX tension consistent",
       ],
     },
     "power-001": {

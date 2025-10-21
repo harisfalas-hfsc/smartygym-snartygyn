@@ -28,6 +28,12 @@ import flowMobilityImg from "@/assets/flow-mobility-workout.jpg";
 import flowForgeImg from "@/assets/flowforge-workout.jpg";
 import powerSurgeImg from "@/assets/power-surge-workout.jpg";
 import ultimateChallengeImg from "@/assets/ultimate-challenge-workout.jpg";
+import metaboLiteImg from "@/assets/metabo-lite-workout.jpg";
+import metaboStartImg from "@/assets/metabo-start-workout.jpg";
+import metaboFlowImg from "@/assets/metabo-flow-workout.jpg";
+import metaboChargeImg from "@/assets/metabo-charge-workout.jpg";
+import metaboInfernoImg from "@/assets/metabo-inferno-workout.jpg";
+import metaboSurgeImg from "@/assets/metabo-surge-workout.jpg";
 
 type EquipmentFilter = "all" | "bodyweight" | "equipment";
 type LevelFilter = "all" | "beginner" | "intermediate" | "advanced";
@@ -81,8 +87,14 @@ const WorkoutDetail = () => {
       { id: "calorie-012", name: "Calorie Crusher", description: "Full-body calorie incinerator with kettlebells", duration: "60 min", equipment: "equipment", level: "advanced", imageUrl: calorieCrusherImg, isFree: true },
     ],
     "metabolic": [
+      { id: "metabolic-013", name: "Metabo Lite", description: "Beginner-friendly metabolic circuit to build stamina", duration: "30 min", equipment: "bodyweight", level: "beginner", imageUrl: metaboLiteImg, isFree: true },
+      { id: "metabolic-014", name: "Metabo Start", description: "Light metabolic circuit with bands and dumbbells", duration: "30 min", equipment: "equipment", level: "beginner", imageUrl: metaboStartImg, isFree: true },
+      { id: "metabolic-015", name: "Metabo Flow", description: "Dynamic bodyweight workout to spike metabolism", duration: "45 min", equipment: "bodyweight", level: "intermediate", imageUrl: metaboFlowImg, isFree: true },
+      { id: "metabolic-016", name: "Metabo Charge", description: "High-intensity metabolic workout with kettlebells and TRX", duration: "45 min", equipment: "equipment", level: "intermediate", imageUrl: metaboChargeImg, isFree: true },
       { id: "metabolic-001", name: "Metabolic Ignition", description: "Boost your metabolism with this explosive workout", duration: "35 min", equipment: "equipment", level: "intermediate", imageUrl: metabolicIgnitionImg, isFree: true },
       { id: "metabolic-002", name: "MetaboShock", description: "Hybrid metabolic blending resistance and cardio", duration: "15 min", equipment: "equipment", level: "intermediate", imageUrl: metaboShockImg, isFree: true },
+      { id: "metabolic-017", name: "Metabo Inferno", description: "Relentless bodyweight metabolic challenge", duration: "60 min", equipment: "bodyweight", level: "advanced", imageUrl: metaboInfernoImg, isFree: true },
+      { id: "metabolic-018", name: "Metabo Surge", description: "Full-body metabolic blast for elite conditioning", duration: "60 min", equipment: "equipment", level: "advanced", imageUrl: metaboSurgeImg, isFree: true },
     ],
     "cardio": [
       { id: "cardio-001", name: "Cardio Blast", description: "Elevate your heart rate and build endurance", duration: "40 min", equipment: "bodyweight", level: "beginner", imageUrl: cardioBlastImg, isFree: true },
