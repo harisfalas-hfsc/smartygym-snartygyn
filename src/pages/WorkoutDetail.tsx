@@ -37,7 +37,7 @@ const WorkoutDetail = () => {
   const workoutData: { [key: string]: Workout[] } = {
     "strength": [
       { id: "strength-free", name: "Beginner Strength Basics", description: "Start your strength journey with this free workout", duration: "25 min", equipment: "bodyweight", level: "beginner", imageUrl: "https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?w=800&h=600&fit=crop", isFree: true },
-      { id: "iron-core-003", name: "Iron Core", description: "A strength-focused workout targeting major muscle groups", duration: "60 min", equipment: "equipment", level: "advanced", imageUrl: "https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=800&h=600&fit=crop" },
+      { id: "iron-core-003", name: "Iron Core", description: "A strength-focused workout targeting major muscle groups", duration: "60 min", equipment: "equipment", level: "advanced", imageUrl: "https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=800&h=600&fit=crop", isFree: true },
       { id: "power-surge-005", name: "Power Surge", description: "Develop explosive strength and fast-twitch muscle activation", duration: "30 min", equipment: "equipment", level: "intermediate", imageUrl: "https://images.unsplash.com/photo-1517836357463-d25dfeac3438?w=800&h=600&fit=crop" },
     ],
     "calorie-burning": [
