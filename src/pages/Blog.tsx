@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Helmet } from "react-helmet";
 import { Button } from "@/components/ui/button";
@@ -50,7 +51,7 @@ const articles: Article[] = [
     image: "https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?auto=format&fit=crop&q=80&w=800",
     readTime: "9 min read",
     date: "March 8, 2024",
-    category: "Recovery",
+    category: "Wellness",
   },
   {
     id: "5",
@@ -77,13 +78,18 @@ const articles: Article[] = [
     image: "https://images.unsplash.com/photo-1517836357463-d25dfeac3438?auto=format&fit=crop&q=80&w=800",
     readTime: "8 min read",
     date: "March 17, 2024",
-    category: "Training",
+    category: "Fitness",
   },
 ];
 
 const Blog = () => {
   const navigate = useNavigate();
   const { canGoBack, goBack } = useShowBackButton();
+  const [categoryFilter, setCategoryFilter] = useState<string>("all");
+
+  const filteredArticles = categoryFilter === "all" 
+    ? articles 
+    : articles.filter(article => article.category.toLowerCase() === categoryFilter.toLowerCase());
 
   return (
     <>
@@ -130,8 +136,40 @@ const Blog = () => {
             </p>
           </header>
 
+          {/* Category Filter */}
+          <div className="flex flex-wrap justify-center gap-3 mb-8">
+            <Button
+              variant={categoryFilter === "all" ? "default" : "outline"}
+              onClick={() => setCategoryFilter("all")}
+              size="sm"
+            >
+              All
+            </Button>
+            <Button
+              variant={categoryFilter === "fitness" ? "default" : "outline"}
+              onClick={() => setCategoryFilter("fitness")}
+              size="sm"
+            >
+              Fitness
+            </Button>
+            <Button
+              variant={categoryFilter === "wellness" ? "default" : "outline"}
+              onClick={() => setCategoryFilter("wellness")}
+              size="sm"
+            >
+              Wellness
+            </Button>
+            <Button
+              variant={categoryFilter === "nutrition" ? "default" : "outline"}
+              onClick={() => setCategoryFilter("nutrition")}
+              size="sm"
+            >
+              Nutrition
+            </Button>
+          </div>
+
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {articles.map((article) => (
+            {filteredArticles.map((article) => (
               <Card
                 key={article.id}
                 className="overflow-hidden cursor-pointer transition-all duration-300 hover:scale-105 hover:shadow-lg"
