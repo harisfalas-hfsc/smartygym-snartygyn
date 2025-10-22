@@ -63,27 +63,57 @@ const CoachProfile = () => {
           <article className="space-y-8">
             {/* Hero Section */}
             <header className="text-center mb-12">
-              <div className="w-32 h-32 mx-auto mb-6 rounded-full bg-gradient-to-br from-primary to-primary/60 flex items-center justify-center">
-                <span className="text-5xl font-bold text-primary-foreground">HF</span>
+              <div className="w-40 h-40 mx-auto mb-6 rounded-full overflow-hidden">
+                <img 
+                  src={new URL("@/assets/haris-falas-coach.png", import.meta.url).href}
+                  alt="Haris Falas - Head Coach" 
+                  className="w-full h-full object-cover"
+                />
               </div>
-              <h1 className="text-4xl md:text-5xl font-bold mb-4">Meet Our Head Coach</h1>
+              <h1 className="text-3xl sm:text-4xl font-bold mb-4">Meet Our Head Coach</h1>
               <h2 className="text-3xl font-semibold text-primary mb-2">Haris Falas</h2>
-              <p className="text-lg text-muted-foreground">Certified Sports Scientist & Strength Coach</p>
+              <p className="text-lg text-muted-foreground">Founder & Head Coach, HFSC and Smarty Gym</p>
             </header>
 
             {/* Main Content Card */}
             <Card className="p-8 md:p-12">
               <div className="prose prose-lg max-w-none">
                 <p className="text-lg leading-relaxed mb-6">
-                  Haris Falas is the driving force behind Smarty Gym and HFSC, bringing over two decades of experience in strength and conditioning, sports science, and human performance. Known for his results-driven approach and deep understanding of how the body truly moves, Haris has coached everyone from elite athletes to everyday adults seeking better performance, strength, and pain-free living.
+                  Haris Falas is the founder and head coach of HFSC and Smarty Gym, one of Cyprus' most respected names in strength and conditioning, human performance, and functional fitness. With more than 20 years of professional experience as a Sports Scientist, Strength & Conditioning Coach, and Educator, Haris has dedicated his career to one mission — helping people move, perform, and live better.
+                </p>
+
+                <h3 className="text-2xl font-semibold mb-4 mt-8">A Visionary Coach with Proven Experience</h3>
+                
+                <p className="text-lg leading-relaxed mb-6">
+                  Haris began his journey in the world of sports performance long before functional training became a trend. As a certified Sports Scientist, he developed a deep understanding of biomechanics, physiology, and the psychology of performance. Over the years, he has worked with elite athletes, football teams, and everyday adults—each time blending scientific precision with practical coaching methods that deliver measurable results.
                 </p>
 
                 <p className="text-lg leading-relaxed mb-6">
-                  As a certified sports scientist and strength coach, Haris combines evidence-based training with real-world experience, ensuring every workout is effective, safe, and purposeful. His philosophy is simple — <strong>train smart, move better, perform stronger</strong>.
+                  Haris has served as a Strength & Conditioning Coach in the Cypriot First Division, most notably with AEL Limassol FC and Nea Salamina FC, where he played a key role in optimizing athletic performance, preventing injuries, and building resilient, high-performing athletes. His professionalism and loyalty have earned him respect across the football community, highlighted by his well-known decision to decline a major offer from Omonia FC—a move that reflected his integrity and dedication to his teams.
                 </p>
 
-                <p className="text-lg leading-relaxed mb-8">
-                  Beyond the gym, Haris is a respected figure in Cyprus' fitness industry and an innovator aiming to redefine functional training through the Smarty Gym platform, helping people worldwide train anywhere, anytime, with purpose and precision.
+                <h3 className="text-2xl font-semibold mb-4 mt-8">The Mind Behind HFSC & Smarty Gym</h3>
+                
+                <p className="text-lg leading-relaxed mb-6">
+                  Through HFSC (Haris Falas Strength & Conditioning) and his innovative digital platform Smarty Gym, Haris has redefined how people approach fitness. His philosophy is clear:
+                </p>
+
+                <p className="text-xl font-semibold text-primary text-center my-6">
+                  "Train smart, move better, perform stronger."
+                </p>
+
+                <p className="text-lg leading-relaxed mb-6">
+                  Under his leadership, HFSC has become a hub for adults and athletes seeking functional, real-world fitness—training that enhances strength, mobility, and performance while preventing pain and injury. Smarty Gym extends that vision globally, giving people the tools to train anywhere, anytime, with scientifically designed workouts and professional guidance.
+                </p>
+
+                <h3 className="text-2xl font-semibold mb-4 mt-8">A Mission That Goes Beyond Fitness</h3>
+                
+                <p className="text-lg leading-relaxed mb-6">
+                  Haris believes fitness isn't just about aesthetics—it's about freedom of movement, energy, and confidence in everyday life. His approach combines traditional strength principles with cutting-edge sports science to create a balanced, sustainable path to peak performance.
+                </p>
+
+                <p className="text-lg leading-relaxed mb-6">
+                  Known for his passion, precision, and results, Haris continues to inspire both his clients and fellow professionals to think differently about training. His next mission is clear: to make Smarty Gym a global fitness brand, empowering people worldwide to train smart and live strong.
                 </p>
               </div>
 
@@ -96,9 +126,9 @@ const CoachProfile = () => {
                     </div>
                   </div>
                   <div>
-                    <h3 className="font-semibold text-lg mb-2">Certified Professional</h3>
+                    <h3 className="font-semibold text-lg mb-2">Sports Scientist & Educator</h3>
                     <p className="text-muted-foreground text-sm">
-                      Sports scientist and strength coach with professional certifications
+                      Certified professional with deep expertise in biomechanics and physiology
                     </p>
                   </div>
                 </div>
@@ -112,7 +142,7 @@ const CoachProfile = () => {
                   <div>
                     <h3 className="font-semibold text-lg mb-2">20+ Years Experience</h3>
                     <p className="text-muted-foreground text-sm">
-                      Over two decades coaching elite athletes and everyday individuals
+                      Elite athletes, professional football teams, and everyday individuals
                     </p>
                   </div>
                 </div>
@@ -124,9 +154,9 @@ const CoachProfile = () => {
                     </div>
                   </div>
                   <div>
-                    <h3 className="font-semibold text-lg mb-2">Evidence-Based Approach</h3>
+                    <h3 className="font-semibold text-lg mb-2">First Division Coach</h3>
                     <p className="text-muted-foreground text-sm">
-                      Combines scientific research with practical real-world application
+                      AEL Limassol FC and Nea Salamina FC - Cypriot First Division
                     </p>
                   </div>
                 </div>
@@ -138,9 +168,9 @@ const CoachProfile = () => {
                     </div>
                   </div>
                   <div>
-                    <h3 className="font-semibold text-lg mb-2">Industry Leader</h3>
+                    <h3 className="font-semibold text-lg mb-2">Industry Pioneer</h3>
                     <p className="text-muted-foreground text-sm">
-                      Respected figure in Cyprus' fitness industry and functional training
+                      Leading Cyprus' functional fitness revolution with HFSC & Smarty Gym
                     </p>
                   </div>
                 </div>
