@@ -43,7 +43,6 @@ import TakeTour from "./pages/TakeTour";
 import PersonalTraining from "./pages/PersonalTraining";
 import PaymentSuccess from "./pages/PaymentSuccess";
 import { AccessGate } from "./components/AccessGate";
-import { WorkoutMotivationPopup } from "./components/WorkoutMotivationPopup";
 import { WhatsAppButton } from "./components/WhatsAppButton";
 
 const queryClient = new QueryClient();
@@ -55,7 +54,6 @@ const App = () => (
         <Toaster />
         <Sonner />
         <BrowserRouter>
-          <WorkoutMotivationPopup />
           <WhatsAppButton />
           <ScrollToTop />
           <div className="flex flex-col min-h-screen">
