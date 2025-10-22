@@ -176,10 +176,10 @@ const PersonalTraining = () => {
             Get your customized and tailor-made program by the fitness expert and sports scientist, <strong>Haris Falas</strong>
           </p>
 
-          <Card className="mb-8">
-            <CardHeader>
-              <CardTitle>Elevate Your Performance</CardTitle>
-              <CardDescription>
+          <Card className="mb-8 bg-gradient-to-br from-primary/5 to-primary/10 border-primary/30">
+            <CardHeader className="text-center">
+              <CardTitle className="text-center">Elevate Your Performance</CardTitle>
+              <CardDescription className="text-center">
                 Improve your human and athlete's performance with a customized and tailor-made program crafted by expert Haris Falas. 
                 Each program is specifically designed to meet your unique goals, abilities, and lifestyle, ensuring optimal results 
                 through science-based training principles and personalized attention.
@@ -187,12 +187,12 @@ const PersonalTraining = () => {
             </CardHeader>
           </Card>
 
-          <Card>
+          <Card className="border-2 border-primary">
             <CardHeader>
               <CardTitle>Personal Training Questionnaire</CardTitle>
               <CardDescription>Please complete all fields to receive your personalized program</CardDescription>
             </CardHeader>
-            <CardContent className="space-y-6">
+            <CardContent className="space-y-6 [&_input]:border-primary [&_textarea]:border-primary [&_button[role=combobox]]:border-primary">
               {/* Basic Information */}
               <div className="space-y-4">
                 <h3 className="font-semibold text-lg">Basic Information</h3>
