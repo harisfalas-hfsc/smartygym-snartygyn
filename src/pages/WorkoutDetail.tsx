@@ -87,7 +87,7 @@ const WorkoutDetail = () => {
 
   const workoutData: { [key: string]: Workout[] } = {
     "strength": [
-      { id: "strength-003", name: "Core Builder", description: "Foundational bodyweight strength for major muscle groups", duration: "30 min", equipment: "bodyweight", level: "beginner", format: "reps & sets", imageUrl: coreBuilderImg, isFree: true },
+      { id: "strength-003", name: "Core Builder", description: "Foundational bodyweight strength for major muscle groups", duration: "30 min", equipment: "bodyweight", level: "beginner", format: "reps & sets", imageUrl: coreBuilderImg },
       { id: "strength-001", name: "Power Foundation", description: "Build your strength base with compound movements", duration: "45 min", equipment: "equipment", level: "intermediate", format: "reps & sets", imageUrl: powerFoundationImg },
       { id: "strength-002", name: "Iron Core", description: "Advanced strength targeting major muscle groups with raw power", duration: "60 min", equipment: "equipment", level: "advanced", format: "reps & sets", imageUrl: ironCoreImg },
       { id: "strength-004", name: "Starter Strength", description: "Gentle intro to resistance training with light weights", duration: "30 min", equipment: "equipment", level: "beginner", format: "reps & sets", imageUrl: starterStrengthImg },

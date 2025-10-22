@@ -57,8 +57,9 @@ const IndividualWorkout = () => {
   const navigate = useNavigate();
   const { type, id } = useParams();
 
-  // All workouts are free
-  const isFreeWorkout = true;
+  // Only specific workouts are free
+  const freeWorkouts = ['calorie-007']; // Burn Start
+  const isFreeWorkout = freeWorkouts.includes(id || '');
 
   // Helper function to format focus label
   const getFocusLabel = (type: string | undefined): string => {

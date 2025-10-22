@@ -85,7 +85,7 @@ const TrainingProgramFlow = () => {
         
         <h1 className="text-3xl sm:text-4xl font-bold text-center mb-2">Training Programs</h1>
         <p className="text-center text-muted-foreground mb-4">
-          Structured 6–8 week programs designed by Sports Scientist Haris Falas — progressions for strength, fat loss and mobility.
+          Structured 6–8 week programs designed by Sports Scientist <a href="/coach-profile" className="text-primary hover:underline font-medium">Haris Falas</a> — progressions for strength, fat loss and mobility.
         </p>
         
         {/* Info Ribbon */}
@@ -113,7 +113,7 @@ const TrainingProgramFlow = () => {
                   </div>
                   <div>
                     <p className="text-xs text-muted-foreground mb-2">
-                      Designed by Haris Falas — 6–8 week results-based training plan
+                      Designed by <a href="/coach-profile" className="text-primary hover:underline font-medium">Haris Falas</a> — 6–8 week results-based training plan
                     </p>
                     <h3 className="font-semibold text-lg mb-2">{program.title}</h3>
                     <p className="text-sm text-muted-foreground">{program.description}</p>

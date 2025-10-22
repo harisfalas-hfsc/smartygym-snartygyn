@@ -94,7 +94,7 @@ const WorkoutFlow = () => {
         
         <h1 className="text-3xl sm:text-4xl font-bold text-center mb-2">Workouts</h1>
         <p className="text-center text-muted-foreground mb-4">
-          Standalone workout sessions designed to challenge you, motivate you, and make you sweat — crafted by Sports Scientist Haris Falas.
+          Standalone workout sessions designed to challenge you, motivate you, and make you sweat — crafted by Sports Scientist <a href="/coach-profile" className="text-primary hover:underline font-medium">Haris Falas</a>.
         </p>
         
         {/* Info Ribbon */}
@@ -122,7 +122,7 @@ const WorkoutFlow = () => {
                   </div>
                   <div>
                     <p className="text-xs text-muted-foreground mb-2">
-                      Designed by Haris Falas — Results-based training plan
+                      Designed by <a href="/coach-profile" className="text-primary hover:underline font-medium">Haris Falas</a> — Results-based training plan
                     </p>
                     <h3 className="font-semibold text-lg mb-2">{workout.title}</h3>
                     <p className="text-sm text-muted-foreground">{workout.description}</p>

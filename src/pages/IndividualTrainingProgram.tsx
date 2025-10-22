@@ -12,7 +12,9 @@ const IndividualTrainingProgram = () => {
   const navigate = useNavigate();
   const { type, id } = useParams();
 
-  const isFreeProgram = true;
+  // Only specific programs are free
+  const freePrograms = ['cardio-001']; // Cardio Endurance Builder
+  const isFreeProgram = freePrograms.includes(id || '');
 
   // Helper function to format focus label
   const getFocusLabel = (type: string | undefined): string => {
