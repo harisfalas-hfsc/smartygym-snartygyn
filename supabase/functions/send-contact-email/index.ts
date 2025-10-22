@@ -15,6 +15,7 @@ interface ContactEmailRequest {
   subject: string;
   message: string;
   recipientEmail: string; // admin@smartygym.com or haris@smartygym.com
+  userStatus?: string; // "Guest", "Free User", "Gold Member", "Platinum Member"
 }
 
 const handler = async (req: Request): Promise<Response> => {
@@ -24,7 +25,7 @@ const handler = async (req: Request): Promise<Response> => {
   }
 
   try {
-    const { name, email, subject, message, recipientEmail }: ContactEmailRequest = await req.json();
+    const { name, email, subject, message, recipientEmail, userStatus }: ContactEmailRequest = await req.json();
 
     console.log(`Sending email from ${email} to ${recipientEmail}`);
 
@@ -41,6 +42,7 @@ const handler = async (req: Request): Promise<Response> => {
             <p style="margin: 5px 0;"><strong>From:</strong> ${name}</p>
             <p style="margin: 5px 0;"><strong>Email:</strong> ${email}</p>
             <p style="margin: 5px 0;"><strong>Subject:</strong> ${subject}</p>
+            ${userStatus ? `<p style="margin: 5px 0;"><strong>User Status:</strong> <span style="color: #d4af37; font-weight: bold;">${userStatus}</span></p>` : ''}
           </div>
           
           <div style="margin: 20px 0;">

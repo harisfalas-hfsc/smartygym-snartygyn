@@ -566,23 +566,24 @@ export const ArticleDetail = () => {
   return (
     <>
       <Helmet>
-        <title>{article.title} - Smarty Gym Blog</title>
+        <title>{article.title} - Fitness Tips by Haris Falas | Smarty Gym Cyprus</title>
         <meta name="description" content={article.excerpt} />
-        <meta name="keywords" content={`${article.category}, fitness, workout, training, health, ${article.title.toLowerCase()}`} />
+        <meta name="keywords" content={`Haris Falas, ${article.category}, fitness Cyprus, workout Cyprus, training Cyprus, health Cyprus, nutrition Cyprus, sports science Cyprus, ${article.title.toLowerCase()}, fitness expert Cyprus`} />
         
         {/* Open Graph tags */}
-        <meta property="og:title" content={article.title} />
+        <meta property="og:title" content={`${article.title} - by Haris Falas`} />
         <meta property="og:description" content={article.excerpt} />
         <meta property="og:type" content="article" />
         <meta property="og:url" content={window.location.href} />
         <meta property="og:image" content={article.image} />
-        <meta property="og:site_name" content="Smarty Gym" />
+        <meta property="og:site_name" content="Smarty Gym Cyprus" />
         <meta property="article:published_time" content={new Date(article.date).toISOString()} />
+        <meta property="article:author" content="Haris Falas" />
         <meta property="article:section" content={article.category} />
         
         {/* Twitter Card tags */}
         <meta name="twitter:card" content="summary_large_image" />
-        <meta name="twitter:title" content={article.title} />
+        <meta name="twitter:title" content={`${article.title} - Haris Falas`} />
         <meta name="twitter:description" content={article.excerpt} />
         <meta name="twitter:image" content={article.image} />
         
@@ -591,7 +592,15 @@ export const ArticleDetail = () => {
         
         {/* Structured Data */}
         <script type="application/ld+json">
-          {JSON.stringify(structuredData)}
+          {JSON.stringify({
+            ...structuredData,
+            author: {
+              "@type": "Person",
+              "name": "Haris Falas",
+              "jobTitle": "Sports Scientist & Strength and Conditioning Coach",
+              "url": "https://smartygym.com/coach-profile"
+            }
+          })}
         </script>
       </Helmet>
       

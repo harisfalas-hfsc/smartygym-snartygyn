@@ -95,21 +95,47 @@ const Blog = () => {
     <>
       <Helmet>
         <title>Fitness Blog - Expert Training & Nutrition Advice | Smarty Gym</title>
-        <meta name="description" content="Read expert articles on fitness, training, nutrition, and performance from certified strength coach Haris Falas. Science-based advice for functional fitness and strength training." />
-        <meta name="keywords" content="fitness blog, training advice, nutrition tips, strength training, functional fitness, performance optimization, convenient fitness, gym reimagined, smart fitness" />
+        <meta name="description" content="Expert fitness articles by Haris Falas, Cyprus-based sports scientist. Get training tips, nutrition advice, workout guides and fitness insights for Cyprus and international athletes." />
+        <meta name="keywords" content="Haris Falas, fitness blog Cyprus, training advice Cyprus, nutrition tips, strength training, functional fitness, Cyprus fitness expert, sports scientist Cyprus, workout tips Cyprus, fitness news Cyprus, gym Cyprus, smartygym Cyprus, online fitness Cyprus" />
         
-        <meta property="og:title" content="Fitness Blog - Expert Training & Nutrition Advice | Smarty Gym" />
-        <meta property="og:description" content="Read expert articles on fitness, training, nutrition, and performance from certified strength coach Haris Falas." />
+        <meta property="og:title" content="Fitness Blog - Expert Training & Nutrition Advice by Haris Falas | Smarty Gym" />
+        <meta property="og:description" content="Expert fitness articles by Cyprus sports scientist Haris Falas. Training tips, nutrition advice, and performance insights." />
         <meta property="og:type" content="website" />
         <meta property="og:url" content={window.location.href} />
         <meta property="og:image" content="https://images.unsplash.com/photo-1581009146145-b5ef050c2e1e?auto=format&fit=crop&q=80&w=1200" />
         
         <meta name="twitter:card" content="summary_large_image" />
-        <meta name="twitter:title" content="Fitness Blog - Expert Training & Nutrition Advice | Smarty Gym" />
-        <meta name="twitter:description" content="Read expert articles on fitness, training, nutrition, and performance from certified strength coach Haris Falas." />
+        <meta name="twitter:title" content="Fitness Blog by Haris Falas - Smarty Gym Cyprus" />
+        <meta name="twitter:description" content="Expert fitness articles by Cyprus sports scientist Haris Falas. Training tips, nutrition advice, and performance insights." />
         <meta name="twitter:image" content="https://images.unsplash.com/photo-1581009146145-b5ef050c2e1e?auto=format&fit=crop&q=80&w=1200" />
         
         <link rel="canonical" href={window.location.href} />
+        
+        {/* Structured Data for Blog */}
+        <script type="application/ld+json">
+          {JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "Blog",
+            "name": "Smarty Gym Fitness Blog",
+            "description": "Expert fitness and nutrition advice by Cyprus sports scientist Haris Falas",
+            "url": "https://smartygym.com/blog",
+            "author": {
+              "@type": "Person",
+              "name": "Haris Falas",
+              "jobTitle": "Sports Scientist & Strength and Conditioning Coach",
+              "address": {
+                "@type": "PostalAddress",
+                "addressCountry": "CY"
+              }
+            },
+            "inLanguage": "en",
+            "publisher": {
+              "@type": "Organization",
+              "name": "Smarty Gym",
+              "url": "https://smartygym.com"
+            }
+          })}
+        </script>
       </Helmet>
 
       <div className="min-h-screen bg-gradient-to-b from-background to-accent/20">

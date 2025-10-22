@@ -105,7 +105,8 @@ const Contact = () => {
       const { error } = await supabase.functions.invoke('send-contact-email', {
         body: {
           ...validatedData,
-          recipientEmail: 'admin@smartygym.com'
+          recipientEmail: 'admin@smartygym.com',
+          userStatus: !isAuthenticated ? 'Guest' : (hasSubscription ? 'Premium Member' : 'Free User')
         }
       });
 
@@ -175,7 +176,8 @@ const Contact = () => {
           email: formData.email,
           subject: validatedData.subject,
           message: validatedData.message,
-          recipientEmail: 'haris@smartygym.com'
+          recipientEmail: 'haris@smartygym.com',
+          userStatus: hasSubscription ? 'Premium Member' : 'Free User'
         }
       });
 
