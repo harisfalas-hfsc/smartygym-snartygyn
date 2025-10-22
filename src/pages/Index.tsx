@@ -169,21 +169,21 @@ const Index = () => {
         <PWAInstallPrompt />
         
         {/* Hero Section */}
-        <section className="relative py-12 px-4 border-b border-border bg-gradient-to-br from-background to-muted/30">
-          <div className="container mx-auto max-w-4xl text-center space-y-4">
-            <h1 className="text-3xl sm:text-4xl font-bold text-center mb-2">
+        <section className="relative py-8 sm:py-12 px-4 border-b border-border bg-gradient-to-br from-background to-muted/30">
+          <div className="container mx-auto max-w-4xl text-center space-y-3 sm:space-y-4">
+            <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-center mb-2">
               Smarty Gym
             </h1>
-            <p className="text-center text-muted-foreground mb-4">
+            <p className="text-sm sm:text-base text-center text-muted-foreground mb-3 sm:mb-4">
               Your Gym Reimagined, Anywhere, Anytime
             </p>
-            <div className="bg-primary/10 border border-primary/20 rounded-lg p-4 mb-4 text-center">
-              <p className="text-sm text-muted-foreground leading-relaxed">
+            <div className="bg-primary/10 border border-primary/20 rounded-lg p-3 sm:p-4 mb-3 sm:mb-4 text-center">
+              <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed">
                 Train smarter with science-based workouts designed by <strong>Haris Falas</strong>, Sports Scientist & Strength and Conditioning Coach. 
                 Free workouts available, no login required.
               </p>
             </div>
-            <div className="flex flex-col sm:flex-row gap-3 justify-center items-center pt-2">
+            <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 justify-center items-center pt-2">
               <Button size="lg" onClick={() => navigate("/workout")} aria-label="Start free workout with Smarty Gym">
                 Start Free Workout
               </Button>

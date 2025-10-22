@@ -168,18 +168,18 @@ const PersonalTraining = () => {
         <meta name="description" content="Get your customized and tailor-made program by fitness expert and sports scientist Haris Falas" />
       </Helmet>
 
-      <div className="min-h-screen bg-background py-12 px-4">
+      <div className="min-h-screen bg-background py-6 sm:py-12 px-4">
         <div className="container mx-auto max-w-4xl">
-          <h1 className="text-4xl font-bold text-center mb-4">Personal Training</h1>
+          <h1 className="text-3xl sm:text-4xl font-bold text-center mb-3 sm:mb-4">Personal Training</h1>
           
-          <p className="text-center text-muted-foreground mb-8">
+          <p className="text-center text-sm sm:text-base text-muted-foreground mb-6 sm:mb-8 px-2">
             Get your customized and tailor-made program by the fitness expert and sports scientist, <strong>Haris Falas</strong>
           </p>
 
-          <Card className="mb-8 bg-gradient-to-br from-primary/5 to-primary/10 border-primary/30">
-            <CardHeader className="text-center">
-              <CardTitle className="text-center">Elevate Your Performance</CardTitle>
-              <CardDescription className="text-center">
+          <Card className="mb-6 sm:mb-8 bg-gradient-to-br from-primary/5 to-primary/10 border-primary/30">
+            <CardHeader className="text-center p-4 sm:p-6">
+              <CardTitle className="text-center text-xl sm:text-2xl mb-2">Elevate Your Performance</CardTitle>
+              <CardDescription className="text-center text-sm sm:text-base leading-relaxed">
                 Improve your human and athlete's performance with a customized and tailor-made program crafted by expert Haris Falas. 
                 Each program is specifically designed to meet your unique goals, abilities, and lifestyle, ensuring optimal results 
                 through science-based training principles and personalized attention.
@@ -188,14 +188,14 @@ const PersonalTraining = () => {
           </Card>
 
           <Card className="border-2 border-primary">
-            <CardHeader>
-              <CardTitle>Personal Training Questionnaire</CardTitle>
-              <CardDescription>Please complete all fields to receive your personalized program</CardDescription>
+            <CardHeader className="p-4 sm:p-6">
+              <CardTitle className="text-xl sm:text-2xl">Personal Training Questionnaire</CardTitle>
+              <CardDescription className="text-sm sm:text-base">Please complete all fields to receive your personalized program</CardDescription>
             </CardHeader>
-            <CardContent className="space-y-6 [&_input]:border-primary [&_textarea]:border-primary [&_button[role=combobox]]:border-primary">
+            <CardContent className="space-y-4 sm:space-y-6 p-4 sm:p-6 [&_input]:border-primary [&_textarea]:border-primary [&_button[role=combobox]]:border-primary">
               {/* Basic Information */}
-              <div className="space-y-4">
-                <h3 className="font-semibold text-lg">Basic Information</h3>
+              <div className="space-y-3 sm:space-y-4">
+                <h3 className="font-semibold text-base sm:text-lg">Basic Information</h3>
                 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
@@ -254,8 +254,8 @@ const PersonalTraining = () => {
               </div>
 
               {/* Performance Type */}
-              <div className="space-y-4">
-                <h3 className="font-semibold text-lg">Your Goals</h3>
+              <div className="space-y-3 sm:space-y-4">
+                <h3 className="font-semibold text-base sm:text-lg">Your Goals</h3>
                 
                 <div>
                   <Label htmlFor="performanceType">Performance Type *</Label>
@@ -303,8 +303,8 @@ const PersonalTraining = () => {
               </div>
 
               {/* Program Details */}
-              <div className="space-y-4">
-                <h3 className="font-semibold text-lg">Program Details</h3>
+              <div className="space-y-3 sm:space-y-4">
+                <h3 className="font-semibold text-base sm:text-lg">Program Details</h3>
                 
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                   <div>
@@ -353,9 +353,9 @@ const PersonalTraining = () => {
               </div>
 
               {/* Equipment */}
-              <div className="space-y-4">
-                <h3 className="font-semibold text-lg">Available Equipment</h3>
-                <p className="text-sm text-muted-foreground">Select all that apply</p>
+              <div className="space-y-3 sm:space-y-4">
+                <h3 className="font-semibold text-base sm:text-lg">Available Equipment</h3>
+                <p className="text-xs sm:text-sm text-muted-foreground">Select all that apply</p>
                 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                   {equipmentOptions.map((equipment) => (
@@ -384,9 +384,9 @@ const PersonalTraining = () => {
               </div>
 
               {/* Limitations */}
-              <div className="space-y-4">
-                <h3 className="font-semibold text-lg">Limitations and Safety</h3>
-                <p className="text-sm text-muted-foreground">
+              <div className="space-y-3 sm:space-y-4">
+                <h3 className="font-semibold text-base sm:text-lg">Limitations and Safety</h3>
+                <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed">
                   Please describe any previous injuries, limitations, pain areas, or movements to avoid. 
                   This information helps us create a safe and effective program tailored to your needs.
                 </p>
@@ -400,8 +400,8 @@ const PersonalTraining = () => {
               </div>
 
               {/* PAR-Q Questionnaire */}
-              <div className="space-y-4">
-                <h3 className="font-semibold text-lg">Part 2: PAR-Q+ Health Assessment</h3>
+              <div className="space-y-3 sm:space-y-4">
+                <h3 className="font-semibold text-base sm:text-lg">Part 2: PAR-Q+ Health Assessment</h3>
                 <Button 
                   variant="outline" 
                   onClick={() => setShowParQ(!showParQ)}
