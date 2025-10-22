@@ -131,7 +131,7 @@ const PersonalTraining = () => {
         window.open(checkoutData.url, '_blank');
         toast({
           title: "Request Sent!",
-          description: "Your personal training request has been sent to Haris Falas, BSc Sports Science, EXOS Specialist, CSCS. Complete the payment to finalize your booking.",
+          description: "Your personal training request has been sent to Haris Falas. Complete the payment to finalize your booking.",
         });
       }
     } catch (error) {
@@ -165,7 +165,7 @@ const PersonalTraining = () => {
     <>
       <Helmet>
         <title>Personal Training - Smarty Gym</title>
-        <meta name="description" content="Get your customized and tailor-made program by fitness expert and sports scientist Haris Falas, BSc Sports Science, EXOS Specialist, CSCS" />
+        <meta name="description" content="Get your customized and tailor-made program by fitness expert and sports scientist Haris Falas" />
       </Helmet>
 
       <div className="min-h-screen bg-background py-6 sm:py-12 px-4">
@@ -173,14 +173,14 @@ const PersonalTraining = () => {
           <h1 className="text-3xl sm:text-4xl font-bold text-center mb-3 sm:mb-4">Personal Training</h1>
           
           <p className="text-center text-sm sm:text-base text-muted-foreground mb-6 sm:mb-8 px-2">
-            Get your customized and tailor-made program by the fitness expert and sports scientist, <a href="/coach-profile" className="text-primary hover:underline font-medium"><strong>Haris Falas, BSc Sports Science, EXOS Specialist, CSCS</strong></a>
+            Get your customized and tailor-made program by the fitness expert and sports scientist, <a href="/coach-profile" className="text-primary hover:underline font-medium"><strong>Haris Falas</strong></a>
           </p>
 
           <Card className="mb-6 sm:mb-8 bg-gradient-to-br from-primary/5 to-primary/10 border-primary/30">
             <CardHeader className="text-center p-4 sm:p-6">
               <CardTitle className="text-center text-xl sm:text-2xl mb-2">Elevate Your Performance</CardTitle>
               <CardDescription className="text-center text-sm sm:text-base leading-relaxed">
-                Improve your human and athlete's performance with a customized and tailor-made program crafted by expert <a href="/coach-profile" className="text-primary hover:underline font-medium">Haris Falas, BSc Sports Science, EXOS Specialist, CSCS</a>. 
+                Improve your human and athlete's performance with a customized and tailor-made program crafted by expert <a href="/coach-profile" className="text-primary hover:underline font-medium">Haris Falas</a>. 
                 Each program is specifically designed to meet your unique goals, abilities, and lifestyle, ensuring optimal results 
                 through science-based training principles and personalized attention.
               </CardDescription>

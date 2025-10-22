@@ -78,7 +78,7 @@ const About = () => {
           {/* Info Ribbon */}
           <div className="bg-primary/10 border border-primary/20 rounded-lg p-4 mb-8 text-center max-w-3xl mx-auto">
             <p className="text-sm text-muted-foreground">
-              Founded by <a href="/coach-profile" className="text-primary hover:underline font-medium">Haris Falas, BSc Sports Science, EXOS Specialist, CSCS</a> — Sports Scientist & Strength and Conditioning Coach | Cyprus Fitness Expert
+              Founded by <a href="/coach-profile" className="text-primary hover:underline font-medium">Haris Falas</a> — Sports Scientist & Strength and Conditioning Coach | Cyprus Fitness Expert
             </p>
           </div>
         </header>
@@ -109,11 +109,11 @@ const About = () => {
                   Smarty Gym workouts and programs are built to fit YOUR life.
                 </p>
                 <p className="text-base leading-relaxed text-muted-foreground">
-                  That's why they work — safe and efficient design by <a href="/coach-profile" className="text-primary hover:underline font-medium"><strong>Haris Falas, BSc Sports Science, EXOS Specialist, CSCS</strong></a>, crafted by hand with care to deliver effective results at <strong>smartygym.com</strong>, <strong className="text-foreground">NOT by AI</strong>.
+                  That's why they work — safe and efficient design by <a href="/coach-profile" className="text-primary hover:underline font-medium"><strong>Haris Falas</strong></a>, crafted by hand with care to deliver effective results at <strong>smartygym.com</strong>, <strong className="text-foreground">NOT by AI</strong>.
                 </p>
                 <div className="bg-background/80 backdrop-blur-sm p-6 rounded-lg border-2 border-primary/30 mt-6">
                   <p className="text-lg font-bold text-primary mb-2">
-                    Every program is evidence-based and personally created by <a href="/coach-profile" className="text-primary hover:underline font-medium">Haris Falas, BSc Sports Science, EXOS Specialist, CSCS</a> in Cyprus.
+                    Every program is evidence-based and personally created by <a href="/coach-profile" className="text-primary hover:underline font-medium">Haris Falas</a> in Cyprus.
                   </p>
                   <p className="text-base text-muted-foreground">
                     Never by AI. Never by algorithms. Always by a real human expert who understands YOUR needs. <strong>Cyprus online fitness</strong> excellence since day one.
@@ -328,7 +328,7 @@ const About = () => {
             <CardContent className="space-y-4 relative">
               <div className="bg-background/80 backdrop-blur-sm p-4 rounded-lg border border-primary/20">
                 <p className="text-lg font-bold mb-1">
-                  <a href="/coach-profile" className="text-primary hover:underline">Haris Falas, BSc Sports Science, EXOS Specialist, CSCS</a>
+                  <a href="/coach-profile" className="text-primary hover:underline">Haris Falas</a>
                 </p>
                 <p className="text-sm text-muted-foreground">Sports Scientist & Strength & Conditioning Coach</p>
               </div>
@@ -359,7 +359,7 @@ const About = () => {
               <div className="flex items-center gap-3 pt-4">
                 <div className="h-px flex-grow bg-border"></div>
                 <p className="font-bold text-primary">
-                  <a href="/coach-profile" className="hover:underline">Haris Falas, BSc Sports Science, EXOS Specialist, CSCS</a>
+                  <a href="/coach-profile" className="hover:underline">Haris Falas</a>
                 </p>
                 <div className="h-px flex-grow bg-border"></div>
               </div>
@@ -395,7 +395,7 @@ const About = () => {
                 <AccordionItem value="item-3">
                   <AccordionTrigger>What makes Smarty Gym different?</AccordionTrigger>
                   <AccordionContent>
-                    <strong>We're 100% human, 0% AI.</strong> Every workout is personally designed by <a href="/coach-profile" className="text-primary hover:underline font-medium">Haris Falas, BSc Sports Science, EXOS Specialist, CSCS</a>, 
+                    <strong>We're 100% human, 0% AI.</strong> Every workout is personally designed by <a href="/coach-profile" className="text-primary hover:underline font-medium">Haris Falas</a>, 
                     a qualified Sports Scientist and S&C Coach — never by algorithms or AI. You get real expertise, 
                     real support, and direct access to the person who created your program. We focus on sustainable progress, 
                     not quick fixes or unrealistic promises.
@@ -438,7 +438,7 @@ const About = () => {
                 <AccordionItem value="item-8">
                   <AccordionTrigger>Who created Smarty Gym?</AccordionTrigger>
                   <AccordionContent>
-                    Smarty Gym was founded by <a href="/coach-profile" className="text-primary hover:underline font-medium">Haris Falas, BSc Sports Science, EXOS Specialist, CSCS</a>, a certified Sports Scientist and Strength & Conditioning Coach. 
+                    Smarty Gym was founded by <a href="/coach-profile" className="text-primary hover:underline font-medium">Haris Falas</a>, a certified Sports Scientist and Strength & Conditioning Coach. 
                     <strong>Every single program is personally designed by Haris himself — never by AI.</strong> All programs 
                     are created using evidence-based training principles and years of hands-on coaching experience. You know 
                     exactly who's behind your training, and you can reach out to him directly anytime.

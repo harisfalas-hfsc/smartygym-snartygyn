@@ -176,7 +176,7 @@ const Index = () => {
             </p>
             <div className="bg-primary/10 border border-primary/20 rounded-lg p-3 sm:p-4 mb-3 sm:mb-4 text-center">
               <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed">
-            Train smarter with science-based workouts designed by <a href="/coach-profile" className="text-primary hover:underline font-medium"><strong>Haris Falas, BSc Sports Science, EXOS Specialist, CSCS</strong></a>, Sports Scientist & Strength and Conditioning Coach. 
+            Train smarter with science-based workouts designed by <a href="/coach-profile" className="text-primary hover:underline font-medium"><strong>Haris Falas</strong></a>, Sports Scientist & Strength and Conditioning Coach. 
             Free workouts available, no login required.
               </p>
             </div>
