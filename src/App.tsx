@@ -41,6 +41,7 @@ import JoinPremium from "./pages/JoinPremium";
 import PremiumBenefits from "./pages/PremiumBenefits";
 import TakeTour from "./pages/TakeTour";
 import { AccessGate } from "./components/AccessGate";
+import { WorkoutMotivationPopup } from "./components/WorkoutMotivationPopup";
 
 const queryClient = new QueryClient();
 
@@ -50,6 +51,7 @@ const App = () => (
       <TooltipProvider>
         <Toaster />
         <Sonner />
+        <WorkoutMotivationPopup />
         <BrowserRouter>
           <ScrollToTop />
           <div className="flex flex-col min-h-screen">
