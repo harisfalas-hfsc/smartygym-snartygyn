@@ -40,6 +40,8 @@ import NotFound from "./pages/NotFound";
 import JoinPremium from "./pages/JoinPremium";
 import PremiumBenefits from "./pages/PremiumBenefits";
 import TakeTour from "./pages/TakeTour";
+import PersonalTraining from "./pages/PersonalTraining";
+import PaymentSuccess from "./pages/PaymentSuccess";
 import { AccessGate } from "./components/AccessGate";
 import { WorkoutMotivationPopup } from "./components/WorkoutMotivationPopup";
 
@@ -77,12 +79,8 @@ const App = () => (
                 <Route path="/trainingprogram/:type/:id" element={<IndividualTrainingProgram />} />
                 <Route path="/dietplan" element={<DietPlanFlow />} />
                 
-                {/* Exercise library and community - require authentication */}
-                <Route path="/exerciselibrary" element={
-                  <AccessGate requireAuth={true} contentType="feature">
-                    <ExerciseLibrary />
-                  </AccessGate>
-                } />
+                {/* Exercise library public, community requires authentication */}
+                <Route path="/exerciselibrary" element={<ExerciseLibrary />} />
                 <Route path="/community" element={
                   <AccessGate requireAuth={true} contentType="feature">
                     <Community />
@@ -101,6 +99,8 @@ const App = () => (
                 <Route path="/about" element={<About />} />
                 <Route path="/takeatour" element={<TakeTour />} />
                 <Route path="/contact" element={<Contact />} />
+                <Route path="/personal-training" element={<PersonalTraining />} />
+                <Route path="/payment-success" element={<PaymentSuccess />} />
                 <Route path="/privacypolicy" element={<PrivacyPolicy />} />
                 <Route path="/termsofservice" element={<TermsOfService />} />
                 <Route path="/disclaimer" element={<Disclaimer />} />

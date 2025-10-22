@@ -139,6 +139,7 @@ export const Navigation = () => {
             <Button variant="ghost" size="sm" onClick={() => navigate("/about")}>About</Button>
             <Button variant="ghost" size="sm" onClick={() => navigate("/workout")}>Workouts</Button>
             <Button variant="ghost" size="sm" onClick={() => navigate("/trainingprogram")}>Programs</Button>
+            <Button variant="ghost" size="sm" onClick={() => navigate("/personal-training")}>Personal Training</Button>
             <Button variant="ghost" size="sm" onClick={() => navigate("/tools")}>Tools</Button>
             <Button variant="ghost" size="sm" onClick={() => navigate("/exerciselibrary")}>Exercise Library</Button>
             <Button variant="ghost" size="sm" onClick={() => navigate("/blog")}>Blog</Button>
@@ -163,6 +164,9 @@ export const Navigation = () => {
                 </Button>
                 <Button variant="ghost" size="lg" onClick={() => handleNavigate("/trainingprogram")} className="justify-start">
                   Programs
+                </Button>
+                <Button variant="ghost" size="lg" onClick={() => handleNavigate("/personal-training")} className="justify-start">
+                  Personal Training
                 </Button>
                 <Button variant="ghost" size="lg" onClick={() => handleNavigate("/tools")} className="justify-start">
                   Tools

@@ -239,6 +239,14 @@ const Index = () => {
                   Get Started
                 </Button>
               </div>
+              <div className="bg-gradient-to-br from-primary/5 to-primary/10 border-2 border-primary/30 rounded-lg p-4 sm:p-6 flex-1 w-full sm:max-w-xs">
+                <div className="text-primary font-bold text-base sm:text-xl mb-1 sm:mb-2">PERSONAL TRAINING</div>
+                <div className="text-xl sm:text-3xl font-bold mb-1 sm:mb-2">€119</div>
+                <div className="text-xs sm:text-sm text-muted-foreground mb-3 sm:mb-4">one-time payment</div>
+                <Button variant="default" className="w-full text-sm sm:text-base" onClick={() => navigate('/personal-training')}>
+                  Get Started
+                </Button>
+              </div>
             </div>
           </div>
 
