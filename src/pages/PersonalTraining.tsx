@@ -18,6 +18,7 @@ const PersonalTraining = () => {
   const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
   const [user, setUser] = useState<any>(null);
+  const [userStatus, setUserStatus] = useState<string>("Guest");
   
   // Form state
   const [formData, setFormData] = useState({
@@ -46,6 +47,19 @@ const PersonalTraining = () => {
     const { data: { user } } = await supabase.auth.getUser();
     if (user) {
       setUser(user);
+      
+      // Check subscription status
+      try {
+        const { data: subscriptionData } = await supabase.functions.invoke('check-subscription');
+        if (subscriptionData?.subscribed) {
+          setUserStatus("Premium Member");
+        } else {
+          setUserStatus("Free User");
+        }
+      } catch (error) {
+        console.error('Error checking subscription:', error);
+        setUserStatus("Free User");
+      }
       
       // Load profile data
       const { data: profile } = await supabase
@@ -115,7 +129,7 @@ const PersonalTraining = () => {
     try {
       // Send email with questionnaire details
       const { error: emailError } = await supabase.functions.invoke('send-personal-training-request', {
-        body: { ...formData }
+        body: { ...formData, userStatus }
       });
 
       if (emailError) throw emailError;

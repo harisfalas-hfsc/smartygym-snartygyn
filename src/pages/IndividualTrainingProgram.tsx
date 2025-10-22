@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { ArrowLeft } from "lucide-react";
 import { WorkoutDisplay } from "@/components/WorkoutDisplay";
+import { AccessGate } from "@/components/AccessGate";
 import cardioEnduranceImg from "@/assets/cardio-endurance-program.jpg";
 import functionalStrengthImg from "@/assets/functional-strength-program.jpg";
 import muscleHypertrophyImg from "@/assets/muscle-hypertrophy-program.jpg";
@@ -721,20 +722,21 @@ Rest: 60–90 sec between sets`,
         </script>
       </Helmet>
 
-      <div className="min-h-screen bg-background">
-        <div className="container mx-auto max-w-4xl px-4 py-8">
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => navigate(`/trainingprogram/${type}`)}
-            className="mb-6"
-          >
-            <ArrowLeft className="mr-2 h-4 w-4" />
-            <span className="text-xs sm:text-sm">Back</span>
-          </Button>
+      <AccessGate requireAuth={!isFreeProgram} requirePremium={!isFreeProgram} contentType="program">
+        <div className="min-h-screen bg-background">
+          <div className="container mx-auto max-w-4xl px-4 py-8">
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => navigate(`/trainingprogram/${type}`)}
+              className="mb-6"
+            >
+              <ArrowLeft className="mr-2 h-4 w-4" />
+              <span className="text-xs sm:text-sm">Back</span>
+            </Button>
 
-          {/* Use WorkoutDisplay component with all functionality */}
-          <WorkoutDisplay
+            {/* Use WorkoutDisplay component with all functionality */}
+            <WorkoutDisplay
             exercises={[
               { name: "Exercise Demo", video_id: "dQw4w9WgXcQ", video_url: "https://www.youtube.com/watch?v=dQw4w9WgXcQ" }
             ]}
@@ -767,6 +769,7 @@ Rest: 60–90 sec between sets`,
           />
         </div>
       </div>
+      </AccessGate>
     </>
   );
 };

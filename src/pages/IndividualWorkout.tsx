@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { ArrowLeft, Clock, Dumbbell, TrendingUp } from "lucide-react";
 import { WorkoutDisplay } from "@/components/WorkoutDisplay";
+import { AccessGate } from "@/components/AccessGate";
 import burnStartImg from "@/assets/burn-start-workout.jpg";
 import sweatCircuitImg from "@/assets/sweat-circuit-workout.jpg";
 import bodyBurnoutImg from "@/assets/body-burnout-workout.jpg";
@@ -3033,7 +3034,8 @@ Finisher: 3 rounds`,
         </script>
       </Helmet>
 
-      <div className="min-h-screen bg-background">
+      <AccessGate requireAuth={!isFreeWorkout} requirePremium={!isFreeWorkout} contentType="workout">
+        <div className="min-h-screen bg-background">
           <div className="container mx-auto max-w-4xl px-4 py-8">
             <Button
               variant="ghost"
@@ -3067,6 +3069,7 @@ Finisher: 3 rounds`,
             />
           </div>
         </div>
+      </AccessGate>
     </>
   );
 };
