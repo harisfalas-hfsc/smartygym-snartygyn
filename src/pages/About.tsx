@@ -76,10 +76,22 @@ const About = () => {
           </p>
           
           {/* Info Ribbon */}
-          <div className="bg-primary/10 border border-primary/20 rounded-lg p-4 mb-8 text-center max-w-3xl mx-auto">
+          <div className="bg-primary/10 border border-primary/20 rounded-lg p-4 mb-6 text-center max-w-3xl mx-auto">
             <p className="text-sm text-muted-foreground">
               Founded by <a href="/coach-profile" className="text-primary hover:underline font-medium">Haris Falas</a> — Sports Scientist & Strength and Conditioning Coach | Cyprus Fitness Expert
             </p>
+          </div>
+          
+          {/* Take A Tour Button */}
+          <div className="flex justify-center mb-8">
+            <Button 
+              variant="default" 
+              size="lg"
+              onClick={() => navigate("/takeatour")}
+              className="shadow-lg hover:shadow-xl transition-all"
+            >
+              Take A Tour
+            </Button>
           </div>
         </header>
 
