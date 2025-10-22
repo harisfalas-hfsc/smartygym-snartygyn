@@ -22,6 +22,7 @@ interface PersonalTrainingRequest {
   equipment: string[];
   otherEquipment: string;
   limitations: string;
+  userStatus?: string; // "Guest", "Free User", "Gold Member", "Platinum Member"
 }
 
 const handler = async (req: Request): Promise<Response> => {
@@ -33,34 +34,48 @@ const handler = async (req: Request): Promise<Response> => {
     const requestData: PersonalTrainingRequest = await req.json();
 
     const emailHtml = `
-      <h1>New Personal Training Request</h1>
-      <h2>Client Information</h2>
-      <p><strong>Name:</strong> ${requestData.name}</p>
-      <p><strong>Email:</strong> ${requestData.email}</p>
-      <p><strong>Age:</strong> ${requestData.age}</p>
-      <p><strong>Weight:</strong> ${requestData.weight} kg</p>
-      <p><strong>Height:</strong> ${requestData.height} cm</p>
+      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+        <h1 style="color: #333; border-bottom: 2px solid #d4af37; padding-bottom: 10px;">New Personal Training Request</h1>
+        
+        <div style="background-color: #f5f5f5; padding: 15px; border-radius: 5px; margin: 20px 0;">
+          <h2 style="color: #333; font-size: 18px; margin-top: 0;">Client Information</h2>
+          <p style="margin: 5px 0;"><strong>Name:</strong> ${requestData.name}</p>
+          <p style="margin: 5px 0;"><strong>Email:</strong> ${requestData.email}</p>
+          ${requestData.userStatus ? `<p style="margin: 5px 0;"><strong>User Status:</strong> <span style="color: #d4af37; font-weight: bold;">${requestData.userStatus}</span></p>` : ''}
+          <p style="margin: 5px 0;"><strong>Age:</strong> ${requestData.age}</p>
+          <p style="margin: 5px 0;"><strong>Weight:</strong> ${requestData.weight} kg</p>
+          <p style="margin: 5px 0;"><strong>Height:</strong> ${requestData.height} cm</p>
+        </div>
       
-      <h2>Training Goals</h2>
-      <p><strong>Performance Type:</strong> ${requestData.performanceType === 'human' ? 'Human Performance' : 'Athlete Performance'}</p>
-      <p><strong>Specific Goal:</strong> ${requestData.specificGoal}</p>
+      <div style="background-color: #f5f5f5; padding: 15px; border-radius: 5px; margin: 20px 0;">
+        <h2 style="color: #333; font-size: 18px; margin-top: 0;">Training Goals</h2>
+        <p style="margin: 5px 0;"><strong>Performance Type:</strong> ${requestData.performanceType === 'human' ? 'Human Performance' : 'Athlete Performance'}</p>
+        <p style="margin: 5px 0;"><strong>Specific Goal:</strong> ${requestData.specificGoal}</p>
+      </div>
       
-      <h2>Program Details</h2>
-      <p><strong>Duration:</strong> ${requestData.duration}</p>
-      <p><strong>Training Days per Week:</strong> ${requestData.trainingDays}</p>
-      <p><strong>Workout Duration:</strong> ${requestData.workoutDuration} minutes</p>
+      <div style="background-color: #f5f5f5; padding: 15px; border-radius: 5px; margin: 20px 0;">
+        <h2 style="color: #333; font-size: 18px; margin-top: 0;">Program Details</h2>
+        <p style="margin: 5px 0;"><strong>Duration:</strong> ${requestData.duration}</p>
+        <p style="margin: 5px 0;"><strong>Training Days per Week:</strong> ${requestData.trainingDays}</p>
+        <p style="margin: 5px 0;"><strong>Workout Duration:</strong> ${requestData.workoutDuration} minutes</p>
+      </div>
       
-      <h2>Available Equipment</h2>
-      <ul>
-        ${requestData.equipment.map(eq => `<li>${eq}</li>`).join('')}
-      </ul>
-      ${requestData.otherEquipment ? `<p><strong>Other Equipment:</strong> ${requestData.otherEquipment}</p>` : ''}
+      <div style="background-color: #f5f5f5; padding: 15px; border-radius: 5px; margin: 20px 0;">
+        <h2 style="color: #333; font-size: 18px; margin-top: 0;">Available Equipment</h2>
+        <ul style="margin: 10px 0; padding-left: 20px;">
+          ${requestData.equipment.map(eq => `<li style="margin: 5px 0;">${eq}</li>`).join('')}
+        </ul>
+        ${requestData.otherEquipment ? `<p style="margin: 5px 0;"><strong>Other Equipment:</strong> ${requestData.otherEquipment}</p>` : ''}
+      </div>
       
-      <h2>Limitations and Safety Considerations</h2>
-      <p>${requestData.limitations || 'None specified'}</p>
+      <div style="background-color: #f5f5f5; padding: 15px; border-radius: 5px; margin: 20px 0;">
+        <h2 style="color: #333; font-size: 18px; margin-top: 0;">Limitations and Safety Considerations</h2>
+        <p style="margin: 5px 0;">${requestData.limitations || 'None specified'}</p>
+      </div>
       
-      <hr />
-      <p><small>This request was submitted through the Smarty Gym Personal Training form.</small></p>
+      <hr style="border: none; border-top: 1px solid #ddd; margin: 30px 0;" />
+      <p style="text-align: center; color: #666; font-size: 12px;">This request was submitted through the Smarty Gym Personal Training form at smartygym.com</p>
+    </div>
     `;
 
     const emailResponse = await resend.emails.send({
