@@ -3,7 +3,8 @@ import { useNavigate } from "react-router-dom";
 import { Helmet } from "react-helmet";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { ArrowLeft, Play, Pause, Square, Heart } from "lucide-react";
+import { Dialog, DialogContent } from "@/components/ui/dialog";
+import { ArrowLeft, Play, Heart } from "lucide-react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
@@ -28,6 +29,7 @@ const ExerciseLibrary = () => {
   const [muscleGroupFilter, setMuscleGroupFilter] = useState<string>("all");
   const [letterFilter, setLetterFilter] = useState<string>("all");
   const [currentVideoId, setCurrentVideoId] = useState<string>("");
+  const [isVideoDialogOpen, setIsVideoDialogOpen] = useState(false);
   const [user, setUser] = useState<User | null>(null);
   const [favoriteExercises, setFavoriteExercises] = useState<string[]>([]);
 
@@ -242,14 +244,11 @@ const ExerciseLibrary = () => {
 
   const handlePlay = (videoId: string) => {
     setCurrentVideoId(videoId);
+    setIsVideoDialogOpen(true);
   };
 
-  const handlePause = () => {
-    // Pause functionality would be implemented with YouTube API
-    console.log("Pause video");
-  };
-
-  const handleStop = () => {
+  const handleCloseDialog = () => {
+    setIsVideoDialogOpen(false);
     setCurrentVideoId("");
   };
 
@@ -414,31 +413,6 @@ const ExerciseLibrary = () => {
           </CardContent>
         </Card>
 
-        {/* Video Player */}
-        <Card className="mb-6">
-          <CardContent className="p-4">
-            <div className="aspect-video bg-muted rounded-lg overflow-hidden flex items-center justify-center">
-              {currentVideoId ? (
-                <iframe
-                  width="100%"
-                  height="100%"
-                  src={`https://www.youtube.com/embed/${currentVideoId}`}
-                  title="Exercise demonstration"
-                  frameBorder="0"
-                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                  allowFullScreen
-                  className="w-full h-full"
-                />
-              ) : (
-                <div className="text-center text-muted-foreground">
-                  <Play className="w-16 h-16 mx-auto mb-2 opacity-50" />
-                  <p className="text-sm">Select an exercise to view demonstration</p>
-                </div>
-              )}
-            </div>
-          </CardContent>
-        </Card>
-
         {/* Exercise List */}
         <Card>
           <CardContent className="p-4">
@@ -482,24 +456,6 @@ const ExerciseLibrary = () => {
                     >
                       <Play className="h-4 w-4" />
                     </Button>
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      onClick={handlePause}
-                      className="h-8 w-8 p-0"
-                      title="Pause"
-                    >
-                      <Pause className="h-4 w-4" />
-                    </Button>
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      onClick={handleStop}
-                      className="h-8 w-8 p-0"
-                      title="Stop"
-                    >
-                      <Square className="h-4 w-4" />
-                    </Button>
                   </div>
                 </div>
               ))}
@@ -507,6 +463,26 @@ const ExerciseLibrary = () => {
           </CardContent>
         </Card>
       </div>
+
+      {/* Video Dialog Popup */}
+      <Dialog open={isVideoDialogOpen} onOpenChange={handleCloseDialog}>
+        <DialogContent className="max-w-md w-full p-0 overflow-hidden">
+          <div className="aspect-video bg-muted">
+            {currentVideoId && (
+              <iframe
+                width="100%"
+                height="100%"
+                src={`https://www.youtube.com/embed/${currentVideoId}?autoplay=1`}
+                title="Exercise demonstration"
+                frameBorder="0"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allowFullScreen
+                className="w-full h-full"
+              />
+            )}
+          </div>
+        </DialogContent>
+      </Dialog>
       </div>
     </>
   );
