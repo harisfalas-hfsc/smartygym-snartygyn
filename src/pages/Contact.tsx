@@ -1,16 +1,17 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Helmet } from "react-helmet";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
-import { ArrowLeft, Mail, MessageSquare, Send, MapPin, Phone } from "lucide-react";
+import { ArrowLeft, Mail, MessageSquare, Send, MapPin, Phone, Lock } from "lucide-react";
 import { BackToTop } from "@/components/BackToTop";
 import { useToast } from "@/hooks/use-toast";
 import { z } from "zod";
 import { useShowBackButton } from "@/hooks/useShowBackButton";
 import { useNavigate } from "react-router-dom";
+import { supabase } from "@/integrations/supabase/client";
 
 const contactSchema = z.object({
   name: z.string().trim().min(1, { message: "Name is required" }).max(100, { message: "Name must be less than 100 characters" }),
@@ -29,8 +30,69 @@ const Contact = () => {
     subject: "",
     message: ""
   });
+  const [coachFormData, setCoachFormData] = useState({
+    subject: "",
+    message: ""
+  });
   const [errors, setErrors] = useState<Record<string, string>>({});
+  const [coachErrors, setCoachErrors] = useState<Record<string, string>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isCoachSubmitting, setIsCoachSubmitting] = useState(false);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [hasSubscription, setHasSubscription] = useState(false);
+  const [userProfile, setUserProfile] = useState<{ full_name: string; } | null>(null);
+
+  // Check authentication and subscription status
+  useEffect(() => {
+    const checkAuthAndSubscription = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      
+      if (session?.user) {
+        setIsAuthenticated(true);
+        
+        // Get user profile
+        const { data: profile } = await supabase
+          .from('profiles')
+          .select('full_name')
+          .eq('user_id', session.user.id)
+          .single();
+        
+        if (profile) {
+          setUserProfile(profile);
+          // Auto-fill form data
+          setFormData(prev => ({
+            ...prev,
+            name: profile.full_name || "",
+            email: session.user.email || ""
+          }));
+        } else {
+          setFormData(prev => ({
+            ...prev,
+            email: session.user.email || ""
+          }));
+        }
+        
+        // Check subscription
+        try {
+          const { data: subscriptionData } = await supabase.functions.invoke('check-subscription');
+          if (subscriptionData?.subscribed) {
+            setHasSubscription(true);
+          }
+        } catch (error) {
+          console.error('Error checking subscription:', error);
+        }
+      }
+    };
+
+    checkAuthAndSubscription();
+
+    // Listen for auth changes
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(() => {
+      checkAuthAndSubscription();
+    });
+
+    return () => subscription.unsubscribe();
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -40,16 +102,30 @@ const Contact = () => {
       const validatedData = contactSchema.parse(formData);
       setIsSubmitting(true);
 
-      // Here you would typically send to your backend or email service
-      // For now, we'll just show a success message
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      const { error } = await supabase.functions.invoke('send-contact-email', {
+        body: {
+          ...validatedData,
+          recipientEmail: 'admin@smartygym.com'
+        }
+      });
+
+      if (error) throw error;
 
       toast({
         title: "Message sent!",
         description: "We'll get back to you as soon as possible.",
       });
 
-      setFormData({ name: "", email: "", subject: "", message: "" });
+      // Reset form, but keep auto-filled data if logged in
+      if (isAuthenticated) {
+        setFormData(prev => ({ 
+          ...prev,
+          subject: "",
+          message: ""
+        }));
+      } else {
+        setFormData({ name: "", email: "", subject: "", message: "" });
+      }
     } catch (error) {
       if (error instanceof z.ZodError) {
         const fieldErrors: Record<string, string> = {};
@@ -59,9 +135,76 @@ const Contact = () => {
           }
         });
         setErrors(fieldErrors);
+      } else {
+        toast({
+          title: "Error",
+          description: "Failed to send message. Please try again.",
+          variant: "destructive",
+        });
       }
     } finally {
       setIsSubmitting(false);
+    }
+  };
+
+  const handleCoachSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setCoachErrors({});
+    
+    if (!isAuthenticated || !hasSubscription) {
+      toast({
+        title: "Access Denied",
+        description: "You need an active subscription to contact the coach directly.",
+        variant: "destructive",
+      });
+      return;
+    }
+    
+    const coachSchema = z.object({
+      subject: z.string().trim().min(1, { message: "Subject is required" }).max(200),
+      message: z.string().trim().min(1, { message: "Message is required" }).max(2000)
+    });
+    
+    try {
+      const validatedData = coachSchema.parse(coachFormData);
+      setIsCoachSubmitting(true);
+
+      const { error } = await supabase.functions.invoke('send-contact-email', {
+        body: {
+          name: formData.name,
+          email: formData.email,
+          subject: validatedData.subject,
+          message: validatedData.message,
+          recipientEmail: 'haris@smartygym.com'
+        }
+      });
+
+      if (error) throw error;
+
+      toast({
+        title: "Message sent to coach!",
+        description: "Haris will get back to you soon.",
+      });
+
+      setCoachFormData({ subject: "", message: "" });
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        const fieldErrors: Record<string, string> = {};
+        error.errors.forEach((err) => {
+          if (err.path) {
+            fieldErrors[err.path[0]] = err.message;
+          }
+        });
+        setCoachErrors(fieldErrors);
+      } else {
+        toast({
+          title: "Error",
+          description: "Failed to send message. Please try again.",
+          variant: "destructive",
+        });
+      }
+    } finally {
+      setIsCoachSubmitting(false);
     }
   };
 
@@ -70,6 +213,14 @@ const Contact = () => {
     setFormData(prev => ({ ...prev, [name]: value }));
     if (errors[name]) {
       setErrors(prev => ({ ...prev, [name]: "" }));
+    }
+  };
+
+  const handleCoachChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const { name, value } = e.target;
+    setCoachFormData(prev => ({ ...prev, [name]: value }));
+    if (coachErrors[name]) {
+      setCoachErrors(prev => ({ ...prev, [name]: "" }));
     }
   };
 
@@ -155,7 +306,7 @@ const Contact = () => {
                 </CardHeader>
                 <CardContent>
                   <form onSubmit={handleSubmit} className="space-y-6">
-                    <div className="space-y-2">
+                     <div className="space-y-2">
                       <Label htmlFor="name">Name *</Label>
                       <Input
                         id="name"
@@ -164,6 +315,7 @@ const Contact = () => {
                         onChange={handleChange}
                         placeholder="Your full name"
                         className={errors.name ? "border-destructive" : ""}
+                        disabled={isAuthenticated}
                       />
                       {errors.name && (
                         <p className="text-sm text-destructive">{errors.name}</p>
@@ -180,6 +332,7 @@ const Contact = () => {
                         onChange={handleChange}
                         placeholder="your.email@example.com"
                         className={errors.email ? "border-destructive" : ""}
+                        disabled={isAuthenticated}
                       />
                       {errors.email && (
                         <p className="text-sm text-destructive">{errors.email}</p>
@@ -247,13 +400,71 @@ const Contact = () => {
 
               <Card className="bg-gradient-to-br from-primary/5 to-accent/10 border-primary/20">
                 <CardHeader>
-                  <CardTitle className="text-lg">Direct Access to Your Coach</CardTitle>
+                  <CardTitle className="text-lg flex items-center gap-2">
+                    Direct Access to Your Coach
+                    {!hasSubscription && <Lock className="h-4 w-4" />}
+                  </CardTitle>
+                  <CardDescription>
+                    {hasSubscription 
+                      ? "Send a message directly to Haris Falas"
+                      : "Available for Premium members only"
+                    }
+                  </CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <p className="text-sm text-muted-foreground">
-                    As a Premium member, you can reach out directly to <strong>Haris Falas</strong> and the coaching team. 
-                    No robots, no automated responses — just real human support when you need it.
-                  </p>
+                  {hasSubscription ? (
+                    <form onSubmit={handleCoachSubmit} className="space-y-4">
+                      <div className="space-y-2">
+                        <Label htmlFor="coach-subject">Subject *</Label>
+                        <Input
+                          id="coach-subject"
+                          name="subject"
+                          value={coachFormData.subject}
+                          onChange={handleCoachChange}
+                          placeholder="What is this about?"
+                          className={coachErrors.subject ? "border-destructive" : ""}
+                        />
+                        {coachErrors.subject && (
+                          <p className="text-sm text-destructive">{coachErrors.subject}</p>
+                        )}
+                      </div>
+
+                      <div className="space-y-2">
+                        <Label htmlFor="coach-message">Message *</Label>
+                        <Textarea
+                          id="coach-message"
+                          name="message"
+                          value={coachFormData.message}
+                          onChange={handleCoachChange}
+                          placeholder="Tell Haris how he can help you..."
+                          rows={4}
+                          className={coachErrors.message ? "border-destructive" : ""}
+                        />
+                        {coachErrors.message && (
+                          <p className="text-sm text-destructive">{coachErrors.message}</p>
+                        )}
+                      </div>
+
+                      <Button type="submit" className="w-full" disabled={isCoachSubmitting}>
+                        <Send className="w-4 h-4 mr-2" />
+                        {isCoachSubmitting ? "Sending..." : "Contact Haris"}
+                      </Button>
+                    </form>
+                  ) : (
+                    <div className="space-y-4">
+                      <p className="text-sm text-muted-foreground">
+                        As a Premium member, you can reach out directly to <strong>Haris Falas</strong>. 
+                        No robots, no automated responses — just real human support when you need it.
+                      </p>
+                      <Button 
+                        onClick={() => navigate("/premiumbenefits")} 
+                        className="w-full"
+                        variant="default"
+                      >
+                        Upgrade to Premium
+                      </Button>
+                    </div>
+                  )}
                 </CardContent>
               </Card>
 
