@@ -71,7 +71,7 @@ const CoachProfile = () => {
                 />
               </div>
               <h1 className="text-3xl sm:text-4xl font-bold mb-4">Meet Our Head Coach</h1>
-              <h2 className="text-3xl font-semibold text-primary mb-2">Haris Falas</h2>
+              <h2 className="text-3xl font-semibold text-primary mb-2">Haris Falas, BSc Sports Science, EXOS Specialist, CSCS</h2>
               <p className="text-lg text-muted-foreground">Founder & Head Coach, HFSC and Smarty Gym</p>
             </header>
 
@@ -79,7 +79,7 @@ const CoachProfile = () => {
             <Card className="p-8 md:p-12">
               <div className="prose prose-lg max-w-none">
                 <p className="text-lg leading-relaxed mb-6">
-                  Haris Falas is the founder and head coach of HFSC and Smarty Gym, one of Cyprus' most respected names in strength and conditioning, human performance, and functional fitness. With more than 20 years of professional experience as a Sports Scientist, Strength & Conditioning Coach, and Educator, Haris has dedicated his career to one mission — helping people move, perform, and live better.
+                  Haris Falas, BSc Sports Science, EXOS Specialist, CSCS is the founder and head coach of HFSC and Smarty Gym, one of Cyprus' most respected names in strength and conditioning, human performance, and functional fitness. With more than 20 years of professional experience as a Sports Scientist, Strength & Conditioning Coach, and Educator, Haris has dedicated his career to one mission — helping people move, perform, and live better.
                 </p>
 
                 <h3 className="text-2xl font-semibold mb-4 mt-8">A Visionary Coach with Proven Experience</h3>

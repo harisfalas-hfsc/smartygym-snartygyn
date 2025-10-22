@@ -679,7 +679,7 @@ export const ArticleDetail = () => {
               {/* Author Signature */}
               <div className="mt-12 pt-6 border-t border-border">
                 <p className="text-sm text-muted-foreground italic">
-                  — <a href="/coach-profile" className="text-primary hover:underline font-medium">Haris Falas</a>, Certified Sports Scientist & Head Coach at Smarty Gym
+                  — <a href="/coach-profile" className="text-primary hover:underline font-medium">Haris Falas, BSc Sports Science, EXOS Specialist, CSCS</a>, Certified Sports Scientist & Head Coach at Smarty Gym
                 </p>
               </div>
             </div>

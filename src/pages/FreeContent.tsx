@@ -200,7 +200,7 @@ const FreeContent = () => {
 
           <TabsContent value="programs">
             <div className="mb-4 text-center text-sm text-muted-foreground">
-              Designed by Haris Falas — 6–8 week results-based training plans
+              Designed by <a href="/coach-profile" className="text-primary hover:underline font-medium">Haris Falas, BSc Sports Science, EXOS Specialist, CSCS</a> — 6–8 week results-based training plans
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
               {programTypes.map((program) => {
