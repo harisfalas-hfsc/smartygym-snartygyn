@@ -4,7 +4,6 @@ import { Card } from "@/components/ui/card";
 import { ArrowLeft, Dumbbell, Flame, Zap, Heart, Move, Activity, Scale, User } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { EmailCaptureBox } from "@/components/EmailCaptureBox";
-import { PremiumPopup } from "@/components/PremiumPopup";
 import { BackToTop } from "@/components/BackToTop";
 import { useShowBackButton } from "@/hooks/useShowBackButton";
 
@@ -124,7 +123,6 @@ const FreeContent = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      <PremiumPopup />
       <BackToTop />
       <div className="container mx-auto max-w-6xl px-4 py-8">
         {canGoBack && (

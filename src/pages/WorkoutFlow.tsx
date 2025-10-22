@@ -4,7 +4,6 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { ArrowLeft, Dumbbell, Flame, Zap, Heart, Move, Activity, TrendingUp } from "lucide-react";
 import { EmailCaptureBox } from "@/components/EmailCaptureBox";
-import { PremiumPopup } from "@/components/PremiumPopup";
 import { BackToTop } from "@/components/BackToTop";
 
 const WorkoutFlow = () => {
@@ -79,7 +78,6 @@ const WorkoutFlow = () => {
       </Helmet>
       
       <div className="min-h-screen bg-background">
-      <PremiumPopup />
       <BackToTop />
       <div className="container mx-auto max-w-6xl px-4 py-8">
         <Button
