@@ -441,6 +441,76 @@ const articles: Record<string, ArticleContent> = {
       "Keep notes on how well you felt the target muscle during each exercise. Over time, you'll identify which movements give you the best connection.",
     ]
   },
+  "6": {
+    id: "6",
+    title: "Creatine: The Ultimate Performance Supplement",
+    excerpt: "Science-backed benefits and how to use creatine effectively for strength, power, and muscle growth",
+    image: "https://images.unsplash.com/photo-1579722821273-0f6c7d44362f?auto=format&fit=crop&q=80&w=800",
+    readTime: "10 min read",
+    date: "March 16, 2024",
+    category: "Nutrition",
+    content: [
+      "Creatine monohydrate is one of the most researched and effective supplements in sports nutrition. With decades of scientific backing, it stands as a cornerstone supplement for anyone serious about improving strength, power, and muscle growth.",
+      "## What is Creatine?",
+      "Creatine is a naturally occurring compound found in muscle cells. It helps your muscles produce energy during heavy lifting or high-intensity exercise. Your body produces some creatine naturally, and you also get it from foods like red meat and fish, but supplementation can maximize your stores.",
+      "## The Science Behind Creatine",
+      "Creatine works by increasing phosphocreatine stores in your muscles. Phosphocreatine helps produce ATP (adenosine triphosphate), the primary energy currency of cells. More ATP means more energy available for high-intensity work.",
+      "## Performance Benefits",
+      "Research consistently shows creatine supplementation can increase strength by 5-15%, improve power output, enhance sprint performance, and increase work capacity during high-intensity training. These effects are most pronounced in explosive, short-duration activities.",
+      "## Muscle Growth Effects",
+      "Creatine promotes muscle growth through multiple mechanisms: it increases training volume capacity, enhances protein synthesis signaling, promotes cell hydration (drawing water into muscle cells), and may reduce muscle breakdown. Typical gains of 1-2kg in the first month are common.",
+      "## Cognitive Benefits",
+      "Beyond physical performance, creatine has shown benefits for brain health and cognitive function. Studies suggest it may improve memory, reduce mental fatigue, and support brain health, particularly in situations of sleep deprivation or cognitive stress.",
+      "## How Much to Take",
+      "The standard protocol is 5g per day for maintenance. A 'loading phase' of 20g daily (split into 4 doses) for 5-7 days can saturate muscles faster, but it's not necessary—taking 5g daily will reach the same saturation in 3-4 weeks.",
+      "## When to Take It",
+      "Timing is less important than consistency. Take it whenever convenient—with a meal, post-workout, or with your morning coffee. The key is taking it daily to maintain elevated creatine stores.",
+      "## Creatine Monohydrate is Best",
+      "Despite marketing for newer forms, creatine monohydrate remains the gold standard. It's the most studied, most effective, and most affordable form. Other forms like creatine HCl or ethyl ester haven't proven superior in research.",
+      "## Safety and Side Effects",
+      "Creatine is one of the safest supplements available, with decades of research supporting its safety profile. The most common side effect is minor water retention. Kidney concerns are unfounded in healthy individuals—studies show no negative effects on kidney function.",
+      "## Who Should Take Creatine",
+      "Anyone engaged in resistance training, high-intensity exercise, or explosive sports can benefit. Vegetarians and vegans often see even greater benefits since they have lower baseline creatine levels from diet.",
+      "## When Creatine Won't Help",
+      "Creatine primarily benefits high-intensity, short-duration activities. It won't significantly improve endurance performance like marathon running. It's also not a fat loss supplement—any weight gain is from increased water in muscles and muscle mass, not fat.",
+      "## Conclusion",
+      "Creatine monohydrate is safe, effective, affordable, and backed by extensive research. If you're training regularly and want to maximize your strength, power, and muscle growth, creatine is one of the few supplements truly worth taking.",
+    ]
+  },
+  "7": {
+    id: "7",
+    title: "Training Frequency: Finding Your Optimal Schedule",
+    excerpt: "How often should you train each muscle group for maximum results?",
+    image: "https://images.unsplash.com/photo-1571902943202-507ec2618e8f?auto=format&fit=crop&q=80&w=800",
+    readTime: "8 min read",
+    date: "March 14, 2024",
+    category: "Training",
+    content: [
+      "One of the most debated topics in strength training is optimal training frequency. How often should you train each muscle group? The answer depends on your goals, recovery capacity, and training experience.",
+      "## Understanding Muscle Protein Synthesis",
+      "After a training session, muscle protein synthesis (MPS) is elevated for 24-48 hours in beginners and returns to baseline sooner in trained individuals. This suggests that training a muscle 2-3 times per week may be optimal for growth.",
+      "## Volume Distribution",
+      "Training frequency is closely tied to volume. If you do 15 sets for chest per week, you could do all 15 in one session, 7-8 sets twice weekly, or 5 sets three times weekly. Research suggests spreading volume across multiple sessions is superior.",
+      "## Beginner Frequency",
+      "Beginners (less than 1 year training) can benefit from full-body routines 3 times per week. This allows adequate stimulus while providing recovery time. Each muscle group is trained with moderate volume but higher frequency.",
+      "## Intermediate Frequency",
+      "Intermediate lifters (1-3 years training) often excel with upper-lower splits or push-pull-legs routines, training each muscle group 2 times per week. This allows for higher per-session volume while maintaining beneficial frequency.",
+      "## Advanced Frequency",
+      "Advanced lifters may benefit from higher frequencies (3+ times per week per muscle) or lower frequencies with higher per-session volumes. At this level, individual response varies significantly, and finding what works for you becomes crucial.",
+      "## Recovery Considerations",
+      "Higher frequency requires managing fatigue carefully. Each session should leave you ready to train again within 48-72 hours. If you're still sore or fatigued, your frequency may be too high or volume too aggressive.",
+      "## Age and Recovery",
+      "As we age, recovery capacity typically decreases. Older athletes may benefit from lower frequencies with more rest between sessions, or from varying intensity across training days rather than always training hard.",
+      "## Individual Response",
+      "Some people are 'high responders' who can handle and benefit from high training frequencies. Others are 'low responders' who need more recovery. Pay attention to your performance, energy levels, and progress.",
+      "## Deload Strategies",
+      "Regardless of your normal frequency, plan deload weeks every 4-6 weeks where you reduce volume by 40-50%. This allows accumulated fatigue to dissipate and often leads to strength gains.",
+      "## Practical Recommendations",
+      "For hypertrophy, aim to train each muscle 2-3 times per week. For strength, frequency can be higher (3-5 times weekly) with lower per-session volumes. For endurance or skill work, even higher frequencies can be beneficial.",
+      "## Conclusion",
+      "Optimal training frequency depends on many factors. Start with training each muscle group 2 times per week, monitor your recovery and progress, and adjust based on your response. Remember, the best program is one you can sustain and progress with long-term.",
+    ]
+  },
 };
 
 export const ArticleDetail = () => {
@@ -596,6 +666,13 @@ export const ArticleDetail = () => {
                   </p>
                 );
               })}
+              
+              {/* Author Signature */}
+              <div className="mt-12 pt-6 border-t border-border">
+                <p className="text-sm text-muted-foreground italic">
+                  — <a href="/coach-profile" className="text-primary hover:underline font-medium">Haris Falas</a>, Certified Sports Scientist & Head Coach at Smarty Gym
+                </p>
+              </div>
             </div>
           </Card>
 

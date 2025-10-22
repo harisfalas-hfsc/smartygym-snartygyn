@@ -30,6 +30,8 @@ import ExerciseLibrary from "./pages/ExerciseLibrary";
 import About from "./pages/About";
 import Tools from "./pages/Tools";
 import FreeContent from "./pages/FreeContent";
+import Blog from "./pages/Blog";
+import CoachProfile from "./pages/CoachProfile";
 import Contact from "./pages/Contact";
 import PrivacyPolicy from "./pages/PrivacyPolicy";
 import TermsOfService from "./pages/TermsOfService";
@@ -61,6 +63,8 @@ const App = () => (
                 
                 {/* Public free content page */}
                 <Route path="/freecontent" element={<FreeContent />} />
+                <Route path="/blog" element={<Blog />} />
+                <Route path="/coach-profile" element={<CoachProfile />} />
                 
                 {/* Public workout and plan flows - anyone can browse */}
                 <Route path="/workout" element={<WorkoutFlow />} />

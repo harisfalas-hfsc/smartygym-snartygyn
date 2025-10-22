@@ -4,7 +4,6 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { ArrowLeft, Clock, Dumbbell, TrendingUp } from "lucide-react";
 import { WorkoutDisplay } from "@/components/WorkoutDisplay";
-import { ShareButtons } from "@/components/ShareButtons";
 import burnStartImg from "@/assets/burn-start-workout.jpg";
 import sweatCircuitImg from "@/assets/sweat-circuit-workout.jpg";
 import bodyBurnoutImg from "@/assets/body-burnout-workout.jpg";
@@ -3065,14 +3064,6 @@ Finisher: 3 rounds`,
               tips={workout.tips.join('\n')}
               workoutDetails={{ exercises: workout.exercises }}
             />
-
-            {/* Share Buttons */}
-            <div className="mt-8">
-              <ShareButtons
-                url={window.location.href}
-                title={`Check out ${workout.name} workout on Smarty Gym!`}
-              />
-            </div>
           </div>
         </div>
     </>

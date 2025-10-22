@@ -4,7 +4,6 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { ArrowLeft } from "lucide-react";
 import { WorkoutDisplay } from "@/components/WorkoutDisplay";
-import { ShareButtons } from "@/components/ShareButtons";
 import cardioEnduranceImg from "@/assets/cardio-endurance-program.jpg";
 import functionalStrengthImg from "@/assets/functional-strength-program.jpg";
 import muscleHypertrophyImg from "@/assets/muscle-hypertrophy-program.jpg";
@@ -764,14 +763,6 @@ Rest: 60–90 sec between sets`,
               }))
             }]}
           />
-
-          {/* Share Buttons */}
-          <div className="mt-8">
-            <ShareButtons
-              url={window.location.href}
-              title={`Check out ${program.name} on Smarty Gym!`}
-            />
-          </div>
         </div>
       </div>
     </>
