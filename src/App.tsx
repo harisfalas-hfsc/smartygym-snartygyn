@@ -51,8 +51,8 @@ const App = () => (
       <TooltipProvider>
         <Toaster />
         <Sonner />
-        <WorkoutMotivationPopup />
         <BrowserRouter>
+          <WorkoutMotivationPopup />
           <ScrollToTop />
           <div className="flex flex-col min-h-screen">
             <Navigation />
