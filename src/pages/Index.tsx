@@ -10,8 +10,6 @@ import { User as SupabaseUser } from "@supabase/supabase-js";
 import { useToast } from "@/hooks/use-toast";
 import smartyGymLogo from "@/assets/smarty-gym-logo.png";
 import { BackToTop } from "@/components/BackToTop";
-import { PWAInstallPrompt } from "@/components/PWAInstallPrompt";
-import { NotificationPrompt } from "@/components/NotificationPrompt";
 
 const Index = () => {
   const navigate = useNavigate();
@@ -166,7 +164,6 @@ const Index = () => {
       
       <div className="min-h-screen bg-background">
         <BackToTop />
-        <PWAInstallPrompt />
         
         {/* Hero Section */}
         <section className="relative py-8 sm:py-12 px-4 border-b border-border bg-gradient-to-br from-background to-muted/30">
