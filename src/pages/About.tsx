@@ -78,7 +78,7 @@ const About = () => {
           {/* Info Ribbon */}
           <div className="bg-primary/10 border border-primary/20 rounded-lg p-4 mb-8 text-center max-w-3xl mx-auto">
             <p className="text-sm text-muted-foreground">
-              Founded by <strong>Haris Falas</strong> — Sports Scientist & Strength and Conditioning Coach | Cyprus Fitness Expert
+              Founded by <a href="/coach-profile" className="text-primary hover:underline font-medium">Haris Falas</a> — Sports Scientist & Strength and Conditioning Coach | Cyprus Fitness Expert
             </p>
           </div>
         </header>
@@ -315,7 +315,9 @@ const About = () => {
             
             <CardContent className="space-y-4 relative">
               <div className="bg-background/80 backdrop-blur-sm p-4 rounded-lg border border-primary/20">
-                <p className="text-lg font-bold mb-1">Haris Falas</p>
+                <p className="text-lg font-bold mb-1">
+                  <a href="/coach-profile" className="text-primary hover:underline">Haris Falas</a>
+                </p>
                 <p className="text-sm text-muted-foreground">Sports Scientist & Strength & Conditioning Coach</p>
               </div>
               
@@ -344,7 +346,9 @@ const About = () => {
               
               <div className="flex items-center gap-3 pt-4">
                 <div className="h-px flex-grow bg-border"></div>
-                <p className="font-bold text-primary">Haris Falas</p>
+                <p className="font-bold text-primary">
+                  <a href="/coach-profile" className="hover:underline">Haris Falas</a>
+                </p>
                 <div className="h-px flex-grow bg-border"></div>
               </div>
               <p className="text-center text-sm text-muted-foreground">Founder, HFSC & SMARTY GYM</p>
@@ -379,7 +383,7 @@ const About = () => {
                 <AccordionItem value="item-3">
                   <AccordionTrigger>What makes Smarty Gym different?</AccordionTrigger>
                   <AccordionContent>
-                    <strong>We're 100% human, 0% AI.</strong> Every workout is personally designed by Haris Falas, 
+                    <strong>We're 100% human, 0% AI.</strong> Every workout is personally designed by <a href="/coach-profile" className="text-primary hover:underline font-medium">Haris Falas</a>, 
                     a qualified Sports Scientist and S&C Coach — never by algorithms or AI. You get real expertise, 
                     real support, and direct access to the person who created your program. We focus on sustainable progress, 
                     not quick fixes or unrealistic promises.

@@ -55,7 +55,7 @@ const TrainingProgramFlow = () => {
     <>
       <Helmet>
         <title>Training Programs - Smarty Gym | 6-8 Week Programs Cyprus | smartygym.com</title>
-        <meta name="description" content="Structured 6-8 week training programs by Sports Scientist Haris Falas. Cardio, strength, hypertrophy, weight loss, mobility programs. Cyprus online fitness expertise." />
+        <meta name="description" content="Explore structured training programs designed by sports scientist Haris Falas. 6-8 week results-based plans for convenient, flexible fitness - gym reimagined for anywhere, anytime training.Structured 6-8 week training programs by Sports Scientist Haris Falas. Cardio, strength, hypertrophy, weight loss, mobility programs. Cyprus online fitness expertise." />
         <meta name="keywords" content="training programs Cyprus, workout programs, 6 week programs, 8 week programs, strength programs, weight loss programs, smartygym programs" />
         
         <meta property="og:title" content="Training Programs - Smarty Gym Cyprus" />

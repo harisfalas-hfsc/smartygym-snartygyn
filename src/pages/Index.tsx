@@ -121,7 +121,7 @@ const Index = () => {
     <>
       <Helmet>
         <title>Smarty Gym - Your Fitness Reimagined Anywhere, Anytime | Online Gym by Haris Falas</title>
-        <meta name="description" content="Smarty Gym (smartygym.com) - Cyprus online fitness platform by Haris Falas. Convenient, flexible gym reimagined for anywhere, anytime training. Human-designed workouts, training programs & fitness tools." />
+        <meta name="description" content="Smarty Gym - Train anywhere, anytime with human-designed functional fitness programs by certified sports scientist Haris Falas. Convenient online gym reimagined for smart, effective training. No AI, just real expertise.Smarty Gym (smartygym.com) - Cyprus online fitness platform by Haris Falas. Convenient, flexible gym reimagined for anywhere, anytime training. Human-designed workouts, training programs & fitness tools." />
         <meta name="keywords" content="smartygym, smarty gym, smartygym.com, Haris Falas, gym reimagined, fitness reimagined, convenient fitness, flexible gym, online fitness Cyprus, anywhere anytime fitness, functional training, strength training online" />
         
         {/* Open Graph / Facebook */}

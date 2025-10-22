@@ -63,7 +63,7 @@ const WorkoutFlow = () => {
     <>
       <Helmet>
         <title>Workouts - Smarty Gym | Convenient & Flexible Training by Haris Falas</title>
-        <meta name="description" content="Free online workouts by Haris Falas at smartygym.com - convenient & flexible gym reimagined. Strength, cardio, metabolic, mobility training anywhere, anytime." />
+        <meta name="description" content="Browse standalone workout sessions designed to challenge and motivate you. Functional fitness workouts by certified sports scientist Haris Falas - convenient training anywhere, anytime.Free online workouts by Haris Falas at smartygym.com - convenient & flexible gym reimagined. Strength, cardio, metabolic, mobility training anywhere, anytime." />
         <meta name="keywords" content="smartygym workouts, smarty gym, smartygym.com, Haris Falas, free workouts, convenient fitness, flexible training, gym reimagined, online workouts, strength training, cardio workouts" />
         
         <meta property="og:title" content="Workouts - Smarty Gym | Fitness Reimagined" />

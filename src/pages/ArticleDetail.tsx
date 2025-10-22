@@ -441,8 +441,8 @@ const articles: Record<string, ArticleContent> = {
       "Keep notes on how well you felt the target muscle during each exercise. Over time, you'll identify which movements give you the best connection.",
     ]
   },
-  "6": {
-    id: "6",
+  "16": {
+    id: "16",
     title: "Creatine: The Ultimate Performance Supplement",
     excerpt: "Science-backed benefits and how to use creatine effectively for strength, power, and muscle growth",
     image: "https://images.unsplash.com/photo-1579722821273-0f6c7d44362f?auto=format&fit=crop&q=80&w=800",
@@ -477,8 +477,8 @@ const articles: Record<string, ArticleContent> = {
       "Creatine monohydrate is safe, effective, affordable, and backed by extensive research. If you're training regularly and want to maximize your strength, power, and muscle growth, creatine is one of the few supplements truly worth taking.",
     ]
   },
-  "7": {
-    id: "7",
+  "17": {
+    id: "17",
     title: "Training Frequency: Finding Your Optimal Schedule",
     excerpt: "How often should you train each muscle group for maximum results?",
     image: "https://images.unsplash.com/photo-1571902943202-507ec2618e8f?auto=format&fit=crop&q=80&w=800",
