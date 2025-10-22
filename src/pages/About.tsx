@@ -3,7 +3,7 @@ import { Helmet } from "react-helmet";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
-import { ArrowLeft, Award, Heart, Users, Target, UserCheck, Brain, Shield, Sparkles, Ban, CheckCircle2 } from "lucide-react";
+import { ArrowLeft, Award, Heart, Users, Target, UserCheck, Brain, Shield, Sparkles, Ban, CheckCircle2, Compass } from "lucide-react";
 import { BackToTop } from "@/components/BackToTop";
 import { useShowBackButton } from "@/hooks/useShowBackButton";
 
@@ -76,22 +76,10 @@ const About = () => {
           </p>
           
           {/* Info Ribbon */}
-          <div className="bg-primary/10 border border-primary/20 rounded-lg p-4 mb-6 text-center max-w-3xl mx-auto">
+          <div className="bg-primary/10 border border-primary/20 rounded-lg p-4 mb-8 text-center max-w-3xl mx-auto">
             <p className="text-sm text-muted-foreground">
               Founded by <a href="/coach-profile" className="text-primary hover:underline font-medium">Haris Falas</a> — Sports Scientist & Strength and Conditioning Coach | Cyprus Fitness Expert
             </p>
-          </div>
-          
-          {/* Take A Tour Button */}
-          <div className="flex justify-center mb-8">
-            <Button 
-              variant="default" 
-              size="lg"
-              onClick={() => navigate("/takeatour")}
-              className="shadow-lg hover:shadow-xl transition-all"
-            >
-              Take A Tour
-            </Button>
           </div>
         </header>
 
@@ -158,6 +146,18 @@ const About = () => {
               </div>
             </CardContent>
           </Card>
+          
+          {/* Take A Tour Button */}
+          <div className="flex justify-center mt-8">
+            <Button 
+              size="lg"
+              onClick={() => navigate("/takeatour")}
+              className="bg-background text-primary border-2 border-primary hover:bg-primary/5 shadow-lg hover:shadow-xl transition-all px-12 py-6 text-lg font-semibold"
+            >
+              <Compass className="mr-3 h-6 w-6" />
+              Take A Tour
+            </Button>
+          </div>
         </section>
 
         {/* Mission Statement with Cards */}
