@@ -289,7 +289,7 @@ const Contact = () => {
             {/* Info Ribbon */}
             <div className="bg-primary/10 border border-primary/20 rounded-lg p-4 mb-8 text-center max-w-3xl mx-auto">
               <p className="text-sm text-muted-foreground">
-                Get in touch with <strong>Haris Falas</strong> and the Smarty Gym team
+                Get in touch with <a href="/coach-profile" className="text-primary hover:underline font-medium"><strong>Haris Falas</strong></a> and the Smarty Gym team
               </p>
             </div>
           </header>
@@ -393,7 +393,7 @@ const Contact = () => {
                     admin@smartygym.com
                   </a>
                   <p className="text-xs text-muted-foreground mt-2">
-                    Direct contact with <strong>Haris Falas</strong> and the team
+                    Direct contact with <a href="/coach-profile" className="text-primary hover:underline font-medium"><strong>Haris Falas</strong></a> and the team
                   </p>
                 </CardContent>
               </Card>
@@ -453,7 +453,7 @@ const Contact = () => {
                   ) : (
                     <div className="space-y-4">
                       <p className="text-sm text-muted-foreground">
-                        As a Premium member, you can reach out directly to <strong>Haris Falas</strong>. 
+                        As a Premium member, you can reach out directly to <a href="/coach-profile" className="text-primary hover:underline font-medium"><strong>Haris Falas</strong></a>. 
                         No robots, no automated responses — just real human support when you need it.
                       </p>
                       <Button 

@@ -109,11 +109,11 @@ const About = () => {
                   Smarty Gym workouts and programs are built to fit YOUR life.
                 </p>
                 <p className="text-base leading-relaxed text-muted-foreground">
-                  That's why they work — safe and efficient design by <strong>Haris Falas</strong>, crafted by hand with care to deliver effective results at <strong>smartygym.com</strong>, <strong className="text-foreground">NOT by AI</strong>.
+                  That's why they work — safe and efficient design by <a href="/coach-profile" className="text-primary hover:underline font-medium"><strong>Haris Falas</strong></a>, crafted by hand with care to deliver effective results at <strong>smartygym.com</strong>, <strong className="text-foreground">NOT by AI</strong>.
                 </p>
                 <div className="bg-background/80 backdrop-blur-sm p-6 rounded-lg border-2 border-primary/30 mt-6">
                   <p className="text-lg font-bold text-primary mb-2">
-                    Every program is evidence-based and personally created by Haris Falas in Cyprus.
+                    Every program is evidence-based and personally created by <a href="/coach-profile" className="text-primary hover:underline font-medium">Haris Falas</a> in Cyprus.
                   </p>
                   <p className="text-base text-muted-foreground">
                     Never by AI. Never by algorithms. Always by a real human expert who understands YOUR needs. <strong>Cyprus online fitness</strong> excellence since day one.
@@ -438,7 +438,7 @@ const About = () => {
                 <AccordionItem value="item-8">
                   <AccordionTrigger>Who created Smarty Gym?</AccordionTrigger>
                   <AccordionContent>
-                    Smarty Gym was founded by Haris Falas, a certified Sports Scientist and Strength & Conditioning Coach. 
+                    Smarty Gym was founded by <a href="/coach-profile" className="text-primary hover:underline font-medium">Haris Falas</a>, a certified Sports Scientist and Strength & Conditioning Coach. 
                     <strong>Every single program is personally designed by Haris himself — never by AI.</strong> All programs 
                     are created using evidence-based training principles and years of hands-on coaching experience. You know 
                     exactly who's behind your training, and you can reach out to him directly anytime.

@@ -88,6 +88,12 @@ interface SubscriptionInfo {
   subscription_end: string | null;
 }
 
+interface StripeSubscription {
+  current_period_start: number;
+  current_period_end: number;
+  cancel_at_period_end: boolean;
+}
+
 export default function UserDashboard() {
   const navigate = useNavigate();
   const { toast } = useToast();
@@ -97,6 +103,7 @@ export default function UserDashboard() {
   const [workoutInteractions, setWorkoutInteractions] = useState<WorkoutInteraction[]>([]);
   const [programInteractions, setProgramInteractions] = useState<ProgramInteraction[]>([]);
   const [subscriptionInfo, setSubscriptionInfo] = useState<SubscriptionInfo | null>(null);
+  const [stripeDetails, setStripeDetails] = useState<StripeSubscription | null>(null);
   const [favoriteExercises, setFavoriteExercises] = useState<FavoriteExercise[]>([]);
   const [oneRMHistory, setOneRMHistory] = useState<OneRMRecord[]>([]);
   const [bmrHistory, setBMRHistory] = useState<BMRRecord[]>([]);
@@ -189,6 +196,22 @@ export default function UserDashboard() {
       const { data, error } = await supabase.functions.invoke("check-subscription");
       if (error) throw error;
       setSubscriptionInfo(data);
+      
+      // Get detailed subscription info from Stripe
+      if (data?.subscribed && user) {
+        try {
+          const { data: stripeData } = await supabase.functions.invoke("get-subscription-details");
+          if (stripeData?.subscription) {
+            setStripeDetails({
+              current_period_start: stripeData.subscription.current_period_start,
+              current_period_end: stripeData.subscription.current_period_end,
+              cancel_at_period_end: stripeData.subscription.cancel_at_period_end
+            });
+          }
+        } catch (err) {
+          console.error("Error fetching Stripe details:", err);
+        }
+      }
     } catch (error) {
       console.error("Error checking subscription:", error);
     }
@@ -201,8 +224,25 @@ export default function UserDashboard() {
     return "Premium";
   };
 
+  const getDaysRemaining = () => {
+    if (!subscriptionInfo?.subscription_end) return null;
+    const endDate = new Date(subscriptionInfo.subscription_end);
+    const today = new Date();
+    const diffTime = endDate.getTime() - today.getTime();
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+    return diffDays;
+  };
+
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString("en-US", {
+      month: "short",
+      day: "numeric",
+      year: "numeric",
+    });
+  };
+
+  const formatTimestamp = (timestamp: number) => {
+    return new Date(timestamp * 1000).toLocaleDateString("en-US", {
       month: "short",
       day: "numeric",
       year: "numeric",
@@ -305,50 +345,97 @@ export default function UserDashboard() {
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-                <div className="flex-1">
+              <div className="flex flex-col gap-6">
+                {/* Plan Name */}
+                <div>
                   <p className="text-2xl font-bold mb-1">
                     {getPlanName(subscriptionInfo.product_id)} Plan
                   </p>
-                  {subscriptionInfo.subscribed && subscriptionInfo.subscription_end ? (
-                    <>
-                      <p className="text-sm text-muted-foreground mb-2">
-                        Renews on {formatDate(subscriptionInfo.subscription_end)}
+                  
+                  {/* Free Plan Info */}
+                  {!subscriptionInfo.subscribed && (
+                    <div className="space-y-2 mt-4">
+                      <p className="text-sm text-muted-foreground">
+                        You're currently on the free plan with limited access.
                       </p>
-                      <div className="flex flex-wrap gap-2 text-xs text-muted-foreground">
-                        <Badge variant="outline" className="text-xs">
+                      <Button onClick={() => navigate("/premiumbenefits")} className="mt-2">
+                        Upgrade Now
+                      </Button>
+                    </div>
+                  )}
+                  
+                  {/* Premium Plan Details */}
+                  {subscriptionInfo.subscribed && subscriptionInfo.subscription_end && (
+                    <div className="space-y-4 mt-4">
+                      {/* Status Badges */}
+                      <div className="flex flex-wrap gap-2">
+                        <Badge variant="outline" className="text-xs bg-green-500/10 text-green-600 border-green-500/20">
                           Active Subscription
                         </Badge>
-                        <span>•</span>
-                        <span>Recurring billing</span>
-                        <span>•</span>
-                        <span>Cancel anytime</span>
+                        {stripeDetails?.cancel_at_period_end ? (
+                          <Badge variant="outline" className="text-xs bg-orange-500/10 text-orange-600 border-orange-500/20">
+                            Cancels at period end
+                          </Badge>
+                        ) : (
+                          <Badge variant="outline" className="text-xs bg-blue-500/10 text-blue-600 border-blue-500/20">
+                            Auto-renewing
+                          </Badge>
+                        )}
                       </div>
-                    </>
-                  ) : (
-                    <p className="text-sm text-muted-foreground">
-                      Upgrade to access premium content
-                    </p>
-                  )}
-                </div>
-                <div className="flex flex-col gap-2 sm:items-end">
-                  {subscriptionInfo.subscribed ? (
-                    <>
-                      <Button 
-                        onClick={handleManageSubscription}
-                        disabled={managingSubscription}
-                        className="w-full sm:w-auto"
-                      >
-                        {managingSubscription ? "Opening..." : "Manage Subscription"}
-                      </Button>
-                      <p className="text-xs text-muted-foreground text-center sm:text-right">
-                        Cancel, update payment, or view billing
+                      
+                      {/* Subscription Details Grid */}
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 p-4 bg-background/50 rounded-lg border border-border/50">
+                        {/* Subscription Start */}
+                        {stripeDetails?.current_period_start && (
+                          <div>
+                            <p className="text-xs text-muted-foreground mb-1">Subscription Started</p>
+                            <p className="font-semibold">{formatTimestamp(stripeDetails.current_period_start)}</p>
+                          </div>
+                        )}
+                        
+                        {/* Next Billing Date */}
+                        <div>
+                          <p className="text-xs text-muted-foreground mb-1">
+                            {stripeDetails?.cancel_at_period_end ? "Expires On" : "Next Billing Date"}
+                          </p>
+                          <p className="font-semibold">{formatDate(subscriptionInfo.subscription_end)}</p>
+                        </div>
+                        
+                        {/* Days Remaining */}
+                        {getDaysRemaining() !== null && (
+                          <div>
+                            <p className="text-xs text-muted-foreground mb-1">Days Remaining</p>
+                            <p className="font-semibold text-primary">{getDaysRemaining()} days</p>
+                          </div>
+                        )}
+                        
+                        {/* Billing Type */}
+                        <div>
+                          <p className="text-xs text-muted-foreground mb-1">Billing Type</p>
+                          <p className="font-semibold">
+                            {stripeDetails?.cancel_at_period_end ? "One-time (No renewal)" : "Recurring Monthly"}
+                          </p>
+                        </div>
+                      </div>
+                      
+                      {/* Action Buttons */}
+                      <div className="flex flex-col sm:flex-row gap-3">
+                        <Button 
+                          onClick={handleManageSubscription}
+                          disabled={managingSubscription}
+                          className="flex-1"
+                        >
+                          {managingSubscription ? "Opening..." : "Manage Subscription"}
+                        </Button>
+                      </div>
+                      
+                      <p className="text-xs text-muted-foreground">
+                        {stripeDetails?.cancel_at_period_end 
+                          ? "Your subscription will end on the expiration date. You can reactivate anytime before then."
+                          : "You can cancel, update payment method, or view billing history in the subscription portal."
+                        }
                       </p>
-                    </>
-                  ) : (
-                    <Button onClick={() => navigate("/premiumbenefits")} className="w-full sm:w-auto">
-                      Upgrade Now
-                    </Button>
+                    </div>
                   )}
                 </div>
               </div>

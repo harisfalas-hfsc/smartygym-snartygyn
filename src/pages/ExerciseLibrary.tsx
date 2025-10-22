@@ -32,22 +32,18 @@ const ExerciseLibrary = () => {
   const [isVideoDialogOpen, setIsVideoDialogOpen] = useState(false);
   const [user, setUser] = useState<User | null>(null);
   const [favoriteExercises, setFavoriteExercises] = useState<string[]>([]);
+  const [hasSubscription, setHasSubscription] = useState(false);
 
   useEffect(() => {
     // Check current session
     supabase.auth.getSession().then(({ data: { session } }) => {
       setUser(session?.user ?? null);
-      if (session?.user) {
-        loadFavorites(session.user.id);
-      }
     });
 
     // Listen for auth changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
       setUser(session?.user ?? null);
-      if (session?.user) {
-        loadFavorites(session.user.id);
-      } else {
+      if (!session?.user) {
         setFavoriteExercises([]);
       }
     });
@@ -55,14 +51,34 @@ const ExerciseLibrary = () => {
     return () => subscription.unsubscribe();
   }, []);
 
-  const loadFavorites = async (userId: string) => {
+  useEffect(() => {
+    loadFavorites();
+    checkSubscription();
+  }, [user]);
+
+  const loadFavorites = async () => {
+    if (!user) return;
+    
     const { data } = await supabase
       .from("favorite_exercises")
       .select("exercise_name")
-      .eq("user_id", userId);
+      .eq("user_id", user.id);
     
     if (data) {
       setFavoriteExercises(data.map(d => d.exercise_name));
+    }
+  };
+
+  const checkSubscription = async () => {
+    if (!user) return;
+    
+    try {
+      const { data } = await supabase.functions.invoke('check-subscription');
+      if (data?.subscribed) {
+        setHasSubscription(true);
+      }
+    } catch (error) {
+      console.error('Error checking subscription:', error);
     }
   };
 
@@ -70,9 +86,20 @@ const ExerciseLibrary = () => {
     if (!user) {
       toast({
         title: "Login required",
-        description: "Please log in to favorite exercises",
+        description: "Please log in to access favorites",
         variant: "destructive"
       });
+      navigate("/auth");
+      return;
+    }
+
+    if (!hasSubscription) {
+      toast({
+        title: "Premium membership required",
+        description: "Upgrade to premium to favorite exercises",
+        variant: "destructive"
+      });
+      navigate("/premiumbenefits");
       return;
     }
 
