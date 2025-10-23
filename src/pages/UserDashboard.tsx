@@ -110,18 +110,16 @@ export default function UserDashboard() {
   const [calorieHistory, setCalorieHistory] = useState<CalorieRecord[]>([]);
 
   useEffect(() => {
-    checkAuth();
+    initDashboard();
   }, []);
 
-  const checkAuth = async () => {
+  const initDashboard = async () => {
     const { data: { session } } = await supabase.auth.getSession();
-    if (!session) {
-      navigate("/auth");
-      return;
+    if (session?.user) {
+      setUser(session.user);
+      await fetchAllData(session.user.id);
+      await checkSubscription();
     }
-    setUser(session.user);
-    await fetchAllData(session.user.id);
-    await checkSubscription();
     setLoading(false);
   };
 
