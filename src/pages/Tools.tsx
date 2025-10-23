@@ -76,9 +76,17 @@ const Tools = () => {
           <p className="text-sm text-muted-foreground mb-2">
             Use these tools for free — no login required. Want personalized programs?
           </p>
-          <Button variant="default" size="sm" onClick={() => navigate("/premiumbenefits")}>
-            Join Premium
-          </Button>
+          <div className="flex flex-col items-center gap-1">
+            <Button variant="default" size="sm" onClick={() => navigate("/premiumbenefits")}>
+              Join Premium
+            </Button>
+            <button 
+              onClick={() => navigate("/premium-comparison")}
+              className="text-xs text-muted-foreground hover:text-primary transition-colors underline"
+            >
+              Why Premium?
+            </button>
+          </div>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">

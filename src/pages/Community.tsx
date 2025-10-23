@@ -159,9 +159,17 @@ export default function Community() {
               <p className="text-sm text-muted-foreground mb-2">
                 Join our growing community of satisfied members — start your fitness journey today
               </p>
-              <Button variant="default" size="sm" onClick={() => navigate("/premiumbenefits")}>
-                Join Premium
-              </Button>
+              <div className="flex flex-col items-center gap-1">
+                <Button variant="default" size="sm" onClick={() => navigate("/premiumbenefits")}>
+                  Join Premium
+                </Button>
+                <button 
+                  onClick={() => navigate("/premium-comparison")}
+                  className="text-xs text-muted-foreground hover:text-primary transition-colors underline"
+                >
+                  Why Premium?
+                </button>
+              </div>
             </div>
           </header>
           
@@ -206,9 +214,25 @@ export default function Community() {
               <Button size="lg" onClick={() => navigate("/workout")}>
                 Try Free Workout
               </Button>
-              <Button size="lg" variant="outline" onClick={() => navigate("/premiumbenefits")}>
-                Join Premium
-              </Button>
+              <div className="flex flex-col items-center gap-1">
+                <Button size="lg" variant="outline" onClick={() => navigate("/premiumbenefits")}>
+                  Join Premium
+                </Button>
+                <button 
+                  onClick={() => navigate("/premium-comparison")}
+                  className="text-xs text-muted-foreground hover:text-primary transition-colors underline"
+                >
+                  Why Premium?
+                </button>
+              </div>
+            </div>
+                <button 
+                  onClick={() => navigate("/premium-comparison")}
+                  className="text-xs text-muted-foreground hover:text-primary transition-colors underline"
+                >
+                  Why Premium?
+                </button>
+              </div>
             </div>
           </aside>
         </div>

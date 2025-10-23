@@ -183,7 +183,7 @@ export const Navigation = () => {
                 <Button variant="ghost" size="lg" onClick={() => handleNavigate("/contact")} className="justify-start">
                   Contact
                 </Button>
-                <div className="border-t pt-4 mt-4">
+                <div className="border-t pt-4 mt-4 space-y-2">
                   <Button 
                     variant="default" 
                     size="lg" 
@@ -192,6 +192,12 @@ export const Navigation = () => {
                   >
                     Join Premium
                   </Button>
+                  <button 
+                    onClick={() => handleNavigate("/premium-comparison")}
+                    className="w-full text-xs text-muted-foreground hover:text-primary transition-colors underline"
+                  >
+                    Why Premium?
+                  </button>
                 </div>
               </nav>
             </SheetContent>
@@ -199,14 +205,20 @@ export const Navigation = () => {
 
           {/* Right Side - Auth */}
           <div className="flex items-center gap-2">
-            <Button 
-              variant="default" 
-              size="sm" 
-              onClick={() => navigate("/premiumbenefits")}
-              className="hidden md:inline-flex"
-            >
-              Join Premium
-            </Button>
+            <div className="hidden md:flex flex-col items-center gap-0.5">
+              <Button
+                size="sm"
+                onClick={() => navigate("/premiumbenefits")}
+              >
+                Join Premium
+              </Button>
+              <button 
+                onClick={() => navigate("/premium-comparison")}
+                className="text-[10px] text-muted-foreground hover:text-primary transition-colors underline"
+              >
+                Why Premium?
+              </button>
+            </div>
             <ThemeToggle />
             
             {user ? (

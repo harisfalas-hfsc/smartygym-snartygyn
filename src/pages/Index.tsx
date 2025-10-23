@@ -184,9 +184,17 @@ const Index = () => {
               <Button size="lg" onClick={() => navigate("/workout")} aria-label="Start free workout with Smarty Gym">
                 Start Free Workout
               </Button>
-              <Button size="lg" variant="outline" onClick={() => navigate("/premiumbenefits")} aria-label="Join Smarty Gym premium membership">
-                Join Premium
-              </Button>
+              <div className="flex flex-col items-center gap-1">
+                <Button size="lg" variant="outline" onClick={() => navigate("/premiumbenefits")} aria-label="Join Smarty Gym premium membership">
+                  Join Premium
+                </Button>
+                <button 
+                  onClick={() => navigate("/premium-comparison")}
+                  className="text-xs text-muted-foreground hover:text-primary transition-colors underline"
+                >
+                  Why Premium?
+                </button>
+              </div>
             </div>
           </div>
         </section>

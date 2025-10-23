@@ -468,10 +468,18 @@ const About = () => {
                 <Target className="w-5 h-5" />
                 Try Free Workouts
               </Button>
-              <Button size="lg" variant="outline" onClick={() => navigate("/premiumbenefits")} className="gap-2">
-                <UserCheck className="w-5 h-5" />
-                Join Premium
-              </Button>
+              <div className="flex flex-col items-center gap-1">
+                <Button size="lg" variant="outline" onClick={() => navigate("/premiumbenefits")} className="gap-2">
+                  <UserCheck className="w-5 h-5" />
+                  Join Premium
+                </Button>
+                <button 
+                  onClick={() => navigate("/premium-comparison")}
+                  className="text-xs text-muted-foreground hover:text-primary transition-colors underline"
+                >
+                  Why Premium?
+                </button>
+              </div>
             </div>
           </CardContent>
         </Card>
