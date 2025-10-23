@@ -286,7 +286,10 @@ const PremiumComparison = () => {
                     <tr className="bg-gradient-to-b from-[hsl(var(--primary)/0.1)] to-[hsl(var(--primary)/0.05)] border-t-2 border-[hsl(var(--primary)/0.4)]">
                       <td className="p-6"></td>
                       <td className="p-6 text-center">
-                        <div className="text-lg font-bold mb-2">Free Access</div>
+                        <div className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-gradient-to-r from-muted to-muted/50 border border-border">
+                          <Eye className="w-4 h-4 text-muted-foreground" />
+                          <span className="text-base font-semibold text-foreground">Free Access</span>
+                        </div>
                       </td>
                       <td className="p-6 text-center">
                         {!user && (
@@ -300,7 +303,10 @@ const PremiumComparison = () => {
                           </Button>
                         )}
                         {user && (
-                          <div className="text-sm text-muted-foreground">Already signed in</div>
+                          <div className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-gradient-to-r from-primary/10 to-primary/5 border border-primary/20">
+                            <UserCheck className="w-4 h-4 text-primary" />
+                            <span className="text-sm font-medium text-muted-foreground">Already signed in</span>
+                          </div>
                         )}
                       </td>
                       <td className="p-6 text-center">
