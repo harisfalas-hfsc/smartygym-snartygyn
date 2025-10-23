@@ -96,6 +96,12 @@ const IndividualWorkout = () => {
     'calorie-058', // Sweat Surge
     'calorie-059', // Inferno Sprint
     'calorie-060', // Calorie Forge
+    'cardio-061', // Cardio Lift-Off
+    'cardio-062', // Pulse Builder
+    'cardio-063', // Cardio Climb
+    'cardio-064', // Cardio Circuit Pro
+    'cardio-065', // Cardio Inferno
+    'cardio-066', // Cardio Overdrive
   ];
   const isFreeWorkout = freeWorkouts.includes(id || '');
 
@@ -2106,6 +2112,310 @@ Finisher: 3 rounds`,
         "Use explosive hip drive",
         "Control weights on descent",
         "Keep transitions tight"
+      ]
+    },
+    "cardio-061": {
+      name: "Cardio Lift-Off",
+      serialNumber: "CAR-BBW-061",
+      difficulty: "Beginner",
+      duration: "30 min",
+      equipment: "No Equipment Required",
+      imageUrl: cardioBlastImg,
+      description: "A gentle cardio circuit designed to elevate heart rate and improve aerobic capacity without high impact. Ideal for beginners easing into movement.",
+      workoutType: "CIRCUIT",
+      format: `Circuit – 3 rounds
+Work: 30s / Rest: 30s`,
+      instructions: "Perform each move for 30 seconds. Rest 30 seconds between exercises. Rest 1 minute between rounds.",
+      exercises: [
+        {
+          name: "March in Place",
+          sets: "3 rounds",
+          reps: "30s",
+          rest: "30s",
+          notes: "Light and rhythmic"
+        },
+        {
+          name: "Step Touch Side to Side",
+          sets: "3 rounds",
+          reps: "30s",
+          rest: "30s",
+          notes: "Controlled movement"
+        },
+        {
+          name: "Standing Knee Raises",
+          sets: "3 rounds",
+          reps: "30s",
+          rest: "30s",
+          notes: "Alternate legs"
+        },
+        {
+          name: "Arm Circles",
+          sets: "3 rounds",
+          reps: "30s",
+          rest: "30s",
+          notes: "Forward and backward"
+        },
+        {
+          name: "Wall Sit",
+          sets: "3 rounds",
+          reps: "30s",
+          rest: "60s after round",
+          notes: "90 degree angle"
+        }
+      ],
+      tips: [
+        "Keep movements light and rhythmic",
+        "Modify jumps to steps if needed",
+        "Focus on breathing and posture"
+      ]
+    },
+    "cardio-062": {
+      name: "Pulse Builder",
+      serialNumber: "CAR-EQ-062",
+      difficulty: "Beginner",
+      duration: "30 min",
+      equipment: "Jump Rope, Fit Ball, Mat",
+      imageUrl: pulseIgniterImg,
+      description: "A beginner-friendly Tabata workout using jump rope and fit ball to build rhythm, coordination, and endurance.",
+      workoutType: "TABATA",
+      format: `Tabata – 4 blocks
+Work: 20s / Rest: 10s x 8 rounds per block`,
+      instructions: "Complete each Tabata block before moving to the next. Rest 1 minute between blocks.",
+      exercises: [
+        {
+          name: "Block 1: Jump Rope",
+          sets: "8 rounds",
+          reps: "20s work / 10s rest",
+          rest: "60s after block",
+          notes: "Each block = 4 mins"
+        },
+        {
+          name: "Block 2: Fit Ball Wall Squats",
+          sets: "8 rounds",
+          reps: "20s work / 10s rest",
+          rest: "60s after block",
+          notes: "Full range"
+        },
+        {
+          name: "Block 3: Jumping Jacks",
+          sets: "8 rounds",
+          reps: "20s work / 10s rest",
+          rest: "60s after block",
+          notes: "Controlled rhythm"
+        },
+        {
+          name: "Block 4: Fit Ball Seated Bounces",
+          sets: "8 rounds",
+          reps: "20s work / 10s rest",
+          rest: "0",
+          notes: "Light bounces"
+        }
+      ],
+      tips: [
+        "Keep jump rope low",
+        "Control fit ball movements",
+        "Don't rush transitions"
+      ]
+    },
+    "cardio-063": {
+      name: "Cardio Climb",
+      serialNumber: "CAR-BBW-063",
+      difficulty: "Intermediate",
+      duration: "45 min",
+      equipment: "No Equipment Required",
+      imageUrl: cardioBlastImg,
+      description: "A bodyweight cardio workout using dynamic movements and short rest to build endurance and burn calories.",
+      workoutType: "AMRAP",
+      format: `AMRAP – 30 mins
+Finisher – 10 mins
+Warm-Up & Cool-Down – 5 mins`,
+      instructions: "Complete as many rounds as possible. Push consistent effort. Finish with a challenge block.",
+      exercises: [
+        {
+          name: "Main Block (30 mins AMRAP)",
+          sets: "AMRAP",
+          reps: "As many rounds as possible",
+          rest: "As needed",
+          notes: "Jump Squats – 15 reps, Push-Ups – 12 reps, Reverse Lunges – 10 reps/leg, Plank Shoulder Taps – 20 reps, Burpees – 8 reps"
+        },
+        {
+          name: "Finisher (10 mins)",
+          sets: "1",
+          reps: "Complete all",
+          rest: "0",
+          notes: "100 High Knees, 50 Mountain Climbers, 25 Jumping Jacks"
+        }
+      ],
+      tips: [
+        "Keep transitions tight",
+        "Use full range of motion",
+        "Hydrate between blocks"
+      ]
+    },
+    "cardio-064": {
+      name: "Cardio Circuit Pro",
+      serialNumber: "CAR-EQ-064",
+      difficulty: "Intermediate",
+      duration: "45 min",
+      equipment: "Jump Rope, Medicine Ball, Wall Ball, Mat",
+      imageUrl: cardioBlastImg,
+      description: "A high-energy cardio circuit using jump rope, medicine ball, and wall ball to boost heart rate and stamina.",
+      workoutType: "HIIT",
+      format: `HIIT – 4 rounds
+Work: 45s / Rest: 15s`,
+      instructions: "Push hard during work intervals. Rest 1 minute between rounds.",
+      exercises: [
+        {
+          name: "Jump Rope",
+          sets: "4 rounds",
+          reps: "45s",
+          rest: "15s",
+          notes: "Steady rhythm"
+        },
+        {
+          name: "Medicine Ball Slams",
+          sets: "4 rounds",
+          reps: "45s",
+          rest: "15s",
+          notes: "Explosive slams"
+        },
+        {
+          name: "Wall Ball Throws",
+          sets: "4 rounds",
+          reps: "45s",
+          rest: "15s",
+          notes: "Squat to throw"
+        },
+        {
+          name: "Jump Lunges",
+          sets: "4 rounds",
+          reps: "45s",
+          rest: "15s",
+          notes: "Explosive alternating"
+        },
+        {
+          name: "Plank to Push-Up",
+          sets: "4 rounds",
+          reps: "45s",
+          rest: "60s after round",
+          notes: "Alternate arms"
+        }
+      ],
+      tips: [
+        "Keep jump rope rhythm steady",
+        "Use explosive power with wall ball",
+        "Don't sacrifice form for speed"
+      ]
+    },
+    "cardio-065": {
+      name: "Cardio Inferno",
+      serialNumber: "CAR-BBW-065",
+      difficulty: "Advanced",
+      duration: "60 min",
+      equipment: "No Equipment Required",
+      imageUrl: cardioBlastImg,
+      description: "A high-intensity bodyweight cardio workout using plyometrics and compound moves for elite endurance and fat burn.",
+      workoutType: "FOR TIME",
+      format: `For Time – 3 blocks
+Rest: 2 mins between blocks`,
+      instructions: "Complete each block as fast as possible. Rest only as needed.",
+      exercises: [
+        {
+          name: "Block 1 (15 mins)",
+          sets: "Repeat for 15 mins",
+          reps: "20-15-10",
+          rest: "As needed",
+          notes: "20 Jump Squats, 15 Push-Ups, 10 Burpees - Repeat"
+        },
+        {
+          name: "Block 2 (15 mins)",
+          sets: "Repeat for 15 mins",
+          reps: "20-15-10",
+          rest: "As needed",
+          notes: "20 Mountain Climbers, 15 Jump Lunges, 10 Plank Jacks - Repeat"
+        },
+        {
+          name: "Block 3 (15 mins)",
+          sets: "Repeat for 15 mins",
+          reps: "20-15-10",
+          rest: "As needed",
+          notes: "20 High Knees, 15 Tuck Jumps, 10 Push-Up to Pike - Repeat"
+        }
+      ],
+      tips: [
+        "Explode through jumps",
+        "Keep transitions tight",
+        "Hydrate between blocks"
+      ]
+    },
+    "cardio-066": {
+      name: "Cardio Overdrive",
+      serialNumber: "CAR-EQ-066",
+      difficulty: "Advanced",
+      duration: "60 min",
+      equipment: "Jump Rope, Wall Ball, Bands, Mat",
+      imageUrl: cardioBlastImg,
+      description: "A full-body cardio blast using jump rope, wall ball, and bands. Designed for elite conditioning and endurance.",
+      workoutType: "MIX",
+      format: `REPS & SETS + HIIT Finisher
+Main Block: 4 sets
+Finisher: 3 rounds`,
+      instructions: "Use progressive overload. Push max effort during finisher. Rest 90s between sets.",
+      exercises: [
+        {
+          name: "Main: Wall Ball Squat to Press",
+          sets: "4",
+          reps: "15",
+          rest: "90s",
+          notes: "Full depth squat"
+        },
+        {
+          name: "Main: Jump Rope",
+          sets: "4",
+          reps: "60s",
+          rest: "90s",
+          notes: "Steady rhythm"
+        },
+        {
+          name: "Main: Band Sprints",
+          sets: "3",
+          reps: "20m",
+          rest: "90s",
+          notes: "Explosive sprints"
+        },
+        {
+          name: "Main: Plank Rows",
+          sets: "4",
+          reps: "10/side",
+          rest: "90s",
+          notes: "Maintain plank"
+        },
+        {
+          name: "Finisher: Jump Lunges",
+          sets: "3 rounds",
+          reps: "45s work",
+          rest: "15s",
+          notes: "HIIT block"
+        },
+        {
+          name: "Finisher: Burpees",
+          sets: "3 rounds",
+          reps: "45s work",
+          rest: "15s",
+          notes: "HIIT block"
+        },
+        {
+          name: "Finisher: Plank Hold",
+          sets: "3 rounds",
+          reps: "45s work",
+          rest: "15s",
+          notes: "HIIT block"
+        }
+      ],
+      tips: [
+        "Use explosive hip drive",
+        "Control wall ball throws",
+        "Keep band tension consistent"
       ]
     }
   };

@@ -110,7 +110,14 @@ const WorkoutDetail = () => {
       { id: "metabolic-047", name: "Metabo Max", description: "A high-intensity bodyweight workout designed to push metabolic output and endurance", duration: "60 min", equipment: "bodyweight", level: "advanced", format: "for time", imageUrl: metaboInfernoImg, isFree: true },
       { id: "metabolic-048", name: "Metabo Forge", description: "A strength-driven metabolic workout using dumbbells, kettlebells, and wall balls", duration: "60 min", equipment: "equipment", level: "advanced", format: "reps & sets", imageUrl: metaboSurgeImg, isFree: true },
     ],
-    "cardio": [],
+    "cardio": [
+      { id: "cardio-061", name: "Cardio Lift-Off", description: "A gentle cardio circuit designed to elevate heart rate and improve aerobic capacity without high impact", duration: "30 min", equipment: "bodyweight", level: "beginner", format: "circuit", imageUrl: cardioBlastImg, isFree: true },
+      { id: "cardio-062", name: "Pulse Builder", description: "A beginner-friendly Tabata workout using jump rope and fit ball to build rhythm, coordination, and endurance", duration: "30 min", equipment: "equipment", level: "beginner", format: "tabata", imageUrl: pulseIgniterImg, isFree: true },
+      { id: "cardio-063", name: "Cardio Climb", description: "A bodyweight cardio workout using dynamic movements and short rest to build endurance and burn calories", duration: "45 min", equipment: "bodyweight", level: "intermediate", format: "amrap", imageUrl: cardioBlastImg, isFree: true },
+      { id: "cardio-064", name: "Cardio Circuit Pro", description: "A high-energy cardio circuit using jump rope, medicine ball, and wall ball to boost heart rate and stamina", duration: "45 min", equipment: "equipment", level: "intermediate", format: "circuit", imageUrl: cardioBlastImg, isFree: true },
+      { id: "cardio-065", name: "Cardio Inferno", description: "A high-intensity bodyweight cardio workout using plyometrics and compound moves for elite endurance and fat burn", duration: "60 min", equipment: "bodyweight", level: "advanced", format: "for time", imageUrl: cardioBlastImg, isFree: true },
+      { id: "cardio-066", name: "Cardio Overdrive", description: "A full-body cardio blast using jump rope, wall ball, and bands", duration: "60 min", equipment: "equipment", level: "advanced", format: "mix", imageUrl: cardioBlastImg, isFree: true },
+    ],
     "mobility": [
       { id: "mobility-025", name: "Flow Starter", description: "A gentle mobility circuit designed to improve joint range, posture, and control", duration: "30 min", equipment: "bodyweight", level: "beginner", format: "circuit", imageUrl: flowStarterImg, isFree: true },
       { id: "mobility-026", name: "Band Balance", description: "A beginner-friendly workout using bands and a fit ball to enhance joint mobility and core stability", duration: "30 min", equipment: "equipment", level: "beginner", format: "reps & sets", imageUrl: bandBalanceImg, isFree: true },
