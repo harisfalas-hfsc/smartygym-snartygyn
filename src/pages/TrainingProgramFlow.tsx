@@ -8,44 +8,7 @@ import { BackToTop } from "@/components/BackToTop";
 const TrainingProgramFlow = () => {
   const navigate = useNavigate();
 
-  const programTypes = [
-    {
-      id: "cardio",
-      icon: Heart,
-      title: "Cardio",
-      description: "Improve cardiovascular endurance and heart health"
-    },
-    {
-      id: "functional-strength",
-      icon: Dumbbell,
-      title: "Functional Strength",
-      description: "Build strength for everyday movements and activities"
-    },
-    {
-      id: "muscle-hypertrophy",
-      icon: Activity,
-      title: "Muscle Hypertrophy",
-      description: "Maximize muscle growth with progressive overload"
-    },
-    {
-      id: "weight-loss",
-      icon: Scale,
-      title: "Weight Loss",
-      description: "Burn fat and achieve your ideal body composition"
-    },
-    {
-      id: "low-back-pain",
-      icon: User,
-      title: "Low Back Pain",
-      description: "Strengthen and rehabilitate your lower back"
-    },
-    {
-      id: "mobility-stability",
-      icon: Move,
-      title: "Mobility & Stability",
-      description: "Enhance flexibility, balance, and joint health"
-    }
-  ];
+  const programTypes: any[] = [];
 
   const handleProgramSelect = (programId: string) => {
     navigate(`/trainingprogram/${programId}`);

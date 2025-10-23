@@ -9,50 +9,7 @@ import { BackToTop } from "@/components/BackToTop";
 const WorkoutFlow = () => {
   const navigate = useNavigate();
 
-  const workoutTypes = [
-    {
-      id: "strength",
-      icon: Dumbbell,
-      title: "Strength",
-      description: "Build muscle and increase power with resistance training"
-    },
-    {
-      id: "calorie-burning",
-      icon: Flame,
-      title: "Calorie Burning",
-      description: "High-intensity workouts to maximize calorie expenditure"
-    },
-    {
-      id: "metabolic",
-      icon: Zap,
-      title: "Metabolic",
-      description: "Boost your metabolism with interval-based training"
-    },
-    {
-      id: "cardio",
-      icon: Heart,
-      title: "Cardio",
-      description: "Improve cardiovascular health and endurance"
-    },
-    {
-      id: "mobility",
-      icon: Move,
-      title: "Mobility & Stability",
-      description: "Enhance flexibility, balance, and joint health"
-    },
-    {
-      id: "power",
-      icon: TrendingUp,
-      title: "Power",
-      description: "Develop explosive strength and fast-twitch muscle activation"
-    },
-    {
-      id: "challenge",
-      icon: Activity,
-      title: "Challenge",
-      description: "Push your limits with advanced workout challenges"
-    }
-  ];
+  const workoutTypes: any[] = [];
 
   const handleWorkoutSelect = (workoutId: string) => {
     navigate(`/workout/${workoutId}`);
