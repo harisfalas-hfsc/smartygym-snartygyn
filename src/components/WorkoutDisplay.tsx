@@ -463,7 +463,7 @@ export const WorkoutDisplay = ({
                   <div key={weekIndex} className="border-2 border-primary/20 rounded-lg p-4">
                     <div className="flex items-center justify-between mb-4">
                       <h3 className="font-bold text-xl">Week {week.week}</h3>
-                      <span className="text-sm font-semibold text-primary bg-primary/10 px-3 py-1 rounded-full">
+                      <span className="text-sm font-semibold bg-primary text-primary-foreground px-3 py-1 rounded-full">
                         {week.focus}
                       </span>
                     </div>
