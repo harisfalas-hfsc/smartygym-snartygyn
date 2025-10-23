@@ -6,6 +6,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { ThemeProvider } from "next-themes";
 import { ProtectedRoute } from "./components/ProtectedRoute";
 import { AuthenticatedLayout } from "./components/AuthenticatedLayout";
+import { AccessControlProvider } from "./contexts/AccessControlContext";
 import { Navigation } from "./components/Navigation";
 import { Footer } from "./components/Footer";
 import { ScrollToTop } from "./components/ScrollToTop";
@@ -55,6 +56,7 @@ const App = () => (
         <Toaster />
         <Sonner />
         <BrowserRouter>
+          <AccessControlProvider>
           <WhatsAppButton />
           <ScrollToTop />
           <div className="flex flex-col min-h-screen">
@@ -84,9 +86,9 @@ const App = () => (
                 {/* Exercise library public, community requires authentication */}
                 <Route path="/exerciselibrary" element={<ExerciseLibrary />} />
                 <Route path="/community" element={
-                  <AccessGate requireAuth={true} contentType="feature">
+                  <ProtectedRoute>
                     <Community />
-                  </AccessGate>
+                  </ProtectedRoute>
                 } />
                 <Route path="/article/:id" element={<ArticleDetail />} />
                 
@@ -118,6 +120,7 @@ const App = () => (
             </div>
             <Footer />
           </div>
+          </AccessControlProvider>
         </BrowserRouter>
       </TooltipProvider>
     </ThemeProvider>
