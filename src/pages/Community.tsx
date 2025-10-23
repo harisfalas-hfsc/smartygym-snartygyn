@@ -5,6 +5,7 @@ import { Card } from "@/components/ui/card";
 import { ArrowLeft, Star, Trophy, Award, Target, CheckCircle2 } from "lucide-react";
 import { BackToTop } from "@/components/BackToTop";
 import { useShowBackButton } from "@/hooks/useShowBackButton";
+import { useAccessControl } from "@/hooks/useAccessControl";
 
 interface Review {
   id: string;
@@ -193,6 +194,10 @@ const mockLeaderboard: LeaderboardMember[] = [
 export default function Community() {
   const navigate = useNavigate();
   const { canGoBack, goBack } = useShowBackButton();
+  const { userTier } = useAccessControl();
+  
+  // Premium members see leaderboard, everyone sees reviews
+  const showLeaderboard = userTier === "premium";
 
   return (
     <>
@@ -246,8 +251,9 @@ export default function Community() {
             </div>
           </header>
           
-          {/* Leaderboard / Competition Card */}
-          <Card className="mb-8 border-2 border-primary/30 bg-primary/5">
+          {/* Leaderboard / Competition Card - Only visible to Premium Members */}
+          {showLeaderboard && (
+            <Card className="mb-8 border-2 border-primary/30 bg-primary/5">
             <div className="p-6">
               <div className="flex items-center gap-3 mb-6">
                 <Trophy className="h-8 w-8 text-primary" />
@@ -276,12 +282,12 @@ export default function Community() {
                           <span className="font-bold text-lg">{member.nickname}</span>
                         </div>
                         <div className="flex items-center gap-2">
-                          <span className={`text-xs px-2 py-1 rounded-full font-semibold ${
+                          <span className={`text-xs px-3 py-1 rounded-full font-semibold ${
                             member.plan === 'Platinum' 
                               ? 'bg-primary text-primary-foreground' 
                               : 'bg-amber-500 text-white'
                           }`}>
-                            {member.plan}
+                            {member.plan} Member
                           </span>
                           <span className="text-sm text-muted-foreground">
                             {member.monthsSubscribed} months
@@ -330,6 +336,7 @@ export default function Community() {
               </div>
             </div>
           </Card>
+          )}
           
           {/* Reviews Container */}
           <Card className="mb-12 p-6">

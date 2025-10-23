@@ -7,11 +7,12 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
-import { ArrowLeft, Loader2, Save } from "lucide-react";
+import { ArrowLeft, Loader2, Save, Crown } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { useProfileData } from "@/hooks/useProfileData";
 import { useShowBackButton } from "@/hooks/useShowBackButton";
+import { useAccessControl } from "@/hooks/useAccessControl";
 
 const fitnessGoalOptions = [
   "Build Strength",
@@ -44,8 +45,10 @@ const ProfileSettings = () => {
   const navigate = useNavigate();
   const { profileData, loading: profileLoading } = useProfileData();
   const { canGoBack, goBack } = useShowBackButton();
+  const { userTier } = useAccessControl();
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
+    nickname: "",
     weight: "",
     height: "",
     age: "",
@@ -64,6 +67,7 @@ const ProfileSettings = () => {
       const filteredEquipment = profileData.equipment_preferences?.filter(eq => !eq.startsWith("Other: ")) || [];
       
       setFormData({
+        nickname: profileData.nickname || "",
         weight: profileData.weight || "",
         height: profileData.height || "",
         age: profileData.age || "",
@@ -120,6 +124,7 @@ const ProfileSettings = () => {
       const { error } = await supabase
         .from("profiles")
         .update({
+          nickname: formData.nickname || null,
           weight: parseFloat(formData.weight),
           height: parseFloat(formData.height),
           age: parseInt(formData.age),
@@ -178,6 +183,31 @@ const ProfileSettings = () => {
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-6">
+            {/* Premium Member Nickname */}
+            {userTier === "premium" && (
+              <div className="space-y-4 border-2 border-primary/30 bg-primary/5 rounded-lg p-4">
+                <div className="flex items-center gap-2 mb-2">
+                  <Crown className="h-5 w-5 text-primary" />
+                  <h3 className="font-semibold text-lg">Premium Member Settings</h3>
+                </div>
+                
+                <div>
+                  <Label htmlFor="nickname">Community Nickname</Label>
+                  <p className="text-xs text-muted-foreground mb-2">
+                    This nickname will appear in the Community Leaderboard (3-20 characters, unique)
+                  </p>
+                  <Input
+                    id="nickname"
+                    type="text"
+                    value={formData.nickname}
+                    onChange={(e) => setFormData({ ...formData, nickname: e.target.value })}
+                    placeholder="e.g., FitnessWarrior"
+                    maxLength={20}
+                  />
+                </div>
+              </div>
+            )}
+            
             {/* Basic Information */}
             <div className="space-y-4">
               <h3 className="font-semibold text-lg">Basic Information</h3>

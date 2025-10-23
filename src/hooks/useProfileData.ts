@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 
 interface ProfileData {
+  nickname: string;
   weight: string;
   height: string;
   age: string;
@@ -26,12 +27,13 @@ export const useProfileData = () => {
 
         const { data: profile } = await supabase
           .from("profiles")
-          .select("weight, height, age, gender, fitness_level, fitness_goals, equipment_preferences")
+          .select("nickname, weight, height, age, gender, fitness_level, fitness_goals, equipment_preferences")
           .eq("user_id", user.id)
           .single();
 
         if (profile) {
           setProfileData({
+            nickname: profile.nickname || "",
             weight: profile.weight?.toString() || "",
             height: profile.height?.toString() || "",
             age: profile.age?.toString() || "",

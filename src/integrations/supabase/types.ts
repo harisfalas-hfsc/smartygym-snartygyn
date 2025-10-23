@@ -288,6 +288,7 @@ export type Database = {
           has_completed_profile: boolean | null
           height: number | null
           id: string
+          nickname: string | null
           updated_at: string
           user_id: string
           weight: number | null
@@ -304,6 +305,7 @@ export type Database = {
           has_completed_profile?: boolean | null
           height?: number | null
           id?: string
+          nickname?: string | null
           updated_at?: string
           user_id: string
           weight?: number | null
@@ -320,6 +322,7 @@ export type Database = {
           has_completed_profile?: boolean | null
           height?: number | null
           id?: string
+          nickname?: string | null
           updated_at?: string
           user_id?: string
           weight?: number | null
