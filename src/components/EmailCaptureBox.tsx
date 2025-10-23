@@ -25,9 +25,9 @@ export const EmailCaptureBox = () => {
 
     setLoading(true);
     try {
-      const { error } = await supabase
-        .from("newsletter_subscribers")
-        .insert({ name, email });
+      const { error } = await supabase.functions.invoke('subscribe-newsletter', {
+        body: { name, email }
+      });
 
       if (error) throw error;
 
