@@ -226,14 +226,6 @@ export default function Community() {
                 </button>
               </div>
             </div>
-                <button 
-                  onClick={() => navigate("/premium-comparison")}
-                  className="text-xs text-muted-foreground hover:text-primary transition-colors underline"
-                >
-                  Why Premium?
-                </button>
-              </div>
-            </div>
           </aside>
         </div>
       </div>
