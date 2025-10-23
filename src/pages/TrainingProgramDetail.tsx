@@ -31,25 +31,151 @@ const TrainingProgramDetail = () => {
   const [durationFilter, setDurationFilter] = useState<DurationFilter>("all");
 
   const programTitles: { [key: string]: string } = {
-    "cardio": "Cardio Program",
-    "functional-strength": "Functional Strength Program",
-    "muscle-hypertrophy": "Muscle Hypertrophy Program",
-    "weight-loss": "Weight Loss Program",
-    "low-back-pain": "Low Back Pain Program",
-    "mobility-stability": "Mobility & Stability Program"
+    "cardio-endurance": "Cardio Endurance Programs",
+    "functional-strength": "Functional Strength Programs",
+    "muscle-hypertrophy": "Muscle Hypertrophy Programs",
+    "weight-loss": "Weight Loss Programs",
+    "low-back-pain": "Low Back Pain Programs",
+    "mobility-stability": "Mobility & Stability Programs"
   };
 
   const programData: { [key: string]: TrainingProgram[] } = {
-    "cardio": [],
-    "functional-strength": [],
-    "muscle-hypertrophy": [],
-    "weight-loss": [],
-    "low-back-pain": [],
-    "mobility-stability": [],
+    "cardio-endurance": [
+      {
+        id: "T-C001",
+        name: "Cardio Performance Booster",
+        description: "6-week cardiovascular conditioning plan to build aerobic base, increase VO₂ max, and improve overall endurance.",
+        duration: "6",
+        equipment: "equipment",
+        level: "intermediate",
+        imageUrl: cardioEnduranceImg,
+        isFree: false
+      },
+      {
+        id: "T-C002",
+        name: "Cardio Max Endurance",
+        description: "Progressive 8-week endurance plan for athletes seeking peak aerobic and anaerobic capacity using HIIT and threshold training.",
+        duration: "8",
+        equipment: "equipment",
+        level: "advanced",
+        imageUrl: cardioEnduranceImg,
+        isFree: false
+      }
+    ],
+    "functional-strength": [
+      {
+        id: "T-F001",
+        name: "Functional Strength Builder",
+        description: "6-week program to develop foundational full-body strength, improve neuromuscular control, and enhance movement efficiency.",
+        duration: "6",
+        equipment: "equipment",
+        level: "intermediate",
+        imageUrl: functionalStrengthImg,
+        isFree: false
+      },
+      {
+        id: "T-F002",
+        name: "Functional Strength Elite",
+        description: "Advanced 8-week program focused on multi-plane compound lifts, explosive power integration, and heavy load tolerance.",
+        duration: "8",
+        equipment: "equipment",
+        level: "advanced",
+        imageUrl: functionalStrengthImg,
+        isFree: false
+      }
+    ],
+    "muscle-hypertrophy": [
+      {
+        id: "T-H001",
+        name: "Muscle Hypertrophy Builder",
+        description: "6-week intermediate hypertrophy split designed to maximize muscle volume and structural balance with moderate loads.",
+        duration: "6",
+        equipment: "equipment",
+        level: "intermediate",
+        imageUrl: muscleHypertrophyImg,
+        isFree: false
+      },
+      {
+        id: "T-H002",
+        name: "Muscle Hypertrophy Pro",
+        description: "Advanced 8-week hypertrophy system emphasizing metabolic stress, mechanical tension, and progressive overload.",
+        duration: "8",
+        equipment: "equipment",
+        level: "advanced",
+        imageUrl: muscleHypertrophyImg,
+        isFree: false
+      }
+    ],
+    "weight-loss": [
+      {
+        id: "T-W001",
+        name: "Weight Loss Ignite",
+        description: "Metabolic-driven 6-week fat loss program combining circuit training, interval cardio, and strength elements.",
+        duration: "6",
+        equipment: "equipment",
+        level: "intermediate",
+        imageUrl: cardioEnduranceImg,
+        isFree: false
+      },
+      {
+        id: "T-W002",
+        name: "Weight Loss Elite",
+        description: "Aggressive 8-week fat-loss regimen focused on metabolic conditioning, resistance circuits, and athletic HIIT.",
+        duration: "8",
+        equipment: "equipment",
+        level: "advanced",
+        imageUrl: cardioEnduranceImg,
+        isFree: false
+      }
+    ],
+    "low-back-pain": [
+      {
+        id: "T-L001",
+        name: "Low Back Pain Rehab Strength",
+        description: "Controlled 6-week program for strengthening spinal stabilizers, improving posture, and reducing lower back discomfort.",
+        duration: "6",
+        equipment: "equipment",
+        level: "intermediate",
+        imageUrl: functionalStrengthImg,
+        isFree: false
+      },
+      {
+        id: "T-L002",
+        name: "Low Back Performance",
+        description: "Advanced 8-week strength and stability program to reinforce posterior chain and protect against re-injury.",
+        duration: "8",
+        equipment: "equipment",
+        level: "advanced",
+        imageUrl: functionalStrengthImg,
+        isFree: false
+      }
+    ],
+    "mobility-stability": [
+      {
+        id: "T-M001",
+        name: "Mobility & Stability Flow",
+        description: "Full-body 6-week mobility plan improving joint range, neuromuscular control, and posture.",
+        duration: "6",
+        equipment: "bodyweight",
+        level: "intermediate",
+        imageUrl: functionalStrengthImg,
+        isFree: false
+      },
+      {
+        id: "T-M002",
+        name: "Mobility & Stability Master Flow",
+        description: "Advanced 8-week flow for dynamic joint control, strength through range, and high-level body awareness.",
+        duration: "8",
+        equipment: "equipment",
+        level: "advanced",
+        imageUrl: functionalStrengthImg,
+        isFree: false
+      }
+    ],
   };
 
-  const title = programTitles[type || ""] || "Training Program";
-  const programs = programData[type || "cardio"] || [];
+  const title = programTitles[type || ""] || "Training Programs";
+  const programs = programData[type || "cardio-endurance"] || [];
   
   const filteredPrograms = programs.filter(
     program => 
