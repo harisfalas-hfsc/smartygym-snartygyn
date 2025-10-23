@@ -34,6 +34,20 @@ import stabilityCircuitImg from "@/assets/stability-circuit-workout.jpg";
 import mobilityMasteryImg from "@/assets/mobility-mastery-workout.jpg";
 import balanceForgeImg from "@/assets/balance-forge-workout.jpg";
 import powerSurgeImg from "@/assets/power-surge-workout.jpg";
+import ironCoreStrengthImg from "@/assets/iron-core-strength-workout.jpg";
+import bodyweightFoundationImg from "@/assets/bodyweight-foundation-workout.jpg";
+import calorieCrusherCircuitImg from "@/assets/calorie-crusher-circuit-workout.jpg";
+import bodyweightFatMeltImg from "@/assets/bodyweight-fat-melt-workout.jpg";
+import cardioPowerIntervalsImg from "@/assets/cardio-power-intervals-workout.jpg";
+import bodyweightEnduroFlowImg from "@/assets/bodyweight-enduro-flow-workout.jpg";
+import metabolicDestroyerImg from "@/assets/metabolic-destroyer-workout.jpg";
+import metabolicBodyBlastImg from "@/assets/metabolic-body-blast-workout.jpg";
+import mobilityResetImg from "@/assets/mobility-reset-workout.jpg";
+import bodyweightStabilityFlowImg from "@/assets/bodyweight-stability-flow-workout.jpg";
+import powerSurgeAdvancedImg from "@/assets/power-surge-advanced-workout.jpg";
+import explosiveBodyControlImg from "@/assets/explosive-body-control-workout.jpg";
+import hfscGrinderImg from "@/assets/hfsc-grinder-challenge-workout.jpg";
+import hfscBodyweightInfernoImg from "@/assets/hfsc-bodyweight-inferno-workout.jpg";
 import ultimateChallengeImg from "@/assets/ultimate-challenge-workout.jpg";
 import powerPrimerImg from "@/assets/power-primer-workout.jpg";
 import explosiveStartImg from "@/assets/explosive-start-workout.jpg";
@@ -2424,7 +2438,7 @@ Finisher: 3 rounds`,
       difficulty: "Advanced",
       duration: "60 min",
       equipment: "Barbell, Dumbbells, Kettlebells, Pull-Up Bar",
-      imageUrl: ironCoreImg,
+      imageUrl: ironCoreStrengthImg,
       description: "This workout focuses on compound lifts to build full-body strength. The mix of bilateral and unilateral movements enhances stability, power output, and joint control.",
       workoutType: "REPS & SETS",
       format: `4-3 Sets per exercise
@@ -2488,7 +2502,7 @@ Tempo: 3-1-1 (controlled)`,
       difficulty: "Intermediate",
       duration: "45 min",
       equipment: "Bodyweight Only",
-      imageUrl: gravityGrindImg,
+      imageUrl: bodyweightFoundationImg,
       description: "A full-body strength session using tempo, holds, and unilateral control to simulate resistance training.",
       workoutType: "REPS & SETS",
       format: `3-4 sets per exercise
@@ -2552,7 +2566,7 @@ Rest 60-90s between sets`,
       difficulty: "Intermediate",
       duration: "45 min",
       equipment: "Dumbbells, Kettlebells",
-      imageUrl: calorieCrusherImg,
+      imageUrl: calorieCrusherCircuitImg,
       description: "A fast-paced circuit that blends resistance and cardio intervals to maximize calorie expenditure and metabolic demand.",
       workoutType: "CIRCUIT",
       format: `5 Rounds for Time
@@ -2609,7 +2623,7 @@ Rest 90s between rounds`,
       difficulty: "Intermediate",
       duration: "30 min",
       equipment: "Bodyweight Only",
-      imageUrl: metabolicBurnImg,
+      imageUrl: bodyweightFatMeltImg,
       description: "A HIIT-style circuit emphasizing continuous movement for maximum fat burn.",
       workoutType: "AMRAP",
       format: `AMRAP - 20 minutes
@@ -2666,7 +2680,7 @@ No rest between exercises`,
       difficulty: "Intermediate",
       duration: "45 min",
       equipment: "Rower, Bike, Kettlebell, Dumbbells",
-      imageUrl: cardioBlastImg,
+      imageUrl: cardioPowerIntervalsImg,
       description: "Cardio conditioning intervals combining endurance with short strength bursts.",
       workoutType: "FOR TIME",
       format: `3 min work per station
@@ -2716,7 +2730,7 @@ Repeat x3 rounds`,
       difficulty: "Beginner",
       duration: "30 min",
       equipment: "Bodyweight Only",
-      imageUrl: cardioBlastImg,
+      imageUrl: bodyweightEnduroFlowImg,
       description: "Continuous-flow cardio bodyweight workout improving endurance and oxygen capacity.",
       workoutType: "CIRCUIT",
       format: `4 Rounds
@@ -2773,7 +2787,7 @@ Continuous movement`,
       difficulty: "Advanced",
       duration: "45 min",
       equipment: "Barbell, Kettlebells, Rower",
-      imageUrl: metaboInfernoImg,
+      imageUrl: metabolicDestroyerImg,
       description: "Metabolic conditioning workout blending strength and cardio elements for post-workout oxygen consumption (EPOC).",
       workoutType: "FOR TIME",
       format: `For Time
@@ -2830,7 +2844,7 @@ Record total time`,
       difficulty: "Intermediate",
       duration: "30 min",
       equipment: "Bodyweight Only",
-      imageUrl: metaboShockImg,
+      imageUrl: metabolicBodyBlastImg,
       description: "Short, explosive bodyweight intervals to maximize metabolic impact.",
       workoutType: "TABATA",
       format: `Tabata Format
@@ -2881,7 +2895,7 @@ Rotate between exercises
       difficulty: "Intermediate",
       duration: "45 min",
       equipment: "Foam Roller, Mini Band, Mat",
-      imageUrl: mobilityMasteryImg,
+      imageUrl: mobilityResetImg,
       description: "Mobility and stability session focusing on controlled joint movement and core activation.",
       workoutType: "CIRCUIT",
       format: `Controlled movements
@@ -2945,7 +2959,7 @@ Focus on breathing
       difficulty: "Beginner",
       duration: "30 min",
       equipment: "Bodyweight Only",
-      imageUrl: flowForgeImg,
+      imageUrl: bodyweightStabilityFlowImg,
       description: "A gentle movement flow focusing on balance, posture, and joint control.",
       workoutType: "FLOW",
       format: `Flow Sequence
@@ -3002,7 +3016,7 @@ Hold each move 30s`,
       difficulty: "Advanced",
       duration: "45 min",
       equipment: "Barbell, Medicine Ball, Box",
-      imageUrl: powerSurgeImg,
+      imageUrl: powerSurgeAdvancedImg,
       description: "Explosive power session for athletes focused on speed, coordination, and maximal output.",
       workoutType: "REPS & SETS",
       format: `3-4 sets per exercise
@@ -3059,7 +3073,7 @@ Full recovery between sets`,
       difficulty: "Intermediate",
       duration: "30 min",
       equipment: "Bodyweight Only",
-      imageUrl: explosiveEngineImg,
+      imageUrl: explosiveBodyControlImg,
       description: "Plyometric training session to develop speed and explosive strength.",
       workoutType: "CIRCUIT",
       format: `4 Rounds
@@ -3116,7 +3130,7 @@ Focus on power output`,
       difficulty: "Elite",
       duration: "60 min",
       equipment: "Barbell, Dumbbells, Pull-Up Bar, Rower",
-      imageUrl: ultimateChallengeImg,
+      imageUrl: hfscBodyweightInfernoImg,
       description: "The HFSC Grinder is a brutal full-body challenge testing strength, endurance, and willpower.",
       workoutType: "FOR TIME",
       format: `For Time
@@ -3181,7 +3195,7 @@ Record total time`,
       difficulty: "Advanced",
       duration: "45 min",
       equipment: "Bodyweight Only, Pull-Up Bar",
-      imageUrl: ultimateChallengeImg,
+      imageUrl: hfscGrinderImg,
       description: "A full-body bodyweight test pushing endurance, coordination, and mindset.",
       workoutType: "AMRAP",
       format: `AMRAP - 30 minutes
