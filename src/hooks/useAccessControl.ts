@@ -116,9 +116,25 @@ export const useAccessControl = () => {
     return true;
   };
 
+  const canInteract = (contentType: "free-workout" | "premium-workout" | "free-program" | "premium-program"): boolean => {
+    const { userTier } = state;
+
+    // Guests cannot interact with any content
+    if (userTier === "guest") return false;
+
+    // Subscribers can interact with free content only
+    if (userTier === "subscriber") {
+      return contentType === "free-workout" || contentType === "free-program";
+    }
+
+    // Premium members can interact with all content
+    return true;
+  };
+
   return {
     ...state,
     canAccessContent,
+    canInteract,
     refreshAccess: checkAccess,
   };
 };

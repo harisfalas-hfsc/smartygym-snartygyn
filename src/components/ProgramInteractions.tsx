@@ -10,16 +10,21 @@ interface ProgramInteractionsProps {
   programId: string;
   programType: string;
   programName: string;
+  isFreeContent: boolean; // Add this to determine if content is free or premium
 }
 
-export const ProgramInteractions = ({ programId, programType, programName }: ProgramInteractionsProps) => {
+export const ProgramInteractions = ({ programId, programType, programName, isFreeContent }: ProgramInteractionsProps) => {
   const [isFavorite, setIsFavorite] = useState(false);
   const [isCompleted, setIsCompleted] = useState(false);
   const [rating, setRating] = useState<number>(0);
   const [isLoading, setIsLoading] = useState(true);
   const { toast } = useToast();
-  const { userTier } = useAccessControl();
+  const { userTier, canInteract } = useAccessControl();
   const navigate = useNavigate();
+
+  // Determine content type for permission check
+  const contentType = isFreeContent ? "free-program" : "premium-program";
+  const canUserInteract = canInteract(contentType);
 
   useEffect(() => {
     loadInteractions();
@@ -78,9 +83,13 @@ export const ProgramInteractions = ({ programId, programType, programName }: Pro
   };
 
   const showUpgradePrompt = () => {
+    const message = isFreeContent && userTier === "subscriber" 
+      ? "This feature is available for free content. Please check your subscription status."
+      : "Upgrade to Premium to favorite, rate, and track this program!";
+    
     toast({
       title: "Premium Feature",
-      description: "Upgrade to Premium to favorite, rate, and track programs!",
+      description: message,
       action: (
         <Button size="sm" onClick={() => navigate("/")}>
           <Crown className="w-4 h-4 mr-2" />
@@ -91,7 +100,7 @@ export const ProgramInteractions = ({ programId, programType, programName }: Pro
   };
 
   const toggleFavorite = async () => {
-    if (userTier !== "premium") {
+    if (!canUserInteract) {
       showUpgradePrompt();
       return;
     }
@@ -130,7 +139,7 @@ export const ProgramInteractions = ({ programId, programType, programName }: Pro
   };
 
   const toggleCompleted = async () => {
-    if (userTier !== "premium") {
+    if (!canUserInteract) {
       showUpgradePrompt();
       return;
     }
@@ -169,7 +178,7 @@ export const ProgramInteractions = ({ programId, programType, programName }: Pro
   };
 
   const handleRating = async (newRating: number) => {
-    if (userTier !== "premium") {
+    if (!canUserInteract) {
       showUpgradePrompt();
       return;
     }
@@ -209,17 +218,23 @@ export const ProgramInteractions = ({ programId, programType, programName }: Pro
     return null;
   }
 
-  // Don't show interactions for guests or subscribers
-  if (userTier === "guest" || userTier === "subscriber") {
+  // Show interactions for subscribers on free content and premium members on all content
+  if (!canUserInteract) {
+    const promptMessage = userTier === "subscriber" && !isFreeContent
+      ? "Upgrade to Premium to track, favorite, and rate premium programs"
+      : "Log in to track, favorite, and rate programs";
+
     return (
       <div className="p-4 bg-muted/50 rounded-lg border-2 border-dashed border-primary/30 text-center">
         <Crown className="w-8 h-8 text-primary mx-auto mb-2" />
-        <p className="text-sm font-semibold mb-1">Premium Feature</p>
-        <p className="text-xs text-muted-foreground mb-3">
-          Upgrade to track, favorite, and rate programs
+        <p className="text-sm font-semibold mb-1">
+          {userTier === "guest" ? "Login Required" : "Premium Feature"}
         </p>
-        <Button size="sm" onClick={() => navigate("/")}>
-          View Plans
+        <p className="text-xs text-muted-foreground mb-3">
+          {promptMessage}
+        </p>
+        <Button size="sm" onClick={() => navigate(userTier === "guest" ? "/auth" : "/")}>
+          {userTier === "guest" ? "Log In" : "View Plans"}
         </Button>
       </div>
     );
