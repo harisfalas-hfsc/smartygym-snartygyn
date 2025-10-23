@@ -221,7 +221,7 @@ const PremiumComparison = () => {
                 </div>
                 <Button 
                   className="w-full mt-6 bg-gradient-to-r from-primary to-accent hover:opacity-90"
-                  onClick={() => navigate("/join-premium")}
+                  onClick={() => navigate("/joinpremium")}
                 >
                   <Crown className="w-4 h-4 mr-2" />
                   Get Premium
@@ -306,7 +306,7 @@ const PremiumComparison = () => {
                       <td className="p-6 text-center">
                         <Button 
                           className="bg-gradient-to-r from-primary to-accent hover:opacity-90 shadow-lg"
-                          onClick={() => navigate("/join-premium")}
+                          onClick={() => navigate("/joinpremium")}
                         >
                           <Crown className="w-4 h-4 mr-2" />
                           Get Premium
