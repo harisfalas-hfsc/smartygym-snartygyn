@@ -83,13 +83,9 @@ const App = () => (
                 <Route path="/trainingprogram/:type/:id" element={<IndividualTrainingProgram />} />
                 <Route path="/dietplan" element={<DietPlanFlow />} />
                 
-                {/* Exercise library public, community requires authentication */}
+                {/* Exercise library and community are public */}
                 <Route path="/exerciselibrary" element={<ExerciseLibrary />} />
-                <Route path="/community" element={
-                  <ProtectedRoute>
-                    <Community />
-                  </ProtectedRoute>
-                } />
+                <Route path="/community" element={<Community />} />
                 <Route path="/article/:id" element={<ArticleDetail />} />
                 
                 {/* Authenticated routes with motivational banner */}
