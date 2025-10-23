@@ -22,9 +22,9 @@ const IndividualTrainingProgram = () => {
   const navigate = useNavigate();
   const { type, id } = useParams();
 
-  // Free programs for testing
+  // Weight Loss Ignite (T-W001) is FREE for testing
   const freePrograms: string[] = ["T-W001"];
-  const isFreeProgram = freePrograms.includes(id || '');
+  const isFreeProgram = id === "T-W001" || freePrograms.includes(id || '');
 
   // Helper function to format focus label
   const getFocusLabel = (type: string | undefined): string => {
@@ -388,7 +388,7 @@ const IndividualTrainingProgram = () => {
         </script>
       </Helmet>
 
-      <AccessGate requireAuth={true} requirePremium={!isFreeProgram} contentType="program">
+      <AccessGate requireAuth={!isFreeProgram} requirePremium={false} contentType="program">
         <div className="min-h-screen bg-background">
           <div className="container mx-auto max-w-4xl px-4 py-8">
             <Button
