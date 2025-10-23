@@ -4,6 +4,7 @@ import { Helmet } from "react-helmet";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { ArrowLeft, Calendar } from "lucide-react";
+import { AccessGate } from "@/components/AccessGate";
 import cardioEnduranceImg from "@/assets/cardio-endurance-program.jpg";
 import functionalStrengthImg from "@/assets/functional-strength-program.jpg";
 import muscleHypertrophyImg from "@/assets/muscle-hypertrophy-program.jpg";
@@ -200,6 +201,7 @@ const TrainingProgramDetail = () => {
         <meta name="description" content={`Browse ${title.toLowerCase()} training programs - 4, 6, and 8 week options`} />
       </Helmet>
       
+      <AccessGate requireAuth={true} requirePremium={false} contentType="feature">
       <div className="min-h-screen bg-background">
       <div className="container mx-auto max-w-6xl px-4 py-8">
         <Button
@@ -356,6 +358,7 @@ const TrainingProgramDetail = () => {
         )}
       </div>
       </div>
+      </AccessGate>
     </>
   );
 };

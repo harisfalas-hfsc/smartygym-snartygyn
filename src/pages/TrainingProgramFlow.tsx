@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { ArrowLeft, Heart, Dumbbell, Activity, Flame, User, Move, Scale } from "lucide-react";
 import { BackToTop } from "@/components/BackToTop";
+import { AccessGate } from "@/components/AccessGate";
 
 const TrainingProgramFlow = () => {
   const navigate = useNavigate();
@@ -54,9 +55,9 @@ const TrainingProgramFlow = () => {
   return (
     <>
       <Helmet>
-        <title>Training Programs - Smarty Gym | 6-8 Week Programs Cyprus | smartygym.com</title>
-        <meta name="description" content="Explore structured training programs designed by sports scientist Haris Falas. 6-8 week results-based plans for convenient, flexible fitness - gym reimagined for anywhere, anytime training.Structured 6-8 week training programs by Sports Scientist Haris Falas. Cardio, strength, hypertrophy, weight loss, mobility programs. Cyprus online fitness expertise." />
-        <meta name="keywords" content="training programs Cyprus, workout programs, 6 week programs, 8 week programs, strength programs, weight loss programs, smartygym programs" />
+        <title>Training Programs - Smarty Gym | 6-8 Week Structured Programs Cyprus | smartygym.com</title>
+        <meta name="description" content="Structured 6-8 week training programs by Sports Scientist Haris Falas at smartygym.com. Results-based programs for cardio endurance, functional strength, muscle hypertrophy, weight loss, low back pain rehab, mobility & stability. Convenient & flexible gym reimagined for Cyprus and worldwide - evidence-based progressive training anywhere, anytime." />
+        <meta name="keywords" content="training programs Cyprus, smartygym programs, smarty gym, smartygym.com, Haris Falas programs, 6 week programs, 8 week programs, cardio endurance program, functional strength program, muscle hypertrophy program, weight loss program Cyprus, back pain program, mobility program, structured training Cyprus, progressive training, evidence-based programs, convenient fitness, flexible training, gym reimagined, online gym Cyprus, sports scientist Cyprus, workout programs, fitness programs Cyprus" />
         
         <meta property="og:title" content="Training Programs - Smarty Gym Cyprus" />
         <meta property="og:description" content="Structured training programs designed by Sports Scientist Haris Falas" />
@@ -70,6 +71,7 @@ const TrainingProgramFlow = () => {
         <link rel="canonical" href="https://smartygym.com/training-program" />
       </Helmet>
       
+      <AccessGate requireAuth={true} requirePremium={false} contentType="feature">
       <div className="min-h-screen bg-background">
       <BackToTop />
       <div className="container mx-auto max-w-6xl px-4 py-8">
@@ -136,6 +138,7 @@ const TrainingProgramFlow = () => {
         </div>
       </div>
       </div>
+      </AccessGate>
     </>
   );
 };

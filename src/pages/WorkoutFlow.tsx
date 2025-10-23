@@ -5,6 +5,7 @@ import { Card } from "@/components/ui/card";
 import { ArrowLeft, Dumbbell, Flame, Zap, Heart, Move, Activity, TrendingUp } from "lucide-react";
 import { EmailCaptureBox } from "@/components/EmailCaptureBox";
 import { BackToTop } from "@/components/BackToTop";
+import { AccessGate } from "@/components/AccessGate";
 
 const WorkoutFlow = () => {
   const navigate = useNavigate();
@@ -61,9 +62,9 @@ const WorkoutFlow = () => {
   return (
     <>
       <Helmet>
-        <title>Workouts - Smarty Gym | Convenient & Flexible Training by Haris Falas</title>
-        <meta name="description" content="Browse standalone workout sessions designed to challenge and motivate you. Functional fitness workouts by certified sports scientist Haris Falas - convenient training anywhere, anytime.Free online workouts by Haris Falas at smartygym.com - convenient & flexible gym reimagined. Strength, cardio, metabolic, mobility training anywhere, anytime." />
-        <meta name="keywords" content="smartygym workouts, smarty gym, smartygym.com, Haris Falas, free workouts, convenient fitness, flexible training, gym reimagined, online workouts, strength training, cardio workouts" />
+        <title>Workouts - Smarty Gym | Free AMRAP TABATA HIIT Circuit Training Cyprus | Haris Falas | smartygym.com</title>
+        <meta name="description" content="Browse 60+ standalone workout sessions at smartygym.com - AMRAP, TABATA, HIIT, circuit, for time workouts by Sports Scientist Haris Falas. Free bodyweight & equipment workouts: strength, cardio, metabolic, mobility, power, challenge training. Convenient & flexible gym reimagined for Cyprus and worldwide." />
+        <meta name="keywords" content="smartygym workouts, smarty gym, smartygym.com, Haris Falas workouts Cyprus, free workouts, AMRAP workouts, TABATA training, HIIT workouts Cyprus, circuit training, for time workouts, bodyweight training, no equipment workouts, strength training, cardio workouts, metabolic conditioning, mobility training, power workouts, challenge workouts, convenient fitness, flexible training, gym reimagined, online workouts Cyprus, functional fitness Cyprus, home workouts, explosive training, plyometric workouts, kettlebell workouts, resistance band training" />
         
         <meta property="og:title" content="Workouts - Smarty Gym | Fitness Reimagined" />
         <meta property="og:description" content="Convenient & flexible workouts designed by Sports Scientist Haris Falas - train anywhere, anytime" />
@@ -77,6 +78,7 @@ const WorkoutFlow = () => {
         <link rel="canonical" href="https://smartygym.com/workout" />
       </Helmet>
       
+      <AccessGate requireAuth={true} requirePremium={false} contentType="feature">
       <div className="min-h-screen bg-background">
       <BackToTop />
       <div className="container mx-auto max-w-6xl px-4 py-8">
@@ -148,6 +150,7 @@ const WorkoutFlow = () => {
         </div>
       </div>
       </div>
+      </AccessGate>
     </>
   );
 };
