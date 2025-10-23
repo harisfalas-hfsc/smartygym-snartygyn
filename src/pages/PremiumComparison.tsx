@@ -287,8 +287,7 @@ const PremiumComparison = () => {
                       <td className="p-6"></td>
                       <td className="p-6 text-center">
                         <Button 
-                          variant="outline"
-                          className="bg-gradient-to-r from-background to-muted/30 border-border hover:bg-muted/50 cursor-default"
+                          className="bg-gradient-to-r from-muted/80 to-muted/60 hover:opacity-90 shadow-lg cursor-default"
                           disabled
                         >
                           <Eye className="w-4 h-4 mr-2" />
@@ -298,7 +297,7 @@ const PremiumComparison = () => {
                       <td className="p-6 text-center">
                         {!user && (
                           <Button 
-                            className="bg-gradient-to-r from-primary/20 to-primary/10 hover:from-primary/30 hover:to-primary/20 border border-primary/30 text-foreground"
+                            className="bg-gradient-to-r from-primary/50 to-primary/30 hover:opacity-90 shadow-lg"
                             onClick={() => navigate("/auth")}
                           >
                             <UserCheck className="w-4 h-4 mr-2" />
@@ -307,8 +306,7 @@ const PremiumComparison = () => {
                         )}
                         {user && (
                           <Button 
-                            variant="outline"
-                            className="bg-gradient-to-r from-primary/20 to-primary/10 border-primary/30 cursor-default text-foreground"
+                            className="bg-gradient-to-r from-primary/50 to-primary/30 hover:opacity-90 shadow-lg cursor-default"
                             disabled
                           >
                             <UserCheck className="w-4 h-4 mr-2" />
