@@ -90,7 +90,14 @@ const WorkoutDetail = () => {
     "calorie-burning": [],
     "metabolic": [],
     "cardio": [],
-    "mobility": [],
+    "mobility": [
+      { id: "mobility-025", name: "Flow Starter", description: "A gentle mobility circuit designed to improve joint range, posture, and control", duration: "30 min", equipment: "bodyweight", level: "beginner", format: "circuit", imageUrl: flowStarterImg, isFree: true },
+      { id: "mobility-026", name: "Band Balance", description: "A beginner-friendly workout using bands and a fit ball to enhance joint mobility and core stability", duration: "30 min", equipment: "equipment", level: "beginner", format: "reps & sets", imageUrl: bandBalanceImg, isFree: true },
+      { id: "mobility-027", name: "Core Flow", description: "A dynamic blend of mobility and core stability using bodyweight flows and static holds", duration: "45 min", equipment: "bodyweight", level: "intermediate", format: "mix", imageUrl: coreFlowImg, isFree: true },
+      { id: "mobility-028", name: "Stability Circuit", description: "A full-body stability circuit using fit ball, bands, and mat work to challenge balance", duration: "45 min", equipment: "equipment", level: "intermediate", format: "circuit", imageUrl: stabilityCircuitImg, isFree: true },
+      { id: "mobility-029", name: "Mobility Mastery", description: "An advanced mobility and stability workout using high-intensity intervals and deep holds", duration: "60 min", equipment: "bodyweight", level: "advanced", format: "circuit", imageUrl: mobilityMasteryImg, isFree: true },
+      { id: "mobility-030", name: "Balance Forge", description: "A precision-based mobility workout using fit ball, bands, and mat work to develop elite control", duration: "60 min", equipment: "equipment", level: "advanced", format: "reps & sets", imageUrl: balanceForgeImg, isFree: true },
+    ],
     "power": [
       { id: "power-037", name: "Power Primer", description: "A beginner-friendly circuit focused on basic explosive movements and coordination", duration: "30 min", equipment: "bodyweight", level: "beginner", format: "circuit", imageUrl: powerPrimerImg, isFree: true },
       { id: "power-038", name: "Explosive Start", description: "A light resistance workout using bands and medicine ball to introduce explosive movement patterns safely", duration: "30 min", equipment: "equipment", level: "beginner", format: "reps & sets", imageUrl: explosiveStartImg, isFree: true },

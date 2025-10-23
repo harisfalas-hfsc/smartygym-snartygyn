@@ -72,6 +72,12 @@ const IndividualWorkout = () => {
     'power-040', // Power Circuit Pro
     'power-041', // Explosive Engine
     'power-042', // Power Surge Elite
+    'mobility-025', // Flow Starter
+    'mobility-026', // Band Balance
+    'mobility-027', // Core Flow
+    'mobility-028', // Stability Circuit
+    'mobility-029', // Mobility Mastery
+    'mobility-030', // Balance Forge
   ];
   const isFreeWorkout = freeWorkouts.includes(id || '');
 
@@ -804,6 +810,380 @@ Finisher: 3 rounds`,
         "Use spotter for heavy lifts",
         "Warm up thoroughly",
         "Prioritize form over load"
+      ]
+    },
+    "mobility-025": {
+      name: "Flow Starter",
+      serialNumber: "MOB-BBW-025",
+      difficulty: "Beginner",
+      duration: "30 min",
+      equipment: "No Equipment Required",
+      imageUrl: flowStarterImg,
+      description: "A gentle mobility circuit designed to improve joint range, posture, and control. Ideal for beginners or recovery days.",
+      workoutType: "CIRCUIT",
+      format: `Circuit – 2 rounds
+Hold Time: 30–60s per move`,
+      instructions: "Move slowly and intentionally. Focus on breath and control. Rest 30s between moves.",
+      exercises: [
+        {
+          name: "Cat-Cow Flow",
+          sets: "2 rounds",
+          reps: "60s",
+          rest: "30s",
+          notes: "Fluid spine movement"
+        },
+        {
+          name: "Deep Squat Hold",
+          sets: "2 rounds",
+          reps: "45s",
+          rest: "30s",
+          notes: "Full range hold"
+        },
+        {
+          name: "Bird-Dog",
+          sets: "2 rounds",
+          reps: "10/side",
+          rest: "30s",
+          notes: "Core stability"
+        },
+        {
+          name: "Standing Hip Circles",
+          sets: "2 rounds",
+          reps: "10/leg",
+          rest: "30s",
+          notes: "Control and balance"
+        },
+        {
+          name: "Side Plank",
+          sets: "2 rounds",
+          reps: "30s/side",
+          rest: "30s",
+          notes: "Engage obliques"
+        }
+      ],
+      tips: [
+        "Avoid rushing through stretches",
+        "Keep spine neutral during core work",
+        "Listen to your body"
+      ]
+    },
+    "mobility-026": {
+      name: "Band Balance",
+      serialNumber: "MOB-EQ-026",
+      difficulty: "Beginner",
+      duration: "30 min",
+      equipment: "Bands, Fit Ball, Mat",
+      imageUrl: bandBalanceImg,
+      description: "A beginner-friendly workout using bands and a fit ball to enhance joint mobility and core stability.",
+      workoutType: "REPS & SETS",
+      format: `3 sets per exercise
+Hold Time: 30–45s`,
+      instructions: "Use light resistance. Perform each move with control. Rest 45s between sets.",
+      exercises: [
+        {
+          name: "Band Shoulder Dislocates",
+          sets: "3",
+          reps: "10",
+          rest: "45s",
+          notes: "Wide grip"
+        },
+        {
+          name: "Fit Ball Hip Bridges",
+          sets: "3",
+          reps: "12",
+          rest: "45s",
+          notes: "Squeeze glutes"
+        },
+        {
+          name: "Band Pull-Aparts",
+          sets: "3",
+          reps: "15",
+          rest: "45s",
+          notes: "Retract scapula"
+        },
+        {
+          name: "Fit Ball Wall Squat Hold",
+          sets: "3",
+          reps: "45s",
+          rest: "45s",
+          notes: "Back against ball"
+        },
+        {
+          name: "Seated Band Leg Extensions",
+          sets: "3",
+          reps: "12/leg",
+          rest: "45s",
+          notes: "Controlled movement"
+        }
+      ],
+      tips: [
+        "Don't overextend joints",
+        "Keep band tension consistent",
+        "Engage core throughout"
+      ]
+    },
+    "mobility-027": {
+      name: "Core Flow",
+      serialNumber: "MOB-BBW-027",
+      difficulty: "Intermediate",
+      duration: "45 min",
+      equipment: "No Equipment Required",
+      imageUrl: coreFlowImg,
+      description: "A dynamic blend of mobility and core stability using bodyweight flows and static holds. Great for posture and control.",
+      workoutType: "MIX",
+      format: `Flow + Static Holds
+2 rounds
+Hold Time: 30–60s`,
+      instructions: "Alternate between movement and holds. Rest 30s between exercises, 1 min between rounds.",
+      exercises: [
+        {
+          name: "Cat-Cow Flow",
+          sets: "2 rounds",
+          reps: "60s",
+          rest: "30s",
+          notes: "Fluid transitions"
+        },
+        {
+          name: "Side Plank Reach",
+          sets: "2 rounds",
+          reps: "30s/side",
+          rest: "30s",
+          notes: "Rotate through torso"
+        },
+        {
+          name: "Deep Squat to Stand",
+          sets: "2 rounds",
+          reps: "10",
+          rest: "30s",
+          notes: "Full range movement"
+        },
+        {
+          name: "Bird-Dog",
+          sets: "2 rounds",
+          reps: "10/side",
+          rest: "30s",
+          notes: "Opposite arm/leg"
+        },
+        {
+          name: "Hollow Body Hold",
+          sets: "2 rounds",
+          reps: "30s",
+          rest: "60s after round",
+          notes: "Lower back pressed down"
+        }
+      ],
+      tips: [
+        "Breathe through transitions",
+        "Keep hips aligned",
+        "Avoid collapsing in planks"
+      ]
+    },
+    "mobility-028": {
+      name: "Stability Circuit",
+      serialNumber: "MOB-EQ-028",
+      difficulty: "Intermediate",
+      duration: "45 min",
+      equipment: "Fit Ball, Bands, Mat",
+      imageUrl: stabilityCircuitImg,
+      description: "A full-body stability circuit using fit ball, bands, and mat work to challenge balance and joint control.",
+      workoutType: "CIRCUIT",
+      format: `Circuit – 3 rounds
+Hold Time: 30–60s`,
+      instructions: "Perform each move with control. Rest 30s between exercises, 1 min between rounds.",
+      exercises: [
+        {
+          name: "Fit Ball Wall Squats",
+          sets: "3 rounds",
+          reps: "12",
+          rest: "30s",
+          notes: "Full range"
+        },
+        {
+          name: "Band Lateral Walks",
+          sets: "3 rounds",
+          reps: "10 steps/side",
+          rest: "30s",
+          notes: "Keep tension"
+        },
+        {
+          name: "Fit Ball Plank Hold",
+          sets: "3 rounds",
+          reps: "45s",
+          rest: "30s",
+          notes: "Engage core"
+        },
+        {
+          name: "Band Shoulder Circles",
+          sets: "3 rounds",
+          reps: "10",
+          rest: "30s",
+          notes: "Controlled rotation"
+        },
+        {
+          name: "Side Plank with Reach",
+          sets: "3 rounds",
+          reps: "30s/side",
+          rest: "60s after round",
+          notes: "Rotate through torso"
+        }
+      ],
+      tips: [
+        "Keep knees aligned",
+        "Don't rush transitions",
+        "Use breath to stabilize"
+      ]
+    },
+    "mobility-029": {
+      name: "Mobility Mastery",
+      serialNumber: "MOB-BBW-029",
+      difficulty: "Advanced",
+      duration: "60 min",
+      equipment: "No Equipment Required",
+      imageUrl: mobilityMasteryImg,
+      description: "An advanced mobility and stability workout using high-intensity intervals and deep holds to challenge control and flexibility.",
+      workoutType: "HIIT",
+      format: `HIIT – 5 blocks
+Work: 45s / Rest: 15s
+Static Holds: 60s`,
+      instructions: "Alternate dynamic moves with static holds. Rest 1 min between blocks.",
+      exercises: [
+        {
+          name: "Block 1: Jump Lunges",
+          sets: "5 blocks",
+          reps: "45s work",
+          rest: "15s",
+          notes: "Explosive movement"
+        },
+        {
+          name: "Block 1: Deep Squat Hold",
+          sets: "5 blocks",
+          reps: "60s",
+          rest: "60s after block",
+          notes: "Static hold"
+        },
+        {
+          name: "Block 2: Plank to Pike",
+          sets: "5 blocks",
+          reps: "45s work",
+          rest: "15s",
+          notes: "Dynamic core"
+        },
+        {
+          name: "Block 2: Side Plank Hold",
+          sets: "5 blocks",
+          reps: "60s",
+          rest: "60s after block",
+          notes: "Each side"
+        },
+        {
+          name: "Block 3: Bird-Dog",
+          sets: "5 blocks",
+          reps: "45s work",
+          rest: "15s",
+          notes: "Alternating sides"
+        },
+        {
+          name: "Block 3: Hollow Body Hold",
+          sets: "5 blocks",
+          reps: "60s",
+          rest: "60s after block",
+          notes: "Core engaged"
+        },
+        {
+          name: "Block 4: Squat to Stand",
+          sets: "5 blocks",
+          reps: "45s work",
+          rest: "15s",
+          notes: "Full range"
+        },
+        {
+          name: "Block 4: Wall Sit",
+          sets: "5 blocks",
+          reps: "60s",
+          rest: "60s after block",
+          notes: "90 degree angle"
+        },
+        {
+          name: "Block 5: Push-Up to Down Dog",
+          sets: "5 blocks",
+          reps: "45s work",
+          rest: "15s",
+          notes: "Flow movement"
+        },
+        {
+          name: "Block 5: Cat-Cow Flow",
+          sets: "5 blocks",
+          reps: "60s",
+          rest: "0",
+          notes: "Fluid transitions"
+        }
+      ],
+      tips: [
+        "Don't skip warm-up",
+        "Keep core engaged",
+        "Focus on breath during holds"
+      ]
+    },
+    "mobility-030": {
+      name: "Balance Forge",
+      serialNumber: "MOB-EQ-030",
+      difficulty: "Advanced",
+      duration: "60 min",
+      equipment: "Fit Ball, Bands, Mat",
+      imageUrl: balanceForgeImg,
+      description: "A precision-based mobility workout using fit ball, bands, and mat work to develop elite control and joint integrity.",
+      workoutType: "REPS & SETS",
+      format: `3 sets per exercise
+Hold Time: 45–60s`,
+      instructions: "Use slow tempo and full range. Rest 60s between sets.",
+      exercises: [
+        {
+          name: "Fit Ball Hip Bridges",
+          sets: "3",
+          reps: "15",
+          rest: "60s",
+          notes: "Squeeze at top"
+        },
+        {
+          name: "Band Shoulder Dislocates",
+          sets: "3",
+          reps: "12",
+          rest: "60s",
+          notes: "Wide grip"
+        },
+        {
+          name: "Fit Ball Plank Hold",
+          sets: "3",
+          reps: "45s",
+          rest: "60s",
+          notes: "Maintain stability"
+        },
+        {
+          name: "Band Lateral Walks",
+          sets: "3",
+          reps: "10 steps/side",
+          rest: "60s",
+          notes: "Keep tension"
+        },
+        {
+          name: "Side Plank with Reach",
+          sets: "3",
+          reps: "45s/side",
+          rest: "60s",
+          notes: "Rotate through core"
+        },
+        {
+          name: "Hollow Body Hold",
+          sets: "3",
+          reps: "45s",
+          rest: "60s",
+          notes: "Lower back pressed"
+        }
+      ],
+      tips: [
+        "Keep spine neutral",
+        "Don't overextend joints",
+        "Engage stabilizers throughout"
       ]
     }
   };
