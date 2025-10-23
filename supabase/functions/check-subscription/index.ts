@@ -49,14 +49,40 @@ serve(async (req) => {
     if (customers.data.length === 0) {
       logStep("No customer found, updating unsubscribed state");
       
-      // Update or create subscription record as free
-      await supabaseClient
+      // Update or create subscription record as free with proper conflict resolution
+      const { error: upsertError } = await supabaseClient
         .from('user_subscriptions')
-        .upsert({
-          user_id: user.id,
-          plan_type: 'free',
-          status: 'active',
-        });
+        .upsert(
+          {
+            user_id: user.id,
+            plan_type: 'free',
+            status: 'active',
+            stripe_customer_id: null,
+            stripe_subscription_id: null,
+            current_period_start: null,
+            current_period_end: null,
+            cancel_at_period_end: false,
+          },
+          {
+            onConflict: 'user_id',
+            ignoreDuplicates: false
+          }
+        );
+      
+      if (upsertError) {
+        console.error('Free plan sync error:', upsertError);
+        return new Response(
+          JSON.stringify({ 
+            subscribed: false, 
+            plan_type: 'free',
+            error: 'Unable to sync subscription status'
+          }),
+          { 
+            status: 500, 
+            headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
+          }
+        );
+      }
       
       return new Response(JSON.stringify({ 
         subscribed: false,
@@ -96,30 +122,78 @@ serve(async (req) => {
       }
       logStep("Determined plan type", { planType });
 
-      // Update database with subscription info
-      await supabaseClient
+      // Update database with subscription info using proper conflict resolution
+      const { error: upsertError } = await supabaseClient
         .from('user_subscriptions')
-        .upsert({
-          user_id: user.id,
-          plan_type: planType,
-          status: 'active',
-          stripe_subscription_id: stripeSubscriptionId,
-          stripe_customer_id: customerId,
-          current_period_start: new Date(subscription.current_period_start * 1000).toISOString(),
-          current_period_end: subscriptionEnd,
-          updated_at: new Date().toISOString(),
-        });
+        .upsert(
+          {
+            user_id: user.id,
+            plan_type: planType,
+            status: 'active',
+            stripe_subscription_id: stripeSubscriptionId,
+            stripe_customer_id: customerId,
+            current_period_start: new Date(subscription.current_period_start * 1000).toISOString(),
+            current_period_end: subscriptionEnd,
+            cancel_at_period_end: subscription.cancel_at_period_end || false,
+          },
+          {
+            onConflict: 'user_id',
+            ignoreDuplicates: false
+          }
+        );
+
+      if (upsertError) {
+        console.error('Subscription sync error:', upsertError);
+        return new Response(
+          JSON.stringify({ 
+            subscribed: true, 
+            plan_type: planType,
+            subscription_end: subscriptionEnd,
+            error: 'Subscription active but sync failed'
+          }),
+          { 
+            status: 200, 
+            headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
+          }
+        );
+      }
     } else {
       logStep("No active subscription found");
       
-      // Update to free plan
-      await supabaseClient
+      // Update to free plan with proper conflict resolution
+      const { error: upsertError } = await supabaseClient
         .from('user_subscriptions')
-        .upsert({
-          user_id: user.id,
-          plan_type: 'free',
-          status: 'active',
-        });
+        .upsert(
+          {
+            user_id: user.id,
+            plan_type: 'free',
+            status: 'active',
+            stripe_customer_id: customerId,
+            stripe_subscription_id: null,
+            current_period_start: null,
+            current_period_end: null,
+            cancel_at_period_end: false,
+          },
+          {
+            onConflict: 'user_id',
+            ignoreDuplicates: false
+          }
+        );
+
+      if (upsertError) {
+        console.error('Free plan update error:', upsertError);
+        return new Response(
+          JSON.stringify({ 
+            subscribed: false, 
+            plan_type: 'free',
+            error: 'Unable to update subscription status'
+          }),
+          { 
+            status: 500, 
+            headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
+          }
+        );
+      }
     }
 
     return new Response(JSON.stringify({
@@ -133,9 +207,12 @@ serve(async (req) => {
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : String(error);
     logStep("ERROR in check-subscription", { message: errorMessage });
-    return new Response(JSON.stringify({ error: errorMessage }), {
-      headers: { ...corsHeaders, "Content-Type": "application/json" },
-      status: 500,
-    });
+    return new Response(
+      JSON.stringify({ error: 'Unable to check subscription status. Please try again.' }), 
+      {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+        status: 500,
+      }
+    );
   }
 });
