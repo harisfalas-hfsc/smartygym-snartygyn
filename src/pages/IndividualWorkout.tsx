@@ -90,6 +90,12 @@ const IndividualWorkout = () => {
     'strength-052', // Iron Builder
     'strength-053', // Bodyweight Powerhouse
     'strength-054', // Iron Mastery
+    'calorie-055', // Burn Flow
+    'calorie-056', // Sweat Band
+    'calorie-057', // Body Burn Pro
+    'calorie-058', // Sweat Surge
+    'calorie-059', // Inferno Sprint
+    'calorie-060', // Calorie Forge
   ];
   const isFreeWorkout = freeWorkouts.includes(id || '');
 
@@ -1789,6 +1795,317 @@ Rest: 2 mins between blocks`,
         "Use spotter for heavy lifts",
         "Warm up thoroughly",
         "Prioritize form over load"
+      ]
+    },
+    "calorie-055": {
+      name: "Burn Flow",
+      serialNumber: "CAL-BBW-055",
+      difficulty: "Beginner",
+      duration: "30 min",
+      equipment: "No Equipment Required",
+      imageUrl: burnStartImg,
+      description: "A low-impact circuit designed to elevate heart rate and burn calories without high-impact stress. Perfect for beginners easing into cardio.",
+      workoutType: "CIRCUIT",
+      format: `Circuit – 3 rounds
+Work: 30s / Rest: 30s`,
+      instructions: "Perform each move for 30 seconds. Rest 30 seconds between exercises. Rest 1 minute between rounds.",
+      exercises: [
+        {
+          name: "March in Place",
+          sets: "3 rounds",
+          reps: "30s",
+          rest: "30s",
+          notes: "Light and rhythmic"
+        },
+        {
+          name: "Bodyweight Squats",
+          sets: "3 rounds",
+          reps: "30s",
+          rest: "30s",
+          notes: "Full range"
+        },
+        {
+          name: "Step-Back Lunges",
+          sets: "3 rounds",
+          reps: "30s",
+          rest: "30s",
+          notes: "Alternate legs"
+        },
+        {
+          name: "Arm Circles",
+          sets: "3 rounds",
+          reps: "30s",
+          rest: "30s",
+          notes: "Forward and backward"
+        },
+        {
+          name: "Standing Knee Raises",
+          sets: "3 rounds",
+          reps: "30s",
+          rest: "30s",
+          notes: "Controlled movement"
+        },
+        {
+          name: "Wall Sit",
+          sets: "3 rounds",
+          reps: "30s",
+          rest: "60s after round",
+          notes: "90 degree angle"
+        }
+      ],
+      tips: [
+        "Keep movements light and rhythmic",
+        "Modify jumps to steps if needed",
+        "Focus on breathing and posture"
+      ]
+    },
+    "calorie-056": {
+      name: "Sweat Band",
+      serialNumber: "CAL-EQ-056",
+      difficulty: "Beginner",
+      duration: "30 min",
+      equipment: "Resistance Bands, Dumbbells, Mat",
+      imageUrl: sweatCircuitImg,
+      description: "A beginner-friendly Tabata workout using bands and light dumbbells to blend cardio and resistance for fat burn.",
+      workoutType: "TABATA",
+      format: `Tabata – 4 blocks
+Work: 20s / Rest: 10s x 8 rounds per block`,
+      instructions: "Complete each Tabata block before moving to the next. Rest 1 minute between blocks.",
+      exercises: [
+        {
+          name: "Block 1: Band Squat to Press",
+          sets: "8 rounds",
+          reps: "20s work / 10s rest",
+          rest: "60s after block",
+          notes: "Each block = 4 mins"
+        },
+        {
+          name: "Block 2: Dumbbell Rows",
+          sets: "8 rounds",
+          reps: "20s work / 10s rest",
+          rest: "60s after block",
+          notes: "Control movement"
+        },
+        {
+          name: "Block 3: Band Lateral Walks",
+          sets: "8 rounds",
+          reps: "20s work / 10s rest",
+          rest: "60s after block",
+          notes: "Keep tension"
+        },
+        {
+          name: "Block 4: Plank Hold",
+          sets: "8 rounds",
+          reps: "20s work / 10s rest",
+          rest: "0",
+          notes: "Maintain form"
+        }
+      ],
+      tips: [
+        "Don't rush reps",
+        "Keep band tension consistent",
+        "Breathe through transitions"
+      ]
+    },
+    "calorie-057": {
+      name: "Body Burn Pro",
+      serialNumber: "CAL-BBW-057",
+      difficulty: "Intermediate",
+      duration: "45 min",
+      equipment: "No Equipment Required",
+      imageUrl: bodyBurnoutImg,
+      description: "A fast-paced bodyweight AMRAP designed to spike heart rate and maximize calorie burn.",
+      workoutType: "AMRAP",
+      format: `AMRAP – 30 mins
+Finisher – 10 mins
+Warm-Up & Cool-Down – 5 mins`,
+      instructions: "Complete as many rounds as possible. Push consistent effort. Finish with a challenge block.",
+      exercises: [
+        {
+          name: "Main Block (30 mins AMRAP)",
+          sets: "AMRAP",
+          reps: "As many rounds as possible",
+          rest: "As needed",
+          notes: "Jump Squats – 15 reps, Push-Ups – 12 reps, Reverse Lunges – 10 reps/leg, Plank Shoulder Taps – 20 reps, Burpees – 8 reps"
+        },
+        {
+          name: "Finisher (10 mins)",
+          sets: "1",
+          reps: "Complete all",
+          rest: "0",
+          notes: "100 High Knees, 50 Mountain Climbers, 25 Jumping Jacks"
+        }
+      ],
+      tips: [
+        "Keep transitions tight",
+        "Use full range of motion",
+        "Hydrate between blocks"
+      ]
+    },
+    "calorie-058": {
+      name: "Sweat Surge",
+      serialNumber: "CAL-EQ-058",
+      difficulty: "Intermediate",
+      duration: "45 min",
+      equipment: "Dumbbells, Jump Rope, Mat",
+      imageUrl: sweatStormImg,
+      description: "A high-intensity interval training session using dumbbells and jump rope to burn calories and improve conditioning.",
+      workoutType: "HIIT",
+      format: `HIIT – 4 rounds
+Work: 45s / Rest: 15s`,
+      instructions: "Push hard during work intervals. Rest 1 minute between rounds.",
+      exercises: [
+        {
+          name: "Jump Rope",
+          sets: "4 rounds",
+          reps: "45s",
+          rest: "15s",
+          notes: "Steady rhythm"
+        },
+        {
+          name: "Dumbbell Thrusters",
+          sets: "4 rounds",
+          reps: "45s",
+          rest: "15s",
+          notes: "Front squat to press"
+        },
+        {
+          name: "Dumbbell Renegade Rows",
+          sets: "4 rounds",
+          reps: "45s",
+          rest: "15s",
+          notes: "Plank position"
+        },
+        {
+          name: "Jump Lunges",
+          sets: "4 rounds",
+          reps: "45s",
+          rest: "15s",
+          notes: "Explosive movement"
+        },
+        {
+          name: "Plank to Push-Up",
+          sets: "4 rounds",
+          reps: "45s",
+          rest: "60s after round",
+          notes: "Alternate arms"
+        }
+      ],
+      tips: [
+        "Keep jump rope rhythm steady",
+        "Choose weights that challenge you",
+        "Don't sacrifice form for speed"
+      ]
+    },
+    "calorie-059": {
+      name: "Inferno Sprint",
+      serialNumber: "CAL-BBW-059",
+      difficulty: "Advanced",
+      duration: "60 min",
+      equipment: "No Equipment Required",
+      imageUrl: infernoFlowImg,
+      description: "A high-intensity bodyweight challenge designed to push endurance and burn maximum calories. Complete the full workout as fast as possible.",
+      workoutType: "FOR TIME",
+      format: `For Time – 3 blocks
+Rest: 2 mins between blocks`,
+      instructions: "Complete each block as fast as possible. Rest only as needed.",
+      exercises: [
+        {
+          name: "Block 1 (15 mins)",
+          sets: "Repeat for 15 mins",
+          reps: "20-15-10",
+          rest: "As needed",
+          notes: "20 Jump Squats, 15 Push-Ups, 10 Burpees - Repeat"
+        },
+        {
+          name: "Block 2 (15 mins)",
+          sets: "Repeat for 15 mins",
+          reps: "20-15-10",
+          rest: "As needed",
+          notes: "20 Mountain Climbers, 15 Jump Lunges, 10 Plank Jacks - Repeat"
+        },
+        {
+          name: "Block 3 (15 mins)",
+          sets: "Repeat for 15 mins",
+          reps: "20-15-10",
+          rest: "As needed",
+          notes: "20 High Knees, 15 Tuck Jumps, 10 Push-Up to Pike - Repeat"
+        }
+      ],
+      tips: [
+        "Explode through jumps",
+        "Keep transitions tight",
+        "Hydrate between blocks"
+      ]
+    },
+    "calorie-060": {
+      name: "Calorie Forge",
+      serialNumber: "CAL-EQ-060",
+      difficulty: "Advanced",
+      duration: "60 min",
+      equipment: "Kettlebells, Dumbbells, Wall Ball, Mat",
+      imageUrl: calorieCrusherImg,
+      description: "A hybrid calorie-burning workout using kettlebells, dumbbells, and wall balls to blend strength and cardio for elite fat burn.",
+      workoutType: "MIX",
+      format: `REPS & SETS + HIIT Finisher
+Main Block: 4 sets
+Finisher: 3 rounds`,
+      instructions: "Use progressive overload. Push max effort during finisher. Rest 90s between sets.",
+      exercises: [
+        {
+          name: "Main: Dumbbell Snatch",
+          sets: "4",
+          reps: "10/arm",
+          rest: "90s",
+          notes: "Explosive movement"
+        },
+        {
+          name: "Main: Kettlebell Swings",
+          sets: "4",
+          reps: "20",
+          rest: "90s",
+          notes: "Hip driven"
+        },
+        {
+          name: "Main: Wall Ball Squat to Press",
+          sets: "4",
+          reps: "15",
+          rest: "90s",
+          notes: "Full depth squat"
+        },
+        {
+          name: "Main: Dumbbell Renegade Rows",
+          sets: "4",
+          reps: "10/side",
+          rest: "90s",
+          notes: "Maintain plank"
+        },
+        {
+          name: "Finisher: Jump Lunges",
+          sets: "3 rounds",
+          reps: "45s work",
+          rest: "15s",
+          notes: "HIIT block"
+        },
+        {
+          name: "Finisher: Burpees",
+          sets: "3 rounds",
+          reps: "45s work",
+          rest: "15s",
+          notes: "HIIT block"
+        },
+        {
+          name: "Finisher: Plank Rows",
+          sets: "3 rounds",
+          reps: "45s work",
+          rest: "15s",
+          notes: "HIIT block"
+        }
+      ],
+      tips: [
+        "Use explosive hip drive",
+        "Control weights on descent",
+        "Keep transitions tight"
       ]
     }
   };

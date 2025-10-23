@@ -94,7 +94,14 @@ const WorkoutDetail = () => {
       { id: "strength-053", name: "Bodyweight Powerhouse", description: "A high-intensity bodyweight strength workout using advanced variations and isometric holds to build serious muscular endurance", duration: "60 min", equipment: "bodyweight", level: "advanced", format: "amrap", imageUrl: bodyweightBeastImg, isFree: true },
       { id: "strength-054", name: "Iron Mastery", description: "A heavy strength workout using barbells, dumbbells, and weighted holds", duration: "60 min", equipment: "equipment", level: "advanced", format: "for time", imageUrl: ironEngineImg, isFree: true },
     ],
-    "calorie-burning": [],
+    "calorie-burning": [
+      { id: "calorie-055", name: "Burn Flow", description: "A low-impact circuit designed to elevate heart rate and burn calories without high-impact stress", duration: "30 min", equipment: "bodyweight", level: "beginner", format: "circuit", imageUrl: burnStartImg, isFree: true },
+      { id: "calorie-056", name: "Sweat Band", description: "A beginner-friendly Tabata workout using bands and light dumbbells to blend cardio and resistance for fat burn", duration: "30 min", equipment: "equipment", level: "beginner", format: "tabata", imageUrl: sweatCircuitImg, isFree: true },
+      { id: "calorie-057", name: "Body Burn Pro", description: "A fast-paced bodyweight AMRAP designed to spike heart rate and maximize calorie burn", duration: "45 min", equipment: "bodyweight", level: "intermediate", format: "amrap", imageUrl: bodyBurnoutImg, isFree: true },
+      { id: "calorie-058", name: "Sweat Surge", description: "A high-intensity interval training session using dumbbells and jump rope to burn calories and improve conditioning", duration: "45 min", equipment: "equipment", level: "intermediate", format: "circuit", imageUrl: sweatStormImg, isFree: true },
+      { id: "calorie-059", name: "Inferno Sprint", description: "A high-intensity bodyweight challenge designed to push endurance and burn maximum calories", duration: "60 min", equipment: "bodyweight", level: "advanced", format: "for time", imageUrl: infernoFlowImg, isFree: true },
+      { id: "calorie-060", name: "Calorie Forge", description: "A hybrid calorie-burning workout using kettlebells, dumbbells, and wall balls to blend strength and cardio for elite fat burn", duration: "60 min", equipment: "equipment", level: "advanced", format: "mix", imageUrl: calorieCrusherImg, isFree: true },
+    ],
     "metabolic": [
       { id: "metabolic-043", name: "Metabo Pulse", description: "A beginner-friendly Tabata workout using bodyweight moves to elevate metabolism and improve aerobic capacity", duration: "30 min", equipment: "bodyweight", level: "beginner", format: "tabata", imageUrl: metaboLiteImg, isFree: true },
       { id: "metabolic-044", name: "Metabo Band Boost", description: "A light metabolic circuit using resistance bands and dumbbells to blend cardio and strength for beginners", duration: "30 min", equipment: "equipment", level: "beginner", format: "circuit", imageUrl: metaboStartImg, isFree: true },
