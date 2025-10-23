@@ -620,7 +620,7 @@ export const ArticleDetail = () => {
         {/* Article Header */}
         <header className="max-w-4xl mx-auto">
           <div className="mb-6">
-            <span className="inline-block px-3 py-1 bg-primary/10 text-primary rounded-full text-sm font-medium mb-4">
+            <span className="inline-block px-3 py-1 bg-primary text-primary-foreground rounded-full text-sm font-medium mb-4">
               {article.category}
             </span>
             <h1 className="text-4xl md:text-5xl font-bold mb-4">
