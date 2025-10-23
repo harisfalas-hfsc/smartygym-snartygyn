@@ -81,6 +81,11 @@ export const Footer = () => {
             </button>
           </div>
           
+          {/* Mission Statement */}
+          <p className="text-center text-sm text-muted-foreground max-w-2xl">
+            Smarty Gym brings science-based functional training to everyone, anywhere.
+          </p>
+          
           {/* Copyright */}
           <p className="text-center text-sm text-muted-foreground">
             © 2025 SmartyGym - Your fitness reimagined anywhere, anytime.

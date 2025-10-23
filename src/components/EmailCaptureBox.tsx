@@ -36,6 +36,11 @@ export const EmailCaptureBox = () => {
         description: "You've joined the Smarty Gym newsletter. Check your inbox!",
       });
       
+      // Redirect to thank you page
+      setTimeout(() => {
+        window.location.href = "/newsletter-thank-you";
+      }, 1500);
+      
       setName("");
       setEmail("");
     } catch (error: any) {
@@ -51,9 +56,9 @@ export const EmailCaptureBox = () => {
 
   return (
     <Card className="p-6 bg-primary/5 border-primary/20">
-      <h3 className="font-semibold text-lg mb-2">Get a free workout every week</h3>
+      <h3 className="font-semibold text-lg mb-2">Get one new workout every week — free!</h3>
       <p className="text-sm text-muted-foreground mb-4">
-        Join the Smarty Gym newsletter for weekly workouts and training tips.
+        We respect your time — no spam, only smart training.
       </p>
       <form onSubmit={handleSubmit} className="flex flex-col sm:flex-row gap-2">
         <Input

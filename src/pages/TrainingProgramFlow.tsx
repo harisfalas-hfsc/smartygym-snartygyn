@@ -4,6 +4,8 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { ArrowLeft, Heart, Dumbbell, Activity, Flame, User, Move, Scale } from "lucide-react";
 import { BackToTop } from "@/components/BackToTop";
+import { TimedPopup } from "@/components/TimedPopup";
+import { TestimonialsSlider } from "@/components/TestimonialsSlider";
 import { AccessGate } from "@/components/AccessGate";
 
 const TrainingProgramFlow = () => {
@@ -74,6 +76,7 @@ const TrainingProgramFlow = () => {
       <AccessGate requireAuth={true} requirePremium={false} contentType="feature">
       <div className="min-h-screen bg-background">
       <BackToTop />
+      <TimedPopup />
       <div className="container mx-auto max-w-6xl px-4 py-8">
         <Button
           variant="ghost"
@@ -85,9 +88,12 @@ const TrainingProgramFlow = () => {
           <span className="text-xs sm:text-sm">Back</span>
         </Button>
         
-        <h1 className="text-3xl sm:text-4xl font-bold text-center mb-2">Training Programs</h1>
-        <p className="text-center text-muted-foreground mb-4">
-          Structured 6–8 week programs designed by Sports Scientist <a href="/coach-profile" className="text-primary hover:underline font-medium">Haris Falas</a> — progressions for strength, fat loss and mobility.
+        <h1 className="text-3xl sm:text-4xl font-bold text-center mb-3">Training Programs</h1>
+        <p className="text-center text-lg text-foreground mb-2 max-w-3xl mx-auto">
+          Structured 6–8 week programs created by Sports Scientist <a href="/coach-profile" className="text-primary hover:underline font-medium">Haris Falas</a>.
+        </p>
+        <p className="text-center text-sm text-muted-foreground mb-6 max-w-2xl mx-auto">
+          Build strength, lose fat, improve mobility — all through evidence-based, functional training.
         </p>
         
         {/* Info Ribbon */}
@@ -114,11 +120,16 @@ const TrainingProgramFlow = () => {
                     <Icon className="w-8 h-8 text-primary" />
                   </div>
                   <div>
-                    <p className="text-xs text-muted-foreground mb-2">
-                      Designed by <a href="/coach-profile" className="text-primary hover:underline font-medium">Haris Falas</a> — 6–8 week results-based training plan
-                    </p>
                     <h3 className="font-semibold text-lg mb-2">{program.title}</h3>
-                    <p className="text-sm text-muted-foreground">{program.description}</p>
+                    <p className="text-sm text-muted-foreground mb-3">{program.description}</p>
+                    <p className="text-xs text-muted-foreground mb-3">
+                      Created by <a href="/coach-profile" className="text-primary hover:underline font-medium">Haris Falas</a> — Sports Scientist & Strength and Conditioning Coach
+                    </p>
+                    <div className="flex flex-wrap gap-2 text-xs mt-2">
+                      <span className="bg-primary/10 text-primary px-2 py-1 rounded">6-8 weeks</span>
+                      <span className="bg-muted text-muted-foreground px-2 py-1 rounded">Intermediate</span>
+                      <span className="bg-muted text-muted-foreground px-2 py-1 rounded">Included in Premium</span>
+                    </div>
                   </div>
                 </div>
               </Card>
@@ -126,11 +137,16 @@ const TrainingProgramFlow = () => {
           })}
         </div>
 
+        {/* Testimonials */}
+        <div className="mt-12">
+          <TestimonialsSlider />
+        </div>
+
         {/* Bottom Premium Banner */}
-        <div className="bg-card border border-border rounded-xl p-6 mt-12 text-center shadow-soft">
-          <h3 className="text-xl font-semibold mb-2">Want full access?</h3>
+        <div className="bg-card border border-border rounded-xl p-6 mt-8 text-center shadow-soft">
+          <h3 className="text-xl font-semibold mb-2">Start your transformation</h3>
           <p className="text-muted-foreground mb-4">
-            Get all programs, workouts, and tools with Smarty Gym Premium.
+            Join Smarty Gym Premium for full access to all training programs.
           </p>
           <Button size="lg" onClick={() => navigate("/premiumbenefits")}>
             Join Premium

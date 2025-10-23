@@ -44,6 +44,7 @@ import PremiumComparison from "./pages/PremiumComparison";
 import TakeTour from "./pages/TakeTour";
 import PersonalTraining from "./pages/PersonalTraining";
 import PaymentSuccess from "./pages/PaymentSuccess";
+import NewsletterThankYou from "./pages/NewsletterThankYou";
 import { AccessGate } from "./components/AccessGate";
 import { WhatsAppButton } from "./components/WhatsAppButton";
 
@@ -71,6 +72,7 @@ const App = () => (
                 
                 {/* Public free content page */}
                 <Route path="/freecontent" element={<FreeContent />} />
+                <Route path="/newsletter-thank-you" element={<NewsletterThankYou />} />
                 <Route path="/blog" element={<Blog />} />
                 <Route path="/coach-profile" element={<CoachProfile />} />
                 

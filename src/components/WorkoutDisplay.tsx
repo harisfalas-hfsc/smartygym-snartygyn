@@ -4,8 +4,11 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Play, Pause, RotateCcw, Star } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 import workoutHero from "@/assets/workout-hero.jpg";
 import { ParQQuestionnaire } from "@/components/ParQQuestionnaire";
+import { WorkoutInfoBar } from "@/components/WorkoutInfoBar";
+import { ShareButtons } from "@/components/ShareButtons";
 
 interface Exercise {
   name: string;
@@ -78,6 +81,7 @@ export const WorkoutDisplay = ({
   instructions,
   tips
 }: WorkoutDisplayProps) => {
+  const navigate = useNavigate();
   const [currentVideoId, setCurrentVideoId] = useState<string>(exercises[0]?.video_id || "");
   const [workTime, setWorkTime] = useState(20);
   const [restTime, setRestTime] = useState(10);
@@ -172,7 +176,22 @@ export const WorkoutDisplay = ({
       {/* Workout Header */}
       <div className="space-y-6">
         {/* Title */}
-        <h1 className="text-4xl font-bold mb-6">{title}</h1>
+        <h1 className="text-4xl font-bold mb-4">{title}</h1>
+        
+        {/* Credit Line */}
+        <p className="text-sm text-muted-foreground mb-4">
+          Created by <a href="/coach-profile" className="text-primary hover:underline font-medium">Haris Falas</a> — Sports Scientist & Strength and Conditioning Coach
+        </p>
+
+        {/* Info Bar */}
+        {focus && duration && equipment && difficulty && (
+          <WorkoutInfoBar 
+            duration={duration}
+            equipment={equipment}
+            difficulty={getDifficultyText(difficulty)}
+            focus={focus}
+          />
+        )}
 
         {/* Info Bar: Serial, Focus, Difficulty with Stars, Type, Duration, Equipment - ABOVE IMAGE */}
         <div className="flex flex-wrap items-center gap-6 text-sm mb-6">
@@ -225,6 +244,15 @@ export const WorkoutDisplay = ({
             className="w-full h-full object-cover brightness-110"
           />
           <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent" />
+        </div>
+        
+        {/* Share Buttons */}
+        <div className="flex flex-col gap-3">
+          <h3 className="text-sm font-semibold">Share this workout:</h3>
+          <ShareButtons 
+            title={title}
+            url={typeof window !== 'undefined' ? window.location.href : 'https://smartygym.com'}
+          />
         </div>
       </div>
 
@@ -501,6 +529,17 @@ export const WorkoutDisplay = ({
 
         {/* PAR-Q+ Questionnaire */}
         <ParQQuestionnaire />
+      </div>
+      
+      {/* Bottom CTA Banner */}
+      <div className="bg-card border border-border rounded-xl p-6 text-center shadow-soft mt-8">
+        <h3 className="text-xl font-semibold mb-2">Want more like this?</h3>
+        <p className="text-muted-foreground mb-4">
+          Unlock 100+ workouts and all programs with Smarty Gym Premium.
+        </p>
+        <Button size="lg" onClick={() => navigate("/premiumbenefits")}>
+          Join Premium
+        </Button>
       </div>
     </div>
   );

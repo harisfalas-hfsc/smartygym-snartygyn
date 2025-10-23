@@ -5,6 +5,7 @@ import { Card } from "@/components/ui/card";
 import { ArrowLeft, Dumbbell, Flame, Zap, Heart, Move, Activity, TrendingUp } from "lucide-react";
 import { EmailCaptureBox } from "@/components/EmailCaptureBox";
 import { BackToTop } from "@/components/BackToTop";
+import { TimedPopup } from "@/components/TimedPopup";
 import { AccessGate } from "@/components/AccessGate";
 
 const WorkoutFlow = () => {
@@ -81,6 +82,7 @@ const WorkoutFlow = () => {
       <AccessGate requireAuth={true} requirePremium={false} contentType="feature">
       <div className="min-h-screen bg-background">
       <BackToTop />
+      <TimedPopup />
       <div className="container mx-auto max-w-6xl px-4 py-8">
         <Button
           variant="ghost"
@@ -92,9 +94,12 @@ const WorkoutFlow = () => {
           <span className="text-xs sm:text-sm">Back</span>
         </Button>
         
-        <h1 className="text-3xl sm:text-4xl font-bold text-center mb-2">Workouts</h1>
-        <p className="text-center text-muted-foreground mb-4">
-          Standalone workout sessions designed to challenge you, motivate you, and make you sweat — crafted by Sports Scientist <a href="/coach-profile" className="text-primary hover:underline font-medium">Haris Falas</a>.
+        <h1 className="text-3xl sm:text-4xl font-bold text-center mb-3">Workouts</h1>
+        <p className="text-center text-lg text-foreground mb-2 max-w-3xl mx-auto">
+          Choose your goal and start your workout today — train smarter with science-based sessions.
+        </p>
+        <p className="text-center text-sm text-muted-foreground mb-6 max-w-2xl mx-auto">
+          All workouts designed by Sports Scientist <a href="/coach-profile" className="text-primary hover:underline font-medium">Haris Falas</a>, based on real human performance principles.
         </p>
         
         {/* Info Ribbon */}
@@ -121,11 +126,14 @@ const WorkoutFlow = () => {
                     <Icon className="w-8 h-8 text-primary" />
                   </div>
                   <div>
-                    <p className="text-xs text-muted-foreground mb-2">
-                      Designed by <a href="/coach-profile" className="text-primary hover:underline font-medium">Haris Falas</a> — Results-based training plan
-                    </p>
                     <h3 className="font-semibold text-lg mb-2">{workout.title}</h3>
-                    <p className="text-sm text-muted-foreground">{workout.description}</p>
+                    <p className="text-sm text-muted-foreground mb-3">{workout.description}</p>
+                    <p className="text-xs text-muted-foreground mb-3">
+                      Created by <a href="/coach-profile" className="text-primary hover:underline font-medium">Haris Falas</a> — Sports Scientist & Strength and Conditioning Coach
+                    </p>
+                    <Button variant="default" size="sm" className="mt-2 w-full">
+                      View Workout →
+                    </Button>
                   </div>
                 </div>
               </Card>
@@ -140,9 +148,9 @@ const WorkoutFlow = () => {
 
         {/* Bottom Premium Banner */}
         <div className="bg-card border border-border rounded-xl p-6 mt-8 text-center shadow-soft">
-          <h3 className="text-xl font-semibold mb-2">Want full access?</h3>
+          <h3 className="text-xl font-semibold mb-2">Love these workouts?</h3>
           <p className="text-muted-foreground mb-4">
-            Get all programs, workouts, and tools with Smarty Gym Premium.
+            Unlock 100+ more exclusive sessions with Smarty Gym Premium.
           </p>
           <Button size="lg" onClick={() => navigate("/premiumbenefits")}>
             Join Premium
