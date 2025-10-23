@@ -154,14 +154,14 @@ const Blog = () => {
 
           <header className="text-center mb-8">
             <h1 className="text-3xl sm:text-4xl font-bold mb-4">Smarty Gym Blog</h1>
-            <Card className="max-w-2xl mx-auto p-4">
-              <p className="text-center text-muted-foreground">
+            <div className="bg-primary/10 border border-primary/20 rounded-lg p-4 max-w-2xl mx-auto">
+              <p className="text-sm text-muted-foreground">
                 Expert insights on training, nutrition, and performance from certified strength coach{" "}
                 <a href="/coach-profile" className="text-primary hover:underline font-medium">
                   Haris Falas
                 </a>
               </p>
-            </Card>
+            </div>
           </header>
 
           {/* Category Filter */}
