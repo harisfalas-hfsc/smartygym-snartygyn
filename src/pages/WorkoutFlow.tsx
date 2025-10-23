@@ -11,11 +11,47 @@ const WorkoutFlow = () => {
 
   const workoutTypes = [
     {
+      id: "strength",
+      title: "Strength",
+      description: "Build muscle and power with resistance training",
+      icon: Dumbbell,
+    },
+    {
+      id: "calorie-burning",
+      title: "Calorie Burning",
+      description: "High-intensity workouts to maximize calorie burn",
+      icon: Flame,
+    },
+    {
+      id: "metabolic",
+      title: "Metabolic",
+      description: "Boost your metabolism with dynamic conditioning",
+      icon: Zap,
+    },
+    {
+      id: "cardio",
+      title: "Cardio",
+      description: "Improve cardiovascular endurance and stamina",
+      icon: Heart,
+    },
+    {
+      id: "mobility",
+      title: "Mobility & Stability",
+      description: "Enhance flexibility and movement quality",
+      icon: Move,
+    },
+    {
+      id: "power",
+      title: "Power",
+      description: "Explosive movements for athletic performance",
+      icon: TrendingUp,
+    },
+    {
       id: "challenge",
-      icon: Activity,
       title: "Challenge",
-      description: "Push your limits with advanced workout challenges"
-    }
+      description: "Push your limits with advanced workouts",
+      icon: Activity,
+    },
   ];
 
   const handleWorkoutSelect = (workoutId: string) => {

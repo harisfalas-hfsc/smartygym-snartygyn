@@ -8,7 +8,44 @@ import { BackToTop } from "@/components/BackToTop";
 const TrainingProgramFlow = () => {
   const navigate = useNavigate();
 
-  const programTypes: any[] = [];
+  const programTypes = [
+    {
+      id: "cardio-endurance",
+      title: "Cardio Endurance",
+      description: "6-8 week program to build cardiovascular fitness",
+      icon: Heart,
+    },
+    {
+      id: "functional-strength",
+      title: "Functional Strength",
+      description: "6-8 week program for real-world strength and movement",
+      icon: Dumbbell,
+    },
+    {
+      id: "muscle-hypertrophy",
+      title: "Muscle Hypertrophy",
+      description: "6-8 week program focused on muscle growth",
+      icon: Activity,
+    },
+    {
+      id: "weight-loss",
+      title: "Weight Loss",
+      description: "6-8 week program designed for fat loss",
+      icon: Flame,
+    },
+    {
+      id: "low-back-pain",
+      title: "Low Back Pain",
+      description: "6-8 week program to strengthen and rehabilitate",
+      icon: User,
+    },
+    {
+      id: "mobility-stability",
+      title: "Mobility & Stability",
+      description: "6-8 week program for movement quality",
+      icon: Move,
+    },
+  ];
 
   const handleProgramSelect = (programId: string) => {
     navigate(`/trainingprogram/${programId}`);
