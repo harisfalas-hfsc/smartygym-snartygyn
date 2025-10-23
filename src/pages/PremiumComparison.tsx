@@ -29,15 +29,15 @@ const PremiumComparison = () => {
     {
       category: "Workouts",
       icon: Dumbbell,
-      visitor: "Free workouts",
-      subscriber: "Free + all workouts",
+      visitor: false,
+      subscriber: "Free workouts",
       premium: "All workouts"
     },
     {
       category: "Training Programs",
       icon: Flame,
       visitor: false,
-      subscriber: false,
+      subscriber: "Free programs",
       premium: "Full access"
     },
     {
@@ -72,29 +72,15 @@ const PremiumComparison = () => {
       category: "Workout Interactions",
       icon: Heart,
       visitor: false,
-      subscriber: "Favorites, ratings, history",
-      premium: "Favorites, ratings, history"
+      subscriber: "Favorites, ratings, history (free only)",
+      premium: "Full favorites, ratings, history"
     },
     {
       category: "Program Interactions",
       icon: Heart,
       visitor: false,
-      subscriber: false,
-      premium: "Favorites, ratings, history"
-    },
-    {
-      category: "AI Diet Plans",
-      icon: Sparkles,
-      visitor: false,
-      subscriber: false,
-      premium: "Personalized plans"
-    },
-    {
-      category: "AI Training Programs",
-      icon: Sparkles,
-      visitor: false,
-      subscriber: false,
-      premium: "Custom programs"
+      subscriber: "Favorites, ratings, history (free only)",
+      premium: "Full favorites, ratings, history"
     }
   ];
 
