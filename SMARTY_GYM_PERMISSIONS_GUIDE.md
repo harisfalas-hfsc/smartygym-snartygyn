@@ -12,17 +12,8 @@ This document outlines all user permissions across the Smarty Gym platform based
 
 ### ✅ **Full Access**
 - **Homepage** - Browse all features and subscription plans
-- **Free Workouts** - Access specific free standalone workouts
-  - Bodyweight Base (Strength)
-  - Strength Starter (Strength)
-  - Gravity Strength (Strength)
-  - Iron Builder (Strength)
-  - Bodyweight Powerhouse (Strength)
-  - Iron Mastery (Strength)
-  - And other free workouts in all categories
-- **Free Training Programs** - Access specific free structured programs
-- **Exercise Library** - Browse complete exercise database with videos and instructions
-- **Blog** - Read all fitness articles and educational content
+- **Exercise Library** - Browse complete exercise database with videos and instructions (NO LOGIN REQUIRED)
+- **Blog** - Read all fitness articles and educational content (NO LOGIN REQUIRED)
 - **Coach Profile** - View Haris Falas's credentials and background
 - **About Page** - Learn about Smarty Gym
 - **Contact Page** - Submit contact form inquiries
@@ -30,6 +21,10 @@ This document outlines all user permissions across the Smarty Gym platform based
 - **Privacy Policy** - View privacy terms
 - **Terms of Service** - View terms and conditions
 - **Disclaimer** - View fitness disclaimer
+
+### ⚠️ **Can Browse But Cannot Access**
+- **Free Workouts** - Can see workout listings and details, but LOGIN REQUIRED to view full workout content
+- **Free Training Programs** - Can see program listings and details, but LOGIN REQUIRED to view full program content
 
 ### ❌ **No Access**
 - **Calculators** (BMR, 1RM, Macro Calculator) - Requires login
@@ -155,10 +150,10 @@ Everything logged-in members can access, PLUS:
 
 | Feature | Visitor | Logged-In | Gold (€9.99/mo) | Platinum (€89.99/yr) |
 |---------|---------|-----------|-----------------|----------------------|
-| Free Workouts | ✅ | ✅ | ✅ | ✅ |
-| Free Programs | ✅ | ✅ | ✅ | ✅ |
-| Exercise Library | ✅ | ✅ | ✅ | ✅ |
-| Blog Access | ✅ | ✅ | ✅ | ✅ |
+| Free Workouts | ❌ (Login Required) | ✅ | ✅ | ✅ |
+| Free Programs | ❌ (Login Required) | ✅ | ✅ | ✅ |
+| Exercise Library | ✅ (No Login) | ✅ | ✅ | ✅ |
+| Blog Access | ✅ (No Login) | ✅ | ✅ | ✅ |
 | Calculators | ❌ | ✅ | ✅ | ✅ |
 | Community | ❌ | ✅ | ✅ | ✅ |
 | User Dashboard | ❌ | ✅ | ✅ | ✅ |
@@ -171,7 +166,7 @@ Everything logged-in members can access, PLUS:
 | Advanced Analytics | ❌ | ❌ | ✅ | ✅ |
 | Direct Messaging | ❌ | ❌ | ✅ | ✅ |
 | Cost | Free | Free | €9.99/mo | €89.99/yr |
-| Best For | Exploring | Trying Out | Monthly Access | Best Value |
+| Best For | Browsing | Trying Out | Monthly Access | Best Value |
 
 ---
 
@@ -182,12 +177,12 @@ Everything logged-in members can access, PLUS:
 #### **Strength Workouts**
 | Workout Name | Serial | Visitor | Logged-In | Premium |
 |--------------|--------|---------|-----------|---------|
-| Bodyweight Base | - | ✅ | ✅ | ✅ |
-| Strength Starter | - | ✅ | ✅ | ✅ |
-| Gravity Strength | - | ✅ | ✅ | ✅ |
-| Iron Builder | - | ✅ | ✅ | ✅ |
-| Bodyweight Powerhouse | - | ✅ | ✅ | ✅ |
-| Iron Mastery | - | ✅ | ✅ | ✅ |
+| Bodyweight Base | - | ❌ (Login Required) | ✅ | ✅ |
+| Strength Starter | - | ❌ (Login Required) | ✅ | ✅ |
+| Gravity Strength | - | ❌ (Login Required) | ✅ | ✅ |
+| Iron Builder | - | ❌ (Login Required) | ✅ | ✅ |
+| Bodyweight Powerhouse | - | ❌ (Login Required) | ✅ | ✅ |
+| Iron Mastery | - | ❌ (Login Required) | ✅ | ✅ |
 | Bodyweight Foundation Strength | WS002 | ❌ | ❌ | ✅ |
 | Iron Core Strength | WS001 | ❌ | ❌ | ✅ |
 
@@ -311,7 +306,14 @@ Everything logged-in members can access, PLUS:
 
 ## Access Gate Behavior
 
-### When Visitor Tries to Access Logged-In Content:
+### When Visitor Tries to Access Free Workout/Program Content:
+1. Shows lock icon modal
+2. Message: "Login Required - Please log in or create an account to access free workouts and training programs"
+3. Two buttons:
+   - "Log In / Sign Up" → Redirects to /auth
+   - "Back to Home" → Redirects to homepage
+
+### When Visitor Tries to Access Other Logged-In Content (Calculators, Community, Dashboard):
 1. Shows lock icon modal
 2. Message: "Login Required - Please log in or create an account to access this content"
 3. Two buttons:

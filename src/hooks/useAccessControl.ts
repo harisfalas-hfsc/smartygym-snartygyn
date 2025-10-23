@@ -93,15 +93,23 @@ export const useAccessControl = () => {
     }
   };
 
-  const canAccessContent = (contentType: "free-workout" | "premium-workout" | "free-program" | "premium-program" | "tool" | "dashboard" | "exercise-library" | "community"): boolean => {
+  const canAccessContent = (contentType: "free-workout" | "premium-workout" | "free-program" | "premium-program" | "tool" | "dashboard" | "exercise-library" | "community" | "blog"): boolean => {
     const { userTier } = state;
 
-    // Guests can't access anything (all content requires login)
-    if (userTier === "guest") return false;
+    // Guests can only access exercise library and blog (no login required)
+    if (userTier === "guest") {
+      return contentType === "exercise-library" || contentType === "blog";
+    }
 
-    // Subscribers can access free content and tools
+    // Subscribers can access free content, tools, dashboard, community, exercise library, and blog
     if (userTier === "subscriber") {
-      return contentType === "free-workout" || contentType === "free-program" || contentType === "tool";
+      return contentType === "free-workout" || 
+             contentType === "free-program" || 
+             contentType === "tool" || 
+             contentType === "dashboard" ||
+             contentType === "community" ||
+             contentType === "exercise-library" ||
+             contentType === "blog";
     }
 
     // Premium members can access everything
