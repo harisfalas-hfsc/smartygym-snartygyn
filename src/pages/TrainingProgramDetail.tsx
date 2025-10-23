@@ -357,7 +357,6 @@ const TrainingProgramDetail = () => {
         )}
       </div>
       </div>
-      </div>
     </>
   );
 };

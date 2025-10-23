@@ -367,7 +367,6 @@ const WorkoutDetail = () => {
         )}
       </div>
       </div>
-      </div>
     </>
   );
 };
