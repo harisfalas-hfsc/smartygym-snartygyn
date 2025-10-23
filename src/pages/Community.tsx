@@ -5,7 +5,6 @@ import { Card } from "@/components/ui/card";
 import { ArrowLeft, Star } from "lucide-react";
 import { BackToTop } from "@/components/BackToTop";
 import { useShowBackButton } from "@/hooks/useShowBackButton";
-import { AccessGate } from "@/components/AccessGate";
 
 interface Review {
   id: string;
@@ -114,7 +113,7 @@ export default function Community() {
   const { canGoBack, goBack } = useShowBackButton();
 
   return (
-    <AccessGate requireAuth={true} requirePremium={false} contentType="feature">
+    <>
       <Helmet>
         <title>Community Reviews - Smarty Gym | What Our Members Say</title>
         <meta name="description" content="Read real reviews from Smarty Gym members. See how our science-based workouts have transformed the fitness journeys of people from all walks of life." />
@@ -215,6 +214,6 @@ export default function Community() {
           </aside>
         </div>
       </div>
-    </AccessGate>
+    </>
   );
 }
