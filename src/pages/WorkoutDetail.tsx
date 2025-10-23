@@ -86,7 +86,14 @@ const WorkoutDetail = () => {
   };
 
   const workoutData: { [key: string]: Workout[] } = {
-    "strength": [],
+    "strength": [
+      { id: "strength-049", name: "Bodyweight Base", description: "A foundational strength workout using bodyweight exercises with controlled tempo and static holds to build muscular endurance", duration: "30 min", equipment: "bodyweight", level: "beginner", format: "reps & sets", imageUrl: starterStrengthImg, isFree: true },
+      { id: "strength-050", name: "Strength Starter", description: "A light resistance circuit using dumbbells and bands to introduce strength training safely and effectively", duration: "30 min", equipment: "equipment", level: "beginner", format: "circuit", imageUrl: powerFoundationImg, isFree: true },
+      { id: "strength-051", name: "Gravity Strength", description: "A bodyweight strength workout combining tempo, holds, and dynamic movement to challenge muscular control and endurance", duration: "45 min", equipment: "bodyweight", level: "intermediate", format: "mix", imageUrl: gravityGrindImg, isFree: true },
+      { id: "strength-052", name: "Iron Builder", description: "A structured strength workout using dumbbells and kettlebells to build muscle and improve movement control", duration: "45 min", equipment: "equipment", level: "intermediate", format: "reps & sets", imageUrl: ironCoreImg, isFree: true },
+      { id: "strength-053", name: "Bodyweight Powerhouse", description: "A high-intensity bodyweight strength workout using advanced variations and isometric holds to build serious muscular endurance", duration: "60 min", equipment: "bodyweight", level: "advanced", format: "amrap", imageUrl: bodyweightBeastImg, isFree: true },
+      { id: "strength-054", name: "Iron Mastery", description: "A heavy strength workout using barbells, dumbbells, and weighted holds", duration: "60 min", equipment: "equipment", level: "advanced", format: "for time", imageUrl: ironEngineImg, isFree: true },
+    ],
     "calorie-burning": [],
     "metabolic": [
       { id: "metabolic-043", name: "Metabo Pulse", description: "A beginner-friendly Tabata workout using bodyweight moves to elevate metabolism and improve aerobic capacity", duration: "30 min", equipment: "bodyweight", level: "beginner", format: "tabata", imageUrl: metaboLiteImg, isFree: true },

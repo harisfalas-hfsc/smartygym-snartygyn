@@ -84,6 +84,12 @@ const IndividualWorkout = () => {
     'metabolic-046', // Metabo Hybrid
     'metabolic-047', // Metabo Max
     'metabolic-048', // Metabo Forge
+    'strength-049', // Bodyweight Base
+    'strength-050', // Strength Starter
+    'strength-051', // Gravity Strength
+    'strength-052', // Iron Builder
+    'strength-053', // Bodyweight Powerhouse
+    'strength-054', // Iron Mastery
   ];
   const isFreeWorkout = freeWorkouts.includes(id || '');
 
@@ -1459,6 +1465,330 @@ Rest: 60–90s between sets`,
         "Use full-body coordination",
         "Don't rush transitions",
         "Prioritize form over speed"
+      ]
+    },
+    "strength-049": {
+      name: "Bodyweight Base",
+      serialNumber: "STR-BBW-049",
+      difficulty: "Beginner",
+      duration: "30 min",
+      equipment: "No Equipment Required",
+      imageUrl: starterStrengthImg,
+      description: "A foundational strength workout using bodyweight exercises with controlled tempo and static holds to build muscular endurance.",
+      workoutType: "REPS & SETS",
+      format: `3 sets per exercise
+Tempo: Controlled (3010)`,
+      instructions: "Perform each exercise slowly and deliberately. Rest 30s between exercises, 1 min between sets.",
+      exercises: [
+        {
+          name: "Squat to Chair",
+          sets: "3",
+          reps: "12",
+          rest: "30s",
+          notes: "Controlled descent"
+        },
+        {
+          name: "Incline Push-Ups",
+          sets: "3",
+          reps: "10",
+          rest: "30s",
+          notes: "Hands elevated"
+        },
+        {
+          name: "Glute Bridges",
+          sets: "3",
+          reps: "15",
+          rest: "30s",
+          notes: "Squeeze at top"
+        },
+        {
+          name: "Wall Sit",
+          sets: "3",
+          reps: "30s",
+          rest: "30s",
+          notes: "90 degree angle"
+        },
+        {
+          name: "Bird-Dog",
+          sets: "3",
+          reps: "10/side",
+          rest: "60s after set",
+          notes: "Maintain stability"
+        }
+      ],
+      tips: [
+        "Focus on form over speed",
+        "Engage your core",
+        "Avoid locking joints"
+      ]
+    },
+    "strength-050": {
+      name: "Strength Starter",
+      serialNumber: "STR-EQ-050",
+      difficulty: "Beginner",
+      duration: "30 min",
+      equipment: "Dumbbells, Bands, Mat",
+      imageUrl: powerFoundationImg,
+      description: "A light resistance circuit using dumbbells and bands to introduce strength training safely and effectively.",
+      workoutType: "CIRCUIT",
+      format: `Circuit – 3 rounds
+Work: 40s / Rest: 20s`,
+      instructions: "Use light weights. Rest 1 minute between rounds. Focus on control and posture.",
+      exercises: [
+        {
+          name: "Dumbbell Goblet Squat",
+          sets: "3 rounds",
+          reps: "40s",
+          rest: "20s",
+          notes: "Full range"
+        },
+        {
+          name: "Band Row",
+          sets: "3 rounds",
+          reps: "40s",
+          rest: "20s",
+          notes: "Squeeze shoulder blades"
+        },
+        {
+          name: "Dumbbell Chest Press (floor)",
+          sets: "3 rounds",
+          reps: "40s",
+          rest: "20s",
+          notes: "Control descent"
+        },
+        {
+          name: "Band Overhead Press",
+          sets: "3 rounds",
+          reps: "40s",
+          rest: "20s",
+          notes: "Keep core tight"
+        },
+        {
+          name: "Plank Hold",
+          sets: "3 rounds",
+          reps: "30s",
+          rest: "60s after round",
+          notes: "Maintain form"
+        }
+      ],
+      tips: [
+        "Keep shoulders relaxed",
+        "Don't swing weights",
+        "Breathe through each rep"
+      ]
+    },
+    "strength-051": {
+      name: "Gravity Strength",
+      serialNumber: "STR-BBW-051",
+      difficulty: "Intermediate",
+      duration: "45 min",
+      equipment: "No Equipment Required",
+      imageUrl: gravityGrindImg,
+      description: "A bodyweight strength workout combining tempo, holds, and dynamic movement to challenge muscular control and endurance.",
+      workoutType: "MIX",
+      format: `Superset + Static Holds
+Tempo: Slow (3010)`,
+      instructions: "Pair exercises into supersets. Rest 30s between moves, 1 min between sets.",
+      exercises: [
+        {
+          name: "Superset 1: Bulgarian Split Squat",
+          sets: "3",
+          reps: "10/leg",
+          rest: "30s",
+          notes: "Control movement"
+        },
+        {
+          name: "Superset 1: Wall Sit",
+          sets: "3",
+          reps: "45s",
+          rest: "60s after superset",
+          notes: "Static hold"
+        },
+        {
+          name: "Superset 2: Push-Up",
+          sets: "3",
+          reps: "12",
+          rest: "30s",
+          notes: "Full range"
+        },
+        {
+          name: "Superset 2: Plank Hold",
+          sets: "3",
+          reps: "45s",
+          rest: "60s after superset",
+          notes: "Keep hips aligned"
+        },
+        {
+          name: "Superset 3: Glute Bridge March",
+          sets: "3",
+          reps: "10/leg",
+          rest: "30s",
+          notes: "Maintain hip height"
+        },
+        {
+          name: "Superset 3: Side Plank",
+          sets: "3",
+          reps: "30s/side",
+          rest: "60s after superset",
+          notes: "Stack hips"
+        }
+      ],
+      tips: [
+        "Control every rep",
+        "Keep spine neutral",
+        "Use breath to stabilize"
+      ]
+    },
+    "strength-052": {
+      name: "Iron Builder",
+      serialNumber: "STR-EQ-052",
+      difficulty: "Intermediate",
+      duration: "45 min",
+      equipment: "Dumbbells, Kettlebells, Mat",
+      imageUrl: ironCoreImg,
+      description: "A structured strength workout using dumbbells and kettlebells to build muscle and improve movement control.",
+      workoutType: "REPS & SETS",
+      format: `3 sets per exercise
+Tempo: Moderate (2011)`,
+      instructions: "Use moderate weights. Rest 60s between sets. Track reps and tempo.",
+      exercises: [
+        {
+          name: "Kettlebell Deadlift",
+          sets: "3",
+          reps: "12",
+          rest: "60s",
+          notes: "Hip hinge pattern"
+        },
+        {
+          name: "Dumbbell Shoulder Press",
+          sets: "3",
+          reps: "10",
+          rest: "60s",
+          notes: "Press overhead"
+        },
+        {
+          name: "Dumbbell Step-Up",
+          sets: "3",
+          reps: "10/leg",
+          rest: "60s",
+          notes: "Drive through heel"
+        },
+        {
+          name: "Kettlebell Goblet Squat",
+          sets: "3",
+          reps: "12",
+          rest: "60s",
+          notes: "Full depth"
+        },
+        {
+          name: "Plank Row",
+          sets: "3",
+          reps: "10/side",
+          rest: "60s",
+          notes: "Maintain plank position"
+        }
+      ],
+      tips: [
+        "Keep knees aligned with toes",
+        "Brace core during lifts",
+        "Don't rush transitions"
+      ]
+    },
+    "strength-053": {
+      name: "Bodyweight Powerhouse",
+      serialNumber: "STR-BBW-053",
+      difficulty: "Advanced",
+      duration: "60 min",
+      equipment: "No Equipment Required",
+      imageUrl: bodyweightBeastImg,
+      description: "A high-intensity bodyweight strength workout using advanced variations and isometric holds to build serious muscular endurance.",
+      workoutType: "AMRAP",
+      format: `AMRAP – 30 mins
+Finisher – 10 mins
+Warm-Up & Cool-Down – 10 mins`,
+      instructions: "Complete as many rounds as possible. Rest only when needed. Finish with a challenge block.",
+      exercises: [
+        {
+          name: "Main Block (30 mins AMRAP)",
+          sets: "AMRAP",
+          reps: "As many rounds as possible",
+          rest: "As needed",
+          notes: "Plyo Push-Ups – 10 reps, Pistol Squat (assisted) – 8 reps/leg, Side Plank Reach – 30s/side, Glute Bridge Hold – 45s, Burpees – 10 reps"
+        },
+        {
+          name: "Finisher",
+          sets: "1",
+          reps: "Complete all",
+          rest: "0",
+          notes: "Wall Sit – 60s, Push-Up Hold (bottom) – 30s, Hollow Body Hold – 30s"
+        }
+      ],
+      tips: [
+        "Maintain joint alignment",
+        "Don't collapse in holds",
+        "Use breath to manage fatigue"
+      ]
+    },
+    "strength-054": {
+      name: "Iron Mastery",
+      serialNumber: "STR-EQ-054",
+      difficulty: "Advanced",
+      duration: "60 min",
+      equipment: "Barbell, Dumbbells, Weight Plates, Mat",
+      imageUrl: ironEngineImg,
+      description: "A heavy strength workout using barbells, dumbbells, and weighted holds. Designed for advanced lifters seeking power and endurance.",
+      workoutType: "FOR TIME",
+      format: `For Time – 3 blocks
+Rest: 2 mins between blocks`,
+      instructions: "Complete each block as fast as possible. Rest only as needed. Track time and weights.",
+      exercises: [
+        {
+          name: "Block 1: Barbell Deadlift",
+          sets: "4",
+          reps: "6",
+          rest: "As needed",
+          notes: "Tempo: 3010"
+        },
+        {
+          name: "Block 1: Dumbbell Bench Press",
+          sets: "4",
+          reps: "8",
+          rest: "2 mins after block",
+          notes: "Tempo: 2011"
+        },
+        {
+          name: "Block 2: Barbell Back Squat",
+          sets: "4",
+          reps: "6",
+          rest: "As needed",
+          notes: "Tempo: 3010"
+        },
+        {
+          name: "Block 2: Dumbbell Row",
+          sets: "3",
+          reps: "10/side",
+          rest: "2 mins after block",
+          notes: "Control movement"
+        },
+        {
+          name: "Block 3: Weighted Plank",
+          sets: "3",
+          reps: "45s",
+          rest: "As needed",
+          notes: "Plate on back"
+        },
+        {
+          name: "Block 3: Hollow Body Hold",
+          sets: "3",
+          reps: "30s",
+          rest: "0",
+          notes: "Core engaged"
+        }
+      ],
+      tips: [
+        "Use spotter for heavy lifts",
+        "Warm up thoroughly",
+        "Prioritize form over load"
       ]
     }
   };
