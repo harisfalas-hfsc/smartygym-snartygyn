@@ -21,6 +21,46 @@ export const AccessGate = ({
   const { user, userTier, isLoading } = useAccessControl();
   const navigate = useNavigate();
 
+  // FREE CONTENT: Skip all checks if not premium required
+  if (!requirePremium) {
+    // Only check if auth is required
+    if (requireAuth && !user && !isLoading) {
+      return (
+        <div className="flex items-center justify-center min-h-[400px] p-4">
+          <Card className="max-w-md w-full border-2 border-primary/30">
+            <CardContent className="pt-6 text-center space-y-4">
+              <div className="flex justify-center">
+                <div className="p-4 bg-primary/10 rounded-full">
+                  <Lock className="w-12 h-12 text-primary" />
+                </div>
+              </div>
+              <h2 className="text-2xl font-bold">Login Required</h2>
+              <p className="text-muted-foreground">
+                Please log in or create an account to access {contentType === "workout" ? "workouts" : contentType === "program" ? "training programs" : "this content"}.
+              </p>
+              <div className="space-y-2 pt-4">
+                <Button onClick={() => navigate("/auth")} className="w-full" size="lg">
+                  <Lock className="w-4 h-4 mr-2" />
+                  Log In / Sign Up
+                </Button>
+                <Button 
+                  onClick={() => navigate("/")} 
+                  variant="outline" 
+                  className="w-full"
+                >
+                  Back to Home
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      );
+    }
+    // Free content - show immediately
+    return <>{children}</>;
+  }
+
+  // PREMIUM CONTENT: Show loading only for premium checks
   if (isLoading) {
     return (
       <div className="flex items-center justify-center min-h-[400px]">

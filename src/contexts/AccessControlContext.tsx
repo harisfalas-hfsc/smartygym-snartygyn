@@ -22,8 +22,8 @@ const AccessControlContext = createContext<AccessControlContextType | undefined>
 export const AccessControlProvider = ({ children }: { children: ReactNode }) => {
   const [state, setState] = useState<AccessControlState>({
     user: null,
-    userTier: "guest",
-    isLoading: true,
+    userTier: "subscriber", // Default to subscriber instead of guest for faster access
+    isLoading: false, // Start with false for instant rendering
     productId: null,
   });
 
