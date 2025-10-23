@@ -287,7 +287,7 @@ const PremiumComparison = () => {
                       <td className="p-6"></td>
                       <td className="p-6 text-center">
                         <Button 
-                          className="bg-gradient-to-r from-primary to-accent hover:opacity-90 shadow-lg cursor-default"
+                          className="bg-gradient-to-r from-primary to-accent shadow-lg cursor-default"
                           disabled
                         >
                           <Eye className="w-4 h-4 mr-2" />
@@ -306,7 +306,7 @@ const PremiumComparison = () => {
                         )}
                         {user && (
                           <Button 
-                            className="bg-gradient-to-r from-primary to-accent hover:opacity-90 shadow-lg cursor-default"
+                            className="bg-gradient-to-r from-primary to-accent shadow-lg cursor-default"
                             disabled
                           >
                             <UserCheck className="w-4 h-4 mr-2" />
