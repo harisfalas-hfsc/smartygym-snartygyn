@@ -9,7 +9,14 @@ import { BackToTop } from "@/components/BackToTop";
 const WorkoutFlow = () => {
   const navigate = useNavigate();
 
-  const workoutTypes: any[] = [];
+  const workoutTypes = [
+    {
+      id: "challenge",
+      icon: Activity,
+      title: "Challenge",
+      description: "Push your limits with advanced workout challenges"
+    }
+  ];
 
   const handleWorkoutSelect = (workoutId: string) => {
     navigate(`/workout/${workoutId}`);
