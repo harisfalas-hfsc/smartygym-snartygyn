@@ -2,7 +2,7 @@ import { useNavigate } from "react-router-dom";
 import { Helmet } from "react-helmet";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { Check, X, ArrowLeft, Eye, UserCheck, Crown, Dumbbell, BookOpen, Calculator, Users, Heart, Sparkles, Flame, LayoutDashboard } from "lucide-react";
+import { Check, X, ArrowLeft, Eye, UserCheck, Crown, Dumbbell, BookOpen, Calculator, Users, Heart, Sparkles, Flame, LayoutDashboard, MessageCircle } from "lucide-react";
 import { useShowBackButton } from "@/hooks/useShowBackButton";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
@@ -88,6 +88,13 @@ const PremiumComparison = () => {
       visitor: false,
       subscriber: "Favorites, ratings, history (free only)",
       premium: "Full favorites, ratings, history"
+    },
+    {
+      category: "WhatsApp Interaction with Coach",
+      icon: MessageCircle,
+      visitor: false,
+      subscriber: false,
+      premium: "Full customer support"
     }
   ];
 

@@ -1,7 +1,9 @@
 import { MessageCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useAccessControl } from "@/hooks/useAccessControl";
 
 export const WhatsAppButton = () => {
+  const { userTier, isLoading } = useAccessControl();
   const phoneNumber = "+35796000620";
   const message = "Hi! I'm interested in Smarty Gym services.";
   
@@ -9,6 +11,11 @@ export const WhatsAppButton = () => {
     const url = `https://wa.me/${phoneNumber.replace(/[^0-9]/g, '')}?text=${encodeURIComponent(message)}`;
     window.open(url, '_blank');
   };
+
+  // Only show for premium users
+  if (isLoading || userTier !== "premium") {
+    return null;
+  }
 
   return (
     <Button
