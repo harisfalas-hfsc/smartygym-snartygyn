@@ -83,12 +83,25 @@ export const Navigation = () => {
   };
 
   const handleLogout = async () => {
-    await supabase.auth.signOut();
-    toast({
-      title: "Logged out",
-      description: "You have been logged out successfully",
-    });
-    navigate("/");
+    try {
+      await supabase.auth.signOut();
+      setUser(null);
+      setAvatarUrl(null);
+      setSubscriptionInfo(null);
+      toast({
+        title: "Logged out",
+        description: "You have been logged out successfully",
+      });
+      navigate("/");
+      setTimeout(() => window.scrollTo(0, 0), 0);
+    } catch (error) {
+      console.error("Logout error:", error);
+      toast({
+        title: "Error",
+        description: "Failed to log out. Please try again.",
+        variant: "destructive"
+      });
+    }
   };
 
   const getUserInitials = () => {
@@ -260,16 +273,31 @@ export const Navigation = () => {
                     </>
                   )}
                   
-                  <DropdownMenuItem onSelect={() => handleProfileNavigate("/userdashboard")}>
+                  <DropdownMenuItem 
+                    onSelect={(e) => {
+                      e.preventDefault();
+                      handleProfileNavigate("/userdashboard");
+                    }}
+                  >
                     <LayoutDashboard className="mr-2 h-4 w-4" />
                     <span>My Dashboard</span>
                   </DropdownMenuItem>
-                  <DropdownMenuItem onSelect={() => handleProfileNavigate("/profilesettings")}>
+                  <DropdownMenuItem 
+                    onSelect={(e) => {
+                      e.preventDefault();
+                      handleProfileNavigate("/profilesettings");
+                    }}
+                  >
                     <Settings className="mr-2 h-4 w-4" />
                     <span>Settings</span>
                   </DropdownMenuItem>
                   <DropdownMenuSeparator />
-                  <DropdownMenuItem onClick={handleLogout}>
+                  <DropdownMenuItem 
+                    onSelect={(e) => {
+                      e.preventDefault();
+                      handleLogout();
+                    }}
+                  >
                     <LogOut className="mr-2 h-4 w-4" />
                     <span>Log out</span>
                   </DropdownMenuItem>
