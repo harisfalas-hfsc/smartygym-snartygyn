@@ -78,6 +78,12 @@ const IndividualWorkout = () => {
     'mobility-028', // Stability Circuit
     'mobility-029', // Mobility Mastery
     'mobility-030', // Balance Forge
+    'metabolic-043', // Metabo Pulse
+    'metabolic-044', // Metabo Band Boost
+    'metabolic-045', // Metabo Sprint
+    'metabolic-046', // Metabo Hybrid
+    'metabolic-047', // Metabo Max
+    'metabolic-048', // Metabo Forge
   ];
   const isFreeWorkout = freeWorkouts.includes(id || '');
 
@@ -1184,6 +1190,275 @@ Hold Time: 45–60s`,
         "Keep spine neutral",
         "Don't overextend joints",
         "Engage stabilizers throughout"
+      ]
+    },
+    "metabolic-043": {
+      name: "Metabo Pulse",
+      serialNumber: "MET-BBW-043",
+      difficulty: "Beginner",
+      duration: "30 min",
+      equipment: "No Equipment Required",
+      imageUrl: metaboLiteImg,
+      description: "A beginner-friendly Tabata workout using bodyweight moves to elevate metabolism and improve aerobic capacity.",
+      workoutType: "TABATA",
+      format: `Tabata – 4 blocks
+Work: 20s / Rest: 10s x 8 rounds per block`,
+      instructions: "Complete each Tabata block before moving to the next. Rest 1 minute between blocks.",
+      exercises: [
+        {
+          name: "Block 1: March in Place",
+          sets: "8 rounds",
+          reps: "20s work / 10s rest",
+          rest: "60s after block",
+          notes: "Each block = 4 mins"
+        },
+        {
+          name: "Block 2: Bodyweight Squats",
+          sets: "8 rounds",
+          reps: "20s work / 10s rest",
+          rest: "60s after block",
+          notes: "Full range of motion"
+        },
+        {
+          name: "Block 3: Step-Back Lunges",
+          sets: "8 rounds",
+          reps: "20s work / 10s rest",
+          rest: "60s after block",
+          notes: "Alternate legs"
+        },
+        {
+          name: "Block 4: Plank Hold",
+          sets: "8 rounds",
+          reps: "20s work / 10s rest",
+          rest: "0",
+          notes: "Maintain form"
+        }
+      ],
+      tips: [
+        "Keep movements light and rhythmic",
+        "Modify jumps to steps if needed",
+        "Focus on breathing and posture"
+      ]
+    },
+    "metabolic-044": {
+      name: "Metabo Band Boost",
+      serialNumber: "MET-EQ-044",
+      difficulty: "Beginner",
+      duration: "30 min",
+      equipment: "Resistance Bands, Dumbbells, Mat",
+      imageUrl: metaboStartImg,
+      description: "A light metabolic circuit using resistance bands and dumbbells to blend cardio and strength for beginners.",
+      workoutType: "CIRCUIT",
+      format: `Circuit – 3 rounds
+Work: 40s / Rest: 20s`,
+      instructions: "Use light resistance. Perform each move with control. Rest 1 minute between rounds.",
+      exercises: [
+        {
+          name: "Band Squat to Row",
+          sets: "3 rounds",
+          reps: "40s",
+          rest: "20s",
+          notes: "Controlled movement"
+        },
+        {
+          name: "Dumbbell Curl to Press",
+          sets: "3 rounds",
+          reps: "40s",
+          rest: "20s",
+          notes: "Full range"
+        },
+        {
+          name: "Band Lateral Walks",
+          sets: "3 rounds",
+          reps: "40s",
+          rest: "20s",
+          notes: "Keep tension"
+        },
+        {
+          name: "Dumbbell Deadlift",
+          sets: "3 rounds",
+          reps: "40s",
+          rest: "20s",
+          notes: "Hip hinge"
+        },
+        {
+          name: "Plank with Band Pull",
+          sets: "3 rounds",
+          reps: "40s",
+          rest: "60s after round",
+          notes: "Maintain plank position"
+        }
+      ],
+      tips: [
+        "Don't rush reps",
+        "Keep band tension consistent",
+        "Breathe through transitions"
+      ]
+    },
+    "metabolic-045": {
+      name: "Metabo Sprint",
+      serialNumber: "MET-BBW-045",
+      difficulty: "Intermediate",
+      duration: "45 min",
+      equipment: "No Equipment Required",
+      imageUrl: metaboFlowImg,
+      description: "A fast-paced bodyweight AMRAP designed to spike metabolism and build muscular endurance.",
+      workoutType: "AMRAP",
+      format: `AMRAP – 30 mins
+Finisher – 10 mins
+Warm-Up & Cool-Down – 5 mins`,
+      instructions: "Complete as many rounds as possible. Push consistent effort. Finish with a challenge block.",
+      exercises: [
+        {
+          name: "Main Block (30 mins AMRAP)",
+          sets: "AMRAP",
+          reps: "As many rounds as possible",
+          rest: "As needed",
+          notes: "Jump Squats – 15 reps, Push-Ups – 12 reps, Reverse Lunges – 10 reps/leg, Plank Shoulder Taps – 20 reps, Burpees – 8 reps"
+        },
+        {
+          name: "Finisher (10 mins)",
+          sets: "1",
+          reps: "Complete all",
+          rest: "0",
+          notes: "100 High Knees, 50 Mountain Climbers, 25 Jumping Jacks"
+        }
+      ],
+      tips: [
+        "Keep transitions tight",
+        "Use full range of motion",
+        "Hydrate between blocks"
+      ]
+    },
+    "metabolic-046": {
+      name: "Metabo Hybrid",
+      serialNumber: "MET-EQ-046",
+      difficulty: "Intermediate",
+      duration: "45 min",
+      equipment: "Kettlebells, TRX, Mat",
+      imageUrl: metaboChargeImg,
+      description: "A hybrid metabolic workout using kettlebells, TRX, and bodyweight to challenge multiple energy systems.",
+      workoutType: "MIX",
+      format: `EMOM + Circuit
+EMOM: 20 mins
+Circuit: 3 rounds`,
+      instructions: "Alternate EMOM and circuit blocks. Push max effort during EMOM.",
+      exercises: [
+        {
+          name: "EMOM Block (20 mins)",
+          sets: "4 cycles",
+          reps: "5 minute cycle",
+          rest: "Minute 5 rest",
+          notes: "Min 1: Kettlebell Swings – 20 reps, Min 2: TRX Rows – 15 reps, Min 3: Jump Squats – 20 reps, Min 4: TRX Push-Ups – 15 reps, Min 5: Rest"
+        },
+        {
+          name: "Circuit (3 rounds)",
+          sets: "3 rounds",
+          reps: "See notes",
+          rest: "As needed",
+          notes: "Kettlebell Goblet Squat – 15 reps, TRX Mountain Climbers – 20 reps, Plank Hold – 45s"
+        }
+      ],
+      tips: [
+        "Keep kettlebell swings hip-driven",
+        "Adjust TRX straps properly",
+        "Don't skip rest minutes"
+      ]
+    },
+    "metabolic-047": {
+      name: "Metabo Max",
+      serialNumber: "MET-BBW-047",
+      difficulty: "Advanced",
+      duration: "60 min",
+      equipment: "No Equipment Required",
+      imageUrl: metaboInfernoImg,
+      description: "A high-intensity bodyweight workout designed to push metabolic output and endurance. Complete the full challenge as fast as possible.",
+      workoutType: "FOR TIME",
+      format: `For Time – 3 blocks
+Rest: 2 mins between blocks`,
+      instructions: "Complete each block as fast as possible. Rest only as needed.",
+      exercises: [
+        {
+          name: "Block 1 (15 mins)",
+          sets: "Repeat for 15 mins",
+          reps: "20-15-10",
+          rest: "As needed",
+          notes: "20 Jump Squats, 15 Push-Ups, 10 Burpees - Repeat"
+        },
+        {
+          name: "Block 2 (15 mins)",
+          sets: "Repeat for 15 mins",
+          reps: "20-15-10",
+          rest: "As needed",
+          notes: "20 Mountain Climbers, 15 Jump Lunges, 10 Plank Jacks - Repeat"
+        },
+        {
+          name: "Block 3 (15 mins)",
+          sets: "Repeat for 15 mins",
+          reps: "20-15-10",
+          rest: "As needed",
+          notes: "20 High Knees, 15 Tuck Jumps, 10 Push-Up to Pike - Repeat"
+        }
+      ],
+      tips: [
+        "Explode through jumps",
+        "Keep transitions tight",
+        "Hydrate between blocks"
+      ]
+    },
+    "metabolic-048": {
+      name: "Metabo Forge",
+      serialNumber: "MET-EQ-048",
+      difficulty: "Advanced",
+      duration: "60 min",
+      equipment: "Dumbbells, Kettlebells, Wall Ball, Mat",
+      imageUrl: metaboSurgeImg,
+      description: "A strength-driven metabolic workout using dumbbells, kettlebells, and wall balls. Designed for elite conditioning and muscular endurance.",
+      workoutType: "REPS & SETS",
+      format: `3 sets per exercise
+Rest: 60–90s between sets`,
+      instructions: "Use moderate to heavy weights. Track reps and tempo. Rest strategically.",
+      exercises: [
+        {
+          name: "Dumbbell Thrusters",
+          sets: "3",
+          reps: "12",
+          rest: "60-90s",
+          notes: "Front squat to overhead press"
+        },
+        {
+          name: "Kettlebell Swings",
+          sets: "3",
+          reps: "20",
+          rest: "60-90s",
+          notes: "Hip hinge, explosive"
+        },
+        {
+          name: "Wall Ball Squat to Press",
+          sets: "3",
+          reps: "15",
+          rest: "60-90s",
+          notes: "Full squat depth"
+        },
+        {
+          name: "Dumbbell Renegade Rows",
+          sets: "3",
+          reps: "10/side",
+          rest: "60-90s",
+          notes: "Plank position"
+        },
+        {
+          name: "Plank Hold",
+          sets: "3",
+          reps: "45s",
+          rest: "60-90s",
+          notes: "Maintain form"
+        }
+      ],
+      tips: [
+        "Use full-body coordination",
+        "Don't rush transitions",
+        "Prioritize form over speed"
       ]
     }
   };

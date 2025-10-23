@@ -88,7 +88,14 @@ const WorkoutDetail = () => {
   const workoutData: { [key: string]: Workout[] } = {
     "strength": [],
     "calorie-burning": [],
-    "metabolic": [],
+    "metabolic": [
+      { id: "metabolic-043", name: "Metabo Pulse", description: "A beginner-friendly Tabata workout using bodyweight moves to elevate metabolism and improve aerobic capacity", duration: "30 min", equipment: "bodyweight", level: "beginner", format: "tabata", imageUrl: metaboLiteImg, isFree: true },
+      { id: "metabolic-044", name: "Metabo Band Boost", description: "A light metabolic circuit using resistance bands and dumbbells to blend cardio and strength for beginners", duration: "30 min", equipment: "equipment", level: "beginner", format: "circuit", imageUrl: metaboStartImg, isFree: true },
+      { id: "metabolic-045", name: "Metabo Sprint", description: "A fast-paced bodyweight AMRAP designed to spike metabolism and build muscular endurance", duration: "45 min", equipment: "bodyweight", level: "intermediate", format: "amrap", imageUrl: metaboFlowImg, isFree: true },
+      { id: "metabolic-046", name: "Metabo Hybrid", description: "A hybrid metabolic workout using kettlebells, TRX, and bodyweight to challenge multiple energy systems", duration: "45 min", equipment: "equipment", level: "intermediate", format: "mix", imageUrl: metaboChargeImg, isFree: true },
+      { id: "metabolic-047", name: "Metabo Max", description: "A high-intensity bodyweight workout designed to push metabolic output and endurance", duration: "60 min", equipment: "bodyweight", level: "advanced", format: "for time", imageUrl: metaboInfernoImg, isFree: true },
+      { id: "metabolic-048", name: "Metabo Forge", description: "A strength-driven metabolic workout using dumbbells, kettlebells, and wall balls", duration: "60 min", equipment: "equipment", level: "advanced", format: "reps & sets", imageUrl: metaboSurgeImg, isFree: true },
+    ],
     "cardio": [],
     "mobility": [
       { id: "mobility-025", name: "Flow Starter", description: "A gentle mobility circuit designed to improve joint range, posture, and control", duration: "30 min", equipment: "bodyweight", level: "beginner", format: "circuit", imageUrl: flowStarterImg, isFree: true },
