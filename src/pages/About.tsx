@@ -463,24 +463,16 @@ const About = () => {
             <p className="text-sm font-semibold text-primary mb-6 max-w-2xl mx-auto">
               Work with a real coach who designed every program personally — not an AI.
             </p>
-            <div className="flex gap-4 justify-center flex-wrap">
-              <Button size="lg" onClick={() => navigate("/workout")} className="gap-2">
-                <Target className="w-5 h-5" />
-                Try Free Workouts
-              </Button>
-              <div className="flex flex-col items-center gap-1">
+              <div className="flex gap-4 justify-center flex-wrap">
+                <Button size="lg" onClick={() => navigate("/workout")} className="gap-2">
+                  <Target className="w-5 h-5" />
+                  Try Free Workouts
+                </Button>
                 <Button size="lg" variant="outline" onClick={() => navigate("/premiumbenefits")} className="gap-2">
                   <UserCheck className="w-5 h-5" />
                   Join Premium
                 </Button>
-                <button 
-                  onClick={() => navigate("/premium-comparison")}
-                  className="text-xs text-muted-foreground hover:text-primary transition-colors underline"
-                >
-                  Why Premium?
-                </button>
               </div>
-            </div>
           </CardContent>
         </Card>
       </div>

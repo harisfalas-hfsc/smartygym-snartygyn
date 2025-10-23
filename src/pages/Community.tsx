@@ -159,17 +159,9 @@ export default function Community() {
               <p className="text-sm text-muted-foreground mb-2">
                 Join our growing community of satisfied members — start your fitness journey today
               </p>
-              <div className="flex flex-col items-center gap-1">
-                <Button variant="default" size="sm" onClick={() => navigate("/premiumbenefits")}>
-                  Join Premium
-                </Button>
-                <button 
-                  onClick={() => navigate("/premium-comparison")}
-                  className="text-xs text-muted-foreground hover:text-primary transition-colors underline"
-                >
-                  Why Premium?
-                </button>
-              </div>
+              <Button variant="default" size="sm" onClick={() => navigate("/premiumbenefits")}>
+                Join Premium
+              </Button>
             </div>
           </header>
           
@@ -219,12 +211,6 @@ export default function Community() {
                   Join Premium
                 </Button>
               </div>
-              <button 
-                onClick={() => navigate("/premium-comparison")}
-                className="text-xs text-muted-foreground hover:text-primary transition-colors underline"
-              >
-                Why Premium?
-              </button>
             </div>
           </aside>
         </div>

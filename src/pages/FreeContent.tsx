@@ -49,17 +49,9 @@ const FreeContent = () => {
           <p className="text-sm text-muted-foreground mb-2">
             Try these workouts and programs for free — no login required. Want full access?
           </p>
-          <div className="flex flex-col items-center gap-1">
-            <Button variant="default" size="sm" onClick={() => navigate("/premiumbenefits")}>
-              Join Premium
-            </Button>
-            <button 
-              onClick={() => navigate("/premium-comparison")}
-              className="text-xs text-muted-foreground hover:text-primary transition-colors underline"
-            >
-              Why Premium?
-            </button>
-          </div>
+          <Button variant="default" size="sm" onClick={() => navigate("/premiumbenefits")}>
+            Join Premium
+          </Button>
         </div>
 
         <Tabs defaultValue="workouts" className="w-full">
