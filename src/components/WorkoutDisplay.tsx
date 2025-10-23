@@ -183,7 +183,7 @@ export const WorkoutDisplay = ({
           {focus && (
             <div className="flex items-center gap-2">
               <span className="font-semibold">Focus:</span>
-              <span className="bg-primary/10 text-primary px-3 py-1 rounded-full font-medium">{focus}</span>
+              <span className="bg-primary text-primary-foreground px-3 py-1 rounded-full font-medium">{focus}</span>
             </div>
           )}
           <div className="flex items-center gap-2">
@@ -200,7 +200,7 @@ export const WorkoutDisplay = ({
           {workoutType && (
             <div className="flex items-center gap-2">
               <span className="font-semibold">Type:</span>
-              <span className="bg-accent/20 text-accent-foreground px-3 py-1 rounded-full font-medium uppercase text-xs tracking-wide">{workoutType}</span>
+              <span className="bg-primary text-primary-foreground px-3 py-1 rounded-full font-medium uppercase text-xs tracking-wide">{workoutType}</span>
             </div>
           )}
           {duration && (
