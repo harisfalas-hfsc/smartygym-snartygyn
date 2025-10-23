@@ -7,6 +7,15 @@ import { ArrowLeft, Calendar } from "lucide-react";
 import cardioEnduranceImg from "@/assets/cardio-endurance-program.jpg";
 import functionalStrengthImg from "@/assets/functional-strength-program.jpg";
 import muscleHypertrophyImg from "@/assets/muscle-hypertrophy-program.jpg";
+import powerFoundationImg from "@/assets/power-foundation-workout.jpg";
+import ironCoreStrengthImg from "@/assets/iron-core-strength-workout.jpg";
+import cardioPowerIntervalsImg from "@/assets/cardio-power-intervals-workout.jpg";
+import metabolicBurnImg from "@/assets/metabolic-burn-workout.jpg";
+import fatFurnaceImg from "@/assets/fat-furnace-workout.jpg";
+import coreBuilderImg from "@/assets/core-builder-workout.jpg";
+import stabilityCircuitImg from "@/assets/stability-circuit-workout.jpg";
+import flowMobilityImg from "@/assets/flow-mobility-workout.jpg";
+import mobilityMasteryImg from "@/assets/mobility-mastery-workout.jpg";
 
 type EquipmentFilter = "all" | "bodyweight" | "equipment";
 type LevelFilter = "all" | "beginner" | "intermediate" | "advanced";
@@ -58,7 +67,7 @@ const TrainingProgramDetail = () => {
         duration: "8",
         equipment: "equipment",
         level: "advanced",
-        imageUrl: cardioEnduranceImg,
+        imageUrl: cardioPowerIntervalsImg,
         isFree: false
       }
     ],
@@ -80,7 +89,7 @@ const TrainingProgramDetail = () => {
         duration: "8",
         equipment: "equipment",
         level: "advanced",
-        imageUrl: functionalStrengthImg,
+        imageUrl: powerFoundationImg,
         isFree: false
       }
     ],
@@ -102,7 +111,7 @@ const TrainingProgramDetail = () => {
         duration: "8",
         equipment: "equipment",
         level: "advanced",
-        imageUrl: muscleHypertrophyImg,
+        imageUrl: ironCoreStrengthImg,
         isFree: false
       }
     ],
@@ -114,7 +123,7 @@ const TrainingProgramDetail = () => {
         duration: "6",
         equipment: "equipment",
         level: "intermediate",
-        imageUrl: cardioEnduranceImg,
+        imageUrl: metabolicBurnImg,
         isFree: true
       },
       {
@@ -124,7 +133,7 @@ const TrainingProgramDetail = () => {
         duration: "8",
         equipment: "equipment",
         level: "advanced",
-        imageUrl: cardioEnduranceImg,
+        imageUrl: fatFurnaceImg,
         isFree: false
       }
     ],
@@ -136,7 +145,7 @@ const TrainingProgramDetail = () => {
         duration: "6",
         equipment: "equipment",
         level: "intermediate",
-        imageUrl: functionalStrengthImg,
+        imageUrl: coreBuilderImg,
         isFree: false
       },
       {
@@ -146,7 +155,7 @@ const TrainingProgramDetail = () => {
         duration: "8",
         equipment: "equipment",
         level: "advanced",
-        imageUrl: functionalStrengthImg,
+        imageUrl: stabilityCircuitImg,
         isFree: false
       }
     ],
@@ -158,7 +167,7 @@ const TrainingProgramDetail = () => {
         duration: "6",
         equipment: "bodyweight",
         level: "intermediate",
-        imageUrl: functionalStrengthImg,
+        imageUrl: flowMobilityImg,
         isFree: false
       },
       {
@@ -168,7 +177,7 @@ const TrainingProgramDetail = () => {
         duration: "8",
         equipment: "equipment",
         level: "advanced",
-        imageUrl: functionalStrengthImg,
+        imageUrl: mobilityMasteryImg,
         isFree: false
       }
     ],
