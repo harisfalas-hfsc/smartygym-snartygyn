@@ -11,11 +11,13 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { ParQQuestionnaire } from "@/components/ParQQuestionnaire";
-import { Loader2 } from "lucide-react";
+import { Loader2, ArrowLeft } from "lucide-react";
+import { useShowBackButton } from "@/hooks/useShowBackButton";
 
 const PersonalTraining = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { canGoBack, goBack } = useShowBackButton();
   const [isLoading, setIsLoading] = useState(false);
   const [user, setUser] = useState<any>(null);
   const [userStatus, setUserStatus] = useState<string>("Guest");
@@ -184,6 +186,18 @@ const PersonalTraining = () => {
 
       <div className="min-h-screen bg-background py-6 sm:py-12 px-4">
         <div className="container mx-auto max-w-4xl">
+          {canGoBack && (
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={goBack}
+              className="mb-6"
+            >
+              <ArrowLeft className="mr-2 h-4 w-4" />
+              <span className="text-xs sm:text-sm">Back</span>
+            </Button>
+          )}
+          
           <h1 className="text-3xl sm:text-4xl font-bold text-center mb-3 sm:mb-4">Personal Training</h1>
           
           <p className="text-center text-sm sm:text-base text-muted-foreground mb-6 sm:mb-8 px-2">
