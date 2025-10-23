@@ -18,8 +18,8 @@ const PremiumComparison = () => {
     },
     {
       category: "Training Programs",
-      visitor: "View only",
-      subscriber: "View only",
+      visitor: false,
+      subscriber: false,
       premium: "Full access"
     },
     {
@@ -53,16 +53,16 @@ const PremiumComparison = () => {
       premium: "Favorites, ratings, history"
     },
     {
-      category: "Diet Plans",
+      category: "AI Diet Plans",
       visitor: false,
       subscriber: false,
-      premium: "AI-generated plans"
+      premium: "Personalized plans"
     },
     {
       category: "AI Training Programs",
       visitor: false,
       subscriber: false,
-      premium: "Personalized programs"
+      premium: "Custom programs"
     },
     {
       category: "Price",

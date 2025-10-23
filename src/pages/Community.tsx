@@ -210,7 +210,7 @@ export default function Community() {
               Experience the same transformation as our members. Get access to science-based workouts, 
               structured programs, and expert guidance designed by Haris Falas.
             </p>
-            <div className="flex flex-col items-center gap-3">
+            <div className="flex flex-col items-center gap-2">
               <div className="flex flex-col sm:flex-row gap-3 justify-center items-center">
                 <Button size="lg" onClick={() => navigate("/workout")}>
                   Try Free Workout

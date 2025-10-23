@@ -180,7 +180,7 @@ const Index = () => {
             Free workouts available, no login required.
               </p>
             </div>
-            <div className="flex flex-col items-center gap-3 pt-2">
+            <div className="flex flex-col items-center gap-2 pt-2">
               <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 justify-center items-center">
                 <Button size="lg" onClick={() => navigate("/workout")} aria-label="Start free workout with Smarty Gym">
                   Start Free Workout

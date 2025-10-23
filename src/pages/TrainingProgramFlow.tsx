@@ -90,18 +90,20 @@ const TrainingProgramFlow = () => {
         
         {/* Info Ribbon */}
         <div className="bg-primary/10 border border-primary/20 rounded-lg p-4 mb-8 text-center">
-          <p className="text-sm text-muted-foreground mb-3">
+          <p className="text-sm text-muted-foreground mb-2">
             Explore our structured programs — want full access to all programs and workouts?
           </p>
-          <Button variant="default" size="sm" onClick={() => navigate("/premiumbenefits")}>
-            Join Premium
-          </Button>
-          <button 
-            onClick={() => navigate("/premium-comparison")}
-            className="text-xs text-muted-foreground hover:text-primary transition-colors underline mt-1"
-          >
-            Why Premium?
-          </button>
+          <div className="flex flex-col items-center gap-1">
+            <Button variant="default" size="sm" onClick={() => navigate("/premiumbenefits")}>
+              Join Premium
+            </Button>
+            <button 
+              onClick={() => navigate("/premium-comparison")}
+              className="text-xs text-muted-foreground hover:text-primary transition-colors underline"
+            >
+              Why Premium?
+            </button>
+          </div>
         </div>
         
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
