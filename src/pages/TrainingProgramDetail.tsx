@@ -40,27 +40,12 @@ const TrainingProgramDetail = () => {
   };
 
   const programData: { [key: string]: TrainingProgram[] } = {
-    "cardio": [
-      { id: "cardio-001", name: "Cardio Endurance Builder", description: "4-week progressive cardio program", duration: "4", equipment: "bodyweight", level: "beginner", imageUrl: "https://images.unsplash.com/photo-1538805060514-97d9cc17730c?w=800&h=600&fit=crop", isFree: true },
-      { id: "cardio-cg-001", name: "Cardio Endurance & Heart Longevity", description: "Improve aerobic capacity, heart health, and stamina through steady-state, interval, and tempo-based training", duration: "6", equipment: "bodyweight", level: "beginner", imageUrl: cardioEnduranceImg },
-    ],
-    "functional-strength": [
-      { id: "functional-001", name: "Functional Power Program", description: "6-week functional strength development", duration: "6", equipment: "equipment", level: "intermediate", imageUrl: "https://images.unsplash.com/photo-1598971861713-54ad16a5c72e?w=800&h=600&fit=crop" },
-      { id: "functional-fs-002", name: "Functional Strength & Movement Control", description: "Compound lifts and movement patterns that enhance real-life performance, stability, and injury prevention", duration: "6", equipment: "equipment", level: "intermediate", imageUrl: functionalStrengthImg },
-    ],
-    "muscle-hypertrophy": [
-      { id: "hypertrophy-001", name: "Mass Builder Program", description: "8-week muscle growth program", duration: "8", equipment: "equipment", level: "intermediate", imageUrl: "https://images.unsplash.com/photo-1581009146145-b5ef050c2e1e?w=800&h=600&fit=crop" },
-      { id: "hypertrophy-mh-003", name: "Muscle Hypertrophy Builder", description: "Stimulate muscle growth through volume, intensity, and controlled tempo across all major muscle groups", duration: "6", equipment: "equipment", level: "intermediate", imageUrl: muscleHypertrophyImg },
-    ],
-    "weight-loss": [
-      { id: "weightloss-001", name: "Fat Loss Transform", description: "6-week weight loss program", duration: "6", equipment: "bodyweight", level: "beginner", imageUrl: "https://images.unsplash.com/photo-1571902943202-507ec2618e8f?w=800&h=600&fit=crop" },
-    ],
-    "low-back-pain": [
-      { id: "backcare-001", name: "Back Rehabilitation Program", description: "4-week back pain relief program", duration: "4", equipment: "bodyweight", level: "beginner", imageUrl: "https://images.unsplash.com/photo-1599901860904-17e6ed7083a0?w=800&h=600&fit=crop" },
-    ],
-    "mobility-stability": [
-      { id: "mobility-001", name: "Mobility Mastery Program", description: "4-week mobility enhancement program", duration: "4", equipment: "bodyweight", level: "beginner", imageUrl: "https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?w=800&h=600&fit=crop" },
-    ],
+    "cardio": [],
+    "functional-strength": [],
+    "muscle-hypertrophy": [],
+    "weight-loss": [],
+    "low-back-pain": [],
+    "mobility-stability": [],
   };
 
   const title = programTitles[type || ""] || "Training Program";
