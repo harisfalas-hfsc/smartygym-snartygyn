@@ -180,21 +180,21 @@ const Index = () => {
             Free workouts available, no login required.
               </p>
             </div>
-            <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 justify-center items-center pt-2">
-              <Button size="lg" onClick={() => navigate("/workout")} aria-label="Start free workout with Smarty Gym">
-                Start Free Workout
-              </Button>
-              <div className="flex flex-col items-center gap-1">
+            <div className="flex flex-col items-center gap-3 pt-2">
+              <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 justify-center items-center">
+                <Button size="lg" onClick={() => navigate("/workout")} aria-label="Start free workout with Smarty Gym">
+                  Start Free Workout
+                </Button>
                 <Button size="lg" variant="outline" onClick={() => navigate("/premiumbenefits")} aria-label="Join Smarty Gym premium membership">
                   Join Premium
                 </Button>
-                <button 
-                  onClick={() => navigate("/premium-comparison")}
-                  className="text-xs text-muted-foreground hover:text-primary transition-colors underline"
-                >
-                  Why Premium?
-                </button>
               </div>
+              <button 
+                onClick={() => navigate("/premium-comparison")}
+                className="text-xs text-muted-foreground hover:text-primary transition-colors underline"
+              >
+                Why Premium?
+              </button>
             </div>
           </div>
         </section>

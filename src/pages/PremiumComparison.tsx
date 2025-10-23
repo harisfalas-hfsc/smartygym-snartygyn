@@ -12,7 +12,7 @@ const PremiumComparison = () => {
   const features = [
     {
       category: "Workouts",
-      visitor: "3 free workouts",
+      visitor: "Free workouts",
       subscriber: "All workouts",
       premium: "All workouts"
     },
