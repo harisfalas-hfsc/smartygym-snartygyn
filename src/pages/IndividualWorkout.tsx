@@ -2478,7 +2478,7 @@ Finisher: 3 rounds`,
         </script>
       </Helmet>
 
-      <AccessGate requireAuth={!isFreeWorkout} requirePremium={!isFreeWorkout} contentType="workout">
+      <AccessGate requireAuth={true} requirePremium={!isFreeWorkout} contentType="workout">
         <div className="min-h-screen bg-background">
           <div className="container mx-auto max-w-4xl px-4 py-8">
             <Button
