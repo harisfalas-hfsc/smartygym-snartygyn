@@ -172,10 +172,12 @@ export default function PremiumBenefits() {
 
           <div className="text-center mb-8">
             <Crown className="h-16 w-16 text-primary mx-auto mb-4" />
-            <h1 className="text-3xl sm:text-4xl font-bold mb-2">Transform Your Fitness Journey</h1>
-            <p className="text-muted-foreground max-w-2xl mx-auto">
-              Join thousands of members who've upgraded to premium and achieved their fitness goals
-            </p>
+            <h1 className="text-3xl sm:text-4xl font-bold mb-4">Transform Your Fitness Journey</h1>
+            <div className="bg-primary/10 border border-primary/20 rounded-lg p-4 max-w-2xl mx-auto">
+              <p className="text-sm text-muted-foreground">
+                Join thousands of members who've upgraded to premium and achieved their fitness goals
+              </p>
+            </div>
           </div>
 
           {/* What You Get */}
