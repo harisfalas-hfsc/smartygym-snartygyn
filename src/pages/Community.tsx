@@ -2,7 +2,7 @@ import { useNavigate } from "react-router-dom";
 import { Helmet } from "react-helmet";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { ArrowLeft, Star } from "lucide-react";
+import { ArrowLeft, Star, Trophy, Award, Target, CheckCircle2 } from "lucide-react";
 import { BackToTop } from "@/components/BackToTop";
 import { useShowBackButton } from "@/hooks/useShowBackButton";
 
@@ -108,6 +108,88 @@ const reviews: Review[] = [
   }
 ];
 
+interface LeaderboardMember {
+  id: string;
+  nickname: string;
+  monthsSubscribed: number;
+  plan: "Gold" | "Platinum";
+  workoutsStarted: number;
+  workoutsCompleted: number;
+  programsStarted: number;
+  programsCompleted: number;
+  favoriteCount: number;
+}
+
+// Mock data for initial display
+const mockLeaderboard: LeaderboardMember[] = [
+  {
+    id: "1",
+    nickname: "IronWarrior",
+    monthsSubscribed: 18,
+    plan: "Platinum",
+    workoutsStarted: 245,
+    workoutsCompleted: 210,
+    programsStarted: 12,
+    programsCompleted: 9,
+    favoriteCount: 34
+  },
+  {
+    id: "2",
+    nickname: "FitnessFanatic",
+    monthsSubscribed: 14,
+    plan: "Gold",
+    workoutsStarted: 189,
+    workoutsCompleted: 165,
+    programsStarted: 8,
+    programsCompleted: 6,
+    favoriteCount: 28
+  },
+  {
+    id: "3",
+    nickname: "PowerLifter89",
+    monthsSubscribed: 22,
+    plan: "Platinum",
+    workoutsStarted: 312,
+    workoutsCompleted: 287,
+    programsStarted: 15,
+    programsCompleted: 13,
+    favoriteCount: 42
+  },
+  {
+    id: "4",
+    nickname: "CardioQueen",
+    monthsSubscribed: 10,
+    plan: "Gold",
+    workoutsStarted: 156,
+    workoutsCompleted: 142,
+    programsStarted: 7,
+    programsCompleted: 5,
+    favoriteCount: 21
+  },
+  {
+    id: "5",
+    nickname: "BeastMode",
+    monthsSubscribed: 16,
+    plan: "Platinum",
+    workoutsStarted: 234,
+    workoutsCompleted: 201,
+    programsStarted: 11,
+    programsCompleted: 8,
+    favoriteCount: 31
+  },
+  {
+    id: "6",
+    nickname: "FlexMaster",
+    monthsSubscribed: 8,
+    plan: "Gold",
+    workoutsStarted: 123,
+    workoutsCompleted: 108,
+    programsStarted: 5,
+    programsCompleted: 4,
+    favoriteCount: 18
+  }
+];
+
 export default function Community() {
   const navigate = useNavigate();
   const { canGoBack, goBack } = useShowBackButton();
@@ -163,6 +245,91 @@ export default function Community() {
               </Button>
             </div>
           </header>
+          
+          {/* Leaderboard / Competition Card */}
+          <Card className="mb-8 border-2 border-primary/30 bg-primary/5">
+            <div className="p-6">
+              <div className="flex items-center gap-3 mb-6">
+                <Trophy className="h-8 w-8 text-primary" />
+                <div>
+                  <h2 className="text-2xl font-bold">Community Leaderboard</h2>
+                  <p className="text-sm text-muted-foreground">Top performers and their achievements</p>
+                </div>
+              </div>
+              
+              <div className="max-h-[400px] overflow-y-auto">
+                <div className="space-y-3">
+                  {mockLeaderboard.map((member, index) => (
+                    <div 
+                      key={member.id}
+                      className="bg-background rounded-lg p-4 border border-border hover:border-primary/50 transition-colors"
+                    >
+                      <div className="flex items-center gap-4 mb-3">
+                        <div className="flex items-center gap-2 min-w-[120px]">
+                          {index < 3 && (
+                            <Award className={`h-5 w-5 ${
+                              index === 0 ? 'text-yellow-500' : 
+                              index === 1 ? 'text-gray-400' : 
+                              'text-amber-600'
+                            }`} />
+                          )}
+                          <span className="font-bold text-lg">{member.nickname}</span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <span className={`text-xs px-2 py-1 rounded-full font-semibold ${
+                            member.plan === 'Platinum' 
+                              ? 'bg-primary text-primary-foreground' 
+                              : 'bg-amber-500 text-white'
+                          }`}>
+                            {member.plan}
+                          </span>
+                          <span className="text-sm text-muted-foreground">
+                            {member.monthsSubscribed} months
+                          </span>
+                        </div>
+                      </div>
+                      
+                      <div className="grid grid-cols-2 md:grid-cols-4 gap-3 text-sm">
+                        <div className="flex items-center gap-2">
+                          <Target className="h-4 w-4 text-primary" />
+                          <div>
+                            <p className="text-xs text-muted-foreground">Workouts</p>
+                            <p className="font-semibold">{member.workoutsCompleted}/{member.workoutsStarted}</p>
+                          </div>
+                        </div>
+                        
+                        <div className="flex items-center gap-2">
+                          <CheckCircle2 className="h-4 w-4 text-primary" />
+                          <div>
+                            <p className="text-xs text-muted-foreground">Programs</p>
+                            <p className="font-semibold">{member.programsCompleted}/{member.programsStarted}</p>
+                          </div>
+                        </div>
+                        
+                        <div className="flex items-center gap-2">
+                          <Star className="h-4 w-4 text-primary fill-primary" />
+                          <div>
+                            <p className="text-xs text-muted-foreground">Favorites</p>
+                            <p className="font-semibold">{member.favoriteCount}</p>
+                          </div>
+                        </div>
+                        
+                        <div className="flex items-center gap-2">
+                          <Trophy className="h-4 w-4 text-primary" />
+                          <div>
+                            <p className="text-xs text-muted-foreground">Completion</p>
+                            <p className="font-semibold">
+                              {Math.round((member.workoutsCompleted / member.workoutsStarted) * 100)}%
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </Card>
           
           {/* Reviews Container */}
           <Card className="mb-12 p-6">
