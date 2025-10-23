@@ -96,15 +96,12 @@ export const useAccessControl = () => {
   const canAccessContent = (contentType: "free-workout" | "premium-workout" | "free-program" | "premium-program" | "tool" | "dashboard" | "exercise-library" | "community"): boolean => {
     const { userTier } = state;
 
-    // Tools are free for everyone
-    if (contentType === "tool") return true;
-
-    // Guests can't access anything except tools
+    // Guests can't access anything (all content requires login)
     if (userTier === "guest") return false;
 
-    // Subscribers can access free content
+    // Subscribers can access free content and tools
     if (userTier === "subscriber") {
-      return contentType === "free-workout" || contentType === "free-program";
+      return contentType === "free-workout" || contentType === "free-program" || contentType === "tool";
     }
 
     // Premium members can access everything

@@ -9,6 +9,7 @@ import { ArrowLeft, Save } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { User } from "@supabase/supabase-js";
+import { AccessGate } from "@/components/AccessGate";
 
 const OneRMCalculator = () => {
   const navigate = useNavigate();
@@ -84,7 +85,7 @@ const OneRMCalculator = () => {
   };
 
   return (
-    <>
+    <AccessGate requireAuth={true} requirePremium={false} contentType="feature">
       <Helmet>
         <title>1RM Calculator - Smarty Gym | Free One Rep Max Calculator | smartygym.com</title>
         <meta name="description" content="Free 1RM Calculator using Brzycki formula. Calculate your one-rep maximum for any exercise at smartygym.com - convenient & flexible fitness tools by Haris Falas." />
@@ -201,7 +202,7 @@ const OneRMCalculator = () => {
         </Card>
       </div>
       </div>
-    </>
+    </AccessGate>
   );
 };
 

@@ -10,6 +10,7 @@ import { ArrowLeft, Save } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { User } from "@supabase/supabase-js";
+import { AccessGate } from "@/components/AccessGate";
 
 const MacroTrackingCalculator = () => {
   const navigate = useNavigate();
@@ -158,7 +159,7 @@ const MacroTrackingCalculator = () => {
   };
 
   return (
-    <>
+    <AccessGate requireAuth={true} requirePremium={false} contentType="feature">
       <Helmet>
         <title>Macro Calculator - Smarty Gym | Free Macro Tracking Calculator | smartygym.com</title>
         <meta name="description" content="Free Macro Tracking Calculator at smartygym.com. Get personalized protein, carbs, and fat recommendations based on your goals - convenient nutrition tool by Haris Falas." />
@@ -355,7 +356,7 @@ const MacroTrackingCalculator = () => {
         </Card>
       </div>
       </div>
-    </>
+    </AccessGate>
   );
 };
 
