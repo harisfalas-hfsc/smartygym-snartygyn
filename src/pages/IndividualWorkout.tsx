@@ -66,6 +66,12 @@ const IndividualWorkout = () => {
     'challenge-005', // Challenge Circuit Pro
     'challenge-006', // Final Form
     'challenge-007', // Elite Gauntlet
+    'power-037', // Power Primer
+    'power-038', // Explosive Start
+    'power-039', // Body Blast
+    'power-040', // Power Circuit Pro
+    'power-041', // Explosive Engine
+    'power-042', // Power Surge Elite
   ];
   const isFreeWorkout = freeWorkouts.includes(id || '');
 
@@ -425,6 +431,379 @@ Rest 1 minute between blocks`,
         "Don't skip rest intervals",
         "Maintain intensity across all 8 rounds",
         "Focus on quality over quantity"
+      ]
+    },
+    "power-037": {
+      name: "Power Primer",
+      serialNumber: "POW-BBW-037",
+      difficulty: "Beginner",
+      duration: "30 min",
+      equipment: "No Equipment Required",
+      imageUrl: powerPrimerImg,
+      description: "A beginner-friendly circuit focused on basic explosive movements and coordination. Builds foundational power and neuromuscular control.",
+      workoutType: "CIRCUIT",
+      format: `Circuit – 3 rounds
+Work: 30s / Rest: 30s`,
+      instructions: "Perform each move with intent and control. Rest 1 minute between rounds.",
+      exercises: [
+        {
+          name: "Squat to Calf Raise",
+          sets: "3 rounds",
+          reps: "12",
+          rest: "30s",
+          notes: "Controlled movement"
+        },
+        {
+          name: "Step-Back Lunge to Knee Drive",
+          sets: "3 rounds",
+          reps: "10/leg",
+          rest: "30s",
+          notes: "Balance and control"
+        },
+        {
+          name: "Jumping Jacks",
+          sets: "3 rounds",
+          reps: "30s",
+          rest: "30s",
+          notes: "Continuous movement"
+        },
+        {
+          name: "Glute Bridge",
+          sets: "3 rounds",
+          reps: "15",
+          rest: "30s",
+          notes: "Squeeze at top"
+        },
+        {
+          name: "Plank Shoulder Taps",
+          sets: "3 rounds",
+          reps: "20",
+          rest: "60s after round",
+          notes: "Keep hips stable"
+        }
+      ],
+      tips: [
+        "Focus on landing softly",
+        "Use arms to drive movement",
+        "Keep core engaged during jumps"
+      ]
+    },
+    "power-038": {
+      name: "Explosive Start",
+      serialNumber: "POW-EQ-038",
+      difficulty: "Beginner",
+      duration: "30 min",
+      equipment: "Resistance Bands, Medicine Ball, Mat",
+      imageUrl: explosiveStartImg,
+      description: "A light resistance workout using bands and medicine ball to introduce explosive movement patterns safely.",
+      workoutType: "REPS & SETS",
+      format: `3 sets per exercise
+Rest: 45s between sets`,
+      instructions: "Use light resistance. Focus on speed of movement with control.",
+      exercises: [
+        {
+          name: "Band Squat to Press",
+          sets: "3",
+          reps: "12",
+          rest: "45s",
+          notes: "Explosive press"
+        },
+        {
+          name: "Medicine Ball Chest Pass (against wall)",
+          sets: "3",
+          reps: "10",
+          rest: "45s",
+          notes: "Catch and throw quickly"
+        },
+        {
+          name: "Band Lateral Steps",
+          sets: "3",
+          reps: "10/side",
+          rest: "45s",
+          notes: "Keep tension"
+        },
+        {
+          name: "Medicine Ball Slams",
+          sets: "3",
+          reps: "12",
+          rest: "45s",
+          notes: "Full body engagement"
+        },
+        {
+          name: "Plank Hold",
+          sets: "3",
+          reps: "30s",
+          rest: "45s",
+          notes: "Maintain neutral spine"
+        }
+      ],
+      tips: [
+        "Don't overextend joints",
+        "Use full-body coordination",
+        "Keep band tension consistent"
+      ]
+    },
+    "power-039": {
+      name: "Body Blast",
+      serialNumber: "POW-BBW-039",
+      difficulty: "Intermediate",
+      duration: "45 min",
+      equipment: "No Equipment Required",
+      imageUrl: bodyBlastImg,
+      description: "A high-intensity bodyweight workout using plyometrics and dynamic core moves to build explosive power and coordination.",
+      workoutType: "HIIT",
+      format: `HIIT – 4 rounds
+Work: 45s / Rest: 15s`,
+      instructions: "Push max effort during work intervals. Rest 1 minute between rounds.",
+      exercises: [
+        {
+          name: "Jump Squats",
+          sets: "4 rounds",
+          reps: "45s work",
+          rest: "15s",
+          notes: "Explosive jumps"
+        },
+        {
+          name: "Push-Up to Pike",
+          sets: "4 rounds",
+          reps: "45s work",
+          rest: "15s",
+          notes: "Controlled movement"
+        },
+        {
+          name: "Jump Lunges",
+          sets: "4 rounds",
+          reps: "45s work",
+          rest: "15s",
+          notes: "Alternate legs"
+        },
+        {
+          name: "Plank Jacks",
+          sets: "4 rounds",
+          reps: "45s work",
+          rest: "15s",
+          notes: "Keep hips level"
+        },
+        {
+          name: "Burpees",
+          sets: "4 rounds",
+          reps: "45s work",
+          rest: "60s after round",
+          notes: "Full range of motion"
+        }
+      ],
+      tips: [
+        "Land softly during jumps",
+        "Keep knees aligned",
+        "Use breath to stabilize"
+      ]
+    },
+    "power-040": {
+      name: "Power Circuit Pro",
+      serialNumber: "POW-EQ-040",
+      difficulty: "Intermediate",
+      duration: "45 min",
+      equipment: "Medicine Ball, Wall Ball, Bands, Mat",
+      imageUrl: powerCircuitProImg,
+      description: "A full-body power circuit using medicine ball, wall ball, and resistance bands to build explosive strength and reactive control.",
+      workoutType: "CIRCUIT",
+      format: `Circuit – 4 rounds
+Work: 40s / Rest: 20s`,
+      instructions: "Push hard during work intervals. Rest 1 minute between rounds.",
+      exercises: [
+        {
+          name: "Medicine Ball Slams",
+          sets: "4 rounds",
+          reps: "40s work",
+          rest: "20s",
+          notes: "Explosive power"
+        },
+        {
+          name: "Wall Ball Squat to Press",
+          sets: "4 rounds",
+          reps: "40s work",
+          rest: "20s",
+          notes: "Full squat depth"
+        },
+        {
+          name: "Band-Resisted Sprints",
+          sets: "4 rounds",
+          reps: "3 x 20m",
+          rest: "20s",
+          notes: "Maximum effort"
+        },
+        {
+          name: "Jump Lunges",
+          sets: "4 rounds",
+          reps: "40s work",
+          rest: "20s",
+          notes: "Alternate legs"
+        },
+        {
+          name: "Plank Rows",
+          sets: "4 rounds",
+          reps: "40s work",
+          rest: "60s after round",
+          notes: "Maintain plank position"
+        }
+      ],
+      tips: [
+        "Use explosive hip drive",
+        "Control wall ball throws",
+        "Keep band tension consistent"
+      ]
+    },
+    "power-041": {
+      name: "Explosive Engine",
+      serialNumber: "POW-BBW-041",
+      difficulty: "Advanced",
+      duration: "60 min",
+      equipment: "No Equipment Required",
+      imageUrl: explosiveEngineImg,
+      description: "An advanced bodyweight challenge focused on explosive strength, plyometrics, and reactive control. Designed for elite performance.",
+      workoutType: "FOR TIME",
+      format: `For Time – 3 blocks
+Rest: 2 mins between blocks`,
+      instructions: "Complete each block as fast as possible. Rest only as needed.",
+      exercises: [
+        {
+          name: "Block 1: Jump Squats",
+          sets: "Repeat for 15 mins",
+          reps: "20",
+          rest: "As needed",
+          notes: "Explosive power"
+        },
+        {
+          name: "Block 1: Plyo Push-Ups",
+          sets: "Repeat for 15 mins",
+          reps: "15",
+          rest: "As needed",
+          notes: "Hands leave ground"
+        },
+        {
+          name: "Block 1: Burpees",
+          sets: "Repeat for 15 mins",
+          reps: "10",
+          rest: "120s after block",
+          notes: "Full range"
+        },
+        {
+          name: "Block 2: Tuck Jumps",
+          sets: "Repeat for 15 mins",
+          reps: "20",
+          rest: "As needed",
+          notes: "Knees to chest"
+        },
+        {
+          name: "Block 2: Jump Lunges",
+          sets: "Repeat for 15 mins",
+          reps: "15",
+          rest: "As needed",
+          notes: "Alternate legs"
+        },
+        {
+          name: "Block 2: Push-Up to Pike",
+          sets: "Repeat for 15 mins",
+          reps: "10",
+          rest: "120s after block",
+          notes: "Controlled movement"
+        },
+        {
+          name: "Block 3: High Knees",
+          sets: "Repeat for 15 mins",
+          reps: "20",
+          rest: "As needed",
+          notes: "Fast pace"
+        },
+        {
+          name: "Block 3: Broad Jumps",
+          sets: "Repeat for 15 mins",
+          reps: "15",
+          rest: "As needed",
+          notes: "Maximum distance"
+        },
+        {
+          name: "Block 3: Plank Jacks",
+          sets: "Repeat for 15 mins",
+          reps: "10",
+          rest: "0",
+          notes: "Keep hips stable"
+        }
+      ],
+      tips: [
+        "Explode through jumps",
+        "Keep transitions tight",
+        "Hydrate between blocks"
+      ]
+    },
+    "power-042": {
+      name: "Power Surge Elite",
+      serialNumber: "POW-EQ-042",
+      difficulty: "Advanced",
+      duration: "60 min",
+      equipment: "Barbell, Medicine Ball, Bands, Mat",
+      imageUrl: powerSurgeEliteImg,
+      description: "A hybrid power workout using barbells, medicine balls, and bands to develop explosive strength and fast-twitch activation.",
+      workoutType: "MIX",
+      format: `REPS & SETS + HIIT Finisher
+Main Block: 4 sets
+Finisher: 3 rounds`,
+      instructions: "Use progressive overload. Push max effort during finisher. Rest 90s between sets.",
+      exercises: [
+        {
+          name: "Barbell Deadlift",
+          sets: "4",
+          reps: "6 @ 3010",
+          rest: "90s",
+          notes: "Heavy load, controlled tempo"
+        },
+        {
+          name: "Medicine Ball Slams",
+          sets: "4",
+          reps: "12",
+          rest: "90s",
+          notes: "Explosive power"
+        },
+        {
+          name: "Band-Resisted Sprints",
+          sets: "4",
+          reps: "3 x 20m",
+          rest: "90s",
+          notes: "Maximum effort"
+        },
+        {
+          name: "Barbell Push Press",
+          sets: "4",
+          reps: "8",
+          rest: "90s",
+          notes: "Explosive overhead drive"
+        },
+        {
+          name: "Finisher: Jump Lunges",
+          sets: "3 rounds",
+          reps: "45s work",
+          rest: "15s",
+          notes: "HIIT block"
+        },
+        {
+          name: "Finisher: Plyo Push-Ups",
+          sets: "3 rounds",
+          reps: "45s work",
+          rest: "15s",
+          notes: "HIIT block"
+        },
+        {
+          name: "Finisher: Plank Rows",
+          sets: "3 rounds",
+          reps: "45s work",
+          rest: "15s",
+          notes: "HIIT block"
+        }
+      ],
+      tips: [
+        "Use spotter for heavy lifts",
+        "Warm up thoroughly",
+        "Prioritize form over load"
       ]
     }
   };

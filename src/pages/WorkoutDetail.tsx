@@ -91,7 +91,14 @@ const WorkoutDetail = () => {
     "metabolic": [],
     "cardio": [],
     "mobility": [],
-    "power": [],
+    "power": [
+      { id: "power-037", name: "Power Primer", description: "A beginner-friendly circuit focused on basic explosive movements and coordination", duration: "30 min", equipment: "bodyweight", level: "beginner", format: "circuit", imageUrl: powerPrimerImg, isFree: true },
+      { id: "power-038", name: "Explosive Start", description: "A light resistance workout using bands and medicine ball to introduce explosive movement patterns safely", duration: "30 min", equipment: "equipment", level: "beginner", format: "reps & sets", imageUrl: explosiveStartImg, isFree: true },
+      { id: "power-039", name: "Body Blast", description: "A high-intensity bodyweight workout using plyometrics and dynamic core moves to build explosive power", duration: "45 min", equipment: "bodyweight", level: "intermediate", format: "circuit", imageUrl: bodyBlastImg, isFree: true },
+      { id: "power-040", name: "Power Circuit Pro", description: "A full-body power circuit using medicine ball, wall ball, and resistance bands", duration: "45 min", equipment: "equipment", level: "intermediate", format: "circuit", imageUrl: powerCircuitProImg, isFree: true },
+      { id: "power-041", name: "Explosive Engine", description: "An advanced bodyweight challenge focused on explosive strength, plyometrics, and reactive control", duration: "60 min", equipment: "bodyweight", level: "advanced", format: "for time", imageUrl: explosiveEngineImg, isFree: true },
+      { id: "power-042", name: "Power Surge Elite", description: "A hybrid power workout using barbells, medicine balls, and bands to develop explosive strength", duration: "60 min", equipment: "equipment", level: "advanced", format: "mix", imageUrl: powerSurgeEliteImg, isFree: true },
+    ],
     "challenge": [
       { id: "challenge-002", name: "Starter Gauntlet", description: "A simple but motivating challenge workout using bodyweight movements in a round-based format", duration: "30 min", equipment: "bodyweight", level: "beginner", format: "for time", imageUrl: starterGauntletImg, isFree: true },
       { id: "challenge-003", name: "Challenge Prep", description: "A light challenge-style circuit using dumbbells and bands to build strength and stamina in a timed format", duration: "30 min", equipment: "equipment", level: "beginner", format: "circuit", imageUrl: challengePrepImg, isFree: true },
