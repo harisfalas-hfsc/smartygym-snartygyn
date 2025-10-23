@@ -13,8 +13,8 @@ const IndividualTrainingProgram = () => {
   const navigate = useNavigate();
   const { type, id } = useParams();
 
-  // All new training programs are premium only - none are free
-  const freePrograms: string[] = [];
+  // Free programs for testing
+  const freePrograms: string[] = ["T-W001"];
   const isFreeProgram = freePrograms.includes(id || '');
 
   // Helper function to format focus label

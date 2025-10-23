@@ -115,7 +115,7 @@ const TrainingProgramDetail = () => {
         equipment: "equipment",
         level: "intermediate",
         imageUrl: cardioEnduranceImg,
-        isFree: false
+        isFree: true
       },
       {
         id: "T-W002",
