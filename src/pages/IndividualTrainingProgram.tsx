@@ -388,7 +388,7 @@ const IndividualTrainingProgram = () => {
         </script>
       </Helmet>
 
-      <AccessGate requireAuth={true} requirePremium={true} contentType="program">
+      <AccessGate requireAuth={true} requirePremium={!isFreeProgram} contentType="program">
         <div className="min-h-screen bg-background">
           <div className="container mx-auto max-w-4xl px-4 py-8">
             <Button

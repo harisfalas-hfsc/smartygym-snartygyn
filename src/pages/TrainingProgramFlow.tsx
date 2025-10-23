@@ -6,7 +6,6 @@ import { ArrowLeft, Heart, Dumbbell, Activity, Flame, User, Move, Scale } from "
 import { BackToTop } from "@/components/BackToTop";
 import { TimedPopup } from "@/components/TimedPopup";
 import { TestimonialsSlider } from "@/components/TestimonialsSlider";
-import { AccessGate } from "@/components/AccessGate";
 
 const TrainingProgramFlow = () => {
   const navigate = useNavigate();
@@ -73,7 +72,6 @@ const TrainingProgramFlow = () => {
         <link rel="canonical" href="https://smartygym.com/training-program" />
       </Helmet>
       
-      <AccessGate requireAuth={true} requirePremium={false} contentType="feature">
       <div className="min-h-screen bg-background">
       <BackToTop />
       <TimedPopup />
@@ -154,7 +152,6 @@ const TrainingProgramFlow = () => {
         </div>
       </div>
       </div>
-      </AccessGate>
     </>
   );
 };
