@@ -164,35 +164,39 @@ export default function Community() {
             </div>
           </header>
           
-          {/* Reviews Grid */}
-          <section className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
-            {reviews.map((review) => (
-              <Card 
-                key={review.id}
-                className="p-6 hover:shadow-lg transition-all duration-300 hover:scale-105 flex flex-col"
-              >
-                <div className="flex items-start gap-3 mb-4">
-                  <div className="text-3xl" aria-hidden="true">{review.emoji}</div>
-                  <div className="flex-1">
-                    <h3 className="font-semibold text-lg">
-                      {review.name}{review.age && `, ${review.age}`}
-                    </h3>
-                    <p className="text-sm text-muted-foreground">{review.role}</p>
+          {/* Reviews Container */}
+          <Card className="mb-12 p-6">
+            <div className="max-h-[600px] overflow-y-auto pr-2">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {reviews.map((review) => (
+                  <div 
+                    key={review.id}
+                    className="p-6 bg-muted rounded-lg hover:shadow-lg transition-all duration-300 flex flex-col"
+                  >
+                    <div className="flex items-start gap-3 mb-4">
+                      <div className="text-3xl" aria-hidden="true">{review.emoji}</div>
+                      <div className="flex-1">
+                        <h3 className="font-semibold text-lg">
+                          {review.name}{review.age && `, ${review.age}`}
+                        </h3>
+                        <p className="text-sm text-muted-foreground">{review.role}</p>
+                      </div>
+                    </div>
+                    
+                    <div className="flex gap-1 mb-3" aria-label="5 star rating">
+                      {[...Array(5)].map((_, i) => (
+                        <Star key={i} className="w-4 h-4 fill-primary text-primary" />
+                      ))}
+                    </div>
+                    
+                    <p className="text-sm text-muted-foreground italic leading-relaxed">
+                      "{review.review}"
+                    </p>
                   </div>
-                </div>
-                
-                <div className="flex gap-1 mb-3" aria-label="5 star rating">
-                  {[...Array(5)].map((_, i) => (
-                    <Star key={i} className="w-4 h-4 fill-primary text-primary" />
-                  ))}
-                </div>
-                
-                <p className="text-sm text-muted-foreground italic leading-relaxed">
-                  "{review.review}"
-                </p>
-              </Card>
-            ))}
-          </section>
+                ))}
+              </div>
+            </div>
+          </Card>
 
           {/* Bottom CTA */}
           <aside className="bg-card border border-border rounded-xl p-8 text-center shadow-soft">
