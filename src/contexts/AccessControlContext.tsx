@@ -53,14 +53,6 @@ export const AccessControlProvider = ({ children }: { children: ReactNode }) => 
       const { data: { session } } = await supabase.auth.getSession();
       
       if (!session?.user) {
-        // Clear cache on logout
-        const keys = Object.keys(sessionStorage);
-        keys.forEach(key => {
-          if (key.startsWith('subscription_')) {
-            sessionStorage.removeItem(key);
-          }
-        });
-        
         setState({
           user: null,
           userTier: "guest",
@@ -84,86 +76,32 @@ export const AccessControlProvider = ({ children }: { children: ReactNode }) => 
 
   const checkSubscription = async (user: User) => {
     try {
-      // First, try to get from session storage for instant access
-      const cachedData = sessionStorage.getItem(`subscription_${user.id}`);
-      if (cachedData) {
-        const cached = JSON.parse(cachedData);
-        const cacheAge = Date.now() - cached.timestamp;
-        
-        // Use cache if less than 5 minutes old
-        if (cacheAge < 5 * 60 * 1000) {
-          setState({
-            user,
-            userTier: cached.isSubscribed ? "premium" : "subscriber",
-            isLoading: false,
-            productId: cached.productId,
-          });
-          return;
-        }
-      }
-
-      // Check database first (much faster than Stripe API)
-      const { data: dbData, error: dbError } = await supabase
+      // Set a timeout for the database query
+      const timeoutPromise = new Promise((_, reject) => 
+        setTimeout(() => reject(new Error('Database query timeout')), 3000)
+      );
+      
+      const queryPromise = supabase
         .from('user_subscriptions')
         .select('plan_type, status, current_period_end')
         .eq('user_id', user.id)
         .maybeSingle();
 
-      if (!dbError && dbData) {
-        const isSubscribed = dbData.status === 'active' && 
-                           (dbData.plan_type === 'gold' || dbData.plan_type === 'platinum');
-        
-        // Check if subscription end date is in the future
-        const isValid = !dbData.current_period_end || 
-                       new Date(dbData.current_period_end) > new Date();
+      const { data: dbData } = await Promise.race([queryPromise, timeoutPromise]) as any;
 
-        if (isValid) {
-          const tierData = {
-            user,
-            userTier: (isSubscribed ? "premium" : "subscriber") as UserTier,
-            isLoading: false,
-            productId: dbData.plan_type,
-          };
-          
-          setState(tierData);
-          
-          // Cache in session storage
-          sessionStorage.setItem(`subscription_${user.id}`, JSON.stringify({
-            isSubscribed,
-            productId: dbData.plan_type,
-            timestamp: Date.now()
-          }));
-          
-          return;
-        }
-      }
-
-      // Only call Stripe API if database check failed or data is stale
-      const { data, error } = await supabase.functions.invoke("check-subscription");
+      // Determine tier from database - default to subscriber if no data
+      const isSubscribed = dbData?.status === 'active' && 
+                         (dbData?.plan_type === 'gold' || dbData?.plan_type === 'platinum');
       
-      if (error) throw error;
-
-      const isSubscribed = data?.subscribed || false;
-      const productId = data?.product_id || data?.plan_type || null;
-
-      const tierData = {
+      setState({
         user,
-        userTier: (isSubscribed ? "premium" : "subscriber") as UserTier,
+        userTier: isSubscribed ? "premium" : "subscriber",
         isLoading: false,
-        productId,
-      };
-
-      setState(tierData);
-      
-      // Cache the result
-      sessionStorage.setItem(`subscription_${user.id}`, JSON.stringify({
-        isSubscribed,
-        productId,
-        timestamp: Date.now()
-      }));
-      
+        productId: dbData?.plan_type || null,
+      });
     } catch (error) {
       console.error("Error checking subscription:", error);
+      // ALWAYS set loading to false and default to subscriber tier
       setState({
         user,
         userTier: "subscriber",
