@@ -74,19 +74,20 @@ const IndividualTrainingProgram = () => {
   return (
     <>
       <Helmet>
-        <title>{program.name} - Smarty Gym | {program.duration} Program by Haris Falas</title>
-        <meta name="description" content={`${program.description} - ${program.duration} ${program.focus} training program by Haris Falas at smartygym.com. Convenient & flexible gym reimagined for anywhere, anytime fitness.`} />
-        <meta name="keywords" content={`smartygym, smarty gym, smartygym.com, Haris Falas, ${program.name}, ${program.focus} program, ${program.duration} program, ${program.equipment}, ${program.difficulty} program, training program, convenient fitness, gym reimagined, flexible training`} />
+        <title>{program.name} - {program.duration} Training Program Cyprus | Haris Falas | smartygym.com</title>
+        <meta name="description" content={`${program.name} - ${program.description} ${program.duration} ${program.focus} program. Progressive strength training, functional fitness, structured workout plan by Sports Scientist Haris Falas at smartygym.com Cyprus`} />
+        <meta name="keywords" content={`${program.name}, ${program.duration} program, ${program.focus} training, structured workout plan, progressive overload, strength program Cyprus, functional fitness program, training program, ${program.equipment}, ${program.difficulty} program, Haris Falas Cyprus, Smarty Gym, smartygym.com, online training Cyprus, periodization, muscle building, endurance training, performance program, sports science Cyprus`} />
         
-        <meta property="og:title" content={`${program.name} - ${program.duration} Training Program`} />
-        <meta property="og:description" content={`${program.description} - Structured ${program.focus} program by Haris Falas`} />
+        <meta property="og:title" content={`${program.name} - ${program.duration} Structured Training Program`} />
+        <meta property="og:description" content={`${program.description} ${program.duration} ${program.focus} program by Haris Falas at Smarty Gym Cyprus`} />
         <meta property="og:type" content="article" />
         <meta property="og:url" content={`https://smartygym.com/trainingprogram/${type}/${id}`} />
         <meta property="og:image" content={program.imageUrl} />
         
         <meta name="twitter:card" content="summary_large_image" />
-        <meta name="twitter:title" content={`${program.name} - Smarty Gym`} />
-        <meta name="twitter:description" content={`${program.duration} ${program.focus} program by Haris Falas at smartygym.com`} />
+        <meta name="twitter:title" content={`${program.name} - ${program.duration} Training Program | Smarty Gym Cyprus`} />
+        <meta name="twitter:description" content={`${program.duration} ${program.focus} program by Sports Scientist Haris Falas`} />
+        <meta name="twitter:image" content={program.imageUrl} />
         
         <link rel="canonical" href={`https://smartygym.com/trainingprogram/${type}/${id}`} />
         
@@ -94,22 +95,36 @@ const IndividualTrainingProgram = () => {
         <script type="application/ld+json">
           {JSON.stringify({
             "@context": "https://schema.org",
-            "@type": "ExercisePlan",
+            "@type": "Course",
             "name": program.name,
             "description": program.description,
             "image": program.imageUrl,
-            "duration": program.duration,
-            "exerciseType": program.focus,
+            "timeRequired": program.duration,
+            "courseCode": program.serialNumber,
+            "hasCourseInstance": {
+              "@type": "CourseInstance",
+              "courseMode": "online",
+              "courseWorkload": program.duration
+            },
             "author": {
               "@type": "Person",
               "name": "Haris Falas",
-              "jobTitle": "Sports Scientist & Strength and Conditioning Coach"
+              "jobTitle": "Sports Scientist & Strength and Conditioning Coach",
+              "address": {
+                "@type": "PostalAddress",
+                "addressCountry": "CY"
+              }
             },
             "provider": {
               "@type": "Organization",
               "name": "Smarty Gym",
-              "url": "https://smartygym.com"
-            }
+              "url": "https://smartygym.com",
+              "address": {
+                "@type": "PostalAddress",
+                "addressCountry": "CY"
+              }
+            },
+            "keywords": `${program.focus}, ${program.duration}, structured training, Cyprus fitness program`
           })}
         </script>
       </Helmet>

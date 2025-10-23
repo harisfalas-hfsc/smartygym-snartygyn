@@ -87,9 +87,9 @@ const OneRMCalculator = () => {
   return (
     <AccessGate requireAuth={true} requirePremium={false} contentType="feature">
       <Helmet>
-        <title>1RM Calculator - Smarty Gym | Free One Rep Max Calculator | smartygym.com</title>
-        <meta name="description" content="Free 1RM Calculator using Brzycki formula. Calculate your one-rep maximum for any exercise at smartygym.com - convenient & flexible fitness tools by Haris Falas." />
-        <meta name="keywords" content="smartygym, smarty gym, smartygym.com, Haris Falas, 1rm calculator, one rep max calculator, brzycki formula, strength calculator, convenient fitness, gym reimagined, flexible training tools" />
+        <title>1RM Calculator Cyprus | Free One Rep Max Strength Calculator | Haris Falas | smartygym.com</title>
+        <meta name="description" content="Free 1RM Calculator using Brzycki formula - Calculate your one-rep maximum for powerlifting, strength training. Training percentages included. By Sports Scientist Haris Falas at smartygym.com Cyprus" />
+        <meta name="keywords" content="1RM calculator Cyprus, one rep max calculator, Brzycki formula, strength calculator, powerlifting calculator, training percentages, max strength test, bench press calculator, squat calculator, deadlift calculator, Haris Falas Cyprus, Smarty Gym, smartygym.com, strength training tool Cyprus, weightlifting calculator" />
         
         <meta property="og:title" content="1RM Calculator - Smarty Gym" />
         <meta property="og:description" content="Free one-rep maximum calculator - convenient fitness tool at smartygym.com" />

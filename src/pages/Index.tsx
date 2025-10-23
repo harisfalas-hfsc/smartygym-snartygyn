@@ -118,9 +118,9 @@ const Index = () => {
   return (
     <>
       <Helmet>
-        <title>Smarty Gym - Your Fitness Reimagined Anywhere, Anytime | Online Gym by Haris Falas</title>
-        <meta name="description" content="Smarty Gym - Train anywhere, anytime with human-designed functional fitness programs by certified sports scientist Haris Falas. Convenient online gym reimagined for smart, effective training. No AI, just real expertise.Smarty Gym (smartygym.com) - Cyprus online fitness platform by Haris Falas. Convenient, flexible gym reimagined for anywhere, anytime training. Human-designed workouts, training programs & fitness tools." />
-        <meta name="keywords" content="smartygym, smarty gym, smartygym.com, Haris Falas, gym reimagined, fitness reimagined, convenient fitness, flexible gym, online fitness Cyprus, anywhere anytime fitness, functional training, strength training online" />
+        <title>Smarty Gym Cyprus | AMRAP TABATA HIIT Workouts | Online Training by Haris Falas | smartygym.com</title>
+        <meta name="description" content="Smarty Gym Cyprus - AMRAP, TABATA, HIIT, circuit workouts by Sports Scientist Haris Falas. Bodyweight & equipment training, strength, cardio, mobility programs. Convenient online gym anywhere, anytime at smartygym.com" />
+        <meta name="keywords" content="Smarty Gym Cyprus, Haris Falas fitness, AMRAP workouts, TABATA training, HIIT workouts Cyprus, circuit training, for time workouts, bodyweight training Cyprus, no equipment workouts, functional fitness Cyprus, strength training online, cardio workouts, metabolic conditioning, mobility training, power workouts, challenge workouts, online gym Cyprus, smartygym.com, convenient fitness, flexible training, sports scientist Cyprus, home workouts Cyprus, explosive training, plyometric workouts, kettlebell training, resistance band workouts, core exercises, fitness anywhere anytime" />
         
         {/* Open Graph / Facebook */}
         <meta property="og:type" content="website" />

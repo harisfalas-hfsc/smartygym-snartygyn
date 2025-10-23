@@ -229,6 +229,46 @@ const Contact = () => {
   return (
     <>
       <Helmet>
+        <title>Contact Us - Smarty Gym Cyprus | Get in Touch with Haris Falas | smartygym.com</title>
+        <meta name="description" content="Contact Smarty Gym Cyprus - Get expert fitness advice from Sports Scientist Haris Falas. Convenient & flexible online training support. Reach us at smartygym.com" />
+        <meta name="keywords" content="contact Smarty Gym, Haris Falas Cyprus contact, fitness coach Cyprus, personal training Cyprus, online gym support, smartygym contact, Cyprus fitness expert, sports scientist Cyprus, training inquiry Cyprus" />
+        
+        <meta property="og:title" content="Contact Smarty Gym Cyprus | Haris Falas" />
+        <meta property="og:description" content="Get in touch with Sports Scientist Haris Falas at Smarty Gym Cyprus for expert fitness guidance" />
+        <meta property="og:type" content="website" />
+        <meta property="og:url" content="https://smartygym.com/contact" />
+        
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content="Contact Smarty Gym Cyprus" />
+        <meta name="twitter:description" content="Reach out to Haris Falas for expert fitness coaching at smartygym.com" />
+        
+        <link rel="canonical" href="https://smartygym.com/contact" />
+        
+        {/* Local Business Schema */}
+        <script type="application/ld+json">
+          {JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "LocalBusiness",
+            "name": "Smarty Gym",
+            "url": "https://smartygym.com",
+            "address": {
+              "@type": "PostalAddress",
+              "addressCountry": "CY"
+            },
+            "founder": {
+              "@type": "Person",
+              "name": "Haris Falas",
+              "jobTitle": "Sports Scientist & Strength and Conditioning Coach"
+            },
+            "contactPoint": {
+              "@type": "ContactPoint",
+              "contactType": "Customer Service",
+              "availableLanguage": ["en", "el"]
+            }
+          })}
+        </script>
+      </Helmet>
+      <Helmet>
         <title>Contact Smarty Gym | Get in Touch with Haris Falas | smartygym.com</title>
         <meta name="description" content="Contact Smarty Gym (smartygym.com) and reach Haris Falas. Get expert support for convenient & flexible fitness training. Ask about our gym reimagined for anywhere, anytime workouts." />
         <meta name="keywords" content="contact smarty gym, smartygym contact, smartygym.com, Haris Falas contact, gym reimagined, convenient fitness, flexible online gym, fitness support, online fitness inquiry" />

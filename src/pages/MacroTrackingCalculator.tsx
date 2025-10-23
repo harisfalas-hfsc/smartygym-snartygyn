@@ -161,9 +161,9 @@ const MacroTrackingCalculator = () => {
   return (
     <AccessGate requireAuth={true} requirePremium={false} contentType="feature">
       <Helmet>
-        <title>Macro Calculator - Smarty Gym | Free Macro Tracking Calculator | smartygym.com</title>
-        <meta name="description" content="Free Macro Tracking Calculator at smartygym.com. Get personalized protein, carbs, and fat recommendations based on your goals - convenient nutrition tool by Haris Falas." />
-        <meta name="keywords" content="smartygym, smarty gym, smartygym.com, Haris Falas, macro calculator, macronutrient calculator, protein calculator, nutrition calculator, calorie tracker, convenient fitness, gym reimagined, flexible nutrition" />
+        <title>Macro Calculator Cyprus | Free Macronutrient & Nutrition Calculator | Haris Falas | smartygym.com</title>
+        <meta name="description" content="Free Macro Calculator - Calculate protein, carbs, fats for weight loss, muscle gain, maintenance. Personalized nutrition planning by Sports Scientist Haris Falas at smartygym.com Cyprus" />
+        <meta name="keywords" content="macro calculator Cyprus, macronutrient calculator, protein calculator, nutrition calculator, TDEE calculator, calorie tracker, meal planning calculator, bodybuilding nutrition, weight loss macros, muscle gain nutrition, Haris Falas Cyprus, Smarty Gym, smartygym.com, flexible dieting, IIFYM calculator, Cyprus nutrition tool" />
         
         <meta property="og:title" content="Macro Calculator - Smarty Gym" />
         <meta property="og:description" content="Free macronutrient calculator - convenient nutrition tool at smartygym.com" />

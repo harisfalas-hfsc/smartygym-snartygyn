@@ -3259,19 +3259,20 @@ Track total rounds`,
   return (
     <>
       <Helmet>
-        <title>{workout.name} - Smarty Gym | Workout by Haris Falas | smartygym.com</title>
-        <meta name="description" content={`${workout.description} - ${workout.duration} ${getFocusLabel(type)} workout by Haris Falas. Convenient & flexible training at smartygym.com for anywhere, anytime fitness.`} />
-        <meta name="keywords" content={`smartygym, smarty gym, smartygym.com, Haris Falas, ${workout.name}, ${getFocusLabel(type)} workout, ${workout.equipment} workout, ${workout.difficulty} workout, convenient fitness, gym reimagined, flexible training, ${workout.format} workout`} />
+        <title>{workout.name} {workout.workoutType ? `- ${workout.workoutType}` : ''} | {getFocusLabel(type)} Workout Cyprus | Haris Falas | smartygym.com</title>
+        <meta name="description" content={`${workout.name} - ${workout.workoutType || 'Circuit'} ${getFocusLabel(type)} workout. ${workout.description} ${workout.duration} ${workout.equipment} training by Sports Scientist Haris Falas at smartygym.com Cyprus`} />
+        <meta name="keywords" content={`${workout.name}, ${workout.workoutType || 'circuit'} workout, ${getFocusLabel(type)}, ${workout.equipment}, ${workout.difficulty} training, AMRAP, TABATA, HIIT, for time, bodyweight training, functional fitness Cyprus, Haris Falas, Smarty Gym Cyprus, smartygym.com, online workout, home training, no equipment workout, strength training, cardio workout, metabolic conditioning, explosive training, challenge workout, fitness Cyprus`} />
         
-        <meta property="og:title" content={`${workout.name} - Smarty Gym Workout`} />
-        <meta property="og:description" content={`${workout.description} - Convenient & flexible ${getFocusLabel(type)} workout by Haris Falas`} />
+        <meta property="og:title" content={`${workout.name} - ${workout.workoutType || 'Workout'} by Haris Falas`} />
+        <meta property="og:description" content={`${workout.description} ${workout.duration} ${getFocusLabel(type)} workout at Smarty Gym Cyprus`} />
         <meta property="og:type" content="article" />
         <meta property="og:url" content={`https://smartygym.com/workout/${type}/${id}`} />
         <meta property="og:image" content={workout.imageUrl} />
         
         <meta name="twitter:card" content="summary_large_image" />
-        <meta name="twitter:title" content={`${workout.name} - Smarty Gym`} />
+        <meta name="twitter:title" content={`${workout.name} - ${workout.workoutType || 'Workout'} | Smarty Gym Cyprus`} />
         <meta name="twitter:description" content={`${workout.description} by Haris Falas at smartygym.com`} />
+        <meta name="twitter:image" content={workout.imageUrl} />
         
         <link rel="canonical" href={`https://smartygym.com/workout/${type}/${id}`} />
         
@@ -3280,21 +3281,34 @@ Track total rounds`,
           {JSON.stringify({
             "@context": "https://schema.org",
             "@type": "ExercisePlan",
-            "name": workout.name,
+            "name": `${workout.name} - ${workout.workoutType || 'Workout'}`,
             "description": workout.description,
             "image": workout.imageUrl,
-            "duration": workout.duration,
-            "exerciseType": getFocusLabel(type),
+            "activityDuration": workout.duration,
+            "exerciseType": `${workout.workoutType || 'Circuit'} - ${getFocusLabel(type)}`,
+            "audience": {
+              "@type": "Audience",
+              "audienceType": workout.difficulty
+            },
             "author": {
               "@type": "Person",
               "name": "Haris Falas",
-              "jobTitle": "Sports Scientist & Strength and Conditioning Coach"
+              "jobTitle": "Sports Scientist & Strength and Conditioning Coach",
+              "address": {
+                "@type": "PostalAddress",
+                "addressCountry": "CY"
+              }
             },
             "provider": {
               "@type": "Organization",
               "name": "Smarty Gym",
-              "url": "https://smartygym.com"
-            }
+              "url": "https://smartygym.com",
+              "address": {
+                "@type": "PostalAddress",
+                "addressCountry": "CY"
+              }
+            },
+            "keywords": `${workout.workoutType}, ${getFocusLabel(type)}, ${workout.equipment}, AMRAP, TABATA, HIIT, Cyprus fitness`
           })}
         </script>
       </Helmet>
