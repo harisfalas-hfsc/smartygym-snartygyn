@@ -13,7 +13,7 @@ const PremiumComparison = () => {
     {
       category: "Workouts",
       visitor: "Free workouts",
-      subscriber: "All workouts",
+      subscriber: "Free + all workouts",
       premium: "All workouts"
     },
     {
@@ -24,7 +24,7 @@ const PremiumComparison = () => {
     },
     {
       category: "Exercise Library",
-      visitor: false,
+      visitor: "View only",
       subscriber: "Full access",
       premium: "Full access"
     },
@@ -37,6 +37,12 @@ const PremiumComparison = () => {
     {
       category: "Community Access",
       visitor: false,
+      subscriber: "Full access",
+      premium: "Full access"
+    },
+    {
+      category: "Blog",
+      visitor: "View only",
       subscriber: "Full access",
       premium: "Full access"
     },
@@ -66,9 +72,9 @@ const PremiumComparison = () => {
     },
     {
       category: "Price",
-      visitor: "Free",
-      subscriber: "€9.99/month",
-      premium: "€89.99/year"
+      visitor: "Free (no login)",
+      subscriber: "Free (login required)",
+      premium: "€9.99/month or €89.99/year"
     }
   ];
 
@@ -126,9 +132,9 @@ const PremiumComparison = () => {
               </CardContent>
             </Card>
 
-            <Card className="border-2 border-primary/50">
+            <Card className="border-2">
               <CardContent className="pt-6">
-                <h2 className="text-2xl font-bold text-center mb-4 text-primary">Subscriber</h2>
+                <h2 className="text-2xl font-bold text-center mb-4">Subscriber</h2>
                 <div className="space-y-3">
                   {features.map((feature, idx) => (
                     <div key={idx} className="flex justify-between items-center py-2 border-b">
@@ -139,19 +145,16 @@ const PremiumComparison = () => {
                 </div>
                 <Button 
                   className="w-full mt-6"
-                  onClick={() => navigate("/join-premium")}
+                  onClick={() => navigate("/auth")}
                 >
-                  Get Subscriber
+                  Sign Up Free
                 </Button>
               </CardContent>
             </Card>
 
-            <Card className="border-2 border-primary">
+            <Card className="border-2">
               <CardContent className="pt-6">
-                <div className="bg-primary text-primary-foreground text-xs font-bold px-3 py-1 rounded-full w-fit mx-auto mb-4">
-                  BEST VALUE
-                </div>
-                <h2 className="text-2xl font-bold text-center mb-4 text-primary">Premium</h2>
+                <h2 className="text-2xl font-bold text-center mb-4">Premium</h2>
                 <div className="space-y-3">
                   {features.map((feature, idx) => (
                     <div key={idx} className="flex justify-between items-center py-2 border-b">
@@ -182,16 +185,13 @@ const PremiumComparison = () => {
                         <div className="text-lg">Visitor</div>
                         <div className="text-sm font-normal text-muted-foreground">Free</div>
                       </th>
-                      <th className="p-4 text-center font-bold bg-primary/5">
-                        <div className="text-lg text-primary">Subscriber</div>
-                        <div className="text-sm font-normal text-muted-foreground">€9.99/month</div>
+                      <th className="p-4 text-center font-bold">
+                        <div className="text-lg">Subscriber</div>
+                        <div className="text-sm font-normal text-muted-foreground">Free (login required)</div>
                       </th>
-                      <th className="p-4 text-center font-bold bg-primary/10 relative">
-                        <div className="absolute -top-2 left-1/2 -translate-x-1/2 bg-primary text-primary-foreground text-xs font-bold px-3 py-1 rounded-full whitespace-nowrap">
-                          BEST VALUE
-                        </div>
-                        <div className="text-lg text-primary mt-2">Premium</div>
-                        <div className="text-sm font-normal text-muted-foreground">€89.99/year</div>
+                      <th className="p-4 text-center font-bold">
+                        <div className="text-lg">Premium</div>
+                        <div className="text-sm font-normal text-muted-foreground">€9.99/month or €89.99/year</div>
                       </th>
                     </tr>
                   </thead>
@@ -200,25 +200,27 @@ const PremiumComparison = () => {
                       <tr key={idx} className="border-b hover:bg-muted/30 transition-colors">
                         <td className="p-4 font-medium">{feature.category}</td>
                         <td className="p-4">{renderFeatureValue(feature.visitor)}</td>
-                        <td className="p-4 bg-primary/5">{renderFeatureValue(feature.subscriber)}</td>
-                        <td className="p-4 bg-primary/10">{renderFeatureValue(feature.premium)}</td>
+                        <td className="p-4">{renderFeatureValue(feature.subscriber)}</td>
+                        <td className="p-4">{renderFeatureValue(feature.premium)}</td>
                       </tr>
                     ))}
                     <tr className="bg-muted/50">
                       <td className="p-6"></td>
                       <td className="p-6 text-center">
-                        <div className="text-xl font-bold">Free</div>
+                        <div className="text-xl font-bold mb-3">Free</div>
+                        <div className="text-sm text-muted-foreground">No login</div>
                       </td>
-                      <td className="p-6 text-center bg-primary/5">
-                        <div className="text-xl font-bold text-primary mb-3">€9.99/month</div>
-                        <Button onClick={() => navigate("/join-premium")}>
-                          Get Started
+                      <td className="p-6 text-center">
+                        <div className="text-xl font-bold mb-3">Free</div>
+                        <div className="text-sm text-muted-foreground mb-3">Login required</div>
+                        <Button onClick={() => navigate("/auth")}>
+                          Sign Up Free
                         </Button>
                       </td>
-                      <td className="p-6 text-center bg-primary/10">
-                        <div className="text-xl font-bold text-primary mb-3">€89.99/year</div>
+                      <td className="p-6 text-center">
+                        <div className="text-xl font-bold mb-3">€9.99/month or €89.99/year</div>
                         <Button onClick={() => navigate("/join-premium")}>
-                          Get Started
+                          Get Premium
                         </Button>
                       </td>
                     </tr>
