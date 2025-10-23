@@ -115,6 +115,12 @@ export const Navigation = () => {
     setTimeout(() => window.scrollTo(0, 0), 0);
   };
 
+  const handleProfileNavigate = (path: string) => {
+    navigate(path);
+    // Scroll to top after navigation
+    setTimeout(() => window.scrollTo(0, 0), 0);
+  };
+
   return (
     <header className="sticky top-0 z-50 bg-background border-b border-border py-2 px-4">
       <div className="container mx-auto max-w-7xl">
@@ -254,11 +260,11 @@ export const Navigation = () => {
                     </>
                   )}
                   
-                  <DropdownMenuItem onClick={() => navigate("/userdashboard")}>
+                  <DropdownMenuItem onSelect={() => handleProfileNavigate("/userdashboard")}>
                     <LayoutDashboard className="mr-2 h-4 w-4" />
                     <span>My Dashboard</span>
                   </DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => navigate("/profilesettings")}>
+                  <DropdownMenuItem onSelect={() => handleProfileNavigate("/profilesettings")}>
                     <Settings className="mr-2 h-4 w-4" />
                     <span>Settings</span>
                   </DropdownMenuItem>
