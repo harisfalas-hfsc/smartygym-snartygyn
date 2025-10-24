@@ -160,10 +160,10 @@ export default function JoinPremium() {
           {/* Pricing Plans */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-4xl mx-auto mb-8">
             {/* Gold Plan */}
-            <Card className="relative">
+            <Card className="relative border-2 border-border shadow-lg">
               <CardHeader>
                 <div className="flex items-center justify-between mb-2">
-                  <Badge variant="outline" className="text-primary border-primary">
+                  <Badge className="bg-card text-foreground border-2 border-primary">
                     MONTHLY SUBSCRIPTION
                   </Badge>
                 </div>
@@ -189,7 +189,7 @@ export default function JoinPremium() {
                   </div>
                 </div>
                 <Button 
-                  className="w-full" 
+                  className="w-full text-lg py-6" 
                   onClick={() => handleSubscribe('gold')}
                   disabled={loading}
                 >
