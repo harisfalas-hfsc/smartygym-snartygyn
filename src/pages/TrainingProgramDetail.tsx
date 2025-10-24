@@ -245,8 +245,8 @@ const TrainingProgramDetail = () => {
         {/* Info Card */}
         {programInfo[type || ""] && (
           <Card className="mb-8 p-6 bg-gradient-to-br from-primary/5 to-primary/10 border-primary/30">
-            <h2 className="text-xl font-semibold mb-4">{programInfo[type || ""].title}</h2>
-            <p className="text-muted-foreground leading-relaxed">{programInfo[type || ""].content}</p>
+            <h2 className="text-xl font-semibold mb-4 text-center">{programInfo[type || ""].title}</h2>
+            <p className="text-muted-foreground leading-relaxed text-center">{programInfo[type || ""].content}</p>
           </Card>
         )}
         
