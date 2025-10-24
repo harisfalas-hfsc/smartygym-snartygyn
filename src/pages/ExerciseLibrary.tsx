@@ -14,7 +14,7 @@ interface Exercise {
   id: string;
   name: string;
   video_id: string;
-  video_url: string;
+  video_url: string | null;
   description: string | null;
   created_at: string;
   updated_at: string;
@@ -24,6 +24,8 @@ const ExerciseLibrary = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
   const [searchQuery, setSearchQuery] = useState<string>("");
+  const [bodyPartFilter, setBodyPartFilter] = useState<string>("all");
+  const [equipmentFilter, setEquipmentFilter] = useState<string>("all");
   const [currentGifUrl, setCurrentGifUrl] = useState<string>("");
   const [isVideoDialogOpen, setIsVideoDialogOpen] = useState(false);
   const [user, setUser] = useState<User | null>(null);
@@ -202,7 +204,8 @@ const ExerciseLibrary = () => {
 
   const filteredExercises = exercises.filter((exercise) => {
     const matchesSearch = searchQuery === "" || 
-      exercise.name.toLowerCase().includes(searchQuery.toLowerCase());
+      exercise.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      (exercise.description && exercise.description.toLowerCase().includes(searchQuery.toLowerCase()));
     return matchesSearch;
   });
 
@@ -284,7 +287,7 @@ const ExerciseLibrary = () => {
             </CardContent>
           </Card>
 
-          {/* Exercise Grid */}
+          {/* Exercise List */}
           {isLoading ? (
             <div className="flex justify-center items-center py-12">
               <Loader2 className="h-8 w-8 animate-spin" />
@@ -303,43 +306,52 @@ const ExerciseLibrary = () => {
                 Showing {filteredExercises.length} of {exercises.length} exercises
               </p>
               
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+              <div className="space-y-3">
                 {filteredExercises.map((exercise) => (
-                  <Card key={exercise.id} className="hover:shadow-lg transition-shadow">
+                  <Card key={exercise.id} className="hover:shadow-md transition-shadow">
                     <CardContent className="p-4">
-                      <div className="flex justify-between items-start mb-2">
-                        <h3 className="font-semibold text-sm sm:text-base line-clamp-2">
-                          {exercise.name}
-                        </h3>
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => toggleFavorite(exercise.name)}
-                          className="h-8 w-8 p-0 flex-shrink-0"
-                        >
-                          <Heart
-                            className={`h-4 w-4 ${
-                              favoriteExercises.includes(exercise.name)
-                                ? "fill-red-500 text-red-500"
-                                : ""
-                            }`}
-                          />
-                        </Button>
-                      </div>
+                      <div className="flex items-start gap-4">
+                        {/* Exercise Info */}
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-start justify-between gap-2 mb-2">
+                            <h3 className="font-semibold text-base">
+                              {exercise.name}
+                            </h3>
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => toggleFavorite(exercise.name)}
+                              className="h-8 w-8 p-0 flex-shrink-0"
+                            >
+                              <Heart
+                                className={`h-4 w-4 ${
+                                  favoriteExercises.includes(exercise.name)
+                                    ? "fill-red-500 text-red-500"
+                                    : ""
+                                }`}
+                              />
+                            </Button>
+                          </div>
+                          
+                          {exercise.description && (
+                            <p className="text-sm text-muted-foreground line-clamp-2 mb-3">
+                              {exercise.description}
+                            </p>
+                          )}
 
-                      {exercise.video_url && (
-                        <div className="flex justify-center">
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() => handlePlay(exercise.video_url)}
-                            className="gap-2"
-                          >
-                            <Play className="h-4 w-4" />
-                            Watch Demo
-                          </Button>
+                          {exercise.video_url && (
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => handlePlay(exercise.video_url!)}
+                              className="gap-2"
+                            >
+                              <Play className="h-4 w-4" />
+                              Watch Demo
+                            </Button>
+                          )}
                         </div>
-                      )}
+                      </div>
                     </CardContent>
                   </Card>
                 ))}

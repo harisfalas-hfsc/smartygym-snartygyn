@@ -44,50 +44,24 @@ serve(async (req) => {
 
     console.log("Fetching exercises from ExerciseDB API...");
     
-    // Fetch all exercises with pagination
-    let allExercises: ExerciseDBExercise[] = [];
-    let offset = 0;
-    const limit = 100; // Fetch in batches of 100
-    
-    while (true) {
-      const exercisesResponse = await fetch(
-        `${EXERCISEDB_API_BASE}/exercises?limit=${limit}&offset=${offset}`,
-        {
-          headers: {
-            "X-RapidAPI-Key": rapidApiKey,
-            "X-RapidAPI-Host": "exercisedb.p.rapidapi.com",
-          },
-        }
-      );
+    // Try fetching with a high limit first (API might not support pagination)
+    const exercisesResponse = await fetch(
+      `${EXERCISEDB_API_BASE}/exercises?limit=0`,
+      {
+        headers: {
+          "X-RapidAPI-Key": rapidApiKey,
+          "X-RapidAPI-Host": "exercisedb.p.rapidapi.com",
+        },
+      }
+    );
 
-      if (!exercisesResponse.ok) {
-        const errorText = await exercisesResponse.text();
-        console.error("ExerciseDB API Error:", errorText);
-        throw new Error(`Failed to fetch exercises: ${exercisesResponse.statusText} - ${errorText}`);
-      }
-
-      const exercisesData: ExerciseDBExercise[] = await exercisesResponse.json();
-      console.log(`Fetched ${exercisesData.length} exercises at offset ${offset}`);
-      
-      if (exercisesData.length === 0) {
-        break; // No more exercises to fetch
-      }
-      
-      allExercises = allExercises.concat(exercisesData);
-      offset += limit;
-      
-      // Stop if we got fewer exercises than requested (last page)
-      if (exercisesData.length < limit) {
-        break;
-      }
-      
-      // Safety limit to prevent infinite loops
-      if (offset >= 2000) {
-        console.log("Reached safety limit of 2000 exercises");
-        break;
-      }
+    if (!exercisesResponse.ok) {
+      const errorText = await exercisesResponse.text();
+      console.error("ExerciseDB API Error:", errorText);
+      throw new Error(`Failed to fetch exercises: ${exercisesResponse.statusText} - ${errorText}`);
     }
-    
+
+    const allExercises: ExerciseDBExercise[] = await exercisesResponse.json();
     console.log(`Total exercises fetched: ${allExercises.length}`);
     
     // Log first exercise to debug the structure
