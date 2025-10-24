@@ -5,30 +5,17 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
-const WGER_API_BASE = "https://wger.de/api/v2";
+const EXERCISEDB_API_BASE = "https://exercisedb.p.rapidapi.com";
 
-interface WgerExercise {
-  id: number;
+interface ExerciseDBExercise {
+  id: string;
   name: string;
-  description: string;
-  category: number;
-  muscles: number[];
-  equipment: number[];
-}
-
-interface WgerVideo {
-  id: number;
-  exercise: number;
-  video: string;
-  is_main: boolean;
-  size: number;
-  duration: string;
-  width: number;
-  height: number;
-  codec: string;
-  codec_long: string;
-  license: number;
-  license_author: string;
+  bodyPart: string;
+  target: string;
+  equipment: string;
+  secondaryMuscles: string[];
+  instructions: string[];
+  gifUrl: string;
 }
 
 serve(async (req) => {
@@ -37,14 +24,21 @@ serve(async (req) => {
   }
 
   try {
-    console.log("Fetching exercises from wger API...");
+    const rapidApiKey = Deno.env.get("RAPIDAPI_KEY");
     
-    // Fetch exercises in English (language=2)
+    if (!rapidApiKey) {
+      throw new Error("RAPIDAPI_KEY is not configured");
+    }
+
+    console.log("Fetching exercises from ExerciseDB API...");
+    
+    // Fetch all exercises from ExerciseDB
     const exercisesResponse = await fetch(
-      `${WGER_API_BASE}/exercise/?language=2&limit=200`,
+      `${EXERCISEDB_API_BASE}/exercises?limit=1400`,
       {
         headers: {
-          "Accept": "application/json",
+          "X-RapidAPI-Key": rapidApiKey,
+          "X-RapidAPI-Host": "exercisedb.p.rapidapi.com",
         },
       }
     );
@@ -53,71 +47,37 @@ serve(async (req) => {
       throw new Error(`Failed to fetch exercises: ${exercisesResponse.statusText}`);
     }
 
-    const exercisesData = await exercisesResponse.json();
-    console.log(`Fetched ${exercisesData.results?.length || 0} exercises`);
+    const exercisesData: ExerciseDBExercise[] = await exercisesResponse.json();
+    console.log(`Fetched ${exercisesData.length} exercises from ExerciseDB`);
 
-    // Fetch all videos
-    const videosResponse = await fetch(
-      `${WGER_API_BASE}/exercisevideo/?limit=500`,
-      {
-        headers: {
-          "Accept": "application/json",
-        },
-      }
-    );
-
-    if (!videosResponse.ok) {
-      throw new Error(`Failed to fetch videos: ${videosResponse.statusText}`);
-    }
-
-    const videosData = await videosResponse.json();
-    console.log(`Fetched ${videosData.results?.length || 0} videos`);
-
-    // Create a map of exercise ID to videos
-    const videoMap = new Map<number, WgerVideo[]>();
-    for (const video of videosData.results || []) {
-      if (!videoMap.has(video.exercise)) {
-        videoMap.set(video.exercise, []);
-      }
-      videoMap.get(video.exercise)!.push(video);
-    }
-
-    // Map our exercises to wger exercises by name similarity
+    // Map our exercises to ExerciseDB exercises by name similarity
     const ourExercises = [
       "Air Squats", "Burpees", "Bridge", "Bicycle Crunches", "Bear Crawl",
-      "Box Jumps", "Burpee Box Jump Overs", "Crunches", "Chin-ups", "Dips",
-      "Diamond Push-ups", "Dead Bugs", "Frog Jumps", "Glute Bridges", "High Knees",
-      "Handstand Push-ups", "Hip Thrusts", "Inchworms", "Jumping Jacks", "Jump Rope",
-      "Knee Raises", "Lunges", "Mountain Climbers", "One Leg Squats", "Plank",
+      "Calf Raises", "Crunches", "Chair Dips", "Crow Pose", "Decline Push-ups",
+      "Diamond Push-ups", "Donkey Kicks", "Flutter Kicks", "Forward Lunges", "Frog Jumps",
+      "Glute Bridges", "High Knees", "Handstand Push-ups", "Hip Thrusts", "Inchworms",
+      "Jumping Jacks", "Jump Squats", "Knee Push-ups", "Leg Raises", "Lunges",
+      "Mountain Climbers", "Neutral Grip Pull-ups", "Nose to Wall Handstand", "One Leg Squats", "Plank",
       "Pike Push-ups", "Push-ups", "Pull-ups", "Russian Twists", "Reverse Lunges",
-      "Sit-ups", "Side Plank", "Step-ups", "Squat Jumps", "Tuck Jumps",
-      "Wall Sit", "Broad Jumps", "Barbell Back Squats", "Barbell Front Squats",
-      "Barbell Bench Press", "Barbell Deadlifts", "Barbell Overhead Press",
-      "Barbell Bent Over Rows", "Barbell Clean and Jerk", "Barbell Snatch",
-      "Barbell Thrusters", "Dumbbell Shoulder Press", "Dumbbell Rows",
-      "Dumbbell Chest Press", "Dumbbell Lunges", "Dumbbell Goblet Squats",
-      "Dumbbell Bicep Curls", "Dumbbell Tricep Extensions", "Dumbbell Lateral Raises",
-      "Dumbbell Front Raises", "Dumbbell Romanian Deadlifts", "Kettlebell Swings",
-      "Kettlebell Goblet Squats", "Kettlebell Turkish Get-ups", "Kettlebell Cleans",
-      "Kettlebell Snatches", "Medicine Ball Slams", "Medicine Ball Wall Balls",
-      "Medicine Ball Russian Twists", "Resistance Band Squats", "Resistance Band Rows",
-      "Resistance Band Chest Press", "Resistance Band Bicep Curls", "Battle Ropes",
-      "TRX Rows", "TRX Push-ups", "TRX Pistol Squats", "Sled Push", "Sled Pull",
-      "Box Step-ups", "Farmer's Walk", "Sprint Intervals", "Assault Bike Sprints",
-      "Rowing Machine Intervals", "Treadmill Sprints", "Stair Climber", "Jump Squats",
-      "Broad Jump", "Lateral Bounds", "Single Leg Hops", "Plyo Push-ups",
-      "Clapping Push-ups", "Depth Jumps", "Banded Squats", "Banded Deadlifts",
-      "Banded Pull-aparts", "Banded Lateral Walks", "Banded Monster Walks",
-      "Overhead Squats", "Walking Lunges", "Pistol Squats", "Bulgarian Split Squats",
-      "Good Mornings", "Hyperextensions", "Ab Wheel Rollouts", "Hollow Body Holds",
-      "L-Sits", "Dragon Flags"
+      "Side Plank", "Sit-ups", "Superman", "Step-ups", "Tuck Jumps",
+      "Tricep Dips", "V-ups", "Wall Sits", "Wide Grip Push-ups", "Yoga Push-ups",
+      "Barbell Back Squats", "Barbell Bench Press", "Barbell Deadlifts", "Barbell Rows", "Barbell Curls",
+      "Barbell Overhead Press", "Cable Flyes", "Cable Rows", "Cable Tricep Pushdowns", "Dumbbell Arnold Press",
+      "Dumbbell Bench Press", "Dumbbell Bicep Curls", "Dumbbell Chest Flyes", "Dumbbell Front Raises", "Dumbbell Goblet Squats",
+      "Dumbbell Hammer Curls", "Dumbbell Incline Press", "Dumbbell Lateral Raises", "Dumbbell Lunges", "Dumbbell Romanian Deadlifts",
+      "Dumbbell Rows", "Dumbbell Shrugs", "Dumbbell Shoulder Press", "Dumbbell Tricep Extensions", "EZ Bar Curls",
+      "Face Pulls", "Farmer's Walk", "Goblet Squats", "Hack Squats", "Hammer Strength Press",
+      "Incline Dumbbell Curls", "Kettlebell Swings", "Kettlebell Goblet Squats", "Lat Pulldowns", "Leg Press",
+      "Leg Curls", "Leg Extensions", "Machine Chest Press", "Machine Shoulder Press", "Nordic Curls",
+      "Overhead Tricep Extensions", "Pec Deck Flyes", "Preacher Curls", "Reverse Flyes", "Romanian Deadlifts",
+      "Seated Cable Rows", "Seated Calf Raises", "Smith Machine Squats", "T-Bar Rows", "Tricep Kickbacks",
+      "Upright Rows", "Weighted Dips", "Weighted Pull-ups", "Wrist Curls", "Zottman Curls"
     ];
 
     // Find matches
     const exerciseMatches: Array<{
       name: string;
-      wgerExercise?: WgerExercise;
-      videos: WgerVideo[];
+      exerciseDBExercise?: ExerciseDBExercise;
       matched: boolean;
     }> = [];
 
@@ -127,12 +87,12 @@ serve(async (req) => {
         .replace(/\s+/g, " ")
         .trim();
 
-      // Try to find a matching wger exercise
-      let bestMatch: WgerExercise | undefined;
+      // Try to find a matching ExerciseDB exercise
+      let bestMatch: ExerciseDBExercise | undefined;
       let bestScore = 0;
 
-      for (const wgerEx of exercisesData.results || []) {
-        const normalizedWgerName = wgerEx.name.toLowerCase()
+      for (const exerciseDBEx of exercisesData) {
+        const normalizedDBName = exerciseDBEx.name.toLowerCase()
           .replace(/[-']/g, " ")
           .replace(/\s+/g, " ")
           .trim();
@@ -140,13 +100,13 @@ serve(async (req) => {
         // Calculate similarity score
         let score = 0;
         const ourWords = normalizedOurName.split(" ");
-        const wgerWords = normalizedWgerName.split(" ");
+        const dbWords = normalizedDBName.split(" ");
 
         for (const ourWord of ourWords) {
-          for (const wgerWord of wgerWords) {
-            if (ourWord === wgerWord) {
+          for (const dbWord of dbWords) {
+            if (ourWord === dbWord) {
               score += 2;
-            } else if (ourWord.includes(wgerWord) || wgerWord.includes(ourWord)) {
+            } else if (ourWord.includes(dbWord) || dbWord.includes(ourWord)) {
               score += 1;
             }
           }
@@ -154,17 +114,14 @@ serve(async (req) => {
 
         if (score > bestScore) {
           bestScore = score;
-          bestMatch = wgerEx;
+          bestMatch = exerciseDBEx;
         }
       }
 
-      const videos = bestMatch ? (videoMap.get(bestMatch.id) || []) : [];
-      
       exerciseMatches.push({
         name: ourExerciseName,
-        wgerExercise: bestMatch,
-        videos: videos,
-        matched: bestScore > 1 && videos.length > 0,
+        exerciseDBExercise: bestMatch,
+        matched: bestScore > 1 && !!bestMatch,
       });
     }
 
@@ -172,22 +129,24 @@ serve(async (req) => {
     const matched = exerciseMatches.filter(e => e.matched);
     const unmatched = exerciseMatches.filter(e => !e.matched);
 
-    console.log(`Matched ${matched.length} exercises with videos`);
-    console.log(`Could not find videos for ${unmatched.length} exercises`);
+    console.log(`Matched ${matched.length} exercises with GIFs`);
+    console.log(`Could not find matches for ${unmatched.length} exercises`);
 
     return new Response(
       JSON.stringify({
         success: true,
         matched: matched.map(e => ({
           name: e.name,
-          wgerName: e.wgerExercise?.name,
-          wgerId: e.wgerExercise?.id,
-          videoUrl: e.videos[0]?.video,
-          videoCount: e.videos.length,
+          exerciseDBName: e.exerciseDBExercise?.name,
+          exerciseDBId: e.exerciseDBExercise?.id,
+          gifUrl: e.exerciseDBExercise?.gifUrl,
+          bodyPart: e.exerciseDBExercise?.bodyPart,
+          target: e.exerciseDBExercise?.target,
+          equipment: e.exerciseDBExercise?.equipment,
         })),
         unmatched: unmatched.map(e => ({
           name: e.name,
-          bestMatch: e.wgerExercise?.name,
+          bestMatch: e.exerciseDBExercise?.name,
         })),
         stats: {
           total: ourExercises.length,
@@ -201,7 +160,7 @@ serve(async (req) => {
       }
     );
   } catch (error: any) {
-    console.error("Error fetching wger exercises:", error);
+    console.error("Error fetching ExerciseDB exercises:", error);
     return new Response(
       JSON.stringify({ error: error.message }),
       {

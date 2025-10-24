@@ -94,15 +94,15 @@ const ExerciseLibrary = () => {
       setWgerData(data);
       toast({
         title: "Sync Complete",
-        description: `Synced ${data.stats.matched} exercises with videos from wger API`,
+        description: `Synced ${data.stats.matched} exercises with GIF demonstrations from ExerciseDB`,
       });
       
-      console.log("Wger data:", data);
+      console.log("ExerciseDB data:", data);
     } catch (error: any) {
-      console.error("Error syncing wger exercises:", error);
+      console.error("Error syncing ExerciseDB exercises:", error);
       toast({
         title: "Sync Failed",
-        description: "Failed to sync exercises from wger API",
+        description: "Failed to sync exercises from ExerciseDB API",
         variant: "destructive"
       });
     } finally {
@@ -342,7 +342,7 @@ const ExerciseLibrary = () => {
           Exercise Library
         </h1>
 
-        {/* Wger Sync Button */}
+        {/* ExerciseDB Sync Button */}
         <div className="text-center mb-6">
           <Button
             onClick={syncWgerExercises}
@@ -351,12 +351,12 @@ const ExerciseLibrary = () => {
             className="gap-2"
           >
             <RefreshCw className={`h-4 w-4 ${isSyncing ? 'animate-spin' : ''}`} />
-            {isSyncing ? 'Syncing with wger API...' : 'Sync Exercise Videos'}
+            {isSyncing ? 'Syncing with ExerciseDB...' : 'Sync Exercise Videos'}
           </Button>
           {wgerData && (
             <div className="mt-3 p-3 bg-muted rounded-lg inline-block">
               <p className="text-sm">
-                ✅ Synced {wgerData.stats.matched}/{wgerData.stats.total} exercises with videos
+                ✅ Synced {wgerData.stats.matched}/{wgerData.stats.total} exercises with GIF demonstrations
               </p>
             </div>
           )}
