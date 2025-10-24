@@ -60,6 +60,11 @@ serve(async (req) => {
 
     const exercisesData: ExerciseDBExercise[] = await exercisesResponse.json();
     console.log(`Fetched ${exercisesData.length} exercises from ExerciseDB`);
+    
+    // Log first exercise to debug the structure
+    if (exercisesData.length > 0) {
+      console.log("Sample exercise structure:", JSON.stringify(exercisesData[0], null, 2));
+    }
 
     // Clear existing exercises from database
     console.log("Clearing existing exercises from database...");
@@ -73,17 +78,16 @@ serve(async (req) => {
       throw new Error(`Failed to clear exercises: ${deleteError.message}`);
     }
 
-    // Prepare exercises for insertion (only include those with GIF URLs)
-    const exercisesToInsert = exercisesData
-      .filter((ex) => ex.gifUrl) // Only include exercises with GIF URLs
-      .map((ex) => ({
-        name: ex.name,
-        video_id: ex.id,
-        video_url: ex.gifUrl,
-        description: ex.instructions.join("\n"),
-      }));
+    // Prepare exercises for insertion
+    const exercisesToInsert = exercisesData.map((ex) => ({
+      name: ex.name,
+      video_id: ex.id,
+      video_url: ex.gifUrl || null, // Use gifUrl if available, otherwise null
+      description: ex.instructions?.join("\n") || "",
+    }));
 
     console.log(`Inserting ${exercisesToInsert.length} exercises into database...`);
+    console.log(`Exercises with GIFs: ${exercisesToInsert.filter(e => e.video_url).length}`);
 
     // Insert exercises in batches of 100 to avoid payload size limits
     const batchSize = 100;
