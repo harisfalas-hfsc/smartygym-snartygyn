@@ -16,7 +16,10 @@ interface ExerciseDBExercise {
   equipment: string;
   secondaryMuscles: string[];
   instructions: string[];
-  gifUrl: string;
+  gifUrl?: string;
+  description?: string;
+  difficulty?: string;
+  category?: string;
 }
 
 serve(async (req) => {
@@ -41,29 +44,55 @@ serve(async (req) => {
 
     console.log("Fetching exercises from ExerciseDB API...");
     
-    // Fetch all exercises from ExerciseDB
-    const exercisesResponse = await fetch(
-      `${EXERCISEDB_API_BASE}/exercises?limit=1400`,
-      {
-        headers: {
-          "X-RapidAPI-Key": rapidApiKey,
-          "X-RapidAPI-Host": "exercisedb.p.rapidapi.com",
-        },
+    // Fetch all exercises with pagination
+    let allExercises: ExerciseDBExercise[] = [];
+    let offset = 0;
+    const limit = 100; // Fetch in batches of 100
+    
+    while (true) {
+      const exercisesResponse = await fetch(
+        `${EXERCISEDB_API_BASE}/exercises?limit=${limit}&offset=${offset}`,
+        {
+          headers: {
+            "X-RapidAPI-Key": rapidApiKey,
+            "X-RapidAPI-Host": "exercisedb.p.rapidapi.com",
+          },
+        }
+      );
+
+      if (!exercisesResponse.ok) {
+        const errorText = await exercisesResponse.text();
+        console.error("ExerciseDB API Error:", errorText);
+        throw new Error(`Failed to fetch exercises: ${exercisesResponse.statusText} - ${errorText}`);
       }
-    );
 
-    if (!exercisesResponse.ok) {
-      const errorText = await exercisesResponse.text();
-      console.error("ExerciseDB API Error:", errorText);
-      throw new Error(`Failed to fetch exercises: ${exercisesResponse.statusText} - ${errorText}`);
+      const exercisesData: ExerciseDBExercise[] = await exercisesResponse.json();
+      console.log(`Fetched ${exercisesData.length} exercises at offset ${offset}`);
+      
+      if (exercisesData.length === 0) {
+        break; // No more exercises to fetch
+      }
+      
+      allExercises = allExercises.concat(exercisesData);
+      offset += limit;
+      
+      // Stop if we got fewer exercises than requested (last page)
+      if (exercisesData.length < limit) {
+        break;
+      }
+      
+      // Safety limit to prevent infinite loops
+      if (offset >= 2000) {
+        console.log("Reached safety limit of 2000 exercises");
+        break;
+      }
     }
-
-    const exercisesData: ExerciseDBExercise[] = await exercisesResponse.json();
-    console.log(`Fetched ${exercisesData.length} exercises from ExerciseDB`);
+    
+    console.log(`Total exercises fetched: ${allExercises.length}`);
     
     // Log first exercise to debug the structure
-    if (exercisesData.length > 0) {
-      console.log("Sample exercise structure:", JSON.stringify(exercisesData[0], null, 2));
+    if (allExercises.length > 0) {
+      console.log("Sample exercise structure:", JSON.stringify(allExercises[0], null, 2));
     }
 
     // Clear existing exercises from database
@@ -79,11 +108,12 @@ serve(async (req) => {
     }
 
     // Prepare exercises for insertion
-    const exercisesToInsert = exercisesData.map((ex) => ({
+    const exercisesToInsert = allExercises.map((ex) => ({
       name: ex.name,
       video_id: ex.id,
-      video_url: ex.gifUrl || null, // Use gifUrl if available, otherwise null
-      description: ex.instructions?.join("\n") || "",
+      // Construct GIF URL from exercise ID if gifUrl is not provided
+      video_url: ex.gifUrl || `https://v2.exercisedb.io/image/${ex.id}`,
+      description: ex.instructions?.join("\n") || ex.description || "",
     }));
 
     console.log(`Inserting ${exercisesToInsert.length} exercises into database...`);
