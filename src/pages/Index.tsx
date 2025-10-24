@@ -217,7 +217,7 @@ const Index = () => {
               Available worldwide – All prices in Euro (€)
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center items-stretch sm:items-center">
-              <div className="bg-muted rounded-lg p-4 sm:p-6 flex-1 w-full sm:max-w-xs">
+              <div className="bg-muted border-2 border-border rounded-lg p-4 sm:p-6 flex-1 w-full sm:max-w-xs">
                 <div className="text-primary font-bold text-base sm:text-xl mb-1 sm:mb-2">GOLD</div>
                 <div className="text-xl sm:text-3xl font-bold mb-1 sm:mb-2">€9.99</div>
                 <div className="text-xs sm:text-sm text-muted-foreground mb-3 sm:mb-4">per month</div>
