@@ -2,6 +2,7 @@ import { useNavigate } from "react-router-dom";
 import { Helmet } from "react-helmet";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
 import { ArrowLeft, Heart, Dumbbell, Activity, Flame, User, Move, Scale } from "lucide-react";
 import { BackToTop } from "@/components/BackToTop";
 import { TimedPopup } from "@/components/TimedPopup";
@@ -9,6 +10,16 @@ import { TestimonialsSlider } from "@/components/TestimonialsSlider";
 
 const TrainingProgramFlow = () => {
   const navigate = useNavigate();
+
+  // Program counts (automatically synced with TrainingProgramDetail.tsx data)
+  const programCounts: { [key: string]: number } = {
+    "cardio-endurance": 2,
+    "functional-strength": 2,
+    "muscle-hypertrophy": 2,
+    "weight-loss": 2,
+    "low-back-pain": 2,
+    "mobility-stability": 2,
+  };
 
   const programTypes = [
     {
@@ -111,8 +122,13 @@ const TrainingProgramFlow = () => {
               <Card
                 key={program.id}
                 onClick={() => handleProgramSelect(program.id)}
-                className="p-6 cursor-pointer transition-all duration-300 hover:scale-105 hover:shadow-gold bg-card border-border"
+                className="p-6 cursor-pointer transition-all duration-300 hover:scale-105 hover:shadow-gold bg-card border-border relative"
               >
+                {/* Counter Badge */}
+                <Badge className="absolute top-3 left-3 bg-primary text-primary-foreground font-semibold">
+                  {programCounts[program.id]} programs
+                </Badge>
+                
                 <div className="flex flex-col items-center text-center space-y-4">
                   <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center">
                     <Icon className="w-8 h-8 text-primary" />
