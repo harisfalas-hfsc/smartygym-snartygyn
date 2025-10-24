@@ -1,4 +1,5 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2.75.0";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -25,10 +26,18 @@ serve(async (req) => {
 
   try {
     const rapidApiKey = Deno.env.get("RAPIDAPI_KEY");
+    const supabaseUrl = Deno.env.get("SUPABASE_URL");
+    const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
     
     if (!rapidApiKey) {
       throw new Error("RAPIDAPI_KEY is not configured");
     }
+
+    if (!supabaseUrl || !supabaseServiceKey) {
+      throw new Error("Supabase credentials not configured");
+    }
+
+    const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
     console.log("Fetching exercises from ExerciseDB API...");
     
@@ -44,114 +53,64 @@ serve(async (req) => {
     );
 
     if (!exercisesResponse.ok) {
-      throw new Error(`Failed to fetch exercises: ${exercisesResponse.statusText}`);
+      const errorText = await exercisesResponse.text();
+      console.error("ExerciseDB API Error:", errorText);
+      throw new Error(`Failed to fetch exercises: ${exercisesResponse.statusText} - ${errorText}`);
     }
 
     const exercisesData: ExerciseDBExercise[] = await exercisesResponse.json();
     console.log(`Fetched ${exercisesData.length} exercises from ExerciseDB`);
 
-    // Map our exercises to ExerciseDB exercises by name similarity
-    const ourExercises = [
-      "Air Squats", "Burpees", "Bridge", "Bicycle Crunches", "Bear Crawl",
-      "Calf Raises", "Crunches", "Chair Dips", "Crow Pose", "Decline Push-ups",
-      "Diamond Push-ups", "Donkey Kicks", "Flutter Kicks", "Forward Lunges", "Frog Jumps",
-      "Glute Bridges", "High Knees", "Handstand Push-ups", "Hip Thrusts", "Inchworms",
-      "Jumping Jacks", "Jump Squats", "Knee Push-ups", "Leg Raises", "Lunges",
-      "Mountain Climbers", "Neutral Grip Pull-ups", "Nose to Wall Handstand", "One Leg Squats", "Plank",
-      "Pike Push-ups", "Push-ups", "Pull-ups", "Russian Twists", "Reverse Lunges",
-      "Side Plank", "Sit-ups", "Superman", "Step-ups", "Tuck Jumps",
-      "Tricep Dips", "V-ups", "Wall Sits", "Wide Grip Push-ups", "Yoga Push-ups",
-      "Barbell Back Squats", "Barbell Bench Press", "Barbell Deadlifts", "Barbell Rows", "Barbell Curls",
-      "Barbell Overhead Press", "Cable Flyes", "Cable Rows", "Cable Tricep Pushdowns", "Dumbbell Arnold Press",
-      "Dumbbell Bench Press", "Dumbbell Bicep Curls", "Dumbbell Chest Flyes", "Dumbbell Front Raises", "Dumbbell Goblet Squats",
-      "Dumbbell Hammer Curls", "Dumbbell Incline Press", "Dumbbell Lateral Raises", "Dumbbell Lunges", "Dumbbell Romanian Deadlifts",
-      "Dumbbell Rows", "Dumbbell Shrugs", "Dumbbell Shoulder Press", "Dumbbell Tricep Extensions", "EZ Bar Curls",
-      "Face Pulls", "Farmer's Walk", "Goblet Squats", "Hack Squats", "Hammer Strength Press",
-      "Incline Dumbbell Curls", "Kettlebell Swings", "Kettlebell Goblet Squats", "Lat Pulldowns", "Leg Press",
-      "Leg Curls", "Leg Extensions", "Machine Chest Press", "Machine Shoulder Press", "Nordic Curls",
-      "Overhead Tricep Extensions", "Pec Deck Flyes", "Preacher Curls", "Reverse Flyes", "Romanian Deadlifts",
-      "Seated Cable Rows", "Seated Calf Raises", "Smith Machine Squats", "T-Bar Rows", "Tricep Kickbacks",
-      "Upright Rows", "Weighted Dips", "Weighted Pull-ups", "Wrist Curls", "Zottman Curls"
-    ];
+    // Clear existing exercises from database
+    console.log("Clearing existing exercises from database...");
+    const { error: deleteError } = await supabase
+      .from("exercises")
+      .delete()
+      .neq("id", "00000000-0000-0000-0000-000000000000"); // Delete all
 
-    // Find matches
-    const exerciseMatches: Array<{
-      name: string;
-      exerciseDBExercise?: ExerciseDBExercise;
-      matched: boolean;
-    }> = [];
-
-    for (const ourExerciseName of ourExercises) {
-      const normalizedOurName = ourExerciseName.toLowerCase()
-        .replace(/[-']/g, " ")
-        .replace(/\s+/g, " ")
-        .trim();
-
-      // Try to find a matching ExerciseDB exercise
-      let bestMatch: ExerciseDBExercise | undefined;
-      let bestScore = 0;
-
-      for (const exerciseDBEx of exercisesData) {
-        const normalizedDBName = exerciseDBEx.name.toLowerCase()
-          .replace(/[-']/g, " ")
-          .replace(/\s+/g, " ")
-          .trim();
-
-        // Calculate similarity score
-        let score = 0;
-        const ourWords = normalizedOurName.split(" ");
-        const dbWords = normalizedDBName.split(" ");
-
-        for (const ourWord of ourWords) {
-          for (const dbWord of dbWords) {
-            if (ourWord === dbWord) {
-              score += 2;
-            } else if (ourWord.includes(dbWord) || dbWord.includes(ourWord)) {
-              score += 1;
-            }
-          }
-        }
-
-        if (score > bestScore) {
-          bestScore = score;
-          bestMatch = exerciseDBEx;
-        }
-      }
-
-      exerciseMatches.push({
-        name: ourExerciseName,
-        exerciseDBExercise: bestMatch,
-        matched: bestScore > 1 && !!bestMatch,
-      });
+    if (deleteError) {
+      console.error("Error clearing exercises:", deleteError);
+      throw new Error(`Failed to clear exercises: ${deleteError.message}`);
     }
 
-    // Separate matched and unmatched
-    const matched = exerciseMatches.filter(e => e.matched);
-    const unmatched = exerciseMatches.filter(e => !e.matched);
+    // Prepare exercises for insertion
+    const exercisesToInsert = exercisesData.map((ex) => ({
+      name: ex.name,
+      video_id: ex.id,
+      video_url: ex.gifUrl,
+      description: ex.instructions.join("\n"),
+    }));
 
-    console.log(`Matched ${matched.length} exercises with GIFs`);
-    console.log(`Could not find matches for ${unmatched.length} exercises`);
+    console.log(`Inserting ${exercisesToInsert.length} exercises into database...`);
+
+    // Insert exercises in batches of 100 to avoid payload size limits
+    const batchSize = 100;
+    let insertedCount = 0;
+    
+    for (let i = 0; i < exercisesToInsert.length; i += batchSize) {
+      const batch = exercisesToInsert.slice(i, i + batchSize);
+      const { error: insertError } = await supabase
+        .from("exercises")
+        .insert(batch);
+
+      if (insertError) {
+        console.error(`Error inserting batch ${i / batchSize + 1}:`, insertError);
+        throw new Error(`Failed to insert exercises: ${insertError.message}`);
+      }
+      
+      insertedCount += batch.length;
+      console.log(`Inserted ${insertedCount}/${exercisesToInsert.length} exercises`);
+    }
+
+    console.log(`Successfully synced ${insertedCount} exercises to database`);
 
     return new Response(
       JSON.stringify({
         success: true,
-        matched: matched.map(e => ({
-          name: e.name,
-          exerciseDBName: e.exerciseDBExercise?.name,
-          exerciseDBId: e.exerciseDBExercise?.id,
-          gifUrl: e.exerciseDBExercise?.gifUrl,
-          bodyPart: e.exerciseDBExercise?.bodyPart,
-          target: e.exerciseDBExercise?.target,
-          equipment: e.exerciseDBExercise?.equipment,
-        })),
-        unmatched: unmatched.map(e => ({
-          name: e.name,
-          bestMatch: e.exerciseDBExercise?.name,
-        })),
+        message: `Successfully synced ${insertedCount} exercises with GIF demonstrations`,
         stats: {
-          total: ourExercises.length,
-          matched: matched.length,
-          unmatched: unmatched.length,
+          total: insertedCount,
+          synced: insertedCount,
         },
       }),
       {
@@ -160,9 +119,12 @@ serve(async (req) => {
       }
     );
   } catch (error: any) {
-    console.error("Error fetching ExerciseDB exercises:", error);
+    console.error("Error syncing ExerciseDB exercises:", error);
     return new Response(
-      JSON.stringify({ error: error.message }),
+      JSON.stringify({ 
+        error: error.message,
+        details: error.toString()
+      }),
       {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
         status: 500,
