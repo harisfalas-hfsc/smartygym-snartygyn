@@ -73,13 +73,15 @@ serve(async (req) => {
       throw new Error(`Failed to clear exercises: ${deleteError.message}`);
     }
 
-    // Prepare exercises for insertion
-    const exercisesToInsert = exercisesData.map((ex) => ({
-      name: ex.name,
-      video_id: ex.id,
-      video_url: ex.gifUrl,
-      description: ex.instructions.join("\n"),
-    }));
+    // Prepare exercises for insertion (only include those with GIF URLs)
+    const exercisesToInsert = exercisesData
+      .filter((ex) => ex.gifUrl) // Only include exercises with GIF URLs
+      .map((ex) => ({
+        name: ex.name,
+        video_id: ex.id,
+        video_url: ex.gifUrl,
+        description: ex.instructions.join("\n"),
+      }));
 
     console.log(`Inserting ${exercisesToInsert.length} exercises into database...`);
 
