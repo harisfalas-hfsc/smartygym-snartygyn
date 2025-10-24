@@ -67,6 +67,41 @@ import bodyweightBlitzImg from "@/assets/bodyweight-blitz-workout.jpg";
 import challengeCircuitProImg from "@/assets/challenge-circuit-pro-workout.jpg";
 import finalFormImg from "@/assets/final-form-workout.jpg";
 import eliteGauntletImg from "@/assets/elite-gauntlet-workout.jpg";
+import ironTitanStrengthImg from "@/assets/iron-titan-strength-workout.jpg";
+import functionalCompoundStrengthImg from "@/assets/functional-compound-strength-workout.jpg";
+import strengthDensityBuilderImg from "@/assets/strength-density-builder-workout.jpg";
+import bodyweightPrimeStrengthImg from "@/assets/bodyweight-prime-strength-workout.jpg";
+import coreStabilityStrengthImg from "@/assets/core-stability-strength-workout.jpg";
+import calorieStormCircuitImg from "@/assets/calorie-storm-circuit-workout.jpg";
+import fullThrottleFatBurnImg from "@/assets/full-throttle-fat-burn-workout.jpg";
+import burnZoneIntervalsImg from "@/assets/burn-zone-intervals-workout.jpg";
+import bodyweightInfernoImg from "@/assets/bodyweight-inferno-workout.jpg";
+import burnFlow2Img from "@/assets/burn-flow-2-workout.jpg";
+import metabolicMayhemImg from "@/assets/metabolic-mayhem-workout.jpg";
+import metabolicEngineImg from "@/assets/metabolic-engine-workout.jpg";
+import metabolicOverdriveImg from "@/assets/metabolic-overdrive-workout.jpg";
+import bodyweightEngineImg from "@/assets/bodyweight-engine-workout.jpg";
+import metabolicCoreBurnImg from "@/assets/metabolic-core-burn-workout.jpg";
+import cardioEngineBuilderImg from "@/assets/cardio-engine-builder-workout.jpg";
+import sprintPowerComboImg from "@/assets/sprint-power-combo-workout.jpg";
+import conditioningPyramidImg from "@/assets/conditioning-pyramid-workout.jpg";
+import bodyweightEnduranceFlowImg from "@/assets/bodyweight-endurance-flow-workout.jpg";
+import fastFeetCardioFlowImg from "@/assets/fast-feet-cardio-flow-workout.jpg";
+import jointFlowRestoreImg from "@/assets/joint-flow-restore-workout.jpg";
+import coreStabilityBuilderImg from "@/assets/core-stability-builder-workout.jpg";
+import balanceFlowResetImg from "@/assets/balance-flow-reset-workout.jpg";
+import mobilityWaveImg from "@/assets/mobility-wave-workout.jpg";
+import stabilityCoreFlowImg from "@/assets/stability-core-flow-workout.jpg";
+import explosiveEnginePowerImg from "@/assets/explosive-engine-power-workout.jpg";
+import speedMechanicsImg from "@/assets/speed-mechanics-workout.jpg";
+import olympicPowerSessionImg from "@/assets/olympic-power-session-workout.jpg";
+import plyometricBurnImg from "@/assets/plyometric-burn-workout.jpg";
+import powerFlowImg from "@/assets/power-flow-workout.jpg";
+import hfscBeastModeImg from "@/assets/hfsc-beast-mode-workout.jpg";
+import spartanEnduranceTestImg from "@/assets/spartan-endurance-test-workout.jpg";
+import fullBodyBenchmarkImg from "@/assets/full-body-benchmark-workout.jpg";
+import burnoutChallengeImg from "@/assets/burnout-challenge-workout.jpg";
+import warriorFlowImg from "@/assets/warrior-flow-workout.jpg";
 
 const IndividualWorkout = () => {
   const navigate = useNavigate();
@@ -3237,6 +3272,906 @@ Track total rounds`,
         "Break early if needed",
         "Mental toughness is key",
         "Track your rounds"
+      ]
+    },
+    "ws003": {
+      name: "Iron Titan Strength",
+      serialNumber: "WS003",
+      difficulty: "Advanced",
+      duration: "60 min",
+      equipment: "Equipment Required",
+      imageUrl: ironTitanStrengthImg,
+      description: "Heavy compound lifts combined with control tempo for raw strength and improved joint stability.",
+      workoutType: "REPS & SETS",
+      format: `Reps & Sets
+5x5 @ 85% 1RM on main lifts
+Rest: 2-3 mins between heavy sets`,
+      instructions: "Maintain 2–3 min rest between heavy sets. Focus on controlled eccentrics.",
+      exercises: [
+        { name: "Barbell Deadlift", sets: "5", reps: "5", rest: "3 mins", notes: "@ 85% 1RM" },
+        { name: "Bench Press", sets: "4", reps: "6", rest: "3 mins", notes: "@ 80% 1RM" },
+        { name: "Barbell Row", sets: "4", reps: "8", rest: "2 mins", notes: "Control the eccentric" },
+        { name: "Dumbbell Lunge", sets: "3", reps: "10/leg", rest: "90s", notes: "Full range of motion" },
+        { name: "Weighted Pull-Up", sets: "3", reps: "8", rest: "2 mins", notes: "Add weight as able" },
+        { name: "Plank", sets: "3", reps: "60s", rest: "60s", notes: "Maintain core tension" }
+      ],
+      tips: [
+        "Prioritize form over load",
+        "Keep core tight throughout",
+        "Control the eccentric phase",
+        "Rest fully between heavy sets",
+        "Track your weights"
+      ]
+    },
+    "ws004": {
+      name: "Functional Compound Strength",
+      serialNumber: "WS004",
+      difficulty: "Intermediate",
+      duration: "45 min",
+      equipment: "Equipment Required",
+      imageUrl: functionalCompoundStrengthImg,
+      description: "Functional strength training combining push, pull, and hinge patterns.",
+      workoutType: "CIRCUIT",
+      format: `Circuit - 3 rounds
+Rest 2 mins between rounds`,
+      instructions: "Perform one round of all exercises, rest 2 min, and repeat 3 times.",
+      exercises: [
+        { name: "Dumbbell Squat to Press", sets: "3", reps: "12", rest: "0", notes: "Fluid movement" },
+        { name: "TRX Row", sets: "3", reps: "12", rest: "0", notes: "Pull chest to hands" },
+        { name: "Kettlebell Deadlift", sets: "3", reps: "10", rest: "0", notes: "Hip hinge pattern" },
+        { name: "Dumbbell Step-Up", sets: "3", reps: "12/leg", rest: "0", notes: "Drive through heel" },
+        { name: "Side Plank", sets: "3", reps: "30s/side", rest: "2 mins", notes: "Maintain alignment" }
+      ],
+      tips: [
+        "Choose weights allowing consistent form",
+        "Keep tempo steady",
+        "Focus on movement quality",
+        "Rest fully between circuits"
+      ]
+    },
+    "ws005": {
+      name: "Strength Density Builder",
+      serialNumber: "WS005",
+      difficulty: "Advanced",
+      duration: "60 min",
+      equipment: "Equipment Required",
+      imageUrl: strengthDensityBuilderImg,
+      description: "High-density strength session focusing on maximal tension per time.",
+      workoutType: "FOR TIME",
+      format: `For Time - 5 rounds
+40 minute cap
+Track total time`,
+      instructions: "Complete 5 rounds as quickly as possible while maintaining good form.",
+      exercises: [
+        { name: "Front Squat", sets: "5", reps: "6", rest: "As needed", notes: "@ 75% 1RM" },
+        { name: "Push Press", sets: "5", reps: "8", rest: "As needed", notes: "@ 70% 1RM" },
+        { name: "Weighted Pull-Up", sets: "5", reps: "8", rest: "As needed", notes: "Control descent" },
+        { name: "Walking Lunges", sets: "5", reps: "20 steps", rest: "As needed", notes: "Maintain posture" },
+        { name: "Weighted Plank", sets: "5", reps: "45s", rest: "As needed", notes: "Add plate on back" }
+      ],
+      tips: [
+        "Control pace on heavy lifts",
+        "Avoid skipping rest when form deteriorates",
+        "Maintain quality over speed",
+        "Track your time"
+      ]
+    },
+    "ws006": {
+      name: "Bodyweight Prime Strength",
+      serialNumber: "WS006",
+      difficulty: "Intermediate",
+      duration: "45 min",
+      equipment: "No Equipment Required",
+      imageUrl: bodyweightPrimeStrengthImg,
+      description: "Develop core strength and stability through unilateral movements.",
+      workoutType: "REPS & SETS",
+      format: `Reps & Sets - 3-4 rounds
+Slow tempo (3-1-1)
+Focus on control`,
+      instructions: "Perform 3–4 rounds with perfect control on every rep.",
+      exercises: [
+        { name: "Single-Leg Squat to Bench", sets: "3-4", reps: "10/leg", rest: "90s", notes: "Controlled descent" },
+        { name: "Decline Push-Ups", sets: "3-4", reps: "12", rest: "60s", notes: "Feet elevated" },
+        { name: "Single-Leg Glute Bridge", sets: "3-4", reps: "15/leg", rest: "60s", notes: "Squeeze at top" },
+        { name: "Side Plank with Reach", sets: "3-4", reps: "12/side", rest: "60s", notes: "Reach under body" },
+        { name: "Superman Hold", sets: "3-4", reps: "40s", rest: "90s", notes: "Full extension" }
+      ],
+      tips: [
+        "Use slow tempo (3–1–1)",
+        "Stay stable during single-leg work",
+        "Focus on control over reps",
+        "Maintain form throughout"
+      ]
+    },
+    "ws007": {
+      name: "Core Stability Strength",
+      serialNumber: "WS007",
+      difficulty: "Beginner",
+      duration: "30 min",
+      equipment: "No Equipment Required",
+      imageUrl: coreStabilityStrengthImg,
+      description: "A foundational bodyweight session to build core tension and muscle endurance.",
+      workoutType: "CIRCUIT",
+      format: `Circuit - 4 rounds
+40s work / 20s rest per exercise`,
+      instructions: "Perform 4 rounds, 40s work, 20s rest per exercise.",
+      exercises: [
+        { name: "Plank Shoulder Taps", sets: "4", reps: "40s", rest: "20s", notes: "Minimize rotation" },
+        { name: "Glute Bridge Hold", sets: "4", reps: "40s", rest: "20s", notes: "Squeeze glutes" },
+        { name: "Superman Pulls", sets: "4", reps: "40s", rest: "20s", notes: "Pull shoulder blades back" },
+        { name: "Push-Ups", sets: "4", reps: "40s", rest: "20s", notes: "Modify as needed" },
+        { name: "Side Plank", sets: "4", reps: "30s/side", rest: "60s", notes: "Maintain alignment" }
+      ],
+      tips: [
+        "Keep abs engaged through all sets",
+        "Focus on quality reps",
+        "Don't rush transitions",
+        "Modify as needed"
+      ]
+    },
+    "wc005": {
+      name: "Calorie Storm Circuit",
+      serialNumber: "WC005",
+      difficulty: "Intermediate",
+      duration: "45 min",
+      equipment: "Equipment Required",
+      imageUrl: calorieStormCircuitImg,
+      description: "A mixed resistance and cardio circuit to maximize total energy output.",
+      workoutType: "CIRCUIT",
+      format: `Circuit - 5 rounds
+Rest 90s between rounds
+Work at 80% effort`,
+      instructions: "Rest 90s between rounds, work at 80% effort.",
+      exercises: [
+        { name: "Kettlebell Swing", sets: "5", reps: "15", rest: "0", notes: "Hip drive" },
+        { name: "Dumbbell Thruster", sets: "5", reps: "12", rest: "0", notes: "Squat to press" },
+        { name: "Jump Lunges", sets: "5", reps: "20", rest: "0", notes: "Explosive" },
+        { name: "Renegade Row", sets: "5", reps: "12", rest: "0", notes: "Plank position" },
+        { name: "Burpees", sets: "5", reps: "10", rest: "90s", notes: "Full range" }
+      ],
+      tips: [
+        "Keep consistent movement pace",
+        "Don't go max effort too early",
+        "Control breathing",
+        "Rest fully between rounds"
+      ]
+    },
+    "wc006": {
+      name: "Full Throttle Fat Burn",
+      serialNumber: "WC006",
+      difficulty: "Advanced",
+      duration: "60 min",
+      equipment: "Equipment Required",
+      imageUrl: fullThrottleFatBurnImg,
+      description: "High-intensity metabolic session combining endurance and strength bursts.",
+      workoutType: "FOR TIME",
+      format: `For Time - 3 rounds
+Complete all stations ASAP`,
+      instructions: "3 rounds, complete all stations as fast as possible.",
+      exercises: [
+        { name: "Row", sets: "3", reps: "500m", rest: "0", notes: "Max effort" },
+        { name: "Dumbbell Snatch", sets: "3", reps: "10/side", rest: "0", notes: "Explosive pull" },
+        { name: "Bike", sets: "3", reps: "1km", rest: "0", notes: "High cadence" },
+        { name: "Jump Squats", sets: "3", reps: "20", rest: "0", notes: "Full depth" },
+        { name: "Push-Ups", sets: "3", reps: "15", rest: "As needed", notes: "Chest to ground" }
+      ],
+      tips: [
+        "Track heart rate (stay near 80–90% MHR)",
+        "Pace the rows and bike",
+        "Push through fatigue",
+        "Track your time"
+      ]
+    },
+    "wc007": {
+      name: "Burn Zone Intervals",
+      serialNumber: "WC007",
+      difficulty: "Intermediate",
+      duration: "45 min",
+      equipment: "Equipment Required",
+      imageUrl: burnZoneIntervalsImg,
+      description: "Explosive intervals alternating upper and lower movements to boost caloric output.",
+      workoutType: "TABATA",
+      format: `Tabata - 20s work / 10s rest
+4 rounds through all exercises`,
+      instructions: "Cycle through all exercises for 4 rounds.",
+      exercises: [
+        { name: "Medicine Ball Slam", sets: "4", reps: "20s", rest: "10s", notes: "Max power" },
+        { name: "Kettlebell Swing", sets: "4", reps: "20s", rest: "10s", notes: "Hip hinge" },
+        { name: "Jump Lunges", sets: "4", reps: "20s", rest: "10s", notes: "Alternate legs" },
+        { name: "Burpees", sets: "4", reps: "20s", rest: "10s", notes: "Full range" }
+      ],
+      tips: [
+        "Max effort during work intervals",
+        "Use the 10s rest to breathe",
+        "Maintain form even when tired",
+        "Track total reps"
+      ]
+    },
+    "wc008": {
+      name: "Bodyweight Inferno",
+      serialNumber: "WC008",
+      difficulty: "Intermediate",
+      duration: "30 min",
+      equipment: "No Equipment Required",
+      imageUrl: bodyweightInfernoImg,
+      description: "A nonstop fat-burner using compound bodyweight movements.",
+      workoutType: "AMRAP",
+      format: `AMRAP - 20 minutes
+As many rounds as possible`,
+      instructions: "Perform as many rounds as possible.",
+      exercises: [
+        { name: "Jump Squats", sets: "AMRAP", reps: "15", rest: "0", notes: "Full depth" },
+        { name: "Push-Ups", sets: "AMRAP", reps: "10", rest: "0", notes: "Chest to ground" },
+        { name: "Mountain Climbers", sets: "AMRAP", reps: "20", rest: "0", notes: "Fast pace" },
+        { name: "Sit-Ups", sets: "AMRAP", reps: "15", rest: "0", notes: "Full range" },
+        { name: "Burpees", sets: "AMRAP", reps: "10", rest: "0", notes: "Explosive jump" }
+      ],
+      tips: [
+        "Keep steady breathing",
+        "Pace yourself",
+        "Don't rest too long",
+        "Track your rounds"
+      ]
+    },
+    "wc009": {
+      name: "Burn Flow 2.0",
+      serialNumber: "WC009",
+      difficulty: "Beginner",
+      duration: "30 min",
+      equipment: "No Equipment Required",
+      imageUrl: burnFlow2Img,
+      description: "Rhythmic cardio workout for beginners aiming at calorie loss and endurance.",
+      workoutType: "CIRCUIT",
+      format: `Circuit - 4 rounds
+45s work / 15s rest`,
+      instructions: "4 rounds, 45s work, 15s rest.",
+      exercises: [
+        { name: "Jumping Jacks", sets: "4", reps: "45s", rest: "15s", notes: "Steady rhythm" },
+        { name: "High Knees", sets: "4", reps: "45s", rest: "15s", notes: "Drive knees up" },
+        { name: "Air Squats", sets: "4", reps: "45s", rest: "15s", notes: "Full range" },
+        { name: "Plank Shoulder Taps", sets: "4", reps: "45s", rest: "15s", notes: "Minimize rotation" },
+        { name: "Jump Rope (imaginary)", sets: "4", reps: "45s", rest: "60s", notes: "Wrist motion" }
+      ],
+      tips: [
+        "Focus on full range motion",
+        "Keep breathing steady",
+        "Don't rush",
+        "Build rhythm"
+      ]
+    },
+    "wm003": {
+      name: "Metabolic Mayhem",
+      serialNumber: "WM003",
+      difficulty: "Advanced",
+      duration: "60 min",
+      equipment: "Equipment Required",
+      imageUrl: metabolicMayhemImg,
+      description: "Advanced metabolic workout combining barbell movements with cardio bursts.",
+      workoutType: "FOR TIME",
+      format: `For Time
+21-15-9 reps scheme
+Then 3 rounds of 15 DB Snatches/arm`,
+      instructions: "Complete 21-15-9 reps, then 3 rounds of 15 Dumbbell Snatches each arm.",
+      exercises: [
+        { name: "Front Squat", sets: "1", reps: "21-15-9", rest: "0", notes: "Barbell" },
+        { name: "Push Press", sets: "1", reps: "21-15-9", rest: "0", notes: "Barbell" },
+        { name: "Row (calories)", sets: "1", reps: "21-15-9", rest: "0", notes: "Max effort" },
+        { name: "Dumbbell Snatch", sets: "3", reps: "15/arm", rest: "As needed", notes: "Explosive" }
+      ],
+      tips: [
+        "Pace the barbell movements",
+        "Push hard on the row",
+        "Rest when needed",
+        "Track your time"
+      ]
+    },
+    "wm004": {
+      name: "Metabolic Engine",
+      serialNumber: "WM004",
+      difficulty: "Intermediate",
+      duration: "45 min",
+      equipment: "Equipment Required",
+      imageUrl: metabolicEngineImg,
+      description: "Circuit-based metabolic conditioning using kettlebells and medicine ball.",
+      workoutType: "CIRCUIT",
+      format: `Circuit - 5 rounds
+Minimal rest between exercises`,
+      instructions: "Perform 5 rounds with minimal rest.",
+      exercises: [
+        { name: "Kettlebell Swing", sets: "5", reps: "15", rest: "0", notes: "Hip drive" },
+        { name: "Medicine Ball Slam", sets: "5", reps: "12", rest: "0", notes: "Overhead slam" },
+        { name: "Kettlebell Lunge", sets: "5", reps: "10/leg", rest: "0", notes: "Front rack" },
+        { name: "Jump Rope", sets: "5", reps: "60s", rest: "90s", notes: "Steady pace" }
+      ],
+      tips: [
+        "Keep movement continuous",
+        "Control breathing",
+        "Rest only between rounds",
+        "Track total rounds"
+      ]
+    },
+    "wm005": {
+      name: "Metabolic Overdrive",
+      serialNumber: "WM005",
+      difficulty: "Advanced",
+      duration: "45 min",
+      equipment: "Equipment Required",
+      imageUrl: metabolicOverdriveImg,
+      description: "High-intensity AMRAP focusing on explosive power and metabolic output.",
+      workoutType: "AMRAP",
+      format: `AMRAP - 20 minutes
+Max rounds possible`,
+      instructions: "Complete as many rounds as possible in 20 minutes.",
+      exercises: [
+        { name: "Box Jump", sets: "AMRAP", reps: "10", rest: "0", notes: "Full extension" },
+        { name: "Dumbbell Clean", sets: "AMRAP", reps: "12", rest: "0", notes: "Explosive pull" },
+        { name: "Push-Up to Row", sets: "AMRAP", reps: "10", rest: "0", notes: "Plank position" },
+        { name: "Air Bike", sets: "AMRAP", reps: "1 min", rest: "0", notes: "High intensity" }
+      ],
+      tips: [
+        "Pace yourself early",
+        "Keep form clean",
+        "Push through fatigue",
+        "Track your rounds"
+      ]
+    },
+    "wm006": {
+      name: "Bodyweight Engine",
+      serialNumber: "WM006",
+      difficulty: "Intermediate",
+      duration: "30 min",
+      equipment: "No Equipment Required",
+      imageUrl: bodyweightEngineImg,
+      description: "Tabata-style metabolic workout using bodyweight movements only.",
+      workoutType: "TABATA",
+      format: `Tabata - 20s work / 10s rest
+8 rounds per exercise`,
+      instructions: "8 rounds of 20s work, 10s rest per exercise.",
+      exercises: [
+        { name: "Jump Squat", sets: "8", reps: "20s", rest: "10s", notes: "Explosive" },
+        { name: "Push-Up", sets: "8", reps: "20s", rest: "10s", notes: "Full range" },
+        { name: "Mountain Climber", sets: "8", reps: "20s", rest: "10s", notes: "Fast pace" },
+        { name: "Plank Jacks", sets: "8", reps: "20s", rest: "10s", notes: "Feet wide" }
+      ],
+      tips: [
+        "Max effort in work intervals",
+        "Use rest to breathe",
+        "Maintain form",
+        "Track total reps"
+      ]
+    },
+    "wm007": {
+      name: "Metabolic Core Burn",
+      serialNumber: "WM007",
+      difficulty: "Beginner",
+      duration: "30 min",
+      equipment: "No Equipment Required",
+      imageUrl: metabolicCoreBurnImg,
+      description: "Circuit combining metabolic conditioning with core-focused movements.",
+      workoutType: "CIRCUIT",
+      format: `Circuit - 4 rounds
+45s work / 15s rest`,
+      instructions: "4 rounds, 45s work, 15s rest.",
+      exercises: [
+        { name: "Burpees", sets: "4", reps: "10", rest: "0", notes: "Full range" },
+        { name: "Sit-Ups", sets: "4", reps: "15", rest: "0", notes: "Hands behind head" },
+        { name: "Jumping Lunges", sets: "4", reps: "10/leg", rest: "0", notes: "Alternate legs" },
+        { name: "Superman", sets: "4", reps: "12", rest: "0", notes: "Arms extended" },
+        { name: "Plank", sets: "4", reps: "45s", rest: "60s", notes: "Maintain alignment" }
+      ],
+      tips: [
+        "Focus on core engagement",
+        "Keep pace steady",
+        "Don't rush reps",
+        "Rest between rounds"
+      ]
+    },
+    "wca005": {
+      name: "Cardio Engine Builder",
+      serialNumber: "WCA005",
+      difficulty: "Intermediate",
+      duration: "45 min",
+      equipment: "Equipment Required",
+      imageUrl: cardioEngineBuilderImg,
+      description: "Build cardiovascular endurance using rower and bike intervals.",
+      workoutType: "CIRCUIT",
+      format: `Circuit - 6 rounds
+Alternate between rower and bike`,
+      instructions: "Alternate between rower and bike for 6 rounds.",
+      exercises: [
+        { name: "Rower", sets: "6", reps: "2 mins", rest: "1 min", notes: "Moderate intensity" },
+        { name: "Bike", sets: "6", reps: "2 mins", rest: "1 min", notes: "Steady cadence" }
+      ],
+      tips: [
+        "Maintain consistent pace",
+        "Focus on breathing",
+        "Don't sprint early",
+        "Build endurance progressively"
+      ]
+    },
+    "wca006": {
+      name: "Sprint Power Combo",
+      serialNumber: "WCA006",
+      difficulty: "Advanced",
+      duration: "45 min",
+      equipment: "Equipment Required",
+      imageUrl: sprintPowerComboImg,
+      description: "Combining sled pushes with kettlebell work for explosive cardio power.",
+      workoutType: "FOR TIME",
+      format: `For Time - 5 rounds
+Complete ASAP`,
+      instructions: "Complete 5 rounds as fast as possible.",
+      exercises: [
+        { name: "Sled Push", sets: "5", reps: "20m", rest: "0", notes: "Heavy load" },
+        { name: "Kettlebell Swing", sets: "5", reps: "15", rest: "0", notes: "Hip drive" },
+        { name: "Sprint", sets: "5", reps: "50m", rest: "2 mins", notes: "Max effort" }
+      ],
+      tips: [
+        "Push through the sled",
+        "Explosive swings",
+        "Sprint all-out",
+        "Rest fully between rounds"
+      ]
+    },
+    "wca007": {
+      name: "Conditioning Pyramid",
+      serialNumber: "WCA007",
+      difficulty: "Intermediate",
+      duration: "45 min",
+      equipment: "Equipment Required",
+      imageUrl: conditioningPyramidImg,
+      description: "Pyramid-style cardio conditioning with dumbbells and jump rope.",
+      workoutType: "CIRCUIT",
+      format: `Circuit - Pyramid
+1-2-3-4-5-4-3-2-1 rounds`,
+      instructions: "Complete pyramid: 1-2-3-4-5-4-3-2-1 rounds.",
+      exercises: [
+        { name: "Dumbbell Thruster", sets: "Pyramid", reps: "Varies", rest: "0", notes: "Squat to press" },
+        { name: "Jump Rope", sets: "Pyramid", reps: "30s each", rest: "0", notes: "Steady pace" },
+        { name: "Burpees", sets: "Pyramid", reps: "Varies", rest: "30s", notes: "Full range" }
+      ],
+      tips: [
+        "Pace the pyramid climb",
+        "Peak at 5 rounds",
+        "Descend with control",
+        "Track your time"
+      ]
+    },
+    "wca008": {
+      name: "Bodyweight Endurance Flow",
+      serialNumber: "WCA008",
+      difficulty: "Intermediate",
+      duration: "30 min",
+      equipment: "No Equipment Required",
+      imageUrl: bodyweightEnduranceFlowImg,
+      description: "Continuous bodyweight cardio flow for sustained aerobic capacity.",
+      workoutType: "CIRCUIT",
+      format: `Circuit - 5 rounds
+40s work / 20s rest`,
+      instructions: "5 rounds, 40s work, 20s rest.",
+      exercises: [
+        { name: "High Knees", sets: "5", reps: "40s", rest: "20s", notes: "Drive knees up" },
+        { name: "Mountain Climbers", sets: "5", reps: "40s", rest: "20s", notes: "Fast pace" },
+        { name: "Jump Squats", sets: "5", reps: "40s", rest: "20s", notes: "Full depth" },
+        { name: "Burpees", sets: "5", reps: "40s", rest: "20s", notes: "Full range" },
+        { name: "Jumping Jacks", sets: "5", reps: "40s", rest: "60s", notes: "Steady rhythm" }
+      ],
+      tips: [
+        "Keep continuous movement",
+        "Control breathing",
+        "Maintain form",
+        "Build aerobic base"
+      ]
+    },
+    "wca009": {
+      name: "Fast Feet Cardio Flow",
+      serialNumber: "WCA009",
+      difficulty: "Beginner",
+      duration: "30 min",
+      equipment: "No Equipment Required",
+      imageUrl: fastFeetCardioFlowImg,
+      description: "Bodyweight cardio focusing on speed and agility movements.",
+      workoutType: "CIRCUIT",
+      format: `Circuit - 4 rounds
+45s work / 15s rest`,
+      instructions: "4 rounds, 45s work, 15s rest.",
+      exercises: [
+        { name: "Fast Feet", sets: "4", reps: "45s", rest: "15s", notes: "Quick steps" },
+        { name: "High Knees", sets: "4", reps: "45s", rest: "15s", notes: "Drive knees" },
+        { name: "Butt Kicks", sets: "4", reps: "45s", rest: "15s", notes: "Heel to glute" },
+        { name: "Lateral Shuffles", sets: "4", reps: "45s", rest: "15s", notes: "Stay low" },
+        { name: "Jumping Jacks", sets: "4", reps: "45s", rest: "60s", notes: "Full range" }
+      ],
+      tips: [
+        "Focus on foot speed",
+        "Stay light on feet",
+        "Maintain good posture",
+        "Build coordination"
+      ]
+    },
+    "wmob003": {
+      name: "Joint Flow Restore",
+      serialNumber: "WMOB003",
+      difficulty: "Intermediate",
+      duration: "45 min",
+      equipment: "Equipment Required",
+      imageUrl: jointFlowRestoreImg,
+      description: "Mobility restoration using foam roller and resistance bands.",
+      workoutType: "CIRCUIT",
+      format: `Circuit - 3 rounds
+Focus on controlled movement`,
+      instructions: "3 rounds, focus on control and mobility.",
+      exercises: [
+        { name: "Foam Roller - IT Band", sets: "3", reps: "60s/side", rest: "30s", notes: "Slow roll" },
+        { name: "Band Pull-Apart", sets: "3", reps: "15", rest: "30s", notes: "Squeeze shoulder blades" },
+        { name: "Cat-Cow Stretch", sets: "3", reps: "10", rest: "30s", notes: "Full range" },
+        { name: "Band Overhead Reach", sets: "3", reps: "12", rest: "30s", notes: "Full extension" },
+        { name: "Hip Circles", sets: "3", reps: "10/direction", rest: "60s", notes: "Control movement" }
+      ],
+      tips: [
+        "Move slowly and controlled",
+        "Breathe deeply",
+        "Don't force range",
+        "Focus on problem areas"
+      ]
+    },
+    "wmob004": {
+      name: "Core Stability Builder",
+      serialNumber: "WMOB004",
+      difficulty: "Intermediate",
+      duration: "45 min",
+      equipment: "Equipment Required",
+      imageUrl: coreStabilityBuilderImg,
+      description: "TRX-based stability workout focusing on core control and balance.",
+      workoutType: "REPS & SETS",
+      format: `Reps & Sets - 3 rounds
+Focus on stability`,
+      instructions: "3 rounds, focus on stability and control.",
+      exercises: [
+        { name: "TRX Plank", sets: "3", reps: "45s", rest: "60s", notes: "Feet in straps" },
+        { name: "TRX Pike", sets: "3", reps: "12", rest: "60s", notes: "Core engagement" },
+        { name: "TRX Mountain Climber", sets: "3", reps: "20", rest: "60s", notes: "Controlled pace" },
+        { name: "TRX Single-Leg Squat", sets: "3", reps: "10/leg", rest: "60s", notes: "Balance focus" },
+        { name: "TRX Row", sets: "3", reps: "15", rest: "90s", notes: "Pull chest to hands" }
+      ],
+      tips: [
+        "Focus on core stability",
+        "Control all movements",
+        "Maintain balance",
+        "Progress gradually"
+      ]
+    },
+    "wmob005": {
+      name: "Balance Flow Reset",
+      serialNumber: "WMOB005",
+      difficulty: "Beginner",
+      duration: "30 min",
+      equipment: "Equipment Required",
+      imageUrl: balanceFlowResetImg,
+      description: "Mini band and mat work for balance and mobility restoration.",
+      workoutType: "CIRCUIT",
+      format: `Circuit - 3 rounds
+Focus on balance`,
+      instructions: "3 rounds, focus on balance and control.",
+      exercises: [
+        { name: "Mini Band Lateral Walk", sets: "3", reps: "20 steps", rest: "30s", notes: "Stay low" },
+        { name: "Single-Leg Balance", sets: "3", reps: "30s/leg", rest: "30s", notes: "Focus point" },
+        { name: "Cat-Cow", sets: "3", reps: "10", rest: "30s", notes: "Spine articulation" },
+        { name: "Mini Band Glute Bridge", sets: "3", reps: "15", rest: "30s", notes: "Push knees out" },
+        { name: "Child's Pose", sets: "3", reps: "30s", rest: "60s", notes: "Relaxation" }
+      ],
+      tips: [
+        "Focus on stability",
+        "Breathe deeply",
+        "Don't rush",
+        "Build balance progressively"
+      ]
+    },
+    "wmob006": {
+      name: "Mobility Wave",
+      serialNumber: "WMOB006",
+      difficulty: "Beginner",
+      duration: "30 min",
+      equipment: "No Equipment Required",
+      imageUrl: mobilityWaveImg,
+      description: "Bodyweight mobility flow with dynamic stretching and joint prep.",
+      workoutType: "CIRCUIT",
+      format: `Circuit - 3 rounds
+Dynamic movement`,
+      instructions: "3 rounds of dynamic mobility movements.",
+      exercises: [
+        { name: "Arm Circles", sets: "3", reps: "10/direction", rest: "0", notes: "Full range" },
+        { name: "Leg Swings", sets: "3", reps: "10/leg", rest: "0", notes: "Front to back" },
+        { name: "Hip Circles", sets: "3", reps: "10/direction", rest: "0", notes: "Control movement" },
+        { name: "Thoracic Rotations", sets: "3", reps: "10/side", rest: "0", notes: "Open chest" },
+        { name: "World's Greatest Stretch", sets: "3", reps: "5/side", rest: "60s", notes: "Full flow" }
+      ],
+      tips: [
+        "Move through full range",
+        "Control each movement",
+        "Breathe deeply",
+        "Warm up joints"
+      ]
+    },
+    "wmob007": {
+      name: "Stability Core Flow",
+      serialNumber: "WMOB007",
+      difficulty: "Beginner",
+      duration: "30 min",
+      equipment: "No Equipment Required",
+      imageUrl: stabilityCoreFlowImg,
+      description: "Bodyweight stability and core activation flow.",
+      workoutType: "CIRCUIT",
+      format: `Circuit - 3 rounds
+Focus on control`,
+      instructions: "3 rounds, focus on core stability.",
+      exercises: [
+        { name: "Bird Dog", sets: "3", reps: "10/side", rest: "30s", notes: "Opposite limbs" },
+        { name: "Dead Bug", sets: "3", reps: "12", rest: "30s", notes: "Core engaged" },
+        { name: "Side Plank", sets: "3", reps: "30s/side", rest: "30s", notes: "Maintain alignment" },
+        { name: "Glute Bridge", sets: "3", reps: "15", rest: "30s", notes: "Squeeze at top" },
+        { name: "Plank", sets: "3", reps: "45s", rest: "60s", notes: "Full tension" }
+      ],
+      tips: [
+        "Focus on core activation",
+        "Control all movements",
+        "Maintain alignment",
+        "Breathe consistently"
+      ]
+    },
+    "wp003": {
+      name: "Explosive Engine",
+      serialNumber: "WP003",
+      difficulty: "Advanced",
+      duration: "45 min",
+      equipment: "Equipment Required",
+      imageUrl: explosiveEnginePowerImg,
+      description: "Barbell and medicine ball power training for maximum explosive output.",
+      workoutType: "REPS & SETS",
+      format: `Reps & Sets - 5 sets
+Focus on explosive power`,
+      instructions: "5 sets, focus on maximal explosive power.",
+      exercises: [
+        { name: "Barbell Power Clean", sets: "5", reps: "5", rest: "3 mins", notes: "Explosive pull" },
+        { name: "Medicine Ball Slam", sets: "5", reps: "10", rest: "2 mins", notes: "Overhead throw" },
+        { name: "Box Jump", sets: "5", reps: "8", rest: "2 mins", notes: "Full extension" },
+        { name: "Barbell Push Press", sets: "5", reps: "6", rest: "3 mins", notes: "Drive through legs" },
+        { name: "Broad Jump", sets: "5", reps: "8", rest: "2 mins", notes: "Explosive hip extension" }
+      ],
+      tips: [
+        "Focus on power output",
+        "Rest fully between sets",
+        "Maintain explosive intent",
+        "Quality over quantity"
+      ]
+    },
+    "wp004": {
+      name: "Speed Mechanics",
+      serialNumber: "WP004",
+      difficulty: "Intermediate",
+      duration: "45 min",
+      equipment: "Equipment Required",
+      imageUrl: speedMechanicsImg,
+      description: "Dumbbells and box work focusing on speed and power mechanics.",
+      workoutType: "CIRCUIT",
+      format: `Circuit - 4 rounds
+Focus on speed`,
+      instructions: "4 rounds, focus on speed and technique.",
+      exercises: [
+        { name: "Dumbbell Snatch", sets: "4", reps: "8/arm", rest: "0", notes: "Explosive pull" },
+        { name: "Box Jump", sets: "4", reps: "10", rest: "0", notes: "Full extension" },
+        { name: "Dumbbell Push Press", sets: "4", reps: "12", rest: "0", notes: "Drive through legs" },
+        { name: "Speed Skaters", sets: "4", reps: "20", rest: "0", notes: "Explosive lateral" },
+        { name: "Plank", sets: "4", reps: "30s", rest: "2 mins", notes: "Core recovery" }
+      ],
+      tips: [
+        "Focus on speed of movement",
+        "Maintain technique",
+        "Rest between rounds",
+        "Progressive load"
+      ]
+    },
+    "wp005": {
+      name: "Olympic Power Session",
+      serialNumber: "WP005",
+      difficulty: "Advanced",
+      duration: "60 min",
+      equipment: "Equipment Required",
+      imageUrl: olympicPowerSessionImg,
+      description: "Olympic lifting-focused session for power development.",
+      workoutType: "REPS & SETS",
+      format: `Reps & Sets - 6 sets
+Olympic lifting focus`,
+      instructions: "6 sets of Olympic lifts with full rest.",
+      exercises: [
+        { name: "Clean & Jerk", sets: "6", reps: "3", rest: "3 mins", notes: "Technical focus" },
+        { name: "Snatch", sets: "6", reps: "2", rest: "3 mins", notes: "Explosive pull" },
+        { name: "Front Squat", sets: "6", reps: "5", rest: "3 mins", notes: "Maintain posture" },
+        { name: "Push Press", sets: "6", reps: "5", rest: "3 mins", notes: "Drive from legs" },
+        { name: "Barbell Row", sets: "6", reps: "8", rest: "2 mins", notes: "Control tempo" }
+      ],
+      tips: [
+        "Focus on technique first",
+        "Rest fully between sets",
+        "Warm up thoroughly",
+        "Progress load gradually"
+      ]
+    },
+    "wp006": {
+      name: "Plyometric Burn",
+      serialNumber: "WP006",
+      difficulty: "Intermediate",
+      duration: "30 min",
+      equipment: "No Equipment Required",
+      imageUrl: plyometricBurnImg,
+      description: "Bodyweight plyometric workout for explosive power and calorie burn.",
+      workoutType: "CIRCUIT",
+      format: `Circuit - 4 rounds
+45s work / 15s rest`,
+      instructions: "4 rounds, 45s work, 15s rest.",
+      exercises: [
+        { name: "Jump Squats", sets: "4", reps: "45s", rest: "15s", notes: "Explosive" },
+        { name: "Burpees", sets: "4", reps: "45s", rest: "15s", notes: "Full range" },
+        { name: "Tuck Jumps", sets: "4", reps: "45s", rest: "15s", notes: "Knees to chest" },
+        { name: "Plyo Push-Ups", sets: "4", reps: "45s", rest: "15s", notes: "Explosive push" },
+        { name: "Box Jumps (or Step-Ups)", sets: "4", reps: "45s", rest: "60s", notes: "Full extension" }
+      ],
+      tips: [
+        "Land softly",
+        "Focus on explosive movements",
+        "Maintain form",
+        "Rest between rounds"
+      ]
+    },
+    "wp007": {
+      name: "Power Flow",
+      serialNumber: "WP007",
+      difficulty: "Beginner",
+      duration: "30 min",
+      equipment: "No Equipment Required",
+      imageUrl: powerFlowImg,
+      description: "Bodyweight power flow combining speed and control.",
+      workoutType: "CIRCUIT",
+      format: `Circuit - 3 rounds
+Focus on controlled power`,
+      instructions: "3 rounds, focus on controlled explosive movements.",
+      exercises: [
+        { name: "Jump Squats", sets: "3", reps: "10", rest: "30s", notes: "Controlled landing" },
+        { name: "Plyo Push-Ups (knee option)", sets: "3", reps: "8", rest: "30s", notes: "Explosive push" },
+        { name: "Lunge Jumps", sets: "3", reps: "8/leg", rest: "30s", notes: "Alternate legs" },
+        { name: "Mountain Climbers", sets: "3", reps: "20", rest: "30s", notes: "Fast pace" },
+        { name: "Burpees", sets: "3", reps: "8", rest: "90s", notes: "Full range" }
+      ],
+      tips: [
+        "Start with control",
+        "Build explosive power",
+        "Land softly",
+        "Progress gradually"
+      ]
+    },
+    "wch003": {
+      name: "HFSC Beast Mode",
+      serialNumber: "WCH003",
+      difficulty: "Advanced",
+      duration: "60 min",
+      equipment: "Equipment Required",
+      imageUrl: hfscBeastModeImg,
+      description: "Barbell and dumbbell challenge workout pushing strength and endurance limits.",
+      workoutType: "FOR TIME",
+      format: `For Time
+Complete all movements ASAP`,
+      instructions: "Complete all movements as fast as possible.",
+      exercises: [
+        { name: "Barbell Back Squat", sets: "1", reps: "50", rest: "0", notes: "Heavy load" },
+        { name: "Dumbbell Bench Press", sets: "1", reps: "40", rest: "0", notes: "Control descent" },
+        { name: "Barbell Deadlift", sets: "1", reps: "30", rest: "0", notes: "Maintain form" },
+        { name: "Dumbbell Thruster", sets: "1", reps: "20", rest: "0", notes: "Squat to press" },
+        { name: "Burpees", sets: "1", reps: "10", rest: "0", notes: "Full range" }
+      ],
+      tips: [
+        "Pace yourself strategically",
+        "Break up reps as needed",
+        "Maintain form throughout",
+        "Mental toughness is key"
+      ]
+    },
+    "wch004": {
+      name: "Spartan Endurance Test",
+      serialNumber: "WCH004",
+      difficulty: "Advanced",
+      duration: "60 min",
+      equipment: "Equipment Required",
+      imageUrl: spartanEnduranceTestImg,
+      description: "Kettlebell and rower endurance challenge for mental and physical toughness.",
+      workoutType: "FOR TIME",
+      format: `For Time
+Complete all stations`,
+      instructions: "Complete all stations as fast as possible.",
+      exercises: [
+        { name: "Row", sets: "1", reps: "2000m", rest: "0", notes: "Steady pace" },
+        { name: "Kettlebell Swing", sets: "1", reps: "100", rest: "0", notes: "Hip drive" },
+        { name: "Row", sets: "1", reps: "1500m", rest: "0", notes: "Push pace" },
+        { name: "Kettlebell Goblet Squat", sets: "1", reps: "75", rest: "0", notes: "Full depth" },
+        { name: "Row", sets: "1", reps: "1000m", rest: "0", notes: "Max effort" }
+      ],
+      tips: [
+        "Pace the rows wisely",
+        "Break kettlebell work early",
+        "Stay mentally strong",
+        "Track your time"
+      ]
+    },
+    "wch005": {
+      name: "Full Body Benchmark",
+      serialNumber: "WCH005",
+      difficulty: "Intermediate",
+      duration: "45 min",
+      equipment: "Equipment Required",
+      imageUrl: fullBodyBenchmarkImg,
+      description: "Dumbbells and pull-up bar benchmark workout testing overall fitness.",
+      workoutType: "FOR TIME",
+      format: `For Time - 21-15-9 reps`,
+      instructions: "Complete 21-15-9 reps of each movement.",
+      exercises: [
+        { name: "Dumbbell Thruster", sets: "1", reps: "21-15-9", rest: "0", notes: "Squat to press" },
+        { name: "Pull-Ups", sets: "1", reps: "21-15-9", rest: "0", notes: "Full extension" },
+        { name: "Dumbbell Burpee", sets: "1", reps: "21-15-9", rest: "0", notes: "Touch dumbbells" }
+      ],
+      tips: [
+        "Pace the thrusters",
+        "Break pull-ups strategically",
+        "Push through the burpees",
+        "Track your time"
+      ]
+    },
+    "wch006": {
+      name: "The Burnout Challenge",
+      serialNumber: "WCH006",
+      difficulty: "Intermediate",
+      duration: "30 min",
+      equipment: "No Equipment Required",
+      imageUrl: burnoutChallengeImg,
+      description: "Bodyweight challenge designed to test muscular endurance and mental fortitude.",
+      workoutType: "AMRAP",
+      format: `AMRAP - 25 minutes`,
+      instructions: "Complete as many rounds as possible in 25 minutes.",
+      exercises: [
+        { name: "Burpees", sets: "AMRAP", reps: "10", rest: "0", notes: "Full range" },
+        { name: "Push-Ups", sets: "AMRAP", reps: "20", rest: "0", notes: "Chest to ground" },
+        { name: "Air Squats", sets: "AMRAP", reps: "30", rest: "0", notes: "Full depth" },
+        { name: "Sit-Ups", sets: "AMRAP", reps: "40", rest: "0", notes: "Full range" }
+      ],
+      tips: [
+        "Start conservative",
+        "Maintain steady pace",
+        "Break strategically",
+        "Track your rounds"
+      ]
+    },
+    "wch007": {
+      name: "Warrior Flow",
+      serialNumber: "WCH007",
+      difficulty: "Beginner",
+      duration: "30 min",
+      equipment: "No Equipment Required",
+      imageUrl: warriorFlowImg,
+      description: "Bodyweight warrior-style flow challenge combining strength and mobility.",
+      workoutType: "CIRCUIT",
+      format: `Circuit - 3 rounds
+Focus on flow`,
+      instructions: "3 rounds, focus on movement flow and control.",
+      exercises: [
+        { name: "Warrior Push-Ups", sets: "3", reps: "10", rest: "30s", notes: "Control descent" },
+        { name: "Jump Squats", sets: "3", reps: "12", rest: "30s", notes: "Soft landing" },
+        { name: "Plank to Downward Dog", sets: "3", reps: "10", rest: "30s", notes: "Flow movement" },
+        { name: "Lunge with Twist", sets: "3", reps: "10/side", rest: "30s", notes: "Open chest" },
+        { name: "Burpees", sets: "3", reps: "8", rest: "90s", notes: "Full range" }
+      ],
+      tips: [
+        "Focus on movement quality",
+        "Control breathing",
+        "Move with intention",
+        "Build warrior mindset"
       ]
     }
   };
