@@ -287,23 +287,35 @@ export const Navigation = () => {
                 </DropdownMenuContent>
               </DropdownMenu>
             ) : (
-              <>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => navigate("/auth")}
-                  className="text-xs sm:text-sm"
-                >
-                  Log In
-                </Button>
-                <Button
-                  size="sm"
-                  onClick={() => navigate("/auth")}
-                  className="text-xs sm:text-sm"
-                >
-                  Sign Up
-                </Button>
-              </>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button size="sm" className="text-xs sm:text-sm">
+                    Sign In / Sign Up
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent className="w-48" align="end">
+                  <DropdownMenuItem 
+                    onSelect={(e) => {
+                      e.preventDefault();
+                      navigate("/auth?mode=login");
+                      setTimeout(() => window.scrollTo(0, 0), 0);
+                    }}
+                  >
+                    <UserIcon className="mr-2 h-4 w-4" />
+                    <span>Log In</span>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem 
+                    onSelect={(e) => {
+                      e.preventDefault();
+                      navigate("/auth?mode=signup");
+                      setTimeout(() => window.scrollTo(0, 0), 0);
+                    }}
+                  >
+                    <UserIcon className="mr-2 h-4 w-4" />
+                    <span>Sign Up</span>
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
             )}
           </div>
         </div>
