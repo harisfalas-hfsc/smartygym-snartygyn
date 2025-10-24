@@ -3,7 +3,6 @@ import { Helmet } from "react-helmet";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { ArrowLeft, Dumbbell, Flame, Zap, Heart, Move, Activity, TrendingUp } from "lucide-react";
-import { EmailCaptureBox } from "@/components/EmailCaptureBox";
 import { BackToTop } from "@/components/BackToTop";
 import { TimedPopup } from "@/components/TimedPopup";
 
@@ -134,11 +133,6 @@ const WorkoutFlow = () => {
               </Card>
             );
           })}
-        </div>
-
-        {/* Email Capture */}
-        <div className="mt-12">
-          <EmailCaptureBox />
         </div>
 
         {/* Bottom Premium Banner */}

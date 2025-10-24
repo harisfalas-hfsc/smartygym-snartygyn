@@ -5,7 +5,6 @@ import { Card } from "@/components/ui/card";
 import { ArrowLeft, Heart, Dumbbell, Activity, Flame, User, Move, Scale } from "lucide-react";
 import { BackToTop } from "@/components/BackToTop";
 import { TimedPopup } from "@/components/TimedPopup";
-import { TestimonialsSlider } from "@/components/TestimonialsSlider";
 
 const TrainingProgramFlow = () => {
   const navigate = useNavigate();
@@ -133,11 +132,6 @@ const TrainingProgramFlow = () => {
               </Card>
             );
           })}
-        </div>
-
-        {/* Testimonials */}
-        <div className="mt-12">
-          <TestimonialsSlider />
         </div>
 
         {/* Bottom Premium Banner */}
