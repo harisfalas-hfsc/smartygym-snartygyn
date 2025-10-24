@@ -34,12 +34,12 @@ export function SearchDialog({ open, onOpenChange }: SearchDialogProps) {
     const down = (e: KeyboardEvent) => {
       if (e.key === "k" && (e.metaKey || e.ctrlKey)) {
         e.preventDefault();
-        onOpenChange(!open);
+        onOpenChange(true);
       }
     };
     document.addEventListener("keydown", down);
     return () => document.removeEventListener("keydown", down);
-  }, [open, onOpenChange]);
+  }, [onOpenChange]);
 
   // All searchable content
   const searchableContent: SearchResult[] = [
