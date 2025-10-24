@@ -43,60 +43,35 @@ serve(async (req) => {
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
     console.log("Fetching exercises from ExerciseDB API...");
+    console.log("Attempting to fetch ALL exercises with limit=0...");
     
-    // Fetch all exercises with proper pagination
-    let allExercises: ExerciseDBExercise[] = [];
-    let offset = 0;
-    const limit = 200; // Fetch 200 at a time
-    
-    while (true) {
-      console.log(`Fetching exercises with offset=${offset}, limit=${limit}...`);
-      
-      const exercisesResponse = await fetch(
-        `${EXERCISEDB_API_BASE}/exercises?offset=${offset}&limit=${limit}`,
-        {
-          headers: {
-            "X-RapidAPI-Key": rapidApiKey,
-            "X-RapidAPI-Host": "exercisedb.p.rapidapi.com",
-          },
-        }
-      );
+    const exercisesResponse = await fetch(
+      `${EXERCISEDB_API_BASE}/exercises?limit=0`,
+      {
+        headers: {
+          "X-RapidAPI-Key": rapidApiKey,
+          "X-RapidAPI-Host": "exercisedb.p.rapidapi.com",
+        },
+      }
+    );
 
-      if (!exercisesResponse.ok) {
-        const errorText = await exercisesResponse.text();
-        console.error("ExerciseDB API Error:", errorText);
-        throw new Error(`Failed to fetch exercises: ${exercisesResponse.statusText} - ${errorText}`);
-      }
-
-      const exercisesData: ExerciseDBExercise[] = await exercisesResponse.json();
-      console.log(`Fetched ${exercisesData.length} exercises at offset ${offset}`);
-      
-      if (exercisesData.length === 0) {
-        break; // No more exercises
-      }
-      
-      allExercises = allExercises.concat(exercisesData);
-      
-      // If we got fewer than the limit, we've reached the end
-      if (exercisesData.length < limit) {
-        console.log("Reached end of exercises");
-        break;
-      }
-      
-      offset += limit;
-      
-      // Safety limit
-      if (offset >= 10000) {
-        console.log("Reached safety limit");
-        break;
-      }
+    if (!exercisesResponse.ok) {
+      const errorText = await exercisesResponse.text();
+      console.error("ExerciseDB API Error:", errorText);
+      throw new Error(`Failed to fetch exercises: ${exercisesResponse.statusText} - ${errorText}`);
     }
-    
+
+    const allExercises: ExerciseDBExercise[] = await exercisesResponse.json();
     console.log(`Total exercises fetched: ${allExercises.length}`);
     
     // Log first exercise to debug the structure
     if (allExercises.length > 0) {
       console.log("Sample exercise structure:", JSON.stringify(allExercises[0], null, 2));
+    }
+    
+    if (allExercises.length <= 10) {
+      console.warn("WARNING: Only got 10 exercises. Your RapidAPI subscription may be on the FREE tier.");
+      console.warn("Upgrade to PRO/ULTRA/MEGA plan on RapidAPI to get all 1300+ exercises.");
     }
 
     // Clear existing exercises from database
@@ -115,8 +90,8 @@ serve(async (req) => {
     const exercisesToInsert = allExercises.map((ex) => ({
       name: ex.name,
       video_id: ex.id,
-      // Construct GIF URL from exercise ID if gifUrl is not provided
-      video_url: ex.gifUrl || `https://v2.exercisedb.io/image/${ex.id}`,
+      // Use the ExerciseDB image API endpoint with appropriate resolution
+      video_url: `https://exercisedb.p.rapidapi.com/image?exerciseId=${ex.id}&resolution=360`,
       description: ex.instructions?.join("\n") || ex.description || "",
     }));
 
