@@ -44,24 +44,54 @@ serve(async (req) => {
 
     console.log("Fetching exercises from ExerciseDB API...");
     
-    // Try fetching with a high limit first (API might not support pagination)
-    const exercisesResponse = await fetch(
-      `${EXERCISEDB_API_BASE}/exercises?limit=0`,
-      {
-        headers: {
-          "X-RapidAPI-Key": rapidApiKey,
-          "X-RapidAPI-Host": "exercisedb.p.rapidapi.com",
-        },
+    // Fetch all exercises with proper pagination
+    let allExercises: ExerciseDBExercise[] = [];
+    let offset = 0;
+    const limit = 200; // Fetch 200 at a time
+    
+    while (true) {
+      console.log(`Fetching exercises with offset=${offset}, limit=${limit}...`);
+      
+      const exercisesResponse = await fetch(
+        `${EXERCISEDB_API_BASE}/exercises?offset=${offset}&limit=${limit}`,
+        {
+          headers: {
+            "X-RapidAPI-Key": rapidApiKey,
+            "X-RapidAPI-Host": "exercisedb.p.rapidapi.com",
+          },
+        }
+      );
+
+      if (!exercisesResponse.ok) {
+        const errorText = await exercisesResponse.text();
+        console.error("ExerciseDB API Error:", errorText);
+        throw new Error(`Failed to fetch exercises: ${exercisesResponse.statusText} - ${errorText}`);
       }
-    );
 
-    if (!exercisesResponse.ok) {
-      const errorText = await exercisesResponse.text();
-      console.error("ExerciseDB API Error:", errorText);
-      throw new Error(`Failed to fetch exercises: ${exercisesResponse.statusText} - ${errorText}`);
+      const exercisesData: ExerciseDBExercise[] = await exercisesResponse.json();
+      console.log(`Fetched ${exercisesData.length} exercises at offset ${offset}`);
+      
+      if (exercisesData.length === 0) {
+        break; // No more exercises
+      }
+      
+      allExercises = allExercises.concat(exercisesData);
+      
+      // If we got fewer than the limit, we've reached the end
+      if (exercisesData.length < limit) {
+        console.log("Reached end of exercises");
+        break;
+      }
+      
+      offset += limit;
+      
+      // Safety limit
+      if (offset >= 10000) {
+        console.log("Reached safety limit");
+        break;
+      }
     }
-
-    const allExercises: ExerciseDBExercise[] = await exercisesResponse.json();
+    
     console.log(`Total exercises fetched: ${allExercises.length}`);
     
     // Log first exercise to debug the structure
