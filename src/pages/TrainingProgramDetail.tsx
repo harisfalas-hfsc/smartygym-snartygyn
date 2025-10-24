@@ -8,15 +8,15 @@ import { AccessGate } from "@/components/AccessGate";
 import cardioEnduranceImg from "@/assets/cardio-endurance-program.jpg";
 import functionalStrengthImg from "@/assets/functional-strength-program.jpg";
 import muscleHypertrophyImg from "@/assets/muscle-hypertrophy-program.jpg";
-import powerFoundationImg from "@/assets/power-foundation-workout.jpg";
-import ironCoreStrengthImg from "@/assets/iron-core-strength-workout.jpg";
-import cardioPowerIntervalsImg from "@/assets/cardio-power-intervals-workout.jpg";
 import metabolicBurnImg from "@/assets/metabolic-burn-workout.jpg";
 import fatFurnaceImg from "@/assets/fat-furnace-workout.jpg";
 import coreBuilderImg from "@/assets/core-builder-workout.jpg";
-import stabilityCircuitImg from "@/assets/stability-circuit-workout.jpg";
 import flowMobilityImg from "@/assets/flow-mobility-workout.jpg";
-import mobilityMasteryImg from "@/assets/mobility-mastery-workout.jpg";
+import muscleHypertrophyProImg from "@/assets/muscle-hypertrophy-pro-program.jpg";
+import cardioMaxEnduranceImg from "@/assets/cardio-max-endurance-program.jpg";
+import lowBackPerformanceImg from "@/assets/low-back-performance-program.jpg";
+import mobilityMasterFlowImg from "@/assets/mobility-master-flow-program.jpg";
+import functionalStrengthEliteImg from "@/assets/functional-strength-elite-program.jpg";
 
 type EquipmentFilter = "all" | "bodyweight" | "equipment";
 type LevelFilter = "all" | "beginner" | "intermediate" | "advanced";
@@ -95,7 +95,7 @@ const TrainingProgramDetail = () => {
         duration: "8",
         equipment: "equipment",
         level: "advanced",
-        imageUrl: cardioPowerIntervalsImg,
+        imageUrl: cardioMaxEnduranceImg,
         isFree: false
       }
     ],
@@ -117,7 +117,7 @@ const TrainingProgramDetail = () => {
         duration: "8",
         equipment: "equipment",
         level: "advanced",
-        imageUrl: powerFoundationImg,
+        imageUrl: functionalStrengthEliteImg,
         isFree: false
       }
     ],
@@ -139,7 +139,7 @@ const TrainingProgramDetail = () => {
         duration: "8",
         equipment: "equipment",
         level: "advanced",
-        imageUrl: ironCoreStrengthImg,
+        imageUrl: muscleHypertrophyProImg,
         isFree: false
       }
     ],
@@ -183,7 +183,7 @@ const TrainingProgramDetail = () => {
         duration: "8",
         equipment: "equipment",
         level: "advanced",
-        imageUrl: stabilityCircuitImg,
+        imageUrl: lowBackPerformanceImg,
         isFree: false
       }
     ],
@@ -205,7 +205,7 @@ const TrainingProgramDetail = () => {
         duration: "8",
         equipment: "equipment",
         level: "advanced",
-        imageUrl: mobilityMasteryImg,
+        imageUrl: mobilityMasterFlowImg,
         isFree: false
       }
     ],

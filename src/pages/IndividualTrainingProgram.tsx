@@ -8,15 +8,15 @@ import { AccessGate } from "@/components/AccessGate";
 import cardioEnduranceImg from "@/assets/cardio-endurance-program.jpg";
 import functionalStrengthImg from "@/assets/functional-strength-program.jpg";
 import muscleHypertrophyImg from "@/assets/muscle-hypertrophy-program.jpg";
-import powerFoundationImg from "@/assets/power-foundation-workout.jpg";
-import ironCoreStrengthImg from "@/assets/iron-core-strength-workout.jpg";
-import cardioPowerIntervalsImg from "@/assets/cardio-power-intervals-workout.jpg";
 import metabolicBurnImg from "@/assets/metabolic-burn-workout.jpg";
 import fatFurnaceImg from "@/assets/fat-furnace-workout.jpg";
 import coreBuilderImg from "@/assets/core-builder-workout.jpg";
-import stabilityCircuitImg from "@/assets/stability-circuit-workout.jpg";
 import flowMobilityImg from "@/assets/flow-mobility-workout.jpg";
-import mobilityMasteryImg from "@/assets/mobility-mastery-workout.jpg";
+import muscleHypertrophyProImg from "@/assets/muscle-hypertrophy-pro-program.jpg";
+import cardioMaxEnduranceImg from "@/assets/cardio-max-endurance-program.jpg";
+import lowBackPerformanceImg from "@/assets/low-back-performance-program.jpg";
+import mobilityMasterFlowImg from "@/assets/mobility-master-flow-program.jpg";
+import functionalStrengthEliteImg from "@/assets/functional-strength-elite-program.jpg";
 
 const IndividualTrainingProgram = () => {
   const navigate = useNavigate();
@@ -92,7 +92,7 @@ const IndividualTrainingProgram = () => {
       difficulty: "Advanced",
       duration: "8 Weeks / 5 Training Days per Week",
       equipment: "Barbell, Dumbbells, Kettlebells, TRX, Weighted Vest",
-      imageUrl: powerFoundationImg,
+      imageUrl: functionalStrengthEliteImg,
       description: "An advanced 8-week program focused on multi-plane compound lifts, explosive power integration, and heavy load tolerance. Designed to build maximum strength with functional carryover.",
       format: "Reps & Sets",
       instructions: "Use structured progressive overload: Weeks 1–4: Build volume (70–80% 1RM), Weeks 5–8: Increase intensity (80–90% 1RM). Tempo: 3-1-1-0 for strength, 1-0-1-0 for power. Rest 2–3 min between compound lifts, 60–90s on accessories.",
@@ -134,7 +134,7 @@ const IndividualTrainingProgram = () => {
       difficulty: "Advanced",
       duration: "8 Weeks / 6 Training Days",
       equipment: "Full Gym Setup",
-      imageUrl: ironCoreStrengthImg,
+      imageUrl: muscleHypertrophyProImg,
       description: "An 8-week advanced hypertrophy system emphasizing metabolic stress, mechanical tension, and progressive overload with high-volume intensity techniques (drop sets, supersets, rest–pause).",
       format: "Reps & Sets",
       instructions: "Weeks 1–4: Volume phase (10–12 reps @70%), Weeks 5–8: Intensity phase (6–8 reps @80%). Tempo: 3-1-1-0. Rest: 60–90s on isolation, 120s on compounds.",
@@ -177,7 +177,7 @@ const IndividualTrainingProgram = () => {
       difficulty: "Advanced",
       duration: "8 Weeks / 5 Days per Week",
       equipment: "Bike, Rower, Treadmill, Weighted Vest, Kettlebell",
-      imageUrl: cardioPowerIntervalsImg,
+      imageUrl: cardioMaxEnduranceImg,
       description: "A progressive 8-week endurance plan for athletes seeking peak aerobic and anaerobic capacity. Uses a blend of HIIT, threshold training, and long slow distance (LSD) sessions.",
       format: "Interval + Steady-State Combination",
       instructions: "Effort measured via HR zones or RPE: LSD (Zone 2–3) = 60–70% HR max, Threshold (Zone 4) = 80–85%, HIIT (Zone 5) = 90%+. Overload by adding 1–2 intervals or extending LSD sessions by 5–10 min weekly.",
@@ -260,7 +260,7 @@ const IndividualTrainingProgram = () => {
       difficulty: "Advanced",
       duration: "8 Weeks / 4 Days per Week",
       equipment: "Cable Machine, Dumbbells, Barbell, Stability Ball",
-      imageUrl: stabilityCircuitImg,
+      imageUrl: lowBackPerformanceImg,
       description: "An advanced 8-week strength and stability program designed to reinforce the posterior chain and protect against re-injury. Enhances hip hinge strength and trunk stiffness.",
       format: "Reps & Sets",
       instructions: "Tempo: 3-1-1-0. Overload via gradual load increases (2.5% per 2 weeks). Prioritize quality movement over volume.",
@@ -300,7 +300,7 @@ const IndividualTrainingProgram = () => {
       difficulty: "Advanced",
       duration: "8 Weeks / 4 Days per Week",
       equipment: "Bands, TRX, Kettlebell, Foam Roller",
-      imageUrl: mobilityMasteryImg,
+      imageUrl: mobilityMasterFlowImg,
       description: "An advanced 8-week flow for dynamic joint control, strength through range, and high-level body awareness. Integrates mobility under tension and stability challenges.",
       format: "Reps & Sets",
       instructions: "Tempo: 4-2-2-0. Progress overload via deeper range, longer holds, or added load. Rest 45s between drills.",

@@ -163,5 +163,17 @@ This standard exists to:
 
 ---
 
-*Last Updated: [Current Session]*
-*Total Premium Workouts with Unique Images: 14*
+## MANDATORY ENFORCEMENT RULES (UPDATED 2025-10-24)
+
+1. **Workout images MUST end with "-workout.jpg"**
+2. **Training program images MUST end with "-program.jpg"**
+3. **ZERO shared images between workouts and programs**
+4. **ZERO duplicate images within same category**
+5. **Pre-audit checklist MANDATORY before ANY additions**
+
+---
+
+*Last Updated: 2025-10-24*
+*Total Premium Workouts: 14 (All Unique)*
+*Total Training Programs: 12 (All Unique)*
+*Status: ✅ FULLY COMPLIANT*
