@@ -7,19 +7,16 @@ import { ArrowLeft, Heart, Dumbbell, Activity, Flame, User, Move, Scale } from "
 import { BackToTop } from "@/components/BackToTop";
 import { TimedPopup } from "@/components/TimedPopup";
 import { TestimonialsSlider } from "@/components/TestimonialsSlider";
+import { programData } from "./TrainingProgramDetail";
 
 const TrainingProgramFlow = () => {
   const navigate = useNavigate();
 
-  // Program counts (automatically synced with TrainingProgramDetail.tsx data)
-  const programCounts: { [key: string]: number } = {
-    "cardio-endurance": 2,
-    "functional-strength": 2,
-    "muscle-hypertrophy": 2,
-    "weight-loss": 2,
-    "low-back-pain": 2,
-    "mobility-stability": 2,
-  };
+  // Automatically count programs from actual data
+  const programCounts: { [key: string]: number } = Object.keys(programData).reduce((acc, key) => {
+    acc[key] = programData[key].length;
+    return acc;
+  }, {} as { [key: string]: number });
 
   const programTypes = [
     {

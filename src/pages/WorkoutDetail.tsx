@@ -107,7 +107,7 @@ type EquipmentFilter = "all" | "bodyweight" | "equipment";
 type LevelFilter = "all" | "beginner" | "intermediate" | "advanced";
 type FormatFilter = "all" | "circuit" | "amrap" | "for time" | "tabata" | "reps & sets" | "mix";
 
-interface Workout {
+export interface Workout {
   id: string;
   name: string;
   description: string;
@@ -119,24 +119,8 @@ interface Workout {
   isFree?: boolean;
 }
 
-const WorkoutDetail = () => {
-  const navigate = useNavigate();
-  const { type } = useParams();
-  const [equipmentFilter, setEquipmentFilter] = useState<EquipmentFilter>("all");
-  const [levelFilter, setLevelFilter] = useState<LevelFilter>("all");
-  const [formatFilter, setFormatFilter] = useState<FormatFilter>("all");
-
-  const workoutTitles: { [key: string]: string } = {
-    "strength": "Strength Workout",
-    "calorie-burning": "Calorie Burning Workout",
-    "metabolic": "Metabolic Workout",
-    "cardio": "Cardio Workout",
-    "mobility": "Mobility & Stability Workout",
-    "power": "Power Workout",
-    "challenge": "Challenge Workout"
-  };
-
-  const workoutData: { [key: string]: Workout[] } = {
+// Export workout data for use in other components
+export const workoutData: { [key: string]: Workout[] } = {
     "strength": [
       { id: "strength-049", name: "Bodyweight Base", description: "A foundational strength workout using bodyweight exercises with controlled tempo and static holds to build muscular endurance", duration: "30 min", equipment: "bodyweight", level: "beginner", format: "reps & sets", imageUrl: starterStrengthImg, isFree: true },
       { id: "strength-050", name: "Strength Starter", description: "A light resistance circuit using dumbbells and bands to introduce strength training safely and effectively", duration: "30 min", equipment: "equipment", level: "beginner", format: "circuit", imageUrl: powerFoundationImg, isFree: true },
@@ -242,6 +226,27 @@ const WorkoutDetail = () => {
       { id: "wch006", name: "The Burnout Challenge", description: "Bodyweight challenge designed to test muscular endurance and mental fortitude", duration: "30 min", equipment: "bodyweight", level: "intermediate", format: "amrap", imageUrl: burnoutChallengeImg, isFree: false },
       { id: "wch007", name: "Warrior Flow", description: "Bodyweight warrior-style flow challenge combining strength and mobility", duration: "30 min", equipment: "bodyweight", level: "beginner", format: "circuit", imageUrl: warriorFlowImg, isFree: false },
     ],
+  };
+
+const WorkoutDetail = () => {
+  const navigate = useNavigate();
+  const { type } = useParams();
+  const [equipmentFilter, setEquipmentFilter] = useState<EquipmentFilter>("all");
+  const [levelFilter, setLevelFilter] = useState<LevelFilter>("all");
+  const [formatFilter, setFormatFilter] = useState<FormatFilter>("all");
+
+  const workoutTitles: { [key: string]: string } = {
+    "strength": "Strength Workout",
+    "calorie-burning": "Calorie Burning Workout",
+    "metabolic": "Metabolic Workout",
+    "cardio": "Cardio Workout",
+    "mobility": "Mobility & Stability Workout",
+    "power": "Power Workout",
+    "challenge": "Challenge Workout"
+  };
+
+  const handleWorkoutClick = (workoutId: string) => {
+    navigate(`/individualworkout/${workoutId}`);
   };
 
   const title = workoutTitles[type || ""] || "Workout";

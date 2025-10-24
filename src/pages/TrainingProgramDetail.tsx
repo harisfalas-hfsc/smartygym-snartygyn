@@ -22,7 +22,7 @@ type EquipmentFilter = "all" | "bodyweight" | "equipment";
 type LevelFilter = "all" | "beginner" | "intermediate" | "advanced";
 type DurationFilter = "all" | "4" | "6" | "8";
 
-interface TrainingProgram {
+export interface TrainingProgram {
   id: string;
   name: string;
   description: string;
@@ -76,7 +76,8 @@ const TrainingProgramDetail = () => {
     }
   };
 
-  const programData: { [key: string]: TrainingProgram[] } = {
+// Export program data for use in other components
+export const programData: { [key: string]: TrainingProgram[] } = {
     "cardio-endurance": [
       {
         id: "T-C001",
