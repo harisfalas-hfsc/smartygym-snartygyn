@@ -2,7 +2,6 @@ import { useNavigate } from "react-router-dom";
 import { Helmet } from "react-helmet";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import { ArrowLeft, Dumbbell, Flame, Zap, Heart, Move, Activity, TrendingUp } from "lucide-react";
 import { EmailCaptureBox } from "@/components/EmailCaptureBox";
 import { BackToTop } from "@/components/BackToTop";
@@ -10,17 +9,6 @@ import { TimedPopup } from "@/components/TimedPopup";
 
 const WorkoutFlow = () => {
   const navigate = useNavigate();
-
-  // Workout counts (update manually when adding new workouts)
-  const workoutCounts: { [key: string]: number } = {
-    "strength": 14,
-    "calorie-burning": 15,
-    "metabolic": 13,
-    "cardio": 11,
-    "mobility": 13,
-    "power": 13,
-    "challenge": 13,
-  };
 
   const workoutTypes = [
     {
@@ -129,13 +117,8 @@ const WorkoutFlow = () => {
               <Card
                 key={workout.id}
                 onClick={() => handleWorkoutSelect(workout.id)}
-                className="p-6 cursor-pointer transition-all duration-300 hover:scale-105 hover:shadow-gold bg-card border-border relative"
+                className="p-6 cursor-pointer transition-all duration-300 hover:scale-105 hover:shadow-gold bg-card border-border"
               >
-                {/* Counter Badge */}
-                <Badge className="absolute top-3 left-3 bg-primary text-primary-foreground font-semibold">
-                  {workoutCounts[workout.id]} workouts
-                </Badge>
-                
                 <div className="flex flex-col items-center text-center space-y-4">
                   <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center">
                     <Icon className="w-8 h-8 text-primary" />
@@ -146,9 +129,6 @@ const WorkoutFlow = () => {
                     <p className="text-xs text-muted-foreground mb-3">
                       Created by <a href="/coach-profile" className="text-primary hover:underline font-medium">Haris Falas</a> — Sports Scientist & Strength and Conditioning Coach
                     </p>
-                    <Button variant="default" size="sm" className="mt-2 w-full">
-                      View Workout →
-                    </Button>
                   </div>
                 </div>
               </Card>
