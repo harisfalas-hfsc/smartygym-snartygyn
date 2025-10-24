@@ -333,9 +333,9 @@ const IndividualTrainingProgram = () => {
   return (
     <>
       <Helmet>
-        <title>{program.name} - {program.duration} Training Program Cyprus | Haris Falas | smartygym.com</title>
-        <meta name="description" content={`${program.name} - ${program.description} ${program.duration} ${program.focus} program. Progressive strength training, functional fitness, structured workout plan by Sports Scientist Haris Falas at smartygym.com Cyprus`} />
-        <meta name="keywords" content={`${program.name}, ${program.duration} program, ${program.focus} training, structured workout plan, progressive overload, strength program Cyprus, functional fitness program, training program, ${program.equipment}, ${program.difficulty} program, Haris Falas Cyprus, Smarty Gym, smartygym.com, online training Cyprus, periodization, muscle building, endurance training, performance program, sports science Cyprus`} />
+        <title>{program.name} - {program.duration} Training Program Cyprus | {program.difficulty} {program.focus} Plan | Haris Falas | smartygym.com</title>
+        <meta name="description" content={`${program.name} - ${program.description} ${program.duration} ${program.focus} program. Progressive strength training, functional fitness, periodized workout plan by Sports Scientist Haris Falas at Smarty Gym Cyprus (smartygym.com). Structured ${program.difficulty} level ${program.equipment === 'bodyweight' ? 'bodyweight' : 'equipment'} training with ${program.format} format.`} />
+        <meta name="keywords" content={`${program.name}, ${program.duration} program, ${program.focus} training, structured workout plan, progressive overload, periodization training Cyprus, strength program Cyprus, functional fitness program, training program Cyprus, ${program.equipment} training, ${program.difficulty} program, muscle building program Cyprus, endurance training Cyprus, performance program Cyprus, hypertrophy training Cyprus, cardio program Cyprus, weight loss program Cyprus, online training program Cyprus, fitness coaching Cyprus, Haris Falas Cyprus, Sports Scientist Cyprus, Smarty Gym, smartygym.com, online fitness Cyprus, personal training Cyprus, strength and conditioning Cyprus, workout periodization, training split, training mesocycle, progressive training Cyprus, structured fitness Cyprus`} />
         
         <meta property="og:title" content={`${program.name} - ${program.duration} Structured Training Program`} />
         <meta property="og:description" content={`${program.description} ${program.duration} ${program.focus} program by Haris Falas at Smarty Gym Cyprus`} />
@@ -383,7 +383,7 @@ const IndividualTrainingProgram = () => {
                 "addressCountry": "CY"
               }
             },
-            "keywords": `${program.focus}, ${program.duration}, structured training, Cyprus fitness program`
+            "keywords": `${program.focus}, ${program.duration}, ${program.difficulty} training, structured program, periodization, Cyprus fitness, online training, Haris Falas Sports Scientist, progressive overload, training split`
           })}
         </script>
       </Helmet>

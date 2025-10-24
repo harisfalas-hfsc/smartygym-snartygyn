@@ -4194,9 +4194,9 @@ Focus on flow`,
   return (
     <>
       <Helmet>
-        <title>{workout.name} {workout.workoutType ? `- ${workout.workoutType}` : ''} | {getFocusLabel(type)} Workout Cyprus | Haris Falas | smartygym.com</title>
-        <meta name="description" content={`${workout.name} - ${workout.workoutType || 'Circuit'} ${getFocusLabel(type)} workout. ${workout.description} ${workout.duration} ${workout.equipment} training by Sports Scientist Haris Falas at smartygym.com Cyprus`} />
-        <meta name="keywords" content={`${workout.name}, ${workout.workoutType || 'circuit'} workout, ${getFocusLabel(type)}, ${workout.equipment}, ${workout.difficulty} training, AMRAP, TABATA, HIIT, for time, bodyweight training, functional fitness Cyprus, Haris Falas, Smarty Gym Cyprus, smartygym.com, online workout, home training, no equipment workout, strength training, cardio workout, metabolic conditioning, explosive training, challenge workout, fitness Cyprus`} />
+        <title>{workout.name} {workout.workoutType ? `- ${workout.workoutType}` : ''} | {getFocusLabel(type)} Workout Cyprus | {workout.difficulty} {workout.equipment === 'bodyweight' ? 'Bodyweight' : 'Equipment'} Training | Haris Falas | smartygym.com</title>
+        <meta name="description" content={`${workout.name} - ${workout.workoutType || 'Circuit'} ${getFocusLabel(type)} workout. ${workout.description} ${workout.duration} ${workout.equipment === 'bodyweight' ? 'bodyweight only, no equipment' : 'equipment-based'} ${workout.difficulty} training. ${workout.format} format by Sports Scientist Haris Falas at Smarty Gym Cyprus (smartygym.com).`} />
+        <meta name="keywords" content={`${workout.name}, ${workout.workoutType || 'circuit'} workout, ${getFocusLabel(type)}, ${workout.equipment} training, ${workout.difficulty} workout, ${workout.format} training, AMRAP workout Cyprus, TABATA training Cyprus, HIIT Cyprus, for time workout, circuit training, ${workout.equipment === 'bodyweight' ? 'bodyweight training, calisthenics Cyprus, no equipment workout, home workout Cyprus' : 'gym workout Cyprus, weight training, equipment training, dumbbell workout, kettlebell training'}, functional fitness Cyprus, strength training Cyprus, cardio workout Cyprus, metabolic conditioning Cyprus, fat loss workout Cyprus, muscle building Cyprus, explosive training Cyprus, power training Cyprus, challenge workout, endurance training Cyprus, conditioning workout Cyprus, online workout Cyprus, fitness training Cyprus, Haris Falas Cyprus, Sports Scientist Cyprus, Smarty Gym, smartygym.com, online fitness Cyprus, personal trainer Cyprus, strength and conditioning Cyprus, workout program Cyprus`} />
         
         <meta property="og:title" content={`${workout.name} - ${workout.workoutType || 'Workout'} by Haris Falas`} />
         <meta property="og:description" content={`${workout.description} ${workout.duration} ${getFocusLabel(type)} workout at Smarty Gym Cyprus`} />
@@ -4243,7 +4243,7 @@ Focus on flow`,
                 "addressCountry": "CY"
               }
             },
-            "keywords": `${workout.workoutType}, ${getFocusLabel(type)}, ${workout.equipment}, AMRAP, TABATA, HIIT, Cyprus fitness`
+            "keywords": `${workout.workoutType}, ${getFocusLabel(type)}, ${workout.equipment}, ${workout.format}, AMRAP, TABATA, HIIT, Cyprus fitness, strength training Cyprus, cardio conditioning, metabolic training, online fitness Cyprus, Haris Falas Sports Scientist, functional fitness, explosive power training, endurance conditioning`
           })}
         </script>
       </Helmet>
