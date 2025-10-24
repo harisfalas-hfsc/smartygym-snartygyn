@@ -97,7 +97,7 @@ const TrainingProgramFlow = () => {
         {/* Info Ribbon */}
         <div className="bg-primary/10 border border-primary/20 rounded-lg p-4 mb-8 text-center">
           <p className="text-sm text-muted-foreground mb-2">
-            Explore our structured programs — want full access to all programs and workouts?
+            Every SMARTY GYM program is a complete path toward better performance and health—but results multiply when training meets smart recovery and mindful living. Stay disciplined, fuel your body intelligently, rest deeply, and treat movement as a daily practice—not a task. That's the SMARTY GYM way.
           </p>
           <Button variant="default" size="sm" onClick={() => navigate("/premiumbenefits")}>
             Join Premium
