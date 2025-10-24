@@ -119,8 +119,7 @@ export interface Workout {
   isFree?: boolean;
 }
 
-// Export workout data for use in other components
-export const workoutData: { [key: string]: Workout[] } = {
+const workoutData: { [key: string]: Workout[] } = {
     "strength": [
       { id: "strength-049", name: "Bodyweight Base", description: "A foundational strength workout using bodyweight exercises with controlled tempo and static holds to build muscular endurance", duration: "30 min", equipment: "bodyweight", level: "beginner", format: "reps & sets", imageUrl: starterStrengthImg, isFree: true },
       { id: "strength-050", name: "Strength Starter", description: "A light resistance circuit using dumbbells and bands to introduce strength training safely and effectively", duration: "30 min", equipment: "equipment", level: "beginner", format: "circuit", imageUrl: powerFoundationImg, isFree: true },

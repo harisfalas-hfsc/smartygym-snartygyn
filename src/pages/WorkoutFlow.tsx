@@ -7,16 +7,20 @@ import { ArrowLeft, Dumbbell, Flame, Zap, Heart, Move, Activity, TrendingUp } fr
 import { EmailCaptureBox } from "@/components/EmailCaptureBox";
 import { BackToTop } from "@/components/BackToTop";
 import { TimedPopup } from "@/components/TimedPopup";
-import { workoutData } from "./WorkoutDetail";
 
 const WorkoutFlow = () => {
   const navigate = useNavigate();
 
-  // Automatically count workouts from actual data
-  const workoutCounts: { [key: string]: number } = Object.keys(workoutData).reduce((acc, key) => {
-    acc[key] = workoutData[key].length;
-    return acc;
-  }, {} as { [key: string]: number });
+  // Workout counts (update manually when adding new workouts)
+  const workoutCounts: { [key: string]: number } = {
+    "strength": 14,
+    "calorie-burning": 15,
+    "metabolic": 13,
+    "cardio": 11,
+    "mobility": 13,
+    "power": 13,
+    "challenge": 13,
+  };
 
   const workoutTypes = [
     {

@@ -76,8 +76,7 @@ const TrainingProgramDetail = () => {
     }
   };
 
-// Export program data for use in other components
-export const programData: { [key: string]: TrainingProgram[] } = {
+  const programData: { [key: string]: TrainingProgram[] } = {
     "cardio-endurance": [
       {
         id: "T-C001",
