@@ -25,6 +25,11 @@ import metabolicIgnitionImg from "@/assets/metabolic-ignition-workout.jpg";
 import metaboShockImg from "@/assets/metaboshock-workout.jpg";
 import cardioBlastImg from "@/assets/cardio-blast-workout.jpg";
 import pulseIgniterImg from "@/assets/pulse-igniter-workout.jpg";
+import cardioLiftOffImg from "@/assets/cardio-lift-off-workout.jpg";
+import cardioClimbImg from "@/assets/cardio-climb-workout.jpg";
+import cardioCircuitProImg from "@/assets/cardio-circuit-pro-workout.jpg";
+import cardioInfernoImg from "@/assets/cardio-inferno-workout.jpg";
+import cardioOverdriveImg from "@/assets/cardio-overdrive-workout.jpg";
 import flowMobilityImg from "@/assets/flow-mobility-workout.jpg";
 import flowForgeImg from "@/assets/flowforge-workout.jpg";
 import flowStarterImg from "@/assets/flow-starter-workout.jpg";
@@ -168,12 +173,12 @@ const workoutData: { [key: string]: Workout[] } = {
       { id: "wm007", name: "Metabolic Core Burn", description: "Circuit combining metabolic conditioning with core-focused movements", duration: "30 min", equipment: "bodyweight", level: "beginner", format: "circuit", imageUrl: metabolicCoreBurnImg, isFree: false },
     ],
     "cardio": [
-      { id: "cardio-061", name: "Cardio Lift-Off", description: "A gentle cardio circuit designed to elevate heart rate and improve aerobic capacity without high impact", duration: "30 min", equipment: "bodyweight", level: "beginner", format: "circuit", imageUrl: cardioBlastImg, isFree: true },
+      { id: "cardio-061", name: "Cardio Lift-Off", description: "A gentle cardio circuit designed to elevate heart rate and improve aerobic capacity without high impact", duration: "30 min", equipment: "bodyweight", level: "beginner", format: "circuit", imageUrl: cardioLiftOffImg, isFree: true },
       { id: "cardio-062", name: "Pulse Builder", description: "A beginner-friendly Tabata workout using jump rope and fit ball to build rhythm, coordination, and endurance", duration: "30 min", equipment: "equipment", level: "beginner", format: "tabata", imageUrl: pulseIgniterImg, isFree: true },
-      { id: "cardio-063", name: "Cardio Climb", description: "A bodyweight cardio workout using dynamic movements and short rest to build endurance and burn calories", duration: "45 min", equipment: "bodyweight", level: "intermediate", format: "amrap", imageUrl: cardioBlastImg, isFree: true },
-      { id: "cardio-064", name: "Cardio Circuit Pro", description: "A high-energy cardio circuit using jump rope, medicine ball, and wall ball to boost heart rate and stamina", duration: "45 min", equipment: "equipment", level: "intermediate", format: "circuit", imageUrl: cardioBlastImg, isFree: true },
-      { id: "cardio-065", name: "Cardio Inferno", description: "A high-intensity bodyweight cardio workout using plyometrics and compound moves for elite endurance and fat burn", duration: "60 min", equipment: "bodyweight", level: "advanced", format: "for time", imageUrl: cardioBlastImg, isFree: true },
-      { id: "cardio-066", name: "Cardio Overdrive", description: "A full-body cardio blast using jump rope, wall ball, and bands", duration: "60 min", equipment: "equipment", level: "advanced", format: "mix", imageUrl: cardioBlastImg, isFree: true },
+      { id: "cardio-063", name: "Cardio Climb", description: "A bodyweight cardio workout using dynamic movements and short rest to build endurance and burn calories", duration: "45 min", equipment: "bodyweight", level: "intermediate", format: "amrap", imageUrl: cardioClimbImg, isFree: true },
+      { id: "cardio-064", name: "Cardio Circuit Pro", description: "A high-energy cardio circuit using jump rope, medicine ball, and wall ball to boost heart rate and stamina", duration: "45 min", equipment: "equipment", level: "intermediate", format: "circuit", imageUrl: cardioCircuitProImg, isFree: true },
+      { id: "cardio-065", name: "Cardio Inferno", description: "A high-intensity bodyweight cardio workout using plyometrics and compound moves for elite endurance and fat burn", duration: "60 min", equipment: "bodyweight", level: "advanced", format: "for time", imageUrl: cardioInfernoImg, isFree: true },
+      { id: "cardio-066", name: "Cardio Overdrive", description: "A full-body cardio blast using jump rope, wall ball, and bands", duration: "60 min", equipment: "equipment", level: "advanced", format: "mix", imageUrl: cardioOverdriveImg, isFree: true },
       { id: "wca005", name: "Cardio Engine Builder", description: "Build cardiovascular endurance using rower and bike intervals", duration: "45 min", equipment: "equipment", level: "intermediate", format: "circuit", imageUrl: cardioEngineBuilderImg, isFree: false },
       { id: "wca006", name: "Sprint Power Combo", description: "Combining sled pushes with kettlebell work for explosive cardio power", duration: "45 min", equipment: "equipment", level: "advanced", format: "for time", imageUrl: sprintPowerComboImg, isFree: false },
       { id: "wca007", name: "Conditioning Pyramid", description: "Pyramid-style cardio conditioning with dumbbells and jump rope", duration: "45 min", equipment: "equipment", level: "intermediate", format: "circuit", imageUrl: conditioningPyramidImg, isFree: false },

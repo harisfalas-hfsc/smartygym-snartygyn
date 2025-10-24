@@ -25,6 +25,11 @@ import metabolicIgnitionImg from "@/assets/metabolic-ignition-workout.jpg";
 import metaboShockImg from "@/assets/metaboshock-workout.jpg";
 import cardioBlastImg from "@/assets/cardio-blast-workout.jpg";
 import pulseIgniterImg from "@/assets/pulse-igniter-workout.jpg";
+import cardioLiftOffImg from "@/assets/cardio-lift-off-workout.jpg";
+import cardioClimbImg from "@/assets/cardio-climb-workout.jpg";
+import cardioCircuitProImg from "@/assets/cardio-circuit-pro-workout.jpg";
+import cardioInfernoImg from "@/assets/cardio-inferno-workout.jpg";
+import cardioOverdriveImg from "@/assets/cardio-overdrive-workout.jpg";
 import flowMobilityImg from "@/assets/flow-mobility-workout.jpg";
 import flowForgeImg from "@/assets/flowforge-workout.jpg";
 import flowStarterImg from "@/assets/flow-starter-workout.jpg";
@@ -2169,7 +2174,7 @@ Finisher: 3 rounds`,
       difficulty: "Beginner",
       duration: "30 min",
       equipment: "No Equipment Required",
-      imageUrl: cardioBlastImg,
+      imageUrl: cardioLiftOffImg,
       description: "A gentle cardio circuit designed to elevate heart rate and improve aerobic capacity without high impact. Ideal for beginners easing into movement.",
       workoutType: "CIRCUIT",
       format: `Circuit – 3 rounds
@@ -2272,7 +2277,7 @@ Work: 20s / Rest: 10s x 8 rounds per block`,
       difficulty: "Intermediate",
       duration: "45 min",
       equipment: "No Equipment Required",
-      imageUrl: cardioBlastImg,
+      imageUrl: cardioClimbImg,
       description: "A bodyweight cardio workout using dynamic movements and short rest to build endurance and burn calories.",
       workoutType: "AMRAP",
       format: `AMRAP – 30 mins
@@ -2307,7 +2312,7 @@ Warm-Up & Cool-Down – 5 mins`,
       difficulty: "Intermediate",
       duration: "45 min",
       equipment: "Jump Rope, Medicine Ball, Wall Ball, Mat",
-      imageUrl: cardioBlastImg,
+      imageUrl: cardioCircuitProImg,
       description: "A high-energy cardio circuit using jump rope, medicine ball, and wall ball to boost heart rate and stamina.",
       workoutType: "HIIT",
       format: `HIIT – 4 rounds
@@ -2362,7 +2367,7 @@ Work: 45s / Rest: 15s`,
       difficulty: "Advanced",
       duration: "60 min",
       equipment: "No Equipment Required",
-      imageUrl: cardioBlastImg,
+      imageUrl: cardioInfernoImg,
       description: "A high-intensity bodyweight cardio workout using plyometrics and compound moves for elite endurance and fat burn.",
       workoutType: "FOR TIME",
       format: `For Time – 3 blocks
@@ -2403,7 +2408,7 @@ Rest: 2 mins between blocks`,
       difficulty: "Advanced",
       duration: "60 min",
       equipment: "Jump Rope, Wall Ball, Bands, Mat",
-      imageUrl: cardioBlastImg,
+      imageUrl: cardioOverdriveImg,
       description: "A full-body cardio blast using jump rope, wall ball, and bands. Designed for elite conditioning and endurance.",
       workoutType: "MIX",
       format: `REPS & SETS + HIIT Finisher
