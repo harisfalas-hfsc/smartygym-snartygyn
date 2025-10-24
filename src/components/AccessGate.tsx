@@ -44,11 +44,11 @@ export const AccessGate = ({
                   Log In / Sign Up
                 </Button>
                 <Button 
-                  onClick={() => navigate("/")} 
+                  onClick={() => navigate(-1)} 
                   variant="outline" 
                   className="w-full"
                 >
-                  Back to Home
+                  Go Back
                 </Button>
               </div>
             </CardContent>
@@ -93,11 +93,11 @@ export const AccessGate = ({
                 Log In / Sign Up
               </Button>
               <Button 
-                onClick={() => navigate("/")} 
+                onClick={() => navigate(-1)} 
                 variant="outline" 
                 className="w-full"
               >
-                Back to Home
+                Go Back
               </Button>
             </div>
           </CardContent>

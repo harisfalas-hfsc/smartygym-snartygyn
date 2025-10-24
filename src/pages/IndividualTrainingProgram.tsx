@@ -388,19 +388,19 @@ const IndividualTrainingProgram = () => {
         </script>
       </Helmet>
 
-      <AccessGate requireAuth={true} requirePremium={!isFreeProgram} contentType="program">
-        <div className="min-h-screen bg-background">
-          <div className="container mx-auto max-w-4xl px-4 py-8">
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => navigate(`/trainingprogram/${type}`)}
-              className="mb-6"
-            >
-              <ArrowLeft className="mr-2 h-4 w-4" />
-              <span className="text-xs sm:text-sm">Back</span>
-            </Button>
+      <div className="min-h-screen bg-background">
+        <div className="container mx-auto max-w-4xl px-4 py-8">
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => navigate(`/trainingprogram/${type}`)}
+            className="mb-6"
+          >
+            <ArrowLeft className="mr-2 h-4 w-4" />
+            <span className="text-xs sm:text-sm">Back</span>
+          </Button>
 
+          <AccessGate requireAuth={true} requirePremium={!isFreeProgram} contentType="program">
             {/* Use WorkoutDisplay component with all functionality */}
             <WorkoutDisplay
             exercises={[
@@ -433,9 +433,9 @@ const IndividualTrainingProgram = () => {
               }))
             }]}
           />
+          </AccessGate>
         </div>
       </div>
-      </AccessGate>
     </>
   );
 };

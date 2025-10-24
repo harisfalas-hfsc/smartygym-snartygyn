@@ -4248,19 +4248,19 @@ Focus on flow`,
         </script>
       </Helmet>
 
-      <AccessGate requireAuth={true} requirePremium={!isFreeWorkout} contentType="workout">
-        <div className="min-h-screen bg-background">
-          <div className="container mx-auto max-w-4xl px-4 py-8">
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => navigate(`/workout/${type}`)}
-              className="mb-6"
-            >
-              <ArrowLeft className="mr-2 h-4 w-4" />
-              <span className="text-xs sm:text-sm">Back</span>
-            </Button>
+      <div className="min-h-screen bg-background">
+        <div className="container mx-auto max-w-4xl px-4 py-8">
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => navigate(`/workout/${type}`)}
+            className="mb-6"
+          >
+            <ArrowLeft className="mr-2 h-4 w-4" />
+            <span className="text-xs sm:text-sm">Back</span>
+          </Button>
 
+          <AccessGate requireAuth={true} requirePremium={!isFreeWorkout} contentType="workout">
             {/* Use WorkoutDisplay component with all functionality */}
             <WorkoutDisplay
               exercises={[
@@ -4281,9 +4281,9 @@ Focus on flow`,
               tips={workout.tips.join('\n')}
               workoutDetails={{ exercises: workout.exercises }}
             />
-          </div>
+          </AccessGate>
         </div>
-      </AccessGate>
+      </div>
     </>
   );
 };
