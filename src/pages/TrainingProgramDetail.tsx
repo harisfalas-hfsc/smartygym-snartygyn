@@ -49,6 +49,33 @@ const TrainingProgramDetail = () => {
     "mobility-stability": "Mobility & Stability Programs"
   };
 
+  const programInfo: { [key: string]: { title: string; content: string } } = {
+    "muscle-hypertrophy": {
+      title: "Muscle Hypertrophy",
+      content: "Building muscle requires consistent mechanical tension, sufficient training volume, and progressive overload—but recovery and nutrition are what turn effort into visible growth. Aim for 1.6–2.0 g of protein per kilogram of body weight daily, maintain a slight caloric surplus (around 200–300 kcal above maintenance), and get at least 7–9 hours of sleep each night to optimize anabolic hormones. Supplementation such as creatine monohydrate, whey protein, and omega-3 fatty acids can support muscle repair and performance. Stay hydrated and plan deload weeks if recovery feels compromised."
+    },
+    "functional-strength": {
+      title: "Functional Strength",
+      content: "Functional strength is about quality of movement, balance, and power that transfers to daily life and sport. To progress, focus on technique before load, emphasizing joint stability, core control, and mobility. Fuel your training with nutrient-dense meals rich in lean protein, complex carbohydrates, and healthy fats. Prioritize post-workout recovery meals containing both carbs and protein, and include mobility sessions or active recovery days to enhance performance longevity."
+    },
+    "cardio-endurance": {
+      title: "Cardio",
+      content: "Cardiovascular fitness improves heart health, endurance, and recovery capacity. For best results, combine steady-state sessions (65–75% max HR) with interval or tempo training to develop both aerobic and anaerobic systems. Support energy demands by eating enough carbohydrates, staying hydrated, and keeping electrolytes balanced. Limit alcohol and processed foods that interfere with recovery. Regular sleep and stress management are essential for maintaining consistent cardio output."
+    },
+    "weight-loss": {
+      title: "Weight Loss",
+      content: "Fat loss happens in a calorie deficit—burning more energy than you consume—without compromising muscle mass. Combine resistance training with cardio and aim for moderate caloric restriction (around –400 to –600 kcal/day). Emphasize high-protein meals to preserve lean tissue, control hunger, and improve metabolism. Reduce refined carbs and sugar, and favor whole foods and fiber-rich vegetables. Quality sleep (7–9 hours) and stress control are critical, since hormonal imbalance can slow fat loss. Stay consistent; small daily improvements create long-term change."
+    },
+    "low-back-pain": {
+      title: "Low Back Pain",
+      content: "A strong, stable core and proper movement mechanics are key to preventing and reducing low back pain. Alongside training, maintain good posture while sitting or working, avoid long periods of inactivity, and practice daily mobility for the hips and thoracic spine. Adequate hydration, anti-inflammatory foods (like omega-3 sources, fruits, and vegetables), and a healthy body weight reduce strain on the spine. Remember that pain often reflects movement habits—move more, move well, and progress gradually."
+    },
+    "mobility-stability": {
+      title: "Mobility & Stability",
+      content: "Mobility and stability training enhance joint range of motion, balance, and coordination—foundations for every other goal. Perform movements slowly, focusing on control, breathing, and alignment. Support your progress by avoiding prolonged sitting, incorporating dynamic warm-ups and stretching, and staying well-hydrated. Magnesium-rich foods and sufficient sleep improve muscle relaxation and recovery. Patience and consistency are the keys to lasting mobility improvements."
+    }
+  };
+
   const programData: { [key: string]: TrainingProgram[] } = {
     "cardio-endurance": [
       {
@@ -214,6 +241,14 @@ const TrainingProgramDetail = () => {
         </Button>
         
         <h1 className="text-3xl sm:text-4xl font-bold text-center mb-8">{title}</h1>
+        
+        {/* Info Card */}
+        {programInfo[type || ""] && (
+          <Card className="mb-8 p-6 bg-card border-border">
+            <h2 className="text-xl font-semibold mb-4">{programInfo[type || ""].title}</h2>
+            <p className="text-muted-foreground leading-relaxed">{programInfo[type || ""].content}</p>
+          </Card>
+        )}
         
         {/* Filters */}
         <div className="mb-8 space-y-4">
