@@ -154,7 +154,7 @@ const ExerciseLibrary = () => {
   // 100 exercises list with comprehensive categorization
   const exercises: Exercise[] = [
     // Bodyweight exercises
-    { id: 1, name: "Air Squats", equipment: "bodyweight", bodyRegion: "lower", movementType: "squat", videoId: "", targetMuscle: "Quadriceps" },
+    { id: 1, name: "Air Squats", equipment: "bodyweight", bodyRegion: "lower", movementType: "squat", videoId: "B_ug7mZik94", targetMuscle: "Quadriceps" },
     { id: 2, name: "Burpees", equipment: "bodyweight", bodyRegion: "full", movementType: "linear", videoId: "", targetMuscle: "Full Body" },
     { id: 3, name: "Bridge", equipment: "bodyweight", bodyRegion: "lower", movementType: "hinge", videoId: "", targetMuscle: "Glutes" },
     { id: 4, name: "Bicycle Crunches", equipment: "bodyweight", bodyRegion: "upper", movementType: "rotational", videoId: "", targetMuscle: "Abs" },
