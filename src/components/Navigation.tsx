@@ -13,10 +13,11 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { User as UserIcon, Settings, LogOut, LayoutDashboard, Crown, Menu } from "lucide-react";
+import { User as UserIcon, Settings, LogOut, LayoutDashboard, Crown, Menu, Search } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import smartyGymLogo from "@/assets/smarty-gym-logo.png";
 import { ThemeToggle } from "@/components/ThemeToggle";
+import { SearchDialog } from "@/components/SearchDialog";
 
 interface SubscriptionInfo {
   subscribed: boolean;
@@ -32,6 +33,7 @@ export const Navigation = () => {
   const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
   const [subscriptionInfo, setSubscriptionInfo] = useState<SubscriptionInfo | null>(null);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [searchOpen, setSearchOpen] = useState(false);
 
   useEffect(() => {
     // Check current session
@@ -166,6 +168,17 @@ export const Navigation = () => {
             <Button variant="ghost" size="sm" onClick={() => navigate("/contact")}>Contact</Button>
           </nav>
 
+          {/* Search Button - Desktop */}
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => setSearchOpen(true)}
+            className="hidden md:flex"
+            aria-label="Search"
+          >
+            <Search className="h-5 w-5" />
+          </Button>
+
           {/* Mobile Menu */}
           <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
             <SheetTrigger asChild className="md:hidden">
@@ -202,6 +215,21 @@ export const Navigation = () => {
                 <Button variant="ghost" size="lg" onClick={() => handleNavigate("/contact")} className="justify-start">
                   Contact
                 </Button>
+                
+                {/* Search Button - Mobile */}
+                <Button 
+                  variant="outline" 
+                  size="lg" 
+                  onClick={() => {
+                    setSearchOpen(true);
+                    setMobileMenuOpen(false);
+                  }} 
+                  className="justify-start"
+                >
+                  <Search className="mr-2 h-4 w-4" />
+                  Search
+                </Button>
+
                 <div className="border-t pt-4 mt-4">
                   <Button 
                     variant="default" 
@@ -325,6 +353,9 @@ export const Navigation = () => {
           </div>
         </div>
       </div>
+
+      {/* Search Dialog */}
+      <SearchDialog open={searchOpen} onOpenChange={setSearchOpen} />
     </header>
   );
 };
