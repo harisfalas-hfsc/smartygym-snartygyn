@@ -4,7 +4,7 @@ import { Helmet } from "react-helmet";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
-import { ArrowLeft, Play, Heart } from "lucide-react";
+import { ArrowLeft, Play, Heart, RefreshCw } from "lucide-react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
@@ -33,6 +33,8 @@ const ExerciseLibrary = () => {
   const [user, setUser] = useState<User | null>(null);
   const [favoriteExercises, setFavoriteExercises] = useState<string[]>([]);
   const [hasSubscription, setHasSubscription] = useState(false);
+  const [isSyncing, setIsSyncing] = useState(false);
+  const [wgerData, setWgerData] = useState<any>(null);
 
   useEffect(() => {
     // Check current session
@@ -79,6 +81,32 @@ const ExerciseLibrary = () => {
       }
     } catch (error) {
       console.error('Error checking subscription:', error);
+    }
+  };
+
+  const syncWgerExercises = async () => {
+    setIsSyncing(true);
+    try {
+      const { data, error } = await supabase.functions.invoke('fetch-wger-exercises');
+      
+      if (error) throw error;
+      
+      setWgerData(data);
+      toast({
+        title: "Sync Complete",
+        description: `Synced ${data.stats.matched} exercises with videos from wger API`,
+      });
+      
+      console.log("Wger data:", data);
+    } catch (error: any) {
+      console.error("Error syncing wger exercises:", error);
+      toast({
+        title: "Sync Failed",
+        description: "Failed to sync exercises from wger API",
+        variant: "destructive"
+      });
+    } finally {
+      setIsSyncing(false);
     }
   };
 
@@ -313,6 +341,26 @@ const ExerciseLibrary = () => {
         <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-center mb-6 sm:mb-8">
           Exercise Library
         </h1>
+
+        {/* Wger Sync Button */}
+        <div className="text-center mb-6">
+          <Button
+            onClick={syncWgerExercises}
+            disabled={isSyncing}
+            variant="outline"
+            className="gap-2"
+          >
+            <RefreshCw className={`h-4 w-4 ${isSyncing ? 'animate-spin' : ''}`} />
+            {isSyncing ? 'Syncing with wger API...' : 'Sync Exercise Videos'}
+          </Button>
+          {wgerData && (
+            <div className="mt-3 p-3 bg-muted rounded-lg inline-block">
+              <p className="text-sm">
+                ✅ Synced {wgerData.stats.matched}/{wgerData.stats.total} exercises with videos
+              </p>
+            </div>
+          )}
+        </div>
 
         {/* Filters */}
         <Card className="mb-6">
