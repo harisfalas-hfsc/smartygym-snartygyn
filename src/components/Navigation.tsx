@@ -290,10 +290,10 @@ export const Navigation = () => {
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <Button size="sm" className="text-xs sm:text-sm">
-                    Sign In / Sign Up
+                    Log In
                   </Button>
                 </DropdownMenuTrigger>
-                <DropdownMenuContent className="w-48" align="end">
+                <DropdownMenuContent className="w-48 bg-background" align="end">
                   <DropdownMenuItem 
                     onSelect={(e) => {
                       e.preventDefault();
@@ -304,6 +304,7 @@ export const Navigation = () => {
                     <UserIcon className="mr-2 h-4 w-4" />
                     <span>Log In</span>
                   </DropdownMenuItem>
+                  <DropdownMenuSeparator />
                   <DropdownMenuItem 
                     onSelect={(e) => {
                       e.preventDefault();
