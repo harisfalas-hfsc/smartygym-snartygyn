@@ -155,7 +155,7 @@ const ExerciseLibrary = () => {
   const exercises: Exercise[] = [
     // Bodyweight exercises
     { id: 1, name: "Air Squats", equipment: "bodyweight", bodyRegion: "lower", movementType: "squat", videoId: "C_VtOYc6j5c", targetMuscle: "Quadriceps" },
-    { id: 2, name: "Burpees", equipment: "bodyweight", bodyRegion: "full", movementType: "linear", videoId: "", targetMuscle: "Full Body" },
+    { id: 2, name: "Burpees", equipment: "bodyweight", bodyRegion: "full", movementType: "linear", videoId: "TU8QYVW0gDU", targetMuscle: "Full Body" },
     { id: 3, name: "Bridge", equipment: "bodyweight", bodyRegion: "lower", movementType: "hinge", videoId: "", targetMuscle: "Glutes" },
     { id: 4, name: "Bicycle Crunches", equipment: "bodyweight", bodyRegion: "upper", movementType: "rotational", videoId: "", targetMuscle: "Abs" },
     { id: 5, name: "Bear Crawl", equipment: "bodyweight", bodyRegion: "full", movementType: "gait", videoId: "", targetMuscle: "Core" },
@@ -171,7 +171,7 @@ const ExerciseLibrary = () => {
     { id: 15, name: "Frog Jumps", equipment: "bodyweight", bodyRegion: "lower", movementType: "squat", videoId: "", targetMuscle: "Quadriceps" },
     { id: 16, name: "Glute Bridges", equipment: "bodyweight", bodyRegion: "lower", movementType: "hinge", videoId: "", targetMuscle: "Glutes" },
     { id: 17, name: "High Knees", equipment: "bodyweight", bodyRegion: "full", movementType: "gait", videoId: "", targetMuscle: "Legs" },
-    { id: 18, name: "Handstand Push-ups", equipment: "bodyweight", bodyRegion: "upper", movementType: "push", videoId: "", targetMuscle: "Shoulders" },
+    { id: 18, name: "Handstand Push-ups", equipment: "bodyweight", bodyRegion: "upper", movementType: "push", videoId: "0wDEO6shVjc", targetMuscle: "Shoulders" },
     { id: 19, name: "Hip Thrusts", equipment: "bodyweight", bodyRegion: "lower", movementType: "hinge", videoId: "", targetMuscle: "Glutes" },
     { id: 20, name: "Inchworms", equipment: "bodyweight", bodyRegion: "full", movementType: "gait", videoId: "", targetMuscle: "Core" },
     { id: 21, name: "Jumping Jacks", equipment: "bodyweight", bodyRegion: "full", movementType: "linear", videoId: "", targetMuscle: "Full Body" },
@@ -185,7 +185,7 @@ const ExerciseLibrary = () => {
     { id: 29, name: "One Leg Squats", equipment: "bodyweight", bodyRegion: "lower", movementType: "squat", videoId: "", targetMuscle: "Quadriceps" },
     { id: 30, name: "Plank", equipment: "bodyweight", bodyRegion: "upper", movementType: "isometric", videoId: "", targetMuscle: "Core" },
     { id: 31, name: "Pike Push-ups", equipment: "bodyweight", bodyRegion: "upper", movementType: "push", videoId: "", targetMuscle: "Shoulders" },
-    { id: 32, name: "Push-ups", equipment: "bodyweight", bodyRegion: "upper", movementType: "push", videoId: "", targetMuscle: "Chest" },
+    { id: 32, name: "Push-ups", equipment: "bodyweight", bodyRegion: "upper", movementType: "push", videoId: "_l3ySVKYVJ8", targetMuscle: "Chest" },
     { id: 33, name: "Pull-ups", equipment: "bodyweight", bodyRegion: "upper", movementType: "pull", videoId: "", targetMuscle: "Back" },
     { id: 34, name: "Russian Twists", equipment: "bodyweight", bodyRegion: "upper", movementType: "rotational", videoId: "", targetMuscle: "Abs" },
     { id: 35, name: "Reverse Lunges", equipment: "bodyweight", bodyRegion: "lower", movementType: "lunge", videoId: "", targetMuscle: "Quadriceps" },
