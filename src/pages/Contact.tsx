@@ -231,10 +231,10 @@ const Contact = () => {
       <Helmet>
         <title>Contact Us - Smarty Gym Cyprus | Get in Touch with Haris Falas | smartygym.com</title>
         <meta name="description" content="Contact Smarty Gym Cyprus - Get expert fitness advice from Sports Scientist Haris Falas. Convenient & flexible online training support. Reach us at smartygym.com" />
-        <meta name="keywords" content="contact Smarty Gym, Haris Falas Cyprus contact, fitness coach Cyprus, personal training Cyprus, online gym support, smartygym contact, Cyprus fitness expert, sports scientist Cyprus, training inquiry Cyprus" />
+        <meta name="keywords" content="contact Smarty Gym, Haris Falas Cyprus contact, fitness coach Cyprus, personal training Cyprus, online gym support, smartygym contact, Cyprus fitness expert, sports scientist Cyprus, training inquiry Cyprus, gym reimagined, convenient fitness, flexible online gym" />
         
         <meta property="og:title" content="Contact Smarty Gym Cyprus | Haris Falas" />
-        <meta property="og:description" content="Get in touch with Sports Scientist Haris Falas at Smarty Gym Cyprus for expert fitness guidance" />
+        <meta property="og:description" content="Get in touch with Sports Scientist Haris Falas at Smarty Gym Cyprus for expert fitness guidance and personalized training support" />
         <meta property="og:type" content="website" />
         <meta property="og:url" content="https://smartygym.com/contact" />
         
@@ -244,47 +244,7 @@ const Contact = () => {
         
         <link rel="canonical" href="https://smartygym.com/contact" />
         
-        {/* Local Business Schema */}
-        <script type="application/ld+json">
-          {JSON.stringify({
-            "@context": "https://schema.org",
-            "@type": "LocalBusiness",
-            "name": "Smarty Gym",
-            "url": "https://smartygym.com",
-            "address": {
-              "@type": "PostalAddress",
-              "addressCountry": "CY"
-            },
-            "founder": {
-              "@type": "Person",
-              "name": "Haris Falas",
-              "jobTitle": "Sports Scientist & Strength and Conditioning Coach"
-            },
-            "contactPoint": {
-              "@type": "ContactPoint",
-              "contactType": "Customer Service",
-              "availableLanguage": ["en", "el"]
-            }
-          })}
-        </script>
-      </Helmet>
-      <Helmet>
-        <title>Contact Smarty Gym | Get in Touch with Haris Falas | smartygym.com</title>
-        <meta name="description" content="Contact Smarty Gym (smartygym.com) and reach Haris Falas. Get expert support for convenient & flexible fitness training. Ask about our gym reimagined for anywhere, anytime workouts." />
-        <meta name="keywords" content="contact smarty gym, smartygym contact, smartygym.com, Haris Falas contact, gym reimagined, convenient fitness, flexible online gym, fitness support, online fitness inquiry" />
-        
-        <meta property="og:title" content="Contact Smarty Gym - Reach Haris Falas" />
-        <meta property="og:description" content="Get in touch with Haris Falas and the Smarty Gym team for personalized fitness guidance" />
-        <meta property="og:type" content="website" />
-        <meta property="og:url" content="https://smartygym.com/contact" />
-        
-        <meta property="twitter:card" content="summary" />
-        <meta property="twitter:title" content="Contact Smarty Gym" />
-        <meta property="twitter:description" content="Reach out to Haris Falas at smartygym.com for fitness support" />
-        
-        <link rel="canonical" href="https://smartygym.com/contact" />
-        
-        {/* Structured Data - ContactPage */}
+        {/* Structured Data - ContactPage & LocalBusiness */}
         <script type="application/ld+json">
           {JSON.stringify({
             "@context": "https://schema.org",
@@ -293,13 +253,23 @@ const Contact = () => {
             "description": "Get in touch with Haris Falas and the Smarty Gym team for Cyprus online fitness support and training inquiries",
             "url": "https://smartygym.com/contact",
             "mainEntity": {
-              "@type": "Organization",
+              "@type": "LocalBusiness",
               "name": "Smarty Gym",
               "url": "https://smartygym.com",
               "email": "admin@smartygym.com",
+              "address": {
+                "@type": "PostalAddress",
+                "addressCountry": "CY"
+              },
               "founder": {
                 "@type": "Person",
-                "name": "Haris Falas"
+                "name": "Haris Falas",
+                "jobTitle": "Sports Scientist & Strength and Conditioning Coach"
+              },
+              "contactPoint": {
+                "@type": "ContactPoint",
+                "contactType": "Customer Service",
+                "availableLanguage": ["en", "el"]
               }
             }
           })}
