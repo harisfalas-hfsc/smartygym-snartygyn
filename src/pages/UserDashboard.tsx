@@ -424,6 +424,16 @@ export default function UserDashboard() {
                     {getPlanName(subscriptionInfo.product_id)} Plan
                   </p>
                   
+                  {/* Premium Badge - Always show for premium users */}
+                  {subscriptionInfo.subscribed && (
+                    <div className="flex items-center gap-2 mt-2">
+                      <Badge variant="outline" className="text-sm bg-gradient-to-r from-yellow-500/20 to-amber-500/20 text-yellow-600 dark:text-yellow-400 border-yellow-500/30 px-3 py-1">
+                        <Crown className="h-3.5 w-3.5 mr-1.5" />
+                        Premium Member
+                      </Badge>
+                    </div>
+                  )}
+                  
                   {/* Free Plan Info */}
                   {!subscriptionInfo.subscribed && (
                     <div className="space-y-2 mt-4">
@@ -437,58 +447,66 @@ export default function UserDashboard() {
                   )}
                   
                   {/* Premium Plan Details */}
-                  {subscriptionInfo.subscribed && subscriptionInfo.subscription_end && (
+                  {subscriptionInfo.subscribed && (
                     <div className="space-y-4 mt-4">
                       {/* Status Badges */}
                       <div className="flex flex-wrap gap-2">
-                        <Badge variant="outline" className="text-xs bg-green-500/10 text-green-600 border-green-500/20">
+                        <Badge variant="outline" className="text-xs bg-green-500/10 text-green-600 dark:text-green-400 border-green-500/20">
                           Active Subscription
                         </Badge>
                         {stripeDetails?.cancel_at_period_end ? (
-                          <Badge variant="outline" className="text-xs bg-orange-500/10 text-orange-600 border-orange-500/20">
+                          <Badge variant="outline" className="text-xs bg-orange-500/10 text-orange-600 dark:text-orange-400 border-orange-500/20">
                             Cancels at period end
                           </Badge>
-                        ) : (
-                          <Badge variant="outline" className="text-xs bg-blue-500/10 text-blue-600 border-blue-500/20">
+                        ) : subscriptionInfo.subscription_end ? (
+                          <Badge variant="outline" className="text-xs bg-blue-500/10 text-blue-600 dark:text-blue-400 border-blue-500/20">
                             Auto-renewing
                           </Badge>
-                        )}
+                        ) : null}
                       </div>
                       
-                      {/* Subscription Details Grid */}
-                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 p-4 bg-background/50 rounded-lg border border-border/50">
-                        {/* Subscription Start */}
-                        {stripeDetails?.current_period_start && (
+                      {/* Subscription Details Grid - Only show if dates exist */}
+                      {subscriptionInfo.subscription_end ? (
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 p-4 bg-background/50 rounded-lg border border-border/50">
+                          {/* Subscription Start */}
+                          {stripeDetails?.current_period_start && (
+                            <div>
+                              <p className="text-xs text-muted-foreground mb-1">Subscription Started</p>
+                              <p className="font-semibold">{formatTimestamp(stripeDetails.current_period_start)}</p>
+                            </div>
+                          )}
+                          
+                          {/* Next Billing Date */}
                           <div>
-                            <p className="text-xs text-muted-foreground mb-1">Subscription Started</p>
-                            <p className="font-semibold">{formatTimestamp(stripeDetails.current_period_start)}</p>
+                            <p className="text-xs text-muted-foreground mb-1">
+                              {stripeDetails?.cancel_at_period_end ? "Expires On" : "Next Billing Date"}
+                            </p>
+                            <p className="font-semibold">{formatDate(subscriptionInfo.subscription_end)}</p>
                           </div>
-                        )}
-                        
-                        {/* Next Billing Date */}
-                        <div>
-                          <p className="text-xs text-muted-foreground mb-1">
-                            {stripeDetails?.cancel_at_period_end ? "Expires On" : "Next Billing Date"}
-                          </p>
-                          <p className="font-semibold">{formatDate(subscriptionInfo.subscription_end)}</p>
-                        </div>
-                        
-                        {/* Days Remaining */}
-                        {getDaysRemaining() !== null && (
+                          
+                          {/* Days Remaining */}
+                          {getDaysRemaining() !== null && (
+                            <div>
+                              <p className="text-xs text-muted-foreground mb-1">Days Remaining</p>
+                              <p className="font-semibold text-primary">{getDaysRemaining()} days</p>
+                            </div>
+                          )}
+                          
+                          {/* Billing Type */}
                           <div>
-                            <p className="text-xs text-muted-foreground mb-1">Days Remaining</p>
-                            <p className="font-semibold text-primary">{getDaysRemaining()} days</p>
+                            <p className="text-xs text-muted-foreground mb-1">Billing Type</p>
+                            <p className="font-semibold">
+                              {stripeDetails?.cancel_at_period_end ? "One-time (No renewal)" : "Recurring Monthly"}
+                            </p>
                           </div>
-                        )}
-                        
-                        {/* Billing Type */}
-                        <div>
-                          <p className="text-xs text-muted-foreground mb-1">Billing Type</p>
-                          <p className="font-semibold">
-                            {stripeDetails?.cancel_at_period_end ? "One-time (No renewal)" : "Recurring Monthly"}
+                        </div>
+                      ) : (
+                        <div className="p-4 bg-background/50 rounded-lg border border-border/50">
+                          <p className="text-sm text-muted-foreground">
+                            Your subscription is active. Use the buttons below to manage your subscription or refresh to see billing details.
                           </p>
                         </div>
-                      </div>
+                      )}
                       
                       {/* Action Buttons */}
                       <div className="flex flex-col sm:flex-row gap-3">
@@ -512,7 +530,7 @@ export default function UserDashboard() {
                       <p className="text-xs text-muted-foreground">
                         {stripeDetails?.cancel_at_period_end 
                           ? "Your subscription will end on the expiration date. You can reactivate anytime before then."
-                          : "You can cancel, update payment method, or view billing history in the subscription portal."
+                          : "You can cancel, update payment method, or view billing history by clicking 'Manage Subscription' above."
                         }
                       </p>
                     </div>

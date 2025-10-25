@@ -3,6 +3,7 @@ import { useNavigate, useLocation } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { User } from "@supabase/supabase-js";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import {
   DropdownMenu,
@@ -251,10 +252,15 @@ export const Navigation = () => {
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <Button variant="ghost" className="relative h-10 w-10 rounded-full">
-                    <Avatar className="h-10 w-10">
+                    <Avatar className={`h-10 w-10 ${subscriptionInfo?.subscribed ? 'ring-2 ring-yellow-500 ring-offset-2 ring-offset-background' : ''}`}>
                       <AvatarImage src={avatarUrl || undefined} alt="Profile" />
                       <AvatarFallback>{getUserInitials()}</AvatarFallback>
                     </Avatar>
+                    {subscriptionInfo?.subscribed && (
+                      <div className="absolute -top-1 -right-1 h-4 w-4 rounded-full bg-yellow-500 flex items-center justify-center">
+                        <Crown className="h-2.5 w-2.5 text-white" />
+                      </div>
+                    )}
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent className="w-56 bg-popover" align="end" forceMount sideOffset={5}>
@@ -274,16 +280,28 @@ export const Navigation = () => {
                     <>
                       <DropdownMenuLabel className="font-normal">
                         <div className="flex items-center gap-2">
-                          <Crown className="h-4 w-4 text-primary" />
-                          <div className="flex flex-col space-y-1">
-                            <p className="text-sm font-medium leading-none">
-                              {subscriptionInfo.subscribed
-                                ? `${getPlanName(subscriptionInfo.product_id)} Plan`
-                                : "Free Plan"}
-                            </p>
+                          <Crown className={`h-4 w-4 ${subscriptionInfo.subscribed ? 'text-yellow-500' : 'text-muted-foreground'}`} />
+                          <div className="flex flex-col space-y-1 flex-1">
+                            <div className="flex items-center gap-2">
+                              <p className="text-sm font-medium leading-none">
+                                {subscriptionInfo.subscribed
+                                  ? `${getPlanName(subscriptionInfo.product_id)} Plan`
+                                  : "Free Plan"}
+                              </p>
+                              {subscriptionInfo.subscribed && (
+                                <Badge variant="outline" className="text-[10px] bg-gradient-to-r from-yellow-500/20 to-amber-500/20 text-yellow-600 dark:text-yellow-400 border-yellow-500/30 px-1.5 py-0">
+                                  Premium
+                                </Badge>
+                              )}
+                            </div>
                             {subscriptionInfo.subscribed && subscriptionInfo.subscription_end && (
                               <p className="text-xs leading-none text-muted-foreground">
                                 Until {new Date(subscriptionInfo.subscription_end).toLocaleDateString()}
+                              </p>
+                            )}
+                            {subscriptionInfo.subscribed && !subscriptionInfo.subscription_end && (
+                              <p className="text-xs leading-none text-muted-foreground">
+                                Active subscription
                               </p>
                             )}
                           </div>
