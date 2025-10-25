@@ -64,9 +64,9 @@ const WorkoutFlow = () => {
   return (
     <>
       <Helmet>
-        <title>Workouts - Smarty Gym | Free AMRAP TABATA HIIT Circuit Training Cyprus | Haris Falas | smartygym.com</title>
-        <meta name="description" content="Browse 60+ standalone workout sessions at smartygym.com - AMRAP, TABATA, HIIT, circuit, for time workouts by Sports Scientist Haris Falas. Free bodyweight & equipment workouts: strength, cardio, metabolic, mobility, power, challenge training. Convenient & flexible gym reimagined for Cyprus and worldwide." />
-        <meta name="keywords" content="smartygym workouts, smarty gym, smartygym.com, Haris Falas workouts Cyprus, free workouts, AMRAP workouts, TABATA training, HIIT workouts Cyprus, circuit training, for time workouts, bodyweight training, no equipment workouts, strength training, cardio workouts, metabolic conditioning, mobility training, power workouts, challenge workouts, convenient fitness, flexible training, gym reimagined, online workouts Cyprus, functional fitness Cyprus, home workouts, explosive training, plyometric workouts, kettlebell workouts, resistance band training" />
+        <title>Workouts - Smarty Gym | Smart Gym Online Fitness | Free AMRAP TABATA HIIT | smartygym.com</title>
+        <meta name="description" content="Browse 60+ smart gym online fitness workouts at smartygym.com - AMRAP, TABATA, HIIT by Sports Scientist Haris Falas. Free bodyweight & equipment workouts: strength, cardio, metabolic, mobility. Your convenient online fitness solution for Cyprus and worldwide." />
+        <meta name="keywords" content="smarty gym workouts, smart gym, online fitness workouts, smartygym, smartygym.com, online gym, Haris Falas workouts, free workouts, AMRAP workouts, TABATA training, HIIT workouts, circuit training, bodyweight training, no equipment workouts, strength training, cardio workouts, metabolic conditioning, mobility training, power workouts, challenge workouts, convenient fitness, flexible training, online workouts, functional fitness, home workouts, online gym Cyprus" />
         
         <meta property="og:title" content="Workouts - Smarty Gym | Fitness Reimagined" />
         <meta property="og:description" content="Convenient & flexible workouts designed by Sports Scientist Haris Falas - train anywhere, anytime" />
@@ -94,12 +94,12 @@ const WorkoutFlow = () => {
           <span className="text-xs sm:text-sm">Back</span>
         </Button>
         
-        <h1 className="text-3xl sm:text-4xl font-bold text-center mb-3">Workouts</h1>
+        <h1 className="text-3xl sm:text-4xl font-bold text-center mb-3">Smart Gym Online Fitness Workouts</h1>
         <p className="text-center text-lg text-foreground mb-2 max-w-3xl mx-auto">
-          Choose your goal and start your workout today — train smarter with science-based sessions.
+          Choose your goal and start your online fitness workout today — train smarter with science-based sessions at smartygym.com
         </p>
         <p className="text-center text-sm text-muted-foreground mb-6 max-w-2xl mx-auto">
-          All workouts designed by Sports Scientist <a href="/coach-profile" className="text-primary hover:underline font-medium">Haris Falas</a>, based on real human performance principles.
+          All smart gym workouts designed by Sports Scientist <a href="/coach-profile" className="text-primary hover:underline font-medium">Haris Falas</a> for convenient online fitness training anywhere, anytime.
         </p>
         
         {/* Info Ribbon */}

@@ -58,9 +58,9 @@ const TrainingProgramFlow = () => {
   return (
     <>
       <Helmet>
-        <title>Training Programs - Smarty Gym | 6-8 Week Structured Programs Cyprus | smartygym.com</title>
-        <meta name="description" content="Structured 6-8 week training programs by Sports Scientist Haris Falas at smartygym.com. Results-based programs for cardio endurance, functional strength, muscle hypertrophy, weight loss, low back pain rehab, mobility & stability. Convenient & flexible gym reimagined for Cyprus and worldwide - evidence-based progressive training anywhere, anytime." />
-        <meta name="keywords" content="training programs Cyprus, smartygym programs, smarty gym, smartygym.com, Haris Falas programs, 6 week programs, 8 week programs, cardio endurance program, functional strength program, muscle hypertrophy program, weight loss program Cyprus, back pain program, mobility program, structured training Cyprus, progressive training, evidence-based programs, convenient fitness, flexible training, gym reimagined, online gym Cyprus, sports scientist Cyprus, workout programs, fitness programs Cyprus" />
+        <title>Training Programs - Smarty Gym | Smart Gym Online Fitness Programs | smartygym.com</title>
+        <meta name="description" content="Smart gym online fitness: Structured 6-8 week training programs by Sports Scientist Haris Falas at smartygym.com. Programs for cardio, strength, muscle growth, weight loss, mobility. Your convenient online gym for Cyprus and worldwide." />
+        <meta name="keywords" content="smart gym programs, online fitness programs, smarty gym, smartygym, smartygym.com, online gym programs, training programs, Haris Falas programs, 6 week programs, 8 week programs, cardio endurance, functional strength, muscle hypertrophy, weight loss program, back pain program, mobility program, structured training, progressive training, evidence-based programs, convenient fitness, flexible training, online gym, sports scientist, workout programs, fitness programs" />
         
         <meta property="og:title" content="Training Programs - Smarty Gym Cyprus" />
         <meta property="og:description" content="Structured training programs designed by Sports Scientist Haris Falas" />
@@ -88,12 +88,12 @@ const TrainingProgramFlow = () => {
           <span className="text-xs sm:text-sm">Back</span>
         </Button>
         
-        <h1 className="text-3xl sm:text-4xl font-bold text-center mb-3">Training Programs</h1>
+        <h1 className="text-3xl sm:text-4xl font-bold text-center mb-3">Smart Gym Online Fitness Programs</h1>
         <p className="text-center text-lg text-foreground mb-2 max-w-3xl mx-auto">
-          Structured 6–8 week programs created by Sports Scientist <a href="/coach-profile" className="text-primary hover:underline font-medium">Haris Falas</a>.
+          Structured 6–8 week online fitness programs created by Sports Scientist <a href="/coach-profile" className="text-primary hover:underline font-medium">Haris Falas</a> at smartygym.com
         </p>
         <p className="text-center text-sm text-muted-foreground mb-6 max-w-2xl mx-auto">
-          Build strength, lose fat, improve mobility — all through evidence-based, functional training.
+          Build strength, lose fat, improve mobility — your smart gym for evidence-based functional training anywhere, anytime.
         </p>
         
         {/* Info Ribbon */}
