@@ -160,9 +160,9 @@ export default function JoinPremium() {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-4xl mx-auto mb-8">
             {/* Gold Plan */}
             <Card className="relative border-2 border-amber-500 shadow-lg">
-              <div className="absolute -top-3 left-1/2 -translate-x-1/2">
-                <Badge className="bg-amber-500 text-white px-4 py-1.5 text-sm">
-                  ⭐ GOLD PLAN
+              <div className="absolute -top-2 -right-2">
+                <Badge className="bg-amber-500 text-white px-3 py-1 text-xs">
+                  ⭐ GOLD
                 </Badge>
               </div>
               <CardHeader>
@@ -207,9 +207,9 @@ export default function JoinPremium() {
 
             {/* Platinum Plan */}
             <Card className="relative border-2 border-primary shadow-lg">
-              <div className="absolute -top-3 left-1/2 -translate-x-1/2">
-                <Badge className="bg-primary text-primary-foreground px-4 py-1.5 text-sm">
-                  🏆 BEST VALUE - SAVE 25%
+              <div className="absolute -top-2 -right-2">
+                <Badge className="bg-primary text-primary-foreground px-3 py-1 text-xs">
+                  🏆 SAVE 25%
                 </Badge>
               </div>
               <CardHeader>
