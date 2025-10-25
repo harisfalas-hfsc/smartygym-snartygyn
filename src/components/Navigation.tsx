@@ -248,7 +248,7 @@ export const Navigation = () => {
             <ThemeToggle />
             
             {user ? (
-              <DropdownMenu modal={false}>
+              <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <Button variant="ghost" className="relative h-10 w-10 rounded-full">
                     <Avatar className="h-10 w-10">
@@ -257,7 +257,7 @@ export const Navigation = () => {
                     </Avatar>
                   </Button>
                 </DropdownMenuTrigger>
-                <DropdownMenuContent className="w-56" align="end" forceMount sideOffset={5}>
+                <DropdownMenuContent className="w-56 bg-popover" align="end" forceMount sideOffset={5}>
                   <DropdownMenuLabel className="font-normal">
                     <div className="flex flex-col space-y-1">
                       <p className="text-sm font-medium leading-none">
