@@ -71,7 +71,7 @@ export default function PremiumBenefits() {
     {
       category: "Exercise Library",
       icon: BookOpen,
-      visitor: "View only",
+      visitor: "Full access",
       subscriber: "Full access",
       premium: "Full access"
     },
@@ -85,7 +85,7 @@ export default function PremiumBenefits() {
     {
       category: "Blog",
       icon: BookOpen,
-      visitor: "View only",
+      visitor: "Full access",
       subscriber: "Full access",
       premium: "Full access"
     },
