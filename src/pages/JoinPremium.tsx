@@ -164,7 +164,7 @@ export default function JoinPremium() {
                 <div className="mb-3">
                   <h2 className="text-2xl font-bold text-amber-600 dark:text-amber-400">Gold Plan</h2>
                 </div>
-                <Badge className="bg-card text-foreground border-2 border-amber-500 mx-auto mb-4">
+                <Badge className="bg-amber-500 text-white mx-auto mb-4">
                   MONTHLY SUBSCRIPTION
                 </Badge>
                 <CardTitle className="text-3xl font-bold">€9.99</CardTitle>
