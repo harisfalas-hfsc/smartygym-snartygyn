@@ -125,12 +125,20 @@ serve(async (req) => {
       const priceId = activeSubscription.items.data[0]?.price?.id;
       logStep("Checking price ID", { priceId });
       
+      // Gold Plan: €9.99/month
       if (priceId === "price_1SJ9q1IxQYg9inGKZzxxqPbD") {
         planType = 'gold';
-      } else if (priceId === "price_1SJ9qGIxQYg9inGKFbgqVRjj") {
+        logStep("Matched Gold Plan", { priceId, productId: "prod_TFfAcybp438BH6" });
+      } 
+      // Platinum Plan: €89.99/year
+      else if (priceId === "price_1SJ9qGIxQYg9inGKFbgqVRjj") {
         planType = 'platinum';
+        logStep("Matched Platinum Plan", { priceId, productId: "prod_TFfAPp1tq7RdUk" });
+      } else {
+        logStep("Unknown price ID - defaulting to free", { priceId });
       }
-      logStep("Determined plan type", { planType });
+      
+      logStep("Determined plan type", { planType, interval: activeSubscription.items.data[0]?.price?.recurring?.interval });
 
       // Update database with subscription info
       const { error: upsertError } = await supabaseClient

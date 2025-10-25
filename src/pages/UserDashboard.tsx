@@ -242,8 +242,10 @@ export default function UserDashboard() {
 
   const getPlanName = (productId: string | null) => {
     if (!productId) return "Free";
-    if (productId.includes("gold") || productId === "prod_SxiRoBlC4pPZkV") return "Gold";
-    if (productId.includes("platinum") || productId === "prod_SxiRyLMu9u8NPC") return "Platinum";
+    // Use plan_type from database (gold, platinum, free)
+    if (productId === "gold") return "Gold";
+    if (productId === "platinum") return "Platinum";
+    if (productId === "free") return "Free";
     return "Premium";
   };
 
@@ -305,6 +307,37 @@ export default function UserDashboard() {
       });
     } finally {
       setManagingSubscription(false);
+    }
+  };
+
+  const handleRefreshSubscription = async () => {
+    if (!user) return;
+    
+    setLoading(true);
+    try {
+      // Force refresh from Stripe
+      const { data, error } = await supabase.functions.invoke('check-subscription');
+      
+      if (error) {
+        throw error;
+      }
+      
+      // Reload subscription data
+      await checkSubscription();
+      
+      toast({
+        title: "Subscription refreshed",
+        description: "Your subscription status has been updated from Stripe",
+      });
+    } catch (error) {
+      console.error('Error refreshing subscription:', error);
+      toast({
+        title: "Error",
+        description: "Failed to refresh subscription status. Please try again.",
+        variant: "destructive"
+      });
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -443,6 +476,14 @@ export default function UserDashboard() {
                       
                       {/* Action Buttons */}
                       <div className="flex flex-col sm:flex-row gap-3">
+                        <Button 
+                          onClick={handleRefreshSubscription}
+                          disabled={loading}
+                          variant="outline"
+                          className="flex-1"
+                        >
+                          {loading ? "Refreshing..." : "Refresh Status"}
+                        </Button>
                         <Button 
                           onClick={handleManageSubscription}
                           disabled={managingSubscription}
