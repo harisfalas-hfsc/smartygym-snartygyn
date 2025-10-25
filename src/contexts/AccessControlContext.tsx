@@ -28,7 +28,24 @@ export const AccessControlProvider = ({ children }: { children: ReactNode }) => 
   });
 
   useEffect(() => {
-    checkAccess();
+    let timeoutId: NodeJS.Timeout;
+    
+    const init = async () => {
+      // Set timeout for loading check
+      timeoutId = setTimeout(() => {
+        setState(prev => {
+          if (prev.isLoading) {
+            console.warn("Access control check timed out, forcing completion");
+            return { ...prev, isLoading: false };
+          }
+          return prev;
+        });
+      }, 5000);
+      
+      await checkAccess();
+    };
+
+    init();
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (_event, session) => {
@@ -45,20 +62,9 @@ export const AccessControlProvider = ({ children }: { children: ReactNode }) => 
       }
     );
 
-    // Add safety timeout - if loading takes more than 10 seconds, force it to complete
-    const timeout = setTimeout(() => {
-      if (state.isLoading) {
-        console.warn("Access control check timed out, forcing completion");
-        setState(prev => ({
-          ...prev,
-          isLoading: false
-        }));
-      }
-    }, 10000);
-
     return () => {
       subscription.unsubscribe();
-      clearTimeout(timeout);
+      clearTimeout(timeoutId);
     };
   }, []);
 

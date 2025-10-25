@@ -104,16 +104,35 @@ export const Navigation = () => {
 
   const handleLogout = async () => {
     try {
-      await supabase.auth.signOut();
+      // Clear all local state first
       setUser(null);
       setAvatarUrl(null);
       setSubscriptionInfo(null);
+      
+      // Sign out with global scope to clear all sessions
+      const { error } = await supabase.auth.signOut({ scope: 'global' });
+      
+      if (error) {
+        console.error("Logout error:", error);
+        toast({
+          title: "Error",
+          description: "Failed to log out completely. Please try again.",
+          variant: "destructive"
+        });
+        return;
+      }
+      
       toast({
         title: "Logged out",
         description: "You have been logged out successfully",
       });
+      
+      // Navigate to home and force page reload to clear all state
       navigate("/");
-      setTimeout(() => window.scrollTo(0, 0), 0);
+      setTimeout(() => {
+        window.scrollTo(0, 0);
+        window.location.reload();
+      }, 100);
     } catch (error) {
       console.error("Logout error:", error);
       toast({
@@ -227,7 +246,7 @@ export const Navigation = () => {
             <ThemeToggle />
             
             {user ? (
-              <DropdownMenu>
+              <DropdownMenu modal={false}>
                 <DropdownMenuTrigger asChild>
                   <Button variant="ghost" className="relative h-10 w-10 rounded-full">
                     <Avatar className="h-10 w-10">
@@ -236,7 +255,7 @@ export const Navigation = () => {
                     </Avatar>
                   </Button>
                 </DropdownMenuTrigger>
-                <DropdownMenuContent className="w-56" align="end" forceMount>
+                <DropdownMenuContent className="w-56" align="end" forceMount sideOffset={5}>
                   <DropdownMenuLabel className="font-normal">
                     <div className="flex flex-col space-y-1">
                       <p className="text-sm font-medium leading-none">
@@ -273,8 +292,7 @@ export const Navigation = () => {
                   )}
                   
                   <DropdownMenuItem 
-                    onSelect={(e) => {
-                      e.preventDefault();
+                    onSelect={() => {
                       handleProfileNavigate("/userdashboard");
                     }}
                   >
@@ -282,8 +300,7 @@ export const Navigation = () => {
                     <span>My Dashboard</span>
                   </DropdownMenuItem>
                   <DropdownMenuItem 
-                    onSelect={(e) => {
-                      e.preventDefault();
+                    onSelect={() => {
                       handleProfileNavigate("/profilesettings");
                     }}
                   >
@@ -292,8 +309,7 @@ export const Navigation = () => {
                   </DropdownMenuItem>
                   <DropdownMenuSeparator />
                   <DropdownMenuItem 
-                    onSelect={(e) => {
-                      e.preventDefault();
+                    onSelect={() => {
                       handleLogout();
                     }}
                   >

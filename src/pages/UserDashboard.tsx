@@ -110,7 +110,22 @@ export default function UserDashboard() {
   const [calorieHistory, setCalorieHistory] = useState<CalorieRecord[]>([]);
 
   useEffect(() => {
+    // Set a safety timeout for loading
+    const loadingTimeout = setTimeout(() => {
+      if (loading) {
+        console.warn("Dashboard loading timed out");
+        setLoading(false);
+        toast({
+          title: "Warning",
+          description: "Dashboard took too long to load. Some data may be incomplete.",
+          variant: "destructive"
+        });
+      }
+    }, 8000);
+
     initDashboard();
+
+    return () => clearTimeout(loadingTimeout);
   }, []);
 
   const initDashboard = async () => {
