@@ -448,56 +448,6 @@ export default function PremiumBenefits() {
               Cancel anytime • No hidden fees • Secure payment
             </p>
           </div>
-
-          {/* Testimonials */}
-          <Card className="mt-12">
-            <CardHeader>
-              <CardTitle>What Our Premium Members Say</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <div className="p-4 bg-muted rounded-lg">
-                  <div className="flex items-center gap-1 mb-2">
-                    {[...Array(5)].map((_, i) => (
-                      <svg key={i} className="h-4 w-4 fill-yellow-500" viewBox="0 0 20 20">
-                        <path d="M10 15l-5.878 3.09 1.123-6.545L.489 6.91l6.572-.955L10 0l2.939 5.955 6.572.955-4.756 4.635 1.123 6.545z" />
-                      </svg>
-                    ))}
-                  </div>
-                  <p className="text-sm italic mb-2">
-                    "The yearly plan was the best investment I made in my fitness journey. Totally worth it!"
-                  </p>
-                  <p className="text-xs text-muted-foreground">— Sarah M., Gold Member</p>
-                </div>
-                <div className="p-4 bg-muted rounded-lg">
-                  <div className="flex items-center gap-1 mb-2">
-                    {[...Array(5)].map((_, i) => (
-                      <svg key={i} className="h-4 w-4 fill-yellow-500" viewBox="0 0 20 20">
-                        <path d="M10 15l-5.878 3.09 1.123-6.545L.489 6.91l6.572-.955L10 0l2.939 5.955 6.572.955-4.756 4.635 1.123 6.545z" />
-                      </svg>
-                    ))}
-                  </div>
-                  <p className="text-sm italic mb-2">
-                    "I've tried 3 months and the progress tracking features helped me stay consistent."
-                  </p>
-                  <p className="text-xs text-muted-foreground">— Michael T., Platinum Member</p>
-                </div>
-                <div className="p-4 bg-muted rounded-lg">
-                  <div className="flex items-center gap-1 mb-2">
-                    {[...Array(5)].map((_, i) => (
-                      <svg key={i} className="h-4 w-4 fill-yellow-500" viewBox="0 0 20 20">
-                        <path d="M10 15l-5.878 3.09 1.123-6.545L.489 6.91l6.572-.955L10 0l2.939 5.955 6.572.955-4.756 4.635 1.123 6.545z" />
-                      </svg>
-                    ))}
-                  </div>
-                  <p className="text-sm italic mb-2">
-                    "Great value for money, especially with the annual plan. Highly recommend!"
-                  </p>
-                  <p className="text-xs text-muted-foreground">— Emma L., Platinum Member</p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
         </main>
       </div>
     </>
