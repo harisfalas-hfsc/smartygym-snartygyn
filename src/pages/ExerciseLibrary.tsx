@@ -61,12 +61,14 @@ const ExerciseLibrary = () => {
                 </p>
                 <div className="flex justify-center">
                   <Button
-                    onClick={() => window.open('https://www.youtube.com/@TheSmartyGym', '_blank')}
+                    asChild
                     className="gap-2"
                     size="lg"
                   >
-                    <Youtube className="h-5 w-5" />
-                    Visit YouTube Channel
+                    <a href="https://www.youtube.com/@TheSmartyGym" target="_blank" rel="noopener noreferrer">
+                      <Youtube className="h-5 w-5" />
+                      Visit YouTube Channel
+                    </a>
                   </Button>
                 </div>
               </div>
