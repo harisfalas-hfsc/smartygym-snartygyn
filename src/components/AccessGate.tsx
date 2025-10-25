@@ -122,7 +122,7 @@ export const AccessGate = ({
               This {contentType} is available exclusively to Gold and Platinum subscribers. Upgrade now to unlock all premium content!
             </p>
             <div className="space-y-2 pt-4">
-              <Button onClick={() => navigate("/")} className="w-full" size="lg">
+              <Button onClick={() => navigate("/premiumbenefits")} className="w-full" size="lg">
                 <Crown className="w-4 h-4 mr-2" />
                 View Premium Plans
               </Button>
