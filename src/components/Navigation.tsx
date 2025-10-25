@@ -154,9 +154,11 @@ export const Navigation = () => {
 
   const getPlanName = (productId: string | null) => {
     if (!productId) return null;
-    // productId is the plan_type from database ('gold' or 'platinum')
-    if (productId === "gold") return "Gold";
-    if (productId === "platinum") return "Platinum";
+    // productId is the plan_type from database ('gold', 'platinum', or 'free')
+    const planType = productId.toLowerCase();
+    if (planType === "gold") return "Gold";
+    if (planType === "platinum") return "Platinum";
+    if (planType === "free") return null; // Don't show "Free" as a plan name
     return "Premium";
   };
 
