@@ -11,6 +11,7 @@ import { WorkoutInfoBar } from "@/components/WorkoutInfoBar";
 import { ShareButtons } from "@/components/ShareButtons";
 import { WorkoutInteractions } from "@/components/WorkoutInteractions";
 import { ProgramInteractions } from "@/components/ProgramInteractions";
+import { useAccessControl } from "@/hooks/useAccessControl";
 
 interface Exercise {
   name: string;
@@ -94,6 +95,8 @@ export const WorkoutDisplay = ({
   isFreeContent = false
 }: WorkoutDisplayProps) => {
   const navigate = useNavigate();
+  const { userTier } = useAccessControl();
+  const isPremium = userTier === "premium";
   const [currentVideoId, setCurrentVideoId] = useState<string>(exercises[0]?.video_id || "");
   const [workTime, setWorkTime] = useState(20);
   const [restTime, setRestTime] = useState(10);
@@ -562,15 +565,17 @@ export const WorkoutDisplay = ({
       </div>
       
       {/* Bottom CTA Banner */}
-      <div className="bg-card border border-border rounded-xl p-6 text-center shadow-soft mt-8">
-        <h3 className="text-xl font-semibold mb-2">Want more like this?</h3>
-        <p className="text-muted-foreground mb-4">
-          Unlock 100+ workouts and all programs with Smarty Gym Premium.
-        </p>
-        <Button size="lg" onClick={() => navigate("/premiumbenefits")}>
-          Join Premium
-        </Button>
-      </div>
+      {!isPremium && (
+        <div className="bg-card border border-border rounded-xl p-6 text-center shadow-soft mt-8">
+          <h3 className="text-xl font-semibold mb-2">Want more like this?</h3>
+          <p className="text-muted-foreground mb-4">
+            Unlock 100+ workouts and all programs with Smarty Gym Premium.
+          </p>
+          <Button size="lg" onClick={() => navigate("/premiumbenefits")}>
+            Join Premium
+          </Button>
+        </div>
+      )}
     </div>
   );
 };

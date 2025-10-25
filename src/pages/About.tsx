@@ -6,10 +6,13 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/
 import { ArrowLeft, Award, Heart, Users, Target, UserCheck, Brain, Shield, Sparkles, Ban, CheckCircle2, Compass } from "lucide-react";
 import { BackToTop } from "@/components/BackToTop";
 import { useShowBackButton } from "@/hooks/useShowBackButton";
+import { useAccessControl } from "@/hooks/useAccessControl";
 
 const About = () => {
   const navigate = useNavigate();
   const { canGoBack, goBack } = useShowBackButton();
+  const { userTier } = useAccessControl();
+  const isPremium = userTier === "premium";
 
   return (
     <>
@@ -468,10 +471,12 @@ const About = () => {
                   <Target className="w-5 h-5" />
                   Try Free Workouts
                 </Button>
-                <Button size="lg" variant="outline" onClick={() => navigate("/premiumbenefits")} className="gap-2">
-                  <UserCheck className="w-5 h-5" />
-                  Join Premium
-                </Button>
+                {!isPremium && (
+                  <Button size="lg" variant="outline" onClick={() => navigate("/premiumbenefits")} className="gap-2">
+                    <UserCheck className="w-5 h-5" />
+                    Join Premium
+                  </Button>
+                )}
               </div>
           </CardContent>
         </Card>

@@ -15,24 +15,12 @@ serve(async (req) => {
   try {
     const { type, data } = await req.json();
     const LOVABLE_API_KEY = Deno.env.get('LOVABLE_API_KEY');
-    const SUPABASE_URL = Deno.env.get('SUPABASE_URL');
-    const SUPABASE_ANON_KEY = Deno.env.get('SUPABASE_ANON_KEY');
     
     if (!LOVABLE_API_KEY) {
       throw new Error('LOVABLE_API_KEY is not configured');
     }
 
-    // Fetch available exercises from database
-    const supabase = createClient(SUPABASE_URL!, SUPABASE_ANON_KEY!);
-    const { data: exercises, error: exercisesError } = await supabase
-      .from('exercises')
-      .select('name, video_id, video_url');
-    
-    if (exercisesError) {
-      console.error('Error fetching exercises:', exercisesError);
-    }
-    
-    // Fallback exercises if database is empty
+    // Use fallback exercises since exercise library has been moved to YouTube
     const fallbackExercises = [
       'Push-ups', 'Pull-ups', 'Squats', 'Lunges', 'Planks', 'Mountain Climbers',
       'Burpees', 'Jumping Jacks', 'High Knees', 'Dumbbell Rows', 'Bench Press',
@@ -43,11 +31,9 @@ serve(async (req) => {
       'Wall Sits', 'Step-ups', 'Box Jumps', 'Kettlebell Swings', 'Farmer Walks'
     ];
     
-    const exerciseList = exercises && exercises.length > 0 
-      ? exercises.map(e => e.name).join(', ')
-      : fallbackExercises.join(', ');
+    const exerciseList = fallbackExercises.join(', ');
     
-    console.log(`Available exercises (${exercises?.length || fallbackExercises.length}):`, exerciseList);
+    console.log(`Available exercises (${fallbackExercises.length}):`, exerciseList);
 
     let systemPrompt = '';
     let userPrompt = '';
@@ -177,10 +163,9 @@ Available exercises: ${exerciseList}`;
     const planData = await response.json();
     const generatedPlan = planData.choices[0].message.content;
 
-    // Return plan with exercises data for video linking
+    // Return plan without exercises data
     return new Response(JSON.stringify({ 
-      plan: generatedPlan,
-      exercises: exercises || []
+      plan: generatedPlan
     }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     });

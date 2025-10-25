@@ -5,9 +5,12 @@ import { Card } from "@/components/ui/card";
 import { ArrowLeft, Heart, Dumbbell, Activity, Flame, User, Move, Scale } from "lucide-react";
 import { BackToTop } from "@/components/BackToTop";
 import { TimedPopup } from "@/components/TimedPopup";
+import { useAccessControl } from "@/hooks/useAccessControl";
 
 const TrainingProgramFlow = () => {
   const navigate = useNavigate();
+  const { userTier } = useAccessControl();
+  const isPremium = userTier === "premium";
 
   const programTypes = [
     {
@@ -94,14 +97,16 @@ const TrainingProgramFlow = () => {
         </p>
         
         {/* Info Ribbon */}
-        <div className="bg-primary/10 border border-primary/20 rounded-lg p-4 mb-8 text-center">
-          <p className="text-sm text-muted-foreground mb-2">
-            Every SMARTY GYM program is a complete path toward better performance and health—but results multiply when training meets smart recovery and mindful living. Stay disciplined, fuel your body intelligently, rest deeply, and treat movement as a daily practice—not a task. That's the SMARTY GYM way.
-          </p>
-          <Button variant="default" size="sm" onClick={() => navigate("/premiumbenefits")}>
-            Join Premium
-          </Button>
-        </div>
+        {!isPremium && (
+          <div className="bg-primary/10 border border-primary/20 rounded-lg p-4 mb-8 text-center">
+            <p className="text-sm text-muted-foreground mb-2">
+              Every SMARTY GYM program is a complete path toward better performance and health—but results multiply when training meets smart recovery and mindful living. Stay disciplined, fuel your body intelligently, rest deeply, and treat movement as a daily practice—not a task. That's the SMARTY GYM way.
+            </p>
+            <Button variant="default" size="sm" onClick={() => navigate("/premiumbenefits")}>
+              Join Premium
+            </Button>
+          </div>
+        )}
         
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
           {programTypes.map((program) => {
@@ -135,15 +140,17 @@ const TrainingProgramFlow = () => {
         </div>
 
         {/* Bottom Premium Banner */}
-        <div className="bg-card border border-border rounded-xl p-6 mt-8 text-center shadow-soft">
-          <h3 className="text-xl font-semibold mb-2">Start your transformation</h3>
-          <p className="text-muted-foreground mb-4">
-            Join Smarty Gym Premium for full access to all training programs.
-          </p>
-          <Button size="lg" onClick={() => navigate("/premiumbenefits")}>
-            Join Premium
-          </Button>
-        </div>
+        {!isPremium && (
+          <div className="bg-card border border-border rounded-xl p-6 mt-8 text-center shadow-soft">
+            <h3 className="text-xl font-semibold mb-2">Start your transformation</h3>
+            <p className="text-muted-foreground mb-4">
+              Join Smarty Gym Premium for full access to all training programs.
+            </p>
+            <Button size="lg" onClick={() => navigate("/premiumbenefits")}>
+              Join Premium
+            </Button>
+          </div>
+        )}
       </div>
       </div>
     </>

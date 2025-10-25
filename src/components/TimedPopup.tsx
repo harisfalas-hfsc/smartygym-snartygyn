@@ -3,19 +3,25 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } f
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 import { X } from "lucide-react";
+import { useAccessControl } from "@/hooks/useAccessControl";
 
 export const TimedPopup = () => {
   const [isOpen, setIsOpen] = useState(false);
   const navigate = useNavigate();
+  const { userTier } = useAccessControl();
+  const isPremium = userTier === "premium";
 
   useEffect(() => {
+    // Don't show popup to premium users
+    if (isPremium) return;
+    
     // Show popup after 27 seconds
     const timer = setTimeout(() => {
       setIsOpen(true);
     }, 27000);
 
     return () => clearTimeout(timer);
-  }, []);
+  }, [isPremium]);
 
   const handleJoinPremium = () => {
     setIsOpen(false);

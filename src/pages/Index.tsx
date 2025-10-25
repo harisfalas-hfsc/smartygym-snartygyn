@@ -10,11 +10,14 @@ import { User as SupabaseUser } from "@supabase/supabase-js";
 import { useToast } from "@/hooks/use-toast";
 import smartyGymLogo from "@/assets/smarty-gym-logo.png";
 import { BackToTop } from "@/components/BackToTop";
+import { useAccessControl } from "@/hooks/useAccessControl";
 
 const Index = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
   const [user, setUser] = useState<SupabaseUser | null>(null);
+  const { userTier } = useAccessControl();
+  const isPremium = userTier === "premium";
 
   useEffect(() => {
     // Check current session
@@ -184,9 +187,11 @@ const Index = () => {
               <Button size="lg" onClick={() => navigate("/workout")} aria-label="Start free workout with Smarty Gym">
                 Start Free Workout
               </Button>
-              <Button size="lg" variant="outline" onClick={() => navigate("/premiumbenefits")} aria-label="Join Smarty Gym premium membership">
-                Join Premium
-              </Button>
+              {!isPremium && (
+                <Button size="lg" variant="outline" onClick={() => navigate("/premiumbenefits")} aria-label="Join Smarty Gym premium membership">
+                  Join Premium
+                </Button>
+              )}
             </div>
           </div>
         </section>

@@ -4,10 +4,13 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { ArrowLeft, Calculator, Activity, Flame } from "lucide-react";
 import { useShowBackButton } from "@/hooks/useShowBackButton";
+import { useAccessControl } from "@/hooks/useAccessControl";
 
 const Tools = () => {
   const navigate = useNavigate();
   const { canGoBack, goBack } = useShowBackButton();
+  const { userTier } = useAccessControl();
+  const isPremium = userTier === "premium";
 
   const tools = [
     {
@@ -72,14 +75,16 @@ const Tools = () => {
         </p>
         
         {/* Info Ribbon */}
-        <div className="bg-primary/10 border border-primary/20 rounded-lg p-4 mb-8 text-center">
-          <p className="text-sm text-muted-foreground mb-2">
-            Use these tools for free — no login required. Want personalized programs?
-          </p>
-          <Button variant="default" size="sm" onClick={() => navigate("/premiumbenefits")}>
-            Join Premium
-          </Button>
-        </div>
+        {!isPremium && (
+          <div className="bg-primary/10 border border-primary/20 rounded-lg p-4 mb-8 text-center">
+            <p className="text-sm text-muted-foreground mb-2">
+              Use these tools for free — no login required. Want personalized programs?
+            </p>
+            <Button variant="default" size="sm" onClick={() => navigate("/premiumbenefits")}>
+              Join Premium
+            </Button>
+          </div>
+        )}
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {tools.map((tool) => {
