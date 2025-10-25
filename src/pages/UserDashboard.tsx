@@ -114,13 +114,25 @@ export default function UserDashboard() {
   }, []);
 
   const initDashboard = async () => {
-    const { data: { session } } = await supabase.auth.getSession();
-    if (session?.user) {
-      setUser(session.user);
-      await fetchAllData(session.user.id);
-      await checkSubscription();
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (session?.user) {
+        setUser(session.user);
+        await Promise.all([
+          fetchAllData(session.user.id),
+          checkSubscription()
+        ]);
+      }
+    } catch (error) {
+      console.error("Error initializing dashboard:", error);
+      toast({
+        title: "Error",
+        description: "Failed to load dashboard. Please refresh the page.",
+        variant: "destructive"
+      });
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
   };
 
   const fetchAllData = async (userId: string) => {

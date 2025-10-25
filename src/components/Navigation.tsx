@@ -82,17 +82,18 @@ export const Navigation = () => {
         .from('user_subscriptions')
         .select('plan_type, status, current_period_end, stripe_subscription_id')
         .eq('user_id', user.id)
-        .single();
+        .maybeSingle();
 
-      if (dbError) {
+      if (dbError && dbError.code !== 'PGRST116') {
         console.error("Database subscription error:", dbError);
         return;
       }
 
-      console.log("Navigation subscription check:", dbData);
+      const isSubscribed = dbData?.status === 'active' && 
+                         (dbData?.plan_type === 'gold' || dbData?.plan_type === 'platinum');
 
       setSubscriptionInfo({
-        subscribed: dbData?.status === 'active' && (dbData.plan_type === 'gold' || dbData.plan_type === 'platinum'),
+        subscribed: isSubscribed,
         product_id: dbData?.plan_type || null,
         subscription_end: dbData?.current_period_end || null
       });

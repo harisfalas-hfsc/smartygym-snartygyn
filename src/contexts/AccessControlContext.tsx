@@ -133,7 +133,7 @@ export const AccessControlProvider = ({ children }: { children: ReactNode }) => 
     // Guests can't interact with anything
     if (userTier === "guest") return false;
 
-    // Premium users can interact with everything
+    // Premium users can interact with ALL content (free and premium)
     if (userTier === "premium") return true;
 
     // Subscribers can only interact with free content

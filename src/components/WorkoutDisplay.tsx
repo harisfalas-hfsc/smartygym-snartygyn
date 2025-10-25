@@ -9,6 +9,8 @@ import workoutHero from "@/assets/workout-hero.jpg";
 import { ParQQuestionnaire } from "@/components/ParQQuestionnaire";
 import { WorkoutInfoBar } from "@/components/WorkoutInfoBar";
 import { ShareButtons } from "@/components/ShareButtons";
+import { WorkoutInteractions } from "@/components/WorkoutInteractions";
+import { ProgramInteractions } from "@/components/ProgramInteractions";
 
 interface Exercise {
   name: string;
@@ -61,6 +63,11 @@ interface WorkoutDisplayProps {
   format?: string;
   instructions?: string;
   tips?: string;
+  workoutId?: string;
+  workoutCategory?: string;
+  programId?: string;
+  programType?: string;
+  isFreeContent?: boolean;
 }
 
 export const WorkoutDisplay = ({ 
@@ -79,7 +86,12 @@ export const WorkoutDisplay = ({
   description,
   format,
   instructions,
-  tips
+  tips,
+  workoutId,
+  workoutCategory,
+  programId,
+  programType,
+  isFreeContent = false
 }: WorkoutDisplayProps) => {
   const navigate = useNavigate();
   const [currentVideoId, setCurrentVideoId] = useState<string>(exercises[0]?.video_id || "");
@@ -525,6 +537,24 @@ export const WorkoutDisplay = ({
               </div>
             </CardContent>
           </Card>
+        )}
+
+        {/* Workout/Program Interactions */}
+        {workoutId && workoutCategory && (
+          <WorkoutInteractions
+            workoutId={workoutId}
+            workoutType={workoutCategory}
+            workoutName={title}
+            isFreeContent={isFreeContent}
+          />
+        )}
+        {programId && programType && (
+          <ProgramInteractions
+            programId={programId}
+            programType={programType}
+            programName={title}
+            isFreeContent={isFreeContent}
+          />
         )}
 
         {/* PAR-Q+ Questionnaire */}
