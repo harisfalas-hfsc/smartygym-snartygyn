@@ -89,63 +89,6 @@ export type Database = {
         }
         Relationships: []
       }
-      community_messages: {
-        Row: {
-          created_at: string
-          id: string
-          message: string
-          updated_at: string
-          user_id: string
-          user_name: string
-        }
-        Insert: {
-          created_at?: string
-          id?: string
-          message: string
-          updated_at?: string
-          user_id: string
-          user_name: string
-        }
-        Update: {
-          created_at?: string
-          id?: string
-          message?: string
-          updated_at?: string
-          user_id?: string
-          user_name?: string
-        }
-        Relationships: []
-      }
-      direct_messages: {
-        Row: {
-          created_at: string | null
-          id: string
-          message: string
-          read: boolean | null
-          receiver_id: string
-          sender_id: string
-          updated_at: string | null
-        }
-        Insert: {
-          created_at?: string | null
-          id?: string
-          message: string
-          read?: boolean | null
-          receiver_id: string
-          sender_id: string
-          updated_at?: string | null
-        }
-        Update: {
-          created_at?: string | null
-          id?: string
-          message?: string
-          read?: boolean | null
-          receiver_id?: string
-          sender_id?: string
-          updated_at?: string | null
-        }
-        Relationships: []
-      }
       exercises: {
         Row: {
           created_at: string

@@ -86,7 +86,6 @@ export default function JoinPremium() {
     { icon: Calendar, text: "Structured training programs" },
     { icon: Calculator, text: "Advanced fitness calculators" },
     { icon: BookOpen, text: "Complete exercise library" },
-    { icon: Users, text: "Community forum access" },
     { icon: Zap, text: "Priority support" }
   ];
 

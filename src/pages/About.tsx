@@ -414,7 +414,7 @@ const About = () => {
                   <AccordionTrigger>What's included in the Premium membership?</AccordionTrigger>
                   <AccordionContent>
                     Premium members get unlimited access to all workouts, structured training programs (4-8 weeks), 
-                    nutrition plans, progress tracking, community support, and regular new content updates. 
+                    nutrition plans, progress tracking, and regular new content updates. 
                     Free users can access a selection of workouts and use our fitness calculators.
                   </AccordionContent>
                 </AccordionItem>

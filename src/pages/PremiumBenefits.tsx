@@ -83,13 +83,6 @@ export default function PremiumBenefits() {
       premium: "Full access"
     },
     {
-      category: "Community Access",
-      icon: Users,
-      visitor: false,
-      subscriber: "Full access",
-      premium: "Full access"
-    },
-    {
       category: "Blog",
       icon: BookOpen,
       visitor: "View only",
@@ -137,7 +130,6 @@ export default function PremiumBenefits() {
     { icon: Target, title: "Goal Setting", description: "Set and track your fitness goals" },
     { icon: BookOpen, title: "Exercise Library", description: "Complete exercise database with videos" },
     { icon: Calculator, title: "Fitness Tools", description: "BMR, 1RM, and macro calculators with history" },
-    { icon: Users, title: "Community Access", description: "Connect with other fitness enthusiasts" },
     { icon: Zap, title: "Priority Support", description: "Get help when you need it" }
   ];
 

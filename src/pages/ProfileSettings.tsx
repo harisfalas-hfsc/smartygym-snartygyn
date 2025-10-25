@@ -192,9 +192,9 @@ const ProfileSettings = () => {
                 </div>
                 
                 <div>
-                  <Label htmlFor="nickname">Community Nickname</Label>
+                  <Label htmlFor="nickname">Nickname (optional)</Label>
                   <p className="text-xs text-muted-foreground mb-2">
-                    This nickname will appear in the Community Leaderboard (3-20 characters, unique)
+                    This is how you'll appear on the platform (3-20 characters, unique)
                   </p>
                   <Input
                     id="nickname"

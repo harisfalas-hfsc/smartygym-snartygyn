@@ -10,8 +10,8 @@ const NewsletterThankYou = () => {
   return (
     <>
       <Helmet>
-        <title>Welcome to Smarty Gym Community | smartygym.com</title>
-        <meta name="description" content="Thank you for joining the Smarty Gym community. Check your email for your first free workout." />
+        <title>Welcome to Smarty Gym | smartygym.com</title>
+        <meta name="description" content="Thank you for joining Smarty Gym. Check your email for your first free workout." />
         <link rel="canonical" href="https://smartygym.com/newsletter-thank-you" />
       </Helmet>
       
@@ -21,7 +21,7 @@ const NewsletterThankYou = () => {
             <CheckCircle2 className="w-16 h-16 text-primary" />
           </div>
           
-          <h1 className="text-3xl font-bold">Welcome to the Smarty Gym Community!</h1>
+          <h1 className="text-3xl font-bold">Welcome to Smarty Gym!</h1>
           
           <p className="text-muted-foreground text-lg">
             Check your email for your first free workout and exclusive training tips.

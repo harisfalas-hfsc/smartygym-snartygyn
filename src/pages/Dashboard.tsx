@@ -375,10 +375,6 @@ export default function Dashboard() {
               <Calculator className="mr-0 sm:mr-2 h-4 w-4" />
               <span className="hidden sm:inline">Calculators</span>
             </TabsTrigger>
-            <TabsTrigger value="community" className="text-xs sm:text-sm">
-              <Users className="mr-0 sm:mr-2 h-4 w-4" />
-              <span className="hidden sm:inline">Community</span>
-            </TabsTrigger>
             <TabsTrigger value="settings" className="text-xs sm:text-sm">
               <Settings className="mr-0 sm:mr-2 h-4 w-4" />
               <span className="hidden sm:inline">Settings</span>
@@ -417,27 +413,6 @@ export default function Dashboard() {
                       Sync Now
                     </>
                   )}
-                </Button>
-              </CardContent>
-            </Card>
-
-            {/* Quick Actions */}
-            <Card className="bg-gradient-to-r from-primary/10 to-primary/5 border-primary/20">
-              <CardContent className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 p-4 sm:p-6">
-                <div className="flex items-start sm:items-center gap-3 sm:gap-4 flex-1">
-                  <div className="p-2 sm:p-3 bg-primary/10 rounded-full flex-shrink-0">
-                    <Users className="h-6 w-6 sm:h-8 sm:w-8 text-primary" />
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <h3 className="text-base sm:text-xl font-bold mb-1">Join the Community Forum</h3>
-                    <p className="text-xs sm:text-sm text-muted-foreground">
-                      Connect, share experiences, and motivate each other!
-                    </p>
-                  </div>
-                </div>
-                <Button size="default" onClick={() => navigate("/community")} className="w-full sm:w-auto flex-shrink-0">
-                  <Users className="mr-2 h-4 w-4 sm:h-5 sm:w-5" />
-                  Go to Forum
                 </Button>
               </CardContent>
             </Card>
@@ -702,29 +677,6 @@ export default function Dashboard() {
                     ))}
                   </div>
                 )}
-              </CardContent>
-            </Card>
-          </TabsContent>
-
-          {/* Community Tab */}
-          <TabsContent value="community" className="space-y-6">
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Users className="h-5 w-5 text-primary" />
-                  Community Forum
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="text-center py-8 sm:py-12 px-4">
-                <Users className="h-12 w-12 sm:h-16 sm:w-16 text-primary mx-auto mb-3 sm:mb-4" />
-                <h3 className="text-lg sm:text-xl font-bold mb-2">Join the Smarty Gym Community!</h3>
-                <p className="text-sm sm:text-base text-muted-foreground mb-4 sm:mb-6 max-w-md mx-auto">
-                  Connect with other fitness enthusiasts, share experiences, and stay motivated together.
-                </p>
-                <Button size="default" onClick={() => navigate("/community")} className="w-full sm:w-auto">
-                  <Users className="mr-2 h-4 w-4 sm:h-5 sm:w-5" />
-                  Go to Community Forum
-                </Button>
               </CardContent>
             </Card>
           </TabsContent>

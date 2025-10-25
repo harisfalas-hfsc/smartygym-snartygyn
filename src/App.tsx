@@ -10,7 +10,6 @@ import { AccessControlProvider } from "./contexts/AccessControlContext";
 import { Navigation } from "./components/Navigation";
 import { Footer } from "./components/Footer";
 import { ScrollToTop } from "./components/ScrollToTop";
-import Community from "./pages/Community";
 import { ArticleDetail } from "./pages/ArticleDetail";
 import Index from "./pages/Index";
 import Auth from "./pages/Auth";
@@ -85,9 +84,8 @@ const App = () => (
                 <Route path="/trainingprogram/:type/:id" element={<IndividualTrainingProgram />} />
                 <Route path="/dietplan" element={<DietPlanFlow />} />
                 
-                {/* Exercise library and community are public */}
+                {/* Exercise library is public */}
                 <Route path="/exerciselibrary" element={<ExerciseLibrary />} />
-                <Route path="/community" element={<Community />} />
                 <Route path="/article/:id" element={<ArticleDetail />} />
                 
                 {/* Authenticated routes with motivational banner */}

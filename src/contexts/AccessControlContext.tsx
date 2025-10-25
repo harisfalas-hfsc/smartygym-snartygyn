@@ -119,7 +119,6 @@ export const AccessControlProvider = ({ children }: { children: ReactNode }) => 
              contentType === "free-program" || 
              contentType === "tool" || 
              contentType === "dashboard" ||
-             contentType === "community" ||
              contentType === "exercise-library" ||
              contentType === "blog";
     }

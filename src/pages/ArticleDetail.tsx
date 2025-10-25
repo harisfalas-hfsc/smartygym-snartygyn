@@ -528,9 +528,9 @@ export const ArticleDetail = () => {
         <div className="min-h-screen flex items-center justify-center">
           <div className="text-center">
             <h1 className="text-2xl font-bold mb-4">Article Not Found</h1>
-            <Button onClick={() => navigate("/community")}>
+            <Button onClick={() => navigate("/blog")}>
               <ArrowLeft className="mr-2 h-4 w-4" />
-              Back to Community
+              Back to Blog
             </Button>
           </div>
         </div>
@@ -607,14 +607,14 @@ export const ArticleDetail = () => {
       <article className="min-h-screen bg-gradient-to-b from-background to-accent/20">
         {/* Header */}
         <div className="container mx-auto px-4 py-8">
-        <Button
+        <Button 
           variant="ghost"
-          onClick={() => navigate("/community")}
+          onClick={() => navigate("/blog")}
           className="mb-6"
-          aria-label="Back to Community page"
+          aria-label="Back to Blog page"
         >
           <ArrowLeft className="mr-2 h-4 w-4" aria-hidden="true" />
-          Back to Community
+          Back to Blog
         </Button>
 
         {/* Article Header */}

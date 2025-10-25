@@ -62,13 +62,6 @@ const PremiumComparison = () => {
       premium: "Full access"
     },
     {
-      category: "Community Access",
-      icon: Users,
-      visitor: false,
-      subscriber: "Full access",
-      premium: "Full access"
-    },
-    {
       category: "Blog",
       icon: BookOpen,
       visitor: "View only",
