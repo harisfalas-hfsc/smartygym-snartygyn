@@ -136,13 +136,20 @@ export const AccessControlProvider = ({ children }: { children: ReactNode }) => 
   const canInteract = (contentType: string): boolean => {
     const { userTier } = state;
 
+    console.log("AccessControl - canInteract check:", { contentType, userTier });
+
+    // Guests can't interact with anything
     if (userTier === "guest") return false;
 
+    // Premium users can interact with everything
+    if (userTier === "premium") return true;
+
+    // Subscribers can only interact with free content
     if (userTier === "subscriber") {
       return contentType === "free-workout" || contentType === "free-program";
     }
 
-    return true;
+    return false;
   };
 
   return (
