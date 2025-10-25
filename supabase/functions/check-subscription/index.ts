@@ -109,53 +109,69 @@ serve(async (req) => {
 
     if (hasActiveSub) {
       const subscription = subscriptions.data[0];
-      subscriptionEnd = new Date(subscription.current_period_end * 1000).toISOString();
       stripeSubscriptionId = subscription.id;
-      logStep("Active subscription found", { subscriptionId: subscription.id, endDate: subscriptionEnd });
       
-      // Determine plan type based on price
-      const priceId = subscription.items.data[0].price.id;
-      if (priceId === "price_1SJ9q1IxQYg9inGKZzxxqPbD") {
-        planType = 'gold';
-      } else if (priceId === "price_1SJ9qGIxQYg9inGKFbgqVRjj") {
-        planType = 'platinum';
+      // Validate and convert timestamps safely
+      const periodEnd = subscription.current_period_end;
+      const periodStart = subscription.current_period_start;
+      
+      if (!periodEnd || !periodStart || typeof periodEnd !== 'number' || typeof periodStart !== 'number') {
+        logStep("Invalid subscription timestamps", { periodEnd, periodStart });
+        throw new Error("Invalid subscription period timestamps from Stripe");
       }
-      logStep("Determined plan type", { planType });
+      
+      try {
+        subscriptionEnd = new Date(periodEnd * 1000).toISOString();
+        const subscriptionStart = new Date(periodStart * 1000).toISOString();
+        logStep("Active subscription found", { subscriptionId: subscription.id, endDate: subscriptionEnd });
+        
+        // Determine plan type based on price
+        const priceId = subscription.items.data[0].price.id;
+        if (priceId === "price_1SJ9q1IxQYg9inGKZzxxqPbD") {
+          planType = 'gold';
+        } else if (priceId === "price_1SJ9qGIxQYg9inGKFbgqVRjj") {
+          planType = 'platinum';
+        }
+        logStep("Determined plan type", { planType });
 
-      // Update database with subscription info using proper conflict resolution
-      const { error: upsertError } = await supabaseClient
-        .from('user_subscriptions')
-        .upsert(
-          {
-            user_id: user.id,
-            plan_type: planType,
-            status: 'active',
-            stripe_subscription_id: stripeSubscriptionId,
-            stripe_customer_id: customerId,
-            current_period_start: new Date(subscription.current_period_start * 1000).toISOString(),
-            current_period_end: subscriptionEnd,
-            cancel_at_period_end: subscription.cancel_at_period_end || false,
-          },
-          {
-            onConflict: 'user_id',
-            ignoreDuplicates: false
-          }
-        );
+        // Update database with subscription info using proper conflict resolution
+        const { error: upsertError } = await supabaseClient
+          .from('user_subscriptions')
+          .upsert(
+            {
+              user_id: user.id,
+              plan_type: planType,
+              status: 'active',
+              stripe_subscription_id: stripeSubscriptionId,
+              stripe_customer_id: customerId,
+              current_period_start: subscriptionStart,
+              current_period_end: subscriptionEnd,
+              cancel_at_period_end: subscription.cancel_at_period_end || false,
+            },
+            {
+              onConflict: 'user_id',
+              ignoreDuplicates: false
+            }
+          );
 
-      if (upsertError) {
-        console.error('Subscription sync error:', upsertError);
-        return new Response(
-          JSON.stringify({ 
-            subscribed: true, 
-            plan_type: planType,
-            subscription_end: subscriptionEnd,
-            error: 'Subscription active but sync failed'
-          }),
-          { 
-            status: 200, 
-            headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
-          }
-        );
+        if (upsertError) {
+          console.error('Subscription sync error:', upsertError);
+          return new Response(
+            JSON.stringify({ 
+              subscribed: true, 
+              plan_type: planType,
+              subscription_end: subscriptionEnd,
+              error: 'Subscription active but sync failed'
+            }),
+            { 
+              status: 200, 
+              headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
+            }
+          );
+        }
+      } catch (dateError) {
+        logStep("Date conversion error", { error: dateError });
+        throw new Error("Failed to convert subscription dates");
       }
     } else {
       logStep("No active subscription found");
