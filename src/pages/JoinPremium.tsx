@@ -164,14 +164,16 @@ export default function JoinPremium() {
                 <div className="mb-3">
                   <h2 className="text-2xl font-bold text-amber-600 dark:text-amber-400">Gold Plan</h2>
                 </div>
-                <Badge className="bg-card text-foreground border-2 border-amber-500 mx-auto">
+                <Badge className="bg-card text-foreground border-2 border-amber-500 mx-auto mb-4">
                   MONTHLY SUBSCRIPTION
                 </Badge>
-                <CardTitle className="text-3xl font-bold mt-4">€9.99</CardTitle>
-                <p className="text-sm text-muted-foreground">per month (billed monthly)</p>
-                <p className="text-xs text-amber-600 dark:text-amber-400 font-semibold mt-1">
-                  🔄 Auto-renews monthly
-                </p>
+                <CardTitle className="text-3xl font-bold">€9.99</CardTitle>
+                <p className="text-sm text-muted-foreground h-5">per month (billed monthly)</p>
+                <div className="h-14 flex flex-col justify-center">
+                  <p className="text-xs text-amber-600 dark:text-amber-400 font-semibold">
+                    🔄 Auto-renews monthly
+                  </p>
+                </div>
               </CardHeader>
               <CardContent className="space-y-4 flex-1 flex flex-col">
                 <div className="space-y-2 flex-1">
@@ -216,12 +218,12 @@ export default function JoinPremium() {
                   </Badge>
                   <h2 className="text-2xl font-bold text-primary">Platinum Plan</h2>
                 </div>
-                <Badge className="bg-primary text-primary-foreground mx-auto">
+                <Badge className="bg-primary text-primary-foreground mx-auto mb-4">
                   YEARLY SUBSCRIPTION
                 </Badge>
-                <CardTitle className="text-3xl font-bold mt-4">€89.99</CardTitle>
-                <p className="text-sm text-muted-foreground">per year (billed annually)</p>
-                <div className="mt-2 space-y-1">
+                <CardTitle className="text-3xl font-bold">€89.99</CardTitle>
+                <p className="text-sm text-muted-foreground h-5">per year (billed annually)</p>
+                <div className="h-14 flex flex-col justify-center">
                   <p className="text-sm text-green-600 font-semibold">
                     Just €7.50/month - Save €29.89!
                   </p>
