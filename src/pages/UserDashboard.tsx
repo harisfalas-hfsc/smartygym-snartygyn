@@ -204,10 +204,19 @@ export default function UserDashboard() {
         .from('user_subscriptions')
         .select('plan_type, status, current_period_end, current_period_start, stripe_subscription_id, cancel_at_period_end')
         .eq('user_id', user.id)
-        .single();
+        .maybeSingle();
 
       if (dbError) {
         console.error("Dashboard subscription error:", dbError);
+        return;
+      }
+
+      if (!dbData) {
+        setSubscriptionInfo({
+          subscribed: false,
+          product_id: null,
+          subscription_end: null
+        });
         return;
       }
 

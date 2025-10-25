@@ -45,7 +45,21 @@ export const AccessControlProvider = ({ children }: { children: ReactNode }) => 
       }
     );
 
-    return () => subscription.unsubscribe();
+    // Add safety timeout - if loading takes more than 10 seconds, force it to complete
+    const timeout = setTimeout(() => {
+      if (state.isLoading) {
+        console.warn("Access control check timed out, forcing completion");
+        setState(prev => ({
+          ...prev,
+          isLoading: false
+        }));
+      }
+    }, 10000);
+
+    return () => {
+      subscription.unsubscribe();
+      clearTimeout(timeout);
+    };
   }, []);
 
   const checkAccess = async () => {
@@ -76,6 +90,8 @@ export const AccessControlProvider = ({ children }: { children: ReactNode }) => 
 
   const checkSubscription = async (user: User) => {
     try {
+      setState(prev => ({ ...prev, isLoading: true }));
+      
       const { data: dbData, error: dbError } = await supabase
         .from('user_subscriptions')
         .select('plan_type, status, current_period_end, stripe_subscription_id')
