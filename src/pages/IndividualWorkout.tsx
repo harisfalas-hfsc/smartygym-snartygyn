@@ -4285,6 +4285,9 @@ Focus on flow`,
               instructions={workout.instructions}
               tips={workout.tips.join('\n')}
               workoutDetails={{ exercises: workout.exercises }}
+              workoutId={id}
+              workoutCategory={type || ''}
+              isFreeContent={isFreeWorkout}
             />
           </AccessGate>
         </div>

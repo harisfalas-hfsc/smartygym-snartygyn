@@ -135,9 +135,9 @@ export const Navigation = () => {
 
   const getPlanName = (productId: string | null) => {
     if (!productId) return null;
-    // These are the product IDs from Stripe
-    if (productId.includes("gold") || productId === "prod_SxiRoBlC4pPZkV") return "Gold";
-    if (productId.includes("platinum") || productId === "prod_SxiRyLMu9u8NPC") return "Platinum";
+    // productId is the plan_type from database ('gold' or 'platinum')
+    if (productId === "gold") return "Gold";
+    if (productId === "platinum") return "Platinum";
     return "Premium";
   };
 

@@ -432,6 +432,9 @@ const IndividualTrainingProgram = () => {
                 }]
               }))
             }]}
+            programId={id}
+            programType={type || ''}
+            isFreeContent={isFreeProgram}
           />
           </AccessGate>
         </div>
