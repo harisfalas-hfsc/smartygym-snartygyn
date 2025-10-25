@@ -172,6 +172,28 @@ const About = () => {
             </p>
           </div>
 
+          {/* Your Gym Anywhere Card */}
+          <Card className="bg-gradient-to-r from-primary/10 to-accent/10 border-2 border-primary/20 mb-8">
+            <CardContent className="p-8">
+              <h3 className="text-2xl font-bold text-center mb-4">
+                Smarty Gym: Your Gym Reaches Anywhere, Anytime
+              </h3>
+              <div className="space-y-4 max-w-3xl mx-auto">
+                <p className="text-base font-semibold text-center">
+                  We are not here to replace your gym. We are here to back you up when life gets in the way.
+                </p>
+                <p className="text-base text-muted-foreground text-center leading-relaxed">
+                  Whether you're traveling, on holiday, can't make it to the gym, or your gym is closed — 
+                  Smarty Gym is your backup plan. Or, if you prefer training from home entirely, we've got you covered. 
+                  Expert workouts, professional programs, and practical tools — all designed by real coaches, not algorithms.
+                </p>
+                <p className="text-base font-semibold text-center text-primary">
+                  Wherever you are, your gym comes with you.
+                </p>
+              </div>
+            </CardContent>
+          </Card>
+
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
             <Card className="hover:shadow-lg transition-shadow">
               <CardHeader>
