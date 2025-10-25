@@ -1,69 +1,24 @@
-import { ReactNode, useEffect, useState } from "react";
+import { ReactNode } from "react";
 import { useNavigate } from "react-router-dom";
-import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Lock } from "lucide-react";
-import { useToast } from "@/hooks/use-toast";
+import { useAccessControl } from "@/hooks/useAccessControl";
 
 interface PremiumContentGateProps {
   children: ReactNode;
 }
 
 export const PremiumContentGate = ({ children }: PremiumContentGateProps) => {
-  const [isSubscribed, setIsSubscribed] = useState<boolean | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
+  const { userTier, isLoading } = useAccessControl();
   const navigate = useNavigate();
-  const { toast } = useToast();
+  const isSubscribed = userTier === "premium";
 
-  useEffect(() => {
-    checkSubscription();
-  }, []);
-
-  const checkSubscription = async () => {
-    try {
-      const { data: { session } } = await supabase.auth.getSession();
-      
-      if (!session) {
-        setIsSubscribed(false);
-        setIsLoading(false);
-        return;
-      }
-
-      const { data, error } = await supabase.functions.invoke('check-subscription');
-      
-      if (error) throw error;
-      
-      setIsSubscribed(data?.subscribed || false);
-    } catch (error) {
-      console.error('Error checking subscription:', error);
-      setIsSubscribed(false);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const handleSubscribe = async () => {
-    try {
-      const { data: { session } } = await supabase.auth.getSession();
-      
-      if (!session) {
-        toast({
-          title: "Authentication Required",
-          description: "Please log in to subscribe",
-          variant: "destructive",
-        });
-        navigate("/auth");
-        return;
-      }
-
-      navigate("/");
-      toast({
-        title: "Subscribe Now",
-        description: "Please select a plan from the homepage to access premium content",
-      });
-    } catch (error) {
-      console.error('Error:', error);
+  const handleSubscribe = () => {
+    if (userTier === "guest") {
+      navigate("/auth");
+    } else {
+      navigate("/premiumbenefits");
     }
   };
 

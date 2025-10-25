@@ -204,11 +204,7 @@ export default function UserDashboard() {
         return;
       }
 
-      console.log("Dashboard subscription data:", dbData);
-
       const isSubscribed = dbData?.status === 'active' && (dbData.plan_type === 'gold' || dbData.plan_type === 'platinum');
-      
-      console.log("Dashboard - isSubscribed:", isSubscribed, "plan_type:", dbData?.plan_type, "status:", dbData?.status);
 
       setSubscriptionInfo({
         subscribed: isSubscribed,
@@ -315,9 +311,6 @@ export default function UserDashboard() {
   const ratedPrograms = programInteractions.filter(p => p.rating && p.rating > 0);
 
   const hasActivePlan = subscriptionInfo?.subscribed && subscriptionInfo?.product_id;
-
-  console.log("UserDashboard - Subscription Info:", subscriptionInfo);
-  console.log("UserDashboard - hasActivePlan:", hasActivePlan);
 
   return (
     <div className="min-h-screen bg-background">

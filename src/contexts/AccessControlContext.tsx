@@ -22,8 +22,8 @@ const AccessControlContext = createContext<AccessControlContextType | undefined>
 export const AccessControlProvider = ({ children }: { children: ReactNode }) => {
   const [state, setState] = useState<AccessControlState>({
     user: null,
-    userTier: "subscriber", // Default to subscriber instead of guest for faster access
-    isLoading: false, // Start with false for instant rendering
+    userTier: "guest",
+    isLoading: true,
     productId: null,
   });
 
@@ -80,21 +80,15 @@ export const AccessControlProvider = ({ children }: { children: ReactNode }) => 
         .from('user_subscriptions')
         .select('plan_type, status, current_period_end, stripe_subscription_id')
         .eq('user_id', user.id)
-        .single();
+        .maybeSingle();
 
-      if (dbError) {
+      if (dbError && dbError.code !== 'PGRST116') {
         console.error("Database subscription error:", dbError);
       }
 
-      // User is premium if they have gold or platinum plan
+      // User is premium if they have gold or platinum plan with active status
       const isSubscribed = dbData?.status === 'active' && 
                          (dbData?.plan_type === 'gold' || dbData?.plan_type === 'platinum');
-      
-      console.log("Subscription check result:", { 
-        plan_type: dbData?.plan_type, 
-        status: dbData?.status, 
-        isSubscribed 
-      });
       
       setState({
         user,
@@ -135,8 +129,6 @@ export const AccessControlProvider = ({ children }: { children: ReactNode }) => 
 
   const canInteract = (contentType: string): boolean => {
     const { userTier } = state;
-
-    console.log("AccessControl - canInteract check:", { contentType, userTier });
 
     // Guests can't interact with anything
     if (userTier === "guest") return false;
