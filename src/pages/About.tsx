@@ -176,7 +176,7 @@ const About = () => {
           <Card className="bg-gradient-to-r from-primary/10 to-accent/10 border-2 border-primary/20 mb-8">
             <CardContent className="p-8">
               <h3 className="text-2xl font-bold text-center mb-4">
-                Smarty Gym: Your Gym Reaches Anywhere, Anytime
+                Your Gym Reimagined Anywhere, Anytime
               </h3>
               <div className="space-y-4 max-w-3xl mx-auto">
                 <p className="text-base font-semibold text-center">
