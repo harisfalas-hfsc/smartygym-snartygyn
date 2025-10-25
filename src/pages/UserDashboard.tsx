@@ -135,7 +135,7 @@ export default function UserDashboard() {
         setUser(session.user);
         await Promise.all([
           fetchAllData(session.user.id),
-          checkSubscription()
+          checkSubscription(session.user.id)
         ]);
       }
     } catch (error) {
@@ -211,14 +211,15 @@ export default function UserDashboard() {
     if (calorie) setCalorieHistory(calorie);
   };
 
-  const checkSubscription = async () => {
+  const checkSubscription = async (userId?: string) => {
     try {
-      if (!user) return;
+      const uid = userId || user?.id;
+      if (!uid) return;
 
       const { data: dbData, error: dbError } = await supabase
         .from('user_subscriptions')
         .select('plan_type, status, current_period_end, current_period_start, stripe_subscription_id, cancel_at_period_end')
-        .eq('user_id', user.id)
+        .eq('user_id', uid)
         .maybeSingle();
 
       if (dbError) {
