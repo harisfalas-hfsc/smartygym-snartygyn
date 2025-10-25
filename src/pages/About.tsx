@@ -402,18 +402,21 @@ const About = () => {
                 <AccordionItem value="item-1">
                   <AccordionTrigger>What is Smarty Gym?</AccordionTrigger>
                   <AccordionContent>
-                    Smarty Gym is an online fitness platform that provides science-based workouts, training programs, 
-                    and nutrition guidance. Our mission is to make quality fitness accessible to everyone, 
-                    regardless of location or budget.
+                    Smarty Gym is an online fitness platform providing functional, science-based workouts and training programs 
+                    designed by certified coaches. Whether you're training at home, in the gym, or on the go, Smarty Gym 
+                    is your backup when life gets in the way — or your complete fitness solution if you prefer training from home. 
+                    We make quality fitness accessible anywhere, anytime.
                   </AccordionContent>
                 </AccordionItem>
 
                 <AccordionItem value="item-2">
-                  <AccordionTrigger>Do I need equipment to use Smarty Gym?</AccordionTrigger>
+                  <AccordionTrigger>Who is Haris Falas?</AccordionTrigger>
                   <AccordionContent>
-                    No! We offer both bodyweight workouts that require no equipment and equipment-based programs. 
-                    You can filter workouts based on what you have available — whether that's nothing, 
-                    resistance bands, dumbbells, or full gym access.
+                    <a href="/coach-profile" className="text-primary hover:underline font-medium">Haris Falas</a> is a certified Sports Scientist 
+                    and Strength & Conditioning Coach with over 20 years of professional experience. He has worked with elite athletes and professional 
+                    football teams in the Cypriot First Division, including AEL Limassol FC and Nea Salamina FC. As the founder of HFSC and 
+                    Smarty Gym, <strong>Haris personally designs every single workout and program</strong> — never by AI, always with evidence-based 
+                    training principles and real coaching experience.
                   </AccordionContent>
                 </AccordionItem>
 
@@ -421,52 +424,71 @@ const About = () => {
                   <AccordionTrigger>What makes Smarty Gym different?</AccordionTrigger>
                   <AccordionContent>
                     <strong>We're 100% human, 0% AI.</strong> Every workout is personally designed by <a href="/coach-profile" className="text-primary hover:underline font-medium">Haris Falas</a>, 
-                    a qualified Sports Scientist and S&C Coach — never by algorithms or AI. You get real expertise, 
-                    real support, and direct access to the person who created your program. We focus on sustainable progress, 
-                    not quick fixes or unrealistic promises.
+                    a qualified Sports Scientist and S&C Coach — never by algorithms or AI. You get real expertise from a real coach with 20+ years 
+                    of experience, real support, and direct access to the person who created your program. We focus on sustainable, functional training 
+                    that fits into your real life — not quick fixes or unrealistic promises.
                   </AccordionContent>
                 </AccordionItem>
 
                 <AccordionItem value="item-4">
-                  <AccordionTrigger>Can beginners use Smarty Gym?</AccordionTrigger>
+                  <AccordionTrigger>Do I need equipment to use Smarty Gym?</AccordionTrigger>
                   <AccordionContent>
-                    Absolutely! We have programs specifically designed for beginners, with clear instructions and 
-                    progressions. Each workout includes difficulty ratings and modifications to match your fitness level.
+                    No! We offer both bodyweight workouts that require no equipment and equipment-based programs. 
+                    You can filter workouts based on what you have available — whether that's nothing, 
+                    resistance bands, dumbbells, or full gym access. Train anywhere with whatever you have.
                   </AccordionContent>
                 </AccordionItem>
 
                 <AccordionItem value="item-5">
-                  <AccordionTrigger>What's included in the Premium membership?</AccordionTrigger>
+                  <AccordionTrigger>How long are the workouts?</AccordionTrigger>
                   <AccordionContent>
-                    Premium members get unlimited access to all workouts, structured training programs (4-8 weeks), 
-                    nutrition plans, progress tracking, and regular new content updates. 
-                    Free users can access a selection of workouts and use our fitness calculators.
+                    Our workouts range from quick 10-minute sessions to comprehensive 60-minute full workouts. 
+                    You can filter by duration to find what fits your schedule — whether you have just 10 minutes or a full hour to train.
                   </AccordionContent>
                 </AccordionItem>
 
                 <AccordionItem value="item-6">
-                  <AccordionTrigger>How long are the workouts?</AccordionTrigger>
+                  <AccordionTrigger>Can beginners use Smarty Gym?</AccordionTrigger>
                   <AccordionContent>
-                    Our workouts range from 10-minute quick sessions to 45-minute full workouts. 
-                    You can filter by duration to find what fits your schedule.
+                    Absolutely! We have workouts and programs specifically designed for all fitness levels, including beginners. 
+                    Each workout includes clear instructions, difficulty ratings, and modifications to match your current fitness level. 
+                    Start where you are and progress at your own pace with safe, effective programming.
                   </AccordionContent>
                 </AccordionItem>
 
                 <AccordionItem value="item-7">
-                  <AccordionTrigger>Can I cancel my subscription anytime?</AccordionTrigger>
+                  <AccordionTrigger>Why should I go premium?</AccordionTrigger>
                   <AccordionContent>
-                    Yes! You can cancel your subscription at any time. There are no long-term commitments or 
-                    cancellation fees. Your access continues until the end of your billing period.
+                    Premium membership unlocks unlimited access to all workouts and training programs, full dashboard access with progress tracking, 
+                    complete workout and program history, ability to favorite and rate all content, and direct WhatsApp support from the coaching team. 
+                    Free subscribers can access selected free workouts, programs, calculators, and the exercise library, but Premium gives you the full 
+                    Smarty Gym experience with structured 6-8 week programs and personalized support. Choose monthly (€9.99/month) or save 25% with yearly (€89.99/year, only €7.50/month).
                   </AccordionContent>
                 </AccordionItem>
 
                 <AccordionItem value="item-8">
-                  <AccordionTrigger>Who created Smarty Gym?</AccordionTrigger>
+                  <AccordionTrigger>What's the difference between free and premium access?</AccordionTrigger>
                   <AccordionContent>
-                    Smarty Gym was founded by <a href="/coach-profile" className="text-primary hover:underline font-medium">Haris Falas</a>, a certified Sports Scientist and Strength & Conditioning Coach. 
-                    <strong>Every single program is personally designed by Haris himself — never by AI.</strong> All programs 
-                    are created using evidence-based training principles and years of hands-on coaching experience. You know 
-                    exactly who's behind your training, and you can reach out to him directly anytime.
+                    <strong>Visitors (no login)</strong> can view the exercise library and blog. <strong>Free subscribers</strong> get access to selected free workouts and programs, 
+                    full calculators (1RM, BMR, Macro), and limited dashboard features. <strong>Premium members</strong> get unlimited access to all workouts and training programs, 
+                    full dashboard with comprehensive progress tracking, complete workout/program favorites and history, and direct WhatsApp support from our coaching team.
+                  </AccordionContent>
+                </AccordionItem>
+
+                <AccordionItem value="item-9">
+                  <AccordionTrigger>Can I cancel my subscription anytime?</AccordionTrigger>
+                  <AccordionContent>
+                    Yes! You can cancel your subscription at any time with no long-term commitments or cancellation fees. 
+                    Your premium access continues until the end of your current billing period, so you get full value for what you've paid.
+                  </AccordionContent>
+                </AccordionItem>
+
+                <AccordionItem value="item-10">
+                  <AccordionTrigger>How do I get support or contact the coach?</AccordionTrigger>
+                  <AccordionContent>
+                    Premium members get direct WhatsApp support from our coaching team for personalized guidance and questions. 
+                    All users can also reach out through our <a href="/contact" className="text-primary hover:underline font-medium">contact page</a>. 
+                    Unlike AI-generated programs, you're working with real people who care about your progress and are here to help.
                   </AccordionContent>
                 </AccordionItem>
               </Accordion>
