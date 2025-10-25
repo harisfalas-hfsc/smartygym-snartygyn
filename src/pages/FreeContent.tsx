@@ -14,9 +14,83 @@ const FreeContent = () => {
   const { userTier } = useAccessControl();
   const isPremium = userTier === "premium";
 
-  const workoutTypes: any[] = [];
+  // Free workouts accessible to visitors and logged-in users
+  const workoutTypes = [
+    {
+      id: "strength",
+      title: "Strength Training",
+      description: "Build muscle and power with bodyweight and resistance exercises",
+      icon: Dumbbell,
+      duration: "30-60 min",
+      difficulty: "Beginner-Advanced",
+      equipment: "Bodyweight & Equipment"
+    },
+    {
+      id: "calorie-burning",
+      title: "Calorie Burning",
+      description: "High-intensity circuits to maximize calorie expenditure",
+      icon: Flame,
+      duration: "30-60 min",
+      difficulty: "Beginner-Advanced",
+      equipment: "Bodyweight & Equipment"
+    },
+    {
+      id: "metabolic",
+      title: "Metabolic Conditioning",
+      description: "Boost metabolism with dynamic conditioning workouts",
+      icon: Zap,
+      duration: "30-60 min",
+      difficulty: "Beginner-Advanced",
+      equipment: "Bodyweight & Equipment"
+    },
+    {
+      id: "cardio",
+      title: "Cardio",
+      description: "Improve cardiovascular endurance and stamina",
+      icon: Heart,
+      duration: "30-60 min",
+      difficulty: "Beginner-Advanced",
+      equipment: "Bodyweight & Equipment"
+    },
+    {
+      id: "mobility",
+      title: "Mobility & Stability",
+      description: "Enhance flexibility, balance, and movement quality",
+      icon: Move,
+      duration: "30-45 min",
+      difficulty: "Beginner-Intermediate",
+      equipment: "Bodyweight & Bands"
+    },
+    {
+      id: "power",
+      title: "Power & Explosiveness",
+      description: "Develop explosive strength and athletic performance",
+      icon: Activity,
+      duration: "30-60 min",
+      difficulty: "Intermediate-Advanced",
+      equipment: "Bodyweight & Equipment"
+    },
+    {
+      id: "challenge",
+      title: "Challenge Workouts",
+      description: "Test your limits with advanced challenge sessions",
+      icon: Dumbbell,
+      duration: "30-60 min",
+      difficulty: "Beginner-Advanced",
+      equipment: "Bodyweight & Equipment"
+    }
+  ];
 
-  const programTypes: any[] = [];
+  // Free training programs
+  const programTypes = [
+    {
+      id: "weight-loss",
+      title: "Weight Loss Ignite",
+      description: "6-week metabolic fat loss program with circuit training and HIIT",
+      icon: Scale,
+      duration: "6 weeks"
+    }
+  ];
 
   const handleWorkoutSelect = (workoutId: string) => {
     navigate(`/workout/${workoutId}`);

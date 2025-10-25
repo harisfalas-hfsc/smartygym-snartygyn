@@ -75,16 +75,31 @@ const Tools = () => {
         </p>
         
         {/* Info Ribbon */}
-        {!isPremium && (
-          <div className="bg-primary/10 border border-primary/20 rounded-lg p-4 mb-8 text-center">
-            <p className="text-sm text-muted-foreground mb-2">
-              Use these tools for free — no login required. Want personalized programs?
+        <div className="bg-primary/10 border border-primary/20 rounded-lg p-4 mb-8 text-center">
+          {userTier === "guest" ? (
+            <>
+              <p className="text-sm text-muted-foreground mb-2">
+                Login required to use these calculators. Already a member? Sign in to access all tools.
+              </p>
+              <Button variant="default" size="sm" onClick={() => navigate("/auth")}>
+                Login / Sign Up
+              </Button>
+            </>
+          ) : !isPremium ? (
+            <>
+              <p className="text-sm text-muted-foreground mb-2">
+                Use these tools for free as a member. Want personalized training programs?
+              </p>
+              <Button variant="default" size="sm" onClick={() => navigate("/premiumbenefits")}>
+                Join Premium
+              </Button>
+            </>
+          ) : (
+            <p className="text-sm text-muted-foreground">
+              All tools included in your premium membership — plus personalized training programs!
             </p>
-            <Button variant="default" size="sm" onClick={() => navigate("/premiumbenefits")}>
-              Join Premium
-            </Button>
-          </div>
-        )}
+          )}
+        </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {tools.map((tool) => {
