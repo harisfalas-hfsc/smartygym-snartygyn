@@ -344,7 +344,7 @@ const About = () => {
                   <UserCheck className="w-10 h-10 text-primary" />
                 </div>
                 <div>
-                  <CardTitle className="text-2xl md:text-3xl">Meet the Founder</CardTitle>
+                  <CardTitle className="text-2xl md:text-3xl">Message from Haris Falas</CardTitle>
                   <p className="text-muted-foreground">Your Personal Coach & Program Designer</p>
                 </div>
               </div>
