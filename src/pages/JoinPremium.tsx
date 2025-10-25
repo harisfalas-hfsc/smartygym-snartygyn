@@ -160,18 +160,14 @@ export default function JoinPremium() {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-4xl mx-auto mb-8">
             {/* Gold Plan */}
             <Card className="relative border-2 border-amber-500 shadow-lg">
-              <div className="absolute -top-2 -right-2">
-                <Badge className="bg-amber-500 text-white px-3 py-1 text-xs">
-                  ⭐ GOLD
-                </Badge>
-              </div>
-              <CardHeader>
-                <div className="flex items-center justify-between mb-2">
-                  <Badge className="bg-card text-foreground border-2 border-primary">
-                    MONTHLY SUBSCRIPTION
-                  </Badge>
+              <CardHeader className="text-center pb-4">
+                <div className="mb-3">
+                  <h2 className="text-2xl font-bold text-amber-600 dark:text-amber-400">Gold Plan</h2>
                 </div>
-                <CardTitle className="text-3xl font-bold">€9.99</CardTitle>
+                <Badge className="bg-card text-foreground border-2 border-amber-500 mx-auto">
+                  MONTHLY SUBSCRIPTION
+                </Badge>
+                <CardTitle className="text-3xl font-bold mt-4">€9.99</CardTitle>
                 <p className="text-sm text-muted-foreground">per month (billed monthly)</p>
                 <p className="text-xs text-amber-600 dark:text-amber-400 font-semibold mt-1">
                   🔄 Auto-renews monthly
@@ -193,7 +189,7 @@ export default function JoinPremium() {
                   </div>
                 </div>
                 <Button 
-                  className="w-full text-lg py-6" 
+                  className="w-full text-lg py-6 mt-6" 
                   onClick={() => handleSubscribe('gold')}
                   disabled={loading}
                 >
@@ -207,18 +203,17 @@ export default function JoinPremium() {
 
             {/* Platinum Plan */}
             <Card className="relative border-2 border-primary shadow-lg">
-              <div className="absolute -top-2 -right-2">
-                <Badge className="bg-primary text-primary-foreground px-3 py-1 text-xs">
-                  🏆 SAVE 25%
-                </Badge>
-              </div>
-              <CardHeader>
-                <div className="flex items-center justify-between mb-2">
-                  <Badge className="bg-primary text-primary-foreground">
-                    YEARLY SUBSCRIPTION
+              <CardHeader className="text-center pb-4">
+                <div className="mb-3 relative">
+                  <Badge className="absolute -top-2 right-0 bg-green-600 text-white px-2 py-1 text-xs">
+                    BEST VALUE
                   </Badge>
+                  <h2 className="text-2xl font-bold text-primary">Platinum Plan</h2>
                 </div>
-                <CardTitle className="text-3xl font-bold">€89.99</CardTitle>
+                <Badge className="bg-primary text-primary-foreground mx-auto">
+                  YEARLY SUBSCRIPTION
+                </Badge>
+                <CardTitle className="text-3xl font-bold mt-4">€89.99</CardTitle>
                 <p className="text-sm text-muted-foreground">per year (billed annually)</p>
                 <div className="mt-2 space-y-1">
                   <p className="text-sm text-green-600 font-semibold">
@@ -249,11 +244,11 @@ export default function JoinPremium() {
                   </div>
                 </div>
                 <Button 
-                  className="w-full text-lg py-6" 
+                  className="w-full text-lg py-6 mt-6" 
                   onClick={() => handleSubscribe('platinum')}
                   disabled={loading}
                 >
-                  {loading ? "Processing..." : "Start Yearly Plan - SAVE 25%"}
+                  {loading ? "Processing..." : "Start Yearly Plan"}
                 </Button>
                 <p className="text-xs text-center text-muted-foreground">
                   Renews automatically each year • Best value for committed members
