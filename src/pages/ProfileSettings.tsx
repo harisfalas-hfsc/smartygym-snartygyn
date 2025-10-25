@@ -7,7 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
-import { ArrowLeft, Loader2, Save, Crown } from "lucide-react";
+import { ArrowLeft, Loader2, Save, Crown, CheckCircle } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { useProfileData } from "@/hooks/useProfileData";
@@ -183,6 +183,38 @@ const ProfileSettings = () => {
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-6">
+            {/* Premium Status Banner */}
+            {userTier === "premium" && (
+              <div className="border-2 border-yellow-500/50 bg-gradient-to-br from-yellow-500/10 via-amber-500/10 to-orange-500/10 rounded-lg p-6 mb-4">
+                <div className="flex items-center gap-3 mb-3">
+                  <Crown className="h-7 w-7 text-yellow-500" />
+                  <div>
+                    <h3 className="font-bold text-xl">Premium Member</h3>
+                    <p className="text-sm text-muted-foreground">You have full access to all features</p>
+                  </div>
+                </div>
+                
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mt-4">
+                  <div className="text-center p-2 bg-background/50 rounded-lg">
+                    <CheckCircle className="h-5 w-5 text-green-500 mx-auto mb-1" />
+                    <p className="text-xs font-medium">All Workouts</p>
+                  </div>
+                  <div className="text-center p-2 bg-background/50 rounded-lg">
+                    <CheckCircle className="h-5 w-5 text-green-500 mx-auto mb-1" />
+                    <p className="text-xs font-medium">All Programs</p>
+                  </div>
+                  <div className="text-center p-2 bg-background/50 rounded-lg">
+                    <CheckCircle className="h-5 w-5 text-green-500 mx-auto mb-1" />
+                    <p className="text-xs font-medium">AI Plans</p>
+                  </div>
+                  <div className="text-center p-2 bg-background/50 rounded-lg">
+                    <CheckCircle className="h-5 w-5 text-green-500 mx-auto mb-1" />
+                    <p className="text-xs font-medium">Coach Access</p>
+                  </div>
+                </div>
+              </div>
+            )}
+
             {/* Premium Member Nickname */}
             {userTier === "premium" && (
               <div className="space-y-4 border-2 border-primary/30 bg-primary/5 rounded-lg p-4">

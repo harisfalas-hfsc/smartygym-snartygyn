@@ -541,6 +541,193 @@ export default function UserDashboard() {
           </Card>
         )}
 
+        {/* Quick Stats Overview - For all users */}
+        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-5 mb-8">
+          <Card className="bg-gradient-to-br from-red-500/10 to-red-500/5">
+            <CardContent className="pt-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-xs text-muted-foreground mb-1">Favorite Workouts</p>
+                  <p className="text-2xl font-bold">{favoriteWorkouts.length}</p>
+                </div>
+                <Heart className="h-8 w-8 text-red-500" />
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className="bg-gradient-to-br from-green-500/10 to-green-500/5">
+            <CardContent className="pt-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-xs text-muted-foreground mb-1">Completed Workouts</p>
+                  <p className="text-2xl font-bold">{completedWorkouts.length}</p>
+                </div>
+                <CheckCircle className="h-8 w-8 text-green-500" />
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className="bg-gradient-to-br from-blue-500/10 to-blue-500/5">
+            <CardContent className="pt-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-xs text-muted-foreground mb-1">Favorite Programs</p>
+                  <p className="text-2xl font-bold">{favoritePrograms.length}</p>
+                </div>
+                <Calendar className="h-8 w-8 text-blue-500" />
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className="bg-gradient-to-br from-yellow-500/10 to-yellow-500/5">
+            <CardContent className="pt-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-xs text-muted-foreground mb-1">Total Ratings</p>
+                  <p className="text-2xl font-bold">{ratedWorkouts.length + ratedPrograms.length}</p>
+                </div>
+                <Star className="h-8 w-8 text-yellow-500" />
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className="bg-gradient-to-br from-purple-500/10 to-purple-500/5">
+            <CardContent className="pt-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-xs text-muted-foreground mb-1">Calculator Uses</p>
+                  <p className="text-2xl font-bold">{oneRMHistory.length + bmrHistory.length + calorieHistory.length}</p>
+                </div>
+                <Calculator className="h-8 w-8 text-purple-500" />
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Premium Features Summary - Only for premium users */}
+        {hasActivePlan && (
+          <Card className="mb-8 border-yellow-500/50 bg-gradient-to-br from-yellow-500/5 via-amber-500/5 to-orange-500/5">
+            <CardHeader>
+              <div className="flex items-center gap-2">
+                <Crown className="h-6 w-6 text-yellow-500" />
+                <CardTitle className="text-xl">Your {getPlanName(subscriptionInfo?.product_id)} Membership Benefits</CardTitle>
+              </div>
+            </CardHeader>
+            <CardContent>
+              <p className="text-sm text-muted-foreground mb-6">
+                You're getting full access to our complete fitness platform. Here's everything included with your membership:
+              </p>
+              
+              <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+                {/* Workout Access */}
+                <div className="p-4 bg-background rounded-lg border border-border/50">
+                  <div className="flex items-center gap-2 mb-2">
+                    <Dumbbell className="h-5 w-5 text-primary" />
+                    <h4 className="font-semibold">Premium Workouts</h4>
+                  </div>
+                  <p className="text-xs text-muted-foreground">
+                    Full access to 100+ expertly designed workouts. Save favorites, track completion, and rate your experience.
+                  </p>
+                </div>
+
+                {/* Training Programs */}
+                <div className="p-4 bg-background rounded-lg border border-border/50">
+                  <div className="flex items-center gap-2 mb-2">
+                    <Calendar className="h-5 w-5 text-primary" />
+                    <h4 className="font-semibold">Training Programs</h4>
+                  </div>
+                  <p className="text-xs text-muted-foreground">
+                    Structured multi-week programs for every goal. Build strength, muscle, endurance, or improve mobility.
+                  </p>
+                </div>
+
+                {/* Interaction Tracking */}
+                <div className="p-4 bg-background rounded-lg border border-border/50">
+                  <div className="flex items-center gap-2 mb-2">
+                    <Heart className="h-5 w-5 text-primary" />
+                    <h4 className="font-semibold">Progress Tracking</h4>
+                  </div>
+                  <p className="text-xs text-muted-foreground">
+                    Save favorites, mark workouts complete, rate content, and view your entire fitness history in one place.
+                  </p>
+                </div>
+
+                {/* Calculators */}
+                <div className="p-4 bg-background rounded-lg border border-border/50">
+                  <div className="flex items-center gap-2 mb-2">
+                    <Calculator className="h-5 w-5 text-primary" />
+                    <h4 className="font-semibold">Fitness Calculators</h4>
+                  </div>
+                  <p className="text-xs text-muted-foreground">
+                    1RM, BMR, and Macro calculators with full history tracking to monitor your progress over time.
+                  </p>
+                </div>
+
+                {/* AI Diet Plans */}
+                <div className="p-4 bg-background rounded-lg border border-border/50">
+                  <div className="flex items-center gap-2 mb-2">
+                    <Star className="h-5 w-5 text-primary" />
+                    <h4 className="font-semibold">AI Diet Plans</h4>
+                  </div>
+                  <p className="text-xs text-muted-foreground">
+                    Generate unlimited personalized nutrition plans tailored to your goals, dietary preferences, and lifestyle.
+                  </p>
+                </div>
+
+                {/* AI Workout Plans */}
+                <div className="p-4 bg-background rounded-lg border border-border/50">
+                  <div className="flex items-center gap-2 mb-2">
+                    <Star className="h-5 w-5 text-primary" />
+                    <h4 className="font-semibold">AI Workout Plans</h4>
+                  </div>
+                  <p className="text-xs text-muted-foreground">
+                    Create custom training programs based on your equipment, fitness level, and specific goals.
+                  </p>
+                </div>
+
+                {/* Exercise Library */}
+                <div className="p-4 bg-background rounded-lg border border-border/50">
+                  <div className="flex items-center gap-2 mb-2">
+                    <Dumbbell className="h-5 w-5 text-primary" />
+                    <h4 className="font-semibold">Exercise Library</h4>
+                  </div>
+                  <p className="text-xs text-muted-foreground">
+                    Comprehensive video library with proper form demonstrations for every exercise.
+                  </p>
+                </div>
+
+                {/* Premium Support */}
+                <div className="p-4 bg-background rounded-lg border border-border/50">
+                  <div className="flex items-center gap-2 mb-2">
+                    <Crown className="h-5 w-5 text-primary" />
+                    <h4 className="font-semibold">Premium Support</h4>
+                  </div>
+                  <p className="text-xs text-muted-foreground">
+                    Direct messaging with Coach Haris Falas for personalized guidance and expert advice.
+                  </p>
+                </div>
+
+                {/* Ad-Free Experience */}
+                <div className="p-4 bg-background rounded-lg border border-border/50">
+                  <div className="flex items-center gap-2 mb-2">
+                    <CheckCircle className="h-5 w-5 text-primary" />
+                    <h4 className="font-semibold">Ad-Free Experience</h4>
+                  </div>
+                  <p className="text-xs text-muted-foreground">
+                    Enjoy an uninterrupted, distraction-free fitness experience without any advertisements.
+                  </p>
+                </div>
+              </div>
+
+              <div className="mt-6 p-4 bg-primary/10 rounded-lg border border-primary/20">
+                <p className="text-sm font-medium text-center">
+                  💪 You're on the {getPlanName(subscriptionInfo?.product_id)} plan - Making the most of your membership by staying consistent!
+                </p>
+              </div>
+            </CardContent>
+          </Card>
+        )}
+
         {/* Fitness Overview */}
         <div className="mb-8">
           <h2 className="text-2xl font-bold mb-4">Your Fitness Overview</h2>
