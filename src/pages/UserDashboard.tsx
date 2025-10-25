@@ -165,13 +165,8 @@ export default function UserDashboard() {
   };
 
   const fetchFavoriteExercises = async (userId: string) => {
-    const { data } = await supabase
-      .from("favorite_exercises")
-      .select("*")
-      .eq("user_id", userId)
-      .order("created_at", { ascending: false });
-
-    if (data) setFavoriteExercises(data);
+    // Favorite exercises feature removed
+    setFavoriteExercises([]);
   };
 
   const fetchCalculatorHistory = async (userId: string) => {

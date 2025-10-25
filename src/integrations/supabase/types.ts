@@ -89,57 +89,6 @@ export type Database = {
         }
         Relationships: []
       }
-      exercises: {
-        Row: {
-          created_at: string
-          description: string | null
-          id: string
-          name: string
-          updated_at: string
-          video_id: string
-          video_url: string | null
-        }
-        Insert: {
-          created_at?: string
-          description?: string | null
-          id?: string
-          name: string
-          updated_at?: string
-          video_id: string
-          video_url?: string | null
-        }
-        Update: {
-          created_at?: string
-          description?: string | null
-          id?: string
-          name?: string
-          updated_at?: string
-          video_id?: string
-          video_url?: string | null
-        }
-        Relationships: []
-      }
-      favorite_exercises: {
-        Row: {
-          created_at: string
-          exercise_name: string
-          id: string
-          user_id: string
-        }
-        Insert: {
-          created_at?: string
-          exercise_name: string
-          id?: string
-          user_id: string
-        }
-        Update: {
-          created_at?: string
-          exercise_name?: string
-          id?: string
-          user_id?: string
-        }
-        Relationships: []
-      }
       newsletter_subscribers: {
         Row: {
           active: boolean
