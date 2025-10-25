@@ -50,27 +50,63 @@ const ExerciseLibrary = () => {
 
           {/* YouTube Channel Card */}
           <Card className="border-2 border-primary/30 shadow-lg">
-            <CardContent className="p-0">
-              <div className="bg-gradient-to-r from-primary/10 to-primary/5 p-4 border-b border-primary/20">
-                <div className="flex items-center gap-2 justify-center">
-                  <Youtube className="h-5 w-5 text-primary" />
-                  <h2 className="text-lg font-semibold text-foreground">The Smarty Gym YouTube Channel</h2>
+            <CardContent className="p-6">
+              <div className="bg-gradient-to-r from-primary/10 to-primary/5 p-6 rounded-lg border border-primary/20 mb-6">
+                <div className="flex items-center gap-3 justify-center mb-3">
+                  <Youtube className="h-6 w-6 text-primary" />
+                  <h2 className="text-xl font-semibold text-foreground">The Smarty Gym YouTube Channel</h2>
                 </div>
-                <p className="text-center text-sm text-muted-foreground mt-1">
+                <p className="text-center text-muted-foreground mb-4">
                   Browse all exercise videos, tutorials, and demonstrations
                 </p>
-              </div>
-              
-              <div className="p-4">
-                <div className="w-full bg-muted/30 rounded-lg overflow-hidden" style={{ height: 'calc(100vh - 380px)', minHeight: '500px' }}>
-                  <iframe
-                    src="https://www.youtube.com/@TheSmartyGym"
-                    title="The Smarty Gym YouTube Channel - Exercise Library"
-                    className="w-full h-full"
-                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                    allowFullScreen
-                  />
+                <div className="flex justify-center">
+                  <Button
+                    onClick={() => window.open('https://www.youtube.com/@TheSmartyGym', '_blank')}
+                    className="gap-2"
+                    size="lg"
+                  >
+                    <Youtube className="h-5 w-5" />
+                    Visit YouTube Channel
+                  </Button>
                 </div>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <Card className="border border-border">
+                  <CardContent className="p-4">
+                    <h3 className="font-semibold mb-2 text-foreground">💪 Exercise Demonstrations</h3>
+                    <p className="text-sm text-muted-foreground">
+                      Watch proper form and technique for hundreds of exercises
+                    </p>
+                  </CardContent>
+                </Card>
+                
+                <Card className="border border-border">
+                  <CardContent className="p-4">
+                    <h3 className="font-semibold mb-2 text-foreground">🎯 Training Tips</h3>
+                    <p className="text-sm text-muted-foreground">
+                      Learn from expert coaching and training methodology
+                    </p>
+                  </CardContent>
+                </Card>
+                
+                <Card className="border border-border">
+                  <CardContent className="p-4">
+                    <h3 className="font-semibold mb-2 text-foreground">📚 Tutorial Videos</h3>
+                    <p className="text-sm text-muted-foreground">
+                      Step-by-step guides for mastering complex movements
+                    </p>
+                  </CardContent>
+                </Card>
+                
+                <Card className="border border-border">
+                  <CardContent className="p-4">
+                    <h3 className="font-semibold mb-2 text-foreground">🔥 Workout Previews</h3>
+                    <p className="text-sm text-muted-foreground">
+                      Preview workouts and see what to expect from each session
+                    </p>
+                  </CardContent>
+                </Card>
               </div>
             </CardContent>
           </Card>
