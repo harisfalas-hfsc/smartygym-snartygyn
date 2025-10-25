@@ -76,22 +76,25 @@ export const AccessControlProvider = ({ children }: { children: ReactNode }) => 
 
   const checkSubscription = async (user: User) => {
     try {
-      // Set a timeout for the database query
-      const timeoutPromise = new Promise((_, reject) => 
-        setTimeout(() => reject(new Error('Database query timeout')), 3000)
-      );
-      
-      const queryPromise = supabase
+      const { data: dbData, error: dbError } = await supabase
         .from('user_subscriptions')
-        .select('plan_type, status, current_period_end')
+        .select('plan_type, status, current_period_end, stripe_subscription_id')
         .eq('user_id', user.id)
-        .maybeSingle();
+        .single();
 
-      const { data: dbData } = await Promise.race([queryPromise, timeoutPromise]) as any;
+      if (dbError) {
+        console.error("Database subscription error:", dbError);
+      }
 
-      // Determine tier from database - default to subscriber if no data
+      // User is premium if they have gold or platinum plan
       const isSubscribed = dbData?.status === 'active' && 
                          (dbData?.plan_type === 'gold' || dbData?.plan_type === 'platinum');
+      
+      console.log("Subscription check result:", { 
+        plan_type: dbData?.plan_type, 
+        status: dbData?.status, 
+        isSubscribed 
+      });
       
       setState({
         user,
@@ -101,7 +104,6 @@ export const AccessControlProvider = ({ children }: { children: ReactNode }) => 
       });
     } catch (error) {
       console.error("Error checking subscription:", error);
-      // ALWAYS set loading to false and default to subscriber tier
       setState({
         user,
         userTier: "subscriber",

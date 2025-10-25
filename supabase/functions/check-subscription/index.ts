@@ -47,9 +47,8 @@ serve(async (req) => {
     const customers = await stripe.customers.list({ email: user.email, limit: 1 });
     
     if (customers.data.length === 0) {
-      logStep("No customer found, updating unsubscribed state");
+      logStep("No customer found, setting free plan");
       
-      // Update or create subscription record as free with proper conflict resolution
       const { error: upsertError } = await supabaseClient
         .from('user_subscriptions')
         .upsert(
@@ -70,18 +69,7 @@ serve(async (req) => {
         );
       
       if (upsertError) {
-        console.error('Free plan sync error:', upsertError);
-        return new Response(
-          JSON.stringify({ 
-            subscribed: false, 
-            plan_type: 'free',
-            error: 'Unable to sync subscription status'
-          }),
-          { 
-            status: 500, 
-            headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
-          }
-        );
+        logStep('Free plan sync error', { error: upsertError });
       }
       
       return new Response(JSON.stringify({ 
@@ -96,87 +84,95 @@ serve(async (req) => {
     const customerId = customers.data[0].id;
     logStep("Found Stripe customer", { customerId });
 
+    // Get all subscriptions with expanded data
     const subscriptions = await stripe.subscriptions.list({
       customer: customerId,
-      status: "active",
-      limit: 1,
+      limit: 10,
+      expand: ['data.items.data.price']
     });
     
-    const hasActiveSub = subscriptions.data.length > 0;
+    logStep("Found subscriptions", { count: subscriptions.data.length });
+    
+    // Find first active subscription
+    const activeSubscription = subscriptions.data.find((sub: any) => 
+      sub.status === 'active' || sub.status === 'trialing'
+    );
+    
     let planType = 'free';
     let subscriptionEnd = null;
     let stripeSubscriptionId = null;
 
-    if (hasActiveSub) {
-      const subscription = subscriptions.data[0];
-      stripeSubscriptionId = subscription.id;
+    if (activeSubscription) {
+      stripeSubscriptionId = activeSubscription.id;
+      logStep("Active subscription found", { 
+        subscriptionId: activeSubscription.id,
+        status: activeSubscription.status 
+      });
       
-      // Validate and convert timestamps safely
-      const periodEnd = subscription.current_period_end;
-      const periodStart = subscription.current_period_start;
+      // Get subscription details
+      const periodEnd = activeSubscription.current_period_end;
+      const periodStart = activeSubscription.current_period_start;
       
-      if (!periodEnd || !periodStart || typeof periodEnd !== 'number' || typeof periodStart !== 'number') {
-        logStep("Invalid subscription timestamps", { periodEnd, periodStart });
-        throw new Error("Invalid subscription period timestamps from Stripe");
-      }
-      
-      try {
+      if (periodEnd && typeof periodEnd === 'number') {
         subscriptionEnd = new Date(periodEnd * 1000).toISOString();
-        const subscriptionStart = new Date(periodStart * 1000).toISOString();
-        logStep("Active subscription found", { subscriptionId: subscription.id, endDate: subscriptionEnd });
-        
-        // Determine plan type based on price
-        const priceId = subscription.items.data[0].price.id;
-        if (priceId === "price_1SJ9q1IxQYg9inGKZzxxqPbD") {
-          planType = 'gold';
-        } else if (priceId === "price_1SJ9qGIxQYg9inGKFbgqVRjj") {
-          planType = 'platinum';
-        }
-        logStep("Determined plan type", { planType });
-
-        // Update database with subscription info using proper conflict resolution
-        const { error: upsertError } = await supabaseClient
-          .from('user_subscriptions')
-          .upsert(
-            {
-              user_id: user.id,
-              plan_type: planType,
-              status: 'active',
-              stripe_subscription_id: stripeSubscriptionId,
-              stripe_customer_id: customerId,
-              current_period_start: subscriptionStart,
-              current_period_end: subscriptionEnd,
-              cancel_at_period_end: subscription.cancel_at_period_end || false,
-            },
-            {
-              onConflict: 'user_id',
-              ignoreDuplicates: false
-            }
-          );
-
-        if (upsertError) {
-          console.error('Subscription sync error:', upsertError);
-          return new Response(
-            JSON.stringify({ 
-              subscribed: true, 
-              plan_type: planType,
-              subscription_end: subscriptionEnd,
-              error: 'Subscription active but sync failed'
-            }),
-            { 
-              status: 200, 
-              headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
-            }
-          );
-        }
-      } catch (dateError) {
-        logStep("Date conversion error", { error: dateError });
-        throw new Error("Failed to convert subscription dates");
+        logStep("Subscription period", { 
+          start: new Date(periodStart * 1000).toISOString(),
+          end: subscriptionEnd 
+        });
       }
+      
+      // Determine plan type based on price
+      const priceId = activeSubscription.items.data[0]?.price?.id;
+      logStep("Checking price ID", { priceId });
+      
+      if (priceId === "price_1SJ9q1IxQYg9inGKZzxxqPbD") {
+        planType = 'gold';
+      } else if (priceId === "price_1SJ9qGIxQYg9inGKFbgqVRjj") {
+        planType = 'platinum';
+      }
+      logStep("Determined plan type", { planType });
+
+      // Update database with subscription info
+      const { error: upsertError } = await supabaseClient
+        .from('user_subscriptions')
+        .upsert(
+          {
+            user_id: user.id,
+            plan_type: planType,
+            status: 'active',
+            stripe_subscription_id: stripeSubscriptionId,
+            stripe_customer_id: customerId,
+            current_period_start: periodStart ? new Date(periodStart * 1000).toISOString() : null,
+            current_period_end: subscriptionEnd,
+            cancel_at_period_end: activeSubscription.cancel_at_period_end || false,
+          },
+          {
+            onConflict: 'user_id',
+            ignoreDuplicates: false
+          }
+        );
+
+      if (upsertError) {
+        logStep('Subscription sync error', { error: upsertError });
+        return new Response(
+          JSON.stringify({ 
+            subscribed: true, 
+            plan_type: planType,
+            subscription_end: subscriptionEnd,
+            error: 'Subscription active but sync failed'
+          }),
+          { 
+            status: 200, 
+            headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
+          }
+        );
+      }
+      
+      logStep("Database updated successfully");
     } else {
       logStep("No active subscription found");
       
-      // Update to free plan with proper conflict resolution
+      // Update to free plan
       const { error: upsertError } = await supabaseClient
         .from('user_subscriptions')
         .upsert(
@@ -197,23 +193,12 @@ serve(async (req) => {
         );
 
       if (upsertError) {
-        console.error('Free plan update error:', upsertError);
-        return new Response(
-          JSON.stringify({ 
-            subscribed: false, 
-            plan_type: 'free',
-            error: 'Unable to update subscription status'
-          }),
-          { 
-            status: 500, 
-            headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
-          }
-        );
+        logStep('Free plan update error', { error: upsertError });
       }
     }
 
     return new Response(JSON.stringify({
-      subscribed: hasActiveSub,
+      subscribed: !!activeSubscription,
       plan_type: planType,
       subscription_end: subscriptionEnd
     }), {

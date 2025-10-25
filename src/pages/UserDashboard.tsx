@@ -191,24 +191,35 @@ export default function UserDashboard() {
 
   const checkSubscription = async () => {
     try {
-      const { data, error } = await supabase.functions.invoke("check-subscription");
-      if (error) throw error;
-      setSubscriptionInfo(data);
-      
-      // Get detailed subscription info from Stripe
-      if (data?.subscribed && user) {
-        try {
-          const { data: stripeData } = await supabase.functions.invoke("get-subscription-details");
-          if (stripeData?.subscription) {
-            setStripeDetails({
-              current_period_start: stripeData.subscription.current_period_start,
-              current_period_end: stripeData.subscription.current_period_end,
-              cancel_at_period_end: stripeData.subscription.cancel_at_period_end
-            });
-          }
-        } catch (err) {
-          console.error("Error fetching Stripe details:", err);
-        }
+      if (!user) return;
+
+      const { data: dbData, error: dbError } = await supabase
+        .from('user_subscriptions')
+        .select('plan_type, status, current_period_end, current_period_start, stripe_subscription_id, cancel_at_period_end')
+        .eq('user_id', user.id)
+        .single();
+
+      if (dbError) {
+        console.error("Dashboard subscription error:", dbError);
+        return;
+      }
+
+      console.log("Dashboard subscription data:", dbData);
+
+      const isSubscribed = dbData?.status === 'active' && (dbData.plan_type === 'gold' || dbData.plan_type === 'platinum');
+
+      setSubscriptionInfo({
+        subscribed: isSubscribed,
+        product_id: dbData?.plan_type || null,
+        subscription_end: dbData?.current_period_end || null
+      });
+
+      if (dbData?.current_period_start && dbData?.current_period_end) {
+        setStripeDetails({
+          current_period_start: new Date(dbData.current_period_start).getTime() / 1000,
+          current_period_end: new Date(dbData.current_period_end).getTime() / 1000,
+          cancel_at_period_end: dbData.cancel_at_period_end || false
+        });
       }
     } catch (error) {
       console.error("Error checking subscription:", error);

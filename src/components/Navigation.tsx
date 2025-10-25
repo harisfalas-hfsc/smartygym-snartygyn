@@ -74,9 +74,28 @@ export const Navigation = () => {
 
   const checkSubscription = async () => {
     try {
-      const { data, error } = await supabase.functions.invoke("check-subscription");
-      if (error) throw error;
-      setSubscriptionInfo(data);
+      // Read subscription directly from database for faster access
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
+
+      const { data: dbData, error: dbError } = await supabase
+        .from('user_subscriptions')
+        .select('plan_type, status, current_period_end, stripe_subscription_id')
+        .eq('user_id', user.id)
+        .single();
+
+      if (dbError) {
+        console.error("Database subscription error:", dbError);
+        return;
+      }
+
+      console.log("Navigation subscription check:", dbData);
+
+      setSubscriptionInfo({
+        subscribed: dbData?.status === 'active' && (dbData.plan_type === 'gold' || dbData.plan_type === 'platinum'),
+        product_id: dbData?.plan_type || null,
+        subscription_end: dbData?.current_period_end || null
+      });
     } catch (error) {
       console.error("Error checking subscription:", error);
     }
