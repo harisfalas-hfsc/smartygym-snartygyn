@@ -93,9 +93,13 @@ const App = () => (
                   <Route path="/dashboard" element={<Dashboard />} />
                   <Route path="/userdashboard" element={<UserDashboard />} />
                   <Route path="/profilesettings" element={<ProfileSettings />} />
+                  <Route path="/1rmcalculator" element={<OneRMCalculator />} />
+                  <Route path="/bmrcalculator" element={<BMRCalculator />} />
+                  <Route path="/macrocalculator" element={<MacroTrackingCalculator />} />
+                  <Route path="/caloriecalculator" element={<MacroTrackingCalculator />} />
                 </Route>
                 
-                {/* Public calculator routes */}
+                {/* Public routes */}
                 <Route path="/about" element={<About />} />
                 <Route path="/takeatour" element={<TakeTour />} />
                 <Route path="/contact" element={<Contact />} />
@@ -105,10 +109,6 @@ const App = () => (
                 <Route path="/termsofservice" element={<TermsOfService />} />
                 <Route path="/disclaimer" element={<Disclaimer />} />
                 <Route path="/tools" element={<Tools />} />
-                <Route path="/1rmcalculator" element={<OneRMCalculator />} />
-                <Route path="/bmrcalculator" element={<BMRCalculator />} />
-                <Route path="/macrocalculator" element={<MacroTrackingCalculator />} />
-                <Route path="/caloriecalculator" element={<MacroTrackingCalculator />} /> {/* Redirect old URL */}
                 
                 {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
                 <Route path="*" element={<NotFound />} />

@@ -50,7 +50,7 @@ const PremiumComparison = () => {
     {
       category: "Exercise Library",
       icon: BookOpen,
-      visitor: "View only",
+      visitor: "Full access",
       subscriber: "Full access",
       premium: "Full access"
     },
@@ -64,7 +64,7 @@ const PremiumComparison = () => {
     {
       category: "Blog",
       icon: BookOpen,
-      visitor: "View only",
+      visitor: "Full access",
       subscriber: "Full access",
       premium: "Full access"
     },

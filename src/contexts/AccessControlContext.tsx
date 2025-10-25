@@ -126,19 +126,26 @@ export const AccessControlProvider = ({ children }: { children: ReactNode }) => 
   const canAccessContent = (contentType: string): boolean => {
     const { userTier } = state;
 
-    if (userTier === "guest") {
-      return contentType === "exercise-library" || contentType === "blog";
+    // Public content accessible to all
+    if (contentType === "exercise-library" || contentType === "blog") {
+      return true;
     }
 
+    // Guests can only access public content
+    if (userTier === "guest") {
+      return false;
+    }
+
+    // Subscribers can access free content, tools, and dashboard
     if (userTier === "subscriber") {
       return contentType === "free-workout" || 
              contentType === "free-program" || 
              contentType === "tool" || 
-             contentType === "dashboard" ||
-             contentType === "exercise-library" ||
-             contentType === "blog";
+             contentType === "calculator" ||
+             contentType === "dashboard";
     }
 
+    // Premium users can access everything
     return true;
   };
 
