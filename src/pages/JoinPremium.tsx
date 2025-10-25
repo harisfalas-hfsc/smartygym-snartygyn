@@ -159,7 +159,7 @@ export default function JoinPremium() {
           {/* Pricing Plans */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-4xl mx-auto mb-8">
             {/* Gold Plan */}
-            <Card className="relative border-2 border-amber-500 shadow-lg">
+            <Card className="relative border-2 border-amber-500 shadow-lg flex flex-col">
               <CardHeader className="text-center pb-4">
                 <div className="mb-3">
                   <h2 className="text-2xl font-bold text-amber-600 dark:text-amber-400">Gold Plan</h2>
@@ -173,8 +173,8 @@ export default function JoinPremium() {
                   🔄 Auto-renews monthly
                 </p>
               </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="space-y-2">
+              <CardContent className="space-y-4 flex-1 flex flex-col">
+                <div className="space-y-2 flex-1">
                   <div className="flex items-start gap-2">
                     <Check className="h-5 w-5 text-green-500 shrink-0 mt-0.5" />
                     <span className="text-sm">Full access to all features</span>
@@ -187,22 +187,28 @@ export default function JoinPremium() {
                     <Check className="h-5 w-5 text-green-500 shrink-0 mt-0.5" />
                     <span className="text-sm">Cancel anytime (subscription-based)</span>
                   </div>
+                  <div className="flex items-start gap-2">
+                    <Check className="h-5 w-5 text-green-500 shrink-0 mt-0.5" />
+                    <span className="text-sm">Perfect for trying premium features</span>
+                  </div>
                 </div>
-                <Button 
-                  className="w-full text-lg py-6 mt-6" 
-                  onClick={() => handleSubscribe('gold')}
-                  disabled={loading}
-                >
-                  {loading ? "Processing..." : "Start Monthly Plan"}
-                </Button>
-                <p className="text-xs text-center text-muted-foreground">
-                  Renews automatically each month
-                </p>
+                <div className="space-y-4 mt-auto">
+                  <Button 
+                    className="w-full text-lg py-6" 
+                    onClick={() => handleSubscribe('gold')}
+                    disabled={loading}
+                  >
+                    {loading ? "Processing..." : "Start Monthly Plan"}
+                  </Button>
+                  <p className="text-xs text-center text-muted-foreground">
+                    Renews automatically each month
+                  </p>
+                </div>
               </CardContent>
             </Card>
 
             {/* Platinum Plan */}
-            <Card className="relative border-2 border-primary shadow-lg">
+            <Card className="relative border-2 border-primary shadow-lg flex flex-col">
               <CardHeader className="text-center pb-4">
                 <div className="mb-3 relative">
                   <Badge className="absolute -top-2 right-0 bg-green-600 text-white px-2 py-1 text-xs">
@@ -224,8 +230,8 @@ export default function JoinPremium() {
                   </p>
                 </div>
               </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="space-y-2">
+              <CardContent className="space-y-4 flex-1 flex flex-col">
+                <div className="space-y-2 flex-1">
                   <div className="flex items-start gap-2">
                     <Check className="h-5 w-5 text-green-500 shrink-0 mt-0.5" />
                     <span className="text-sm">Full access to all features</span>
@@ -243,16 +249,18 @@ export default function JoinPremium() {
                     <span className="text-sm">Cancel anytime (subscription-based)</span>
                   </div>
                 </div>
-                <Button 
-                  className="w-full text-lg py-6 mt-6" 
-                  onClick={() => handleSubscribe('platinum')}
-                  disabled={loading}
-                >
-                  {loading ? "Processing..." : "Start Yearly Plan"}
-                </Button>
-                <p className="text-xs text-center text-muted-foreground">
-                  Renews automatically each year • Best value for committed members
-                </p>
+                <div className="space-y-4 mt-auto">
+                  <Button 
+                    className="w-full text-lg py-6" 
+                    onClick={() => handleSubscribe('platinum')}
+                    disabled={loading}
+                  >
+                    {loading ? "Processing..." : "Start Yearly Plan"}
+                  </Button>
+                  <p className="text-xs text-center text-muted-foreground">
+                    Renews automatically each year • Best value for committed members
+                  </p>
+                </div>
               </CardContent>
             </Card>
           </div>
