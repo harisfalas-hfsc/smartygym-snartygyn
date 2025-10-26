@@ -48,54 +48,50 @@ export const CookieConsent = () => {
 
   return (
     <div 
-      className={`fixed bottom-0 left-0 right-0 z-50 p-4 transition-all duration-300 ${
-        isVisible ? "translate-y-0 opacity-100" : "translate-y-full opacity-0"
+      className={`fixed bottom-4 right-4 z-50 transition-all duration-300 ${
+        isVisible ? "translate-x-0 opacity-100" : "translate-x-full opacity-0"
       }`}
     >
-      <Card className="max-w-4xl mx-auto p-4 sm:p-6 shadow-lg border-2">
-        <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
-          <div className="flex-shrink-0">
-            <Cookie className="h-6 w-6 text-primary" />
+      <Card className="w-80 p-4 shadow-2xl border-2 bg-background">
+        <Button
+          variant="ghost"
+          size="icon"
+          className="absolute top-2 right-2 h-6 w-6"
+          onClick={handleReject}
+        >
+          <X className="h-3 w-3" />
+        </Button>
+
+        <div className="space-y-3">
+          <div className="flex items-center gap-2">
+            <Cookie className="h-5 w-5 text-primary flex-shrink-0" />
+            <h3 className="text-sm font-semibold">Cookie Notice</h3>
           </div>
           
-          <div className="flex-1 space-y-2">
-            <h3 className="text-sm font-semibold">Cookie Notice</h3>
-            <p className="text-xs sm:text-sm text-muted-foreground">
-              We use essential cookies for authentication and functionality, plus optional cookies to remember your preferences. 
-              By accepting, you help us provide a better experience. See our{" "}
-              <Link to="/privacy-policy" className="text-primary hover:underline font-medium">
-                Privacy Policy
-              </Link>{" "}
-              for details.
-            </p>
-          </div>
+          <p className="text-xs text-muted-foreground leading-relaxed">
+            We use cookies for authentication and preferences. See our{" "}
+            <Link to="/privacy-policy" className="text-primary hover:underline font-medium">
+              Privacy Policy
+            </Link>.
+          </p>
 
-          <div className="flex flex-row sm:flex-col gap-2 w-full sm:w-auto">
+          <div className="flex gap-2">
             <Button 
               onClick={handleAccept}
               size="sm"
-              className="flex-1 sm:flex-none text-xs"
+              className="flex-1 h-8 text-xs"
             >
-              Accept All
+              Accept
             </Button>
             <Button 
               onClick={handleReject}
               variant="outline"
               size="sm"
-              className="flex-1 sm:flex-none text-xs"
+              className="flex-1 h-8 text-xs"
             >
-              Essential Only
+              Decline
             </Button>
           </div>
-
-          <Button
-            variant="ghost"
-            size="icon"
-            className="absolute top-2 right-2 sm:relative sm:top-0 sm:right-0 h-6 w-6"
-            onClick={handleReject}
-          >
-            <X className="h-4 w-4" />
-          </Button>
         </div>
       </Card>
     </div>
