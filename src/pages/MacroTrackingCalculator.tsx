@@ -10,7 +10,7 @@ import { ArrowLeft, Save } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { User } from "@supabase/supabase-js";
-import { AccessGate } from "@/components/AccessGate";
+import { ProtectedRoute } from "@/components/ProtectedRoute";
 
 const MacroTrackingCalculator = () => {
   const navigate = useNavigate();
@@ -159,7 +159,7 @@ const MacroTrackingCalculator = () => {
   };
 
   return (
-    <AccessGate requireAuth={true} requirePremium={false} contentType="feature">
+    <ProtectedRoute>
       <Helmet>
         <title>Macro Calculator Cyprus | Free Macronutrient & Nutrition Calculator | Haris Falas | smartygym.com</title>
         <meta name="description" content="Free Macro Calculator - Calculate protein, carbs, fats for weight loss, muscle gain, maintenance. Personalized nutrition planning by Sports Scientist Haris Falas at smartygym.com Cyprus" />
@@ -356,7 +356,7 @@ const MacroTrackingCalculator = () => {
         </Card>
       </div>
       </div>
-    </AccessGate>
+    </ProtectedRoute>
   );
 };
 

@@ -10,7 +10,7 @@ import { ArrowLeft, Save } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { User } from "@supabase/supabase-js";
-import { AccessGate } from "@/components/AccessGate";
+import { ProtectedRoute } from "@/components/ProtectedRoute";
 
 const BMRCalculator = () => {
   const navigate = useNavigate();
@@ -92,7 +92,7 @@ const BMRCalculator = () => {
   };
 
   return (
-    <AccessGate requireAuth={true} requirePremium={false} contentType="feature">
+    <ProtectedRoute>
       <Helmet>
         <title>BMR Calculator - Smarty Gym | Free Basal Metabolic Rate Calculator | smartygym.com</title>
         <meta name="description" content="Free BMR Calculator using Mifflin-St Jeor equation. Calculate your basal metabolic rate and daily calorie needs at smartygym.com - convenient fitness tool by Haris Falas." />
@@ -224,7 +224,7 @@ const BMRCalculator = () => {
         </Card>
       </div>
       </div>
-    </AccessGate>
+    </ProtectedRoute>
   );
 };
 

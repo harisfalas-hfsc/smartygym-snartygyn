@@ -29,17 +29,25 @@ export const AccessControlProvider = ({ children }: { children: ReactNode }) => 
 
   useEffect(() => {
     let timeoutId: NodeJS.Timeout;
+    let mounted = true;
     
     const init = async () => {
-      // Set timeout for loading check
+      // Set timeout for loading check with better UX
       timeoutId = setTimeout(() => {
-        setState(prev => {
-          if (prev.isLoading) {
-            console.warn("Access control check timed out, forcing completion");
-            return { ...prev, isLoading: false };
-          }
-          return prev;
-        });
+        if (mounted) {
+          setState(prev => {
+            if (prev.isLoading) {
+              console.warn("Access control check timed out after 5s - defaulting to guest");
+              return { 
+                user: null,
+                userTier: "guest",
+                isLoading: false,
+                productId: null
+              };
+            }
+            return prev;
+          });
+        }
       }, 5000);
       
       await checkAccess();
@@ -49,6 +57,8 @@ export const AccessControlProvider = ({ children }: { children: ReactNode }) => 
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (_event, session) => {
+        if (!mounted) return;
+        
         if (session?.user) {
           await checkSubscription(session.user);
         } else {
@@ -63,6 +73,7 @@ export const AccessControlProvider = ({ children }: { children: ReactNode }) => 
     );
 
     return () => {
+      mounted = false;
       subscription.unsubscribe();
       clearTimeout(timeoutId);
     };

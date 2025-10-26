@@ -9,7 +9,7 @@ import { ArrowLeft, Save } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { User } from "@supabase/supabase-js";
-import { AccessGate } from "@/components/AccessGate";
+import { ProtectedRoute } from "@/components/ProtectedRoute";
 
 const OneRMCalculator = () => {
   const navigate = useNavigate();
@@ -85,7 +85,7 @@ const OneRMCalculator = () => {
   };
 
   return (
-    <AccessGate requireAuth={true} requirePremium={false} contentType="feature">
+    <ProtectedRoute>
       <Helmet>
         <title>1RM Calculator Cyprus | Free One Rep Max Strength Calculator | Haris Falas | smartygym.com</title>
         <meta name="description" content="Free 1RM Calculator using Brzycki formula - Calculate your one-rep maximum for powerlifting, strength training. Training percentages included. By Sports Scientist Haris Falas at smartygym.com Cyprus" />
@@ -202,7 +202,7 @@ const OneRMCalculator = () => {
         </Card>
       </div>
       </div>
-    </AccessGate>
+    </ProtectedRoute>
   );
 };
 

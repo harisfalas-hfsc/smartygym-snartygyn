@@ -1,15 +1,6 @@
 [functions.generate-fitness-plan]
 verify_jwt = true
 
-[functions.strava-oauth-callback]
-verify_jwt = true
-
-[functions.strava-fetch-activities]
-verify_jwt = true
-
-[functions.strava-disconnect]
-verify_jwt = true
-
 [functions.send-contact-email]
 verify_jwt = false
 
