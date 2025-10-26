@@ -56,8 +56,8 @@ const App = () => (
       <TooltipProvider>
         <Toaster />
         <Sonner />
-        <CookieConsent />
         <BrowserRouter>
+          <CookieConsent />
           <AccessControlProvider>
           <WhatsAppButton />
           <ScrollToTop />
