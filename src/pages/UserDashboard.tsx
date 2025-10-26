@@ -110,34 +110,26 @@ export default function UserDashboard() {
   const [calorieHistory, setCalorieHistory] = useState<CalorieRecord[]>([]);
 
   useEffect(() => {
-    // Set a safety timeout for loading
-    const loadingTimeout = setTimeout(() => {
-      if (loading) {
-        console.warn("Dashboard loading timed out");
-        setLoading(false);
-        toast({
-          title: "Warning",
-          description: "Dashboard took too long to load. Some data may be incomplete.",
-          variant: "destructive"
-        });
-      }
-    }, 8000);
-
     initDashboard();
-
-    return () => clearTimeout(loadingTimeout);
   }, []);
 
   const initDashboard = async () => {
     try {
       const { data: { session } } = await supabase.auth.getSession();
-      if (session?.user) {
-        setUser(session.user);
-        await Promise.all([
-          fetchAllData(session.user.id),
-          checkSubscription(session.user.id)
-        ]);
+      if (!session?.user) {
+        setLoading(false);
+        navigate('/auth');
+        return;
       }
+
+      setUser(session.user);
+      
+      // Fetch all data in parallel with individual error handling
+      await Promise.allSettled([
+        fetchAllData(session.user.id),
+        checkSubscription(session.user.id)
+      ]);
+      
     } catch (error) {
       console.error("Error initializing dashboard:", error);
       toast({
@@ -151,7 +143,8 @@ export default function UserDashboard() {
   };
 
   const fetchAllData = async (userId: string) => {
-    await Promise.all([
+    // Use allSettled so individual failures don't block others
+    await Promise.allSettled([
       fetchWorkoutInteractions(userId),
       fetchProgramInteractions(userId),
       fetchFavoriteExercises(userId),
@@ -160,23 +153,33 @@ export default function UserDashboard() {
   };
 
   const fetchWorkoutInteractions = async (userId: string) => {
-    const { data } = await supabase
-      .from("workout_interactions")
-      .select("*")
-      .eq("user_id", userId)
-      .order("updated_at", { ascending: false });
+    try {
+      const { data, error } = await supabase
+        .from("workout_interactions")
+        .select("*")
+        .eq("user_id", userId)
+        .order("updated_at", { ascending: false });
 
-    if (data) setWorkoutInteractions(data);
+      if (error) throw error;
+      if (data) setWorkoutInteractions(data);
+    } catch (error) {
+      console.error("Error fetching workout interactions:", error);
+    }
   };
 
   const fetchProgramInteractions = async (userId: string) => {
-    const { data } = await supabase
-      .from("program_interactions")
-      .select("*")
-      .eq("user_id", userId)
-      .order("updated_at", { ascending: false });
+    try {
+      const { data, error } = await supabase
+        .from("program_interactions")
+        .select("*")
+        .eq("user_id", userId)
+        .order("updated_at", { ascending: false });
 
-    if (data) setProgramInteractions(data);
+      if (error) throw error;
+      if (data) setProgramInteractions(data);
+    } catch (error) {
+      console.error("Error fetching program interactions:", error);
+    }
   };
 
   const fetchFavoriteExercises = async (userId: string) => {
@@ -185,30 +188,41 @@ export default function UserDashboard() {
   };
 
   const fetchCalculatorHistory = async (userId: string) => {
-    const { data: onerm } = await supabase
-      .from("onerm_history")
-      .select("*")
-      .eq("user_id", userId)
-      .order("created_at", { ascending: false })
-      .limit(5);
+    try {
+      // Fetch all calculator histories in parallel
+      const [onermResult, bmrResult, calorieResult] = await Promise.allSettled([
+        supabase
+          .from("onerm_history")
+          .select("*")
+          .eq("user_id", userId)
+          .order("created_at", { ascending: false })
+          .limit(5),
+        supabase
+          .from("bmr_history")
+          .select("*")
+          .eq("user_id", userId)
+          .order("created_at", { ascending: false })
+          .limit(5),
+        supabase
+          .from("calorie_history")
+          .select("*")
+          .eq("user_id", userId)
+          .order("created_at", { ascending: false })
+          .limit(5)
+      ]);
 
-    const { data: bmr } = await supabase
-      .from("bmr_history")
-      .select("*")
-      .eq("user_id", userId)
-      .order("created_at", { ascending: false })
-      .limit(5);
-
-    const { data: calorie } = await supabase
-      .from("calorie_history")
-      .select("*")
-      .eq("user_id", userId)
-      .order("created_at", { ascending: false })
-      .limit(5);
-
-    if (onerm) setOneRMHistory(onerm);
-    if (bmr) setBMRHistory(bmr);
-    if (calorie) setCalorieHistory(calorie);
+      if (onermResult.status === 'fulfilled' && onermResult.value.data) {
+        setOneRMHistory(onermResult.value.data);
+      }
+      if (bmrResult.status === 'fulfilled' && bmrResult.value.data) {
+        setBMRHistory(bmrResult.value.data);
+      }
+      if (calorieResult.status === 'fulfilled' && calorieResult.value.data) {
+        setCalorieHistory(calorieResult.value.data);
+      }
+    } catch (error) {
+      console.error("Error fetching calculator history:", error);
+    }
   };
 
   const checkSubscription = async (userId?: string) => {
