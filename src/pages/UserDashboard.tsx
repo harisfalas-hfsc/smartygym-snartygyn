@@ -314,26 +314,56 @@ export default function UserDashboard() {
   };
 
   const handleManageSubscription = async () => {
-    if (!user) return;
+    if (!user) {
+      console.error("No user found when trying to manage subscription");
+      toast({
+        title: "Error",
+        description: "Please log in to manage your subscription.",
+        variant: "destructive"
+      });
+      return;
+    }
     
+    console.log("Opening customer portal for user:", user.id);
     setManagingSubscription(true);
+    
     try {
-      const { data, error } = await supabase.functions.invoke('customer-portal');
+      const { data: { session } } = await supabase.auth.getSession();
       
-      if (error) throw error;
+      if (!session) {
+        throw new Error("No active session found");
+      }
+
+      console.log("Invoking customer-portal function...");
+      const { data, error } = await supabase.functions.invoke('customer-portal', {
+        headers: {
+          Authorization: `Bearer ${session.access_token}`
+        }
+      });
+      
+      console.log("Customer portal response:", { data, error });
+      
+      if (error) {
+        console.error("Customer portal error:", error);
+        throw error;
+      }
       
       if (data?.url) {
+        console.log("Opening portal URL:", data.url);
         window.open(data.url, '_blank');
         toast({
           title: "Opening subscription portal",
           description: "Manage your subscription in the new tab",
         });
+      } else {
+        throw new Error("No portal URL returned");
       }
     } catch (error) {
       console.error('Error opening customer portal:', error);
+      const errorMessage = error instanceof Error ? error.message : "Unknown error occurred";
       toast({
         title: "Error",
-        description: "Failed to open subscription management. Please try again.",
+        description: `Failed to open subscription management: ${errorMessage}`,
         variant: "destructive"
       });
     } finally {
