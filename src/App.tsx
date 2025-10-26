@@ -10,6 +10,7 @@ import { AccessControlProvider } from "./contexts/AccessControlContext";
 import { Navigation } from "./components/Navigation";
 import { Footer } from "./components/Footer";
 import { ScrollToTop } from "./components/ScrollToTop";
+import { CookieConsent } from "./components/CookieConsent";
 import { ArticleDetail } from "./pages/ArticleDetail";
 import Index from "./pages/Index";
 import Auth from "./pages/Auth";
@@ -55,6 +56,7 @@ const App = () => (
       <TooltipProvider>
         <Toaster />
         <Sonner />
+        <CookieConsent />
         <BrowserRouter>
           <AccessControlProvider>
           <WhatsAppButton />

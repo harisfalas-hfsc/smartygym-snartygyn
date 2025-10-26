@@ -133,10 +133,18 @@ const PrivacyPolicy = () => {
               <div className="flex items-start gap-3">
                 <AlertCircle className="h-6 w-6 text-primary mt-1 flex-shrink-0" />
                 <div>
-                  <h2 className="text-2xl font-bold mb-3">8. Cookies</h2>
-                  <p className="text-muted-foreground">
-                    Our website uses cookies to enhance user experience. You can manage or disable cookies in your 
-                    browser settings.
+                  <h2 className="text-2xl font-bold mb-3">8. Cookies and Similar Technologies</h2>
+                  <p className="text-muted-foreground mb-3">
+                    Our website uses cookies and similar technologies (such as localStorage) to provide and improve our services:
+                  </p>
+                  <ul className="space-y-2 text-muted-foreground">
+                    <li><strong>Essential Cookies:</strong> Required for authentication, security, and core website functionality. These cannot be disabled as they are necessary for the website to work.</li>
+                    <li><strong>Functional Cookies:</strong> Remember your preferences such as theme selection (light/dark mode) and UI settings to enhance your experience.</li>
+                    <li><strong>Third-Party Cookies:</strong> Our payment processor (Stripe) may set cookies to process transactions securely.</li>
+                  </ul>
+                  <p className="text-muted-foreground mt-3">
+                    You can manage your cookie preferences through our cookie consent banner or by adjusting your browser settings. 
+                    Note that disabling certain cookies may affect website functionality.
                   </p>
                 </div>
               </div>
