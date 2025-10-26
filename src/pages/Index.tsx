@@ -35,11 +35,33 @@ const Index = () => {
     return () => subscription.unsubscribe();
   }, []);
   const handleLogout = async () => {
-    await supabase.auth.signOut();
-    toast({
-      title: "Logged out",
-      description: "You have been logged out successfully",
-    });
+    try {
+      // Sign out with global scope to clear all sessions
+      const { error } = await supabase.auth.signOut({ scope: 'global' });
+      
+      if (error) {
+        console.error("Logout error:", error);
+        toast({
+          title: "Error",
+          description: "Failed to log out. Please try again.",
+          variant: "destructive"
+        });
+        return;
+      }
+
+      setUser(null);
+      toast({
+        title: "Logged out",
+        description: "You have been logged out successfully",
+      });
+      
+      // Force reload to clear all state
+      setTimeout(() => {
+        window.location.reload();
+      }, 500);
+    } catch (error) {
+      console.error("Logout error:", error);
+    }
   };
   const services = [{
     id: "workout",

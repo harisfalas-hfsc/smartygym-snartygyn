@@ -244,9 +244,34 @@ export default function Dashboard() {
   };
 
   const handleLogout = async () => {
-    await supabase.auth.signOut();
-    toast({ title: "Logged out", description: "You have been logged out successfully" });
-    navigate("/");
+    try {
+      // Sign out with global scope to clear all sessions
+      const { error } = await supabase.auth.signOut({ scope: 'global' });
+      
+      if (error) {
+        console.error("Logout error:", error);
+        toast({ 
+          title: "Error", 
+          description: "Failed to log out. Please try again.",
+          variant: "destructive"
+        });
+        return;
+      }
+
+      toast({ 
+        title: "Logged out", 
+        description: "You have been logged out successfully" 
+      });
+      
+      navigate("/");
+      
+      // Force reload to clear all state
+      setTimeout(() => {
+        window.location.reload();
+      }, 500);
+    } catch (error) {
+      console.error("Logout error:", error);
+    }
   };
 
   const calculateOneRMProgress = () => {

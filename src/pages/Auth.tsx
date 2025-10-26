@@ -23,13 +23,27 @@ export default function Auth() {
   // Get the mode from URL params, default to login
   const defaultTab = searchParams.get("mode") === "signup" ? "signup" : "login";
 
-  // Check if user is already authenticated
+  // Check if user is already authenticated and set up listener
   useEffect(() => {
+    // Check current session
     supabase.auth.getSession().then(({ data: { session } }) => {
       if (session) {
         navigate("/userdashboard");
       }
     });
+
+    // Listen for auth state changes
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      if (event === 'SIGNED_OUT') {
+        // User signed out, stay on auth page
+        console.log("User signed out");
+      } else if (session) {
+        // User signed in
+        navigate("/userdashboard");
+      }
+    });
+
+    return () => subscription.unsubscribe();
   }, [navigate]);
 
   // Sign Up State
