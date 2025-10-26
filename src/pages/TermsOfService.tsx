@@ -28,9 +28,9 @@ const TermsOfService = () => {
           <Card className="p-8 space-y-8">
             <div className="prose dark:prose-invert max-w-none">
               <div className="bg-muted/50 p-4 rounded-lg mb-6">
-                <p className="text-sm text-muted-foreground mb-2"><strong>Effective Date:</strong> August 15, 2025</p>
+                <p className="text-sm text-muted-foreground mb-2"><strong>Effective Date:</strong> January 2025</p>
                 <p className="text-sm text-muted-foreground mb-2"><strong>Website:</strong> smartygym.com</p>
-                <p className="text-sm text-muted-foreground"><strong>Company:</strong> Smarty Gym | Founded by Haris Falas</p>
+                <p className="text-sm text-muted-foreground"><strong>Company:</strong> Smarty Gym | Founded by Haris Falas | Cyprus</p>
               </div>
 
               <p className="text-lg text-muted-foreground">
@@ -118,12 +118,31 @@ const TermsOfService = () => {
               <div className="flex items-start gap-3">
                 <AlertTriangle className="h-6 w-6 text-primary mt-1 flex-shrink-0" />
                 <div>
-                  <h2 className="text-2xl font-bold mb-3">7. Health Disclaimer</h2>
+                  <h2 className="text-2xl font-bold mb-3">7. Health & Safety Requirements</h2>
                   <ul className="space-y-2 text-muted-foreground">
-                    <li>All workouts and programs are designed for general fitness purposes.</li>
-                    <li>Always consult a medical professional before beginning any new exercise program.</li>
-                    <li>Smarty Gym is not responsible for injuries, health issues, or adverse effects resulting from misuse of our programs.</li>
-                    <li>Participation is at your own risk.</li>
+                    <li>
+                      <strong>PAR-Q+ Mandatory:</strong> You MUST complete the PAR-Q+ (Physical Activity Readiness 
+                      Questionnaire) health assessment available on our Disclaimer page before starting any workout program.
+                    </li>
+                    <li>
+                      <strong>Medical Consultation:</strong> Always consult a medical professional before beginning 
+                      any new exercise program, especially if you have pre-existing health conditions, injuries, or concerns.
+                    </li>
+                    <li>
+                      <strong>Medical Clearance:</strong> If your PAR-Q+ responses indicate health risks, you must 
+                      obtain written medical clearance before using our services.
+                    </li>
+                    <li>
+                      All workouts and programs are designed for general fitness purposes and not as medical treatment.
+                    </li>
+                    <li>
+                      Smarty Gym is not responsible for injuries, health issues, or adverse effects resulting from 
+                      participation in our programs.
+                    </li>
+                    <li>
+                      <strong>Assumption of Risk:</strong> Participation is entirely at your own risk. See our 
+                      Disclaimer page for complete liability release.
+                    </li>
                   </ul>
                 </div>
               </div>
@@ -157,9 +176,24 @@ const TermsOfService = () => {
                 <Shield className="h-6 w-6 text-primary mt-1 flex-shrink-0" />
                 <div>
                   <h2 className="text-2xl font-bold mb-3">10. Limitation of Liability</h2>
+                  <p className="text-muted-foreground mb-3">
+                    To the maximum extent permitted by Cyprus law and EU regulations:
+                  </p>
                   <ul className="space-y-2 text-muted-foreground">
-                    <li>Smarty Gym provides fitness programs "as is" and makes no warranties regarding results.</li>
-                    <li>To the maximum extent permitted by law, Smarty Gym shall not be liable for any direct, indirect, incidental, or consequential damages.</li>
+                    <li>Smarty Gym provides fitness programs "as is" without warranties of any kind, express or implied.</li>
+                    <li>
+                      We shall not be liable for any direct, indirect, incidental, consequential, special, or punitive 
+                      damages arising from your use of our services, including but not limited to personal injury, 
+                      property damage, lost profits, or data loss.
+                    </li>
+                    <li>
+                      This limitation applies even if we have been advised of the possibility of such damages.
+                    </li>
+                    <li>
+                      <strong>EU Consumer Rights:</strong> Nothing in these terms shall exclude or limit liability 
+                      that cannot be excluded or limited under Cyprus and EU law, including liability for death or 
+                      personal injury caused by negligence.
+                    </li>
                   </ul>
                 </div>
               </div>
@@ -201,13 +235,26 @@ const TermsOfService = () => {
               <div className="flex items-start gap-3">
                 <Scale className="h-6 w-6 text-primary mt-1 flex-shrink-0" />
                 <div>
-                  <h2 className="text-2xl font-bold mb-3">14. Governing Law & Jurisdiction</h2>
+                  <h2 className="text-2xl font-bold mb-3">14. Governing Law, Jurisdiction & Dispute Resolution</h2>
                   <p className="text-muted-foreground mb-3">
-                    These Terms & Conditions are governed by the laws of Cyprus and applicable EU regulations.
+                    These Terms & Conditions are governed by the laws of the Republic of Cyprus and applicable 
+                    European Union regulations, including but not limited to:
                   </p>
                   <ul className="space-y-2 text-muted-foreground">
-                    <li>Any disputes shall be subject to the exclusive jurisdiction of the courts of Cyprus.</li>
+                    <li>General Data Protection Regulation (GDPR) (EU) 2016/679</li>
+                    <li>Consumer Rights Directive 2011/83/EU</li>
+                    <li>E-Commerce Directive 2000/31/EC</li>
+                    <li>Cyprus consumer protection laws</li>
                   </ul>
+                  <p className="text-muted-foreground mt-3">
+                    Any disputes arising from these terms shall be subject to the exclusive jurisdiction of the 
+                    courts of the Republic of Cyprus.
+                  </p>
+                  <p className="text-muted-foreground mt-3">
+                    <strong>Alternative Dispute Resolution:</strong> As an EU-based business, we are committed to 
+                    resolving complaints fairly. EU consumers may access the EU Online Dispute Resolution platform 
+                    at <a href="https://ec.europa.eu/consumers/odr" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">https://ec.europa.eu/consumers/odr</a>
+                  </p>
                 </div>
               </div>
 
@@ -227,7 +274,7 @@ const TermsOfService = () => {
           </Card>
 
           <p className="text-center text-sm text-muted-foreground mt-8">
-            Effective Date: August 15, 2025
+            Effective Date: January 2025
           </p>
         </div>
       </div>

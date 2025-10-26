@@ -1,7 +1,8 @@
 import { Helmet } from "react-helmet";
 import { Card } from "@/components/ui/card";
-import { AlertTriangle, Heart, Scale, Shield, Users } from "lucide-react";
+import { AlertTriangle, Heart, Scale, Shield, Users, FileCheck } from "lucide-react";
 import { BackToTop } from "@/components/BackToTop";
+import { ParQQuestionnaire } from "@/components/ParQQuestionnaire";
 
 const Disclaimer = () => {
   return (
@@ -27,9 +28,21 @@ const Disclaimer = () => {
 
           <Card className="p-8 space-y-8">
             <div className="prose dark:prose-invert max-w-none">
+              <div className="bg-destructive/10 border-2 border-destructive/30 p-6 rounded-lg mb-6">
+                <p className="text-base font-bold text-destructive mb-3">
+                  ⚠️ IMPORTANT: MANDATORY PAR-Q+ HEALTH ASSESSMENT
+                </p>
+                <p className="text-sm font-semibold text-destructive">
+                  Before starting any workout program, diet plan, or physical activity offered by Smarty Gym, 
+                  you MUST complete the PAR-Q+ (Physical Activity Readiness Questionnaire) health assessment 
+                  available below. By using our services, you confirm that you have read and completed this 
+                  questionnaire and accept full responsibility for your participation.
+                </p>
+              </div>
+
               <div className="bg-primary/10 border border-primary/20 p-4 rounded-lg mb-6">
                 <p className="text-sm font-semibold">
-                  <strong>Last updated:</strong> August 15, 2025
+                  <strong>Last updated:</strong> January 2025
                 </p>
               </div>
 
@@ -122,31 +135,116 @@ const Disclaimer = () => {
               <div className="flex items-start gap-3">
                 <Scale className="h-6 w-6 text-primary mt-1 flex-shrink-0" />
                 <div>
-                  <h2 className="text-2xl font-bold mb-3">5. Limitation of Liability</h2>
+                  <h2 className="text-2xl font-bold mb-3">5. Limitation of Liability & Release of Claims</h2>
                   <p className="text-muted-foreground mb-3">
-                    To the fullest extent permitted by law in Cyprus and the European Union:
+                    To the fullest extent permitted by law in Cyprus, the European Union, and internationally:
                   </p>
                   <ul className="space-y-2 text-muted-foreground">
                     <li>
-                      Smarty Gym, its owners, trainers, employees, and affiliates <strong>shall not be held liable</strong> for 
-                      any direct, indirect, incidental, or consequential damages arising from participation in any workout, 
-                      program, or activity offered on this Website or App.
+                      <strong>Complete Release:</strong> By using Smarty Gym services, you voluntarily and knowingly 
+                      assume all risks associated with physical activity and hereby <strong>RELEASE, WAIVE, DISCHARGE, 
+                      and COVENANT NOT TO SUE</strong> Smarty Gym, Haris Falas, its owners, trainers, employees, 
+                      contractors, affiliates, and agents from any and all liability.
+                    </li>
+                    <li>
+                      <strong>No Liability:</strong> Smarty Gym and its representatives <strong>shall not be held 
+                      liable</strong> for any direct, indirect, incidental, consequential, special, punitive, or 
+                      exemplary damages arising from participation in any workout, program, diet plan, or activity 
+                      offered on this Website or App, including but not limited to:
+                      <ul className="ml-6 mt-2 space-y-1">
+                        <li>• Personal injury, death, or disability</li>
+                        <li>• Property damage or loss</li>
+                        <li>• Medical expenses or costs</li>
+                        <li>• Lost wages or income</li>
+                        <li>• Pain and suffering</li>
+                        <li>• Emotional distress</li>
+                      </ul>
+                    </li>
+                    <li>
+                      <strong>Waiver of Right to Sue:</strong> You expressly waive any right to bring legal action 
+                      against Smarty Gym for injuries or damages sustained during or after participation in our programs.
+                    </li>
+                    <li>
+                      <strong>Indemnification:</strong> You agree to indemnify and hold harmless Smarty Gym from any 
+                      claims, damages, or expenses (including legal fees) arising from your use of our services or 
+                      breach of this disclaimer.
                     </li>
                   </ul>
                 </div>
               </div>
 
-              <div className="bg-primary/10 border border-primary/20 p-6 rounded-lg mt-8">
-                <p className="text-muted-foreground font-semibold">
-                  By accessing and using Smarty Gym, you acknowledge that you have <strong>read, understood, and 
-                  accepted</strong> this Disclaimer.
+              <div className="flex items-start gap-3">
+                <FileCheck className="h-6 w-6 text-primary mt-1 flex-shrink-0" />
+                <div>
+                  <h2 className="text-2xl font-bold mb-3">6. Mandatory PAR-Q+ Completion</h2>
+                  <ul className="space-y-2 text-muted-foreground">
+                    <li>
+                      <strong>Required Health Assessment:</strong> Before starting any workout or program, you 
+                      <strong> MUST complete the PAR-Q+ questionnaire</strong> below. This is a mandatory safety 
+                      requirement.
+                    </li>
+                    <li>
+                      <strong>Medical Clearance:</strong> If your PAR-Q+ responses indicate potential health risks, 
+                      you must obtain written clearance from a qualified physician before proceeding with any physical activity.
+                    </li>
+                    <li>
+                      <strong>Truthful Disclosure:</strong> You are responsible for providing accurate and truthful 
+                      information in the PAR-Q+ questionnaire. Failure to do so may increase your risk of injury.
+                    </li>
+                    <li>
+                      <strong>Ongoing Responsibility:</strong> You must retake the PAR-Q+ assessment if your health 
+                      status changes or if you develop new medical conditions.
+                    </li>
+                  </ul>
+                </div>
+              </div>
+
+              <div className="flex items-start gap-3">
+                <Shield className="h-6 w-6 text-primary mt-1 flex-shrink-0" />
+                <div>
+                  <h2 className="text-2xl font-bold mb-3">7. Jurisdiction & Governing Law</h2>
+                  <p className="text-muted-foreground">
+                    This Disclaimer is governed by the laws of the Republic of Cyprus and applicable EU regulations. 
+                    Any disputes shall be subject to the exclusive jurisdiction of Cyprus courts. This limitation 
+                    of liability applies to the maximum extent permitted by Cyprus law and EU consumer protection 
+                    directives while maintaining your statutory rights as a consumer under EU law.
+                  </p>
+                </div>
+              </div>
+
+              <div className="bg-destructive/10 border-2 border-destructive/30 p-6 rounded-lg mt-8">
+                <p className="text-base font-bold text-destructive mb-3">
+                  ⚠️ ACCEPTANCE AND ACKNOWLEDGMENT
+                </p>
+                <p className="text-sm text-muted-foreground mb-3">
+                  By accessing and using Smarty Gym, you acknowledge and confirm that you have:
+                </p>
+                <ul className="text-sm text-muted-foreground space-y-1 ml-4 list-disc">
+                  <li><strong>Read and understood</strong> this entire Disclaimer</li>
+                  <li><strong>Completed the PAR-Q+ questionnaire</strong> below</li>
+                  <li><strong>Obtained medical clearance</strong> if required by your PAR-Q+ responses</li>
+                  <li><strong>Voluntarily assumed all risks</strong> associated with physical activity</li>
+                  <li><strong>Released Smarty Gym from all liability</strong> for any injuries or damages</li>
+                  <li><strong>Agreed to exercise at your own risk</strong></li>
+                </ul>
+                <p className="text-sm font-bold text-destructive mt-4">
+                  IF YOU DO NOT AGREE WITH ANY PART OF THIS DISCLAIMER, DO NOT USE SMARTY GYM SERVICES.
                 </p>
               </div>
             </div>
           </Card>
 
+          {/* PAR-Q+ Questionnaire */}
+          <div className="mt-8">
+            <h2 className="text-3xl font-bold mb-4 text-center">Complete Your PAR-Q+ Assessment</h2>
+            <p className="text-center text-muted-foreground mb-6">
+              This health assessment is mandatory before starting any workout program. Please answer all questions truthfully.
+            </p>
+            <ParQQuestionnaire />
+          </div>
+
           <p className="text-center text-sm text-muted-foreground mt-8">
-            Last updated: August 15, 2025
+            Last updated: January 2025
           </p>
         </div>
       </div>
