@@ -106,7 +106,7 @@ const WorkoutFlow = () => {
         {!isPremium && (
           <div className="bg-primary/10 border border-primary/20 rounded-lg p-4 mb-8 text-center">
             <p className="text-sm text-muted-foreground mb-2">
-              Free workouts included. Join premium to unlock everything.
+              SMARTY GYM workouts are standalone sessions designed to target specific fitness goals—whether you want to build strength, torch calories, boost your metabolism, get a quick sweat, or simply keep your body moving. Each workout is crafted to fit your schedule and deliver results, no matter where you train.
             </p>
             <Button variant="default" size="sm" onClick={() => navigate("/premiumbenefits")}>
               Join Premium
