@@ -83,7 +83,7 @@ export const Footer = () => {
           
           {/* Copyright */}
           <p className="text-center text-sm text-muted-foreground">
-            © 2025 SmartyGym - Your fitness reimagined anywhere, anytime.
+            © 2025 SmartyGym - Your fitness Reimagined anywhere, anytime.
           </p>
         </div>
       </div>

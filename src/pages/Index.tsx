@@ -144,21 +144,21 @@ const Index = () => {
     <>
       <Helmet>
         <title>SmartyGym Cyprus | Online Fitness | AMRAP TABATA HIIT | smartygym.com</title>
-        <meta name="description" content="SmartyGym - Your gym re-imagined. AMRAP, TABATA, HIIT workouts by Sports Scientist Haris Falas. Train anywhere, anytime with convenient online fitness at smartygym.com" />
+        <meta name="description" content="SmartyGym - Your gym Reimagined. AMRAP, TABATA, HIIT workouts by Sports Scientist Haris Falas. Train anywhere, anytime with convenient online fitness at smartygym.com" />
         <meta name="keywords" content="smartygym, online fitness, smartygym.com, SmartyGym Cyprus, online fitness Cyprus, Haris Falas fitness, AMRAP workouts, TABATA training, HIIT workouts, circuit training, for time workouts, bodyweight training, no equipment workouts, functional fitness, strength training online, cardio workouts, metabolic conditioning, mobility training, power workouts, challenge workouts, convenient fitness, flexible training, sports scientist Cyprus, home workouts, online gym, gym anywhere anytime" />
         
         {/* Open Graph / Facebook */}
         <meta property="og:type" content="website" />
         <meta property="og:url" content="https://smartygym.com/" />
         <meta property="og:title" content="SmartyGym | Online Fitness - Train Anywhere, Anytime" />
-        <meta property="og:description" content="SmartyGym - Your gym re-imagined. Train anywhere, anytime at smartygym.com with science-based programs by Haris Falas." />
+        <meta property="og:description" content="SmartyGym - Your gym Reimagined. Train anywhere, anytime at smartygym.com with science-based programs by Haris Falas." />
         <meta property="og:image" content={smartyGymLogo} />
         <meta property="og:site_name" content="Smarty Gym" />
         
         {/* Twitter */}
         <meta property="twitter:card" content="summary_large_image" />
         <meta property="twitter:title" content="SmartyGym | Online Fitness" />
-        <meta property="twitter:description" content="SmartyGym - Your gym re-imagined. Train anywhere, anytime by Haris Falas at smartygym.com" />
+        <meta property="twitter:description" content="SmartyGym - Your gym Reimagined. Train anywhere, anytime by Haris Falas at smartygym.com" />
         
         <link rel="canonical" href="https://smartygym.com/" />
         
@@ -198,7 +198,7 @@ const Index = () => {
               SmartyGym
             </h1>
             <p className="text-lg sm:text-xl text-center text-muted-foreground mb-6">
-              Your gym re-imagined. Train anywhere, anytime.
+              Your gym Reimagined. Train anywhere, anytime.
             </p>
             <div className="bg-primary/10 border border-primary/20 rounded-lg p-3 sm:p-4 mb-3 sm:mb-4 text-center">
               <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed">

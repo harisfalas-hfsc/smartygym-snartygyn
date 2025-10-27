@@ -41,7 +41,7 @@ const Tools = () => {
       <Helmet>
         <title>Fitness Tools - Smarty Gym | Free Calculators by Haris Falas | smartygym.com</title>
         <meta name="description" content="Free fitness calculators at smartygym.com: 1RM Calculator, BMR Calculator, Macro Tracking. Convenient & flexible tools by Haris Falas for anywhere, anytime fitness planning." />
-        <meta name="keywords" content="smartygym tools, smarty gym, smartygym.com, Haris Falas, 1rm calculator, bmr calculator, macro calculator, fitness tools, convenient fitness, gym reimagined, workout calculators" />
+        <meta name="keywords" content="smartygym tools, smarty gym, smartygym.com, Haris Falas, 1rm calculator, bmr calculator, macro calculator, fitness tools, convenient fitness, gym Reimagined, workout calculators" />
         
         <meta property="og:title" content="Fitness Tools - Smarty Gym | Free Calculators" />
         <meta property="og:description" content="Free fitness calculators by Haris Falas - convenient tools for flexible training anywhere" />

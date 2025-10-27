@@ -13,7 +13,7 @@ const ExerciseLibrary = () => {
       <Helmet>
         <title>Exercise Library - Smarty Gym | YouTube Channel by Haris Falas | smartygym.com</title>
         <meta name="description" content="Watch exercise demonstrations on The Smarty Gym YouTube channel by Haris Falas at smartygym.com. Inside Smarty Gym - comprehensive exercise tutorials and technique guides. Convenient & flexible training for anywhere, anytime." />
-        <meta name="keywords" content="smartygym exercises, smarty gym, smartygym.com, Haris Falas, exercise library, workout videos, exercise tutorials, Inside Smarty Gym, gym training videos, exercise demonstrations, convenient fitness, gym reimagined" />
+        <meta name="keywords" content="smartygym exercises, smarty gym, smartygym.com, Haris Falas, exercise library, workout videos, exercise tutorials, Inside Smarty Gym, gym training videos, exercise demonstrations, convenient fitness, gym Reimagined" />
         
         <meta property="og:title" content="Exercise Library - Smarty Gym | YouTube Channel" />
         <meta property="og:description" content="Watch exercise demonstrations on The Smarty Gym YouTube channel by Haris Falas - Inside Smarty Gym" />

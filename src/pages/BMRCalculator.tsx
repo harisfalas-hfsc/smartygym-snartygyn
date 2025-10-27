@@ -96,7 +96,7 @@ const BMRCalculator = () => {
       <Helmet>
         <title>BMR Calculator - Smarty Gym | Free Basal Metabolic Rate Calculator | smartygym.com</title>
         <meta name="description" content="Free BMR Calculator using Mifflin-St Jeor equation. Calculate your basal metabolic rate and daily calorie needs at smartygym.com - convenient fitness tool by Haris Falas." />
-        <meta name="keywords" content="smartygym, smarty gym, smartygym.com, Haris Falas, bmr calculator, basal metabolic rate, tdee calculator, calorie calculator, convenient fitness, gym reimagined, flexible nutrition tools" />
+        <meta name="keywords" content="smartygym, smarty gym, smartygym.com, Haris Falas, bmr calculator, basal metabolic rate, tdee calculator, calorie calculator, convenient fitness, gym Reimagined, flexible nutrition tools" />
         
         <meta property="og:title" content="BMR Calculator - Smarty Gym" />
         <meta property="og:description" content="Free basal metabolic rate calculator - convenient fitness tool at smartygym.com" />
