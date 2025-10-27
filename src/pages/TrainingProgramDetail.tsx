@@ -17,6 +17,12 @@ import cardioMaxEnduranceImg from "@/assets/cardio-max-endurance-program.jpg";
 import lowBackPerformanceImg from "@/assets/low-back-performance-program.jpg";
 import mobilityMasterFlowImg from "@/assets/mobility-master-flow-program.jpg";
 import functionalStrengthEliteImg from "@/assets/functional-strength-elite-program.jpg";
+import functionalStrengthFoundationsImg from "@/assets/functional-strength-foundations-program.jpg";
+import muscleHypertrophyBuildImg from "@/assets/muscle-hypertrophy-build-program.jpg";
+import cardioPerformanceImg from "@/assets/cardio-performance-program.jpg";
+import weightLossIgniteImg from "@/assets/weight-loss-ignite-program.jpg";
+import lowBackPainReliefImg from "@/assets/low-back-pain-relief-program.jpg";
+import mobilityStabilityFlowImg from "@/assets/mobility-stability-flow-program.jpg";
 
 type EquipmentFilter = "all" | "bodyweight" | "equipment";
 type LevelFilter = "all" | "beginner" | "intermediate" | "advanced";
@@ -97,6 +103,16 @@ const TrainingProgramDetail = () => {
         level: "advanced",
         imageUrl: cardioMaxEnduranceImg,
         isFree: false
+      },
+      {
+        id: "T-C003",
+        name: "Cardio Performance",
+        description: "6-week program to develop endurance, VO₂ max, and cardiovascular efficiency through interval training and steady-state conditioning.",
+        duration: "6",
+        equipment: "equipment",
+        level: "intermediate",
+        imageUrl: cardioPerformanceImg,
+        isFree: false
       }
     ],
     "functional-strength": [
@@ -118,6 +134,16 @@ const TrainingProgramDetail = () => {
         equipment: "equipment",
         level: "advanced",
         imageUrl: functionalStrengthEliteImg,
+        isFree: false
+      },
+      {
+        id: "T-F003",
+        name: "Functional Strength Foundations",
+        description: "6-week program developing functional strength for daily activities and athletic performance through multi-joint movements and core stability.",
+        duration: "6",
+        equipment: "equipment",
+        level: "intermediate",
+        imageUrl: functionalStrengthFoundationsImg,
         isFree: false
       }
     ],
@@ -141,6 +167,16 @@ const TrainingProgramDetail = () => {
         level: "advanced",
         imageUrl: muscleHypertrophyProImg,
         isFree: false
+      },
+      {
+        id: "T-H003",
+        name: "Muscle Hypertrophy Build",
+        description: "6-week hypertrophy plan targeting all major muscle groups using progressive overload principles and time-under-tension.",
+        duration: "6",
+        equipment: "equipment",
+        level: "intermediate",
+        imageUrl: muscleHypertrophyBuildImg,
+        isFree: false
       }
     ],
     "weight-loss": [
@@ -162,6 +198,16 @@ const TrainingProgramDetail = () => {
         equipment: "equipment",
         level: "advanced",
         imageUrl: fatFurnaceImg,
+        isFree: false
+      },
+      {
+        id: "T-W003",
+        name: "Weight Loss Ignite Premium",
+        description: "6-week program maximizing caloric expenditure while maintaining lean muscle using metabolic circuits and HIIT.",
+        duration: "6",
+        equipment: "equipment",
+        level: "intermediate",
+        imageUrl: weightLossIgniteImg,
         isFree: false
       }
     ],
@@ -185,6 +231,16 @@ const TrainingProgramDetail = () => {
         level: "advanced",
         imageUrl: lowBackPerformanceImg,
         isFree: false
+      },
+      {
+        id: "T-L003",
+        name: "Low Back Pain Relief",
+        description: "6-week program strengthening spinal stabilizers, improving posture, and reducing lower back discomfort through controlled movements.",
+        duration: "6",
+        equipment: "equipment",
+        level: "intermediate",
+        imageUrl: lowBackPainReliefImg,
+        isFree: false
       }
     ],
     "mobility-stability": [
@@ -206,6 +262,16 @@ const TrainingProgramDetail = () => {
         equipment: "equipment",
         level: "advanced",
         imageUrl: mobilityMasterFlowImg,
+        isFree: false
+      },
+      {
+        id: "T-M003",
+        name: "Mobility & Stability Flow Premium",
+        description: "6-week program improving joint range of motion, neuromuscular control, and balance for better performance and injury prevention.",
+        duration: "6",
+        equipment: "bodyweight",
+        level: "intermediate",
+        imageUrl: mobilityStabilityFlowImg,
         isFree: false
       }
     ],

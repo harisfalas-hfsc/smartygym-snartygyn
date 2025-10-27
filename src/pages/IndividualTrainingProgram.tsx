@@ -17,6 +17,12 @@ import cardioMaxEnduranceImg from "@/assets/cardio-max-endurance-program.jpg";
 import lowBackPerformanceImg from "@/assets/low-back-performance-program.jpg";
 import mobilityMasterFlowImg from "@/assets/mobility-master-flow-program.jpg";
 import functionalStrengthEliteImg from "@/assets/functional-strength-elite-program.jpg";
+import functionalStrengthFoundationsImg from "@/assets/functional-strength-foundations-program.jpg";
+import muscleHypertrophyBuildImg from "@/assets/muscle-hypertrophy-build-program.jpg";
+import cardioPerformanceImg from "@/assets/cardio-performance-program.jpg";
+import weightLossIgniteImg from "@/assets/weight-loss-ignite-program.jpg";
+import lowBackPainReliefImg from "@/assets/low-back-pain-relief-program.jpg";
+import mobilityStabilityFlowImg from "@/assets/mobility-stability-flow-program.jpg";
 
 const IndividualTrainingProgram = () => {
   const navigate = useNavigate();
@@ -311,6 +317,127 @@ const IndividualTrainingProgram = () => {
         { week: "All Weeks", day: "Day 3", workout: "Dynamic Flow Session", details: "World's Greatest Stretch – 3x5/side\nKB Halo – 3x10\nCrawling Patterns – 3x20m\nWindmill – 3x10/side" },
         { week: "All Weeks", day: "Day 4", workout: "Full Body Integration", details: "Turkish Get-Up – 3x6/side\nJefferson Curl – 3x8\nSumo Deadlift to Upright Row – 3x10\nControlled Hip CARs – 3x6/side" },
         { week: "All Weeks", day: "Day 5-7", workout: "Rest / Optional Yoga", details: "Complete rest or optional yoga session" }
+      ]
+    },
+    "T-F003": {
+      name: "Functional Strength Foundations",
+      serialNumber: "T-F003",
+      focus: "Functional Strength",
+      difficulty: "Intermediate",
+      duration: "6 Weeks / 4 Training Days per Week",
+      equipment: "Dumbbells, Kettlebells, Resistance Bands, Pull-Up Bar",
+      imageUrl: functionalStrengthFoundationsImg,
+      description: "This program develops functional strength for daily activities and athletic performance. Focused on multi-joint movements, core stability, and progressive overload, it improves overall power, coordination, and resilience.",
+      format: "Circuit + Strength",
+      instructions: "Use controlled tempo (2-0-1-0 for compound lifts, 1-0-1-0 for accessory). Progress overload weekly by increasing weight by 2–5% or adding 1–2 reps per set. Rest between strength exercises 90–120s, circuits 60s.",
+      tips: ["Focus on movement quality over load", "Warm up thoroughly, engage core during all lifts", "Use proper footwear"],
+      exercises: [
+        { week: "All Weeks", day: "Day 1", workout: "Lower Body Push + Core", details: "Bulgarian Split Squat – 3x12 each leg, tempo 3-0-1-0, RIR 2\nGoblet Squat – 3x15, tempo 2-0-1-0, RIR 2\nPlank with Arm Reach – 3x30s\nMini-Band Lateral Walks – 3x20 steps" },
+        { week: "All Weeks", day: "Day 2", workout: "Upper Body Push + Pull", details: "Push-Ups – 4x12, RIR 2\nDumbbell Row – 4x10 each arm, tempo 2-1-1-0\nShoulder Press – 3x12, tempo 2-0-1-0\nFace Pulls (Band) – 3x15" },
+        { week: "All Weeks", day: "Day 3", workout: "Rest or Active Recovery", details: "Light cardio, mobility, or yoga" },
+        { week: "All Weeks", day: "Day 4", workout: "Full Body Strength Circuit", details: "Kettlebell Deadlift – 3x12, tempo 2-1-1-0\nStep-Ups – 3x12 each leg\nPull-Ups (Assisted if needed) – 3x8\nRussian Twists – 3x20" },
+        { week: "All Weeks", day: "Day 5-7", workout: "Rest or light activity", details: "Complete rest or light activity" }
+      ]
+    },
+    "T-H003": {
+      name: "Muscle Hypertrophy Build",
+      serialNumber: "T-H003",
+      focus: "Muscle Hypertrophy",
+      difficulty: "Intermediate",
+      duration: "6 Weeks / 4 Training Days",
+      equipment: "Dumbbells, Barbell, Cable Machine, Bench",
+      imageUrl: muscleHypertrophyBuildImg,
+      description: "A 6-week hypertrophy plan targeting all major muscle groups using progressive overload principles. Focuses on time-under-tension and structured volume to stimulate muscle growth.",
+      format: "Reps and Sets",
+      instructions: "Tempo: 3-1-2-0 for compound lifts, 2-0-1-0 for isolation. Overload by increasing 2–5% load weekly or adding reps while maintaining form. Rest 60–90s between hypertrophy sets.",
+      tips: ["Consume 1.6–2 g protein per kg bodyweight", "Maintain slight caloric surplus, and sleep 7–9 hours", "Creatine and whey protein can enhance results"],
+      exercises: [
+        { week: "All Weeks", day: "Day 1", workout: "Upper Body Push", details: "Barbell Bench Press – 4x8, tempo 3-1-2-0, RIR 1–2\nDumbbell Shoulder Press – 3x10, tempo 2-0-1-0\nIncline Dumbbell Fly – 3x12\nTricep Rope Pushdown – 3x15" },
+        { week: "All Weeks", day: "Day 2", workout: "Lower Body Push", details: "Back Squat – 4x8, tempo 3-1-2-0, RIR 1–2\nBulgarian Split Squat – 3x10 each leg\nLeg Press – 3x12\nStanding Calf Raises – 4x15" },
+        { week: "All Weeks", day: "Day 3", workout: "Rest or Active Recovery", details: "Complete rest or light activity" },
+        { week: "All Weeks", day: "Day 4", workout: "Upper Body Pull", details: "Barbell Row – 4x8\nPull-Ups – 3x10\nDumbbell Bicep Curl – 3x12\nFace Pull – 3x15" },
+        { week: "All Weeks", day: "Day 5", workout: "Lower Body Pull + Core", details: "Romanian Deadlift – 4x8\nHamstring Curl Machine – 3x12\nHanging Leg Raise – 3x12\nPlank – 3x40s" },
+        { week: "All Weeks", day: "Day 6-7", workout: "Rest", details: "Complete rest days" }
+      ]
+    },
+    "T-C003": {
+      name: "Cardio Performance",
+      serialNumber: "T-C003",
+      focus: "Cardio",
+      difficulty: "Intermediate",
+      duration: "6 Weeks / 4 Training Days",
+      equipment: "Treadmill, Rowing Machine, Bike, Jump Rope",
+      imageUrl: cardioPerformanceImg,
+      description: "Develops endurance, VO₂ max, and cardiovascular efficiency through a combination of interval training and steady-state conditioning.",
+      format: "Interval + Steady-State",
+      instructions: "Tempo: RPE 6–8 for intervals, 5–6 for steady-state. Increase duration by 5% weekly or increase intensity slightly. Rest 60–90s between intervals.",
+      tips: ["Hydrate, sleep well, maintain carbohydrate intake to support energy", "Track HR zones for precision"],
+      exercises: [
+        { week: "All Weeks", day: "Day 1", workout: "Treadmill Intervals", details: "10x1 min fast / 1 min walk" },
+        { week: "All Weeks", day: "Day 2", workout: "Bike Steady-State", details: "40 min moderate intensity" },
+        { week: "All Weeks", day: "Day 3", workout: "Rest or Active Recovery", details: "Light cardio or rest" },
+        { week: "All Weeks", day: "Day 4", workout: "Rowing Pyramid", details: "250m / 500m / 750m / 1000m / 750m / 500m / 250m, 60s rest" },
+        { week: "All Weeks", day: "Day 5", workout: "Bodyweight Cardio Circuit (3 Rounds)", details: "Jump Rope – 1 min\nMountain Climbers – 40\nAir Squats – 20\nBurpees – 12" },
+        { week: "All Weeks", day: "Day 6-7", workout: "Rest", details: "Complete rest days" }
+      ]
+    },
+    "T-W003": {
+      name: "Weight Loss Ignite Premium",
+      serialNumber: "T-W003",
+      focus: "Weight Loss",
+      difficulty: "Intermediate",
+      duration: "6 Weeks / 5 Training Days",
+      equipment: "Dumbbells, Kettlebells, Bodyweight, Bands",
+      imageUrl: weightLossIgniteImg,
+      description: "Maximizes caloric expenditure while maintaining lean muscle using metabolic circuits, cardio intervals, and strength training.",
+      format: "Circuit + HIIT",
+      instructions: "Tempo: 1-0-1-0 for circuits. Overload by increasing rounds or weight progressively. Work:Rest ratio 40:20–60:30.",
+      tips: ["Calorie deficit is key", "High-protein intake preserves muscle", "Sleep, stress management, and consistency are crucial"],
+      exercises: [
+        { week: "All Weeks", day: "Day 1", workout: "Full Body Circuit", details: "Goblet Squat – 15\nPush-Up – 12\nBent-Over Row – 12\nMountain Climbers – 40\nRest 90s, 3 Rounds" },
+        { week: "All Weeks", day: "Day 2", workout: "HIIT Intervals", details: "Treadmill or Bike: 10x (30s sprint / 90s walk)" },
+        { week: "All Weeks", day: "Day 3", workout: "Active Recovery", details: "Mobility & walk 30 min" },
+        { week: "All Weeks", day: "Day 4", workout: "Lower Body Blast", details: "Kettlebell Swing – 20\nReverse Lunge – 10 each leg\nJump Squat – 15\n3 Rounds" },
+        { week: "All Weeks", day: "Day 5", workout: "Upper Body + Core", details: "Dumbbell Bench Press – 3x12\nTRX Row – 3x12\nPlank – 3x40s\nSit-Ups – 3x20" },
+        { week: "All Weeks", day: "Day 6-7", workout: "Rest", details: "Complete rest days" }
+      ]
+    },
+    "T-L003": {
+      name: "Low Back Pain Relief",
+      serialNumber: "T-L003",
+      focus: "Low Back Pain",
+      difficulty: "Intermediate",
+      duration: "6 Weeks / 3 Training Days",
+      equipment: "Stability Ball, Bands, Bodyweight",
+      imageUrl: lowBackPainReliefImg,
+      description: "Strengthens spinal stabilizers, improves posture, and reduces lower back discomfort through controlled movements and core activation.",
+      format: "Rehab + Strength",
+      instructions: "Tempo: 3-1-2-0. Overload only when pain-free. Gradually increase reps or resistance every 2 weeks. Rest 60s between sets.",
+      tips: ["Maintain neutral spine, avoid prolonged sitting", "Incorporate daily movement and mobility"],
+      exercises: [
+        { week: "All Weeks", day: "Day 1", workout: "Core Activation", details: "Dead Bug – 3x12\nBird Dog – 3x12/side\nGlute Bridge – 3x15\nPallof Press – 3x15" },
+        { week: "All Weeks", day: "Day 2", workout: "Posterior Chain & Mobility", details: "Romanian Deadlift (light) – 3x10\nCable Pull-Through – 3x12\nSide Plank – 3x20s" },
+        { week: "All Weeks", day: "Day 3", workout: "Stability & Recovery", details: "Cat-Cow – 3x10\nHip Flexor Stretch – 3x30s\nGlute Activation Mini Band – 3x15" },
+        { week: "All Weeks", day: "Day 4-7", workout: "Rest / Light Activity", details: "Complete rest or light activity" }
+      ]
+    },
+    "T-M003": {
+      name: "Mobility & Stability Flow Premium",
+      serialNumber: "T-M003",
+      focus: "Mobility & Stability",
+      difficulty: "Intermediate",
+      duration: "6 Weeks / 3 Days per Week",
+      equipment: "Foam Roller, Bands, Bodyweight",
+      imageUrl: mobilityStabilityFlowImg,
+      description: "Improves joint range of motion, neuromuscular control, and balance for better performance and injury prevention.",
+      format: "Flow + Stability",
+      instructions: "Tempo: 3-2-2-0. Overload by holding stretches longer or performing deeper ranges. Rest 45s–60s between drills.",
+      tips: ["Move slowly, control breathing, and maintain good posture throughout", "Include barefoot or minimal footwear training for better proprioception"],
+      exercises: [
+        { week: "All Weeks", day: "Day 1", workout: "Lower Body", details: "Foam Roll Quads/Glutes – 5 min\n90/90 Hip Stretch – 3x30s\nDeep Squat Hold – 3x40s\nGlute Bridge – 3x12" },
+        { week: "All Weeks", day: "Day 2", workout: "Upper Body", details: "Band Pull-Apart – 3x15\nT-Spine Rotation – 3x10\nWall Angels – 3x10\nShoulder CARs – 3x5/side" },
+        { week: "All Weeks", day: "Day 3", workout: "Full Body Flow", details: "World's Greatest Stretch – 3x5/side\nBear Crawl – 3x20m\nDead Bug – 3x12\nCat-Camel – 3x10" },
+        { week: "All Weeks", day: "Day 4-7", workout: "Rest / Optional Yoga or Cardio", details: "Complete rest or optional light activity" }
       ]
     }
   };
