@@ -198,7 +198,7 @@ const Index = () => {
               SmartyGym
             </h1>
             <p className="text-lg sm:text-xl text-center text-muted-foreground mb-6">
-              Your gym Reimagined. Train anywhere, anytime.
+              Your Gym Reimagined. Anywhere, Anytime.
             </p>
             <div className="bg-primary/10 border border-primary/20 rounded-lg p-3 sm:p-4 mb-3 sm:mb-4 text-center">
               <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed">
