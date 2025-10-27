@@ -125,7 +125,7 @@ const Tools = () => {
         </div>
 
         {/* Info Section */}
-        <Card className="mt-12 bg-muted/30">
+        <Card className="mt-12 bg-gradient-to-br from-primary/5 via-background to-primary/5 border-2 border-primary/40 shadow-gold">
           <div className="p-8">
             <h2 className="text-2xl font-bold mb-4 text-center">About These Tools</h2>
             <div className="space-y-4 text-muted-foreground max-w-3xl mx-auto">
