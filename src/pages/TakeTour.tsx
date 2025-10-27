@@ -21,20 +21,20 @@ const TakeTour = () => {
   const freeFeatures = [
     {
       icon: Dumbbell,
-      title: "Free Workouts",
-      description: "Access standalone workout sessions without logging in",
+      title: "Browse Workouts",
+      description: "Navigate and explore workout listings and exercise library",
       color: "text-blue-500"
     },
     {
       icon: Calendar,
-      title: "Free Training Programs",
-      description: "Explore sample training programs to get started",
+      title: "Browse Programs",
+      description: "See available training programs and what's included",
       color: "text-purple-500"
     },
     {
-      icon: Calculator,
-      title: "Fitness Calculators",
-      description: "Use our 1RM, BMR, and Macro calculators - completely free",
+      icon: Target,
+      title: "Explore Platform",
+      description: "Navigate SmartyGym, read blog articles, and discover features",
       color: "text-green-500"
     }
   ];
@@ -152,10 +152,11 @@ const TakeTour = () => {
                     </div>
                   ))}
                 </div>
-                <div className="mt-8 text-center">
-                  <div className="inline-flex items-center gap-2 bg-green-500/20 border border-green-500/30 rounded-full px-4 py-2">
-                    <CheckCircle className="h-5 w-5 text-green-500" />
-                    <span className="font-semibold">No Credit Card Required • No Login Needed</span>
+                <div className="mt-8 text-center space-y-3">
+                  <p className="text-muted-foreground text-sm">Browse and explore the platform, see what workouts and programs are available</p>
+                  <div className="inline-flex items-center gap-2 bg-blue-500/20 border border-blue-500/30 rounded-full px-4 py-2">
+                    <CheckCircle className="h-5 w-5 text-blue-500" />
+                    <span className="font-semibold">No Credit Card • No Commitment</span>
                   </div>
                 </div>
               </Card>
@@ -173,19 +174,23 @@ const TakeTour = () => {
               <Card className="p-8 bg-gradient-to-br from-purple-500/10 to-background border-2 border-purple-500/20">
                 <div className="flex flex-col md:flex-row items-center gap-8">
                   <div className="flex-1 space-y-4">
-                    <h4 className="text-lg sm:text-xl font-semibold">Track Your Journey</h4>
+                    <h4 className="text-lg sm:text-xl font-semibold">Unlock Essential Tools & Free Content</h4>
                     <ul className="space-y-3">
                       <li className="flex items-start gap-3">
                         <CheckCircle className="h-5 w-5 text-primary mt-0.5 flex-shrink-0" />
-                        <span>Access all free workouts and programs</span>
+                        <span>View and use all free workouts and training programs</span>
                       </li>
                       <li className="flex items-start gap-3">
                         <CheckCircle className="h-5 w-5 text-primary mt-0.5 flex-shrink-0" />
-                        <span>Use all fitness calculators and tools</span>
+                        <span>Access fitness calculators: 1RM, BMR, Macro Tracking</span>
                       </li>
                       <li className="flex items-start gap-3">
                         <CheckCircle className="h-5 w-5 text-primary mt-0.5 flex-shrink-0" />
-                        <span>Explore the exercise library</span>
+                        <span>Use diet planner and personal dashboard</span>
+                      </li>
+                      <li className="flex items-start gap-3">
+                        <CheckCircle className="h-5 w-5 text-primary mt-0.5 flex-shrink-0" />
+                        <span>Browse premium content details (upgrade to access full content)</span>
                       </li>
                     </ul>
                     <Button onClick={() => navigate("/auth")} className="mt-4">
@@ -201,7 +206,7 @@ const TakeTour = () => {
                             <Dumbbell className="h-5 w-5 text-primary" />
                             <div>
                               <div className="font-semibold text-sm">Free Workouts</div>
-                              <div className="text-xs text-muted-foreground">No subscription needed</div>
+                              <div className="text-xs text-muted-foreground">Full access to free content</div>
                             </div>
                           </div>
                         </div>
@@ -210,7 +215,7 @@ const TakeTour = () => {
                             <Calendar className="h-5 w-5 text-primary" />
                             <div>
                               <div className="font-semibold text-sm">Free Programs</div>
-                              <div className="text-xs text-muted-foreground">Sample training plans</div>
+                              <div className="text-xs text-muted-foreground">Complete training plans</div>
                             </div>
                           </div>
                         </div>
@@ -218,8 +223,17 @@ const TakeTour = () => {
                           <div className="flex items-center gap-3">
                             <Calculator className="h-5 w-5 text-primary" />
                             <div>
-                              <div className="font-semibold text-sm">All Tools</div>
-                              <div className="text-xs text-muted-foreground">Calculators & resources</div>
+                              <div className="font-semibold text-sm">Fitness Tools</div>
+                              <div className="text-xs text-muted-foreground">Calculators & diet planner</div>
+                            </div>
+                          </div>
+                        </div>
+                        <div className="bg-background rounded p-3 border border-border">
+                          <div className="flex items-center gap-3">
+                            <BarChart className="h-5 w-5 text-primary" />
+                            <div>
+                              <div className="font-semibold text-sm">Dashboard Access</div>
+                              <div className="text-xs text-muted-foreground">Track your progress</div>
                             </div>
                           </div>
                         </div>
@@ -249,7 +263,7 @@ const TakeTour = () => {
                 <div className="mb-8">
                   <h4 className="text-xl sm:text-2xl font-bold mb-4">What You Get With Premium</h4>
                   <p className="text-muted-foreground mb-6">
-                    Transform your fitness journey with unlimited access to everything SmartyGym offers
+                    Get full access to ALL workouts, programs, and exclusive features to maximize your results
                   </p>
                 </div>
 
@@ -265,6 +279,15 @@ const TakeTour = () => {
                       </div>
                     </div>
                   ))}
+                  <div className="flex gap-4 hover-scale">
+                    <div className="bg-primary/20 rounded-lg p-3 h-fit">
+                      <CheckCircle className="h-6 w-6 text-primary" />
+                    </div>
+                    <div>
+                      <h5 className="font-semibold mb-1">Full Interaction Features</h5>
+                      <p className="text-sm text-muted-foreground">Rate, favorite, and mark workouts complete</p>
+                    </div>
+                  </div>
                 </div>
 
                 <div className="bg-background/50 backdrop-blur-sm rounded-lg p-6 border border-primary/20">
