@@ -143,22 +143,22 @@ const Index = () => {
   return (
     <>
       <Helmet>
-        <title>Smarty Gym Cyprus | Smart Gym Online Fitness | AMRAP TABATA HIIT | smartygym.com</title>
-        <meta name="description" content="Smarty Gym - Your smart gym for online fitness in Cyprus and worldwide. AMRAP, TABATA, HIIT workouts by Sports Scientist Haris Falas. Train anywhere, anytime with convenient online fitness at smartygym.com" />
-        <meta name="keywords" content="smarty gym, smart gym, online fitness, smartygym, smartygym.com, Smarty Gym Cyprus, smart gym online, online fitness Cyprus, Haris Falas fitness, AMRAP workouts, TABATA training, HIIT workouts, circuit training, for time workouts, bodyweight training, no equipment workouts, functional fitness, strength training online, cardio workouts, metabolic conditioning, mobility training, power workouts, challenge workouts, convenient fitness, flexible training, sports scientist Cyprus, home workouts, online gym, gym anywhere anytime" />
+        <title>SmartyGym Cyprus | Online Fitness | AMRAP TABATA HIIT | smartygym.com</title>
+        <meta name="description" content="SmartyGym - Your gym re-imagined. AMRAP, TABATA, HIIT workouts by Sports Scientist Haris Falas. Train anywhere, anytime with convenient online fitness at smartygym.com" />
+        <meta name="keywords" content="smartygym, online fitness, smartygym.com, SmartyGym Cyprus, online fitness Cyprus, Haris Falas fitness, AMRAP workouts, TABATA training, HIIT workouts, circuit training, for time workouts, bodyweight training, no equipment workouts, functional fitness, strength training online, cardio workouts, metabolic conditioning, mobility training, power workouts, challenge workouts, convenient fitness, flexible training, sports scientist Cyprus, home workouts, online gym, gym anywhere anytime" />
         
         {/* Open Graph / Facebook */}
         <meta property="og:type" content="website" />
         <meta property="og:url" content="https://smartygym.com/" />
-        <meta property="og:title" content="Smarty Gym | Smart Gym Online Fitness - Train Anywhere, Anytime" />
-        <meta property="og:description" content="Your smart gym for online fitness by Haris Falas. Convenient gym reimagined - train anywhere, anytime at smartygym.com with science-based programs." />
+        <meta property="og:title" content="SmartyGym | Online Fitness - Train Anywhere, Anytime" />
+        <meta property="og:description" content="SmartyGym - Your gym re-imagined. Train anywhere, anytime at smartygym.com with science-based programs by Haris Falas." />
         <meta property="og:image" content={smartyGymLogo} />
         <meta property="og:site_name" content="Smarty Gym" />
         
         {/* Twitter */}
         <meta property="twitter:card" content="summary_large_image" />
-        <meta property="twitter:title" content="Smarty Gym | Smart Gym Online Fitness" />
-        <meta property="twitter:description" content="Your smart gym for online fitness by Haris Falas at smartygym.com" />
+        <meta property="twitter:title" content="SmartyGym | Online Fitness" />
+        <meta property="twitter:description" content="SmartyGym - Your gym re-imagined. Train anywhere, anytime by Haris Falas at smartygym.com" />
         
         <link rel="canonical" href="https://smartygym.com/" />
         
@@ -194,15 +194,15 @@ const Index = () => {
         {/* Hero Section */}
         <section className="relative py-8 sm:py-12 px-4 border-b border-border bg-gradient-to-br from-background to-muted/30">
           <div className="container mx-auto max-w-4xl text-center space-y-3 sm:space-y-4">
-            <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-center mb-2">
-              Smarty Gym | Your Smart Gym for Online Fitness
+            <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold text-center mb-4">
+              SmartyGym
             </h1>
-            <p className="text-sm sm:text-base text-center text-muted-foreground mb-3 sm:mb-4">
-              Train Anywhere, Anytime with smartygym.com
+            <p className="text-lg sm:text-xl text-center text-muted-foreground mb-6">
+              Your gym re-imagined. Train anywhere, anytime.
             </p>
             <div className="bg-primary/10 border border-primary/20 rounded-lg p-3 sm:p-4 mb-3 sm:mb-4 text-center">
               <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed">
-            Your smart gym for convenient online fitness - Science-based workouts designed by <a href="/coach-profile" className="text-primary hover:underline font-medium"><strong>Haris Falas</strong></a>, Sports Scientist & Strength and Conditioning Coach. 
+            Science-based workouts designed by <a href="/coach-profile" className="text-primary hover:underline font-medium"><strong>Haris Falas</strong></a>, Sports Scientist & Strength and Conditioning Coach. 
             Free workouts available, no login required at smartygym.com
               </p>
             </div>
