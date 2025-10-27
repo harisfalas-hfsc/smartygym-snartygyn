@@ -107,6 +107,20 @@ import spartanEnduranceTestImg from "@/assets/spartan-endurance-test-workout.jpg
 import fullBodyBenchmarkImg from "@/assets/full-body-benchmark-workout.jpg";
 import burnoutChallengeImg from "@/assets/burnout-challenge-workout.jpg";
 import warriorFlowImg from "@/assets/warrior-flow-workout.jpg";
+import ironCoreBuilderImg from "@/assets/iron-core-builder-workout.jpg";
+import bodyweightPowerFrameImg from "@/assets/bodyweight-power-frame-workout.jpg";
+import burnstormImg from "@/assets/burnstorm-workout.jpg";
+import cardioSculptImg from "@/assets/cardio-sculpt-workout.jpg";
+import hiitInfernoImg from "@/assets/hiit-inferno-workout.jpg";
+import sweatCircuitProImg from "@/assets/sweat-circuit-pro-workout.jpg";
+import enduroFlowImg from "@/assets/enduro-flow-workout.jpg";
+import cardioSprintLadderImg from "@/assets/cardio-sprint-ladder-workout.jpg";
+import coreFlowRestoreImg from "@/assets/core-flow-restore-workout.jpg";
+import mobilityResetProImg from "@/assets/mobility-reset-pro-workout.jpg";
+import explosiveEngineProImg from "@/assets/explosive-engine-pro-workout.jpg";
+import bodyBlastPowerImg from "@/assets/body-blast-power-workout.jpg";
+import repGauntletImg from "@/assets/100-rep-gauntlet-workout.jpg";
+import bodyweightMadnessImg from "@/assets/bodyweight-madness-workout.jpg";
 
 type EquipmentFilter = "all" | "bodyweight" | "equipment";
 type LevelFilter = "all" | "beginner" | "intermediate" | "advanced";
@@ -139,6 +153,8 @@ const workoutData: { [key: string]: Workout[] } = {
       { id: "ws005", name: "Strength Density Builder", description: "High-density strength session focusing on maximal tension per time", duration: "60 min", equipment: "equipment", level: "advanced", format: "for time", imageUrl: strengthDensityBuilderImg, isFree: false },
       { id: "ws006", name: "Bodyweight Prime Strength", description: "Develop core strength and stability through unilateral movements", duration: "45 min", equipment: "bodyweight", level: "intermediate", format: "reps & sets", imageUrl: bodyweightPrimeStrengthImg, isFree: false },
       { id: "ws007", name: "Core Stability Strength", description: "A foundational bodyweight session to build core tension and muscle endurance", duration: "30 min", equipment: "bodyweight", level: "beginner", format: "circuit", imageUrl: coreStabilityStrengthImg, isFree: false },
+      { id: "ws008", name: "Iron Core Builder", description: "A balanced session focusing on compound lifts to enhance total-body strength and stability", duration: "45 min", equipment: "equipment", level: "intermediate", format: "reps & sets", imageUrl: ironCoreBuilderImg, isFree: false },
+      { id: "ws009", name: "Bodyweight Power Frame", description: "Develop raw body control and full-body tension through basic but powerful bodyweight strength moves", duration: "30 min", equipment: "bodyweight", level: "beginner", format: "circuit", imageUrl: bodyweightPowerFrameImg, isFree: false },
     ],
     "calorie-burning": [
       { id: "calorie-055", name: "Burn Flow", description: "A low-impact circuit designed to elevate heart rate and burn calories without high-impact stress", duration: "30 min", equipment: "bodyweight", level: "beginner", format: "circuit", imageUrl: burnStartImg, isFree: true },
@@ -156,6 +172,8 @@ const workoutData: { [key: string]: Workout[] } = {
       { id: "wc007", name: "Burn Zone Intervals", description: "Explosive intervals alternating upper and lower movements to boost caloric output", duration: "45 min", equipment: "equipment", level: "intermediate", format: "tabata", imageUrl: burnZoneIntervalsImg, isFree: false },
       { id: "wc008", name: "Bodyweight Inferno", description: "A nonstop fat-burner using compound bodyweight movements", duration: "30 min", equipment: "bodyweight", level: "intermediate", format: "amrap", imageUrl: bodyweightInfernoImg, isFree: false },
       { id: "wc009", name: "Burn Flow 2.0", description: "Rhythmic cardio workout for beginners aiming at calorie loss and endurance", duration: "30 min", equipment: "bodyweight", level: "beginner", format: "circuit", imageUrl: burnFlow2Img, isFree: false },
+      { id: "wc010", name: "Burnstorm", description: "A high-energy session blending power moves and cardio bursts to maximize calorie expenditure", duration: "45 min", equipment: "equipment", level: "advanced", format: "amrap", imageUrl: burnstormImg, isFree: false },
+      { id: "wc011", name: "Cardio Sculpt", description: "A quick and dynamic fat-burning session using simple full-body movements", duration: "30 min", equipment: "bodyweight", level: "beginner", format: "tabata", imageUrl: cardioSculptImg, isFree: false },
     ],
     "metabolic": [
       { id: "metabolic-043", name: "Metabo Pulse", description: "A beginner-friendly Tabata workout using bodyweight moves to elevate metabolism and improve aerobic capacity", duration: "30 min", equipment: "bodyweight", level: "beginner", format: "tabata", imageUrl: metaboLiteImg, isFree: true },
@@ -171,6 +189,8 @@ const workoutData: { [key: string]: Workout[] } = {
       { id: "wm005", name: "Metabolic Overdrive", description: "High-intensity AMRAP focusing on explosive power and metabolic output", duration: "45 min", equipment: "equipment", level: "advanced", format: "amrap", imageUrl: metabolicOverdriveImg, isFree: false },
       { id: "wm006", name: "Bodyweight Engine", description: "Tabata-style metabolic workout using bodyweight movements only", duration: "30 min", equipment: "bodyweight", level: "intermediate", format: "tabata", imageUrl: bodyweightEngineImg, isFree: false },
       { id: "wm007", name: "Metabolic Core Burn", description: "Circuit combining metabolic conditioning with core-focused movements", duration: "30 min", equipment: "bodyweight", level: "beginner", format: "circuit", imageUrl: metabolicCoreBurnImg, isFree: false },
+      { id: "wm010", name: "HIIT Inferno", description: "A brutal metabolic conditioning workout designed to skyrocket endurance and afterburn", duration: "45 min", equipment: "equipment", level: "advanced", format: "circuit", imageUrl: hiitInfernoImg, isFree: false },
+      { id: "wm011", name: "Sweat Circuit Pro", description: "Simple, effective circuit to elevate metabolism and improve endurance", duration: "30 min", equipment: "bodyweight", level: "beginner", format: "circuit", imageUrl: sweatCircuitProImg, isFree: false },
     ],
     "cardio": [
       { id: "cardio-061", name: "Cardio Lift-Off", description: "A gentle cardio circuit designed to elevate heart rate and improve aerobic capacity without high impact", duration: "30 min", equipment: "bodyweight", level: "beginner", format: "circuit", imageUrl: cardioLiftOffImg, isFree: true },
@@ -184,6 +204,8 @@ const workoutData: { [key: string]: Workout[] } = {
       { id: "wca007", name: "Conditioning Pyramid", description: "Pyramid-style cardio conditioning with dumbbells and jump rope", duration: "45 min", equipment: "equipment", level: "intermediate", format: "circuit", imageUrl: conditioningPyramidImg, isFree: false },
       { id: "wca008", name: "Bodyweight Endurance Flow", description: "Continuous bodyweight cardio flow for sustained aerobic capacity", duration: "30 min", equipment: "bodyweight", level: "intermediate", format: "circuit", imageUrl: bodyweightEnduranceFlowImg, isFree: false },
       { id: "wca009", name: "Fast Feet Cardio Flow", description: "Bodyweight cardio focusing on speed and agility movements", duration: "30 min", equipment: "bodyweight", level: "beginner", format: "circuit", imageUrl: fastFeetCardioFlowImg, isFree: false },
+      { id: "wca012", name: "Enduro Flow", description: "A total-body cardio endurance workout combining strength intervals and aerobic conditioning", duration: "45 min", equipment: "equipment", level: "intermediate", format: "for time", imageUrl: enduroFlowImg, isFree: false },
+      { id: "wca013", name: "Cardio Sprint Ladder", description: "A fun ladder-style session improving aerobic endurance and leg power", duration: "30 min", equipment: "bodyweight", level: "beginner", format: "circuit", imageUrl: cardioSprintLadderImg, isFree: false },
     ],
     "mobility": [
       { id: "mobility-025", name: "Flow Starter", description: "A gentle mobility circuit designed to improve joint range, posture, and control", duration: "30 min", equipment: "bodyweight", level: "beginner", format: "circuit", imageUrl: flowStarterImg, isFree: true },
@@ -199,6 +221,8 @@ const workoutData: { [key: string]: Workout[] } = {
       { id: "wmob005", name: "Balance Flow Reset", description: "Mini band and mat work for balance and mobility restoration", duration: "30 min", equipment: "equipment", level: "beginner", format: "circuit", imageUrl: balanceFlowResetImg, isFree: false },
       { id: "wmob006", name: "Mobility Wave", description: "Bodyweight mobility flow with dynamic stretching and joint prep", duration: "30 min", equipment: "bodyweight", level: "beginner", format: "circuit", imageUrl: mobilityWaveImg, isFree: false },
       { id: "wmob007", name: "Stability Core Flow", description: "Bodyweight stability and core activation flow", duration: "30 min", equipment: "bodyweight", level: "beginner", format: "circuit", imageUrl: stabilityCoreFlowImg, isFree: false },
+      { id: "wmob012", name: "Core Flow Restore", description: "Core stability and dynamic flexibility session designed for recovery and control", duration: "45 min", equipment: "equipment", level: "intermediate", format: "circuit", imageUrl: coreFlowRestoreImg, isFree: false },
+      { id: "wmob013", name: "Mobility Reset Pro", description: "A restorative routine to unlock stiff joints and realign posture", duration: "30 min", equipment: "bodyweight", level: "beginner", format: "circuit", imageUrl: mobilityResetProImg, isFree: false },
     ],
     "power": [
       { id: "power-037", name: "Power Primer", description: "A beginner-friendly circuit focused on basic explosive movements and coordination", duration: "30 min", equipment: "bodyweight", level: "beginner", format: "circuit", imageUrl: powerPrimerImg, isFree: true },
@@ -214,6 +238,8 @@ const workoutData: { [key: string]: Workout[] } = {
       { id: "wp005", name: "Olympic Power Session", description: "Olympic lifting-focused session for power development", duration: "60 min", equipment: "equipment", level: "advanced", format: "reps & sets", imageUrl: olympicPowerSessionImg, isFree: false },
       { id: "wp006", name: "Plyometric Burn", description: "Bodyweight plyometric workout for explosive power and calorie burn", duration: "30 min", equipment: "bodyweight", level: "intermediate", format: "circuit", imageUrl: plyometricBurnImg, isFree: false },
       { id: "wp007", name: "Power Flow", description: "Bodyweight power flow combining speed and control", duration: "30 min", equipment: "bodyweight", level: "beginner", format: "circuit", imageUrl: powerFlowImg, isFree: false },
+      { id: "wp008", name: "Explosive Engine Pro", description: "Build fast-twitch muscle power and athletic performance", duration: "45 min", equipment: "equipment", level: "advanced", format: "reps & sets", imageUrl: explosiveEngineProImg, isFree: false },
+      { id: "wp009", name: "Body Blast Power", description: "Fast, reactive movements to improve coordination and speed", duration: "30 min", equipment: "bodyweight", level: "intermediate", format: "tabata", imageUrl: bodyBlastPowerImg, isFree: false },
     ],
     "challenge": [
       { id: "challenge-002", name: "Starter Gauntlet", description: "A simple but motivating challenge workout using bodyweight movements in a round-based format", duration: "30 min", equipment: "bodyweight", level: "beginner", format: "for time", imageUrl: starterGauntletImg, isFree: true },
@@ -229,6 +255,8 @@ const workoutData: { [key: string]: Workout[] } = {
       { id: "wch005", name: "Full Body Benchmark", description: "Dumbbells and pull-up bar benchmark workout testing overall fitness", duration: "45 min", equipment: "equipment", level: "intermediate", format: "for time", imageUrl: fullBodyBenchmarkImg, isFree: false },
       { id: "wch006", name: "The Burnout Challenge", description: "Bodyweight challenge designed to test muscular endurance and mental fortitude", duration: "30 min", equipment: "bodyweight", level: "intermediate", format: "amrap", imageUrl: burnoutChallengeImg, isFree: false },
       { id: "wch007", name: "Warrior Flow", description: "Bodyweight warrior-style flow challenge combining strength and mobility", duration: "30 min", equipment: "bodyweight", level: "beginner", format: "circuit", imageUrl: warriorFlowImg, isFree: false },
+      { id: "wch008", name: "100 Rep Gauntlet", description: "Complete 100 total reps of each movement — no quitting allowed", duration: "45 min", equipment: "equipment", level: "advanced", format: "for time", imageUrl: repGauntletImg, isFree: false },
+      { id: "wch009", name: "Bodyweight Madness", description: "A fast-paced total-body challenge to test endurance and focus", duration: "30 min", equipment: "bodyweight", level: "intermediate", format: "amrap", imageUrl: bodyweightMadnessImg, isFree: false },
     ],
   };
 
