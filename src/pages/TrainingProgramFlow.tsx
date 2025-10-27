@@ -88,9 +88,9 @@ const TrainingProgramFlow = () => {
           <span className="text-xs sm:text-sm">Back</span>
         </Button>
         
-        <h1 className="text-3xl sm:text-4xl font-bold text-center mb-3">SmartyGym Online Fitness Programs</h1>
+        <h1 className="text-3xl sm:text-4xl font-bold text-center mb-3">SmartyGym Training Programs</h1>
         <p className="text-center text-lg text-foreground mb-2 max-w-3xl mx-auto">
-          Structured 6–8 week online fitness programs created by Sports Scientist <a href="/coach-profile" className="text-primary hover:underline font-medium">Haris Falas</a> at smartygym.com
+          Structured 6–8 week training programs created by Sports Scientist <a href="/coach-profile" className="text-primary hover:underline font-medium">Haris Falas</a> at smartygym.com
         </p>
         <p className="text-center text-sm text-muted-foreground mb-6 max-w-2xl mx-auto">
           Build strength, lose fat, improve mobility — SmartyGym delivers evidence-based functional training anywhere, anytime.
