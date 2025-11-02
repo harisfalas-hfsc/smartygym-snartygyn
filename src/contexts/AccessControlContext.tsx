@@ -56,11 +56,16 @@ export const AccessControlProvider = ({ children }: { children: ReactNode }) => 
     init();
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      async (_event, session) => {
+      (_event, session) => {
         if (!mounted) return;
         
         if (session?.user) {
-          await checkSubscription(session.user);
+          // Defer Supabase calls to prevent deadlock
+          setTimeout(() => {
+            if (mounted) {
+              checkSubscription(session.user);
+            }
+          }, 0);
         } else {
           setState({
             user: null,

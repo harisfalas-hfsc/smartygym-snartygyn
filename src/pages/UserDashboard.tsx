@@ -111,6 +111,29 @@ export default function UserDashboard() {
 
   useEffect(() => {
     initDashboard();
+
+    // Listen for auth state changes to handle session updates after refresh
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      (event, session) => {
+        if (event === 'SIGNED_OUT' || !session?.user) {
+          setUser(null);
+          setLoading(false);
+          navigate('/auth');
+        } else if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') {
+          // Defer Supabase calls to prevent deadlock
+          setUser(session.user);
+          setTimeout(async () => {
+            await Promise.allSettled([
+              fetchAllData(session.user.id),
+              checkSubscription(session.user.id)
+            ]);
+            setLoading(false);
+          }, 0);
+        }
+      }
+    );
+
+    return () => subscription.unsubscribe();
   }, []);
 
   const initDashboard = async () => {

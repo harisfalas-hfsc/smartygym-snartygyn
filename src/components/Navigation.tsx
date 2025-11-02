@@ -50,8 +50,11 @@ export const Navigation = () => {
     } = supabase.auth.onAuthStateChange((_event, session) => {
       setUser(session?.user ?? null);
       if (session?.user) {
-        loadUserData(session.user.id);
-        checkSubscription();
+        // Defer Supabase calls to prevent deadlock
+        setTimeout(() => {
+          loadUserData(session.user.id);
+          checkSubscription();
+        }, 0);
       } else {
         setAvatarUrl(null);
         setSubscriptionInfo(null);
