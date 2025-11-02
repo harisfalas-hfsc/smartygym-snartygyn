@@ -29,6 +29,8 @@ const PersonalTraining = () => {
     age: "",
     weight: "",
     height: "",
+    fitnessLevel: "",
+    lifestyle: [] as string[],
     performanceType: "",
     specificGoal: "",
     duration: "",
@@ -97,9 +99,18 @@ const PersonalTraining = () => {
     }));
   };
 
+  const handleLifestyleChange = (lifestyle: string, checked: boolean) => {
+    setFormData(prev => ({
+      ...prev,
+      lifestyle: checked 
+        ? [...prev.lifestyle, lifestyle]
+        : prev.lifestyle.filter(l => l !== lifestyle)
+    }));
+  };
+
   const handleSubmit = async () => {
     // Validate required fields
-    if (!formData.email || !formData.name || !formData.age || !formData.weight || !formData.height) {
+    if (!formData.email || !formData.name || !formData.age || !formData.weight || !formData.height || !formData.fitnessLevel) {
       toast({
         title: "Missing Information",
         description: "Please fill in all required fields",
@@ -218,7 +229,14 @@ const PersonalTraining = () => {
           <Card className="border-2 border-primary">
             <CardHeader className="p-4 sm:p-6">
               <CardTitle className="text-xl sm:text-2xl">Personal Training Questionnaire</CardTitle>
-              <CardDescription className="text-sm sm:text-base">Please complete all fields to receive your personalized program</CardDescription>
+              <CardDescription className="text-sm sm:text-base leading-relaxed">
+                Please complete all fields to receive your personalized program. The detailed information you provide 
+                is essential for me to design a truly tailor-made training program that aligns perfectly with your unique 
+                needs, goals, and circumstances. Understanding your fitness level, lifestyle, available equipment, and any 
+                physical limitations allows me to create a customized program that is not only effective but also safe and 
+                sustainable for you. This comprehensive approach ensures that every aspect of your training is optimized 
+                specifically for your situation, maximizing your results and minimizing the risk of injury.
+              </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4 sm:space-y-6 p-4 sm:p-6 [&_input]:border-primary [&_textarea]:border-primary [&_button[role=combobox]]:border-primary">
               {/* Basic Information */}
@@ -277,6 +295,124 @@ const PersonalTraining = () => {
                       onChange={(e) => setFormData({...formData, height: e.target.value})}
                       placeholder="175"
                     />
+                  </div>
+                </div>
+
+                <div>
+                  <Label htmlFor="fitnessLevel">Fitness Level *</Label>
+                  <Select value={formData.fitnessLevel} onValueChange={(value) => setFormData({...formData, fitnessLevel: value})}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select your fitness level" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="beginner">
+                        <div className="flex flex-col">
+                          <span className="font-medium">Beginner</span>
+                          <span className="text-xs text-muted-foreground">New to structured training, or returning after a long break</span>
+                        </div>
+                      </SelectItem>
+                      <SelectItem value="intermediate">
+                        <div className="flex flex-col">
+                          <span className="font-medium">Intermediate</span>
+                          <span className="text-xs text-muted-foreground">Training consistently for 6+ months with good exercise form</span>
+                        </div>
+                      </SelectItem>
+                      <SelectItem value="advanced">
+                        <div className="flex flex-col">
+                          <span className="font-medium">Advanced</span>
+                          <span className="text-xs text-muted-foreground">Training consistently for 2+ years with advanced techniques</span>
+                        </div>
+                      </SelectItem>
+                    </SelectContent>
+                  </Select>
+                  <p className="text-xs text-muted-foreground mt-1">
+                    {formData.fitnessLevel === "beginner" && "You're just starting your fitness journey or coming back after time away"}
+                    {formData.fitnessLevel === "intermediate" && "You have a solid foundation and train regularly with proper form"}
+                    {formData.fitnessLevel === "advanced" && "You have extensive training experience and understand advanced programming"}
+                  </p>
+                </div>
+
+                <div>
+                  <Label>Lifestyle & Activity Level *</Label>
+                  <p className="text-xs text-muted-foreground mb-3">Select all that apply to help customize your program</p>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                    <div className="flex items-start space-x-2">
+                      <Checkbox
+                        id="very-busy"
+                        checked={formData.lifestyle.includes("very-busy")}
+                        onCheckedChange={(checked) => handleLifestyleChange("very-busy", checked as boolean)}
+                      />
+                      <Label htmlFor="very-busy" className="cursor-pointer leading-tight">
+                        <div className="font-medium">Very Busy Schedule</div>
+                        <div className="text-xs text-muted-foreground">Limited time for training</div>
+                      </Label>
+                    </div>
+                    <div className="flex items-start space-x-2">
+                      <Checkbox
+                        id="flexible-time"
+                        checked={formData.lifestyle.includes("flexible-time")}
+                        onCheckedChange={(checked) => handleLifestyleChange("flexible-time", checked as boolean)}
+                      />
+                      <Label htmlFor="flexible-time" className="cursor-pointer leading-tight">
+                        <div className="font-medium">Flexible Schedule</div>
+                        <div className="text-xs text-muted-foreground">Good availability for training</div>
+                      </Label>
+                    </div>
+                    <div className="flex items-start space-x-2">
+                      <Checkbox
+                        id="sedentary"
+                        checked={formData.lifestyle.includes("sedentary")}
+                        onCheckedChange={(checked) => handleLifestyleChange("sedentary", checked as boolean)}
+                      />
+                      <Label htmlFor="sedentary" className="cursor-pointer leading-tight">
+                        <div className="font-medium">Mostly Sedentary</div>
+                        <div className="text-xs text-muted-foreground">Desk job, sitting most of the day</div>
+                      </Label>
+                    </div>
+                    <div className="flex items-start space-x-2">
+                      <Checkbox
+                        id="moderately-active"
+                        checked={formData.lifestyle.includes("moderately-active")}
+                        onCheckedChange={(checked) => handleLifestyleChange("moderately-active", checked as boolean)}
+                      />
+                      <Label htmlFor="moderately-active" className="cursor-pointer leading-tight">
+                        <div className="font-medium">Moderately Active</div>
+                        <div className="text-xs text-muted-foreground">Mix of sitting and movement</div>
+                      </Label>
+                    </div>
+                    <div className="flex items-start space-x-2">
+                      <Checkbox
+                        id="very-active"
+                        checked={formData.lifestyle.includes("very-active")}
+                        onCheckedChange={(checked) => handleLifestyleChange("very-active", checked as boolean)}
+                      />
+                      <Label htmlFor="very-active" className="cursor-pointer leading-tight">
+                        <div className="font-medium">Very Active</div>
+                        <div className="text-xs text-muted-foreground">Physical job, on your feet most of the day</div>
+                      </Label>
+                    </div>
+                    <div className="flex items-start space-x-2">
+                      <Checkbox
+                        id="outdoor-work"
+                        checked={formData.lifestyle.includes("outdoor-work")}
+                        onCheckedChange={(checked) => handleLifestyleChange("outdoor-work", checked as boolean)}
+                      />
+                      <Label htmlFor="outdoor-work" className="cursor-pointer leading-tight">
+                        <div className="font-medium">Outdoor Work</div>
+                        <div className="text-xs text-muted-foreground">Working outdoors regularly</div>
+                      </Label>
+                    </div>
+                    <div className="flex items-start space-x-2">
+                      <Checkbox
+                        id="high-stress"
+                        checked={formData.lifestyle.includes("high-stress")}
+                        onCheckedChange={(checked) => handleLifestyleChange("high-stress", checked as boolean)}
+                      />
+                      <Label htmlFor="high-stress" className="cursor-pointer leading-tight">
+                        <div className="font-medium">High Stress Level</div>
+                        <div className="text-xs text-muted-foreground">Demanding work/life situation</div>
+                      </Label>
+                    </div>
                   </div>
                 </div>
               </div>
