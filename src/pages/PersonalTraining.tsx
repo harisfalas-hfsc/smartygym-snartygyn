@@ -222,7 +222,6 @@ const PersonalTraining = () => {
                 This isn't a cookie-cut program. This is you, translated into performance. When you complete your lifestyle 
                 and goals questionnaire, I take every detail — your habits, your equipment, your challenges, your ambitions — 
                 and build a training plan designed entirely around you. My goal isn't just to get you fit; it's to upgrade the way you live.
-                <br /><br />
                 Whether you want to move pain-free, perform better in your sport, keep up with your kids, or simply feel strong 
                 and confident again — I'll give you the roadmap. Every session is crafted through my years of expertise in human 
                 and athletic performance to make your training not only effective, but sustainable and meaningful. This is your 
