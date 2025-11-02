@@ -63,7 +63,15 @@ serve(async (req) => {
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : String(error);
     logStep("ERROR in customer-portal", { message: errorMessage });
-    return new Response(JSON.stringify({ error: errorMessage }), {
+    
+    // Check if error is due to unconfigured portal
+    const isPortalNotConfigured = errorMessage.includes("No configuration provided") || 
+                                   errorMessage.includes("default configuration has not been created");
+    
+    return new Response(JSON.stringify({ 
+      error: errorMessage,
+      portalNotConfigured: isPortalNotConfigured
+    }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
       status: 500,
     });

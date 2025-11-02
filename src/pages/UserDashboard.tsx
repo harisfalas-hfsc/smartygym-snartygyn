@@ -355,17 +355,37 @@ export default function UserDashboard() {
           title: "Opening subscription portal",
           description: "Manage your subscription in the new tab",
         });
+      } else if (data?.portalNotConfigured) {
+        // Portal not configured in Stripe - provide helpful message
+        toast({
+          title: "Portal Setup Required",
+          description: "The subscription management portal is being set up. Please contact support for subscription changes.",
+          variant: "destructive"
+        });
       } else {
         throw new Error("No portal URL returned");
       }
     } catch (error) {
       console.error('Error opening customer portal:', error);
-      const errorMessage = error instanceof Error ? error.message : "Unknown error occurred";
-      toast({
-        title: "Error",
-        description: `Failed to open subscription management: ${errorMessage}`,
-        variant: "destructive"
-      });
+      
+      // Check if it's a portal configuration error
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      const isConfigError = errorMessage.includes("No configuration") || 
+                           errorMessage.includes("default configuration");
+      
+      if (isConfigError) {
+        toast({
+          title: "Portal Setup Required",
+          description: "The subscription management portal is being configured. Please contact support for subscription changes.",
+          variant: "destructive"
+        });
+      } else {
+        toast({
+          title: "Error",
+          description: `Failed to open subscription management: ${errorMessage}`,
+          variant: "destructive"
+        });
+      }
     } finally {
       setManagingSubscription(false);
     }
