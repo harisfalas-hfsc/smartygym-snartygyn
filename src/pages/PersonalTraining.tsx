@@ -235,12 +235,9 @@ const PersonalTraining = () => {
             <CardHeader className="p-4 sm:p-6">
               <CardTitle className="text-xl sm:text-2xl">Personal Training Questionnaire</CardTitle>
               <CardDescription className="text-sm sm:text-base leading-relaxed">
-                Please complete all fields to receive your personalized program. The detailed information you provide 
-                is essential for me to design a truly tailor-made training program that aligns perfectly with your unique 
-                needs, goals, and circumstances. Understanding your fitness level, lifestyle, available equipment, and any 
-                physical limitations allows me to create a customized program that is not only effective but also safe and 
-                sustainable for you. This comprehensive approach ensures that every aspect of your training is optimized 
-                specifically for your situation, maximizing your results and minimizing the risk of injury.
+                Please complete all fields to receive your personalized program. Your detailed responses allow me to design 
+                a truly tailor-made training plan based on your fitness level, lifestyle, available equipment, and any 
+                physical limitations—ensuring a program that is effective, safe, and sustainable specifically for you.
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4 sm:space-y-6 p-4 sm:p-6 [&_input]:border-primary [&_textarea]:border-primary [&_button[role=combobox]]:border-primary">
