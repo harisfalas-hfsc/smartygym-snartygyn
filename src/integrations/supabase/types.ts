@@ -488,6 +488,48 @@ export type Database = {
         }
         Relationships: []
       }
+      workout_comments: {
+        Row: {
+          comment_text: string
+          created_at: string
+          id: string
+          program_id: string | null
+          program_name: string | null
+          program_type: string | null
+          updated_at: string
+          user_id: string
+          workout_id: string | null
+          workout_name: string | null
+          workout_type: string | null
+        }
+        Insert: {
+          comment_text: string
+          created_at?: string
+          id?: string
+          program_id?: string | null
+          program_name?: string | null
+          program_type?: string | null
+          updated_at?: string
+          user_id: string
+          workout_id?: string | null
+          workout_name?: string | null
+          workout_type?: string | null
+        }
+        Update: {
+          comment_text?: string
+          created_at?: string
+          id?: string
+          program_id?: string | null
+          program_name?: string | null
+          program_type?: string | null
+          updated_at?: string
+          user_id?: string
+          workout_id?: string | null
+          workout_name?: string | null
+          workout_type?: string | null
+        }
+        Relationships: []
+      }
       workout_interactions: {
         Row: {
           created_at: string | null

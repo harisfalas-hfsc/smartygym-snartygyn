@@ -45,6 +45,7 @@ import TakeTour from "./pages/TakeTour";
 import PersonalTraining from "./pages/PersonalTraining";
 import PaymentSuccess from "./pages/PaymentSuccess";
 import NewsletterThankYou from "./pages/NewsletterThankYou";
+import Community from "./pages/Community";
 import { AccessGate } from "./components/AccessGate";
 import { WhatsAppButton } from "./components/WhatsAppButton";
 
@@ -103,6 +104,7 @@ const App = () => (
                 
                 {/* Public routes */}
                 <Route path="/about" element={<About />} />
+                <Route path="/community" element={<Community />} />
                 <Route path="/takeatour" element={<TakeTour />} />
                 <Route path="/contact" element={<Contact />} />
                 <Route path="/personal-training" element={<PersonalTraining />} />
