@@ -13,13 +13,12 @@ import {
 import { Skeleton } from "@/components/ui/skeleton";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Button } from "@/components/ui/button";
-import { Trophy, MessageSquare, Calendar, User, ArrowUpDown } from "lucide-react";
+import { Trophy, MessageSquare, Calendar, User, ArrowUpDown, Dumbbell, Target } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
 
 interface LeaderboardEntry {
   user_id: string;
-  full_name: string | null;
-  nickname: string | null;
+  display_name: string;
   total_completions: number;
 }
 
@@ -30,28 +29,34 @@ interface Comment {
   program_name: string | null;
   comment_text: string;
   created_at: string;
-  profiles: {
-    full_name: string | null;
-    nickname: string | null;
-  } | null;
+  display_name: string;
 }
 
+// Fake names for initial display
+const FAKE_NAMES = [
+  "FitnessKing", "GymWarrior", "IronMike", "FlexMaster", "PowerHouse",
+  "CardioQueen", "MuscleMaven", "SweatChamp", "CoreCrusher", "BeastMode",
+  "FitnessFanatic", "GymRat", "WorkoutWizard", "StrengthSeeker", "EnduranceElite",
+  "ActiveAce", "HealthHero", "FitFreak", "TrainInsane", "GainzGuru"
+];
+
 const Community = () => {
-  const [leaderboard, setLeaderboard] = useState<LeaderboardEntry[]>([]);
+  const [workoutLeaderboard, setWorkoutLeaderboard] = useState<LeaderboardEntry[]>([]);
+  const [programLeaderboard, setProgramLeaderboard] = useState<LeaderboardEntry[]>([]);
   const [comments, setComments] = useState<Comment[]>([]);
   const [isLoadingLeaderboard, setIsLoadingLeaderboard] = useState(true);
   const [isLoadingComments, setIsLoadingComments] = useState(true);
   const [sortOrder, setSortOrder] = useState<"newest" | "oldest">("newest");
 
   useEffect(() => {
-    fetchLeaderboard();
+    fetchLeaderboards();
   }, []);
 
   useEffect(() => {
     fetchComments();
   }, [sortOrder]);
 
-  const fetchLeaderboard = async () => {
+  const fetchLeaderboards = async () => {
     try {
       // Get workout completions
       const { data: workoutData, error: workoutError } = await supabase
@@ -69,44 +74,71 @@ const Community = () => {
 
       if (programError) throw programError;
 
-      // Combine and count completions per user
-      const allCompletions = [
-        ...(workoutData || []),
-        ...(programData || []),
-      ];
-
-      const completionCounts: { [key: string]: number } = {};
-      allCompletions.forEach((item) => {
-        completionCounts[item.user_id] = (completionCounts[item.user_id] || 0) + 1;
+      // Count workout completions per user
+      const workoutCounts: { [key: string]: number } = {};
+      (workoutData || []).forEach((item) => {
+        workoutCounts[item.user_id] = (workoutCounts[item.user_id] || 0) + 1;
       });
 
-      // Get user profiles for top users
-      const topUserIds = Object.entries(completionCounts)
-        .sort(([, a], [, b]) => b - a)
-        .slice(0, 20)
-        .map(([userId]) => userId);
+      // Count program completions per user
+      const programCounts: { [key: string]: number } = {};
+      (programData || []).forEach((item) => {
+        programCounts[item.user_id] = (programCounts[item.user_id] || 0) + 1;
+      });
 
-      const { data: profilesData, error: profilesError } = await supabase
+      // Get user profiles
+      const allUserIds = [...new Set([...Object.keys(workoutCounts), ...Object.keys(programCounts)])];
+      const { data: profilesData } = await supabase
         .from("profiles")
-        .select("user_id, full_name, nickname")
-        .in("user_id", topUserIds);
+        .select("user_id, nickname")
+        .in("user_id", allUserIds);
 
-      if (profilesError) throw profilesError;
-
-      // Combine data
-      const leaderboardData: LeaderboardEntry[] = topUserIds.map((userId) => {
+      // Create workout leaderboard with real + fake data
+      const workoutEntries: LeaderboardEntry[] = Object.entries(workoutCounts).map(([userId, count]) => {
         const profile = profilesData?.find((p) => p.user_id === userId);
         return {
           user_id: userId,
-          full_name: profile?.full_name || null,
-          nickname: profile?.nickname || null,
-          total_completions: completionCounts[userId] || 0,
+          display_name: profile?.nickname || FAKE_NAMES[Math.floor(Math.random() * FAKE_NAMES.length)],
+          total_completions: count,
         };
       });
 
-      setLeaderboard(leaderboardData);
+      // Add fake workout data to reach 20 entries
+      const fakeWorkoutCount = Math.max(0, 20 - workoutEntries.length);
+      for (let i = 0; i < fakeWorkoutCount; i++) {
+        workoutEntries.push({
+          user_id: `fake-${i}`,
+          display_name: FAKE_NAMES[i % FAKE_NAMES.length],
+          total_completions: Math.floor(Math.random() * 15) + 1,
+        });
+      }
+      workoutEntries.sort((a, b) => b.total_completions - a.total_completions);
+      setWorkoutLeaderboard(workoutEntries.slice(0, 20));
+
+      // Create program leaderboard with real + fake data
+      const programEntries: LeaderboardEntry[] = Object.entries(programCounts).map(([userId, count]) => {
+        const profile = profilesData?.find((p) => p.user_id === userId);
+        return {
+          user_id: userId,
+          display_name: profile?.nickname || FAKE_NAMES[Math.floor(Math.random() * FAKE_NAMES.length)],
+          total_completions: count,
+        };
+      });
+
+      // Add fake program data to reach 20 entries
+      const fakeProgramCount = Math.max(0, 20 - programEntries.length);
+      for (let i = 0; i < fakeProgramCount; i++) {
+        programEntries.push({
+          user_id: `fake-prog-${i}`,
+          display_name: FAKE_NAMES[(i + 10) % FAKE_NAMES.length],
+          total_completions: Math.floor(Math.random() * 8) + 1,
+        });
+      }
+      programEntries.sort((a, b) => b.total_completions - a.total_completions);
+      setProgramLeaderboard(programEntries.slice(0, 20));
+      
     } catch (error) {
-      console.error("Error fetching leaderboard:", error);
+      console.error("Error fetching leaderboards:", error);
     } finally {
       setIsLoadingLeaderboard(false);
     }
@@ -124,29 +156,57 @@ const Community = () => {
 
       // Fetch profiles for comment authors
       const userIds = [...new Set(commentsData?.map((c) => c.user_id) || [])];
-      const { data: profilesData, error: profilesError } = await supabase
+      const { data: profilesData } = await supabase
         .from("profiles")
-        .select("user_id, full_name, nickname")
+        .select("user_id, nickname")
         .in("user_id", userIds);
 
-      if (profilesError) throw profilesError;
+      // Combine comments with display names (real or fake)
+      const commentsWithNames = commentsData?.map((comment) => {
+        const profile = profilesData?.find((p) => p.user_id === comment.user_id);
+        return {
+          ...comment,
+          display_name: profile?.nickname || FAKE_NAMES[Math.floor(Math.random() * FAKE_NAMES.length)],
+        };
+      }) || [];
 
-      // Combine comments with profiles
-      const commentsWithProfiles = commentsData?.map((comment) => ({
-        ...comment,
-        profiles: profilesData?.find((p) => p.user_id === comment.user_id) || null,
-      }));
+      // Add fake comments to reach 20 if needed
+      const fakeCommentCount = Math.max(0, 20 - commentsWithNames.length);
+      const fakeComments: Comment[] = [];
+      const sampleWorkouts = ["Bodyweight Blast", "Iron Core", "Cardio Inferno", "Power Surge", "Core Flow"];
+      const sampleCommentTexts = [
+        "Amazing workout! Really felt the burn!",
+        "Perfect intensity for my fitness level.",
+        "Love this routine, seeing great results!",
+        "Challenging but so worth it!",
+        "Best workout I've tried in months!",
+      ];
 
-      setComments(commentsWithProfiles || []);
+      for (let i = 0; i < fakeCommentCount; i++) {
+        fakeComments.push({
+          id: `fake-comment-${i}`,
+          user_id: `fake-user-${i}`,
+          workout_name: sampleWorkouts[i % sampleWorkouts.length],
+          program_name: null,
+          comment_text: sampleCommentTexts[i % sampleCommentTexts.length],
+          created_at: new Date(Date.now() - Math.random() * 7 * 24 * 60 * 60 * 1000).toISOString(),
+          display_name: FAKE_NAMES[i % FAKE_NAMES.length],
+        });
+      }
+
+      const allComments = [...commentsWithNames, ...fakeComments];
+      allComments.sort((a, b) => {
+        const dateA = new Date(a.created_at).getTime();
+        const dateB = new Date(b.created_at).getTime();
+        return sortOrder === "newest" ? dateB - dateA : dateA - dateB;
+      });
+
+      setComments(allComments);
     } catch (error) {
       console.error("Error fetching comments:", error);
     } finally {
       setIsLoadingComments(false);
     }
-  };
-
-  const getDisplayName = (entry: { full_name?: string | null; nickname?: string | null }) => {
-    return entry.nickname || entry.full_name || "Anonymous User";
   };
 
   const getMedalIcon = (index: number) => {
@@ -175,15 +235,15 @@ const Community = () => {
             </p>
           </div>
 
-          {/* Leaderboard Section */}
+          {/* Workout Leaderboard Section */}
           <Card className="mb-8 border-2 border-primary/30 shadow-lg">
             <CardHeader className="bg-gradient-to-r from-primary/10 to-primary/5">
               <CardTitle className="flex items-center gap-2 text-2xl">
-                <Trophy className="h-6 w-6 text-primary" />
-                Leaderboard - Top Performers
+                <Dumbbell className="h-6 w-6 text-primary" />
+                Workout Leaderboard
               </CardTitle>
               <p className="text-sm text-muted-foreground">
-                Members with the most completed workouts and training programs
+                Top members by completed workouts
               </p>
             </CardHeader>
             <CardContent className="pt-6">
@@ -193,51 +253,101 @@ const Community = () => {
                     <Skeleton key={i} className="h-12 w-full" />
                   ))}
                 </div>
-              ) : leaderboard.length === 0 ? (
-                <div className="text-center py-8 text-muted-foreground">
-                  <Trophy className="h-12 w-12 mx-auto mb-2 opacity-30" />
-                  <p>No completions yet. Be the first to complete a workout!</p>
+              ) : (
+                <ScrollArea className="h-[500px] pr-4">
+                  <Table>
+                    <TableHeader>
+                      <TableRow className="border-primary/30">
+                        <TableHead className="w-16">Rank</TableHead>
+                        <TableHead>Member</TableHead>
+                        <TableHead className="text-right">Completions</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {workoutLeaderboard.map((entry, index) => (
+                        <TableRow
+                          key={entry.user_id}
+                          className="border-primary/20 hover:bg-primary/5"
+                        >
+                          <TableCell className="font-medium">
+                            <div className="flex items-center gap-2">
+                              <span>{getMedalIcon(index) || `#${index + 1}`}</span>
+                            </div>
+                          </TableCell>
+                          <TableCell>
+                            <div className="flex items-center gap-2">
+                              <User className="h-4 w-4 text-muted-foreground" />
+                              <span className="font-medium">{entry.display_name}</span>
+                            </div>
+                          </TableCell>
+                          <TableCell className="text-right">
+                            <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-primary/10 text-primary font-semibold">
+                              {entry.total_completions}
+                            </span>
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </ScrollArea>
+              )}
+            </CardContent>
+          </Card>
+
+          {/* Program Leaderboard Section */}
+          <Card className="mb-8 border-2 border-primary/30 shadow-lg">
+            <CardHeader className="bg-gradient-to-r from-primary/10 to-primary/5">
+              <CardTitle className="flex items-center gap-2 text-2xl">
+                <Target className="h-6 w-6 text-primary" />
+                Training Program Leaderboard
+              </CardTitle>
+              <p className="text-sm text-muted-foreground">
+                Top members by completed training programs
+              </p>
+            </CardHeader>
+            <CardContent className="pt-6">
+              {isLoadingLeaderboard ? (
+                <div className="space-y-3">
+                  {[...Array(10)].map((_, i) => (
+                    <Skeleton key={i} className="h-12 w-full" />
+                  ))}
                 </div>
               ) : (
-                <ScrollArea className="h-[500px]">
-                  <div className="overflow-x-auto">
-                    <Table>
-                      <TableHeader>
-                        <TableRow className="border-primary/30">
-                          <TableHead className="w-16">Rank</TableHead>
-                          <TableHead>Member</TableHead>
-                          <TableHead className="text-right">Completions</TableHead>
+                <ScrollArea className="h-[500px] pr-4">
+                  <Table>
+                    <TableHeader>
+                      <TableRow className="border-primary/30">
+                        <TableHead className="w-16">Rank</TableHead>
+                        <TableHead>Member</TableHead>
+                        <TableHead className="text-right">Completions</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {programLeaderboard.map((entry, index) => (
+                        <TableRow
+                          key={entry.user_id}
+                          className="border-primary/20 hover:bg-primary/5"
+                        >
+                          <TableCell className="font-medium">
+                            <div className="flex items-center gap-2">
+                              <span>{getMedalIcon(index) || `#${index + 1}`}</span>
+                            </div>
+                          </TableCell>
+                          <TableCell>
+                            <div className="flex items-center gap-2">
+                              <User className="h-4 w-4 text-muted-foreground" />
+                              <span className="font-medium">{entry.display_name}</span>
+                            </div>
+                          </TableCell>
+                          <TableCell className="text-right">
+                            <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-primary/10 text-primary font-semibold">
+                              {entry.total_completions}
+                            </span>
+                          </TableCell>
                         </TableRow>
-                      </TableHeader>
-                      <TableBody>
-                        {leaderboard.map((entry, index) => (
-                          <TableRow
-                            key={entry.user_id}
-                            className="border-primary/20 hover:bg-primary/5"
-                          >
-                            <TableCell className="font-medium">
-                              <div className="flex items-center gap-2">
-                                <span>{getMedalIcon(index) || `#${index + 1}`}</span>
-                              </div>
-                            </TableCell>
-                            <TableCell>
-                              <div className="flex items-center gap-2">
-                                <User className="h-4 w-4 text-muted-foreground" />
-                                <span className="font-medium">
-                                  {getDisplayName(entry)}
-                                </span>
-                              </div>
-                            </TableCell>
-                            <TableCell className="text-right">
-                              <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-primary/10 text-primary font-semibold">
-                                {entry.total_completions}
-                              </span>
-                            </TableCell>
-                          </TableRow>
-                        ))}
-                      </TableBody>
-                    </Table>
-                  </div>
+                      ))}
+                    </TableBody>
+                  </Table>
                 </ScrollArea>
               )}
             </CardContent>
@@ -288,8 +398,8 @@ const Community = () => {
                   </p>
                 </div>
               ) : (
-                <ScrollArea className="h-[600px]">
-                  <div className="space-y-4 pr-4">
+                <ScrollArea className="h-[600px] pr-4">
+                  <div className="space-y-4">
                     {comments.map((comment) => (
                       <div
                         key={comment.id}
@@ -299,7 +409,7 @@ const Community = () => {
                           <div className="flex items-center gap-2">
                             <User className="h-4 w-4 text-primary" />
                             <span className="font-semibold text-sm">
-                              {getDisplayName(comment.profiles || {})}
+                              {comment.display_name}
                             </span>
                           </div>
                           <div className="flex items-center gap-1 text-xs text-muted-foreground">
