@@ -11,7 +11,9 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Trophy, MessageSquare, Calendar, User } from "lucide-react";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { Button } from "@/components/ui/button";
+import { Trophy, MessageSquare, Calendar, User, ArrowUpDown } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
 
 interface LeaderboardEntry {
@@ -39,11 +41,15 @@ const Community = () => {
   const [comments, setComments] = useState<Comment[]>([]);
   const [isLoadingLeaderboard, setIsLoadingLeaderboard] = useState(true);
   const [isLoadingComments, setIsLoadingComments] = useState(true);
+  const [sortOrder, setSortOrder] = useState<"newest" | "oldest">("newest");
 
   useEffect(() => {
     fetchLeaderboard();
-    fetchComments();
   }, []);
+
+  useEffect(() => {
+    fetchComments();
+  }, [sortOrder]);
 
   const fetchLeaderboard = async () => {
     try {
@@ -111,7 +117,7 @@ const Community = () => {
       const { data: commentsData, error: commentsError } = await supabase
         .from("workout_comments")
         .select("id, user_id, workout_name, program_name, comment_text, created_at")
-        .order("created_at", { ascending: false })
+        .order("created_at", { ascending: sortOrder === "oldest" })
         .limit(50);
 
       if (commentsError) throw commentsError;
@@ -193,44 +199,46 @@ const Community = () => {
                   <p>No completions yet. Be the first to complete a workout!</p>
                 </div>
               ) : (
-                <div className="overflow-x-auto">
-                  <Table>
-                    <TableHeader>
-                      <TableRow className="border-primary/30">
-                        <TableHead className="w-16">Rank</TableHead>
-                        <TableHead>Member</TableHead>
-                        <TableHead className="text-right">Completions</TableHead>
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                      {leaderboard.map((entry, index) => (
-                        <TableRow
-                          key={entry.user_id}
-                          className="border-primary/20 hover:bg-primary/5"
-                        >
-                          <TableCell className="font-medium">
-                            <div className="flex items-center gap-2">
-                              <span>{getMedalIcon(index) || `#${index + 1}`}</span>
-                            </div>
-                          </TableCell>
-                          <TableCell>
-                            <div className="flex items-center gap-2">
-                              <User className="h-4 w-4 text-muted-foreground" />
-                              <span className="font-medium">
-                                {getDisplayName(entry)}
-                              </span>
-                            </div>
-                          </TableCell>
-                          <TableCell className="text-right">
-                            <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-primary/10 text-primary font-semibold">
-                              {entry.total_completions}
-                            </span>
-                          </TableCell>
+                <ScrollArea className="h-[500px]">
+                  <div className="overflow-x-auto">
+                    <Table>
+                      <TableHeader>
+                        <TableRow className="border-primary/30">
+                          <TableHead className="w-16">Rank</TableHead>
+                          <TableHead>Member</TableHead>
+                          <TableHead className="text-right">Completions</TableHead>
                         </TableRow>
-                      ))}
-                    </TableBody>
-                  </Table>
-                </div>
+                      </TableHeader>
+                      <TableBody>
+                        {leaderboard.map((entry, index) => (
+                          <TableRow
+                            key={entry.user_id}
+                            className="border-primary/20 hover:bg-primary/5"
+                          >
+                            <TableCell className="font-medium">
+                              <div className="flex items-center gap-2">
+                                <span>{getMedalIcon(index) || `#${index + 1}`}</span>
+                              </div>
+                            </TableCell>
+                            <TableCell>
+                              <div className="flex items-center gap-2">
+                                <User className="h-4 w-4 text-muted-foreground" />
+                                <span className="font-medium">
+                                  {getDisplayName(entry)}
+                                </span>
+                              </div>
+                            </TableCell>
+                            <TableCell className="text-right">
+                              <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-primary/10 text-primary font-semibold">
+                                {entry.total_completions}
+                              </span>
+                            </TableCell>
+                          </TableRow>
+                        ))}
+                      </TableBody>
+                    </Table>
+                  </div>
+                </ScrollArea>
               )}
             </CardContent>
           </Card>
@@ -238,13 +246,26 @@ const Community = () => {
           {/* Comments Section */}
           <Card className="border-2 border-primary/30 shadow-lg">
             <CardHeader className="bg-gradient-to-r from-primary/10 to-primary/5">
-              <CardTitle className="flex items-center gap-2 text-2xl">
-                <MessageSquare className="h-6 w-6 text-primary" />
-                Community Comments
-              </CardTitle>
-              <p className="text-sm text-muted-foreground">
-                Reviews and feedback from premium members
-              </p>
+              <div className="flex items-center justify-between">
+                <div>
+                  <CardTitle className="flex items-center gap-2 text-2xl">
+                    <MessageSquare className="h-6 w-6 text-primary" />
+                    Community Comments
+                  </CardTitle>
+                  <p className="text-sm text-muted-foreground">
+                    Reviews and feedback from premium members
+                  </p>
+                </div>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setSortOrder(sortOrder === "newest" ? "oldest" : "newest")}
+                  className="flex items-center gap-2"
+                >
+                  <ArrowUpDown className="h-4 w-4" />
+                  {sortOrder === "newest" ? "Newest First" : "Oldest First"}
+                </Button>
+              </div>
             </CardHeader>
             <CardContent className="pt-6">
               {isLoadingComments ? (
@@ -267,35 +288,37 @@ const Community = () => {
                   </p>
                 </div>
               ) : (
-                <div className="space-y-4">
-                  {comments.map((comment) => (
-                    <div
-                      key={comment.id}
-                      className="p-4 rounded-lg border-2 border-primary/20 bg-gradient-to-r from-background to-primary/5 hover:border-primary/40 transition-colors"
-                    >
-                      <div className="flex items-start justify-between mb-2">
-                        <div className="flex items-center gap-2">
-                          <User className="h-4 w-4 text-primary" />
-                          <span className="font-semibold text-sm">
-                            {getDisplayName(comment.profiles || {})}
-                          </span>
+                <ScrollArea className="h-[600px]">
+                  <div className="space-y-4 pr-4">
+                    {comments.map((comment) => (
+                      <div
+                        key={comment.id}
+                        className="p-4 rounded-lg border-2 border-primary/20 bg-gradient-to-r from-background to-primary/5 hover:border-primary/40 transition-colors"
+                      >
+                        <div className="flex items-start justify-between mb-2">
+                          <div className="flex items-center gap-2">
+                            <User className="h-4 w-4 text-primary" />
+                            <span className="font-semibold text-sm">
+                              {getDisplayName(comment.profiles || {})}
+                            </span>
+                          </div>
+                          <div className="flex items-center gap-1 text-xs text-muted-foreground">
+                            <Calendar className="h-3 w-3" />
+                            {formatDistanceToNow(new Date(comment.created_at), {
+                              addSuffix: true,
+                            })}
+                          </div>
                         </div>
-                        <div className="flex items-center gap-1 text-xs text-muted-foreground">
-                          <Calendar className="h-3 w-3" />
-                          {formatDistanceToNow(new Date(comment.created_at), {
-                            addSuffix: true,
-                          })}
-                        </div>
+                        <p className="text-xs text-primary font-medium mb-2">
+                          {comment.workout_name
+                            ? `Workout: ${comment.workout_name}`
+                            : `Program: ${comment.program_name}`}
+                        </p>
+                        <p className="text-sm leading-relaxed">{comment.comment_text}</p>
                       </div>
-                      <p className="text-xs text-primary font-medium mb-2">
-                        {comment.workout_name
-                          ? `Workout: ${comment.workout_name}`
-                          : `Program: ${comment.program_name}`}
-                      </p>
-                      <p className="text-sm leading-relaxed">{comment.comment_text}</p>
-                    </div>
-                  ))}
-                </div>
+                    ))}
+                  </div>
+                </ScrollArea>
               )}
             </CardContent>
           </Card>
