@@ -751,28 +751,6 @@ export default function UserDashboard() {
                   </p>
                 </div>
 
-                {/* AI Diet Plans */}
-                <div className="p-4 bg-background rounded-lg border border-border/50">
-                  <div className="flex items-center gap-2 mb-2">
-                    <Star className="h-5 w-5 text-primary" />
-                    <h4 className="font-semibold">AI Diet Plans</h4>
-                  </div>
-                  <p className="text-xs text-muted-foreground">
-                    Generate unlimited personalized nutrition plans tailored to your goals, dietary preferences, and lifestyle.
-                  </p>
-                </div>
-
-                {/* AI Workout Plans */}
-                <div className="p-4 bg-background rounded-lg border border-border/50">
-                  <div className="flex items-center gap-2 mb-2">
-                    <Star className="h-5 w-5 text-primary" />
-                    <h4 className="font-semibold">AI Workout Plans</h4>
-                  </div>
-                  <p className="text-xs text-muted-foreground">
-                    Create custom training programs based on your equipment, fitness level, and specific goals.
-                  </p>
-                </div>
-
                 {/* Exercise Library */}
                 <div className="p-4 bg-background rounded-lg border border-border/50">
                   <div className="flex items-center gap-2 mb-2">
