@@ -226,11 +226,12 @@ const Community = () => {
   return (
     <>
       <Helmet>
-        <title>Community | Smarty Gym</title>
+        <title>Community Leaderboard & Reviews | Smarty Gym Cyprus | smartygym.com</title>
         <meta
           name="description"
-          content="Join the Smarty Gym community! View the leaderboard of top performers and read reviews from premium members."
+          content="Join Smarty Gym community! View workout leaderboards, training program rankings, and premium member reviews. Online fitness community Cyprus by Sports Scientist Haris Falas at smartygym.com"
         />
+        <meta name="keywords" content="fitness community, workout leaderboard, training rankings, gym reviews, online fitness community cyprus, smarty gym community, smartygym members" />
       </Helmet>
 
       <div className="min-h-screen bg-background">
@@ -243,17 +244,17 @@ const Community = () => {
           </div>
 
           {/* Workout Leaderboard Section */}
-          <Card className="mb-8 border-2 border-primary/30 shadow-lg">
-            <CardHeader className="bg-gradient-to-r from-primary/10 to-primary/5">
-              <CardTitle className="flex items-center gap-2 text-2xl">
-                <Dumbbell className="h-6 w-6 text-primary" />
+          <Card className="mb-6 md:mb-8 border-2 border-primary/30 shadow-lg">
+            <CardHeader className="bg-gradient-to-r from-primary/10 to-primary/5 p-4 md:p-6">
+              <CardTitle className="flex items-center gap-2 text-xl md:text-2xl">
+                <Dumbbell className="h-5 w-5 md:h-6 md:w-6 text-primary" />
                 Workout Leaderboard
               </CardTitle>
-              <p className="text-sm text-muted-foreground">
+              <p className="text-xs md:text-sm text-muted-foreground">
                 Top members by completed workouts
               </p>
             </CardHeader>
-            <CardContent className="pt-6">
+            <CardContent className="p-4 md:pt-6">
               {isLoadingLeaderboard ? (
                 <div className="space-y-3">
                   {[...Array(10)].map((_, i) => (
@@ -261,58 +262,60 @@ const Community = () => {
                   ))}
                 </div>
               ) : (
-                <ScrollArea className="h-[500px] pr-4">
-                  <Table>
-                    <TableHeader>
-                      <TableRow className="border-primary/30">
-                        <TableHead className="w-16">Rank</TableHead>
-                        <TableHead>Member</TableHead>
-                        <TableHead className="text-right">Completions</TableHead>
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                      {workoutLeaderboard.map((entry, index) => (
-                        <TableRow
-                          key={entry.user_id}
-                          className="border-primary/20 hover:bg-primary/5"
-                        >
-                          <TableCell className="font-medium">
-                            <div className="flex items-center gap-2">
-                              <span>{getMedalIcon(index) || `#${index + 1}`}</span>
-                            </div>
-                          </TableCell>
-                          <TableCell>
-                            <div className="flex items-center gap-2">
-                              <User className="h-4 w-4 text-muted-foreground" />
-                              <span className="font-medium">{entry.display_name}</span>
-                            </div>
-                          </TableCell>
-                          <TableCell className="text-right">
-                            <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-primary/10 text-primary font-semibold">
-                              {entry.total_completions}
-                            </span>
-                          </TableCell>
+                <ScrollArea className="h-[400px] md:h-[500px] pr-2 md:pr-4">
+                  <div className="overflow-x-auto">
+                    <Table>
+                      <TableHeader>
+                        <TableRow className="border-primary/30">
+                          <TableHead className="w-12 md:w-16 text-xs md:text-sm">Rank</TableHead>
+                          <TableHead className="text-xs md:text-sm">Member</TableHead>
+                          <TableHead className="text-right text-xs md:text-sm">Completions</TableHead>
                         </TableRow>
-                      ))}
-                    </TableBody>
-                  </Table>
+                      </TableHeader>
+                      <TableBody>
+                        {workoutLeaderboard.map((entry, index) => (
+                          <TableRow
+                            key={entry.user_id}
+                            className="border-primary/20 hover:bg-primary/5"
+                          >
+                            <TableCell className="font-medium text-xs md:text-sm py-2 md:py-3">
+                              <div className="flex items-center gap-1 md:gap-2">
+                                <span className="text-base md:text-lg">{getMedalIcon(index) || `#${index + 1}`}</span>
+                              </div>
+                            </TableCell>
+                            <TableCell className="py-2 md:py-3">
+                              <div className="flex items-center gap-1 md:gap-2">
+                                <User className="h-3 w-3 md:h-4 md:w-4 text-muted-foreground flex-shrink-0" />
+                                <span className="font-medium text-xs md:text-sm truncate">{entry.display_name}</span>
+                              </div>
+                            </TableCell>
+                            <TableCell className="text-right py-2 md:py-3">
+                              <span className="inline-flex items-center gap-1 px-2 md:px-3 py-0.5 md:py-1 rounded-full bg-primary/10 text-primary font-semibold text-xs md:text-sm whitespace-nowrap">
+                                {entry.total_completions}
+                              </span>
+                            </TableCell>
+                          </TableRow>
+                        ))}
+                      </TableBody>
+                    </Table>
+                  </div>
                 </ScrollArea>
               )}
             </CardContent>
           </Card>
 
           {/* Program Leaderboard Section */}
-          <Card className="mb-8 border-2 border-primary/30 shadow-lg">
-            <CardHeader className="bg-gradient-to-r from-primary/10 to-primary/5">
-              <CardTitle className="flex items-center gap-2 text-2xl">
-                <Target className="h-6 w-6 text-primary" />
+          <Card className="mb-6 md:mb-8 border-2 border-primary/30 shadow-lg">
+            <CardHeader className="bg-gradient-to-r from-primary/10 to-primary/5 p-4 md:p-6">
+              <CardTitle className="flex items-center gap-2 text-xl md:text-2xl">
+                <Target className="h-5 w-5 md:h-6 md:w-6 text-primary" />
                 Training Program Leaderboard
               </CardTitle>
-              <p className="text-sm text-muted-foreground">
+              <p className="text-xs md:text-sm text-muted-foreground">
                 Top members by completed training programs
               </p>
             </CardHeader>
-            <CardContent className="pt-6">
+            <CardContent className="p-4 md:pt-6">
               {isLoadingLeaderboard ? (
                 <div className="space-y-3">
                   {[...Array(10)].map((_, i) => (
@@ -320,41 +323,43 @@ const Community = () => {
                   ))}
                 </div>
               ) : (
-                <ScrollArea className="h-[500px] pr-4">
-                  <Table>
-                    <TableHeader>
-                      <TableRow className="border-primary/30">
-                        <TableHead className="w-16">Rank</TableHead>
-                        <TableHead>Member</TableHead>
-                        <TableHead className="text-right">Completions</TableHead>
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                      {programLeaderboard.map((entry, index) => (
-                        <TableRow
-                          key={entry.user_id}
-                          className="border-primary/20 hover:bg-primary/5"
-                        >
-                          <TableCell className="font-medium">
-                            <div className="flex items-center gap-2">
-                              <span>{getMedalIcon(index) || `#${index + 1}`}</span>
-                            </div>
-                          </TableCell>
-                          <TableCell>
-                            <div className="flex items-center gap-2">
-                              <User className="h-4 w-4 text-muted-foreground" />
-                              <span className="font-medium">{entry.display_name}</span>
-                            </div>
-                          </TableCell>
-                          <TableCell className="text-right">
-                            <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-primary/10 text-primary font-semibold">
-                              {entry.total_completions}
-                            </span>
-                          </TableCell>
+                <ScrollArea className="h-[400px] md:h-[500px] pr-2 md:pr-4">
+                  <div className="overflow-x-auto">
+                    <Table>
+                      <TableHeader>
+                        <TableRow className="border-primary/30">
+                          <TableHead className="w-12 md:w-16 text-xs md:text-sm">Rank</TableHead>
+                          <TableHead className="text-xs md:text-sm">Member</TableHead>
+                          <TableHead className="text-right text-xs md:text-sm">Completions</TableHead>
                         </TableRow>
-                      ))}
-                    </TableBody>
-                  </Table>
+                      </TableHeader>
+                      <TableBody>
+                        {programLeaderboard.map((entry, index) => (
+                          <TableRow
+                            key={entry.user_id}
+                            className="border-primary/20 hover:bg-primary/5"
+                          >
+                            <TableCell className="font-medium text-xs md:text-sm py-2 md:py-3">
+                              <div className="flex items-center gap-1 md:gap-2">
+                                <span className="text-base md:text-lg">{getMedalIcon(index) || `#${index + 1}`}</span>
+                              </div>
+                            </TableCell>
+                            <TableCell className="py-2 md:py-3">
+                              <div className="flex items-center gap-1 md:gap-2">
+                                <User className="h-3 w-3 md:h-4 md:w-4 text-muted-foreground flex-shrink-0" />
+                                <span className="font-medium text-xs md:text-sm truncate">{entry.display_name}</span>
+                              </div>
+                            </TableCell>
+                            <TableCell className="text-right py-2 md:py-3">
+                              <span className="inline-flex items-center gap-1 px-2 md:px-3 py-0.5 md:py-1 rounded-full bg-primary/10 text-primary font-semibold text-xs md:text-sm whitespace-nowrap">
+                                {entry.total_completions}
+                              </span>
+                            </TableCell>
+                          </TableRow>
+                        ))}
+                      </TableBody>
+                    </Table>
+                  </div>
                 </ScrollArea>
               )}
             </CardContent>
@@ -362,14 +367,14 @@ const Community = () => {
 
           {/* Comments Section */}
           <Card className="border-2 border-primary/30 shadow-lg">
-            <CardHeader className="bg-gradient-to-r from-primary/10 to-primary/5">
-              <div className="flex items-center justify-between">
+            <CardHeader className="bg-gradient-to-r from-primary/10 to-primary/5 p-4 md:p-6">
+              <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-3 md:gap-0">
                 <div>
-                  <CardTitle className="flex items-center gap-2 text-2xl">
-                    <MessageSquare className="h-6 w-6 text-primary" />
+                  <CardTitle className="flex items-center gap-2 text-xl md:text-2xl">
+                    <MessageSquare className="h-5 w-5 md:h-6 md:w-6 text-primary" />
                     Community Comments
                   </CardTitle>
-                  <p className="text-sm text-muted-foreground">
+                  <p className="text-xs md:text-sm text-muted-foreground mt-1">
                     Reviews and feedback from premium members
                   </p>
                 </div>
@@ -377,14 +382,14 @@ const Community = () => {
                   variant="outline"
                   size="sm"
                   onClick={() => setSortOrder(sortOrder === "newest" ? "oldest" : "newest")}
-                  className="flex items-center gap-2"
+                  className="flex items-center gap-2 text-xs md:text-sm w-full md:w-auto"
                 >
-                  <ArrowUpDown className="h-4 w-4" />
-                  {sortOrder === "newest" ? "Newest First" : "Oldest First"}
+                  <ArrowUpDown className="h-3 w-3 md:h-4 md:w-4" />
+                  <span className="whitespace-nowrap">{sortOrder === "newest" ? "Newest First" : "Oldest First"}</span>
                 </Button>
               </div>
             </CardHeader>
-            <CardContent className="pt-6">
+            <CardContent className="p-4 md:pt-6">
               {isLoadingComments ? (
                 <div className="space-y-4">
                   {[...Array(5)].map((_, i) => (
@@ -405,33 +410,35 @@ const Community = () => {
                   </p>
                 </div>
               ) : (
-                <ScrollArea className="h-[600px] pr-4">
-                  <div className="space-y-4">
+                <ScrollArea className="h-[500px] md:h-[600px] pr-2 md:pr-4">
+                  <div className="space-y-3 md:space-y-4">
                     {comments.map((comment) => (
                       <div
                         key={comment.id}
-                        className="p-4 rounded-lg border-2 border-primary/20 bg-gradient-to-r from-background to-primary/5 hover:border-primary/40 transition-colors"
+                        className="p-3 md:p-4 rounded-lg border-2 border-primary/20 bg-gradient-to-r from-background to-primary/5 hover:border-primary/40 transition-colors"
                       >
-                        <div className="flex items-start justify-between mb-2">
+                        <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-2 mb-2">
                           <div className="flex items-center gap-2">
-                            <User className="h-4 w-4 text-primary" />
-                            <span className="font-semibold text-sm">
+                            <User className="h-3 w-3 md:h-4 md:w-4 text-primary flex-shrink-0" />
+                            <span className="font-semibold text-xs md:text-sm truncate">
                               {comment.display_name}
                             </span>
                           </div>
-                          <div className="flex items-center gap-1 text-xs text-muted-foreground">
+                          <div className="flex items-center gap-1 text-xs text-muted-foreground whitespace-nowrap">
                             <Calendar className="h-3 w-3" />
-                            {formatDistanceToNow(new Date(comment.created_at), {
-                              addSuffix: true,
-                            })}
+                            <span className="text-[10px] md:text-xs">
+                              {formatDistanceToNow(new Date(comment.created_at), {
+                                addSuffix: true,
+                              })}
+                            </span>
                           </div>
                         </div>
-                        <p className="text-xs text-primary font-medium mb-2">
+                        <p className="text-[10px] md:text-xs text-primary font-medium mb-2">
                           {comment.workout_name
                             ? `Workout: ${comment.workout_name}`
                             : `Program: ${comment.program_name}`}
                         </p>
-                        <p className="text-sm leading-relaxed">{comment.comment_text}</p>
+                        <p className="text-xs md:text-sm leading-relaxed">{comment.comment_text}</p>
                       </div>
                     ))}
                   </div>
