@@ -32,12 +32,16 @@ interface Comment {
   display_name: string;
 }
 
-// Fake names for initial display
+// Realistic fake names from various cultures
 const FAKE_NAMES = [
-  "FitnessKing", "GymWarrior", "IronMike", "FlexMaster", "PowerHouse",
-  "CardioQueen", "MuscleMaven", "SweatChamp", "CoreCrusher", "BeastMode",
-  "FitnessFanatic", "GymRat", "WorkoutWizard", "StrengthSeeker", "EnduranceElite",
-  "ActiveAce", "HealthHero", "FitFreak", "TrainInsane", "GainzGuru"
+  "Dimitris Papadopoulos", "Elena Georgiou", "Nikos Konstantinou", "Maria Vlachou",
+  "Yiannis Andreou", "Sophia Christodoulou", "Kostas Makris", "Despina Nikolaou",
+  "James Anderson", "Emma Thompson", "Oliver Williams", "Charlotte Davies",
+  "William Brown", "Sophia Miller", "George Taylor", "Isabella Wilson",
+  "Kwame Mensah", "Amara Okafor", "Jabari Nkosi", "Zara Adeyemi",
+  "Ahmed Hassan", "Fatima Ali", "Omar Ibrahim", "Leila Mohamed",
+  "Lucas Silva", "Sofia Martinez", "Diego Rodriguez", "Valentina Garcia",
+  "Raj Patel", "Priya Sharma", "Arjun Kumar", "Ananya Singh"
 ];
 
 const Community = () => {
@@ -90,7 +94,7 @@ const Community = () => {
       const allUserIds = [...new Set([...Object.keys(workoutCounts), ...Object.keys(programCounts)])];
       const { data: profilesData } = await supabase
         .from("profiles")
-        .select("user_id, nickname")
+        .select("user_id, full_name")
         .in("user_id", allUserIds);
 
       // Create workout leaderboard with real + fake data
@@ -98,18 +102,17 @@ const Community = () => {
         const profile = profilesData?.find((p) => p.user_id === userId);
         return {
           user_id: userId,
-          display_name: profile?.nickname || FAKE_NAMES[Math.floor(Math.random() * FAKE_NAMES.length)],
+          display_name: profile?.full_name || FAKE_NAMES[Math.floor(Math.random() * FAKE_NAMES.length)],
           total_completions: count,
         };
       });
 
-      // Add fake workout data to reach 20 entries
-      const fakeWorkoutCount = Math.max(0, 20 - workoutEntries.length);
-      for (let i = 0; i < fakeWorkoutCount; i++) {
+      // Add fake workout data (always add 20 fake users, real users will appear on top)
+      for (let i = 0; i < 20; i++) {
         workoutEntries.push({
-          user_id: `fake-${i}`,
+          user_id: `fake-workout-${i}`,
           display_name: FAKE_NAMES[i % FAKE_NAMES.length],
-          total_completions: Math.floor(Math.random() * 15) + 1,
+          total_completions: Math.floor(Math.random() * 15) + 5,
         });
       }
       workoutEntries.sort((a, b) => b.total_completions - a.total_completions);
@@ -120,18 +123,17 @@ const Community = () => {
         const profile = profilesData?.find((p) => p.user_id === userId);
         return {
           user_id: userId,
-          display_name: profile?.nickname || FAKE_NAMES[Math.floor(Math.random() * FAKE_NAMES.length)],
+          display_name: profile?.full_name || FAKE_NAMES[Math.floor(Math.random() * FAKE_NAMES.length)],
           total_completions: count,
         };
       });
 
-      // Add fake program data to reach 20 entries
-      const fakeProgramCount = Math.max(0, 20 - programEntries.length);
-      for (let i = 0; i < fakeProgramCount; i++) {
+      // Add fake program data (always add 20 fake users, real users will appear on top)
+      for (let i = 0; i < 20; i++) {
         programEntries.push({
-          user_id: `fake-prog-${i}`,
+          user_id: `fake-program-${i}`,
           display_name: FAKE_NAMES[(i + 10) % FAKE_NAMES.length],
-          total_completions: Math.floor(Math.random() * 8) + 1,
+          total_completions: Math.floor(Math.random() * 8) + 2,
         });
       }
       programEntries.sort((a, b) => b.total_completions - a.total_completions);
@@ -158,7 +160,7 @@ const Community = () => {
       const userIds = [...new Set(commentsData?.map((c) => c.user_id) || [])];
       const { data: profilesData } = await supabase
         .from("profiles")
-        .select("user_id, nickname")
+        .select("user_id, full_name")
         .in("user_id", userIds);
 
       // Combine comments with display names (real or fake)
@@ -166,20 +168,25 @@ const Community = () => {
         const profile = profilesData?.find((p) => p.user_id === comment.user_id);
         return {
           ...comment,
-          display_name: profile?.nickname || FAKE_NAMES[Math.floor(Math.random() * FAKE_NAMES.length)],
+          display_name: profile?.full_name || FAKE_NAMES[Math.floor(Math.random() * FAKE_NAMES.length)],
         };
       }) || [];
 
-      // Add fake comments to reach 20 if needed
-      const fakeCommentCount = Math.max(0, 20 - commentsWithNames.length);
+      // Add fake comments (always add 20 fake comments, real ones will appear alongside)
+      const fakeCommentCount = 20;
       const fakeComments: Comment[] = [];
-      const sampleWorkouts = ["Bodyweight Blast", "Iron Core", "Cardio Inferno", "Power Surge", "Core Flow"];
+      const sampleWorkouts = ["Bodyweight Blast", "Iron Core", "Cardio Inferno", "Power Surge", "Core Flow", "Metabolic Burn", "Explosive Start"];
       const sampleCommentTexts = [
         "Amazing workout! Really felt the burn!",
         "Perfect intensity for my fitness level.",
         "Love this routine, seeing great results!",
         "Challenging but so worth it!",
-        "Best workout I've tried in months!",
+        "Best workout I have tried in months!",
+        "Incredible program! My strength has improved dramatically.",
+        "Fantastic exercises, very well structured!",
+        "This workout is exactly what I needed. Highly recommend!",
+        "Great balance of cardio and strength training.",
+        "Excellent workout routine! Already seeing progress after two weeks.",
       ];
 
       for (let i = 0; i < fakeCommentCount; i++) {
