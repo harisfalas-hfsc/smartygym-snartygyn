@@ -13,6 +13,7 @@ import { toast } from "sonner";
 import { useProfileData } from "@/hooks/useProfileData";
 import { useShowBackButton } from "@/hooks/useShowBackButton";
 import { useAccessControl } from "@/hooks/useAccessControl";
+import { ShareButtons } from "@/components/ShareButtons";
 
 const fitnessGoalOptions = [
   "Build Strength",
@@ -157,8 +158,21 @@ const ProfileSettings = () => {
   return (
     <>
       <Helmet>
-        <title>Profile Settings | Smarty Gym</title>
-        <meta name="description" content="Update your fitness profile and preferences" />
+        <title>Fitness Profile Settings | Smarty Gym</title>
+        <meta name="description" content="Customize your fitness profile, set goals, track progress, and manage equipment preferences for personalized workout recommendations." />
+        <meta name="keywords" content="fitness profile settings, workout preferences, fitness goals, equipment settings, personalized training, Cyprus fitness" />
+        <link rel="canonical" href="https://smartygym.com/profilesettings" />
+        
+        {/* Open Graph */}
+        <meta property="og:title" content="Fitness Profile Settings | Smarty Gym" />
+        <meta property="og:description" content="Customize your fitness profile, set goals, track progress, and manage equipment preferences for personalized workout recommendations." />
+        <meta property="og:type" content="website" />
+        <meta property="og:url" content="https://smartygym.com/profilesettings" />
+        
+        {/* Twitter Card */}
+        <meta name="twitter:card" content="summary" />
+        <meta name="twitter:title" content="Fitness Profile Settings | Smarty Gym" />
+        <meta name="twitter:description" content="Customize your fitness profile, set goals, track progress, and manage equipment preferences for personalized workout recommendations." />
       </Helmet>
       
       <div className="min-h-screen bg-background p-4">
@@ -175,11 +189,43 @@ const ProfileSettings = () => {
           </Button>
         )}
 
+        {/* SEO Content Section */}
+        <div className="mb-8 space-y-4">
+          <h1 className="text-4xl font-bold">Fitness Profile Settings</h1>
+          <p className="text-lg text-muted-foreground">
+            Welcome to your personalized fitness profile settings at Smarty Gym. This comprehensive profile management system allows you to customize your training experience, track your fitness journey, and achieve your health goals more effectively.
+          </p>
+          <div className="prose dark:prose-invert max-w-none">
+            <h2 className="text-2xl font-semibold mt-6 mb-3">Why Your Fitness Profile Matters</h2>
+            <p>
+              Your fitness profile is the foundation of your personalized workout experience. By providing accurate information about your body metrics, fitness level, and goals, you enable our advanced algorithm to recommend the most suitable workouts and training programs tailored specifically for you. Whether you're looking to build muscle, lose weight, improve cardiovascular health, or enhance mobility, your profile settings ensure you receive science-based recommendations that match your current fitness level and available equipment.
+            </p>
+            
+            <h2 className="text-2xl font-semibold mt-6 mb-3">Customize Your Training Experience</h2>
+            <p>
+              Configure your equipment preferences to receive workout suggestions that match what you have available. From bodyweight-only exercises to fully-equipped gym routines, Smarty Gym adapts to your situation. Premium members enjoy additional benefits including progress tracking, personalized coaching access, and exclusive training programs designed by certified fitness professionals in Cyprus.
+            </p>
+
+            <h2 className="text-2xl font-semibold mt-6 mb-3">Track Your Progress</h2>
+            <p>
+              Regular updates to your profile measurements help you monitor your fitness transformation. As you progress through your training journey, updating your weight, fitness level, and goals ensures that workout recommendations evolve with you, maintaining optimal challenge and effectiveness throughout your fitness journey.
+            </p>
+          </div>
+          
+          {/* Social Sharing */}
+          <div className="mt-6">
+            <ShareButtons 
+              url="https://smartygym.com/profilesettings"
+              title="Check out Smarty Gym - Personalized Fitness Training"
+            />
+          </div>
+        </div>
+
         <Card>
           <CardHeader>
-            <CardTitle className="text-2xl">Profile Settings</CardTitle>
+            <CardTitle className="text-2xl">Your Profile Settings</CardTitle>
             <CardDescription>
-              Update your fitness profile information. This data will be used to pre-fill your workout and diet plan questionnaires.
+              Update your fitness profile information. This data will be used to pre-fill your workout and diet plan questionnaires and provide personalized recommendations.
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-6">
