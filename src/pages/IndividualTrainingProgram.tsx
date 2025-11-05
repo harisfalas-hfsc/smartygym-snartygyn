@@ -93,24 +93,45 @@ const IndividualTrainingProgram = () => {
       ]
     },
     "T-F002": {
-      name: "Functional Strength Elite",
+      name: "Functional Strength Elite I",
       serialNumber: "T-F002",
       focus: "Functional Strength",
       difficulty: "Advanced",
       duration: "8 Weeks / 5 Training Days per Week",
-      equipment: "Barbell, Dumbbells, Kettlebells, TRX, Weighted Vest",
+      equipment: "Barbell, Dumbbells, Kettlebells, TRX, Bands, Sled, Pull-up Bar",
       imageUrl: functionalStrengthEliteImg,
-      description: "An advanced 8-week program focused on multi-plane compound lifts, explosive power integration, and heavy load tolerance. Designed to build maximum strength with functional carryover.",
-      format: "Reps & Sets",
-      instructions: "Use structured progressive overload: Weeks 1–4: Build volume (70–80% 1RM), Weeks 5–8: Increase intensity (80–90% 1RM). Tempo: 3-1-1-0 for strength, 1-0-1-0 for power. Rest 2–3 min between compound lifts, 60–90s on accessories.",
-      tips: ["Maintain braced core and neutral spine", "Track every session", "Prioritize recovery with adequate sleep and hydration"],
+      description: "Eight weeks of high-intensity compound lifting and functional circuits that develop maximal strength, explosiveness, and control through every plane of motion.",
+      format: "Strength + Power Hybrid",
+      instructions: "Tempo 3-1-1-0 on strength, 1-0-1-0 on power moves. Weeks 1–4 = volume (70–80% 1RM). Weeks 5–8 = intensity (80–90%). Increase load 2–5% weekly when all sets complete. Rest 2 min on compounds, 60–90s on accessories.",
+      tips: ["Brace the core before every rep", "Maintain mobility work 2×/week", "Fuel with carbs pre-workout and protein after"],
       exercises: [
-        { week: "All Weeks", day: "Day 1", workout: "Squat Strength", details: "Back Squat – 5x5 @80% 1RM\nFront Squat – 3x6 @70%\nWalking Lunge – 3x10/leg\nCore: Weighted Plank – 3x30s" },
-        { week: "All Weeks", day: "Day 2", workout: "Push Strength", details: "Bench Press – 5x5 @80%\nStanding Overhead Press – 4x6\nDB Floor Press – 3x10\nDips – 3x12" },
-        { week: "All Weeks", day: "Day 3", workout: "Pull Strength", details: "Deadlift – 5x4 @85%\nBarbell Row – 4x8 @75%\nPull-Ups (weighted) – 3x10\nFace Pulls – 3x15" },
-        { week: "All Weeks", day: "Day 4", workout: "Power & Stability", details: "Hang Power Clean – 4x4 @70%\nBox Jumps – 3x8\nTRX Y-T-W – 3x15\nFarmer Carry – 4x40m" },
-        { week: "All Weeks", day: "Day 5", workout: "Core & Conditioning", details: "Anti-Rotation Cable Press – 3x12\nKB Swings – 4x20\nAb Wheel – 3x10\nSprint Intervals – 8x20s on / 40s off" },
-        { week: "All Weeks", day: "Day 6-7", workout: "Rest / Active Recovery", details: "Complete rest or light active recovery" }
+        { week: "All Weeks", day: "Day 1", workout: "Lower Body Power", details: "Back Squat – 5×5 @ 80% 1RM (3-1-1-0) Rest 2 min\nJump Squat – 4×6 (bodyweight or light load) Rest 90s\nWalking Lunge – 3×12/leg (2-0-1-0)\nWeighted Plank – 3×40s" },
+        { week: "All Weeks", day: "Day 2", workout: "Upper Push + Core", details: "Bench Press – 5×5 @ 80%\nDB Overhead Press – 4×8\nDips – 3×12 @ RIR 1\nPallof Press – 3×15" },
+        { week: "All Weeks", day: "Day 3", workout: "Pull Strength", details: "Deadlift – 5×4 @ 85%\nPull-Ups (weighted) – 4×8\nBarbell Row – 3×10\nFace Pull – 3×15" },
+        { week: "All Weeks", day: "Day 4", workout: "Functional Circuit (3 Rounds)", details: "Kettlebell Swing 15\nPush Press 10\nSled Push 20m\nTRX Row 12\nRest 2 min" },
+        { week: "All Weeks", day: "Day 5", workout: "Core & Conditioning", details: "Farmer Carry 4×40m\nHanging Leg Raise 3×12\nAb Wheel Roll-out 3×10\nAssault Bike Intervals 8×20s on / 40s off" },
+        { week: "All Weeks", day: "Day 6-7", workout: "Rest or Mobility", details: "Complete rest or light mobility work" }
+      ]
+    },
+    "T-F003": {
+      name: "Functional Strength Elite II",
+      serialNumber: "T-F003",
+      focus: "Functional Strength",
+      difficulty: "Advanced",
+      duration: "8 Weeks / 4 Training Days",
+      equipment: "Barbell, Trap Bar, Kettlebells, Sandbag, TRX, Slam Ball",
+      imageUrl: functionalStrengthEliteImg,
+      description: "A power-endurance plan for advanced athletes blending heavy compound movements with metabolic finishers. Ideal for building real-world strength and capacity.",
+      format: "Mixed (Strength + MetCon)",
+      instructions: "Main lifts 3-1-1-0, finishers 1-0-1-0. Add load or rounds each week (+5% or +1 set). Rest 90–120s between strength sets, 30–45s inside circuits.",
+      tips: ["Perfect technique beats extra weight", "Recover with sleep and mobility days"],
+      exercises: [
+        { week: "All Weeks", day: "Day 1", workout: "Lower Pull + Posterior Chain", details: "Trap Bar Deadlift – 5×5 @ 80%\nRomanian Deadlift – 4×8\nSingle-Leg Glute Bridge – 3×12/leg\nBand Good Morning – 3×15" },
+        { week: "All Weeks", day: "Day 2", workout: "Upper Push/Pull Complex", details: "Superset (4 Rounds):\nIncline Barbell Press – 8 reps @ 75%\nPendlay Row – 8 reps @ 75%\n\nThen:\nPush-Up to Row 3×10\nFace Pull 3×15" },
+        { week: "All Weeks", day: "Day 3", workout: "Rest / Mobility", details: "Complete rest or mobility session" },
+        { week: "All Weeks", day: "Day 4", workout: "Full Body MetCon (5 Rounds)", details: "Sandbag Clean 5\nFront Squat 5\nPush Press 5\nBurpee 10\nSlam Ball 15\nRest 90s" },
+        { week: "All Weeks", day: "Day 5", workout: "Core & Grip", details: "Hanging Knee Raise 3×15\nFarmer Carry 5×30m\nSide Plank Hip Lift 3×12/side\nSled Drag 4×20m" },
+        { week: "All Weeks", day: "Day 6-7", workout: "Rest", details: "Complete rest days" }
       ]
     },
     "T-H001": {
@@ -135,25 +156,46 @@ const IndividualTrainingProgram = () => {
       ]
     },
     "T-H002": {
-      name: "Muscle Hypertrophy Pro",
+      name: "Muscle Hypertrophy Pro I",
       serialNumber: "T-H002",
-      focus: "Hypertrophy",
+      focus: "Muscle Hypertrophy",
       difficulty: "Advanced",
-      duration: "8 Weeks / 6 Training Days",
+      duration: "8 Weeks / 6 Training Days (Push/Pull/Legs × 2)",
       equipment: "Full Gym Setup",
       imageUrl: muscleHypertrophyProImg,
-      description: "An 8-week advanced hypertrophy system emphasizing metabolic stress, mechanical tension, and progressive overload with high-volume intensity techniques (drop sets, supersets, rest–pause).",
+      description: "A classic push-pull-legs split geared for maximum size. High volume, controlled tempo, and progressive overload build thickness and symmetry.",
       format: "Reps & Sets",
-      instructions: "Weeks 1–4: Volume phase (10–12 reps @70%), Weeks 5–8: Intensity phase (6–8 reps @80%). Tempo: 3-1-1-0. Rest: 60–90s on isolation, 120s on compounds.",
-      tips: ["Train close to failure with control", "Use supersets efficiently", "Don't skip deload at week 8 if fatigue accumulates"],
+      instructions: "Weeks 1–4 10–12 reps @ 70%; Weeks 5–8 6–8 reps @ 80%. Tempo 3-1-1-0 on compounds. Add 2–5% load weekly. Rest 90s (iso), 120s (compound).",
+      tips: ["Eat in a small surplus (+250 kcal)", "Hit 1.8–2g protein/kg", "Sleep 8h min", "Creatine and EAAs help recovery"],
       exercises: [
-        { week: "All Weeks", day: "Day 1", workout: "Chest", details: "Flat Bench – 5x8\nIncline DB Press – 4x10\nCable Fly – 3x15\nDips – 3xAMRAP" },
-        { week: "All Weeks", day: "Day 2", workout: "Back", details: "Deadlift – 5x5 @80%\nPull-Up – 4x10\nT-Bar Row – 3x12\nFace Pull – 3x15" },
-        { week: "All Weeks", day: "Day 3", workout: "Legs", details: "Back Squat – 5x6\nLeg Press – 4x12\nLeg Curl – 3x15\nCalf Raise – 4x20" },
-        { week: "All Weeks", day: "Day 4", workout: "Shoulders", details: "Seated Overhead Press – 4x10\nUpright Row – 3x12\nLateral Raise – 3x15\nRear Delt Fly – 3x15" },
-        { week: "All Weeks", day: "Day 5", workout: "Arms", details: "Close Grip Bench Press – 4x10\nBarbell Curl – 4x10\nSkull Crusher – 3x12\nIncline DB Curl – 3x12" },
-        { week: "All Weeks", day: "Day 6", workout: "Conditioning / Core", details: "Weighted Plank – 3x40s\nHanging Leg Raise – 3x12\nRope Slam – 4x20s\nSled Push – 5x20m" },
+        { week: "All Weeks", day: "Day 1", workout: "Push", details: "Flat Bench Press – 5×8 @ 75%\nIncline DB Press – 4×10\nDB Lateral Raise – 3×15\nCable Fly – 3×15\nOverhead Tricep Ext – 3×12" },
+        { week: "All Weeks", day: "Day 2", workout: "Pull", details: "Deadlift – 5×5 @ 80%\nPull-Up – 4×10\nSeated Row – 3×12\nBarbell Curl – 3×10\nFace Pull – 3×15" },
+        { week: "All Weeks", day: "Day 3", workout: "Legs", details: "Back Squat – 5×6 @ 80%\nLeg Press – 4×12\nRomanian Deadlift – 3×10\nLeg Curl – 3×15\nStanding Calf Raise – 4×20" },
+        { week: "All Weeks", day: "Day 4", workout: "Repeat Push", details: "DB Press – 4×10\nArnold Press – 3×12\nCable Crossover – 3×15\nRope Pushdown – 3×15" },
+        { week: "All Weeks", day: "Day 5", workout: "Repeat Pull", details: "Bent Over Row – 4×8\nLat Pulldown – 3×12\nIncline DB Curl – 3×12\nRear Delt Fly – 3×15" },
+        { week: "All Weeks", day: "Day 6", workout: "Legs 2", details: "Front Squat – 4×8\nDB Lunge – 3×10/leg\nLeg Extension – 3×15\nSeated Calf Raise – 4×20" },
         { week: "All Weeks", day: "Day 7", workout: "Rest", details: "Complete rest" }
+      ]
+    },
+    "T-H003": {
+      name: "Muscle Hypertrophy Pro II",
+      serialNumber: "T-H003",
+      focus: "Muscle Hypertrophy",
+      difficulty: "Advanced",
+      duration: "8 Weeks / 5 Training Days",
+      equipment: "Barbell, Machines, Dumbbells, Cable Station",
+      imageUrl: muscleHypertrophyProImg,
+      description: "A blended upper/lower split for advanced lifters targeting balanced growth and metabolic stress. Includes mechanical drops and supersets to maximize hypertrophy.",
+      format: "Upper/Lower + Full Body",
+      instructions: "Tempo 3-1-2-0. Progressive overload via added volume (+1 set every 2 weeks) or +2.5% load if all reps completed. Rest 60–90s between supersets.",
+      tips: ["Use controlled eccentrics and train 1–2 reps short of failure", "Deload after week 8 before restarting"],
+      exercises: [
+        { week: "All Weeks", day: "Day 1", workout: "Upper A", details: "Barbell Bench Press – 4×8\nBarbell Row – 4×10\nSeated DB Press – 3×12\nPull-Ups – 3×10\nCable Curl + Tricep Pushdown (Superset) 3×12 each" },
+        { week: "All Weeks", day: "Day 2", workout: "Lower A", details: "Back Squat – 5×6 @ 80%\nRDL – 4×8\nWalking Lunge – 3×12/leg\nCalf Raise – 4×15" },
+        { week: "All Weeks", day: "Day 3", workout: "Rest / Mobility", details: "Complete rest or light mobility work" },
+        { week: "All Weeks", day: "Day 4", workout: "Upper B", details: "Incline DB Press – 4×10\nT-Bar Row – 4×10\nLateral Raise – 3×15\nPreacher Curl – 3×12\nOverhead Tricep Ext – 3×12" },
+        { week: "All Weeks", day: "Day 5", workout: "Lower B + Full Body Finisher", details: "Front Squat – 4×8\nLeg Press – 3×12\nLeg Curl – 3×15\nFull-Body Finisher (3 Rounds): 10 Burpees + 10 KB Swings + 250m Row" },
+        { week: "All Weeks", day: "Day 6-7", workout: "Rest", details: "Complete rest days" }
       ]
     },
     "T-C001": {
@@ -220,25 +262,47 @@ const IndividualTrainingProgram = () => {
       ]
     },
     "T-W002": {
-      name: "Weight Loss Elite",
+      name: "Weight Loss Max Burn I",
       serialNumber: "T-W002",
       focus: "Weight Loss",
       difficulty: "Advanced",
-      duration: "8 Weeks / 5–6 Days per Week",
-      equipment: "Kettlebells, Dumbbells, Barbell, Rower, Bike",
+      duration: "8 Weeks / 5 Training Days per Week",
+      equipment: "Dumbbells, Kettlebells, Barbell, Rower, Bike, Resistance Bands, Treadmill",
       imageUrl: fatFurnaceImg,
-      description: "An aggressive fat-loss regimen focused on metabolic conditioning, resistance circuits, and athletic HIIT. Ideal for advanced trainees aiming to strip fat while maintaining lean muscle.",
-      format: "Reps & Sets",
-      instructions: "Tempo varies by component: Strength: 3-1-1-0, Conditioning: 1-0-1-0. Progressive overload via density (more rounds same time). Use RPE 8–9 in conditioning blocks.",
-      tips: ["Track resting heart rate and recovery", "Prioritize nutrition and hydration", "Avoid overtraining"],
+      description: "An eight-week metabolic-conditioning plan created to accelerate fat loss while maintaining lean muscle. It blends strength endurance, Tabata, and cardio intervals with structured recovery and outdoor runs.",
+      format: "Mixed (Circuit + HIIT + Running)",
+      instructions: "Tempo 1-0-1-0 for conditioning, 2-0-1-0 for loaded work. Use RPE 8–9 for work intervals, 5–6 for active recoveries. Progress by adding 1–2 reps or 5% load weekly, or reducing rest by 10s each week. Rest 60s between circuits and 2 min after full rounds. Follow proper warm-up and cool-down routines before and after each session.",
+      tips: ["Maintain a calorie deficit (–400 to –600 kcal/day)", "Sleep 7–9h, stay hydrated, and refuel with protein and fiber", "Change music or environment to keep energy high — variety beats boredom"],
       exercises: [
-        { week: "All Weeks", day: "Day 1", workout: "MetCon Strength", details: "Circuit x4 Rounds:\nFront Squat – 10\nPush Press – 10\nDeadlift – 10\nRow (Calorie) – 10\nRest: 2 min" },
-        { week: "All Weeks", day: "Day 2", workout: "Sprint & Core", details: "10x100m sprints / 60s rest\nAb Circuit: 3x (Plank 40s + Leg Raise 15 + Sit-Ups 20)" },
-        { week: "All Weeks", day: "Day 3", workout: "Rest / Mobility Flow", details: "Complete rest or mobility work" },
-        { week: "All Weeks", day: "Day 4", workout: "Full Body Complex", details: "4 Rounds:\nClean – 5\nFront Squat – 5\nPush Press – 5\nDeadlift – 5\nRest: 2 min" },
-        { week: "All Weeks", day: "Day 5", workout: "Conditioning Ladder", details: "10-9-8-7-6-5-4-3-2-1 Reps of:\nBurpees\nKB Swings\nGoblet Squats" },
-        { week: "All Weeks", day: "Day 6", workout: "Long Duration Cardio", details: "45–60 min continuous work (Bike, Run, or Row) @ Zone 3" },
+        { week: "All Weeks", day: "Day 1", workout: "Metabolic Strength Circuit (4 Rounds)", details: "Front Squat – 10 @ 70% 1RM (2-0-1-0)\nPush Press – 10 (1-0-1-0)\nBent-Over Row – 12\nKettlebell Swing – 20\nPlank w/ Shoulder Tap – 20 taps\nRest 90s between rounds" },
+        { week: "All Weeks", day: "Day 2", workout: "Tabata Inferno (20s work / 10s rest × 8 per station)", details: "Burpees\nJump Lunges\nDB Thrusters\nMountain Climbers\nRest 1 min between stations → Repeat Twice" },
+        { week: "All Weeks", day: "Day 3", workout: "Outdoor Cardio", details: "Jog 5 min warm-up → 4 × (3 min hard run + 2 min walk) → 5 min cool-down\nKeep RPE 7–8 on run segments" },
+        { week: "All Weeks", day: "Day 4", workout: "Lower Body Power & Core", details: "Barbell Deadlift – 4×6 @ 80% (3-1-1-0)\nWalking Lunge – 3×12/leg\nBox Jump – 3×8\nHanging Leg Raise – 3×15" },
+        { week: "All Weeks", day: "Day 5", workout: "HIIT Bike + Core", details: "10× (30s sprint + 90s easy) → finish with:\nSide Plank 3×30s each\nAb Wheel 3×10" },
+        { week: "All Weeks", day: "Day 6", workout: "Active Recovery", details: "Yoga / Mobility / Walk 45 min" },
         { week: "All Weeks", day: "Day 7", workout: "Rest", details: "Complete rest" }
+      ]
+    },
+    "T-W003": {
+      name: "Weight Loss Shred II",
+      serialNumber: "T-W003",
+      focus: "Weight Loss",
+      difficulty: "Advanced",
+      duration: "8 Weeks / 6 Training Days per Week",
+      equipment: "Barbell, Dumbbells, Kettlebells, TRX, Bike, Row Erg, Treadmill, Bodyweight",
+      imageUrl: fatFurnaceImg,
+      description: "A challenging hybrid program that combines resistance training, cardio intervals, and athletic conditioning to keep metabolism elevated all day. It integrates running days, HIIT, and functional strength for constant variety and max engagement.",
+      format: "Hybrid (Metabolic Training + Running + Tabata + Functional Circuits)",
+      instructions: "Use tempo 1-0-1-0 for conditioning, 3-1-1-0 for strength. Overload by adding rounds (+1 each two weeks) or reducing rest (–10s every two weeks). Alternate high- and moderate-intensity days to avoid fatigue. Hydrate well and stretch after each session.",
+      tips: ["Eat protein with every meal, limit refined carbs post-evening, and keep stress low", "Use music or outdoor locations for running sessions to prevent burnout"],
+      exercises: [
+        { week: "All Weeks", day: "Day 1", workout: "Full-Body MetCon (AMRAP 20 min)", details: "As many rounds as possible in 20 min of:\n10 Barbell Front Squats @ 60%\n10 Push-Ups\n10 Pull-Ups\n15 Kettlebell Swings\nRest as needed" },
+        { week: "All Weeks", day: "Day 2", workout: "Interval Run", details: "Warm-Up 5 min → 8× (400m run fast + 200m walk) → Cool-Down 5 min\nMaintain RPE 8 on run segments" },
+        { week: "All Weeks", day: "Day 3", workout: "Upper Body Strength + Tabata Finisher", details: "Strength Block:\nBench Press 4×8 @ 75% (3-1-1-0)\nBent-Over Row 4×10\nDB Shoulder Press 3×12\n\nTabata Finisher (20s on / 10s off × 8): Jump Rope + Burpees" },
+        { week: "All Weeks", day: "Day 4", workout: "Active Recovery Run/Walk", details: "40–60 min continuous Zone 2 effort (RPE 6). Choose trail or treadmill" },
+        { week: "All Weeks", day: "Day 5", workout: "Lower Body & Core Complex (4 Rounds)", details: "Deadlift – 6 @ 80%\nFront Rack Lunge – 10/leg\nBox Jump – 8\nHanging Knee Raise – 15\nRest 90s" },
+        { week: "All Weeks", day: "Day 6", workout: "Metabolic Tabata Series", details: "Perform 4 Stations (20s work / 10s rest × 8):\nKettlebell Clean & Press\nBattle Rope Slams\nJump Lunges\nRow (Calories)\nRest 1 min between stations" },
+        { week: "All Weeks", day: "Day 7", workout: "Rest or Light Stretching", details: "Complete rest or light stretching" }
       ]
     },
     "T-L001": {
@@ -320,9 +384,9 @@ const IndividualTrainingProgram = () => {
         { week: "All Weeks", day: "Day 5-7", workout: "Rest / Optional Yoga", details: "Complete rest or optional yoga session" }
       ]
     },
-    "T-F003": {
+    "T-F004": {
       name: "Functional Strength Foundations",
-      serialNumber: "T-F003",
+      serialNumber: "T-F004",
       focus: "Functional Strength",
       difficulty: "Intermediate",
       duration: "6 Weeks / 4 Training Days per Week",
@@ -340,9 +404,9 @@ const IndividualTrainingProgram = () => {
         { week: "All Weeks", day: "Day 5-7", workout: "Rest or light activity", details: "Complete rest or light activity" }
       ]
     },
-    "T-H003": {
+    "T-H004": {
       name: "Muscle Hypertrophy Build",
-      serialNumber: "T-H003",
+      serialNumber: "T-H004",
       focus: "Muscle Hypertrophy",
       difficulty: "Intermediate",
       duration: "6 Weeks / 4 Training Days",
@@ -382,9 +446,9 @@ const IndividualTrainingProgram = () => {
         { week: "All Weeks", day: "Day 6-7", workout: "Rest", details: "Complete rest days" }
       ]
     },
-    "T-W003": {
+    "T-W004": {
       name: "Weight Loss Ignite Premium",
-      serialNumber: "T-W003",
+      serialNumber: "T-W004",
       focus: "Weight Loss",
       difficulty: "Intermediate",
       duration: "6 Weeks / 5 Training Days",
