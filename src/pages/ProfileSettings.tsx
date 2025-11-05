@@ -205,7 +205,7 @@ const ProfileSettings = () => {
                   </div>
                   <div className="text-center p-2 bg-background/50 rounded-lg">
                     <CheckCircle className="h-5 w-5 text-green-500 mx-auto mb-1" />
-                    <p className="text-xs font-medium">AI Plans</p>
+                    <p className="text-xs font-medium">Progress Tracking</p>
                   </div>
                   <div className="text-center p-2 bg-background/50 rounded-lg">
                     <CheckCircle className="h-5 w-5 text-green-500 mx-auto mb-1" />

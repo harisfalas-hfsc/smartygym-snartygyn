@@ -629,69 +629,6 @@ export default function UserDashboard() {
           </Card>
         )}
 
-        {/* Quick Stats Overview - For all users */}
-        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-5 mb-8">
-          <Card className="bg-gradient-to-br from-red-500/10 to-red-500/5">
-            <CardContent className="pt-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-xs text-muted-foreground mb-1">Favorite Workouts</p>
-                  <p className="text-2xl font-bold">{favoriteWorkouts.length}</p>
-                </div>
-                <Heart className="h-8 w-8 text-red-500" />
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card className="bg-gradient-to-br from-green-500/10 to-green-500/5">
-            <CardContent className="pt-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-xs text-muted-foreground mb-1">Completed Workouts</p>
-                  <p className="text-2xl font-bold">{completedWorkouts.length}</p>
-                </div>
-                <CheckCircle className="h-8 w-8 text-green-500" />
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card className="bg-gradient-to-br from-blue-500/10 to-blue-500/5">
-            <CardContent className="pt-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-xs text-muted-foreground mb-1">Favorite Programs</p>
-                  <p className="text-2xl font-bold">{favoritePrograms.length}</p>
-                </div>
-                <Calendar className="h-8 w-8 text-blue-500" />
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card className="bg-gradient-to-br from-yellow-500/10 to-yellow-500/5">
-            <CardContent className="pt-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-xs text-muted-foreground mb-1">Total Ratings</p>
-                  <p className="text-2xl font-bold">{ratedWorkouts.length + ratedPrograms.length}</p>
-                </div>
-                <Star className="h-8 w-8 text-yellow-500" />
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card className="bg-gradient-to-br from-purple-500/10 to-purple-500/5">
-            <CardContent className="pt-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-xs text-muted-foreground mb-1">Calculator Uses</p>
-                  <p className="text-2xl font-bold">{oneRMHistory.length + bmrHistory.length + calorieHistory.length}</p>
-                </div>
-                <Calculator className="h-8 w-8 text-purple-500" />
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-
         {/* Premium Features Summary - Only for premium users */}
         {hasActivePlan && (
           <Card className="mb-8 border-yellow-500/50 bg-gradient-to-br from-yellow-500/5 via-amber-500/5 to-orange-500/5">
@@ -718,11 +655,11 @@ export default function UserDashboard() {
                   </p>
                 </div>
 
-                {/* Training Programs */}
+                {/* Premium Training Programs */}
                 <div className="p-4 bg-background rounded-lg border border-border/50">
                   <div className="flex items-center gap-2 mb-2">
                     <Calendar className="h-5 w-5 text-primary" />
-                    <h4 className="font-semibold">Training Programs</h4>
+                    <h4 className="font-semibold">Premium Training Programmes</h4>
                   </div>
                   <p className="text-xs text-muted-foreground">
                     Structured multi-week programs for every goal. Build strength, muscle, endurance, or improve mobility.
@@ -794,6 +731,69 @@ export default function UserDashboard() {
           </Card>
         )}
 
+        {/* Quick Stats Overview - For all users */}
+        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-5 mb-8">
+          <Card className="bg-gradient-to-br from-red-500/10 to-red-500/5">
+            <CardContent className="pt-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-xs text-muted-foreground mb-1">Favorite Workouts</p>
+                  <p className="text-2xl font-bold">{favoriteWorkouts.length}</p>
+                </div>
+                <Heart className="h-8 w-8 text-red-500" />
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className="bg-gradient-to-br from-green-500/10 to-green-500/5">
+            <CardContent className="pt-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-xs text-muted-foreground mb-1">Completed Workouts</p>
+                  <p className="text-2xl font-bold">{completedWorkouts.length}</p>
+                </div>
+                <CheckCircle className="h-8 w-8 text-green-500" />
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className="bg-gradient-to-br from-blue-500/10 to-blue-500/5">
+            <CardContent className="pt-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-xs text-muted-foreground mb-1">Favorite Programs</p>
+                  <p className="text-2xl font-bold">{favoritePrograms.length}</p>
+                </div>
+                <Calendar className="h-8 w-8 text-blue-500" />
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className="bg-gradient-to-br from-yellow-500/10 to-yellow-500/5">
+            <CardContent className="pt-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-xs text-muted-foreground mb-1">Total Ratings</p>
+                  <p className="text-2xl font-bold">{ratedWorkouts.length + ratedPrograms.length}</p>
+                </div>
+                <Star className="h-8 w-8 text-yellow-500" />
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className="bg-gradient-to-br from-purple-500/10 to-purple-500/5">
+            <CardContent className="pt-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-xs text-muted-foreground mb-1">Calculator Uses</p>
+                  <p className="text-2xl font-bold">{oneRMHistory.length + bmrHistory.length + calorieHistory.length}</p>
+                </div>
+                <Calculator className="h-8 w-8 text-purple-500" />
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+
         {/* Fitness Overview */}
         <div className="mb-8">
           <h2 className="text-2xl font-bold mb-4">Your Fitness Overview</h2>
@@ -803,7 +803,7 @@ export default function UserDashboard() {
         </div>
 
         <Tabs defaultValue="workouts" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-2 sm:grid-cols-4">
+          <TabsList className="grid w-full grid-cols-1 sm:grid-cols-3">
             <TabsTrigger value="workouts">
               <Dumbbell className="mr-2 h-4 w-4" />
               Workouts
@@ -811,10 +811,6 @@ export default function UserDashboard() {
             <TabsTrigger value="programs">
               <Calendar className="mr-2 h-4 w-4" />
               Programs
-            </TabsTrigger>
-            <TabsTrigger value="exercises">
-              <Heart className="mr-2 h-4 w-4" />
-              Exercises
             </TabsTrigger>
             <TabsTrigger value="calculators">
               <Calculator className="mr-2 h-4 w-4" />
@@ -1136,58 +1132,6 @@ export default function UserDashboard() {
             )}
           </TabsContent>
 
-          {/* Exercises Tab */}
-          <TabsContent value="exercises" className="space-y-6">
-            {!hasActivePlan ? (
-              <Card className="border-primary/50 bg-gradient-to-r from-primary/5 to-primary/10">
-                <CardContent className="text-center py-12">
-                  <Crown className="h-12 w-12 text-primary mx-auto mb-4" />
-                  <h3 className="text-xl font-bold mb-2">Premium Feature</h3>
-                  <p className="text-muted-foreground mb-6">
-                    Save your favorite exercises and build your personalized library with a Gold or Platinum plan.
-                  </p>
-                  <Button onClick={() => navigate("/premiumbenefits")}>
-                    Upgrade to Premium
-                  </Button>
-                </CardContent>
-              </Card>
-            ) : (
-              <Card>
-              <CardHeader>
-                <CardTitle>My Favorite Exercises</CardTitle>
-              </CardHeader>
-              <CardContent>
-                {favoriteExercises.length === 0 ? (
-                  <div className="text-center py-8">
-                    <p className="text-sm text-muted-foreground mb-4">No favorite exercises yet</p>
-                    <Button onClick={() => navigate("/exerciselibrary")}>
-                      Browse Exercise Library
-                    </Button>
-                  </div>
-                ) : (
-                  <div className="space-y-2">
-                    {favoriteExercises.map((exercise) => (
-                      <div
-                        key={exercise.id}
-                        className="p-3 bg-muted rounded-lg"
-                      >
-                        <div className="flex items-center justify-between">
-                          <div className="flex-1">
-                            <p className="font-medium text-sm">{exercise.exercise_name}</p>
-                            <p className="text-xs text-muted-foreground mt-1">
-                              Added {formatDate(exercise.created_at)}
-                            </p>
-                          </div>
-                          <Heart className="h-4 w-4 fill-red-500 text-red-500 ml-2" />
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </CardContent>
-            </Card>
-            )}
-          </TabsContent>
 
           {/* Calculators Tab */}
           <TabsContent value="calculators" className="space-y-6">
