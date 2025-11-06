@@ -128,8 +128,8 @@ const TrainingProgramDetail = () => {
       },
       {
         id: "T-F002",
-        name: "Functional Strength Elite",
-        description: "Advanced 8-week program focused on multi-plane compound lifts, explosive power integration, and heavy load tolerance.",
+        name: "Functional Strength Elite I",
+        description: "Eight weeks of high-intensity compound lifting and functional circuits that develop maximal strength, explosiveness, and control through every plane of motion.",
         duration: "8",
         equipment: "equipment",
         level: "advanced",
@@ -138,6 +138,16 @@ const TrainingProgramDetail = () => {
       },
       {
         id: "T-F003",
+        name: "Functional Strength Elite II",
+        description: "A power-endurance plan for advanced athletes blending heavy compound movements with metabolic finishers. Ideal for building real-world strength and capacity.",
+        duration: "8",
+        equipment: "equipment",
+        level: "advanced",
+        imageUrl: functionalStrengthEliteImg,
+        isFree: false
+      },
+      {
+        id: "T-F004",
         name: "Functional Strength Foundations",
         description: "6-week program developing functional strength for daily activities and athletic performance through multi-joint movements and core stability.",
         duration: "6",
@@ -160,8 +170,8 @@ const TrainingProgramDetail = () => {
       },
       {
         id: "T-H002",
-        name: "Muscle Hypertrophy Pro",
-        description: "Advanced 8-week hypertrophy system emphasizing metabolic stress, mechanical tension, and progressive overload.",
+        name: "Muscle Hypertrophy Pro I",
+        description: "A classic push-pull-legs split geared for maximum size. High volume, controlled tempo, and progressive overload build thickness and symmetry.",
         duration: "8",
         equipment: "equipment",
         level: "advanced",
@@ -170,6 +180,16 @@ const TrainingProgramDetail = () => {
       },
       {
         id: "T-H003",
+        name: "Muscle Hypertrophy Pro II",
+        description: "A blended upper/lower split for advanced lifters targeting balanced growth and metabolic stress. Includes mechanical drops and supersets to maximize hypertrophy.",
+        duration: "8",
+        equipment: "equipment",
+        level: "advanced",
+        imageUrl: muscleHypertrophyProImg,
+        isFree: false
+      },
+      {
+        id: "T-H004",
         name: "Muscle Hypertrophy Build",
         description: "6-week hypertrophy plan targeting all major muscle groups using progressive overload principles and time-under-tension.",
         duration: "6",
@@ -192,8 +212,8 @@ const TrainingProgramDetail = () => {
       },
       {
         id: "T-W002",
-        name: "Weight Loss Elite",
-        description: "Aggressive 8-week fat-loss regimen focused on metabolic conditioning, resistance circuits, and athletic HIIT.",
+        name: "Weight Loss Max Burn I",
+        description: "An eight-week metabolic-conditioning plan created to accelerate fat loss while maintaining lean muscle. It blends strength endurance, Tabata, and cardio intervals with structured recovery and outdoor runs.",
         duration: "8",
         equipment: "equipment",
         level: "advanced",
@@ -202,6 +222,16 @@ const TrainingProgramDetail = () => {
       },
       {
         id: "T-W003",
+        name: "Weight Loss Shred II",
+        description: "A challenging hybrid program that combines resistance training, cardio intervals, and athletic conditioning to keep metabolism elevated all day.",
+        duration: "8",
+        equipment: "equipment",
+        level: "advanced",
+        imageUrl: fatFurnaceImg,
+        isFree: false
+      },
+      {
+        id: "T-W004",
         name: "Weight Loss Ignite Premium",
         description: "6-week program maximizing caloric expenditure while maintaining lean muscle using metabolic circuits and HIIT.",
         duration: "6",
