@@ -320,8 +320,44 @@ const TrainingProgramDetail = () => {
   return (
     <>
       <Helmet>
-        <title>{title} | Smarty Gym</title>
-        <meta name="description" content={`Browse ${title.toLowerCase()} training programs - 4, 6, and 8 week options`} />
+        <title>{title} | 6-8 Week Structured Programs Cyprus | Smarty Gym | Haris Falas Sports Scientist | smartygym.com</title>
+        <meta name="description" content={`${title} at smartygym.com - Structured 6-8 week training programs by Sports Scientist Haris Falas. Progressive ${type ? type.replace('-', ' ') : 'training'} plans for all experience levels. Evidence-based periodization, clear progression, and proven results for Cyprus and worldwide online fitness.`} />
+        <meta name="keywords" content={`${title}, smartygym.com, Smarty Gym Cyprus, training programs Cyprus, ${type ? type.replace('-', ' ') : 'fitness'} program Cyprus, 6 week program, 8 week program, structured training Cyprus, periodization program, progressive training, workout program Cyprus, fitness program Cyprus, Haris Falas programs, Sports Scientist Cyprus, strength program, hypertrophy program, cardio program, weight loss program, mobility program, functional training program, online training program Cyprus, fitness coaching Cyprus, personal training program, workout split Cyprus, training plan Cyprus, online fitness Cyprus, evidence-based training, structured workout plan`} />
+        
+        <meta property="og:title" content={`${title} | Smarty Gym Cyprus Training Programs`} />
+        <meta property="og:description" content={`Structured 6-8 week ${title.toLowerCase()} by Sports Scientist Haris Falas at smartygym.com`} />
+        <meta property="og:type" content="website" />
+        <meta property="og:url" content={`https://smartygym.com/trainingprogram/${type || ''}`} />
+        
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content={`${title} | Smarty Gym Cyprus`} />
+        <meta name="twitter:description" content={`Professional ${title.toLowerCase()} with structured progression`} />
+        
+        <link rel="canonical" href={`https://smartygym.com/trainingprogram/${type || ''}`} />
+        
+        {/* Structured Data - Collection of Training Programs */}
+        <script type="application/ld+json">
+          {JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "ItemList",
+            "name": title,
+            "description": `Collection of ${title.toLowerCase()} - 6 to 8 week structured training plans`,
+            "numberOfItems": filteredPrograms.length,
+            "itemListElement": filteredPrograms.map((program, index) => ({
+              "@type": "ListItem",
+              "position": index + 1,
+              "item": {
+                "@type": "Course",
+                "name": program.name,
+                "description": program.description,
+                "image": program.imageUrl,
+                "timeRequired": `${program.duration} weeks`,
+                "courseWorkload": `${program.duration} weeks`,
+                "educationalLevel": program.level
+              }
+            }))
+          })}
+        </script>
       </Helmet>
       
       <div className="min-h-screen bg-background">

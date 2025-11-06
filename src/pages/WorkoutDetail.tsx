@@ -294,8 +294,42 @@ const WorkoutDetail = () => {
   return (
     <>
       <Helmet>
-        <title>{title} | Smarty Gym</title>
-        <meta name="description" content={`Browse ${title.toLowerCase()} workouts - bodyweight and equipment-based options`} />
+        <title>{title} Workouts | Smarty Gym Cyprus | {type ? type.charAt(0).toUpperCase() + type.slice(1) : 'Fitness'} Training by Sports Scientist Haris Falas | smartygym.com</title>
+        <meta name="description" content={`Explore ${title.toLowerCase()} at smartygym.com - from beginner to advanced. Evidence-based ${type ? type : 'fitness'} workouts designed by Sports Scientist Haris Falas. HIIT, circuits, AMRAP, Tabata formats. Bodyweight and equipment options for home or gym training in Cyprus and worldwide.`} />
+        <meta name="keywords" content={`${title}, smartygym.com, Smarty Gym Cyprus, ${type ? type : 'fitness'} workouts Cyprus, workout library Cyprus, HIIT workouts, circuit training, AMRAP workouts, Tabata training, bodyweight workouts, gym workouts, beginner workouts Cyprus, intermediate workouts, advanced workouts, home workouts Cyprus, online workouts, fitness training Cyprus, Haris Falas workouts, Sports Scientist Cyprus, strength training Cyprus, cardio workouts Cyprus, metabolic conditioning, fat loss workouts, muscle building, functional training Cyprus, workout programs, fitness plans Cyprus, online fitness Cyprus, personal training Cyprus`} />
+        
+        <meta property="og:title" content={`${title} | Smarty Gym Cyprus Workout Library`} />
+        <meta property="og:description" content={`${title} - beginner to advanced levels designed by Sports Scientist Haris Falas`} />
+        <meta property="og:type" content="website" />
+        <meta property="og:url" content={`https://smartygym.com/workout/${type || ''}`} />
+        
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content={`${title} | Smarty Gym Cyprus`} />
+        <meta name="twitter:description" content={`Professional ${title.toLowerCase()} by Haris Falas at smartygym.com`} />
+        
+        <link rel="canonical" href={`https://smartygym.com/workout/${type || ''}`} />
+        
+        {/* Structured Data - Collection of Workouts */}
+        <script type="application/ld+json">
+          {JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "ItemList",
+            "name": title,
+            "description": `Collection of ${title.toLowerCase()} from beginner to advanced levels`,
+            "numberOfItems": filteredWorkouts.length,
+            "itemListElement": filteredWorkouts.slice(0, 10).map((workout, index) => ({
+              "@type": "ListItem",
+              "position": index + 1,
+              "item": {
+                "@type": "ExercisePlan",
+                "name": workout.name,
+                "description": workout.description,
+                "image": workout.imageUrl,
+                "timeRequired": workout.duration
+              }
+            }))
+          })}
+        </script>
       </Helmet>
       
       <div className="min-h-screen bg-background">

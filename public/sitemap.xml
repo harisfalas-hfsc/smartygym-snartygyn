@@ -106,23 +106,110 @@
   
   <url>
     <loc>https://smartygym.com/trainingprogram/functional-strength</loc>
-    <lastmod>2025-01-01</lastmod>
+    <lastmod>2025-01-15</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
+  </url>
+  
+  <!-- Functional Strength Programs -->
+  <url>
+    <loc>https://smartygym.com/trainingprogram/functional-strength/T-F001</loc>
+    <lastmod>2025-01-15</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  
+  <url>
+    <loc>https://smartygym.com/trainingprogram/functional-strength/T-F002</loc>
+    <lastmod>2025-01-15</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  
+  <url>
+    <loc>https://smartygym.com/trainingprogram/functional-strength/T-F003</loc>
+    <lastmod>2025-01-15</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  
+  <url>
+    <loc>https://smartygym.com/trainingprogram/functional-strength/T-F004</loc>
+    <lastmod>2025-01-15</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
   </url>
   
   <url>
     <loc>https://smartygym.com/trainingprogram/muscle-hypertrophy</loc>
-    <lastmod>2025-01-01</lastmod>
+    <lastmod>2025-01-15</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   
+  <!-- Muscle Hypertrophy Programs -->
+  <url>
+    <loc>https://smartygym.com/trainingprogram/muscle-hypertrophy/T-H001</loc>
+    <lastmod>2025-01-15</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  
+  <url>
+    <loc>https://smartygym.com/trainingprogram/muscle-hypertrophy/T-H002</loc>
+    <lastmod>2025-01-15</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  
+  <url>
+    <loc>https://smartygym.com/trainingprogram/muscle-hypertrophy/T-H003</loc>
+    <lastmod>2025-01-15</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  
+  <url>
+    <loc>https://smartygym.com/trainingprogram/muscle-hypertrophy/T-H004</loc>
+    <lastmod>2025-01-15</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  
   <url>
     <loc>https://smartygym.com/trainingprogram/weight-loss</loc>
-    <lastmod>2025-01-01</lastmod>
+    <lastmod>2025-01-15</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
+  </url>
+  
+  <!-- Weight Loss Programs -->
+  <url>
+    <loc>https://smartygym.com/trainingprogram/weight-loss/T-W001</loc>
+    <lastmod>2025-01-15</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  
+  <url>
+    <loc>https://smartygym.com/trainingprogram/weight-loss/T-W002</loc>
+    <lastmod>2025-01-15</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  
+  <url>
+    <loc>https://smartygym.com/trainingprogram/weight-loss/T-W003</loc>
+    <lastmod>2025-01-15</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  
+  <url>
+    <loc>https://smartygym.com/trainingprogram/weight-loss/T-W004</loc>
+    <lastmod>2025-01-15</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
   </url>
   
   <url>
