@@ -134,6 +134,36 @@ export type Database = {
         }
         Relationships: []
       }
+      banned_users: {
+        Row: {
+          banned_at: string | null
+          banned_by: string
+          expires_at: string | null
+          id: string
+          is_permanent: boolean | null
+          reason: string
+          user_id: string
+        }
+        Insert: {
+          banned_at?: string | null
+          banned_by: string
+          expires_at?: string | null
+          id?: string
+          is_permanent?: boolean | null
+          reason: string
+          user_id: string
+        }
+        Update: {
+          banned_at?: string | null
+          banned_by?: string
+          expires_at?: string | null
+          id?: string
+          is_permanent?: boolean | null
+          reason?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       bmr_history: {
         Row: {
           age: number
@@ -209,6 +239,42 @@ export type Database = {
         }
         Relationships: []
       }
+      content_flags: {
+        Row: {
+          content_id: string
+          content_type: string
+          created_at: string | null
+          flagged_by: string
+          id: string
+          reason: string
+          reviewed_at: string | null
+          reviewed_by: string | null
+          status: string | null
+        }
+        Insert: {
+          content_id: string
+          content_type: string
+          created_at?: string | null
+          flagged_by: string
+          id?: string
+          reason: string
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          status?: string | null
+        }
+        Update: {
+          content_id?: string
+          content_type?: string
+          created_at?: string | null
+          flagged_by?: string
+          id?: string
+          reason?: string
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          status?: string | null
+        }
+        Relationships: []
+      }
       email_templates: {
         Row: {
           body: string
@@ -239,6 +305,36 @@ export type Database = {
           name?: string
           subject?: string
           updated_at?: string | null
+        }
+        Relationships: []
+      }
+      moderation_actions: {
+        Row: {
+          action_type: string
+          created_at: string | null
+          id: string
+          moderator_id: string
+          reason: string | null
+          target_id: string
+          target_type: string
+        }
+        Insert: {
+          action_type: string
+          created_at?: string | null
+          id?: string
+          moderator_id: string
+          reason?: string | null
+          target_id: string
+          target_type: string
+        }
+        Update: {
+          action_type?: string
+          created_at?: string | null
+          id?: string
+          moderator_id?: string
+          reason?: string | null
+          target_id?: string
+          target_type?: string
         }
         Relationships: []
       }
@@ -758,6 +854,7 @@ export type Database = {
         }
         Returns: boolean
       }
+      is_user_banned: { Args: { user_id_param: string }; Returns: boolean }
     }
     Enums: {
       app_role: "admin" | "moderator" | "user"
