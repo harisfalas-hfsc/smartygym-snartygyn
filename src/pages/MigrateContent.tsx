@@ -3,14 +3,49 @@ import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { Loader2, ArrowLeft } from "lucide-react";
+import { Loader2, ArrowLeft, CheckCircle, XCircle } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useAdminRole } from "@/hooks/useAdminRole";
+import { supabase } from "@/integrations/supabase/client";
 
 export default function MigrateContent() {
   const navigate = useNavigate();
   const { isAdmin, loading } = useAdminRole();
   const { toast } = useToast();
+  const [migrating, setMigrating] = useState(false);
+  const [migrationResults, setMigrationResults] = useState<any>(null);
+
+  const handleCheckDatabase = async () => {
+    setMigrating(true);
+    try {
+      const { count: workoutCount } = await supabase
+        .from("admin_workouts")
+        .select("*", { count: "exact", head: true });
+
+      const { count: programCount } = await supabase
+        .from("admin_training_programs")
+        .select("*", { count: "exact", head: true });
+
+      setMigrationResults({
+        workouts: { success: workoutCount || 0, failed: 0, errors: [] },
+        programs: { success: programCount || 0, failed: 0, errors: [] }
+      });
+
+      toast({
+        title: "Database Status",
+        description: `Found ${workoutCount || 0} workouts and ${programCount || 0} programs in database.`,
+      });
+    } catch (error) {
+      console.error("Error checking database:", error);
+      toast({
+        title: "Error",
+        description: "Could not check database status",
+        variant: "destructive",
+      });
+    } finally {
+      setMigrating(false);
+    }
+  };
 
   if (loading) {
     return (
@@ -74,9 +109,43 @@ export default function MigrateContent() {
 
             <div className="space-y-4">
               <div>
+                <h3 className="text-lg font-semibold mb-2">Check Database Status</h3>
+                <p className="text-sm text-muted-foreground mb-3">
+                  See how many workouts and programs are currently in the database.
+                </p>
+                <Button 
+                  onClick={handleCheckDatabase}
+                  disabled={migrating}
+                  variant="outline"
+                  className="gap-2"
+                >
+                  {migrating && <Loader2 className="h-4 w-4 animate-spin" />}
+                  Check Database
+                </Button>
+              </div>
+
+              {migrationResults && (
+                <Alert>
+                  <AlertDescription>
+                    <div className="space-y-2">
+                      <div className="flex items-center gap-2">
+                        <CheckCircle className="h-4 w-4 text-green-500" />
+                        <span className="font-semibold">Workouts: {migrationResults.workouts.success}</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <CheckCircle className="h-4 w-4 text-green-500" />
+                        <span className="font-semibold">Programs: {migrationResults.programs.success}</span>
+                      </div>
+                    </div>
+                  </AlertDescription>
+                </Alert>
+              )}
+
+              <div>
                 <h3 className="text-lg font-semibold mb-2">Option 1: Manual Entry (Recommended)</h3>
                 <p className="text-sm text-muted-foreground mb-3">
                   Use the admin backoffice to create workouts and programs one at a time with full control.
+                  Any content you add will automatically be used by the app going forward.
                 </p>
                 <Button onClick={() => navigate("/admin")}>
                   Go to Admin Backoffice

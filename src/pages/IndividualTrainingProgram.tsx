@@ -6,6 +6,7 @@ import { ArrowLeft } from "lucide-react";
 import { WorkoutDisplay } from "@/components/WorkoutDisplay";
 import { AccessGate } from "@/components/AccessGate";
 import { CommentDialog } from "@/components/CommentDialog";
+import { useProgramData } from "@/hooks/useProgramData";
 import cardioEnduranceImg from "@/assets/cardio-endurance-program.jpg";
 import functionalStrengthImg from "@/assets/functional-strength-program.jpg";
 import muscleHypertrophyImg from "@/assets/muscle-hypertrophy-program.jpg";
@@ -28,6 +29,9 @@ import mobilityStabilityFlowImg from "@/assets/mobility-stability-flow-program.j
 const IndividualTrainingProgram = () => {
   const navigate = useNavigate();
   const { type, id } = useParams();
+  
+  // Try to fetch from database first
+  const { data: dbProgram, isLoading: isLoadingDb } = useProgramData(id);
 
   // Weight Loss Ignite (T-W001) is FREE for testing
   const freePrograms: string[] = ["T-W001"];
@@ -507,7 +511,46 @@ const IndividualTrainingProgram = () => {
     }
   };
 
-  const program = programData[id || ""];
+  // Use database program if available, otherwise fall back to hardcoded data
+  let program: any = null;
+  
+  if (dbProgram) {
+    // Convert database format to expected format
+    program = {
+      name: dbProgram.name,
+      serialNumber: id || '',
+      focus: dbProgram.category,
+      difficulty: dbProgram.target_audience?.split('\n')[0]?.replace('Difficulty:', '').trim() || 'Intermediate',
+      duration: dbProgram.duration || '6 Weeks',
+      equipment: dbProgram.target_audience?.split('\n')[1]?.replace('Equipment:', '').trim() || 'Various',
+      imageUrl: dbProgram.image_url || '',
+      description: dbProgram.description || '',
+      format: dbProgram.program_structure || '',
+      instructions: dbProgram.progression_plan || '',
+      exercises: dbProgram.weekly_schedule?.split('\n\n').map((ex: string) => {
+        const [week, details] = ex.split(':');
+        const [weekNum, day] = week.split(' - ');
+        return {
+          week: weekNum || '',
+          day: day || '',
+          workout: details?.split('\n')[0] || '',
+          details: details?.split('\n').slice(1).join('\n') || ''
+        };
+      }) || [],
+      tips: dbProgram.overview?.split('\n') || []
+    };
+  } else {
+    // Fall back to hardcoded data
+    program = programData[id || ""];
+  }
+
+  if (isLoadingDb) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="animate-pulse">Loading program...</div>
+      </div>
+    );
+  }
 
   if (!program) {
     return (

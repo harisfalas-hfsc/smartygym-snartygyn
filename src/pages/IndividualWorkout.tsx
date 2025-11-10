@@ -6,6 +6,7 @@ import { ArrowLeft, Clock, Dumbbell, TrendingUp } from "lucide-react";
 import { WorkoutDisplay } from "@/components/WorkoutDisplay";
 import { AccessGate } from "@/components/AccessGate";
 import { CommentDialog } from "@/components/CommentDialog";
+import { useWorkoutData } from "@/hooks/useWorkoutData";
 import burnStartImg from "@/assets/burn-start-workout.jpg";
 import sweatCircuitImg from "@/assets/sweat-circuit-workout.jpg";
 import bodyBurnoutImg from "@/assets/body-burnout-workout.jpg";
@@ -126,6 +127,9 @@ import bodyweightMadnessImg from "@/assets/bodyweight-madness-workout.jpg";
 const IndividualWorkout = () => {
   const navigate = useNavigate();
   const { type, id } = useParams();
+  
+  // Try to fetch from database first
+  const { data: dbWorkout, isLoading: isLoadingDb } = useWorkoutData(id);
 
   // Free workouts (accessible by logged-in members)
   const freeWorkouts = [
@@ -4555,7 +4559,46 @@ Rest 30s between rounds`,
     }
   };
 
-  const workout = workoutData[id || ""];
+  // Use database workout if available, otherwise fall back to hardcoded data
+  let workout: any = null;
+  
+  if (dbWorkout) {
+    // Convert database format to expected format
+    workout = {
+      name: dbWorkout.name,
+      serialNumber: id || '',
+      difficulty: dbWorkout.difficulty || 'Intermediate',
+      duration: dbWorkout.duration || '30 min',
+      equipment: dbWorkout.equipment || 'No Equipment',
+      imageUrl: dbWorkout.image_url || '',
+      description: dbWorkout.description || '',
+      workoutType: dbWorkout.type,
+      format: dbWorkout.notes?.split('\n\n')[0] || '',
+      instructions: dbWorkout.notes?.split('\n\n')[1] || '',
+      exercises: dbWorkout.main_workout?.split('\n\n').map((ex: string) => {
+        const lines = ex.split('\n');
+        return {
+          name: lines[0] || '',
+          sets: lines[1]?.split('|')[0]?.replace('Sets:', '').trim() || '',
+          reps: lines[1]?.split('|')[1]?.replace('Reps:', '').trim() || '',
+          rest: lines[1]?.split('|')[2]?.replace('Rest:', '').trim() || '',
+          notes: lines[2]?.replace('Notes:', '').trim() || ''
+        };
+      }) || [],
+      tips: dbWorkout.notes?.split('\n\n').slice(2) || []
+    };
+  } else {
+    // Fall back to hardcoded data
+    workout = workoutData[id || ""];
+  }
+
+  if (isLoadingDb) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="animate-pulse">Loading workout...</div>
+      </div>
+    );
+  }
 
   if (!workout) {
     return (
