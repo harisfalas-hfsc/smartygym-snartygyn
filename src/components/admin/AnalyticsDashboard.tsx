@@ -66,24 +66,25 @@ export function AnalyticsDashboard() {
 
       const activeSubscribers = subscriptions?.filter(s => s.status === "active" && s.plan_type !== "free").length || 0;
 
-      // Calculate revenue (mock values based on plan type)
-      const planPrices: { [key: string]: number } = { gold: 29, platinum: 49 };
-      const totalRevenue = subscriptions?.reduce((sum, sub) => {
-        if (sub.status === "active" && sub.plan_type !== "free") {
-          return sum + (planPrices[sub.plan_type] || 0);
+      // Fetch real revenue from Stripe
+      let totalRevenue = 0;
+      let revenueChartData: ChartData[] = [];
+      
+      try {
+        const { data: revenueData, error: revenueError } = await supabase.functions.invoke('get-stripe-revenue');
+        
+        if (!revenueError && revenueData) {
+          totalRevenue = revenueData.totalRevenue || 0;
+          
+          // Create revenue by month data (simplified - showing current month)
+          const currentMonth = new Date().toLocaleDateString("en-US", { year: "numeric", month: "short" });
+          revenueChartData = [{ name: currentMonth, value: totalRevenue }];
         }
-        return sum;
-      }, 0) || 0;
-
-      // Revenue by month
-      const revenueByMonth: { [key: string]: number } = {};
-      subscriptions?.forEach((sub) => {
-        if (sub.status === "active" && sub.plan_type !== "free") {
-          const month = new Date(sub.created_at).toLocaleDateString("en-US", { year: "numeric", month: "short" });
-          revenueByMonth[month] = (revenueByMonth[month] || 0) + (planPrices[sub.plan_type] || 0);
-        }
-      });
-      const revenueChartData = Object.entries(revenueByMonth).map(([name, value]) => ({ name, value }));
+      } catch (error) {
+        console.error("Error fetching Stripe revenue:", error);
+        // Fallback to 0 if Stripe fetch fails
+        totalRevenue = 0;
+      }
 
       // Subscription distribution
       const subDistribution: { [key: string]: number } = {};
