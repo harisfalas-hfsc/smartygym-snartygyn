@@ -1,10 +1,11 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { Helmet } from "react-helmet";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { ArrowLeft } from "lucide-react";
 import { AccessGate } from "@/components/AccessGate";
+import { useAllWorkouts } from "@/hooks/useWorkoutData";
 import burnStartImg from "@/assets/burn-start-workout.jpg";
 import sweatCircuitImg from "@/assets/sweat-circuit-workout.jpg";
 import bodyBurnoutImg from "@/assets/body-burnout-workout.jpg";
@@ -266,6 +267,20 @@ const WorkoutDetail = () => {
   const [equipmentFilter, setEquipmentFilter] = useState<EquipmentFilter>("all");
   const [levelFilter, setLevelFilter] = useState<LevelFilter>("all");
   const [formatFilter, setFormatFilter] = useState<FormatFilter>("all");
+  
+  // Fetch workouts from database
+  const { data: allWorkouts = [], isLoading } = useAllWorkouts();
+  
+  // Map URL type to database category
+  const categoryMap: { [key: string]: string } = {
+    "strength": "STRENGTH",
+    "calorie-burning": "CARDIO",
+    "metabolic": "CONDITIONING",
+    "cardio": "CARDIO",
+    "mobility": "MOBILITY",
+    "power": "POWER",
+    "challenge": "CONDITIONING"
+  };
 
   const workoutTitles: { [key: string]: string } = {
     "strength": "Strength Workout",
@@ -282,17 +297,42 @@ const WorkoutDetail = () => {
   };
 
   const title = workoutTitles[type || ""] || "Workout";
-  const workouts = workoutData[type || "strength"] || [];
+  const mappedCategory = categoryMap[type || "strength"];
   
-  const filteredWorkouts = workouts.filter(
-    workout => 
-      (equipmentFilter === "all" || workout.equipment === equipmentFilter) &&
-      (levelFilter === "all" || workout.level === levelFilter) &&
-      (formatFilter === "all" || workout.format === formatFilter)
-  );
+  // Filter workouts by category from URL and user filters
+  const filteredWorkouts = allWorkouts.filter(workout => {
+    // Match category
+    if (!workout.category?.toUpperCase().includes(mappedCategory)) return false;
+    
+    // Equipment filter
+    if (equipmentFilter !== "all") {
+      const hasEquipment = workout.equipment?.toUpperCase() !== "BODYWEIGHT";
+      if (equipmentFilter === "bodyweight" && hasEquipment) return false;
+      if (equipmentFilter === "equipment" && !hasEquipment) return false;
+    }
+    
+    // Level filter
+    if (levelFilter !== "all" && workout.difficulty?.toLowerCase() !== levelFilter) return false;
+    
+    // Format filter
+    if (formatFilter !== "all") {
+      const workoutFormat = workout.format?.toLowerCase();
+      if (formatFilter === "reps & sets" && workoutFormat !== "reps & sets") return false;
+      if (formatFilter === "for time" && workoutFormat !== "for time") return false;
+      if (formatFilter !== "reps & sets" && formatFilter !== "for time" && workoutFormat !== formatFilter) return false;
+    }
+    
+    return true;
+  });
 
   return (
     <>
+      {isLoading ? (
+        <div className="min-h-screen bg-background flex items-center justify-center">
+          <p className="text-muted-foreground">Loading workouts...</p>
+        </div>
+      ) : (
+        <>
       <Helmet>
         <title>{title} Workouts | Smarty Gym Cyprus | {type ? type.charAt(0).toUpperCase() + type.slice(1) : 'Fitness'} Training by Sports Scientist Haris Falas | smartygym.com</title>
         <meta name="description" content={`Explore ${title.toLowerCase()} at smartygym.com - from beginner to advanced. Evidence-based ${type ? type : 'fitness'} workouts designed by Sports Scientist Haris Falas. HIIT, circuits, AMRAP, Tabata formats. Bodyweight and equipment options for home or gym training in Cyprus and worldwide.`} />
@@ -324,7 +364,7 @@ const WorkoutDetail = () => {
                 "@type": "ExercisePlan",
                 "name": workout.name,
                 "description": workout.description,
-                "image": workout.imageUrl,
+                "image": workout.image_url,
                 "timeRequired": workout.duration
               }
             }))
@@ -478,14 +518,14 @@ const WorkoutDetail = () => {
             >
               <div className="relative h-48 w-full overflow-hidden">
                 <img 
-                  src={workout.imageUrl} 
-                  alt={`${workout.name} - ${workout.duration} ${workout.level} ${workout.equipment === 'bodyweight' ? 'bodyweight' : 'equipment-based'} ${workout.format} workout by Haris Falas Sports Scientist at Smarty Gym Cyprus`}
+                  src={workout.image_url} 
+                  alt={`${workout.name} - ${workout.duration} ${workout.difficulty} ${workout.equipment === 'BODYWEIGHT' ? 'bodyweight' : 'equipment-based'} ${workout.format} workout by Haris Falas Sports Scientist at Smarty Gym Cyprus`}
                   className="w-full h-full object-cover"
                 />
                 <div className="absolute top-2 right-2 bg-primary text-primary-foreground text-xs px-2 py-1 rounded">
                   {workout.duration}
                 </div>
-                {workout.isFree && (
+                {!workout.is_premium && (
                   <div className="absolute top-2 left-2 bg-primary text-primary-foreground px-3 py-1 rounded-full text-xs font-semibold">
                     FREE
                   </div>
@@ -508,6 +548,8 @@ const WorkoutDetail = () => {
         )}
       </div>
       </div>
+      </>
+      )}
     </>
   );
 };
