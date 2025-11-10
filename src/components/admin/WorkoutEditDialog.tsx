@@ -76,50 +76,76 @@ export const WorkoutEditDialog = ({ workout, open, onOpenChange, onSave }: Worko
   });
   const [isGeneratingImage, setIsGeneratingImage] = useState(false);
 
-  useEffect(() => {
-    const generateSerialNumber = async () => {
-      const { data } = await supabase
-        .from('admin_workouts')
-        .select('serial_number')
-        .order('serial_number', { ascending: false })
-        .limit(1);
-      
-      if (data && data.length > 0 && data[0].serial_number) {
-        return data[0].serial_number + 1;
-      }
-      return 1;
+  const getCategoryPrefix = (category: string) => {
+    const prefixMap: { [key: string]: string } = {
+      'STRENGTH': 'S',
+      'CALORIE BURNING': 'CB',
+      'METABOLIC': 'ME',
+      'CARDIO': 'C',
+      'MOBILITY AND STABILITY': 'MS',
+      'POWER': 'P',
+      'CHALLENGE': 'CH',
     };
+    return prefixMap[category] || 'W';
+  };
 
+  useEffect(() => {
     if (workout) {
       setFormData(workout);
     } else {
-      generateSerialNumber().then(nextSerial => {
-        setFormData({
-          id: `W-${nextSerial.toString().padStart(3, '0')}`,
-          serial_number: nextSerial,
-          name: '',
-          category: '',
-          focus: '',
-          difficulty_stars: 3,
-          equipment: '',
-          format: '',
-          duration: '',
-          activation: '',
-          warm_up: '',
-          main_workout: '',
-          finisher: '',
-          cool_down: '',
-          description: '',
-          instructions: '',
-          tips: '',
-          image_url: '',
-          generate_unique_image: false,
-          is_premium: false,
-          tier_required: '',
-        });
+      setFormData({
+        id: '',
+        serial_number: 0,
+        name: '',
+        category: '',
+        focus: '',
+        difficulty_stars: 3,
+        equipment: '',
+        format: '',
+        duration: '',
+        activation: '',
+        warm_up: '',
+        main_workout: '',
+        finisher: '',
+        cool_down: '',
+        description: '',
+        instructions: '',
+        tips: '',
+        image_url: '',
+        generate_unique_image: false,
+        is_premium: false,
+        tier_required: '',
       });
     }
   }, [workout]);
+
+  // Auto-generate serial number when category changes
+  useEffect(() => {
+    if (!workout && formData.category) {
+      const generateSerialNumber = async () => {
+        const prefix = getCategoryPrefix(formData.category);
+        const { data } = await supabase
+          .from('admin_workouts')
+          .select('id, serial_number')
+          .like('id', `${prefix}-%`)
+          .order('serial_number', { ascending: false })
+          .limit(1);
+        
+        let nextSerial = 1;
+        if (data && data.length > 0 && data[0].serial_number) {
+          nextSerial = data[0].serial_number + 1;
+        }
+        
+        setFormData(prev => ({
+          ...prev,
+          serial_number: nextSerial,
+          id: `${prefix}-${nextSerial.toString().padStart(3, '0')}`
+        }));
+      };
+      
+      generateSerialNumber();
+    }
+  }, [formData.category, workout]);
 
   const getDifficultyLabel = (stars: number) => {
     if (stars <= 2) return "Beginner";
@@ -236,15 +262,17 @@ export const WorkoutEditDialog = ({ workout, open, onOpenChange, onSave }: Worko
               value={formData.serial_number}
               onChange={(e) => {
                 const serial = parseInt(e.target.value) || 0;
+                const prefix = formData.category ? getCategoryPrefix(formData.category) : 'W';
                 setFormData({ 
                   ...formData, 
                   serial_number: serial,
-                  id: `W-${serial.toString().padStart(3, '0')}`
+                  id: `${prefix}-${serial.toString().padStart(3, '0')}`
                 });
               }}
-              placeholder="Auto-generated"
+              placeholder="Auto-generated based on category"
+              disabled={!formData.category}
             />
-            <p className="text-sm text-muted-foreground">Workout ID: {formData.id}</p>
+            <p className="text-sm text-muted-foreground">Workout ID: {formData.id || 'Select category first'}</p>
           </div>
 
           {/* 3. Name */}

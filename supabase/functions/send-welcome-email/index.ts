@@ -1,6 +1,6 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.57.2";
-import { Resend } from "npm:resend@2.0.0";
+import { Resend } from "https://esm.sh/resend@3.5.0";
 
 const resend = new Resend(Deno.env.get("RESEND_API_KEY"));
 
@@ -37,6 +37,8 @@ serve(async (req) => {
     if (userError) throw userError;
     
     const userEmail = userData.user.email;
+    if (!userEmail) throw new Error("User email not found");
+    
     const userName = record.full_name || "there";
     
     logStep("User details fetched", { email: userEmail, name: userName });
@@ -85,10 +87,10 @@ serve(async (req) => {
       html: body.replace(/\n/g, "<br>"),
     });
 
-    logStep("Welcome email sent", { emailId: emailResponse.id });
+    logStep("Welcome email sent", { emailId: emailResponse.data?.id });
 
     return new Response(
-      JSON.stringify({ success: true, emailId: emailResponse.id }),
+      JSON.stringify({ success: true, emailId: emailResponse.data?.id }),
       {
         status: 200,
         headers: { ...corsHeaders, "Content-Type": "application/json" },

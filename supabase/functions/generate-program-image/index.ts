@@ -12,7 +12,7 @@ serve(async (req) => {
   }
 
   try {
-    const { name, category, format, difficulty_stars } = await req.json();
+    const { name, category, difficulty_stars, weeks } = await req.json();
 
     // Initialize Supabase client
     const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
@@ -41,21 +41,22 @@ serve(async (req) => {
     else if (difficulty_stars > 2) difficultyLabel = "Intermediate";
 
     // Create a detailed prompt for image generation
-    const imagePrompt = `Create a professional fitness workout cover image for "${name}". 
-Style: Modern, energetic, and motivating fitness photography.
+    const imagePrompt = `Create a professional fitness training program cover image for "${name}". 
+Style: Modern, inspiring, and motivating fitness photography showing progression and dedication.
 Category: ${category}
-Format: ${format}
+Duration: ${weeks} weeks
 Difficulty: ${difficultyLabel}
 Requirements:
-- High-energy, dynamic composition
-- Professional fitness setting
-- Clean, vibrant colors
+- High-quality, inspirational composition showing fitness journey/transformation
+- Professional fitness or gym setting
+- Clean, vibrant, energetic colors
 - No text or watermarks
-- Focus on the type of movement/exercise related to ${category} and ${format}
-- Should look unique and different from these existing workouts: ${existingImagePrompts.slice(0, 10).join(", ")}
-Aspect ratio: 16:9 landscape format suitable for a workout cover image.`;
+- Focus on the type of training related to ${category}
+- Should look completely unique and different from these existing programs and workouts: ${existingImagePrompts.slice(0, 10).join(", ")}
+- Convey a sense of structured program and long-term commitment
+Aspect ratio: 16:9 landscape format suitable for a training program cover image.`;
 
-    console.log("Generating image with prompt:", imagePrompt);
+    console.log("Generating program image with prompt:", imagePrompt);
 
     // Generate image using Lovable AI
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
@@ -95,13 +96,13 @@ Aspect ratio: 16:9 landscape format suitable for a workout cover image.`;
     }
 
     // Upload to Supabase Storage
-    const fileName = `workout-${Date.now()}-${Math.random().toString(36).substring(7)}.png`;
+    const fileName = `program-${Date.now()}-${Math.random().toString(36).substring(7)}.png`;
     const base64Data = imageBase64.replace(/^data:image\/\w+;base64,/, "");
     const buffer = Uint8Array.from(atob(base64Data), (c) => c.charCodeAt(0));
 
     const { data: uploadData, error: uploadError } = await supabase.storage
       .from("avatars")
-      .upload(`workout-covers/${fileName}`, buffer, {
+      .upload(`program-covers/${fileName}`, buffer, {
         contentType: "image/png",
         upsert: false,
       });
@@ -114,16 +115,16 @@ Aspect ratio: 16:9 landscape format suitable for a workout cover image.`;
     // Get public URL
     const { data: urlData } = supabase.storage
       .from("avatars")
-      .getPublicUrl(`workout-covers/${fileName}`);
+      .getPublicUrl(`program-covers/${fileName}`);
 
-    console.log("Image generated and uploaded successfully:", urlData.publicUrl);
+    console.log("Program image generated and uploaded successfully:", urlData.publicUrl);
 
     return new Response(
       JSON.stringify({ image_url: urlData.publicUrl }),
       { headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
   } catch (error) {
-    console.error("Error generating workout image:", error);
+    console.error("Error generating program image:", error);
     return new Response(
       JSON.stringify({ error: error instanceof Error ? error.message : String(error) }),
       { 

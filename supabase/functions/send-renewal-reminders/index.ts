@@ -1,6 +1,6 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.57.2";
-import { Resend } from "npm:resend@2.0.0";
+import { Resend } from "https://esm.sh/resend@3.5.0";
 
 const resend = new Resend(Deno.env.get("RESEND_API_KEY"));
 
@@ -113,10 +113,10 @@ serve(async (req) => {
           html: body.replace(/\n/g, "<br>"),
         });
 
-        emailsSent.push({ userId: subscription.user_id, emailId: emailResponse.id });
-        logStep("Renewal reminder sent", { userId: subscription.user_id, emailId: emailResponse.id });
+        emailsSent.push({ userId: subscription.user_id, emailId: emailResponse.data?.id });
+        logStep("Renewal reminder sent", { userId: subscription.user_id, emailId: emailResponse.data?.id });
       } catch (error) {
-        logStep("Error sending to user", { userId: subscription.user_id, error: error.message });
+        logStep("Error sending to user", { userId: subscription.user_id, error: error instanceof Error ? error.message : String(error) });
       }
     }
 

@@ -1,3 +1,5 @@
+project_id = "cvccrvyimyzrxcwzmxwk"
+
 [functions.generate-fitness-plan]
 verify_jwt = true
 
@@ -8,4 +10,10 @@ verify_jwt = false
 verify_jwt = false
 
 [functions.subscribe-newsletter]
+verify_jwt = false
+
+[functions.generate-workout-image]
+verify_jwt = false
+
+[functions.generate-program-image]
 verify_jwt = false

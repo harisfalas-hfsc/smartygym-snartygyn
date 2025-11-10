@@ -56,16 +56,33 @@ export const ProgramEditDialog = ({ program, open, onOpenChange, onSave }: Progr
     instructions: '',
     tips: '',
     image_url: '',
+    generate_unique_image: false,
     is_premium: false,
     tier_required: '',
   });
   const [weekDayContents, setWeekDayContents] = useState<WeekDayContent[]>([]);
 
+  const [isGeneratingImage, setIsGeneratingImage] = useState(false);
+
+  const getCategoryPrefix = (category: string) => {
+    const prefixMap: { [key: string]: string } = {
+      'CARDIO': 'C',
+      'FUNCTIONAL STRENGTH': 'F',
+      'MUSCLE HYPERTROPHY': 'M',
+      'WEIGHT LOSS': 'W',
+      'LOW BACK PAIN': 'L',
+      'MOBILITY/STABILITY': 'MS',
+    };
+    return prefixMap[category] || 'P';
+  };
+
   useEffect(() => {
-    const generateSerialNumber = async () => {
+    const generateSerialNumber = async (category: string) => {
+      const prefix = getCategoryPrefix(category);
       const { data } = await supabase
         .from('admin_training_programs')
-        .select('serial_number')
+        .select('id, serial_number')
+        .like('id', `${prefix}-%`)
         .order('serial_number', { ascending: false })
         .limit(1);
       
@@ -89,6 +106,7 @@ export const ProgramEditDialog = ({ program, open, onOpenChange, onSave }: Progr
         instructions: program.progression_plan || '',
         tips: program.nutrition_tips || '',
         image_url: program.image_url || '',
+        generate_unique_image: false,
         is_premium: program.is_premium || false,
         tier_required: program.tier_required || '',
       });
@@ -103,27 +121,54 @@ export const ProgramEditDialog = ({ program, open, onOpenChange, onSave }: Progr
         }
       }
     } else {
-      generateSerialNumber().then(nextSerial => {
-        setFormData({
-          id: `P-${nextSerial.toString().padStart(3, '0')}`,
-          serial_number: nextSerial,
-          name: '',
-          category: '',
-          difficulty_stars: 1,
-          weeks: 4,
-          days_per_week: 4,
-          equipment: '',
-          description: '',
-          instructions: '',
-          tips: '',
-          image_url: '',
-          is_premium: false,
-          tier_required: '',
-        });
+      setFormData({
+        id: '',
+        serial_number: 0,
+        name: '',
+        category: '',
+        difficulty_stars: 1,
+        weeks: 4,
+        days_per_week: 4,
+        equipment: '',
+        description: '',
+        instructions: '',
+        tips: '',
+        image_url: '',
+        generate_unique_image: false,
+        is_premium: false,
+        tier_required: '',
       });
       setWeekDayContents([]);
     }
   }, [program]);
+
+  // Auto-generate serial number when category changes
+  useEffect(() => {
+    if (!program && formData.category) {
+      const generateSerialNumber = async () => {
+        const prefix = getCategoryPrefix(formData.category);
+        const { data } = await supabase
+          .from('admin_training_programs')
+          .select('id, serial_number')
+          .like('id', `${prefix}-%`)
+          .order('serial_number', { ascending: false })
+          .limit(1);
+        
+        let nextSerial = 1;
+        if (data && data.length > 0 && data[0].serial_number) {
+          nextSerial = data[0].serial_number + 1;
+        }
+        
+        setFormData(prev => ({
+          ...prev,
+          serial_number: nextSerial,
+          id: `${prefix}-${nextSerial.toString().padStart(3, '0')}`
+        }));
+      };
+      
+      generateSerialNumber();
+    }
+  }, [formData.category, program]);
 
   // Generate week/day boxes when weeks or days_per_week changes
   useEffect(() => {
@@ -151,6 +196,33 @@ export const ProgramEditDialog = ({ program, open, onOpenChange, onSave }: Progr
 
   const handleSave = async () => {
     try {
+      setIsGeneratingImage(true);
+      
+      let imageUrl = formData.image_url;
+      
+      // Generate unique image if requested
+      if (formData.generate_unique_image) {
+        const { data: imageData, error: imageError } = await supabase.functions.invoke('generate-program-image', {
+          body: {
+            name: formData.name,
+            category: formData.category,
+            difficulty_stars: formData.difficulty_stars,
+            weeks: formData.weeks,
+          }
+        });
+
+        if (imageError) {
+          console.error('Error generating image:', imageError);
+          toast({
+            title: "Warning",
+            description: "Failed to generate image, saving without image",
+            variant: "destructive",
+          });
+        } else if (imageData?.image_url) {
+          imageUrl = imageData.image_url;
+        }
+      }
+      
       const duration = `${formData.weeks} Weeks / ${formData.days_per_week} Days per Week`;
       
       // Map difficulty stars to difficulty level
@@ -176,7 +248,7 @@ export const ProgramEditDialog = ({ program, open, onOpenChange, onSave }: Progr
         progression_plan: formData.instructions,
         nutrition_tips: formData.tips,
         weekly_schedule: JSON.stringify(weekDayContents),
-        image_url: formData.image_url,
+        image_url: imageUrl,
         is_premium: formData.is_premium,
         tier_required: formData.tier_required || null,
       };
@@ -206,6 +278,8 @@ export const ProgramEditDialog = ({ program, open, onOpenChange, onSave }: Progr
         description: error instanceof Error ? error.message : "Failed to save program",
         variant: "destructive",
       });
+    } finally {
+      setIsGeneratingImage(false);
     }
   };
 
@@ -409,18 +483,36 @@ export const ProgramEditDialog = ({ program, open, onOpenChange, onSave }: Progr
             />
           </div>
 
-          {/* 11. Image URL */}
-          <div className="space-y-2">
-            <Label htmlFor="image_url">11. Image URL</Label>
-            <Input
-              id="image_url"
-              value={formData.image_url}
-              onChange={(e) => setFormData({ ...formData, image_url: e.target.value })}
-              placeholder="/src/assets/program-image.jpg"
-            />
-            <p className="text-xs text-muted-foreground">
-              For best results: 800x600px, .jpg format, under 200KB
-            </p>
+          {/* 11. Image Generation */}
+          <div className="space-y-4 pt-4 border-t">
+            <div className="flex items-center justify-between">
+              <div className="space-y-1">
+                <Label htmlFor="generate_unique_image">11. Generate Unique Image</Label>
+                <p className="text-sm text-muted-foreground">
+                  AI will create a unique program cover image that doesn't match any existing workout or program
+                </p>
+              </div>
+              <Switch
+                id="generate_unique_image"
+                checked={formData.generate_unique_image}
+                onCheckedChange={(checked) => setFormData({ ...formData, generate_unique_image: checked })}
+              />
+            </div>
+            
+            {!formData.generate_unique_image && (
+              <div className="space-y-2">
+                <Label htmlFor="image_url">Or Enter Image URL Manually</Label>
+                <Input
+                  id="image_url"
+                  value={formData.image_url}
+                  onChange={(e) => setFormData({ ...formData, image_url: e.target.value })}
+                  placeholder="/src/assets/program-image.jpg"
+                />
+                <p className="text-xs text-muted-foreground">
+                  For best results: 800x600px, .jpg format, under 200KB
+                </p>
+              </div>
+            )}
           </div>
 
           <div className="flex items-center space-x-2">
@@ -448,11 +540,11 @@ export const ProgramEditDialog = ({ program, open, onOpenChange, onSave }: Progr
           )}
 
           <div className="flex justify-end gap-2 pt-4">
-            <Button variant="outline" onClick={() => onOpenChange(false)}>
+            <Button variant="outline" onClick={() => onOpenChange(false)} disabled={isGeneratingImage}>
               Cancel
             </Button>
-            <Button onClick={handleSave}>
-              Save Program
+            <Button onClick={handleSave} disabled={isGeneratingImage}>
+              {isGeneratingImage ? "Generating Image..." : "Save Program"}
             </Button>
           </div>
         </div>
