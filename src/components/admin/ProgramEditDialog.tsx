@@ -10,13 +10,29 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { useToast } from "@/hooks/use-toast";
 
 const PROGRAM_CATEGORIES = [
-  "Functional Strength", "Muscle Hypertrophy", "Weight Loss", "Cardio Endurance",
-  "Mobility & Flexibility", "Athletic Performance", "Powerlifting", "Bodybuilding",
-  "General Fitness", "Injury Prevention", "Rehabilitation"
+  "Functional Strength",
+  "Muscle Hypertrophy",
+  "Cardio",
+  "Weight Loss",
+  "Mobility & Stability",
+  "Low Back Pain Prevention & Performance"
 ];
 
 const PROGRAM_DURATIONS = [
-  "4 weeks", "6 weeks", "8 weeks", "10 weeks", "12 weeks", "16 weeks", "20 weeks"
+  "4 Weeks / 3 Training Days per Week",
+  "4 Weeks / 4 Training Days per Week",
+  "4 Weeks / 5 Training Days per Week",
+  "6 Weeks / 3 Days per Week",
+  "6 Weeks / 4 Training Days per Week",
+  "6 Weeks / 4 Days per Week",
+  "6 Weeks / 5 Training Days",
+  "8 Weeks / 4 Days per Week",
+  "8 Weeks / 5 Days per Week",
+  "8 Weeks / 5 Training Days per Week",
+  "8 Weeks / 6 Training Days per Week",
+  "10 Weeks / 4 Training Days per Week",
+  "12 Weeks / 4 Training Days per Week",
+  "12 Weeks / 5 Training Days per Week"
 ];
 
 interface ProgramEditDialogProps {
