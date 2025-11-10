@@ -43,19 +43,27 @@ export default function AdminBackoffice() {
     <div className="min-h-screen bg-background">
       <div className="container mx-auto py-8 px-4">
         {/* Header */}
-        <div className="flex items-center gap-4 mb-8">
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={() => navigate("/")}
-            className="rounded-full"
-          >
-            <ArrowLeft className="h-5 w-5" />
-          </Button>
-          <div>
-            <h1 className="text-3xl font-bold">Admin Backoffice</h1>
-            <p className="text-muted-foreground">Manage your workouts and training programs</p>
+        <div className="flex items-center justify-between mb-8">
+          <div className="flex items-center gap-4">
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => navigate("/")}
+              className="rounded-full"
+            >
+              <ArrowLeft className="h-5 w-5" />
+            </Button>
+            <div>
+              <h1 className="text-3xl font-bold">Admin Backoffice</h1>
+              <p className="text-muted-foreground">Manage your workouts and training programs</p>
+            </div>
           </div>
+          <Button
+            variant="outline"
+            onClick={() => navigate("/admin/migrate")}
+          >
+            Import Content
+          </Button>
         </div>
 
         {/* Main Content */}

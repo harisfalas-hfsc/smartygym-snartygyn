@@ -2,9 +2,12 @@ import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
-import { Plus, Edit, Trash2, Eye } from "lucide-react";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Plus, Edit, Trash2, Eye, Search, Download, Filter } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { ProgramEditDialog } from "./ProgramEditDialog";
 
@@ -19,14 +22,46 @@ interface Program {
 
 export const ProgramsManager = () => {
   const [programs, setPrograms] = useState<Program[]>([]);
+  const [filteredPrograms, setFilteredPrograms] = useState<Program[]>([]);
   const [loading, setLoading] = useState(true);
   const [editingProgram, setEditingProgram] = useState<Program | null>(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [selectedPrograms, setSelectedPrograms] = useState<string[]>([]);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [categoryFilter, setCategoryFilter] = useState("all");
+  const [accessFilter, setAccessFilter] = useState("all");
   const { toast } = useToast();
 
   useEffect(() => {
     loadPrograms();
   }, []);
+
+  useEffect(() => {
+    filterPrograms();
+  }, [programs, searchTerm, categoryFilter, accessFilter]);
+
+  const filterPrograms = () => {
+    let filtered = programs;
+
+    if (searchTerm) {
+      filtered = filtered.filter(p => 
+        p.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        p.id.toLowerCase().includes(searchTerm.toLowerCase())
+      );
+    }
+
+    if (categoryFilter !== "all") {
+      filtered = filtered.filter(p => p.category === categoryFilter);
+    }
+
+    if (accessFilter === "free") {
+      filtered = filtered.filter(p => !p.is_premium);
+    } else if (accessFilter === "premium") {
+      filtered = filtered.filter(p => p.is_premium);
+    }
+
+    setFilteredPrograms(filtered);
+  };
 
   const loadPrograms = async () => {
     try {
@@ -90,6 +125,69 @@ export const ProgramsManager = () => {
     loadPrograms();
   };
 
+  const toggleSelectAll = () => {
+    if (selectedPrograms.length === filteredPrograms.length) {
+      setSelectedPrograms([]);
+    } else {
+      setSelectedPrograms(filteredPrograms.map(p => p.id));
+    }
+  };
+
+  const toggleSelect = (id: string) => {
+    setSelectedPrograms(prev => 
+      prev.includes(id) ? prev.filter(i => i !== id) : [...prev, id]
+    );
+  };
+
+  const handleBulkDelete = async () => {
+    if (selectedPrograms.length === 0) return;
+    
+    if (!confirm(`Delete ${selectedPrograms.length} selected programs?`)) return;
+
+    try {
+      const { error } = await supabase
+        .from('admin_training_programs')
+        .delete()
+        .in('id', selectedPrograms);
+
+      if (error) throw error;
+
+      toast({
+        title: "Success",
+        description: `Deleted ${selectedPrograms.length} programs`,
+      });
+      setSelectedPrograms([]);
+      loadPrograms();
+    } catch (error) {
+      console.error('Error deleting programs:', error);
+      toast({
+        title: "Error",
+        description: "Failed to delete programs",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleExport = () => {
+    const csv = [
+      ['ID', 'Name', 'Category', 'Duration', 'Access'].join(','),
+      ...filteredPrograms.map(p => [
+        p.id,
+        `"${p.name}"`,
+        p.category,
+        p.duration || 'N/A',
+        p.is_premium ? p.tier_required || 'Premium' : 'Free'
+      ].join(','))
+    ].join('\n');
+
+    const blob = new Blob([csv], { type: 'text/csv' });
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'programs.csv';
+    a.click();
+  };
+
   if (loading) {
     return <div className="text-center py-8">Loading programs...</div>;
   }
@@ -101,18 +199,75 @@ export const ProgramsManager = () => {
           <div className="flex items-center justify-between">
             <div>
               <CardTitle>Training Programs Management</CardTitle>
-              <CardDescription>Manage all training program content and details</CardDescription>
+              <CardDescription>
+                {filteredPrograms.length} program{filteredPrograms.length !== 1 ? 's' : ''}
+                {selectedPrograms.length > 0 && ` (${selectedPrograms.length} selected)`}
+              </CardDescription>
             </div>
-            <Button onClick={handleNew}>
-              <Plus className="h-4 w-4 mr-2" />
-              New Program
-            </Button>
+            <div className="flex gap-2">
+              <Button variant="outline" size="sm" onClick={handleExport}>
+                <Download className="h-4 w-4 mr-2" />
+                Export
+              </Button>
+              {selectedPrograms.length > 0 && (
+                <Button variant="destructive" size="sm" onClick={handleBulkDelete}>
+                  <Trash2 className="h-4 w-4 mr-2" />
+                  Delete ({selectedPrograms.length})
+                </Button>
+              )}
+              <Button onClick={handleNew}>
+                <Plus className="h-4 w-4 mr-2" />
+                New
+              </Button>
+            </div>
           </div>
         </CardHeader>
-        <CardContent>
+        <CardContent className="space-y-4">
+          <div className="flex gap-4 flex-wrap">
+            <div className="flex-1 min-w-[200px]">
+              <div className="relative">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                <Input
+                  placeholder="Search programs..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="pl-9"
+                />
+              </div>
+            </div>
+            <Select value={categoryFilter} onValueChange={setCategoryFilter}>
+              <SelectTrigger className="w-[180px]">
+                <Filter className="h-4 w-4 mr-2" />
+                <SelectValue placeholder="Category" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Categories</SelectItem>
+                <SelectItem value="Strength">Strength</SelectItem>
+                <SelectItem value="Cardio">Cardio</SelectItem>
+                <SelectItem value="Hypertrophy">Hypertrophy</SelectItem>
+                <SelectItem value="Weight Loss">Weight Loss</SelectItem>
+              </SelectContent>
+            </Select>
+            <Select value={accessFilter} onValueChange={setAccessFilter}>
+              <SelectTrigger className="w-[180px]">
+                <SelectValue placeholder="Access" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Access</SelectItem>
+                <SelectItem value="free">Free</SelectItem>
+                <SelectItem value="premium">Premium</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
           <Table>
             <TableHeader>
               <TableRow>
+                <TableHead className="w-12">
+                  <Checkbox
+                    checked={selectedPrograms.length === filteredPrograms.length && filteredPrograms.length > 0}
+                    onCheckedChange={toggleSelectAll}
+                  />
+                </TableHead>
                 <TableHead>Name</TableHead>
                 <TableHead>Category</TableHead>
                 <TableHead>Duration</TableHead>
@@ -121,15 +276,21 @@ export const ProgramsManager = () => {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {programs.length === 0 ? (
+              {filteredPrograms.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={5} className="text-center py-8 text-muted-foreground">
-                    No programs yet. Create your first program!
+                  <TableCell colSpan={6} className="text-center py-8 text-muted-foreground">
+                    {programs.length === 0 ? 'No programs yet. Create your first program!' : 'No programs match your filters.'}
                   </TableCell>
                 </TableRow>
               ) : (
-                programs.map((program) => (
+                filteredPrograms.map((program) => (
                   <TableRow key={program.id}>
+                    <TableCell>
+                      <Checkbox
+                        checked={selectedPrograms.includes(program.id)}
+                        onCheckedChange={() => toggleSelect(program.id)}
+                      />
+                    </TableCell>
                     <TableCell className="font-medium">{program.name}</TableCell>
                     <TableCell>{program.category}</TableCell>
                     <TableCell>{program.duration || 'N/A'}</TableCell>

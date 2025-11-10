@@ -2,9 +2,12 @@ import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
-import { Plus, Edit, Trash2, Eye } from "lucide-react";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Plus, Edit, Trash2, Eye, Search, Download, Filter } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { WorkoutEditDialog } from "./WorkoutEditDialog";
 
@@ -20,14 +23,51 @@ interface Workout {
 
 export const WorkoutsManager = () => {
   const [workouts, setWorkouts] = useState<Workout[]>([]);
+  const [filteredWorkouts, setFilteredWorkouts] = useState<Workout[]>([]);
   const [loading, setLoading] = useState(true);
   const [editingWorkout, setEditingWorkout] = useState<Workout | null>(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [selectedWorkouts, setSelectedWorkouts] = useState<string[]>([]);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [typeFilter, setTypeFilter] = useState("all");
+  const [difficultyFilter, setDifficultyFilter] = useState("all");
+  const [accessFilter, setAccessFilter] = useState("all");
   const { toast } = useToast();
 
   useEffect(() => {
     loadWorkouts();
   }, []);
+
+  useEffect(() => {
+    filterWorkouts();
+  }, [workouts, searchTerm, typeFilter, difficultyFilter, accessFilter]);
+
+  const filterWorkouts = () => {
+    let filtered = workouts;
+
+    if (searchTerm) {
+      filtered = filtered.filter(w => 
+        w.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        w.id.toLowerCase().includes(searchTerm.toLowerCase())
+      );
+    }
+
+    if (typeFilter !== "all") {
+      filtered = filtered.filter(w => w.type === typeFilter);
+    }
+
+    if (difficultyFilter !== "all") {
+      filtered = filtered.filter(w => w.difficulty === difficultyFilter);
+    }
+
+    if (accessFilter === "free") {
+      filtered = filtered.filter(w => !w.is_premium);
+    } else if (accessFilter === "premium") {
+      filtered = filtered.filter(w => w.is_premium);
+    }
+
+    setFilteredWorkouts(filtered);
+  };
 
   const loadWorkouts = async () => {
     try {
@@ -91,6 +131,70 @@ export const WorkoutsManager = () => {
     loadWorkouts();
   };
 
+  const toggleSelectAll = () => {
+    if (selectedWorkouts.length === filteredWorkouts.length) {
+      setSelectedWorkouts([]);
+    } else {
+      setSelectedWorkouts(filteredWorkouts.map(w => w.id));
+    }
+  };
+
+  const toggleSelect = (id: string) => {
+    setSelectedWorkouts(prev => 
+      prev.includes(id) ? prev.filter(i => i !== id) : [...prev, id]
+    );
+  };
+
+  const handleBulkDelete = async () => {
+    if (selectedWorkouts.length === 0) return;
+    
+    if (!confirm(`Delete ${selectedWorkouts.length} selected workouts?`)) return;
+
+    try {
+      const { error } = await supabase
+        .from('admin_workouts')
+        .delete()
+        .in('id', selectedWorkouts);
+
+      if (error) throw error;
+
+      toast({
+        title: "Success",
+        description: `Deleted ${selectedWorkouts.length} workouts`,
+      });
+      setSelectedWorkouts([]);
+      loadWorkouts();
+    } catch (error) {
+      console.error('Error deleting workouts:', error);
+      toast({
+        title: "Error",
+        description: "Failed to delete workouts",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleExport = () => {
+    const csv = [
+      ['ID', 'Name', 'Type', 'Difficulty', 'Duration', 'Access'].join(','),
+      ...filteredWorkouts.map(w => [
+        w.id,
+        `"${w.name}"`,
+        w.type,
+        w.difficulty,
+        w.duration,
+        w.is_premium ? w.tier_required || 'Premium' : 'Free'
+      ].join(','))
+    ].join('\n');
+
+    const blob = new Blob([csv], { type: 'text/csv' });
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'workouts.csv';
+    a.click();
+  };
+
   if (loading) {
     return <div className="text-center py-8">Loading workouts...</div>;
   }
@@ -102,18 +206,86 @@ export const WorkoutsManager = () => {
           <div className="flex items-center justify-between">
             <div>
               <CardTitle>Workouts Management</CardTitle>
-              <CardDescription>Manage all workout content and details</CardDescription>
+              <CardDescription>
+                {filteredWorkouts.length} workout{filteredWorkouts.length !== 1 ? 's' : ''} 
+                {selectedWorkouts.length > 0 && ` (${selectedWorkouts.length} selected)`}
+              </CardDescription>
             </div>
-            <Button onClick={handleNew}>
-              <Plus className="h-4 w-4 mr-2" />
-              New Workout
-            </Button>
+            <div className="flex gap-2">
+              <Button variant="outline" size="sm" onClick={handleExport}>
+                <Download className="h-4 w-4 mr-2" />
+                Export
+              </Button>
+              {selectedWorkouts.length > 0 && (
+                <Button variant="destructive" size="sm" onClick={handleBulkDelete}>
+                  <Trash2 className="h-4 w-4 mr-2" />
+                  Delete ({selectedWorkouts.length})
+                </Button>
+              )}
+              <Button onClick={handleNew}>
+                <Plus className="h-4 w-4 mr-2" />
+                New
+              </Button>
+            </div>
           </div>
         </CardHeader>
-        <CardContent>
+        <CardContent className="space-y-4">
+          <div className="flex gap-4 flex-wrap">
+            <div className="flex-1 min-w-[200px]">
+              <div className="relative">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                <Input
+                  placeholder="Search workouts..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="pl-9"
+                />
+              </div>
+            </div>
+            <Select value={typeFilter} onValueChange={setTypeFilter}>
+              <SelectTrigger className="w-[180px]">
+                <Filter className="h-4 w-4 mr-2" />
+                <SelectValue placeholder="Type" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Types</SelectItem>
+                <SelectItem value="HIIT">HIIT</SelectItem>
+                <SelectItem value="Strength">Strength</SelectItem>
+                <SelectItem value="Cardio">Cardio</SelectItem>
+                <SelectItem value="Mobility">Mobility</SelectItem>
+              </SelectContent>
+            </Select>
+            <Select value={difficultyFilter} onValueChange={setDifficultyFilter}>
+              <SelectTrigger className="w-[180px]">
+                <SelectValue placeholder="Difficulty" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Levels</SelectItem>
+                <SelectItem value="Beginner">Beginner</SelectItem>
+                <SelectItem value="Intermediate">Intermediate</SelectItem>
+                <SelectItem value="Advanced">Advanced</SelectItem>
+              </SelectContent>
+            </Select>
+            <Select value={accessFilter} onValueChange={setAccessFilter}>
+              <SelectTrigger className="w-[180px]">
+                <SelectValue placeholder="Access" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Access</SelectItem>
+                <SelectItem value="free">Free</SelectItem>
+                <SelectItem value="premium">Premium</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
           <Table>
             <TableHeader>
               <TableRow>
+                <TableHead className="w-12">
+                  <Checkbox
+                    checked={selectedWorkouts.length === filteredWorkouts.length && filteredWorkouts.length > 0}
+                    onCheckedChange={toggleSelectAll}
+                  />
+                </TableHead>
                 <TableHead>Name</TableHead>
                 <TableHead>Type</TableHead>
                 <TableHead>Difficulty</TableHead>
@@ -123,15 +295,21 @@ export const WorkoutsManager = () => {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {workouts.length === 0 ? (
+              {filteredWorkouts.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={6} className="text-center py-8 text-muted-foreground">
-                    No workouts yet. Create your first workout!
+                  <TableCell colSpan={7} className="text-center py-8 text-muted-foreground">
+                    {workouts.length === 0 ? 'No workouts yet. Create your first workout!' : 'No workouts match your filters.'}
                   </TableCell>
                 </TableRow>
               ) : (
-                workouts.map((workout) => (
+                filteredWorkouts.map((workout) => (
                   <TableRow key={workout.id}>
+                    <TableCell>
+                      <Checkbox
+                        checked={selectedWorkouts.includes(workout.id)}
+                        onCheckedChange={() => toggleSelect(workout.id)}
+                      />
+                    </TableCell>
                     <TableCell className="font-medium">{workout.name}</TableCell>
                     <TableCell>{workout.type}</TableCell>
                     <TableCell>{workout.difficulty}</TableCell>
