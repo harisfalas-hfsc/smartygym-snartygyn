@@ -18,8 +18,11 @@ export type Database = {
         Row: {
           category: string
           created_at: string | null
+          days_per_week: number | null
           description: string | null
+          difficulty: string | null
           duration: string | null
+          equipment: string | null
           expected_results: string | null
           id: string
           image_url: string | null
@@ -29,16 +32,21 @@ export type Database = {
           overview: string | null
           program_structure: string | null
           progression_plan: string | null
+          serial_number: number | null
           target_audience: string | null
           tier_required: string | null
           updated_at: string | null
           weekly_schedule: string | null
+          weeks: number | null
         }
         Insert: {
           category: string
           created_at?: string | null
+          days_per_week?: number | null
           description?: string | null
+          difficulty?: string | null
           duration?: string | null
+          equipment?: string | null
           expected_results?: string | null
           id: string
           image_url?: string | null
@@ -48,16 +56,21 @@ export type Database = {
           overview?: string | null
           program_structure?: string | null
           progression_plan?: string | null
+          serial_number?: number | null
           target_audience?: string | null
           tier_required?: string | null
           updated_at?: string | null
           weekly_schedule?: string | null
+          weeks?: number | null
         }
         Update: {
           category?: string
           created_at?: string | null
+          days_per_week?: number | null
           description?: string | null
+          difficulty?: string | null
           duration?: string | null
+          equipment?: string | null
           expected_results?: string | null
           id?: string
           image_url?: string | null
@@ -67,10 +80,12 @@ export type Database = {
           overview?: string | null
           program_structure?: string | null
           progression_plan?: string | null
+          serial_number?: number | null
           target_audience?: string | null
           tier_required?: string | null
           updated_at?: string | null
           weekly_schedule?: string | null
+          weeks?: number | null
         }
         Relationships: []
       }

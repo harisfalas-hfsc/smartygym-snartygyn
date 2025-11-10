@@ -16,6 +16,8 @@ interface Program {
   name: string;
   category: string;
   duration: string | null;
+  difficulty: string | null;
+  equipment: string | null;
   is_premium: boolean;
   tier_required: string | null;
 }
@@ -29,6 +31,8 @@ export const ProgramsManager = () => {
   const [selectedPrograms, setSelectedPrograms] = useState<string[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [categoryFilter, setCategoryFilter] = useState("all");
+  const [difficultyFilter, setDifficultyFilter] = useState("all");
+  const [equipmentFilter, setEquipmentFilter] = useState("all");
   const [accessFilter, setAccessFilter] = useState("all");
   const { toast } = useToast();
 
@@ -38,7 +42,7 @@ export const ProgramsManager = () => {
 
   useEffect(() => {
     filterPrograms();
-  }, [programs, searchTerm, categoryFilter, accessFilter]);
+  }, [programs, searchTerm, categoryFilter, difficultyFilter, equipmentFilter, accessFilter]);
 
   const filterPrograms = () => {
     let filtered = programs;
@@ -54,6 +58,14 @@ export const ProgramsManager = () => {
       filtered = filtered.filter(p => p.category === categoryFilter);
     }
 
+    if (difficultyFilter !== "all") {
+      filtered = filtered.filter(p => p.difficulty === difficultyFilter);
+    }
+
+    if (equipmentFilter !== "all") {
+      filtered = filtered.filter(p => p.equipment === equipmentFilter);
+    }
+
     if (accessFilter === "free") {
       filtered = filtered.filter(p => !p.is_premium);
     } else if (accessFilter === "premium") {
@@ -67,8 +79,8 @@ export const ProgramsManager = () => {
     try {
       const { data, error } = await supabase
         .from('admin_training_programs')
-        .select('id, name, category, duration, is_premium, tier_required')
-        .order('name');
+        .select('id, name, category, duration, difficulty, equipment, is_premium, tier_required')
+        .order('serial_number');
 
       if (error) throw error;
       setPrograms(data || []);
@@ -242,10 +254,38 @@ export const ProgramsManager = () => {
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">All Categories</SelectItem>
-                <SelectItem value="Strength">Strength</SelectItem>
-                <SelectItem value="Cardio">Cardio</SelectItem>
-                <SelectItem value="Hypertrophy">Hypertrophy</SelectItem>
-                <SelectItem value="Weight Loss">Weight Loss</SelectItem>
+                <SelectItem value="CARDIO">Cardio</SelectItem>
+                <SelectItem value="FUNCTIONAL STRENGTH">Functional Strength</SelectItem>
+                <SelectItem value="MUSCLE HYPERTROPHY">Muscle Hypertrophy</SelectItem>
+                <SelectItem value="WEIGHT LOSS">Weight Loss</SelectItem>
+                <SelectItem value="LOW BACK PAIN">Low Back Pain</SelectItem>
+                <SelectItem value="MOBILITY/STABILITY">Mobility/Stability</SelectItem>
+              </SelectContent>
+            </Select>
+            <Select value={difficultyFilter} onValueChange={setDifficultyFilter}>
+              <SelectTrigger className="w-[180px]">
+                <SelectValue placeholder="Difficulty" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Levels</SelectItem>
+                <SelectItem value="Beginner">Beginner</SelectItem>
+                <SelectItem value="Intermediate">Intermediate</SelectItem>
+                <SelectItem value="Advanced">Advanced</SelectItem>
+              </SelectContent>
+            </Select>
+            <Select value={equipmentFilter} onValueChange={setEquipmentFilter}>
+              <SelectTrigger className="w-[180px]">
+                <SelectValue placeholder="Equipment" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Equipment</SelectItem>
+                <SelectItem value="Bodyweight">Bodyweight</SelectItem>
+                <SelectItem value="Dumbbells">Dumbbells</SelectItem>
+                <SelectItem value="Barbell">Barbell</SelectItem>
+                <SelectItem value="Resistance Bands">Resistance Bands</SelectItem>
+                <SelectItem value="Kettlebell">Kettlebell</SelectItem>
+                <SelectItem value="Pull-up Bar">Pull-up Bar</SelectItem>
+                <SelectItem value="Gym Equipment">Gym Equipment</SelectItem>
               </SelectContent>
             </Select>
             <Select value={accessFilter} onValueChange={setAccessFilter}>
@@ -270,6 +310,8 @@ export const ProgramsManager = () => {
                 </TableHead>
                 <TableHead>Name</TableHead>
                 <TableHead>Category</TableHead>
+                <TableHead>Difficulty</TableHead>
+                <TableHead>Equipment</TableHead>
                 <TableHead>Duration</TableHead>
                 <TableHead>Access</TableHead>
                 <TableHead className="text-right">Actions</TableHead>
@@ -278,7 +320,7 @@ export const ProgramsManager = () => {
             <TableBody>
               {filteredPrograms.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={6} className="text-center py-8 text-muted-foreground">
+                  <TableCell colSpan={8} className="text-center py-8 text-muted-foreground">
                     {programs.length === 0 ? 'No programs yet. Create your first program!' : 'No programs match your filters.'}
                   </TableCell>
                 </TableRow>
@@ -293,6 +335,8 @@ export const ProgramsManager = () => {
                     </TableCell>
                     <TableCell className="font-medium">{program.name}</TableCell>
                     <TableCell>{program.category}</TableCell>
+                    <TableCell>{program.difficulty || 'N/A'}</TableCell>
+                    <TableCell>{program.equipment || 'N/A'}</TableCell>
                     <TableCell>{program.duration || 'N/A'}</TableCell>
                     <TableCell>
                       {program.is_premium ? (

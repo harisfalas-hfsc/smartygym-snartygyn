@@ -10,30 +10,34 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { useToast } from "@/hooks/use-toast";
 
 const PROGRAM_CATEGORIES = [
-  "Functional Strength",
-  "Muscle Hypertrophy",
-  "Cardio",
-  "Weight Loss",
-  "Mobility & Stability",
-  "Low Back Pain Prevention & Performance"
+  "CARDIO",
+  "FUNCTIONAL STRENGTH",
+  "MUSCLE HYPERTROPHY",
+  "WEIGHT LOSS",
+  "LOW BACK PAIN",
+  "MOBILITY/STABILITY"
 ];
 
-const PROGRAM_DURATIONS = [
-  "4 Weeks / 3 Training Days per Week",
-  "4 Weeks / 4 Training Days per Week",
-  "4 Weeks / 5 Training Days per Week",
-  "6 Weeks / 3 Days per Week",
-  "6 Weeks / 4 Training Days per Week",
-  "6 Weeks / 4 Days per Week",
-  "6 Weeks / 5 Training Days",
-  "8 Weeks / 4 Days per Week",
-  "8 Weeks / 5 Days per Week",
-  "8 Weeks / 5 Training Days per Week",
-  "8 Weeks / 6 Training Days per Week",
-  "10 Weeks / 4 Training Days per Week",
-  "12 Weeks / 4 Training Days per Week",
-  "12 Weeks / 5 Training Days per Week"
+const DIFFICULTY_LEVELS = ["Beginner", "Intermediate", "Advanced"];
+
+const WEEKS_OPTIONS = [4, 6, 8];
+const DAYS_PER_WEEK_OPTIONS = [3, 4, 5, 6];
+
+const EQUIPMENT_OPTIONS = [
+  "Bodyweight",
+  "Dumbbells",
+  "Barbell",
+  "Resistance Bands",
+  "Kettlebell",
+  "Pull-up Bar",
+  "Gym Equipment"
 ];
+
+interface WeekDayContent {
+  week: number;
+  day: number;
+  content: string;
+}
 
 interface ProgramEditDialogProps {
   program: any;
@@ -46,82 +50,119 @@ export const ProgramEditDialog = ({ program, open, onOpenChange, onSave }: Progr
   const { toast } = useToast();
   const [formData, setFormData] = useState({
     id: '',
+    serial_number: 0,
     name: '',
     category: '',
-    duration: '',
+    difficulty: '',
+    weeks: 4,
+    days_per_week: 4,
+    equipment: '',
     description: '',
-    overview: '',
-    target_audience: '',
-    program_structure: '',
-    weekly_schedule: '',
-    progression_plan: '',
-    nutrition_tips: '',
-    expected_results: '',
+    instructions: '',
+    tips: '',
     image_url: '',
     is_premium: false,
     tier_required: '',
   });
+  const [weekDayContents, setWeekDayContents] = useState<WeekDayContent[]>([]);
 
   useEffect(() => {
-    const generateProgramId = async () => {
-      const { data } = await supabase
-        .from('admin_training_programs')
-        .select('id')
-        .order('id', { ascending: false })
-        .limit(1);
+    if (program) {
+      setFormData({
+        id: program.id,
+        serial_number: program.serial_number || 0,
+        name: program.name,
+        category: program.category,
+        difficulty: program.difficulty || 'Beginner',
+        weeks: program.weeks || 4,
+        days_per_week: program.days_per_week || 4,
+        equipment: program.equipment || '',
+        description: program.description || '',
+        instructions: program.progression_plan || '',
+        tips: program.nutrition_tips || '',
+        image_url: program.image_url || '',
+        is_premium: program.is_premium || false,
+        tier_required: program.tier_required || '',
+      });
       
-      if (data && data.length > 0) {
-        const lastId = data[0].id;
-        const match = lastId.match(/T-[A-Z](\d+)/);
-        if (match) {
-          const nextNum = parseInt(match[1]) + 1;
-          return `T-F${nextNum.toString().padStart(3, '0')}`;
+      // Parse weekly_schedule if exists
+      if (program.weekly_schedule) {
+        try {
+          const parsed = JSON.parse(program.weekly_schedule);
+          setWeekDayContents(parsed);
+        } catch {
+          setWeekDayContents([]);
         }
       }
-      return 'T-F001';
-    };
-
-    if (program) {
-      setFormData(program);
     } else {
-      generateProgramId().then(newId => {
-        setFormData({
-          id: newId,
-          name: '',
-          category: '',
-          duration: '',
-          description: '',
-          overview: '',
-          target_audience: '',
-          program_structure: '',
-          weekly_schedule: '',
-          progression_plan: '',
-          nutrition_tips: '',
-          expected_results: '',
-          image_url: '',
-          is_premium: false,
-          tier_required: '',
-        });
+      setFormData({
+        id: '',
+        serial_number: 0,
+        name: '',
+        category: '',
+        difficulty: 'Beginner',
+        weeks: 4,
+        days_per_week: 4,
+        equipment: '',
+        description: '',
+        instructions: '',
+        tips: '',
+        image_url: '',
+        is_premium: false,
+        tier_required: '',
       });
+      setWeekDayContents([]);
     }
   }, [program]);
 
+  // Generate week/day boxes when weeks or days_per_week changes
+  useEffect(() => {
+    const boxes: WeekDayContent[] = [];
+    for (let week = 1; week <= formData.weeks; week++) {
+      for (let day = 1; day <= formData.days_per_week; day++) {
+        const existing = weekDayContents.find(wdc => wdc.week === week && wdc.day === day);
+        boxes.push({
+          week,
+          day,
+          content: existing?.content || ''
+        });
+      }
+    }
+    setWeekDayContents(boxes);
+  }, [formData.weeks, formData.days_per_week]);
+
+  const updateWeekDayContent = (week: number, day: number, content: string) => {
+    setWeekDayContents(prev => 
+      prev.map(wdc => 
+        wdc.week === week && wdc.day === day ? { ...wdc, content } : wdc
+      )
+    );
+  };
+
   const handleSave = async () => {
     try {
+      const duration = `${formData.weeks} Weeks / ${formData.days_per_week} Days per Week`;
+      
+      const dataToSave = {
+        ...formData,
+        duration,
+        weekly_schedule: JSON.stringify(weekDayContents),
+        progression_plan: formData.instructions,
+        nutrition_tips: formData.tips,
+      };
+
       if (program) {
-        // Update existing
         const { error } = await supabase
           .from('admin_training_programs')
-          .update(formData)
+          .update(dataToSave)
           .eq('id', program.id);
 
         if (error) throw error;
         toast({ title: "Success", description: "Program updated successfully" });
       } else {
-        // Insert new
         const { error } = await supabase
           .from('admin_training_programs')
-          .insert([formData]);
+          .insert([dataToSave]);
 
         if (error) throw error;
         toast({ title: "Success", description: "Program created successfully" });
@@ -148,142 +189,179 @@ export const ProgramEditDialog = ({ program, open, onOpenChange, onSave }: Progr
         </DialogHeader>
 
         <div className="space-y-4">
-          <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label htmlFor="id">Program ID</Label>
-              <Input
-                id="id"
-                value={formData.id}
-                onChange={(e) => setFormData({ ...formData, id: e.target.value })}
-                placeholder="e.g., T-F001"
-                disabled={!!program}
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="name">Name</Label>
-              <Input
-                id="name"
-                value={formData.name}
-                onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                placeholder="Program name"
-              />
-            </div>
-          </div>
-
-          <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label htmlFor="category">Category</Label>
-              <Select value={formData.category} onValueChange={(value) => setFormData({ ...formData, category: value })}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Select category" />
-                </SelectTrigger>
-                <SelectContent>
-                  {PROGRAM_CATEGORIES.map(cat => (
-                    <SelectItem key={cat} value={cat}>{cat}</SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="duration">Duration</Label>
-              <Select value={formData.duration} onValueChange={(value) => setFormData({ ...formData, duration: value })}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Select duration" />
-                </SelectTrigger>
-                <SelectContent>
-                  {PROGRAM_DURATIONS.map(dur => (
-                    <SelectItem key={dur} value={dur}>{dur}</SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-          </div>
-
+          {/* 1. Category */}
           <div className="space-y-2">
-            <Label htmlFor="description">Description</Label>
+            <Label htmlFor="category">1. Category</Label>
+            <Select value={formData.category} onValueChange={(value) => setFormData({ ...formData, category: value })}>
+              <SelectTrigger>
+                <SelectValue placeholder="Select category" />
+              </SelectTrigger>
+              <SelectContent>
+                {PROGRAM_CATEGORIES.map(cat => (
+                  <SelectItem key={cat} value={cat}>{cat}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+
+          {/* 2. Serial Number */}
+          <div className="space-y-2">
+            <Label htmlFor="serial_number">2. Serial Number</Label>
+            <Input
+              id="serial_number"
+              type="number"
+              value={formData.serial_number}
+              onChange={(e) => setFormData({ ...formData, serial_number: parseInt(e.target.value) || 0 })}
+              placeholder="e.g., 1"
+            />
+          </div>
+
+          {/* 3. Name */}
+          <div className="space-y-2">
+            <Label htmlFor="name">3. Name</Label>
+            <Input
+              id="name"
+              value={formData.name}
+              onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+              placeholder="Program name"
+            />
+          </div>
+
+          {/* 4. Difficulty Level */}
+          <div className="space-y-2">
+            <Label htmlFor="difficulty">4. Difficulty Level</Label>
+            <Select value={formData.difficulty} onValueChange={(value) => setFormData({ ...formData, difficulty: value })}>
+              <SelectTrigger>
+                <SelectValue placeholder="Select difficulty" />
+              </SelectTrigger>
+              <SelectContent>
+                {DIFFICULTY_LEVELS.map(level => (
+                  <SelectItem key={level} value={level}>{level}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+
+          {/* 5. Duration */}
+          <div className="space-y-2">
+            <Label>5. Duration</Label>
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="weeks">Weeks</Label>
+                <Select 
+                  value={formData.weeks.toString()} 
+                  onValueChange={(value) => setFormData({ ...formData, weeks: parseInt(value) })}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select weeks" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {WEEKS_OPTIONS.map(weeks => (
+                      <SelectItem key={weeks} value={weeks.toString()}>{weeks} Weeks</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="days_per_week">Training Days per Week</Label>
+                <Select 
+                  value={formData.days_per_week.toString()} 
+                  onValueChange={(value) => setFormData({ ...formData, days_per_week: parseInt(value) })}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select days" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {DAYS_PER_WEEK_OPTIONS.map(days => (
+                      <SelectItem key={days} value={days.toString()}>{days} Days</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+          </div>
+
+          {/* 6. Equipment */}
+          <div className="space-y-2">
+            <Label htmlFor="equipment">6. Equipment</Label>
+            <Select value={formData.equipment} onValueChange={(value) => setFormData({ ...formData, equipment: value })}>
+              <SelectTrigger>
+                <SelectValue placeholder="Select equipment" />
+              </SelectTrigger>
+              <SelectContent>
+                {EQUIPMENT_OPTIONS.map(equip => (
+                  <SelectItem key={equip} value={equip}>{equip}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+
+          {/* 7. Training Program Content - Week/Day Boxes */}
+          <div className="space-y-4">
+            <Label>7. Training Program Content</Label>
+            <div className="space-y-6">
+              {Array.from({ length: formData.weeks }, (_, weekIndex) => (
+                <div key={weekIndex} className="border rounded-lg p-4 space-y-3">
+                  <h4 className="font-semibold text-lg">Week {weekIndex + 1}</h4>
+                  <div className="space-y-3">
+                    {Array.from({ length: formData.days_per_week }, (_, dayIndex) => {
+                      const content = weekDayContents.find(
+                        wdc => wdc.week === weekIndex + 1 && wdc.day === dayIndex + 1
+                      );
+                      return (
+                        <div key={dayIndex} className="space-y-2">
+                          <Label htmlFor={`week-${weekIndex + 1}-day-${dayIndex + 1}`}>
+                            Day {dayIndex + 1}
+                          </Label>
+                          <Textarea
+                            id={`week-${weekIndex + 1}-day-${dayIndex + 1}`}
+                            value={content?.content || ''}
+                            onChange={(e) => updateWeekDayContent(weekIndex + 1, dayIndex + 1, e.target.value)}
+                            placeholder={`Training content for Week ${weekIndex + 1}, Day ${dayIndex + 1}`}
+                            rows={4}
+                          />
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* 8. Description */}
+          <div className="space-y-2">
+            <Label htmlFor="description">8. Description</Label>
             <Textarea
               id="description"
               value={formData.description}
               onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-              placeholder="Brief description"
+              placeholder="Brief description of the program"
               rows={3}
             />
           </div>
 
+          {/* 9. Instructions */}
           <div className="space-y-2">
-            <Label htmlFor="overview">Overview</Label>
+            <Label htmlFor="instructions">9. Instructions</Label>
             <Textarea
-              id="overview"
-              value={formData.overview}
-              onChange={(e) => setFormData({ ...formData, overview: e.target.value })}
-              placeholder="Program overview"
+              id="instructions"
+              value={formData.instructions}
+              onChange={(e) => setFormData({ ...formData, instructions: e.target.value })}
+              placeholder="Program instructions and progression plan"
               rows={4}
             />
           </div>
 
+          {/* 10. Tips */}
           <div className="space-y-2">
-            <Label htmlFor="target_audience">Target Audience</Label>
+            <Label htmlFor="tips">10. Tips</Label>
             <Textarea
-              id="target_audience"
-              value={formData.target_audience}
-              onChange={(e) => setFormData({ ...formData, target_audience: e.target.value })}
-              placeholder="Who is this program for?"
-              rows={3}
-            />
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="program_structure">Program Structure</Label>
-            <Textarea
-              id="program_structure"
-              value={formData.program_structure}
-              onChange={(e) => setFormData({ ...formData, program_structure: e.target.value })}
-              placeholder="How is the program structured?"
-              rows={5}
-            />
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="weekly_schedule">Weekly Schedule</Label>
-            <Textarea
-              id="weekly_schedule"
-              value={formData.weekly_schedule}
-              onChange={(e) => setFormData({ ...formData, weekly_schedule: e.target.value })}
-              placeholder="Weekly training schedule"
-              rows={5}
-            />
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="progression_plan">Progression Plan</Label>
-            <Textarea
-              id="progression_plan"
-              value={formData.progression_plan}
-              onChange={(e) => setFormData({ ...formData, progression_plan: e.target.value })}
-              placeholder="How to progress through the program"
+              id="tips"
+              value={formData.tips}
+              onChange={(e) => setFormData({ ...formData, tips: e.target.value })}
+              placeholder="Nutrition tips and additional guidance"
               rows={4}
-            />
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="nutrition_tips">Nutrition Tips</Label>
-            <Textarea
-              id="nutrition_tips"
-              value={formData.nutrition_tips}
-              onChange={(e) => setFormData({ ...formData, nutrition_tips: e.target.value })}
-              placeholder="Nutrition recommendations"
-              rows={4}
-            />
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="expected_results">Expected Results</Label>
-            <Textarea
-              id="expected_results"
-              value={formData.expected_results}
-              onChange={(e) => setFormData({ ...formData, expected_results: e.target.value })}
-              placeholder="What results can users expect?"
-              rows={3}
             />
           </div>
 
