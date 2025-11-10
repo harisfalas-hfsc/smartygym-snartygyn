@@ -46,6 +46,7 @@ import PersonalTraining from "./pages/PersonalTraining";
 import PaymentSuccess from "./pages/PaymentSuccess";
 import NewsletterThankYou from "./pages/NewsletterThankYou";
 import Community from "./pages/Community";
+import AdminBackoffice from "./pages/AdminBackoffice";
 import { AccessGate } from "./components/AccessGate";
 import { WhatsAppButton } from "./components/WhatsAppButton";
 
@@ -100,6 +101,7 @@ const App = () => (
                   <Route path="/bmrcalculator" element={<BMRCalculator />} />
                   <Route path="/macrocalculator" element={<MacroTrackingCalculator />} />
                   <Route path="/caloriecalculator" element={<MacroTrackingCalculator />} />
+                  <Route path="/admin" element={<AdminBackoffice />} />
                 </Route>
                 
                 {/* Public routes */}

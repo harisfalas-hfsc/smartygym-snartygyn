@@ -14,6 +14,126 @@ export type Database = {
   }
   public: {
     Tables: {
+      admin_training_programs: {
+        Row: {
+          category: string
+          created_at: string | null
+          description: string | null
+          duration: string | null
+          expected_results: string | null
+          id: string
+          image_url: string | null
+          is_premium: boolean | null
+          name: string
+          nutrition_tips: string | null
+          overview: string | null
+          program_structure: string | null
+          progression_plan: string | null
+          target_audience: string | null
+          tier_required: string | null
+          updated_at: string | null
+          weekly_schedule: string | null
+        }
+        Insert: {
+          category: string
+          created_at?: string | null
+          description?: string | null
+          duration?: string | null
+          expected_results?: string | null
+          id: string
+          image_url?: string | null
+          is_premium?: boolean | null
+          name: string
+          nutrition_tips?: string | null
+          overview?: string | null
+          program_structure?: string | null
+          progression_plan?: string | null
+          target_audience?: string | null
+          tier_required?: string | null
+          updated_at?: string | null
+          weekly_schedule?: string | null
+        }
+        Update: {
+          category?: string
+          created_at?: string | null
+          description?: string | null
+          duration?: string | null
+          expected_results?: string | null
+          id?: string
+          image_url?: string | null
+          is_premium?: boolean | null
+          name?: string
+          nutrition_tips?: string | null
+          overview?: string | null
+          program_structure?: string | null
+          progression_plan?: string | null
+          target_audience?: string | null
+          tier_required?: string | null
+          updated_at?: string | null
+          weekly_schedule?: string | null
+        }
+        Relationships: []
+      }
+      admin_workouts: {
+        Row: {
+          cool_down: string | null
+          created_at: string | null
+          description: string | null
+          difficulty: string | null
+          duration: string | null
+          equipment: string | null
+          focus: string | null
+          id: string
+          image_url: string | null
+          is_premium: boolean | null
+          main_workout: string | null
+          name: string
+          notes: string | null
+          tier_required: string | null
+          type: string
+          updated_at: string | null
+          warm_up: string | null
+        }
+        Insert: {
+          cool_down?: string | null
+          created_at?: string | null
+          description?: string | null
+          difficulty?: string | null
+          duration?: string | null
+          equipment?: string | null
+          focus?: string | null
+          id: string
+          image_url?: string | null
+          is_premium?: boolean | null
+          main_workout?: string | null
+          name: string
+          notes?: string | null
+          tier_required?: string | null
+          type: string
+          updated_at?: string | null
+          warm_up?: string | null
+        }
+        Update: {
+          cool_down?: string | null
+          created_at?: string | null
+          description?: string | null
+          difficulty?: string | null
+          duration?: string | null
+          equipment?: string | null
+          focus?: string | null
+          id?: string
+          image_url?: string | null
+          is_premium?: boolean | null
+          main_workout?: string | null
+          name?: string
+          notes?: string | null
+          tier_required?: string | null
+          type?: string
+          updated_at?: string | null
+          warm_up?: string | null
+        }
+        Relationships: []
+      }
       bmr_history: {
         Row: {
           age: number
@@ -446,6 +566,27 @@ export type Database = {
         }
         Relationships: []
       }
+      user_roles: {
+        Row: {
+          created_at: string | null
+          id: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          user_id?: string
+        }
+        Relationships: []
+      }
       user_subscriptions: {
         Row: {
           cancel_at_period_end: boolean | null
@@ -577,9 +718,16 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      has_role: {
+        Args: {
+          _role: Database["public"]["Enums"]["app_role"]
+          _user_id: string
+        }
+        Returns: boolean
+      }
     }
     Enums: {
+      app_role: "admin" | "moderator" | "user"
       plan_type: "free" | "gold" | "platinum"
       subscription_status: "active" | "canceled" | "past_due"
     }
@@ -709,6 +857,7 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
+      app_role: ["admin", "moderator", "user"],
       plan_type: ["free", "gold", "platinum"],
       subscription_status: ["active", "canceled", "past_due"],
     },
