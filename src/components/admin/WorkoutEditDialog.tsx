@@ -22,7 +22,8 @@ const CATEGORIES = [
 const FORMATS = [
   "Tabata",
   "Circuit",
-  "AMRAP for time",
+  "AMRAP",
+  "For Time",
   "EMOM",
   "Reps and Set",
   "Mix"
