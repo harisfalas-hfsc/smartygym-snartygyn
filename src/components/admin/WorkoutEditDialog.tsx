@@ -9,6 +9,21 @@ import { Switch } from "@/components/ui/switch";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
 
+const WORKOUT_TYPES = [
+  "HIIT", "Strength", "Cardio", "Mobility", "Core", "Full Body",
+  "Upper Body", "Lower Body", "Endurance", "Circuit", "Functional"
+];
+
+const EQUIPMENT_OPTIONS = [
+  "None (Bodyweight)", "Dumbbells", "Barbells", "Resistance Bands",
+  "Kettlebells", "Pull-up Bar", "Bench", "Medicine Ball", "Jump Rope", "Mixed"
+];
+
+const FOCUS_OPTIONS = [
+  "Full Body", "Upper Body", "Lower Body", "Core", "Cardio",
+  "Strength", "Endurance", "Power", "Hypertrophy", "Fat Loss", "Mobility"
+];
+
 interface WorkoutEditDialogProps {
   workout: any;
   open: boolean;
@@ -37,25 +52,45 @@ export const WorkoutEditDialog = ({ workout, open, onOpenChange, onSave }: Worko
   });
 
   useEffect(() => {
+    const generateWorkoutId = async () => {
+      const { data } = await supabase
+        .from('admin_workouts')
+        .select('id')
+        .order('id', { ascending: false })
+        .limit(1);
+      
+      if (data && data.length > 0) {
+        const lastId = data[0].id;
+        const match = lastId.match(/W-(\d+)/);
+        if (match) {
+          const nextNum = parseInt(match[1]) + 1;
+          return `W-${nextNum.toString().padStart(3, '0')}`;
+        }
+      }
+      return 'W-001';
+    };
+
     if (workout) {
       setFormData(workout);
     } else {
-      setFormData({
-        id: '',
-        name: '',
-        type: '',
-        description: '',
-        duration: '',
-        equipment: '',
-        difficulty: '',
-        focus: '',
-        warm_up: '',
-        main_workout: '',
-        cool_down: '',
-        notes: '',
-        image_url: '',
-        is_premium: false,
-        tier_required: '',
+      generateWorkoutId().then(newId => {
+        setFormData({
+          id: newId,
+          name: '',
+          type: '',
+          description: '',
+          duration: '',
+          equipment: '',
+          difficulty: '',
+          focus: '',
+          warm_up: '',
+          main_workout: '',
+          cool_down: '',
+          notes: '',
+          image_url: '',
+          is_premium: false,
+          tier_required: '',
+        });
       });
     }
   }, [workout]);
@@ -127,12 +162,16 @@ export const WorkoutEditDialog = ({ workout, open, onOpenChange, onSave }: Worko
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
               <Label htmlFor="type">Type</Label>
-              <Input
-                id="type"
-                value={formData.type}
-                onChange={(e) => setFormData({ ...formData, type: e.target.value })}
-                placeholder="e.g., HIIT, Strength"
-              />
+              <Select value={formData.type} onValueChange={(value) => setFormData({ ...formData, type: value })}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Select type" />
+                </SelectTrigger>
+                <SelectContent>
+                  {WORKOUT_TYPES.map(type => (
+                    <SelectItem key={type} value={type}>{type}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
             <div className="space-y-2">
               <Label htmlFor="difficulty">Difficulty</Label>
@@ -161,21 +200,29 @@ export const WorkoutEditDialog = ({ workout, open, onOpenChange, onSave }: Worko
             </div>
             <div className="space-y-2">
               <Label htmlFor="equipment">Equipment</Label>
-              <Input
-                id="equipment"
-                value={formData.equipment}
-                onChange={(e) => setFormData({ ...formData, equipment: e.target.value })}
-                placeholder="e.g., Dumbbells"
-              />
+              <Select value={formData.equipment} onValueChange={(value) => setFormData({ ...formData, equipment: value })}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Select equipment" />
+                </SelectTrigger>
+                <SelectContent>
+                  {EQUIPMENT_OPTIONS.map(eq => (
+                    <SelectItem key={eq} value={eq}>{eq}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
             <div className="space-y-2">
               <Label htmlFor="focus">Focus</Label>
-              <Input
-                id="focus"
-                value={formData.focus}
-                onChange={(e) => setFormData({ ...formData, focus: e.target.value })}
-                placeholder="e.g., Full Body"
-              />
+              <Select value={formData.focus} onValueChange={(value) => setFormData({ ...formData, focus: value })}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Select focus" />
+                </SelectTrigger>
+                <SelectContent>
+                  {FOCUS_OPTIONS.map(focus => (
+                    <SelectItem key={focus} value={focus}>{focus}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
           </div>
 

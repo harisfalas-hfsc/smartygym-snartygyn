@@ -9,6 +9,16 @@ import { Switch } from "@/components/ui/switch";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
 
+const PROGRAM_CATEGORIES = [
+  "Functional Strength", "Muscle Hypertrophy", "Weight Loss", "Cardio Endurance",
+  "Mobility & Flexibility", "Athletic Performance", "Powerlifting", "Bodybuilding",
+  "General Fitness", "Injury Prevention", "Rehabilitation"
+];
+
+const PROGRAM_DURATIONS = [
+  "4 weeks", "6 weeks", "8 weeks", "10 weeks", "12 weeks", "16 weeks", "20 weeks"
+];
+
 interface ProgramEditDialogProps {
   program: any;
   open: boolean;
@@ -37,25 +47,45 @@ export const ProgramEditDialog = ({ program, open, onOpenChange, onSave }: Progr
   });
 
   useEffect(() => {
+    const generateProgramId = async () => {
+      const { data } = await supabase
+        .from('admin_training_programs')
+        .select('id')
+        .order('id', { ascending: false })
+        .limit(1);
+      
+      if (data && data.length > 0) {
+        const lastId = data[0].id;
+        const match = lastId.match(/T-[A-Z](\d+)/);
+        if (match) {
+          const nextNum = parseInt(match[1]) + 1;
+          return `T-F${nextNum.toString().padStart(3, '0')}`;
+        }
+      }
+      return 'T-F001';
+    };
+
     if (program) {
       setFormData(program);
     } else {
-      setFormData({
-        id: '',
-        name: '',
-        category: '',
-        duration: '',
-        description: '',
-        overview: '',
-        target_audience: '',
-        program_structure: '',
-        weekly_schedule: '',
-        progression_plan: '',
-        nutrition_tips: '',
-        expected_results: '',
-        image_url: '',
-        is_premium: false,
-        tier_required: '',
+      generateProgramId().then(newId => {
+        setFormData({
+          id: newId,
+          name: '',
+          category: '',
+          duration: '',
+          description: '',
+          overview: '',
+          target_audience: '',
+          program_structure: '',
+          weekly_schedule: '',
+          progression_plan: '',
+          nutrition_tips: '',
+          expected_results: '',
+          image_url: '',
+          is_premium: false,
+          tier_required: '',
+        });
       });
     }
   }, [program]);
@@ -127,21 +157,29 @@ export const ProgramEditDialog = ({ program, open, onOpenChange, onSave }: Progr
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
               <Label htmlFor="category">Category</Label>
-              <Input
-                id="category"
-                value={formData.category}
-                onChange={(e) => setFormData({ ...formData, category: e.target.value })}
-                placeholder="e.g., Functional Strength"
-              />
+              <Select value={formData.category} onValueChange={(value) => setFormData({ ...formData, category: value })}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Select category" />
+                </SelectTrigger>
+                <SelectContent>
+                  {PROGRAM_CATEGORIES.map(cat => (
+                    <SelectItem key={cat} value={cat}>{cat}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
             <div className="space-y-2">
               <Label htmlFor="duration">Duration</Label>
-              <Input
-                id="duration"
-                value={formData.duration}
-                onChange={(e) => setFormData({ ...formData, duration: e.target.value })}
-                placeholder="e.g., 12 weeks"
-              />
+              <Select value={formData.duration} onValueChange={(value) => setFormData({ ...formData, duration: value })}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Select duration" />
+                </SelectTrigger>
+                <SelectContent>
+                  {PROGRAM_DURATIONS.map(dur => (
+                    <SelectItem key={dur} value={dur}>{dur}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
           </div>
 
