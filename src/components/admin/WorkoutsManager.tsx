@@ -15,6 +15,9 @@ interface Workout {
   id: string;
   name: string;
   type: string;
+  category: string;
+  format: string;
+  equipment: string;
   difficulty: string;
   duration: string;
   is_premium: boolean;
@@ -29,6 +32,9 @@ export const WorkoutsManager = () => {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [selectedWorkouts, setSelectedWorkouts] = useState<string[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
+  const [categoryFilter, setCategoryFilter] = useState("all");
+  const [formatFilter, setFormatFilter] = useState("all");
+  const [equipmentFilter, setEquipmentFilter] = useState("all");
   const [typeFilter, setTypeFilter] = useState("all");
   const [difficultyFilter, setDifficultyFilter] = useState("all");
   const [accessFilter, setAccessFilter] = useState("all");
@@ -40,7 +46,7 @@ export const WorkoutsManager = () => {
 
   useEffect(() => {
     filterWorkouts();
-  }, [workouts, searchTerm, typeFilter, difficultyFilter, accessFilter]);
+  }, [workouts, searchTerm, categoryFilter, formatFilter, equipmentFilter, typeFilter, difficultyFilter, accessFilter]);
 
   const filterWorkouts = () => {
     let filtered = workouts;
@@ -50,6 +56,18 @@ export const WorkoutsManager = () => {
         w.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
         w.id.toLowerCase().includes(searchTerm.toLowerCase())
       );
+    }
+
+    if (categoryFilter !== "all") {
+      filtered = filtered.filter(w => w.category === categoryFilter);
+    }
+
+    if (formatFilter !== "all") {
+      filtered = filtered.filter(w => w.format === formatFilter);
+    }
+
+    if (equipmentFilter !== "all") {
+      filtered = filtered.filter(w => w.equipment === equipmentFilter);
     }
 
     if (typeFilter !== "all") {
@@ -73,7 +91,7 @@ export const WorkoutsManager = () => {
     try {
       const { data, error } = await supabase
         .from('admin_workouts')
-        .select('id, name, type, difficulty, duration, is_premium, tier_required')
+        .select('id, name, type, category, format, equipment, difficulty, duration, is_premium, tier_required')
         .order('name');
 
       if (error) throw error;
@@ -242,17 +260,71 @@ export const WorkoutsManager = () => {
                 />
               </div>
             </div>
-            <Select value={typeFilter} onValueChange={setTypeFilter}>
+            <Select value={categoryFilter} onValueChange={setCategoryFilter}>
               <SelectTrigger className="w-[180px]">
                 <Filter className="h-4 w-4 mr-2" />
+                <SelectValue placeholder="Category" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Categories</SelectItem>
+                <SelectItem value="STRENGTH">STRENGTH</SelectItem>
+                <SelectItem value="CARDIO">CARDIO</SelectItem>
+                <SelectItem value="MOBILITY">MOBILITY</SelectItem>
+                <SelectItem value="CONDITIONING">CONDITIONING</SelectItem>
+                <SelectItem value="POWER">POWER</SelectItem>
+                <SelectItem value="RECOVERY">RECOVERY</SelectItem>
+              </SelectContent>
+            </Select>
+            <Select value={formatFilter} onValueChange={setFormatFilter}>
+              <SelectTrigger className="w-[180px]">
+                <SelectValue placeholder="Format" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Formats</SelectItem>
+                <SelectItem value="CIRCUIT">CIRCUIT</SelectItem>
+                <SelectItem value="AMRAP">AMRAP</SelectItem>
+                <SelectItem value="EMOM">EMOM</SelectItem>
+                <SelectItem value="TABATA">TABATA</SelectItem>
+                <SelectItem value="REPS & SETS">REPS & SETS</SelectItem>
+                <SelectItem value="TIMED SETS">TIMED SETS</SelectItem>
+                <SelectItem value="INTERVALS">INTERVALS</SelectItem>
+                <SelectItem value="LADDER">LADDER</SelectItem>
+                <SelectItem value="COMPLEX">COMPLEX</SelectItem>
+              </SelectContent>
+            </Select>
+            <Select value={equipmentFilter} onValueChange={setEquipmentFilter}>
+              <SelectTrigger className="w-[180px]">
+                <SelectValue placeholder="Equipment" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Equipment</SelectItem>
+                <SelectItem value="BODYWEIGHT">BODYWEIGHT</SelectItem>
+                <SelectItem value="DUMBBELLS">DUMBBELLS</SelectItem>
+                <SelectItem value="BARBELL">BARBELL</SelectItem>
+                <SelectItem value="KETTLEBELL">KETTLEBELL</SelectItem>
+                <SelectItem value="RESISTANCE BANDS">RESISTANCE BANDS</SelectItem>
+                <SelectItem value="MIXED">MIXED</SelectItem>
+                <SelectItem value="MINIMAL">MINIMAL</SelectItem>
+              </SelectContent>
+            </Select>
+            <Select value={typeFilter} onValueChange={setTypeFilter}>
+              <SelectTrigger className="w-[180px]">
                 <SelectValue placeholder="Type" />
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">All Types</SelectItem>
                 <SelectItem value="HIIT">HIIT</SelectItem>
-                <SelectItem value="Strength">Strength</SelectItem>
-                <SelectItem value="Cardio">Cardio</SelectItem>
-                <SelectItem value="Mobility">Mobility</SelectItem>
+                <SelectItem value="STRENGTH">STRENGTH</SelectItem>
+                <SelectItem value="CARDIO">CARDIO</SelectItem>
+                <SelectItem value="MOBILITY">MOBILITY</SelectItem>
+                <SelectItem value="CIRCUIT">CIRCUIT</SelectItem>
+                <SelectItem value="AMRAP">AMRAP</SelectItem>
+                <SelectItem value="EMOM">EMOM</SelectItem>
+                <SelectItem value="TABATA">TABATA</SelectItem>
+                <SelectItem value="METCON">METCON</SelectItem>
+                <SelectItem value="ENDURANCE">ENDURANCE</SelectItem>
+                <SelectItem value="POWER">POWER</SelectItem>
+                <SelectItem value="RECOVERY">RECOVERY</SelectItem>
               </SelectContent>
             </Select>
             <Select value={difficultyFilter} onValueChange={setDifficultyFilter}>
@@ -287,6 +359,8 @@ export const WorkoutsManager = () => {
                   />
                 </TableHead>
                 <TableHead>Name</TableHead>
+                <TableHead>Category</TableHead>
+                <TableHead>Format</TableHead>
                 <TableHead>Type</TableHead>
                 <TableHead>Difficulty</TableHead>
                 <TableHead>Duration</TableHead>
@@ -297,7 +371,7 @@ export const WorkoutsManager = () => {
             <TableBody>
               {filteredWorkouts.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={7} className="text-center py-8 text-muted-foreground">
+                  <TableCell colSpan={9} className="text-center py-8 text-muted-foreground">
                     {workouts.length === 0 ? 'No workouts yet. Create your first workout!' : 'No workouts match your filters.'}
                   </TableCell>
                 </TableRow>
@@ -311,6 +385,8 @@ export const WorkoutsManager = () => {
                       />
                     </TableCell>
                     <TableCell className="font-medium">{workout.name}</TableCell>
+                    <TableCell><Badge variant="outline">{workout.category}</Badge></TableCell>
+                    <TableCell><Badge variant="outline">{workout.format}</Badge></TableCell>
                     <TableCell>{workout.type}</TableCell>
                     <TableCell>{workout.difficulty}</TableCell>
                     <TableCell>{workout.duration}</TableCell>
