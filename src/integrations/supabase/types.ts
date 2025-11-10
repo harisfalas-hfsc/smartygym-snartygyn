@@ -275,6 +275,30 @@ export type Database = {
         }
         Relationships: []
       }
+      email_campaign_log: {
+        Row: {
+          campaign_type: string
+          email_id: string | null
+          id: string
+          sent_at: string | null
+          user_id: string
+        }
+        Insert: {
+          campaign_type: string
+          email_id?: string | null
+          id?: string
+          sent_at?: string | null
+          user_id: string
+        }
+        Update: {
+          campaign_type?: string
+          email_id?: string | null
+          id?: string
+          sent_at?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       email_templates: {
         Row: {
           body: string
