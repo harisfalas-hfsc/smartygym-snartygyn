@@ -4,9 +4,10 @@ import { useAdminRole } from "@/hooks/useAdminRole";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, Dumbbell, Calendar, Settings } from "lucide-react";
+import { ArrowLeft, Dumbbell, Calendar, Settings, Users } from "lucide-react";
 import { WorkoutsManager } from "@/components/admin/WorkoutsManager";
 import { ProgramsManager } from "@/components/admin/ProgramsManager";
+import { UsersManager } from "@/components/admin/UsersManager";
 
 export default function AdminBackoffice() {
   const navigate = useNavigate();
@@ -68,7 +69,7 @@ export default function AdminBackoffice() {
 
         {/* Main Content */}
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="grid w-full max-w-md grid-cols-3">
+          <TabsList className="grid w-full max-w-2xl grid-cols-4">
             <TabsTrigger value="workouts" className="flex items-center gap-2">
               <Dumbbell className="h-4 w-4" />
               Workouts
@@ -76,6 +77,10 @@ export default function AdminBackoffice() {
             <TabsTrigger value="programs" className="flex items-center gap-2">
               <Calendar className="h-4 w-4" />
               Programs
+            </TabsTrigger>
+            <TabsTrigger value="users" className="flex items-center gap-2">
+              <Users className="h-4 w-4" />
+              Users
             </TabsTrigger>
             <TabsTrigger value="settings" className="flex items-center gap-2">
               <Settings className="h-4 w-4" />
@@ -89,6 +94,10 @@ export default function AdminBackoffice() {
 
           <TabsContent value="programs" className="mt-6">
             <ProgramsManager />
+          </TabsContent>
+
+          <TabsContent value="users" className="mt-6">
+            <UsersManager />
           </TabsContent>
 
           <TabsContent value="settings" className="mt-6">
