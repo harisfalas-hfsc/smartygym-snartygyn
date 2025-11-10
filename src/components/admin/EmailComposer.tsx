@@ -7,8 +7,16 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
-import { Mail, Send, Users, AlertCircle, CheckCircle2 } from "lucide-react";
+import { Mail, Send, Users, AlertCircle, CheckCircle2, FileText } from "lucide-react";
 import { toast } from "sonner";
+
+interface EmailTemplate {
+  id: string;
+  name: string;
+  subject: string;
+  body: string;
+  category: string;
+}
 
 interface UserData {
   user_id: string;
@@ -21,6 +29,7 @@ interface UserData {
 export function EmailComposer() {
   const [users, setUsers] = useState<UserData[]>([]);
   const [filteredUsers, setFilteredUsers] = useState<UserData[]>([]);
+  const [templates, setTemplates] = useState<EmailTemplate[]>([]);
   const [loading, setLoading] = useState(true);
   const [sending, setSending] = useState(false);
   
@@ -31,6 +40,7 @@ export function EmailComposer() {
   // Email content
   const [subject, setSubject] = useState("");
   const [message, setMessage] = useState("");
+  const [selectedTemplate, setSelectedTemplate] = useState<string>("");
   
   // Confirmation dialog
   const [showConfirm, setShowConfirm] = useState(false);
@@ -72,8 +82,24 @@ export function EmailComposer() {
     }
   };
 
+  const fetchTemplates = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('email_templates')
+        .select('id, name, subject, body, category')
+        .eq('is_active', true)
+        .order('name');
+
+      if (error) throw error;
+      setTemplates(data || []);
+    } catch (error) {
+      console.error('Error fetching templates:', error);
+    }
+  };
+
   useEffect(() => {
     fetchUsers();
+    fetchTemplates();
   }, []);
 
   useEffect(() => {
@@ -206,7 +232,36 @@ export function EmailComposer() {
 
           {/* Email Content */}
           <div className="space-y-4">
-            <h3 className="text-sm font-medium">Compose Email</h3>
+            <div className="flex items-center justify-between">
+              <h3 className="text-sm font-medium">Compose Email</h3>
+              {templates.length > 0 && (
+                <div className="flex items-center gap-2">
+                  <FileText className="h-4 w-4 text-muted-foreground" />
+                  <Select
+                    value={selectedTemplate}
+                    onValueChange={(value) => {
+                      setSelectedTemplate(value);
+                      const template = templates.find(t => t.id === value);
+                      if (template) {
+                        setSubject(template.subject);
+                        setMessage(template.body);
+                      }
+                    }}
+                  >
+                    <SelectTrigger className="w-[200px]">
+                      <SelectValue placeholder="Use template" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {templates.map((template) => (
+                        <SelectItem key={template.id} value={template.id}>
+                          {template.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+              )}
+            </div>
             
             <div className="space-y-2">
               <label className="text-sm text-muted-foreground">Subject</label>
@@ -228,7 +283,7 @@ export function EmailComposer() {
                 disabled={sending}
               />
               <p className="text-xs text-muted-foreground">
-                Plain text will be converted to HTML. Line breaks will be preserved.
+                Use {`{{name}}`}, {`{{plan_type}}`}, {`{{renewal_date}}`} as placeholders. Plain text will be converted to HTML.
               </p>
             </div>
           </div>

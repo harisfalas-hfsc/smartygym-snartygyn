@@ -209,6 +209,39 @@ export type Database = {
         }
         Relationships: []
       }
+      email_templates: {
+        Row: {
+          body: string
+          category: string
+          created_at: string | null
+          id: string
+          is_active: boolean | null
+          name: string
+          subject: string
+          updated_at: string | null
+        }
+        Insert: {
+          body: string
+          category: string
+          created_at?: string | null
+          id?: string
+          is_active?: boolean | null
+          name: string
+          subject: string
+          updated_at?: string | null
+        }
+        Update: {
+          body?: string
+          category?: string
+          created_at?: string | null
+          id?: string
+          is_active?: boolean | null
+          name?: string
+          subject?: string
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       newsletter_subscribers: {
         Row: {
           active: boolean

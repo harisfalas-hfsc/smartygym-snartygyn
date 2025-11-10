@@ -4,11 +4,12 @@ import { useAdminRole } from "@/hooks/useAdminRole";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, Dumbbell, Calendar, Settings, Users, Mail } from "lucide-react";
+import { ArrowLeft, Dumbbell, Calendar, Settings, Users, Mail, FileText } from "lucide-react";
 import { WorkoutsManager } from "@/components/admin/WorkoutsManager";
 import { ProgramsManager } from "@/components/admin/ProgramsManager";
 import { UsersManager } from "@/components/admin/UsersManager";
 import { EmailComposer } from "@/components/admin/EmailComposer";
+import { EmailTemplatesManager } from "@/components/admin/EmailTemplatesManager";
 
 export default function AdminBackoffice() {
   const navigate = useNavigate();
@@ -70,26 +71,30 @@ export default function AdminBackoffice() {
 
         {/* Main Content */}
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="grid w-full max-w-3xl grid-cols-5">
+          <TabsList className="grid w-full max-w-4xl grid-cols-6">
             <TabsTrigger value="workouts" className="flex items-center gap-2">
               <Dumbbell className="h-4 w-4" />
-              Workouts
+              <span className="hidden sm:inline">Workouts</span>
             </TabsTrigger>
             <TabsTrigger value="programs" className="flex items-center gap-2">
               <Calendar className="h-4 w-4" />
-              Programs
+              <span className="hidden sm:inline">Programs</span>
             </TabsTrigger>
             <TabsTrigger value="users" className="flex items-center gap-2">
               <Users className="h-4 w-4" />
-              Users
+              <span className="hidden sm:inline">Users</span>
             </TabsTrigger>
             <TabsTrigger value="email" className="flex items-center gap-2">
               <Mail className="h-4 w-4" />
-              Email
+              <span className="hidden sm:inline">Email</span>
+            </TabsTrigger>
+            <TabsTrigger value="templates" className="flex items-center gap-2">
+              <FileText className="h-4 w-4" />
+              <span className="hidden sm:inline">Templates</span>
             </TabsTrigger>
             <TabsTrigger value="settings" className="flex items-center gap-2">
               <Settings className="h-4 w-4" />
-              Settings
+              <span className="hidden sm:inline">Settings</span>
             </TabsTrigger>
           </TabsList>
 
@@ -107,6 +112,10 @@ export default function AdminBackoffice() {
 
           <TabsContent value="email" className="mt-6">
             <EmailComposer />
+          </TabsContent>
+
+          <TabsContent value="templates" className="mt-6">
+            <EmailTemplatesManager />
           </TabsContent>
 
           <TabsContent value="settings" className="mt-6">
