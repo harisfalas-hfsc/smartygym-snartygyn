@@ -41,6 +41,25 @@ serve(async (req) => {
     
     logStep("User details fetched", { email: userEmail, name: userName });
 
+    // Check user notification preferences
+    const { data: preferences } = await supabaseAdmin
+      .from("notification_preferences")
+      .select("newsletter")
+      .eq("user_id", record.user_id)
+      .single();
+
+    // Skip if user has disabled newsletter emails
+    if (preferences && !preferences.newsletter) {
+      logStep("User has disabled newsletter emails, skipping");
+      return new Response(
+        JSON.stringify({ success: false, reason: "User preferences: newsletter disabled" }),
+        {
+          status: 200,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        }
+      );
+    }
+
     // Get welcome email template
     const { data: template, error: templateError } = await supabaseAdmin
       .from("email_templates")

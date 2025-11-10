@@ -3,17 +3,19 @@ import { useNavigate } from "react-router-dom";
 import { Helmet } from "react-helmet";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
-import { ArrowLeft, Loader2, Save, Crown, CheckCircle } from "lucide-react";
+import { ArrowLeft, Loader2, Save, Crown, CheckCircle, User, Bell } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { useProfileData } from "@/hooks/useProfileData";
 import { useShowBackButton } from "@/hooks/useShowBackButton";
 import { useAccessControl } from "@/hooks/useAccessControl";
 import { ShareButtons } from "@/components/ShareButtons";
+import { NotificationPreferences } from "@/components/NotificationPreferences";
 
 const fitnessGoalOptions = [
   "Build Strength",
@@ -221,13 +223,26 @@ const ProfileSettings = () => {
           </div>
         </div>
 
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-2xl">Your Profile Settings</CardTitle>
-            <CardDescription>
-              Update your fitness profile information. This data will be used to pre-fill your workout and diet plan questionnaires and provide personalized recommendations.
-            </CardDescription>
-          </CardHeader>
+        <Tabs defaultValue="profile" className="w-full">
+          <TabsList className="grid w-full grid-cols-2 mb-6">
+            <TabsTrigger value="profile" className="flex items-center gap-2">
+              <User className="h-4 w-4" />
+              Profile Settings
+            </TabsTrigger>
+            <TabsTrigger value="notifications" className="flex items-center gap-2">
+              <Bell className="h-4 w-4" />
+              Notifications
+            </TabsTrigger>
+          </TabsList>
+
+          <TabsContent value="profile">
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-2xl">Your Profile Settings</CardTitle>
+                <CardDescription>
+                  Update your fitness profile information. This data will be used to pre-fill your workout and diet plan questionnaires and provide personalized recommendations.
+                </CardDescription>
+              </CardHeader>
           <CardContent className="space-y-6">
             {/* Premium Status Banner */}
             {userTier === "premium" && (
@@ -434,9 +449,15 @@ const ProfileSettings = () => {
                   </>
                 )}
               </Button>
-            </div>
-          </CardContent>
-        </Card>
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="notifications">
+          <NotificationPreferences />
+        </TabsContent>
+      </Tabs>
       </div>
       </div>
     </>

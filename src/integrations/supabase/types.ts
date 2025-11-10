@@ -386,6 +386,45 @@ export type Database = {
         }
         Relationships: []
       }
+      notification_preferences: {
+        Row: {
+          community_updates: boolean | null
+          created_at: string | null
+          id: string
+          newsletter: boolean | null
+          promotional_emails: boolean | null
+          renewal_reminders: boolean | null
+          updated_at: string | null
+          user_id: string
+          workout_completion_emails: boolean | null
+          workout_reminders: boolean | null
+        }
+        Insert: {
+          community_updates?: boolean | null
+          created_at?: string | null
+          id?: string
+          newsletter?: boolean | null
+          promotional_emails?: boolean | null
+          renewal_reminders?: boolean | null
+          updated_at?: string | null
+          user_id: string
+          workout_completion_emails?: boolean | null
+          workout_reminders?: boolean | null
+        }
+        Update: {
+          community_updates?: boolean | null
+          created_at?: string | null
+          id?: string
+          newsletter?: boolean | null
+          promotional_emails?: boolean | null
+          renewal_reminders?: boolean | null
+          updated_at?: string | null
+          user_id?: string
+          workout_completion_emails?: boolean | null
+          workout_reminders?: boolean | null
+        }
+        Relationships: []
+      }
       onerm_history: {
         Row: {
           created_at: string

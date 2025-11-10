@@ -85,6 +85,19 @@ serve(async (req) => {
         const userName = profile?.full_name || "there";
         const renewalDate = new Date(subscription.current_period_end).toLocaleDateString();
 
+        // Check user notification preferences
+        const { data: preferences } = await supabaseAdmin
+          .from("notification_preferences")
+          .select("renewal_reminders")
+          .eq("user_id", subscription.user_id)
+          .single();
+
+        // Skip if user has disabled renewal reminders
+        if (preferences && !preferences.renewal_reminders) {
+          logStep("User has disabled renewal reminders, skipping", { userId: subscription.user_id });
+          continue;
+        }
+
         // Replace placeholders
         const subject = template?.subject.replace(/{{name}}/g, userName) || "Your subscription is renewing soon";
         const body = (template?.body || "")

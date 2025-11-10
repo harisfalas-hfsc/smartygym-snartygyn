@@ -88,6 +88,19 @@ serve(async (req) => {
 
         const userName = profile?.full_name || "there";
 
+        // Check user notification preferences
+        const { data: preferences } = await supabaseAdmin
+          .from("notification_preferences")
+          .select("promotional_emails")
+          .eq("user_id", subscription.user_id)
+          .single();
+
+        // Skip if user has disabled promotional emails
+        if (preferences && !preferences.promotional_emails) {
+          logStep("User has disabled promotional emails, skipping", { userId: subscription.user_id });
+          continue;
+        }
+
         // Replace placeholders
         const subject = template?.subject.replace(/{{name}}/g, userName) || "We miss you at SmartyGym!";
         const body = (template?.body || "")
