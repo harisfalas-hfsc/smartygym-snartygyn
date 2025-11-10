@@ -76,58 +76,82 @@ export type Database = {
       }
       admin_workouts: {
         Row: {
+          activation: string | null
+          category: string | null
           cool_down: string | null
           created_at: string | null
           description: string | null
           difficulty: string | null
+          difficulty_stars: number | null
           duration: string | null
           equipment: string | null
+          finisher: string | null
           focus: string | null
+          format: string | null
           id: string
           image_url: string | null
+          instructions: string | null
           is_premium: boolean | null
           main_workout: string | null
           name: string
           notes: string | null
+          serial_number: number | null
           tier_required: string | null
+          tips: string | null
           type: string
           updated_at: string | null
           warm_up: string | null
         }
         Insert: {
+          activation?: string | null
+          category?: string | null
           cool_down?: string | null
           created_at?: string | null
           description?: string | null
           difficulty?: string | null
+          difficulty_stars?: number | null
           duration?: string | null
           equipment?: string | null
+          finisher?: string | null
           focus?: string | null
+          format?: string | null
           id: string
           image_url?: string | null
+          instructions?: string | null
           is_premium?: boolean | null
           main_workout?: string | null
           name: string
           notes?: string | null
+          serial_number?: number | null
           tier_required?: string | null
+          tips?: string | null
           type: string
           updated_at?: string | null
           warm_up?: string | null
         }
         Update: {
+          activation?: string | null
+          category?: string | null
           cool_down?: string | null
           created_at?: string | null
           description?: string | null
           difficulty?: string | null
+          difficulty_stars?: number | null
           duration?: string | null
           equipment?: string | null
+          finisher?: string | null
           focus?: string | null
+          format?: string | null
           id?: string
           image_url?: string | null
+          instructions?: string | null
           is_premium?: boolean | null
           main_workout?: string | null
           name?: string
           notes?: string | null
+          serial_number?: number | null
           tier_required?: string | null
+          tips?: string | null
           type?: string
           updated_at?: string | null
           warm_up?: string | null

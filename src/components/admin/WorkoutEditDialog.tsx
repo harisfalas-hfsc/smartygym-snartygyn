@@ -9,20 +9,37 @@ import { Switch } from "@/components/ui/switch";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
 
-const WORKOUT_TYPES = [
-  "HIIT", "Strength", "Cardio", "Mobility", "Core", "Full Body",
-  "Upper Body", "Lower Body", "Endurance", "Circuit", "Functional"
+const CATEGORIES = [
+  "Strength",
+  "Calorie Burning",
+  "Metabolic",
+  "Cardio",
+  "Mobility and Stability",
+  "Power",
+  "Challenge"
 ];
 
-const EQUIPMENT_OPTIONS = [
-  "None (Bodyweight)", "Dumbbells", "Barbells", "Resistance Bands",
-  "Kettlebells", "Pull-up Bar", "Bench", "Medicine Ball", "Jump Rope", "Mixed"
+const FORMATS = [
+  "Tabata",
+  "Circuit",
+  "AMRAP for time",
+  "EMOM",
+  "Reps and Set",
+  "Mix"
 ];
 
-const FOCUS_OPTIONS = [
-  "Full Body", "Upper Body", "Lower Body", "Core", "Cardio",
-  "Strength", "Endurance", "Power", "Hypertrophy", "Fat Loss", "Mobility"
+const EQUIPMENT_OPTIONS = ["Bodyweight", "Equipment"];
+
+const DURATION_OPTIONS = [
+  "15 minutes",
+  "20 minutes",
+  "30 minutes",
+  "45 minutes",
+  "60 minutes",
+  "Varies"
 ];
+
+const DIFFICULTY_STARS = [1, 2, 3, 4, 5, 6];
 
 interface WorkoutEditDialogProps {
   workout: any;
@@ -35,58 +52,63 @@ export const WorkoutEditDialog = ({ workout, open, onOpenChange, onSave }: Worko
   const { toast } = useToast();
   const [formData, setFormData] = useState({
     id: '',
+    serial_number: 0,
     name: '',
-    type: '',
-    description: '',
-    duration: '',
-    equipment: '',
-    difficulty: '',
+    category: '',
     focus: '',
+    difficulty_stars: 3,
+    equipment: '',
+    format: '',
+    duration: '',
+    activation: '',
     warm_up: '',
     main_workout: '',
+    finisher: '',
     cool_down: '',
-    notes: '',
+    description: '',
+    instructions: '',
+    tips: '',
     image_url: '',
     is_premium: false,
     tier_required: '',
   });
 
   useEffect(() => {
-    const generateWorkoutId = async () => {
+    const generateSerialNumber = async () => {
       const { data } = await supabase
         .from('admin_workouts')
-        .select('id')
-        .order('id', { ascending: false })
+        .select('serial_number')
+        .order('serial_number', { ascending: false })
         .limit(1);
       
-      if (data && data.length > 0) {
-        const lastId = data[0].id;
-        const match = lastId.match(/W-(\d+)/);
-        if (match) {
-          const nextNum = parseInt(match[1]) + 1;
-          return `W-${nextNum.toString().padStart(3, '0')}`;
-        }
+      if (data && data.length > 0 && data[0].serial_number) {
+        return data[0].serial_number + 1;
       }
-      return 'W-001';
+      return 1;
     };
 
     if (workout) {
       setFormData(workout);
     } else {
-      generateWorkoutId().then(newId => {
+      generateSerialNumber().then(nextSerial => {
         setFormData({
-          id: newId,
+          id: `W-${nextSerial.toString().padStart(3, '0')}`,
+          serial_number: nextSerial,
           name: '',
-          type: '',
-          description: '',
-          duration: '',
-          equipment: '',
-          difficulty: '',
+          category: '',
           focus: '',
+          difficulty_stars: 3,
+          equipment: '',
+          format: '',
+          duration: '',
+          activation: '',
           warm_up: '',
           main_workout: '',
+          finisher: '',
           cool_down: '',
-          notes: '',
+          description: '',
+          instructions: '',
+          tips: '',
           image_url: '',
           is_premium: false,
           tier_required: '',
@@ -95,13 +117,26 @@ export const WorkoutEditDialog = ({ workout, open, onOpenChange, onSave }: Worko
     }
   }, [workout]);
 
+  const getDifficultyLabel = (stars: number) => {
+    if (stars <= 2) return "Beginner";
+    if (stars <= 4) return "Intermediate";
+    return "Advanced";
+  };
+
   const handleSave = async () => {
     try {
+      // Prepare data with backward compatibility
+      const saveData = {
+        ...formData,
+        type: formData.format || formData.category, // For backward compatibility
+        difficulty: getDifficultyLabel(formData.difficulty_stars), // For backward compatibility
+      };
+
       if (workout) {
         // Update existing
         const { error } = await supabase
           .from('admin_workouts')
-          .update(formData)
+          .update(saveData)
           .eq('id', workout.id);
 
         if (error) throw error;
@@ -110,7 +145,7 @@ export const WorkoutEditDialog = ({ workout, open, onOpenChange, onSave }: Worko
         // Insert new
         const { error } = await supabase
           .from('admin_workouts')
-          .insert([formData]);
+          .insert([saveData]);
 
         if (error) throw error;
         toast({ title: "Success", description: "Workout created successfully" });
@@ -137,152 +172,235 @@ export const WorkoutEditDialog = ({ workout, open, onOpenChange, onSave }: Worko
         </DialogHeader>
 
         <div className="space-y-4">
-          <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label htmlFor="id">Workout ID</Label>
-              <Input
-                id="id"
-                value={formData.id}
-                onChange={(e) => setFormData({ ...formData, id: e.target.value })}
-                placeholder="e.g., W-001"
-                disabled={!!workout}
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="name">Name</Label>
-              <Input
-                id="name"
-                value={formData.name}
-                onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                placeholder="Workout name"
-              />
-            </div>
-          </div>
-
-          <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label htmlFor="type">Type</Label>
-              <Select value={formData.type} onValueChange={(value) => setFormData({ ...formData, type: value })}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Select type" />
-                </SelectTrigger>
-                <SelectContent>
-                  {WORKOUT_TYPES.map(type => (
-                    <SelectItem key={type} value={type}>{type}</SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="difficulty">Difficulty</Label>
-              <Select value={formData.difficulty} onValueChange={(value) => setFormData({ ...formData, difficulty: value })}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Select difficulty" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="Beginner">Beginner</SelectItem>
-                  <SelectItem value="Intermediate">Intermediate</SelectItem>
-                  <SelectItem value="Advanced">Advanced</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-          </div>
-
-          <div className="grid grid-cols-3 gap-4">
-            <div className="space-y-2">
-              <Label htmlFor="duration">Duration</Label>
-              <Input
-                id="duration"
-                value={formData.duration}
-                onChange={(e) => setFormData({ ...formData, duration: e.target.value })}
-                placeholder="e.g., 30 mins"
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="equipment">Equipment</Label>
-              <Select value={formData.equipment} onValueChange={(value) => setFormData({ ...formData, equipment: value })}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Select equipment" />
-                </SelectTrigger>
-                <SelectContent>
-                  {EQUIPMENT_OPTIONS.map(eq => (
-                    <SelectItem key={eq} value={eq}>{eq}</SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="focus">Focus</Label>
-              <Select value={formData.focus} onValueChange={(value) => setFormData({ ...formData, focus: value })}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Select focus" />
-                </SelectTrigger>
-                <SelectContent>
-                  {FOCUS_OPTIONS.map(focus => (
-                    <SelectItem key={focus} value={focus}>{focus}</SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-          </div>
-
+          {/* 1. Category */}
           <div className="space-y-2">
-            <Label htmlFor="description">Description</Label>
+            <Label htmlFor="category">1. Category *</Label>
+            <Select 
+              value={formData.category} 
+              onValueChange={(value) => setFormData({ ...formData, category: value, focus: value })}
+            >
+              <SelectTrigger>
+                <SelectValue placeholder="Select category" />
+              </SelectTrigger>
+              <SelectContent>
+                {CATEGORIES.map(cat => (
+                  <SelectItem key={cat} value={cat}>{cat}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+
+          {/* 2. Serial Number */}
+          <div className="space-y-2">
+            <Label htmlFor="serial_number">2. Serial Number</Label>
+            <Input
+              id="serial_number"
+              type="number"
+              value={formData.serial_number}
+              onChange={(e) => {
+                const serial = parseInt(e.target.value) || 0;
+                setFormData({ 
+                  ...formData, 
+                  serial_number: serial,
+                  id: `W-${serial.toString().padStart(3, '0')}`
+                });
+              }}
+              placeholder="Auto-generated"
+            />
+            <p className="text-sm text-muted-foreground">Workout ID: {formData.id}</p>
+          </div>
+
+          {/* 3. Name */}
+          <div className="space-y-2">
+            <Label htmlFor="name">3. Workout Name *</Label>
+            <Input
+              id="name"
+              value={formData.name}
+              onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+              placeholder="Enter workout name"
+            />
+          </div>
+
+          {/* 4. Focus (auto-filled from category) */}
+          <div className="space-y-2">
+            <Label htmlFor="focus">4. Focus (Auto-filled from Category)</Label>
+            <Input
+              id="focus"
+              value={formData.focus}
+              disabled
+              className="bg-muted"
+            />
+          </div>
+
+          {/* 5. Difficulty Level (Stars) */}
+          <div className="space-y-2">
+            <Label>5. Difficulty Level *</Label>
+            <div className="flex items-center gap-4">
+              <Select 
+                value={formData.difficulty_stars.toString()} 
+                onValueChange={(value) => setFormData({ ...formData, difficulty_stars: parseInt(value) })}
+              >
+                <SelectTrigger className="w-32">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {DIFFICULTY_STARS.map(stars => (
+                    <SelectItem key={stars} value={stars.toString()}>
+                      {"⭐".repeat(stars)}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <span className="text-sm text-muted-foreground">
+                {getDifficultyLabel(formData.difficulty_stars)}
+              </span>
+            </div>
+          </div>
+
+          {/* 6. Equipment */}
+          <div className="space-y-2">
+            <Label htmlFor="equipment">6. Equipment *</Label>
+            <Select value={formData.equipment} onValueChange={(value) => setFormData({ ...formData, equipment: value })}>
+              <SelectTrigger>
+                <SelectValue placeholder="Select equipment" />
+              </SelectTrigger>
+              <SelectContent>
+                {EQUIPMENT_OPTIONS.map(eq => (
+                  <SelectItem key={eq} value={eq}>{eq}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+
+          {/* 7. Format */}
+          <div className="space-y-2">
+            <Label htmlFor="format">7. Format *</Label>
+            <Select value={formData.format} onValueChange={(value) => setFormData({ ...formData, format: value })}>
+              <SelectTrigger>
+                <SelectValue placeholder="Select format" />
+              </SelectTrigger>
+              <SelectContent>
+                {FORMATS.map(format => (
+                  <SelectItem key={format} value={format}>{format}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+
+          {/* 8. Duration */}
+          <div className="space-y-2">
+            <Label htmlFor="duration">8. Duration *</Label>
+            <Select value={formData.duration} onValueChange={(value) => setFormData({ ...formData, duration: value })}>
+              <SelectTrigger>
+                <SelectValue placeholder="Select duration" />
+              </SelectTrigger>
+              <SelectContent>
+                {DURATION_OPTIONS.map(dur => (
+                  <SelectItem key={dur} value={dur}>{dur}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+
+          {/* 9. Workout Sections */}
+          <div className="space-y-4 pt-4 border-t">
+            <h3 className="font-semibold">9. Workout Sections</h3>
+            
+            <div className="space-y-2">
+              <Label htmlFor="activation">Activation</Label>
+              <Textarea
+                id="activation"
+                value={formData.activation}
+                onChange={(e) => setFormData({ ...formData, activation: e.target.value })}
+                placeholder="Activation exercises..."
+                rows={4}
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="warm_up">Warm Up</Label>
+              <Textarea
+                id="warm_up"
+                value={formData.warm_up}
+                onChange={(e) => setFormData({ ...formData, warm_up: e.target.value })}
+                placeholder="Warm up exercises..."
+                rows={4}
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="main_workout">Primary Workout</Label>
+              <Textarea
+                id="main_workout"
+                value={formData.main_workout}
+                onChange={(e) => setFormData({ ...formData, main_workout: e.target.value })}
+                placeholder="Main workout content..."
+                rows={6}
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="finisher">Finisher</Label>
+              <Textarea
+                id="finisher"
+                value={formData.finisher}
+                onChange={(e) => setFormData({ ...formData, finisher: e.target.value })}
+                placeholder="Finisher exercises..."
+                rows={4}
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="cool_down">Cool Down</Label>
+              <Textarea
+                id="cool_down"
+                value={formData.cool_down}
+                onChange={(e) => setFormData({ ...formData, cool_down: e.target.value })}
+                placeholder="Cool down exercises..."
+                rows={4}
+              />
+            </div>
+          </div>
+
+          {/* 10. Description */}
+          <div className="space-y-2">
+            <Label htmlFor="description">10. Description</Label>
             <Textarea
               id="description"
               value={formData.description}
               onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-              placeholder="Brief description"
+              placeholder="Brief description of the workout..."
               rows={3}
             />
           </div>
 
+          {/* 11. Instructions */}
           <div className="space-y-2">
-            <Label htmlFor="warm_up">Warm Up</Label>
+            <Label htmlFor="instructions">11. Instructions</Label>
             <Textarea
-              id="warm_up"
-              value={formData.warm_up}
-              onChange={(e) => setFormData({ ...formData, warm_up: e.target.value })}
-              placeholder="Warm up exercises"
+              id="instructions"
+              value={formData.instructions}
+              onChange={(e) => setFormData({ ...formData, instructions: e.target.value })}
+              placeholder="Step-by-step instructions..."
               rows={4}
             />
           </div>
 
+          {/* 12. Tips */}
           <div className="space-y-2">
-            <Label htmlFor="main_workout">Main Workout</Label>
+            <Label htmlFor="tips">12. Tips</Label>
             <Textarea
-              id="main_workout"
-              value={formData.main_workout}
-              onChange={(e) => setFormData({ ...formData, main_workout: e.target.value })}
-              placeholder="Main workout content"
-              rows={6}
-            />
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="cool_down">Cool Down</Label>
-            <Textarea
-              id="cool_down"
-              value={formData.cool_down}
-              onChange={(e) => setFormData({ ...formData, cool_down: e.target.value })}
-              placeholder="Cool down exercises"
-              rows={4}
-            />
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="notes">Notes</Label>
-            <Textarea
-              id="notes"
-              value={formData.notes}
-              onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
-              placeholder="Additional notes"
+              id="tips"
+              value={formData.tips}
+              onChange={(e) => setFormData({ ...formData, tips: e.target.value })}
+              placeholder="Helpful tips for this workout..."
               rows={3}
             />
           </div>
 
+          {/* Image URL */}
           <div className="space-y-2">
-            <Label htmlFor="image_url">Image URL</Label>
+            <Label htmlFor="image_url">Image URL (Optional)</Label>
             <Input
               id="image_url"
               value={formData.image_url}
@@ -291,29 +409,33 @@ export const WorkoutEditDialog = ({ workout, open, onOpenChange, onSave }: Worko
             />
           </div>
 
-          <div className="flex items-center space-x-2">
-            <Switch
-              id="is_premium"
-              checked={formData.is_premium}
-              onCheckedChange={(checked) => setFormData({ ...formData, is_premium: checked })}
-            />
-            <Label htmlFor="is_premium">Premium Content</Label>
-          </div>
-
-          {formData.is_premium && (
-            <div className="space-y-2">
-              <Label htmlFor="tier_required">Tier Required</Label>
-              <Select value={formData.tier_required} onValueChange={(value) => setFormData({ ...formData, tier_required: value })}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Select tier" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="gold">Gold</SelectItem>
-                  <SelectItem value="platinum">Platinum</SelectItem>
-                </SelectContent>
-              </Select>
+          {/* 13. Free or Premium */}
+          <div className="space-y-4 pt-4 border-t">
+            <Label>13. Access Level *</Label>
+            <div className="flex items-center space-x-2">
+              <Switch
+                id="is_premium"
+                checked={formData.is_premium}
+                onCheckedChange={(checked) => setFormData({ ...formData, is_premium: checked })}
+              />
+              <Label htmlFor="is_premium" className="cursor-pointer">Premium Content</Label>
             </div>
-          )}
+
+            {formData.is_premium && (
+              <div className="space-y-2 ml-6">
+                <Label htmlFor="tier_required">Required Tier</Label>
+                <Select value={formData.tier_required} onValueChange={(value) => setFormData({ ...formData, tier_required: value })}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select tier" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="gold">Gold</SelectItem>
+                    <SelectItem value="platinum">Platinum</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            )}
+          </div>
 
           <div className="flex justify-end gap-2 pt-4">
             <Button variant="outline" onClick={() => onOpenChange(false)}>
