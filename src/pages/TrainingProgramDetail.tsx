@@ -1,10 +1,11 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { Helmet } from "react-helmet";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { ArrowLeft, Calendar } from "lucide-react";
 import { AccessGate } from "@/components/AccessGate";
+import { useAllPrograms } from "@/hooks/useProgramData";
 import cardioEnduranceImg from "@/assets/cardio-endurance-program.jpg";
 import functionalStrengthImg from "@/assets/functional-strength-program.jpg";
 import muscleHypertrophyImg from "@/assets/muscle-hypertrophy-program.jpg";
@@ -45,6 +46,19 @@ const TrainingProgramDetail = () => {
   const [equipmentFilter, setEquipmentFilter] = useState<EquipmentFilter>("all");
   const [levelFilter, setLevelFilter] = useState<LevelFilter>("all");
   const [durationFilter, setDurationFilter] = useState<DurationFilter>("all");
+
+  // Fetch programs from database
+  const { data: allPrograms = [], isLoading } = useAllPrograms();
+  
+  // Map URL type to database category
+  const categoryMap: { [key: string]: string } = {
+    "cardio-endurance": "CARDIO",
+    "functional-strength": "STRENGTH",
+    "muscle-hypertrophy": "HYPERTROPHY",
+    "weight-loss": "WEIGHT LOSS",
+    "low-back-pain": "RECOVERY",
+    "mobility-stability": "MOBILITY"
+  };
 
   const programTitles: { [key: string]: string } = {
     "cardio-endurance": "Cardio Endurance Programs",
@@ -308,17 +322,37 @@ const TrainingProgramDetail = () => {
   };
 
   const title = programTitles[type || ""] || "Training Programs";
-  const programs = programData[type || "cardio-endurance"] || [];
+  const mappedCategory = categoryMap[type || "cardio-endurance"];
   
-  const filteredPrograms = programs.filter(
-    program => 
-      (equipmentFilter === "all" || program.equipment === equipmentFilter) &&
-      (levelFilter === "all" || program.level === levelFilter) &&
-      (durationFilter === "all" || program.duration === durationFilter)
-  );
+  // Filter programs by category from URL and user filters
+  const filteredPrograms = allPrograms.filter(program => {
+    // Match category
+    if (!program.category?.toUpperCase().includes(mappedCategory)) return false;
+    
+    // Equipment filter
+    if (equipmentFilter !== "all") {
+      const hasEquipment = program.duration?.toLowerCase() !== "bodyweight";
+      if (equipmentFilter === "bodyweight" && hasEquipment) return false;
+      if (equipmentFilter === "equipment" && !hasEquipment) return false;
+    }
+    
+    // Duration filter (programs use "duration" field like "6 weeks", "8 weeks")
+    if (durationFilter !== "all") {
+      const programWeeks = program.duration?.match(/\d+/)?.[0];
+      if (programWeeks !== durationFilter) return false;
+    }
+    
+    return true;
+  });
 
   return (
     <>
+      {isLoading ? (
+        <div className="min-h-screen bg-background flex items-center justify-center">
+          <p className="text-muted-foreground">Loading programs...</p>
+        </div>
+      ) : (
+        <>
       <Helmet>
         <title>{title} | 6-8 Week Structured Programs Cyprus | Smarty Gym | Haris Falas Sports Scientist | smartygym.com</title>
         <meta name="description" content={`${title} at smartygym.com - Structured 6-8 week training programs by Sports Scientist Haris Falas. Progressive ${type ? type.replace('-', ' ') : 'training'} plans for all experience levels. Evidence-based periodization, clear progression, and proven results for Cyprus and worldwide online fitness.`} />
@@ -350,10 +384,9 @@ const TrainingProgramDetail = () => {
                 "@type": "Course",
                 "name": program.name,
                 "description": program.description,
-                "image": program.imageUrl,
-                "timeRequired": `${program.duration} weeks`,
-                "courseWorkload": `${program.duration} weeks`,
-                "educationalLevel": program.level
+                "image": program.image_url,
+                "timeRequired": `${program.duration}`,
+                "courseWorkload": `${program.duration}`
               }
             }))
           })}
@@ -493,15 +526,15 @@ const TrainingProgramDetail = () => {
             >
               <div className="relative h-48 w-full overflow-hidden">
                 <img 
-                  src={program.imageUrl} 
-                  alt={`${program.name} - ${program.duration} week ${program.level} ${program.equipment === 'bodyweight' ? 'bodyweight' : 'equipment-based'} training program by Haris Falas Sports Scientist at Smarty Gym Cyprus`}
+                  src={program.image_url} 
+                  alt={`${program.name} - ${program.duration} training program by Haris Falas Sports Scientist at Smarty Gym Cyprus`}
                   className="w-full h-full object-cover"
                 />
                 <div className="absolute top-2 right-2 bg-primary text-primary-foreground text-xs px-2 py-1 rounded flex items-center gap-1">
                   <Calendar className="w-3 h-3" />
                   <span>{program.duration} weeks</span>
                 </div>
-                {program.isFree && (
+                {!program.is_premium && (
                   <div className="absolute top-2 left-2 bg-primary text-primary-foreground px-3 py-1 rounded-full text-xs font-semibold">
                     FREE
                   </div>
@@ -524,6 +557,8 @@ const TrainingProgramDetail = () => {
         )}
       </div>
       </div>
+      </>
+      )}
     </>
   );
 };
