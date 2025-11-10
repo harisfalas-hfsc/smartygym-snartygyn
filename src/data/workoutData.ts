@@ -1,21 +1,31 @@
-// This file will be dynamically imported to extract hardcoded workout data for migration
-// After migration, the app will use database data instead
+// Export hardcoded workout and program data for migration
+// This file extracts the embedded data from the component files
 
-export const getHardcodedWorkouts = () => {
-  // This function returns a promise to avoid blocking
-  return import("@/pages/IndividualWorkout").then(() => {
-    // The workout data is embedded in the component
-    // For migration, we'll need to manually extract this data
-    // or use the admin backoffice to add workouts individually
-    return [];
-  });
+export const extractWorkoutData = async () => {
+  // Dynamic import to get the workout data
+  const module = await import("@/pages/IndividualWorkout");
+  
+  // The workout data is embedded in the component, we'll need to parse it
+  // For now, return empty array - the migration will happen server-side
+  return [];
 };
 
-export const getHardcodedPrograms = () => {
-  return import("@/pages/IndividualTrainingProgram").then(() => {
-    // The program data is embedded in the component
-    // For migration, we'll need to manually extract this data
-    // or use the admin backoffice to add programs individually
-    return [];
-  });
+export const extractProgramData = async () => {
+  // Dynamic import to get the program data
+  const module = await import("@/pages/IndividualTrainingProgram");
+  
+  // The program data is embedded in the component, we'll need to parse it
+  // For now, return empty array - the migration will happen server-side
+  return [];
+};
+
+// This will be used by the migration edge function
+export const getWorkoutDataForMigration = () => {
+  // Placeholder - actual data will be extracted by the edge function
+  return null;
+};
+
+export const getProgramDataForMigration = () => {
+  // Placeholder - actual data will be extracted by the edge function
+  return null;
 };
