@@ -5,6 +5,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { LineChart, Line, BarChart, Bar, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from "recharts";
 import { Users, DollarSign, TrendingUp, Star, Activity } from "lucide-react";
 import { toast } from "sonner";
+import { RevenueAnalytics } from "./RevenueAnalytics";
 
 interface AnalyticsData {
   totalUsers: number;
@@ -250,13 +251,17 @@ export function AnalyticsDashboard() {
       </div>
 
       {/* Charts */}
-      <Tabs defaultValue="growth" className="space-y-4">
-        <TabsList>
-          <TabsTrigger value="growth">User Growth</TabsTrigger>
+      <Tabs defaultValue="revenue" className="space-y-4">
+        <TabsList className="grid w-full grid-cols-4">
           <TabsTrigger value="revenue">Revenue</TabsTrigger>
+          <TabsTrigger value="growth">User Growth</TabsTrigger>
           <TabsTrigger value="completion">Completion Rates</TabsTrigger>
           <TabsTrigger value="popular">Popular Content</TabsTrigger>
         </TabsList>
+
+        <TabsContent value="revenue" className="space-y-4">
+          <RevenueAnalytics />
+        </TabsContent>
 
         <TabsContent value="growth" className="space-y-4">
           <Card>
@@ -307,26 +312,6 @@ export function AnalyticsDashboard() {
           </Card>
         </TabsContent>
 
-        <TabsContent value="revenue" className="space-y-4">
-          <Card>
-            <CardHeader>
-              <CardTitle>Revenue Trends</CardTitle>
-              <CardDescription>Monthly recurring revenue from subscriptions</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <ResponsiveContainer width="100%" height={350}>
-                <BarChart data={revenueData}>
-                  <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis dataKey="name" />
-                  <YAxis />
-                  <Tooltip />
-                  <Legend />
-                  <Bar dataKey="value" name="Revenue ($)" fill="hsl(var(--primary))" />
-                </BarChart>
-              </ResponsiveContainer>
-            </CardContent>
-          </Card>
-        </TabsContent>
 
         <TabsContent value="completion" className="space-y-4">
           <Card>

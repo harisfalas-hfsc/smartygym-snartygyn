@@ -58,12 +58,10 @@ export function EmailComposer() {
   const fetchUsers = async () => {
     setLoading(true);
     try {
-      // Fetch registered users with profiles
-      const { data: profiles, error: profilesError } = await supabase
-        .from('profiles')
-        .select('user_id, full_name, nickname');
-
-      if (profilesError) throw profilesError;
+      // Fetch registered users with emails from edge function
+      const { data: usersData, error: usersError } = await supabase.functions.invoke('get-users-with-emails');
+      
+      if (usersError) throw usersError;
 
       const { data: subscriptions, error: subsError } = await supabase
         .from('user_subscriptions')
@@ -79,14 +77,15 @@ export function EmailComposer() {
 
       if (newsletterError) throw newsletterError;
 
-      // Combine registered users
-      const registeredUsers: UserData[] = profiles.map(profile => {
-        const subscription = subscriptions?.find(sub => sub.user_id === profile.user_id);
+      // Combine registered users with emails
+      const registeredUsers: UserData[] = (usersData?.users || []).map((user: any) => {
+        const subscription = subscriptions?.find(sub => sub.user_id === user.id);
         
         return {
-          user_id: profile.user_id,
-          full_name: profile.full_name,
-          nickname: profile.nickname,
+          user_id: user.id,
+          email: user.email,
+          full_name: user.full_name || user.email,
+          nickname: user.nickname,
           plan_type: subscription?.plan_type || 'free',
           status: subscription?.status || 'inactive',
           user_type: 'registered' as const,
