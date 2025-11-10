@@ -21,6 +21,7 @@ export type Database = {
           days_per_week: number | null
           description: string | null
           difficulty: string | null
+          difficulty_stars: number | null
           duration: string | null
           equipment: string | null
           expected_results: string | null
@@ -45,6 +46,7 @@ export type Database = {
           days_per_week?: number | null
           description?: string | null
           difficulty?: string | null
+          difficulty_stars?: number | null
           duration?: string | null
           equipment?: string | null
           expected_results?: string | null
@@ -69,6 +71,7 @@ export type Database = {
           days_per_week?: number | null
           description?: string | null
           difficulty?: string | null
+          difficulty_stars?: number | null
           duration?: string | null
           equipment?: string | null
           expected_results?: string | null

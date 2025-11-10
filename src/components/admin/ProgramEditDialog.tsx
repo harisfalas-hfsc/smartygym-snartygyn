@@ -25,12 +25,7 @@ const DAYS_PER_WEEK_OPTIONS = [3, 4, 5, 6];
 
 const EQUIPMENT_OPTIONS = [
   "Bodyweight",
-  "Dumbbells",
-  "Barbell",
-  "Resistance Bands",
-  "Kettlebell",
-  "Pull-up Bar",
-  "Gym Equipment"
+  "Equipment"
 ];
 
 interface WeekDayContent {
@@ -53,7 +48,7 @@ export const ProgramEditDialog = ({ program, open, onOpenChange, onSave }: Progr
     serial_number: 0,
     name: '',
     category: '',
-    difficulty: '',
+    difficulty_stars: 1,
     weeks: 4,
     days_per_week: 4,
     equipment: '',
@@ -67,13 +62,26 @@ export const ProgramEditDialog = ({ program, open, onOpenChange, onSave }: Progr
   const [weekDayContents, setWeekDayContents] = useState<WeekDayContent[]>([]);
 
   useEffect(() => {
+    const generateSerialNumber = async () => {
+      const { data } = await supabase
+        .from('admin_training_programs')
+        .select('serial_number')
+        .order('serial_number', { ascending: false })
+        .limit(1);
+      
+      if (data && data.length > 0 && data[0].serial_number) {
+        return data[0].serial_number + 1;
+      }
+      return 1;
+    };
+
     if (program) {
       setFormData({
         id: program.id,
         serial_number: program.serial_number || 0,
         name: program.name,
         category: program.category,
-        difficulty: program.difficulty || 'Beginner',
+        difficulty_stars: program.difficulty_stars || 1,
         weeks: program.weeks || 4,
         days_per_week: program.days_per_week || 4,
         equipment: program.equipment || '',
@@ -95,21 +103,23 @@ export const ProgramEditDialog = ({ program, open, onOpenChange, onSave }: Progr
         }
       }
     } else {
-      setFormData({
-        id: '',
-        serial_number: 0,
-        name: '',
-        category: '',
-        difficulty: 'Beginner',
-        weeks: 4,
-        days_per_week: 4,
-        equipment: '',
-        description: '',
-        instructions: '',
-        tips: '',
-        image_url: '',
-        is_premium: false,
-        tier_required: '',
+      generateSerialNumber().then(nextSerial => {
+        setFormData({
+          id: `P-${nextSerial.toString().padStart(3, '0')}`,
+          serial_number: nextSerial,
+          name: '',
+          category: '',
+          difficulty_stars: 1,
+          weeks: 4,
+          days_per_week: 4,
+          equipment: '',
+          description: '',
+          instructions: '',
+          tips: '',
+          image_url: '',
+          is_premium: false,
+          tier_required: '',
+        });
       });
       setWeekDayContents([]);
     }
@@ -143,12 +153,32 @@ export const ProgramEditDialog = ({ program, open, onOpenChange, onSave }: Progr
     try {
       const duration = `${formData.weeks} Weeks / ${formData.days_per_week} Days per Week`;
       
+      // Map difficulty stars to difficulty level
+      let difficultyLevel = 'Beginner';
+      if (formData.difficulty_stars >= 5) {
+        difficultyLevel = 'Advanced';
+      } else if (formData.difficulty_stars >= 3) {
+        difficultyLevel = 'Intermediate';
+      }
+
       const dataToSave = {
-        ...formData,
+        id: formData.id,
+        serial_number: formData.serial_number,
+        name: formData.name,
+        category: formData.category,
+        difficulty: difficultyLevel,
+        difficulty_stars: formData.difficulty_stars,
+        weeks: formData.weeks,
+        days_per_week: formData.days_per_week,
+        equipment: formData.equipment,
         duration,
-        weekly_schedule: JSON.stringify(weekDayContents),
+        description: formData.description,
         progression_plan: formData.instructions,
         nutrition_tips: formData.tips,
+        weekly_schedule: JSON.stringify(weekDayContents),
+        image_url: formData.image_url,
+        is_premium: formData.is_premium,
+        tier_required: formData.tier_required || null,
       };
 
       if (program) {
@@ -168,11 +198,12 @@ export const ProgramEditDialog = ({ program, open, onOpenChange, onSave }: Progr
         toast({ title: "Success", description: "Program created successfully" });
       }
       onSave();
+      onOpenChange(false);
     } catch (error) {
       console.error('Error saving program:', error);
       toast({
         title: "Error",
-        description: "Failed to save program",
+        description: error instanceof Error ? error.message : "Failed to save program",
         variant: "destructive",
       });
     }
@@ -211,9 +242,17 @@ export const ProgramEditDialog = ({ program, open, onOpenChange, onSave }: Progr
               id="serial_number"
               type="number"
               value={formData.serial_number}
-              onChange={(e) => setFormData({ ...formData, serial_number: parseInt(e.target.value) || 0 })}
-              placeholder="e.g., 1"
+              onChange={(e) => {
+                const serial = parseInt(e.target.value) || 0;
+                setFormData({ 
+                  ...formData, 
+                  serial_number: serial,
+                  id: `P-${serial.toString().padStart(3, '0')}`
+                });
+              }}
+              placeholder="Auto-generated"
             />
+            <p className="text-sm text-muted-foreground">Program ID: {formData.id}</p>
           </div>
 
           {/* 3. Name */}
@@ -229,17 +268,22 @@ export const ProgramEditDialog = ({ program, open, onOpenChange, onSave }: Progr
 
           {/* 4. Difficulty Level */}
           <div className="space-y-2">
-            <Label htmlFor="difficulty">4. Difficulty Level</Label>
-            <Select value={formData.difficulty} onValueChange={(value) => setFormData({ ...formData, difficulty: value })}>
-              <SelectTrigger>
-                <SelectValue placeholder="Select difficulty" />
-              </SelectTrigger>
-              <SelectContent>
-                {DIFFICULTY_LEVELS.map(level => (
-                  <SelectItem key={level} value={level}>{level}</SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+            <Label htmlFor="difficulty_stars">4. Difficulty Level</Label>
+            <div className="flex items-center gap-2">
+              {[1, 2, 3, 4, 5, 6].map((star) => (
+                <button
+                  key={star}
+                  type="button"
+                  onClick={() => setFormData({ ...formData, difficulty_stars: star })}
+                  className="text-2xl focus:outline-none"
+                >
+                  {star <= formData.difficulty_stars ? '⭐' : '☆'}
+                </button>
+              ))}
+              <span className="ml-2 text-sm text-muted-foreground">
+                {formData.difficulty_stars <= 2 ? 'Beginner' : formData.difficulty_stars <= 4 ? 'Intermediate' : 'Advanced'}
+              </span>
+            </div>
           </div>
 
           {/* 5. Duration */}
@@ -365,14 +409,18 @@ export const ProgramEditDialog = ({ program, open, onOpenChange, onSave }: Progr
             />
           </div>
 
+          {/* 11. Image URL */}
           <div className="space-y-2">
-            <Label htmlFor="image_url">Image URL</Label>
+            <Label htmlFor="image_url">11. Image URL</Label>
             <Input
               id="image_url"
               value={formData.image_url}
               onChange={(e) => setFormData({ ...formData, image_url: e.target.value })}
               placeholder="/src/assets/program-image.jpg"
             />
+            <p className="text-xs text-muted-foreground">
+              For best results: 800x600px, .jpg format, under 200KB
+            </p>
           </div>
 
           <div className="flex items-center space-x-2">
