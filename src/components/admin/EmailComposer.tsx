@@ -20,10 +20,19 @@ interface EmailTemplate {
 
 interface UserData {
   user_id: string;
+  email?: string;
   full_name: string | null;
   nickname: string | null;
   plan_type: string;
   status: string;
+  user_type: 'registered' | 'newsletter'; // Track user type
+}
+
+interface NewsletterSubscriber {
+  id: string;
+  email: string;
+  name: string;
+  active: boolean;
 }
 
 export function EmailComposer() {
@@ -34,6 +43,7 @@ export function EmailComposer() {
   const [sending, setSending] = useState(false);
   
   // Filters
+  const [userTypeFilter, setUserTypeFilter] = useState<string>("all");
   const [planFilter, setPlanFilter] = useState<string>("all");
   const [statusFilter, setStatusFilter] = useState<string>("all");
   
@@ -48,6 +58,7 @@ export function EmailComposer() {
   const fetchUsers = async () => {
     setLoading(true);
     try {
+      // Fetch registered users with profiles
       const { data: profiles, error: profilesError } = await supabase
         .from('profiles')
         .select('user_id, full_name, nickname');
@@ -60,7 +71,16 @@ export function EmailComposer() {
 
       if (subsError) throw subsError;
 
-      const combinedData: UserData[] = profiles.map(profile => {
+      // Fetch newsletter subscribers
+      const { data: newsletterSubs, error: newsletterError } = await supabase
+        .from('newsletter_subscribers')
+        .select('id, email, name, active')
+        .eq('active', true);
+
+      if (newsletterError) throw newsletterError;
+
+      // Combine registered users
+      const registeredUsers: UserData[] = profiles.map(profile => {
         const subscription = subscriptions?.find(sub => sub.user_id === profile.user_id);
         
         return {
@@ -69,11 +89,24 @@ export function EmailComposer() {
           nickname: profile.nickname,
           plan_type: subscription?.plan_type || 'free',
           status: subscription?.status || 'inactive',
+          user_type: 'registered' as const,
         };
       });
 
-      setUsers(combinedData);
-      setFilteredUsers(combinedData);
+      // Add newsletter subscribers as separate user type
+      const newsletterUsers: UserData[] = (newsletterSubs || []).map(sub => ({
+        user_id: sub.id,
+        email: sub.email,
+        full_name: sub.name,
+        nickname: null,
+        plan_type: 'newsletter',
+        status: 'active',
+        user_type: 'newsletter' as const,
+      }));
+
+      const allUsers = [...registeredUsers, ...newsletterUsers];
+      setUsers(allUsers);
+      setFilteredUsers(allUsers);
     } catch (error) {
       console.error('Error fetching users:', error);
       toast.error('Failed to load users');
@@ -105,16 +138,37 @@ export function EmailComposer() {
   useEffect(() => {
     let filtered = users;
 
+    // User type filter (registered vs newsletter)
+    if (userTypeFilter !== "all") {
+      if (userTypeFilter === "registered_with_plan") {
+        filtered = filtered.filter(user => 
+          user.user_type === 'registered' && 
+          (user.plan_type === 'gold' || user.plan_type === 'platinum')
+        );
+      } else if (userTypeFilter === "registered_without_plan") {
+        filtered = filtered.filter(user => 
+          user.user_type === 'registered' && 
+          user.plan_type === 'free'
+        );
+      } else if (userTypeFilter === "registered_all") {
+        filtered = filtered.filter(user => user.user_type === 'registered');
+      } else if (userTypeFilter === "newsletter_only") {
+        filtered = filtered.filter(user => user.user_type === 'newsletter');
+      }
+    }
+
+    // Plan filter (only applies to registered users)
     if (planFilter !== "all") {
       filtered = filtered.filter(user => user.plan_type === planFilter);
     }
 
+    // Status filter (only applies to registered users)
     if (statusFilter !== "all") {
       filtered = filtered.filter(user => user.status === statusFilter);
     }
 
     setFilteredUsers(filtered);
-  }, [planFilter, statusFilter, users]);
+  }, [userTypeFilter, planFilter, statusFilter, users]);
 
   const handleSendEmails = async () => {
     if (!subject.trim() || !message.trim()) {
@@ -135,11 +189,19 @@ export function EmailComposer() {
     setSending(true);
 
     try {
-      const userIds = filteredUsers.map(u => u.user_id);
+      // Separate registered users and newsletter subscribers
+      const registeredUserIds = filteredUsers
+        .filter(u => u.user_type === 'registered')
+        .map(u => u.user_id);
+      
+      const newsletterEmails = filteredUsers
+        .filter(u => u.user_type === 'newsletter')
+        .map(u => ({ email: u.email!, name: u.full_name || 'Subscriber' }));
       
       const { data, error } = await supabase.functions.invoke('send-bulk-email', {
         body: {
-          userIds,
+          userIds: registeredUserIds,
+          newsletterRecipients: newsletterEmails,
           subject,
           message,
         }
@@ -198,26 +260,40 @@ export function EmailComposer() {
           {/* Filter Section */}
           <div className="space-y-4">
             <h3 className="text-sm font-medium">Select Recipients</h3>
-            <div className="flex flex-col sm:flex-row gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+              <Select value={userTypeFilter} onValueChange={setUserTypeFilter}>
+                <SelectTrigger>
+                  <SelectValue placeholder="User Type" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All Users</SelectItem>
+                  <SelectItem value="registered_all">All Registered Users</SelectItem>
+                  <SelectItem value="registered_with_plan">Registered with Plan</SelectItem>
+                  <SelectItem value="registered_without_plan">Registered without Plan</SelectItem>
+                  <SelectItem value="newsletter_only">Newsletter Subscribers</SelectItem>
+                </SelectContent>
+              </Select>
+              
               <Select value={planFilter} onValueChange={setPlanFilter}>
-                <SelectTrigger className="w-full sm:w-[200px]">
-                  <SelectValue placeholder="Filter by plan" />
+                <SelectTrigger>
+                  <SelectValue placeholder="Plan Type" />
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="all">All Plans</SelectItem>
                   <SelectItem value="free">Free Users</SelectItem>
                   <SelectItem value="gold">Gold Members</SelectItem>
                   <SelectItem value="platinum">Platinum Members</SelectItem>
+                  <SelectItem value="newsletter">Newsletter Only</SelectItem>
                 </SelectContent>
               </Select>
               
               <Select value={statusFilter} onValueChange={setStatusFilter}>
-                <SelectTrigger className="w-full sm:w-[200px]">
-                  <SelectValue placeholder="Filter by status" />
+                <SelectTrigger>
+                  <SelectValue placeholder="Status" />
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="all">All Statuses</SelectItem>
-                  <SelectItem value="active">Active Subscribers</SelectItem>
+                  <SelectItem value="active">Active</SelectItem>
                   <SelectItem value="canceled">Canceled</SelectItem>
                   <SelectItem value="inactive">Inactive</SelectItem>
                 </SelectContent>
@@ -296,8 +372,16 @@ export function EmailComposer() {
                 <span className="font-medium">Email Preview</span>
               </div>
               <div className="space-y-1 text-sm text-muted-foreground">
-                <p>This email will be sent to <strong>{filteredUsers.length}</strong> user{filteredUsers.length !== 1 ? 's' : ''}</p>
+                <p>This email will be sent to <strong>{filteredUsers.length}</strong> recipient{filteredUsers.length !== 1 ? 's' : ''}</p>
                 <div className="flex flex-wrap gap-2 mt-2">
+                  {userTypeFilter !== "all" && (
+                    <Badge variant="secondary">
+                      {userTypeFilter === "registered_all" && "All Registered"}
+                      {userTypeFilter === "registered_with_plan" && "With Plan"}
+                      {userTypeFilter === "registered_without_plan" && "Without Plan"}
+                      {userTypeFilter === "newsletter_only" && "Newsletter Only"}
+                    </Badge>
+                  )}
                   {planFilter !== "all" && (
                     <Badge variant="secondary">
                       {planFilter.charAt(0).toUpperCase() + planFilter.slice(1)} Plan
@@ -308,6 +392,10 @@ export function EmailComposer() {
                       {statusFilter.charAt(0).toUpperCase() + statusFilter.slice(1)} Status
                     </Badge>
                   )}
+                </div>
+                <div className="text-xs mt-2 space-y-1">
+                  <p>• Registered users: {filteredUsers.filter(u => u.user_type === 'registered').length}</p>
+                  <p>• Newsletter subscribers: {filteredUsers.filter(u => u.user_type === 'newsletter').length}</p>
                 </div>
               </div>
             </div>
