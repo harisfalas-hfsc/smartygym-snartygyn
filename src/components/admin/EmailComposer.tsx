@@ -1,0 +1,307 @@
+import { useState, useEffect } from "react";
+import { supabase } from "@/integrations/supabase/client";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { Textarea } from "@/components/ui/textarea";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Badge } from "@/components/ui/badge";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
+import { Mail, Send, Users, AlertCircle, CheckCircle2 } from "lucide-react";
+import { toast } from "sonner";
+
+interface UserData {
+  user_id: string;
+  full_name: string | null;
+  nickname: string | null;
+  plan_type: string;
+  status: string;
+}
+
+export function EmailComposer() {
+  const [users, setUsers] = useState<UserData[]>([]);
+  const [filteredUsers, setFilteredUsers] = useState<UserData[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [sending, setSending] = useState(false);
+  
+  // Filters
+  const [planFilter, setPlanFilter] = useState<string>("all");
+  const [statusFilter, setStatusFilter] = useState<string>("all");
+  
+  // Email content
+  const [subject, setSubject] = useState("");
+  const [message, setMessage] = useState("");
+  
+  // Confirmation dialog
+  const [showConfirm, setShowConfirm] = useState(false);
+
+  const fetchUsers = async () => {
+    setLoading(true);
+    try {
+      const { data: profiles, error: profilesError } = await supabase
+        .from('profiles')
+        .select('user_id, full_name, nickname');
+
+      if (profilesError) throw profilesError;
+
+      const { data: subscriptions, error: subsError } = await supabase
+        .from('user_subscriptions')
+        .select('user_id, plan_type, status');
+
+      if (subsError) throw subsError;
+
+      const combinedData: UserData[] = profiles.map(profile => {
+        const subscription = subscriptions?.find(sub => sub.user_id === profile.user_id);
+        
+        return {
+          user_id: profile.user_id,
+          full_name: profile.full_name,
+          nickname: profile.nickname,
+          plan_type: subscription?.plan_type || 'free',
+          status: subscription?.status || 'inactive',
+        };
+      });
+
+      setUsers(combinedData);
+      setFilteredUsers(combinedData);
+    } catch (error) {
+      console.error('Error fetching users:', error);
+      toast.error('Failed to load users');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchUsers();
+  }, []);
+
+  useEffect(() => {
+    let filtered = users;
+
+    if (planFilter !== "all") {
+      filtered = filtered.filter(user => user.plan_type === planFilter);
+    }
+
+    if (statusFilter !== "all") {
+      filtered = filtered.filter(user => user.status === statusFilter);
+    }
+
+    setFilteredUsers(filtered);
+  }, [planFilter, statusFilter, users]);
+
+  const handleSendEmails = async () => {
+    if (!subject.trim() || !message.trim()) {
+      toast.error("Please provide both subject and message");
+      return;
+    }
+
+    if (filteredUsers.length === 0) {
+      toast.error("No recipients selected");
+      return;
+    }
+
+    setShowConfirm(true);
+  };
+
+  const confirmSendEmails = async () => {
+    setShowConfirm(false);
+    setSending(true);
+
+    try {
+      const userIds = filteredUsers.map(u => u.user_id);
+      
+      const { data, error } = await supabase.functions.invoke('send-bulk-email', {
+        body: {
+          userIds,
+          subject,
+          message,
+        }
+      });
+
+      if (error) throw error;
+
+      const result = data as { success: boolean; sent: number; failed: number; total: number };
+      
+      if (result.success) {
+        toast.success(
+          `Email sent successfully to ${result.sent} recipient${result.sent !== 1 ? 's' : ''}${
+            result.failed > 0 ? ` (${result.failed} failed)` : ''
+          }`
+        );
+        
+        // Clear form
+        setSubject("");
+        setMessage("");
+      } else {
+        throw new Error("Failed to send emails");
+      }
+    } catch (error) {
+      console.error('Error sending emails:', error);
+      toast.error('Failed to send emails');
+    } finally {
+      setSending(false);
+    }
+  };
+
+  if (loading) {
+    return (
+      <Card>
+        <CardContent className="pt-6">
+          <div className="flex items-center justify-center py-12">
+            <div className="animate-pulse text-lg">Loading...</div>
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
+
+  return (
+    <>
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Mail className="h-5 w-5" />
+            Bulk Email Notifications
+          </CardTitle>
+          <CardDescription>
+            Send email notifications to users based on subscription filters
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-6">
+          {/* Filter Section */}
+          <div className="space-y-4">
+            <h3 className="text-sm font-medium">Select Recipients</h3>
+            <div className="flex flex-col sm:flex-row gap-4">
+              <Select value={planFilter} onValueChange={setPlanFilter}>
+                <SelectTrigger className="w-full sm:w-[200px]">
+                  <SelectValue placeholder="Filter by plan" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All Plans</SelectItem>
+                  <SelectItem value="free">Free Users</SelectItem>
+                  <SelectItem value="gold">Gold Members</SelectItem>
+                  <SelectItem value="platinum">Platinum Members</SelectItem>
+                </SelectContent>
+              </Select>
+              
+              <Select value={statusFilter} onValueChange={setStatusFilter}>
+                <SelectTrigger className="w-full sm:w-[200px]">
+                  <SelectValue placeholder="Filter by status" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All Statuses</SelectItem>
+                  <SelectItem value="active">Active Subscribers</SelectItem>
+                  <SelectItem value="canceled">Canceled</SelectItem>
+                  <SelectItem value="inactive">Inactive</SelectItem>
+                </SelectContent>
+              </Select>
+
+              <div className="flex items-center gap-2 px-4 py-2 bg-muted rounded-md">
+                <Users className="h-4 w-4 text-muted-foreground" />
+                <span className="text-sm font-medium">{filteredUsers.length} recipients</span>
+              </div>
+            </div>
+          </div>
+
+          {/* Email Content */}
+          <div className="space-y-4">
+            <h3 className="text-sm font-medium">Compose Email</h3>
+            
+            <div className="space-y-2">
+              <label className="text-sm text-muted-foreground">Subject</label>
+              <Input
+                placeholder="Email subject..."
+                value={subject}
+                onChange={(e) => setSubject(e.target.value)}
+                disabled={sending}
+              />
+            </div>
+
+            <div className="space-y-2">
+              <label className="text-sm text-muted-foreground">Message</label>
+              <Textarea
+                placeholder="Your message to users..."
+                value={message}
+                onChange={(e) => setMessage(e.target.value)}
+                rows={10}
+                disabled={sending}
+              />
+              <p className="text-xs text-muted-foreground">
+                Plain text will be converted to HTML. Line breaks will be preserved.
+              </p>
+            </div>
+          </div>
+
+          {/* Preview Section */}
+          {filteredUsers.length > 0 && (
+            <div className="p-4 border rounded-lg bg-muted/50 space-y-2">
+              <div className="flex items-center gap-2 text-sm">
+                <AlertCircle className="h-4 w-4 text-muted-foreground" />
+                <span className="font-medium">Email Preview</span>
+              </div>
+              <div className="space-y-1 text-sm text-muted-foreground">
+                <p>This email will be sent to <strong>{filteredUsers.length}</strong> user{filteredUsers.length !== 1 ? 's' : ''}</p>
+                <div className="flex flex-wrap gap-2 mt-2">
+                  {planFilter !== "all" && (
+                    <Badge variant="secondary">
+                      {planFilter.charAt(0).toUpperCase() + planFilter.slice(1)} Plan
+                    </Badge>
+                  )}
+                  {statusFilter !== "all" && (
+                    <Badge variant="secondary">
+                      {statusFilter.charAt(0).toUpperCase() + statusFilter.slice(1)} Status
+                    </Badge>
+                  )}
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Send Button */}
+          <Button
+            onClick={handleSendEmails}
+            disabled={sending || !subject.trim() || !message.trim() || filteredUsers.length === 0}
+            className="w-full"
+            size="lg"
+          >
+            {sending ? (
+              <>
+                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2" />
+                Sending Emails...
+              </>
+            ) : (
+              <>
+                <Send className="h-4 w-4 mr-2" />
+                Send to {filteredUsers.length} Recipient{filteredUsers.length !== 1 ? 's' : ''}
+              </>
+            )}
+          </Button>
+        </CardContent>
+      </Card>
+
+      {/* Confirmation Dialog */}
+      <AlertDialog open={showConfirm} onOpenChange={setShowConfirm}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Confirm Bulk Email</AlertDialogTitle>
+            <AlertDialogDescription>
+              You are about to send an email to <strong>{filteredUsers.length}</strong> user{filteredUsers.length !== 1 ? 's' : ''}.
+              <br /><br />
+              <strong>Subject:</strong> {subject}
+              <br /><br />
+              This action cannot be undone. Are you sure you want to proceed?
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={confirmSendEmails}>
+              <Send className="h-4 w-4 mr-2" />
+              Send Emails
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+    </>
+  );
+}
