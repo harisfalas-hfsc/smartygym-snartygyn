@@ -4,7 +4,7 @@ import { useAdminRole } from "@/hooks/useAdminRole";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, Dumbbell, Calendar, Settings, Users, Mail, FileText, Shield, BarChart3 } from "lucide-react";
+import { ArrowLeft, Dumbbell, Calendar, Settings, Users, Mail, FileText, Shield, BarChart3, BookOpen } from "lucide-react";
 import { WorkoutsManager } from "@/components/admin/WorkoutsManager";
 import { ProgramsManager } from "@/components/admin/ProgramsManager";
 import { UsersManager } from "@/components/admin/UsersManager";
@@ -13,6 +13,7 @@ import { EmailTemplatesManager } from "@/components/admin/EmailTemplatesManager"
 import { ModerationDashboard } from "@/components/admin/ModerationDashboard";
 import { AnalyticsDashboard } from "@/components/admin/AnalyticsDashboard";
 import { NewsletterManager } from "@/components/admin/NewsletterManager";
+import { BlogManager } from "@/components/admin/BlogManager";
 
 export default function AdminBackoffice() {
   const navigate = useNavigate();
@@ -74,7 +75,7 @@ export default function AdminBackoffice() {
 
         {/* Main Content */}
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="grid w-full max-w-6xl grid-cols-9">
+          <TabsList className="grid w-full max-w-6xl grid-cols-10">
             <TabsTrigger value="workouts" className="flex items-center gap-1">
               <Dumbbell className="h-4 w-4" />
               <span className="hidden lg:inline">Workouts</span>
@@ -82,6 +83,10 @@ export default function AdminBackoffice() {
             <TabsTrigger value="programs" className="flex items-center gap-1">
               <Calendar className="h-4 w-4" />
               <span className="hidden lg:inline">Programs</span>
+            </TabsTrigger>
+            <TabsTrigger value="blog" className="flex items-center gap-1">
+              <BookOpen className="h-4 w-4" />
+              <span className="hidden lg:inline">Blog</span>
             </TabsTrigger>
             <TabsTrigger value="users" className="flex items-center gap-1">
               <Users className="h-4 w-4" />
@@ -119,6 +124,10 @@ export default function AdminBackoffice() {
 
           <TabsContent value="programs" className="mt-6">
             <ProgramsManager />
+          </TabsContent>
+
+          <TabsContent value="blog" className="mt-6">
+            <BlogManager />
           </TabsContent>
 
           <TabsContent value="users" className="mt-6">
