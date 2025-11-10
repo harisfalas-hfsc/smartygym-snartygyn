@@ -70,9 +70,11 @@ export const WorkoutEditDialog = ({ workout, open, onOpenChange, onSave }: Worko
     instructions: '',
     tips: '',
     image_url: '',
+    generate_unique_image: false,
     is_premium: false,
     tier_required: '',
   });
+  const [isGeneratingImage, setIsGeneratingImage] = useState(false);
 
   useEffect(() => {
     const generateSerialNumber = async () => {
@@ -111,6 +113,7 @@ export const WorkoutEditDialog = ({ workout, open, onOpenChange, onSave }: Worko
           instructions: '',
           tips: '',
           image_url: '',
+          generate_unique_image: false,
           is_premium: false,
           tier_required: '',
         });
@@ -126,18 +129,49 @@ export const WorkoutEditDialog = ({ workout, open, onOpenChange, onSave }: Worko
 
   const handleSave = async () => {
     try {
+      setIsGeneratingImage(true);
+      
+      let imageUrl = formData.image_url;
+      
+      // Generate unique image if requested
+      if (formData.generate_unique_image) {
+        const { data: imageData, error: imageError } = await supabase.functions.invoke('generate-workout-image', {
+          body: {
+            name: formData.name,
+            category: formData.category,
+            format: formData.format,
+            difficulty_stars: formData.difficulty_stars,
+          }
+        });
+
+        if (imageError) {
+          console.error('Error generating image:', imageError);
+          toast({
+            title: "Warning",
+            description: "Failed to generate image, saving without image",
+            variant: "destructive",
+          });
+        } else if (imageData?.image_url) {
+          imageUrl = imageData.image_url;
+        }
+      }
+
       // Prepare data with backward compatibility
       const saveData = {
         ...formData,
-        type: formData.format || formData.category, // For backward compatibility
-        difficulty: getDifficultyLabel(formData.difficulty_stars), // For backward compatibility
+        image_url: imageUrl,
+        type: formData.format || formData.category,
+        difficulty: getDifficultyLabel(formData.difficulty_stars),
       };
+
+      // Remove the generate_unique_image flag before saving
+      const { generate_unique_image, ...dataToSave } = saveData;
 
       if (workout) {
         // Update existing
         const { error } = await supabase
           .from('admin_workouts')
-          .update(saveData)
+          .update(dataToSave)
           .eq('id', workout.id);
 
         if (error) throw error;
@@ -146,7 +180,7 @@ export const WorkoutEditDialog = ({ workout, open, onOpenChange, onSave }: Worko
         // Insert new
         const { error } = await supabase
           .from('admin_workouts')
-          .insert([saveData]);
+          .insert([dataToSave]);
 
         if (error) throw error;
         toast({ title: "Success", description: "Workout created successfully" });
@@ -159,6 +193,8 @@ export const WorkoutEditDialog = ({ workout, open, onOpenChange, onSave }: Worko
         description: "Failed to save workout",
         variant: "destructive",
       });
+    } finally {
+      setIsGeneratingImage(false);
     }
   };
 
@@ -399,15 +435,33 @@ export const WorkoutEditDialog = ({ workout, open, onOpenChange, onSave }: Worko
             />
           </div>
 
-          {/* Image URL */}
-          <div className="space-y-2">
-            <Label htmlFor="image_url">Image URL (Optional)</Label>
-            <Input
-              id="image_url"
-              value={formData.image_url}
-              onChange={(e) => setFormData({ ...formData, image_url: e.target.value })}
-              placeholder="/src/assets/workout-image.jpg"
-            />
+          {/* Image Generation */}
+          <div className="space-y-4 pt-4 border-t">
+            <div className="flex items-center justify-between">
+              <div className="space-y-1">
+                <Label htmlFor="generate_unique_image">Generate Unique Image</Label>
+                <p className="text-sm text-muted-foreground">
+                  AI will create a unique workout cover image based on title, category, and format
+                </p>
+              </div>
+              <Switch
+                id="generate_unique_image"
+                checked={formData.generate_unique_image}
+                onCheckedChange={(checked) => setFormData({ ...formData, generate_unique_image: checked })}
+              />
+            </div>
+            
+            {!formData.generate_unique_image && (
+              <div className="space-y-2">
+                <Label htmlFor="image_url">Or Enter Image URL Manually</Label>
+                <Input
+                  id="image_url"
+                  value={formData.image_url}
+                  onChange={(e) => setFormData({ ...formData, image_url: e.target.value })}
+                  placeholder="/src/assets/workout-image.jpg"
+                />
+              </div>
+            )}
           </div>
 
           {/* 13. Free or Premium */}
@@ -439,11 +493,11 @@ export const WorkoutEditDialog = ({ workout, open, onOpenChange, onSave }: Worko
           </div>
 
           <div className="flex justify-end gap-2 pt-4">
-            <Button variant="outline" onClick={() => onOpenChange(false)}>
+            <Button variant="outline" onClick={() => onOpenChange(false)} disabled={isGeneratingImage}>
               Cancel
             </Button>
-            <Button onClick={handleSave}>
-              Save Workout
+            <Button onClick={handleSave} disabled={isGeneratingImage}>
+              {isGeneratingImage ? "Generating Image..." : "Save Workout"}
             </Button>
           </div>
         </div>
