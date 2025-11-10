@@ -4,13 +4,14 @@ import { useAdminRole } from "@/hooks/useAdminRole";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, Dumbbell, Calendar, Settings, Users, Mail, FileText, Shield } from "lucide-react";
+import { ArrowLeft, Dumbbell, Calendar, Settings, Users, Mail, FileText, Shield, BarChart3 } from "lucide-react";
 import { WorkoutsManager } from "@/components/admin/WorkoutsManager";
 import { ProgramsManager } from "@/components/admin/ProgramsManager";
 import { UsersManager } from "@/components/admin/UsersManager";
 import { EmailComposer } from "@/components/admin/EmailComposer";
 import { EmailTemplatesManager } from "@/components/admin/EmailTemplatesManager";
 import { ModerationDashboard } from "@/components/admin/ModerationDashboard";
+import { AnalyticsDashboard } from "@/components/admin/AnalyticsDashboard";
 
 export default function AdminBackoffice() {
   const navigate = useNavigate();
@@ -72,7 +73,7 @@ export default function AdminBackoffice() {
 
         {/* Main Content */}
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="grid w-full max-w-5xl grid-cols-7">
+          <TabsList className="grid w-full max-w-6xl grid-cols-8">
             <TabsTrigger value="workouts" className="flex items-center gap-1">
               <Dumbbell className="h-4 w-4" />
               <span className="hidden lg:inline">Workouts</span>
@@ -96,6 +97,10 @@ export default function AdminBackoffice() {
             <TabsTrigger value="moderation" className="flex items-center gap-1">
               <Shield className="h-4 w-4" />
               <span className="hidden lg:inline">Moderation</span>
+            </TabsTrigger>
+            <TabsTrigger value="analytics" className="flex items-center gap-1">
+              <BarChart3 className="h-4 w-4" />
+              <span className="hidden lg:inline">Analytics</span>
             </TabsTrigger>
             <TabsTrigger value="settings" className="flex items-center gap-1">
               <Settings className="h-4 w-4" />
@@ -125,6 +130,10 @@ export default function AdminBackoffice() {
 
           <TabsContent value="moderation" className="mt-6">
             <ModerationDashboard />
+          </TabsContent>
+
+          <TabsContent value="analytics" className="mt-6">
+            <AnalyticsDashboard />
           </TabsContent>
 
           <TabsContent value="settings" className="mt-6">
