@@ -47,6 +47,7 @@ import PaymentSuccess from "./pages/PaymentSuccess";
 import NewsletterThankYou from "./pages/NewsletterThankYou";
 import Community from "./pages/Community";
 import AdminBackoffice from "./pages/AdminBackoffice";
+import MigrateContent from "./pages/MigrateContent";
 import { AccessGate } from "./components/AccessGate";
 import { WhatsAppButton } from "./components/WhatsAppButton";
 
@@ -102,6 +103,7 @@ const App = () => (
                   <Route path="/macrocalculator" element={<MacroTrackingCalculator />} />
                   <Route path="/caloriecalculator" element={<MacroTrackingCalculator />} />
                   <Route path="/admin" element={<AdminBackoffice />} />
+                  <Route path="/admin/migrate" element={<MigrateContent />} />
                 </Route>
                 
                 {/* Public routes */}
