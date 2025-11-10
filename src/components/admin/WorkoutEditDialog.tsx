@@ -10,34 +10,34 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { useToast } from "@/hooks/use-toast";
 
 const CATEGORIES = [
-  "Strength",
-  "Calorie Burning",
-  "Metabolic",
-  "Cardio",
-  "Mobility and Stability",
-  "Power",
-  "Challenge"
+  "STRENGTH",
+  "CALORIE BURNING",
+  "METABOLIC",
+  "CARDIO",
+  "MOBILITY AND STABILITY",
+  "POWER",
+  "CHALLENGE"
 ];
 
 const FORMATS = [
-  "Tabata",
-  "Circuit",
+  "TABATA",
+  "CIRCUIT",
   "AMRAP",
-  "For Time",
+  "FOR TIME",
   "EMOM",
-  "Reps and Set",
-  "Mix"
+  "REPS & SETS",
+  "MIX"
 ];
 
-const EQUIPMENT_OPTIONS = ["Bodyweight", "Equipment"];
+const EQUIPMENT_OPTIONS = ["BODYWEIGHT", "EQUIPMENT"];
 
 const DURATION_OPTIONS = [
-  "15 minutes",
-  "20 minutes",
-  "30 minutes",
-  "45 minutes",
-  "60 minutes",
-  "Varies"
+  "15 MINUTES",
+  "20 MINUTES",
+  "30 MINUTES",
+  "45 MINUTES",
+  "60 MINUTES",
+  "VARIES"
 ];
 
 const DIFFICULTY_STARS = [1, 2, 3, 4, 5, 6];
