@@ -35,40 +35,15 @@ export function UsersManager() {
   const fetchUsers = async () => {
     setLoading(true);
     try {
-      // Fetch profiles with auth user data
-      const { data: profiles, error: profilesError } = await supabase
-        .from('profiles')
-        .select('user_id, full_name, nickname, avatar_url, created_at');
+      // Use edge function to fetch users with emails (requires admin auth)
+      const { data, error } = await supabase.functions.invoke('get-users-with-emails');
 
-      if (profilesError) throw profilesError;
+      if (error) throw error;
 
-      // Fetch subscriptions
-      const { data: subscriptions, error: subsError } = await supabase
-        .from('user_subscriptions')
-        .select('user_id, plan_type, status, current_period_start, current_period_end');
-
-      if (subsError) throw subsError;
-
-      // Combine data (email would need edge function with service role to fetch)
-      const combinedData: UserData[] = profiles.map(profile => {
-        const subscription = subscriptions?.find(sub => sub.user_id === profile.user_id);
-        
-        return {
-          user_id: profile.user_id,
-          full_name: profile.full_name,
-          nickname: profile.nickname,
-          avatar_url: profile.avatar_url,
-          email: null, // Email access requires edge function with service role
-          plan_type: subscription?.plan_type || 'free',
-          status: subscription?.status || 'inactive',
-          current_period_start: subscription?.current_period_start || null,
-          current_period_end: subscription?.current_period_end || null,
-          created_at: profile.created_at,
-        };
-      });
-
-      setUsers(combinedData);
-      setFilteredUsers(combinedData);
+      if (data?.users) {
+        setUsers(data.users);
+        setFilteredUsers(data.users);
+      }
     } catch (error) {
       console.error('Error fetching users:', error);
       toast.error('Failed to load users');

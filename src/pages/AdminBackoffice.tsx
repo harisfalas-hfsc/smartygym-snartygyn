@@ -12,6 +12,7 @@ import { EmailComposer } from "@/components/admin/EmailComposer";
 import { EmailTemplatesManager } from "@/components/admin/EmailTemplatesManager";
 import { ModerationDashboard } from "@/components/admin/ModerationDashboard";
 import { AnalyticsDashboard } from "@/components/admin/AnalyticsDashboard";
+import { NewsletterManager } from "@/components/admin/NewsletterManager";
 
 export default function AdminBackoffice() {
   const navigate = useNavigate();
@@ -73,7 +74,7 @@ export default function AdminBackoffice() {
 
         {/* Main Content */}
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="grid w-full max-w-6xl grid-cols-8">
+          <TabsList className="grid w-full max-w-6xl grid-cols-9">
             <TabsTrigger value="workouts" className="flex items-center gap-1">
               <Dumbbell className="h-4 w-4" />
               <span className="hidden lg:inline">Workouts</span>
@@ -93,6 +94,10 @@ export default function AdminBackoffice() {
             <TabsTrigger value="templates" className="flex items-center gap-1">
               <FileText className="h-4 w-4" />
               <span className="hidden lg:inline">Templates</span>
+            </TabsTrigger>
+            <TabsTrigger value="newsletter" className="flex items-center gap-1">
+              <Mail className="h-4 w-4" />
+              <span className="hidden lg:inline">Newsletter</span>
             </TabsTrigger>
             <TabsTrigger value="moderation" className="flex items-center gap-1">
               <Shield className="h-4 w-4" />
@@ -126,6 +131,10 @@ export default function AdminBackoffice() {
 
           <TabsContent value="templates" className="mt-6">
             <EmailTemplatesManager />
+          </TabsContent>
+
+          <TabsContent value="newsletter" className="mt-6">
+            <NewsletterManager />
           </TabsContent>
 
           <TabsContent value="moderation" className="mt-6">
