@@ -50,6 +50,21 @@ serve(async (req) => {
         throw error;
       }
 
+      // Send purchase thank you message
+      try {
+        await supabaseClient.functions.invoke('send-system-message', {
+          body: {
+            userId: user_id,
+            messageType: 'purchase_thank_you',
+            customData: {
+              contentName: content_name
+            }
+          }
+        });
+      } catch (msgError) {
+        console.error('Failed to send purchase thank you message:', msgError);
+      }
+
       return new Response(JSON.stringify({ 
         success: true, 
         purchased: true,

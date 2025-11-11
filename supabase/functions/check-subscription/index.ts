@@ -140,6 +140,17 @@ serve(async (req) => {
       
       logStep("Determined plan type", { planType, interval: activeSubscription.items.data[0]?.price?.recurring?.interval });
 
+      // Check if this is a renewal (previous subscription existed and new one started)
+      const { data: existingSub } = await supabaseClient
+        .from('user_subscriptions')
+        .select('current_period_end')
+        .eq('user_id', user.id)
+        .single();
+      
+      const isRenewal = existingSub && 
+        existingSub.current_period_end && 
+        new Date(existingSub.current_period_end) < new Date(periodStart * 1000);
+
       // Update database with subscription info
       const { error: upsertError } = await supabaseClient
         .from('user_subscriptions')
@@ -177,8 +188,37 @@ serve(async (req) => {
       }
       
       logStep("Database updated successfully");
+
+      // Send renewal thank you message if this is a renewal
+      if (isRenewal) {
+        try {
+          await supabaseClient.functions.invoke('send-system-message', {
+            body: {
+              userId: user.id,
+              messageType: 'renewal_thank_you',
+              customData: {
+                planName: planType
+              }
+            }
+          });
+          logStep("Sent renewal thank you message");
+        } catch (msgError) {
+          logStep("Failed to send renewal thank you message", { error: msgError });
+        }
+      }
     } else {
       logStep("No active subscription found");
+      
+      // Check if user had a subscription before (to detect cancellation)
+      const { data: previousSub } = await supabaseClient
+        .from('user_subscriptions')
+        .select('plan_type, status')
+        .eq('user_id', user.id)
+        .single();
+
+      const wasCancelled = previousSub && 
+        previousSub.plan_type !== 'free' && 
+        previousSub.status === 'active';
       
       // Update to free plan
       const { error: upsertError } = await supabaseClient
@@ -202,6 +242,24 @@ serve(async (req) => {
 
       if (upsertError) {
         logStep('Free plan update error', { error: upsertError });
+      }
+
+      // Send cancellation message if subscription was just cancelled
+      if (wasCancelled) {
+        try {
+          await supabaseClient.functions.invoke('send-system-message', {
+            body: {
+              userId: user.id,
+              messageType: 'cancellation',
+              customData: {
+                planName: previousSub.plan_type
+              }
+            }
+          });
+          logStep("Sent cancellation message");
+        } catch (msgError) {
+          logStep("Failed to send cancellation message", { error: msgError });
+        }
       }
     }
 

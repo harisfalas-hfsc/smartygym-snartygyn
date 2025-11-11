@@ -1,8 +1,5 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.57.2";
-import { Resend } from "https://esm.sh/resend@3.5.0";
-
-const resend = new Resend(Deno.env.get("RESEND_API_KEY"));
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -49,15 +46,7 @@ serve(async (req) => {
       );
     }
 
-    // Get reactivation template
-    const { data: template } = await supabaseAdmin
-      .from("email_templates")
-      .select("*")
-      .eq("category", "reactivation")
-      .eq("is_active", true)
-      .single();
-
-    const emailsSent = [];
+    const messagesSent = [];
 
     for (const subscription of expiredSubs) {
       try {
@@ -75,19 +64,6 @@ serve(async (req) => {
         // Skip if user was recently active
         if (recentActivity && recentActivity.length > 0) continue;
 
-        // Get user details
-        const { data: profile } = await supabaseAdmin
-          .from("profiles")
-          .select("full_name")
-          .eq("user_id", subscription.user_id)
-          .single();
-
-        const { data: userData } = await supabaseAdmin.auth.admin.getUserById(subscription.user_id);
-        
-        if (!userData?.user?.email) continue;
-
-        const userName = profile?.full_name || "there";
-
         // Check user notification preferences
         const { data: preferences } = await supabaseAdmin
           .from("notification_preferences")
@@ -101,28 +77,26 @@ serve(async (req) => {
           continue;
         }
 
-        // Replace placeholders
-        const subject = template?.subject.replace(/{{name}}/g, userName) || "We miss you at SmartyGym!";
-        const body = (template?.body || "")
-          .replace(/{{name}}/g, userName);
-
-        // Send email
-        const emailResponse = await resend.emails.send({
-          from: "SmartyGym <onboarding@resend.dev>",
-          to: [userData.user.email],
-          subject: subject,
-          html: body.replace(/\n/g, "<br>"),
+        // Send dashboard message
+        await supabaseAdmin.functions.invoke('send-system-message', {
+          body: {
+            userId: subscription.user_id,
+            messageType: 'reactivation',
+            customData: {
+              planName: subscription.plan_type
+            }
+          }
         });
 
-        emailsSent.push({ userId: subscription.user_id, emailId: emailResponse.data?.id });
-        logStep("Re-engagement email sent", { userId: subscription.user_id, emailId: emailResponse.data?.id });
+        messagesSent.push({ userId: subscription.user_id });
+        logStep("Re-engagement message sent", { userId: subscription.user_id });
       } catch (error) {
         logStep("Error sending to user", { userId: subscription.user_id, error: error instanceof Error ? error.message : String(error) });
       }
     }
 
     return new Response(
-      JSON.stringify({ success: true, emailsSent: emailsSent.length }),
+      JSON.stringify({ success: true, messagesSent: messagesSent.length }),
       {
         status: 200,
         headers: { ...corsHeaders, "Content-Type": "application/json" },

@@ -140,8 +140,21 @@ export default function Auth() {
             variant: "destructive",
           });
         }
-      } else {
-        setNewUserId(data.user?.id || null);
+      } else if (data.user) {
+        setNewUserId(data.user.id);
+        
+        // Send welcome message
+        try {
+          await supabase.functions.invoke('send-system-message', {
+            body: {
+              userId: data.user.id,
+              messageType: 'welcome'
+            }
+          });
+        } catch (msgError) {
+          console.error('Failed to send welcome message:', msgError);
+        }
+        
         toast({
           title: "Success!",
           description: "Account created successfully!",

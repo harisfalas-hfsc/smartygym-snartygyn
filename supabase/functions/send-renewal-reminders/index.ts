@@ -1,8 +1,5 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.57.2";
-import { Resend } from "https://esm.sh/resend@3.5.0";
-
-const resend = new Resend(Deno.env.get("RESEND_API_KEY"));
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -28,22 +25,21 @@ serve(async (req) => {
       { auth: { persistSession: false } }
     );
 
-    // Get subscriptions expiring in 7 days
-    const sevenDaysFromNow = new Date();
-    sevenDaysFromNow.setDate(sevenDaysFromNow.getDate() + 7);
-    const sevenDaysISO = sevenDaysFromNow.toISOString();
-
-    const eightDaysFromNow = new Date();
-    eightDaysFromNow.setDate(eightDaysFromNow.getDate() + 8);
-    const eightDaysISO = eightDaysFromNow.toISOString();
+    // Get subscriptions expiring in 3 days
+    const threeDaysFromNow = new Date();
+    threeDaysFromNow.setDate(threeDaysFromNow.getDate() + 3);
+    const threeDaysStart = new Date(threeDaysFromNow);
+    threeDaysStart.setHours(0, 0, 0, 0);
+    const threeDaysEnd = new Date(threeDaysFromNow);
+    threeDaysEnd.setHours(23, 59, 59, 999);
 
     const { data: expiringSubscriptions, error: subsError } = await supabaseAdmin
       .from("user_subscriptions")
       .select("user_id, plan_type, current_period_end")
       .eq("status", "active")
       .neq("plan_type", "free")
-      .gte("current_period_end", sevenDaysISO)
-      .lt("current_period_end", eightDaysISO);
+      .gte("current_period_end", threeDaysStart.toISOString())
+      .lte("current_period_end", threeDaysEnd.toISOString());
 
     if (subsError) throw subsError;
 
@@ -51,7 +47,7 @@ serve(async (req) => {
 
     if (!expiringSubscriptions || expiringSubscriptions.length === 0) {
       return new Response(
-        JSON.stringify({ message: "No subscriptions expiring soon" }),
+        JSON.stringify({ message: "No subscriptions expiring in 3 days" }),
         {
           status: 200,
           headers: { ...corsHeaders, "Content-Type": "application/json" },
@@ -59,32 +55,10 @@ serve(async (req) => {
       );
     }
 
-    // Get renewal template
-    const { data: template } = await supabaseAdmin
-      .from("email_templates")
-      .select("*")
-      .eq("category", "renewal")
-      .eq("is_active", true)
-      .single();
-
-    const emailsSent = [];
+    const messagesSent = [];
 
     for (const subscription of expiringSubscriptions) {
       try {
-        // Get user details
-        const { data: profile } = await supabaseAdmin
-          .from("profiles")
-          .select("full_name")
-          .eq("user_id", subscription.user_id)
-          .single();
-
-        const { data: userData } = await supabaseAdmin.auth.admin.getUserById(subscription.user_id);
-        
-        if (!userData?.user?.email) continue;
-
-        const userName = profile?.full_name || "there";
-        const renewalDate = new Date(subscription.current_period_end).toLocaleDateString();
-
         // Check user notification preferences
         const { data: preferences } = await supabaseAdmin
           .from("notification_preferences")
@@ -98,30 +72,29 @@ serve(async (req) => {
           continue;
         }
 
-        // Replace placeholders
-        const subject = template?.subject.replace(/{{name}}/g, userName) || "Your subscription is renewing soon";
-        const body = (template?.body || "")
-          .replace(/{{name}}/g, userName)
-          .replace(/{{plan_type}}/g, subscription.plan_type)
-          .replace(/{{renewal_date}}/g, renewalDate);
+        const renewalDate = new Date(subscription.current_period_end).toLocaleDateString();
 
-        // Send email
-        const emailResponse = await resend.emails.send({
-          from: "SmartyGym <onboarding@resend.dev>",
-          to: [userData.user.email],
-          subject: subject,
-          html: body.replace(/\n/g, "<br>"),
+        // Send dashboard message
+        await supabaseAdmin.functions.invoke('send-system-message', {
+          body: {
+            userId: subscription.user_id,
+            messageType: 'renewal_reminder',
+            customData: {
+              planName: subscription.plan_type,
+              date: renewalDate
+            }
+          }
         });
 
-        emailsSent.push({ userId: subscription.user_id, emailId: emailResponse.data?.id });
-        logStep("Renewal reminder sent", { userId: subscription.user_id, emailId: emailResponse.data?.id });
+        messagesSent.push({ userId: subscription.user_id });
+        logStep("Renewal reminder sent", { userId: subscription.user_id, renewalDate });
       } catch (error) {
         logStep("Error sending to user", { userId: subscription.user_id, error: error instanceof Error ? error.message : String(error) });
       }
     }
 
     return new Response(
-      JSON.stringify({ success: true, emailsSent: emailsSent.length }),
+      JSON.stringify({ success: true, messagesSent: messagesSent.length }),
       {
         status: 200,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
