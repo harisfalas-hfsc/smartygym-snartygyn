@@ -297,15 +297,14 @@ export const WorkoutDisplay = ({
         </div>
       </div>
 
-      {/* Utility Cards - Two Equal Cards */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Workout Timer */}
-        <Card className="border-2 border-primary/30">
+      {/* Workout Timer - Centered */}
+      <div className="flex justify-center">
+        <Card className="border-2 border-primary/30 w-full max-w-2xl">
           <CardHeader className="pb-3 bg-primary/5">
             <CardTitle className="text-center text-primary">Workout Timer</CardTitle>
           </CardHeader>
-          <CardContent className="pt-4 space-y-3">
-            <div className="grid grid-cols-2 gap-3">
+          <CardContent className="pt-4">
+            <div className="grid grid-cols-3 gap-3 mb-3">
               <div>
                 <Label className="text-xs font-semibold">Work</Label>
                 <div className="flex items-center gap-1">
@@ -314,7 +313,7 @@ export const WorkoutDisplay = ({
                     value={workTime}
                     onChange={(e) => setWorkTime(parseInt(e.target.value) || 20)}
                     disabled={isRunning}
-                    className="h-9 text-center border-2 border-primary/40"
+                    className="h-8 text-center border-2 border-primary/40"
                   />
                   <span className="text-xs">s</span>
                 </div>
@@ -327,25 +326,24 @@ export const WorkoutDisplay = ({
                     value={restTime}
                     onChange={(e) => setRestTime(parseInt(e.target.value) || 10)}
                     disabled={isRunning}
-                    className="h-9 text-center border-2 border-primary/40"
+                    className="h-8 text-center border-2 border-primary/40"
                   />
                   <span className="text-xs">s</span>
                 </div>
               </div>
+              <div>
+                <Label className="text-xs font-semibold">Rounds</Label>
+                <Input
+                  type="number"
+                  value={rounds}
+                  onChange={(e) => setRounds(parseInt(e.target.value) || 8)}
+                  disabled={isRunning}
+                  className="h-8 text-center border-2 border-primary/40"
+                />
+              </div>
             </div>
 
-            <div>
-              <Label className="text-xs font-semibold">Rounds</Label>
-              <Input
-                type="number"
-                value={rounds}
-                onChange={(e) => setRounds(parseInt(e.target.value) || 8)}
-                disabled={isRunning}
-                className="h-9 text-center border-2 border-primary/40"
-              />
-            </div>
-
-            <div className="text-center py-3 bg-muted rounded-lg">
+            <div className="text-center py-2 bg-muted rounded-lg mb-3">
               <div className="text-3xl font-bold text-primary mb-1">
                 {timeLeft}s
               </div>
@@ -357,66 +355,18 @@ export const WorkoutDisplay = ({
             <div className="flex gap-2">
               <Button 
                 onClick={handleStartStop}
-                className="flex-1 h-10"
+                className="flex-1 h-9"
               >
                 {isRunning ? <><Pause className="w-4 h-4 mr-2" /> Stop</> : <><Play className="w-4 h-4 mr-2" /> Start</>}
               </Button>
-              <Button onClick={handleReset} variant="outline" className="h-10 px-4">
+              <Button onClick={handleReset} variant="outline" className="h-9 px-4">
                 <RotateCcw className="w-4 h-4" />
               </Button>
             </div>
           </CardContent>
         </Card>
-
-        {/* 1RM Calculator */}
-        <Card className="border-2 border-primary/30">
-          <CardHeader className="pb-3 bg-primary/5">
-            <CardTitle className="text-center text-primary">1RM Calculator</CardTitle>
-          </CardHeader>
-          <CardContent className="pt-4 space-y-3">
-            <div>
-              <Label className="text-xs font-semibold">Weight</Label>
-              <div className="flex items-center gap-1">
-                <Input
-                  type="number"
-                  value={weight}
-                  onChange={(e) => setWeight(parseInt(e.target.value) || 100)}
-                  className="h-9 text-center border-2 border-primary/40"
-                />
-                <span className="text-xs font-medium">kg</span>
-              </div>
-            </div>
-
-            <div>
-              <Label className="text-xs font-semibold">Reps</Label>
-              <Input
-                type="number"
-                value={reps}
-                onChange={(e) => setReps(parseInt(e.target.value) || 8)}
-                className="h-9 text-center border-2 border-primary/40"
-              />
-            </div>
-
-            <Button 
-              onClick={calculate1RM}
-              className="w-full h-10"
-            >
-              Calculate 1RM
-            </Button>
-
-            {oneRM ? (
-              <div className="text-center py-3 bg-muted rounded-lg">
-                <div className="text-sm text-muted-foreground mb-1">Your 1RM</div>
-                <div className="text-3xl font-bold text-primary">{oneRM} kg</div>
-              </div>
-            ) : (
-              <div className="text-center py-3 bg-muted rounded-lg">
-                <div className="text-sm text-muted-foreground">Enter values to calculate</div>
-              </div>
-            )}
-          </CardContent>
-        </Card>
       </div>
+
 
       {/* Workout Content - EXACT ORDER FROM BACK OFFICE */}
       <div className="space-y-6 mt-8">
@@ -632,61 +582,13 @@ export const WorkoutDisplay = ({
           </Card>
         )}
 
-        {/* Program Content Sections - IN ORDER FROM BACK OFFICE */}
-        {/* 1. Overview */}
-        {overview && (
-          <Card className="border-2 border-primary/30">
-            <CardHeader className="bg-primary/5">
-              <CardTitle className="flex items-center gap-2 text-2xl font-bold">
-                🎯 Overview
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="border-l-4 border-primary pl-4 py-2">
-                <p className="text-base leading-relaxed whitespace-pre-wrap">{overview}</p>
-              </div>
-            </CardContent>
-          </Card>
-        )}
-
-        {/* 2. Target Audience */}
-        {target_audience && (
-          <Card className="border-2 border-primary/30">
-            <CardHeader className="bg-primary/5">
-              <CardTitle className="flex items-center gap-2 text-2xl font-bold">
-                👥 Target Audience
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="border-l-4 border-primary pl-4 py-2">
-                <p className="text-base leading-relaxed whitespace-pre-wrap">{target_audience}</p>
-              </div>
-            </CardContent>
-          </Card>
-        )}
-
-        {/* 3. Program Structure */}
-        {program_structure && (
-          <Card className="border-2 border-primary/30">
-            <CardHeader className="bg-primary/5">
-              <CardTitle className="flex items-center gap-2 text-2xl font-bold">
-                🏗️ Program Structure
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="border-l-4 border-primary pl-4 py-2">
-                <p className="text-base leading-relaxed whitespace-pre-wrap">{program_structure}</p>
-              </div>
-            </CardContent>
-          </Card>
-        )}
-
-        {/* 4. Weekly Schedule */}
+        {/* Program Content Sections - CORRECT ORDER */}
+        {/* 1. Training Program Content */}
         {weekly_schedule && (
           <Card className="border-2 border-primary/30">
             <CardHeader className="bg-primary/5">
               <CardTitle className="flex items-center gap-2 text-2xl font-bold">
-                📆 Weekly Schedule
+                📆 Training Program
               </CardTitle>
             </CardHeader>
             <CardContent>
@@ -697,49 +599,49 @@ export const WorkoutDisplay = ({
           </Card>
         )}
 
-        {/* 5. Progression Plan */}
-        {progression_plan && (
+        {/* 2. Description */}
+        {description && (
           <Card className="border-2 border-primary/30">
             <CardHeader className="bg-primary/5">
               <CardTitle className="flex items-center gap-2 text-2xl font-bold">
-                📈 Progression Plan
+                🔍 Description
               </CardTitle>
             </CardHeader>
             <CardContent>
               <div className="border-l-4 border-primary pl-4 py-2">
-                <p className="text-base leading-relaxed whitespace-pre-wrap">{progression_plan}</p>
+                <p className="text-base leading-relaxed whitespace-pre-wrap">{description}</p>
               </div>
             </CardContent>
           </Card>
         )}
 
-        {/* 6. Nutrition Tips */}
+        {/* 3. Construction (Program Structure) */}
+        {program_structure && (
+          <Card className="border-2 border-primary/30">
+            <CardHeader className="bg-primary/5">
+              <CardTitle className="flex items-center gap-2 text-2xl font-bold">
+                🏗️ Construction
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="border-l-4 border-primary pl-4 py-2">
+                <p className="text-base leading-relaxed whitespace-pre-wrap">{program_structure}</p>
+              </div>
+            </CardContent>
+          </Card>
+        )}
+
+        {/* 4. Tips (formerly Nutrition Tips) */}
         {nutrition_tips && (
           <Card className="border-2 border-primary/30">
             <CardHeader className="bg-primary/5">
               <CardTitle className="flex items-center gap-2 text-2xl font-bold">
-                🥗 Nutrition Tips
+                💡 Tips
               </CardTitle>
             </CardHeader>
             <CardContent>
               <div className="border-l-4 border-primary pl-4 py-2">
                 <p className="text-base leading-relaxed whitespace-pre-wrap">{nutrition_tips}</p>
-              </div>
-            </CardContent>
-          </Card>
-        )}
-
-        {/* 7. Expected Results */}
-        {expected_results && (
-          <Card className="border-2 border-primary/30">
-            <CardHeader className="bg-primary/5">
-              <CardTitle className="flex items-center gap-2 text-2xl font-bold">
-                🏆 Expected Results
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="border-l-4 border-primary pl-4 py-2">
-                <p className="text-base leading-relaxed whitespace-pre-wrap">{expected_results}</p>
               </div>
             </CardContent>
           </Card>

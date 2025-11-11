@@ -52,9 +52,10 @@ export const ProgramEditDialog = ({ program, open, onOpenChange, onSave }: Progr
     weeks: 4,
     days_per_week: 4,
     equipment: '',
-    description: '',
-    instructions: '',
-    tips: '',
+    training_program: '',
+    program_description: '',
+    construction: '',
+    final_tips: '',
     image_url: '',
     generate_unique_image: false,
     is_premium: false,
@@ -102,9 +103,10 @@ export const ProgramEditDialog = ({ program, open, onOpenChange, onSave }: Progr
         weeks: program.weeks || 4,
         days_per_week: program.days_per_week || 4,
         equipment: program.equipment || '',
-        description: program.description || '',
-        instructions: program.progression_plan || '',
-        tips: program.nutrition_tips || '',
+        training_program: program.weekly_schedule || '',
+        program_description: program.description || '',
+        construction: program.program_structure || '',
+        final_tips: program.nutrition_tips || '',
         image_url: program.image_url || '',
         generate_unique_image: false,
         is_premium: program.is_premium || false,
@@ -130,9 +132,10 @@ export const ProgramEditDialog = ({ program, open, onOpenChange, onSave }: Progr
         weeks: 4,
         days_per_week: 4,
         equipment: '',
-        description: '',
-        instructions: '',
-        tips: '',
+        training_program: '',
+        program_description: '',
+        construction: '',
+        final_tips: '',
         image_url: '',
         generate_unique_image: false,
         is_premium: false,
@@ -244,10 +247,10 @@ export const ProgramEditDialog = ({ program, open, onOpenChange, onSave }: Progr
         days_per_week: formData.days_per_week,
         equipment: formData.equipment,
         duration,
-        description: formData.description,
-        progression_plan: formData.instructions,
-        nutrition_tips: formData.tips,
-        weekly_schedule: JSON.stringify(weekDayContents),
+        weekly_schedule: formData.training_program,
+        description: formData.program_description,
+        program_structure: formData.construction,
+        nutrition_tips: formData.final_tips,
         image_url: imageUrl,
         is_premium: formData.is_premium,
         tier_required: formData.tier_required || null,
@@ -414,71 +417,53 @@ export const ProgramEditDialog = ({ program, open, onOpenChange, onSave }: Progr
             </Select>
           </div>
 
-          {/* 7. Training Program Content - Week/Day Boxes */}
-          <div className="space-y-4">
-            <Label>7. Training Program Content</Label>
-            <div className="space-y-6">
-              {Array.from({ length: formData.weeks }, (_, weekIndex) => (
-                <div key={weekIndex} className="border rounded-lg p-4 space-y-3">
-                  <h4 className="font-semibold text-lg">Week {weekIndex + 1}</h4>
-                  <div className="space-y-3">
-                    {Array.from({ length: formData.days_per_week }, (_, dayIndex) => {
-                      const content = weekDayContents.find(
-                        wdc => wdc.week === weekIndex + 1 && wdc.day === dayIndex + 1
-                      );
-                      return (
-                        <div key={dayIndex} className="space-y-2">
-                          <Label htmlFor={`week-${weekIndex + 1}-day-${dayIndex + 1}`}>
-                            Day {dayIndex + 1}
-                          </Label>
-                          <Textarea
-                            id={`week-${weekIndex + 1}-day-${dayIndex + 1}`}
-                            value={content?.content || ''}
-                            onChange={(e) => updateWeekDayContent(weekIndex + 1, dayIndex + 1, e.target.value)}
-                            placeholder={`Training content for Week ${weekIndex + 1}, Day ${dayIndex + 1}`}
-                            rows={4}
-                          />
-                        </div>
-                      );
-                    })}
-                  </div>
-                </div>
-              ))}
-            </div>
+          {/* 7. Training Program Content - Single Box */}
+          <div className="space-y-2">
+            <Label htmlFor="training_program">7. Training Program</Label>
+            <p className="text-sm text-muted-foreground">
+              Enter the complete training program content. You can use formatting like bold, bullets, spacing, etc.
+            </p>
+            <Textarea
+              id="training_program"
+              value={formData.training_program}
+              onChange={(e) => setFormData({ ...formData, training_program: e.target.value })}
+              placeholder="Enter your complete training program content here..."
+              rows={12}
+            />
           </div>
 
           {/* 8. Description */}
           <div className="space-y-2">
-            <Label htmlFor="description">8. Description</Label>
+            <Label htmlFor="program_description">8. Description</Label>
             <Textarea
-              id="description"
-              value={formData.description}
-              onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+              id="program_description"
+              value={formData.program_description}
+              onChange={(e) => setFormData({ ...formData, program_description: e.target.value })}
               placeholder="Brief description of the program"
               rows={3}
             />
           </div>
 
-          {/* 9. Instructions */}
+          {/* 9. Construction */}
           <div className="space-y-2">
-            <Label htmlFor="instructions">9. Instructions</Label>
+            <Label htmlFor="construction">9. Construction</Label>
             <Textarea
-              id="instructions"
-              value={formData.instructions}
-              onChange={(e) => setFormData({ ...formData, instructions: e.target.value })}
-              placeholder="Program instructions and progression plan"
+              id="construction"
+              value={formData.construction}
+              onChange={(e) => setFormData({ ...formData, construction: e.target.value })}
+              placeholder="Program structure and construction details"
               rows={4}
             />
           </div>
 
           {/* 10. Tips */}
           <div className="space-y-2">
-            <Label htmlFor="tips">10. Tips</Label>
+            <Label htmlFor="final_tips">10. Tips</Label>
             <Textarea
-              id="tips"
-              value={formData.tips}
-              onChange={(e) => setFormData({ ...formData, tips: e.target.value })}
-              placeholder="Nutrition tips and additional guidance"
+              id="final_tips"
+              value={formData.final_tips}
+              onChange={(e) => setFormData({ ...formData, final_tips: e.target.value })}
+              placeholder="Tips and additional guidance"
               rows={4}
             />
           </div>
