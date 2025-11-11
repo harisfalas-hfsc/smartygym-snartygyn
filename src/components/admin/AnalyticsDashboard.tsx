@@ -252,12 +252,14 @@ export function AnalyticsDashboard() {
 
       {/* Charts */}
       <Tabs defaultValue="revenue" className="space-y-4">
-        <TabsList className="grid w-full grid-cols-4">
-          <TabsTrigger value="revenue">Revenue</TabsTrigger>
-          <TabsTrigger value="growth">User Growth</TabsTrigger>
-          <TabsTrigger value="completion">Completion Rates</TabsTrigger>
-          <TabsTrigger value="popular">Popular Content</TabsTrigger>
-        </TabsList>
+        <div className="w-full overflow-x-auto">
+          <TabsList className="w-full inline-flex sm:grid sm:grid-cols-4 min-w-max sm:min-w-0">
+            <TabsTrigger value="revenue" className="flex-shrink-0 whitespace-nowrap">Revenue</TabsTrigger>
+            <TabsTrigger value="growth" className="flex-shrink-0 whitespace-nowrap">User Growth</TabsTrigger>
+            <TabsTrigger value="completion" className="flex-shrink-0 whitespace-nowrap">Completion Rates</TabsTrigger>
+            <TabsTrigger value="popular" className="flex-shrink-0 whitespace-nowrap">Popular Content</TabsTrigger>
+          </TabsList>
+        </div>
 
         <TabsContent value="revenue" className="space-y-4">
           <RevenueAnalytics />

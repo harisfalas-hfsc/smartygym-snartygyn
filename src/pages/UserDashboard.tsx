@@ -845,36 +845,38 @@ export default function UserDashboard() {
         </div>
 
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-          <TabsList className="grid w-full grid-cols-1 sm:grid-cols-5">
-            <TabsTrigger value="workouts">
-              <Dumbbell className="mr-2 h-4 w-4" />
-              Workouts
-            </TabsTrigger>
-            <TabsTrigger value="programs">
-              <Calendar className="mr-2 h-4 w-4" />
-              Programs
-            </TabsTrigger>
-            <TabsTrigger value="purchases">
-              <ShoppingBag className="mr-2 h-4 w-4" />
-              My Purchases
-            </TabsTrigger>
-            <TabsTrigger value="messages">
-              <MessageSquare className="mr-2 h-4 w-4" />
-              Messages
-              {unreadCount > 0 && (
-                <Badge 
-                  variant="destructive" 
-                  className="ml-2 h-5 min-w-5 flex items-center justify-center rounded-full p-1 text-xs"
-                >
-                  {unreadCount}
-                </Badge>
-              )}
-            </TabsTrigger>
-            <TabsTrigger value="calculators">
-              <Calculator className="mr-2 h-4 w-4" />
-              My Calculators
-            </TabsTrigger>
-          </TabsList>
+          <div className="w-full overflow-x-auto">
+            <TabsList className="w-full inline-flex sm:grid sm:grid-cols-5 min-w-max sm:min-w-0">
+              <TabsTrigger value="workouts" className="flex-shrink-0">
+                <Dumbbell className="mr-2 h-4 w-4" />
+                <span className="whitespace-nowrap">Workouts</span>
+              </TabsTrigger>
+              <TabsTrigger value="programs" className="flex-shrink-0">
+                <Calendar className="mr-2 h-4 w-4" />
+                <span className="whitespace-nowrap">Programs</span>
+              </TabsTrigger>
+              <TabsTrigger value="purchases" className="flex-shrink-0">
+                <ShoppingBag className="mr-2 h-4 w-4" />
+                <span className="whitespace-nowrap">My Purchases</span>
+              </TabsTrigger>
+              <TabsTrigger value="messages" className="flex-shrink-0">
+                <MessageSquare className="mr-2 h-4 w-4" />
+                <span className="whitespace-nowrap">Messages</span>
+                {unreadCount > 0 && (
+                  <Badge 
+                    variant="destructive" 
+                    className="ml-2 h-5 min-w-5 flex items-center justify-center rounded-full p-1 text-xs"
+                  >
+                    {unreadCount}
+                  </Badge>
+                )}
+              </TabsTrigger>
+              <TabsTrigger value="calculators" className="flex-shrink-0">
+                <Calculator className="mr-2 h-4 w-4" />
+                <span className="whitespace-nowrap">My Calculators</span>
+              </TabsTrigger>
+            </TabsList>
+          </div>
 
           {/* Workouts Tab */}
           <TabsContent value="workouts" className="space-y-6">

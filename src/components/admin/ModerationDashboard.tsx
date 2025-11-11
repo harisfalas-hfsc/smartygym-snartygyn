@@ -333,17 +333,19 @@ export function ModerationDashboard() {
         </CardHeader>
         <CardContent>
           <Tabs defaultValue="comments" className="w-full">
-            <TabsList className="grid w-full grid-cols-3">
-              <TabsTrigger value="comments">
-                Comments ({comments.length})
-              </TabsTrigger>
-              <TabsTrigger value="flags">
-                Flags ({flags.filter(f => f.status === 'pending').length})
-              </TabsTrigger>
-              <TabsTrigger value="banned">
-                Banned ({bannedUsers.length})
-              </TabsTrigger>
-            </TabsList>
+            <div className="w-full overflow-x-auto">
+              <TabsList className="w-full inline-flex sm:grid sm:grid-cols-3 min-w-max sm:min-w-0">
+                <TabsTrigger value="comments" className="flex-shrink-0 whitespace-nowrap">
+                  Comments ({comments.length})
+                </TabsTrigger>
+                <TabsTrigger value="flags" className="flex-shrink-0 whitespace-nowrap">
+                  Flags ({flags.filter(f => f.status === 'pending').length})
+                </TabsTrigger>
+                <TabsTrigger value="banned" className="flex-shrink-0 whitespace-nowrap">
+                  Banned ({bannedUsers.length})
+                </TabsTrigger>
+              </TabsList>
+            </div>
 
             {/* Comments Tab */}
             <TabsContent value="comments" className="space-y-4 mt-4">

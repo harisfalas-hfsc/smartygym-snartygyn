@@ -383,28 +383,30 @@ export default function Dashboard() {
         </div>
 
         <Tabs defaultValue="favorites" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-2 sm:grid-cols-3 lg:grid-cols-7 gap-1">
-            <TabsTrigger value="favorites" className="text-xs sm:text-sm">
-              <Heart className="mr-0 sm:mr-2 h-4 w-4" />
-              <span className="hidden sm:inline">Favorites</span>
-            </TabsTrigger>
-            <TabsTrigger value="workouts" className="text-xs sm:text-sm">
-              <Dumbbell className="mr-0 sm:mr-2 h-4 w-4" />
-              <span className="hidden sm:inline">Workouts</span>
-            </TabsTrigger>
-            <TabsTrigger value="programs" className="text-xs sm:text-sm">
-              <Calendar className="mr-0 sm:mr-2 h-4 w-4" />
-              <span className="hidden sm:inline">Programs</span>
-            </TabsTrigger>
-            <TabsTrigger value="calculators" className="text-xs sm:text-sm">
-              <Calculator className="mr-0 sm:mr-2 h-4 w-4" />
-              <span className="hidden sm:inline">Calculators</span>
-            </TabsTrigger>
-            <TabsTrigger value="settings" className="text-xs sm:text-sm">
-              <Settings className="mr-0 sm:mr-2 h-4 w-4" />
-              <span className="hidden sm:inline">Settings</span>
-            </TabsTrigger>
-          </TabsList>
+          <div className="w-full overflow-x-auto">
+            <TabsList className="w-full inline-flex sm:grid sm:grid-cols-3 lg:grid-cols-7 min-w-max sm:min-w-0 gap-1">
+              <TabsTrigger value="favorites" className="text-xs sm:text-sm flex-shrink-0">
+                <Heart className="mr-2 h-4 w-4" />
+                <span className="whitespace-nowrap">Favorites</span>
+              </TabsTrigger>
+              <TabsTrigger value="workouts" className="text-xs sm:text-sm flex-shrink-0">
+                <Dumbbell className="mr-2 h-4 w-4" />
+                <span className="whitespace-nowrap">Workouts</span>
+              </TabsTrigger>
+              <TabsTrigger value="programs" className="text-xs sm:text-sm flex-shrink-0">
+                <Calendar className="mr-2 h-4 w-4" />
+                <span className="whitespace-nowrap">Programs</span>
+              </TabsTrigger>
+              <TabsTrigger value="calculators" className="text-xs sm:text-sm flex-shrink-0">
+                <Calculator className="mr-2 h-4 w-4" />
+                <span className="whitespace-nowrap">Calculators</span>
+              </TabsTrigger>
+              <TabsTrigger value="settings" className="text-xs sm:text-sm flex-shrink-0">
+                <Settings className="mr-2 h-4 w-4" />
+                <span className="whitespace-nowrap">Settings</span>
+              </TabsTrigger>
+            </TabsList>
+          </div>
 
           {/* Favorites Tab */}
           <TabsContent value="favorites" className="space-y-6">

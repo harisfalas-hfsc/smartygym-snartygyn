@@ -162,17 +162,19 @@ export const PersonalTrainingManager = () => {
           </div>
 
           <Tabs defaultValue="pending">
-            <TabsList className="grid w-full grid-cols-3">
-              <TabsTrigger value="pending">
-                Pending ({pendingRequests.length})
-              </TabsTrigger>
-              <TabsTrigger value="in_progress">
-                In Progress ({inProgressRequests.length})
-              </TabsTrigger>
-              <TabsTrigger value="completed">
-                Completed ({completedRequests.length})
-              </TabsTrigger>
-            </TabsList>
+            <div className="w-full overflow-x-auto">
+              <TabsList className="w-full inline-flex sm:grid sm:grid-cols-3 min-w-max sm:min-w-0">
+                <TabsTrigger value="pending" className="flex-shrink-0 whitespace-nowrap">
+                  Pending ({pendingRequests.length})
+                </TabsTrigger>
+                <TabsTrigger value="in_progress" className="flex-shrink-0 whitespace-nowrap">
+                  In Progress ({inProgressRequests.length})
+                </TabsTrigger>
+                <TabsTrigger value="completed" className="flex-shrink-0 whitespace-nowrap">
+                  Completed ({completedRequests.length})
+                </TabsTrigger>
+              </TabsList>
+            </div>
 
             <TabsContent value="pending" className="space-y-4">
               {pendingRequests.map((request) => (

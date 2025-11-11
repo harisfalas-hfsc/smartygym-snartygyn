@@ -454,23 +454,25 @@ export const ContactManager = () => {
           </div>
 
           <Tabs defaultValue="all">
-            <TabsList className="grid w-full grid-cols-5">
-              <TabsTrigger value="all">
-                All ({messages.length})
-              </TabsTrigger>
-              <TabsTrigger value="general">
-                General ({generalMessages.length})
-              </TabsTrigger>
-              <TabsTrigger value="support">
-                Support ({supportMessages.length})
-              </TabsTrigger>
-              <TabsTrigger value="coach">
-                Coach ({coachMessages.length})
-              </TabsTrigger>
-              <TabsTrigger value="new">
-                New ({newMessages.length})
-              </TabsTrigger>
-            </TabsList>
+            <div className="w-full overflow-x-auto">
+              <TabsList className="w-full inline-flex sm:grid sm:grid-cols-5 min-w-max sm:min-w-0">
+                <TabsTrigger value="all" className="flex-shrink-0 whitespace-nowrap">
+                  All ({messages.length})
+                </TabsTrigger>
+                <TabsTrigger value="general" className="flex-shrink-0 whitespace-nowrap">
+                  General ({generalMessages.length})
+                </TabsTrigger>
+                <TabsTrigger value="support" className="flex-shrink-0 whitespace-nowrap">
+                  Support ({supportMessages.length})
+                </TabsTrigger>
+                <TabsTrigger value="coach" className="flex-shrink-0 whitespace-nowrap">
+                  Coach ({coachMessages.length})
+                </TabsTrigger>
+                <TabsTrigger value="new" className="flex-shrink-0 whitespace-nowrap">
+                  New ({newMessages.length})
+                </TabsTrigger>
+              </TabsList>
+            </div>
 
             <TabsContent value="all" className="space-y-4 mt-4">
               {filteredMessages.length === 0 ? (
