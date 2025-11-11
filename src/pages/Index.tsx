@@ -233,8 +233,8 @@ const Index = () => {
             <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold text-center mb-4">
               Smarty Gym
             </h1>
-            <p className="text-lg sm:text-xl text-center text-muted-foreground mb-6">
-              Smarty Gym, it's your gym re-imagined, anywhere, anytime.
+            <p className="text-lg sm:text-xl text-center text-muted-foreground mb-6 underline">
+              your gym re-imagined, anywhere, anytime
             </p>
             <div className="bg-primary/10 border border-primary/20 rounded-lg p-3 sm:p-4 mb-3 sm:mb-4 text-center">
               <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed">
