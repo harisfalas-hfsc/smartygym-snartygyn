@@ -3,10 +3,12 @@ import { useNavigate, useParams } from "react-router-dom";
 import { Helmet } from "react-helmet";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { ArrowLeft, Calendar } from "lucide-react";
+import { ArrowLeft, Calendar, Eye, CheckCircle } from "lucide-react";
 import { AccessGate } from "@/components/AccessGate";
 import { CompactFilters } from "@/components/CompactFilters";
 import { useAllPrograms } from "@/hooks/useProgramData";
+import { useProgramInteractions } from "@/hooks/useProgramInteractions";
+import { supabase } from "@/integrations/supabase/client";
 import cardioEnduranceImg from "@/assets/cardio-endurance-program.jpg";
 import functionalStrengthImg from "@/assets/functional-strength-program.jpg";
 import muscleHypertrophyImg from "@/assets/muscle-hypertrophy-program.jpg";
@@ -29,6 +31,7 @@ import mobilityStabilityFlowImg from "@/assets/mobility-stability-flow-program.j
 type EquipmentFilter = "all" | "bodyweight" | "equipment";
 type LevelFilter = "all" | "beginner" | "intermediate" | "advanced";
 type DurationFilter = "all" | "4" | "6" | "8";
+type StatusFilter = "all" | "viewed" | "completed";
 
 export interface TrainingProgram {
   id: string;
@@ -47,9 +50,19 @@ const TrainingProgramDetail = () => {
   const [equipmentFilter, setEquipmentFilter] = useState<EquipmentFilter>("all");
   const [levelFilter, setLevelFilter] = useState<LevelFilter>("all");
   const [durationFilter, setDurationFilter] = useState<DurationFilter>("all");
+  const [statusFilter, setStatusFilter] = useState<StatusFilter>("all");
+  const [userId, setUserId] = useState<string | undefined>();
 
-  // Fetch programs from database
+  // Fetch current user
+  useEffect(() => {
+    supabase.auth.getUser().then(({ data: { user } }) => {
+      setUserId(user?.id);
+    });
+  }, []);
+
+  // Fetch programs and interactions from database
   const { data: allPrograms = [], isLoading } = useAllPrograms();
+  const { data: interactions = [] } = useProgramInteractions(userId);
   
   // Map URL type to database category
   const categoryMap: { [key: string]: string } = {
@@ -343,6 +356,13 @@ const TrainingProgramDetail = () => {
       if (programWeeks !== durationFilter) return false;
     }
     
+    // Status filter (only for authenticated users)
+    if (statusFilter !== "all" && userId) {
+      const interaction = interactions.find(i => i.program_id === program.id);
+      if (statusFilter === "viewed" && !interaction?.has_viewed) return false;
+      if (statusFilter === "completed" && !interaction?.is_completed) return false;
+    }
+    
     return true;
   });
 
@@ -454,39 +474,68 @@ const TrainingProgramDetail = () => {
                 { value: "8", label: "8 Weeks" },
               ],
             },
+            ...(userId ? [{
+              name: "Status",
+              value: statusFilter,
+              onChange: (value) => setStatusFilter(value as StatusFilter),
+              placeholder: "Status",
+              options: [
+                { value: "all", label: "All Programs" },
+                { value: "viewed", label: "Viewed" },
+                { value: "completed", label: "Completed" },
+              ],
+            }] : []),
           ]}
         />
 
         {/* Program Cards */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
-          {filteredPrograms.map((program) => (
-            <Card
-              key={program.id}
-              className="overflow-hidden cursor-pointer transition-all duration-300 hover:scale-105 hover:shadow-gold bg-card border-border"
-              onClick={() => navigate(`/trainingprogram/${type}/${program.id}`)}
-            >
-              <div className="relative h-48 w-full overflow-hidden">
-                <img 
-                  src={program.image_url} 
-                  alt={`${program.name} - ${program.duration} training program by Haris Falas Sports Scientist at Smarty Gym Cyprus`}
-                  className="w-full h-full object-cover"
-                />
-                <div className="absolute top-2 right-2 bg-primary text-primary-foreground text-xs px-2 py-1 rounded flex items-center gap-1">
-                  <Calendar className="w-3 h-3" />
-                  <span>{program.duration} weeks</span>
-                </div>
-                {!program.is_premium && (
-                  <div className="absolute top-2 left-2 bg-primary text-primary-foreground px-3 py-1 rounded-full text-xs font-semibold">
-                    FREE
+          {filteredPrograms.map((program) => {
+            const interaction = userId ? interactions.find(i => i.program_id === program.id) : null;
+            const isViewed = interaction?.has_viewed;
+            const isCompleted = interaction?.is_completed;
+            
+            return (
+              <Card
+                key={program.id}
+                className="overflow-hidden cursor-pointer transition-all duration-300 hover:scale-105 hover:shadow-gold bg-card border-border"
+                onClick={() => navigate(`/trainingprogram/${type}/${program.id}`)}
+              >
+                <div className="relative h-48 w-full overflow-hidden">
+                  <img 
+                    src={program.image_url} 
+                    alt={`${program.name} - ${program.duration} training program by Haris Falas Sports Scientist at Smarty Gym Cyprus`}
+                    className="w-full h-full object-cover"
+                  />
+                  <div className="absolute top-2 right-2 bg-primary text-primary-foreground text-xs px-2 py-1 rounded flex items-center gap-1">
+                    <Calendar className="w-3 h-3" />
+                    <span>{program.duration} weeks</span>
                   </div>
-                )}
-              </div>
-              <div className="p-4 space-y-2">
-                <h3 className="font-semibold text-lg">{program.name}</h3>
-                <p className="text-sm text-muted-foreground line-clamp-2">{program.description}</p>
-              </div>
-            </Card>
-          ))}
+                  {!program.is_premium && (
+                    <div className="absolute top-2 left-2 bg-primary text-primary-foreground px-3 py-1 rounded-full text-xs font-semibold">
+                      FREE
+                    </div>
+                  )}
+                  {userId && isCompleted && (
+                    <div className="absolute bottom-2 left-2 bg-green-600 text-white px-2 py-1 rounded-full text-xs font-semibold flex items-center gap-1">
+                      <CheckCircle className="h-3 w-3" />
+                      Completed
+                    </div>
+                  )}
+                  {userId && isViewed && !isCompleted && (
+                    <div className="absolute bottom-2 left-2 bg-blue-600 text-white px-2 py-1 rounded-full text-xs font-semibold flex items-center gap-1">
+                      <Eye className="h-3 w-3" />
+                      Viewed
+                    </div>
+                  )}
+                </div>
+                <div className="p-4 space-y-2">
+                  <h3 className="font-semibold text-lg">{program.name}</h3>
+                  <p className="text-sm text-muted-foreground line-clamp-2">{program.description}</p>
+                </div>
+              </Card>
+            );
+          })}
         </div>
 
         {filteredPrograms.length === 0 && (

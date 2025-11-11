@@ -3,10 +3,12 @@ import { useNavigate, useParams } from "react-router-dom";
 import { Helmet } from "react-helmet";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, Eye, CheckCircle } from "lucide-react";
 import { AccessGate } from "@/components/AccessGate";
 import { CompactFilters } from "@/components/CompactFilters";
 import { useAllWorkouts } from "@/hooks/useWorkoutData";
+import { useWorkoutInteractions } from "@/hooks/useWorkoutInteractions";
+import { supabase } from "@/integrations/supabase/client";
 import burnStartImg from "@/assets/burn-start-workout.jpg";
 import sweatCircuitImg from "@/assets/sweat-circuit-workout.jpg";
 import bodyBurnoutImg from "@/assets/body-burnout-workout.jpg";
@@ -128,6 +130,7 @@ type EquipmentFilter = "all" | "bodyweight" | "equipment";
 type LevelFilter = "all" | "beginner" | "intermediate" | "advanced";
 type FormatFilter = "all" | "circuit" | "amrap" | "for time" | "tabata" | "reps & sets" | "emom" | "mix";
 type DurationFilter = "all" | "15" | "20" | "30" | "45" | "60" | "various";
+type StatusFilter = "all" | "viewed" | "completed";
 
 export interface Workout {
   id: string;
@@ -270,9 +273,19 @@ const WorkoutDetail = () => {
   const [levelFilter, setLevelFilter] = useState<LevelFilter>("all");
   const [formatFilter, setFormatFilter] = useState<FormatFilter>("all");
   const [durationFilter, setDurationFilter] = useState<DurationFilter>("all");
+  const [statusFilter, setStatusFilter] = useState<StatusFilter>("all");
+  const [userId, setUserId] = useState<string | undefined>();
   
-  // Fetch workouts from database
+  // Fetch current user
+  useEffect(() => {
+    supabase.auth.getUser().then(({ data: { user } }) => {
+      setUserId(user?.id);
+    });
+  }, []);
+  
+  // Fetch workouts and interactions from database
   const { data: allWorkouts = [], isLoading } = useAllWorkouts();
+  const { data: interactions = [] } = useWorkoutInteractions(userId);
   
   // Map URL type to database category
   const categoryMap: { [key: string]: string } = {
@@ -336,6 +349,13 @@ const WorkoutDetail = () => {
         const durationNumber = workout.duration?.match(/\d+/)?.[0];
         if (durationNumber !== durationFilter) return false;
       }
+    }
+    
+    // Status filter (only for authenticated users)
+    if (statusFilter !== "all" && userId) {
+      const interaction = interactions.find(i => i.workout_id === workout.id);
+      if (statusFilter === "viewed" && !interaction?.has_viewed) return false;
+      if (statusFilter === "completed" && !interaction?.is_completed) return false;
     }
     
     return true;
@@ -459,38 +479,67 @@ const WorkoutDetail = () => {
                 { value: "various", label: "Various" },
               ],
             },
+            ...(userId ? [{
+              name: "Status",
+              value: statusFilter,
+              onChange: (value) => setStatusFilter(value as StatusFilter),
+              placeholder: "Status",
+              options: [
+                { value: "all", label: "All Workouts" },
+                { value: "viewed", label: "Viewed" },
+                { value: "completed", label: "Completed" },
+              ],
+            }] : []),
           ]}
         />
 
         {/* Workout Cards */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
-          {filteredWorkouts.map((workout) => (
-            <Card
-              key={workout.id}
-              className="overflow-hidden cursor-pointer transition-all duration-300 hover:scale-105 hover:shadow-gold bg-card border-border relative"
-              onClick={() => navigate(`/workout/${type}/${workout.id}`)}
-            >
-              <div className="relative h-48 w-full overflow-hidden">
-                <img 
-                  src={workout.image_url} 
-                  alt={`${workout.name} - ${workout.duration} ${workout.difficulty} ${workout.equipment === 'BODYWEIGHT' ? 'bodyweight' : 'equipment-based'} ${workout.format} workout by Haris Falas Sports Scientist at Smarty Gym Cyprus`}
-                  className="w-full h-full object-cover"
-                />
-                <div className="absolute top-2 right-2 bg-primary text-primary-foreground text-xs px-2 py-1 rounded">
-                  {workout.duration}
-                </div>
-                {!workout.is_premium && (
-                  <div className="absolute top-2 left-2 bg-primary text-primary-foreground px-3 py-1 rounded-full text-xs font-semibold">
-                    FREE
+          {filteredWorkouts.map((workout) => {
+            const interaction = userId ? interactions.find(i => i.workout_id === workout.id) : null;
+            const isViewed = interaction?.has_viewed;
+            const isCompleted = interaction?.is_completed;
+            
+            return (
+              <Card
+                key={workout.id}
+                className="overflow-hidden cursor-pointer transition-all duration-300 hover:scale-105 hover:shadow-gold bg-card border-border relative"
+                onClick={() => navigate(`/workout/${type}/${workout.id}`)}
+              >
+                <div className="relative h-48 w-full overflow-hidden">
+                  <img 
+                    src={workout.image_url} 
+                    alt={`${workout.name} - ${workout.duration} ${workout.difficulty} ${workout.equipment === 'BODYWEIGHT' ? 'bodyweight' : 'equipment-based'} ${workout.format} workout by Haris Falas Sports Scientist at Smarty Gym Cyprus`}
+                    className="w-full h-full object-cover"
+                  />
+                  <div className="absolute top-2 right-2 bg-primary text-primary-foreground text-xs px-2 py-1 rounded">
+                    {workout.duration}
                   </div>
-                )}
-              </div>
-              <div className="p-4 space-y-2">
-                <h3 className="font-semibold text-lg">{workout.name}</h3>
-                <p className="text-sm text-muted-foreground line-clamp-2">{workout.description}</p>
-              </div>
-            </Card>
-          ))}
+                  {!workout.is_premium && (
+                    <div className="absolute top-2 left-2 bg-primary text-primary-foreground px-3 py-1 rounded-full text-xs font-semibold">
+                      FREE
+                    </div>
+                  )}
+                  {userId && isCompleted && (
+                    <div className="absolute bottom-2 left-2 bg-green-600 text-white px-2 py-1 rounded-full text-xs font-semibold flex items-center gap-1">
+                      <CheckCircle className="h-3 w-3" />
+                      Completed
+                    </div>
+                  )}
+                  {userId && isViewed && !isCompleted && (
+                    <div className="absolute bottom-2 left-2 bg-blue-600 text-white px-2 py-1 rounded-full text-xs font-semibold flex items-center gap-1">
+                      <Eye className="h-3 w-3" />
+                      Viewed
+                    </div>
+                  )}
+                </div>
+                <div className="p-4 space-y-2">
+                  <h3 className="font-semibold text-lg">{workout.name}</h3>
+                  <p className="text-sm text-muted-foreground line-clamp-2">{workout.description}</p>
+                </div>
+              </Card>
+            );
+          })}
         </div>
 
         {filteredWorkouts.length === 0 && (
