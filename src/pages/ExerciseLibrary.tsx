@@ -49,9 +49,9 @@ const ExerciseLibrary = () => {
           <Card className="border-2 border-primary/30 shadow-lg">
             <CardContent className="p-6">
               <div className="bg-gradient-to-r from-primary/10 to-primary/5 p-6 rounded-lg border border-primary/20 mb-6">
-                <div className="flex items-center gap-3 justify-center mb-3">
-                  <Youtube className="h-6 w-6 text-primary" />
-                  <h2 className="text-xl font-semibold text-foreground">The Smarty Gym <span className="whitespace-nowrap">YouTube</span> Channel</h2>
+                <div className="flex flex-col sm:flex-row items-center gap-2 sm:gap-3 justify-center mb-3">
+                  <Youtube className="h-6 w-6 text-primary flex-shrink-0" />
+                  <h2 className="text-xl font-semibold text-foreground text-center">The Smarty Gym YouTube Channel</h2>
                 </div>
                 <p className="text-center text-muted-foreground mb-4">
                   Browse all exercise videos, tutorials, and demonstrations
