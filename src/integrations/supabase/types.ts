@@ -200,6 +200,42 @@ export type Database = {
         }
         Relationships: []
       }
+      automated_message_templates: {
+        Row: {
+          content: string
+          created_at: string | null
+          id: string
+          is_active: boolean | null
+          is_default: boolean | null
+          message_type: Database["public"]["Enums"]["message_type"]
+          subject: string
+          template_name: string
+          updated_at: string | null
+        }
+        Insert: {
+          content: string
+          created_at?: string | null
+          id?: string
+          is_active?: boolean | null
+          is_default?: boolean | null
+          message_type: Database["public"]["Enums"]["message_type"]
+          subject: string
+          template_name: string
+          updated_at?: string | null
+        }
+        Update: {
+          content?: string
+          created_at?: string | null
+          id?: string
+          is_active?: boolean | null
+          is_default?: boolean | null
+          message_type?: Database["public"]["Enums"]["message_type"]
+          subject?: string
+          template_name?: string
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       banned_users: {
         Row: {
           banned_at: string | null
@@ -1207,6 +1243,36 @@ export type Database = {
         }
         Relationships: []
       }
+      user_system_messages: {
+        Row: {
+          content: string
+          created_at: string | null
+          id: string
+          is_read: boolean | null
+          message_type: Database["public"]["Enums"]["message_type"]
+          subject: string
+          user_id: string
+        }
+        Insert: {
+          content: string
+          created_at?: string | null
+          id?: string
+          is_read?: boolean | null
+          message_type: Database["public"]["Enums"]["message_type"]
+          subject: string
+          user_id: string
+        }
+        Update: {
+          content?: string
+          created_at?: string | null
+          id?: string
+          is_read?: boolean | null
+          message_type?: Database["public"]["Enums"]["message_type"]
+          subject?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       workout_comments: {
         Row: {
           comment_text: string
@@ -1307,6 +1373,15 @@ export type Database = {
     }
     Enums: {
       app_role: "admin" | "moderator" | "user"
+      message_type:
+        | "welcome"
+        | "purchase_workout"
+        | "purchase_program"
+        | "purchase_personal_training"
+        | "purchase_subscription"
+        | "renewal_reminder"
+        | "renewal_thank_you"
+        | "cancellation"
       plan_type: "free" | "gold" | "platinum"
       subscription_status: "active" | "canceled" | "past_due"
     }
@@ -1437,6 +1512,16 @@ export const Constants = {
   public: {
     Enums: {
       app_role: ["admin", "moderator", "user"],
+      message_type: [
+        "welcome",
+        "purchase_workout",
+        "purchase_program",
+        "purchase_personal_training",
+        "purchase_subscription",
+        "renewal_reminder",
+        "renewal_thank_you",
+        "cancellation",
+      ],
       plan_type: ["free", "gold", "platinum"],
       subscription_status: ["active", "canceled", "past_due"],
     },

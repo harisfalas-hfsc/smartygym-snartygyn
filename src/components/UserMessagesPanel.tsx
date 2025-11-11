@@ -1,11 +1,12 @@
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { format } from "date-fns";
-import { MessageSquare, Mail, Paperclip, Download } from "lucide-react";
+import { MessageSquare, Mail, Paperclip, Download, Zap, User } from "lucide-react";
 import { useEffect } from "react";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 interface ContactMessage {
   id: string;
@@ -24,9 +25,18 @@ interface ContactMessage {
   attachments: any[];
 }
 
+interface SystemMessage {
+  id: string;
+  message_type: string;
+  subject: string;
+  content: string;
+  is_read: boolean;
+  created_at: string;
+}
+
 export const UserMessagesPanel = () => {
-  const { data: rawMessages = [], isLoading, refetch } = useQuery({
-    queryKey: ['user-messages'],
+  const { data: rawContactMessages = [], isLoading: contactLoading, refetch: refetchContact } = useQuery({
+    queryKey: ['user-contact-messages'],
     queryFn: async () => {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error('Not authenticated');
@@ -42,13 +52,30 @@ export const UserMessagesPanel = () => {
     },
   });
 
-  // Transform the data to ensure attachments is an array
-  const messages: ContactMessage[] = (rawMessages || []).map(msg => ({
+  const { data: systemMessages = [], isLoading: systemLoading, refetch: refetchSystem } = useQuery({
+    queryKey: ['user-system-messages'],
+    queryFn: async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error('Not authenticated');
+
+      const { data, error } = await supabase
+        .from('user_system_messages')
+        .select('*')
+        .eq('user_id', user.id)
+        .order('created_at', { ascending: false });
+
+      if (error) throw error;
+      return data;
+    },
+  });
+
+  const contactMessages: ContactMessage[] = (rawContactMessages || []).map(msg => ({
     ...msg,
     attachments: Array.isArray(msg.attachments) ? msg.attachments : []
   }));
 
-  // Mark all responses as read when component mounts
+  const isLoading = contactLoading || systemLoading;
+
   useEffect(() => {
     const markAsRead = async () => {
       const { data: { user } } = await supabase.auth.getUser();
@@ -61,11 +88,18 @@ export const UserMessagesPanel = () => {
         .not('response', 'is', null)
         .is('response_read_at', null);
       
-      refetch();
+      await supabase
+        .from('user_system_messages')
+        .update({ is_read: true })
+        .eq('user_id', user.id)
+        .eq('is_read', false);
+      
+      refetchContact();
+      refetchSystem();
     };
 
     markAsRead();
-  }, [refetch]);
+  }, [refetchContact, refetchSystem]);
 
   const getCategoryIcon = (category: string) => {
     switch (category) {
@@ -78,29 +112,50 @@ export const UserMessagesPanel = () => {
     }
   };
 
-  const getStatusBadge = (message: ContactMessage) => {
-    if (message.response && !message.response_read_at) {
-      return <Badge variant="destructive">New Response</Badge>;
-    } else if (message.response) {
-      return <Badge variant="default" className="bg-green-600">Responded</Badge>;
-    } else if (message.status === 'read') {
-      return <Badge variant="secondary">Read</Badge>;
-    } else {
-      return <Badge variant="outline">Pending</Badge>;
+  const getMessageTypeIcon = (type: string) => {
+    switch (type) {
+      case 'welcome':
+        return <User className="h-4 w-4 text-green-600" />;
+      case 'purchase_workout':
+      case 'purchase_program':
+      case 'purchase_personal_training':
+      case 'purchase_subscription':
+        return <MessageSquare className="h-4 w-4 text-blue-600" />;
+      case 'renewal_reminder':
+      case 'renewal_thank_you':
+        return <Zap className="h-4 w-4 text-yellow-600" />;
+      case 'cancellation':
+        return <MessageSquare className="h-4 w-4 text-red-600" />;
+      default:
+        return <MessageSquare className="h-4 w-4" />;
     }
+  };
+
+  const getMessageTypeLabel = (type: string) => {
+    const labels: Record<string, string> = {
+      welcome: 'Welcome',
+      purchase_workout: 'Workout Purchase',
+      purchase_program: 'Program Purchase',
+      purchase_personal_training: 'Personal Training',
+      purchase_subscription: 'Subscription',
+      renewal_reminder: 'Renewal Reminder',
+      renewal_thank_you: 'Thank You',
+      cancellation: 'Cancellation'
+    };
+    return labels[type] || type;
   };
 
   if (isLoading) {
     return <div className="text-center py-8">Loading messages...</div>;
   }
 
-  if (messages.length === 0) {
+  if (contactMessages.length === 0 && systemMessages.length === 0) {
     return (
       <Card>
         <CardContent className="pt-6">
           <div className="text-center py-8 text-muted-foreground">
             <MessageSquare className="h-12 w-12 mx-auto mb-4 opacity-50" />
-            <p>You haven't sent any messages yet</p>
+            <p>You don't have any messages yet</p>
           </div>
         </CardContent>
       </Card>
@@ -108,63 +163,207 @@ export const UserMessagesPanel = () => {
   }
 
   return (
-    <>
-      <div className="space-y-4">
-        <h2 className="text-2xl font-bold">My Messages</h2>
-        <p className="text-muted-foreground">
-          View your contact messages and responses from the team
-        </p>
+    <div className="space-y-4">
+      <h2 className="text-2xl font-bold">My Messages</h2>
+      <p className="text-muted-foreground">
+        View your messages, system notifications, and responses from the team
+      </p>
 
-        {messages.map((message) => (
-          <Card key={message.id} className={!message.response_read_at && message.response ? 'border-green-500' : ''}>
-            <CardContent className="pt-6">
-              <div className="flex items-start justify-between">
-                <div className="flex-1">
-                  <div className="flex items-center gap-2 mb-2">
-                    {getCategoryIcon(message.category)}
-                    <h3 className="font-semibold">{message.subject}</h3>
-                    {!message.response_read_at && message.response && (
-                      <Badge variant="destructive">New Response</Badge>
-                    )}
-                  </div>
-                  <p className="text-sm text-muted-foreground line-clamp-2 mb-3">
-                    {message.message}
-                  </p>
-                  <div className="flex items-center gap-4 flex-wrap">
-                    <span className="text-xs text-muted-foreground">
-                      {format(new Date(message.created_at), 'MMM dd, yyyy HH:mm')}
-                    </span>
-                    {getStatusBadge(message)}
-                    <Badge variant="outline" className="text-xs">
-                      {message.category.replace('_', ' ')}
-                    </Badge>
+      <Tabs defaultValue="all" className="w-full">
+        <TabsList>
+          <TabsTrigger value="all">All ({contactMessages.length + systemMessages.length})</TabsTrigger>
+          <TabsTrigger value="system">System ({systemMessages.length})</TabsTrigger>
+          <TabsTrigger value="contact">My Requests ({contactMessages.length})</TabsTrigger>
+        </TabsList>
+
+        <TabsContent value="all" className="space-y-4 mt-4">
+          {systemMessages.map((message) => (
+            <Card key={`system-${message.id}`} className={!message.is_read ? 'border-blue-500' : ''}>
+              <CardContent className="pt-6">
+                <div className="flex items-start gap-3">
+                  {getMessageTypeIcon(message.message_type)}
+                  <div className="flex-1">
+                    <div className="flex items-center gap-2 mb-2">
+                      <h3 className="font-semibold">{message.subject}</h3>
+                      {!message.is_read && <Badge variant="destructive">New</Badge>}
+                      <Badge variant="outline" className="text-xs">
+                        <Zap className="h-3 w-3 mr-1" />
+                        System
+                      </Badge>
+                    </div>
+                    <div className="bg-muted p-4 rounded-lg text-sm whitespace-pre-wrap mb-3">
+                      {message.content}
+                    </div>
+                    <div className="flex items-center gap-4">
+                      <span className="text-xs text-muted-foreground">
+                        {format(new Date(message.created_at), 'MMM dd, yyyy HH:mm')}
+                      </span>
+                      <Badge variant="secondary" className="text-xs">
+                        {getMessageTypeLabel(message.message_type)}
+                      </Badge>
+                    </div>
                   </div>
                 </div>
-                <Button 
-                  size="sm" 
-                  variant={!message.response_read_at && message.response ? "default" : "outline"}
-                >
-                  View
-                </Button>
-              </div>
+              </CardContent>
+            </Card>
+          ))}
 
-              {message.attachments && message.attachments.length > 0 && (
-                <div className="mt-4 pt-4 border-t">
-                  <p className="text-xs text-muted-foreground mb-2">Attachments ({message.attachments.length})</p>
-                  <div className="flex flex-wrap gap-2">
-                    {message.attachments.map((attachment: any, index: number) => (
-                      <div key={index} className="flex items-center gap-1 bg-muted px-2 py-1 rounded text-xs">
-                        <Paperclip className="h-3 w-3" />
-                        <span className="truncate max-w-[150px]">{attachment.name}</span>
+          {contactMessages.map((message) => (
+            <Card key={`contact-${message.id}`} className={!message.response_read_at && message.response ? 'border-green-500' : ''}>
+              <CardContent className="pt-6">
+                <div className="flex items-start justify-between">
+                  <div className="flex-1">
+                    <div className="flex items-center gap-2 mb-2">
+                      {getCategoryIcon(message.category)}
+                      <h3 className="font-semibold">{message.subject}</h3>
+                      {!message.response_read_at && message.response && (
+                        <Badge variant="destructive">New Response</Badge>
+                      )}
+                      <Badge variant="outline" className="text-xs">
+                        <User className="h-3 w-3 mr-1" />
+                        Your Message
+                      </Badge>
+                    </div>
+                    <p className="text-sm text-muted-foreground line-clamp-2 mb-3">
+                      {message.message}
+                    </p>
+                    <div className="flex items-center gap-4 flex-wrap">
+                      <span className="text-xs text-muted-foreground">
+                        {format(new Date(message.created_at), 'MMM dd, yyyy HH:mm')}
+                      </span>
+                      {message.response ? (
+                        <Badge variant="default" className="bg-green-600">Coach Replied</Badge>
+                      ) : (
+                        <Badge variant="secondary">Pending</Badge>
+                      )}
+                    </div>
+                  </div>
+                </div>
+
+                {message.response && (
+                  <div className="mt-4 pt-4 border-t">
+                    <p className="text-sm font-semibold mb-2 text-green-600">Coach Response:</p>
+                    <div className="bg-green-50 dark:bg-green-950 border border-green-200 dark:border-green-800 p-3 rounded-lg text-sm whitespace-pre-wrap">
+                      {message.response}
+                    </div>
+                    <p className="text-xs text-muted-foreground mt-2">
+                      {format(new Date(message.responded_at!), 'MMM dd, yyyy HH:mm')}
+                    </p>
+                  </div>
+                )}
+
+                {message.attachments && message.attachments.length > 0 && (
+                  <div className="mt-4 pt-4 border-t">
+                    <p className="text-xs text-muted-foreground mb-2">Attachments</p>
+                    <div className="flex flex-wrap gap-2">
+                      {message.attachments.map((attachment: any, index: number) => (
+                        <div key={index} className="flex items-center gap-1 bg-muted px-2 py-1 rounded text-xs">
+                          <Paperclip className="h-3 w-3" />
+                          <span className="truncate max-w-[150px]">{attachment.name}</span>
+                          <Button
+                            size="sm"
+                            variant="ghost"
+                            className="h-5 w-5 p-0"
+                            onClick={() => window.open(attachment.url, '_blank')}
+                          >
+                            <Download className="h-3 w-3" />
+                          </Button>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          ))}
+        </TabsContent>
+
+        <TabsContent value="system" className="space-y-4 mt-4">
+          {systemMessages.length === 0 ? (
+            <Card>
+              <CardContent className="text-center py-12">
+                <Zap className="h-12 w-12 mx-auto mb-4 opacity-50" />
+                <p className="text-muted-foreground">No system messages yet</p>
+              </CardContent>
+            </Card>
+          ) : (
+            systemMessages.map((message) => (
+              <Card key={message.id}>
+                <CardContent className="pt-6">
+                  <div className="flex items-start gap-3">
+                    {getMessageTypeIcon(message.message_type)}
+                    <div className="flex-1">
+                      <div className="flex items-center gap-2 mb-2">
+                        <h3 className="font-semibold">{message.subject}</h3>
+                        <Badge variant="outline" className="text-xs">
+                          {getMessageTypeLabel(message.message_type)}
+                        </Badge>
                       </div>
-                    ))}
+                      <div className="bg-muted p-4 rounded-lg text-sm whitespace-pre-wrap mb-3">
+                        {message.content}
+                      </div>
+                      <p className="text-xs text-muted-foreground">
+                        {format(new Date(message.created_at), 'MMM dd, yyyy HH:mm')}
+                      </p>
+                    </div>
                   </div>
-                </div>
-              )}
-            </CardContent>
-          </Card>
-        ))}
-      </div>
-    </>
+                </CardContent>
+              </Card>
+            ))
+          )}
+        </TabsContent>
+
+        <TabsContent value="contact" className="space-y-4 mt-4">
+          {contactMessages.length === 0 ? (
+            <Card>
+              <CardContent className="text-center py-12">
+                <MessageSquare className="h-12 w-12 mx-auto mb-4 opacity-50" />
+                <p className="text-muted-foreground">No contact messages yet</p>
+              </CardContent>
+            </Card>
+          ) : (
+            contactMessages.map((message) => (
+              <Card key={message.id}>
+                <CardContent className="pt-6">
+                  <div className="space-y-3">
+                    <div className="flex items-center gap-2">
+                      {getCategoryIcon(message.category)}
+                      <h3 className="font-semibold">{message.subject}</h3>
+                      {!message.response_read_at && message.response && (
+                        <Badge variant="destructive">New Response</Badge>
+                      )}
+                    </div>
+                    <div>
+                      <p className="text-sm font-medium mb-2">Your message:</p>
+                      <p className="text-sm text-muted-foreground">{message.message}</p>
+                    </div>
+                    
+                    {message.response && (
+                      <div className="pt-3 border-t">
+                        <p className="text-sm font-semibold mb-2 text-green-600">Coach Response:</p>
+                        <div className="bg-green-50 dark:bg-green-950 border border-green-200 dark:border-green-800 p-3 rounded-lg text-sm whitespace-pre-wrap">
+                          {message.response}
+                        </div>
+                        <p className="text-xs text-muted-foreground mt-2">
+                          {format(new Date(message.responded_at!), 'MMM dd, yyyy HH:mm')}
+                        </p>
+                      </div>
+                    )}
+
+                    {!message.response && (
+                      <Badge variant="secondary">Pending Response</Badge>
+                    )}
+
+                    <p className="text-xs text-muted-foreground">
+                      Sent: {format(new Date(message.created_at), 'MMM dd, yyyy HH:mm')}
+                    </p>
+                  </div>
+                </CardContent>
+              </Card>
+            ))
+          )}
+        </TabsContent>
+      </Tabs>
+    </div>
   );
 };

@@ -5,7 +5,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { ArrowLeft, Dumbbell, Calendar, Settings, Users, Mail, FileText, Shield, BarChart3, BookOpen, MessageSquare } from "lucide-react";
+import { ArrowLeft, Dumbbell, Calendar, Settings, Users, Mail, FileText, Shield, BarChart3, BookOpen, MessageSquare, Zap } from "lucide-react";
 import { WorkoutsManager } from "@/components/admin/WorkoutsManager";
 import { ProgramsManager } from "@/components/admin/ProgramsManager";
 import { UsersManager } from "@/components/admin/UsersManager";
@@ -17,6 +17,7 @@ import { NewsletterManager } from "@/components/admin/NewsletterManager";
 import { BlogManager } from "@/components/admin/BlogManager";
 import { PersonalTrainingManager } from "@/components/admin/PersonalTrainingManager";
 import { ContactManager } from "@/components/admin/ContactManager";
+import { AutomatedMessagesManager } from "@/components/admin/AutomatedMessagesManager";
 import { supabase } from "@/integrations/supabase/client";
 
 export default function AdminBackoffice() {
@@ -151,6 +152,10 @@ export default function AdminBackoffice() {
                 </Badge>
               )}
             </TabsTrigger>
+            <TabsTrigger value="automated" className="flex items-center gap-1 text-xs px-2 py-1.5 h-auto">
+              <Zap className="h-3.5 w-3.5 shrink-0" />
+              <span className="hidden sm:inline">Auto Messages</span>
+            </TabsTrigger>
             <TabsTrigger value="blog" className="flex items-center gap-1 text-xs px-2 py-1.5 h-auto">
               <BookOpen className="h-3.5 w-3.5 shrink-0" />
               <span className="hidden sm:inline">Blog</span>
@@ -199,6 +204,10 @@ export default function AdminBackoffice() {
 
           <TabsContent value="contact" className="mt-6">
             <ContactManager />
+          </TabsContent>
+
+          <TabsContent value="automated" className="mt-6">
+            <AutomatedMessagesManager />
           </TabsContent>
 
           <TabsContent value="blog" className="mt-6">

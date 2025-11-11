@@ -117,21 +117,30 @@ export default function UserDashboard() {
   // Fetch user purchases
   const { data: purchases = [], isLoading: purchasesLoading } = usePurchases(user?.id);
 
-  // Fetch unread messages count
+  // Fetch unread messages count (both contact and system)
   const { data: unreadCount = 0, refetch: refetchUnreadCount } = useQuery({
     queryKey: ['unread-messages-count', user?.id],
     queryFn: async () => {
       if (!user) return 0;
 
-      const { count, error } = await supabase
-        .from('contact_messages')
-        .select('*', { count: 'exact', head: true })
-        .eq('user_id', user.id)
-        .not('response', 'is', null)
-        .is('response_read_at', null);
+      const [contactResult, systemResult] = await Promise.all([
+        supabase
+          .from('contact_messages')
+          .select('*', { count: 'exact', head: true })
+          .eq('user_id', user.id)
+          .not('response', 'is', null)
+          .is('response_read_at', null),
+        supabase
+          .from('user_system_messages')
+          .select('*', { count: 'exact', head: true })
+          .eq('user_id', user.id)
+          .eq('is_read', false)
+      ]);
 
-      if (error) throw error;
-      return count || 0;
+      const contactCount = contactResult.count || 0;
+      const systemCount = systemResult.count || 0;
+
+      return contactCount + systemCount;
     },
     enabled: !!user,
   });
