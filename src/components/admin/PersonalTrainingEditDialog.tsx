@@ -8,6 +8,8 @@ import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
+import { ProgramPreviewDialog } from "./ProgramPreviewDialog";
+import { Eye } from "lucide-react";
 
 const PROGRAM_CATEGORIES = [
   "CARDIO",
@@ -51,6 +53,7 @@ export const PersonalTrainingEditDialog = ({
     generate_unique_image: false,
   });
   const [isGeneratingImage, setIsGeneratingImage] = useState(false);
+  const [showPreview, setShowPreview] = useState(false);
 
   useEffect(() => {
     if (program) {
@@ -164,6 +167,22 @@ export const PersonalTrainingEditDialog = ({
             content_name: formData.name,
             price: 119.00, // Personal training price
           }]);
+
+        // Send notification email to user
+        try {
+          await supabase.functions.invoke('send-program-notification', {
+            body: {
+              userId: request.user_id,
+              userEmail: request.user_email,
+              userName: request.user_name,
+              programName: formData.name,
+              notificationType: 'program_delivered',
+            }
+          });
+        } catch (emailError) {
+          console.error('Error sending notification email:', emailError);
+          // Don't fail the operation if email fails
+        }
 
         toast({ title: "Success", description: "Personal training program created and sent to user" });
       }
@@ -344,12 +363,26 @@ export const PersonalTrainingEditDialog = ({
             <Button variant="outline" onClick={() => onOpenChange(false)} disabled={isGeneratingImage}>
               Cancel
             </Button>
+            <Button 
+              variant="secondary" 
+              onClick={() => setShowPreview(true)}
+              disabled={isGeneratingImage || !formData.name}
+            >
+              <Eye className="h-4 w-4 mr-2" />
+              Preview
+            </Button>
             <Button onClick={handleSave} disabled={isGeneratingImage}>
               {isGeneratingImage ? "Generating..." : program ? "Update Program" : "Create & Send to User"}
             </Button>
           </div>
         </div>
       </DialogContent>
+
+      <ProgramPreviewDialog 
+        open={showPreview}
+        onOpenChange={setShowPreview}
+        programData={formData}
+      />
     </Dialog>
   );
 };

@@ -75,6 +75,9 @@ export const PersonalTrainingManager = () => {
   };
 
   const handleUpdateStatus = async (requestId: string, status: string) => {
+    // Get request details for notification
+    const request = requests.find(r => r.id === requestId);
+    
     const { error } = await supabase
       .from('personal_training_requests')
       .update({ status, completed_at: status === 'completed' ? new Date().toISOString() : null })
@@ -87,6 +90,24 @@ export const PersonalTrainingManager = () => {
         variant: "destructive",
       });
     } else {
+      // Send status update notification
+      if (request && (status === 'in_progress' || status === 'completed')) {
+        try {
+          await supabase.functions.invoke('send-program-notification', {
+            body: {
+              userId: request.user_id,
+              userEmail: request.user_email,
+              userName: request.user_name,
+              programName: '',
+              notificationType: 'status_update',
+              newStatus: status,
+            }
+          });
+        } catch (emailError) {
+          console.error('Error sending status notification:', emailError);
+        }
+      }
+
       toast({
         title: "Success",
         description: "Status updated successfully",
