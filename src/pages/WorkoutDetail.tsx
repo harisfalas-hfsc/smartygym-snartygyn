@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { ArrowLeft } from "lucide-react";
 import { AccessGate } from "@/components/AccessGate";
+import { CompactFilters } from "@/components/CompactFilters";
 import { useAllWorkouts } from "@/hooks/useWorkoutData";
 import burnStartImg from "@/assets/burn-start-workout.jpg";
 import sweatCircuitImg from "@/assets/sweat-circuit-workout.jpg";
@@ -401,190 +402,65 @@ const WorkoutDetail = () => {
         
         <h1 className="text-3xl sm:text-4xl font-bold text-center mb-8">{title}</h1>
         
-        {/* Filters */}
-        <div className="mb-8 space-y-4">
-          {/* Equipment Filter */}
-          <div>
-            <p className="text-sm font-medium mb-2">Equipment Type</p>
-            <div className="flex gap-2 flex-wrap">
-              <Button
-                variant={equipmentFilter === "all" ? "default" : "outline"}
-                onClick={() => setEquipmentFilter("all")}
-                size="sm"
-              >
-                All
-              </Button>
-              <Button
-                variant={equipmentFilter === "bodyweight" ? "default" : "outline"}
-                onClick={() => setEquipmentFilter("bodyweight")}
-                size="sm"
-              >
-                Body Weight
-              </Button>
-              <Button
-                variant={equipmentFilter === "equipment" ? "default" : "outline"}
-                onClick={() => setEquipmentFilter("equipment")}
-                size="sm"
-              >
-                Equipment
-              </Button>
-            </div>
-          </div>
-
-          {/* Level Filter */}
-          <div>
-            <p className="text-sm font-medium mb-2">Experience Level</p>
-            <div className="flex gap-2 flex-wrap">
-              <Button
-                variant={levelFilter === "all" ? "default" : "outline"}
-                onClick={() => setLevelFilter("all")}
-                size="sm"
-              >
-                All
-              </Button>
-              <Button
-                variant={levelFilter === "beginner" ? "default" : "outline"}
-                onClick={() => setLevelFilter("beginner")}
-                size="sm"
-              >
-                Beginner
-              </Button>
-              <Button
-                variant={levelFilter === "intermediate" ? "default" : "outline"}
-                onClick={() => setLevelFilter("intermediate")}
-                size="sm"
-              >
-                Intermediate
-              </Button>
-              <Button
-                variant={levelFilter === "advanced" ? "default" : "outline"}
-                onClick={() => setLevelFilter("advanced")}
-                size="sm"
-              >
-                Advanced
-              </Button>
-            </div>
-          </div>
-
-          {/* Format Filter */}
-          <div>
-            <p className="text-sm font-medium mb-2">Workout Format</p>
-            <div className="flex gap-2 flex-wrap">
-              <Button
-                variant={formatFilter === "all" ? "default" : "outline"}
-                onClick={() => setFormatFilter("all")}
-                size="sm"
-              >
-                All
-              </Button>
-              <Button
-                variant={formatFilter === "circuit" ? "default" : "outline"}
-                onClick={() => setFormatFilter("circuit")}
-                size="sm"
-              >
-                Circuit
-              </Button>
-              <Button
-                variant={formatFilter === "amrap" ? "default" : "outline"}
-                onClick={() => setFormatFilter("amrap")}
-                size="sm"
-              >
-                AMRAP
-              </Button>
-              <Button
-                variant={formatFilter === "for time" ? "default" : "outline"}
-                onClick={() => setFormatFilter("for time")}
-                size="sm"
-              >
-                For Time
-              </Button>
-              <Button
-                variant={formatFilter === "tabata" ? "default" : "outline"}
-                onClick={() => setFormatFilter("tabata")}
-                size="sm"
-              >
-                Tabata
-              </Button>
-              <Button
-                variant={formatFilter === "reps & sets" ? "default" : "outline"}
-                onClick={() => setFormatFilter("reps & sets")}
-                size="sm"
-              >
-                Reps & Sets
-              </Button>
-              <Button
-                variant={formatFilter === "emom" ? "default" : "outline"}
-                onClick={() => setFormatFilter("emom")}
-                size="sm"
-              >
-                EMOM
-              </Button>
-              <Button
-                variant={formatFilter === "mix" ? "default" : "outline"}
-                onClick={() => setFormatFilter("mix")}
-                size="sm"
-              >
-                Mix
-              </Button>
-            </div>
-          </div>
-
-          {/* Duration Filter */}
-          <div>
-            <p className="text-sm font-medium mb-2">Duration (minutes)</p>
-            <div className="flex gap-2 flex-wrap">
-              <Button
-                variant={durationFilter === "all" ? "default" : "outline"}
-                onClick={() => setDurationFilter("all")}
-                size="sm"
-              >
-                All
-              </Button>
-              <Button
-                variant={durationFilter === "15" ? "default" : "outline"}
-                onClick={() => setDurationFilter("15")}
-                size="sm"
-              >
-                15 min
-              </Button>
-              <Button
-                variant={durationFilter === "20" ? "default" : "outline"}
-                onClick={() => setDurationFilter("20")}
-                size="sm"
-              >
-                20 min
-              </Button>
-              <Button
-                variant={durationFilter === "30" ? "default" : "outline"}
-                onClick={() => setDurationFilter("30")}
-                size="sm"
-              >
-                30 min
-              </Button>
-              <Button
-                variant={durationFilter === "45" ? "default" : "outline"}
-                onClick={() => setDurationFilter("45")}
-                size="sm"
-              >
-                45 min
-              </Button>
-              <Button
-                variant={durationFilter === "60" ? "default" : "outline"}
-                onClick={() => setDurationFilter("60")}
-                size="sm"
-              >
-                60 min
-              </Button>
-              <Button
-                variant={durationFilter === "various" ? "default" : "outline"}
-                onClick={() => setDurationFilter("various")}
-                size="sm"
-              >
-                Various
-              </Button>
-            </div>
-          </div>
-        </div>
+        {/* Compact Filters */}
+        <CompactFilters
+          filters={[
+            {
+              name: "Equipment",
+              value: equipmentFilter,
+              onChange: (value) => setEquipmentFilter(value as EquipmentFilter),
+              placeholder: "Equipment",
+              options: [
+                { value: "all", label: "All Equipment" },
+                { value: "bodyweight", label: "Bodyweight" },
+                { value: "equipment", label: "Equipment" },
+              ],
+            },
+            {
+              name: "Level",
+              value: levelFilter,
+              onChange: (value) => setLevelFilter(value as LevelFilter),
+              placeholder: "Level",
+              options: [
+                { value: "all", label: "All Levels" },
+                { value: "beginner", label: "Beginner" },
+                { value: "intermediate", label: "Intermediate" },
+                { value: "advanced", label: "Advanced" },
+              ],
+            },
+            {
+              name: "Format",
+              value: formatFilter,
+              onChange: (value) => setFormatFilter(value as FormatFilter),
+              placeholder: "Format",
+              options: [
+                { value: "all", label: "All Formats" },
+                { value: "circuit", label: "Circuit" },
+                { value: "amrap", label: "AMRAP" },
+                { value: "for time", label: "For Time" },
+                { value: "tabata", label: "Tabata" },
+                { value: "reps & sets", label: "Reps & Sets" },
+                { value: "emom", label: "EMOM" },
+                { value: "mix", label: "Mix" },
+              ],
+            },
+            {
+              name: "Duration",
+              value: durationFilter,
+              onChange: (value) => setDurationFilter(value as DurationFilter),
+              placeholder: "Duration",
+              options: [
+                { value: "all", label: "All Durations" },
+                { value: "15", label: "15 min" },
+                { value: "20", label: "20 min" },
+                { value: "30", label: "30 min" },
+                { value: "45", label: "45 min" },
+                { value: "60", label: "60 min" },
+                { value: "various", label: "Various" },
+              ],
+            },
+          ]}
+        />
 
         {/* Workout Cards */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">

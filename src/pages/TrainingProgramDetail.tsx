@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { ArrowLeft, Calendar } from "lucide-react";
 import { AccessGate } from "@/components/AccessGate";
+import { CompactFilters } from "@/components/CompactFilters";
 import { useAllPrograms } from "@/hooks/useProgramData";
 import cardioEnduranceImg from "@/assets/cardio-endurance-program.jpg";
 import functionalStrengthImg from "@/assets/functional-strength-program.jpg";
@@ -415,106 +416,46 @@ const TrainingProgramDetail = () => {
           </Card>
         )}
         
-        {/* Filters */}
-        <div className="mb-8 space-y-4">
-          {/* Equipment Filter */}
-          <div>
-            <p className="text-sm font-medium mb-2">Equipment Type</p>
-            <div className="flex gap-2 flex-wrap">
-              <Button
-                variant={equipmentFilter === "all" ? "default" : "outline"}
-                onClick={() => setEquipmentFilter("all")}
-                size="sm"
-              >
-                All
-              </Button>
-              <Button
-                variant={equipmentFilter === "bodyweight" ? "default" : "outline"}
-                onClick={() => setEquipmentFilter("bodyweight")}
-                size="sm"
-              >
-                Body Weight
-              </Button>
-              <Button
-                variant={equipmentFilter === "equipment" ? "default" : "outline"}
-                onClick={() => setEquipmentFilter("equipment")}
-                size="sm"
-              >
-                Equipment
-              </Button>
-            </div>
-          </div>
-
-          {/* Level Filter */}
-          <div>
-            <p className="text-sm font-medium mb-2">Experience Level</p>
-            <div className="flex gap-2 flex-wrap">
-              <Button
-                variant={levelFilter === "all" ? "default" : "outline"}
-                onClick={() => setLevelFilter("all")}
-                size="sm"
-              >
-                All
-              </Button>
-              <Button
-                variant={levelFilter === "beginner" ? "default" : "outline"}
-                onClick={() => setLevelFilter("beginner")}
-                size="sm"
-              >
-                Beginner
-              </Button>
-              <Button
-                variant={levelFilter === "intermediate" ? "default" : "outline"}
-                onClick={() => setLevelFilter("intermediate")}
-                size="sm"
-              >
-                Intermediate
-              </Button>
-              <Button
-                variant={levelFilter === "advanced" ? "default" : "outline"}
-                onClick={() => setLevelFilter("advanced")}
-                size="sm"
-              >
-                Advanced
-              </Button>
-            </div>
-          </div>
-
-          {/* Duration Filter */}
-          <div>
-            <p className="text-sm font-medium mb-2">Program Duration</p>
-            <div className="flex gap-2 flex-wrap">
-              <Button
-                variant={durationFilter === "all" ? "default" : "outline"}
-                onClick={() => setDurationFilter("all")}
-                size="sm"
-              >
-                All
-              </Button>
-              <Button
-                variant={durationFilter === "4" ? "default" : "outline"}
-                onClick={() => setDurationFilter("4")}
-                size="sm"
-              >
-                4 Weeks
-              </Button>
-              <Button
-                variant={durationFilter === "6" ? "default" : "outline"}
-                onClick={() => setDurationFilter("6")}
-                size="sm"
-              >
-                6 Weeks
-              </Button>
-              <Button
-                variant={durationFilter === "8" ? "default" : "outline"}
-                onClick={() => setDurationFilter("8")}
-                size="sm"
-              >
-                8 Weeks
-              </Button>
-            </div>
-          </div>
-        </div>
+        {/* Compact Filters */}
+        <CompactFilters
+          filters={[
+            {
+              name: "Equipment",
+              value: equipmentFilter,
+              onChange: (value) => setEquipmentFilter(value as EquipmentFilter),
+              placeholder: "Equipment",
+              options: [
+                { value: "all", label: "All Equipment" },
+                { value: "bodyweight", label: "Bodyweight" },
+                { value: "equipment", label: "Equipment" },
+              ],
+            },
+            {
+              name: "Level",
+              value: levelFilter,
+              onChange: (value) => setLevelFilter(value as LevelFilter),
+              placeholder: "Level",
+              options: [
+                { value: "all", label: "All Levels" },
+                { value: "beginner", label: "Beginner" },
+                { value: "intermediate", label: "Intermediate" },
+                { value: "advanced", label: "Advanced" },
+              ],
+            },
+            {
+              name: "Duration",
+              value: durationFilter,
+              onChange: (value) => setDurationFilter(value as DurationFilter),
+              placeholder: "Duration",
+              options: [
+                { value: "all", label: "All Durations" },
+                { value: "4", label: "4 Weeks" },
+                { value: "6", label: "6 Weeks" },
+                { value: "8", label: "8 Weeks" },
+              ],
+            },
+          ]}
+        />
 
         {/* Program Cards */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
