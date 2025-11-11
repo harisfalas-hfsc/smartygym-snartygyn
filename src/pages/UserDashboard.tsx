@@ -7,6 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
+import { usePurchases } from "@/hooks/usePurchases";
 import { 
   Heart, 
   CheckCircle, 
@@ -16,7 +17,8 @@ import {
   Calendar,
   Crown,
   ArrowLeft,
-  Calculator
+  Calculator,
+  ShoppingBag
 } from "lucide-react";
 
 interface WorkoutInteraction {
@@ -108,6 +110,9 @@ export default function UserDashboard() {
   const [oneRMHistory, setOneRMHistory] = useState<OneRMRecord[]>([]);
   const [bmrHistory, setBMRHistory] = useState<BMRRecord[]>([]);
   const [calorieHistory, setCalorieHistory] = useState<CalorieRecord[]>([]);
+  
+  // Fetch user purchases
+  const { data: purchases = [], isLoading: purchasesLoading } = usePurchases(user?.id);
 
   useEffect(() => {
     initDashboard();
@@ -803,7 +808,7 @@ export default function UserDashboard() {
         </div>
 
         <Tabs defaultValue="workouts" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-1 sm:grid-cols-3">
+          <TabsList className="grid w-full grid-cols-1 sm:grid-cols-4">
             <TabsTrigger value="workouts">
               <Dumbbell className="mr-2 h-4 w-4" />
               Workouts
@@ -811,6 +816,10 @@ export default function UserDashboard() {
             <TabsTrigger value="programs">
               <Calendar className="mr-2 h-4 w-4" />
               Programs
+            </TabsTrigger>
+            <TabsTrigger value="purchases">
+              <ShoppingBag className="mr-2 h-4 w-4" />
+              My Purchases
             </TabsTrigger>
             <TabsTrigger value="calculators">
               <Calculator className="mr-2 h-4 w-4" />
@@ -1132,6 +1141,68 @@ export default function UserDashboard() {
             )}
           </TabsContent>
 
+          {/* My Purchases Tab */}
+          <TabsContent value="purchases" className="space-y-6">
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <ShoppingBag className="h-5 w-5" />
+                  My Purchases
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                {purchasesLoading ? (
+                  <p className="text-center text-muted-foreground py-8">Loading purchases...</p>
+                ) : purchases.length === 0 ? (
+                  <div className="text-center py-8 space-y-4">
+                    <p className="text-muted-foreground">You haven't purchased any individual content yet</p>
+                    <div className="flex flex-col sm:flex-row gap-3 justify-center">
+                      <Button onClick={() => navigate("/workout/strength")}>
+                        Browse Workouts
+                      </Button>
+                      <Button variant="outline" onClick={() => navigate("/trainingprogram/functional-strength")}>
+                        Browse Programs
+                      </Button>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="space-y-4">
+                    {purchases.map((purchase) => (
+                      <Card key={purchase.id} className="overflow-hidden hover:shadow-lg transition-shadow">
+                        <CardContent className="p-6">
+                          <div className="flex flex-col sm:flex-row justify-between items-start gap-4">
+                            <div className="space-y-2 flex-1">
+                              <div className="flex items-center gap-2">
+                                <Badge variant="outline" className="text-xs">
+                                  {purchase.content_type === "workout" ? "Workout" : "Program"}
+                                </Badge>
+                                <span className="text-xs text-muted-foreground">
+                                  Purchased {new Date(purchase.purchased_at).toLocaleDateString()}
+                                </span>
+                              </div>
+                              <h3 className="text-lg font-semibold">{purchase.content_name}</h3>
+                              <p className="text-sm text-muted-foreground">€{Number(purchase.price).toFixed(2)}</p>
+                            </div>
+                            <Button
+                              onClick={() => {
+                                if (purchase.content_type === "workout") {
+                                  navigate(`/workout/detail/${purchase.content_id}`);
+                                } else {
+                                  navigate(`/trainingprogram/detail/${purchase.content_id}`);
+                                }
+                              }}
+                            >
+                              View Content
+                            </Button>
+                          </div>
+                        </CardContent>
+                      </Card>
+                    ))}
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          </TabsContent>
 
           {/* Calculators Tab */}
           <TabsContent value="calculators" className="space-y-6">

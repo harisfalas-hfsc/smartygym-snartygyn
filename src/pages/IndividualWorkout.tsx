@@ -6,7 +6,9 @@ import { ArrowLeft, Clock, Dumbbell, TrendingUp } from "lucide-react";
 import { WorkoutDisplay } from "@/components/WorkoutDisplay";
 import { AccessGate } from "@/components/AccessGate";
 import { CommentDialog } from "@/components/CommentDialog";
+import { PurchaseButton } from "@/components/PurchaseButton";
 import { useWorkoutData } from "@/hooks/useWorkoutData";
+import { useAccessControl } from "@/hooks/useAccessControl";
 import burnStartImg from "@/assets/burn-start-workout.jpg";
 import sweatCircuitImg from "@/assets/sweat-circuit-workout.jpg";
 import bodyBurnoutImg from "@/assets/body-burnout-workout.jpg";
@@ -127,6 +129,7 @@ import bodyweightMadnessImg from "@/assets/bodyweight-madness-workout.jpg";
 const IndividualWorkout = () => {
   const navigate = useNavigate();
   const { type, id } = useParams();
+  const { userTier, hasPurchased } = useAccessControl();
   
   // Helper function to format focus label
   const getFocusLabel = (type: string | undefined): string => {
@@ -4592,8 +4595,15 @@ Rest 30s between rounds`,
 
   // Use database workout if available, otherwise fall back to hardcoded data
   let workout: any = null;
+  let isPremium = false;
+  let canPurchase = false;
+  let hasAccess = true;
   
   if (dbWorkout) {
+    isPremium = dbWorkout.is_premium && !isFreeWorkout;
+    canPurchase = dbWorkout.is_standalone_purchase && !!dbWorkout.price;
+    hasAccess = userTier === "premium" || hasPurchased(dbWorkout.id, "workout") || !isPremium;
+
     // Convert database format to expected format
     workout = {
       name: dbWorkout.name,
@@ -4711,15 +4721,37 @@ Rest 30s between rounds`,
             >
               <ArrowLeft className="mr-2 h-4 w-4" />
               <span className="text-xs sm:text-sm">Back</span>
-            </Button>
-            <CommentDialog
-              workoutId={id}
-              workoutName={workout.name}
-              workoutType={type}
-            />
-          </div>
+        </Button>
+        <CommentDialog
+          workoutId={id}
+          workoutName={workout.name}
+          workoutType={type}
+        />
+      </div>
 
-          <AccessGate requireAuth={true} requirePremium={!isFreeWorkout} contentType="workout">
+      {/* Show purchase button if available and user doesn't have access */}
+      {!hasAccess && canPurchase && userTier === "subscriber" && dbWorkout && (
+        <div className="mb-6">
+          <Card className="border-primary/50 bg-gradient-to-r from-primary/5 to-primary/10">
+            <div className="p-6 text-center space-y-4">
+              <h3 className="text-xl font-semibold">Get Instant Access</h3>
+              <p className="text-muted-foreground">
+                Purchase this workout once and own it forever
+              </p>
+              <PurchaseButton
+                contentId={dbWorkout.id}
+                contentType="workout"
+                contentName={dbWorkout.name}
+                price={Number(dbWorkout.price) || 0}
+                stripeProductId={dbWorkout.stripe_product_id}
+                stripePriceId={dbWorkout.stripe_price_id}
+              />
+            </div>
+          </Card>
+        </div>
+      )}
+
+      <AccessGate requireAuth={true} requirePremium={isPremium && !hasAccess} contentType="workout">
             {/* Use WorkoutDisplay component with all functionality */}
             <WorkoutDisplay
               exercises={[

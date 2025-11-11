@@ -6,7 +6,9 @@ import { ArrowLeft } from "lucide-react";
 import { WorkoutDisplay } from "@/components/WorkoutDisplay";
 import { AccessGate } from "@/components/AccessGate";
 import { CommentDialog } from "@/components/CommentDialog";
+import { PurchaseButton } from "@/components/PurchaseButton";
 import { useProgramData } from "@/hooks/useProgramData";
+import { useAccessControl } from "@/hooks/useAccessControl";
 import cardioEnduranceImg from "@/assets/cardio-endurance-program.jpg";
 import functionalStrengthImg from "@/assets/functional-strength-program.jpg";
 import muscleHypertrophyImg from "@/assets/muscle-hypertrophy-program.jpg";
@@ -29,6 +31,7 @@ import mobilityStabilityFlowImg from "@/assets/mobility-stability-flow-program.j
 const IndividualTrainingProgram = () => {
   const navigate = useNavigate();
   const { type, id } = useParams();
+  const { userTier, hasPurchased } = useAccessControl();
   
   // Helper function to format focus label
   const getFocusLabel = (type: string | undefined): string => {
@@ -64,6 +67,10 @@ const IndividualTrainingProgram = () => {
   }
 
   if (dbProgram) {
+    const isPremium = dbProgram.is_premium && !isFreeProgram;
+    const canPurchase = dbProgram.is_standalone_purchase && dbProgram.price;
+    const hasAccess = userTier === "premium" || hasPurchased(dbProgram.id, "program") || !isPremium;
+
     return (
       <>
         <Helmet>
@@ -88,7 +95,29 @@ const IndividualTrainingProgram = () => {
               />
             </div>
 
-            <AccessGate requireAuth={true} requirePremium={!isFreeProgram} contentType="program">
+            {/* Show purchase button if available and user doesn't have access */}
+            {!hasAccess && canPurchase && userTier === "subscriber" && (
+              <div className="mb-6">
+                <Card className="border-primary/50 bg-gradient-to-r from-primary/5 to-primary/10">
+                  <div className="p-6 text-center space-y-4">
+                    <h3 className="text-xl font-semibold">Get Instant Access</h3>
+                    <p className="text-muted-foreground">
+                      Purchase this program once and own it forever
+                    </p>
+                    <PurchaseButton
+                      contentId={dbProgram.id}
+                      contentType="program"
+                      contentName={dbProgram.name}
+                      price={Number(dbProgram.price) || 0}
+                      stripeProductId={dbProgram.stripe_product_id}
+                      stripePriceId={dbProgram.stripe_price_id}
+                    />
+                  </div>
+                </Card>
+              </div>
+            )}
+
+            <AccessGate requireAuth={true} requirePremium={isPremium && !hasAccess} contentType="program">
               <WorkoutDisplay
                 exercises={[]}
                 planContent=""

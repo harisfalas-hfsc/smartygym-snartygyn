@@ -9,11 +9,13 @@ interface AccessControlState {
   userTier: UserTier;
   isLoading: boolean;
   productId: string | null;
+  purchasedContent: Set<string>;
 }
 
 interface AccessControlContextType extends AccessControlState {
-  canAccessContent: (contentType: string) => boolean;
+  canAccessContent: (contentType: string, contentId?: string) => boolean;
   canInteract: (contentType: string) => boolean;
+  hasPurchased: (contentId: string, contentType: string) => boolean;
   refreshAccess: () => Promise<void>;
 }
 
@@ -25,6 +27,7 @@ export const AccessControlProvider = ({ children }: { children: ReactNode }) => 
     userTier: "guest",
     isLoading: true,
     productId: null,
+    purchasedContent: new Set(),
   });
 
   useEffect(() => {
@@ -42,7 +45,8 @@ export const AccessControlProvider = ({ children }: { children: ReactNode }) => 
                 user: null,
                 userTier: "guest",
                 isLoading: false,
-                productId: null
+                productId: null,
+                purchasedContent: new Set(),
               };
             }
             return prev;
@@ -72,6 +76,7 @@ export const AccessControlProvider = ({ children }: { children: ReactNode }) => 
             userTier: "guest",
             isLoading: false,
             productId: null,
+            purchasedContent: new Set(),
           });
         }
       }
@@ -94,6 +99,7 @@ export const AccessControlProvider = ({ children }: { children: ReactNode }) => 
           userTier: "guest",
           isLoading: false,
           productId: null,
+          purchasedContent: new Set(),
         });
         return;
       }
@@ -106,6 +112,7 @@ export const AccessControlProvider = ({ children }: { children: ReactNode }) => 
         userTier: "guest",
         isLoading: false,
         productId: null,
+        purchasedContent: new Set(),
       });
     }
   };
@@ -124,6 +131,16 @@ export const AccessControlProvider = ({ children }: { children: ReactNode }) => 
         console.error("Database subscription error:", dbError);
       }
 
+      // Fetch purchased content
+      const { data: purchases } = await supabase
+        .from('user_purchases')
+        .select('content_id, content_type')
+        .eq('user_id', user.id);
+
+      const purchasedContent = new Set(
+        purchases?.map(p => `${p.content_type}:${p.content_id}`) || []
+      );
+
       // User is premium if they have gold or platinum plan with active status
       const isSubscribed = dbData?.status === 'active' && 
                          (dbData?.plan_type === 'gold' || dbData?.plan_type === 'platinum');
@@ -133,6 +150,7 @@ export const AccessControlProvider = ({ children }: { children: ReactNode }) => 
         userTier: isSubscribed ? "premium" : "subscriber",
         isLoading: false,
         productId: dbData?.plan_type || null,
+        purchasedContent,
       });
     } catch (error) {
       console.error("Error checking subscription:", error);
@@ -141,12 +159,13 @@ export const AccessControlProvider = ({ children }: { children: ReactNode }) => 
         userTier: "subscriber",
         isLoading: false,
         productId: null,
+        purchasedContent: new Set(),
       });
     }
   };
 
-  const canAccessContent = (contentType: string): boolean => {
-    const { userTier } = state;
+  const canAccessContent = (contentType: string, contentId?: string): boolean => {
+    const { userTier, purchasedContent } = state;
 
     // Public content accessible to all
     if (contentType === "exercise-library" || contentType === "blog") {
@@ -156,6 +175,11 @@ export const AccessControlProvider = ({ children }: { children: ReactNode }) => 
     // Guests can only access public content
     if (userTier === "guest") {
       return false;
+    }
+
+    // Check if content was individually purchased
+    if (contentId && purchasedContent.has(`${contentType}:${contentId}`)) {
+      return true;
     }
 
     // Subscribers can access free content, tools, and dashboard
@@ -169,6 +193,10 @@ export const AccessControlProvider = ({ children }: { children: ReactNode }) => 
 
     // Premium users can access everything
     return true;
+  };
+
+  const hasPurchased = (contentId: string, contentType: string): boolean => {
+    return state.purchasedContent.has(`${contentType}:${contentId}`);
   };
 
   const canInteract = (contentType: string): boolean => {
@@ -193,6 +221,7 @@ export const AccessControlProvider = ({ children }: { children: ReactNode }) => 
       ...state,
       canAccessContent,
       canInteract,
+      hasPurchased,
       refreshAccess: checkAccess,
     }}>
       {children}
