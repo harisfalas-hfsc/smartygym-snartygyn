@@ -9,6 +9,7 @@ import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
 import { usePurchases } from "@/hooks/usePurchases";
 import { UserMessagesPanel } from "@/components/UserMessagesPanel";
+import { useQuery } from "@tanstack/react-query";
 import { 
   Heart, 
   CheckCircle, 
@@ -115,6 +116,25 @@ export default function UserDashboard() {
   
   // Fetch user purchases
   const { data: purchases = [], isLoading: purchasesLoading } = usePurchases(user?.id);
+
+  // Fetch unread messages count
+  const { data: unreadCount = 0, refetch: refetchUnreadCount } = useQuery({
+    queryKey: ['unread-messages-count', user?.id],
+    queryFn: async () => {
+      if (!user) return 0;
+
+      const { count, error } = await supabase
+        .from('contact_messages')
+        .select('*', { count: 'exact', head: true })
+        .eq('user_id', user.id)
+        .not('response', 'is', null)
+        .is('response_read_at', null);
+
+      if (error) throw error;
+      return count || 0;
+    },
+    enabled: !!user,
+  });
 
   useEffect(() => {
     initDashboard();
@@ -826,6 +846,14 @@ export default function UserDashboard() {
             <TabsTrigger value="messages">
               <MessageSquare className="mr-2 h-4 w-4" />
               Messages
+              {unreadCount > 0 && (
+                <Badge 
+                  variant="destructive" 
+                  className="ml-2 h-5 min-w-5 flex items-center justify-center rounded-full p-1 text-xs"
+                >
+                  {unreadCount}
+                </Badge>
+              )}
             </TabsTrigger>
             <TabsTrigger value="calculators">
               <Calculator className="mr-2 h-4 w-4" />

@@ -10,7 +10,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Mail, MessageSquare, Eye, CheckCircle, X, ArrowLeft, Send, Search, Filter, FileText, Paperclip, Download } from "lucide-react";
+import { Mail, MessageSquare, Eye, CheckCircle, X, ArrowLeft, Send, Search, Filter, FileText, Paperclip, Download, Upload } from "lucide-react";
 import { format } from "date-fns";
 
 interface ContactMessage {
@@ -50,6 +50,8 @@ export const ContactManager = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [filterStatus, setFilterStatus] = useState("all");
   const [filterCategory, setFilterCategory] = useState("all");
+  const [selectedTemplate, setSelectedTemplate] = useState<string>("");
+  const [uploadingAttachments, setUploadingAttachments] = useState(false);
 
   useEffect(() => {
     fetchMessages();
@@ -178,6 +180,66 @@ export const ContactManager = () => {
     }
   };
 
+  const handleTemplateSelect = (templateId: string) => {
+    const template = templates.find(t => t.id === templateId);
+    if (template) {
+      setResponseText(template.content);
+    }
+    setSelectedTemplate(templateId);
+  };
+
+  const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    if (!selectedMessage || !event.target.files?.length) return;
+
+    setUploadingAttachments(true);
+    const files = Array.from(event.target.files);
+    const uploadedUrls: string[] = [];
+
+    try {
+      for (const file of files) {
+        const fileExt = file.name.split('.').pop();
+        const fileName = `${selectedMessage.id}/${Date.now()}.${fileExt}`;
+        
+        const { error: uploadError, data } = await supabase.storage
+          .from('message-attachments')
+          .upload(fileName, file);
+
+        if (uploadError) throw uploadError;
+        
+        const { data: { publicUrl } } = supabase.storage
+          .from('message-attachments')
+          .getPublicUrl(fileName);
+        
+        uploadedUrls.push(publicUrl);
+      }
+
+      // Update message with new attachments
+      const currentAttachments = selectedMessage.attachments || [];
+      await supabase
+        .from('contact_messages')
+        .update({ 
+          attachments: [...currentAttachments, ...uploadedUrls.map(url => ({ url, name: files[uploadedUrls.indexOf(url)].name }))]
+        })
+        .eq('id', selectedMessage.id);
+
+      toast({
+        title: "Success",
+        description: "Attachments uploaded successfully",
+      });
+      
+      fetchMessages();
+    } catch (error) {
+      console.error('Upload error:', error);
+      toast({
+        title: "Error",
+        description: "Failed to upload attachments",
+        variant: "destructive",
+      });
+    } finally {
+      setUploadingAttachments(false);
+    }
+  };
+
   const handleSendResponse = async () => {
     if (!selectedMessage || !responseText.trim()) return;
 
@@ -187,7 +249,8 @@ export const ContactManager = () => {
       .update({ 
         response: responseText,
         responded_at: new Date().toISOString(),
-        status: 'responded'
+        status: 'responded',
+        response_read_at: null
       })
       .eq('id', selectedMessage.id);
 
@@ -318,6 +381,42 @@ export const ContactManager = () => {
           </CardDescription>
         </CardHeader>
         <CardContent>
+          {/* Search and Filters */}
+          <div className="flex flex-col md:flex-row gap-4 mb-6">
+            <div className="flex-1 relative">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+              <Input
+                placeholder="Search messages..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="pl-10"
+              />
+            </div>
+            <Select value={filterStatus} onValueChange={setFilterStatus}>
+              <SelectTrigger className="w-full md:w-[180px]">
+                <SelectValue placeholder="Filter by status" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Status</SelectItem>
+                <SelectItem value="new">New</SelectItem>
+                <SelectItem value="read">Read</SelectItem>
+                <SelectItem value="responded">Responded</SelectItem>
+                <SelectItem value="closed">Closed</SelectItem>
+              </SelectContent>
+            </Select>
+            <Select value={filterCategory} onValueChange={setFilterCategory}>
+              <SelectTrigger className="w-full md:w-[180px]">
+                <SelectValue placeholder="Filter by category" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Categories</SelectItem>
+                <SelectItem value="general">General</SelectItem>
+                <SelectItem value="support">Support</SelectItem>
+                <SelectItem value="coach_direct">Coach Direct</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
           {/* Stats */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
             <Card>
@@ -374,10 +473,10 @@ export const ContactManager = () => {
             </TabsList>
 
             <TabsContent value="all" className="space-y-4 mt-4">
-              {messages.length === 0 ? (
-                <p className="text-center text-muted-foreground py-8">No messages yet</p>
+              {filteredMessages.length === 0 ? (
+                <p className="text-center text-muted-foreground py-8">No messages found</p>
               ) : (
-                messages.map(message => <MessageCard key={message.id} message={message} />)
+                filteredMessages.map(message => <MessageCard key={message.id} message={message} />)
               )}
             </TabsContent>
 
@@ -471,6 +570,27 @@ export const ContactManager = () => {
                 </div>
               </div>
 
+              {selectedMessage.attachments && selectedMessage.attachments.length > 0 && (
+                <div>
+                  <p className="text-sm font-semibold mb-2">Attachments</p>
+                  <div className="space-y-2">
+                    {selectedMessage.attachments.map((attachment: any, index: number) => (
+                      <div key={index} className="flex items-center gap-2 bg-muted p-2 rounded">
+                        <Paperclip className="h-4 w-4" />
+                        <span className="text-sm flex-1">{attachment.name}</span>
+                        <Button
+                          size="sm"
+                          variant="ghost"
+                          onClick={() => window.open(attachment.url, '_blank')}
+                        >
+                          <Download className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
               {selectedMessage.response && (
                 <div>
                   <p className="text-sm font-semibold mb-2">Your Response</p>
@@ -486,15 +606,59 @@ export const ContactManager = () => {
               )}
 
               {!selectedMessage.response && (
-                <div className="space-y-2">
-                  <Label htmlFor="response">Add Response (Internal Note)</Label>
-                  <Textarea
-                    id="response"
-                    value={responseText}
-                    onChange={(e) => setResponseText(e.target.value)}
-                    placeholder="Add your response or notes here..."
-                    rows={6}
-                  />
+                <div className="space-y-4">
+                  <div>
+                    <Label htmlFor="template">Use Template (Optional)</Label>
+                    <Select value={selectedTemplate} onValueChange={handleTemplateSelect}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select a template..." />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {templates.map((template) => (
+                          <SelectItem key={template.id} value={template.id}>
+                            {template.name}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  
+                  <div>
+                    <Label htmlFor="response">Add Response</Label>
+                    <Textarea
+                      id="response"
+                      value={responseText}
+                      onChange={(e) => setResponseText(e.target.value)}
+                      placeholder="Type your response here..."
+                      rows={6}
+                    />
+                  </div>
+
+                  <div>
+                    <Label htmlFor="attachments">Attach Files (Optional)</Label>
+                    <div className="mt-2">
+                      <label className="cursor-pointer">
+                        <Input
+                          id="attachments"
+                          type="file"
+                          multiple
+                          onChange={handleFileUpload}
+                          className="hidden"
+                          disabled={uploadingAttachments}
+                        />
+                        <Button
+                          type="button"
+                          variant="outline"
+                          className="w-full"
+                          disabled={uploadingAttachments}
+                          onClick={() => document.getElementById('attachments')?.click()}
+                        >
+                          <Upload className="h-4 w-4 mr-2" />
+                          {uploadingAttachments ? "Uploading..." : "Upload Attachments"}
+                        </Button>
+                      </label>
+                    </div>
+                  </div>
                 </div>
               )}
 

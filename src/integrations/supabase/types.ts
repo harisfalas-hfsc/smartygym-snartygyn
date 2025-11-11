@@ -365,6 +365,7 @@ export type Database = {
           read_at: string | null
           responded_at: string | null
           response: string | null
+          response_read_at: string | null
           status: string
           subject: string
           user_id: string | null
@@ -380,6 +381,7 @@ export type Database = {
           read_at?: string | null
           responded_at?: string | null
           response?: string | null
+          response_read_at?: string | null
           status?: string
           subject: string
           user_id?: string | null
@@ -395,6 +397,7 @@ export type Database = {
           read_at?: string | null
           responded_at?: string | null
           response?: string | null
+          response_read_at?: string | null
           status?: string
           subject?: string
           user_id?: string | null
