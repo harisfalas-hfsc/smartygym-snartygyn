@@ -1,10 +1,11 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAdminRole } from "@/hooks/useAdminRole";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, Dumbbell, Calendar, Settings, Users, Mail, FileText, Shield, BarChart3, BookOpen } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import { ArrowLeft, Dumbbell, Calendar, Settings, Users, Mail, FileText, Shield, BarChart3, BookOpen, MessageSquare } from "lucide-react";
 import { WorkoutsManager } from "@/components/admin/WorkoutsManager";
 import { ProgramsManager } from "@/components/admin/ProgramsManager";
 import { UsersManager } from "@/components/admin/UsersManager";
@@ -15,11 +16,60 @@ import { AnalyticsDashboard } from "@/components/admin/AnalyticsDashboard";
 import { NewsletterManager } from "@/components/admin/NewsletterManager";
 import { BlogManager } from "@/components/admin/BlogManager";
 import { PersonalTrainingManager } from "@/components/admin/PersonalTrainingManager";
+import { ContactManager } from "@/components/admin/ContactManager";
+import { supabase } from "@/integrations/supabase/client";
 
 export default function AdminBackoffice() {
   const navigate = useNavigate();
   const { isAdmin, loading } = useAdminRole();
   const [activeTab, setActiveTab] = useState("workouts");
+  const [newContactCount, setNewContactCount] = useState(0);
+
+  useEffect(() => {
+    if (isAdmin) {
+      fetchNewContactCount();
+
+      // Subscribe to real-time updates
+      const channel = supabase
+        .channel('contact_messages_admin')
+        .on(
+          'postgres_changes',
+          {
+            event: 'INSERT',
+            schema: 'public',
+            table: 'contact_messages'
+          },
+          () => {
+            fetchNewContactCount();
+          }
+        )
+        .on(
+          'postgres_changes',
+          {
+            event: 'UPDATE',
+            schema: 'public',
+            table: 'contact_messages'
+          },
+          () => {
+            fetchNewContactCount();
+          }
+        )
+        .subscribe();
+
+      return () => {
+        supabase.removeChannel(channel);
+      };
+    }
+  }, [isAdmin]);
+
+  const fetchNewContactCount = async () => {
+    const { count } = await supabase
+      .from('contact_messages')
+      .select('*', { count: 'exact', head: true })
+      .eq('status', 'new');
+    
+    setNewContactCount(count || 0);
+  };
 
   if (loading) {
     return (
@@ -80,7 +130,7 @@ export default function AdminBackoffice() {
         {/* Main Content */}
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
           <div className="overflow-x-auto pb-2">
-            <TabsList className="inline-flex w-auto min-w-full lg:grid lg:w-full lg:max-w-6xl lg:grid-cols-10 gap-1">
+            <TabsList className="inline-flex w-auto min-w-full lg:grid lg:w-full lg:max-w-6xl lg:grid-cols-11 gap-1">
               <TabsTrigger value="workouts" className="flex items-center gap-1 whitespace-nowrap">
                 <Dumbbell className="h-4 w-4 shrink-0" />
                 <span className="hidden sm:inline">Workouts</span>
@@ -92,6 +142,15 @@ export default function AdminBackoffice() {
               <TabsTrigger value="personal-training" className="flex items-center gap-1 whitespace-nowrap">
                 <Users className="h-4 w-4 shrink-0" />
                 <span className="hidden sm:inline">Personal Training</span>
+              </TabsTrigger>
+              <TabsTrigger value="contact" className="flex items-center gap-1 whitespace-nowrap relative">
+                <MessageSquare className="h-4 w-4 shrink-0" />
+                <span className="hidden sm:inline">Contact</span>
+                {newContactCount > 0 && (
+                  <Badge variant="destructive" className="ml-1 h-5 w-5 rounded-full p-0 flex items-center justify-center text-xs">
+                    {newContactCount}
+                  </Badge>
+                )}
               </TabsTrigger>
               <TabsTrigger value="blog" className="flex items-center gap-1 whitespace-nowrap">
                 <BookOpen className="h-4 w-4 shrink-0" />
@@ -138,6 +197,10 @@ export default function AdminBackoffice() {
 
           <TabsContent value="personal-training" className="mt-6">
             <PersonalTrainingManager />
+          </TabsContent>
+
+          <TabsContent value="contact" className="mt-6">
+            <ContactManager />
           </TabsContent>
 
           <TabsContent value="blog" className="mt-6">

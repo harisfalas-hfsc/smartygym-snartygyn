@@ -102,13 +102,21 @@ const Contact = () => {
       const validatedData = contactSchema.parse(formData);
       setIsSubmitting(true);
 
-      const { error } = await supabase.functions.invoke('send-contact-email', {
-        body: {
-          ...validatedData,
-          recipientEmail: 'admin@smartygym.com',
-          userStatus: !isAuthenticated ? 'Guest' : (hasSubscription ? 'Premium Member' : 'Free User')
-        }
-      });
+      // Get current user session
+      const { data: { session } } = await supabase.auth.getSession();
+
+      // Save to database instead of sending email
+      const { error } = await supabase
+        .from('contact_messages')
+        .insert([{
+          user_id: session?.user?.id || null,
+          name: validatedData.name,
+          email: validatedData.email,
+          subject: validatedData.subject,
+          message: validatedData.message,
+          category: 'general',
+          status: 'new'
+        }]);
 
       if (error) throw error;
 
@@ -170,16 +178,21 @@ const Contact = () => {
       const validatedData = coachSchema.parse(coachFormData);
       setIsCoachSubmitting(true);
 
-      const { error } = await supabase.functions.invoke('send-contact-email', {
-        body: {
+      // Get current user session
+      const { data: { session } } = await supabase.auth.getSession();
+
+      // Save to database instead of sending email
+      const { error } = await supabase
+        .from('contact_messages')
+        .insert([{
+          user_id: session?.user?.id || null,
           name: formData.name,
           email: formData.email,
           subject: validatedData.subject,
           message: validatedData.message,
-          recipientEmail: 'haris@smartygym.com',
-          userStatus: hasSubscription ? 'Premium Member' : 'Free User'
-        }
-      });
+          category: 'coach_direct',
+          status: 'new'
+        }]);
 
       if (error) throw error;
 
