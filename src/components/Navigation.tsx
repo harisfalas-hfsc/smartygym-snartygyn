@@ -18,8 +18,6 @@ import { User as UserIcon, Settings, LogOut, LayoutDashboard, Crown, Menu } from
 import { useToast } from "@/hooks/use-toast";
 import smartyGymLogo from "@/assets/smarty-gym-logo.png";
 import { ThemeToggle } from "@/components/ThemeToggle";
-import { LanguageSwitcher } from "@/components/LanguageSwitcher";
-import { useTranslation } from "react-i18next";
 
 interface SubscriptionInfo {
   subscribed: boolean;
@@ -31,7 +29,6 @@ export const Navigation = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const { toast } = useToast();
-  const { t } = useTranslation();
   const [user, setUser] = useState<User | null>(null);
   const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
   const [subscriptionInfo, setSubscriptionInfo] = useState<SubscriptionInfo | null>(null);
@@ -203,15 +200,15 @@ export const Navigation = () => {
 
           {/* Desktop Navigation Links */}
           <nav className="hidden md:flex items-center gap-4 flex-1 justify-center">
-            <Button variant="ghost" size="sm" onClick={() => navigate("/about")}>{t('nav.about')}</Button>
-            <Button variant="ghost" size="sm" onClick={() => navigate("/workout")}>{t('nav.workouts')}</Button>
-            <Button variant="ghost" size="sm" onClick={() => navigate("/trainingprogram")}>{t('nav.programs')}</Button>
-            <Button variant="ghost" size="sm" onClick={() => navigate("/personal-training")}>{t('nav.personalTraining')}</Button>
-            <Button variant="ghost" size="sm" onClick={() => navigate("/tools")}>{t('nav.tools')}</Button>
-            <Button variant="ghost" size="sm" onClick={() => navigate("/exerciselibrary")}>{t('nav.exerciseLibrary')}</Button>
-            <Button variant="ghost" size="sm" onClick={() => navigate("/community")}>{t('nav.community')}</Button>
+            <Button variant="ghost" size="sm" onClick={() => navigate("/about")}>About</Button>
+            <Button variant="ghost" size="sm" onClick={() => navigate("/workout")}>Workouts</Button>
+            <Button variant="ghost" size="sm" onClick={() => navigate("/trainingprogram")}>Programs</Button>
+            <Button variant="ghost" size="sm" onClick={() => navigate("/personal-training")}>Personal Training</Button>
+            <Button variant="ghost" size="sm" onClick={() => navigate("/tools")}>Tools</Button>
+            <Button variant="ghost" size="sm" onClick={() => navigate("/exerciselibrary")}>Exercise Library</Button>
+            <Button variant="ghost" size="sm" onClick={() => navigate("/community")}>Community</Button>
             <Button variant="ghost" size="sm" onClick={() => navigate("/blog")}>Blog</Button>
-            <Button variant="ghost" size="sm" onClick={() => navigate("/contact")}>{t('nav.contact')}</Button>
+            <Button variant="ghost" size="sm" onClick={() => navigate("/contact")}>Contact</Button>
           </nav>
 
           {/* Mobile Menu */}
@@ -256,7 +253,6 @@ export const Navigation = () => {
 
           {/* Right Side - Auth */}
           <div className="flex items-center gap-2">
-            <LanguageSwitcher />
             <ThemeToggle />
             
             {user ? (
@@ -328,7 +324,7 @@ export const Navigation = () => {
                     }}
                   >
                     <LayoutDashboard className="mr-2 h-4 w-4" />
-                    <span>{t('nav.dashboard')}</span>
+                    <span>Dashboard</span>
                   </DropdownMenuItem>
                   <DropdownMenuItem 
                     onSelect={() => {
@@ -336,7 +332,7 @@ export const Navigation = () => {
                     }}
                   >
                     <Settings className="mr-2 h-4 w-4" />
-                    <span>{t('nav.settings')}</span>
+                    <span>Settings</span>
                   </DropdownMenuItem>
                   <DropdownMenuSeparator />
                   <DropdownMenuItem 
@@ -345,7 +341,7 @@ export const Navigation = () => {
                     }}
                   >
                     <LogOut className="mr-2 h-4 w-4" />
-                    <span>{t('nav.logout')}</span>
+                    <span>Logout</span>
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
@@ -353,7 +349,7 @@ export const Navigation = () => {
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <Button size="sm" className="text-xs sm:text-sm">
-                    {t('nav.login')}
+                    Login / Sign Up
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent className="w-48 bg-background" align="end">
@@ -365,7 +361,7 @@ export const Navigation = () => {
                     }}
                   >
                     <UserIcon className="mr-2 h-4 w-4" />
-                    <span>{t('nav.login')}</span>
+                    <span>Login</span>
                   </DropdownMenuItem>
                   <DropdownMenuSeparator />
                   <DropdownMenuItem 
@@ -376,7 +372,7 @@ export const Navigation = () => {
                     }}
                   >
                     <UserIcon className="mr-2 h-4 w-4" />
-                    <span>{t('nav.signup')}</span>
+                    <span>Sign Up</span>
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
