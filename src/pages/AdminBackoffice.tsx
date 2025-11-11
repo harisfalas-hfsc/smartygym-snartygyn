@@ -14,6 +14,7 @@ import { ModerationDashboard } from "@/components/admin/ModerationDashboard";
 import { AnalyticsDashboard } from "@/components/admin/AnalyticsDashboard";
 import { NewsletterManager } from "@/components/admin/NewsletterManager";
 import { BlogManager } from "@/components/admin/BlogManager";
+import { PersonalTrainingManager } from "@/components/admin/PersonalTrainingManager";
 
 export default function AdminBackoffice() {
   const navigate = useNavigate();
@@ -88,6 +89,10 @@ export default function AdminBackoffice() {
                 <Calendar className="h-4 w-4 shrink-0" />
                 <span className="hidden sm:inline">Programs</span>
               </TabsTrigger>
+              <TabsTrigger value="personal-training" className="flex items-center gap-1 whitespace-nowrap">
+                <Users className="h-4 w-4 shrink-0" />
+                <span className="hidden sm:inline">Personal Training</span>
+              </TabsTrigger>
               <TabsTrigger value="blog" className="flex items-center gap-1 whitespace-nowrap">
                 <BookOpen className="h-4 w-4 shrink-0" />
                 <span className="hidden sm:inline">Blog</span>
@@ -129,6 +134,10 @@ export default function AdminBackoffice() {
 
           <TabsContent value="programs" className="mt-6">
             <ProgramsManager />
+          </TabsContent>
+
+          <TabsContent value="personal-training" className="mt-6">
+            <PersonalTrainingManager />
           </TabsContent>
 
           <TabsContent value="blog" className="mt-6">

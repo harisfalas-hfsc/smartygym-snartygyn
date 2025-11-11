@@ -444,14 +444,14 @@ export const ProgramEditDialog = ({ program, open, onOpenChange, onSave }: Progr
             />
           </div>
 
-          {/* 9. Construction */}
+          {/* 9. Instructions */}
           <div className="space-y-2">
-            <Label htmlFor="construction">9. Construction</Label>
+            <Label htmlFor="construction">9. Instructions</Label>
             <Textarea
               id="construction"
               value={formData.construction}
               onChange={(e) => setFormData({ ...formData, construction: e.target.value })}
-              placeholder="Program structure and construction details"
+              placeholder="Program instructions and structure details"
               rows={4}
             />
           </div>

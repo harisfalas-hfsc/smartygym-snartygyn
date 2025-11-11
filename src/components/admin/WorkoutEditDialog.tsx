@@ -367,64 +367,20 @@ export const WorkoutEditDialog = ({ workout, open, onOpenChange, onSave }: Worko
             </Select>
           </div>
 
-          {/* 9. Workout Sections */}
-          <div className="space-y-4 pt-4 border-t">
-            <h3 className="font-semibold">9. Workout Sections</h3>
-            
-            <div className="space-y-2">
-              <Label htmlFor="activation">Activation</Label>
-              <Textarea
-                id="activation"
-                value={formData.activation}
-                onChange={(e) => setFormData({ ...formData, activation: e.target.value })}
-                placeholder="Activation exercises..."
-                rows={4}
-              />
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="warm_up">Warm Up</Label>
-              <Textarea
-                id="warm_up"
-                value={formData.warm_up}
-                onChange={(e) => setFormData({ ...formData, warm_up: e.target.value })}
-                placeholder="Warm up exercises..."
-                rows={4}
-              />
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="main_workout">Primary Workout</Label>
-              <Textarea
-                id="main_workout"
-                value={formData.main_workout}
-                onChange={(e) => setFormData({ ...formData, main_workout: e.target.value })}
-                placeholder="Main workout content..."
-                rows={6}
-              />
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="finisher">Finisher</Label>
-              <Textarea
-                id="finisher"
-                value={formData.finisher}
-                onChange={(e) => setFormData({ ...formData, finisher: e.target.value })}
-                placeholder="Finisher exercises..."
-                rows={4}
-              />
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="cool_down">Cool Down</Label>
-              <Textarea
-                id="cool_down"
-                value={formData.cool_down}
-                onChange={(e) => setFormData({ ...formData, cool_down: e.target.value })}
-                placeholder="Cool down exercises..."
-                rows={4}
-              />
-            </div>
+          {/* 9. Workout Content - Single Box */}
+          <div className="space-y-2 pt-4 border-t">
+            <Label htmlFor="main_workout">9. Workout Content *</Label>
+            <Textarea
+              id="main_workout"
+              value={formData.main_workout}
+              onChange={(e) => setFormData({ ...formData, main_workout: e.target.value })}
+              placeholder="Enter the complete workout content here - use spaces, bold letters, capitals, bullets (•, -, *), and line breaks to format your content as needed..."
+              rows={15}
+              className="font-mono text-sm whitespace-pre-wrap"
+            />
+            <p className="text-xs text-muted-foreground">
+              Write freely with full formatting control - add sections (Warm Up, Main Workout, Cool Down, etc.), bullets, emphasis as needed
+            </p>
           </div>
 
           {/* 10. Description */}

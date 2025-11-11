@@ -140,12 +140,48 @@ const PersonalTraining = () => {
     setIsLoading(true);
 
     try {
-      // Send email with questionnaire details
-      const { error: emailError } = await supabase.functions.invoke('send-personal-training-request', {
+      // Check if user is logged in
+      const { data: { user } } = await supabase.auth.getUser();
+      
+      if (!user) {
+        toast({
+          title: "Authentication Required",
+          description: "You must be logged in to request personal training",
+          variant: "destructive"
+        });
+        navigate("/auth");
+        return;
+      }
+
+      // Save request to database
+      const { error: dbError } = await supabase
+        .from('personal_training_requests')
+        .insert([{
+          user_id: user.id,
+          user_email: formData.email,
+          user_name: formData.name,
+          age: parseInt(formData.age),
+          weight: parseFloat(formData.weight),
+          height: parseFloat(formData.height),
+          fitness_level: formData.fitnessLevel,
+          lifestyle: formData.lifestyle,
+          performance_type: formData.performanceType,
+          specific_goal: formData.specificGoal,
+          duration: formData.duration,
+          training_days: formData.trainingDays,
+          workout_duration: formData.workoutDuration,
+          equipment: formData.equipment,
+          other_equipment: formData.otherEquipment,
+          limitations: formData.limitations,
+          status: 'pending',
+        }]);
+
+      if (dbError) throw dbError;
+
+      // Send email notification
+      await supabase.functions.invoke('send-personal-training-request', {
         body: { ...formData, userStatus }
       });
-
-      if (emailError) throw emailError;
 
       // Create checkout session
       const { data: checkoutData, error: checkoutError } = await supabase.functions.invoke('create-personal-training-checkout', {

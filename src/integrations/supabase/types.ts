@@ -28,12 +28,16 @@ export type Database = {
           id: string
           image_url: string | null
           is_premium: boolean | null
+          is_standalone_purchase: boolean | null
           name: string
           nutrition_tips: string | null
           overview: string | null
+          price: number | null
           program_structure: string | null
           progression_plan: string | null
           serial_number: number | null
+          stripe_price_id: string | null
+          stripe_product_id: string | null
           target_audience: string | null
           tier_required: string | null
           updated_at: string | null
@@ -53,12 +57,16 @@ export type Database = {
           id: string
           image_url?: string | null
           is_premium?: boolean | null
+          is_standalone_purchase?: boolean | null
           name: string
           nutrition_tips?: string | null
           overview?: string | null
+          price?: number | null
           program_structure?: string | null
           progression_plan?: string | null
           serial_number?: number | null
+          stripe_price_id?: string | null
+          stripe_product_id?: string | null
           target_audience?: string | null
           tier_required?: string | null
           updated_at?: string | null
@@ -78,12 +86,16 @@ export type Database = {
           id?: string
           image_url?: string | null
           is_premium?: boolean | null
+          is_standalone_purchase?: boolean | null
           name?: string
           nutrition_tips?: string | null
           overview?: string | null
+          price?: number | null
           program_structure?: string | null
           progression_plan?: string | null
           serial_number?: number | null
+          stripe_price_id?: string | null
+          stripe_product_id?: string | null
           target_audience?: string | null
           tier_required?: string | null
           updated_at?: string | null
@@ -110,10 +122,14 @@ export type Database = {
           image_url: string | null
           instructions: string | null
           is_premium: boolean | null
+          is_standalone_purchase: boolean | null
           main_workout: string | null
           name: string
           notes: string | null
+          price: number | null
           serial_number: number | null
+          stripe_price_id: string | null
+          stripe_product_id: string | null
           tier_required: string | null
           tips: string | null
           type: string
@@ -137,10 +153,14 @@ export type Database = {
           image_url?: string | null
           instructions?: string | null
           is_premium?: boolean | null
+          is_standalone_purchase?: boolean | null
           main_workout?: string | null
           name: string
           notes?: string | null
+          price?: number | null
           serial_number?: number | null
+          stripe_price_id?: string | null
+          stripe_product_id?: string | null
           tier_required?: string | null
           tips?: string | null
           type: string
@@ -164,10 +184,14 @@ export type Database = {
           image_url?: string | null
           instructions?: string | null
           is_premium?: boolean | null
+          is_standalone_purchase?: boolean | null
           main_workout?: string | null
           name?: string
           notes?: string | null
+          price?: number | null
           serial_number?: number | null
+          stripe_price_id?: string | null
+          stripe_product_id?: string | null
           tier_required?: string | null
           tips?: string | null
           type?: string
@@ -545,6 +569,161 @@ export type Database = {
         }
         Relationships: []
       }
+      personal_training_programs: {
+        Row: {
+          category: string
+          construction: string | null
+          created_at: string | null
+          days_per_week: number | null
+          difficulty: string | null
+          difficulty_stars: number | null
+          duration: string | null
+          equipment: string | null
+          expected_results: string | null
+          id: string
+          image_url: string | null
+          name: string
+          overview: string | null
+          progression_plan: string | null
+          request_id: string
+          serial_number: string | null
+          target_audience: string | null
+          tips: string | null
+          training_program: string | null
+          updated_at: string | null
+          user_id: string
+          weeks: number | null
+        }
+        Insert: {
+          category: string
+          construction?: string | null
+          created_at?: string | null
+          days_per_week?: number | null
+          difficulty?: string | null
+          difficulty_stars?: number | null
+          duration?: string | null
+          equipment?: string | null
+          expected_results?: string | null
+          id?: string
+          image_url?: string | null
+          name: string
+          overview?: string | null
+          progression_plan?: string | null
+          request_id: string
+          serial_number?: string | null
+          target_audience?: string | null
+          tips?: string | null
+          training_program?: string | null
+          updated_at?: string | null
+          user_id: string
+          weeks?: number | null
+        }
+        Update: {
+          category?: string
+          construction?: string | null
+          created_at?: string | null
+          days_per_week?: number | null
+          difficulty?: string | null
+          difficulty_stars?: number | null
+          duration?: string | null
+          equipment?: string | null
+          expected_results?: string | null
+          id?: string
+          image_url?: string | null
+          name?: string
+          overview?: string | null
+          progression_plan?: string | null
+          request_id?: string
+          serial_number?: string | null
+          target_audience?: string | null
+          tips?: string | null
+          training_program?: string | null
+          updated_at?: string | null
+          user_id?: string
+          weeks?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "personal_training_programs_request_id_fkey"
+            columns: ["request_id"]
+            isOneToOne: false
+            referencedRelation: "personal_training_requests"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      personal_training_requests: {
+        Row: {
+          age: number
+          completed_at: string | null
+          created_at: string
+          duration: string
+          equipment: string[]
+          fitness_level: string
+          height: number
+          id: string
+          lifestyle: string[]
+          limitations: string | null
+          other_equipment: string | null
+          performance_type: string
+          specific_goal: string
+          status: string | null
+          stripe_payment_status: string | null
+          training_days: string
+          user_email: string
+          user_id: string
+          user_name: string
+          weight: number
+          workout_duration: string
+        }
+        Insert: {
+          age: number
+          completed_at?: string | null
+          created_at?: string
+          duration: string
+          equipment: string[]
+          fitness_level: string
+          height: number
+          id?: string
+          lifestyle: string[]
+          limitations?: string | null
+          other_equipment?: string | null
+          performance_type: string
+          specific_goal: string
+          status?: string | null
+          stripe_payment_status?: string | null
+          training_days: string
+          user_email: string
+          user_id: string
+          user_name: string
+          weight: number
+          workout_duration: string
+        }
+        Update: {
+          age?: number
+          completed_at?: string | null
+          created_at?: string
+          duration?: string
+          equipment?: string[]
+          fitness_level?: string
+          height?: number
+          id?: string
+          lifestyle?: string[]
+          limitations?: string | null
+          other_equipment?: string | null
+          performance_type?: string
+          specific_goal?: string
+          status?: string | null
+          stripe_payment_status?: string | null
+          training_days?: string
+          user_email?: string
+          user_id?: string
+          user_name?: string
+          weight?: number
+          workout_duration?: string
+        }
+        Relationships: []
+      }
       plan_generation_usage: {
         Row: {
           generated_at: string
@@ -844,6 +1023,39 @@ export type Database = {
           rating?: number | null
           status?: string | null
           updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      user_purchases: {
+        Row: {
+          content_id: string
+          content_name: string
+          content_type: string
+          id: string
+          price: number
+          purchased_at: string
+          stripe_payment_intent_id: string | null
+          user_id: string
+        }
+        Insert: {
+          content_id: string
+          content_name: string
+          content_type: string
+          id?: string
+          price: number
+          purchased_at?: string
+          stripe_payment_intent_id?: string | null
+          user_id: string
+        }
+        Update: {
+          content_id?: string
+          content_name?: string
+          content_type?: string
+          id?: string
+          price?: number
+          purchased_at?: string
+          stripe_payment_intent_id?: string | null
           user_id?: string
         }
         Relationships: []
