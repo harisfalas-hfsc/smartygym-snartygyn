@@ -9,8 +9,8 @@ const corsHeaders = {
 interface MassNotificationRequest {
   messageType: string;
   recipientFilter: string;
-  customContent: string;
-  customSubject?: string;
+  subject: string;
+  content: string;
 }
 
 serve(async (req) => {
@@ -19,12 +19,15 @@ serve(async (req) => {
   }
 
   try {
-    const { messageType, recipientFilter, customContent, customSubject }: MassNotificationRequest = await req.json();
+    const { messageType, recipientFilter, subject, content } = await req.json() as MassNotificationRequest;
 
-    console.log('[MASS-NOTIFICATION] Request:', { messageType, recipientFilter, customContent });
+    console.log('[MASS-NOTIFICATION] Request:', { messageType, recipientFilter, subject, content });
 
-    if (!messageType || !recipientFilter || !customContent) {
-      throw new Error("Missing required fields");
+    if (!messageType || !recipientFilter || !subject || !content) {
+      return new Response(
+        JSON.stringify({ error: 'Missing required fields' }),
+        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
     }
 
     // Create Supabase client with service role
@@ -55,28 +58,9 @@ serve(async (req) => {
 
     console.log('[MASS-NOTIFICATION] Admin verified:', userData.user.id);
 
-    // Get the template
-    const { data: template, error: templateError } = await supabaseAdmin
-      .from('automated_message_templates')
-      .select('*')
-      .eq('message_type', messageType)
-      .eq('is_active', true)
-      .eq('is_default', true)
-      .single();
-
-    if (templateError || !template) {
-      console.error('[MASS-NOTIFICATION] Template not found:', templateError);
-      throw new Error(`Template not found for message type: ${messageType}`);
-    }
-
-    console.log('[MASS-NOTIFICATION] Using template:', template.template_name);
-
-    // Replace placeholders in subject and content
-    let subject = customSubject || template.subject;
-    let content = template.content;
-
-    subject = subject.replace(/\[Content\]/g, customContent);
-    content = content.replace(/\[Content\]/g, customContent);
+    // Use the provided subject and content directly
+    const finalSubject = subject;
+    const finalContent = content;
 
     // Get recipients based on filter
     let recipientQuery = supabaseAdmin
@@ -127,8 +111,8 @@ serve(async (req) => {
     const messages = recipients.map(recipient => ({
       user_id: recipient.user_id,
       message_type: messageType,
-      subject: subject,
-      content: content,
+      subject: finalSubject,
+      content: finalContent,
       is_read: false
     }));
 

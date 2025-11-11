@@ -22,10 +22,9 @@ export function MassNotificationManager() {
   const [loading, setLoading] = useState(false);
   const [recipientFilter, setRecipientFilter] = useState<string>("all");
   const [notificationType, setNotificationType] = useState<string>("");
-  const [customContent, setCustomContent] = useState("");
-  const [subject, setSubject] = useState("");
+  const [editableSubject, setEditableSubject] = useState("");
+  const [editableContent, setEditableContent] = useState("");
   const [templates, setTemplates] = useState<Template[]>([]);
-  const [selectedTemplate, setSelectedTemplate] = useState<Template | null>(null);
 
   useEffect(() => {
     fetchTemplates();
@@ -53,9 +52,12 @@ export function MassNotificationManager() {
   const handleTemplateChange = (value: string) => {
     setNotificationType(value);
     const template = templates.find(t => t.message_type === value);
-    setSelectedTemplate(template || null);
     if (template) {
-      setSubject(template.subject);
+      setEditableSubject(template.subject);
+      setEditableContent(template.content);
+    } else {
+      setEditableSubject("");
+      setEditableContent("");
     }
   };
 
@@ -77,10 +79,10 @@ export function MassNotificationManager() {
       return;
     }
 
-    if (!customContent.trim()) {
+    if (!editableSubject.trim() || !editableContent.trim()) {
       toast({
         title: "Error",
-        description: "Please enter content for the notification",
+        description: "Please ensure both subject and content are filled",
         variant: "destructive"
       });
       return;
@@ -93,8 +95,8 @@ export function MassNotificationManager() {
         body: {
           messageType: notificationType,
           recipientFilter: recipientFilter,
-          customContent: customContent,
-          customSubject: subject
+          subject: editableSubject,
+          content: editableContent
         }
       });
 
@@ -105,10 +107,15 @@ export function MassNotificationManager() {
         description: `Notification sent to ${data.recipientCount} users`,
       });
 
-      // Reset form
+      // Reset form - reload original template
+      const template = templates.find(t => t.message_type === notificationType);
+      if (template) {
+        setEditableSubject(template.subject);
+        setEditableContent(template.content);
+      }
       setNotificationType("");
-      setCustomContent("");
-      setSubject("");
+      setEditableSubject("");
+      setEditableContent("");
       setRecipientFilter("all");
     } catch (error: any) {
       console.error("Error sending mass notification:", error);
@@ -157,10 +164,10 @@ export function MassNotificationManager() {
 
           {/* Notification Template */}
           <div className="space-y-2">
-            <Label htmlFor="notification-type">Notification Template</Label>
+            <Label htmlFor="notification-type">Select Notification Template</Label>
             <Select value={notificationType} onValueChange={handleTemplateChange}>
               <SelectTrigger id="notification-type">
-                <SelectValue placeholder="Choose a template" />
+                <SelectValue placeholder="Choose a template to customize" />
               </SelectTrigger>
               <SelectContent>
                 {templates.map((template) => (
@@ -172,51 +179,40 @@ export function MassNotificationManager() {
             </Select>
           </div>
 
-          {/* Template Preview */}
-          {selectedTemplate && (
-            <div className="p-4 bg-muted rounded-lg space-y-2">
-              <p className="text-sm font-semibold">Template Preview:</p>
-              <div className="space-y-1">
-                <p className="text-sm"><span className="font-medium">Subject:</span> {selectedTemplate.subject}</p>
-                <p className="text-sm"><span className="font-medium">Content:</span></p>
-                <p className="text-sm text-muted-foreground whitespace-pre-wrap">{selectedTemplate.content}</p>
+          {/* Editable Subject */}
+          {notificationType && (
+            <>
+              <div className="space-y-2">
+                <Label htmlFor="editable-subject">
+                  Subject <span className="text-destructive">*</span>
+                </Label>
+                <Input
+                  id="editable-subject"
+                  placeholder="Notification subject"
+                  value={editableSubject}
+                  onChange={(e) => setEditableSubject(e.target.value)}
+                />
               </div>
-              <p className="text-xs text-muted-foreground mt-2">
-                Note: [Content] will be replaced with your custom content below.
-              </p>
-            </div>
+
+              {/* Editable Content */}
+              <div className="space-y-2">
+                <Label htmlFor="editable-content">
+                  Message Content <span className="text-destructive">*</span>
+                </Label>
+                <Textarea
+                  id="editable-content"
+                  placeholder="Edit the notification message"
+                  value={editableContent}
+                  onChange={(e) => setEditableContent(e.target.value)}
+                  rows={8}
+                  className="resize-y font-mono text-sm"
+                />
+                <p className="text-xs text-muted-foreground">
+                  Edit the template above before sending. Original template will be restored after sending.
+                </p>
+              </div>
+            </>
           )}
-
-          {/* Custom Subject (Optional) */}
-          <div className="space-y-2">
-            <Label htmlFor="custom-subject">
-              Custom Subject <span className="text-muted-foreground">(Optional - leave empty to use template)</span>
-            </Label>
-            <Input
-              id="custom-subject"
-              placeholder="e.g., New HIIT Workout - Cardio Blast"
-              value={subject}
-              onChange={(e) => setSubject(e.target.value)}
-            />
-          </div>
-
-          {/* Custom Content */}
-          <div className="space-y-2">
-            <Label htmlFor="custom-content">
-              Content Details <span className="text-destructive">*</span>
-            </Label>
-            <Textarea
-              id="custom-content"
-              placeholder="Enter the specific details for this notification (e.g., workout name, program name, offer details). This will replace [Content] in the template."
-              value={customContent}
-              onChange={(e) => setCustomContent(e.target.value)}
-              rows={4}
-              className="resize-none"
-            />
-            <p className="text-sm text-muted-foreground">
-              This content will be inserted into the selected template where [Content] appears.
-            </p>
-          </div>
 
           {/* Recipient Info */}
           {notificationType && (
@@ -231,7 +227,7 @@ export function MassNotificationManager() {
           {/* Send Button */}
           <Button
             onClick={handleSendNotification}
-            disabled={loading || !notificationType || !customContent.trim()}
+            disabled={loading || !notificationType || !editableSubject.trim() || !editableContent.trim()}
             className="w-full"
             size="lg"
           >
