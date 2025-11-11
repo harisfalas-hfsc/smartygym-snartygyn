@@ -1382,6 +1382,12 @@ export type Database = {
         | "renewal_reminder"
         | "renewal_thank_you"
         | "cancellation"
+        | "announcement_new_workout"
+        | "announcement_new_program"
+        | "announcement_new_service"
+        | "announcement_special_offer"
+        | "announcement_update"
+        | "announcement_event"
       plan_type: "free" | "gold" | "platinum"
       subscription_status: "active" | "canceled" | "past_due"
     }
@@ -1521,6 +1527,12 @@ export const Constants = {
         "renewal_reminder",
         "renewal_thank_you",
         "cancellation",
+        "announcement_new_workout",
+        "announcement_new_program",
+        "announcement_new_service",
+        "announcement_special_offer",
+        "announcement_update",
+        "announcement_event",
       ],
       plan_type: ["free", "gold", "platinum"],
       subscription_status: ["active", "canceled", "past_due"],

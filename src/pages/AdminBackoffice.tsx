@@ -18,6 +18,7 @@ import { BlogManager } from "@/components/admin/BlogManager";
 import { PersonalTrainingManager } from "@/components/admin/PersonalTrainingManager";
 import { ContactManager } from "@/components/admin/ContactManager";
 import { AutomatedMessagesManager } from "@/components/admin/AutomatedMessagesManager";
+import { MassNotificationManager } from "@/components/admin/MassNotificationManager";
 import { supabase } from "@/integrations/supabase/client";
 
 export default function AdminBackoffice() {
@@ -156,6 +157,10 @@ export default function AdminBackoffice() {
               <Zap className="h-3.5 w-3.5 shrink-0" />
               <span className="hidden sm:inline">Auto Messages</span>
             </TabsTrigger>
+            <TabsTrigger value="notifications" className="flex items-center gap-1 text-xs px-2 py-1.5 h-auto">
+              <Mail className="h-3.5 w-3.5 shrink-0" />
+              <span className="hidden sm:inline">Notifications</span>
+            </TabsTrigger>
             <TabsTrigger value="blog" className="flex items-center gap-1 text-xs px-2 py-1.5 h-auto">
               <BookOpen className="h-3.5 w-3.5 shrink-0" />
               <span className="hidden sm:inline">Blog</span>
@@ -208,6 +213,10 @@ export default function AdminBackoffice() {
 
           <TabsContent value="automated" className="mt-6">
             <AutomatedMessagesManager />
+          </TabsContent>
+
+          <TabsContent value="notifications" className="mt-6">
+            <MassNotificationManager />
           </TabsContent>
 
           <TabsContent value="blog" className="mt-6">
