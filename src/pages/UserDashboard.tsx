@@ -8,6 +8,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
 import { usePurchases } from "@/hooks/usePurchases";
+import { UserMessagesPanel } from "@/components/UserMessagesPanel";
 import { 
   Heart, 
   CheckCircle, 
@@ -18,7 +19,8 @@ import {
   Crown,
   ArrowLeft,
   Calculator,
-  ShoppingBag
+  ShoppingBag,
+  MessageSquare
 } from "lucide-react";
 
 interface WorkoutInteraction {
@@ -808,7 +810,7 @@ export default function UserDashboard() {
         </div>
 
         <Tabs defaultValue="workouts" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-1 sm:grid-cols-4">
+          <TabsList className="grid w-full grid-cols-1 sm:grid-cols-5">
             <TabsTrigger value="workouts">
               <Dumbbell className="mr-2 h-4 w-4" />
               Workouts
@@ -820,6 +822,10 @@ export default function UserDashboard() {
             <TabsTrigger value="purchases">
               <ShoppingBag className="mr-2 h-4 w-4" />
               My Purchases
+            </TabsTrigger>
+            <TabsTrigger value="messages">
+              <MessageSquare className="mr-2 h-4 w-4" />
+              Messages
             </TabsTrigger>
             <TabsTrigger value="calculators">
               <Calculator className="mr-2 h-4 w-4" />
@@ -1202,6 +1208,11 @@ export default function UserDashboard() {
                 )}
               </CardContent>
             </Card>
+          </TabsContent>
+
+          {/* Messages Tab */}
+          <TabsContent value="messages" className="space-y-6">
+            <UserMessagesPanel />
           </TabsContent>
 
           {/* Calculators Tab */}

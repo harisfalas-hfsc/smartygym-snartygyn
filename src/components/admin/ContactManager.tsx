@@ -92,7 +92,7 @@ export const ContactManager = () => {
     if (!message.read_at) {
       await supabase
         .from('contact_messages')
-        .update({ read_at: new Date().toISOString() })
+        .update({ read_at: new Date().toISOString(), status: 'read' })
         .eq('id', message.id);
       
       fetchMessages();
@@ -202,6 +202,8 @@ export const ContactManager = () => {
               <div className={`w-2 h-2 rounded-full ${getCategoryColor(message.category)}`} />
               <h3 className="font-semibold">{message.name}</h3>
               {message.status === 'new' && <Badge variant="destructive">New</Badge>}
+              {message.user_id && <Badge variant="outline">Has Account</Badge>}
+              {!message.user_id && <Badge variant="secondary">Visitor</Badge>}
             </div>
             <p className="text-sm text-muted-foreground">{message.email}</p>
             <p className="font-medium mt-2">{message.subject}</p>
@@ -434,11 +436,18 @@ export const ContactManager = () => {
                     Mark as Read
                   </Button>
                 )}
-                {selectedMessage.status !== 'closed' && !selectedMessage.response && (
+                {selectedMessage.user_id && selectedMessage.status !== 'closed' && !selectedMessage.response && (
                   <Button onClick={handleSendResponse} disabled={isResponding || !responseText.trim()}>
                     <Send className="h-4 w-4 mr-2" />
-                    {isResponding ? "Saving..." : "Save Response"}
+                    {isResponding ? "Saving..." : "Send Response to Dashboard"}
                   </Button>
+                )}
+                {!selectedMessage.user_id && (
+                  <div className="bg-blue-50 dark:bg-blue-950 border border-blue-200 dark:border-blue-800 p-3 rounded-lg flex-1">
+                    <p className="text-sm text-blue-900 dark:text-blue-100">
+                      💡 This is a visitor message. Respond via email: <strong>{selectedMessage.email}</strong>
+                    </p>
+                  </div>
                 )}
                 {selectedMessage.status !== 'closed' && (
                   <Button 
