@@ -836,11 +836,11 @@ export default function UserDashboard() {
           </Card>
         </div>
 
-        {/* Fitness Overview */}
+        {/* Dashboard Overview */}
         <div className="mb-8">
-          <h2 className="text-2xl font-bold mb-4">Your Fitness Overview</h2>
+          <h2 className="text-2xl font-bold mb-4">My Dashboard</h2>
           <p className="text-muted-foreground mb-4">
-            Track your workout progress and achievements
+            Access your workouts, programs, purchases, messages, and more
           </p>
         </div>
 
