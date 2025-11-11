@@ -1,0 +1,85 @@
+{
+  "nav": {
+    "home": "Home",
+    "workouts": "Workouts",
+    "programs": "Programs",
+    "personalTraining": "Personal Training",
+    "tools": "Tools",
+    "exerciseLibrary": "Exercise Library",
+    "community": "Community",
+    "about": "About",
+    "contact": "Contact",
+    "login": "Login",
+    "signup": "Sign Up",
+    "logout": "Logout",
+    "dashboard": "Dashboard",
+    "settings": "Settings"
+  },
+  "home": {
+    "tagline": "Smarty Gym, it's your gym re-imagined, anywhere, anytime.",
+    "heroTitle": "Transform Your Fitness Journey",
+    "heroSubtitle": "Professional workouts, training programs, and personal coaching - all in one place",
+    "getStarted": "Get Started",
+    "ourServices": "Our Services",
+    "servicesSubtitle": "Choose the perfect service for your fitness goals",
+    "readyToStart": "Ready to Start Your Fitness Journey?",
+    "joinCommunity": "Join our community of fitness enthusiasts and get access to premium content",
+    "subscribeNow": "Subscribe Now",
+    "monthlyPrice": "/month",
+    "goldPlan": "Gold Plan - All Workouts",
+    "platinumPlan": "Platinum Plan - Everything"
+  },
+  "services": {
+    "workouts": {
+      "title": "Workouts",
+      "description": "Access hundreds of professionally designed workouts for all fitness levels"
+    },
+    "programs": {
+      "title": "Training Programs",
+      "description": "Structured 6-8 week programs to achieve your specific goals"
+    },
+    "personalTraining": {
+      "title": "Personal Training",
+      "description": "Get a customized program designed specifically for you"
+    },
+    "tools": {
+      "title": "Fitness Tools",
+      "description": "BMR calculator, 1RM calculator, and more useful fitness tools"
+    }
+  },
+  "auth": {
+    "welcome": "Welcome to Smarty Gym",
+    "welcomeDescription": "Create an account or sign in to continue",
+    "login": "Login",
+    "signup": "Sign Up",
+    "email": "Email",
+    "password": "Password",
+    "confirmPassword": "Confirm Password",
+    "fullName": "Full Name",
+    "acceptTerms": "I accept the terms and conditions",
+    "signIn": "Sign In",
+    "signingIn": "Signing in...",
+    "createAccount": "Create Account",
+    "creatingAccount": "Creating account...",
+    "back": "Back",
+    "emailPlaceholder": "you@example.com",
+    "passwordPlaceholder": "••••••••",
+    "namePlaceholder": "John Doe",
+    "errors": {
+      "passwordMismatch": "Passwords do not match",
+      "passwordTooShort": "Password must be at least 8 characters",
+      "acceptTermsRequired": "Please accept the terms and conditions",
+      "alreadyRegistered": "This email is already registered. Please log in instead.",
+      "invalidCredentials": "Invalid email or password"
+    },
+    "success": {
+      "accountCreated": "Account created successfully!",
+      "loggedIn": "Logged in successfully. Redirecting..."
+    }
+  },
+  "common": {
+    "loading": "Loading...",
+    "error": "Error",
+    "success": "Success!"
+  }
+}

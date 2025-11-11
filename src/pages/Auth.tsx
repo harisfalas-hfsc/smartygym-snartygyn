@@ -11,11 +11,13 @@ import { useToast } from "@/hooks/use-toast";
 import { ArrowLeft } from "lucide-react";
 import smartyGymLogo from "@/assets/smarty-gym-logo.png";
 import { AvatarSetupDialog } from "@/components/AvatarSetupDialog";
+import { useTranslation } from "react-i18next";
 
 export default function Auth() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const { toast } = useToast();
+  const { t } = useTranslation();
   const [loading, setLoading] = useState(false);
   const [showAvatarSetup, setShowAvatarSetup] = useState(false);
   const [newUserId, setNewUserId] = useState<string | null>(null);
@@ -66,8 +68,8 @@ export default function Auth() {
     
     if (signUpData.password !== signUpData.confirmPassword) {
       toast({
-        title: "Error",
-        description: "Passwords do not match",
+        title: t('common.error'),
+        description: t('auth.errors.passwordMismatch'),
         variant: "destructive",
       });
       return;
@@ -75,8 +77,8 @@ export default function Auth() {
 
     if (signUpData.password.length < 8) {
       toast({
-        title: "Error",
-        description: "Password must be at least 8 characters",
+        title: t('common.error'),
+        description: t('auth.errors.passwordTooShort'),
         variant: "destructive",
       });
       return;
@@ -84,8 +86,8 @@ export default function Auth() {
 
     if (!signUpData.acceptTerms) {
       toast({
-        title: "Error",
-        description: "Please accept the terms and conditions",
+        title: t('common.error'),
+        description: t('auth.errors.acceptTermsRequired'),
         variant: "destructive",
       });
       return;
@@ -108,13 +110,13 @@ export default function Auth() {
       if (error) {
         if (error.message.includes("already registered")) {
           toast({
-            title: "Error",
-            description: "This email is already registered. Please log in instead.",
+            title: t('common.error'),
+            description: t('auth.errors.alreadyRegistered'),
             variant: "destructive",
           });
         } else {
           toast({
-            title: "Error",
+            title: t('common.error'),
             description: error.message,
             variant: "destructive",
           });
@@ -135,14 +137,14 @@ export default function Auth() {
         }
         
         toast({
-          title: "Success!",
-          description: "Account created successfully!",
+          title: t('common.success'),
+          description: t('auth.success.accountCreated'),
         });
         setShowAvatarSetup(true);
       }
     } catch (error: any) {
       toast({
-        title: "Error",
+        title: t('common.error'),
         description: error.message || "Something went wrong",
         variant: "destructive",
       });
@@ -164,27 +166,27 @@ export default function Auth() {
       if (error) {
         if (error.message.includes("Invalid login credentials")) {
           toast({
-            title: "Error",
-            description: "Invalid email or password",
+            title: t('common.error'),
+            description: t('auth.errors.invalidCredentials'),
             variant: "destructive",
           });
         } else {
           toast({
-            title: "Error",
+            title: t('common.error'),
             description: error.message,
             variant: "destructive",
           });
         }
       } else {
         toast({
-          title: "Success!",
-          description: "Logged in successfully. Redirecting...",
+          title: t('common.success'),
+          description: t('auth.success.loggedIn'),
         });
         setTimeout(() => navigate("/userdashboard"), 1500);
       }
     } catch (error: any) {
       toast({
-        title: "Error",
+        title: t('common.error'),
         description: error.message || "Something went wrong",
         variant: "destructive",
       });
@@ -217,50 +219,50 @@ export default function Auth() {
           className="mb-4"
         >
           <ArrowLeft className="mr-2 h-4 w-4" />
-          Back
+          {t('auth.back')}
         </Button>
         
         <Card className="w-full">
           <CardHeader className="space-y-1 flex flex-col items-center">
             <img src={smartyGymLogo} alt="Smarty Gym" className="h-20 w-auto mb-2" />
-            <CardTitle className="text-2xl font-bold text-center">Welcome to Smarty Gym</CardTitle>
+            <CardTitle className="text-2xl font-bold text-center">{t('auth.welcome')}</CardTitle>
             <CardDescription className="text-center">
-              Create an account or sign in to continue
+              {t('auth.welcomeDescription')}
             </CardDescription>
           </CardHeader>
         <CardContent>
           <Tabs defaultValue={defaultTab} className="w-full">
             <TabsList className="grid w-full grid-cols-2">
-              <TabsTrigger value="login">Login</TabsTrigger>
-              <TabsTrigger value="signup">Sign Up</TabsTrigger>
+              <TabsTrigger value="login">{t('auth.login')}</TabsTrigger>
+              <TabsTrigger value="signup">{t('auth.signup')}</TabsTrigger>
             </TabsList>
 
             <TabsContent value="login">
               <form onSubmit={handleLogin} className="space-y-4 mt-4">
                 <div className="space-y-2">
-                  <Label htmlFor="login-email">Email</Label>
+                  <Label htmlFor="login-email">{t('auth.email')}</Label>
                   <Input
                     id="login-email"
                     type="email"
-                    placeholder="you@example.com"
+                    placeholder={t('auth.emailPlaceholder')}
                     value={loginData.email}
                     onChange={(e) => setLoginData({ ...loginData, email: e.target.value })}
                     required
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="login-password">Password</Label>
+                  <Label htmlFor="login-password">{t('auth.password')}</Label>
                   <Input
                     id="login-password"
                     type="password"
-                    placeholder="••••••••"
+                    placeholder={t('auth.passwordPlaceholder')}
                     value={loginData.password}
                     onChange={(e) => setLoginData({ ...loginData, password: e.target.value })}
                     required
                   />
                 </div>
                 <Button type="submit" className="w-full" disabled={loading}>
-                  {loading ? "Signing in..." : "Sign In"}
+                  {loading ? t('auth.signingIn') : t('auth.signIn')}
                 </Button>
               </form>
             </TabsContent>
@@ -268,44 +270,44 @@ export default function Auth() {
             <TabsContent value="signup">
               <form onSubmit={handleSignUp} className="space-y-4 mt-4">
                 <div className="space-y-2">
-                  <Label htmlFor="signup-name">Full Name</Label>
+                  <Label htmlFor="signup-name">{t('auth.fullName')}</Label>
                   <Input
                     id="signup-name"
                     type="text"
-                    placeholder="John Doe"
+                    placeholder={t('auth.namePlaceholder')}
                     value={signUpData.fullName}
                     onChange={(e) => setSignUpData({ ...signUpData, fullName: e.target.value })}
                     required
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="signup-email">Email</Label>
+                  <Label htmlFor="signup-email">{t('auth.email')}</Label>
                   <Input
                     id="signup-email"
                     type="email"
-                    placeholder="you@example.com"
+                    placeholder={t('auth.emailPlaceholder')}
                     value={signUpData.email}
                     onChange={(e) => setSignUpData({ ...signUpData, email: e.target.value })}
                     required
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="signup-password">Password</Label>
+                  <Label htmlFor="signup-password">{t('auth.password')}</Label>
                   <Input
                     id="signup-password"
                     type="password"
-                    placeholder="••••••••"
+                    placeholder={t('auth.passwordPlaceholder')}
                     value={signUpData.password}
                     onChange={(e) => setSignUpData({ ...signUpData, password: e.target.value })}
                     required
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="signup-confirm-password">Confirm Password</Label>
+                  <Label htmlFor="signup-confirm-password">{t('auth.confirmPassword')}</Label>
                   <Input
                     id="signup-confirm-password"
                     type="password"
-                    placeholder="••••••••"
+                    placeholder={t('auth.passwordPlaceholder')}
                     value={signUpData.confirmPassword}
                     onChange={(e) => setSignUpData({ ...signUpData, confirmPassword: e.target.value })}
                     required
@@ -321,11 +323,11 @@ export default function Auth() {
                     htmlFor="terms"
                     className="text-sm leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
                   >
-                    I accept the terms and conditions
+                    {t('auth.acceptTerms')}
                   </label>
                 </div>
                 <Button type="submit" className="w-full" disabled={loading}>
-                  {loading ? "Creating account..." : "Create Account"}
+                  {loading ? t('auth.creatingAccount') : t('auth.createAccount')}
                 </Button>
               </form>
             </TabsContent>
