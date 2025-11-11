@@ -73,6 +73,10 @@ export const WorkoutEditDialog = ({ workout, open, onOpenChange, onSave }: Worko
     generate_unique_image: false,
     is_premium: false,
     tier_required: '',
+    is_standalone_purchase: false,
+    price: '',
+    stripe_product_id: '',
+    stripe_price_id: '',
   });
   const [isGeneratingImage, setIsGeneratingImage] = useState(false);
 
@@ -115,6 +119,10 @@ export const WorkoutEditDialog = ({ workout, open, onOpenChange, onSave }: Worko
         generate_unique_image: false,
         is_premium: false,
         tier_required: '',
+        is_standalone_purchase: false,
+        price: '',
+        stripe_product_id: '',
+        stripe_price_id: '',
       });
     }
   }, [workout]);
@@ -182,12 +190,44 @@ export const WorkoutEditDialog = ({ workout, open, onOpenChange, onSave }: Worko
         }
       }
 
+      // Create Stripe product if standalone purchase with price
+      let stripeProductId = formData.stripe_product_id;
+      let stripePriceId = formData.stripe_price_id;
+      
+      if (formData.is_standalone_purchase && formData.price && parseFloat(formData.price) > 0) {
+        const { data: stripeData, error: stripeError } = await supabase.functions.invoke('create-stripe-product', {
+          body: {
+            name: formData.name,
+            price: formData.price,
+            contentType: "Workout"
+          }
+        });
+
+        if (stripeError) {
+          console.error('Error creating Stripe product:', stripeError);
+          toast({
+            title: "Error",
+            description: "Failed to create Stripe product. Please try again.",
+            variant: "destructive",
+          });
+          return;
+        }
+
+        if (stripeData) {
+          stripeProductId = stripeData.product_id;
+          stripePriceId = stripeData.price_id;
+        }
+      }
+
       // Prepare data with backward compatibility
       const saveData = {
         ...formData,
         image_url: imageUrl,
         type: formData.format || formData.category,
         difficulty: getDifficultyLabel(formData.difficulty_stars),
+        stripe_product_id: stripeProductId,
+        stripe_price_id: stripePriceId,
+        price: formData.price ? parseFloat(formData.price) : null,
       };
 
       // Remove the generate_unique_image flag before saving
@@ -472,6 +512,45 @@ export const WorkoutEditDialog = ({ workout, open, onOpenChange, onSave }: Worko
                     <SelectItem value="platinum">Platinum</SelectItem>
                   </SelectContent>
                 </Select>
+              </div>
+            )}
+          </div>
+
+          {/* 14. Standalone Purchase */}
+          <div className="space-y-4 pt-4 border-t">
+            <Label>14. Standalone Purchase Options</Label>
+            <div className="flex items-center space-x-2">
+              <Switch
+                id="is_standalone_purchase"
+                checked={formData.is_standalone_purchase}
+                onCheckedChange={(checked) => setFormData({ ...formData, is_standalone_purchase: checked })}
+              />
+              <Label htmlFor="is_standalone_purchase" className="cursor-pointer">Available as Standalone Purchase</Label>
+            </div>
+            <p className="text-sm text-muted-foreground">
+              Enable this to allow users to buy this workout individually without a subscription
+            </p>
+
+            {formData.is_standalone_purchase && (
+              <div className="space-y-2 ml-6">
+                <Label htmlFor="price">Price (€) *</Label>
+                <Input
+                  id="price"
+                  type="number"
+                  step="0.01"
+                  min="0"
+                  value={formData.price}
+                  onChange={(e) => setFormData({ ...formData, price: e.target.value })}
+                  placeholder="e.g., 9.99"
+                />
+                <p className="text-sm text-muted-foreground">
+                  This will automatically create a Stripe product when you save
+                </p>
+                {formData.stripe_product_id && (
+                  <p className="text-xs text-green-600">
+                    ✓ Stripe Product ID: {formData.stripe_product_id}
+                  </p>
+                )}
               </div>
             )}
           </div>

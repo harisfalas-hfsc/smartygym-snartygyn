@@ -60,6 +60,10 @@ export const ProgramEditDialog = ({ program, open, onOpenChange, onSave }: Progr
     generate_unique_image: false,
     is_premium: false,
     tier_required: '',
+    is_standalone_purchase: false,
+    price: '',
+    stripe_product_id: '',
+    stripe_price_id: '',
   });
   const [weekDayContents, setWeekDayContents] = useState<WeekDayContent[]>([]);
 
@@ -111,6 +115,10 @@ export const ProgramEditDialog = ({ program, open, onOpenChange, onSave }: Progr
         generate_unique_image: false,
         is_premium: program.is_premium || false,
         tier_required: program.tier_required || '',
+        is_standalone_purchase: program.is_standalone_purchase || false,
+        price: program.price ? program.price.toString() : '',
+        stripe_product_id: program.stripe_product_id || '',
+        stripe_price_id: program.stripe_price_id || '',
       });
       
       // Parse weekly_schedule if exists
@@ -140,6 +148,10 @@ export const ProgramEditDialog = ({ program, open, onOpenChange, onSave }: Progr
         generate_unique_image: false,
         is_premium: false,
         tier_required: '',
+        is_standalone_purchase: false,
+        price: '',
+        stripe_product_id: '',
+        stripe_price_id: '',
       });
       setWeekDayContents([]);
     }
@@ -225,6 +237,35 @@ export const ProgramEditDialog = ({ program, open, onOpenChange, onSave }: Progr
           imageUrl = imageData.image_url;
         }
       }
+
+      // Create Stripe product if standalone purchase with price
+      let stripeProductId = formData.stripe_product_id;
+      let stripePriceId = formData.stripe_price_id;
+      
+      if (formData.is_standalone_purchase && formData.price && parseFloat(formData.price) > 0) {
+        const { data: stripeData, error: stripeError } = await supabase.functions.invoke('create-stripe-product', {
+          body: {
+            name: formData.name,
+            price: formData.price,
+            contentType: "Training Program"
+          }
+        });
+
+        if (stripeError) {
+          console.error('Error creating Stripe product:', stripeError);
+          toast({
+            title: "Error",
+            description: "Failed to create Stripe product. Please try again.",
+            variant: "destructive",
+          });
+          return;
+        }
+
+        if (stripeData) {
+          stripeProductId = stripeData.product_id;
+          stripePriceId = stripeData.price_id;
+        }
+      }
       
       const duration = `${formData.weeks} Weeks / ${formData.days_per_week} Days per Week`;
       
@@ -254,6 +295,10 @@ export const ProgramEditDialog = ({ program, open, onOpenChange, onSave }: Progr
         image_url: imageUrl,
         is_premium: formData.is_premium,
         tier_required: formData.tier_required || null,
+        is_standalone_purchase: formData.is_standalone_purchase,
+        price: formData.price ? parseFloat(formData.price) : null,
+        stripe_product_id: stripeProductId,
+        stripe_price_id: stripePriceId,
       };
 
       if (program) {
@@ -523,6 +568,44 @@ export const ProgramEditDialog = ({ program, open, onOpenChange, onSave }: Progr
               </Select>
             </div>
           )}
+
+          {/* Standalone Purchase Section */}
+          <div className="space-y-4 pt-4 border-t">
+            <div className="flex items-center space-x-2">
+              <Switch
+                id="is_standalone_purchase"
+                checked={formData.is_standalone_purchase}
+                onCheckedChange={(checked) => setFormData({ ...formData, is_standalone_purchase: checked })}
+              />
+              <Label htmlFor="is_standalone_purchase">Available as Standalone Purchase</Label>
+            </div>
+            <p className="text-sm text-muted-foreground">
+              Enable this to allow users to buy this program individually without a subscription
+            </p>
+
+            {formData.is_standalone_purchase && (
+              <div className="space-y-2">
+                <Label htmlFor="price">Price (€) *</Label>
+                <Input
+                  id="price"
+                  type="number"
+                  step="0.01"
+                  min="0"
+                  value={formData.price}
+                  onChange={(e) => setFormData({ ...formData, price: e.target.value })}
+                  placeholder="e.g., 29.99"
+                />
+                <p className="text-sm text-muted-foreground">
+                  This will automatically create a Stripe product when you save
+                </p>
+                {formData.stripe_product_id && (
+                  <p className="text-xs text-green-600">
+                    ✓ Stripe Product ID: {formData.stripe_product_id}
+                  </p>
+                )}
+              </div>
+            )}
+          </div>
 
           <div className="flex justify-end gap-2 pt-4">
             <Button variant="outline" onClick={() => onOpenChange(false)} disabled={isGeneratingImage}>

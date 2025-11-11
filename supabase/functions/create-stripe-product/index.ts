@@ -1,0 +1,66 @@
+import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
+import Stripe from "https://esm.sh/stripe@18.5.0";
+
+const corsHeaders = {
+  "Access-Control-Allow-Origin": "*",
+  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
+};
+
+serve(async (req) => {
+  if (req.method === "OPTIONS") {
+    return new Response(null, { headers: corsHeaders });
+  }
+
+  try {
+    const { name, price, contentType } = await req.json();
+    
+    if (!name || !price) {
+      throw new Error("Name and price are required");
+    }
+
+    console.log("Creating Stripe product:", { name, price, contentType });
+
+    const stripe = new Stripe(Deno.env.get("STRIPE_SECRET_KEY") || "", {
+      apiVersion: "2025-08-27.basil",
+    });
+
+    // Create product
+    const product = await stripe.products.create({
+      name: name,
+      description: `${contentType}: ${name}`,
+    });
+
+    console.log("Product created:", product.id);
+
+    // Create price (convert to cents)
+    const priceInCents = Math.round(parseFloat(price) * 100);
+    const stripePrice = await stripe.prices.create({
+      product: product.id,
+      unit_amount: priceInCents,
+      currency: "eur",
+    });
+
+    console.log("Price created:", stripePrice.id);
+
+    return new Response(
+      JSON.stringify({
+        product_id: product.id,
+        price_id: stripePrice.id,
+      }),
+      {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+        status: 200,
+      }
+    );
+  } catch (error) {
+    console.error("Error creating Stripe product:", error);
+    const errorMessage = error instanceof Error ? error.message : "Unknown error occurred";
+    return new Response(
+      JSON.stringify({ error: errorMessage }),
+      {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+        status: 500,
+      }
+    );
+  }
+});
