@@ -126,7 +126,7 @@ import bodyweightMadnessImg from "@/assets/bodyweight-madness-workout.jpg";
 type EquipmentFilter = "all" | "bodyweight" | "equipment";
 type LevelFilter = "all" | "beginner" | "intermediate" | "advanced";
 type FormatFilter = "all" | "circuit" | "amrap" | "for time" | "tabata" | "reps & sets" | "emom" | "mix";
-type DurationFilter = "all" | "15" | "20" | "30" | "45" | "60";
+type DurationFilter = "all" | "15" | "20" | "30" | "45" | "60" | "various";
 
 export interface Workout {
   id: string;
@@ -326,8 +326,15 @@ const WorkoutDetail = () => {
     
     // Duration filter
     if (durationFilter !== "all") {
-      const workoutDuration = workout.duration?.match(/\d+/)?.[0]; // Extract number from "30 min", "45 min", etc.
-      if (workoutDuration !== durationFilter) return false;
+      const workoutDuration = workout.duration?.toLowerCase();
+      if (durationFilter === "various") {
+        // Match "various" or similar variations
+        if (!workoutDuration?.includes("various") && !workoutDuration?.includes("varies")) return false;
+      } else {
+        // Extract number from "30 min", "45 min", etc.
+        const durationNumber = workout.duration?.match(/\d+/)?.[0];
+        if (durationNumber !== durationFilter) return false;
+      }
     }
     
     return true;
@@ -567,6 +574,13 @@ const WorkoutDetail = () => {
                 size="sm"
               >
                 60 min
+              </Button>
+              <Button
+                variant={durationFilter === "various" ? "default" : "outline"}
+                onClick={() => setDurationFilter("various")}
+                size="sm"
+              >
+                Various
               </Button>
             </div>
           </div>
