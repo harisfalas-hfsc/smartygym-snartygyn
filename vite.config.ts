@@ -20,24 +20,29 @@ export default defineConfig(({ mode }) => ({
         name: "Smarty Gym",
         short_name: "Smarty Gym",
         description: "Your Smart Gym — Functional, science-based workouts anywhere, anytime",
-        theme_color: "#000000",
-        background_color: "#ffffff",
+        theme_color: "#D4AF37",
+        background_color: "#000000",
         display: "standalone",
+        orientation: "portrait",
+        scope: "/",
+        start_url: "/",
         icons: [
           {
             src: "/smarty-gym-logo.png",
             sizes: "192x192",
-            type: "image/png"
+            type: "image/png",
+            purpose: "any maskable"
           },
           {
             src: "/smarty-gym-logo.png",
             sizes: "512x512",
-            type: "image/png"
+            type: "image/png",
+            purpose: "any maskable"
           }
         ]
       },
       workbox: {
-        maximumFileSizeToCacheInBytes: 5 * 1024 * 1024, // 5 MB
+        maximumFileSizeToCacheInBytes: 5 * 1024 * 1024,
         globPatterns: ["**/*.{js,css,html,ico,png,svg,jpg}"],
         runtimeCaching: [
           {
@@ -53,8 +58,23 @@ export default defineConfig(({ mode }) => ({
                 statuses: [0, 200]
               }
             }
+          },
+          {
+            urlPattern: /^https:\/\/.*\.supabase\.co\/.*/i,
+            handler: "NetworkFirst",
+            options: {
+              cacheName: "api-cache",
+              networkTimeoutSeconds: 10,
+              expiration: {
+                maxEntries: 50,
+                maxAgeSeconds: 60 * 5
+              }
+            }
           }
         ]
+      },
+      devOptions: {
+        enabled: true
       }
     })
   ].filter(Boolean),

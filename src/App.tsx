@@ -50,6 +50,7 @@ import AdminBackoffice from "./pages/AdminBackoffice";
 import MigrateContent from "./pages/MigrateContent";
 import { AccessGate } from "./components/AccessGate";
 import { WhatsAppButton } from "./components/WhatsAppButton";
+import { InstallPWA } from "./components/InstallPWA";
 
 const queryClient = new QueryClient();
 
@@ -61,6 +62,7 @@ const App = () => (
         <Sonner />
         <BrowserRouter>
           <CookieConsent />
+          <InstallPWA />
           <AccessControlProvider>
           <WhatsAppButton />
           <ScrollToTop />
