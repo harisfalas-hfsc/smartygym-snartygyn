@@ -125,7 +125,8 @@ import bodyweightMadnessImg from "@/assets/bodyweight-madness-workout.jpg";
 
 type EquipmentFilter = "all" | "bodyweight" | "equipment";
 type LevelFilter = "all" | "beginner" | "intermediate" | "advanced";
-type FormatFilter = "all" | "circuit" | "amrap" | "for time" | "tabata" | "reps & sets" | "mix";
+type FormatFilter = "all" | "circuit" | "amrap" | "for time" | "tabata" | "reps & sets" | "emom" | "mix";
+type DurationFilter = "all" | "15" | "20" | "30" | "45" | "60";
 
 export interface Workout {
   id: string;
@@ -267,6 +268,7 @@ const WorkoutDetail = () => {
   const [equipmentFilter, setEquipmentFilter] = useState<EquipmentFilter>("all");
   const [levelFilter, setLevelFilter] = useState<LevelFilter>("all");
   const [formatFilter, setFormatFilter] = useState<FormatFilter>("all");
+  const [durationFilter, setDurationFilter] = useState<DurationFilter>("all");
   
   // Fetch workouts from database
   const { data: allWorkouts = [], isLoading } = useAllWorkouts();
@@ -320,6 +322,12 @@ const WorkoutDetail = () => {
       if (formatFilter === "reps & sets" && workoutFormat !== "reps & sets") return false;
       if (formatFilter === "for time" && workoutFormat !== "for time") return false;
       if (formatFilter !== "reps & sets" && formatFilter !== "for time" && workoutFormat !== formatFilter) return false;
+    }
+    
+    // Duration filter
+    if (durationFilter !== "all") {
+      const workoutDuration = workout.duration?.match(/\d+/)?.[0]; // Extract number from "30 min", "45 min", etc.
+      if (workoutDuration !== durationFilter) return false;
     }
     
     return true;
@@ -498,11 +506,67 @@ const WorkoutDetail = () => {
                 Reps & Sets
               </Button>
               <Button
+                variant={formatFilter === "emom" ? "default" : "outline"}
+                onClick={() => setFormatFilter("emom")}
+                size="sm"
+              >
+                EMOM
+              </Button>
+              <Button
                 variant={formatFilter === "mix" ? "default" : "outline"}
                 onClick={() => setFormatFilter("mix")}
                 size="sm"
               >
                 Mix
+              </Button>
+            </div>
+          </div>
+
+          {/* Duration Filter */}
+          <div>
+            <p className="text-sm font-medium mb-2">Duration (minutes)</p>
+            <div className="flex gap-2 flex-wrap">
+              <Button
+                variant={durationFilter === "all" ? "default" : "outline"}
+                onClick={() => setDurationFilter("all")}
+                size="sm"
+              >
+                All
+              </Button>
+              <Button
+                variant={durationFilter === "15" ? "default" : "outline"}
+                onClick={() => setDurationFilter("15")}
+                size="sm"
+              >
+                15 min
+              </Button>
+              <Button
+                variant={durationFilter === "20" ? "default" : "outline"}
+                onClick={() => setDurationFilter("20")}
+                size="sm"
+              >
+                20 min
+              </Button>
+              <Button
+                variant={durationFilter === "30" ? "default" : "outline"}
+                onClick={() => setDurationFilter("30")}
+                size="sm"
+              >
+                30 min
+              </Button>
+              <Button
+                variant={durationFilter === "45" ? "default" : "outline"}
+                onClick={() => setDurationFilter("45")}
+                size="sm"
+              >
+                45 min
+              </Button>
+              <Button
+                variant={durationFilter === "60" ? "default" : "outline"}
+                onClick={() => setDurationFilter("60")}
+                size="sm"
+              >
+                60 min
               </Button>
             </div>
           </div>
