@@ -64,6 +64,19 @@ interface WorkoutDisplayProps {
   format?: string;
   instructions?: string;
   tips?: string;
+  activation?: string;
+  warm_up?: string;
+  main_workout?: string;
+  finisher?: string;
+  cool_down?: string;
+  programContent?: string;
+  overview?: string;
+  target_audience?: string;
+  program_structure?: string;
+  weekly_schedule?: string;
+  progression_plan?: string;
+  nutrition_tips?: string;
+  expected_results?: string;
   workoutId?: string;
   workoutCategory?: string;
   programId?: string;
@@ -88,6 +101,19 @@ export const WorkoutDisplay = ({
   format,
   instructions,
   tips,
+  activation,
+  warm_up,
+  main_workout,
+  finisher,
+  cool_down,
+  programContent,
+  overview,
+  target_audience,
+  program_structure,
+  weekly_schedule,
+  progression_plan,
+  nutrition_tips,
+  expected_results,
   workoutId,
   workoutCategory,
   programId,
@@ -224,7 +250,7 @@ export const WorkoutDisplay = ({
             <span className="font-semibold">Difficulty:</span>
             <div className="flex items-center gap-2">
               <div className="flex">
-                {[1, 2, 3, 4, 5].map((i) => (
+                {[1, 2, 3, 4, 5, 6].map((i) => (
                   <Star key={i} className={`w-4 h-4 ${i <= difficulty ? 'fill-primary text-primary' : 'text-gray-300'}`} />
                 ))}
               </div>
@@ -392,9 +418,89 @@ export const WorkoutDisplay = ({
         </Card>
       </div>
 
-      {/* Workout Content */}
+      {/* Workout Content - EXACT ORDER FROM BACK OFFICE */}
       <div className="space-y-6 mt-8">
-        {/* Description Card */}
+        {/* 1. Activation */}
+        {activation && (
+          <Card className="border-2 border-primary/30">
+            <CardHeader className="bg-primary/5">
+              <CardTitle className="flex items-center gap-2 text-2xl font-bold">
+                🔥 Activation
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="border-l-4 border-primary pl-4 py-2">
+                <p className="text-base leading-relaxed whitespace-pre-wrap">{activation}</p>
+              </div>
+            </CardContent>
+          </Card>
+        )}
+
+        {/* 2. Warm Up */}
+        {warm_up && (
+          <Card className="border-2 border-primary/30">
+            <CardHeader className="bg-primary/5">
+              <CardTitle className="flex items-center gap-2 text-2xl font-bold">
+                🌡️ Warm Up
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="border-l-4 border-primary pl-4 py-2">
+                <p className="text-base leading-relaxed whitespace-pre-wrap">{warm_up}</p>
+              </div>
+            </CardContent>
+          </Card>
+        )}
+
+        {/* 3. Main Workout */}
+        {main_workout && (
+          <Card className="border-2 border-primary/30">
+            <CardHeader className="bg-primary/5">
+              <CardTitle className="flex items-center gap-2 text-2xl font-bold">
+                💪 Primary Workout
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="border-l-4 border-primary pl-4 py-2">
+                <p className="text-base leading-relaxed whitespace-pre-wrap">{main_workout}</p>
+              </div>
+            </CardContent>
+          </Card>
+        )}
+
+        {/* 4. Finisher */}
+        {finisher && (
+          <Card className="border-2 border-primary/30">
+            <CardHeader className="bg-primary/5">
+              <CardTitle className="flex items-center gap-2 text-2xl font-bold">
+                ⚡ Finisher
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="border-l-4 border-primary pl-4 py-2">
+                <p className="text-base leading-relaxed whitespace-pre-wrap">{finisher}</p>
+              </div>
+            </CardContent>
+          </Card>
+        )}
+
+        {/* 5. Cool Down */}
+        {cool_down && (
+          <Card className="border-2 border-primary/30">
+            <CardHeader className="bg-primary/5">
+              <CardTitle className="flex items-center gap-2 text-2xl font-bold">
+                ❄️ Cool Down
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="border-l-4 border-primary pl-4 py-2">
+                <p className="text-base leading-relaxed whitespace-pre-wrap">{cool_down}</p>
+              </div>
+            </CardContent>
+          </Card>
+        )}
+
+        {/* 6. Description */}
         {description && (
           <Card className="border-2 border-primary/30">
             <CardHeader className="bg-primary/5">
@@ -410,23 +516,7 @@ export const WorkoutDisplay = ({
           </Card>
         )}
 
-        {/* Format Card */}
-        {format && (
-          <Card className="border-2 border-primary/30">
-            <CardHeader className="bg-primary/5">
-              <CardTitle className="flex items-center gap-2 text-2xl font-bold">
-                🏋️‍♂️ Format
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="border-l-4 border-primary pl-4 py-2">
-                <p className="text-base leading-relaxed whitespace-pre-wrap">{format}</p>
-              </div>
-            </CardContent>
-          </Card>
-        )}
-
-        {/* Instructions Card */}
+        {/* 7. Instructions */}
         {instructions && (
           <Card className="border-2 border-primary/30">
             <CardHeader className="bg-primary/5">
@@ -442,12 +532,12 @@ export const WorkoutDisplay = ({
           </Card>
         )}
 
-        {/* Tips Card */}
+        {/* 8. Tips */}
         {tips && (
           <Card className="border-2 border-primary/30">
             <CardHeader className="bg-primary/5">
               <CardTitle className="flex items-center gap-2 text-2xl font-bold">
-                ⚠️ Tips
+                💡 Tips
               </CardTitle>
             </CardHeader>
             <CardContent>
@@ -537,6 +627,119 @@ export const WorkoutDisplay = ({
                     </div>
                   </div>
                 ))}
+              </div>
+            </CardContent>
+          </Card>
+        )}
+
+        {/* Program Content Sections - IN ORDER FROM BACK OFFICE */}
+        {/* 1. Overview */}
+        {overview && (
+          <Card className="border-2 border-primary/30">
+            <CardHeader className="bg-primary/5">
+              <CardTitle className="flex items-center gap-2 text-2xl font-bold">
+                🎯 Overview
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="border-l-4 border-primary pl-4 py-2">
+                <p className="text-base leading-relaxed whitespace-pre-wrap">{overview}</p>
+              </div>
+            </CardContent>
+          </Card>
+        )}
+
+        {/* 2. Target Audience */}
+        {target_audience && (
+          <Card className="border-2 border-primary/30">
+            <CardHeader className="bg-primary/5">
+              <CardTitle className="flex items-center gap-2 text-2xl font-bold">
+                👥 Target Audience
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="border-l-4 border-primary pl-4 py-2">
+                <p className="text-base leading-relaxed whitespace-pre-wrap">{target_audience}</p>
+              </div>
+            </CardContent>
+          </Card>
+        )}
+
+        {/* 3. Program Structure */}
+        {program_structure && (
+          <Card className="border-2 border-primary/30">
+            <CardHeader className="bg-primary/5">
+              <CardTitle className="flex items-center gap-2 text-2xl font-bold">
+                🏗️ Program Structure
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="border-l-4 border-primary pl-4 py-2">
+                <p className="text-base leading-relaxed whitespace-pre-wrap">{program_structure}</p>
+              </div>
+            </CardContent>
+          </Card>
+        )}
+
+        {/* 4. Weekly Schedule */}
+        {weekly_schedule && (
+          <Card className="border-2 border-primary/30">
+            <CardHeader className="bg-primary/5">
+              <CardTitle className="flex items-center gap-2 text-2xl font-bold">
+                📆 Weekly Schedule
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="border-l-4 border-primary pl-4 py-2">
+                <p className="text-base leading-relaxed whitespace-pre-wrap">{weekly_schedule}</p>
+              </div>
+            </CardContent>
+          </Card>
+        )}
+
+        {/* 5. Progression Plan */}
+        {progression_plan && (
+          <Card className="border-2 border-primary/30">
+            <CardHeader className="bg-primary/5">
+              <CardTitle className="flex items-center gap-2 text-2xl font-bold">
+                📈 Progression Plan
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="border-l-4 border-primary pl-4 py-2">
+                <p className="text-base leading-relaxed whitespace-pre-wrap">{progression_plan}</p>
+              </div>
+            </CardContent>
+          </Card>
+        )}
+
+        {/* 6. Nutrition Tips */}
+        {nutrition_tips && (
+          <Card className="border-2 border-primary/30">
+            <CardHeader className="bg-primary/5">
+              <CardTitle className="flex items-center gap-2 text-2xl font-bold">
+                🥗 Nutrition Tips
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="border-l-4 border-primary pl-4 py-2">
+                <p className="text-base leading-relaxed whitespace-pre-wrap">{nutrition_tips}</p>
+              </div>
+            </CardContent>
+          </Card>
+        )}
+
+        {/* 7. Expected Results */}
+        {expected_results && (
+          <Card className="border-2 border-primary/30">
+            <CardHeader className="bg-primary/5">
+              <CardTitle className="flex items-center gap-2 text-2xl font-bold">
+                🏆 Expected Results
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="border-l-4 border-primary pl-4 py-2">
+                <p className="text-base leading-relaxed whitespace-pre-wrap">{expected_results}</p>
               </div>
             </CardContent>
           </Card>

@@ -128,56 +128,6 @@ const IndividualWorkout = () => {
   const navigate = useNavigate();
   const { type, id } = useParams();
   
-  // Try to fetch from database first
-  const { data: dbWorkout, isLoading: isLoadingDb } = useWorkoutData(id);
-
-  // Free workouts (accessible by logged-in members)
-  const freeWorkouts = [
-    'challenge-002', // Starter Gauntlet
-    'challenge-003', // Challenge Prep
-    'challenge-004', // Bodyweight Blitz
-    'challenge-005', // Challenge Circuit Pro
-    'challenge-006', // Final Form
-    'challenge-007', // Elite Gauntlet
-    'power-037', // Power Primer
-    'power-038', // Explosive Start
-    'power-039', // Body Blast
-    'power-040', // Power Circuit Pro
-    'power-041', // Explosive Engine
-    'power-042', // Power Surge Elite
-    'mobility-025', // Flow Starter
-    'mobility-026', // Band Balance
-    'mobility-027', // Core Flow
-    'mobility-028', // Stability Circuit
-    'mobility-029', // Mobility Mastery
-    'mobility-030', // Balance Forge
-    'metabolic-043', // Metabo Pulse
-    'metabolic-044', // Metabo Band Boost
-    'metabolic-045', // Metabo Sprint
-    'metabolic-046', // Metabo Hybrid
-    'metabolic-047', // Metabo Max
-    'metabolic-048', // Metabo Forge
-    'strength-049', // Bodyweight Base
-    'strength-050', // Strength Starter
-    'strength-051', // Gravity Strength
-    'strength-052', // Iron Builder
-    'strength-053', // Bodyweight Powerhouse
-    'strength-054', // Iron Mastery
-    'calorie-055', // Burn Flow
-    'calorie-056', // Sweat Band
-    'calorie-057', // Body Burn Pro
-    'calorie-058', // Sweat Surge
-    'calorie-059', // Inferno Sprint
-    'calorie-060', // Calorie Forge
-    'cardio-061', // Cardio Lift-Off
-    'cardio-062', // Pulse Builder
-    'cardio-063', // Cardio Climb
-    'cardio-064', // Cardio Circuit Pro
-    'cardio-065', // Cardio Inferno
-    'cardio-066', // Cardio Overdrive
-  ];
-  const isFreeWorkout = freeWorkouts.includes(id || '');
-
   // Helper function to format focus label
   const getFocusLabel = (type: string | undefined): string => {
     const focusMap: { [key: string]: string } = {
@@ -193,7 +143,88 @@ const IndividualWorkout = () => {
     return focusMap[type || ''] || 'General Fitness';
   };
 
-  // Workout data structure
+  // Free workouts (accessible by logged-in members)
+  const freeWorkouts = [
+    'challenge-002', 'challenge-003', 'challenge-004', 'challenge-005', 'challenge-006', 'challenge-007',
+    'power-037', 'power-038', 'power-039', 'power-040', 'power-041', 'power-042',
+    'mobility-025', 'mobility-026', 'mobility-027', 'mobility-028', 'mobility-029', 'mobility-030',
+    'metabolic-043', 'metabolic-044', 'metabolic-045', 'metabolic-046', 'metabolic-047', 'metabolic-048',
+    'strength-049', 'strength-050', 'strength-051', 'strength-052', 'strength-053', 'strength-054',
+    'calorie-055', 'calorie-056', 'calorie-057', 'calorie-058', 'calorie-059', 'calorie-060',
+    'cardio-061', 'cardio-062', 'cardio-063', 'cardio-064', 'cardio-065', 'cardio-066',
+  ];
+  const isFreeWorkout = freeWorkouts.includes(id || '');
+  
+  // Fetch from database
+  const { data: dbWorkout, isLoading: isLoadingDb } = useWorkoutData(id);
+
+  // If we have database workout, use it directly
+  if (isLoadingDb) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <p className="text-muted-foreground">Loading workout...</p>
+      </div>
+    );
+  }
+
+  if (dbWorkout) {
+    return (
+      <>
+        <Helmet>
+          <title>{dbWorkout.name} | Smarty Gym</title>
+          <meta name="description" content={dbWorkout.description || `${dbWorkout.name} workout`} />
+        </Helmet>
+        <div className="min-h-screen bg-background">
+          <div className="container mx-auto px-4 py-8">
+            <div className="mb-6 flex items-center justify-between">
+              <Button
+                variant="outline"
+                onClick={() => navigate(-1)}
+                className="gap-2"
+              >
+                <ArrowLeft className="mr-2 h-4 w-4" />
+                <span className="text-xs sm:text-sm">Back</span>
+              </Button>
+              <CommentDialog
+                workoutId={id}
+                workoutName={dbWorkout.name}
+                workoutType={type}
+              />
+            </div>
+
+            <AccessGate requireAuth={true} requirePremium={!isFreeWorkout} contentType="workout">
+              <WorkoutDisplay
+                exercises={[]}
+                planContent=""
+                title={dbWorkout.name}
+                serial={dbWorkout.id}
+                focus={dbWorkout.focus || getFocusLabel(type)}
+                difficulty={dbWorkout.difficulty_stars || 3}
+                workoutType={dbWorkout.format}
+                imageUrl={dbWorkout.image_url}
+                duration={dbWorkout.duration}
+                equipment={dbWorkout.equipment}
+                description={dbWorkout.description}
+                format={dbWorkout.format}
+                instructions={dbWorkout.instructions}
+                tips={dbWorkout.tips}
+                activation={dbWorkout.activation}
+                warm_up={dbWorkout.warm_up}
+                main_workout={dbWorkout.main_workout}
+                finisher={dbWorkout.finisher}
+                cool_down={dbWorkout.cool_down}
+                workoutId={id}
+                workoutCategory={type || ''}
+                isFreeContent={isFreeWorkout}
+              />
+            </AccessGate>
+          </div>
+        </div>
+      </>
+    );
+  }
+
+  // Workout data structure (fallback for hardcoded workouts)
   const workoutData: {
     [key: string]: {
       name: string;

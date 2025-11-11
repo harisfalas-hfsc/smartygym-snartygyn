@@ -30,13 +30,6 @@ const IndividualTrainingProgram = () => {
   const navigate = useNavigate();
   const { type, id } = useParams();
   
-  // Try to fetch from database first
-  const { data: dbProgram, isLoading: isLoadingDb } = useProgramData(id);
-
-  // Weight Loss Ignite (T-W001) is FREE for testing
-  const freePrograms: string[] = ["T-W001"];
-  const isFreeProgram = id === "T-W001" || freePrograms.includes(id || '');
-
   // Helper function to format focus label
   const getFocusLabel = (type: string | undefined): string => {
     const focusMap: { [key: string]: string } = {
@@ -54,6 +47,78 @@ const IndividualTrainingProgram = () => {
     return focusMap[type || ''] || 'General Training';
   };
 
+  // Weight Loss Ignite (T-W001) is FREE for testing
+  const freePrograms: string[] = ["T-W001"];
+  const isFreeProgram = id === "T-W001" || freePrograms.includes(id || '');
+  
+  // Try to fetch from database first
+  const { data: dbProgram, isLoading: isLoadingDb } = useProgramData(id);
+
+  // If we have database program, use it directly
+  if (isLoadingDb) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <p className="text-muted-foreground">Loading program...</p>
+      </div>
+    );
+  }
+
+  if (dbProgram) {
+    return (
+      <>
+        <Helmet>
+          <title>{dbProgram.name} | Smarty Gym</title>
+          <meta name="description" content={dbProgram.description || `${dbProgram.name} training program`} />
+        </Helmet>
+        <div className="min-h-screen bg-background">
+          <div className="container mx-auto px-4 py-8">
+            <div className="mb-6 flex items-center justify-between">
+              <Button
+                variant="outline"
+                onClick={() => navigate(-1)}
+                className="gap-2"
+              >
+                <ArrowLeft className="mr-2 h-4 w-4" />
+                <span className="text-xs sm:text-sm">Back</span>
+              </Button>
+              <CommentDialog
+                programId={id}
+                programName={dbProgram.name}
+                programType={type}
+              />
+            </div>
+
+            <AccessGate requireAuth={true} requirePremium={!isFreeProgram} contentType="program">
+              <WorkoutDisplay
+                exercises={[]}
+                planContent=""
+                title={dbProgram.name}
+                serial={dbProgram.id}
+                focus={dbProgram.category || getFocusLabel(type)}
+                difficulty={dbProgram.difficulty_stars || 3}
+                imageUrl={dbProgram.image_url}
+                duration={`${dbProgram.weeks} weeks / ${dbProgram.days_per_week} days per week`}
+                equipment={dbProgram.equipment}
+                description={dbProgram.description}
+                overview={dbProgram.overview}
+                target_audience={dbProgram.target_audience}
+                program_structure={dbProgram.program_structure}
+                weekly_schedule={dbProgram.weekly_schedule}
+                progression_plan={dbProgram.progression_plan}
+                nutrition_tips={dbProgram.nutrition_tips}
+                expected_results={dbProgram.expected_results}
+                programId={id}
+                programType={type || ''}
+                isFreeContent={isFreeProgram}
+              />
+            </AccessGate>
+          </div>
+        </div>
+      </>
+    );
+  }
+
+  // Program data structure (fallback for hardcoded programs)
   const programData: {
     [key: string]: {
       name: string;
