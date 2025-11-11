@@ -40,12 +40,9 @@ const ExerciseLibrary = () => {
             <span className="text-xs sm:text-sm">Back</span>
           </Button>
           
-          <h1 className="text-3xl sm:text-4xl font-bold text-center mb-3">Exercise Library</h1>
-          <p className="text-center text-lg text-foreground mb-2 max-w-3xl mx-auto">
-            Navigate through all exercise demonstrations and find the perfect technique with your Smarty Coach.
-          </p>
-          <p className="text-center text-sm text-muted-foreground mb-8 max-w-2xl mx-auto">
-            Welcome Inside Smarty Gym — watch professional exercise tutorials and technique guides by <a href="/coach-profile" className="text-primary hover:underline font-medium">Haris Falas</a>.
+          <h1 className="text-3xl sm:text-4xl font-bold text-center mb-2">Exercise Library</h1>
+          <p className="text-center text-muted-foreground mb-4 max-w-3xl mx-auto">
+            Navigate through all exercise demonstrations and find the perfect technique with your Smarty Coach. Welcome Inside Smarty Gym — watch professional exercise tutorials and technique guides by <a href="/coach-profile" className="text-primary hover:underline font-medium">Haris Falas</a>.
           </p>
 
           {/* YouTube Channel Card */}

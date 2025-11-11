@@ -94,12 +94,9 @@ const WorkoutFlow = () => {
           <span className="text-xs sm:text-sm">Back</span>
         </Button>
         
-        <h1 className="text-3xl sm:text-4xl font-bold text-center mb-3">SmartyGym Workouts</h1>
-        <p className="text-center text-lg text-foreground mb-2 max-w-3xl mx-auto">
-          Choose your goal and start your fitness journey today
-        </p>
-        <p className="text-center text-sm text-muted-foreground mb-6 max-w-2xl mx-auto">
-          All SmartyGym workouts designed by Sports Scientist <a href="/coach-profile" className="text-primary hover:underline font-medium">Haris Falas</a> for convenient online fitness training anywhere, anytime.
+        <h1 className="text-3xl sm:text-4xl font-bold text-center mb-2">SmartyGym Workouts</h1>
+        <p className="text-center text-muted-foreground mb-4 max-w-3xl mx-auto">
+          Choose your goal and start your fitness journey today. All SmartyGym workouts designed by Sports Scientist <a href="/coach-profile" className="text-primary hover:underline font-medium">Haris Falas</a> for convenient online fitness training anywhere, anytime.
         </p>
         
         {/* Info Ribbon */}

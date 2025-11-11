@@ -284,9 +284,9 @@ const PersonalTraining = () => {
             </Button>
           )}
           
-          <h1 className="text-3xl sm:text-4xl font-bold text-center mb-3 sm:mb-4">Personal Training</h1>
+          <h1 className="text-3xl sm:text-4xl font-bold text-center mb-2">Personal Training</h1>
           
-          <p className="text-center text-sm sm:text-base text-muted-foreground mb-6 sm:mb-8 px-2">
+          <p className="text-center text-muted-foreground mb-4 px-2">
             Get your customized and tailor-made program by the fitness expert and sports scientist, <a href="/coach-profile" className="text-primary hover:underline font-medium"><strong>Haris Falas</strong></a>
           </p>
 
