@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation, useSearchParams } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { User } from "@supabase/supabase-js";
 import { Button } from "@/components/ui/button";
@@ -101,6 +101,8 @@ interface StripeSubscription {
 
 export default function UserDashboard() {
   const navigate = useNavigate();
+  const location = useLocation();
+  const [searchParams] = useSearchParams();
   const { toast } = useToast();
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
@@ -113,6 +115,10 @@ export default function UserDashboard() {
   const [oneRMHistory, setOneRMHistory] = useState<OneRMRecord[]>([]);
   const [bmrHistory, setBMRHistory] = useState<BMRRecord[]>([]);
   const [calorieHistory, setCalorieHistory] = useState<CalorieRecord[]>([]);
+  
+  // Get tab from URL or default to "workouts"
+  const tabParam = searchParams.get('tab');
+  const [activeTab, setActiveTab] = useState(tabParam || 'workouts');
   
   // Fetch user purchases
   const { data: purchases = [], isLoading: purchasesLoading } = usePurchases(user?.id);
@@ -838,7 +844,7 @@ export default function UserDashboard() {
           </p>
         </div>
 
-        <Tabs defaultValue="workouts" className="space-y-6">
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
           <TabsList className="grid w-full grid-cols-1 sm:grid-cols-5">
             <TabsTrigger value="workouts">
               <Dumbbell className="mr-2 h-4 w-4" />

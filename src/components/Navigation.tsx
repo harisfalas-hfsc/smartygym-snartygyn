@@ -14,10 +14,11 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { User as UserIcon, Settings, LogOut, LayoutDashboard, Crown, Menu } from "lucide-react";
+import { User as UserIcon, Settings, LogOut, LayoutDashboard, Crown, Menu, Bell } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import smartyGymLogo from "@/assets/smarty-gym-logo.png";
 import { ThemeToggle } from "@/components/ThemeToggle";
+import { useUnreadMessages } from "@/hooks/useUnreadMessages";
 
 interface SubscriptionInfo {
   subscribed: boolean;
@@ -33,6 +34,7 @@ export const Navigation = () => {
   const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
   const [subscriptionInfo, setSubscriptionInfo] = useState<SubscriptionInfo | null>(null);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const { data: unreadCount = 0 } = useUnreadMessages();
 
   useEffect(() => {
     // Check current session
@@ -254,6 +256,26 @@ export const Navigation = () => {
           {/* Right Side - Auth */}
           <div className="flex items-center gap-2">
             <ThemeToggle />
+            
+            {user && unreadCount > 0 && (
+              <Button
+                variant="ghost"
+                size="icon"
+                className="relative"
+                onClick={() => {
+                  navigate("/userdashboard?tab=messages");
+                  setTimeout(() => window.scrollTo(0, 0), 0);
+                }}
+              >
+                <Bell className="h-5 w-5" />
+                <Badge 
+                  variant="destructive" 
+                  className="absolute -top-1 -right-1 h-5 w-5 flex items-center justify-center p-0 text-xs"
+                >
+                  {unreadCount > 9 ? '9+' : unreadCount}
+                </Badge>
+              </Button>
+            )}
             
             {user ? (
               <DropdownMenu>
