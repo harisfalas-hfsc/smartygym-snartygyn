@@ -8,7 +8,9 @@ import { useToast } from "@/hooks/use-toast";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
-import { Mail, MessageSquare, Eye, CheckCircle, X, ArrowLeft, Send } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Mail, MessageSquare, Eye, CheckCircle, X, ArrowLeft, Send, Search, Filter, FileText, Paperclip, Download } from "lucide-react";
 import { format } from "date-fns";
 
 interface ContactMessage {
@@ -24,19 +26,34 @@ interface ContactMessage {
   response: string | null;
   responded_at: string | null;
   user_id: string | null;
+  attachments: any[];
+}
+
+interface ResponseTemplate {
+  id: string;
+  name: string;
+  subject: string;
+  content: string;
+  category: string;
 }
 
 export const ContactManager = () => {
   const { toast } = useToast();
   const [messages, setMessages] = useState<ContactMessage[]>([]);
+  const [filteredMessages, setFilteredMessages] = useState<ContactMessage[]>([]);
+  const [templates, setTemplates] = useState<ResponseTemplate[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedMessage, setSelectedMessage] = useState<ContactMessage | null>(null);
   const [showMessageDialog, setShowMessageDialog] = useState(false);
   const [responseText, setResponseText] = useState("");
   const [isResponding, setIsResponding] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [filterStatus, setFilterStatus] = useState("all");
+  const [filterCategory, setFilterCategory] = useState("all");
 
   useEffect(() => {
     fetchMessages();
+    fetchTemplates();
 
     // Subscribe to real-time updates
     const channel = supabase
@@ -63,6 +80,42 @@ export const ContactManager = () => {
     };
   }, []);
 
+  useEffect(() => {
+    // Apply filters
+    let filtered = messages;
+
+    if (searchQuery) {
+      filtered = filtered.filter(msg => 
+        msg.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        msg.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        msg.subject.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        msg.message.toLowerCase().includes(searchQuery.toLowerCase())
+      );
+    }
+
+    if (filterStatus !== "all") {
+      filtered = filtered.filter(msg => msg.status === filterStatus);
+    }
+
+    if (filterCategory !== "all") {
+      filtered = filtered.filter(msg => msg.category === filterCategory);
+    }
+
+    setFilteredMessages(filtered);
+  }, [messages, searchQuery, filterStatus, filterCategory]);
+
+  const fetchTemplates = async () => {
+    const { data, error } = await supabase
+      .from('response_templates')
+      .select('*')
+      .eq('is_active', true)
+      .order('name');
+
+    if (!error && data) {
+      setTemplates(data);
+    }
+  };
+
   const fetchMessages = async () => {
     setLoading(true);
     const { data, error } = await supabase
@@ -78,7 +131,12 @@ export const ContactManager = () => {
         variant: "destructive",
       });
     } else {
-      setMessages(data || []);
+      const messagesWithAttachments = (data || []).map(msg => ({
+        ...msg,
+        attachments: Array.isArray(msg.attachments) ? msg.attachments : []
+      }));
+      setMessages(messagesWithAttachments);
+      setFilteredMessages(messagesWithAttachments);
     }
     setLoading(false);
   };
@@ -140,9 +198,26 @@ export const ContactManager = () => {
         variant: "destructive",
       });
     } else {
+      // Send email notification
+      if (selectedMessage.user_id && selectedMessage.email) {
+        try {
+          await supabase.functions.invoke('send-contact-response-notification', {
+            body: {
+              userId: selectedMessage.user_id,
+              userEmail: selectedMessage.email,
+              userName: selectedMessage.name,
+              subject: selectedMessage.subject,
+              responsePreview: responseText,
+            }
+          });
+        } catch (emailError) {
+          console.error('Error sending notification email:', emailError);
+        }
+      }
+
       toast({
-        title: "Response Saved",
-        description: "Response has been saved to the message",
+        title: "Response Sent",
+        description: "Response has been saved and user has been notified",
       });
       setShowMessageDialog(false);
       fetchMessages();

@@ -355,6 +355,7 @@ export type Database = {
       }
       contact_messages: {
         Row: {
+          attachments: Json | null
           category: string
           created_at: string
           email: string
@@ -369,6 +370,7 @@ export type Database = {
           user_id: string | null
         }
         Insert: {
+          attachments?: Json | null
           category?: string
           created_at?: string
           email: string
@@ -383,6 +385,7 @@ export type Database = {
           user_id?: string | null
         }
         Update: {
+          attachments?: Json | null
           category?: string
           created_at?: string
           email?: string
@@ -949,6 +952,39 @@ export type Database = {
           identifier?: string
           request_count?: number
           window_start?: string
+        }
+        Relationships: []
+      }
+      response_templates: {
+        Row: {
+          category: string
+          content: string
+          created_at: string
+          id: string
+          is_active: boolean
+          name: string
+          subject: string
+          updated_at: string
+        }
+        Insert: {
+          category?: string
+          content: string
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          name: string
+          subject: string
+          updated_at?: string
+        }
+        Update: {
+          category?: string
+          content?: string
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          name?: string
+          subject?: string
+          updated_at?: string
         }
         Relationships: []
       }
