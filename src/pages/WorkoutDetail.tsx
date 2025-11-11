@@ -370,18 +370,21 @@ const WorkoutDetail = () => {
       ) : (
         <>
       <Helmet>
-        <title>{title} Workouts | Smarty Gym Cyprus | {type ? type.charAt(0).toUpperCase() + type.slice(1) : 'Fitness'} Training by Sports Scientist Haris Falas | smartygym.com</title>
-        <meta name="description" content={`Explore ${title.toLowerCase()} at smartygym.com - from beginner to advanced. Evidence-based ${type ? type : 'fitness'} workouts designed by Sports Scientist Haris Falas. HIIT, circuits, AMRAP, Tabata formats. Bodyweight and equipment options for home or gym training in Cyprus and worldwide.`} />
-        <meta name="keywords" content={`${title}, smartygym.com, Smarty Gym Cyprus, ${type ? type : 'fitness'} workouts Cyprus, workout library Cyprus, HIIT workouts, circuit training, AMRAP workouts, Tabata training, bodyweight workouts, gym workouts, beginner workouts Cyprus, intermediate workouts, advanced workouts, home workouts Cyprus, online workouts, fitness training Cyprus, Haris Falas workouts, Sports Scientist Cyprus, strength training Cyprus, cardio workouts Cyprus, metabolic conditioning, fat loss workouts, muscle building, functional training Cyprus, workout programs, fitness plans Cyprus, online fitness Cyprus, personal training Cyprus`} />
+        <title>{title} Online Workouts | Cyprus Fitness | Haris Falas | SmartyGym</title>
+        <meta name="description" content={`${title} online workouts by Cyprus Sports Scientist Haris Falas. Professional ${type || 'fitness'} workouts from beginner to advanced. AMRAP, HIIT, TABATA, circuit training. Free and premium online workouts for Cyprus and worldwide.`} />
+        <meta name="keywords" content={`online workouts, ${title}, ${type} workouts, Cyprus fitness, Haris Falas workouts, online fitness Cyprus, HIIT workouts, AMRAP workouts, TABATA training, circuit training, bodyweight workouts, Cyprus personal trainers, online gym Cyprus, home workouts Cyprus`} />
         
-        <meta property="og:title" content={`${title} | Smarty Gym Cyprus Workout Library`} />
-        <meta property="og:description" content={`${title} - beginner to advanced levels designed by Sports Scientist Haris Falas`} />
+        {/* Open Graph */}
+        <meta property="og:title" content={`${title} Online Workouts | Cyprus Fitness by Haris Falas`} />
+        <meta property="og:description" content={`Professional ${title.toLowerCase()} online workouts designed by Cyprus Sports Scientist Haris Falas`} />
         <meta property="og:type" content="website" />
         <meta property="og:url" content={`https://smartygym.com/workout/${type || ''}`} />
+        <meta property="og:site_name" content="SmartyGym Cyprus" />
         
+        {/* Twitter */}
         <meta name="twitter:card" content="summary_large_image" />
-        <meta name="twitter:title" content={`${title} | Smarty Gym Cyprus`} />
-        <meta name="twitter:description" content={`Professional ${title.toLowerCase()} by Haris Falas at smartygym.com`} />
+        <meta name="twitter:title" content={`${title} Online Workouts | Haris Falas`} />
+        <meta name="twitter:description" content={`Professional ${title.toLowerCase()} by Cyprus Sports Scientist`} />
         
         <link rel="canonical" href={`https://smartygym.com/workout/${type || ''}`} />
         
@@ -390,9 +393,15 @@ const WorkoutDetail = () => {
           {JSON.stringify({
             "@context": "https://schema.org",
             "@type": "ItemList",
-            "name": title,
-            "description": `Collection of ${title.toLowerCase()} from beginner to advanced levels`,
+            "name": `${title} Online Workouts`,
+            "description": `Collection of professional online ${title.toLowerCase()} designed by Cyprus Sports Scientist Haris Falas`,
             "numberOfItems": filteredWorkouts.length,
+            "provider": {
+              "@type": "Person",
+              "name": "Haris Falas",
+              "jobTitle": "Sports Scientist & Personal Trainer",
+              "description": "Cyprus fitness expert specializing in functional training"
+            },
             "itemListElement": filteredWorkouts.slice(0, 10).map((workout, index) => ({
               "@type": "ListItem",
               "position": index + 1,
@@ -401,7 +410,8 @@ const WorkoutDetail = () => {
                 "name": workout.name,
                 "description": workout.description,
                 "image": workout.image_url,
-                "timeRequired": workout.duration
+                "duration": workout.duration,
+                "workLocation": "Online / Home / Gym"
               }
             }))
           })}

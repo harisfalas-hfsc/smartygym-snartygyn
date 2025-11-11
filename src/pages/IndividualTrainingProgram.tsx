@@ -74,8 +74,53 @@ const IndividualTrainingProgram = () => {
     return (
       <>
         <Helmet>
-          <title>{dbProgram.name} | Smarty Gym</title>
-          <meta name="description" content={dbProgram.description || `${dbProgram.name} training program`} />
+          <title>{dbProgram.name} | Online Training Program by Haris Falas | SmartyGym Cyprus</title>
+          <meta name="description" content={`${dbProgram.description || dbProgram.name} - ${dbProgram.weeks} week online training program by Cyprus Sports Scientist Haris Falas. ${dbProgram.category} program. ${dbProgram.days_per_week} days per week. ${dbProgram.equipment}.`} />
+          <meta name="keywords" content={`${dbProgram.name}, online training programs, ${dbProgram.category} program, ${dbProgram.weeks} week program, Haris Falas, Cyprus fitness programs, online personal training, Cyprus personal trainers, structured training program`} />
+          
+          {/* Open Graph */}
+          <meta property="og:type" content="article" />
+          <meta property="og:url" content={window.location.href} />
+          <meta property="og:title" content={`${dbProgram.name} | Online Training Program by Haris Falas`} />
+          <meta property="og:description" content={dbProgram.description || `${dbProgram.weeks} week ${dbProgram.category} program designed by Cyprus Sports Scientist`} />
+          <meta property="og:image" content={dbProgram.image_url} />
+          
+          {/* Twitter */}
+          <meta name="twitter:card" content="summary_large_image" />
+          <meta name="twitter:title" content={`${dbProgram.name} | Training Program`} />
+          <meta name="twitter:description" content={dbProgram.description || dbProgram.name} />
+          <meta name="twitter:image" content={dbProgram.image_url} />
+          
+          <link rel="canonical" href={window.location.href} />
+          
+          {/* Structured Data - ExercisePlan */}
+          <script type="application/ld+json">
+            {JSON.stringify({
+              "@context": "https://schema.org",
+              "@type": "ExercisePlan",
+              "name": dbProgram.name,
+              "description": dbProgram.description,
+              "image": dbProgram.image_url,
+              "duration": `P${dbProgram.weeks}W`,
+              "category": dbProgram.category,
+              "exerciseType": dbProgram.category,
+              "intensity": dbProgram.difficulty,
+              "repetitions": `${dbProgram.days_per_week} days per week`,
+              "workLocation": "Online / Home / Gym",
+              "author": {
+                "@type": "Person",
+                "name": "Haris Falas",
+                "jobTitle": "Sports Scientist & Strength Coach",
+                "description": "Cyprus personal trainer specializing in structured training programs"
+              },
+              "identifier": dbProgram.id,
+              "offers": dbProgram.is_standalone_purchase ? {
+                "@type": "Offer",
+                "price": dbProgram.price,
+                "priceCurrency": "EUR"
+              } : undefined
+            })}
+          </script>
         </Helmet>
         <div className="min-h-screen bg-background">
           <div className="container mx-auto px-4 py-8">

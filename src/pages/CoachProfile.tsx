@@ -12,36 +12,76 @@ const CoachProfile = () => {
   return (
     <>
       <Helmet>
-        <title>Meet Our Head Coach - Haris Falas | Smarty Gym</title>
-        <meta name="description" content="Haris Falas is a certified sports scientist and strength coach with over two decades of experience in strength and conditioning, bringing results-driven functional training to Smarty Gym." />
-        <meta name="keywords" content="Haris Falas, strength coach, sports scientist, functional training, HFSC, certified coach, strength and conditioning, Cyprus fitness, personal trainer" />
+        <title>Haris Falas | Cyprus Personal Trainer & Sports Scientist | SmartyGym</title>
+        <meta name="description" content="Haris Falas - Cyprus personal trainer and Sports Scientist with 20+ years experience. Expert in online workouts, online training programs, and online personal training. Certified strength and conditioning coach for Cyprus fitness and worldwide." />
+        <meta name="keywords" content="Haris Falas, Cyprus personal trainer, Cyprus personal trainers, Sports Scientist Cyprus, strength and conditioning coach, HFSC, Cyprus fitness expert, online personal training Cyprus, fitness in Cyprus, personal trainer Cyprus, functional training coach, Cyprus fitness professional" />
         
-        <meta property="og:title" content="Meet Our Head Coach - Haris Falas | Smarty Gym" />
-        <meta property="og:description" content="Over two decades of experience in strength and conditioning, sports science, and human performance." />
+        {/* Open Graph */}
+        <meta property="og:title" content="Haris Falas | Cyprus Personal Trainer & Sports Scientist" />
+        <meta property="og:description" content="Cyprus personal trainer with 20+ years experience in strength and conditioning, sports science, and online fitness training." />
         <meta property="og:type" content="profile" />
         <meta property="og:url" content={window.location.href} />
         <meta property="og:image" content="https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?auto=format&fit=crop&q=80&w=1200" />
+        <meta property="og:site_name" content="SmartyGym Cyprus" />
         
+        {/* Twitter */}
         <meta name="twitter:card" content="summary_large_image" />
-        <meta name="twitter:title" content="Meet Our Head Coach - Haris Falas | Smarty Gym" />
-        <meta name="twitter:description" content="Over two decades of experience in strength and conditioning, sports science, and human performance." />
+        <meta name="twitter:title" content="Haris Falas | Cyprus Personal Trainer" />
+        <meta name="twitter:description" content="Cyprus personal trainer and Sports Scientist with 20+ years experience" />
         <meta name="twitter:image" content="https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?auto=format&fit=crop&q=80&w=1200" />
         
         <link rel="canonical" href={window.location.href} />
         
+        {/* Structured Data - Person */}
         <script type="application/ld+json">
           {JSON.stringify({
             "@context": "https://schema.org",
             "@type": "Person",
             "name": "Haris Falas",
-            "jobTitle": "Head Coach & Sports Scientist",
-            "description": "Certified sports scientist and strength coach with over two decades of experience",
-            "knowsAbout": ["Strength Training", "Sports Science", "Functional Training", "Human Performance"],
-            "alumniOf": "Sports Science Certification",
+            "jobTitle": "Sports Scientist & Personal Trainer",
+            "description": "Cyprus personal trainer and Sports Scientist with over 20 years of experience in strength and conditioning, online fitness training, and athletic performance",
+            "knowsAbout": ["Strength Training", "Sports Science", "Functional Training", "Human Performance", "Online Personal Training", "Athletic Conditioning"],
+            "hasCredential": {
+              "@type": "EducationalOccupationalCredential",
+              "credentialCategory": "Sports Science Certification"
+            },
             "worksFor": {
               "@type": "Organization",
-              "name": "Smarty Gym"
-            }
+              "name": "SmartyGym Cyprus",
+              "address": {
+                "@type": "PostalAddress",
+                "addressCountry": "CY"
+              }
+            },
+            "alumniOf": "Sports Science Certification",
+            "nationality": "Cyprus",
+            "workLocation": "Cyprus",
+            "offers": [
+              {
+                "@type": "Offer",
+                "itemOffered": {
+                  "@type": "Service",
+                  "name": "Online Personal Training",
+                  "description": "Customized online personal training programs"
+                }
+              },
+              {
+                "@type": "Offer",
+                "itemOffered": {
+                  "@type": "Service",
+                  "name": "Online Workouts",
+                  "description": "Professional online workout programs"
+                }
+              },
+              {
+                "@type": "Offer",
+                "itemOffered": {
+                  "@type": "Service",
+                  "name": "Online Training Programs",
+                  "description": "Structured training programs for all fitness levels"
+                }
+              }
+            ]
           })}
         </script>
       </Helmet>

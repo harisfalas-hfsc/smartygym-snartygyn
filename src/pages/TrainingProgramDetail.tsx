@@ -375,18 +375,21 @@ const TrainingProgramDetail = () => {
       ) : (
         <>
       <Helmet>
-        <title>{title} | 6-8 Week Structured Programs Cyprus | Smarty Gym | Haris Falas Sports Scientist | smartygym.com</title>
-        <meta name="description" content={`${title} at smartygym.com - Structured 6-8 week training programs by Sports Scientist Haris Falas. Progressive ${type ? type.replace('-', ' ') : 'training'} plans for all experience levels. Evidence-based periodization, clear progression, and proven results for Cyprus and worldwide online fitness.`} />
-        <meta name="keywords" content={`${title}, smartygym.com, Smarty Gym Cyprus, training programs Cyprus, ${type ? type.replace('-', ' ') : 'fitness'} program Cyprus, 6 week program, 8 week program, structured training Cyprus, periodization program, progressive training, workout program Cyprus, fitness program Cyprus, Haris Falas programs, Sports Scientist Cyprus, strength program, hypertrophy program, cardio program, weight loss program, mobility program, functional training program, online training program Cyprus, fitness coaching Cyprus, personal training program, workout split Cyprus, training plan Cyprus, online fitness Cyprus, evidence-based training, structured workout plan`} />
+        <title>{title} Online Training Programs | Cyprus | Haris Falas | SmartyGym</title>
+        <meta name="description" content={`${title} online training programs by Cyprus Sports Scientist Haris Falas. Professional 6-8 week structured ${type || 'fitness'} programs. Evidence-based training for Cyprus and worldwide. Expert online personal training approach.`} />
+        <meta name="keywords" content={`online training programs, ${title}, ${type} programs, Cyprus fitness programs, Haris Falas programs, structured training programs, online personal training, Cyprus personal trainers, 6 week programs, 8 week programs, fitness programs Cyprus, online fitness Cyprus`} />
         
-        <meta property="og:title" content={`${title} | Smarty Gym Cyprus Training Programs`} />
-        <meta property="og:description" content={`Structured 6-8 week ${title.toLowerCase()} by Sports Scientist Haris Falas at smartygym.com`} />
+        {/* Open Graph */}
+        <meta property="og:title" content={`${title} Online Training Programs | Cyprus by Haris Falas`} />
+        <meta property="og:description" content={`Structured 6-8 week ${title.toLowerCase()} online training programs by Cyprus Sports Scientist Haris Falas`} />
         <meta property="og:type" content="website" />
         <meta property="og:url" content={`https://smartygym.com/trainingprogram/${type || ''}`} />
+        <meta property="og:site_name" content="SmartyGym Cyprus" />
         
+        {/* Twitter */}
         <meta name="twitter:card" content="summary_large_image" />
-        <meta name="twitter:title" content={`${title} | Smarty Gym Cyprus`} />
-        <meta name="twitter:description" content={`Professional ${title.toLowerCase()} with structured progression`} />
+        <meta name="twitter:title" content={`${title} Online Training Programs | Haris Falas`} />
+        <meta name="twitter:description" content={`Professional ${title.toLowerCase()} with structured progression by Cyprus expert`} />
         
         <link rel="canonical" href={`https://smartygym.com/trainingprogram/${type || ''}`} />
         
@@ -395,19 +398,26 @@ const TrainingProgramDetail = () => {
           {JSON.stringify({
             "@context": "https://schema.org",
             "@type": "ItemList",
-            "name": title,
-            "description": `Collection of ${title.toLowerCase()} - 6 to 8 week structured training plans`,
+            "name": `${title} Online Training Programs`,
+            "description": `Collection of structured online ${title.toLowerCase()} - 6 to 8 week training programs designed by Cyprus Sports Scientist Haris Falas`,
             "numberOfItems": filteredPrograms.length,
+            "provider": {
+              "@type": "Person",
+              "name": "Haris Falas",
+              "jobTitle": "Sports Scientist & Personal Trainer",
+              "description": "Cyprus personal trainer with expertise in structured program design"
+            },
             "itemListElement": filteredPrograms.map((program, index) => ({
               "@type": "ListItem",
               "position": index + 1,
               "item": {
-                "@type": "Course",
+                "@type": "ExercisePlan",
                 "name": program.name,
                 "description": program.description,
                 "image": program.image_url,
-                "timeRequired": `${program.duration}`,
-                "courseWorkload": `${program.duration}`
+                "duration": program.duration,
+                "workLocation": "Online / Home / Gym",
+                "exerciseType": program.category
               }
             }))
           })}
