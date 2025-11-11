@@ -131,21 +131,21 @@ export default function AdminBackoffice() {
 
         {/* Main Content */}
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="w-full flex flex-wrap gap-1 h-auto p-2 justify-start">
-            <TabsTrigger value="workouts" className="flex items-center gap-1 text-xs px-2 py-1.5 h-auto">
-              <Dumbbell className="h-3.5 w-3.5 shrink-0" />
+          <TabsList className="w-full grid grid-cols-7 lg:grid-cols-14 gap-1 h-auto p-2">
+            <TabsTrigger value="workouts" className="flex items-center justify-center gap-1.5 text-sm px-3 py-2.5">
+              <Dumbbell className="h-4 w-4 shrink-0" />
               <span className="hidden sm:inline">Workouts</span>
             </TabsTrigger>
-            <TabsTrigger value="programs" className="flex items-center gap-1 text-xs px-2 py-1.5 h-auto">
-              <Calendar className="h-3.5 w-3.5 shrink-0" />
+            <TabsTrigger value="programs" className="flex items-center justify-center gap-1.5 text-sm px-3 py-2.5">
+              <Calendar className="h-4 w-4 shrink-0" />
               <span className="hidden sm:inline">Programs</span>
             </TabsTrigger>
-            <TabsTrigger value="personal-training" className="flex items-center gap-1 text-xs px-2 py-1.5 h-auto">
-              <Users className="h-3.5 w-3.5 shrink-0" />
+            <TabsTrigger value="personal-training" className="flex items-center justify-center gap-1.5 text-sm px-3 py-2.5">
+              <Users className="h-4 w-4 shrink-0" />
               <span className="hidden sm:inline">PT</span>
             </TabsTrigger>
-            <TabsTrigger value="contact" className="flex items-center gap-1 text-xs px-2 py-1.5 h-auto relative">
-              <MessageSquare className="h-3.5 w-3.5 shrink-0" />
+            <TabsTrigger value="contact" className="flex items-center justify-center gap-1.5 text-sm px-3 py-2.5 relative">
+              <MessageSquare className="h-4 w-4 shrink-0" />
               <span className="hidden sm:inline">Contact</span>
               {newContactCount > 0 && (
                 <Badge variant="destructive" className="absolute -top-1 -right-1 h-4 w-4 rounded-full p-0 flex items-center justify-center text-[10px]">
@@ -153,44 +153,44 @@ export default function AdminBackoffice() {
                 </Badge>
               )}
             </TabsTrigger>
-            <TabsTrigger value="automated" className="flex items-center gap-1 text-xs px-2 py-1.5 h-auto">
-              <Zap className="h-3.5 w-3.5 shrink-0" />
-              <span className="hidden sm:inline">Auto Messages</span>
+            <TabsTrigger value="automated" className="flex items-center justify-center gap-1.5 text-sm px-3 py-2.5">
+              <Zap className="h-4 w-4 shrink-0" />
+              <span className="hidden sm:inline">Auto</span>
             </TabsTrigger>
-            <TabsTrigger value="notifications" className="flex items-center gap-1 text-xs px-2 py-1.5 h-auto">
-              <Mail className="h-3.5 w-3.5 shrink-0" />
-              <span className="hidden sm:inline">Notifications</span>
+            <TabsTrigger value="notifications" className="flex items-center justify-center gap-1.5 text-sm px-3 py-2.5">
+              <Mail className="h-4 w-4 shrink-0" />
+              <span className="hidden sm:inline">Notify</span>
             </TabsTrigger>
-            <TabsTrigger value="blog" className="flex items-center gap-1 text-xs px-2 py-1.5 h-auto">
-              <BookOpen className="h-3.5 w-3.5 shrink-0" />
+            <TabsTrigger value="blog" className="flex items-center justify-center gap-1.5 text-sm px-3 py-2.5">
+              <BookOpen className="h-4 w-4 shrink-0" />
               <span className="hidden sm:inline">Blog</span>
             </TabsTrigger>
-            <TabsTrigger value="users" className="flex items-center gap-1 text-xs px-2 py-1.5 h-auto">
-              <Users className="h-3.5 w-3.5 shrink-0" />
+            <TabsTrigger value="users" className="flex items-center justify-center gap-1.5 text-sm px-3 py-2.5">
+              <Users className="h-4 w-4 shrink-0" />
               <span className="hidden sm:inline">Users</span>
             </TabsTrigger>
-            <TabsTrigger value="email" className="flex items-center gap-1 text-xs px-2 py-1.5 h-auto">
-              <Mail className="h-3.5 w-3.5 shrink-0" />
+            <TabsTrigger value="email" className="flex items-center justify-center gap-1.5 text-sm px-3 py-2.5">
+              <Mail className="h-4 w-4 shrink-0" />
               <span className="hidden sm:inline">Email</span>
             </TabsTrigger>
-            <TabsTrigger value="templates" className="flex items-center gap-1 text-xs px-2 py-1.5 h-auto">
-              <FileText className="h-3.5 w-3.5 shrink-0" />
+            <TabsTrigger value="templates" className="flex items-center justify-center gap-1.5 text-sm px-3 py-2.5">
+              <FileText className="h-4 w-4 shrink-0" />
               <span className="hidden sm:inline">Templates</span>
             </TabsTrigger>
-            <TabsTrigger value="newsletter" className="flex items-center gap-1 text-xs px-2 py-1.5 h-auto">
-              <Mail className="h-3.5 w-3.5 shrink-0" />
+            <TabsTrigger value="newsletter" className="flex items-center justify-center gap-1.5 text-sm px-3 py-2.5">
+              <Mail className="h-4 w-4 shrink-0" />
               <span className="hidden sm:inline">Newsletter</span>
             </TabsTrigger>
-            <TabsTrigger value="moderation" className="flex items-center gap-1 text-xs px-2 py-1.5 h-auto">
-              <Shield className="h-3.5 w-3.5 shrink-0" />
+            <TabsTrigger value="moderation" className="flex items-center justify-center gap-1.5 text-sm px-3 py-2.5">
+              <Shield className="h-4 w-4 shrink-0" />
               <span className="hidden sm:inline">Moderate</span>
             </TabsTrigger>
-            <TabsTrigger value="analytics" className="flex items-center gap-1 text-xs px-2 py-1.5 h-auto">
-              <BarChart3 className="h-3.5 w-3.5 shrink-0" />
+            <TabsTrigger value="analytics" className="flex items-center justify-center gap-1.5 text-sm px-3 py-2.5">
+              <BarChart3 className="h-4 w-4 shrink-0" />
               <span className="hidden sm:inline">Analytics</span>
             </TabsTrigger>
-            <TabsTrigger value="settings" className="flex items-center gap-1 text-xs px-2 py-1.5 h-auto">
-              <Settings className="h-3.5 w-3.5 shrink-0" />
+            <TabsTrigger value="settings" className="flex items-center justify-center gap-1.5 text-sm px-3 py-2.5">
+              <Settings className="h-4 w-4 shrink-0" />
               <span className="hidden sm:inline">Settings</span>
             </TabsTrigger>
           </TabsList>

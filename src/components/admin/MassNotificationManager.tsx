@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
@@ -9,6 +9,14 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Input } from "@/components/ui/input";
 import { Send, Users, Loader2 } from "lucide-react";
 
+interface Template {
+  id: string;
+  message_type: string;
+  template_name: string;
+  subject: string;
+  content: string;
+}
+
 export function MassNotificationManager() {
   const { toast } = useToast();
   const [loading, setLoading] = useState(false);
@@ -16,15 +24,40 @@ export function MassNotificationManager() {
   const [notificationType, setNotificationType] = useState<string>("");
   const [customContent, setCustomContent] = useState("");
   const [subject, setSubject] = useState("");
+  const [templates, setTemplates] = useState<Template[]>([]);
+  const [selectedTemplate, setSelectedTemplate] = useState<Template | null>(null);
 
-  const notificationTemplates = [
-    { value: "announcement_new_workout", label: "New Workout Announcement" },
-    { value: "announcement_new_program", label: "New Training Program" },
-    { value: "announcement_new_service", label: "New Service" },
-    { value: "announcement_special_offer", label: "Special Offer" },
-    { value: "announcement_update", label: "Platform Update" },
-    { value: "announcement_event", label: "Event Announcement" }
-  ];
+  useEffect(() => {
+    fetchTemplates();
+  }, []);
+
+  const fetchTemplates = async () => {
+    const { data, error } = await supabase
+      .from('automated_message_templates')
+      .select('*')
+      .eq('is_active', true)
+      .order('template_name');
+
+    if (error) {
+      console.error('Error fetching templates:', error);
+      return;
+    }
+
+    // Filter for announcement templates
+    const announcementTemplates = (data || []).filter(t => 
+      t.message_type && t.message_type.toString().startsWith('announcement_')
+    );
+    setTemplates(announcementTemplates);
+  };
+
+  const handleTemplateChange = (value: string) => {
+    setNotificationType(value);
+    const template = templates.find(t => t.message_type === value);
+    setSelectedTemplate(template || null);
+    if (template) {
+      setSubject(template.subject);
+    }
+  };
 
   const recipientFilters = [
     { value: "all", label: "All Users" },
@@ -125,19 +158,34 @@ export function MassNotificationManager() {
           {/* Notification Template */}
           <div className="space-y-2">
             <Label htmlFor="notification-type">Notification Template</Label>
-            <Select value={notificationType} onValueChange={setNotificationType}>
+            <Select value={notificationType} onValueChange={handleTemplateChange}>
               <SelectTrigger id="notification-type">
                 <SelectValue placeholder="Choose a template" />
               </SelectTrigger>
               <SelectContent>
-                {notificationTemplates.map((template) => (
-                  <SelectItem key={template.value} value={template.value}>
-                    {template.label}
+                {templates.map((template) => (
+                  <SelectItem key={template.id} value={template.message_type}>
+                    {template.template_name}
                   </SelectItem>
                 ))}
               </SelectContent>
             </Select>
           </div>
+
+          {/* Template Preview */}
+          {selectedTemplate && (
+            <div className="p-4 bg-muted rounded-lg space-y-2">
+              <p className="text-sm font-semibold">Template Preview:</p>
+              <div className="space-y-1">
+                <p className="text-sm"><span className="font-medium">Subject:</span> {selectedTemplate.subject}</p>
+                <p className="text-sm"><span className="font-medium">Content:</span></p>
+                <p className="text-sm text-muted-foreground whitespace-pre-wrap">{selectedTemplate.content}</p>
+              </div>
+              <p className="text-xs text-muted-foreground mt-2">
+                Note: [Content] will be replaced with your custom content below.
+              </p>
+            </div>
+          )}
 
           {/* Custom Subject (Optional) */}
           <div className="space-y-2">
@@ -170,15 +218,12 @@ export function MassNotificationManager() {
             </p>
           </div>
 
-          {/* Preview Info */}
+          {/* Recipient Info */}
           {notificationType && (
-            <div className="p-4 bg-muted rounded-lg space-y-2">
-              <p className="text-sm font-medium">Preview Info:</p>
+            <div className="p-4 bg-accent/50 rounded-lg space-y-1">
+              <p className="text-sm font-medium">Recipients:</p>
               <p className="text-sm text-muted-foreground">
-                Template: {notificationTemplates.find(t => t.value === notificationType)?.label}
-              </p>
-              <p className="text-sm text-muted-foreground">
-                Recipients: {recipientFilters.find(f => f.value === recipientFilter)?.label}
+                {recipientFilters.find(f => f.value === recipientFilter)?.label}
               </p>
             </div>
           )}
