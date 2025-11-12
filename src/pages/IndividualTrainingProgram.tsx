@@ -172,7 +172,16 @@ const IndividualTrainingProgram = () => {
               </div>
             )}
 
-            <AccessGate requireAuth={true} requirePremium={isPremium && !hasAccess} contentType="program">
+            <AccessGate 
+              requireAuth={true} 
+              requirePremium={isPremium && !hasAccess} 
+              contentType="program"
+              contentId={dbProgram.id}
+              contentName={dbProgram.name}
+              price={canPurchase ? Number(dbProgram.price) : undefined}
+              stripePriceId={dbProgram.stripe_price_id || undefined}
+              stripeProductId={dbProgram.stripe_product_id || undefined}
+            >
               <WorkoutDisplay
                 exercises={[]}
                 planContent=""

@@ -233,7 +233,16 @@ const IndividualWorkout = () => {
               />
             </div>
 
-            <AccessGate requireAuth={true} requirePremium={!isFreeWorkout} contentType="workout">
+            <AccessGate 
+              requireAuth={true} 
+              requirePremium={!isFreeWorkout} 
+              contentType="workout"
+              contentId={dbWorkout.id}
+              contentName={dbWorkout.name}
+              price={dbWorkout.price || undefined}
+              stripePriceId={dbWorkout.stripe_price_id || undefined}
+              stripeProductId={dbWorkout.stripe_product_id || undefined}
+            >
               <WorkoutDisplay
                 exercises={[]}
                 planContent=""
