@@ -526,6 +526,11 @@ const TrainingProgramDetail = () => {
                       FREE
                     </div>
                   )}
+                  {program.is_standalone_purchase && program.price && (
+                    <div className="absolute bottom-2 right-2 bg-gold-600 text-white px-3 py-1 rounded-full text-xs font-semibold">
+                      €{Number(program.price).toFixed(2)}
+                    </div>
+                  )}
                   {userId && isCompleted && (
                     <div className="absolute bottom-2 left-2 bg-green-600 text-white px-2 py-1 rounded-full text-xs font-semibold flex items-center gap-1">
                       <CheckCircle className="h-3 w-3" />

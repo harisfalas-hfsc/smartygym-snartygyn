@@ -59,7 +59,6 @@ export const ProgramEditDialog = ({ program, open, onOpenChange, onSave }: Progr
     image_url: '',
     generate_unique_image: false,
     is_premium: false,
-    tier_required: '',
     is_standalone_purchase: false,
     price: '',
     stripe_product_id: '',
@@ -114,7 +113,6 @@ export const ProgramEditDialog = ({ program, open, onOpenChange, onSave }: Progr
         image_url: program.image_url || '',
         generate_unique_image: false,
         is_premium: program.is_premium || false,
-        tier_required: program.tier_required || '',
         is_standalone_purchase: program.is_standalone_purchase || false,
         price: program.price ? program.price.toString() : '',
         stripe_product_id: program.stripe_product_id || '',
@@ -147,7 +145,6 @@ export const ProgramEditDialog = ({ program, open, onOpenChange, onSave }: Progr
         image_url: '',
         generate_unique_image: false,
         is_premium: false,
-        tier_required: '',
         is_standalone_purchase: false,
         price: '',
         stripe_product_id: '',
@@ -238,11 +235,11 @@ export const ProgramEditDialog = ({ program, open, onOpenChange, onSave }: Progr
         }
       }
 
-      // Create Stripe product if standalone purchase with price
+      // Create Stripe product if premium + standalone purchase with price
       let stripeProductId = formData.stripe_product_id;
       let stripePriceId = formData.stripe_price_id;
       
-      if (formData.is_standalone_purchase && formData.price && parseFloat(formData.price) > 0) {
+      if (formData.is_premium && formData.is_standalone_purchase && formData.price && parseFloat(formData.price) > 0) {
         const { data: stripeData, error: stripeError } = await supabase.functions.invoke('create-stripe-product', {
           body: {
             name: formData.name,
@@ -294,9 +291,9 @@ export const ProgramEditDialog = ({ program, open, onOpenChange, onSave }: Progr
         nutrition_tips: formData.final_tips,
         image_url: imageUrl,
         is_premium: formData.is_premium,
-        tier_required: formData.tier_required || null,
-        is_standalone_purchase: formData.is_standalone_purchase,
-        price: formData.price ? parseFloat(formData.price) : null,
+        tier_required: null,
+        is_standalone_purchase: formData.is_premium && formData.is_standalone_purchase,
+        price: formData.is_premium && formData.price ? parseFloat(formData.price) : null,
         stripe_product_id: stripeProductId,
         stripe_price_id: stripePriceId,
       };
@@ -549,41 +546,37 @@ export const ProgramEditDialog = ({ program, open, onOpenChange, onSave }: Progr
             <Switch
               id="is_premium"
               checked={formData.is_premium}
-              onCheckedChange={(checked) => setFormData({ ...formData, is_premium: checked })}
+              onCheckedChange={(checked) => setFormData({ 
+                ...formData, 
+                is_premium: checked,
+                // Reset standalone purchase if premium is disabled
+                is_standalone_purchase: checked ? formData.is_standalone_purchase : false,
+                price: checked ? formData.price : ''
+              })}
             />
             <Label htmlFor="is_premium">Premium Content</Label>
           </div>
+          
+          <p className="text-sm text-muted-foreground">
+            Premium content is accessible to both Gold and Platinum subscribers
+          </p>
 
+          {/* Standalone Purchase Section - Only available for premium content */}
           {formData.is_premium && (
-            <div className="space-y-2">
-              <Label htmlFor="tier_required">Tier Required</Label>
-              <Select value={formData.tier_required} onValueChange={(value) => setFormData({ ...formData, tier_required: value })}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Select tier" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="gold">Gold</SelectItem>
-                  <SelectItem value="platinum">Platinum</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-          )}
+            <div className="space-y-4 pt-4 border-t">
+              <div className="flex items-center space-x-2">
+                <Switch
+                  id="is_standalone_purchase"
+                  checked={formData.is_standalone_purchase}
+                  onCheckedChange={(checked) => setFormData({ ...formData, is_standalone_purchase: checked })}
+                />
+                <Label htmlFor="is_standalone_purchase">Available as Standalone Purchase</Label>
+              </div>
+              <p className="text-sm text-muted-foreground">
+                Enable this to allow users to buy this program individually without a subscription
+              </p>
 
-          {/* Standalone Purchase Section */}
-          <div className="space-y-4 pt-4 border-t">
-            <div className="flex items-center space-x-2">
-              <Switch
-                id="is_standalone_purchase"
-                checked={formData.is_standalone_purchase}
-                onCheckedChange={(checked) => setFormData({ ...formData, is_standalone_purchase: checked })}
-              />
-              <Label htmlFor="is_standalone_purchase">Available as Standalone Purchase</Label>
-            </div>
-            <p className="text-sm text-muted-foreground">
-              Enable this to allow users to buy this program individually without a subscription
-            </p>
-
-            {formData.is_standalone_purchase && (
+              {formData.is_standalone_purchase && (
               <div className="space-y-2">
                 <Label htmlFor="price">Price (€) *</Label>
                 <Input
@@ -604,8 +597,9 @@ export const ProgramEditDialog = ({ program, open, onOpenChange, onSave }: Progr
                   </p>
                 )}
               </div>
-            )}
-          </div>
+              )}
+            </div>
+          )}
 
           <div className="flex justify-end gap-2 pt-4">
             <Button variant="outline" onClick={() => onOpenChange(false)} disabled={isGeneratingImage}>

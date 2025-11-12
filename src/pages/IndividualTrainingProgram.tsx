@@ -68,8 +68,9 @@ const IndividualTrainingProgram = () => {
 
   if (dbProgram) {
     const isPremium = dbProgram.is_premium && !isFreeProgram;
-    const canPurchase = dbProgram.is_standalone_purchase && dbProgram.price;
-    const hasAccess = userTier === "premium" || hasPurchased(dbProgram.id, "program") || !isPremium;
+    const canPurchase = dbProgram.is_standalone_purchase && dbProgram.price && isPremium;
+    const alreadyPurchased = hasPurchased(dbProgram.id, "program");
+    const hasAccess = userTier === "premium" || alreadyPurchased || !isPremium;
 
     return (
       <>
@@ -140,23 +141,32 @@ const IndividualTrainingProgram = () => {
               />
             </div>
 
-            {/* Show purchase button if available and user doesn't have access */}
-            {!hasAccess && canPurchase && userTier === "subscriber" && (
+            {/* Show purchase button for standalone purchases */}
+            {canPurchase && !hasAccess && (
               <div className="mb-6">
                 <Card className="border-primary/50 bg-gradient-to-r from-primary/5 to-primary/10">
                   <div className="p-6 text-center space-y-4">
-                    <h3 className="text-xl font-semibold">Get Instant Access</h3>
+                    <h3 className="text-xl font-semibold">
+                      {alreadyPurchased ? "You Own This Program" : "Get Instant Access"}
+                    </h3>
                     <p className="text-muted-foreground">
-                      Purchase this program once and own it forever
+                      {alreadyPurchased 
+                        ? "This program is in your library" 
+                        : "Purchase this program once and own it forever"}
                     </p>
-                    <PurchaseButton
-                      contentId={dbProgram.id}
-                      contentType="program"
-                      contentName={dbProgram.name}
-                      price={Number(dbProgram.price) || 0}
-                      stripeProductId={dbProgram.stripe_product_id}
-                      stripePriceId={dbProgram.stripe_price_id}
-                    />
+                    <div className="text-3xl font-bold text-primary">
+                      €{Number(dbProgram.price).toFixed(2)}
+                    </div>
+                    {!alreadyPurchased && (
+                      <PurchaseButton
+                        contentId={dbProgram.id}
+                        contentType="program"
+                        contentName={dbProgram.name}
+                        price={Number(dbProgram.price) || 0}
+                        stripeProductId={dbProgram.stripe_product_id}
+                        stripePriceId={dbProgram.stripe_price_id}
+                      />
+                    )}
                   </div>
                 </Card>
               </div>
