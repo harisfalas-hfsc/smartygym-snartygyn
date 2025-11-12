@@ -13,6 +13,7 @@ import smartyGymIcon from "@/assets/smarty-gym-icon.png";
 import { BackToTop } from "@/components/BackToTop";
 import { useAccessControl } from "@/hooks/useAccessControl";
 import { PageTitleCard } from "@/components/PageTitleCard";
+import { ScrollReveal } from "@/components/ScrollReveal";
 
 const Index = () => {
   const navigate = useNavigate();
@@ -266,42 +267,53 @@ const Index = () => {
 
           {/* Services Grid */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 mb-8">
-            {services.map(service => <ServiceCard key={service.id} icon={service.icon} title={service.title} description={service.description} onClick={() => handleServiceSelect(service.id)} />)}
+            {services.map((service, index) => (
+              <ScrollReveal key={service.id} delay={index * 100}>
+                <ServiceCard 
+                  icon={service.icon} 
+                  title={service.title} 
+                  description={service.description} 
+                  onClick={() => handleServiceSelect(service.id)} 
+                />
+              </ScrollReveal>
+            ))}
           </div>
 
           {/* CTA Section */}
-          <div className="bg-card border border-border rounded-xl p-4 sm:p-6 md:p-8 shadow-soft text-center">
-            <h3 className="text-lg sm:text-2xl font-bold mb-2 sm:mb-4 leading-tight">
-              Ready to Start Your Fitness Journey?
-            </h3>
-            <p className="text-muted-foreground text-xs sm:text-base mb-4 sm:mb-6 max-w-2xl mx-auto leading-relaxed">
-              Join the community of fitness enthusiasts and get access to premium content
-            </p>
-            <p className="text-xs text-muted-foreground mb-4">
-              Available worldwide – All prices in Euro (€)
-            </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center items-stretch sm:items-center max-w-2xl mx-auto">
-              <div className="bg-gradient-to-br from-yellow-500/20 via-amber-500/15 to-yellow-600/20 border-2 border-yellow-600/40 rounded-lg p-4 sm:p-6 flex-1 w-full">
-                <div className="text-yellow-600 dark:text-yellow-400 font-bold text-base sm:text-xl mb-1 sm:mb-2">Gold Plan - All Included</div>
-                <div className="text-xl sm:text-3xl font-bold mb-1 sm:mb-2">€9.99</div>
-                <div className="text-xs sm:text-sm text-muted-foreground mb-3 sm:mb-4">per month</div>
-                <Button variant="default" className="w-full text-sm sm:text-base" onClick={() => handleSubscribe('gold')}>
-                  Get Started
-                </Button>
-              </div>
-              <div className="bg-gradient-to-br from-slate-300/30 via-gray-200/20 to-slate-300/30 dark:from-slate-700/30 dark:via-slate-600/20 dark:to-slate-700/30 border-2 border-slate-400/50 dark:border-slate-500/50 rounded-lg p-4 sm:p-6 flex-1 w-full relative">
-                <div className="absolute -top-2.5 left-1/2 -translate-x-1/2 bg-primary text-primary-foreground text-[10px] sm:text-xs font-bold px-2 sm:px-3 py-0.5 sm:py-1 rounded-full whitespace-nowrap">
-                  BEST VALUE
+          <ScrollReveal>
+            <div className="bg-card border border-border rounded-xl p-4 sm:p-6 md:p-8 shadow-soft text-center">
+              <h3 className="text-lg sm:text-2xl font-bold mb-2 sm:mb-4 leading-tight">
+                Ready to Start Your Fitness Journey?
+              </h3>
+              <p className="text-muted-foreground text-xs sm:text-base mb-4 sm:mb-6 max-w-2xl mx-auto leading-relaxed">
+                Join the community of fitness enthusiasts and get access to premium content
+              </p>
+              <p className="text-xs text-muted-foreground mb-4">
+                Available worldwide – All prices in Euro (€)
+              </p>
+              <div className="flex flex-col sm:flex-row gap-4 justify-center items-stretch sm:items-center max-w-2xl mx-auto">
+                <div className="bg-gradient-to-br from-yellow-500/20 via-amber-500/15 to-yellow-600/20 border-2 border-yellow-600/40 rounded-lg p-4 sm:p-6 flex-1 w-full">
+                  <div className="text-yellow-600 dark:text-yellow-400 font-bold text-base sm:text-xl mb-1 sm:mb-2">Gold Plan - All Included</div>
+                  <div className="text-xl sm:text-3xl font-bold mb-1 sm:mb-2">€9.99</div>
+                  <div className="text-xs sm:text-sm text-muted-foreground mb-3 sm:mb-4">per month</div>
+                  <Button variant="default" className="w-full text-sm sm:text-base" onClick={() => handleSubscribe('gold')}>
+                    Get Started
+                  </Button>
                 </div>
-                <div className="text-slate-700 dark:text-slate-300 font-bold text-base sm:text-xl mb-1 sm:mb-2">Platinum Plan - All Included</div>
-                <div className="text-xl sm:text-3xl font-bold mb-1 sm:mb-2">€89.99</div>
-                <div className="text-xs sm:text-sm text-muted-foreground mb-3 sm:mb-4">per year</div>
-                <Button variant="default" className="w-full text-sm sm:text-base" onClick={() => handleSubscribe('platinum')}>
-                  Get Started
-                </Button>
+                <div className="bg-gradient-to-br from-slate-300/30 via-gray-200/20 to-slate-300/30 dark:from-slate-700/30 dark:via-slate-600/20 dark:to-slate-700/30 border-2 border-slate-400/50 dark:border-slate-500/50 rounded-lg p-4 sm:p-6 flex-1 w-full relative">
+                  <div className="absolute -top-2.5 left-1/2 -translate-x-1/2 bg-primary text-primary-foreground text-[10px] sm:text-xs font-bold px-2 sm:px-3 py-0.5 sm:py-1 rounded-full whitespace-nowrap">
+                    BEST VALUE
+                  </div>
+                  <div className="text-slate-700 dark:text-slate-300 font-bold text-base sm:text-xl mb-1 sm:mb-2">Platinum Plan - All Included</div>
+                  <div className="text-xl sm:text-3xl font-bold mb-1 sm:mb-2">€89.99</div>
+                  <div className="text-xs sm:text-sm text-muted-foreground mb-3 sm:mb-4">per year</div>
+                  <Button variant="default" className="w-full text-sm sm:text-base" onClick={() => handleSubscribe('platinum')}>
+                    Get Started
+                  </Button>
+                </div>
               </div>
             </div>
-          </div>
+          </ScrollReveal>
         </div>
       </main>
 

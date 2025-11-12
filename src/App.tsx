@@ -53,6 +53,7 @@ import { WhatsAppButton } from "./components/WhatsAppButton";
 import { InstallPWA } from "./components/InstallPWA";
 import { NotificationPrompt } from "./components/NotificationPrompt";
 import { PageTransition } from "./components/PageTransition";
+import { LoadingBar } from "./components/LoadingBar";
 
 const queryClient = new QueryClient();
 
@@ -63,6 +64,7 @@ const App = () => (
         <Toaster />
         <Sonner />
         <BrowserRouter>
+          <LoadingBar />
           <CookieConsent />
           <InstallPWA />
           <NotificationPrompt />

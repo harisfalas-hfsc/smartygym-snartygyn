@@ -7,6 +7,7 @@ import { ArrowLeft, Dumbbell, Flame, Zap, Heart, Move, Activity, TrendingUp } fr
 import { BackToTop } from "@/components/BackToTop";
 import { TimedPopup } from "@/components/TimedPopup";
 import { useAccessControl } from "@/hooks/useAccessControl";
+import { ScrollReveal } from "@/components/ScrollReveal";
 
 const WorkoutFlow = () => {
   const navigate = useNavigate();
@@ -117,42 +118,45 @@ const WorkoutFlow = () => {
         )}
         
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
-          {workoutTypes.map((workout) => {
+          {workoutTypes.map((workout, index) => {
             const Icon = workout.icon;
             return (
-              <Card
-                key={workout.id}
-                onClick={() => handleWorkoutSelect(workout.id)}
-                className="p-6 cursor-pointer transition-all duration-300 hover:scale-105 hover:shadow-gold bg-card border-border"
-              >
-                <div className="flex flex-col items-center text-center space-y-4">
-                  <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center">
-                    <Icon className="w-8 h-8 text-primary" />
+              <ScrollReveal key={workout.id} delay={index * 100}>
+                <Card
+                  onClick={() => handleWorkoutSelect(workout.id)}
+                  className="p-6 cursor-pointer transition-all duration-300 hover:scale-105 hover:shadow-gold bg-card border-border"
+                >
+                  <div className="flex flex-col items-center text-center space-y-4">
+                    <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center">
+                      <Icon className="w-8 h-8 text-primary" />
+                    </div>
+                    <div>
+                      <h3 className="font-semibold text-lg mb-2">{workout.title}</h3>
+                      <p className="text-sm text-muted-foreground mb-3">{workout.description}</p>
+                      <p className="text-xs text-muted-foreground mb-3">
+                        Created by <a href="/coach-profile" className="text-primary hover:underline font-medium">Haris Falas</a> — Sports Scientist & Strength and Conditioning Coach
+                      </p>
+                    </div>
                   </div>
-                  <div>
-                    <h3 className="font-semibold text-lg mb-2">{workout.title}</h3>
-                    <p className="text-sm text-muted-foreground mb-3">{workout.description}</p>
-                    <p className="text-xs text-muted-foreground mb-3">
-                      Created by <a href="/coach-profile" className="text-primary hover:underline font-medium">Haris Falas</a> — Sports Scientist & Strength and Conditioning Coach
-                    </p>
-                  </div>
-                </div>
-              </Card>
+                </Card>
+              </ScrollReveal>
             );
           })}
         </div>
 
         {/* Bottom Premium Banner */}
         {!isPremium && (
-          <div className="bg-card border border-border rounded-xl p-6 mt-8 text-center shadow-soft">
-            <h3 className="text-xl font-semibold mb-2">Love these workouts?</h3>
-            <p className="text-muted-foreground mb-4">
-              Unlock 100+ more exclusive sessions with Smarty Gym Premium.
-            </p>
-            <Button size="lg" onClick={() => navigate("/premiumbenefits")}>
-              Join Premium
-            </Button>
-          </div>
+          <ScrollReveal delay={700}>
+            <div className="bg-card border border-border rounded-xl p-6 mt-8 text-center shadow-soft">
+              <h3 className="text-xl font-semibold mb-2">Love these workouts?</h3>
+              <p className="text-muted-foreground mb-4">
+                Unlock 100+ more exclusive sessions with Smarty Gym Premium.
+              </p>
+              <Button size="lg" onClick={() => navigate("/premiumbenefits")}>
+                Join Premium
+              </Button>
+            </div>
+          </ScrollReveal>
         )}
       </div>
       </div>
