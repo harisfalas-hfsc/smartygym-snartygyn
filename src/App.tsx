@@ -11,6 +11,7 @@ import { Navigation } from "./components/Navigation";
 import { Footer } from "./components/Footer";
 import { ScrollToTop } from "./components/ScrollToTop";
 import { CookieConsent } from "./components/CookieConsent";
+import { FloatingActionButton } from "./components/FloatingActionButton";
 import { ArticleDetail } from "./pages/ArticleDetail";
 import Index from "./pages/Index";
 import Auth from "./pages/Auth";
@@ -70,6 +71,7 @@ const App = () => (
           <NotificationPrompt />
           <AccessControlProvider>
           <WhatsAppButton />
+          <FloatingActionButton />
           <ScrollToTop />
           <div className="flex flex-col min-h-screen">
             <Navigation />

@@ -14,6 +14,7 @@ import { BackToTop } from "@/components/BackToTop";
 import { useAccessControl } from "@/hooks/useAccessControl";
 import { PageTitleCard } from "@/components/PageTitleCard";
 import { ScrollReveal } from "@/components/ScrollReveal";
+import { ParticleBackground } from "@/components/ParticleBackground";
 
 const Index = () => {
   const navigate = useNavigate();
@@ -231,8 +232,9 @@ const Index = () => {
         <BackToTop />
         
         {/* Hero Section */}
-        <section className="relative py-8 sm:py-12 px-4 border-b border-border bg-gradient-to-br from-background to-muted/30">
-          <div className="container mx-auto max-w-4xl space-y-3 sm:space-y-4">
+        <section className="relative py-8 sm:py-12 px-4 border-b border-border bg-gradient-to-br from-background to-muted/30 overflow-hidden">
+          <ParticleBackground />
+          <div className="container mx-auto max-w-4xl space-y-3 sm:space-y-4 relative z-10">
             <PageTitleCard
               title="Smarty Gym"
               subtitle="Your Gym Re-imagined. Anywhere, Anytime"
@@ -267,8 +269,8 @@ const Index = () => {
 
           {/* Services Grid */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 mb-8">
-            {services.map((service, index) => (
-              <ScrollReveal key={service.id} delay={index * 100}>
+            {services.map((service) => (
+              <ScrollReveal key={service.id}>
                 <ServiceCard 
                   icon={service.icon} 
                   title={service.title} 

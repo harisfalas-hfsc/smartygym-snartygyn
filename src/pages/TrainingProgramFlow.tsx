@@ -112,10 +112,10 @@ const TrainingProgramFlow = () => {
         )}
         
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
-          {programTypes.map((program, index) => {
+          {programTypes.map((program) => {
             const Icon = program.icon;
             return (
-              <ScrollReveal key={program.id} delay={index * 100}>
+              <ScrollReveal key={program.id}>
                 <Card
                   onClick={() => handleProgramSelect(program.id)}
                   className="p-6 cursor-pointer transition-all duration-300 hover:scale-105 hover:shadow-gold bg-card border-border"
