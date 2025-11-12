@@ -82,11 +82,11 @@ const About = () => {
           icon={Info} 
         />
         
-        <InfoRibbon className="max-w-3xl mx-auto">
-          <p>
+        <div className="text-center mb-8 max-w-3xl mx-auto">
+          <p className="text-sm sm:text-base text-muted-foreground">
             Founded by <a href="/coach-profile" className="text-primary hover:underline font-medium">Haris Falas</a> - BSc Sports Science | EXOS Specialist | CSCS
           </p>
-        </InfoRibbon>
+        </div>
 
         <DecorativeDivider className="mb-12" />
 
