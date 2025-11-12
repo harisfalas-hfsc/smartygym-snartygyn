@@ -121,7 +121,7 @@ const About = () => {
                     Every program is science-based and personally created by <a href="/coach-profile" className="text-primary hover:underline font-medium">Haris Falas</a>.
                   </p>
                   <p className="text-base text-muted-foreground">
-                    Never by AI. Never by algorithms. Always by a real human expert who understands YOUR needs. <strong>Cyprus online fitness</strong> excellence since day one.
+                    Never by AI. Never by algorithms. Always by a real human expert who understands YOUR needs. Training designed by humans, for humans.
                   </p>
                 </div>
               </div>
