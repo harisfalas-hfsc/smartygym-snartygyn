@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { PageTitleCard } from "@/components/PageTitleCard";
+import { InfoRibbon } from "@/components/InfoRibbon";
 import { DecorativeDivider } from "@/components/DecorativeDivider";
 import { ArrowLeft, Mail, MessageSquare, Send, MapPin, Phone, Lock } from "lucide-react";
 import { BackToTop } from "@/components/BackToTop";
@@ -294,17 +295,18 @@ const Contact = () => {
       <div className="min-h-screen bg-background">
         <BackToTop />
         <div className="container mx-auto max-w-6xl px-4 py-8">
-          {canGoBack && (
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={goBack}
-              className="mb-6"
-            >
-              <ArrowLeft className="mr-2 h-4 w-4" />
-              Back
-            </Button>
-          )}
+          <div className="h-10 mb-6">
+            {canGoBack && (
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={goBack}
+              >
+                <ArrowLeft className="mr-2 h-4 w-4" />
+                Back
+              </Button>
+            )}
+          </div>
 
           {/* Hero Section */}
           <PageTitleCard 
@@ -312,15 +314,12 @@ const Contact = () => {
             subtitle="Have questions? Need support? Want to discuss your fitness goals?"
             icon={Mail} 
           />
-          <header className="text-center mb-8">
-            
-            {/* Info Ribbon */}
-            <div className="bg-primary/10 border border-primary/20 rounded-lg p-4 mb-8 text-center max-w-3xl mx-auto">
-              <p className="text-sm text-muted-foreground">
-                Get in touch with <a href="/coach-profile" className="text-primary hover:underline font-medium"><strong>Haris Falas</strong></a> and the Smarty Gym team
-              </p>
-            </div>
-          </header>
+          
+          <InfoRibbon className="max-w-3xl mx-auto">
+            <p>
+              Get in touch with <a href="/coach-profile" className="text-primary hover:underline font-medium"><strong>Haris Falas</strong></a> and the Smarty Gym team
+            </p>
+          </InfoRibbon>
 
           <DecorativeDivider className="mb-12" />
 

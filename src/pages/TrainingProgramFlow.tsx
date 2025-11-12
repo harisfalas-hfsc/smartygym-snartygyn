@@ -3,6 +3,7 @@ import { Helmet } from "react-helmet";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { PageTitleCard } from "@/components/PageTitleCard";
+import { InfoRibbon } from "@/components/InfoRibbon";
 import { ArrowLeft, Heart, Dumbbell, Activity, Flame, User, Move, Scale, Target } from "lucide-react";
 import { BackToTop } from "@/components/BackToTop";
 import { TimedPopup } from "@/components/TimedPopup";
@@ -80,15 +81,16 @@ const TrainingProgramFlow = () => {
       <BackToTop />
       <TimedPopup />
       <div className="container mx-auto max-w-6xl px-4 py-8">
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={() => navigate(-1)}
-          className="mb-6"
-        >
-          <ArrowLeft className="mr-2 h-4 w-4" />
-          <span className="text-xs sm:text-sm">Back</span>
-        </Button>
+        <div className="h-10 mb-6">
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => navigate(-1)}
+          >
+            <ArrowLeft className="mr-2 h-4 w-4" />
+            <span className="text-xs sm:text-sm">Back</span>
+          </Button>
+        </div>
         
         <PageTitleCard 
           title="Training Programs" 
@@ -96,19 +98,21 @@ const TrainingProgramFlow = () => {
           icon={Target}
         />
         
-        {/* Info Ribbon */}
-        {!isPremium && (
-          <div className="bg-primary/10 border border-primary/20 rounded-lg p-3 sm:p-4 mb-6 sm:mb-8 text-center">
-            <p className="text-xs sm:text-sm text-muted-foreground mb-2">
+        {!isPremium ? (
+          <InfoRibbon ctaText="Join Premium" onCtaClick={() => navigate("/premiumbenefits")}>
+            <p>
               Structured 6–8 week training programs created by Sports Scientist <a href="/coach-profile" className="text-primary hover:underline font-medium">Haris Falas</a> at smartygym.com. Build strength, lose fat, improve mobility — SmartyGym delivers evidence-based functional training anywhere, anytime.
             </p>
-            <p className="text-xs sm:text-sm text-muted-foreground mb-2">
+            <p className="mt-2">
               Every SMARTY GYM program is a complete path toward better performance and health—but results multiply when training meets smart recovery and mindful living. Stay disciplined, fuel your body intelligently, rest deeply, and treat movement as a daily practice—not a task. That&apos;s the SMARTY GYM way.
             </p>
-            <Button variant="default" size="sm" onClick={() => navigate("/premiumbenefits")} className="text-xs sm:text-sm">
-              Join Premium
-            </Button>
-          </div>
+          </InfoRibbon>
+        ) : (
+          <InfoRibbon>
+            <p>
+              All training programs included in your premium membership. Start your transformation today with unlimited access to structured 6-8 week programs.
+            </p>
+          </InfoRibbon>
         )}
         
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">

@@ -3,6 +3,7 @@ import { Helmet } from "react-helmet";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { PageTitleCard } from "@/components/PageTitleCard";
+import { InfoRibbon } from "@/components/InfoRibbon";
 import { DecorativeDivider } from "@/components/DecorativeDivider";
 import {
   Table,
@@ -238,11 +239,17 @@ const Community = () => {
 
       <div className="min-h-screen bg-background">
         <div className="container mx-auto max-w-7xl px-4 py-8">
+          <div className="h-10 mb-6"></div>
+          
           <PageTitleCard 
             title="Community" 
             subtitle="Join our community of fitness enthusiasts"
             icon={Users} 
           />
+          
+          <InfoRibbon className="max-w-3xl mx-auto">
+            <p>Connect with other members, share your progress, and celebrate your achievements together</p>
+          </InfoRibbon>
 
           <DecorativeDivider className="mb-12" />
 
