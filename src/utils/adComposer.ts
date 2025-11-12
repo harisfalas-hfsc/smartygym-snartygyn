@@ -44,17 +44,24 @@ export class AdComposer {
     // Add gradient overlay for better text contrast
     this.addGradientOverlay(dimensions);
     
-    // Draw gold border (ALWAYS)
+    // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+    // PERMANENT BRANDING ELEMENTS - NEVER REMOVE THESE
+    // These MUST appear on every ad, regardless of user prompt
+    // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+    
+    // 1. GOLD BORDER - Always around entire image
     this.drawGoldBorder(dimensions);
     
-    // Draw logo (ALWAYS)
+    // 2. LOGO - Always top right with adaptive visibility
     await this.drawLogo(dimensions);
     
-    // Draw content based on platform and purpose
+    // 3. CONTENT - Platform-specific text and messaging
     this.drawContent(config, dimensions);
     
-    // Draw website at bottom (ALWAYS)
+    // 4. WEBSITE URL - Always bottom center (smartgym.com)
     this.drawWebsite(dimensions);
+    
+    // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
     
     // Convert to base64
     return this.canvas.toDataURL("image/jpeg", 0.9);
@@ -95,8 +102,9 @@ export class AdComposer {
   }
 
   private drawGoldBorder(dimensions: Dimensions): void {
-    const borderWidth = Math.max(12, dimensions.width * 0.012); // Thicker, more visible border
-    this.ctx.strokeStyle = "#D4AF37"; // Gold
+    // PERMANENT ELEMENT: Gold border must ALWAYS appear around entire image
+    const borderWidth = Math.max(12, dimensions.width * 0.012);
+    this.ctx.strokeStyle = "#D4AF37"; // Brand gold color - NEVER CHANGE
     this.ctx.lineWidth = borderWidth;
     this.ctx.strokeRect(
       borderWidth / 2,
@@ -108,17 +116,34 @@ export class AdComposer {
 
   private async drawLogo(dimensions: Dimensions): Promise<void> {
     try {
-      // Use window.location.origin to ensure proper URL resolution
+      // PERMANENT ELEMENT: Logo must ALWAYS appear in top right
       const logoUrl = `${window.location.origin}${BRAND_IDENTITY.logo}`;
       const logo = await this.loadImage(logoUrl);
-      const logoSize = dimensions.width * 0.12; // Slightly smaller for better positioning
-      const padding = Math.max(30, dimensions.width * 0.025); // Consistent padding from border
+      const logoSize = dimensions.width * 0.12;
+      const padding = Math.max(30, dimensions.width * 0.025);
       const x = dimensions.width - logoSize - padding;
       const y = padding;
       
-      // Draw logo with strong shadow for visibility
-      this.ctx.shadowColor = "rgba(0, 0, 0, 0.7)";
-      this.ctx.shadowBlur = 15;
+      // Draw white background circle for contrast against any background
+      const centerX = x + logoSize / 2;
+      const centerY = y + logoSize / 2;
+      const radius = logoSize / 2 + 8;
+      
+      this.ctx.fillStyle = "rgba(255, 255, 255, 0.95)";
+      this.ctx.beginPath();
+      this.ctx.arc(centerX, centerY, radius, 0, Math.PI * 2);
+      this.ctx.fill();
+      
+      // Add gold ring around logo for brand consistency
+      this.ctx.strokeStyle = "#D4AF37";
+      this.ctx.lineWidth = 3;
+      this.ctx.beginPath();
+      this.ctx.arc(centerX, centerY, radius, 0, Math.PI * 2);
+      this.ctx.stroke();
+      
+      // Draw logo with strong shadow for depth
+      this.ctx.shadowColor = "rgba(0, 0, 0, 0.3)";
+      this.ctx.shadowBlur = 12;
       this.ctx.shadowOffsetX = 2;
       this.ctx.shadowOffsetY = 2;
       this.ctx.drawImage(logo, x, y, logoSize, logoSize);
@@ -130,7 +155,6 @@ export class AdComposer {
       this.ctx.shadowOffsetY = 0;
     } catch (error) {
       console.error("Failed to load logo:", error);
-      // Continue without logo if it fails to load
     }
   }
 
@@ -238,11 +262,12 @@ export class AdComposer {
   }
 
   private drawWebsite(dimensions: Dimensions): void {
+    // PERMANENT ELEMENT: Website URL must ALWAYS appear at bottom center
     const centerX = dimensions.width / 2;
     const padding = Math.max(30, dimensions.width * 0.025);
     const bottomY = dimensions.height - padding - 15;
     
-    // Add text shadow
+    // Add text shadow for visibility
     this.ctx.shadowColor = "rgba(0, 0, 0, 0.8)";
     this.ctx.shadowBlur = 8;
     this.ctx.shadowOffsetX = 2;
