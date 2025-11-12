@@ -5,6 +5,7 @@ interface AdConfig {
   purpose: string;
   details: string;
   backgroundImage: string;
+  customPrompt?: string;
 }
 
 interface Dimensions {
@@ -43,11 +44,17 @@ export class AdComposer {
     // Add gradient overlay for better text contrast
     this.addGradientOverlay(dimensions);
     
-    // Draw logo
+    // Draw gold border (ALWAYS)
+    this.drawGoldBorder(dimensions);
+    
+    // Draw logo (ALWAYS)
     await this.drawLogo(dimensions);
     
     // Draw content based on platform and purpose
     this.drawContent(config, dimensions);
+    
+    // Draw website at bottom (ALWAYS)
+    this.drawWebsite(dimensions);
     
     // Convert to base64
     return this.canvas.toDataURL("image/jpeg", 0.9);
@@ -85,6 +92,18 @@ export class AdComposer {
     
     this.ctx.fillStyle = gradient;
     this.ctx.fillRect(0, 0, dimensions.width, dimensions.height);
+  }
+
+  private drawGoldBorder(dimensions: Dimensions): void {
+    const borderWidth = Math.max(8, dimensions.width * 0.008);
+    this.ctx.strokeStyle = "#D4AF37"; // Gold
+    this.ctx.lineWidth = borderWidth;
+    this.ctx.strokeRect(
+      borderWidth / 2,
+      borderWidth / 2,
+      dimensions.width - borderWidth,
+      dimensions.height - borderWidth
+    );
   }
 
   private async drawLogo(dimensions: Dimensions): Promise<void> {
@@ -146,10 +165,10 @@ export class AdComposer {
     this.ctx.fillStyle = "#D4AF37";
     this.ctx.fillText(this.getPurposeLabel(purpose), centerX, centerY + 80);
     
-    // Tagline at bottom
+    // Tagline at bottom (moved up to make room for website)
     this.ctx.font = `italic ${dimensions.width * 0.03}px ${BRAND_IDENTITY.fonts.body}`;
     this.ctx.fillStyle = "#FFFFFF";
-    this.ctx.fillText(BRAND_IDENTITY.tagline, centerX, dimensions.height - 80);
+    this.ctx.fillText(BRAND_IDENTITY.tagline, centerX, dimensions.height - 120);
   }
 
   private drawTikTokContent(
@@ -176,10 +195,21 @@ export class AdComposer {
     this.ctx.fillStyle = "#D4AF37";
     this.ctx.fillText(`🔥 ${this.getPurposeLabel(purpose)} 🔥`, centerX, bottomY);
     
-    // Tagline at bottom
+    // Tagline at bottom (moved up to make room for website)
     this.ctx.font = `italic ${dimensions.width * 0.035}px ${BRAND_IDENTITY.fonts.body}`;
     this.ctx.fillStyle = "#FFFFFF";
-    this.ctx.fillText(BRAND_IDENTITY.tagline, centerX, dimensions.height - 100);
+    this.ctx.fillText(BRAND_IDENTITY.tagline, centerX, dimensions.height - 140);
+  }
+
+  private drawWebsite(dimensions: Dimensions): void {
+    const centerX = dimensions.width / 2;
+    const bottomY = dimensions.height - 50;
+    
+    this.ctx.textAlign = "center";
+    this.ctx.textBaseline = "middle";
+    this.ctx.font = `bold ${dimensions.width * 0.035}px ${BRAND_IDENTITY.fonts.heading}`;
+    this.ctx.fillStyle = "#D4AF37"; // Gold
+    this.ctx.fillText("smartygym.com", centerX, bottomY);
   }
 
   private drawMultilineText(

@@ -3,11 +3,12 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Download, Loader2, RefreshCw, Image as ImageIcon, Sparkles } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { AdComposer } from "@/utils/adComposer";
-import { getRandomWorkoutImage, WORKOUT_IMAGES } from "@/utils/brandingService";
+import { supabase } from "@/integrations/supabase/client";
 
 interface AdTemplate {
   id: string;
@@ -94,12 +95,23 @@ const AD_PURPOSES: AdPurpose[] = [
 
 const PLATFORMS = ["Instagram", "TikTok", "Facebook"] as const;
 
+const BACKGROUND_STYLES = [
+  { value: "fitness_action", label: "Fitness Action", description: "People actively exercising" },
+  { value: "motivating_couple", label: "Motivating Couple", description: "Couple working out together" },
+  { value: "bright_clean", label: "Bright & Clean", description: "Bright, minimal, professional look" },
+  { value: "empty_minimal", label: "Empty/Minimal", description: "Simple background or solid color" },
+  { value: "graphical_abstract", label: "Graphical/Abstract", description: "Abstract fitness graphics" },
+  { value: "gym_equipment", label: "Gym Equipment", description: "Focus on fitness equipment" },
+  { value: "outdoor_fitness", label: "Outdoor Fitness", description: "Outdoor workout setting" },
+];
+
 export const AdvertiseTemplatesManager = () => {
   const { toast } = useToast();
   const [selectedPurpose, setSelectedPurpose] = useState<string>("");
   const [customDetails, setCustomDetails] = useState<string>("");
+  const [customPrompt, setCustomPrompt] = useState<string>("");
   const [selectedPlatform, setSelectedPlatform] = useState<string>("");
-  const [selectedBackground, setSelectedBackground] = useState<string>("random");
+  const [selectedBackground, setSelectedBackground] = useState<string>("bright_clean");
   const [generatedAds, setGeneratedAds] = useState<AdTemplate[]>([]);
 
   const generateAdsForPlatform = async () => {
@@ -130,15 +142,18 @@ export const AdvertiseTemplatesManager = () => {
     setGeneratedAds((prev) => [newAd, ...prev]);
 
     try {
-      // Use actual Smarty Gym branding and images
-      const composer = new AdComposer();
-      const backgroundImage = selectedBackground === "random" ? getRandomWorkoutImage() : selectedBackground;
+      // Generate AI background image based on style and prompt
+      const backgroundPrompt = buildBackgroundPrompt(selectedBackground, customPrompt);
+      const bgImageUrl = await generateBackgroundImage(backgroundPrompt, aspectRatios[platform]);
       
+      // Compose final ad with branding
+      const composer = new AdComposer();
       const imageUrl = await composer.composeAd({
         platform,
         purpose: selectedPurpose,
         details: customDetails,
-        backgroundImage,
+        backgroundImage: bgImageUrl,
+        customPrompt,
       });
 
       setGeneratedAds((prev) =>
@@ -168,6 +183,37 @@ export const AdvertiseTemplatesManager = () => {
     }
   };
 
+  const buildBackgroundPrompt = (style: string, customPrompt: string): string => {
+    const styleDescriptions: Record<string, string> = {
+      fitness_action: "dynamic fitness scene with athletic person exercising, high energy, professional gym setting",
+      motivating_couple: "inspiring couple working out together, supportive atmosphere, modern gym environment",
+      bright_clean: "bright, clean, professional fitness setting with minimal elements, high-key lighting, airy feel",
+      empty_minimal: "simple, minimal background with subtle fitness theme, clean and professional",
+      graphical_abstract: "modern abstract fitness graphics, dynamic shapes, energetic design elements",
+      gym_equipment: "professional gym equipment showcase, modern fitness gear, clean and organized",
+      outdoor_fitness: "outdoor fitness setting, natural environment, energetic outdoor workout scene",
+    };
+
+    const baseStyle = styleDescriptions[style] || styleDescriptions.bright_clean;
+    
+    if (customPrompt.trim()) {
+      return `${baseStyle}. Additional requirements: ${customPrompt}`;
+    }
+    
+    return baseStyle;
+  };
+
+  const generateBackgroundImage = async (prompt: string, aspectRatio: string): Promise<string> => {
+    const { data, error } = await supabase.functions.invoke('generate-ad-image', {
+      body: { prompt, aspectRatio },
+    });
+
+    if (error) throw error;
+    if (!data?.imageUrl) throw new Error("No image generated");
+    
+    return data.imageUrl;
+  };
+
   const regenerateAd = async (adId: string) => {
     const ad = generatedAds.find((a) => a.id === adId);
     if (!ad || !selectedPurpose || !customDetails.trim()) return;
@@ -177,14 +223,22 @@ export const AdvertiseTemplatesManager = () => {
     );
 
     try {
-      const composer = new AdComposer();
-      const backgroundImage = selectedBackground === "random" ? getRandomWorkoutImage() : selectedBackground;
+      const aspectRatios = {
+        Instagram: "1:1 (1080x1080)",
+        TikTok: "9:16 (1080x1920)",
+        Facebook: "1.91:1 (1200x628)",
+      };
+
+      const backgroundPrompt = buildBackgroundPrompt(selectedBackground, customPrompt);
+      const bgImageUrl = await generateBackgroundImage(backgroundPrompt, aspectRatios[ad.platform]);
       
+      const composer = new AdComposer();
       const imageUrl = await composer.composeAd({
         platform: ad.platform,
         purpose: selectedPurpose,
         details: customDetails,
-        backgroundImage,
+        backgroundImage: bgImageUrl,
+        customPrompt,
       });
 
       setGeneratedAds((prev) =>
@@ -309,7 +363,7 @@ export const AdvertiseTemplatesManager = () => {
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="details">Details *</Label>
+            <Label htmlFor="details">Advertisement Title *</Label>
             <Input
               id="details"
               placeholder="e.g., 'HIIT Cardio Blast', 'Summer Special - 30% Off', 'Transform Your Body in 12 Weeks'"
@@ -318,40 +372,60 @@ export const AdvertiseTemplatesManager = () => {
               maxLength={100}
             />
             <p className="text-xs text-muted-foreground">
-              Enter the specific name, offer, or message for your advertisement
+              Enter the main headline or message for your advertisement
             </p>
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="background">Background Image (Optional)</Label>
+            <Label htmlFor="customPrompt">Custom Style Instructions (Optional)</Label>
+            <Textarea
+              id="customPrompt"
+              placeholder="Describe exactly how you want the ad to look: bright, white background, minimalist, motivating, energetic, professional, with specific colors, atmosphere, etc."
+              value={customPrompt}
+              onChange={(e) => setCustomPrompt(e.target.value)}
+              rows={4}
+              className="resize-none"
+            />
+            <p className="text-xs text-muted-foreground">
+              Be as detailed as you want - describe colors, mood, lighting, style preferences
+            </p>
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="background">Background Style *</Label>
             <Select value={selectedBackground} onValueChange={setSelectedBackground}>
               <SelectTrigger id="background">
-                <SelectValue placeholder="Random workout image (recommended)" />
+                <SelectValue placeholder="Choose background style" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="random">Random (Recommended)</SelectItem>
-                <SelectItem value={WORKOUT_IMAGES[0]}>Bodyweight Inferno</SelectItem>
-                <SelectItem value={WORKOUT_IMAGES[1]}>HIIT Inferno</SelectItem>
-                <SelectItem value={WORKOUT_IMAGES[2]}>Cardio Blast</SelectItem>
-                <SelectItem value={WORKOUT_IMAGES[3]}>Power Surge</SelectItem>
-                <SelectItem value={WORKOUT_IMAGES[4]}>Metabolic Burn</SelectItem>
-                <SelectItem value={WORKOUT_IMAGES[5]}>Explosive Engine</SelectItem>
-                <SelectItem value={WORKOUT_IMAGES[6]}>Functional Strength</SelectItem>
-                <SelectItem value={WORKOUT_IMAGES[7]}>Cardio Endurance</SelectItem>
-                <SelectItem value={WORKOUT_IMAGES[8]}>Muscle Hypertrophy</SelectItem>
+                {BACKGROUND_STYLES.map((style) => (
+                  <SelectItem key={style.value} value={style.value}>
+                    <div className="flex flex-col">
+                      <span className="font-medium">{style.label}</span>
+                      <span className="text-xs text-muted-foreground">
+                        {style.description}
+                      </span>
+                    </div>
+                  </SelectItem>
+                ))}
               </SelectContent>
             </Select>
             <p className="text-xs text-muted-foreground">
-              Uses actual Smarty Gym workout images from your library
+              AI will generate a unique background matching this style
             </p>
           </div>
 
           <div className="bg-primary/10 border border-primary/30 rounded-lg p-4 space-y-2">
-            <p className="text-sm font-medium text-primary">✓ 100% Brand Aligned</p>
-            <p className="text-xs text-muted-foreground">
-              All ads use your actual Smarty Gym logo, exact tagline "Your Gym Re-imagined. Anywhere, Anytime", 
-              real workout images from your library, and gold brand colors. No random generic content.
+            <p className="text-sm font-medium text-primary flex items-center gap-2">
+              <span className="text-lg">✓</span> Consistent Branding Always Included
             </p>
+            <ul className="text-xs text-muted-foreground space-y-1 ml-6">
+              <li>• Gold borders around the image</li>
+              <li>• Smarty Gym logo prominently displayed</li>
+              <li>• Tagline: "Your Gym Re-imagined. Anywhere, Anytime"</li>
+              <li>• Website: smartygym.com</li>
+              <li>• Your custom style and background preferences</li>
+            </ul>
           </div>
 
           <Button
