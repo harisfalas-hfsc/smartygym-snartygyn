@@ -281,9 +281,9 @@ const Index = () => {
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center items-stretch sm:items-center max-w-2xl mx-auto">
               <div className="bg-gradient-to-br from-yellow-500/20 via-amber-500/15 to-yellow-600/20 border-2 border-yellow-600/40 rounded-lg p-4 sm:p-6 flex-1 w-full">
-                <div className="text-yellow-600 dark:text-yellow-400 font-bold text-base sm:text-xl mb-1 sm:mb-2">Gold Plan - All Workouts</div>
+                <div className="text-yellow-600 dark:text-yellow-400 font-bold text-base sm:text-xl mb-1 sm:mb-2">Gold Plan - All Included</div>
                 <div className="text-xl sm:text-3xl font-bold mb-1 sm:mb-2">€9.99</div>
-                <div className="text-xs sm:text-sm text-muted-foreground mb-3 sm:mb-4">/month</div>
+                <div className="text-xs sm:text-sm text-muted-foreground mb-3 sm:mb-4">per month</div>
                 <Button variant="default" className="w-full text-sm sm:text-base" onClick={() => handleSubscribe('gold')}>
                   Get Started
                 </Button>
@@ -292,7 +292,7 @@ const Index = () => {
                 <div className="absolute -top-2.5 left-1/2 -translate-x-1/2 bg-primary text-primary-foreground text-[10px] sm:text-xs font-bold px-2 sm:px-3 py-0.5 sm:py-1 rounded-full whitespace-nowrap">
                   BEST VALUE
                 </div>
-                <div className="text-slate-700 dark:text-slate-300 font-bold text-base sm:text-xl mb-1 sm:mb-2">Platinum Plan - Everything</div>
+                <div className="text-slate-700 dark:text-slate-300 font-bold text-base sm:text-xl mb-1 sm:mb-2">Platinum Plan - All Included</div>
                 <div className="text-xl sm:text-3xl font-bold mb-1 sm:mb-2">€89.99</div>
                 <div className="text-xs sm:text-sm text-muted-foreground mb-3 sm:mb-4">per year</div>
                 <Button variant="default" className="w-full text-sm sm:text-base" onClick={() => handleSubscribe('platinum')}>
