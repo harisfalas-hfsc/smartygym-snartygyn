@@ -236,18 +236,36 @@ const Index = () => {
           <div className="container mx-auto max-w-4xl space-y-3 sm:space-y-4 relative z-10">
             <Card className="border-2 border-primary bg-gradient-to-r from-primary/5 to-primary/10 mb-6 sm:mb-8">
               <div className="p-4 sm:p-6 text-center relative">
-                {/* Left Side Icons */}
-                <div className="absolute left-2 sm:left-4 top-1/2 -translate-y-1/2 flex flex-col gap-3 sm:gap-4">
-                  <Dumbbell className="w-5 h-5 sm:w-6 sm:h-6 text-primary" />
-                  <Target className="w-5 h-5 sm:w-6 sm:h-6 text-primary" />
-                  <UserCheck className="w-5 h-5 sm:w-6 sm:h-6 text-primary" />
+                {/* Left Side Icons - Horizontal */}
+                <div className="absolute left-2 sm:left-4 top-1/2 -translate-y-1/2 flex flex-row gap-2 sm:gap-3">
+                  <Dumbbell 
+                    className="w-5 h-5 sm:w-6 sm:h-6 text-primary cursor-pointer transition-all duration-200 hover:scale-110 hover:text-primary/80" 
+                    onClick={() => navigate("/workout")}
+                  />
+                  <Target 
+                    className="w-5 h-5 sm:w-6 sm:h-6 text-primary cursor-pointer transition-all duration-200 hover:scale-110 hover:text-primary/80" 
+                    onClick={() => navigate("/training-program")}
+                  />
+                  <UserCheck 
+                    className="w-5 h-5 sm:w-6 sm:h-6 text-primary cursor-pointer transition-all duration-200 hover:scale-110 hover:text-primary/80" 
+                    onClick={() => navigate("/personal-training")}
+                  />
                 </div>
                 
-                {/* Right Side Icons */}
-                <div className="absolute right-2 sm:right-4 top-1/2 -translate-y-1/2 flex flex-col gap-3 sm:gap-4">
-                  <Wrench className="w-5 h-5 sm:w-6 sm:h-6 text-primary" />
-                  <Video className="w-5 h-5 sm:w-6 sm:h-6 text-primary" />
-                  <FileText className="w-5 h-5 sm:w-6 sm:h-6 text-primary" />
+                {/* Right Side Icons - Horizontal */}
+                <div className="absolute right-2 sm:right-4 top-1/2 -translate-y-1/2 flex flex-row gap-2 sm:gap-3">
+                  <Wrench 
+                    className="w-5 h-5 sm:w-6 sm:h-6 text-primary cursor-pointer transition-all duration-200 hover:scale-110 hover:text-primary/80" 
+                    onClick={() => navigate("/tools")}
+                  />
+                  <Video 
+                    className="w-5 h-5 sm:w-6 sm:h-6 text-primary cursor-pointer transition-all duration-200 hover:scale-110 hover:text-primary/80" 
+                    onClick={() => navigate("/exercise-library")}
+                  />
+                  <FileText 
+                    className="w-5 h-5 sm:w-6 sm:h-6 text-primary cursor-pointer transition-all duration-200 hover:scale-110 hover:text-primary/80" 
+                    onClick={() => navigate("/blog")}
+                  />
                 </div>
                 
                 {/* Title and Subtitle */}
