@@ -11,6 +11,7 @@ import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { FileText, Plus, Edit, Trash2, Eye } from "lucide-react";
 import { toast } from "sonner";
+import { AdvertiseTemplatesManager } from "./AdvertiseTemplatesManager";
 
 interface EmailTemplate {
   id: string;
@@ -239,6 +240,11 @@ export function EmailTemplatesManager() {
           </div>
         </CardContent>
       </Card>
+
+      {/* Advertise Templates Section */}
+      <div className="mt-6">
+        <AdvertiseTemplatesManager />
+      </div>
 
       {/* Edit/Create Dialog */}
       <Dialog open={showDialog} onOpenChange={setShowDialog}>
