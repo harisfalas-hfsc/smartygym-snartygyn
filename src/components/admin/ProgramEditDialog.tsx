@@ -542,24 +542,25 @@ export const ProgramEditDialog = ({ program, open, onOpenChange, onSave }: Progr
             )}
           </div>
 
-          <div className="flex items-center space-x-2">
-            <Switch
-              id="is_premium"
-              checked={formData.is_premium}
-              onCheckedChange={(checked) => setFormData({ 
-                ...formData, 
-                is_premium: checked,
-                // Reset standalone purchase if premium is disabled
-                is_standalone_purchase: checked ? formData.is_standalone_purchase : false,
-                price: checked ? formData.price : ''
-              })}
-            />
-            <Label htmlFor="is_premium">Premium Content</Label>
+          <div className="space-y-2">
+            <div className="flex items-center space-x-2">
+              <Switch
+                id="is_premium"
+                checked={formData.is_premium}
+                onCheckedChange={(checked) => setFormData({ 
+                  ...formData, 
+                  is_premium: checked,
+                  // Reset standalone purchase if premium is disabled
+                  is_standalone_purchase: checked ? formData.is_standalone_purchase : false,
+                  price: checked ? formData.price : ''
+                })}
+              />
+              <Label htmlFor="is_premium">Premium or Free</Label>
+            </div>
+            <p className="text-sm text-muted-foreground">
+              Toggle on for Premium content, toggle off for Free content
+            </p>
           </div>
-          
-          <p className="text-sm text-muted-foreground">
-            Premium content is accessible to both Gold and Platinum subscribers
-          </p>
 
           {/* Standalone Purchase Section - Only available for premium content */}
           {formData.is_premium && (

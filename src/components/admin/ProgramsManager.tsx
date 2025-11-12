@@ -19,7 +19,8 @@ interface Program {
   difficulty: string | null;
   equipment: string | null;
   is_premium: boolean;
-  tier_required: string | null;
+  is_standalone_purchase: boolean;
+  price: number | null;
 }
 
 export const ProgramsManager = () => {
@@ -79,7 +80,7 @@ export const ProgramsManager = () => {
     try {
       const { data, error } = await supabase
         .from('admin_training_programs')
-        .select('id, name, category, duration, difficulty, equipment, is_premium, tier_required')
+        .select('id, name, category, duration, difficulty, equipment, is_premium, is_standalone_purchase, price')
         .order('serial_number');
 
       if (error) throw error;
@@ -182,13 +183,14 @@ export const ProgramsManager = () => {
 
   const handleExport = () => {
     const csv = [
-      ['ID', 'Name', 'Category', 'Duration', 'Access'].join(','),
+      ['ID', 'Name', 'Category', 'Duration', 'Access', 'Price'].join(','),
       ...filteredPrograms.map(p => [
         p.id,
         `"${p.name}"`,
         p.category,
         p.duration || 'N/A',
-        p.is_premium ? p.tier_required || 'Premium' : 'Free'
+        p.is_premium ? 'Premium' : 'Free',
+        p.is_standalone_purchase && p.price ? `€${p.price}` : '-'
       ].join(','))
     ].join('\n');
 
@@ -314,13 +316,14 @@ export const ProgramsManager = () => {
                 <TableHead>Equipment</TableHead>
                 <TableHead>Duration</TableHead>
                 <TableHead>Access</TableHead>
+                <TableHead>Price</TableHead>
                 <TableHead className="text-right">Actions</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {filteredPrograms.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={8} className="text-center py-8 text-muted-foreground">
+                  <TableCell colSpan={9} className="text-center py-8 text-muted-foreground">
                     {programs.length === 0 ? 'No programs yet. Create your first program!' : 'No programs match your filters.'}
                   </TableCell>
                 </TableRow>
@@ -340,9 +343,16 @@ export const ProgramsManager = () => {
                     <TableCell>{program.duration || 'N/A'}</TableCell>
                     <TableCell>
                       {program.is_premium ? (
-                        <Badge variant="secondary">{program.tier_required || 'Premium'}</Badge>
+                        <Badge variant="secondary">Premium</Badge>
                       ) : (
                         <Badge variant="outline">Free</Badge>
+                      )}
+                    </TableCell>
+                    <TableCell>
+                      {program.is_standalone_purchase && program.price ? (
+                        <span className="text-sm font-semibold text-gold-600">€{Number(program.price).toFixed(2)}</span>
+                      ) : (
+                        <span className="text-sm text-muted-foreground">-</span>
                       )}
                     </TableCell>
                     <TableCell className="text-right">
