@@ -295,8 +295,8 @@ const Contact = () => {
       <div className="min-h-screen bg-background">
         <BackToTop />
         <div className="container mx-auto max-w-6xl px-4 py-8">
-          <div className="h-10 mb-6 flex items-center">
-            {canGoBack && (
+          {canGoBack && (
+            <div className="mb-6">
               <Button
                 variant="ghost"
                 size="sm"
@@ -305,11 +305,11 @@ const Contact = () => {
                 <ArrowLeft className="mr-2 h-4 w-4" />
                 Back
               </Button>
-            )}
-          </div>
+            </div>
+          )}
 
           {/* Hero Section */}
-          <PageTitleCard 
+          <PageTitleCard
             title="Contact" 
             subtitle="Have questions? Need support? Want to discuss your fitness goals?"
             icon={Mail} 

@@ -5,9 +5,11 @@ import { Card, CardContent } from "@/components/ui/card";
 import { PageTitleCard } from "@/components/PageTitleCard";
 import { ArrowLeft, Youtube, Video } from "lucide-react";
 import { BackToTop } from "@/components/BackToTop";
+import { useShowBackButton } from "@/hooks/useShowBackButton";
 
 const ExerciseLibrary = () => {
   const navigate = useNavigate();
+  const { canGoBack, goBack } = useShowBackButton();
 
   return (
     <>
@@ -31,18 +33,20 @@ const ExerciseLibrary = () => {
       <div className="min-h-screen bg-background">
         <BackToTop />
         <div className="container mx-auto max-w-6xl px-4 py-8">
-          <div className="h-10 mb-6 flex items-center">
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => navigate(-1)}
-            >
-              <ArrowLeft className="mr-2 h-4 w-4" />
-              <span className="text-xs sm:text-sm">Back</span>
-            </Button>
-          </div>
+          {canGoBack && (
+            <div className="mb-6">
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={goBack}
+              >
+                <ArrowLeft className="mr-2 h-4 w-4" />
+                <span className="text-xs sm:text-sm">Back</span>
+              </Button>
+            </div>
+          )}
           
-          <PageTitleCard 
+          <PageTitleCard
             title="Exercise Library" 
             icon={Video}
           >

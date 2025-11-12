@@ -274,8 +274,8 @@ const PersonalTraining = () => {
 
       <div className="min-h-screen bg-background py-6 sm:py-12 px-4">
         <div className="container mx-auto max-w-4xl">
-          <div className="h-10 mb-6 flex items-center">
-            {canGoBack && (
+          {canGoBack && (
+            <div className="mb-6">
               <Button
                 variant="ghost"
                 size="sm"
@@ -284,10 +284,10 @@ const PersonalTraining = () => {
                 <ArrowLeft className="mr-2 h-4 w-4" />
                 <span className="text-xs sm:text-sm">Back</span>
               </Button>
-            )}
-          </div>
+            </div>
+          )}
           
-          <PageTitleCard 
+          <PageTitleCard
             title="Personal Training" 
             icon={UserCheck}
           >

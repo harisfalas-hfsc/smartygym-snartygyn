@@ -9,10 +9,12 @@ import { ArrowLeft, Dumbbell, Flame, Zap, Heart, Move, Activity, TrendingUp } fr
 import { BackToTop } from "@/components/BackToTop";
 import { TimedPopup } from "@/components/TimedPopup";
 import { useAccessControl } from "@/hooks/useAccessControl";
+import { useShowBackButton } from "@/hooks/useShowBackButton";
 import { ScrollReveal } from "@/components/ScrollReveal";
 
 const WorkoutFlow = () => {
   const navigate = useNavigate();
+  const { canGoBack, goBack } = useShowBackButton();
   const { userTier } = useAccessControl();
   const isPremium = userTier === "premium";
 
@@ -88,16 +90,18 @@ const WorkoutFlow = () => {
       <BackToTop />
       <TimedPopup />
       <div className="container mx-auto max-w-6xl px-4 py-8">
-        <div className="h-10 mb-6 flex items-center">
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => navigate(-1)}
-          >
-            <ArrowLeft className="mr-2 h-4 w-4" />
-            <span className="text-xs sm:text-sm">Back</span>
-          </Button>
-        </div>
+        {canGoBack && (
+          <div className="mb-6">
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={goBack}
+            >
+              <ArrowLeft className="mr-2 h-4 w-4" />
+              <span className="text-xs sm:text-sm">Back</span>
+            </Button>
+          </div>
+        )}
         
         <PageTitleCard 
           title="Workouts" 

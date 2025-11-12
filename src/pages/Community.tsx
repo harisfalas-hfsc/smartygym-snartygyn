@@ -239,9 +239,8 @@ const Community = () => {
 
       <div className="min-h-screen bg-background">
         <div className="container mx-auto max-w-7xl px-4 py-8">
-          <div className="h-10 mb-6 flex items-center"></div>
           
-          <PageTitleCard 
+          <PageTitleCard
             title="Community" 
             subtitle="Connect with other members, share your progress, and celebrate your achievements together"
             icon={Users} 

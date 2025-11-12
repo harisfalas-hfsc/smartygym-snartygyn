@@ -143,8 +143,8 @@ const Blog = () => {
 
       <div className="min-h-screen bg-gradient-to-b from-background to-accent/20">
         <div className="container mx-auto max-w-6xl px-4 py-8">
-          <div className="h-10 mb-6 flex items-center">
-            {canGoBack && (
+          {canGoBack && (
+            <div className="mb-6">
               <Button
                 variant="ghost"
                 size="sm"
@@ -153,10 +153,10 @@ const Blog = () => {
                 <ArrowLeft className="mr-2 h-4 w-4" />
                 Back
               </Button>
-            )}
-          </div>
+            </div>
+          )}
 
-          <PageTitleCard 
+          <PageTitleCard
             title="Blog" 
             subtitle="Expert insights on training, nutrition, and performance"
             icon={FileText} 
