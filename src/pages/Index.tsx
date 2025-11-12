@@ -9,6 +9,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { User as SupabaseUser } from "@supabase/supabase-js";
 import { useToast } from "@/hooks/use-toast";
 import smartyGymLogo from "@/assets/smarty-gym-logo.png";
+import smartyGymIcon from "@/assets/smarty-gym-icon.png";
 import { BackToTop } from "@/components/BackToTop";
 import { useAccessControl } from "@/hooks/useAccessControl";
 import { PageTitleCard } from "@/components/PageTitleCard";
@@ -234,7 +235,7 @@ const Index = () => {
             <PageTitleCard
               title="Smarty Gym"
               subtitle="Your Gym Re-imagined. Anywhere, Anytime"
-              imageSrc={smartyGymLogo}
+              imageSrc={smartyGymIcon}
             />
             <div className="bg-primary/10 border border-primary/20 rounded-lg p-3 sm:p-4 mb-3 sm:mb-4 text-center">
               <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed">
