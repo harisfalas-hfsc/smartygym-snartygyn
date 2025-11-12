@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { PageTitleCard } from "@/components/PageTitleCard";
+import { DecorativeDivider } from "@/components/DecorativeDivider";
 import { ArrowLeft, Award, Heart, Users, Target, UserCheck, Brain, Shield, Sparkles, Ban, CheckCircle2, Compass, Info } from "lucide-react";
 import { BackToTop } from "@/components/BackToTop";
 import { useShowBackButton } from "@/hooks/useShowBackButton";
@@ -87,6 +88,8 @@ const About = () => {
           </div>
         </header>
 
+        <DecorativeDivider className="mb-12" />
+
         {/* NO AI Section - Main Differentiator */}
         <section className="mb-16">
           <Card className="border-2 border-primary bg-gradient-to-br from-primary/5 to-accent/10 overflow-hidden relative">
@@ -163,6 +166,8 @@ const About = () => {
             </Button>
           </div>
         </section>
+
+        <DecorativeDivider className="my-12" />
 
         {/* Mission Statement with Cards */}
         <section className="mb-16">
@@ -271,6 +276,8 @@ const About = () => {
             </CardContent>
           </Card>
         </section>
+
+        <DecorativeDivider className="my-12" />
 
         {/* Core Values */}
         <section className="mb-16">
