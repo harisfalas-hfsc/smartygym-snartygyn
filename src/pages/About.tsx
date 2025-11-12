@@ -118,7 +118,7 @@ const About = () => {
                 </p>
                 <div className="bg-background/80 backdrop-blur-sm p-6 rounded-lg border-2 border-primary/30 mt-6">
                   <p className="text-lg font-bold text-primary mb-2">
-                    Every program is evidence-based and personally created by <a href="/coach-profile" className="text-primary hover:underline font-medium">Haris Falas</a> in Cyprus.
+                    Every program is science-based and personally created by <a href="/coach-profile" className="text-primary hover:underline font-medium">Haris Falas</a>.
                   </p>
                   <p className="text-base text-muted-foreground">
                     Never by AI. Never by algorithms. Always by a real human expert who understands YOUR needs. <strong>Cyprus online fitness</strong> excellence since day one.
