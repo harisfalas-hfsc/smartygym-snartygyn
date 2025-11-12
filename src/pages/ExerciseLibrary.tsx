@@ -31,7 +31,7 @@ const ExerciseLibrary = () => {
       <div className="min-h-screen bg-background">
         <BackToTop />
         <div className="container mx-auto max-w-6xl px-4 py-8">
-          <div className="h-10 mb-6">
+          <div className="h-10 mb-6 flex items-center">
             <Button
               variant="ghost"
               size="sm"
@@ -44,9 +44,13 @@ const ExerciseLibrary = () => {
           
           <PageTitleCard 
             title="Exercise Library" 
-            subtitle="Navigate through all exercise demonstrations and find the perfect technique with your Smarty Coach. Welcome Inside Smarty Gym — watch professional exercise tutorials and technique guides by Haris Falas."
-            icon={Video} 
-          />
+            subtitle="Navigate through all exercise demonstrations and find the perfect technique with your Smarty Coach, Haris Falas."
+            icon={Video}
+          >
+            <p className="text-sm text-muted-foreground">
+              <a href="/coach-profile" className="text-primary hover:underline font-medium">Haris Falas</a>
+            </p>
+          </PageTitleCard>
 
           {/* YouTube Channel Card */}
           <Card className="border-2 border-primary/30 shadow-lg">
