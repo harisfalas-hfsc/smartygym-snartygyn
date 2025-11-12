@@ -238,10 +238,11 @@ const Community = () => {
 
       <div className="min-h-screen bg-background">
         <div className="container mx-auto max-w-7xl px-4 py-8">
-          <PageTitleCard title="Community" icon={Users} />
-          <p className="text-center text-muted-foreground mb-6">
-            Join our community of fitness enthusiasts
-          </p>
+          <PageTitleCard 
+            title="Community" 
+            subtitle="Join our community of fitness enthusiasts"
+            icon={Users} 
+          />
 
           <DecorativeDivider className="mb-12" />
 

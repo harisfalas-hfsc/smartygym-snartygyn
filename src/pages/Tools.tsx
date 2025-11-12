@@ -71,10 +71,11 @@ const Tools = () => {
           </Button>
           )}
 
-        <PageTitleCard title="Smart Tools" icon={Wrench} />
-        <p className="text-center text-muted-foreground mb-4 text-sm sm:text-base px-2">
-          Free fitness calculators to support your training
-        </p>
+        <PageTitleCard 
+          title="Smart Tools" 
+          subtitle="Free fitness calculators to support your training"
+          icon={Wrench} 
+        />
         
         {/* Info Ribbon */}
         <div className="bg-primary/10 border border-primary/20 rounded-lg p-3 sm:p-4 mb-6 sm:mb-8 text-center">

@@ -307,11 +307,12 @@ const Contact = () => {
           )}
 
           {/* Hero Section */}
-          <PageTitleCard title="Contact" icon={Mail} />
+          <PageTitleCard 
+            title="Contact" 
+            subtitle="Have questions? Need support? Want to discuss your fitness goals?"
+            icon={Mail} 
+          />
           <header className="text-center mb-8">
-            <p className="text-center text-muted-foreground mb-4">
-              Have questions? Need support? Want to discuss your fitness goals?
-            </p>
             
             {/* Info Ribbon */}
             <div className="bg-primary/10 border border-primary/20 rounded-lg p-4 mb-8 text-center max-w-3xl mx-auto">
