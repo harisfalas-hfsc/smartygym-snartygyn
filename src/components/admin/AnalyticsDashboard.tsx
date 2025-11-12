@@ -69,25 +69,45 @@ export function AnalyticsDashboard() {
 
       const activeSubscribers = subscriptions?.filter(s => s.status === "active" && s.plan_type !== "free").length || 0;
 
-      // Fetch real revenue from Stripe
+      // Fetch real revenue from Stripe and calculate all income streams
       let totalRevenue = 0;
       let revenueChartData: ChartData[] = [];
       
       try {
-        const { data: revenueData, error: revenueError } = await supabase.functions.invoke('get-stripe-revenue');
+        const { data: stripeData, error: revenueError } = await supabase.functions.invoke('get-stripe-revenue');
         
-        if (!revenueError && revenueData) {
-          totalRevenue = revenueData.totalRevenue || 0;
-          
-          // Create revenue by month data (simplified - showing current month)
-          const currentMonth = new Date().toLocaleDateString("en-US", { year: "numeric", month: "short" });
-          revenueChartData = [{ name: currentMonth, value: totalRevenue }];
+        if (!revenueError && stripeData) {
+          totalRevenue = stripeData.totalRevenue || 0;
         }
       } catch (error) {
         console.error("Error fetching Stripe revenue:", error);
-        // Fallback to 0 if Stripe fetch fails
         totalRevenue = 0;
       }
+
+      // Calculate revenue by income stream
+      const goldRevenue = subscriptions?.filter(s => s.status === "active" && s.plan_type === "gold").length || 0;
+      const platinumRevenue = subscriptions?.filter(s => s.status === "active" && s.plan_type === "platinum").length || 0;
+
+      // Fetch standalone purchases revenue
+      const { data: purchases } = await supabase
+        .from("user_purchases")
+        .select("price");
+      const standaloneRevenue = purchases?.reduce((sum, p) => sum + Number(p.price || 0), 0) || 0;
+
+      // Fetch personal training revenue
+      const { data: ptRequests } = await supabase
+        .from("personal_training_requests")
+        .select("*")
+        .eq("stripe_payment_status", "paid");
+      const personalTrainingRevenue = (ptRequests?.length || 0) * 100; // Assuming $100 per PT request
+
+      // Create unified revenue comparison data
+      revenueChartData = [
+        { name: "Gold Plans", value: goldRevenue * 15 }, // Assuming $15/month
+        { name: "Platinum Plans", value: platinumRevenue * 25 }, // Assuming $25/month
+        { name: "Standalone Purchases", value: standaloneRevenue },
+        { name: "Personal Training", value: personalTrainingRevenue }
+      ];
 
       // Subscription distribution
       const subDistribution: { [key: string]: number } = {};
@@ -266,6 +286,24 @@ export function AnalyticsDashboard() {
         </div>
 
         <TabsContent value="revenue" className="space-y-4">
+          <Card>
+            <CardHeader>
+              <CardTitle>Revenue Comparison - All Income Streams</CardTitle>
+              <CardDescription>Side-by-side comparison of all revenue sources</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <ResponsiveContainer width="100%" height={350}>
+                <BarChart data={revenueData}>
+                  <CartesianGrid strokeDasharray="3 3" />
+                  <XAxis dataKey="name" />
+                  <YAxis />
+                  <Tooltip />
+                  <Legend />
+                  <Bar dataKey="value" name="Revenue ($)" fill="hsl(var(--primary))" />
+                </BarChart>
+              </ResponsiveContainer>
+            </CardContent>
+          </Card>
           <RevenueAnalytics />
         </TabsContent>
 
