@@ -6,6 +6,7 @@ import { LineChart, Line, BarChart, Bar, PieChart, Pie, Cell, XAxis, YAxis, Cart
 import { Users, DollarSign, TrendingUp, Star, Activity } from "lucide-react";
 import { toast } from "sonner";
 import { RevenueAnalytics } from "./RevenueAnalytics";
+import { PurchaseAnalytics } from "./PurchaseAnalytics";
 
 interface AnalyticsData {
   totalUsers: number;
@@ -253,8 +254,9 @@ export function AnalyticsDashboard() {
       {/* Charts */}
       <Tabs defaultValue="revenue" className="space-y-4">
         <div className="w-full overflow-x-auto">
-          <TabsList className="w-full inline-flex sm:grid sm:grid-cols-4 min-w-max sm:min-w-0">
-            <TabsTrigger value="revenue" className="flex-shrink-0 whitespace-nowrap">Revenue</TabsTrigger>
+          <TabsList className="w-full inline-flex sm:grid sm:grid-cols-5 min-w-max sm:min-w-0">
+            <TabsTrigger value="revenue" className="flex-shrink-0 whitespace-nowrap">Subscriptions</TabsTrigger>
+            <TabsTrigger value="purchases" className="flex-shrink-0 whitespace-nowrap">Purchases</TabsTrigger>
             <TabsTrigger value="growth" className="flex-shrink-0 whitespace-nowrap">User Growth</TabsTrigger>
             <TabsTrigger value="completion" className="flex-shrink-0 whitespace-nowrap">Completion Rates</TabsTrigger>
             <TabsTrigger value="popular" className="flex-shrink-0 whitespace-nowrap">Popular Content</TabsTrigger>
@@ -263,6 +265,10 @@ export function AnalyticsDashboard() {
 
         <TabsContent value="revenue" className="space-y-4">
           <RevenueAnalytics />
+        </TabsContent>
+
+        <TabsContent value="purchases" className="space-y-4">
+          <PurchaseAnalytics />
         </TabsContent>
 
         <TabsContent value="growth" className="space-y-4">
