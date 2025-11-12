@@ -74,11 +74,12 @@ const About = () => {
         )}
 
         {/* Hero Section */}
-        <PageTitleCard title="About" icon={Info} />
+        <PageTitleCard 
+          title="About" 
+          subtitle="Fitness Without the Chains | smartygym.com"
+          icon={Info} 
+        />
         <header className="text-center mb-6 sm:mb-8">
-          <p className="text-center text-muted-foreground mb-4 text-sm sm:text-base px-2">
-            Fitness Without the Chains | smartygym.com
-          </p>
           
           {/* Info Ribbon */}
           <div className="bg-primary/10 border border-primary/20 rounded-lg p-3 sm:p-4 mb-6 sm:mb-8 text-center max-w-3xl mx-auto">

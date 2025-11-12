@@ -101,13 +101,13 @@ const WorkoutFlow = () => {
           subtitle="Purchase individual workouts or unlock unlimited access with a premium plan"
           icon={Dumbbell}
         />
-        <p className="text-center text-muted-foreground mb-4 max-w-3xl mx-auto text-sm sm:text-base px-2">
-          Choose your goal and start your fitness journey today. All SmartyGym workouts designed by Sports Scientist <a href="/coach-profile" className="text-primary hover:underline font-medium">Haris Falas</a> for convenient online fitness training anywhere, anytime.
-        </p>
         
         {/* Info Ribbon */}
         {!isPremium && (
           <div className="bg-primary/10 border border-primary/20 rounded-lg p-3 sm:p-4 mb-6 sm:mb-8 text-center">
+            <p className="text-xs sm:text-sm text-muted-foreground mb-2">
+              Choose your goal and start your fitness journey today. All SmartyGym workouts designed by Sports Scientist <a href="/coach-profile" className="text-primary hover:underline font-medium">Haris Falas</a> for convenient online fitness training anywhere, anytime.
+            </p>
             <p className="text-xs sm:text-sm text-muted-foreground mb-2">
               SMARTY GYM workouts are standalone sessions designed to target specific fitness goals—whether you want to build strength, torch calories, boost your metabolism, get a quick sweat, or simply keep your body moving. Each workout is crafted to fit your schedule and deliver results, no matter where you train.
             </p>
