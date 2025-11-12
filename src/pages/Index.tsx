@@ -11,7 +11,6 @@ import { useToast } from "@/hooks/use-toast";
 import smartyGymLogo from "@/assets/smarty-gym-logo.png";
 import { BackToTop } from "@/components/BackToTop";
 import { useAccessControl } from "@/hooks/useAccessControl";
-import { FeaturedStandalonePurchases } from "@/components/FeaturedStandalonePurchases";
 
 const Index = () => {
   const navigate = useNavigate();
@@ -268,15 +267,8 @@ const Index = () => {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 mb-8">
             {services.map(service => <ServiceCard key={service.id} icon={service.icon} title={service.title} description={service.description} onClick={() => handleServiceSelect(service.id)} />)}
           </div>
-        </div>
-      </main>
 
-      {/* Featured Standalone Purchases */}
-      <FeaturedStandalonePurchases />
-
-      {/* CTA Section */}
-      <section className="py-8 px-4">
-        <div className="container mx-auto max-w-6xl">
+          {/* CTA Section */}
           <div className="bg-card border border-border rounded-xl p-4 sm:p-6 md:p-8 shadow-soft text-center">
             <h3 className="text-lg sm:text-2xl font-bold mb-2 sm:mb-4 leading-tight">
               Ready to Start Your Fitness Journey?
@@ -310,7 +302,7 @@ const Index = () => {
             </div>
           </div>
         </div>
-      </section>
+      </main>
 
     </div>
     </>
