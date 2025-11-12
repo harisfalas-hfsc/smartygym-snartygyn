@@ -349,7 +349,7 @@ export const AdvertiseTemplatesManager = () => {
           <div className="bg-primary/10 border border-primary/30 rounded-lg p-4 space-y-2">
             <p className="text-sm font-medium text-primary">✓ 100% Brand Aligned</p>
             <p className="text-xs text-muted-foreground">
-              All ads use your actual Smarty Gym logo, exact tagline "Your gym reimagined. Anywhere, anytime.", 
+              All ads use your actual Smarty Gym logo, exact tagline "Your Gym Re-imagined. Anywhere, Anytime", 
               real workout images from your library, and gold brand colors. No random generic content.
             </p>
           </div>

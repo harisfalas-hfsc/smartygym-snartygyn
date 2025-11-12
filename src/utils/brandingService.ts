@@ -11,7 +11,7 @@ import muscleHypertrophyImg from "@/assets/muscle-hypertrophy-program.jpg";
 // Smarty Gym Brand Identity
 export const BRAND_IDENTITY = {
   name: "Smarty Gym",
-  tagline: "Your gym reimagined. Anywhere, anytime.",
+  tagline: "Your Gym Re-imagined. Anywhere, Anytime",
   logo: "/smarty-gym-logo.png",
   
   colors: {
