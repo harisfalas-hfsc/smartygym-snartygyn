@@ -20,6 +20,7 @@ import { ContactManager } from "@/components/admin/ContactManager";
 import { AutomatedMessagesManager } from "@/components/admin/AutomatedMessagesManager";
 import { AutomatedSchedulingManager } from "@/components/admin/AutomatedSchedulingManager";
 import { MassNotificationManager } from "@/components/admin/MassNotificationManager";
+import { SettingsManager } from "@/components/admin/SettingsManager";
 import { supabase } from "@/integrations/supabase/client";
 
 export default function AdminBackoffice() {
@@ -257,15 +258,7 @@ export default function AdminBackoffice() {
           </TabsContent>
 
           <TabsContent value="settings" className="mt-6">
-            <Card>
-              <CardHeader>
-                <CardTitle>Settings</CardTitle>
-                <CardDescription>Configure your backoffice preferences</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <p className="text-muted-foreground">Settings panel coming soon...</p>
-              </CardContent>
-            </Card>
+            <SettingsManager />
           </TabsContent>
         </Tabs>
       </div>
