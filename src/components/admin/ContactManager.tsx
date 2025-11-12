@@ -544,7 +544,18 @@ export const ContactManager = () => {
                 </div>
                 <div>
                   <p className="text-sm font-semibold">Email</p>
-                  <p className="text-sm">{selectedMessage.email}</p>
+                  <a 
+                    href={`mailto:${selectedMessage.email}?subject=Re: ${encodeURIComponent(selectedMessage.subject)}`}
+                    className="text-sm text-primary hover:underline cursor-pointer flex items-center gap-1"
+                  >
+                    <Mail className="h-3 w-3" />
+                    {selectedMessage.email}
+                  </a>
+                  {!selectedMessage.user_id && (
+                    <p className="text-xs text-muted-foreground mt-1">
+                      This is a visitor message - click email to respond directly
+                    </p>
+                  )}
                 </div>
                 <div>
                   <p className="text-sm font-semibold">Category</p>
