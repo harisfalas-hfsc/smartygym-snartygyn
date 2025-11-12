@@ -4,7 +4,7 @@ import { Helmet } from "react-helmet";
 import { ServiceCard } from "@/components/ServiceCard";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { Dumbbell, Calendar, BookOpen, Calculator, Activity, Flame, Instagram, Facebook, Youtube } from "lucide-react";
+import { Dumbbell, Calendar, BookOpen, Calculator, Activity, Flame, Instagram, Facebook, Youtube, UserCheck, Wrench, Video, FileText, Target } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { User as SupabaseUser } from "@supabase/supabase-js";
 import { useToast } from "@/hooks/use-toast";
@@ -234,11 +234,31 @@ const Index = () => {
         <section className="relative py-8 sm:py-12 px-4 border-b border-border bg-gradient-to-br from-background to-muted/30 overflow-hidden">
           <div className="absolute inset-0 bg-gradient-to-b from-primary/5 via-transparent to-transparent" />
           <div className="container mx-auto max-w-4xl space-y-3 sm:space-y-4 relative z-10">
-            <PageTitleCard
-              title="Smarty Gym"
-              subtitle="Your Gym Re-imagined. Anywhere, Anytime"
-              imageSrc={smartyGymIcon}
-            />
+            <Card className="border-2 border-primary bg-gradient-to-r from-primary/5 to-primary/10 mb-6 sm:mb-8">
+              <div className="p-4 sm:p-6 text-center relative">
+                {/* Left Side Icons */}
+                <div className="absolute left-2 sm:left-4 top-1/2 -translate-y-1/2 flex flex-col gap-3 sm:gap-4">
+                  <Dumbbell className="w-5 h-5 sm:w-6 sm:h-6 text-primary" />
+                  <Target className="w-5 h-5 sm:w-6 sm:h-6 text-primary" />
+                  <UserCheck className="w-5 h-5 sm:w-6 sm:h-6 text-primary" />
+                </div>
+                
+                {/* Right Side Icons */}
+                <div className="absolute right-2 sm:right-4 top-1/2 -translate-y-1/2 flex flex-col gap-3 sm:gap-4">
+                  <Wrench className="w-5 h-5 sm:w-6 sm:h-6 text-primary" />
+                  <Video className="w-5 h-5 sm:w-6 sm:h-6 text-primary" />
+                  <FileText className="w-5 h-5 sm:w-6 sm:h-6 text-primary" />
+                </div>
+                
+                {/* Title and Subtitle */}
+                <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-foreground px-8 sm:px-12">
+                  Smarty Gym
+                </h1>
+                <p className="text-sm sm:text-base text-muted-foreground mt-2 px-8 sm:px-12">
+                  Your Gym Re-imagined. Anywhere, Anytime
+                </p>
+              </div>
+            </Card>
             <div className="bg-primary/10 border border-primary/20 rounded-lg p-3 sm:p-4 mb-3 sm:mb-4 text-center">
               <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed">
             Expert online workouts, online training programs, and online personal training designed by <a href="/coach-profile" className="text-primary hover:underline font-medium"><strong>Haris Falas</strong></a> - Cyprus Sports Scientist & Personal Trainer with 20+ years experience in fitness and strength conditioning. 
