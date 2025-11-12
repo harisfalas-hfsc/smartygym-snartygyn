@@ -329,6 +329,13 @@ const Index = () => {
                 <p className="text-xs sm:text-sm text-muted-foreground mt-1 px-8 sm:px-12">
                   Your Gym Re-imagined. Anywhere, Anytime
                 </p>
+                
+                {/* Decorative Divider */}
+                <div className="flex items-center justify-center gap-2 mt-3 px-8 sm:px-12">
+                  <div className="h-px flex-1 bg-gradient-to-r from-transparent via-primary/50 to-primary/20"></div>
+                  <div className="w-2 h-2 rounded-full bg-primary/60 shadow-[0_0_8px_rgba(var(--primary),0.4)]"></div>
+                  <div className="h-px flex-1 bg-gradient-to-l from-transparent via-primary/50 to-primary/20"></div>
+                </div>
               </div>
             </Card>
             <div className="bg-primary/10 border border-primary/20 rounded-lg p-3 sm:p-4 mb-3 sm:mb-4 text-center">
