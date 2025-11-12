@@ -1194,6 +1194,35 @@ export default function UserDashboard() {
 
           {/* My Purchases Tab */}
           <TabsContent value="purchases" className="space-y-6">
+            {/* Premium Member Special Message */}
+            {hasActivePlan && (
+              <Card className="border-primary bg-gradient-to-br from-primary/10 via-primary/5 to-background overflow-hidden">
+                <CardContent className="text-center py-12 px-6 relative">
+                  <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-primary to-transparent"></div>
+                  <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-primary/10 mb-4">
+                    <Crown className="h-10 w-10 text-primary animate-pulse" />
+                  </div>
+                  <h3 className="text-3xl font-bold mb-3 bg-gradient-to-r from-primary via-primary/80 to-primary bg-clip-text text-transparent">
+                    🎉 Congratulations! 🎉
+                  </h3>
+                  <p className="text-xl font-semibold mb-2 text-foreground">
+                    You're a {getPlanName(subscriptionInfo?.product_id)} Member!
+                  </p>
+                  <p className="text-lg text-muted-foreground mb-4">
+                    No need to purchase anything — everything is unlocked for you!
+                  </p>
+                  <div className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-primary/5 border border-primary/20">
+                    <CheckCircle className="h-5 w-5 text-primary" />
+                    <span className="font-medium text-primary">Full Access to All Content</span>
+                  </div>
+                  <p className="text-sm text-muted-foreground mt-6 max-w-2xl mx-auto">
+                    As a premium member, you have unlimited access to all workouts, training programs, and exclusive features. 
+                    Enjoy your complete fitness experience!
+                  </p>
+                </CardContent>
+              </Card>
+            )}
+
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
@@ -1206,15 +1235,22 @@ export default function UserDashboard() {
                   <p className="text-center text-muted-foreground py-8">Loading purchases...</p>
                 ) : purchases.length === 0 ? (
                   <div className="text-center py-8 space-y-4">
-                    <p className="text-muted-foreground">You haven't purchased any individual content yet</p>
-                    <div className="flex flex-col sm:flex-row gap-3 justify-center">
-                      <Button onClick={() => navigate("/workout/strength")}>
-                        Browse Workouts
-                      </Button>
-                      <Button variant="outline" onClick={() => navigate("/trainingprogram/functional-strength")}>
-                        Browse Programs
-                      </Button>
-                    </div>
+                    {!hasActivePlan && (
+                      <>
+                        <p className="text-muted-foreground">You haven't purchased any individual content yet</p>
+                        <div className="flex flex-col sm:flex-row gap-3 justify-center">
+                          <Button onClick={() => navigate("/workout/strength")}>
+                            Browse Workouts
+                          </Button>
+                          <Button variant="outline" onClick={() => navigate("/trainingprogram/functional-strength")}>
+                            Browse Programs
+                          </Button>
+                        </div>
+                      </>
+                    )}
+                    {hasActivePlan && (
+                      <p className="text-muted-foreground">No individual purchases — but you have full access to everything as a premium member!</p>
+                    )}
                   </div>
                 ) : (
                   <div className="space-y-4">
