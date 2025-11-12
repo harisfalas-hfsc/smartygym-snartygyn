@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { PageTitleCard } from "@/components/PageTitleCard";
+import { DecorativeDivider } from "@/components/DecorativeDivider";
 import { ArrowLeft, Mail, MessageSquare, Send, MapPin, Phone, Lock } from "lucide-react";
 import { BackToTop } from "@/components/BackToTop";
 import { useToast } from "@/hooks/use-toast";
@@ -319,6 +320,8 @@ const Contact = () => {
               </p>
             </div>
           </header>
+
+          <DecorativeDivider className="mb-12" />
 
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
             {/* Contact Form */}
