@@ -340,7 +340,7 @@ const TrainingProgramDetail = () => {
   
   // Filter programs by category from URL and user filters
   const filteredPrograms = allPrograms.filter(program => {
-    // Match category
+    // Match category - correctly filtering by category field
     if (!program.category?.toUpperCase().includes(mappedCategory)) return false;
     
     // Equipment filter
