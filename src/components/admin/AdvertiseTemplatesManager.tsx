@@ -185,19 +185,20 @@ export const AdvertiseTemplatesManager = () => {
 
   const buildBackgroundPrompt = (style: string, customPrompt: string): string => {
     const styleDescriptions: Record<string, string> = {
-      fitness_action: "dynamic fitness scene with athletic person exercising, high energy, professional gym setting",
-      motivating_couple: "inspiring couple working out together, supportive atmosphere, modern gym environment",
-      bright_clean: "bright, clean, professional fitness setting with minimal elements, high-key lighting, airy feel",
-      empty_minimal: "simple, minimal background with subtle fitness theme, clean and professional",
-      graphical_abstract: "modern abstract fitness graphics, dynamic shapes, energetic design elements",
-      gym_equipment: "professional gym equipment showcase, modern fitness gear, clean and organized",
-      outdoor_fitness: "outdoor fitness setting, natural environment, energetic outdoor workout scene",
+      fitness_action: "Ultra high resolution professional photograph of athletic people actively exercising in a modern gym. Dynamic poses showing strength and energy. Clean, uncluttered composition. Natural lighting.",
+      motivating_couple: "Ultra high resolution professional photograph of an inspiring athletic couple training together with fitness equipment in a bright, modern gym. Energetic and motivating atmosphere. Natural poses showing teamwork and determination.",
+      bright_clean: "Ultra high resolution professional photograph of a pristine, bright fitness environment with abundant natural lighting streaming through large windows. Minimal equipment visible. Clean white and light tones creating an airy, spacious, uplifting feeling.",
+      empty_minimal: "Ultra high resolution solid gradient background with soft, professional fitness-themed colors. Subtle texture, clean and minimal aesthetic perfect for text overlay.",
+      graphical_abstract: "Ultra high resolution modern abstract fitness-themed graphic design with dynamic geometric shapes, energetic flowing lines, and bold colors. Professional and eye-catching composition.",
+      gym_equipment: "Ultra high resolution professional photograph showcasing premium gym equipment in dramatic, professional lighting. Sleek, modern fitness equipment as the focal point. Clean, organized setting.",
+      outdoor_fitness: "Ultra high resolution professional photograph of athletes training outdoors in a beautiful natural environment. Stunning natural lighting, dynamic movement, vibrant outdoor setting.",
     };
 
     const baseStyle = styleDescriptions[style] || styleDescriptions.bright_clean;
     
+    // Add custom requirements if provided
     if (customPrompt.trim()) {
-      return `${baseStyle}. Additional requirements: ${customPrompt}`;
+      return `${baseStyle}. Additional specific requirements: ${customPrompt}`;
     }
     
     return baseStyle;

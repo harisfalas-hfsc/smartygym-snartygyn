@@ -74,8 +74,8 @@ export class AdComposer {
     
     this.ctx.drawImage(image, x, y, scaledWidth, scaledHeight);
     
-    // Add dark overlay for text readability
-    this.ctx.fillStyle = "rgba(0, 0, 0, 0.4)";
+    // Add moderate overlay for text readability without making it too dark
+    this.ctx.fillStyle = "rgba(0, 0, 0, 0.35)";
     this.ctx.fillRect(0, 0, dimensions.width, dimensions.height);
   }
 
@@ -95,7 +95,7 @@ export class AdComposer {
   }
 
   private drawGoldBorder(dimensions: Dimensions): void {
-    const borderWidth = Math.max(8, dimensions.width * 0.008);
+    const borderWidth = Math.max(12, dimensions.width * 0.012); // Thicker, more visible border
     this.ctx.strokeStyle = "#D4AF37"; // Gold
     this.ctx.lineWidth = borderWidth;
     this.ctx.strokeRect(
@@ -111,15 +111,23 @@ export class AdComposer {
       // Use window.location.origin to ensure proper URL resolution
       const logoUrl = `${window.location.origin}${BRAND_IDENTITY.logo}`;
       const logo = await this.loadImage(logoUrl);
-      const logoSize = dimensions.width * 0.15;
-      const x = dimensions.width - logoSize - 40;
-      const y = 40;
+      const logoSize = dimensions.width * 0.12; // Slightly smaller for better positioning
+      const padding = Math.max(30, dimensions.width * 0.025); // Consistent padding from border
+      const x = dimensions.width - logoSize - padding;
+      const y = padding;
       
-      // Draw logo with slight shadow
-      this.ctx.shadowColor = "rgba(0, 0, 0, 0.5)";
-      this.ctx.shadowBlur = 10;
+      // Draw logo with strong shadow for visibility
+      this.ctx.shadowColor = "rgba(0, 0, 0, 0.7)";
+      this.ctx.shadowBlur = 15;
+      this.ctx.shadowOffsetX = 2;
+      this.ctx.shadowOffsetY = 2;
       this.ctx.drawImage(logo, x, y, logoSize, logoSize);
+      
+      // Reset shadow
+      this.ctx.shadowColor = "transparent";
       this.ctx.shadowBlur = 0;
+      this.ctx.shadowOffsetX = 0;
+      this.ctx.shadowOffsetY = 0;
     } catch (error) {
       console.error("Failed to load logo:", error);
       // Continue without logo if it fails to load
@@ -150,25 +158,39 @@ export class AdComposer {
     details: string,
     dimensions: Dimensions
   ): void {
-    // Brand name at top
-    this.ctx.font = `bold ${dimensions.width * 0.05}px ${BRAND_IDENTITY.fonts.heading}`;
-    this.ctx.fillStyle = "#D4AF37"; // Gold
-    this.ctx.fillText(BRAND_IDENTITY.name.toUpperCase(), centerX, centerY - 200);
+    const padding = Math.max(30, dimensions.width * 0.025);
     
-    // Main headline
-    this.ctx.font = `bold ${dimensions.width * 0.06}px ${BRAND_IDENTITY.fonts.heading}`;
+    // Add text shadow for all text elements
+    this.ctx.shadowColor = "rgba(0, 0, 0, 0.8)";
+    this.ctx.shadowBlur = 8;
+    this.ctx.shadowOffsetX = 2;
+    this.ctx.shadowOffsetY = 2;
+    
+    // Brand name at top
+    this.ctx.font = `bold ${dimensions.width * 0.055}px ${BRAND_IDENTITY.fonts.heading}`;
+    this.ctx.fillStyle = "#D4AF37"; // Gold
+    this.ctx.fillText(BRAND_IDENTITY.name.toUpperCase(), centerX, centerY - 180);
+    
+    // Main headline - clean and prominent
+    this.ctx.font = `bold ${dimensions.width * 0.068}px ${BRAND_IDENTITY.fonts.heading}`;
     this.ctx.fillStyle = "#FFFFFF";
-    this.drawMultilineText(details.toUpperCase(), centerX, centerY - 80, dimensions.width * 0.9, 80);
+    this.drawMultilineText(details.toUpperCase(), centerX, centerY - 40, dimensions.width * 0.85, 90);
     
     // Purpose/category
-    this.ctx.font = `${dimensions.width * 0.035}px ${BRAND_IDENTITY.fonts.body}`;
+    this.ctx.font = `${dimensions.width * 0.04}px ${BRAND_IDENTITY.fonts.body}`;
     this.ctx.fillStyle = "#D4AF37";
-    this.ctx.fillText(this.getPurposeLabel(purpose), centerX, centerY + 80);
+    this.ctx.fillText(this.getPurposeLabel(purpose), centerX, centerY + 100);
     
-    // Tagline at bottom (moved up to make room for website)
-    this.ctx.font = `italic ${dimensions.width * 0.03}px ${BRAND_IDENTITY.fonts.body}`;
+    // Tagline - only once, positioned above website
+    this.ctx.font = `italic ${dimensions.width * 0.032}px ${BRAND_IDENTITY.fonts.body}`;
     this.ctx.fillStyle = "#FFFFFF";
-    this.ctx.fillText(BRAND_IDENTITY.tagline, centerX, dimensions.height - 120);
+    this.ctx.fillText(BRAND_IDENTITY.tagline, centerX, dimensions.height - 110);
+    
+    // Reset shadow
+    this.ctx.shadowColor = "transparent";
+    this.ctx.shadowBlur = 0;
+    this.ctx.shadowOffsetX = 0;
+    this.ctx.shadowOffsetY = 0;
   }
 
   private drawTikTokContent(
@@ -177,39 +199,66 @@ export class AdComposer {
     purpose: string,
     details: string
   ): void {
+    const padding = Math.max(30, dimensions.width * 0.025);
+    
+    // Add text shadow for all text elements
+    this.ctx.shadowColor = "rgba(0, 0, 0, 0.8)";
+    this.ctx.shadowBlur = 8;
+    this.ctx.shadowOffsetX = 2;
+    this.ctx.shadowOffsetY = 2;
+    
     // Brand name at top third
-    const topY = dimensions.height * 0.3;
-    this.ctx.font = `bold ${dimensions.width * 0.06}px ${BRAND_IDENTITY.fonts.heading}`;
+    const topY = dimensions.height * 0.28;
+    this.ctx.font = `bold ${dimensions.width * 0.065}px ${BRAND_IDENTITY.fonts.heading}`;
     this.ctx.fillStyle = "#D4AF37";
     this.ctx.fillText(BRAND_IDENTITY.name.toUpperCase(), centerX, topY);
     
-    // Main headline in middle
-    const middleY = dimensions.height * 0.5;
-    this.ctx.font = `bold ${dimensions.width * 0.065}px ${BRAND_IDENTITY.fonts.heading}`;
+    // Main headline in middle - clean and prominent
+    const middleY = dimensions.height * 0.48;
+    this.ctx.font = `bold ${dimensions.width * 0.072}px ${BRAND_IDENTITY.fonts.heading}`;
     this.ctx.fillStyle = "#FFFFFF";
-    this.drawMultilineText(details.toUpperCase(), centerX, middleY, dimensions.width * 0.9, 90);
+    this.drawMultilineText(details.toUpperCase(), centerX, middleY, dimensions.width * 0.85, 95);
     
     // Purpose with emoji
-    const bottomY = dimensions.height * 0.7;
-    this.ctx.font = `${dimensions.width * 0.04}px ${BRAND_IDENTITY.fonts.body}`;
+    const bottomY = dimensions.height * 0.68;
+    this.ctx.font = `${dimensions.width * 0.045}px ${BRAND_IDENTITY.fonts.body}`;
     this.ctx.fillStyle = "#D4AF37";
     this.ctx.fillText(`🔥 ${this.getPurposeLabel(purpose)} 🔥`, centerX, bottomY);
     
-    // Tagline at bottom (moved up to make room for website)
-    this.ctx.font = `italic ${dimensions.width * 0.035}px ${BRAND_IDENTITY.fonts.body}`;
+    // Tagline - only once, positioned above website
+    this.ctx.font = `italic ${dimensions.width * 0.038}px ${BRAND_IDENTITY.fonts.body}`;
     this.ctx.fillStyle = "#FFFFFF";
-    this.ctx.fillText(BRAND_IDENTITY.tagline, centerX, dimensions.height - 140);
+    this.ctx.fillText(BRAND_IDENTITY.tagline, centerX, dimensions.height - 130);
+    
+    // Reset shadow
+    this.ctx.shadowColor = "transparent";
+    this.ctx.shadowBlur = 0;
+    this.ctx.shadowOffsetX = 0;
+    this.ctx.shadowOffsetY = 0;
   }
 
   private drawWebsite(dimensions: Dimensions): void {
     const centerX = dimensions.width / 2;
-    const bottomY = dimensions.height - 50;
+    const padding = Math.max(30, dimensions.width * 0.025);
+    const bottomY = dimensions.height - padding - 15;
+    
+    // Add text shadow
+    this.ctx.shadowColor = "rgba(0, 0, 0, 0.8)";
+    this.ctx.shadowBlur = 8;
+    this.ctx.shadowOffsetX = 2;
+    this.ctx.shadowOffsetY = 2;
     
     this.ctx.textAlign = "center";
     this.ctx.textBaseline = "middle";
-    this.ctx.font = `bold ${dimensions.width * 0.035}px ${BRAND_IDENTITY.fonts.heading}`;
+    this.ctx.font = `bold ${dimensions.width * 0.04}px ${BRAND_IDENTITY.fonts.heading}`;
     this.ctx.fillStyle = "#D4AF37"; // Gold
     this.ctx.fillText("smartygym.com", centerX, bottomY);
+    
+    // Reset shadow
+    this.ctx.shadowColor = "transparent";
+    this.ctx.shadowBlur = 0;
+    this.ctx.shadowOffsetX = 0;
+    this.ctx.shadowOffsetY = 0;
   }
 
   private drawMultilineText(

@@ -19,7 +19,19 @@ serve(async (req: Request) => {
       throw new Error("LOVABLE_API_KEY is not configured");
     }
 
-    console.log("Generating ad image with prompt:", prompt);
+    // CRITICAL: Add strict instructions to prevent text in background
+    const cleanPrompt = `${prompt}
+
+CRITICAL REQUIREMENTS - YOU MUST FOLLOW THESE EXACTLY:
+- Generate ONLY the background fitness scene/environment
+- ABSOLUTELY NO TEXT of any kind (no words, no letters, no numbers, no branding)
+- ABSOLUTELY NO logos, icons, or symbols
+- ABSOLUTELY NO borders or frames
+- Just a clean, professional fitness photograph/scene
+- The image will have text and branding added later by a different system
+- Think of this as providing ONLY the background layer for a professional advertisement`;
+
+    console.log("Generating clean background with prompt:", cleanPrompt);
 
     const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
@@ -32,7 +44,7 @@ serve(async (req: Request) => {
         messages: [
           {
             role: "user",
-            content: prompt,
+            content: cleanPrompt,
           },
         ],
         modalities: ["image", "text"],
