@@ -101,6 +101,32 @@ export const ProgramsManager = () => {
     if (!confirm('Are you sure you want to delete this program?')) return;
 
     try {
+      // Get program details to find Stripe product ID
+      const { data: program, error: fetchError } = await supabase
+        .from('admin_training_programs')
+        .select('stripe_product_id')
+        .eq('id', id)
+        .single();
+
+      if (fetchError) throw fetchError;
+
+      // Delete from Stripe first if product exists
+      if (program?.stripe_product_id) {
+        const { error: stripeError } = await supabase.functions.invoke('delete-stripe-product', {
+          body: { productId: program.stripe_product_id }
+        });
+
+        if (stripeError) {
+          console.error('Error deleting from Stripe:', stripeError);
+          toast({
+            title: "Warning",
+            description: "Failed to delete from Stripe, but continuing with database deletion",
+            variant: "default",
+          });
+        }
+      }
+
+      // Delete from database
       const { error } = await supabase
         .from('admin_training_programs')
         .delete()
@@ -110,7 +136,7 @@ export const ProgramsManager = () => {
 
       toast({
         title: "Success",
-        description: "Program deleted successfully",
+        description: "Program deleted successfully from database and Stripe",
       });
       loadPrograms();
     } catch (error) {
@@ -158,6 +184,24 @@ export const ProgramsManager = () => {
     if (!confirm(`Delete ${selectedPrograms.length} selected programs?`)) return;
 
     try {
+      // Get all programs to find Stripe product IDs
+      const { data: programsToDelete, error: fetchError } = await supabase
+        .from('admin_training_programs')
+        .select('id, stripe_product_id')
+        .in('id', selectedPrograms);
+
+      if (fetchError) throw fetchError;
+
+      // Delete from Stripe for each program that has a product
+      for (const program of programsToDelete || []) {
+        if (program.stripe_product_id) {
+          await supabase.functions.invoke('delete-stripe-product', {
+            body: { productId: program.stripe_product_id }
+          });
+        }
+      }
+
+      // Delete from database
       const { error } = await supabase
         .from('admin_training_programs')
         .delete()
@@ -167,7 +211,7 @@ export const ProgramsManager = () => {
 
       toast({
         title: "Success",
-        description: `Deleted ${selectedPrograms.length} programs`,
+        description: `Deleted ${selectedPrograms.length} programs from database and Stripe`,
       });
       setSelectedPrograms([]);
       loadPrograms();

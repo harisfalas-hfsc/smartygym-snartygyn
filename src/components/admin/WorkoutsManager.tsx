@@ -116,6 +116,32 @@ export const WorkoutsManager = () => {
     if (!confirm('Are you sure you want to delete this workout?')) return;
 
     try {
+      // Get workout details to find Stripe product ID
+      const { data: workout, error: fetchError } = await supabase
+        .from('admin_workouts')
+        .select('stripe_product_id')
+        .eq('id', id)
+        .single();
+
+      if (fetchError) throw fetchError;
+
+      // Delete from Stripe first if product exists
+      if (workout?.stripe_product_id) {
+        const { error: stripeError } = await supabase.functions.invoke('delete-stripe-product', {
+          body: { productId: workout.stripe_product_id }
+        });
+
+        if (stripeError) {
+          console.error('Error deleting from Stripe:', stripeError);
+          toast({
+            title: "Warning",
+            description: "Failed to delete from Stripe, but continuing with database deletion",
+            variant: "default",
+          });
+        }
+      }
+
+      // Delete from database
       const { error } = await supabase
         .from('admin_workouts')
         .delete()
@@ -125,7 +151,7 @@ export const WorkoutsManager = () => {
 
       toast({
         title: "Success",
-        description: "Workout deleted successfully",
+        description: "Workout deleted successfully from database and Stripe",
       });
       loadWorkouts();
     } catch (error) {
@@ -173,6 +199,24 @@ export const WorkoutsManager = () => {
     if (!confirm(`Delete ${selectedWorkouts.length} selected workouts?`)) return;
 
     try {
+      // Get all workouts to find Stripe product IDs
+      const { data: workoutsToDelete, error: fetchError } = await supabase
+        .from('admin_workouts')
+        .select('id, stripe_product_id')
+        .in('id', selectedWorkouts);
+
+      if (fetchError) throw fetchError;
+
+      // Delete from Stripe for each workout that has a product
+      for (const workout of workoutsToDelete || []) {
+        if (workout.stripe_product_id) {
+          await supabase.functions.invoke('delete-stripe-product', {
+            body: { productId: workout.stripe_product_id }
+          });
+        }
+      }
+
+      // Delete from database
       const { error } = await supabase
         .from('admin_workouts')
         .delete()
@@ -182,7 +226,7 @@ export const WorkoutsManager = () => {
 
       toast({
         title: "Success",
-        description: `Deleted ${selectedWorkouts.length} workouts`,
+        description: `Deleted ${selectedWorkouts.length} workouts from database and Stripe`,
       });
       setSelectedWorkouts([]);
       loadWorkouts();
