@@ -1,11 +1,18 @@
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useNavigate } from "react-router-dom";
-import { ShoppingCart } from "lucide-react";
+import { ShoppingCart, Dumbbell } from "lucide-react";
+import {
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+  CarouselNext,
+  CarouselPrevious,
+} from "@/components/ui/carousel";
 
 interface StandaloneItem {
   id: string;
@@ -20,9 +27,10 @@ interface StandaloneItem {
 export const FeaturedStandalonePurchases = () => {
   const navigate = useNavigate();
 
-  const { data: items, isLoading, refetch } = useQuery<StandaloneItem[]>({
+  const { data: items, isLoading } = useQuery<StandaloneItem[]>({
     queryKey: ["featured-standalone-purchases"],
     staleTime: 0,
+    refetchInterval: 30000, // Auto-refresh every 30 seconds
     queryFn: async () => {
       const [workoutsResult, programsResult] = await Promise.all([
         supabase
@@ -31,14 +39,14 @@ export const FeaturedStandalonePurchases = () => {
           .eq("is_standalone_purchase", true)
           .not("price", "is", null)
           .order("serial_number", { ascending: false })
-          .limit(3),
+          .limit(20),
         supabase
           .from("admin_training_programs")
           .select("id, name, price, image_url, description, difficulty")
           .eq("is_standalone_purchase", true)
           .not("price", "is", null)
           .order("serial_number", { ascending: false })
-          .limit(3)
+          .limit(20)
       ]);
 
       const workouts: StandaloneItem[] = (workoutsResult.data || []).map(w => ({
@@ -51,7 +59,7 @@ export const FeaturedStandalonePurchases = () => {
         type: 'program' as const
       }));
 
-      return [...workouts, ...programs].slice(0, 6);
+      return [...workouts, ...programs];
     },
   });
 
@@ -65,112 +73,104 @@ export const FeaturedStandalonePurchases = () => {
 
   if (isLoading) {
     return (
-      <section className="py-12 px-4 bg-muted/30">
+      <section className="py-8 px-4">
         <div className="container mx-auto max-w-6xl">
-          <div className="text-center mb-8">
-            <Skeleton className="h-8 w-64 mx-auto mb-2" />
-            <Skeleton className="h-4 w-96 mx-auto" />
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {[1, 2, 3].map((i) => (
-              <Skeleton key={i} className="h-96 w-full" />
-            ))}
+          <div className="bg-card border-2 border-primary/30 rounded-xl p-6 shadow-gold">
+            <div className="text-center mb-6">
+              <Skeleton className="h-6 w-64 mx-auto mb-2" />
+              <Skeleton className="h-4 w-80 mx-auto" />
+            </div>
+            <div className="flex gap-4 justify-center">
+              {[1, 2, 3, 4].map((i) => (
+                <Skeleton key={i} className="h-48 w-56" />
+              ))}
+            </div>
           </div>
         </div>
       </section>
     );
   }
 
-  // Always show the section, even if empty (for debugging)
   const hasItems = items && items.length > 0;
 
+  if (!hasItems) {
+    return null;
+  }
+
   return (
-    <section className="py-12 px-4 bg-muted/30">
+    <section className="py-8 px-4">
       <div className="container mx-auto max-w-6xl">
-        <div className="text-center mb-8">
-          <h2 className="text-3xl md:text-4xl font-bold mb-2">
-            Featured Standalone Purchases
-          </h2>
-          <p className="text-muted-foreground text-lg">
-            Get individual workouts and programs without a subscription
-          </p>
-        </div>
-
-        {!hasItems && !isLoading && (
-          <div className="text-center py-12">
-            <p className="text-muted-foreground mb-4">
-              No standalone purchases available yet. Create workouts or programs with standalone purchase enabled in the admin panel.
+        <div className="bg-card border-2 border-primary/30 rounded-xl p-6 md:p-8 shadow-gold">
+          <div className="text-center mb-6">
+            <h2 className="text-xl sm:text-2xl md:text-3xl font-bold mb-2">
+              Grab One Without a Plan
+            </h2>
+            <p className="text-muted-foreground text-sm sm:text-base">
+              Get individual workouts and programs without a plan
             </p>
-            <Button onClick={() => refetch()} variant="outline">
-              Refresh
-            </Button>
           </div>
-        )}
 
-        {hasItems && (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {items.map((item) => (
-            <Card 
-              key={`${item.type}-${item.id}`} 
-              className="overflow-hidden hover-lift cursor-pointer group"
-              onClick={() => handleItemClick(item)}
-            >
-              <CardHeader className="p-0">
-                <div className="relative aspect-video overflow-hidden">
-                  {item.image_url ? (
-                    <img
-                      src={item.image_url}
-                      alt={item.name}
-                      className="w-full h-full object-cover transition-transform group-hover:scale-105"
-                    />
-                  ) : (
-                    <div className="w-full h-full bg-muted flex items-center justify-center">
-                      <ShoppingCart className="w-12 h-12 text-muted-foreground" />
+          <Carousel
+            opts={{
+              align: "start",
+              loop: true,
+            }}
+            className="w-full"
+          >
+            <CarouselContent className="-ml-2 md:-ml-4">
+              {items.map((item) => (
+                <CarouselItem key={`${item.type}-${item.id}`} className="pl-2 md:pl-4 basis-full sm:basis-1/2 md:basis-1/3 lg:basis-1/4">
+                  <Card 
+                    className="overflow-hidden hover-lift cursor-pointer group border-primary/20 h-full"
+                    onClick={() => handleItemClick(item)}
+                  >
+                    <div className="relative aspect-[4/3] overflow-hidden">
+                      {item.image_url ? (
+                        <img
+                          src={item.image_url}
+                          alt={item.name}
+                          className="w-full h-full object-cover transition-transform group-hover:scale-105"
+                        />
+                      ) : (
+                        <div className="w-full h-full bg-muted flex items-center justify-center">
+                          <Dumbbell className="w-8 h-8 text-muted-foreground" />
+                        </div>
+                      )}
+                      <Badge className="absolute top-2 right-2 bg-primary text-primary-foreground font-bold">
+                        €{item.price}
+                      </Badge>
                     </div>
-                  )}
-                  <Badge className="absolute top-2 right-2 bg-primary text-primary-foreground">
-                    €{item.price}
-                  </Badge>
-                  {item.type === 'program' && (
-                    <Badge className="absolute top-2 left-2 bg-accent text-accent-foreground">
-                      Program
-                    </Badge>
-                  )}
-                </div>
-              </CardHeader>
-              <CardContent className="p-4">
-                <CardTitle className="text-lg mb-2 line-clamp-2">
-                  {item.name}
-                </CardTitle>
-                {item.description && (
-                  <p className="text-sm text-muted-foreground line-clamp-2">
-                    {item.description}
-                  </p>
-                )}
-                {item.difficulty && (
-                  <div className="mt-2">
-                    <Badge variant="outline" className="text-xs">
-                      {item.difficulty}
-                    </Badge>
-                  </div>
-                )}
-              </CardContent>
-              <CardFooter className="p-4 pt-0">
-                <Button 
-                  className="w-full" 
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    handleItemClick(item);
-                  }}
-                >
-                  <ShoppingCart className="w-4 h-4 mr-2" />
-                  View Details
-                </Button>
-              </CardFooter>
-            </Card>
-          ))}
-          </div>
-        )}
+                    <CardContent className="p-3">
+                      <h3 className="font-semibold text-sm line-clamp-2 mb-1">
+                        {item.name}
+                      </h3>
+                      {item.difficulty && (
+                        <Badge variant="outline" className="text-xs">
+                          {item.difficulty}
+                        </Badge>
+                      )}
+                    </CardContent>
+                    <CardFooter className="p-3 pt-0">
+                      <Button 
+                        size="sm"
+                        className="w-full text-xs" 
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleItemClick(item);
+                        }}
+                      >
+                        <ShoppingCart className="w-3 h-3 mr-1" />
+                        Buy Now
+                      </Button>
+                    </CardFooter>
+                  </Card>
+                </CarouselItem>
+              ))}
+            </CarouselContent>
+            <CarouselPrevious className="hidden md:flex" />
+            <CarouselNext className="hidden md:flex" />
+          </Carousel>
+        </div>
       </div>
     </section>
   );
