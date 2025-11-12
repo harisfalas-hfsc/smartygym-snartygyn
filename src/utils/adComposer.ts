@@ -89,7 +89,9 @@ export class AdComposer {
 
   private async drawLogo(dimensions: Dimensions): Promise<void> {
     try {
-      const logo = await this.loadImage(BRAND_IDENTITY.logo);
+      // Use window.location.origin to ensure proper URL resolution
+      const logoUrl = `${window.location.origin}${BRAND_IDENTITY.logo}`;
+      const logo = await this.loadImage(logoUrl);
       const logoSize = dimensions.width * 0.15;
       const x = dimensions.width - logoSize - 40;
       const y = 40;
@@ -101,6 +103,7 @@ export class AdComposer {
       this.ctx.shadowBlur = 0;
     } catch (error) {
       console.error("Failed to load logo:", error);
+      // Continue without logo if it fails to load
     }
   }
 

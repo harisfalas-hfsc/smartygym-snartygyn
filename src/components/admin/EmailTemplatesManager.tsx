@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, Component, ReactNode } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -9,9 +9,51 @@ import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
-import { FileText, Plus, Edit, Trash2, Eye } from "lucide-react";
+import { FileText, Plus, Edit, Trash2, Eye, AlertTriangle } from "lucide-react";
 import { toast } from "sonner";
 import { AdvertiseTemplatesManager } from "./AdvertiseTemplatesManager";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+
+// Error Boundary Component
+class ErrorBoundary extends Component<
+  { children: ReactNode },
+  { hasError: boolean; error: Error | null }
+> {
+  constructor(props: { children: ReactNode }) {
+    super(props);
+    this.state = { hasError: false, error: null };
+  }
+
+  static getDerivedStateFromError(error: Error) {
+    return { hasError: true, error };
+  }
+
+  componentDidCatch(error: Error, errorInfo: any) {
+    console.error("AdvertiseTemplatesManager Error:", error, errorInfo);
+  }
+
+  render() {
+    if (this.state.hasError) {
+      return (
+        <Alert variant="destructive">
+          <AlertTriangle className="h-4 w-4" />
+          <AlertTitle>Advertise Templates Error</AlertTitle>
+          <AlertDescription>
+            There was an error loading the advertisement templates manager. Please refresh the page to try again.
+            {this.state.error && (
+              <details className="mt-2 text-xs">
+                <summary>Error details</summary>
+                <pre className="mt-1 whitespace-pre-wrap">{this.state.error.message}</pre>
+              </details>
+            )}
+          </AlertDescription>
+        </Alert>
+      );
+    }
+
+    return this.props.children;
+  }
+}
 
 interface EmailTemplate {
   id: string;
@@ -243,7 +285,9 @@ export function EmailTemplatesManager() {
 
       {/* Advertise Templates Section */}
       <div className="mt-6">
-        <AdvertiseTemplatesManager />
+        <ErrorBoundary>
+          <AdvertiseTemplatesManager />
+        </ErrorBoundary>
       </div>
 
       {/* Edit/Create Dialog */}
