@@ -91,7 +91,7 @@ export const WorkoutsManager = () => {
     try {
       const { data, error } = await supabase
         .from('admin_workouts')
-        .select('id, name, type, category, format, equipment, difficulty, duration, is_premium, tier_required')
+        .select('*')
         .order('name');
 
       if (error) throw error;
@@ -402,7 +402,8 @@ export const WorkoutsManager = () => {
                         <Button
                           variant="ghost"
                           size="icon"
-                          onClick={() => window.open(`/workout/${workout.id}`, '_blank')}
+                          onClick={() => window.open(`/workout/${workout.category.toLowerCase().replace(/\s+/g, '-')}/${workout.id}`, '_blank')}
+                          title="View workout"
                         >
                           <Eye className="h-4 w-4" />
                         </Button>
