@@ -450,21 +450,7 @@ export const WorkoutDisplay = ({
           </Card>
         )}
 
-        {/* 6. Description - Only for Workouts */}
-        {description && workoutId && (
-          <Card className="border-2 border-primary/30">
-            <CardHeader className="bg-primary/5">
-              <CardTitle className="flex items-center gap-2 text-2xl font-bold">
-                🔍 Description
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="border-l-4 border-primary pl-4 py-2">
-                <p className="text-base leading-relaxed whitespace-pre-wrap">{description}</p>
-              </div>
-            </CardContent>
-          </Card>
-        )}
+        {/* 6. Description - REMOVED to prevent duplicate, moved to unified section below */}
 
         {/* 7. Instructions */}
         {instructions && (
@@ -583,8 +569,8 @@ export const WorkoutDisplay = ({
         )}
 
         {/* Program Content Sections - CORRECT ORDER */}
-        {/* 1. Training Program Content - Only for Programs */}
-        {weekly_schedule && programId && (
+        {/* 1. Training Program Content */}
+        {weekly_schedule && (
           <Card className="border-2 border-primary/30">
             <CardHeader className="bg-primary/5">
               <CardTitle className="flex items-center gap-2 text-2xl font-bold">
@@ -599,8 +585,8 @@ export const WorkoutDisplay = ({
           </Card>
         )}
 
-        {/* 2. Description - Only for Programs */}
-        {description && programId && (
+        {/* 2. Description - Works for both workouts and programs */}
+        {description && (
           <Card className="border-2 border-primary/30">
             <CardHeader className="bg-primary/5">
               <CardTitle className="flex items-center gap-2 text-2xl font-bold">
@@ -615,8 +601,8 @@ export const WorkoutDisplay = ({
           </Card>
         )}
 
-        {/* 3. Instructions (Program Structure) */}
-        {program_structure && programId && (
+        {/* 3. Instructions - Works for both workouts and programs */}
+        {program_structure && (
           <Card className="border-2 border-primary/30">
             <CardHeader className="bg-primary/5">
               <CardTitle className="flex items-center gap-2 text-2xl font-bold">
@@ -631,8 +617,8 @@ export const WorkoutDisplay = ({
           </Card>
         )}
 
-        {/* 4. Tips - Only for Programs */}
-        {nutrition_tips && programId && (
+        {/* 4. Tips - Works for both workouts and programs */}
+        {nutrition_tips && (
           <Card className="border-2 border-primary/30">
             <CardHeader className="bg-primary/5">
               <CardTitle className="flex items-center gap-2 text-2xl font-bold">
