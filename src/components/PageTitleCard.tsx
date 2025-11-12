@@ -18,8 +18,8 @@ export const PageTitleCard = ({ title, subtitle, icon: Icon, imageSrc }: PageTit
           </div>
         )}
         {imageSrc && (
-          <div className="absolute left-4 sm:left-6 top-1/2 -translate-y-1/2">
-            <img src={imageSrc} alt="" className="w-8 h-8 sm:w-12 sm:h-12 object-contain" />
+          <div className="absolute left-4 sm:left-6 top-1/2 -translate-y-1/2 overflow-hidden w-10 h-10 sm:w-14 sm:h-14">
+            <img src={imageSrc} alt="" className="h-full object-cover object-left scale-150" style={{ objectPosition: '25% center' }} />
           </div>
         )}
         <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-foreground">
