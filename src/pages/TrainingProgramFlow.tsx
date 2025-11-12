@@ -2,6 +2,7 @@ import { useNavigate } from "react-router-dom";
 import { Helmet } from "react-helmet";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import { PageTitleCard } from "@/components/PageTitleCard";
 import { ArrowLeft, Heart, Dumbbell, Activity, Flame, User, Move, Scale } from "lucide-react";
 import { BackToTop } from "@/components/BackToTop";
 import { TimedPopup } from "@/components/TimedPopup";
@@ -88,7 +89,7 @@ const TrainingProgramFlow = () => {
           <span className="text-xs sm:text-sm">Back</span>
         </Button>
         
-        <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-center mb-2">SmartyGym Training Programs</h1>
+        <PageTitleCard title="Training Programs" />
         <p className="text-center text-muted-foreground mb-4 max-w-3xl mx-auto text-sm sm:text-base px-2">
           Structured 6–8 week training programs created by Sports Scientist <a href="/coach-profile" className="text-primary hover:underline font-medium">Haris Falas</a> at smartygym.com. Build strength, lose fat, improve mobility — SmartyGym delivers evidence-based functional training anywhere, anytime.
         </p>
