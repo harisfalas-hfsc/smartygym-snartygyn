@@ -34,6 +34,8 @@ export function AnalyticsDashboard() {
   });
   const [userGrowth, setUserGrowth] = useState<ChartData[]>([]);
   const [revenueData, setRevenueData] = useState<ChartData[]>([]);
+  const [revenueDistribution, setRevenueDistribution] = useState<ChartData[]>([]);
+  const [revenueTrends, setRevenueTrends] = useState<any[]>([]);
   const [completionData, setCompletionData] = useState<ChartData[]>([]);
   const [popularWorkouts, setPopularWorkouts] = useState<ChartData[]>([]);
   const [subscriptionDistribution, setSubscriptionDistribution] = useState<ChartData[]>([]);
@@ -65,7 +67,7 @@ export function AnalyticsDashboard() {
       // Fetch subscription data
       const { data: subscriptions } = await supabase
         .from("user_subscriptions")
-        .select("plan_type, status, created_at");
+        .select("plan_type, status, created_at, current_period_end");
 
       const activeSubscribers = subscriptions?.filter(s => s.status === "active" && s.plan_type !== "free").length || 0;
 
@@ -91,13 +93,13 @@ export function AnalyticsDashboard() {
       // Fetch standalone purchases revenue
       const { data: purchases } = await supabase
         .from("user_purchases")
-        .select("price");
+        .select("price, purchased_at");
       const standaloneRevenue = purchases?.reduce((sum, p) => sum + Number(p.price || 0), 0) || 0;
 
       // Fetch personal training revenue
       const { data: ptRequests } = await supabase
         .from("personal_training_requests")
-        .select("*")
+        .select("created_at")
         .eq("stripe_payment_status", "paid");
       const personalTrainingRevenue = (ptRequests?.length || 0) * 100; // Assuming $100 per PT request
 
@@ -108,6 +110,62 @@ export function AnalyticsDashboard() {
         { name: "Standalone Purchases", value: standaloneRevenue },
         { name: "Personal Training", value: personalTrainingRevenue }
       ];
+
+      // Create revenue distribution pie chart data
+      const totalRevenueSum = revenueChartData.reduce((sum, item) => sum + item.value, 0);
+      const distributionData = revenueChartData.map(item => ({
+        name: item.name,
+        value: item.value,
+        percentage: totalRevenueSum > 0 ? ((item.value / totalRevenueSum) * 100).toFixed(1) : 0
+      }));
+
+      // Calculate 6-month revenue trends
+      const trendsData: any[] = [];
+      const now = new Date();
+      
+      for (let i = 5; i >= 0; i--) {
+        const monthDate = new Date(now.getFullYear(), now.getMonth() - i, 1);
+        const monthName = monthDate.toLocaleDateString("en-US", { year: "numeric", month: "short" });
+        const monthStart = new Date(monthDate.getFullYear(), monthDate.getMonth(), 1);
+        const monthEnd = new Date(monthDate.getFullYear(), monthDate.getMonth() + 1, 0);
+
+        // Count active subscriptions for that month
+        const goldCount = subscriptions?.filter(s => {
+          const startDate = new Date(s.created_at);
+          return s.plan_type === "gold" && startDate <= monthEnd && 
+                 (!s.current_period_end || new Date(s.current_period_end) >= monthStart);
+        }).length || 0;
+
+        const platinumCount = subscriptions?.filter(s => {
+          const startDate = new Date(s.created_at);
+          return s.plan_type === "platinum" && startDate <= monthEnd && 
+                 (!s.current_period_end || new Date(s.current_period_end) >= monthStart);
+        }).length || 0;
+
+        // Count purchases for that month
+        const monthPurchases = purchases?.filter(p => {
+          const purchaseDate = new Date(p.purchased_at);
+          return purchaseDate >= monthStart && purchaseDate <= monthEnd;
+        }) || [];
+        const monthPurchaseRevenue = monthPurchases.reduce((sum, p) => sum + Number(p.price || 0), 0);
+
+        // Count PT requests for that month
+        const monthPT = ptRequests?.filter(pt => {
+          const ptDate = new Date(pt.created_at);
+          return ptDate >= monthStart && ptDate <= monthEnd;
+        }).length || 0;
+
+        trendsData.push({
+          name: monthName,
+          "Gold Plans": goldCount * 15,
+          "Platinum Plans": platinumCount * 25,
+          "Standalone Purchases": monthPurchaseRevenue,
+          "Personal Training": monthPT * 100
+        });
+      }
+
+      setRevenueDistribution(distributionData);
+      setRevenueTrends(trendsData);
 
       // Subscription distribution
       const subDistribution: { [key: string]: number } = {};
@@ -286,24 +344,77 @@ export function AnalyticsDashboard() {
         </div>
 
         <TabsContent value="revenue" className="space-y-4">
+          <div className="grid gap-4 md:grid-cols-2">
+            <Card>
+              <CardHeader>
+                <CardTitle>Revenue Comparison - All Income Streams</CardTitle>
+                <CardDescription>Side-by-side comparison of all revenue sources</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <ResponsiveContainer width="100%" height={300}>
+                  <BarChart data={revenueData}>
+                    <CartesianGrid strokeDasharray="3 3" />
+                    <XAxis dataKey="name" />
+                    <YAxis />
+                    <Tooltip />
+                    <Legend />
+                    <Bar dataKey="value" name="Revenue ($)" fill="hsl(var(--primary))" />
+                  </BarChart>
+                </ResponsiveContainer>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader>
+                <CardTitle>Revenue Distribution</CardTitle>
+                <CardDescription>Percentage breakdown by income stream</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <ResponsiveContainer width="100%" height={300}>
+                  <PieChart>
+                    <Pie
+                      data={revenueDistribution}
+                      cx="50%"
+                      cy="50%"
+                      labelLine={false}
+                      label={({ name, percentage }) => `${name}: ${percentage}%`}
+                      outerRadius={100}
+                      fill="hsl(var(--primary))"
+                      dataKey="value"
+                    >
+                      {revenueDistribution.map((entry, index) => (
+                        <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                      ))}
+                    </Pie>
+                    <Tooltip />
+                  </PieChart>
+                </ResponsiveContainer>
+              </CardContent>
+            </Card>
+          </div>
+
           <Card>
             <CardHeader>
-              <CardTitle>Revenue Comparison - All Income Streams</CardTitle>
-              <CardDescription>Side-by-side comparison of all revenue sources</CardDescription>
+              <CardTitle>6-Month Revenue Trends</CardTitle>
+              <CardDescription>Historical revenue by income stream</CardDescription>
             </CardHeader>
             <CardContent>
               <ResponsiveContainer width="100%" height={350}>
-                <BarChart data={revenueData}>
+                <LineChart data={revenueTrends}>
                   <CartesianGrid strokeDasharray="3 3" />
                   <XAxis dataKey="name" />
                   <YAxis />
                   <Tooltip />
                   <Legend />
-                  <Bar dataKey="value" name="Revenue ($)" fill="hsl(var(--primary))" />
-                </BarChart>
+                  <Line type="monotone" dataKey="Gold Plans" stroke="hsl(var(--primary))" strokeWidth={2} />
+                  <Line type="monotone" dataKey="Platinum Plans" stroke="hsl(var(--secondary))" strokeWidth={2} />
+                  <Line type="monotone" dataKey="Standalone Purchases" stroke="hsl(var(--accent))" strokeWidth={2} />
+                  <Line type="monotone" dataKey="Personal Training" stroke="hsl(var(--muted))" strokeWidth={2} />
+                </LineChart>
               </ResponsiveContainer>
             </CardContent>
           </Card>
+
           <RevenueAnalytics />
         </TabsContent>
 
