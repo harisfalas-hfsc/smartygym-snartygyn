@@ -1,100 +1,158 @@
 import { useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Download, Loader2, RefreshCw, Image as ImageIcon } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Download, Loader2, RefreshCw, Image as ImageIcon, Sparkles } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 
 interface AdTemplate {
   id: string;
   platform: "Instagram" | "TikTok" | "Facebook";
-  type: "Launch" | "Personal Training";
   imageUrl: string | null;
   generating: boolean;
   aspectRatio: string;
-  prompt: string;
 }
 
-const AD_TEMPLATES: Omit<AdTemplate, "imageUrl" | "generating">[] = [
+interface AdPurpose {
+  value: string;
+  label: string;
+  description: string;
+  promptTemplate: (details: string, platform: string) => string;
+}
+
+const AD_PURPOSES: AdPurpose[] = [
   {
-    id: "instagram-launch",
-    platform: "Instagram",
-    type: "Launch",
-    aspectRatio: "1:1 (1080x1080)",
-    prompt: "Create a vibrant, motivating fitness advertisement for Instagram showing an athletic couple working out together in front of a laptop or mobile device. The scene should be bright, light, and energizing with modern gym equipment visible. Include text overlay: 'SMARTY GYM - Coming Soon!' and key points: '✓ Expert-Designed Workouts ✓ Training Programs ✓ Professional Tools ✓ 100% Human Expertise'. Use bright colors like gold, white, and energetic blues. Modern, clean design with inspiring atmosphere. Make it look professional and premium.",
+    value: "new_workout",
+    label: "New Workout Release",
+    description: "Announce a new workout program",
+    promptTemplate: (details, platform) => {
+      const aspectRatios = {
+        Instagram: "1:1 (1080x1080)",
+        TikTok: "9:16 (1080x1920)",
+        Facebook: "1.91:1 (1200x628)",
+      };
+      return `Create a dynamic, energetic ${platform} advertisement for a new workout: "${details}". Show an athletic person performing an exercise in a bright, modern gym setting. Include bold text: "NEW WORKOUT AVAILABLE - ${details}" with highlights: "🔥 Expert Designed 🔥 Proven Results 🔥 Start Today". Use vibrant gold and blue colors with high energy. Aspect ratio: ${aspectRatios[platform as keyof typeof aspectRatios]}. Make it eye-catching and motivating with 60% action imagery, 40% text content.`;
+    },
   },
   {
-    id: "instagram-pt",
-    platform: "Instagram",
-    type: "Personal Training",
-    aspectRatio: "1:1 (1080x1080)",
-    prompt: "Design a professional Instagram advertisement for personal training services. Show a confident fitness trainer coaching a client, both looking motivated and engaged. Bright, premium atmosphere with modern gym setting. Include text: 'PERSONAL TRAINING - Your Journey Starts Here' and benefits: '✓ Custom Programs ✓ Expert Guidance ✓ Achieve Your Goals'. Use gold accents and clean typography. Professional, inspiring, and approachable design with visible workout space. 60% image, 40% text content.",
+    value: "new_program",
+    label: "New Training Program",
+    description: "Promote a new training program",
+    promptTemplate: (details, platform) => {
+      const aspectRatios = {
+        Instagram: "1:1 (1080x1080)",
+        TikTok: "9:16 (1080x1920)",
+        Facebook: "1.91:1 (1200x628)",
+      };
+      return `Design a professional ${platform} advertisement for a new training program: "${details}". Feature determined athletes working out together in a premium gym environment. Text overlay: "NEW PROGRAM LAUNCH - ${details}" with benefits: "✓ Structured Plan ✓ Progressive Results ✓ Expert Coaching". Use premium gold accents with clean, motivating design. Aspect ratio: ${aspectRatios[platform as keyof typeof aspectRatios]}. Professional and inspiring with balanced 55% imagery, 45% content layout.`;
+    },
   },
   {
-    id: "tiktok-launch",
-    platform: "TikTok",
-    type: "Launch",
-    aspectRatio: "9:16 (1080x1920)",
-    prompt: "Create a dynamic vertical TikTok advertisement showing an energetic young couple working out with phones/tablets in a bright, modern setting. Eye-catching and trendy design. Bold text: 'SMARTY GYM IS COMING!' with quick highlights: '🔥 Real Workouts 🔥 Pro Programs 🔥 Expert Tools 🔥 No AI, Pure Human'. Use trending colors - vibrant gold, electric blue, bright whites. High-energy, youthful vibe with movement. Make it scroll-stopping and shareable.",
+    value: "awareness",
+    label: "Brand Awareness",
+    description: "Build brand awareness and reach",
+    promptTemplate: (details, platform) => {
+      const aspectRatios = {
+        Instagram: "1:1 (1080x1080)",
+        TikTok: "9:16 (1080x1920)",
+        Facebook: "1.91:1 (1200x628)",
+      };
+      return `Create a bright, inspiring ${platform} brand awareness advertisement for Smarty Gym. Show diverse people achieving fitness success with digital devices in a modern, welcoming environment. Bold text: "SMARTY GYM - ${details}" with key points: "💪 Expert Workouts 💪 Training Programs 💪 Professional Tools 💪 100% Human Expertise". Use vibrant colors, gold accents, clean design. Aspect ratio: ${aspectRatios[platform as keyof typeof aspectRatios]}. Friendly, approachable, and premium feel with 50% lifestyle imagery, 50% brand messaging.`;
+    },
   },
   {
-    id: "tiktok-pt",
-    platform: "TikTok",
-    type: "Personal Training",
-    aspectRatio: "9:16 (1080x1920)",
-    prompt: "Design a vertical TikTok advertisement for personal training with a trainer actively coaching someone during a workout. Dynamic, energetic atmosphere with modern equipment visible. Text overlay: 'UNLOCK YOUR POTENTIAL - Personal Training Available' and quick points: '💪 1-on-1 Expert Coaching 💪 Custom Plans 💪 Real Results'. Bright, trendy colors with gold highlights. 70% action shot, 30% text. Make it feel authentic and achievable.",
+    value: "special_offer",
+    label: "Special Offer/Promotion",
+    description: "Advertise limited-time offers",
+    promptTemplate: (details, platform) => {
+      const aspectRatios = {
+        Instagram: "1:1 (1080x1080)",
+        TikTok: "9:16 (1080x1920)",
+        Facebook: "1.91:1 (1200x628)",
+      };
+      return `Design an exciting ${platform} promotional advertisement for: "${details}". Show energetic people celebrating fitness achievements with bright, attention-grabbing visuals. Bold text: "LIMITED TIME OFFER - ${details}" with urgency: "⚡ Act Now ⚡ Limited Spots ⚡ Don't Miss Out". Use bold gold, electric blue, and bright white colors. Aspect ratio: ${aspectRatios[platform as keyof typeof aspectRatios]}. High-energy, urgent, and compelling with prominent call-to-action. 40% imagery, 60% offer details.`;
+    },
   },
   {
-    id: "facebook-launch",
-    platform: "Facebook",
-    type: "Launch",
-    aspectRatio: "1.91:1 (1200x628)",
-    prompt: "Create a professional Facebook cover-style advertisement showing a diverse couple exercising with digital devices (laptop/tablet) in a bright, welcoming fitness space. Clean, trustworthy design. Prominent text: 'Introducing SMARTY GYM - Your Complete Fitness Platform' with benefits listed: '✓ Professional Workout Programs ✓ Training Plans by Experts ✓ Advanced Fitness Tools ✓ Human-Designed, Not AI'. Use professional color scheme with gold accents, clean white backgrounds. Balanced composition with 50% image, 50% information.",
-  },
-  {
-    id: "facebook-pt",
-    platform: "Facebook",
-    type: "Personal Training",
-    aspectRatio: "1.91:1 (1200x628)",
-    prompt: "Design a professional Facebook advertisement for personal training services. Show a trainer and client working together in a bright, modern gym environment with visible equipment. Text: 'Transform With Expert Personal Training' and detailed benefits: '✓ Personalized Workout Plans ✓ Professional 1-on-1 Coaching ✓ Achieve Your Fitness Goals ✓ Expert Human Trainers'. Professional, trustworthy design with gold and blue accents. Balanced layout with 55% imagery, 45% content. Make it look credible and results-focused.",
+    value: "personal_training",
+    label: "Personal Training Service",
+    description: "Promote personal training services",
+    promptTemplate: (details, platform) => {
+      const aspectRatios = {
+        Instagram: "1:1 (1080x1080)",
+        TikTok: "9:16 (1080x1920)",
+        Facebook: "1.91:1 (1200x628)",
+      };
+      return `Create a professional ${platform} advertisement for personal training. Show a confident trainer actively coaching a client with visible engagement and motivation. Text: "PERSONAL TRAINING - ${details}" with benefits: "✓ Custom Programs ✓ 1-on-1 Expert Coaching ✓ Achieve Your Goals ✓ Professional Guidance". Premium design with gold accents and trustworthy feel. Aspect ratio: ${aspectRatios[platform as keyof typeof aspectRatios]}. Professional, approachable, results-focused with 65% coaching action, 35% service details.`;
+    },
   },
 ];
 
+const PLATFORMS = ["Instagram", "TikTok", "Facebook"] as const;
+
 export const AdvertiseTemplatesManager = () => {
   const { toast } = useToast();
-  const [templates, setTemplates] = useState<AdTemplate[]>(
-    AD_TEMPLATES.map((t) => ({ ...t, imageUrl: null, generating: false }))
-  );
+  const [selectedPurpose, setSelectedPurpose] = useState<string>("");
+  const [customDetails, setCustomDetails] = useState<string>("");
+  const [selectedPlatform, setSelectedPlatform] = useState<string>("");
+  const [generatedAds, setGeneratedAds] = useState<AdTemplate[]>([]);
 
-  const generateImage = async (templateId: string) => {
-    const template = templates.find((t) => t.id === templateId);
-    if (!template) return;
+  const generateAdsForPlatform = async () => {
+    if (!selectedPurpose || !customDetails.trim() || !selectedPlatform) {
+      toast({
+        title: "Missing Information",
+        description: "Please select ad purpose, enter details, and choose a platform",
+        variant: "destructive",
+      });
+      return;
+    }
 
-    setTemplates((prev) =>
-      prev.map((t) => (t.id === templateId ? { ...t, generating: true } : t))
-    );
+    const purpose = AD_PURPOSES.find((p) => p.value === selectedPurpose);
+    if (!purpose) return;
+
+    const platform = selectedPlatform as "Instagram" | "TikTok" | "Facebook";
+    const aspectRatios = {
+      Instagram: "1:1 (1080x1080)",
+      TikTok: "9:16 (1080x1920)",
+      Facebook: "1.91:1 (1200x628)",
+    };
+
+    const newAd: AdTemplate = {
+      id: `${platform.toLowerCase()}-${Date.now()}`,
+      platform,
+      aspectRatio: aspectRatios[platform],
+      imageUrl: null,
+      generating: true,
+    };
+
+    setGeneratedAds((prev) => [newAd, ...prev]);
 
     try {
+      const prompt = purpose.promptTemplate(customDetails, platform);
+      
       const { data, error } = await supabase.functions.invoke("generate-ad-image", {
         body: {
-          prompt: template.prompt,
-          aspectRatio: template.aspectRatio,
+          prompt,
+          aspectRatio: aspectRatios[platform],
         },
       });
 
       if (error) throw error;
 
-      setTemplates((prev) =>
-        prev.map((t) =>
-          t.id === templateId
-            ? { ...t, imageUrl: data.imageUrl, generating: false }
-            : t
+      setGeneratedAds((prev) =>
+        prev.map((ad) =>
+          ad.id === newAd.id
+            ? { ...ad, imageUrl: data.imageUrl, generating: false }
+            : ad
         )
       );
 
       toast({
         title: "Success",
-        description: "Advertisement image generated successfully",
+        description: `${platform} advertisement generated successfully`,
       });
     } catch (error: any) {
       console.error("Error generating image:", error);
@@ -103,8 +161,58 @@ export const AdvertiseTemplatesManager = () => {
         description: error.message || "Failed to generate image",
         variant: "destructive",
       });
-      setTemplates((prev) =>
-        prev.map((t) => (t.id === templateId ? { ...t, generating: false } : t))
+      setGeneratedAds((prev) =>
+        prev.map((ad) =>
+          ad.id === newAd.id ? { ...ad, generating: false } : ad
+        )
+      );
+    }
+  };
+
+  const regenerateAd = async (adId: string) => {
+    const ad = generatedAds.find((a) => a.id === adId);
+    if (!ad || !selectedPurpose || !customDetails.trim()) return;
+
+    const purpose = AD_PURPOSES.find((p) => p.value === selectedPurpose);
+    if (!purpose) return;
+
+    setGeneratedAds((prev) =>
+      prev.map((a) => (a.id === adId ? { ...a, generating: true } : a))
+    );
+
+    try {
+      const prompt = purpose.promptTemplate(customDetails, ad.platform);
+      
+      const { data, error } = await supabase.functions.invoke("generate-ad-image", {
+        body: {
+          prompt,
+          aspectRatio: ad.aspectRatio,
+        },
+      });
+
+      if (error) throw error;
+
+      setGeneratedAds((prev) =>
+        prev.map((a) =>
+          a.id === adId
+            ? { ...a, imageUrl: data.imageUrl, generating: false }
+            : a
+        )
+      );
+
+      toast({
+        title: "Success",
+        description: "Advertisement regenerated successfully",
+      });
+    } catch (error: any) {
+      console.error("Error regenerating image:", error);
+      toast({
+        title: "Error",
+        description: error.message || "Failed to regenerate image",
+        variant: "destructive",
+      });
+      setGeneratedAds((prev) =>
+        prev.map((a) => (a.id === adId ? { ...a, generating: false } : a))
       );
     }
   };
@@ -139,115 +247,180 @@ export const AdvertiseTemplatesManager = () => {
     }
   };
 
-  const generateAllImages = async () => {
-    for (const template of templates) {
-      if (!template.imageUrl) {
-        await generateImage(template.id);
-        // Add small delay between generations to avoid rate limits
-        await new Promise((resolve) => setTimeout(resolve, 2000));
-      }
-    }
+  const deleteAd = (adId: string) => {
+    setGeneratedAds((prev) => prev.filter((ad) => ad.id !== adId));
+    toast({
+      title: "Deleted",
+      description: "Advertisement removed",
+    });
   };
 
   return (
     <Card>
       <CardHeader>
-        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-          <div>
-            <CardTitle className="flex items-center gap-2">
-              <ImageIcon className="h-5 w-5" />
-              Advertise Templates
-            </CardTitle>
-            <CardDescription>
-              AI-generated advertisement templates for Instagram, TikTok, and Facebook
-            </CardDescription>
+        <CardTitle className="flex items-center gap-2">
+          <ImageIcon className="h-5 w-5" />
+          Advertise Templates
+        </CardTitle>
+        <CardDescription>
+          Create custom AI-generated advertisements for your social media platforms
+        </CardDescription>
+      </CardHeader>
+      <CardContent className="space-y-6">
+        {/* Ad Generator Form */}
+        <div className="border rounded-lg p-6 bg-muted/50 space-y-4">
+          <div className="flex items-center gap-2 mb-4">
+            <Sparkles className="h-5 w-5 text-primary" />
+            <h3 className="font-semibold text-lg">Generate New Advertisement</h3>
           </div>
-          <Button onClick={generateAllImages} variant="outline" className="shrink-0">
-            <RefreshCw className="h-4 w-4 mr-2" />
-            Generate All
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label htmlFor="purpose">Ad Purpose *</Label>
+              <Select value={selectedPurpose} onValueChange={setSelectedPurpose}>
+                <SelectTrigger id="purpose">
+                  <SelectValue placeholder="Choose what to advertise" />
+                </SelectTrigger>
+                <SelectContent>
+                  {AD_PURPOSES.map((purpose) => (
+                    <SelectItem key={purpose.value} value={purpose.value}>
+                      <div className="flex flex-col">
+                        <span className="font-medium">{purpose.label}</span>
+                        <span className="text-xs text-muted-foreground">
+                          {purpose.description}
+                        </span>
+                      </div>
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="platform">Platform *</Label>
+              <Select value={selectedPlatform} onValueChange={setSelectedPlatform}>
+                <SelectTrigger id="platform">
+                  <SelectValue placeholder="Choose platform" />
+                </SelectTrigger>
+                <SelectContent>
+                  {PLATFORMS.map((platform) => (
+                    <SelectItem key={platform} value={platform}>
+                      {platform}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="details">Details *</Label>
+            <Input
+              id="details"
+              placeholder="e.g., 'HIIT Cardio Blast', 'Summer Special - 30% Off', 'Transform Your Body in 12 Weeks'"
+              value={customDetails}
+              onChange={(e) => setCustomDetails(e.target.value)}
+              maxLength={100}
+            />
+            <p className="text-xs text-muted-foreground">
+              Enter the specific name, offer, or message for your advertisement
+            </p>
+          </div>
+
+          <Button
+            onClick={generateAdsForPlatform}
+            disabled={!selectedPurpose || !customDetails.trim() || !selectedPlatform}
+            className="w-full"
+            size="lg"
+          >
+            <Sparkles className="h-4 w-4 mr-2" />
+            Generate Advertisement
           </Button>
         </div>
-      </CardHeader>
-      <CardContent>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {templates.map((template) => (
-            <div
-              key={template.id}
-              className="border rounded-lg overflow-hidden bg-card hover:shadow-lg transition-shadow"
-            >
-              <div className="aspect-square bg-muted flex items-center justify-center relative">
-                {template.generating ? (
-                  <div className="flex flex-col items-center gap-2">
-                    <Loader2 className="h-8 w-8 animate-spin text-primary" />
-                    <p className="text-sm text-muted-foreground">Generating...</p>
-                  </div>
-                ) : template.imageUrl ? (
-                  <img
-                    src={template.imageUrl}
-                    alt={`${template.platform} ${template.type} Ad`}
-                    className="w-full h-full object-cover"
-                  />
-                ) : (
-                  <div className="text-center p-4">
-                    <ImageIcon className="h-12 w-12 mx-auto text-muted-foreground mb-2" />
-                    <p className="text-sm text-muted-foreground">No image generated</p>
-                  </div>
-                )}
-              </div>
 
-              <div className="p-4 space-y-3">
-                <div>
-                  <h3 className="font-semibold text-lg">{template.platform}</h3>
-                  <p className="text-sm text-muted-foreground">{template.type}</p>
-                  <p className="text-xs text-muted-foreground mt-1">
-                    {template.aspectRatio}
-                  </p>
-                </div>
-
-                <div className="flex gap-2">
-                  {!template.imageUrl && !template.generating && (
-                    <Button
-                      onClick={() => generateImage(template.id)}
-                      className="flex-1"
-                      size="sm"
-                    >
-                      <ImageIcon className="h-4 w-4 mr-2" />
-                      Generate
-                    </Button>
-                  )}
-
-                  {template.imageUrl && (
-                    <>
-                      <Button
-                        onClick={() => generateImage(template.id)}
-                        variant="outline"
-                        size="sm"
-                        className="flex-1"
-                      >
-                        <RefreshCw className="h-4 w-4 mr-2" />
-                        Regenerate
-                      </Button>
-                      <Button
-                        onClick={() =>
-                          downloadImage(
-                            template.imageUrl!,
-                            `smarty-gym-${template.platform.toLowerCase()}-${template.type.toLowerCase().replace(" ", "-")}`
-                          )
-                        }
-                        variant="default"
-                        size="sm"
-                        className="flex-1"
-                      >
-                        <Download className="h-4 w-4 mr-2" />
-                        Download
-                      </Button>
-                    </>
-                  )}
-                </div>
-              </div>
+        {/* Generated Ads Gallery */}
+        {generatedAds.length > 0 && (
+          <div className="space-y-4">
+            <div className="flex items-center justify-between">
+              <h3 className="font-semibold text-lg">Generated Advertisements</h3>
+              <p className="text-sm text-muted-foreground">{generatedAds.length} ads created</p>
             </div>
-          ))}
-        </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {generatedAds.map((ad) => (
+                <div
+                  key={ad.id}
+                  className="border rounded-lg overflow-hidden bg-card hover:shadow-lg transition-shadow"
+                >
+                  <div className="aspect-square bg-muted flex items-center justify-center relative">
+                    {ad.generating ? (
+                      <div className="flex flex-col items-center gap-2">
+                        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+                        <p className="text-sm text-muted-foreground">Generating...</p>
+                      </div>
+                    ) : ad.imageUrl ? (
+                      <img
+                        src={ad.imageUrl}
+                        alt={`${ad.platform} Advertisement`}
+                        className="w-full h-full object-cover"
+                      />
+                    ) : (
+                      <div className="text-center p-4">
+                        <ImageIcon className="h-12 w-12 mx-auto text-muted-foreground mb-2" />
+                        <p className="text-sm text-muted-foreground">Generation failed</p>
+                      </div>
+                    )}
+                  </div>
+
+                  <div className="p-4 space-y-3">
+                    <div>
+                      <h3 className="font-semibold text-lg">{ad.platform}</h3>
+                      <p className="text-xs text-muted-foreground mt-1">
+                        {ad.aspectRatio}
+                      </p>
+                    </div>
+
+                    <div className="flex gap-2">
+                      {ad.imageUrl && (
+                        <>
+                          <Button
+                            onClick={() => regenerateAd(ad.id)}
+                            variant="outline"
+                            size="sm"
+                            disabled={ad.generating}
+                          >
+                            <RefreshCw className="h-4 w-4" />
+                          </Button>
+                          <Button
+                            onClick={() =>
+                              downloadImage(
+                                ad.imageUrl!,
+                                `smarty-gym-${ad.platform.toLowerCase()}-${Date.now()}`
+                              )
+                            }
+                            variant="default"
+                            size="sm"
+                            className="flex-1"
+                          >
+                            <Download className="h-4 w-4 mr-2" />
+                            Download
+                          </Button>
+                          <Button
+                            onClick={() => deleteAd(ad.id)}
+                            variant="ghost"
+                            size="sm"
+                          >
+                            <RefreshCw className="h-4 w-4 rotate-180" />
+                          </Button>
+                        </>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
       </CardContent>
     </Card>
   );
