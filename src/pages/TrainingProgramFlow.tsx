@@ -95,15 +95,15 @@ const TrainingProgramFlow = () => {
           subtitle="Purchase individual programs or unlock unlimited access with a premium plan"
           icon={Target}
         />
-        <p className="text-center text-muted-foreground mb-4 max-w-3xl mx-auto text-sm sm:text-base px-2">
-          Structured 6–8 week training programs created by Sports Scientist <a href="/coach-profile" className="text-primary hover:underline font-medium">Haris Falas</a> at smartygym.com. Build strength, lose fat, improve mobility — SmartyGym delivers evidence-based functional training anywhere, anytime.
-        </p>
         
         {/* Info Ribbon */}
         {!isPremium && (
           <div className="bg-primary/10 border border-primary/20 rounded-lg p-3 sm:p-4 mb-6 sm:mb-8 text-center">
             <p className="text-xs sm:text-sm text-muted-foreground mb-2">
-              Every SMARTY GYM program is a complete path toward better performance and health—but results multiply when training meets smart recovery and mindful living. Stay disciplined, fuel your body intelligently, rest deeply, and treat movement as a daily practice—not a task. That's the SMARTY GYM way.
+              Structured 6–8 week training programs created by Sports Scientist <a href="/coach-profile" className="text-primary hover:underline font-medium">Haris Falas</a> at smartygym.com. Build strength, lose fat, improve mobility — SmartyGym delivers evidence-based functional training anywhere, anytime.
+            </p>
+            <p className="text-xs sm:text-sm text-muted-foreground mb-2">
+              Every SMARTY GYM program is a complete path toward better performance and health—but results multiply when training meets smart recovery and mindful living. Stay disciplined, fuel your body intelligently, rest deeply, and treat movement as a daily practice—not a task. That&apos;s the SMARTY GYM way.
             </p>
             <Button variant="default" size="sm" onClick={() => navigate("/premiumbenefits")} className="text-xs sm:text-sm">
               Join Premium
