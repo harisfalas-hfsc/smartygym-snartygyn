@@ -27,11 +27,19 @@ export const useProgramData = (programId: string | undefined) => {
 export const useAllPrograms = () => {
   return useQuery({
     queryKey: ["all-programs"],
+    staleTime: 0,
+    gcTime: 0,
+    refetchOnMount: "always",
+    refetchOnWindowFocus: true,
     queryFn: async () => {
+      console.log("🔍 Fetching ALL programs...");
       const { data, error } = await supabase
         .from("admin_training_programs")
         .select("*")
         .order("name");
+
+      console.log("📦 Programs data:", data);
+      console.log("❌ Programs error:", error);
 
       if (error) {
         console.error("Error fetching programs:", error);

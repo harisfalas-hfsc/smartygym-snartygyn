@@ -27,11 +27,19 @@ export const useWorkoutData = (workoutId: string | undefined) => {
 export const useAllWorkouts = () => {
   return useQuery({
     queryKey: ["all-workouts"],
+    staleTime: 0,
+    gcTime: 0,
+    refetchOnMount: "always",
+    refetchOnWindowFocus: true,
     queryFn: async () => {
+      console.log("🔍 Fetching ALL workouts...");
       const { data, error } = await supabase
         .from("admin_workouts")
         .select("*")
         .order("name");
+
+      console.log("📦 Workouts data:", data);
+      console.log("❌ Workouts error:", error);
 
       if (error) {
         console.error("Error fetching workouts:", error);

@@ -318,7 +318,10 @@ const WorkoutDetail = () => {
   // Filter workouts by category from URL and user filters
   const filteredWorkouts = allWorkouts.filter(workout => {
     // Match category
-    if (!workout.category?.toUpperCase().includes(mappedCategory)) return false;
+    const categoryMatch = workout.category?.toUpperCase().includes(mappedCategory);
+    console.log(`🔍 Workout ${workout.name} - Category: ${workout.category}, Mapped: ${mappedCategory}, Match: ${categoryMatch}`);
+    
+    if (!categoryMatch) return false;
     
     // Equipment filter
     if (equipmentFilter !== "all") {
