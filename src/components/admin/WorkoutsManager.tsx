@@ -22,6 +22,10 @@ interface Workout {
   duration: string;
   is_premium: boolean;
   tier_required: string | null;
+  is_standalone_purchase: boolean;
+  price: number | null;
+  stripe_product_id: string | null;
+  stripe_price_id: string | null;
 }
 
 export const WorkoutsManager = () => {
@@ -391,11 +395,18 @@ export const WorkoutsManager = () => {
                     <TableCell>{workout.difficulty}</TableCell>
                     <TableCell>{workout.duration}</TableCell>
                     <TableCell>
-                      {workout.is_premium ? (
-                        <Badge variant="secondary">{workout.tier_required || 'Premium'}</Badge>
-                      ) : (
-                        <Badge variant="outline">Free</Badge>
-                      )}
+                      <div className="flex flex-wrap gap-1">
+                        {workout.is_premium ? (
+                          <Badge variant="secondary">Premium</Badge>
+                        ) : (
+                          <Badge variant="outline">Free</Badge>
+                        )}
+                        {workout.is_standalone_purchase && workout.price && (
+                          <Badge variant="default" className="bg-accent text-accent-foreground">
+                            €{parseFloat(workout.price.toString()).toFixed(2)}
+                          </Badge>
+                        )}
+                      </div>
                     </TableCell>
                     <TableCell className="text-right">
                       <div className="flex items-center justify-end gap-2">

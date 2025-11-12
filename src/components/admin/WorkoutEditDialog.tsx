@@ -11,11 +11,13 @@ import { useToast } from "@/hooks/use-toast";
 
 const CATEGORIES = [
   "STRENGTH",
+  "CARDIO",
+  "MOBILITY",
+  "CONDITIONING",
+  "POWER",
+  "RECOVERY",
   "CALORIE BURNING",
   "METABOLIC",
-  "CARDIO",
-  "MOBILITY AND STABILITY",
-  "POWER",
   "CHALLENGE"
 ];
 
@@ -83,11 +85,13 @@ export const WorkoutEditDialog = ({ workout, open, onOpenChange, onSave }: Worko
   const getCategoryPrefix = (category: string) => {
     const prefixMap: { [key: string]: string } = {
       'STRENGTH': 'S',
+      'CARDIO': 'C',
+      'MOBILITY': 'M',
+      'CONDITIONING': 'CO',
+      'POWER': 'P',
+      'RECOVERY': 'R',
       'CALORIE BURNING': 'CB',
       'METABOLIC': 'ME',
-      'CARDIO': 'C',
-      'MOBILITY AND STABILITY': 'MS',
-      'POWER': 'P',
       'CHALLENGE': 'CH',
     };
     return prefixMap[category] || 'W';
@@ -495,25 +499,24 @@ export const WorkoutEditDialog = ({ workout, open, onOpenChange, onSave }: Worko
               <Switch
                 id="is_premium"
                 checked={formData.is_premium}
-                onCheckedChange={(checked) => setFormData({ ...formData, is_premium: checked })}
+                onCheckedChange={(checked) => setFormData({ 
+                  ...formData, 
+                  is_premium: checked,
+                  // Reset standalone when switching to free
+                  is_standalone_purchase: checked ? formData.is_standalone_purchase : false,
+                  price: checked ? formData.price : '',
+                  tier_required: checked ? 'premium' : null
+                })}
               />
-              <Label htmlFor="is_premium" className="cursor-pointer">Premium Content</Label>
+              <Label htmlFor="is_premium" className="cursor-pointer">
+                {formData.is_premium ? 'Premium Content' : 'Free Content'}
+              </Label>
             </div>
-
-            {formData.is_premium && (
-              <div className="space-y-2 ml-6">
-                <Label htmlFor="tier_required">Required Tier</Label>
-                <Select value={formData.tier_required} onValueChange={(value) => setFormData({ ...formData, tier_required: value })}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select tier" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="gold">Gold</SelectItem>
-                    <SelectItem value="platinum">Platinum</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-            )}
+            <p className="text-sm text-muted-foreground">
+              {formData.is_premium 
+                ? 'This workout will be available to Gold and Platinum subscribers' 
+                : 'This workout will be free for all visitors'}
+            </p>
           </div>
 
           {/* 14. Standalone Purchase */}
@@ -524,11 +527,19 @@ export const WorkoutEditDialog = ({ workout, open, onOpenChange, onSave }: Worko
                 id="is_standalone_purchase"
                 checked={formData.is_standalone_purchase}
                 onCheckedChange={(checked) => setFormData({ ...formData, is_standalone_purchase: checked })}
+                disabled={!formData.is_premium}
               />
-              <Label htmlFor="is_standalone_purchase" className="cursor-pointer">Available as Standalone Purchase</Label>
+              <Label 
+                htmlFor="is_standalone_purchase" 
+                className={`cursor-pointer ${!formData.is_premium ? 'opacity-50' : ''}`}
+              >
+                Available as Standalone Purchase
+              </Label>
             </div>
             <p className="text-sm text-muted-foreground">
-              Enable this to allow users to buy this workout individually without a subscription
+              {!formData.is_premium 
+                ? 'Only premium content can be sold as standalone purchases. Switch to Premium first.' 
+                : 'Enable this to allow users to buy this workout individually without a subscription'}
             </p>
 
             {formData.is_standalone_purchase && (

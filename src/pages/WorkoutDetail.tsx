@@ -530,6 +530,11 @@ const WorkoutDetail = () => {
                       FREE
                     </div>
                   )}
+                  {workout.is_standalone_purchase && workout.price && (
+                    <div className="absolute top-12 left-2 bg-accent text-accent-foreground px-3 py-1 rounded-full text-xs font-bold flex items-center gap-1">
+                      🛒 €{Number(workout.price).toFixed(2)}
+                    </div>
+                  )}
                   {userId && isCompleted && (
                     <div className="absolute bottom-2 left-2 bg-green-600 text-white px-2 py-1 rounded-full text-xs font-semibold flex items-center gap-1">
                       <CheckCircle className="h-3 w-3" />
