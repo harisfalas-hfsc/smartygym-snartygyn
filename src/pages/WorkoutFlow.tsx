@@ -95,7 +95,10 @@ const WorkoutFlow = () => {
           <span className="text-xs sm:text-sm">Back</span>
         </Button>
         
-        <PageTitleCard title="Workouts" />
+        <PageTitleCard 
+          title="Workouts" 
+          subtitle="Purchase individual workouts or unlock unlimited access with a premium plan"
+        />
         <p className="text-center text-muted-foreground mb-4 max-w-3xl mx-auto text-sm sm:text-base px-2">
           Choose your goal and start your fitness journey today. All SmartyGym workouts designed by Sports Scientist <a href="/coach-profile" className="text-primary hover:underline font-medium">Haris Falas</a> for convenient online fitness training anywhere, anytime.
         </p>

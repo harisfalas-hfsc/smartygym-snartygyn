@@ -2,15 +2,21 @@ import { Card } from "@/components/ui/card";
 
 interface PageTitleCardProps {
   title: string;
+  subtitle?: string;
 }
 
-export const PageTitleCard = ({ title }: PageTitleCardProps) => {
+export const PageTitleCard = ({ title, subtitle }: PageTitleCardProps) => {
   return (
     <Card className="border-2 border-primary bg-gradient-to-r from-primary/5 to-primary/10 mb-6 sm:mb-8">
       <div className="p-4 sm:p-6 text-center">
         <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-foreground">
           {title}
         </h1>
+        {subtitle && (
+          <p className="text-sm sm:text-base text-muted-foreground mt-2">
+            {subtitle}
+          </p>
+        )}
       </div>
     </Card>
   );
