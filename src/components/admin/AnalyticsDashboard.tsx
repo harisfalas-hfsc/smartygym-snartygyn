@@ -332,14 +332,14 @@ export function AnalyticsDashboard() {
 
       {/* Charts */}
       <Tabs defaultValue="revenue" className="space-y-4">
-        <div className="w-full overflow-x-auto">
-          <TabsList className="w-full inline-flex sm:grid sm:grid-cols-6 min-w-max sm:min-w-0">
-            <TabsTrigger value="revenue" className="flex-shrink-0 whitespace-nowrap">Subscriptions</TabsTrigger>
-            <TabsTrigger value="purchases" className="flex-shrink-0 whitespace-nowrap">Purchases</TabsTrigger>
-            <TabsTrigger value="personal-training" className="flex-shrink-0 whitespace-nowrap">Personal Training</TabsTrigger>
-            <TabsTrigger value="growth" className="flex-shrink-0 whitespace-nowrap">User Growth</TabsTrigger>
-            <TabsTrigger value="completion" className="flex-shrink-0 whitespace-nowrap">Completion Rates</TabsTrigger>
-            <TabsTrigger value="popular" className="flex-shrink-0 whitespace-nowrap">Popular Content</TabsTrigger>
+        <div className="w-full overflow-x-auto -mx-2 px-2">
+          <TabsList className="inline-flex w-auto min-w-full h-auto p-1">
+            <TabsTrigger value="revenue" className="flex-shrink-0 whitespace-nowrap text-xs sm:text-sm px-2 sm:px-3 py-2">Revenue</TabsTrigger>
+            <TabsTrigger value="purchases" className="flex-shrink-0 whitespace-nowrap text-xs sm:text-sm px-2 sm:px-3 py-2">Purchases</TabsTrigger>
+            <TabsTrigger value="personal-training" className="flex-shrink-0 whitespace-nowrap text-xs sm:text-sm px-2 sm:px-3 py-2">PT</TabsTrigger>
+            <TabsTrigger value="growth" className="flex-shrink-0 whitespace-nowrap text-xs sm:text-sm px-2 sm:px-3 py-2">Growth</TabsTrigger>
+            <TabsTrigger value="completion" className="flex-shrink-0 whitespace-nowrap text-xs sm:text-sm px-2 sm:px-3 py-2">Completion</TabsTrigger>
+            <TabsTrigger value="popular" className="flex-shrink-0 whitespace-nowrap text-xs sm:text-sm px-2 sm:px-3 py-2">Popular</TabsTrigger>
           </TabsList>
         </div>
 

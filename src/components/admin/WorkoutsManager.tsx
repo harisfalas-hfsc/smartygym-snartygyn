@@ -225,27 +225,27 @@ export const WorkoutsManager = () => {
     <>
       <Card>
         <CardHeader>
-          <div className="flex items-center justify-between">
-            <div>
-              <CardTitle>Workouts Management</CardTitle>
-              <CardDescription>
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4">
+            <div className="min-w-0">
+              <CardTitle className="text-base sm:text-lg">Workouts Management</CardTitle>
+              <CardDescription className="text-xs sm:text-sm">
                 {filteredWorkouts.length} workout{filteredWorkouts.length !== 1 ? 's' : ''} 
                 {selectedWorkouts.length > 0 && ` (${selectedWorkouts.length} selected)`}
               </CardDescription>
             </div>
-            <div className="flex gap-2">
-              <Button variant="outline" size="sm" onClick={handleExport}>
-                <Download className="h-4 w-4 mr-2" />
+            <div className="flex gap-2 flex-wrap">
+              <Button variant="outline" size="sm" onClick={handleExport} className="text-xs sm:text-sm">
+                <Download className="h-3 w-3 sm:h-4 sm:w-4 mr-2" />
                 Export
               </Button>
               {selectedWorkouts.length > 0 && (
-                <Button variant="destructive" size="sm" onClick={handleBulkDelete}>
-                  <Trash2 className="h-4 w-4 mr-2" />
+                <Button variant="destructive" size="sm" onClick={handleBulkDelete} className="text-xs sm:text-sm">
+                  <Trash2 className="h-3 w-3 sm:h-4 sm:w-4 mr-2" />
                   Delete ({selectedWorkouts.length})
                 </Button>
               )}
-              <Button onClick={handleNew}>
-                <Plus className="h-4 w-4 mr-2" />
+              <Button onClick={handleNew} size="sm" className="text-xs sm:text-sm">
+                <Plus className="h-3 w-3 sm:h-4 sm:w-4 mr-2" />
                 New
               </Button>
             </div>

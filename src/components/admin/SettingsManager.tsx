@@ -192,30 +192,32 @@ export const SettingsManager = () => {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 w-full overflow-x-hidden">
       <Tabs defaultValue="general" className="w-full">
-        <TabsList className="grid w-full grid-cols-2 md:grid-cols-5 gap-2">
-          <TabsTrigger value="general" className="text-xs sm:text-sm">
-            <Settings className="h-4 w-4 mr-2" />
-            General
-          </TabsTrigger>
-          <TabsTrigger value="notifications" className="text-xs sm:text-sm">
-            <Bell className="h-4 w-4 mr-2" />
-            Notifications
-          </TabsTrigger>
-          <TabsTrigger value="system" className="text-xs sm:text-sm">
-            <Mail className="h-4 w-4 mr-2" />
-            System
-          </TabsTrigger>
-          <TabsTrigger value="access" className="text-xs sm:text-sm">
-            <Shield className="h-4 w-4 mr-2" />
-            Access
-          </TabsTrigger>
-          <TabsTrigger value="backup" className="text-xs sm:text-sm">
-            <Database className="h-4 w-4 mr-2" />
-            Backup
-          </TabsTrigger>
-        </TabsList>
+        <div className="w-full overflow-x-auto -mx-2 px-2">
+          <TabsList className="inline-flex w-auto min-w-full h-auto p-1">
+            <TabsTrigger value="general" className="flex items-center gap-1 text-xs sm:text-sm px-2 sm:px-3 py-2 whitespace-nowrap">
+              <Settings className="h-3 w-3 sm:h-4 sm:w-4 shrink-0" />
+              <span>General</span>
+            </TabsTrigger>
+            <TabsTrigger value="notifications" className="flex items-center gap-1 text-xs sm:text-sm px-2 sm:px-3 py-2 whitespace-nowrap">
+              <Bell className="h-3 w-3 sm:h-4 sm:w-4 shrink-0" />
+              <span>Alerts</span>
+            </TabsTrigger>
+            <TabsTrigger value="system" className="flex items-center gap-1 text-xs sm:text-sm px-2 sm:px-3 py-2 whitespace-nowrap">
+              <Mail className="h-3 w-3 sm:h-4 sm:w-4 shrink-0" />
+              <span>System</span>
+            </TabsTrigger>
+            <TabsTrigger value="access" className="flex items-center gap-1 text-xs sm:text-sm px-2 sm:px-3 py-2 whitespace-nowrap">
+              <Shield className="h-3 w-3 sm:h-4 sm:w-4 shrink-0" />
+              <span>Access</span>
+            </TabsTrigger>
+            <TabsTrigger value="backup" className="flex items-center gap-1 text-xs sm:text-sm px-2 sm:px-3 py-2 whitespace-nowrap">
+              <Database className="h-3 w-3 sm:h-4 sm:w-4 shrink-0" />
+              <span>Backup</span>
+            </TabsTrigger>
+          </TabsList>
+        </div>
 
         {/* General Preferences */}
         <TabsContent value="general">
@@ -225,36 +227,39 @@ export const SettingsManager = () => {
               <CardDescription>Configure default values and display options</CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                 <div className="space-y-2">
-                  <Label>Default Workout Duration (minutes)</Label>
+                  <Label className="text-xs sm:text-sm">Default Workout Duration (min)</Label>
                   <Input
                     type="number"
                     value={defaultWorkoutDuration}
                     onChange={(e) => setDefaultWorkoutDuration(e.target.value)}
+                    className="text-sm"
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label>Default Program Length (weeks)</Label>
+                  <Label className="text-xs sm:text-sm">Default Program Length (weeks)</Label>
                   <Input
                     type="number"
                     value={defaultProgramWeeks}
                     onChange={(e) => setDefaultProgramWeeks(e.target.value)}
+                    className="text-sm"
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label>Default Standalone Price</Label>
+                  <Label className="text-xs sm:text-sm">Default Standalone Price</Label>
                   <Input
                     type="number"
                     step="0.01"
                     value={defaultPrice}
                     onChange={(e) => setDefaultPrice(e.target.value)}
+                    className="text-sm"
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label>Currency</Label>
+                  <Label className="text-xs sm:text-sm">Currency</Label>
                   <Select value={currency} onValueChange={setCurrency}>
-                    <SelectTrigger>
+                    <SelectTrigger className="text-sm">
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
@@ -280,45 +285,49 @@ export const SettingsManager = () => {
               <CardDescription>Configure admin alerts and system notifications</CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
-              <div className="space-y-4">
-                <div className="flex items-center justify-between">
-                  <div className="space-y-0.5">
-                    <Label>Email on New Contact Message</Label>
-                    <p className="text-sm text-muted-foreground">Get notified when users send contact messages</p>
+              <div className="space-y-3 sm:space-y-4">
+                <div className="flex items-start sm:items-center justify-between gap-3">
+                  <div className="space-y-0.5 flex-1 min-w-0">
+                    <Label className="text-xs sm:text-sm">Email on New Contact</Label>
+                    <p className="text-xs text-muted-foreground">Get notified of contact messages</p>
                   </div>
                   <Switch
                     checked={emailOnNewContact}
                     onCheckedChange={setEmailOnNewContact}
+                    className="shrink-0"
                   />
                 </div>
-                <div className="flex items-center justify-between">
-                  <div className="space-y-0.5">
-                    <Label>Email on New Purchase</Label>
-                    <p className="text-sm text-muted-foreground">Get notified when a purchase is completed</p>
+                <div className="flex items-start sm:items-center justify-between gap-3">
+                  <div className="space-y-0.5 flex-1 min-w-0">
+                    <Label className="text-xs sm:text-sm">Email on New Purchase</Label>
+                    <p className="text-xs text-muted-foreground">Get notified of purchases</p>
                   </div>
                   <Switch
                     checked={emailOnNewPurchase}
                     onCheckedChange={setEmailOnNewPurchase}
+                    className="shrink-0"
                   />
                 </div>
-                <div className="flex items-center justify-between">
-                  <div className="space-y-0.5">
-                    <Label>Email on Personal Training Request</Label>
-                    <p className="text-sm text-muted-foreground">Get notified when someone requests PT</p>
+                <div className="flex items-start sm:items-center justify-between gap-3">
+                  <div className="space-y-0.5 flex-1 min-w-0">
+                    <Label className="text-xs sm:text-sm">Email on PT Request</Label>
+                    <p className="text-xs text-muted-foreground">Get notified of PT requests</p>
                   </div>
                   <Switch
                     checked={emailOnNewPTRequest}
                     onCheckedChange={setEmailOnNewPTRequest}
+                    className="shrink-0"
                   />
                 </div>
-                <div className="flex items-center justify-between">
-                  <div className="space-y-0.5">
-                    <Label>Daily Analytics Summary</Label>
-                    <p className="text-sm text-muted-foreground">Receive daily summary of platform activity</p>
+                <div className="flex items-start sm:items-center justify-between gap-3">
+                  <div className="space-y-0.5 flex-1 min-w-0">
+                    <Label className="text-xs sm:text-sm">Daily Analytics</Label>
+                    <p className="text-xs text-muted-foreground">Daily platform summary</p>
                   </div>
                   <Switch
                     checked={dailyAnalyticsSummary}
                     onCheckedChange={setDailyAnalyticsSummary}
+                    className="shrink-0"
                   />
                 </div>
               </div>
@@ -337,41 +346,45 @@ export const SettingsManager = () => {
               <CardDescription>Configure email and system settings</CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
-              <div className="space-y-4">
+              <div className="space-y-3 sm:space-y-4">
                 <div className="space-y-2">
-                  <Label>Sender Email Address</Label>
+                  <Label className="text-xs sm:text-sm">Sender Email</Label>
                   <Input
                     type="email"
                     value={senderEmail}
                     onChange={(e) => setSenderEmail(e.target.value)}
                     placeholder="noreply@smartygym.com"
+                    className="text-sm"
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label>Reply-To Email Address</Label>
+                  <Label className="text-xs sm:text-sm">Reply-To Email</Label>
                   <Input
                     type="email"
                     value={replyToEmail}
                     onChange={(e) => setReplyToEmail(e.target.value)}
                     placeholder="support@smartygym.com"
+                    className="text-sm"
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label>Max Image Upload Size (MB)</Label>
+                  <Label className="text-xs sm:text-sm">Max Upload Size (MB)</Label>
                   <Input
                     type="number"
                     value={maxImageSize}
                     onChange={(e) => setMaxImageSize(e.target.value)}
+                    className="text-sm"
                   />
                 </div>
-                <div className="flex items-center justify-between">
-                  <div className="space-y-0.5">
-                    <Label>Allow Guest Purchases</Label>
-                    <p className="text-sm text-muted-foreground">Allow non-registered users to purchase content</p>
+                <div className="flex items-start sm:items-center justify-between gap-3">
+                  <div className="space-y-0.5 flex-1 min-w-0">
+                    <Label className="text-xs sm:text-sm">Guest Purchases</Label>
+                    <p className="text-xs text-muted-foreground">Allow non-registered purchases</p>
                   </div>
                   <Switch
                     checked={allowGuestPurchases}
                     onCheckedChange={setAllowGuestPurchases}
+                    className="shrink-0"
                   />
                 </div>
               </div>
@@ -390,33 +403,36 @@ export const SettingsManager = () => {
               <CardDescription>Configure authentication and security settings</CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
-              <div className="space-y-4">
-                <div className="flex items-center justify-between">
-                  <div className="space-y-0.5">
-                    <Label>Require Email Verification</Label>
-                    <p className="text-sm text-muted-foreground">Users must verify email before accessing content</p>
+              <div className="space-y-3 sm:space-y-4">
+                <div className="flex items-start sm:items-center justify-between gap-3">
+                  <div className="space-y-0.5 flex-1 min-w-0">
+                    <Label className="text-xs sm:text-sm">Email Verification</Label>
+                    <p className="text-xs text-muted-foreground">Require verified email</p>
                   </div>
                   <Switch
                     checked={requireEmailVerification}
                     onCheckedChange={setRequireEmailVerification}
+                    className="shrink-0"
                   />
                 </div>
-                <div className="flex items-center justify-between">
-                  <div className="space-y-0.5">
-                    <Label>Auto-Approve Purchases</Label>
-                    <p className="text-sm text-muted-foreground">Automatically grant access after payment</p>
+                <div className="flex items-start sm:items-center justify-between gap-3">
+                  <div className="space-y-0.5 flex-1 min-w-0">
+                    <Label className="text-xs sm:text-sm">Auto-Approve Purchases</Label>
+                    <p className="text-xs text-muted-foreground">Grant access after payment</p>
                   </div>
                   <Switch
                     checked={autoApprovePurchases}
                     onCheckedChange={setAutoApprovePurchases}
+                    className="shrink-0"
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label>Session Timeout (hours)</Label>
+                  <Label className="text-xs sm:text-sm">Session Timeout (hours)</Label>
                   <Input
                     type="number"
                     value={sessionTimeout}
                     onChange={(e) => setSessionTimeout(e.target.value)}
+                    className="text-sm"
                   />
                 </div>
               </div>
@@ -435,32 +451,32 @@ export const SettingsManager = () => {
               <CardDescription>Export data and create backups</CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
-              <div className="space-y-4">
-                <div className="flex items-center justify-between p-4 border rounded-lg">
-                  <div className="space-y-1">
-                    <h3 className="font-medium">Export Complete Database</h3>
-                    <p className="text-sm text-muted-foreground">
-                      Export all workouts and training programs as JSON
+              <div className="space-y-3 sm:space-y-4">
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 p-3 sm:p-4 border rounded-lg">
+                  <div className="space-y-1 flex-1 min-w-0">
+                    <h3 className="text-sm sm:text-base font-medium">Export Database</h3>
+                    <p className="text-xs text-muted-foreground">
+                      All workouts & programs (JSON)
                     </p>
                   </div>
-                  <Button onClick={handleExportDatabase} disabled={loading}>
-                    <Download className="h-4 w-4 mr-2" />
+                  <Button onClick={handleExportDatabase} disabled={loading} className="w-full sm:w-auto shrink-0 text-sm">
+                    <Download className="h-3 w-3 sm:h-4 sm:w-4 mr-2" />
                     Export
                   </Button>
                 </div>
-                <div className="flex items-center justify-between p-4 border rounded-lg">
-                  <div className="space-y-1">
-                    <h3 className="font-medium">Export User List</h3>
-                    <p className="text-sm text-muted-foreground">
-                      Export all registered users as CSV
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 p-3 sm:p-4 border rounded-lg">
+                  <div className="space-y-1 flex-1 min-w-0">
+                    <h3 className="text-sm sm:text-base font-medium">Export Users</h3>
+                    <p className="text-xs text-muted-foreground">
+                      All registered users (CSV)
                     </p>
                   </div>
-                  <Button onClick={handleExportUsers} disabled={loading}>
-                    <Download className="h-4 w-4 mr-2" />
+                  <Button onClick={handleExportUsers} disabled={loading} className="w-full sm:w-auto shrink-0 text-sm">
+                    <Download className="h-3 w-3 sm:h-4 sm:w-4 mr-2" />
                     Export
                   </Button>
                 </div>
-                <div className="p-4 border rounded-lg bg-muted/50">
+                <div className="p-3 sm:p-4 border rounded-lg bg-muted/50">
                   <h3 className="font-medium mb-2">Automated Backups</h3>
                   <p className="text-sm text-muted-foreground mb-4">
                     Your database is automatically backed up daily by Lovable Cloud. You can restore from any backup point in the last 7 days via the Cloud dashboard.
