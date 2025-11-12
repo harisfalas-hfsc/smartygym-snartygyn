@@ -62,52 +62,92 @@ export function RevenueAnalytics() {
         }
       }
 
-      // Fetch subscriptions within the date range
-      let query = supabase
-        .from("user_subscriptions")
-        .select("plan_type, status, created_at, current_period_start, current_period_end")
-        .eq("status", "active")
-        .gte("created_at", startDate.toISOString());
-
-      // Apply plan filter
-      if (planFilter !== "all") {
-        if (planFilter === "personal_training") {
-          // Personal training is tracked differently - skip for now or handle separately
-          query = query.eq("plan_type", "platinum"); // Placeholder
-        } else {
-          query = query.eq("plan_type", planFilter as "gold" | "platinum");
-        }
-      }
-
-      const { data: subscriptions, error } = await query;
-
-      if (error) throw error;
-
-      // Calculate revenue by month and plan
       const revenueByMonth: { [key: string]: { [plan: string]: number } } = {};
       let total = 0;
 
-      subscriptions?.forEach((sub) => {
-        const month = new Date(sub.created_at).toLocaleDateString("en-US", {
-          year: "numeric",
-          month: "short",
+      // Fetch subscriptions
+      if (planFilter === "all" || planFilter === "gold" || planFilter === "platinum") {
+        let subQuery = supabase
+          .from("user_subscriptions")
+          .select("plan_type, created_at")
+          .eq("status", "active")
+          .gte("created_at", startDate.toISOString());
+
+        if (planFilter !== "all") {
+          subQuery = subQuery.eq("plan_type", planFilter as "gold" | "platinum");
+        }
+
+        const { data: subscriptions } = await subQuery;
+
+        subscriptions?.forEach((sub) => {
+          const month = new Date(sub.created_at).toLocaleDateString("en-US", {
+            year: "numeric",
+            month: "short",
+          });
+
+          if (!revenueByMonth[month]) {
+            revenueByMonth[month] = {};
+          }
+
+          let monthlyRevenue = 0;
+          if (sub.plan_type === "gold") {
+            monthlyRevenue = 15;
+          } else if (sub.plan_type === "platinum") {
+            monthlyRevenue = 25;
+          }
+
+          revenueByMonth[month][sub.plan_type] = (revenueByMonth[month][sub.plan_type] || 0) + monthlyRevenue;
+          total += monthlyRevenue;
         });
+      }
 
-        if (!revenueByMonth[month]) {
-          revenueByMonth[month] = {};
-        }
+      // Fetch standalone purchases
+      if (planFilter === "all" || planFilter === "standalone_purchases") {
+        const { data: purchases } = await supabase
+          .from("user_purchases")
+          .select("price, purchased_at, content_type")
+          .gte("purchased_at", startDate.toISOString())
+          .neq("content_type", "personal_training");
 
-        // Calculate revenue based on plan type
-        let monthlyRevenue = 0;
-        if (sub.plan_type === "gold") {
-          monthlyRevenue = 15; // €15/month
-        } else if (sub.plan_type === "platinum") {
-          monthlyRevenue = 25; // €25/month
-        }
+        purchases?.forEach((purchase) => {
+          const month = new Date(purchase.purchased_at).toLocaleDateString("en-US", {
+            year: "numeric",
+            month: "short",
+          });
 
-        revenueByMonth[month][sub.plan_type] = (revenueByMonth[month][sub.plan_type] || 0) + monthlyRevenue;
-        total += monthlyRevenue;
-      });
+          if (!revenueByMonth[month]) {
+            revenueByMonth[month] = {};
+          }
+
+          const revenue = parseFloat(purchase.price?.toString() || "0");
+          revenueByMonth[month]["standalone"] = (revenueByMonth[month]["standalone"] || 0) + revenue;
+          total += revenue;
+        });
+      }
+
+      // Fetch personal training purchases
+      if (planFilter === "all" || planFilter === "personal_training") {
+        const { data: ptPurchases } = await supabase
+          .from("user_purchases")
+          .select("price, purchased_at")
+          .eq("content_type", "personal_training")
+          .gte("purchased_at", startDate.toISOString());
+
+        ptPurchases?.forEach((purchase) => {
+          const month = new Date(purchase.purchased_at).toLocaleDateString("en-US", {
+            year: "numeric",
+            month: "short",
+          });
+
+          if (!revenueByMonth[month]) {
+            revenueByMonth[month] = {};
+          }
+
+          const revenue = parseFloat(purchase.price?.toString() || "0");
+          revenueByMonth[month]["personal_training"] = (revenueByMonth[month]["personal_training"] || 0) + revenue;
+          total += revenue;
+        });
+      }
 
       // Convert to chart data
       const chartData: RevenueData[] = Object.entries(revenueByMonth).map(([period, plans]) => ({
@@ -157,9 +197,10 @@ export function RevenueAnalytics() {
                 <SelectValue placeholder="Plan Type" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">All Plans</SelectItem>
-                <SelectItem value="gold">Gold</SelectItem>
-                <SelectItem value="platinum">Platinum</SelectItem>
+                <SelectItem value="all">All Sources</SelectItem>
+                <SelectItem value="gold">Gold Plans</SelectItem>
+                <SelectItem value="platinum">Platinum Plans</SelectItem>
+                <SelectItem value="standalone_purchases">Standalone Purchases</SelectItem>
                 <SelectItem value="personal_training">Personal Training</SelectItem>
               </SelectContent>
             </Select>
@@ -228,18 +269,19 @@ export function RevenueAnalytics() {
               No revenue data for selected period
             </div>
            ) : (
-             <div className="overflow-x-auto">
+             <div className="overflow-x-auto pb-4">
                <ResponsiveContainer width="100%" height={400} minWidth={300}>
-                 <BarChart data={revenueData}>
+                 <BarChart data={revenueData} margin={{ top: 20, right: 30, left: 20, bottom: 20 }}>
                 <CartesianGrid strokeDasharray="3 3" />
                 <XAxis dataKey="period" />
                 <YAxis />
-                <Tooltip />
-                <Legend />
+                <Tooltip formatter={(value) => `€${value}`} />
+                <Legend wrapperStyle={{ paddingTop: "20px" }} />
                 {planFilter === "all" ? (
                   <>
-                    <Bar dataKey="gold" name="Gold" stackId="a" fill="hsl(var(--chart-1))" />
-                    <Bar dataKey="platinum" name="Platinum" stackId="a" fill="hsl(var(--chart-2))" />
+                    <Bar dataKey="gold" name="Gold Plans" stackId="a" fill="hsl(var(--chart-1))" />
+                    <Bar dataKey="platinum" name="Platinum Plans" stackId="a" fill="hsl(var(--chart-2))" />
+                    <Bar dataKey="standalone" name="Standalone Purchases" stackId="a" fill="hsl(var(--chart-4))" />
                     <Bar
                       dataKey="personal_training"
                       name="Personal Training"

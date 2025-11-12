@@ -81,15 +81,6 @@ export const useAutoLogout = () => {
     // Initialize timer
     resetTimer();
 
-    // Handle browser/tab close
-    const handleBeforeUnload = async () => {
-      await supabase.auth.signOut({ scope: 'global' });
-      localStorage.clear();
-      sessionStorage.clear();
-    };
-
-    window.addEventListener('beforeunload', handleBeforeUnload);
-
     // Handle visibility change (tab becomes hidden)
     const handleVisibilityChange = () => {
       if (document.hidden) {
@@ -119,7 +110,6 @@ export const useAutoLogout = () => {
       events.forEach(event => {
         window.removeEventListener(event, resetTimer);
       });
-      window.removeEventListener('beforeunload', handleBeforeUnload);
       document.removeEventListener('visibilitychange', handleVisibilityChange);
     };
   }, [navigate, inactivityTimeout]);
