@@ -10,6 +10,7 @@ import { PageTitleCard } from "@/components/PageTitleCard";
 import { useAllPrograms } from "@/hooks/useProgramData";
 import { useProgramInteractions } from "@/hooks/useProgramInteractions";
 import { supabase } from "@/integrations/supabase/client";
+import { Target } from "lucide-react";
 import cardioEnduranceImg from "@/assets/cardio-endurance-program.jpg";
 import functionalStrengthImg from "@/assets/functional-strength-program.jpg";
 import muscleHypertrophyImg from "@/assets/muscle-hypertrophy-program.jpg";
@@ -445,7 +446,7 @@ const TrainingProgramDetail = () => {
           <span className="text-xs sm:text-sm">Back</span>
         </Button>
         
-        <PageTitleCard title={title} />
+        <PageTitleCard title={title} icon={Target} />
         
         {/* Info Card */}
         {programInfo[type || ""] && (

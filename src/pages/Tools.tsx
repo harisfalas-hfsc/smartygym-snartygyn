@@ -3,7 +3,7 @@ import { Helmet } from "react-helmet";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { PageTitleCard } from "@/components/PageTitleCard";
-import { ArrowLeft, Calculator, Activity, Flame } from "lucide-react";
+import { ArrowLeft, Calculator, Activity, Flame, Wrench } from "lucide-react";
 import { useShowBackButton } from "@/hooks/useShowBackButton";
 import { useAccessControl } from "@/hooks/useAccessControl";
 
@@ -70,7 +70,7 @@ const Tools = () => {
           </Button>
           )}
 
-        <PageTitleCard title="Smart Tools" />
+        <PageTitleCard title="Smart Tools" icon={Wrench} />
         <p className="text-center text-muted-foreground mb-4 text-sm sm:text-base px-2">
           Free fitness calculators to support your training
         </p>

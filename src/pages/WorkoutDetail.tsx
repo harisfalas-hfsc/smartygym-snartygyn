@@ -10,6 +10,7 @@ import { PageTitleCard } from "@/components/PageTitleCard";
 import { useAllWorkouts } from "@/hooks/useWorkoutData";
 import { useWorkoutInteractions } from "@/hooks/useWorkoutInteractions";
 import { supabase } from "@/integrations/supabase/client";
+import { Dumbbell } from "lucide-react";
 import burnStartImg from "@/assets/burn-start-workout.jpg";
 import sweatCircuitImg from "@/assets/sweat-circuit-workout.jpg";
 import bodyBurnoutImg from "@/assets/body-burnout-workout.jpg";
@@ -445,7 +446,7 @@ const WorkoutDetail = () => {
           <span className="text-xs sm:text-sm">Back</span>
         </Button>
         
-        <PageTitleCard title={title} />
+        <PageTitleCard title={title} icon={Dumbbell} />
         
         {/* Compact Filters */}
         <CompactFilters

@@ -12,7 +12,7 @@ import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { ParQQuestionnaire } from "@/components/ParQQuestionnaire";
 import { PageTitleCard } from "@/components/PageTitleCard";
-import { Loader2, ArrowLeft } from "lucide-react";
+import { Loader2, ArrowLeft, UserCheck } from "lucide-react";
 import { useShowBackButton } from "@/hooks/useShowBackButton";
 
 const PersonalTraining = () => {
@@ -285,7 +285,7 @@ const PersonalTraining = () => {
             </Button>
           )}
           
-          <PageTitleCard title="Personal Training" />
+          <PageTitleCard title="Personal Training" icon={UserCheck} />
           
           <p className="text-center text-muted-foreground mb-4 px-2 text-sm sm:text-base">
             Get your customized and tailor-made program by the fitness expert and sports scientist, <a href="/coach-profile" className="text-primary hover:underline font-medium"><strong>Haris Falas</strong></a>

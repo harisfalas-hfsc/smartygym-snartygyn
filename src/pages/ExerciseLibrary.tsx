@@ -3,7 +3,7 @@ import { Helmet } from "react-helmet";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { PageTitleCard } from "@/components/PageTitleCard";
-import { ArrowLeft, Youtube } from "lucide-react";
+import { ArrowLeft, Youtube, Video } from "lucide-react";
 import { BackToTop } from "@/components/BackToTop";
 
 const ExerciseLibrary = () => {
@@ -41,7 +41,7 @@ const ExerciseLibrary = () => {
             <span className="text-xs sm:text-sm">Back</span>
           </Button>
           
-          <PageTitleCard title="Exercise Library" />
+          <PageTitleCard title="Exercise Library" icon={Video} />
           <p className="text-center text-muted-foreground mb-4 max-w-3xl mx-auto">
             Navigate through all exercise demonstrations and find the perfect technique with your Smarty Coach. Welcome Inside Smarty Gym — watch professional exercise tutorials and technique guides by <a href="/coach-profile" className="text-primary hover:underline font-medium">Haris Falas</a>.
           </p>

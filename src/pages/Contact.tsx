@@ -306,7 +306,7 @@ const Contact = () => {
           )}
 
           {/* Hero Section */}
-          <PageTitleCard title="Contact" />
+          <PageTitleCard title="Contact" icon={Mail} />
           <header className="text-center mb-8">
             <p className="text-center text-muted-foreground mb-4">
               Have questions? Need support? Want to discuss your fitness goals?

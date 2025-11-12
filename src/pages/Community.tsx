@@ -14,7 +14,7 @@ import {
 import { Skeleton } from "@/components/ui/skeleton";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Button } from "@/components/ui/button";
-import { Trophy, MessageSquare, Calendar, User, ArrowUpDown, Dumbbell, Target } from "lucide-react";
+import { Trophy, MessageSquare, Calendar, User, ArrowUpDown, Dumbbell, Target, Users } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
 
 interface LeaderboardEntry {
@@ -237,7 +237,7 @@ const Community = () => {
 
       <div className="min-h-screen bg-background">
         <div className="container mx-auto max-w-7xl px-4 py-8">
-          <PageTitleCard title="Community" />
+          <PageTitleCard title="Community" icon={Users} />
           <p className="text-center text-muted-foreground mb-6">
             Join our community of fitness enthusiasts
           </p>

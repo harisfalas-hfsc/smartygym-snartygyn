@@ -3,7 +3,8 @@ import { Helmet } from "react-helmet";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
-import { ArrowLeft, Award, Heart, Users, Target, UserCheck, Brain, Shield, Sparkles, Ban, CheckCircle2, Compass } from "lucide-react";
+import { PageTitleCard } from "@/components/PageTitleCard";
+import { ArrowLeft, Award, Heart, Users, Target, UserCheck, Brain, Shield, Sparkles, Ban, CheckCircle2, Compass, Info } from "lucide-react";
 import { BackToTop } from "@/components/BackToTop";
 import { useShowBackButton } from "@/hooks/useShowBackButton";
 import { useAccessControl } from "@/hooks/useAccessControl";
@@ -72,8 +73,8 @@ const About = () => {
         )}
 
         {/* Hero Section */}
+        <PageTitleCard title="About" icon={Info} />
         <header className="text-center mb-6 sm:mb-8">
-          <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-2">About</h1>
           <p className="text-center text-muted-foreground mb-4 text-sm sm:text-base px-2">
             Fitness Without the Chains | smartygym.com
           </p>

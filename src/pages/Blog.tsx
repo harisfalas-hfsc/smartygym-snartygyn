@@ -4,7 +4,7 @@ import { Helmet } from "react-helmet";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { PageTitleCard } from "@/components/PageTitleCard";
-import { ArrowLeft, Clock, Calendar } from "lucide-react";
+import { ArrowLeft, Clock, Calendar, FileText } from "lucide-react";
 import { useShowBackButton } from "@/hooks/useShowBackButton";
 
 interface Article {
@@ -153,7 +153,7 @@ const Blog = () => {
             </Button>
           )}
 
-          <PageTitleCard title="Blog" />
+          <PageTitleCard title="Blog" icon={FileText} />
           <header className="text-center mb-6 sm:mb-8">
             <div className="bg-primary/10 border border-primary/20 rounded-lg p-3 sm:p-4 max-w-2xl mx-auto">
               <p className="text-xs sm:text-sm text-muted-foreground">
