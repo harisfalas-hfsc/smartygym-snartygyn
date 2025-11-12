@@ -2,6 +2,7 @@ import { useNavigate } from "react-router-dom";
 import { Helmet } from "react-helmet";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import { PageTitleCard } from "@/components/PageTitleCard";
 import { ArrowLeft, Calculator, Activity, Flame } from "lucide-react";
 import { useShowBackButton } from "@/hooks/useShowBackButton";
 import { useAccessControl } from "@/hooks/useAccessControl";
@@ -67,9 +68,9 @@ const Tools = () => {
             <ArrowLeft className="mr-2 h-4 w-4" />
             Back
           </Button>
-        )}
+          )}
 
-        <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-center mb-2">Smart Tools</h1>
+        <PageTitleCard title="Smart Tools" />
         <p className="text-center text-muted-foreground mb-4 text-sm sm:text-base px-2">
           Free fitness calculators to support your training
         </p>

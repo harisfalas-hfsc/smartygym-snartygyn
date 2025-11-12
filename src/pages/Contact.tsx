@@ -5,6 +5,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
+import { PageTitleCard } from "@/components/PageTitleCard";
 import { ArrowLeft, Mail, MessageSquare, Send, MapPin, Phone, Lock } from "lucide-react";
 import { BackToTop } from "@/components/BackToTop";
 import { useToast } from "@/hooks/use-toast";
@@ -305,8 +306,8 @@ const Contact = () => {
           )}
 
           {/* Hero Section */}
+          <PageTitleCard title="Contact" />
           <header className="text-center mb-8">
-            <h1 className="text-3xl sm:text-4xl font-bold mb-2">Contact</h1>
             <p className="text-center text-muted-foreground mb-4">
               Have questions? Need support? Want to discuss your fitness goals?
             </p>

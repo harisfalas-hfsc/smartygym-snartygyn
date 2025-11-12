@@ -6,6 +6,7 @@ import { Card } from "@/components/ui/card";
 import { ArrowLeft, Eye, CheckCircle } from "lucide-react";
 import { AccessGate } from "@/components/AccessGate";
 import { CompactFilters } from "@/components/CompactFilters";
+import { PageTitleCard } from "@/components/PageTitleCard";
 import { useAllWorkouts } from "@/hooks/useWorkoutData";
 import { useWorkoutInteractions } from "@/hooks/useWorkoutInteractions";
 import { supabase } from "@/integrations/supabase/client";
@@ -305,13 +306,13 @@ const WorkoutDetail = () => {
   };
 
   const workoutTitles: { [key: string]: string } = {
-    "strength": "Strength Workout",
-    "calorie-burning": "Calorie Burning Workout",
-    "metabolic": "Metabolic Workout",
-    "cardio": "Cardio Workout",
-    "mobility": "Mobility & Stability Workout",
-    "power": "Power Workout",
-    "challenge": "Challenge Workout"
+    "strength": "Strength Workouts",
+    "calorie-burning": "Calorie Burning Workouts",
+    "metabolic": "Metabolic Workouts",
+    "cardio": "Cardio Workouts",
+    "mobility": "Mobility & Stability Workouts",
+    "power": "Power Workouts",
+    "challenge": "Challenge Workouts"
   };
 
   const handleWorkoutClick = (workoutId: string) => {
@@ -444,7 +445,7 @@ const WorkoutDetail = () => {
           <span className="text-xs sm:text-sm">Back</span>
         </Button>
         
-        <h1 className="text-3xl sm:text-4xl font-bold text-center mb-8">{title}</h1>
+        <PageTitleCard title={title} />
         
         {/* Compact Filters */}
         <CompactFilters

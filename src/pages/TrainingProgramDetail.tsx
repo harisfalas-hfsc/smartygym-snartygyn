@@ -6,6 +6,7 @@ import { Card } from "@/components/ui/card";
 import { ArrowLeft, Calendar, Eye, CheckCircle } from "lucide-react";
 import { AccessGate } from "@/components/AccessGate";
 import { CompactFilters } from "@/components/CompactFilters";
+import { PageTitleCard } from "@/components/PageTitleCard";
 import { useAllPrograms } from "@/hooks/useProgramData";
 import { useProgramInteractions } from "@/hooks/useProgramInteractions";
 import { supabase } from "@/integrations/supabase/client";
@@ -444,7 +445,7 @@ const TrainingProgramDetail = () => {
           <span className="text-xs sm:text-sm">Back</span>
         </Button>
         
-        <h1 className="text-3xl sm:text-4xl font-bold text-center mb-8">{title}</h1>
+        <PageTitleCard title={title} />
         
         {/* Info Card */}
         {programInfo[type || ""] && (

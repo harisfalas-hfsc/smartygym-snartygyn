@@ -2,6 +2,7 @@ import { useNavigate } from "react-router-dom";
 import { Helmet } from "react-helmet";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import { PageTitleCard } from "@/components/PageTitleCard";
 import { ArrowLeft, Youtube } from "lucide-react";
 import { BackToTop } from "@/components/BackToTop";
 
@@ -40,7 +41,7 @@ const ExerciseLibrary = () => {
             <span className="text-xs sm:text-sm">Back</span>
           </Button>
           
-          <h1 className="text-3xl sm:text-4xl font-bold text-center mb-2">Exercise Library</h1>
+          <PageTitleCard title="Exercise Library" />
           <p className="text-center text-muted-foreground mb-4 max-w-3xl mx-auto">
             Navigate through all exercise demonstrations and find the perfect technique with your Smarty Coach. Welcome Inside Smarty Gym — watch professional exercise tutorials and technique guides by <a href="/coach-profile" className="text-primary hover:underline font-medium">Haris Falas</a>.
           </p>

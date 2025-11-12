@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { Helmet } from "react-helmet";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import { PageTitleCard } from "@/components/PageTitleCard";
 import { ArrowLeft, Clock, Calendar } from "lucide-react";
 import { useShowBackButton } from "@/hooks/useShowBackButton";
 
@@ -152,8 +153,8 @@ const Blog = () => {
             </Button>
           )}
 
+          <PageTitleCard title="Blog" />
           <header className="text-center mb-6 sm:mb-8">
-            <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-4">Smarty Gym Blog</h1>
             <div className="bg-primary/10 border border-primary/20 rounded-lg p-3 sm:p-4 max-w-2xl mx-auto">
               <p className="text-xs sm:text-sm text-muted-foreground">
                 Expert insights on training, nutrition, and performance from certified strength coach{" "}

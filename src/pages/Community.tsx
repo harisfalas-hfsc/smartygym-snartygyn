@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { Helmet } from "react-helmet";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { PageTitleCard } from "@/components/PageTitleCard";
 import {
   Table,
   TableBody,
@@ -236,12 +237,10 @@ const Community = () => {
 
       <div className="min-h-screen bg-background">
         <div className="container mx-auto max-w-7xl px-4 py-8">
-          <div className="text-center mb-8">
-            <h1 className="text-3xl sm:text-4xl font-bold mb-2">Community</h1>
-            <p className="text-muted-foreground mb-4">
-              Join our community of fitness enthusiasts
-            </p>
-          </div>
+          <PageTitleCard title="Community" />
+          <p className="text-center text-muted-foreground mb-6">
+            Join our community of fitness enthusiasts
+          </p>
 
           {/* Workout Leaderboard Section */}
           <Card className="mb-6 md:mb-8 border-2 border-primary/30 shadow-lg">
