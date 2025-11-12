@@ -52,6 +52,7 @@ import { AccessGate } from "./components/AccessGate";
 import { WhatsAppButton } from "./components/WhatsAppButton";
 import { InstallPWA } from "./components/InstallPWA";
 import { NotificationPrompt } from "./components/NotificationPrompt";
+import { PageTransition } from "./components/PageTransition";
 
 const queryClient = new QueryClient();
 
@@ -71,12 +72,13 @@ const App = () => (
           <div className="flex flex-col min-h-screen">
             <Navigation />
             <div className="flex-1">
-              <Routes>
-                <Route path="/" element={<Index />} />
-                <Route path="/auth" element={<Auth />} />
-                <Route path="/joinpremium" element={<JoinPremium />} />
-                <Route path="/premiumbenefits" element={<PremiumBenefits />} />
-                <Route path="/premium-comparison" element={<PremiumComparison />} />
+              <PageTransition>
+                <Routes>
+                  <Route path="/" element={<Index />} />
+                  <Route path="/auth" element={<Auth />} />
+                  <Route path="/joinpremium" element={<JoinPremium />} />
+                  <Route path="/premiumbenefits" element={<PremiumBenefits />} />
+                  <Route path="/premium-comparison" element={<PremiumComparison />} />
                 
                 {/* Public free content page */}
                 <Route path="/freecontent" element={<FreeContent />} />
@@ -125,6 +127,7 @@ const App = () => (
                 {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
                 <Route path="*" element={<NotFound />} />
               </Routes>
+              </PageTransition>
             </div>
             <Footer />
           </div>
