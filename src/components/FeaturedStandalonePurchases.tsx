@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
@@ -27,47 +28,52 @@ interface StandaloneItem {
 export const FeaturedStandalonePurchases = () => {
   const navigate = useNavigate();
 
-  const { data: items, isLoading } = useQuery<StandaloneItem[]>({
+  const { data: items, isLoading, refetch } = useQuery<StandaloneItem[]>({
     queryKey: ["featured-standalone-purchases"],
+    refetchOnMount: "always",
+    refetchOnWindowFocus: true,
     staleTime: 0,
-    refetchInterval: 30000, // Auto-refresh every 30 seconds
+    gcTime: 0,
     queryFn: async () => {
-      console.log("🔍 Fetching standalone items...");
-      const [workoutsResult, programsResult] = await Promise.all([
-        supabase
-          .from("admin_workouts")
-          .select("id, name, price, image_url, description, difficulty")
-          .eq("is_standalone_purchase", true)
-          .not("price", "is", null)
-          .order("serial_number", { ascending: false })
-          .limit(20),
-        supabase
-          .from("admin_training_programs")
-          .select("id, name, price, image_url, description, difficulty")
-          .eq("is_standalone_purchase", true)
-          .not("price", "is", null)
-          .order("serial_number", { ascending: false })
-          .limit(20)
-      ]);
+      const { data: workouts, error: workoutsError } = await supabase
+        .from("admin_workouts")
+        .select("id, name, price, image_url, description, difficulty")
+        .eq("is_standalone_purchase", true)
+        .not("price", "is", null)
+        .order("serial_number", { ascending: false })
+        .limit(20);
 
-      console.log("📦 Workouts result:", workoutsResult);
-      console.log("📦 Programs result:", programsResult);
+      const { data: programs, error: programsError } = await supabase
+        .from("admin_training_programs")
+        .select("id, name, price, image_url, description, difficulty")
+        .eq("is_standalone_purchase", true)
+        .not("price", "is", null)
+        .order("serial_number", { ascending: false })
+        .limit(20);
 
-      const workouts: StandaloneItem[] = (workoutsResult.data || []).map(w => ({
+      if (workoutsError) console.error("Workouts error:", workoutsError);
+      if (programsError) console.error("Programs error:", programsError);
+
+      const workoutItems: StandaloneItem[] = (workouts || []).map(w => ({
         ...w,
         type: 'workout' as const
       }));
 
-      const programs: StandaloneItem[] = (programsResult.data || []).map(p => ({
+      const programItems: StandaloneItem[] = (programs || []).map(p => ({
         ...p,
         type: 'program' as const
       }));
 
-      const combined = [...workouts, ...programs];
-      console.log("✅ Total items:", combined.length, combined);
+      const combined = [...workoutItems, ...programItems];
+      console.log("🎯 Featured items loaded:", combined);
       return combined;
     },
   });
+
+  // Force refetch on mount
+  useEffect(() => {
+    refetch();
+  }, [refetch]);
 
   const handleItemClick = (item: StandaloneItem) => {
     if (item.type === 'workout') {
@@ -98,8 +104,6 @@ export const FeaturedStandalonePurchases = () => {
   }
 
   const hasItems = items && items.length > 0;
-  
-  console.log("🎯 Featured Section - hasItems:", hasItems, "items:", items);
 
   return (
     <section className="py-8 px-4">
@@ -116,9 +120,12 @@ export const FeaturedStandalonePurchases = () => {
 
           {!hasItems && (
             <div className="text-center py-8">
-              <p className="text-muted-foreground">
-                No standalone items found. Check console for details.
+              <p className="text-muted-foreground mb-3">
+                No standalone items available yet.
               </p>
+              <Button onClick={() => refetch()} variant="outline" size="sm">
+                Refresh
+              </Button>
             </div>
           )}
 
