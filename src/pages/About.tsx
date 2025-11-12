@@ -84,7 +84,7 @@ const About = () => {
         
         <InfoRibbon className="max-w-3xl mx-auto">
           <p>
-            Founded by <a href="/coach-profile" className="text-primary hover:underline font-medium">Haris Falas</a> — Sports Scientist & Strength and Conditioning Coach | Cyprus Fitness Expert
+            Founded by <a href="/coach-profile" className="text-primary hover:underline font-medium">Haris Falas</a> - BSc Sports Science | EXOS Specialist | CSCS
           </p>
         </InfoRibbon>
 

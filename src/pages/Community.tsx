@@ -243,13 +243,9 @@ const Community = () => {
           
           <PageTitleCard 
             title="Community" 
-            subtitle="Join our community of fitness enthusiasts"
+            subtitle="Connect with other members, share your progress, and celebrate your achievements together"
             icon={Users} 
           />
-          
-          <InfoRibbon className="max-w-3xl mx-auto">
-            <p>Connect with other members, share your progress, and celebrate your achievements together</p>
-          </InfoRibbon>
 
           <DecorativeDivider className="mb-12" />
 
