@@ -3,6 +3,7 @@ import { Helmet } from "react-helmet";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { PageTitleCard } from "@/components/PageTitleCard";
+import { InfoRibbon } from "@/components/InfoRibbon";
 import { DecorativeDivider } from "@/components/DecorativeDivider";
 import { ArrowLeft, Calculator, Activity, Flame, Wrench } from "lucide-react";
 import { useShowBackButton } from "@/hooks/useShowBackButton";
@@ -59,17 +60,18 @@ const Tools = () => {
       
       <div className="min-h-screen bg-background">
       <div className="container mx-auto max-w-6xl px-4 py-8">
-        {canGoBack && (
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={goBack}
-            className="mb-6"
-          >
-            <ArrowLeft className="mr-2 h-4 w-4" />
-            Back
-          </Button>
+        <div className="h-10 mb-6">
+          {canGoBack && (
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={goBack}
+            >
+              <ArrowLeft className="mr-2 h-4 w-4" />
+              Back
+            </Button>
           )}
+        </div>
 
         <PageTitleCard 
           title="Smart Tools" 
@@ -77,32 +79,25 @@ const Tools = () => {
           icon={Wrench} 
         />
         
-        {/* Info Ribbon */}
-        <div className="bg-primary/10 border border-primary/20 rounded-lg p-3 sm:p-4 mb-6 sm:mb-8 text-center">
-          {userTier === "guest" ? (
-            <>
-              <p className="text-xs sm:text-sm text-muted-foreground mb-2">
-                Login required to use these calculators. Already a member? Sign in to access all tools.
-              </p>
-              <Button variant="default" size="sm" onClick={() => navigate("/auth")} className="text-xs sm:text-sm">
-                Login / Sign Up
-              </Button>
-            </>
-          ) : !isPremium ? (
-            <>
-              <p className="text-xs sm:text-sm text-muted-foreground mb-2">
-                Use these tools for free as a member. Want personalized training programs?
-              </p>
-              <Button variant="default" size="sm" onClick={() => navigate("/premiumbenefits")} className="text-xs sm:text-sm">
-                Join Premium
-              </Button>
-            </>
-          ) : (
-            <p className="text-xs sm:text-sm text-muted-foreground">
-              All tools included in your premium membership — plus personalized training programs!
-            </p>
-          )}
-        </div>
+        {userTier === "guest" ? (
+          <InfoRibbon 
+            ctaText="Login / Sign Up"
+            onCtaClick={() => navigate("/auth")}
+          >
+            <p>Login required to use these calculators. Already a member? Sign in to access all tools.</p>
+          </InfoRibbon>
+        ) : !isPremium ? (
+          <InfoRibbon 
+            ctaText="Join Premium"
+            onCtaClick={() => navigate("/premiumbenefits")}
+          >
+            <p>Use these tools for free as a member. Want personalized training programs?</p>
+          </InfoRibbon>
+        ) : (
+          <InfoRibbon>
+            <p>All tools included in your premium membership — plus personalized training programs!</p>
+          </InfoRibbon>
+        )}
 
         <DecorativeDivider className="mb-12" />
 
