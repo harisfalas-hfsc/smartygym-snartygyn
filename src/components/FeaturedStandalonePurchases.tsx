@@ -32,6 +32,7 @@ export const FeaturedStandalonePurchases = () => {
     staleTime: 0,
     refetchInterval: 30000, // Auto-refresh every 30 seconds
     queryFn: async () => {
+      console.log("🔍 Fetching standalone items...");
       const [workoutsResult, programsResult] = await Promise.all([
         supabase
           .from("admin_workouts")
@@ -49,6 +50,9 @@ export const FeaturedStandalonePurchases = () => {
           .limit(20)
       ]);
 
+      console.log("📦 Workouts result:", workoutsResult);
+      console.log("📦 Programs result:", programsResult);
+
       const workouts: StandaloneItem[] = (workoutsResult.data || []).map(w => ({
         ...w,
         type: 'workout' as const
@@ -59,7 +63,9 @@ export const FeaturedStandalonePurchases = () => {
         type: 'program' as const
       }));
 
-      return [...workouts, ...programs];
+      const combined = [...workouts, ...programs];
+      console.log("✅ Total items:", combined.length, combined);
+      return combined;
     },
   });
 
@@ -92,10 +98,8 @@ export const FeaturedStandalonePurchases = () => {
   }
 
   const hasItems = items && items.length > 0;
-
-  if (!hasItems) {
-    return null;
-  }
+  
+  console.log("🎯 Featured Section - hasItems:", hasItems, "items:", items);
 
   return (
     <section className="py-8 px-4">
@@ -109,6 +113,16 @@ export const FeaturedStandalonePurchases = () => {
               Get individual workouts and programs without a plan
             </p>
           </div>
+
+          {!hasItems && (
+            <div className="text-center py-8">
+              <p className="text-muted-foreground">
+                No standalone items found. Check console for details.
+              </p>
+            </div>
+          )}
+
+          {hasItems && (
 
           <Carousel
             opts={{
@@ -170,6 +184,7 @@ export const FeaturedStandalonePurchases = () => {
             <CarouselPrevious className="hidden md:flex" />
             <CarouselNext className="hidden md:flex" />
           </Carousel>
+          )}
         </div>
       </div>
     </section>
