@@ -96,13 +96,13 @@ const AD_PURPOSES: AdPurpose[] = [
 const PLATFORMS = ["Instagram", "TikTok", "Facebook"] as const;
 
 const BACKGROUND_STYLES = [
-  { value: "fitness_action", label: "Fitness Action", description: "People actively exercising" },
-  { value: "motivating_couple", label: "Motivating Couple", description: "Couple working out together" },
-  { value: "bright_clean", label: "Bright & Clean", description: "Bright, minimal, professional look" },
-  { value: "empty_minimal", label: "Empty/Minimal", description: "Simple background or solid color" },
-  { value: "graphical_abstract", label: "Graphical/Abstract", description: "Abstract fitness graphics" },
-  { value: "gym_equipment", label: "Gym Equipment", description: "Focus on fitness equipment" },
-  { value: "outdoor_fitness", label: "Outdoor Fitness", description: "Outdoor workout setting" },
+  { value: "fitness_action", label: "Home Training with Device", description: "Person working out at home with laptop/tablet visible" },
+  { value: "motivating_couple", label: "Couple Training at Home", description: "Couple working out at home with TV/laptop" },
+  { value: "bright_clean", label: "Bright Home Workout Space", description: "Modern home interior with device for online training" },
+  { value: "empty_minimal", label: "Clean Minimal Background", description: "Simple gradient background" },
+  { value: "graphical_abstract", label: "Digital Fitness Graphics", description: "Abstract design with digital/tech elements" },
+  { value: "gym_equipment", label: "Home Equipment Setup", description: "Home workout equipment with device visible" },
+  { value: "outdoor_fitness", label: "Outdoor Training with Mobile", description: "Outdoor workout with smartphone/mobile device" },
 ];
 
 export const AdvertiseTemplatesManager = () => {
@@ -185,23 +185,23 @@ export const AdvertiseTemplatesManager = () => {
 
   const buildBackgroundPrompt = (style: string, customPrompt: string): string => {
     const styleDescriptions: Record<string, string> = {
-      fitness_action: "Professional fitness advertisement photography: MUST show 1-2 athletic people actively exercising with dumbbells or resistance bands, capturing dynamic movement mid-action. Bright, well-lit modern gym with white walls and natural light. People must be visible, fit, determined, and in motion. High energy composition with professional lighting. Vibrant and motivating atmosphere.",
-      motivating_couple: "Professional fitness advertisement photography: MUST feature an athletic man and woman training together as a couple, both holding resistance bands or dumbbells, smiling and energetic. Bright modern gym setting with excellent lighting. Both people clearly visible showing teamwork and motivation. Clean, professional, high-energy scene.",
-      bright_clean: "Professional fitness advertisement photography: Bright, airy fitness studio with floor-to-ceiling windows flooding space with natural sunlight. 1-2 fit people exercising in the well-lit space. White and light gray tones dominating. Spacious, clean, premium feel. People should be visible but not the main focus. Fresh, uplifting, professional atmosphere.",
+      fitness_action: "Professional online fitness platform advertisement: MUST show 1-2 athletic people working out AT HOME while watching a workout on their LAPTOP or TABLET on a table/stand. Home living room or home gym setting with bright natural light. Person actively exercising (dumbbells, resistance bands, bodyweight) while following online training on screen. Modern home interior, motivating atmosphere. Device screen must be visible showing they're using an online platform.",
+      motivating_couple: "Professional online fitness platform advertisement: MUST show an athletic couple training together AT HOME while following a workout on a LARGE TV SCREEN or LAPTOP in their living room. Both holding resistance bands or doing bodyweight exercises. Bright, modern home setting. TV/screen visible in background showing online workout content. Home environment, not gym. Digital fitness lifestyle.",
+      bright_clean: "Professional online fitness platform advertisement: Bright, spacious home interior with person using PHONE or TABLET to access online workouts. Minimalist modern home with natural light from windows. Person in athletic wear holding device or device on stand nearby. Clean, airy, home workout space. Emphasis on digital/online fitness accessible anywhere at home.",
       empty_minimal: "Professional gradient background: Smooth gradient from light gray (#E5E5E5) at top to soft white (#F8F8F8) at bottom. Clean, minimal, professional. Perfect neutral base for text overlay. No textures, no patterns, no objects - just smooth, professional gradient.",
-      graphical_abstract: "Professional abstract fitness graphic design: Bold geometric shapes in gold (#D4AF37), electric blue, and white. Dynamic diagonal lines suggesting movement and energy. Modern, energetic, eye-catching composition. Abstract but clearly fitness-themed. High contrast and professional design.",
-      gym_equipment: "Professional fitness advertisement photography: Showcase of premium gym equipment (dumbbells, kettlebells, resistance bands) arranged attractively with dramatic side lighting creating highlights and shadows. 1 person visible using equipment in background. Clean, organized, professional product-style shot with dark background.",
-      outdoor_fitness: "Professional fitness advertisement photography: MUST show 1-2 athletic people doing outdoor exercises (running, bodyweight workout) in a beautiful natural setting with mountains or park in background. Golden hour lighting, vibrant colors, dynamic action shot. Natural environment, fresh air feeling, energetic outdoor training scene.",
+      graphical_abstract: "Professional abstract digital fitness graphic: Bold geometric shapes in gold (#D4AF37), electric blue, and white. Include subtle digital elements like device screens, app interface shapes, or connectivity icons. Modern, tech-forward, energetic. Abstract representation of ONLINE FITNESS PLATFORM. Digital, connected, accessible anywhere.",
+      gym_equipment: "Professional home workout equipment photography: Premium home fitness equipment (dumbbells, resistance bands, yoga mat, kettlebells) arranged in a modern HOME SETTING with a LAPTOP or TABLET visible showing online workout interface. Bright home interior. Equipment accessible for home training, not commercial gym equipment.",
+      outdoor_fitness: "Professional online fitness platform advertisement: MUST show 1-2 athletic people doing outdoor exercises (running, bodyweight workout, resistance band training) in a park or beach setting while using a SMARTPHONE held in hand or mounted on armband. Natural outdoor environment, beautiful lighting. Mobile device visible showing they're following online training outdoors. Freedom to train anywhere.",
     };
 
     const baseStyle = styleDescriptions[style] || styleDescriptions.bright_clean;
     
     // Add custom requirements if provided
     if (customPrompt.trim()) {
-      return `${baseStyle}. ADDITIONAL SPECIFIC REQUIREMENTS: ${customPrompt}. Remember: Image must be professional advertisement quality with high visual appeal.`;
+      return `${baseStyle}. ADDITIONAL SPECIFIC REQUIREMENTS: ${customPrompt}. CRITICAL: This is for an ONLINE FITNESS PLATFORM accessed via devices (phones, laptops, tablets), NOT a physical gym. Show home/outdoor training with digital devices.`;
     }
     
-    return baseStyle;
+    return `${baseStyle}. CRITICAL: This is for an ONLINE FITNESS PLATFORM accessed via devices, NOT a physical gym.`;
   };
 
   const generateBackgroundImage = async (prompt: string, aspectRatio: string): Promise<string> => {

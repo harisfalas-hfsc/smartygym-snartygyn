@@ -20,34 +20,50 @@ serve(async (req: Request) => {
     }
 
     // CRITICAL: Add strict instructions to ensure professional, usable backgrounds
-    const enhancedPrompt = `You are generating a background image for a professional fitness advertisement that will be used in a business marketing campaign.
+    const enhancedPrompt = `You are generating a background image for a professional ONLINE FITNESS PLATFORM advertisement that will be used in a business marketing campaign.
+
+CRITICAL BRAND CONTEXT - UNDERSTAND THIS FIRST:
+- Smarty Gym is an ONLINE FITNESS PLATFORM, NOT a physical gym
+- Users work out AT HOME, in PARKS, or ANYWHERE they choose
+- Users access workouts through PHONES, LAPTOPS, TABLETS, or TVs
+- This is DIGITAL FITNESS - workouts are delivered through SCREENS and DEVICES
+- The platform brings expert training to users wherever they are
+- This is about FREEDOM, FLEXIBILITY, and DIGITAL ACCESS to fitness
 
 BASE REQUIREMENTS: ${prompt}
 
-CRITICAL TECHNICAL REQUIREMENTS - FOLLOW EXACTLY:
+CRITICAL VISUAL REQUIREMENTS - FOLLOW EXACTLY:
 1. ABSOLUTELY NO TEXT of any kind - no words, letters, numbers, captions, or labels
 2. ABSOLUTELY NO logos, brand names, icons, or symbols  
 3. ABSOLUTELY NO borders, frames, or graphic overlays
 4. Generate ONLY a clean, professional photograph or graphic background
-5. If people are mentioned in requirements, they MUST be clearly visible and in action
-6. Lighting must be bright, professional, and high-quality
-7. Colors must be vibrant, saturated, and visually appealing
-8. Composition must be dynamic and eye-catching
-9. Overall image must look like professional advertisement photography
-10. Image quality must be ultra-high resolution and sharp
+5. If people are shown, they MUST be training in HOME or OUTDOOR environments (never commercial gyms)
+6. If devices are mentioned, they MUST be clearly visible (laptop, phone, tablet, TV screen)
+7. Show the DIGITAL FITNESS lifestyle - people using technology to train anywhere
+8. Lighting must be bright, natural, and professional
+9. Colors must be vibrant, saturated, and visually appealing
+10. Composition must show the convenience and accessibility of online fitness
+
+ENVIRONMENT GUIDELINES:
+- HOME settings: living rooms, home workout spaces, bedrooms with laptops/tablets/TVs visible
+- OUTDOOR settings: parks, beaches, nature with mobile phones/devices
+- NEVER show: commercial gym equipment, gym interiors, fitness studios
+- ALWAYS emphasize: personal space, digital devices, train-anywhere freedom
 
 WHAT THIS IMAGE IS FOR:
-- This is ONLY the background layer for an advertisement
+- Background layer for an ONLINE FITNESS PLATFORM advertisement
+- Must convey digital fitness, home training, mobile accessibility
 - Text, branding, and messaging will be added by a separate system later
-- The image must be visually appealing enough for professional marketing use
-- Think: "Would this background make someone want to click on an ad?"
+- Must be visually appealing for professional digital marketing
+- Think: "This shows people can train anywhere with online fitness"
 
 QUALITY STANDARDS:
 - Professional photography studio quality
-- Commercial advertisement grade
+- Commercial advertisement grade for digital fitness marketing
 - High contrast and visual impact
-- Bright, energetic, motivating atmosphere
-- Sharp focus and excellent composition`;
+- Bright, energetic, accessible atmosphere
+- Sharp focus and excellent composition
+- Clearly communicates ONLINE/DIGITAL fitness concept`;
 
     console.log("Generating professional ad background with enhanced prompt");
 
