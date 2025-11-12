@@ -338,9 +338,15 @@ const TrainingProgramDetail = () => {
   const title = programTitles[type || ""] || "Training Programs";
   const mappedCategory = categoryMap[type || "cardio-endurance"];
   
+  console.log("🎯 TrainingProgramDetail mounted - type:", type);
+  console.log("📦 All Programs from DB:", allPrograms.length, allPrograms);
+  console.log("🗺️ Mapped Category:", mappedCategory);
+  console.log("⏳ Loading:", isLoading);
+  
   // Filter programs by category from URL and user filters
   const filteredPrograms = allPrograms.filter(program => {
     // Match category - correctly filtering by category field
+    console.log(`🔍 Filtering program: ${program.name} Category: ${program.category} Expected: ${mappedCategory}`);
     if (!program.category?.toUpperCase().includes(mappedCategory)) return false;
     
     // Equipment filter
@@ -365,6 +371,8 @@ const TrainingProgramDetail = () => {
     
     return true;
   });
+  
+  console.log("✅ Filtered Programs:", filteredPrograms.length, filteredPrograms.map(p => p.name));
 
   return (
     <>
