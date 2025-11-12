@@ -202,15 +202,78 @@ export const Navigation = () => {
 
           {/* Desktop Navigation Links */}
           <nav className="hidden md:flex items-center gap-4 flex-1 justify-center">
-            <Button variant="ghost" size="sm" onClick={() => navigate("/about")} className="text-primary bg-primary/10 hover:bg-primary hover:text-primary-foreground border border-primary/30">About</Button>
-            <Button variant="ghost" size="sm" onClick={() => navigate("/workout")} className="text-primary bg-primary/10 hover:bg-primary hover:text-primary-foreground border border-primary/30">Workouts</Button>
-            <Button variant="ghost" size="sm" onClick={() => navigate("/trainingprogram")} className="text-primary bg-primary/10 hover:bg-primary hover:text-primary-foreground border border-primary/30">Programs</Button>
-            <Button variant="ghost" size="sm" onClick={() => navigate("/personal-training")} className="text-primary bg-primary/10 hover:bg-primary hover:text-primary-foreground border border-primary/30">Personal Training</Button>
-            <Button variant="ghost" size="sm" onClick={() => navigate("/tools")} className="text-primary bg-primary/10 hover:bg-primary hover:text-primary-foreground border border-primary/30">Tools</Button>
-            <Button variant="ghost" size="sm" onClick={() => navigate("/exerciselibrary")} className="text-primary bg-primary/10 hover:bg-primary hover:text-primary-foreground border border-primary/30">Exercise Library</Button>
-            <Button variant="ghost" size="sm" onClick={() => navigate("/community")} className="text-primary bg-primary/10 hover:bg-primary hover:text-primary-foreground border border-primary/30">Community</Button>
-            <Button variant="ghost" size="sm" onClick={() => navigate("/blog")} className="text-primary bg-primary/10 hover:bg-primary hover:text-primary-foreground border border-primary/30">Blog</Button>
-            <Button variant="ghost" size="sm" onClick={() => navigate("/contact")} className="text-primary bg-primary/10 hover:bg-primary hover:text-primary-foreground border border-primary/30">Contact</Button>
+            <Button 
+              variant="ghost" 
+              size="sm" 
+              onClick={() => navigate("/about")} 
+              className={`text-primary border border-primary/30 ${location.pathname === '/about' ? 'bg-primary text-primary-foreground' : 'bg-primary/10 hover:bg-primary hover:text-primary-foreground'}`}
+            >
+              About
+            </Button>
+            <Button 
+              variant="ghost" 
+              size="sm" 
+              onClick={() => navigate("/workout")} 
+              className={`text-primary border border-primary/30 ${location.pathname === '/workout' ? 'bg-primary text-primary-foreground' : 'bg-primary/10 hover:bg-primary hover:text-primary-foreground'}`}
+            >
+              Workouts
+            </Button>
+            <Button 
+              variant="ghost" 
+              size="sm" 
+              onClick={() => navigate("/trainingprogram")} 
+              className={`text-primary border border-primary/30 ${location.pathname === '/trainingprogram' ? 'bg-primary text-primary-foreground' : 'bg-primary/10 hover:bg-primary hover:text-primary-foreground'}`}
+            >
+              Programs
+            </Button>
+            <Button 
+              variant="ghost" 
+              size="sm" 
+              onClick={() => navigate("/personal-training")} 
+              className={`text-primary border border-primary/30 ${location.pathname === '/personal-training' ? 'bg-primary text-primary-foreground' : 'bg-primary/10 hover:bg-primary hover:text-primary-foreground'}`}
+            >
+              Personal Training
+            </Button>
+            <Button 
+              variant="ghost" 
+              size="sm" 
+              onClick={() => navigate("/tools")} 
+              className={`text-primary border border-primary/30 ${location.pathname === '/tools' ? 'bg-primary text-primary-foreground' : 'bg-primary/10 hover:bg-primary hover:text-primary-foreground'}`}
+            >
+              Tools
+            </Button>
+            <Button 
+              variant="ghost" 
+              size="sm" 
+              onClick={() => navigate("/exerciselibrary")} 
+              className={`text-primary border border-primary/30 ${location.pathname === '/exerciselibrary' ? 'bg-primary text-primary-foreground' : 'bg-primary/10 hover:bg-primary hover:text-primary-foreground'}`}
+            >
+              Exercise Library
+            </Button>
+            <Button 
+              variant="ghost" 
+              size="sm" 
+              onClick={() => navigate("/community")} 
+              className={`text-primary border border-primary/30 ${location.pathname === '/community' ? 'bg-primary text-primary-foreground' : 'bg-primary/10 hover:bg-primary hover:text-primary-foreground'}`}
+            >
+              Community
+            </Button>
+            <Button 
+              variant="ghost" 
+              size="sm" 
+              onClick={() => navigate("/blog")} 
+              className={`text-primary border border-primary/30 ${location.pathname === '/blog' ? 'bg-primary text-primary-foreground' : 'bg-primary/10 hover:bg-primary hover:text-primary-foreground'}`}
+            >
+              Blog
+            </Button>
+            <Button 
+              variant="ghost" 
+              size="sm" 
+              onClick={() => navigate("/contact")} 
+              className={`text-primary border border-primary/30 ${location.pathname === '/contact' ? 'bg-primary text-primary-foreground' : 'bg-primary/10 hover:bg-primary hover:text-primary-foreground'}`}
+            >
+              Contact
+            </Button>
           </nav>
 
           {/* Mobile Menu */}
@@ -222,31 +285,76 @@ export const Navigation = () => {
             </SheetTrigger>
             <SheetContent side="right" className="w-64">
               <nav className="flex flex-col gap-4 mt-8">
-                <Button variant="ghost" size="lg" onClick={() => handleNavigate("/about")} className="justify-start text-primary bg-primary/10 hover:bg-primary hover:text-primary-foreground border border-primary/30">
+                <Button 
+                  variant="ghost" 
+                  size="lg" 
+                  onClick={() => handleNavigate("/about")} 
+                  className={`justify-start text-primary border border-primary/30 ${location.pathname === '/about' ? 'bg-primary text-primary-foreground' : 'bg-primary/10 hover:bg-primary hover:text-primary-foreground'}`}
+                >
                   About
                 </Button>
-                <Button variant="ghost" size="lg" onClick={() => handleNavigate("/workout")} className="justify-start text-primary bg-primary/10 hover:bg-primary hover:text-primary-foreground border border-primary/30">
+                <Button 
+                  variant="ghost" 
+                  size="lg" 
+                  onClick={() => handleNavigate("/workout")} 
+                  className={`justify-start text-primary border border-primary/30 ${location.pathname === '/workout' ? 'bg-primary text-primary-foreground' : 'bg-primary/10 hover:bg-primary hover:text-primary-foreground'}`}
+                >
                   Workouts
                 </Button>
-                <Button variant="ghost" size="lg" onClick={() => handleNavigate("/trainingprogram")} className="justify-start text-primary bg-primary/10 hover:bg-primary hover:text-primary-foreground border border-primary/30">
+                <Button 
+                  variant="ghost" 
+                  size="lg" 
+                  onClick={() => handleNavigate("/trainingprogram")} 
+                  className={`justify-start text-primary border border-primary/30 ${location.pathname === '/trainingprogram' ? 'bg-primary text-primary-foreground' : 'bg-primary/10 hover:bg-primary hover:text-primary-foreground'}`}
+                >
                   Programs
                 </Button>
-                <Button variant="ghost" size="lg" onClick={() => handleNavigate("/personal-training")} className="justify-start text-primary bg-primary/10 hover:bg-primary hover:text-primary-foreground border border-primary/30">
+                <Button 
+                  variant="ghost" 
+                  size="lg" 
+                  onClick={() => handleNavigate("/personal-training")} 
+                  className={`justify-start text-primary border border-primary/30 ${location.pathname === '/personal-training' ? 'bg-primary text-primary-foreground' : 'bg-primary/10 hover:bg-primary hover:text-primary-foreground'}`}
+                >
                   Personal Training
                 </Button>
-                <Button variant="ghost" size="lg" onClick={() => handleNavigate("/tools")} className="justify-start text-primary bg-primary/10 hover:bg-primary hover:text-primary-foreground border border-primary/30">
+                <Button 
+                  variant="ghost" 
+                  size="lg" 
+                  onClick={() => handleNavigate("/tools")} 
+                  className={`justify-start text-primary border border-primary/30 ${location.pathname === '/tools' ? 'bg-primary text-primary-foreground' : 'bg-primary/10 hover:bg-primary hover:text-primary-foreground'}`}
+                >
                   Tools
                 </Button>
-                <Button variant="ghost" size="lg" onClick={() => handleNavigate("/exerciselibrary")} className="justify-start text-primary bg-primary/10 hover:bg-primary hover:text-primary-foreground border border-primary/30">
+                <Button 
+                  variant="ghost" 
+                  size="lg" 
+                  onClick={() => handleNavigate("/exerciselibrary")} 
+                  className={`justify-start text-primary border border-primary/30 ${location.pathname === '/exerciselibrary' ? 'bg-primary text-primary-foreground' : 'bg-primary/10 hover:bg-primary hover:text-primary-foreground'}`}
+                >
                   Exercise Library
                 </Button>
-                <Button variant="ghost" size="lg" onClick={() => handleNavigate("/community")} className="justify-start text-primary bg-primary/10 hover:bg-primary hover:text-primary-foreground border border-primary/30">
+                <Button 
+                  variant="ghost" 
+                  size="lg" 
+                  onClick={() => handleNavigate("/community")} 
+                  className={`justify-start text-primary border border-primary/30 ${location.pathname === '/community' ? 'bg-primary text-primary-foreground' : 'bg-primary/10 hover:bg-primary hover:text-primary-foreground'}`}
+                >
                   Community
                 </Button>
-                <Button variant="ghost" size="lg" onClick={() => handleNavigate("/blog")} className="justify-start text-primary bg-primary/10 hover:bg-primary hover:text-primary-foreground border border-primary/30">
+                <Button 
+                  variant="ghost" 
+                  size="lg" 
+                  onClick={() => handleNavigate("/blog")} 
+                  className={`justify-start text-primary border border-primary/30 ${location.pathname === '/blog' ? 'bg-primary text-primary-foreground' : 'bg-primary/10 hover:bg-primary hover:text-primary-foreground'}`}
+                >
                   Blog
                 </Button>
-                <Button variant="ghost" size="lg" onClick={() => handleNavigate("/contact")} className="justify-start text-primary bg-primary/10 hover:bg-primary hover:text-primary-foreground border border-primary/30">
+                <Button 
+                  variant="ghost" 
+                  size="lg" 
+                  onClick={() => handleNavigate("/contact")} 
+                  className={`justify-start text-primary border border-primary/30 ${location.pathname === '/contact' ? 'bg-primary text-primary-foreground' : 'bg-primary/10 hover:bg-primary hover:text-primary-foreground'}`}
+                >
                   Contact
                 </Button>
               </nav>
