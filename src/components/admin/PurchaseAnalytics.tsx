@@ -242,7 +242,7 @@ export function PurchaseAnalytics() {
           <CardDescription>Analyze standalone purchase performance and customer behavior</CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
             <Select value={timeFilter} onValueChange={setTimeFilter}>
               <SelectTrigger>
                 <SelectValue placeholder="Time Period" />
@@ -346,12 +346,14 @@ export function PurchaseAnalytics() {
 
       {/* Charts */}
       <Tabs defaultValue="revenue" className="space-y-4">
-        <TabsList className="grid w-full grid-cols-2 lg:grid-cols-4">
-          <TabsTrigger value="revenue">Revenue Trends</TabsTrigger>
-          <TabsTrigger value="popular">Popular Items</TabsTrigger>
-          <TabsTrigger value="distribution">Distribution</TabsTrigger>
-          <TabsTrigger value="customers">Top Customers</TabsTrigger>
-        </TabsList>
+        <div className="w-full overflow-x-auto -mx-2 px-2">
+          <TabsList className="inline-flex w-auto min-w-full h-auto p-1">
+            <TabsTrigger value="revenue" className="flex-shrink-0 whitespace-nowrap text-xs sm:text-sm px-2 sm:px-3 py-2">Revenue Trends</TabsTrigger>
+            <TabsTrigger value="popular" className="flex-shrink-0 whitespace-nowrap text-xs sm:text-sm px-2 sm:px-3 py-2">Popular Items</TabsTrigger>
+            <TabsTrigger value="distribution" className="flex-shrink-0 whitespace-nowrap text-xs sm:text-sm px-2 sm:px-3 py-2">Distribution</TabsTrigger>
+            <TabsTrigger value="customers" className="flex-shrink-0 whitespace-nowrap text-xs sm:text-sm px-2 sm:px-3 py-2">Top Customers</TabsTrigger>
+          </TabsList>
+        </div>
 
         <TabsContent value="revenue" className="space-y-4">
           <Card>
@@ -368,9 +370,10 @@ export function PurchaseAnalytics() {
                 <div className="flex items-center justify-center h-80 text-muted-foreground">
                   No purchase data for selected period
                 </div>
-              ) : (
-                <ResponsiveContainer width="100%" height={400}>
-                  <LineChart data={revenueByDay}>
+               ) : (
+                 <div className="overflow-x-auto">
+                   <ResponsiveContainer width="100%" height={400} minWidth={300}>
+                     <LineChart data={revenueByDay}>
                     <CartesianGrid strokeDasharray="3 3" />
                     <XAxis dataKey="name" />
                     <YAxis />
@@ -382,11 +385,12 @@ export function PurchaseAnalytics() {
                       name="Revenue (€)" 
                       stroke="hsl(var(--primary))" 
                       strokeWidth={2}
-                      dot={{ fill: "hsl(var(--primary))" }}
-                    />
-                  </LineChart>
-                </ResponsiveContainer>
-              )}
+                       dot={{ fill: "hsl(var(--primary))" }}
+                     />
+                   </LineChart>
+                 </ResponsiveContainer>
+                 </div>
+               )}
             </CardContent>
           </Card>
         </TabsContent>
@@ -406,9 +410,10 @@ export function PurchaseAnalytics() {
                 <div className="flex items-center justify-center h-80 text-muted-foreground">
                   No purchase data for selected period
                 </div>
-              ) : (
-                <ResponsiveContainer width="100%" height={400}>
-                  <BarChart data={popularItems} layout="vertical">
+               ) : (
+                 <div className="overflow-x-auto">
+                   <ResponsiveContainer width="100%" height={400} minWidth={300}>
+                     <BarChart data={popularItems} layout="vertical">
                     <CartesianGrid strokeDasharray="3 3" />
                     <XAxis type="number" />
                     <YAxis type="category" dataKey="name" width={200} />
@@ -420,10 +425,11 @@ export function PurchaseAnalytics() {
                     />
                     <Legend />
                     <Bar dataKey="count" name="Purchases" fill="hsl(var(--chart-1))" />
-                    <Bar dataKey="value" name="Revenue (€)" fill="hsl(var(--chart-2))" />
-                  </BarChart>
-                </ResponsiveContainer>
-              )}
+                     <Bar dataKey="value" name="Revenue (€)" fill="hsl(var(--chart-2))" />
+                   </BarChart>
+                 </ResponsiveContainer>
+                 </div>
+               )}
             </CardContent>
           </Card>
         </TabsContent>
@@ -443,9 +449,10 @@ export function PurchaseAnalytics() {
                 <div className="flex items-center justify-center h-80 text-muted-foreground">
                   No purchase data for selected period
                 </div>
-              ) : (
-                <ResponsiveContainer width="100%" height={400}>
-                  <PieChart>
+               ) : (
+                 <div className="overflow-x-auto flex justify-center">
+                   <ResponsiveContainer width="100%" height={400} minWidth={300}>
+                     <PieChart>
                     <Pie
                       data={contentTypeDistribution}
                       cx="50%"
@@ -463,6 +470,7 @@ export function PurchaseAnalytics() {
                     <Tooltip />
                   </PieChart>
                 </ResponsiveContainer>
+                </div>
               )}
             </CardContent>
           </Card>

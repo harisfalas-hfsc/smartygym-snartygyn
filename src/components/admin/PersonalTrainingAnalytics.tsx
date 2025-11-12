@@ -210,9 +210,9 @@ export function PersonalTrainingAnalytics() {
           <CardDescription>Track personal training requests, completions, and revenue</CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="flex gap-4">
+          <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
             <Select value={timeFilter} onValueChange={setTimeFilter}>
-              <SelectTrigger className="w-[200px]">
+              <SelectTrigger className="w-full sm:w-[200px]">
                 <SelectValue placeholder="Time Period" />
               </SelectTrigger>
               <SelectContent>
@@ -224,7 +224,7 @@ export function PersonalTrainingAnalytics() {
               </SelectContent>
             </Select>
 
-            <Button onClick={fetchPTAnalytics} disabled={loading}>
+            <Button onClick={fetchPTAnalytics} disabled={loading} className="w-full sm:w-auto">
               <RefreshCw className={`h-4 w-4 mr-2 ${loading ? "animate-spin" : ""}`} />
               {loading ? "Loading..." : "Refresh"}
             </Button>
@@ -319,8 +319,9 @@ export function PersonalTrainingAnalytics() {
                 No requests in selected period
               </div>
             ) : (
-              <ResponsiveContainer width="100%" height={300}>
-                <PieChart>
+              <div className="overflow-x-auto flex justify-center">
+                <ResponsiveContainer width="100%" height={300} minWidth={250}>
+                  <PieChart>
                   <Pie
                     data={statusDistribution}
                     cx="50%"
@@ -338,6 +339,7 @@ export function PersonalTrainingAnalytics() {
                   <Tooltip />
                 </PieChart>
               </ResponsiveContainer>
+              </div>
             )}
           </CardContent>
         </Card>
@@ -358,8 +360,9 @@ export function PersonalTrainingAnalytics() {
                 No completed requests yet
               </div>
             ) : (
-              <ResponsiveContainer width="100%" height={300}>
-                <BarChart data={completionTimes}>
+              <div className="overflow-x-auto">
+                <ResponsiveContainer width="100%" height={300} minWidth={300}>
+                  <BarChart data={completionTimes}>
                   <CartesianGrid strokeDasharray="3 3" />
                   <XAxis dataKey="name" />
                   <YAxis />
@@ -368,6 +371,7 @@ export function PersonalTrainingAnalytics() {
                   <Bar dataKey="value" name="Requests" fill="hsl(var(--primary))" />
                 </BarChart>
               </ResponsiveContainer>
+              </div>
             )}
           </CardContent>
         </Card>
@@ -388,8 +392,9 @@ export function PersonalTrainingAnalytics() {
                 No requests in selected period
               </div>
             ) : (
-              <ResponsiveContainer width="100%" height={300}>
-                <LineChart data={requestsByMonth}>
+              <div className="overflow-x-auto">
+                <ResponsiveContainer width="100%" height={300} minWidth={300}>
+                  <LineChart data={requestsByMonth}>
                   <CartesianGrid strokeDasharray="3 3" />
                   <XAxis dataKey="name" />
                   <YAxis />
@@ -405,6 +410,7 @@ export function PersonalTrainingAnalytics() {
                   />
                 </LineChart>
               </ResponsiveContainer>
+              </div>
             )}
           </CardContent>
         </Card>

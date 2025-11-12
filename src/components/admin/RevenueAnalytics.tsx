@@ -138,7 +138,7 @@ export function RevenueAnalytics() {
           <CardDescription>Filter revenue by time period and plan type</CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
             <Select value={timeFilter} onValueChange={setTimeFilter}>
               <SelectTrigger>
                 <SelectValue placeholder="Time Period" />
@@ -193,12 +193,12 @@ export function RevenueAnalytics() {
             )}
           </div>
 
-          <div className="flex items-center justify-between p-4 bg-muted rounded-lg">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between p-4 bg-muted rounded-lg gap-3">
             <div>
               <p className="text-sm text-muted-foreground">Total Revenue</p>
-              <p className="text-3xl font-bold">€{totalRevenue.toFixed(2)}</p>
+              <p className="text-2xl sm:text-3xl font-bold">€{totalRevenue.toFixed(2)}</p>
             </div>
-            <Button onClick={fetchRevenueData} disabled={loading}>
+            <Button onClick={fetchRevenueData} disabled={loading} className="w-full sm:w-auto">
               {loading ? "Loading..." : "Refresh"}
             </Button>
           </div>
@@ -227,9 +227,10 @@ export function RevenueAnalytics() {
             <div className="flex items-center justify-center h-64 text-muted-foreground">
               No revenue data for selected period
             </div>
-          ) : (
-            <ResponsiveContainer width="100%" height={400}>
-              <BarChart data={revenueData}>
+           ) : (
+             <div className="overflow-x-auto">
+               <ResponsiveContainer width="100%" height={400} minWidth={300}>
+                 <BarChart data={revenueData}>
                 <CartesianGrid strokeDasharray="3 3" />
                 <XAxis dataKey="period" />
                 <YAxis />
@@ -247,11 +248,12 @@ export function RevenueAnalytics() {
                     />
                   </>
                 ) : (
-                  <Bar dataKey="revenue" name="Revenue (€)" fill="hsl(var(--primary))" />
-                )}
-              </BarChart>
-            </ResponsiveContainer>
-          )}
+                   <Bar dataKey="revenue" name="Revenue (€)" fill="hsl(var(--primary))" />
+                 )}
+               </BarChart>
+             </ResponsiveContainer>
+             </div>
+           )}
         </CardContent>
       </Card>
     </div>
