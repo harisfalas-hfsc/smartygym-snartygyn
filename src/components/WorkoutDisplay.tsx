@@ -407,7 +407,7 @@ export const WorkoutDisplay = ({
           <Card className="border-2 border-primary/30">
             <CardHeader className="bg-primary/5">
               <CardTitle className="flex items-center gap-2 text-2xl font-bold">
-                💪 Primary Workout
+                💪 Workout
               </CardTitle>
             </CardHeader>
             <CardContent>

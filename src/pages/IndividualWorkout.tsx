@@ -4631,16 +4631,17 @@ Rest 30s between rounds`,
     }
   };
 
-  // Use database workout if available, otherwise fall back to hardcoded data
   let workout: any = null;
   let isPremium = false;
   let canPurchase = false;
   let hasAccess = true;
+  let alreadyPurchased = false;
   
   if (dbWorkout) {
     isPremium = dbWorkout.is_premium && !isFreeWorkout;
     canPurchase = dbWorkout.is_standalone_purchase && !!dbWorkout.price;
-    hasAccess = userTier === "premium" || hasPurchased(dbWorkout.id, "workout") || !isPremium;
+    alreadyPurchased = hasPurchased(dbWorkout.id, "workout");
+    hasAccess = userTier === "premium" || alreadyPurchased || !isPremium;
 
     // Convert database format to expected format
     workout = {
@@ -4767,23 +4768,32 @@ Rest 30s between rounds`,
         />
       </div>
 
-      {/* Show purchase button if available and user doesn't have access */}
-      {!hasAccess && canPurchase && userTier === "subscriber" && dbWorkout && (
+      {/* Show purchase button if available for standalone purchases */}
+      {canPurchase && !hasAccess && dbWorkout && (
         <div className="mb-6">
           <Card className="border-primary/50 bg-gradient-to-r from-primary/5 to-primary/10">
             <div className="p-6 text-center space-y-4">
-              <h3 className="text-xl font-semibold">Get Instant Access</h3>
+              <h3 className="text-xl font-semibold">
+                {alreadyPurchased ? "You Own This Workout" : "Get Instant Access"}
+              </h3>
               <p className="text-muted-foreground">
-                Purchase this workout once and own it forever
+                {alreadyPurchased 
+                  ? "This workout is in your library" 
+                  : "Purchase this workout once and own it forever"}
               </p>
-              <PurchaseButton
-                contentId={dbWorkout.id}
-                contentType="workout"
-                contentName={dbWorkout.name}
-                price={Number(dbWorkout.price) || 0}
-                stripeProductId={dbWorkout.stripe_product_id}
-                stripePriceId={dbWorkout.stripe_price_id}
-              />
+              <div className="text-3xl font-bold text-primary">
+                €{Number(dbWorkout.price).toFixed(2)}
+              </div>
+              {!alreadyPurchased && (
+                <PurchaseButton
+                  contentId={dbWorkout.id}
+                  contentType="workout"
+                  contentName={dbWorkout.name}
+                  price={Number(dbWorkout.price) || 0}
+                  stripeProductId={dbWorkout.stripe_product_id}
+                  stripePriceId={dbWorkout.stripe_price_id}
+                />
+              )}
             </div>
           </Card>
         </div>

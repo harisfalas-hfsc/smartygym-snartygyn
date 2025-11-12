@@ -544,7 +544,8 @@ export const ProgramEditDialog = ({ program, open, onOpenChange, onSave }: Progr
           </div>
 
           <div className="space-y-2">
-            <div className="flex items-center space-x-2">
+            <Label htmlFor="is_premium" className="text-base font-semibold">Premium or Free</Label>
+            <div className="flex items-center space-x-3 p-3 border rounded-lg">
               <Switch
                 id="is_premium"
                 checked={formData.is_premium}
@@ -556,10 +557,14 @@ export const ProgramEditDialog = ({ program, open, onOpenChange, onSave }: Progr
                   price: checked ? formData.price : ''
                 })}
               />
-              <Label htmlFor="is_premium">Premium or Free</Label>
+              <div className="flex-1">
+                <span className="text-sm font-medium">
+                  {formData.is_premium ? '🔒 Premium Content' : '🆓 Free Content'}
+                </span>
+              </div>
             </div>
-            <p className="text-sm text-muted-foreground">
-              Toggle on for Premium content, toggle off for Free content
+            <p className="text-xs text-muted-foreground">
+              Toggle ON for Premium (requires subscription), toggle OFF for Free (accessible to all)
             </p>
           </div>
 

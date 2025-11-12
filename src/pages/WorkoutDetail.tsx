@@ -315,14 +315,6 @@ const WorkoutDetail = () => {
   const title = workoutTitles[type || ""] || "Workout";
   const mappedCategory = categoryMap[type || "strength"];
   
-  // Debug logging
-  console.log("=== WORKOUT FILTERING DEBUG ===");
-  console.log("URL type:", type);
-  console.log("Mapped category:", mappedCategory);
-  console.log("Total workouts from DB:", allWorkouts.length);
-  console.log("All workouts:", allWorkouts);
-  console.log("Active filters:", { equipmentFilter, levelFilter, formatFilter, durationFilter, statusFilter });
-  
   // Filter workouts by category from URL and user filters
   const filteredWorkouts = allWorkouts.filter(workout => {
     // Match category
@@ -368,10 +360,6 @@ const WorkoutDetail = () => {
     
     return true;
   });
-
-  console.log("Filtered workouts count:", filteredWorkouts.length);
-  console.log("Filtered workouts:", filteredWorkouts);
-  console.log("=== END DEBUG ===");
 
   return (
     <>
