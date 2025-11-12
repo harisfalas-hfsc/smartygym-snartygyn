@@ -14,6 +14,12 @@ import { BackToTop } from "@/components/BackToTop";
 import { useAccessControl } from "@/hooks/useAccessControl";
 import { PageTitleCard } from "@/components/PageTitleCard";
 import { ScrollReveal } from "@/components/ScrollReveal";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 const Index = () => {
   const navigate = useNavigate();
@@ -236,40 +242,88 @@ const Index = () => {
           <div className="container mx-auto max-w-4xl space-y-3 sm:space-y-4 relative z-10">
             <Card className="border-2 border-primary bg-gradient-to-r from-primary/5 to-primary/10 mb-6 sm:mb-8">
               <div className="p-4 sm:p-6 text-center relative">
-                {/* Left Side Icons - Horizontal */}
-                <div className="absolute left-2 sm:left-4 top-1/2 -translate-y-1/2 flex flex-row gap-2 sm:gap-3">
-                  <Dumbbell 
-                    className="w-5 h-5 sm:w-6 sm:h-6 text-primary cursor-pointer transition-all duration-200 hover:scale-110 hover:text-primary/80" 
-                    onClick={() => navigate("/workout")}
-                  />
-                  <Target 
-                    className="w-5 h-5 sm:w-6 sm:h-6 text-primary cursor-pointer transition-all duration-200 hover:scale-110 hover:text-primary/80" 
-                    onClick={() => navigate("/training-program")}
-                  />
-                  <UserCheck 
-                    className="w-5 h-5 sm:w-6 sm:h-6 text-primary cursor-pointer transition-all duration-200 hover:scale-110 hover:text-primary/80" 
-                    onClick={() => navigate("/personal-training")}
-                  />
-                </div>
-                
-                {/* Right Side Icons - Horizontal */}
-                <div className="absolute right-2 sm:right-4 top-1/2 -translate-y-1/2 flex flex-row gap-2 sm:gap-3">
-                  <Wrench 
-                    className="w-5 h-5 sm:w-6 sm:h-6 text-primary cursor-pointer transition-all duration-200 hover:scale-110 hover:text-primary/80" 
-                    onClick={() => navigate("/tools")}
-                  />
-                  <Video 
-                    className="w-5 h-5 sm:w-6 sm:h-6 text-primary cursor-pointer transition-all duration-200 hover:scale-110 hover:text-primary/80" 
-                    onClick={() => navigate("/exercise-library")}
-                  />
-                  <FileText 
-                    className="w-5 h-5 sm:w-6 sm:h-6 text-primary cursor-pointer transition-all duration-200 hover:scale-110 hover:text-primary/80" 
-                    onClick={() => navigate("/blog")}
-                  />
-                </div>
+                <TooltipProvider>
+                  {/* Left Side Icons - Horizontal */}
+                  <div className="absolute left-2 sm:left-4 top-1/2 -translate-y-1/2 flex flex-row gap-3 sm:gap-4">
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <Dumbbell 
+                          className="w-6 h-6 sm:w-7 sm:h-7 text-primary cursor-pointer transition-all duration-200 hover:scale-110 hover:text-primary/80" 
+                          onClick={() => navigate("/workout")}
+                        />
+                      </TooltipTrigger>
+                      <TooltipContent>
+                        <p>Workouts</p>
+                      </TooltipContent>
+                    </Tooltip>
+                    
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <Target 
+                          className="w-6 h-6 sm:w-7 sm:h-7 text-primary cursor-pointer transition-all duration-200 hover:scale-110 hover:text-primary/80" 
+                          onClick={() => navigate("/training-program")}
+                        />
+                      </TooltipTrigger>
+                      <TooltipContent>
+                        <p>Programs</p>
+                      </TooltipContent>
+                    </Tooltip>
+                    
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <UserCheck 
+                          className="w-6 h-6 sm:w-7 sm:h-7 text-primary cursor-pointer transition-all duration-200 hover:scale-110 hover:text-primary/80" 
+                          onClick={() => navigate("/personal-training")}
+                        />
+                      </TooltipTrigger>
+                      <TooltipContent>
+                        <p>Personal Training</p>
+                      </TooltipContent>
+                    </Tooltip>
+                  </div>
+                  
+                  {/* Right Side Icons - Horizontal */}
+                  <div className="absolute right-2 sm:right-4 top-1/2 -translate-y-1/2 flex flex-row gap-3 sm:gap-4">
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <Wrench 
+                          className="w-6 h-6 sm:w-7 sm:h-7 text-primary cursor-pointer transition-all duration-200 hover:scale-110 hover:text-primary/80" 
+                          onClick={() => navigate("/tools")}
+                        />
+                      </TooltipTrigger>
+                      <TooltipContent>
+                        <p>Tools</p>
+                      </TooltipContent>
+                    </Tooltip>
+                    
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <Video 
+                          className="w-6 h-6 sm:w-7 sm:h-7 text-primary cursor-pointer transition-all duration-200 hover:scale-110 hover:text-primary/80" 
+                          onClick={() => navigate("/exercise-library")}
+                        />
+                      </TooltipTrigger>
+                      <TooltipContent>
+                        <p>Exercise Library</p>
+                      </TooltipContent>
+                    </Tooltip>
+                    
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <FileText 
+                          className="w-6 h-6 sm:w-7 sm:h-7 text-primary cursor-pointer transition-all duration-200 hover:scale-110 hover:text-primary/80" 
+                          onClick={() => navigate("/blog")}
+                        />
+                      </TooltipTrigger>
+                      <TooltipContent>
+                        <p>Blog</p>
+                      </TooltipContent>
+                    </Tooltip>
+                  </div>
+                </TooltipProvider>
                 
                 {/* Title and Subtitle */}
-                <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-foreground px-8 sm:px-12">
+                <h1 className="text-2xl sm:text-3xl md:text-4xl font-black bg-gradient-to-r from-primary via-primary/90 to-primary bg-clip-text text-transparent drop-shadow-[0_0_15px_rgba(var(--primary),0.3)] px-8 sm:px-12">
                   Smarty Gym
                 </h1>
                 <p className="text-sm sm:text-base text-muted-foreground mt-2 px-8 sm:px-12">
