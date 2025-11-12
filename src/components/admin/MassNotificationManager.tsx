@@ -7,7 +7,9 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
-import { Send, Users, Loader2 } from "lucide-react";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Send, Users, Loader2, Clock, Zap } from "lucide-react";
+import { ScheduledNotificationsManager } from "./ScheduledNotificationsManager";
 
 interface Template {
   id: string;
@@ -131,120 +133,139 @@ export function MassNotificationManager() {
 
   return (
     <div className="space-y-6">
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Send className="h-5 w-5" />
-            Send Mass Notification
-          </CardTitle>
-          <CardDescription>
-            Send announcements and notifications to your users. Messages will appear in their dashboard.
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-6">
-          {/* Recipient Filter */}
-          <div className="space-y-2">
-            <Label htmlFor="recipient-filter" className="flex items-center gap-2">
-              <Users className="h-4 w-4" />
-              Select Recipients
-            </Label>
-            <Select value={recipientFilter} onValueChange={setRecipientFilter}>
-              <SelectTrigger id="recipient-filter">
-                <SelectValue placeholder="Choose recipient group" />
-              </SelectTrigger>
-              <SelectContent>
-                {recipientFilters.map((filter) => (
-                  <SelectItem key={filter.value} value={filter.value}>
-                    {filter.label}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
+      <Tabs defaultValue="instant" className="w-full">
+        <TabsList className="grid w-full grid-cols-2">
+          <TabsTrigger value="instant" className="flex items-center gap-2">
+            <Zap className="h-4 w-4" />
+            Instant Notifications
+          </TabsTrigger>
+          <TabsTrigger value="scheduled" className="flex items-center gap-2">
+            <Clock className="h-4 w-4" />
+            Scheduled Notifications
+          </TabsTrigger>
+        </TabsList>
 
-          {/* Notification Template */}
-          <div className="space-y-2">
-            <Label htmlFor="notification-type">Select Notification Template</Label>
-            <Select value={notificationType} onValueChange={handleTemplateChange}>
-              <SelectTrigger id="notification-type">
-                <SelectValue placeholder="Choose a template to customize" />
-              </SelectTrigger>
-              <SelectContent>
-                {templates.map((template) => (
-                  <SelectItem key={template.id} value={template.message_type}>
-                    {template.template_name}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-
-          {/* Editable Subject */}
-          {notificationType && (
-            <>
+        <TabsContent value="instant" className="mt-6">
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Send className="h-5 w-5" />
+                Send Mass Notification
+              </CardTitle>
+              <CardDescription>
+                Send announcements and notifications to your users. Messages will appear in their dashboard.
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-6">
+              {/* Recipient Filter */}
               <div className="space-y-2">
-                <Label htmlFor="editable-subject">
-                  Subject <span className="text-destructive">*</span>
+                <Label htmlFor="recipient-filter" className="flex items-center gap-2">
+                  <Users className="h-4 w-4" />
+                  Select Recipients
                 </Label>
-                <Input
-                  id="editable-subject"
-                  placeholder="Notification subject"
-                  value={editableSubject}
-                  onChange={(e) => setEditableSubject(e.target.value)}
-                />
+                <Select value={recipientFilter} onValueChange={setRecipientFilter}>
+                  <SelectTrigger id="recipient-filter">
+                    <SelectValue placeholder="Choose recipient group" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {recipientFilters.map((filter) => (
+                      <SelectItem key={filter.value} value={filter.value}>
+                        {filter.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </div>
 
-              {/* Editable Content */}
+              {/* Notification Template */}
               <div className="space-y-2">
-                <Label htmlFor="editable-content">
-                  Message Content <span className="text-destructive">*</span>
-                </Label>
-                <Textarea
-                  id="editable-content"
-                  placeholder="Edit the notification message"
-                  value={editableContent}
-                  onChange={(e) => setEditableContent(e.target.value)}
-                  rows={8}
-                  className="resize-y font-mono text-sm"
-                />
-                <p className="text-xs text-muted-foreground">
-                  Edit the template above before sending. Original template will be restored after sending.
-                </p>
+                <Label htmlFor="notification-type">Select Notification Template</Label>
+                <Select value={notificationType} onValueChange={handleTemplateChange}>
+                  <SelectTrigger id="notification-type">
+                    <SelectValue placeholder="Choose a template to customize" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {templates.map((template) => (
+                      <SelectItem key={template.id} value={template.message_type}>
+                        {template.template_name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </div>
-            </>
-          )}
 
-          {/* Recipient Info */}
-          {notificationType && (
-            <div className="p-4 bg-accent/50 rounded-lg space-y-1">
-              <p className="text-sm font-medium">Recipients:</p>
-              <p className="text-sm text-muted-foreground">
-                {recipientFilters.find(f => f.value === recipientFilter)?.label}
-              </p>
-            </div>
-          )}
+              {/* Editable Subject */}
+              {notificationType && (
+                <>
+                  <div className="space-y-2">
+                    <Label htmlFor="editable-subject">
+                      Subject <span className="text-destructive">*</span>
+                    </Label>
+                    <Input
+                      id="editable-subject"
+                      placeholder="Notification subject"
+                      value={editableSubject}
+                      onChange={(e) => setEditableSubject(e.target.value)}
+                    />
+                  </div>
 
-          {/* Send Button */}
-          <Button
-            onClick={handleSendNotification}
-            disabled={loading || !notificationType || !editableSubject.trim() || !editableContent.trim()}
-            className="w-full"
-            size="lg"
-          >
-            {loading ? (
-              <>
-                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                Sending Notifications...
-              </>
-            ) : (
-              <>
-                <Send className="mr-2 h-4 w-4" />
-                Send Notification
-              </>
-            )}
-          </Button>
-        </CardContent>
-      </Card>
+                  {/* Editable Content */}
+                  <div className="space-y-2">
+                    <Label htmlFor="editable-content">
+                      Message Content <span className="text-destructive">*</span>
+                    </Label>
+                    <Textarea
+                      id="editable-content"
+                      placeholder="Edit the notification message"
+                      value={editableContent}
+                      onChange={(e) => setEditableContent(e.target.value)}
+                      rows={8}
+                      className="resize-y font-mono text-sm"
+                    />
+                    <p className="text-xs text-muted-foreground">
+                      Edit the template above before sending. Original template will be restored after sending.
+                    </p>
+                  </div>
+                </>
+              )}
+
+              {/* Recipient Info */}
+              {notificationType && (
+                <div className="p-4 bg-accent/50 rounded-lg space-y-1">
+                  <p className="text-sm font-medium">Recipients:</p>
+                  <p className="text-sm text-muted-foreground">
+                    {recipientFilters.find(f => f.value === recipientFilter)?.label}
+                  </p>
+                </div>
+              )}
+
+              {/* Send Button */}
+              <Button
+                onClick={handleSendNotification}
+                disabled={loading || !notificationType || !editableSubject.trim() || !editableContent.trim()}
+                className="w-full"
+                size="lg"
+              >
+                {loading ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Sending Notifications...
+                  </>
+                ) : (
+                  <>
+                    <Send className="mr-2 h-4 w-4" />
+                    Send Notification
+                  </>
+                )}
+              </Button>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="scheduled" className="mt-6">
+          <ScheduledNotificationsManager />
+        </TabsContent>
+      </Tabs>
     </div>
   );
 }

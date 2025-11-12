@@ -1183,6 +1183,57 @@ export type Database = {
         }
         Relationships: []
       }
+      scheduled_notifications: {
+        Row: {
+          body: string
+          created_at: string
+          created_by: string | null
+          error_message: string | null
+          icon: string | null
+          id: string
+          recipient_count: number | null
+          scheduled_time: string
+          sent_at: string | null
+          status: string
+          target_audience: string
+          timezone: string | null
+          title: string
+          url: string | null
+        }
+        Insert: {
+          body: string
+          created_at?: string
+          created_by?: string | null
+          error_message?: string | null
+          icon?: string | null
+          id?: string
+          recipient_count?: number | null
+          scheduled_time: string
+          sent_at?: string | null
+          status?: string
+          target_audience: string
+          timezone?: string | null
+          title: string
+          url?: string | null
+        }
+        Update: {
+          body?: string
+          created_at?: string
+          created_by?: string | null
+          error_message?: string | null
+          icon?: string | null
+          id?: string
+          recipient_count?: number | null
+          scheduled_time?: string
+          sent_at?: string | null
+          status?: string
+          target_audience?: string
+          timezone?: string | null
+          title?: string
+          url?: string | null
+        }
+        Relationships: []
+      }
       user_purchases: {
         Row: {
           content_id: string
