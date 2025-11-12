@@ -156,16 +156,11 @@ const Blog = () => {
             )}
           </div>
 
-          <PageTitleCard title="Blog" icon={FileText} />
-          
-          <InfoRibbon className="max-w-2xl mx-auto">
-            <p>
-              Expert insights on training, nutrition, and performance from certified strength coach{" "}
-              <a href="/coach-profile" className="text-primary hover:underline font-medium">
-                Haris Falas
-              </a>
-            </p>
-          </InfoRibbon>
+          <PageTitleCard 
+            title="Blog" 
+            subtitle="Expert insights on training, nutrition, and performance"
+            icon={FileText} 
+          />
 
           <DecorativeDivider className="mb-8" />
 
