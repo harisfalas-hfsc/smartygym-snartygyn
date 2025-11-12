@@ -36,6 +36,24 @@ export const SettingsManager = () => {
   const [requireEmailVerification, setRequireEmailVerification] = useState(false);
   const [autoApprovePurchases, setAutoApprovePurchases] = useState(true);
   const [sessionTimeout, setSessionTimeout] = useState("24");
+  const [inactivityTimeout, setInactivityTimeout] = useState("30");
+
+  // Load inactivity timeout on mount
+  useEffect(() => {
+    const loadInactivityTimeout = async () => {
+      const { data } = await supabase
+        .from('system_settings')
+        .select('setting_value')
+        .eq('setting_key', 'inactivity_timeout_minutes')
+        .single();
+      
+      if (data?.setting_value) {
+        setInactivityTimeout(data.setting_value as string);
+      }
+    };
+
+    loadInactivityTimeout();
+  }, []);
 
   const handleSaveGeneral = async () => {
     setLoading(true);
@@ -94,6 +112,14 @@ export const SettingsManager = () => {
   const handleSaveAccessControl = async () => {
     setLoading(true);
     try {
+      // Save inactivity timeout to database
+      const { error } = await supabase
+        .from('system_settings')
+        .update({ setting_value: inactivityTimeout })
+        .eq('setting_key', 'inactivity_timeout_minutes');
+
+      if (error) throw error;
+
       toast({
         title: "Settings Saved",
         description: "Access control settings have been updated successfully.",
@@ -434,6 +460,21 @@ export const SettingsManager = () => {
                     onChange={(e) => setSessionTimeout(e.target.value)}
                     className="text-sm"
                   />
+                </div>
+                <div className="space-y-2">
+                  <Label className="text-xs sm:text-sm">Inactivity Auto-Logout</Label>
+                  <Select value={inactivityTimeout} onValueChange={setInactivityTimeout}>
+                    <SelectTrigger className="text-sm">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="15">15 minutes</SelectItem>
+                      <SelectItem value="30">30 minutes</SelectItem>
+                      <SelectItem value="45">45 minutes</SelectItem>
+                      <SelectItem value="60">60 minutes</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  <p className="text-xs text-muted-foreground">Users will see a warning 2 minutes before auto-logout</p>
                 </div>
               </div>
               <Button onClick={handleSaveAccessControl} disabled={loading}>

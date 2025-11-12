@@ -1,12 +1,15 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useNavigate } from 'react-router-dom';
+import { toast } from '@/hooks/use-toast';
 
-const INACTIVITY_TIMEOUT = 30 * 60 * 1000; // 30 minutes in milliseconds
+const WARNING_TIME = 2 * 60 * 1000; // 2 minutes before logout
 
 export const useAutoLogout = () => {
   const navigate = useNavigate();
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const warningTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const [inactivityTimeout, setInactivityTimeout] = useState<number>(30 * 60 * 1000);
 
   const logout = async () => {
     try {
@@ -20,18 +23,53 @@ export const useAutoLogout = () => {
   };
 
   const resetTimer = () => {
-    // Clear existing timeout
+    // Clear existing timeouts
     if (timeoutRef.current) {
       clearTimeout(timeoutRef.current);
     }
+    if (warningTimeoutRef.current) {
+      clearTimeout(warningTimeoutRef.current);
+    }
 
-    // Set new timeout
+    // Set warning timeout (show warning 2 minutes before logout)
+    const warningTime = inactivityTimeout - WARNING_TIME;
+    if (warningTime > 0) {
+      warningTimeoutRef.current = setTimeout(() => {
+        showWarning();
+      }, warningTime);
+    }
+
+    // Set logout timeout
     timeoutRef.current = setTimeout(() => {
       logout();
-    }, INACTIVITY_TIMEOUT);
+    }, inactivityTimeout);
+  };
+
+  const showWarning = () => {
+    toast({
+      title: "⚠️ Session Expiring Soon",
+      description: "You'll be logged out in 2 minutes due to inactivity. Move your mouse or click anywhere to stay logged in.",
+      duration: 120000, // Show for 2 minutes
+    });
   };
 
   useEffect(() => {
+    // Fetch inactivity timeout from database
+    const fetchTimeout = async () => {
+      const { data } = await supabase
+        .from('system_settings')
+        .select('setting_value')
+        .eq('setting_key', 'inactivity_timeout_minutes')
+        .single();
+      
+      if (data?.setting_value) {
+        const minutes = parseInt(data.setting_value as string);
+        setInactivityTimeout(minutes * 60 * 1000);
+      }
+    };
+
+    fetchTimeout();
+
     // Activity events to track
     const events = ['mousemove', 'keydown', 'click', 'scroll', 'touchstart'];
 
@@ -61,7 +99,7 @@ export const useAutoLogout = () => {
         }
         timeoutRef.current = setTimeout(() => {
           logout();
-        }, INACTIVITY_TIMEOUT);
+        }, inactivityTimeout);
       } else {
         // Reset timer when tab becomes visible again
         resetTimer();
@@ -75,11 +113,14 @@ export const useAutoLogout = () => {
       if (timeoutRef.current) {
         clearTimeout(timeoutRef.current);
       }
+      if (warningTimeoutRef.current) {
+        clearTimeout(warningTimeoutRef.current);
+      }
       events.forEach(event => {
         window.removeEventListener(event, resetTimer);
       });
       window.removeEventListener('beforeunload', handleBeforeUnload);
       document.removeEventListener('visibilitychange', handleVisibilityChange);
     };
-  }, [navigate]);
+  }, [navigate, inactivityTimeout]);
 };
