@@ -94,18 +94,18 @@ const WorkoutFlow = () => {
           <span className="text-xs sm:text-sm">Back</span>
         </Button>
         
-        <h1 className="text-3xl sm:text-4xl font-bold text-center mb-2">SmartyGym Workouts</h1>
-        <p className="text-center text-muted-foreground mb-4 max-w-3xl mx-auto">
+        <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-center mb-2">SmartyGym Workouts</h1>
+        <p className="text-center text-muted-foreground mb-4 max-w-3xl mx-auto text-sm sm:text-base px-2">
           Choose your goal and start your fitness journey today. All SmartyGym workouts designed by Sports Scientist <a href="/coach-profile" className="text-primary hover:underline font-medium">Haris Falas</a> for convenient online fitness training anywhere, anytime.
         </p>
         
         {/* Info Ribbon */}
         {!isPremium && (
-          <div className="bg-primary/10 border border-primary/20 rounded-lg p-4 mb-8 text-center">
-            <p className="text-sm text-muted-foreground mb-2">
+          <div className="bg-primary/10 border border-primary/20 rounded-lg p-3 sm:p-4 mb-6 sm:mb-8 text-center">
+            <p className="text-xs sm:text-sm text-muted-foreground mb-2">
               SMARTY GYM workouts are standalone sessions designed to target specific fitness goals—whether you want to build strength, torch calories, boost your metabolism, get a quick sweat, or simply keep your body moving. Each workout is crafted to fit your schedule and deliver results, no matter where you train.
             </p>
-            <Button variant="default" size="sm" onClick={() => navigate("/premiumbenefits")}>
+            <Button variant="default" size="sm" onClick={() => navigate("/premiumbenefits")} className="text-xs sm:text-sm">
               Join Premium
             </Button>
           </div>

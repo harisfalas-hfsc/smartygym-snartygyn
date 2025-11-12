@@ -230,10 +230,10 @@ const Index = () => {
         {/* Hero Section */}
         <section className="relative py-8 sm:py-12 px-4 border-b border-border bg-gradient-to-br from-background to-muted/30">
           <div className="container mx-auto max-w-4xl text-center space-y-3 sm:space-y-4">
-            <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold text-center mb-4">
+            <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-center mb-4">
               Smarty Gym
             </h1>
-            <p className="text-lg sm:text-xl text-center text-muted-foreground mb-6">
+            <p className="text-base sm:text-lg md:text-xl text-center text-muted-foreground mb-6">
               Your Gym Re-imagined. Anywhere, Anytime
             </p>
             <div className="bg-primary/10 border border-primary/20 rounded-lg p-3 sm:p-4 mb-3 sm:mb-4 text-center">

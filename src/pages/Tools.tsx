@@ -69,33 +69,33 @@ const Tools = () => {
           </Button>
         )}
 
-        <h1 className="text-3xl sm:text-4xl font-bold text-center mb-2">Smart Tools</h1>
-        <p className="text-center text-muted-foreground mb-4">
+        <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-center mb-2">Smart Tools</h1>
+        <p className="text-center text-muted-foreground mb-4 text-sm sm:text-base px-2">
           Free fitness calculators to support your training
         </p>
         
         {/* Info Ribbon */}
-        <div className="bg-primary/10 border border-primary/20 rounded-lg p-4 mb-8 text-center">
+        <div className="bg-primary/10 border border-primary/20 rounded-lg p-3 sm:p-4 mb-6 sm:mb-8 text-center">
           {userTier === "guest" ? (
             <>
-              <p className="text-sm text-muted-foreground mb-2">
+              <p className="text-xs sm:text-sm text-muted-foreground mb-2">
                 Login required to use these calculators. Already a member? Sign in to access all tools.
               </p>
-              <Button variant="default" size="sm" onClick={() => navigate("/auth")}>
+              <Button variant="default" size="sm" onClick={() => navigate("/auth")} className="text-xs sm:text-sm">
                 Login / Sign Up
               </Button>
             </>
           ) : !isPremium ? (
             <>
-              <p className="text-sm text-muted-foreground mb-2">
+              <p className="text-xs sm:text-sm text-muted-foreground mb-2">
                 Use these tools for free as a member. Want personalized training programs?
               </p>
-              <Button variant="default" size="sm" onClick={() => navigate("/premiumbenefits")}>
+              <Button variant="default" size="sm" onClick={() => navigate("/premiumbenefits")} className="text-xs sm:text-sm">
                 Join Premium
               </Button>
             </>
           ) : (
-            <p className="text-sm text-muted-foreground">
+            <p className="text-xs sm:text-sm text-muted-foreground">
               All tools included in your premium membership — plus personalized training programs!
             </p>
           )}

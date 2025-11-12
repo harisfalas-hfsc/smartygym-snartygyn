@@ -72,15 +72,15 @@ const About = () => {
         )}
 
         {/* Hero Section */}
-        <header className="text-center mb-8">
-          <h1 className="text-3xl sm:text-4xl font-bold mb-2">About</h1>
-          <p className="text-center text-muted-foreground mb-4">
+        <header className="text-center mb-6 sm:mb-8">
+          <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-2">About</h1>
+          <p className="text-center text-muted-foreground mb-4 text-sm sm:text-base px-2">
             Fitness Without the Chains | smartygym.com
           </p>
           
           {/* Info Ribbon */}
-          <div className="bg-primary/10 border border-primary/20 rounded-lg p-4 mb-8 text-center max-w-3xl mx-auto">
-            <p className="text-sm text-muted-foreground">
+          <div className="bg-primary/10 border border-primary/20 rounded-lg p-3 sm:p-4 mb-6 sm:mb-8 text-center max-w-3xl mx-auto">
+            <p className="text-xs sm:text-sm text-muted-foreground">
               Founded by <a href="/coach-profile" className="text-primary hover:underline font-medium">Haris Falas</a> — Sports Scientist & Strength and Conditioning Coach | Cyprus Fitness Expert
             </p>
           </div>
@@ -103,7 +103,7 @@ const About = () => {
                 </div>
               </div>
               
-              <h2 className="text-3xl md:text-4xl font-bold mb-6 text-center">
+              <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-4 sm:mb-6 text-center">
                 100% Human. 0% AI.
               </h2>
               
