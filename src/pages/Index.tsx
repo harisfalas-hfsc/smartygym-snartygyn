@@ -14,6 +14,7 @@ import { BackToTop } from "@/components/BackToTop";
 import { useAccessControl } from "@/hooks/useAccessControl";
 import { PageTitleCard } from "@/components/PageTitleCard";
 import { ScrollReveal } from "@/components/ScrollReveal";
+import { DecorativeDivider } from "@/components/DecorativeDivider";
 import {
   Tooltip,
   TooltipContent,
@@ -331,11 +332,7 @@ const Index = () => {
                 </p>
                 
                 {/* Decorative Divider */}
-                <div className="flex items-center justify-center gap-2 mt-3 px-8 sm:px-12">
-                  <div className="h-px flex-1 bg-gradient-to-r from-transparent via-primary/50 to-primary/20"></div>
-                  <div className="w-2 h-2 rounded-full bg-primary/60 shadow-[0_0_8px_rgba(var(--primary),0.4)]"></div>
-                  <div className="h-px flex-1 bg-gradient-to-l from-transparent via-primary/50 to-primary/20"></div>
-                </div>
+                <DecorativeDivider className="mt-3 px-8 sm:px-12" />
               </div>
             </Card>
             <div className="bg-primary/10 border border-primary/20 rounded-lg p-3 sm:p-4 mb-3 sm:mb-4 text-center">
@@ -360,6 +357,9 @@ const Index = () => {
       {/* Main Content */}
       <main className="py-8 px-4">
         <div className="container mx-auto max-w-6xl">
+          {/* Decorative Divider */}
+          <DecorativeDivider className="mb-12" />
+          
           <div className="text-center mb-8 px-4">
             
             
@@ -378,6 +378,9 @@ const Index = () => {
               </ScrollReveal>
             ))}
           </div>
+
+          {/* Decorative Divider */}
+          <DecorativeDivider className="my-12" />
 
           {/* CTA Section */}
           <ScrollReveal>
