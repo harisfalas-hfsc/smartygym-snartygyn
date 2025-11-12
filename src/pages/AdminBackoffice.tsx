@@ -5,7 +5,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { ArrowLeft, Dumbbell, Calendar, Settings, Users, Mail, FileText, Shield, BarChart3, BookOpen, MessageSquare, Zap } from "lucide-react";
+import { ArrowLeft, Dumbbell, Calendar, Settings, Users, Mail, FileText, Shield, BarChart3, BookOpen, MessageSquare, Zap, Clock } from "lucide-react";
 import { WorkoutsManager } from "@/components/admin/WorkoutsManager";
 import { ProgramsManager } from "@/components/admin/ProgramsManager";
 import { UsersManager } from "@/components/admin/UsersManager";
@@ -18,6 +18,7 @@ import { BlogManager } from "@/components/admin/BlogManager";
 import { PersonalTrainingManager } from "@/components/admin/PersonalTrainingManager";
 import { ContactManager } from "@/components/admin/ContactManager";
 import { AutomatedMessagesManager } from "@/components/admin/AutomatedMessagesManager";
+import { AutomatedSchedulingManager } from "@/components/admin/AutomatedSchedulingManager";
 import { MassNotificationManager } from "@/components/admin/MassNotificationManager";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -157,6 +158,10 @@ export default function AdminBackoffice() {
               <Zap className="h-3 w-3 sm:h-4 sm:w-4 shrink-0" />
               <span className="hidden sm:inline">Auto</span>
             </TabsTrigger>
+            <TabsTrigger value="scheduling" className="flex items-center justify-center gap-1 sm:gap-1.5 text-xs sm:text-sm px-2 sm:px-3 py-2 sm:py-2.5 whitespace-nowrap flex-shrink-0">
+              <Clock className="h-3 w-3 sm:h-4 sm:w-4 shrink-0" />
+              <span className="hidden sm:inline">Schedule</span>
+            </TabsTrigger>
             <TabsTrigger value="notifications" className="flex items-center justify-center gap-1 sm:gap-1.5 text-xs sm:text-sm px-2 sm:px-3 py-2 sm:py-2.5 whitespace-nowrap flex-shrink-0">
               <Mail className="h-3 w-3 sm:h-4 sm:w-4 shrink-0" />
               <span className="hidden sm:inline">Notify</span>
@@ -213,6 +218,10 @@ export default function AdminBackoffice() {
 
           <TabsContent value="automated" className="mt-6">
             <AutomatedMessagesManager />
+          </TabsContent>
+
+          <TabsContent value="scheduling" className="mt-6">
+            <AutomatedSchedulingManager />
           </TabsContent>
 
           <TabsContent value="notifications" className="mt-6">
