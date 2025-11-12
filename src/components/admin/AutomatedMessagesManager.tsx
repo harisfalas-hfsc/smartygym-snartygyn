@@ -319,7 +319,7 @@ export const AutomatedMessagesManager = () => {
   );
 
   return (
-    <>
+    <div className="pt-6">
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
@@ -481,6 +481,6 @@ export const AutomatedMessagesManager = () => {
           </div>
         </DialogContent>
       </Dialog>
-    </>
+    </div>
   );
 };

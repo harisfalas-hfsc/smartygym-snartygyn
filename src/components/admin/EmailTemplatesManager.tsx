@@ -200,7 +200,7 @@ export function EmailTemplatesManager() {
   }
 
   return (
-    <>
+    <div className="pt-6">
       <Card>
         <CardHeader>
           <div className="flex items-center justify-between">
@@ -391,6 +391,6 @@ export function EmailTemplatesManager() {
           </div>
         </DialogContent>
       </Dialog>
-    </>
+    </div>
   );
 }

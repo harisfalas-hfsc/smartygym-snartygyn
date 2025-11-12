@@ -320,7 +320,7 @@ export function ModerationDashboard() {
   }
 
   return (
-    <>
+    <div className="pt-6">
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
@@ -621,6 +621,6 @@ export function ModerationDashboard() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
-    </>
+    </div>
   );
 }

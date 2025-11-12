@@ -218,7 +218,7 @@ export const SettingsManager = () => {
   };
 
   return (
-    <div className="space-y-6 w-full overflow-x-hidden">
+    <div className="pt-6 space-y-6 w-full overflow-x-hidden">
       <Tabs defaultValue="general" className="w-full">
         <div className="w-full overflow-x-auto -mx-2 px-2">
           <TabsList className="inline-flex w-auto min-w-full h-auto p-1">

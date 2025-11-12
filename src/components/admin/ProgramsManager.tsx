@@ -251,7 +251,7 @@ export const ProgramsManager = () => {
   }
 
   return (
-    <>
+    <div className="pt-6">
       <Card>
         <CardHeader>
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4">
@@ -438,6 +438,6 @@ export const ProgramsManager = () => {
         onOpenChange={setIsDialogOpen}
         onSave={handleSave}
       />
-    </>
+    </div>
   );
 };

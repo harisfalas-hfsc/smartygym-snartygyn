@@ -163,7 +163,7 @@ export function NewsletterManager() {
   }
 
   return (
-    <>
+    <div className="pt-6">
       <Card>
         <CardHeader>
           <div className="flex items-center justify-between">
@@ -322,6 +322,6 @@ export function NewsletterManager() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
-    </>
+    </div>
   );
 }

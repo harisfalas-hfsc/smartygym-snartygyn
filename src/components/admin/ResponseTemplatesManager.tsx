@@ -150,7 +150,7 @@ export const ResponseTemplatesManager = () => {
   };
 
   return (
-    <>
+    <div className="pt-6">
       <Card>
         <CardHeader>
           <div className="flex items-center justify-between">
@@ -281,6 +281,6 @@ export const ResponseTemplatesManager = () => {
           </div>
         </DialogContent>
       </Dialog>
-    </>
+    </div>
   );
 };

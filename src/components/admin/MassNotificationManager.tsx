@@ -132,7 +132,7 @@ export function MassNotificationManager() {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="pt-6 space-y-6">
       <Tabs defaultValue="instant" className="w-full">
         <TabsList className="grid w-full grid-cols-2">
           <TabsTrigger value="instant" className="flex items-center gap-2">

@@ -141,7 +141,7 @@ export function BlogManager() {
   }
 
   return (
-    <>
+    <div className="pt-6">
       <Card>
         <CardHeader>
           <div className="flex items-center justify-between">
@@ -278,6 +278,6 @@ export function BlogManager() {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
-    </>
+    </div>
   );
 }

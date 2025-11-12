@@ -244,7 +244,7 @@ export function EmailComposer() {
   }
 
   return (
-    <>
+    <div className="pt-6">
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
@@ -444,6 +444,6 @@ export function EmailComposer() {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
-    </>
+    </div>
   );
 }

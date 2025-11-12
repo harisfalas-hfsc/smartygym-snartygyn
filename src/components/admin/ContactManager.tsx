@@ -398,7 +398,7 @@ export const ContactManager = () => {
   );
 
   return (
-    <>
+    <div className="pt-6">
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
@@ -759,6 +759,6 @@ export const ContactManager = () => {
           )}
         </DialogContent>
       </Dialog>
-    </>
+    </div>
   );
 };

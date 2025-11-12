@@ -250,7 +250,7 @@ SELECT * FROM cron.job;
   };
 
   return (
-    <div className="space-y-6">
+    <div className="pt-6 space-y-6">
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">

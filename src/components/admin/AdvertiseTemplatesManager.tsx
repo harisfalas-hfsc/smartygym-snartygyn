@@ -306,16 +306,17 @@ export const AdvertiseTemplatesManager = () => {
   };
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle className="flex items-center gap-2">
-          <ImageIcon className="h-5 w-5" />
-          Advertise Templates
-        </CardTitle>
-        <CardDescription>
-          Create branded advertisements using your actual Smarty Gym images, logo, and tagline
-        </CardDescription>
-      </CardHeader>
+    <div className="pt-6">
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <ImageIcon className="h-5 w-5" />
+            Advertise Templates
+          </CardTitle>
+          <CardDescription>
+            Create branded advertisements using your actual Smarty Gym images, logo, and tagline
+          </CardDescription>
+        </CardHeader>
       <CardContent className="space-y-6">
         {/* Ad Generator Form */}
         <div className="border rounded-lg p-6 bg-muted/50 space-y-4">
@@ -525,5 +526,6 @@ export const AdvertiseTemplatesManager = () => {
         )}
       </CardContent>
     </Card>
+    </div>
   );
 };

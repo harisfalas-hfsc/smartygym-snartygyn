@@ -138,16 +138,17 @@ export function UsersManager() {
   }
 
   return (
-    <Card>
-      <CardHeader>
-        <div className="flex items-center justify-between">
-          <div>
-            <CardTitle>User Management</CardTitle>
-            <CardDescription>View and manage all registered users</CardDescription>
-          </div>
-          <div className="flex gap-2">
-            <Button onClick={fetchUsers} variant="outline" size="sm">
-              <RefreshCw className="h-4 w-4 mr-2" />
+    <div className="pt-6">
+      <Card>
+        <CardHeader>
+          <div className="flex items-center justify-between">
+            <div>
+              <CardTitle>User Management</CardTitle>
+              <CardDescription>View and manage all registered users</CardDescription>
+            </div>
+            <div className="flex gap-2">
+              <Button onClick={fetchUsers} variant="outline" size="sm">
+                <RefreshCw className="h-4 w-4 mr-2" />
               Refresh
             </Button>
             <Button onClick={exportToCSV} variant="outline" size="sm">
@@ -300,5 +301,6 @@ export function UsersManager() {
         </div>
       </CardContent>
     </Card>
+    </div>
   );
 }

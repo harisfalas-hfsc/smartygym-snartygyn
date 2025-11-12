@@ -121,7 +121,7 @@ export const PersonalTrainingManager = () => {
   const completedRequests = requests.filter(r => r.status === 'completed');
 
   return (
-    <>
+    <div className="pt-6">
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
@@ -417,6 +417,6 @@ export const PersonalTrainingManager = () => {
           setShowProgramDialog(false);
         }}
       />
-    </>
+    </div>
   );
 };

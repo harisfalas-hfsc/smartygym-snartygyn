@@ -283,7 +283,7 @@ export function AnalyticsDashboard() {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="pt-6 space-y-6">
       {/* Key Metrics Cards */}
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
         <Card>
