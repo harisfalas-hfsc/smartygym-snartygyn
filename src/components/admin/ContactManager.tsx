@@ -10,8 +10,9 @@ import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Mail, MessageSquare, Eye, CheckCircle, X, ArrowLeft, Send, Search, Filter, FileText, Paperclip, Download, Upload } from "lucide-react";
+import { Mail, MessageSquare, Eye, CheckCircle, X, ArrowLeft, Send, Search, Filter, FileText, Paperclip, Download, Upload, BarChart3 } from "lucide-react";
 import { format } from "date-fns";
+import { ContactAnalytics } from "./ContactAnalytics";
 
 interface ContactMessage {
   id: string;
@@ -455,7 +456,7 @@ export const ContactManager = () => {
 
           <Tabs defaultValue="all">
             <div className="w-full overflow-x-auto">
-              <TabsList className="w-full inline-flex sm:grid sm:grid-cols-5 min-w-max sm:min-w-0">
+              <TabsList className="w-full inline-flex sm:grid sm:grid-cols-6 min-w-max sm:min-w-0">
                 <TabsTrigger value="all" className="flex-shrink-0 whitespace-nowrap">
                   All ({messages.length})
                 </TabsTrigger>
@@ -470,6 +471,10 @@ export const ContactManager = () => {
                 </TabsTrigger>
                 <TabsTrigger value="new" className="flex-shrink-0 whitespace-nowrap">
                   New ({newMessages.length})
+                </TabsTrigger>
+                <TabsTrigger value="analytics" className="flex-shrink-0 whitespace-nowrap flex items-center gap-1">
+                  <BarChart3 className="h-4 w-4" />
+                  Analytics
                 </TabsTrigger>
               </TabsList>
             </div>
@@ -512,6 +517,10 @@ export const ContactManager = () => {
               ) : (
                 newMessages.map(message => <MessageCard key={message.id} message={message} />)
               )}
+            </TabsContent>
+
+            <TabsContent value="analytics" className="mt-4">
+              <ContactAnalytics />
             </TabsContent>
           </Tabs>
         </CardContent>
