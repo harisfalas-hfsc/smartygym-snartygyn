@@ -244,7 +244,8 @@ export const ProgramEditDialog = ({ program, open, onOpenChange, onSave }: Progr
           body: {
             name: formData.name,
             price: formData.price,
-            contentType: "Training Program"
+            contentType: "Training Program",
+            imageUrl: imageUrl
           }
         });
 

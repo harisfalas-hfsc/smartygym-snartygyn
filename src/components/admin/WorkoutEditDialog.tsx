@@ -203,7 +203,8 @@ export const WorkoutEditDialog = ({ workout, open, onOpenChange, onSave }: Worko
           body: {
             name: formData.name,
             price: formData.price,
-            contentType: "Workout"
+            contentType: "Workout",
+            imageUrl: imageUrl
           }
         });
 

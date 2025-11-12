@@ -12,23 +12,30 @@ serve(async (req) => {
   }
 
   try {
-    const { name, price, contentType } = await req.json();
+    const { name, price, contentType, imageUrl } = await req.json();
     
     if (!name || !price) {
       throw new Error("Name and price are required");
     }
 
-    console.log("Creating Stripe product:", { name, price, contentType });
+    console.log("Creating Stripe product:", { name, price, contentType, imageUrl });
 
     const stripe = new Stripe(Deno.env.get("STRIPE_SECRET_KEY") || "", {
       apiVersion: "2025-08-27.basil",
     });
 
-    // Create product
-    const product = await stripe.products.create({
+    // Create product with image
+    const productData: any = {
       name: name,
       description: `${contentType}: ${name}`,
-    });
+    };
+
+    // Add image if provided
+    if (imageUrl) {
+      productData.images = [imageUrl];
+    }
+
+    const product = await stripe.products.create(productData);
 
     console.log("Product created:", product.id);
 
