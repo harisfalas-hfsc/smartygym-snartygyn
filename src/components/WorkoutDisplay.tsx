@@ -450,8 +450,8 @@ export const WorkoutDisplay = ({
           </Card>
         )}
 
-        {/* 6. Description */}
-        {description && (
+        {/* 6. Description - Only for Workouts */}
+        {description && workoutId && (
           <Card className="border-2 border-primary/30">
             <CardHeader className="bg-primary/5">
               <CardTitle className="flex items-center gap-2 text-2xl font-bold">
@@ -583,8 +583,8 @@ export const WorkoutDisplay = ({
         )}
 
         {/* Program Content Sections - CORRECT ORDER */}
-        {/* 1. Training Program Content */}
-        {weekly_schedule && (
+        {/* 1. Training Program Content - Only for Programs */}
+        {weekly_schedule && programId && (
           <Card className="border-2 border-primary/30">
             <CardHeader className="bg-primary/5">
               <CardTitle className="flex items-center gap-2 text-2xl font-bold">
@@ -599,8 +599,8 @@ export const WorkoutDisplay = ({
           </Card>
         )}
 
-        {/* 2. Description */}
-        {description && (
+        {/* 2. Description - Only for Programs */}
+        {description && programId && (
           <Card className="border-2 border-primary/30">
             <CardHeader className="bg-primary/5">
               <CardTitle className="flex items-center gap-2 text-2xl font-bold">
@@ -615,12 +615,12 @@ export const WorkoutDisplay = ({
           </Card>
         )}
 
-        {/* 3. Construction (Program Structure) */}
-        {program_structure && (
+        {/* 3. Instructions (Program Structure) */}
+        {program_structure && programId && (
           <Card className="border-2 border-primary/30">
             <CardHeader className="bg-primary/5">
               <CardTitle className="flex items-center gap-2 text-2xl font-bold">
-                🏗️ Construction
+                📋 Instructions
               </CardTitle>
             </CardHeader>
             <CardContent>
@@ -631,8 +631,8 @@ export const WorkoutDisplay = ({
           </Card>
         )}
 
-        {/* 4. Tips (formerly Nutrition Tips) */}
-        {nutrition_tips && (
+        {/* 4. Tips - Only for Programs */}
+        {nutrition_tips && programId && (
           <Card className="border-2 border-primary/30">
             <CardHeader className="bg-primary/5">
               <CardTitle className="flex items-center gap-2 text-2xl font-bold">
