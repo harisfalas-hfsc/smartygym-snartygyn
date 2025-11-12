@@ -262,7 +262,7 @@ const Index = () => {
                       <TooltipTrigger asChild>
                         <Target 
                           className="w-6 h-6 sm:w-7 sm:h-7 text-primary cursor-pointer transition-all duration-200 hover:scale-110 hover:text-primary/80" 
-                          onClick={() => navigate("/training-program")}
+                          onClick={() => navigate("/trainingprogram")}
                         />
                       </TooltipTrigger>
                       <TooltipContent>
@@ -301,7 +301,7 @@ const Index = () => {
                       <TooltipTrigger asChild>
                         <Video 
                           className="w-6 h-6 sm:w-7 sm:h-7 text-primary cursor-pointer transition-all duration-200 hover:scale-110 hover:text-primary/80" 
-                          onClick={() => navigate("/exercise-library")}
+                          onClick={() => navigate("/exerciselibrary")}
                         />
                       </TooltipTrigger>
                       <TooltipContent>
