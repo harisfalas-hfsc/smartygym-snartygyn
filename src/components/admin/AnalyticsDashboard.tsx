@@ -393,15 +393,13 @@ export function AnalyticsDashboard() {
                 <CardDescription>Percentage breakdown by income stream</CardDescription>
               </CardHeader>
               <CardContent>
-                <ResponsiveContainer width="100%" height={300}>
+                <ResponsiveContainer width="100%" height={400}>
                   <PieChart>
                     <Pie
                       data={revenueDistribution}
                       cx="50%"
-                      cy="50%"
-                      labelLine={false}
-                      label={({ name, percentage }) => `${name}: ${percentage}%`}
-                      outerRadius={100}
+                      cy="45%"
+                      outerRadius={120}
                       fill="hsl(var(--primary))"
                       dataKey="value"
                     >
@@ -409,7 +407,12 @@ export function AnalyticsDashboard() {
                         <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                       ))}
                     </Pie>
-                    <Tooltip />
+                    <Tooltip formatter={(value: any, name: any, props: any) => [`€${value}`, `${props.payload.percentage}%`]} />
+                    <Legend 
+                      verticalAlign="bottom" 
+                      height={60}
+                      formatter={(value: string, entry: any) => `${value}: ${entry.payload.percentage}%`}
+                    />
                   </PieChart>
                 </ResponsiveContainer>
               </CardContent>
