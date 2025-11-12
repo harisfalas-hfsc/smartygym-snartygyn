@@ -6,7 +6,8 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Download, Loader2, RefreshCw, Image as ImageIcon, Sparkles } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
-import { supabase } from "@/integrations/supabase/client";
+import { AdComposer } from "@/utils/adComposer";
+import { getRandomWorkoutImage, WORKOUT_IMAGES } from "@/utils/brandingService";
 
 interface AdTemplate {
   id: string;
@@ -98,6 +99,7 @@ export const AdvertiseTemplatesManager = () => {
   const [selectedPurpose, setSelectedPurpose] = useState<string>("");
   const [customDetails, setCustomDetails] = useState<string>("");
   const [selectedPlatform, setSelectedPlatform] = useState<string>("");
+  const [selectedBackground, setSelectedBackground] = useState<string>("");
   const [generatedAds, setGeneratedAds] = useState<AdTemplate[]>([]);
 
   const generateAdsForPlatform = async () => {
@@ -109,9 +111,6 @@ export const AdvertiseTemplatesManager = () => {
       });
       return;
     }
-
-    const purpose = AD_PURPOSES.find((p) => p.value === selectedPurpose);
-    if (!purpose) return;
 
     const platform = selectedPlatform as "Instagram" | "TikTok" | "Facebook";
     const aspectRatios = {
@@ -131,28 +130,28 @@ export const AdvertiseTemplatesManager = () => {
     setGeneratedAds((prev) => [newAd, ...prev]);
 
     try {
-      const prompt = purpose.promptTemplate(customDetails, platform);
+      // Use actual Smarty Gym branding and images
+      const composer = new AdComposer();
+      const backgroundImage = selectedBackground || getRandomWorkoutImage();
       
-      const { data, error } = await supabase.functions.invoke("generate-ad-image", {
-        body: {
-          prompt,
-          aspectRatio: aspectRatios[platform],
-        },
+      const imageUrl = await composer.composeAd({
+        platform,
+        purpose: selectedPurpose,
+        details: customDetails,
+        backgroundImage,
       });
-
-      if (error) throw error;
 
       setGeneratedAds((prev) =>
         prev.map((ad) =>
           ad.id === newAd.id
-            ? { ...ad, imageUrl: data.imageUrl, generating: false }
+            ? { ...ad, imageUrl, generating: false }
             : ad
         )
       );
 
       toast({
         title: "Success",
-        description: `${platform} advertisement generated successfully`,
+        description: `${platform} advertisement created with your branding`,
       });
     } catch (error: any) {
       console.error("Error generating image:", error);
@@ -173,36 +172,32 @@ export const AdvertiseTemplatesManager = () => {
     const ad = generatedAds.find((a) => a.id === adId);
     if (!ad || !selectedPurpose || !customDetails.trim()) return;
 
-    const purpose = AD_PURPOSES.find((p) => p.value === selectedPurpose);
-    if (!purpose) return;
-
     setGeneratedAds((prev) =>
       prev.map((a) => (a.id === adId ? { ...a, generating: true } : a))
     );
 
     try {
-      const prompt = purpose.promptTemplate(customDetails, ad.platform);
+      const composer = new AdComposer();
+      const backgroundImage = selectedBackground || getRandomWorkoutImage();
       
-      const { data, error } = await supabase.functions.invoke("generate-ad-image", {
-        body: {
-          prompt,
-          aspectRatio: ad.aspectRatio,
-        },
+      const imageUrl = await composer.composeAd({
+        platform: ad.platform,
+        purpose: selectedPurpose,
+        details: customDetails,
+        backgroundImage,
       });
-
-      if (error) throw error;
 
       setGeneratedAds((prev) =>
         prev.map((a) =>
           a.id === adId
-            ? { ...a, imageUrl: data.imageUrl, generating: false }
+            ? { ...a, imageUrl, generating: false }
             : a
         )
       );
 
       toast({
         title: "Success",
-        description: "Advertisement regenerated successfully",
+        description: "Advertisement regenerated with your branding",
       });
     } catch (error: any) {
       console.error("Error regenerating image:", error);
@@ -263,7 +258,7 @@ export const AdvertiseTemplatesManager = () => {
           Advertise Templates
         </CardTitle>
         <CardDescription>
-          Create custom AI-generated advertisements for your social media platforms
+          Create branded advertisements using your actual Smarty Gym images, logo, and tagline
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-6">
@@ -327,6 +322,38 @@ export const AdvertiseTemplatesManager = () => {
             </p>
           </div>
 
+          <div className="space-y-2">
+            <Label htmlFor="background">Background Image (Optional)</Label>
+            <Select value={selectedBackground} onValueChange={setSelectedBackground}>
+              <SelectTrigger id="background">
+                <SelectValue placeholder="Random workout image (recommended)" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="">Random (Recommended)</SelectItem>
+                <SelectItem value={WORKOUT_IMAGES[0]}>Bodyweight Inferno</SelectItem>
+                <SelectItem value={WORKOUT_IMAGES[1]}>HIIT Inferno</SelectItem>
+                <SelectItem value={WORKOUT_IMAGES[2]}>Cardio Blast</SelectItem>
+                <SelectItem value={WORKOUT_IMAGES[3]}>Power Surge</SelectItem>
+                <SelectItem value={WORKOUT_IMAGES[4]}>Metabolic Burn</SelectItem>
+                <SelectItem value={WORKOUT_IMAGES[5]}>Explosive Engine</SelectItem>
+                <SelectItem value={WORKOUT_IMAGES[6]}>Functional Strength</SelectItem>
+                <SelectItem value={WORKOUT_IMAGES[7]}>Cardio Endurance</SelectItem>
+                <SelectItem value={WORKOUT_IMAGES[8]}>Muscle Hypertrophy</SelectItem>
+              </SelectContent>
+            </Select>
+            <p className="text-xs text-muted-foreground">
+              Uses actual Smarty Gym workout images from your library
+            </p>
+          </div>
+
+          <div className="bg-primary/10 border border-primary/30 rounded-lg p-4 space-y-2">
+            <p className="text-sm font-medium text-primary">✓ 100% Brand Aligned</p>
+            <p className="text-xs text-muted-foreground">
+              All ads use your actual Smarty Gym logo, exact tagline "Your gym reimagined. Anywhere, anytime.", 
+              real workout images from your library, and gold brand colors. No random generic content.
+            </p>
+          </div>
+
           <Button
             onClick={generateAdsForPlatform}
             disabled={!selectedPurpose || !customDetails.trim() || !selectedPlatform}
@@ -334,7 +361,7 @@ export const AdvertiseTemplatesManager = () => {
             size="lg"
           >
             <Sparkles className="h-4 w-4 mr-2" />
-            Generate Advertisement
+            Generate Branded Advertisement
           </Button>
         </div>
 
