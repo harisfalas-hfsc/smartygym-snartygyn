@@ -274,7 +274,7 @@ const PersonalTraining = () => {
 
       <div className="min-h-screen bg-background py-6 sm:py-12 px-4">
         <div className="container mx-auto max-w-4xl">
-          <div className="h-10 mb-6">
+          <div className="h-10 mb-6 flex items-center">
             {canGoBack && (
               <Button
                 variant="ghost"
