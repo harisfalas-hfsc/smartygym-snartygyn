@@ -4,6 +4,7 @@ import { Helmet } from "react-helmet";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { PageTitleCard } from "@/components/PageTitleCard";
+import { DecorativeDivider } from "@/components/DecorativeDivider";
 import { ArrowLeft, Clock, Calendar, FileText } from "lucide-react";
 import { useShowBackButton } from "@/hooks/useShowBackButton";
 
@@ -164,6 +165,8 @@ const Blog = () => {
               </p>
             </div>
           </header>
+
+          <DecorativeDivider className="mb-8" />
 
           {/* Category Filter */}
           <div className="flex flex-wrap justify-center gap-3 mb-8">

@@ -12,6 +12,7 @@ import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { ParQQuestionnaire } from "@/components/ParQQuestionnaire";
 import { PageTitleCard } from "@/components/PageTitleCard";
+import { DecorativeDivider } from "@/components/DecorativeDivider";
 import { Loader2, ArrowLeft, UserCheck } from "lucide-react";
 import { useShowBackButton } from "@/hooks/useShowBackButton";
 
@@ -306,6 +307,8 @@ const PersonalTraining = () => {
               </CardDescription>
             </CardHeader>
           </Card>
+
+          <DecorativeDivider className="my-12" />
 
           <Card className="border-2 border-primary">
             <CardHeader className="p-4 sm:p-6">
