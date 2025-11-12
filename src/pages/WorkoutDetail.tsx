@@ -276,16 +276,22 @@ const WorkoutDetail = () => {
   const [statusFilter, setStatusFilter] = useState<StatusFilter>("all");
   const [userId, setUserId] = useState<string | undefined>();
   
+  console.log("🎯 WorkoutDetail mounted - type:", type);
+  
   // Fetch current user
   useEffect(() => {
     supabase.auth.getUser().then(({ data: { user } }) => {
       setUserId(user?.id);
+      console.log("👤 User ID:", user?.id || "NOT LOGGED IN");
     });
   }, []);
   
   // Fetch workouts and interactions from database
   const { data: allWorkouts = [], isLoading } = useAllWorkouts();
   const { data: interactions = [] } = useWorkoutInteractions(userId);
+  
+  console.log("📦 All Workouts:", allWorkouts.length, allWorkouts);
+  console.log("⏳ Loading:", isLoading);
   
   // Map URL type to database category
   const categoryMap: { [key: string]: string } = {
@@ -317,11 +323,14 @@ const WorkoutDetail = () => {
   
   // Filter workouts by category from URL and user filters
   const filteredWorkouts = allWorkouts.filter(workout => {
+    console.log("🔍 Filtering workout:", workout.name, "Category:", workout.category, "Expected:", mappedCategory);
+    
     // Match category
     const categoryMatch = workout.category?.toUpperCase().includes(mappedCategory);
-    console.log(`🔍 Workout ${workout.name} - Category: ${workout.category}, Mapped: ${mappedCategory}, Match: ${categoryMatch}`);
-    
-    if (!categoryMatch) return false;
+    if (!categoryMatch) {
+      console.log("❌ Category mismatch for:", workout.name);
+      return false;
+    }
     
     // Equipment filter
     if (equipmentFilter !== "all") {
@@ -363,6 +372,8 @@ const WorkoutDetail = () => {
     
     return true;
   });
+  
+  console.log("✅ Filtered Workouts:", filteredWorkouts.length, filteredWorkouts.map(w => w.name));
 
   return (
     <>
