@@ -143,7 +143,7 @@ const Blog = () => {
 
       <div className="min-h-screen bg-gradient-to-b from-background to-accent/20">
         <div className="container mx-auto max-w-6xl px-4 py-8">
-          <div className="h-10 mb-6">
+          <div className="h-10 mb-6 flex items-center">
             {canGoBack && (
               <Button
                 variant="ghost"
