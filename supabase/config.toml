@@ -24,5 +24,11 @@ verify_jwt = false
 [functions.generate-program-image]
 verify_jwt = false
 
-[functions.generate-ad-image]
-verify_jwt = true
+[functions.send-renewal-reminders]
+verify_jwt = false
+
+[functions.send-reengagement-emails]
+verify_jwt = false
+
+[functions.send-scheduled-notifications]
+verify_jwt = false
