@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { PageTitleCard } from "@/components/PageTitleCard";
 import { InfoRibbon } from "@/components/InfoRibbon";
+import { DecorativeDivider } from "@/components/DecorativeDivider";
 import { ArrowLeft, Heart, Dumbbell, Activity, Flame, User, Move, Scale, Target } from "lucide-react";
 import { BackToTop } from "@/components/BackToTop";
 import { TimedPopup } from "@/components/TimedPopup";
@@ -114,6 +115,8 @@ const TrainingProgramFlow = () => {
             </p>
           </InfoRibbon>
         )}
+
+        <DecorativeDivider className="my-12" />
         
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
           {programTypes.map((program) => {
