@@ -323,10 +323,10 @@ const Index = () => {
                 </TooltipProvider>
                 
                 {/* Title and Subtitle */}
-                <h1 className="text-2xl sm:text-3xl md:text-4xl font-black bg-gradient-to-r from-primary via-primary/90 to-primary bg-clip-text text-transparent drop-shadow-[0_0_15px_rgba(var(--primary),0.3)] px-8 sm:px-12">
+                <h1 className="text-3xl sm:text-4xl md:text-5xl font-black bg-gradient-to-r from-primary via-primary/90 to-primary bg-clip-text text-transparent drop-shadow-[0_0_15px_rgba(var(--primary),0.3)] px-8 sm:px-12">
                   Smarty Gym
                 </h1>
-                <p className="text-sm sm:text-base text-muted-foreground mt-2 px-8 sm:px-12">
+                <p className="text-xs sm:text-sm text-muted-foreground mt-1 px-8 sm:px-12">
                   Your Gym Re-imagined. Anywhere, Anytime
                 </p>
               </div>
