@@ -3,6 +3,7 @@ import { Outlet, useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { User } from "@supabase/supabase-js";
 import { ProfileSetupDialog } from "@/components/ProfileSetupDialog";
+import { useAutoLogout } from "@/hooks/useAutoLogout";
 
 export const AuthenticatedLayout = () => {
   const navigate = useNavigate();
@@ -10,6 +11,9 @@ export const AuthenticatedLayout = () => {
   const [loading, setLoading] = useState(true);
   const [showProfileSetup, setShowProfileSetup] = useState(false);
   const [hasCheckedProfile, setHasCheckedProfile] = useState(false);
+  
+  // Enable automatic logout on inactivity (30 min) and browser close
+  useAutoLogout();
 
   useEffect(() => {
     // Check if user is authenticated
