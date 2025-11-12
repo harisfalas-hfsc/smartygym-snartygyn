@@ -7,6 +7,7 @@ import { ArrowLeft, Eye, CheckCircle } from "lucide-react";
 import { AccessGate } from "@/components/AccessGate";
 import { CompactFilters } from "@/components/CompactFilters";
 import { PageTitleCard } from "@/components/PageTitleCard";
+import { ContentLoadingSkeleton } from "@/components/ContentLoadingSkeleton";
 import { useAllWorkouts } from "@/hooks/useWorkoutData";
 import { useWorkoutInteractions } from "@/hooks/useWorkoutInteractions";
 import { supabase } from "@/integrations/supabase/client";
@@ -380,8 +381,10 @@ const WorkoutDetail = () => {
   return (
     <>
       {isLoading ? (
-        <div className="min-h-screen bg-background flex items-center justify-center">
-          <p className="text-muted-foreground">Loading workouts...</p>
+        <div className="min-h-screen bg-background py-8 px-4">
+          <div className="container mx-auto max-w-7xl">
+            <ContentLoadingSkeleton />
+          </div>
         </div>
       ) : (
         <>

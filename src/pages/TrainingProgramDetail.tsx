@@ -7,6 +7,7 @@ import { ArrowLeft, Calendar, Eye, CheckCircle } from "lucide-react";
 import { AccessGate } from "@/components/AccessGate";
 import { CompactFilters } from "@/components/CompactFilters";
 import { PageTitleCard } from "@/components/PageTitleCard";
+import { ContentLoadingSkeleton } from "@/components/ContentLoadingSkeleton";
 import { useAllPrograms } from "@/hooks/useProgramData";
 import { useProgramInteractions } from "@/hooks/useProgramInteractions";
 import { supabase } from "@/integrations/supabase/client";
@@ -379,8 +380,10 @@ const TrainingProgramDetail = () => {
   return (
     <>
       {isLoading ? (
-        <div className="min-h-screen bg-background flex items-center justify-center">
-          <p className="text-muted-foreground">Loading programs...</p>
+        <div className="min-h-screen bg-background py-8 px-4">
+          <div className="container mx-auto max-w-7xl">
+            <ContentLoadingSkeleton />
+          </div>
         </div>
       ) : (
         <>
