@@ -51,6 +51,7 @@ import MigrateContent from "./pages/MigrateContent";
 import { AccessGate } from "./components/AccessGate";
 import { WhatsAppButton } from "./components/WhatsAppButton";
 import { InstallPWA } from "./components/InstallPWA";
+import { NotificationPrompt } from "./components/NotificationPrompt";
 
 const queryClient = new QueryClient();
 
@@ -63,6 +64,7 @@ const App = () => (
         <BrowserRouter>
           <CookieConsent />
           <InstallPWA />
+          <NotificationPrompt />
           <AccessControlProvider>
           <WhatsAppButton />
           <ScrollToTop />

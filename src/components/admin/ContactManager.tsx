@@ -58,7 +58,7 @@ export const ContactManager = () => {
     fetchMessages();
     fetchTemplates();
 
-    // Subscribe to real-time updates
+    // Subscribe to real-time updates and send push notification to admin
     const channel = supabase
       .channel('contact_messages_changes')
       .on(
@@ -68,12 +68,29 @@ export const ContactManager = () => {
           schema: 'public',
           table: 'contact_messages'
         },
-        () => {
+        async (payload) => {
           fetchMessages();
           toast({
             title: "New Contact Message",
             description: "A new message has been received",
           });
+
+          // Send push notification to admin
+          try {
+            const { data: { user } } = await supabase.auth.getUser();
+            if (user) {
+              await supabase.functions.invoke('send-push-notification', {
+                body: {
+                  userId: user.id,
+                  title: 'New Contact Message',
+                  body: `New message from ${payload.new.name}`,
+                  url: '/admin?tab=contact'
+                }
+              });
+            }
+          } catch (error) {
+            console.error('Error sending admin notification:', error);
+          }
         }
       )
       .subscribe();
@@ -262,9 +279,10 @@ export const ContactManager = () => {
         variant: "destructive",
       });
     } else {
-      // Send email notification
+      // Send email notification and push notification
       if (selectedMessage.user_id && selectedMessage.email) {
         try {
+          // Send email notification
           await supabase.functions.invoke('send-contact-response-notification', {
             body: {
               userId: selectedMessage.user_id,
@@ -274,8 +292,18 @@ export const ContactManager = () => {
               responsePreview: responseText,
             }
           });
-        } catch (emailError) {
-          console.error('Error sending notification email:', emailError);
+
+          // Send push notification
+          await supabase.functions.invoke('send-push-notification', {
+            body: {
+              userId: selectedMessage.user_id,
+              title: 'New Response from Smarty Gym',
+              body: `${selectedMessage.name}, you have a new response to your message`,
+              url: '/userdashboard?tab=messages'
+            }
+          });
+        } catch (notificationError) {
+          console.error('Error sending notifications:', notificationError);
         }
       }
 

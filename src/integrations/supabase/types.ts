@@ -849,6 +849,7 @@ export type Database = {
           height: number | null
           id: string
           nickname: string | null
+          notification_preferences: Json | null
           updated_at: string
           user_id: string
           weight: number | null
@@ -866,6 +867,7 @@ export type Database = {
           height?: number | null
           id?: string
           nickname?: string | null
+          notification_preferences?: Json | null
           updated_at?: string
           user_id: string
           weight?: number | null
@@ -883,6 +885,7 @@ export type Database = {
           height?: number | null
           id?: string
           nickname?: string | null
+          notification_preferences?: Json | null
           updated_at?: string
           user_id?: string
           weight?: number | null
@@ -964,6 +967,39 @@ export type Database = {
           plan_type?: string
           user_id?: string
           weight?: number | null
+        }
+        Relationships: []
+      }
+      push_subscriptions: {
+        Row: {
+          browser_info: string | null
+          created_at: string | null
+          device_type: string | null
+          id: string
+          is_active: boolean | null
+          subscription_data: Json
+          updated_at: string | null
+          user_id: string | null
+        }
+        Insert: {
+          browser_info?: string | null
+          created_at?: string | null
+          device_type?: string | null
+          id?: string
+          is_active?: boolean | null
+          subscription_data: Json
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          browser_info?: string | null
+          created_at?: string | null
+          device_type?: string | null
+          id?: string
+          is_active?: boolean | null
+          subscription_data?: Json
+          updated_at?: string | null
+          user_id?: string | null
         }
         Relationships: []
       }

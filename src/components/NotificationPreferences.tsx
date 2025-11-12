@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { Bell, Mail, TrendingUp, Calendar, Users, Trophy, Save } from "lucide-react";
 import { toast } from "sonner";
+import { PushNotificationSetup } from "./PushNotificationSetup";
 
 interface NotificationPrefs {
   workout_reminders: boolean;
@@ -113,17 +114,22 @@ export function NotificationPreferences() {
   }
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle className="flex items-center gap-2">
-          <Bell className="h-5 w-5" />
-          Notification Preferences
-        </CardTitle>
-        <CardDescription>
-          Manage how you want to receive updates and notifications from SmartyGym
-        </CardDescription>
-      </CardHeader>
-      <CardContent className="space-y-6">
+    <div className="space-y-6">
+      {/* Push Notification Setup */}
+      <PushNotificationSetup />
+
+      {/* Email and In-App Preferences */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2 text-base sm:text-lg">
+            <Bell className="h-4 w-4 sm:h-5 sm:w-5" />
+            Email & In-App Notifications
+          </CardTitle>
+          <CardDescription className="text-xs sm:text-sm">
+            Manage how you want to receive updates and notifications from SmartyGym
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-6">
         {/* Workout Related */}
         <div className="space-y-4">
           <div className="flex items-center gap-2">
@@ -253,19 +259,21 @@ export function NotificationPreferences() {
         <Separator />
 
         {/* Save Button */}
-        <div className="flex items-center justify-between pt-4">
-          <p className="text-sm text-muted-foreground">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 pt-4">
+          <p className="text-xs sm:text-sm text-muted-foreground">
             {hasChanges ? 'You have unsaved changes' : 'All changes saved'}
           </p>
           <Button
             onClick={handleSave}
             disabled={!hasChanges || saving}
+            className="w-full sm:w-auto text-xs sm:text-sm"
           >
-            <Save className="h-4 w-4 mr-2" />
+            <Save className="h-3 w-3 sm:h-4 sm:w-4 mr-2" />
             {saving ? 'Saving...' : 'Save Preferences'}
           </Button>
         </div>
       </CardContent>
     </Card>
+    </div>
   );
 }
