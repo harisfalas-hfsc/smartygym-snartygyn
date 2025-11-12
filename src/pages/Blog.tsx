@@ -4,6 +4,7 @@ import { Helmet } from "react-helmet";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { PageTitleCard } from "@/components/PageTitleCard";
+import { InfoRibbon } from "@/components/InfoRibbon";
 import { DecorativeDivider } from "@/components/DecorativeDivider";
 import { ArrowLeft, Clock, Calendar, FileText } from "lucide-react";
 import { useShowBackButton } from "@/hooks/useShowBackButton";
@@ -142,29 +143,29 @@ const Blog = () => {
 
       <div className="min-h-screen bg-gradient-to-b from-background to-accent/20">
         <div className="container mx-auto max-w-6xl px-4 py-8">
-          {canGoBack && (
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={goBack}
-              className="mb-6"
-            >
-              <ArrowLeft className="mr-2 h-4 w-4" />
-              Back
-            </Button>
-          )}
+          <div className="h-10 mb-6">
+            {canGoBack && (
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={goBack}
+              >
+                <ArrowLeft className="mr-2 h-4 w-4" />
+                Back
+              </Button>
+            )}
+          </div>
 
           <PageTitleCard title="Blog" icon={FileText} />
-          <header className="text-center mb-6 sm:mb-8">
-            <div className="bg-primary/10 border border-primary/20 rounded-lg p-3 sm:p-4 max-w-2xl mx-auto">
-              <p className="text-xs sm:text-sm text-muted-foreground">
-                Expert insights on training, nutrition, and performance from certified strength coach{" "}
-                <a href="/coach-profile" className="text-primary hover:underline font-medium">
-                  Haris Falas
-                </a>
-              </p>
-            </div>
-          </header>
+          
+          <InfoRibbon className="max-w-2xl mx-auto">
+            <p>
+              Expert insights on training, nutrition, and performance from certified strength coach{" "}
+              <a href="/coach-profile" className="text-primary hover:underline font-medium">
+                Haris Falas
+              </a>
+            </p>
+          </InfoRibbon>
 
           <DecorativeDivider className="mb-8" />
 

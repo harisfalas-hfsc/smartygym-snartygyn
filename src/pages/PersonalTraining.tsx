@@ -274,17 +274,18 @@ const PersonalTraining = () => {
 
       <div className="min-h-screen bg-background py-6 sm:py-12 px-4">
         <div className="container mx-auto max-w-4xl">
-          {canGoBack && (
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={goBack}
-              className="mb-6"
-            >
-              <ArrowLeft className="mr-2 h-4 w-4" />
-              <span className="text-xs sm:text-sm">Back</span>
-            </Button>
-          )}
+          <div className="h-10 mb-6">
+            {canGoBack && (
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={goBack}
+              >
+                <ArrowLeft className="mr-2 h-4 w-4" />
+                <span className="text-xs sm:text-sm">Back</span>
+              </Button>
+            )}
+          </div>
           
           <PageTitleCard 
             title="Personal Training" 

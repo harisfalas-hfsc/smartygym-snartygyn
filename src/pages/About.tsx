@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { PageTitleCard } from "@/components/PageTitleCard";
+import { InfoRibbon } from "@/components/InfoRibbon";
 import { DecorativeDivider } from "@/components/DecorativeDivider";
 import { ArrowLeft, Award, Heart, Users, Target, UserCheck, Brain, Shield, Sparkles, Ban, CheckCircle2, Compass, Info } from "lucide-react";
 import { BackToTop } from "@/components/BackToTop";
@@ -61,17 +62,18 @@ const About = () => {
       <div className="min-h-screen bg-background">
         <BackToTop />
         <div className="container mx-auto max-w-6xl px-4 py-8">
-        {canGoBack && (
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={goBack}
-            className="mb-6"
-          >
-            <ArrowLeft className="mr-2 h-4 w-4" />
-            Back
-          </Button>
-        )}
+        <div className="h-10 mb-6">
+          {canGoBack && (
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={goBack}
+            >
+              <ArrowLeft className="mr-2 h-4 w-4" />
+              Back
+            </Button>
+          )}
+        </div>
 
         {/* Hero Section */}
         <PageTitleCard 
@@ -79,15 +81,12 @@ const About = () => {
           subtitle="Fitness Without the Chains | smartygym.com"
           icon={Info} 
         />
-        <header className="text-center mb-6 sm:mb-8">
-          
-          {/* Info Ribbon */}
-          <div className="bg-primary/10 border border-primary/20 rounded-lg p-3 sm:p-4 mb-6 sm:mb-8 text-center max-w-3xl mx-auto">
-            <p className="text-xs sm:text-sm text-muted-foreground">
-              Founded by <a href="/coach-profile" className="text-primary hover:underline font-medium">Haris Falas</a> — Sports Scientist & Strength and Conditioning Coach | Cyprus Fitness Expert
-            </p>
-          </div>
-        </header>
+        
+        <InfoRibbon className="max-w-3xl mx-auto">
+          <p>
+            Founded by <a href="/coach-profile" className="text-primary hover:underline font-medium">Haris Falas</a> — Sports Scientist & Strength and Conditioning Coach | Cyprus Fitness Expert
+          </p>
+        </InfoRibbon>
 
         <DecorativeDivider className="mb-12" />
 
