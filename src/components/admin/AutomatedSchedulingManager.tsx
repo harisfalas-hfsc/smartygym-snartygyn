@@ -12,9 +12,23 @@ import {
   Calendar,
   RefreshCw,
   Settings,
-  Info
+  Info,
+  Edit,
+  Save,
+  X
 } from "lucide-react";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Switch } from "@/components/ui/switch";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from "@/components/ui/dialog";
 
 interface ScheduledJob {
   name: string;
@@ -26,6 +40,7 @@ interface ScheduledJob {
   icon: typeof Clock;
   color: string;
   lastRun?: string;
+  cronJobName: string;
 }
 
 const SCHEDULED_JOBS: ScheduledJob[] = [
@@ -35,9 +50,10 @@ const SCHEDULED_JOBS: ScheduledJob[] = [
     schedule: "0 9 * * *",
     scheduleDescription: "Daily at 9:00 AM",
     functionName: "send-renewal-reminders",
-    isActive: false, // Will be checked against database
+    isActive: false,
     icon: Calendar,
-    color: "text-cyan-600"
+    color: "text-cyan-600",
+    cronJobName: "send-renewal-reminders-daily"
   },
   {
     name: "Re-engagement Messages",
@@ -47,7 +63,8 @@ const SCHEDULED_JOBS: ScheduledJob[] = [
     functionName: "send-reengagement-emails",
     isActive: false,
     icon: RefreshCw,
-    color: "text-purple-600"
+    color: "text-purple-600",
+    cronJobName: "send-reengagement-emails-weekly"
   }
 ];
 
@@ -56,6 +73,11 @@ export const AutomatedSchedulingManager = () => {
   const [jobs, setJobs] = useState<ScheduledJob[]>(SCHEDULED_JOBS);
   const [loading, setLoading] = useState(true);
   const [cronJobsEnabled, setCronJobsEnabled] = useState(false);
+  const [editingJob, setEditingJob] = useState<ScheduledJob | null>(null);
+  const [editDialogOpen, setEditDialogOpen] = useState(false);
+  const [editSchedule, setEditSchedule] = useState("");
+  const [editEnabled, setEditEnabled] = useState(true);
+  const [saving, setSaving] = useState(false);
 
   useEffect(() => {
     checkCronStatus();
@@ -156,6 +178,77 @@ SELECT * FROM cron.job;
     });
   };
 
+  const handleEditJob = (job: ScheduledJob) => {
+    setEditingJob(job);
+    setEditSchedule(job.schedule);
+    setEditEnabled(job.isActive);
+    setEditDialogOpen(true);
+  };
+
+  const handleSaveSchedule = async () => {
+    if (!editingJob) return;
+
+    setSaving(true);
+    try {
+      const projectUrl = import.meta.env.VITE_SUPABASE_URL;
+      const anonKey = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY;
+
+      let sql = '';
+
+      // Generate SQL to unschedule
+      sql += `-- Unschedule existing job\nSELECT cron.unschedule('${editingJob.cronJobName}');\n\n`;
+
+      // If enabled, generate SQL to schedule with new timing
+      if (editEnabled) {
+        sql += `-- Schedule with new timing\nSELECT cron.schedule(\n  '${editingJob.cronJobName}',\n  '${editSchedule}',\n  $$\n  SELECT net.http_post(\n    url:='${projectUrl}/functions/v1/${editingJob.functionName}',\n    headers:='{"Content-Type": "application/json", "Authorization": "Bearer ${anonKey}"}'::jsonb,\n    body:='{}'::jsonb\n  ) as request_id;\n  $$\n);`;
+      }
+
+      // Copy SQL to clipboard
+      await navigator.clipboard.writeText(sql);
+
+      // Update local state optimistically
+      setJobs(jobs.map(j => 
+        j.cronJobName === editingJob.cronJobName 
+          ? { ...j, schedule: editSchedule, isActive: editEnabled, scheduleDescription: parseCronToDescription(editSchedule) }
+          : j
+      ));
+
+      toast({
+        title: "SQL Commands Copied",
+        description: "Paste and run these commands in your database SQL editor to apply changes",
+      });
+
+      setEditDialogOpen(false);
+    } catch (error) {
+      console.error("Error generating SQL:", error);
+      toast({
+        title: "Error",
+        description: error instanceof Error ? error.message : "Failed to generate SQL",
+        variant: "destructive",
+      });
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const parseCronToDescription = (cron: string): string => {
+    const parts = cron.split(' ');
+    if (parts.length !== 5) return cron;
+    
+    const [minute, hour, dayOfMonth, month, dayOfWeek] = parts;
+    
+    if (dayOfWeek !== '*') {
+      const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+      return `Weekly on ${days[parseInt(dayOfWeek)]} at ${hour}:${minute.padStart(2, '0')}`;
+    }
+    
+    if (dayOfMonth === '*' && month === '*') {
+      return `Daily at ${hour}:${minute.padStart(2, '0')}`;
+    }
+    
+    return cron;
+  };
+
   return (
     <div className="space-y-6">
       <Card>
@@ -229,6 +322,14 @@ SELECT * FROM cron.job;
                             <Play className="h-4 w-4 mr-2" />
                             Test Now
                           </Button>
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={() => handleEditJob(job)}
+                          >
+                            <Edit className="h-4 w-4 mr-2" />
+                            Edit Schedule
+                          </Button>
                         </div>
                       </div>
                     </CardContent>
@@ -295,6 +396,79 @@ SELECT * FROM cron.job;
               </CardContent>
             </Card>
           )}
+
+          {/* Edit Schedule Dialog */}
+          <Dialog open={editDialogOpen} onOpenChange={setEditDialogOpen}>
+            <DialogContent>
+              <DialogHeader>
+                <DialogTitle>Edit Schedule: {editingJob?.name}</DialogTitle>
+                <DialogDescription>
+                  Modify the cron schedule expression and enable/disable the job.
+                </DialogDescription>
+              </DialogHeader>
+
+              <div className="space-y-4 py-4">
+                <div className="space-y-2">
+                  <Label htmlFor="enabled">Status</Label>
+                  <div className="flex items-center gap-2">
+                    <Switch
+                      id="enabled"
+                      checked={editEnabled}
+                      onCheckedChange={setEditEnabled}
+                    />
+                    <span className="text-sm text-muted-foreground">
+                      {editEnabled ? "Enabled" : "Disabled"}
+                    </span>
+                  </div>
+                </div>
+
+                {editEnabled && (
+                  <>
+                    <div className="space-y-2">
+                      <Label htmlFor="schedule">Cron Expression</Label>
+                      <Input
+                        id="schedule"
+                        value={editSchedule}
+                        onChange={(e) => setEditSchedule(e.target.value)}
+                        placeholder="0 9 * * *"
+                      />
+                      <p className="text-xs text-muted-foreground">
+                        Current: {parseCronToDescription(editSchedule)}
+                      </p>
+                    </div>
+
+                    <Alert>
+                      <Info className="h-4 w-4" />
+                      <AlertTitle>Cron Format</AlertTitle>
+                      <AlertDescription className="text-xs space-y-1">
+                        <p>Format: <code className="bg-muted px-1 py-0.5 rounded">minute hour day month day-of-week</code></p>
+                        <ul className="list-disc list-inside">
+                          <li><code className="bg-muted px-1 py-0.5 rounded">0 9 * * *</code> = Daily at 9:00 AM</li>
+                          <li><code className="bg-muted px-1 py-0.5 rounded">0 10 * * 1</code> = Monday at 10:00 AM</li>
+                          <li><code className="bg-muted px-1 py-0.5 rounded">*/30 * * * *</code> = Every 30 minutes</li>
+                        </ul>
+                      </AlertDescription>
+                    </Alert>
+                  </>
+                )}
+              </div>
+
+              <DialogFooter>
+                <Button
+                  variant="outline"
+                  onClick={() => setEditDialogOpen(false)}
+                  disabled={saving}
+                >
+                  <X className="h-4 w-4 mr-2" />
+                  Cancel
+                </Button>
+                <Button onClick={handleSaveSchedule} disabled={saving}>
+                  <Save className="h-4 w-4 mr-2" />
+                  {saving ? "Generating..." : "Copy SQL Commands"}
+                </Button>
+              </DialogFooter>
+            </DialogContent>
+          </Dialog>
         </CardContent>
       </Card>
     </div>
