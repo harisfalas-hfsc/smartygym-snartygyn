@@ -99,7 +99,7 @@ export const AdvertiseTemplatesManager = () => {
   const [selectedPurpose, setSelectedPurpose] = useState<string>("");
   const [customDetails, setCustomDetails] = useState<string>("");
   const [selectedPlatform, setSelectedPlatform] = useState<string>("");
-  const [selectedBackground, setSelectedBackground] = useState<string>("");
+  const [selectedBackground, setSelectedBackground] = useState<string>("random");
   const [generatedAds, setGeneratedAds] = useState<AdTemplate[]>([]);
 
   const generateAdsForPlatform = async () => {
@@ -132,7 +132,7 @@ export const AdvertiseTemplatesManager = () => {
     try {
       // Use actual Smarty Gym branding and images
       const composer = new AdComposer();
-      const backgroundImage = selectedBackground || getRandomWorkoutImage();
+      const backgroundImage = selectedBackground === "random" ? getRandomWorkoutImage() : selectedBackground;
       
       const imageUrl = await composer.composeAd({
         platform,
@@ -178,7 +178,7 @@ export const AdvertiseTemplatesManager = () => {
 
     try {
       const composer = new AdComposer();
-      const backgroundImage = selectedBackground || getRandomWorkoutImage();
+      const backgroundImage = selectedBackground === "random" ? getRandomWorkoutImage() : selectedBackground;
       
       const imageUrl = await composer.composeAd({
         platform: ad.platform,
@@ -329,7 +329,7 @@ export const AdvertiseTemplatesManager = () => {
                 <SelectValue placeholder="Random workout image (recommended)" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="">Random (Recommended)</SelectItem>
+                <SelectItem value="random">Random (Recommended)</SelectItem>
                 <SelectItem value={WORKOUT_IMAGES[0]}>Bodyweight Inferno</SelectItem>
                 <SelectItem value={WORKOUT_IMAGES[1]}>HIIT Inferno</SelectItem>
                 <SelectItem value={WORKOUT_IMAGES[2]}>Cardio Blast</SelectItem>
