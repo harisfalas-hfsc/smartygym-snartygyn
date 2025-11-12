@@ -2,8 +2,10 @@ import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Button } from "@/components/ui/button";
 import { LineChart, Line, BarChart, Bar, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from "recharts";
-import { Users, DollarSign, TrendingUp, Star, Activity } from "lucide-react";
+import { Users, DollarSign, TrendingUp, Star, Activity, RefreshCw } from "lucide-react";
 import { toast } from "sonner";
 import { RevenueAnalytics } from "./RevenueAnalytics";
 import { PurchaseAnalytics } from "./PurchaseAnalytics";
@@ -24,6 +26,7 @@ interface ChartData {
 }
 
 export function AnalyticsDashboard() {
+  const [timeFilter, setTimeFilter] = useState<string>("30");
   const [analytics, setAnalytics] = useState<AnalyticsData>({
     totalUsers: 0,
     activeSubscribers: 0,
@@ -43,16 +46,22 @@ export function AnalyticsDashboard() {
 
   useEffect(() => {
     fetchAnalytics();
-  }, []);
+  }, [timeFilter]);
 
   const fetchAnalytics = async () => {
     try {
       setLoading(true);
 
+      // Calculate date range based on time filter
+      const endDate = new Date();
+      const startDate = new Date();
+      startDate.setDate(startDate.getDate() - parseInt(timeFilter));
+
       // Fetch total users and user growth over time
       const { data: profiles } = await supabase
         .from("profiles")
-        .select("created_at");
+        .select("created_at")
+        .gte("created_at", startDate.toISOString());
 
       const totalUsers = profiles?.length || 0;
 
@@ -105,8 +114,8 @@ export function AnalyticsDashboard() {
 
       // Create unified revenue comparison data
       revenueChartData = [
-        { name: "Gold Plans", value: goldRevenue * 15 }, // Assuming $15/month
-        { name: "Platinum Plans", value: platinumRevenue * 25 }, // Assuming $25/month
+        { name: "Gold Plans", value: goldRevenue * 15 }, // €15/month
+        { name: "Platinum Plans", value: platinumRevenue * 25 }, // €25/month
         { name: "Standalone Purchases", value: standaloneRevenue },
         { name: "Personal Training", value: personalTrainingRevenue }
       ];
@@ -176,10 +185,11 @@ export function AnalyticsDashboard() {
       });
       const subDistData = Object.entries(subDistribution).map(([name, value]) => ({ name, value }));
 
-      // Fetch workout interactions
+      // Fetch workout interactions within date range
       const { data: workoutInteractions } = await supabase
         .from("workout_interactions")
-        .select("is_completed, workout_name");
+        .select("is_completed, workout_name")
+        .gte("created_at", startDate.toISOString());
 
       const totalWorkouts = workoutInteractions?.length || 0;
       const completedWorkouts = workoutInteractions?.filter(w => w.is_completed).length || 0;
@@ -205,14 +215,27 @@ export function AnalyticsDashboard() {
         .sort((a, b) => b.value - a.value)
         .slice(0, 5);
 
-      // Popular workouts (most completed)
-      const workoutPopularity: { [key: string]: number } = {};
+      // Popular workouts - Query from actual database workouts
+      const { data: adminWorkouts } = await supabase
+        .from("admin_workouts")
+        .select("name, id");
+
+      const { data: adminPrograms } = await supabase
+        .from("admin_training_programs")
+        .select("name, id");
+
+      // Count completions for each workout/program from database
+      const contentCompletions: { [key: string]: number } = {};
+      
       workoutInteractions?.forEach((interaction) => {
-        if (interaction.is_completed) {
-          workoutPopularity[interaction.workout_name] = (workoutPopularity[interaction.workout_name] || 0) + 1;
+        const exists = adminWorkouts?.some(w => w.name === interaction.workout_name) ||
+                      adminPrograms?.some(p => p.name === interaction.workout_name);
+        if (exists && interaction.is_completed) {
+          contentCompletions[interaction.workout_name] = (contentCompletions[interaction.workout_name] || 0) + 1;
         }
       });
-      const popularWorkoutsData = Object.entries(workoutPopularity)
+      
+      const popularWorkoutsData = Object.entries(contentCompletions)
         .map(([name, value]) => ({
           name: name.length > 20 ? name.substring(0, 20) + "..." : name,
           value,
@@ -291,7 +314,7 @@ export function AnalyticsDashboard() {
             <DollarSign className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">${analytics.totalRevenue}</div>
+            <div className="text-2xl font-bold">€{analytics.totalRevenue}</div>
             <p className="text-xs text-muted-foreground">From subscriptions</p>
           </CardContent>
         </Card>
@@ -358,7 +381,7 @@ export function AnalyticsDashboard() {
                     <YAxis />
                     <Tooltip />
                     <Legend />
-                    <Bar dataKey="value" name="Revenue ($)" fill="hsl(var(--primary))" />
+                    <Bar dataKey="value" name="Revenue (€)" fill="hsl(var(--primary))" />
                   </BarChart>
                 </ResponsiveContainer>
               </CardContent>
@@ -427,6 +450,30 @@ export function AnalyticsDashboard() {
         </TabsContent>
 
         <TabsContent value="growth" className="space-y-4">
+          {/* Filter */}
+          <Card>
+            <CardContent className="pt-6">
+              <div className="flex gap-4">
+                <Select value={timeFilter} onValueChange={setTimeFilter}>
+                  <SelectTrigger className="w-[200px]">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="7">Last 7 Days</SelectItem>
+                    <SelectItem value="30">Last 30 Days</SelectItem>
+                    <SelectItem value="90">Last 90 Days</SelectItem>
+                    <SelectItem value="180">Last 6 Months</SelectItem>
+                    <SelectItem value="365">Last Year</SelectItem>
+                  </SelectContent>
+                </Select>
+                <Button onClick={fetchAnalytics} disabled={loading}>
+                  <RefreshCw className={`h-4 w-4 mr-2 ${loading ? "animate-spin" : ""}`} />
+                  {loading ? "Loading..." : "Refresh"}
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+
           <Card>
             <CardHeader>
               <CardTitle>User Growth Over Time</CardTitle>
@@ -477,6 +524,30 @@ export function AnalyticsDashboard() {
 
 
         <TabsContent value="completion" className="space-y-4">
+          {/* Filter */}
+          <Card>
+            <CardContent className="pt-6">
+              <div className="flex gap-4">
+                <Select value={timeFilter} onValueChange={setTimeFilter}>
+                  <SelectTrigger className="w-[200px]">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="7">Last 7 Days</SelectItem>
+                    <SelectItem value="30">Last 30 Days</SelectItem>
+                    <SelectItem value="90">Last 90 Days</SelectItem>
+                    <SelectItem value="180">Last 6 Months</SelectItem>
+                    <SelectItem value="365">Last Year</SelectItem>
+                  </SelectContent>
+                </Select>
+                <Button onClick={fetchAnalytics} disabled={loading}>
+                  <RefreshCw className={`h-4 w-4 mr-2 ${loading ? "animate-spin" : ""}`} />
+                  {loading ? "Loading..." : "Refresh"}
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+
           <Card>
             <CardHeader>
               <CardTitle>Workout Completion Rates</CardTitle>
@@ -498,6 +569,30 @@ export function AnalyticsDashboard() {
         </TabsContent>
 
         <TabsContent value="popular" className="space-y-4">
+          {/* Filter */}
+          <Card>
+            <CardContent className="pt-6">
+              <div className="flex gap-4">
+                <Select value={timeFilter} onValueChange={setTimeFilter}>
+                  <SelectTrigger className="w-[200px]">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="7">Last 7 Days</SelectItem>
+                    <SelectItem value="30">Last 30 Days</SelectItem>
+                    <SelectItem value="90">Last 90 Days</SelectItem>
+                    <SelectItem value="180">Last 6 Months</SelectItem>
+                    <SelectItem value="365">Last Year</SelectItem>
+                  </SelectContent>
+                </Select>
+                <Button onClick={fetchAnalytics} disabled={loading}>
+                  <RefreshCw className={`h-4 w-4 mr-2 ${loading ? "animate-spin" : ""}`} />
+                  {loading ? "Loading..." : "Refresh"}
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+
           <Card>
             <CardHeader>
               <CardTitle>Most Popular Workouts</CardTitle>

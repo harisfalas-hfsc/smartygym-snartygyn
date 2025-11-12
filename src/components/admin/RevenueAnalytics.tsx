@@ -100,9 +100,9 @@ export function RevenueAnalytics() {
         // Calculate revenue based on plan type
         let monthlyRevenue = 0;
         if (sub.plan_type === "gold") {
-          monthlyRevenue = 15; // $15/month
+          monthlyRevenue = 15; // €15/month
         } else if (sub.plan_type === "platinum") {
-          monthlyRevenue = 25; // $25/month
+          monthlyRevenue = 25; // €25/month
         }
 
         revenueByMonth[month][sub.plan_type] = (revenueByMonth[month][sub.plan_type] || 0) + monthlyRevenue;
@@ -196,7 +196,7 @@ export function RevenueAnalytics() {
           <div className="flex items-center justify-between p-4 bg-muted rounded-lg">
             <div>
               <p className="text-sm text-muted-foreground">Total Revenue</p>
-              <p className="text-3xl font-bold">${totalRevenue.toFixed(2)}</p>
+              <p className="text-3xl font-bold">€{totalRevenue.toFixed(2)}</p>
             </div>
             <Button onClick={fetchRevenueData} disabled={loading}>
               {loading ? "Loading..." : "Refresh"}
@@ -247,7 +247,7 @@ export function RevenueAnalytics() {
                     />
                   </>
                 ) : (
-                  <Bar dataKey="revenue" name="Revenue ($)" fill="hsl(var(--primary))" />
+                  <Bar dataKey="revenue" name="Revenue (€)" fill="hsl(var(--primary))" />
                 )}
               </BarChart>
             </ResponsiveContainer>
