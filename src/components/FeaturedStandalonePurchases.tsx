@@ -20,8 +20,9 @@ interface StandaloneItem {
 export const FeaturedStandalonePurchases = () => {
   const navigate = useNavigate();
 
-  const { data: items, isLoading } = useQuery({
+  const { data: items, isLoading, refetch } = useQuery<StandaloneItem[]>({
     queryKey: ["featured-standalone-purchases"],
+    staleTime: 0,
     queryFn: async () => {
       const [workoutsResult, programsResult] = await Promise.all([
         supabase
@@ -80,9 +81,8 @@ export const FeaturedStandalonePurchases = () => {
     );
   }
 
-  if (!items || items.length === 0) {
-    return null;
-  }
+  // Always show the section, even if empty (for debugging)
+  const hasItems = items && items.length > 0;
 
   return (
     <section className="py-12 px-4 bg-muted/30">
@@ -96,7 +96,19 @@ export const FeaturedStandalonePurchases = () => {
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {!hasItems && !isLoading && (
+          <div className="text-center py-12">
+            <p className="text-muted-foreground mb-4">
+              No standalone purchases available yet. Create workouts or programs with standalone purchase enabled in the admin panel.
+            </p>
+            <Button onClick={() => refetch()} variant="outline">
+              Refresh
+            </Button>
+          </div>
+        )}
+
+        {hasItems && (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {items.map((item) => (
             <Card 
               key={`${item.type}-${item.id}`} 
@@ -157,7 +169,8 @@ export const FeaturedStandalonePurchases = () => {
               </CardFooter>
             </Card>
           ))}
-        </div>
+          </div>
+        )}
       </div>
     </section>
   );
