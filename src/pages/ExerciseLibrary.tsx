@@ -44,11 +44,10 @@ const ExerciseLibrary = () => {
           
           <PageTitleCard 
             title="Exercise Library" 
-            subtitle="Navigate through all exercise demonstrations and find the perfect technique with your Smarty Coach, Haris Falas."
             icon={Video}
           >
-            <p className="text-sm text-muted-foreground">
-              <a href="/coach-profile" className="text-primary hover:underline font-medium">Haris Falas</a>
+            <p className="text-sm sm:text-base text-muted-foreground">
+              Navigate through all exercise demonstrations and find the perfect technique with your Smarty Coach, <a href="/coach-profile" className="text-primary hover:underline font-medium">Haris Falas</a>.
             </p>
           </PageTitleCard>
 
