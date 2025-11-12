@@ -34,14 +34,16 @@ ${prompt}
 
 YOU MUST GENERATE **ONLY** A CLEAN BACKGROUND PHOTOGRAPH OR GRAPHIC.
 
-THIS IS ONLY THE BACKGROUND LAYER. ALL BRANDING WILL BE ADDED LATER BY A SEPARATE SYSTEM.
+THIS IS ONLY THE BACKGROUND LAYER. CORE BRANDING (logo, gold border, website) WILL BE ADDED LATER BY A SEPARATE SYSTEM.
 
-ABSOLUTELY FORBIDDEN IN YOUR OUTPUT:
-❌ NO TEXT - no words, letters, numbers, captions, labels, or typography of ANY kind
-❌ NO LOGOS - no Smarty Gym logo, no brand marks, no company names
-❌ NO ICONS - no symbols, emojis, or graphic elements overlaid on the image
-❌ NO BORDERS - no frames, edges, or decorative borders around the image
-❌ NO OVERLAYS - no graphic elements, shapes, or design overlays
+ABSOLUTELY FORBIDDEN IN YOUR OUTPUT (unless explicitly requested above):
+❌ NO LOGOS - never add Smarty Gym logo, brand marks, or company names
+❌ NO BORDERS - never add frames, edges, or decorative borders around the image
+❌ NO BRANDING ELEMENTS - never add website URLs, taglines, or brand identity elements
+
+CONDITIONAL RULES (follow user requirements above):
+⚠️ TEXT: Only add text/words if EXPLICITLY requested in the requirements section above
+⚠️ GRAPHICS: Only add graphic overlays/icons if EXPLICITLY specified in requirements above
 
 WHAT YOU MUST GENERATE:
 ✅ A clean, professional photograph or gradient background ONLY
