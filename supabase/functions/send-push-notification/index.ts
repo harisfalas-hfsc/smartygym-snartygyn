@@ -1,5 +1,6 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+import webpush from "https://esm.sh/web-push@3.6.7";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -27,6 +28,16 @@ serve(async (req: Request) => {
     const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
     const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
+
+    // Configure web-push with VAPID keys
+    const vapidPublicKey = Deno.env.get("VAPID_PUBLIC_KEY")!;
+    const vapidPrivateKey = Deno.env.get("VAPID_PRIVATE_KEY")!;
+    
+    webpush.setVapidDetails(
+      "mailto:admin@smartygym.com",
+      vapidPublicKey,
+      vapidPrivateKey
+    );
 
     const {
       userId,
@@ -75,23 +86,41 @@ serve(async (req: Request) => {
 
     console.log(`Found ${subscriptions.length} active subscriptions`);
 
-    // Note: In a production environment, you would use web-push library to send actual push notifications
-    // For now, we're simulating the notification send
-    // You'll need to:
-    // 1. Generate VAPID keys
-    // 2. Install web-push library
-    // 3. Send notifications using the subscription data
-
-    // Simulate notification sending
+    // Send actual push notifications
     const results = await Promise.allSettled(
       subscriptions.map(async (subscription) => {
-        // In production, you would send actual push notification here
-        // using web-push library with subscription.subscription_data
-        console.log(`Simulating push to user ${subscription.user_id}`);
-        return {
-          userId: subscription.user_id,
-          success: true,
-        };
+        try {
+          const pushSubscription = subscription.subscription_data as any;
+          
+          const payload = JSON.stringify({
+            title,
+            body,
+            icon,
+            url,
+            requireInteraction,
+          });
+
+          console.log(`Sending push notification to user ${subscription.user_id}`);
+          
+          await webpush.sendNotification(pushSubscription, payload);
+          
+          return {
+            userId: subscription.user_id,
+            success: true,
+          };
+        } catch (error: any) {
+          console.error(`Failed to send push to user ${subscription.user_id}:`, error);
+          
+          // If subscription is invalid/expired, mark it as inactive
+          if (error.statusCode === 410 || error.statusCode === 404) {
+            await supabase
+              .from("push_subscriptions")
+              .update({ is_active: false })
+              .eq("id", subscription.id);
+          }
+          
+          throw error;
+        }
       })
     );
 

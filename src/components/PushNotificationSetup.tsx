@@ -74,14 +74,12 @@ export const PushNotificationSetup = () => {
           await navigator.serviceWorker.ready;
         }
 
-        // Subscribe to push notifications
-        // Note: In production, you'll need to generate VAPID keys
-        // For now, we'll use a dummy subscription
+        // Subscribe to push notifications with VAPID key
+        const vapidPublicKey = import.meta.env.VITE_VAPID_PUBLIC_KEY || "BNxJvJCFg7yQN3VVPqYuJZz8r5nW2mK9pL3xT6hR4sV7bC8dE9fG0aH1iJ2kL3mN4oP5qR6sT7uV8wX9yZ0aB1c";
+        
         const subscription = await registration.pushManager.subscribe({
           userVisibleOnly: true,
-          applicationServerKey: urlBase64ToUint8Array(
-            'BEl62iUYgUivxIkv69yViEuiBIa-Ib37J8xQmrLiz3g7YcxDIe7Ht6ZpCUt4tJ4H-3d0R8n4vL5-R5i3wq5h_4E'
-          )
+          applicationServerKey: urlBase64ToUint8Array(vapidPublicKey)
         });
 
         // Save subscription to database
