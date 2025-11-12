@@ -19,19 +19,37 @@ serve(async (req: Request) => {
       throw new Error("LOVABLE_API_KEY is not configured");
     }
 
-    // CRITICAL: Add strict instructions to prevent text in background
-    const cleanPrompt = `${prompt}
+    // CRITICAL: Add strict instructions to ensure professional, usable backgrounds
+    const enhancedPrompt = `You are generating a background image for a professional fitness advertisement that will be used in a business marketing campaign.
 
-CRITICAL REQUIREMENTS - YOU MUST FOLLOW THESE EXACTLY:
-- Generate ONLY the background fitness scene/environment
-- ABSOLUTELY NO TEXT of any kind (no words, no letters, no numbers, no branding)
-- ABSOLUTELY NO logos, icons, or symbols
-- ABSOLUTELY NO borders or frames
-- Just a clean, professional fitness photograph/scene
-- The image will have text and branding added later by a different system
-- Think of this as providing ONLY the background layer for a professional advertisement`;
+BASE REQUIREMENTS: ${prompt}
 
-    console.log("Generating clean background with prompt:", cleanPrompt);
+CRITICAL TECHNICAL REQUIREMENTS - FOLLOW EXACTLY:
+1. ABSOLUTELY NO TEXT of any kind - no words, letters, numbers, captions, or labels
+2. ABSOLUTELY NO logos, brand names, icons, or symbols  
+3. ABSOLUTELY NO borders, frames, or graphic overlays
+4. Generate ONLY a clean, professional photograph or graphic background
+5. If people are mentioned in requirements, they MUST be clearly visible and in action
+6. Lighting must be bright, professional, and high-quality
+7. Colors must be vibrant, saturated, and visually appealing
+8. Composition must be dynamic and eye-catching
+9. Overall image must look like professional advertisement photography
+10. Image quality must be ultra-high resolution and sharp
+
+WHAT THIS IMAGE IS FOR:
+- This is ONLY the background layer for an advertisement
+- Text, branding, and messaging will be added by a separate system later
+- The image must be visually appealing enough for professional marketing use
+- Think: "Would this background make someone want to click on an ad?"
+
+QUALITY STANDARDS:
+- Professional photography studio quality
+- Commercial advertisement grade
+- High contrast and visual impact
+- Bright, energetic, motivating atmosphere
+- Sharp focus and excellent composition`;
+
+    console.log("Generating professional ad background with enhanced prompt");
 
     const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
@@ -44,7 +62,7 @@ CRITICAL REQUIREMENTS - YOU MUST FOLLOW THESE EXACTLY:
         messages: [
           {
             role: "user",
-            content: cleanPrompt,
+            content: enhancedPrompt,
           },
         ],
         modalities: ["image", "text"],

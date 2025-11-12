@@ -185,20 +185,20 @@ export const AdvertiseTemplatesManager = () => {
 
   const buildBackgroundPrompt = (style: string, customPrompt: string): string => {
     const styleDescriptions: Record<string, string> = {
-      fitness_action: "Ultra high resolution professional photograph of athletic people actively exercising in a modern gym. Dynamic poses showing strength and energy. Clean, uncluttered composition. Natural lighting.",
-      motivating_couple: "Ultra high resolution professional photograph of an inspiring athletic couple training together with fitness equipment in a bright, modern gym. Energetic and motivating atmosphere. Natural poses showing teamwork and determination.",
-      bright_clean: "Ultra high resolution professional photograph of a pristine, bright fitness environment with abundant natural lighting streaming through large windows. Minimal equipment visible. Clean white and light tones creating an airy, spacious, uplifting feeling.",
-      empty_minimal: "Ultra high resolution solid gradient background with soft, professional fitness-themed colors. Subtle texture, clean and minimal aesthetic perfect for text overlay.",
-      graphical_abstract: "Ultra high resolution modern abstract fitness-themed graphic design with dynamic geometric shapes, energetic flowing lines, and bold colors. Professional and eye-catching composition.",
-      gym_equipment: "Ultra high resolution professional photograph showcasing premium gym equipment in dramatic, professional lighting. Sleek, modern fitness equipment as the focal point. Clean, organized setting.",
-      outdoor_fitness: "Ultra high resolution professional photograph of athletes training outdoors in a beautiful natural environment. Stunning natural lighting, dynamic movement, vibrant outdoor setting.",
+      fitness_action: "Professional fitness advertisement photography: MUST show 1-2 athletic people actively exercising with dumbbells or resistance bands, capturing dynamic movement mid-action. Bright, well-lit modern gym with white walls and natural light. People must be visible, fit, determined, and in motion. High energy composition with professional lighting. Vibrant and motivating atmosphere.",
+      motivating_couple: "Professional fitness advertisement photography: MUST feature an athletic man and woman training together as a couple, both holding resistance bands or dumbbells, smiling and energetic. Bright modern gym setting with excellent lighting. Both people clearly visible showing teamwork and motivation. Clean, professional, high-energy scene.",
+      bright_clean: "Professional fitness advertisement photography: Bright, airy fitness studio with floor-to-ceiling windows flooding space with natural sunlight. 1-2 fit people exercising in the well-lit space. White and light gray tones dominating. Spacious, clean, premium feel. People should be visible but not the main focus. Fresh, uplifting, professional atmosphere.",
+      empty_minimal: "Professional gradient background: Smooth gradient from light gray (#E5E5E5) at top to soft white (#F8F8F8) at bottom. Clean, minimal, professional. Perfect neutral base for text overlay. No textures, no patterns, no objects - just smooth, professional gradient.",
+      graphical_abstract: "Professional abstract fitness graphic design: Bold geometric shapes in gold (#D4AF37), electric blue, and white. Dynamic diagonal lines suggesting movement and energy. Modern, energetic, eye-catching composition. Abstract but clearly fitness-themed. High contrast and professional design.",
+      gym_equipment: "Professional fitness advertisement photography: Showcase of premium gym equipment (dumbbells, kettlebells, resistance bands) arranged attractively with dramatic side lighting creating highlights and shadows. 1 person visible using equipment in background. Clean, organized, professional product-style shot with dark background.",
+      outdoor_fitness: "Professional fitness advertisement photography: MUST show 1-2 athletic people doing outdoor exercises (running, bodyweight workout) in a beautiful natural setting with mountains or park in background. Golden hour lighting, vibrant colors, dynamic action shot. Natural environment, fresh air feeling, energetic outdoor training scene.",
     };
 
     const baseStyle = styleDescriptions[style] || styleDescriptions.bright_clean;
     
     // Add custom requirements if provided
     if (customPrompt.trim()) {
-      return `${baseStyle}. Additional specific requirements: ${customPrompt}`;
+      return `${baseStyle}. ADDITIONAL SPECIFIC REQUIREMENTS: ${customPrompt}. Remember: Image must be professional advertisement quality with high visual appeal.`;
     }
     
     return baseStyle;
