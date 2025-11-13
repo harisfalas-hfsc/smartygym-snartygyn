@@ -8,12 +8,12 @@ const Disclaimer = () => {
   return (
     <>
       <Helmet>
-        <title>Disclaimer | Smarty Gym Cyprus Online Fitness | smartygym.com</title>
-        <meta name="description" content="Health and fitness disclaimer for Smarty Gym (smartygym.com) - Cyprus online fitness platform by Haris Falas. Important information about exercise risks and liability for online fitness training." />
-        <meta name="keywords" content="smartygym disclaimer, smartygym.com health disclaimer, Cyprus online fitness disclaimer, Haris Falas, fitness training risks, online fitness legal" />
+        <title>Disclaimer | SmartyGym.com Online Fitness Platform | smartygym.com</title>
+        <meta name="description" content="Health and fitness disclaimer for Smarty Gym (smartygym.com) - Online Fitness Platform by <span className="whitespace-nowrap">Haris Falas</span>. Important information about exercise risks and liability for online fitness training." />
+        <meta name="keywords" content="smartygym disclaimer, smartygym.com health disclaimer, online fitness platform disclaimer, <span className="whitespace-nowrap">Haris Falas</span>, fitness training risks, online fitness legal" />
         
-        <meta property="og:title" content="Disclaimer - Smarty Gym Cyprus" />
-        <meta property="og:description" content="Important health and safety information for Smarty Gym online fitness platform" />
+        <meta property="og:title" content="Disclaimer - SmartyGym.com" />
+        <meta property="og:description" content="Important health and safety information for Smarty Gym Online Fitness Platform" />
         
         <link rel="canonical" href="https://smartygym.com/disclaimer" />
       </Helmet>
@@ -23,7 +23,7 @@ const Disclaimer = () => {
         <div className="container mx-auto px-4 py-16 max-w-4xl">
           <div className="flex items-center gap-3 mb-8">
             <AlertTriangle className="h-10 w-10 text-primary" />
-            <h1 className="text-4xl font-bold">Disclaimer - Smarty Gym Cyprus</h1>
+            <h1 className="text-4xl font-bold">Disclaimer - SmartyGym.com</h1>
           </div>
 
           <Card className="p-8 space-y-8">

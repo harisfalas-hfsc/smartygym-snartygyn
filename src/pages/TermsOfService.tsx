@@ -7,12 +7,12 @@ const TermsOfService = () => {
   return (
     <>
       <Helmet>
-        <title>Terms of Service | Smarty Gym Cyprus Online Fitness | smartygym.com</title>
-        <meta name="description" content="Terms and Conditions for Smarty Gym (smartygym.com) - Cyprus online fitness platform by Haris Falas. Read our terms of service for using our evidence-based fitness programs and online training services." />
-        <meta name="keywords" content="smartygym terms, smartygym.com terms of service, Cyprus online fitness terms, Haris Falas, online fitness legal, fitness platform terms Cyprus" />
+        <title>Terms of Service | SmartyGym.com Online Fitness Platform | smartygym.com</title>
+        <meta name="description" content="Terms and Conditions for Smarty Gym (smartygym.com) - Online Fitness Platform by <span className="whitespace-nowrap">Haris Falas</span>. Read our terms of service for using our evidence-based fitness programs and online training services." />
+        <meta name="keywords" content="smartygym terms, smartygym.com terms of service, online fitness platform terms, <span className="whitespace-nowrap">Haris Falas</span>, online fitness legal, fitness platform terms Cyprus" />
         
-        <meta property="og:title" content="Terms of Service - Smarty Gym Cyprus" />
-        <meta property="og:description" content="Legal terms for using Smarty Gym Cyprus online fitness platform" />
+        <meta property="og:title" content="Terms of Service - SmartyGym.com" />
+        <meta property="og:description" content="Legal terms for using Smarty Gym Online Fitness Platform" />
         
         <link rel="canonical" href="https://smartygym.com/terms-of-service" />
       </Helmet>
