@@ -64,9 +64,9 @@ const TrainingProgramFlow = () => {
   return (
     <>
       <Helmet>
-        <title>Training Programs - SmartyGym | Online Fitness Programs | smartygym.com</title>
-        <meta name="description" content="SmartyGym online fitness: Structured 6-8 week training programs by Sports Scientist Haris Falas at smartygym.com. Programs for cardio, strength, muscle growth, weight loss, mobility. Your convenient online gym for Cyprus and worldwide." />
-        <meta name="keywords" content="smartygym programs, online fitness programs, smartygym, smartygym.com, online gym programs, training programs, Haris Falas programs, 6 week programs, 8 week programs, cardio endurance, functional strength, muscle hypertrophy, weight loss program, back pain program, mobility program, structured training, progressive training, evidence-based programs, convenient fitness, flexible training, online gym, sports scientist, workout programs, fitness programs" />
+        <title>Online Gym Training Programs | 6-8 Week Plans | SmartyGym Cyprus | Haris Falas</title>
+        <meta name="description" content="Structured online gym training programs at smartygym.com - Cyprus' #1 online fitness. 6-8 week programs by Sports Scientist Haris Falas: cardio, strength, muscle growth, weight loss, mobility. Gym programs online for anywhere, anytime training." />
+        <meta name="keywords" content="online gym training programs, gym training programs, training programs online, online fitness programs, gym programs online, workout training programs, smartygym programs, online gym, smartygym.com, online gym Cyprus, gym Cyprus, Haris Falas programs, Haris Falas Cyprus, Cyprus fitness programs, 6 week training programs, 8 week gym programs, cardio endurance programs, functional strength training, muscle hypertrophy programs, online gym weight loss program, back pain program, mobility training program, structured gym training, progressive training programs, evidence-based gym programs, convenient fitness programs, flexible gym training, virtual gym programs, sports scientist programs, workout programs online, fitness training programs" />
         
         <meta property="og:title" content="Training Programs - Smarty Gym Cyprus" />
         <meta property="og:description" content="Structured training programs designed by Sports Scientist Haris Falas" />

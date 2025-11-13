@@ -229,9 +229,9 @@ const PersonalTraining = () => {
   return (
     <>
       <Helmet>
-        <title>Online Personal Training Cyprus | Haris Falas | SmartyGym</title>
-        <meta name="description" content="Get customized online personal training from Cyprus Sports Scientist Haris Falas. Tailored training programs designed for your goals. Expert personal trainer with 20+ years experience in Cyprus fitness." />
-        <meta name="keywords" content="online personal training, personal training Cyprus, Cyprus personal trainers, Haris Falas personal training, online fitness coach, Cyprus fitness trainer, customized workout plans, tailored training programs, sports scientist Cyprus, strength and conditioning coach" />
+        <title>Online Personal Training Cyprus | Haris Falas Sports Scientist | smartygym.com</title>
+        <meta name="description" content="Premium online personal training Cyprus by Haris Falas - BSc Sports Science, CSCS. Customized gym programs tailored to YOUR goals. #1 Cyprus personal trainer with 20+ years experience. Online fitness coaching at smartygym.com" />
+        <meta name="keywords" content="online personal training, personal training Cyprus, Cyprus personal trainers, online personal training Cyprus, Haris Falas personal training, Haris Falas Cyprus, Cyprus fitness, personal training online, online fitness coach Cyprus, Cyprus fitness trainer, personal trainer Cyprus, gym personal training Cyprus, customized workout plans, tailored training programs online, personalized gym programs, sports scientist Cyprus, strength and conditioning coach Cyprus, online gym personal training, virtual personal training Cyprus, Cyprus online fitness coaching, personal training services Cyprus, Cyprus gym trainer, online coaching Cyprus" />
         
         {/* Open Graph */}
         <meta property="og:type" content="website" />

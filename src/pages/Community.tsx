@@ -229,12 +229,12 @@ const Community = () => {
   return (
     <>
       <Helmet>
-        <title>Community Leaderboard & Reviews | Smarty Gym Cyprus | smartygym.com</title>
+        <title>Fitness Community Cyprus | SmartyGym Leaderboard & Member Reviews | Online Gym</title>
         <meta
           name="description"
-          content="Join Smarty Gym community! View workout leaderboards, training program rankings, and premium member reviews. Online fitness community Cyprus by Sports Scientist Haris Falas at smartygym.com"
+          content="Join Cyprus' #1 online gym community at smartygym.com! View online fitness leaderboards, workout rankings, training program achievements & premium member reviews. Connect with Haris Falas & fellow fitness enthusiasts."
         />
-        <meta name="keywords" content="fitness community, workout leaderboard, training rankings, gym reviews, online fitness community cyprus, smarty gym community, smartygym members" />
+        <meta name="keywords" content="online gym community Cyprus, fitness community Cyprus, workout leaderboard, training rankings, gym reviews Cyprus, online fitness community, smartygym community, SmartyGym members, Cyprus gym community, fitness motivation Cyprus, workout achievements, training community online, gym leaderboard Cyprus, fitness reviews Cyprus, Haris Falas community" />
       </Helmet>
 
       <div className="min-h-screen bg-background">

@@ -14,9 +14,9 @@ const ExerciseLibrary = () => {
   return (
     <>
       <Helmet>
-        <title>Exercise Library - Smarty Gym | YouTube Channel by Haris Falas | smartygym.com</title>
-        <meta name="description" content="Watch exercise demonstrations on The Smarty Gym YouTube channel by Haris Falas at smartygym.com. Inside Smarty Gym - comprehensive exercise tutorials and technique guides. Convenient & flexible training for anywhere, anytime." />
-        <meta name="keywords" content="smartygym exercises, smarty gym, smartygym.com, Haris Falas, exercise library, workout videos, exercise tutorials, Inside Smarty Gym, gym training videos, exercise demonstrations, convenient fitness, gym Reimagined" />
+        <title>Exercise Library Cyprus | Online Gym Videos | SmartyGym YouTube | Haris Falas</title>
+        <meta name="description" content="Watch 100+ online gym exercise demonstrations at smartygym.com - Cyprus' #1 online fitness. The Smarty Gym YouTube channel by Sports Scientist Haris Falas. Inside Smarty Gym: comprehensive exercise tutorials, technique guides, gym training videos." />
+        <meta name="keywords" content="exercise library Cyprus, online gym exercises, gym exercise videos, online fitness videos, smartygym exercises, smartygym.com, online gym Cyprus, Haris Falas exercises, Haris Falas Cyprus, exercise library online, workout videos online, exercise tutorials Cyprus, Inside Smarty Gym, gym training videos Cyprus, exercise demonstrations, gym exercises online, fitness exercise library, training videos online, workout demonstrations, gym technique videos, Cyprus fitness videos, online gym tutorials, exercise videos Cyprus, gym workout videos, fitness demonstrations Cyprus" />
         
         <meta property="og:title" content="Exercise Library - Smarty Gym | YouTube Channel" />
         <meta property="og:description" content="Watch exercise demonstrations on The Smarty Gym YouTube channel by Haris Falas - Inside Smarty Gym" />

@@ -42,9 +42,9 @@ const Tools = () => {
   return (
     <>
       <Helmet>
-        <title>Fitness Tools - Smarty Gym | Free Calculators by Haris Falas | smartygym.com</title>
-        <meta name="description" content="Free fitness calculators at smartygym.com: 1RM Calculator, BMR Calculator, Macro Tracking. Convenient & flexible tools by Haris Falas for anywhere, anytime fitness planning." />
-        <meta name="keywords" content="smartygym tools, smarty gym, smartygym.com, Haris Falas, 1rm calculator, bmr calculator, macro calculator, fitness tools, convenient fitness, gym Reimagined, workout calculators" />
+        <title>Free Fitness Calculators | Online Gym Tools | SmartyGym Cyprus | smartygym.com</title>
+        <meta name="description" content="Free online gym fitness tools at smartygym.com: 1RM Calculator, BMR Calculator, Macro Tracking Calculator. Professional fitness planning tools by Sports Scientist Haris Falas for online gym training. Convenient fitness tools for anywhere, anytime." />
+        <meta name="keywords" content="online gym tools, fitness calculators online, gym calculators, smartygym tools, smartygym.com, online gym Cyprus, gym tools Cyprus, Haris Falas tools, Haris Falas Cyprus, 1rm calculator online, bmr calculator online, macro calculator, fitness tools online, gym training tools, convenient fitness tools, gym Reimagined, workout calculators, online fitness tools, gym planning tools, training calculators, Cyprus fitness tools, strength calculator, nutrition calculator, calorie calculator online" />
         
         <meta property="og:title" content="Fitness Tools - Smarty Gym | Free Calculators" />
         <meta property="og:description" content="Free fitness calculators by Haris Falas - convenient tools for flexible training anywhere" />

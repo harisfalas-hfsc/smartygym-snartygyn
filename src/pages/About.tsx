@@ -20,12 +20,12 @@ const About = () => {
   return (
     <>
       <Helmet>
-        <title>About Smarty Gym - Haris Falas | Gym Reimagined for Convenient & Flexible Fitness</title>
-        <meta name="description" content="Meet Haris Falas, founder of Smarty Gym (smartygym.com) - convenient & flexible online fitness Reimagined. Sports Scientist delivering human-crafted, evidence-based programs anywhere, anytime." />
-        <meta name="keywords" content="Haris Falas, Smarty Gym, smartygym, smartygym.com, gym Reimagined, convenient fitness, flexible online gym, sports scientist, strength conditioning coach, fitness anywhere anytime, human-designed workouts" />
+        <title>About SmartyGym | Haris Falas Sports Scientist | Online Gym Cyprus | smartygym.com</title>
+        <meta name="description" content="Meet Haris Falas - Founder of Cyprus' #1 online gym, smartygym.com. BSc Sports Science, CSCS, EXOS specialist. 20+ years experience in online fitness, personal training & strength conditioning. Human-designed programs, 0% AI." />
+        <meta name="keywords" content="Haris Falas, Haris Falas Cyprus, online gym Cyprus, SmartyGym Cyprus, smartygym, smartygym.com, Cyprus fitness, personal training Cyprus, sports scientist Cyprus, strength conditioning coach, online fitness expert, gym Cyprus, Cyprus personal trainer, CSCS Cyprus, fitness coach Cyprus, online gym, gym Reimagined, convenient fitness, flexible online gym, human-designed workouts, no AI fitness" />
         
-        <meta property="og:title" content="About Smarty Gym & Haris Falas - Fitness Reimagined" />
-        <meta property="og:description" content="Every workout personally designed by Haris Falas, Sports Scientist. Convenient & flexible gym Reimagined for anywhere, anytime training." />
+        <meta property="og:title" content="About SmartyGym | Haris Falas Sports Scientist | Online Gym Cyprus" />
+        <meta property="og:description" content="Cyprus' #1 online gym by Haris Falas - BSc Sports Science, CSCS. 20+ years in online fitness & personal training. Human-designed programs, 0% AI at smartygym.com" />
         <meta property="og:type" content="website" />
         <meta property="og:url" content="https://smartygym.com/about" />
         
