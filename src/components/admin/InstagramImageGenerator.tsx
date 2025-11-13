@@ -184,17 +184,17 @@ export const InstagramImageGenerator = () => {
           Download All in {category}
         </Button>
       </div>
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3">
         {templates.map((template) => {
           const TemplateComponent = template.component;
           return (
             <Card key={template.id} className="overflow-hidden">
               <div 
                 id={`template-${template.id}`} 
-                className="aspect-square bg-muted relative group cursor-pointer"
+                className="h-48 bg-muted relative group cursor-pointer overflow-hidden"
                 onClick={() => setPreviewTemplate(template)}
               >
-                <div className="scale-[0.23] origin-top-left">
+                <div className="scale-[0.19] origin-top-left">
                   <TemplateComponent />
                 </div>
                 <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
@@ -202,7 +202,7 @@ export const InstagramImageGenerator = () => {
                 </div>
               </div>
               
-              <CardContent className="p-3 space-y-2">
+              <CardContent className="p-2 space-y-1.5">
                 <h4 className="text-sm font-semibold truncate">{template.name}</h4>
                 <Select
                   value={selectedSizes[template.id]?.name || "square"}
