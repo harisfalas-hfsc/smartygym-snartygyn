@@ -8,11 +8,11 @@ const Disclaimer = () => {
   return (
     <>
       <Helmet>
-        <title>Disclaimer | Smarty Gym Cyprus Online Fitness | smartygym.com</title>
-        <meta name="description" content="Health and fitness disclaimer for Smarty Gym (smartygym.com) - Cyprus online fitness platform by Haris Falas. Important information about exercise risks and liability for online fitness training." />
-        <meta name="keywords" content="smartygym disclaimer, smartygym.com health disclaimer, Cyprus online fitness disclaimer, Haris Falas, fitness training risks, online fitness legal" />
+        <title>Disclaimer | SmartyGym.com Online Fitness Platform | smartygym.com</title>
+        <meta name="description" content="Health and fitness disclaimer for Smarty Gym (smartygym.com) - Online Fitness Platform by Haris Falas. Important information about exercise risks and liability for online fitness training." />
+        <meta name="keywords" content="smartygym disclaimer, smartygym.com health disclaimer, online fitness disclaimer, Haris Falas, fitness training risks, online fitness legal" />
         
-        <meta property="og:title" content="Disclaimer - Smarty Gym Cyprus" />
+        <meta property="og:title" content="Disclaimer - SmartyGym.com" />
         <meta property="og:description" content="Important health and safety information for Smarty Gym online fitness platform" />
         
         <link rel="canonical" href="https://smartygym.com/disclaimer" />
@@ -23,19 +23,19 @@ const Disclaimer = () => {
         <div className="container mx-auto px-4 py-16 max-w-4xl">
           <div className="flex items-center gap-3 mb-8">
             <AlertTriangle className="h-10 w-10 text-primary" />
-            <h1 className="text-4xl font-bold">Disclaimer - Smarty Gym Cyprus</h1>
+            <h1 className="text-4xl font-bold">Disclaimer - SmartyGym.com</h1>
           </div>
 
           <Card className="p-8 space-y-8">
             <div className="prose dark:prose-invert max-w-none">
               <div className="bg-destructive/10 border-2 border-destructive/30 p-6 rounded-lg mb-6">
                 <p className="text-base font-bold text-destructive mb-3">
-                  ⚠️ IMPORTANT: MANDATORY PAR-Q+ HEALTH ASSESSMENT
+                  ⚠️ IMPORTANT: MANDATORY <span className="whitespace-nowrap">PAR-Q</span> HEALTH ASSESSMENT
                 </p>
                 <p className="text-sm font-semibold text-destructive">
                   Before starting any workout program, diet plan, or physical activity offered by Smarty Gym, 
-                  you MUST complete the PAR-Q+ (Physical Activity Readiness Questionnaire) health assessment 
-                  available below. By using our services, you confirm that you have read and completed this 
+                  you MUST complete the <span className="whitespace-nowrap">PAR-Q</span> (Physical Activity Readiness Questionnaire) health assessment 
+                  available below. By using our services, you confirm that you have read and completed this
                   questionnaire and accept full responsibility for your participation.
                 </p>
               </div>
@@ -48,8 +48,8 @@ const Disclaimer = () => {
 
               <p className="text-lg text-muted-foreground">
                 The information provided on <strong>Smarty Gym</strong> (smartygym.com), founded by <strong>Haris Falas</strong> in Cyprus (the "Website" and mobile applications) is intended 
-                solely for <strong>general educational and informational purposes</strong>. While every effort has been made by our <strong>Cyprus online fitness</strong> experts 
-                to provide safe and effective guidance, <strong>Smarty Gym is not a substitute for professional medical 
+                solely for <strong>general educational and informational purposes</strong>. While every effort has been made by our <strong>Online Fitness Platform</strong> experts 
+                to provide safe and effective guidance, <strong>Smarty Gym is not a substitute for professional medical
                 advice, diagnosis, or treatment</strong>.
               </p>
 
@@ -176,23 +176,23 @@ const Disclaimer = () => {
               <div className="flex items-start gap-3">
                 <FileCheck className="h-6 w-6 text-primary mt-1 flex-shrink-0" />
                 <div>
-                  <h2 className="text-2xl font-bold mb-3">6. Mandatory PAR-Q+ Completion</h2>
+                  <h2 className="text-2xl font-bold mb-3">6. Mandatory <span className="whitespace-nowrap">PAR-Q</span> Completion</h2>
                   <ul className="space-y-2 text-muted-foreground">
                     <li>
                       <strong>Required Health Assessment:</strong> Before starting any workout or program, you 
-                      <strong> MUST complete the PAR-Q+ questionnaire</strong> below. This is a mandatory safety 
+                      <strong> MUST complete the <span className="whitespace-nowrap">PAR-Q</span> questionnaire</strong> below. This is a mandatory safety
                       requirement.
                     </li>
                     <li>
-                      <strong>Medical Clearance:</strong> If your PAR-Q+ responses indicate potential health risks, 
+                      <strong>Medical Clearance:</strong> If your <span className="whitespace-nowrap">PAR-Q</span> responses indicate potential health risks, 
                       you must obtain written clearance from a qualified physician before proceeding with any physical activity.
                     </li>
                     <li>
                       <strong>Truthful Disclosure:</strong> You are responsible for providing accurate and truthful 
-                      information in the PAR-Q+ questionnaire. Failure to do so may increase your risk of injury.
+                      information in the <span className="whitespace-nowrap">PAR-Q</span> questionnaire. Failure to do so may increase your risk of injury.
                     </li>
                     <li>
-                      <strong>Ongoing Responsibility:</strong> You must retake the PAR-Q+ assessment if your health 
+                      <strong>Ongoing Responsibility:</strong> You must retake the <span className="whitespace-nowrap">PAR-Q</span> assessment if your health 
                       status changes or if you develop new medical conditions.
                     </li>
                   </ul>
@@ -221,8 +221,8 @@ const Disclaimer = () => {
                 </p>
                 <ul className="text-sm text-muted-foreground space-y-1 ml-4 list-disc">
                   <li><strong>Read and understood</strong> this entire Disclaimer</li>
-                  <li><strong>Completed the PAR-Q+ questionnaire</strong> below</li>
-                  <li><strong>Obtained medical clearance</strong> if required by your PAR-Q+ responses</li>
+                  <li><strong>Completed the <span className="whitespace-nowrap">PAR-Q</span> questionnaire</strong> below</li>
+                  <li><strong>Obtained medical clearance</strong> if required by your <span className="whitespace-nowrap">PAR-Q</span> responses</li>
                   <li><strong>Voluntarily assumed all risks</strong> associated with physical activity</li>
                   <li><strong>Released Smarty Gym from all liability</strong> for any injuries or damages</li>
                   <li><strong>Agreed to exercise at your own risk</strong></li>
@@ -236,7 +236,7 @@ const Disclaimer = () => {
 
           {/* PAR-Q+ Questionnaire */}
           <div className="mt-8">
-            <h2 className="text-3xl font-bold mb-4 text-center">Complete Your PAR-Q+ Assessment</h2>
+            <h2 className="text-3xl font-bold mb-4 text-center">Complete Your <span className="whitespace-nowrap">PAR-Q</span> Assessment</h2>
             <p className="text-center text-muted-foreground mb-6">
               This health assessment is mandatory before starting any workout program. Please answer all questions truthfully.
             </p>

@@ -7,11 +7,11 @@ const TermsOfService = () => {
   return (
     <>
       <Helmet>
-        <title>Terms of Service | Smarty Gym Cyprus Online Fitness | smartygym.com</title>
-        <meta name="description" content="Terms and Conditions for Smarty Gym (smartygym.com) - Cyprus online fitness platform by Haris Falas. Read our terms of service for using our evidence-based fitness programs and online training services." />
-        <meta name="keywords" content="smartygym terms, smartygym.com terms of service, Cyprus online fitness terms, Haris Falas, online fitness legal, fitness platform terms Cyprus" />
+        <title>Terms of Service | SmartyGym.com Online Fitness Platform | smartygym.com</title>
+        <meta name="description" content="Terms and Conditions for Smarty Gym (smartygym.com) - Online Fitness Platform by Haris Falas. Read our terms of service for using our evidence-based fitness programs and online training services." />
+        <meta name="keywords" content="smartygym terms, smartygym.com terms of service, online fitness terms, Haris Falas, online fitness legal, fitness platform terms" />
         
-        <meta property="og:title" content="Terms of Service - Smarty Gym Cyprus" />
+        <meta property="og:title" content="Terms of Service - SmartyGym.com" />
         <meta property="og:description" content="Legal terms for using Smarty Gym Cyprus online fitness platform" />
         
         <link rel="canonical" href="https://smartygym.com/terms-of-service" />
@@ -34,7 +34,7 @@ const TermsOfService = () => {
               </div>
 
               <p className="text-lg text-muted-foreground">
-                Welcome to <strong>Smarty Gym</strong> (smartygym.com)! By accessing or using our <strong>Cyprus online fitness</strong> platform, services, and subscription-based fitness programs designed by <strong>Haris Falas</strong>, 
+                Welcome to <strong>Smarty Gym</strong> (smartygym.com)! By accessing or using our <strong>Online Fitness Platform</strong>, services, and subscription-based fitness programs designed by <strong>Haris Falas</strong>, 
                 you agree to comply with and be bound by the following Terms & Conditions. Please read them carefully before 
                 using our online fitness services.
               </p>

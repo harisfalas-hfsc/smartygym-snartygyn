@@ -132,8 +132,8 @@ const PersonalTraining = () => {
 
     if (!showParQ) {
       toast({
-        title: "PAR-Q+ Required",
-        description: "Please complete the PAR-Q+ questionnaire",
+        title: "PAR-Q Required",
+        description: "Please complete the PAR-Q questionnaire",
         variant: "destructive"
       });
       return;

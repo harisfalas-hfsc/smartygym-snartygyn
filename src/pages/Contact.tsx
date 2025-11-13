@@ -249,13 +249,13 @@ const Contact = () => {
         <meta name="description" content="Contact Cyprus' #1 online gym - SmartyGym at smartygym.com. Get expert online fitness advice from Sports Scientist Haris Falas. Online gym support, personal training inquiries, Cyprus fitness questions answered. Contact us today!" />
         <meta name="keywords" content="contact SmartyGym, contact online gym Cyprus, Haris Falas Cyprus contact, Haris Falas contact, Cyprus online gym contact, fitness coach Cyprus, personal training Cyprus, online gym support Cyprus, smartygym contact, smartygym.com, Cyprus fitness expert, sports scientist Cyprus contact, training inquiry Cyprus, gym Cyprus contact, online fitness support, Cyprus personal trainer contact, gym support online, online gym inquiries, fitness questions Cyprus, Cyprus gym help, contact fitness coach, reach Haris Falas" />
         
-        <meta property="og:title" content="Contact Smarty Gym Cyprus | Haris Falas" />
-        <meta property="og:description" content="Get in touch with Sports Scientist Haris Falas at Smarty Gym Cyprus for expert fitness guidance and personalized training support" />
+        <meta property="og:title" content="Contact SmartyGym.com | Haris Falas" />
+        <meta property="og:description" content="Get in touch with Sports Scientist Haris Falas at SmartyGym.com for expert fitness guidance and personalized training support" />
         <meta property="og:type" content="website" />
         <meta property="og:url" content="https://smartygym.com/contact" />
         
         <meta name="twitter:card" content="summary_large_image" />
-        <meta name="twitter:title" content="Contact Smarty Gym Cyprus" />
+        <meta name="twitter:title" content="Contact SmartyGym.com" />
         <meta name="twitter:description" content="Reach out to Haris Falas for expert fitness coaching at smartygym.com" />
         
         <link rel="canonical" href="https://smartygym.com/contact" />
