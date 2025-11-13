@@ -108,7 +108,7 @@ const Blog = () => {
         <meta property="og:image" content="https://images.unsplash.com/photo-1581009146145-b5ef050c2e1e?auto=format&fit=crop&q=80&w=1200" />
         
         <meta name="twitter:card" content="summary_large_image" />
-        <meta name="twitter:title" content="Fitness Blog by Haris Falas - Smarty Gym Cyprus" />
+        <meta name="twitter:title" content="Fitness Blog by Haris Falas - SmartyGym.com" />
         <meta name="twitter:description" content="Expert fitness articles by Cyprus sports scientist Haris Falas. Training tips, nutrition advice, and performance insights." />
         <meta name="twitter:image" content="https://images.unsplash.com/photo-1581009146145-b5ef050c2e1e?auto=format&fit=crop&q=80&w=1200" />
         
@@ -158,8 +158,8 @@ const Blog = () => {
 
           <PageTitleCard
             title="Blog" 
-            subtitle="Expert insights on training, nutrition, and performance"
-            icon={FileText} 
+            subtitle="Insights on Fitness Wellness and Nutrition"
+            icon={FileText}
           />
 
           <DecorativeDivider className="mb-8" />

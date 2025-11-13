@@ -618,7 +618,7 @@ export const WorkoutDisplay = ({
           />
         )}
 
-        {/* PAR-Q+ Questionnaire */}
+        {/* PAR-Q Questionnaire */}
         <ParQQuestionnaire />
       </div>
       

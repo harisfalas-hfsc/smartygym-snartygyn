@@ -53,7 +53,7 @@ export const ParQQuestionnaire = () => {
       <CardHeader className="bg-primary/5">
         <div className="flex items-center gap-3">
           <img src={logo} alt="Smarty Gym" className="h-12 w-12 object-contain" />
-          <CardTitle className="text-2xl text-primary">PAR-Q+ Assessment</CardTitle>
+          <CardTitle className="text-2xl text-primary">PAR-Q Assessment</CardTitle>
         </div>
         <p className="text-sm text-muted-foreground mt-2">
           Physical Activity Readiness Questionnaire - Complete this before starting your workout program
