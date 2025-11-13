@@ -104,6 +104,12 @@ serve(async (req) => {
         content_id: contentId,
         content_name: contentName,
       },
+      metadata: {
+        user_id: user.id,
+        content_type: contentType,
+        content_id: contentId,
+        content_name: contentName,
+      },
     });
 
     return new Response(JSON.stringify({ url: session.url }), {
