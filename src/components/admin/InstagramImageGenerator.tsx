@@ -163,7 +163,7 @@ export const InstagramImageGenerator = () => {
     const size = selectedSizes[templateId];
     try {
       await exportToInstagram(
-        `template-${templateId}`,
+        `export-${templateId}`,
         `${templateName}-${size.name}`,
         size
       );
@@ -299,6 +299,24 @@ export const InstagramImageGenerator = () => {
           </Tabs>
         </CardContent>
       </Card>
+
+      {/* Hidden full-size templates for export */}
+      <div className="fixed -left-[9999px] -top-[9999px] pointer-events-none">
+        {[
+          ...compositeTemplates,
+          ...serviceTemplates,
+          ...brandTemplates,
+          ...workoutTemplates,
+          ...programTemplates,
+          ...toolTemplates,
+          ...featureTemplates,
+          ...communityTemplates,
+        ].map((template) => (
+          <div key={template.id} id={`export-${template.id}`}>
+            <template.component />
+          </div>
+        ))}
+      </div>
 
       <Dialog open={!!previewTemplate} onOpenChange={() => setPreviewTemplate(null)}>
         <DialogContent className="max-w-4xl max-h-[90vh] overflow-auto">

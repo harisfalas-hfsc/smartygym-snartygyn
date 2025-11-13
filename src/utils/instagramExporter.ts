@@ -21,42 +21,16 @@ export const exportToInstagram = async (
     throw new Error("Element not found");
   }
 
-  // Create a canvas at Instagram dimensions
-  const canvas = document.createElement("canvas");
-  canvas.width = size.width;
-  canvas.height = size.height;
-  const ctx = canvas.getContext("2d");
-  
-  if (!ctx) {
-    throw new Error("Could not get canvas context");
-  }
-
-  // Fill with background color
-  ctx.fillStyle = "hsl(224, 71%, 4%)"; // background color
-  ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-  // Use html2canvas to render the element
+  // Use html2canvas to render the element at its native size
   const html2canvas = (await import("html2canvas")).default;
-  const sourceCanvas = await html2canvas(element, {
+  const canvas = await html2canvas(element, {
     backgroundColor: "hsl(224, 71%, 4%)",
-    scale: 2,
+    scale: 1,
     logging: false,
     useCORS: true,
+    width: size.width,
+    height: size.height,
   });
-
-  // Calculate scaling to fit Instagram dimensions while maintaining aspect ratio
-  const scale = Math.min(
-    size.width / sourceCanvas.width,
-    size.height / sourceCanvas.height
-  );
-
-  const scaledWidth = sourceCanvas.width * scale;
-  const scaledHeight = sourceCanvas.height * scale;
-  const x = (size.width - scaledWidth) / 2;
-  const y = (size.height - scaledHeight) / 2;
-
-  // Draw the scaled image centered
-  ctx.drawImage(sourceCanvas, x, y, scaledWidth, scaledHeight);
 
   // Convert to JPEG and download
   canvas.toBlob(
@@ -71,6 +45,6 @@ export const exportToInstagram = async (
       }
     },
     "image/jpeg",
-    0.9
+    0.95
   );
 };
