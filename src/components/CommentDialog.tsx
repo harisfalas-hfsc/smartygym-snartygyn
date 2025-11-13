@@ -119,6 +119,11 @@ export const CommentDialog = ({
     }
   };
 
+  // Don't show comment button to guests
+  if (userTier === "guest") {
+    return null;
+  }
+
   return (
     <>
       <Button
