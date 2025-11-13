@@ -1272,6 +1272,7 @@ export type Database = {
           id: string
           price: number
           purchased_at: string
+          stripe_checkout_session_id: string | null
           stripe_payment_intent_id: string | null
           user_id: string
         }
@@ -1282,6 +1283,7 @@ export type Database = {
           id?: string
           price: number
           purchased_at?: string
+          stripe_checkout_session_id?: string | null
           stripe_payment_intent_id?: string | null
           user_id: string
         }
@@ -1292,6 +1294,7 @@ export type Database = {
           id?: string
           price?: number
           purchased_at?: string
+          stripe_checkout_session_id?: string | null
           stripe_payment_intent_id?: string | null
           user_id?: string
         }
