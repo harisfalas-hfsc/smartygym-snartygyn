@@ -244,12 +244,12 @@ const Index = () => {
             <Card className="border-2 border-primary bg-gradient-to-r from-primary/5 to-primary/10 mb-6 sm:mb-8">
               <div className="p-4 sm:p-6 text-center relative">
                 <TooltipProvider>
-                  {/* Left Side Icons - Horizontal */}
-                  <div className="absolute left-2 sm:left-4 top-1/2 -translate-y-1/2 flex flex-row gap-3 sm:gap-4">
+                  {/* Left Side Icons - Hidden on mobile to prevent overlap */}
+                  <div className="hidden sm:flex absolute left-4 top-1/2 -translate-y-1/2 flex-row gap-4">
                     <Tooltip>
                       <TooltipTrigger asChild>
                         <Dumbbell 
-                          className="w-6 h-6 sm:w-7 sm:h-7 text-primary cursor-pointer transition-all duration-200 hover:scale-110 hover:text-primary/80" 
+                          className="w-7 h-7 text-primary cursor-pointer transition-all duration-200 hover:scale-110 hover:text-primary/80" 
                           onClick={() => navigate("/workout")}
                         />
                       </TooltipTrigger>
@@ -261,7 +261,7 @@ const Index = () => {
                     <Tooltip>
                       <TooltipTrigger asChild>
                         <Target 
-                          className="w-6 h-6 sm:w-7 sm:h-7 text-primary cursor-pointer transition-all duration-200 hover:scale-110 hover:text-primary/80" 
+                          className="w-7 h-7 text-primary cursor-pointer transition-all duration-200 hover:scale-110 hover:text-primary/80" 
                           onClick={() => navigate("/trainingprogram")}
                         />
                       </TooltipTrigger>
@@ -273,7 +273,7 @@ const Index = () => {
                     <Tooltip>
                       <TooltipTrigger asChild>
                         <UserCheck 
-                          className="w-6 h-6 sm:w-7 sm:h-7 text-primary cursor-pointer transition-all duration-200 hover:scale-110 hover:text-primary/80" 
+                          className="w-7 h-7 text-primary cursor-pointer transition-all duration-200 hover:scale-110 hover:text-primary/80" 
                           onClick={() => navigate("/personal-training")}
                         />
                       </TooltipTrigger>
@@ -283,12 +283,12 @@ const Index = () => {
                     </Tooltip>
                   </div>
                   
-                  {/* Right Side Icons - Horizontal */}
-                  <div className="absolute right-2 sm:right-4 top-1/2 -translate-y-1/2 flex flex-row gap-3 sm:gap-4">
+                  {/* Right Side Icons - Hidden on mobile to prevent overlap */}
+                  <div className="hidden sm:flex absolute right-4 top-1/2 -translate-y-1/2 flex-row gap-4">
                     <Tooltip>
                       <TooltipTrigger asChild>
                         <Wrench 
-                          className="w-6 h-6 sm:w-7 sm:h-7 text-primary cursor-pointer transition-all duration-200 hover:scale-110 hover:text-primary/80" 
+                          className="w-7 h-7 text-primary cursor-pointer transition-all duration-200 hover:scale-110 hover:text-primary/80" 
                           onClick={() => navigate("/tools")}
                         />
                       </TooltipTrigger>
@@ -300,7 +300,7 @@ const Index = () => {
                     <Tooltip>
                       <TooltipTrigger asChild>
                         <Video 
-                          className="w-6 h-6 sm:w-7 sm:h-7 text-primary cursor-pointer transition-all duration-200 hover:scale-110 hover:text-primary/80" 
+                          className="w-7 h-7 text-primary cursor-pointer transition-all duration-200 hover:scale-110 hover:text-primary/80" 
                           onClick={() => navigate("/exerciselibrary")}
                         />
                       </TooltipTrigger>
@@ -312,7 +312,7 @@ const Index = () => {
                     <Tooltip>
                       <TooltipTrigger asChild>
                         <FileText 
-                          className="w-6 h-6 sm:w-7 sm:h-7 text-primary cursor-pointer transition-all duration-200 hover:scale-110 hover:text-primary/80" 
+                          className="w-7 h-7 text-primary cursor-pointer transition-all duration-200 hover:scale-110 hover:text-primary/80" 
                           onClick={() => navigate("/blog")}
                         />
                       </TooltipTrigger>
@@ -324,15 +324,15 @@ const Index = () => {
                 </TooltipProvider>
                 
                 {/* Title and Subtitle */}
-                <h1 className="text-3xl sm:text-4xl md:text-5xl font-black bg-gradient-to-r from-primary via-primary/90 to-primary bg-clip-text text-transparent drop-shadow-[0_0_15px_rgba(var(--primary),0.3)] px-8 sm:px-12">
+                <h1 className="text-3xl sm:text-4xl md:text-5xl font-black bg-gradient-to-r from-primary via-primary/90 to-primary bg-clip-text text-transparent drop-shadow-[0_0_15px_rgba(var(--primary),0.3)] px-4 sm:px-12">
                   Smarty Gym
                 </h1>
-                <p className="text-xs sm:text-sm text-muted-foreground mt-1 px-8 sm:px-12">
+                <p className="text-xs sm:text-sm text-muted-foreground mt-1 px-4 sm:px-12">
                   Your Gym Re-imagined. Anywhere, Anytime
                 </p>
                 
                 {/* Decorative Divider */}
-                <DecorativeDivider className="mt-3 px-8 sm:px-12" />
+                <DecorativeDivider className="mt-3 px-4 sm:px-12" />
               </div>
             </Card>
             <div className="bg-primary/10 border border-primary/20 rounded-lg p-3 sm:p-4 mb-3 sm:mb-4 text-center">
