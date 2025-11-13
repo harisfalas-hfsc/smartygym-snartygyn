@@ -266,7 +266,7 @@ const Contact = () => {
             "@context": "https://schema.org",
             "@type": "ContactPage",
             "name": "Contact Smarty Gym",
-            "description": "Get in touch with <span className="whitespace-nowrap">Haris Falas</span> and the Smarty Gym team for online fitness platform support and training inquiries",
+            "description": "Get in touch with Haris Falas and the Smarty Gym team for online fitness platform support and training inquiries",
             "url": "https://smartygym.com/contact",
             "mainEntity": {
               "@type": "LocalBusiness",

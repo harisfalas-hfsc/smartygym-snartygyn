@@ -132,8 +132,8 @@ const PersonalTraining = () => {
 
     if (!showParQ) {
       toast({
-        title: "PAR-Q+ Required",
-        description: "Please complete the PAR-Q+ questionnaire",
+        title: "<span className="whitespace-nowrap">PAR-Q</span> Required",
+        description: "Please complete the <span className="whitespace-nowrap">PAR-Q</span> questionnaire",
         variant: "destructive"
       });
       return;
@@ -229,20 +229,20 @@ const PersonalTraining = () => {
   return (
     <>
       <Helmet>
-        <title>Online Personal Training Cyprus | Haris Falas Sports Scientist | smartygym.com</title>
-        <meta name="description" content="Premium online personal training Cyprus by Haris Falas - BSc Sports Science, CSCS. Customized gym programs tailored to YOUR goals. #1 Cyprus personal trainer with 20+ years experience. Online fitness coaching at smartygym.com" />
-        <meta name="keywords" content="online personal training, personal training Cyprus, Cyprus personal trainers, online personal training Cyprus, Haris Falas personal training, Haris Falas Cyprus, Cyprus fitness, personal training online, online fitness coach Cyprus, Cyprus fitness trainer, personal trainer Cyprus, gym personal training Cyprus, customized workout plans, tailored training programs online, personalized gym programs, sports scientist Cyprus, strength and conditioning coach Cyprus, online gym personal training, virtual personal training Cyprus, Cyprus online fitness coaching, personal training services Cyprus, Cyprus gym trainer, online coaching Cyprus" />
+        <title>Online Personal Training Cyprus | <span className="whitespace-nowrap">Haris Falas</span> Sports Scientist | smartygym.com</title>
+        <meta name="description" content="Premium online personal training Cyprus by <span className="whitespace-nowrap">Haris Falas</span> - BSc Sports Science, CSCS. Customized gym programs tailored to YOUR goals. #1 Cyprus personal trainer with 20+ years experience. Online fitness coaching at smartygym.com" />
+        <meta name="keywords" content="online personal training, personal training Cyprus, Cyprus personal trainers, online personal training Cyprus, Haris Falas personal training, Haris Falas Cyprus, Cyprus fitness, personal training online, online fitness coach Cyprus, Cyprus fitness trainer, personal trainer Cyprus, gym personal training Cyprus, customized workout plans, tailored training programs online, personalized gym programs, sports scientist Cyprus, strength and conditioning coach Cyprus, online gym personal training, virtual personal training Cyprus, online fitness platform coaching, personal training services Cyprus, Cyprus gym trainer, online coaching Cyprus" />
         
         {/* Open Graph */}
         <meta property="og:type" content="website" />
         <meta property="og:url" content={window.location.href} />
-        <meta property="og:title" content="Online Personal Training Cyprus | Haris Falas" />
-        <meta property="og:description" content="Customized online personal training by Cyprus Sports Scientist Haris Falas. Professional personal trainer with proven expertise." />
+        <meta property="og:title" content="Online Personal Training Cyprus | <span className="whitespace-nowrap">Haris Falas</span>" />
+        <meta property="og:description" content="Customized online personal training by Cyprus Sports Scientist <span className="whitespace-nowrap">Haris Falas</span>. Professional personal trainer with proven expertise." />
         <meta property="og:site_name" content="SmartyGym Cyprus" />
         
         {/* Twitter */}
         <meta name="twitter:card" content="summary_large_image" />
-        <meta name="twitter:title" content="Online Personal Training Cyprus | Haris Falas" />
+        <meta name="twitter:title" content="Online Personal Training Cyprus | <span className="whitespace-nowrap">Haris Falas</span>" />
         <meta name="twitter:description" content="Customized online personal training by Cyprus Sports Scientist Haris Falas" />
         
         <link rel="canonical" href={window.location.href} />
@@ -650,13 +650,13 @@ const PersonalTraining = () => {
 
               {/* PAR-Q Questionnaire */}
               <div className="space-y-3 sm:space-y-4">
-                <h3 className="font-semibold text-base sm:text-lg">Part 2: PAR-Q+ Health Assessment</h3>
+                <h3 className="font-semibold text-base sm:text-lg">Part 2: <span className="whitespace-nowrap">PAR-Q</span> Health Assessment</h3>
                 <Button 
                   variant="outline" 
                   onClick={() => setShowParQ(!showParQ)}
                   className="w-full"
                 >
-                  {showParQ ? "Hide" : "Show"} PAR-Q+ Questionnaire
+                  {showParQ ? "Hide" : "Show"} <span className="whitespace-nowrap">PAR-Q</span> Questionnaire
                 </Button>
                 
                 {showParQ && (

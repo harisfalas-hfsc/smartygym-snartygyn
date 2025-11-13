@@ -8,8 +8,8 @@ const PrivacyPolicy = () => {
     <>
       <Helmet>
         <title>Privacy Policy | SmartyGym.com Online Fitness Platform | smartygym.com</title>
-        <meta name="description" content="Smarty Gym (smartygym.com) Privacy Policy - Learn how Online Fitness Platform protects your personal data. Founded by <span className="whitespace-nowrap">Haris Falas</span>. GDPR compliant and Cyprus law adherent data protection for online fitness members." />
-        <meta name="keywords" content="smartygym privacy, smartygym.com privacy policy, online fitness platform privacy, <span className="whitespace-nowrap">Haris Falas</span>, data protection Cyprus, GDPR fitness platform, online fitness security" />
+        <meta name="description" content="Smarty Gym (smartygym.com) Privacy Policy - Learn how Online Fitness Platform protects your personal data. Founded by Haris Falas. GDPR compliant and Cyprus law adherent data protection for online fitness members." />
+        <meta name="keywords" content="smartygym privacy, smartygym.com privacy policy, online fitness platform privacy, Haris Falas, data protection Cyprus, GDPR fitness platform, online fitness security" />
         
         <meta property="og:title" content="Privacy Policy - SmartyGym.com" />
         <meta property="og:description" content="How Smarty Gym protects your data - GDPR compliant Online Fitness Platform" />

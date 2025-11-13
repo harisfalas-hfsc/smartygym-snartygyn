@@ -51,7 +51,7 @@ const ExerciseLibrary = () => {
             icon={Video}
           >
             <p className="text-sm sm:text-base text-muted-foreground">
-              Navigate through all exercise demonstrations and find the perfect technique with your Smarty Coach, <a href="/coach-profile" className="text-primary hover:underline font-medium">Haris Falas</a>.
+              Navigate through all exercise demonstrations and find the perfect technique with your Smarty Coach, <a href="/coach-profile" className="text-primary hover:underline font-medium whitespace-nowrap">Haris Falas</a>.
             </p>
           </PageTitleCard>
 

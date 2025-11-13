@@ -566,17 +566,17 @@ export const ArticleDetail = () => {
   return (
     <>
       <Helmet>
-        <title>{article.title} - Fitness Tips by Haris Falas | Smarty Gym Cyprus</title>
+        <title>{article.title} - Fitness Tips by <span className="whitespace-nowrap">Haris Falas</span> | SmartyGym.com</title>
         <meta name="description" content={article.excerpt} />
         <meta name="keywords" content={`Haris Falas, ${article.category}, fitness Cyprus, workout Cyprus, training Cyprus, health Cyprus, nutrition Cyprus, sports science Cyprus, ${article.title.toLowerCase()}, fitness expert Cyprus`} />
         
         {/* Open Graph tags */}
-        <meta property="og:title" content={`${article.title} - by Haris Falas`} />
+        <meta property="og:title" content={`${article.title} - by <span className="whitespace-nowrap">Haris Falas</span>`} />
         <meta property="og:description" content={article.excerpt} />
         <meta property="og:type" content="article" />
         <meta property="og:url" content={window.location.href} />
         <meta property="og:image" content={article.image} />
-        <meta property="og:site_name" content="Smarty Gym Cyprus" />
+        <meta property="og:site_name" content="SmartyGym.com" />
         <meta property="article:published_time" content={new Date(article.date).toISOString()} />
         <meta property="article:author" content="Haris Falas" />
         <meta property="article:section" content={article.category} />

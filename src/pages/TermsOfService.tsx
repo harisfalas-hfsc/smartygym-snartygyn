@@ -8,8 +8,8 @@ const TermsOfService = () => {
     <>
       <Helmet>
         <title>Terms of Service | SmartyGym.com Online Fitness Platform | smartygym.com</title>
-        <meta name="description" content="Terms and Conditions for Smarty Gym (smartygym.com) - Online Fitness Platform by <span className="whitespace-nowrap">Haris Falas</span>. Read our terms of service for using our evidence-based fitness programs and online training services." />
-        <meta name="keywords" content="smartygym terms, smartygym.com terms of service, online fitness platform terms, <span className="whitespace-nowrap">Haris Falas</span>, online fitness legal, fitness platform terms Cyprus" />
+        <meta name="description" content="Terms and Conditions for Smarty Gym (smartygym.com) - Online Fitness Platform by Haris Falas. Read our terms of service for using our evidence-based fitness programs and online training services." />
+        <parameter name="keywords" content="smartygym terms, smartygym.com terms of service, online fitness platform terms, Haris Falas, online fitness legal, fitness platform terms Cyprus" />
         
         <meta property="og:title" content="Terms of Service - SmartyGym.com" />
         <meta property="og:description" content="Legal terms for using Smarty Gym Online Fitness Platform" />
@@ -34,7 +34,7 @@ const TermsOfService = () => {
               </div>
 
               <p className="text-lg text-muted-foreground">
-                Welcome to <strong>Smarty Gym</strong> (smartygym.com)! By accessing or using our <strong>Cyprus online fitness</strong> platform, services, and subscription-based fitness programs designed by <strong>Haris Falas</strong>, 
+                Welcome to <strong>Smarty Gym</strong> (smartygym.com)! By accessing or using our <strong>Online Fitness Platform</strong>, services, and subscription-based fitness programs designed by <strong><a href="/coach-profile" className="text-primary hover:underline whitespace-nowrap">Haris Falas</a></strong>, 
                 you agree to comply with and be bound by the following Terms & Conditions. Please read them carefully before 
                 using our online fitness services.
               </p>
@@ -121,7 +121,7 @@ const TermsOfService = () => {
                   <h2 className="text-2xl font-bold mb-3">7. Health & Safety Requirements</h2>
                   <ul className="space-y-2 text-muted-foreground">
                     <li>
-                      <strong>PAR-Q+ Mandatory:</strong> You MUST complete the PAR-Q+ (Physical Activity Readiness 
+                      <strong><span className="whitespace-nowrap">PAR-Q</span> Mandatory:</strong> You MUST complete the <span className="whitespace-nowrap">PAR-Q</span> (Physical Activity Readiness 
                       Questionnaire) health assessment available on our Disclaimer page before starting any workout program.
                     </li>
                     <li>
@@ -129,7 +129,7 @@ const TermsOfService = () => {
                       any new exercise program, especially if you have pre-existing health conditions, injuries, or concerns.
                     </li>
                     <li>
-                      <strong>Medical Clearance:</strong> If your PAR-Q+ responses indicate health risks, you must 
+                      <strong>Medical Clearance:</strong> If your <span className="whitespace-nowrap">PAR-Q</span> responses indicate health risks, you must 
                       obtain written medical clearance before using our services.
                     </li>
                     <li>
