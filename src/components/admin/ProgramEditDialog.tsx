@@ -345,19 +345,20 @@ export const ProgramEditDialog = ({ program, open, onOpenChange, onSave, isPerso
                 purchased_at: new Date().toISOString(),
               }]);
 
-            // Send notification to user
+            // Send dashboard notification to user
             try {
-              await supabase.functions.invoke('send-program-notification', {
+              await supabase.functions.invoke('send-system-message', {
                 body: {
                   userId: request.user_id,
-                  userEmail: request.user_email,
-                  userName: request.user_name,
-                  programName: formData.name,
-                  notificationType: 'program_ready',
+                  messageType: 'program_delivered',
+                  customData: {
+                    contentName: formData.name,
+                    contentType: 'personal_training_program'
+                  }
                 }
               });
-            } catch (emailError) {
-              console.error('Error sending notification:', emailError);
+            } catch (messageError) {
+              console.error('Error sending dashboard notification:', messageError);
             }
           }
         }
