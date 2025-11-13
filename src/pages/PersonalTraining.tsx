@@ -650,13 +650,13 @@ const PersonalTraining = () => {
 
               {/* PAR-Q Questionnaire */}
               <div className="space-y-3 sm:space-y-4">
-                <h3 className="font-semibold text-base sm:text-lg">Part 2: PAR-Q+ Health Assessment</h3>
+                <h3 className="font-semibold text-base sm:text-lg">Part 2: <span className="whitespace-nowrap">PAR-Q</span> Health Assessment</h3>
                 <Button 
                   variant="outline" 
                   onClick={() => setShowParQ(!showParQ)}
                   className="w-full"
                 >
-                  {showParQ ? "Hide" : "Show"} PAR-Q+ Questionnaire
+                  {showParQ ? "Hide" : "Show"} <span className="whitespace-nowrap">PAR-Q</span> Questionnaire
                 </Button>
                 
                 {showParQ && (

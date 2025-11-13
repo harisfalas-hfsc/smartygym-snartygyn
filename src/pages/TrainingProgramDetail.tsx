@@ -527,7 +527,7 @@ const TrainingProgramDetail = () => {
                 <div className="relative h-48 w-full overflow-hidden">
                   <img 
                     src={program.image_url} 
-                    alt={`${program.name} - ${program.duration} training program by Haris Falas Sports Scientist at Smarty Gym Cyprus`}
+                    alt={`${program.name} - ${program.duration} training program by Haris Falas Sports Scientist at SmartyGym.com`}
                     className="w-full h-full object-cover"
                   />
                   <div className="absolute top-2 right-2 bg-primary text-primary-foreground text-xs px-2 py-1 rounded flex items-center gap-1">

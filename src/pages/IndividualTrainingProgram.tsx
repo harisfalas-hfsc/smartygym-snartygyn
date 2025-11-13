@@ -727,17 +727,17 @@ const IndividualTrainingProgram = () => {
     <>
       <Helmet>
         <title>{program.name} - {program.duration} Training Program Cyprus | {program.difficulty} {program.focus} Plan | Haris Falas | smartygym.com</title>
-        <meta name="description" content={`${program.name} - ${program.description} ${program.duration} ${program.focus} program. Progressive strength training, functional fitness, periodized workout plan by Sports Scientist Haris Falas at Smarty Gym Cyprus (smartygym.com). Structured ${program.difficulty} level ${program.equipment === 'bodyweight' ? 'bodyweight' : 'equipment'} training with ${program.format} format.`} />
+        <meta name="description" content={`${program.name} - ${program.description} ${program.duration} ${program.focus} program. Progressive strength training, functional fitness, periodized workout plan by Sports Scientist Haris Falas at SmartyGym.com. Structured ${program.difficulty} level ${program.equipment === 'bodyweight' ? 'bodyweight' : 'equipment'} training with ${program.format} format.`} />
         <meta name="keywords" content={`${program.name}, ${program.duration} program, ${program.focus} training, structured workout plan, progressive overload, periodization training Cyprus, strength program Cyprus, functional fitness program, training program Cyprus, ${program.equipment} training, ${program.difficulty} program, muscle building program Cyprus, endurance training Cyprus, performance program Cyprus, hypertrophy training Cyprus, cardio program Cyprus, weight loss program Cyprus, online training program Cyprus, fitness coaching Cyprus, Haris Falas Cyprus, Sports Scientist Cyprus, Smarty Gym, smartygym.com, online fitness Cyprus, personal training Cyprus, strength and conditioning Cyprus, workout periodization, training split, training mesocycle, progressive training Cyprus, structured fitness Cyprus`} />
         
         <meta property="og:title" content={`${program.name} - ${program.duration} Structured Training Program`} />
-        <meta property="og:description" content={`${program.description} ${program.duration} ${program.focus} program by Haris Falas at Smarty Gym Cyprus`} />
+        <meta property="og:description" content={`${program.description} ${program.duration} ${program.focus} program by Haris Falas at SmartyGym.com`} />
         <meta property="og:type" content="article" />
         <meta property="og:url" content={`https://smartygym.com/trainingprogram/${type}/${id}`} />
         <meta property="og:image" content={program.imageUrl} />
         
         <meta name="twitter:card" content="summary_large_image" />
-        <meta name="twitter:title" content={`${program.name} - ${program.duration} Training Program | Smarty Gym Cyprus`} />
+        <meta name="twitter:title" content={`${program.name} - ${program.duration} Training Program | SmartyGym.com`} />
         <meta name="twitter:description" content={`${program.duration} ${program.focus} program by Sports Scientist Haris Falas`} />
         <meta name="twitter:image" content={program.imageUrl} />
         
