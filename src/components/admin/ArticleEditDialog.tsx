@@ -161,6 +161,7 @@ export const ArticleEditDialog = ({ article, open, onOpenChange, onSave }: Artic
               onChange={(e) => setFormData({ ...formData, excerpt: e.target.value })}
               placeholder="Brief article summary"
               rows={3}
+              className="break-words-safe resize-none"
             />
           </div>
 
@@ -171,8 +172,8 @@ export const ArticleEditDialog = ({ article, open, onOpenChange, onSave }: Artic
               value={formData.content}
               onChange={(e) => setFormData({ ...formData, content: e.target.value })}
               placeholder="Article content in markdown format"
-              rows={12}
-              className="font-mono text-sm"
+              rows={20}
+              className="font-mono text-sm break-words-safe resize-none"
             />
           </div>
 

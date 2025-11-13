@@ -264,6 +264,7 @@ export const ResponseTemplatesManager = () => {
                 onChange={(e) => setFormData({ ...formData, content: e.target.value })}
                 placeholder="Enter your template content..."
                 rows={10}
+                className="break-words-safe resize-none"
               />
               <p className="text-xs text-muted-foreground">
                 Tip: Use placeholders like {`{{name}}`} or {`{{email}}`} for personalization

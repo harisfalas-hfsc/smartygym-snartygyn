@@ -124,6 +124,26 @@ All colors MUST be HSL.
     transform: translateY(-4px);
     box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
   }
+  
+  /* Universal content overflow prevention */
+  .break-words-safe {
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    word-break: break-word;
+    hyphens: auto;
+  }
+  
+  .content-container {
+    max-width: 100%;
+    overflow-x: auto;
+  }
+  
+  .text-display {
+    white-space: pre-wrap;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    max-width: 100%;
+  }
 }
 
 /* Global smooth scrolling */

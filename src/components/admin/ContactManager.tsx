@@ -615,7 +615,7 @@ export const ContactManager = () => {
 
               <div>
                 <p className="text-sm font-semibold mb-2">Message</p>
-                <div className="bg-muted p-4 rounded-lg whitespace-pre-wrap text-sm">
+                <div className="bg-muted p-4 rounded-lg text-display break-words-safe content-container text-sm">
                   {selectedMessage.message}
                 </div>
               </div>
@@ -644,7 +644,7 @@ export const ContactManager = () => {
               {selectedMessage.response && (
                 <div>
                   <p className="text-sm font-semibold mb-2">Your Response</p>
-                  <div className="bg-primary/10 p-4 rounded-lg whitespace-pre-wrap text-sm">
+                  <div className="bg-primary/10 p-4 rounded-lg text-display break-words-safe content-container text-sm">
                     {selectedMessage.response}
                   </div>
                   {selectedMessage.responded_at && (
@@ -681,6 +681,7 @@ export const ContactManager = () => {
                       onChange={(e) => setResponseText(e.target.value)}
                       placeholder="Type your response here..."
                       rows={6}
+                      className="break-words-safe resize-none"
                     />
                   </div>
 

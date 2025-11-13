@@ -220,7 +220,7 @@ export function MassNotificationManager() {
                       value={editableContent}
                       onChange={(e) => setEditableContent(e.target.value)}
                       rows={8}
-                      className="resize-y font-mono text-sm"
+                      className="resize-none font-mono text-sm break-words-safe"
                     />
                     <p className="text-xs text-muted-foreground">
                       Edit the template above before sending. Original template will be restored after sending.

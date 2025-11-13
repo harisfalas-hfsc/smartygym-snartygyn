@@ -421,7 +421,7 @@ export const WorkoutEditDialog = ({ workout, open, onOpenChange, onSave }: Worko
               onChange={(e) => setFormData({ ...formData, main_workout: e.target.value })}
               placeholder="Enter the complete workout content here - use spaces, bold letters, capitals, bullets (•, -, *), and line breaks to format your content as needed..."
               rows={15}
-              className="font-mono text-sm whitespace-pre-wrap"
+              className="font-mono text-sm break-words-safe resize-none"
             />
             <p className="text-xs text-muted-foreground">
               Write freely with full formatting control - add sections (Warm Up, Main Workout, Cool Down, etc.), bullets, emphasis as needed
@@ -437,6 +437,7 @@ export const WorkoutEditDialog = ({ workout, open, onOpenChange, onSave }: Worko
               onChange={(e) => setFormData({ ...formData, description: e.target.value })}
               placeholder="Brief description of the workout..."
               rows={3}
+              className="break-words-safe resize-none"
             />
           </div>
 
@@ -448,6 +449,7 @@ export const WorkoutEditDialog = ({ workout, open, onOpenChange, onSave }: Worko
               value={formData.instructions}
               onChange={(e) => setFormData({ ...formData, instructions: e.target.value })}
               placeholder="Step-by-step instructions..."
+              className="break-words-safe resize-none"
               rows={4}
             />
           </div>
@@ -461,6 +463,7 @@ export const WorkoutEditDialog = ({ workout, open, onOpenChange, onSave }: Worko
               onChange={(e) => setFormData({ ...formData, tips: e.target.value })}
               placeholder="Helpful tips for this workout..."
               rows={3}
+              className="break-words-safe resize-none"
             />
           </div>
 

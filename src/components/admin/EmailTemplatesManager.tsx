@@ -346,6 +346,7 @@ export function EmailTemplatesManager() {
                 value={formData.body}
                 onChange={(e) => setFormData({ ...formData, body: e.target.value })}
                 rows={15}
+                className="break-words-safe resize-none"
               />
             </div>
 

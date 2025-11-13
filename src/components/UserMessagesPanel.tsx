@@ -191,7 +191,7 @@ export const UserMessagesPanel = () => {
                         System
                       </Badge>
                     </div>
-                    <div className="bg-muted p-4 rounded-lg text-sm whitespace-pre-wrap mb-3">
+                    <div className="bg-muted p-4 rounded-lg text-sm text-display break-words-safe content-container mb-3">
                       {message.content}
                     </div>
                     <div className="flex items-center gap-4">
@@ -243,7 +243,7 @@ export const UserMessagesPanel = () => {
                 {message.response && (
                   <div className="mt-4 pt-4 border-t">
                     <p className="text-sm font-semibold mb-2 text-green-600">Coach Response:</p>
-                    <div className="bg-green-50 dark:bg-green-950 border border-green-200 dark:border-green-800 p-3 rounded-lg text-sm whitespace-pre-wrap">
+                    <div className="bg-green-50 dark:bg-green-950 border border-green-200 dark:border-green-800 p-3 rounded-lg text-sm text-display break-words-safe content-container">
                       {message.response}
                     </div>
                     <p className="text-xs text-muted-foreground mt-2">
@@ -299,7 +299,7 @@ export const UserMessagesPanel = () => {
                           {getMessageTypeLabel(message.message_type)}
                         </Badge>
                       </div>
-                      <div className="bg-muted p-4 rounded-lg text-sm whitespace-pre-wrap mb-3">
+                      <div className="bg-muted p-4 rounded-lg text-sm text-display break-words-safe content-container mb-3">
                         {message.content}
                       </div>
                       <p className="text-xs text-muted-foreground">
@@ -341,7 +341,7 @@ export const UserMessagesPanel = () => {
                     {message.response && (
                       <div className="pt-3 border-t">
                         <p className="text-sm font-semibold mb-2 text-green-600">Coach Response:</p>
-                        <div className="bg-green-50 dark:bg-green-950 border border-green-200 dark:border-green-800 p-3 rounded-lg text-sm whitespace-pre-wrap">
+                        <div className="bg-green-50 dark:bg-green-950 border border-green-200 dark:border-green-800 p-3 rounded-lg text-sm text-display break-words-safe content-container">
                           {message.response}
                         </div>
                         <p className="text-xs text-muted-foreground mt-2">

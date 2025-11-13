@@ -356,6 +356,7 @@ export function EmailComposer() {
                 onChange={(e) => setMessage(e.target.value)}
                 rows={10}
                 disabled={sending}
+                className="break-words-safe resize-none"
               />
               <p className="text-xs text-muted-foreground">
                 Use {`{{name}}`}, {`{{plan_type}}`}, {`{{renewal_date}}`} as placeholders. Plain text will be converted to HTML.

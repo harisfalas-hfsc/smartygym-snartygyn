@@ -434,7 +434,7 @@ export const AutomatedMessagesManager = () => {
                 onChange={(e) => setFormData({ ...formData, content: e.target.value })}
                 placeholder="Write your message here..."
                 rows={15}
-                className="font-mono text-sm"
+                className="font-mono text-sm break-words-safe resize-none"
               />
               <p className="text-xs text-muted-foreground mt-1">
                 You can use placeholders like [Plan], [Date], [Amount] which will be replaced automatically

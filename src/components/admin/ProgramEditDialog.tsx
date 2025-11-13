@@ -549,6 +549,7 @@ export const ProgramEditDialog = ({ program, open, onOpenChange, onSave, isPerso
               onChange={(e) => setFormData({ ...formData, training_program: e.target.value })}
               placeholder="Enter your complete training program content here..."
               rows={12}
+              className="break-words-safe resize-none"
             />
           </div>
 
@@ -561,6 +562,7 @@ export const ProgramEditDialog = ({ program, open, onOpenChange, onSave, isPerso
               onChange={(e) => setFormData({ ...formData, program_description: e.target.value })}
               placeholder="Brief description of the program"
               rows={3}
+              className="break-words-safe resize-none"
             />
           </div>
 
@@ -573,6 +575,7 @@ export const ProgramEditDialog = ({ program, open, onOpenChange, onSave, isPerso
               onChange={(e) => setFormData({ ...formData, construction: e.target.value })}
               placeholder="Program instructions and structure details"
               rows={4}
+              className="break-words-safe resize-none"
             />
           </div>
 
@@ -585,6 +588,7 @@ export const ProgramEditDialog = ({ program, open, onOpenChange, onSave, isPerso
               onChange={(e) => setFormData({ ...formData, final_tips: e.target.value })}
               placeholder="Tips and additional guidance"
               rows={4}
+              className="break-words-safe resize-none"
             />
           </div>
 
