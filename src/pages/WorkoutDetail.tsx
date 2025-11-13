@@ -538,7 +538,7 @@ const WorkoutDetail = () => {
                 <div className="relative h-48 w-full overflow-hidden">
                   <img 
                     src={workout.image_url} 
-                    alt={`${workout.name} - ${workout.duration} ${workout.difficulty} ${workout.equipment === 'BODYWEIGHT' ? 'bodyweight' : 'equipment-based'} ${workout.format} workout by Haris Falas Sports Scientist at Smarty Gym Cyprus`}
+                    alt={`${workout.name} - ${workout.duration} ${workout.difficulty} ${workout.equipment === 'BODYWEIGHT' ? 'bodyweight' : 'equipment-based'} ${workout.format} workout by Haris Falas Sports Scientist at SmartyGym.com`}
                     className="w-full h-full object-cover"
                   />
                   <div className="absolute top-2 right-2 bg-primary text-primary-foreground text-xs px-2 py-1 rounded">
