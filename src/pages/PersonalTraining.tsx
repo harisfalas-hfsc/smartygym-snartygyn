@@ -187,7 +187,7 @@ const PersonalTraining = () => {
 
       // Create checkout session
       const { data: checkoutData, error: checkoutError } = await supabase.functions.invoke('create-personal-training-checkout', {
-        body: { email: formData.email, name: formData.name }
+        body: { email: formData.email, name: formData.name, userId: user.id }
       });
 
       if (checkoutError) throw checkoutError;

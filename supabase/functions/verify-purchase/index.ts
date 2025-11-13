@@ -28,7 +28,54 @@ serve(async (req) => {
     const session = await stripe.checkout.sessions.retrieve(sessionId);
 
     if (session.payment_status === "paid" && session.metadata) {
-      const { user_id, content_type, content_id, content_name } = session.metadata;
+      const { user_id, product_type } = session.metadata;
+      
+      // Handle personal training payment differently
+      if (product_type === "personal_training") {
+        // Update the personal_training_requests stripe_payment_status
+        const { error: updateError } = await supabaseClient
+          .from('personal_training_requests')
+          .update({ 
+            stripe_payment_status: 'paid',
+            payment_completed_at: new Date().toISOString()
+          })
+          .eq('user_id', user_id)
+          .eq('status', 'pending')
+          .order('created_at', { ascending: false })
+          .limit(1);
+
+        if (updateError) {
+          console.error('Error updating personal training request:', updateError);
+          throw updateError;
+        }
+
+        // Send confirmation message
+        try {
+          await supabaseClient.functions.invoke('send-system-message', {
+            body: {
+              userId: user_id,
+              messageType: 'purchase_thank_you',
+              customData: {
+                contentName: 'Personal Training Program'
+              }
+            }
+          });
+        } catch (msgError) {
+          console.error('Failed to send confirmation message:', msgError);
+        }
+
+        return new Response(JSON.stringify({ 
+          success: true, 
+          purchased: true,
+          content_type: 'personal_training',
+        }), {
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+          status: 200,
+        });
+      }
+
+      // Handle regular standalone purchases
+      const { content_type, content_id, content_name } = session.metadata;
       
       // Get the price from the line items
       const lineItems = await stripe.checkout.sessions.listLineItems(sessionId);

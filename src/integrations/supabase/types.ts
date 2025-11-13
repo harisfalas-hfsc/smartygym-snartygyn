@@ -752,6 +752,7 @@ export type Database = {
           lifestyle: string[]
           limitations: string | null
           other_equipment: string | null
+          payment_completed_at: string | null
           performance_type: string
           specific_goal: string
           status: string | null
@@ -775,6 +776,7 @@ export type Database = {
           lifestyle: string[]
           limitations?: string | null
           other_equipment?: string | null
+          payment_completed_at?: string | null
           performance_type: string
           specific_goal: string
           status?: string | null
@@ -798,6 +800,7 @@ export type Database = {
           lifestyle?: string[]
           limitations?: string | null
           other_equipment?: string | null
+          payment_completed_at?: string | null
           performance_type?: string
           specific_goal?: string
           status?: string | null
