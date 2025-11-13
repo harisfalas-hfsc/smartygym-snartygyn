@@ -181,12 +181,10 @@ async function handleOneTimePurchase(
   stripe: Stripe
 ) {
   const userId = session.metadata?.user_id;
-  const contentType = session.metadata?.content_type;
-  const contentId = session.metadata?.content_id;
-  const contentName = session.metadata?.content_name;
-
-  if (!userId || !contentType || !contentId) {
-    logStep("ERROR: Missing metadata for one-time purchase", { userId, contentType, contentId });
+  const productType = session.metadata?.product_type;
+  
+  if (!userId) {
+    logStep("ERROR: Missing user_id in metadata");
     return;
   }
 
@@ -194,6 +192,46 @@ async function handleOneTimePurchase(
   const paymentIntentId = session.payment_intent as string;
   const paymentIntent = await stripe.paymentIntents.retrieve(paymentIntentId);
   const amount = paymentIntent.amount / 100; // Convert from cents
+
+  // Check if this is a personal training purchase
+  if (productType === 'personal_training') {
+    logStep("Recording personal training purchase", { userId, amount });
+    
+    // Update personal training request status
+    const { error: updateError } = await supabase
+      .from('personal_training_requests')
+      .update({ status: 'paid' })
+      .eq('user_id', userId)
+      .order('created_at', { ascending: false })
+      .limit(1);
+
+    if (updateError) {
+      logStep("ERROR: Failed to update personal training request", { error: updateError });
+    }
+
+    // Send confirmation message
+    await supabase
+      .from('user_system_messages')
+      .insert({
+        user_id: userId,
+        subject: 'Personal Training Payment Confirmed',
+        message: 'Thank you for your payment! Your personal training program will be created by Haris Falas and delivered to your dashboard soon.',
+        message_type: 'purchase_confirmation',
+        is_read: false,
+      });
+    
+    return;
+  }
+
+  // Handle standalone workout/program purchases
+  const contentType = session.metadata?.content_type;
+  const contentId = session.metadata?.content_id;
+  const contentName = session.metadata?.content_name;
+
+  if (!contentType || !contentId) {
+    logStep("ERROR: Missing metadata for standalone purchase", { contentType, contentId });
+    return;
+  }
 
   logStep("Recording standalone purchase", { userId, contentType, contentId, amount });
 
