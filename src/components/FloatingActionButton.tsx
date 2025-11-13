@@ -10,13 +10,13 @@ export const FloatingActionButton = () => {
     {
       label: "Browse Workouts",
       icon: Dumbbell,
-      path: "/workouts",
+      path: "/workout",
       color: "from-primary to-primary/80",
     },
     {
       label: "View Programs",
       icon: Trophy,
-      path: "/programs",
+      path: "/trainingprogram",
       color: "from-secondary to-secondary/80",
     },
     {
