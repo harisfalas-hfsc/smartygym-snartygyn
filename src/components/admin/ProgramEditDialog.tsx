@@ -39,9 +39,11 @@ interface ProgramEditDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onSave: () => void;
+  isPersonalTraining?: boolean;
+  request?: any; // For personal training requests
 }
 
-export const ProgramEditDialog = ({ program, open, onOpenChange, onSave }: ProgramEditDialogProps) => {
+export const ProgramEditDialog = ({ program, open, onOpenChange, onSave, isPersonalTraining = false, request }: ProgramEditDialogProps) => {
   const { toast } = useToast();
   const [formData, setFormData] = useState({
     id: '',
@@ -83,15 +85,19 @@ export const ProgramEditDialog = ({ program, open, onOpenChange, onSave }: Progr
   useEffect(() => {
     const generateSerialNumber = async (category: string) => {
       const prefix = getCategoryPrefix(category);
+      const tableName = isPersonalTraining ? 'personal_training_programs' : 'admin_training_programs';
       const { data } = await supabase
-        .from('admin_training_programs')
+        .from(tableName)
         .select('id, serial_number')
         .like('id', `${prefix}-%`)
         .order('serial_number', { ascending: false })
         .limit(1);
       
       if (data && data.length > 0 && data[0].serial_number) {
-        return data[0].serial_number + 1;
+        const currentSerial = typeof data[0].serial_number === 'string' 
+          ? parseInt(data[0].serial_number) 
+          : data[0].serial_number;
+        return currentSerial + 1;
       }
       return 1;
     };
@@ -159,8 +165,9 @@ export const ProgramEditDialog = ({ program, open, onOpenChange, onSave }: Progr
     if (!program && formData.category) {
       const generateSerialNumber = async () => {
         const prefix = getCategoryPrefix(formData.category);
+        const tableName = isPersonalTraining ? 'personal_training_programs' : 'admin_training_programs';
         const { data } = await supabase
-          .from('admin_training_programs')
+          .from(tableName)
           .select('id, serial_number')
           .like('id', `${prefix}-%`)
           .order('serial_number', { ascending: false })
@@ -168,7 +175,10 @@ export const ProgramEditDialog = ({ program, open, onOpenChange, onSave }: Progr
         
         let nextSerial = 1;
         if (data && data.length > 0 && data[0].serial_number) {
-          nextSerial = data[0].serial_number + 1;
+          const currentSerial = typeof data[0].serial_number === 'string' 
+            ? parseInt(data[0].serial_number) 
+            : data[0].serial_number;
+          nextSerial = currentSerial + 1;
         }
         
         setFormData(prev => ({
@@ -180,7 +190,7 @@ export const ProgramEditDialog = ({ program, open, onOpenChange, onSave }: Progr
       
       generateSerialNumber();
     }
-  }, [formData.category, program]);
+  }, [formData.category, program, isPersonalTraining]);
 
   // Generate week/day boxes when weeks or days_per_week changes
   useEffect(() => {
@@ -235,11 +245,11 @@ export const ProgramEditDialog = ({ program, open, onOpenChange, onSave }: Progr
         }
       }
 
-      // Create Stripe product if premium + standalone purchase with price
+      // Create Stripe product if premium + standalone purchase with price (not for personal training)
       let stripeProductId = formData.stripe_product_id;
       let stripePriceId = formData.stripe_price_id;
       
-      if (formData.is_premium && formData.is_standalone_purchase && formData.price && parseFloat(formData.price) > 0) {
+      if (!isPersonalTraining && formData.is_premium && formData.is_standalone_purchase && formData.price && parseFloat(formData.price) > 0) {
         const { data: stripeData, error: stripeError } = await supabase.functions.invoke('create-stripe-product', {
           body: {
             name: formData.name,
@@ -275,7 +285,7 @@ export const ProgramEditDialog = ({ program, open, onOpenChange, onSave }: Progr
         difficultyLevel = 'Intermediate';
       }
 
-      const dataToSave = {
+      const baseData = {
         id: formData.id,
         serial_number: formData.serial_number,
         name: formData.name,
@@ -291,29 +301,95 @@ export const ProgramEditDialog = ({ program, open, onOpenChange, onSave }: Progr
         program_structure: formData.construction,
         nutrition_tips: formData.final_tips,
         image_url: imageUrl,
-        is_premium: formData.is_premium,
-        tier_required: null,
-        is_standalone_purchase: formData.is_premium && formData.is_standalone_purchase,
-        price: formData.is_premium && formData.price ? parseFloat(formData.price) : null,
-        stripe_product_id: stripeProductId,
-        stripe_price_id: stripePriceId,
       };
 
-      if (program) {
-        const { error } = await supabase
-          .from('admin_training_programs')
-          .update(dataToSave)
-          .eq('id', program.id);
+      if (isPersonalTraining) {
+        // Personal training programs - always prepaid, no premium/price logic
+        // Note: personal_training_programs.serial_number is string type
+        const personalTrainingData = {
+          ...baseData,
+          serial_number: baseData.serial_number.toString(),
+          request_id: request?.id || null,
+          user_id: request?.user_id || null,
+        };
 
-        if (error) throw error;
-        toast({ title: "Success", description: "Program updated successfully" });
+        if (program) {
+          const { error } = await supabase
+            .from('personal_training_programs')
+            .update(personalTrainingData)
+            .eq('id', program.id);
+
+          if (error) throw error;
+        } else {
+          const { error: insertError } = await supabase
+            .from('personal_training_programs')
+            .insert([personalTrainingData]);
+
+          if (insertError) throw insertError;
+
+          // Update request status to completed and add to user_purchases
+          if (request) {
+            await supabase
+              .from('personal_training_requests')
+              .update({ status: 'completed', completed_at: new Date().toISOString() })
+              .eq('id', request.id);
+
+            await supabase
+              .from('user_purchases')
+              .insert([{
+                user_id: request.user_id,
+                content_type: 'personal_training_program',
+                content_id: formData.id,
+                content_name: formData.name,
+                price: 119,
+                purchased_at: new Date().toISOString(),
+              }]);
+
+            // Send notification to user
+            try {
+              await supabase.functions.invoke('send-program-notification', {
+                body: {
+                  userId: request.user_id,
+                  userEmail: request.user_email,
+                  userName: request.user_name,
+                  programName: formData.name,
+                  notificationType: 'program_ready',
+                }
+              });
+            } catch (emailError) {
+              console.error('Error sending notification:', emailError);
+            }
+          }
+        }
+        toast({ title: "Success", description: program ? "Personal training program updated successfully" : "Personal training program created and delivered to user" });
       } else {
-        const { error } = await supabase
-          .from('admin_training_programs')
-          .insert([dataToSave]);
+        // Regular training programs with premium/standalone options
+        const dataToSave = {
+          ...baseData,
+          is_premium: formData.is_premium,
+          tier_required: null,
+          is_standalone_purchase: formData.is_premium && formData.is_standalone_purchase,
+          price: formData.is_premium && formData.price ? parseFloat(formData.price) : null,
+          stripe_product_id: stripeProductId,
+          stripe_price_id: stripePriceId,
+        };
 
-        if (error) throw error;
-        toast({ title: "Success", description: "Program created successfully" });
+        if (program) {
+          const { error } = await supabase
+            .from('admin_training_programs')
+            .update(dataToSave)
+            .eq('id', program.id);
+
+          if (error) throw error;
+          toast({ title: "Success", description: "Program updated successfully" });
+        } else {
+          const { error } = await supabase
+            .from('admin_training_programs')
+            .insert([dataToSave]);
+
+          if (error) throw error;
+          toast({ title: "Success", description: "Program created successfully" });
+        }
       }
       onSave();
       onOpenChange(false);
@@ -543,69 +619,72 @@ export const ProgramEditDialog = ({ program, open, onOpenChange, onSave }: Progr
             )}
           </div>
 
-          <div className="space-y-2">
-            <Label htmlFor="is_premium" className="text-base font-semibold">Premium or Free</Label>
-            <div className="flex items-center space-x-3 p-3 border rounded-lg">
-              <Switch
-                id="is_premium"
-                checked={formData.is_premium}
-                onCheckedChange={(checked) => setFormData({ 
-                  ...formData, 
-                  is_premium: checked,
-                  // Reset standalone purchase if premium is disabled
-                  is_standalone_purchase: checked ? formData.is_standalone_purchase : false,
-                  price: checked ? formData.price : ''
-                })}
-              />
-              <div className="flex-1">
-                <span className="text-sm font-medium">
-                  {formData.is_premium ? '🔒 Premium Content' : '🆓 Free Content'}
-                </span>
-              </div>
-            </div>
-            <p className="text-xs text-muted-foreground">
-              Toggle ON for Premium (requires subscription), toggle OFF for Free (accessible to all)
-            </p>
-          </div>
-
-          {/* Standalone Purchase Section - Only available for premium content */}
-          {formData.is_premium && (
-            <div className="space-y-4 pt-4 border-t">
-              <div className="flex items-center space-x-2">
-                <Switch
-                  id="is_standalone_purchase"
-                  checked={formData.is_standalone_purchase}
-                  onCheckedChange={(checked) => setFormData({ ...formData, is_standalone_purchase: checked })}
-                />
-                <Label htmlFor="is_standalone_purchase">Available as Standalone Purchase</Label>
-              </div>
-              <p className="text-sm text-muted-foreground">
-                Enable this to allow users to buy this program individually without a subscription
-              </p>
-
-              {formData.is_standalone_purchase && (
+          {/* Premium/Free and Standalone Purchase - Not shown for personal training */}
+          {!isPersonalTraining && (
+            <>
               <div className="space-y-2">
-                <Label htmlFor="price">Price (€) *</Label>
-                <Input
-                  id="price"
-                  type="number"
-                  step="0.01"
-                  min="0"
-                  value={formData.price}
-                  onChange={(e) => setFormData({ ...formData, price: e.target.value })}
-                  placeholder="e.g., 29.99"
-                />
-                <p className="text-sm text-muted-foreground">
-                  This will automatically create a Stripe product when you save
+                <Label htmlFor="is_premium" className="text-base font-semibold">Premium or Free</Label>
+                <div className="flex items-center space-x-3 p-3 border rounded-lg">
+                  <Switch
+                    id="is_premium"
+                    checked={formData.is_premium}
+                    onCheckedChange={(checked) => setFormData({ 
+                      ...formData, 
+                      is_premium: checked,
+                      is_standalone_purchase: checked ? formData.is_standalone_purchase : false,
+                      price: checked ? formData.price : ''
+                    })}
+                  />
+                  <div className="flex-1">
+                    <span className="text-sm font-medium">
+                      {formData.is_premium ? '🔒 Premium Content' : '🆓 Free Content'}
+                    </span>
+                  </div>
+                </div>
+                <p className="text-xs text-muted-foreground">
+                  Toggle ON for Premium (requires subscription), toggle OFF for Free (accessible to all)
                 </p>
-                {formData.stripe_product_id && (
-                  <p className="text-xs text-green-600">
-                    ✓ Stripe Product ID: {formData.stripe_product_id}
-                  </p>
-                )}
               </div>
+
+              {formData.is_premium && (
+                <div className="space-y-4 pt-4 border-t">
+                  <div className="flex items-center space-x-2">
+                    <Switch
+                      id="is_standalone_purchase"
+                      checked={formData.is_standalone_purchase}
+                      onCheckedChange={(checked) => setFormData({ ...formData, is_standalone_purchase: checked })}
+                    />
+                    <Label htmlFor="is_standalone_purchase">Available as Standalone Purchase</Label>
+                  </div>
+                  <p className="text-sm text-muted-foreground">
+                    Enable this to allow users to buy this program individually without a subscription
+                  </p>
+
+                  {formData.is_standalone_purchase && (
+                    <div className="space-y-2">
+                      <Label htmlFor="price">Price (€) *</Label>
+                      <Input
+                        id="price"
+                        type="number"
+                        step="0.01"
+                        min="0"
+                        value={formData.price}
+                        onChange={(e) => setFormData({ ...formData, price: e.target.value })}
+                        placeholder="e.g., 29.99"
+                      />
+                      <p className="text-sm text-muted-foreground">
+                        This will automatically create a Stripe product when you save
+                      </p>
+                      {formData.stripe_product_id && (
+                        <p className="text-xs text-green-600">
+                          ✓ Stripe Product ID: {formData.stripe_product_id}
+                        </p>
+                      )}
+                    </div>
+                  )}
+                </div>
               )}
-            </div>
+            </>
           )}
 
           <div className="flex justify-end gap-2 pt-4">

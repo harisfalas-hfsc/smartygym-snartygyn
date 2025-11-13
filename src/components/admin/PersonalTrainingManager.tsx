@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
-import { PersonalTrainingEditDialog } from "./PersonalTrainingEditDialog";
+import { ProgramEditDialog } from "./ProgramEditDialog";
 import { Clock, CheckCircle, Users, Eye } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 
@@ -407,11 +407,12 @@ export const PersonalTrainingManager = () => {
       </Dialog>
 
       {/* Program Creation/Edit Dialog */}
-      <PersonalTrainingEditDialog
+      <ProgramEditDialog
         open={showProgramDialog}
         onOpenChange={setShowProgramDialog}
-        request={selectedRequest}
         program={editingProgram}
+        isPersonalTraining={true}
+        request={selectedRequest}
         onSave={() => {
           fetchData();
           setShowProgramDialog(false);
