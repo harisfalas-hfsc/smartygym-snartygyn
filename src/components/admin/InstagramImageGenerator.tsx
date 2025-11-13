@@ -1,14 +1,21 @@
 import { useState } from "react";
-import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Download, Loader2 } from "lucide-react";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Download, Eye } from "lucide-react";
 import { toast } from "sonner";
-import { exportToInstagram, INSTAGRAM_SIZES } from "@/utils/instagramExporter";
+import { exportToInstagram, INSTAGRAM_SIZES, InstagramSize } from "@/utils/instagramExporter";
 
-// Services Templates
-import { ServicesTemplate } from "./instagram/ServicesTemplate";
+// Composite Cards
+import { HumanNotAICompositeTemplate } from "./instagram/composite/HumanNotAICompositeTemplate";
+import { ServicesOverviewCompositeTemplate } from "./instagram/composite/ServicesOverviewCompositeTemplate";
+import { WorkoutCategoriesCompositeTemplate } from "./instagram/composite/WorkoutCategoriesCompositeTemplate";
+import { ProgramCategoriesCompositeTemplate } from "./instagram/composite/ProgramCategoriesCompositeTemplate";
+import { FitnessToolsCompositeTemplate } from "./instagram/composite/FitnessToolsCompositeTemplate";
+
+// Services
 import { WorkoutsCardTemplate } from "./instagram/services/WorkoutsCardTemplate";
 import { ProgramsCardTemplate } from "./instagram/services/ProgramsCardTemplate";
 import { ExerciseLibraryCardTemplate } from "./instagram/services/ExerciseLibraryCardTemplate";
@@ -18,14 +25,12 @@ import { MacroCardTemplate } from "./instagram/services/MacroCardTemplate";
 import { GoldPlanCardTemplate } from "./instagram/services/GoldPlanCardTemplate";
 import { PlatinumPlanCardTemplate } from "./instagram/services/PlatinumPlanCardTemplate";
 
-// Brand Templates
-import { HumanNotAITemplate } from "./instagram/HumanNotAITemplate";
+// Brand & Values
 import { RealExpertiseCardTemplate } from "./instagram/brand/RealExpertiseCardTemplate";
 import { PersonalTouchCardTemplate } from "./instagram/brand/PersonalTouchCardTemplate";
 import { NotARobotCardTemplate } from "./instagram/brand/NotARobotCardTemplate";
 
-// Workout Templates
-import { WorkoutCategoriesTemplate } from "./instagram/WorkoutCategoriesTemplate";
+// Workouts
 import { StrengthCardTemplate } from "./instagram/workouts/StrengthCardTemplate";
 import { CalorieBurningCardTemplate } from "./instagram/workouts/CalorieBurningCardTemplate";
 import { MetabolicCardTemplate } from "./instagram/workouts/MetabolicCardTemplate";
@@ -34,8 +39,7 @@ import { MobilityCardTemplate } from "./instagram/workouts/MobilityCardTemplate"
 import { PowerCardTemplate } from "./instagram/workouts/PowerCardTemplate";
 import { ChallengeCardTemplate } from "./instagram/workouts/ChallengeCardTemplate";
 
-// Program Templates
-import { ProgramCategoriesTemplate } from "./instagram/ProgramCategoriesTemplate";
+// Programs
 import { CardioEnduranceCardTemplate } from "./instagram/programs/CardioEnduranceCardTemplate";
 import { FunctionalStrengthCardTemplate } from "./instagram/programs/FunctionalStrengthCardTemplate";
 import { MuscleHypertrophyCardTemplate } from "./instagram/programs/MuscleHypertrophyCardTemplate";
@@ -43,270 +47,293 @@ import { WeightLossCardTemplate } from "./instagram/programs/WeightLossCardTempl
 import { LowBackPainCardTemplate } from "./instagram/programs/LowBackPainCardTemplate";
 import { MobilityStabilityCardTemplate } from "./instagram/programs/MobilityStabilityCardTemplate";
 
-// Tools Templates
-import { FitnessToolsTemplate } from "./instagram/FitnessToolsTemplate";
+// Tools
 import { OneRMToolCardTemplate } from "./instagram/tools/OneRMToolCardTemplate";
 import { BMRToolCardTemplate } from "./instagram/tools/BMRToolCardTemplate";
 import { MacroToolCardTemplate } from "./instagram/tools/MacroToolCardTemplate";
 
-// Community Templates
+// Features & Benefits
+import { BrowseWorkoutsFeatureTemplate } from "./instagram/features/BrowseWorkoutsFeatureTemplate";
+import { BrowseProgramsFeatureTemplate } from "./instagram/features/BrowseProgramsFeatureTemplate";
+import { ExplorePlatformFeatureTemplate } from "./instagram/features/ExplorePlatformFeatureTemplate";
+import { UnlimitedAccessBenefitTemplate } from "./instagram/features/UnlimitedAccessBenefitTemplate";
+import { PersonalizedPlansBenefitTemplate } from "./instagram/features/PersonalizedPlansBenefitTemplate";
+import { SaveFavoritesBenefitTemplate } from "./instagram/features/SaveFavoritesBenefitTemplate";
+import { PersonalDashboardBenefitTemplate } from "./instagram/features/PersonalDashboardBenefitTemplate";
+import { GoalSettingBenefitTemplate } from "./instagram/features/GoalSettingBenefitTemplate";
+
+// Community
 import { WorkoutLeaderboardTemplate } from "./instagram/community/WorkoutLeaderboardTemplate";
 import { ProgramLeaderboardTemplate } from "./instagram/community/ProgramLeaderboardTemplate";
-
-// Premium Template
-import { PremiumBenefitsTemplate } from "./instagram/PremiumBenefitsTemplate";
 
 interface Template {
   id: string;
   name: string;
-  description: string;
   component: React.ComponentType;
 }
 
-const servicesTemplates: Template[] = [
-  { id: "services-overview", name: "Services Overview", description: "All services in one card", component: ServicesTemplate },
-  { id: "workouts-card", name: "Workouts Card", description: "Individual workout service card", component: WorkoutsCardTemplate },
-  { id: "programs-card", name: "Programs Card", description: "Individual programs service card", component: ProgramsCardTemplate },
-  { id: "exercise-library-card", name: "Exercise Library", description: "Individual exercise library card", component: ExerciseLibraryCardTemplate },
-  { id: "1rm-card", name: "1RM Calculator", description: "Individual 1RM calculator card", component: OneRMCardTemplate },
-  { id: "bmr-card", name: "BMR Calculator", description: "Individual BMR calculator card", component: BMRCardTemplate },
-  { id: "macro-card", name: "Macro Tracker", description: "Individual macro tracker card", component: MacroCardTemplate },
-  { id: "gold-plan", name: "Gold Plan", description: "Gold membership plan card", component: GoldPlanCardTemplate },
-  { id: "platinum-plan", name: "Platinum Plan", description: "Platinum membership plan card", component: PlatinumPlanCardTemplate },
-  { id: "premium-benefits", name: "Premium Benefits", description: "All premium benefits listed", component: PremiumBenefitsTemplate },
+const compositeTemplates: Template[] = [
+  { id: "human-not-ai", name: "100% Human. 0% AI.", component: HumanNotAICompositeTemplate },
+  { id: "services-overview", name: "Services Overview", component: ServicesOverviewCompositeTemplate },
+  { id: "workout-categories", name: "Workout Categories", component: WorkoutCategoriesCompositeTemplate },
+  { id: "program-categories", name: "Program Categories", component: ProgramCategoriesCompositeTemplate },
+  { id: "fitness-tools", name: "Fitness Tools", component: FitnessToolsCompositeTemplate },
+];
+
+const serviceTemplates: Template[] = [
+  { id: "workouts-service", name: "Workouts", component: WorkoutsCardTemplate },
+  { id: "programs-service", name: "Training Programs", component: ProgramsCardTemplate },
+  { id: "exercise-library", name: "Exercise Library", component: ExerciseLibraryCardTemplate },
+  { id: "1rm-calc", name: "1RM Calculator", component: OneRMCardTemplate },
+  { id: "bmr-calc", name: "BMR Calculator", component: BMRCardTemplate },
+  { id: "macro-tracker", name: "Macro Tracker", component: MacroCardTemplate },
+  { id: "gold-plan", name: "Gold Plan", component: GoldPlanCardTemplate },
+  { id: "platinum-plan", name: "Platinum Plan", component: PlatinumPlanCardTemplate },
 ];
 
 const brandTemplates: Template[] = [
-  { id: "human-not-ai", name: "100% Human, 0% AI", description: "Brand values overview", component: HumanNotAITemplate },
-  { id: "real-expertise", name: "Real Expertise", description: "Created by sports scientists", component: RealExpertiseCardTemplate },
-  { id: "personal-touch", name: "Personal Touch", description: "Workouts that fit your life", component: PersonalTouchCardTemplate },
-  { id: "not-robot", name: "Not a Robot", description: "Human-designed content", component: NotARobotCardTemplate },
+  { id: "real-expertise", name: "Real Expertise", component: RealExpertiseCardTemplate },
+  { id: "personal-touch", name: "Personal Touch", component: PersonalTouchCardTemplate },
+  { id: "not-robot", name: "Not a Robot", component: NotARobotCardTemplate },
 ];
 
 const workoutTemplates: Template[] = [
-  { id: "workout-categories", name: "Workout Categories", description: "All workout types overview", component: WorkoutCategoriesTemplate },
-  { id: "strength-card", name: "Strength", description: "Strength training card", component: StrengthCardTemplate },
-  { id: "calorie-card", name: "Calorie Burning", description: "Calorie burning workouts card", component: CalorieBurningCardTemplate },
-  { id: "metabolic-card", name: "Metabolic", description: "Metabolic training card", component: MetabolicCardTemplate },
-  { id: "cardio-card", name: "Cardio", description: "Cardio training card", component: CardioCardTemplate },
-  { id: "mobility-card", name: "Mobility", description: "Mobility training card", component: MobilityCardTemplate },
-  { id: "power-card", name: "Power", description: "Power training card", component: PowerCardTemplate },
-  { id: "challenge-card", name: "Challenge", description: "Challenge workouts card", component: ChallengeCardTemplate },
+  { id: "strength", name: "Strength", component: StrengthCardTemplate },
+  { id: "calorie-burning", name: "Calorie Burning", component: CalorieBurningCardTemplate },
+  { id: "metabolic", name: "Metabolic", component: MetabolicCardTemplate },
+  { id: "cardio", name: "Cardio", component: CardioCardTemplate },
+  { id: "mobility", name: "Mobility", component: MobilityCardTemplate },
+  { id: "power", name: "Power", component: PowerCardTemplate },
+  { id: "challenge", name: "Challenge", component: ChallengeCardTemplate },
 ];
 
 const programTemplates: Template[] = [
-  { id: "program-categories", name: "Program Categories", description: "All program types overview", component: ProgramCategoriesTemplate },
-  { id: "cardio-endurance", name: "Cardio Endurance", description: "Cardio endurance program card", component: CardioEnduranceCardTemplate },
-  { id: "functional-strength", name: "Functional Strength", description: "Functional strength program card", component: FunctionalStrengthCardTemplate },
-  { id: "muscle-hypertrophy", name: "Muscle Hypertrophy", description: "Muscle building program card", component: MuscleHypertrophyCardTemplate },
-  { id: "weight-loss", name: "Weight Loss", description: "Weight loss program card", component: WeightLossCardTemplate },
-  { id: "low-back-pain", name: "Low Back Pain", description: "Back pain relief program card", component: LowBackPainCardTemplate },
-  { id: "mobility-stability", name: "Mobility & Stability", description: "Mobility program card", component: MobilityStabilityCardTemplate },
+  { id: "cardio-endurance", name: "Cardio Endurance", component: CardioEnduranceCardTemplate },
+  { id: "functional-strength", name: "Functional Strength", component: FunctionalStrengthCardTemplate },
+  { id: "muscle-hypertrophy", name: "Muscle Hypertrophy", component: MuscleHypertrophyCardTemplate },
+  { id: "weight-loss", name: "Weight Loss", component: WeightLossCardTemplate },
+  { id: "low-back-pain", name: "Low Back Pain Relief", component: LowBackPainCardTemplate },
+  { id: "mobility-stability", name: "Mobility & Stability", component: MobilityStabilityCardTemplate },
 ];
 
-const toolsTemplates: Template[] = [
-  { id: "fitness-tools", name: "Fitness Tools", description: "All fitness tools overview", component: FitnessToolsTemplate },
-  { id: "1rm-tool", name: "1RM Tool Card", description: "1RM calculator tool card", component: OneRMToolCardTemplate },
-  { id: "bmr-tool", name: "BMR Tool Card", description: "BMR calculator tool card", component: BMRToolCardTemplate },
-  { id: "macro-tool", name: "Macro Tool Card", description: "Macro tracker tool card", component: MacroToolCardTemplate },
+const toolTemplates: Template[] = [
+  { id: "1rm-tool", name: "1RM Calculator Tool", component: OneRMToolCardTemplate },
+  { id: "bmr-tool", name: "BMR Calculator Tool", component: BMRToolCardTemplate },
+  { id: "macro-tool", name: "Macro Tracker Tool", component: MacroToolCardTemplate },
+];
+
+const featureTemplates: Template[] = [
+  { id: "browse-workouts", name: "Browse Workouts", component: BrowseWorkoutsFeatureTemplate },
+  { id: "browse-programs", name: "Browse Programs", component: BrowseProgramsFeatureTemplate },
+  { id: "explore-platform", name: "Explore Platform", component: ExplorePlatformFeatureTemplate },
+  { id: "unlimited-access", name: "Unlimited Access", component: UnlimitedAccessBenefitTemplate },
+  { id: "personalized-plans", name: "Personalized Plans", component: PersonalizedPlansBenefitTemplate },
+  { id: "save-favorites", name: "Save Favorites", component: SaveFavoritesBenefitTemplate },
+  { id: "personal-dashboard", name: "Personal Dashboard", component: PersonalDashboardBenefitTemplate },
+  { id: "goal-setting", name: "Goal Setting", component: GoalSettingBenefitTemplate },
 ];
 
 const communityTemplates: Template[] = [
-  { id: "workout-leaderboard", name: "Workout Leaderboard", description: "Top workout performers", component: WorkoutLeaderboardTemplate },
-  { id: "program-leaderboard", name: "Program Leaderboard", description: "Top program completers", component: ProgramLeaderboardTemplate },
+  { id: "workout-leaderboard", name: "Workout Leaderboard", component: WorkoutLeaderboardTemplate },
+  { id: "program-leaderboard", name: "Program Leaderboard", component: ProgramLeaderboardTemplate },
 ];
 
 export const InstagramImageGenerator = () => {
-  const [downloadingStates, setDownloadingStates] = useState<Record<string, boolean>>({});
-  const [templateSizes, setTemplateSizes] = useState<Record<string, string>>({});
+  const [selectedSizes, setSelectedSizes] = useState<Record<string, InstagramSize>>(
+    Object.fromEntries([
+      ...compositeTemplates,
+      ...serviceTemplates,
+      ...brandTemplates,
+      ...workoutTemplates,
+      ...programTemplates,
+      ...toolTemplates,
+      ...featureTemplates,
+      ...communityTemplates,
+    ].map(t => [t.id, INSTAGRAM_SIZES[0]]))
+  );
+  const [previewTemplate, setPreviewTemplate] = useState<Template | null>(null);
 
-  const handleDownload = async (template: Template) => {
-    setDownloadingStates(prev => ({ ...prev, [template.id]: true }));
-    
+  const handleDownload = async (templateId: string, templateName: string) => {
+    const size = selectedSizes[templateId];
     try {
-      const size = INSTAGRAM_SIZES.find(s => s.name === (templateSizes[template.id] || "square")) || INSTAGRAM_SIZES[0];
       await exportToInstagram(
-        `instagram-template-${template.id}`,
-        `smartygym-${template.id}-${size.name}`,
+        `template-${templateId}`,
+        `${templateName}-${size.name}`,
         size
       );
-      toast.success(`${template.name} downloaded successfully!`);
+      toast.success(`Downloaded ${templateName} as ${size.label}`);
     } catch (error) {
-      console.error("Error exporting template:", error);
-      toast.error("Failed to download template");
-    } finally {
-      setDownloadingStates(prev => ({ ...prev, [template.id]: false }));
+      toast.error("Failed to download image");
+      console.error(error);
     }
   };
 
-  const handleDownloadCategory = async (templates: Template[], categoryName: string) => {
-    toast.info(`Downloading all ${categoryName} templates...`);
-    
+  const handleDownloadAll = async (templates: Template[], category: string) => {
+    toast.loading(`Downloading all ${category} templates...`);
     for (const template of templates) {
-      await handleDownload(template);
-      await new Promise(resolve => setTimeout(resolve, 500));
+      await handleDownload(template.id, template.name);
     }
-    
-    toast.success(`All ${categoryName} templates downloaded!`);
+    toast.success(`All ${category} templates downloaded`);
   };
 
-  const renderTemplateGrid = (templates: Template[]) => (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-      {templates.map((template) => {
-        const TemplateComponent = template.component;
-        return (
-          <Card key={template.id} className="overflow-hidden">
-            <CardHeader className="pb-3">
-              <CardTitle className="text-lg">{template.name}</CardTitle>
-              <p className="text-sm text-muted-foreground">{template.description}</p>
-            </CardHeader>
-            <CardContent className="space-y-4">
+  const renderTemplateGrid = (templates: Template[], category: string) => (
+    <div className="space-y-4">
+      <div className="flex justify-end">
+        <Button onClick={() => handleDownloadAll(templates, category)} variant="outline" size="sm">
+          <Download className="w-4 h-4 mr-2" />
+          Download All in {category}
+        </Button>
+      </div>
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+        {templates.map((template) => {
+          const TemplateComponent = template.component;
+          return (
+            <Card key={template.id} className="overflow-hidden">
               <div 
-                id={`instagram-template-${template.id}`}
-                className="w-full aspect-square border-2 border-primary/20 rounded-lg overflow-hidden"
-                style={{ transform: "scale(0.3)", transformOrigin: "top left", width: "333%", height: "333%" }}
+                id={`template-${template.id}`} 
+                className="aspect-square bg-muted relative group cursor-pointer"
+                onClick={() => setPreviewTemplate(template)}
               >
-                <TemplateComponent />
+                <div className="scale-[0.23] origin-top-left">
+                  <TemplateComponent />
+                </div>
+                <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                  <Eye className="w-12 h-12 text-white" />
+                </div>
               </div>
-
-              <Select
-                value={templateSizes[template.id] || "square"}
-                onValueChange={(value) => setTemplateSizes(prev => ({ ...prev, [template.id]: value }))}
-              >
-                <SelectTrigger>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  {INSTAGRAM_SIZES.map((size) => (
-                    <SelectItem key={size.name} value={size.name}>
-                      {size.label}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-
-              <Button
-                onClick={() => handleDownload(template)}
-                disabled={downloadingStates[template.id]}
-                className="w-full"
-              >
-                {downloadingStates[template.id] ? (
-                  <>
-                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                    Downloading...
-                  </>
-                ) : (
-                  <>
-                    <Download className="w-4 h-4 mr-2" />
-                    Download JPEG
-                  </>
-                )}
-              </Button>
-            </CardContent>
-          </Card>
-        );
-      })}
+              
+              <CardContent className="p-3 space-y-2">
+                <h4 className="text-sm font-semibold truncate">{template.name}</h4>
+                <Select
+                  value={selectedSizes[template.id]?.name || "square"}
+                  onValueChange={(value) => {
+                    const size = INSTAGRAM_SIZES.find(s => s.name === value);
+                    if (size) {
+                      setSelectedSizes(prev => ({ ...prev, [template.id]: size }));
+                    }
+                  }}
+                >
+                  <SelectTrigger className="h-8 text-xs">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {INSTAGRAM_SIZES.map((size) => (
+                      <SelectItem key={size.name} value={size.name}>
+                        {size.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                <Button 
+                  onClick={() => handleDownload(template.id, template.name)}
+                  className="w-full h-8 text-xs"
+                  size="sm"
+                >
+                  <Download className="w-3 h-3 mr-1" />
+                  Download
+                </Button>
+              </CardContent>
+            </Card>
+          );
+        })}
+      </div>
     </div>
   );
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>Instagram Image Generator</CardTitle>
-        <p className="text-sm text-muted-foreground">
-          Generate Instagram-ready marketing images from all website content
-        </p>
-      </CardHeader>
-      <CardContent>
-        <Tabs defaultValue="services" className="w-full">
-          <TabsList className="grid w-full grid-cols-3 lg:grid-cols-6 mb-6">
-            <TabsTrigger value="services">Services</TabsTrigger>
-            <TabsTrigger value="brand">Brand</TabsTrigger>
-            <TabsTrigger value="workouts">Workouts</TabsTrigger>
-            <TabsTrigger value="programs">Programs</TabsTrigger>
-            <TabsTrigger value="tools">Tools</TabsTrigger>
-            <TabsTrigger value="community">Community</TabsTrigger>
-          </TabsList>
+    <>
+      <Card>
+        <CardHeader>
+          <CardTitle>Instagram Template Library</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <Tabs defaultValue="composite" className="w-full">
+            <TabsList className="grid w-full grid-cols-4 lg:grid-cols-8">
+              <TabsTrigger value="composite">Composite</TabsTrigger>
+              <TabsTrigger value="services">Services</TabsTrigger>
+              <TabsTrigger value="brand">Brand</TabsTrigger>
+              <TabsTrigger value="workouts">Workouts</TabsTrigger>
+              <TabsTrigger value="programs">Programs</TabsTrigger>
+              <TabsTrigger value="tools">Tools</TabsTrigger>
+              <TabsTrigger value="features">Features</TabsTrigger>
+              <TabsTrigger value="community">Community</TabsTrigger>
+            </TabsList>
 
-          <TabsContent value="services" className="space-y-4">
-            <div className="flex justify-end mb-4">
-              <Button 
-                onClick={() => handleDownloadCategory(servicesTemplates, "Services")}
-                variant="outline"
-              >
-                <Download className="w-4 h-4 mr-2" />
-                Download All Services
-              </Button>
-            </div>
-            {renderTemplateGrid(servicesTemplates)}
-          </TabsContent>
+            <TabsContent value="composite" className="mt-6">
+              {renderTemplateGrid(compositeTemplates, "Composite")}
+            </TabsContent>
 
-          <TabsContent value="brand" className="space-y-4">
-            <div className="flex justify-end mb-4">
-              <Button 
-                onClick={() => handleDownloadCategory(brandTemplates, "Brand")}
-                variant="outline"
-              >
-                <Download className="w-4 h-4 mr-2" />
-                Download All Brand
-              </Button>
-            </div>
-            {renderTemplateGrid(brandTemplates)}
-          </TabsContent>
+            <TabsContent value="services" className="mt-6">
+              {renderTemplateGrid(serviceTemplates, "Services")}
+            </TabsContent>
 
-          <TabsContent value="workouts" className="space-y-4">
-            <div className="flex justify-end mb-4">
-              <Button 
-                onClick={() => handleDownloadCategory(workoutTemplates, "Workouts")}
-                variant="outline"
-              >
-                <Download className="w-4 h-4 mr-2" />
-                Download All Workouts
-              </Button>
-            </div>
-            {renderTemplateGrid(workoutTemplates)}
-          </TabsContent>
+            <TabsContent value="brand" className="mt-6">
+              {renderTemplateGrid(brandTemplates, "Brand & Values")}
+            </TabsContent>
 
-          <TabsContent value="programs" className="space-y-4">
-            <div className="flex justify-end mb-4">
-              <Button 
-                onClick={() => handleDownloadCategory(programTemplates, "Programs")}
-                variant="outline"
-              >
-                <Download className="w-4 h-4 mr-2" />
-                Download All Programs
-              </Button>
-            </div>
-            {renderTemplateGrid(programTemplates)}
-          </TabsContent>
+            <TabsContent value="workouts" className="mt-6">
+              {renderTemplateGrid(workoutTemplates, "Workouts")}
+            </TabsContent>
 
-          <TabsContent value="tools" className="space-y-4">
-            <div className="flex justify-end mb-4">
-              <Button 
-                onClick={() => handleDownloadCategory(toolsTemplates, "Tools")}
-                variant="outline"
-              >
-                <Download className="w-4 h-4 mr-2" />
-                Download All Tools
-              </Button>
-            </div>
-            {renderTemplateGrid(toolsTemplates)}
-          </TabsContent>
+            <TabsContent value="programs" className="mt-6">
+              {renderTemplateGrid(programTemplates, "Programs")}
+            </TabsContent>
 
-          <TabsContent value="community" className="space-y-4">
-            <div className="flex justify-end mb-4">
-              <Button 
-                onClick={() => handleDownloadCategory(communityTemplates, "Community")}
-                variant="outline"
-              >
-                <Download className="w-4 h-4 mr-2" />
-                Download All Community
-              </Button>
+            <TabsContent value="tools" className="mt-6">
+              {renderTemplateGrid(toolTemplates, "Tools")}
+            </TabsContent>
+
+            <TabsContent value="features" className="mt-6">
+              {renderTemplateGrid(featureTemplates, "Features & Benefits")}
+            </TabsContent>
+
+            <TabsContent value="community" className="mt-6">
+              {renderTemplateGrid(communityTemplates, "Community")}
+            </TabsContent>
+          </Tabs>
+        </CardContent>
+      </Card>
+
+      <Dialog open={!!previewTemplate} onOpenChange={() => setPreviewTemplate(null)}>
+        <DialogContent className="max-w-4xl max-h-[90vh] overflow-auto">
+          <DialogHeader>
+            <DialogTitle>{previewTemplate?.name} - Full Preview</DialogTitle>
+          </DialogHeader>
+          {previewTemplate && (
+            <div className="space-y-4">
+              <div id={`preview-${previewTemplate.id}`} className="w-full overflow-auto">
+                <previewTemplate.component />
+              </div>
+              <div className="flex gap-2 justify-end">
+                <Select
+                  value={selectedSizes[previewTemplate.id]?.name || "square"}
+                  onValueChange={(value) => {
+                    const size = INSTAGRAM_SIZES.find(s => s.name === value);
+                    if (size) {
+                      setSelectedSizes(prev => ({ ...prev, [previewTemplate.id]: size }));
+                    }
+                  }}
+                >
+                  <SelectTrigger className="w-40">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {INSTAGRAM_SIZES.map((size) => (
+                      <SelectItem key={size.name} value={size.name}>
+                        {size.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                <Button onClick={() => handleDownload(previewTemplate.id, previewTemplate.name)}>
+                  <Download className="w-4 h-4 mr-2" />
+                  Download
+                </Button>
+              </div>
             </div>
-            {renderTemplateGrid(communityTemplates)}
-          </TabsContent>
-        </Tabs>
-      </CardContent>
-    </Card>
+          )}
+        </DialogContent>
+      </Dialog>
+    </>
   );
 };
