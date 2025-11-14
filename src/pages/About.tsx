@@ -89,15 +89,21 @@ const About = () => {
             <div className="absolute bottom-0 left-0 w-24 h-24 bg-accent/20 rounded-full -ml-12 -mb-12" aria-hidden="true"></div>
             
             <CardContent className="p-8 md:p-12 relative">
-              {/* Take A Tour Button - Top Right */}
-              <div className="absolute top-8 right-8 z-10">
+              {/* Take A Tour Button - Top Left */}
+              <div className="absolute top-8 left-8 z-10">
                 <Button 
                   size="lg"
                   onClick={() => navigate("/takeatour")}
-                  className="bg-background text-primary border-2 border-primary hover:bg-primary/5 shadow-lg hover:shadow-xl transition-all px-6 py-3 text-sm md:text-base font-semibold"
+                  className="relative overflow-hidden rounded-full bg-gradient-to-r from-primary to-accent text-white border-0 hover:scale-110 hover:shadow-2xl hover:shadow-primary/50 transition-all duration-300 px-8 py-4 text-base font-bold group"
                 >
-                  <Compass className="mr-2 h-4 w-4 md:h-5 md:w-5" />
-                  Take A Tour
+                  {/* Animated shine effect */}
+                  <span className="absolute inset-0 w-full h-full bg-gradient-to-r from-transparent via-white/30 to-transparent animate-shimmer -skew-x-12" />
+                  
+                  {/* Button content */}
+                  <span className="relative flex items-center gap-2">
+                    <Compass className="h-5 w-5 group-hover:rotate-180 transition-transform duration-500" />
+                    Take A Tour
+                  </span>
                 </Button>
               </div>
 
@@ -132,7 +138,7 @@ const About = () => {
                 </div>
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 max-w-4xl mx-auto">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 max-w-3xl mx-auto">
                 <div className="flex items-start gap-3 p-4 bg-background/50 rounded-lg border border-primary/20">
                   <CheckCircle2 className="w-5 h-5 text-primary flex-shrink-0 mt-1" />
                   <div>
@@ -157,7 +163,7 @@ const About = () => {
               </div>
 
               {/* Freedom Statement - Emphasized */}
-              <div className="mt-6 mb-0 max-w-4xl mx-auto">
+              <div className="mt-6 mb-0 max-w-3xl mx-auto">
                 <div className="bg-gradient-to-r from-primary/10 to-accent/15 backdrop-blur-sm p-4 rounded-lg border-2 border-primary/40 shadow-md">
                   <div className="flex items-center justify-center gap-4">
                     <Sparkles className="w-6 h-6 text-primary flex-shrink-0" />
