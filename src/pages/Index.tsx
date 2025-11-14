@@ -269,10 +269,10 @@ const Index = () => {
           <div className="container mx-auto max-w-5xl relative z-10">
             <ScrollReveal>
               <Card className="border-2 border-primary bg-gradient-to-br from-primary/5 via-background to-accent/5 backdrop-blur-sm">
-                <div className="p-4 sm:p-5 md:p-6 space-y-4 sm:space-y-5">
+                <div className="p-2 sm:p-3 md:p-4 space-y-2 sm:space-y-3">
                   
                   {/* Logo & Main Headline */}
-                  <div className="text-center space-y-4">
+                  <div className="text-center space-y-2">
                     <img 
                       src={smartyGymLogo} 
                       alt="Smarty Gym Logo" 
