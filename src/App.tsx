@@ -50,6 +50,7 @@ import Community from "./pages/Community";
 import AdminBackoffice from "./pages/AdminBackoffice";
 import MigrateContent from "./pages/MigrateContent";
 import NotificationTest from "./pages/NotificationTest";
+import ProcessLogo from "./pages/ProcessLogo";
 import { AccessGate } from "./components/AccessGate";
 import { WhatsAppButton } from "./components/WhatsAppButton";
 import { InstallPWA } from "./components/InstallPWA";
@@ -120,6 +121,7 @@ const App = () => (
                   <Route path="/admin" element={<AdminBackoffice />} />
                   <Route path="/admin/migrate" element={<MigrateContent />} />
                   <Route path="/admin/notification-test" element={<NotificationTest />} />
+                  <Route path="/admin/process-logo" element={<ProcessLogo />} />
                 </Route>
                 
                 {/* Public routes */}
