@@ -6,7 +6,7 @@ import { PageBreadcrumbs } from "@/components/PageBreadcrumbs";
 import { InfoRibbon } from "@/components/InfoRibbon";
 import { ArrowLeft, Dumbbell, Flame, Zap, Heart, Move, Activity, TrendingUp } from "lucide-react";
 import { BackToTop } from "@/components/BackToTop";
-import { TimedPopup } from "@/components/TimedPopup";
+
 import { useAccessControl } from "@/hooks/useAccessControl";
 import { useShowBackButton } from "@/hooks/useShowBackButton";
 import { ScrollReveal } from "@/components/ScrollReveal";
@@ -87,7 +87,6 @@ const WorkoutFlow = () => {
       
       <div className="min-h-screen bg-background">
       <BackToTop />
-      <TimedPopup />
       <div className="container mx-auto max-w-6xl px-4 py-8">
         {canGoBack && (
           <div className="mb-6">

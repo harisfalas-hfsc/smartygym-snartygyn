@@ -272,11 +272,11 @@ const Index = () => {
                 <div className="p-6 sm:p-8 md:p-12 space-y-6 sm:space-y-8">
                   
                   {/* Logo & Main Headline */}
-                  <div className="text-center space-y-4">
+                  <div className="text-center space-y-8">
                     <img 
                       src={smartyGymLogo} 
                       alt="Smarty Gym Logo" 
-                      className="h-16 sm:h-20 md:h-24 mx-auto"
+                      className="h-48 sm:h-60 md:h-72 mx-auto max-w-md"
                     />
                     <h1 className="text-3xl sm:text-4xl md:text-5xl font-black bg-gradient-to-r from-primary via-amber-400 to-primary bg-clip-text text-transparent">
                       Welcome to SmartyGym
