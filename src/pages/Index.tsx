@@ -263,17 +263,33 @@ const Index = () => {
           
           <div className="container mx-auto max-w-6xl relative z-10">
             <ScrollReveal>
-              <Card className="border-2 border-primary bg-gradient-to-br from-yellow-50/50 via-background to-yellow-50/30 backdrop-blur-sm">
+              <Card 
+                itemScope
+                itemType="https://schema.org/Organization"
+                className="border-2 border-primary bg-gradient-to-br from-yellow-50/50 via-background to-yellow-50/30 backdrop-blur-sm"
+                data-hero-section="true"
+                data-keywords="smarty gym, online gym, online fitness, smartygym.com, Haris Falas Cyprus, online gym Cyprus"
+                aria-label="Smarty Gym Cyprus - Your online gym and fitness platform - smartygym.com"
+              >
                 <div className="p-8 sm:p-10 md:p-12 space-y-6 sm:space-y-8">
                   
                   {/* Main Headline */}
                   <div className="text-center space-y-2 sm:space-y-3">
-                    <h1 className="text-3xl sm:text-4xl md:text-5xl font-black bg-gradient-to-r from-primary via-amber-400 to-primary bg-clip-text text-transparent">
-                      Welcome to SmartyGym
+                    <h1 
+                      className="text-3xl sm:text-4xl md:text-5xl font-black bg-gradient-to-r from-primary via-amber-400 to-primary bg-clip-text text-transparent"
+                      itemProp="name"
+                    >
+                      Welcome to Smarty Gym Cyprus - Your Online Gym
                     </h1>
-                    <p className="text-lg sm:text-xl text-muted-foreground font-medium">
-                      Your Gym Re-imagined. Anywhere, Anytime.
+                    <p 
+                      className="text-lg sm:text-xl text-muted-foreground font-medium"
+                      itemProp="slogan"
+                    >
+                      Your Gym Re-imagined. Anywhere, Anytime - Online Fitness at smartygym.com
                     </p>
+                    <meta itemProp="url" content="https://smartygym.com" />
+                    <meta itemProp="description" content="Smarty Gym Cyprus - #1 online gym and fitness platform by Haris Falas - smartygym.com" />
+                    <meta itemProp="foundingLocation" content="Cyprus" />
                   </div>
 
                   {/* Three Core Messages: WHAT, WHY, HOW */}

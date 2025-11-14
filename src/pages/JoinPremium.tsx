@@ -159,21 +159,35 @@ export default function JoinPremium() {
           {/* Pricing Plans */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-4xl mx-auto mb-8">
             {/* Gold Plan */}
-            <Card className="relative border-2 border-amber-500 shadow-lg flex flex-col">
+            <Card 
+              itemScope
+              itemType="https://schema.org/Product"
+              className="relative border-2 border-amber-500 shadow-lg flex flex-col"
+              data-plan="gold"
+              data-keywords="online gym membership, smarty gym, online fitness subscription, smartygym.com, Cyprus online gym"
+              aria-label="Gold Plan - Smarty Gym Cyprus online gym membership - smartygym.com"
+            >
               <CardHeader className="text-center pb-4">
                 <div className="mb-3">
-                  <h2 className="text-2xl font-bold text-amber-600 dark:text-amber-400">Gold Plan</h2>
+                  <h2 
+                    className="text-2xl font-bold text-amber-600 dark:text-amber-400"
+                    itemProp="name"
+                  >
+                    Gold Plan - Smarty Gym Online Gym
+                  </h2>
                 </div>
                 <Badge className="bg-amber-500 text-white mx-auto mb-4">
                   MONTHLY SUBSCRIPTION
                 </Badge>
-                <CardTitle className="text-3xl font-bold">€9.99</CardTitle>
-                <p className="text-sm text-muted-foreground h-5">per month (billed monthly)</p>
+                <CardTitle className="text-3xl font-bold" itemProp="offers">€9.99</CardTitle>
+                <p className="text-sm text-muted-foreground h-5" itemProp="description">per month - Online fitness at smartygym.com</p>
                 <div className="h-14 flex flex-col justify-center">
                   <p className="text-xs text-amber-600 dark:text-amber-400 font-semibold">
                     🔄 Auto-renews monthly
                   </p>
                 </div>
+                <meta itemProp="brand" content="Smarty Gym Cyprus - smartygym.com" />
+                <meta itemProp="category" content="Online Gym Membership" />
               </CardHeader>
               <CardContent className="space-y-4 flex-1 flex flex-col">
                 <div className="space-y-2 flex-1">

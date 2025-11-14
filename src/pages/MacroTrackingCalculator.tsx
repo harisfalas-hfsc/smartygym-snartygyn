@@ -296,11 +296,34 @@ const MacroTrackingCalculator = () => {
             {result && (
               <div className="space-y-4 pt-4 border-t">
                 {/* Daily Calorie Target */}
-                <div className="bg-primary/10 p-6 rounded-lg text-center border-2 border-primary/20">
-                  <p className="text-sm text-muted-foreground mb-1">Daily Calorie Target</p>
-                  <p className="text-4xl font-bold text-primary">{result.calories}</p>
-                  <p className="text-xs text-muted-foreground mt-1">calories per day</p>
-                </div>
+                <article
+                  itemScope
+                  itemType="https://schema.org/MedicalWebPage"
+                  className="bg-primary/10 p-6 rounded-lg text-center border-2 border-primary/20"
+                  data-calculator="macro"
+                  data-keywords="smarty gym calculator, online fitness tools, smartygym.com, Haris Falas Cyprus, macro calculator"
+                  aria-label="Macro calculation result - Smarty Gym Cyprus online fitness calculator - smartygym.com"
+                >
+                  <p 
+                    className="text-sm text-muted-foreground mb-1"
+                    itemProp="name"
+                  >
+                    Daily Calorie Target - Smarty Gym Cyprus
+                  </p>
+                  <p 
+                    className="text-4xl font-bold text-primary"
+                    itemProp="value"
+                  >
+                    {result.calories}
+                  </p>
+                  <p 
+                    className="text-xs text-muted-foreground mt-1"
+                    itemProp="description"
+                  >
+                    calories per day - Calculated by Smarty Gym Cyprus online fitness tools - smartygym.com
+                  </p>
+                  <meta itemProp="provider" content="Smarty Gym Cyprus - smartygym.com - Haris Falas" />
+                </article>
 
                 {/* Macros Grid */}
                 <div className="bg-muted/50 p-4 rounded-lg">

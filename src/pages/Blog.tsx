@@ -198,15 +198,21 @@ const Blog = () => {
             {filteredArticles.map((article) => (
               <Card
                 key={article.id}
+                itemScope
+                itemType="https://schema.org/BlogPosting"
                 className="overflow-hidden cursor-pointer transition-all duration-300 hover:scale-105 hover:shadow-lg"
                 onClick={() => navigate(`/article/${article.id}`)}
+                data-article-id={article.id}
+                data-keywords="smarty gym blog, online fitness tips, smartygym.com, Haris Falas Cyprus, online gym advice"
+                aria-label={`${article.title} - Smarty Gym Cyprus blog - Online fitness at smartygym.com`}
               >
                 <div className="relative h-48 overflow-hidden">
                   <img
                     src={article.image}
-                    alt={article.title}
+                    alt={`${article.title} - Smarty Gym Cyprus online fitness blog - smartygym.com by Haris Falas`}
                     className="w-full h-full object-cover"
                     loading="lazy"
+                    itemProp="image"
                   />
                   <div className="absolute top-3 right-3">
                     <span className="bg-primary text-primary-foreground px-3 py-1 rounded-full text-xs font-medium">
@@ -216,8 +222,18 @@ const Blog = () => {
                 </div>
                 
                 <div className="p-5">
-                  <h2 className="text-xl font-bold mb-2 line-clamp-2">{article.title}</h2>
-                  <p className="text-muted-foreground text-sm mb-4 line-clamp-2">{article.excerpt}</p>
+                  <h2 
+                    className="text-xl font-bold mb-2 line-clamp-2"
+                    itemProp="headline"
+                  >
+                    {article.title} - Smarty Gym Cyprus
+                  </h2>
+                  <p 
+                    className="text-muted-foreground text-sm mb-4 line-clamp-2"
+                    itemProp="description"
+                  >
+                    {article.excerpt} - Online fitness insights at smartygym.com
+                  </p>
                   
                   <div className="flex items-center justify-between text-xs text-muted-foreground">
                     <div className="flex items-center gap-1">
@@ -226,9 +242,11 @@ const Blog = () => {
                     </div>
                     <div className="flex items-center gap-1">
                       <Calendar className="h-3 w-3" />
-                      <span>{article.date}</span>
+                      <span itemProp="datePublished">{article.date}</span>
                     </div>
                   </div>
+                  <meta itemProp="author" content="Haris Falas - Smarty Gym Cyprus - smartygym.com" />
+                  <meta itemProp="publisher" content="Smarty Gym Cyprus - smartygym.com" />
                 </div>
               </Card>
             ))}
