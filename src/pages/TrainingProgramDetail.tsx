@@ -4,7 +4,7 @@ import { Helmet } from "react-helmet";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { ArrowLeft, Calendar, Eye, CheckCircle, Search, X, Sparkles, Star, Crown, Euro, Check } from "lucide-react";
+import { ArrowLeft, Calendar, Eye, CheckCircle, Search, X, Sparkles, Star, Crown, ShoppingCart, Check } from "lucide-react";
 import { AccessGate } from "@/components/AccessGate";
 import { CompactFilters } from "@/components/CompactFilters";
 import { PageBreadcrumbs } from "@/components/PageBreadcrumbs";
@@ -737,7 +737,7 @@ const TrainingProgramDetail = () => {
                     {program.is_premium ? (
                       program.is_standalone_purchase && program.price ? (
                         <span className="inline-flex items-center gap-1 bg-gradient-to-r from-green-500 to-emerald-600 text-white text-xs font-semibold px-2 py-1 rounded-full">
-                          <Euro className="h-3 w-3 shrink-0" />
+                          <ShoppingCart className="h-3 w-3 shrink-0" />
                           €{Number(program.price).toFixed(2)}
                         </span>
                       ) : (
