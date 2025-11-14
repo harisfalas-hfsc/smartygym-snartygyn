@@ -182,7 +182,7 @@ export const Navigation = () => {
   };
 
   return (
-    <header className="sticky top-0 z-50 bg-background border-b border-border py-2 px-4">
+    <header className="sticky top-0 z-50 bg-background border-b border-border py-1 px-4">
       <div className="container mx-auto max-w-7xl">
         <div className="flex justify-between items-center gap-4">
           {/* LEFT SECTION - Hamburger Menu + Social Media Icons */}
