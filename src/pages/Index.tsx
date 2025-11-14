@@ -347,7 +347,7 @@ const Index = () => {
                 </TooltipProvider>
                 
                 {/* Title and Subtitle */}
-                <h1 className="text-3xl sm:text-4xl md:text-5xl font-black bg-gradient-to-r from-primary via-primary/90 to-primary bg-clip-text text-transparent drop-shadow-[0_0_15px_rgba(var(--primary),0.3)] px-4 sm:px-12">
+                <h1 className="text-3xl sm:text-4xl md:text-5xl font-black bg-gradient-to-r from-primary via-amber-400 to-primary bg-clip-text text-transparent [text-shadow:0_2px_12px_hsl(var(--primary)/0.4)] px-4 sm:px-12">
                   Smarty Gym
                 </h1>
                 <p className="text-xs sm:text-sm text-muted-foreground mt-1 px-4 sm:px-12">
