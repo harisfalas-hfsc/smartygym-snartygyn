@@ -98,7 +98,6 @@ const TrainingProgramFlow = () => {
         
         <PageTitleCard
           title="Training Programs" 
-          subtitle="Purchase individual programs or unlock unlimited access with a premium plan"
           icon={Target}
         />
         

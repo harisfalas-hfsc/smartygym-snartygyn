@@ -104,7 +104,6 @@ const WorkoutFlow = () => {
         
         <PageTitleCard 
           title="Workouts" 
-          subtitle="Purchase individual workouts or unlock unlimited access with a premium plan"
           icon={Dumbbell}
         />
         

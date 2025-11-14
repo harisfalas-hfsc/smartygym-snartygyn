@@ -289,11 +289,7 @@ const PersonalTraining = () => {
           <PageTitleCard
             title="Personal Training" 
             icon={UserCheck}
-          >
-            <p className="text-sm sm:text-base text-muted-foreground">
-              Get your customized and tailor-made program by the fitness expert and sports scientist, <a href="/coach-profile" className="text-primary hover:underline font-medium">Haris Falas</a>
-            </p>
-          </PageTitleCard>
+          />
 
           <Card className="mb-6 sm:mb-8 bg-gradient-to-br from-primary/5 to-primary/10 border-primary/30">
             <CardHeader className="text-center p-4 sm:p-6">

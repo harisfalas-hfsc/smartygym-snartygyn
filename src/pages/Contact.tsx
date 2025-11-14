@@ -310,13 +310,8 @@ const Contact = () => {
           {/* Hero Section */}
           <PageTitleCard
             title="Contact" 
-            subtitle="Have questions? Need support? Want to discuss your fitness goals?"
             icon={Mail} 
-          >
-            <p className="text-sm sm:text-base text-muted-foreground">
-              Get in touch with <a href="/coach-profile" className="text-primary hover:underline font-medium"><strong>Haris Falas</strong></a> and the Smarty Gym team
-            </p>
-          </PageTitleCard>
+          />
 
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
             {/* Contact Form */}

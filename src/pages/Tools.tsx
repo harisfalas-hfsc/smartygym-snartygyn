@@ -74,7 +74,6 @@ const Tools = () => {
 
         <PageTitleCard 
           title="Smart Tools" 
-          subtitle="Free fitness calculators to support your training"
           icon={Wrench} 
         />
         

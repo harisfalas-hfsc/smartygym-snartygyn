@@ -241,7 +241,6 @@ const Community = () => {
           
           <PageTitleCard
             title="Community" 
-            subtitle="Connect with other members, share your progress, and celebrate your achievements together"
             icon={Users} 
           />
 

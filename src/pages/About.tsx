@@ -77,13 +77,8 @@ const About = () => {
         {/* Hero Section */}
         <PageTitleCard 
           title="About" 
-          subtitle="Fitness Without the Chains | smartygym.com"
           icon={Info}
-        >
-          <p className="text-sm sm:text-base text-muted-foreground">
-            Founded by <a href="/coach-profile" className="text-primary hover:underline font-medium">Haris Falas</a> - BSc Sports Science | EXOS Specialist | CSCS
-          </p>
-        </PageTitleCard>
+        />
 
         {/* NO AI Section - Main Differentiator */}
         <section className="mb-16">
