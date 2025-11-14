@@ -32,6 +32,18 @@ export const AccessGate = ({
   const { user, userTier, isLoading, hasPurchased } = useAccessControl();
   const navigate = useNavigate();
 
+  // Debug logging for access control decisions
+  console.log('[AccessGate] Access check:', {
+    requirePremium,
+    requireAuth,
+    userTier,
+    contentId,
+    contentType,
+    contentName,
+    isLoading,
+    user: user?.id
+  });
+
   // FREE CONTENT: Skip all checks if not premium required
   if (!requirePremium) {
     // Only check if auth is required
@@ -173,5 +185,42 @@ export const AccessGate = ({
     );
   }
 
+  // SECURITY FIX: Block premium content for non-premium users
+  if (requirePremium && userTier !== "premium") {
+    console.log('[AccessGate] BLOCKING: User tier is not premium', { userTier, requirePremium });
+    
+    return (
+      <div className="flex items-center justify-center min-h-[400px] p-4">
+        <Card className="max-w-md w-full border-2 border-primary/30">
+          <CardContent className="pt-6 text-center space-y-4">
+            <div className="flex justify-center">
+              <div className="p-4 bg-primary/10 rounded-full">
+                <Crown className="w-12 h-12 text-primary" />
+              </div>
+            </div>
+            <h2 className="text-2xl font-bold">Premium Content</h2>
+            <p className="text-muted-foreground">
+              This {contentType} is only available to premium members.
+            </p>
+            <div className="space-y-2 pt-4">
+              <Button onClick={() => navigate("/premiumbenefits")} className="w-full" size="lg">
+                <Crown className="w-4 h-4 mr-2" />
+                View Premium Plans
+              </Button>
+              <Button 
+                onClick={() => navigate(-1)} 
+                variant="outline" 
+                className="w-full"
+              >
+                Go Back
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
+  console.log('[AccessGate] GRANTING ACCESS', { userTier, requirePremium });
   return <>{children}</>;
 };
