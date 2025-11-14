@@ -465,6 +465,20 @@ const About = () => {
                   </AccordionContent>
                 </AccordionItem>
 
+                <AccordionItem value="item-3a">
+                  <AccordionTrigger>What's the difference between a workout and training program?</AccordionTrigger>
+                  <AccordionContent>
+                    A <strong>workout</strong> is a standalone training session designed for a specific goal — whether that's calorie burning, 
+                    strength building, cardio conditioning, mobility work, or power development. It's perfect when you want a single, 
+                    focused session that fits your current needs or time constraints.
+                    <br /><br />
+                    A <strong>training program</strong> is a complete, structured plan that runs up to 8 weeks and contains multiple workouts 
+                    scheduled for every day of the week. Programs are designed with progression in mind, helping you achieve long-term 
+                    fitness goals like building muscle hypertrophy, improving cardiovascular endurance, enhancing functional strength, 
+                    or losing weight through systematic, progressive training over time.
+                  </AccordionContent>
+                </AccordionItem>
+
                 <AccordionItem value="item-4">
                   <AccordionTrigger>Do I need equipment to use Smarty Gym?</AccordionTrigger>
                   <AccordionContent>
