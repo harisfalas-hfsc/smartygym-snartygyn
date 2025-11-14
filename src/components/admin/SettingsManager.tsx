@@ -468,13 +468,16 @@ export const SettingsManager = () => {
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="15">15 minutes</SelectItem>
-                      <SelectItem value="30">30 minutes</SelectItem>
-                      <SelectItem value="45">45 minutes</SelectItem>
-                      <SelectItem value="60">60 minutes</SelectItem>
+                      <SelectItem value="30">30 minutes (Testing only)</SelectItem>
+                      <SelectItem value="60">1 hour</SelectItem>
+                      <SelectItem value="240">4 hours</SelectItem>
+                      <SelectItem value="480">8 hours</SelectItem>
+                      <SelectItem value="1440">24 hours (Recommended)</SelectItem>
+                      <SelectItem value="2880">48 hours</SelectItem>
+                      <SelectItem value="10080">7 days</SelectItem>
                     </SelectContent>
                   </Select>
-                  <p className="text-xs text-muted-foreground">Users will see a warning 2 minutes before auto-logout</p>
+                  <p className="text-xs text-muted-foreground">⚠️ Setting this too low may prevent users from receiving push notifications. 24 hours is recommended for optimal notification delivery. Users will see a warning 10 minutes before auto-logout.</p>
                 </div>
               </div>
               <Button onClick={handleSaveAccessControl} disabled={loading}>

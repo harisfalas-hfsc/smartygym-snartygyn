@@ -53,6 +53,39 @@ export const AuthenticatedLayout = () => {
       }
     });
 
+    // Listen for session refresh messages from service worker (when notification clicked)
+    if ('serviceWorker' in navigator) {
+      const messageHandler = async (event: MessageEvent) => {
+        if (event.data.type === 'REFRESH_SESSION') {
+          console.log('Refreshing session from notification click');
+          const { data: { session }, error } = await supabase.auth.refreshSession();
+          if (session && !error) {
+            console.log('Session refreshed successfully');
+          }
+        }
+      };
+      
+      navigator.serviceWorker.addEventListener('message', messageHandler);
+      
+      // Check URL for refresh_session flag
+      const urlParams = new URLSearchParams(window.location.search);
+      if (urlParams.get('refresh_session') === 'true') {
+        supabase.auth.refreshSession().then(({ data: { session }, error }) => {
+          if (session && !error) {
+            console.log('Session refreshed from notification click');
+          }
+        });
+        
+        // Clean up URL
+        window.history.replaceState({}, '', window.location.pathname);
+      }
+      
+      return () => {
+        navigator.serviceWorker.removeEventListener('message', messageHandler);
+        subscription.unsubscribe();
+      };
+    }
+
     return () => subscription.unsubscribe();
   }, [navigate]);
 
