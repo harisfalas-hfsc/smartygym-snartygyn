@@ -466,7 +466,7 @@ const About = () => {
                 </AccordionItem>
 
                 <AccordionItem value="item-3a">
-                  <AccordionTrigger>What's the difference between a workout and training program?</AccordionTrigger>
+                  <AccordionTrigger className="text-left">What's the difference between a workout and training program?</AccordionTrigger>
                   <AccordionContent>
                     A <strong>workout</strong> is a standalone training session designed for a specific goal — whether that's calorie burning, 
                     strength building, cardio conditioning, mobility work, or power development. It's perfect when you want a single, 
