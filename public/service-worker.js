@@ -70,13 +70,23 @@ self.addEventListener('notificationclick', (event) => {
       .then((windowClients) => {
         // Check if there's already a window open
         for (let client of windowClients) {
-          if (client.url === urlToOpen && 'focus' in client) {
+          if (client.url.includes(new URL(urlToOpen, self.location.origin).pathname) && 'focus' in client) {
+            // Send message to client to refresh session
+            client.postMessage({
+              type: 'REFRESH_SESSION',
+              timestamp: Date.now()
+            });
+            console.log('Sent REFRESH_SESSION message to client');
             return client.focus();
           }
         }
-        // If no window is open, open a new one
+        
+        // If no window is open, open a new one with session refresh flag
         if (clients.openWindow) {
-          return clients.openWindow(urlToOpen);
+          const fullUrl = new URL(urlToOpen, self.location.origin);
+          fullUrl.searchParams.set('refresh_session', 'true');
+          console.log('Opening new window with session refresh:', fullUrl.toString());
+          return clients.openWindow(fullUrl.toString());
         }
       })
   );
