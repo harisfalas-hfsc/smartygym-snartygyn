@@ -144,8 +144,8 @@ const About = () => {
                 >
                   <CheckCircle2 className="w-5 h-5 text-primary flex-shrink-0 mt-1" aria-hidden="true" />
                   <div>
-                    <p className="font-semibold text-sm mb-1" itemProp="name">Real Expertise - Smarty Gym Cyprus</p>
-                    <p className="text-xs text-muted-foreground" itemProp="description">Sports science degree & online fitness coaching at smartygym.com - Haris Falas Cyprus</p>
+                    <p className="font-semibold text-sm mb-1" itemProp="name">Real Expertise</p>
+                    <p className="text-xs text-muted-foreground" itemProp="description">Sports science degree & years of coaching</p>
                   </div>
                 </article>
                 <article 
@@ -159,8 +159,8 @@ const About = () => {
                 >
                   <CheckCircle2 className="w-5 h-5 text-primary flex-shrink-0 mt-1" aria-hidden="true" />
                   <div>
-                    <p className="font-semibold text-sm mb-1" itemProp="name">Personal Touch - Smarty Gym</p>
-                    <p className="text-xs text-muted-foreground" itemProp="description">Direct access to Haris and the team at smartygym.com - Online gym Cyprus</p>
+                    <p className="font-semibold text-sm mb-1" itemProp="name">Personal Touch</p>
+                    <p className="text-xs text-muted-foreground" itemProp="description">Every program refined through real client feedback</p>
                   </div>
                 </article>
                 <article 
@@ -174,8 +174,8 @@ const About = () => {
                 >
                   <CheckCircle2 className="w-5 h-5 text-primary flex-shrink-0 mt-1" aria-hidden="true" />
                   <div>
-                    <p className="font-semibold text-sm mb-1" itemProp="name">Not a Robot - Smarty Gym Cyprus</p>
-                    <p className="text-xs text-muted-foreground" itemProp="description">Real people who care about your progress at smartygym.com - Haris Falas Cyprus</p>
+                    <p className="font-semibold text-sm mb-1" itemProp="name">Not a Robot</p>
+                    <p className="text-xs text-muted-foreground" itemProp="description">Human-designed workouts backed by science, not AI</p>
                   </div>
                 </article>
               </div>

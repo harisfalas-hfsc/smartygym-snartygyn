@@ -279,13 +279,13 @@ const Index = () => {
                       className="text-3xl sm:text-4xl md:text-5xl font-black bg-gradient-to-r from-primary via-amber-400 to-primary bg-clip-text text-transparent"
                       itemProp="name"
                     >
-                      Welcome to Smarty Gym Cyprus - Your Online Gym
+                      Welcome to SmartyGym
                     </h1>
                     <p 
                       className="text-lg sm:text-xl text-muted-foreground font-medium"
                       itemProp="slogan"
                     >
-                      Your Gym Re-imagined. Anywhere, Anytime - Online Fitness at smartygym.com
+                      Your Gym Re-imagined. Anywhere, Anytime.
                     </p>
                     <meta itemProp="url" content="https://smartygym.com" />
                     <meta itemProp="description" content="Smarty Gym Cyprus - #1 online gym and fitness platform by Haris Falas - smartygym.com" />

@@ -128,16 +128,16 @@ const TrainingProgramFlow = () => {
                         className="font-semibold text-lg mb-2"
                         itemProp="name"
                       >
-                        {program.title} - Smarty Gym Online Program
+                        {program.title}
                       </h3>
                       <p 
                         className="text-sm text-muted-foreground mb-3"
                         itemProp="description"
                       >
-                        {program.description} - Online fitness program at smartygym.com
+                        {program.description}
                       </p>
                       <p className="text-xs text-muted-foreground mb-3">
-                        By <a href="/coach-profile" className="text-primary hover:underline font-medium" itemProp="instructor">Haris Falas</a> — Sports Scientist at Smarty Gym Cyprus
+                        By <a href="/coach-profile" className="text-primary hover:underline font-medium" itemProp="instructor">Haris Falas</a>
                       </p>
                       <div className="flex flex-wrap gap-2 text-xs mt-2">
                         <span className="bg-primary/10 text-primary px-2 py-1 rounded" itemProp="duration">6-8 weeks</span>

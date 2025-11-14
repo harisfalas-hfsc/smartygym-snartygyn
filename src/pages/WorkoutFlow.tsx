@@ -134,16 +134,13 @@ const WorkoutFlow = () => {
                         className="font-semibold text-lg mb-2"
                         itemProp="name"
                       >
-                        {workout.title} Workouts - Smarty Gym
+                        {workout.title}
                       </h3>
                       <p 
                         className="text-sm text-muted-foreground mb-3"
                         itemProp="description"
                       >
-                        {workout.description} - Online gym workouts at smartygym.com
-                      </p>
-                      <p className="text-xs text-muted-foreground mb-3">
-                        By <a href="/coach-profile" className="text-primary hover:underline font-medium" itemProp="author">Haris Falas</a> — Sports Scientist at Smarty Gym Cyprus
+                        {workout.description}
                       </p>
                       <meta itemProp="exerciseType" content={workout.title} />
                       <meta itemProp="provider" content="Smarty Gym Cyprus - Online Gym - smartygym.com" />

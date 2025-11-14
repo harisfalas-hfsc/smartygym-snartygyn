@@ -173,14 +173,14 @@ export default function JoinPremium() {
                     className="text-2xl font-bold text-amber-600 dark:text-amber-400"
                     itemProp="name"
                   >
-                    Gold Plan - Smarty Gym Online Gym
+                    Gold Plan
                   </h2>
                 </div>
                 <Badge className="bg-amber-500 text-white mx-auto mb-4">
                   MONTHLY SUBSCRIPTION
                 </Badge>
                 <CardTitle className="text-3xl font-bold" itemProp="offers">€9.99</CardTitle>
-                <p className="text-sm text-muted-foreground h-5" itemProp="description">per month - Online fitness at smartygym.com</p>
+                <p className="text-sm text-muted-foreground h-5" itemProp="description">per month</p>
                 <div className="h-14 flex flex-col justify-center">
                   <p className="text-xs text-amber-600 dark:text-amber-400 font-semibold">
                     🔄 Auto-renews monthly
