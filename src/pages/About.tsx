@@ -143,6 +143,18 @@ const About = () => {
                   </div>
                 </div>
               </div>
+
+              {/* Freedom Statement - Emphasized */}
+              <div className="mt-6 max-w-3xl mx-auto">
+                <div className="bg-gradient-to-r from-primary/10 to-accent/15 backdrop-blur-sm p-6 rounded-lg border-2 border-primary/40 shadow-md">
+                  <div className="flex items-center justify-center gap-3 mb-3">
+                    <Sparkles className="w-6 h-6 text-primary" />
+                  </div>
+                  <p className="text-xl font-bold text-center text-foreground">
+                    At smartygym.com, we don't just sell fitness. We sell freedom.
+                  </p>
+                </div>
+              </div>
             </CardContent>
           </Card>
           
