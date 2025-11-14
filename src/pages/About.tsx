@@ -89,6 +89,18 @@ const About = () => {
             <div className="absolute bottom-0 left-0 w-24 h-24 bg-accent/20 rounded-full -ml-12 -mb-12" aria-hidden="true"></div>
             
             <CardContent className="p-8 md:p-12 relative">
+              {/* Take A Tour Button - Top Right */}
+              <div className="absolute top-8 right-8 z-10">
+                <Button 
+                  size="lg"
+                  onClick={() => navigate("/takeatour")}
+                  className="bg-background text-primary border-2 border-primary hover:bg-primary/5 shadow-lg hover:shadow-xl transition-all px-6 py-3 text-sm md:text-base font-semibold"
+                >
+                  <Compass className="mr-2 h-4 w-4 md:h-5 md:w-5" />
+                  Take A Tour
+                </Button>
+              </div>
+
               <div className="flex items-center justify-center gap-3 mb-6">
                 <div className="w-16 h-16 rounded-full bg-primary/20 flex items-center justify-center">
                   <UserCheck className="w-8 h-8 text-primary" />
@@ -145,7 +157,7 @@ const About = () => {
               </div>
 
               {/* Freedom Statement - Emphasized */}
-              <div className="mt-6">
+              <div className="mt-6 mb-0 max-w-4xl mx-auto">
                 <div className="bg-gradient-to-r from-primary/10 to-accent/15 backdrop-blur-sm p-4 rounded-lg border-2 border-primary/40 shadow-md">
                   <div className="flex items-center justify-center gap-4">
                     <Sparkles className="w-6 h-6 text-primary flex-shrink-0" />
@@ -157,17 +169,6 @@ const About = () => {
                 </div>
               </div>
 
-              {/* Take A Tour Button - Inside Card */}
-              <div className="flex justify-center mt-6">
-                <Button 
-                  size="lg"
-                  onClick={() => navigate("/takeatour")}
-                  className="bg-background text-primary border-2 border-primary hover:bg-primary/5 shadow-lg hover:shadow-xl transition-all px-12 py-6 text-lg font-semibold"
-                >
-                  <Compass className="mr-3 h-6 w-6" />
-                  Take A Tour
-                </Button>
-              </div>
             </CardContent>
           </Card>
         </section>
