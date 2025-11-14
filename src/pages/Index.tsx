@@ -80,7 +80,7 @@ const Index = () => {
     id: "trainingprogram",
     icon: Calendar,
     title: "Training Programs",
-    description: "Structured 6-8 week programs to achieve your specific goals"
+    description: "Structured training programs to achieve your long-term specific goals"
   }, {
     id: "exerciselibrary",
     icon: BookOpen,

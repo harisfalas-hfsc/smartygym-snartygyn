@@ -497,7 +497,7 @@ const About = () => {
                     Premium membership unlocks unlimited access to all workouts and training programs, full dashboard access with progress tracking, 
                     complete workout and program history, ability to favorite and rate all content, and direct WhatsApp support from the coaching team. 
                     Free subscribers can access selected free workouts, programs, calculators, and the exercise library, but Premium gives you the full 
-                    Smarty Gym experience with structured 6-8 week programs and personalized support. Choose monthly (€9.99/month) or save 25% with yearly (€89.99/year, only €7.50/month).
+                    Smarty Gym experience with structured training programs for long-term goals and personalized support. Choose monthly (€9.99/month) or save 25% with yearly (€89.99/year, only €7.50/month).
                   </AccordionContent>
                 </AccordionItem>
 

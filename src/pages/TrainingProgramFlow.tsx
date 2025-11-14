@@ -21,37 +21,37 @@ const TrainingProgramFlow = () => {
     {
       id: "cardio-endurance",
       title: "Cardio Endurance",
-      description: "6-8 week program to build cardiovascular fitness",
+      description: "Structured program to build cardiovascular fitness",
       icon: Heart,
     },
     {
       id: "functional-strength",
       title: "Functional Strength",
-      description: "6-8 week program for real-world strength and movement",
+      description: "Structured program for real-world strength and movement",
       icon: Dumbbell,
     },
     {
       id: "muscle-hypertrophy",
       title: "Muscle Hypertrophy",
-      description: "6-8 week program focused on muscle growth",
+      description: "Structured program focused on muscle growth",
       icon: Activity,
     },
     {
       id: "weight-loss",
       title: "Weight Loss",
-      description: "6-8 week program designed for fat loss",
+      description: "Structured program designed for fat loss",
       icon: Flame,
     },
     {
       id: "low-back-pain",
       title: "Low Back Pain",
-      description: "6-8 week program to strengthen and rehabilitate",
+      description: "Structured program to strengthen and rehabilitate",
       icon: User,
     },
     {
       id: "mobility-stability",
       title: "Mobility & Stability",
-      description: "6-8 week program for movement quality",
+      description: "Structured program for movement quality",
       icon: Move,
     },
   ];
@@ -63,9 +63,9 @@ const TrainingProgramFlow = () => {
   return (
     <>
       <Helmet>
-        <title>Online Gym Training Programs | 6-8 Week Plans | SmartyGym Cyprus | Haris Falas</title>
-        <meta name="description" content="Structured online gym training programs at smartygym.com - Cyprus' #1 online fitness. 6-8 week programs by Sports Scientist Haris Falas: cardio, strength, muscle growth, weight loss, mobility. Gym programs online for anywhere, anytime training." />
-        <meta name="keywords" content="online gym training programs, gym training programs, training programs online, online fitness programs, gym programs online, workout training programs, smartygym programs, online gym, smartygym.com, online gym Cyprus, gym Cyprus, Haris Falas programs, Haris Falas Cyprus, Cyprus fitness programs, 6 week training programs, 8 week gym programs, cardio endurance programs, functional strength training, muscle hypertrophy programs, online gym weight loss program, back pain program, mobility training program, structured gym training, progressive training programs, evidence-based gym programs, convenient fitness programs, flexible gym training, virtual gym programs, sports scientist programs, workout programs online, fitness training programs" />
+        <title>Online Gym Training Programs | Structured Plans | SmartyGym Cyprus | Haris Falas</title>
+        <meta name="description" content="Structured online gym training programs at smartygym.com - Cyprus' #1 online fitness. Long-term programs by Sports Scientist Haris Falas: cardio, strength, muscle growth, weight loss, mobility. Gym programs online for anywhere, anytime training." />
+        <meta name="keywords" content="online gym training programs, gym training programs, training programs online, online fitness programs, gym programs online, workout training programs, smartygym programs, online gym, smartygym.com, online gym Cyprus, gym Cyprus, Haris Falas programs, Haris Falas Cyprus, Cyprus fitness programs, structured training programs, long-term training programs, cardio endurance programs, functional strength training, muscle hypertrophy programs, online gym weight loss program, back pain program, mobility training program, structured gym training, progressive training programs, evidence-based gym programs, convenient fitness programs, flexible gym training, virtual gym programs, sports scientist programs, workout programs online, fitness training programs" />
         
         <meta property="og:title" content="Training Programs - SmartyGym.com" />
         <meta property="og:description" content="Structured training programs designed by Sports Scientist Haris Falas" />
