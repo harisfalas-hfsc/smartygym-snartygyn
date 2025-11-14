@@ -140,7 +140,7 @@ const TrainingProgramFlow = () => {
                         By <a href="/coach-profile" className="text-primary hover:underline font-medium" itemProp="instructor">Haris Falas</a>
                       </p>
                       <div className="flex flex-wrap gap-2 text-xs mt-2">
-                        <span className="bg-primary/10 text-primary px-2 py-1 rounded" itemProp="duration">6-8 weeks</span>
+                        <span className="bg-primary/10 text-primary px-2 py-1 rounded" itemProp="duration">4-12 weeks</span>
                         <span className="bg-muted text-muted-foreground px-2 py-1 rounded">Intermediate</span>
                         <span className="bg-muted text-muted-foreground px-2 py-1 rounded">Included in Premium</span>
                       </div>

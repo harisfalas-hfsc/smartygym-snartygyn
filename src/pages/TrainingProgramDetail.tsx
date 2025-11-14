@@ -458,12 +458,12 @@ const TrainingProgramDetail = () => {
         <>
       <Helmet>
         <title>{title} Online Training Programs | Cyprus | Haris Falas | SmartyGym</title>
-        <meta name="description" content={`${title} online training programs by Cyprus Sports Scientist Haris Falas. Professional 6-8 week structured ${type || 'fitness'} programs. Evidence-based training for Cyprus and worldwide. Expert online personal training approach.`} />
+        <meta name="description" content={`${title} online training programs by Cyprus Sports Scientist Haris Falas. Professional structured long-term ${type || 'fitness'} programs. Evidence-based training for Cyprus and worldwide. Expert online personal training approach.`} />
         <meta name="keywords" content={`online training programs, ${title}, ${type} programs, Cyprus fitness programs, Haris Falas programs, structured training programs, online personal training, Cyprus personal trainers, 6 week programs, 8 week programs, fitness programs Cyprus, online fitness Cyprus`} />
         
         {/* Open Graph */}
         <meta property="og:title" content={`${title} Online Training Programs | Cyprus by Haris Falas`} />
-        <meta property="og:description" content={`Structured 6-8 week ${title.toLowerCase()} online training programs by Cyprus Sports Scientist Haris Falas`} />
+        <meta property="og:description" content={`Structured long-term ${title.toLowerCase()} online training programs by Cyprus Sports Scientist Haris Falas`} />
         <meta property="og:type" content="website" />
         <meta property="og:url" content={`https://smartygym.com/trainingprogram/${type || ''}`} />
         <meta property="og:site_name" content="SmartyGym Cyprus" />
@@ -481,7 +481,7 @@ const TrainingProgramDetail = () => {
             "@context": "https://schema.org",
             "@type": "ItemList",
             "name": `${title} Online Training Programs`,
-            "description": `Collection of structured online ${title.toLowerCase()} - 6 to 8 week training programs designed by Cyprus Sports Scientist Haris Falas`,
+            "description": `Collection of structured long-term ${title.toLowerCase()} training programs designed by Cyprus Sports Scientist Haris Falas`,
             "numberOfItems": filteredPrograms.length,
             "provider": {
               "@type": "Person",
