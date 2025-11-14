@@ -37,7 +37,7 @@ export const HumanNotAICompositeTemplate = () => {
             {/* Highlighted Box */}
             <div className="bg-background/80 backdrop-blur-sm p-6 rounded-lg border-2 border-primary/30 mt-4">
               <p className="text-xl font-bold text-primary mb-2">
-                Every program is science-based and personally created by Haris Falas.
+                Every workout and training program is science-based and personally created by Haris Falas.
               </p>
               <p className="text-lg text-muted-foreground">
                 Never by AI. Never by algorithms. Always by a real human expert who understands YOUR needs. Training designed by humans, for humans.

@@ -12,7 +12,7 @@ export const TrainAnywhereCardTemplate = () => {
           <div className="text-center space-y-4">
             <h3 className="text-5xl font-bold">Train Anywhere, Anytime</h3>
             <p className="text-3xl text-muted-foreground leading-relaxed">
-              Access professional workouts on any device. Flexible training that fits YOUR schedule
+              Access professional workouts on any device. Flexible training that fits YOUR schedule and YOUR goals—at home, gym, or traveling.
             </p>
           </div>
           <p className="text-2xl font-semibold text-primary mt-8">smartygym.com</p>

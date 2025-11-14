@@ -11,6 +11,7 @@ import { exportToInstagram, INSTAGRAM_SIZES, InstagramSize } from "@/utils/insta
 // Composite Cards
 import { HumanNotAICompositeTemplate } from "./instagram/composite/HumanNotAICompositeTemplate";
 import { HomeHeroCompositeTemplate } from "./instagram/composite/HomeHeroCompositeTemplate";
+import { FullHeroCompositeTemplate } from "./instagram/composite/FullHeroCompositeTemplate";
 import { GoldPlanCompositeTemplate } from "./instagram/composite/GoldPlanCompositeTemplate";
 import { PlatinumPlanCompositeTemplate } from "./instagram/composite/PlatinumPlanCompositeTemplate";
 import { ServicesOverviewCompositeTemplate } from "./instagram/composite/ServicesOverviewCompositeTemplate";
@@ -79,8 +80,9 @@ interface Template {
 }
 
 const compositeTemplates: Template[] = [
-  { id: "human-not-ai", name: "100% Human. 0% AI.", component: HumanNotAICompositeTemplate },
+  { id: "full-hero", name: "Complete Hero", component: FullHeroCompositeTemplate },
   { id: "home-hero", name: "Homepage Hero", component: HomeHeroCompositeTemplate },
+  { id: "human-not-ai", name: "100% Human. 0% AI.", component: HumanNotAICompositeTemplate },
   { id: "gold-plan-composite", name: "Gold Plan (Full Card)", component: GoldPlanCompositeTemplate },
   { id: "platinum-plan-composite", name: "Platinum Plan (Full Card)", component: PlatinumPlanCompositeTemplate },
   { id: "services-overview", name: "Services Overview", component: ServicesOverviewCompositeTemplate },
