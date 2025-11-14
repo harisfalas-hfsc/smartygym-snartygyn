@@ -254,7 +254,54 @@ export const WorkoutEditDialog = ({ workout, open, onOpenChange, onSave }: Worko
           .insert([dataToSave]);
 
         if (error) throw error;
-        toast({ title: "Success", description: "Workout created successfully" });
+
+        // Schedule notification for new workout (5 minutes from now)
+        try {
+          const scheduledTime = new Date(Date.now() + 5 * 60 * 1000).toISOString();
+          
+          // Compose notification body
+          let notificationBody = `New workout available: ${formData.name}. `;
+          
+          // Add description preview
+          if (dataToSave.description) {
+            const descPreview = dataToSave.description.length > 100 
+              ? dataToSave.description.substring(0, 100) + '...'
+              : dataToSave.description;
+            notificationBody += descPreview + ' ';
+          }
+          
+          // Add access information
+          if (dataToSave.is_premium) {
+            if (dataToSave.is_standalone_purchase && dataToSave.price) {
+              notificationBody += `Available as standalone purchase for €${dataToSave.price} or included in Premium subscription.`;
+            } else {
+              notificationBody += 'Exclusive for Premium subscribers.';
+            }
+          } else {
+            notificationBody += 'Free for all users!';
+          }
+          
+          // Insert scheduled notification
+          await supabase
+            .from('scheduled_notifications')
+            .insert([{
+              title: '🔥 New Workout Added!',
+              body: notificationBody,
+              url: `/workout/${dataToSave.id}`,
+              icon: imageUrl || '/smarty-gym-logo.png',
+              target_audience: 'subscribers',
+              scheduled_time: scheduledTime,
+              timezone: 'UTC',
+              status: 'pending'
+            }]);
+          
+          console.log('✅ Notification scheduled for new workout:', formData.name);
+        } catch (notifError) {
+          console.error('Error scheduling notification:', notifError);
+          // Don't fail the workout creation if notification fails
+        }
+
+        toast({ title: "Success", description: "Workout created successfully and notification scheduled!" });
       }
       onSave();
     } catch (error) {

@@ -73,20 +73,11 @@ export const useAutoLogout = () => {
       const { data: { user } } = await supabase.auth.getUser();
       
       if (user) {
-        const { data: profile } = await supabase
-          .from('profiles')
-          .select('custom_session_duration')
-          .eq('user_id', user.id)
-          .single();
-        
-        if (profile?.custom_session_duration) {
-          // Use custom timeout for this user
-          setInactivityTimeout(profile.custom_session_duration * 60 * 1000);
-          return;
-        }
+        // Note: custom_session_duration column needs to be added via migration
+        // For now, just use system default
       }
       
-      // Otherwise use system default
+      // Use system default
       const { data } = await supabase
         .from('system_settings')
         .select('setting_value')

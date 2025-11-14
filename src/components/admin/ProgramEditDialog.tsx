@@ -389,7 +389,57 @@ export const ProgramEditDialog = ({ program, open, onOpenChange, onSave, isPerso
             .insert([dataToSave]);
 
           if (error) throw error;
-          toast({ title: "Success", description: "Program created successfully" });
+
+          // Schedule notification for new program (5 minutes from now)
+          try {
+            const scheduledTime = new Date(Date.now() + 5 * 60 * 1000).toISOString();
+            
+            // Compose notification body
+            let notificationBody = `New training program available: ${formData.name}. `;
+            
+            // Add description preview
+            if (formData.program_description) {
+              const descPreview = formData.program_description.length > 100 
+                ? formData.program_description.substring(0, 100) + '...'
+                : formData.program_description;
+              notificationBody += descPreview + ' ';
+            }
+            
+            // Add duration info
+            notificationBody += `${formData.weeks} weeks, ${formData.days_per_week} days per week. `;
+            
+            // Add access information
+            if (dataToSave.is_premium) {
+              if (dataToSave.is_standalone_purchase && dataToSave.price) {
+                notificationBody += `Available as standalone purchase for €${dataToSave.price.toFixed(2)} or included in Premium subscription.`;
+              } else {
+                notificationBody += 'Exclusive for Premium subscribers.';
+              }
+            } else {
+              notificationBody += 'Free for all users!';
+            }
+            
+            // Insert scheduled notification
+            await supabase
+              .from('scheduled_notifications')
+              .insert([{
+                title: '💪 New Training Program Added!',
+                body: notificationBody,
+                url: `/training-program/${dataToSave.id}`,
+                icon: imageUrl || '/smarty-gym-logo.png',
+                target_audience: 'subscribers',
+                scheduled_time: scheduledTime,
+                timezone: 'UTC',
+                status: 'pending'
+              }]);
+            
+            console.log('✅ Notification scheduled for new program:', formData.name);
+          } catch (notifError) {
+            console.error('Error scheduling notification:', notifError);
+            // Don't fail the program creation if notification fails
+          }
+
+          toast({ title: "Success", description: "Program created successfully and notification scheduled!" });
         }
       }
       onSave();
