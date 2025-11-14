@@ -272,7 +272,7 @@ const Index = () => {
                 <div className="p-6 sm:p-8 md:p-10 space-y-6 sm:space-y-8 md:space-y-10">
                   
                   {/* Main Headline */}
-                  <div className="text-center space-y-6 sm:space-y-8 md:space-y-10">
+                  <div className="text-center space-y-2 sm:space-y-3">
                     <h1 className="text-3xl sm:text-4xl md:text-5xl font-black bg-gradient-to-r from-primary via-amber-400 to-primary bg-clip-text text-transparent">
                       Welcome to SmartyGym
                     </h1>
