@@ -12,7 +12,6 @@ import smartyGymLogo from "@/assets/smarty-gym-logo.png";
 import smartyGymIcon from "@/assets/smarty-gym-icon.png";
 import { BackToTop } from "@/components/BackToTop";
 import { useAccessControl } from "@/hooks/useAccessControl";
-import { PageTitleCard } from "@/components/PageTitleCard";
 import { ScrollReveal } from "@/components/ScrollReveal";
 import {
   Tooltip,
@@ -262,115 +261,153 @@ const Index = () => {
         {/* Hero Section */}
         <section className="relative py-8 sm:py-12 px-4 border-b border-border bg-gradient-to-br from-background to-muted/30 overflow-hidden">
           <div className="absolute inset-0 bg-gradient-to-b from-primary/5 via-transparent to-transparent" />
-          <div className="container mx-auto max-w-4xl space-y-3 sm:space-y-4 relative z-10">
-            <Card className="border-2 border-primary bg-gradient-to-r from-primary/5 to-primary/10 mb-6 sm:mb-8">
-              <div className="p-4 sm:p-6 text-center relative">
-                <TooltipProvider>
-                  {/* Left Side Icons - Hidden on mobile to prevent overlap */}
-                  <div className="hidden sm:flex absolute left-4 top-1/2 -translate-y-1/2 flex-row gap-4">
-                    <Tooltip>
-                      <TooltipTrigger asChild>
-                        <Dumbbell 
-                          className="w-7 h-7 text-primary cursor-pointer transition-all duration-200 hover:scale-110 hover:text-primary/80" 
-                          onClick={() => navigate("/workout")}
-                        />
-                      </TooltipTrigger>
-                      <TooltipContent>
-                        <p>Workouts</p>
-                      </TooltipContent>
-                    </Tooltip>
-                    
-                    <Tooltip>
-                      <TooltipTrigger asChild>
-                        <Target 
-                          className="w-7 h-7 text-primary cursor-pointer transition-all duration-200 hover:scale-110 hover:text-primary/80" 
-                          onClick={() => navigate("/trainingprogram")}
-                        />
-                      </TooltipTrigger>
-                      <TooltipContent>
-                        <p>Programs</p>
-                      </TooltipContent>
-                    </Tooltip>
-                    
-                    <Tooltip>
-                      <TooltipTrigger asChild>
-                        <UserCheck 
-                          className="w-7 h-7 text-primary cursor-pointer transition-all duration-200 hover:scale-110 hover:text-primary/80" 
-                          onClick={() => navigate("/personal-training")}
-                        />
-                      </TooltipTrigger>
-                      <TooltipContent>
-                        <p>Personal Training</p>
-                      </TooltipContent>
-                    </Tooltip>
-                  </div>
+          
+          {/* Decorative elements */}
+          <div className="absolute top-10 left-10 w-32 h-32 bg-primary/10 rounded-full blur-3xl" />
+          <div className="absolute bottom-10 right-10 w-40 h-40 bg-accent/10 rounded-full blur-3xl" />
+          
+          <div className="container mx-auto max-w-5xl relative z-10">
+            <ScrollReveal>
+              <Card className="border-2 border-primary bg-gradient-to-br from-primary/5 via-background to-accent/5 backdrop-blur-sm">
+                <div className="p-6 sm:p-8 md:p-12 space-y-6 sm:space-y-8">
                   
-                  {/* Right Side Icons - Hidden on mobile to prevent overlap */}
-                  <div className="hidden sm:flex absolute right-4 top-1/2 -translate-y-1/2 flex-row gap-4">
-                    <Tooltip>
-                      <TooltipTrigger asChild>
-                        <Wrench 
-                          className="w-7 h-7 text-primary cursor-pointer transition-all duration-200 hover:scale-110 hover:text-primary/80" 
-                          onClick={() => navigate("/tools")}
-                        />
-                      </TooltipTrigger>
-                      <TooltipContent>
-                        <p>Tools</p>
-                      </TooltipContent>
-                    </Tooltip>
-                    
-                    <Tooltip>
-                      <TooltipTrigger asChild>
-                        <Video 
-                          className="w-7 h-7 text-primary cursor-pointer transition-all duration-200 hover:scale-110 hover:text-primary/80" 
-                          onClick={() => navigate("/exerciselibrary")}
-                        />
-                      </TooltipTrigger>
-                      <TooltipContent>
-                        <p>Exercise Library</p>
-                      </TooltipContent>
-                    </Tooltip>
-                    
-                    <Tooltip>
-                      <TooltipTrigger asChild>
-                        <FileText 
-                          className="w-7 h-7 text-primary cursor-pointer transition-all duration-200 hover:scale-110 hover:text-primary/80" 
-                          onClick={() => navigate("/blog")}
-                        />
-                      </TooltipTrigger>
-                      <TooltipContent>
-                        <p>Blog</p>
-                      </TooltipContent>
-                    </Tooltip>
+                  {/* Logo & Main Headline */}
+                  <div className="text-center space-y-4">
+                    <img 
+                      src={smartyGymLogo} 
+                      alt="Smarty Gym Logo" 
+                      className="h-16 sm:h-20 md:h-24 mx-auto"
+                    />
+                    <h1 className="text-3xl sm:text-4xl md:text-5xl font-black bg-gradient-to-r from-primary via-amber-400 to-primary bg-clip-text text-transparent">
+                      Welcome to SmartyGym
+                    </h1>
+                    <p className="text-lg sm:text-xl text-muted-foreground font-medium">
+                      Your Gym Re-imagined. Anywhere, Anytime.
+                    </p>
                   </div>
-                </TooltipProvider>
-                
-                {/* Title and Subtitle */}
-                <h1 className="text-3xl sm:text-4xl md:text-5xl font-black bg-gradient-to-r from-primary via-amber-400 to-primary bg-clip-text text-transparent [text-shadow:0_2px_12px_hsl(var(--primary)/0.4)] px-4 sm:px-12">
-                  Smarty Gym
-                </h1>
-                <p className="text-xs sm:text-sm text-muted-foreground mt-1 px-4 sm:px-12">
-                  Your Gym Re-imagined. Anywhere, Anytime
-                </p>
-                
-              </div>
-            </Card>
-            <div className="bg-primary/10 border border-primary/20 rounded-lg p-3 sm:p-4 mb-3 sm:mb-4 text-center">
-              <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed">
-            Welcome to Cyprus' premier online gym - <strong>smartygym.com</strong>. Expert online fitness workouts, structured training programs, and personalized online personal training designed by <a href="/coach-profile" className="text-primary hover:underline font-medium"><strong>Haris Falas</strong></a> - Sports Scientist & Strength Conditioning Coach with 20+ years experience. 
-            Your convenient gym anywhere, anytime. Free online workouts available.
-              </p>
-            </div>
-            <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 justify-center items-center">
-              <Button size="lg" onClick={() => navigate("/workout")} aria-label="Start free workout with Smarty Gym">
-                Get Started
-              </Button>
-              {!isPremium && (
-                <Button size="lg" variant="outline" onClick={() => navigate("/premiumbenefits")} aria-label="Join Smarty Gym premium membership">
-                  Subscribe Now
-                </Button>
-              )}
-            </div>
+
+                  {/* Three Core Messages: WHAT, WHY, HOW */}
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-6 sm:gap-8">
+                    
+                    {/* WHAT */}
+                    <div className="text-center space-y-3 p-4 rounded-lg bg-background/50 border border-primary/20">
+                      <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-primary/10">
+                        <Target className="w-6 h-6 text-primary" />
+                      </div>
+                      <h2 className="text-lg sm:text-xl font-bold text-foreground">
+                        Cyprus' Premier Online Gym
+                      </h2>
+                      <p className="text-sm text-muted-foreground leading-relaxed">
+                        Professional online fitness platform offering expert workouts, structured training programs, and personalized coaching at smartygym.com.
+                      </p>
+                    </div>
+
+                    {/* WHY */}
+                    <div className="text-center space-y-3 p-4 rounded-lg bg-background/50 border border-primary/20">
+                      <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-primary/10">
+                        <UserCheck className="w-6 h-6 text-primary" />
+                      </div>
+                      <h2 className="text-lg sm:text-xl font-bold text-foreground">
+                        100% Human. 0% AI.
+                      </h2>
+                      <p className="text-sm text-muted-foreground leading-relaxed">
+                        Every workout personally designed by Sports Scientist <a href="/coach-profile" className="text-primary hover:underline font-semibold">Haris Falas</a> with 20+ years of experience. Real expertise, not algorithms.
+                      </p>
+                    </div>
+
+                    {/* HOW */}
+                    <div className="text-center space-y-3 p-4 rounded-lg bg-background/50 border border-primary/20">
+                      <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-primary/10">
+                        <Dumbbell className="w-6 h-6 text-primary" />
+                      </div>
+                      <h2 className="text-lg sm:text-xl font-bold text-foreground">
+                        Train Anywhere, Anytime
+                      </h2>
+                      <p className="text-sm text-muted-foreground leading-relaxed">
+                        Access professional workouts on any device. Flexible training that fits YOUR schedule and YOUR goals—at home, gym, or traveling.
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* Feature Highlights Grid */}
+                  <div className="border-t border-primary/20 pt-6">
+                    <div className="grid grid-cols-2 md:grid-cols-3 gap-4 sm:gap-6">
+                      
+                      <div className="flex items-start gap-3">
+                        <Dumbbell className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
+                        <div>
+                          <p className="font-semibold text-sm text-foreground">100+ Expert Workouts</p>
+                          <p className="text-xs text-muted-foreground">AMRAP, HIIT, Strength & more</p>
+                        </div>
+                      </div>
+
+                      <div className="flex items-start gap-3">
+                        <Target className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
+                        <div>
+                          <p className="font-semibold text-sm text-foreground">Training Programs</p>
+                          <p className="text-xs text-muted-foreground">6-8 week structured plans</p>
+                        </div>
+                      </div>
+
+                      <div className="flex items-start gap-3">
+                        <UserCheck className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
+                        <div>
+                          <p className="font-semibold text-sm text-foreground">Personal Training</p>
+                          <p className="text-xs text-muted-foreground">Custom plans by Haris Falas</p>
+                        </div>
+                      </div>
+
+                      <div className="flex items-start gap-3">
+                        <Wrench className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
+                        <div>
+                          <p className="font-semibold text-sm text-foreground">Smart Tools</p>
+                          <p className="text-xs text-muted-foreground">BMR, Macro, 1RM calculators</p>
+                        </div>
+                      </div>
+
+                      <div className="flex items-start gap-3">
+                        <Video className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
+                        <div>
+                          <p className="font-semibold text-sm text-foreground">Exercise Library</p>
+                          <p className="text-xs text-muted-foreground">Comprehensive video guide</p>
+                        </div>
+                      </div>
+
+                      <div className="flex items-start gap-3">
+                        <Activity className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
+                        <div>
+                          <p className="font-semibold text-sm text-foreground">Community Support</p>
+                          <p className="text-xs text-muted-foreground">Connect with members</p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* CTA Buttons */}
+                  <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center items-center pt-4">
+                    <Button 
+                      size="lg" 
+                      onClick={() => navigate("/workout")} 
+                      className="w-full sm:w-auto min-w-[200px]"
+                      aria-label="Start free workout with Smarty Gym"
+                    >
+                      Start Your Free Workout
+                    </Button>
+                    {!isPremium && (
+                      <Button 
+                        size="lg" 
+                        variant="outline" 
+                        onClick={() => navigate("/premiumbenefits")}
+                        className="w-full sm:w-auto min-w-[200px]"
+                        aria-label="Join Smarty Gym premium membership"
+                      >
+                        View Premium Plans
+                      </Button>
+                    )}
+                  </div>
+                </div>
+              </Card>
+            </ScrollReveal>
           </div>
         </section>
 
