@@ -1,9 +1,10 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { Helmet } from "react-helmet";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { ArrowLeft, Calendar, Eye, CheckCircle } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { ArrowLeft, Calendar, Eye, CheckCircle, Search, X, Sparkles, Star, Crown, Euro, Check } from "lucide-react";
 import { AccessGate } from "@/components/AccessGate";
 import { CompactFilters } from "@/components/CompactFilters";
 import { PageTitleCard } from "@/components/PageTitleCard";
@@ -34,7 +35,8 @@ import mobilityStabilityFlowImg from "@/assets/mobility-stability-flow-program.j
 type EquipmentFilter = "all" | "bodyweight" | "equipment";
 type LevelFilter = "all" | "beginner" | "intermediate" | "advanced";
 type DurationFilter = "all" | "4" | "6" | "8";
-type StatusFilter = "all" | "viewed" | "completed";
+type StatusFilter = "all" | "viewed" | "completed" | "not-viewed" | "favorites";
+type SortByFilter = "newest" | "oldest" | "name-asc" | "name-desc";
 
 export interface TrainingProgram {
   id: string;
@@ -50,11 +52,22 @@ export interface TrainingProgram {
 const TrainingProgramDetail = () => {
   const navigate = useNavigate();
   const { type } = useParams();
+  const [searchTerm, setSearchTerm] = useState("");
+  const [debouncedSearch, setDebouncedSearch] = useState("");
   const [equipmentFilter, setEquipmentFilter] = useState<EquipmentFilter>("all");
   const [levelFilter, setLevelFilter] = useState<LevelFilter>("all");
   const [durationFilter, setDurationFilter] = useState<DurationFilter>("all");
   const [statusFilter, setStatusFilter] = useState<StatusFilter>("all");
+  const [sortBy, setSortBy] = useState<SortByFilter>("newest");
   const [userId, setUserId] = useState<string | undefined>();
+
+  // Debounce search
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedSearch(searchTerm);
+    }, 300);
+    return () => clearTimeout(timer);
+  }, [searchTerm]);
 
   // Fetch current user
   useEffect(() => {
@@ -66,6 +79,26 @@ const TrainingProgramDetail = () => {
   // Fetch programs and interactions from database
   const { data: allPrograms = [], isLoading } = useAllPrograms();
   const { data: interactions = [] } = useProgramInteractions(userId);
+
+  // Helper function to check if program is new (created within last 7 days)
+  const isNew = (createdAt: string | undefined) => {
+    if (!createdAt) return false;
+    const daysSinceCreation = (Date.now() - new Date(createdAt).getTime()) / (1000 * 60 * 60 * 24);
+    return daysSinceCreation <= 7;
+  };
+
+  // Clear all filters
+  const clearAllFilters = () => {
+    setSearchTerm("");
+    setEquipmentFilter("all");
+    setLevelFilter("all");
+    setDurationFilter("all");
+    setStatusFilter("all");
+    setSortBy("newest");
+  };
+
+  const hasActiveFilters = searchTerm || equipmentFilter !== "all" || levelFilter !== "all" || 
+    durationFilter !== "all" || statusFilter !== "all" || sortBy !== "newest";
   
   // Map URL type to database category
   const categoryMap: { [key: string]: string } = {
@@ -341,41 +374,78 @@ const TrainingProgramDetail = () => {
   const title = programTitles[type || ""] || "Training Programs";
   const mappedCategory = categoryMap[type || "cardio-endurance"];
   
-  console.log("🎯 TrainingProgramDetail mounted - type:", type);
-  console.log("📦 All Programs from DB:", allPrograms.length, allPrograms);
-  console.log("🗺️ Mapped Category:", mappedCategory);
-  console.log("⏳ Loading:", isLoading);
-  
-  // Filter programs by category from URL and user filters
-  const filteredPrograms = allPrograms.filter(program => {
-    // Match category - correctly filtering by category field
-    console.log(`🔍 Filtering program: ${program.name} Category: ${program.category} Expected: ${mappedCategory}`);
-    if (!program.category?.toUpperCase().includes(mappedCategory)) return false;
-    
-    // Equipment filter
-    if (equipmentFilter !== "all") {
-      const hasEquipment = program.duration?.toLowerCase() !== "bodyweight";
-      if (equipmentFilter === "bodyweight" && hasEquipment) return false;
-      if (equipmentFilter === "equipment" && !hasEquipment) return false;
-    }
-    
-    // Duration filter (programs use "duration" field like "6 weeks", "8 weeks")
-    if (durationFilter !== "all") {
-      const programWeeks = program.duration?.match(/\d+/)?.[0];
-      if (programWeeks !== durationFilter) return false;
-    }
-    
-    // Status filter (only for authenticated users)
-    if (statusFilter !== "all" && userId) {
-      const interaction = interactions.find(i => i.program_id === program.id);
-      if (statusFilter === "viewed" && !interaction?.has_viewed) return false;
-      if (statusFilter === "completed" && !interaction?.is_completed) return false;
-    }
-    
-    return true;
+  // First filter by category from URL
+  const currentTypePrograms = allPrograms.filter(program => {
+    return program.category?.toUpperCase().includes(mappedCategory);
   });
   
-  console.log("✅ Filtered Programs:", filteredPrograms.length, filteredPrograms.map(p => p.name));
+  console.log("📦 Category filtered programs:", currentTypePrograms.length);
+
+  // Filter and sort programs with memoization
+  const filteredPrograms = useMemo(() => {
+    let filtered = currentTypePrograms.filter(program => {
+      // Search filter
+      if (debouncedSearch) {
+        const searchLower = debouncedSearch.toLowerCase();
+        const matchesName = program.name.toLowerCase().includes(searchLower);
+        const matchesDescription = program.description?.toLowerCase().includes(searchLower);
+        const matchesCategory = program.category?.toLowerCase().includes(searchLower);
+        if (!matchesName && !matchesDescription && !matchesCategory) return false;
+      }
+    
+      // Equipment filter
+      if (equipmentFilter !== "all" && program.equipment?.toLowerCase() !== equipmentFilter) return false;
+      
+      // Level filter
+      if (levelFilter !== "all" && program.difficulty?.toLowerCase() !== levelFilter) return false;
+      
+      // Duration filter
+      if (durationFilter !== "all" && program.duration !== durationFilter) return false;
+      
+      // Status filter
+      if (statusFilter !== "all" && userId) {
+        const interaction = interactions.find(i => i.program_id === program.id);
+        
+        if (statusFilter === "viewed" && !interaction?.has_viewed) return false;
+        if (statusFilter === "completed" && !interaction?.is_completed) return false;
+        if (statusFilter === "not-viewed") {
+          // Not viewed = no interaction OR has_viewed is false
+          if (interaction?.has_viewed) return false;
+        }
+        if (statusFilter === "favorites" && !interaction?.is_favorite) return false;
+      }
+      
+      return true;
+    });
+
+    // Sort programs
+    const sorted = [...filtered];
+    switch (sortBy) {
+      case "newest":
+        sorted.sort((a, b) => {
+          const dateA = a.created_at ? new Date(a.created_at).getTime() : 0;
+          const dateB = b.created_at ? new Date(b.created_at).getTime() : 0;
+          return dateB - dateA;
+        });
+        break;
+      case "oldest":
+        sorted.sort((a, b) => {
+          const dateA = a.created_at ? new Date(a.created_at).getTime() : 0;
+          const dateB = b.created_at ? new Date(b.created_at).getTime() : 0;
+          return dateA - dateB;
+        });
+        break;
+      case "name-asc":
+        sorted.sort((a, b) => a.name.localeCompare(b.name));
+        break;
+      case "name-desc":
+        sorted.sort((a, b) => b.name.localeCompare(a.name));
+        break;
+    }
+
+    return sorted;
+  }, [currentTypePrograms, debouncedSearch, equipmentFilter, levelFilter, durationFilter, 
+      statusFilter, sortBy, userId, interactions]);
 
   return (
     <>
@@ -459,6 +529,30 @@ const TrainingProgramDetail = () => {
           </Card>
         )}
         
+        {/* Search Bar */}
+        <div className="mb-4">
+          <div className="relative">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+            <Input
+              type="text"
+              placeholder="Search programs by name or keyword..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="pl-10 pr-10 text-sm h-10"
+            />
+            {searchTerm && (
+              <Button
+                variant="ghost"
+                size="sm"
+                className="absolute right-2 top-1/2 -translate-y-1/2 h-6 w-6 p-0"
+                onClick={() => setSearchTerm('')}
+              >
+                <X className="h-4 w-4" />
+              </Button>
+            )}
+          </div>
+        </div>
+
         {/* Compact Filters */}
         <CompactFilters
           filters={[
@@ -504,12 +598,46 @@ const TrainingProgramDetail = () => {
               placeholder: "Status",
               options: [
                 { value: "all", label: "All Programs" },
-                { value: "viewed", label: "Viewed" },
-                { value: "completed", label: "Completed" },
+                { value: "viewed", label: "👁️ Viewed" },
+                { value: "completed", label: "✓ Completed" },
+                { value: "not-viewed", label: "✨ Not Viewed Yet" },
+                { value: "favorites", label: "⭐ Favorites" },
               ],
             }] : []),
+            {
+              name: "Sort By",
+              value: sortBy,
+              onChange: (value) => setSortBy(value as SortByFilter),
+              placeholder: "Sort By",
+              options: [
+                { value: "newest", label: "🆕 Newest First" },
+                { value: "oldest", label: "📅 Oldest First" },
+                { value: "name-asc", label: "🔤 Name A-Z" },
+                { value: "name-desc", label: "🔤 Name Z-A" },
+              ],
+            },
           ]}
         />
+
+        {/* Results Counter & Clear Filters */}
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 mb-4 px-1">
+          <p className="text-xs sm:text-sm text-muted-foreground">
+            Showing {filteredPrograms.length} of {currentTypePrograms.length} programs
+            {searchTerm && ` matching "${searchTerm}"`}
+          </p>
+          
+          {hasActiveFilters && (
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={clearAllFilters}
+              className="w-full sm:w-auto text-xs"
+            >
+              <X className="h-3 w-3 mr-1" />
+              Clear All Filters
+            </Button>
+          )}
+        </div>
 
         {/* Program Cards */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
@@ -517,49 +645,97 @@ const TrainingProgramDetail = () => {
             const interaction = userId ? interactions.find(i => i.program_id === program.id) : null;
             const isViewed = interaction?.has_viewed;
             const isCompleted = interaction?.is_completed;
+            const isFavorite = interaction?.is_favorite;
+            const isNewProgram = isNew(program.created_at);
             
             return (
               <Card
                 key={program.id}
-                className="overflow-hidden cursor-pointer transition-all duration-300 hover:scale-105 hover:shadow-gold bg-card border-border"
+                className="overflow-hidden cursor-pointer transition-all duration-300 hover:scale-105 hover:shadow-gold bg-card border-border relative"
                 onClick={() => navigate(`/trainingprogram/${type}/${program.id}`)}
               >
+                {/* NEW Badge */}
+                {isNewProgram && (
+                  <div className="absolute top-2 left-2 z-10">
+                    <span className="inline-flex items-center gap-1 bg-gradient-to-r from-yellow-400 to-orange-500 text-white text-xs font-bold px-2 py-1 rounded-full shadow-lg animate-pulse">
+                      <Sparkles className="h-3 w-3 shrink-0" />
+                      NEW
+                    </span>
+                  </div>
+                )}
+
                 <div className="relative h-48 w-full overflow-hidden">
                   <img 
                     src={program.image_url} 
                     alt={`${program.name} - ${program.duration} training program by Haris Falas Sports Scientist at SmartyGym.com`}
                     className="w-full h-full object-cover"
+                    loading="lazy"
                   />
-                  <div className="absolute top-2 right-2 bg-primary text-primary-foreground text-xs px-2 py-1 rounded flex items-center gap-1">
-                    <Calendar className="w-3 h-3" />
-                    <span>{program.duration} weeks</span>
-                  </div>
-                  {!program.is_premium && (
-                    <div className="absolute top-2 left-2 bg-primary text-primary-foreground px-3 py-1 rounded-full text-xs font-semibold">
-                      FREE
-                    </div>
-                  )}
-                  {program.is_standalone_purchase && program.price && (
-                    <div className="absolute bottom-2 right-2 bg-gold-600 text-white px-3 py-1 rounded-full text-xs font-semibold">
-                      €{Number(program.price).toFixed(2)}
-                    </div>
-                  )}
-                  {userId && isCompleted && (
-                    <div className="absolute bottom-2 left-2 bg-green-600 text-white px-2 py-1 rounded-full text-xs font-semibold flex items-center gap-1">
-                      <CheckCircle className="h-3 w-3" />
-                      Completed
-                    </div>
-                  )}
-                  {userId && isViewed && !isCompleted && (
-                    <div className="absolute bottom-2 left-2 bg-blue-600 text-white px-2 py-1 rounded-full text-xs font-semibold flex items-center gap-1">
-                      <Eye className="h-3 w-3" />
-                      Viewed
-                    </div>
-                  )}
                 </div>
-                <div className="p-4 space-y-2">
-                  <h3 className="font-semibold text-lg">{program.name}</h3>
-                  <p className="text-sm text-muted-foreground line-clamp-2">{program.description}</p>
+                
+                <div className="p-4 space-y-3">
+                  <h3 className="font-semibold text-base sm:text-lg">{program.name}</h3>
+                  <p className="text-xs sm:text-sm text-muted-foreground line-clamp-2">{program.description}</p>
+                  
+                  {/* Status Indicators Row */}
+                  {userId && (
+                    <div className="flex items-center gap-2 flex-wrap">
+                      {isCompleted && (
+                        <div className="flex items-center gap-1 text-xs text-green-600 dark:text-green-400">
+                          <CheckCircle className="h-3 w-3 sm:h-4 sm:w-4 shrink-0" />
+                          <span className="hidden sm:inline">Completed</span>
+                        </div>
+                      )}
+                      
+                      {isViewed && !isCompleted && (
+                        <div className="flex items-center gap-1 text-xs text-blue-600 dark:text-blue-400">
+                          <Eye className="h-3 w-3 sm:h-4 sm:w-4 shrink-0" />
+                          <span className="hidden sm:inline">Viewed</span>
+                        </div>
+                      )}
+                      
+                      {isFavorite && (
+                        <div className="flex items-center gap-1 text-xs text-yellow-600 dark:text-yellow-400">
+                          <Star className="h-3 w-3 sm:h-4 sm:w-4 fill-current shrink-0" />
+                          <span className="hidden sm:inline">Favorite</span>
+                        </div>
+                      )}
+                      
+                      {isNewProgram && (
+                        <div className="flex items-center gap-1 text-xs text-orange-600 dark:text-orange-400 font-semibold">
+                          <Sparkles className="h-3 w-3 sm:h-4 sm:w-4 shrink-0" />
+                          <span>NEW</span>
+                        </div>
+                      )}
+                    </div>
+                  )}
+                  
+                  {/* Access Badge */}
+                  <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-1 text-xs text-muted-foreground">
+                      <Calendar className="h-3 w-3 shrink-0" />
+                      <span>{program.duration.toString()} weeks</span>
+                    </div>
+                    <span className="text-xs text-muted-foreground">•</span>
+                    {program.is_premium ? (
+                      program.is_standalone_purchase && program.price ? (
+                        <span className="inline-flex items-center gap-1 bg-gradient-to-r from-green-500 to-emerald-600 text-white text-xs font-semibold px-2 py-1 rounded-full">
+                          <Euro className="h-3 w-3 shrink-0" />
+                          €{Number(program.price).toFixed(2)}
+                        </span>
+                      ) : (
+                        <span className="inline-flex items-center gap-1 bg-gradient-to-r from-yellow-400 to-orange-500 text-white text-xs font-semibold px-2 py-1 rounded-full">
+                          <Crown className="h-3 w-3 shrink-0" />
+                          <span className="hidden sm:inline">Premium</span>
+                        </span>
+                      )
+                    ) : (
+                      <span className="inline-flex items-center gap-1 bg-gradient-to-r from-green-500 to-teal-600 text-white text-xs font-semibold px-2 py-1 rounded-full">
+                        <Check className="h-3 w-3 shrink-0" />
+                        FREE
+                      </span>
+                    )}
+                  </div>
                 </div>
               </Card>
             );
