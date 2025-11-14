@@ -32,6 +32,9 @@ import { PlatinumPlanCardTemplate } from "./instagram/services/PlatinumPlanCardT
 import { RealExpertiseCardTemplate } from "./instagram/brand/RealExpertiseCardTemplate";
 import { PersonalTouchCardTemplate } from "./instagram/brand/PersonalTouchCardTemplate";
 import { NotARobotCardTemplate } from "./instagram/brand/NotARobotCardTemplate";
+import { YourGymInPocketCardTemplate } from "./instagram/brand/YourGymInPocketCardTemplate";
+import { HumanNotAICardTemplate } from "./instagram/brand/HumanNotAICardTemplate";
+import { TrainAnywhereCardTemplate } from "./instagram/brand/TrainAnywhereCardTemplate";
 
 // Workouts
 import { StrengthCardTemplate } from "./instagram/workouts/StrengthCardTemplate";
@@ -101,6 +104,9 @@ const brandTemplates: Template[] = [
   { id: "real-expertise", name: "Real Expertise", component: RealExpertiseCardTemplate },
   { id: "personal-touch", name: "Personal Touch", component: PersonalTouchCardTemplate },
   { id: "not-robot", name: "Not a Robot", component: NotARobotCardTemplate },
+  { id: "gym-in-pocket", name: "Your Gym In Your Pocket", component: YourGymInPocketCardTemplate },
+  { id: "human-not-ai-card", name: "100% Human. 0% AI.", component: HumanNotAICardTemplate },
+  { id: "train-anywhere", name: "Train Anywhere, Anytime", component: TrainAnywhereCardTemplate },
 ];
 
 const workoutTemplates: Template[] = [
