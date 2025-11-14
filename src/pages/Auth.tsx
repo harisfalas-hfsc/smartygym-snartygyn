@@ -177,21 +177,13 @@ export default function Auth() {
           });
         }
       } else {
-        // If remember me is checked, extend session duration to 30 days
+        // Note: Remember Me feature requires custom_session_duration column
+        // To be added via database migration
+        // For now, session management is handled by Supabase auth defaults
         if (rememberMe && data.session) {
-          await supabase
-            .from('profiles')
-            .update({ 
-              custom_session_duration: 30 * 24 * 60 // 30 days in minutes
-            })
-            .eq('user_id', data.user.id);
-        } else if (data.session) {
-          // Clear custom duration if remember me is not checked
-          await supabase
-            .from('profiles')
-            .update({ custom_session_duration: null })
-            .eq('user_id', data.user.id);
+          console.log('Remember Me selected - custom session handling pending migration');
         }
+
 
         toast({
           title: "Success!",
