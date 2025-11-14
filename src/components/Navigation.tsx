@@ -206,7 +206,7 @@ export const Navigation = () => {
               variant="ghost" 
               size="sm" 
               onClick={() => navigate("/about")} 
-              className={`text-primary border border-primary/30 ${location.pathname === '/about' ? 'bg-primary text-primary-foreground' : 'bg-primary/10 hover:bg-primary hover:text-primary-foreground'}`}
+              className={`rounded-xl border-2 font-semibold shadow-sm transition-all duration-200 ${location.pathname === '/about' ? 'bg-primary text-primary-foreground border-primary shadow-md scale-105' : 'text-primary border-primary/40 bg-primary/5 hover:bg-primary hover:text-primary-foreground hover:border-primary hover:shadow-md hover:scale-105 active:scale-95'}`}
             >
               About
             </Button>
@@ -214,7 +214,7 @@ export const Navigation = () => {
               variant="ghost" 
               size="sm" 
               onClick={() => navigate("/workout")} 
-              className={`text-primary border border-primary/30 ${location.pathname === '/workout' ? 'bg-primary text-primary-foreground' : 'bg-primary/10 hover:bg-primary hover:text-primary-foreground'}`}
+              className={`rounded-xl border-2 font-semibold shadow-sm transition-all duration-200 ${location.pathname === '/workout' ? 'bg-primary text-primary-foreground border-primary shadow-md scale-105' : 'text-primary border-primary/40 bg-primary/5 hover:bg-primary hover:text-primary-foreground hover:border-primary hover:shadow-md hover:scale-105 active:scale-95'}`}
             >
               Workouts
             </Button>
@@ -222,7 +222,7 @@ export const Navigation = () => {
               variant="ghost" 
               size="sm" 
               onClick={() => navigate("/trainingprogram")} 
-              className={`text-primary border border-primary/30 ${location.pathname === '/trainingprogram' ? 'bg-primary text-primary-foreground' : 'bg-primary/10 hover:bg-primary hover:text-primary-foreground'}`}
+              className={`rounded-xl border-2 font-semibold shadow-sm transition-all duration-200 ${location.pathname === '/trainingprogram' ? 'bg-primary text-primary-foreground border-primary shadow-md scale-105' : 'text-primary border-primary/40 bg-primary/5 hover:bg-primary hover:text-primary-foreground hover:border-primary hover:shadow-md hover:scale-105 active:scale-95'}`}
             >
               Programs
             </Button>
@@ -230,7 +230,7 @@ export const Navigation = () => {
               variant="ghost" 
               size="sm" 
               onClick={() => navigate("/personal-training")} 
-              className={`text-primary border border-primary/30 ${location.pathname === '/personal-training' ? 'bg-primary text-primary-foreground' : 'bg-primary/10 hover:bg-primary hover:text-primary-foreground'}`}
+              className={`rounded-xl border-2 font-semibold shadow-sm transition-all duration-200 ${location.pathname === '/personal-training' ? 'bg-primary text-primary-foreground border-primary shadow-md scale-105' : 'text-primary border-primary/40 bg-primary/5 hover:bg-primary hover:text-primary-foreground hover:border-primary hover:shadow-md hover:scale-105 active:scale-95'}`}
             >
               Personal Training
             </Button>
@@ -238,7 +238,7 @@ export const Navigation = () => {
               variant="ghost" 
               size="sm" 
               onClick={() => navigate("/tools")} 
-              className={`text-primary border border-primary/30 ${location.pathname === '/tools' ? 'bg-primary text-primary-foreground' : 'bg-primary/10 hover:bg-primary hover:text-primary-foreground'}`}
+              className={`rounded-xl border-2 font-semibold shadow-sm transition-all duration-200 ${location.pathname === '/tools' ? 'bg-primary text-primary-foreground border-primary shadow-md scale-105' : 'text-primary border-primary/40 bg-primary/5 hover:bg-primary hover:text-primary-foreground hover:border-primary hover:shadow-md hover:scale-105 active:scale-95'}`}
             >
               Tools
             </Button>
@@ -246,7 +246,7 @@ export const Navigation = () => {
               variant="ghost" 
               size="sm" 
               onClick={() => navigate("/exerciselibrary")} 
-              className={`text-primary border border-primary/30 ${location.pathname === '/exerciselibrary' ? 'bg-primary text-primary-foreground' : 'bg-primary/10 hover:bg-primary hover:text-primary-foreground'}`}
+              className={`rounded-xl border-2 font-semibold shadow-sm transition-all duration-200 ${location.pathname === '/exerciselibrary' ? 'bg-primary text-primary-foreground border-primary shadow-md scale-105' : 'text-primary border-primary/40 bg-primary/5 hover:bg-primary hover:text-primary-foreground hover:border-primary hover:shadow-md hover:scale-105 active:scale-95'}`}
             >
               Exercise Library
             </Button>
@@ -254,15 +254,15 @@ export const Navigation = () => {
               variant="ghost" 
               size="sm" 
               onClick={() => navigate("/community")} 
-              className={`text-primary border border-primary/30 ${location.pathname === '/community' ? 'bg-primary text-primary-foreground' : 'bg-primary/10 hover:bg-primary hover:text-primary-foreground'}`}
+              className={`rounded-xl border-2 font-semibold shadow-sm transition-all duration-200 ${location.pathname === '/community' ? 'bg-primary text-primary-foreground border-primary shadow-md scale-105' : 'text-primary border-primary/40 bg-primary/5 hover:bg-primary hover:text-primary-foreground hover:border-primary hover:shadow-md hover:scale-105 active:scale-95'}`}
             >
               Community
             </Button>
             <Button 
               variant="ghost" 
               size="sm" 
-              onClick={() => navigate("/blog")} 
-              className={`text-primary border border-primary/30 ${location.pathname === '/blog' ? 'bg-primary text-primary-foreground' : 'bg-primary/10 hover:bg-primary hover:text-primary-foreground'}`}
+              onClick={() => navigate("/blog")}
+              className={`rounded-xl border-2 font-semibold shadow-sm transition-all duration-200 ${location.pathname === '/blog' ? 'bg-primary text-primary-foreground border-primary shadow-md scale-105' : 'text-primary border-primary/40 bg-primary/5 hover:bg-primary hover:text-primary-foreground hover:border-primary hover:shadow-md hover:scale-105 active:scale-95'}`}
             >
               Blog
             </Button>
@@ -270,7 +270,7 @@ export const Navigation = () => {
               variant="ghost" 
               size="sm" 
               onClick={() => navigate("/contact")} 
-              className={`text-primary border border-primary/30 ${location.pathname === '/contact' ? 'bg-primary text-primary-foreground' : 'bg-primary/10 hover:bg-primary hover:text-primary-foreground'}`}
+              className={`rounded-xl border-2 font-semibold shadow-sm transition-all duration-200 ${location.pathname === '/contact' ? 'bg-primary text-primary-foreground border-primary shadow-md scale-105' : 'text-primary border-primary/40 bg-primary/5 hover:bg-primary hover:text-primary-foreground hover:border-primary hover:shadow-md hover:scale-105 active:scale-95'}`}
             >
               Contact
             </Button>
@@ -289,7 +289,7 @@ export const Navigation = () => {
                   variant="ghost" 
                   size="lg" 
                   onClick={() => handleNavigate("/about")} 
-                  className={`justify-start text-primary border border-primary/30 ${location.pathname === '/about' ? 'bg-primary text-primary-foreground' : 'bg-primary/10 hover:bg-primary hover:text-primary-foreground'}`}
+                  className={`justify-start rounded-xl border-2 font-semibold shadow-sm transition-all duration-200 ${location.pathname === '/about' ? 'bg-primary text-primary-foreground border-primary shadow-md scale-105' : 'text-primary border-primary/40 bg-primary/5 hover:bg-primary hover:text-primary-foreground hover:border-primary hover:shadow-md hover:scale-105 active:scale-95'}`}
                 >
                   About
                 </Button>
@@ -297,7 +297,7 @@ export const Navigation = () => {
                   variant="ghost" 
                   size="lg" 
                   onClick={() => handleNavigate("/workout")} 
-                  className={`justify-start text-primary border border-primary/30 ${location.pathname === '/workout' ? 'bg-primary text-primary-foreground' : 'bg-primary/10 hover:bg-primary hover:text-primary-foreground'}`}
+                  className={`justify-start rounded-xl border-2 font-semibold shadow-sm transition-all duration-200 ${location.pathname === '/workout' ? 'bg-primary text-primary-foreground border-primary shadow-md scale-105' : 'text-primary border-primary/40 bg-primary/5 hover:bg-primary hover:text-primary-foreground hover:border-primary hover:shadow-md hover:scale-105 active:scale-95'}`}
                 >
                   Workouts
                 </Button>
@@ -305,7 +305,7 @@ export const Navigation = () => {
                   variant="ghost" 
                   size="lg" 
                   onClick={() => handleNavigate("/trainingprogram")} 
-                  className={`justify-start text-primary border border-primary/30 ${location.pathname === '/trainingprogram' ? 'bg-primary text-primary-foreground' : 'bg-primary/10 hover:bg-primary hover:text-primary-foreground'}`}
+                  className={`justify-start rounded-xl border-2 font-semibold shadow-sm transition-all duration-200 ${location.pathname === '/trainingprogram' ? 'bg-primary text-primary-foreground border-primary shadow-md scale-105' : 'text-primary border-primary/40 bg-primary/5 hover:bg-primary hover:text-primary-foreground hover:border-primary hover:shadow-md hover:scale-105 active:scale-95'}`}
                 >
                   Programs
                 </Button>
@@ -313,7 +313,7 @@ export const Navigation = () => {
                   variant="ghost" 
                   size="lg" 
                   onClick={() => handleNavigate("/personal-training")} 
-                  className={`justify-start text-primary border border-primary/30 ${location.pathname === '/personal-training' ? 'bg-primary text-primary-foreground' : 'bg-primary/10 hover:bg-primary hover:text-primary-foreground'}`}
+                  className={`justify-start rounded-xl border-2 font-semibold shadow-sm transition-all duration-200 ${location.pathname === '/personal-training' ? 'bg-primary text-primary-foreground border-primary shadow-md scale-105' : 'text-primary border-primary/40 bg-primary/5 hover:bg-primary hover:text-primary-foreground hover:border-primary hover:shadow-md hover:scale-105 active:scale-95'}`}
                 >
                   Personal Training
                 </Button>
@@ -321,7 +321,7 @@ export const Navigation = () => {
                   variant="ghost" 
                   size="lg" 
                   onClick={() => handleNavigate("/tools")} 
-                  className={`justify-start text-primary border border-primary/30 ${location.pathname === '/tools' ? 'bg-primary text-primary-foreground' : 'bg-primary/10 hover:bg-primary hover:text-primary-foreground'}`}
+                  className={`justify-start rounded-xl border-2 font-semibold shadow-sm transition-all duration-200 ${location.pathname === '/tools' ? 'bg-primary text-primary-foreground border-primary shadow-md scale-105' : 'text-primary border-primary/40 bg-primary/5 hover:bg-primary hover:text-primary-foreground hover:border-primary hover:shadow-md hover:scale-105 active:scale-95'}`}
                 >
                   Tools
                 </Button>
@@ -329,15 +329,15 @@ export const Navigation = () => {
                   variant="ghost" 
                   size="lg" 
                   onClick={() => handleNavigate("/exerciselibrary")} 
-                  className={`justify-start text-primary border border-primary/30 ${location.pathname === '/exerciselibrary' ? 'bg-primary text-primary-foreground' : 'bg-primary/10 hover:bg-primary hover:text-primary-foreground'}`}
+                  className={`justify-start rounded-xl border-2 font-semibold shadow-sm transition-all duration-200 ${location.pathname === '/exerciselibrary' ? 'bg-primary text-primary-foreground border-primary shadow-md scale-105' : 'text-primary border-primary/40 bg-primary/5 hover:bg-primary hover:text-primary-foreground hover:border-primary hover:shadow-md hover:scale-105 active:scale-95'}`}
                 >
                   Exercise Library
                 </Button>
                 <Button 
                   variant="ghost" 
                   size="lg" 
-                  onClick={() => handleNavigate("/community")} 
-                  className={`justify-start text-primary border border-primary/30 ${location.pathname === '/community' ? 'bg-primary text-primary-foreground' : 'bg-primary/10 hover:bg-primary hover:text-primary-foreground'}`}
+                  onClick={() => handleNavigate("/community")}
+                  className={`justify-start rounded-xl border-2 font-semibold shadow-sm transition-all duration-200 ${location.pathname === '/community' ? 'bg-primary text-primary-foreground border-primary shadow-md scale-105' : 'text-primary border-primary/40 bg-primary/5 hover:bg-primary hover:text-primary-foreground hover:border-primary hover:shadow-md hover:scale-105 active:scale-95'}`}
                 >
                   Community
                 </Button>
@@ -345,7 +345,7 @@ export const Navigation = () => {
                   variant="ghost" 
                   size="lg" 
                   onClick={() => handleNavigate("/blog")} 
-                  className={`justify-start text-primary border border-primary/30 ${location.pathname === '/blog' ? 'bg-primary text-primary-foreground' : 'bg-primary/10 hover:bg-primary hover:text-primary-foreground'}`}
+                  className={`justify-start rounded-xl border-2 font-semibold shadow-sm transition-all duration-200 ${location.pathname === '/blog' ? 'bg-primary text-primary-foreground border-primary shadow-md scale-105' : 'text-primary border-primary/40 bg-primary/5 hover:bg-primary hover:text-primary-foreground hover:border-primary hover:shadow-md hover:scale-105 active:scale-95'}`}
                 >
                   Blog
                 </Button>
@@ -353,7 +353,7 @@ export const Navigation = () => {
                   variant="ghost" 
                   size="lg" 
                   onClick={() => handleNavigate("/contact")} 
-                  className={`justify-start text-primary border border-primary/30 ${location.pathname === '/contact' ? 'bg-primary text-primary-foreground' : 'bg-primary/10 hover:bg-primary hover:text-primary-foreground'}`}
+                  className={`justify-start rounded-xl border-2 font-semibold shadow-sm transition-all duration-200 ${location.pathname === '/contact' ? 'bg-primary text-primary-foreground border-primary shadow-md scale-105' : 'text-primary border-primary/40 bg-primary/5 hover:bg-primary hover:text-primary-foreground hover:border-primary hover:shadow-md hover:scale-105 active:scale-95'}`}
                 >
                   Contact
                 </Button>
