@@ -843,6 +843,7 @@ export type Database = {
           age: number | null
           avatar_url: string | null
           created_at: string
+          custom_session_duration: number | null
           equipment_preferences: string[] | null
           fitness_goals: string[] | null
           fitness_level: string | null
@@ -861,6 +862,7 @@ export type Database = {
           age?: number | null
           avatar_url?: string | null
           created_at?: string
+          custom_session_duration?: number | null
           equipment_preferences?: string[] | null
           fitness_goals?: string[] | null
           fitness_level?: string | null
@@ -879,6 +881,7 @@ export type Database = {
           age?: number | null
           avatar_url?: string | null
           created_at?: string
+          custom_session_duration?: number | null
           equipment_preferences?: string[] | null
           fitness_goals?: string[] | null
           fitness_level?: string | null
