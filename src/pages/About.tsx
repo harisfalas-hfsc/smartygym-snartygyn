@@ -90,7 +90,7 @@ const About = () => {
             
             <CardContent className="p-8 md:p-12 relative">
               {/* Take A Tour Button - Top Left */}
-              <div className="absolute top-8 left-8 z-10">
+              <div className="hidden md:block absolute top-8 left-8 z-10">
                 <Button 
                   size="lg"
                   onClick={() => navigate("/takeatour")}
