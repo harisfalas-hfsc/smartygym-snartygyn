@@ -36,6 +36,7 @@ type LevelFilter = "all" | "beginner" | "intermediate" | "advanced";
 type DurationFilter = "all" | "4" | "6" | "8";
 type StatusFilter = "all" | "viewed" | "completed" | "not-viewed" | "favorites";
 type SortByFilter = "newest" | "oldest" | "name-asc" | "name-desc";
+type AccessFilter = "all" | "free" | "premium" | "purchasable";
 
 export interface TrainingProgram {
   id: string;
@@ -58,6 +59,7 @@ const TrainingProgramDetail = () => {
   const [durationFilter, setDurationFilter] = useState<DurationFilter>("all");
   const [statusFilter, setStatusFilter] = useState<StatusFilter>("all");
   const [sortBy, setSortBy] = useState<SortByFilter>("newest");
+  const [accessFilter, setAccessFilter] = useState<AccessFilter>("all");
   const [userId, setUserId] = useState<string | undefined>();
 
   // Debounce search
@@ -94,10 +96,11 @@ const TrainingProgramDetail = () => {
     setDurationFilter("all");
     setStatusFilter("all");
     setSortBy("newest");
+    setAccessFilter("all");
   };
 
   const hasActiveFilters = searchTerm || equipmentFilter !== "all" || levelFilter !== "all" || 
-    durationFilter !== "all" || statusFilter !== "all" || sortBy !== "newest";
+    durationFilter !== "all" || statusFilter !== "all" || sortBy !== "newest" || accessFilter !== "all";
   
   // Map URL type to database category
   const categoryMap: { [key: string]: string } = {
@@ -414,6 +417,11 @@ const TrainingProgramDetail = () => {
         if (statusFilter === "favorites" && !interaction?.is_favorite) return false;
       }
       
+      // Access filter
+      if (accessFilter === "free" && program.is_premium) return false;
+      if (accessFilter === "premium" && !program.is_premium) return false;
+      if (accessFilter === "purchasable" && (!program.is_standalone_purchase || !program.price)) return false;
+      
       return true;
     });
 
@@ -444,7 +452,7 @@ const TrainingProgramDetail = () => {
 
     return sorted;
   }, [currentTypePrograms, debouncedSearch, equipmentFilter, levelFilter, durationFilter, 
-      statusFilter, sortBy, userId, interactions]);
+      statusFilter, sortBy, accessFilter, userId, interactions]);
 
   return (
     <>
@@ -586,6 +594,18 @@ const TrainingProgramDetail = () => {
                 { value: "4", label: "4 Weeks" },
                 { value: "6", label: "6 Weeks" },
                 { value: "8", label: "8 Weeks" },
+              ],
+            },
+            {
+              name: "Access",
+              value: accessFilter,
+              onChange: (value) => setAccessFilter(value as AccessFilter),
+              placeholder: "Access Level",
+              options: [
+                { value: "all", label: "All Content" },
+                { value: "free", label: "🆓 Free Only" },
+                { value: "premium", label: "👑 Premium Only" },
+                { value: "purchasable", label: "💶 Purchasable" },
               ],
             },
             ...(userId ? [{
