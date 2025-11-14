@@ -271,13 +271,8 @@ const Index = () => {
               <Card className="border-2 border-primary bg-gradient-to-br from-primary/5 via-background to-accent/5 backdrop-blur-sm">
                 <div className="p-6 sm:p-8 md:p-10 space-y-6 sm:space-y-8 md:space-y-10">
                   
-                  {/* Logo & Main Headline */}
+                  {/* Main Headline */}
                   <div className="text-center space-y-6 sm:space-y-8 md:space-y-10">
-                    <img 
-                      src={smartyGymLogo} 
-                      alt="Smarty Gym Logo" 
-                      className="h-48 sm:h-60 md:h-72 mx-auto max-w-md"
-                    />
                     <h1 className="text-3xl sm:text-4xl md:text-5xl font-black bg-gradient-to-r from-primary via-amber-400 to-primary bg-clip-text text-transparent">
                       Welcome to SmartyGym
                     </h1>
