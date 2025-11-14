@@ -157,7 +157,6 @@ const Blog = () => {
 
           <PageTitleCard
             title="Blog" 
-            subtitle="Insights on Fitness Wellness and Nutrition"
             icon={FileText}
           />
 
