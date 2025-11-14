@@ -4,7 +4,6 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { PageTitleCard } from "@/components/PageTitleCard";
 import { InfoRibbon } from "@/components/InfoRibbon";
-import { DecorativeDivider } from "@/components/DecorativeDivider";
 import { ArrowLeft, Calculator, Activity, Flame, Wrench } from "lucide-react";
 import { useShowBackButton } from "@/hooks/useShowBackButton";
 import { useAccessControl } from "@/hooks/useAccessControl";
@@ -99,8 +98,6 @@ const Tools = () => {
           </InfoRibbon>
         )}
 
-        <DecorativeDivider className="mb-12" />
-
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {tools.map((tool) => {
             const Icon = tool.icon;
@@ -123,8 +120,6 @@ const Tools = () => {
             );
           })}
         </div>
-
-        <DecorativeDivider className="my-12" />
 
         {/* Info Section */}
         <Card className="mt-12 bg-gradient-to-br from-primary/5 via-background to-primary/5 border-2 border-primary/40 shadow-gold">
