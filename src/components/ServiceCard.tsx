@@ -32,13 +32,13 @@ export const ServiceCard = ({ icon: Icon, title, description, onClick }: Service
             className="font-semibold text-lg mb-2 transition-colors duration-300 group-hover:text-primary"
             itemProp="name"
           >
-            {title} - Smarty Gym Cyprus
+            {title}
           </h3>
           <p 
             className="text-sm text-muted-foreground"
             itemProp="description"
           >
-            {description} - Online gym at smartygym.com by Haris Falas
+            {description}
           </p>
           <meta itemProp="provider" content="Smarty Gym Cyprus - smartygym.com" />
           <meta itemProp="serviceType" content="Online Fitness" />

@@ -226,13 +226,13 @@ const Blog = () => {
                     className="text-xl font-bold mb-2 line-clamp-2"
                     itemProp="headline"
                   >
-                    {article.title} - Smarty Gym Cyprus
+                {article.title}
                   </h2>
                   <p 
                     className="text-muted-foreground text-sm mb-4 line-clamp-2"
                     itemProp="description"
                   >
-                    {article.excerpt} - Online fitness insights at smartygym.com
+                    {article.excerpt}
                   </p>
                   
                   <div className="flex items-center justify-between text-xs text-muted-foreground">
