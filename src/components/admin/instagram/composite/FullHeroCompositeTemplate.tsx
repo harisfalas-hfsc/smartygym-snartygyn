@@ -5,23 +5,23 @@ export const FullHeroCompositeTemplate = () => {
   return (
     <div className="w-[1080px] h-[1080px] bg-background p-8 flex items-center justify-center">
       <Card className="border-primary border-4 w-full h-full flex flex-col bg-gradient-to-br from-yellow-50/50 via-background to-yellow-50/30">
-        <CardContent className="p-8 flex flex-col h-full space-y-6">
+        <CardContent className="p-5 flex flex-col h-full space-y-3">
           
           {/* Main Title */}
-          <div className="text-center space-y-2">
-            <h1 className="text-5xl font-black bg-gradient-to-r from-primary via-amber-400 to-primary bg-clip-text text-transparent">
+          <div className="text-center space-y-1">
+            <h1 className="text-4xl font-black bg-gradient-to-r from-primary via-amber-400 to-primary bg-clip-text text-transparent">
               Welcome to SmartyGym
             </h1>
-            <p className="text-2xl text-muted-foreground font-medium">
+            <p className="text-xl text-muted-foreground font-medium">
               Your Gym Re-imagined. Anywhere, Anytime.
             </p>
           </div>
 
           {/* Three Core Messages */}
-          <div className="grid grid-cols-3 gap-4">
+          <div className="grid grid-cols-3 gap-2">
             
             {/* Your Gym In Your Pocket */}
-            <div className="text-center space-y-2 p-3 rounded-lg bg-background/50 border border-primary/20">
+            <div className="text-center space-y-1 p-2 rounded-lg bg-background/50 border border-primary/20">
               <div className="inline-flex items-center justify-center w-10 h-10 rounded-full bg-primary/10">
                 <Smartphone className="w-5 h-5 text-primary" />
               </div>
@@ -34,7 +34,7 @@ export const FullHeroCompositeTemplate = () => {
             </div>
 
             {/* 100% Human. 0% AI. */}
-            <div className="text-center space-y-2 p-3 rounded-lg bg-background/50 border border-primary/20">
+            <div className="text-center space-y-1 p-2 rounded-lg bg-background/50 border border-primary/20">
               <div className="inline-flex items-center justify-center w-10 h-10 rounded-full bg-primary/10">
                 <UserCheck className="w-5 h-5 text-primary" />
               </div>
@@ -47,7 +47,7 @@ export const FullHeroCompositeTemplate = () => {
             </div>
 
             {/* Train Anywhere, Anytime */}
-            <div className="text-center space-y-2 p-3 rounded-lg bg-background/50 border border-primary/20">
+            <div className="text-center space-y-1 p-2 rounded-lg bg-background/50 border border-primary/20">
               <div className="inline-flex items-center justify-center w-10 h-10 rounded-full bg-primary/10">
                 <Dumbbell className="w-5 h-5 text-primary" />
               </div>
@@ -61,10 +61,10 @@ export const FullHeroCompositeTemplate = () => {
           </div>
 
           {/* Feature Highlights Grid */}
-          <div className="border-t border-primary/20 pt-4 flex-1 flex flex-col justify-center">
-            <div className="grid grid-cols-2 gap-3">
+          <div className="border-t border-primary/20 pt-3">
+            <div className="grid grid-cols-2 gap-2">
               
-              <div className="flex items-start gap-2 bg-background/50 p-2 rounded-lg">
+              <div className="flex items-start gap-2 bg-background/50 p-1.5 rounded-lg">
                 <Dumbbell className="w-4 h-4 text-primary flex-shrink-0 mt-0.5" />
                 <div>
                   <p className="font-semibold text-xs text-foreground">100+ Expert Workouts</p>
@@ -72,7 +72,7 @@ export const FullHeroCompositeTemplate = () => {
                 </div>
               </div>
 
-              <div className="flex items-start gap-2 bg-background/50 p-2 rounded-lg">
+              <div className="flex items-start gap-2 bg-background/50 p-1.5 rounded-lg">
                 <Calendar className="w-4 h-4 text-primary flex-shrink-0 mt-0.5" />
                 <div>
                   <p className="font-semibold text-xs text-foreground">Training Programs</p>
@@ -80,7 +80,7 @@ export const FullHeroCompositeTemplate = () => {
                 </div>
               </div>
 
-              <div className="flex items-start gap-2 bg-background/50 p-2 rounded-lg">
+              <div className="flex items-start gap-2 bg-background/50 p-1.5 rounded-lg">
                 <UserCheck className="w-4 h-4 text-primary flex-shrink-0 mt-0.5" />
                 <div>
                   <p className="font-semibold text-xs text-foreground">Personal Training</p>
@@ -88,7 +88,7 @@ export const FullHeroCompositeTemplate = () => {
                 </div>
               </div>
 
-              <div className="flex items-start gap-2 bg-background/50 p-2 rounded-lg">
+              <div className="flex items-start gap-2 bg-background/50 p-1.5 rounded-lg">
                 <Wrench className="w-4 h-4 text-primary flex-shrink-0 mt-0.5" />
                 <div>
                   <p className="font-semibold text-xs text-foreground">Smart Tools</p>
@@ -96,7 +96,7 @@ export const FullHeroCompositeTemplate = () => {
                 </div>
               </div>
 
-              <div className="flex items-start gap-2 bg-background/50 p-2 rounded-lg">
+              <div className="flex items-start gap-2 bg-background/50 p-1.5 rounded-lg">
                 <Video className="w-4 h-4 text-primary flex-shrink-0 mt-0.5" />
                 <div>
                   <p className="font-semibold text-xs text-foreground">Exercise Library</p>
@@ -104,7 +104,7 @@ export const FullHeroCompositeTemplate = () => {
                 </div>
               </div>
 
-              <div className="flex items-start gap-2 bg-background/50 p-2 rounded-lg">
+              <div className="flex items-start gap-2 bg-background/50 p-1.5 rounded-lg">
                 <Activity className="w-4 h-4 text-primary flex-shrink-0 mt-0.5" />
                 <div>
                   <p className="font-semibold text-xs text-foreground">Community Support</p>
@@ -116,7 +116,7 @@ export const FullHeroCompositeTemplate = () => {
 
           {/* Footer */}
           <div className="text-center">
-            <p className="text-2xl font-semibold text-primary">smartygym.com</p>
+            <p className="text-xl font-semibold text-primary">smartygym.com</p>
           </div>
         </CardContent>
       </Card>
