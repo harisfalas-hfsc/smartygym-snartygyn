@@ -145,47 +145,49 @@ const About = () => {
               </div>
 
               {/* Freedom Statement - Emphasized */}
-              <div className="mt-4">
+              <div className="mt-0">
                 <div className="bg-gradient-to-r from-primary/10 to-accent/15 backdrop-blur-sm p-4 rounded-lg border-2 border-primary/40 shadow-md">
-                  <div className="flex items-center justify-center gap-2 mb-2">
-                    <Sparkles className="w-6 h-6 text-primary" />
+                  <div className="flex items-center justify-center gap-4">
+                    <Sparkles className="w-6 h-6 text-primary flex-shrink-0" />
+                    <p className="text-xl font-bold text-center text-foreground">
+                      At smartygym.com, we don't just sell fitness. We sell freedom.
+                    </p>
+                    <Sparkles className="w-6 h-6 text-primary flex-shrink-0" />
                   </div>
-                  <p className="text-xl font-bold text-center text-foreground">
-                    At smartygym.com, we don't just sell fitness. We sell freedom.
-                  </p>
                 </div>
+              </div>
+
+              {/* Take A Tour Button - Inside Card */}
+              <div className="flex justify-center mt-6">
+                <Button 
+                  size="lg"
+                  onClick={() => navigate("/takeatour")}
+                  className="bg-background text-primary border-2 border-primary hover:bg-primary/5 shadow-lg hover:shadow-xl transition-all px-12 py-6 text-lg font-semibold"
+                >
+                  <Compass className="mr-3 h-6 w-6" />
+                  Take A Tour
+                </Button>
               </div>
             </CardContent>
           </Card>
-          
-          {/* Take A Tour Button */}
-          <div className="flex justify-center mt-8">
-            <Button 
-              size="lg"
-              onClick={() => navigate("/takeatour")}
-              className="bg-background text-primary border-2 border-primary hover:bg-primary/5 shadow-lg hover:shadow-xl transition-all px-12 py-6 text-lg font-semibold"
-            >
-              <Compass className="mr-3 h-6 w-6" />
-              Take A Tour
-            </Button>
-          </div>
         </section>
 
         {/* Mission Statement with Cards */}
         <section className="mb-16">
-          <div className="text-center mb-10">
-            <h2 className="text-3xl md:text-4xl font-bold mb-4">Our Mission</h2>
-            <p className="text-lg text-muted-foreground max-w-3xl mx-auto">
-              At Smarty Gym, our mission is simple: to provide functional, science-based fitness solutions that fit into your real life.
-            </p>
-          </div>
-
           {/* Your Gym Anywhere Card */}
           <Card className="bg-gradient-to-r from-primary/10 to-accent/10 border-2 border-primary/20 mb-8">
             <CardContent className="p-8">
-              <h3 className="text-2xl font-bold text-center mb-4">
-                Your Gym Reimagined Anywhere, Anytime
-              </h3>
+              <div className="flex items-start justify-between mb-4">
+                <h3 className="text-2xl font-bold flex-1">
+                  Your Gym Reimagined Anywhere, Anytime
+                </h3>
+                <Button
+                  onClick={() => navigate("/join-premium")}
+                  className="ml-4 bg-primary text-primary-foreground hover:bg-primary/90 shadow-md"
+                >
+                  Join Now
+                </Button>
+              </div>
               <div className="space-y-4 max-w-3xl mx-auto">
                 <p className="text-base font-semibold text-center">
                   We are not here to replace your gym. We are here to back you up when life gets in the way.
