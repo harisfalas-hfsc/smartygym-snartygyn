@@ -269,10 +269,10 @@ const Index = () => {
           <div className="container mx-auto max-w-5xl relative z-10">
             <ScrollReveal>
               <Card className="border-2 border-primary bg-gradient-to-br from-primary/5 via-background to-accent/5 backdrop-blur-sm">
-                <div className="p-2 sm:p-3 md:p-4 space-y-2 sm:space-y-3">
+                <div className="p-6 sm:p-8 md:p-10 space-y-6 sm:space-y-8 md:space-y-10">
                   
                   {/* Logo & Main Headline */}
-                  <div className="text-center space-y-2">
+                  <div className="text-center space-y-6 sm:space-y-8 md:space-y-10">
                     <img 
                       src={smartyGymLogo} 
                       alt="Smarty Gym Logo" 
@@ -384,7 +384,7 @@ const Index = () => {
                   </div>
 
                   {/* CTA Buttons */}
-                  <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center items-center pt-4">
+                  <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center items-center">
                     <Button 
                       size="lg" 
                       onClick={() => navigate("/workout")} 
