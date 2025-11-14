@@ -124,7 +124,7 @@ export default function PremiumBenefits() {
 
   const benefits = [
     { icon: Dumbbell, title: "Unlimited Workouts", description: "Access to all personalized workout plans" },
-    { icon: Calendar, title: "Training Programs", description: "Structured 6-8 week programs by experts" },
+    { icon: Calendar, title: "Training Programs", description: "Structured training programs to achieve long-term goals" },
     { icon: Heart, title: "Track Favorites", description: "Save and organize your favorite workouts" },
     { icon: TrendingUp, title: "Progress Tracking", description: "Monitor completed workouts and achievements" },
     { icon: Target, title: "Goal Setting", description: "Set and track your fitness goals" },
