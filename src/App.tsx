@@ -77,7 +77,6 @@ const App = () => (
           <NotificationPrompt />
           <AccessControlProvider>
           <WhatsAppButton />
-          <FloatingActionButton />
           <ScrollToTop />
           <div className="flex flex-col min-h-screen">
             <Navigation />
