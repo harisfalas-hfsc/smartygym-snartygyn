@@ -135,6 +135,7 @@ type FormatFilter = "all" | "circuit" | "amrap" | "for time" | "tabata" | "reps 
 type DurationFilter = "all" | "15" | "20" | "30" | "45" | "60" | "various";
 type StatusFilter = "all" | "viewed" | "completed" | "not-viewed" | "favorites";
 type SortByFilter = "newest" | "oldest" | "name-asc" | "name-desc";
+type AccessFilter = "all" | "free" | "premium" | "purchasable";
 
 export interface Workout {
   id: string;
@@ -281,6 +282,7 @@ const WorkoutDetail = () => {
   const [durationFilter, setDurationFilter] = useState<DurationFilter>("all");
   const [statusFilter, setStatusFilter] = useState<StatusFilter>("all");
   const [sortBy, setSortBy] = useState<SortByFilter>("newest");
+  const [accessFilter, setAccessFilter] = useState<AccessFilter>("all");
   const [userId, setUserId] = useState<string | undefined>();
 
   // Debounce search
@@ -321,10 +323,11 @@ const WorkoutDetail = () => {
     setDurationFilter("all");
     setStatusFilter("all");
     setSortBy("newest");
+    setAccessFilter("all");
   };
 
   const hasActiveFilters = searchTerm || equipmentFilter !== "all" || levelFilter !== "all" || 
-    formatFilter !== "all" || durationFilter !== "all" || statusFilter !== "all" || sortBy !== "newest";
+    formatFilter !== "all" || durationFilter !== "all" || statusFilter !== "all" || sortBy !== "newest" || accessFilter !== "all";
   
   console.log("📦 All Workouts:", allWorkouts.length, allWorkouts);
   console.log("⏳ Loading:", isLoading);
@@ -411,6 +414,11 @@ const WorkoutDetail = () => {
         if (statusFilter === "favorites" && !interaction?.is_favorite) return false;
       }
       
+      // Access filter
+      if (accessFilter === "free" && workout.is_premium) return false;
+      if (accessFilter === "premium" && !workout.is_premium) return false;
+      if (accessFilter === "purchasable" && (!workout.is_standalone_purchase || !workout.price)) return false;
+      
       return true;
     });
 
@@ -441,7 +449,7 @@ const WorkoutDetail = () => {
 
     return sorted;
   }, [currentTypeWorkouts, debouncedSearch, equipmentFilter, levelFilter, formatFilter, 
-      durationFilter, statusFilter, sortBy, userId, interactions]);
+      durationFilter, statusFilter, sortBy, accessFilter, userId, interactions]);
 
   return (
     <>
@@ -601,6 +609,18 @@ const WorkoutDetail = () => {
                 { value: "45", label: "45 min" },
                 { value: "60", label: "60 min" },
                 { value: "various", label: "Various" },
+              ],
+            },
+            {
+              name: "Access",
+              value: accessFilter,
+              onChange: (value) => setAccessFilter(value as AccessFilter),
+              placeholder: "Access Level",
+              options: [
+                { value: "all", label: "All Content" },
+                { value: "free", label: "🆓 Free Only" },
+                { value: "premium", label: "👑 Premium Only" },
+                { value: "purchasable", label: "💶 Purchasable" },
               ],
             },
             ...(userId ? [{
