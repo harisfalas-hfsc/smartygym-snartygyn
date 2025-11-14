@@ -65,15 +65,6 @@ export default function Auth() {
   const handleSignUp = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!signUpData.fullName.trim()) {
-      toast({
-        title: "Error",
-        description: "Please enter your full name",
-        variant: "destructive",
-      });
-      return;
-    }
-    
     if (signUpData.password !== signUpData.confirmPassword) {
       toast({
         title: "Error",
