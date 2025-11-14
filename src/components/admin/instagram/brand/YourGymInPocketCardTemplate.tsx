@@ -12,7 +12,7 @@ export const YourGymInPocketCardTemplate = () => {
           <div className="text-center space-y-4">
             <h3 className="text-5xl font-bold">Your Gym In Your Pocket</h3>
             <p className="text-3xl text-muted-foreground leading-relaxed">
-              Professional fitness platform with expert workouts, structured programs, and personalized coaching
+              Professional fitness platform with expert workouts, structured programs, and personalized coaching - accessible worldwide at smartygym.com.
             </p>
           </div>
           <p className="text-2xl font-semibold text-primary mt-8">smartygym.com</p>
