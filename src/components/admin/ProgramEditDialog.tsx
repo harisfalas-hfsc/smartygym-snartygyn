@@ -218,6 +218,16 @@ export const ProgramEditDialog = ({ program, open, onOpenChange, onSave, isPerso
 
   const handleSave = async () => {
     try {
+      // Validate that free content cannot be standalone purchase
+      if (!formData.is_premium && formData.is_standalone_purchase) {
+        toast({
+          variant: "destructive",
+          title: "Invalid Configuration",
+          description: "Free content cannot be sold as standalone purchase. Please enable Premium first.",
+        });
+        return;
+      }
+
       setIsGeneratingImage(true);
       
       let imageUrl = formData.image_url;
