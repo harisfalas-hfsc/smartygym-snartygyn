@@ -7,7 +7,6 @@ import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { PageTitleCard } from "@/components/PageTitleCard";
 import { InfoRibbon } from "@/components/InfoRibbon";
-import { DecorativeDivider } from "@/components/DecorativeDivider";
 import { ArrowLeft, Mail, MessageSquare, Send, MapPin, Phone, Lock } from "lucide-react";
 import { BackToTop } from "@/components/BackToTop";
 import { useToast } from "@/hooks/use-toast";
@@ -318,8 +317,6 @@ const Contact = () => {
               Get in touch with <a href="/coach-profile" className="text-primary hover:underline font-medium"><strong>Haris Falas</strong></a> and the Smarty Gym team
             </p>
           </PageTitleCard>
-
-          <DecorativeDivider className="mb-12" />
 
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
             {/* Contact Form */}

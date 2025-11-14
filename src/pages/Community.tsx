@@ -4,7 +4,6 @@ import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { PageTitleCard } from "@/components/PageTitleCard";
 import { InfoRibbon } from "@/components/InfoRibbon";
-import { DecorativeDivider } from "@/components/DecorativeDivider";
 import {
   Table,
   TableBody,
@@ -246,8 +245,6 @@ const Community = () => {
             icon={Users} 
           />
 
-          <DecorativeDivider className="mb-12" />
-
           {/* Workout Leaderboard Section */}
           <Card className="mb-6 md:mb-8 border-2 border-primary/30 shadow-lg">
             <CardHeader className="bg-gradient-to-r from-primary/10 to-primary/5 p-4 md:p-6">
@@ -309,8 +306,6 @@ const Community = () => {
             </CardContent>
           </Card>
 
-          <DecorativeDivider className="my-12" />
-
           {/* Program Leaderboard Section */}
           <Card className="mb-6 md:mb-8 border-2 border-primary/30 shadow-lg">
             <CardHeader className="bg-gradient-to-r from-primary/10 to-primary/5 p-4 md:p-6">
@@ -371,8 +366,6 @@ const Community = () => {
               )}
             </CardContent>
           </Card>
-
-          <DecorativeDivider className="my-12" />
 
           {/* Comments Section */}
           <Card className="border-2 border-primary/30 shadow-lg">
