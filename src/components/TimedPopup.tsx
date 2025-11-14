@@ -39,7 +39,7 @@ export const TimedPopup = () => {
           <span className="sr-only">Close</span>
         </button>
         <DialogHeader>
-          <DialogTitle className="text-xl">Enjoying your free workouts?</DialogTitle>
+          <DialogTitle className="text-xl">Upgrade to Premium</DialogTitle>
           <DialogDescription className="text-base pt-2">
             Get full access to all programs, tools, and exclusive content with Smarty Gym Premium.
           </DialogDescription>
