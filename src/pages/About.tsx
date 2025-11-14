@@ -3,9 +3,9 @@ import { Helmet } from "react-helmet";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
-import { PageTitleCard } from "@/components/PageTitleCard";
+import { PageBreadcrumbs } from "@/components/PageBreadcrumbs";
 import { InfoRibbon } from "@/components/InfoRibbon";
-import { ArrowLeft, Award, Heart, Users, Target, UserCheck, Brain, Shield, Sparkles, Ban, CheckCircle2, Compass, Info } from "lucide-react";
+import { ArrowLeft, Award, Heart, Users, Target, UserCheck, Brain, Shield, Sparkles, Ban, CheckCircle2, Compass } from "lucide-react";
 import { BackToTop } from "@/components/BackToTop";
 import { useShowBackButton } from "@/hooks/useShowBackButton";
 import { useAccessControl } from "@/hooks/useAccessControl";
@@ -74,10 +74,12 @@ const About = () => {
           </div>
         )}
 
-        {/* Hero Section */}
-        <PageTitleCard 
-          title="About" 
-          icon={Info}
+        {/* Breadcrumbs */}
+        <PageBreadcrumbs 
+          items={[
+            { label: "Home", href: "/" },
+            { label: "About" }
+          ]} 
         />
 
         {/* NO AI Section - Main Differentiator */}

@@ -2,8 +2,8 @@ import { useNavigate } from "react-router-dom";
 import { Helmet } from "react-helmet";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { PageTitleCard } from "@/components/PageTitleCard";
-import { ArrowLeft, Youtube, Video } from "lucide-react";
+import { PageBreadcrumbs } from "@/components/PageBreadcrumbs";
+import { ArrowLeft, Youtube } from "lucide-react";
 import { BackToTop } from "@/components/BackToTop";
 import { useShowBackButton } from "@/hooks/useShowBackButton";
 
@@ -46,9 +46,11 @@ const ExerciseLibrary = () => {
             </div>
           )}
           
-          <PageTitleCard
-            title="Exercise Library" 
-            icon={Video}
+          <PageBreadcrumbs 
+            items={[
+              { label: "Home", href: "/" },
+              { label: "Exercise Library" }
+            ]} 
           />
 
           {/* YouTube Channel Card */}

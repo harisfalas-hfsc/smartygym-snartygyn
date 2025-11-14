@@ -2,7 +2,7 @@ import { useNavigate } from "react-router-dom";
 import { Helmet } from "react-helmet";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { PageTitleCard } from "@/components/PageTitleCard";
+import { PageBreadcrumbs } from "@/components/PageBreadcrumbs";
 import { InfoRibbon } from "@/components/InfoRibbon";
 import { ArrowLeft, Dumbbell, Flame, Zap, Heart, Move, Activity, TrendingUp } from "lucide-react";
 import { BackToTop } from "@/components/BackToTop";
@@ -102,9 +102,11 @@ const WorkoutFlow = () => {
           </div>
         )}
         
-        <PageTitleCard 
-          title="Workouts" 
-          icon={Dumbbell}
+        <PageBreadcrumbs 
+          items={[
+            { label: "Home", href: "/" },
+            { label: "Workouts" }
+          ]} 
         />
         
         {!isPremium ? (

@@ -5,9 +5,9 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
-import { PageTitleCard } from "@/components/PageTitleCard";
+import { PageBreadcrumbs } from "@/components/PageBreadcrumbs";
 import { InfoRibbon } from "@/components/InfoRibbon";
-import { ArrowLeft, Mail, MessageSquare, Send, MapPin, Phone, Lock } from "lucide-react";
+import { ArrowLeft, MessageSquare, Send, MapPin, Phone, Lock } from "lucide-react";
 import { BackToTop } from "@/components/BackToTop";
 import { useToast } from "@/hooks/use-toast";
 import { z } from "zod";
@@ -307,10 +307,12 @@ const Contact = () => {
             </div>
           )}
 
-          {/* Hero Section */}
-          <PageTitleCard
-            title="Contact" 
-            icon={Mail} 
+          {/* Breadcrumbs */}
+          <PageBreadcrumbs 
+            items={[
+              { label: "Home", href: "/" },
+              { label: "Contact" }
+            ]} 
           />
 
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">

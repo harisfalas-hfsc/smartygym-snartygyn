@@ -7,12 +7,11 @@ import { Input } from "@/components/ui/input";
 import { ArrowLeft, Eye, CheckCircle, Search, X, Sparkles, Star, Crown, Euro, Check } from "lucide-react";
 import { AccessGate } from "@/components/AccessGate";
 import { CompactFilters } from "@/components/CompactFilters";
-import { PageTitleCard } from "@/components/PageTitleCard";
+import { PageBreadcrumbs } from "@/components/PageBreadcrumbs";
 import { ContentLoadingSkeleton } from "@/components/ContentLoadingSkeleton";
 import { useAllWorkouts } from "@/hooks/useWorkoutData";
 import { useWorkoutInteractions } from "@/hooks/useWorkoutInteractions";
 import { supabase } from "@/integrations/supabase/client";
-import { Dumbbell } from "lucide-react";
 import burnStartImg from "@/assets/burn-start-workout.jpg";
 import sweatCircuitImg from "@/assets/sweat-circuit-workout.jpg";
 import bodyBurnoutImg from "@/assets/body-burnout-workout.jpg";
@@ -515,7 +514,13 @@ const WorkoutDetail = () => {
           <span className="text-xs sm:text-sm">Back</span>
         </Button>
         
-        <PageTitleCard title={title} icon={Dumbbell} />
+        <PageBreadcrumbs 
+          items={[
+            { label: "Home", href: "/" },
+            { label: "Workouts", href: "/workout" },
+            { label: title }
+          ]} 
+        />
         
         {/* Search Bar */}
         <div className="mb-4">

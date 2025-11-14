@@ -11,8 +11,8 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { ParQQuestionnaire } from "@/components/ParQQuestionnaire";
-import { PageTitleCard } from "@/components/PageTitleCard";
-import { Loader2, ArrowLeft, UserCheck } from "lucide-react";
+import { PageBreadcrumbs } from "@/components/PageBreadcrumbs";
+import { Loader2, ArrowLeft } from "lucide-react";
 import { useShowBackButton } from "@/hooks/useShowBackButton";
 
 const PersonalTraining = () => {
@@ -286,9 +286,11 @@ const PersonalTraining = () => {
             </div>
           )}
           
-          <PageTitleCard
-            title="Personal Training" 
-            icon={UserCheck}
+          <PageBreadcrumbs 
+            items={[
+              { label: "Home", href: "/" },
+              { label: "Personal Training" }
+            ]} 
           />
 
           <Card className="mb-6 sm:mb-8 bg-gradient-to-br from-primary/5 to-primary/10 border-primary/30">

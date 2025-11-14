@@ -2,9 +2,9 @@ import { useNavigate } from "react-router-dom";
 import { Helmet } from "react-helmet";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { PageTitleCard } from "@/components/PageTitleCard";
+import { PageBreadcrumbs } from "@/components/PageBreadcrumbs";
 import { InfoRibbon } from "@/components/InfoRibbon";
-import { ArrowLeft, Heart, Dumbbell, Activity, Flame, User, Move, Scale, Target } from "lucide-react";
+import { ArrowLeft, Heart, Dumbbell, Activity, Flame, User, Move, Scale } from "lucide-react";
 import { BackToTop } from "@/components/BackToTop";
 import { TimedPopup } from "@/components/TimedPopup";
 import { useAccessControl } from "@/hooks/useAccessControl";
@@ -96,9 +96,11 @@ const TrainingProgramFlow = () => {
           </div>
         )}
         
-        <PageTitleCard
-          title="Training Programs" 
-          icon={Target}
+        <PageBreadcrumbs 
+          items={[
+            { label: "Home", href: "/" },
+            { label: "Training Programs" }
+          ]} 
         />
         
         {!isPremium ? (

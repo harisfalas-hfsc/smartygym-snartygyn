@@ -7,12 +7,11 @@ import { Input } from "@/components/ui/input";
 import { ArrowLeft, Calendar, Eye, CheckCircle, Search, X, Sparkles, Star, Crown, Euro, Check } from "lucide-react";
 import { AccessGate } from "@/components/AccessGate";
 import { CompactFilters } from "@/components/CompactFilters";
-import { PageTitleCard } from "@/components/PageTitleCard";
+import { PageBreadcrumbs } from "@/components/PageBreadcrumbs";
 import { ContentLoadingSkeleton } from "@/components/ContentLoadingSkeleton";
 import { useAllPrograms } from "@/hooks/useProgramData";
 import { useProgramInteractions } from "@/hooks/useProgramInteractions";
 import { supabase } from "@/integrations/supabase/client";
-import { Target } from "lucide-react";
 import cardioEnduranceImg from "@/assets/cardio-endurance-program.jpg";
 import functionalStrengthImg from "@/assets/functional-strength-program.jpg";
 import muscleHypertrophyImg from "@/assets/muscle-hypertrophy-program.jpg";
@@ -519,7 +518,13 @@ const TrainingProgramDetail = () => {
           <span className="text-xs sm:text-sm">Back</span>
         </Button>
         
-        <PageTitleCard title={title} icon={Target} />
+        <PageBreadcrumbs 
+          items={[
+            { label: "Home", href: "/" },
+            { label: "Training Programs", href: "/trainingprogram" },
+            { label: title }
+          ]} 
+        />
         
         {/* Info Card */}
         {programInfo[type || ""] && (
