@@ -94,16 +94,10 @@ const About = () => {
                 <Button 
                   size="lg"
                   onClick={() => navigate("/takeatour")}
-                  className="relative overflow-hidden rounded-full bg-gradient-to-r from-primary to-accent text-white border-0 hover:scale-110 hover:shadow-2xl hover:shadow-primary/50 transition-all duration-300 px-8 py-4 text-base font-bold group"
+                  className="bg-background text-primary border-2 border-primary hover:bg-primary/5 shadow-lg hover:shadow-xl transition-all px-6 py-3 text-sm md:text-base font-semibold"
                 >
-                  {/* Animated shine effect */}
-                  <span className="absolute inset-0 w-full h-full bg-gradient-to-r from-transparent via-white/30 to-transparent animate-shimmer -skew-x-12" />
-                  
-                  {/* Button content */}
-                  <span className="relative flex items-center gap-2">
-                    <Compass className="h-5 w-5 group-hover:rotate-180 transition-transform duration-500" />
-                    Take A Tour
-                  </span>
+                  <Compass className="mr-2 h-4 w-4 md:h-5 md:w-5" />
+                  Take A Tour
                 </Button>
               </div>
 
@@ -130,7 +124,7 @@ const About = () => {
                 </p>
                 <div className="bg-background/80 backdrop-blur-sm p-6 rounded-lg border-2 border-primary/30 mt-6">
                   <p className="text-lg font-bold text-primary mb-2">
-                    Every program is science-based and personally created by <a href="/coach-profile" className="text-primary hover:underline font-medium">Haris Falas</a>.
+                    Every workout and training program is science-based and personally created by <a href="/coach-profile" className="text-primary hover:underline font-medium">Haris Falas</a>.
                   </p>
                   <p className="text-base text-muted-foreground">
                     Never by AI. Never by algorithms. Always by a real human expert who understands YOUR needs. Training designed by humans, for humans.
@@ -189,7 +183,7 @@ const About = () => {
                   Your Gym Reimagined Anywhere, Anytime
                 </h3>
                 <Button
-                  onClick={() => navigate("/join-premium")}
+                  onClick={() => navigate("/join-premium", { state: { from: location.pathname } })}
                   className="ml-4 bg-primary text-primary-foreground hover:bg-primary/90 shadow-md"
                 >
                   Join Now
