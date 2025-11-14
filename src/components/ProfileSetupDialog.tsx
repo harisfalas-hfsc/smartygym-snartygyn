@@ -42,7 +42,6 @@ const equipmentOptions = [
 export const ProfileSetupDialog = ({ open, onComplete }: ProfileSetupDialogProps) => {
   const [step, setStep] = useState(1);
   const [formData, setFormData] = useState({
-    fullName: "",
     weight: "",
     height: "",
     age: "",
@@ -73,8 +72,8 @@ export const ProfileSetupDialog = ({ open, onComplete }: ProfileSetupDialogProps
 
   const handleNext = () => {
     if (step === 1) {
-      if (!formData.fullName || !formData.weight || !formData.height || !formData.age || !formData.gender) {
-        toast.error("Please fill in all information including your name");
+      if (!formData.weight || !formData.height || !formData.age || !formData.gender) {
+        toast.error("Please fill in all basic information");
         return;
       }
     }
@@ -101,7 +100,6 @@ export const ProfileSetupDialog = ({ open, onComplete }: ProfileSetupDialogProps
       const { error } = await supabase
         .from("profiles")
         .update({
-          full_name: formData.fullName,
           weight: parseFloat(formData.weight),
           height: parseFloat(formData.height),
           age: parseInt(formData.age),
@@ -139,18 +137,6 @@ export const ProfileSetupDialog = ({ open, onComplete }: ProfileSetupDialogProps
           {step === 1 && (
             <div className="space-y-4">
               <h3 className="font-semibold">Basic Information</h3>
-              
-              <div>
-                <Label htmlFor="fullName">Full Name *</Label>
-                <Input
-                  id="fullName"
-                  type="text"
-                  value={formData.fullName}
-                  onChange={(e) => setFormData({ ...formData, fullName: e.target.value })}
-                  placeholder="John Doe"
-                  required
-                />
-              </div>
               
               <div className="grid grid-cols-2 gap-4">
                 <div>
