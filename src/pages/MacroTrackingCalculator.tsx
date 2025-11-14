@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Helmet } from "react-helmet";
+import { PageBreadcrumbs } from "@/components/PageBreadcrumbs";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -188,6 +189,14 @@ const MacroTrackingCalculator = () => {
           <ArrowLeft className="mr-2 h-4 w-4" />
           <span className="text-xs sm:text-sm">Back</span>
         </Button>
+
+        <PageBreadcrumbs 
+          items={[
+            { label: "Home", href: "/" },
+            { label: "Tools", href: "/tools" },
+            { label: "Macro Calculator" }
+          ]} 
+        />
         
         <div className="text-center mb-6">
           <p className="text-sm text-muted-foreground mb-2">Smart Tools — Free to Use</p>

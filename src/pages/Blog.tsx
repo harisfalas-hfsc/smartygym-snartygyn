@@ -3,9 +3,9 @@ import { useNavigate } from "react-router-dom";
 import { Helmet } from "react-helmet";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { PageTitleCard } from "@/components/PageTitleCard";
+import { PageBreadcrumbs } from "@/components/PageBreadcrumbs";
 import { InfoRibbon } from "@/components/InfoRibbon";
-import { ArrowLeft, Clock, Calendar, FileText } from "lucide-react";
+import { ArrowLeft, Clock, Calendar } from "lucide-react";
 import { useShowBackButton } from "@/hooks/useShowBackButton";
 
 interface Article {
@@ -155,9 +155,11 @@ const Blog = () => {
             </div>
           )}
 
-          <PageTitleCard
-            title="Blog" 
-            icon={FileText}
+          <PageBreadcrumbs 
+            items={[
+              { label: "Home", href: "/" },
+              { label: "Blog" }
+            ]} 
           />
 
           {/* Category Filter */}

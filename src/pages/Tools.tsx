@@ -2,9 +2,9 @@ import { useNavigate } from "react-router-dom";
 import { Helmet } from "react-helmet";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { PageTitleCard } from "@/components/PageTitleCard";
+import { PageBreadcrumbs } from "@/components/PageBreadcrumbs";
 import { InfoRibbon } from "@/components/InfoRibbon";
-import { ArrowLeft, Calculator, Activity, Flame, Wrench } from "lucide-react";
+import { ArrowLeft, Calculator, Activity, Flame } from "lucide-react";
 import { useShowBackButton } from "@/hooks/useShowBackButton";
 import { useAccessControl } from "@/hooks/useAccessControl";
 
@@ -72,9 +72,11 @@ const Tools = () => {
           </div>
         )}
 
-        <PageTitleCard 
-          title="Smart Tools" 
-          icon={Wrench} 
+        <PageBreadcrumbs 
+          items={[
+            { label: "Home", href: "/" },
+            { label: "Tools" }
+          ]} 
         />
         
         {userTier === "guest" ? (

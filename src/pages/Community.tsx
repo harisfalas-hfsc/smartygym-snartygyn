@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { Helmet } from "react-helmet";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { PageTitleCard } from "@/components/PageTitleCard";
+import { PageBreadcrumbs } from "@/components/PageBreadcrumbs";
 import { InfoRibbon } from "@/components/InfoRibbon";
 import {
   Table,
@@ -239,9 +239,11 @@ const Community = () => {
       <div className="min-h-screen bg-background">
         <div className="container mx-auto max-w-7xl px-4 py-8">
           
-          <PageTitleCard
-            title="Community" 
-            icon={Users} 
+          <PageBreadcrumbs 
+            items={[
+              { label: "Home", href: "/" },
+              { label: "Community" }
+            ]} 
           />
 
           {/* Workout Leaderboard Section */}
