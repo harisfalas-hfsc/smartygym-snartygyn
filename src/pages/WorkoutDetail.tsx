@@ -1,9 +1,10 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { Helmet } from "react-helmet";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { ArrowLeft, Eye, CheckCircle } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { ArrowLeft, Eye, CheckCircle, Search, X, Sparkles, Star, Crown, Euro, Check } from "lucide-react";
 import { AccessGate } from "@/components/AccessGate";
 import { CompactFilters } from "@/components/CompactFilters";
 import { PageTitleCard } from "@/components/PageTitleCard";
@@ -133,7 +134,8 @@ type EquipmentFilter = "all" | "bodyweight" | "equipment";
 type LevelFilter = "all" | "beginner" | "intermediate" | "advanced";
 type FormatFilter = "all" | "circuit" | "amrap" | "for time" | "tabata" | "reps & sets" | "emom" | "mix";
 type DurationFilter = "all" | "15" | "20" | "30" | "45" | "60" | "various";
-type StatusFilter = "all" | "viewed" | "completed";
+type StatusFilter = "all" | "viewed" | "completed" | "not-viewed" | "favorites";
+type SortByFilter = "newest" | "oldest" | "name-asc" | "name-desc";
 
 export interface Workout {
   id: string;
@@ -272,12 +274,23 @@ const workoutData: { [key: string]: Workout[] } = {
 const WorkoutDetail = () => {
   const navigate = useNavigate();
   const { type } = useParams();
+  const [searchTerm, setSearchTerm] = useState("");
+  const [debouncedSearch, setDebouncedSearch] = useState("");
   const [equipmentFilter, setEquipmentFilter] = useState<EquipmentFilter>("all");
   const [levelFilter, setLevelFilter] = useState<LevelFilter>("all");
   const [formatFilter, setFormatFilter] = useState<FormatFilter>("all");
   const [durationFilter, setDurationFilter] = useState<DurationFilter>("all");
   const [statusFilter, setStatusFilter] = useState<StatusFilter>("all");
+  const [sortBy, setSortBy] = useState<SortByFilter>("newest");
   const [userId, setUserId] = useState<string | undefined>();
+
+  // Debounce search
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedSearch(searchTerm);
+    }, 300);
+    return () => clearTimeout(timer);
+  }, [searchTerm]);
   
   console.log("🎯 WorkoutDetail mounted - type:", type);
   
@@ -292,6 +305,27 @@ const WorkoutDetail = () => {
   // Fetch workouts and interactions from database
   const { data: allWorkouts = [], isLoading } = useAllWorkouts();
   const { data: interactions = [] } = useWorkoutInteractions(userId);
+
+  // Helper function to check if workout is new (created within last 7 days)
+  const isNew = (createdAt: string | undefined) => {
+    if (!createdAt) return false;
+    const daysSinceCreation = (Date.now() - new Date(createdAt).getTime()) / (1000 * 60 * 60 * 24);
+    return daysSinceCreation <= 7;
+  };
+
+  // Clear all filters
+  const clearAllFilters = () => {
+    setSearchTerm("");
+    setEquipmentFilter("all");
+    setLevelFilter("all");
+    setFormatFilter("all");
+    setDurationFilter("all");
+    setStatusFilter("all");
+    setSortBy("newest");
+  };
+
+  const hasActiveFilters = searchTerm || equipmentFilter !== "all" || levelFilter !== "all" || 
+    formatFilter !== "all" || durationFilter !== "all" || statusFilter !== "all" || sortBy !== "newest";
   
   console.log("📦 All Workouts:", allWorkouts.length, allWorkouts);
   console.log("⏳ Loading:", isLoading);
@@ -324,59 +358,91 @@ const WorkoutDetail = () => {
   const title = workoutTitles[type || ""] || "Workout";
   const mappedCategory = categoryMap[type || "strength"];
   
-  // Filter workouts by category from URL and user filters
-  const filteredWorkouts = allWorkouts.filter(workout => {
-    console.log("🔍 Filtering workout:", workout.name, "Category:", workout.category, "Expected:", mappedCategory);
-    
-    // Match category
+  // First filter by category from URL
+  const currentTypeWorkouts = allWorkouts.filter(workout => {
     const categoryMatch = workout.category?.toUpperCase().includes(mappedCategory);
-    if (!categoryMatch) {
-      console.log("❌ Category mismatch for:", workout.name);
-      return false;
-    }
-    
-    // Equipment filter
-    if (equipmentFilter !== "all") {
-      const hasEquipment = workout.equipment?.toUpperCase() !== "BODYWEIGHT";
-      if (equipmentFilter === "bodyweight" && hasEquipment) return false;
-      if (equipmentFilter === "equipment" && !hasEquipment) return false;
-    }
-    
-    // Level filter
-    if (levelFilter !== "all" && workout.difficulty?.toLowerCase() !== levelFilter) return false;
-    
-    // Format filter
-    if (formatFilter !== "all") {
-      const workoutFormat = workout.format?.toLowerCase();
-      if (formatFilter === "reps & sets" && workoutFormat !== "reps & sets") return false;
-      if (formatFilter === "for time" && workoutFormat !== "for time") return false;
-      if (formatFilter !== "reps & sets" && formatFilter !== "for time" && workoutFormat !== formatFilter) return false;
-    }
-    
-    // Duration filter
-    if (durationFilter !== "all") {
-      const workoutDuration = workout.duration?.toLowerCase();
-      if (durationFilter === "various") {
-        // Match "various" or similar variations
-        if (!workoutDuration?.includes("various") && !workoutDuration?.includes("varies")) return false;
-      } else {
-        // Extract number from "30 min", "45 min", etc.
-        const durationNumber = workout.duration?.match(/\d+/)?.[0];
-        if (durationNumber !== durationFilter) return false;
-      }
-    }
-    
-    // Status filter (only for authenticated users)
-    if (statusFilter !== "all" && userId) {
-      const interaction = interactions.find(i => i.workout_id === workout.id);
-      if (statusFilter === "viewed" && !interaction?.has_viewed) return false;
-      if (statusFilter === "completed" && !interaction?.is_completed) return false;
-    }
-    
-    return true;
+    return categoryMatch;
   });
   
-  console.log("✅ Filtered Workouts:", filteredWorkouts.length, filteredWorkouts.map(w => w.name));
+  console.log("📦 Category filtered workouts:", currentTypeWorkouts.length);
+
+  // Filter and sort workouts with memoization
+  const filteredWorkouts = useMemo(() => {
+    let filtered = currentTypeWorkouts.filter(workout => {
+      // Search filter
+      if (debouncedSearch) {
+        const searchLower = debouncedSearch.toLowerCase();
+        const matchesName = workout.name.toLowerCase().includes(searchLower);
+        const matchesDescription = workout.description?.toLowerCase().includes(searchLower);
+        const matchesCategory = workout.category?.toLowerCase().includes(searchLower);
+        if (!matchesName && !matchesDescription && !matchesCategory) return false;
+      }
+
+      // Equipment filter
+      if (equipmentFilter !== "all" && workout.equipment?.toLowerCase() !== equipmentFilter) return false;
+      
+      // Level filter
+      if (levelFilter !== "all" && workout.difficulty?.toLowerCase() !== levelFilter) return false;
+      
+      // Format filter
+      if (formatFilter !== "all") {
+        const workoutFormat = workout.format?.toLowerCase();
+        if (formatFilter === "reps & sets" && workoutFormat !== "reps & sets") return false;
+        if (formatFilter === "for time" && workoutFormat !== "for time") return false;
+        if (formatFilter !== "reps & sets" && formatFilter !== "for time" && workoutFormat !== formatFilter) return false;
+      }
+      
+      // Duration filter
+      if (durationFilter !== "all") {
+        const workoutDuration = workout.duration?.toLowerCase();
+        if (durationFilter === "various") {
+          if (!workoutDuration?.includes("various") && !workoutDuration?.includes("varies")) return false;
+        } else {
+          const durationNumber = workout.duration?.match(/\d+/)?.[0];
+          if (durationNumber !== durationFilter) return false;
+        }
+      }
+      
+      // Status filter
+      if (statusFilter !== "all" && userId) {
+        const interaction = interactions.find(i => i.workout_id === workout.id);
+        if (statusFilter === "viewed" && !interaction?.has_viewed) return false;
+        if (statusFilter === "completed" && !interaction?.is_completed) return false;
+        if (statusFilter === "not-viewed" && interaction?.has_viewed) return false;
+        if (statusFilter === "favorites" && !interaction?.is_favorite) return false;
+      }
+      
+      return true;
+    });
+
+    // Sort workouts
+    const sorted = [...filtered];
+    switch (sortBy) {
+      case "newest":
+        sorted.sort((a, b) => {
+          const dateA = a.created_at ? new Date(a.created_at).getTime() : 0;
+          const dateB = b.created_at ? new Date(b.created_at).getTime() : 0;
+          return dateB - dateA;
+        });
+        break;
+      case "oldest":
+        sorted.sort((a, b) => {
+          const dateA = a.created_at ? new Date(a.created_at).getTime() : 0;
+          const dateB = b.created_at ? new Date(b.created_at).getTime() : 0;
+          return dateA - dateB;
+        });
+        break;
+      case "name-asc":
+        sorted.sort((a, b) => a.name.localeCompare(b.name));
+        break;
+      case "name-desc":
+        sorted.sort((a, b) => b.name.localeCompare(a.name));
+        break;
+    }
+
+    return sorted;
+  }, [currentTypeWorkouts, debouncedSearch, equipmentFilter, levelFilter, formatFilter, 
+      durationFilter, statusFilter, sortBy, userId, interactions]);
 
   return (
     <>
@@ -451,6 +517,30 @@ const WorkoutDetail = () => {
         
         <PageTitleCard title={title} icon={Dumbbell} />
         
+        {/* Search Bar */}
+        <div className="mb-4">
+          <div className="relative">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+            <Input
+              type="text"
+              placeholder="Search workouts by name or keyword..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="pl-10 pr-10 text-sm h-10"
+            />
+            {searchTerm && (
+              <Button
+                variant="ghost"
+                size="sm"
+                className="absolute right-2 top-1/2 -translate-y-1/2 h-6 w-6 p-0"
+                onClick={() => setSearchTerm('')}
+              >
+                <X className="h-4 w-4" />
+              </Button>
+            )}
+          </div>
+        </div>
+
         {/* Compact Filters */}
         <CompactFilters
           filters={[
@@ -515,12 +605,46 @@ const WorkoutDetail = () => {
               placeholder: "Status",
               options: [
                 { value: "all", label: "All Workouts" },
-                { value: "viewed", label: "Viewed" },
-                { value: "completed", label: "Completed" },
+                { value: "viewed", label: "👁️ Viewed" },
+                { value: "completed", label: "✓ Completed" },
+                { value: "not-viewed", label: "✨ Not Viewed Yet" },
+                { value: "favorites", label: "⭐ Favorites" },
               ],
             }] : []),
+            {
+              name: "Sort By",
+              value: sortBy,
+              onChange: (value) => setSortBy(value as SortByFilter),
+              placeholder: "Sort By",
+              options: [
+                { value: "newest", label: "🆕 Newest First" },
+                { value: "oldest", label: "📅 Oldest First" },
+                { value: "name-asc", label: "🔤 Name A-Z" },
+                { value: "name-desc", label: "🔤 Name Z-A" },
+              ],
+            },
           ]}
         />
+
+        {/* Results Counter & Clear Filters */}
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 mb-4 px-1">
+          <p className="text-xs sm:text-sm text-muted-foreground">
+            Showing {filteredWorkouts.length} of {currentTypeWorkouts.length} workouts
+            {searchTerm && ` matching "${searchTerm}"`}
+          </p>
+          
+          {hasActiveFilters && (
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={clearAllFilters}
+              className="w-full sm:w-auto text-xs"
+            >
+              <X className="h-3 w-3 mr-1" />
+              Clear All Filters
+            </Button>
+          )}
+        </div>
 
         {/* Workout Cards */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
@@ -528,6 +652,8 @@ const WorkoutDetail = () => {
             const interaction = userId ? interactions.find(i => i.workout_id === workout.id) : null;
             const isViewed = interaction?.has_viewed;
             const isCompleted = interaction?.is_completed;
+            const isFavorite = interaction?.is_favorite;
+            const isNewWorkout = isNew(workout.created_at);
             
             return (
               <Card
@@ -535,41 +661,85 @@ const WorkoutDetail = () => {
                 className="overflow-hidden cursor-pointer transition-all duration-300 hover:scale-105 hover:shadow-gold bg-card border-border relative"
                 onClick={() => navigate(`/workout/${type}/${workout.id}`)}
               >
+                {/* NEW Badge */}
+                {isNewWorkout && (
+                  <div className="absolute top-2 right-2 z-10">
+                    <span className="inline-flex items-center gap-1 bg-gradient-to-r from-yellow-400 to-orange-500 text-white text-xs font-bold px-2 py-1 rounded-full shadow-lg animate-pulse">
+                      <Sparkles className="h-3 w-3 shrink-0" />
+                      NEW
+                    </span>
+                  </div>
+                )}
+
                 <div className="relative h-48 w-full overflow-hidden">
                   <img 
                     src={workout.image_url} 
                     alt={`${workout.name} - ${workout.duration} ${workout.difficulty} ${workout.equipment === 'BODYWEIGHT' ? 'bodyweight' : 'equipment-based'} ${workout.format} workout by Haris Falas Sports Scientist at SmartyGym.com`}
                     className="w-full h-full object-cover"
+                    loading="lazy"
                   />
-                  <div className="absolute top-2 right-2 bg-primary text-primary-foreground text-xs px-2 py-1 rounded">
-                    {workout.duration}
-                  </div>
-                  {!workout.is_premium && (
-                    <div className="absolute top-2 left-2 bg-primary text-primary-foreground px-3 py-1 rounded-full text-xs font-semibold">
-                      FREE
-                    </div>
-                  )}
-                  {workout.is_standalone_purchase && workout.price && (
-                    <div className="absolute top-12 left-2 bg-accent text-accent-foreground px-3 py-1 rounded-full text-xs font-bold flex items-center gap-1">
-                      🛒 €{Number(workout.price).toFixed(2)}
-                    </div>
-                  )}
-                  {userId && isCompleted && (
-                    <div className="absolute bottom-2 left-2 bg-green-600 text-white px-2 py-1 rounded-full text-xs font-semibold flex items-center gap-1">
-                      <CheckCircle className="h-3 w-3" />
-                      Completed
-                    </div>
-                  )}
-                  {userId && isViewed && !isCompleted && (
-                    <div className="absolute bottom-2 left-2 bg-blue-600 text-white px-2 py-1 rounded-full text-xs font-semibold flex items-center gap-1">
-                      <Eye className="h-3 w-3" />
-                      Viewed
-                    </div>
-                  )}
                 </div>
-                <div className="p-4 space-y-2">
-                  <h3 className="font-semibold text-lg">{workout.name}</h3>
-                  <p className="text-sm text-muted-foreground line-clamp-2">{workout.description}</p>
+                
+                <div className="p-4 space-y-3">
+                  <h3 className="font-semibold text-base sm:text-lg">{workout.name}</h3>
+                  <p className="text-xs sm:text-sm text-muted-foreground line-clamp-2">{workout.description}</p>
+                  
+                  {/* Status Indicators Row */}
+                  {userId && (
+                    <div className="flex items-center gap-2 flex-wrap">
+                      {isCompleted && (
+                        <div className="flex items-center gap-1 text-xs text-green-600 dark:text-green-400">
+                          <CheckCircle className="h-3 w-3 sm:h-4 sm:w-4 shrink-0" />
+                          <span className="hidden sm:inline">Completed</span>
+                        </div>
+                      )}
+                      
+                      {isViewed && !isCompleted && (
+                        <div className="flex items-center gap-1 text-xs text-blue-600 dark:text-blue-400">
+                          <Eye className="h-3 w-3 sm:h-4 sm:w-4 shrink-0" />
+                          <span className="hidden sm:inline">Viewed</span>
+                        </div>
+                      )}
+                      
+                      {isFavorite && (
+                        <div className="flex items-center gap-1 text-xs text-yellow-600 dark:text-yellow-400">
+                          <Star className="h-3 w-3 sm:h-4 sm:w-4 fill-current shrink-0" />
+                          <span className="hidden sm:inline">Favorite</span>
+                        </div>
+                      )}
+                      
+                      {isNewWorkout && (
+                        <div className="flex items-center gap-1 text-xs text-orange-600 dark:text-orange-400 font-semibold">
+                          <Sparkles className="h-3 w-3 sm:h-4 sm:w-4 shrink-0" />
+                          <span>NEW</span>
+                        </div>
+                      )}
+                    </div>
+                  )}
+                  
+                  {/* Access Badge */}
+                  <div className="flex items-center gap-2">
+                    <span className="text-xs text-muted-foreground">{workout.duration}</span>
+                    <span className="text-xs text-muted-foreground">•</span>
+                    {workout.is_premium ? (
+                      workout.is_standalone_purchase && workout.price ? (
+                        <span className="inline-flex items-center gap-1 bg-gradient-to-r from-green-500 to-emerald-600 text-white text-xs font-semibold px-2 py-1 rounded-full">
+                          <Euro className="h-3 w-3 shrink-0" />
+                          €{Number(workout.price).toFixed(2)}
+                        </span>
+                      ) : (
+                        <span className="inline-flex items-center gap-1 bg-gradient-to-r from-yellow-400 to-orange-500 text-white text-xs font-semibold px-2 py-1 rounded-full">
+                          <Crown className="h-3 w-3 shrink-0" />
+                          <span className="hidden sm:inline">Premium</span>
+                        </span>
+                      )
+                    ) : (
+                      <span className="inline-flex items-center gap-1 bg-gradient-to-r from-green-500 to-teal-600 text-white text-xs font-semibold px-2 py-1 rounded-full">
+                        <Check className="h-3 w-3 shrink-0" />
+                        FREE
+                      </span>
+                    )}
+                  </div>
                 </div>
               </Card>
             );
