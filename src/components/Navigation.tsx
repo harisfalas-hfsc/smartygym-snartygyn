@@ -14,7 +14,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { User as UserIcon, Settings, LogOut, LayoutDashboard, Crown, Menu, Bell } from "lucide-react";
+import { User as UserIcon, Settings, LogOut, LayoutDashboard, Crown, Menu, Bell, Facebook, Instagram, Music, Youtube } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import smartyGymLogo from "@/assets/smarty-gym-logo.png";
 import { ThemeToggle } from "@/components/ThemeToggle";
@@ -185,181 +185,138 @@ export const Navigation = () => {
     <header className="sticky top-0 z-50 bg-background border-b border-border py-2 px-4">
       <div className="container mx-auto max-w-7xl">
         <div className="flex justify-between items-center gap-4">
-          {/* Logo - Clickable to go home */}
-          <div 
-            className="flex items-center cursor-pointer flex-shrink-0"
-            onClick={() => {
-              navigate("/");
-              setTimeout(() => window.scrollTo(0, 0), 0);
-            }}
-          >
-            <img 
-              src={smartyGymLogo} 
-              alt="Smarty Gym - Home" 
-              className="h-20 sm:h-24 md:h-28 lg:h-32 w-auto object-contain"
-            />
+          {/* LEFT SECTION - Hamburger Menu + Social Media Icons */}
+          <div className="flex items-center gap-3">
+            {/* Hamburger Menu */}
+            <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
+              <SheetTrigger asChild>
+                <Button variant="ghost" size="icon">
+                  <Menu className="h-6 w-6" />
+                </Button>
+              </SheetTrigger>
+              <SheetContent side="left" className="w-64">
+                <nav className="flex flex-col gap-2 mt-8">
+                  <Button
+                    variant="ghost"
+                    onClick={() => handleNavigate("/about")}
+                    className={`justify-start font-semibold transition-colors duration-200 ${location.pathname === '/about' ? 'text-primary underline underline-offset-4' : 'text-foreground hover:text-primary'}`}
+                  >
+                    About
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    onClick={() => handleNavigate("/workout-flow")}
+                    className={`justify-start font-semibold transition-colors duration-200 ${location.pathname === '/workout-flow' ? 'text-primary underline underline-offset-4' : 'text-foreground hover:text-primary'}`}
+                  >
+                    Workouts
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    onClick={() => handleNavigate("/training-program-flow")}
+                    className={`justify-start font-semibold transition-colors duration-200 ${location.pathname === '/training-program-flow' ? 'text-primary underline underline-offset-4' : 'text-foreground hover:text-primary'}`}
+                  >
+                    Programs
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    onClick={() => handleNavigate("/personal-training")}
+                    className={`justify-start font-semibold transition-colors duration-200 ${location.pathname === '/personal-training' ? 'text-primary underline underline-offset-4' : 'text-foreground hover:text-primary'}`}
+                  >
+                    Personal Training
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    onClick={() => handleNavigate("/tools")}
+                    className={`justify-start font-semibold transition-colors duration-200 ${location.pathname === '/tools' ? 'text-primary underline underline-offset-4' : 'text-foreground hover:text-primary'}`}
+                  >
+                    Tools
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    onClick={() => handleNavigate("/exercise-library")}
+                    className={`justify-start font-semibold transition-colors duration-200 ${location.pathname === '/exercise-library' ? 'text-primary underline underline-offset-4' : 'text-foreground hover:text-primary'}`}
+                  >
+                    Exercise Library
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    onClick={() => handleNavigate("/community")}
+                    className={`justify-start font-semibold transition-colors duration-200 ${location.pathname === '/community' ? 'text-primary underline underline-offset-4' : 'text-foreground hover:text-primary'}`}
+                  >
+                    Community
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    onClick={() => handleNavigate("/blog")}
+                    className={`justify-start font-semibold transition-colors duration-200 ${location.pathname === '/blog' ? 'text-primary underline underline-offset-4' : 'text-foreground hover:text-primary'}`}
+                  >
+                    Blog
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    onClick={() => handleNavigate("/contact")}
+                    className={`justify-start font-semibold transition-colors duration-200 ${location.pathname === '/contact' ? 'text-primary underline underline-offset-4' : 'text-foreground hover:text-primary'}`}
+                  >
+                    Contact
+                  </Button>
+                </nav>
+              </SheetContent>
+            </Sheet>
+
+            {/* Social Media Icons */}
+            <div className="hidden sm:flex items-center gap-2">
+              <a
+                href="https://www.facebook.com/harisfalascoach"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="p-2 rounded-full border-2 border-primary text-primary hover:bg-primary hover:text-primary-foreground transition-colors"
+                aria-label="Facebook"
+              >
+                <Facebook className="h-4 w-4" />
+              </a>
+              <a
+                href="https://www.instagram.com/harisfalascoach/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="p-2 rounded-full border-2 border-primary text-primary hover:bg-primary hover:text-primary-foreground transition-colors"
+                aria-label="Instagram"
+              >
+                <Instagram className="h-4 w-4" />
+              </a>
+              <a
+                href="https://www.tiktok.com/@harisfalascoach"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="p-2 rounded-full border-2 border-primary text-primary hover:bg-primary hover:text-primary-foreground transition-colors"
+                aria-label="TikTok"
+              >
+                <Music className="h-4 w-4" />
+              </a>
+              <a
+                href="https://www.youtube.com/@HarisFalasCoach"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="p-2 rounded-full border-2 border-primary text-primary hover:bg-primary hover:text-primary-foreground transition-colors"
+                aria-label="YouTube"
+              >
+                <Youtube className="h-4 w-4" />
+              </a>
+            </div>
           </div>
 
-          {/* Desktop Navigation Links */}
-          <nav className="hidden md:flex items-center gap-4 flex-1 justify-center">
-            <Button 
-              variant="ghost" 
-              size="sm" 
-              onClick={() => navigate("/about")} 
-              className={`font-semibold transition-colors duration-200 ${location.pathname === '/about' ? 'text-primary underline underline-offset-4' : 'text-foreground hover:text-primary'}`}
+          {/* CENTER SECTION - Logo */}
+          <div className="flex-1 flex justify-center">
+            <div
+              onClick={() => handleNavigate("/")}
+              className="cursor-pointer flex-shrink-0"
             >
-              About
-            </Button>
-            <Button 
-              variant="ghost" 
-              size="sm" 
-              onClick={() => navigate("/workout")} 
-              className={`font-semibold transition-colors duration-200 ${location.pathname === '/workout' ? 'text-primary underline underline-offset-4' : 'text-foreground hover:text-primary'}`}
-            >
-              Workouts
-            </Button>
-            <Button 
-              variant="ghost" 
-              size="sm" 
-              onClick={() => navigate("/trainingprogram")} 
-              className={`font-semibold transition-colors duration-200 ${location.pathname === '/trainingprogram' ? 'text-primary underline underline-offset-4' : 'text-foreground hover:text-primary'}`}
-            >
-              Programs
-            </Button>
-            <Button 
-              variant="ghost" 
-              size="sm" 
-              onClick={() => navigate("/personal-training")} 
-              className={`font-semibold transition-colors duration-200 ${location.pathname === '/personal-training' ? 'text-primary underline underline-offset-4' : 'text-foreground hover:text-primary'}`}
-            >
-              Personal Training
-            </Button>
-            <Button 
-              variant="ghost" 
-              size="sm" 
-              onClick={() => navigate("/tools")} 
-              className={`font-semibold transition-colors duration-200 ${location.pathname === '/tools' ? 'text-primary underline underline-offset-4' : 'text-foreground hover:text-primary'}`}
-            >
-              Tools
-            </Button>
-            <Button 
-              variant="ghost" 
-              size="sm" 
-              onClick={() => navigate("/exerciselibrary")} 
-              className={`font-semibold transition-colors duration-200 ${location.pathname === '/exerciselibrary' ? 'text-primary underline underline-offset-4' : 'text-foreground hover:text-primary'}`}
-            >
-              Exercise Library
-            </Button>
-            <Button 
-              variant="ghost" 
-              size="sm" 
-              onClick={() => navigate("/community")} 
-              className={`font-semibold transition-colors duration-200 ${location.pathname === '/community' ? 'text-primary underline underline-offset-4' : 'text-foreground hover:text-primary'}`}
-            >
-              Community
-            </Button>
-            <Button 
-              variant="ghost" 
-              size="sm" 
-              onClick={() => navigate("/blog")}
-              className={`font-semibold transition-colors duration-200 ${location.pathname === '/blog' ? 'text-primary underline underline-offset-4' : 'text-foreground hover:text-primary'}`}
-            >
-              Blog
-            </Button>
-            <Button 
-              variant="ghost" 
-              size="sm" 
-              onClick={() => navigate("/contact")} 
-              className={`font-semibold transition-colors duration-200 ${location.pathname === '/contact' ? 'text-primary underline underline-offset-4' : 'text-foreground hover:text-primary'}`}
-            >
-              Contact
-            </Button>
-          </nav>
-
-          {/* Mobile Menu */}
-          <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
-            <SheetTrigger asChild className="md:hidden">
-              <Button variant="ghost" size="icon">
-                <Menu className="h-6 w-6" />
-              </Button>
-            </SheetTrigger>
-            <SheetContent side="right" className="w-64">
-              <nav className="flex flex-col gap-4 mt-8">
-                <Button 
-                  variant="ghost" 
-                  size="lg" 
-                  onClick={() => handleNavigate("/about")} 
-                  className={`justify-start font-semibold transition-colors duration-200 ${location.pathname === '/about' ? 'text-primary underline underline-offset-4' : 'text-foreground hover:text-primary'}`}
-                >
-                  About
-                </Button>
-                <Button 
-                  variant="ghost" 
-                  size="lg" 
-                  onClick={() => handleNavigate("/workout")} 
-                  className={`justify-start font-semibold transition-colors duration-200 ${location.pathname === '/workout' ? 'text-primary underline underline-offset-4' : 'text-foreground hover:text-primary'}`}
-                >
-                  Workouts
-                </Button>
-                <Button 
-                  variant="ghost" 
-                  size="lg" 
-                  onClick={() => handleNavigate("/trainingprogram")} 
-                  className={`justify-start font-semibold transition-colors duration-200 ${location.pathname === '/trainingprogram' ? 'text-primary underline underline-offset-4' : 'text-foreground hover:text-primary'}`}
-                >
-                  Programs
-                </Button>
-                <Button 
-                  variant="ghost" 
-                  size="lg" 
-                  onClick={() => handleNavigate("/personal-training")} 
-                  className={`justify-start font-semibold transition-colors duration-200 ${location.pathname === '/personal-training' ? 'text-primary underline underline-offset-4' : 'text-foreground hover:text-primary'}`}
-                >
-                  Personal Training
-                </Button>
-                <Button 
-                  variant="ghost" 
-                  size="lg" 
-                  onClick={() => handleNavigate("/tools")} 
-                  className={`justify-start font-semibold transition-colors duration-200 ${location.pathname === '/tools' ? 'text-primary underline underline-offset-4' : 'text-foreground hover:text-primary'}`}
-                >
-                  Tools
-                </Button>
-                <Button 
-                  variant="ghost" 
-                  size="lg" 
-                  onClick={() => handleNavigate("/exerciselibrary")} 
-                  className={`justify-start font-semibold transition-colors duration-200 ${location.pathname === '/exerciselibrary' ? 'text-primary underline underline-offset-4' : 'text-foreground hover:text-primary'}`}
-                >
-                  Exercise Library
-                </Button>
-                <Button 
-                  variant="ghost" 
-                  size="lg" 
-                  onClick={() => handleNavigate("/community")}
-                  className={`justify-start font-semibold transition-colors duration-200 ${location.pathname === '/community' ? 'text-primary underline underline-offset-4' : 'text-foreground hover:text-primary'}`}
-                >
-                  Community
-                </Button>
-                <Button 
-                  variant="ghost" 
-                  size="lg" 
-                  onClick={() => handleNavigate("/blog")} 
-                  className={`justify-start font-semibold transition-colors duration-200 ${location.pathname === '/blog' ? 'text-primary underline underline-offset-4' : 'text-foreground hover:text-primary'}`}
-                >
-                  Blog
-                </Button>
-                <Button 
-                  variant="ghost" 
-                  size="lg" 
-                  onClick={() => handleNavigate("/contact")} 
-                  className={`justify-start font-semibold transition-colors duration-200 ${location.pathname === '/contact' ? 'text-primary underline underline-offset-4' : 'text-foreground hover:text-primary'}`}
-                >
-                  Contact
-                </Button>
-              </nav>
-            </SheetContent>
-          </Sheet>
+              <img
+                src={smartyGymLogo}
+                alt="Smarty Gym"
+                className="h-20 sm:h-24 md:h-28 lg:h-32 w-auto object-contain"
+              />
+            </div>
+          </div>
 
           {/* Right Side - Auth */}
           <div className="flex items-center gap-2">
