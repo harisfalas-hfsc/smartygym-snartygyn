@@ -133,27 +133,51 @@ const About = () => {
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4 max-w-3xl mx-auto">
-                <div className="flex items-start gap-3 p-4 bg-background/50 rounded-lg border border-primary/20">
-                  <CheckCircle2 className="w-5 h-5 text-primary flex-shrink-0 mt-1" />
+                <article 
+                  className="flex items-start gap-3 p-4 bg-background/50 rounded-lg border border-primary/20"
+                  itemScope
+                  itemType="https://schema.org/Thing"
+                  data-feature="smarty-gym-expertise"
+                  data-keywords="smarty gym, online gym, online fitness, smartygym.com, Haris Falas Cyprus, sports scientist"
+                  role="article"
+                  aria-label="Real expertise - Smarty Gym Cyprus online fitness - smartygym.com by Haris Falas"
+                >
+                  <CheckCircle2 className="w-5 h-5 text-primary flex-shrink-0 mt-1" aria-hidden="true" />
                   <div>
-                    <p className="font-semibold text-sm mb-1">Real Expertise</p>
-                    <p className="text-xs text-muted-foreground">Sports science degree & years of coaching experience</p>
+                    <p className="font-semibold text-sm mb-1" itemProp="name">Real Expertise - Smarty Gym Cyprus</p>
+                    <p className="text-xs text-muted-foreground" itemProp="description">Sports science degree & online fitness coaching at smartygym.com - Haris Falas Cyprus</p>
                   </div>
-                </div>
-                <div className="flex items-start gap-3 p-4 bg-background/50 rounded-lg border border-primary/20">
-                  <CheckCircle2 className="w-5 h-5 text-primary flex-shrink-0 mt-1" />
+                </article>
+                <article 
+                  className="flex items-start gap-3 p-4 bg-background/50 rounded-lg border border-primary/20"
+                  itemScope
+                  itemType="https://schema.org/Thing"
+                  data-feature="smarty-gym-personal-touch"
+                  data-keywords="smarty gym, online gym, online fitness, smartygym.com, Haris Falas Cyprus, personalized training"
+                  role="article"
+                  aria-label="Personal touch - Smarty Gym Cyprus online fitness - smartygym.com by Haris Falas"
+                >
+                  <CheckCircle2 className="w-5 h-5 text-primary flex-shrink-0 mt-1" aria-hidden="true" />
                   <div>
-                    <p className="font-semibold text-sm mb-1">Personal Touch</p>
-                    <p className="text-xs text-muted-foreground">Direct access to Haris and the team anytime</p>
+                    <p className="font-semibold text-sm mb-1" itemProp="name">Personal Touch - Smarty Gym</p>
+                    <p className="text-xs text-muted-foreground" itemProp="description">Direct access to Haris and the team at smartygym.com - Online gym Cyprus</p>
                   </div>
-                </div>
-                <div className="flex items-start gap-3 p-4 bg-background/50 rounded-lg border border-primary/20">
-                  <CheckCircle2 className="w-5 h-5 text-primary flex-shrink-0 mt-1" />
+                </article>
+                <article 
+                  className="flex items-start gap-3 p-4 bg-background/50 rounded-lg border border-primary/20"
+                  itemScope
+                  itemType="https://schema.org/Thing"
+                  data-feature="smarty-gym-human-designed"
+                  data-keywords="smarty gym, online gym, online fitness, smartygym.com, Haris Falas Cyprus, human designed workouts"
+                  role="article"
+                  aria-label="Human designed workouts - Smarty Gym Cyprus online fitness - smartygym.com by Haris Falas"
+                >
+                  <CheckCircle2 className="w-5 h-5 text-primary flex-shrink-0 mt-1" aria-hidden="true" />
                   <div>
-                    <p className="font-semibold text-sm mb-1">Not a Robot</p>
-                    <p className="text-xs text-muted-foreground">Real people who care about your progress</p>
+                    <p className="font-semibold text-sm mb-1" itemProp="name">Not a Robot - Smarty Gym Cyprus</p>
+                    <p className="text-xs text-muted-foreground" itemProp="description">Real people who care about your progress at smartygym.com - Haris Falas Cyprus</p>
                   </div>
-                </div>
+                </article>
               </div>
 
               {/* Freedom Statement - Emphasized */}

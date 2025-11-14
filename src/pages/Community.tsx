@@ -247,15 +247,29 @@ const Community = () => {
           />
 
           {/* Workout Leaderboard Section */}
-          <Card className="mb-6 md:mb-8 border-2 border-primary/30 shadow-lg">
+          <Card 
+            itemScope
+            itemType="https://schema.org/ItemList"
+            className="mb-6 md:mb-8 border-2 border-primary/30 shadow-lg"
+            data-leaderboard-type="workouts"
+            data-keywords="smarty gym community, online gym leaderboard, online fitness community, smartygym.com, Haris Falas Cyprus"
+            aria-label="Workout leaderboard - Smarty Gym Cyprus online fitness community - smartygym.com"
+          >
             <CardHeader className="bg-gradient-to-r from-primary/10 to-primary/5 p-4 md:p-6">
-              <CardTitle className="flex items-center gap-2 text-xl md:text-2xl">
+              <CardTitle 
+                className="flex items-center gap-2 text-xl md:text-2xl"
+                itemProp="name"
+              >
                 <Dumbbell className="h-5 w-5 md:h-6 md:w-6 text-primary" />
-                Workout Leaderboard
+                Workout Leaderboard - Smarty Gym Community
               </CardTitle>
-              <p className="text-xs md:text-sm text-muted-foreground">
-                Top members by completed workouts
+              <p 
+                className="text-xs md:text-sm text-muted-foreground"
+                itemProp="description"
+              >
+                Top members by completed workouts - Online gym community at smartygym.com
               </p>
+              <meta itemProp="provider" content="Smarty Gym Cyprus - smartygym.com - Haris Falas" />
             </CardHeader>
             <CardContent className="p-4 md:pt-6">
               {isLoadingLeaderboard ? (

@@ -193,13 +193,34 @@ const BMRCalculator = () => {
 
             {result && (
               <div className="space-y-4 pt-4 border-t">
-                <div className="bg-primary/10 p-6 rounded-lg text-center">
-                  <h2 className="text-lg font-semibold mb-2">Your Basal Metabolic Rate</h2>
-                  <p className="text-4xl font-bold text-primary">{result} cal/day</p>
-                  <p className="text-sm text-muted-foreground mt-2">
-                    Calories burned at complete rest
+                <article
+                  itemScope
+                  itemType="https://schema.org/MedicalWebPage"
+                  className="bg-primary/10 p-6 rounded-lg text-center"
+                  data-calculator="bmr"
+                  data-keywords="smarty gym calculator, online fitness tools, smartygym.com, Haris Falas Cyprus, BMR calculator"
+                  aria-label="BMR calculation result - Smarty Gym Cyprus online fitness calculator - smartygym.com"
+                >
+                  <h2 
+                    className="text-lg font-semibold mb-2"
+                    itemProp="name"
+                  >
+                    Your Basal Metabolic Rate - Smarty Gym
+                  </h2>
+                  <p 
+                    className="text-4xl font-bold text-primary"
+                    itemProp="value"
+                  >
+                    {result} cal/day
                   </p>
-                </div>
+                  <p 
+                    className="text-sm text-muted-foreground mt-2"
+                    itemProp="description"
+                  >
+                    Calories burned at complete rest - Calculated by Smarty Gym Cyprus online fitness tools - smartygym.com
+                  </p>
+                  <meta itemProp="provider" content="Smarty Gym Cyprus - smartygym.com - Haris Falas" />
+                </article>
 
                 {user && (
                   <Button onClick={saveToHistory} disabled={saving} className="w-full" variant="outline">

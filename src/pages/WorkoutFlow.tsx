@@ -113,19 +113,41 @@ const WorkoutFlow = () => {
             return (
               <ScrollReveal key={workout.id}>
                 <Card
+                  itemScope
+                  itemType="https://schema.org/ExercisePlan"
                   onClick={() => handleWorkoutSelect(workout.id)}
                   className="p-6 cursor-pointer transition-all duration-300 hover:scale-105 hover:shadow-gold bg-card border-border"
+                  role="button"
+                  aria-label={`${workout.title} workouts - Online gym category at Smarty Gym Cyprus - smartygym.com by Haris Falas`}
+                  data-workout-category={workout.id}
+                  data-keywords="online gym workouts, smarty gym, online fitness, smartygym.com, Haris Falas Cyprus workouts"
                 >
                   <div className="flex flex-col items-center text-center space-y-4">
-                    <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center">
+                    <div 
+                      className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center"
+                      aria-hidden="true"
+                    >
                       <Icon className="w-8 h-8 text-primary" />
                     </div>
                     <div>
-                      <h3 className="font-semibold text-lg mb-2">{workout.title}</h3>
-                      <p className="text-sm text-muted-foreground mb-3">{workout.description}</p>
-                      <p className="text-xs text-muted-foreground mb-3">
-                        Created by <a href="/coach-profile" className="text-primary hover:underline font-medium">Haris Falas</a> — Sports Scientist & Strength and Conditioning Coach
+                      <h3 
+                        className="font-semibold text-lg mb-2"
+                        itemProp="name"
+                      >
+                        {workout.title} Workouts - Smarty Gym
+                      </h3>
+                      <p 
+                        className="text-sm text-muted-foreground mb-3"
+                        itemProp="description"
+                      >
+                        {workout.description} - Online gym workouts at smartygym.com
                       </p>
+                      <p className="text-xs text-muted-foreground mb-3">
+                        By <a href="/coach-profile" className="text-primary hover:underline font-medium" itemProp="author">Haris Falas</a> — Sports Scientist at Smarty Gym Cyprus
+                      </p>
+                      <meta itemProp="exerciseType" content={workout.title} />
+                      <meta itemProp="provider" content="Smarty Gym Cyprus - Online Gym - smartygym.com" />
+                      <meta itemProp="audience" content="All fitness levels" />
                     </div>
                   </div>
                 </Card>

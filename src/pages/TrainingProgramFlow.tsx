@@ -107,24 +107,46 @@ const TrainingProgramFlow = () => {
             return (
               <ScrollReveal key={program.id}>
                 <Card
+                  itemScope
+                  itemType="https://schema.org/Course"
                   onClick={() => handleProgramSelect(program.id)}
                   className="p-6 cursor-pointer transition-all duration-300 hover:scale-105 hover:shadow-gold bg-card border-border"
+                  role="button"
+                  aria-label={`${program.title} training program - Online gym program at Smarty Gym Cyprus - smartygym.com by Haris Falas`}
+                  data-program-category={program.id}
+                  data-keywords="online gym training programs, workout training programs, smarty gym, online fitness programs, smartygym.com, Haris Falas Cyprus"
                 >
                   <div className="flex flex-col items-center text-center space-y-4">
-                    <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center">
+                    <div 
+                      className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center"
+                      aria-hidden="true"
+                    >
                       <Icon className="w-8 h-8 text-primary" />
                     </div>
                     <div>
-                      <h3 className="font-semibold text-lg mb-2">{program.title}</h3>
-                      <p className="text-sm text-muted-foreground mb-3">{program.description}</p>
+                      <h3 
+                        className="font-semibold text-lg mb-2"
+                        itemProp="name"
+                      >
+                        {program.title} - Smarty Gym Online Program
+                      </h3>
+                      <p 
+                        className="text-sm text-muted-foreground mb-3"
+                        itemProp="description"
+                      >
+                        {program.description} - Online fitness program at smartygym.com
+                      </p>
                       <p className="text-xs text-muted-foreground mb-3">
-                        Created by <a href="/coach-profile" className="text-primary hover:underline font-medium">Haris Falas</a> — Sports Scientist & Strength and Conditioning Coach
+                        By <a href="/coach-profile" className="text-primary hover:underline font-medium" itemProp="instructor">Haris Falas</a> — Sports Scientist at Smarty Gym Cyprus
                       </p>
                       <div className="flex flex-wrap gap-2 text-xs mt-2">
-                        <span className="bg-primary/10 text-primary px-2 py-1 rounded">6-8 weeks</span>
+                        <span className="bg-primary/10 text-primary px-2 py-1 rounded" itemProp="duration">6-8 weeks</span>
                         <span className="bg-muted text-muted-foreground px-2 py-1 rounded">Intermediate</span>
                         <span className="bg-muted text-muted-foreground px-2 py-1 rounded">Included in Premium</span>
                       </div>
+                      <meta itemProp="provider" content="Smarty Gym Cyprus - Online Gym - smartygym.com" />
+                      <meta itemProp="courseMode" content="Online" />
+                      <meta itemProp="availableLanguage" content="English" />
                     </div>
                   </div>
                 </Card>
