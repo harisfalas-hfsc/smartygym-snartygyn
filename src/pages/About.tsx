@@ -479,6 +479,31 @@ const About = () => {
                   </AccordionContent>
                 </AccordionItem>
 
+                <AccordionItem value="item-3b">
+                  <AccordionTrigger className="text-left">How do I choose between a workout and training program?</AccordionTrigger>
+                  <AccordionContent>
+                    <strong>Choose a workout if:</strong>
+                    <ul className="list-disc pl-6 mt-2 space-y-1">
+                      <li>You want flexibility to train when it fits your schedule</li>
+                      <li>You're looking for variety and mixing different training styles</li>
+                      <li>You have limited time and need quick, focused sessions</li>
+                      <li>You're maintaining fitness rather than pursuing specific long-term goals</li>
+                    </ul>
+                    <br />
+                    <strong>Choose a training program if:</strong>
+                    <ul className="list-disc pl-6 mt-2 space-y-1">
+                      <li>You have a specific goal like building muscle, losing weight, or improving endurance</li>
+                      <li>You want structured progression and accountability</li>
+                      <li>You can commit to 4-8 weeks of consistent training</li>
+                      <li>You prefer having your training planned out with clear weekly schedules</li>
+                      <li>You want to see measurable results through systematic training</li>
+                    </ul>
+                    <br />
+                    <strong>Pro tip:</strong> Many members use both — following a program for their main goal while adding individual 
+                    workouts for extra sessions or when they want to focus on something specific!
+                  </AccordionContent>
+                </AccordionItem>
+
                 <AccordionItem value="item-4">
                   <AccordionTrigger>Do I need equipment to use Smarty Gym?</AccordionTrigger>
                   <AccordionContent>
