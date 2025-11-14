@@ -259,17 +259,12 @@ const Index = () => {
         <BackToTop />
         
         {/* Hero Section */}
-        <section className="relative py-8 sm:py-12 px-4 border-b border-border bg-gradient-to-br from-background to-muted/30 overflow-hidden">
-          <div className="absolute inset-0 bg-gradient-to-b from-primary/5 via-transparent to-transparent" />
+        <section className="relative py-8 sm:py-12 px-4 border-b border-border bg-background overflow-hidden">
           
-          {/* Decorative elements */}
-          <div className="absolute top-10 left-10 w-32 h-32 bg-primary/10 rounded-full blur-3xl" />
-          <div className="absolute bottom-10 right-10 w-40 h-40 bg-accent/10 rounded-full blur-3xl" />
-          
-          <div className="container mx-auto max-w-5xl relative z-10">
+          <div className="container mx-auto max-w-6xl relative z-10">
             <ScrollReveal>
-              <Card className="border-2 border-primary bg-gradient-to-br from-primary/5 via-background to-accent/5 backdrop-blur-sm">
-                <div className="p-6 sm:p-8 md:p-10 space-y-6 sm:space-y-8 md:space-y-10">
+              <Card className="border-2 border-primary bg-gradient-to-br from-yellow-50/50 via-background to-yellow-50/30 backdrop-blur-sm">
+                <div className="p-8 sm:p-10 md:p-12 space-y-6 sm:space-y-8">
                   
                   {/* Main Headline */}
                   <div className="text-center space-y-2 sm:space-y-3">

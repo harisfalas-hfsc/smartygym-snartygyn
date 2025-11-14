@@ -199,63 +199,63 @@ export const Navigation = () => {
                   <Button
                     variant="ghost"
                     onClick={() => handleNavigate("/about")}
-                    className={`justify-start font-semibold transition-colors duration-200 ${location.pathname === '/about' ? 'text-primary underline underline-offset-4' : 'text-foreground hover:text-primary'}`}
+                    className={`justify-start font-semibold transition-all duration-200 ${location.pathname === '/about' ? 'text-primary underline underline-offset-4 bg-yellow-500/10' : 'text-foreground hover:bg-yellow-500/20 hover:text-white'}`}
                   >
                     About
                   </Button>
                   <Button
                     variant="ghost"
-                    onClick={() => handleNavigate("/workout-flow")}
-                    className={`justify-start font-semibold transition-colors duration-200 ${location.pathname === '/workout-flow' ? 'text-primary underline underline-offset-4' : 'text-foreground hover:text-primary'}`}
+                    onClick={() => handleNavigate("/workout")}
+                    className={`justify-start font-semibold transition-all duration-200 ${location.pathname === '/workout' ? 'text-primary underline underline-offset-4 bg-yellow-500/10' : 'text-foreground hover:bg-yellow-500/20 hover:text-white'}`}
                   >
                     Workouts
                   </Button>
                   <Button
                     variant="ghost"
-                    onClick={() => handleNavigate("/training-program-flow")}
-                    className={`justify-start font-semibold transition-colors duration-200 ${location.pathname === '/training-program-flow' ? 'text-primary underline underline-offset-4' : 'text-foreground hover:text-primary'}`}
+                    onClick={() => handleNavigate("/trainingprogram")}
+                    className={`justify-start font-semibold transition-all duration-200 ${location.pathname === '/trainingprogram' ? 'text-primary underline underline-offset-4 bg-yellow-500/10' : 'text-foreground hover:bg-yellow-500/20 hover:text-white'}`}
                   >
                     Programs
                   </Button>
                   <Button
                     variant="ghost"
                     onClick={() => handleNavigate("/personal-training")}
-                    className={`justify-start font-semibold transition-colors duration-200 ${location.pathname === '/personal-training' ? 'text-primary underline underline-offset-4' : 'text-foreground hover:text-primary'}`}
+                    className={`justify-start font-semibold transition-all duration-200 ${location.pathname === '/personal-training' ? 'text-primary underline underline-offset-4 bg-yellow-500/10' : 'text-foreground hover:bg-yellow-500/20 hover:text-white'}`}
                   >
                     Personal Training
                   </Button>
                   <Button
                     variant="ghost"
                     onClick={() => handleNavigate("/tools")}
-                    className={`justify-start font-semibold transition-colors duration-200 ${location.pathname === '/tools' ? 'text-primary underline underline-offset-4' : 'text-foreground hover:text-primary'}`}
+                    className={`justify-start font-semibold transition-all duration-200 ${location.pathname === '/tools' ? 'text-primary underline underline-offset-4 bg-yellow-500/10' : 'text-foreground hover:bg-yellow-500/20 hover:text-white'}`}
                   >
                     Tools
                   </Button>
                   <Button
                     variant="ghost"
-                    onClick={() => handleNavigate("/exercise-library")}
-                    className={`justify-start font-semibold transition-colors duration-200 ${location.pathname === '/exercise-library' ? 'text-primary underline underline-offset-4' : 'text-foreground hover:text-primary'}`}
+                    onClick={() => handleNavigate("/exerciselibrary")}
+                    className={`justify-start font-semibold transition-all duration-200 ${location.pathname === '/exerciselibrary' ? 'text-primary underline underline-offset-4 bg-yellow-500/10' : 'text-foreground hover:bg-yellow-500/20 hover:text-white'}`}
                   >
                     Exercise Library
                   </Button>
                   <Button
                     variant="ghost"
                     onClick={() => handleNavigate("/community")}
-                    className={`justify-start font-semibold transition-colors duration-200 ${location.pathname === '/community' ? 'text-primary underline underline-offset-4' : 'text-foreground hover:text-primary'}`}
+                    className={`justify-start font-semibold transition-all duration-200 ${location.pathname === '/community' ? 'text-primary underline underline-offset-4 bg-yellow-500/10' : 'text-foreground hover:bg-yellow-500/20 hover:text-white'}`}
                   >
                     Community
                   </Button>
                   <Button
                     variant="ghost"
                     onClick={() => handleNavigate("/blog")}
-                    className={`justify-start font-semibold transition-colors duration-200 ${location.pathname === '/blog' ? 'text-primary underline underline-offset-4' : 'text-foreground hover:text-primary'}`}
+                    className={`justify-start font-semibold transition-all duration-200 ${location.pathname === '/blog' ? 'text-primary underline underline-offset-4 bg-yellow-500/10' : 'text-foreground hover:bg-yellow-500/20 hover:text-white'}`}
                   >
                     Blog
                   </Button>
                   <Button
                     variant="ghost"
                     onClick={() => handleNavigate("/contact")}
-                    className={`justify-start font-semibold transition-colors duration-200 ${location.pathname === '/contact' ? 'text-primary underline underline-offset-4' : 'text-foreground hover:text-primary'}`}
+                    className={`justify-start font-semibold transition-all duration-200 ${location.pathname === '/contact' ? 'text-primary underline underline-offset-4 bg-yellow-500/10' : 'text-foreground hover:bg-yellow-500/20 hover:text-white'}`}
                   >
                     Contact
                   </Button>
