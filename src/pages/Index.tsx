@@ -4,7 +4,7 @@ import { Helmet } from "react-helmet";
 import { ServiceCard } from "@/components/ServiceCard";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { Dumbbell, Calendar, BookOpen, Calculator, Activity, Flame, Instagram, Facebook, Youtube, UserCheck, Wrench, Video, FileText, Target } from "lucide-react";
+import { Dumbbell, Calendar, BookOpen, Calculator, Activity, Flame, Instagram, Facebook, Youtube, UserCheck, Wrench, Video, FileText, Smartphone } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { User as SupabaseUser } from "@supabase/supabase-js";
 import { useToast } from "@/hooks/use-toast";
@@ -292,13 +292,13 @@ const Index = () => {
                     {/* WHAT */}
                     <div className="text-center space-y-3 p-4 rounded-lg bg-background/50 border border-primary/20">
                       <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-primary/10">
-                        <Target className="w-6 h-6 text-primary" />
+                        <Smartphone className="w-6 h-6 text-primary" />
                       </div>
                       <h2 className="text-lg sm:text-xl font-bold text-foreground">
-                        Cyprus' Premier Online Gym
+                        Your Gym In Your Pocket
                       </h2>
                       <p className="text-sm text-muted-foreground leading-relaxed">
-                        Professional online fitness platform offering expert workouts, structured training programs, and personalized coaching at smartygym.com.
+                        Professional fitness platform with expert workouts, structured programs, and personalized coaching - accessible worldwide at smartygym.com.
                       </p>
                     </div>
 
@@ -342,7 +342,7 @@ const Index = () => {
                       </div>
 
                       <div className="flex items-start gap-3">
-                        <Target className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
+                        <Calendar className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
                         <div>
                           <p className="font-semibold text-sm text-foreground">Training Programs</p>
                           <p className="text-xs text-muted-foreground">6-8 week structured plans</p>

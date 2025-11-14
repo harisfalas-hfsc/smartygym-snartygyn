@@ -106,10 +106,7 @@ const TrainingProgramFlow = () => {
         {!isPremium ? (
           <InfoRibbon ctaText="Join Premium" onCtaClick={() => navigate("/premiumbenefits")}>
             <p>
-              Structured 6–8 week training programs created by Sports Scientist <a href="/coach-profile" className="text-primary hover:underline font-medium">Haris Falas</a> at smartygym.com. Build strength, lose fat, improve mobility — SmartyGym delivers evidence-based functional training anywhere, anytime.
-            </p>
-            <p className="mt-2">
-              Every SMARTY GYM program is a complete path toward better performance and health—but results multiply when training meets smart recovery and mindful living. Stay disciplined, fuel your body intelligently, rest deeply, and treat movement as a daily practice—not a task. That&apos;s the SMARTY GYM way.
+              Structured 6-8 week programs by Sports Scientist <a href="/coach-profile" className="text-primary hover:underline font-medium">Haris Falas</a>. Build strength, lose fat, improve mobility — evidence-based training, anywhere, anytime. Premium membership unlocks all programs.
             </p>
           </InfoRibbon>
         ) : (
