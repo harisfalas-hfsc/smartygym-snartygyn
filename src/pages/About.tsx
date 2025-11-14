@@ -145,9 +145,9 @@ const About = () => {
               </div>
 
               {/* Freedom Statement - Emphasized */}
-              <div className="mt-6 max-w-3xl mx-auto">
-                <div className="bg-gradient-to-r from-primary/10 to-accent/15 backdrop-blur-sm p-6 rounded-lg border-2 border-primary/40 shadow-md">
-                  <div className="flex items-center justify-center gap-3 mb-3">
+              <div className="mt-4">
+                <div className="bg-gradient-to-r from-primary/10 to-accent/15 backdrop-blur-sm p-4 rounded-lg border-2 border-primary/40 shadow-md">
+                  <div className="flex items-center justify-center gap-2 mb-2">
                     <Sparkles className="w-6 h-6 text-primary" />
                   </div>
                   <p className="text-xl font-bold text-center text-foreground">

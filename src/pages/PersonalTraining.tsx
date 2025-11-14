@@ -294,6 +294,31 @@ const PersonalTraining = () => {
           />
 
           <Card className="border-2 border-primary bg-gradient-to-br from-primary/5 via-yellow-50/30 to-primary/5 shadow-lg shadow-primary/20">
+            {/* Personal Training Introduction */}
+            <div className="px-4 sm:px-6 pt-6 mb-4">
+              <div className="bg-primary/10 border-2 border-primary/30 rounded-lg p-5 shadow-sm">
+                <div className="flex items-start gap-3">
+                  <Target className="w-6 h-6 text-primary flex-shrink-0 mt-1" />
+                  <div className="space-y-2">
+                    <h4 className="font-bold text-base text-foreground">
+                      Truly Personalized Training by Expert Sports Scientist{" "}
+                      <a 
+                        href="/coach-profile" 
+                        className="text-primary hover:underline cursor-pointer transition-colors"
+                      >
+                        Haris Falas
+                      </a>
+                    </h4>
+                    <p className="text-sm text-muted-foreground leading-relaxed">
+                      Want a <strong className="text-foreground">100% customized training program</strong> crafted specifically for your unique needs, goals, and lifestyle? 
+                      Expert sports scientist and strength coach personally designs each program based on your exact specifications, 
+                      physical characteristics, available equipment, and any limitations—ensuring maximum effectiveness and safety tailored exclusively to you.
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
             <CardHeader className="p-4 sm:p-6">
               <CardTitle className="text-xl sm:text-2xl">Personal Training Questionnaire</CardTitle>
               <CardDescription className="text-sm sm:text-base leading-relaxed">
@@ -302,25 +327,6 @@ const PersonalTraining = () => {
                 physical limitations—ensuring a program that is effective, safe, and sustainable specifically for you.
               </CardDescription>
             </CardHeader>
-
-            {/* Personal Training Introduction */}
-            <div className="mx-6 mb-4 -mt-2">
-              <div className="bg-primary/10 border-2 border-primary/30 rounded-lg p-5 shadow-sm">
-                <div className="flex items-start gap-3">
-                  <Target className="w-6 h-6 text-primary flex-shrink-0 mt-1" />
-                  <div className="space-y-2">
-                    <h4 className="font-bold text-base text-foreground">
-                      Truly Personalized Training by Expert Sports Scientist
-                    </h4>
-                    <p className="text-sm text-muted-foreground leading-relaxed">
-                      Want a <strong className="text-foreground">100% customized training program</strong> crafted specifically for your unique needs, goals, and lifestyle? 
-                      Expert sports scientist and strength coach <strong className="text-foreground">Haris Falas</strong> personally designs each program based on your exact specifications, 
-                      physical characteristics, available equipment, and any limitations—ensuring maximum effectiveness and safety tailored exclusively to you.
-                    </p>
-                  </div>
-                </div>
-              </div>
-            </div>
 
             <CardContent className="space-y-4 sm:space-y-6 p-4 sm:p-6 [&_input]:border-primary [&_textarea]:border-primary [&_button[role=combobox]]:border-primary">
               {/* Basic Information */}
