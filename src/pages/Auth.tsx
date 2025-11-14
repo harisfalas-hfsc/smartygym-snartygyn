@@ -60,6 +60,7 @@ export default function Auth() {
     email: "",
     password: "",
   });
+  const [rememberMe, setRememberMe] = useState(false);
 
   const handleSignUp = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -156,7 +157,7 @@ export default function Auth() {
     setLoading(true);
 
     try {
-      const { error } = await supabase.auth.signInWithPassword({
+      const { data, error } = await supabase.auth.signInWithPassword({
         email: loginData.email,
         password: loginData.password,
       });
@@ -176,9 +177,25 @@ export default function Auth() {
           });
         }
       } else {
+        // If remember me is checked, extend session duration to 30 days
+        if (rememberMe && data.session) {
+          await supabase
+            .from('profiles')
+            .update({ 
+              custom_session_duration: 30 * 24 * 60 // 30 days in minutes
+            })
+            .eq('user_id', data.user.id);
+        } else if (data.session) {
+          // Clear custom duration if remember me is not checked
+          await supabase
+            .from('profiles')
+            .update({ custom_session_duration: null })
+            .eq('user_id', data.user.id);
+        }
+
         toast({
           title: "Success!",
-          description: "Logged in successfully. Redirecting...",
+          description: rememberMe ? "Logged in successfully. You'll stay logged in for 30 days." : "Logged in successfully. Redirecting...",
         });
         setTimeout(() => navigate("/userdashboard"), 1500);
       }
@@ -258,6 +275,16 @@ export default function Auth() {
                     onChange={(e) => setLoginData({ ...loginData, password: e.target.value })}
                     required
                   />
+                </div>
+                <div className="flex items-center space-x-2">
+                  <Checkbox
+                    id="remember-me"
+                    checked={rememberMe}
+                    onCheckedChange={(checked) => setRememberMe(checked as boolean)}
+                  />
+                  <Label htmlFor="remember-me" className="text-sm cursor-pointer">
+                    Keep me logged in for 30 days
+                  </Label>
                 </div>
                 <Button type="submit" className="w-full" disabled={loading}>
                   {loading ? "Signing in..." : "Sign In"}

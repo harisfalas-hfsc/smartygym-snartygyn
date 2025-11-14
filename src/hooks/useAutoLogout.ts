@@ -3,19 +3,32 @@ import { supabase } from '@/integrations/supabase/client';
 import { useNavigate } from 'react-router-dom';
 import { toast } from '@/hooks/use-toast';
 
-const WARNING_TIME = 2 * 60 * 1000; // 2 minutes before logout
+const WARNING_TIME = 10 * 60 * 1000; // 10 minutes before logout
 
 export const useAutoLogout = () => {
   const navigate = useNavigate();
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
   const warningTimeoutRef = useRef<NodeJS.Timeout | null>(null);
-  const [inactivityTimeout, setInactivityTimeout] = useState<number>(30 * 60 * 1000);
+  const [inactivityTimeout, setInactivityTimeout] = useState<number>(24 * 60 * 60 * 1000); // 24 hours default
 
   const logout = async () => {
     try {
       await supabase.auth.signOut({ scope: 'global' });
+      
+      // Preserve notification-related keys before clearing storage
+      const notificationPermission = localStorage.getItem('notification_permission');
+      const pushSubscriptionStatus = localStorage.getItem('push_subscription_status');
+      const swRegistrationTime = localStorage.getItem('sw_registration_time');
+      
+      // Clear all storage
       localStorage.clear();
       sessionStorage.clear();
+      
+      // Restore notification state so users can still receive notifications
+      if (notificationPermission) localStorage.setItem('notification_permission', notificationPermission);
+      if (pushSubscriptionStatus) localStorage.setItem('push_subscription_status', pushSubscriptionStatus);
+      if (swRegistrationTime) localStorage.setItem('sw_registration_time', swRegistrationTime);
+      
       navigate('/auth', { replace: true });
     } catch (error) {
       console.error('Auto-logout error:', error);
@@ -48,14 +61,32 @@ export const useAutoLogout = () => {
   const showWarning = () => {
     toast({
       title: "⚠️ Session Expiring Soon",
-      description: "You'll be logged out in 2 minutes due to inactivity. Move your mouse or click anywhere to stay logged in.",
-      duration: 120000, // Show for 2 minutes
+      description: "You'll be logged out in 10 minutes due to inactivity. Click anywhere to stay logged in.",
+      duration: 600000, // Show for 10 minutes
     });
   };
 
   useEffect(() => {
     // Fetch inactivity timeout from database
     const fetchTimeout = async () => {
+      // First check if user has custom session duration (Remember Me)
+      const { data: { user } } = await supabase.auth.getUser();
+      
+      if (user) {
+        const { data: profile } = await supabase
+          .from('profiles')
+          .select('custom_session_duration')
+          .eq('user_id', user.id)
+          .single();
+        
+        if (profile?.custom_session_duration) {
+          // Use custom timeout for this user
+          setInactivityTimeout(profile.custom_session_duration * 60 * 1000);
+          return;
+        }
+      }
+      
+      // Otherwise use system default
       const { data } = await supabase
         .from('system_settings')
         .select('setting_value')
