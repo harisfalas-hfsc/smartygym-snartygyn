@@ -78,27 +78,6 @@ const Tools = () => {
             { label: "Tools" }
           ]} 
         />
-        
-        {userTier === "guest" ? (
-          <InfoRibbon 
-            ctaText="Login / Sign Up"
-            onCtaClick={() => navigate("/auth")}
-          >
-            <p>Login required to use these calculators. Already a member? Sign in to access all tools.</p>
-          </InfoRibbon>
-        ) : !isPremium ? (
-          <InfoRibbon 
-            ctaText="Join Premium"
-            onCtaClick={() => navigate("/premiumbenefits")}
-          >
-            <p>Use these tools for free as a member. Want personalized training programs?</p>
-          </InfoRibbon>
-        ) : (
-          <InfoRibbon>
-            <p>All tools included in your premium membership — plus personalized training programs!</p>
-          </InfoRibbon>
-        )}
-
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {tools.map((tool) => {
             const Icon = tool.icon;

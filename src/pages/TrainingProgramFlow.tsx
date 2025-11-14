@@ -102,21 +102,6 @@ const TrainingProgramFlow = () => {
             { label: "Training Programs" }
           ]} 
         />
-        
-        {!isPremium ? (
-          <InfoRibbon ctaText="Join Premium" onCtaClick={() => navigate("/premiumbenefits")}>
-            <p>
-              Structured 6-8 week programs by Sports Scientist <a href="/coach-profile" className="text-primary hover:underline font-medium">Haris Falas</a>. Build strength, lose fat, improve mobility — evidence-based training, anywhere, anytime. Premium membership unlocks all programs.
-            </p>
-          </InfoRibbon>
-        ) : (
-          <InfoRibbon>
-            <p>
-              All training programs included in your premium membership. Start your transformation today with unlimited access to structured 6-8 week programs.
-            </p>
-          </InfoRibbon>
-        )}
-
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
           {programTypes.map((program) => {
             const Icon = program.icon;

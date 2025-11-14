@@ -108,24 +108,6 @@ const WorkoutFlow = () => {
             { label: "Workouts" }
           ]} 
         />
-        
-        {!isPremium ? (
-          <InfoRibbon ctaText="Join Premium" onCtaClick={() => navigate("/premiumbenefits")}>
-            <p>
-              Choose your goal and start your fitness journey today. All SmartyGym workouts designed by Sports Scientist <a href="/coach-profile" className="text-primary hover:underline font-medium">Haris Falas</a> for convenient online fitness training anywhere, anytime.
-            </p>
-            <p className="mt-2">
-              SMARTY GYM workouts are standalone sessions designed to target specific fitness goals—whether you want to build strength, torch calories, boost your metabolism, get a quick sweat, or simply keep your body moving. Each workout is crafted to fit your schedule and deliver results, no matter where you train.
-            </p>
-          </InfoRibbon>
-        ) : (
-          <InfoRibbon>
-            <p>
-              All workouts included in your premium membership. Choose your goal and start training today with unlimited access to every workout.
-            </p>
-          </InfoRibbon>
-        )}
-
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
           {workoutTypes.map((workout) => {
             const Icon = workout.icon;
