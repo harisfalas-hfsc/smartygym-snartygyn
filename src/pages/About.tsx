@@ -183,7 +183,7 @@ const About = () => {
                   Your Gym Reimagined Anywhere, Anytime
                 </h3>
                 <Button
-                  onClick={() => navigate("/join-premium", { state: { from: location.pathname } })}
+                  onClick={() => navigate("/joinpremium", { state: { from: location.pathname } })}
                   className="ml-4 bg-primary text-primary-foreground hover:bg-primary/90 shadow-md"
                 >
                   Join Now
