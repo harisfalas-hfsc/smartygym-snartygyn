@@ -30,11 +30,11 @@ export const AuthenticatedLayout = () => {
       // Check if profile is complete
       const { data: profile } = await supabase
         .from("profiles")
-        .select("has_completed_profile")
+        .select("has_completed_profile, full_name")
         .eq("user_id", session.user.id)
         .single();
 
-      if (profile && !profile.has_completed_profile) {
+      if (profile && (!profile.has_completed_profile || !profile.full_name)) {
         setShowProfileSetup(true);
       }
       
