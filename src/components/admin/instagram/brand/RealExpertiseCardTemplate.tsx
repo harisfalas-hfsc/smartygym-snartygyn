@@ -12,7 +12,7 @@ export const RealExpertiseCardTemplate = () => {
           <div className="text-center space-y-4">
             <h3 className="text-5xl font-bold">Real Expertise</h3>
             <p className="text-3xl text-muted-foreground leading-relaxed">
-              Created by Sports Scientists
+              Sports science degree & years of coaching
             </p>
           </div>
           <p className="text-2xl font-semibold text-primary mt-8">smartygym.com</p>

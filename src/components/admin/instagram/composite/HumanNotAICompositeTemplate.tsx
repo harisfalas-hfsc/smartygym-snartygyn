@@ -51,21 +51,21 @@ export const HumanNotAICompositeTemplate = () => {
               <CheckCircle2 className="w-6 h-6 text-primary flex-shrink-0 mt-1" />
               <div>
                 <p className="font-semibold text-base mb-1">Real Expertise</p>
-                <p className="text-sm text-muted-foreground">Sports science degree & years of coaching experience</p>
+                <p className="text-sm text-muted-foreground">Sports science degree & years of coaching</p>
               </div>
             </div>
             <div className="flex items-start gap-3 p-4 bg-background/50 rounded-lg border border-primary/20">
               <CheckCircle2 className="w-6 h-6 text-primary flex-shrink-0 mt-1" />
               <div>
                 <p className="font-semibold text-base mb-1">Personal Touch</p>
-                <p className="text-sm text-muted-foreground">Direct access to Haris and the team anytime</p>
+                <p className="text-sm text-muted-foreground">Every program refined through real client feedback</p>
               </div>
             </div>
             <div className="flex items-start gap-3 p-4 bg-background/50 rounded-lg border border-primary/20">
               <CheckCircle2 className="w-6 h-6 text-primary flex-shrink-0 mt-1" />
               <div>
                 <p className="font-semibold text-base mb-1">Not a Robot</p>
-                <p className="text-sm text-muted-foreground">Real people who care about your progress</p>
+                <p className="text-sm text-muted-foreground">Human-designed workouts backed by science, not AI</p>
               </div>
             </div>
           </div>

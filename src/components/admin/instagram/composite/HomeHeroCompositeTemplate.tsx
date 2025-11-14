@@ -28,7 +28,7 @@ export const HomeHeroCompositeTemplate = () => {
               Smarty Gym
             </h1>
             <p className="text-3xl text-foreground leading-relaxed">
-              Your Gym Reimagined Anywhere Anytime
+              Your Gym Re-imagined. Anywhere, Anytime.
             </p>
           </div>
 
