@@ -390,13 +390,23 @@ const About = () => {
                 <p className="text-lg font-bold mb-1">
                   <a href="/coach-profile" className="text-primary hover:underline">Haris Falas</a>
                 </p>
-                <p className="text-sm text-muted-foreground">Sports Scientist & Strength & Conditioning Coach</p>
+                <p className="text-sm text-muted-foreground">Sports Scientist and Strength and Conditioning Coach</p>
               </div>
               
               <p className="text-base leading-relaxed">
-                Welcome to Smarty Gym! As a sports scientist and S&C coach, I've spent years studying what truly works in fitness. 
-                I created Smarty Gym because I believe everyone deserves access to quality, evidence-based training — 
-                without the need for expensive gym memberships or complicated equipment.
+                For more than twenty years I've coached athletes, teams, and everyday people — beginners, busy professionals, and gym-goers who simply want to train with purpose. If there's one thing I've learned, it's that people don't struggle because they're lazy. They struggle because they walk into their training without a clear plan, without structure, and without guidance they can trust.
+              </p>
+
+              <p className="text-base leading-relaxed">
+                That's exactly why I created SmartyGym.
+              </p>
+
+              <p className="text-base leading-relaxed">
+                My vision is to give people the kind of coaching that makes everything simpler: structured programs, smart progressions, expert guidance, and clear workouts you can follow with confidence — whether you train at home, outdoors, or inside a gym. SmartyGym is here to support your fitness journey, not replace any part of it. If you train in a gym, you'll have a plan. If you train at home, you'll have a structure. If you're busy or traveling, you'll still know exactly what to do.
+              </p>
+
+              <p className="text-base leading-relaxed">
+                I built this platform for people who want real training, not random exercises. For those who want to feel stronger, move better, improve performance, and see results — with a system that removes confusion and brings clarity every step of the way.
               </p>
               
               <div className="bg-primary/10 p-4 rounded-lg border-l-4 border-primary">
@@ -407,13 +417,15 @@ const About = () => {
               </div>
               
               <p className="text-base leading-relaxed">
-                Our programs are designed to be practical, effective, and sustainable. Whether you're just starting your fitness journey 
-                or you're an experienced athlete looking to optimize your training, Smarty Gym has something for you.
+                This project isn't just another fitness idea. It's the result of decades of experience, passion for coaching, and a deep belief that everyone deserves access to smart, effective training, no matter their level or lifestyle.
               </p>
-              
+
               <p className="text-base leading-relaxed">
-                My goal is to help you build a stronger, healthier body that serves you in everyday life. 
-                And unlike AI-generated programs, you can reach out to me directly anytime you need guidance or support.
+                Thank you for trusting me with your fitness. I'm here to guide you, support you, and help you improve — one session at a time.
+              </p>
+
+              <p className="text-base leading-relaxed font-medium">
+                Every day is a game day.
               </p>
               
               <div className="flex items-center gap-3 pt-4">
@@ -423,7 +435,7 @@ const About = () => {
                 </p>
                 <div className="h-px flex-grow bg-border"></div>
               </div>
-              <p className="text-center text-sm text-muted-foreground">Founder, HFSC & SMARTY GYM</p>
+              <p className="text-center text-sm text-muted-foreground">Founder, SmartyGym</p>
             </CardContent>
           </Card>
         </section>
