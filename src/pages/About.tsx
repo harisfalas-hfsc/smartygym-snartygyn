@@ -390,7 +390,7 @@ const About = () => {
                 <p className="text-lg font-bold mb-1">
                   <a href="/coach-profile" className="text-primary hover:underline">Haris Falas</a>
                 </p>
-                <p className="text-sm text-muted-foreground">Sports Scientist and Strength and Conditioning Coach</p>
+                <p className="text-sm text-muted-foreground">Sports Scientist and Strength & Conditioning Coach</p>
               </div>
               
               <p className="text-base leading-relaxed">
