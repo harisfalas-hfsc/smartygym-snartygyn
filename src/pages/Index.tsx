@@ -229,7 +229,8 @@ const Index = () => {
         <section className="relative py-12 sm:py-16 lg:py-20 px-4 overflow-hidden">
           <div className="container mx-auto max-w-6xl">
             <ScrollReveal>
-              <div className="grid lg:grid-cols-2 gap-8 lg:gap-12 items-center">
+          <Card className="p-6 sm:p-8 lg:p-12 bg-gradient-to-br from-yellow-50/50 via-background to-yellow-50/30 dark:from-yellow-950/20 dark:via-background dark:to-yellow-950/10">
+            <div className="grid lg:grid-cols-2 gap-8 lg:gap-12 items-center">
                 {/* Left Column - Content */}
                 <div className="text-center lg:text-left space-y-6">
                   <h1 className="text-3xl sm:text-4xl lg:text-5xl xl:text-6xl font-bold leading-tight">
@@ -330,8 +331,9 @@ const Index = () => {
                     className="w-full rounded-2xl shadow-2xl"
                   />
                 </div>
-              </div>
-            </ScrollReveal>
+            </div>
+          </Card>
+        </ScrollReveal>
           </div>
         </section>
 
