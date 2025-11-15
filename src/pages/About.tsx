@@ -329,7 +329,7 @@ const About = () => {
                 <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-4">
                   <Compass className="w-8 h-8 text-primary" />
                 </div>
-                <CardTitle>Simplicity & Structure</CardTitle>
+                <CardTitle>Structure & Clarity</CardTitle>
               </CardHeader>
               <CardContent>
                 <p className="text-sm text-muted-foreground">
