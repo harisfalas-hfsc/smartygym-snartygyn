@@ -319,7 +319,7 @@ const About = () => {
               </CardHeader>
               <CardContent>
                 <p className="text-sm text-muted-foreground">
-                  Every workout is designed using proven training principles and sports science research.
+                  Every workout and training program is designed using proven training principles and sports science research.
                 </p>
               </CardContent>
             </Card>
@@ -327,13 +327,13 @@ const About = () => {
             <Card className="text-center hover:shadow-lg transition-all hover:-translate-y-1">
               <CardHeader>
                 <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-4">
-                  <Heart className="w-8 h-8 text-primary" />
+                  <Compass className="w-8 h-8 text-primary" />
                 </div>
-                <CardTitle>Functional Training</CardTitle>
+                <CardTitle>Simplicity & Structure</CardTitle>
               </CardHeader>
               <CardContent>
                 <p className="text-sm text-muted-foreground">
-                  Train for real-life movements that improve your daily performance and quality of life.
+                  No confusion, no noise, no wasted time. Just structured workouts and programs you can follow with confidence every single day.
                 </p>
               </CardContent>
             </Card>
