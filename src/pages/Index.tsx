@@ -4,7 +4,7 @@ import { Helmet } from "react-helmet";
 import { ServiceCard } from "@/components/ServiceCard";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { Dumbbell, Calendar, BookOpen, Calculator, Activity, Flame, Instagram, Facebook, Youtube, UserCheck, Wrench, Video, FileText, Smartphone, Users, Target, Heart, Zap, Plane, GraduationCap, CheckCircle } from "lucide-react";
+import { Dumbbell, Calendar, BookOpen, Calculator, Activity, Flame, Instagram, Facebook, Youtube, UserCheck, Wrench, Video, FileText, Smartphone, Users, Target, Heart, Zap, Plane, GraduationCap, CheckCircle, User } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { User as SupabaseUser } from "@supabase/supabase-js";
 import { useToast } from "@/hooks/use-toast";
@@ -230,107 +230,106 @@ const Index = () => {
           <div className="container mx-auto max-w-6xl">
             <ScrollReveal>
           <Card className="p-6 sm:p-8 lg:p-12 bg-gradient-to-br from-yellow-50/50 via-background to-yellow-50/30 dark:from-yellow-950/20 dark:via-background dark:to-yellow-950/10">
-            <div className="grid lg:grid-cols-2 gap-8 lg:gap-12 items-center">
-                {/* Left Column - Content */}
-                <div className="text-center lg:text-left space-y-6">
-                  <h1 className="text-3xl sm:text-4xl lg:text-5xl xl:text-6xl font-bold leading-tight">
-                    Your Personal AI Fitness Coach
-                  </h1>
-                  <p className="text-lg sm:text-xl text-muted-foreground">
-                    Access expert-designed workouts, comprehensive training programs, and personalized fitness guidance — all in one place
-                  </p>
+            <div className="space-y-8">
+              {/* Main Title */}
+              <div className="text-center space-y-4">
+                <h1 className="text-4xl sm:text-5xl lg:text-6xl font-black bg-gradient-to-r from-primary via-amber-400 to-primary bg-clip-text text-transparent">
+                  Welcome to SmartyGym
+                </h1>
+                <p className="text-xl sm:text-2xl text-muted-foreground font-medium">
+                  Your Gym Re-imagined. Anywhere, Anytime.
+                </p>
+              </div>
 
-                  {/* Feature Highlights Grid */}
-                  <div className="grid grid-cols-2 gap-4 py-6">
-                    <div className="flex items-center gap-3">
-                      <CheckCircle className="w-5 h-5 text-primary flex-shrink-0" />
-                      <span className="text-sm sm:text-base">Daily Workouts</span>
+              {/* Three Core Value Propositions */}
+              <div className="grid md:grid-cols-3 gap-6">
+                {/* Card 1: Your Gym In Your Pocket */}
+                <Card className="p-6 bg-background/50 backdrop-blur-sm border-border/50">
+                  <div className="flex flex-col items-center text-center space-y-4">
+                    <div className="p-4 rounded-full bg-primary/10">
+                      <Smartphone className="w-8 h-8 text-primary" />
                     </div>
-                    <div className="flex items-center gap-3">
-                      <CheckCircle className="w-5 h-5 text-primary flex-shrink-0" />
-                      <span className="text-sm sm:text-base">Training Programs</span>
+                    <h3 className="text-lg font-bold">Your Gym In Your Pocket</h3>
+                    <p className="text-sm text-muted-foreground leading-relaxed">
+                      Professional fitness platform with expert workouts, structured programs, and personalized coaching - accessible worldwide at smartygym.com.
+                    </p>
+                  </div>
+                </Card>
+
+                {/* Card 2: 100% Human. 0% AI. */}
+                <Card className="p-6 bg-background/50 backdrop-blur-sm border-border/50">
+                  <div className="flex flex-col items-center text-center space-y-4">
+                    <div className="p-4 rounded-full bg-primary/10">
+                      <UserCheck className="w-8 h-8 text-primary" />
                     </div>
-                    <div className="flex items-center gap-3">
-                      <CheckCircle className="w-5 h-5 text-primary flex-shrink-0" />
-                      <span className="text-sm sm:text-base">Exercise Library</span>
+                    <h3 className="text-lg font-bold">100% Human. 0% AI.</h3>
+                    <p className="text-sm text-muted-foreground leading-relaxed">
+                      Every workout personally designed by Sports Scientist <span className="text-primary font-semibold">Haris Falas</span> with 20+ years of experience. Real expertise, not algorithms.
+                    </p>
+                  </div>
+                </Card>
+
+                {/* Card 3: Train Anywhere, Anytime */}
+                <Card className="p-6 bg-background/50 backdrop-blur-sm border-border/50">
+                  <div className="flex flex-col items-center text-center space-y-4">
+                    <div className="p-4 rounded-full bg-primary/10">
+                      <Dumbbell className="w-8 h-8 text-primary" />
                     </div>
-                    <div className="flex items-center gap-3">
-                      <CheckCircle className="w-5 h-5 text-primary flex-shrink-0" />
-                      <span className="text-sm sm:text-base">Fitness Tools</span>
+                    <h3 className="text-lg font-bold">Train Anywhere, Anytime</h3>
+                    <p className="text-sm text-muted-foreground leading-relaxed">
+                      Access professional workouts on any device. Flexible training that fits YOUR schedule and YOUR goals—at home, gym, or traveling.
+                    </p>
+                  </div>
+                </Card>
+              </div>
+
+              {/* Six Feature Items */}
+              <div className="border-t border-border/40 pt-8">
+                <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                  <div className="flex items-start gap-3">
+                    <Dumbbell className="w-5 h-5 text-primary flex-shrink-0 mt-1" />
+                    <div>
+                      <h4 className="font-semibold">500+ Expert Workouts</h4>
+                      <p className="text-sm text-muted-foreground">Science-backed routines for all fitness levels</p>
                     </div>
                   </div>
-
-                  {/* CTA Buttons */}
-                  <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start pt-4">
-                    {!user ? (
-                      <>
-                        <Button 
-                          size="lg" 
-                          onClick={() => navigate("/auth")}
-                          className="text-base sm:text-lg px-6 sm:px-8"
-                        >
-                          Start Free Trial
-                        </Button>
-                        <Button 
-                          size="lg" 
-                          variant="outline"
-                          onClick={() => navigate("/about")}
-                          className="text-base sm:text-lg px-6 sm:px-8"
-                        >
-                          Learn More
-                        </Button>
-                      </>
-                    ) : (
-                      <Button 
-                        size="lg" 
-                        onClick={() => navigate("/dashboard")}
-                        className="text-base sm:text-lg px-6 sm:px-8"
-                      >
-                        Go to Dashboard
-                      </Button>
-                    )}
+                  <div className="flex items-start gap-3">
+                    <Target className="w-5 h-5 text-primary flex-shrink-0 mt-1" />
+                    <div>
+                      <h4 className="font-semibold">Training Programs</h4>
+                      <p className="text-sm text-muted-foreground">Structured plans for specific goals</p>
+                    </div>
                   </div>
-
-                  {/* Who Is This For - Inline */}
-                  <div className="mt-8 pt-8 border-t border-border/40">
-                    <h3 className="text-xl font-semibold mb-4">Perfect For:</h3>
-                    <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-                      <div className="flex items-center gap-2">
-                        <Users className="w-4 h-4 text-primary flex-shrink-0" />
-                        <span className="text-sm">Busy Professionals</span>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <Target className="w-4 h-4 text-primary flex-shrink-0" />
-                        <span className="text-sm">Fitness Enthusiasts</span>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <Heart className="w-4 h-4 text-primary flex-shrink-0" />
-                        <span className="text-sm">Health Seekers</span>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <Zap className="w-4 h-4 text-primary flex-shrink-0" />
-                        <span className="text-sm">Athletes</span>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <Plane className="w-4 h-4 text-primary flex-shrink-0" />
-                        <span className="text-sm">Travelers</span>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <GraduationCap className="w-4 h-4 text-primary flex-shrink-0" />
-                        <span className="text-sm">Students</span>
-                      </div>
+                  <div className="flex items-start gap-3">
+                    <User className="w-5 h-5 text-primary flex-shrink-0 mt-1" />
+                    <div>
+                      <h4 className="font-semibold">Personal Training</h4>
+                      <p className="text-sm text-muted-foreground">Custom programs tailored to you</p>
+                    </div>
+                  </div>
+                  <div className="flex items-start gap-3">
+                    <Calculator className="w-5 h-5 text-primary flex-shrink-0 mt-1" />
+                    <div>
+                      <h4 className="font-semibold">Smart Tools</h4>
+                      <p className="text-sm text-muted-foreground">BMR, Macro, and 1RM calculators</p>
+                    </div>
+                  </div>
+                  <div className="flex items-start gap-3">
+                    <BookOpen className="w-5 h-5 text-primary flex-shrink-0 mt-1" />
+                    <div>
+                      <h4 className="font-semibold">Exercise Library</h4>
+                      <p className="text-sm text-muted-foreground">Detailed exercise instructions</p>
+                    </div>
+                  </div>
+                  <div className="flex items-start gap-3">
+                    <Users className="w-5 h-5 text-primary flex-shrink-0 mt-1" />
+                    <div>
+                      <h4 className="font-semibold">Community Support</h4>
+                      <p className="text-sm text-muted-foreground">Connect with fellow fitness enthusiasts</p>
                     </div>
                   </div>
                 </div>
-
-                {/* Right Column - Hero Image */}
-                <div className="relative">
-                  <img
-                    src={workoutHeroImg}
-                    alt="Professional fitness training"
-                    className="w-full rounded-2xl shadow-2xl"
-                  />
-                </div>
+              </div>
             </div>
           </Card>
         </ScrollReveal>
