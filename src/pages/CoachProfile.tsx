@@ -2,7 +2,7 @@ import { useNavigate } from "react-router-dom";
 import { Helmet } from "react-helmet";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { ArrowLeft, Award, Target, TrendingUp, Users } from "lucide-react";
+import { ArrowLeft, Award, GraduationCap, Building2, Target, CheckCircle, Smartphone, Shield } from "lucide-react";
 import { useShowBackButton } from "@/hooks/useShowBackButton";
 
 const CoachProfile = () => {
@@ -110,127 +110,160 @@ const CoachProfile = () => {
                   className="w-full h-full object-cover"
                 />
               </div>
-              <h1 className="text-3xl sm:text-4xl font-bold mb-4">Meet Our Head Coach</h1>
-              <h2 className="text-3xl font-semibold text-primary mb-2">Haris Falas</h2>
-              <p className="text-lg text-muted-foreground">Founder & Head Coach, HFSC and Smarty Gym</p>
+              <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-4">Meet Haris Falas</h1>
+              <p className="text-base sm:text-lg text-muted-foreground">Strength and Conditioning Coach and Founder of SmartyGym</p>
             </header>
 
             {/* Main Content Card */}
-            <Card className="p-8 md:p-12">
-              <div className="prose prose-lg max-w-none">
-                <p className="text-lg leading-relaxed mb-6">
-                  Haris Falas is the founder and head coach of HFSC and Smarty Gym, one of Cyprus' most respected names in strength and conditioning, human performance, and functional fitness. With more than 20 years of professional experience as a Sports Scientist, Strength & Conditioning Coach, and Educator, Haris has dedicated his career to one mission — helping people move, perform, and live better.
+            <Card className="p-6 sm:p-8 md:p-10 space-y-6 sm:space-y-8">
+              {/* Introduction */}
+              <section>
+                <p className="text-base sm:text-lg leading-relaxed text-muted-foreground">
+                  I've spent more than twenty years helping athletes, teams, and everyday people improve their performance, overcome injuries, lose fat, gain strength, and train with purpose. SmartyGym is the evolution of that journey — a complete online gym built on science, experience, and real coaching.
                 </p>
+              </section>
 
-                <h3 className="text-2xl font-semibold mb-4 mt-8">A Visionary Coach with Proven Experience</h3>
-                
-                <p className="text-lg leading-relaxed mb-6">
-                  Haris began his journey in the world of sports performance long before functional training became a trend. As a certified Sports Scientist, he developed a deep understanding of biomechanics, physiology, and the psychology of performance. Over the years, he has worked with elite athletes, football teams, and everyday adults—each time blending scientific precision with practical coaching methods that deliver measurable results.
-                </p>
-
-                <p className="text-lg leading-relaxed mb-6">
-                  Haris has served as a Strength & Conditioning Coach in the Cypriot First Division, most notably with AEL Limassol FC and Nea Salamina FC, where he played a key role in optimizing athletic performance, preventing injuries, and building resilient, high-performing athletes. His professionalism and loyalty have earned him respect across the football community, highlighted by his well-known decision to decline a major offer from Omonia FC—a move that reflected his integrity and dedication to his teams.
-                </p>
-
-                <h3 className="text-2xl font-semibold mb-4 mt-8">The Mind Behind HFSC & Smarty Gym</h3>
-                
-                <p className="text-lg leading-relaxed mb-6">
-                  Through HFSC (Haris Falas Strength & Conditioning) and his innovative digital platform Smarty Gym, Haris has redefined how people approach fitness. His philosophy is clear:
-                </p>
-
-                <p className="text-xl font-semibold text-primary text-center my-6">
-                  "Train smart, move better, perform stronger."
-                </p>
-
-                <p className="text-lg leading-relaxed mb-6">
-                  Under his leadership, HFSC has become a hub for adults and athletes seeking functional, real-world fitness—training that enhances strength, mobility, and performance while preventing pain and injury. Smarty Gym extends that vision globally, giving people the tools to train anywhere, anytime, with scientifically designed workouts and professional guidance.
-                </p>
-
-                <h3 className="text-2xl font-semibold mb-4 mt-8">A Mission That Goes Beyond Fitness</h3>
-                
-                <p className="text-lg leading-relaxed mb-6">
-                  Haris believes fitness isn't just about aesthetics—it's about freedom of movement, energy, and confidence in everyday life. His approach combines traditional strength principles with cutting-edge sports science to create a balanced, sustainable path to peak performance.
-                </p>
-
-                <p className="text-lg leading-relaxed mb-6">
-                  Known for his passion, precision, and results, Haris continues to inspire both his clients and fellow professionals to think differently about training. His next mission is clear: to make Smarty Gym a global fitness brand, empowering people worldwide to train smart and live strong.
-                </p>
-              </div>
-
-              {/* Key Highlights */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-12">
-                <div className="flex gap-4">
-                  <div className="flex-shrink-0">
-                    <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center">
-                      <Award className="h-6 w-6 text-primary" />
-                    </div>
+              {/* My Background */}
+              <section>
+                <h3 className="text-xl sm:text-2xl font-semibold mb-4">My Background</h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-4">
+                  <div className="flex items-start gap-2">
+                    <Award className="w-5 h-5 sm:w-6 sm:h-6 text-primary shrink-0 mt-0.5" />
+                    <span className="text-sm sm:text-base">Sports Scientist (BSc, Football Specialist)</span>
                   </div>
-                  <div>
-                    <h3 className="font-semibold text-lg mb-2">Sports Scientist & Educator</h3>
-                    <p className="text-muted-foreground text-sm">
-                      Certified professional with deep expertise in biomechanics and physiology
-                    </p>
+                  <div className="flex items-start gap-2">
+                    <GraduationCap className="w-5 h-5 sm:w-6 sm:h-6 text-primary shrink-0 mt-0.5" />
+                    <span className="text-sm sm:text-base">MBA in Marketing</span>
+                  </div>
+                  <div className="flex items-start gap-2">
+                    <Award className="w-5 h-5 sm:w-6 sm:h-6 text-primary shrink-0 mt-0.5" />
+                    <span className="text-sm sm:text-base">Strength and Conditioning Coach since 2002</span>
+                  </div>
+                  <div className="flex items-start gap-2">
+                    <Award className="w-5 h-5 sm:w-6 sm:h-6 text-primary shrink-0 mt-0.5" />
+                    <span className="text-sm sm:text-base">EXOS Performance Specialist (Phases 1, 2, 3)</span>
+                  </div>
+                  <div className="flex items-start gap-2">
+                    <Award className="w-5 h-5 sm:w-6 sm:h-6 text-primary shrink-0 mt-0.5" />
+                    <span className="text-sm sm:text-base">EXOS Rehabilitation Specialist</span>
+                  </div>
+                  <div className="flex items-start gap-2">
+                    <Award className="w-5 h-5 sm:w-6 sm:h-6 text-primary shrink-0 mt-0.5" />
+                    <span className="text-sm sm:text-base">FMS Specialist</span>
+                  </div>
+                  <div className="flex items-start gap-2">
+                    <Award className="w-5 h-5 sm:w-6 sm:h-6 text-primary shrink-0 mt-0.5" />
+                    <span className="text-sm sm:text-base">ACE Medical Exercise Specialist</span>
+                  </div>
+                  <div className="flex items-start gap-2">
+                    <Award className="w-5 h-5 sm:w-6 sm:h-6 text-primary shrink-0 mt-0.5" />
+                    <span className="text-sm sm:text-base">AFPA Certification</span>
+                  </div>
+                  <div className="flex items-start gap-2">
+                    <Award className="w-5 h-5 sm:w-6 sm:h-6 text-primary shrink-0 mt-0.5" />
+                    <span className="text-sm sm:text-base">NSCA CSCS (ongoing)</span>
                   </div>
                 </div>
+              </section>
 
-                <div className="flex gap-4">
-                  <div className="flex-shrink-0">
-                    <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center">
-                      <TrendingUp className="h-6 w-6 text-primary" />
-                    </div>
+              {/* Professional Experience */}
+              <section>
+                <h3 className="text-xl sm:text-2xl font-semibold mb-4">Professional Experience</h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-4">
+                  <div className="flex items-start gap-2">
+                    <Building2 className="w-5 h-5 sm:w-6 sm:h-6 text-primary shrink-0 mt-0.5" />
+                    <span className="text-sm sm:text-base">Olympiakos Nicosia</span>
                   </div>
-                  <div>
-                    <h3 className="font-semibold text-lg mb-2">20+ Years Experience</h3>
-                    <p className="text-muted-foreground text-sm">
-                      Elite athletes, professional football teams, and everyday individuals
-                    </p>
+                  <div className="flex items-start gap-2">
+                    <Building2 className="w-5 h-5 sm:w-6 sm:h-6 text-primary shrink-0 mt-0.5" />
+                    <span className="text-sm sm:text-base">Digenis FC</span>
+                  </div>
+                  <div className="flex items-start gap-2">
+                    <Building2 className="w-5 h-5 sm:w-6 sm:h-6 text-primary shrink-0 mt-0.5" />
+                    <span className="text-sm sm:text-base">APOEL FC</span>
+                  </div>
+                  <div className="flex items-start gap-2">
+                    <Building2 className="w-5 h-5 sm:w-6 sm:h-6 text-primary shrink-0 mt-0.5" />
+                    <span className="text-sm sm:text-base">Anorthosis</span>
+                  </div>
+                  <div className="flex items-start gap-2">
+                    <Building2 className="w-5 h-5 sm:w-6 sm:h-6 text-primary shrink-0 mt-0.5" />
+                    <span className="text-sm sm:text-base">AEL FC</span>
+                  </div>
+                  <div className="flex items-start gap-2">
+                    <Building2 className="w-5 h-5 sm:w-6 sm:h-6 text-primary shrink-0 mt-0.5" />
+                    <span className="text-sm sm:text-base">Athletes Evolution Exercise Evaluation</span>
+                  </div>
+                  <div className="flex items-start gap-2 md:col-span-2">
+                    <Building2 className="w-5 h-5 sm:w-6 sm:h-6 text-primary shrink-0 mt-0.5" />
+                    <span className="text-sm sm:text-base">Multiple teams, athletes, and hundreds of adults</span>
                   </div>
                 </div>
+              </section>
 
-                <div className="flex gap-4">
-                  <div className="flex-shrink-0">
-                    <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center">
-                      <Target className="h-6 w-6 text-primary" />
+              {/* My Philosophy */}
+              <section>
+                <Card className="bg-primary/5 border-2 border-primary/20 p-4 sm:p-6">
+                  <h3 className="text-xl sm:text-2xl font-semibold mb-4">My Philosophy</h3>
+                  <div className="space-y-3">
+                    <div className="flex items-start gap-2">
+                      <Target className="w-5 h-5 sm:w-6 sm:h-6 text-primary shrink-0 mt-0.5" />
+                      <p className="text-sm sm:text-base">Training should be simple, effective, and designed for real life.</p>
+                    </div>
+                    <div className="flex items-start gap-2">
+                      <CheckCircle className="w-5 h-5 sm:w-6 sm:h-6 text-primary shrink-0 mt-0.5" />
+                      <p className="text-sm sm:text-base">People don't fail because they are lazy.</p>
+                    </div>
+                    <div className="flex items-start gap-2">
+                      <CheckCircle className="w-5 h-5 sm:w-6 sm:h-6 text-primary shrink-0 mt-0.5" />
+                      <p className="text-sm sm:text-base">They fail because the program isn't clear, practical, or sustainable.</p>
                     </div>
                   </div>
-                  <div>
-                    <h3 className="font-semibold text-lg mb-2">First Division Coach</h3>
-                    <p className="text-muted-foreground text-sm">
-                      AEL Limassol FC and Nea Salamina FC - Cypriot First Division
-                    </p>
-                  </div>
-                </div>
+                  <p className="font-semibold text-primary mt-4 text-sm sm:text-base">
+                    SmartyGym is built to remove confusion and bring clarity, structure, and expert guidance.
+                  </p>
+                </Card>
+              </section>
 
-                <div className="flex gap-4">
-                  <div className="flex-shrink-0">
-                    <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center">
-                      <Users className="h-6 w-6 text-primary" />
+              {/* Why I Created SmartyGym */}
+              <section>
+                <h3 className="text-xl sm:text-2xl font-semibold mb-4">Why I Created SmartyGym</h3>
+                <div className="flex items-start gap-3">
+                  <Smartphone className="w-6 h-6 sm:w-7 sm:h-7 text-primary shrink-0 mt-0.5" />
+                  <p className="text-base sm:text-lg leading-relaxed text-muted-foreground">
+                    People need coaching beyond the gym. Not everyone can come physically to HFSC in Nicosia. Many travel, work late, or prefer training at home. SmartyGym gives them a complete training solution in their pocket. Anywhere. Anytime.
+                  </p>
+                </div>
+              </section>
+
+              {/* My Promise */}
+              <section>
+                <Card className="bg-primary/5 border-2 border-primary/20 p-4 sm:p-6 text-center">
+                  <h3 className="text-xl sm:text-2xl font-semibold mb-4">My Promise</h3>
+                  <div className="space-y-3">
+                    <div className="flex items-center justify-center gap-2">
+                      <Shield className="w-5 h-5 sm:w-6 sm:h-6 text-primary shrink-0" />
+                      <p className="text-sm sm:text-base font-semibold">No gimmicks.</p>
+                    </div>
+                    <div className="flex items-center justify-center gap-2">
+                      <Shield className="w-5 h-5 sm:w-6 sm:h-6 text-primary shrink-0" />
+                      <p className="text-sm sm:text-base font-semibold">No shortcuts.</p>
+                    </div>
+                    <div className="flex items-center justify-center gap-2">
+                      <Shield className="w-5 h-5 sm:w-6 sm:h-6 text-primary shrink-0" />
+                      <p className="text-sm sm:text-base font-semibold">Just structured, science-based training that works.</p>
                     </div>
                   </div>
-                  <div>
-                    <h3 className="font-semibold text-lg mb-2">Industry Pioneer</h3>
-                    <p className="text-muted-foreground text-sm">
-                      Leading Cyprus' functional fitness revolution with HFSC & Smarty Gym
-                    </p>
-                  </div>
-                </div>
-              </div>
+                </Card>
+              </section>
             </Card>
 
             {/* CTA Section */}
             <div className="text-center py-8">
-              <h3 className="text-2xl font-semibold mb-4">Ready to Train with Purpose?</h3>
-              <p className="text-muted-foreground mb-6">
-                Experience Haris Falas' proven training methods through Smarty Gym's comprehensive programs
-              </p>
-              <div className="flex gap-4 justify-center flex-wrap">
-                <Button size="lg" onClick={() => navigate("/premiumbenefits")}>
-                  Start Training
-                </Button>
-                <Button size="lg" variant="outline" onClick={() => navigate("/blog")}>
-                  Read Articles
-                </Button>
-              </div>
+              <h3 className="text-xl sm:text-2xl font-semibold mb-6">Join me inside SmartyGym and start your training today.</h3>
+              <Button size="lg" onClick={() => navigate("/premiumbenefits")}>
+                Start Training
+              </Button>
             </div>
           </article>
         </div>
