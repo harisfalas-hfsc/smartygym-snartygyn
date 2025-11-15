@@ -193,7 +193,15 @@ export default function JoinPremium() {
                 <div className="space-y-2 flex-1">
                   <div className="flex items-start gap-2">
                     <Check className="h-5 w-5 text-green-500 shrink-0 mt-0.5" />
-                    <span className="text-sm">Full access to all features</span>
+                    <span className="text-sm">Full access to all workouts</span>
+                  </div>
+                  <div className="flex items-start gap-2">
+                    <Check className="h-5 w-5 text-green-500 shrink-0 mt-0.5" />
+                    <span className="text-sm">Full access to all training programs</span>
+                  </div>
+                  <div className="flex items-start gap-2">
+                    <Check className="h-5 w-5 text-green-500 shrink-0 mt-0.5" />
+                    <span className="text-sm">Full access to training tools</span>
                   </div>
                   <div className="flex items-start gap-2">
                     <Check className="h-5 w-5 text-green-500 shrink-0 mt-0.5" />
@@ -250,7 +258,15 @@ export default function JoinPremium() {
                 <div className="space-y-2 flex-1">
                   <div className="flex items-start gap-2">
                     <Check className="h-5 w-5 text-green-500 shrink-0 mt-0.5" />
-                    <span className="text-sm">Full access to all features</span>
+                    <span className="text-sm">Full access to all workouts</span>
+                  </div>
+                  <div className="flex items-start gap-2">
+                    <Check className="h-5 w-5 text-green-500 shrink-0 mt-0.5" />
+                    <span className="text-sm">Full access to all training programs</span>
+                  </div>
+                  <div className="flex items-start gap-2">
+                    <Check className="h-5 w-5 text-green-500 shrink-0 mt-0.5" />
+                    <span className="text-sm">Full access to training tools</span>
                   </div>
                   <div className="flex items-start gap-2">
                     <Check className="h-5 w-5 text-green-500 shrink-0 mt-0.5" />
