@@ -767,14 +767,6 @@ export default function UserDashboard() {
                           <span className="text-xs font-medium">Support</span>
                         </div>
                       </div>
-                      
-                      <div className="bg-white/50 dark:bg-gray-800/50 rounded-md p-2 border border-primary/10 hover:border-primary/30 transition-colors">
-                        <div className="flex flex-col items-center text-center gap-1">
-                          <Sparkles className="h-5 w-5 text-primary" />
-                          <span className="text-xs font-semibold">Ad-Free</span>
-                          <span className="text-xs font-medium">Experience</span>
-                        </div>
-                      </div>
                     </div>
                   </div>
                 </div>
@@ -827,68 +819,6 @@ export default function UserDashboard() {
 
           {/* Overview Tab */}
           <TabsContent value="overview" className="space-y-6">
-            {/* Quick Stats Overview */}
-            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-5">
-              <Card className="bg-gradient-to-br from-red-500/10 to-red-500/5">
-                <CardContent className="pt-6">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className="text-xs text-muted-foreground mb-1">Favorite Workouts</p>
-                      <p className="text-2xl font-bold">{favoriteWorkouts.length}</p>
-                    </div>
-                    <Heart className="h-8 w-8 text-red-500" />
-                  </div>
-                </CardContent>
-              </Card>
-
-              <Card className="bg-gradient-to-br from-green-500/10 to-green-500/5">
-                <CardContent className="pt-6">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className="text-xs text-muted-foreground mb-1">Completed Workouts</p>
-                      <p className="text-2xl font-bold">{completedWorkouts.length}</p>
-                    </div>
-                    <CheckCircle className="h-8 w-8 text-green-500" />
-                  </div>
-                </CardContent>
-              </Card>
-
-              <Card className="bg-gradient-to-br from-blue-500/10 to-blue-500/5">
-                <CardContent className="pt-6">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className="text-xs text-muted-foreground mb-1">Favorite Programs</p>
-                      <p className="text-2xl font-bold">{favoritePrograms.length}</p>
-                    </div>
-                    <Calendar className="h-8 w-8 text-blue-500" />
-                  </div>
-                </CardContent>
-              </Card>
-
-              <Card className="bg-gradient-to-br from-purple-500/10 to-purple-500/5">
-                <CardContent className="pt-6">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className="text-xs text-muted-foreground mb-1">Workouts Rated</p>
-                      <p className="text-2xl font-bold">{ratedWorkouts.length + ratedPrograms.length}</p>
-                    </div>
-                    <Star className="h-8 w-8 text-purple-500" />
-                  </div>
-                </CardContent>
-              </Card>
-
-              <Card className="bg-gradient-to-br from-orange-500/10 to-orange-500/5">
-                <CardContent className="pt-6">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className="text-xs text-muted-foreground mb-1">Calculator Uses</p>
-                      <p className="text-2xl font-bold">{oneRMHistory.length + bmrHistory.length + calorieHistory.length}</p>
-                    </div>
-                    <Calculator className="h-8 w-8 text-orange-500" />
-                  </div>
-                </CardContent>
-              </Card>
-            </div>
 
             {/* Recent Activity */}
             <Card>

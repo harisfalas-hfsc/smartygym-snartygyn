@@ -33,8 +33,8 @@ export const PlatinumPlanCardTemplate = () => {
             </div>
           ))}
           <div className="text-center mt-8 pt-8 border-t-2 border-primary/20">
-            <p className="text-5xl font-bold text-primary mb-2">€19.99</p>
-            <p className="text-2xl text-muted-foreground mb-6">per month</p>
+            <p className="text-5xl font-bold text-primary mb-2">€89.99</p>
+            <p className="text-2xl text-muted-foreground mb-6">per year</p>
             <p className="text-xl font-semibold text-primary">smartygym.com</p>
           </div>
         </CardContent>
