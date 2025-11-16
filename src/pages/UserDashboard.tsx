@@ -543,231 +543,155 @@ export default function UserDashboard() {
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <Crown className="h-5 w-5 text-primary" />
-                Your Subscription
+                Your {subscriptionInfo.subscribed ? getPlanName(subscriptionInfo.product_id) : 'Free'} Membership
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="flex flex-col gap-6">
-                {/* Plan Name */}
-                <div>
-                  <p className="text-2xl font-bold mb-1">
-                    {getPlanName(subscriptionInfo.product_id)} Plan
-                  </p>
-                  
-                  {/* Premium Badge - Always show for premium users */}
+              <div className="flex flex-col gap-4">
+                {/* Plan Status Row */}
+                <div className="flex flex-wrap items-center gap-2">
+                  <span className="text-lg font-bold">{getPlanName(subscriptionInfo.product_id)} Plan</span>
                   {subscriptionInfo.subscribed && (
-                    <div className="flex items-center gap-2 mt-2">
-                      <Badge variant="outline" className="text-sm bg-gradient-to-r from-yellow-500/20 to-amber-500/20 text-yellow-600 dark:text-yellow-400 border-yellow-500/30 px-3 py-1">
-                        <Crown className="h-3.5 w-3.5 mr-1.5" />
+                    <>
+                      <span className="text-muted-foreground">•</span>
+                      <Badge variant="outline" className="text-xs bg-gradient-to-r from-yellow-500/20 to-amber-500/20 text-yellow-600 dark:text-yellow-400 border-yellow-500/30">
+                        <Crown className="h-3 w-3 mr-1" />
                         Premium Member
                       </Badge>
-                    </div>
-                  )}
-                  
-                  {/* Free Plan Info */}
-                  {!subscriptionInfo.subscribed && (
-                    <div className="space-y-2 mt-4">
-                      <p className="text-sm text-muted-foreground">
-                        You're currently on the free plan with limited access.
-                      </p>
-                      <Button onClick={() => navigate("/premiumbenefits")} className="mt-2">
-                        Upgrade Now
-                      </Button>
-                    </div>
-                  )}
-                  
-                  {/* Premium Plan Details */}
-                  {subscriptionInfo.subscribed && (
-                    <div className="space-y-4 mt-4">
-                      {/* Status Badges */}
-                      <div className="flex flex-wrap gap-2">
-                        <Badge variant="outline" className="text-xs bg-green-500/10 text-green-600 dark:text-green-400 border-green-500/20">
-                          Active Subscription
-                        </Badge>
-                        {stripeDetails?.cancel_at_period_end ? (
+                      <span className="text-muted-foreground">•</span>
+                      <Badge variant="outline" className="text-xs bg-green-500/10 text-green-600 dark:text-green-400 border-green-500/20">
+                        Active Subscription
+                      </Badge>
+                      {stripeDetails?.cancel_at_period_end && (
+                        <>
+                          <span className="text-muted-foreground">•</span>
                           <Badge variant="outline" className="text-xs bg-orange-500/10 text-orange-600 dark:text-orange-400 border-orange-500/20">
                             Cancels at period end
                           </Badge>
-                        ) : subscriptionInfo.subscription_end ? (
-                          <Badge variant="outline" className="text-xs bg-blue-500/10 text-blue-600 dark:text-blue-400 border-blue-500/20">
-                            Auto-renewing
-                          </Badge>
-                        ) : null}
-                      </div>
-                      
-                      {/* Subscription Details Grid - Only show if dates exist */}
-                      {subscriptionInfo.subscription_end ? (
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 p-4 bg-background/50 rounded-lg border border-border/50">
-                          {/* Subscription Start */}
-                          {stripeDetails?.current_period_start && (
-                            <div>
-                              <p className="text-xs text-muted-foreground mb-1">Subscription Started</p>
-                              <p className="font-semibold">{formatTimestamp(stripeDetails.current_period_start)}</p>
-                            </div>
-                          )}
-                          
-                          {/* Next Billing Date */}
-                          <div>
-                            <p className="text-xs text-muted-foreground mb-1">
-                              {stripeDetails?.cancel_at_period_end ? "Expires On" : "Next Billing Date"}
-                            </p>
-                            <p className="font-semibold">{formatDate(subscriptionInfo.subscription_end)}</p>
-                          </div>
-                          
-                          {/* Days Remaining */}
-                          {getDaysRemaining() !== null && (
-                            <div>
-                              <p className="text-xs text-muted-foreground mb-1">Days Remaining</p>
-                              <p className="font-semibold text-primary">{getDaysRemaining()} days</p>
-                            </div>
-                          )}
-                          
-                          {/* Billing Type */}
-                          <div>
-                            <p className="text-xs text-muted-foreground mb-1">Billing Type</p>
-                            <p className="font-semibold">
-                              {stripeDetails?.cancel_at_period_end ? "One-time (No renewal)" : "Recurring Monthly"}
-                            </p>
-                          </div>
-                        </div>
-                      ) : (
-                        <div className="p-4 bg-background/50 rounded-lg border border-border/50">
-                          <p className="text-sm text-muted-foreground">
-                            Your subscription is active. Use the buttons below to manage your subscription or refresh to see billing details.
-                          </p>
-                        </div>
+                        </>
                       )}
-                      
-                      {/* Action Buttons */}
-                      <div className="flex flex-col sm:flex-row gap-3">
-                        <Button 
-                          onClick={handleRefreshSubscription}
-                          disabled={loading}
-                          variant="outline"
-                          className="flex-1"
-                        >
-                          {loading ? "Refreshing..." : "Refresh Status"}
-                        </Button>
-                        <Button 
-                          onClick={handleManageSubscription}
-                          disabled={managingSubscription}
-                          className="flex-1"
-                        >
-                          {managingSubscription ? "Opening..." : "Manage Subscription"}
-                        </Button>
-                      </div>
-                      
-                      <p className="text-xs text-muted-foreground">
-                        {stripeDetails?.cancel_at_period_end 
-                          ? "Your subscription will end on the expiration date. You can reactivate anytime before then."
-                          : "You can cancel, update payment method, or view billing history by clicking 'Manage Subscription' above."
-                        }
-                      </p>
-                    </div>
+                    </>
                   )}
                 </div>
-              </div>
-            </CardContent>
-          </Card>
-        )}
 
-        {/* Premium Features Summary - Only for premium users */}
-        {hasActivePlan && (
-          <Card className="mb-8 border-yellow-500/50 bg-gradient-to-br from-yellow-500/5 via-amber-500/5 to-orange-500/5">
-            <CardHeader>
-              <div className="flex items-center gap-2">
-                <Crown className="h-6 w-6 text-yellow-500" />
-                <CardTitle className="text-xl">Your {getPlanName(subscriptionInfo?.product_id)} Membership Benefits</CardTitle>
-              </div>
-            </CardHeader>
-            <CardContent>
-              <p className="text-sm text-muted-foreground mb-6">
-                You're getting full access to our complete fitness platform. Here's everything included with your membership:
-              </p>
-              
-              <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-                {/* Workout Access */}
-                <div className="p-4 bg-background rounded-lg border border-border/50">
-                  <div className="flex items-center gap-2 mb-2">
-                    <Dumbbell className="h-5 w-5 text-primary" />
-                    <h4 className="font-semibold">Premium Workouts</h4>
+                {/* Free Plan - Upgrade Button */}
+                {!subscriptionInfo.subscribed && (
+                  <div className="space-y-2">
+                    <p className="text-sm text-muted-foreground">
+                      You're currently on the free plan with limited access.
+                    </p>
+                    <Button onClick={() => navigate("/premiumbenefits")} className="w-full sm:w-auto">
+                      Upgrade Now
+                    </Button>
                   </div>
-                  <p className="text-xs text-muted-foreground">
-                    Full access to 100+ expertly designed workouts. Save favorites, track completion, and rate your experience.
-                  </p>
-                </div>
+                )}
 
-                {/* Premium Training Programs */}
-                <div className="p-4 bg-background rounded-lg border border-border/50">
-                  <div className="flex items-center gap-2 mb-2">
-                    <Calendar className="h-5 w-5 text-primary" />
-                    <h4 className="font-semibold">Premium Training Programmes</h4>
-                  </div>
-                  <p className="text-xs text-muted-foreground">
-                    Structured multi-week programs for every goal. Build strength, muscle, endurance, or improve mobility.
-                  </p>
-                </div>
+                {/* Premium Plan Details */}
+                {subscriptionInfo.subscribed && (
+                  <>
+                    {/* Subscription Details - 3 Column Grid */}
+                    {subscriptionInfo.subscription_end ? (
+                      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 p-3 bg-background/50 rounded-lg border border-border/50">
+                        <div>
+                          <p className="text-xs text-muted-foreground mb-0.5">
+                            {stripeDetails?.cancel_at_period_end ? "Expires On" : "Next Billing"}
+                          </p>
+                          <p className="text-sm font-semibold">{formatDate(subscriptionInfo.subscription_end)}</p>
+                        </div>
+                        
+                        {getDaysRemaining() !== null && (
+                          <div>
+                            <p className="text-xs text-muted-foreground mb-0.5">Days Remaining</p>
+                            <p className="text-sm font-semibold text-primary">{getDaysRemaining()} days</p>
+                          </div>
+                        )}
+                        
+                        <div>
+                          <p className="text-xs text-muted-foreground mb-0.5">Billing Type</p>
+                          <p className="text-sm font-semibold">
+                            {stripeDetails?.cancel_at_period_end ? "One-time" : "Auto-renewing"}
+                          </p>
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="p-3 bg-background/50 rounded-lg border border-border/50">
+                        <p className="text-sm text-muted-foreground">
+                          Your subscription is active. Refresh to see billing details.
+                        </p>
+                      </div>
+                    )}
 
-                {/* Interaction Tracking */}
-                <div className="p-4 bg-background rounded-lg border border-border/50">
-                  <div className="flex items-center gap-2 mb-2">
-                    <Heart className="h-5 w-5 text-primary" />
-                    <h4 className="font-semibold">Progress Tracking</h4>
-                  </div>
-                  <p className="text-xs text-muted-foreground">
-                    Save favorites, mark workouts complete, rate content, and view your entire fitness history in one place.
-                  </p>
-                </div>
+                    {/* Action Buttons */}
+                    <div className="flex flex-col sm:flex-row gap-2">
+                      <Button 
+                        onClick={handleRefreshSubscription}
+                        disabled={loading}
+                        variant="outline"
+                        className="flex-1"
+                        size="sm"
+                      >
+                        {loading ? "Refreshing..." : "Refresh Status"}
+                      </Button>
+                      <Button 
+                        onClick={handleManageSubscription}
+                        disabled={managingSubscription}
+                        className="flex-1"
+                        size="sm"
+                      >
+                        {managingSubscription ? "Opening..." : "Manage Subscription"}
+                      </Button>
+                    </div>
 
-                {/* Calculators */}
-                <div className="p-4 bg-background rounded-lg border border-border/50">
-                  <div className="flex items-center gap-2 mb-2">
-                    <Calculator className="h-5 w-5 text-primary" />
-                    <h4 className="font-semibold">Fitness Calculators</h4>
-                  </div>
-                  <p className="text-xs text-muted-foreground">
-                    1RM, BMR, and Macro calculators with full history tracking to monitor your progress over time.
-                  </p>
-                </div>
+                    {/* Divider */}
+                    <div className="relative my-2">
+                      <div className="absolute inset-0 flex items-center">
+                        <span className="w-full border-t border-border" />
+                      </div>
+                      <div className="relative flex justify-center text-xs uppercase">
+                        <span className="bg-card px-2 text-muted-foreground">Membership Benefits</span>
+                      </div>
+                    </div>
 
-                {/* Exercise Library */}
-                <div className="p-4 bg-background rounded-lg border border-border/50">
-                  <div className="flex items-center gap-2 mb-2">
-                    <Dumbbell className="h-5 w-5 text-primary" />
-                    <h4 className="font-semibold">Exercise Library</h4>
-                  </div>
-                  <p className="text-xs text-muted-foreground">
-                    Comprehensive video library with proper form demonstrations for every exercise.
-                  </p>
-                </div>
+                    {/* Benefits Checklist - 2 Column Grid */}
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                      <div className="flex items-center gap-2">
+                        <CheckCircle className="h-4 w-4 text-green-500 flex-shrink-0" />
+                        <span className="text-sm">100+ Premium Workouts</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <CheckCircle className="h-4 w-4 text-green-500 flex-shrink-0" />
+                        <span className="text-sm">Training Programs</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <CheckCircle className="h-4 w-4 text-green-500 flex-shrink-0" />
+                        <span className="text-sm">Progress Tracking</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <CheckCircle className="h-4 w-4 text-green-500 flex-shrink-0" />
+                        <span className="text-sm">Fitness Calculators</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <CheckCircle className="h-4 w-4 text-green-500 flex-shrink-0" />
+                        <span className="text-sm">Exercise Library</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <CheckCircle className="h-4 w-4 text-green-500 flex-shrink-0" />
+                        <span className="text-sm">Premium Support</span>
+                      </div>
+                      <div className="flex items-center gap-2 sm:col-span-2">
+                        <CheckCircle className="h-4 w-4 text-green-500 flex-shrink-0" />
+                        <span className="text-sm">Ad-Free Experience</span>
+                      </div>
+                    </div>
 
-                {/* Premium Support */}
-                <div className="p-4 bg-background rounded-lg border border-border/50">
-                  <div className="flex items-center gap-2 mb-2">
-                    <Crown className="h-5 w-5 text-primary" />
-                    <h4 className="font-semibold">Premium Support</h4>
-                  </div>
-                  <p className="text-xs text-muted-foreground">
-                    Direct messaging with Coach Haris Falas for personalized guidance and expert advice.
-                  </p>
-                </div>
-
-                {/* Ad-Free Experience */}
-                <div className="p-4 bg-background rounded-lg border border-border/50">
-                  <div className="flex items-center gap-2 mb-2">
-                    <CheckCircle className="h-5 w-5 text-primary" />
-                    <h4 className="font-semibold">Ad-Free Experience</h4>
-                  </div>
-                  <p className="text-xs text-muted-foreground">
-                    Enjoy an uninterrupted, distraction-free fitness experience without any advertisements.
-                  </p>
-                </div>
-              </div>
-
-              <div className="mt-6 p-4 bg-primary/10 rounded-lg border border-primary/20">
-                <p className="text-sm font-medium text-center">
-                  💪 You're on the {getPlanName(subscriptionInfo?.product_id)} plan - Making the most of your membership by staying consistent!
-                </p>
+                    {/* Optional Note */}
+                    {stripeDetails?.cancel_at_period_end && (
+                      <p className="text-xs text-muted-foreground mt-2">
+                        Your subscription will end on the expiration date. You can reactivate anytime before then.
+                      </p>
+                    )}
+                  </>
+                )}
               </div>
             </CardContent>
           </Card>
