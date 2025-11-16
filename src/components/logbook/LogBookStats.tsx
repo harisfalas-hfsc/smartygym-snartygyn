@@ -64,12 +64,6 @@ export const LogBookStats = ({ userId }: LogBookStatsProps) => {
       color: "text-orange-500",
     },
     {
-      title: "PT Days",
-      value: stats.ptDaysThisMonth,
-      icon: User,
-      color: "text-purple-500",
-    },
-    {
       title: "Tool Uses",
       value: stats.toolCalculationsThisMonth,
       icon: Calculator,
@@ -85,7 +79,7 @@ export const LogBookStats = ({ userId }: LogBookStatsProps) => {
   ];
 
   return (
-    <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-6">
+    <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-5">
       {statCards.map((stat) => {
         const Icon = stat.icon;
         return (
