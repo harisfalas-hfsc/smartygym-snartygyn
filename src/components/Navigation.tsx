@@ -357,7 +357,7 @@ export const Navigation = () => {
               <Button
                 variant="ghost"
                 size="icon"
-                onClick={() => navigate('/profile-settings?tab=notifications')}
+                onClick={() => navigate('/profilesettings?tab=notifications')}
                 className="relative"
                 title="Notifications Disabled"
               >
