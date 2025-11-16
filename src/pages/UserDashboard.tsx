@@ -788,13 +788,6 @@ export default function UserDashboard() {
           </Card>
         </div>
 
-        {/* Dashboard Overview */}
-        <div className="mb-8">
-          <h2 className="text-2xl font-bold mb-4">My Dashboard</h2>
-          <p className="text-muted-foreground mb-4">
-            Access your workouts, programs, purchases, messages, and more
-          </p>
-        </div>
 
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
           <div className="w-full overflow-x-auto">
