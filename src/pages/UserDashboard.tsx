@@ -24,7 +24,12 @@ import {
   MessageSquare,
   Loader2,
   RefreshCw,
-  ExternalLink
+  ExternalLink,
+  ClipboardList,
+  TrendingUp,
+  BookOpen,
+  Headphones,
+  Sparkles
 } from "lucide-react";
 
 interface WorkoutInteraction {
@@ -656,34 +661,61 @@ export default function UserDashboard() {
                     <h4 className="text-xs font-semibold uppercase text-muted-foreground mb-2 tracking-wide">
                       Membership Benefits
                     </h4>
-                    <div className="space-y-1.5">
-                      <div className="flex items-center gap-2">
-                        <CheckCircle className="h-4 w-4 text-green-500 flex-shrink-0" />
-                        <span className="text-sm font-medium">100+ Premium Workouts</span>
+                    <div className="grid grid-cols-2 lg:grid-cols-3 gap-2">
+                      <div className="bg-white/50 dark:bg-gray-800/50 rounded-md p-2 border border-primary/10 hover:border-primary/30 transition-colors">
+                        <div className="flex flex-col items-center text-center gap-1">
+                          <Dumbbell className="h-5 w-5 text-primary" />
+                          <span className="text-xs font-semibold">500+ Premium</span>
+                          <span className="text-xs font-medium">Workouts</span>
+                        </div>
                       </div>
-                      <div className="flex items-center gap-2">
-                        <CheckCircle className="h-4 w-4 text-green-500 flex-shrink-0" />
-                        <span className="text-sm font-medium">Training Programs</span>
+                      
+                      <div className="bg-white/50 dark:bg-gray-800/50 rounded-md p-2 border border-primary/10 hover:border-primary/30 transition-colors">
+                        <div className="flex flex-col items-center text-center gap-1">
+                          <ClipboardList className="h-5 w-5 text-primary" />
+                          <span className="text-xs font-semibold">Training</span>
+                          <span className="text-xs font-medium">Programs</span>
+                        </div>
                       </div>
-                      <div className="flex items-center gap-2">
-                        <CheckCircle className="h-4 w-4 text-green-500 flex-shrink-0" />
-                        <span className="text-sm font-medium">Progress Tracking</span>
+                      
+                      <div className="bg-white/50 dark:bg-gray-800/50 rounded-md p-2 border border-primary/10 hover:border-primary/30 transition-colors">
+                        <div className="flex flex-col items-center text-center gap-1">
+                          <TrendingUp className="h-5 w-5 text-primary" />
+                          <span className="text-xs font-semibold">Progress</span>
+                          <span className="text-xs font-medium">Tracking</span>
+                        </div>
                       </div>
-                      <div className="flex items-center gap-2">
-                        <CheckCircle className="h-4 w-4 text-green-500 flex-shrink-0" />
-                        <span className="text-sm font-medium">Fitness Calculators</span>
+                      
+                      <div className="bg-white/50 dark:bg-gray-800/50 rounded-md p-2 border border-primary/10 hover:border-primary/30 transition-colors">
+                        <div className="flex flex-col items-center text-center gap-1">
+                          <Calculator className="h-5 w-5 text-primary" />
+                          <span className="text-xs font-semibold">Fitness</span>
+                          <span className="text-xs font-medium">Calculators</span>
+                        </div>
                       </div>
-                      <div className="flex items-center gap-2">
-                        <CheckCircle className="h-4 w-4 text-green-500 flex-shrink-0" />
-                        <span className="text-sm font-medium">Exercise Library</span>
+                      
+                      <div className="bg-white/50 dark:bg-gray-800/50 rounded-md p-2 border border-primary/10 hover:border-primary/30 transition-colors">
+                        <div className="flex flex-col items-center text-center gap-1">
+                          <BookOpen className="h-5 w-5 text-primary" />
+                          <span className="text-xs font-semibold">Exercise</span>
+                          <span className="text-xs font-medium">Library</span>
+                        </div>
                       </div>
-                      <div className="flex items-center gap-2">
-                        <CheckCircle className="h-4 w-4 text-green-500 flex-shrink-0" />
-                        <span className="text-sm font-medium">Premium Support</span>
+                      
+                      <div className="bg-white/50 dark:bg-gray-800/50 rounded-md p-2 border border-primary/10 hover:border-primary/30 transition-colors">
+                        <div className="flex flex-col items-center text-center gap-1">
+                          <Headphones className="h-5 w-5 text-primary" />
+                          <span className="text-xs font-semibold">Premium</span>
+                          <span className="text-xs font-medium">Support</span>
+                        </div>
                       </div>
-                      <div className="flex items-center gap-2">
-                        <CheckCircle className="h-4 w-4 text-green-500 flex-shrink-0" />
-                        <span className="text-sm font-medium">Ad-Free Experience</span>
+                      
+                      <div className="bg-white/50 dark:bg-gray-800/50 rounded-md p-2 border border-primary/10 hover:border-primary/30 transition-colors">
+                        <div className="flex flex-col items-center text-center gap-1">
+                          <Sparkles className="h-5 w-5 text-primary" />
+                          <span className="text-xs font-semibold">Ad-Free</span>
+                          <span className="text-xs font-medium">Experience</span>
+                        </div>
                       </div>
                     </div>
                   </div>
