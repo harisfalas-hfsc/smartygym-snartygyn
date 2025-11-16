@@ -55,9 +55,21 @@ export const LogBookCalendar = ({ userId, filter }: LogBookCalendarProps) => {
       if (activity.content_type === 'workout') {
         badges.add(activity.action_type === 'completed' ? 'workout-completed' : 'workout-viewed');
       } else if (activity.content_type === 'program') {
-        badges.add(activity.action_type === 'program_day_completed' ? 'program-completed' : 'program-viewed');
+        if (activity.action_type === 'program_started') {
+          badges.add('program-ongoing');
+        } else if (activity.action_type === 'program_day_completed') {
+          badges.add('program-completed');
+        } else {
+          badges.add('program-viewed');
+        }
       } else if (activity.content_type === 'personal_training') {
-        badges.add(activity.action_type === 'pt_day_completed' ? 'pt-completed' : 'pt-viewed');
+        if (activity.action_type === 'pt_started') {
+          badges.add('pt-ongoing');
+        } else if (activity.action_type === 'pt_day_completed') {
+          badges.add('pt-completed');
+        } else {
+          badges.add('pt-viewed');
+        }
       } else if (activity.content_type === 'tool') {
         badges.add('tool');
       }
@@ -70,11 +82,13 @@ export const LogBookCalendar = ({ userId, filter }: LogBookCalendarProps) => {
     const colors: Record<string, string> = {
       'workout-viewed': 'bg-gray-400',
       'workout-completed': 'bg-green-500',
-      'program-viewed': 'bg-yellow-400',
+      'program-viewed': 'bg-gray-400',
+      'program-ongoing': 'bg-orange-500',
       'program-completed': 'bg-blue-500',
-      'pt-viewed': 'bg-yellow-400',
-      'pt-completed': 'bg-orange-500',
-      'tool': 'bg-purple-500',
+      'pt-viewed': 'bg-gray-400',
+      'pt-ongoing': 'bg-orange-400',
+      'pt-completed': 'bg-purple-500',
+      'tool': 'bg-pink-500',
     };
     return colors[badge] || 'bg-gray-400';
   };
@@ -176,26 +190,26 @@ export const LogBookCalendar = ({ userId, filter }: LogBookCalendarProps) => {
             <div className="grid grid-cols-2 md:grid-cols-3 gap-2 text-xs">
               <div className="flex items-center gap-2">
                 <div className="w-3 h-3 rounded-full bg-gray-400" />
-                <span>Workout Viewed</span>
+                <span>Viewed</span>
               </div>
               <div className="flex items-center gap-2">
                 <div className="w-3 h-3 rounded-full bg-green-500" />
                 <span>Workout Completed</span>
               </div>
               <div className="flex items-center gap-2">
-                <div className="w-3 h-3 rounded-full bg-yellow-400" />
-                <span>Program Viewed</span>
+                <div className="w-3 h-3 rounded-full bg-orange-500" />
+                <span>Program Ongoing</span>
               </div>
               <div className="flex items-center gap-2">
                 <div className="w-3 h-3 rounded-full bg-blue-500" />
                 <span>Program Completed</span>
               </div>
               <div className="flex items-center gap-2">
-                <div className="w-3 h-3 rounded-full bg-orange-500" />
+                <div className="w-3 h-3 rounded-full bg-purple-500" />
                 <span>PT Completed</span>
               </div>
               <div className="flex items-center gap-2">
-                <div className="w-3 h-3 rounded-full bg-purple-500" />
+                <div className="w-3 h-3 rounded-full bg-pink-500" />
                 <span>Tool Used</span>
               </div>
             </div>

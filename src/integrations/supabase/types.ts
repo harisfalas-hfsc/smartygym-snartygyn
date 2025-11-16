@@ -905,6 +905,7 @@ export type Database = {
           id: string
           is_completed: boolean | null
           is_favorite: boolean | null
+          is_ongoing: boolean | null
           program_id: string
           program_name: string
           program_type: string
@@ -918,6 +919,7 @@ export type Database = {
           id?: string
           is_completed?: boolean | null
           is_favorite?: boolean | null
+          is_ongoing?: boolean | null
           program_id: string
           program_name: string
           program_type: string
@@ -931,6 +933,7 @@ export type Database = {
           id?: string
           is_completed?: boolean | null
           is_favorite?: boolean | null
+          is_ongoing?: boolean | null
           program_id?: string
           program_name?: string
           program_type?: string

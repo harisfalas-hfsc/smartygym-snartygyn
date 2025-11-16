@@ -16,6 +16,7 @@ interface ProgramInteractionsProps {
 export const ProgramInteractions = ({ programId, programType, programName, isFreeContent }: ProgramInteractionsProps) => {
   const [isFavorite, setIsFavorite] = useState(false);
   const [isCompleted, setIsCompleted] = useState(false);
+  const [isOngoing, setIsOngoing] = useState(false);
   const [rating, setRating] = useState<number>(0);
   const [isLoading, setIsLoading] = useState(true);
   const { toast } = useToast();
@@ -52,6 +53,7 @@ export const ProgramInteractions = ({ programId, programType, programName, isFre
       if (data) {
         setIsFavorite(data.is_favorite);
         setIsCompleted(data.is_completed);
+        setIsOngoing(data.is_ongoing || false);
         setRating(data.rating || 0);
       }
     } catch (error) {
@@ -133,6 +135,136 @@ export const ProgramInteractions = ({ programId, programType, programName, isFre
       toast({
         title: "Error",
         description: "Failed to update favorites",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const startProgram = async () => {
+    if (!canUserInteract) {
+      showUpgradePrompt();
+      return;
+    }
+
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) return;
+
+      await supabase
+        .from('program_interactions')
+        .upsert({
+          user_id: session.user.id,
+          program_id: programId,
+          program_type: programType,
+          program_name: programName,
+          is_ongoing: true,
+          is_completed: false,
+        }, {
+          onConflict: 'user_id,program_id,program_type'
+        });
+
+      // Log to activity log
+      await supabase.from('user_activity_log').insert({
+        user_id: session.user.id,
+        content_type: programType,
+        item_id: programId,
+        item_name: programName,
+        action_type: programType === 'personal_training' ? 'pt_started' : 'program_started',
+        activity_date: new Date().toISOString().split('T')[0],
+      });
+
+      setIsOngoing(true);
+      setIsCompleted(false);
+      
+      toast({
+        title: "Program Started! 🔥",
+        description: "Let's do this! Stay consistent and track your progress.",
+      });
+    } catch (error) {
+      console.error('Error starting program:', error);
+      toast({
+        title: "Error",
+        description: "Failed to start program",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const markComplete = async () => {
+    if (!canUserInteract) {
+      showUpgradePrompt();
+      return;
+    }
+
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) return;
+
+      await supabase
+        .from('program_interactions')
+        .upsert({
+          user_id: session.user.id,
+          program_id: programId,
+          program_type: programType,
+          program_name: programName,
+          is_completed: true,
+          is_ongoing: false,
+        }, {
+          onConflict: 'user_id,program_id,program_type'
+        });
+
+      setIsCompleted(true);
+      setIsOngoing(false);
+      
+      toast({
+        title: "Amazing Work! 🎉",
+        description: "Program completed! You're crushing your fitness goals!",
+      });
+    } catch (error) {
+      console.error('Error completing program:', error);
+      toast({
+        title: "Error",
+        description: "Failed to mark program as complete",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const resetProgram = async () => {
+    if (!canUserInteract) {
+      showUpgradePrompt();
+      return;
+    }
+
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) return;
+
+      await supabase
+        .from('program_interactions')
+        .upsert({
+          user_id: session.user.id,
+          program_id: programId,
+          program_type: programType,
+          program_name: programName,
+          is_completed: false,
+          is_ongoing: false,
+        }, {
+          onConflict: 'user_id,program_id,program_type'
+        });
+
+      setIsCompleted(false);
+      setIsOngoing(false);
+      
+      toast({
+        title: "Program Reset",
+        description: "Ready to start fresh!",
+      });
+    } catch (error) {
+      console.error('Error resetting program:', error);
+      toast({
+        title: "Error",
+        description: "Failed to reset program",
         variant: "destructive",
       });
     }
@@ -252,15 +384,63 @@ export const ProgramInteractions = ({ programId, programType, programName, isFre
         {isFavorite ? 'Favorited' : 'Add to Favorites'}
       </Button>
 
-      <Button
-        onClick={toggleCompleted}
-        variant={isCompleted ? "default" : "outline"}
-        size="sm"
-        className="gap-2"
-      >
-        <CheckCircle2 className={`w-4 h-4 ${isCompleted ? 'fill-current' : ''}`} />
-        {isCompleted ? 'Completed' : 'Mark as Complete'}
-      </Button>
+      {/* 3-State Program Progress Toggle */}
+      {!isOngoing && !isCompleted && (
+        <Button
+          onClick={startProgram}
+          variant="ghost"
+          size="sm"
+          className="gap-2"
+        >
+          <CheckCircle2 className="w-4 h-4" />
+          Start Program
+        </Button>
+      )}
+
+      {isOngoing && !isCompleted && (
+        <>
+          <Button
+            variant="default"
+            size="sm"
+            className="gap-2 bg-orange-500 hover:bg-orange-600"
+            disabled
+          >
+            <CheckCircle2 className="w-4 h-4 fill-current" />
+            In Progress 🔥
+          </Button>
+          <Button
+            onClick={markComplete}
+            variant="outline"
+            size="sm"
+            className="gap-2"
+          >
+            <CheckCircle2 className="w-4 h-4" />
+            Complete
+          </Button>
+        </>
+      )}
+
+      {isCompleted && (
+        <>
+          <Button
+            variant="default"
+            size="sm"
+            className="gap-2 bg-green-500 hover:bg-green-600"
+            disabled
+          >
+            <CheckCircle2 className="w-4 h-4 fill-current" />
+            Completed ✓
+          </Button>
+          <Button
+            onClick={resetProgram}
+            variant="ghost"
+            size="sm"
+            className="gap-2"
+          >
+            Reset
+          </Button>
+        </>
+      )}
 
       <div className="flex items-center gap-2">
         <span className="text-sm font-semibold">Rate:</span>

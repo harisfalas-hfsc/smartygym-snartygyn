@@ -8,7 +8,7 @@ export interface ActivityLog {
   content_type: 'workout' | 'program' | 'personal_training' | 'tool';
   item_id: string;
   item_name: string;
-  action_type: 'viewed' | 'completed' | 'calculated' | 'program_day_completed' | 'pt_day_completed' | 'program_day_viewed' | 'pt_day_viewed' | 'missed';
+  action_type: 'viewed' | 'completed' | 'calculated' | 'program_started' | 'program_day_completed' | 'pt_started' | 'pt_day_completed' | 'program_day_viewed' | 'pt_day_viewed' | 'missed';
   program_week?: number;
   program_day?: number;
   total_weeks?: number;
