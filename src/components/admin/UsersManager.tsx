@@ -7,7 +7,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Download, Search, RefreshCw, Mail } from "lucide-react";
+import { Download, Search, RefreshCw, Mail, Shield } from "lucide-react";
 import { toast } from "sonner";
 import { format } from "date-fns";
 
@@ -32,6 +32,8 @@ export function UsersManager() {
   const [planFilter, setPlanFilter] = useState<string>("all");
   const [statusFilter, setStatusFilter] = useState<string>("all");
   const [userPurchases, setUserPurchases] = useState<string[]>([]);
+  const [userRoles, setUserRoles] = useState<Record<string, string[]>>({});
+  const SUPER_ADMIN_EMAIL = "harisfallas@gmail.com";
 
   const fetchUsers = async () => {
     setLoading(true);
@@ -53,6 +55,19 @@ export function UsersManager() {
       
       const uniquePurchasers = [...new Set(purchases?.map(p => p.user_id) || [])];
       setUserPurchases(uniquePurchasers);
+
+      // Fetch all user roles
+      const { data: roles } = await supabase
+        .from('user_roles')
+        .select('user_id, role');
+
+      // Create a map of user_id -> roles[]
+      const rolesMap: Record<string, string[]> = {};
+      roles?.forEach(r => {
+        if (!rolesMap[r.user_id]) rolesMap[r.user_id] = [];
+        rolesMap[r.user_id].push(r.role);
+      });
+      setUserRoles(rolesMap);
     } catch (error) {
       console.error('Error fetching users:', error);
       toast.error('Failed to load users');
@@ -64,6 +79,42 @@ export function UsersManager() {
   useEffect(() => {
     fetchUsers();
   }, []);
+
+  const toggleAdminRole = async (userId: string, userEmail: string | null, isCurrentlyAdmin: boolean) => {
+    // Protect super admin
+    if (userEmail === SUPER_ADMIN_EMAIL && isCurrentlyAdmin) {
+      toast.error("Cannot remove admin privileges from the main administrator");
+      return;
+    }
+
+    try {
+      if (isCurrentlyAdmin) {
+        // Remove admin role
+        const { error } = await supabase
+          .from('user_roles')
+          .delete()
+          .eq('user_id', userId)
+          .eq('role', 'admin');
+        
+        if (error) throw error;
+        toast.success("Admin privileges removed successfully");
+      } else {
+        // Add admin role
+        const { error } = await supabase
+          .from('user_roles')
+          .insert({ user_id: userId, role: 'admin' });
+        
+        if (error) throw error;
+        toast.success("Admin privileges granted successfully");
+      }
+      
+      // Refresh users
+      fetchUsers();
+    } catch (error) {
+      console.error('Error toggling admin role:', error);
+      toast.error("Failed to update admin privileges");
+    }
+  };
 
   useEffect(() => {
     let filtered = users;
@@ -89,18 +140,21 @@ export function UsersManager() {
       filtered = filtered.filter(user => user.status === "canceled");
     } else if (statusFilter === "with_purchases") {
       filtered = filtered.filter(user => userPurchases.includes(user.user_id));
+    } else if (statusFilter === "admins_only") {
+      filtered = filtered.filter(user => userRoles[user.user_id]?.includes('admin'));
     }
 
     setFilteredUsers(filtered);
   }, [searchTerm, planFilter, statusFilter, users, userPurchases]);
 
   const exportToCSV = () => {
-    const headers = ["User ID", "Name", "Nickname", "Email", "Plan", "Status", "Period Start", "Period End", "Joined"];
+    const headers = ["User ID", "Name", "Nickname", "Email", "Is Admin", "Plan", "Status", "Period Start", "Period End", "Joined"];
     const rows = filteredUsers.map(user => [
       user.user_id,
       user.full_name || '',
       user.nickname || '',
       user.email || '',
+      userRoles[user.user_id]?.includes('admin') ? 'Yes' : 'No',
       user.plan_type,
       user.status,
       user.current_period_start ? format(new Date(user.current_period_start), 'yyyy-MM-dd') : '',
@@ -209,15 +263,16 @@ export function UsersManager() {
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="all">All Statuses</SelectItem>
-              <SelectItem value="active">Active Subscribers</SelectItem>
-              <SelectItem value="canceled">Expired Subscribers</SelectItem>
-              <SelectItem value="with_purchases">Users with Purchases</SelectItem>
+              <SelectItem value="active">Active</SelectItem>
+              <SelectItem value="canceled">Canceled</SelectItem>
+              <SelectItem value="with_purchases">With Purchases</SelectItem>
+              <SelectItem value="admins_only">Admins Only</SelectItem>
             </SelectContent>
           </Select>
         </div>
 
         {/* Stats */}
-        <div className="grid grid-cols-2 sm:grid-cols-5 gap-4 mb-6">
+        <div className="grid grid-cols-2 sm:grid-cols-6 gap-4 mb-6">
           <div className="bg-muted/50 p-4 rounded-lg">
             <p className="text-sm text-muted-foreground">Total Users</p>
             <p className="text-2xl font-bold">{users.length}</p>
@@ -246,6 +301,12 @@ export function UsersManager() {
               {userPurchases.length}
             </p>
           </div>
+          <div className="bg-muted/50 p-4 rounded-lg">
+            <p className="text-sm text-muted-foreground">Administrators</p>
+            <p className="text-2xl font-bold">
+              {Object.values(userRoles).filter(roles => roles.includes('admin')).length}
+            </p>
+          </div>
         </div>
 
         {/* Users Table */}
@@ -254,6 +315,7 @@ export function UsersManager() {
             <TableHeader>
               <TableRow>
               <TableHead>User</TableHead>
+              <TableHead>Admin</TableHead>
               <TableHead>Email</TableHead>
               <TableHead>Plan</TableHead>
               <TableHead>User Status</TableHead>
@@ -265,7 +327,7 @@ export function UsersManager() {
             <TableBody>
               {filteredUsers.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={7} className="text-center py-12 text-muted-foreground">
+                  <TableCell colSpan={8} className="text-center py-12 text-muted-foreground">
                     No users found
                   </TableCell>
                 </TableRow>
@@ -290,6 +352,16 @@ export function UsersManager() {
                               <p className="text-xs text-muted-foreground">@{user.nickname}</p>
                             )}
                           </div>
+                        </div>
+                      </TableCell>
+                      <TableCell>
+                        <div className="flex items-center gap-2">
+                          {userRoles[user.user_id]?.includes('admin') && (
+                            <Badge variant="destructive" className="text-xs">
+                              👑 Admin
+                              {user.email === SUPER_ADMIN_EMAIL && " (Main)"}
+                            </Badge>
+                          )}
                         </div>
                       </TableCell>
                       <TableCell className="text-sm">{user.email || 'N/A'}</TableCell>
@@ -319,18 +391,32 @@ export function UsersManager() {
                         {format(new Date(user.created_at), 'MMM d, yyyy')}
                       </TableCell>
                       <TableCell>
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => {
-                            if (user.email) {
-                              window.location.href = `mailto:${user.email}`;
-                            }
-                          }}
-                          disabled={!user.email}
-                        >
-                          <Mail className="h-4 w-4" />
-                        </Button>
+                        <div className="flex items-center gap-2">
+                          <Button
+                            variant={userRoles[user.user_id]?.includes('admin') ? "destructive" : "default"}
+                            size="sm"
+                            onClick={() => toggleAdminRole(
+                              user.user_id, 
+                              user.email, 
+                              userRoles[user.user_id]?.includes('admin') || false
+                            )}
+                            disabled={user.email === SUPER_ADMIN_EMAIL && userRoles[user.user_id]?.includes('admin')}
+                          >
+                            {userRoles[user.user_id]?.includes('admin') ? "Remove Admin" : "Make Admin"}
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => {
+                              if (user.email) {
+                                window.location.href = `mailto:${user.email}`;
+                              }
+                            }}
+                            disabled={!user.email}
+                          >
+                            <Mail className="h-4 w-4" />
+                          </Button>
+                        </div>
                       </TableCell>
                     </TableRow>
                   );
