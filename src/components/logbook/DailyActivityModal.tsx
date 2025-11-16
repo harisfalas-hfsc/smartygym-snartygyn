@@ -34,8 +34,10 @@ export const DailyActivityModal = ({ date, isOpen, onClose, userId }: DailyActiv
       'viewed': 'Viewed',
       'completed': 'Completed',
       'calculated': 'Calculated',
+      'program_started': '🔥 Started',
       'program_day_viewed': 'Day Viewed',
       'program_day_completed': 'Day Completed',
+      'pt_started': '🔥 Started',
       'pt_day_viewed': 'Day Viewed',
       'pt_day_completed': 'Day Completed',
     };

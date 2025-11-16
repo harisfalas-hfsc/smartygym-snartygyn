@@ -523,7 +523,9 @@ export default function UserDashboard() {
   const viewedPrograms = programInteractions.filter(p => p.has_viewed);
   const ratedPrograms = programInteractions.filter(p => p.rating && p.rating > 0);
 
-  const hasActivePlan = subscriptionInfo?.subscribed && subscriptionInfo?.product_id;
+  // User has access if they have either an active subscription OR any standalone purchases
+  const hasActivePlan = (subscriptionInfo?.subscribed && subscriptionInfo?.product_id) || 
+                       (purchases && purchases.length > 0);
 
   return (
     <div className="min-h-screen bg-background">
