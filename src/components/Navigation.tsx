@@ -19,6 +19,8 @@ import { useToast } from "@/hooks/use-toast";
 import smartyGymLogo from "@/assets/smarty-gym-logo.png";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { useUnreadMessages } from "@/hooks/useUnreadMessages";
+import { SafeNotificationBadge } from "@/components/NotificationBadge";
+import { WhatsAppButton } from "@/components/WhatsAppButton";
 
 interface SubscriptionInfo {
   subscribed: boolean;
@@ -389,12 +391,7 @@ export const Navigation = () => {
                 }}
               >
                 <Bell className="h-5 w-5" />
-                <Badge 
-                  variant="destructive"
-                  className="absolute -top-1 -right-1 h-5 w-5 flex items-center justify-center p-0 text-xs"
-                >
-                  {unreadCount > 9 ? '9+' : unreadCount}
-                </Badge>
+                <SafeNotificationBadge count={unreadCount} />
               </Button>
             )}
             
