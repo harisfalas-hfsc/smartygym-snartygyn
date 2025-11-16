@@ -129,7 +129,8 @@ const App = () => (
                 <Route path="/community" element={<Community />} />
                 <Route path="/takeatour" element={<TakeTour />} />
                 <Route path="/contact" element={<Contact />} />
-                <Route path="/personal-training" element={<PersonalTraining />} />
+                {/* TEMPORARILY DISABLED - Personal Training */}
+                {/* <Route path="/personal-training" element={<PersonalTraining />} /> */}
                 <Route path="/payment-success" element={<PaymentSuccess />} />
                 <Route path="/privacypolicy" element={<PrivacyPolicy />} />
                 <Route path="/termsofservice" element={<TermsOfService />} />

@@ -1,3 +1,11 @@
+// ============================================
+// TEMPORARILY DISABLED - DO NOT DELETE
+// This page is hidden but preserved for future use
+// To re-enable:
+//   1. Uncomment route in App.tsx (line ~132)
+//   2. Uncomment navigation link in Navigation.tsx (line ~248-254)
+// ============================================
+
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Helmet } from "react-helmet";

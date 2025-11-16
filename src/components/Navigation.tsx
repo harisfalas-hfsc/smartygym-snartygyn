@@ -245,6 +245,7 @@ export const Navigation = () => {
                   >
                     Programs
                   </Button>
+                  {/* TEMPORARILY DISABLED - Personal Training
                   <Button
                     variant="ghost"
                     onClick={() => handleNavigate("/personal-training")}
@@ -252,6 +253,7 @@ export const Navigation = () => {
                   >
                     Personal Training
                   </Button>
+                  */}
                   <Button
                     variant="ghost"
                     onClick={() => handleNavigate("/tools")}
