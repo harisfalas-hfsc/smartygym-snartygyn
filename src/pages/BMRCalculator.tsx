@@ -66,6 +66,25 @@ const BMRCalculator = () => {
 
       if (error) throw error;
 
+      // Log to activity log
+      await supabase.from("user_activity_log").insert({
+        user_id: user.id,
+        content_type: 'tool',
+        item_id: 'bmr-calculator',
+        item_name: 'BMR Calculator',
+        action_type: 'calculated',
+        tool_input: {
+          age: parseInt(age),
+          weight: parseFloat(weight),
+          height: parseFloat(height),
+          gender
+        },
+        tool_result: {
+          bmr: result
+        },
+        activity_date: new Date().toISOString().split('T')[0]
+      });
+
       toast({
         title: "Saved!",
         description: "Calculation saved to your history",

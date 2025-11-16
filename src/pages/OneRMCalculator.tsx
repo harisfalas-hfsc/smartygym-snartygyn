@@ -56,6 +56,24 @@ const OneRMCalculator = () => {
 
       if (error) throw error;
 
+      // Log to activity log
+      await supabase.from("user_activity_log").insert({
+        user_id: user.id,
+        content_type: 'tool',
+        item_id: '1rm-calculator',
+        item_name: '1RM Calculator',
+        action_type: 'calculated',
+        tool_input: {
+          weight: parseFloat(weight),
+          reps: parseInt(reps),
+          exercise: exerciseName || 'Unknown'
+        },
+        tool_result: {
+          oneRM: result
+        },
+        activity_date: new Date().toISOString().split('T')[0]
+      });
+
       toast({
         title: "Saved!",
         description: "Calculation saved to your history",

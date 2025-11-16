@@ -77,6 +77,18 @@ export const WorkoutInteractions = ({ workoutId, workoutType, workoutName, isFre
         }, {
           onConflict: 'user_id,workout_id,workout_type'
         });
+
+      // Log to activity log
+      await supabase
+        .from('user_activity_log')
+        .insert({
+          user_id: session.user.id,
+          content_type: 'workout',
+          item_id: workoutId,
+          item_name: workoutName,
+          action_type: 'viewed',
+          activity_date: new Date().toISOString().split('T')[0]
+        });
     } catch (error) {
       console.error('Error marking as viewed:', error);
     }
@@ -161,6 +173,20 @@ export const WorkoutInteractions = ({ workoutId, workoutType, workoutName, isFre
         }, {
           onConflict: 'user_id,workout_id,workout_type'
         });
+
+      // Log to activity log
+      if (newCompletedStatus) {
+        await supabase
+          .from('user_activity_log')
+          .insert({
+            user_id: session.user.id,
+            content_type: 'workout',
+            item_id: workoutId,
+            item_name: workoutName,
+            action_type: 'completed',
+            activity_date: new Date().toISOString().split('T')[0]
+          });
+      }
 
       setIsCompleted(newCompletedStatus);
       toast({
