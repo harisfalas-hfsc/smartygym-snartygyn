@@ -991,7 +991,7 @@ export default function UserDashboard() {
                   <Button 
                     variant="outline" 
                     className="h-auto py-4 flex flex-col items-center gap-2"
-                    onClick={() => navigate("/workoutflow")}
+                    onClick={() => navigate("/workout")}
                   >
                     <Dumbbell className="h-6 w-6" />
                     <span className="text-sm font-medium">Browse Workouts</span>
@@ -1000,7 +1000,7 @@ export default function UserDashboard() {
                   <Button 
                     variant="outline" 
                     className="h-auto py-4 flex flex-col items-center gap-2"
-                    onClick={() => navigate("/trainingprogramflow")}
+                    onClick={() => navigate("/trainingprogram")}
                   >
                     <Calendar className="h-6 w-6" />
                     <span className="text-sm font-medium">Browse Programs</span>
@@ -1018,7 +1018,7 @@ export default function UserDashboard() {
                   <Button 
                     variant="outline" 
                     className="h-auto py-4 flex flex-col items-center gap-2"
-                    onClick={() => navigate("/exercise-library")}
+                    onClick={() => navigate("/exerciselibrary")}
                   >
                     <BookOpen className="h-6 w-6" />
                     <span className="text-sm font-medium">Exercise Library</span>
