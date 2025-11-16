@@ -133,9 +133,9 @@ export default function UserDashboard() {
   const [bmrHistory, setBMRHistory] = useState<BMRRecord[]>([]);
   const [calorieHistory, setCalorieHistory] = useState<CalorieRecord[]>([]);
   
-  // Get tab from URL or default to "workouts"
+  // Get tab from URL or default to "overview"
   const tabParam = searchParams.get('tab');
-  const [activeTab, setActiveTab] = useState(tabParam || 'workouts');
+  const [activeTab, setActiveTab] = useState(tabParam || 'overview');
   
   // LogBook filter state
   const [logBookFilter, setLogBookFilter] = useState<'all' | 'workout' | 'program' | 'personal_training' | 'tool'>('all');
@@ -787,73 +787,13 @@ export default function UserDashboard() {
           </Card>
         )}
 
-        {/* Quick Stats Overview - For all users */}
-        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-5 mb-8">
-          <Card className="bg-gradient-to-br from-red-500/10 to-red-500/5">
-            <CardContent className="pt-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-xs text-muted-foreground mb-1">Favorite Workouts</p>
-                  <p className="text-2xl font-bold">{favoriteWorkouts.length}</p>
-                </div>
-                <Heart className="h-8 w-8 text-red-500" />
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card className="bg-gradient-to-br from-green-500/10 to-green-500/5">
-            <CardContent className="pt-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-xs text-muted-foreground mb-1">Completed Workouts</p>
-                  <p className="text-2xl font-bold">{completedWorkouts.length}</p>
-                </div>
-                <CheckCircle className="h-8 w-8 text-green-500" />
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card className="bg-gradient-to-br from-blue-500/10 to-blue-500/5">
-            <CardContent className="pt-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-xs text-muted-foreground mb-1">Favorite Programs</p>
-                  <p className="text-2xl font-bold">{favoritePrograms.length}</p>
-                </div>
-                <Calendar className="h-8 w-8 text-blue-500" />
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card className="bg-gradient-to-br from-yellow-500/10 to-yellow-500/5">
-            <CardContent className="pt-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-xs text-muted-foreground mb-1">Total Ratings</p>
-                  <p className="text-2xl font-bold">{ratedWorkouts.length + ratedPrograms.length}</p>
-                </div>
-                <Star className="h-8 w-8 text-yellow-500" />
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card className="bg-gradient-to-br from-purple-500/10 to-purple-500/5">
-            <CardContent className="pt-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-xs text-muted-foreground mb-1">Calculator Uses</p>
-                  <p className="text-2xl font-bold">{oneRMHistory.length + bmrHistory.length + calorieHistory.length}</p>
-                </div>
-                <Calculator className="h-8 w-8 text-purple-500" />
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-
-
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
           <div className="w-full overflow-x-auto">
-            <TabsList className="w-full inline-flex sm:grid sm:grid-cols-6 min-w-max sm:min-w-0">
+            <TabsList className="w-full inline-flex sm:grid sm:grid-cols-7 min-w-max sm:min-w-0">
+              <TabsTrigger value="overview" className="flex-shrink-0">
+                <TrendingUp className="mr-2 h-4 w-4" />
+                <span className="whitespace-nowrap">Overview</span>
+              </TabsTrigger>
               <TabsTrigger value="workouts" className="flex-shrink-0">
                 <Dumbbell className="mr-2 h-4 w-4" />
                 <span className="whitespace-nowrap">Workouts</span>
@@ -888,6 +828,205 @@ export default function UserDashboard() {
               </TabsTrigger>
             </TabsList>
           </div>
+
+          {/* Overview Tab */}
+          <TabsContent value="overview" className="space-y-6">
+            {/* Quick Stats Overview */}
+            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-5">
+              <Card className="bg-gradient-to-br from-red-500/10 to-red-500/5">
+                <CardContent className="pt-6">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-xs text-muted-foreground mb-1">Favorite Workouts</p>
+                      <p className="text-2xl font-bold">{favoriteWorkouts.length}</p>
+                    </div>
+                    <Heart className="h-8 w-8 text-red-500" />
+                  </div>
+                </CardContent>
+              </Card>
+
+              <Card className="bg-gradient-to-br from-green-500/10 to-green-500/5">
+                <CardContent className="pt-6">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-xs text-muted-foreground mb-1">Completed Workouts</p>
+                      <p className="text-2xl font-bold">{completedWorkouts.length}</p>
+                    </div>
+                    <CheckCircle className="h-8 w-8 text-green-500" />
+                  </div>
+                </CardContent>
+              </Card>
+
+              <Card className="bg-gradient-to-br from-blue-500/10 to-blue-500/5">
+                <CardContent className="pt-6">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-xs text-muted-foreground mb-1">Favorite Programs</p>
+                      <p className="text-2xl font-bold">{favoritePrograms.length}</p>
+                    </div>
+                    <Calendar className="h-8 w-8 text-blue-500" />
+                  </div>
+                </CardContent>
+              </Card>
+
+              <Card className="bg-gradient-to-br from-purple-500/10 to-purple-500/5">
+                <CardContent className="pt-6">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-xs text-muted-foreground mb-1">Workouts Rated</p>
+                      <p className="text-2xl font-bold">{ratedWorkouts.length + ratedPrograms.length}</p>
+                    </div>
+                    <Star className="h-8 w-8 text-purple-500" />
+                  </div>
+                </CardContent>
+              </Card>
+
+              <Card className="bg-gradient-to-br from-orange-500/10 to-orange-500/5">
+                <CardContent className="pt-6">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-xs text-muted-foreground mb-1">Calculator Uses</p>
+                      <p className="text-2xl font-bold">{oneRMHistory.length + bmrHistory.length + calorieHistory.length}</p>
+                    </div>
+                    <Calculator className="h-8 w-8 text-orange-500" />
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+
+            {/* Recent Activity */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <TrendingUp className="h-5 w-5" />
+                  Recent Activity
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  {/* Recent Workouts */}
+                  {completedWorkouts.slice(0, 3).length > 0 ? (
+                    <div>
+                      <h4 className="text-sm font-semibold mb-2 flex items-center gap-2">
+                        <CheckCircle className="h-4 w-4 text-green-500" />
+                        Recently Completed Workouts
+                      </h4>
+                      <div className="space-y-2">
+                        {completedWorkouts.slice(0, 3).map((workout) => (
+                          <div 
+                            key={workout.id}
+                            className="flex items-center justify-between p-3 rounded-lg bg-muted/50 hover:bg-muted cursor-pointer transition-colors"
+                            onClick={() => handleNavigateToWorkout(workout.workout_type, workout.workout_id)}
+                          >
+                            <div className="flex items-center gap-3">
+                              <Dumbbell className="h-4 w-4 text-muted-foreground" />
+                              <div>
+                                <p className="text-sm font-medium">{workout.workout_name}</p>
+                                <p className="text-xs text-muted-foreground">{formatDate(workout.updated_at)}</p>
+                              </div>
+                            </div>
+                            {workout.rating && workout.rating > 0 && (
+                              <div className="flex items-center gap-1">
+                                <Star className="h-3 w-3 fill-yellow-500 text-yellow-500" />
+                                <span className="text-xs">{workout.rating}</span>
+                              </div>
+                            )}
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="text-center py-8 text-muted-foreground">
+                      <ClipboardList className="h-12 w-12 mx-auto mb-3 opacity-50" />
+                      <p className="text-sm">No recent activity yet. Start your fitness journey today!</p>
+                    </div>
+                  )}
+
+                  {/* Recent Programs */}
+                  {completedPrograms.slice(0, 2).length > 0 && (
+                    <div>
+                      <h4 className="text-sm font-semibold mb-2 flex items-center gap-2">
+                        <CheckCircle className="h-4 w-4 text-blue-500" />
+                        Recently Completed Programs
+                      </h4>
+                      <div className="space-y-2">
+                        {completedPrograms.slice(0, 2).map((program) => (
+                          <div 
+                            key={program.id}
+                            className="flex items-center justify-between p-3 rounded-lg bg-muted/50 hover:bg-muted cursor-pointer transition-colors"
+                            onClick={() => handleNavigateToProgram(program.program_type, program.program_id)}
+                          >
+                            <div className="flex items-center gap-3">
+                              <Calendar className="h-4 w-4 text-muted-foreground" />
+                              <div>
+                                <p className="text-sm font-medium">{program.program_name}</p>
+                                <p className="text-xs text-muted-foreground">{formatDate(program.updated_at)}</p>
+                              </div>
+                            </div>
+                            {program.rating && program.rating > 0 && (
+                              <div className="flex items-center gap-1">
+                                <Star className="h-3 w-3 fill-yellow-500 text-yellow-500" />
+                                <span className="text-xs">{program.rating}</span>
+                              </div>
+                            )}
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Quick Access */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Sparkles className="h-5 w-5" />
+                  Quick Access
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="grid gap-3 md:grid-cols-2 lg:grid-cols-4">
+                  <Button 
+                    variant="outline" 
+                    className="h-auto py-4 flex flex-col items-center gap-2"
+                    onClick={() => navigate("/workoutflow")}
+                  >
+                    <Dumbbell className="h-6 w-6" />
+                    <span className="text-sm font-medium">Browse Workouts</span>
+                  </Button>
+                  
+                  <Button 
+                    variant="outline" 
+                    className="h-auto py-4 flex flex-col items-center gap-2"
+                    onClick={() => navigate("/trainingprogramflow")}
+                  >
+                    <Calendar className="h-6 w-6" />
+                    <span className="text-sm font-medium">Browse Programs</span>
+                  </Button>
+                  
+                  <Button 
+                    variant="outline" 
+                    className="h-auto py-4 flex flex-col items-center gap-2"
+                    onClick={() => navigate("/tools")}
+                  >
+                    <Calculator className="h-6 w-6" />
+                    <span className="text-sm font-medium">Fitness Tools</span>
+                  </Button>
+                  
+                  <Button 
+                    variant="outline" 
+                    className="h-auto py-4 flex flex-col items-center gap-2"
+                    onClick={() => navigate("/exercise-library")}
+                  >
+                    <BookOpen className="h-6 w-6" />
+                    <span className="text-sm font-medium">Exercise Library</span>
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
 
           {/* Workouts Tab */}
           <TabsContent value="workouts" className="space-y-6">
