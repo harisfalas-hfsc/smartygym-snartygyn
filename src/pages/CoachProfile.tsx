@@ -112,7 +112,7 @@ const CoachProfile = () => {
               </div>
               <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-4">Meet Haris Falas</h1>
               <p className="text-base sm:text-lg text-muted-foreground">
-                Strength and Conditioning Coach® and Founder of <span className="text-primary font-semibold">SmartyGym</span>
+                Strength & Conditioning Coach® and Founder of <span className="text-primary font-semibold">SmartyGym</span>
               </p>
             </header>
 
