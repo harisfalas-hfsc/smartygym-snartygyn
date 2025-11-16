@@ -96,6 +96,9 @@ export const UserMessagesPanel = () => {
       
       refetchContact();
       refetchSystem();
+      
+      // Trigger a refetch of the unread count in Navigation
+      window.dispatchEvent(new CustomEvent('messages-read'));
     };
 
     markAsRead();
