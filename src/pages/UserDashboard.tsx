@@ -29,7 +29,8 @@ import {
   TrendingUp,
   BookOpen,
   Headphones,
-  Sparkles
+  Sparkles,
+  Quote
 } from "lucide-react";
 import { LogBookStats } from "@/components/logbook/LogBookStats";
 import { LogBookFilters } from "@/components/logbook/LogBookFilters";
@@ -724,6 +725,43 @@ export default function UserDashboard() {
                           <span className="text-xs font-semibold">Ad-Free</span>
                           <span className="text-xs font-medium">Experience</span>
                         </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Motivational Message from Coach */}
+                <div className="mt-6 bg-gradient-to-r from-primary/10 via-primary/5 to-primary/10 rounded-lg p-6 border border-primary/20 relative overflow-hidden">
+                  {/* Decorative quote icon background */}
+                  <div className="absolute top-2 right-2 opacity-5">
+                    <Quote className="h-16 w-16" />
+                  </div>
+                  
+                  <div className="relative flex gap-3">
+                    {/* Left side icon */}
+                    <div className="flex-shrink-0 mt-1">
+                      <div className="p-2 rounded-full bg-primary/10">
+                        <Heart className="h-5 w-5 text-primary" />
+                      </div>
+                    </div>
+                    
+                    {/* Message content */}
+                    <div className="flex-1 space-y-2">
+                      <p className="text-sm leading-relaxed text-foreground/90 italic">
+                        "Thank you for trusting SmartyGym with your fitness journey. Every workout you complete, every step you log, every effort you make is an investment in a stronger, healthier you. Keep showing up. Your consistency today becomes your confidence tomorrow."
+                      </p>
+                      
+                      {/* Coach signature - clickable */}
+                      <div className="flex items-center gap-2 pt-2">
+                        <div className="h-px flex-1 bg-primary/20"></div>
+                        <button
+                          onClick={() => navigate("/coach-profile")}
+                          className="text-xs font-semibold text-primary hover:text-primary/80 transition-colors flex items-center gap-1 group"
+                        >
+                          <span>Haris Falas</span>
+                          <ExternalLink className="h-3 w-3 opacity-0 group-hover:opacity-100 transition-opacity" />
+                        </button>
+                        <div className="h-px flex-1 bg-primary/20"></div>
                       </div>
                     </div>
                   </div>
