@@ -209,29 +209,29 @@ const CoachProfile = () => {
               <section>
                 <Card className="bg-primary/5 border-2 border-primary/20 p-4 sm:p-6">
                   <h3 className="text-xl sm:text-2xl font-semibold mb-4">My Philosophy</h3>
-                  <div className="space-y-4 text-sm sm:text-base leading-relaxed">
-                    <p className="font-bold text-foreground">PERFORMANCE COMES IN MANY FORMS</p>
+                  <div className="space-y-1 text-sm sm:text-base leading-relaxed">
+                    <p className="font-bold text-foreground">Performance comes in many forms</p>
                     
-                    <div className="space-y-2 text-muted-foreground">
-                      <p>WHETHER IS THE STRENGTH TO BE A BETTER PARENT</p>
-                      <p>THE STRENGTH TO OVERCOME LIFE DIFFICULTIES</p>
-                      <p>THE STRENGTH TO BE A BETTER EMPLOYEE</p>
-                      <p>THE STRENGTH TO BE A BETTER ATHLETE</p>
-                      <p>TO BE ABLE TO SET HIGHER GOALS</p>
-                      <p>TO ACCEPT ANY CHALLENGE</p>
-                      <p>TO BUILD CONFIDENCE AND ACHIEVE A HEALTHIER AND MORE FULFILLING LIFE.</p>
+                    <div className="text-muted-foreground">
+                      <p>Whether is the strength to be a better parent</p>
+                      <p>The strength to overcome life difficulties</p>
+                      <p>The strength to be a better employee</p>
+                      <p>The strength to be a better athlete</p>
+                      <p>To be able to set higher goals</p>
+                      <p>To accept any challenge</p>
+                      <p>To build confidence and achieve a healthier and more fulfilling life.</p>
                     </div>
 
-                    <p className="font-semibold text-foreground pt-2">
-                      WHOEVER YOU ARE, FROM AN ELITE ATHLETE TO A FORWARD THINKING FITNESS ENTHUSIAST..
+                    <p className="font-semibold text-foreground pt-1">
+                      Whoever you are, from an elite athlete to a forward thinking fitness enthusiast..
                     </p>
-                    <p className="font-bold text-primary">WE MOVE YOU TO NEW PLACES.</p>
+                    <p className="font-bold text-primary">We move you to new places.</p>
 
-                    <p className="font-bold text-foreground pt-4">WE ARE PIONEERING HUMAN PERFORMANCE.</p>
+                    <p className="font-bold text-foreground pt-1">We are pioneering human performance.</p>
 
-                    <p className="font-bold text-foreground pt-4">AT HFSC, OUR MISSION IS CLEAR.</p>
+                    <p className="font-bold text-foreground pt-1">At <span className="font-bold">SmartyGym</span>, our mission is clear.</p>
 
-                    <p className="font-bold text-primary pt-2">WE ARE HERE TO EMPOWER YOU AND IMPROVE YOUR PERFORMANCE.</p>
+                    <p className="font-bold text-primary">We are here to empower you and improve your performance.</p>
                   </div>
                 </Card>
               </section>
