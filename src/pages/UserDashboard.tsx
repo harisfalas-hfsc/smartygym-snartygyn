@@ -543,18 +543,16 @@ export default function UserDashboard() {
         {/* Subscription Info */}
         {subscriptionInfo && (
           <Card className="mb-6 border-primary/50 bg-gradient-to-r from-primary/5 to-primary/10">
-            <CardHeader className="pb-3">
-              <CardTitle className="flex items-center gap-2 text-lg">
-                <Crown className="h-5 w-5 text-primary" />
-                Your {subscriptionInfo.subscribed ? getPlanName(subscriptionInfo.product_id) : 'Free'} Membership
-              </CardTitle>
-            </CardHeader>
             <CardContent className="p-4">
               {/* Free Plan - Simple Layout */}
               {!subscriptionInfo.subscribed && (
                 <div className="space-y-3">
+                  <h2 className="flex items-center gap-2 text-lg font-bold">
+                    <Crown className="h-5 w-5 text-primary" />
+                    Your Free Membership
+                  </h2>
                   <div>
-                    <h3 className="text-base font-bold mb-1">Free Plan</h3>
+                    <h3 className="text-sm font-semibold mb-1">Free Plan</h3>
                     <p className="text-sm text-muted-foreground">
                       You're currently on the free plan with limited access.
                     </p>
@@ -565,14 +563,20 @@ export default function UserDashboard() {
                 </div>
               )}
 
-              {/* Premium Plan - Two Column Layout */}
+              {/* Premium Plan - Two Column Layout with Title in Left Column */}
               {subscriptionInfo.subscribed && (
                 <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
-                  {/* LEFT COLUMN - Plan Info & Actions */}
+                  {/* LEFT COLUMN - Title + Plan Info & Actions */}
                   <div className="col-span-1 md:col-span-2 space-y-3">
+                    {/* Title at top of left column */}
+                    <h2 className="flex items-center gap-2 text-lg font-bold">
+                      <Crown className="h-5 w-5 text-primary" />
+                      Your {getPlanName(subscriptionInfo.product_id)} Membership
+                    </h2>
+                    
                     {/* Plan Status */}
                     <div className="space-y-1">
-                      <h3 className="text-base font-bold">{getPlanName(subscriptionInfo.product_id)} Plan</h3>
+                      <h3 className="text-sm font-semibold">{getPlanName(subscriptionInfo.product_id)} Plan</h3>
                       <div className="flex flex-wrap gap-1.5">
                         <Badge variant="outline" className="text-xs h-5 px-1.5 bg-gradient-to-r from-yellow-500/20 to-amber-500/20 text-yellow-600 dark:text-yellow-400 border-yellow-500/30">
                           <Crown className="h-3 w-3 mr-1" />
@@ -647,7 +651,7 @@ export default function UserDashboard() {
                     </div>
                   </div>
 
-                  {/* RIGHT COLUMN - Membership Benefits */}
+                  {/* RIGHT COLUMN - Membership Benefits (aligned with title) */}
                   <div className="col-span-1 md:col-span-3 bg-gradient-to-br from-primary/5 to-primary/10 rounded-lg p-3 border border-primary/20">
                     <h4 className="text-xs font-semibold uppercase text-muted-foreground mb-2 tracking-wide">
                       Membership Benefits
