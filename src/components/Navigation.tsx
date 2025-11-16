@@ -35,7 +35,21 @@ export const Navigation = () => {
   const [subscriptionInfo, setSubscriptionInfo] = useState<SubscriptionInfo | null>(null);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [notificationsEnabled, setNotificationsEnabled] = useState(false);
-  const { data: unreadCount = 0 } = useUnreadMessages();
+  const { data: unreadCount = 0, error: unreadError, refetch: refetchUnread } = useUnreadMessages();
+
+  // Refetch unread count when user changes
+  useEffect(() => {
+    if (user) {
+      refetchUnread();
+    }
+  }, [user, refetchUnread]);
+
+  // Log errors
+  useEffect(() => {
+    if (unreadError) {
+      console.error('[Navigation] Unread messages error:', unreadError);
+    }
+  }, [unreadError]);
 
   useEffect(() => {
     // Check current session
