@@ -123,6 +123,7 @@ export default function UserDashboard() {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
   const [managingSubscription, setManagingSubscription] = useState(false);
+  const [openingPortal, setOpeningPortal] = useState(false);
   const [workoutInteractions, setWorkoutInteractions] = useState<WorkoutInteraction[]>([]);
   const [programInteractions, setProgramInteractions] = useState<ProgramInteraction[]>([]);
   const [subscriptionInfo, setSubscriptionInfo] = useState<SubscriptionInfo | null>(null);
@@ -196,6 +197,18 @@ export default function UserDashboard() {
 
     return () => subscription.unsubscribe();
   }, []);
+
+  // Listen for purchase verification events to refresh data
+  useEffect(() => {
+    const handlePurchaseVerified = () => {
+      if (user) {
+        fetchAllData(user.id);
+      }
+    };
+
+    window.addEventListener('purchase-verified', handlePurchaseVerified);
+    return () => window.removeEventListener('purchase-verified', handlePurchaseVerified);
+  }, [user]);
 
   const initDashboard = async () => {
     try {
@@ -409,7 +422,7 @@ export default function UserDashboard() {
     }
     
     console.log("Opening customer portal for user:", user.id);
-    setManagingSubscription(true);
+    setOpeningPortal(true);
     
     try {
       const { data: { session } } = await supabase.auth.getSession();
@@ -440,7 +453,6 @@ export default function UserDashboard() {
           description: "Manage your subscription in the new tab",
         });
       } else if (data?.portalNotConfigured) {
-        // Portal not configured in Stripe - provide helpful message
         toast({
           title: "Portal Setup Required",
           description: "The subscription management portal is being set up. Please contact support for subscription changes.",
@@ -452,7 +464,6 @@ export default function UserDashboard() {
     } catch (error) {
       console.error('Error opening customer portal:', error);
       
-      // Check if it's a portal configuration error
       const errorMessage = error instanceof Error ? error.message : String(error);
       const isConfigError = errorMessage.includes("No configuration") || 
                            errorMessage.includes("default configuration");
@@ -471,7 +482,7 @@ export default function UserDashboard() {
         });
       }
     } finally {
-      setManagingSubscription(false);
+      setOpeningPortal(false);
     }
   };
 
@@ -655,10 +666,10 @@ export default function UserDashboard() {
                       </Button>
                       <Button
                         onClick={handleManageSubscription}
-                        disabled={managingSubscription}
+                        disabled={openingPortal}
                         className="h-7 px-2 text-xs"
                       >
-                        {managingSubscription ? (
+                        {openingPortal ? (
                           <Loader2 className="h-3 w-3 animate-spin" />
                         ) : (
                           <>
