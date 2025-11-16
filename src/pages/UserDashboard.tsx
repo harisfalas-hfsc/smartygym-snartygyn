@@ -578,8 +578,9 @@ export default function UserDashboard() {
               )}
 
               {/* Premium Plan - Two Column Layout with Title in Left Column */}
-              {subscriptionInfo.subscribed && (
-                <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
+            {subscriptionInfo.subscribed && (
+              <>
+              <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
                   {/* LEFT COLUMN - Title + Plan Info & Actions */}
                   <div className="col-span-1 md:col-span-2 space-y-3">
                     {/* Title at top of left column */}
@@ -766,6 +767,7 @@ export default function UserDashboard() {
                     </div>
                   </div>
                 </div>
+              </>
               )}
             </CardContent>
           </Card>
