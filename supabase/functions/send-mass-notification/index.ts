@@ -63,31 +63,52 @@ serve(async (req) => {
     const finalContent = content;
 
     // Get recipients based on filter
-    let recipientQuery = supabaseAdmin
-      .from('user_subscriptions')
-      .select('user_id');
+    let recipients: { user_id: string }[] = [];
+    let recipientError = null;
 
-    switch (recipientFilter) {
-      case 'subscribers':
-        recipientQuery = recipientQuery.in('plan_type', ['gold', 'platinum']);
-        break;
-      case 'gold':
-        recipientQuery = recipientQuery.eq('plan_type', 'gold');
-        break;
-      case 'platinum':
-        recipientQuery = recipientQuery.eq('plan_type', 'platinum');
-        break;
-      case 'free':
-        recipientQuery = recipientQuery.eq('plan_type', 'free');
-        break;
-      case 'all':
-        // No filter, get all users
-        break;
-      default:
-        throw new Error(`Invalid recipient filter: ${recipientFilter}`);
+    if (recipientFilter === 'purchasers') {
+      // Query user_purchases table for users with purchases
+      const { data: purchaseData, error: purchaseErr } = await supabaseAdmin
+        .from('user_purchases')
+        .select('user_id');
+      
+      recipientError = purchaseErr;
+      
+      if (purchaseData) {
+        // Get unique user IDs
+        const uniqueUserIds = [...new Set(purchaseData.map(p => p.user_id))];
+        recipients = uniqueUserIds.map(user_id => ({ user_id }));
+      }
+    } else {
+      // Query user_subscriptions table
+      let recipientQuery = supabaseAdmin
+        .from('user_subscriptions')
+        .select('user_id');
+
+      switch (recipientFilter) {
+        case 'subscribers':
+          recipientQuery = recipientQuery.in('plan_type', ['gold', 'platinum']);
+          break;
+        case 'gold':
+          recipientQuery = recipientQuery.eq('plan_type', 'gold');
+          break;
+        case 'platinum':
+          recipientQuery = recipientQuery.eq('plan_type', 'platinum');
+          break;
+        case 'free':
+          recipientQuery = recipientQuery.eq('plan_type', 'free');
+          break;
+        case 'all':
+          // No filter, get all users
+          break;
+        default:
+          throw new Error(`Invalid recipient filter: ${recipientFilter}`);
+      }
+
+      const result = await recipientQuery;
+      recipients = result.data || [];
+      recipientError = result.error;
     }
-
-    const { data: recipients, error: recipientError } = await recipientQuery;
 
     if (recipientError) {
       console.error('[MASS-NOTIFICATION] Error fetching recipients:', recipientError);

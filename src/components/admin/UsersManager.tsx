@@ -83,12 +83,16 @@ export function UsersManager() {
     }
 
     // Status filter
-    if (statusFilter !== "all") {
-      filtered = filtered.filter(user => user.status === statusFilter);
+    if (statusFilter === "active") {
+      filtered = filtered.filter(user => user.status === "active");
+    } else if (statusFilter === "canceled") {
+      filtered = filtered.filter(user => user.status === "canceled");
+    } else if (statusFilter === "with_purchases") {
+      filtered = filtered.filter(user => userPurchases.includes(user.user_id));
     }
 
     setFilteredUsers(filtered);
-  }, [searchTerm, planFilter, statusFilter, users]);
+  }, [searchTerm, planFilter, statusFilter, users, userPurchases]);
 
   const exportToCSV = () => {
     const headers = ["User ID", "Name", "Nickname", "Email", "Plan", "Status", "Period Start", "Period End", "Joined"];
@@ -118,19 +122,28 @@ export function UsersManager() {
     toast.success(`Exported ${filteredUsers.length} users`);
   };
 
+  const getUserStatus = (user: UserData, hasPurchases: boolean) => {
+    if (user.status === 'active') {
+      if (user.plan_type === 'gold') return 'Gold Subscriber';
+      if (user.plan_type === 'platinum') return 'Platinum Subscriber';
+    }
+    if (hasPurchases) return 'Purchase Only';
+    if (user.status === 'canceled') return 'Expired Subscriber';
+    return 'Free User';
+  };
+
+  const getStatusBadgeVariant = (statusLabel: string) => {
+    if (statusLabel.includes('Subscriber') && !statusLabel.includes('Expired')) return 'default';
+    if (statusLabel === 'Purchase Only') return 'secondary';
+    if (statusLabel === 'Expired Subscriber') return 'destructive';
+    return 'outline';
+  };
+
   const getPlanBadgeVariant = (plan: string) => {
     switch (plan) {
       case 'platinum': return 'default';
       case 'gold': return 'secondary';
       default: return 'outline';
-    }
-  };
-
-  const getStatusBadgeVariant = (status: string) => {
-    switch (status) {
-      case 'active': return 'default';
-      case 'canceled': return 'destructive';
-      default: return 'secondary';
     }
   };
 
@@ -196,9 +209,9 @@ export function UsersManager() {
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="all">All Statuses</SelectItem>
-              <SelectItem value="active">Active</SelectItem>
-              <SelectItem value="canceled">Canceled</SelectItem>
-              <SelectItem value="inactive">Inactive</SelectItem>
+              <SelectItem value="active">Active Subscribers</SelectItem>
+              <SelectItem value="canceled">Expired Subscribers</SelectItem>
+              <SelectItem value="with_purchases">Users with Purchases</SelectItem>
             </SelectContent>
           </Select>
         </div>
@@ -240,13 +253,13 @@ export function UsersManager() {
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>User</TableHead>
-                <TableHead>Email</TableHead>
-                <TableHead>Plan</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead>Period End</TableHead>
-                <TableHead>Joined</TableHead>
-                <TableHead>Actions</TableHead>
+              <TableHead>User</TableHead>
+              <TableHead>Email</TableHead>
+              <TableHead>Plan</TableHead>
+              <TableHead>User Status</TableHead>
+              <TableHead>Period End</TableHead>
+              <TableHead>Joined</TableHead>
+              <TableHead>Actions</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -257,59 +270,71 @@ export function UsersManager() {
                   </TableCell>
                 </TableRow>
               ) : (
-                filteredUsers.map((user) => (
-                  <TableRow key={user.user_id}>
-                    <TableCell>
-                      <div className="flex items-center gap-3">
-                        <Avatar>
-                          <AvatarImage src={user.avatar_url || undefined} />
-                          <AvatarFallback>
-                            {user.full_name?.charAt(0) || user.nickname?.charAt(0) || 'U'}
-                          </AvatarFallback>
-                        </Avatar>
-                        <div>
-                          <p className="font-medium">{user.full_name || user.nickname || 'Anonymous'}</p>
-                          {user.nickname && user.full_name && (
-                            <p className="text-xs text-muted-foreground">@{user.nickname}</p>
+                filteredUsers.map((user) => {
+                  const hasPurchases = userPurchases.includes(user.user_id);
+                  const statusLabel = getUserStatus(user, hasPurchases);
+                  
+                  return (
+                    <TableRow key={user.user_id}>
+                      <TableCell>
+                        <div className="flex items-center gap-3">
+                          <Avatar>
+                            <AvatarImage src={user.avatar_url || undefined} />
+                            <AvatarFallback>
+                              {user.full_name?.charAt(0) || user.nickname?.charAt(0) || 'U'}
+                            </AvatarFallback>
+                          </Avatar>
+                          <div>
+                            <p className="font-medium">{user.full_name || user.nickname || 'Anonymous'}</p>
+                            {user.nickname && user.full_name && (
+                              <p className="text-xs text-muted-foreground">@{user.nickname}</p>
+                            )}
+                          </div>
+                        </div>
+                      </TableCell>
+                      <TableCell className="text-sm">{user.email || 'N/A'}</TableCell>
+                      <TableCell>
+                        <Badge variant={getPlanBadgeVariant(user.plan_type)}>
+                          {user.plan_type}
+                        </Badge>
+                      </TableCell>
+                      <TableCell>
+                        <div className="flex items-center gap-2">
+                          <Badge variant={getStatusBadgeVariant(statusLabel)}>
+                            {statusLabel}
+                          </Badge>
+                          {hasPurchases && (
+                            <Badge variant="outline" className="text-xs">
+                              💳 Purchases
+                            </Badge>
                           )}
                         </div>
-                      </div>
-                    </TableCell>
-                    <TableCell className="text-sm">{user.email || 'N/A'}</TableCell>
-                    <TableCell>
-                      <Badge variant={getPlanBadgeVariant(user.plan_type)}>
-                        {user.plan_type}
-                      </Badge>
-                    </TableCell>
-                    <TableCell>
-                      <Badge variant={getStatusBadgeVariant(user.status)}>
-                        {user.status}
-                      </Badge>
-                    </TableCell>
-                    <TableCell className="text-sm">
-                      {user.current_period_end
-                        ? format(new Date(user.current_period_end), 'MMM d, yyyy')
-                        : 'N/A'}
-                    </TableCell>
-                    <TableCell className="text-sm">
-                      {format(new Date(user.created_at), 'MMM d, yyyy')}
-                    </TableCell>
-                    <TableCell>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => {
-                          if (user.email) {
-                            window.location.href = `mailto:${user.email}`;
-                          }
-                        }}
-                        disabled={!user.email}
-                      >
-                        <Mail className="h-4 w-4" />
-                      </Button>
-                    </TableCell>
-                  </TableRow>
-                ))
+                      </TableCell>
+                      <TableCell className="text-sm">
+                        {user.current_period_end
+                          ? format(new Date(user.current_period_end), 'MMM d, yyyy')
+                          : 'N/A'}
+                      </TableCell>
+                      <TableCell className="text-sm">
+                        {format(new Date(user.created_at), 'MMM d, yyyy')}
+                      </TableCell>
+                      <TableCell>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => {
+                            if (user.email) {
+                              window.location.href = `mailto:${user.email}`;
+                            }
+                          }}
+                          disabled={!user.email}
+                        >
+                          <Mail className="h-4 w-4" />
+                        </Button>
+                      </TableCell>
+                    </TableRow>
+                  );
+                })
               )}
             </TableBody>
           </Table>

@@ -62,18 +62,26 @@ serve(async (req: Request) => {
               .eq("is_active", true);
             
             targetUserIds = users?.map((u) => u.user_id) || [];
+          } else if (notification.target_audience === "purchasers") {
+            // Get users with purchases
+            const { data: purchases } = await supabase
+              .from("user_purchases")
+              .select("user_id");
+            
+            targetUserIds = [...new Set(purchases?.map((p) => p.user_id) || [])];
           } else if (notification.target_audience === "subscribers") {
             // Get all subscribers (users with active subscriptions)
             const { data: users } = await supabase
-              .from("subscriptions")
+              .from("user_subscriptions")
               .select("user_id")
+              .in("plan_type", ["gold", "platinum"])
               .eq("status", "active");
             
             targetUserIds = users?.map((u) => u.user_id) || [];
           } else if (notification.target_audience === "gold" || notification.target_audience === "platinum") {
             // Get users with specific plan
             const { data: users } = await supabase
-              .from("subscriptions")
+              .from("user_subscriptions")
               .select("user_id")
               .eq("status", "active")
               .eq("plan_type", notification.target_audience);

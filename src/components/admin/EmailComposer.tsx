@@ -41,11 +41,13 @@ export function EmailComposer() {
   const [templates, setTemplates] = useState<EmailTemplate[]>([]);
   const [loading, setLoading] = useState(true);
   const [sending, setSending] = useState(false);
+  const [userPurchases, setUserPurchases] = useState<string[]>([]);
   
   // Filters
   const [userTypeFilter, setUserTypeFilter] = useState<string>("all");
   const [planFilter, setPlanFilter] = useState<string>("all");
   const [statusFilter, setStatusFilter] = useState<string>("all");
+  const [purchaseFilter, setPurchaseFilter] = useState<string>("all");
   
   // Email content
   const [subject, setSubject] = useState("");
@@ -106,6 +108,14 @@ export function EmailComposer() {
       const allUsers = [...registeredUsers, ...newsletterUsers];
       setUsers(allUsers);
       setFilteredUsers(allUsers);
+
+      // Fetch users with purchases
+      const { data: purchases } = await supabase
+        .from('user_purchases')
+        .select('user_id');
+      
+      const uniquePurchasers = [...new Set(purchases?.map(p => p.user_id) || [])];
+      setUserPurchases(uniquePurchasers);
     } catch (error) {
       console.error('Error fetching users:', error);
       toast.error('Failed to load users');
@@ -166,8 +176,15 @@ export function EmailComposer() {
       filtered = filtered.filter(user => user.status === statusFilter);
     }
 
+    // Purchase filter
+    if (purchaseFilter === "with_purchases") {
+      filtered = filtered.filter(user => userPurchases.includes(user.user_id));
+    } else if (purchaseFilter === "without_purchases") {
+      filtered = filtered.filter(user => !userPurchases.includes(user.user_id));
+    }
+
     setFilteredUsers(filtered);
-  }, [userTypeFilter, planFilter, statusFilter, users]);
+  }, [userTypeFilter, planFilter, statusFilter, purchaseFilter, users, userPurchases]);
 
   const handleSendEmails = async () => {
     if (!subject.trim() || !message.trim()) {
@@ -295,6 +312,17 @@ export function EmailComposer() {
                   <SelectItem value="active">Active</SelectItem>
                   <SelectItem value="canceled">Canceled</SelectItem>
                   <SelectItem value="inactive">Inactive</SelectItem>
+                </SelectContent>
+              </Select>
+
+              <Select value={purchaseFilter} onValueChange={setPurchaseFilter}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Purchase Status" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All Users</SelectItem>
+                  <SelectItem value="with_purchases">With Purchases</SelectItem>
+                  <SelectItem value="without_purchases">Without Purchases</SelectItem>
                 </SelectContent>
               </Select>
 

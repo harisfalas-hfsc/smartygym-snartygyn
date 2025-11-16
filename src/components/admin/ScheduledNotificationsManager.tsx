@@ -242,12 +242,13 @@ export const ScheduledNotificationsManager = () => {
                   <SelectTrigger id="target">
                     <SelectValue />
                   </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all">All Users</SelectItem>
-                    <SelectItem value="subscribers">All Subscribers</SelectItem>
-                    <SelectItem value="gold">Gold Members</SelectItem>
-                    <SelectItem value="platinum">Platinum Members</SelectItem>
-                  </SelectContent>
+                <SelectContent>
+                  <SelectItem value="all">All Users</SelectItem>
+                  <SelectItem value="subscribers">All Subscribers</SelectItem>
+                  <SelectItem value="gold">Gold Members</SelectItem>
+                  <SelectItem value="platinum">Platinum Members</SelectItem>
+                  <SelectItem value="purchasers">Users with Purchases</SelectItem>
+                </SelectContent>
                 </Select>
               </div>
             </div>

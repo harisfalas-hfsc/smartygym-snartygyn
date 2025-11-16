@@ -68,6 +68,7 @@ export function MassNotificationManager() {
     { value: "subscribers", label: "Subscribers Only (Gold + Platinum)" },
     { value: "gold", label: "Gold Members Only" },
     { value: "platinum", label: "Platinum Members Only" },
+    { value: "purchasers", label: "Users with Purchases" },
     { value: "free", label: "Free Users Only" }
   ];
 
