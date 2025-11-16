@@ -356,10 +356,10 @@ const Index = () => {
                       </div>
 
                       <div className="flex items-start gap-3">
-                        <UserCheck className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
+                        <GraduationCap className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
                         <div>
-                          <p className="font-semibold text-sm text-foreground">Personal Training</p>
-                          <p className="text-xs text-muted-foreground">Custom plans by Haris Falas</p>
+                          <p className="font-semibold text-sm text-foreground">Expert Coach Guidance</p>
+                          <p className="text-xs text-muted-foreground">Connect with Sports Scientist Haris Falas - real human expertise, not AI-generated advice</p>
                         </div>
                       </div>
 
@@ -380,10 +380,10 @@ const Index = () => {
                       </div>
 
                       <div className="flex items-start gap-3">
-                        <Activity className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
+                        <Users className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
                         <div>
-                          <p className="font-semibold text-sm text-foreground">Community Support</p>
-                          <p className="text-xs text-muted-foreground">Connect with members</p>
+                          <p className="font-semibold text-sm text-foreground">Fitness Community</p>
+                          <p className="text-xs text-muted-foreground">Join and connect with like-minded members on their fitness journey</p>
                         </div>
                       </div>
                     </div>
