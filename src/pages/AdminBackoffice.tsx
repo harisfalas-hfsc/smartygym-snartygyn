@@ -131,7 +131,7 @@ export default function AdminBackoffice() {
           <TabsList className="w-full h-auto p-1 sm:p-2 flex flex-nowrap overflow-x-auto gap-0.5 sm:gap-1 bg-background border border-border rounded-lg">
             <TabsTrigger value="content" className="flex items-center justify-center gap-1 sm:gap-1.5 text-xs sm:text-sm px-2 sm:px-3 py-2 sm:py-2.5 whitespace-nowrap flex-shrink-0">
               <Folder className="h-3 w-3 sm:h-4 sm:w-4 shrink-0" />
-              <span className="hidden sm:inline">Content</span>
+              <span>Content</span>
             </TabsTrigger>
             
             <TabsTrigger value="community" className="flex items-center justify-center gap-1 sm:gap-1.5 text-xs sm:text-sm px-2 sm:px-3 py-2 sm:py-2.5 whitespace-nowrap flex-shrink-0">

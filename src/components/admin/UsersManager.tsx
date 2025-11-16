@@ -31,6 +31,7 @@ export function UsersManager() {
   const [searchTerm, setSearchTerm] = useState("");
   const [planFilter, setPlanFilter] = useState<string>("all");
   const [statusFilter, setStatusFilter] = useState<string>("all");
+  const [userPurchases, setUserPurchases] = useState<string[]>([]);
 
   const fetchUsers = async () => {
     setLoading(true);
@@ -44,6 +45,14 @@ export function UsersManager() {
         setUsers(data.users);
         setFilteredUsers(data.users);
       }
+
+      // Fetch users with purchases
+      const { data: purchases } = await supabase
+        .from('user_purchases')
+        .select('user_id');
+      
+      const uniquePurchasers = [...new Set(purchases?.map(p => p.user_id) || [])];
+      setUserPurchases(uniquePurchasers);
     } catch (error) {
       console.error('Error fetching users:', error);
       toast.error('Failed to load users');
@@ -195,7 +204,7 @@ export function UsersManager() {
         </div>
 
         {/* Stats */}
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-6">
+        <div className="grid grid-cols-2 sm:grid-cols-5 gap-4 mb-6">
           <div className="bg-muted/50 p-4 rounded-lg">
             <p className="text-sm text-muted-foreground">Total Users</p>
             <p className="text-2xl font-bold">{users.length}</p>
@@ -216,6 +225,12 @@ export function UsersManager() {
             <p className="text-sm text-muted-foreground">Platinum Members</p>
             <p className="text-2xl font-bold">
               {users.filter(u => u.plan_type === 'platinum').length}
+            </p>
+          </div>
+          <div className="bg-muted/50 p-4 rounded-lg">
+            <p className="text-sm text-muted-foreground">Users with Purchases</p>
+            <p className="text-2xl font-bold">
+              {userPurchases.length}
             </p>
           </div>
         </div>
