@@ -82,12 +82,14 @@ export function NotificationPreferences() {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error('Not authenticated');
 
-      const { error } = await supabase
-        .from('notification_preferences')
-        .upsert({
-          user_id: user.id,
-          ...preferences,
-        });
+    const { error } = await supabase
+      .from('notification_preferences')
+      .upsert({
+        user_id: user.id,
+        ...preferences,
+      }, { 
+        onConflict: 'user_id' 
+      });
 
       if (error) throw error;
 
