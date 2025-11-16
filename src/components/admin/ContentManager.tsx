@@ -4,7 +4,19 @@ import { WorkoutsManager } from "./WorkoutsManager";
 import { ProgramsManager } from "./ProgramsManager";
 import { Dumbbell, Calendar } from "lucide-react";
 
-export const ContentManager = () => {
+interface ContentManagerProps {
+  externalWorkoutDialog?: boolean;
+  setExternalWorkoutDialog?: (value: boolean) => void;
+  externalProgramDialog?: boolean;
+  setExternalProgramDialog?: (value: boolean) => void;
+}
+
+export const ContentManager = ({
+  externalWorkoutDialog,
+  setExternalWorkoutDialog,
+  externalProgramDialog,
+  setExternalProgramDialog,
+}: ContentManagerProps) => {
   return (
     <Card>
       <CardHeader>
@@ -30,11 +42,17 @@ export const ContentManager = () => {
           </TabsList>
           
           <TabsContent value="workouts">
-            <WorkoutsManager />
+            <WorkoutsManager 
+              externalDialog={externalWorkoutDialog}
+              setExternalDialog={setExternalWorkoutDialog}
+            />
           </TabsContent>
           
           <TabsContent value="programs">
-            <ProgramsManager />
+            <ProgramsManager 
+              externalDialog={externalProgramDialog}
+              setExternalDialog={setExternalProgramDialog}
+            />
           </TabsContent>
         </Tabs>
       </CardContent>
