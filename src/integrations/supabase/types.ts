@@ -1267,6 +1267,57 @@ export type Database = {
         }
         Relationships: []
       }
+      user_activity_log: {
+        Row: {
+          action_type: string
+          activity_date: string
+          content_type: string
+          created_at: string
+          id: string
+          item_id: string
+          item_name: string
+          program_day: number | null
+          program_week: number | null
+          tool_input: Json | null
+          tool_result: Json | null
+          total_days_per_week: number | null
+          total_weeks: number | null
+          user_id: string
+        }
+        Insert: {
+          action_type: string
+          activity_date?: string
+          content_type: string
+          created_at?: string
+          id?: string
+          item_id: string
+          item_name: string
+          program_day?: number | null
+          program_week?: number | null
+          tool_input?: Json | null
+          tool_result?: Json | null
+          total_days_per_week?: number | null
+          total_weeks?: number | null
+          user_id: string
+        }
+        Update: {
+          action_type?: string
+          activity_date?: string
+          content_type?: string
+          created_at?: string
+          id?: string
+          item_id?: string
+          item_name?: string
+          program_day?: number | null
+          program_week?: number | null
+          tool_input?: Json | null
+          tool_result?: Json | null
+          total_days_per_week?: number | null
+          total_weeks?: number | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       user_purchases: {
         Row: {
           content_id: string

@@ -31,6 +31,11 @@ import {
   Headphones,
   Sparkles
 } from "lucide-react";
+import { LogBookStats } from "@/components/logbook/LogBookStats";
+import { LogBookFilters } from "@/components/logbook/LogBookFilters";
+import { LogBookCalendar } from "@/components/logbook/LogBookCalendar";
+import { LogBookCharts } from "@/components/logbook/LogBookCharts";
+import { LogBookExport } from "@/components/logbook/LogBookExport";
 
 interface WorkoutInteraction {
   id: string;
@@ -127,6 +132,9 @@ export default function UserDashboard() {
   // Get tab from URL or default to "workouts"
   const tabParam = searchParams.get('tab');
   const [activeTab, setActiveTab] = useState(tabParam || 'workouts');
+  
+  // LogBook filter state
+  const [logBookFilter, setLogBookFilter] = useState<'all' | 'workout' | 'program' | 'personal_training' | 'tool'>('all');
   
   // Fetch user purchases
   const { data: purchases = [], isLoading: purchasesLoading } = usePurchases(user?.id);
@@ -791,7 +799,7 @@ export default function UserDashboard() {
 
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
           <div className="w-full overflow-x-auto">
-            <TabsList className="w-full inline-flex sm:grid sm:grid-cols-5 min-w-max sm:min-w-0">
+            <TabsList className="w-full inline-flex sm:grid sm:grid-cols-6 min-w-max sm:min-w-0">
               <TabsTrigger value="workouts" className="flex-shrink-0">
                 <Dumbbell className="mr-2 h-4 w-4" />
                 <span className="whitespace-nowrap">Workouts</span>
@@ -819,6 +827,10 @@ export default function UserDashboard() {
               <TabsTrigger value="calculators" className="flex-shrink-0">
                 <Calculator className="mr-2 h-4 w-4" />
                 <span className="whitespace-nowrap">My Calculators</span>
+              </TabsTrigger>
+              <TabsTrigger value="logbook" className="flex-shrink-0">
+                <BookOpen className="mr-2 h-4 w-4" />
+                <span className="whitespace-nowrap">My LogBook</span>
               </TabsTrigger>
             </TabsList>
           </div>
@@ -1370,6 +1382,52 @@ export default function UserDashboard() {
                 </CardContent>
               </Card>
             </div>
+          </TabsContent>
+
+          {/* LogBook Tab */}
+          <TabsContent value="logbook" className="space-y-6">
+            {!hasActivePlan ? (
+              <Card className="border-primary/50 bg-gradient-to-r from-primary/5 to-primary/10">
+                <CardContent className="text-center py-12">
+                  <Crown className="h-12 w-12 text-primary mx-auto mb-4" />
+                  <h3 className="text-xl font-bold mb-2">Premium Feature</h3>
+                  <p className="text-muted-foreground mb-6">
+                    Track all your fitness activities in one place with a Gold or Platinum plan.
+                  </p>
+                  <Button onClick={() => navigate("/premiumbenefits")}>
+                    Upgrade to Premium
+                  </Button>
+                </CardContent>
+              </Card>
+            ) : (
+              <>
+                <LogBookStats userId={user!.id} />
+                
+                <LogBookFilters 
+                  activeFilter={logBookFilter} 
+                  onFilterChange={setLogBookFilter} 
+                />
+                
+                <div id="logbook-calendar">
+                  <LogBookCalendar 
+                    userId={user!.id} 
+                    filter={logBookFilter}
+                  />
+                </div>
+                
+                <div id="logbook-charts">
+                  <LogBookCharts 
+                    userId={user!.id} 
+                    filter={logBookFilter} 
+                  />
+                </div>
+                
+                <LogBookExport 
+                  userId={user!.id} 
+                  filter={logBookFilter} 
+                />
+              </>
+            )}
           </TabsContent>
         </Tabs>
       </main>

@@ -144,6 +144,30 @@ const MacroTrackingCalculator = () => {
 
       if (error) throw error;
 
+      // Log to activity log
+      await supabase.from("user_activity_log").insert({
+        user_id: user.id,
+        content_type: 'tool',
+        item_id: 'macro-calculator',
+        item_name: 'Macro Calculator',
+        action_type: 'calculated',
+        tool_input: {
+          age: parseInt(age),
+          weight: parseFloat(weight),
+          height: parseFloat(height),
+          gender,
+          activityLevel,
+          goal
+        },
+        tool_result: {
+          calories: result.calories,
+          protein: result.protein,
+          carbs: result.carbs,
+          fats: result.fats
+        },
+        activity_date: new Date().toISOString().split('T')[0]
+      });
+
       toast({
         title: "Saved!",
         description: "Calculation saved to your history",
