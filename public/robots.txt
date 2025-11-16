@@ -1,7 +1,30 @@
+# SmartyGym Robots.txt - Optimized for Search Engines and AI Crawlers
+
 User-agent: Googlebot
 Allow: /
+Crawl-delay: 0
 
 User-agent: Bingbot
+Allow: /
+Crawl-delay: 0
+
+User-agent: GPTBot
+Allow: /
+Crawl-delay: 1
+
+User-agent: ChatGPT-User
+Allow: /
+
+User-agent: CCBot
+Allow: /
+
+User-agent: anthropic-ai
+Allow: /
+
+User-agent: Claude-Web
+Allow: /
+
+User-agent: PerplexityBot
 Allow: /
 
 User-agent: Twitterbot
@@ -12,3 +35,6 @@ Allow: /
 
 User-agent: *
 Allow: /
+Crawl-delay: 5
+
+Sitemap: https://smartygym.com/sitemap.xml
