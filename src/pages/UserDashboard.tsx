@@ -37,6 +37,7 @@ import { LogBookFilters } from "@/components/logbook/LogBookFilters";
 import { LogBookCalendar } from "@/components/logbook/LogBookCalendar";
 import { LogBookCharts } from "@/components/logbook/LogBookCharts";
 import { LogBookExport } from "@/components/logbook/LogBookExport";
+import { NotificationPromptBanner } from "@/components/NotificationPromptBanner";
 
 interface WorkoutInteraction {
   id: string;
@@ -527,6 +528,9 @@ export default function UserDashboard() {
   return (
     <div className="min-h-screen bg-background">
       <main className="container mx-auto max-w-7xl p-4 py-8">
+        {/* Notification Prompt Banner */}
+        <NotificationPromptBanner />
+        
         <Button
           variant="ghost"
           size="sm"

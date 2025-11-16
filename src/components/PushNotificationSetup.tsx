@@ -16,20 +16,29 @@ export const PushNotificationSetup = () => {
   }, []);
 
   const checkNotificationStatus = async () => {
+    console.log('[PushNotificationSetup] Checking notification status');
+    
     if (!('Notification' in window)) {
-      console.log('Push notifications not supported');
+      console.log('[PushNotificationSetup] Push notifications not supported');
       return;
     }
 
-    setPermission(Notification.permission);
+    const currentPermission = Notification.permission;
+    console.log('[PushNotificationSetup] Current permission:', currentPermission);
+    setPermission(currentPermission);
 
-    if (Notification.permission === 'granted' && 'serviceWorker' in navigator) {
+    if (currentPermission === 'granted' && 'serviceWorker' in navigator) {
       try {
         const registration = await navigator.serviceWorker.ready;
         const subscription = await registration.pushManager.getSubscription();
-        setSubscribed(!!subscription);
+        const isSubscribed = !!subscription;
+        console.log('[PushNotificationSetup] Subscription status:', {
+          isSubscribed,
+          endpoint: subscription?.endpoint
+        });
+        setSubscribed(isSubscribed);
       } catch (error) {
-        console.error('Error checking subscription:', error);
+        console.error('[PushNotificationSetup] Error checking subscription:', error);
       }
     }
   };
@@ -50,49 +59,67 @@ export const PushNotificationSetup = () => {
   };
 
   const subscribeToPush = async () => {
+    console.log('[PushNotificationSetup] Starting push subscription process');
     setLoading(true);
     try {
       // Check if notifications are supported
       if (!('Notification' in window)) {
+        console.error('[PushNotificationSetup] Push notifications not supported');
         throw new Error('Push notifications are not supported in this browser');
       }
 
       // Request notification permission
+      console.log('[PushNotificationSetup] Requesting permission...');
       const permission = await Notification.requestPermission();
+      console.log('[PushNotificationSetup] Permission result:', permission);
       setPermission(permission);
 
       if (permission !== 'granted') {
+        console.warn('[PushNotificationSetup] Permission denied');
         throw new Error('Notification permission denied');
       }
 
       // Register service worker
       if ('serviceWorker' in navigator) {
+        console.log('[PushNotificationSetup] Checking service worker registration...');
         let registration = await navigator.serviceWorker.getRegistration();
         
         if (!registration) {
+          console.log('[PushNotificationSetup] Registering new service worker...');
           registration = await navigator.serviceWorker.register('/service-worker.js');
           await navigator.serviceWorker.ready;
+          console.log('[PushNotificationSetup] Service worker ready');
+        } else {
+          console.log('[PushNotificationSetup] Using existing service worker registration');
         }
 
         // Subscribe to push notifications with VAPID key
         const vapidPublicKey = import.meta.env.VITE_VAPID_PUBLIC_KEY || "BNxJvJCFg7yQN3VVPqYuJZz8r5nW2mK9pL3xT6hR4sV7bC8dE9fG0aH1iJ2kL3mN4oP5qR6sT7uV8wX9yZ0aB1c";
+        console.log('[PushNotificationSetup] Subscribing to push manager...');
         
         const subscription = await registration.pushManager.subscribe({
           userVisibleOnly: true,
           applicationServerKey: urlBase64ToUint8Array(vapidPublicKey)
         });
 
+        console.log('[PushNotificationSetup] Push subscription created:', {
+          endpoint: subscription.endpoint
+        });
+
         // Save subscription to database
         const { data: { user } } = await supabase.auth.getUser();
         
         if (user) {
+          console.log('[PushNotificationSetup] Saving subscription to database for user:', user.id);
+          const deviceType = /iPhone|iPad|iPod/.test(navigator.userAgent) ? 'ios' : 
+                           /Android/.test(navigator.userAgent) ? 'android' : 'desktop';
+          
           const { error: upsertError } = await supabase
             .from('push_subscriptions')
             .upsert({
               user_id: user.id,
               subscription_data: subscription.toJSON() as any,
-              device_type: /iPhone|iPad|iPod/.test(navigator.userAgent) ? 'ios' : 
-                           /Android/.test(navigator.userAgent) ? 'android' : 'desktop',
+              device_type: deviceType,
               browser_info: navigator.userAgent,
               is_active: true
             }, {
@@ -100,8 +127,11 @@ export const PushNotificationSetup = () => {
             });
 
           if (upsertError) {
-            console.error('Error saving subscription:', upsertError);
+            console.error('[PushNotificationSetup] Error saving subscription:', upsertError);
+            throw upsertError;
           }
+
+          console.log('[PushNotificationSetup] Subscription saved successfully');
 
           // Update notification preferences
           await supabase

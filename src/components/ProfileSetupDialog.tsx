@@ -5,6 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
+import { Bell } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
@@ -48,7 +49,8 @@ export const ProfileSetupDialog = ({ open, onComplete }: ProfileSetupDialogProps
     gender: "",
     fitness_level: "",
     fitness_goals: [] as string[],
-    equipment_preferences: [] as string[]
+    equipment_preferences: [] as string[],
+    notificationsEnabled: false
   });
   const [loading, setLoading] = useState(false);
 
@@ -86,12 +88,30 @@ export const ProfileSetupDialog = ({ open, onComplete }: ProfileSetupDialogProps
     setStep(step + 1);
   };
 
-  const handleComplete = async () => {
-    if (formData.equipment_preferences.length === 0) {
-      toast.error("Please select at least one equipment option");
+  const handleEnableNotifications = async () => {
+    console.log('[ProfileSetupDialog] User enabling notifications');
+    if (!('Notification' in window)) {
+      toast.error("Notifications are not supported in your browser");
       return;
     }
 
+    try {
+      const permission = await Notification.requestPermission();
+      console.log('[ProfileSetupDialog] Notification permission:', permission);
+      
+      if (permission === 'granted') {
+        setFormData(prev => ({ ...prev, notificationsEnabled: true }));
+        toast.success("Notifications enabled!");
+      } else {
+        toast.error("Notification permission denied");
+      }
+    } catch (error) {
+      console.error('[ProfileSetupDialog] Error requesting permission:', error);
+      toast.error("Failed to enable notifications");
+    }
+  };
+
+  const handleComplete = async () => {
     setLoading(true);
     try {
       const { data: { user } } = await supabase.auth.getUser();
@@ -113,6 +133,7 @@ export const ProfileSetupDialog = ({ open, onComplete }: ProfileSetupDialogProps
 
       if (error) throw error;
 
+      console.log('[ProfileSetupDialog] Profile setup complete, notifications enabled:', formData.notificationsEnabled);
       toast.success("Profile setup complete!");
       onComplete();
     } catch (error) {
@@ -256,6 +277,38 @@ export const ProfileSetupDialog = ({ open, onComplete }: ProfileSetupDialogProps
             </div>
           )}
 
+          {step === 4 && (
+            <div className="space-y-4">
+              <h3 className="font-semibold">Stay Connected</h3>
+              <p className="text-sm text-muted-foreground mb-4">
+                Enable notifications to receive instant updates about new workouts, coach responses, and important updates.
+              </p>
+              
+              <div className="flex flex-col items-center justify-center p-6 border-2 border-dashed border-border rounded-lg bg-muted/30">
+                <Bell className="h-12 w-12 text-primary mb-4" />
+                
+                {formData.notificationsEnabled ? (
+                  <div className="text-center">
+                    <p className="font-semibold text-green-600 mb-2">✓ Notifications Enabled</p>
+                    <p className="text-sm text-muted-foreground">You'll receive instant updates</p>
+                  </div>
+                ) : (
+                  <div className="text-center">
+                    <p className="font-semibold mb-2">Enable Push Notifications</p>
+                    <p className="text-xs text-muted-foreground mb-4">Get notified instantly when your coach responds</p>
+                    <Button onClick={handleEnableNotifications} size="sm">
+                      Enable Notifications
+                    </Button>
+                  </div>
+                )}
+              </div>
+
+              <p className="text-xs text-muted-foreground text-center">
+                You can change notification settings anytime in your profile
+              </p>
+            </div>
+          )}
+
           <div className="flex justify-between pt-4">
             {step > 1 && (
               <Button variant="outline" onClick={() => setStep(step - 1)}>
@@ -263,7 +316,7 @@ export const ProfileSetupDialog = ({ open, onComplete }: ProfileSetupDialogProps
               </Button>
             )}
             <div className="ml-auto">
-              {step < 3 ? (
+              {step < 4 ? (
                 <Button onClick={handleNext}>
                   Next
                 </Button>

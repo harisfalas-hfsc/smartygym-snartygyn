@@ -14,7 +14,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { User as UserIcon, Settings, LogOut, LayoutDashboard, Crown, Menu, Bell, Facebook, Instagram, Music, Youtube } from "lucide-react";
+import { User as UserIcon, Settings, LogOut, LayoutDashboard, Crown, Menu, Bell, BellOff, Facebook, Instagram, Music, Youtube } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import smartyGymLogo from "@/assets/smarty-gym-logo.png";
 import { ThemeToggle } from "@/components/ThemeToggle";
@@ -34,6 +34,7 @@ export const Navigation = () => {
   const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
   const [subscriptionInfo, setSubscriptionInfo] = useState<SubscriptionInfo | null>(null);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [notificationsEnabled, setNotificationsEnabled] = useState(false);
   const { data: unreadCount = 0 } = useUnreadMessages();
 
   useEffect(() => {
@@ -43,6 +44,7 @@ export const Navigation = () => {
       if (session?.user) {
         loadUserData(session.user.id);
         checkSubscription();
+        checkNotificationStatus();
       }
     });
 
@@ -56,6 +58,7 @@ export const Navigation = () => {
         setTimeout(() => {
           loadUserData(session.user.id);
           checkSubscription();
+          checkNotificationStatus();
         }, 0);
       } else {
         setAvatarUrl(null);
@@ -105,6 +108,31 @@ export const Navigation = () => {
       });
     } catch (error) {
       console.error("Error checking subscription:", error);
+    }
+  };
+
+  const checkNotificationStatus = async () => {
+    if (!('Notification' in window)) {
+      console.log('[Navigation] Notifications not supported');
+      return;
+    }
+
+    const hasPermission = Notification.permission === 'granted';
+    
+    if (hasPermission && 'serviceWorker' in navigator) {
+      try {
+        const registration = await navigator.serviceWorker.ready;
+        const subscription = await registration.pushManager.getSubscription();
+        const isEnabled = !!subscription;
+        console.log('[Navigation] Notification status:', { hasPermission, isEnabled });
+        setNotificationsEnabled(isEnabled);
+      } catch (error) {
+        console.error('[Navigation] Error checking notification status:', error);
+        setNotificationsEnabled(false);
+      }
+    } else {
+      console.log('[Navigation] No permission or service worker not ready');
+      setNotificationsEnabled(false);
     }
   };
 
@@ -321,6 +349,20 @@ export const Navigation = () => {
           {/* Right Side - Auth */}
           <div className="flex items-center gap-2">
             <ThemeToggle />
+
+            {/* Notification status badge - only show for logged in users */}
+            {user && !notificationsEnabled && (
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => navigate('/profile-settings?tab=notifications')}
+                className="relative"
+                title="Notifications Disabled"
+              >
+                <BellOff className="h-5 w-5 text-muted-foreground" />
+                <span className="absolute -bottom-1 -right-1 h-3 w-3 rounded-full bg-yellow-500" />
+              </Button>
+            )}
             
             {user && unreadCount > 0 && (
               <Button
@@ -334,7 +376,7 @@ export const Navigation = () => {
               >
                 <Bell className="h-5 w-5" />
                 <Badge 
-                  variant="destructive" 
+                  variant="destructive"
                   className="absolute -top-1 -right-1 h-5 w-5 flex items-center justify-center p-0 text-xs"
                 >
                   {unreadCount > 9 ? '9+' : unreadCount}

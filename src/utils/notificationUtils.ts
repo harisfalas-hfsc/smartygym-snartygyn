@@ -5,19 +5,25 @@ import { supabase } from "@/integrations/supabase/client";
  */
 export const registerServiceWorker = async (): Promise<ServiceWorkerRegistration | null> => {
   if (!('serviceWorker' in navigator)) {
-    console.warn('Service workers are not supported');
+    console.warn('[NotificationUtils] Service workers are not supported');
     return null;
   }
 
   try {
+    console.log('[NotificationUtils] Registering service worker...');
     const registration = await navigator.serviceWorker.register('/service-worker.js', {
       scope: '/'
     });
     
-    console.log('Service Worker registered successfully:', registration);
+    console.log('[NotificationUtils] Service Worker registered successfully:', {
+      scope: registration.scope,
+      active: !!registration.active,
+      installing: !!registration.installing,
+      waiting: !!registration.waiting
+    });
     return registration;
   } catch (error) {
-    console.error('Service Worker registration failed:', error);
+    console.error('[NotificationUtils] Service Worker registration failed:', error);
     return null;
   }
 };
@@ -27,10 +33,13 @@ export const registerServiceWorker = async (): Promise<ServiceWorkerRegistration
  */
 export const requestNotificationPermission = async (): Promise<NotificationPermission> => {
   if (!('Notification' in window)) {
+    console.error('[NotificationUtils] Notifications are not supported in this browser');
     throw new Error('Notifications are not supported in this browser');
   }
 
+  console.log('[NotificationUtils] Requesting notification permission...');
   const permission = await Notification.requestPermission();
+  console.log('[NotificationUtils] Notification permission result:', permission);
   return permission;
 };
 
@@ -46,9 +55,11 @@ export const isNotificationSupported = (): boolean => {
  */
 export const sendTestNotification = async (title: string, body: string) => {
   if (!('Notification' in window) || Notification.permission !== 'granted') {
+    console.error('[NotificationUtils] Notification permission not granted');
     throw new Error('Notification permission not granted');
   }
 
+  console.log('[NotificationUtils] Sending test notification:', { title, body });
   const registration = await navigator.serviceWorker.ready;
   
   await registration.showNotification(title, {
@@ -59,6 +70,8 @@ export const sendTestNotification = async (title: string, body: string) => {
       url: window.location.origin
     }
   } as NotificationOptions);
+  
+  console.log('[NotificationUtils] Test notification sent successfully');
 };
 
 /**
@@ -71,6 +84,13 @@ export const sendPushNotification = async (
   url?: string
 ) => {
   try {
+    console.log('[NotificationUtils] Sending push notification via edge function:', {
+      userId: Array.isArray(userId) ? `${userId.length} users` : userId,
+      title,
+      body,
+      url
+    });
+
     const { data, error } = await supabase.functions.invoke('send-push-notification', {
       body: {
         userId: Array.isArray(userId) ? undefined : userId,
@@ -81,10 +101,15 @@ export const sendPushNotification = async (
       }
     });
 
-    if (error) throw error;
+    if (error) {
+      console.error('[NotificationUtils] Error from edge function:', error);
+      throw error;
+    }
+
+    console.log('[NotificationUtils] Push notification sent successfully:', data);
     return data;
   } catch (error) {
-    console.error('Error sending push notification:', error);
+    console.error('[NotificationUtils] Error sending push notification:', error);
     throw error;
   }
 };
