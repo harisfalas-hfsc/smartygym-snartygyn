@@ -10,6 +10,7 @@ export const PushNotificationSetup = () => {
   const [permission, setPermission] = useState<NotificationPermission>("default");
   const [loading, setLoading] = useState(false);
   const [subscribed, setSubscribed] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     checkNotificationStatus();
@@ -26,6 +27,24 @@ export const PushNotificationSetup = () => {
     const currentPermission = Notification.permission;
     console.log('[PushNotificationSetup] Current permission:', currentPermission);
     setPermission(currentPermission);
+
+    // Verify service worker status
+    if ('serviceWorker' in navigator) {
+      try {
+        const registration = await navigator.serviceWorker.getRegistration();
+        console.log('[PushNotificationSetup] Service Worker Status:', {
+          registered: !!registration,
+          active: registration?.active?.state,
+          installing: registration?.installing?.state
+        });
+      } catch (err) {
+        console.error('[PushNotificationSetup] Service Worker check failed:', err);
+      }
+    }
+
+    // Verify VAPID key
+    const vapidKey = import.meta.env.VITE_VAPID_PUBLIC_KEY;
+    console.log('[PushNotificationSetup] VAPID Key present:', !!vapidKey);
 
     if (currentPermission === 'granted' && 'serviceWorker' in navigator) {
       try {
@@ -61,6 +80,7 @@ export const PushNotificationSetup = () => {
   const subscribeToPush = async () => {
     console.log('[PushNotificationSetup] Starting push subscription process');
     setLoading(true);
+    setError(null);
     try {
       // Check if notifications are supported
       if (!('Notification' in window)) {
@@ -76,90 +96,96 @@ export const PushNotificationSetup = () => {
 
       if (permission !== 'granted') {
         console.warn('[PushNotificationSetup] Permission denied');
-        throw new Error('Notification permission denied');
-      }
-
-      // Register service worker
-      if ('serviceWorker' in navigator) {
-        console.log('[PushNotificationSetup] Checking service worker registration...');
-        let registration = await navigator.serviceWorker.getRegistration();
-        
-        if (!registration) {
-          console.log('[PushNotificationSetup] Registering new service worker...');
-          registration = await navigator.serviceWorker.register('/service-worker.js');
-          await navigator.serviceWorker.ready;
-          console.log('[PushNotificationSetup] Service worker ready');
-        } else {
-          console.log('[PushNotificationSetup] Using existing service worker registration');
-        }
-
-        // Subscribe to push notifications with VAPID key
-        const vapidPublicKey = import.meta.env.VITE_VAPID_PUBLIC_KEY || "BNxJvJCFg7yQN3VVPqYuJZz8r5nW2mK9pL3xT6hR4sV7bC8dE9fG0aH1iJ2kL3mN4oP5qR6sT7uV8wX9yZ0aB1c";
-        console.log('[PushNotificationSetup] Subscribing to push manager...');
-        
-        const subscription = await registration.pushManager.subscribe({
-          userVisibleOnly: true,
-          applicationServerKey: urlBase64ToUint8Array(vapidPublicKey)
-        });
-
-        console.log('[PushNotificationSetup] Push subscription created:', {
-          endpoint: subscription.endpoint
-        });
-
-        // Save subscription to database
-        const { data: { user } } = await supabase.auth.getUser();
-        
-        if (user) {
-          console.log('[PushNotificationSetup] Saving subscription to database for user:', user.id);
-          const deviceType = /iPhone|iPad|iPod/.test(navigator.userAgent) ? 'ios' : 
-                           /Android/.test(navigator.userAgent) ? 'android' : 'desktop';
-          
-          const { error: upsertError } = await supabase
-            .from('push_subscriptions')
-            .upsert({
-              user_id: user.id,
-              subscription_data: subscription.toJSON() as any,
-              device_type: deviceType,
-              browser_info: navigator.userAgent,
-              is_active: true
-            }, {
-              onConflict: 'user_id'
-            });
-
-          if (upsertError) {
-            console.error('[PushNotificationSetup] Error saving subscription:', upsertError);
-            throw upsertError;
-          }
-
-          console.log('[PushNotificationSetup] Subscription saved successfully');
-
-          // Update notification preferences
-          await supabase
-            .from('profiles')
-            .update({
-              notification_preferences: {
-                email: true,
-                push: true,
-                new_messages: true,
-                admin_responses: true,
-                system_updates: false
-              }
-            })
-            .eq('user_id', user.id);
-        }
-
-        setSubscribed(true);
-        
         toast({
-          title: "Notifications Enabled",
-          description: "You will now receive push notifications from Smarty Gym",
+          title: "Permission Denied",
+          description: "Please enable notifications in your browser settings.",
+          variant: "destructive",
         });
+        setLoading(false);
+        return;
       }
-    } catch (error: any) {
-      console.error('Error subscribing to push:', error);
+
+      // Get service worker registration
+      const registration = await navigator.serviceWorker.getRegistration();
+      if (!registration) {
+        throw new Error('Service worker not registered. Please refresh the page.');
+      }
+
+      console.log('[PushNotificationSetup] Service worker registration:', registration);
+
+      // Get VAPID public key
+      const vapidPublicKey = import.meta.env.VITE_VAPID_PUBLIC_KEY;
+      if (!vapidPublicKey) {
+        throw new Error('VAPID public key not configured. Please contact support.');
+      }
+
+      console.log('[PushNotificationSetup] VAPID key available:', !!vapidPublicKey);
+      console.log('[PushNotificationSetup] Subscribing to push manager...');
+      
+      const subscription = await registration.pushManager.subscribe({
+        userVisibleOnly: true,
+        applicationServerKey: urlBase64ToUint8Array(vapidPublicKey)
+      });
+
+      console.log('[PushNotificationSetup] Push subscription created:', subscription);
+
+      // Save subscription to database
+      const { data: { user } } = await supabase.auth.getUser();
+      
+      if (!user) {
+        throw new Error('User not authenticated. Please log in again.');
+      }
+
+      console.log('[PushNotificationSetup] Saving subscription to database for user:', user.id);
+      const deviceType = /iPhone|iPad|iPod/.test(navigator.userAgent) ? 'ios' : 
+                       /Android/.test(navigator.userAgent) ? 'android' : 'desktop';
+      
+      const { error: upsertError } = await supabase
+        .from('push_subscriptions')
+        .upsert({
+          user_id: user.id,
+          subscription_data: subscription.toJSON() as any,
+          device_type: deviceType,
+          browser_info: navigator.userAgent,
+          is_active: true
+        }, {
+          onConflict: 'user_id'
+        });
+
+      if (upsertError) {
+        console.error('[PushNotificationSetup] Error saving subscription:', upsertError);
+        throw new Error(`Failed to save subscription: ${upsertError.message}`);
+      }
+
+      console.log('[PushNotificationSetup] Subscription saved successfully');
+
+      // Update notification preferences
+      await supabase
+        .from('profiles')
+        .update({
+          notification_preferences: {
+            email: true,
+            push: true,
+            new_messages: true,
+            admin_responses: true,
+            system_updates: false
+          }
+        })
+        .eq('user_id', user.id);
+
+      setSubscribed(true);
+      
       toast({
-        title: "Error",
-        description: error.message || "Failed to enable notifications",
+        title: "Success!",
+        description: "Notifications enabled successfully.",
+      });
+    } catch (error: any) {
+      console.error('[PushNotificationSetup] Subscribe error:', error);
+      const errorMsg = error.message || "Failed to enable notifications. Please try again.";
+      setError(errorMsg);
+      toast({
+        title: "Error Enabling Notifications",
+        description: errorMsg,
         variant: "destructive",
       });
     } finally {
@@ -272,6 +298,12 @@ export const PushNotificationSetup = () => {
               )}
             </Button>
           </div>
+
+          {error && (
+            <div className="bg-destructive/10 border border-destructive/30 rounded-lg p-3">
+              <p className="text-xs text-destructive">{error}</p>
+            </div>
+          )}
 
           {permission === 'denied' && (
             <div className="bg-destructive/10 border border-destructive/30 rounded-lg p-3">

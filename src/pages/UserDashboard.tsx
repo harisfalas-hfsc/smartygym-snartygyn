@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
+import { ScrollArea } from "@/components/ui/scroll-area";
 import { useToast } from "@/hooks/use-toast";
 import { usePurchases } from "@/hooks/usePurchases";
 import { UserMessagesPanel } from "@/components/UserMessagesPanel";
@@ -957,35 +958,37 @@ export default function UserDashboard() {
                   {favoriteWorkouts.length === 0 ? (
                     <p className="text-sm text-muted-foreground">No favorite workouts yet</p>
                   ) : (
-                    <div className="space-y-2">
-                      {favoriteWorkouts.map((workout) => (
-                        <div
-                          key={workout.id}
-                          className="p-3 bg-muted rounded-lg cursor-pointer hover:bg-muted/80 transition-colors"
-                          onClick={() => handleNavigateToWorkout(workout.workout_type, workout.workout_id)}
-                        >
-                          <div className="flex items-center justify-between">
-                            <div className="flex-1">
-                              <p className="font-medium text-sm">{workout.workout_name}</p>
-                              <div className="flex items-center gap-2 mt-1">
-                                <Badge variant="outline" className="text-xs">
-                                  {workout.workout_type}
-                                </Badge>
-                                {workout.rating && (
-                                  <div className="flex items-center gap-1">
-                                    <Star className="h-3 w-3 fill-yellow-500 text-yellow-500" />
-                                    <span className="text-xs">{workout.rating}</span>
-                                  </div>
-                                )}
+                    <ScrollArea className="max-h-[400px] pr-4">
+                      <div className="space-y-2">
+                        {favoriteWorkouts.map((workout) => (
+                          <div
+                            key={workout.id}
+                            className="p-3 bg-muted rounded-lg cursor-pointer hover:bg-muted/80 transition-colors"
+                            onClick={() => handleNavigateToWorkout(workout.workout_type, workout.workout_id)}
+                          >
+                            <div className="flex items-center justify-between">
+                              <div className="flex-1">
+                                <p className="font-medium text-sm">{workout.workout_name}</p>
+                                <div className="flex items-center gap-2 mt-1">
+                                  <Badge variant="outline" className="text-xs">
+                                    {workout.workout_type}
+                                  </Badge>
+                                  {workout.rating && (
+                                    <div className="flex items-center gap-1">
+                                      <Star className="h-3 w-3 fill-yellow-500 text-yellow-500" />
+                                      <span className="text-xs">{workout.rating}</span>
+                                    </div>
+                                  )}
+                                </div>
                               </div>
+                              {workout.is_completed && (
+                                <CheckCircle className="h-4 w-4 text-green-500 ml-2" />
+                              )}
                             </div>
-                            {workout.is_completed && (
-                              <CheckCircle className="h-4 w-4 text-green-500 ml-2" />
-                            )}
                           </div>
-                        </div>
-                      ))}
-                    </div>
+                        ))}
+                      </div>
+                    </ScrollArea>
                   )}
                 </CardContent>
               </Card>
@@ -999,35 +1002,34 @@ export default function UserDashboard() {
                   {completedWorkouts.length === 0 ? (
                     <p className="text-sm text-muted-foreground">No completed workouts yet</p>
                   ) : (
-                    <div className="space-y-2">
-                      {completedWorkouts.map((workout) => (
-                        <div
-                          key={workout.id}
-                          className="p-3 bg-muted rounded-lg cursor-pointer hover:bg-muted/80 transition-colors"
-                          onClick={() => handleNavigateToWorkout(workout.workout_type, workout.workout_id)}
-                        >
-                          <div className="flex items-center justify-between">
-                            <div className="flex-1">
-                              <p className="font-medium text-sm">{workout.workout_name}</p>
-                              <div className="flex items-center gap-2 mt-1">
-                                <Badge variant="outline" className="text-xs">
-                                  {workout.workout_type}
-                                </Badge>
-                                {workout.rating && (
-                                  <div className="flex items-center gap-1">
-                                    <Star className="h-3 w-3 fill-yellow-500 text-yellow-500" />
-                                    <span className="text-xs">{workout.rating}</span>
-                                  </div>
-                                )}
+                    <ScrollArea className="max-h-[400px] pr-4">
+                      <div className="space-y-2">
+                        {completedWorkouts.map((workout) => (
+                          <div
+                            key={workout.id}
+                            className="p-3 bg-muted rounded-lg cursor-pointer hover:bg-muted/80 transition-colors"
+                            onClick={() => handleNavigateToWorkout(workout.workout_type, workout.workout_id)}
+                          >
+                            <div className="flex items-center justify-between">
+                              <div className="flex-1">
+                                <p className="font-medium text-sm">{workout.workout_name}</p>
+                                <div className="flex items-center gap-2 mt-1">
+                                  <Badge variant="outline" className="text-xs">
+                                    {workout.workout_type}
+                                  </Badge>
+                                  {workout.rating && (
+                                    <div className="flex items-center gap-1">
+                                      <Star className="h-3 w-3 fill-yellow-500 text-yellow-500" />
+                                      <span className="text-xs">{workout.rating}</span>
+                                    </div>
+                                  )}
+                                </div>
                               </div>
                             </div>
-                            {workout.is_favorite && (
-                              <Heart className="h-4 w-4 fill-red-500 text-red-500 ml-2" />
-                            )}
                           </div>
-                        </div>
-                      ))}
-                    </div>
+                        ))}
+                      </div>
+                    </ScrollArea>
                   )}
                 </CardContent>
               </Card>
