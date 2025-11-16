@@ -172,6 +172,23 @@ async function handleSubscriptionCheckout(
     logStep("ERROR: Failed to update subscription", { error });
   } else {
     logStep("Subscription created successfully");
+    
+    // Track subscription purchase for social media analytics
+    try {
+      await supabase
+        .from('social_media_analytics')
+        .insert({
+          user_id: userId,
+          session_id: `subscription_${subscriptionId}`,
+          referral_source: 'direct', // Will be updated if we have referral data
+          event_type: 'subscription_purchase',
+          event_value: subscription.items.data[0]?.price?.unit_amount ? (subscription.items.data[0].price.unit_amount / 100) : 0,
+          landing_page: '/checkout',
+        });
+      logStep("Subscription purchase tracked in analytics");
+    } catch (analyticsError) {
+      logStep("ERROR: Failed to track subscription in analytics", { error: analyticsError });
+    }
   }
 }
 
@@ -247,6 +264,29 @@ async function handleOneTimePurchase(
       stripe_payment_intent_id: paymentIntentId,
       stripe_checkout_session_id: session.id,
     });
+
+  if (error) {
+    logStep("ERROR: Failed to record purchase", { error });
+  } else {
+    logStep("Purchase recorded successfully");
+    
+    // Track standalone purchase for social media analytics
+    try {
+      await supabase
+        .from('social_media_analytics')
+        .insert({
+          user_id: userId,
+          session_id: session.id,
+          referral_source: 'direct', // Will be updated if we have referral data
+          event_type: 'standalone_purchase',
+          event_value: amount,
+          landing_page: '/checkout',
+        });
+      logStep("Standalone purchase tracked in analytics");
+    } catch (analyticsError) {
+      logStep("ERROR: Failed to track purchase in analytics", { error: analyticsError });
+    }
+  }
 
   if (error) {
     logStep("ERROR: Failed to record purchase", { error });

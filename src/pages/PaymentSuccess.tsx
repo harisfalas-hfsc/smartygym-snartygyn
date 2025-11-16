@@ -6,6 +6,7 @@ import { CheckCircle, Loader2 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { trackSocialMediaEvent } from "@/utils/socialMediaTracking";
 
 const PaymentSuccess = () => {
   const navigate = useNavigate();
@@ -38,6 +39,23 @@ const PaymentSuccess = () => {
 
         if (error) throw error;
         setVerified(true);
+        
+        // Track purchase event
+        const { data: { session: userSession } } = await supabase.auth.getSession();
+        if (userSession?.user) {
+          // Fetch purchase details to get the amount
+          const { data: purchases } = await supabase
+            .from('user_purchases')
+            .select('price')
+            .eq('stripe_checkout_session_id', sessionId)
+            .single();
+            
+          trackSocialMediaEvent({
+            eventType: 'standalone_purchase',
+            userId: userSession.user.id,
+            eventValue: purchases?.price || 0,
+          });
+        }
         
         // Invalidate purchases query to refresh the list
         await supabase.auth.getSession().then(async ({ data: { session } }) => {
