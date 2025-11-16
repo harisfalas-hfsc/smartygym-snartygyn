@@ -28,7 +28,12 @@ interface Workout {
   stripe_price_id: string | null;
 }
 
-export const WorkoutsManager = () => {
+interface WorkoutsManagerProps {
+  externalDialog?: boolean;
+  setExternalDialog?: (value: boolean) => void;
+}
+
+export const WorkoutsManager = ({ externalDialog, setExternalDialog }: WorkoutsManagerProps) => {
   const [workouts, setWorkouts] = useState<Workout[]>([]);
   const [filteredWorkouts, setFilteredWorkouts] = useState<Workout[]>([]);
   const [loading, setLoading] = useState(true);
@@ -51,6 +56,14 @@ export const WorkoutsManager = () => {
   useEffect(() => {
     filterWorkouts();
   }, [workouts, searchTerm, categoryFilter, formatFilter, equipmentFilter, typeFilter, difficultyFilter, accessFilter]);
+
+  // Watch for external dialog trigger
+  useEffect(() => {
+    if (externalDialog) {
+      handleNew();
+      setExternalDialog?.(false);
+    }
+  }, [externalDialog]);
 
   const filterWorkouts = () => {
     let filtered = workouts;

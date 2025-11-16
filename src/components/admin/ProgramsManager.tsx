@@ -23,7 +23,12 @@ interface Program {
   price: number | null;
 }
 
-export const ProgramsManager = () => {
+interface ProgramsManagerProps {
+  externalDialog?: boolean;
+  setExternalDialog?: (value: boolean) => void;
+}
+
+export const ProgramsManager = ({ externalDialog, setExternalDialog }: ProgramsManagerProps) => {
   const [programs, setPrograms] = useState<Program[]>([]);
   const [filteredPrograms, setFilteredPrograms] = useState<Program[]>([]);
   const [loading, setLoading] = useState(true);
@@ -44,6 +49,14 @@ export const ProgramsManager = () => {
   useEffect(() => {
     filterPrograms();
   }, [programs, searchTerm, categoryFilter, difficultyFilter, equipmentFilter, accessFilter]);
+
+  // Watch for external dialog trigger
+  useEffect(() => {
+    if (externalDialog) {
+      handleNew();
+      setExternalDialog?.(false);
+    }
+  }, [externalDialog]);
 
   const filterPrograms = () => {
     let filtered = programs;

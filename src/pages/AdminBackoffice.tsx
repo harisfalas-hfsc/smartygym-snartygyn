@@ -5,7 +5,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { ArrowLeft, Folder, Users, Mail, FileText, Settings, BarChart3, BookOpen, MessageSquare, Inbox, Image, TrendingUp } from "lucide-react";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { ArrowLeft, Folder, Users, Mail, FileText, Settings, BarChart3, BookOpen, MessageSquare, Inbox, Image, TrendingUp, Plus, Dumbbell, Calendar } from "lucide-react";
 import { ContentManager } from "@/components/admin/ContentManager";
 import { CommunicationsManager } from "@/components/admin/CommunicationsManager";
 import { EmailManager } from "@/components/admin/EmailManager";
@@ -24,6 +25,8 @@ export default function AdminBackoffice() {
   const navigate = useNavigate();
   const { isAdmin, loading } = useAdminRole();
   const [activeTab, setActiveTab] = useState("content");
+  const [showWorkoutDialog, setShowWorkoutDialog] = useState(false);
+  const [showProgramDialog, setShowProgramDialog] = useState(false);
   const [newContactCount, setNewContactCount] = useState(0);
 
   useEffect(() => {
@@ -117,13 +120,54 @@ export default function AdminBackoffice() {
               <p className="text-xs sm:text-base text-muted-foreground">Manage your platform</p>
             </div>
           </div>
-          <Button
-            variant="outline"
-            onClick={() => navigate("/admin/migrate")}
-            className="w-full sm:w-auto text-sm"
-          >
-            Import Content
-          </Button>
+          <div className="flex gap-2">
+            <Button
+              variant="outline"
+              onClick={() => navigate("/admin/migrate")}
+              className="gap-2"
+            >
+              Import Content
+            </Button>
+
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="default" className="gap-2">
+                  <Plus className="h-4 w-4" />
+                  <span className="hidden sm:inline">Create Content</span>
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-56 bg-background border-border z-50">
+                <DropdownMenuItem 
+                  onClick={() => {
+                    setActiveTab("content");
+                    setTimeout(() => setShowWorkoutDialog(true), 100);
+                  }}
+                  className="cursor-pointer"
+                >
+                  <Dumbbell className="h-4 w-4 mr-2" />
+                  New Workout
+                </DropdownMenuItem>
+                <DropdownMenuItem 
+                  onClick={() => {
+                    setActiveTab("content");
+                    setTimeout(() => setShowProgramDialog(true), 100);
+                  }}
+                  className="cursor-pointer"
+                >
+                  <Calendar className="h-4 w-4 mr-2" />
+                  New Training Program
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem 
+                  onClick={() => setActiveTab("content")}
+                  className="cursor-pointer"
+                >
+                  <Folder className="h-4 w-4 mr-2" />
+                  Go to Content Library
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
         </div>
 
         {/* Main Content */}
@@ -192,7 +236,12 @@ export default function AdminBackoffice() {
 
           <div className="mt-6">
             <TabsContent value="content" className="mt-0">
-              <ContentManager />
+              <ContentManager 
+                externalWorkoutDialog={showWorkoutDialog}
+                setExternalWorkoutDialog={setShowWorkoutDialog}
+                externalProgramDialog={showProgramDialog}
+                setExternalProgramDialog={setShowProgramDialog}
+              />
             </TabsContent>
 
             <TabsContent value="community" className="mt-0">
