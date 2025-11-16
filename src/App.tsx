@@ -4,6 +4,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { ThemeProvider } from "next-themes";
+import { useEffect } from "react";
 import { ProtectedRoute } from "./components/ProtectedRoute";
 import { AuthenticatedLayout } from "./components/AuthenticatedLayout";
 import { AccessControlProvider } from "./contexts/AccessControlContext";
@@ -13,6 +14,7 @@ import { ScrollToTop } from "./components/ScrollToTop";
 import { CookieConsent } from "./components/CookieConsent";
 import { FloatingActionButton } from "./components/FloatingActionButton";
 import { ArticleDetail } from "./pages/ArticleDetail";
+import { trackPageVisit } from "./utils/socialMediaTracking";
 import Index from "./pages/Index";
 import Auth from "./pages/Auth";
 import Dashboard from "./pages/Dashboard";
@@ -60,29 +62,25 @@ import { LoadingBar } from "./components/LoadingBar";
 
 const queryClient = new QueryClient();
 
-const App = () => (
-  <QueryClientProvider client={queryClient}>
-    <ThemeProvider 
-      attribute="class" 
-      defaultTheme="light" 
-      storageKey="smartygym-theme"
-      enableSystem={false}
-    >
-      <TooltipProvider>
-        <Toaster />
-        <Sonner />
-        <BrowserRouter>
-          <LoadingBar />
-          <CookieConsent />
-          <InstallPWA />
-          <NotificationPrompt />
-          <AccessControlProvider>
-          <WhatsAppButton />
-          <ScrollToTop />
-          <div className="flex flex-col min-h-screen">
-            <Navigation />
-            <div className="flex-1">
-              <PageTransition>
+const AppContent = () => {
+  useEffect(() => {
+    // Track page visit on initial load
+    trackPageVisit();
+  }, []);
+
+  return (
+    <>
+      <LoadingBar />
+      <CookieConsent />
+      <InstallPWA />
+      <NotificationPrompt />
+      <AccessControlProvider>
+        <WhatsAppButton />
+        <ScrollToTop />
+        <div className="flex flex-col min-h-screen">
+          <Navigation />
+          <div className="flex-1">
+            <PageTransition>
                 <Routes>
                   <Route path="/" element={<Index />} />
                   <Route path="/auth" element={<Auth />} />
@@ -140,11 +138,28 @@ const App = () => (
                 {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
                 <Route path="*" element={<NotFound />} />
               </Routes>
-              </PageTransition>
-            </div>
-            <Footer />
+            </PageTransition>
           </div>
-          </AccessControlProvider>
+          <Footer />
+        </div>
+      </AccessControlProvider>
+    </>
+  );
+};
+
+const App = () => (
+  <QueryClientProvider client={queryClient}>
+    <ThemeProvider 
+      attribute="class" 
+      defaultTheme="light" 
+      storageKey="smartygym-theme"
+      enableSystem={false}
+    >
+      <TooltipProvider>
+        <Toaster />
+        <Sonner />
+        <BrowserRouter>
+          <AppContent />
         </BrowserRouter>
       </TooltipProvider>
     </ThemeProvider>

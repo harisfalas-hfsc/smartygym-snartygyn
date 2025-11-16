@@ -1243,6 +1243,57 @@ export type Database = {
         }
         Relationships: []
       }
+      social_media_analytics: {
+        Row: {
+          browser_info: string | null
+          created_at: string | null
+          device_type: string | null
+          event_type: string
+          event_value: number | null
+          id: string
+          landing_page: string | null
+          referral_source: string
+          session_id: string
+          user_id: string | null
+          utm_campaign: string | null
+          utm_content: string | null
+          utm_medium: string | null
+          utm_source: string | null
+        }
+        Insert: {
+          browser_info?: string | null
+          created_at?: string | null
+          device_type?: string | null
+          event_type: string
+          event_value?: number | null
+          id?: string
+          landing_page?: string | null
+          referral_source: string
+          session_id: string
+          user_id?: string | null
+          utm_campaign?: string | null
+          utm_content?: string | null
+          utm_medium?: string | null
+          utm_source?: string | null
+        }
+        Update: {
+          browser_info?: string | null
+          created_at?: string | null
+          device_type?: string | null
+          event_type?: string
+          event_value?: number | null
+          id?: string
+          landing_page?: string | null
+          referral_source?: string
+          session_id?: string
+          user_id?: string | null
+          utm_campaign?: string | null
+          utm_content?: string | null
+          utm_medium?: string | null
+          utm_source?: string | null
+        }
+        Relationships: []
+      }
       system_settings: {
         Row: {
           created_at: string | null

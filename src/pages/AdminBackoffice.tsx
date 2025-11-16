@@ -5,13 +5,14 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { ArrowLeft, Folder, Users, Mail, FileText, Settings, BarChart3, BookOpen, MessageSquare, Inbox, Image } from "lucide-react";
+import { ArrowLeft, Folder, Users, Mail, FileText, Settings, BarChart3, BookOpen, MessageSquare, Inbox, Image, TrendingUp } from "lucide-react";
 import { ContentManager } from "@/components/admin/ContentManager";
 import { CommunicationsManager } from "@/components/admin/CommunicationsManager";
 import { EmailManager } from "@/components/admin/EmailManager";
 import { UsersManager } from "@/components/admin/UsersManager";
 import { ModerationDashboard } from "@/components/admin/ModerationDashboard";
 import { AnalyticsDashboard } from "@/components/admin/AnalyticsDashboard";
+import { SocialMediaAnalytics } from "@/components/admin/SocialMediaAnalytics";
 import { BlogManager } from "@/components/admin/BlogManager";
 import { ContactManager } from "@/components/admin/ContactManager";
 import { InstagramImageGenerator } from "@/components/admin/InstagramImageGenerator";
@@ -178,6 +179,11 @@ export default function AdminBackoffice() {
               <span className="hidden sm:inline">Analytics</span>
             </TabsTrigger>
             
+            <TabsTrigger value="social" className="flex items-center justify-center gap-1 sm:gap-1.5 text-xs sm:text-sm px-2 sm:px-3 py-2 sm:py-2.5 whitespace-nowrap flex-shrink-0">
+              <TrendingUp className="h-3 w-3 sm:h-4 sm:w-4 shrink-0" />
+              <span className="hidden sm:inline">Social</span>
+            </TabsTrigger>
+            
             <TabsTrigger value="settings" className="flex items-center justify-center gap-1 sm:gap-1.5 text-xs sm:text-sm px-2 sm:px-3 py-2 sm:py-2.5 whitespace-nowrap flex-shrink-0">
               <Settings className="h-3 w-3 sm:h-4 sm:w-4 shrink-0" />
               <span className="hidden sm:inline">Settings</span>
@@ -230,6 +236,10 @@ export default function AdminBackoffice() {
 
             <TabsContent value="analytics" className="mt-0">
               <AnalyticsDashboard />
+            </TabsContent>
+
+            <TabsContent value="social" className="mt-0">
+              <SocialMediaAnalytics />
             </TabsContent>
 
             <TabsContent value="settings" className="mt-0">

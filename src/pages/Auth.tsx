@@ -11,6 +11,7 @@ import { useToast } from "@/hooks/use-toast";
 import { ArrowLeft } from "lucide-react";
 import smartyGymLogo from "@/assets/smarty-gym-logo.png";
 import { AvatarSetupDialog } from "@/components/AvatarSetupDialog";
+import { trackSocialMediaEvent } from "@/utils/socialMediaTracking";
 
 export default function Auth() {
   const navigate = useNavigate();
@@ -122,6 +123,12 @@ export default function Auth() {
         }
       } else if (data.user) {
         setNewUserId(data.user.id);
+        
+        // Track signup event
+        trackSocialMediaEvent({
+          eventType: 'signup',
+          userId: data.user.id,
+        });
         
         // Send welcome message
         try {
