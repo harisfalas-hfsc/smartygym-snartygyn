@@ -31,7 +31,8 @@ import {
   BookOpen,
   Headphones,
   Sparkles,
-  Quote
+  Quote,
+  User as UserIcon
 } from "lucide-react";
 import { LogBookStats } from "@/components/logbook/LogBookStats";
 import { LogBookFilters } from "@/components/logbook/LogBookFilters";
@@ -570,11 +571,31 @@ export default function UserDashboard() {
         {subscriptionInfo && (
           <Card className="mb-6 border-primary/50 bg-gradient-to-r from-primary/5 to-primary/10">
             <CardContent className="p-4">
-              {/* Free Plan - Simple Layout */}
-              {!subscriptionInfo.subscribed && (
+              {/* Free Plan with Purchases */}
+              {!subscriptionInfo.subscribed && purchases && purchases.length > 0 && (
                 <div className="space-y-3">
                   <h2 className="flex items-center gap-2 text-lg font-bold">
-                    <Crown className="h-5 w-5 text-primary" />
+                    <ShoppingBag className="h-5 w-5 text-primary" />
+                    Your Active Membership
+                  </h2>
+                  <div>
+                    <h3 className="text-sm font-semibold mb-1">Free Plan with Purchases</h3>
+                    <p className="text-sm text-muted-foreground">
+                      You have {purchases.length} purchased item{purchases.length !== 1 ? 's' : ''}. 
+                      Upgrade for unlimited access to all content!
+                    </p>
+                  </div>
+                  <Button onClick={() => navigate("/premiumbenefits")} className="w-full sm:w-auto">
+                    Upgrade to Premium
+                  </Button>
+                </div>
+              )}
+
+              {/* Free Plan without Purchases */}
+              {!subscriptionInfo.subscribed && (!purchases || purchases.length === 0) && (
+                <div className="space-y-3">
+                  <h2 className="flex items-center gap-2 text-lg font-bold">
+                    <UserIcon className="h-5 w-5 text-muted-foreground" />
                     Your Free Membership
                   </h2>
                   <div>
