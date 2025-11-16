@@ -38,6 +38,14 @@ const PaymentSuccess = () => {
 
         if (error) throw error;
         setVerified(true);
+        
+        // Invalidate purchases query to refresh the list
+        await supabase.auth.getSession().then(async ({ data: { session } }) => {
+          if (session?.user) {
+            // This will trigger a refetch of purchases in any component using usePurchases
+            window.dispatchEvent(new CustomEvent('purchase-verified'));
+          }
+        });
       } catch (error) {
         console.error('Error verifying purchase:', error);
         toast({

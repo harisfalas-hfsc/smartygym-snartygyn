@@ -16,6 +16,7 @@ import { BlogManager } from "@/components/admin/BlogManager";
 import { ContactManager } from "@/components/admin/ContactManager";
 import { InstagramImageGenerator } from "@/components/admin/InstagramImageGenerator";
 import { SettingsManager } from "@/components/admin/SettingsManager";
+import { CommentModerationPanel } from "@/components/admin/CommentModerationPanel";
 import { supabase } from "@/integrations/supabase/client";
 
 export default function AdminBackoffice() {
@@ -189,7 +190,18 @@ export default function AdminBackoffice() {
             </TabsContent>
 
             <TabsContent value="community" className="mt-0">
-              <ModerationDashboard />
+              <Tabs defaultValue="moderation" className="w-full">
+                <TabsList className="grid w-full grid-cols-2">
+                  <TabsTrigger value="moderation">Moderation</TabsTrigger>
+                  <TabsTrigger value="comments">Comments & Flags</TabsTrigger>
+                </TabsList>
+                <TabsContent value="moderation" className="mt-4">
+                  <ModerationDashboard />
+                </TabsContent>
+                <TabsContent value="comments" className="mt-4">
+                  <CommentModerationPanel />
+                </TabsContent>
+              </Tabs>
             </TabsContent>
 
             <TabsContent value="contact" className="mt-0">

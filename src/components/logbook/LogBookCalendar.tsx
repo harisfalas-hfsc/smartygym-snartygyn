@@ -52,20 +52,27 @@ export const LogBookCalendar = ({ userId, filter }: LogBookCalendarProps) => {
     
     const badges = new Set<string>();
     activities.forEach(activity => {
+      const actionType = activity.action_type as string;
       if (activity.content_type === 'workout') {
-        badges.add(activity.action_type === 'completed' ? 'workout-completed' : 'workout-viewed');
+        if (actionType === 'purchased') {
+          badges.add('workout-purchased');
+        } else {
+          badges.add(actionType === 'completed' ? 'workout-completed' : 'workout-viewed');
+        }
       } else if (activity.content_type === 'program') {
-        if (activity.action_type === 'program_started') {
+        if (actionType === 'purchased') {
+          badges.add('program-purchased');
+        } else if (actionType === 'program_started') {
           badges.add('program-ongoing');
-        } else if (activity.action_type === 'program_day_completed') {
+        } else if (actionType === 'program_day_completed') {
           badges.add('program-completed');
         } else {
           badges.add('program-viewed');
         }
       } else if (activity.content_type === 'personal_training') {
-        if (activity.action_type === 'pt_started') {
+        if (actionType === 'pt_started') {
           badges.add('pt-ongoing');
-        } else if (activity.action_type === 'pt_day_completed') {
+        } else if (actionType === 'pt_day_completed') {
           badges.add('pt-completed');
         } else {
           badges.add('pt-viewed');
@@ -82,9 +89,11 @@ export const LogBookCalendar = ({ userId, filter }: LogBookCalendarProps) => {
     const colors: Record<string, string> = {
       'workout-viewed': 'bg-gray-400',
       'workout-completed': 'bg-green-500',
+      'workout-purchased': 'bg-amber-500',
       'program-viewed': 'bg-gray-400',
       'program-ongoing': 'bg-orange-500',
       'program-completed': 'bg-blue-500',
+      'program-purchased': 'bg-amber-600',
       'pt-viewed': 'bg-gray-400',
       'pt-ongoing': 'bg-orange-400',
       'pt-completed': 'bg-purple-500',

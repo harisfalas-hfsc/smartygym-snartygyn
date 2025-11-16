@@ -97,6 +97,21 @@ serve(async (req) => {
         throw error;
       }
 
+      // Log purchase to activity log for logbook
+      try {
+        await supabaseClient
+          .from('user_activity_log')
+          .insert({
+            user_id,
+            content_type: content_type === 'workout' ? 'workout' : 'program',
+            item_id: content_id,
+            item_name: content_name,
+            action_type: 'purchased'
+          });
+      } catch (logError) {
+        console.error('Failed to log purchase activity:', logError);
+      }
+
       // Send purchase thank you message
       try {
         await supabaseClient.functions.invoke('send-system-message', {

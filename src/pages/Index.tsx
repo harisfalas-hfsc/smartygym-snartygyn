@@ -13,6 +13,7 @@ import smartyGymIcon from "@/assets/smarty-gym-icon.png";
 import { BackToTop } from "@/components/BackToTop";
 import { useAccessControl } from "@/hooks/useAccessControl";
 import { ScrollReveal } from "@/components/ScrollReveal";
+import { NotificationPromptBanner } from "@/components/NotificationPromptBanner";
 import {
   Tooltip,
   TooltipContent,
@@ -257,6 +258,9 @@ const Index = () => {
       
       <div className="min-h-screen bg-background">
         <BackToTop />
+        
+        {/* Notification Prompt Banner */}
+        {user && <NotificationPromptBanner />}
         
         {/* Hero Section */}
         <section className="relative py-8 sm:py-12 px-4 border-b border-border bg-background overflow-hidden">
