@@ -177,3 +177,96 @@ export const useActivityStats = (userId: string | undefined) => {
 
   return { stats, isLoading };
 };
+
+// Helper function to get month range
+const getMonthRange = (monthsAgo: number) => {
+  const now = new Date();
+  const start = new Date(now.getFullYear(), now.getMonth() - monthsAgo, 1);
+  const end = new Date(now.getFullYear(), now.getMonth() - monthsAgo + 1, 0);
+  return { start, end };
+};
+
+// Helper function to calculate percentage change
+const calculatePercentageChange = (current: number, previous: number): number => {
+  if (previous === 0) return current > 0 ? 100 : 0;
+  return ((current - previous) / previous) * 100;
+};
+
+// Month-over-month comparison hook
+export const useActivityComparison = (userId: string | undefined) => {
+  const thisMonthRange = getMonthRange(0);
+  const lastMonthRange = getMonthRange(1);
+
+  const { activities: thisMonthActivities, isLoading: thisMonthLoading } = useActivityLog(
+    userId,
+    undefined,
+    thisMonthRange.start,
+    thisMonthRange.end
+  );
+
+  const { activities: lastMonthActivities, isLoading: lastMonthLoading } = useActivityLog(
+    userId,
+    undefined,
+    lastMonthRange.start,
+    lastMonthRange.end
+  );
+
+  const calculateStats = (activities: ActivityLog[]) => {
+    const stats = {
+      workoutsCompleted: 0,
+      programDaysCompleted: 0,
+      toolCalculations: 0,
+      totalActivities: activities.length,
+      currentStreak: 0,
+    };
+
+    activities.forEach(activity => {
+      if (activity.content_type === 'workout' && activity.action_type === 'completed') {
+        stats.workoutsCompleted++;
+      }
+      if (activity.content_type === 'program' && activity.action_type === 'program_day_completed') {
+        stats.programDaysCompleted++;
+      }
+      if (activity.content_type === 'tool' && activity.action_type === 'calculated') {
+        stats.toolCalculations++;
+      }
+    });
+
+    // Calculate streak for this month
+    const uniqueDates = [...new Set(activities.map(a => a.activity_date))].sort().reverse();
+    let streak = 0;
+    const today = new Date().toISOString().split('T')[0];
+    
+    for (let i = 0; i < uniqueDates.length; i++) {
+      const expectedDate = new Date();
+      expectedDate.setDate(expectedDate.getDate() - i);
+      const expectedDateStr = expectedDate.toISOString().split('T')[0];
+      
+      if (uniqueDates[i] === expectedDateStr) {
+        streak++;
+      } else {
+        break;
+      }
+    }
+    
+    stats.currentStreak = streak;
+
+    return stats;
+  };
+
+  const thisMonth = calculateStats(thisMonthActivities);
+  const lastMonth = calculateStats(lastMonthActivities);
+
+  const changes = {
+    workoutsCompleted: calculatePercentageChange(thisMonth.workoutsCompleted, lastMonth.workoutsCompleted),
+    programDaysCompleted: calculatePercentageChange(thisMonth.programDaysCompleted, lastMonth.programDaysCompleted),
+    toolCalculations: calculatePercentageChange(thisMonth.toolCalculations, lastMonth.toolCalculations),
+    totalActivities: calculatePercentageChange(thisMonth.totalActivities, lastMonth.totalActivities),
+    currentStreak: calculatePercentageChange(thisMonth.currentStreak, lastMonth.currentStreak),
+  };
+
+  return {
+    stats: { thisMonth, lastMonth, changes },
+    isLoading: thisMonthLoading || lastMonthLoading,
+  };
+};

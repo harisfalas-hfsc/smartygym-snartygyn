@@ -37,7 +37,8 @@ import {
 import { LogBookStats } from "@/components/logbook/LogBookStats";
 import { LogBookFilters } from "@/components/logbook/LogBookFilters";
 import { LogBookCalendar } from "@/components/logbook/LogBookCalendar";
-import { LogBookCharts } from "@/components/logbook/LogBookCharts";
+import { LogBookComparison } from "@/components/logbook/LogBookComparison";
+import { LogBookEnhancedCharts } from "@/components/logbook/LogBookEnhancedCharts";
 import { LogBookExport } from "@/components/logbook/LogBookExport";
 
 interface WorkoutInteraction {
@@ -1544,6 +1545,8 @@ export default function UserDashboard() {
               <>
                 <LogBookStats userId={user!.id} />
                 
+                <LogBookComparison userId={user!.id} />
+                
                 <LogBookFilters 
                   activeFilter={logBookFilter} 
                   onFilterChange={setLogBookFilter} 
@@ -1557,7 +1560,7 @@ export default function UserDashboard() {
                 </div>
                 
                 <div id="logbook-charts">
-                  <LogBookCharts 
+                  <LogBookEnhancedCharts 
                     userId={user!.id} 
                     filter={logBookFilter} 
                   />
