@@ -545,16 +545,14 @@ export default function UserDashboard() {
         </Button>
         
         <h1 className="text-3xl sm:text-4xl font-bold text-center mb-2">My Dashboard</h1>
-        <p className="text-center text-muted-foreground mb-4">
-          Track your fitness journey, monitor your progress, and stay on top of your goals.
-        </p>
         
-        {/* Info Ribbon */}
-        <div className="bg-primary/10 border border-primary/20 rounded-lg p-4 mb-8 text-center">
-          <p className="text-sm text-muted-foreground">
-            Your personalized hub for workouts, programs, and achievements. Keep pushing forward!
-          </p>
-        </div>
+        <Card className="mb-8 bg-primary/10 border-primary/20">
+          <CardContent className="p-4 text-center">
+            <p className="text-sm text-muted-foreground">
+              Track your fitness journey, monitor your progress, and stay on top of your goals.
+            </p>
+          </CardContent>
+        </Card>
 
         <div className="mb-8 flex items-center justify-between">
           <div>
