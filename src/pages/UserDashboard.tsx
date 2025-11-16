@@ -137,7 +137,7 @@ export default function UserDashboard() {
   const [activeTab, setActiveTab] = useState(tabParam || 'overview');
   
   // LogBook filter state
-  const [logBookFilter, setLogBookFilter] = useState<'all' | 'workout' | 'program' | 'personal_training' | 'tool'>('all');
+  const [logBookFilter, setLogBookFilter] = useState<'all' | 'workout' | 'program' | 'tool'>('all');
   
   // Fetch user purchases
   const { data: purchases = [], isLoading: purchasesLoading } = usePurchases(user?.id);

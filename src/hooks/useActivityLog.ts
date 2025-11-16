@@ -127,14 +127,13 @@ export const useActivitiesByDate = (userId: string | undefined, filterType?: str
 export const useActivityStats = (userId: string | undefined) => {
   const { activities, isLoading } = useActivityLog(userId);
 
-  const stats = {
-    workoutsThisMonth: 0,
-    programDaysThisMonth: 0,
-    ptDaysThisMonth: 0,
-    toolCalculationsThisMonth: 0,
-    totalActivities: activities.length,
-    currentStreak: 0,
-  };
+    const stats = {
+      workoutsThisMonth: 0,
+      programDaysThisMonth: 0,
+      toolCalculationsThisMonth: 0,
+      totalActivities: activities.length,
+      currentStreak: 0,
+    };
 
   if (activities.length === 0) return { stats, isLoading };
 
@@ -150,9 +149,7 @@ export const useActivityStats = (userId: string | undefined) => {
       if (activity.content_type === 'program' && activity.action_type === 'program_day_completed') {
         stats.programDaysThisMonth++;
       }
-      if (activity.content_type === 'personal_training' && activity.action_type === 'pt_day_completed') {
-        stats.ptDaysThisMonth++;
-      }
+      
       if (activity.content_type === 'tool' && activity.action_type === 'calculated') {
         stats.toolCalculationsThisMonth++;
       }
