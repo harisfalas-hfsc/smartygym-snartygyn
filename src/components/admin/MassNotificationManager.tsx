@@ -8,9 +8,8 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Send, Users, Loader2, Clock, Zap, Bell, TestTube } from "lucide-react";
+import { Send, Users, Loader2, Clock, Zap, Bell } from "lucide-react";
 import { ScheduledNotificationsManager } from "./ScheduledNotificationsManager";
-import { sendPushNotification } from "@/utils/notificationUtils";
 
 interface Template {
   id: string;
@@ -23,7 +22,6 @@ interface Template {
 export function MassNotificationManager() {
   const { toast } = useToast();
   const [loading, setLoading] = useState(false);
-  const [testingPush, setTestingPush] = useState(false);
   const [recipientFilter, setRecipientFilter] = useState<string>("all");
   const [notificationType, setNotificationType] = useState<string>("");
   const [editableSubject, setEditableSubject] = useState("");
@@ -133,63 +131,6 @@ export function MassNotificationManager() {
     }
   };
 
-  const handleTestPushNotification = async () => {
-    console.log('[MassNotificationManager] Testing push notification');
-    setTestingPush(true);
-    
-    try {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) {
-        toast({
-          title: "Error",
-          description: "You must be logged in to test notifications",
-          variant: "destructive"
-        });
-        return;
-      }
-
-      // Check if user has active push subscription
-      const { data: subscription } = await supabase
-        .from('push_subscriptions')
-        .select('is_active')
-        .eq('user_id', user.id)
-        .eq('is_active', true)
-        .maybeSingle();
-
-      if (!subscription) {
-        toast({
-          title: "No Push Subscription",
-          description: "You need to enable push notifications in your profile first. Go to Profile Settings → Notifications.",
-          variant: "destructive"
-        });
-        return;
-      }
-
-      // Send test notification
-      console.log('[MassNotificationManager] Sending test push to user:', user.id);
-      await sendPushNotification(
-        user.id,
-        "Test Notification from SmartyGym",
-        "If you see this, push notifications are working perfectly! 🎉",
-        "/userdashboard"
-      );
-
-      toast({
-        title: "Test Notification Sent",
-        description: "Check your device for the push notification. If you don't see it, check browser notification permissions.",
-      });
-    } catch (error) {
-      console.error('[MassNotificationManager] Error testing push:', error);
-      toast({
-        title: "Test Failed",
-        description: error instanceof Error ? error.message : "Failed to send test notification",
-        variant: "destructive"
-      });
-    } finally {
-      setTestingPush(false);
-    }
-  };
-
   return (
     <div className="pt-6 space-y-6">
       <Tabs defaultValue="instant" className="w-full">
@@ -205,49 +146,6 @@ export function MassNotificationManager() {
         </TabsList>
 
         <TabsContent value="instant" className="mt-6 space-y-6">
-          {/* Test Push Notification Card */}
-          <Card className="border-blue-200 bg-blue-50/50 dark:bg-blue-950/20 dark:border-blue-800">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2 text-blue-700 dark:text-blue-400">
-                <TestTube className="h-5 w-5" />
-                Test Push Notifications
-              </CardTitle>
-              <CardDescription className="text-blue-600 dark:text-blue-300">
-                Test if push notifications are working properly. This will send a test notification to your device.
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-3">
-                <p className="text-sm text-muted-foreground">
-                  Before testing:
-                </p>
-                <ul className="text-sm text-muted-foreground list-disc list-inside space-y-1">
-                  <li>Make sure you've enabled push notifications in your Profile Settings</li>
-                  <li>Check that your browser allows notifications</li>
-                  <li>The test will be sent to your currently logged in account</li>
-                </ul>
-                <Button 
-                  onClick={handleTestPushNotification}
-                  disabled={testingPush}
-                  variant="outline"
-                  className="border-blue-500 text-blue-700 hover:bg-blue-100 dark:text-blue-400 dark:hover:bg-blue-950"
-                >
-                  {testingPush ? (
-                    <>
-                      <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                      Sending Test...
-                    </>
-                  ) : (
-                    <>
-                      <Bell className="h-4 w-4 mr-2" />
-                      Send Test Notification to Me
-                    </>
-                  )}
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
-
           {/* Mass Notification Card */}
           <Card>
             <CardHeader>

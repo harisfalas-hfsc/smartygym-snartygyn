@@ -7,7 +7,6 @@ import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { Bell, Mail, TrendingUp, Calendar, Users, Trophy, Save } from "lucide-react";
 import { toast } from "sonner";
-import { PushNotificationSetup } from "./PushNotificationSetup";
 
 interface NotificationPrefs {
   workout_reminders: boolean;
@@ -117,9 +116,6 @@ export function NotificationPreferences() {
 
   return (
     <div className="space-y-6">
-      {/* Push Notification Setup */}
-      <PushNotificationSetup />
-
       {/* Email and In-App Preferences */}
       <Card>
         <CardHeader>
