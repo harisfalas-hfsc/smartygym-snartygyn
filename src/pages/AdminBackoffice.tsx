@@ -25,6 +25,7 @@ export default function AdminBackoffice() {
   const navigate = useNavigate();
   const { isAdmin, loading } = useAdminRole();
   const [activeTab, setActiveTab] = useState("content");
+  const [contentInnerTab, setContentInnerTab] = useState("workouts");
   const [showWorkoutDialog, setShowWorkoutDialog] = useState(false);
   const [showProgramDialog, setShowProgramDialog] = useState(false);
   const [newContactCount, setNewContactCount] = useState(0);
@@ -150,6 +151,7 @@ export default function AdminBackoffice() {
                 <DropdownMenuItem 
                   onClick={() => {
                     setActiveTab("content");
+                    setContentInnerTab("programs");
                     setTimeout(() => setShowProgramDialog(true), 100);
                   }}
                   className="cursor-pointer"
@@ -241,6 +243,7 @@ export default function AdminBackoffice() {
                 setExternalWorkoutDialog={setShowWorkoutDialog}
                 externalProgramDialog={showProgramDialog}
                 setExternalProgramDialog={setShowProgramDialog}
+                activeInnerTab={contentInnerTab}
               />
             </TabsContent>
 

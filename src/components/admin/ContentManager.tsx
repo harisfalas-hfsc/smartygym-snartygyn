@@ -1,3 +1,4 @@
+import { useState, useEffect } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { WorkoutsManager } from "./WorkoutsManager";
@@ -9,6 +10,7 @@ interface ContentManagerProps {
   setExternalWorkoutDialog?: (value: boolean) => void;
   externalProgramDialog?: boolean;
   setExternalProgramDialog?: (value: boolean) => void;
+  activeInnerTab?: string;
 }
 
 export const ContentManager = ({
@@ -16,7 +18,16 @@ export const ContentManager = ({
   setExternalWorkoutDialog,
   externalProgramDialog,
   setExternalProgramDialog,
+  activeInnerTab,
 }: ContentManagerProps) => {
+  const [innerTab, setInnerTab] = useState(activeInnerTab || "workouts");
+
+  useEffect(() => {
+    if (activeInnerTab) {
+      setInnerTab(activeInnerTab);
+    }
+  }, [activeInnerTab]);
+
   return (
     <Card>
       <CardHeader>
@@ -29,7 +40,7 @@ export const ContentManager = ({
         </CardDescription>
       </CardHeader>
       <CardContent>
-        <Tabs defaultValue="workouts" className="w-full">
+        <Tabs value={innerTab} onValueChange={setInnerTab} className="w-full">
           <TabsList className="grid w-full grid-cols-2">
             <TabsTrigger value="workouts" className="flex items-center gap-2">
               <Dumbbell className="w-4 h-4" />
