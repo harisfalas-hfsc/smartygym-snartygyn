@@ -111,7 +111,9 @@ const CoachProfile = () => {
                 />
               </div>
               <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-4">Meet Haris Falas</h1>
-              <p className="text-base sm:text-lg text-muted-foreground">Strength and Conditioning Coach and Founder of SmartyGym</p>
+              <p className="text-base sm:text-lg text-muted-foreground">
+                Strength and Conditioning Coach® and Founder of <span className="text-primary font-semibold">SmartyGym</span>
+              </p>
             </header>
 
             {/* Main Content Card */}
@@ -229,7 +231,7 @@ const CoachProfile = () => {
 
                     <p className="font-bold text-foreground pt-1">We are pioneering human performance.</p>
 
-                    <p className="font-bold text-foreground pt-1">At <span className="font-bold">SmartyGym</span>, our mission is clear.</p>
+                    <p className="font-bold text-foreground pt-1">At <span className="font-bold text-primary">SmartyGym</span>, our mission is clear.</p>
 
                     <p className="font-bold text-primary">We are here to empower you and improve your performance.</p>
                   </div>
