@@ -149,7 +149,7 @@ export const PushNotificationSetup = () => {
           browser_info: navigator.userAgent,
           is_active: true
         }, {
-          onConflict: 'user_id'
+          onConflict: 'user_id,device_type'
         });
 
       if (upsertError) {
