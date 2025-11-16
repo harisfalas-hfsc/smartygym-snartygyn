@@ -21,7 +21,10 @@ import {
   ArrowLeft,
   Calculator,
   ShoppingBag,
-  MessageSquare
+  MessageSquare,
+  Loader2,
+  RefreshCw,
+  ExternalLink
 } from "lucide-react";
 
 interface WorkoutInteraction {
@@ -539,160 +542,149 @@ export default function UserDashboard() {
 
         {/* Subscription Info */}
         {subscriptionInfo && (
-          <Card className="mb-8 border-primary/50 bg-gradient-to-r from-primary/5 to-primary/10">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
+          <Card className="mb-6 border-primary/50 bg-gradient-to-r from-primary/5 to-primary/10">
+            <CardHeader className="pb-3">
+              <CardTitle className="flex items-center gap-2 text-lg">
                 <Crown className="h-5 w-5 text-primary" />
                 Your {subscriptionInfo.subscribed ? getPlanName(subscriptionInfo.product_id) : 'Free'} Membership
               </CardTitle>
             </CardHeader>
-            <CardContent>
-              <div className="flex flex-col gap-4">
-                {/* Plan Status Row */}
-                <div className="flex flex-wrap items-center gap-2">
-                  <span className="text-lg font-bold">{getPlanName(subscriptionInfo.product_id)} Plan</span>
-                  {subscriptionInfo.subscribed && (
-                    <>
-                      <span className="text-muted-foreground">•</span>
-                      <Badge variant="outline" className="text-xs bg-gradient-to-r from-yellow-500/20 to-amber-500/20 text-yellow-600 dark:text-yellow-400 border-yellow-500/30">
-                        <Crown className="h-3 w-3 mr-1" />
-                        Premium Member
-                      </Badge>
-                      <span className="text-muted-foreground">•</span>
-                      <Badge variant="outline" className="text-xs bg-green-500/10 text-green-600 dark:text-green-400 border-green-500/20">
-                        Active Subscription
-                      </Badge>
-                      {stripeDetails?.cancel_at_period_end && (
-                        <>
-                          <span className="text-muted-foreground">•</span>
-                          <Badge variant="outline" className="text-xs bg-orange-500/10 text-orange-600 dark:text-orange-400 border-orange-500/20">
-                            Cancels at period end
-                          </Badge>
-                        </>
-                      )}
-                    </>
-                  )}
-                </div>
-
-                {/* Free Plan - Upgrade Button */}
-                {!subscriptionInfo.subscribed && (
-                  <div className="space-y-2">
+            <CardContent className="p-4">
+              {/* Free Plan - Simple Layout */}
+              {!subscriptionInfo.subscribed && (
+                <div className="space-y-3">
+                  <div>
+                    <h3 className="text-base font-bold mb-1">Free Plan</h3>
                     <p className="text-sm text-muted-foreground">
                       You're currently on the free plan with limited access.
                     </p>
-                    <Button onClick={() => navigate("/premiumbenefits")} className="w-full sm:w-auto">
-                      Upgrade Now
-                    </Button>
                   </div>
-                )}
+                  <Button onClick={() => navigate("/premiumbenefits")} className="w-full sm:w-auto">
+                    Upgrade Now
+                  </Button>
+                </div>
+              )}
 
-                {/* Premium Plan Details */}
-                {subscriptionInfo.subscribed && (
-                  <>
-                    {/* Subscription Details - 3 Column Grid */}
-                    {subscriptionInfo.subscription_end ? (
-                      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 p-3 bg-background/50 rounded-lg border border-border/50">
-                        <div>
-                          <p className="text-xs text-muted-foreground mb-0.5">
-                            {stripeDetails?.cancel_at_period_end ? "Expires On" : "Next Billing"}
-                          </p>
-                          <p className="text-sm font-semibold">{formatDate(subscriptionInfo.subscription_end)}</p>
+              {/* Premium Plan - Two Column Layout */}
+              {subscriptionInfo.subscribed && (
+                <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
+                  {/* LEFT COLUMN - Plan Info & Actions */}
+                  <div className="col-span-1 md:col-span-2 space-y-3">
+                    {/* Plan Status */}
+                    <div className="space-y-1">
+                      <h3 className="text-base font-bold">{getPlanName(subscriptionInfo.product_id)} Plan</h3>
+                      <div className="flex flex-wrap gap-1.5">
+                        <Badge variant="outline" className="text-xs h-5 px-1.5 bg-gradient-to-r from-yellow-500/20 to-amber-500/20 text-yellow-600 dark:text-yellow-400 border-yellow-500/30">
+                          <Crown className="h-3 w-3 mr-1" />
+                          Premium Member
+                        </Badge>
+                        <Badge variant="outline" className="text-xs h-5 px-1.5 bg-green-500/10 text-green-600 dark:text-green-400 border-green-500/20">
+                          Active
+                        </Badge>
+                        {stripeDetails?.cancel_at_period_end && (
+                          <Badge variant="outline" className="text-xs h-5 px-1.5 bg-orange-500/10 text-orange-600 dark:text-orange-400 border-orange-500/20">
+                            Cancels at period end
+                          </Badge>
+                        )}
+                      </div>
+                    </div>
+
+                    {/* Subscription Details */}
+                    {subscriptionInfo.subscription_end && (
+                      <div className="space-y-1 text-sm">
+                        <div className="flex justify-between">
+                          <span className="text-muted-foreground">
+                            {stripeDetails?.cancel_at_period_end ? "Expires:" : "Next Billing:"}
+                          </span>
+                          <span className="font-medium">{formatDate(subscriptionInfo.subscription_end)}</span>
                         </div>
-                        
                         {getDaysRemaining() !== null && (
-                          <div>
-                            <p className="text-xs text-muted-foreground mb-0.5">Days Remaining</p>
-                            <p className="text-sm font-semibold text-primary">{getDaysRemaining()} days</p>
+                          <div className="flex justify-between">
+                            <span className="text-muted-foreground">Days Left:</span>
+                            <span className="font-medium text-primary">{getDaysRemaining()} days</span>
                           </div>
                         )}
-                        
-                        <div>
-                          <p className="text-xs text-muted-foreground mb-0.5">Billing Type</p>
-                          <p className="text-sm font-semibold">
+                        <div className="flex justify-between">
+                          <span className="text-muted-foreground">Billing:</span>
+                          <span className="font-medium">
                             {stripeDetails?.cancel_at_period_end ? "One-time" : "Auto-renewing"}
-                          </p>
+                          </span>
                         </div>
-                      </div>
-                    ) : (
-                      <div className="p-3 bg-background/50 rounded-lg border border-border/50">
-                        <p className="text-sm text-muted-foreground">
-                          Your subscription is active. Refresh to see billing details.
-                        </p>
                       </div>
                     )}
 
                     {/* Action Buttons */}
-                    <div className="flex flex-col sm:flex-row gap-2">
-                      <Button 
+                    <div className="flex gap-2 pt-1">
+                      <Button
                         onClick={handleRefreshSubscription}
                         disabled={loading}
                         variant="outline"
-                        className="flex-1"
-                        size="sm"
+                        className="h-7 px-2 text-xs"
                       >
-                        {loading ? "Refreshing..." : "Refresh Status"}
+                        {loading ? (
+                          <Loader2 className="h-3 w-3 animate-spin" />
+                        ) : (
+                          <>
+                            <RefreshCw className="h-3 w-3 mr-1" />
+                            Refresh
+                          </>
+                        )}
                       </Button>
-                      <Button 
+                      <Button
                         onClick={handleManageSubscription}
                         disabled={managingSubscription}
-                        className="flex-1"
-                        size="sm"
+                        className="h-7 px-2 text-xs"
                       >
-                        {managingSubscription ? "Opening..." : "Manage Subscription"}
+                        {managingSubscription ? (
+                          <Loader2 className="h-3 w-3 animate-spin" />
+                        ) : (
+                          <>
+                            <ExternalLink className="h-3 w-3 mr-1" />
+                            Manage
+                          </>
+                        )}
                       </Button>
                     </div>
+                  </div>
 
-                    {/* Divider */}
-                    <div className="relative my-2">
-                      <div className="absolute inset-0 flex items-center">
-                        <span className="w-full border-t border-border" />
+                  {/* RIGHT COLUMN - Membership Benefits */}
+                  <div className="col-span-1 md:col-span-3 bg-gradient-to-br from-primary/5 to-primary/10 rounded-lg p-3 border border-primary/20">
+                    <h4 className="text-xs font-semibold uppercase text-muted-foreground mb-2 tracking-wide">
+                      Membership Benefits
+                    </h4>
+                    <div className="space-y-1.5">
+                      <div className="flex items-center gap-2">
+                        <CheckCircle className="h-4 w-4 text-green-500 flex-shrink-0" />
+                        <span className="text-sm font-medium">100+ Premium Workouts</span>
                       </div>
-                      <div className="relative flex justify-center text-xs uppercase">
-                        <span className="bg-card px-2 text-muted-foreground">Membership Benefits</span>
+                      <div className="flex items-center gap-2">
+                        <CheckCircle className="h-4 w-4 text-green-500 flex-shrink-0" />
+                        <span className="text-sm font-medium">Training Programs</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <CheckCircle className="h-4 w-4 text-green-500 flex-shrink-0" />
+                        <span className="text-sm font-medium">Progress Tracking</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <CheckCircle className="h-4 w-4 text-green-500 flex-shrink-0" />
+                        <span className="text-sm font-medium">Fitness Calculators</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <CheckCircle className="h-4 w-4 text-green-500 flex-shrink-0" />
+                        <span className="text-sm font-medium">Exercise Library</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <CheckCircle className="h-4 w-4 text-green-500 flex-shrink-0" />
+                        <span className="text-sm font-medium">Premium Support</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <CheckCircle className="h-4 w-4 text-green-500 flex-shrink-0" />
+                        <span className="text-sm font-medium">Ad-Free Experience</span>
                       </div>
                     </div>
-
-                    {/* Benefits Checklist - 2 Column Grid */}
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                      <div className="flex items-center gap-2">
-                        <CheckCircle className="h-4 w-4 text-green-500 flex-shrink-0" />
-                        <span className="text-sm">100+ Premium Workouts</span>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <CheckCircle className="h-4 w-4 text-green-500 flex-shrink-0" />
-                        <span className="text-sm">Training Programs</span>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <CheckCircle className="h-4 w-4 text-green-500 flex-shrink-0" />
-                        <span className="text-sm">Progress Tracking</span>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <CheckCircle className="h-4 w-4 text-green-500 flex-shrink-0" />
-                        <span className="text-sm">Fitness Calculators</span>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <CheckCircle className="h-4 w-4 text-green-500 flex-shrink-0" />
-                        <span className="text-sm">Exercise Library</span>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <CheckCircle className="h-4 w-4 text-green-500 flex-shrink-0" />
-                        <span className="text-sm">Premium Support</span>
-                      </div>
-                      <div className="flex items-center gap-2 sm:col-span-2">
-                        <CheckCircle className="h-4 w-4 text-green-500 flex-shrink-0" />
-                        <span className="text-sm">Ad-Free Experience</span>
-                      </div>
-                    </div>
-
-                    {/* Optional Note */}
-                    {stripeDetails?.cancel_at_period_end && (
-                      <p className="text-xs text-muted-foreground mt-2">
-                        Your subscription will end on the expiration date. You can reactivate anytime before then.
-                      </p>
-                    )}
-                  </>
-                )}
-              </div>
+                  </div>
+                </div>
+              )}
             </CardContent>
           </Card>
         )}
