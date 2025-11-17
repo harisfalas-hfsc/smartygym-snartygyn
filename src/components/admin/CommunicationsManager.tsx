@@ -3,7 +3,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { AutomatedMessagesManager } from "./AutomatedMessagesManager";
 import { ScheduledNotificationsManager } from "./ScheduledNotificationsManager";
 import { MassNotificationManager } from "./MassNotificationManager";
-import { MessageSquare, Calendar, Bell } from "lucide-react";
+import { TestMessageSender } from "./TestMessageSender";
+import { MessageSquare, Calendar, Bell, Send } from "lucide-react";
 
 export const CommunicationsManager = () => {
   return (
@@ -19,7 +20,7 @@ export const CommunicationsManager = () => {
       </CardHeader>
       <CardContent>
         <Tabs defaultValue="automated" className="w-full">
-          <TabsList className="grid w-full grid-cols-3">
+          <TabsList className="grid w-full grid-cols-4">
             <TabsTrigger value="automated" className="flex items-center gap-2">
               <MessageSquare className="w-4 h-4" />
               Automated Messages
@@ -31,6 +32,10 @@ export const CommunicationsManager = () => {
             <TabsTrigger value="mass" className="flex items-center gap-2">
               <Bell className="w-4 h-4" />
               Mass Notifications
+            </TabsTrigger>
+            <TabsTrigger value="test" className="flex items-center gap-2">
+              <Send className="w-4 h-4" />
+              Test Messages
             </TabsTrigger>
           </TabsList>
           
@@ -44,6 +49,10 @@ export const CommunicationsManager = () => {
           
           <TabsContent value="mass">
             <MassNotificationManager />
+          </TabsContent>
+          
+          <TabsContent value="test">
+            <TestMessageSender />
           </TabsContent>
         </Tabs>
       </CardContent>
