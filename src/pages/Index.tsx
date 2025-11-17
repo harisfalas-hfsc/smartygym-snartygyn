@@ -476,91 +476,6 @@ const Index = () => {
                       </DropdownMenuContent>
                     </DropdownMenu>
                   </div>
-
-                  {/* Feature Highlights Grid */}
-                  <div className="border-t border-primary/20 pt-6">
-                    <div className="grid grid-cols-2 md:grid-cols-3 gap-4 sm:gap-6">
-                      
-                      {/* Workouts */}
-                      <Card className="p-3 sm:p-4 hover:shadow-md transition-all cursor-pointer border-primary/30" onClick={() => navigate("/workout-flow")}>
-                        <div className="flex flex-col items-center text-center space-y-2">
-                          <div className="p-2 rounded-full bg-primary/10">
-                            <Dumbbell className="w-5 h-5 sm:w-6 sm:h-6 text-primary" />
-                          </div>
-                          <h3 className="font-semibold text-xs sm:text-sm">Workouts</h3>
-                          <p className="text-[10px] sm:text-xs text-muted-foreground leading-tight">
-                            Expert-designed workouts
-                          </p>
-                        </div>
-                      </Card>
-
-                      {/* Training Programs */}
-                      <Card className="p-3 sm:p-4 hover:shadow-md transition-all cursor-pointer border-primary/30" onClick={() => navigate("/training-program-flow")}>
-                        <div className="flex flex-col items-center text-center space-y-2">
-                          <div className="p-2 rounded-full bg-primary/10">
-                            <BookOpen className="w-5 h-5 sm:w-6 sm:h-6 text-primary" />
-                          </div>
-                          <h3 className="font-semibold text-xs sm:text-sm">Programs</h3>
-                          <p className="text-[10px] sm:text-xs text-muted-foreground leading-tight">
-                            Structured training plans
-                          </p>
-                        </div>
-                      </Card>
-
-                      {/* Exercise Library */}
-                      <Card className="p-3 sm:p-4 hover:shadow-md transition-all cursor-pointer border-primary/30" onClick={() => navigate("/exercise-library")}>
-                        <div className="flex flex-col items-center text-center space-y-2">
-                          <div className="p-2 rounded-full bg-primary/10">
-                            <Video className="w-5 h-5 sm:w-6 sm:h-6 text-primary" />
-                          </div>
-                          <h3 className="font-semibold text-xs sm:text-sm">Exercises</h3>
-                          <p className="text-[10px] sm:text-xs text-muted-foreground leading-tight">
-                            Video tutorials
-                          </p>
-                        </div>
-                      </Card>
-
-                      {/* 1RM Calculator */}
-                      <Card className="p-3 sm:p-4 hover:shadow-md transition-all cursor-pointer border-primary/30" onClick={() => navigate("/onerm-calculator")}>
-                        <div className="flex flex-col items-center text-center space-y-2">
-                          <div className="p-2 rounded-full bg-primary/10">
-                            <Calculator className="w-5 h-5 sm:w-6 sm:h-6 text-primary" />
-                          </div>
-                          <h3 className="font-semibold text-xs sm:text-sm">1RM Calc</h3>
-                          <p className="text-[10px] sm:text-xs text-muted-foreground leading-tight">
-                            Track strength
-                          </p>
-                        </div>
-                      </Card>
-
-                      {/* BMR Calculator */}
-                      <Card className="p-3 sm:p-4 hover:shadow-md transition-all cursor-pointer border-primary/30" onClick={() => navigate("/bmr-calculator")}>
-                        <div className="flex flex-col items-center text-center space-y-2">
-                          <div className="p-2 rounded-full bg-primary/10">
-                            <Flame className="w-5 h-5 sm:w-6 sm:h-6 text-primary" />
-                          </div>
-                          <h3 className="font-semibold text-xs sm:text-sm">BMR Calc</h3>
-                          <p className="text-[10px] sm:text-xs text-muted-foreground leading-tight">
-                            Calorie needs
-                          </p>
-                        </div>
-                      </Card>
-
-                      {/* Macro Calculator */}
-                      <Card className="p-3 sm:p-4 hover:shadow-md transition-all cursor-pointer border-primary/30" onClick={() => navigate("/macro-tracking-calculator")}>
-                        <div className="flex flex-col items-center text-center space-y-2">
-                          <div className="p-2 rounded-full bg-primary/10">
-                            <Target className="w-5 h-5 sm:w-6 sm:h-6 text-primary" />
-                          </div>
-                          <h3 className="font-semibold text-xs sm:text-sm">Macros</h3>
-                          <p className="text-[10px] sm:text-xs text-muted-foreground leading-tight">
-                            Nutrition goals
-                          </p>
-                        </div>
-                      </Card>
-
-                    </div>
-                  </div>
                 </div>
               </Card>
             </ScrollReveal>
@@ -574,6 +489,20 @@ const Index = () => {
           <div className="text-center mb-8 px-4">
             
             
+          </div>
+
+          {/* Services Grid */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 mb-8">
+            {services.map((service) => (
+              <ScrollReveal key={service.id}>
+                <ServiceCard 
+                  icon={service.icon} 
+                  title={service.title} 
+                  description={service.description} 
+                  onClick={() => handleServiceSelect(service.id)} 
+                />
+              </ScrollReveal>
+            ))}
           </div>
 
           {/* CTA Section */}
