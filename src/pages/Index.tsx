@@ -603,9 +603,6 @@ const Index = () => {
 
                         {/* Pricing Plans */}
                         <div className="border-t border-primary/20 pt-6 mt-6">
-                          <h3 className="text-lg sm:text-xl font-semibold text-center mb-2">
-                            Available Worldwide – All Prices in Euro (€)
-                          </h3>
                           <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 mt-4">
                             {/* Gold Plan */}
                             <Card className="relative border-2 border-amber-500 shadow-lg flex flex-col">
