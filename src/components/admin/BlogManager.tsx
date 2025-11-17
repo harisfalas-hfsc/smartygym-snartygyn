@@ -4,7 +4,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
-import { Plus, Search, Pencil, Trash2, Eye, EyeOff, AlertTriangle, CheckCircle, Calendar, Clock, ExternalLink } from "lucide-react";
+import { Plus, Search, Pencil, Trash2, Download, AlertTriangle, CheckCircle, Calendar, Clock, ExternalLink } from "lucide-react";
 import { toast } from "sonner";
 import { ArticleEditDialog } from "./ArticleEditDialog";
 import {
@@ -141,36 +141,28 @@ export function BlogManager() {
     }
   };
 
-  const togglePublished = async (article: any) => {
-    try {
-      const newPublishedState = !article.is_published;
-      const updateData: any = {
-        is_published: newPublishedState,
-      };
-      
-      // Only set published_at when publishing (not when unpublishing)
-      if (newPublishedState) {
-        updateData.published_at = new Date().toISOString();
-      } else {
-        updateData.published_at = null;
-      }
+  const handleExport = () => {
+    const csv = [
+      ['ID', 'Slug', 'Title', 'Category', 'Author', 'Status', 'Published Date', 'Read Time'].join(','),
+      ...filteredArticles.map(article => [
+        article.id,
+        article.slug,
+        `"${article.title}"`,
+        article.category,
+        article.author_name || 'N/A',
+        article.is_published ? 'Published' : 'Draft',
+        article.published_at ? new Date(article.published_at).toLocaleDateString() : 'N/A',
+        article.read_time || 'N/A'
+      ].join(','))
+    ].join('\n');
 
-      const { error } = await supabase
-        .from('blog_articles')
-        .update(updateData)
-        .eq('id', article.id);
-
-      if (error) {
-        console.error('Toggle publish error:', error);
-        throw error;
-      }
-
-      toast.success(`Article ${newPublishedState ? 'published' : 'unpublished'} successfully`);
-      fetchArticles();
-    } catch (error: any) {
-      console.error('Error toggling publish status:', error);
-      toast.error(`Failed to ${article.is_published ? 'unpublish' : 'publish'} article: ${error.message || 'Unknown error'}`);
-    }
+    const blob = new Blob([csv], { type: 'text/csv' });
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `blog-articles-${new Date().toISOString().split('T')[0]}.csv`;
+    a.click();
+    window.URL.revokeObjectURL(url);
   };
 
   const getCategoryColor = (category: string) => {
@@ -195,18 +187,24 @@ export function BlogManager() {
   return (
     <div className="pt-6">
       <Card>
-        <CardHeader>
-          <div className="flex items-center justify-between">
-            <div>
-              <CardTitle>Blog Articles</CardTitle>
-              <CardDescription>Manage your blog content across all categories</CardDescription>
-            </div>
+      <CardHeader>
+        <div className="flex items-center justify-between">
+          <div>
+            <CardTitle>Blog Articles</CardTitle>
+            <CardDescription>Manage your blog content across all categories</CardDescription>
+          </div>
+          <div className="flex gap-2">
+            <Button variant="outline" size="sm" onClick={handleExport} className="gap-2">
+              <Download className="h-4 w-4" />
+              Export
+            </Button>
             <Button onClick={handleCreate} className="gap-2">
               <Plus className="h-4 w-4" />
               New Article
             </Button>
           </div>
-        </CardHeader>
+        </div>
+      </CardHeader>
         <CardContent>
           <div className="mb-6">
             <div className="relative">
@@ -275,7 +273,7 @@ export function BlogManager() {
                                   {article.category}
                                 </Badge>
                                 <Badge variant="secondary" className="gap-1">
-                                  <EyeOff className="h-3 w-3" />
+                                  <AlertTriangle className="h-3 w-3" />
                                   Draft
                                 </Badge>
                               </>
@@ -321,24 +319,6 @@ export function BlogManager() {
                         </div>
                       </div>
                       <div className="flex gap-2 flex-wrap sm:flex-nowrap">
-                        <Button
-                          size="sm"
-                          variant="ghost"
-                          onClick={() => togglePublished(article)}
-                          className="flex-1 sm:flex-none"
-                        >
-                          {article.is_published ? (
-                            <>
-                              <EyeOff className="h-4 w-4 sm:mr-0" />
-                              <span className="sm:hidden ml-2">Unpublish</span>
-                            </>
-                          ) : (
-                            <>
-                              <Eye className="h-4 w-4 sm:mr-0" />
-                              <span className="sm:hidden ml-2">Publish</span>
-                            </>
-                          )}
-                        </Button>
                   <Button
                     size="sm"
                     variant="ghost"
