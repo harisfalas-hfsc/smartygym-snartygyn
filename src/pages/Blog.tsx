@@ -13,6 +13,7 @@ import { Link } from "react-router-dom";
 
 interface Article {
   id: string;
+  slug: string;
   title: string;
   excerpt: string;
   image: string;
@@ -25,6 +26,7 @@ interface Article {
 const articles: Article[] = [
   {
     id: "1",
+    slug: "building-muscle-complete-guide",
     title: "Building Muscle: The Complete Guide",
     excerpt: "Everything you need to know about gaining muscle mass effectively",
     image: "https://images.unsplash.com/photo-1581009146145-b5ef050c2e1e?auto=format&fit=crop&q=80&w=800",
@@ -34,6 +36,7 @@ const articles: Article[] = [
   },
   {
     id: "2",
+    slug: "hiit-vs-steady-state-cardio",
     title: "HIIT vs Steady State Cardio",
     excerpt: "Which cardio method is best for your fitness goals?",
     image: "https://images.unsplash.com/photo-1538805060514-97d9cc17730c?auto=format&fit=crop&q=80&w=800",
@@ -43,6 +46,7 @@ const articles: Article[] = [
   },
   {
     id: "3",
+    slug: "perfect-form-squat-technique",
     title: "Perfect Form: Squat Technique",
     excerpt: "Master the king of all exercises with proper technique",
     image: "https://images.unsplash.com/photo-1574680096145-d05b474e2155?auto=format&fit=crop&q=80&w=800",
@@ -52,6 +56,7 @@ const articles: Article[] = [
   },
   {
     id: "4",
+    slug: "recovery-strategies-athletes",
     title: "Recovery Strategies for Athletes",
     excerpt: "Optimize your recovery to maximize performance gains",
     image: "https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?auto=format&fit=crop&q=80&w=800",
@@ -61,6 +66,7 @@ const articles: Article[] = [
   },
   {
     id: "5",
+    slug: "nutrition-timing-performance",
     title: "Nutrition Timing for Performance",
     excerpt: "When to eat for optimal training results",
     image: "https://images.unsplash.com/photo-1490645935967-10de6ba17061?auto=format&fit=crop&q=80&w=800",
@@ -70,6 +76,7 @@ const articles: Article[] = [
   },
   {
     id: "16",
+    slug: "creatine-performance-supplement",
     title: "Creatine: The Ultimate Performance Supplement",
     excerpt: "Science-backed benefits and how to use creatine effectively",
     image: "https://images.unsplash.com/photo-1579722821273-0f6c7d44362f?auto=format&fit=crop&q=80&w=800",
@@ -79,6 +86,7 @@ const articles: Article[] = [
   },
   {
     id: "17",
+    slug: "training-frequency-optimal-schedule",
     title: "Training Frequency: Finding Your Optimal Schedule",
     excerpt: "How often should you train for maximum results?",
     image: "https://images.unsplash.com/photo-1517836357463-d25dfeac3438?auto=format&fit=crop&q=80&w=800",
@@ -110,6 +118,7 @@ const Blog = () => {
         if (data && data.length > 0) {
           const formattedArticles: Article[] = data.map((article: any) => ({
             id: article.id,
+            slug: article.slug,
             title: article.title,
             excerpt: article.excerpt,
             image: article.image_url || 'https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?auto=format&fit=crop&q=80&w=800',
@@ -254,7 +263,7 @@ const Blog = () => {
                 itemScope
                 itemType="https://schema.org/BlogPosting"
                 className="overflow-hidden cursor-pointer transition-all duration-300 hover:scale-105 hover:shadow-lg"
-                onClick={() => navigate(`/article/${article.id}`)}
+                onClick={() => navigate(`/blog/${article.slug}`)}
                 data-article-id={article.id}
                 data-keywords="smarty gym blog, online fitness tips, smartygym.com, Haris Falas Cyprus, online gym advice"
                 aria-label={`${article.title} - SmartyGym Cyprus blog - Online fitness at smartygym.com`}

@@ -4,7 +4,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
-import { Plus, Search, Pencil, Trash2, Eye, EyeOff, AlertTriangle, CheckCircle, Calendar, Clock } from "lucide-react";
+import { Plus, Search, Pencil, Trash2, Eye, EyeOff, AlertTriangle, CheckCircle, Calendar, Clock, ExternalLink } from "lucide-react";
 import { toast } from "sonner";
 import { ArticleEditDialog } from "./ArticleEditDialog";
 import {
@@ -143,21 +143,33 @@ export function BlogManager() {
 
   const togglePublished = async (article: any) => {
     try {
+      const newPublishedState = !article.is_published;
+      const updateData: any = {
+        is_published: newPublishedState,
+      };
+      
+      // Only set published_at when publishing (not when unpublishing)
+      if (newPublishedState) {
+        updateData.published_at = new Date().toISOString();
+      } else {
+        updateData.published_at = null;
+      }
+
       const { error } = await supabase
         .from('blog_articles')
-        .update({
-          is_published: !article.is_published,
-          published_at: !article.is_published ? new Date().toISOString() : null,
-        })
+        .update(updateData)
         .eq('id', article.id);
 
-      if (error) throw error;
+      if (error) {
+        console.error('Toggle publish error:', error);
+        throw error;
+      }
 
-      toast.success(`Article ${!article.is_published ? 'published' : 'unpublished'} successfully`);
+      toast.success(`Article ${newPublishedState ? 'published' : 'unpublished'} successfully`);
       fetchArticles();
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error toggling publish status:', error);
-      toast.error("Failed to update article status");
+      toast.error(`Failed to ${article.is_published ? 'unpublish' : 'publish'} article: ${error.message || 'Unknown error'}`);
     }
   };
 
@@ -327,16 +339,16 @@ export function BlogManager() {
                             </>
                           )}
                         </Button>
-                        <Button
-                          size="sm"
-                          variant="ghost"
-                          onClick={() => window.open(`/blog/${article.slug}`, '_blank')}
-                          disabled={!article.is_published}
-                          className="flex-1 sm:flex-none"
-                        >
-                          <Eye className="h-4 w-4 sm:mr-0" />
-                          <span className="sm:hidden ml-2">Preview</span>
-                        </Button>
+                  <Button
+                    size="sm"
+                    variant="ghost"
+                    onClick={() => window.open(`/blog/${article.slug}`, '_blank')}
+                    disabled={!article.is_published}
+                    className="flex-1 sm:flex-none"
+                  >
+                    <ExternalLink className="h-4 w-4 sm:mr-0" />
+                    <span className="sm:hidden ml-2">Preview</span>
+                  </Button>
                         <Button
                           size="sm"
                           variant="ghost"
