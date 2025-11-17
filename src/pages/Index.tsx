@@ -353,13 +353,13 @@ const Index = () => {
         </script>
       </Helmet>
       
-      <div className="min-h-screen bg-background">
+      <div className="min-h-screen bg-background overflow-x-hidden">
         <BackToTop />
         
         {/* Hero Section */}
         <section className="relative py-8 sm:py-12 px-4 border-b border-border bg-background overflow-hidden">
           
-          <div className="container mx-auto max-w-6xl relative z-10">
+          <div className="container mx-auto max-w-6xl relative z-10 overflow-x-hidden">
             <ScrollReveal>
               <Card 
                 itemScope
@@ -435,17 +435,18 @@ const Index = () => {
 
                   {/* Navigation Cards after three cards */}
                   <div className="pt-6">
-                    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3 sm:gap-4">
+                    {/* Horizontal scrollable navigation buttons */}
+                    <div className="flex overflow-x-auto gap-3 pb-2 snap-x snap-mandatory scrollbar-hide -mx-2 px-2">
                       
                       {/* Workouts Card */}
     <Button
       variant="outline"
       size="lg"
       onClick={() => navigate("/workout")}
-      className="h-auto py-2 sm:py-3 px-4 flex flex-row items-center gap-2 sm:gap-3 bg-background hover:bg-primary/10 border-2 border-primary/20 hover:border-primary transition-all"
+      className="h-auto py-2 sm:py-3 px-4 flex flex-row items-center gap-2 sm:gap-3 bg-background hover:bg-primary/10 border-2 border-primary/20 hover:border-primary transition-all min-w-[140px] sm:min-w-0 flex-shrink-0 snap-start"
     >
       <Dumbbell className="w-5 h-5 sm:w-6 sm:h-6 text-primary flex-shrink-0" />
-      <span className="font-semibold text-sm sm:text-base">Workouts</span>
+      <span className="font-semibold text-sm sm:text-base whitespace-nowrap">Workouts</span>
     </Button>
 
                       {/* Training Programs Card */}
@@ -453,10 +454,10 @@ const Index = () => {
       variant="outline"
       size="lg"
       onClick={() => navigate("/trainingprogram")}
-      className="h-auto py-2 sm:py-3 px-4 flex flex-row items-center gap-2 sm:gap-3 bg-background hover:bg-primary/10 border-2 border-primary/20 hover:border-primary transition-all"
+      className="h-auto py-2 sm:py-3 px-4 flex flex-row items-center gap-2 sm:gap-3 bg-background hover:bg-primary/10 border-2 border-primary/20 hover:border-primary transition-all min-w-[140px] sm:min-w-0 flex-shrink-0 snap-start"
     >
       <Calendar className="w-5 h-5 sm:w-6 sm:h-6 text-primary flex-shrink-0" />
-      <span className="font-semibold text-sm sm:text-base">Training Programs</span>
+      <span className="font-semibold text-sm sm:text-base whitespace-nowrap">Programs</span>
     </Button>
 
                       {/* Tools Card */}
@@ -464,10 +465,10 @@ const Index = () => {
       variant="outline"
       size="lg"
       onClick={() => navigate("/tools")}
-      className="h-auto py-2 sm:py-3 px-4 flex flex-row items-center gap-2 sm:gap-3 bg-background hover:bg-primary/10 border-2 border-primary/20 hover:border-primary transition-all"
+      className="h-auto py-2 sm:py-3 px-4 flex flex-row items-center gap-2 sm:gap-3 bg-background hover:bg-primary/10 border-2 border-primary/20 hover:border-primary transition-all min-w-[140px] sm:min-w-0 flex-shrink-0 snap-start"
     >
       <Wrench className="w-5 h-5 sm:w-6 sm:h-6 text-primary flex-shrink-0" />
-      <span className="font-semibold text-sm sm:text-base">Tools</span>
+      <span className="font-semibold text-sm sm:text-base whitespace-nowrap">Tools</span>
     </Button>
 
                       {/* Library Card */}
@@ -475,10 +476,10 @@ const Index = () => {
       variant="outline"
       size="lg"
       onClick={() => navigate("/exerciselibrary")}
-      className="h-auto py-2 sm:py-3 px-4 flex flex-row items-center gap-2 sm:gap-3 bg-background hover:bg-primary/10 border-2 border-primary/20 hover:border-primary transition-all"
+      className="h-auto py-2 sm:py-3 px-4 flex flex-row items-center gap-2 sm:gap-3 bg-background hover:bg-primary/10 border-2 border-primary/20 hover:border-primary transition-all min-w-[140px] sm:min-w-0 flex-shrink-0 snap-start"
     >
       <BookOpen className="w-5 h-5 sm:w-6 sm:h-6 text-primary flex-shrink-0" />
-      <span className="font-semibold text-sm sm:text-base">Library</span>
+      <span className="font-semibold text-sm sm:text-base whitespace-nowrap">Library</span>
     </Button>
 
                       {/* Blog Card */}
@@ -486,10 +487,10 @@ const Index = () => {
       variant="outline"
       size="lg"
       onClick={() => navigate("/blog")}
-      className="h-auto py-2 sm:py-3 px-4 flex flex-row items-center gap-2 sm:gap-3 bg-background hover:bg-primary/10 border-2 border-primary/20 hover:border-primary transition-all"
+      className="h-auto py-2 sm:py-3 px-4 flex flex-row items-center gap-2 sm:gap-3 bg-background hover:bg-primary/10 border-2 border-primary/20 hover:border-primary transition-all min-w-[140px] sm:min-w-0 flex-shrink-0 snap-start"
     >
       <FileText className="w-5 h-5 sm:w-6 sm:h-6 text-primary flex-shrink-0" />
-      <span className="font-semibold text-sm sm:text-base">Blog</span>
+      <span className="font-semibold text-sm sm:text-base whitespace-nowrap">Blog</span>
     </Button>
 
                     </div>
