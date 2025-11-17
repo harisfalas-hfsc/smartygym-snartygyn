@@ -262,7 +262,10 @@ export function BlogManager() {
                                 <Badge className={getCategoryColor(article.category)}>
                                   {article.category}
                                 </Badge>
-                                <Badge variant="outline">Draft</Badge>
+                                <Badge variant="secondary" className="gap-1">
+                                  <EyeOff className="h-3 w-3" />
+                                  Draft
+                                </Badge>
                               </>
                             )}
                             {imageStatus && !imageStatus.hasImage && (
@@ -272,7 +275,7 @@ export function BlogManager() {
                               </Badge>
                             )}
                             {imageStatus && imageStatus.hasImage && !imageStatus.isUnique && (
-                              <Badge variant="destructive" className="gap-1">
+                              <Badge variant="outline" className="border-yellow-500 text-yellow-600 dark:text-yellow-400 gap-1">
                                 <AlertTriangle className="h-3 w-3" />
                                 Duplicate
                               </Badge>
@@ -300,31 +303,42 @@ export function BlogManager() {
                           </div>
                         </div>
                       </div>
-                      <div className="flex gap-2">
+                      <div className="flex gap-2 flex-wrap sm:flex-nowrap">
                         <Button
                           size="sm"
                           variant="ghost"
                           onClick={() => togglePublished(article)}
+                          className="flex-1 sm:flex-none"
                         >
                           {article.is_published ? (
-                            <EyeOff className="h-4 w-4" />
+                            <>
+                              <EyeOff className="h-4 w-4 sm:mr-0" />
+                              <span className="sm:hidden ml-2">Unpublish</span>
+                            </>
                           ) : (
-                            <Eye className="h-4 w-4" />
+                            <>
+                              <Eye className="h-4 w-4 sm:mr-0" />
+                              <span className="sm:hidden ml-2">Publish</span>
+                            </>
                           )}
                         </Button>
                         <Button
                           size="sm"
                           variant="ghost"
                           onClick={() => handleEdit(article)}
+                          className="flex-1 sm:flex-none"
                         >
-                          <Pencil className="h-4 w-4" />
+                          <Pencil className="h-4 w-4 sm:mr-0" />
+                          <span className="sm:hidden ml-2">Edit</span>
                         </Button>
                         <Button
                           size="sm"
                           variant="ghost"
                           onClick={() => handleDeleteClick(article)}
+                          className="flex-1 sm:flex-none"
                         >
-                          <Trash2 className="h-4 w-4" />
+                          <Trash2 className="h-4 w-4 sm:mr-0" />
+                          <span className="sm:hidden ml-2">Delete</span>
                         </Button>
                       </div>
                     </div>
