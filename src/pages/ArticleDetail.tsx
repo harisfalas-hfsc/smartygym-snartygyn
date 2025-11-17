@@ -642,6 +642,28 @@ export const ArticleDetail = () => {
                 <time dateTime={new Date(article.date).toISOString()}>{article.date}</time>
               </div>
             </div>
+
+            {/* Author Section */}
+            {article.author_name && (
+              <div className="flex items-start gap-2 mb-6 p-4 bg-accent/10 rounded-lg border border-border">
+                <span className="text-sm text-muted-foreground">By:</span>
+                <div>
+                  <Link 
+                    to="/coach-profile" 
+                    className="font-semibold text-primary hover:underline whitespace-nowrap inline-block"
+                  >
+                    {article.author_name}
+                  </Link>
+                  {article.author_credentials && (
+                    <div className="text-sm text-muted-foreground mt-1 space-y-0.5">
+                      {article.author_credentials.split('\n').map((line, i) => (
+                        <div key={i}>{line}</div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
           </div>
 
           {/* Article Image */}

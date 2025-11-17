@@ -268,6 +268,11 @@ export function BlogManager() {
                                 </Badge>
                               </>
                             )}
+                            {article.author_name && (
+                              <Badge variant="outline" className="bg-primary/5">
+                                By {article.author_name}
+                              </Badge>
+                            )}
                             {imageStatus && !imageStatus.hasImage && (
                               <Badge variant="destructive" className="gap-1">
                                 <AlertTriangle className="h-3 w-3" />
