@@ -102,7 +102,7 @@ const AppContent = () => {
                 
                 {/* Exercise library is public */}
                 <Route path="/exerciselibrary" element={<ExerciseLibrary />} />
-                <Route path="/article/:id" element={<ArticleDetail />} />
+                <Route path="/blog/:slug" element={<ArticleDetail />} />
                 
                 {/* Authenticated routes with motivational banner */}
                 <Route element={<ProtectedRoute><AuthenticatedLayout /></ProtectedRoute>}>
