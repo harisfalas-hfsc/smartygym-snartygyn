@@ -4,7 +4,7 @@ import { Helmet } from "react-helmet";
 import { ServiceCard } from "@/components/ServiceCard";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { Dumbbell, Calendar, BookOpen, Calculator, Activity, Flame, Instagram, Facebook, Youtube, UserCheck, Wrench, Video, FileText, Smartphone, Users, Target, Heart, Zap, Plane, GraduationCap } from "lucide-react";
+import { Dumbbell, Calendar, BookOpen, Calculator, Activity, Flame, Instagram, Facebook, Youtube, UserCheck, Wrench, Video, FileText, Smartphone, Users, Target, Heart, Zap, Plane, GraduationCap, ChevronDown } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { User as SupabaseUser } from "@supabase/supabase-js";
 import { useToast } from "@/hooks/use-toast";
@@ -13,6 +13,12 @@ import smartyGymIcon from "@/assets/smarty-gym-icon.png";
 import { BackToTop } from "@/components/BackToTop";
 import { useAccessControl } from "@/hooks/useAccessControl";
 import { ScrollReveal } from "@/components/ScrollReveal";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import {
   Tooltip,
   TooltipContent,
@@ -432,138 +438,44 @@ const Index = () => {
                     </div>
                   </div>
 
-                  {/* CTA Buttons after three cards */}
-                  <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center items-center pt-6">
-                    <Button 
-                      size="lg" 
-                      onClick={() => navigate("/premiumbenefits")} 
-                      className="w-full sm:w-auto min-w-[200px]"
-                      aria-label="Get started with Smarty Gym"
-                    >
-                      Get Started
-                    </Button>
-                    {!isPremium && (
-                      <Button 
-                        size="lg" 
-                        variant="outline" 
-                        onClick={() => navigate("/premiumbenefits")}
-                        className="w-full sm:w-auto min-w-[200px]"
-                        aria-label="Join Smarty Gym premium membership"
-                      >
-                        View Premium Plans
-                      </Button>
-                    )}
+                  {/* Get Started Dropdown Menu */}
+                  <div className="flex justify-center items-center pt-6">
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button 
+                          size="lg" 
+                          variant="outline"
+                          className="w-full sm:w-auto min-w-[280px] text-lg"
+                          aria-label="Get started with Smarty Gym"
+                        >
+                          Get Started
+                          <ChevronDown className="ml-2 h-5 w-5" />
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent className="w-[280px] bg-background border-primary/20">
+                        <DropdownMenuItem onClick={() => navigate("/workout-flow")} className="cursor-pointer text-base py-3">
+                          <Dumbbell className="mr-2 h-5 w-5" />
+                          Workouts
+                        </DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => navigate("/training-program-flow")} className="cursor-pointer text-base py-3">
+                          <BookOpen className="mr-2 h-5 w-5" />
+                          Training Programs
+                        </DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => navigate("/tools")} className="cursor-pointer text-base py-3">
+                          <Calculator className="mr-2 h-5 w-5" />
+                          Tools
+                        </DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => navigate("/exercise-library")} className="cursor-pointer text-base py-3">
+                          <Video className="mr-2 h-5 w-5" />
+                          Exercise Library
+                        </DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => navigate("/blog")} className="cursor-pointer text-base py-3">
+                          <FileText className="mr-2 h-5 w-5" />
+                          Blog
+                        </DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
                   </div>
-
-                  {/* Feature Highlights Grid */}
-                  <div className="border-t border-primary/20 pt-6">
-                    <div className="grid grid-cols-2 md:grid-cols-3 gap-4 sm:gap-6">
-                      
-                      <div className="flex items-start gap-3">
-                        <Dumbbell className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
-                        <div>
-                          <p className="font-semibold text-sm text-foreground">500+ Expert Workouts</p>
-                          <p className="text-xs text-muted-foreground">Pick your daily session: Strength, Cardio, Fat Burn, or whatever fits your mood</p>
-                        </div>
-                      </div>
-
-                      <div className="flex items-start gap-3">
-                        <Calendar className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
-                        <div>
-                          <p className="font-semibold text-sm text-foreground">Training Programs</p>
-                          <p className="text-xs text-muted-foreground">Structured expert training programs to achieve your long-term goals</p>
-                        </div>
-                      </div>
-
-                      <div className="flex items-start gap-3">
-                        <GraduationCap className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
-                        <div>
-                          <p className="font-semibold text-sm text-foreground">Expert Coach Guidance</p>
-                          <p className="text-xs text-muted-foreground">Connect with Sports Scientist Haris Falas - real human expertise, not AI-generated advice</p>
-                        </div>
-                      </div>
-
-                      <div className="flex items-start gap-3">
-                        <Wrench className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
-                        <div>
-                          <p className="font-semibold text-sm text-foreground">Smart Tools</p>
-                          <p className="text-xs text-muted-foreground">BMR, Macro, 1RM calculators</p>
-                        </div>
-                      </div>
-
-                      <div className="flex items-start gap-3">
-                        <Video className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
-                        <div>
-                          <p className="font-semibold text-sm text-foreground">Exercise Library</p>
-                          <p className="text-xs text-muted-foreground">Comprehensive video guide</p>
-                        </div>
-                      </div>
-
-                      <div className="flex items-start gap-3">
-                        <Users className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
-                        <div>
-                          <p className="font-semibold text-sm text-foreground">Fitness Community</p>
-                          <p className="text-xs text-muted-foreground">Join and connect with like-minded members on their fitness journey</p>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Who Is Smarty Gym For? Section */}
-                  <div className="border-t border-primary/20 pt-6">
-                    <Card className="border border-primary/30 bg-background/80">
-                      <div className="p-6 sm:p-8 space-y-4">
-                        <h2 className="text-xl sm:text-2xl font-bold text-center text-foreground">
-                          Who Is Smarty Gym For?
-                        </h2>
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-4 text-sm sm:text-base">
-                          <div className="flex items-start gap-2 sm:gap-3">
-                            <Users className="w-4 h-4 sm:w-5 sm:h-5 text-primary flex-shrink-0 mt-1" />
-                            <p className="text-muted-foreground">
-                              <span className="font-semibold text-foreground">Busy adults</span> juggling work and fitness
-                            </p>
-                          </div>
-                          <div className="flex items-start gap-2 sm:gap-3">
-                            <Heart className="w-4 h-4 sm:w-5 sm:h-5 text-primary flex-shrink-0 mt-1" />
-                            <p className="text-muted-foreground">
-                              <span className="font-semibold text-foreground">Parents</span> who need flexible workout times
-                            </p>
-                          </div>
-                          <div className="flex items-start gap-2 sm:gap-3">
-                            <GraduationCap className="w-4 h-4 sm:w-5 sm:h-5 text-primary flex-shrink-0 mt-1" />
-                            <p className="text-muted-foreground">
-                              <span className="font-semibold text-foreground">Beginners</span> starting their fitness journey
-                            </p>
-                          </div>
-                          <div className="flex items-start gap-2 sm:gap-3">
-                            <Target className="w-4 h-4 sm:w-5 sm:h-5 text-primary flex-shrink-0 mt-1" />
-                            <p className="text-muted-foreground">
-                              <span className="font-semibold text-foreground">Intermediate lifters</span> looking for structured progression
-                            </p>
-                          </div>
-                          <div className="flex items-start gap-2 sm:gap-3">
-                            <Plane className="w-4 h-4 sm:w-5 sm:h-5 text-primary flex-shrink-0 mt-1" />
-                            <p className="text-muted-foreground">
-                              <span className="font-semibold text-foreground">Travelers</span> who need workouts anywhere
-                            </p>
-                          </div>
-                          <div className="flex items-start gap-2 sm:gap-3">
-                            <Dumbbell className="w-4 h-4 sm:w-5 sm:h-5 text-primary flex-shrink-0 mt-1" />
-                            <p className="text-muted-foreground">
-                              <span className="font-semibold text-foreground">Gym-goers</span> who want expert guidance from <a href="/coach-profile" className="text-primary hover:underline font-semibold">Haris Falas</a>
-                            </p>
-                          </div>
-                          <div className="flex items-start gap-2 sm:gap-3 md:col-span-2">
-                            <Zap className="w-4 h-4 sm:w-5 sm:h-5 text-primary flex-shrink-0 mt-1" />
-                            <p className="text-muted-foreground">
-                              <span className="font-semibold text-foreground">Anyone</span> seeking professional coaching without personal training costs
-                            </p>
-                          </div>
-                        </div>
-                      </div>
-                    </Card>
-                  </div>
-
                 </div>
               </Card>
             </ScrollReveal>
