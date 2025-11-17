@@ -125,6 +125,50 @@ serve(async (req) => {
   }
 });
 
+// Helper function to check if user is a first-time customer
+async function isFirstTimeCustomer(userId: string, supabase: any): Promise<boolean> {
+  try {
+    // Check if user has any previous purchases
+    const { data: purchases, error: purchaseError } = await supabase
+      .from('user_purchases')
+      .select('id')
+      .eq('user_id', userId)
+      .limit(1);
+    
+    if (purchaseError) {
+      logStep("ERROR checking purchases", { error: purchaseError });
+      return false;
+    }
+    
+    if (purchases && purchases.length > 0) {
+      return false; // Has previous purchases
+    }
+    
+    // Check if user has any previous subscriptions (excluding 'free')
+    const { data: subscriptions, error: subError } = await supabase
+      .from('user_subscriptions')
+      .select('id, plan_type')
+      .eq('user_id', userId)
+      .neq('plan_type', 'free')
+      .limit(1);
+    
+    if (subError) {
+      logStep("ERROR checking subscriptions", { error: subError });
+      return false;
+    }
+    
+    if (subscriptions && subscriptions.length > 0) {
+      return false; // Has previous subscriptions
+    }
+    
+    // No purchases and no paid subscriptions = first-time customer
+    return true;
+  } catch (error) {
+    logStep("ERROR in isFirstTimeCustomer", { error });
+    return false;
+  }
+}
+
 async function handleSubscriptionCheckout(
   session: Stripe.Checkout.Session,
   supabase: any,
@@ -189,6 +233,48 @@ async function handleSubscriptionCheckout(
     } catch (analyticsError) {
       logStep("ERROR: Failed to track subscription in analytics", { error: analyticsError });
     }
+    
+    // Send automated messages to user
+    const isFirstTime = await isFirstTimeCustomer(userId, supabase);
+    logStep("Checking if first-time customer", { userId, isFirstTime });
+    
+    // Capitalize plan type for display (gold -> Gold, platinum -> Platinum)
+    const planName = planType.charAt(0).toUpperCase() + planType.slice(1);
+    
+    if (isFirstTime) {
+      // Send welcome message first
+      try {
+        await supabase.functions.invoke('send-system-message', {
+          body: {
+            userId: userId,
+            messageType: 'welcome',
+            customData: {}
+          }
+        });
+        logStep("Welcome message sent");
+        
+        // Wait a moment before sending thank you
+        await new Promise(resolve => setTimeout(resolve, 1000));
+      } catch (welcomeError) {
+        logStep("ERROR sending welcome message", { error: welcomeError });
+      }
+    }
+    
+    // Send subscription thank you message
+    try {
+      await supabase.functions.invoke('send-system-message', {
+        body: {
+          userId: userId,
+          messageType: 'purchase_subscription',
+          customData: {
+            planName: planName
+          }
+        }
+      });
+      logStep("Subscription thank you message sent", { planName });
+    } catch (thankYouError) {
+      logStep("ERROR sending subscription thank you message", { error: thankYouError });
+    }
   }
 }
 
@@ -226,16 +312,44 @@ async function handleOneTimePurchase(
       logStep("ERROR: Failed to update personal training request", { error: updateError });
     }
 
-    // Send confirmation message
-    await supabase
-      .from('user_system_messages')
-      .insert({
-        user_id: userId,
-        subject: 'Personal Training Payment Confirmed',
-        message: 'Thank you for your payment! Your personal training program will be created by Haris Falas and delivered to your dashboard soon.',
-        message_type: 'purchase_confirmation',
-        is_read: false,
+    // Send automated messages for personal training
+    const isFirstTime = await isFirstTimeCustomer(userId, supabase);
+    logStep("Checking if first-time customer for personal training", { userId, isFirstTime });
+    
+    if (isFirstTime) {
+      // Send welcome message first
+      try {
+        await supabase.functions.invoke('send-system-message', {
+          body: {
+            userId: userId,
+            messageType: 'welcome',
+            customData: {}
+          }
+        });
+        logStep("Welcome message sent for personal training");
+        
+        // Wait a moment before sending thank you
+        await new Promise(resolve => setTimeout(resolve, 1000));
+      } catch (welcomeError) {
+        logStep("ERROR sending welcome message for personal training", { error: welcomeError });
+      }
+    }
+    
+    // Send personal training thank you message
+    try {
+      await supabase.functions.invoke('send-system-message', {
+        body: {
+          userId: userId,
+          messageType: 'purchase_personal_training',
+          customData: {
+            contentName: 'Personal Training Program'
+          }
+        }
       });
+      logStep("Personal training thank you message sent");
+    } catch (thankYouError) {
+      logStep("ERROR sending personal training thank you message", { error: thankYouError });
+    }
     
     return;
   }
@@ -293,16 +407,47 @@ async function handleOneTimePurchase(
   } else {
     logStep("Purchase recorded successfully");
     
-    // Send welcome message to user
-    await supabase
-      .from('user_system_messages')
-      .insert({
-        user_id: userId,
-        subject: `Purchase Confirmed: ${contentName}`,
-        message: `Thank you for your purchase! Your ${contentType} "${contentName}" is now available in your dashboard under "My Purchases".`,
-        message_type: 'purchase_confirmation',
-        is_read: false,
+    // Send automated messages for standalone purchase
+    const isFirstTime = await isFirstTimeCustomer(userId, supabase);
+    logStep("Checking if first-time customer for standalone purchase", { userId, isFirstTime });
+    
+    if (isFirstTime) {
+      // Send welcome message first
+      try {
+        await supabase.functions.invoke('send-system-message', {
+          body: {
+            userId: userId,
+            messageType: 'welcome',
+            customData: {}
+          }
+        });
+        logStep("Welcome message sent for standalone purchase");
+        
+        // Wait a moment before sending thank you
+        await new Promise(resolve => setTimeout(resolve, 1000));
+      } catch (welcomeError) {
+        logStep("ERROR sending welcome message for standalone purchase", { error: welcomeError });
+      }
+    }
+    
+    // Determine message type based on content type
+    const messageType = contentType === 'workout' ? 'purchase_workout' : 'purchase_program';
+    
+    // Send standalone purchase thank you message
+    try {
+      await supabase.functions.invoke('send-system-message', {
+        body: {
+          userId: userId,
+          messageType: messageType,
+          customData: {
+            contentName: contentName
+          }
+        }
       });
+      logStep("Standalone purchase thank you message sent", { contentType, contentName });
+    } catch (thankYouError) {
+      logStep("ERROR sending standalone purchase thank you message", { error: thankYouError });
+    }
   }
 }
 
