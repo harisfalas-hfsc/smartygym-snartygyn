@@ -1,8 +1,5 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.57.2";
-import { Resend } from "https://esm.sh/resend@3.5.0";
-
-const resend = new Resend(Deno.env.get("RESEND_API_KEY"));
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -62,35 +59,23 @@ serve(async (req) => {
       );
     }
 
-    // Get welcome email template
-    const { data: template, error: templateError } = await supabaseAdmin
-      .from("email_templates")
-      .select("*")
-      .eq("category", "welcome")
-      .eq("is_active", true)
-      .single();
-
-    if (templateError || !template) {
-      logStep("No welcome template found, using default");
+    // Send welcome message to user's dashboard
+    try {
+      await supabaseAdmin.functions.invoke('send-system-message', {
+        body: {
+          userId: record.user_id,
+          messageType: 'welcome',
+          customData: {}
+        }
+      });
+      logStep("Welcome message sent to dashboard");
+    } catch (msgError) {
+      logStep("ERROR sending welcome message", { error: msgError });
+      throw msgError;
     }
 
-    // Replace placeholders in template
-    const subject = template?.subject.replace(/{{name}}/g, userName) || `Welcome to SmartyGym, ${userName}!`;
-    const body = template?.body.replace(/{{name}}/g, userName) || 
-      `Hello ${userName}!\n\nWelcome to SmartyGym! We're excited to have you join our fitness community.`;
-
-    // Send email
-    const emailResponse = await resend.emails.send({
-      from: "SmartyGym <onboarding@resend.dev>",
-      to: [userEmail],
-      subject: subject,
-      html: body.replace(/\n/g, "<br>"),
-    });
-
-    logStep("Welcome email sent", { emailId: emailResponse.data?.id });
-
     return new Response(
-      JSON.stringify({ success: true, emailId: emailResponse.data?.id }),
+      JSON.stringify({ success: true, message: "Welcome message sent to dashboard" }),
       {
         status: 200,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
