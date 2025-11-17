@@ -4,7 +4,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
-import { Plus, Search, Pencil, Trash2, Eye, EyeOff } from "lucide-react";
+import { Plus, Search, Pencil, Trash2, Eye, EyeOff, AlertTriangle, CheckCircle } from "lucide-react";
 import { toast } from "sonner";
 import { ArticleEditDialog } from "./ArticleEditDialog";
 import {
@@ -27,6 +27,7 @@ export function BlogManager() {
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [articleToDelete, setArticleToDelete] = useState<any>(null);
   const [loading, setLoading] = useState(true);
+  const [imageStatuses, setImageStatuses] = useState<Record<string, { hasImage: boolean; isUnique: boolean }>>({});
 
   useEffect(() => {
     fetchArticles();
@@ -56,12 +57,51 @@ export function BlogManager() {
       if (error) throw error;
       setArticles(data || []);
       setFilteredArticles(data || []);
+      
+      if (data) {
+        checkImageStatuses(data);
+      }
     } catch (error) {
       console.error('Error fetching articles:', error);
       toast.error("Failed to load articles");
     } finally {
       setLoading(false);
     }
+  };
+
+  const checkImageStatuses = async (articles: any[]) => {
+    const statuses: Record<string, { hasImage: boolean; isUnique: boolean }> = {};
+
+    for (const article of articles) {
+      const hasImage = !!article.image_url && article.image_url.trim() !== '';
+      
+      if (hasImage) {
+        try {
+          const [workoutsRes, programsRes, articlesRes] = await Promise.all([
+            supabase.from('admin_workouts').select('image_url').eq('image_url', article.image_url),
+            supabase.from('admin_training_programs').select('image_url').eq('image_url', article.image_url),
+            supabase.from('blog_articles').select('image_url').eq('image_url', article.image_url).neq('id', article.id)
+          ]);
+
+          const conflicts = [
+            ...(workoutsRes.data || []),
+            ...(programsRes.data || []),
+            ...(articlesRes.data || [])
+          ];
+
+          statuses[article.id] = {
+            hasImage: true,
+            isUnique: conflicts.length === 0
+          };
+        } catch (error) {
+          statuses[article.id] = { hasImage: true, isUnique: true };
+        }
+      } else {
+        statuses[article.id] = { hasImage: false, isUnique: true };
+      }
+    }
+
+    setImageStatuses(statuses);
   };
 
   const handleCreate = () => {
@@ -174,79 +214,123 @@ export function BlogManager() {
                 {searchQuery ? 'No articles found matching your search.' : 'No articles yet. Create your first one!'}
               </div>
             ) : (
-              filteredArticles.map((article) => (
-                <div
-                  key={article.id}
-                  className="border rounded-lg p-4 hover:bg-accent/50 transition-colors"
-                >
-                  <div className="flex items-start justify-between gap-4">
-                    <div className="flex-1 space-y-2">
-                      <div className="flex items-center gap-2">
-                        <h3 className="text-lg font-semibold">{article.title}</h3>
-                        {article.is_published ? (
-                          <Badge className={getCategoryColor(article.category)}>
-                            {article.category}
-                          </Badge>
+              filteredArticles.map((article) => {
+                const imageStatus = imageStatuses[article.id];
+                return (
+                  <div
+                    key={article.id}
+                    className="border rounded-lg p-4 hover:bg-accent/50 transition-colors"
+                  >
+                    <div className="flex items-start justify-between gap-4">
+                      <div className="flex items-center gap-3 flex-1">
+                        {article.image_url ? (
+                          <div className="relative flex-shrink-0">
+                            <img 
+                              src={article.image_url} 
+                              alt={article.title}
+                              className="w-20 h-20 object-cover rounded-lg"
+                              onError={(e) => {
+                                e.currentTarget.src = 'https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?auto=format&fit=crop&q=80&w=800';
+                              }}
+                            />
+                            {imageStatus && !imageStatus.isUnique && (
+                              <div className="absolute -top-1 -right-1 bg-destructive text-destructive-foreground rounded-full p-1">
+                                <AlertTriangle className="h-3 w-3" />
+                              </div>
+                            )}
+                            {imageStatus && imageStatus.isUnique && (
+                              <div className="absolute -top-1 -right-1 bg-green-600 text-white rounded-full p-1">
+                                <CheckCircle className="h-3 w-3" />
+                              </div>
+                            )}
+                          </div>
                         ) : (
-                          <>
-                            <Badge className={getCategoryColor(article.category)}>
-                              {article.category}
-                            </Badge>
-                            <Badge variant="outline">Draft</Badge>
-                          </>
+                          <div className="w-20 h-20 bg-muted rounded-lg flex items-center justify-center flex-shrink-0">
+                            <AlertTriangle className="h-6 w-6 text-muted-foreground" />
+                          </div>
                         )}
-                      </div>
-                      <p className="text-sm text-muted-foreground line-clamp-2">
-                        {article.excerpt}
-                      </p>
-                      <div className="flex items-center gap-4 text-xs text-muted-foreground">
-                        <span>{article.read_time || 'No read time'}</span>
-                        <span>•</span>
-                        <span>
-                          {article.created_at
-                            ? new Date(article.created_at).toLocaleDateString()
-                            : 'Unknown date'}
-                        </span>
-                        {article.published_at && (
-                          <>
+                        
+                        <div className="flex-1 space-y-2">
+                          <div className="flex items-center gap-2 flex-wrap">
+                            <h3 className="text-lg font-semibold">{article.title}</h3>
+                            {article.is_published ? (
+                              <Badge className={getCategoryColor(article.category)}>
+                                {article.category}
+                              </Badge>
+                            ) : (
+                              <>
+                                <Badge className={getCategoryColor(article.category)}>
+                                  {article.category}
+                                </Badge>
+                                <Badge variant="outline">Draft</Badge>
+                              </>
+                            )}
+                            {imageStatus && !imageStatus.hasImage && (
+                              <Badge variant="destructive" className="gap-1">
+                                <AlertTriangle className="h-3 w-3" />
+                                No Image
+                              </Badge>
+                            )}
+                            {imageStatus && imageStatus.hasImage && !imageStatus.isUnique && (
+                              <Badge variant="destructive" className="gap-1">
+                                <AlertTriangle className="h-3 w-3" />
+                                Duplicate
+                              </Badge>
+                            )}
+                          </div>
+                          <p className="text-sm text-muted-foreground line-clamp-2">
+                            {article.excerpt}
+                          </p>
+                          <div className="flex items-center gap-4 text-xs text-muted-foreground">
+                            <span>{article.read_time || 'No read time'}</span>
                             <span>•</span>
                             <span>
-                              Published: {new Date(article.published_at).toLocaleDateString()}
+                              {article.created_at
+                                ? new Date(article.created_at).toLocaleDateString()
+                                : 'Unknown date'}
                             </span>
-                          </>
-                        )}
+                            {article.published_at && (
+                              <>
+                                <span>•</span>
+                                <span>
+                                  Published: {new Date(article.published_at).toLocaleDateString()}
+                                </span>
+                              </>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                      <div className="flex gap-2">
+                        <Button
+                          size="sm"
+                          variant="ghost"
+                          onClick={() => togglePublished(article)}
+                        >
+                          {article.is_published ? (
+                            <EyeOff className="h-4 w-4" />
+                          ) : (
+                            <Eye className="h-4 w-4" />
+                          )}
+                        </Button>
+                        <Button
+                          size="sm"
+                          variant="ghost"
+                          onClick={() => handleEdit(article)}
+                        >
+                          <Pencil className="h-4 w-4" />
+                        </Button>
+                        <Button
+                          size="sm"
+                          variant="ghost"
+                          onClick={() => handleDeleteClick(article)}
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
                       </div>
                     </div>
-                    <div className="flex gap-2">
-                      <Button
-                        size="sm"
-                        variant="ghost"
-                        onClick={() => togglePublished(article)}
-                      >
-                        {article.is_published ? (
-                          <EyeOff className="h-4 w-4" />
-                        ) : (
-                          <Eye className="h-4 w-4" />
-                        )}
-                      </Button>
-                      <Button
-                        size="sm"
-                        variant="ghost"
-                        onClick={() => handleEdit(article)}
-                      >
-                        <Pencil className="h-4 w-4" />
-                      </Button>
-                      <Button
-                        size="sm"
-                        variant="ghost"
-                        onClick={() => handleDeleteClick(article)}
-                      >
-                        <Trash2 className="h-4 w-4 text-destructive" />
-                      </Button>
-                    </div>
                   </div>
-                </div>
-              ))
+                );
+              })
             )}
           </div>
         </CardContent>

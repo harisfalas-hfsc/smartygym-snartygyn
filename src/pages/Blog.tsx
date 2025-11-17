@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Helmet } from "react-helmet";
 import { Button } from "@/components/ui/button";
@@ -7,6 +7,7 @@ import { PageBreadcrumbs } from "@/components/PageBreadcrumbs";
 import { InfoRibbon } from "@/components/InfoRibbon";
 import { ArrowLeft, Clock, Calendar } from "lucide-react";
 import { useShowBackButton } from "@/hooks/useShowBackButton";
+import { supabase } from "@/integrations/supabase/client";
 
 interface Article {
   id: string;
@@ -88,10 +89,56 @@ const Blog = () => {
   const navigate = useNavigate();
   const { canGoBack, goBack } = useShowBackButton();
   const [categoryFilter, setCategoryFilter] = useState<string>("all");
+  const [dbArticles, setDbArticles] = useState<Article[]>([]);
+  const [allArticles, setAllArticles] = useState<Article[]>(articles);
+
+  useEffect(() => {
+    const fetchArticles = async () => {
+      try {
+        const { data, error } = await supabase
+          .from('blog_articles')
+          .select('*')
+          .eq('is_published', true)
+          .order('published_at', { ascending: false });
+
+        if (error) throw error;
+
+        if (data && data.length > 0) {
+          const formattedArticles: Article[] = data.map(article => ({
+            id: article.id,
+            title: article.title,
+            excerpt: article.excerpt,
+            image: article.image_url || 'https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?auto=format&fit=crop&q=80&w=800',
+            readTime: article.read_time || '5 min read',
+            date: new Date(article.published_at || article.created_at).toLocaleDateString('en-US', { 
+              year: 'numeric', 
+              month: 'long', 
+              day: 'numeric' 
+            }),
+            category: article.category
+          }));
+
+          setDbArticles(formattedArticles);
+          
+          const combined = [...formattedArticles, ...articles].sort((a, b) => {
+            const dateA = new Date(a.date).getTime();
+            const dateB = new Date(b.date).getTime();
+            return dateB - dateA;
+          });
+          
+          setAllArticles(combined);
+        }
+      } catch (error) {
+        console.error('Error fetching articles:', error);
+      }
+    };
+
+    fetchArticles();
+  }, []);
 
   const filteredArticles = categoryFilter === "all" 
-    ? articles 
-    : articles.filter(article => article.category.toLowerCase() === categoryFilter.toLowerCase());
+    ? allArticles 
+    : allArticles.filter(article => article.category.toLowerCase() === categoryFilter.toLowerCase());
 
   return (
     <>
