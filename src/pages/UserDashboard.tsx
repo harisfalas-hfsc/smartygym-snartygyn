@@ -536,9 +536,11 @@ export default function UserDashboard() {
   const viewedPrograms = programInteractions.filter(p => p.has_viewed);
   const ratedPrograms = programInteractions.filter(p => p.rating && p.rating > 0);
 
-  // User has access if they have either an active subscription OR any standalone purchases
-  const hasActivePlan = (subscriptionInfo?.subscribed && subscriptionInfo?.product_id) || 
-                       (purchases && purchases.length > 0);
+  // Premium members have Gold/Platinum subscription
+  const hasActivePlan = subscriptionInfo?.subscribed && subscriptionInfo?.product_id;
+  
+  // Separate flag for standalone purchases
+  const hasStandalonePurchases = purchases && purchases.length > 0;
 
   return (
     <div className="min-h-screen bg-background">
@@ -978,7 +980,7 @@ export default function UserDashboard() {
 
           {/* Workouts Tab */}
           <TabsContent value="workouts" className="space-y-6">
-            {!hasActivePlan ? (
+            {!hasActivePlan && !hasStandalonePurchases ? (
               <Card className="border-primary/50 bg-gradient-to-r from-primary/5 to-primary/10">
                 <CardContent className="text-center py-12">
                   <Crown className="h-12 w-12 text-primary mx-auto mb-4" />
@@ -1317,6 +1319,21 @@ export default function UserDashboard() {
                   <p className="text-sm text-muted-foreground mt-6 max-w-2xl mx-auto">
                     As a premium member, you have unlimited access to all workouts, training programs, and exclusive features. 
                     Enjoy your complete fitness experience!
+                  </p>
+                </CardContent>
+              </Card>
+            )}
+
+            {/* Free User with Purchases Message */}
+            {!hasActivePlan && hasStandalonePurchases && (
+              <Card className="border-border bg-accent/10">
+                <CardContent className="text-center py-8 px-6">
+                  <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-primary/10 mb-3">
+                    <ShoppingBag className="h-8 w-8 text-primary" />
+                  </div>
+                  <p className="text-lg font-medium mb-2">Your Purchases</p>
+                  <p className="text-sm text-muted-foreground">
+                    View and access your individually purchased content below
                   </p>
                 </CardContent>
               </Card>
