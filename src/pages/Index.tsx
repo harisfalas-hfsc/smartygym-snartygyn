@@ -434,7 +434,7 @@ const Index = () => {
 
                   {/* Navigation Cards after three cards */}
                   <div className="pt-6">
-                    <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4">
+                    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3 sm:gap-4">
                       
                       {/* Workouts Card */}
     <Button
@@ -456,6 +456,17 @@ const Index = () => {
     >
       <Calendar className="w-5 h-5 sm:w-6 sm:h-6 text-primary flex-shrink-0" />
       <span className="font-semibold text-sm sm:text-base">Training Programs</span>
+    </Button>
+
+                      {/* Tools Card */}
+    <Button
+      variant="outline"
+      size="lg"
+      onClick={() => navigate("/tools")}
+      className="h-auto py-2 sm:py-3 px-4 flex flex-row items-center gap-2 sm:gap-3 bg-background hover:bg-primary/10 border-2 border-primary/20 hover:border-primary transition-all"
+    >
+      <Wrench className="w-5 h-5 sm:w-6 sm:h-6 text-primary flex-shrink-0" />
+      <span className="font-semibold text-sm sm:text-base">Tools</span>
     </Button>
 
                       {/* Library Card */}
