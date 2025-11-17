@@ -165,132 +165,145 @@ export default function JoinPremium() {
               className="relative border-2 border-amber-500 shadow-lg flex flex-col"
               data-plan="gold"
               data-keywords="online gym membership, smarty gym, online fitness subscription, smartygym.com, Cyprus online gym"
-              aria-label="Gold Plan - Smarty Gym Cyprus online gym membership - smartygym.com"
+              aria-label="Gold Plan - SmartyGym Cyprus online gym membership - smartygym.com"
             >
-              <CardHeader className="text-center pb-4">
-                <div className="mb-3">
+              <CardHeader className="text-center pb-2 sm:pb-4">
+                <div className="mb-2 sm:mb-3">
                   <h2 
-                    className="text-2xl font-bold text-amber-600 dark:text-amber-400"
+                    className="text-xl sm:text-2xl font-bold text-amber-600 dark:text-amber-400"
                     itemProp="name"
                   >
                     Gold Plan
                   </h2>
                 </div>
-                <Badge className="bg-amber-500 text-white mx-auto mb-4">
-                  MONTHLY SUBSCRIPTION
+                <Badge className="bg-amber-500 text-white mx-auto mb-3 sm:mb-4 text-xs sm:text-sm">
+                  MONTHLY
                 </Badge>
-                <CardTitle className="text-3xl font-bold" itemProp="offers">€9.99</CardTitle>
-                <p className="text-sm text-muted-foreground h-5" itemProp="description">per month</p>
-                <div className="h-14 flex flex-col justify-center">
+                <CardTitle className="text-2xl sm:text-3xl font-bold" itemProp="offers">€9.99</CardTitle>
+                <p className="text-xs sm:text-sm text-muted-foreground h-4 sm:h-5" itemProp="description">per month</p>
+                <div className="h-10 sm:h-14 flex flex-col justify-center">
                   <p className="text-xs text-amber-600 dark:text-amber-400 font-semibold">
                     🔄 Auto-renews monthly
                   </p>
                 </div>
-                <meta itemProp="brand" content="Smarty Gym Cyprus - smartygym.com" />
+                <meta itemProp="brand" content="SmartyGym Cyprus - smartygym.com" />
                 <meta itemProp="category" content="Online Gym Membership" />
               </CardHeader>
-              <CardContent className="space-y-4 flex-1 flex flex-col">
-                <div className="space-y-2 flex-1">
+              <CardContent className="space-y-2 sm:space-y-4 flex-1 flex flex-col">
+                <div className="space-y-1.5 sm:space-y-2 flex-1">
                   <div className="flex items-start gap-2">
-                    <Check className="h-5 w-5 text-green-500 shrink-0 mt-0.5" />
-                    <span className="text-sm">Full access to all workouts</span>
+                    <Check className="h-4 w-4 sm:h-5 sm:w-5 text-green-500 shrink-0 mt-0.5" />
+                    <span className="text-xs sm:text-sm">Full access to all workouts</span>
                   </div>
                   <div className="flex items-start gap-2">
-                    <Check className="h-5 w-5 text-green-500 shrink-0 mt-0.5" />
-                    <span className="text-sm">Full access to all training programs</span>
+                    <Check className="h-4 w-4 sm:h-5 sm:w-5 text-green-500 shrink-0 mt-0.5" />
+                    <span className="text-xs sm:text-sm">Full access to all training programs</span>
                   </div>
                   <div className="flex items-start gap-2">
-                    <Check className="h-5 w-5 text-green-500 shrink-0 mt-0.5" />
-                    <span className="text-sm">Full access to training tools</span>
+                    <Check className="h-4 w-4 sm:h-5 sm:w-5 text-green-500 shrink-0 mt-0.5" />
+                    <span className="text-xs sm:text-sm">Full access to training tools</span>
                   </div>
                   <div className="flex items-start gap-2">
-                    <Check className="h-5 w-5 text-green-500 shrink-0 mt-0.5" />
-                    <span className="text-sm">Flexible monthly billing</span>
+                    <Check className="h-4 w-4 sm:h-5 sm:w-5 text-green-500 shrink-0 mt-0.5" />
+                    <span className="text-xs sm:text-sm">Flexible monthly billing</span>
                   </div>
-                  <div className="flex items-start gap-2">
+                  <div className="flex items-start gap-2 hidden sm:flex">
                     <Check className="h-5 w-5 text-green-500 shrink-0 mt-0.5" />
-                    <span className="text-sm">Cancel anytime (subscription-based)</span>
+                    <span className="text-sm">Cancel anytime</span>
                   </div>
-                  <div className="flex items-start gap-2">
+                  <div className="flex items-start gap-2 hidden sm:flex">
                     <Check className="h-5 w-5 text-green-500 shrink-0 mt-0.5" />
-                    <span className="text-sm">Perfect for trying premium features</span>
+                    <span className="text-sm">Perfect for trying premium</span>
                   </div>
                 </div>
-                <div className="space-y-4 mt-auto">
+                <div className="space-y-3 sm:space-y-4 mt-auto">
                   <Button 
-                    className="w-full text-lg py-6" 
+                    className="w-full text-sm sm:text-lg py-4 sm:py-6" 
                     onClick={() => handleSubscribe('gold')}
                     disabled={loading}
                   >
-                    {loading ? "Processing..." : "Start Monthly Plan"}
+                    {loading ? "Processing..." : (
+                      <>
+                        <span className="sm:hidden">Get Monthly</span>
+                        <span className="hidden sm:inline">Start Monthly Plan</span>
+                      </>
+                    )}
                   </Button>
                   <p className="text-xs text-center text-muted-foreground">
-                    Renews automatically each month
+                    Auto-renews each month
                   </p>
                 </div>
               </CardContent>
             </Card>
 
             {/* Platinum Plan */}
-            <Card className="relative border-2 border-primary shadow-lg flex flex-col">
-              <CardHeader className="text-center pb-4">
-                <div className="mb-3 relative">
-                  <Badge className="absolute -top-2 right-0 bg-green-600 text-white px-2 py-1 text-xs">
+            <Card className="relative border-2 border-primary shadow-lg flex flex-col bg-gradient-to-br from-primary/5 to-amber-500/5">
+              <CardHeader className="text-center pb-2 sm:pb-4">
+                <div className="mb-2 sm:mb-3 relative">
+                  <Badge className="absolute -top-3 right-1 sm:right-0 bg-green-600 text-white px-2 py-1 text-xs sm:text-sm">
                     BEST VALUE
                   </Badge>
-                  <h2 className="text-2xl font-bold text-primary">Platinum Plan</h2>
+                  <div className="flex items-center justify-center gap-2">
+                    <Crown className="h-5 w-5 sm:h-6 sm:w-6 text-primary" />
+                    <h2 className="text-xl sm:text-2xl font-bold text-primary">Platinum</h2>
+                  </div>
                 </div>
-                <Badge className="bg-primary text-primary-foreground mx-auto mb-4">
-                  YEARLY SUBSCRIPTION
+                <Badge className="bg-primary text-primary-foreground mx-auto mb-3 sm:mb-4 text-xs sm:text-sm">
+                  YEARLY
                 </Badge>
-                <CardTitle className="text-3xl font-bold">€89.99</CardTitle>
-                <p className="text-sm text-muted-foreground h-5">per year (billed annually)</p>
-                <div className="h-14 flex flex-col justify-center">
-                  <p className="text-sm text-green-600 font-semibold">
-                    Just €7.50/month - Save €29.89!
+                <CardTitle className="text-2xl sm:text-3xl font-bold">€89.99</CardTitle>
+                <p className="text-xs sm:text-sm text-muted-foreground h-4 sm:h-5">per year</p>
+                <div className="h-10 sm:h-14 flex flex-col justify-center">
+                  <p className="text-sm sm:text-base text-green-600 font-bold">
+                    Save €29.89!
                   </p>
-                  <p className="text-xs text-amber-600 dark:text-amber-400 font-semibold">
-                    🔄 Auto-renews yearly
+                  <p className="text-xs text-muted-foreground">
+                    Just €7.50/month • 🔄 Auto-renews yearly
                   </p>
                 </div>
               </CardHeader>
-              <CardContent className="space-y-4 flex-1 flex flex-col">
-                <div className="space-y-2 flex-1">
+              <CardContent className="space-y-2 sm:space-y-4 flex-1 flex flex-col">
+                <div className="space-y-1.5 sm:space-y-2 flex-1">
                   <div className="flex items-start gap-2">
-                    <Check className="h-5 w-5 text-green-500 shrink-0 mt-0.5" />
-                    <span className="text-sm">Full access to all workouts</span>
+                    <Check className="h-4 w-4 sm:h-5 sm:w-5 text-green-500 shrink-0 mt-0.5" />
+                    <span className="text-xs sm:text-sm">Full access to all workouts</span>
                   </div>
                   <div className="flex items-start gap-2">
-                    <Check className="h-5 w-5 text-green-500 shrink-0 mt-0.5" />
-                    <span className="text-sm">Full access to all training programs</span>
+                    <Check className="h-4 w-4 sm:h-5 sm:w-5 text-green-500 shrink-0 mt-0.5" />
+                    <span className="text-xs sm:text-sm">Full access to all training programs</span>
                   </div>
                   <div className="flex items-start gap-2">
-                    <Check className="h-5 w-5 text-green-500 shrink-0 mt-0.5" />
-                    <span className="text-sm">Full access to training tools</span>
+                    <Check className="h-4 w-4 sm:h-5 sm:w-5 text-green-500 shrink-0 mt-0.5" />
+                    <span className="text-xs sm:text-sm">Full access to training tools</span>
                   </div>
                   <div className="flex items-start gap-2">
-                    <Check className="h-5 w-5 text-green-500 shrink-0 mt-0.5" />
-                    <span className="text-sm"><strong>25% savings</strong> vs monthly plan</span>
+                    <Check className="h-4 w-4 sm:h-5 sm:w-5 text-green-500 shrink-0 mt-0.5" />
+                    <span className="text-xs sm:text-sm"><strong>25% savings</strong> vs monthly</span>
                   </div>
-                  <div className="flex items-start gap-2">
+                  <div className="flex items-start gap-2 hidden sm:flex">
                     <Check className="h-5 w-5 text-green-500 shrink-0 mt-0.5" />
-                    <span className="text-sm">Lock in your rate for 12 months</span>
+                    <span className="text-sm">Lock in rate for 12 months</span>
                   </div>
-                  <div className="flex items-start gap-2">
+                  <div className="flex items-start gap-2 hidden sm:flex">
                     <Check className="h-5 w-5 text-green-500 shrink-0 mt-0.5" />
-                    <span className="text-sm">Cancel anytime (subscription-based)</span>
+                    <span className="text-sm">Cancel anytime</span>
                   </div>
                 </div>
-                <div className="space-y-4 mt-auto">
+                <div className="space-y-3 sm:space-y-4 mt-auto">
                   <Button 
-                    className="w-full text-lg py-6" 
+                    className="w-full text-sm sm:text-lg py-4 sm:py-6 bg-gradient-to-r from-primary to-amber-600 hover:from-primary/90 hover:to-amber-600/90" 
                     onClick={() => handleSubscribe('platinum')}
                     disabled={loading}
                   >
-                    {loading ? "Processing..." : "Start Yearly Plan"}
+                    {loading ? "Processing..." : (
+                      <>
+                        <span className="sm:hidden">Get Yearly</span>
+                        <span className="hidden sm:inline">Start Yearly Plan</span>
+                      </>
+                    )}
                   </Button>
                   <p className="text-xs text-center text-muted-foreground">
-                    Renews automatically each year • Best value for committed members
+                    Best value • Auto-renews each year
                   </p>
                 </div>
               </CardContent>

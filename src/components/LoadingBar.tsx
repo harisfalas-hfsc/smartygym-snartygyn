@@ -64,7 +64,7 @@ export const LoadingBar = () => {
   if (!isLoading && progress === 0) return null;
 
   return (
-    <div className="fixed top-0 left-0 right-0 z-[9999] h-1">
+    <div className="fixed top-0 left-0 right-0 z-[100] h-1">
       <div
         className="h-full bg-gradient-to-r from-primary via-primary/80 to-primary transition-all duration-300 ease-out shadow-lg shadow-primary/50"
         style={{

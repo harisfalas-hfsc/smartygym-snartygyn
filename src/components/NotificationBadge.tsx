@@ -43,7 +43,7 @@ export const NotificationBadge = ({ count }: NotificationBadgeProps) => {
     return (
       <Badge 
         variant="destructive"
-        className="absolute -top-1 -right-1 h-5 w-5 flex items-center justify-center p-0 text-xs"
+        className="absolute -top-1 -right-1 h-4 w-4 sm:h-5 sm:w-5 flex items-center justify-center p-0 text-[10px] sm:text-xs"
       >
         {count > 9 ? '9+' : count}
       </Badge>
