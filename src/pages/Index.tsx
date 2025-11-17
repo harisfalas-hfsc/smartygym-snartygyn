@@ -437,48 +437,48 @@ const Index = () => {
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4">
                       
                       {/* Workouts Card */}
-                      <Button
-                        variant="outline"
-                        size="lg"
-                        onClick={() => navigate("/workout")}
-                        className="h-auto py-4 px-4 flex flex-col items-center gap-2 bg-background hover:bg-primary/10 border-2 border-primary/20 hover:border-primary transition-all"
-                      >
-                        <Dumbbell className="w-8 h-8 text-primary" />
-                        <span className="font-semibold text-sm sm:text-base">Workouts</span>
-                      </Button>
+    <Button
+      variant="outline"
+      size="lg"
+      onClick={() => navigate("/workout")}
+      className="h-auto py-2 sm:py-3 px-4 flex flex-row items-center gap-2 sm:gap-3 bg-background hover:bg-primary/10 border-2 border-primary/20 hover:border-primary transition-all"
+    >
+      <Dumbbell className="w-5 h-5 sm:w-6 sm:h-6 text-primary flex-shrink-0" />
+      <span className="font-semibold text-sm sm:text-base">Workouts</span>
+    </Button>
 
                       {/* Training Programs Card */}
-                      <Button
-                        variant="outline"
-                        size="lg"
-                        onClick={() => navigate("/trainingprogram")}
-                        className="h-auto py-4 px-4 flex flex-col items-center gap-2 bg-background hover:bg-primary/10 border-2 border-primary/20 hover:border-primary transition-all"
-                      >
-                        <Calendar className="w-8 h-8 text-primary" />
-                        <span className="font-semibold text-sm sm:text-base">Training Programs</span>
-                      </Button>
+    <Button
+      variant="outline"
+      size="lg"
+      onClick={() => navigate("/trainingprogram")}
+      className="h-auto py-2 sm:py-3 px-4 flex flex-row items-center gap-2 sm:gap-3 bg-background hover:bg-primary/10 border-2 border-primary/20 hover:border-primary transition-all"
+    >
+      <Calendar className="w-5 h-5 sm:w-6 sm:h-6 text-primary flex-shrink-0" />
+      <span className="font-semibold text-sm sm:text-base">Training Programs</span>
+    </Button>
 
                       {/* Library Card */}
-                      <Button
-                        variant="outline"
-                        size="lg"
-                        onClick={() => navigate("/exerciselibrary")}
-                        className="h-auto py-4 px-4 flex flex-col items-center gap-2 bg-background hover:bg-primary/10 border-2 border-primary/20 hover:border-primary transition-all"
-                      >
-                        <BookOpen className="w-8 h-8 text-primary" />
-                        <span className="font-semibold text-sm sm:text-base">Library</span>
-                      </Button>
+    <Button
+      variant="outline"
+      size="lg"
+      onClick={() => navigate("/exerciselibrary")}
+      className="h-auto py-2 sm:py-3 px-4 flex flex-row items-center gap-2 sm:gap-3 bg-background hover:bg-primary/10 border-2 border-primary/20 hover:border-primary transition-all"
+    >
+      <BookOpen className="w-5 h-5 sm:w-6 sm:h-6 text-primary flex-shrink-0" />
+      <span className="font-semibold text-sm sm:text-base">Library</span>
+    </Button>
 
                       {/* Blog Card */}
-                      <Button
-                        variant="outline"
-                        size="lg"
-                        onClick={() => navigate("/blog")}
-                        className="h-auto py-4 px-4 flex flex-col items-center gap-2 bg-background hover:bg-primary/10 border-2 border-primary/20 hover:border-primary transition-all"
-                      >
-                        <FileText className="w-8 h-8 text-primary" />
-                        <span className="font-semibold text-sm sm:text-base">Blog</span>
-                      </Button>
+    <Button
+      variant="outline"
+      size="lg"
+      onClick={() => navigate("/blog")}
+      className="h-auto py-2 sm:py-3 px-4 flex flex-row items-center gap-2 sm:gap-3 bg-background hover:bg-primary/10 border-2 border-primary/20 hover:border-primary transition-all"
+    >
+      <FileText className="w-5 h-5 sm:w-6 sm:h-6 text-primary flex-shrink-0" />
+      <span className="font-semibold text-sm sm:text-base">Blog</span>
+    </Button>
 
                     </div>
                   </div>
@@ -599,10 +599,10 @@ const Index = () => {
         </section>
 
       {/* Main Content */}
-      <main className="py-8 px-4">
+      <main className="py-4 px-4">
         <div className="container mx-auto max-w-6xl">
           
-          <div className="text-center mb-8 px-4">
+          <div className="text-center mb-3 px-4">
             
             
           </div>
