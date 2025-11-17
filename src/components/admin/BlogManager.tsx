@@ -330,6 +330,16 @@ export function BlogManager() {
                         <Button
                           size="sm"
                           variant="ghost"
+                          onClick={() => window.open(`/blog/${article.slug}`, '_blank')}
+                          disabled={!article.is_published}
+                          className="flex-1 sm:flex-none"
+                        >
+                          <Eye className="h-4 w-4 sm:mr-0" />
+                          <span className="sm:hidden ml-2">Preview</span>
+                        </Button>
+                        <Button
+                          size="sm"
+                          variant="ghost"
                           onClick={() => handleEdit(article)}
                           className="flex-1 sm:flex-none"
                         >
