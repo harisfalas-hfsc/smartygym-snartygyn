@@ -432,6 +432,29 @@ const Index = () => {
                     </div>
                   </div>
 
+                  {/* CTA Buttons after three cards */}
+                  <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center items-center pt-6">
+                    <Button 
+                      size="lg" 
+                      onClick={() => navigate("/premiumbenefits")} 
+                      className="w-full sm:w-auto min-w-[200px]"
+                      aria-label="Get started with Smarty Gym"
+                    >
+                      Get Started
+                    </Button>
+                    {!isPremium && (
+                      <Button 
+                        size="lg" 
+                        variant="outline" 
+                        onClick={() => navigate("/premiumbenefits")}
+                        className="w-full sm:w-auto min-w-[200px]"
+                        aria-label="Join Smarty Gym premium membership"
+                      >
+                        View Premium Plans
+                      </Button>
+                    )}
+                  </div>
+
                   {/* Feature Highlights Grid */}
                   <div className="border-t border-primary/20 pt-6">
                     <div className="grid grid-cols-2 md:grid-cols-3 gap-4 sm:gap-6">
@@ -541,28 +564,6 @@ const Index = () => {
                     </Card>
                   </div>
 
-                  {/* CTA Buttons */}
-                  <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center items-center">
-                    <Button 
-                      size="lg" 
-                      onClick={() => navigate("/premiumbenefits")} 
-                      className="w-full sm:w-auto min-w-[200px]"
-                      aria-label="Get started with Smarty Gym"
-                    >
-                      Get Started
-                    </Button>
-                    {!isPremium && (
-                      <Button 
-                        size="lg" 
-                        variant="outline" 
-                        onClick={() => navigate("/premiumbenefits")}
-                        className="w-full sm:w-auto min-w-[200px]"
-                        aria-label="Join Smarty Gym premium membership"
-                      >
-                        View Premium Plans
-                      </Button>
-                    )}
-                  </div>
                 </div>
               </Card>
             </ScrollReveal>
