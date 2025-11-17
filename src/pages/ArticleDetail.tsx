@@ -522,7 +522,7 @@ export const ArticleDetail = () => {
     return (
       <>
         <Helmet>
-          <title>Article Not Found - Smarty Gym</title>
+          <title>Article Not Found - SmartyGym</title>
           <meta name="robots" content="noindex" />
         </Helmet>
         <div className="min-h-screen flex items-center justify-center">
@@ -549,11 +549,11 @@ export const ArticleDetail = () => {
     "dateModified": new Date(article.date).toISOString(),
     "author": {
       "@type": "Organization",
-      "name": "Smarty Gym"
+      "name": "SmartyGym"
     },
     "publisher": {
       "@type": "Organization",
-      "name": "Smarty Gym",
+      "name": "SmartyGym",
       "logo": {
         "@type": "ImageObject",
         "url": `${window.location.origin}/smarty-gym-logo.png`
@@ -679,7 +679,7 @@ export const ArticleDetail = () => {
               {/* Author Signature */}
               <div className="mt-12 pt-6 border-t border-border">
                 <p className="text-sm text-muted-foreground italic">
-                  — <a href="/coach-profile" className="text-primary hover:underline font-medium">Haris Falas</a>, Certified Sports Scientist & Head Coach at Smarty Gym
+                  — <a href="/coach-profile" className="text-primary hover:underline font-medium">Haris Falas</a>, Certified Sports Scientist & Head Coach at SmartyGym
                 </p>
               </div>
             </div>
@@ -694,7 +694,7 @@ export const ArticleDetail = () => {
               <p className="text-muted-foreground mb-6">
                 Get personalized workout plans, nutrition guidance, and expert support
               </p>
-              <Button size="lg" onClick={() => navigate("/auth")} aria-label="Start your free trial with Smarty Gym">
+              <Button size="lg" onClick={() => navigate("/auth")} aria-label="Start your free trial with SmartyGym" className="cta-button">
                 Start Your Free Trial
               </Button>
             </Card>

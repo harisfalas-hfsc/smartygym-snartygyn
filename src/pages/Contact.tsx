@@ -264,12 +264,12 @@ const Contact = () => {
           {JSON.stringify({
             "@context": "https://schema.org",
             "@type": "ContactPage",
-            "name": "Contact Smarty Gym",
-            "description": "Get in touch with Haris Falas and the Smarty Gym team for online fitness platform support and training inquiries",
+            "name": "Contact SmartyGym",
+            "description": "Get in touch with Haris Falas and the SmartyGym team for online fitness platform support and training inquiries",
             "url": "https://smartygym.com/contact",
             "mainEntity": {
               "@type": "LocalBusiness",
-              "name": "Smarty Gym",
+              "name": "SmartyGym",
               "url": "https://smartygym.com",
               "email": "admin@smartygym.com",
               "address": {

@@ -70,17 +70,17 @@ const TakeTour = () => {
   return (
     <>
       <Helmet>
-        <title>Take a Tour - Discover Smarty Gym | Your Fitness Reimagined by Haris Falas</title>
+        <title>Take a Tour - Discover SmartyGym | Your Fitness Reimagined by Haris Falas</title>
         <meta name="description" content="Explore smartygym.com - convenient & flexible online fitness Reimagined by Haris Falas. See how our gym works anywhere, anytime. Free workouts, premium programs & tools." />
         <meta name="keywords" content="smartygym tour, smarty gym demo, smartygym.com features, Haris Falas, gym Reimagined, convenient fitness, flexible online gym, fitness anywhere anytime, online fitness tour" />
         
-        <meta property="og:title" content="Take a Tour - Smarty Gym Features" />
-        <meta property="og:description" content="Discover how Smarty Gym reimagines fitness - convenient, flexible training anywhere, anytime by Haris Falas" />
+        <meta property="og:title" content="Take a Tour - SmartyGym Features" />
+        <meta property="og:description" content="Discover how SmartyGym reimagines fitness - convenient, flexible training anywhere, anytime by Haris Falas" />
         <meta property="og:type" content="website" />
         <meta property="og:url" content="https://smartygym.com/takeatour" />
         
         <meta property="twitter:card" content="summary_large_image" />
-        <meta property="twitter:title" content="Take a Tour - Smarty Gym" />
+        <meta property="twitter:title" content="Take a Tour - SmartyGym" />
         <meta property="twitter:description" content="Explore smartygym.com features - fitness Reimagined for convenience & flexibility" />
         
         <link rel="canonical" href="https://smartygym.com/takeatour" />
@@ -93,7 +93,7 @@ const TakeTour = () => {
             <Button 
               variant="premium"
               onClick={() => navigate("/workout")}
-              className="w-full sm:w-auto"
+              className="w-full sm:w-auto cta-button"
             >
               <Play className="mr-2 h-5 w-5 text-primary" />
               Start Your Fitness Experience
@@ -101,7 +101,7 @@ const TakeTour = () => {
             <Button 
               variant="premium"
               onClick={() => navigate("/premiumbenefits")}
-              className="w-full sm:w-auto"
+              className="w-full sm:w-auto cta-button"
             >
               <Crown className="mr-2 h-5 w-5 text-primary" />
               Unlock Premium

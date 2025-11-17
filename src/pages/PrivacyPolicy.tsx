@@ -28,7 +28,7 @@ const PrivacyPolicy = () => {
           <Card className="p-8 space-y-8">
             <div className="prose dark:prose-invert max-w-none">
               <p className="text-lg text-muted-foreground">
-                At <strong>Smarty Gym</strong> (smartygym.com), founded by <strong>Haris Falas</strong>, we value your privacy and are committed to protecting your personal data. 
+                At <strong>SmartyGym</strong> (smartygym.com), founded by <strong>Haris Falas</strong>, we value your privacy and are committed to protecting your personal data. 
                 This Privacy Policy explains how our <strong>Online Fitness Platform</strong> collects, uses, stores, and protects your information when you visit our
                 website or use our services. Our practices comply with the General Data Protection Regulation (GDPR) 
                 (EU) 2016/679 and applicable Cyprus data protection laws.

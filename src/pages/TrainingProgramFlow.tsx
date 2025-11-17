@@ -73,7 +73,7 @@ const TrainingProgramFlow = () => {
         <meta property="og:url" content="https://smartygym.com/training-program" />
         
         <meta name="twitter:card" content="summary_large_image" />
-        <meta name="twitter:title" content="Training Programs - Smarty Gym" />
+        <meta name="twitter:title" content="Training Programs - SmartyGym" />
         <meta name="twitter:description" content="Structured training programs designed by Sports Scientist Haris Falas" />
         
         <link rel="canonical" href="https://smartygym.com/training-program" />
@@ -187,7 +187,7 @@ const TrainingProgramFlow = () => {
               <p className="text-muted-foreground mb-4">
                 Join SmartyGym Premium for full access to all training programs.
               </p>
-              <Button size="lg" onClick={() => navigate("/premiumbenefits")}>
+              <Button size="lg" onClick={() => navigate("/premiumbenefits")} className="cta-button">
                 Join Premium
               </Button>
             </div>

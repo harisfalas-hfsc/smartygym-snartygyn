@@ -67,13 +67,13 @@ const WorkoutFlow = () => {
         <meta name="description" content="100+ online gym workouts at smartygym.com - #1 online fitness platform Cyprus. AMRAP, TABATA, HIIT, circuit training by Sports Scientist Haris Falas. Free online workouts + premium gym programs. Train anywhere, anytime." />
         <meta name="keywords" content="online gym workouts, gym workouts online, online fitness workouts, workout programs online, gym Cyprus, smartygym workouts, online gym, smartygym.com, Haris Falas workouts, Haris Falas Cyprus, Cyprus fitness, free gym workouts, AMRAP workouts, TABATA training, HIIT workouts, circuit training workouts, bodyweight training, no equipment gym workouts, strength training workouts, cardio workouts online, metabolic conditioning, mobility training, power workouts, challenge workouts, convenient gym, flexible training, online workouts, functional fitness, home gym workouts, online gym Cyprus, Cyprus gym workouts, virtual gym, digital gym, gym training online, workout training programs" />
         
-        <meta property="og:title" content="Workouts - Smarty Gym | Fitness Reimagined" />
+        <meta property="og:title" content="Workouts - SmartyGym | Fitness Reimagined" />
         <meta property="og:description" content="Convenient & flexible workouts designed by Sports Scientist Haris Falas - train anywhere, anytime" />
         <meta property="og:type" content="website" />
         <meta property="og:url" content="https://smartygym.com/workout" />
         
         <meta name="twitter:card" content="summary_large_image" />
-        <meta name="twitter:title" content="Workouts - Smarty Gym" />
+        <meta name="twitter:title" content="Workouts - SmartyGym" />
         <meta name="twitter:description" content="Convenient & flexible workouts by Haris Falas at smartygym.com" />
         
         <link rel="canonical" href="https://smartygym.com/workout" />
@@ -177,7 +177,7 @@ const WorkoutFlow = () => {
               <p className="text-muted-foreground mb-4">
                 Unlock 100+ more exclusive sessions with SmartyGym Premium.
               </p>
-              <Button size="lg" onClick={() => navigate("/premiumbenefits")}>
+              <Button size="lg" onClick={() => navigate("/premiumbenefits")} className="cta-button">
                 Join Premium
               </Button>
             </div>

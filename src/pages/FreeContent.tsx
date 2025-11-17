@@ -127,7 +127,7 @@ const FreeContent = () => {
             <p className="text-sm text-muted-foreground mb-2">
               Try these workouts and programs for free — no login required. Want full access?
             </p>
-            <Button variant="default" size="sm" onClick={() => navigate("/premiumbenefits")}>
+            <Button variant="default" size="sm" onClick={() => navigate("/premiumbenefits")} className="cta-button">
               Join Premium
             </Button>
           </div>
@@ -221,7 +221,7 @@ const FreeContent = () => {
             <p className="text-muted-foreground mb-4">
               Get all programs, workouts, and tools with Smarty Gym Premium.
             </p>
-            <Button size="lg" onClick={() => navigate("/premiumbenefits")}>
+            <Button size="lg" onClick={() => navigate("/premiumbenefits")} className="cta-button">
               Join Premium
             </Button>
           </div>

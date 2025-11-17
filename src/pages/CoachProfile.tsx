@@ -274,7 +274,7 @@ const CoachProfile = () => {
             {/* CTA Section */}
             <div className="text-center py-8">
               <h3 className="text-xl sm:text-2xl font-semibold mb-6">Join me inside SmartyGym and start your training today.</h3>
-              <Button size="lg" onClick={() => navigate("/premiumbenefits")}>
+              <Button size="lg" onClick={() => navigate("/premiumbenefits")} className="cta-button">
                 Start Training
               </Button>
             </div>

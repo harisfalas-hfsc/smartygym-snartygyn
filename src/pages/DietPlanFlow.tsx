@@ -182,7 +182,7 @@ const DietPlanFlow = () => {
   return (
     <>
       <Helmet>
-        <title>Diet Plan Generator | Smarty Gym</title>
+        <title>Diet Plan Generator | SmartyGym</title>
         <meta name="description" content="Generate your personalized diet plan based on your goals and preferences" />
       </Helmet>
       

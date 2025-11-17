@@ -345,7 +345,7 @@ export default function Dashboard() {
         <div className="container mx-auto max-w-7xl">
           <div className="flex justify-between items-center gap-2">
             <div className="flex items-center gap-2 sm:gap-4 min-w-0">
-              <img src={smartyGymLogo} alt="Smarty Gym" className="h-10 sm:h-12 w-auto flex-shrink-0" />
+              <img src={smartyGymLogo} alt="SmartyGym" className="h-10 sm:h-12 w-auto flex-shrink-0" />
               <h1 className="text-lg sm:text-2xl font-bold truncate">Dashboard</h1>
             </div>
             <div className="flex gap-2 flex-shrink-0">
@@ -375,7 +375,7 @@ export default function Dashboard() {
       <main className="container mx-auto max-w-7xl p-4 py-8">
         <div className="mb-8">
           <h2 className="text-3xl font-bold mb-2">
-            {isNewUser() ? `Welcome to Smarty Gym, ${user?.user_metadata?.full_name || "User"}!` : `Welcome back, ${user?.user_metadata?.full_name || "User"}!`}
+            {isNewUser() ? `Welcome to SmartyGym, ${user?.user_metadata?.full_name || "User"}!` : `Welcome back, ${user?.user_metadata?.full_name || "User"}!`}
           </h2>
           <p className="text-muted-foreground">
             {isNewUser() ? "We're excited to have you here! Let's start your fitness journey." : "Here's your fitness overview"}
