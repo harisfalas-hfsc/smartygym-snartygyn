@@ -4,13 +4,7 @@ import { Helmet } from "react-helmet";
 import { ServiceCard } from "@/components/ServiceCard";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { Dumbbell, Calendar, BookOpen, Calculator, Activity, Flame, Instagram, Facebook, Youtube, UserCheck, Wrench, Video, FileText, Smartphone, Users, Target, Heart, Zap, Plane, GraduationCap, ChevronDown } from "lucide-react";
+import { Dumbbell, Calendar, BookOpen, Calculator, Activity, Flame, Instagram, Facebook, Youtube, UserCheck, Wrench, Video, FileText, Smartphone, Users, Target, Heart, Zap, Plane, GraduationCap } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { User as SupabaseUser } from "@supabase/supabase-js";
 import { useToast } from "@/hooks/use-toast";
@@ -438,54 +432,55 @@ const Index = () => {
                     </div>
                   </div>
 
-                  {/* CTA Buttons after three cards - Single Dropdown */}
-                  <div className="flex justify-center items-center pt-6">
-                    <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
-                        <Button 
-                          size="lg" 
-                          variant="outline"
-                          className="w-full sm:w-auto min-w-[250px] bg-transparent border-2 border-primary hover:bg-primary/10 text-lg font-semibold"
-                          aria-label="Get started with Smarty Gym - Browse our services"
-                        >
-                          Get Started
-                          <ChevronDown className="ml-2 h-5 w-5" />
-                        </Button>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent 
-                        align="center" 
-                        className="w-[250px] bg-popover border-primary/20"
+                  {/* Navigation Cards after three cards */}
+                  <div className="pt-6">
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4">
+                      
+                      {/* Workouts Card */}
+                      <Button
+                        variant="outline"
+                        size="lg"
+                        onClick={() => navigate("/workout")}
+                        className="h-auto py-4 px-4 flex flex-col items-center gap-2 bg-background hover:bg-primary/10 border-2 border-primary/20 hover:border-primary transition-all"
                       >
-                        <DropdownMenuItem 
-                          onClick={() => navigate("/workout")}
-                          className="cursor-pointer text-base py-3 hover:bg-primary/10"
-                        >
-                          <Dumbbell className="mr-3 h-5 w-5 text-primary" />
-                          Workouts
-                        </DropdownMenuItem>
-                        <DropdownMenuItem 
-                          onClick={() => navigate("/trainingprogram")}
-                          className="cursor-pointer text-base py-3 hover:bg-primary/10"
-                        >
-                          <Calendar className="mr-3 h-5 w-5 text-primary" />
-                          Training Programs
-                        </DropdownMenuItem>
-                        <DropdownMenuItem 
-                          onClick={() => navigate("/exerciselibrary")}
-                          className="cursor-pointer text-base py-3 hover:bg-primary/10"
-                        >
-                          <BookOpen className="mr-3 h-5 w-5 text-primary" />
-                          Library
-                        </DropdownMenuItem>
-                        <DropdownMenuItem 
-                          onClick={() => navigate("/blog")}
-                          className="cursor-pointer text-base py-3 hover:bg-primary/10"
-                        >
-                          <FileText className="mr-3 h-5 w-5 text-primary" />
-                          Blog
-                        </DropdownMenuItem>
-                      </DropdownMenuContent>
-                    </DropdownMenu>
+                        <Dumbbell className="w-8 h-8 text-primary" />
+                        <span className="font-semibold text-sm sm:text-base">Workouts</span>
+                      </Button>
+
+                      {/* Training Programs Card */}
+                      <Button
+                        variant="outline"
+                        size="lg"
+                        onClick={() => navigate("/trainingprogram")}
+                        className="h-auto py-4 px-4 flex flex-col items-center gap-2 bg-background hover:bg-primary/10 border-2 border-primary/20 hover:border-primary transition-all"
+                      >
+                        <Calendar className="w-8 h-8 text-primary" />
+                        <span className="font-semibold text-sm sm:text-base">Training Programs</span>
+                      </Button>
+
+                      {/* Library Card */}
+                      <Button
+                        variant="outline"
+                        size="lg"
+                        onClick={() => navigate("/exerciselibrary")}
+                        className="h-auto py-4 px-4 flex flex-col items-center gap-2 bg-background hover:bg-primary/10 border-2 border-primary/20 hover:border-primary transition-all"
+                      >
+                        <BookOpen className="w-8 h-8 text-primary" />
+                        <span className="font-semibold text-sm sm:text-base">Library</span>
+                      </Button>
+
+                      {/* Blog Card */}
+                      <Button
+                        variant="outline"
+                        size="lg"
+                        onClick={() => navigate("/blog")}
+                        className="h-auto py-4 px-4 flex flex-col items-center gap-2 bg-background hover:bg-primary/10 border-2 border-primary/20 hover:border-primary transition-all"
+                      >
+                        <FileText className="w-8 h-8 text-primary" />
+                        <span className="font-semibold text-sm sm:text-base">Blog</span>
+                      </Button>
+
+                    </div>
                   </div>
 
                   {/* Feature Highlights Grid */}
