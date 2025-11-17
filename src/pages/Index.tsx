@@ -4,7 +4,7 @@ import { Helmet } from "react-helmet";
 import { ServiceCard } from "@/components/ServiceCard";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { Dumbbell, Calendar, BookOpen, Calculator, Activity, Flame, Instagram, Facebook, Youtube, UserCheck, Wrench, Video, FileText, Smartphone, Users, Target, Heart, Zap, Plane, GraduationCap } from "lucide-react";
+import { Dumbbell, Calendar, BookOpen, Calculator, Activity, Flame, Instagram, Facebook, Youtube, UserCheck, Wrench, Video, FileText, Smartphone, Users, Target, Heart, Zap, Plane, GraduationCap, Check } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { User as SupabaseUser } from "@supabase/supabase-js";
 import { useToast } from "@/hooks/use-toast";
@@ -607,38 +607,101 @@ const Index = () => {
                           </h3>
                           <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center items-stretch sm:items-center mt-4">
                             {/* Gold Plan Card */}
-                            <div className="bg-gradient-to-br from-yellow-500/20 via-amber-500/15 to-yellow-600/20 border-2 border-yellow-600/40 rounded-lg p-4 sm:p-6 flex-1 w-full">
-                              <div className="text-yellow-600 dark:text-yellow-400 font-bold text-sm sm:text-base md:text-xl mb-1 sm:mb-2">
-                                Gold Plan - All Included
+                            <div className="bg-gradient-to-br from-yellow-500/20 via-amber-500/15 to-yellow-600/20 border-2 border-yellow-600/40 rounded-lg p-4 sm:p-6 flex-1 w-full flex flex-col sm:flex-row gap-4">
+                              {/* Left Column - Pricing Info */}
+                              <div className="flex flex-col items-center sm:items-start sm:w-2/5">
+                                <div className="text-yellow-600 dark:text-yellow-400 font-bold text-sm sm:text-base md:text-lg mb-1">
+                                  Gold Plan
+                                </div>
+                                <div className="text-2xl sm:text-3xl font-bold mb-1">€9.99</div>
+                                <div className="text-xs sm:text-sm text-muted-foreground mb-3">per month</div>
+                                <Button 
+                                  variant="default" 
+                                  className="w-full sm:w-auto px-4 sm:px-6 text-sm py-2" 
+                                  onClick={() => handleSubscribe('gold')}
+                                >
+                                  Get Started
+                                </Button>
                               </div>
-                              <div className="text-xl sm:text-2xl md:text-3xl font-bold mb-1 sm:mb-2">€9.99</div>
-                              <div className="text-xs sm:text-sm text-muted-foreground mb-2 sm:mb-3 md:mb-4">per month</div>
-                              <Button 
-                                variant="default" 
-                                className="w-full text-sm sm:text-base py-2 sm:py-3" 
-                                onClick={() => handleSubscribe('gold')}
-                              >
-                                Get Started
-                              </Button>
+                              
+                              {/* Right Column - Features */}
+                              <div className="sm:w-3/5 space-y-1.5">
+                                <div className="flex items-start gap-2">
+                                  <Check className="h-4 w-4 text-green-500 shrink-0 mt-0.5" />
+                                  <span className="text-xs sm:text-sm">Full access to all workouts</span>
+                                </div>
+                                <div className="flex items-start gap-2">
+                                  <Check className="h-4 w-4 text-green-500 shrink-0 mt-0.5" />
+                                  <span className="text-xs sm:text-sm">Full access to all training programs</span>
+                                </div>
+                                <div className="flex items-start gap-2">
+                                  <Check className="h-4 w-4 text-green-500 shrink-0 mt-0.5" />
+                                  <span className="text-xs sm:text-sm">Full access to training tools</span>
+                                </div>
+                                <div className="flex items-start gap-2">
+                                  <Check className="h-4 w-4 text-green-500 shrink-0 mt-0.5" />
+                                  <span className="text-xs sm:text-sm">Flexible monthly billing</span>
+                                </div>
+                                <div className="flex items-start gap-2">
+                                  <Check className="h-4 w-4 text-green-500 shrink-0 mt-0.5" />
+                                  <span className="text-xs sm:text-sm">Cancel anytime</span>
+                                </div>
+                                <div className="flex items-start gap-2">
+                                  <Check className="h-4 w-4 text-green-500 shrink-0 mt-0.5" />
+                                  <span className="text-xs sm:text-sm">Perfect for trying premium</span>
+                                </div>
+                              </div>
                             </div>
                             
                             {/* Platinum Plan Card */}
-                            <div className="bg-gradient-to-br from-slate-300/30 via-gray-200/20 to-slate-300/30 dark:from-slate-700/30 dark:via-slate-600/20 dark:to-slate-700/30 border-2 border-slate-400/50 dark:border-slate-500/50 rounded-lg p-4 sm:p-6 flex-1 w-full relative">
+                            <div className="bg-gradient-to-br from-slate-300/30 via-gray-200/20 to-slate-300/30 dark:from-slate-700/30 dark:via-slate-600/20 dark:to-slate-700/30 border-2 border-slate-400/50 dark:border-slate-500/50 rounded-lg p-4 sm:p-6 flex-1 w-full relative flex flex-col sm:flex-row gap-4">
                               <div className="absolute -top-2.5 left-1/2 -translate-x-1/2 bg-primary text-primary-foreground text-[10px] sm:text-xs font-bold px-2 sm:px-3 py-0.5 sm:py-1 rounded-full whitespace-nowrap z-10">
                                 BEST VALUE
                               </div>
-                              <div className="text-slate-700 dark:text-slate-300 font-bold text-sm sm:text-base md:text-xl mb-1 sm:mb-2">
-                                Platinum Plan - All Included
+                              
+                              {/* Left Column - Pricing Info */}
+                              <div className="flex flex-col items-center sm:items-start sm:w-2/5">
+                                <div className="text-slate-700 dark:text-slate-300 font-bold text-sm sm:text-base md:text-lg mb-1">
+                                  Platinum Plan
+                                </div>
+                                <div className="text-2xl sm:text-3xl font-bold mb-1">€89.99</div>
+                                <div className="text-xs sm:text-sm text-muted-foreground mb-3">per year</div>
+                                <Button 
+                                  variant="default" 
+                                  className="w-full sm:w-auto px-4 sm:px-6 text-sm py-2" 
+                                  onClick={() => handleSubscribe('platinum')}
+                                >
+                                  Get Started
+                                </Button>
                               </div>
-                              <div className="text-xl sm:text-2xl md:text-3xl font-bold mb-1 sm:mb-2">€89.99</div>
-                              <div className="text-xs sm:text-sm text-muted-foreground mb-2 sm:mb-3 md:mb-4">per year</div>
-                              <Button 
-                                variant="default" 
-                                className="w-full text-sm sm:text-base py-2 sm:py-3" 
-                                onClick={() => handleSubscribe('platinum')}
-                              >
-                                Get Started
-                              </Button>
+                              
+                              {/* Right Column - Features */}
+                              <div className="sm:w-3/5 space-y-1.5">
+                                <div className="flex items-start gap-2">
+                                  <Check className="h-4 w-4 text-green-500 shrink-0 mt-0.5" />
+                                  <span className="text-xs sm:text-sm">Full access to all workouts</span>
+                                </div>
+                                <div className="flex items-start gap-2">
+                                  <Check className="h-4 w-4 text-green-500 shrink-0 mt-0.5" />
+                                  <span className="text-xs sm:text-sm">Full access to all training programs</span>
+                                </div>
+                                <div className="flex items-start gap-2">
+                                  <Check className="h-4 w-4 text-green-500 shrink-0 mt-0.5" />
+                                  <span className="text-xs sm:text-sm">Full access to training tools</span>
+                                </div>
+                                <div className="flex items-start gap-2">
+                                  <Check className="h-4 w-4 text-green-500 shrink-0 mt-0.5" />
+                                  <span className="text-xs sm:text-sm font-semibold">25% savings vs monthly plan</span>
+                                </div>
+                                <div className="flex items-start gap-2">
+                                  <Check className="h-4 w-4 text-green-500 shrink-0 mt-0.5" />
+                                  <span className="text-xs sm:text-sm">Lock in your rate for 12 months</span>
+                                </div>
+                                <div className="flex items-start gap-2">
+                                  <Check className="h-4 w-4 text-green-500 shrink-0 mt-0.5" />
+                                  <span className="text-xs sm:text-sm">Cancel anytime</span>
+                                </div>
+                              </div>
                             </div>
                           </div>
                         </div>
