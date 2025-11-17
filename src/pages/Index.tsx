@@ -667,15 +667,14 @@ const Index = () => {
 
             {/* Platinum Plan */}
             <Card className="relative border-2 border-primary shadow-lg flex flex-col bg-gradient-to-br from-primary/5 to-amber-500/5">
-              <CardHeader className="text-center pb-2 sm:pb-4">
-                <div className="mb-2 sm:mb-3 relative">
-                  <Badge className="absolute -top-3 right-1 sm:right-0 bg-green-600 text-white px-2 py-1 text-xs sm:text-sm">
-                    BEST VALUE
-                  </Badge>
-                  <div className="flex items-center justify-center gap-2">
-                    <Crown className="h-5 w-5 sm:h-6 sm:w-6 text-primary" />
-                    <h2 className="text-xl sm:text-2xl font-bold text-primary">Platinum</h2>
-                  </div>
+              <Badge className="absolute -top-2 right-2 sm:-top-3 sm:right-3 bg-green-600 text-white px-2 sm:px-3 py-1 text-xs sm:text-sm shadow-md z-10">
+                BEST VALUE
+              </Badge>
+              
+              <CardHeader className="text-center pb-2 sm:pb-4 pt-4 sm:pt-6">
+                <div className="flex items-center justify-center gap-2 mb-2 sm:mb-3">
+                  <Crown className="h-5 w-5 sm:h-6 sm:w-6 text-primary" />
+                  <h2 className="text-xl sm:text-2xl font-bold text-primary">Platinum</h2>
                 </div>
                 <Badge className="bg-primary text-primary-foreground mx-auto mb-3 sm:mb-4 text-xs sm:text-sm">
                   YEARLY
