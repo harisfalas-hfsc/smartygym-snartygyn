@@ -43,7 +43,6 @@ import { CalorieBurningCardTemplate } from "./instagram/workouts/CalorieBurningC
 import { MetabolicCardTemplate } from "./instagram/workouts/MetabolicCardTemplate";
 import { CardioCardTemplate } from "./instagram/workouts/CardioCardTemplate";
 import { MobilityCardTemplate } from "./instagram/workouts/MobilityCardTemplate";
-import { PowerCardTemplate } from "./instagram/workouts/PowerCardTemplate";
 import { ChallengeCardTemplate } from "./instagram/workouts/ChallengeCardTemplate";
 
 // Programs
@@ -117,7 +116,6 @@ const workoutTemplates: Template[] = [
   { id: "metabolic", name: "Metabolic", component: MetabolicCardTemplate },
   { id: "cardio", name: "Cardio", component: CardioCardTemplate },
   { id: "mobility", name: "Mobility", component: MobilityCardTemplate },
-  { id: "power", name: "Power", component: PowerCardTemplate },
   { id: "challenge", name: "Challenge", component: ChallengeCardTemplate },
 ];
 
