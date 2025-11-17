@@ -14,7 +14,7 @@ export const AvatarSetupDialog = ({ open, onOpenChange, userId, userName }: Avat
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
-          <DialogTitle>Welcome to Smarty Gym!</DialogTitle>
+          <DialogTitle>Welcome to SmartyGym!</DialogTitle>
           <DialogDescription>
             Let's set up your profile. Upload an avatar so other members can recognize you.
           </DialogDescription>

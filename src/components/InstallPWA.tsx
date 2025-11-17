@@ -62,7 +62,7 @@ export const InstallPWA = () => {
     if (!deferredPrompt) {
       // For iOS or if prompt not available
       toast({
-        title: "Install Smarty Gym",
+        title: "Install SmartyGym",
         description: "Tap the Share button and select 'Add to Home Screen'",
         duration: 5000,
       });
@@ -77,7 +77,7 @@ export const InstallPWA = () => {
       if (outcome === "accepted") {
         toast({
           title: "Success!",
-          description: "Smarty Gym has been installed",
+          description: "SmartyGym has been installed",
         });
       }
       
@@ -87,7 +87,7 @@ export const InstallPWA = () => {
       console.error("Error installing PWA:", error);
       toast({
         title: "Installation",
-        description: "Use your browser's menu to install Smarty Gym",
+        description: "Use your browser's menu to install SmartyGym",
         duration: 5000,
       });
     }
@@ -108,7 +108,7 @@ export const InstallPWA = () => {
             <Download className="h-5 w-5 text-primary" />
           </div>
           <div className="flex-1 min-w-0">
-            <h3 className="font-semibold text-sm mb-1">Install Smarty Gym</h3>
+            <h3 className="font-semibold text-sm mb-1">Install SmartyGym</h3>
             <p className="text-xs text-muted-foreground mb-3">
               Get instant access to workouts, offline access, and a native app experience!
             </p>

@@ -238,8 +238,8 @@ export default function Auth() {
         
         <Card className="w-full">
           <CardHeader className="space-y-1 flex flex-col items-center">
-            <img src={smartyGymLogo} alt="Smarty Gym" className="h-20 w-auto mb-2" />
-            <CardTitle className="text-2xl font-bold text-center">Welcome to Smarty Gym</CardTitle>
+            <img src={smartyGymLogo} alt="SmartyGym" className="h-20 w-auto mb-2" />
+            <CardTitle className="text-2xl font-bold text-center">Welcome to SmartyGym</CardTitle>
             <CardDescription className="text-center">
               Create an account or sign in to continue
             </CardDescription>

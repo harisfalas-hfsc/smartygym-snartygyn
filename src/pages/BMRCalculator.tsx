@@ -114,17 +114,17 @@ const BMRCalculator = () => {
   return (
     <ProtectedRoute>
       <Helmet>
-        <title>BMR Calculator - Smarty Gym | Free Basal Metabolic Rate Calculator | smartygym.com</title>
+        <title>BMR Calculator - SmartyGym | Free Basal Metabolic Rate Calculator | smartygym.com</title>
         <meta name="description" content="Free BMR Calculator using Mifflin-St Jeor equation. Calculate your basal metabolic rate and daily calorie needs at smartygym.com - convenient fitness tool by Haris Falas." />
         <meta name="keywords" content="smartygym, smarty gym, smartygym.com, Haris Falas, bmr calculator, basal metabolic rate, tdee calculator, calorie calculator, convenient fitness, gym Reimagined, flexible nutrition tools" />
         
-        <meta property="og:title" content="BMR Calculator - Smarty Gym" />
+        <meta property="og:title" content="BMR Calculator - SmartyGym" />
         <meta property="og:description" content="Free basal metabolic rate calculator - convenient fitness tool at smartygym.com" />
         <meta property="og:type" content="website" />
         <meta property="og:url" content="https://smartygym.com/bmrcalculator" />
         
         <meta name="twitter:card" content="summary_large_image" />
-        <meta name="twitter:title" content="BMR Calculator - Smarty Gym" />
+        <meta name="twitter:title" content="BMR Calculator - SmartyGym" />
         <meta name="twitter:description" content="Free BMR calculator at smartygym.com for flexible fitness planning" />
         
         <link rel="canonical" href="https://smartygym.com/bmrcalculator" />
@@ -218,13 +218,13 @@ const BMRCalculator = () => {
                   className="bg-primary/10 p-6 rounded-lg text-center"
                   data-calculator="bmr"
                   data-keywords="smarty gym calculator, online fitness tools, smartygym.com, Haris Falas Cyprus, BMR calculator"
-                  aria-label="BMR calculation result - Smarty Gym Cyprus online fitness calculator - smartygym.com"
+                  aria-label="BMR calculation result - SmartyGym Cyprus online fitness calculator - smartygym.com"
                 >
                   <h2 
                     className="text-lg font-semibold mb-2"
                     itemProp="name"
                   >
-                    Your Basal Metabolic Rate - Smarty Gym
+                    Your Basal Metabolic Rate - SmartyGym
                   </h2>
                   <p 
                     className="text-4xl font-bold text-primary"
@@ -236,9 +236,9 @@ const BMRCalculator = () => {
                     className="text-sm text-muted-foreground mt-2"
                     itemProp="description"
                   >
-                    Calories burned at complete rest - Calculated by Smarty Gym Cyprus online fitness tools - smartygym.com
+                    Calories burned at complete rest - Calculated by SmartyGym Cyprus online fitness tools - smartygym.com
                   </p>
-                  <meta itemProp="provider" content="Smarty Gym Cyprus - smartygym.com - Haris Falas" />
+                  <meta itemProp="provider" content="SmartyGym Cyprus - smartygym.com - Haris Falas" />
                 </article>
 
                 {user && (

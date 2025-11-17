@@ -185,7 +185,7 @@ const TrainingProgramFlow = () => {
             <div className="bg-card border border-border rounded-xl p-6 mt-8 text-center shadow-soft">
               <h3 className="text-xl font-semibold mb-2">Start your transformation</h3>
               <p className="text-muted-foreground mb-4">
-                Join Smarty Gym Premium for full access to all training programs.
+                Join SmartyGym Premium for full access to all training programs.
               </p>
               <Button size="lg" onClick={() => navigate("/premiumbenefits")}>
                 Join Premium

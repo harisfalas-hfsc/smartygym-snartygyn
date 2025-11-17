@@ -41,7 +41,7 @@ export const TimedPopup = () => {
         <DialogHeader>
           <DialogTitle className="text-xl">Upgrade to Premium</DialogTitle>
           <DialogDescription className="text-base pt-2">
-            Get full access to all programs, tools, and exclusive content with Smarty Gym Premium.
+            Get full access to all programs, tools, and exclusive content with SmartyGym Premium.
           </DialogDescription>
         </DialogHeader>
         <div className="flex flex-col gap-3 pt-4">
