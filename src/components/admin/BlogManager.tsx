@@ -4,7 +4,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
-import { Plus, Search, Pencil, Trash2, Eye, EyeOff, AlertTriangle, CheckCircle } from "lucide-react";
+import { Plus, Search, Pencil, Trash2, Eye, EyeOff, AlertTriangle, CheckCircle, Calendar, Clock } from "lucide-react";
 import { toast } from "sonner";
 import { ArticleEditDialog } from "./ArticleEditDialog";
 import {

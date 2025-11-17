@@ -9,6 +9,7 @@ import { ArrowLeft, Clock, Calendar } from "lucide-react";
 import { useShowBackButton } from "@/hooks/useShowBackButton";
 import { supabase } from "@/integrations/supabase/client";
 import { CompactFilters } from "@/components/CompactFilters";
+import { Link } from "react-router-dom";
 
 interface Article {
   id: string;
@@ -18,6 +19,7 @@ interface Article {
   readTime: string;
   date: string;
   category: string;
+  author_name?: string;
 }
 
 const articles: Article[] = [
@@ -106,7 +108,7 @@ const Blog = () => {
         if (error) throw error;
 
         if (data && data.length > 0) {
-          const formattedArticles: Article[] = data.map(article => ({
+          const formattedArticles: Article[] = data.map((article: any) => ({
             id: article.id,
             title: article.title,
             excerpt: article.excerpt,
@@ -117,7 +119,8 @@ const Blog = () => {
               month: 'long', 
               day: 'numeric' 
             }),
-            category: article.category
+            category: article.category,
+            author_name: article.author_name,
           }));
 
           setDbArticles(formattedArticles);

@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
@@ -9,8 +9,19 @@ import { RichTextEditor } from "@/components/ui/rich-text-editor";
 import { Switch } from "@/components/ui/switch";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
-import { Loader2, Sparkles, CheckCircle, XCircle, Image as ImageIcon } from "lucide-react";
+import { Loader2, Sparkles, CheckCircle, XCircle } from "lucide-react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+import { Link } from "react-router-dom";
 
 const ARTICLE_CATEGORIES = ["Fitness", "Wellness", "Nutrition"];
 
@@ -32,6 +43,8 @@ export const ArticleEditDialog = ({ article, open, onOpenChange, onSave }: Artic
     image_url: '',
     read_time: '',
     is_published: false,
+    author_name: '',
+    author_credentials: '',
   });
   const [isGeneratingImage, setIsGeneratingImage] = useState(false);
   const [imageUniqueness, setImageUniqueness] = useState<{
@@ -39,11 +52,42 @@ export const ArticleEditDialog = ({ article, open, onOpenChange, onSave }: Artic
     conflicts: any[];
     checked: boolean;
   }>({ isUnique: true, conflicts: [], checked: false });
+  const [draftTimestamp, setDraftTimestamp] = useState<number | null>(null);
+  const [showDraftDialog, setShowDraftDialog] = useState(false);
+  const [savedDraft, setSavedDraft] = useState<any>(null);
 
   useEffect(() => {
     if (article) {
-      setFormData(article);
+      setFormData({
+        title: article.title || '',
+        slug: article.slug || '',
+        excerpt: article.excerpt || '',
+        content: article.content || '',
+        category: article.category || 'Fitness',
+        image_url: article.image_url || '',
+        read_time: article.read_time || '',
+        is_published: article.is_published || false,
+        author_name: article.author_name || '',
+        author_credentials: article.author_credentials || '',
+      });
+      if (article.image_url) {
+        checkImageUniqueness(article.image_url);
+      }
     } else {
+      // Check for draft
+      const draftKey = `blog-article-draft-${article?.id || 'new'}`;
+      const savedDraftStr = localStorage.getItem(draftKey);
+      
+      if (savedDraftStr) {
+        try {
+          const draft = JSON.parse(savedDraftStr);
+          setSavedDraft(draft);
+          setShowDraftDialog(true);
+        } catch (e) {
+          console.error("Failed to parse draft", e);
+        }
+      }
+      
       setFormData({
         title: '',
         slug: '',
@@ -53,9 +97,74 @@ export const ArticleEditDialog = ({ article, open, onOpenChange, onSave }: Artic
         image_url: '',
         read_time: '',
         is_published: false,
+        author_name: '',
+        author_credentials: '',
       });
     }
-  }, [article]);
+  }, [article, open]);
+
+  // Draft management
+  const saveDraft = (data: typeof formData) => {
+    const draftKey = `blog-article-draft-${article?.id || 'new'}`;
+    const draft = {
+      ...data,
+      timestamp: Date.now(),
+    };
+    localStorage.setItem(draftKey, JSON.stringify(draft));
+    setDraftTimestamp(Date.now());
+  };
+
+  const clearDraft = () => {
+    const draftKey = `blog-article-draft-${article?.id || 'new'}`;
+    localStorage.removeItem(draftKey);
+    setDraftTimestamp(null);
+  };
+
+  const restoreDraft = () => {
+    if (savedDraft) {
+      setFormData(savedDraft);
+      setDraftTimestamp(savedDraft.timestamp);
+      setShowDraftDialog(false);
+    }
+  };
+
+  const discardDraft = () => {
+    clearDraft();
+    setShowDraftDialog(false);
+    setSavedDraft(null);
+  };
+
+  // Auto-save every 30 seconds
+  useEffect(() => {
+    if (!open) return;
+    
+    const interval = setInterval(() => {
+      if (formData.title || formData.content) {
+        saveDraft(formData);
+      }
+    }, 30000);
+
+    return () => clearInterval(interval);
+  }, [formData, open]);
+
+  // Debounced save on content changes
+  const debouncedSave = useMemo(() => {
+    let timeout: NodeJS.Timeout;
+    return (data: typeof formData) => {
+      clearTimeout(timeout);
+      timeout = setTimeout(() => {
+        if (data.title || data.content) {
+          saveDraft(data);
+        }
+      }, 3000);
+    };
+  }, []);
+
+  useEffect(() => {
+    if (formData.title || formData.content) {
+      debouncedSave(formData);
+    }
+  }, [formData.content, formData.title]);
 
   const generateSlug = (title: string) => {
     return title
@@ -118,43 +227,59 @@ export const ArticleEditDialog = ({ article, open, onOpenChange, onSave }: Artic
     if (!formData.title || !formData.category) {
       toast({
         title: "Error",
-        description: "Please enter article title and select category first",
+        description: "Please enter a title and select a category first",
         variant: "destructive",
       });
       return;
     }
 
     setIsGeneratingImage(true);
+    let attempts = 0;
+    const maxAttempts = 3;
+
     try {
-      const response = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/generate-ad-image`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`
-        },
-        body: JSON.stringify({
-          prompt: `Professional blog article hero image about "${formData.title}", ${formData.category.toLowerCase()} theme, modern editorial style, high-quality photography, inspiring and informative, suitable for fitness/wellness blog, clean composition, professional lighting`,
-          template: 'blog-article'
-        })
-      });
-
-      if (!response.ok) throw new Error('Failed to generate image');
-
-      const data = await response.json();
-      
-      if (data.imageUrl) {
-        setFormData({ ...formData, image_url: data.imageUrl });
-        await checkImageUniqueness(data.imageUrl);
-        toast({
-          title: "Success",
-          description: "Unique image generated successfully",
+      while (attempts < maxAttempts) {
+        const { data, error } = await supabase.functions.invoke('generate-ad-image', {
+          body: {
+            contentType: 'blog_article',
+            prompt: `Blog article about ${formData.title}, category: ${formData.category}`,
+            category: formData.category,
+          },
         });
+
+        if (error) throw error;
+
+        const imageUrl = data.imageUrl;
+        const uniquenessCheck = await checkImageUniqueness(imageUrl);
+
+        if (uniquenessCheck.isUnique) {
+          setFormData({ ...formData, image_url: imageUrl });
+          toast({
+            title: "Success",
+            description: "Unique image generated successfully",
+          });
+          return;
+        }
+
+        attempts++;
+        if (attempts < maxAttempts) {
+          toast({
+            title: "Duplicate Image",
+            description: `Image already exists. Generating another attempt (${attempts}/${maxAttempts})...`,
+          });
+        }
       }
-    } catch (error) {
+
+      toast({
+        title: "Warning",
+        description: "Could not generate a unique image after 3 attempts. Please try again or use a custom URL.",
+        variant: "destructive",
+      });
+    } catch (error: any) {
       console.error('Error generating image:', error);
       toast({
         title: "Error",
-        description: "Failed to generate image",
+        description: error.message || "Failed to generate image",
         variant: "destructive",
       });
     } finally {
@@ -162,242 +287,324 @@ export const ArticleEditDialog = ({ article, open, onOpenChange, onSave }: Artic
     }
   };
 
-  const handleSave = async () => {
-    try {
-      if (!formData.title || !formData.excerpt || !formData.content || !formData.category) {
-        toast({
-          title: "Error",
-          description: "Please fill in all required fields",
-          variant: "destructive",
-        });
-        return;
-      }
-
-      if (!formData.image_url || !formData.image_url.trim()) {
-        toast({
-          title: "Error",
-          description: "Image is required. Please add an image URL or generate one.",
-          variant: "destructive",
-        });
-        return;
-      }
-
-      const uniquenessCheck = await checkImageUniqueness(formData.image_url);
-      if (!uniquenessCheck.isUnique) {
-        const conflictsList = uniquenessCheck.conflicts.map(c => `${c.name} (${c.type})`).join(', ');
-        toast({
-          title: "Error",
-          description: `This image is already used in: ${conflictsList}. Please choose a different image.`,
-          variant: "destructive",
-        });
-        return;
-      }
-
-      const articleData = {
+  const handleAuthorToggle = (checked: boolean) => {
+    if (checked) {
+      setFormData({
         ...formData,
+        author_name: 'Haris Falas',
+        author_credentials: 'BSc Sports Science\nEXOS Specialist\nCSCS'
+      });
+    } else {
+      setFormData({
+        ...formData,
+        author_name: '',
+        author_credentials: ''
+      });
+    }
+  };
+
+  const handleSave = async () => {
+    if (!formData.title || !formData.slug || !formData.excerpt || !formData.content || !formData.category) {
+      toast({
+        title: "Error",
+        description: "Please fill in all required fields",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (!formData.image_url || !formData.image_url.trim()) {
+      toast({
+        title: "Error",
+        description: "Please generate or enter an image URL",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (imageUniqueness.checked && !imageUniqueness.isUnique) {
+      toast({
+        title: "Error",
+        description: "Image is already used by another content. Please generate a unique image or use a different URL.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    try {
+      const dataToSave = {
+        title: formData.title,
+        slug: formData.slug,
+        excerpt: formData.excerpt,
+        content: formData.content,
+        category: formData.category,
+        image_url: formData.image_url,
+        read_time: formData.read_time,
+        is_published: formData.is_published,
         published_at: formData.is_published ? new Date().toISOString() : null,
+        author_name: formData.author_name || null,
+        author_credentials: formData.author_credentials || null,
       };
 
       if (article) {
-        // Update existing
         const { error } = await supabase
           .from('blog_articles')
-          .update(articleData)
+          .update(dataToSave)
           .eq('id', article.id);
 
         if (error) throw error;
-        toast({ title: "Success", description: "Article updated successfully" });
       } else {
-        // Insert new
         const { error } = await supabase
           .from('blog_articles')
-          .insert([articleData]);
+          .insert([dataToSave]);
 
         if (error) throw error;
-        toast({ title: "Success", description: "Article created successfully" });
       }
+
+      // Clear draft on successful save
+      clearDraft();
+
+      toast({
+        title: "Success",
+        description: `Article ${article ? "updated" : "created"} successfully`,
+      });
       onSave();
-    } catch (error) {
-      console.error('Error saving article:', error);
+      onOpenChange(false);
+    } catch (error: any) {
+      console.error("Error saving article:", error);
       toast({
         title: "Error",
-        description: "Failed to save article",
+        description: error.message || "Failed to save article",
         variant: "destructive",
       });
     }
   };
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-5xl max-h-[90vh] overflow-y-auto">
-        <DialogHeader>
-          <DialogTitle>{article ? 'Edit Article' : 'Create New Article'}</DialogTitle>
-          <DialogDescription>
-            {article ? 'Update article details' : 'Add a new blog article'}
-          </DialogDescription>
-        </DialogHeader>
+    <>
+      <AlertDialog open={showDraftDialog} onOpenChange={setShowDraftDialog}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Draft Found</AlertDialogTitle>
+            <AlertDialogDescription>
+              A draft was found from {savedDraft?.timestamp && new Date(savedDraft.timestamp).toLocaleString()}. 
+              Would you like to restore it?
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel onClick={discardDraft}>Discard Draft</AlertDialogCancel>
+            <AlertDialogAction onClick={restoreDraft}>Restore Draft</AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
 
-        <div className="space-y-4">
-          <div className="space-y-2">
-            <Label htmlFor="title">Title *</Label>
-            <Input
-              id="title"
-              value={formData.title}
-              onChange={(e) => handleTitleChange(e.target.value)}
-              placeholder="Article title"
-            />
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="slug">Slug (URL)</Label>
-            <Input
-              id="slug"
-              value={formData.slug}
-              onChange={(e) => setFormData({ ...formData, slug: e.target.value })}
-              placeholder="article-url-slug"
-            />
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="category">Category *</Label>
-            <Select value={formData.category} onValueChange={(value) => setFormData({ ...formData, category: value })}>
-              <SelectTrigger>
-                <SelectValue placeholder="Select category" />
-              </SelectTrigger>
-              <SelectContent>
-                {ARTICLE_CATEGORIES.map(cat => (
-                  <SelectItem key={cat} value={cat}>{cat}</SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="excerpt">Excerpt *</Label>
-            <Textarea
-              id="excerpt"
-              value={formData.excerpt}
-              onChange={(e) => setFormData({ ...formData, excerpt: e.target.value })}
-              placeholder="Brief article summary"
-              rows={3}
-              className="break-words-safe resize-none"
-            />
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="content">Content *</Label>
-            <p className="text-sm text-muted-foreground mb-2">
-              Use the toolbar to format your article with headings, bold text, lists, tables, and more
-            </p>
-            <RichTextEditor
-              value={formData.content}
-              onChange={(value) => setFormData({ ...formData, content: value })}
-              placeholder="Write your article content here..."
-              minHeight="400px"
-            />
-          </div>
+      <Dialog open={open} onOpenChange={onOpenChange}>
+        <DialogContent className="max-w-5xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>{article ? 'Edit Article' : 'Create New Article'}</DialogTitle>
+            <DialogDescription>
+              {article ? 'Update the article details' : 'Fill in the article information'}
+            </DialogDescription>
+          </DialogHeader>
 
           <div className="space-y-4">
+            {draftTimestamp && (
+              <p className="text-xs text-muted-foreground">
+                Draft saved at {new Date(draftTimestamp).toLocaleTimeString()}
+              </p>
+            )}
+            
+            <div>
+              <Label htmlFor="title">Title *</Label>
+              <Input
+                id="title"
+                value={formData.title}
+                onChange={(e) => handleTitleChange(e.target.value)}
+                placeholder="Article title"
+              />
+            </div>
+
+            <div>
+              <Label htmlFor="slug">Slug (auto-generated)</Label>
+              <Input
+                id="slug"
+                value={formData.slug}
+                readOnly
+                className="bg-muted"
+              />
+            </div>
+
+            <div>
+              <Label htmlFor="category">Category *</Label>
+              <Select
+                value={formData.category}
+                onValueChange={(value) => setFormData({ ...formData, category: value })}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Select category" />
+                </SelectTrigger>
+                <SelectContent>
+                  {ARTICLE_CATEGORIES.map(cat => (
+                    <SelectItem key={cat} value={cat}>{cat}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div className="space-y-3">
+              <Label>Author Attribution</Label>
+              <div className="flex items-center space-x-2">
+                <Switch
+                  id="author-toggle"
+                  checked={!!formData.author_name}
+                  onCheckedChange={handleAuthorToggle}
+                />
+                <Label htmlFor="author-toggle" className="cursor-pointer">
+                  Mark as written by Haris Falas
+                </Label>
+              </div>
+              
+              {formData.author_name && (
+                <div className="border border-border bg-muted/50 p-4 rounded-md">
+                  <p className="text-sm text-muted-foreground mb-1">Preview:</p>
+                  <div className="flex items-start gap-2">
+                    <span className="text-sm text-muted-foreground">By:</span>
+                    <div>
+                      <Link 
+                        to="/coach-profile" 
+                        className="font-semibold text-primary hover:underline whitespace-nowrap pointer-events-none"
+                      >
+                        {formData.author_name}
+                      </Link>
+                      {formData.author_credentials && (
+                        <div className="text-sm text-muted-foreground mt-1">
+                          {formData.author_credentials.split('\n').map((line, i) => (
+                            <div key={i}>{line}</div>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
+
+            <div>
+              <Label htmlFor="excerpt">Excerpt *</Label>
+              <Textarea
+                id="excerpt"
+                value={formData.excerpt}
+                onChange={(e) => setFormData({ ...formData, excerpt: e.target.value })}
+                placeholder="Brief description"
+                rows={2}
+              />
+            </div>
+
+            <div>
+              <Label>Content *</Label>
+              <RichTextEditor
+                value={formData.content}
+                onChange={(content) => setFormData({ ...formData, content })}
+                placeholder="Write your article content..."
+                minHeight="300px"
+              />
+            </div>
+
             <div className="space-y-2">
-              <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2">
-                <Label htmlFor="image_url">Image URL *</Label>
+              <Label htmlFor="image_url">Image URL *</Label>
+              <div className="flex flex-col sm:flex-row gap-2">
+                <Input
+                  id="image_url"
+                  value={formData.image_url}
+                  onChange={(e) => handleImageUrlChange(e.target.value)}
+                  placeholder="Enter image URL or generate one"
+                  className="flex-1"
+                />
                 <Button
                   type="button"
                   onClick={generateUniqueImage}
                   disabled={isGeneratingImage}
                   variant="outline"
-                  size="sm"
-                  className="gap-2 w-full sm:w-auto"
+                  className="w-full sm:w-auto"
                 >
                   {isGeneratingImage ? (
                     <>
-                      <Loader2 className="h-4 w-4 animate-spin" />
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                       Generating...
                     </>
                   ) : (
                     <>
-                      <Sparkles className="h-4 w-4" />
+                      <Sparkles className="mr-2 h-4 w-4" />
                       Generate Unique Image
                     </>
                   )}
                 </Button>
               </div>
-              <Input
-                id="image_url"
-                value={formData.image_url || ''}
-                onChange={(e) => handleImageUrlChange(e.target.value)}
-                placeholder="https://example.com/image.jpg"
-                required
-              />
-              
+
               {imageUniqueness.checked && (
-                <Alert variant={imageUniqueness.isUnique ? "default" : "destructive"}>
-                  <div className="flex items-start gap-2">
+                <Alert variant={imageUniqueness.isUnique ? "default" : "destructive"} className="mt-2">
+                  <div className="flex items-center gap-2">
                     {imageUniqueness.isUnique ? (
-                      <CheckCircle className="h-4 w-4 text-green-600 mt-0.5" />
+                      <CheckCircle className="h-4 w-4 text-green-500" />
                     ) : (
-                      <XCircle className="h-4 w-4 text-destructive mt-0.5" />
+                      <XCircle className="h-4 w-4" />
                     )}
                     <AlertDescription>
-                      {imageUniqueness.isUnique ? (
-                        "Image is unique ✓"
-                      ) : (
-                        <>
-                          Already used in: {imageUniqueness.conflicts.map(c => `${c.name} (${c.type})`).join(', ')}
-                        </>
-                      )}
+                      {imageUniqueness.isUnique 
+                        ? "Image is unique!" 
+                        : `Image already used by: ${imageUniqueness.conflicts.map(c => `${c.name} (${c.type})`).join(', ')}`
+                      }
                     </AlertDescription>
                   </div>
                 </Alert>
               )}
 
               {formData.image_url && (
-                <div className="mt-2 relative rounded-lg overflow-hidden border border-border">
+                <div className="mt-2">
                   <img 
                     src={formData.image_url} 
-                    alt="Preview" 
-                    className="w-full h-48 object-cover"
+                    alt="Article preview"
+                    className="max-w-full h-auto rounded-md border"
                     onError={(e) => {
-                      e.currentTarget.src = 'https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?auto=format&fit=crop&q=80&w=800';
+                      (e.target as HTMLImageElement).style.display = 'none';
                     }}
                   />
-                  <div className="absolute top-2 right-2 bg-background/80 backdrop-blur-sm rounded-full p-2">
-                    <ImageIcon className="h-4 w-4" />
-                  </div>
                 </div>
               )}
             </div>
 
-            <div className="space-y-2">
+            <div>
               <Label htmlFor="read_time">Read Time</Label>
               <Input
                 id="read_time"
-                value={formData.read_time || ''}
+                value={formData.read_time}
                 onChange={(e) => setFormData({ ...formData, read_time: e.target.value })}
                 placeholder="e.g., 5 min read"
               />
             </div>
-          </div>
 
-          <div className="flex items-center space-x-2">
-            <Switch
-              id="is_published"
-              checked={formData.is_published}
-              onCheckedChange={(checked) => setFormData({ ...formData, is_published: checked })}
-            />
-            <Label htmlFor="is_published">Published</Label>
-          </div>
+            <div className="flex items-center space-x-2">
+              <Switch
+                id="is_published"
+                checked={formData.is_published}
+                onCheckedChange={(checked) => setFormData({ ...formData, is_published: checked })}
+              />
+              <Label htmlFor="is_published" className="cursor-pointer">
+                Publish article
+              </Label>
+            </div>
 
-          <div className="flex justify-end gap-2 pt-4">
-            <Button variant="outline" onClick={() => onOpenChange(false)}>
-              Cancel
-            </Button>
-            <Button onClick={handleSave}>
-              Save Article
-            </Button>
+            <div className="flex justify-end gap-2 pt-4">
+              <Button variant="outline" onClick={() => onOpenChange(false)}>
+                Cancel
+              </Button>
+              <Button onClick={handleSave}>
+                {article ? 'Update' : 'Create'} Article
+              </Button>
+            </div>
           </div>
-        </div>
-      </DialogContent>
-    </Dialog>
+        </DialogContent>
+      </Dialog>
+    </>
   );
 };
