@@ -155,6 +155,30 @@ const TrainingProgramFlow = () => {
           })}
         </div>
 
+        {/* Info Section - About Training Programs */}
+        <Card className="mt-12 bg-gradient-to-br from-primary/5 via-background to-primary/5 border-2 border-primary/40 shadow-gold">
+          <div className="p-6 sm:p-8">
+            <h2 className="text-xl sm:text-2xl font-bold mb-4 text-center">About Our Training Programs</h2>
+            <div className="space-y-4 text-muted-foreground max-w-3xl mx-auto">
+              <p className="text-sm sm:text-base">
+                Our training programs are long-term, structured plans designed to help you achieve your specific 
+                fitness goals. Whether you want to lose weight, build muscle, improve functional strength, 
+                enhance cardiovascular endurance, rehabilitate from low back pain, or develop better mobility 
+                and stability — we have a science-based program for you.
+              </p>
+              <p className="text-sm sm:text-base">
+                Each program is meticulously crafted by Sports Scientist Haris Falas, using evidence-based 
+                training principles and progressive programming to ensure sustainable results. These aren't 
+                just random workouts — they're strategic, periodized plans that take you from where you are 
+                to where you want to be.
+              </p>
+              <p className="text-sm sm:text-base font-semibold text-foreground text-center mt-6">
+                Unlock all training programs with a Premium plan or grab one standalone program to start your journey.
+              </p>
+            </div>
+          </div>
+        </Card>
+
         {/* Bottom Premium Banner */}
         {!isPremium && (
           <ScrollReveal delay={600}>

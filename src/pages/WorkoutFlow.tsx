@@ -147,6 +147,28 @@ const WorkoutFlow = () => {
           })}
         </div>
 
+        {/* Info Section - About Workouts */}
+        <Card className="mt-12 bg-gradient-to-br from-primary/5 via-background to-primary/5 border-2 border-primary/40 shadow-gold">
+          <div className="p-6 sm:p-8">
+            <h2 className="text-xl sm:text-2xl font-bold mb-4 text-center">About Our Workouts</h2>
+            <div className="space-y-4 text-muted-foreground max-w-3xl mx-auto">
+              <p className="text-sm sm:text-base">
+                Our workouts are single-session training routines designed to fit your lifestyle and goals. 
+                Whether you're targeting strength, calorie burning, metabolic conditioning, cardio endurance, 
+                mobility & stability, or looking for a challenge — we have you covered.
+              </p>
+              <p className="text-sm sm:text-base">
+                Each workout can be performed with bodyweight only or with equipment, making them perfect for 
+                quick training sessions anywhere you are. Hit the gym without a plan? On the go? 
+                Our workouts are designed to deliver results in any setting.
+              </p>
+              <p className="text-sm sm:text-base font-semibold text-foreground text-center mt-6">
+                Unlock all workouts with a Premium plan or grab one standalone session whenever you need it.
+              </p>
+            </div>
+          </div>
+        </Card>
+
         {/* Bottom Premium Banner */}
         {!isPremium && (
           <ScrollReveal delay={700}>
