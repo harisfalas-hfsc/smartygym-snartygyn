@@ -483,59 +483,57 @@ const Index = () => {
                       </Select>
                     </div>
 
-                    {/* Desktop/Tablet: Centered Button Grid */}
-                    <div className="hidden md:flex md:justify-center">
-                      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3 lg:gap-4 max-w-4xl">
-                        <Button
-                          variant="outline"
-                          size="lg"
-                          onClick={() => navigate("/workout")}
-                          className="h-auto py-3 px-4 flex flex-col items-center gap-2 bg-background hover:bg-primary/10 border-2 border-primary/20 hover:border-primary transition-all"
-                        >
-                          <Dumbbell className="w-6 h-6 text-primary" />
-                          <span className="font-semibold text-sm">Workouts</span>
-                        </Button>
+                    {/* Desktop/Tablet: Full-Width Button Grid */}
+                    <div className="hidden md:grid md:grid-cols-5 gap-3 lg:gap-4">
+                      <Button
+                        variant="outline"
+                        size="lg"
+                        onClick={() => navigate("/workout")}
+                        className="h-auto py-3 px-4 flex flex-col items-center gap-2 bg-background hover:bg-primary/10 border-2 border-primary/20 hover:border-primary transition-all"
+                      >
+                        <Dumbbell className="w-6 h-6 text-primary" />
+                        <span className="font-semibold text-sm">Workouts</span>
+                      </Button>
 
-                        <Button
-                          variant="outline"
-                          size="lg"
-                          onClick={() => navigate("/trainingprogram")}
-                          className="h-auto py-3 px-4 flex flex-col items-center gap-2 bg-background hover:bg-primary/10 border-2 border-primary/20 hover:border-primary transition-all"
-                        >
-                          <Calendar className="w-6 h-6 text-primary" />
-                          <span className="font-semibold text-sm">Programs</span>
-                        </Button>
+                      <Button
+                        variant="outline"
+                        size="lg"
+                        onClick={() => navigate("/trainingprogram")}
+                        className="h-auto py-3 px-4 flex flex-col items-center gap-2 bg-background hover:bg-primary/10 border-2 border-primary/20 hover:border-primary transition-all"
+                      >
+                        <Calendar className="w-6 h-6 text-primary" />
+                        <span className="font-semibold text-sm">Programs</span>
+                      </Button>
 
-                        <Button
-                          variant="outline"
-                          size="lg"
-                          onClick={() => navigate("/tools")}
-                          className="h-auto py-3 px-4 flex flex-col items-center gap-2 bg-background hover:bg-primary/10 border-2 border-primary/20 hover:border-primary transition-all"
-                        >
-                          <Wrench className="w-6 h-6 text-primary" />
-                          <span className="font-semibold text-sm">Tools</span>
-                        </Button>
+                      <Button
+                        variant="outline"
+                        size="lg"
+                        onClick={() => navigate("/tools")}
+                        className="h-auto py-3 px-4 flex flex-col items-center gap-2 bg-background hover:bg-primary/10 border-2 border-primary/20 hover:border-primary transition-all"
+                      >
+                        <Wrench className="w-6 h-6 text-primary" />
+                        <span className="font-semibold text-sm">Tools</span>
+                      </Button>
 
-                        <Button
-                          variant="outline"
-                          size="lg"
-                          onClick={() => navigate("/exerciselibrary")}
-                          className="h-auto py-3 px-4 flex flex-col items-center gap-2 bg-background hover:bg-primary/10 border-2 border-primary/20 hover:border-primary transition-all"
-                        >
-                          <BookOpen className="w-6 h-6 text-primary" />
-                          <span className="font-semibold text-sm">Library</span>
-                        </Button>
+                      <Button
+                        variant="outline"
+                        size="lg"
+                        onClick={() => navigate("/exerciselibrary")}
+                        className="h-auto py-3 px-4 flex flex-col items-center gap-2 bg-background hover:bg-primary/10 border-2 border-primary/20 hover:border-primary transition-all"
+                      >
+                        <BookOpen className="w-6 h-6 text-primary" />
+                        <span className="font-semibold text-sm">Library</span>
+                      </Button>
 
-                        <Button
-                          variant="outline"
-                          size="lg"
-                          onClick={() => navigate("/blog")}
-                          className="h-auto py-3 px-4 flex flex-col items-center gap-2 bg-background hover:bg-primary/10 border-2 border-primary/20 hover:border-primary transition-all"
-                        >
-                          <FileText className="w-6 h-6 text-primary" />
-                          <span className="font-semibold text-sm">Blog</span>
-                        </Button>
-                      </div>
+                      <Button
+                        variant="outline"
+                        size="lg"
+                        onClick={() => navigate("/blog")}
+                        className="h-auto py-3 px-4 flex flex-col items-center gap-2 bg-background hover:bg-primary/10 border-2 border-primary/20 hover:border-primary transition-all"
+                      >
+                        <FileText className="w-6 h-6 text-primary" />
+                        <span className="font-semibold text-sm">Blog</span>
+                      </Button>
                     </div>
                   </div>
 
