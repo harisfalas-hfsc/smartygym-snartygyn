@@ -48,11 +48,11 @@ export const CookieConsent = () => {
 
   return (
     <div 
-      className={`fixed bottom-4 right-4 z-50 transition-all duration-300 ${
+      className={`fixed bottom-4 right-4 z-[85] max-w-[90vw] sm:max-w-none transition-all duration-300 ${
         isVisible ? "translate-x-0 opacity-100" : "translate-x-full opacity-0"
       }`}
     >
-      <Card className="w-80 p-4 shadow-2xl border-2 bg-background">
+      <Card className="w-full sm:w-80 p-4 shadow-2xl border-2 bg-background">
         <Button
           variant="ghost"
           size="icon"

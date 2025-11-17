@@ -20,10 +20,10 @@ export const WhatsAppButton = () => {
   return (
     <Button
       onClick={handleWhatsAppClick}
-      className="fixed bottom-6 right-6 z-50 h-14 w-14 rounded-full shadow-lg hover:scale-110 transition-transform duration-300 bg-[#25D366] hover:bg-[#20BA5A] p-0 flex items-center justify-center"
+      className="fixed bottom-24 sm:bottom-6 right-4 sm:right-6 z-[80] h-12 w-12 sm:h-14 sm:w-14 rounded-full shadow-lg hover:scale-110 transition-transform duration-300 bg-[#25D366] hover:bg-[#20BA5A] p-0 flex items-center justify-center"
       aria-label="Contact us on WhatsApp"
     >
-      <MessageCircle className="h-7 w-7 text-white" />
+      <MessageCircle className="h-6 w-6 sm:h-7 sm:w-7 text-white" />
     </Button>
   );
 };

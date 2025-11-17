@@ -30,10 +30,10 @@ export const BackToTop = () => {
       {isVisible && (
         <Button
           onClick={scrollToTop}
-          className="fixed bottom-8 right-8 z-50 rounded-full w-12 h-12 shadow-lg"
+          className="fixed bottom-24 sm:bottom-8 left-4 sm:left-auto sm:right-8 z-[70] rounded-full w-10 h-10 sm:w-12 sm:h-12 shadow-lg"
           size="icon"
         >
-          <ArrowUp className="h-5 w-5" />
+          <ArrowUp className="h-4 w-4 sm:h-5 sm:w-5" />
         </Button>
       )}
     </>

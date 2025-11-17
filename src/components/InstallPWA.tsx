@@ -101,8 +101,8 @@ export const InstallPWA = () => {
   if (!showPrompt) return null;
 
   return (
-    <div className="fixed bottom-4 left-4 right-4 z-50 md:left-auto md:right-4 md:max-w-sm animate-fade-in">
-      <Card className="p-4 shadow-lg border-2 border-primary/20 bg-card">
+    <div className="fixed bottom-4 left-4 right-4 z-[90] md:left-auto md:right-4 md:max-w-sm animate-fade-in">
+      <Card className="p-3 sm:p-4 shadow-lg border-2 border-primary/20 bg-card">
         <div className="flex items-start gap-3">
           <div className="flex-shrink-0 w-10 h-10 bg-primary/10 rounded-lg flex items-center justify-center">
             <Download className="h-5 w-5 text-primary" />
