@@ -5,7 +5,7 @@ import { useAccessControl } from "@/hooks/useAccessControl";
 export const WhatsAppButton = () => {
   const { userTier, isLoading } = useAccessControl();
   const phoneNumber = "+35796000620";
-  const message = "Hi! I'm interested in Smarty Gym services.";
+  const message = "Hi! I'm interested in SmartyGym services.";
   
   const handleWhatsAppClick = () => {
     const url = `https://wa.me/${phoneNumber.replace(/[^0-9]/g, '')}?text=${encodeURIComponent(message)}`;

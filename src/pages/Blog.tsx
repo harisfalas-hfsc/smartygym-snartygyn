@@ -96,11 +96,11 @@ const Blog = () => {
   return (
     <>
       <Helmet>
-        <title>Fitness Blog - Expert Training & Nutrition Advice | Smarty Gym</title>
+        <title>Fitness Blog - Expert Training & Nutrition Advice | SmartyGym</title>
         <meta name="description" content="Expert fitness articles by Haris Falas, Cyprus-based sports scientist. Get training tips, nutrition advice, workout guides and fitness insights for Cyprus and international athletes." />
         <meta name="keywords" content="Haris Falas, fitness blog Cyprus, training advice Cyprus, nutrition tips, strength training, functional fitness, Cyprus fitness expert, sports scientist Cyprus, workout tips Cyprus, fitness news Cyprus, gym Cyprus, smartygym Cyprus, online fitness Cyprus" />
         
-        <meta property="og:title" content="Fitness Blog - Expert Training & Nutrition Advice by Haris Falas | Smarty Gym" />
+        <meta property="og:title" content="Fitness Blog - Expert Training & Nutrition Advice by Haris Falas | SmartyGym" />
         <meta property="og:description" content="Expert fitness articles by Cyprus sports scientist Haris Falas. Training tips, nutrition advice, and performance insights." />
         <meta property="og:type" content="website" />
         <meta property="og:url" content={window.location.href} />
@@ -118,7 +118,7 @@ const Blog = () => {
           {JSON.stringify({
             "@context": "https://schema.org",
             "@type": "Blog",
-            "name": "Smarty Gym Fitness Blog",
+            "name": "SmartyGym Fitness Blog",
             "description": "Expert fitness and nutrition advice by Cyprus sports scientist Haris Falas",
             "url": "https://smartygym.com/blog",
             "author": {
@@ -133,7 +133,7 @@ const Blog = () => {
             "inLanguage": "en",
             "publisher": {
               "@type": "Organization",
-              "name": "Smarty Gym",
+              "name": "SmartyGym",
               "url": "https://smartygym.com"
             }
           })}
@@ -204,12 +204,12 @@ const Blog = () => {
                 onClick={() => navigate(`/article/${article.id}`)}
                 data-article-id={article.id}
                 data-keywords="smarty gym blog, online fitness tips, smartygym.com, Haris Falas Cyprus, online gym advice"
-                aria-label={`${article.title} - Smarty Gym Cyprus blog - Online fitness at smartygym.com`}
+                aria-label={`${article.title} - SmartyGym Cyprus blog - Online fitness at smartygym.com`}
               >
                 <div className="relative h-48 overflow-hidden">
                   <img
                     src={article.image}
-                    alt={`${article.title} - Smarty Gym Cyprus online fitness blog - smartygym.com by Haris Falas`}
+                    alt={`${article.title} - SmartyGym Cyprus online fitness blog - smartygym.com by Haris Falas`}
                     className="w-full h-full object-cover"
                     loading="lazy"
                     itemProp="image"
@@ -245,8 +245,8 @@ const Blog = () => {
                       <span itemProp="datePublished">{article.date}</span>
                     </div>
                   </div>
-                  <meta itemProp="author" content="Haris Falas - Smarty Gym Cyprus - smartygym.com" />
-                  <meta itemProp="publisher" content="Smarty Gym Cyprus - smartygym.com" />
+                  <meta itemProp="author" content="Haris Falas - SmartyGym Cyprus - smartygym.com" />
+                  <meta itemProp="publisher" content="SmartyGym Cyprus - smartygym.com" />
                 </div>
               </Card>
             ))}

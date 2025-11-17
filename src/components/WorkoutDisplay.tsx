@@ -627,7 +627,7 @@ export const WorkoutDisplay = ({
         <div className="bg-card border border-border rounded-xl p-6 text-center shadow-soft mt-8">
           <h3 className="text-xl font-semibold mb-2">Want more like this?</h3>
           <p className="text-muted-foreground mb-4">
-            Unlock 100+ workouts and all programs with Smarty Gym Premium.
+            Unlock 100+ workouts and all programs with SmartyGym Premium.
           </p>
           <Button size="lg" onClick={() => navigate("/premiumbenefits")}>
             Join Premium

@@ -52,7 +52,7 @@ export const ParQQuestionnaire = () => {
     <Card className="border-2 border-primary/30">
       <CardHeader className="bg-primary/5">
         <div className="flex items-center gap-3">
-          <img src={logo} alt="Smarty Gym" className="h-12 w-12 object-contain" />
+          <img src={logo} alt="SmartyGym" className="h-12 w-12 object-contain" />
           <CardTitle className="text-2xl text-primary">PAR-Q Assessment</CardTitle>
         </div>
         <p className="text-sm text-muted-foreground mt-2">
@@ -119,7 +119,7 @@ export const ParQQuestionnaire = () => {
                   </ul>
                   <p className="text-sm font-semibold">
                     By proceeding, you acknowledge that you are exercising at your own risk 
-                    and that Smarty Gym is released from any liability.
+                    and that SmartyGym is released from any liability.
                   </p>
                 </AlertDescription>
               </>
@@ -141,7 +141,7 @@ export const ParQQuestionnaire = () => {
                     proceed with the workout program.
                   </p>
                   <p className="text-sm font-bold">
-                    Smarty Gym and its affiliates are released from any liability related to 
+                    SmartyGym and its affiliates are released from any liability related to 
                     your participation in this program. You are exercising at your own risk.
                   </p>
                 </AlertDescription>

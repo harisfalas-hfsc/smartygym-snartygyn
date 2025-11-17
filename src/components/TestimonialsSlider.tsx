@@ -10,7 +10,7 @@ const testimonials = [
   },
   {
     id: 2,
-    text: "The structure keeps me consistent. Highly recommend Smarty Gym!",
+    text: "The structure keeps me consistent. Highly recommend SmartyGym!",
     author: "Andreas P.",
     rating: 5,
   },

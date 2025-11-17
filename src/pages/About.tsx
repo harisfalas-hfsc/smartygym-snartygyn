@@ -5,7 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { PageBreadcrumbs } from "@/components/PageBreadcrumbs";
 import { InfoRibbon } from "@/components/InfoRibbon";
-import { ArrowLeft, Award, Heart, Users, Target, UserCheck, Brain, Shield, Sparkles, Ban, CheckCircle2, Compass } from "lucide-react";
+import { ArrowLeft, Award, Heart, Users, Target, UserCheck, Brain, Shield, Sparkles, Ban, CheckCircle2, Compass, Calendar } from "lucide-react";
 import { BackToTop } from "@/components/BackToTop";
 import { useShowBackButton } from "@/hooks/useShowBackButton";
 import { useAccessControl } from "@/hooks/useAccessControl";
@@ -30,8 +30,8 @@ const About = () => {
         
         {/* Twitter */}
         <meta property="twitter:card" content="summary_large_image" />
-        <meta property="twitter:title" content="About Smarty Gym & Haris Falas" />
-        <meta property="twitter:description" content="Smarty Gym - convenient & flexible fitness by Sports Scientist Haris Falas at smartygym.com" />
+        <meta property="twitter:title" content="About SmartyGym & Haris Falas" />
+        <meta property="twitter:description" content="SmartyGym - convenient & flexible fitness by Sports Scientist Haris Falas at smartygym.com" />
         
         <link rel="canonical" href="https://smartygym.com/about" />
         
@@ -44,7 +44,7 @@ const About = () => {
             "jobTitle": "Sports Scientist & Strength and Conditioning Coach",
             "worksFor": {
               "@type": "Organization",
-              "name": "Smarty Gym",
+              "name": "SmartyGym",
               "url": "https://smartygym.com",
               "alternateName": "smartygym.com"
             },
@@ -117,7 +117,7 @@ const About = () => {
               
               <div className="max-w-3xl mx-auto space-y-4 text-center mb-8">
                 <p className="text-lg font-semibold text-foreground">
-                  Smarty Gym workouts and programs are built to fit YOUR life.
+                  SmartyGym workouts and programs are built to fit YOUR life.
                 </p>
                 <p className="text-base leading-relaxed text-muted-foreground">
                   That's why they work — safe and efficient design by <a href="/coach-profile" className="text-primary hover:underline font-medium"><strong>Haris Falas</strong></a>, crafted by hand with care to deliver effective results at <strong>smartygym.com</strong>, <strong className="text-foreground">NOT by AI</strong>.
@@ -140,7 +140,7 @@ const About = () => {
                   data-feature="smarty-gym-expertise"
                   data-keywords="smarty gym, online gym, online fitness, smartygym.com, Haris Falas Cyprus, sports scientist"
                   role="article"
-                  aria-label="Real expertise - Smarty Gym Cyprus online fitness - smartygym.com by Haris Falas"
+                  aria-label="Real expertise - SmartyGym Cyprus online fitness - smartygym.com by Haris Falas"
                 >
                   <CheckCircle2 className="w-5 h-5 text-primary flex-shrink-0 mt-1" aria-hidden="true" />
                   <div>
@@ -155,7 +155,7 @@ const About = () => {
                   data-feature="smarty-gym-personal-touch"
                   data-keywords="smarty gym, online gym, online fitness, smartygym.com, Haris Falas Cyprus, personalized training"
                   role="article"
-                  aria-label="Personal touch - Smarty Gym Cyprus online fitness - smartygym.com by Haris Falas"
+                  aria-label="Personal touch - SmartyGym Cyprus online fitness - smartygym.com by Haris Falas"
                 >
                   <CheckCircle2 className="w-5 h-5 text-primary flex-shrink-0 mt-1" aria-hidden="true" />
                   <div>
@@ -170,7 +170,7 @@ const About = () => {
                   data-feature="smarty-gym-human-designed"
                   data-keywords="smarty gym, online gym, online fitness, smartygym.com, Haris Falas Cyprus, human designed workouts"
                   role="article"
-                  aria-label="Human designed workouts - Smarty Gym Cyprus online fitness - smartygym.com by Haris Falas"
+                  aria-label="Human designed workouts - SmartyGym Cyprus online fitness - smartygym.com by Haris Falas"
                 >
                   <CheckCircle2 className="w-5 h-5 text-primary flex-shrink-0 mt-1" aria-hidden="true" />
                   <div>
@@ -219,7 +219,7 @@ const About = () => {
                 </p>
                 <p className="text-base text-muted-foreground text-center leading-relaxed">
                   Whether you're traveling, on holiday, can't make it to the gym, or your gym is closed — 
-                  Smarty Gym is your backup plan. Or, if you prefer training from home entirely, we've got you covered. 
+                  SmartyGym is your backup plan. Or, if you prefer training from home entirely, we've got you covered. 
                   Expert workouts, professional programs, and practical tools — all designed by real coaches, not algorithms.
                 </p>
                 <p className="text-base font-semibold text-center text-primary">
@@ -295,11 +295,11 @@ const About = () => {
             <CardContent className="p-8">
               <div className="flex items-center justify-center gap-3 mb-4">
                 <Sparkles className="w-6 h-6 text-primary" />
-                <h3 className="text-xl font-bold text-center">The Smarty Gym Promise</h3>
+                <h3 className="text-xl font-bold text-center">The SmartyGym Promise</h3>
                 <Sparkles className="w-6 h-6 text-primary" />
               </div>
               <p className="text-base font-semibold text-center max-w-3xl mx-auto">
-                At Smarty Gym, we bring science-based functional training to everyone, everywhere. 
+                At SmartyGym, we bring science-based functional training to everyone, everywhere. 
                 Train smarter. Move better. Live stronger.
               </p>
             </CardContent>
@@ -447,10 +447,10 @@ const About = () => {
             <CardContent className="p-6">
               <Accordion type="single" collapsible className="w-full">
                 <AccordionItem value="item-1">
-                  <AccordionTrigger>What is Smarty Gym?</AccordionTrigger>
+                  <AccordionTrigger>What is SmartyGym?</AccordionTrigger>
                   <AccordionContent>
-                    Smarty Gym is an online fitness platform providing functional, science-based workouts and training programs 
-                    designed by certified coaches. Whether you're training at home, in the gym, or on the go, Smarty Gym 
+                    SmartyGym is an online fitness platform providing functional, science-based workouts and training programs 
+                    designed by certified coaches. Whether you're training at home, in the gym, or on the go, SmartyGym 
                     is your backup when life gets in the way — or your complete fitness solution if you prefer training from home. 
                     We make quality fitness accessible anywhere, anytime.
                   </AccordionContent>
@@ -462,13 +462,13 @@ const About = () => {
                     <a href="/coach-profile" className="text-primary hover:underline font-medium">Haris Falas</a> is a certified Sports Scientist 
                     and Strength & Conditioning Coach with over 20 years of professional experience. He has worked with elite athletes and professional 
                     football teams in the Cypriot First Division, including AEL Limassol FC and Nea Salamina FC. As the founder of HFSC and 
-                    Smarty Gym, <strong>Haris personally designs every single workout and program</strong> — never by AI, always with evidence-based 
+                    SmartyGym, <strong>Haris personally designs every single workout and program</strong> — never by AI, always with evidence-based
                     training principles and real coaching experience.
                   </AccordionContent>
                 </AccordionItem>
 
                 <AccordionItem value="item-3">
-                  <AccordionTrigger>What makes Smarty Gym different?</AccordionTrigger>
+                  <AccordionTrigger>What makes SmartyGym different?</AccordionTrigger>
                   <AccordionContent>
                     <strong>We're 100% human, 0% AI.</strong> Every workout is personally designed by <a href="/coach-profile" className="text-primary hover:underline font-medium">Haris Falas</a>, 
                     a qualified Sports Scientist and S&C Coach — never by algorithms or AI. You get real expertise from a real coach with 20+ years 
@@ -517,7 +517,7 @@ const About = () => {
                 </AccordionItem>
 
                 <AccordionItem value="item-4">
-                  <AccordionTrigger>Do I need equipment to use Smarty Gym?</AccordionTrigger>
+                  <AccordionTrigger>Do I need equipment to use SmartyGym?</AccordionTrigger>
                   <AccordionContent>
                     No! We offer both bodyweight workouts that require no equipment and equipment-based programs. 
                     You can filter workouts based on what you have available — whether that's nothing, 
@@ -534,7 +534,7 @@ const About = () => {
                 </AccordionItem>
 
                 <AccordionItem value="item-6">
-                  <AccordionTrigger>Can beginners use Smarty Gym?</AccordionTrigger>
+                  <AccordionTrigger>Can beginners use SmartyGym?</AccordionTrigger>
                   <AccordionContent>
                     Absolutely! We have workouts and programs specifically designed for all fitness levels, including beginners. 
                     Each workout includes clear instructions, difficulty ratings, and modifications to match your current fitness level. 
@@ -548,7 +548,7 @@ const About = () => {
                     Premium membership unlocks unlimited access to all workouts and training programs, full dashboard access with progress tracking, 
                     complete workout and program history, ability to favorite and rate all content, and direct WhatsApp support from the coaching team. 
                     Free subscribers can access selected free workouts, programs, calculators, and the exercise library, but Premium gives you the full 
-                    Smarty Gym experience with structured training programs for long-term goals and personalized support. Choose monthly (€9.99/month) or save 25% with yearly (€89.99/year, only €7.50/month).
+                    SmartyGym experience with structured training programs for long-term goals and personalized support. Choose monthly (€9.99/month) or save 25% with yearly (€89.99/year, only €7.50/month).
                   </AccordionContent>
                 </AccordionItem>
 
@@ -591,7 +591,7 @@ const About = () => {
               <Sparkles className="w-6 h-6 text-primary" />
             </div>
             <p className="text-base md:text-lg text-muted-foreground mb-2 max-w-2xl mx-auto">
-              Join thousands of people who are training smarter with Smarty Gym.
+              Join thousands of people who are training smarter with SmartyGym.
             </p>
             <p className="text-sm font-semibold text-primary mb-6 max-w-2xl mx-auto">
               Work with a real coach who designed every program personally — not an AI.
@@ -601,8 +601,12 @@ const About = () => {
                   <Target className="w-5 h-5" />
                   Try Free Workouts
                 </Button>
+                <Button size="lg" variant="outline" onClick={() => navigate("/program")} className="gap-2">
+                  <Calendar className="w-5 h-5" />
+                  Try Free Training Programs
+                </Button>
                 {!isPremium && (
-                  <Button size="lg" variant="outline" onClick={() => navigate("/premiumbenefits")} className="gap-2">
+                  <Button size="lg" variant="default" onClick={() => navigate("/premiumbenefits")} className="gap-2">
                     <UserCheck className="w-5 h-5" />
                     Join Premium
                   </Button>

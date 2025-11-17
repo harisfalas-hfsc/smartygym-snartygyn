@@ -33,7 +33,7 @@ export const EmailCaptureBox = () => {
 
       toast({
         title: "Success!",
-        description: "You've joined the Smarty Gym newsletter. Check your inbox!",
+        description: "You've joined the SmartyGym newsletter. Check your inbox!",
       });
       
       // Redirect to thank you page
