@@ -4,7 +4,7 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } f
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
+import { RichTextEditor } from "@/components/ui/rich-text-editor";
 import { Switch } from "@/components/ui/switch";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
@@ -601,54 +601,46 @@ export const ProgramEditDialog = ({ program, open, onOpenChange, onSave, isPerso
           <div className="space-y-2">
             <Label htmlFor="training_program">7. Training Program</Label>
             <p className="text-sm text-muted-foreground">
-              Enter the complete training program content. You can use formatting like bold, bullets, spacing, etc.
+              Enter the complete training program content. Use the toolbar to format with bold, headings, lists, tables, etc.
             </p>
-            <Textarea
-              id="training_program"
+            <RichTextEditor
               value={formData.training_program}
-              onChange={(e) => setFormData({ ...formData, training_program: e.target.value })}
+              onChange={(value) => setFormData({ ...formData, training_program: value })}
               placeholder="Enter your complete training program content here..."
-              rows={12}
-              className="break-words-safe resize-none"
+              minHeight="300px"
             />
           </div>
 
           {/* 8. Description */}
           <div className="space-y-2">
             <Label htmlFor="program_description">8. Description</Label>
-            <Textarea
-              id="program_description"
+            <RichTextEditor
               value={formData.program_description}
-              onChange={(e) => setFormData({ ...formData, program_description: e.target.value })}
+              onChange={(value) => setFormData({ ...formData, program_description: value })}
               placeholder="Brief description of the program"
-              rows={3}
-              className="break-words-safe resize-none"
+              minHeight="120px"
             />
           </div>
 
           {/* 9. Instructions */}
           <div className="space-y-2">
             <Label htmlFor="construction">9. Instructions</Label>
-            <Textarea
-              id="construction"
+            <RichTextEditor
               value={formData.construction}
-              onChange={(e) => setFormData({ ...formData, construction: e.target.value })}
+              onChange={(value) => setFormData({ ...formData, construction: value })}
               placeholder="Program instructions and structure details"
-              rows={4}
-              className="break-words-safe resize-none"
+              minHeight="150px"
             />
           </div>
 
           {/* 10. Tips */}
           <div className="space-y-2">
             <Label htmlFor="final_tips">10. Tips</Label>
-            <Textarea
-              id="final_tips"
+            <RichTextEditor
               value={formData.final_tips}
-              onChange={(e) => setFormData({ ...formData, final_tips: e.target.value })}
+              onChange={(value) => setFormData({ ...formData, final_tips: value })}
               placeholder="Tips and additional guidance"
-              rows={4}
-              className="break-words-safe resize-none"
+              minHeight="150px"
             />
           </div>
 

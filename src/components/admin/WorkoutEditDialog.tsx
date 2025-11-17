@@ -4,7 +4,7 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } f
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
+import { RichTextEditor } from "@/components/ui/rich-text-editor";
 import { Switch } from "@/components/ui/switch";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
@@ -472,55 +472,47 @@ export const WorkoutEditDialog = ({ workout, open, onOpenChange, onSave }: Worko
           {/* 9. Workout Content - Single Box */}
           <div className="space-y-2 pt-4 border-t">
             <Label htmlFor="main_workout">9. Workout Content *</Label>
-            <Textarea
-              id="main_workout"
+            <RichTextEditor
               value={formData.main_workout}
-              onChange={(e) => setFormData({ ...formData, main_workout: e.target.value })}
-              placeholder="Enter the complete workout content here - use spaces, bold letters, capitals, bullets (•, -, *), and line breaks to format your content as needed..."
-              rows={15}
-              className="font-mono text-sm break-words-safe resize-none"
+              onChange={(value) => setFormData({ ...formData, main_workout: value })}
+              placeholder="Enter the complete workout content here - format with bold, bullets, headings, tables, etc..."
+              minHeight="300px"
             />
             <p className="text-xs text-muted-foreground">
-              Write freely with full formatting control - add sections (Warm Up, Main Workout, Cool Down, etc.), bullets, emphasis as needed
+              Use the toolbar to format your content with headings, bold text, lists, tables, and more
             </p>
           </div>
 
           {/* 10. Description */}
           <div className="space-y-2">
             <Label htmlFor="description">10. Description</Label>
-            <Textarea
-              id="description"
+            <RichTextEditor
               value={formData.description}
-              onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+              onChange={(value) => setFormData({ ...formData, description: value })}
               placeholder="Brief description of the workout..."
-              rows={3}
-              className="break-words-safe resize-none"
+              minHeight="120px"
             />
           </div>
 
           {/* 11. Instructions */}
           <div className="space-y-2">
             <Label htmlFor="instructions">11. Instructions</Label>
-            <Textarea
-              id="instructions"
+            <RichTextEditor
               value={formData.instructions}
-              onChange={(e) => setFormData({ ...formData, instructions: e.target.value })}
+              onChange={(value) => setFormData({ ...formData, instructions: value })}
               placeholder="Step-by-step instructions..."
-              className="break-words-safe resize-none"
-              rows={4}
+              minHeight="150px"
             />
           </div>
 
           {/* 12. Tips */}
           <div className="space-y-2">
             <Label htmlFor="tips">12. Tips</Label>
-            <Textarea
-              id="tips"
+            <RichTextEditor
               value={formData.tips}
-              onChange={(e) => setFormData({ ...formData, tips: e.target.value })}
+              onChange={(value) => setFormData({ ...formData, tips: value })}
               placeholder="Helpful tips for this workout..."
-              rows={3}
-              className="break-words-safe resize-none"
+              minHeight="120px"
             />
           </div>
 

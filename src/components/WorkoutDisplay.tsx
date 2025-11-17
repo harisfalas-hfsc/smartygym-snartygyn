@@ -12,6 +12,7 @@ import { ShareButtons } from "@/components/ShareButtons";
 import { WorkoutInteractions } from "@/components/WorkoutInteractions";
 import { ProgramInteractions } from "@/components/ProgramInteractions";
 import { useAccessControl } from "@/hooks/useAccessControl";
+import { HTMLContent } from "@/components/ui/html-content";
 
 interface Exercise {
   name: string;
@@ -389,7 +390,7 @@ export const WorkoutDisplay = ({
             </CardHeader>
             <CardContent className="content-container">
               <div className="border-l-4 border-primary pl-4 py-2">
-                <p className="text-base leading-relaxed text-display break-words-safe">{description}</p>
+                <HTMLContent content={description} className="text-base" />
               </div>
             </CardContent>
           </Card>
@@ -409,7 +410,7 @@ export const WorkoutDisplay = ({
                 {activation && (
                   <div className="border-l-4 border-primary/50 pl-4 py-2">
                     <h3 className="font-bold text-lg mb-2 text-primary">🔥 Activation</h3>
-                    <p className="text-base leading-relaxed text-display break-words-safe">{activation}</p>
+                    <HTMLContent content={activation} className="text-base" />
                   </div>
                 )}
                 
@@ -417,21 +418,21 @@ export const WorkoutDisplay = ({
                 {warm_up && (
                   <div className="border-l-4 border-primary/50 pl-4 py-2">
                     <h3 className="font-bold text-lg mb-2 text-primary">🌡️ Warm Up</h3>
-                    <p className="text-base leading-relaxed text-display break-words-safe">{warm_up}</p>
+                    <HTMLContent content={warm_up} className="text-base" />
                   </div>
                 )}
                 
                 {/* Main Workout */}
                 <div className="border-l-4 border-primary pl-4 py-2">
                   <h3 className="font-bold text-lg mb-2 text-primary">💪 Main Workout</h3>
-                  <p className="text-base leading-relaxed text-display break-words-safe">{main_workout}</p>
+                  <HTMLContent content={main_workout} className="text-base" />
                 </div>
                 
                 {/* Finisher */}
                 {finisher && (
                   <div className="border-l-4 border-primary/50 pl-4 py-2">
                     <h3 className="font-bold text-lg mb-2 text-primary">⚡ Finisher</h3>
-                    <p className="text-base leading-relaxed text-display break-words-safe">{finisher}</p>
+                    <HTMLContent content={finisher} className="text-base" />
                   </div>
                 )}
                 
@@ -439,7 +440,7 @@ export const WorkoutDisplay = ({
                 {cool_down && (
                   <div className="border-l-4 border-primary/50 pl-4 py-2">
                     <h3 className="font-bold text-lg mb-2 text-primary">❄️ Cool Down</h3>
-                    <p className="text-base leading-relaxed text-display break-words-safe">{cool_down}</p>
+                    <HTMLContent content={cool_down} className="text-base" />
                   </div>
                 )}
               </div>
@@ -457,7 +458,7 @@ export const WorkoutDisplay = ({
             </CardHeader>
             <CardContent className="content-container">
               <div className="border-l-4 border-primary pl-4 py-2">
-                <p className="text-base leading-relaxed text-display break-words-safe">{weekly_schedule}</p>
+                <HTMLContent content={weekly_schedule} className="text-base" />
               </div>
             </CardContent>
           </Card>
@@ -473,7 +474,7 @@ export const WorkoutDisplay = ({
             </CardHeader>
             <CardContent className="content-container">
               <div className="border-l-4 border-primary pl-4 py-2">
-                <p className="text-base leading-relaxed text-display break-words-safe">{programContent}</p>
+                <HTMLContent content={programContent} className="text-base" />
               </div>
             </CardContent>
           </Card>
@@ -489,9 +490,7 @@ export const WorkoutDisplay = ({
             </CardHeader>
             <CardContent className="content-container">
               <div className="border-l-4 border-primary pl-4 py-2">
-                <p className="text-base leading-relaxed text-display break-words-safe">
-                  {instructions || program_structure}
-                </p>
+                <HTMLContent content={instructions || program_structure || ''} className="text-base" />
               </div>
             </CardContent>
           </Card>
@@ -507,9 +506,7 @@ export const WorkoutDisplay = ({
             </CardHeader>
             <CardContent className="content-container">
               <div className="border-l-4 border-primary pl-4 py-2">
-                <p className="text-base leading-relaxed text-display break-words-safe">
-                  {tips || nutrition_tips}
-                </p>
+                <HTMLContent content={tips || nutrition_tips || ''} className="text-base" />
               </div>
             </CardContent>
           </Card>

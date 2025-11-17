@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { RichTextEditor } from "@/components/ui/rich-text-editor";
 import { Switch } from "@/components/ui/switch";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
@@ -284,14 +285,15 @@ export const ArticleEditDialog = ({ article, open, onOpenChange, onSave }: Artic
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="content">Content * (Markdown supported)</Label>
-            <Textarea
-              id="content"
+            <Label htmlFor="content">Content *</Label>
+            <p className="text-sm text-muted-foreground mb-2">
+              Use the toolbar to format your article with headings, bold text, lists, tables, and more
+            </p>
+            <RichTextEditor
               value={formData.content}
-              onChange={(e) => setFormData({ ...formData, content: e.target.value })}
-              placeholder="Article content in markdown format"
-              rows={20}
-              className="font-mono text-sm break-words-safe resize-none"
+              onChange={(value) => setFormData({ ...formData, content: value })}
+              placeholder="Write your article content here..."
+              minHeight="400px"
             />
           </div>
 
