@@ -5,6 +5,9 @@ import { Button } from "@/components/ui/button";
 import { ShareButtons } from "@/components/ShareButtons";
 import { Card } from "@/components/ui/card";
 import { HTMLContent } from "@/components/ui/html-content";
+import { Badge } from "@/components/ui/badge";
+import { PageBreadcrumbs } from "@/components/PageBreadcrumbs";
+import { Link } from "react-router-dom";
 
 interface ArticleContent {
   id: string;
@@ -15,6 +18,8 @@ interface ArticleContent {
   date: string;
   category: string;
   content: string[];
+  author_name?: string;
+  author_credentials?: string;
 }
 
 const articles: Record<string, ArticleContent> = {
