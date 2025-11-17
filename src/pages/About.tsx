@@ -597,16 +597,16 @@ const About = () => {
               Work with a real coach who designed every program personally — not an AI.
             </p>
               <div className="flex gap-4 justify-center flex-wrap">
-                <Button size="lg" onClick={() => navigate("/workout")} className="gap-2">
+                <Button size="lg" variant="outline" onClick={() => navigate("/workout")} className="gap-2">
                   <Target className="w-5 h-5" />
                   Try Free Workouts
                 </Button>
-                <Button size="lg" variant="outline" onClick={() => navigate("/program")} className="gap-2">
+                <Button size="lg" variant="outline" onClick={() => navigate("/trainingprogram")} className="gap-2">
                   <Calendar className="w-5 h-5" />
                   Try Free Training Programs
                 </Button>
                 {!isPremium && (
-                  <Button size="lg" variant="default" onClick={() => navigate("/premiumbenefits")} className="gap-2">
+                  <Button size="lg" variant="outline" onClick={() => navigate("/premiumbenefits")} className="gap-2">
                     <UserCheck className="w-5 h-5" />
                     Join Premium
                   </Button>
