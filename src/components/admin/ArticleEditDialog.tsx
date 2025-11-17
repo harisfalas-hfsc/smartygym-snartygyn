@@ -229,7 +229,7 @@ export const ArticleEditDialog = ({ article, open, onOpenChange, onSave }: Artic
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+      <DialogContent className="max-w-5xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>{article ? 'Edit Article' : 'Create New Article'}</DialogTitle>
           <DialogDescription>
@@ -299,7 +299,7 @@ export const ArticleEditDialog = ({ article, open, onOpenChange, onSave }: Artic
 
           <div className="space-y-4">
             <div className="space-y-2">
-              <div className="flex items-center justify-between">
+              <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2">
                 <Label htmlFor="image_url">Image URL *</Label>
                 <Button
                   type="button"
@@ -307,7 +307,7 @@ export const ArticleEditDialog = ({ article, open, onOpenChange, onSave }: Artic
                   disabled={isGeneratingImage}
                   variant="outline"
                   size="sm"
-                  className="gap-2"
+                  className="gap-2 w-full sm:w-auto"
                 >
                   {isGeneratingImage ? (
                     <>

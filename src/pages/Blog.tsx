@@ -8,6 +8,7 @@ import { InfoRibbon } from "@/components/InfoRibbon";
 import { ArrowLeft, Clock, Calendar } from "lucide-react";
 import { useShowBackButton } from "@/hooks/useShowBackButton";
 import { supabase } from "@/integrations/supabase/client";
+import { CompactFilters } from "@/components/CompactFilters";
 
 interface Article {
   id: string;
@@ -89,6 +90,7 @@ const Blog = () => {
   const navigate = useNavigate();
   const { canGoBack, goBack } = useShowBackButton();
   const [categoryFilter, setCategoryFilter] = useState<string>("all");
+  const [sortFilter, setSortFilter] = useState<string>("newest");
   const [dbArticles, setDbArticles] = useState<Article[]>([]);
   const [allArticles, setAllArticles] = useState<Article[]>(articles);
 
@@ -136,9 +138,15 @@ const Blog = () => {
     fetchArticles();
   }, []);
 
-  const filteredArticles = categoryFilter === "all" 
-    ? allArticles 
-    : allArticles.filter(article => article.category.toLowerCase() === categoryFilter.toLowerCase());
+  const filteredArticles = allArticles
+    .filter((article) =>
+      categoryFilter === "all" || article.category.toLowerCase() === categoryFilter.toLowerCase()
+    )
+    .sort((a, b) => {
+      const dateA = new Date(a.date).getTime();
+      const dateB = new Date(b.date).getTime();
+      return sortFilter === "newest" ? dateB - dateA : dateA - dateB;
+    });
 
   return (
     <>
@@ -209,37 +217,32 @@ const Blog = () => {
             ]} 
           />
 
-          {/* Category Filter */}
-          <div className="flex flex-wrap justify-center gap-3 mb-8">
-            <Button
-              variant={categoryFilter === "all" ? "default" : "outline"}
-              onClick={() => setCategoryFilter("all")}
-              size="sm"
-            >
-              All
-            </Button>
-            <Button
-              variant={categoryFilter === "fitness" ? "default" : "outline"}
-              onClick={() => setCategoryFilter("fitness")}
-              size="sm"
-            >
-              Fitness
-            </Button>
-            <Button
-              variant={categoryFilter === "wellness" ? "default" : "outline"}
-              onClick={() => setCategoryFilter("wellness")}
-              size="sm"
-            >
-              Wellness
-            </Button>
-            <Button
-              variant={categoryFilter === "nutrition" ? "default" : "outline"}
-              onClick={() => setCategoryFilter("nutrition")}
-              size="sm"
-            >
-              Nutrition
-            </Button>
-          </div>
+          <CompactFilters
+            filters={[
+              {
+                name: "Sort by",
+                value: sortFilter,
+                onChange: setSortFilter,
+                options: [
+                  { value: "newest", label: "Newest" },
+                  { value: "oldest", label: "Oldest" }
+                ],
+                placeholder: "Sort"
+              },
+              {
+                name: "Category",
+                value: categoryFilter,
+                onChange: setCategoryFilter,
+                options: [
+                  { value: "all", label: "All" },
+                  { value: "fitness", label: "Fitness" },
+                  { value: "wellness", label: "Wellness" },
+                  { value: "nutrition", label: "Nutrition" }
+                ],
+                placeholder: "Category"
+              }
+            ]}
+          />
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {filteredArticles.map((article) => (

@@ -247,24 +247,36 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({
         .ProseMirror {
           outline: none;
           min-height: ${minHeight};
+          word-wrap: break-word;
+          overflow-wrap: break-word;
+          white-space: normal;
+          max-width: 100%;
         }
         .ProseMirror p {
           margin: 0.5em 0;
+          word-wrap: break-word;
+          overflow-wrap: break-word;
         }
         .ProseMirror h1 {
           font-size: 2em;
           font-weight: bold;
           margin: 0.5em 0;
+          word-wrap: break-word;
+          overflow-wrap: break-word;
         }
         .ProseMirror h2 {
           font-size: 1.5em;
           font-weight: bold;
           margin: 0.5em 0;
+          word-wrap: break-word;
+          overflow-wrap: break-word;
         }
         .ProseMirror h3 {
           font-size: 1.25em;
           font-weight: bold;
           margin: 0.5em 0;
+          word-wrap: break-word;
+          overflow-wrap: break-word;
         }
         .ProseMirror ul, .ProseMirror ol {
           padding-left: 1.5em;
@@ -282,6 +294,8 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({
           padding: 0.5em;
           position: relative;
           vertical-align: top;
+          word-wrap: break-word;
+          overflow-wrap: break-word;
         }
         .ProseMirror table th {
           background-color: hsl(var(--muted));
@@ -291,6 +305,8 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({
         .ProseMirror a {
           color: hsl(var(--primary));
           text-decoration: underline;
+          word-wrap: break-word;
+          overflow-wrap: break-word;
         }
       `}</style>
     </div>
