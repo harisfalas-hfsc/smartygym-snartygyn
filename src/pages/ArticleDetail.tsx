@@ -4,6 +4,7 @@ import { ArrowLeft, Clock, Calendar } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ShareButtons } from "@/components/ShareButtons";
 import { Card } from "@/components/ui/card";
+import { HTMLContent } from "@/components/ui/html-content";
 
 interface ArticleContent {
   id: string;
@@ -660,28 +661,13 @@ export const ArticleDetail = () => {
         {/* Article Content */}
         <main className="max-w-4xl mx-auto">
           <Card className="p-8">
-            <div className="prose prose-lg max-w-none dark:prose-invert">
-              {article.content.map((paragraph, index) => {
-                if (paragraph.startsWith("## ")) {
-                  return (
-                    <h2 key={index} className="text-2xl font-bold mt-8 mb-4">
-                      {paragraph.replace("## ", "")}
-                    </h2>
-                  );
-                }
-                return (
-                  <p key={index} className="mb-4 leading-relaxed">
-                    {paragraph}
-                  </p>
-                );
-              })}
-              
-              {/* Author Signature */}
-              <div className="mt-12 pt-6 border-t border-border">
-                <p className="text-sm text-muted-foreground italic">
-                  — <a href="/coach-profile" className="text-primary hover:underline font-medium">Haris Falas</a>, Certified Sports Scientist & Head Coach at SmartyGym
-                </p>
-              </div>
+            <HTMLContent content={typeof article.content === 'string' ? article.content : article.content.join('\n\n')} className="prose-lg" />
+            
+            {/* Author Signature */}
+            <div className="mt-12 pt-6 border-t border-border">
+              <p className="text-sm text-muted-foreground italic">
+                — <a href="/coach-profile" className="text-primary hover:underline font-medium">Haris Falas</a>, Certified Sports Scientist & Head Coach at SmartyGym
+              </p>
             </div>
           </Card>
 
