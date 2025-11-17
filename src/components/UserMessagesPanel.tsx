@@ -4,9 +4,10 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { format } from "date-fns";
-import { MessageSquare, Mail, Paperclip, Download, Zap, User } from "lucide-react";
-import { useEffect } from "react";
+import { MessageSquare, Mail, Paperclip, Download, Zap, User, Eye, EyeOff } from "lucide-react";
+import { useState } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { toast } from "sonner";
 
 interface ContactMessage {
   id: string;
@@ -35,6 +36,8 @@ interface SystemMessage {
 }
 
 export const UserMessagesPanel = () => {
+  const [expandedMessages, setExpandedMessages] = useState<Set<string>>(new Set());
+
   const { data: rawContactMessages = [], isLoading: contactLoading, refetch: refetchContact } = useQuery({
     queryKey: ['user-contact-messages'],
     queryFn: async () => {
@@ -76,33 +79,75 @@ export const UserMessagesPanel = () => {
 
   const isLoading = contactLoading || systemLoading;
 
-  useEffect(() => {
-    const markAsRead = async () => {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) return;
+  const handleMessageClick = async (messageId: string, type: 'system' | 'contact') => {
+    if (expandedMessages.has(messageId)) {
+      setExpandedMessages(prev => {
+        const next = new Set(prev);
+        next.delete(messageId);
+        return next;
+      });
+      return;
+    }
 
-      await supabase
-        .from('contact_messages')
-        .update({ response_read_at: new Date().toISOString() })
-        .eq('user_id', user.id)
-        .not('response', 'is', null)
-        .is('response_read_at', null);
+    setExpandedMessages(prev => new Set(prev).add(messageId));
+
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return;
+
+    if (type === 'system') {
+      const message = systemMessages.find(m => m.id === messageId);
+      if (message && !message.is_read) {
+        await supabase
+          .from('user_system_messages')
+          .update({ is_read: true })
+          .eq('id', messageId);
+        
+        refetchSystem();
+        window.dispatchEvent(new CustomEvent('messages-read'));
+      }
+    } else if (type === 'contact') {
+      const message = contactMessages.find(m => m.id === messageId);
+      if (message && message.response && !message.response_read_at) {
+        await supabase
+          .from('contact_messages')
+          .update({ response_read_at: new Date().toISOString() })
+          .eq('id', messageId);
+        
+        refetchContact();
+        window.dispatchEvent(new CustomEvent('messages-read'));
+      }
+    }
+  };
+
+  const handleToggleRead = async (messageId: string, type: 'system' | 'contact', currentState: boolean) => {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return;
+
+    try {
+      if (type === 'system') {
+        await supabase
+          .from('user_system_messages')
+          .update({ is_read: !currentState })
+          .eq('id', messageId);
+        
+        toast.success(!currentState ? "Message marked as read" : "Message marked as unread");
+        refetchSystem();
+      } else if (type === 'contact') {
+        await supabase
+          .from('contact_messages')
+          .update({ response_read_at: !currentState ? new Date().toISOString() : null })
+          .eq('id', messageId);
+        
+        toast.success(!currentState ? "Message marked as read" : "Message marked as unread");
+        refetchContact();
+      }
       
-      await supabase
-        .from('user_system_messages')
-        .update({ is_read: true })
-        .eq('user_id', user.id)
-        .eq('is_read', false);
-      
-      refetchContact();
-      refetchSystem();
-      
-      // Trigger a refetch of the unread count in Navigation
       window.dispatchEvent(new CustomEvent('messages-read'));
-    };
-
-    markAsRead();
-  }, [refetchContact, refetchSystem]);
+    } catch (error) {
+      toast.error("Failed to update message status");
+      console.error("Error toggling message read status:", error);
+    }
+  };
 
   const getCategoryIcon = (category: string) => {
     switch (category) {
