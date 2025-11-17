@@ -144,6 +144,48 @@ All colors MUST be HSL.
     overflow-wrap: break-word;
     max-width: 100%;
   }
+  
+  /* CTA Button Enhanced Animations */
+  .cta-button {
+    position: relative;
+    overflow: hidden;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  
+  .cta-button::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.1);
+    transform: translate(-50%, -50%);
+    transition: width 0.6s, height 0.6s;
+  }
+  
+  .cta-button:hover::before {
+    width: 300px;
+    height: 300px;
+  }
+  
+  .cta-button:hover {
+    box-shadow: 0 0 20px rgba(212, 175, 55, 0.4), 0 0 40px rgba(212, 175, 55, 0.2);
+    transform: translateY(-2px);
+  }
+  
+  .cta-button:active {
+    transform: translateY(0);
+  }
+  
+  .cta-button svg {
+    transition: transform 0.3s ease;
+  }
+  
+  .cta-button:hover svg {
+    transform: scale(1.2) rotate(5deg);
+  }
 }
 
 /* Global smooth scrolling */

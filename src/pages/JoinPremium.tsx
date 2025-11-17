@@ -92,8 +92,8 @@ export default function JoinPremium() {
   return (
     <>
       <Helmet>
-        <title>Join Premium | Smarty Gym</title>
-        <meta name="description" content="Upgrade to Smarty Gym Premium and unlock unlimited workouts, training programs, and exclusive fitness tools." />
+        <title>Join Premium | SmartyGym</title>
+        <meta name="description" content="Upgrade to SmartyGym Premium and unlock unlimited workouts, training programs, and exclusive fitness tools." />
       </Helmet>
 
       <div className="min-h-screen bg-background">

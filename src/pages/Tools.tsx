@@ -45,13 +45,13 @@ const Tools = () => {
         <meta name="description" content="Free online gym fitness tools at smartygym.com: 1RM Calculator, BMR Calculator, Macro Tracking Calculator. Professional fitness planning tools by Sports Scientist Haris Falas for online gym training. Convenient fitness tools for anywhere, anytime." />
         <meta name="keywords" content="online gym tools, fitness calculators online, gym calculators, smartygym tools, smartygym.com, online gym Cyprus, gym tools Cyprus, Haris Falas tools, Haris Falas Cyprus, 1rm calculator online, bmr calculator online, macro calculator, fitness tools online, gym training tools, convenient fitness tools, gym Reimagined, workout calculators, online fitness tools, gym planning tools, training calculators, Cyprus fitness tools, strength calculator, nutrition calculator, calorie calculator online" />
         
-        <meta property="og:title" content="Fitness Tools - Smarty Gym | Free Calculators" />
+        <meta property="og:title" content="Fitness Tools - SmartyGym | Free Calculators" />
         <meta property="og:description" content="Free fitness calculators by Haris Falas - convenient tools for flexible training anywhere" />
         <meta property="og:type" content="website" />
         <meta property="og:url" content="https://smartygym.com/tools" />
         
         <meta name="twitter:card" content="summary_large_image" />
-        <meta name="twitter:title" content="Fitness Tools - Smarty Gym" />
+        <meta name="twitter:title" content="Fitness Tools - SmartyGym" />
         <meta name="twitter:description" content="Free fitness calculators at smartygym.com for convenient training planning" />
         
         <link rel="canonical" href="https://smartygym.com/tools" />

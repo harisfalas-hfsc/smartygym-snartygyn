@@ -9,11 +9,11 @@ const Disclaimer = () => {
     <>
       <Helmet>
         <title>Disclaimer | SmartyGym.com Online Fitness Platform | smartygym.com</title>
-        <meta name="description" content="Health and fitness disclaimer for Smarty Gym (smartygym.com) - Online Fitness Platform by Haris Falas. Important information about exercise risks and liability for online fitness training." />
+        <meta name="description" content="Health and fitness disclaimer for SmartyGym (smartygym.com) - Online Fitness Platform by Haris Falas. Important information about exercise risks and liability for online fitness training." />
         <meta name="keywords" content="smartygym disclaimer, smartygym.com health disclaimer, online fitness disclaimer, Haris Falas, fitness training risks, online fitness legal" />
         
         <meta property="og:title" content="Disclaimer - SmartyGym.com" />
-        <meta property="og:description" content="Important health and safety information for Smarty Gym online fitness platform" />
+        <meta property="og:description" content="Important health and safety information for SmartyGym online fitness platform" />
         
         <link rel="canonical" href="https://smartygym.com/disclaimer" />
       </Helmet>
@@ -33,7 +33,7 @@ const Disclaimer = () => {
                   ⚠️ IMPORTANT: MANDATORY <span className="whitespace-nowrap">PAR-Q</span> HEALTH ASSESSMENT
                 </p>
                 <p className="text-sm font-semibold text-destructive">
-                  Before starting any workout program, diet plan, or physical activity offered by Smarty Gym, 
+                  Before starting any workout program, diet plan, or physical activity offered by SmartyGym, 
                   you MUST complete the <span className="whitespace-nowrap">PAR-Q</span> (Physical Activity Readiness Questionnaire) health assessment 
                   available below. By using our services, you confirm that you have read and completed this
                   questionnaire and accept full responsibility for your participation.
@@ -47,9 +47,9 @@ const Disclaimer = () => {
               </div>
 
               <p className="text-lg text-muted-foreground">
-                The information provided on <strong>Smarty Gym</strong> (smartygym.com), founded by <strong>Haris Falas</strong> in Cyprus (the "Website" and mobile applications) is intended 
+                The information provided on <strong>SmartyGym</strong> (smartygym.com), founded by <strong>Haris Falas</strong> in Cyprus (the "Website" and mobile applications) is intended 
                 solely for <strong>general educational and informational purposes</strong>. While every effort has been made by our <strong>Online Fitness Platform</strong> experts 
-                to provide safe and effective guidance, <strong>Smarty Gym is not a substitute for professional medical
+                to provide safe and effective guidance, <strong>SmartyGym is not a substitute for professional medical
                 advice, diagnosis, or treatment</strong>.
               </p>
 
@@ -59,7 +59,7 @@ const Disclaimer = () => {
                   <h2 className="text-2xl font-bold mb-3">1. Not Medical Advice</h2>
                   <ul className="space-y-2 text-muted-foreground">
                     <li>
-                      All workout programs, exercises, nutritional advice, or fitness-related content provided by Smarty Gym 
+                      All workout programs, exercises, nutritional advice, or fitness-related content provided by SmartyGym 
                       are <strong>for general fitness purposes only</strong>.
                     </li>
                     <li>
@@ -81,7 +81,7 @@ const Disclaimer = () => {
                   <h2 className="text-2xl font-bold mb-3">2. Assumption of Risk</h2>
                   <ul className="space-y-2 text-muted-foreground">
                     <li>
-                      By using Smarty Gym, you <strong>voluntarily assume all risks</strong> associated with physical 
+                      By using SmartyGym, you <strong>voluntarily assume all risks</strong> associated with physical 
                       activity, exercise, and training.
                     </li>
                     <li>
@@ -89,7 +89,7 @@ const Disclaimer = () => {
                       cardiovascular complications, or other health-related problems.
                     </li>
                     <li>
-                      Smarty Gym, its trainers, and affiliates <strong>accept no responsibility</strong> for any injury, 
+                      SmartyGym, its trainers, and affiliates <strong>accept no responsibility</strong> for any injury, 
                       illness, accident, or health-related issue that may occur during or after participation in our programs.
                     </li>
                   </ul>
@@ -109,7 +109,7 @@ const Disclaimer = () => {
                       should <strong>stop immediately and seek medical attention</strong>.
                     </li>
                     <li>
-                      Children and minors should not use Smarty Gym programs without <strong>adult supervision</strong> and 
+                      Children and minors should not use SmartyGym programs without <strong>adult supervision</strong> and 
                       prior medical clearance.
                     </li>
                   </ul>
@@ -126,7 +126,7 @@ const Disclaimer = () => {
                       depending on age, health status, genetics, lifestyle, and adherence to the program.
                     </li>
                     <li>
-                      Smarty Gym <strong>does not guarantee specific fitness, weight loss, or health outcomes</strong>.
+                      SmartyGym <strong>does not guarantee specific fitness, weight loss, or health outcomes</strong>.
                     </li>
                   </ul>
                 </div>
@@ -147,7 +147,7 @@ const Disclaimer = () => {
                       contractors, affiliates, and agents from any and all liability.
                     </li>
                     <li>
-                      <strong>No Liability:</strong> Smarty Gym and its representatives <strong>shall not be held 
+                      <strong>No Liability:</strong> SmartyGym and its representatives <strong>shall not be held 
                       liable</strong> for any direct, indirect, incidental, consequential, special, punitive, or 
                       exemplary damages arising from participation in any workout, program, diet plan, or activity 
                       offered on this Website or App, including but not limited to:
@@ -162,10 +162,10 @@ const Disclaimer = () => {
                     </li>
                     <li>
                       <strong>Waiver of Right to Sue:</strong> You expressly waive any right to bring legal action 
-                      against Smarty Gym for injuries or damages sustained during or after participation in our programs.
+                      against SmartyGym for injuries or damages sustained during or after participation in our programs.
                     </li>
                     <li>
-                      <strong>Indemnification:</strong> You agree to indemnify and hold harmless Smarty Gym from any 
+                      <strong>Indemnification:</strong> You agree to indemnify and hold harmless SmartyGym from any 
                       claims, damages, or expenses (including legal fees) arising from your use of our services or 
                       breach of this disclaimer.
                     </li>
@@ -217,18 +217,18 @@ const Disclaimer = () => {
                   ⚠️ ACCEPTANCE AND ACKNOWLEDGMENT
                 </p>
                 <p className="text-sm text-muted-foreground mb-3">
-                  By accessing and using Smarty Gym, you acknowledge and confirm that you have:
+                  By accessing and using SmartyGym, you acknowledge and confirm that you have:
                 </p>
                 <ul className="text-sm text-muted-foreground space-y-1 ml-4 list-disc">
                   <li><strong>Read and understood</strong> this entire Disclaimer</li>
                   <li><strong>Completed the <span className="whitespace-nowrap">PAR-Q</span> questionnaire</strong> below</li>
                   <li><strong>Obtained medical clearance</strong> if required by your <span className="whitespace-nowrap">PAR-Q</span> responses</li>
                   <li><strong>Voluntarily assumed all risks</strong> associated with physical activity</li>
-                  <li><strong>Released Smarty Gym from all liability</strong> for any injuries or damages</li>
+                  <li><strong>Released SmartyGym from all liability</strong> for any injuries or damages</li>
                   <li><strong>Agreed to exercise at your own risk</strong></li>
                 </ul>
                 <p className="text-sm font-bold text-destructive mt-4">
-                  IF YOU DO NOT AGREE WITH ANY PART OF THIS DISCLAIMER, DO NOT USE SMARTY GYM SERVICES.
+                  IF YOU DO NOT AGREE WITH ANY PART OF THIS DISCLAIMER, DO NOT USE SMARTYGYM SERVICES.
                 </p>
               </div>
             </div>

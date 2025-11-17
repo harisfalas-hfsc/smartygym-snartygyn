@@ -586,7 +586,7 @@ export default function UserDashboard() {
                       Upgrade for unlimited access to all content!
                     </p>
                   </div>
-                  <Button onClick={() => navigate("/premiumbenefits")} className="w-full sm:w-auto">
+                  <Button onClick={() => navigate("/premiumbenefits")} className="w-full sm:w-auto cta-button">
                     Upgrade to Premium
                   </Button>
                 </div>
@@ -605,7 +605,7 @@ export default function UserDashboard() {
                       You're currently on the free plan with limited access.
                     </p>
                   </div>
-                  <Button onClick={() => navigate("/premiumbenefits")} className="w-full sm:w-auto">
+                  <Button onClick={() => navigate("/premiumbenefits")} className="w-full sm:w-auto cta-button">
                     Upgrade Now
                   </Button>
                 </div>
@@ -986,7 +986,7 @@ export default function UserDashboard() {
                   <p className="text-muted-foreground mb-6">
                     Track your workouts, mark favorites, and monitor your progress with a Gold or Platinum plan.
                   </p>
-                  <Button onClick={() => navigate("/premiumbenefits")}>
+                  <Button onClick={() => navigate("/premiumbenefits")} className="cta-button">
                     Upgrade to Premium
                   </Button>
                 </CardContent>
@@ -1144,7 +1144,7 @@ export default function UserDashboard() {
                   <p className="text-muted-foreground mb-6">
                     Access structured training programs, track your progress, and achieve your fitness goals with a Gold or Platinum plan.
                   </p>
-                  <Button onClick={() => navigate("/premiumbenefits")}>
+                  <Button onClick={() => navigate("/premiumbenefits")} className="cta-button">
                     Upgrade to Premium
                   </Button>
                 </CardContent>
@@ -1536,7 +1536,7 @@ export default function UserDashboard() {
                   <p className="text-muted-foreground mb-6">
                     Track all your fitness activities in one place with a Gold or Platinum plan.
                   </p>
-                  <Button onClick={() => navigate("/premiumbenefits")}>
+                  <Button onClick={() => navigate("/premiumbenefits")} className="cta-button">
                     Upgrade to Premium
                   </Button>
                 </CardContent>
