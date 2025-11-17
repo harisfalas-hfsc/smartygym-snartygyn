@@ -7,7 +7,6 @@ export const WorkoutCategoriesCompositeTemplate = () => {
     { icon: Heart, name: "Cardio" },
     { icon: Flame, name: "Calorie Burning" },
     { icon: Zap, name: "Metabolic" },
-    { icon: Zap, name: "Power" },
     { icon: Waves, name: "Mobility" },
     { icon: Trophy, name: "Challenge" },
   ];

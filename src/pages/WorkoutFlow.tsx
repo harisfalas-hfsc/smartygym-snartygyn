@@ -49,12 +49,6 @@ const WorkoutFlow = () => {
       icon: Move,
     },
     {
-      id: "power",
-      title: "Power",
-      description: "Explosive movements for athletic performance",
-      icon: TrendingUp,
-    },
-    {
       id: "challenge",
       title: "Challenge",
       description: "Push your limits with advanced workouts",
