@@ -4,7 +4,13 @@ import { Helmet } from "react-helmet";
 import { ServiceCard } from "@/components/ServiceCard";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { Dumbbell, Calendar, BookOpen, Calculator, Activity, Flame, Instagram, Facebook, Youtube, UserCheck, Wrench, Video, FileText, Smartphone, Users, Target, Heart, Zap, Plane, GraduationCap } from "lucide-react";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { Dumbbell, Calendar, BookOpen, Calculator, Activity, Flame, Instagram, Facebook, Youtube, UserCheck, Wrench, Video, FileText, Smartphone, Users, Target, Heart, Zap, Plane, GraduationCap, ChevronDown } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { User as SupabaseUser } from "@supabase/supabase-js";
 import { useToast } from "@/hooks/use-toast";
@@ -432,27 +438,54 @@ const Index = () => {
                     </div>
                   </div>
 
-                  {/* CTA Buttons after three cards */}
-                  <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center items-center pt-6">
-                    <Button 
-                      size="lg" 
-                      onClick={() => navigate("/premiumbenefits")} 
-                      className="w-full sm:w-auto min-w-[200px]"
-                      aria-label="Get started with Smarty Gym"
-                    >
-                      Get Started
-                    </Button>
-                    {!isPremium && (
-                      <Button 
-                        size="lg" 
-                        variant="outline" 
-                        onClick={() => navigate("/premiumbenefits")}
-                        className="w-full sm:w-auto min-w-[200px]"
-                        aria-label="Join Smarty Gym premium membership"
+                  {/* CTA Buttons after three cards - Single Dropdown */}
+                  <div className="flex justify-center items-center pt-6">
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button 
+                          size="lg" 
+                          variant="outline"
+                          className="w-full sm:w-auto min-w-[250px] bg-transparent border-2 border-primary hover:bg-primary/10 text-lg font-semibold"
+                          aria-label="Get started with Smarty Gym - Browse our services"
+                        >
+                          Get Started
+                          <ChevronDown className="ml-2 h-5 w-5" />
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent 
+                        align="center" 
+                        className="w-[250px] bg-popover border-primary/20"
                       >
-                        View Premium Plans
-                      </Button>
-                    )}
+                        <DropdownMenuItem 
+                          onClick={() => navigate("/workout")}
+                          className="cursor-pointer text-base py-3 hover:bg-primary/10"
+                        >
+                          <Dumbbell className="mr-3 h-5 w-5 text-primary" />
+                          Workouts
+                        </DropdownMenuItem>
+                        <DropdownMenuItem 
+                          onClick={() => navigate("/trainingprogram")}
+                          className="cursor-pointer text-base py-3 hover:bg-primary/10"
+                        >
+                          <Calendar className="mr-3 h-5 w-5 text-primary" />
+                          Training Programs
+                        </DropdownMenuItem>
+                        <DropdownMenuItem 
+                          onClick={() => navigate("/exerciselibrary")}
+                          className="cursor-pointer text-base py-3 hover:bg-primary/10"
+                        >
+                          <BookOpen className="mr-3 h-5 w-5 text-primary" />
+                          Library
+                        </DropdownMenuItem>
+                        <DropdownMenuItem 
+                          onClick={() => navigate("/blog")}
+                          className="cursor-pointer text-base py-3 hover:bg-primary/10"
+                        >
+                          <FileText className="mr-3 h-5 w-5 text-primary" />
+                          Blog
+                        </DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
                   </div>
 
                   {/* Feature Highlights Grid */}
@@ -577,20 +610,6 @@ const Index = () => {
           <div className="text-center mb-8 px-4">
             
             
-          </div>
-
-          {/* Services Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 mb-8">
-            {services.map((service) => (
-              <ScrollReveal key={service.id}>
-                <ServiceCard 
-                  icon={service.icon} 
-                  title={service.title} 
-                  description={service.description} 
-                  onClick={() => handleServiceSelect(service.id)} 
-                />
-              </ScrollReveal>
-            ))}
           </div>
 
           {/* CTA Section */}
