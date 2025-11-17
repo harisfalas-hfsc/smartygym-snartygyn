@@ -539,7 +539,7 @@ const Index = () => {
 
                   {/* Feature Highlights Grid */}
                   <div className="border-t border-primary/20 pt-6">
-                    <div className="grid grid-cols-2 md:grid-cols-3 gap-4 sm:gap-6">
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
                       
                       <div className="flex items-start gap-3">
                         <Dumbbell className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
@@ -645,7 +645,7 @@ const Index = () => {
 
                         {/* Pricing Plans */}
                         <div className="border-t border-primary/20 pt-6 mt-6">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-4">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-4">
             {/* Gold Plan */}
             <Card className="relative border-2 border-amber-500 shadow-lg flex flex-col">
               <CardHeader className="text-center pb-2 sm:pb-4">
