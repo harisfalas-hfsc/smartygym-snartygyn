@@ -10,6 +10,7 @@ import { toast } from "sonner";
 import { RevenueAnalytics } from "./RevenueAnalytics";
 import { PurchaseAnalytics } from "./PurchaseAnalytics";
 import { PersonalTrainingAnalytics } from "./PersonalTrainingAnalytics";
+import { ContactAnalytics } from "./ContactAnalytics";
 
 interface AnalyticsData {
   totalUsers: number;
@@ -360,6 +361,7 @@ export function AnalyticsDashboard() {
             <TabsTrigger value="revenue" className="flex-shrink-0 whitespace-nowrap text-xs sm:text-sm px-2 sm:px-3 py-2">Revenue</TabsTrigger>
             <TabsTrigger value="purchases" className="flex-shrink-0 whitespace-nowrap text-xs sm:text-sm px-2 sm:px-3 py-2">Purchases</TabsTrigger>
             <TabsTrigger value="personal-training" className="flex-shrink-0 whitespace-nowrap text-xs sm:text-sm px-2 sm:px-3 py-2">PT</TabsTrigger>
+            <TabsTrigger value="communications" className="flex-shrink-0 whitespace-nowrap text-xs sm:text-sm px-2 sm:px-3 py-2">Messages</TabsTrigger>
             <TabsTrigger value="growth" className="flex-shrink-0 whitespace-nowrap text-xs sm:text-sm px-2 sm:px-3 py-2">Growth</TabsTrigger>
             <TabsTrigger value="completion" className="flex-shrink-0 whitespace-nowrap text-xs sm:text-sm px-2 sm:px-3 py-2">Completion</TabsTrigger>
             <TabsTrigger value="popular" className="flex-shrink-0 whitespace-nowrap text-xs sm:text-sm px-2 sm:px-3 py-2">Popular</TabsTrigger>
@@ -450,6 +452,10 @@ export function AnalyticsDashboard() {
 
         <TabsContent value="personal-training" className="space-y-4">
           <PersonalTrainingAnalytics />
+        </TabsContent>
+
+        <TabsContent value="communications" className="space-y-4">
+          <ContactAnalytics />
         </TabsContent>
 
         <TabsContent value="growth" className="space-y-4">
