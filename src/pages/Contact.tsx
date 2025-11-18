@@ -394,139 +394,141 @@ const Contact = () => {
                   </CardDescription>
                 </CardHeader>
                 <CardContent className="flex flex-col h-full">
-                  <form onSubmit={handleSubmit} className="space-y-6">
-                     <div className="space-y-2">
-                      <Label htmlFor="name">Name *</Label>
-                      <Input
-                        id="name"
-                        name="name"
-                        value={formData.name}
-                        onChange={handleChange}
-                        placeholder="Your full name"
-                        className={errors.name ? "border-destructive" : ""}
-                        disabled={isAuthenticated}
-                      />
-                      {errors.name && (
-                        <p className="text-sm text-destructive">{errors.name}</p>
-                      )}
-                    </div>
-
-                    <div className="space-y-2">
-                      <Label htmlFor="email">Email *</Label>
-                      <Input
-                        id="email"
-                        name="email"
-                        type="email"
-                        value={formData.email}
-                        onChange={handleChange}
-                        placeholder="your.email@example.com"
-                        className={errors.email ? "border-destructive" : ""}
-                        disabled={isAuthenticated}
-                      />
-                      {errors.email && (
-                        <p className="text-sm text-destructive">{errors.email}</p>
-                      )}
-                    </div>
-
-                    <div className="space-y-2">
-                      <Label htmlFor="subject">Subject *</Label>
-                      <Input
-                        id="subject"
-                        name="subject"
-                        value={formData.subject}
-                        onChange={handleChange}
-                        placeholder="What is this about?"
-                        className={errors.subject ? "border-destructive" : ""}
-                      />
-                      {errors.subject && (
-                        <p className="text-sm text-destructive">{errors.subject}</p>
-                      )}
-                    </div>
-
-                    <div className="space-y-2">
-                      <Label htmlFor="message">Message *</Label>
-                      <Textarea
-                        id="message"
-                        name="message"
-                        value={formData.message}
-                        onChange={handleChange}
-                        placeholder="Tell us how we can help you..."
-                        rows={6}
-                        className={cn("resize-none", errors.message ? "border-destructive" : "")}
-                      />
-                      {errors.message && (
-                        <p className="text-sm text-destructive">{errors.message}</p>
-                      )}
-                    </div>
-
-                    <div className="space-y-2">
-                      <Label htmlFor="attachments">
-                        Attachments <span className="text-xs text-muted-foreground">(optional, max 5 files, 10MB each)</span>
-                      </Label>
-                      <div className="flex items-center gap-2">
-                        <Button
-                          type="button"
-                          variant="outline"
-                          size="sm"
-                          onClick={() => document.getElementById('file-input')?.click()}
-                          disabled={uploadingFiles || attachments.length >= 5}
-                        >
-                          <Paperclip className="w-4 h-4 mr-2" />
-                          Attach Files
-                        </Button>
-                        <input
-                          id="file-input"
-                          type="file"
-                          multiple
-                          accept=".pdf,.doc,.docx,.txt,.jpg,.jpeg,.png"
-                          className="hidden"
-                          onChange={(e) => {
-                            const files = Array.from(e.target.files || []);
-                            if (files.length + attachments.length > 5) {
-                              toast({
-                                title: "Too many files",
-                                description: "Maximum 5 files allowed",
-                                variant: "destructive",
-                              });
-                              return;
-                            }
-                            const invalidFiles = files.filter(f => f.size > 10 * 1024 * 1024);
-                            if (invalidFiles.length > 0) {
-                              toast({
-                                title: "File too large",
-                                description: "Each file must be less than 10MB",
-                                variant: "destructive",
-                              });
-                              return;
-                            }
-                            setAttachments(prev => [...prev, ...files]);
-                          }}
+                  <form onSubmit={handleSubmit} className="flex flex-col h-full">
+                    <div className="space-y-3 flex-1">
+                      <div className="space-y-1.5">
+                        <Label htmlFor="name">Name *</Label>
+                        <Input
+                          id="name"
+                          name="name"
+                          value={formData.name}
+                          onChange={handleChange}
+                          placeholder="Your full name"
+                          className={errors.name ? "border-destructive" : ""}
+                          disabled={isAuthenticated}
                         />
+                        {errors.name && (
+                          <p className="text-sm text-destructive">{errors.name}</p>
+                        )}
                       </div>
-                      
-                      {attachments.length > 0 && (
-                        <div className="space-y-1 mt-2">
-                          {attachments.map((file, index) => (
-                            <div key={index} className="flex items-center justify-between text-sm bg-muted p-2 rounded">
-                              <span className="flex items-center gap-2">
-                                <Paperclip className="w-3 h-3" />
-                                {file.name} ({(file.size / 1024).toFixed(1)}KB)
-                              </span>
-                              <Button
-                                type="button"
-                                variant="ghost"
-                                size="sm"
-                                onClick={() => setAttachments(prev => prev.filter((_, i) => i !== index))}
-                              >
-                                <X className="w-3 h-3" />
-                              </Button>
-                            </div>
-                          ))}
+
+                      <div className="space-y-1.5">
+                        <Label htmlFor="email">Email *</Label>
+                        <Input
+                          id="email"
+                          name="email"
+                          type="email"
+                          value={formData.email}
+                          onChange={handleChange}
+                          placeholder="your.email@example.com"
+                          className={errors.email ? "border-destructive" : ""}
+                          disabled={isAuthenticated}
+                        />
+                        {errors.email && (
+                          <p className="text-sm text-destructive">{errors.email}</p>
+                        )}
+                      </div>
+
+                      <div className="space-y-1.5">
+                        <Label htmlFor="subject">Subject *</Label>
+                        <Input
+                          id="subject"
+                          name="subject"
+                          value={formData.subject}
+                          onChange={handleChange}
+                          placeholder="What is this about?"
+                          className={errors.subject ? "border-destructive" : ""}
+                        />
+                        {errors.subject && (
+                          <p className="text-sm text-destructive">{errors.subject}</p>
+                        )}
+                      </div>
+
+                      <div className="space-y-1.5">
+                        <Label htmlFor="message">Message *</Label>
+                        <Textarea
+                          id="message"
+                          name="message"
+                          value={formData.message}
+                          onChange={handleChange}
+                          placeholder="Tell us how we can help you..."
+                          rows={6}
+                          className={cn("resize-none", errors.message ? "border-destructive" : "")}
+                        />
+                        {errors.message && (
+                          <p className="text-sm text-destructive">{errors.message}</p>
+                        )}
+                      </div>
+
+                      <div className="space-y-1.5">
+                        <Label htmlFor="attachments">
+                          Attachments <span className="text-xs text-muted-foreground">(optional, max 5 files, 10MB each)</span>
+                        </Label>
+                        <div className="flex items-center gap-2">
+                          <Button
+                            type="button"
+                            variant="outline"
+                            size="sm"
+                            onClick={() => document.getElementById('file-input')?.click()}
+                            disabled={uploadingFiles || attachments.length >= 5}
+                          >
+                            <Paperclip className="w-4 h-4 mr-2" />
+                            Attach Files
+                          </Button>
+                          <input
+                            id="file-input"
+                            type="file"
+                            multiple
+                            accept=".pdf,.doc,.docx,.txt,.jpg,.jpeg,.png"
+                            className="hidden"
+                            onChange={(e) => {
+                              const files = Array.from(e.target.files || []);
+                              if (files.length + attachments.length > 5) {
+                                toast({
+                                  title: "Too many files",
+                                  description: "You can only attach up to 5 files",
+                                  variant: "destructive",
+                                });
+                                return;
+                              }
+                              const invalidFiles = files.filter(f => f.size > 10 * 1024 * 1024);
+                              if (invalidFiles.length > 0) {
+                                toast({
+                                  title: "File size exceeded",
+                                  description: "Each file must be less than 10MB",
+                                  variant: "destructive",
+                                });
+                                return;
+                              }
+                              setAttachments(prev => [...prev, ...files]);
+                            }}
+                          />
                         </div>
-                      )}
+                        {attachments.length > 0 && (
+                          <div className="space-y-1 mt-2">
+                            {attachments.map((file, index) => (
+                              <div key={index} className="flex items-center justify-between p-2 bg-secondary rounded-md text-sm">
+                                <span className="truncate flex-1">{file.name}</span>
+                                <span className="text-xs text-muted-foreground ml-2">
+                                  ({(file.size / 1024 / 1024).toFixed(2)} MB)
+                                </span>
+                                <Button
+                                  type="button"
+                                  variant="ghost"
+                                  size="sm"
+                                  onClick={() => setAttachments(prev => prev.filter((_, i) => i !== index))}
+                                  className="ml-2 h-6 w-6 p-0"
+                                >
+                                  <X className="w-3 h-3" />
+                                </Button>
+                              </div>
+                            ))}
+                          </div>
+                        )}
+                      </div>
                     </div>
 
-                    <Button type="submit" size="lg" className="w-full" disabled={isSubmitting}>
+                    <Button type="submit" size="lg" className="w-full mt-4" disabled={isSubmitting}>
                       <Send className="w-4 h-4 mr-2" />
                       {isSubmitting ? "Sending..." : "Send Message"}
                     </Button>
@@ -569,127 +571,132 @@ const Contact = () => {
                 </CardHeader>
                 <CardContent className="flex flex-col h-full">
                   {hasSubscription ? (
-                    <form onSubmit={handleCoachSubmit} className="space-y-4">
-                      <div className="space-y-2">
-                        <Label htmlFor="coach-subject">Subject *</Label>
-                        <Input
-                          id="coach-subject"
-                          name="subject"
-                          value={coachFormData.subject}
-                          onChange={handleCoachChange}
-                          placeholder="What is this about?"
-                          className={coachErrors.subject ? "border-destructive" : ""}
-                        />
-                        {coachErrors.subject && (
-                          <p className="text-sm text-destructive">{coachErrors.subject}</p>
-                        )}
-                      </div>
-
-                      <div className="space-y-2">
-                        <Label htmlFor="coach-message">Message *</Label>
-                        <Textarea
-                          id="coach-message"
-                          name="message"
-                          value={coachFormData.message}
-                          onChange={handleCoachChange}
-                          placeholder="Tell Haris how he can help you..."
-                          rows={6}
-                          className={cn("resize-none", coachErrors.message ? "border-destructive" : "")}
-                        />
-                        {coachErrors.message && (
-                          <p className="text-sm text-destructive">{coachErrors.message}</p>
-                        )}
-                      </div>
-
-                      <div className="space-y-2">
-                        <Label htmlFor="coach-attachments">
-                          Attachments <span className="text-xs text-muted-foreground">(optional, max 5 files)</span>
-                        </Label>
-                        <div className="flex items-center gap-2">
-                          <Button
-                            type="button"
-                            variant="outline"
-                            size="sm"
-                            onClick={() => document.getElementById('coach-file-input')?.click()}
-                            disabled={uploadingFiles || coachAttachments.length >= 5}
-                          >
-                            <Paperclip className="w-4 h-4 mr-2" />
-                            Attach Files
-                          </Button>
-                          <input
-                            id="coach-file-input"
-                            type="file"
-                            multiple
-                            accept=".pdf,.doc,.docx,.txt,.jpg,.jpeg,.png"
-                            className="hidden"
-                      onChange={(e) => {
-                        const files = Array.from(e.target.files || []);
-                        if (files.length + coachAttachments.length > 5) {
-                          toast({
-                            title: "Too many files",
-                            description: "Maximum 5 files allowed",
-                            variant: "destructive",
-                          });
-                          return;
-                        }
-                        const invalidFiles = files.filter(f => f.size > 10 * 1024 * 1024);
-                        if (invalidFiles.length > 0) {
-                          toast({
-                            title: "File too large",
-                            description: "Each file must be less than 10MB",
-                            variant: "destructive",
-                          });
-                          return;
-                        }
-                        setCoachAttachments(prev => [...prev, ...files]);
-                      }}
+                    <form onSubmit={handleCoachSubmit} className="flex flex-col h-full">
+                      <div className="space-y-3 flex-1">
+                        <div className="space-y-1.5">
+                          <Label htmlFor="coach-subject">Subject *</Label>
+                          <Input
+                            id="coach-subject"
+                            name="subject"
+                            value={coachFormData.subject}
+                            onChange={handleCoachChange}
+                            placeholder="What is this about?"
+                            className={coachErrors.subject ? "border-destructive" : ""}
                           />
+                          {coachErrors.subject && (
+                            <p className="text-sm text-destructive">{coachErrors.subject}</p>
+                          )}
                         </div>
-                        
-                        {coachAttachments.length > 0 && (
-                          <div className="space-y-1 mt-2">
-                            {coachAttachments.map((file, index) => (
-                              <div key={index} className="flex items-center justify-between text-sm bg-muted p-2 rounded">
-                                <span className="flex items-center gap-2">
-                                  <Paperclip className="w-3 h-3" />
-                                  {file.name} ({(file.size / 1024).toFixed(1)}KB)
-                                </span>
-                                <Button
-                                  type="button"
-                                  variant="ghost"
-                                  size="sm"
-                                  onClick={() => setCoachAttachments(prev => prev.filter((_, i) => i !== index))}
-                                >
-                                  <X className="w-3 h-3" />
-                                </Button>
-                              </div>
-                            ))}
+
+                        <div className="space-y-1.5">
+                          <Label htmlFor="coach-message">Message *</Label>
+                          <Textarea
+                            id="coach-message"
+                            name="message"
+                            value={coachFormData.message}
+                            onChange={handleCoachChange}
+                            placeholder="Tell Haris how he can help you..."
+                            rows={6}
+                            className={cn("resize-none", coachErrors.message ? "border-destructive" : "")}
+                          />
+                          {coachErrors.message && (
+                            <p className="text-sm text-destructive">{coachErrors.message}</p>
+                          )}
+                        </div>
+
+                        <div className="space-y-1.5">
+                          <Label htmlFor="coach-attachments">
+                            Attachments <span className="text-xs text-muted-foreground">(optional, max 5 files)</span>
+                          </Label>
+                          <div className="flex items-center gap-2">
+                            <Button
+                              type="button"
+                              variant="outline"
+                              size="sm"
+                              onClick={() => document.getElementById('coach-file-input')?.click()}
+                              disabled={uploadingFiles || coachAttachments.length >= 5}
+                            >
+                              <Paperclip className="w-4 h-4 mr-2" />
+                              Attach Files
+                            </Button>
+                            <input
+                              id="coach-file-input"
+                              type="file"
+                              multiple
+                              accept=".pdf,.doc,.docx,.txt,.jpg,.jpeg,.png"
+                              className="hidden"
+                              onChange={(e) => {
+                                const files = Array.from(e.target.files || []);
+                                if (files.length + coachAttachments.length > 5) {
+                                  toast({
+                                    title: "Too many files",
+                                    description: "Maximum 5 files allowed",
+                                    variant: "destructive",
+                                  });
+                                  return;
+                                }
+                                const invalidFiles = files.filter(f => f.size > 10 * 1024 * 1024);
+                                if (invalidFiles.length > 0) {
+                                  toast({
+                                    title: "File too large",
+                                    description: "Each file must be less than 10MB",
+                                    variant: "destructive",
+                                  });
+                                  return;
+                                }
+                                setCoachAttachments(prev => [...prev, ...files]);
+                              }}
+                            />
                           </div>
-                        )}
+                          
+                          {coachAttachments.length > 0 && (
+                            <div className="space-y-1 mt-2">
+                              {coachAttachments.map((file, index) => (
+                                <div key={index} className="flex items-center justify-between p-2 bg-secondary rounded-md text-sm">
+                                  <span className="truncate flex-1">{file.name}</span>
+                                  <span className="text-xs text-muted-foreground ml-2">
+                                    ({(file.size / 1024 / 1024).toFixed(2)} MB)
+                                  </span>
+                                  <Button
+                                    type="button"
+                                    variant="ghost"
+                                    size="sm"
+                                    onClick={() => setCoachAttachments(prev => prev.filter((_, i) => i !== index))}
+                                    className="ml-2 h-6 w-6 p-0"
+                                  >
+                                    <X className="w-3 h-3" />
+                                  </Button>
+                                </div>
+                              ))}
+                            </div>
+                          )}
+                        </div>
                       </div>
 
-                      <Button type="submit" className="w-full" disabled={isCoachSubmitting}>
-                        <Send className="w-4 h-4 mr-2" />
-                        {isCoachSubmitting ? "Sending..." : "Contact Haris"}
-                      </Button>
+                      <div className="space-y-3 mt-4">
+                        <Button type="submit" className="w-full" disabled={isCoachSubmitting}>
+                          <Send className="w-4 h-4 mr-2" />
+                          {isCoachSubmitting ? "Sending..." : "Contact Haris"}
+                        </Button>
 
-                      <div className="relative my-4">
-                        <div className="absolute inset-0 flex items-center">
-                          <span className="w-full border-t" />
+                        <div className="relative">
+                          <div className="absolute inset-0 flex items-center">
+                            <span className="w-full border-t" />
+                          </div>
+                          <div className="relative flex justify-center text-xs uppercase">
+                            <span className="bg-background px-2 text-muted-foreground">or</span>
+                          </div>
                         </div>
-                        <div className="relative flex justify-center text-xs uppercase">
-                          <span className="bg-background px-2 text-muted-foreground">or</span>
-                        </div>
+
+                        <Button 
+                          onClick={handleWhatsAppClick}
+                          className="w-full bg-[#25D366] hover:bg-[#20BA5A]"
+                          type="button"
+                        >
+                          <MessageCircle className="w-4 h-4 mr-2" />
+                          Direct Communication via WhatsApp
+                        </Button>
                       </div>
-
-                      <Button 
-                        onClick={handleWhatsAppClick}
-                        className="w-full bg-[#25D366] hover:bg-[#20BA5A]"
-                        type="button"
-                      >
-                        <MessageCircle className="w-4 h-4 mr-2" />
-                        Direct Communication via WhatsApp
-                      </Button>
                     </form>
                   ) : (
                     <div className="space-y-4">
