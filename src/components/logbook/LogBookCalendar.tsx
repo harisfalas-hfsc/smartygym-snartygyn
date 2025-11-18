@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { useActivitiesByDate } from "@/hooks/useActivityLog";
 import { DailyActivityModal } from "./DailyActivityModal";
@@ -132,18 +133,57 @@ export const LogBookCalendar = ({ userId, filter }: LogBookCalendarProps) => {
       <Card>
         <CardContent className="p-6">
           {/* Calendar Header */}
-          <div className="flex items-center justify-between mb-6">
-            <h2 className="text-2xl font-bold">
-              {monthName} {year}
-            </h2>
-            <div className="flex gap-2">
-              <Button variant="outline" size="icon" onClick={previousMonth}>
-                <ChevronLeft className="h-4 w-4" />
-              </Button>
-              <Button variant="outline" size="icon" onClick={nextMonth}>
-                <ChevronRight className="h-4 w-4" />
-              </Button>
+          <div className="flex items-center justify-between mb-6 gap-2">
+            <Button variant="outline" size="icon" onClick={previousMonth}>
+              <ChevronLeft className="h-4 w-4" />
+            </Button>
+            
+            <div className="flex items-center gap-2">
+              {/* Month Selector */}
+              <Select 
+                value={String(currentDate.getMonth())} 
+                onValueChange={(value) => {
+                  setCurrentDate(new Date(currentDate.getFullYear(), parseInt(value), 1));
+                }}
+              >
+                <SelectTrigger className="w-[140px] h-9">
+                  <SelectValue>{monthName}</SelectValue>
+                </SelectTrigger>
+                <SelectContent>
+                  {monthNames.map((month, index) => (
+                    <SelectItem key={month} value={String(index)}>
+                      {month}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+
+              {/* Year Selector */}
+              <Select 
+                value={String(year)} 
+                onValueChange={(value) => {
+                  setCurrentDate(new Date(parseInt(value), currentDate.getMonth(), 1));
+                }}
+              >
+                <SelectTrigger className="w-[100px] h-9">
+                  <SelectValue>{year}</SelectValue>
+                </SelectTrigger>
+                <SelectContent>
+                  {Array.from({ length: 10 }, (_, i) => {
+                    const yearOption = new Date().getFullYear() - 5 + i;
+                    return (
+                      <SelectItem key={yearOption} value={String(yearOption)}>
+                        {yearOption}
+                      </SelectItem>
+                    );
+                  })}
+                </SelectContent>
+              </Select>
             </div>
+
+            <Button variant="outline" size="icon" onClick={nextMonth}>
+              <ChevronRight className="h-4 w-4" />
+            </Button>
           </div>
 
           {/* Day Names */}
