@@ -165,7 +165,9 @@ export const LogBookCalendar = ({ userId, filter }: LogBookCalendarProps) => {
               const badges = getActivityBadges(day);
               const hasActivity = badges.length > 0;
               const dateStr = `${year}-${String(currentDate.getMonth() + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
-              const isToday = new Date().toISOString().split('T')[0] === dateStr;
+            const today = new Date();
+            const todayStr = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
+            const isToday = todayStr === dateStr;
 
               return (
                 <button
