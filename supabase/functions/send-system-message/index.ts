@@ -93,6 +93,26 @@ serve(async (req) => {
 
     console.log('[SEND-SYSTEM-MESSAGE] Message sent successfully to user:', userId);
 
+    // Log to notification audit
+    try {
+      await supabaseAdmin
+        .from('notification_audit_log')
+        .insert({
+          notification_type: 'automated',
+          message_type: messageType,
+          sent_by: null,
+          recipient_filter: 'single_user',
+          recipient_count: 1,
+          success_count: 1,
+          failed_count: 0,
+          subject: subject,
+          content: content,
+          metadata: { userId, template_id: template.id }
+        });
+    } catch (auditError) {
+      console.error('[SEND-SYSTEM-MESSAGE] Failed to log audit:', auditError);
+    }
+
     return new Response(
       JSON.stringify({ success: true, message: "System message sent successfully" }),
       {

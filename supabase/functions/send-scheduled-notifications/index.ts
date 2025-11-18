@@ -122,6 +122,26 @@ serve(async (req: Request) => {
             })
             .eq("id", notification.id);
 
+          // Log to notification audit
+          try {
+            await supabase
+              .from('notification_audit_log')
+              .insert({
+                notification_type: 'scheduled',
+                message_type: 'scheduled_notification',
+                sent_by: notification.created_by,
+                recipient_filter: notification.target_audience,
+                recipient_count: targetUserIds.length,
+                success_count: targetUserIds.length,
+                failed_count: 0,
+                subject: notification.title,
+                content: notification.body,
+                metadata: { notification_id: notification.id, scheduled_time: notification.scheduled_time }
+              });
+          } catch (auditError) {
+            console.error('Failed to log audit:', auditError);
+          }
+
           console.log(`Successfully sent notification ${notification.id} to ${targetUserIds.length} users`);
 
           return {
