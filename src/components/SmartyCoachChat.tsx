@@ -13,6 +13,7 @@ import type {
   Message,
   Recommendation,
   SmartyCoachResponse,
+  UserContext,
 } from "@/types/smartyCoach";
 import { useNavigate } from "react-router-dom";
 
@@ -43,6 +44,68 @@ export const SmartyCoachChat = ({ onClose }: SmartyCoachChatProps) => {
   ]);
 
   const [awaitingAnswer, setAwaitingAnswer] = useState<QuestionType | null>(null);
+  const [userContext, setUserContext] = useState<UserContext | null>(null);
+
+  // Load user context on mount
+  useEffect(() => {
+    const loadUserContext = async () => {
+      try {
+        const { data: { session } } = await supabase.auth.getSession();
+        if (!session) return;
+
+        const userId = session.user.id;
+
+        const [{ data: workoutData }, { data: programData }, { data: subData }] = await Promise.all([
+          supabase
+            .from("workout_interactions")
+            .select("workout_id, has_viewed, is_completed")
+            .eq("user_id", userId),
+          supabase
+            .from("program_interactions")
+            .select("program_id, has_viewed, is_completed")
+            .eq("user_id", userId),
+          supabase
+            .from("user_subscriptions")
+            .select("plan_type, status")
+            .eq("user_id", userId)
+            .maybeSingle(),
+        ]);
+
+        const completedWorkouts = (workoutData || [])
+          .filter(w => w.is_completed && w.workout_id)
+          .map(w => w.workout_id as string);
+
+        const viewedWorkouts = (workoutData || [])
+          .filter(w => w.has_viewed && !w.is_completed && w.workout_id)
+          .map(w => w.workout_id as string);
+
+        const completedPrograms = (programData || [])
+          .filter(p => p.is_completed && p.program_id)
+          .map(p => p.program_id as string);
+
+        const viewedPrograms = (programData || [])
+          .filter(p => p.has_viewed && !p.is_completed && p.program_id)
+          .map(p => p.program_id as string);
+
+        const subscriptionPlan: string =
+          subData && subData.status === "active"
+            ? (subData.plan_type as string)
+            : "free";
+
+        setUserContext({
+          completedWorkouts,
+          viewedWorkouts,
+          completedPrograms,
+          viewedPrograms,
+          subscriptionPlan,
+        });
+      } catch (e) {
+        console.error("SmartyCoach user context error:", e);
+      }
+    };
+
+    loadUserContext();
+  }, []);
 
   useEffect(() => {
     scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight, behavior: "smooth" });
@@ -97,7 +160,7 @@ export const SmartyCoachChat = ({ onClose }: SmartyCoachChatProps) => {
       } else {
         await getRecommendation(state.currentQuestion!, null, equipmentArray, null);
       }
-    } else if (awaitingAnswer === "time") {
+    } else if (awaitingAnswer === "time" || awaitingAnswer === "limited-time") {
       const answerStr = Array.isArray(answer) ? answer[0] : answer;
       setState((prev) => ({ ...prev, selectedTime: answerStr }));
       addMessage("user", getAnswerLabel(answerStr));
@@ -112,7 +175,7 @@ export const SmartyCoachChat = ({ onClose }: SmartyCoachChatProps) => {
 
   const getRecommendation = async (
     question: QuestionType,
-    goal: string | null,
+    goal: string[] | null,
     equipment: string[] | null,
     time: string | null
   ) => {
@@ -122,9 +185,10 @@ export const SmartyCoachChat = ({ onClose }: SmartyCoachChatProps) => {
     try {
       const payload = {
         question,
-        goal: goal || undefined,
-        equipment: equipment || undefined,
+        goal: goal && goal.length ? goal : undefined,
+        equipment: equipment && equipment.length ? equipment : undefined,
         time: time || undefined,
+        userContext: userContext || undefined,
       };
 
       const { data, error } = await supabase.functions.invoke<SmartyCoachResponse>("smarty-coach", {

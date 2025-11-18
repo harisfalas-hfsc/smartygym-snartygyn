@@ -1,4 +1,3 @@
-import "jsr:@supabase/functions-js/edge-runtime.d.ts";
 import { createClient } from "jsr:@supabase/supabase-js@2";
 
 const corsHeaders = {
@@ -6,11 +5,20 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
+interface UserContext {
+  completedWorkouts?: string[];
+  viewedWorkouts?: string[];
+  completedPrograms?: string[];
+  viewedPrograms?: string[];
+  subscriptionPlan?: string | null;
+}
+
 interface SmartyCoachRequest {
   question: string;
-  goal?: string;
+  goal?: string | string[];
   equipment?: string[];
   time?: string;
+  userContext?: UserContext;
 }
 
 Deno.serve(async (req) => {
@@ -25,9 +33,11 @@ Deno.serve(async (req) => {
 
     const supabase = createClient(supabaseUrl, supabaseKey);
 
-    const { question, goal, equipment, time } = await req.json() as SmartyCoachRequest;
+    const { question, goal, equipment, time, userContext } = await req.json() as SmartyCoachRequest;
 
-    console.log('SmartyCoach request:', { question, goal, equipment, time });
+    const goals = Array.isArray(goal) ? goal : (goal ? [goal] : []);
+
+    console.log('SmartyCoach request:', { question, goals, equipment, time, userContext });
 
     // Fetch all workouts and programs from database
     const { data: workouts, error: workoutsError } = await supabase
@@ -44,22 +54,41 @@ Deno.serve(async (req) => {
 
     console.log(`Loaded ${workouts?.length || 0} workouts, ${programs?.length || 0} programs`);
 
+    // Filter content based on user's completed items
+    const completedWorkoutIds = userContext?.completedWorkouts ?? [];
+    const completedProgramIds = userContext?.completedPrograms ?? [];
+
+    const filteredWorkouts = workouts?.filter(w => !completedWorkoutIds.includes(w.id));
+    const filteredPrograms = programs?.filter(p => !completedProgramIds.includes(p.id));
+
+    const effectiveWorkouts = filteredWorkouts && filteredWorkouts.length > 0 ? filteredWorkouts : workouts;
+    const effectivePrograms = filteredPrograms && filteredPrograms.length > 0 ? filteredPrograms : programs;
+
     // Build AI prompt with complete content library
-    const systemPrompt = `You are SmartyCoach, an AI assistant for Smartygym.com. Your ONLY job is to recommend existing workouts, programs, tools, and subscriptions.
+    const systemPrompt = `You are SmartyCoach for Smartygym.com. Your ONLY job is to recommend existing workouts, programs, tools, and subscriptions.
 
 CRITICAL RULES:
 - ALWAYS suggest something (never say "unavailable" or "coming soon")
-- Choose the CLOSEST match from the available content
+- Prefer content that the user has NOT completed yet
+- If possible, also prefer content the user has not viewed yet
+- ONLY recommend items from the lists below
 - NEVER invent new workouts or programs
 - NEVER provide medical advice
 - Keep responses SHORT and friendly
 
-Available content:
-WORKOUTS (${workouts?.length || 0} total):
-${workouts?.map(w => `- ${w.name} [${w.category || 'General'}] [${w.difficulty || 'All levels'}] [${w.duration || 'Various'}] [Equipment: ${w.equipment || 'Various'}] ${w.is_premium ? '[PREMIUM]' : ''} ${w.tier_required ? `[Tier: ${w.tier_required}]` : ''}`).join('\n')}
+User profile:
+- Subscription plan: ${userContext?.subscriptionPlan ?? 'unknown or visitor'}
+- Completed workouts (IDs): ${completedWorkoutIds.join(', ') || 'none known'}
+- Completed programs (IDs): ${completedProgramIds.join(', ') || 'none known'}
 
-PROGRAMS (${programs?.length || 0} total):
-${programs?.map(p => `- ${p.name} [${p.category || 'General'}] [${p.difficulty || 'All levels'}] [${p.weeks || '?'} weeks] [Equipment: ${p.equipment || 'Various'}] ${p.is_premium ? '[PREMIUM]' : ''} ${p.tier_required ? `[Tier: ${p.tier_required}]` : ''}`).join('\n')}
+If subscription plan is "gold" or "platinum", you may prioritize PREMIUM content when it fits their selections.
+
+Available content:
+WORKOUTS (${effectiveWorkouts?.length || 0} total):
+${effectiveWorkouts?.map(w => `- id: ${w.id} | name: ${w.name} [${w.category || 'General'}] [${w.difficulty || 'All levels'}] [${w.duration || 'Various'}] [Equipment: ${w.equipment || 'Various'}] ${w.is_premium ? '[PREMIUM]' : ''} ${w.tier_required ? `[Tier: ${w.tier_required}]` : ''}`).join('\n')}
+
+PROGRAMS (${effectivePrograms?.length || 0} total):
+${effectivePrograms?.map(p => `- id: ${p.id} | name: ${p.name} [${p.category || 'General'}] [${p.difficulty || 'All levels'}] [${p.weeks || '?'} weeks] [Equipment: ${p.equipment || 'Various'}] ${p.is_premium ? '[PREMIUM]' : ''} ${p.tier_required ? `[Tier: ${p.tier_required}]` : ''}`).join('\n')}
 
 Available tools:
 - 1RM Calculator (strength training)
@@ -73,11 +102,11 @@ Subscription tiers:
 - Platinum (all content + personal training)`;
 
     const userPrompt = `User question: ${question}
-${goal ? `Goal: ${goal}` : ''}
+${goals.length ? `Goals: ${goals.join(', ')}` : ''}
 ${equipment?.length ? `Equipment available: ${equipment.join(', ')}` : ''}
 ${time ? `Time available: ${time === 'unlimited' ? 'Unlimited' : `${time} minutes`}` : ''}
 
-Recommend ONE single best option from the available content. If it's not a perfect match, still suggest the closest option and explain briefly why.
+Recommend ONE single best option from the available content that obeys the above rules. If it's not a perfect match, still suggest the closest option and explain briefly why.
 
 Also suggest ONE ecosystem tool if relevant (1RM for strength, BMR for fat loss, etc.).
 
