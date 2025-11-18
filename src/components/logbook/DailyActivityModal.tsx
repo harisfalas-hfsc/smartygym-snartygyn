@@ -13,7 +13,7 @@ interface DailyActivityModalProps {
 }
 
 export const DailyActivityModal = ({ date, isOpen, onClose, userId }: DailyActivityModalProps) => {
-  const dateStr = date.toISOString().split('T')[0];
+  const dateStr = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
   const { activities, isLoading } = useActivityLog(userId);
 
   const dayActivities = activities.filter(a => a.activity_date === dateStr);

@@ -54,12 +54,14 @@ export const useActivityLog = (userId: string | undefined, filterType?: string, 
       }
 
       // Apply date range filter
-      if (startDate) {
-        query = query.gte('activity_date', startDate.toISOString().split('T')[0]);
-      }
-      if (endDate) {
-        query = query.lte('activity_date', endDate.toISOString().split('T')[0]);
-      }
+    if (startDate) {
+      const startDateStr = `${startDate.getFullYear()}-${String(startDate.getMonth() + 1).padStart(2, '0')}-${String(startDate.getDate()).padStart(2, '0')}`;
+      query = query.gte('activity_date', startDateStr);
+    }
+    if (endDate) {
+      const endDateStr = `${endDate.getFullYear()}-${String(endDate.getMonth() + 1).padStart(2, '0')}-${String(endDate.getDate()).padStart(2, '0')}`;
+      query = query.lte('activity_date', endDateStr);
+    }
 
       const { data, error } = await query;
 
