@@ -463,9 +463,12 @@ const Index = () => {
               data-[side=bottom]:slide-in-from-top-2 
               data-[side=left]:slide-in-from-right-2 
               data-[side=right]:slide-in-from-left-2 
-              data-[side=top]:slide-in-from-bottom-2"
+              data-[side=top]:slide-in-from-bottom-2 max-h-[85vh] overflow-y-auto"
               align="center"
               sideOffset={8}
+              collisionPadding={20}
+              avoidCollisions={true}
+              sticky="always"
             >
                         {/* Workouts */}
               <DropdownMenuItem
