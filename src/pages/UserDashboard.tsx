@@ -145,7 +145,7 @@ export default function UserDashboard() {
   // LogBook filter state
   const [logBookFilter, setLogBookFilter] = useState<'all' | 'workout' | 'program' | 'tool' | 'measurement'>('all');
   const [logBookSecondaryFilter, setLogBookSecondaryFilter] = useState("all");
-  const [logBookTimeFilter, setLogBookTimeFilter] = useState<'weekly' | 'monthly' | 'custom'>('monthly');
+  const [logBookTimeFilter, setLogBookTimeFilter] = useState<'last_month' | 'last_12_months' | 'last_6_months' | 'custom'>('last_6_months');
   const [logBookCustomStartDate, setLogBookCustomStartDate] = useState<Date | undefined>();
   const [logBookCustomEndDate, setLogBookCustomEndDate] = useState<Date | undefined>();
   
@@ -1888,11 +1888,11 @@ export default function UserDashboard() {
                   <LogBookAdvancedCharts 
                     userId={user!.id} 
                     primaryFilter={logBookFilter}
-                    onPrimaryFilterChange={setLogBookFilter}
+                    onPrimaryFilterChange={(filter) => setLogBookFilter(filter as any)}
                     secondaryFilter={logBookSecondaryFilter}
-                    onSecondaryFilterChange={setLogBookSecondaryFilter}
+                    onSecondaryFilterChange={(filter) => setLogBookSecondaryFilter(filter)}
                     timeFilter={logBookTimeFilter}
-                    onTimeFilterChange={setLogBookTimeFilter}
+                    onTimeFilterChange={(filter) => setLogBookTimeFilter(filter as any)}
                     customStartDate={logBookCustomStartDate}
                     onCustomStartDateChange={setLogBookCustomStartDate}
                     customEndDate={logBookCustomEndDate}
