@@ -64,18 +64,50 @@ export const SmartyCoachAnswerButtons = ({
   onSelectAnswer,
   disabled = false,
 }: SmartyCoachAnswerButtonsProps) => {
+  const [selectedGoals, setSelectedGoals] = useState<string[]>([]);
   const [selectedEquipment, setSelectedEquipment] = useState<string[]>([]);
-  
-  let options: { id: string; label: string }[] = [];
 
+  // Multi-select for goals
   if (questionType === "goal" || questionType === "today" || questionType === "workout-or-program") {
-    options = goalOptions;
-  } else if (questionType === "equipment") {
-    options = equipmentOptions;
-  } else if (questionType === "time") {
-    options = allTimeOptions;
-  } else if (questionType === "limited-time") {
-    options = limitedTimeOptions;
+    return (
+      <div className="flex flex-col gap-2 p-4 border-t border-border max-h-[300px] overflow-y-auto">
+        <p className="text-sm text-muted-foreground mb-2">
+          Choose your goals (multiple allowed):
+        </p>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+          {goalOptions.map((option) => {
+            const isSelected = selectedGoals.includes(option.id);
+            return (
+              <Button
+                key={option.id}
+                variant={isSelected ? "default" : "outline"}
+                onClick={() => {
+                  const updated = isSelected
+                    ? selectedGoals.filter(g => g !== option.id)
+                    : [...selectedGoals, option.id];
+                  setSelectedGoals(updated);
+                }}
+                disabled={disabled}
+                className="justify-start text-left h-auto py-2 transition-all"
+              >
+                <span className="mr-2">{isSelected ? "✓" : ""}</span>
+                {option.label}
+              </Button>
+            );
+          })}
+        </div>
+        <Button
+          onClick={() => {
+            onSelectAnswer(selectedGoals);
+            setSelectedGoals([]);
+          }}
+          disabled={!selectedGoals.length || disabled}
+          className="w-full mt-2 bg-green-600 hover:bg-green-700"
+        >
+          Done
+        </Button>
+      </div>
+    );
   }
 
   // Multi-select for equipment
@@ -121,26 +153,22 @@ export const SmartyCoachAnswerButtons = ({
     );
   }
 
+  // Single-select for time
+  const timeOptions = questionType === "limited-time" ? limitedTimeOptions : allTimeOptions;
+  
   return (
-    <div className="flex flex-col gap-2 p-4 border-t border-border max-h-[300px] overflow-y-auto">
-      <p className="text-sm text-muted-foreground mb-2">
-        {questionType === "goal" || questionType === "today" || questionType === "workout-or-program"
-          ? "Choose your goal:"
-          : "How much time do you have?"}
-      </p>
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-        {options.map((option) => (
-          <Button
-            key={option.id}
-            variant="outline"
-            onClick={() => onSelectAnswer(option.id)}
-            disabled={disabled}
-            className="justify-start text-left h-auto py-2 hover:bg-green-500/10 hover:text-green-600 hover:border-green-600 transition-all"
-          >
-            {option.label}
-          </Button>
-        ))}
-      </div>
+    <div className="flex flex-col gap-2 p-4 border-t border-border">
+      {timeOptions.map((option) => (
+        <Button
+          key={option.id}
+          variant="outline"
+          onClick={() => onSelectAnswer(option.id)}
+          disabled={disabled}
+          className="w-full justify-start text-left h-auto py-3 hover:bg-green-500/10 hover:text-green-600 hover:border-green-600 transition-all"
+        >
+          {option.label}
+        </Button>
+      ))}
     </div>
   );
 };
