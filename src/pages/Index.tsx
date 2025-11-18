@@ -5,7 +5,7 @@ import { ServiceCard } from "@/components/ServiceCard";
 import { Button } from "@/components/ui/button";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Dumbbell, Calendar, BookOpen, Calculator, Activity, Flame, Instagram, Facebook, Youtube, UserCheck, Wrench, Video, FileText, Smartphone, Users, Target, Heart, Zap, Plane, GraduationCap, Check, Crown } from "lucide-react";
+import { Dumbbell, Calendar, BookOpen, Calculator, Activity, Flame, Instagram, Facebook, Youtube, UserCheck, Wrench, Video, FileText, Smartphone, Users, Target, Heart, Zap, Plane, GraduationCap, Check, Crown, ChevronDown, ChevronRight } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { User as SupabaseUser } from "@supabase/supabase-js";
 import { useToast } from "@/hooks/use-toast";
@@ -21,12 +21,11 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 const Index = () => {
   const navigate = useNavigate();
@@ -440,101 +439,133 @@ const Index = () => {
                     </div>
                   </div>
 
-                  {/* Navigation Cards after three cards */}
+                  {/* Navigation Dropdown - Full Width Elegant Design */}
                   <div className="pt-6">
-                    {/* Mobile/Tablet: Dropdown Select */}
-                    <div className="md:hidden">
-                      <Select onValueChange={(value) => navigate(value)}>
-                        <SelectTrigger className="w-full h-12 text-base border-2 border-primary/20 bg-background">
-                          <SelectValue placeholder="🎯 Choose a section to explore..." />
-                        </SelectTrigger>
-                        <SelectContent className="z-[100] bg-background">
-                          <SelectItem value="/workout" className="text-base py-3">
-                            <div className="flex items-center gap-3">
-                              <Dumbbell className="w-5 h-5 text-primary" />
-                              <span>Workouts</span>
-                            </div>
-                          </SelectItem>
-                          <SelectItem value="/trainingprogram" className="text-base py-3">
-                            <div className="flex items-center gap-3">
-                              <Calendar className="w-5 h-5 text-primary" />
-                              <span>Training Programs</span>
-                            </div>
-                          </SelectItem>
-                          <SelectItem value="/tools" className="text-base py-3">
-                            <div className="flex items-center gap-3">
-                              <Wrench className="w-5 h-5 text-primary" />
-                              <span>Tools</span>
-                            </div>
-                          </SelectItem>
-                          <SelectItem value="/exerciselibrary" className="text-base py-3">
-                            <div className="flex items-center gap-3">
-                              <BookOpen className="w-5 h-5 text-primary" />
-                              <span>Exercise Library</span>
-                            </div>
-                          </SelectItem>
-                          <SelectItem value="/blog" className="text-base py-3">
-                            <div className="flex items-center gap-3">
-                              <FileText className="w-5 h-5 text-primary" />
-                              <span>Blog</span>
-                            </div>
-                          </SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-
-                    {/* Desktop/Tablet: Full-Width Button Grid */}
-                    <div className="hidden md:grid md:grid-cols-5 gap-3 lg:gap-4">
-                      <Button
-                        variant="outline"
-                        size="lg"
-                        onClick={() => navigate("/workout")}
-                        className="h-auto py-3 px-4 flex flex-col items-center gap-2 bg-background hover:bg-primary/10 border-2 border-primary/20 hover:border-primary transition-all"
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button
+                          size="lg"
+                          className="w-full h-16 text-lg font-bold bg-gradient-to-r from-primary via-amber-400 to-primary hover:from-primary/90 hover:via-amber-500 hover:to-primary/90 border-2 border-primary/30 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-[1.02] group"
+                        >
+                          <div className="flex items-center justify-center gap-3 w-full">
+                            <Zap className="w-6 h-6 animate-pulse group-hover:rotate-12 transition-transform duration-300" />
+                            <span className="text-white drop-shadow-md">Let's Get Started</span>
+                            <ChevronDown className="w-5 h-5 ml-2 group-hover:translate-y-1 transition-transform duration-300" />
+                          </div>
+                        </Button>
+                      </DropdownMenuTrigger>
+                      
+                      <DropdownMenuContent 
+                        className="w-[calc(100vw-4rem)] sm:w-[600px] lg:w-[700px] p-3 bg-gradient-to-br from-background via-primary/5 to-background border-2 border-primary/20 shadow-2xl backdrop-blur-sm"
+                        align="center"
+                        sideOffset={8}
                       >
-                        <Dumbbell className="w-6 h-6 text-primary" />
-                        <span className="font-semibold text-sm">Workouts</span>
-                      </Button>
+                        {/* Workouts */}
+                        <DropdownMenuItem
+                          onClick={() => navigate("/workout")}
+                          className="h-16 px-5 rounded-lg cursor-pointer group hover:bg-primary/10 border border-transparent hover:border-primary/30 transition-all duration-200 hover:scale-[1.02] mb-2"
+                        >
+                          <div className="flex items-center gap-4 w-full">
+                            <div className="p-3 rounded-full bg-primary/10 group-hover:bg-primary/20 transition-colors">
+                              <Dumbbell className="w-6 h-6 text-primary group-hover:scale-110 transition-transform" />
+                            </div>
+                            <div className="flex-1">
+                              <p className="text-lg font-bold text-foreground group-hover:text-primary transition-colors">
+                                Workouts
+                              </p>
+                              <p className="text-xs text-muted-foreground">
+                                500+ Expert workouts for all fitness levels
+                              </p>
+                            </div>
+                            <ChevronRight className="w-5 h-5 text-muted-foreground group-hover:text-primary group-hover:translate-x-1 transition-all" />
+                          </div>
+                        </DropdownMenuItem>
 
-                      <Button
-                        variant="outline"
-                        size="lg"
-                        onClick={() => navigate("/trainingprogram")}
-                        className="h-auto py-3 px-4 flex flex-col items-center gap-2 bg-background hover:bg-primary/10 border-2 border-primary/20 hover:border-primary transition-all"
-                      >
-                        <Calendar className="w-6 h-6 text-primary" />
-                        <span className="font-semibold text-sm">Programs</span>
-                      </Button>
+                        {/* Training Programs */}
+                        <DropdownMenuItem
+                          onClick={() => navigate("/trainingprogram")}
+                          className="h-16 px-5 rounded-lg cursor-pointer group hover:bg-primary/10 border border-transparent hover:border-primary/30 transition-all duration-200 hover:scale-[1.02] mb-2"
+                        >
+                          <div className="flex items-center gap-4 w-full">
+                            <div className="p-3 rounded-full bg-primary/10 group-hover:bg-primary/20 transition-colors">
+                              <Calendar className="w-6 h-6 text-primary group-hover:scale-110 transition-transform" />
+                            </div>
+                            <div className="flex-1">
+                              <p className="text-lg font-bold text-foreground group-hover:text-primary transition-colors">
+                                Training Programs
+                              </p>
+                              <p className="text-xs text-muted-foreground">
+                                Structured programs for long-term goals
+                              </p>
+                            </div>
+                            <ChevronRight className="w-5 h-5 text-muted-foreground group-hover:text-primary group-hover:translate-x-1 transition-all" />
+                          </div>
+                        </DropdownMenuItem>
 
-                      <Button
-                        variant="outline"
-                        size="lg"
-                        onClick={() => navigate("/tools")}
-                        className="h-auto py-3 px-4 flex flex-col items-center gap-2 bg-background hover:bg-primary/10 border-2 border-primary/20 hover:border-primary transition-all"
-                      >
-                        <Wrench className="w-6 h-6 text-primary" />
-                        <span className="font-semibold text-sm">Tools</span>
-                      </Button>
+                        {/* Tools */}
+                        <DropdownMenuItem
+                          onClick={() => navigate("/tools")}
+                          className="h-16 px-5 rounded-lg cursor-pointer group hover:bg-primary/10 border border-transparent hover:border-primary/30 transition-all duration-200 hover:scale-[1.02] mb-2"
+                        >
+                          <div className="flex items-center gap-4 w-full">
+                            <div className="p-3 rounded-full bg-primary/10 group-hover:bg-primary/20 transition-colors">
+                              <Wrench className="w-6 h-6 text-primary group-hover:scale-110 transition-transform" />
+                            </div>
+                            <div className="flex-1">
+                              <p className="text-lg font-bold text-foreground group-hover:text-primary transition-colors">
+                                Tools
+                              </p>
+                              <p className="text-xs text-muted-foreground">
+                                Calculators and fitness tracking tools
+                              </p>
+                            </div>
+                            <ChevronRight className="w-5 h-5 text-muted-foreground group-hover:text-primary group-hover:translate-x-1 transition-all" />
+                          </div>
+                        </DropdownMenuItem>
 
-                      <Button
-                        variant="outline"
-                        size="lg"
-                        onClick={() => navigate("/exerciselibrary")}
-                        className="h-auto py-3 px-4 flex flex-col items-center gap-2 bg-background hover:bg-primary/10 border-2 border-primary/20 hover:border-primary transition-all"
-                      >
-                        <BookOpen className="w-6 h-6 text-primary" />
-                        <span className="font-semibold text-sm">Library</span>
-                      </Button>
+                        {/* Exercise Library */}
+                        <DropdownMenuItem
+                          onClick={() => navigate("/exerciselibrary")}
+                          className="h-16 px-5 rounded-lg cursor-pointer group hover:bg-primary/10 border border-transparent hover:border-primary/30 transition-all duration-200 hover:scale-[1.02] mb-2"
+                        >
+                          <div className="flex items-center gap-4 w-full">
+                            <div className="p-3 rounded-full bg-primary/10 group-hover:bg-primary/20 transition-colors">
+                              <Video className="w-6 h-6 text-primary group-hover:scale-110 transition-transform" />
+                            </div>
+                            <div className="flex-1">
+                              <p className="text-lg font-bold text-foreground group-hover:text-primary transition-colors">
+                                Exercise Library
+                              </p>
+                              <p className="text-xs text-muted-foreground">
+                                Comprehensive exercise video database
+                              </p>
+                            </div>
+                            <ChevronRight className="w-5 h-5 text-muted-foreground group-hover:text-primary group-hover:translate-x-1 transition-all" />
+                          </div>
+                        </DropdownMenuItem>
 
-                      <Button
-                        variant="outline"
-                        size="lg"
-                        onClick={() => navigate("/blog")}
-                        className="h-auto py-3 px-4 flex flex-col items-center gap-2 bg-background hover:bg-primary/10 border-2 border-primary/20 hover:border-primary transition-all"
-                      >
-                        <FileText className="w-6 h-6 text-primary" />
-                        <span className="font-semibold text-sm">Blog</span>
-                      </Button>
-                    </div>
+                        {/* Blog */}
+                        <DropdownMenuItem
+                          onClick={() => navigate("/blog")}
+                          className="h-16 px-5 rounded-lg cursor-pointer group hover:bg-primary/10 border border-transparent hover:border-primary/30 transition-all duration-200 hover:scale-[1.02]"
+                        >
+                          <div className="flex items-center gap-4 w-full">
+                            <div className="p-3 rounded-full bg-primary/10 group-hover:bg-primary/20 transition-colors">
+                              <FileText className="w-6 h-6 text-primary group-hover:scale-110 transition-transform" />
+                            </div>
+                            <div className="flex-1">
+                              <p className="text-lg font-bold text-foreground group-hover:text-primary transition-colors">
+                                Blog
+                              </p>
+                              <p className="text-xs text-muted-foreground">
+                                Expert articles and fitness insights
+                              </p>
+                            </div>
+                            <ChevronRight className="w-5 h-5 text-muted-foreground group-hover:text-primary group-hover:translate-x-1 transition-all" />
+                          </div>
+                        </DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
                   </div>
 
                   {/* Feature Highlights Grid */}
