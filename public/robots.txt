@@ -33,8 +33,21 @@ Allow: /
 User-agent: facebookexternalhit
 Allow: /
 
+User-agent: AhrefsBot
+Crawl-delay: 10
+
+User-agent: SemrushBot
+Crawl-delay: 10
+
 User-agent: *
 Allow: /
 Crawl-delay: 5
+
+# Important pages
+Allow: /workout
+Allow: /training-program
+Allow: /tools
+Allow: /about
+Allow: /contact
 
 Sitemap: https://smartygym.com/sitemap.xml
