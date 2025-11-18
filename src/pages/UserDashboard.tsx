@@ -1563,53 +1563,53 @@ export default function UserDashboard() {
               <>
                 {/* Workout Activity Stats */}
                 <div>
-            <h3 className="text-lg font-semibold mb-4">Workout Activity</h3>
-            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4 mb-4">
+            <h3 className="text-lg font-semibold mb-2">Workout Activity</h3>
+            <div className="grid gap-2 md:grid-cols-2 lg:grid-cols-4 mb-3">
               <Card>
-                <CardHeader className="pb-1">
+                <CardHeader className="pb-0 pt-3">
                   <CardTitle className="text-sm font-medium flex items-center gap-2">
                     <Heart className="h-4 w-4 text-red-500" />
                     Favorites
                   </CardTitle>
                 </CardHeader>
-                <CardContent className="py-2">
-                  <div className="text-xl font-bold">{favoriteWorkouts.length}</div>
+                <CardContent className="py-1 px-4">
+                  <div className="text-lg font-bold">{favoriteWorkouts.length}</div>
                 </CardContent>
               </Card>
 
               <Card>
-                <CardHeader className="pb-1">
+                <CardHeader className="pb-0 pt-3">
                   <CardTitle className="text-sm font-medium flex items-center gap-2">
                     <Clock className="h-4 w-4 text-blue-500" />
                     Viewed
                   </CardTitle>
                 </CardHeader>
-                <CardContent className="py-2">
-                  <div className="text-xl font-bold">{viewedWorkouts.length}</div>
+                <CardContent className="py-1 px-4">
+                  <div className="text-lg font-bold">{viewedWorkouts.length}</div>
                 </CardContent>
               </Card>
 
               <Card>
-                <CardHeader className="pb-1">
+                <CardHeader className="pb-0 pt-3">
                   <CardTitle className="text-sm font-medium flex items-center gap-2">
                     <CheckCircle className="h-4 w-4 text-green-500" />
                     Completed
                   </CardTitle>
                 </CardHeader>
-                <CardContent className="py-2">
-                  <div className="text-xl font-bold">{completedWorkouts.length}</div>
+                <CardContent className="py-1 px-4">
+                  <div className="text-lg font-bold">{completedWorkouts.length}</div>
                 </CardContent>
               </Card>
 
               <Card>
-                <CardHeader className="pb-1">
+                <CardHeader className="pb-0 pt-3">
                   <CardTitle className="text-sm font-medium flex items-center gap-2">
                     <Star className="h-4 w-4 text-yellow-500" />
                     Rated
                   </CardTitle>
                 </CardHeader>
-                <CardContent className="py-2">
-                  <div className="text-xl font-bold">{ratedWorkouts.length}</div>
+                <CardContent className="py-1 px-4">
+                  <div className="text-lg font-bold">{ratedWorkouts.length}</div>
                 </CardContent>
               </Card>
             </div>
@@ -1617,65 +1617,65 @@ export default function UserDashboard() {
 
                 {/* Program Activity Stats */}
                 <div>
-            <h3 className="text-lg font-semibold mb-4">Program Activity</h3>
-            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-5 mb-4">
+            <h3 className="text-lg font-semibold mb-2">Program Activity</h3>
+            <div className="grid gap-2 md:grid-cols-2 lg:grid-cols-5 mb-3">
               <Card>
-                <CardHeader className="pb-1">
+                <CardHeader className="pb-0 pt-3">
                   <CardTitle className="text-sm font-medium flex items-center gap-2">
                     <Heart className="h-4 w-4 text-red-500" />
                     Favorites
                   </CardTitle>
                 </CardHeader>
-                <CardContent className="py-2">
-                  <div className="text-xl font-bold">{favoritePrograms.length}</div>
+                <CardContent className="py-1 px-4">
+                  <div className="text-lg font-bold">{favoritePrograms.length}</div>
                 </CardContent>
               </Card>
 
               <Card>
-                <CardHeader className="pb-1">
+                <CardHeader className="pb-0 pt-3">
                   <CardTitle className="text-sm font-medium flex items-center gap-2">
                     <Clock className="h-4 w-4 text-blue-500" />
                     Viewed
                   </CardTitle>
                 </CardHeader>
-                <CardContent className="py-2">
-                  <div className="text-xl font-bold">{viewedPrograms.length}</div>
+                <CardContent className="py-1 px-4">
+                  <div className="text-lg font-bold">{viewedPrograms.length}</div>
                 </CardContent>
               </Card>
 
               <Card>
-                <CardHeader className="pb-1">
+                <CardHeader className="pb-0 pt-3">
                   <CardTitle className="text-sm font-medium flex items-center gap-2">
                     <Play className="h-4 w-4 text-purple-500" />
                     In Progress
                   </CardTitle>
                 </CardHeader>
-                <CardContent className="py-2">
-                  <div className="text-xl font-bold">{inProgressPrograms.length}</div>
+                <CardContent className="py-1 px-4">
+                  <div className="text-lg font-bold">{inProgressPrograms.length}</div>
                 </CardContent>
               </Card>
 
               <Card>
-                <CardHeader className="pb-1">
+                <CardHeader className="pb-0 pt-3">
                   <CardTitle className="text-sm font-medium flex items-center gap-2">
                     <CheckCircle className="h-4 w-4 text-green-500" />
                     Completed
                   </CardTitle>
                 </CardHeader>
-                <CardContent className="py-2">
-                  <div className="text-xl font-bold">{completedPrograms.length}</div>
+                <CardContent className="py-1 px-4">
+                  <div className="text-lg font-bold">{completedPrograms.length}</div>
                 </CardContent>
               </Card>
 
               <Card>
-                <CardHeader className="pb-1">
+                <CardHeader className="pb-0 pt-3">
                   <CardTitle className="text-sm font-medium flex items-center gap-2">
                     <Star className="h-4 w-4 text-yellow-500" />
                     Rated
                   </CardTitle>
                 </CardHeader>
-                <CardContent className="py-2">
-                  <div className="text-xl font-bold">{ratedPrograms.length}</div>
+                <CardContent className="py-1 px-4">
+                  <div className="text-lg font-bold">{ratedPrograms.length}</div>
                 </CardContent>
               </Card>
             </div>
@@ -1683,25 +1683,25 @@ export default function UserDashboard() {
 
                 {/* Calculator History */}
                 <div>
-                  <h3 className="text-lg font-semibold mb-4">Calculator History</h3>
-                  <div className="grid gap-4 md:grid-cols-3 mb-4">
+                  <h3 className="text-lg font-semibold mb-2">Calculator History</h3>
+                  <div className="grid gap-2 md:grid-cols-3 mb-3">
                     {/* 1RM Calculator */}
                     <Card>
-                      <CardHeader className="pb-2">
+                      <CardHeader className="pb-0 pt-3">
                         <CardTitle className="text-sm font-medium">1RM Calculator</CardTitle>
                       </CardHeader>
-                      <CardContent className="py-3 px-4">
+                      <CardContent className="py-2 px-3">
                         {oneRMHistory.length === 0 ? (
-                          <div className="text-center py-2">
+                          <div className="text-center py-1">
                             <p className="text-xs text-muted-foreground mb-2">No history yet</p>
                             <Button size="sm" variant="outline" onClick={() => navigate("/one-rm-calculator")}>
                               Calculate Now
                             </Button>
                           </div>
                         ) : (
-                          <div className="space-y-1">
+                          <div className="space-y-0.5">
                             {oneRMHistory.slice(0, 3).map((record) => (
-                              <div key={record.id} className="p-1.5 bg-muted rounded text-xs">
+                              <div key={record.id} className="p-1 bg-muted rounded text-xs">
                                 <div className="font-semibold">{record.one_rm_result.toFixed(1)} kg</div>
                                 {record.exercise_name && (
                                   <div className="text-muted-foreground">{record.exercise_name}</div>
@@ -1717,7 +1717,7 @@ export default function UserDashboard() {
                             <Button 
                               size="sm" 
                               variant="outline" 
-                              className="w-full mt-2"
+                              className="w-full mt-1"
                               onClick={() => navigate("/one-rm-calculator")}
                             >
                               View All / Add New
@@ -1729,21 +1729,21 @@ export default function UserDashboard() {
 
                     {/* BMR Calculator */}
                     <Card>
-                      <CardHeader className="pb-2">
+                      <CardHeader className="pb-0 pt-3">
                         <CardTitle className="text-sm font-medium">BMR Calculator</CardTitle>
                       </CardHeader>
-                      <CardContent className="py-3 px-4">
+                      <CardContent className="py-2 px-3">
                         {bmrHistory.length === 0 ? (
-                          <div className="text-center py-2">
+                          <div className="text-center py-1">
                             <p className="text-xs text-muted-foreground mb-2">No history yet</p>
                             <Button size="sm" variant="outline" onClick={() => navigate("/bmr-calculator")}>
                               Calculate Now
                             </Button>
                           </div>
                         ) : (
-                          <div className="space-y-1">
+                          <div className="space-y-0.5">
                             {bmrHistory.slice(0, 3).map((record) => (
-                              <div key={record.id} className="p-1.5 bg-muted rounded text-xs">
+                              <div key={record.id} className="p-1 bg-muted rounded text-xs">
                                 <div className="font-semibold">{record.bmr_result.toFixed(0)} cal/day</div>
                                 <div className="text-muted-foreground">
                                   {record.gender === "male" ? "Male" : "Female"}, {record.age} years
@@ -1759,7 +1759,7 @@ export default function UserDashboard() {
                             <Button 
                               size="sm" 
                               variant="outline" 
-                              className="w-full mt-2"
+                              className="w-full mt-1"
                               onClick={() => navigate("/bmr-calculator")}
                             >
                               View All / Add New
@@ -1771,21 +1771,21 @@ export default function UserDashboard() {
 
                     {/* Macro Calculator */}
                     <Card>
-                      <CardHeader className="pb-2">
+                      <CardHeader className="pb-0 pt-3">
                         <CardTitle className="text-sm font-medium">Macro Calculator</CardTitle>
                       </CardHeader>
-                      <CardContent className="py-3 px-4">
+                      <CardContent className="py-2 px-3">
                         {calorieHistory.length === 0 ? (
-                          <div className="text-center py-2">
+                          <div className="text-center py-1">
                             <p className="text-xs text-muted-foreground mb-2">No history yet</p>
                             <Button size="sm" variant="outline" onClick={() => navigate("/macro-tracking-calculator")}>
                               Calculate Now
                             </Button>
                           </div>
                         ) : (
-                          <div className="space-y-1">
+                          <div className="space-y-0.5">
                             {calorieHistory.slice(0, 3).map((record) => (
-                              <div key={record.id} className="p-1.5 bg-muted rounded text-xs">
+                              <div key={record.id} className="p-1 bg-muted rounded text-xs">
                                 <div className="font-semibold">{record.target_calories.toFixed(0)} cal/day</div>
                                 <div className="text-muted-foreground capitalize">
                                   Goal: {record.goal}
@@ -1801,7 +1801,7 @@ export default function UserDashboard() {
                             <Button 
                               size="sm" 
                               variant="outline" 
-                              className="w-full mt-2"
+                              className="w-full mt-1"
                               onClick={() => navigate("/macro-tracking-calculator")}
                             >
                               View All / Add New
