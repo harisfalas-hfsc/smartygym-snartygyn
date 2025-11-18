@@ -16,11 +16,11 @@ export const SmartyCoach = () => {
         <Button
           size="icon"
           onClick={() => setIsOpen(!isOpen)}
-          className="h-14 w-14 rounded-full shadow-gold hover:scale-110 transition-all bg-gradient-to-r from-accent via-primary to-primary/90 relative"
+          className="h-14 w-14 rounded-full shadow-lg hover:scale-110 transition-all bg-gradient-to-r from-green-500 via-green-600 to-green-700 relative"
         >
           <Sparkles className="h-6 w-6" />
           {/* Pulse animation for first-time users */}
-          <span className="absolute inset-0 rounded-full bg-primary/20 animate-ping" />
+          <span className="absolute inset-0 rounded-full bg-green-500/20 animate-ping" />
         </Button>
 
         {/* Hover Label */}

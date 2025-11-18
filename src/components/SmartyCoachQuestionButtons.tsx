@@ -8,10 +8,10 @@ interface SmartyCoachQuestionButtonsProps {
 
 const questions: { id: QuestionType; label: string }[] = [
   { id: "today", label: "What should I do today?" },
-  { id: "workout-or-program", label: "Workout or training program?" },
+  { id: "workout-or-program", label: "Should I go for a workout or a training program?" },
   { id: "goal", label: "What is your goal?" },
-  { id: "equipment", label: "Best for my equipment?" },
-  { id: "time", label: "I have limited time" },
+  { id: "equipment", label: "What is best for my equipment?" },
+  { id: "limited-time", label: "I have limited time, what should I do?" },
 ];
 
 export const SmartyCoachQuestionButtons = ({
@@ -26,7 +26,7 @@ export const SmartyCoachQuestionButtons = ({
           variant="outline"
           onClick={() => onSelectQuestion(q.id)}
           disabled={disabled}
-          className="w-full justify-start text-left h-auto py-3 hover:bg-primary/10 hover:text-primary hover:border-primary transition-all"
+          className="w-full justify-start text-left h-auto py-3 hover:bg-green-500/10 hover:text-green-600 hover:border-green-600 transition-all"
         >
           {q.label}
         </Button>

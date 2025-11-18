@@ -63,17 +63,16 @@ export const SmartyCoachChat = ({ onClose }: SmartyCoachChatProps) => {
       setAwaitingAnswer("goal");
     } else if (question === "equipment") {
       setAwaitingAnswer("equipment");
-    } else if (question === "time") {
+    } else if (question === "limited-time") {
       setAwaitingAnswer("time");
     }
   };
 
-  const handleAnswerSelect = async (answer: string) => {
-    const answerLabel = getAnswerLabel(answer);
-    addMessage("user", answerLabel);
-
+  const handleAnswerSelect = async (answer: string | string[]) => {
     if (awaitingAnswer === "goal") {
-      setState((prev) => ({ ...prev, selectedGoal: answer }));
+      const answerStr = Array.isArray(answer) ? answer[0] : answer;
+      setState((prev) => ({ ...prev, selectedGoal: answerStr }));
+      addMessage("user", getAnswerLabel(answerStr));
 
       if (state.currentQuestion === "today") {
         setTimeout(() => {
@@ -81,11 +80,14 @@ export const SmartyCoachChat = ({ onClose }: SmartyCoachChatProps) => {
           setAwaitingAnswer("equipment");
         }, 300);
       } else {
-        // For "goal" or "workout-or-program", get recommendation immediately
-        await getRecommendation(state.currentQuestion!, answer, null, null);
+        await getRecommendation(state.currentQuestion!, answerStr, null, null);
       }
     } else if (awaitingAnswer === "equipment") {
-      setState((prev) => ({ ...prev, selectedEquipment: answer }));
+      const equipmentArray = Array.isArray(answer) ? answer : [answer];
+      setState((prev) => ({ ...prev, selectedEquipment: equipmentArray }));
+      
+      const equipmentLabels = equipmentArray.map(eq => getAnswerLabel(eq)).join(", ");
+      addMessage("user", equipmentLabels);
 
       if (state.currentQuestion === "today") {
         setTimeout(() => {
@@ -93,15 +95,17 @@ export const SmartyCoachChat = ({ onClose }: SmartyCoachChatProps) => {
           setAwaitingAnswer("time");
         }, 300);
       } else {
-        await getRecommendation(state.currentQuestion!, null, answer, null);
+        await getRecommendation(state.currentQuestion!, null, equipmentArray, null);
       }
     } else if (awaitingAnswer === "time") {
-      setState((prev) => ({ ...prev, selectedTime: answer }));
+      const answerStr = Array.isArray(answer) ? answer[0] : answer;
+      setState((prev) => ({ ...prev, selectedTime: answerStr }));
+      addMessage("user", getAnswerLabel(answerStr));
 
       if (state.currentQuestion === "today") {
-        await getRecommendation("today", state.selectedGoal, state.selectedEquipment, answer);
+        await getRecommendation("today", state.selectedGoal, state.selectedEquipment, answerStr);
       } else {
-        await getRecommendation(state.currentQuestion!, null, null, answer);
+        await getRecommendation(state.currentQuestion!, null, null, answerStr);
       }
     }
   };
@@ -109,7 +113,7 @@ export const SmartyCoachChat = ({ onClose }: SmartyCoachChatProps) => {
   const getRecommendation = async (
     question: QuestionType,
     goal: string | null,
-    equipment: string | null,
+    equipment: string[] | null,
     time: string | null
   ) => {
     setState((prev) => ({ ...prev, isLoading: true }));
@@ -289,16 +293,17 @@ export const SmartyCoachChat = ({ onClose }: SmartyCoachChatProps) => {
 };
 
 // Helper functions
-function getQuestionLabel(question: QuestionType): string {
-  const labels: Record<QuestionType, string> = {
-    today: "What should I do today?",
-    "workout-or-program": "Workout or training program?",
-    goal: "What is your goal?",
-    equipment: "Best for my equipment?",
-    time: "I have limited time",
-  };
-  return labels[question];
-}
+  function getQuestionLabel(question: QuestionType): string {
+    const labels: Record<QuestionType, string> = {
+      today: "What should I do today?",
+      "workout-or-program": "Should I go for a workout or a training program?",
+      goal: "What is your goal?",
+      equipment: "What is best for my equipment?",
+      "limited-time": "I have limited time, what should I do?",
+      time: "How much time do you have?",
+    };
+    return labels[question];
+  }
 
 function getAnswerLabel(answer: string): string {
   const labelMap: Record<string, string> = {

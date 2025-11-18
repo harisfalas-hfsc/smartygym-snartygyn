@@ -1,9 +1,10 @@
 import { Button } from "./ui/button";
 import type { GoalType, EquipmentType, TimeOption, QuestionType } from "@/types/smartyCoach";
+import { useState } from "react";
 
 interface SmartyCoachAnswerButtonsProps {
   questionType: QuestionType;
-  onSelectAnswer: (answer: string) => void;
+  onSelectAnswer: (answer: string | string[]) => void;
   disabled?: boolean;
 }
 
@@ -43,12 +44,19 @@ const equipmentOptions: { id: EquipmentType; label: string }[] = [
   { id: "weighted-vest", label: "Weighted vest" },
 ];
 
-const timeOptions: { id: TimeOption; label: string }[] = [
+const limitedTimeOptions: { id: TimeOption; label: string }[] = [
+  { id: "10", label: "10 minutes" },
+  { id: "20", label: "20 minutes" },
+  { id: "30", label: "30 minutes" },
+];
+
+const allTimeOptions: { id: TimeOption; label: string }[] = [
   { id: "10", label: "10 minutes" },
   { id: "20", label: "20 minutes" },
   { id: "30", label: "30 minutes" },
   { id: "45", label: "45 minutes" },
   { id: "60", label: "60 minutes" },
+  { id: "unlimited", label: "Unlimited time" },
 ];
 
 export const SmartyCoachAnswerButtons = ({
@@ -56,6 +64,8 @@ export const SmartyCoachAnswerButtons = ({
   onSelectAnswer,
   disabled = false,
 }: SmartyCoachAnswerButtonsProps) => {
+  const [selectedEquipment, setSelectedEquipment] = useState<string[]>([]);
+  
   let options: { id: string; label: string }[] = [];
 
   if (questionType === "goal" || questionType === "today" || questionType === "workout-or-program") {
@@ -63,7 +73,52 @@ export const SmartyCoachAnswerButtons = ({
   } else if (questionType === "equipment") {
     options = equipmentOptions;
   } else if (questionType === "time") {
-    options = timeOptions;
+    options = allTimeOptions;
+  } else if (questionType === "limited-time") {
+    options = limitedTimeOptions;
+  }
+
+  // Multi-select for equipment
+  if (questionType === "equipment") {
+    return (
+      <div className="flex flex-col gap-2 p-4 border-t border-border max-h-[300px] overflow-y-auto">
+        <p className="text-sm text-muted-foreground mb-2">
+          Select your equipment (multiple allowed):
+        </p>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+          {equipmentOptions.map((option) => {
+            const isSelected = selectedEquipment.includes(option.id);
+            return (
+              <Button
+                key={option.id}
+                variant={isSelected ? "default" : "outline"}
+                onClick={() => {
+                  const updated = isSelected
+                    ? selectedEquipment.filter(e => e !== option.id)
+                    : [...selectedEquipment, option.id];
+                  setSelectedEquipment(updated);
+                }}
+                disabled={disabled}
+                className="justify-start text-left h-auto py-2 transition-all"
+              >
+                <span className="mr-2">{isSelected ? "✓" : ""}</span>
+                {option.label}
+              </Button>
+            );
+          })}
+        </div>
+        <Button 
+          onClick={() => {
+            onSelectAnswer(selectedEquipment);
+            setSelectedEquipment([]);
+          }}
+          disabled={!selectedEquipment.length || disabled}
+          className="w-full mt-2 bg-green-600 hover:bg-green-700"
+        >
+          Done
+        </Button>
+      </div>
+    );
   }
 
   return (
@@ -71,8 +126,6 @@ export const SmartyCoachAnswerButtons = ({
       <p className="text-sm text-muted-foreground mb-2">
         {questionType === "goal" || questionType === "today" || questionType === "workout-or-program"
           ? "Choose your goal:"
-          : questionType === "equipment"
-          ? "Select your equipment:"
           : "How much time do you have?"}
       </p>
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
@@ -82,7 +135,7 @@ export const SmartyCoachAnswerButtons = ({
             variant="outline"
             onClick={() => onSelectAnswer(option.id)}
             disabled={disabled}
-            className="justify-start text-left h-auto py-2 hover:bg-primary/10 hover:text-primary hover:border-primary transition-all"
+            className="justify-start text-left h-auto py-2 hover:bg-green-500/10 hover:text-green-600 hover:border-green-600 transition-all"
           >
             {option.label}
           </Button>
