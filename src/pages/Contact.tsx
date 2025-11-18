@@ -7,7 +7,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { PageBreadcrumbs } from "@/components/PageBreadcrumbs";
 import { InfoRibbon } from "@/components/InfoRibbon";
-import { ArrowLeft, MessageSquare, Send, MapPin, Phone, Lock, MessageCircle } from "lucide-react";
+import { ArrowLeft, MessageSquare, Send, MapPin, Phone, Lock, MessageCircle, Paperclip, X } from "lucide-react";
 import { BackToTop } from "@/components/BackToTop";
 import { useToast } from "@/hooks/use-toast";
 import { z } from "zod";
@@ -44,6 +44,9 @@ const Contact = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [hasSubscription, setHasSubscription] = useState(false);
   const [userProfile, setUserProfile] = useState<{ full_name: string; } | null>(null);
+  const [attachments, setAttachments] = useState<File[]>([]);
+  const [coachAttachments, setCoachAttachments] = useState<File[]>([]);
+  const [uploadingFiles, setUploadingFiles] = useState(false);
   const { userTier } = useAccessControl();
 
   // WhatsApp functionality
@@ -53,6 +56,19 @@ const Contact = () => {
   const handleWhatsAppClick = () => {
     const url = `https://wa.me/${phoneNumber.replace(/[^0-9]/g, '')}?text=${encodeURIComponent(whatsappMessage)}`;
     window.open(url, '_blank');
+  };
+
+  const uploadFiles = async (files: File[]) => {
+    const uploadedUrls = [];
+    for (const file of files) {
+      const fileExt = file.name.split('.').pop();
+      const fileName = `${Math.random()}.${fileExt}`;
+      const { error: uploadError } = await supabase.storage.from('contact-files').upload(fileName, file);
+      if (uploadError) throw uploadError;
+      const { data: { publicUrl } } = supabase.storage.from('contact-files').getPublicUrl(fileName);
+      uploadedUrls.push({ name: file.name, url: publicUrl, size: file.size, type: file.type });
+    }
+    return uploadedUrls;
   };
 
   // Check authentication and subscription status
@@ -474,6 +490,64 @@ const Contact = () => {
                         />
                         {coachErrors.message && (
                           <p className="text-sm text-destructive">{coachErrors.message}</p>
+                        )}
+                      </div>
+
+                      <div className="space-y-2">
+                        <Label htmlFor="coach-attachments">
+                          Attachments <span className="text-xs text-muted-foreground">(optional, max 5 files)</span>
+                        </Label>
+                        <div className="flex items-center gap-2">
+                          <Button
+                            type="button"
+                            variant="outline"
+                            size="sm"
+                            onClick={() => document.getElementById('coach-file-input')?.click()}
+                            disabled={uploadingFiles || coachAttachments.length >= 5}
+                          >
+                            <Paperclip className="w-4 h-4 mr-2" />
+                            Attach Files
+                          </Button>
+                          <input
+                            id="coach-file-input"
+                            type="file"
+                            multiple
+                            accept=".pdf,.doc,.docx,.txt,.jpg,.jpeg,.png"
+                            className="hidden"
+                            onChange={(e) => {
+                              const files = Array.from(e.target.files || []);
+                              if (files.length + coachAttachments.length > 5) {
+                                toast({
+                                  title: "Too many files",
+                                  description: "Maximum 5 files allowed",
+                                  variant: "destructive",
+                                });
+                                return;
+                              }
+                              setCoachAttachments(prev => [...prev, ...files]);
+                            }}
+                          />
+                        </div>
+                        
+                        {coachAttachments.length > 0 && (
+                          <div className="space-y-1 mt-2">
+                            {coachAttachments.map((file, index) => (
+                              <div key={index} className="flex items-center justify-between text-sm bg-muted p-2 rounded">
+                                <span className="flex items-center gap-2">
+                                  <Paperclip className="w-3 h-3" />
+                                  {file.name} ({(file.size / 1024).toFixed(1)}KB)
+                                </span>
+                                <Button
+                                  type="button"
+                                  variant="ghost"
+                                  size="sm"
+                                  onClick={() => setCoachAttachments(prev => prev.filter((_, i) => i !== index))}
+                                >
+                                  <X className="w-3 h-3" />
+                                </Button>
+                              </div>
+                            ))}
+                          </div>
                         )}
                       </div>
 
