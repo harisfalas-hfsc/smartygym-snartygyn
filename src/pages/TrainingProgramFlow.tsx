@@ -160,7 +160,7 @@ const TrainingProgramFlow = () => {
                         </a>
                         {" "}BSc Sports Science, EXOS Specialist, CSCS
                       </p>
-                  <div className="flex gap-1.5 text-[11px] mt-2">
+                  <div className="flex gap-1 text-[10px] mt-2">
                     <span 
                       className="bg-primary/20 text-primary border border-primary/40 px-1.5 py-0.5 rounded-full whitespace-nowrap" 
                       itemProp="duration"
