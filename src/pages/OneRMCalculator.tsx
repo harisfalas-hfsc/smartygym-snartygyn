@@ -156,21 +156,7 @@ const OneRMCalculator = () => {
           aiKeywords={["1RM", "one rep max", "strength calculator", "powerlifting", "Brzycki formula", "training percentages", "gym tools", "fitness calculator"]}
           relatedContent={["strength training workouts", "powerlifting programs", "gym tools"]}
         />
-        <title>1RM Calculator Cyprus | Free One Rep Max Strength Calculator | Haris Falas | smartygym.com</title>
-        <meta name="description" content="Free 1RM Calculator using Brzycki formula - Calculate your one-rep maximum for powerlifting, strength training. Training percentages included. By Sports Scientist Haris Falas at smartygym.com Cyprus" />
-        <meta name="keywords" content="1RM calculator Cyprus, one rep max calculator, Brzycki formula, strength calculator, powerlifting calculator, training percentages, max strength test, bench press calculator, squat calculator, deadlift calculator, Haris Falas Cyprus, Smarty Gym, smartygym.com, strength training tool Cyprus, weightlifting calculator" />
-        
-        <meta property="og:title" content="1RM Calculator - Smarty Gym" />
-        <meta property="og:description" content="Free one-rep maximum calculator - convenient fitness tool at smartygym.com" />
-        <meta property="og:type" content="website" />
-        <meta property="og:url" content="https://smartygym.com/1rmcalculator" />
-        
-        <meta name="twitter:card" content="summary_large_image" />
-        <meta name="twitter:title" content="1RM Calculator - Smarty Gym" />
-        <meta name="twitter:description" content="Free one-rep maximum calculator at smartygym.com" />
-        
-        <link rel="canonical" href="https://smartygym.com/1rmcalculator" />
-      </Helmet>
+      </>
       
       <div className="min-h-screen bg-background p-4">
       <div className="max-w-2xl mx-auto py-4 sm:py-8">

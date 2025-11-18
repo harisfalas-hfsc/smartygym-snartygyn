@@ -7,6 +7,8 @@ import { InfoRibbon } from "@/components/InfoRibbon";
 import { ArrowLeft, Calculator, Activity, Flame } from "lucide-react";
 import { useShowBackButton } from "@/hooks/useShowBackButton";
 import { useAccessControl } from "@/hooks/useAccessControl";
+import { SEOEnhancer } from "@/components/SEOEnhancer";
+import { generateBreadcrumbSchema } from "@/utils/seoHelpers";
 
 const Tools = () => {
   const navigate = useNavigate();
@@ -49,13 +51,32 @@ const Tools = () => {
         <meta property="og:description" content="Free fitness calculators by Haris Falas - convenient tools for flexible training anywhere" />
         <meta property="og:type" content="website" />
         <meta property="og:url" content="https://smartygym.com/tools" />
+        <meta property="og:image" content="https://smartygym.com/smarty-gym-logo.png" />
         
         <meta name="twitter:card" content="summary_large_image" />
         <meta name="twitter:title" content="Fitness Tools - SmartyGym" />
         <meta name="twitter:description" content="Free fitness calculators at smartygym.com for convenient training planning" />
+        <meta name="twitter:image" content="https://smartygym.com/smarty-gym-logo.png" />
         
         <link rel="canonical" href="https://smartygym.com/tools" />
+        
+        <script type="application/ld+json">
+          {JSON.stringify(generateBreadcrumbSchema([
+            { name: "Home", url: "/" },
+            { name: "Tools", url: "/tools" }
+          ]))}
+        </script>
       </Helmet>
+      
+      <SEOEnhancer
+        entities={["SmartyGym", "Haris Falas", "Fitness Calculators", "1RM Calculator", "BMR Calculator"]}
+        topics={["fitness tools", "1RM calculator", "BMR calculator", "macro calculator", "strength planning", "nutrition planning"]}
+        expertise={["sports science", "exercise physiology", "nutrition science"]}
+        contentType="tool-collection"
+        aiSummary="Free online fitness calculators at SmartyGym Cyprus by Sports Scientist Haris Falas. 1RM, BMR, and Macro calculators for professional training planning."
+        aiKeywords={["fitness calculators", "1RM calculator", "BMR calculator", "macro calculator", "training tools", "nutrition tools"]}
+        relatedContent={["workouts", "training programs", "nutrition guidance"]}
+      />
       
       <div className="min-h-screen bg-background">
       <div className="container mx-auto max-w-6xl px-4 py-8">
