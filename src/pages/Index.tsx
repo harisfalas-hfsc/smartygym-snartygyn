@@ -11,7 +11,7 @@ import { User as SupabaseUser } from "@supabase/supabase-js";
 import { useToast } from "@/hooks/use-toast";
 import smartyGymLogo from "@/assets/smarty-gym-logo.png";
 import smartyGymIcon from "@/assets/smarty-gym-icon.png";
-import { BackToTop } from "@/components/BackToTop";
+
 import { useAccessControl } from "@/hooks/useAccessControl";
 import { ScrollReveal } from "@/components/ScrollReveal";
 import {
@@ -361,7 +361,7 @@ const Index = () => {
       </Helmet>
       
       <div className="min-h-screen bg-background overflow-x-hidden">
-        <BackToTop />
+        
         
         {/* Hero Section */}
         <section className="relative py-8 sm:py-12 px-4 border-b border-border bg-background overflow-hidden">

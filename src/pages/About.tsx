@@ -7,7 +7,7 @@ import { PageBreadcrumbs } from "@/components/PageBreadcrumbs";
 import { InfoRibbon } from "@/components/InfoRibbon";
 import { ArrowLeft, Award, Heart, Users, Target, UserCheck, Brain, Shield, Sparkles, Ban, CheckCircle2, Compass, Calendar } from "lucide-react";
 import harisPhoto from "@/assets/haris-falas-coach.png";
-import { BackToTop } from "@/components/BackToTop";
+
 import { useShowBackButton } from "@/hooks/useShowBackButton";
 import { useAccessControl } from "@/hooks/useAccessControl";
 
@@ -60,7 +60,7 @@ const About = () => {
       </Helmet>
       
       <div className="min-h-screen bg-background">
-        <BackToTop />
+        
         <div className="container mx-auto max-w-6xl px-4 py-8">
         {canGoBack && (
           <div className="mb-6">

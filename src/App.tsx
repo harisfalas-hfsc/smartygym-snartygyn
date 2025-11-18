@@ -12,7 +12,7 @@ import { Navigation } from "./components/Navigation";
 import { Footer } from "./components/Footer";
 import { ScrollToTop } from "./components/ScrollToTop";
 import { CookieConsent } from "./components/CookieConsent";
-import { FloatingActionButton } from "./components/FloatingActionButton";
+
 import { SmartyCoach } from "./components/SmartyCoach";
 import { ArticleDetail } from "./pages/ArticleDetail";
 import { trackPageVisit } from "./utils/socialMediaTracking";
@@ -138,7 +138,7 @@ const AppContent = () => {
           </div>
           <Footer />
           <SmartyCoach />
-          <FloatingActionButton />
+          
         </div>
       </AccessControlProvider>
     </>

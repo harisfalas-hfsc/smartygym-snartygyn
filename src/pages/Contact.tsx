@@ -8,7 +8,7 @@ import { Label } from "@/components/ui/label";
 import { PageBreadcrumbs } from "@/components/PageBreadcrumbs";
 import { InfoRibbon } from "@/components/InfoRibbon";
 import { ArrowLeft, MessageSquare, Send, MapPin, Phone, Lock, MessageCircle, Paperclip, X } from "lucide-react";
-import { BackToTop } from "@/components/BackToTop";
+
 import { useToast } from "@/hooks/use-toast";
 import { z } from "zod";
 import { useShowBackButton } from "@/hooks/useShowBackButton";
@@ -360,7 +360,7 @@ const Contact = () => {
       </Helmet>
       
       <div className="min-h-screen bg-background">
-        <BackToTop />
+        
         <div className="container mx-auto max-w-6xl px-4 py-8">
           {canGoBack && (
             <div className="mb-6">
