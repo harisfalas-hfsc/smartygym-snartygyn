@@ -136,8 +136,17 @@ const TrainingProgramFlow = () => {
                       >
                         {program.description}
                       </p>
-                      <p className="text-xs text-muted-foreground mb-3">
-                        By <a href="/coach-profile" className="text-primary hover:underline font-medium" itemProp="instructor">Haris Falas</a>
+                      <p className="text-xs text-muted-foreground/80 italic mb-3">
+                        Crafted by{" "}
+                        <a 
+                          href="/coach-profile" 
+                          className="text-primary hover:underline font-medium whitespace-nowrap"
+                          itemProp="instructor"
+                          onClick={(e) => e.stopPropagation()}
+                        >
+                          Haris Falas
+                        </a>
+                        {" "}BSc Sports Science, EXOS Specialist, CSCS
                       </p>
                       <div className="flex flex-wrap gap-2 text-xs mt-2">
                         <span className="bg-primary/10 text-primary px-2 py-1 rounded" itemProp="duration">4-12 weeks</span>

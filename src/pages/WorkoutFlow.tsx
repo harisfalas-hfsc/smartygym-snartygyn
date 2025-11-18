@@ -136,6 +136,17 @@ const WorkoutFlow = () => {
                       >
                         {workout.description}
                       </p>
+                      <p className="text-xs text-muted-foreground/80 italic">
+                        Crafted by{" "}
+                        <a 
+                          href="/coach-profile" 
+                          className="text-primary hover:underline font-medium whitespace-nowrap"
+                          onClick={(e) => e.stopPropagation()}
+                        >
+                          Haris Falas
+                        </a>
+                        {" "}BSc Sports Science, EXOS Specialist, CSCS
+                      </p>
                       <meta itemProp="exerciseType" content={workout.title} />
                       <meta itemProp="provider" content="Smarty Gym Cyprus - Online Gym - smartygym.com" />
                       <meta itemProp="audience" content="All fitness levels" />
