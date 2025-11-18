@@ -447,8 +447,8 @@ const About = () => {
           <Card>
             <CardContent className="p-6">
               <Accordion type="single" collapsible className="w-full">
-                <AccordionItem value="item-1">
-                  <AccordionTrigger>What is SmartyGym?</AccordionTrigger>
+            <AccordionItem value="item-1">
+              <AccordionTrigger className="text-left">What is SmartyGym?</AccordionTrigger>
                   <AccordionContent>
                     SmartyGym is an online fitness platform providing functional, science-based workouts and training programs 
                     designed by certified coaches. Whether you're training at home, in the gym, or on the go, SmartyGym 
@@ -457,8 +457,8 @@ const About = () => {
                   </AccordionContent>
                 </AccordionItem>
 
-                <AccordionItem value="item-2">
-                  <AccordionTrigger>Who is Haris Falas?</AccordionTrigger>
+            <AccordionItem value="item-2">
+              <AccordionTrigger className="text-left">Who is Haris Falas?</AccordionTrigger>
                   <AccordionContent>
                     <a href="/coach-profile" className="text-primary hover:underline font-medium">Haris Falas</a> is a certified Sports Scientist 
                     and Strength & Conditioning Coach with over 20 years of professional experience. He has worked with elite athletes and professional 
@@ -468,8 +468,8 @@ const About = () => {
                   </AccordionContent>
                 </AccordionItem>
 
-                <AccordionItem value="item-3">
-                  <AccordionTrigger>What makes SmartyGym different?</AccordionTrigger>
+            <AccordionItem value="item-3">
+              <AccordionTrigger className="text-left">What makes SmartyGym different?</AccordionTrigger>
                   <AccordionContent>
                     <strong>We're 100% human, 0% AI.</strong> Every workout is personally designed by <a href="/coach-profile" className="text-primary hover:underline font-medium">Haris Falas</a>, 
                     a qualified Sports Scientist and S&C Coach — never by algorithms or AI. You get real expertise from a real coach with 20+ years 
@@ -518,7 +518,7 @@ const About = () => {
                 </AccordionItem>
 
                 <AccordionItem value="item-4">
-                  <AccordionTrigger>Do I need equipment to use SmartyGym?</AccordionTrigger>
+                  <AccordionTrigger className="text-left">Do I need equipment to use SmartyGym?</AccordionTrigger>
                   <AccordionContent>
                     No! We offer both bodyweight workouts that require no equipment and equipment-based programs. 
                     You can filter workouts based on what you have available — whether that's nothing, 
@@ -527,7 +527,7 @@ const About = () => {
                 </AccordionItem>
 
                 <AccordionItem value="item-5">
-                  <AccordionTrigger>How long are the workouts?</AccordionTrigger>
+                  <AccordionTrigger className="text-left">How long are the workouts?</AccordionTrigger>
                   <AccordionContent>
                     Our workouts range from quick 10-minute sessions to comprehensive 60-minute full workouts. 
                     You can filter by duration to find what fits your schedule — whether you have just 10 minutes or a full hour to train.
@@ -535,7 +535,7 @@ const About = () => {
                 </AccordionItem>
 
                 <AccordionItem value="item-6">
-                  <AccordionTrigger>Can beginners use SmartyGym?</AccordionTrigger>
+                  <AccordionTrigger className="text-left">Can beginners use SmartyGym?</AccordionTrigger>
                   <AccordionContent>
                     Absolutely! We have workouts and programs specifically designed for all fitness levels, including beginners. 
                     Each workout includes clear instructions, difficulty ratings, and modifications to match your current fitness level. 
@@ -544,7 +544,7 @@ const About = () => {
                 </AccordionItem>
 
                 <AccordionItem value="item-7">
-                  <AccordionTrigger>Why should I go premium?</AccordionTrigger>
+                  <AccordionTrigger className="text-left">Why should I go premium?</AccordionTrigger>
                   <AccordionContent>
                     Premium membership unlocks unlimited access to all workouts and training programs, full dashboard access with progress tracking, 
                     complete workout and program history, ability to favorite and rate all content, and direct WhatsApp support from the coaching team. 
@@ -554,7 +554,7 @@ const About = () => {
                 </AccordionItem>
 
                 <AccordionItem value="item-8">
-                  <AccordionTrigger>What's the difference between free and premium access?</AccordionTrigger>
+                  <AccordionTrigger className="text-left">What's the difference between free and premium access?</AccordionTrigger>
                   <AccordionContent>
                     <strong>Visitors (no login)</strong> can view the exercise library and blog. <strong>Free subscribers</strong> get access to selected free workouts and programs, 
                     full calculators (1RM, BMR, Macro), and limited dashboard features. <strong>Premium members</strong> get unlimited access to all workouts and training programs, 
@@ -563,7 +563,7 @@ const About = () => {
                 </AccordionItem>
 
                 <AccordionItem value="item-9">
-                  <AccordionTrigger>Can I cancel my subscription anytime?</AccordionTrigger>
+                  <AccordionTrigger className="text-left">Can I cancel my subscription anytime?</AccordionTrigger>
                   <AccordionContent>
                     Yes! You can cancel your subscription at any time with no long-term commitments or cancellation fees. 
                     Your premium access continues until the end of your current billing period, so you get full value for what you've paid.
@@ -571,14 +571,27 @@ const About = () => {
                 </AccordionItem>
 
                 <AccordionItem value="item-10">
-                  <AccordionTrigger>How do I get support or contact the coach?</AccordionTrigger>
+                  <AccordionTrigger className="text-left">How do I get support or contact the coach?</AccordionTrigger>
                   <AccordionContent>
                     Premium members get direct WhatsApp support from our coaching team for personalized guidance and questions. 
                     All users can also reach out through our <a href="/contact" className="text-primary hover:underline font-medium">contact page</a>. 
                     Unlike AI-generated programs, you're working with real people who care about your progress and are here to help.
-                  </AccordionContent>
-                </AccordionItem>
-              </Accordion>
+              </AccordionContent>
+            </AccordionItem>
+
+            <AccordionItem value="item-13">
+              <AccordionTrigger className="text-left">Can I subscribe to receive email updates?</AccordionTrigger>
+              <AccordionContent>
+                We've made a conscious decision not to offer email subscriptions or send promotional emails. 
+                As fitness enthusiasts ourselves, we understand how overwhelming it can be to receive constant marketing emails 
+                that often go unread. We don't want to contribute to inbox clutter or email fatigue. Instead, all important 
+                updates, workout notifications, and communication happen directly within your SmartyGym dashboard — 
+                keeping everything organized in one place without distractions. If you'd like to stay connected and receive 
+                updates about new content, you're welcome to follow us on social media. This approach ensures you only get 
+                the information you need, when you need it, without unnecessary noise.
+              </AccordionContent>
+            </AccordionItem>
+          </Accordion>
             </CardContent>
           </Card>
         </section>
