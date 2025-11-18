@@ -144,6 +144,10 @@ export default function UserDashboard() {
   
   // LogBook filter state
   const [logBookFilter, setLogBookFilter] = useState<'all' | 'workout' | 'program' | 'tool' | 'measurement'>('all');
+  const [logBookSecondaryFilter, setLogBookSecondaryFilter] = useState("all");
+  const [logBookTimeFilter, setLogBookTimeFilter] = useState<'weekly' | 'monthly' | 'custom'>('monthly');
+  const [logBookCustomStartDate, setLogBookCustomStartDate] = useState<Date | undefined>();
+  const [logBookCustomEndDate, setLogBookCustomEndDate] = useState<Date | undefined>();
   
   // Fetch user purchases
   const { data: purchases = [], isLoading: purchasesLoading } = usePurchases(user?.id);
@@ -1884,17 +1888,29 @@ export default function UserDashboard() {
                   />
                 </div>
                 
-                <div id="logbook-charts">
-                  <LogBookAdvancedCharts 
+                  <div id="logbook-charts">
+                    <LogBookAdvancedCharts 
+                      userId={user!.id} 
+                      primaryFilter={logBookFilter}
+                      secondaryFilter={logBookSecondaryFilter}
+                      onSecondaryFilterChange={setLogBookSecondaryFilter}
+                      timeFilter={logBookTimeFilter}
+                      onTimeFilterChange={setLogBookTimeFilter}
+                      customStartDate={logBookCustomStartDate}
+                      onCustomStartDateChange={setLogBookCustomStartDate}
+                      customEndDate={logBookCustomEndDate}
+                      onCustomEndDateChange={setLogBookCustomEndDate}
+                    />
+                  </div>
+
+                  <LogBookAdvancedExport 
                     userId={user!.id} 
-                    primaryFilter={logBookFilter} 
+                    primaryFilter={logBookFilter}
+                    secondaryFilter={logBookSecondaryFilter}
+                    timeFilter={logBookTimeFilter}
+                    customStartDate={logBookCustomStartDate}
+                    customEndDate={logBookCustomEndDate}
                   />
-                </div>
-                
-                <LogBookAdvancedExport 
-                  userId={user!.id} 
-                  primaryFilter={logBookFilter} 
-                />
               </>
             )}
           </TabsContent>

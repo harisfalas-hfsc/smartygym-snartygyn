@@ -2,23 +2,35 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { FileText, Image } from "lucide-react";
 import html2canvas from "html2canvas";
-import { useActivityLog } from "@/hooks/useActivityLog";
+import { useAdvancedActivityLog } from "@/hooks/useAdvancedActivityLog";
 import { toast } from "sonner";
+import { format } from "date-fns";
 
 interface LogBookAdvancedExportProps {
   userId: string;
   primaryFilter: string;
   secondaryFilter?: string;
-  timeFilter?: string;
+  timeFilter?: 'weekly' | 'monthly' | 'custom';
+  customStartDate?: Date;
+  customEndDate?: Date;
 }
 
 export const LogBookAdvancedExport = ({ 
   userId, 
   primaryFilter,
   secondaryFilter = 'all',
-  timeFilter = 'monthly'
+  timeFilter = 'monthly',
+  customStartDate,
+  customEndDate
 }: LogBookAdvancedExportProps) => {
-  const { activities, isLoading } = useActivityLog(userId, primaryFilter === 'all' ? undefined : primaryFilter);
+  const { lineChartData, pieChartData, isLoading } = useAdvancedActivityLog(
+    userId,
+    primaryFilter,
+    secondaryFilter,
+    timeFilter,
+    customStartDate,
+    customEndDate
+  );
 
   const exportToPDF = async () => {
     try {
@@ -37,11 +49,13 @@ export const LogBookAdvancedExport = ({
       const chartsCanvas = await html2canvas(chartsElement, { scale: 2 });
 
       // Calculate summary statistics
-      const totalActivities = activities.length;
-      const workouts = activities.filter(a => a.content_type === 'workout').length;
-      const programs = activities.filter(a => a.content_type === 'program').length;
-      const tools = activities.filter(a => a.content_type === 'tool').length;
-      const measurements = activities.filter(a => a.content_type === 'measurement').length;
+      const stats = {
+        totalActivities: pieChartData.reduce((sum, item) => sum + item.value, 0),
+        filter: `${primaryFilter} - ${secondaryFilter} - ${timeFilter}`,
+        period: timeFilter === 'custom' && customStartDate && customEndDate
+          ? `${format(customStartDate, 'MMM dd, yyyy')} - ${format(customEndDate, 'MMM dd, yyyy')}`
+          : timeFilter === 'weekly' ? 'Last 12 weeks' : 'Last 6 months'
+      };
 
       // Create new window for printing
       const printWindow = window.open('', '_blank');
@@ -112,31 +126,15 @@ export const LogBookAdvancedExport = ({
             <p>Generated on ${new Date().toLocaleDateString()}</p>
             
             <div class="filters">
-              <p>Primary Filter: <strong>${primaryFilter}</strong></p>
-              <p>Secondary Filter: <strong>${secondaryFilter}</strong></p>
-              <p>Time Period: <strong>${timeFilter}</strong></p>
+              <p>Filters: <strong>${stats.filter}</strong></p>
+              <p>Period: <strong>${stats.period}</strong></p>
             </div>
 
+            <h2>Activity Summary</h2>
             <div class="stats">
               <div class="stat-card">
-                <h3>${totalActivities}</h3>
+                <h3>${stats.totalActivities}</h3>
                 <p>Total Activities</p>
-              </div>
-              <div class="stat-card">
-                <h3>${workouts}</h3>
-                <p>Workouts</p>
-              </div>
-              <div class="stat-card">
-                <h3>${programs}</h3>
-                <p>Programs</p>
-              </div>
-              <div class="stat-card">
-                <h3>${tools}</h3>
-                <p>Tools Used</p>
-              </div>
-              <div class="stat-card">
-                <h3>${measurements}</h3>
-                <p>Measurements</p>
               </div>
             </div>
 
