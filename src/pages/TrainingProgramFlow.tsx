@@ -24,8 +24,7 @@ const TrainingProgramFlow = () => {
       description: "Structured program to build cardiovascular fitness",
       icon: Heart,
       level: "Beginner-Advanced",
-      equipment: "Equipment/No Equipment",
-      badgeColor: "bg-blue-500/10 border-blue-500"
+      equipment: "Equipment/No Equipment"
     },
     {
       id: "functional-strength",
@@ -33,8 +32,7 @@ const TrainingProgramFlow = () => {
       description: "Structured program for real-world strength and movement",
       icon: Dumbbell,
       level: "Beginner-Advanced",
-      equipment: "Equipment/No Equipment",
-      badgeColor: "bg-orange-500/10 border-orange-500"
+      equipment: "Equipment/No Equipment"
     },
     {
       id: "muscle-hypertrophy",
@@ -42,8 +40,7 @@ const TrainingProgramFlow = () => {
       description: "Structured program focused on muscle growth",
       icon: Activity,
       level: "Beginner-Advanced",
-      equipment: "Equipment/No Equipment",
-      badgeColor: "bg-orange-500/10 border-orange-500"
+      equipment: "Equipment/No Equipment"
     },
     {
       id: "weight-loss",
@@ -51,8 +48,7 @@ const TrainingProgramFlow = () => {
       description: "Structured program designed for fat loss",
       icon: Flame,
       level: "Beginner-Advanced",
-      equipment: "Equipment/No Equipment",
-      badgeColor: "bg-green-500/10 border-green-500"
+      equipment: "Equipment/No Equipment"
     },
     {
       id: "low-back-pain",
@@ -60,8 +56,7 @@ const TrainingProgramFlow = () => {
       description: "Structured program to strengthen and rehabilitate",
       icon: User,
       level: "Beginner-Advanced",
-      equipment: "Equipment/No Equipment",
-      badgeColor: "bg-blue-500/10 border-blue-500"
+      equipment: "Equipment/No Equipment"
     },
     {
       id: "mobility-stability",
@@ -69,8 +64,7 @@ const TrainingProgramFlow = () => {
       description: "Structured program for movement quality",
       icon: Move,
       level: "Beginner-Advanced",
-      equipment: "Equipment/No Equipment",
-      badgeColor: "bg-green-500/10 border-green-500"
+      equipment: "Equipment/No Equipment"
     },
   ];
 
@@ -141,7 +135,7 @@ const TrainingProgramFlow = () => {
                     >
                       <Icon className="w-8 h-8 text-primary" />
                     </div>
-                    <div className="w-full">
+                    <div>
                       <h3 
                         className="font-semibold text-lg mb-2"
                         itemProp="name"
@@ -154,35 +148,25 @@ const TrainingProgramFlow = () => {
                       >
                         {program.description}
                       </p>
-                      
-                      {/* Two-column layout for details and credentials */}
-                      <div className="flex items-start justify-between gap-3 mt-3">
-                        {/* Left: Program details in colored rounded border */}
-                        <div className={`flex-shrink-0 px-3 py-2 rounded-lg border ${program.badgeColor}`}>
-                          <p className="text-xs text-muted-foreground whitespace-nowrap">
-                            <span itemProp="duration">4-8 weeks</span>
-                            {" • "}
-                            <span>{program.level}</span>
-                            {" • "}
-                            <span>{program.equipment}</span>
-                          </p>
-                        </div>
-                        
-                        {/* Right: Credentials */}
-                        <p className="text-xs text-muted-foreground/80 italic text-right">
-                          Crafted by{" "}
-                          <a 
-                            href="/coach-profile" 
-                            className="text-primary hover:underline font-medium whitespace-nowrap"
-                            itemProp="instructor"
-                            onClick={(e) => e.stopPropagation()}
-                          >
-                            Haris Falas
-                          </a>
-                          {" "}BSc Sports Science, EXOS Specialist, CSCS
-                        </p>
-                      </div>
-                      
+                      <p className="text-xs text-muted-foreground/80 italic mb-3">
+                        Crafted by{" "}
+                        <a 
+                          href="/coach-profile" 
+                          className="text-primary hover:underline font-medium whitespace-nowrap"
+                          itemProp="instructor"
+                          onClick={(e) => e.stopPropagation()}
+                        >
+                          Haris Falas
+                        </a>
+                        {" "}BSc Sports Science, EXOS Specialist, CSCS
+                      </p>
+                      <p className="text-xs text-muted-foreground mt-2">
+                        <span itemProp="duration">4-8 weeks</span>
+                        {" • "}
+                        <span>{program.level}</span>
+                        {" • "}
+                        <span>{program.equipment}</span>
+                      </p>
                       <meta itemProp="provider" content="Smarty Gym Cyprus - Online Gym - smartygym.com" />
                       <meta itemProp="courseMode" content="Online" />
                       <meta itemProp="availableLanguage" content="English" />
