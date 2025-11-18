@@ -148,6 +148,26 @@ serve(async (req) => {
 
     console.log('[MASS-NOTIFICATION] Messages sent successfully to', recipients.length, 'users');
 
+    // Log to notification audit
+    try {
+      await supabaseAdmin
+        .from('notification_audit_log')
+        .insert({
+          notification_type: 'manual',
+          message_type: messageType,
+          sent_by: userData.user.id,
+          recipient_filter: recipientFilter,
+          recipient_count: recipients.length,
+          success_count: recipients.length,
+          failed_count: 0,
+          subject: finalSubject,
+          content: finalContent,
+          metadata: {}
+        });
+    } catch (auditError) {
+      console.error('[MASS-NOTIFICATION] Failed to log audit:', auditError);
+    }
+
     return new Response(
       JSON.stringify({ 
         success: true, 

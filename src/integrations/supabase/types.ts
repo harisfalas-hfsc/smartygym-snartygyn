@@ -593,6 +593,51 @@ export type Database = {
         }
         Relationships: []
       }
+      notification_audit_log: {
+        Row: {
+          content: string
+          failed_count: number | null
+          id: string
+          message_type: string
+          metadata: Json | null
+          notification_type: string
+          recipient_count: number | null
+          recipient_filter: string | null
+          sent_at: string | null
+          sent_by: string | null
+          subject: string
+          success_count: number | null
+        }
+        Insert: {
+          content: string
+          failed_count?: number | null
+          id?: string
+          message_type: string
+          metadata?: Json | null
+          notification_type: string
+          recipient_count?: number | null
+          recipient_filter?: string | null
+          sent_at?: string | null
+          sent_by?: string | null
+          subject: string
+          success_count?: number | null
+        }
+        Update: {
+          content?: string
+          failed_count?: number | null
+          id?: string
+          message_type?: string
+          metadata?: Json | null
+          notification_type?: string
+          recipient_count?: number | null
+          recipient_filter?: string | null
+          sent_at?: string | null
+          sent_by?: string | null
+          subject?: string
+          success_count?: number | null
+        }
+        Relationships: []
+      }
       onerm_history: {
         Row: {
           created_at: string

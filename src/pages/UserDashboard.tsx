@@ -839,10 +839,6 @@ export default function UserDashboard() {
                   </Badge>
                 )}
               </TabsTrigger>
-              <TabsTrigger value="messages" className="flex-shrink-0">
-                <MessageSquare className="mr-2 h-4 w-4" />
-                <span className="whitespace-nowrap">Messages</span>
-              </TabsTrigger>
               <TabsTrigger value="calculators" className="flex-shrink-0">
                 <Calculator className="mr-2 h-4 w-4" />
                 <span className="whitespace-nowrap">My Calculators</span>
