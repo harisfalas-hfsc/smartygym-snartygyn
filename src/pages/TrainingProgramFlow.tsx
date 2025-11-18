@@ -23,36 +23,48 @@ const TrainingProgramFlow = () => {
       title: "Cardio Endurance",
       description: "Structured program to build cardiovascular fitness",
       icon: Heart,
+      level: "Beginner-Advanced",
+      equipment: "No Equipment"
     },
     {
       id: "functional-strength",
       title: "Functional Strength",
       description: "Structured program for real-world strength and movement",
       icon: Dumbbell,
+      level: "Intermediate-Advanced",
+      equipment: "Equipment Required"
     },
     {
       id: "muscle-hypertrophy",
       title: "Muscle Hypertrophy",
       description: "Structured program focused on muscle growth",
       icon: Activity,
+      level: "Intermediate-Advanced",
+      equipment: "Equipment Required"
     },
     {
       id: "weight-loss",
       title: "Weight Loss",
       description: "Structured program designed for fat loss",
       icon: Flame,
+      level: "Beginner-Advanced",
+      equipment: "No Equipment"
     },
     {
       id: "low-back-pain",
       title: "Low Back Pain",
       description: "Structured program to strengthen and rehabilitate",
       icon: User,
+      level: "Beginner-Intermediate",
+      equipment: "No Equipment"
     },
     {
       id: "mobility-stability",
       title: "Mobility & Stability",
       description: "Structured program for movement quality",
       icon: Move,
+      level: "Beginner-Advanced",
+      equipment: "No Equipment"
     },
   ];
 
@@ -148,11 +160,13 @@ const TrainingProgramFlow = () => {
                         </a>
                         {" "}BSc Sports Science, EXOS Specialist, CSCS
                       </p>
-                      <div className="flex flex-wrap gap-2 text-xs mt-2">
-                        <span className="bg-primary/10 text-primary px-2 py-1 rounded" itemProp="duration">4-12 weeks</span>
-                        <span className="bg-muted text-muted-foreground px-2 py-1 rounded">Intermediate</span>
-                        <span className="bg-muted text-muted-foreground px-2 py-1 rounded">Included in Premium</span>
-                      </div>
+                      <p className="text-xs text-muted-foreground mt-2">
+                        <span itemProp="duration">4-8 weeks</span>
+                        {" • "}
+                        <span>{program.level}</span>
+                        {" • "}
+                        <span>{program.equipment}</span>
+                      </p>
                       <meta itemProp="provider" content="Smarty Gym Cyprus - Online Gym - smartygym.com" />
                       <meta itemProp="courseMode" content="Online" />
                       <meta itemProp="availableLanguage" content="English" />
