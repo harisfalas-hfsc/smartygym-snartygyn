@@ -12,6 +12,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { User } from "@supabase/supabase-js";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
+import { SEOEnhancer } from "@/components/SEOEnhancer";
+import { generateSoftwareApplicationSchema, generateBreadcrumbSchema } from "@/utils/seoHelpers";
 
 const MacroTrackingCalculator = () => {
   const navigate = useNavigate();

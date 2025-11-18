@@ -1,43 +1,74 @@
 <!doctype html>
-<html lang="en">
+<html lang="en-GB">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes" />
+    
+    <!-- PWA & Mobile Meta Tags -->
     <meta name="mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-    <meta name="apple-mobile-web-app-title" content="Smarty Gym" />
+    <meta name="apple-mobile-web-app-title" content="SmartyGym" />
     <meta name="theme-color" content="#D4AF37" />
-    <meta name="application-name" content="Smarty Gym" />
+    <meta name="application-name" content="SmartyGym" />
     <meta name="msapplication-TileColor" content="#D4AF37" />
     <meta name="msapplication-tap-highlight" content="no" />
     <meta name="format-detection" content="telephone=no" />
     
+    <!-- Preconnect for Performance -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    
+    <!-- Favicon -->
     <link rel="icon" type="image/png" href="/smarty-gym-logo.png" />
-    <title>Smarty Gym | Online Fitness Platform | smartygym.com</title>
-    <meta name="description" content="Smarty Gym - Your smart gym for online fitness. Train anywhere, anytime with science-based workouts by Sports Scientist Haris Falas. Free workouts & premium programs at smartygym.com">
-    <meta name="keywords" content="smarty gym, smart gym, online fitness, smartygym, smartygym.com, Cyprus gym, online gym, home workouts, fitness training, Haris Falas, workout programs, training programs, functional fitness">
-    <meta name="author" content="Smarty Gym - Haris Falas" />
+    <link rel="apple-touch-icon" href="/smarty-gym-logo.png" />
+    
+    <!-- Primary Meta Tags -->
+    <title>SmartyGym | Online Gym Cyprus | Workouts Training Programs | Haris Falas | smartygym.com</title>
+    <meta name="description" content="SmartyGym - Cyprus' #1 online gym platform. 100+ workouts, training programs, fitness tools by Sports Scientist Haris Falas. AMRAP, TABATA, HIIT, strength, cardio. Train anywhere, anytime. 100% human-made, zero AI. Free online workouts + premium gym membership at smartygym.com" />
+    <meta name="keywords" content="smartygym, smarty gym, online gym, online gym Cyprus, gym Cyprus, Cyprus online fitness, online fitness platform, online fitness, home workouts, bodyweight workouts, AMRAP workouts, TABATA training, HIIT workouts, circuit training, strength training, cardio workouts, metabolic training, mobility training, power workouts, challenge workouts, online training programs, workout programs, training programs, functional fitness, muscle hypertrophy, weight loss program, cardio endurance, gym training online, Haris Falas, Haris Falas Cyprus, Sports Scientist, CSCS coach, evidence-based training, human-made workouts, fitness calculators, 1RM calculator, BMR calculator, macro calculator, online gym membership, Gold Plan, Platinum Plan, smartygym.com, gym reimagined, train anywhere, flexible training, convenient fitness, virtual gym, digital gym, online coaching, Cyprus gym, Limassol gym, Nicosia gym, exercise library, fitness tools, online personal training" />
+    <meta name="author" content="Haris Falas - SmartyGym" />
+    
+    <!-- Canonical & Alternates -->
     <link rel="canonical" href="https://smartygym.com/" />
-
+    <link rel="alternate" hreflang="en-GB" href="https://smartygym.com/" />
+    <link rel="alternate" hreflang="en-US" href="https://smartygym.com/" />
+    <link rel="alternate" hreflang="x-default" href="https://smartygym.com/" />
     
-    
+    <!-- Open Graph / Facebook -->
     <meta property="og:type" content="website" />
     <meta property="og:url" content="https://smartygym.com/" />
+    <meta property="og:title" content="SmartyGym | Online Gym Cyprus | 100% Human-Made Workouts | Haris Falas" />
+    <meta property="og:description" content="Cyprus' leading online gym. 100+ workouts, training programs by Sports Scientist Haris Falas. AMRAP, TABATA, HIIT, strength, cardio. Train anywhere, anytime at smartygym.com" />
     <meta property="og:image" content="https://smartygym.com/smarty-gym-logo.png" />
-    <meta property="og:site_name" content="Smarty Gym" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:site_name" content="SmartyGym" />
+    <meta property="og:locale" content="en_GB" />
 
+    <!-- Twitter / X -->
     <meta name="twitter:card" content="summary_large_image" />
-    
-    
+    <meta name="twitter:site" content="@smartygym" />
+    <meta name="twitter:creator" content="@harisfalas" />
+    <meta name="twitter:title" content="SmartyGym | Online Gym Cyprus | Workouts & Training Programs" />
+    <meta name="twitter:description" content="100+ online gym workouts & programs by Sports Scientist Haris Falas. Train anywhere, anytime with science-based fitness at smartygym.com" />
     <meta name="twitter:image" content="https://smartygym.com/smarty-gym-logo.png" />
     
-    <link rel="apple-touch-icon" href="/smarty-gym-logo.png" />
-    <meta property="og:title" content="Smarty Gym | Online Fitness Platform | smartygym.com">
-  <meta name="twitter:title" content="Smarty Gym | Online Fitness Platform | smartygym.com">
-  <meta property="og:description" content="Smarty Gym - Your smart gym for online fitness. Train anywhere, anytime with science-based workouts by Sports Scientist Haris Falas. Free workouts &amp; premium programs at smartygym.com">
-  <meta name="twitter:description" content="Smarty Gym - Your smart gym for online fitness. Train anywhere, anytime with science-based workouts by Sports Scientist Haris Falas. Free workouts &amp; premium programs at smartygym.com">
-</head>
+    <!-- Entity Recognition for AI Search -->
+    <meta property="schema:entity" content="SmartyGym" />
+    <meta property="schema:entity" content="Haris Falas" />
+    <meta property="schema:entity" content="Online Fitness" />
+    <meta property="schema:entity" content="Cyprus Gym" />
+    
+    <!-- Knowledge Graph Signals -->
+    <meta property="kg:topic" content="online fitness training" />
+    <meta property="kg:topic" content="gym workouts" />
+    <meta property="kg:topic" content="training programs" />
+    <meta property="kg:expertise" content="sports science" />
+    <meta property="kg:expertise" content="strength conditioning" />
+    <meta property="kg:location" content="Cyprus" />
+    <meta property="kg:founder" content="Haris Falas" />
+  </head>
 
   <body>
     <div id="root"></div>
