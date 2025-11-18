@@ -53,7 +53,7 @@ import AdminBackoffice from "./pages/AdminBackoffice";
 import MigrateContent from "./pages/MigrateContent";
 import ProcessLogo from "./pages/ProcessLogo";
 import { AccessGate } from "./components/AccessGate";
-import { WhatsAppButton } from "./components/WhatsAppButton";
+
 import { InstallPWA } from "./components/InstallPWA";
 import { PageTransition } from "./components/PageTransition";
 import { LoadingBar } from "./components/LoadingBar";
@@ -72,7 +72,6 @@ const AppContent = () => {
       <CookieConsent />
       <InstallPWA />
       <AccessControlProvider>
-        <WhatsAppButton />
         <ScrollToTop />
         <div className="flex flex-col min-h-screen">
           <Navigation />
