@@ -33,12 +33,14 @@ import {
   Headphones,
   Sparkles,
   Quote,
-  User as UserIcon
+  User as UserIcon,
+  Scale
 } from "lucide-react";
 import { LogBookFilters } from "@/components/logbook/LogBookFilters";
 import { LogBookCalendar } from "@/components/logbook/LogBookCalendar";
 import { LogBookEnhancedCharts } from "@/components/logbook/LogBookEnhancedCharts";
 import { LogBookExport } from "@/components/logbook/LogBookExport";
+import { MeasurementDialog } from "@/components/logbook/MeasurementDialog";
 
 interface WorkoutInteraction {
   id: string;
@@ -133,13 +135,15 @@ export default function UserDashboard() {
   const [oneRMHistory, setOneRMHistory] = useState<OneRMRecord[]>([]);
   const [bmrHistory, setBMRHistory] = useState<BMRRecord[]>([]);
   const [calorieHistory, setCalorieHistory] = useState<CalorieRecord[]>([]);
+  const [measurementHistory, setMeasurementHistory] = useState<any[]>([]);
+  const [isMeasurementDialogOpen, setIsMeasurementDialogOpen] = useState(false);
   
   // Get tab from URL or default to "overview"
   const tabParam = searchParams.get('tab');
   const [activeTab, setActiveTab] = useState(tabParam || 'overview');
   
   // LogBook filter state
-  const [logBookFilter, setLogBookFilter] = useState<'all' | 'workout' | 'program' | 'tool'>('all');
+  const [logBookFilter, setLogBookFilter] = useState<'all' | 'workout' | 'program' | 'tool' | 'measurement'>('all');
   
   // Fetch user purchases
   const { data: purchases = [], isLoading: purchasesLoading } = usePurchases(user?.id);
@@ -1540,9 +1544,54 @@ export default function UserDashboard() {
                     </div>
                   )}
                 </CardContent>
-              </Card>
-            </div>
-          </TabsContent>
+                    </Card>
+
+                    {/* Measurements */}
+                    <Card>
+                      <CardHeader className="pb-0 pt-3">
+                        <CardTitle className="text-sm font-medium flex items-center gap-2">
+                          <Scale className="h-4 w-4" />
+                          Measurements
+                        </CardTitle>
+                      </CardHeader>
+                      <CardContent className="py-2 px-3">
+                        {measurementHistory.length === 0 ? (
+                          <div className="text-center py-1">
+                            <p className="text-xs text-muted-foreground mb-2">No measurements yet</p>
+                            <Button size="sm" variant="outline" onClick={() => setIsMeasurementDialogOpen(true)}>
+                              Add Measurement
+                            </Button>
+                          </div>
+                        ) : (
+                          <div className="space-y-0.5">
+                            {measurementHistory.slice(0, 3).map((record) => (
+                              <div key={record.id} className="p-1 bg-muted rounded text-xs">
+                                <div className="font-semibold">
+                                  {record.tool_result?.weight && `${record.tool_result.weight} kg`}
+                                  {record.tool_result?.weight && (record.tool_result?.body_fat || record.tool_result?.muscle_mass) && ' | '}
+                                  {record.tool_result?.body_fat && `BF: ${record.tool_result.body_fat}%`}
+                                  {record.tool_result?.body_fat && record.tool_result?.muscle_mass && ' | '}
+                                  {record.tool_result?.muscle_mass && `MM: ${record.tool_result.muscle_mass} kg`}
+                                </div>
+                                <div className="text-muted-foreground mt-1">
+                                  {formatDate(record.created_at)}
+                                </div>
+                              </div>
+                            ))}
+                            <Button 
+                              size="sm" 
+                              variant="outline" 
+                              className="w-full mt-1"
+                              onClick={() => setIsMeasurementDialogOpen(true)}
+                            >
+                              View All / Add New
+                            </Button>
+                          </div>
+                        )}
+                      </CardContent>
+                    </Card>
+                  </div>
+                </TabsContent>
 
           {/* LogBook Tab */}
           <TabsContent value="logbook" className="space-y-6">
@@ -1684,7 +1733,7 @@ export default function UserDashboard() {
                 {/* Calculator History */}
                 <div>
                   <h3 className="text-lg font-semibold mb-2">Calculator History</h3>
-                  <div className="grid gap-2 md:grid-cols-3 mb-3">
+                  <div className="grid gap-2 md:grid-cols-4 mb-3">
                     {/* 1RM Calculator */}
                     <Card>
                       <CardHeader className="pb-0 pt-3">

@@ -1,7 +1,7 @@
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Dumbbell, Calendar, User, Calculator } from "lucide-react";
+import { Dumbbell, Calendar, User, Calculator, Scale } from "lucide-react";
 import { useActivityLog } from "@/hooks/useActivityLog";
 import { format } from "date-fns";
 
@@ -22,6 +22,7 @@ export const DailyActivityModal = ({ date, isOpen, onClose, userId }: DailyActiv
   const programs = dayActivities.filter(a => a.content_type === 'program');
   const personalTraining = dayActivities.filter(a => a.content_type === 'personal_training');
   const tools = dayActivities.filter(a => a.content_type === 'tool');
+  const measurements = dayActivities.filter(a => a.content_type === 'measurement');
 
   const getBadgeVariant = (actionType: string): "default" | "secondary" | "outline" => {
     if (actionType.includes('completed')) return 'default';
@@ -171,7 +172,7 @@ export const DailyActivityModal = ({ date, isOpen, onClose, userId }: DailyActiv
             {tools.length > 0 && (
               <div>
                 <h3 className="font-semibold mb-3 flex items-center gap-2">
-                  <Calculator className="h-4 w-4 text-purple-500" />
+                  <Calculator className="h-4 w-4 text-orange-500" />
                   Calculator Tools ({tools.length})
                 </h3>
                 <div className="space-y-2">
@@ -194,9 +195,47 @@ export const DailyActivityModal = ({ date, isOpen, onClose, userId }: DailyActiv
                               {format(new Date(activity.created_at), 'h:mm a')}
                             </p>
                           </div>
-                          <Badge variant="outline" className="bg-purple-500/10">
+                          <Badge variant="outline" className="bg-orange-500/10">
                             Calculated
                           </Badge>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Measurements Section */}
+            {measurements.length > 0 && (
+              <div>
+                <h3 className="font-semibold mb-3 flex items-center gap-2">
+                  <Scale className="h-4 w-4 text-purple-500" />
+                  Measurements ({measurements.length})
+                </h3>
+                <div className="space-y-2">
+                  {measurements.map(activity => (
+                    <Card key={activity.id}>
+                      <CardContent className="p-3">
+                        <div className="flex items-center justify-between">
+                          <div className="flex-1">
+                            <p className="font-medium">Body Measurements</p>
+                            <div className="text-sm text-muted-foreground mt-1 space-y-0.5">
+                              {activity.tool_result?.weight && (
+                                <p>Weight: {activity.tool_result.weight} kg</p>
+                              )}
+                              {activity.tool_result?.body_fat && (
+                                <p>Body Fat: {activity.tool_result.body_fat}%</p>
+                              )}
+                              {activity.tool_result?.muscle_mass && (
+                                <p>Muscle Mass: {activity.tool_result.muscle_mass} kg</p>
+                              )}
+                            </div>
+                            <p className="text-xs text-muted-foreground mt-1">
+                              {format(new Date(activity.created_at), 'h:mm a')}
+                            </p>
+                          </div>
+                          <Badge variant="outline">Recorded</Badge>
                         </div>
                       </CardContent>
                     </Card>
