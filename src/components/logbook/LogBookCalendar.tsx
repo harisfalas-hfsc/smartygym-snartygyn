@@ -79,6 +79,8 @@ export const LogBookCalendar = ({ userId, filter }: LogBookCalendarProps) => {
         }
       } else if (activity.content_type === 'tool') {
         badges.add('tool');
+      } else if (activity.content_type === 'measurement') {
+        badges.add('measurement');
       }
     });
 
@@ -98,6 +100,7 @@ export const LogBookCalendar = ({ userId, filter }: LogBookCalendarProps) => {
       'pt-ongoing': 'bg-orange-400',
       'pt-completed': 'bg-purple-500',
       'tool': 'bg-pink-500',
+      'measurement': 'bg-purple-500',
     };
     return colors[badge] || 'bg-gray-400';
   };
@@ -222,6 +225,10 @@ export const LogBookCalendar = ({ userId, filter }: LogBookCalendarProps) => {
               <div className="flex items-center gap-2">
                 <div className="w-3 h-3 rounded-full bg-pink-500" />
                 <span>Tool Used</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <div className="w-3 h-3 rounded-full bg-purple-500" />
+                <span>Measurement</span>
               </div>
             </div>
           </div>

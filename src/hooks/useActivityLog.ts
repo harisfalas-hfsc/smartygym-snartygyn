@@ -5,10 +5,10 @@ import { toast } from "sonner";
 export interface ActivityLog {
   id: string;
   user_id: string;
-  content_type: 'workout' | 'program' | 'personal_training' | 'tool';
+  content_type: 'workout' | 'program' | 'personal_training' | 'tool' | 'measurement';
   item_id: string;
   item_name: string;
-  action_type: 'viewed' | 'completed' | 'calculated' | 'program_started' | 'program_day_completed' | 'pt_started' | 'pt_day_completed' | 'program_day_viewed' | 'pt_day_viewed' | 'missed';
+  action_type: 'viewed' | 'completed' | 'calculated' | 'program_started' | 'program_day_completed' | 'pt_started' | 'pt_day_completed' | 'program_day_viewed' | 'pt_day_viewed' | 'missed' | 'recorded';
   program_week?: number;
   program_day?: number;
   total_weeks?: number;
