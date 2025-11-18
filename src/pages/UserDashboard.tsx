@@ -1876,32 +1876,29 @@ export default function UserDashboard() {
                 </div>
 
                 
-                <LogBookFilters 
-                  activeFilter={logBookFilter} 
-                  onFilterChange={setLogBookFilter} 
-                />
-                
+                {/* Calendar - Always shows ALL activity */}
                 <div id="logbook-calendar">
                   <LogBookCalendar 
                     userId={user!.id} 
-                    filter={logBookFilter}
+                    filter="all"
                   />
                 </div>
                 
-                  <div id="logbook-charts">
-                    <LogBookAdvancedCharts 
-                      userId={user!.id} 
-                      primaryFilter={logBookFilter}
-                      secondaryFilter={logBookSecondaryFilter}
-                      onSecondaryFilterChange={setLogBookSecondaryFilter}
-                      timeFilter={logBookTimeFilter}
-                      onTimeFilterChange={setLogBookTimeFilter}
-                      customStartDate={logBookCustomStartDate}
-                      onCustomStartDateChange={setLogBookCustomStartDate}
-                      customEndDate={logBookCustomEndDate}
-                      onCustomEndDateChange={setLogBookCustomEndDate}
-                    />
-                  </div>
+                <div id="logbook-charts">
+                  <LogBookAdvancedCharts 
+                    userId={user!.id} 
+                    primaryFilter={logBookFilter}
+                    onPrimaryFilterChange={setLogBookFilter}
+                    secondaryFilter={logBookSecondaryFilter}
+                    onSecondaryFilterChange={setLogBookSecondaryFilter}
+                    timeFilter={logBookTimeFilter}
+                    onTimeFilterChange={setLogBookTimeFilter}
+                    customStartDate={logBookCustomStartDate}
+                    onCustomStartDateChange={setLogBookCustomStartDate}
+                    customEndDate={logBookCustomEndDate}
+                    onCustomEndDateChange={setLogBookCustomEndDate}
+                  />
+                </div>
 
                   <LogBookAdvancedExport 
                     userId={user!.id} 
