@@ -449,7 +449,7 @@ const Contact = () => {
                         value={formData.message}
                         onChange={handleChange}
                         placeholder="Tell us how we can help you..."
-                        rows={12}
+                        rows={6}
                         className={cn("resize-none", errors.message ? "border-destructive" : "")}
                       />
                       {errors.message && (
@@ -530,22 +530,6 @@ const Contact = () => {
 
             {/* Contact Info */}
             <div className="space-y-6 flex flex-col h-full">
-              <Card>
-                <CardHeader>
-                  <CardTitle>Email Us</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-sm text-muted-foreground mb-2">
-                    For general inquiries and support
-                  </p>
-                  <a href="mailto:admin@smartygym.com" className="text-primary hover:underline font-semibold">
-                    admin@smartygym.com
-                  </a>
-                  <p className="text-xs text-muted-foreground mt-2">
-                    Direct contact with <a href="/coach-profile" className="text-primary hover:underline font-medium"><strong>Haris Falas</strong></a> and the team
-                  </p>
-                </CardContent>
-              </Card>
 
               {hasSubscription ? (
                 <form onSubmit={handleCoachSubmit} className="h-full">
