@@ -742,23 +742,10 @@ const WorkoutDetail = () => {
                     </div>
                   )}
                   
-                  {/* Workout Info Badges - Same as Training Programs */}
-                  <div className="flex gap-1 text-[10px] mt-2">
-                    <span 
-                      className="bg-primary/20 text-primary border border-primary/40 px-1.5 py-0.5 rounded-full whitespace-nowrap"
-                    >
-                      Single Session
-                    </span>
-                    <span className="bg-green-500/20 text-green-700 dark:text-green-400 border border-green-500/40 px-1.5 py-0.5 rounded-full whitespace-nowrap">
-                      {workout.difficulty || "Intermediate"}
-                    </span>
-                    <span className="bg-orange-500/20 text-orange-700 dark:text-orange-400 border border-orange-500/40 px-1.5 py-0.5 rounded-full whitespace-nowrap">
-                      {workout.equipment || "Equipment"}
-                    </span>
-                  </div>
-
-                  {/* Access Badge - Below badges */}
-                  <div className="flex items-center gap-2 mt-2">
+                  {/* Access Badge */}
+                  <div className="flex items-center gap-2">
+                    <span className="text-xs text-muted-foreground">{workout.duration}</span>
+                    <span className="text-xs text-muted-foreground">•</span>
                     {workout.is_premium ? (
                       workout.is_standalone_purchase && workout.price ? (
                         <span className="inline-flex items-center gap-1 bg-gradient-to-r from-green-500 to-emerald-600 text-white text-xs font-semibold px-2 py-1 rounded-full">
