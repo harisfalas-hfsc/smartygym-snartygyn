@@ -1,7 +1,7 @@
 import { Helmet } from "react-helmet";
 import { Card } from "@/components/ui/card";
 import { AlertTriangle, Heart, Scale, Shield, Users, FileCheck } from "lucide-react";
-import { BackToTop } from "@/components/BackToTop";
+
 import { ParQQuestionnaire } from "@/components/ParQQuestionnaire";
 
 const Disclaimer = () => {
@@ -19,7 +19,7 @@ const Disclaimer = () => {
       </Helmet>
 
       <div className="min-h-screen bg-background">
-        <BackToTop />
+        
         <div className="container mx-auto px-4 py-16 max-w-4xl">
           <div className="flex items-center gap-3 mb-8">
             <AlertTriangle className="h-10 w-10 text-primary" />

@@ -1,7 +1,7 @@
 import { Helmet } from "react-helmet";
 import { Card } from "@/components/ui/card";
 import { FileText, UserCheck, CreditCard, Shield, AlertTriangle, Scale } from "lucide-react";
-import { BackToTop } from "@/components/BackToTop";
+
 
 const TermsOfService = () => {
   return (
@@ -18,7 +18,7 @@ const TermsOfService = () => {
       </Helmet>
 
       <div className="min-h-screen bg-background">
-        <BackToTop />
+        
         <div className="container mx-auto px-4 py-16 max-w-4xl">
           <div className="flex items-center gap-3 mb-8">
             <FileText className="h-10 w-10 text-primary" />

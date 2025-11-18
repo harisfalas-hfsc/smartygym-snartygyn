@@ -5,7 +5,7 @@ import { Card } from "@/components/ui/card";
 import { PageBreadcrumbs } from "@/components/PageBreadcrumbs";
 import { InfoRibbon } from "@/components/InfoRibbon";
 import { ArrowLeft, Heart, Dumbbell, Activity, Flame, User, Move, Scale } from "lucide-react";
-import { BackToTop } from "@/components/BackToTop";
+
 
 import { useAccessControl } from "@/hooks/useAccessControl";
 import { useShowBackButton } from "@/hooks/useShowBackButton";
@@ -92,7 +92,7 @@ const TrainingProgramFlow = () => {
       </Helmet>
       
       <div className="min-h-screen bg-background">
-      <BackToTop />
+      
       <div className="container mx-auto max-w-6xl px-4 py-8">
         {canGoBack && (
           <div className="mb-6">

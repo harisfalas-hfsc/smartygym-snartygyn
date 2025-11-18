@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { PageBreadcrumbs } from "@/components/PageBreadcrumbs";
 import { ArrowLeft, Youtube } from "lucide-react";
-import { BackToTop } from "@/components/BackToTop";
+
 import { useShowBackButton } from "@/hooks/useShowBackButton";
 
 const ExerciseLibrary = () => {
@@ -31,7 +31,7 @@ const ExerciseLibrary = () => {
       </Helmet>
       
       <div className="min-h-screen bg-background">
-        <BackToTop />
+        
         <div className="container mx-auto max-w-6xl px-4 py-8">
           {canGoBack && (
             <div className="mb-6">
