@@ -1544,53 +1544,8 @@ export default function UserDashboard() {
                     </div>
                   )}
                 </CardContent>
-                    </Card>
-
-                    {/* Measurements */}
-                    <Card>
-                      <CardHeader className="pb-0 pt-3">
-                        <CardTitle className="text-sm font-medium flex items-center gap-2">
-                          <Scale className="h-4 w-4" />
-                          Measurements
-                        </CardTitle>
-                      </CardHeader>
-                      <CardContent className="py-2 px-3">
-                        {measurementHistory.length === 0 ? (
-                          <div className="text-center py-1">
-                            <p className="text-xs text-muted-foreground mb-2">No measurements yet</p>
-                            <Button size="sm" variant="outline" onClick={() => setIsMeasurementDialogOpen(true)}>
-                              Add Measurement
-                            </Button>
-                          </div>
-                        ) : (
-                          <div className="space-y-0.5">
-                            {measurementHistory.slice(0, 3).map((record) => (
-                              <div key={record.id} className="p-1 bg-muted rounded text-xs">
-                                <div className="font-semibold">
-                                  {record.tool_result?.weight && `${record.tool_result.weight} kg`}
-                                  {record.tool_result?.weight && (record.tool_result?.body_fat || record.tool_result?.muscle_mass) && ' | '}
-                                  {record.tool_result?.body_fat && `BF: ${record.tool_result.body_fat}%`}
-                                  {record.tool_result?.body_fat && record.tool_result?.muscle_mass && ' | '}
-                                  {record.tool_result?.muscle_mass && `MM: ${record.tool_result.muscle_mass} kg`}
-                                </div>
-                                <div className="text-muted-foreground mt-1">
-                                  {formatDate(record.created_at)}
-                                </div>
-                              </div>
-                            ))}
-                            <Button 
-                              size="sm" 
-                              variant="outline" 
-                              className="w-full mt-1"
-                              onClick={() => setIsMeasurementDialogOpen(true)}
-                            >
-                              View All / Add New
-                            </Button>
-                          </div>
-                        )}
-                      </CardContent>
-                    </Card>
-                  </div>
+            </Card>
+          </div>
                 </TabsContent>
 
           {/* LogBook Tab */}
@@ -1859,6 +1814,51 @@ export default function UserDashboard() {
                         )}
                       </CardContent>
                     </Card>
+
+                    {/* Measurements */}
+                    <Card>
+                      <CardHeader className="pb-0 pt-3">
+                        <CardTitle className="text-sm font-medium flex items-center gap-2">
+                          <Scale className="h-4 w-4 text-primary" />
+                          Measurements
+                        </CardTitle>
+                      </CardHeader>
+                      <CardContent className="py-2 px-3">
+                        {measurementHistory.length === 0 ? (
+                          <div className="text-center py-1">
+                            <p className="text-xs text-muted-foreground mb-2">Track your body measurements</p>
+                            <Button size="sm" variant="outline" onClick={() => setIsMeasurementDialogOpen(true)}>
+                              Add Measurement
+                            </Button>
+                          </div>
+                        ) : (
+                          <div className="space-y-0.5">
+                            {measurementHistory.slice(0, 3).map((record) => (
+                              <div key={record.id} className="p-1 bg-muted rounded text-xs">
+                                <div className="font-semibold">
+                                  {record.tool_result?.weight && `${record.tool_result.weight} kg`}
+                                  {record.tool_result?.weight && (record.tool_result?.body_fat || record.tool_result?.muscle_mass) && ' | '}
+                                  {record.tool_result?.body_fat && `BF: ${record.tool_result.body_fat}%`}
+                                  {record.tool_result?.body_fat && record.tool_result?.muscle_mass && ' | '}
+                                  {record.tool_result?.muscle_mass && `MM: ${record.tool_result.muscle_mass} kg`}
+                                </div>
+                                <div className="text-muted-foreground mt-1">
+                                  {formatDate(record.created_at)}
+                                </div>
+                              </div>
+                            ))}
+                            <Button 
+                              size="sm" 
+                              variant="outline" 
+                              className="w-full mt-1"
+                              onClick={() => setIsMeasurementDialogOpen(true)}
+                            >
+                              View All / Add New
+                            </Button>
+                          </div>
+                        )}
+                      </CardContent>
+                    </Card>
                   </div>
                 </div>
 
@@ -1891,6 +1891,12 @@ export default function UserDashboard() {
           </TabsContent>
         </Tabs>
       </main>
+
+      <MeasurementDialog
+        isOpen={isMeasurementDialogOpen}
+        onClose={() => setIsMeasurementDialogOpen(false)}
+        userId={user?.id || ''}
+      />
     </div>
   );
 }
