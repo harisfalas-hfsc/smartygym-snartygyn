@@ -34,10 +34,8 @@ import {
   Quote,
   User as UserIcon
 } from "lucide-react";
-import { LogBookStats } from "@/components/logbook/LogBookStats";
 import { LogBookFilters } from "@/components/logbook/LogBookFilters";
 import { LogBookCalendar } from "@/components/logbook/LogBookCalendar";
-import { LogBookComparison } from "@/components/logbook/LogBookComparison";
 import { LogBookEnhancedCharts } from "@/components/logbook/LogBookEnhancedCharts";
 import { LogBookExport } from "@/components/logbook/LogBookExport";
 
@@ -1560,9 +1558,246 @@ export default function UserDashboard() {
               </Card>
             ) : (
               <>
-                <LogBookStats userId={user!.id} />
-                
-                <LogBookComparison userId={user!.id} />
+                {/* Workout Activity Stats */}
+                <div>
+                  <h3 className="text-lg font-semibold mb-4">Workout Activity</h3>
+                  <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4 mb-6">
+                    <Card>
+                      <CardHeader className="pb-3">
+                        <CardTitle className="text-sm font-medium flex items-center gap-2">
+                          <Heart className="h-4 w-4 text-red-500" />
+                          Favorites
+                        </CardTitle>
+                      </CardHeader>
+                      <CardContent>
+                        <div className="text-2xl font-bold">{favoriteWorkouts.length}</div>
+                      </CardContent>
+                    </Card>
+
+                    <Card>
+                      <CardHeader className="pb-3">
+                        <CardTitle className="text-sm font-medium flex items-center gap-2">
+                          <CheckCircle className="h-4 w-4 text-green-500" />
+                          Completed
+                        </CardTitle>
+                      </CardHeader>
+                      <CardContent>
+                        <div className="text-2xl font-bold">{completedWorkouts.length}</div>
+                      </CardContent>
+                    </Card>
+
+                    <Card>
+                      <CardHeader className="pb-3">
+                        <CardTitle className="text-sm font-medium flex items-center gap-2">
+                          <Clock className="h-4 w-4 text-blue-500" />
+                          Viewed
+                        </CardTitle>
+                      </CardHeader>
+                      <CardContent>
+                        <div className="text-2xl font-bold">{viewedWorkouts.length}</div>
+                      </CardContent>
+                    </Card>
+
+                    <Card>
+                      <CardHeader className="pb-3">
+                        <CardTitle className="text-sm font-medium flex items-center gap-2">
+                          <Star className="h-4 w-4 text-yellow-500" />
+                          Rated
+                        </CardTitle>
+                      </CardHeader>
+                      <CardContent>
+                        <div className="text-2xl font-bold">{ratedWorkouts.length}</div>
+                      </CardContent>
+                    </Card>
+                  </div>
+                </div>
+
+                {/* Program Activity Stats */}
+                <div>
+                  <h3 className="text-lg font-semibold mb-4">Program Activity</h3>
+                  <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4 mb-6">
+                    <Card>
+                      <CardHeader className="pb-3">
+                        <CardTitle className="text-sm font-medium flex items-center gap-2">
+                          <Heart className="h-4 w-4 text-red-500" />
+                          Favorites
+                        </CardTitle>
+                      </CardHeader>
+                      <CardContent>
+                        <div className="text-2xl font-bold">{favoritePrograms.length}</div>
+                      </CardContent>
+                    </Card>
+
+                    <Card>
+                      <CardHeader className="pb-3">
+                        <CardTitle className="text-sm font-medium flex items-center gap-2">
+                          <CheckCircle className="h-4 w-4 text-green-500" />
+                          Completed
+                        </CardTitle>
+                      </CardHeader>
+                      <CardContent>
+                        <div className="text-2xl font-bold">{completedPrograms.length}</div>
+                      </CardContent>
+                    </Card>
+
+                    <Card>
+                      <CardHeader className="pb-3">
+                        <CardTitle className="text-sm font-medium flex items-center gap-2">
+                          <Clock className="h-4 w-4 text-blue-500" />
+                          Viewed
+                        </CardTitle>
+                      </CardHeader>
+                      <CardContent>
+                        <div className="text-2xl font-bold">{viewedPrograms.length}</div>
+                      </CardContent>
+                    </Card>
+
+                    <Card>
+                      <CardHeader className="pb-3">
+                        <CardTitle className="text-sm font-medium flex items-center gap-2">
+                          <Star className="h-4 w-4 text-yellow-500" />
+                          Rated
+                        </CardTitle>
+                      </CardHeader>
+                      <CardContent>
+                        <div className="text-2xl font-bold">{ratedPrograms.length}</div>
+                      </CardContent>
+                    </Card>
+                  </div>
+                </div>
+
+                {/* Calculator History */}
+                <div>
+                  <h3 className="text-lg font-semibold mb-4">Calculator History</h3>
+                  <div className="grid gap-6 md:grid-cols-3 mb-6">
+                    {/* 1RM Calculator */}
+                    <Card>
+                      <CardHeader>
+                        <CardTitle className="text-sm font-medium">1RM Calculator</CardTitle>
+                      </CardHeader>
+                      <CardContent>
+                        {oneRMHistory.length === 0 ? (
+                          <div className="text-center py-4">
+                            <p className="text-xs text-muted-foreground mb-2">No history yet</p>
+                            <Button size="sm" variant="outline" onClick={() => navigate("/1rmcalculator")}>
+                              Calculate Now
+                            </Button>
+                          </div>
+                        ) : (
+                          <div className="space-y-2">
+                            {oneRMHistory.slice(0, 3).map((record) => (
+                              <div key={record.id} className="p-2 bg-muted rounded text-xs">
+                                <div className="font-semibold">{record.one_rm_result.toFixed(1)} kg</div>
+                                {record.exercise_name && (
+                                  <div className="text-muted-foreground">{record.exercise_name}</div>
+                                )}
+                                <div className="text-muted-foreground">
+                                  {record.weight_lifted}kg × {record.reps} reps
+                                </div>
+                                <div className="text-muted-foreground mt-1">
+                                  {formatDate(record.created_at)}
+                                </div>
+                              </div>
+                            ))}
+                            <Button 
+                              size="sm" 
+                              variant="outline" 
+                              className="w-full mt-2"
+                              onClick={() => navigate("/1rmcalculator")}
+                            >
+                              View All / Add New
+                            </Button>
+                          </div>
+                        )}
+                      </CardContent>
+                    </Card>
+
+                    {/* BMR Calculator */}
+                    <Card>
+                      <CardHeader>
+                        <CardTitle className="text-sm font-medium">BMR Calculator</CardTitle>
+                      </CardHeader>
+                      <CardContent>
+                        {bmrHistory.length === 0 ? (
+                          <div className="text-center py-4">
+                            <p className="text-xs text-muted-foreground mb-2">No history yet</p>
+                            <Button size="sm" variant="outline" onClick={() => navigate("/bmrcalculator")}>
+                              Calculate Now
+                            </Button>
+                          </div>
+                        ) : (
+                          <div className="space-y-2">
+                            {bmrHistory.slice(0, 3).map((record) => (
+                              <div key={record.id} className="p-2 bg-muted rounded text-xs">
+                                <div className="font-semibold">{record.bmr_result} cal/day</div>
+                                <div className="text-muted-foreground">
+                                  {record.age}y • {record.weight}kg • {record.height}cm
+                                </div>
+                                <div className="text-muted-foreground capitalize">
+                                  {record.gender}
+                                </div>
+                                <div className="text-muted-foreground mt-1">
+                                  {formatDate(record.created_at)}
+                                </div>
+                              </div>
+                            ))}
+                            <Button 
+                              size="sm" 
+                              variant="outline" 
+                              className="w-full mt-2"
+                              onClick={() => navigate("/bmrcalculator")}
+                            >
+                              View All / Add New
+                            </Button>
+                          </div>
+                        )}
+                      </CardContent>
+                    </Card>
+
+                    {/* Macro Calculator */}
+                    <Card>
+                      <CardHeader>
+                        <CardTitle className="text-sm font-medium">Macro Calculator</CardTitle>
+                      </CardHeader>
+                      <CardContent>
+                        {calorieHistory.length === 0 ? (
+                          <div className="text-center py-4">
+                            <p className="text-xs text-muted-foreground mb-2">No history yet</p>
+                            <Button size="sm" variant="outline" onClick={() => navigate("/macrocalculator")}>
+                              Calculate Now
+                            </Button>
+                          </div>
+                        ) : (
+                          <div className="space-y-2">
+                            {calorieHistory.slice(0, 3).map((record) => (
+                              <div key={record.id} className="p-2 bg-muted rounded text-xs">
+                                <div className="font-semibold">{record.target_calories} cal/day</div>
+                                <div className="text-muted-foreground capitalize">
+                                  Goal: {record.goal.replace('_', ' ')}
+                                </div>
+                                <div className="text-muted-foreground">
+                                  Maintenance: {record.maintenance_calories} cal
+                                </div>
+                                <div className="text-muted-foreground mt-1">
+                                  {formatDate(record.created_at)}
+                                </div>
+                              </div>
+                            ))}
+                            <Button 
+                              size="sm" 
+                              variant="outline" 
+                              className="w-full mt-2"
+                              onClick={() => navigate("/macrocalculator")}
+                            >
+                              View All / Add New
+                            </Button>
+                          </div>
+                        )}
+                      </CardContent>
+                    </Card>
+                  </div>
+                </div>
+
                 
                 <LogBookFilters 
                   activeFilter={logBookFilter} 
