@@ -23,36 +23,48 @@ const WorkoutFlow = () => {
       title: "Strength",
       description: "Build muscle and power with resistance training",
       icon: Dumbbell,
+      level: "Beginner-Advanced",
+      equipment: "Equipment/No Equipment",
     },
     {
       id: "calorie-burning",
       title: "Calorie Burning",
       description: "High-intensity workouts to maximize calorie burn",
       icon: Flame,
+      level: "Beginner-Advanced",
+      equipment: "Equipment/No Equipment",
     },
     {
       id: "metabolic",
       title: "Metabolic",
       description: "Boost your metabolism with dynamic conditioning",
       icon: Zap,
+      level: "Beginner-Advanced",
+      equipment: "Equipment/No Equipment",
     },
     {
       id: "cardio",
       title: "Cardio",
       description: "Improve cardiovascular endurance and stamina",
       icon: Heart,
+      level: "Beginner-Advanced",
+      equipment: "Equipment/No Equipment",
     },
     {
       id: "mobility",
       title: "Mobility & Stability",
       description: "Enhance flexibility and movement quality",
       icon: Move,
+      level: "Beginner-Advanced",
+      equipment: "Equipment/No Equipment",
     },
     {
       id: "challenge",
       title: "Challenge",
       description: "Push your limits with advanced workouts",
       icon: Activity,
+      level: "Beginner-Advanced",
+      equipment: "Equipment/No Equipment",
     },
   ];
 
@@ -136,20 +148,35 @@ const WorkoutFlow = () => {
                       >
                         {workout.description}
                       </p>
-                      <p className="text-xs text-muted-foreground/80 italic">
-                        Crafted by{" "}
-                        <a 
-                          href="/coach-profile" 
-                          className="text-primary hover:underline font-medium whitespace-nowrap"
-                          onClick={(e) => e.stopPropagation()}
-                        >
-                          Haris Falas
-                        </a>
-                        {" "}BSc Sports Science, EXOS Specialist, CSCS
-                      </p>
-                      <meta itemProp="exerciseType" content={workout.title} />
-                      <meta itemProp="provider" content="Smarty Gym Cyprus - Online Gym - smartygym.com" />
-                      <meta itemProp="audience" content="All fitness levels" />
+              <p className="text-xs text-muted-foreground/80 italic">
+                Crafted by{" "}
+                <a 
+                  href="/coach-profile" 
+                  className="text-primary hover:underline font-medium whitespace-nowrap"
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  Haris Falas
+                </a>
+                {" "}BSc Sports Science, EXOS Specialist, CSCS
+              </p>
+              
+              <div className="flex gap-1 text-[10px] mt-2">
+                <span 
+                  className="bg-primary/20 text-primary border border-primary/40 px-1.5 py-0.5 rounded-full whitespace-nowrap"
+                >
+                  Single Session
+                </span>
+                <span className="bg-green-500/20 text-green-700 dark:text-green-400 border border-green-500/40 px-1.5 py-0.5 rounded-full whitespace-nowrap">
+                  {workout.level}
+                </span>
+                <span className="bg-orange-500/20 text-orange-700 dark:text-orange-400 border border-orange-500/40 px-1.5 py-0.5 rounded-full whitespace-nowrap">
+                  {workout.equipment}
+                </span>
+              </div>
+              
+              <meta itemProp="exerciseType" content={workout.title} />
+              <meta itemProp="provider" content="Smarty Gym Cyprus - Online Gym - smartygym.com" />
+              <meta itemProp="audience" content="All fitness levels" />
                     </div>
                   </div>
                 </Card>
