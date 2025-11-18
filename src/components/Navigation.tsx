@@ -20,7 +20,6 @@ import smartyGymLogo from "@/assets/smarty-gym-logo.png";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { useUnreadMessages } from "@/hooks/useUnreadMessages";
 import { SafeNotificationBadge } from "@/components/NotificationBadge";
-import { WhatsAppButton } from "@/components/WhatsAppButton";
 
 interface SubscriptionInfo {
   subscribed: boolean;

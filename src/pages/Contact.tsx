@@ -7,13 +7,14 @@ import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { PageBreadcrumbs } from "@/components/PageBreadcrumbs";
 import { InfoRibbon } from "@/components/InfoRibbon";
-import { ArrowLeft, MessageSquare, Send, MapPin, Phone, Lock } from "lucide-react";
+import { ArrowLeft, MessageSquare, Send, MapPin, Phone, Lock, MessageCircle } from "lucide-react";
 import { BackToTop } from "@/components/BackToTop";
 import { useToast } from "@/hooks/use-toast";
 import { z } from "zod";
 import { useShowBackButton } from "@/hooks/useShowBackButton";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
+import { useAccessControl } from "@/hooks/useAccessControl";
 
 const contactSchema = z.object({
   name: z.string().trim().min(1, { message: "Name is required" }).max(100, { message: "Name must be less than 100 characters" }),
@@ -43,6 +44,16 @@ const Contact = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [hasSubscription, setHasSubscription] = useState(false);
   const [userProfile, setUserProfile] = useState<{ full_name: string; } | null>(null);
+  const { userTier } = useAccessControl();
+
+  // WhatsApp functionality
+  const phoneNumber = "+35796000620";
+  const whatsappMessage = "Hi! I'm interested in SmartyGym services.";
+  
+  const handleWhatsAppClick = () => {
+    const url = `https://wa.me/${phoneNumber.replace(/[^0-9]/g, '')}?text=${encodeURIComponent(whatsappMessage)}`;
+    window.open(url, '_blank');
+  };
 
   // Check authentication and subscription status
   useEffect(() => {
@@ -470,6 +481,24 @@ const Contact = () => {
                         <Send className="w-4 h-4 mr-2" />
                         {isCoachSubmitting ? "Sending..." : "Contact Haris"}
                       </Button>
+
+                      <div className="relative my-4">
+                        <div className="absolute inset-0 flex items-center">
+                          <span className="w-full border-t" />
+                        </div>
+                        <div className="relative flex justify-center text-xs uppercase">
+                          <span className="bg-background px-2 text-muted-foreground">or</span>
+                        </div>
+                      </div>
+
+                      <Button 
+                        onClick={handleWhatsAppClick}
+                        className="w-full bg-[#25D366] hover:bg-[#20BA5A]"
+                        type="button"
+                      >
+                        <MessageCircle className="w-4 h-4 mr-2" />
+                        Direct Communication via WhatsApp
+                      </Button>
                     </form>
                   ) : (
                     <div className="space-y-4">
@@ -489,17 +518,14 @@ const Contact = () => {
                 </CardContent>
               </Card>
 
-              <Card>
-                <CardHeader>
-                  <CardTitle className="text-lg">Response Time</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-sm text-muted-foreground">
-                    We typically respond within 24 hours during business days. Premium members receive priority support.
-                  </p>
-                </CardContent>
-              </Card>
             </div>
+          </div>
+
+          {/* Response Time Notice */}
+          <div className="mt-6 text-center">
+            <p className="text-sm text-muted-foreground">
+              We typically respond within 24 hours during business days. Premium members receive priority support.
+            </p>
           </div>
 
           {/* FAQ Quick Links */}
