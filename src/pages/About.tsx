@@ -6,6 +6,7 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/
 import { PageBreadcrumbs } from "@/components/PageBreadcrumbs";
 import { InfoRibbon } from "@/components/InfoRibbon";
 import { ArrowLeft, Award, Heart, Users, Target, UserCheck, Brain, Shield, Sparkles, Ban, CheckCircle2, Compass, Calendar } from "lucide-react";
+import harisPhoto from "@/assets/haris-falas-coach.png";
 import { BackToTop } from "@/components/BackToTop";
 import { useShowBackButton } from "@/hooks/useShowBackButton";
 import { useAccessControl } from "@/hooks/useAccessControl";
@@ -375,9 +376,13 @@ const About = () => {
             
             <CardHeader className="relative">
               <div className="flex items-center gap-4 mb-4">
-                <div className="w-20 h-20 rounded-full bg-primary/20 flex items-center justify-center">
-                  <UserCheck className="w-10 h-10 text-primary" />
-                </div>
+              <div className="w-20 h-20 rounded-full overflow-hidden border-2 border-primary/30">
+                <img 
+                  src={harisPhoto}
+                  alt="Haris Falas - Personal Coach" 
+                  className="w-full h-full object-cover"
+                />
+              </div>
                 <div>
                   <CardTitle className="text-2xl md:text-3xl">Message from Haris Falas</CardTitle>
                   <p className="text-muted-foreground">Your Personal Coach & Program Designer</p>
