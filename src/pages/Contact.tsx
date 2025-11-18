@@ -134,6 +134,24 @@ const Contact = () => {
       // Get current user session
       const { data: { session } } = await supabase.auth.getSession();
 
+      // Upload attachments if any
+      let attachmentData: any[] = [];
+      if (attachments.length > 0) {
+        setUploadingFiles(true);
+        try {
+          attachmentData = await uploadFiles(attachments);
+        } catch (error) {
+          console.error('File upload error:', error);
+          toast({
+            title: "File Upload Error",
+            description: "Some files couldn't be uploaded. Message will be sent without attachments.",
+            variant: "destructive",
+          });
+        } finally {
+          setUploadingFiles(false);
+        }
+      }
+
       // Save to database instead of sending email
       const { error } = await supabase
         .from('contact_messages')
@@ -144,7 +162,8 @@ const Contact = () => {
           subject: validatedData.subject,
           message: validatedData.message,
           category: 'general',
-          status: 'new'
+          status: 'new',
+          attachments: attachmentData
         }]);
 
       if (error) throw error;
@@ -164,6 +183,7 @@ const Contact = () => {
       } else {
         setFormData({ name: "", email: "", subject: "", message: "" });
       }
+      setAttachments([]);
     } catch (error) {
       if (error instanceof z.ZodError) {
         const fieldErrors: Record<string, string> = {};
@@ -210,6 +230,24 @@ const Contact = () => {
       // Get current user session
       const { data: { session } } = await supabase.auth.getSession();
 
+      // Upload attachments if any
+      let attachmentData: any[] = [];
+      if (coachAttachments.length > 0) {
+        setUploadingFiles(true);
+        try {
+          attachmentData = await uploadFiles(coachAttachments);
+        } catch (error) {
+          console.error('File upload error:', error);
+          toast({
+            title: "File Upload Error",
+            description: "Some files couldn't be uploaded. Message will be sent without attachments.",
+            variant: "destructive",
+          });
+        } finally {
+          setUploadingFiles(false);
+        }
+      }
+
       // Save to database instead of sending email
       const { error } = await supabase
         .from('contact_messages')
@@ -220,7 +258,8 @@ const Contact = () => {
           subject: validatedData.subject,
           message: validatedData.message,
           category: 'coach_direct',
-          status: 'new'
+          status: 'new',
+          attachments: attachmentData
         }]);
 
       if (error) throw error;
@@ -231,6 +270,7 @@ const Contact = () => {
       });
 
       setCoachFormData({ subject: "", message: "" });
+      setCoachAttachments([]);
     } catch (error) {
       if (error instanceof z.ZodError) {
         const fieldErrors: Record<string, string> = {};
@@ -410,11 +450,78 @@ const Contact = () => {
                         value={formData.message}
                         onChange={handleChange}
                         placeholder="Tell us how we can help you..."
-                        rows={6}
+                        rows={12}
                         className={errors.message ? "border-destructive" : ""}
                       />
                       {errors.message && (
                         <p className="text-sm text-destructive">{errors.message}</p>
+                      )}
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label htmlFor="attachments">
+                        Attachments <span className="text-xs text-muted-foreground">(optional, max 5 files, 10MB each)</span>
+                      </Label>
+                      <div className="flex items-center gap-2">
+                        <Button
+                          type="button"
+                          variant="outline"
+                          size="sm"
+                          onClick={() => document.getElementById('file-input')?.click()}
+                          disabled={uploadingFiles || attachments.length >= 5}
+                        >
+                          <Paperclip className="w-4 h-4 mr-2" />
+                          Attach Files
+                        </Button>
+                        <input
+                          id="file-input"
+                          type="file"
+                          multiple
+                          accept=".pdf,.doc,.docx,.txt,.jpg,.jpeg,.png"
+                          className="hidden"
+                          onChange={(e) => {
+                            const files = Array.from(e.target.files || []);
+                            if (files.length + attachments.length > 5) {
+                              toast({
+                                title: "Too many files",
+                                description: "Maximum 5 files allowed",
+                                variant: "destructive",
+                              });
+                              return;
+                            }
+                            const invalidFiles = files.filter(f => f.size > 10 * 1024 * 1024);
+                            if (invalidFiles.length > 0) {
+                              toast({
+                                title: "File too large",
+                                description: "Each file must be less than 10MB",
+                                variant: "destructive",
+                              });
+                              return;
+                            }
+                            setAttachments(prev => [...prev, ...files]);
+                          }}
+                        />
+                      </div>
+                      
+                      {attachments.length > 0 && (
+                        <div className="space-y-1 mt-2">
+                          {attachments.map((file, index) => (
+                            <div key={index} className="flex items-center justify-between text-sm bg-muted p-2 rounded">
+                              <span className="flex items-center gap-2">
+                                <Paperclip className="w-3 h-3" />
+                                {file.name} ({(file.size / 1024).toFixed(1)}KB)
+                              </span>
+                              <Button
+                                type="button"
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => setAttachments(prev => prev.filter((_, i) => i !== index))}
+                              >
+                                <X className="w-3 h-3" />
+                              </Button>
+                            </div>
+                          ))}
+                        </div>
                       )}
                     </div>
 
@@ -514,18 +621,27 @@ const Contact = () => {
                             multiple
                             accept=".pdf,.doc,.docx,.txt,.jpg,.jpeg,.png"
                             className="hidden"
-                            onChange={(e) => {
-                              const files = Array.from(e.target.files || []);
-                              if (files.length + coachAttachments.length > 5) {
-                                toast({
-                                  title: "Too many files",
-                                  description: "Maximum 5 files allowed",
-                                  variant: "destructive",
-                                });
-                                return;
-                              }
-                              setCoachAttachments(prev => [...prev, ...files]);
-                            }}
+                      onChange={(e) => {
+                        const files = Array.from(e.target.files || []);
+                        if (files.length + coachAttachments.length > 5) {
+                          toast({
+                            title: "Too many files",
+                            description: "Maximum 5 files allowed",
+                            variant: "destructive",
+                          });
+                          return;
+                        }
+                        const invalidFiles = files.filter(f => f.size > 10 * 1024 * 1024);
+                        if (invalidFiles.length > 0) {
+                          toast({
+                            title: "File too large",
+                            description: "Each file must be less than 10MB",
+                            variant: "destructive",
+                          });
+                          return;
+                        }
+                        setCoachAttachments(prev => [...prev, ...files]);
+                      }}
                           />
                         </div>
                         
