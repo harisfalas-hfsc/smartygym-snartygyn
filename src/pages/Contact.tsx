@@ -518,7 +518,7 @@ const Contact = () => {
                       </div>
                     </div>
                   </CardContent>
-                  <CardFooter className="pt-0">
+                  <CardFooter className="pt-0 mt-3">
                     <Button type="submit" size="lg" className="w-full" disabled={isSubmitting}>
                       <Send className="w-4 h-4 mr-2" />
                       {isSubmitting ? "Sending..." : "Send Message"}
@@ -644,7 +644,7 @@ const Contact = () => {
                         )}
                       </div>
                     </CardContent>
-                    <CardFooter className="flex flex-col gap-3 pt-0">
+                    <CardFooter className="flex flex-col gap-3 pt-0 mt-3">
                       <Button type="submit" className="w-full" disabled={isCoachSubmitting}>
                         <Send className="w-4 h-4 mr-2" />
                         {isCoachSubmitting ? "Sending..." : "Contact Haris"}
