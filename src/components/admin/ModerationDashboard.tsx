@@ -24,7 +24,6 @@ interface Comment {
   created_at: string;
   user_profile?: {
     full_name: string | null;
-    nickname: string | null;
     avatar_url: string | null;
   };
 }
@@ -38,7 +37,6 @@ interface ContentFlag {
   created_at: string;
   flagged_by_profile?: {
     full_name: string | null;
-    nickname: string | null;
   };
 }
 
@@ -51,7 +49,6 @@ interface BannedUser {
   is_permanent: boolean;
   user_profile?: {
     full_name: string | null;
-    nickname: string | null;
     avatar_url: string | null;
   };
 }
@@ -94,7 +91,7 @@ export function ModerationDashboard() {
       const userIds = [...new Set(data.map(c => c.user_id))];
       const { data: profiles } = await supabase
         .from('profiles')
-        .select('user_id, full_name, nickname, avatar_url')
+        .select('user_id, full_name, avatar_url')
         .in('user_id', userIds);
 
       const commentsWithProfiles = data.map(comment => ({
@@ -122,7 +119,7 @@ export function ModerationDashboard() {
       const userIds = [...new Set(data.map(f => f.flagged_by))];
       const { data: profiles } = await supabase
         .from('profiles')
-        .select('user_id, full_name, nickname')
+        .select('user_id, full_name')
         .in('user_id', userIds);
 
       const flagsWithProfiles = data.map(flag => ({
@@ -150,7 +147,7 @@ export function ModerationDashboard() {
       const userIds = [...new Set(data.map(b => b.user_id))];
       const { data: profiles } = await supabase
         .from('profiles')
-        .select('user_id, full_name, nickname, avatar_url')
+        .select('user_id, full_name, avatar_url')
         .in('user_id', userIds);
 
       const bannedWithProfiles = data.map(ban => ({
@@ -368,7 +365,7 @@ export function ModerationDashboard() {
                           <div className="flex-1">
                             <div className="flex items-center gap-2 mb-1">
                               <span className="font-medium">
-                                {comment.user_profile?.full_name || comment.user_profile?.nickname || 'Anonymous'}
+                                {comment.user_profile?.full_name || 'Anonymous'}
                               </span>
                               <span className="text-xs text-muted-foreground">
                                 {format(new Date(comment.created_at), 'MMM d, yyyy')}
@@ -437,7 +434,7 @@ export function ModerationDashboard() {
                         </TableCell>
                         <TableCell className="max-w-xs truncate">{flag.reason}</TableCell>
                         <TableCell>
-                          {flag.flagged_by_profile?.full_name || flag.flagged_by_profile?.nickname || 'Unknown'}
+                          {flag.flagged_by_profile?.full_name || 'Unknown'}
                         </TableCell>
                         <TableCell>
                           <Badge
@@ -511,7 +508,7 @@ export function ModerationDashboard() {
                               </AvatarFallback>
                             </Avatar>
                             <span>
-                              {ban.user_profile?.full_name || ban.user_profile?.nickname || 'Unknown'}
+                              {ban.user_profile?.full_name || 'Unknown'}
                             </span>
                           </div>
                         </TableCell>

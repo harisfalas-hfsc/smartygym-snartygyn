@@ -27,7 +27,6 @@ interface Comment {
   profile?: {
     full_name: string | null;
     avatar_url: string | null;
-    nickname: string | null;
   };
 }
 
@@ -42,7 +41,6 @@ interface ContentFlag {
   profile?: {
     full_name: string | null;
     avatar_url: string | null;
-    nickname: string | null;
   };
 }
 
@@ -56,7 +54,6 @@ interface BannedUser {
   profile?: {
     full_name: string | null;
     avatar_url: string | null;
-    nickname: string | null;
   };
 }
 
@@ -104,7 +101,7 @@ export const CommentModerationPanel = () => {
     const userIds = [...new Set(commentsData.map(c => c.user_id))];
     const { data: profilesData } = await supabase
       .from('profiles')
-      .select('user_id, full_name, avatar_url, nickname')
+      .select('user_id, full_name, avatar_url')
       .in('user_id', userIds);
 
     const profilesMap = new Map(profilesData?.map(p => [p.user_id, p]));
@@ -137,7 +134,7 @@ export const CommentModerationPanel = () => {
     const userIds = [...new Set(flagsData.map(f => f.flagged_by))];
     const { data: profilesData } = await supabase
       .from('profiles')
-      .select('user_id, full_name, avatar_url, nickname')
+      .select('user_id, full_name, avatar_url')
       .in('user_id', userIds);
 
     const profilesMap = new Map(profilesData?.map(p => [p.user_id, p]));
@@ -169,7 +166,7 @@ export const CommentModerationPanel = () => {
     const userIds = [...new Set(banData.map(b => b.user_id))];
     const { data: profilesData } = await supabase
       .from('profiles')
-      .select('user_id, full_name, avatar_url, nickname')
+      .select('user_id, full_name, avatar_url')
       .in('user_id', userIds);
 
     const profilesMap = new Map(profilesData?.map(p => [p.user_id, p]));
@@ -376,13 +373,13 @@ export const CommentModerationPanel = () => {
                             <Avatar>
                               <AvatarImage src={comment.profile?.avatar_url || undefined} />
                               <AvatarFallback>
-                                {comment.profile?.full_name?.[0] || comment.profile?.nickname?.[0] || 'U'}
+                                {comment.profile?.full_name?.[0] || 'U'}
                               </AvatarFallback>
                             </Avatar>
                             <div className="flex-1 space-y-2">
                               <div className="flex items-center gap-2">
                                 <span className="font-semibold">
-                                  {comment.profile?.full_name || comment.profile?.nickname || 'Anonymous'}
+                                  {comment.profile?.full_name || 'Anonymous'}
                                 </span>
                                 <Badge variant="outline">
                                   {format(new Date(comment.created_at), 'MMM d, yyyy')}
@@ -457,7 +454,7 @@ export const CommentModerationPanel = () => {
                           <div>
                             <p className="text-sm font-semibold">Flagged by:</p>
                             <p className="text-sm text-muted-foreground">
-                              {flag.profile?.full_name || flag.profile?.nickname || 'Anonymous'}
+                              {flag.profile?.full_name || 'Anonymous'}
                             </p>
                           </div>
                           <div className="flex gap-2 pt-2">
@@ -510,13 +507,13 @@ export const CommentModerationPanel = () => {
                             <Avatar>
                               <AvatarImage src={ban.profile?.avatar_url || undefined} />
                               <AvatarFallback>
-                                {ban.profile?.full_name?.[0] || ban.profile?.nickname?.[0] || 'U'}
+                                {ban.profile?.full_name?.[0] || 'U'}
                               </AvatarFallback>
                             </Avatar>
                             <div className="space-y-2">
                               <div className="flex items-center gap-2">
                                 <span className="font-semibold">
-                                  {ban.profile?.full_name || ban.profile?.nickname || 'Anonymous'}
+                                  {ban.profile?.full_name || 'Anonymous'}
                                 </span>
                                 <Badge variant={ban.is_permanent ? "destructive" : "secondary"}>
                                   {ban.is_permanent ? "Permanent" : "Temporary"}

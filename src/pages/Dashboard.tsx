@@ -349,13 +349,6 @@ export default function Dashboard() {
               <h1 className="text-lg sm:text-2xl font-bold truncate">Dashboard</h1>
             </div>
             <div className="flex gap-2 flex-shrink-0">
-              <Button variant="outline" size="sm" onClick={() => navigate("/profilesettings")} className="hidden lg:flex">
-                <Settings className="mr-2 h-4 w-4" />
-                Profile Settings
-              </Button>
-              <Button variant="outline" size="sm" onClick={() => navigate("/profilesettings")} className="lg:hidden" title="Profile Settings">
-                <Settings className="h-4 w-4" />
-              </Button>
               <Button variant="outline" size="sm" onClick={() => navigate("/")} className="hidden sm:flex">
                 <ArrowLeft className="mr-2 h-4 w-4" />
                 Home

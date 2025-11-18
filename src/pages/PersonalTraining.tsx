@@ -77,7 +77,7 @@ const PersonalTraining = () => {
       // Load profile data
       const { data: profile } = await supabase
         .from("profiles")
-        .select("full_name, age, weight, height")
+        .select("full_name")
         .eq("user_id", user.id)
         .single();
 
@@ -86,9 +86,6 @@ const PersonalTraining = () => {
           ...prev,
           email: user.email || "",
           name: profile.full_name || "",
-          age: profile.age?.toString() || "",
-          weight: profile.weight?.toString() || "",
-          height: profile.height?.toString() || "",
         }));
       } else {
         setFormData(prev => ({
