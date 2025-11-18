@@ -5,7 +5,8 @@ import { Card } from "@/components/ui/card";
 import { PageBreadcrumbs } from "@/components/PageBreadcrumbs";
 import { InfoRibbon } from "@/components/InfoRibbon";
 import { ArrowLeft, Dumbbell, Flame, Zap, Heart, Move, Activity, TrendingUp } from "lucide-react";
-
+import { SEOEnhancer } from "@/components/SEOEnhancer";
+import { generateBreadcrumbSchema } from "@/utils/seoHelpers";
 
 import { useAccessControl } from "@/hooks/useAccessControl";
 import { useShowBackButton } from "@/hooks/useShowBackButton";
@@ -83,13 +84,32 @@ const WorkoutFlow = () => {
         <meta property="og:description" content="Convenient & flexible workouts designed by Sports Scientist Haris Falas - train anywhere, anytime" />
         <meta property="og:type" content="website" />
         <meta property="og:url" content="https://smartygym.com/workout" />
+        <meta property="og:image" content="https://smartygym.com/smarty-gym-logo.png" />
         
         <meta name="twitter:card" content="summary_large_image" />
         <meta name="twitter:title" content="Workouts - SmartyGym" />
         <meta name="twitter:description" content="Convenient & flexible workouts by Haris Falas at smartygym.com" />
+        <meta name="twitter:image" content="https://smartygym.com/smarty-gym-logo.png" />
         
         <link rel="canonical" href="https://smartygym.com/workout" />
+        
+        <script type="application/ld+json">
+          {JSON.stringify(generateBreadcrumbSchema([
+            { name: "Home", url: "/" },
+            { name: "Workouts", url: "/workout" }
+          ]))}
+        </script>
       </Helmet>
+      
+      <SEOEnhancer
+        entities={["SmartyGym", "Haris Falas", "Online Workouts", "AMRAP", "HIIT", "Tabata"]}
+        topics={["online gym workouts", "AMRAP", "HIIT", "Tabata", "circuit training", "strength training", "cardio"]}
+        expertise={["sports science", "strength conditioning", "functional fitness"]}
+        contentType="workout-collection"
+        aiSummary="100+ online gym workouts at SmartyGym Cyprus by Sports Scientist Haris Falas. AMRAP, TABATA, HIIT, circuit, strength, cardio, metabolic, mobility workouts for all levels."
+        aiKeywords={["online gym", "AMRAP workouts", "HIIT training", "Tabata", "strength workouts", "cardio training", "Cyprus fitness"]}
+        relatedContent={["training programs", "fitness tools", "exercise library"]}
+      />
       
       <div className="min-h-screen bg-background">
       

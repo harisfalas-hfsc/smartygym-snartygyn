@@ -164,21 +164,7 @@ const BMRCalculator = () => {
           aiKeywords={["BMR", "basal metabolic rate", "TDEE", "calorie calculator", "metabolism", "nutrition planning", "weight loss", "fitness calculator"]}
           relatedContent={["weight loss programs", "nutrition planning", "macro calculator"]}
         />
-        <title>BMR Calculator - SmartyGym | Free Basal Metabolic Rate Calculator | smartygym.com</title>
-        <meta name="description" content="Free BMR Calculator using Mifflin-St Jeor equation. Calculate your basal metabolic rate and daily calorie needs at smartygym.com - convenient fitness tool by Haris Falas." />
-        <meta name="keywords" content="smartygym, smarty gym, smartygym.com, Haris Falas, bmr calculator, basal metabolic rate, tdee calculator, calorie calculator, convenient fitness, gym Reimagined, flexible nutrition tools" />
-        
-        <meta property="og:title" content="BMR Calculator - SmartyGym" />
-        <meta property="og:description" content="Free basal metabolic rate calculator - convenient fitness tool at smartygym.com" />
-        <meta property="og:type" content="website" />
-        <meta property="og:url" content="https://smartygym.com/bmrcalculator" />
-        
-        <meta name="twitter:card" content="summary_large_image" />
-        <meta name="twitter:title" content="BMR Calculator - SmartyGym" />
-        <meta name="twitter:description" content="Free BMR calculator at smartygym.com for flexible fitness planning" />
-        
-        <link rel="canonical" href="https://smartygym.com/bmrcalculator" />
-      </Helmet>
+      </>
       
       <div className="min-h-screen bg-background p-4">
       <div className="max-w-2xl mx-auto py-4 sm:py-8">
