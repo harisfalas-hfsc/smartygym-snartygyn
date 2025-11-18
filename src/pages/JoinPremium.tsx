@@ -92,8 +92,88 @@ export default function JoinPremium() {
   return (
     <>
       <Helmet>
-        <title>Join Premium | SmartyGym</title>
-        <meta name="description" content="Upgrade to SmartyGym Premium and unlock unlimited workouts, training programs, and exclusive fitness tools." />
+        <title>Gold & Platinum Membership | Premium Online Gym Cyprus | SmartyGym by Haris Falas | smartygym.com</title>
+        <meta name="description" content="Join SmartyGym Premium at smartygym.com - Gold Plan €9.99/month or Platinum €89.99/year. Unlimited workouts, training programs, calculators, full dashboard access. Premium online gym Cyprus by Sports Scientist Haris Falas. Cancel anytime." />
+        <meta name="keywords" content="online gym membership Cyprus, premium fitness Cyprus, gym subscription Cyprus, online gym plans, Gold membership SmartyGym, Platinum membership SmartyGym, smartygym premium, online fitness subscription, gym membership online, Cyprus gym membership, affordable online gym, premium workouts, unlimited training programs, Haris Falas membership, smartygym.com premium" />
+        
+        <meta property="og:title" content="Premium Membership | SmartyGym Cyprus | smartygym.com" />
+        <meta property="og:description" content="Gold €9.99/month or Platinum €89.99/year. Unlimited workouts, training programs, premium fitness tools." />
+        <meta property="og:type" content="website" />
+        <meta property="og:url" content="https://smartygym.com/join-premium" />
+        
+        <meta name="twitter:card" content="summary" />
+        <meta name="twitter:title" content="Premium Membership | SmartyGym Cyprus" />
+        <meta name="twitter:description" content="Gold €9.99/month or Platinum €89.99/year. Unlimited fitness access." />
+        
+        <link rel="canonical" href="https://smartygym.com/join-premium" />
+        
+        {/* Product Schema - Gold Plan */}
+        <script type="application/ld+json">
+          {JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "Product",
+            "name": "SmartyGym Gold Plan",
+            "description": "Monthly premium membership with unlimited workouts, training programs, and fitness calculators",
+            "brand": {
+              "@type": "Brand",
+              "name": "SmartyGym"
+            },
+            "offers": {
+              "@type": "Offer",
+              "price": "9.99",
+              "priceCurrency": "EUR",
+              "availability": "https://schema.org/InStock",
+              "url": "https://smartygym.com/join-premium",
+              "priceValidUntil": "2026-12-31"
+            },
+            "category": "Online Fitness Membership"
+          })}
+        </script>
+        
+        {/* Product Schema - Platinum Plan */}
+        <script type="application/ld+json">
+          {JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "Product",
+            "name": "SmartyGym Platinum Plan",
+            "description": "Yearly premium membership with unlimited workouts, training programs, and fitness calculators. Best value.",
+            "brand": {
+              "@type": "Brand",
+              "name": "SmartyGym"
+            },
+            "offers": {
+              "@type": "Offer",
+              "price": "89.99",
+              "priceCurrency": "EUR",
+              "availability": "https://schema.org/InStock",
+              "url": "https://smartygym.com/join-premium",
+              "priceValidUntil": "2026-12-31"
+            },
+            "category": "Online Fitness Membership"
+          })}
+        </script>
+        
+        {/* BreadcrumbList Schema */}
+        <script type="application/ld+json">
+          {JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "BreadcrumbList",
+            "itemListElement": [
+              {
+                "@type": "ListItem",
+                "position": 1,
+                "name": "Home",
+                "item": "https://smartygym.com"
+              },
+              {
+                "@type": "ListItem",
+                "position": 2,
+                "name": "Premium Plans",
+                "item": "https://smartygym.com/join-premium"
+              }
+            ]
+          })}
+        </script>
       </Helmet>
 
       <div className="min-h-screen bg-background">
