@@ -26,6 +26,12 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
 
 const Index = () => {
   const navigate = useNavigate();
@@ -439,9 +445,132 @@ const Index = () => {
                     </div>
                   </div>
 
-        {/* Navigation Dropdown - Full Width Elegant Design */}
-        <div className="pt-1 flex justify-center">
-                    <DropdownMenu>
+        {/* Navigation - Mobile (Accordion inside card) */}
+        <div className="pt-1 sm:hidden">
+          <Accordion type="single" collapsible>
+            <AccordionItem value="hero-navigation" className="border-none">
+              <AccordionTrigger className="px-4 py-3 rounded-md bg-transparent hover:bg-primary/5 border border-primary/20 text-base font-bold text-primary">
+                <div className="flex items-center gap-3">
+                  <Dumbbell className="w-5 h-5 text-primary" />
+                  <span className="drop-shadow-md">
+                    Start your fitness journey with SmartyGym
+                  </span>
+                </div>
+              </AccordionTrigger>
+
+              <AccordionContent className="pt-2 space-y-1">
+                {/* Workouts */}
+                <button
+                  onClick={() => navigate("/workout")}
+                  className="w-full px-4 py-3 rounded-lg text-left cursor-pointer group hover:bg-primary/15 border border-transparent hover:border-primary/30 transition-all duration-200"
+                >
+                  <div className="flex items-center gap-4">
+                    <div className="p-2 rounded-full bg-primary/10 group-hover:bg-primary/20 transition-colors">
+                      <Dumbbell className="w-5 h-5 text-primary" />
+                    </div>
+                    <div className="flex-1">
+                      <p className="text-base font-bold text-foreground">
+                        Workouts
+                      </p>
+                      <p className="text-xs text-muted-foreground">
+                        500+ Expert workouts for all fitness levels
+                      </p>
+                    </div>
+                    <ChevronRight className="w-4 h-4 text-primary" />
+                  </div>
+                </button>
+
+                {/* Training Programs */}
+                <button
+                  onClick={() => navigate("/trainingprogram")}
+                  className="w-full px-4 py-3 rounded-lg text-left cursor-pointer group hover:bg-primary/15 border border-transparent hover:border-primary/30 transition-all duration-200"
+                >
+                  <div className="flex items-center gap-4">
+                    <div className="p-2 rounded-full bg-primary/10 group-hover:bg-primary/20 transition-colors">
+                      <Calendar className="w-5 h-5 text-primary" />
+                    </div>
+                    <div className="flex-1">
+                      <p className="text-base font-bold text-foreground">
+                        Training Programs
+                      </p>
+                      <p className="text-xs text-muted-foreground">
+                        Structured programs for long-term goals
+                      </p>
+                    </div>
+                    <ChevronRight className="w-4 h-4 text-primary" />
+                  </div>
+                </button>
+
+                {/* Tools */}
+                <button
+                  onClick={() => navigate("/tools")}
+                  className="w-full px-4 py-3 rounded-lg text-left cursor-pointer group hover:bg-primary/15 border border-transparent hover:border-primary/30 transition-all duration-200"
+                >
+                  <div className="flex items-center gap-4">
+                    <div className="p-2 rounded-full bg-primary/10 group-hover:bg-primary/20 transition-colors">
+                      <Wrench className="w-5 h-5 text-primary" />
+                    </div>
+                    <div className="flex-1">
+                      <p className="text-base font-bold text-foreground">
+                        Tools
+                      </p>
+                      <p className="text-xs text-muted-foreground">
+                        Calculators and fitness tracking tools
+                      </p>
+                    </div>
+                    <ChevronRight className="w-4 h-4 text-primary" />
+                  </div>
+                </button>
+
+                {/* Exercise Library */}
+                <button
+                  onClick={() => navigate("/exerciselibrary")}
+                  className="w-full px-4 py-3 rounded-lg text-left cursor-pointer group hover:bg-primary/15 border border-transparent hover:border-primary/30 transition-all duration-200"
+                >
+                  <div className="flex items-center gap-4">
+                    <div className="p-2 rounded-full bg-primary/10 group-hover:bg-primary/20 transition-colors">
+                      <Video className="w-5 h-5 text-primary" />
+                    </div>
+                    <div className="flex-1">
+                      <p className="text-base font-bold text-foreground">
+                        Exercise Library
+                      </p>
+                      <p className="text-xs text-muted-foreground">
+                        Comprehensive exercise video database
+                      </p>
+                    </div>
+                    <ChevronRight className="w-4 h-4 text-primary" />
+                  </div>
+                </button>
+
+                {/* Blog */}
+                <button
+                  onClick={() => navigate("/blog")}
+                  className="w-full px-4 py-3 rounded-lg text-left cursor-pointer group hover:bg-primary/15 border border-transparent hover:border-primary/30 transition-all duration-200"
+                >
+                  <div className="flex items-center gap-4">
+                    <div className="p-2 rounded-full bg-primary/10 group-hover:bg-primary/20 transition-colors">
+                      <FileText className="w-5 h-5 text-primary" />
+                    </div>
+                    <div className="flex-1">
+                      <p className="text-base font-bold text-foreground">
+                        Blog
+                      </p>
+                      <p className="text-xs text-muted-foreground">
+                        Tips, guides, and insights
+                      </p>
+                    </div>
+                    <ChevronRight className="w-4 h-4 text-primary" />
+                  </div>
+                </button>
+              </AccordionContent>
+            </AccordionItem>
+          </Accordion>
+        </div>
+
+        {/* Navigation - Tablet & Desktop (Dropdown) */}
+        <div className="pt-1 hidden sm:flex justify-center">
+          <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button
                 size="lg"
@@ -470,7 +599,7 @@ const Index = () => {
               avoidCollisions={true}
               sticky="always"
             >
-                        {/* Workouts */}
+              {/* Workouts */}
               <DropdownMenuItem
                 onClick={() => navigate("/workout")}
                 className="h-12 px-4 rounded-lg cursor-pointer group hover:bg-primary/15 border border-transparent hover:border-primary/30 transition-all duration-200 hover:scale-[1.02] mb-1.5"
@@ -491,7 +620,7 @@ const Index = () => {
                 </div>
               </DropdownMenuItem>
 
-                        {/* Training Programs */}
+              {/* Training Programs */}
               <DropdownMenuItem
                 onClick={() => navigate("/trainingprogram")}
                 className="h-12 px-4 rounded-lg cursor-pointer group hover:bg-primary/15 border border-transparent hover:border-primary/30 transition-all duration-200 hover:scale-[1.02] mb-1.5"
@@ -512,7 +641,7 @@ const Index = () => {
                 </div>
               </DropdownMenuItem>
 
-                        {/* Tools */}
+              {/* Tools */}
               <DropdownMenuItem
                 onClick={() => navigate("/tools")}
                 className="h-12 px-4 rounded-lg cursor-pointer group hover:bg-primary/15 border border-transparent hover:border-primary/30 transition-all duration-200 hover:scale-[1.02] mb-1.5"
@@ -533,7 +662,7 @@ const Index = () => {
                 </div>
               </DropdownMenuItem>
 
-                        {/* Exercise Library */}
+              {/* Exercise Library */}
               <DropdownMenuItem
                 onClick={() => navigate("/exerciselibrary")}
                 className="h-12 px-4 rounded-lg cursor-pointer group hover:bg-primary/15 border border-transparent hover:border-primary/30 transition-all duration-200 hover:scale-[1.02] mb-1.5"
@@ -554,7 +683,7 @@ const Index = () => {
                 </div>
               </DropdownMenuItem>
 
-                        {/* Blog */}
+              {/* Blog */}
               <DropdownMenuItem
                 onClick={() => navigate("/blog")}
                 className="h-12 px-4 rounded-lg cursor-pointer group hover:bg-primary/15 border border-transparent hover:border-primary/30 transition-all duration-200 hover:scale-[1.02]"
@@ -568,15 +697,15 @@ const Index = () => {
                       Blog
                     </p>
                     <p className="text-xs text-muted-foreground group-hover:text-muted-foreground">
-                      Expert articles and fitness insights
+                      Tips, guides, and insights
                     </p>
                   </div>
                   <ChevronRight className="w-5 h-5 text-muted-foreground group-hover:text-primary group-hover:translate-x-1 transition-all" />
                 </div>
               </DropdownMenuItem>
-                      </DropdownMenuContent>
-                    </DropdownMenu>
-                  </div>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </div>
 
                   {/* Feature Highlights Grid */}
                   <div className="border-t border-primary/20 pt-6">
