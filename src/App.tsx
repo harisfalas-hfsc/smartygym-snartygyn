@@ -138,7 +138,7 @@ const AppContent = () => {
             </PageTransition>
           </div>
           <Footer />
-          {!loading && isAdmin && <SmartyCoach />}
+          {/* {!loading && isAdmin && <SmartyCoach />} */}
           
         </div>
       </AccessControlProvider>
