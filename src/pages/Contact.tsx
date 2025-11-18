@@ -15,6 +15,7 @@ import { useShowBackButton } from "@/hooks/useShowBackButton";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useAccessControl } from "@/hooks/useAccessControl";
+import { cn } from "@/lib/utils";
 
 const contactSchema = z.object({
   name: z.string().trim().min(1, { message: "Name is required" }).max(100, { message: "Name must be less than 100 characters" }),
@@ -451,7 +452,7 @@ const Contact = () => {
                         onChange={handleChange}
                         placeholder="Tell us how we can help you..."
                         rows={12}
-                        className={errors.message ? "border-destructive" : ""}
+                        className={cn("resize-none", errors.message ? "border-destructive" : "")}
                       />
                       {errors.message && (
                         <p className="text-sm text-destructive">{errors.message}</p>
@@ -593,7 +594,7 @@ const Contact = () => {
                           onChange={handleCoachChange}
                           placeholder="Tell Haris how he can help you..."
                           rows={6}
-                          className={coachErrors.message ? "border-destructive" : ""}
+                          className={cn("resize-none", coachErrors.message ? "border-destructive" : "")}
                         />
                         {coachErrors.message && (
                           <p className="text-sm text-destructive">{coachErrors.message}</p>
