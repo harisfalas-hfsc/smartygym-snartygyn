@@ -456,7 +456,7 @@ const Index = () => {
             </DropdownMenuTrigger>
                       
             <DropdownMenuContent 
-              className="w-[calc(100vw-4rem)] max-w-[92%] sm:w-[480px] lg:w-[520px] p-2 bg-gradient-to-br from-background via-primary/5 to-background border-2 border-primary/20 shadow-2xl backdrop-blur-sm
+              className="w-[18rem] max-w-[calc(100vw-3rem)] sm:w-[480px] lg:w-[520px] p-2 bg-gradient-to-br from-background via-primary/5 to-background border-2 border-primary/20 shadow-2xl backdrop-blur-sm
               data-[state=open]:animate-in data-[state=closed]:animate-out 
               data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 
               data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 
