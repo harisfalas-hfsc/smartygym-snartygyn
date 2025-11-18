@@ -1,8 +1,11 @@
 import { useNavigate } from "react-router-dom";
 import { Facebook, Instagram, Youtube } from "lucide-react";
+import { useState } from "react";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 
 export const Footer = () => {
   const navigate = useNavigate();
+  const [emailDialogOpen, setEmailDialogOpen] = useState(false);
 
   return (
     <footer className="bg-background border-t border-border py-8 px-4 mt-auto">
@@ -50,6 +53,14 @@ export const Footer = () => {
             </a>
           </div>
           
+          {/* Email Subscription FAQ Button */}
+          <button 
+            onClick={() => setEmailDialogOpen(true)}
+            className="text-sm text-muted-foreground hover:text-primary transition-colors underline decoration-dotted"
+          >
+            Can I subscribe to receive email updates?
+          </button>
+          
           {/* Legal Links */}
           <div className="flex flex-wrap items-center justify-center gap-4 text-sm text-muted-foreground">
             <button 
@@ -87,6 +98,24 @@ export const Footer = () => {
           </p>
         </div>
       </div>
+
+      {/* Email Subscription Dialog */}
+      <Dialog open={emailDialogOpen} onOpenChange={setEmailDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Can I subscribe to receive email updates?</DialogTitle>
+            <DialogDescription className="text-left pt-4">
+              We've made a conscious decision not to offer email subscriptions or send promotional emails. 
+              As fitness enthusiasts ourselves, we understand how overwhelming it can be to receive constant marketing emails 
+              that often go unread. We don't want to contribute to inbox clutter or email fatigue. Instead, all important 
+              updates, workout notifications, and communication happen directly within your SmartyGym dashboard — 
+              keeping everything organized in one place without distractions. If you'd like to stay connected and receive 
+              updates about new content, you're welcome to follow us on social media. This approach ensures you only get 
+              the information you need, when you need it, without unnecessary noise.
+            </DialogDescription>
+          </DialogHeader>
+        </DialogContent>
+      </Dialog>
     </footer>
   );
 };
