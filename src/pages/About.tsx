@@ -230,63 +230,59 @@ const About = () => {
             </CardContent>
           </Card>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-            <Card className="hover:shadow-lg transition-shadow">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+            <Card className="text-center hover:shadow-lg transition-all hover:-translate-y-1">
               <CardHeader>
-                <div className="w-14 h-14 rounded-full bg-primary/10 flex items-center justify-center mb-4">
+                <div className="w-14 h-14 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-4">
                   <Target className="w-7 h-7 text-primary" />
                 </div>
                 <CardTitle className="text-xl">Built for Real Life</CardTitle>
               </CardHeader>
               <CardContent>
-                <CardDescription className="text-base">
-                  Our workouts and programs are built for real life — whether you're training at home, in the gym, or on the go. 
-                  No complicated equipment, no expensive memberships, just effective training that works.
+                <CardDescription className="text-sm text-muted-foreground">
+                  Flexible, effective training designed for busy professionals who want results without hours at the gym.
                 </CardDescription>
               </CardContent>
             </Card>
 
-            <Card className="hover:shadow-lg transition-shadow">
+            <Card className="text-center hover:shadow-lg transition-all hover:-translate-y-1">
               <CardHeader>
-                <div className="w-14 h-14 rounded-full bg-primary/10 flex items-center justify-center mb-4">
+                <div className="w-14 h-14 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-4">
                   <Brain className="w-7 h-7 text-primary" />
                 </div>
                 <CardTitle className="text-xl">Science-Based Approach</CardTitle>
               </CardHeader>
               <CardContent>
-                <CardDescription className="text-base">
-                  Every workout is grounded in sports science and designed with evidence-based training principles. 
-                  We don't follow trends — we follow what actually works.
+                <CardDescription className="text-sm text-muted-foreground">
+                  Rooted in proven exercise science, biomechanics, and progressive overload. No gimmicks, just results.
                 </CardDescription>
               </CardContent>
             </Card>
 
-            <Card className="hover:shadow-lg transition-shadow">
+            <Card className="text-center hover:shadow-lg transition-all hover:-translate-y-1">
               <CardHeader>
-                <div className="w-14 h-14 rounded-full bg-primary/10 flex items-center justify-center mb-4">
+                <div className="w-14 h-14 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-4">
                   <Users className="w-7 h-7 text-primary" />
                 </div>
                 <CardTitle className="text-xl">Accessible to Everyone</CardTitle>
               </CardHeader>
               <CardContent>
-                <CardDescription className="text-base">
-                  Fitness for everyone, anywhere. Train smarter, move better, live stronger — 
-                  no matter your starting point or available equipment.
+                <CardDescription className="text-sm text-muted-foreground">
+                  For beginners and athletes alike. Train at home, in the gym, or on the go with programs for every level.
                 </CardDescription>
               </CardContent>
             </Card>
 
-            <Card className="hover:shadow-lg transition-shadow">
+            <Card className="text-center hover:shadow-lg transition-all hover:-translate-y-1">
               <CardHeader>
-                <div className="w-14 h-14 rounded-full bg-primary/10 flex items-center justify-center mb-4">
+                <div className="w-14 h-14 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-4">
                   <Shield className="w-7 h-7 text-primary" />
                 </div>
                 <CardTitle className="text-xl">Safe & Effective</CardTitle>
               </CardHeader>
               <CardContent>
-                <CardDescription className="text-base">
-                  Crafted by hand with care to deliver results safely. Every exercise, every progression, 
-                  every program is designed with your wellbeing in mind.
+                <CardDescription className="text-sm text-muted-foreground">
+                  Designed to minimize injury risk while maximizing performance. Proper form and progression always prioritized.
                 </CardDescription>
               </CardContent>
             </Card>
