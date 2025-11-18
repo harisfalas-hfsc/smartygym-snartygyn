@@ -38,8 +38,8 @@ import {
 } from "lucide-react";
 import { LogBookFilters } from "@/components/logbook/LogBookFilters";
 import { LogBookCalendar } from "@/components/logbook/LogBookCalendar";
-import { LogBookEnhancedCharts } from "@/components/logbook/LogBookEnhancedCharts";
-import { LogBookExport } from "@/components/logbook/LogBookExport";
+import { LogBookAdvancedCharts } from "@/components/logbook/LogBookAdvancedCharts";
+import { LogBookAdvancedExport } from "@/components/logbook/LogBookAdvancedExport";
 import { MeasurementDialog } from "@/components/logbook/MeasurementDialog";
 
 interface WorkoutInteraction {
@@ -1885,15 +1885,15 @@ export default function UserDashboard() {
                 </div>
                 
                 <div id="logbook-charts">
-                  <LogBookEnhancedCharts 
+                  <LogBookAdvancedCharts 
                     userId={user!.id} 
-                    filter={logBookFilter} 
+                    primaryFilter={logBookFilter} 
                   />
                 </div>
                 
-                <LogBookExport 
+                <LogBookAdvancedExport 
                   userId={user!.id} 
-                  filter={logBookFilter} 
+                  primaryFilter={logBookFilter} 
                 />
               </>
             )}
