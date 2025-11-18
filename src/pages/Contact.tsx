@@ -383,7 +383,7 @@ const Contact = () => {
             ]} 
           />
 
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-stretch">
             {/* Contact Form */}
             <div className="lg:col-span-2">
               <Card className="h-full">
@@ -393,8 +393,8 @@ const Contact = () => {
                     Fill out the form below and we'll get back to you within 24 hours
                   </CardDescription>
                 </CardHeader>
-                <CardContent className="flex flex-col h-full">
-                  <form onSubmit={handleSubmit} className="flex flex-col h-full">
+              <CardContent className="flex flex-col h-full pb-4">
+                <form onSubmit={handleSubmit} className="flex flex-col h-full">
                     <div className="space-y-3 flex-1">
                       <div className="space-y-1.5">
                         <Label htmlFor="name">Name *</Label>
@@ -528,7 +528,7 @@ const Contact = () => {
                       </div>
                     </div>
 
-                    <Button type="submit" size="lg" className="w-full mt-4" disabled={isSubmitting}>
+                    <Button type="submit" size="lg" className="w-full mt-3" disabled={isSubmitting}>
                       <Send className="w-4 h-4 mr-2" />
                       {isSubmitting ? "Sending..." : "Send Message"}
                     </Button>
@@ -538,7 +538,7 @@ const Contact = () => {
             </div>
 
             {/* Contact Info */}
-            <div className="space-y-6 flex flex-col">
+            <div className="space-y-6 flex flex-col h-full">
               <Card>
                 <CardHeader>
                   <CardTitle>Email Us</CardTitle>
@@ -556,7 +556,7 @@ const Contact = () => {
                 </CardContent>
               </Card>
 
-              <Card className="h-full bg-gradient-to-br from-primary/5 to-accent/10 border-primary/20">
+              <Card className="flex-1 bg-gradient-to-br from-primary/5 to-accent/10 border-primary/20">
                 <CardHeader>
                   <CardTitle className="text-lg flex items-center gap-2">
                     Direct Access to Your Coach
@@ -699,14 +699,14 @@ const Contact = () => {
                       </div>
                     </form>
                   ) : (
-                    <div className="space-y-4">
+                    <div className="space-y-4 flex-1 flex flex-col justify-between">
                       <p className="text-sm text-muted-foreground">
                         As a Premium member, you can reach out directly to <a href="/coach-profile" className="text-primary hover:underline font-medium"><strong>Haris Falas</strong></a>. 
                         No robots, no automated responses — just real human support when you need it.
                       </p>
                       <Button 
                         onClick={() => navigate("/premiumbenefits")} 
-                        className="w-full"
+                        className="w-full mt-2"
                         variant="default"
                       >
                         Upgrade to Premium
