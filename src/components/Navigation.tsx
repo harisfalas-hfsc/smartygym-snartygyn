@@ -367,7 +367,7 @@ export const Navigation = () => {
                     )}
                   </Button>
                 </DropdownMenuTrigger>
-                <DropdownMenuContent className="w-56 bg-popover" align="end" forceMount sideOffset={5}>
+                <DropdownMenuContent className="w-56 max-w-[calc(100vw-2rem)] bg-popover" align="end" forceMount sideOffset={5}>
                   <DropdownMenuLabel className="font-normal">
                     <div className="flex flex-col space-y-1">
                       <p className="text-sm font-medium leading-none">
@@ -441,7 +441,7 @@ export const Navigation = () => {
                     Login / Sign Up
                   </Button>
                 </DropdownMenuTrigger>
-                <DropdownMenuContent className="w-48 bg-background" align="end">
+                <DropdownMenuContent className="w-48 max-w-[calc(100vw-2rem)] bg-background" align="end">
                   <DropdownMenuItem 
                     onSelect={(e) => {
                       e.preventDefault();
