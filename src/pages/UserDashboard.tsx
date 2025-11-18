@@ -16,6 +16,7 @@ import {
   CheckCircle, 
   Clock,
   Star,
+  Play,
   Dumbbell,
   Calendar,
   Crown,
@@ -59,6 +60,7 @@ interface ProgramInteraction {
   program_type: string;
   is_favorite: boolean;
   is_completed: boolean;
+  is_ongoing?: boolean | null;
   has_viewed: boolean;
   rating: number | null;
   created_at: string;
@@ -528,11 +530,13 @@ export default function UserDashboard() {
   const completedWorkouts = workoutInteractions.filter(w => w.is_completed);
   const viewedWorkouts = workoutInteractions.filter(w => w.has_viewed);
   const ratedWorkouts = workoutInteractions.filter(w => w.rating && w.rating > 0);
-
+  const inProgressWorkouts = workoutInteractions.filter(w => w.has_viewed && !w.is_completed);
+  
   const favoritePrograms = programInteractions.filter(p => p.is_favorite);
   const completedPrograms = programInteractions.filter(p => p.is_completed);
   const viewedPrograms = programInteractions.filter(p => p.has_viewed);
   const ratedPrograms = programInteractions.filter(p => p.rating && p.rating > 0);
+  const inProgressPrograms = programInteractions.filter(p => p.is_ongoing);
 
   // Premium members have Gold/Platinum subscription
   const hasActivePlan = subscriptionInfo?.subscribed && subscriptionInfo?.product_id;
@@ -1561,7 +1565,7 @@ export default function UserDashboard() {
                 {/* Workout Activity Stats */}
                 <div>
                   <h3 className="text-lg font-semibold mb-4">Workout Activity</h3>
-                  <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4 mb-6">
+                  <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-5 mb-6">
                     <Card>
                       <CardHeader className="pb-3">
                         <CardTitle className="text-sm font-medium flex items-center gap-2">
@@ -1577,24 +1581,36 @@ export default function UserDashboard() {
                     <Card>
                       <CardHeader className="pb-3">
                         <CardTitle className="text-sm font-medium flex items-center gap-2">
-                          <CheckCircle className="h-4 w-4 text-green-500" />
-                          Completed
-                        </CardTitle>
-                      </CardHeader>
-                      <CardContent>
-                        <div className="text-2xl font-bold">{completedWorkouts.length}</div>
-                      </CardContent>
-                    </Card>
-
-                    <Card>
-                      <CardHeader className="pb-3">
-                        <CardTitle className="text-sm font-medium flex items-center gap-2">
                           <Clock className="h-4 w-4 text-blue-500" />
                           Viewed
                         </CardTitle>
                       </CardHeader>
                       <CardContent>
                         <div className="text-2xl font-bold">{viewedWorkouts.length}</div>
+                      </CardContent>
+                    </Card>
+
+                    <Card>
+                      <CardHeader className="pb-3">
+                        <CardTitle className="text-sm font-medium flex items-center gap-2">
+                          <Play className="h-4 w-4 text-purple-500" />
+                          In Progress
+                        </CardTitle>
+                      </CardHeader>
+                      <CardContent>
+                        <div className="text-2xl font-bold">{inProgressWorkouts.length}</div>
+                      </CardContent>
+                    </Card>
+
+                    <Card>
+                      <CardHeader className="pb-3">
+                        <CardTitle className="text-sm font-medium flex items-center gap-2">
+                          <CheckCircle className="h-4 w-4 text-green-500" />
+                          Completed
+                        </CardTitle>
+                      </CardHeader>
+                      <CardContent>
+                        <div className="text-2xl font-bold">{completedWorkouts.length}</div>
                       </CardContent>
                     </Card>
 
@@ -1615,7 +1631,7 @@ export default function UserDashboard() {
                 {/* Program Activity Stats */}
                 <div>
                   <h3 className="text-lg font-semibold mb-4">Program Activity</h3>
-                  <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4 mb-6">
+                  <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-5 mb-6">
                     <Card>
                       <CardHeader className="pb-3">
                         <CardTitle className="text-sm font-medium flex items-center gap-2">
@@ -1631,24 +1647,36 @@ export default function UserDashboard() {
                     <Card>
                       <CardHeader className="pb-3">
                         <CardTitle className="text-sm font-medium flex items-center gap-2">
-                          <CheckCircle className="h-4 w-4 text-green-500" />
-                          Completed
-                        </CardTitle>
-                      </CardHeader>
-                      <CardContent>
-                        <div className="text-2xl font-bold">{completedPrograms.length}</div>
-                      </CardContent>
-                    </Card>
-
-                    <Card>
-                      <CardHeader className="pb-3">
-                        <CardTitle className="text-sm font-medium flex items-center gap-2">
                           <Clock className="h-4 w-4 text-blue-500" />
                           Viewed
                         </CardTitle>
                       </CardHeader>
                       <CardContent>
                         <div className="text-2xl font-bold">{viewedPrograms.length}</div>
+                      </CardContent>
+                    </Card>
+
+                    <Card>
+                      <CardHeader className="pb-3">
+                        <CardTitle className="text-sm font-medium flex items-center gap-2">
+                          <Play className="h-4 w-4 text-purple-500" />
+                          In Progress
+                        </CardTitle>
+                      </CardHeader>
+                      <CardContent>
+                        <div className="text-2xl font-bold">{inProgressPrograms.length}</div>
+                      </CardContent>
+                    </Card>
+
+                    <Card>
+                      <CardHeader className="pb-3">
+                        <CardTitle className="text-sm font-medium flex items-center gap-2">
+                          <CheckCircle className="h-4 w-4 text-green-500" />
+                          Completed
+                        </CardTitle>
+                      </CardHeader>
+                      <CardContent>
+                        <div className="text-2xl font-bold">{completedPrograms.length}</div>
                       </CardContent>
                     </Card>
 
