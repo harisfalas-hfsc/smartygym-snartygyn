@@ -120,12 +120,27 @@ export const useAdvancedActivityLog = (
       });
     }
 
-    // Generate time buckets
+    // Generate time buckets based on time filter
     const timeBuckets: { [key: string]: any } = {};
     
-    if (timeFilter === 'weekly') {
-      // Generate 12 weeks
-      for (let i = 11; i >= 0; i--) {
+    // Determine bucket count and type
+    const getTimeBucketCount = () => {
+      if (timeFilter === 'last_month') return 4; // 4 weeks
+      if (timeFilter === 'last_12_months') return 12; // 12 months
+      if (timeFilter === 'last_6_months') return 6; // 6 months
+      if (timeFilter === 'custom') {
+        const months = Math.ceil((endDate.getTime() - startDate.getTime()) / (30 * 24 * 60 * 60 * 1000));
+        return Math.max(1, Math.min(12, months));
+      }
+      return 6;
+    };
+
+    const bucketCount = getTimeBucketCount();
+    const isWeekly = timeFilter === 'last_month';
+
+    if (isWeekly) {
+      // Generate weeks for last month
+      for (let i = bucketCount - 1; i >= 0; i--) {
         const weekStart = new Date(endDate);
         weekStart.setDate(weekStart.getDate() - (i * 7));
         const weekEnd = new Date(weekStart);
@@ -134,8 +149,8 @@ export const useAdvancedActivityLog = (
         timeBuckets[key] = { name: key, start: weekStart, end: weekEnd };
       }
     } else {
-      // Generate 6 months
-      for (let i = 5; i >= 0; i--) {
+      // Generate months for longer periods
+      for (let i = bucketCount - 1; i >= 0; i--) {
         const monthStart = new Date(endDate.getFullYear(), endDate.getMonth() - i, 1);
         const monthEnd = endOfMonth(monthStart);
         const key = format(monthStart, 'MMM yyyy');
