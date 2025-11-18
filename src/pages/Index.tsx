@@ -440,16 +440,16 @@ const Index = () => {
                   </div>
 
         {/* Navigation Dropdown - Full Width Elegant Design */}
-        <div className="pt-3">
+        <div className="pt-3 flex justify-center">
                     <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button
                 size="lg"
-                className="w-full h-12 text-base font-bold bg-transparent hover:bg-primary/5 border-2 border-primary transition-all duration-300 hover:scale-[1.02] group"
+                className="h-12 px-6 text-base font-bold bg-transparent hover:bg-primary/5 border border-primary/20 transition-all duration-300 hover:scale-[1.02] group"
               >
-                <div className="flex items-center justify-center gap-3 w-full">
+                <div className="flex items-center justify-center gap-3">
                   <Dumbbell className="w-5 h-5 text-primary group-hover:scale-110 transition-transform duration-300" />
-                  <span className="text-primary drop-shadow-md">Let's Get Started</span>
+                  <span className="text-primary drop-shadow-md">Start your fitness journey with Smarty Gym</span>
                   <ChevronDown className="w-5 h-5 text-primary ml-2 group-hover:translate-y-1 transition-transform duration-300" />
                 </div>
               </Button>
