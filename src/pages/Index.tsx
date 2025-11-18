@@ -455,11 +455,18 @@ const Index = () => {
               </Button>
             </DropdownMenuTrigger>
                       
-                      <DropdownMenuContent 
-                        className="w-[calc(100vw-4rem)] sm:w-[600px] lg:w-[700px] p-3 bg-gradient-to-br from-background via-primary/5 to-background border-2 border-primary/20 shadow-2xl backdrop-blur-sm"
-                        align="center"
-                        sideOffset={8}
-                      >
+            <DropdownMenuContent 
+              className="w-[calc(100vw-2rem)] sm:w-[600px] lg:w-[700px] p-3 bg-gradient-to-br from-background via-primary/5 to-background border-2 border-primary/20 shadow-2xl backdrop-blur-sm
+              data-[state=open]:animate-in data-[state=closed]:animate-out 
+              data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 
+              data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 
+              data-[side=bottom]:slide-in-from-top-2 
+              data-[side=left]:slide-in-from-right-2 
+              data-[side=right]:slide-in-from-left-2 
+              data-[side=top]:slide-in-from-bottom-2"
+              align="center"
+              sideOffset={8}
+            >
                         {/* Workouts */}
               <DropdownMenuItem
                 onClick={() => navigate("/workout")}
