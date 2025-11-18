@@ -160,17 +160,17 @@ const TrainingProgramFlow = () => {
                         </a>
                         {" "}BSc Sports Science, EXOS Specialist, CSCS
                       </p>
-                  <div className="flex flex-wrap gap-2 text-xs mt-2">
+                  <div className="flex gap-1.5 text-[11px] mt-2">
                     <span 
-                      className="bg-primary/20 text-primary border border-primary/40 px-2 py-1 rounded-full whitespace-nowrap" 
+                      className="bg-primary/20 text-primary border border-primary/40 px-1.5 py-0.5 rounded-full whitespace-nowrap" 
                       itemProp="duration"
                     >
                       4-8 weeks
                     </span>
-                    <span className="bg-green-500/20 text-green-700 dark:text-green-400 border border-green-500/40 px-2 py-1 rounded-full whitespace-nowrap">
+                    <span className="bg-green-500/20 text-green-700 dark:text-green-400 border border-green-500/40 px-1.5 py-0.5 rounded-full whitespace-nowrap">
                       {program.level}
                     </span>
-                    <span className="bg-orange-500/20 text-orange-700 dark:text-orange-400 border border-orange-500/40 px-2 py-1 rounded-full whitespace-nowrap">
+                    <span className="bg-orange-500/20 text-orange-700 dark:text-orange-400 border border-orange-500/40 px-1.5 py-0.5 rounded-full whitespace-nowrap">
                       {program.equipment}
                     </span>
                   </div>
