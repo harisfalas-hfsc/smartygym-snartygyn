@@ -13,6 +13,7 @@ import { Footer } from "./components/Footer";
 import { ScrollToTop } from "./components/ScrollToTop";
 import { CookieConsent } from "./components/CookieConsent";
 import { FloatingActionButton } from "./components/FloatingActionButton";
+import { SmartyCoach } from "./components/SmartyCoach";
 import { ArticleDetail } from "./pages/ArticleDetail";
 import { trackPageVisit } from "./utils/socialMediaTracking";
 import Index from "./pages/Index";
@@ -136,6 +137,8 @@ const AppContent = () => {
             </PageTransition>
           </div>
           <Footer />
+          <SmartyCoach />
+          <FloatingActionButton />
         </div>
       </AccessControlProvider>
     </>
