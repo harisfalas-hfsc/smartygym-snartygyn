@@ -567,7 +567,7 @@ const Contact = () => {
                           value={coachFormData.message}
                           onChange={handleCoachChange}
                           placeholder="Tell Haris how he can help you..."
-                          rows={6}
+                          rows={10}
                           className={cn("resize-none", coachErrors.message ? "border-destructive" : "")}
                         />
                         {coachErrors.message && (
