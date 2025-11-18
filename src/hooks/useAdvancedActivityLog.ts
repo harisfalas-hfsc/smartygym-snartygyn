@@ -27,27 +27,28 @@ export const useAdvancedActivityLog = (
   userId: string | undefined,
   primaryFilter: string,
   secondaryFilter: string,
-  timeFilter: 'weekly' | 'monthly' | 'custom',
+  timeFilter: 'last_month' | 'last_12_months' | 'last_6_months' | 'custom',
   customStartDate?: Date,
   customEndDate?: Date
 ) => {
   // Determine date range
-  const { startDate, endDate } = useMemo(() => {
+  const { startDate, endDate} = useMemo(() => {
     const now = new Date();
     
     if (timeFilter === 'custom' && customStartDate && customEndDate) {
       return { startDate: customStartDate, endDate: customEndDate };
     }
     
-    if (timeFilter === 'weekly') {
-      const start = new Date(now);
-      start.setDate(start.getDate() - 84); // 12 weeks ago
-      return { startDate: start, endDate: now };
+    const start = new Date(now);
+    if (timeFilter === 'last_month') {
+      start.setMonth(start.getMonth() - 1);
+    } else if (timeFilter === 'last_12_months') {
+      start.setMonth(start.getMonth() - 12);
+    } else {
+      // last_6_months (default)
+      start.setMonth(start.getMonth() - 6);
     }
     
-    // monthly
-    const start = new Date(now);
-    start.setMonth(start.getMonth() - 6); // 6 months ago
     return { startDate: start, endDate: now };
   }, [timeFilter, customStartDate, customEndDate]);
 

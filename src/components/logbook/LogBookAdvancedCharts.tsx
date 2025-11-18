@@ -13,10 +13,11 @@ import { cn } from "@/lib/utils";
 interface LogBookAdvancedChartsProps {
   userId: string;
   primaryFilter: string;
+  onPrimaryFilterChange: (filter: string) => void;
   secondaryFilter: string;
   onSecondaryFilterChange: (filter: string) => void;
-  timeFilter: 'weekly' | 'monthly' | 'custom';
-  onTimeFilterChange: (filter: 'weekly' | 'monthly' | 'custom') => void;
+  timeFilter: 'last_month' | 'last_12_months' | 'last_6_months' | 'custom';
+  onTimeFilterChange: (filter: 'last_month' | 'last_12_months' | 'last_6_months' | 'custom') => void;
   customStartDate?: Date;
   onCustomStartDateChange: (date?: Date) => void;
   customEndDate?: Date;
@@ -70,6 +71,7 @@ const SECONDARY_FILTERS = {
 export const LogBookAdvancedCharts = ({ 
   userId, 
   primaryFilter,
+  onPrimaryFilterChange,
   secondaryFilter,
   onSecondaryFilterChange,
   timeFilter,
@@ -159,6 +161,20 @@ export const LogBookAdvancedCharts = ({
     <div className="space-y-6">
       {/* Filter Controls */}
       <div className="flex gap-4 flex-wrap items-center">
+        {/* Primary Filter */}
+        <Select value={primaryFilter} onValueChange={onPrimaryFilterChange}>
+          <SelectTrigger className="w-48">
+            <SelectValue placeholder="Activity Type" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">All Activity</SelectItem>
+            <SelectItem value="workout">Workouts</SelectItem>
+            <SelectItem value="program">Training Programs</SelectItem>
+            <SelectItem value="tool">Tools</SelectItem>
+            <SelectItem value="measurement">Measurements</SelectItem>
+          </SelectContent>
+        </Select>
+
         {/* Secondary Filter */}
         {getSecondaryFilters().length > 0 && (
           <Select value={secondaryFilter} onValueChange={onSecondaryFilterChange}>

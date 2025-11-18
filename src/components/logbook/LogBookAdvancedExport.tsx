@@ -10,7 +10,7 @@ interface LogBookAdvancedExportProps {
   userId: string;
   primaryFilter: string;
   secondaryFilter?: string;
-  timeFilter?: 'weekly' | 'monthly' | 'custom';
+  timeFilter?: 'last_month' | 'last_12_months' | 'last_6_months' | 'custom';
   customStartDate?: Date;
   customEndDate?: Date;
 }
@@ -19,7 +19,7 @@ export const LogBookAdvancedExport = ({
   userId, 
   primaryFilter,
   secondaryFilter = 'all',
-  timeFilter = 'monthly',
+  timeFilter = 'last_6_months',
   customStartDate,
   customEndDate
 }: LogBookAdvancedExportProps) => {
@@ -54,7 +54,7 @@ export const LogBookAdvancedExport = ({
         filter: `${primaryFilter} - ${secondaryFilter} - ${timeFilter}`,
         period: timeFilter === 'custom' && customStartDate && customEndDate
           ? `${format(customStartDate, 'MMM dd, yyyy')} - ${format(customEndDate, 'MMM dd, yyyy')}`
-          : timeFilter === 'weekly' ? 'Last 12 weeks' : 'Last 6 months'
+          : timeFilter === 'last_month' ? 'Last Month' : timeFilter === 'last_12_months' ? 'Last 12 Months' : 'Last 6 Months'
       };
 
       // Create new window for printing
