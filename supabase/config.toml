@@ -1,5 +1,8 @@
 project_id = "cvccrvyimyzrxcwzmxwk"
 
+[functions.smarty-coach]
+verify_jwt = false
+
 [functions.generate-fitness-plan]
 verify_jwt = true
 
