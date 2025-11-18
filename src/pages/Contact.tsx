@@ -451,7 +451,7 @@ const Contact = () => {
                         value={formData.message}
                         onChange={handleChange}
                         placeholder="Tell us how we can help you..."
-                        rows={12}
+                        rows={6}
                         className={cn("resize-none", errors.message ? "border-destructive" : "")}
                       />
                       {errors.message && (
