@@ -501,6 +501,7 @@ const About = () => {
                       <li>You're looking for variety and mixing different training styles</li>
                       <li>You have limited time and need quick, focused sessions</li>
                       <li>You're maintaining fitness rather than pursuing specific long-term goals</li>
+                      <li>You're seeking a quick sweat or daily movement session to kickstart or complete your day</li>
                     </ul>
                     <br />
                     <strong>Choose a training program if:</strong>
