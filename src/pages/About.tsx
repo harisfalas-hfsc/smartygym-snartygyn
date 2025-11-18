@@ -462,7 +462,7 @@ const About = () => {
                   <AccordionContent>
                     <a href="/coach-profile" className="text-primary hover:underline font-medium">Haris Falas</a> is a certified Sports Scientist 
                     and Strength & Conditioning Coach with over 20 years of professional experience. He has worked with elite athletes and professional 
-                    football teams in the Cypriot First Division, including AEL Limassol FC and Nea Salamina FC. As the founder of HFSC and 
+                    football teams in the Cypriot First Division. As the founder of HFSC and 
                     SmartyGym, <strong>Haris personally designs every single workout and program</strong> — never by AI, always with evidence-based
                     training principles and real coaching experience.
                   </AccordionContent>
