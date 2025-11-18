@@ -593,45 +593,6 @@ export type Database = {
         }
         Relationships: []
       }
-      notification_preferences: {
-        Row: {
-          community_updates: boolean | null
-          created_at: string | null
-          id: string
-          newsletter: boolean | null
-          promotional_emails: boolean | null
-          renewal_reminders: boolean | null
-          updated_at: string | null
-          user_id: string
-          workout_completion_emails: boolean | null
-          workout_reminders: boolean | null
-        }
-        Insert: {
-          community_updates?: boolean | null
-          created_at?: string | null
-          id?: string
-          newsletter?: boolean | null
-          promotional_emails?: boolean | null
-          renewal_reminders?: boolean | null
-          updated_at?: string | null
-          user_id: string
-          workout_completion_emails?: boolean | null
-          workout_reminders?: boolean | null
-        }
-        Update: {
-          community_updates?: boolean | null
-          created_at?: string | null
-          id?: string
-          newsletter?: boolean | null
-          promotional_emails?: boolean | null
-          renewal_reminders?: boolean | null
-          updated_at?: string | null
-          user_id?: string
-          workout_completion_emails?: boolean | null
-          workout_reminders?: boolean | null
-        }
-        Relationships: []
-      }
       onerm_history: {
         Row: {
           created_at: string
@@ -846,61 +807,34 @@ export type Database = {
       }
       profiles: {
         Row: {
-          age: number | null
           avatar_url: string | null
           created_at: string
           custom_session_duration: number | null
-          equipment_preferences: string[] | null
-          fitness_goals: string[] | null
-          fitness_level: string | null
           full_name: string | null
-          gender: string | null
-          has_completed_profile: boolean | null
-          height: number | null
           id: string
-          nickname: string | null
           notification_preferences: Json | null
           updated_at: string
           user_id: string
-          weight: number | null
         }
         Insert: {
-          age?: number | null
           avatar_url?: string | null
           created_at?: string
           custom_session_duration?: number | null
-          equipment_preferences?: string[] | null
-          fitness_goals?: string[] | null
-          fitness_level?: string | null
           full_name?: string | null
-          gender?: string | null
-          has_completed_profile?: boolean | null
-          height?: number | null
           id?: string
-          nickname?: string | null
           notification_preferences?: Json | null
           updated_at?: string
           user_id: string
-          weight?: number | null
         }
         Update: {
-          age?: number | null
           avatar_url?: string | null
           created_at?: string
           custom_session_duration?: number | null
-          equipment_preferences?: string[] | null
-          fitness_goals?: string[] | null
-          fitness_level?: string | null
           full_name?: string | null
-          gender?: string | null
-          has_completed_profile?: boolean | null
-          height?: number | null
           id?: string
-          nickname?: string | null
           notification_preferences?: Json | null
           updated_at?: string
           user_id?: string
-          weight?: number | null
         }
         Relationships: []
       }

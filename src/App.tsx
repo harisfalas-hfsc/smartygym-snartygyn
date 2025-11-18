@@ -27,7 +27,6 @@ import TrainingProgramFlow from "./pages/TrainingProgramFlow";
 import TrainingProgramDetail from "./pages/TrainingProgramDetail";
 import IndividualTrainingProgram from "./pages/IndividualTrainingProgram";
 import DietPlanFlow from "./pages/DietPlanFlow";
-import ProfileSettings from "./pages/ProfileSettings";
 import OneRMCalculator from "./pages/OneRMCalculator";
 import BMRCalculator from "./pages/BMRCalculator";
 import MacroTrackingCalculator from "./pages/MacroTrackingCalculator";
@@ -108,7 +107,6 @@ const AppContent = () => {
                 <Route element={<ProtectedRoute><AuthenticatedLayout /></ProtectedRoute>}>
                   <Route path="/dashboard" element={<Dashboard />} />
                   <Route path="/userdashboard" element={<UserDashboard />} />
-                  <Route path="/profilesettings" element={<ProfileSettings />} />
                   <Route path="/1rmcalculator" element={<OneRMCalculator />} />
                   <Route path="/bmrcalculator" element={<BMRCalculator />} />
                   <Route path="/macrocalculator" element={<MacroTrackingCalculator />} />
