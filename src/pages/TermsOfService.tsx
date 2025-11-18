@@ -7,14 +7,56 @@ const TermsOfService = () => {
   return (
     <>
       <Helmet>
-        <title>Terms of Service | SmartyGym.com Online Fitness Platform | smartygym.com</title>
-        <meta name="description" content="Terms and Conditions for Smarty Gym (smartygym.com) - Online Fitness Platform by Haris Falas. Read our terms of service for using our evidence-based fitness programs and online training services." />
-        <meta name="keywords" content="smartygym terms, smartygym.com terms of service, online fitness terms, Haris Falas, online fitness legal, fitness platform terms" />
+        <title>Terms of Service | SmartyGym.com Online Fitness Platform Cyprus | smartygym.com</title>
+        <meta name="description" content="Terms and Conditions for SmartyGym (smartygym.com) - Online Fitness Platform by Haris Falas Cyprus. Read our terms of service for using our evidence-based fitness programs, online workouts, training programs, and online gym services. Legal information for Cyprus online fitness." />
+        <meta name="keywords" content="smartygym terms, smartygym.com terms of service, online fitness terms Cyprus, Haris Falas legal, online fitness legal, fitness platform terms, online gym terms, SmartyGym legal, Cyprus fitness terms, workout platform terms, training program terms, online gym legal Cyprus" />
         
-        <meta property="og:title" content="Terms of Service - SmartyGym.com" />
-        <meta property="og:description" content="Legal terms for using SmartyGym.com Online Fitness Platform" />
+        <meta property="og:title" content="Terms of Service | SmartyGym.com Cyprus" />
+        <meta property="og:description" content="Legal terms for using SmartyGym.com Online Fitness Platform by Haris Falas" />
+        <meta property="og:type" content="website" />
+        <meta property="og:url" content="https://smartygym.com/terms-of-service" />
+        
+        <meta name="twitter:card" content="summary" />
+        <meta name="twitter:title" content="Terms of Service | SmartyGym Cyprus" />
+        <meta name="twitter:description" content="Legal terms for SmartyGym online fitness platform" />
         
         <link rel="canonical" href="https://smartygym.com/terms-of-service" />
+        
+        {/* WebPage Schema */}
+        <script type="application/ld+json">
+          {JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "WebPage",
+            "name": "Terms of Service",
+            "description": "Terms and Conditions for SmartyGym Online Fitness Platform",
+            "publisher": {
+              "@type": "Organization",
+              "name": "SmartyGym"
+            }
+          })}
+        </script>
+        
+        {/* BreadcrumbList Schema */}
+        <script type="application/ld+json">
+          {JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "BreadcrumbList",
+            "itemListElement": [
+              {
+                "@type": "ListItem",
+                "position": 1,
+                "name": "Home",
+                "item": "https://smartygym.com"
+              },
+              {
+                "@type": "ListItem",
+                "position": 2,
+                "name": "Terms of Service",
+                "item": "https://smartygym.com/terms-of-service"
+              }
+            ]
+          })}
+        </script>
       </Helmet>
 
       <div className="min-h-screen bg-background">

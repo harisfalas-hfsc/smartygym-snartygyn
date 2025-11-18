@@ -104,8 +104,42 @@ const PremiumComparison = () => {
   return (
     <>
       <Helmet>
-        <title>Compare Plans | Smarty Gym</title>
-        <meta name="description" content="Compare Visitor, Subscriber, and Premium access levels at Smarty Gym. Find the perfect plan for your fitness journey." />
+        <title>Compare Plans - Visitor vs Free vs Premium | SmartyGym Cyprus Online Gym | smartygym.com</title>
+        <meta name="description" content="Compare SmartyGym access levels at smartygym.com - Visitor, Free Subscriber, Premium membership. See what's included: workouts, training programs, dashboard, calculators, exercise library. Choose the best plan for your fitness goals. Cyprus online gym by Haris Falas." />
+        <meta name="keywords" content="SmartyGym plans comparison, online gym plans Cyprus, free vs premium fitness, gym membership comparison, SmartyGym pricing, smartygym.com plans, visitor vs subscriber, premium vs free gym, online fitness comparison, Cyprus gym plans, compare fitness memberships, SmartyGym access levels, workout access comparison, Haris Falas gym plans" />
+        
+        <meta property="og:title" content="Compare Plans | SmartyGym Cyprus Online Gym" />
+        <meta property="og:description" content="Compare Visitor, Free, and Premium access levels. Find your perfect fitness plan." />
+        <meta property="og:type" content="website" />
+        <meta property="og:url" content="https://smartygym.com/premium-comparison" />
+        
+        <meta name="twitter:card" content="summary" />
+        <meta name="twitter:title" content="Compare Plans | SmartyGym Cyprus" />
+        <meta name="twitter:description" content="Find the perfect plan for your fitness journey" />
+        
+        <link rel="canonical" href="https://smartygym.com/premium-comparison" />
+        
+        {/* BreadcrumbList Schema */}
+        <script type="application/ld+json">
+          {JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "BreadcrumbList",
+            "itemListElement": [
+              {
+                "@type": "ListItem",
+                "position": 1,
+                "name": "Home",
+                "item": "https://smartygym.com"
+              },
+              {
+                "@type": "ListItem",
+                "position": 2,
+                "name": "Compare Plans",
+                "item": "https://smartygym.com/premium-comparison"
+              }
+            ]
+          })}
+        </script>
       </Helmet>
 
       <div className="min-h-screen bg-background py-8 px-4">
