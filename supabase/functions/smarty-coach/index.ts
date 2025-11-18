@@ -9,7 +9,7 @@ const corsHeaders = {
 interface SmartyCoachRequest {
   question: string;
   goal?: string;
-  equipment?: string;
+  equipment?: string[];
   time?: string;
 }
 
@@ -74,8 +74,8 @@ Subscription tiers:
 
     const userPrompt = `User question: ${question}
 ${goal ? `Goal: ${goal}` : ''}
-${equipment ? `Equipment: ${equipment}` : ''}
-${time ? `Time available: ${time} minutes` : ''}
+${equipment?.length ? `Equipment available: ${equipment.join(', ')}` : ''}
+${time ? `Time available: ${time === 'unlimited' ? 'Unlimited' : `${time} minutes`}` : ''}
 
 Recommend ONE single best option from the available content. If it's not a perfect match, still suggest the closest option and explain briefly why.
 

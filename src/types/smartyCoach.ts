@@ -3,7 +3,8 @@ export type QuestionType =
   | "workout-or-program" 
   | "goal"
   | "equipment"
-  | "time";
+  | "time"
+  | "limited-time";
 
 export type GoalType = 
   | "lose-fat"
@@ -39,12 +40,12 @@ export type EquipmentType =
   | "ankle-weights"
   | "weighted-vest";
 
-export type TimeOption = "10" | "20" | "30" | "45" | "60";
+export type TimeOption = "10" | "20" | "30" | "45" | "60" | "unlimited";
 
 export interface ConversationState {
   currentQuestion: QuestionType | null;
   selectedGoal: string | null;
-  selectedEquipment: string | null;
+  selectedEquipment: string[] | null;
   selectedTime: string | null;
   isLoading: boolean;
   recommendation: Recommendation | null;
