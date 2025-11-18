@@ -24,23 +24,23 @@ const TrainingProgramFlow = () => {
       description: "Structured program to build cardiovascular fitness",
       icon: Heart,
       level: "Beginner-Advanced",
-      equipment: "No Equipment"
+      equipment: "Equipment/No Equipment"
     },
     {
       id: "functional-strength",
       title: "Functional Strength",
       description: "Structured program for real-world strength and movement",
       icon: Dumbbell,
-      level: "Intermediate-Advanced",
-      equipment: "Equipment Required"
+      level: "Beginner-Advanced",
+      equipment: "Equipment/No Equipment"
     },
     {
       id: "muscle-hypertrophy",
       title: "Muscle Hypertrophy",
       description: "Structured program focused on muscle growth",
       icon: Activity,
-      level: "Intermediate-Advanced",
-      equipment: "Equipment Required"
+      level: "Beginner-Advanced",
+      equipment: "Equipment/No Equipment"
     },
     {
       id: "weight-loss",
@@ -48,15 +48,15 @@ const TrainingProgramFlow = () => {
       description: "Structured program designed for fat loss",
       icon: Flame,
       level: "Beginner-Advanced",
-      equipment: "No Equipment"
+      equipment: "Equipment/No Equipment"
     },
     {
       id: "low-back-pain",
       title: "Low Back Pain",
       description: "Structured program to strengthen and rehabilitate",
       icon: User,
-      level: "Beginner-Intermediate",
-      equipment: "No Equipment"
+      level: "Beginner-Advanced",
+      equipment: "Equipment/No Equipment"
     },
     {
       id: "mobility-stability",
@@ -64,7 +64,7 @@ const TrainingProgramFlow = () => {
       description: "Structured program for movement quality",
       icon: Move,
       level: "Beginner-Advanced",
-      equipment: "No Equipment"
+      equipment: "Equipment/No Equipment"
     },
   ];
 
