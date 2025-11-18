@@ -133,9 +133,11 @@ export const SmartyCoachChat = ({ onClose }: SmartyCoachChatProps) => {
 
   const handleAnswerSelect = async (answer: string | string[]) => {
     if (awaitingAnswer === "goal") {
-      const answerStr = Array.isArray(answer) ? answer[0] : answer;
-      setState((prev) => ({ ...prev, selectedGoal: answerStr }));
-      addMessage("user", getAnswerLabel(answerStr));
+      const goalsArray = Array.isArray(answer) ? answer : [answer];
+      setState((prev) => ({ ...prev, selectedGoal: goalsArray }));
+      
+      const goalLabels = goalsArray.map(g => getAnswerLabel(g)).join(", ");
+      addMessage("user", goalLabels);
 
       if (state.currentQuestion === "today") {
         setTimeout(() => {
@@ -143,7 +145,7 @@ export const SmartyCoachChat = ({ onClose }: SmartyCoachChatProps) => {
           setAwaitingAnswer("equipment");
         }, 300);
       } else {
-        await getRecommendation(state.currentQuestion!, answerStr, null, null);
+        await getRecommendation(state.currentQuestion!, goalsArray, null, null);
       }
     } else if (awaitingAnswer === "equipment") {
       const equipmentArray = Array.isArray(answer) ? answer : [answer];
