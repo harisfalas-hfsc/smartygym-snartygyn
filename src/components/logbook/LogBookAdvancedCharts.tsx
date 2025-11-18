@@ -13,6 +13,14 @@ import { cn } from "@/lib/utils";
 interface LogBookAdvancedChartsProps {
   userId: string;
   primaryFilter: string;
+  secondaryFilter: string;
+  onSecondaryFilterChange: (filter: string) => void;
+  timeFilter: 'weekly' | 'monthly' | 'custom';
+  onTimeFilterChange: (filter: 'weekly' | 'monthly' | 'custom') => void;
+  customStartDate?: Date;
+  onCustomStartDateChange: (date?: Date) => void;
+  customEndDate?: Date;
+  onCustomEndDateChange: (date?: Date) => void;
 }
 
 const CHART_COLORS = {
@@ -59,11 +67,18 @@ const SECONDARY_FILTERS = {
   ],
 };
 
-export const LogBookAdvancedCharts = ({ userId, primaryFilter }: LogBookAdvancedChartsProps) => {
-  const [secondaryFilter, setSecondaryFilter] = useState('all');
-  const [timeFilter, setTimeFilter] = useState<'weekly' | 'monthly' | 'custom'>('monthly');
-  const [customStartDate, setCustomStartDate] = useState<Date>();
-  const [customEndDate, setCustomEndDate] = useState<Date>();
+export const LogBookAdvancedCharts = ({ 
+  userId, 
+  primaryFilter,
+  secondaryFilter,
+  onSecondaryFilterChange,
+  timeFilter,
+  onTimeFilterChange,
+  customStartDate,
+  onCustomStartDateChange,
+  customEndDate,
+  onCustomEndDateChange
+}: LogBookAdvancedChartsProps) => {
 
   const { lineChartData, pieChartData, isLoading } = useAdvancedActivityLog(
     userId,
@@ -146,7 +161,7 @@ export const LogBookAdvancedCharts = ({ userId, primaryFilter }: LogBookAdvanced
       <div className="flex gap-4 flex-wrap items-center">
         {/* Secondary Filter */}
         {getSecondaryFilters().length > 0 && (
-          <Select value={secondaryFilter} onValueChange={setSecondaryFilter}>
+          <Select value={secondaryFilter} onValueChange={onSecondaryFilterChange}>
             <SelectTrigger className="w-48">
               <SelectValue placeholder="Filter by..." />
             </SelectTrigger>
@@ -161,7 +176,7 @@ export const LogBookAdvancedCharts = ({ userId, primaryFilter }: LogBookAdvanced
         )}
 
         {/* Time Filter */}
-        <Select value={timeFilter} onValueChange={(value: any) => setTimeFilter(value)}>
+        <Select value={timeFilter} onValueChange={(value: any) => onTimeFilterChange(value)}>
           <SelectTrigger className="w-48">
             <SelectValue placeholder="Time period" />
           </SelectTrigger>
@@ -183,7 +198,7 @@ export const LogBookAdvancedCharts = ({ userId, primaryFilter }: LogBookAdvanced
                 </Button>
               </PopoverTrigger>
               <PopoverContent className="w-auto p-0">
-                <Calendar mode="single" selected={customStartDate} onSelect={setCustomStartDate} initialFocus />
+                <Calendar mode="single" selected={customStartDate} onSelect={onCustomStartDateChange} initialFocus />
               </PopoverContent>
             </Popover>
 
@@ -195,7 +210,7 @@ export const LogBookAdvancedCharts = ({ userId, primaryFilter }: LogBookAdvanced
                 </Button>
               </PopoverTrigger>
               <PopoverContent className="w-auto p-0">
-                <Calendar mode="single" selected={customEndDate} onSelect={setCustomEndDate} initialFocus />
+                <Calendar mode="single" selected={customEndDate} onSelect={onCustomEndDateChange} initialFocus />
               </PopoverContent>
             </Popover>
           </>
