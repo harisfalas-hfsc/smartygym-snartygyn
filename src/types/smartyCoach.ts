@@ -44,7 +44,7 @@ export type TimeOption = "10" | "20" | "30" | "45" | "60" | "unlimited";
 
 export interface ConversationState {
   currentQuestion: QuestionType | null;
-  selectedGoal: string | null;
+  selectedGoal: string[] | null;
   selectedEquipment: string[] | null;
   selectedTime: string | null;
   isLoading: boolean;
@@ -73,11 +73,20 @@ export interface Recommendation {
   };
 }
 
+export interface UserContext {
+  completedWorkouts?: string[];
+  viewedWorkouts?: string[];
+  completedPrograms?: string[];
+  viewedPrograms?: string[];
+  subscriptionPlan?: string | null;
+}
+
 export interface SmartyCoachRequest {
   question: QuestionType;
-  goal?: GoalType;
-  equipment?: EquipmentType;
+  goal?: GoalType | GoalType[];
+  equipment?: EquipmentType[];
   time?: TimeOption;
+  userContext?: UserContext;
 }
 
 export interface SmartyCoachResponse {
