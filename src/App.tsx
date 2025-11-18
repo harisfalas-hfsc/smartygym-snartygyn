@@ -14,6 +14,7 @@ import { ScrollToTop } from "./components/ScrollToTop";
 import { CookieConsent } from "./components/CookieConsent";
 
 import { SmartyCoach } from "./components/SmartyCoach";
+import { useAdminRole } from "./hooks/useAdminRole";
 import { ArticleDetail } from "./pages/ArticleDetail";
 import { trackPageVisit } from "./utils/socialMediaTracking";
 import Index from "./pages/Index";
@@ -61,6 +62,8 @@ import { LoadingBar } from "./components/LoadingBar";
 const queryClient = new QueryClient();
 
 const AppContent = () => {
+  const { isAdmin, loading } = useAdminRole();
+  
   useEffect(() => {
     // Track page visit on initial load
     trackPageVisit();
@@ -135,7 +138,7 @@ const AppContent = () => {
             </PageTransition>
           </div>
           <Footer />
-          <SmartyCoach />
+          {!loading && isAdmin && <SmartyCoach />}
           
         </div>
       </AccessControlProvider>
