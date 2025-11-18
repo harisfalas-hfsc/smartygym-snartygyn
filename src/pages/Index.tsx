@@ -445,18 +445,18 @@ const Index = () => {
             <DropdownMenuTrigger asChild>
               <Button
                 size="lg"
-                className="w-full h-12 text-base font-bold bg-gradient-to-r from-primary via-amber-400 to-primary hover:from-primary/90 hover:via-amber-500 hover:to-primary/90 border-2 border-primary/30 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-[1.02] group"
+                className="w-full h-12 text-base font-bold bg-transparent hover:bg-primary/5 border-2 border-primary shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-[1.02] group"
               >
                 <div className="flex items-center justify-center gap-3 w-full">
                   <Dumbbell className="w-5 h-5 group-hover:scale-110 transition-transform duration-300" />
-                  <span className="text-white drop-shadow-md">Let's Get Started</span>
+                  <span className="text-primary drop-shadow-md">Let's Get Started</span>
                   <ChevronDown className="w-5 h-5 ml-2 group-hover:translate-y-1 transition-transform duration-300" />
                 </div>
               </Button>
             </DropdownMenuTrigger>
                       
             <DropdownMenuContent 
-              className="w-[calc(100vw-2rem)] sm:w-[600px] lg:w-[700px] p-3 bg-transparent border-2 border-primary shadow-md
+              className="w-[calc(100vw-2rem)] sm:w-[600px] lg:w-[700px] p-3 bg-gradient-to-br from-background via-primary/5 to-background border-2 border-primary/20 shadow-2xl backdrop-blur-sm
               data-[state=open]:animate-in data-[state=closed]:animate-out 
               data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 
               data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 
@@ -473,105 +473,105 @@ const Index = () => {
                         {/* Workouts */}
               <DropdownMenuItem
                 onClick={() => navigate("/workout")}
-                className="h-16 px-5 rounded-lg cursor-pointer group hover:bg-primary/10 border border-transparent hover:border-primary/30 transition-all duration-200 hover:scale-[1.02] mb-2"
+                className="h-16 px-5 rounded-lg cursor-pointer group hover:bg-primary/80 border border-transparent hover:border-primary transition-all duration-200 hover:scale-[1.02] mb-2"
               >
                 <div className="flex items-center gap-4 w-full">
                   <div className="p-3 rounded-full bg-primary/10 group-hover:bg-primary/20 transition-colors">
                     <Dumbbell className="w-6 h-6 text-primary group-hover:scale-110 transition-transform" />
                   </div>
                   <div className="flex-1">
-                    <p className="text-lg font-bold text-foreground group-hover:text-primary transition-colors">
+                    <p className="text-lg font-bold text-foreground group-hover:text-white transition-colors">
                       Workouts
                     </p>
-                    <p className="text-xs text-muted-foreground group-hover:text-foreground/80">
+                    <p className="text-xs text-muted-foreground group-hover:text-white/90">
                       500+ Expert workouts for all fitness levels
                     </p>
                   </div>
-                  <ChevronRight className="w-5 h-5 text-muted-foreground group-hover:text-primary group-hover:translate-x-1 transition-all" />
+                  <ChevronRight className="w-5 h-5 text-muted-foreground group-hover:text-white group-hover:translate-x-1 transition-all" />
                 </div>
               </DropdownMenuItem>
 
                         {/* Training Programs */}
               <DropdownMenuItem
                 onClick={() => navigate("/trainingprogram")}
-                className="h-16 px-5 rounded-lg cursor-pointer group hover:bg-primary/10 border border-transparent hover:border-primary/30 transition-all duration-200 hover:scale-[1.02] mb-2"
+                className="h-16 px-5 rounded-lg cursor-pointer group hover:bg-primary/80 border border-transparent hover:border-primary transition-all duration-200 hover:scale-[1.02] mb-2"
               >
                 <div className="flex items-center gap-4 w-full">
                   <div className="p-3 rounded-full bg-primary/10 group-hover:bg-primary/20 transition-colors">
                     <Calendar className="w-6 h-6 text-primary group-hover:scale-110 transition-transform" />
                   </div>
                   <div className="flex-1">
-                    <p className="text-lg font-bold text-foreground group-hover:text-primary transition-colors">
+                    <p className="text-lg font-bold text-foreground group-hover:text-white transition-colors">
                       Training Programs
                     </p>
-                    <p className="text-xs text-muted-foreground group-hover:text-foreground/80">
+                    <p className="text-xs text-muted-foreground group-hover:text-white/90">
                       Structured programs for long-term goals
                     </p>
                   </div>
-                  <ChevronRight className="w-5 h-5 text-muted-foreground group-hover:text-primary group-hover:translate-x-1 transition-all" />
+                  <ChevronRight className="w-5 h-5 text-muted-foreground group-hover:text-white group-hover:translate-x-1 transition-all" />
                 </div>
               </DropdownMenuItem>
 
                         {/* Tools */}
               <DropdownMenuItem
                 onClick={() => navigate("/tools")}
-                className="h-16 px-5 rounded-lg cursor-pointer group hover:bg-primary/10 border border-transparent hover:border-primary/30 transition-all duration-200 hover:scale-[1.02] mb-2"
+                className="h-16 px-5 rounded-lg cursor-pointer group hover:bg-primary/80 border border-transparent hover:border-primary transition-all duration-200 hover:scale-[1.02] mb-2"
               >
                 <div className="flex items-center gap-4 w-full">
                   <div className="p-3 rounded-full bg-primary/10 group-hover:bg-primary/20 transition-colors">
                     <Wrench className="w-6 h-6 text-primary group-hover:scale-110 transition-transform" />
                   </div>
                   <div className="flex-1">
-                    <p className="text-lg font-bold text-foreground group-hover:text-primary transition-colors">
+                    <p className="text-lg font-bold text-foreground group-hover:text-white transition-colors">
                       Tools
                     </p>
-                    <p className="text-xs text-muted-foreground group-hover:text-foreground/80">
+                    <p className="text-xs text-muted-foreground group-hover:text-white/90">
                       Calculators and fitness tracking tools
                     </p>
                   </div>
-                  <ChevronRight className="w-5 h-5 text-muted-foreground group-hover:text-primary group-hover:translate-x-1 transition-all" />
+                  <ChevronRight className="w-5 h-5 text-muted-foreground group-hover:text-white group-hover:translate-x-1 transition-all" />
                 </div>
               </DropdownMenuItem>
 
                         {/* Exercise Library */}
               <DropdownMenuItem
                 onClick={() => navigate("/exerciselibrary")}
-                className="h-16 px-5 rounded-lg cursor-pointer group hover:bg-primary/10 border border-transparent hover:border-primary/30 transition-all duration-200 hover:scale-[1.02] mb-2"
+                className="h-16 px-5 rounded-lg cursor-pointer group hover:bg-primary/80 border border-transparent hover:border-primary transition-all duration-200 hover:scale-[1.02] mb-2"
               >
                 <div className="flex items-center gap-4 w-full">
                   <div className="p-3 rounded-full bg-primary/10 group-hover:bg-primary/20 transition-colors">
                     <Video className="w-6 h-6 text-primary group-hover:scale-110 transition-transform" />
                   </div>
                   <div className="flex-1">
-                    <p className="text-lg font-bold text-foreground group-hover:text-primary transition-colors">
+                    <p className="text-lg font-bold text-foreground group-hover:text-white transition-colors">
                       Exercise Library
                     </p>
-                    <p className="text-xs text-muted-foreground group-hover:text-foreground/80">
+                    <p className="text-xs text-muted-foreground group-hover:text-white/90">
                       Comprehensive exercise video database
                     </p>
                   </div>
-                  <ChevronRight className="w-5 h-5 text-muted-foreground group-hover:text-primary group-hover:translate-x-1 transition-all" />
+                  <ChevronRight className="w-5 h-5 text-muted-foreground group-hover:text-white group-hover:translate-x-1 transition-all" />
                 </div>
               </DropdownMenuItem>
 
                         {/* Blog */}
               <DropdownMenuItem
                 onClick={() => navigate("/blog")}
-                className="h-16 px-5 rounded-lg cursor-pointer group hover:bg-primary/10 border border-transparent hover:border-primary/30 transition-all duration-200 hover:scale-[1.02]"
+                className="h-16 px-5 rounded-lg cursor-pointer group hover:bg-primary/80 border border-transparent hover:border-primary transition-all duration-200 hover:scale-[1.02]"
               >
                 <div className="flex items-center gap-4 w-full">
                   <div className="p-3 rounded-full bg-primary/10 group-hover:bg-primary/20 transition-colors">
                     <FileText className="w-6 h-6 text-primary group-hover:scale-110 transition-transform" />
                   </div>
                   <div className="flex-1">
-                    <p className="text-lg font-bold text-foreground group-hover:text-primary transition-colors">
+                    <p className="text-lg font-bold text-foreground group-hover:text-white transition-colors">
                       Blog
                     </p>
-                    <p className="text-xs text-muted-foreground group-hover:text-foreground/80">
+                    <p className="text-xs text-muted-foreground group-hover:text-white/90">
                       Expert articles and fitness insights
                     </p>
                   </div>
-                  <ChevronRight className="w-5 h-5 text-muted-foreground group-hover:text-primary group-hover:translate-x-1 transition-all" />
+                  <ChevronRight className="w-5 h-5 text-muted-foreground group-hover:text-white group-hover:translate-x-1 transition-all" />
                 </div>
               </DropdownMenuItem>
                       </DropdownMenuContent>
