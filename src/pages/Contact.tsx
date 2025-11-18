@@ -329,14 +329,14 @@ const Contact = () => {
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
             {/* Contact Form */}
             <div className="lg:col-span-2">
-              <Card>
+              <Card className="h-full">
                 <CardHeader>
                   <CardTitle className="text-2xl">Send Us a Message</CardTitle>
                   <CardDescription>
                     Fill out the form below and we'll get back to you within 24 hours
                   </CardDescription>
                 </CardHeader>
-                <CardContent>
+                <CardContent className="flex flex-col h-full">
                   <form onSubmit={handleSubmit} className="space-y-6">
                      <div className="space-y-2">
                       <Label htmlFor="name">Name *</Label>
@@ -412,7 +412,7 @@ const Contact = () => {
             </div>
 
             {/* Contact Info */}
-            <div className="space-y-6">
+            <div className="space-y-6 flex flex-col">
               <Card>
                 <CardHeader>
                   <CardTitle>Email Us</CardTitle>
@@ -430,7 +430,7 @@ const Contact = () => {
                 </CardContent>
               </Card>
 
-              <Card className="bg-gradient-to-br from-primary/5 to-accent/10 border-primary/20">
+              <Card className="h-full bg-gradient-to-br from-primary/5 to-accent/10 border-primary/20">
                 <CardHeader>
                   <CardTitle className="text-lg flex items-center gap-2">
                     Direct Access to Your Coach
@@ -443,7 +443,7 @@ const Contact = () => {
                     }
                   </CardDescription>
                 </CardHeader>
-                <CardContent>
+                <CardContent className="flex flex-col h-full">
                   {hasSubscription ? (
                     <form onSubmit={handleCoachSubmit} className="space-y-4">
                       <div className="space-y-2">
@@ -469,7 +469,7 @@ const Contact = () => {
                           value={coachFormData.message}
                           onChange={handleCoachChange}
                           placeholder="Tell Haris how he can help you..."
-                          rows={4}
+                          rows={6}
                           className={coachErrors.message ? "border-destructive" : ""}
                         />
                         {coachErrors.message && (
