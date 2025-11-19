@@ -559,15 +559,16 @@ const Index = () => {
                   </div>
 
                   {/* Middle Section: Phone (Left) + Three Cards (Right) */}
-                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 items-stretch lg:items-stretch">
+                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 items-stretch lg:items-stretch">
                     
                     {/* LEFT: Mobile Phone Illustration */}
                     <div className="order-1 lg:order-1 flex justify-center lg:justify-start items-stretch">
                       <div className="flex items-center h-full">
-                        <MobilePhoneIllustration 
-                  className="h-full max-h-[480px] w-auto"
-                  imageUrl="https://images.unsplash.com/photo-1517836357463-d25dfeac3438?w=400&h=800&fit=crop&crop=center"
-                        />
+            <MobilePhoneIllustration
+              variant="tablet"
+              className="h-full max-h-[480px] w-auto"
+              imageUrl="https://images.unsplash.com/photo-1517836357463-d25dfeac3438?w=600&h=800&fit=crop&crop=center"
+            />
                       </div>
                     </div>
 

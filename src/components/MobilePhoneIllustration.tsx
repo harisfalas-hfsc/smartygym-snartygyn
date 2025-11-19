@@ -1,27 +1,38 @@
 interface MobilePhoneIllustrationProps {
   imageUrl?: string;
   className?: string;
+  variant?: 'phone' | 'tablet';
 }
 
-export const MobilePhoneIllustration = ({ imageUrl, className }: MobilePhoneIllustrationProps) => {
+export const MobilePhoneIllustration = ({ imageUrl, className, variant = 'phone' }: MobilePhoneIllustrationProps) => {
   return (
     <div className={`relative ${className}`}>
-      {/* Phone frame */}
-      <div className="relative h-full max-h-[480px] mx-auto aspect-[9/19] border-[8px] border-foreground rounded-[2.5rem] shadow-2xl bg-background overflow-hidden">
-        {/* Notch */}
-        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-1/3 h-6 bg-foreground rounded-b-2xl z-10" />
+      {/* Tablet/Phone frame */}
+      <div className={`relative h-full mx-auto border-foreground shadow-2xl bg-background overflow-hidden ${
+        variant === 'tablet' 
+          ? 'max-h-[480px] aspect-[3/4] border-[6px] rounded-[1.5rem]'
+          : 'max-h-[480px] aspect-[9/19] border-[8px] rounded-[2.5rem]'
+      }`}>
+        {/* Notch - ONLY FOR PHONE */}
+        {variant === 'phone' && (
+          <div className="absolute top-0 left-1/2 -translate-x-1/2 w-1/3 h-6 bg-foreground rounded-b-2xl z-10" />
+        )}
         
         {/* Screen content */}
         <div className="relative w-full h-full p-2 bg-gradient-to-br from-primary/10 to-background">
           {imageUrl ? (
             <img 
               src={imageUrl} 
-              alt="SmartyGym App Preview" 
-              className="w-full h-full object-cover rounded-[1.5rem]"
+              alt={variant === 'tablet' ? 'SmartyGym Tablet Preview' : 'SmartyGym App Preview'}
+              className={`w-full h-full object-cover ${
+                variant === 'tablet' ? 'rounded-[1rem]' : 'rounded-[1.5rem]'
+              }`}
             />
           ) : (
             // Default diagonal lines pattern
-            <div className="w-full h-full flex items-center justify-center rounded-[1.5rem] bg-gradient-to-br from-primary/20 to-primary/5">
+            <div className={`w-full h-full flex items-center justify-center bg-gradient-to-br from-primary/20 to-primary/5 ${
+              variant === 'tablet' ? 'rounded-[1rem]' : 'rounded-[1.5rem]'
+            }`}>
               <div className="space-y-3 w-full px-4">
                 <div className="h-2 bg-primary/40 rounded-full w-3/4 transform -rotate-12" />
                 <div className="h-2 bg-primary/30 rounded-full w-full transform -rotate-12" />
@@ -33,8 +44,10 @@ export const MobilePhoneIllustration = ({ imageUrl, className }: MobilePhoneIllu
           )}
         </div>
         
-        {/* Home button indicator */}
-        <div className="absolute bottom-2 left-1/2 -translate-x-1/2 w-1/3 h-1 bg-foreground/30 rounded-full" />
+        {/* Home button indicator - ONLY FOR PHONE */}
+        {variant === 'phone' && (
+          <div className="absolute bottom-2 left-1/2 -translate-x-1/2 w-1/3 h-1 bg-foreground/30 rounded-full" />
+        )}
       </div>
     </div>
   );
