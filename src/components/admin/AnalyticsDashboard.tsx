@@ -11,6 +11,7 @@ import { RevenueAnalytics } from "./RevenueAnalytics";
 import { PurchaseAnalytics } from "./PurchaseAnalytics";
 import { PersonalTrainingAnalytics } from "./PersonalTrainingAnalytics";
 import { ContactAnalytics } from "./ContactAnalytics";
+import { ShopAnalytics } from "./ShopAnalytics";
 
 interface AnalyticsData {
   totalUsers: number;
@@ -448,6 +449,10 @@ export function AnalyticsDashboard() {
 
         <TabsContent value="purchases" className="space-y-4">
           <PurchaseAnalytics />
+        </TabsContent>
+
+        <TabsContent value="shop" className="space-y-4">
+          <ShopAnalytics />
         </TabsContent>
 
         <TabsContent value="personal-training" className="space-y-4">

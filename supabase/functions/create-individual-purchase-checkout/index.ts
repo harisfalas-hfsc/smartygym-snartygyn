@@ -98,6 +98,9 @@ serve(async (req) => {
       mode: "payment",
       success_url: `${req.headers.get("origin")}/payment-success?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${req.headers.get("origin")}/${contentType}/${contentId}`,
+      shipping_address_collection: contentType === 'shop_product' ? {
+        allowed_countries: ['US', 'CA', 'GB', 'DE', 'FR', 'ES', 'IT', 'GR', 'CY', 'NL', 'BE', 'AT', 'PT', 'IE', 'SE', 'DK', 'FI', 'NO', 'CH', 'PL'],
+      } : undefined,
       metadata: {
         user_id: user.id,
         content_type: contentType,

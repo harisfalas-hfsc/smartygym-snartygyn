@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -23,6 +23,25 @@ export const ShopOrdersManager = () => {
   const [fulfillmentStatus, setFulfillmentStatus] = useState("");
   const [trackingInfo, setTrackingInfo] = useState("");
   const queryClient = useQueryClient();
+
+  // Real-time subscription for order updates
+  useEffect(() => {
+    const channel = supabase
+      .channel('shop_orders')
+      .on('postgres_changes', {
+        event: '*',
+        schema: 'public',
+        table: 'user_purchases',
+        filter: 'content_type=eq.shop_product'
+      }, () => {
+        queryClient.invalidateQueries({ queryKey: ["shop-orders"] });
+      })
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [queryClient]);
 
   const { data: orders, isLoading } = useQuery({
     queryKey: ["shop-orders"],
@@ -144,6 +163,15 @@ export const ShopOrdersManager = () => {
                       <p>Email: {order.user_email}</p>
                       <p>Price: €{order.price?.toFixed(2)}</p>
                       <p>Purchased: {new Date(order.purchased_at).toLocaleDateString()}</p>
+                      {order.shipping_address && (
+                        <div className="text-xs mt-1 p-2 bg-muted/50 rounded">
+                          <p className="font-semibold">Shipping Address:</p>
+                          <p>{order.shipping_address.line1}</p>
+                          {order.shipping_address.line2 && <p>{order.shipping_address.line2}</p>}
+                          <p>{order.shipping_address.city}, {order.shipping_address.state} {order.shipping_address.postal_code}</p>
+                          <p>{order.shipping_address.country}</p>
+                        </div>
+                      )}
                       {order.tracking_info && (
                         <p className="font-mono text-xs">Tracking: {order.tracking_info}</p>
                       )}

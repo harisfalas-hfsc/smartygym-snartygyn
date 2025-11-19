@@ -28,6 +28,12 @@ export const ProductCard = ({ product }: ProductCardProps) => {
   const [isProcessing, setIsProcessing] = useState(false);
   const navigate = useNavigate();
 
+  // Check stock availability for direct sale products
+  const isOutOfStock = product.product_type === 'direct_sale' && 
+                        product.stock_quantity !== null && 
+                        product.stock_quantity !== undefined &&
+                        product.stock_quantity <= 0;
+
   const handleDirectPurchase = async () => {
     try {
       setIsProcessing(true);
