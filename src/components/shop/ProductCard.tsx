@@ -18,11 +18,11 @@ interface ProductCardProps {
 
 export const ProductCard = ({ product }: ProductCardProps) => {
   return (
-    <Card className="h-full flex flex-col hover:shadow-lg transition-all duration-300 hover:scale-[1.02]">
+    <Card className="h-full flex flex-col hover:shadow-lg transition-all duration-300 hover:scale-[1.01] group">
       <CardHeader className="p-0">
-        <div className="relative">
+        <div className="relative overflow-hidden rounded-t-lg">
           {product.is_featured && (
-            <Badge className="absolute top-2 left-2 z-10 bg-primary">
+            <Badge className="absolute top-2 left-2 z-10 bg-primary/90 backdrop-blur-sm">
               <Star className="w-3 h-3 mr-1" />
               Featured
             </Badge>
@@ -30,28 +30,29 @@ export const ProductCard = ({ product }: ProductCardProps) => {
           <img
             src={product.image_url}
             alt={product.title}
-            className="w-full h-64 object-cover rounded-t-lg"
+            className="w-full h-48 object-cover transition-transform duration-300 group-hover:scale-105"
             loading="lazy"
           />
         </div>
       </CardHeader>
 
-      <CardContent className="flex-1 p-6">
-        <Badge variant="outline" className="mb-3">
-          {product.category}
-        </Badge>
-        <h3 className="text-xl font-semibold mb-2">{product.title}</h3>
-        <p className="text-muted-foreground text-sm mb-3">
+      <CardContent className="flex-1 p-4 space-y-2">
+        <h3 className="text-lg font-semibold line-clamp-2 leading-tight">
+          {product.title}
+        </h3>
+        <p className="text-muted-foreground text-sm line-clamp-2 leading-relaxed">
           {product.description}
         </p>
-        <p className="text-lg font-bold text-primary">{product.price_range}</p>
+        <p className="text-base font-bold text-primary pt-1">
+          {product.price_range}
+        </p>
       </CardContent>
 
-      <CardFooter className="p-6 pt-0">
+      <CardFooter className="p-4 pt-0">
         <Button
           asChild
           className="w-full"
-          size="lg"
+          size="sm"
         >
           <a
             href={product.amazon_url}
@@ -60,7 +61,7 @@ export const ProductCard = ({ product }: ProductCardProps) => {
             className="flex items-center justify-center gap-2"
           >
             View on Amazon
-            <ExternalLink className="w-4 h-4" />
+            <ExternalLink className="w-3.5 h-3.5" />
           </a>
         </Button>
       </CardFooter>
