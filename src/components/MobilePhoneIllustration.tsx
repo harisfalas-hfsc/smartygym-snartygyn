@@ -21,7 +21,7 @@ export const MobilePhoneIllustration = ({ imageUrl, className, variant = 'phone'
         
         {/* Screen content */}
         <div className={`relative w-full h-full ${
-          children ? 'p-3' : 'p-2 bg-gradient-to-br from-primary/10 to-background'
+          children ? (variant === 'tablet' ? 'p-3 pb-8' : 'p-3') : 'p-2 bg-gradient-to-br from-primary/10 to-background'
         }`}>
           {children ? (
             // Render children (workout cards)
