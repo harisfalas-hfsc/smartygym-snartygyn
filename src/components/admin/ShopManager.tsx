@@ -25,10 +25,11 @@ export const ShopManager = () => {
   const [isCreating, setIsCreating] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [deleteId, setDeleteId] = useState<string | null>(null);
+  const [categoryFilter, setCategoryFilter] = useState<string>("all");
   const [formData, setFormData] = useState({
     title: "",
     description: "",
-    category: "General Equipment", // Hidden default value
+    category: "Training",
     amazon_url: "",
     image_url: "",
     price_range: "",
@@ -37,14 +38,21 @@ export const ShopManager = () => {
   });
 
   const queryClient = useQueryClient();
+  const categories = ["Training", "Nutrition", "Clothes", "Apparel"];
 
   const { data: products, isLoading } = useQuery({
-    queryKey: ["admin-shop-products"],
+    queryKey: ["admin-shop-products", categoryFilter],
     queryFn: async () => {
-      const { data, error } = await supabase
+      let query = supabase
         .from("shop_products")
         .select("*")
         .order("display_order", { ascending: true });
+      
+      if (categoryFilter !== "all") {
+        query = query.eq("category", categoryFilter);
+      }
+      
+      const { data, error } = await query;
       if (error) throw error;
       return data;
     },
@@ -105,7 +113,7 @@ export const ShopManager = () => {
     setFormData({
       title: "",
       description: "",
-      category: "General Equipment", // Hidden default value
+      category: "Training",
       amazon_url: "",
       image_url: "",
       price_range: "",
@@ -190,6 +198,27 @@ export const ShopManager = () => {
                 />
               </div>
 
+              <div className="space-y-2">
+                <Label htmlFor="category">Category</Label>
+                <Select
+                  value={formData.category}
+                  onValueChange={(value) =>
+                    setFormData({ ...formData, category: value })
+                  }
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select category" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {categories.map((category) => (
+                      <SelectItem key={category} value={category}>
+                        {category}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
               <div>
                 <Label htmlFor="price_range">Price Range</Label>
                 <Input
@@ -262,6 +291,25 @@ export const ShopManager = () => {
           </CardContent>
         </Card>
       )}
+
+      <div className="flex gap-4 items-center mb-4">
+        <Label htmlFor="category-filter">Filter by Category:</Label>
+        <Select value={categoryFilter} onValueChange={setCategoryFilter}>
+          <SelectTrigger className="w-[200px]">
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">All Categories</SelectItem>
+            <SelectItem value="Training">Training</SelectItem>
+            <SelectItem value="Nutrition">Nutrition</SelectItem>
+            <SelectItem value="Clothes">Clothes</SelectItem>
+            <SelectItem value="Apparel">Apparel</SelectItem>
+          </SelectContent>
+        </Select>
+        <p className="text-sm text-muted-foreground">
+          {products?.length || 0} products
+        </p>
+      </div>
 
       <div className="grid gap-4">
         {isLoading ? (

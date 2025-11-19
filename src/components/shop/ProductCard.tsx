@@ -40,6 +40,9 @@ export const ProductCard = ({ product }: ProductCardProps) => {
         <h3 className="text-lg font-semibold line-clamp-2 leading-tight">
           {product.title}
         </h3>
+        <Badge variant="outline" className="mb-2 text-xs">
+          {product.category}
+        </Badge>
         <p className="text-muted-foreground text-sm line-clamp-2 leading-relaxed">
           {product.description}
         </p>
