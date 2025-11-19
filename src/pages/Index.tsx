@@ -427,7 +427,7 @@ const Index = () => {
                   {/* Top Section: Title */}
             <div className="text-center space-y-2 mb-6">
               <h1
-                className="text-3xl sm:text-4xl md:text-5xl font-black text-foreground"
+                className="text-3xl sm:text-4xl md:text-5xl font-black text-foreground animate-fade-in"
                 itemProp="name"
               >
                 Welcome to <span className="text-primary">SmartyGym</span>
