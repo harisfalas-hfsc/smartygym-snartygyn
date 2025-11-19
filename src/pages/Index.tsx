@@ -11,6 +11,7 @@ import { User as SupabaseUser } from "@supabase/supabase-js";
 import { useToast } from "@/hooks/use-toast";
 import smartyGymLogo from "@/assets/smarty-gym-logo.png";
 import smartyGymIcon from "@/assets/smarty-gym-icon.png";
+import { MobilePhoneIllustration } from "@/components/MobilePhoneIllustration";
 
 import { useAccessControl } from "@/hooks/useAccessControl";
 import { ScrollReveal } from "@/components/ScrollReveal";
@@ -381,15 +382,15 @@ const Index = () => {
                 data-keywords="smarty gym, online gym, online fitness, smartygym.com, Haris Falas Cyprus, online gym Cyprus"
                 aria-label="Smarty Gym Cyprus - Your online gym and fitness platform - smartygym.com"
               >
-                <div className="p-8 sm:p-10 md:p-12 space-y-6 sm:space-y-8">
+                <div className="p-8 sm:p-10 md:p-12 space-y-8">
                   
-                  {/* Main Headline */}
-                  <div className="text-center space-y-2 sm:space-y-3">
+                  {/* Top Section: Title + GET STARTED Button */}
+                  <div className="text-center space-y-4">
                     <h1 
-                      className="text-3xl sm:text-4xl md:text-5xl font-black bg-gradient-to-r from-primary via-amber-400 to-primary bg-clip-text text-transparent"
+                      className="text-4xl sm:text-5xl md:text-6xl font-black bg-gradient-to-r from-primary via-amber-400 to-primary bg-clip-text text-transparent"
                       itemProp="name"
                     >
-                      Welcome to SmartyGym
+                      Welcome to SMARTYGYM
                     </h1>
                     <p 
                       className="text-lg sm:text-xl text-muted-foreground font-medium"
@@ -400,48 +401,94 @@ const Index = () => {
                     <meta itemProp="url" content="https://smartygym.com" />
                     <meta itemProp="description" content="Smarty Gym Cyprus - #1 online gym and fitness platform by Haris Falas - smartygym.com" />
                     <meta itemProp="foundingLocation" content="Cyprus" />
+                    
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button 
+                          size="lg" 
+                          className="bg-primary hover:bg-primary/90 text-primary-foreground px-8 py-6 text-lg font-bold rounded-full shadow-lg hover:shadow-xl transition-all"
+                        >
+                          GET STARTED
+                          <ChevronDown className="ml-2 h-5 w-5" />
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent className="w-[18rem] max-w-[calc(100vw-3rem)]">
+                        <DropdownMenuItem onClick={() => navigate("/workout")}>
+                          <Dumbbell className="mr-2 h-4 w-4" />
+                          Browse Workouts
+                        </DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => navigate("/trainingprogram")}>
+                          <Calendar className="mr-2 h-4 w-4" />
+                          Browse Programs
+                        </DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => navigate("/tools")}>
+                          <Calculator className="mr-2 h-4 w-4" />
+                          Use Tools
+                        </DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => navigate("/exerciselibrary")}>
+                          <Video className="mr-2 h-4 w-4" />
+                          Exercise Library
+                        </DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => navigate("/join-premium")}>
+                          <Crown className="mr-2 h-4 w-4 text-primary" />
+                          Join Premium
+                        </DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
                   </div>
 
-                  {/* Three Core Messages: WHAT, WHY, HOW */}
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-6 sm:gap-8">
+                  {/* Middle Section: Phone (Left) + Three Cards (Right) */}
+                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
                     
-                    {/* WHAT */}
-                    <div className="text-center space-y-3 p-4 rounded-lg bg-background/50 border border-primary/20">
-                      <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-primary/10">
-                        <Smartphone className="w-6 h-6 text-primary" />
-                      </div>
-                      <h2 className="text-lg sm:text-xl font-bold text-foreground">
-                        Your Gym In Your Pocket
-                      </h2>
-                      <p className="text-sm text-muted-foreground leading-relaxed">
-                        Professional fitness platform with expert workouts, structured programs, and personalized coaching - accessible worldwide at smartygym.com.
-                      </p>
+                    {/* LEFT: Mobile Phone Illustration */}
+                    <div className="flex justify-center lg:justify-end order-1 lg:order-1">
+                      <MobilePhoneIllustration className="w-full max-w-[280px]" />
                     </div>
 
-                    {/* WHY */}
-                    <div className="text-center space-y-3 p-4 rounded-lg bg-background/50 border border-primary/20">
-                      <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-primary/10">
-                        <UserCheck className="w-6 h-6 text-primary" />
-                      </div>
-                      <h2 className="text-lg sm:text-xl font-bold text-foreground">
-                        <span className="text-red-600">100% Human.</span> 0% AI.
-                      </h2>
-                      <p className="text-sm text-muted-foreground leading-relaxed">
-                        Every workout and training program personally designed by Sports Scientist <a href="/coach-profile" className="text-primary hover:underline font-semibold">Haris Falas</a> with 20+ years of experience. Real expertise, not algorithms.
-                      </p>
-                    </div>
+                    {/* RIGHT: Three Core Message Cards */}
+                    <div className="space-y-4 order-2 lg:order-2">
+                      
+                      {/* Card 1: Your Gym in Your Pocket */}
+                      <Card className="border-2 border-primary/30 hover:border-primary hover:shadow-lg transition-all cursor-pointer group">
+                        <CardContent className="p-6 flex items-center gap-4">
+                          <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-primary/10 group-hover:bg-primary/20 transition-all flex-shrink-0">
+                            <Smartphone className="w-6 h-6 text-primary" />
+                          </div>
+                          <div>
+                            <h3 className="text-lg font-bold text-foreground">Your Gym In Your Pocket</h3>
+                            <p className="text-sm text-muted-foreground">Train anywhere, anytime with expert guidance</p>
+                          </div>
+                        </CardContent>
+                      </Card>
 
-                    {/* HOW */}
-                    <div className="text-center space-y-3 p-4 rounded-lg bg-background/50 border border-primary/20">
-                      <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-primary/10">
-                        <Dumbbell className="w-6 h-6 text-primary" />
-                      </div>
-                      <h2 className="text-lg sm:text-xl font-bold text-foreground">
-                        Train Anywhere, Anytime
-                      </h2>
-                      <p className="text-sm text-muted-foreground leading-relaxed">
-                        Access professional workouts on any device. Flexible training that fits YOUR schedule and YOUR goals—at home, gym, or traveling.
-                      </p>
+                      {/* Card 2: 100% Human */}
+                      <Card className="border-2 border-primary/30 hover:border-primary hover:shadow-lg transition-all cursor-pointer group">
+                        <CardContent className="p-6 flex items-center gap-4">
+                          <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-primary/10 group-hover:bg-primary/20 transition-all flex-shrink-0">
+                            <UserCheck className="w-6 h-6 text-primary" />
+                          </div>
+                          <div>
+                            <h3 className="text-lg font-bold text-foreground">
+                              <span className="text-red-600">100% Human.</span> 0% AI.
+                            </h3>
+                            <p className="text-sm text-muted-foreground">Every workout designed by Haris Falas</p>
+                          </div>
+                        </CardContent>
+                      </Card>
+
+                      {/* Card 3: Train Anywhere */}
+                      <Card className="border-2 border-primary/30 hover:border-primary hover:shadow-lg transition-all cursor-pointer group">
+                        <CardContent className="p-6 flex items-center gap-4">
+                          <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-primary/10 group-hover:bg-primary/20 transition-all flex-shrink-0">
+                            <Dumbbell className="w-6 h-6 text-primary" />
+                          </div>
+                          <div>
+                            <h3 className="text-lg font-bold text-foreground">Train Anywhere, Anytime</h3>
+                            <p className="text-sm text-muted-foreground">Flexible training that fits YOUR schedule</p>
+                          </div>
+                        </CardContent>
+                      </Card>
+
                     </div>
                   </div>
 
