@@ -183,7 +183,7 @@ const About = () => {
 
               {/* Freedom Statement - Emphasized */}
               <div className="mt-6 mb-0 max-w-3xl mx-auto">
-                <div className="p-4 rounded-lg border-2 border-primary/40 shadow-md">
+                <div className="bg-background/80 backdrop-blur-sm p-4 rounded-lg border-2 border-primary/40 shadow-md">
                   <div className="flex items-center justify-center gap-4">
                     <Sparkles className="w-6 h-6 text-primary flex-shrink-0" />
                     <p className="text-xl font-bold text-center text-primary">
