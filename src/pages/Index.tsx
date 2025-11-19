@@ -414,7 +414,7 @@ const Index = () => {
                           <ChevronDown className="ml-2 h-5 w-5" />
                         </Button>
                       </DialogTrigger>
-                      <DialogContent className="sm:max-w-[900px] max-h-[80vh] overflow-y-auto">
+                      <DialogContent className="sm:max-w-[1100px]">
                         <DialogHeader>
                           <DialogTitle className="text-2xl font-bold text-center">
                             Explore SmartyGym Services
@@ -424,7 +424,7 @@ const Index = () => {
                           </DialogDescription>
                         </DialogHeader>
                         
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 py-6">
+                        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 py-4">
                           
                           {/* Workouts Card */}
                           <Card 
@@ -434,17 +434,17 @@ const Index = () => {
                               setIsGetStartedOpen(false);
                             }}
                           >
-                            <CardContent className="h-full p-6 flex flex-col gap-3">
-                              <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-primary/10 group-hover:bg-primary/20 transition-all">
-                                <Dumbbell className="w-6 h-6 text-primary" />
-                              </div>
-                              <div>
-                                <h3 className="text-lg font-bold text-foreground mb-1">500+ Expert Workouts</h3>
-                                <p className="text-sm text-muted-foreground">
-                                  Pick your daily session: Strength, Cardio, Fat Burn, or whatever fits your mood
-                                </p>
-                              </div>
-                            </CardContent>
+                <CardContent className="h-full p-4 flex flex-col gap-2">
+                  <div className="inline-flex items-center justify-center w-10 h-10 rounded-full bg-primary/10 group-hover:bg-primary/20 transition-all">
+                    <Dumbbell className="w-5 h-5 text-primary" />
+                  </div>
+                  <div>
+                    <h3 className="text-base font-bold text-foreground">500+ Expert Workouts</h3>
+                    <p className="text-xs text-muted-foreground">
+                      Pick your daily session: Strength, Cardio, Fat Burn, or whatever fits your mood
+                    </p>
+                  </div>
+                </CardContent>
                           </Card>
 
                           {/* Training Programs Card */}
@@ -455,13 +455,13 @@ const Index = () => {
                               setIsGetStartedOpen(false);
                             }}
                           >
-                            <CardContent className="h-full p-6 flex flex-col gap-3">
-                              <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-primary/10 group-hover:bg-primary/20 transition-all">
-                                <Calendar className="w-6 h-6 text-primary" />
+                            <CardContent className="h-full p-4 flex flex-col gap-2">
+                              <div className="inline-flex items-center justify-center w-10 h-10 rounded-full bg-primary/10 group-hover:bg-primary/20 transition-all">
+                                <Calendar className="w-5 h-5 text-primary" />
                               </div>
                               <div>
-                                <h3 className="text-lg font-bold text-foreground mb-1">Training Programs</h3>
-                                <p className="text-sm text-muted-foreground">
+                                <h3 className="text-base font-bold text-foreground">Training Programs</h3>
+                                <p className="text-xs text-muted-foreground">
                                   Structured expert training programs to achieve your long-term goals
                                 </p>
                               </div>
@@ -476,13 +476,13 @@ const Index = () => {
                               setIsGetStartedOpen(false);
                             }}
                           >
-                            <CardContent className="h-full p-6 flex flex-col gap-3">
-                              <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-primary/10 group-hover:bg-primary/20 transition-all">
-                                <Calculator className="w-6 h-6 text-primary" />
+                            <CardContent className="h-full p-4 flex flex-col gap-2">
+                              <div className="inline-flex items-center justify-center w-10 h-10 rounded-full bg-primary/10 group-hover:bg-primary/20 transition-all">
+                                <Calculator className="w-5 h-5 text-primary" />
                               </div>
                               <div>
-                                <h3 className="text-lg font-bold text-foreground mb-1">Smart Tools</h3>
-                                <p className="text-sm text-muted-foreground">
+                                <h3 className="text-base font-bold text-foreground">Smart Tools</h3>
+                                <p className="text-xs text-muted-foreground">
                                   BMR, Macro, 1RM calculators and training timers to optimize your workouts
                                 </p>
                               </div>
@@ -497,13 +497,13 @@ const Index = () => {
                               setIsGetStartedOpen(false);
                             }}
                           >
-                            <CardContent className="h-full p-6 flex flex-col gap-3">
-                              <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-primary/10 group-hover:bg-primary/20 transition-all">
-                                <Video className="w-6 h-6 text-primary" />
+                            <CardContent className="h-full p-4 flex flex-col gap-2">
+                              <div className="inline-flex items-center justify-center w-10 h-10 rounded-full bg-primary/10 group-hover:bg-primary/20 transition-all">
+                                <Video className="w-5 h-5 text-primary" />
                               </div>
                               <div>
-                                <h3 className="text-lg font-bold text-foreground mb-1">Exercise Library</h3>
-                                <p className="text-sm text-muted-foreground">
+                                <h3 className="text-base font-bold text-foreground">Exercise Library</h3>
+                                <p className="text-xs text-muted-foreground">
                                   Comprehensive video guide with proper form demonstrations for every exercise
                                 </p>
                               </div>
@@ -518,13 +518,13 @@ const Index = () => {
                               setIsGetStartedOpen(false);
                             }}
                           >
-                            <CardContent className="h-full p-6 flex flex-col gap-3">
-                              <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-primary/10 group-hover:bg-primary/20 transition-all">
-                                <FileText className="w-6 h-6 text-primary" />
+                            <CardContent className="h-full p-4 flex flex-col gap-2">
+                              <div className="inline-flex items-center justify-center w-10 h-10 rounded-full bg-primary/10 group-hover:bg-primary/20 transition-all">
+                                <FileText className="w-5 h-5 text-primary" />
                               </div>
                               <div>
-                                <h3 className="text-lg font-bold text-foreground mb-1">Blog & Expert Articles</h3>
-                                <p className="text-sm text-muted-foreground">
+                                <h3 className="text-base font-bold text-foreground">Blog & Expert Articles</h3>
+                                <p className="text-xs text-muted-foreground">
                                   Read expert tips, training guides, and fitness insights
                                 </p>
                               </div>
@@ -539,42 +539,19 @@ const Index = () => {
                               setIsGetStartedOpen(false);
                             }}
                           >
-                            <CardContent className="h-full p-6 flex flex-col gap-3">
-                              <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-primary/10 group-hover:bg-primary/20 transition-all">
-                                <GraduationCap className="w-6 h-6 text-primary" />
+                            <CardContent className="h-full p-4 flex flex-col gap-2">
+                              <div className="inline-flex items-center justify-center w-10 h-10 rounded-full bg-primary/10 group-hover:bg-primary/20 transition-all">
+                                <GraduationCap className="w-5 h-5 text-primary" />
                               </div>
                               <div>
-                                <h3 className="text-lg font-bold text-foreground mb-1">Expert Coach Guidance</h3>
-                                <p className="text-sm text-muted-foreground">
+                                <h3 className="text-base font-bold text-foreground">Expert Coach Guidance</h3>
+                                <p className="text-xs text-muted-foreground">
                                   Connect with Sports Scientist Haris Falas - real human expertise, not AI-generated advice
                                 </p>
                               </div>
                             </CardContent>
                           </Card>
 
-                          {/* Premium Card */}
-                          <Card 
-                            className="h-full border-2 border-primary/50 hover:border-primary hover:shadow-lg transition-all cursor-pointer group bg-primary/5"
-                            onClick={() => {
-                              navigate("/joinpremium");
-                              setIsGetStartedOpen(false);
-                            }}
-                          >
-                            <CardContent className="h-full p-6 flex flex-col gap-3">
-                              <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-primary/20 group-hover:bg-primary/30 transition-all">
-                                <Crown className="w-6 h-6 text-primary" />
-                              </div>
-                              <div>
-                                <h3 className="text-lg font-bold text-foreground mb-1 flex items-center gap-2">
-                                  Join Premium
-                                  <span className="text-xs bg-primary text-primary-foreground px-2 py-1 rounded-full">RECOMMENDED</span>
-                                </h3>
-                                <p className="text-sm text-muted-foreground">
-                                  Unlock all premium workouts, programs, and exclusive features
-                                </p>
-                              </div>
-                            </CardContent>
-                          </Card>
 
                         </div>
                       </DialogContent>
@@ -582,14 +559,14 @@ const Index = () => {
                   </div>
 
                   {/* Middle Section: Phone (Left) + Three Cards (Right) */}
-                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-stretch lg:items-stretch">
+                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 items-stretch lg:items-stretch">
                     
                     {/* LEFT: Mobile Phone Illustration */}
                     <div className="order-1 lg:order-1 flex justify-center lg:justify-start items-stretch">
                       <div className="flex items-center h-full">
                         <MobilePhoneIllustration 
-                          className="h-full max-h-[360px] w-auto"
-                          imageUrl="https://images.unsplash.com/photo-1518611012118-696072aa579a?w=400&h=800&fit=crop&crop=faces"
+                  className="h-full max-h-[480px] w-auto"
+                  imageUrl="https://images.unsplash.com/photo-1517836357463-d25dfeac3438?w=400&h=800&fit=crop&crop=center"
                         />
                       </div>
                     </div>
@@ -599,7 +576,7 @@ const Index = () => {
                       
                       {/* Card 1: Your Gym in Your Pocket */}
                       <Card className="flex-1 border-2 border-primary/30 hover:border-primary hover:shadow-lg transition-all cursor-pointer group">
-                        <CardContent className="h-full p-6 flex items-center gap-4">
+                <CardContent className="h-full p-8 flex items-center gap-6">
                           <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-primary/10 group-hover:bg-primary/20 transition-all flex-shrink-0">
                             <Smartphone className="w-6 h-6 text-primary" />
                           </div>
@@ -612,7 +589,7 @@ const Index = () => {
 
                       {/* Card 2: 100% Human */}
                       <Card className="flex-1 border-2 border-primary/30 hover:border-primary hover:shadow-lg transition-all cursor-pointer group">
-                        <CardContent className="h-full p-6 flex items-center gap-4">
+                <CardContent className="h-full p-8 flex items-center gap-6">
                           <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-primary/10 group-hover:bg-primary/20 transition-all flex-shrink-0">
                             <UserCheck className="w-6 h-6 text-primary" />
                           </div>
@@ -627,7 +604,7 @@ const Index = () => {
 
                       {/* Card 3: Train Anywhere */}
                       <Card className="flex-1 border-2 border-primary/30 hover:border-primary hover:shadow-lg transition-all cursor-pointer group">
-                        <CardContent className="h-full p-6 flex items-center gap-4">
+                        <CardContent className="h-full p-8 flex items-center gap-6">
                           <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-primary/10 group-hover:bg-primary/20 transition-all flex-shrink-0">
                             <Dumbbell className="w-6 h-6 text-primary" />
                           </div>
