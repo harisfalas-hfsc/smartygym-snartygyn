@@ -38,7 +38,7 @@ export const ShopManager = () => {
   });
 
   const queryClient = useQueryClient();
-  const categories = ["Fitness", "Nutrition", "Clothing", "Apparel", "Accessories"];
+  const categories = ["Fitness", "Nutrition", "Clothing", "Apparel & Accessories"];
 
   const { data: products, isLoading } = useQuery({
     queryKey: ["admin-shop-products", categoryFilter],
@@ -303,8 +303,7 @@ export const ShopManager = () => {
                 <SelectItem value="Fitness">Fitness</SelectItem>
                 <SelectItem value="Nutrition">Nutrition</SelectItem>
                 <SelectItem value="Clothing">Clothing</SelectItem>
-                <SelectItem value="Apparel">Apparel</SelectItem>
-                <SelectItem value="Accessories">Accessories</SelectItem>
+                <SelectItem value="Apparel & Accessories">Apparel & Accessories</SelectItem>
               </SelectContent>
         </Select>
         <p className="text-sm text-muted-foreground">
