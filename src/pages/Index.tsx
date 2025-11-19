@@ -448,7 +448,7 @@ const Index = () => {
 
 
                   {/* Feature Highlights Grid */}
-                  <div className="border-t border-primary/20 pt-3">
+                  <div className="pt-3">
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
                       
                       <div 
@@ -520,7 +520,7 @@ const Index = () => {
                   </div>
 
                   {/* Who Is Smarty Gym For? Section */}
-                  <div className="border-t border-primary/20 pt-6">
+                  <div className="pt-6">
                     <Card className="border border-primary/30 bg-background/80">
                       <div className="p-6 sm:p-8 space-y-4">
                         <h2 className="text-xl sm:text-2xl font-bold text-center text-foreground">
@@ -572,7 +572,7 @@ const Index = () => {
                         </div>
 
                         {/* Pricing Plans */}
-                        <div className="border-t border-primary/20 pt-6 mt-6">
+                        <div className="pt-6 mt-6">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-4">
             {/* Gold Plan */}
             <Card className="relative border-2 border-amber-500 shadow-lg flex flex-col">
