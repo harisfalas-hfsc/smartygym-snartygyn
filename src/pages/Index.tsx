@@ -711,7 +711,10 @@ const Index = () => {
                   <div className="border-t border-primary/20 pt-6">
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
                       
-                      <div className="flex items-start gap-3">
+                      <div 
+                        onClick={() => navigate("/workout")}
+                        className="flex items-start gap-3 cursor-pointer hover:bg-primary/10 transition-all duration-200 rounded-lg p-3 border border-transparent hover:border-primary/20"
+                      >
                         <Dumbbell className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
                         <div>
                           <p className="font-semibold text-sm text-foreground">500+ Expert Workouts</p>
@@ -719,7 +722,10 @@ const Index = () => {
                         </div>
                       </div>
 
-                      <div className="flex items-start gap-3">
+                      <div 
+                        onClick={() => navigate("/training-programs")}
+                        className="flex items-start gap-3 cursor-pointer hover:bg-primary/10 transition-all duration-200 rounded-lg p-3 border border-transparent hover:border-primary/20"
+                      >
                         <Calendar className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
                         <div>
                           <p className="font-semibold text-sm text-foreground">Training Programs</p>
@@ -727,7 +733,10 @@ const Index = () => {
                         </div>
                       </div>
 
-                      <div className="flex items-start gap-3">
+                      <div 
+                        onClick={() => navigate("/tools")}
+                        className="flex items-start gap-3 cursor-pointer hover:bg-primary/10 transition-all duration-200 rounded-lg p-3 border border-transparent hover:border-primary/20"
+                      >
                         <Wrench className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
                         <div>
                           <p className="font-semibold text-sm text-foreground">Smart Tools</p>
@@ -735,7 +744,10 @@ const Index = () => {
                         </div>
                       </div>
 
-                      <div className="flex items-start gap-3">
+                      <div 
+                        onClick={() => navigate("/exercise-library")}
+                        className="flex items-start gap-3 cursor-pointer hover:bg-primary/10 transition-all duration-200 rounded-lg p-3 border border-transparent hover:border-primary/20"
+                      >
                         <Video className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
                         <div>
                           <p className="font-semibold text-sm text-foreground">Exercise Library</p>
@@ -743,7 +755,10 @@ const Index = () => {
                         </div>
                       </div>
 
-                      <div className="flex items-start gap-3">
+                      <div 
+                        onClick={() => navigate("/blog")}
+                        className="flex items-start gap-3 cursor-pointer hover:bg-primary/10 transition-all duration-200 rounded-lg p-3 border border-transparent hover:border-primary/20"
+                      >
                         <FileText className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
                         <div>
                           <p className="font-semibold text-sm text-foreground">Blog & Expert Articles</p>
@@ -751,7 +766,10 @@ const Index = () => {
                         </div>
                       </div>
 
-                      <div className="flex items-start gap-3">
+                      <div 
+                        onClick={() => navigate("/contact")}
+                        className="flex items-start gap-3 cursor-pointer hover:bg-primary/10 transition-all duration-200 rounded-lg p-3 border border-transparent hover:border-primary/20"
+                      >
                         <GraduationCap className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
                         <div>
                           <p className="font-semibold text-sm text-foreground">Expert Coach Guidance</p>
