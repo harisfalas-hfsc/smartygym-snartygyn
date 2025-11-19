@@ -22,7 +22,8 @@ const Tools = () => {
       icon: Calculator,
       title: "1RM Calculator",
       description: "Calculate your one-rep maximum for any exercise",
-      route: "/1rmcalculator"
+      route: "/1rmcalculator",
+      featured: true,
     },
     {
       id: "bmr-calculator",
@@ -106,7 +107,7 @@ const Tools = () => {
               <Card
                 key={tool.id}
                 onClick={() => navigate(tool.route)}
-                className="group p-6 cursor-pointer transition-all duration-500 ease-out transform-gpu hover:scale-110 hover:-translate-y-3 hover:shadow-2xl hover:shadow-primary/40 hover:border-primary/60 bg-card border-2 border-border"
+                className={`group p-6 cursor-pointer transition-all duration-500 ease-out transform-gpu hover:scale-110 hover:-translate-y-3 hover:shadow-2xl hover:shadow-primary/40 hover:border-primary/60 bg-card border-2 border-border ${tool.featured ? 'animate-[pulse_3s_ease-in-out_infinite]' : ''}`}
               >
                 <div className="flex flex-col items-center text-center space-y-4">
                   <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center transition-transform duration-300 group-hover:scale-110">
