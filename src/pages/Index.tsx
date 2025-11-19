@@ -43,13 +43,43 @@ const Index = () => {
   const isPremium = userTier === "premium";
   const [isGetStartedOpen, setIsGetStartedOpen] = useState(false);
 
-  const workoutCategories = [
-    { id: "strength", title: "Strength", icon: Dumbbell },
-    { id: "calorie-burning", title: "Calorie Burning", icon: Flame },
-    { id: "metabolic", title: "Metabolic", icon: Zap },
-    { id: "cardio", title: "Cardio", icon: Heart },
-    { id: "mobility", title: "Mobility & Stability", icon: Move },
-    { id: "challenge", title: "Challenge", icon: Activity },
+  const heroCards = [
+    { 
+      id: "workouts", 
+      title: "500+ Expert Workouts", 
+      icon: Dumbbell,
+      route: "/workout"
+    },
+    { 
+      id: "programs", 
+      title: "Training Programs", 
+      icon: Calendar,
+      route: "/trainingprogram"
+    },
+    { 
+      id: "tools", 
+      title: "Smart Tools", 
+      icon: Calculator,
+      route: "/tools"
+    },
+    { 
+      id: "exercises", 
+      title: "Exercise Library", 
+      icon: Video,
+      route: "/exerciselibrary"
+    },
+    { 
+      id: "blog", 
+      title: "Blog & Expert Articles", 
+      icon: FileText,
+      route: "/blog"
+    },
+    { 
+      id: "coach", 
+      title: "Expert Coach Guidance", 
+      icon: GraduationCap,
+      route: "/contact"
+    },
   ];
 
   useEffect(() => {
@@ -577,22 +607,22 @@ const Index = () => {
               variant="tablet"
               className="h-full max-h-[480px] w-auto"
             >
-              {/* 3 rows × 2 columns grid of workout cards */}
+              {/* 3 rows × 2 columns grid of "Get Started" cards */}
               <div className="grid grid-rows-3 grid-cols-2 gap-2 h-full w-full p-2">
-                {workoutCategories.map((category) => {
-                  const Icon = category.icon;
+                {heroCards.map((card) => {
+                  const Icon = card.icon;
                   return (
                     <Card
-                      key={category.id}
+                      key={card.id}
                       className="border-2 border-primary/30 hover:border-primary hover:shadow-md transition-all cursor-pointer group flex items-center justify-center"
-                      onClick={() => navigate(`/workout/${category.id}`)}
+                      onClick={() => navigate(card.route)}
                     >
                       <div className="flex flex-col items-center justify-center gap-1 p-2">
                         <div className="inline-flex items-center justify-center w-8 h-8 rounded-full bg-primary/10 group-hover:bg-primary/20 transition-all">
                           <Icon className="w-4 h-4 text-primary" />
                         </div>
                         <h3 className="text-xs font-bold text-center leading-tight">
-                          {category.title}
+                          {card.title}
                         </h3>
                       </div>
                     </Card>
@@ -606,7 +636,7 @@ const Index = () => {
                     {/* RIGHT: Three Core Message Cards */}
                     <div className="order-2 lg:order-2 flex flex-col justify-between gap-4 h-full">
                       
-                      {/* Card 1: Your Gym in Your Pocket */}
+                       {/* Card 1: Your Gym in Your Pocket */}
                       <Card className="flex-1 border-2 border-primary/30 hover:border-primary hover:shadow-lg transition-all cursor-pointer group">
                 <CardContent className="h-full p-8 flex items-center gap-6">
                           <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-primary/10 group-hover:bg-primary/20 transition-all flex-shrink-0">
@@ -614,7 +644,9 @@ const Index = () => {
                           </div>
                           <div>
                             <h3 className="text-lg font-bold text-foreground">Your Gym In Your Pocket</h3>
-                            <p className="text-sm text-muted-foreground">Train anywhere, anytime with expert guidance</p>
+                            <p className="text-sm text-muted-foreground leading-relaxed">
+                              Professional fitness platform with expert workouts, structured programs, and personalized coaching - accessible worldwide at smartygym.com.
+                            </p>
                           </div>
                         </CardContent>
                       </Card>
@@ -629,7 +661,9 @@ const Index = () => {
                             <h3 className="text-lg font-bold text-foreground">
                               <span className="text-red-600">100% Human.</span> 0% AI.
                             </h3>
-                            <p className="text-sm text-muted-foreground">Every workout designed by Haris Falas</p>
+                            <p className="text-sm text-muted-foreground leading-relaxed">
+                              Every workout personally designed by Sports Scientist Haris Falas with 20+ years of experience. Real expertise, not algorithms.
+                            </p>
                           </div>
                         </CardContent>
                       </Card>
@@ -638,11 +672,13 @@ const Index = () => {
                       <Card className="flex-1 border-2 border-primary/30 hover:border-primary hover:shadow-lg transition-all cursor-pointer group">
                         <CardContent className="h-full p-8 flex items-center gap-6">
                           <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-primary/10 group-hover:bg-primary/20 transition-all flex-shrink-0">
-                            <Dumbbell className="w-6 h-6 text-primary" />
+                            <Plane className="w-6 h-6 text-primary" />
                           </div>
                           <div>
                             <h3 className="text-lg font-bold text-foreground">Train Anywhere, Anytime</h3>
-                            <p className="text-sm text-muted-foreground">Flexible training that fits YOUR schedule</p>
+                            <p className="text-sm text-muted-foreground leading-relaxed">
+                              Access professional workouts on any device. Flexible training that fits YOUR schedule and YOUR goals—at home, gym, or traveling.
+                            </p>
                           </div>
                         </CardContent>
                       </Card>
