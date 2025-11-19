@@ -2,8 +2,6 @@ import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Helmet } from "react-helmet";
-import { Navigation } from "@/components/Navigation";
-import { Footer } from "@/components/Footer";
 import { SEOEnhancer } from "@/components/SEOEnhancer";
 import { PageTitleCard } from "@/components/PageTitleCard";
 import { CategoryFilter } from "@/components/shop/CategoryFilter";
@@ -45,7 +43,7 @@ const Shop = () => {
   ];
 
   return (
-    <div className="min-h-screen flex flex-col bg-background">
+    <>
       <Helmet>
         <title>Recommended Fitness Gear by Haris Falas | SmartyGym</title>
         <meta name="description" content="Hand-picked fitness equipment and gear recommended by certified strength coach Haris Falas. Quality products for home workouts and gym training." />
@@ -59,9 +57,7 @@ const Shop = () => {
         contentType="product recommendations"
       />
       
-      <Navigation />
-      
-      <main className="flex-1 container mx-auto px-4 py-6 max-w-7xl">
+      <main className="container mx-auto px-4 py-6 max-w-7xl">
         <PageTitleCard
           icon={ShoppingBag}
           title="Recommended Fitness Gear"
@@ -92,9 +88,7 @@ const Shop = () => {
           </div>
         )}
       </main>
-
-      <Footer />
-    </div>
+    </>
   );
 };
 
