@@ -8,8 +8,9 @@ import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { toast } from "sonner";
-import { Plus, Pencil, Trash2, Star, Upload, X } from "lucide-react";
+import { Plus, Pencil, Trash2, Star, Upload, X, ShoppingCart, ExternalLink } from "lucide-react";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -32,9 +33,12 @@ export const ShopManager = () => {
     title: "",
     description: "",
     category: "Fitness",
+    product_type: "amazon_affiliate" as "amazon_affiliate" | "direct_sale",
     amazon_url: "",
     image_url: "",
     price_range: "",
+    price: "",
+    stock_quantity: "",
     is_featured: false,
     display_order: 0,
   });
@@ -61,7 +65,7 @@ export const ShopManager = () => {
   });
 
   const createMutation = useMutation({
-    mutationFn: async (data: typeof formData) => {
+    mutationFn: async (data: any) => {
       const { error } = await supabase.from("shop_products").insert([data]);
       if (error) throw error;
     },
@@ -77,7 +81,7 @@ export const ShopManager = () => {
   });
 
   const updateMutation = useMutation({
-    mutationFn: async ({ id, data }: { id: string; data: typeof formData }) => {
+    mutationFn: async ({ id, data }: { id: string; data: any }) => {
       const { error } = await supabase
         .from("shop_products")
         .update(data)
@@ -111,98 +115,158 @@ export const ShopManager = () => {
     },
   });
 
+  const uploadImage = async (file: File, productId?: string): Promise<string> => {
+    const fileExt = file.name.split('.').pop();
+    const fileName = `${productId || Date.now()}-${Math.random().toString(36).substring(2)}.${fileExt}`;
+    const filePath = `shop-images/${fileName}`;
+
+    const { error: uploadError } = await supabase.storage
+      .from('contact-files')
+      .upload(filePath, file);
+
+    if (uploadError) throw uploadError;
+
+    const { data: { publicUrl } } = supabase.storage
+      .from('contact-files')
+      .getPublicUrl(filePath);
+
+    return publicUrl;
+  };
+
+  const createStripeProduct = async (productData: typeof formData) => {
+    const { data, error } = await supabase.functions.invoke('create-stripe-product', {
+      body: {
+        name: productData.title,
+        price: parseFloat(productData.price),
+        contentType: 'shop_product',
+        imageUrl: productData.image_url || undefined,
+      }
+    });
+
+    if (error) throw error;
+    return data;
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    try {
+      setIsUploading(true);
+      
+      let imageUrl = formData.image_url;
+      let stripeProductId = null;
+      let stripePriceId = null;
+      
+      // Upload image if a file is selected
+      if (selectedFile) {
+        imageUrl = await uploadImage(selectedFile, editingId || undefined);
+      }
+
+      // Create Stripe product for direct sale items
+      if (formData.product_type === 'direct_sale' && !editingId) {
+        if (!formData.price) {
+          toast.error("Price is required for direct sale products");
+          setIsUploading(false);
+          return;
+        }
+        
+        const stripeData = await createStripeProduct({ ...formData, image_url: imageUrl });
+        stripeProductId = stripeData.product_id;
+        stripePriceId = stripeData.price_id;
+        toast.success("Stripe product created successfully!");
+      }
+
+      const submitData: any = {
+        title: formData.title,
+        description: formData.description,
+        category: formData.category,
+        product_type: formData.product_type,
+        image_url: imageUrl,
+        is_featured: formData.is_featured,
+        display_order: formData.display_order,
+      };
+
+      // Add type-specific fields
+      if (formData.product_type === 'amazon_affiliate') {
+        submitData.amazon_url = formData.amazon_url;
+        submitData.price_range = formData.price_range;
+      } else {
+        submitData.price = parseFloat(formData.price);
+        submitData.stock_quantity = formData.stock_quantity ? parseInt(formData.stock_quantity) : null;
+        if (stripeProductId) submitData.stripe_product_id = stripeProductId;
+        if (stripePriceId) submitData.stripe_price_id = stripePriceId;
+      }
+
+      if (editingId) {
+        await updateMutation.mutateAsync({ id: editingId, data: submitData });
+      } else {
+        await createMutation.mutateAsync(submitData);
+      }
+    } catch (error: any) {
+      toast.error("Error: " + error.message);
+    } finally {
+      setIsUploading(false);
+    }
+  };
+
   const resetForm = () => {
     setFormData({
       title: "",
       description: "",
       category: "Fitness",
+      product_type: "amazon_affiliate",
       amazon_url: "",
       image_url: "",
       price_range: "",
+      price: "",
+      stock_quantity: "",
       is_featured: false,
       display_order: 0,
     });
-    setSelectedFile(null);
     setIsCreating(false);
     setEditingId(null);
+    setSelectedFile(null);
   };
 
   const handleEdit = (product: any) => {
     setFormData({
       title: product.title,
       description: product.description,
-      category: product.category || "General Equipment", // Preserve existing or use default
-      amazon_url: product.amazon_url,
+      category: product.category,
+      product_type: product.product_type || "amazon_affiliate",
+      amazon_url: product.amazon_url || "",
       image_url: product.image_url,
-      price_range: product.price_range,
+      price_range: product.price_range || "",
+      price: product.price?.toString() || "",
+      stock_quantity: product.stock_quantity?.toString() || "",
       is_featured: product.is_featured,
       display_order: product.display_order,
     });
     setEditingId(product.id);
     setIsCreating(true);
     
-    // Scroll to form at the top
-    setTimeout(() => {
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-    }, 100);
+    // Scroll to form
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
-  const uploadImage = async (): Promise<string | null> => {
-    if (!selectedFile) return null;
-
-    try {
-      setIsUploading(true);
-      const fileExt = selectedFile.name.split('.').pop();
-      const fileName = `${Date.now()}-${Math.random().toString(36).substring(7)}.${fileExt}`;
-      const filePath = `shop-images/${fileName}`;
-
-      const { error: uploadError } = await supabase.storage
-        .from('contact-files')
-        .upload(filePath, selectedFile);
-
-      if (uploadError) throw uploadError;
-
-      const { data: { publicUrl } } = supabase.storage
-        .from('contact-files')
-        .getPublicUrl(filePath);
-
-      return publicUrl;
-    } catch (error: any) {
-      toast.error("Failed to upload image: " + error.message);
-      return null;
-    } finally {
-      setIsUploading(false);
+  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      if (file.size > 10 * 1024 * 1024) {
+        toast.error("File size must be less than 10MB");
+        return;
+      }
+      setSelectedFile(file);
+      setFormData({ ...formData, image_url: "" });
     }
   };
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    
-    let finalImageUrl = formData.image_url;
-    
-    // Upload new image if selected
-    if (selectedFile) {
-      const uploadedUrl = await uploadImage();
-      if (!uploadedUrl) return; // Stop if upload failed
-      finalImageUrl = uploadedUrl;
-    }
-
-    const dataToSubmit = { ...formData, image_url: finalImageUrl };
-
-    if (editingId) {
-      updateMutation.mutate({ id: editingId, data: dataToSubmit });
-    } else {
-      createMutation.mutate(dataToSubmit);
-    }
-  };
-
 
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
         <div>
           <h2 className="text-3xl font-bold">Shop Management</h2>
-          <p className="text-muted-foreground">Manage Amazon affiliate products</p>
+          <p className="text-muted-foreground">Manage Amazon affiliate products and direct sale items</p>
         </div>
         <Button onClick={() => setIsCreating(!isCreating)}>
           <Plus className="mr-2 h-4 w-4" />
@@ -215,11 +279,41 @@ export const ShopManager = () => {
           <CardHeader>
             <CardTitle>{editingId ? "Edit Product" : "Add New Product"}</CardTitle>
             <CardDescription>
-              Add your Amazon affiliate link and product details
+              Choose between Amazon affiliate or direct sale product
             </CardDescription>
           </CardHeader>
           <CardContent>
             <form onSubmit={handleSubmit} className="space-y-4">
+              {/* Product Type Selector */}
+              <div className="space-y-3">
+                <Label>Product Type</Label>
+                <RadioGroup
+                  value={formData.product_type}
+                  onValueChange={(value: "amazon_affiliate" | "direct_sale") =>
+                    setFormData({ ...formData, product_type: value })
+                  }
+                >
+                  <div className="flex items-center space-x-2">
+                    <RadioGroupItem value="amazon_affiliate" id="amazon" />
+                    <Label htmlFor="amazon" className="font-normal cursor-pointer">
+                      <div className="flex items-center gap-2">
+                        <ExternalLink className="h-4 w-4" />
+                        Amazon Affiliate Product
+                      </div>
+                    </Label>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <RadioGroupItem value="direct_sale" id="direct" />
+                    <Label htmlFor="direct" className="font-normal cursor-pointer">
+                      <div className="flex items-center gap-2">
+                        <ShoppingCart className="h-4 w-4" />
+                        Direct Sale Product (via Stripe)
+                      </div>
+                    </Label>
+                  </div>
+                </RadioGroup>
+              </div>
+
               <div>
                 <Label htmlFor="title">Product Title</Label>
                 <Input
@@ -262,28 +356,61 @@ export const ShopManager = () => {
                 </Select>
               </div>
 
-              <div>
-                <Label htmlFor="price_range">Price Range</Label>
-                <Input
-                  id="price_range"
-                  placeholder="e.g., $20-$30"
-                  value={formData.price_range}
-                  onChange={(e) => setFormData({ ...formData, price_range: e.target.value })}
-                  required
-                />
-              </div>
+              {/* Conditional Fields Based on Product Type */}
+              {formData.product_type === 'amazon_affiliate' ? (
+                <>
+                  <div>
+                    <Label htmlFor="price_range">Price Range</Label>
+                    <Input
+                      id="price_range"
+                      placeholder="e.g., €20-€30"
+                      value={formData.price_range}
+                      onChange={(e) => setFormData({ ...formData, price_range: e.target.value })}
+                      required
+                    />
+                  </div>
 
-              <div>
-                <Label htmlFor="amazon_url">Amazon URL (with affiliate tag)</Label>
-                <Input
-                  id="amazon_url"
-                  type="url"
-                  placeholder="https://www.amazon.com/dp/..."
-                  value={formData.amazon_url}
-                  onChange={(e) => setFormData({ ...formData, amazon_url: e.target.value })}
-                  required
-                />
-              </div>
+                  <div>
+                    <Label htmlFor="amazon_url">Amazon URL (with affiliate tag)</Label>
+                    <Input
+                      id="amazon_url"
+                      type="url"
+                      placeholder="https://www.amazon.com/dp/..."
+                      value={formData.amazon_url}
+                      onChange={(e) => setFormData({ ...formData, amazon_url: e.target.value })}
+                      required
+                    />
+                  </div>
+                </>
+              ) : (
+                <>
+                  <div>
+                    <Label htmlFor="price">Price (€)</Label>
+                    <Input
+                      id="price"
+                      type="number"
+                      step="0.01"
+                      min="0"
+                      placeholder="e.g., 25.00"
+                      value={formData.price}
+                      onChange={(e) => setFormData({ ...formData, price: e.target.value })}
+                      required
+                    />
+                  </div>
+
+                  <div>
+                    <Label htmlFor="stock_quantity">Stock Quantity (optional)</Label>
+                    <Input
+                      id="stock_quantity"
+                      type="number"
+                      min="0"
+                      placeholder="Leave empty for unlimited"
+                      value={formData.stock_quantity}
+                      onChange={(e) => setFormData({ ...formData, stock_quantity: e.target.value })}
+                    />
+                  </div>
+                </>
+              )}
 
               <div className="space-y-3">
                 <Label>Product Image</Label>
@@ -312,65 +439,62 @@ export const ShopManager = () => {
                 )}
 
                 {/* File Upload */}
-                <div className="flex gap-2 items-center">
-                  <Input
-                    type="file"
-                    accept="image/*"
-                    onChange={(e) => {
-                      const file = e.target.files?.[0];
-                      if (file) {
-                        if (file.size > 10 * 1024 * 1024) {
-                          toast.error("Image must be less than 10MB");
-                          return;
-                        }
-                        setSelectedFile(file);
-                      }
-                    }}
-                    className="flex-1"
-                  />
-                  <Upload className="h-4 w-4 text-muted-foreground" />
+                <div className="flex gap-2 items-end">
+                  <div className="flex-1">
+                    <Input
+                      type="file"
+                      accept="image/*"
+                      onChange={handleFileSelect}
+                      className="cursor-pointer"
+                    />
+                    <p className="text-xs text-muted-foreground mt-1">
+                      Upload image (max 10MB) or provide URL below
+                    </p>
+                  </div>
                 </div>
-                <p className="text-xs text-muted-foreground">
-                  Upload a product image (max 10MB) or paste an image URL below
-                </p>
 
-                {/* Manual URL Input (fallback) */}
+                {/* Manual URL Input */}
+                {!selectedFile && (
+                  <div>
+                    <Label htmlFor="image_url">Or Image URL</Label>
+                    <Input
+                      id="image_url"
+                      type="url"
+                      placeholder="https://..."
+                      value={formData.image_url}
+                      onChange={(e) => setFormData({ ...formData, image_url: e.target.value })}
+                    />
+                  </div>
+                )}
+              </div>
+
+              <div>
+                <Label htmlFor="display_order">Display Order</Label>
                 <Input
-                  id="image_url"
-                  type="url"
-                  placeholder="Or paste image URL..."
-                  value={formData.image_url}
-                  onChange={(e) => setFormData({ ...formData, image_url: e.target.value })}
+                  id="display_order"
+                  type="number"
+                  value={formData.display_order}
+                  onChange={(e) => setFormData({ ...formData, display_order: parseInt(e.target.value) })}
+                  required
                 />
               </div>
 
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <Label htmlFor="display_order">Display Order</Label>
-                  <Input
-                    id="display_order"
-                    type="number"
-                    value={formData.display_order}
-                    onChange={(e) =>
-                      setFormData({ ...formData, display_order: parseInt(e.target.value) })
-                    }
-                  />
-                </div>
-
-                <div className="flex items-center space-x-2 pt-8">
-                  <Switch
-                    id="is_featured"
-                    checked={formData.is_featured}
-                    onCheckedChange={(checked) =>
-                      setFormData({ ...formData, is_featured: checked })
-                    }
-                  />
-                  <Label htmlFor="is_featured">Featured Product</Label>
-                </div>
+              <div className="flex items-center space-x-2">
+                <Switch
+                  id="featured"
+                  checked={formData.is_featured}
+                  onCheckedChange={(checked) =>
+                    setFormData({ ...formData, is_featured: checked })
+                  }
+                />
+                <Label htmlFor="featured">Featured Product</Label>
               </div>
 
               <div className="flex gap-2">
-                <Button type="submit" disabled={createMutation.isPending || updateMutation.isPending || isUploading}>
+                <Button 
+                  type="submit" 
+                  disabled={isUploading || createMutation.isPending || updateMutation.isPending}
+                >
                   {isUploading ? "Uploading..." : editingId ? "Update Product" : "Add Product"}
                 </Button>
                 <Button type="button" variant="outline" onClick={resetForm}>
@@ -382,80 +506,116 @@ export const ShopManager = () => {
         </Card>
       )}
 
-      <div className="flex gap-4 items-center mb-4">
-        <Label htmlFor="category-filter">Filter by Category:</Label>
-        <Select value={categoryFilter} onValueChange={setCategoryFilter}>
-          <SelectTrigger className="w-[200px]">
-            <SelectValue />
-          </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">All Categories</SelectItem>
-                <SelectItem value="Fitness">Fitness</SelectItem>
-                <SelectItem value="Nutrition">Nutrition</SelectItem>
-                <SelectItem value="Clothing">Clothing</SelectItem>
-                <SelectItem value="Apparel & Accessories">Apparel & Accessories</SelectItem>
-              </SelectContent>
-        </Select>
-        <p className="text-sm text-muted-foreground">
-          {products?.length || 0} products
-        </p>
+      {/* Category Filter */}
+      <div className="flex gap-2">
+        <Button
+          variant={categoryFilter === "all" ? "default" : "outline"}
+          onClick={() => setCategoryFilter("all")}
+          size="sm"
+        >
+          All
+        </Button>
+        {categories.map((category) => (
+          <Button
+            key={category}
+            variant={categoryFilter === category ? "default" : "outline"}
+            onClick={() => setCategoryFilter(category)}
+            size="sm"
+          >
+            {category}
+          </Button>
+        ))}
       </div>
 
+      {/* Products List */}
       <div className="grid gap-4">
         {isLoading ? (
           <p>Loading products...</p>
         ) : products && products.length > 0 ? (
-          products.map((product) => (
+          products.map((product: any) => (
             <Card key={product.id}>
-              <CardContent className="flex items-center gap-4 p-4">
-                <img
-                  src={product.image_url}
-                  alt={product.title}
-                  className="w-24 h-24 object-cover rounded"
-                />
-                <div className="flex-1">
-                  <div className="flex items-center gap-2">
-                    <h3 className="font-semibold">{product.title}</h3>
-                    {product.is_featured && <Star className="w-4 h-4 text-primary" />}
+              <CardContent className="p-4">
+                <div className="flex items-start justify-between gap-4">
+                  <div className="flex gap-4 flex-1">
+                    {product.image_url && (
+                      <img
+                        src={product.image_url}
+                        alt={product.title}
+                        className="w-20 h-20 object-cover rounded"
+                      />
+                    )}
+                    <div className="flex-1">
+                      <div className="flex items-center gap-2">
+                        <h3 className="font-semibold">{product.title}</h3>
+                        {product.is_featured && (
+                          <Star className="h-4 w-4 fill-primary text-primary" />
+                        )}
+                        {product.product_type === 'direct_sale' && (
+                          <ShoppingCart className="h-4 w-4 text-primary" />
+                        )}
+                      </div>
+                      <p className="text-sm text-muted-foreground">{product.category}</p>
+                      <p className="text-sm mt-1">{product.description}</p>
+                      
+                      {product.product_type === 'amazon_affiliate' ? (
+                        <p className="text-sm font-semibold mt-1">{product.price_range}</p>
+                      ) : (
+                        <div className="text-sm font-semibold mt-1 space-y-1">
+                          <p>€{product.price?.toFixed(2)}</p>
+                          {product.stock_quantity !== null && (
+                            <p className="text-xs text-muted-foreground">
+                              Stock: {product.stock_quantity}
+                            </p>
+                          )}
+                          {product.stripe_product_id && (
+                            <p className="text-xs text-muted-foreground font-mono">
+                              Stripe: {product.stripe_product_id}
+                            </p>
+                          )}
+                        </div>
+                      )}
+                    </div>
                   </div>
-                  <p className="text-sm text-muted-foreground">{product.category}</p>
-                  <p className="text-sm font-medium text-primary">{product.price_range}</p>
-                </div>
-                <div className="flex gap-2">
-                  <Button variant="outline" size="sm" onClick={() => handleEdit(product)}>
-                    <Pencil className="h-4 w-4" />
-                  </Button>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => setDeleteId(product.id)}
-                  >
-                    <Trash2 className="h-4 w-4" />
-                  </Button>
+                  <div className="flex gap-2">
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={() => handleEdit(product)}
+                    >
+                      <Pencil className="h-4 w-4" />
+                    </Button>
+                    <Button
+                      size="sm"
+                      variant="destructive"
+                      onClick={() => setDeleteId(product.id)}
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
+                  </div>
                 </div>
               </CardContent>
             </Card>
           ))
         ) : (
-          <p className="text-muted-foreground text-center py-8">
-            No products yet. Add your first product!
+          <p className="text-center text-muted-foreground py-8">
+            No products found. Add your first product!
           </p>
         )}
       </div>
 
+      {/* Delete Confirmation Dialog */}
       <AlertDialog open={!!deleteId} onOpenChange={() => setDeleteId(null)}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Delete Product</AlertDialogTitle>
+            <AlertDialogTitle>Are you sure?</AlertDialogTitle>
             <AlertDialogDescription>
-              Are you sure you want to delete this product? This action cannot be undone.
+              This action cannot be undone. This will permanently delete this product.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>Cancel</AlertDialogCancel>
             <AlertDialogAction
               onClick={() => deleteId && deleteMutation.mutate(deleteId)}
-              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
             >
               Delete
             </AlertDialogAction>

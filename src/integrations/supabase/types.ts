@@ -1230,41 +1230,59 @@ export type Database = {
       }
       shop_products: {
         Row: {
-          amazon_url: string
+          amazon_url: string | null
           category: string
           created_at: string
           description: string
           display_order: number | null
           id: string
           image_url: string
+          is_available: boolean | null
           is_featured: boolean | null
+          price: number | null
           price_range: string
+          product_type: string
+          stock_quantity: number | null
+          stripe_price_id: string | null
+          stripe_product_id: string | null
           title: string
           updated_at: string
         }
         Insert: {
-          amazon_url: string
+          amazon_url?: string | null
           category: string
           created_at?: string
           description: string
           display_order?: number | null
           id?: string
           image_url: string
+          is_available?: boolean | null
           is_featured?: boolean | null
+          price?: number | null
           price_range: string
+          product_type?: string
+          stock_quantity?: number | null
+          stripe_price_id?: string | null
+          stripe_product_id?: string | null
           title: string
           updated_at?: string
         }
         Update: {
-          amazon_url?: string
+          amazon_url?: string | null
           category?: string
           created_at?: string
           description?: string
           display_order?: number | null
           id?: string
           image_url?: string
+          is_available?: boolean | null
           is_featured?: boolean | null
+          price?: number | null
           price_range?: string
+          product_type?: string
+          stock_quantity?: number | null
+          stripe_price_id?: string | null
+          stripe_product_id?: string | null
           title?: string
           updated_at?: string
         }
@@ -1404,33 +1422,42 @@ export type Database = {
           content_id: string
           content_name: string
           content_type: string
+          fulfillment_status: string | null
           id: string
           price: number
           purchased_at: string
+          shipping_address: Json | null
           stripe_checkout_session_id: string | null
           stripe_payment_intent_id: string | null
+          tracking_info: string | null
           user_id: string
         }
         Insert: {
           content_id: string
           content_name: string
           content_type: string
+          fulfillment_status?: string | null
           id?: string
           price: number
           purchased_at?: string
+          shipping_address?: Json | null
           stripe_checkout_session_id?: string | null
           stripe_payment_intent_id?: string | null
+          tracking_info?: string | null
           user_id: string
         }
         Update: {
           content_id?: string
           content_name?: string
           content_type?: string
+          fulfillment_status?: string | null
           id?: string
           price?: number
           purchased_at?: string
+          shipping_address?: Json | null
           stripe_checkout_session_id?: string | null
           stripe_payment_intent_id?: string | null
+          tracking_info?: string | null
           user_id?: string
         }
         Relationships: []
