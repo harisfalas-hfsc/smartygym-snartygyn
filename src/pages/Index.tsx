@@ -438,11 +438,14 @@ const Index = () => {
                   </div>
 
                   {/* Middle Section: Phone (Left) + Three Cards (Right) */}
-                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
+                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">
                     
                     {/* LEFT: Mobile Phone Illustration */}
-                    <div className="flex justify-center lg:justify-end order-1 lg:order-1">
-                      <MobilePhoneIllustration className="w-full max-w-[280px]" />
+                    <div className="flex justify-center lg:justify-start order-1 lg:order-1">
+                      <MobilePhoneIllustration 
+                        className="w-full max-w-[200px]"
+                        imageUrl="https://images.unsplash.com/photo-1518611012118-696072aa579a?w=400&h=800&fit=crop&crop=faces"
+                      />
                     </div>
 
                     {/* RIGHT: Three Core Message Cards */}
