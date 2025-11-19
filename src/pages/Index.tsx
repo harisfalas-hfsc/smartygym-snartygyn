@@ -389,10 +389,10 @@ const Index = () => {
           <div className="absolute inset-0 z-0">
             <img 
               src={workoutHeroImg} 
-              alt="Online fitness training - professional workouts and programs"
-              className="w-full h-full object-cover opacity-20 blur-sm"
+              alt="People training with online fitness platform" 
+              className="w-full h-full object-cover opacity-40 blur-[2px]"
             />
-            <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/40 to-black/60" />
+            <div className="absolute inset-0 bg-gradient-to-b from-black/20 via-black/10 to-black/20" />
           </div>
           
           {/* Content */}
@@ -400,12 +400,14 @@ const Index = () => {
             <ScrollReveal>
               <h1 
                 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-black text-white tracking-tight"
+                style={{ textShadow: '2px 2px 8px rgba(0,0,0,0.8)' }}
                 itemProp="name"
               >
                 Welcome to Smarty Gym
               </h1>
               <p 
                 className="text-xl sm:text-2xl md:text-3xl text-white/90 font-light max-w-3xl mx-auto"
+                style={{ textShadow: '2px 2px 8px rgba(0,0,0,0.8)' }}
                 itemProp="slogan"
               >
                 Your gym reimagined anywhere, anytime.
@@ -512,22 +514,22 @@ const Index = () => {
             <ScrollReveal>
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
                 
-                {/* Left: Icon */}
-                <div className="flex justify-center lg:justify-end">
-                  <div className="relative">
-                    <div className="absolute inset-0 bg-primary/20 blur-3xl rounded-full" />
-                    <Smartphone className="relative w-48 h-48 sm:w-64 sm:h-64 text-primary drop-shadow-2xl" />
-                  </div>
-                </div>
+            {/* Left: Icon */}
+            <div className="flex justify-center lg:justify-end">
+              <div className="relative">
+                <div className="absolute inset-0 bg-primary/20 blur-3xl rounded-full" />
+                <Smartphone className="relative w-64 h-64 sm:w-80 sm:h-80 lg:w-96 lg:h-96 text-primary drop-shadow-2xl" />
+              </div>
+            </div>
                 
-                {/* Right: Content */}
-                <div className="space-y-8">
-                  <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold text-center lg:text-left">
-                    Online fitness platform trusted by thousands of users
-                  </h2>
-                  
-                  {/* Three Value Cards */}
-                  <div className="grid grid-cols-1 gap-6">
+            {/* Right: Content */}
+            <div className="space-y-8">
+              <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-center lg:text-left leading-tight">
+                Trusted by Thousands of Users Worldwide
+              </h2>
+              
+              {/* Four Value Cards */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                     {/* Your Gym In Your Pocket */}
                     <Card className="border-2 hover:border-primary/50 transition-colors">
                       <CardContent className="p-6 space-y-3">
@@ -574,6 +576,44 @@ const Index = () => {
                         </p>
                       </CardContent>
                     </Card>
+
+                    {/* Who Is SmartyGym For? Card */}
+                    <Card className="border-2 hover:border-primary/50 transition-colors">
+                      <CardContent className="p-6 space-y-4">
+                        <div className="flex items-center gap-3">
+                          <div className="p-3 rounded-full bg-primary/10">
+                            <Users className="w-6 h-6 text-primary" />
+                          </div>
+                          <h3 className="text-xl font-bold">Who Is SmartyGym For?</h3>
+                        </div>
+                        <div className="space-y-2 text-sm text-muted-foreground">
+                          <div className="flex items-start gap-2">
+                            <span className="text-primary mt-1">•</span>
+                            <p><span className="font-semibold text-foreground">Busy adults</span> juggling work and fitness</p>
+                          </div>
+                          <div className="flex items-start gap-2">
+                            <span className="text-primary mt-1">•</span>
+                            <p><span className="font-semibold text-foreground">Parents</span> who need flexible workout times</p>
+                          </div>
+                          <div className="flex items-start gap-2">
+                            <span className="text-primary mt-1">•</span>
+                            <p><span className="font-semibold text-foreground">Beginners</span> starting their fitness journey</p>
+                          </div>
+                          <div className="flex items-start gap-2">
+                            <span className="text-primary mt-1">•</span>
+                            <p><span className="font-semibold text-foreground">Intermediate lifters</span> looking for structured progression</p>
+                          </div>
+                          <div className="flex items-start gap-2">
+                            <span className="text-primary mt-1">•</span>
+                            <p><span className="font-semibold text-foreground">Travelers</span> needing workouts anywhere</p>
+                          </div>
+                          <div className="flex items-start gap-2">
+                            <span className="text-primary mt-1">•</span>
+                            <p><span className="font-semibold text-foreground">Anyone</span> seeking professional coaching</p>
+                          </div>
+                        </div>
+                      </CardContent>
+                    </Card>
                   </div>
                 </div>
               </div>
@@ -581,64 +621,7 @@ const Index = () => {
           </div>
         </section>
 
-        {/* Separator spacing before "Who Is Smarty Gym For?" */}
-        <div className="py-8"></div>
-
-        {/* Who Is Smarty Gym For? Section */}
-        <section className="container mx-auto px-4 max-w-6xl">
-          <ScrollReveal>
-            <Card className="border border-primary/30 bg-background/80">
-
-              <div className="p-6 sm:p-8 space-y-4">
-                        <h2 className="text-xl sm:text-2xl font-bold text-center text-foreground">
-                          Who Is Smarty Gym For?
-                        </h2>
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-4 text-sm sm:text-base">
-                          <div className="flex items-start gap-2 sm:gap-3">
-                            <Users className="w-4 h-4 sm:w-5 sm:h-5 text-primary flex-shrink-0 mt-1" />
-                            <p className="text-muted-foreground">
-                              <span className="font-semibold text-foreground">Busy adults</span> juggling work and fitness
-                            </p>
-                          </div>
-                          <div className="flex items-start gap-2 sm:gap-3">
-                            <Heart className="w-4 h-4 sm:w-5 sm:h-5 text-primary flex-shrink-0 mt-1" />
-                            <p className="text-muted-foreground">
-                              <span className="font-semibold text-foreground">Parents</span> who need flexible workout times
-                            </p>
-                          </div>
-                          <div className="flex items-start gap-2 sm:gap-3">
-                            <GraduationCap className="w-4 h-4 sm:w-5 sm:h-5 text-primary flex-shrink-0 mt-1" />
-                            <p className="text-muted-foreground">
-                              <span className="font-semibold text-foreground">Beginners</span> starting their fitness journey
-                            </p>
-                          </div>
-                          <div className="flex items-start gap-2 sm:gap-3">
-                            <Target className="w-4 h-4 sm:w-5 sm:h-5 text-primary flex-shrink-0 mt-1" />
-                            <p className="text-muted-foreground">
-                              <span className="font-semibold text-foreground">Intermediate lifters</span> looking for structured progression
-                            </p>
-                          </div>
-                          <div className="flex items-start gap-2 sm:gap-3">
-                            <Plane className="w-4 h-4 sm:w-5 sm:h-5 text-primary flex-shrink-0 mt-1" />
-                            <p className="text-muted-foreground">
-                              <span className="font-semibold text-foreground">Travelers</span> who need workouts anywhere
-                            </p>
-                          </div>
-                          <div className="flex items-start gap-2 sm:gap-3">
-                            <Dumbbell className="w-4 h-4 sm:w-5 sm:h-5 text-primary flex-shrink-0 mt-1" />
-                            <p className="text-muted-foreground">
-                              <span className="font-semibold text-foreground">Gym-goers</span> who want expert guidance from <a href="/coach-profile" className="text-primary hover:underline font-semibold">Haris Falas</a>
-                            </p>
-                          </div>
-                          <div className="flex items-start gap-2 sm:gap-3 md:col-span-2">
-                            <Zap className="w-4 h-4 sm:w-5 sm:h-5 text-primary flex-shrink-0 mt-1" />
-                            <p className="text-muted-foreground">
-                              <span className="font-semibold text-foreground">Anyone</span> seeking professional coaching without personal training costs
-                            </p>
-                          </div>
-                        </div>
-
-                        {/* Pricing Plans */}
+        {/* Pricing Section */}
                         <div className="pt-12">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-4">
             {/* Gold Plan */}
@@ -769,11 +752,7 @@ const Index = () => {
               </CardContent>
             </Card>
           </div>
-                        </div>
-                      </div>
-                    </Card>
-                  </ScrollReveal>
-                </section>
+        </div>
 
 
     </div>
