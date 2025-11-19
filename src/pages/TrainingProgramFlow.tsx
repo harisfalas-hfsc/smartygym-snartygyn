@@ -123,34 +123,33 @@ const TrainingProgramFlow = () => {
                   itemScope
                   itemType="https://schema.org/Course"
                   onClick={() => handleProgramSelect(program.id)}
-                  className="group p-6 cursor-pointer transition-all duration-500 ease-out hover:scale-110 hover:shadow-2xl hover:shadow-primary/50 hover:-translate-y-2 bg-card border-2 border-border hover:border-primary overflow-hidden relative"
+                  className="p-6 cursor-pointer transition-all duration-300 hover:scale-105 hover:shadow-gold bg-card border-border"
                   role="button"
                   aria-label={`${program.title} training program - Online gym program at Smarty Gym Cyprus - smartygym.com by Haris Falas`}
                   data-program-category={program.id}
                   data-keywords="online gym training programs, workout training programs, smarty gym, online fitness programs, smartygym.com, Haris Falas Cyprus"
                 >
-                  <div className="absolute inset-0 bg-gradient-to-br from-primary/0 to-primary/0 group-hover:from-primary/90 group-hover:to-primary/100 transition-all duration-500 -z-10" />
                   <div className="flex flex-col items-center text-center space-y-4">
                     <div 
-                      className="w-16 h-16 rounded-full bg-primary/10 group-hover:bg-white/20 flex items-center justify-center transition-all duration-500"
+                      className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center"
                       aria-hidden="true"
                     >
-                      <Icon className="w-8 h-8 text-primary group-hover:text-white transition-all duration-500" />
+                      <Icon className="w-8 h-8 text-primary" />
                     </div>
                     <div>
                       <h3 
-                        className="font-semibold text-lg mb-2 group-hover:text-white transition-all duration-500"
+                        className="font-semibold text-lg mb-2"
                         itemProp="name"
                       >
                         {program.title}
                       </h3>
                       <p 
-                        className="text-sm text-muted-foreground group-hover:text-white/90 mb-3 transition-all duration-500"
+                        className="text-sm text-muted-foreground mb-3"
                         itemProp="description"
                       >
                         {program.description}
                       </p>
-                      <p className="text-xs text-muted-foreground/80 group-hover:text-white/80 italic mb-3 transition-all duration-500">
+                      <p className="text-xs text-muted-foreground/80 italic mb-3">
                         Crafted by{" "}
                         <a 
                           href="/coach-profile" 
@@ -164,15 +163,15 @@ const TrainingProgramFlow = () => {
                       </p>
                   <div className="flex gap-1 text-[10px] mt-2">
                     <span 
-                      className="bg-primary/20 text-primary border border-primary/40 group-hover:bg-white/20 group-hover:text-white group-hover:border-white/40 px-1.5 py-0.5 rounded-full whitespace-nowrap transition-all duration-500" 
+                      className="bg-primary/20 text-primary border border-primary/40 px-1.5 py-0.5 rounded-full whitespace-nowrap" 
                       itemProp="duration"
                     >
                       4-8 weeks
                     </span>
-                    <span className="bg-green-500/20 text-green-700 dark:text-green-400 border border-green-500/40 group-hover:bg-white/20 group-hover:text-white group-hover:border-white/40 px-1.5 py-0.5 rounded-full whitespace-nowrap transition-all duration-500">
+                    <span className="bg-green-500/20 text-green-700 dark:text-green-400 border border-green-500/40 px-1.5 py-0.5 rounded-full whitespace-nowrap">
                       {program.level}
                     </span>
-                    <span className="bg-orange-500/20 text-orange-700 dark:text-orange-400 border border-orange-500/40 group-hover:bg-white/20 group-hover:text-white group-hover:border-white/40 px-1.5 py-0.5 rounded-full whitespace-nowrap transition-all duration-500">
+                    <span className="bg-orange-500/20 text-orange-700 dark:text-orange-400 border border-orange-500/40 px-1.5 py-0.5 rounded-full whitespace-nowrap">
                       {program.equipment}
                     </span>
                   </div>

@@ -142,34 +142,33 @@ const WorkoutFlow = () => {
                   itemScope
                   itemType="https://schema.org/ExercisePlan"
                   onClick={() => handleWorkoutSelect(workout.id)}
-                  className="group p-6 cursor-pointer transition-all duration-500 ease-out hover:scale-110 hover:shadow-2xl hover:shadow-primary/50 hover:-translate-y-2 bg-card border-2 border-border hover:border-primary overflow-hidden relative"
+                  className="p-6 cursor-pointer transition-all duration-300 hover:scale-105 hover:shadow-gold bg-card border-border"
                   role="button"
                   aria-label={`${workout.title} workouts - Online gym category at Smarty Gym Cyprus - smartygym.com by Haris Falas`}
                   data-workout-category={workout.id}
                   data-keywords="online gym workouts, smarty gym, online fitness, smartygym.com, Haris Falas Cyprus workouts"
                 >
-                  <div className="absolute inset-0 bg-gradient-to-br from-primary/0 to-primary/0 group-hover:from-primary/90 group-hover:to-primary/100 transition-all duration-500 -z-10" />
                   <div className="flex flex-col items-center text-center space-y-4">
                     <div 
-                      className="w-16 h-16 rounded-full bg-primary/10 group-hover:bg-white/20 flex items-center justify-center transition-all duration-500"
+                      className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center"
                       aria-hidden="true"
                     >
-                      <Icon className="w-8 h-8 text-primary group-hover:text-white transition-all duration-500" />
+                      <Icon className="w-8 h-8 text-primary" />
                     </div>
                     <div>
                       <h3 
-                        className="font-semibold text-lg mb-2 group-hover:text-white transition-all duration-500"
+                        className="font-semibold text-lg mb-2"
                         itemProp="name"
                       >
                         {workout.title}
                       </h3>
                       <p 
-                        className="text-sm text-muted-foreground group-hover:text-white/90 mb-3 transition-all duration-500"
+                        className="text-sm text-muted-foreground mb-3"
                         itemProp="description"
                       >
                         {workout.description}
                       </p>
-              <p className="text-xs text-muted-foreground/80 group-hover:text-white/80 italic transition-all duration-500">
+              <p className="text-xs text-muted-foreground/80 italic">
                 Crafted by{" "}
                 <a 
                   href="/coach-profile" 
