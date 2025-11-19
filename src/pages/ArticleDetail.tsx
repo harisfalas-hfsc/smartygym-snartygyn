@@ -128,7 +128,7 @@ export const ArticleDetail = () => {
               <HTMLContent content={article.content} />
             </div>
 
-            <div className="border-t pt-6">
+            <div className="pt-6">
               <h3 className="text-lg font-semibold mb-4">Share this article</h3>
               <ShareButtons url={articleUrl} title={article.title} />
             </div>

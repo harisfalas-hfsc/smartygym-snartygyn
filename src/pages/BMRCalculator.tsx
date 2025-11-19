@@ -247,7 +247,7 @@ const BMRCalculator = () => {
             </div>
 
             {result && (
-              <div className="space-y-4 pt-4 border-t">
+              <div className="space-y-4 pt-6">
                 <article
                   itemScope
                   itemType="https://schema.org/MedicalWebPage"
