@@ -12,6 +12,7 @@ import { useToast } from "@/hooks/use-toast";
 import smartyGymLogo from "@/assets/smarty-gym-logo.png";
 import smartyGymIcon from "@/assets/smarty-gym-icon.png";
 import { MobilePhoneIllustration } from "@/components/MobilePhoneIllustration";
+import workoutCategoriesPreview from "@/assets/workout-categories-preview.jpg";
 
 import { useAccessControl } from "@/hooks/useAccessControl";
 import { ScrollReveal } from "@/components/ScrollReveal";
@@ -567,7 +568,7 @@ const Index = () => {
             <MobilePhoneIllustration
               variant="tablet"
               className="h-full max-h-[480px] w-auto"
-              imageUrl="https://images.unsplash.com/photo-1517836357463-d25dfeac3438?w=600&h=800&fit=crop&crop=center"
+              imageUrl={workoutCategoriesPreview}
             />
                       </div>
                     </div>
