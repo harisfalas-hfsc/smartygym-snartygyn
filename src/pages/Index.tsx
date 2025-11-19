@@ -453,7 +453,7 @@ const Index = () => {
                       
                       <div 
                         onClick={() => navigate("/workout")}
-                        className="flex items-start gap-3 cursor-pointer hover:bg-primary/10 transition-all duration-200 rounded-lg p-3 border border-transparent hover:border-primary/20 hover:scale-[1.02] hover:shadow-md"
+                        className="flex items-start gap-3 cursor-pointer hover:bg-primary/10 transition-all duration-300 ease-in-out rounded-lg p-3 border border-transparent hover:border-primary/20 hover:scale-105 hover:shadow-lg transform-gpu"
                       >
                         <Dumbbell className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
                         <div>
@@ -464,7 +464,7 @@ const Index = () => {
 
                       <div 
                         onClick={() => navigate("/trainingprogram")}
-                        className="flex items-start gap-3 cursor-pointer hover:bg-primary/10 transition-all duration-200 rounded-lg p-3 border border-transparent hover:border-primary/20 hover:scale-[1.02] hover:shadow-md"
+                        className="flex items-start gap-3 cursor-pointer hover:bg-primary/10 transition-all duration-300 ease-in-out rounded-lg p-3 border border-transparent hover:border-primary/20 hover:scale-105 hover:shadow-lg transform-gpu"
                       >
                         <Calendar className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
                         <div>
@@ -475,7 +475,7 @@ const Index = () => {
 
                       <div 
                         onClick={() => navigate("/tools")}
-                        className="flex items-start gap-3 cursor-pointer hover:bg-primary/10 transition-all duration-200 rounded-lg p-3 border border-transparent hover:border-primary/20 hover:scale-[1.02] hover:shadow-md"
+                        className="flex items-start gap-3 cursor-pointer hover:bg-primary/10 transition-all duration-300 ease-in-out rounded-lg p-3 border border-transparent hover:border-primary/20 hover:scale-105 hover:shadow-lg transform-gpu"
                       >
                         <Wrench className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
                         <div>
@@ -486,7 +486,7 @@ const Index = () => {
 
                       <div 
                         onClick={() => navigate("/exerciselibrary")}
-                        className="flex items-start gap-3 cursor-pointer hover:bg-primary/10 transition-all duration-200 rounded-lg p-3 border border-transparent hover:border-primary/20 hover:scale-[1.02] hover:shadow-md"
+                        className="flex items-start gap-3 cursor-pointer hover:bg-primary/10 transition-all duration-300 ease-in-out rounded-lg p-3 border border-transparent hover:border-primary/20 hover:scale-105 hover:shadow-lg transform-gpu"
                       >
                         <Video className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
                         <div>
@@ -497,7 +497,7 @@ const Index = () => {
 
                       <div 
                         onClick={() => navigate("/blog")}
-                        className="flex items-start gap-3 cursor-pointer hover:bg-primary/10 transition-all duration-200 rounded-lg p-3 border border-transparent hover:border-primary/20 hover:scale-[1.02] hover:shadow-md"
+                        className="flex items-start gap-3 cursor-pointer hover:bg-primary/10 transition-all duration-300 ease-in-out rounded-lg p-3 border border-transparent hover:border-primary/20 hover:scale-105 hover:shadow-lg transform-gpu"
                       >
                         <FileText className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
                         <div>
@@ -508,7 +508,7 @@ const Index = () => {
 
                       <div 
                         onClick={() => navigate("/contact")}
-                        className="flex items-start gap-3 cursor-pointer hover:bg-primary/10 transition-all duration-200 rounded-lg p-3 border border-transparent hover:border-primary/20 hover:scale-[1.02] hover:shadow-md"
+                        className="flex items-start gap-3 cursor-pointer hover:bg-primary/10 transition-all duration-300 ease-in-out rounded-lg p-3 border border-transparent hover:border-primary/20 hover:scale-105 hover:shadow-lg transform-gpu"
                       >
                         <GraduationCap className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
                         <div>
