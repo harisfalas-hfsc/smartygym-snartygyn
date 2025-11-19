@@ -10,6 +10,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { useToast } from "@/hooks/use-toast";
 import { usePurchases } from "@/hooks/usePurchases";
 import { UserMessagesPanel } from "@/components/UserMessagesPanel";
+import { MyOrders } from "@/components/MyOrders";
 import { useQuery } from "@tanstack/react-query";
 import { 
   Heart, 

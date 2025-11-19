@@ -81,6 +81,9 @@ serve(async (req) => {
       const lineItems = await stripe.checkout.sessions.listLineItems(sessionId);
       const priceAmount = lineItems.data[0]?.amount_total || 0;
 
+      // Get shipping address if available (for shop products)
+      const shippingAddress = session.shipping_details?.address || null;
+
       // Insert purchase record
       const { error } = await supabaseClient
         .from('user_purchases')
@@ -91,6 +94,8 @@ serve(async (req) => {
           content_name,
           price: priceAmount / 100, // Convert from cents to euros
           stripe_payment_intent_id: session.payment_intent as string,
+          stripe_checkout_session_id: sessionId,
+          shipping_address: shippingAddress,
         }]);
 
       if (error && error.code !== '23505') { // Ignore duplicate key errors
@@ -110,6 +115,30 @@ serve(async (req) => {
           });
       } catch (logError) {
         console.error('Failed to log purchase activity:', logError);
+      }
+
+      // Decrement stock for shop products
+      if (content_type === 'shop_product') {
+        try {
+          const { data: product } = await supabaseClient
+            .from('shop_products')
+            .select('stock_quantity')
+            .eq('id', content_id)
+            .maybeSingle();
+
+          if (product && product.stock_quantity !== null && product.stock_quantity > 0) {
+            const newStock = Math.max(0, product.stock_quantity - 1);
+            await supabaseClient
+              .from('shop_products')
+              .update({ 
+                stock_quantity: newStock,
+                is_available: newStock > 0
+              })
+              .eq('id', content_id);
+          }
+        } catch (stockError) {
+          console.error('Failed to update stock:', stockError);
+        }
       }
 
       // Send purchase thank you message with correct message type
