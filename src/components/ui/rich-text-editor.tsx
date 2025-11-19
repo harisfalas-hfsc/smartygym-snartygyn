@@ -11,6 +11,7 @@ import { Color } from '@tiptap/extension-color';
 import { TextStyle } from '@tiptap/extension-text-style';
 import { Underline } from '@tiptap/extension-underline';
 import { Placeholder } from '@tiptap/extension-placeholder';
+import { Image } from '@tiptap/extension-image';
 import { Button } from './button';
 import {
   Bold,
@@ -31,6 +32,13 @@ import {
   Redo,
   Palette,
   Grid3x3,
+  ImageIcon,
+  Upload,
+  Plus,
+  Trash,
+  Merge,
+  Split,
+  Table2,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import {
@@ -42,6 +50,8 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Input } from "@/components/ui/input";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
 
 interface RichTextEditorProps {
   value: string;
@@ -50,7 +60,7 @@ interface RichTextEditorProps {
   minHeight?: string;
 }
 
-// Extended TableCell with border customization
+// Extended TableCell with border and background customization
 const CustomTableCell = TableCell.extend({
   addAttributes() {
     return {
@@ -86,11 +96,22 @@ const CustomTableCell = TableCell.extend({
           };
         },
       },
+      backgroundColor: {
+        default: null,
+        parseHTML: element => element.getAttribute('data-bg-color') || element.style.backgroundColor,
+        renderHTML: attributes => {
+          if (!attributes.backgroundColor) return {};
+          return { 
+            'data-bg-color': attributes.backgroundColor,
+            style: `background-color: ${attributes.backgroundColor} !important;`
+          };
+        },
+      },
     };
   },
 });
 
-// Extended TableHeader with border customization
+// Extended TableHeader with border and background customization
 const CustomTableHeader = TableHeader.extend({
   addAttributes() {
     return {
@@ -126,6 +147,17 @@ const CustomTableHeader = TableHeader.extend({
           };
         },
       },
+      backgroundColor: {
+        default: null,
+        parseHTML: element => element.getAttribute('data-bg-color') || element.style.backgroundColor,
+        renderHTML: attributes => {
+          if (!attributes.backgroundColor) return {};
+          return { 
+            'data-bg-color': attributes.backgroundColor,
+            style: `background-color: ${attributes.backgroundColor} !important;`
+          };
+        },
+      },
     };
   },
 });
@@ -139,6 +171,7 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({
   const [borderColor, setBorderColor] = useState('#000000');
   const [borderWidth, setBorderWidth] = useState('1px');
   const [borderStyle, setBorderStyle] = useState('solid');
+  const [cellBgColor, setCellBgColor] = useState('#ffffff');
 
   const editor = useEditor({
     extensions: [
@@ -146,6 +179,13 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({
       Underline,
       TextStyle,
       Color,
+      Image.configure({
+        inline: true,
+        allowBase64: true,
+        HTMLAttributes: {
+          class: 'editor-image',
+        },
+      }),
       Table.configure({
         resizable: true,
       }),
@@ -228,6 +268,82 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({
 
   const applyGoldBorders = () => {
     applyBorderToAllCells('hsl(var(--primary))', '2px', 'solid');
+  };
+
+  // Image upload helper functions
+  const insertImageFromURL = () => {
+    const url = window.prompt('Enter image URL:');
+    if (url) {
+      editor.chain().focus().setImage({ src: url }).run();
+    }
+  };
+
+  const uploadImage = async () => {
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = 'image/*';
+    
+    input.onchange = async (e) => {
+      const file = (e.target as HTMLInputElement).files?.[0];
+      if (!file) return;
+      
+      toast.loading('Uploading image...');
+      
+      try {
+        const fileExt = file.name.split('.').pop();
+        const fileName = `${Math.random()}.${fileExt}`;
+        const filePath = `content-images/${fileName}`;
+        
+        const { error: uploadError } = await supabase.storage
+          .from('contact-files')
+          .upload(filePath, file);
+        
+        if (uploadError) {
+          toast.dismiss();
+          toast.error('Failed to upload image');
+          return;
+        }
+        
+        const { data: { publicUrl } } = supabase.storage
+          .from('contact-files')
+          .getPublicUrl(filePath);
+        
+        editor.chain().focus().setImage({ src: publicUrl }).run();
+        toast.dismiss();
+        toast.success('Image inserted successfully');
+      } catch (error) {
+        toast.dismiss();
+        toast.error('Failed to upload image');
+      }
+    };
+    
+    input.click();
+  };
+
+  // Cell background color helper functions
+  const applyCellBackground = (color: string, applyToAll: boolean) => {
+    if (applyToAll) {
+      const { state } = editor;
+      const { tr } = state;
+      let modified = false;
+
+      state.doc.descendants((node, pos) => {
+        if (node.type.name === 'tableCell' || node.type.name === 'tableHeader') {
+          tr.setNodeMarkup(pos, undefined, {
+            ...node.attrs,
+            backgroundColor: color,
+          });
+          modified = true;
+        }
+      });
+
+      if (modified) {
+        editor.view.dispatch(tr);
+      }
+    } else {
+      editor.commands.updateAttributes('tableCell', { backgroundColor: color });
+      editor.commands.updateAttributes('tableHeader', { backgroundColor: color });
+    }
   };
 
   return (
@@ -326,9 +442,33 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({
           <TableIcon className="h-4 w-4" />
         </Button>
 
+        {/* Image insertion dropdown */}
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button
+              type="button"
+              variant="ghost"
+              size="sm"
+            >
+              <ImageIcon className="h-4 w-4" />
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="start" className="w-48 bg-background z-50">
+            <DropdownMenuItem onSelect={insertImageFromURL} className="cursor-pointer">
+              <LinkIcon className="h-4 w-4 mr-2" />
+              Insert from URL
+            </DropdownMenuItem>
+            <DropdownMenuItem onSelect={uploadImage} className="cursor-pointer">
+              <Upload className="h-4 w-4 mr-2" />
+              Upload from Device
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+
         {editor.isActive('table') && (
           <>
             <div className="w-px h-6 bg-border mx-1" />
+            {/* Table border and background customization dropdown */}
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button
@@ -489,6 +629,74 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({
                 </DropdownMenuItem>
 
                 <DropdownMenuSeparator />
+                <DropdownMenuLabel>Cell Background</DropdownMenuLabel>
+                <DropdownMenuSeparator />
+                
+                <div className="p-2 space-y-3">
+                  <div>
+                    <label className="text-xs font-medium mb-1 block">Background Color</label>
+                    <div className="flex gap-2">
+                      <Input
+                        type="color"
+                        value={cellBgColor}
+                        onChange={(e) => setCellBgColor(e.target.value)}
+                        className="h-8 w-16 p-1 cursor-pointer"
+                      />
+                      <div className="flex gap-1 flex-wrap flex-1">
+                        <button
+                          type="button"
+                          className="w-6 h-6 rounded border-2 border-red-500 bg-transparent relative"
+                          onClick={() => setCellBgColor('transparent')}
+                          title="None"
+                        >
+                          <span className="absolute inset-0 flex items-center justify-center text-red-500 text-xs font-bold">✕</span>
+                        </button>
+                        <button
+                          type="button"
+                          className="w-6 h-6 rounded border border-input bg-white"
+                          onClick={() => setCellBgColor('#ffffff')}
+                          title="White"
+                        />
+                        <button
+                          type="button"
+                          className="w-6 h-6 rounded border border-input bg-gray-200"
+                          onClick={() => setCellBgColor('#e5e7eb')}
+                          title="Light Gray"
+                        />
+                        <button
+                          type="button"
+                          className="w-6 h-6 rounded border border-input"
+                          style={{ backgroundColor: 'hsl(var(--primary) / 0.1)' }}
+                          onClick={() => setCellBgColor('hsl(var(--primary) / 0.1)')}
+                          title="Light Gold"
+                        />
+                        <button
+                          type="button"
+                          className="w-6 h-6 rounded border border-input bg-black"
+                          onClick={() => setCellBgColor('#000000')}
+                          title="Black"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <DropdownMenuSeparator />
+                
+                <DropdownMenuItem 
+                  onClick={() => applyCellBackground(cellBgColor, false)}
+                  className="cursor-pointer"
+                >
+                  Apply to Selected Cell
+                </DropdownMenuItem>
+                <DropdownMenuItem 
+                  onClick={() => applyCellBackground(cellBgColor, true)}
+                  className="cursor-pointer"
+                >
+                  Apply to All Cells
+                </DropdownMenuItem>
+
+                <DropdownMenuSeparator />
                 <DropdownMenuLabel className="text-xs font-normal text-muted-foreground">Quick Presets</DropdownMenuLabel>
                 
                 <DropdownMenuItem onClick={removeBordersFromTable} className="cursor-pointer">
@@ -499,6 +707,91 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({
                 </DropdownMenuItem>
                 <DropdownMenuItem onClick={applyGoldBorders} className="cursor-pointer">
                   Gold Borders
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+
+            {/* Table operations dropdown */}
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="sm"
+                >
+                  <Table2 className="h-4 w-4" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="start" className="w-56 bg-background z-50">
+                <DropdownMenuLabel>Table Operations</DropdownMenuLabel>
+                <DropdownMenuSeparator />
+                
+                {/* Row operations */}
+                <DropdownMenuLabel className="text-xs text-muted-foreground px-2 py-1">Rows</DropdownMenuLabel>
+                <DropdownMenuItem onSelect={() => editor.chain().focus().addRowBefore().run()} className="cursor-pointer">
+                  <Plus className="h-4 w-4 mr-2" />
+                  Add Row Above
+                </DropdownMenuItem>
+                <DropdownMenuItem onSelect={() => editor.chain().focus().addRowAfter().run()} className="cursor-pointer">
+                  <Plus className="h-4 w-4 mr-2" />
+                  Add Row Below
+                </DropdownMenuItem>
+                <DropdownMenuItem onSelect={() => editor.chain().focus().deleteRow().run()} className="cursor-pointer">
+                  <Trash className="h-4 w-4 mr-2" />
+                  Delete Row
+                </DropdownMenuItem>
+                
+                <DropdownMenuSeparator />
+                
+                {/* Column operations */}
+                <DropdownMenuLabel className="text-xs text-muted-foreground px-2 py-1">Columns</DropdownMenuLabel>
+                <DropdownMenuItem onSelect={() => editor.chain().focus().addColumnBefore().run()} className="cursor-pointer">
+                  <Plus className="h-4 w-4 mr-2" />
+                  Add Column Left
+                </DropdownMenuItem>
+                <DropdownMenuItem onSelect={() => editor.chain().focus().addColumnAfter().run()} className="cursor-pointer">
+                  <Plus className="h-4 w-4 mr-2" />
+                  Add Column Right
+                </DropdownMenuItem>
+                <DropdownMenuItem onSelect={() => editor.chain().focus().deleteColumn().run()} className="cursor-pointer">
+                  <Trash className="h-4 w-4 mr-2" />
+                  Delete Column
+                </DropdownMenuItem>
+                
+                <DropdownMenuSeparator />
+                
+                {/* Cell operations */}
+                <DropdownMenuLabel className="text-xs text-muted-foreground px-2 py-1">Cells</DropdownMenuLabel>
+                <DropdownMenuItem 
+                  onSelect={() => editor.chain().focus().mergeCells().run()}
+                  disabled={!editor.can().mergeCells()}
+                  className="cursor-pointer"
+                >
+                  <Merge className="h-4 w-4 mr-2" />
+                  Merge Cells
+                </DropdownMenuItem>
+                <DropdownMenuItem 
+                  onSelect={() => editor.chain().focus().splitCell().run()}
+                  disabled={!editor.can().splitCell()}
+                  className="cursor-pointer"
+                >
+                  <Split className="h-4 w-4 mr-2" />
+                  Split Cell
+                </DropdownMenuItem>
+                <DropdownMenuItem onSelect={() => editor.chain().focus().toggleHeaderCell().run()} className="cursor-pointer">
+                  <Grid3x3 className="h-4 w-4 mr-2" />
+                  Toggle Header Cell
+                </DropdownMenuItem>
+                
+                <DropdownMenuSeparator />
+                
+                {/* Table operations */}
+                <DropdownMenuItem 
+                  onSelect={() => editor.chain().focus().deleteTable().run()}
+                  className="cursor-pointer text-destructive"
+                >
+                  <Trash className="h-4 w-4 mr-2" />
+                  Delete Table
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
@@ -628,6 +921,26 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({
           text-decoration: underline;
           word-wrap: break-word;
           overflow-wrap: break-word;
+        }
+        .ProseMirror .editor-image {
+          max-width: 100%;
+          height: auto;
+          border-radius: 4px;
+          cursor: pointer;
+          margin: 0.5em 0;
+        }
+        .ProseMirror .editor-image.ProseMirror-selectednode {
+          outline: 2px solid hsl(var(--primary));
+        }
+        .ProseMirror table td[data-bg-color],
+        .ProseMirror table th[data-bg-color] {
+          background-color: var(--cell-bg-color);
+        }
+        .ProseMirror table td[colspan],
+        .ProseMirror table th[colspan],
+        .ProseMirror table td[rowspan],
+        .ProseMirror table th[rowspan] {
+          border: 2px dashed hsl(var(--primary) / 0.5) !important;
         }
       `}</style>
     </div>
