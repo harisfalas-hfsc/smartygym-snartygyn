@@ -1,7 +1,11 @@
-import { ExternalLink, Star } from "lucide-react";
+import { useState } from "react";
+import { ExternalLink, Star, ShoppingCart } from "lucide-react";
 import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
+import { useNavigate } from "react-router-dom";
 
 interface ProductCardProps {
   product: {
@@ -9,14 +13,67 @@ interface ProductCardProps {
     title: string;
     description: string;
     category: string;
-    amazon_url: string;
+    product_type: string;
+    amazon_url?: string;
+    price?: number;
+    price_range?: string;
     image_url: string;
-    price_range: string;
     is_featured: boolean;
+    stripe_price_id?: string;
+    stock_quantity?: number;
   };
 }
 
 export const ProductCard = ({ product }: ProductCardProps) => {
+  const [isProcessing, setIsProcessing] = useState(false);
+  const navigate = useNavigate();
+
+  const handleDirectPurchase = async () => {
+    try {
+      setIsProcessing(true);
+
+      // Check if user is logged in
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) {
+        toast.error("Please log in to purchase");
+        navigate("/auth");
+        return;
+      }
+
+      if (!product.stripe_price_id) {
+        toast.error("Product configuration error");
+        return;
+      }
+
+      // Call checkout function
+      const { data, error } = await supabase.functions.invoke(
+        'create-individual-purchase-checkout',
+        {
+          body: {
+            contentType: 'shop_product',
+            contentId: product.id,
+            contentName: product.title,
+            stripePriceId: product.stripe_price_id,
+            imageUrl: product.image_url,
+          }
+        }
+      );
+
+      if (error) throw error;
+
+      if (data?.url) {
+        window.open(data.url, '_blank');
+      }
+    } catch (error: any) {
+      console.error('Purchase error:', error);
+      toast.error(error.message || "Failed to start checkout");
+    } finally {
+      setIsProcessing(false);
+    }
+  };
+
+  const isDirectSale = product.product_type === 'direct_sale';
+
   return (
     <Card className="h-full flex flex-col hover:shadow-lg transition-all duration-300 hover:scale-[1.01] group">
       <CardHeader className="p-0">
@@ -25,6 +82,12 @@ export const ProductCard = ({ product }: ProductCardProps) => {
             <Badge className="absolute top-2 left-2 z-10 bg-primary/90 backdrop-blur-sm">
               <Star className="w-3 h-3 mr-1" />
               Featured
+            </Badge>
+          )}
+          {isDirectSale && (
+            <Badge className="absolute top-2 right-2 z-10 bg-green-600/90 backdrop-blur-sm">
+              <ShoppingCart className="w-3 h-3 mr-1" />
+              Direct from SmartyGym
             </Badge>
           )}
           <img
@@ -51,22 +114,41 @@ export const ProductCard = ({ product }: ProductCardProps) => {
           {product.description}
         </p>
         <p className="text-base font-bold text-primary pt-1">
-          {product.price_range}
+          {isDirectSale ? `€${product.price?.toFixed(2)}` : product.price_range}
         </p>
+        {isDirectSale && product.stock_quantity !== null && product.stock_quantity !== undefined && (
+          <p className="text-xs text-muted-foreground">
+            {product.stock_quantity > 0 
+              ? `Only ${product.stock_quantity} left in stock` 
+              : "Out of stock"}
+          </p>
+        )}
       </CardContent>
 
       <CardFooter className="p-4 pt-0">
-        <a
-          href={product.amazon_url}
-          target="_blank"
-          rel="noopener noreferrer sponsored"
-          className="w-full"
-        >
-          <Button className="w-full" size="sm">
-            View on Amazon
-            <ExternalLink className="w-3.5 h-3.5" />
+        {isDirectSale ? (
+          <Button 
+            className="w-full" 
+            size="sm"
+            onClick={handleDirectPurchase}
+            disabled={isProcessing || (product.stock_quantity !== null && product.stock_quantity === 0)}
+          >
+            {isProcessing ? "Processing..." : `Buy Now for €${product.price?.toFixed(2)}`}
+            <ShoppingCart className="w-3.5 h-3.5" />
           </Button>
-        </a>
+        ) : (
+          <a
+            href={product.amazon_url}
+            target="_blank"
+            rel="noopener noreferrer sponsored"
+            className="w-full"
+          >
+            <Button className="w-full" size="sm">
+              View on Amazon
+              <ExternalLink className="w-3.5 h-3.5" />
+            </Button>
+          </a>
+        )}
       </CardFooter>
     </Card>
   );
