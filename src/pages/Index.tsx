@@ -398,7 +398,7 @@ const Index = () => {
         {/* Hero Section */}
         <section className="relative py-8 sm:py-12 px-4 border-b border-border bg-background overflow-hidden">
           
-          <div className="container mx-auto max-w-6xl relative z-10 overflow-x-hidden">
+          <div className="container mx-auto max-w-6xl px-4 relative z-10 overflow-x-hidden">
             <ScrollReveal>
               <Card 
                 itemScope
