@@ -32,6 +32,14 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import workoutHeroImg from "@/assets/workout-hero.jpg";
 
 const Index = () => {
   const navigate = useNavigate();
@@ -368,161 +376,220 @@ const Index = () => {
       <div className="min-h-screen bg-background overflow-x-hidden">
         
         
-        {/* Hero Section */}
-        <section className="relative py-8 sm:py-12 px-4 border-b border-border bg-background overflow-hidden">
+        {/* New Dark Hero Section */}
+        <section 
+          className="relative min-h-[70vh] flex items-center justify-center bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 overflow-hidden"
+          itemScope
+          itemType="https://schema.org/Organization"
+          data-hero-section="true"
+          data-keywords="smarty gym, online gym, online fitness, smartygym.com, Haris Falas Cyprus, online gym Cyprus"
+          aria-label="Smarty Gym Cyprus - Your online gym and fitness platform - smartygym.com"
+        >
+          {/* Background Image with Overlay */}
+          <div className="absolute inset-0 z-0">
+            <img 
+              src={workoutHeroImg} 
+              alt="Online fitness training - professional workouts and programs"
+              className="w-full h-full object-cover opacity-20 blur-sm"
+            />
+            <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/40 to-black/60" />
+          </div>
           
-          <div className="container mx-auto max-w-6xl relative z-10 overflow-x-hidden">
+          {/* Content */}
+          <div className="relative z-10 container mx-auto px-4 text-center space-y-8">
             <ScrollReveal>
-              <Card 
-                itemScope
-                itemType="https://schema.org/Organization"
-                className="border-2 border-primary bg-gradient-to-br from-yellow-50/50 via-background to-yellow-50/30 backdrop-blur-sm"
-                data-hero-section="true"
-                data-keywords="smarty gym, online gym, online fitness, smartygym.com, Haris Falas Cyprus, online gym Cyprus"
-                aria-label="Smarty Gym Cyprus - Your online gym and fitness platform - smartygym.com"
+              <h1 
+                className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-black text-white tracking-tight"
+                itemProp="name"
               >
-                <div className="p-8 sm:p-10 md:p-12 space-y-6 sm:space-y-8">
+                Welcome to Smarty Gym
+              </h1>
+              <p 
+                className="text-xl sm:text-2xl md:text-3xl text-white/90 font-light max-w-3xl mx-auto"
+                itemProp="slogan"
+              >
+                Your gym reimagined anywhere, anytime.
+              </p>
+              <meta itemProp="url" content="https://smartygym.com" />
+              <meta itemProp="description" content="Smarty Gym Cyprus - #1 online gym and fitness platform by Haris Falas - smartygym.com" />
+              <meta itemProp="foundingLocation" content="Cyprus" />
+              
+              {/* CTA Button with Dialog */}
+              <Dialog>
+                <DialogTrigger asChild>
+                  <Button 
+                    size="lg" 
+                    className="text-lg px-8 py-6 bg-primary hover:bg-primary/90 text-white mt-8"
+                  >
+                    Explore SmartyGym
+                    <ChevronDown className="ml-2 h-5 w-5" />
+                  </Button>
+                </DialogTrigger>
+                <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+                  <DialogHeader>
+                    <DialogTitle className="text-2xl">What would you like to explore?</DialogTitle>
+                  </DialogHeader>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mt-4">
+                    {/* Expert Workouts */}
+                    <Card 
+                      onClick={() => {
+                        navigate("/workout");
+                      }}
+                      className="cursor-pointer hover:border-primary hover:shadow-lg transition-all border-2"
+                    >
+                      <CardContent className="p-6 text-center space-y-3">
+                        <Dumbbell className="w-12 h-12 mx-auto text-primary" />
+                        <h3 className="font-bold text-lg">Expert Workouts</h3>
+                        <p className="text-sm text-muted-foreground">500+ professionally designed workouts for all fitness levels</p>
+                      </CardContent>
+                    </Card>
+
+                    {/* Training Programs */}
+                    <Card 
+                      onClick={() => {
+                        navigate("/trainingprogram");
+                      }}
+                      className="cursor-pointer hover:border-primary hover:shadow-lg transition-all border-2"
+                    >
+                      <CardContent className="p-6 text-center space-y-3">
+                        <Calendar className="w-12 h-12 mx-auto text-primary" />
+                        <h3 className="font-bold text-lg">Training Programs</h3>
+                        <p className="text-sm text-muted-foreground">Structured multi-week programs for your goals</p>
+                      </CardContent>
+                    </Card>
+
+                    {/* Smart Tools */}
+                    <Card 
+                      onClick={() => {
+                        navigate("/tools");
+                      }}
+                      className="cursor-pointer hover:border-primary hover:shadow-lg transition-all border-2"
+                    >
+                      <CardContent className="p-6 text-center space-y-3">
+                        <Wrench className="w-12 h-12 mx-auto text-primary" />
+                        <h3 className="font-bold text-lg">Smart Tools</h3>
+                        <p className="text-sm text-muted-foreground">BMR, Macro, and 1RM calculators</p>
+                      </CardContent>
+                    </Card>
+
+                    {/* Exercise Library */}
+                    <Card 
+                      onClick={() => {
+                        navigate("/exerciselibrary");
+                      }}
+                      className="cursor-pointer hover:border-primary hover:shadow-lg transition-all border-2"
+                    >
+                      <CardContent className="p-6 text-center space-y-3">
+                        <Video className="w-12 h-12 mx-auto text-primary" />
+                        <h3 className="font-bold text-lg">Exercise Library</h3>
+                        <p className="text-sm text-muted-foreground">Comprehensive exercise database with videos</p>
+                      </CardContent>
+                    </Card>
+
+                    {/* Blog & Expert Articles */}
+                    <Card 
+                      onClick={() => {
+                        navigate("/blog");
+                      }}
+                      className="cursor-pointer hover:border-primary hover:shadow-lg transition-all border-2"
+                    >
+                      <CardContent className="p-6 text-center space-y-3">
+                        <FileText className="w-12 h-12 mx-auto text-primary" />
+                        <h3 className="font-bold text-lg">Blog & Expert Articles</h3>
+                        <p className="text-sm text-muted-foreground">Fitness tips and expert advice</p>
+                      </CardContent>
+                    </Card>
+                  </div>
+                </DialogContent>
+              </Dialog>
+            </ScrollReveal>
+          </div>
+        </section>
+
+        {/* Trust & Stats Section */}
+        <section className="py-16 sm:py-24 bg-background">
+          <div className="container mx-auto px-4">
+            <ScrollReveal>
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+                
+                {/* Left: Icon */}
+                <div className="flex justify-center lg:justify-end">
+                  <div className="relative">
+                    <div className="absolute inset-0 bg-primary/20 blur-3xl rounded-full" />
+                    <Smartphone className="relative w-48 h-48 sm:w-64 sm:h-64 text-primary drop-shadow-2xl" />
+                  </div>
+                </div>
+                
+                {/* Right: Content */}
+                <div className="space-y-8">
+                  <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold text-center lg:text-left">
+                    Online fitness platform trusted by thousands of users
+                  </h2>
                   
-                  {/* Main Headline */}
-                  <div className="text-center space-y-2 sm:space-y-3">
-                    <h1 
-                      className="text-3xl sm:text-4xl md:text-5xl font-black bg-gradient-to-r from-primary via-amber-400 to-primary bg-clip-text text-transparent"
-                      itemProp="name"
-                    >
-                      Welcome to SmartyGym
-                    </h1>
-                    <p 
-                      className="text-lg sm:text-xl text-muted-foreground font-medium"
-                      itemProp="slogan"
-                    >
-                      Your Gym Re-imagined. Anywhere, Anytime.
-                    </p>
-                    <meta itemProp="url" content="https://smartygym.com" />
-                    <meta itemProp="description" content="Smarty Gym Cyprus - #1 online gym and fitness platform by Haris Falas - smartygym.com" />
-                    <meta itemProp="foundingLocation" content="Cyprus" />
+                  {/* Three Value Cards */}
+                  <div className="grid grid-cols-1 gap-6">
+                    {/* Your Gym In Your Pocket */}
+                    <Card className="border-2 hover:border-primary/50 transition-colors">
+                      <CardContent className="p-6 space-y-3">
+                        <div className="flex items-center gap-3">
+                          <div className="p-3 rounded-full bg-primary/10">
+                            <Smartphone className="w-6 h-6 text-primary" />
+                          </div>
+                          <h3 className="text-xl font-bold">Your Gym In Your Pocket</h3>
+                        </div>
+                        <p className="text-sm text-muted-foreground leading-relaxed">
+                          Professional fitness platform with expert workouts, structured programs, and personalized coaching - accessible worldwide at smartygym.com.
+                        </p>
+                      </CardContent>
+                    </Card>
+
+                    {/* 100% Human. 0% AI. */}
+                    <Card className="border-2 hover:border-primary/50 transition-colors">
+                      <CardContent className="p-6 space-y-3">
+                        <div className="flex items-center gap-3">
+                          <div className="p-3 rounded-full bg-primary/10">
+                            <UserCheck className="w-6 h-6 text-primary" />
+                          </div>
+                          <h3 className="text-xl font-bold">
+                            <span className="text-red-600">100% Human.</span> 0% AI.
+                          </h3>
+                        </div>
+                        <p className="text-sm text-muted-foreground leading-relaxed">
+                          Every workout and training program personally designed by Sports Scientist <a href="/coach-profile" className="text-primary hover:underline font-semibold">Haris Falas</a> with 20+ years of experience. Real expertise, not algorithms.
+                        </p>
+                      </CardContent>
+                    </Card>
+
+                    {/* Train Anywhere, Anytime */}
+                    <Card className="border-2 hover:border-primary/50 transition-colors">
+                      <CardContent className="p-6 space-y-3">
+                        <div className="flex items-center gap-3">
+                          <div className="p-3 rounded-full bg-primary/10">
+                            <Dumbbell className="w-6 h-6 text-primary" />
+                          </div>
+                          <h3 className="text-xl font-bold">Train Anywhere, Anytime</h3>
+                        </div>
+                        <p className="text-sm text-muted-foreground leading-relaxed">
+                          Access professional workouts on any device. Flexible training that fits YOUR schedule and YOUR goals—at home, gym, or traveling.
+                        </p>
+                      </CardContent>
+                    </Card>
                   </div>
+                </div>
+              </div>
+            </ScrollReveal>
+          </div>
+        </section>
 
-                  {/* Three Core Messages: WHAT, WHY, HOW */}
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-6 sm:gap-8">
-                    
-                    {/* WHAT */}
-                    <div className="text-center space-y-3 p-4 rounded-lg bg-background/50 border border-primary/20">
-                      <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-primary/10">
-                        <Smartphone className="w-6 h-6 text-primary" />
-                      </div>
-                      <h2 className="text-lg sm:text-xl font-bold text-foreground">
-                        Your Gym In Your Pocket
-                      </h2>
-                      <p className="text-sm text-muted-foreground leading-relaxed">
-                        Professional fitness platform with expert workouts, structured programs, and personalized coaching - accessible worldwide at smartygym.com.
-                      </p>
-                    </div>
+        {/* Separator spacing before "Who Is Smarty Gym For?" */}
+        <div className="py-8"></div>
 
-                    {/* WHY */}
-                    <div className="text-center space-y-3 p-4 rounded-lg bg-background/50 border border-primary/20">
-                      <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-primary/10">
-                        <UserCheck className="w-6 h-6 text-primary" />
-                      </div>
-                      <h2 className="text-lg sm:text-xl font-bold text-foreground">
-                        <span className="text-red-600">100% Human.</span> 0% AI.
-                      </h2>
-                      <p className="text-sm text-muted-foreground leading-relaxed">
-                        Every workout and training program personally designed by Sports Scientist <a href="/coach-profile" className="text-primary hover:underline font-semibold">Haris Falas</a> with 20+ years of experience. Real expertise, not algorithms.
-                      </p>
-                    </div>
+        {/* Who Is Smarty Gym For? Section */}
+        <section className="container mx-auto px-4 max-w-6xl">
+          <ScrollReveal>
+            <Card className="border border-primary/30 bg-background/80">
 
-                    {/* HOW */}
-                    <div className="text-center space-y-3 p-4 rounded-lg bg-background/50 border border-primary/20">
-                      <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-primary/10">
-                        <Dumbbell className="w-6 h-6 text-primary" />
-                      </div>
-                      <h2 className="text-lg sm:text-xl font-bold text-foreground">
-                        Train Anywhere, Anytime
-                      </h2>
-                      <p className="text-sm text-muted-foreground leading-relaxed">
-                        Access professional workouts on any device. Flexible training that fits YOUR schedule and YOUR goals—at home, gym, or traveling.
-                      </p>
-                    </div>
-                  </div>
-
-
-
-                  {/* Feature Highlights Grid */}
-                  <div className="pt-3">
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
-                      
-                      <div 
-                        onClick={() => navigate("/workout")}
-                        className="group flex items-start gap-3 cursor-pointer hover:bg-primary/10 transition-all duration-300 ease-in-out rounded-lg p-3 border border-transparent hover:border-primary/20 hover:scale-105 hover:shadow-lg transform-gpu"
-                      >
-                        <Dumbbell className="w-5 h-5 text-primary flex-shrink-0 mt-0.5 transition-all duration-300 group-hover:scale-[1.3] group-hover:brightness-125 group-hover:rotate-3 group-hover:drop-shadow-[0_0_12px_hsl(var(--primary))]" />
-                        <div>
-                          <p className="font-semibold text-base text-foreground border-b border-primary/30 pb-1 inline-block">500+ Expert Workouts</p>
-                          <p className="text-xs text-muted-foreground">Pick your daily session: Strength, Cardio, Fat Burn, or whatever fits your mood</p>
-                        </div>
-                      </div>
-
-                      <div 
-                        onClick={() => navigate("/trainingprogram")}
-                        className="group flex items-start gap-3 cursor-pointer hover:bg-primary/10 transition-all duration-300 ease-in-out rounded-lg p-3 border border-transparent hover:border-primary/20 hover:scale-105 hover:shadow-lg transform-gpu"
-                      >
-                        <Calendar className="w-5 h-5 text-primary flex-shrink-0 mt-0.5 transition-all duration-300 group-hover:scale-[1.3] group-hover:brightness-125 group-hover:rotate-3 group-hover:drop-shadow-[0_0_12px_hsl(var(--primary))]" />
-                        <div>
-                          <p className="font-semibold text-base text-foreground border-b border-primary/30 pb-1 inline-block">Training Programs</p>
-                          <p className="text-xs text-muted-foreground">Structured expert training programs to achieve your long-term goals</p>
-                        </div>
-                      </div>
-
-                      <div 
-                        onClick={() => navigate("/tools")}
-                        className="group flex items-start gap-3 cursor-pointer hover:bg-primary/10 transition-all duration-300 ease-in-out rounded-lg p-3 border border-transparent hover:border-primary/20 hover:scale-105 hover:shadow-lg transform-gpu"
-                      >
-                        <Wrench className="w-5 h-5 text-primary flex-shrink-0 mt-0.5 transition-all duration-300 group-hover:scale-[1.3] group-hover:brightness-125 group-hover:rotate-3 group-hover:drop-shadow-[0_0_12px_hsl(var(--primary))]" />
-                        <div>
-                          <p className="font-semibold text-base text-foreground border-b border-primary/30 pb-1 inline-block">Smart Tools</p>
-                          <p className="text-xs text-muted-foreground">BMR, Macro, 1RM calculators</p>
-                        </div>
-                      </div>
-
-                      <div 
-                        onClick={() => navigate("/exerciselibrary")}
-                        className="group flex items-start gap-3 cursor-pointer hover:bg-primary/10 transition-all duration-300 ease-in-out rounded-lg p-3 border border-transparent hover:border-primary/20 hover:scale-105 hover:shadow-lg transform-gpu"
-                      >
-                        <Video className="w-5 h-5 text-primary flex-shrink-0 mt-0.5 transition-all duration-300 group-hover:scale-[1.3] group-hover:brightness-125 group-hover:rotate-3 group-hover:drop-shadow-[0_0_12px_hsl(var(--primary))]" />
-                        <div>
-                          <p className="font-semibold text-base text-foreground border-b border-primary/30 pb-1 inline-block">Exercise Library</p>
-                          <p className="text-xs text-muted-foreground">Comprehensive video guide</p>
-                        </div>
-                      </div>
-
-                      <div 
-                        onClick={() => navigate("/blog")}
-                        className="group flex items-start gap-3 cursor-pointer hover:bg-primary/10 transition-all duration-300 ease-in-out rounded-lg p-3 border border-transparent hover:border-primary/20 hover:scale-105 hover:shadow-lg transform-gpu"
-                      >
-                        <FileText className="w-5 h-5 text-primary flex-shrink-0 mt-0.5 transition-all duration-300 group-hover:scale-[1.3] group-hover:brightness-125 group-hover:rotate-3 group-hover:drop-shadow-[0_0_12px_hsl(var(--primary))]" />
-                        <div>
-                          <p className="font-semibold text-base text-foreground border-b border-primary/30 pb-1 inline-block">Blog & Expert Articles</p>
-                          <p className="text-xs text-muted-foreground">Read expert tips, training guides, and fitness insights</p>
-                        </div>
-                      </div>
-
-                      <div 
-                        onClick={() => navigate("/contact")}
-                        className="group flex items-start gap-3 cursor-pointer hover:bg-primary/10 transition-all duration-300 ease-in-out rounded-lg p-3 border border-transparent hover:border-primary/20 hover:scale-105 hover:shadow-lg transform-gpu"
-                      >
-                        <GraduationCap className="w-5 h-5 text-primary flex-shrink-0 mt-0.5 transition-all duration-300 group-hover:scale-[1.3] group-hover:brightness-125 group-hover:rotate-3 group-hover:drop-shadow-[0_0_12px_hsl(var(--primary))]" />
-                        <div>
-                          <p className="font-semibold text-base text-foreground border-b border-primary/30 pb-1 inline-block">Expert Coach Guidance</p>
-                          <p className="text-xs text-muted-foreground">Connect with Sports Scientist Haris Falas - real human expertise, not AI-generated advice</p>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Who Is Smarty Gym For? Section */}
-                  <div className="pt-3">
-                    <Card className="border border-primary/30 bg-background/80">
-                      <div className="p-6 sm:p-8 space-y-4">
+              <div className="p-6 sm:p-8 space-y-4">
                         <h2 className="text-xl sm:text-2xl font-bold text-center text-foreground">
                           Who Is Smarty Gym For?
                         </h2>
@@ -705,13 +772,8 @@ const Index = () => {
                         </div>
                       </div>
                     </Card>
-                  </div>
-
-                </div>
-              </Card>
-            </ScrollReveal>
-          </div>
-        </section>
+                  </ScrollReveal>
+                </section>
 
 
     </div>
