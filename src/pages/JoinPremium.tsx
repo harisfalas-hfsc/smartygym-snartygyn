@@ -247,8 +247,8 @@ export default function JoinPremium() {
               data-keywords="online gym membership, smarty gym, online fitness subscription, smartygym.com, Cyprus online gym"
               aria-label="Gold Plan - SmartyGym Cyprus online gym membership - smartygym.com"
             >
-              <CardHeader className="text-center pb-1 sm:pb-3">
-                <div className="mb-1.5 sm:mb-2">
+              <CardHeader className="text-center pb-2 sm:pb-4">
+                <div className="mb-2 sm:mb-3">
                   <h2 
                     className="text-xl sm:text-2xl font-bold text-amber-600 dark:text-amber-400"
                     itemProp="name"
@@ -256,12 +256,12 @@ export default function JoinPremium() {
                     Gold Plan
                   </h2>
                 </div>
-                <Badge className="bg-amber-500 text-white mx-auto mb-2 sm:mb-3 text-xs sm:text-sm">
+                <Badge className="bg-amber-500 text-white mx-auto mb-3 sm:mb-4 text-xs sm:text-sm">
                   MONTHLY
                 </Badge>
                 <CardTitle className="text-2xl sm:text-3xl font-bold" itemProp="offers">€9.99</CardTitle>
-                <p className="text-xs sm:text-sm text-muted-foreground" itemProp="description">per month</p>
-                <div className="h-8 sm:h-12 flex flex-col justify-center">
+                <p className="text-xs sm:text-sm text-muted-foreground h-4 sm:h-5" itemProp="description">per month</p>
+                <div className="h-10 sm:h-14 flex flex-col justify-center">
                   <p className="text-xs text-amber-600 dark:text-amber-400 font-semibold">
                     🔄 Auto-renews monthly
                   </p>
@@ -269,8 +269,8 @@ export default function JoinPremium() {
                 <meta itemProp="brand" content="SmartyGym Cyprus - smartygym.com" />
                 <meta itemProp="category" content="Online Gym Membership" />
               </CardHeader>
-              <CardContent className="space-y-1.5 sm:space-y-3 flex-1 flex flex-col">
-                <div className="space-y-1 sm:space-y-1.5 flex-1">
+              <CardContent className="space-y-2 sm:space-y-4 flex-1 flex flex-col">
+                <div className="space-y-1.5 sm:space-y-2 flex-1">
                   <div className="flex items-start gap-2">
                     <Check className="h-4 w-4 sm:h-5 sm:w-5 text-green-500 shrink-0 mt-0.5" />
                     <span className="text-xs sm:text-sm">Full access to all workouts</span>
@@ -296,9 +296,9 @@ export default function JoinPremium() {
                     <span className="text-sm">Perfect for trying premium</span>
                   </div>
                 </div>
-                <div className="space-y-2 sm:space-y-3 mt-auto">
+                <div className="space-y-3 sm:space-y-4 mt-auto">
                   <Button 
-                    className="w-full text-sm sm:text-lg py-3 sm:py-5" 
+                    className="w-full text-sm sm:text-lg py-4 sm:py-6" 
                     onClick={() => handleSubscribe('gold')}
                     disabled={loading}
                   >
@@ -318,21 +318,21 @@ export default function JoinPremium() {
 
             {/* Platinum Plan */}
             <Card className="relative border-2 border-primary shadow-lg flex flex-col bg-gradient-to-br from-primary/5 to-amber-500/5">
-              <Badge className="absolute top-2 right-2 sm:top-3 sm:right-3 bg-green-600 text-white px-2 sm:px-3 py-1 text-xs sm:text-sm shadow-md z-10">
+              <Badge className="absolute -top-2 right-2 sm:-top-3 sm:right-3 bg-green-600 text-white px-2 sm:px-3 py-1 text-xs sm:text-sm shadow-md z-10">
                 BEST VALUE
               </Badge>
               
-              <CardHeader className="text-center pb-1 sm:pb-3 pt-3 sm:pt-5">
-                <div className="flex items-center justify-center gap-2 mb-2">
+              <CardHeader className="text-center pb-2 sm:pb-4 pt-4 sm:pt-6">
+                <div className="flex items-center justify-center gap-2 mb-2 sm:mb-3">
                   <Crown className="h-5 w-5 sm:h-6 sm:w-6 text-primary" />
                   <h2 className="text-xl sm:text-2xl font-bold text-primary">Platinum</h2>
                 </div>
-                <Badge className="bg-primary text-primary-foreground mx-auto mb-2 sm:mb-3 text-xs sm:text-sm">
+                <Badge className="bg-primary text-primary-foreground mx-auto mb-3 sm:mb-4 text-xs sm:text-sm">
                   YEARLY
                 </Badge>
                 <CardTitle className="text-2xl sm:text-3xl font-bold">€89.99</CardTitle>
-                <p className="text-xs sm:text-sm text-muted-foreground">per year</p>
-                <div className="h-8 sm:h-12 flex flex-col justify-center">
+                <p className="text-xs sm:text-sm text-muted-foreground h-4 sm:h-5">per year</p>
+                <div className="h-10 sm:h-14 flex flex-col justify-center">
                   <p className="text-sm sm:text-base text-green-600 font-bold">
                     Save €29.89!
                   </p>
@@ -341,8 +341,8 @@ export default function JoinPremium() {
                   </p>
                 </div>
               </CardHeader>
-              <CardContent className="space-y-1.5 sm:space-y-3 flex-1 flex flex-col">
-                <div className="space-y-1 sm:space-y-1.5 flex-1">
+              <CardContent className="space-y-2 sm:space-y-4 flex-1 flex flex-col">
+                <div className="space-y-1.5 sm:space-y-2 flex-1">
                   <div className="flex items-start gap-2">
                     <Check className="h-4 w-4 sm:h-5 sm:w-5 text-green-500 shrink-0 mt-0.5" />
                     <span className="text-xs sm:text-sm">Full access to all workouts</span>
@@ -368,9 +368,9 @@ export default function JoinPremium() {
                     <span className="text-sm">Cancel anytime</span>
                   </div>
                 </div>
-                <div className="space-y-2 sm:space-y-3 mt-auto">
+                <div className="space-y-3 sm:space-y-4 mt-auto">
                   <Button 
-                    className="w-full text-sm sm:text-lg py-3 sm:py-5 bg-gradient-to-r from-primary to-amber-600 hover:from-primary/90 hover:to-amber-600/90" 
+                    className="w-full text-sm sm:text-lg py-4 sm:py-6 bg-gradient-to-r from-primary to-amber-600 hover:from-primary/90 hover:to-amber-600/90" 
                     onClick={() => handleSubscribe('platinum')}
                     disabled={loading}
                   >
