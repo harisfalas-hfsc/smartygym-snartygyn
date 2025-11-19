@@ -5,14 +5,13 @@ import { ServiceCard } from "@/components/ServiceCard";
 import { Button } from "@/components/ui/button";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Dumbbell, Calendar, BookOpen, Calculator, Activity, Flame, Instagram, Facebook, Youtube, UserCheck, Wrench, Video, FileText, Smartphone, Users, Target, Heart, Zap, Plane, GraduationCap, Check, Crown, ChevronDown, ChevronRight } from "lucide-react";
+import { Dumbbell, Calendar, BookOpen, Calculator, Activity, Flame, Instagram, Facebook, Youtube, UserCheck, Wrench, Video, FileText, Smartphone, Users, Target, Heart, Zap, Plane, GraduationCap, Check, Crown, ChevronDown, ChevronRight, Move } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { User as SupabaseUser } from "@supabase/supabase-js";
 import { useToast } from "@/hooks/use-toast";
 import smartyGymLogo from "@/assets/smarty-gym-logo.png";
 import smartyGymIcon from "@/assets/smarty-gym-icon.png";
 import { MobilePhoneIllustration } from "@/components/MobilePhoneIllustration";
-import workoutCategoriesPreview from "@/assets/workout-categories-preview.jpg";
 
 import { useAccessControl } from "@/hooks/useAccessControl";
 import { ScrollReveal } from "@/components/ScrollReveal";
@@ -43,6 +42,15 @@ const Index = () => {
   const { userTier } = useAccessControl();
   const isPremium = userTier === "premium";
   const [isGetStartedOpen, setIsGetStartedOpen] = useState(false);
+
+  const workoutCategories = [
+    { id: "strength", title: "Strength", icon: Dumbbell },
+    { id: "calorie-burning", title: "Calorie Burning", icon: Flame },
+    { id: "metabolic", title: "Metabolic", icon: Zap },
+    { id: "cardio", title: "Cardio", icon: Heart },
+    { id: "mobility", title: "Mobility & Stability", icon: Move },
+    { id: "challenge", title: "Challenge", icon: Activity },
+  ];
 
   useEffect(() => {
     // Check current session
@@ -568,8 +576,30 @@ const Index = () => {
             <MobilePhoneIllustration
               variant="tablet"
               className="h-full max-h-[480px] w-auto"
-              imageUrl={workoutCategoriesPreview}
-            />
+            >
+              {/* 3 rows × 2 columns grid of workout cards */}
+              <div className="grid grid-rows-3 grid-cols-2 gap-2 h-full w-full p-2">
+                {workoutCategories.map((category) => {
+                  const Icon = category.icon;
+                  return (
+                    <Card
+                      key={category.id}
+                      className="border-2 border-primary/30 hover:border-primary hover:shadow-md transition-all cursor-pointer group flex items-center justify-center"
+                      onClick={() => navigate(`/workout/${category.id}`)}
+                    >
+                      <div className="flex flex-col items-center justify-center gap-1 p-2">
+                        <div className="inline-flex items-center justify-center w-8 h-8 rounded-full bg-primary/10 group-hover:bg-primary/20 transition-all">
+                          <Icon className="w-4 h-4 text-primary" />
+                        </div>
+                        <h3 className="text-xs font-bold text-center leading-tight">
+                          {category.title}
+                        </h3>
+                      </div>
+                    </Card>
+                  );
+                })}
+              </div>
+            </MobilePhoneIllustration>
                       </div>
                     </div>
 
