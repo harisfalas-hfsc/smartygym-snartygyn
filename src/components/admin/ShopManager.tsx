@@ -9,7 +9,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
 import { toast } from "sonner";
-import { Plus, Pencil, Trash2, Star } from "lucide-react";
+import { Plus, Pencil, Trash2, Star, Upload, X } from "lucide-react";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -26,6 +26,8 @@ export const ShopManager = () => {
   const [editingId, setEditingId] = useState<string | null>(null);
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const [categoryFilter, setCategoryFilter] = useState<string>("all");
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [isUploading, setIsUploading] = useState(false);
   const [formData, setFormData] = useState({
     title: "",
     description: "",
@@ -120,6 +122,7 @@ export const ShopManager = () => {
       is_featured: false,
       display_order: 0,
     });
+    setSelectedFile(null);
     setIsCreating(false);
     setEditingId(null);
   };
@@ -144,12 +147,52 @@ export const ShopManager = () => {
     }, 100);
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const uploadImage = async (): Promise<string | null> => {
+    if (!selectedFile) return null;
+
+    try {
+      setIsUploading(true);
+      const fileExt = selectedFile.name.split('.').pop();
+      const fileName = `${Date.now()}-${Math.random().toString(36).substring(7)}.${fileExt}`;
+      const filePath = `shop-images/${fileName}`;
+
+      const { error: uploadError } = await supabase.storage
+        .from('contact-files')
+        .upload(filePath, selectedFile);
+
+      if (uploadError) throw uploadError;
+
+      const { data: { publicUrl } } = supabase.storage
+        .from('contact-files')
+        .getPublicUrl(filePath);
+
+      return publicUrl;
+    } catch (error: any) {
+      toast.error("Failed to upload image: " + error.message);
+      return null;
+    } finally {
+      setIsUploading(false);
+    }
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    let finalImageUrl = formData.image_url;
+    
+    // Upload new image if selected
+    if (selectedFile) {
+      const uploadedUrl = await uploadImage();
+      if (!uploadedUrl) return; // Stop if upload failed
+      finalImageUrl = uploadedUrl;
+    }
+
+    const dataToSubmit = { ...formData, image_url: finalImageUrl };
+
     if (editingId) {
-      updateMutation.mutate({ id: editingId, data: formData });
+      updateMutation.mutate({ id: editingId, data: dataToSubmit });
     } else {
-      createMutation.mutate(formData);
+      createMutation.mutate(dataToSubmit);
     }
   };
 
@@ -242,15 +285,62 @@ export const ShopManager = () => {
                 />
               </div>
 
-              <div>
-                <Label htmlFor="image_url">Product Image URL</Label>
+              <div className="space-y-3">
+                <Label>Product Image</Label>
+                
+                {/* Current/Preview Image */}
+                {(formData.image_url || selectedFile) && (
+                  <div className="relative w-32 h-32 border rounded-lg overflow-hidden bg-muted">
+                    <img
+                      src={selectedFile ? URL.createObjectURL(selectedFile) : formData.image_url}
+                      alt="Product preview"
+                      className="w-full h-full object-cover"
+                    />
+                    <Button
+                      type="button"
+                      variant="destructive"
+                      size="icon"
+                      className="absolute top-1 right-1 h-6 w-6"
+                      onClick={() => {
+                        setSelectedFile(null);
+                        setFormData({ ...formData, image_url: "" });
+                      }}
+                    >
+                      <X className="h-3 w-3" />
+                    </Button>
+                  </div>
+                )}
+
+                {/* File Upload */}
+                <div className="flex gap-2 items-center">
+                  <Input
+                    type="file"
+                    accept="image/*"
+                    onChange={(e) => {
+                      const file = e.target.files?.[0];
+                      if (file) {
+                        if (file.size > 10 * 1024 * 1024) {
+                          toast.error("Image must be less than 10MB");
+                          return;
+                        }
+                        setSelectedFile(file);
+                      }
+                    }}
+                    className="flex-1"
+                  />
+                  <Upload className="h-4 w-4 text-muted-foreground" />
+                </div>
+                <p className="text-xs text-muted-foreground">
+                  Upload a product image (max 10MB) or paste an image URL below
+                </p>
+
+                {/* Manual URL Input (fallback) */}
                 <Input
                   id="image_url"
                   type="url"
-                  placeholder="https://..."
+                  placeholder="Or paste image URL..."
                   value={formData.image_url}
                   onChange={(e) => setFormData({ ...formData, image_url: e.target.value })}
-                  required
                 />
               </div>
 
@@ -280,8 +370,8 @@ export const ShopManager = () => {
               </div>
 
               <div className="flex gap-2">
-                <Button type="submit" disabled={createMutation.isPending || updateMutation.isPending}>
-                  {editingId ? "Update Product" : "Add Product"}
+                <Button type="submit" disabled={createMutation.isPending || updateMutation.isPending || isUploading}>
+                  {isUploading ? "Uploading..." : editingId ? "Update Product" : "Add Product"}
                 </Button>
                 <Button type="button" variant="outline" onClick={resetForm}>
                   Cancel
