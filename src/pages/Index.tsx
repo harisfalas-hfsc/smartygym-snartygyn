@@ -1,16 +1,17 @@
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { Helmet } from "react-helmet";
 import { ServiceCard } from "@/components/ServiceCard";
 import { Button } from "@/components/ui/button";
-import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
+import { Card, CardHeader, CardTitle, CardContent, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Dumbbell, Calendar, BookOpen, Calculator, Activity, Flame, Instagram, Facebook, Youtube, UserCheck, Wrench, Video, FileText, Smartphone, Users, Target, Heart, Zap, Plane, GraduationCap, Check, Crown, ChevronDown, ChevronRight, Move, Ban, Brain, CheckCircle2 } from "lucide-react";
+import { Dumbbell, Calendar, BookOpen, Calculator, Activity, Flame, Instagram, Facebook, Youtube, UserCheck, Wrench, Video, FileText, Smartphone, Users, Target, Heart, Zap, Plane, GraduationCap, Check, Crown, ChevronDown, ChevronRight, Move, Ban, Brain, CheckCircle2, Award, Shield, Compass, Sparkles } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { User as SupabaseUser } from "@supabase/supabase-js";
 import { useToast } from "@/hooks/use-toast";
 import smartyGymLogo from "@/assets/smarty-gym-logo.png";
 import smartyGymIcon from "@/assets/smarty-gym-icon.png";
+import harisPhoto from "@/assets/haris-falas-coach.png";
 import { MobilePhoneIllustration } from "@/components/MobilePhoneIllustration";
 
 import { useAccessControl } from "@/hooks/useAccessControl";
@@ -37,10 +38,27 @@ import {
 
 const Index = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const { toast } = useToast();
   const [user, setUser] = useState<SupabaseUser | null>(null);
   const { userTier } = useAccessControl();
   const isPremium = userTier === "premium";
+  const [expandedFAQ, setExpandedFAQ] = useState<string>("");
+  const [allExpanded, setAllExpanded] = useState(false);
+
+  const handleExpandCollapseAll = () => {
+    setAllExpanded(!allExpanded);
+    setExpandedFAQ(allExpanded ? "" : "all");
+  };
+
+  const scrollToAccordionItem = (value: string) => {
+    setTimeout(() => {
+      const element = document.querySelector(`[data-accordion-value="${value}"]`);
+      if (element) {
+        element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    }, 100);
+  };
 
   const heroCards = [
     { 
@@ -670,6 +688,433 @@ const Index = () => {
           </div>
         </section>
 
+        {/* Mission Statement with Cards */}
+        <section className="mb-16">
+          {/* Your Gym Anywhere Card */}
+          <Card className="bg-gradient-to-r from-primary/10 to-accent/10 border-2 border-primary/20 mb-8">
+            <CardContent className="p-8">
+              <div className="flex items-start justify-between mb-4">
+                <h3 className="text-2xl font-bold flex-1">
+                  Your Gym Reimagined Anywhere, Anytime
+                </h3>
+                <Button
+                  onClick={() => navigate("/joinpremium", { state: { from: location.pathname } })}
+                  className="ml-4 bg-primary text-primary-foreground hover:bg-primary/90 shadow-md"
+                >
+                  Join Now
+                </Button>
+              </div>
+              <div className="space-y-4 max-w-3xl mx-auto">
+                <p className="text-base font-semibold text-center">
+                  We are not here to replace your gym. We are here to back you up when life gets in the way.
+                </p>
+                <p className="text-base text-muted-foreground text-center leading-relaxed">
+                  Whether you're traveling, on holiday, can't make it to the gym, or your gym is closed — 
+                  SmartyGym is your backup plan. Or, if you prefer training from home entirely, we've got you covered. 
+                  Expert workouts, professional programs, and practical tools — all designed by real coaches, not algorithms.
+                </p>
+                <p className="text-base font-semibold text-center text-primary">
+                  Wherever you are, your gym comes with you.
+                </p>
+              </div>
+            </CardContent>
+          </Card>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+            <Card className="text-center hover:shadow-lg transition-all hover:-translate-y-1">
+              <CardHeader>
+                <div className="w-14 h-14 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-4">
+                  <Target className="w-7 h-7 text-primary" />
+                </div>
+                <CardTitle className="text-xl">Built for Real Life</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <CardDescription className="text-sm text-muted-foreground">
+                  Flexible, effective training designed for busy professionals who want results without hours at the gym.
+                </CardDescription>
+              </CardContent>
+            </Card>
+
+            <Card className="text-center hover:shadow-lg transition-all hover:-translate-y-1">
+              <CardHeader>
+                <div className="w-14 h-14 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-4">
+                  <Brain className="w-7 h-7 text-primary" />
+                </div>
+                <CardTitle className="text-xl">Science-Based Approach</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <CardDescription className="text-sm text-muted-foreground">
+                  Rooted in proven exercise science, biomechanics, and progressive overload. No gimmicks, just results.
+                </CardDescription>
+              </CardContent>
+            </Card>
+
+            <Card className="text-center hover:shadow-lg transition-all hover:-translate-y-1">
+              <CardHeader>
+                <div className="w-14 h-14 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-4">
+                  <Users className="w-7 h-7 text-primary" />
+                </div>
+                <CardTitle className="text-xl">Accessible to Everyone</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <CardDescription className="text-sm text-muted-foreground">
+                  For beginners and athletes alike. Train at home, in the gym, or on the go with programs for every level.
+                </CardDescription>
+              </CardContent>
+            </Card>
+
+            <Card className="text-center hover:shadow-lg transition-all hover:-translate-y-1">
+              <CardHeader>
+                <div className="w-14 h-14 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-4">
+                  <Shield className="w-7 h-7 text-primary" />
+                </div>
+                <CardTitle className="text-xl">Safe & Effective</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <CardDescription className="text-sm text-muted-foreground">
+                  Programs designed to build strength, mobility, and conditioning while reducing injury risk.
+                </CardDescription>
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* The SmartyGym Promise */}
+          <Card className="bg-gradient-to-r from-primary/5 to-accent/5 border border-primary/20">
+            <CardContent className="p-8">
+              <h3 className="text-2xl font-bold mb-6 text-center">The SmartyGym Promise</h3>
+              <div className="max-w-3xl mx-auto space-y-4">
+                <p className="text-base leading-relaxed text-center">
+                  Every workout and program at SmartyGym is crafted with one goal: to help you reach YOUR fitness goals, 
+                  whatever they may be. Whether you're building muscle, losing weight, improving endurance, or simply staying active, 
+                  we provide the structure, guidance, and flexibility you need to succeed — on your terms, in your time, wherever you are.
+                </p>
+                <p className="text-base font-semibold text-center text-primary">
+                  Real coaching. Real results. Anywhere you train.
+                </p>
+              </div>
+            </CardContent>
+          </Card>
+        </section>
+
+        {/* Core Values Section */}
+        <section className="mb-16">
+          <h2 className="text-3xl font-bold text-center mb-8">What We Stand For</h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            <Card className="text-center hover:shadow-lg transition-all hover:-translate-y-1">
+              <CardHeader>
+                <div className="w-14 h-14 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-4">
+                  <Award className="w-7 h-7 text-primary" />
+                </div>
+                <CardTitle className="text-xl">Evidence-Based</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <CardDescription className="text-sm text-muted-foreground">
+                  Every program is backed by sports science, biomechanics, and proven training principles — not trends or guesswork.
+                </CardDescription>
+              </CardContent>
+            </Card>
+
+            <Card className="text-center hover:shadow-lg transition-all hover:-translate-y-1">
+              <CardHeader>
+                <div className="w-14 h-14 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-4">
+                  <CheckCircle2 className="w-7 h-7 text-primary" />
+                </div>
+                <CardTitle className="text-xl">Structure & Clarity</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <CardDescription className="text-sm text-muted-foreground">
+                  Clear workout plans, step-by-step guidance, and structured progression so you always know what to do and why.
+                </CardDescription>
+              </CardContent>
+            </Card>
+
+            <Card className="text-center hover:shadow-lg transition-all hover:-translate-y-1">
+              <CardHeader>
+                <div className="w-14 h-14 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-4">
+                  <Heart className="w-7 h-7 text-primary" />
+                </div>
+                <CardTitle className="text-xl">Human Connection</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <CardDescription className="text-sm text-muted-foreground">
+                  Real coaching, personalized support, and direct access to expert guidance — not chatbots or automated responses.
+                </CardDescription>
+              </CardContent>
+            </Card>
+
+            <Card className="text-center hover:shadow-lg transition-all hover:-translate-y-1">
+              <CardHeader>
+                <div className="w-14 h-14 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-4">
+                  <Target className="w-7 h-7 text-primary" />
+                </div>
+                <CardTitle className="text-xl">Results-Driven</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <CardDescription className="text-sm text-muted-foreground">
+                  Our programs are designed to deliver measurable results — strength gains, fat loss, endurance, or whatever your goal is.
+                </CardDescription>
+              </CardContent>
+            </Card>
+          </div>
+        </section>
+
+        {/* Message from Head Coach */}
+        <section className="mb-16">
+          <Card className="border-2 border-primary/20 overflow-hidden">
+            <CardContent className="p-0">
+              <div className="md:flex">
+                <div className="md:w-1/3 relative">
+                  <img
+                    src={harisPhoto}
+                    alt="Haris Falas - Head Coach & Founder of SmartyGym | Sports Scientist | smartygym.com Cyprus Fitness Expert"
+                    className="w-full h-full object-cover"
+                    loading="lazy"
+                  />
+                </div>
+                <div className="md:w-2/3 p-8 md:p-12">
+                  <h2 className="text-2xl md:text-3xl font-bold mb-6">A Message from Your Head Coach</h2>
+                  <div className="space-y-4 text-base leading-relaxed">
+                    <p>
+                      I'm <strong>Haris Falas</strong>, the founder and head coach behind every workout and program at <strong>smartygym.com</strong>.
+                    </p>
+                    <p>
+                      I started SmartyGym because I saw too many people struggling with cookie-cutter plans, trendy gimmicks, 
+                      or programs that didn't fit their lifestyle. I wanted to create something different — something real, flexible, 
+                      and backed by science.
+                    </p>
+                    <p>
+                      As a Sports Scientist and Strength & Conditioning Coach, I've spent over 20 years designing programs for 
+                      elite athletes and everyday people alike. I've learned one key truth: <strong>the best program is the one 
+                      you can actually stick to</strong>.
+                    </p>
+                    <p>
+                      That's why every workout at SmartyGym is designed with you in mind — clear, effective, and adaptable to 
+                      wherever you are, whatever you have. No fluff, no AI-generated shortcuts, just real coaching for real results.
+                    </p>
+                    <p className="font-semibold text-primary">
+                      Train smart. Train anywhere. Welcome to SmartyGym.
+                    </p>
+                  </div>
+                  <div className="mt-8 pt-6 border-t border-border">
+                    <p className="font-semibold">Haris Falas</p>
+                    <p className="text-sm text-muted-foreground">Sports Scientist & Head Coach</p>
+                    <p className="text-sm text-muted-foreground italic">Founder of SmartyGym</p>
+                  </div>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </section>
+
+        {/* FAQ Section */}
+        <section className="mb-16">
+          <Card>
+            <CardHeader>
+              <div className="flex items-center justify-between">
+                <CardTitle className="text-3xl">Frequently Asked Questions</CardTitle>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={handleExpandCollapseAll}
+                  className="text-sm"
+                >
+                  {allExpanded ? "Collapse All" : "Expand All"}
+                </Button>
+              </div>
+            </CardHeader>
+            <CardContent className="p-4">
+              <Accordion 
+                type="single" 
+                collapsible 
+                className="w-full" 
+                value={expandedFAQ === "all" ? undefined : expandedFAQ}
+                onValueChange={(value) => {
+                  setExpandedFAQ(value);
+                  setAllExpanded(false);
+                  if (value) scrollToAccordionItem(value);
+                }}
+              >
+                <AccordionItem value="item-1" data-accordion-value="item-1">
+                  <AccordionTrigger className="text-left">Who is Haris Falas?</AccordionTrigger>
+                  <AccordionContent className="py-2 leading-relaxed">
+                    Haris Falas is a certified Sports Scientist and Strength & Conditioning Coach with over 20 years of 
+                    professional experience. He has worked with elite athletes and professional football teams in the 
+                    Cypriot First Division. As the founder of HFSC and SmartyGym, he personally designs every workout and 
+                    program based on evidence-based training principles and real coaching experience. All workouts and 
+                    programs are personally created by Haris — not AI-generated.
+                  </AccordionContent>
+                </AccordionItem>
+
+                <AccordionItem value="item-2" data-accordion-value="item-2">
+                  <AccordionTrigger className="text-left">What makes SmartyGym different from other fitness platforms?</AccordionTrigger>
+                  <AccordionContent className="py-2 leading-relaxed">
+                    SmartyGym combines expert coaching with real flexibility. Every workout and program is personally designed 
+                    by Haris Falas, a certified Sports Scientist — not generated by AI or algorithms. You get structured, 
+                    evidence-based training that actually fits into your life, whether you're at home, traveling, or in the gym. 
+                    Plus, with tools like the 1RM Calculator and direct coach access, you get everything you need in one place.
+                  </AccordionContent>
+                </AccordionItem>
+
+                <AccordionItem value="item-3" data-accordion-value="item-3">
+                  <AccordionTrigger className="text-left">How do I choose between a workout and a training program?</AccordionTrigger>
+                  <AccordionContent className="py-2 leading-relaxed">
+                    <strong>Choose a workout if:</strong>
+                    <ul className="list-disc list-inside mt-1 space-y-1">
+                      <li>You want a single session to do today</li>
+                      <li>You prefer flexibility and variety in your training</li>
+                      <li>You're looking for a specific type of workout (strength, cardio, mobility, etc.)</li>
+                      <li>You're seeking a quick sweat or daily movement session to kickstart or complete your day.</li>
+                      <li>You have limited time or an unpredictable schedule</li>
+                      <li>You're supplementing another training plan</li>
+                    </ul>
+                    <br />
+                    <strong>Choose a training program if:</strong>
+                    <ul className="list-disc list-inside mt-1 space-y-1">
+                      <li>You have a specific goal like building muscle, losing weight, or improving endurance</li>
+                      <li>You want structured progression and accountability</li>
+                      <li>You can commit to 4-8 weeks of consistent training</li>
+                      <li>You prefer having your training planned out with clear weekly schedules</li>
+                      <li>You want to see measurable results through systematic training</li>
+                    </ul>
+                    <br />
+                    <strong>Pro tip:</strong> Many members use both — following a program for their main goal while adding individual 
+                    workouts for extra sessions or when they want to focus on something specific!
+                  </AccordionContent>
+                </AccordionItem>
+
+                <AccordionItem value="item-4" data-accordion-value="item-4">
+                  <AccordionTrigger className="text-left">Do I need equipment to use SmartyGym?</AccordionTrigger>
+                  <AccordionContent className="py-2 leading-relaxed">
+                    No! We offer both bodyweight workouts that require no equipment and equipment-based programs.
+                    You can filter workouts based on what you have available — whether that's nothing, 
+                    resistance bands, dumbbells, or full gym access. Train anywhere with whatever you have.
+                  </AccordionContent>
+                </AccordionItem>
+
+                <AccordionItem value="item-5" data-accordion-value="item-5">
+                  <AccordionTrigger className="text-left">How long are the workouts?</AccordionTrigger>
+                  <AccordionContent className="py-2 leading-relaxed">
+                    Our workouts range from quick 10-minute sessions to comprehensive 60-minute full workouts.
+                    You can filter by duration to find what fits your schedule — whether you have just 10 minutes or a full hour to train.
+                  </AccordionContent>
+                </AccordionItem>
+
+                <AccordionItem value="item-6" data-accordion-value="item-6">
+                  <AccordionTrigger className="text-left">Can beginners use SmartyGym?</AccordionTrigger>
+                  <AccordionContent className="py-2 leading-relaxed">
+                    Absolutely! We have workouts and programs specifically designed for all fitness levels, including beginners.
+                    Each workout includes clear instructions, difficulty ratings, and modifications to match your current fitness level. 
+                    Start where you are and progress at your own pace with safe, effective programming.
+                  </AccordionContent>
+                </AccordionItem>
+
+                <AccordionItem value="item-7" data-accordion-value="item-7">
+                  <AccordionTrigger className="text-left">Why should I go premium?</AccordionTrigger>
+                  <AccordionContent className="py-2 leading-relaxed">
+                    Premium membership unlocks unlimited access to all workouts and training programs, full dashboard access with progress tracking,
+                    complete workout and program history, ability to favorite and rate all content, and direct WhatsApp support from the coaching team. 
+                    Free subscribers can access selected free workouts, programs, calculators, and the exercise library, but Premium gives you the full 
+                    SmartyGym experience with structured training programs for long-term goals and personalized support. Choose monthly (€9.99/month) or save 25% with yearly (€89.99/year, only €7.50/month).
+                  </AccordionContent>
+                </AccordionItem>
+
+                <AccordionItem value="item-8" data-accordion-value="item-8">
+                  <AccordionTrigger className="text-left">What's the difference between free and premium access?</AccordionTrigger>
+                  <AccordionContent className="py-2 leading-relaxed">
+                    <strong>Visitors (no login)</strong> can view the exercise library and blog. <strong>Free subscribers</strong> get access to selected free workouts and programs,
+                    full calculators (1RM, BMR, Macro), and limited dashboard features. <strong>Premium members</strong> get unlimited access to all workouts and training programs, 
+                    complete dashboard with progress tracking, workout/program history, favorites, ratings, and direct WhatsApp support.
+                  </AccordionContent>
+                </AccordionItem>
+
+                <AccordionItem value="item-9" data-accordion-value="item-9">
+                  <AccordionTrigger className="text-left">Can I cancel my premium membership anytime?</AccordionTrigger>
+                  <AccordionContent className="py-2 leading-relaxed">
+                    Yes! You can cancel your premium membership at any time with no penalties or cancellation fees. 
+                    If you cancel, you'll retain premium access until the end of your current billing period. After that, 
+                    your account will automatically revert to free access, giving you continued use of selected free workouts, 
+                    programs, calculators, and the exercise library.
+                  </AccordionContent>
+                </AccordionItem>
+
+                <AccordionItem value="item-10" data-accordion-value="item-10">
+                  <AccordionTrigger className="text-left">How do I access my workouts and programs?</AccordionTrigger>
+                  <AccordionContent className="py-2 leading-relaxed">
+                    Once you sign up (free or premium), you can access all your workouts and programs through your dashboard. 
+                    Simply log in, browse the workout or program library, and click on what you want to do. Each workout includes 
+                    clear instructions and can be saved to your favorites for quick access later.
+                  </AccordionContent>
+                </AccordionItem>
+
+                <AccordionItem value="item-11" data-accordion-value="item-11">
+                  <AccordionTrigger className="text-left">Can I get personalized training plans?</AccordionTrigger>
+                  <AccordionContent className="py-2 leading-relaxed">
+                    Yes! If you're looking for a fully personalized training program designed specifically for your goals, lifestyle, 
+                    and available equipment, you can request a custom program through our Personal Training service. This includes 
+                    a detailed assessment, one-on-one consultation with Haris Falas, and a tailor-made program built just for you. 
+                    Contact us to learn more.
+                  </AccordionContent>
+                </AccordionItem>
+
+                <AccordionItem value="item-12" data-accordion-value="item-12">
+                  <AccordionTrigger className="text-left">Do you offer nutrition guidance or meal plans?</AccordionTrigger>
+                  <AccordionContent className="py-2 leading-relaxed">
+                    While we don't offer full meal plans, many of our programs include general nutrition tips and strategies to support 
+                    your training goals (like fat loss, muscle gain, or endurance). We also provide calculators to help you determine 
+                    your daily calorie needs and macronutrient targets, giving you the foundation to build your own nutrition plan.
+                  </AccordionContent>
+                </AccordionItem>
+
+                <AccordionItem value="item-13" data-accordion-value="item-13">
+                  <AccordionTrigger className="text-left">Can I subscribe to receive email updates?</AccordionTrigger>
+                  <AccordionContent className="py-2 leading-relaxed">
+                    No, we intentionally do not offer email subscriptions or newsletters. We believe in keeping your inbox clutter-free 
+                    and respecting your time. All important updates, new content releases, and announcements are communicated directly 
+                    within your SmartyGym dashboard when you log in. This ensures you only receive the information you need, when you 
+                    need it, without the noise of promotional emails. You can also follow us on social media for additional updates and 
+                    fitness tips if you'd like to stay connected.
+                  </AccordionContent>
+                </AccordionItem>
+              </Accordion>
+            </CardContent>
+          </Card>
+        </section>
+
+        {/* CTA Section */}
+        <section className="mb-16">
+          <Card className="bg-gradient-to-r from-primary/10 to-accent/10 border-2 border-primary/20">
+            <CardContent className="p-8 md:p-12 text-center">
+              <h2 className="text-3xl font-bold mb-4">Ready to Start Your Journey?</h2>
+              <p className="text-lg text-muted-foreground mb-8 max-w-2xl mx-auto">
+                Join thousands of people who train smarter, not harder. Get started with free workouts today, 
+                or unlock everything with premium access.
+              </p>
+              <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
+                <Button
+                  size="lg"
+                  onClick={() => navigate("/workout")}
+                  className="w-full sm:w-auto bg-background text-primary border-2 border-primary hover:bg-primary/5 shadow-lg hover:shadow-xl transition-all"
+                >
+                  Try Free Workouts
+                </Button>
+                <Button
+                  size="lg"
+                  onClick={() => navigate("/trainingprogram")}
+                  className="w-full sm:w-auto bg-background text-primary border-2 border-primary hover:bg-primary/5 shadow-lg hover:shadow-xl transition-all"
+                >
+                  Try Free Training Programs
+                </Button>
+                <Button
+                  size="lg"
+                  onClick={() => navigate("/joinpremium", { state: { from: location.pathname } })}
+                  className="w-full sm:w-auto bg-primary text-primary-foreground hover:bg-primary/90 shadow-lg hover:shadow-xl transition-all"
+                >
+                  Join Premium
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        </section>
 
     </div>
     </>
