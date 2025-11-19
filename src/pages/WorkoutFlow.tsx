@@ -142,7 +142,7 @@ const WorkoutFlow = () => {
                   itemScope
                   itemType="https://schema.org/ExercisePlan"
                   onClick={() => handleWorkoutSelect(workout.id)}
-                  className="p-6 cursor-pointer transition-all duration-300 hover:scale-105 hover:shadow-gold bg-card border-border"
+                  className="group p-6 cursor-pointer transition-all duration-500 ease-out transform-gpu hover:scale-110 hover:-translate-y-3 hover:shadow-2xl hover:shadow-primary/40 hover:border-primary/60 bg-card border-2 border-border"
                   role="button"
                   aria-label={`${workout.title} workouts - Online gym category at Smarty Gym Cyprus - smartygym.com by Haris Falas`}
                   data-workout-category={workout.id}
@@ -150,10 +150,10 @@ const WorkoutFlow = () => {
                 >
                   <div className="flex flex-col items-center text-center space-y-4">
                     <div 
-                      className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center"
+                      className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center transition-transform duration-300 group-hover:scale-110"
                       aria-hidden="true"
                     >
-                      <Icon className="w-8 h-8 text-primary" />
+                      <Icon className="w-8 h-8 text-primary transition-transform duration-300 group-hover:rotate-3" />
                     </div>
                     <div>
                       <h3 
