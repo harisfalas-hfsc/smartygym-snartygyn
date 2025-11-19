@@ -168,33 +168,62 @@ export const ContactManager = () => {
 
     // Mark as read if not already read
     if (!message.read_at) {
-      await supabase
-        .from('contact_messages')
-        .update({ read_at: new Date().toISOString(), status: 'read' })
-        .eq('id', message.id);
-      
-      fetchMessages();
+      try {
+        const { error } = await supabase
+          .from('contact_messages')
+          .update({ read_at: new Date().toISOString(), status: 'read' })
+          .eq('id', message.id);
+        
+        if (error) {
+          console.error('[ContactManager] Mark as read failed:', error);
+          toast({
+            title: "Error",
+            description: "Failed to mark message as read.",
+            variant: "destructive",
+          });
+        } else {
+          fetchMessages();
+        }
+      } catch (e) {
+        console.error('[ContactManager] Unexpected error marking as read:', e);
+        toast({
+          title: "Error",
+          description: "Failed to mark message as read.",
+          variant: "destructive",
+        });
+      }
     }
   };
 
   const handleStatusUpdate = async (messageId: string, newStatus: string) => {
-    const { error } = await supabase
-      .from('contact_messages')
-      .update({ status: newStatus })
-      .eq('id', messageId);
+    try {
+      const { error } = await supabase
+        .from('contact_messages')
+        .update({ status: newStatus })
+        .eq('id', messageId);
 
-    if (error) {
-      toast({
-        title: "Error",
-        description: "Failed to update status",
-        variant: "destructive",
-      });
-    } else {
+      if (error) {
+        console.error('[ContactManager] Status update failed:', error);
+        toast({
+          title: "Error",
+          description: "Failed to update status",
+          variant: "destructive",
+        });
+        return;
+      }
+      
       toast({
         title: "Success",
         description: "Message status updated",
       });
       fetchMessages();
+    } catch (e) {
+      console.error('[ContactManager] Unexpected error updating status:', e);
+      toast({
+        title: "Error",
+        description: "Failed to update status",
+        variant: "destructive",
+      });
     }
   };
 
@@ -262,23 +291,29 @@ export const ContactManager = () => {
     if (!selectedMessage || !responseText.trim()) return;
 
     setIsResponding(true);
-    const { error } = await supabase
-      .from('contact_messages')
-      .update({ 
-        response: responseText,
-        responded_at: new Date().toISOString(),
-        status: 'responded',
-        response_read_at: null
-      })
-      .eq('id', selectedMessage.id);
+    
+    try {
+      const { error } = await supabase
+        .from('contact_messages')
+        .update({ 
+          response: responseText,
+          responded_at: new Date().toISOString(),
+          status: 'responded',
+          response_read_at: null
+        })
+        .eq('id', selectedMessage.id);
 
-    if (error) {
-      toast({
-        title: "Error",
-        description: "Failed to save response",
-        variant: "destructive",
-      });
-    } else {
+      if (error) {
+        console.error('[ContactManager] Save response failed:', error);
+        toast({
+          title: "Error",
+          description: "Failed to save response",
+          variant: "destructive",
+        });
+        setIsResponding(false);
+        return;
+      }
+
       // Send email notification and push notification
       if (selectedMessage.user_id && selectedMessage.email) {
         try {
@@ -303,7 +338,7 @@ export const ContactManager = () => {
             }
           });
         } catch (notificationError) {
-          console.error('Error sending notifications:', notificationError);
+          console.error('[ContactManager] Error sending notifications:', notificationError);
         }
       }
 
@@ -313,7 +348,15 @@ export const ContactManager = () => {
       });
       setShowMessageDialog(false);
       fetchMessages();
+    } catch (e) {
+      console.error('[ContactManager] Unexpected error sending response:', e);
+      toast({
+        title: "Error",
+        description: "Failed to send response",
+        variant: "destructive",
+      });
     }
+    
     setIsResponding(false);
   };
 
