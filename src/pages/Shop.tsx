@@ -9,17 +9,24 @@ import { ProductCard } from "@/components/shop/ProductCard";
 import { PersonalRecommendation } from "@/components/shop/PersonalRecommendation";
 import { MinimalDisclosure } from "@/components/shop/MinimalDisclosure";
 import { ContentLoadingSkeleton } from "@/components/ContentLoadingSkeleton";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { CompactFilters } from "@/components/CompactFilters";
 import { ShoppingBag } from "lucide-react";
 
 const Shop = () => {
   const [sortBy, setSortBy] = useState<string>("featured");
+  const [categoryFilter, setCategoryFilter] = useState<string>("all");
 
   const { data: products, isLoading } = useQuery({
-    queryKey: ["shop-products", sortBy],
+    queryKey: ["shop-products", sortBy, categoryFilter],
     queryFn: async () => {
       let query = supabase.from("shop_products").select("*");
       
+      // Apply category filter first
+      if (categoryFilter !== "all") {
+        query = query.eq("category", categoryFilter);
+      }
+      
+      // Then apply sorting
       switch (sortBy) {
         case "featured":
           query = query.order("is_featured", { ascending: false })
@@ -76,22 +83,42 @@ const Shop = () => {
 
         <PersonalRecommendation />
 
+        <CompactFilters
+          filters={[
+            {
+              name: "Category",
+              value: categoryFilter,
+              onChange: setCategoryFilter,
+              options: [
+                { value: "all", label: "All Categories" },
+                { value: "Training", label: "Training" },
+                { value: "Nutrition", label: "Nutrition" },
+                { value: "Clothes", label: "Clothes" },
+                { value: "Apparel", label: "Apparel" },
+              ],
+              placeholder: "All Categories",
+            },
+            {
+              name: "Sort By",
+              value: sortBy,
+              onChange: setSortBy,
+              options: [
+                { value: "featured", label: "Featured First" },
+                { value: "newest", label: "Newest First" },
+                { value: "oldest", label: "Oldest First" },
+                { value: "price-low", label: "Price: Low to High" },
+                { value: "price-high", label: "Price: High to Low" },
+              ],
+              placeholder: "Featured First",
+            },
+          ]}
+        />
+
         <div className="flex justify-between items-center mb-6">
           <p className="text-sm text-muted-foreground">
             {products?.length || 0} products
+            {categoryFilter !== "all" && ` in ${categoryFilter}`}
           </p>
-          <Select value={sortBy} onValueChange={setSortBy}>
-            <SelectTrigger className="w-[200px]">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="featured">Featured First</SelectItem>
-              <SelectItem value="newest">Newest First</SelectItem>
-              <SelectItem value="oldest">Oldest First</SelectItem>
-              <SelectItem value="price-low">Price: Low to High</SelectItem>
-              <SelectItem value="price-high">Price: High to Low</SelectItem>
-            </SelectContent>
-          </Select>
         </div>
 
         {isLoading ? (
