@@ -1228,6 +1228,48 @@ export type Database = {
         }
         Relationships: []
       }
+      shop_products: {
+        Row: {
+          amazon_url: string
+          category: string
+          created_at: string
+          description: string
+          display_order: number | null
+          id: string
+          image_url: string
+          is_featured: boolean | null
+          price_range: string
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          amazon_url: string
+          category: string
+          created_at?: string
+          description: string
+          display_order?: number | null
+          id?: string
+          image_url: string
+          is_featured?: boolean | null
+          price_range: string
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          amazon_url?: string
+          category?: string
+          created_at?: string
+          description?: string
+          display_order?: number | null
+          id?: string
+          image_url?: string
+          is_featured?: boolean | null
+          price_range?: string
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       social_media_analytics: {
         Row: {
           browser_info: string | null

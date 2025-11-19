@@ -6,7 +6,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
-import { ArrowLeft, Folder, Users, Mail, FileText, Settings, BarChart3, BookOpen, MessageSquare, Inbox, Image, TrendingUp, Plus, Dumbbell, Calendar, Bell } from "lucide-react";
+import { ArrowLeft, Folder, Users, Mail, FileText, Settings, BarChart3, BookOpen, MessageSquare, Inbox, Image, TrendingUp, Plus, Dumbbell, Calendar, Bell, ShoppingBag } from "lucide-react";
 import { ContentManager } from "@/components/admin/ContentManager";
 import { CommunicationsManager } from "@/components/admin/CommunicationsManager";
 import { EmailManager } from "@/components/admin/EmailManager";
@@ -17,6 +17,7 @@ import { SocialMediaAnalytics } from "@/components/admin/SocialMediaAnalytics";
 import { BlogManager } from "@/components/admin/BlogManager";
 import { ContactManager } from "@/components/admin/ContactManager";
 import { InstagramImageGenerator } from "@/components/admin/InstagramImageGenerator";
+import { ShopManager } from "@/components/admin/ShopManager";
 import { SettingsManager } from "@/components/admin/SettingsManager";
 import { CommentModerationPanel } from "@/components/admin/CommentModerationPanel";
 import { NotificationHistoryManager } from "@/components/admin/NotificationHistoryManager";
@@ -240,6 +241,11 @@ export default function AdminBackoffice() {
               <Bell className="h-3 w-3 sm:h-4 sm:w-4 shrink-0" />
               <span className="hidden sm:inline">Notifications</span>
             </TabsTrigger>
+
+            <TabsTrigger value="shop" className="flex items-center justify-center gap-1 sm:gap-1.5 text-xs sm:text-sm px-2 sm:px-3 py-2 sm:py-2.5 whitespace-nowrap flex-shrink-0">
+              <ShoppingBag className="h-3 w-3 sm:h-4 sm:w-4 shrink-0" />
+              <span className="hidden sm:inline">Shop</span>
+            </TabsTrigger>
           </TabsList>
 
           <div className="mt-6">
@@ -306,6 +312,10 @@ export default function AdminBackoffice() {
 
             <TabsContent value="notification-history" className="mt-0">
               <NotificationHistoryManager />
+            </TabsContent>
+
+            <TabsContent value="shop" className="mt-0">
+              <ShopManager />
             </TabsContent>
           </div>
         </Tabs>

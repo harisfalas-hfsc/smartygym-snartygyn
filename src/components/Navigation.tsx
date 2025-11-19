@@ -272,6 +272,13 @@ export const Navigation = () => {
                   >
                     Contact
                   </Button>
+                  <Button
+                    variant="ghost"
+                    onClick={() => handleNavigate("/shop")}
+                    className={`justify-start font-semibold transition-all duration-200 ${location.pathname === '/shop' ? 'text-primary underline underline-offset-4 bg-yellow-100/50' : 'text-foreground hover:bg-yellow-100/80 hover:text-foreground'}`}
+                  >
+                    Shop
+                  </Button>
                 </nav>
               </SheetContent>
             </Sheet>

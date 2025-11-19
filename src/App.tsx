@@ -38,6 +38,7 @@ import FreeContent from "./pages/FreeContent";
 import Blog from "./pages/Blog";
 import CoachProfile from "./pages/CoachProfile";
 import Contact from "./pages/Contact";
+import Shop from "./pages/Shop";
 import PrivacyPolicy from "./pages/PrivacyPolicy";
 import TermsOfService from "./pages/TermsOfService";
 import Disclaimer from "./pages/Disclaimer";
@@ -131,6 +132,7 @@ const AppContent = () => {
                 <Route path="/termsofservice" element={<TermsOfService />} />
                 <Route path="/disclaimer" element={<Disclaimer />} />
                 <Route path="/tools" element={<Tools />} />
+                <Route path="/shop" element={<Shop />} />
                 
                 {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
                 <Route path="*" element={<NotFound />} />
