@@ -32,7 +32,7 @@ import OneRMCalculator from "./pages/OneRMCalculator";
 import BMRCalculator from "./pages/BMRCalculator";
 import MacroTrackingCalculator from "./pages/MacroTrackingCalculator";
 import ExerciseLibrary from "./pages/ExerciseLibrary";
-import About from "./pages/About";
+
 import Tools from "./pages/Tools";
 import FreeContent from "./pages/FreeContent";
 import Blog from "./pages/Blog";
@@ -121,7 +121,7 @@ const AppContent = () => {
                 </Route>
                 
                 {/* Public routes */}
-                <Route path="/about" element={<About />} />
+                
                 <Route path="/community" element={<Community />} />
                 <Route path="/takeatour" element={<TakeTour />} />
                 <Route path="/contact" element={<Contact />} />
