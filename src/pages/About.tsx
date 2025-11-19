@@ -1,3 +1,4 @@
+import { useState, useRef, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Helmet } from "react-helmet";
 import { Button } from "@/components/ui/button";
@@ -5,7 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { PageBreadcrumbs } from "@/components/PageBreadcrumbs";
 import { InfoRibbon } from "@/components/InfoRibbon";
-import { ArrowLeft, Award, Heart, Users, Target, UserCheck, Brain, Shield, Sparkles, Ban, CheckCircle2, Compass, Calendar } from "lucide-react";
+import { ArrowLeft, Award, Heart, Users, Target, UserCheck, Brain, Shield, Sparkles, Ban, CheckCircle2, Compass, Calendar, ChevronDown, ChevronUp } from "lucide-react";
 import harisPhoto from "@/assets/haris-falas-coach.png";
 
 import { useShowBackButton } from "@/hooks/useShowBackButton";
@@ -16,6 +17,33 @@ const About = () => {
   const { canGoBack, goBack } = useShowBackButton();
   const { userTier } = useAccessControl();
   const isPremium = userTier === "premium";
+  
+  // FAQ accordion state
+  const faqSectionRef = useRef<HTMLElement>(null);
+  const [openItems, setOpenItems] = useState<string[]>([]);
+  
+  const allFaqItems = [
+    "item-1", "item-2", "item-3", "item-3a", "item-3b", 
+    "item-4", "item-5", "item-6", "item-7", "item-8", 
+    "item-9", "item-10", "item-13"
+  ];
+  
+  const allExpanded = openItems.length === allFaqItems.length;
+  
+  const toggleExpandAll = () => {
+    setOpenItems(allExpanded ? [] : allFaqItems);
+  };
+  
+  // Smooth scroll to FAQ section when an item is opened
+  useEffect(() => {
+    if (openItems.length > 0 && faqSectionRef.current) {
+      const yOffset = -100; // Offset from top
+      const element = faqSectionRef.current;
+      const y = element.getBoundingClientRect().top + window.pageYOffset + yOffset;
+      
+      window.scrollTo({ top: y, behavior: 'smooth' });
+    }
+  }, [openItems]);
 
   return (
     <>
@@ -442,10 +470,36 @@ const About = () => {
         </section>
 
         {/* FAQ Section */}
-        <section className="mb-12">
+        <section className="mb-12" ref={faqSectionRef}>
           <Card>
             <CardContent className="p-4">
-              <Accordion type="single" collapsible className="w-full">
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="text-lg font-semibold">Frequently Asked Questions</h3>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={toggleExpandAll}
+                  className="text-sm"
+                >
+                  {allExpanded ? (
+                    <>
+                      <ChevronUp className="w-4 h-4 mr-2" />
+                      Collapse All
+                    </>
+                  ) : (
+                    <>
+                      <ChevronDown className="w-4 h-4 mr-2" />
+                      Expand All
+                    </>
+                  )}
+                </Button>
+              </div>
+              <Accordion 
+                type="multiple" 
+                value={openItems}
+                onValueChange={setOpenItems}
+                className="w-full"
+              >
             <AccordionItem value="item-1">
               <AccordionTrigger className="text-left">What is SmartyGym?</AccordionTrigger>
                   <AccordionContent className="py-2 leading-relaxed">
