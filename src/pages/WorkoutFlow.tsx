@@ -26,6 +26,7 @@ const WorkoutFlow = () => {
       icon: Dumbbell,
       level: "Beginner-Advanced",
       equipment: "Equipment/No Equipment",
+      featured: true,
     },
     {
       id: "calorie-burning",
@@ -34,6 +35,7 @@ const WorkoutFlow = () => {
       icon: Flame,
       level: "Beginner-Advanced",
       equipment: "Equipment/No Equipment",
+      featured: true,
     },
     {
       id: "metabolic",
@@ -142,7 +144,7 @@ const WorkoutFlow = () => {
                   itemScope
                   itemType="https://schema.org/ExercisePlan"
                   onClick={() => handleWorkoutSelect(workout.id)}
-                  className="group p-6 cursor-pointer transition-all duration-500 ease-out transform-gpu hover:scale-110 hover:-translate-y-3 hover:shadow-2xl hover:shadow-primary/40 hover:border-primary/60 bg-card border-2 border-border"
+                  className={`group p-6 cursor-pointer transition-all duration-500 ease-out transform-gpu hover:scale-110 hover:-translate-y-3 hover:shadow-2xl hover:shadow-primary/40 hover:border-primary/60 bg-card border-2 border-border ${workout.featured ? 'animate-[pulse_3s_ease-in-out_infinite]' : ''}`}
                   role="button"
                   aria-label={`${workout.title} workouts - Online gym category at Smarty Gym Cyprus - smartygym.com by Haris Falas`}
                   data-workout-category={workout.id}
