@@ -29,7 +29,7 @@ export const ShopManager = () => {
   const [formData, setFormData] = useState({
     title: "",
     description: "",
-    category: "Training",
+    category: "Fitness",
     amazon_url: "",
     image_url: "",
     price_range: "",
@@ -38,7 +38,7 @@ export const ShopManager = () => {
   });
 
   const queryClient = useQueryClient();
-  const categories = ["Training", "Nutrition", "Clothes", "Apparel"];
+  const categories = ["Fitness", "Nutrition", "Clothing", "Apparel", "Accessories"];
 
   const { data: products, isLoading } = useQuery({
     queryKey: ["admin-shop-products", categoryFilter],
@@ -113,7 +113,7 @@ export const ShopManager = () => {
     setFormData({
       title: "",
       description: "",
-      category: "Training",
+      category: "Fitness",
       amazon_url: "",
       image_url: "",
       price_range: "",
@@ -298,13 +298,14 @@ export const ShopManager = () => {
           <SelectTrigger className="w-[200px]">
             <SelectValue />
           </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">All Categories</SelectItem>
-            <SelectItem value="Training">Training</SelectItem>
-            <SelectItem value="Nutrition">Nutrition</SelectItem>
-            <SelectItem value="Clothes">Clothes</SelectItem>
-            <SelectItem value="Apparel">Apparel</SelectItem>
-          </SelectContent>
+              <SelectContent>
+                <SelectItem value="all">All Categories</SelectItem>
+                <SelectItem value="Fitness">Fitness</SelectItem>
+                <SelectItem value="Nutrition">Nutrition</SelectItem>
+                <SelectItem value="Clothing">Clothing</SelectItem>
+                <SelectItem value="Apparel">Apparel</SelectItem>
+                <SelectItem value="Accessories">Accessories</SelectItem>
+              </SelectContent>
         </Select>
         <p className="text-sm text-muted-foreground">
           {products?.length || 0} products
