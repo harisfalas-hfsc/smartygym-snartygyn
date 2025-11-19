@@ -672,11 +672,12 @@ const Index = () => {
           </div>
         </section>
 
-        {/* Mission Statement with Cards */}
-        <section className="mb-16">
-          {/* Your Gym Anywhere Card */}
-          <Card className="bg-gradient-to-r from-primary/10 to-accent/10 border-2 border-primary/20 mb-8">
-            <CardContent className="p-8">
+        <div className="container mx-auto max-w-6xl px-4">
+          {/* Mission Statement with Cards */}
+          <section className="mb-16">
+            {/* Your Gym Anywhere Card */}
+            <Card className="bg-gradient-to-r from-primary/10 to-accent/10 border-2 border-primary/20 mb-8">
+              <CardContent className="p-6">
               <div className="flex items-start justify-between mb-4">
                 <h3 className="text-2xl font-bold flex-1">
                   Your Gym Reimagined Anywhere, Anytime
@@ -705,7 +706,7 @@ const Index = () => {
           </Card>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-            <Card className="text-center hover:shadow-lg transition-all hover:-translate-y-1">
+            <Card className="border-2 border-border text-center hover:shadow-lg transition-all hover:-translate-y-1">
               <CardHeader>
                 <div className="w-14 h-14 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-4">
                   <Target className="w-7 h-7 text-primary" />
@@ -719,7 +720,7 @@ const Index = () => {
               </CardContent>
             </Card>
 
-            <Card className="text-center hover:shadow-lg transition-all hover:-translate-y-1">
+            <Card className="border-2 border-border text-center hover:shadow-lg transition-all hover:-translate-y-1">
               <CardHeader>
                 <div className="w-14 h-14 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-4">
                   <Brain className="w-7 h-7 text-primary" />
@@ -733,7 +734,7 @@ const Index = () => {
               </CardContent>
             </Card>
 
-            <Card className="text-center hover:shadow-lg transition-all hover:-translate-y-1">
+            <Card className="border-2 border-border text-center hover:shadow-lg transition-all hover:-translate-y-1">
               <CardHeader>
                 <div className="w-14 h-14 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-4">
                   <Users className="w-7 h-7 text-primary" />
@@ -747,7 +748,7 @@ const Index = () => {
               </CardContent>
             </Card>
 
-            <Card className="text-center hover:shadow-lg transition-all hover:-translate-y-1">
+            <Card className="border-2 border-border text-center hover:shadow-lg transition-all hover:-translate-y-1">
               <CardHeader>
                 <div className="w-14 h-14 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-4">
                   <Shield className="w-7 h-7 text-primary" />
@@ -763,8 +764,8 @@ const Index = () => {
           </div>
 
           {/* The SmartyGym Promise */}
-          <Card className="bg-gradient-to-r from-primary/5 to-accent/5 border border-primary/20">
-            <CardContent className="p-8">
+          <Card className="bg-gradient-to-r from-primary/5 to-accent/5 border-2 border-primary/20">
+            <CardContent className="p-6">
               <h3 className="text-2xl font-bold mb-6 text-center">The SmartyGym Promise</h3>
               <div className="max-w-3xl mx-auto space-y-4">
                 <p className="text-base leading-relaxed text-center">
@@ -784,7 +785,7 @@ const Index = () => {
         <section className="mb-16">
           <h2 className="text-3xl font-bold text-center mb-8">What We Stand For</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            <Card className="text-center hover:shadow-lg transition-all hover:-translate-y-1">
+            <Card className="border-2 border-border text-center hover:shadow-lg transition-all hover:-translate-y-1">
               <CardHeader>
                 <div className="w-14 h-14 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-4">
                   <Award className="w-7 h-7 text-primary" />
@@ -798,7 +799,7 @@ const Index = () => {
               </CardContent>
             </Card>
 
-            <Card className="text-center hover:shadow-lg transition-all hover:-translate-y-1">
+            <Card className="border-2 border-border text-center hover:shadow-lg transition-all hover:-translate-y-1">
               <CardHeader>
                 <div className="w-14 h-14 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-4">
                   <CheckCircle2 className="w-7 h-7 text-primary" />
@@ -812,7 +813,7 @@ const Index = () => {
               </CardContent>
             </Card>
 
-            <Card className="text-center hover:shadow-lg transition-all hover:-translate-y-1">
+            <Card className="border-2 border-border text-center hover:shadow-lg transition-all hover:-translate-y-1">
               <CardHeader>
                 <div className="w-14 h-14 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-4">
                   <Heart className="w-7 h-7 text-primary" />
@@ -826,7 +827,7 @@ const Index = () => {
               </CardContent>
             </Card>
 
-            <Card className="text-center hover:shadow-lg transition-all hover:-translate-y-1">
+            <Card className="border-2 border-border text-center hover:shadow-lg transition-all hover:-translate-y-1">
               <CardHeader>
                 <div className="w-14 h-14 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-4">
                   <Target className="w-7 h-7 text-primary" />
@@ -912,10 +913,10 @@ const Index = () => {
           </Card>
         </section>
 
-        {/* FAQ Section */}
-        <section className="mb-12">
-          <Card>
-            <CardContent className="p-4">
+      {/* FAQ Section */}
+      <section className="mb-12">
+        <Card className="border-2 border-border">
+          <CardContent className="p-4">
               <Accordion type="single" collapsible className="w-full">
                 <AccordionItem value="what-is-smartygym">
                   <AccordionTrigger className="text-left">What is SmartyGym?</AccordionTrigger>
@@ -1057,7 +1058,7 @@ const Index = () => {
         {/* CTA Section */}
         <section className="mb-16">
           <Card className="bg-gradient-to-r from-primary/10 to-accent/10 border-2 border-primary/20">
-            <CardContent className="p-8 text-center space-y-6">
+            <CardContent className="p-6 text-center space-y-6">
               <div className="flex items-center justify-center gap-2">
                 <Sparkles className="h-6 w-6 text-primary" />
                 <h2 className="text-3xl font-bold">Ready to Start Your Journey?</h2>
@@ -1088,6 +1089,7 @@ const Index = () => {
             </CardContent>
           </Card>
         </section>
+      </div>
 
     </div>
     </>
