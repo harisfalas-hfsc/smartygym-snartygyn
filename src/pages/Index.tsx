@@ -634,17 +634,17 @@ const Index = () => {
                     </div>
 
                     {/* RIGHT: Three Core Message Cards */}
-                    <div className="order-2 lg:order-2 flex flex-col justify-between gap-4 h-full">
+                    <div className="order-2 lg:order-2 flex flex-col justify-between gap-2 h-full max-h-[480px]">
                       
                        {/* Card 1: Your Gym in Your Pocket */}
                       <Card className="flex-1 border-2 border-primary/30 hover:border-primary hover:shadow-lg transition-all cursor-pointer group">
-                <CardContent className="h-full p-8 flex items-center gap-6">
-                          <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-primary/10 group-hover:bg-primary/20 transition-all flex-shrink-0">
-                            <Smartphone className="w-6 h-6 text-primary" />
+                <CardContent className="h-full p-5 flex items-center gap-4">
+                          <div className="inline-flex items-center justify-center w-10 h-10 rounded-full bg-primary/10 group-hover:bg-primary/20 transition-all flex-shrink-0">
+                            <Smartphone className="w-5 h-5 text-primary" />
                           </div>
                           <div>
-                            <h3 className="text-lg font-bold text-foreground">Your Gym In Your Pocket</h3>
-                            <p className="text-sm text-muted-foreground leading-relaxed">
+                            <h3 className="text-base font-bold text-foreground">Your Gym In Your Pocket</h3>
+                            <p className="text-xs text-muted-foreground leading-normal">
                               Professional fitness platform with expert workouts, structured programs, and personalized coaching - accessible worldwide at smartygym.com.
                             </p>
                           </div>
@@ -653,15 +653,15 @@ const Index = () => {
 
                       {/* Card 2: 100% Human */}
                       <Card className="flex-1 border-2 border-primary/30 hover:border-primary hover:shadow-lg transition-all cursor-pointer group">
-                <CardContent className="h-full p-8 flex items-center gap-6">
-                          <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-primary/10 group-hover:bg-primary/20 transition-all flex-shrink-0">
-                            <UserCheck className="w-6 h-6 text-primary" />
+                <CardContent className="h-full p-5 flex items-center gap-4">
+                          <div className="inline-flex items-center justify-center w-10 h-10 rounded-full bg-primary/10 group-hover:bg-primary/20 transition-all flex-shrink-0">
+                            <UserCheck className="w-5 h-5 text-primary" />
                           </div>
                           <div>
-                            <h3 className="text-lg font-bold text-foreground">
+                            <h3 className="text-base font-bold text-foreground">
                               <span className="text-red-600">100% Human.</span> 0% AI.
                             </h3>
-                            <p className="text-sm text-muted-foreground leading-relaxed">
+                            <p className="text-xs text-muted-foreground leading-normal">
                               Every workout personally designed by Sports Scientist Haris Falas with 20+ years of experience. Real expertise, not algorithms.
                             </p>
                           </div>
@@ -670,13 +670,13 @@ const Index = () => {
 
                       {/* Card 3: Train Anywhere */}
                       <Card className="flex-1 border-2 border-primary/30 hover:border-primary hover:shadow-lg transition-all cursor-pointer group">
-                        <CardContent className="h-full p-8 flex items-center gap-6">
-                          <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-primary/10 group-hover:bg-primary/20 transition-all flex-shrink-0">
-                            <Plane className="w-6 h-6 text-primary" />
+                        <CardContent className="h-full p-5 flex items-center gap-4">
+                          <div className="inline-flex items-center justify-center w-10 h-10 rounded-full bg-primary/10 group-hover:bg-primary/20 transition-all flex-shrink-0">
+                            <Plane className="w-5 h-5 text-primary" />
                           </div>
                           <div>
-                            <h3 className="text-lg font-bold text-foreground">Train Anywhere, Anytime</h3>
-                            <p className="text-sm text-muted-foreground leading-relaxed">
+                            <h3 className="text-base font-bold text-foreground">Train Anywhere, Anytime</h3>
+                            <p className="text-xs text-muted-foreground leading-normal">
                               Access professional workouts on any device. Flexible training that fits YOUR schedule and YOUR goals—at home, gym, or traveling.
                             </p>
                           </div>
