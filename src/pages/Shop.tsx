@@ -84,20 +84,21 @@ const Shop = () => {
         <PersonalRecommendation />
 
         <CompactFilters
-          filters={[
-            {
-              name: "Category",
-              value: categoryFilter,
-              onChange: setCategoryFilter,
-              options: [
-                { value: "all", label: "All Categories" },
-                { value: "Training", label: "Training" },
-                { value: "Nutrition", label: "Nutrition" },
-                { value: "Clothes", label: "Clothes" },
-                { value: "Apparel", label: "Apparel" },
-              ],
-              placeholder: "All Categories",
-            },
+        filters={[
+          {
+            name: "Category",
+            value: categoryFilter,
+            onChange: setCategoryFilter,
+            options: [
+              { value: "all", label: "All Categories" },
+              { value: "Fitness", label: "Fitness" },
+              { value: "Nutrition", label: "Nutrition" },
+              { value: "Clothing", label: "Clothing" },
+              { value: "Apparel", label: "Apparel" },
+              { value: "Accessories", label: "Accessories" },
+            ],
+            placeholder: "All Categories",
+          },
             {
               name: "Sort By",
               value: sortBy,
