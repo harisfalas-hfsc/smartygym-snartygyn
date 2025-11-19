@@ -4,6 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Helmet } from "react-helmet";
 import { SEOEnhancer } from "@/components/SEOEnhancer";
 import { PageTitleCard } from "@/components/PageTitleCard";
+import { PageBreadcrumbs } from "@/components/PageBreadcrumbs";
 import { CategoryFilter } from "@/components/shop/CategoryFilter";
 import { ProductCard } from "@/components/shop/ProductCard";
 import { AffiliateDisclosure } from "@/components/shop/AffiliateDisclosure";
@@ -58,6 +59,13 @@ const Shop = () => {
       />
       
       <main className="container mx-auto px-4 py-6 max-w-7xl">
+        <PageBreadcrumbs 
+          items={[
+            { label: "Home", href: "/" },
+            { label: "Shop" }
+          ]} 
+        />
+        
         <PageTitleCard
           icon={ShoppingBag}
           title="Recommended Fitness Gear"
