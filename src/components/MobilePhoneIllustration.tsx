@@ -2,9 +2,10 @@ interface MobilePhoneIllustrationProps {
   imageUrl?: string;
   className?: string;
   variant?: 'phone' | 'tablet';
+  children?: React.ReactNode;
 }
 
-export const MobilePhoneIllustration = ({ imageUrl, className, variant = 'phone' }: MobilePhoneIllustrationProps) => {
+export const MobilePhoneIllustration = ({ imageUrl, className, variant = 'phone', children }: MobilePhoneIllustrationProps) => {
   return (
     <div className={`relative ${className}`}>
       {/* Tablet/Phone frame */}
@@ -19,8 +20,15 @@ export const MobilePhoneIllustration = ({ imageUrl, className, variant = 'phone'
         )}
         
         {/* Screen content */}
-        <div className="relative w-full h-full p-2 bg-gradient-to-br from-primary/10 to-background">
-          {imageUrl ? (
+        <div className={`relative w-full h-full ${
+          children ? 'p-3' : 'p-2 bg-gradient-to-br from-primary/10 to-background'
+        }`}>
+          {children ? (
+            // Render children (workout cards)
+            <div className="w-full h-full overflow-hidden">
+              {children}
+            </div>
+          ) : imageUrl ? (
             <img 
               src={imageUrl} 
               alt={variant === 'tablet' ? 'SmartyGym Tablet Preview' : 'SmartyGym App Preview'}
