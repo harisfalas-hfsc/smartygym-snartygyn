@@ -14,7 +14,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { User as UserIcon, Settings, LogOut, LayoutDashboard, Crown, Menu, Bell, Facebook, Instagram, Youtube, ShoppingBag } from "lucide-react";
+import { User as UserIcon, Settings, LogOut, LayoutDashboard, Crown, Menu, Bell, Facebook, Instagram, Youtube, ShoppingBag, Info, Dumbbell, ListChecks, Wrench, BookOpen, Users, Newspaper, Mail } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import smartyGymLogo from "@/assets/smarty-gym-logo.png";
 import { ThemeToggle } from "@/components/ThemeToggle";
@@ -212,6 +212,7 @@ export const Navigation = () => {
                     onClick={() => handleNavigate("/about")}
                     className={`justify-start font-semibold transition-all duration-200 ${location.pathname === '/about' ? 'text-primary underline underline-offset-4 bg-yellow-100/50' : 'text-foreground hover:bg-yellow-100/80 hover:text-foreground'}`}
                   >
+                    <Info className="mr-2 h-4 w-4" />
                     About
                   </Button>
                   <Button
@@ -219,6 +220,7 @@ export const Navigation = () => {
                     onClick={() => handleNavigate("/workout")}
                     className={`justify-start font-semibold transition-all duration-200 ${location.pathname === '/workout' ? 'text-primary underline underline-offset-4 bg-yellow-100/50' : 'text-foreground hover:bg-yellow-100/80 hover:text-foreground'}`}
                   >
+                    <Dumbbell className="mr-2 h-4 w-4" />
                     Workouts
                   </Button>
                   <Button
@@ -226,6 +228,7 @@ export const Navigation = () => {
                     onClick={() => handleNavigate("/trainingprogram")}
                     className={`justify-start font-semibold transition-all duration-200 ${location.pathname === '/trainingprogram' ? 'text-primary underline underline-offset-4 bg-yellow-100/50' : 'text-foreground hover:bg-yellow-100/80 hover:text-foreground'}`}
                   >
+                    <ListChecks className="mr-2 h-4 w-4" />
                     Programs
                   </Button>
                   {/* TEMPORARILY DISABLED - Personal Training
@@ -242,6 +245,7 @@ export const Navigation = () => {
                     onClick={() => handleNavigate("/tools")}
                     className={`justify-start font-semibold transition-all duration-200 ${location.pathname === '/tools' ? 'text-primary underline underline-offset-4 bg-yellow-100/50' : 'text-foreground hover:bg-yellow-100/80 hover:text-foreground'}`}
                   >
+                    <Wrench className="mr-2 h-4 w-4" />
                     Tools
                   </Button>
                   <Button
@@ -249,6 +253,7 @@ export const Navigation = () => {
                     onClick={() => handleNavigate("/exerciselibrary")}
                     className={`justify-start font-semibold transition-all duration-200 ${location.pathname === '/exerciselibrary' ? 'text-primary underline underline-offset-4 bg-yellow-100/50' : 'text-foreground hover:bg-yellow-100/80 hover:text-foreground'}`}
                   >
+                    <BookOpen className="mr-2 h-4 w-4" />
                     Exercise Library
                   </Button>
                   <Button
@@ -264,6 +269,7 @@ export const Navigation = () => {
                     onClick={() => handleNavigate("/community")}
                     className={`justify-start font-semibold transition-all duration-200 ${location.pathname === '/community' ? 'text-primary underline underline-offset-4 bg-yellow-100/50' : 'text-foreground hover:bg-yellow-100/80 hover:text-foreground'}`}
                   >
+                    <Users className="mr-2 h-4 w-4" />
                     Community
                   </Button>
                   <Button
@@ -271,6 +277,7 @@ export const Navigation = () => {
                     onClick={() => handleNavigate("/blog")}
                     className={`justify-start font-semibold transition-all duration-200 ${location.pathname === '/blog' ? 'text-primary underline underline-offset-4 bg-yellow-100/50' : 'text-foreground hover:bg-yellow-100/80 hover:text-foreground'}`}
                   >
+                    <Newspaper className="mr-2 h-4 w-4" />
                     Blog
                   </Button>
                   <Button
@@ -278,6 +285,7 @@ export const Navigation = () => {
                     onClick={() => handleNavigate("/contact")}
                     className={`justify-start font-semibold transition-all duration-200 ${location.pathname === '/contact' ? 'text-primary underline underline-offset-4 bg-yellow-100/50' : 'text-foreground hover:bg-yellow-100/80 hover:text-foreground'}`}
                   >
+                    <Mail className="mr-2 h-4 w-4" />
                     Contact
                   </Button>
                 </nav>
