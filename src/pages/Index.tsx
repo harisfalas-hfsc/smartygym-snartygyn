@@ -463,7 +463,7 @@ const Index = () => {
                       </div>
 
                       <div 
-                        onClick={() => navigate("/training-programs")}
+                        onClick={() => navigate("/trainingprogram")}
                         className="flex items-start gap-3 cursor-pointer hover:bg-primary/10 transition-all duration-200 rounded-lg p-3 border border-transparent hover:border-primary/20"
                       >
                         <Calendar className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
@@ -485,7 +485,7 @@ const Index = () => {
                       </div>
 
                       <div 
-                        onClick={() => navigate("/exercise-library")}
+                        onClick={() => navigate("/exerciselibrary")}
                         className="flex items-start gap-3 cursor-pointer hover:bg-primary/10 transition-all duration-200 rounded-lg p-3 border border-transparent hover:border-primary/20"
                       >
                         <Video className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
