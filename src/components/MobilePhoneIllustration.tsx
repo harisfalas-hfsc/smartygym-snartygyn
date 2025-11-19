@@ -7,7 +7,7 @@ export const MobilePhoneIllustration = ({ imageUrl, className }: MobilePhoneIllu
   return (
     <div className={`relative ${className}`}>
       {/* Phone frame */}
-      <div className="relative h-full max-h-[360px] mx-auto aspect-[9/19] border-[8px] border-foreground rounded-[2.5rem] shadow-2xl bg-background overflow-hidden">
+      <div className="relative h-full max-h-[480px] mx-auto aspect-[9/19] border-[8px] border-foreground rounded-[2.5rem] shadow-2xl bg-background overflow-hidden">
         {/* Notch */}
         <div className="absolute top-0 left-1/2 -translate-x-1/2 w-1/3 h-6 bg-foreground rounded-b-2xl z-10" />
         
