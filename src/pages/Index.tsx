@@ -27,6 +27,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import {
   Accordion,
   AccordionContent,
@@ -40,6 +41,7 @@ const Index = () => {
   const [user, setUser] = useState<SupabaseUser | null>(null);
   const { userTier } = useAccessControl();
   const isPremium = userTier === "premium";
+  const [isGetStartedOpen, setIsGetStartedOpen] = useState(false);
 
   useEffect(() => {
     // Check current session
@@ -390,7 +392,7 @@ const Index = () => {
                       className="text-4xl sm:text-5xl md:text-6xl font-black bg-gradient-to-r from-primary via-amber-400 to-primary bg-clip-text text-transparent"
                       itemProp="name"
                     >
-                      Welcome to SMARTYGYM
+                      Welcome to SmartyGym
                     </h1>
                     <p 
                       className="text-lg sm:text-xl text-muted-foreground font-medium"
@@ -402,8 +404,8 @@ const Index = () => {
                     <meta itemProp="description" content="Smarty Gym Cyprus - #1 online gym and fitness platform by Haris Falas - smartygym.com" />
                     <meta itemProp="foundingLocation" content="Cyprus" />
                     
-                    <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
+                    <Dialog open={isGetStartedOpen} onOpenChange={setIsGetStartedOpen}>
+                      <DialogTrigger asChild>
                         <Button 
                           size="lg" 
                           className="bg-primary hover:bg-primary/90 text-primary-foreground px-8 py-6 text-lg font-bold rounded-full shadow-lg hover:shadow-xl transition-all"
@@ -411,30 +413,140 @@ const Index = () => {
                           GET STARTED
                           <ChevronDown className="ml-2 h-5 w-5" />
                         </Button>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent className="w-[18rem] max-w-[calc(100vw-3rem)]">
-                        <DropdownMenuItem onClick={() => navigate("/workout")}>
-                          <Dumbbell className="mr-2 h-4 w-4" />
-                          Browse Workouts
-                        </DropdownMenuItem>
-                        <DropdownMenuItem onClick={() => navigate("/trainingprogram")}>
-                          <Calendar className="mr-2 h-4 w-4" />
-                          Browse Programs
-                        </DropdownMenuItem>
-                        <DropdownMenuItem onClick={() => navigate("/tools")}>
-                          <Calculator className="mr-2 h-4 w-4" />
-                          Use Tools
-                        </DropdownMenuItem>
-                        <DropdownMenuItem onClick={() => navigate("/exerciselibrary")}>
-                          <Video className="mr-2 h-4 w-4" />
-                          Exercise Library
-                        </DropdownMenuItem>
-                        <DropdownMenuItem onClick={() => navigate("/join-premium")}>
-                          <Crown className="mr-2 h-4 w-4 text-primary" />
-                          Join Premium
-                        </DropdownMenuItem>
-                      </DropdownMenuContent>
-                    </DropdownMenu>
+                      </DialogTrigger>
+                      <DialogContent className="sm:max-w-[600px] max-h-[80vh] overflow-y-auto">
+                        <DialogHeader>
+                          <DialogTitle className="text-2xl font-bold text-center">
+                            Explore SmartyGym Services
+                          </DialogTitle>
+                          <DialogDescription className="text-center">
+                            Choose where you want to start your fitness journey
+                          </DialogDescription>
+                        </DialogHeader>
+                        
+                        <div className="grid gap-4 py-4">
+                          
+                          {/* Workouts Card */}
+                          <Card 
+                            className="border-2 border-primary/30 hover:border-primary hover:shadow-lg transition-all cursor-pointer group"
+                            onClick={() => {
+                              navigate("/workout");
+                              setIsGetStartedOpen(false);
+                            }}
+                          >
+                            <CardContent className="p-6">
+                              <div className="flex items-start gap-4">
+                                <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-primary/10 group-hover:bg-primary/20 transition-all flex-shrink-0">
+                                  <Dumbbell className="w-6 h-6 text-primary" />
+                                </div>
+                                <div>
+                                  <h3 className="text-lg font-bold text-foreground mb-2">500+ Expert Workouts</h3>
+                                  <p className="text-sm text-muted-foreground">
+                                    Pick your daily session: Strength, Cardio, Fat Burn, or whatever fits your mood
+                                  </p>
+                                </div>
+                              </div>
+                            </CardContent>
+                          </Card>
+
+                          {/* Training Programs Card */}
+                          <Card 
+                            className="border-2 border-primary/30 hover:border-primary hover:shadow-lg transition-all cursor-pointer group"
+                            onClick={() => {
+                              navigate("/trainingprogram");
+                              setIsGetStartedOpen(false);
+                            }}
+                          >
+                            <CardContent className="p-6">
+                              <div className="flex items-start gap-4">
+                                <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-primary/10 group-hover:bg-primary/20 transition-all flex-shrink-0">
+                                  <Calendar className="w-6 h-6 text-primary" />
+                                </div>
+                                <div>
+                                  <h3 className="text-lg font-bold text-foreground mb-2">Training Programs</h3>
+                                  <p className="text-sm text-muted-foreground">
+                                    Structured expert training programs to achieve your long-term goals
+                                  </p>
+                                </div>
+                              </div>
+                            </CardContent>
+                          </Card>
+
+                          {/* Smart Tools Card */}
+                          <Card 
+                            className="border-2 border-primary/30 hover:border-primary hover:shadow-lg transition-all cursor-pointer group"
+                            onClick={() => {
+                              navigate("/tools");
+                              setIsGetStartedOpen(false);
+                            }}
+                          >
+                            <CardContent className="p-6">
+                              <div className="flex items-start gap-4">
+                                <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-primary/10 group-hover:bg-primary/20 transition-all flex-shrink-0">
+                                  <Calculator className="w-6 h-6 text-primary" />
+                                </div>
+                                <div>
+                                  <h3 className="text-lg font-bold text-foreground mb-2">Smart Tools</h3>
+                                  <p className="text-sm text-muted-foreground">
+                                    BMR, Macro, 1RM calculators and training timers to optimize your workouts
+                                  </p>
+                                </div>
+                              </div>
+                            </CardContent>
+                          </Card>
+
+                          {/* Exercise Library Card */}
+                          <Card 
+                            className="border-2 border-primary/30 hover:border-primary hover:shadow-lg transition-all cursor-pointer group"
+                            onClick={() => {
+                              navigate("/exerciselibrary");
+                              setIsGetStartedOpen(false);
+                            }}
+                          >
+                            <CardContent className="p-6">
+                              <div className="flex items-start gap-4">
+                                <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-primary/10 group-hover:bg-primary/20 transition-all flex-shrink-0">
+                                  <Video className="w-6 h-6 text-primary" />
+                                </div>
+                                <div>
+                                  <h3 className="text-lg font-bold text-foreground mb-2">Exercise Library</h3>
+                                  <p className="text-sm text-muted-foreground">
+                                    Comprehensive video guide with proper form demonstrations for every exercise
+                                  </p>
+                                </div>
+                              </div>
+                            </CardContent>
+                          </Card>
+
+                          {/* Premium Card */}
+                          <Card 
+                            className="border-2 border-primary/50 hover:border-primary hover:shadow-lg transition-all cursor-pointer group bg-primary/5"
+                            onClick={() => {
+                              navigate("/join-premium");
+                              setIsGetStartedOpen(false);
+                            }}
+                          >
+                            <CardContent className="p-6">
+                              <div className="flex items-start gap-4">
+                                <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-primary/20 group-hover:bg-primary/30 transition-all flex-shrink-0">
+                                  <Crown className="w-6 h-6 text-primary" />
+                                </div>
+                                <div>
+                                  <h3 className="text-lg font-bold text-foreground mb-2 flex items-center gap-2">
+                                    Join Premium
+                                    <span className="text-xs bg-primary text-primary-foreground px-2 py-1 rounded-full">RECOMMENDED</span>
+                                  </h3>
+                                  <p className="text-sm text-muted-foreground">
+                                    Unlock all premium workouts, programs, and exclusive features
+                                  </p>
+                                </div>
+                              </div>
+                            </CardContent>
+                          </Card>
+
+                        </div>
+                      </DialogContent>
+                    </Dialog>
                   </div>
 
                   {/* Middle Section: Phone (Left) + Three Cards (Right) */}
