@@ -448,7 +448,7 @@ const Index = () => {
 
 
                   {/* Feature Highlights Grid */}
-                  <div className="pt-8">
+                  <div className="pt-3">
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
                       
                       <div 
@@ -457,7 +457,7 @@ const Index = () => {
                       >
                         <Dumbbell className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
                         <div>
-                          <p className="font-semibold text-sm text-foreground">500+ Expert Workouts</p>
+                          <p className="font-semibold text-base text-foreground border-b border-primary/30 pb-1 inline-block">500+ Expert Workouts</p>
                           <p className="text-xs text-muted-foreground">Pick your daily session: Strength, Cardio, Fat Burn, or whatever fits your mood</p>
                         </div>
                       </div>
@@ -468,7 +468,7 @@ const Index = () => {
                       >
                         <Calendar className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
                         <div>
-                          <p className="font-semibold text-sm text-foreground">Training Programs</p>
+                          <p className="font-semibold text-base text-foreground border-b border-primary/30 pb-1 inline-block">Training Programs</p>
                           <p className="text-xs text-muted-foreground">Structured expert training programs to achieve your long-term goals</p>
                         </div>
                       </div>
@@ -479,7 +479,7 @@ const Index = () => {
                       >
                         <Wrench className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
                         <div>
-                          <p className="font-semibold text-sm text-foreground">Smart Tools</p>
+                          <p className="font-semibold text-base text-foreground border-b border-primary/30 pb-1 inline-block">Smart Tools</p>
                           <p className="text-xs text-muted-foreground">BMR, Macro, 1RM calculators</p>
                         </div>
                       </div>
@@ -490,7 +490,7 @@ const Index = () => {
                       >
                         <Video className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
                         <div>
-                          <p className="font-semibold text-sm text-foreground">Exercise Library</p>
+                          <p className="font-semibold text-base text-foreground border-b border-primary/30 pb-1 inline-block">Exercise Library</p>
                           <p className="text-xs text-muted-foreground">Comprehensive video guide</p>
                         </div>
                       </div>
@@ -501,7 +501,7 @@ const Index = () => {
                       >
                         <FileText className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
                         <div>
-                          <p className="font-semibold text-sm text-foreground">Blog & Expert Articles</p>
+                          <p className="font-semibold text-base text-foreground border-b border-primary/30 pb-1 inline-block">Blog & Expert Articles</p>
                           <p className="text-xs text-muted-foreground">Read expert tips, training guides, and fitness insights</p>
                         </div>
                       </div>
@@ -512,7 +512,7 @@ const Index = () => {
                       >
                         <GraduationCap className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
                         <div>
-                          <p className="font-semibold text-sm text-foreground">Expert Coach Guidance</p>
+                          <p className="font-semibold text-base text-foreground border-b border-primary/30 pb-1 inline-block">Expert Coach Guidance</p>
                           <p className="text-xs text-muted-foreground">Connect with Sports Scientist Haris Falas - real human expertise, not AI-generated advice</p>
                         </div>
                       </div>
@@ -520,7 +520,7 @@ const Index = () => {
                   </div>
 
                   {/* Who Is Smarty Gym For? Section */}
-                  <div className="pt-6">
+                  <div className="pt-3">
                     <Card className="border border-primary/30 bg-background/80">
                       <div className="p-6 sm:p-8 space-y-4">
                         <h2 className="text-xl sm:text-2xl font-bold text-center text-foreground">
