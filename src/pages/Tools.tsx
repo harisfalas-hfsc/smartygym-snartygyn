@@ -99,31 +99,9 @@ const Tools = () => {
             { label: "Tools" }
           ]} 
         />
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {tools.map((tool) => {
-            const Icon = tool.icon;
-            return (
-              <Card
-                key={tool.id}
-                onClick={() => navigate(tool.route)}
-                className="group p-6 cursor-pointer transition-all duration-500 ease-out transform-gpu hover:scale-110 hover:-translate-y-3 hover:shadow-2xl hover:shadow-primary/40 hover:border-primary/60 bg-card border-2 border-border"
-              >
-                <div className="flex flex-col items-center text-center space-y-4">
-                  <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center transition-transform duration-300 group-hover:scale-110">
-                    <Icon className="w-8 h-8 text-primary transition-transform duration-300 group-hover:rotate-3" />
-                  </div>
-                  <div>
-                    <h3 className="font-semibold text-lg mb-2">{tool.title}</h3>
-                    <p className="text-sm text-muted-foreground">{tool.description}</p>
-                  </div>
-                </div>
-              </Card>
-            );
-          })}
-        </div>
 
         {/* Info Section */}
-        <Card className="mt-12 bg-gradient-to-br from-primary/5 via-background to-primary/5 border-2 border-primary/40 shadow-gold">
+        <Card className="mb-8 bg-gradient-to-br from-primary/5 via-background to-primary/5 border-2 border-primary/40 shadow-gold">
           <div className="p-8">
             <h2 className="text-2xl font-bold mb-4 text-center">About These Tools</h2>
             <div className="space-y-4 text-muted-foreground max-w-3xl mx-auto">
@@ -154,6 +132,29 @@ const Tools = () => {
             </div>
           </div>
         </Card>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {tools.map((tool) => {
+            const Icon = tool.icon;
+            return (
+              <Card
+                key={tool.id}
+                onClick={() => navigate(tool.route)}
+                className="group p-6 cursor-pointer transition-all duration-500 ease-out transform-gpu hover:scale-110 hover:-translate-y-3 hover:shadow-2xl hover:shadow-primary/40 hover:border-primary/60 bg-card border-2 border-border"
+              >
+                <div className="flex flex-col items-center text-center space-y-4">
+                  <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center transition-transform duration-300 group-hover:scale-110">
+                    <Icon className="w-8 h-8 text-primary transition-transform duration-300 group-hover:rotate-3" />
+                  </div>
+                  <div>
+                    <h3 className="font-semibold text-lg mb-2">{tool.title}</h3>
+                    <p className="text-sm text-muted-foreground">{tool.description}</p>
+                  </div>
+                </div>
+              </Card>
+            );
+          })}
+        </div>
       </div>
       </div>
     </>
