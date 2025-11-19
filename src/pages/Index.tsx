@@ -396,22 +396,20 @@ const Index = () => {
           
           {/* Content */}
           <div className="relative z-10 container mx-auto px-4 text-center space-y-8">
-            <div className="bg-white/20 backdrop-blur-sm rounded-2xl p-6 sm:p-8 shadow-lg max-w-4xl mx-auto">
+            <div className="bg-white/90 backdrop-blur-sm rounded-3xl p-8 sm:p-12 shadow-2xl max-w-4xl mx-auto">
               <ScrollReveal>
-          <h1 
-            className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-black tracking-tight"
-            itemProp="name"
-            style={{ textShadow: '2px 2px 8px rgba(0,0,0,0.8)' }}
-          >
-            Welcome to <span className="text-primary">SmartyGym</span>
-          </h1>
-          <p 
-            className="text-xl sm:text-2xl md:text-3xl text-foreground font-light max-w-3xl mx-auto"
-            itemProp="slogan"
-            style={{ textShadow: '2px 2px 8px rgba(0,0,0,0.8)' }}
-          >
-            Your gym reimagined anywhere, anytime.
-          </p>
+                <h1 
+                  className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-black tracking-tight"
+                  itemProp="name"
+                >
+                  Welcome to <span className="text-primary">SmartyGym</span>
+                </h1>
+                <p 
+                  className="text-xl sm:text-2xl md:text-3xl text-foreground font-light max-w-3xl mx-auto"
+                  itemProp="slogan"
+                >
+                  Your gym reimagined anywhere, anytime.
+                </p>
               <meta itemProp="url" content="https://smartygym.com" />
               <meta itemProp="description" content="Smarty Gym Cyprus - #1 online gym and fitness platform by Haris Falas - smartygym.com" />
               <meta itemProp="foundingLocation" content="Cyprus" />
