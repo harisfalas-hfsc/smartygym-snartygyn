@@ -112,14 +112,31 @@ serve(async (req) => {
         console.error('Failed to log purchase activity:', logError);
       }
 
-      // Send purchase thank you message
+      // Send purchase thank you message with correct message type
       try {
+        // Determine the correct message type based on content_type
+        let messageType = 'purchase_thank_you';
+        if (content_type === 'shop_product') {
+          messageType = 'purchase_shop_product';
+        } else if (content_type === 'workout') {
+          messageType = 'purchase_workout';
+        } else if (content_type === 'program') {
+          messageType = 'purchase_program';
+        }
+
         await supabaseClient.functions.invoke('send-system-message', {
           body: {
             userId: user_id,
-            messageType: 'purchase_thank_you',
+            messageType: messageType,
             customData: {
-              contentName: content_name
+              contentName: content_name,
+              purchaseDate: new Date().toLocaleString('en-US', {
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit'
+              })
             }
           }
         });
