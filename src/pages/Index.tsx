@@ -455,7 +455,7 @@ const Index = () => {
                         onClick={() => navigate("/workout")}
                         className="group flex items-start gap-3 cursor-pointer hover:bg-primary/10 transition-all duration-300 ease-in-out rounded-lg p-3 border border-transparent hover:border-primary/20 hover:scale-105 hover:shadow-lg transform-gpu"
                       >
-                        <Dumbbell className="w-5 h-5 text-primary flex-shrink-0 mt-0.5 transition-all duration-300 group-hover:scale-110 group-hover:drop-shadow-[0_0_8px_hsl(var(--primary))]" />
+                        <Dumbbell className="w-5 h-5 text-primary flex-shrink-0 mt-0.5 transition-all duration-300 group-hover:scale-[1.3] group-hover:brightness-125 group-hover:drop-shadow-[0_0_12px_hsl(var(--primary))]" />
                         <div>
                           <p className="font-semibold text-base text-foreground border-b border-primary/30 pb-1 inline-block">500+ Expert Workouts</p>
                           <p className="text-xs text-muted-foreground">Pick your daily session: Strength, Cardio, Fat Burn, or whatever fits your mood</p>
@@ -466,7 +466,7 @@ const Index = () => {
                         onClick={() => navigate("/trainingprogram")}
                         className="group flex items-start gap-3 cursor-pointer hover:bg-primary/10 transition-all duration-300 ease-in-out rounded-lg p-3 border border-transparent hover:border-primary/20 hover:scale-105 hover:shadow-lg transform-gpu"
                       >
-                        <Calendar className="w-5 h-5 text-primary flex-shrink-0 mt-0.5 transition-all duration-300 group-hover:scale-110 group-hover:drop-shadow-[0_0_8px_hsl(var(--primary))]" />
+                        <Calendar className="w-5 h-5 text-primary flex-shrink-0 mt-0.5 transition-all duration-300 group-hover:scale-[1.3] group-hover:brightness-125 group-hover:drop-shadow-[0_0_12px_hsl(var(--primary))]" />
                         <div>
                           <p className="font-semibold text-base text-foreground border-b border-primary/30 pb-1 inline-block">Training Programs</p>
                           <p className="text-xs text-muted-foreground">Structured expert training programs to achieve your long-term goals</p>
@@ -477,7 +477,7 @@ const Index = () => {
                         onClick={() => navigate("/tools")}
                         className="group flex items-start gap-3 cursor-pointer hover:bg-primary/10 transition-all duration-300 ease-in-out rounded-lg p-3 border border-transparent hover:border-primary/20 hover:scale-105 hover:shadow-lg transform-gpu"
                       >
-                        <Wrench className="w-5 h-5 text-primary flex-shrink-0 mt-0.5 transition-all duration-300 group-hover:scale-110 group-hover:drop-shadow-[0_0_8px_hsl(var(--primary))]" />
+                        <Wrench className="w-5 h-5 text-primary flex-shrink-0 mt-0.5 transition-all duration-300 group-hover:scale-[1.3] group-hover:brightness-125 group-hover:drop-shadow-[0_0_12px_hsl(var(--primary))]" />
                         <div>
                           <p className="font-semibold text-base text-foreground border-b border-primary/30 pb-1 inline-block">Smart Tools</p>
                           <p className="text-xs text-muted-foreground">BMR, Macro, 1RM calculators</p>
@@ -488,7 +488,7 @@ const Index = () => {
                         onClick={() => navigate("/exerciselibrary")}
                         className="group flex items-start gap-3 cursor-pointer hover:bg-primary/10 transition-all duration-300 ease-in-out rounded-lg p-3 border border-transparent hover:border-primary/20 hover:scale-105 hover:shadow-lg transform-gpu"
                       >
-                        <Video className="w-5 h-5 text-primary flex-shrink-0 mt-0.5 transition-all duration-300 group-hover:scale-110 group-hover:drop-shadow-[0_0_8px_hsl(var(--primary))]" />
+                        <Video className="w-5 h-5 text-primary flex-shrink-0 mt-0.5 transition-all duration-300 group-hover:scale-[1.3] group-hover:brightness-125 group-hover:drop-shadow-[0_0_12px_hsl(var(--primary))]" />
                         <div>
                           <p className="font-semibold text-base text-foreground border-b border-primary/30 pb-1 inline-block">Exercise Library</p>
                           <p className="text-xs text-muted-foreground">Comprehensive video guide</p>
@@ -499,7 +499,7 @@ const Index = () => {
                         onClick={() => navigate("/blog")}
                         className="group flex items-start gap-3 cursor-pointer hover:bg-primary/10 transition-all duration-300 ease-in-out rounded-lg p-3 border border-transparent hover:border-primary/20 hover:scale-105 hover:shadow-lg transform-gpu"
                       >
-                        <FileText className="w-5 h-5 text-primary flex-shrink-0 mt-0.5 transition-all duration-300 group-hover:scale-110 group-hover:drop-shadow-[0_0_8px_hsl(var(--primary))]" />
+                        <FileText className="w-5 h-5 text-primary flex-shrink-0 mt-0.5 transition-all duration-300 group-hover:scale-[1.3] group-hover:brightness-125 group-hover:drop-shadow-[0_0_12px_hsl(var(--primary))]" />
                         <div>
                           <p className="font-semibold text-base text-foreground border-b border-primary/30 pb-1 inline-block">Blog & Expert Articles</p>
                           <p className="text-xs text-muted-foreground">Read expert tips, training guides, and fitness insights</p>
@@ -510,7 +510,7 @@ const Index = () => {
                         onClick={() => navigate("/contact")}
                         className="group flex items-start gap-3 cursor-pointer hover:bg-primary/10 transition-all duration-300 ease-in-out rounded-lg p-3 border border-transparent hover:border-primary/20 hover:scale-105 hover:shadow-lg transform-gpu"
                       >
-                        <GraduationCap className="w-5 h-5 text-primary flex-shrink-0 mt-0.5 transition-all duration-300 group-hover:scale-110 group-hover:drop-shadow-[0_0_8px_hsl(var(--primary))]" />
+                        <GraduationCap className="w-5 h-5 text-primary flex-shrink-0 mt-0.5 transition-all duration-300 group-hover:scale-[1.3] group-hover:brightness-125 group-hover:drop-shadow-[0_0_12px_hsl(var(--primary))]" />
                         <div>
                           <p className="font-semibold text-base text-foreground border-b border-primary/30 pb-1 inline-block">Expert Coach Guidance</p>
                           <p className="text-xs text-muted-foreground">Connect with Sports Scientist Haris Falas - real human expertise, not AI-generated advice</p>
