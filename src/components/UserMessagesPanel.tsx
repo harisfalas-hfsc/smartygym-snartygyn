@@ -108,13 +108,23 @@ export const UserMessagesPanel = () => {
     } else if (type === 'contact') {
       const message = contactMessages.find(m => m.id === messageId);
       if (message && message.response && !message.response_read_at) {
-        await supabase
-          .from('contact_messages')
-          .update({ response_read_at: new Date().toISOString() })
-          .eq('id', messageId);
-        
-        refetchContact();
-        window.dispatchEvent(new CustomEvent('messages-read'));
+        try {
+          const { error } = await supabase
+            .from('contact_messages')
+            .update({ response_read_at: new Date().toISOString() })
+            .eq('id', messageId);
+          
+          if (error) {
+            console.error('[UserMessagesPanel] Mark contact message as read failed:', error);
+            toast.error("Failed to mark message as read");
+          } else {
+            refetchContact();
+            window.dispatchEvent(new CustomEvent('messages-read'));
+          }
+        } catch (e) {
+          console.error('[UserMessagesPanel] Unexpected error marking contact message as read:', e);
+          toast.error("Failed to mark message as read");
+        }
       }
     }
   };
@@ -125,18 +135,30 @@ export const UserMessagesPanel = () => {
 
     try {
       if (type === 'system') {
-        await supabase
+        const { error } = await supabase
           .from('user_system_messages')
           .update({ is_read: !currentState })
           .eq('id', messageId);
         
+        if (error) {
+          console.error('[UserMessagesPanel] Toggle system message read state failed:', error);
+          toast.error("Failed to update message status");
+          return;
+        }
+        
         toast.success(!currentState ? "Message marked as read" : "Message marked as unread");
         refetchSystem();
       } else if (type === 'contact') {
-        await supabase
+        const { error } = await supabase
           .from('contact_messages')
           .update({ response_read_at: !currentState ? new Date().toISOString() : null })
           .eq('id', messageId);
+        
+        if (error) {
+          console.error('[UserMessagesPanel] Toggle contact message read state failed:', error);
+          toast.error("Failed to update message status");
+          return;
+        }
         
         toast.success(!currentState ? "Message marked as read" : "Message marked as unread");
         refetchContact();
@@ -144,8 +166,8 @@ export const UserMessagesPanel = () => {
       
       window.dispatchEvent(new CustomEvent('messages-read'));
     } catch (error) {
+      console.error('[UserMessagesPanel] Unexpected error toggling read state:', error);
       toast.error("Failed to update message status");
-      console.error("Error toggling message read status:", error);
     }
   };
 
