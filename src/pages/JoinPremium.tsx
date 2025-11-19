@@ -260,7 +260,7 @@ export default function JoinPremium() {
                   MONTHLY
                 </Badge>
                 <CardTitle className="text-2xl sm:text-3xl font-bold" itemProp="offers">€9.99</CardTitle>
-                <p className="text-xs sm:text-sm text-muted-foreground h-3 sm:h-4" itemProp="description">per month</p>
+                <p className="text-xs sm:text-sm text-muted-foreground" itemProp="description">per month</p>
                 <div className="h-8 sm:h-12 flex flex-col justify-center">
                   <p className="text-xs text-amber-600 dark:text-amber-400 font-semibold">
                     🔄 Auto-renews monthly
@@ -318,7 +318,7 @@ export default function JoinPremium() {
 
             {/* Platinum Plan */}
             <Card className="relative border-2 border-primary shadow-lg flex flex-col bg-gradient-to-br from-primary/5 to-amber-500/5">
-              <Badge className="absolute -top-2 right-2 sm:-top-3 sm:right-3 bg-green-600 text-white px-2 sm:px-3 py-1 text-xs sm:text-sm shadow-md z-10">
+              <Badge className="absolute top-2 right-2 sm:top-3 sm:right-3 bg-green-600 text-white px-2 sm:px-3 py-1 text-xs sm:text-sm shadow-md z-10">
                 BEST VALUE
               </Badge>
               
@@ -331,7 +331,7 @@ export default function JoinPremium() {
                   YEARLY
                 </Badge>
                 <CardTitle className="text-2xl sm:text-3xl font-bold">€89.99</CardTitle>
-                <p className="text-xs sm:text-sm text-muted-foreground h-3 sm:h-4">per year</p>
+                <p className="text-xs sm:text-sm text-muted-foreground">per year</p>
                 <div className="h-8 sm:h-12 flex flex-col justify-center">
                   <p className="text-sm sm:text-base text-green-600 font-bold">
                     Save €29.89!
