@@ -367,7 +367,7 @@ const TakeTour = () => {
               <Button 
                 size="lg" 
                 variant="outline" 
-                onClick={() => navigate("/about")}
+                onClick={() => navigate("/")}
                 className="w-full sm:w-auto"
               >
                 Learn More About Us

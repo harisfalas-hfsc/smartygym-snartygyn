@@ -698,20 +698,6 @@ const Contact = () => {
             </p>
           </div>
 
-          {/* FAQ Quick Links */}
-          <section className="mt-12">
-            <Card className="bg-primary/5">
-              <CardContent className="p-6 text-center">
-                <h2 className="text-xl font-bold mb-3">Looking for Quick Answers?</h2>
-                <p className="text-muted-foreground mb-4">
-                  Check out our About page for frequently asked questions
-                </p>
-                <Button variant="outline" onClick={() => navigate("/about")}>
-                  View FAQ
-                </Button>
-              </CardContent>
-            </Card>
-          </section>
         </div>
       </div>
     </>

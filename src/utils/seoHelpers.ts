@@ -136,7 +136,7 @@ export const generatePersonSchema = () => {
       "name": "SmartyGym",
       "url": "https://smartygym.com"
     },
-    "url": "https://smartygym.com/about",
+    "url": "https://smartygym.com",
     "image": "https://smartygym.com/haris-falas-coach.png",
     "address": {
       "@type": "PostalAddress",
