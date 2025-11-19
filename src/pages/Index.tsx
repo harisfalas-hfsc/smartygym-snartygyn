@@ -425,13 +425,13 @@ const Index = () => {
                 <div className="p-8 sm:p-10 md:p-12 space-y-4">
                   
                   {/* Top Section: Title */}
-                  <div className="text-center space-y-2">
-                    <h1
-                      className="text-4xl sm:text-5xl md:text-6xl font-black bg-gradient-to-r from-primary via-amber-400 to-primary bg-clip-text text-transparent"
-                      itemProp="name"
-                    >
-                      Welcome to SmartyGym
-                    </h1>
+            <div className="text-center space-y-2 mb-6">
+              <h1
+                className="text-3xl sm:text-4xl md:text-5xl font-black text-foreground"
+                itemProp="name"
+              >
+                Welcome to <span className="text-primary">SmartyGym</span>
+              </h1>
                     <p 
                       className="text-lg sm:text-xl text-muted-foreground font-medium"
                       itemProp="slogan"
