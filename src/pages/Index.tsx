@@ -728,14 +728,6 @@ const Index = () => {
                       </div>
 
                       <div className="flex items-start gap-3">
-                        <GraduationCap className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
-                        <div>
-                          <p className="font-semibold text-sm text-foreground">Expert Coach Guidance</p>
-                          <p className="text-xs text-muted-foreground">Connect with Sports Scientist Haris Falas - real human expertise, not AI-generated advice</p>
-                        </div>
-                      </div>
-
-                      <div className="flex items-start gap-3">
                         <Wrench className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
                         <div>
                           <p className="font-semibold text-sm text-foreground">Smart Tools</p>
@@ -748,6 +740,14 @@ const Index = () => {
                         <div>
                           <p className="font-semibold text-sm text-foreground">Exercise Library</p>
                           <p className="text-xs text-muted-foreground">Comprehensive video guide</p>
+                        </div>
+                      </div>
+
+                      <div className="flex items-start gap-3">
+                        <GraduationCap className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
+                        <div>
+                          <p className="font-semibold text-sm text-foreground">Expert Coach Guidance</p>
+                          <p className="text-xs text-muted-foreground">Connect with Sports Scientist Haris Falas - real human expertise, not AI-generated advice</p>
                         </div>
                       </div>
 
