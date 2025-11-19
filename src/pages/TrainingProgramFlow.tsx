@@ -25,8 +25,7 @@ const TrainingProgramFlow = () => {
       description: "Structured program to build cardiovascular fitness",
       icon: Heart,
       level: "Beginner-Advanced",
-      equipment: "Equipment/No Equipment",
-      featured: true,
+      equipment: "Equipment/No Equipment"
     },
     {
       id: "functional-strength",
@@ -42,8 +41,7 @@ const TrainingProgramFlow = () => {
       description: "Structured program focused on muscle growth",
       icon: Activity,
       level: "Beginner-Advanced",
-      equipment: "Equipment/No Equipment",
-      featured: true,
+      equipment: "Equipment/No Equipment"
     },
     {
       id: "weight-loss",
@@ -125,7 +123,7 @@ const TrainingProgramFlow = () => {
                   itemScope
                   itemType="https://schema.org/Course"
                   onClick={() => handleProgramSelect(program.id)}
-                  className={`group p-6 cursor-pointer transition-all duration-500 ease-out transform-gpu hover:scale-110 hover:-translate-y-3 hover:shadow-2xl hover:shadow-primary/40 hover:border-primary/60 bg-card border-2 border-border ${program.featured ? 'animate-[pulse_3s_ease-in-out_infinite]' : ''}`}
+                  className="group p-6 cursor-pointer transition-all duration-500 ease-out transform-gpu hover:scale-110 hover:-translate-y-3 hover:shadow-2xl hover:shadow-primary/40 hover:border-primary/60 bg-card border-2 border-border"
                   role="button"
                   aria-label={`${program.title} training program - Online gym program at Smarty Gym Cyprus - smartygym.com by Haris Falas`}
                   data-program-category={program.id}
