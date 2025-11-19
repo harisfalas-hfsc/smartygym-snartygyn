@@ -342,7 +342,7 @@ export default function PremiumBenefits() {
                           </tr>
                         );
                       })}
-                      <tr className="bg-gradient-to-b from-[hsl(var(--primary)/0.1)] to-[hsl(var(--primary)/0.05)] border-t-2 border-[hsl(var(--primary)/0.4)]">
+                      <tr className="bg-gradient-to-b from-[hsl(var(--primary)/0.1)] to-[hsl(var(--primary)/0.05)]">
                         <td className="p-6"></td>
                         <td className="p-6 text-center">
                           <Button 
@@ -419,9 +419,7 @@ export default function PremiumBenefits() {
                     </div>
                     <p className="text-sm text-muted-foreground mb-4">per year</p>
                     
-                    <div className="my-4 border-t border-border"></div>
-                    
-                    <p className="text-sm text-muted-foreground mb-2">Annual Plan (Save 25%)</p>
+                    <p className="text-sm text-muted-foreground mb-2 mt-4">Annual Plan (Save 25%)</p>
                     <div className="text-4xl font-bold text-primary mb-2">
                       €89.99
                     </div>

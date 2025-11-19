@@ -310,7 +310,7 @@ const PremiumComparison = () => {
                         </tr>
                       );
                     })}
-                    <tr className="bg-gradient-to-b from-[hsl(var(--primary)/0.1)] to-[hsl(var(--primary)/0.05)] border-t-2 border-[hsl(var(--primary)/0.4)]">
+                    <tr className="bg-gradient-to-b from-[hsl(var(--primary)/0.1)] to-[hsl(var(--primary)/0.05)]">
                       <td className="p-6"></td>
                       <td className="p-6 text-center">
                         <Button 
