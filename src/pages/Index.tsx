@@ -5,7 +5,7 @@ import { ServiceCard } from "@/components/ServiceCard";
 import { Button } from "@/components/ui/button";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Dumbbell, Calendar, BookOpen, Calculator, Activity, Flame, Instagram, Facebook, Youtube, UserCheck, Wrench, Video, FileText, Smartphone, Users, Target, Heart, Zap, Plane, GraduationCap, Check, Crown, ChevronDown, ChevronRight, Move } from "lucide-react";
+import { Dumbbell, Calendar, BookOpen, Calculator, Activity, Flame, Instagram, Facebook, Youtube, UserCheck, Wrench, Video, FileText, Smartphone, Users, Target, Heart, Zap, Plane, GraduationCap, Check, Crown, ChevronDown, ChevronRight, Move, Ban, Brain, CheckCircle2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { User as SupabaseUser } from "@supabase/supabase-js";
 import { useToast } from "@/hooks/use-toast";
@@ -720,6 +720,95 @@ const Index = () => {
           </div>
                         </div>
                       </div>
+                    </Card>
+                  </div>
+
+                  {/* 100% Human. 0% AI Section */}
+                  <div className="pt-6">
+                    <Card className="border-2 border-primary bg-gradient-to-br from-primary/5 to-accent/10 overflow-hidden relative">
+                      <div className="absolute top-0 right-0 w-32 h-32 bg-primary/10 rounded-full -mr-16 -mt-16" aria-hidden="true"></div>
+                      <div className="absolute bottom-0 left-0 w-24 h-24 bg-accent/20 rounded-full -ml-12 -mb-12" aria-hidden="true"></div>
+                      
+                      <CardContent className="p-8 md:p-12 relative">
+                        <div className="flex items-center justify-center gap-3 mb-6">
+                          <div className="w-16 h-16 rounded-full bg-primary/20 flex items-center justify-center">
+                            <UserCheck className="w-8 h-8 text-primary" />
+                          </div>
+                          <Ban className="w-12 h-12 text-destructive" />
+                          <div className="w-16 h-16 rounded-full bg-destructive/10 flex items-center justify-center">
+                            <Brain className="w-8 h-8 text-destructive" />
+                          </div>
+                        </div>
+                        
+                        <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-4 sm:mb-6 text-center">
+                          100% Human. 0% AI.
+                        </h2>
+                        
+                        <div className="max-w-3xl mx-auto space-y-4 text-center mb-8">
+                          <p className="text-lg font-semibold text-foreground">
+                            SmartyGym workouts and programs are built to fit YOUR life.
+                          </p>
+                          <p className="text-base leading-relaxed text-muted-foreground">
+                            That's why they work — safe and efficient design by <a href="/coach-profile" className="text-primary hover:underline font-medium"><strong>Haris Falas</strong></a>, crafted by hand with care to deliver effective results at <strong>smartygym.com</strong>, <strong className="text-foreground">NOT by AI</strong>.
+                          </p>
+                          <div className="bg-background/80 backdrop-blur-sm p-6 rounded-lg border-2 border-primary/30 mt-6">
+                            <p className="text-lg font-bold text-primary mb-2">
+                              Every workout and training program is science-based and personally created by <a href="/coach-profile" className="text-primary hover:underline font-medium">Haris Falas</a>.
+                            </p>
+                            <p className="text-base text-muted-foreground">
+                              Never by AI. Never by algorithms. Always by a real human expert who understands YOUR needs. Training designed by humans, for humans.
+                            </p>
+                          </div>
+                        </div>
+
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 max-w-3xl mx-auto">
+                          <article 
+                            className="flex items-start gap-3 p-4 bg-background/50 rounded-lg border border-primary/20"
+                            itemScope
+                            itemType="https://schema.org/Thing"
+                            data-feature="smarty-gym-expertise"
+                            data-keywords="smarty gym, online gym, online fitness, smartygym.com, Haris Falas Cyprus, sports scientist"
+                            role="article"
+                            aria-label="Real expertise - SmartyGym Cyprus online fitness - smartygym.com by Haris Falas"
+                          >
+                            <CheckCircle2 className="w-5 h-5 text-primary flex-shrink-0 mt-1" aria-hidden="true" />
+                            <div>
+                              <p className="font-semibold text-sm mb-1" itemProp="name">Real Expertise</p>
+                              <p className="text-xs text-muted-foreground" itemProp="description">Sports science degree & years of coaching</p>
+                            </div>
+                          </article>
+                          <article 
+                            className="flex items-start gap-3 p-4 bg-background/50 rounded-lg border border-primary/20"
+                            itemScope
+                            itemType="https://schema.org/Thing"
+                            data-feature="smarty-gym-personal-touch"
+                            data-keywords="online personal training Cyprus, smartygym, Haris Falas, online fitness, real coaching"
+                            role="article"
+                            aria-label="Personal touch - SmartyGym Cyprus online training - smartygym.com with real client feedback"
+                          >
+                            <CheckCircle2 className="w-5 h-5 text-primary flex-shrink-0 mt-1" aria-hidden="true" />
+                            <div>
+                              <p className="font-semibold text-sm mb-1" itemProp="name">Personal Touch</p>
+                              <p className="text-xs text-muted-foreground" itemProp="description">Every program refined through real client feedback</p>
+                            </div>
+                          </article>
+                          <article 
+                            className="flex items-start gap-3 p-4 bg-background/50 rounded-lg border border-primary/20"
+                            itemScope
+                            itemType="https://schema.org/Thing"
+                            data-feature="smarty-gym-no-ai"
+                            data-keywords="human-designed workouts, no AI fitness, smartygym.com, online gym Cyprus, real coaching"
+                            role="article"
+                            aria-label="Not a robot - SmartyGym Cyprus online gym - human-designed at smartygym.com"
+                          >
+                            <CheckCircle2 className="w-5 h-5 text-primary flex-shrink-0 mt-1" aria-hidden="true" />
+                            <div>
+                              <p className="font-semibold text-sm mb-1" itemProp="name">Not a Robot</p>
+                              <p className="text-xs text-muted-foreground" itemProp="description">Human-designed workouts backed by science, not AI</p>
+                            </div>
+                          </article>
+                        </div>
+                      </CardContent>
                     </Card>
                   </div>
 
