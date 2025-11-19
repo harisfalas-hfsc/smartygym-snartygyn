@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Helmet } from "react-helmet";
@@ -11,10 +11,36 @@ import { MinimalDisclosure } from "@/components/shop/MinimalDisclosure";
 import { ContentLoadingSkeleton } from "@/components/ContentLoadingSkeleton";
 import { CompactFilters } from "@/components/CompactFilters";
 import { ShoppingBag } from "lucide-react";
+import { toast } from "sonner";
 
 const Shop = () => {
   const [sortBy, setSortBy] = useState<string>("featured");
   const [categoryFilter, setCategoryFilter] = useState<string>("all");
+
+  // Handle redirect after authentication
+  useEffect(() => {
+    const checkPendingPurchase = async () => {
+      const pendingPurchase = sessionStorage.getItem('pendingPurchase');
+      if (pendingPurchase) {
+        const { data: { session } } = await supabase.auth.getSession();
+        if (session) {
+          const purchaseData = JSON.parse(pendingPurchase);
+          sessionStorage.removeItem('pendingPurchase');
+          toast.success("Welcome! You can now complete your purchase", {
+            description: `Continue with ${purchaseData.productTitle}`,
+          });
+          // Scroll to the product if we're on the shop page
+          setTimeout(() => {
+            const productElement = document.querySelector(`[data-product-id="${purchaseData.productId}"]`);
+            if (productElement) {
+              productElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
+          }, 500);
+        }
+      }
+    };
+    checkPendingPurchase();
+  }, []);
 
   const { data: products, isLoading } = useQuery({
     queryKey: ["shop-products", sortBy, categoryFilter],
@@ -126,7 +152,9 @@ const Shop = () => {
         ) : products && products.length > 0 ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {products.map((product) => (
-              <ProductCard key={product.id} product={product} />
+              <div key={product.id} data-product-id={product.id}>
+                <ProductCard product={product} />
+              </div>
             ))}
           </div>
         ) : (

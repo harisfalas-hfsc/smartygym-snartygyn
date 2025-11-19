@@ -35,8 +35,17 @@ export const ProductCard = ({ product }: ProductCardProps) => {
       // Check if user is logged in
       const { data: { session } } = await supabase.auth.getSession();
       if (!session) {
-        toast.error("Please log in to purchase");
-        navigate("/auth");
+        toast.info("Create a free account to complete your purchase", {
+          description: "You'll be redirected to sign up, then back to complete your order",
+          duration: 4000,
+        });
+        // Store the product info in session storage to redirect back after auth
+        sessionStorage.setItem('pendingPurchase', JSON.stringify({
+          productId: product.id,
+          productTitle: product.title,
+          returnUrl: window.location.pathname
+        }));
+        navigate("/auth?redirect=shop");
         return;
       }
 
