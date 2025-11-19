@@ -52,6 +52,11 @@ export const MobilePhoneIllustration = ({ imageUrl, className, variant = 'phone'
           )}
         </div>
         
+        {/* Home button indicator - ONLY FOR TABLET */}
+        {variant === 'tablet' && (
+          <div className="absolute bottom-3 left-1/2 -translate-x-1/2 w-3 h-3 bg-foreground rounded-full" />
+        )}
+        
         {/* Home button indicator - ONLY FOR PHONE */}
         {variant === 'phone' && (
           <div className="absolute bottom-2 left-1/2 -translate-x-1/2 w-1/3 h-1 bg-foreground/30 rounded-full" />
