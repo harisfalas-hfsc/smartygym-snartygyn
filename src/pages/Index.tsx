@@ -41,7 +41,6 @@ const Index = () => {
   const [user, setUser] = useState<SupabaseUser | null>(null);
   const { userTier } = useAccessControl();
   const isPremium = userTier === "premium";
-  const [isGetStartedOpen, setIsGetStartedOpen] = useState(false);
 
   const heroCards = [
     { 
@@ -423,11 +422,11 @@ const Index = () => {
                 data-keywords="smarty gym, online gym, online fitness, smartygym.com, Haris Falas Cyprus, online gym Cyprus"
                 aria-label="Smarty Gym Cyprus - Your online gym and fitness platform - smartygym.com"
               >
-                <div className="p-8 sm:p-10 md:p-12 space-y-8">
+                <div className="p-8 sm:p-10 md:p-12 space-y-4">
                   
-                  {/* Top Section: Title + GET STARTED Button */}
-                  <div className="text-center space-y-4">
-                    <h1 
+                  {/* Top Section: Title */}
+                  <div className="text-center space-y-2">
+                    <h1
                       className="text-4xl sm:text-5xl md:text-6xl font-black bg-gradient-to-r from-primary via-amber-400 to-primary bg-clip-text text-transparent"
                       itemProp="name"
                     >
@@ -442,159 +441,6 @@ const Index = () => {
                     <meta itemProp="url" content="https://smartygym.com" />
                     <meta itemProp="description" content="Smarty Gym Cyprus - #1 online gym and fitness platform by Haris Falas - smartygym.com" />
                     <meta itemProp="foundingLocation" content="Cyprus" />
-                    
-                    <Dialog open={isGetStartedOpen} onOpenChange={setIsGetStartedOpen}>
-                      <DialogTrigger asChild>
-                        <Button 
-                          size="lg" 
-                          className="bg-primary hover:bg-primary/90 text-primary-foreground px-8 py-6 text-lg font-bold rounded-full shadow-lg hover:shadow-xl transition-all"
-                        >
-                          GET STARTED
-                          <ChevronDown className="ml-2 h-5 w-5" />
-                        </Button>
-                      </DialogTrigger>
-                      <DialogContent className="sm:max-w-[1100px]">
-                        <DialogHeader>
-                          <DialogTitle className="text-2xl font-bold text-center">
-                            Explore SmartyGym Services
-                          </DialogTitle>
-                          <DialogDescription className="text-center">
-                            Choose where you want to start your fitness journey
-                          </DialogDescription>
-                        </DialogHeader>
-                        
-                        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 py-4">
-                          
-                          {/* Workouts Card */}
-                          <Card 
-                            className="h-full border-2 border-primary/30 hover:border-primary hover:shadow-lg transition-all cursor-pointer group"
-                            onClick={() => {
-                              navigate("/workout");
-                              setIsGetStartedOpen(false);
-                            }}
-                          >
-                <CardContent className="h-full p-4 flex flex-col gap-2">
-                  <div className="inline-flex items-center justify-center w-10 h-10 rounded-full bg-primary/10 group-hover:bg-primary/20 transition-all">
-                    <Dumbbell className="w-5 h-5 text-primary" />
-                  </div>
-                  <div>
-                    <h3 className="text-base font-bold text-foreground">500+ Expert Workouts</h3>
-                    <p className="text-xs text-muted-foreground">
-                      Pick your daily session: Strength, Cardio, Fat Burn, or whatever fits your mood
-                    </p>
-                  </div>
-                </CardContent>
-                          </Card>
-
-                          {/* Training Programs Card */}
-                          <Card 
-                            className="h-full border-2 border-primary/30 hover:border-primary hover:shadow-lg transition-all cursor-pointer group"
-                            onClick={() => {
-                              navigate("/trainingprogram");
-                              setIsGetStartedOpen(false);
-                            }}
-                          >
-                            <CardContent className="h-full p-4 flex flex-col gap-2">
-                              <div className="inline-flex items-center justify-center w-10 h-10 rounded-full bg-primary/10 group-hover:bg-primary/20 transition-all">
-                                <Calendar className="w-5 h-5 text-primary" />
-                              </div>
-                              <div>
-                                <h3 className="text-base font-bold text-foreground">Training Programs</h3>
-                                <p className="text-xs text-muted-foreground">
-                                  Structured expert training programs to achieve your long-term goals
-                                </p>
-                              </div>
-                            </CardContent>
-                          </Card>
-
-                          {/* Smart Tools Card */}
-                          <Card 
-                            className="h-full border-2 border-primary/30 hover:border-primary hover:shadow-lg transition-all cursor-pointer group"
-                            onClick={() => {
-                              navigate("/tools");
-                              setIsGetStartedOpen(false);
-                            }}
-                          >
-                            <CardContent className="h-full p-4 flex flex-col gap-2">
-                              <div className="inline-flex items-center justify-center w-10 h-10 rounded-full bg-primary/10 group-hover:bg-primary/20 transition-all">
-                                <Calculator className="w-5 h-5 text-primary" />
-                              </div>
-                              <div>
-                                <h3 className="text-base font-bold text-foreground">Smart Tools</h3>
-                                <p className="text-xs text-muted-foreground">
-                                  BMR, Macro, 1RM calculators and training timers to optimize your workouts
-                                </p>
-                              </div>
-                            </CardContent>
-                          </Card>
-
-                          {/* Exercise Library Card */}
-                          <Card 
-                            className="h-full border-2 border-primary/30 hover:border-primary hover:shadow-lg transition-all cursor-pointer group"
-                            onClick={() => {
-                              navigate("/exerciselibrary");
-                              setIsGetStartedOpen(false);
-                            }}
-                          >
-                            <CardContent className="h-full p-4 flex flex-col gap-2">
-                              <div className="inline-flex items-center justify-center w-10 h-10 rounded-full bg-primary/10 group-hover:bg-primary/20 transition-all">
-                                <Video className="w-5 h-5 text-primary" />
-                              </div>
-                              <div>
-                                <h3 className="text-base font-bold text-foreground">Exercise Library</h3>
-                                <p className="text-xs text-muted-foreground">
-                                  Comprehensive video guide with proper form demonstrations for every exercise
-                                </p>
-                              </div>
-                            </CardContent>
-                          </Card>
-
-                          {/* Blog & Expert Articles Card */}
-                          <Card 
-                            className="h-full border-2 border-primary/30 hover:border-primary hover:shadow-lg transition-all cursor-pointer group"
-                            onClick={() => {
-                              navigate("/blog");
-                              setIsGetStartedOpen(false);
-                            }}
-                          >
-                            <CardContent className="h-full p-4 flex flex-col gap-2">
-                              <div className="inline-flex items-center justify-center w-10 h-10 rounded-full bg-primary/10 group-hover:bg-primary/20 transition-all">
-                                <FileText className="w-5 h-5 text-primary" />
-                              </div>
-                              <div>
-                                <h3 className="text-base font-bold text-foreground">Blog & Expert Articles</h3>
-                                <p className="text-xs text-muted-foreground">
-                                  Read expert tips, training guides, and fitness insights
-                                </p>
-                              </div>
-                            </CardContent>
-                          </Card>
-
-                          {/* Expert Coach Guidance Card */}
-                          <Card 
-                            className="h-full border-2 border-primary/30 hover:border-primary hover:shadow-lg transition-all cursor-pointer group"
-                            onClick={() => {
-                              navigate("/contact");
-                              setIsGetStartedOpen(false);
-                            }}
-                          >
-                            <CardContent className="h-full p-4 flex flex-col gap-2">
-                              <div className="inline-flex items-center justify-center w-10 h-10 rounded-full bg-primary/10 group-hover:bg-primary/20 transition-all">
-                                <GraduationCap className="w-5 h-5 text-primary" />
-                              </div>
-                              <div>
-                                <h3 className="text-base font-bold text-foreground">Expert Coach Guidance</h3>
-                                <p className="text-xs text-muted-foreground">
-                                  Connect with Sports Scientist Haris Falas - real human expertise, not AI-generated advice
-                                </p>
-                              </div>
-                            </CardContent>
-                          </Card>
-
-
-                        </div>
-                      </DialogContent>
-                    </Dialog>
                   </div>
 
                   {/* Middle Section: Phone (Left) + Three Cards (Right) */}
@@ -614,12 +460,12 @@ const Index = () => {
                   return (
                     <Card
                       key={card.id}
-                      className="border-2 border-primary/30 hover:border-primary hover:shadow-md transition-all cursor-pointer group flex items-center justify-center"
+                      className="border-2 border-primary/30 hover:border-primary hover:shadow-lg hover:scale-105 transition-all duration-300 cursor-pointer group flex items-center justify-center hover:bg-primary/5"
                       onClick={() => navigate(card.route)}
                     >
                       <div className="flex flex-col items-center justify-center gap-1 p-2">
-                        <div className="inline-flex items-center justify-center w-8 h-8 rounded-full bg-primary/10 group-hover:bg-primary/20 transition-all">
-                          <Icon className="w-4 h-4 text-primary" />
+                        <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-primary/10 group-hover:bg-primary/30 group-hover:scale-110 transition-all duration-300">
+                          <Icon className="w-6 h-6 text-primary" />
                         </div>
                         <h3 className="text-xs font-bold text-center leading-tight">
                           {card.title}
@@ -637,7 +483,7 @@ const Index = () => {
                     <div className="order-2 lg:order-2 flex flex-col justify-between gap-2 h-full max-h-[480px]">
                       
                        {/* Card 1: Your Gym in Your Pocket */}
-                      <Card className="flex-1 border-2 border-primary/30 hover:border-primary hover:shadow-lg transition-all cursor-pointer group">
+                      <Card className="flex-1 border-2 border-primary/30 hover:border-primary hover:shadow-lg transition-all cursor-pointer group bg-primary/5">
                 <CardContent className="h-full p-5 flex items-center gap-4">
                           <div className="inline-flex items-center justify-center w-10 h-10 rounded-full bg-primary/10 group-hover:bg-primary/20 transition-all flex-shrink-0">
                             <Smartphone className="w-5 h-5 text-primary" />
@@ -652,7 +498,7 @@ const Index = () => {
                       </Card>
 
                       {/* Card 2: 100% Human */}
-                      <Card className="flex-1 border-2 border-primary/30 hover:border-primary hover:shadow-lg transition-all cursor-pointer group">
+                      <Card className="flex-1 border-2 border-primary/30 hover:border-primary hover:shadow-lg transition-all cursor-pointer group bg-primary/5">
                 <CardContent className="h-full p-5 flex items-center gap-4">
                           <div className="inline-flex items-center justify-center w-10 h-10 rounded-full bg-primary/10 group-hover:bg-primary/20 transition-all flex-shrink-0">
                             <UserCheck className="w-5 h-5 text-primary" />
@@ -669,7 +515,7 @@ const Index = () => {
                       </Card>
 
                       {/* Card 3: Train Anywhere */}
-                      <Card className="flex-1 border-2 border-primary/30 hover:border-primary hover:shadow-lg transition-all cursor-pointer group">
+                      <Card className="flex-1 border-2 border-primary/30 hover:border-primary hover:shadow-lg transition-all cursor-pointer group bg-primary/5">
                         <CardContent className="h-full p-5 flex items-center gap-4">
                           <div className="inline-flex items-center justify-center w-10 h-10 rounded-full bg-primary/10 group-hover:bg-primary/20 transition-all flex-shrink-0">
                             <Plane className="w-5 h-5 text-primary" />
@@ -690,7 +536,7 @@ const Index = () => {
 
 
                   {/* Who Is Smarty Gym For? Section */}
-                  <div className="pt-3">
+                  <div className="pt-1">
                     <Card className="border border-primary/30 bg-background/80">
                       <div className="p-6 sm:p-8 space-y-4">
                         <h2 className="text-xl sm:text-2xl font-bold text-center text-foreground">
