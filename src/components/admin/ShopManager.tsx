@@ -28,7 +28,7 @@ export const ShopManager = () => {
   const [formData, setFormData] = useState({
     title: "",
     description: "",
-    category: "Resistance Bands",
+    category: "General Equipment", // Hidden default value
     amazon_url: "",
     image_url: "",
     price_range: "",
@@ -105,7 +105,7 @@ export const ShopManager = () => {
     setFormData({
       title: "",
       description: "",
-      category: "Resistance Bands",
+      category: "General Equipment", // Hidden default value
       amazon_url: "",
       image_url: "",
       price_range: "",
@@ -120,7 +120,7 @@ export const ShopManager = () => {
     setFormData({
       title: product.title,
       description: product.description,
-      category: product.category,
+      category: product.category || "General Equipment", // Preserve existing or use default
       amazon_url: product.amazon_url,
       image_url: product.image_url,
       price_range: product.price_range,
@@ -129,6 +129,11 @@ export const ShopManager = () => {
     });
     setEditingId(product.id);
     setIsCreating(true);
+    
+    // Scroll to form at the top
+    setTimeout(() => {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }, 100);
   };
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -140,14 +145,6 @@ export const ShopManager = () => {
     }
   };
 
-  const categories = [
-    "Resistance Bands",
-    "Dumbbells & Weights",
-    "Yoga & Mobility",
-    "Cardio Equipment",
-    "Recovery Tools",
-    "Apparel & Accessories",
-  ];
 
   return (
     <div className="space-y-6">
@@ -193,36 +190,15 @@ export const ShopManager = () => {
                 />
               </div>
 
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <Label htmlFor="category">Category</Label>
-                  <Select
-                    value={formData.category}
-                    onValueChange={(value) => setFormData({ ...formData, category: value })}
-                  >
-                    <SelectTrigger>
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {categories.map((cat) => (
-                        <SelectItem key={cat} value={cat}>
-                          {cat}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-
-                <div>
-                  <Label htmlFor="price_range">Price Range</Label>
-                  <Input
-                    id="price_range"
-                    placeholder="e.g., $20-$30"
-                    value={formData.price_range}
-                    onChange={(e) => setFormData({ ...formData, price_range: e.target.value })}
-                    required
-                  />
-                </div>
+              <div>
+                <Label htmlFor="price_range">Price Range</Label>
+                <Input
+                  id="price_range"
+                  placeholder="e.g., $20-$30"
+                  value={formData.price_range}
+                  onChange={(e) => setFormData({ ...formData, price_range: e.target.value })}
+                  required
+                />
               </div>
 
               <div>
