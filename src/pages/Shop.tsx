@@ -1,47 +1,29 @@
-import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Helmet } from "react-helmet";
 import { SEOEnhancer } from "@/components/SEOEnhancer";
 import { PageTitleCard } from "@/components/PageTitleCard";
 import { PageBreadcrumbs } from "@/components/PageBreadcrumbs";
-import { CategoryFilter } from "@/components/shop/CategoryFilter";
 import { ProductCard } from "@/components/shop/ProductCard";
-import { AffiliateDisclosure } from "@/components/shop/AffiliateDisclosure";
+import { PersonalRecommendation } from "@/components/shop/PersonalRecommendation";
+import { MinimalDisclosure } from "@/components/shop/MinimalDisclosure";
 import { ContentLoadingSkeleton } from "@/components/ContentLoadingSkeleton";
 import { ShoppingBag } from "lucide-react";
 
 const Shop = () => {
-  const [selectedCategory, setSelectedCategory] = useState<string>("all");
-
   const { data: products, isLoading } = useQuery({
-    queryKey: ["shop-products", selectedCategory],
+    queryKey: ["shop-products"],
     queryFn: async () => {
-      let query = supabase
+      const { data, error } = await supabase
         .from("shop_products")
         .select("*")
         .order("is_featured", { ascending: false })
         .order("display_order", { ascending: true });
-
-      if (selectedCategory !== "all") {
-        query = query.eq("category", selectedCategory);
-      }
-
-      const { data, error } = await query;
+      
       if (error) throw error;
       return data;
     },
   });
-
-  const categories = [
-    { value: "all", label: "All Products" },
-    { value: "Resistance Bands", label: "Resistance Bands" },
-    { value: "Dumbbells & Weights", label: "Dumbbells & Weights" },
-    { value: "Yoga & Mobility", label: "Yoga & Mobility" },
-    { value: "Cardio Equipment", label: "Cardio Equipment" },
-    { value: "Recovery Tools", label: "Recovery Tools" },
-    { value: "Apparel & Accessories", label: "Apparel & Accessories" },
-  ];
 
   return (
     <>
@@ -69,16 +51,10 @@ const Shop = () => {
         <PageTitleCard
           icon={ShoppingBag}
           title="Recommended Fitness Gear"
-          subtitle="Hand-picked equipment I use and trust"
+          subtitle="Equipment I personally use and recommend"
         />
 
-        <AffiliateDisclosure />
-
-        <CategoryFilter
-          categories={categories}
-          selectedCategory={selectedCategory}
-          onCategoryChange={setSelectedCategory}
-        />
+        <PersonalRecommendation />
 
         {isLoading ? (
           <ContentLoadingSkeleton />
@@ -91,10 +67,12 @@ const Shop = () => {
         ) : (
           <div className="text-center py-12">
             <p className="text-muted-foreground">
-              No products found in this category.
+              No products found.
             </p>
           </div>
         )}
+
+        <MinimalDisclosure />
       </main>
     </>
   );
