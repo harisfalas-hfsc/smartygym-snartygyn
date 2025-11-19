@@ -20,7 +20,7 @@ export const ProductCard = ({ product }: ProductCardProps) => {
   return (
     <Card className="h-full flex flex-col hover:shadow-lg transition-all duration-300 hover:scale-[1.01] group">
       <CardHeader className="p-0">
-        <div className="relative overflow-hidden rounded-t-lg">
+        <div className="relative overflow-hidden rounded-t-lg h-48 bg-muted">
           {product.is_featured && (
             <Badge className="absolute top-2 left-2 z-10 bg-primary/90 backdrop-blur-sm">
               <Star className="w-3 h-3 mr-1" />
@@ -32,6 +32,10 @@ export const ProductCard = ({ product }: ProductCardProps) => {
             alt={product.title}
             className="w-full h-48 object-cover transition-transform duration-300 group-hover:scale-105"
             loading="lazy"
+            onError={(e) => {
+              e.currentTarget.src = '/placeholder.svg';
+              e.currentTarget.classList.add('opacity-50');
+            }}
           />
         </div>
       </CardHeader>
@@ -52,21 +56,17 @@ export const ProductCard = ({ product }: ProductCardProps) => {
       </CardContent>
 
       <CardFooter className="p-4 pt-0">
-        <Button
-          asChild
+        <a
+          href={product.amazon_url}
+          target="_blank"
+          rel="noopener noreferrer sponsored"
           className="w-full"
-          size="sm"
         >
-          <a
-            href={product.amazon_url}
-            target="_blank"
-            rel="noopener noreferrer sponsored"
-            className="flex items-center justify-center gap-2"
-          >
+          <Button className="w-full" size="sm">
             View on Amazon
             <ExternalLink className="w-3.5 h-3.5" />
-          </a>
-        </Button>
+          </Button>
+        </a>
       </CardFooter>
     </Card>
   );
