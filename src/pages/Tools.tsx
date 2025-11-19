@@ -106,11 +106,11 @@ const Tools = () => {
               <Card
                 key={tool.id}
                 onClick={() => navigate(tool.route)}
-                className="p-6 cursor-pointer transition-all duration-300 hover:scale-105 hover:shadow-gold bg-card border-border"
+                className="group p-6 cursor-pointer transition-all duration-500 ease-out transform-gpu hover:scale-110 hover:-translate-y-3 hover:shadow-2xl hover:shadow-primary/40 hover:border-primary/60 bg-card border-2 border-border"
               >
                 <div className="flex flex-col items-center text-center space-y-4">
-                  <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center">
-                    <Icon className="w-8 h-8 text-primary" />
+                  <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center transition-transform duration-300 group-hover:scale-110">
+                    <Icon className="w-8 h-8 text-primary transition-transform duration-300 group-hover:rotate-3" />
                   </div>
                   <div>
                     <h3 className="font-semibold text-lg mb-2">{tool.title}</h3>
