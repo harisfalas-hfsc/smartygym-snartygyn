@@ -396,7 +396,7 @@ const Index = () => {
         
         
         {/* Hero Section */}
-        <section className="relative py-8 sm:py-12 px-4 border-b border-border bg-background overflow-hidden">
+        <section className="relative py-8 sm:py-12 border-b border-border bg-background overflow-hidden">
           
           <div className="container mx-auto max-w-6xl px-4 relative z-10 overflow-x-hidden">
             <ScrollReveal>
@@ -440,7 +440,7 @@ const Index = () => {
               className="h-full max-h-[480px] w-auto"
             >
               {/* 3 rows × 2 columns grid of "Get Started" cards */}
-              <div className="grid grid-rows-3 grid-cols-2 gap-2 h-full w-full p-2">
+              <div className="grid grid-rows-3 grid-cols-2 gap-1.5 sm:gap-2 h-full w-full p-1.5 sm:p-2">
                 {heroCards.map((card) => {
                   const Icon = card.icon;
                   return (
@@ -450,8 +450,8 @@ const Index = () => {
                       onClick={() => navigate(card.route)}
                     >
                       <div className="flex flex-col items-center justify-center gap-1 p-2">
-                        <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-primary/10 group-hover:bg-primary/30 group-hover:scale-110 transition-all duration-300">
-                          <Icon className="w-6 h-6 text-primary" />
+                        <div className="inline-flex items-center justify-center w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-primary/10 group-hover:bg-primary/30 group-hover:scale-110 transition-all duration-300">
+                          <Icon className="w-5 h-5 sm:w-6 sm:h-6 text-primary" />
                         </div>
                         <h3 className="text-xs font-bold text-center leading-tight">
                           {card.title}
@@ -528,7 +528,7 @@ const Index = () => {
                         <h2 className="text-xl sm:text-2xl font-bold text-center text-foreground">
                           Who Is Smarty Gym For?
                         </h2>
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-4 text-sm sm:text-base">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 text-sm sm:text-base">
                           <div className="flex items-start gap-2 sm:gap-3">
                             <Users className="w-4 h-4 sm:w-5 sm:h-5 text-primary flex-shrink-0 mt-1" />
                             <p className="text-muted-foreground">
@@ -705,7 +705,7 @@ const Index = () => {
             </CardContent>
           </Card>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-8">
             <Card className="border-2 border-border text-center hover:shadow-lg transition-all hover:-translate-y-1">
               <CardHeader>
                 <div className="w-14 h-14 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-4">
@@ -924,7 +924,7 @@ const Index = () => {
         <section className="mb-12">
           <h2 className="text-2xl md:text-3xl font-semibold mb-6 text-center md:text-left">Frequently Asked Questions</h2>
           <Card>
-            <CardContent className="p-4">
+            <CardContent className="p-3 sm:p-4">
               <Accordion type="single" collapsible className="w-full">
             <AccordionItem value="item-1">
               <AccordionTrigger className="text-left">What is SmartyGym?</AccordionTrigger>
