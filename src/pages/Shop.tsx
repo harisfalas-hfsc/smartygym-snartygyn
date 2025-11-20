@@ -10,12 +10,15 @@ import { PersonalRecommendation } from "@/components/shop/PersonalRecommendation
 import { MinimalDisclosure } from "@/components/shop/MinimalDisclosure";
 import { ContentLoadingSkeleton } from "@/components/ContentLoadingSkeleton";
 import { CompactFilters } from "@/components/CompactFilters";
-import { ShoppingBag } from "lucide-react";
+import { ShoppingBag, ArrowLeft } from "lucide-react";
 import { toast } from "sonner";
+import { Button } from "@/components/ui/button";
+import { useShowBackButton } from "@/hooks/useShowBackButton";
 
 const Shop = () => {
   const [sortBy, setSortBy] = useState<string>("featured");
   const [categoryFilter, setCategoryFilter] = useState<string>("all");
+  const { canGoBack, goBack } = useShowBackButton();
 
   // Handle redirect after authentication
   useEffect(() => {
@@ -94,6 +97,18 @@ const Shop = () => {
       />
       
       <main className="container mx-auto px-4 py-6 max-w-7xl">
+        {canGoBack && (
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={goBack}
+            className="mb-4"
+          >
+            <ArrowLeft className="mr-2 h-4 w-4" />
+            Back
+          </Button>
+        )}
+        
         <PageBreadcrumbs 
           items={[
             { label: "Home", href: "/" },

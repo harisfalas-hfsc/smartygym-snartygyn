@@ -118,127 +118,78 @@ const CoachProfile = () => {
 
             {/* Main Content Card */}
             <Card className="p-6 sm:p-8 md:p-10 space-y-6 sm:space-y-8">
-              {/* Introduction */}
+              {/* Message from Haris Falas */}
               <section>
-                <p className="text-base sm:text-lg leading-relaxed text-muted-foreground">
-                  I've spent more than twenty years helping athletes, teams, and everyday people improve their performance, overcome injuries, lose fat, gain strength, and train with purpose. SmartyGym is the evolution of that journey — a complete online gym built on science, experience, and real coaching.
-                </p>
-              </section>
-
-              {/* My Background */}
-              <section>
-                <h3 className="text-xl sm:text-2xl font-semibold mb-4">My Background</h3>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-4">
-                  <div className="flex items-start gap-2">
-                    <Award className="w-5 h-5 sm:w-6 sm:h-6 text-primary shrink-0 mt-0.5" />
-                    <span className="text-sm sm:text-base">BSc in Sport Science</span>
-                  </div>
-                  <div className="flex items-start gap-2">
-                    <GraduationCap className="w-5 h-5 sm:w-6 sm:h-6 text-primary shrink-0 mt-0.5" />
-                    <span className="text-sm sm:text-base">MBA in Marketing</span>
-                  </div>
-                  <div className="flex items-start gap-2">
-                    <Award className="w-5 h-5 sm:w-6 sm:h-6 text-primary shrink-0 mt-0.5" />
-                    <span className="text-sm sm:text-base">Strength and Conditioning Coach since 2002</span>
-                  </div>
-                  <div className="flex items-start gap-2">
-                    <Award className="w-5 h-5 sm:w-6 sm:h-6 text-primary shrink-0 mt-0.5" />
-                    <span className="text-sm sm:text-base">EXOS Performance Specialist (Phases 1, 2, 3)</span>
-                  </div>
-                  <div className="flex items-start gap-2">
-                    <Award className="w-5 h-5 sm:w-6 sm:h-6 text-primary shrink-0 mt-0.5" />
-                    <span className="text-sm sm:text-base">EXOS Rehabilitation Specialist</span>
-                  </div>
-                  <div className="flex items-start gap-2">
-                    <Award className="w-5 h-5 sm:w-6 sm:h-6 text-primary shrink-0 mt-0.5" />
-                    <span className="text-sm sm:text-base">FMS Specialist</span>
-                  </div>
-                  <div className="flex items-start gap-2">
-                    <Award className="w-5 h-5 sm:w-6 sm:h-6 text-primary shrink-0 mt-0.5" />
-                    <span className="text-sm sm:text-base">ACE Medical Exercise Specialist</span>
-                  </div>
-                  <div className="flex items-start gap-2">
-                    <Award className="w-5 h-5 sm:w-6 sm:h-6 text-primary shrink-0 mt-0.5" />
-                    <span className="text-sm sm:text-base">AFPA Certification</span>
-                  </div>
-                  <div className="flex items-start gap-2">
-                    <Award className="w-5 h-5 sm:w-6 sm:h-6 text-primary shrink-0 mt-0.5" />
-                    <span className="text-sm sm:text-base">NSCA CSCS (ongoing)</span>
-                  </div>
-                </div>
-              </section>
-
-              {/* Professional Experience */}
-              <section>
-                <h3 className="text-xl sm:text-2xl font-semibold mb-4">Professional Experience</h3>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-4">
-                  <div className="flex items-start gap-2">
-                    <Building2 className="w-5 h-5 sm:w-6 sm:h-6 text-primary shrink-0 mt-0.5" />
-                    <span className="text-sm sm:text-base">HFSC Founder & Head Coach</span>
-                  </div>
-                  <div className="flex items-start gap-2">
-                    <Building2 className="w-5 h-5 sm:w-6 sm:h-6 text-primary shrink-0 mt-0.5" />
-                    <span className="text-sm sm:text-base">Olympiakos Nicosia</span>
-                  </div>
-                  <div className="flex items-start gap-2">
-                    <Building2 className="w-5 h-5 sm:w-6 sm:h-6 text-primary shrink-0 mt-0.5" />
-                    <span className="text-sm sm:text-base">Digenis FC</span>
-                  </div>
-                  <div className="flex items-start gap-2">
-                    <Building2 className="w-5 h-5 sm:w-6 sm:h-6 text-primary shrink-0 mt-0.5" />
-                    <span className="text-sm sm:text-base">APOEL FC</span>
-                  </div>
-                  <div className="flex items-start gap-2">
-                    <Building2 className="w-5 h-5 sm:w-6 sm:h-6 text-primary shrink-0 mt-0.5" />
-                    <span className="text-sm sm:text-base">Anorthosis</span>
-                  </div>
-                  <div className="flex items-start gap-2">
-                    <Building2 className="w-5 h-5 sm:w-6 sm:h-6 text-primary shrink-0 mt-0.5" />
-                    <span className="text-sm sm:text-base">AEL FC</span>
-                  </div>
-                  <div className="flex items-start gap-2">
-                    <Building2 className="w-5 h-5 sm:w-6 sm:h-6 text-primary shrink-0 mt-0.5" />
-                    <span className="text-sm sm:text-base">Athletes Evolution Exercise Evaluation</span>
-                  </div>
-                  <div className="flex items-start gap-2 md:col-span-2">
-                    <Building2 className="w-5 h-5 sm:w-6 sm:h-6 text-primary shrink-0 mt-0.5" />
-                    <span className="text-sm sm:text-base">Multiple teams, athletes, and hundreds of adults</span>
-                  </div>
-                </div>
-              </section>
-
-              {/* My Philosophy */}
-              <section>
-                <Card className="bg-primary/5 border-2 border-primary/20 p-4 sm:p-6">
-                  <h3 className="text-xl sm:text-2xl font-semibold mb-4">My Philosophy</h3>
-                  <div className="space-y-1 text-sm sm:text-base leading-relaxed">
-                    <p className="font-bold text-foreground">Performance comes in many forms</p>
-                    
-                    <div className="text-muted-foreground">
-                      <p>Whether is the strength to be a better parent</p>
-                      <p>The strength to overcome life difficulties</p>
-                      <p>The strength to be a better employee</p>
-                      <p>The strength to be a better athlete</p>
-                      <p>To be able to set higher goals</p>
-                      <p>To accept any challenge</p>
-                      <p>To build confidence and achieve a healthier and more fulfilling life.</p>
-                    </div>
-
-                    <p className="font-semibold text-foreground pt-1">
-                      Whoever you are, from an elite athlete to a forward thinking fitness enthusiast..
+                <h2 className="text-2xl font-bold mb-6">Message from Haris Falas</h2>
+                
+                <div className="space-y-4">
+                  <div className="bg-background/80 backdrop-blur-sm p-4 rounded-lg border border-primary/20">
+                    <p className="text-lg font-bold mb-1">
+                      Haris Falas
                     </p>
-                    <p className="font-bold text-primary">We move you to new places.</p>
-
-                    <p className="font-bold text-foreground pt-1">We are pioneering human performance.</p>
-
-                    <p className="font-bold text-foreground pt-1">At <span className="font-bold text-primary">SmartyGym</span>, our mission is clear.</p>
-
-                    <p className="font-bold text-primary">We are here to empower you and improve your performance.</p>
+                    <p className="text-sm text-muted-foreground">Sports Scientist and Strength & Conditioning Coach</p>
                   </div>
-                </Card>
+                  
+                  <p className="text-base leading-relaxed">
+                    For more than twenty years I've coached athletes, teams, and everyday people — beginners, busy professionals, and gym-goers who simply want to train with purpose. If there's one thing I've learned, it's that people don't struggle because they're lazy. They struggle because they walk into their training without a clear plan, without structure, and without guidance they can trust.
+                  </p>
+
+                  <p className="text-base leading-relaxed">
+                    That's exactly why I created SmartyGym.
+                  </p>
+
+                  <p className="text-base leading-relaxed">
+                    My vision is to give people the kind of coaching that makes everything simpler: structured programs, smart progressions, expert guidance, and clear workouts you can follow with confidence — whether you train at home, outdoors, or inside a gym. SmartyGym is here to support your fitness journey, not replace any part of it. If you train in a gym, you'll have a plan. If you train at home, you'll have a structure. If you're busy or traveling, you'll still know exactly what to do.
+                  </p>
+
+                  <p className="text-base leading-relaxed">
+                    I built this platform for people who want real training, not random exercises. For those who want to feel stronger, move better, improve performance, and see results — with a system that removes confusion and brings clarity every step of the way.
+                  </p>
+                  
+                  <div className="bg-primary/10 p-4 rounded-lg border-l-4 border-primary">
+                    <p className="text-base leading-relaxed font-medium">
+                      Every single program you see here? I designed it myself. No AI. No automation. No copy-paste templates. 
+                      Just years of education, experience, and a genuine commitment to YOUR success.
+                    </p>
+                  </div>
+                  
+                  <p className="text-base leading-relaxed">
+                    This project isn't just another fitness idea. It's the result of decades of experience, passion for coaching, and a deep belief that everyone deserves access to smart, effective training, no matter their level or lifestyle.
+                  </p>
+
+                  <p className="text-base leading-relaxed">
+                    Thank you for trusting me with your fitness. I'm here to guide you, support you, and help you improve — one session at a time.
+                  </p>
+
+                  <p className="text-base leading-relaxed font-medium">
+                    Every day is a game day.
+                  </p>
+                  
+                  <div className="flex items-center justify-center gap-2 pt-4">
+                    <div className="h-px flex-grow bg-border"></div>
+                    <p className="font-bold text-primary">
+                      Haris Falas
+                    </p>
+                    <div className="h-px flex-grow bg-border"></div>
+                  </div>
+                </div>
               </section>
 
-              {/* Why I Created SmartyGym */}
+              {/* CV Button */}
+              <div className="text-center">
+                <Button 
+                  variant="outline" 
+                  size="lg" 
+                  onClick={() => navigate("/coach-cv")}
+                  className="border-primary text-primary hover:bg-primary hover:text-primary-foreground"
+                >
+                  View Haris Falas CV
+                </Button>
+              </div>
+            </Card>
+
+            {/* Why I Created SmartyGym */}
+            <Card className="p-6 sm:p-8 md:p-10">
               <section>
                 <h3 className="text-xl sm:text-2xl font-semibold mb-4">Why I Created SmartyGym</h3>
                 <div className="flex items-start gap-3">
@@ -250,7 +201,7 @@ const CoachProfile = () => {
               </section>
 
               {/* My Promise */}
-              <section>
+              <section className="mt-6 sm:mt-8">
                 <Card className="bg-primary/5 border-2 border-primary/20 p-4 sm:p-6">
                   <h3 className="text-xl sm:text-2xl font-semibold mb-4">My Promise</h3>
                   <div className="space-y-3">
