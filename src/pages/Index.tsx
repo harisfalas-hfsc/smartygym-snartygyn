@@ -419,32 +419,34 @@ const Index = () => {
                 {heroCards.map((card) => {
                   const Icon = card.icon;
                   return (
-                    <CarouselItem key={card.id} className="pl-4 basis-[85%]">
-                      <Card className="h-[280px] flex flex-col border-2 border-primary/30 hover:border-primary transition-all">
-                        <CardContent className="flex-1 flex flex-col items-center justify-between p-6 text-center">
+                    <CarouselItem key={card.id} className="pl-4 basis-[92%]">
+                      <Card className="h-[160px] border-2 border-primary/30 hover:border-primary transition-all">
+                        <CardContent className="h-full flex flex-row items-stretch p-4 gap-4">
                           
-                          {/* Icon */}
-                          <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-primary/10">
-                            <Icon className="w-8 h-8 text-primary" />
+                          {/* LEFT: Content Section (60%) */}
+                          <div className="flex-[6] flex flex-col justify-center gap-2">
+                            <div className="flex items-center gap-3">
+                              <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-primary/10 flex-shrink-0">
+                                <Icon className="w-6 h-6 text-primary" />
+                              </div>
+                              <h3 className="text-base font-bold text-foreground leading-tight">
+                                {card.title}
+                              </h3>
+                            </div>
+                            <p className="text-xs text-muted-foreground leading-snug line-clamp-2">
+                              {card.description}
+                            </p>
                           </div>
                           
-                          {/* Title */}
-                          <h3 className="text-lg font-bold text-foreground px-2">
-                            {card.title}
-                          </h3>
-                          
-                          {/* Description */}
-                          <p className="text-sm text-muted-foreground leading-relaxed px-2">
-                            {card.description}
-                          </p>
-                          
-                          {/* Button */}
-                          <Button 
-                            className="w-full mt-auto"
-                            onClick={() => navigate(card.route)}
-                          >
-                            {card.buttonText}
-                          </Button>
+                          {/* RIGHT: Button Section (40%) - Fixed Position */}
+                          <div className="flex-[4] flex items-center justify-center">
+                            <Button 
+                              className="w-full h-12"
+                              onClick={() => navigate(card.route)}
+                            >
+                              {card.buttonText}
+                            </Button>
+                          </div>
                           
                         </CardContent>
                       </Card>
@@ -458,44 +460,44 @@ const Index = () => {
               <CarouselNext className="-right-12 bg-background border-2 border-primary shadow-lg" />
             </Carousel>
 
-            {/* Quick Access Menu */}
-            <div className="mt-8 space-y-3">
-              <div 
-                onClick={() => navigate('/about')}
-                className="flex items-center gap-3 p-4 bg-card border-2 border-border rounded-lg hover:border-primary transition-all cursor-pointer hover:shadow-md"
-              >
-                <Info className="w-5 h-5 text-primary flex-shrink-0" />
-                <span className="text-base font-medium">About SmartyGym</span>
-                <ChevronRight className="w-5 h-5 ml-auto text-muted-foreground" />
-              </div>
-              
-              <div 
-                onClick={() => navigate('/coach-profile')}
-                className="flex items-center gap-3 p-4 bg-card border-2 border-border rounded-lg hover:border-primary transition-all cursor-pointer hover:shadow-md"
-              >
-                <User className="w-5 h-5 text-primary flex-shrink-0" />
-                <span className="text-base font-medium">Coach Haris Falas</span>
-                <ChevronRight className="w-5 h-5 ml-auto text-muted-foreground" />
-              </div>
-              
-              <div 
-                onClick={() => navigate('/faq')}
-                className="flex items-center gap-3 p-4 bg-card border-2 border-border rounded-lg hover:border-primary transition-all cursor-pointer hover:shadow-md"
-              >
-                <HelpCircle className="w-5 h-5 text-primary flex-shrink-0" />
-                <span className="text-base font-medium">FAQ</span>
-                <ChevronRight className="w-5 h-5 ml-auto text-muted-foreground" />
-              </div>
-              
-              <div 
-                onClick={() => navigate('/shop')}
-                className="flex items-center gap-3 p-4 bg-card border-2 border-border rounded-lg hover:border-primary transition-all cursor-pointer hover:shadow-md"
-              >
-                <ShoppingBag className="w-5 h-5 text-primary flex-shrink-0" />
-                <span className="text-base font-medium">Shop</span>
-                <ChevronRight className="w-5 h-5 ml-auto text-muted-foreground" />
-              </div>
-            </div>
+        {/* Quick Access Menu */}
+        <div className="mt-8 space-y-3">
+          <div 
+            onClick={() => navigate('/about')}
+            className="flex items-center gap-2.5 py-2 px-4 bg-primary/5 border-2 border-border rounded-lg hover:border-primary transition-all cursor-pointer hover:shadow-md"
+          >
+            <Info className="w-5 h-5 text-primary flex-shrink-0" />
+            <span className="text-base font-medium">About SmartyGym</span>
+            <ChevronRight className="w-5 h-5 ml-auto text-muted-foreground" />
+          </div>
+          
+          <div 
+            onClick={() => navigate('/coach-profile')}
+            className="flex items-center gap-2.5 py-2 px-4 bg-primary/5 border-2 border-border rounded-lg hover:border-primary transition-all cursor-pointer hover:shadow-md"
+          >
+            <User className="w-5 h-5 text-primary flex-shrink-0" />
+            <span className="text-base font-medium">Coach Haris Falas</span>
+            <ChevronRight className="w-5 h-5 ml-auto text-muted-foreground" />
+          </div>
+          
+          <div 
+            onClick={() => navigate('/faq')}
+            className="flex items-center gap-2.5 py-2 px-4 bg-primary/5 border-2 border-border rounded-lg hover:border-primary transition-all cursor-pointer hover:shadow-md"
+          >
+            <HelpCircle className="w-5 h-5 text-primary flex-shrink-0" />
+            <span className="text-base font-medium">FAQ</span>
+            <ChevronRight className="w-5 h-5 ml-auto text-muted-foreground" />
+          </div>
+          
+          <div 
+            onClick={() => navigate('/shop')}
+            className="flex items-center gap-2.5 py-2 px-4 bg-primary/5 border-2 border-border rounded-lg hover:border-primary transition-all cursor-pointer hover:shadow-md"
+          >
+            <ShoppingBag className="w-5 h-5 text-primary flex-shrink-0" />
+            <span className="text-base font-medium">Shop</span>
+            <ChevronRight className="w-5 h-5 ml-auto text-muted-foreground" />
+          </div>
+        </div>
           </section>
         ) : (
           <>
@@ -632,48 +634,30 @@ const Index = () => {
                         <h2 className="text-xl sm:text-2xl font-bold text-center text-foreground">
                           Who Is Smarty Gym For?
                         </h2>
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 text-sm sm:text-base">
-                          <div className="flex items-start gap-2 sm:gap-3">
-                            <Users className="w-4 h-4 sm:w-5 sm:h-5 text-primary flex-shrink-0 mt-1" />
-                            <p className="text-muted-foreground">
-                              <span className="font-semibold text-foreground">Busy adults</span> juggling work and fitness
-                            </p>
+                        <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 sm:gap-3">
+                          <div className="flex items-center gap-2 p-3 bg-primary/5 border border-primary/20 rounded-lg">
+                            <Users className="w-4 h-4 text-primary flex-shrink-0" />
+                            <span className="text-sm font-semibold text-foreground">Busy adults</span>
                           </div>
-                          <div className="flex items-start gap-2 sm:gap-3">
-                            <Heart className="w-4 h-4 sm:w-5 sm:h-5 text-primary flex-shrink-0 mt-1" />
-                            <p className="text-muted-foreground">
-                              <span className="font-semibold text-foreground">Parents</span> who need flexible workout times
-                            </p>
+                          <div className="flex items-center gap-2 p-3 bg-primary/5 border border-primary/20 rounded-lg">
+                            <Heart className="w-4 h-4 text-primary flex-shrink-0" />
+                            <span className="text-sm font-semibold text-foreground">Parents</span>
                           </div>
-                          <div className="flex items-start gap-2 sm:gap-3">
-                            <GraduationCap className="w-4 h-4 sm:w-5 sm:h-5 text-primary flex-shrink-0 mt-1" />
-                            <p className="text-muted-foreground">
-                              <span className="font-semibold text-foreground">Beginners</span> starting their fitness journey
-                            </p>
+                          <div className="flex items-center gap-2 p-3 bg-primary/5 border border-primary/20 rounded-lg">
+                            <GraduationCap className="w-4 h-4 text-primary flex-shrink-0" />
+                            <span className="text-sm font-semibold text-foreground">Beginners</span>
                           </div>
-                          <div className="flex items-start gap-2 sm:gap-3">
-                            <Target className="w-4 h-4 sm:w-5 sm:h-5 text-primary flex-shrink-0 mt-1" />
-                            <p className="text-muted-foreground">
-                              <span className="font-semibold text-foreground">Intermediate lifters</span> looking for structured progression
-                            </p>
+                          <div className="flex items-center gap-2 p-3 bg-primary/5 border border-primary/20 rounded-lg">
+                            <Target className="w-4 h-4 text-primary flex-shrink-0" />
+                            <span className="text-sm font-semibold text-foreground">Intermediate lifters</span>
                           </div>
-                          <div className="flex items-start gap-2 sm:gap-3">
-                            <Plane className="w-4 h-4 sm:w-5 sm:h-5 text-primary flex-shrink-0 mt-1" />
-                            <p className="text-muted-foreground">
-                              <span className="font-semibold text-foreground">Travelers</span> who need workouts anywhere
-                            </p>
+                          <div className="flex items-center gap-2 p-3 bg-primary/5 border border-primary/20 rounded-lg">
+                            <Plane className="w-4 h-4 text-primary flex-shrink-0" />
+                            <span className="text-sm font-semibold text-foreground">Travelers</span>
                           </div>
-                          <div className="flex items-start gap-2 sm:gap-3">
-                            <Dumbbell className="w-4 h-4 sm:w-5 sm:h-5 text-primary flex-shrink-0 mt-1" />
-                            <p className="text-muted-foreground">
-                              <span className="font-semibold text-foreground">Gym-goers</span> who want expert guidance from <a href="/coach-profile" className="text-primary hover:underline font-semibold">Haris Falas</a>
-                            </p>
-                          </div>
-                          <div className="flex items-start gap-2 sm:gap-3 md:col-span-2">
-                            <Zap className="w-4 h-4 sm:w-5 sm:h-5 text-primary flex-shrink-0 mt-1" />
-                            <p className="text-muted-foreground">
-                              <span className="font-semibold text-foreground">Anyone</span> seeking professional coaching without personal training costs
-                            </p>
+                          <div className="flex items-center gap-2 p-3 bg-primary/5 border border-primary/20 rounded-lg">
+                            <Dumbbell className="w-4 h-4 text-primary flex-shrink-0" />
+                            <span className="text-sm font-semibold text-foreground">Gym-goers</span>
                           </div>
                         </div>
 
