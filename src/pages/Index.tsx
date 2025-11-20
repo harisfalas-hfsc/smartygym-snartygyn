@@ -443,7 +443,7 @@ const Index = () => {
             </div>
 
             <Carousel 
-              className="w-full px-12" 
+              className="w-full px-10" 
               opts={{ align: "start", loop: true }}
               setApi={setCarouselApi}
             >
@@ -451,10 +451,10 @@ const Index = () => {
                 {heroCards.map((card) => {
                   const Icon = card.icon;
                   return (
-                    <CarouselItem key={card.id} className="pl-4 basis-[92%]">
+                    <CarouselItem key={card.id} className="pl-4 basis-[96%]">
                       <Card 
                         onClick={() => navigate(card.route)}
-                        className="h-[160px] border-2 border-primary/30 hover:border-primary hover:scale-[1.02] hover:shadow-xl hover:bg-primary/5 transition-all duration-300 cursor-pointer"
+                        className="h-[160px] border-[3px] border-primary/40 hover:border-primary hover:scale-[1.02] hover:shadow-xl hover:bg-primary/5 transition-all duration-300 cursor-pointer"
                       >
                         <CardContent className="h-full flex flex-row items-center p-4 gap-4">
                           
@@ -507,36 +507,36 @@ const Index = () => {
 
         {/* Quick Access Menu */}
         <div className="mt-8 space-y-3">
-          <div 
-            onClick={() => navigate('/about')}
-            className="flex items-center gap-2.5 py-2 px-4 bg-primary/5 border-2 border-border rounded-lg hover:border-primary transition-all cursor-pointer hover:shadow-md"
+              <div 
+                onClick={() => navigate('/about')}
+                className="flex items-center gap-2.5 py-1.5 px-4 bg-primary/5 border-2 border-border rounded-lg hover:border-primary transition-all cursor-pointer hover:shadow-md"
           >
             <Info className="w-5 h-5 text-primary flex-shrink-0" />
             <span className="text-base font-medium">About SmartyGym</span>
             <ChevronRight className="w-5 h-5 ml-auto text-muted-foreground" />
           </div>
           
-          <div 
-            onClick={() => navigate('/coach-profile')}
-            className="flex items-center gap-2.5 py-2 px-4 bg-primary/5 border-2 border-border rounded-lg hover:border-primary transition-all cursor-pointer hover:shadow-md"
+              <div 
+                onClick={() => navigate('/coach-profile')}
+                className="flex items-center gap-2.5 py-1.5 px-4 bg-primary/5 border-2 border-border rounded-lg hover:border-primary transition-all cursor-pointer hover:shadow-md"
           >
             <User className="w-5 h-5 text-primary flex-shrink-0" />
             <span className="text-base font-medium">Coach Haris Falas</span>
             <ChevronRight className="w-5 h-5 ml-auto text-muted-foreground" />
           </div>
           
-          <div 
-            onClick={() => navigate('/faq')}
-            className="flex items-center gap-2.5 py-2 px-4 bg-primary/5 border-2 border-border rounded-lg hover:border-primary transition-all cursor-pointer hover:shadow-md"
+              <div 
+                onClick={() => navigate('/faq')}
+                className="flex items-center gap-2.5 py-1.5 px-4 bg-primary/5 border-2 border-border rounded-lg hover:border-primary transition-all cursor-pointer hover:shadow-md"
           >
             <HelpCircle className="w-5 h-5 text-primary flex-shrink-0" />
             <span className="text-base font-medium">FAQ</span>
             <ChevronRight className="w-5 h-5 ml-auto text-muted-foreground" />
           </div>
           
-          <div 
-            onClick={() => navigate('/shop')}
-            className="flex items-center gap-2.5 py-2 px-4 bg-primary/5 border-2 border-border rounded-lg hover:border-primary transition-all cursor-pointer hover:shadow-md"
+              <div 
+                onClick={() => navigate('/shop')}
+                className="flex items-center gap-2.5 py-1.5 px-4 bg-primary/5 border-2 border-border rounded-lg hover:border-primary transition-all cursor-pointer hover:shadow-md"
           >
             <ShoppingBag className="w-5 h-5 text-primary flex-shrink-0" />
             <span className="text-base font-medium">Shop</span>
