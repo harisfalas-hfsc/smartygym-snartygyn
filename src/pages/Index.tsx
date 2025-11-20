@@ -5,7 +5,7 @@ import { ServiceCard } from "@/components/ServiceCard";
 import { Button } from "@/components/ui/button";
 import { Card, CardHeader, CardTitle, CardContent, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Dumbbell, Calendar, BookOpen, Calculator, Activity, Flame, Instagram, Facebook, Youtube, UserCheck, Wrench, Video, FileText, Smartphone, Users, Target, Heart, Zap, Plane, GraduationCap, Check, Crown, ChevronDown, ChevronRight, Move, Ban, Brain, CheckCircle2, Award, Shield, Compass, Sparkles } from "lucide-react";
+import { Dumbbell, Calendar, BookOpen, Calculator, Activity, Flame, Instagram, Facebook, Youtube, UserCheck, Wrench, Video, FileText, Smartphone, Users, Target, Heart, Zap, Plane, GraduationCap, Check, Crown, ChevronDown, ChevronRight, Move, Ban, Brain, CheckCircle2, Award, Shield, Compass, Sparkles, Info, User, HelpCircle, ShoppingBag } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { User as SupabaseUser } from "@supabase/supabase-js";
 import { useToast } from "@/hooks/use-toast";
@@ -458,15 +458,43 @@ const Index = () => {
               <CarouselNext className="-right-12 bg-background border-2 border-primary shadow-lg" />
             </Carousel>
 
-            {/* START TRAINING Button */}
-            <div className="mt-6">
-              <Button 
-                size="lg" 
-                className="w-full h-14 text-lg font-bold"
-                onClick={() => navigate('/workout')}
+            {/* Quick Access Menu */}
+            <div className="mt-8 space-y-3">
+              <div 
+                onClick={() => navigate('/about')}
+                className="flex items-center gap-3 p-4 bg-card border-2 border-border rounded-lg hover:border-primary transition-all cursor-pointer hover:shadow-md"
               >
-                START TRAINING
-              </Button>
+                <Info className="w-5 h-5 text-primary flex-shrink-0" />
+                <span className="text-base font-medium">About SmartyGym</span>
+                <ChevronRight className="w-5 h-5 ml-auto text-muted-foreground" />
+              </div>
+              
+              <div 
+                onClick={() => navigate('/coach-profile')}
+                className="flex items-center gap-3 p-4 bg-card border-2 border-border rounded-lg hover:border-primary transition-all cursor-pointer hover:shadow-md"
+              >
+                <User className="w-5 h-5 text-primary flex-shrink-0" />
+                <span className="text-base font-medium">Coach Haris Falas</span>
+                <ChevronRight className="w-5 h-5 ml-auto text-muted-foreground" />
+              </div>
+              
+              <div 
+                onClick={() => navigate('/faq')}
+                className="flex items-center gap-3 p-4 bg-card border-2 border-border rounded-lg hover:border-primary transition-all cursor-pointer hover:shadow-md"
+              >
+                <HelpCircle className="w-5 h-5 text-primary flex-shrink-0" />
+                <span className="text-base font-medium">FAQ</span>
+                <ChevronRight className="w-5 h-5 ml-auto text-muted-foreground" />
+              </div>
+              
+              <div 
+                onClick={() => navigate('/shop')}
+                className="flex items-center gap-3 p-4 bg-card border-2 border-border rounded-lg hover:border-primary transition-all cursor-pointer hover:shadow-md"
+              >
+                <ShoppingBag className="w-5 h-5 text-primary flex-shrink-0" />
+                <span className="text-base font-medium">Shop</span>
+                <ChevronRight className="w-5 h-5 ml-auto text-muted-foreground" />
+              </div>
             </div>
           </section>
         ) : (
