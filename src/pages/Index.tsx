@@ -435,7 +435,7 @@ const Index = () => {
             <div className="text-center mb-6 px-4">
               <h2 className="text-2xl mb-2">
                 <span className="font-normal text-foreground">Welcome to </span>
-                <span className="font-bold text-foreground">SmartyGym</span>
+                <span className="font-bold text-primary">SmartyGym</span>
               </h2>
               <p className="text-base text-muted-foreground">
                 Your gym reimagined. Anywhere. Anytime.
