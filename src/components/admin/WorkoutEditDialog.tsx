@@ -11,13 +11,10 @@ import { useToast } from "@/hooks/use-toast";
 
 const CATEGORIES = [
   "STRENGTH",
-  "CARDIO",
-  "MOBILITY",
-  "CONDITIONING",
-  "POWER",
-  "RECOVERY",
   "CALORIE BURNING",
   "METABOLIC",
+  "CARDIO",
+  "MOBILITY & STABILITY",
   "CHALLENGE"
 ];
 
@@ -85,13 +82,10 @@ export const WorkoutEditDialog = ({ workout, open, onOpenChange, onSave }: Worko
   const getCategoryPrefix = (category: string) => {
     const prefixMap: { [key: string]: string } = {
       'STRENGTH': 'S',
-      'CARDIO': 'C',
-      'MOBILITY': 'M',
-      'CONDITIONING': 'CO',
-      'POWER': 'P',
-      'RECOVERY': 'R',
       'CALORIE BURNING': 'CB',
       'METABOLIC': 'ME',
+      'CARDIO': 'C',
+      'MOBILITY & STABILITY': 'MS',
       'CHALLENGE': 'CH',
     };
     return prefixMap[category] || 'W';
