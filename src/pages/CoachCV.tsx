@@ -4,10 +4,13 @@ import { ArrowLeft, Shield } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useNavigate } from "react-router-dom";
+import { useAccessControl } from "@/hooks/useAccessControl";
 
 const CoachCV = () => {
   const { canGoBack, goBack } = useShowBackButton();
   const navigate = useNavigate();
+  const { userTier } = useAccessControl();
+  const isPremium = userTier === "premium";
 
   return (
     <>
@@ -37,7 +40,7 @@ const CoachCV = () => {
               <img
                 src="https://cvccrvyimyzrxcwzmxwk.supabase.co/storage/v1/object/public/logos/haris-photo.png"
                 alt="Haris Falas - Professional Strength & Conditioning Coach"
-                className="w-full h-full object-cover"
+                className="w-full h-full object-cover object-center"
               />
             </div>
             <h1 className="text-4xl font-bold mb-2">
@@ -56,7 +59,7 @@ const CoachCV = () => {
           {/* My Background */}
           <Card className="mb-8 border-2 border-primary">
             <CardHeader>
-              <CardTitle className="text-2xl">My Background</CardTitle>
+              <CardTitle className="text-2xl text-primary">My Background</CardTitle>
             </CardHeader>
             <CardContent>
               <ul className="space-y-3">
@@ -99,7 +102,7 @@ const CoachCV = () => {
           {/* Professional Experience */}
           <Card className="mb-8 border-2 border-primary">
             <CardHeader>
-              <CardTitle className="text-2xl">Professional Experience</CardTitle>
+              <CardTitle className="text-2xl text-primary">Professional Experience</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               <p>
@@ -109,7 +112,7 @@ const CoachCV = () => {
               
               <div className="space-y-4">
               <div>
-                <h3 className="font-semibold text-lg mb-2">Professional Football Teams (Cypriot First Division):</h3>
+                <h3 className="font-semibold text-lg mb-2 text-primary">Professional Football Teams (Cypriot First Division):</h3>
                 <ul className="space-y-2 ml-4">
                   <li className="flex items-start gap-3">
                     <span className="text-primary mt-1">•</span>
@@ -127,14 +130,14 @@ const CoachCV = () => {
               </div>
 
               <div>
-                <h3 className="font-semibold text-lg mb-2">Current Position:</h3>
+                <h3 className="font-semibold text-lg mb-2 text-primary">Current Position:</h3>
                 <p className="ml-4">
                   Founder and Head of Strength & Conditioning at HFSC (Haris Falas Strength & Conditioning) and Creator of SmartyGym platform
                 </p>
               </div>
 
                 <div>
-                  <h3 className="font-semibold text-lg mb-2">Training Experience:</h3>
+                  <h3 className="font-semibold text-lg mb-2 text-primary">Training Experience:</h3>
                   <p className="ml-4">
                     Successfully trained hundreds of adults seeking to improve their fitness, 
                     strength, mobility, and overall health — combining evidence-based methodology 
@@ -146,18 +149,20 @@ const CoachCV = () => {
           </Card>
 
           {/* CTA */}
-          <div className="text-center space-y-4">
-            <Button 
-              size="lg" 
-              onClick={() => navigate("/premiumbenefits")}
-              className="bg-primary text-primary-foreground hover:bg-primary/90"
-            >
-              Join SmartyGym Today
-            </Button>
-            <p className="text-sm text-muted-foreground">
-              Train with confidence under expert guidance
-            </p>
-          </div>
+          {!isPremium && (
+            <div className="text-center space-y-4">
+              <Button 
+                size="lg" 
+                onClick={() => navigate("/premiumbenefits")}
+                className="bg-primary text-primary-foreground hover:bg-primary/90"
+              >
+                Join SmartyGym Today
+              </Button>
+              <p className="text-sm text-muted-foreground">
+                Train with confidence under expert guidance
+              </p>
+            </div>
+          )}
         </div>
       </main>
     </>
