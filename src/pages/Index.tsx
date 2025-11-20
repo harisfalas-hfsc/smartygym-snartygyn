@@ -13,6 +13,8 @@ import smartyGymLogo from "@/assets/smarty-gym-logo.png";
 import smartyGymIcon from "@/assets/smarty-gym-icon.png";
 import harisPhoto from "@/assets/haris-falas-coach.png";
 import { MobilePhoneIllustration } from "@/components/MobilePhoneIllustration";
+import { useIsMobile } from "@/hooks/use-mobile";
+import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel";
 
 import { useAccessControl } from "@/hooks/useAccessControl";
 import { ScrollReveal } from "@/components/ScrollReveal";
@@ -43,6 +45,7 @@ const Index = () => {
   const [user, setUser] = useState<SupabaseUser | null>(null);
   const { userTier } = useAccessControl();
   const isPremium = userTier === "premium";
+  const isMobile = useIsMobile();
 
   const heroCards = [
     { 
@@ -392,11 +395,47 @@ const Index = () => {
         </script>
       </Helmet>
       
-      <div className="min-h-screen bg-background overflow-x-hidden">
+      <div className={`min-h-screen bg-background overflow-x-hidden ${isMobile ? 'pt-14' : ''}`}>
         
-        
-        {/* Hero Section */}
-        <section className="relative py-8 sm:py-12 border-b border-border bg-background overflow-hidden">
+        {isMobile ? (
+          // Mobile: Carousel Section
+          <section className="py-6 px-4">
+            <Carousel className="w-full">
+              <CarouselContent>
+                {heroCards.map((card) => {
+                  const Icon = card.icon;
+                  return (
+                    <CarouselItem key={card.id} className="basis-4/5">
+                      <Card 
+                        className="h-48 flex flex-col items-center justify-center cursor-pointer hover:shadow-lg transition-shadow border-2 border-primary/30 hover:border-primary"
+                        onClick={() => navigate(card.route)}
+                      >
+                        <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-primary/10 mb-3">
+                          <Icon className="w-8 h-8 text-primary" />
+                        </div>
+                        <h2 className="text-lg font-bold text-center px-4">{card.title}</h2>
+                      </Card>
+                    </CarouselItem>
+                  );
+                })}
+              </CarouselContent>
+              <CarouselPrevious className="left-2" />
+              <CarouselNext className="right-2" />
+            </Carousel>
+
+            <div className="mt-6">
+              <Button 
+                size="lg" 
+                className="w-full h-14 text-lg font-bold"
+                onClick={() => navigate('/workout')}
+              >
+                START TRAINING
+              </Button>
+            </div>
+          </section>
+        ) : (
+          // Desktop: Hero Section
+          <section className="relative py-8 sm:py-12 border-b border-border bg-background overflow-hidden">
           
           <div className="container mx-auto max-w-6xl px-4 relative z-10 overflow-x-hidden">
             <ScrollReveal>
