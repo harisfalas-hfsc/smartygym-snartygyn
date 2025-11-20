@@ -427,10 +427,10 @@ const Index = () => {
         </script>
       </Helmet>
       
-      <div className={`min-h-screen bg-background overflow-x-hidden ${isMobile ? 'pt-14' : ''}`}>
+      <div className="min-h-screen bg-background overflow-x-hidden">
         
         {isMobile ? (
-          <section className="py-6 px-4">
+          <section className="pt-2 pb-6 px-4">
             {/* Mobile Carousel Headline */}
             <div className="text-center mb-6 px-4">
               <h2 className="text-2xl mb-2">
