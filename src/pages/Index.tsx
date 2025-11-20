@@ -51,36 +51,48 @@ const Index = () => {
     { 
       id: "workouts", 
       title: "500+ Expert Workouts", 
+      description: "Access a vast library of professional workout routines for every fitness level and goal",
+      buttonText: "Browse Workouts",
       icon: Dumbbell,
       route: "/workout"
     },
     { 
       id: "programs", 
       title: "Training Programs", 
+      description: "Structured multi-week programs designed to transform your fitness journey",
+      buttonText: "View Programs",
       icon: Calendar,
       route: "/trainingprogram"
     },
     { 
       id: "tools", 
       title: "Smart Tools", 
+      description: "Professional fitness calculators and tracking tools to optimize your training",
+      buttonText: "Explore Tools",
       icon: Calculator,
       route: "/tools"
     },
     { 
       id: "exercises", 
       title: "Exercise Library", 
+      description: "Comprehensive video library with proper form demonstrations and technique guides",
+      buttonText: "View Library",
       icon: Video,
       route: "/exerciselibrary"
     },
     { 
       id: "blog", 
       title: "Blog & Expert Articles", 
+      description: "Evidence-based fitness articles and expert insights from professional coaches",
+      buttonText: "Read Articles",
       icon: FileText,
       route: "/blog"
     },
     { 
       id: "coach", 
       title: "Expert Coach Guidance", 
+      description: "Get personalized support and answers directly from experienced fitness professionals",
+      buttonText: "Contact Coach",
       icon: GraduationCap,
       route: "/contact"
     },
@@ -398,31 +410,55 @@ const Index = () => {
       <div className={`min-h-screen bg-background overflow-x-hidden ${isMobile ? 'pt-14' : ''}`}>
         
         {isMobile ? (
-          // Mobile: Carousel Section
           <section className="py-6 px-4">
-            <Carousel className="w-full">
-              <CarouselContent>
+            <Carousel 
+              className="w-full px-12" 
+              opts={{ align: "start", loop: true }}
+            >
+              <CarouselContent className="-ml-4">
                 {heroCards.map((card) => {
                   const Icon = card.icon;
                   return (
-                    <CarouselItem key={card.id} className="basis-4/5">
-                      <Card 
-                        className="h-48 flex flex-col items-center justify-center cursor-pointer hover:shadow-lg transition-shadow border-2 border-primary/30 hover:border-primary"
-                        onClick={() => navigate(card.route)}
-                      >
-                        <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-primary/10 mb-3">
-                          <Icon className="w-8 h-8 text-primary" />
-                        </div>
-                        <h2 className="text-lg font-bold text-center px-4">{card.title}</h2>
+                    <CarouselItem key={card.id} className="pl-4 basis-[85%]">
+                      <Card className="h-[280px] flex flex-col border-2 border-primary/30 hover:border-primary transition-all">
+                        <CardContent className="flex-1 flex flex-col items-center justify-between p-6 text-center">
+                          
+                          {/* Icon */}
+                          <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-primary/10">
+                            <Icon className="w-8 h-8 text-primary" />
+                          </div>
+                          
+                          {/* Title */}
+                          <h3 className="text-lg font-bold text-foreground px-2">
+                            {card.title}
+                          </h3>
+                          
+                          {/* Description */}
+                          <p className="text-sm text-muted-foreground leading-relaxed px-2">
+                            {card.description}
+                          </p>
+                          
+                          {/* Button */}
+                          <Button 
+                            className="w-full mt-auto"
+                            onClick={() => navigate(card.route)}
+                          >
+                            {card.buttonText}
+                          </Button>
+                          
+                        </CardContent>
                       </Card>
                     </CarouselItem>
                   );
                 })}
               </CarouselContent>
-              <CarouselPrevious className="left-2" />
-              <CarouselNext className="right-2" />
+              
+              {/* Arrows positioned OUTSIDE cards */}
+              <CarouselPrevious className="-left-12 bg-background border-2 border-primary shadow-lg" />
+              <CarouselNext className="-right-12 bg-background border-2 border-primary shadow-lg" />
             </Carousel>
 
+            {/* START TRAINING Button */}
             <div className="mt-6">
               <Button 
                 size="lg" 
