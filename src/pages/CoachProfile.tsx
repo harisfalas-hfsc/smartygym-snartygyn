@@ -251,18 +251,18 @@ const CoachProfile = () => {
 
               {/* My Promise */}
               <section>
-                <Card className="bg-primary/5 border-2 border-primary/20 p-4 sm:p-6 text-center">
+                <Card className="bg-primary/5 border-2 border-primary/20 p-4 sm:p-6">
                   <h3 className="text-xl sm:text-2xl font-semibold mb-4">My Promise</h3>
                   <div className="space-y-3">
-                    <div className="flex items-center justify-center gap-2">
+                    <div className="flex items-center justify-start gap-2">
                       <Shield className="w-5 h-5 sm:w-6 sm:h-6 text-primary shrink-0" />
                       <p className="text-sm sm:text-base font-semibold">No gimmicks.</p>
                     </div>
-                    <div className="flex items-center justify-center gap-2">
+                    <div className="flex items-center justify-start gap-2">
                       <Shield className="w-5 h-5 sm:w-6 sm:h-6 text-primary shrink-0" />
                       <p className="text-sm sm:text-base font-semibold">No shortcuts.</p>
                     </div>
-                    <div className="flex items-center justify-center gap-2">
+                    <div className="flex items-center justify-start gap-2">
                       <Shield className="w-5 h-5 sm:w-6 sm:h-6 text-primary shrink-0" />
                       <p className="text-sm sm:text-base font-semibold">Just structured, science-based training that works.</p>
                     </div>
