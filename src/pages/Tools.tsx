@@ -102,14 +102,14 @@ const Tools = () => {
 
         {/* Info Section */}
         <Card className="mb-8 bg-gradient-to-br from-primary/5 via-background to-primary/5 border-2 border-primary/40 shadow-gold">
-          <div className="p-8">
-            <h2 className="text-2xl font-bold mb-4 text-center">About These Tools</h2>
-            <div className="space-y-4 text-muted-foreground max-w-3xl mx-auto">
+          <div className="p-5">
+            <h2 className="text-2xl font-bold mb-3 text-center">About These Tools</h2>
+            <div className="space-y-2 text-muted-foreground max-w-3xl mx-auto">
               <p>
                 Our fitness calculators are designed to help you understand your body and optimize your training. 
                 All tools use scientifically validated formulas and equations.
               </p>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-6">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
                 <div>
                   <h3 className="font-semibold text-foreground mb-2">1RM Calculator</h3>
                   <p className="text-sm">
