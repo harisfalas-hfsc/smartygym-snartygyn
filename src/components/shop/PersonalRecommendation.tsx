@@ -9,7 +9,7 @@ export const PersonalRecommendation = () => {
           <Heart className="h-5 w-5 text-primary mt-1 flex-shrink-0" />
           <div>
             <p className="text-base leading-relaxed">
-              <strong>A Personal Note from Haris Falas:</strong>
+              <strong>A Personal Note from <a href="/coach-profile" className="text-primary hover:underline font-medium">Haris Falas</a>:</strong>
             </p>
             <p className="text-sm text-muted-foreground mt-2 leading-relaxed">
               These are products I personally use, trust, and believe offer genuine value for your money. 

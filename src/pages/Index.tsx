@@ -438,7 +438,7 @@ const Index = () => {
                 <span className="font-bold text-primary">SmartyGym</span>
               </h2>
               <p className="text-base text-muted-foreground">
-                Your gym reimagined. Anywhere. Anytime.
+                Your gym Re-imagined. Anywhere. Anytime.
               </p>
             </div>
 
@@ -813,7 +813,7 @@ const Index = () => {
               <CardContent className="p-6">
               <div className="flex items-start justify-between mb-4">
                 <h3 className="text-2xl font-bold flex-1">
-                  Your Gym Reimagined Anywhere, Anytime
+                  Your Gym Re-imagined Anywhere, Anytime
                 </h3>
                 <Button
                   onClick={() => navigate("/joinpremium", { state: { from: location.pathname } })}

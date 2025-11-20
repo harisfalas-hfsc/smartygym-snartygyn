@@ -72,7 +72,7 @@ const WorkoutFlow = () => {
         <meta name="description" content="100+ online gym workouts at smartygym.com - #1 online fitness platform Cyprus. AMRAP, TABATA, HIIT, circuit training by Sports Scientist Haris Falas. Free online workouts + premium gym programs. Train anywhere, anytime." />
         <meta name="keywords" content="online gym workouts, gym workouts online, online fitness workouts, workout programs online, gym Cyprus, smartygym workouts, online gym, smartygym.com, Haris Falas workouts, Haris Falas Cyprus, Cyprus fitness, free gym workouts, AMRAP workouts, TABATA training, HIIT workouts, circuit training workouts, bodyweight training, no equipment gym workouts, strength training workouts, cardio workouts online, metabolic conditioning, mobility training, power workouts, challenge workouts, convenient gym, flexible training, online workouts, functional fitness, home gym workouts, online gym Cyprus, Cyprus gym workouts, virtual gym, digital gym, gym training online, workout training programs" />
         
-        <meta property="og:title" content="Workouts - SmartyGym | Fitness Reimagined" />
+        <meta property="og:title" content="Workouts - SmartyGym | Fitness Re-imagined" />
         <meta property="og:description" content="Convenient & flexible workouts designed by Sports Scientist Haris Falas - train anywhere, anytime" />
         <meta property="og:type" content="website" />
         <meta property="og:url" content="https://smartygym.com/workout" />

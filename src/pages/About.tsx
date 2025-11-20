@@ -18,7 +18,7 @@ const About = () => {
         <meta name="keywords" content="about smartygym, online fitness platform cyprus, science-based training, haris falas, online personal training, functional workouts, home gym cyprus" />
         
         {/* Open Graph */}
-        <meta property="og:title" content="About SmartyGym - Your Online Gym Reimagined" />
+        <meta property="og:title" content="About SmartyGym - Your Online Gym Re-imagined" />
         <meta property="og:description" content="Discover how SmartyGym makes quality fitness accessible to everyone with science-based workouts and expert coaching." />
         <meta property="og:type" content="website" />
         <meta property="og:url" content="https://smartygym.com/about" />
@@ -110,7 +110,7 @@ const About = () => {
                 <div className="text-center space-y-4">
                   <Target className="w-12 h-12 text-primary mx-auto" />
                   <h2 className="text-2xl md:text-3xl font-bold text-foreground">
-                    Your Gym Reimagined. Anywhere, Anytime.
+                    Your Gym Re-imagined. Anywhere, Anytime.
                   </h2>
                   <p className="text-base leading-relaxed text-muted-foreground max-w-4xl mx-auto">
                     SmartyGym was created to solve a simple problem: life gets in the way. Whether you're traveling, 
@@ -187,7 +187,7 @@ const About = () => {
                       <CheckCircle2 className="w-8 h-8 text-primary" />
                       <h3 className="font-bold">Real Expertise</h3>
                       <p className="text-sm text-muted-foreground">
-                        Every program is designed by certified coach Haris Falas — never by AI, always with 20+ years of experience.
+                        Every program is designed by certified coach <a href="/coach-profile" className="text-primary hover:underline font-medium">Haris Falas</a> — never by AI, always with 20+ years of experience.
                       </p>
                     </div>
 
