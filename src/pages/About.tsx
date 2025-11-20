@@ -230,9 +230,56 @@ const About = () => {
             </Card>
           </ScrollReveal>
 
-          {/* Who Is SmartyGym For */}
+          {/* Mobile Only: Who Is SmartyGym For? - Compact Vertical */}
+          <div className="mb-12 md:hidden">
+            <div className="text-center space-y-6">
+              <h2 className="text-2xl font-bold text-foreground">
+                Who Is <span className="text-primary">SmartyGym</span> For?
+              </h2>
+              
+              <div className="space-y-4 mt-6">
+                {/* Busy adults */}
+                <div className="flex flex-col items-center text-center">
+                  <Users className="w-8 h-8 text-primary mb-2" />
+                  <span className="text-sm font-semibold text-foreground">Busy adults</span>
+                </div>
+                
+                {/* Parents */}
+                <div className="flex flex-col items-center text-center">
+                  <Heart className="w-8 h-8 text-primary mb-2" />
+                  <span className="text-sm font-semibold text-foreground">Parents</span>
+                </div>
+                
+                {/* Beginners */}
+                <div className="flex flex-col items-center text-center">
+                  <GraduationCap className="w-8 h-8 text-primary mb-2" />
+                  <span className="text-sm font-semibold text-foreground">Beginners</span>
+                </div>
+                
+                {/* Intermediate lifters */}
+                <div className="flex flex-col items-center text-center">
+                  <Target className="w-8 h-8 text-primary mb-2" />
+                  <span className="text-sm font-semibold text-foreground">Intermediate lifters</span>
+                </div>
+                
+                {/* Travelers */}
+                <div className="flex flex-col items-center text-center">
+                  <Plane className="w-8 h-8 text-primary mb-2" />
+                  <span className="text-sm font-semibold text-foreground">Travelers</span>
+                </div>
+                
+                {/* Gym-goers */}
+                <div className="flex flex-col items-center text-center">
+                  <Dumbbell className="w-8 h-8 text-primary mb-2" />
+                  <span className="text-sm font-semibold text-foreground">Gym-goers</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Desktop/Tablet: Who Is SmartyGym For? - Grid Layout */}
           <ScrollReveal>
-            <Card className="mb-12 border-2 border-border">
+            <Card className="mb-12 border-2 border-border hidden md:block">
               <CardContent className="p-6">
                 <div className="text-center space-y-4">
                   <Users className="w-12 h-12 text-primary mx-auto" />
