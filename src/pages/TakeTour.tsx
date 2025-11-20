@@ -14,9 +14,12 @@ import {
   Play,
   BarChart
 } from "lucide-react";
+import { useAccessControl } from "@/hooks/useAccessControl";
 
 const TakeTour = () => {
   const navigate = useNavigate();
+  const { userTier } = useAccessControl();
+  const isPremium = userTier === "premium";
 
   const freeFeatures = [
     {
@@ -98,14 +101,16 @@ const TakeTour = () => {
               <Play className="mr-2 h-5 w-5 text-primary" />
               Start Your Fitness Experience
             </Button>
-            <Button 
-              variant="premium"
-              onClick={() => navigate("/premiumbenefits")}
-              className="w-full sm:w-auto cta-button"
-            >
-              <Crown className="mr-2 h-5 w-5 text-primary" />
-              Unlock Premium
-            </Button>
+            {!isPremium && (
+              <Button 
+                variant="premium"
+                onClick={() => navigate("/premiumbenefits")}
+                className="w-full sm:w-auto cta-button"
+              >
+                <Crown className="mr-2 h-5 w-5 text-primary" />
+                Unlock Premium
+              </Button>
+            )}
           </div>
         </div>
       </div>

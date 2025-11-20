@@ -2,16 +2,20 @@ import { useNavigate } from "react-router-dom";
 import { Helmet } from "react-helmet";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
 import { Check, X, ArrowLeft, Eye, UserCheck, Crown, Dumbbell, BookOpen, Calculator, Users, Heart, Sparkles, Flame, LayoutDashboard, MessageCircle } from "lucide-react";
 import { useShowBackButton } from "@/hooks/useShowBackButton";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { User } from "@supabase/supabase-js";
+import { useAccessControl } from "@/hooks/useAccessControl";
 
 const PremiumComparison = () => {
   const navigate = useNavigate();
   useShowBackButton();
   const [user, setUser] = useState<User | null>(null);
+  const { userTier } = useAccessControl();
+  const isPremium = userTier === "premium";
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
@@ -246,13 +250,15 @@ const PremiumComparison = () => {
                     );
                   })}
                 </div>
-                <Button 
-                  className="w-full mt-6 bg-gradient-to-r from-primary to-accent hover:opacity-90"
-                  onClick={() => navigate("/joinpremium")}
-                >
-                  <Crown className="w-4 h-4 mr-2" />
-                  Get Premium
-                </Button>
+                {!isPremium && (
+                  <Button 
+                    className="w-full mt-6 bg-gradient-to-r from-primary to-accent hover:opacity-90"
+                    onClick={() => navigate("/joinpremium")}
+                  >
+                    <Crown className="w-4 h-4 mr-2" />
+                    Get Premium
+                  </Button>
+                )}
               </CardContent>
             </Card>
           </div>
@@ -342,13 +348,21 @@ const PremiumComparison = () => {
                         )}
                       </td>
                       <td className="p-6 text-center">
-                        <Button 
-                          className="bg-gradient-to-r from-primary to-accent hover:opacity-90 shadow-lg"
-                          onClick={() => navigate("/joinpremium")}
-                        >
-                          <Crown className="w-4 h-4 mr-2" />
-                          Get Premium
-                        </Button>
+                        {!isPremium && (
+                          <Button 
+                            className="bg-gradient-to-r from-primary to-accent hover:opacity-90 shadow-lg"
+                            onClick={() => navigate("/joinpremium")}
+                          >
+                            <Crown className="w-4 h-4 mr-2" />
+                            Get Premium
+                          </Button>
+                        )}
+                        {isPremium && (
+                          <Badge variant="default" className="px-4 py-2">
+                            <Crown className="w-4 h-4 mr-2" />
+                            Current Plan
+                          </Badge>
+                        )}
                       </td>
                     </tr>
                   </tbody>

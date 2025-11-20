@@ -7,7 +7,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { PageBreadcrumbs } from "@/components/PageBreadcrumbs";
 import { InfoRibbon } from "@/components/InfoRibbon";
-import { ArrowLeft, MessageSquare, Send, MapPin, Phone, Lock, MessageCircle, Paperclip, X } from "lucide-react";
+import { ArrowLeft, MessageSquare, Send, MapPin, Phone, Lock, MessageCircle, Paperclip, X, Crown } from "lucide-react";
 
 import { useToast } from "@/hooks/use-toast";
 import { z } from "zod";
@@ -49,6 +49,7 @@ const Contact = () => {
   const [coachAttachments, setCoachAttachments] = useState<File[]>([]);
   const [uploadingFiles, setUploadingFiles] = useState(false);
   const { userTier } = useAccessControl();
+  const isPremium = userTier === "premium";
 
   // WhatsApp functionality
   const phoneNumber = "+35796000620";
@@ -677,13 +678,16 @@ const Contact = () => {
                       As a Premium member, you can reach out directly to <a href="/coach-profile" className="text-primary hover:underline font-medium"><strong>Haris Falas</strong></a>. 
                       No robots, no automated responses — just real human support when you need it.
                     </p>
-                    <Button 
-                      onClick={() => navigate("/premiumbenefits")} 
-                      className="w-full"
-                      variant="default"
-                    >
-                      Upgrade to Premium
-                    </Button>
+                    {!isPremium && (
+                      <Button 
+                        onClick={() => navigate("/premiumbenefits")} 
+                        className="w-full"
+                        variant="default"
+                      >
+                        <Crown className="mr-2 h-4 w-4" />
+                        Upgrade to Premium
+                      </Button>
+                    )}
                   </CardContent>
                 </Card>
               )}
