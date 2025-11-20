@@ -432,7 +432,7 @@ const Index = () => {
         {isMobile ? (
           <section className="pt-2 pb-2 px-4">
             {/* Mobile Carousel Headline */}
-            <div className="text-center mb-6 px-4">
+            <div className="text-center mb-6">
               <h2 className="text-2xl mb-2">
                 <span className="font-normal text-foreground">Welcome to </span>
                 <span className="font-bold text-primary">SmartyGym</span>
@@ -443,7 +443,7 @@ const Index = () => {
             </div>
 
             <Carousel 
-              className="w-full px-10" 
+              className="w-full px-2" 
               opts={{ align: "start", loop: true }}
               setApi={setCarouselApi}
             >
@@ -451,7 +451,7 @@ const Index = () => {
                 {heroCards.map((card) => {
                   const Icon = card.icon;
                   return (
-                    <CarouselItem key={card.id} className="pl-4 basis-[96%]">
+                    <CarouselItem key={card.id} className="pl-4 basis-[90%]">
                       <Card 
                         onClick={() => navigate(card.route)}
                         className="h-[160px] border-[3px] border-primary/40 hover:border-primary hover:scale-[1.02] hover:shadow-xl hover:bg-primary/5 transition-all duration-300 cursor-pointer"
@@ -484,8 +484,8 @@ const Index = () => {
               </CarouselContent>
               
               {/* Arrows positioned OUTSIDE cards */}
-              <CarouselPrevious className="-left-12 bg-background border-2 border-primary shadow-lg" />
-              <CarouselNext className="-right-12 bg-background border-2 border-primary shadow-lg" />
+              <CarouselPrevious className="hidden -left-12 bg-background border-2 border-primary shadow-lg" />
+              <CarouselNext className="hidden -right-12 bg-background border-2 border-primary shadow-lg" />
             </Carousel>
 
             {/* Carousel Dots */}
