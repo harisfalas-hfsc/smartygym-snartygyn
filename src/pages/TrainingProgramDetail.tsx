@@ -105,11 +105,11 @@ const TrainingProgramDetail = () => {
   // Map URL type to database category
   const categoryMap: { [key: string]: string } = {
     "cardio-endurance": "CARDIO",
-    "functional-strength": "STRENGTH",
-    "muscle-hypertrophy": "HYPERTROPHY",
+    "functional-strength": "FUNCTIONAL STRENGTH",
+    "muscle-hypertrophy": "MUSCLE HYPERTROPHY",
     "weight-loss": "WEIGHT LOSS",
-    "low-back-pain": "RECOVERY",
-    "mobility-stability": "MOBILITY"
+    "low-back-pain": "LOW BACK PAIN",
+    "mobility-stability": "MOBILITY/STABILITY"
   };
 
   const programTitles: { [key: string]: string } = {
