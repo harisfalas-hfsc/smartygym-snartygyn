@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { ScrollReveal } from "@/components/ScrollReveal";
-import { CheckCircle2, Target, Heart, Users, Shield, Award, Compass, ArrowLeft } from "lucide-react";
+import { CheckCircle2, Target, Heart, Users, Shield, Award, Compass, ArrowLeft, GraduationCap, Plane, Dumbbell } from "lucide-react";
 import { useShowBackButton } from "@/hooks/useShowBackButton";
 
 const About = () => {
@@ -112,12 +112,29 @@ const About = () => {
                   <h2 className="text-2xl md:text-3xl font-bold text-foreground">
                     Your Gym Re-imagined. Anywhere, Anytime.
                   </h2>
-                  <p className="text-base leading-relaxed text-muted-foreground max-w-4xl mx-auto">
-                    SmartyGym was created to solve a simple problem: life gets in the way. Whether you're traveling, 
-                    stuck at home, can't make it to the gym, or simply prefer training on your own terms — 
-                    we're here to back you up. Our platform offers science-based workouts and training programs 
-                    designed by qualified coaches, ensuring you never miss a session and always have access to expert training.
-                  </p>
+                  <div className="space-y-4 max-w-4xl mx-auto">
+                    <p className="text-base font-semibold text-center">
+                      We are not here to replace your gym. We are here to back you up when life gets in the way.
+                    </p>
+                    <p className="text-base text-muted-foreground text-center leading-relaxed">
+                      Whether you're traveling, on holiday, can't make it to the gym, or your gym is closed — 
+                      SmartyGym is your backup plan. Or, if you prefer training from home entirely, we've got you covered. 
+                      Or, if you go to your gym but want to follow a professional, science-based workout or training program designed by{' '}
+                      <a 
+                        href="/coach-profile" 
+                        onClick={(e) => {
+                          e.preventDefault();
+                          navigate('/coach-profile');
+                        }}
+                        className="text-primary hover:underline font-medium cursor-pointer"
+                      >
+                        Haris Falas
+                      </a>, we provide that expert guidance.
+                    </p>
+                    <p className="text-base font-semibold text-center text-primary">
+                      Wherever you are, your gym comes with you.
+                    </p>
+                  </div>
                 </div>
               </CardContent>
             </Card>
@@ -222,28 +239,30 @@ const About = () => {
                   <h2 className="text-2xl md:text-3xl font-bold text-foreground">
                     Who Is SmartyGym For?
                   </h2>
-                  <div className="max-w-4xl mx-auto space-y-6 text-left">
-                    <div>
-                      <h3 className="font-bold text-lg mb-2 flex items-center gap-2">
-                        <CheckCircle2 className="w-5 h-5 text-primary" />
-                        Beginner-Friendly
-                      </h3>
-                      <p className="text-muted-foreground ml-7">
-                        If you're new to fitness, SmartyGym is a safe, structured, and supportive place to start. 
-                        Our workouts guide you through proper technique, realistic progressions, and sustainable training habits.
-                      </p>
+                  <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 max-w-4xl mx-auto mt-6">
+                    <div className="flex items-center gap-2 p-3 bg-primary/5 border border-primary/20 rounded-lg">
+                      <Users className="w-5 h-5 text-primary flex-shrink-0" />
+                      <span className="text-sm font-semibold text-foreground">Busy adults</span>
                     </div>
-                    
-                    <div>
-                      <h3 className="font-bold text-lg mb-2 flex items-center gap-2">
-                        <CheckCircle2 className="w-5 h-5 text-primary" />
-                        Expert-Approved
-                      </h3>
-                      <p className="text-muted-foreground ml-7">
-                        If you're already experienced, you'll appreciate the science-based approach, intelligent programming, 
-                        and advanced training methods built into every session. No fluff, no shortcuts — just effective training 
-                        designed by a qualified coach with over 20 years in the field.
-                      </p>
+                    <div className="flex items-center gap-2 p-3 bg-primary/5 border border-primary/20 rounded-lg">
+                      <Heart className="w-5 h-5 text-primary flex-shrink-0" />
+                      <span className="text-sm font-semibold text-foreground">Parents</span>
+                    </div>
+                    <div className="flex items-center gap-2 p-3 bg-primary/5 border border-primary/20 rounded-lg">
+                      <GraduationCap className="w-5 h-5 text-primary flex-shrink-0" />
+                      <span className="text-sm font-semibold text-foreground">Beginners</span>
+                    </div>
+                    <div className="flex items-center gap-2 p-3 bg-primary/5 border border-primary/20 rounded-lg">
+                      <Target className="w-5 h-5 text-primary flex-shrink-0" />
+                      <span className="text-sm font-semibold text-foreground">Intermediate lifters</span>
+                    </div>
+                    <div className="flex items-center gap-2 p-3 bg-primary/5 border border-primary/20 rounded-lg">
+                      <Plane className="w-5 h-5 text-primary flex-shrink-0" />
+                      <span className="text-sm font-semibold text-foreground">Travelers</span>
+                    </div>
+                    <div className="flex items-center gap-2 p-3 bg-primary/5 border border-primary/20 rounded-lg">
+                      <Dumbbell className="w-5 h-5 text-primary flex-shrink-0" />
+                      <span className="text-sm font-semibold text-foreground">Gym-goers</span>
                     </div>
                   </div>
                 </div>

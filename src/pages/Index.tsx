@@ -829,6 +829,17 @@ const Index = () => {
                 <p className="text-base text-muted-foreground text-center leading-relaxed">
                   Whether you're traveling, on holiday, can't make it to the gym, or your gym is closed — 
                   SmartyGym is your backup plan. Or, if you prefer training from home entirely, we've got you covered. 
+                  Or, if you go to your gym but want to follow a professional, science-based workout or training program designed by{' '}
+                  <a 
+                    href="/coach-profile" 
+                    onClick={(e) => {
+                      e.preventDefault();
+                      navigate('/coach-profile');
+                    }}
+                    className="text-primary hover:underline font-medium cursor-pointer"
+                  >
+                    Haris Falas
+                  </a>, we provide that expert guidance.
                   Expert workouts, professional programs, and practical tools — all designed by real coaches, not algorithms.
                 </p>
                 <p className="text-base font-semibold text-center text-primary">
