@@ -107,16 +107,11 @@ const TrainingProgramFlow = () => {
             <h2 className="text-xl sm:text-2xl font-bold mb-3 text-center">About Our Training Programs</h2>
             <div className="space-y-2 text-muted-foreground max-w-3xl mx-auto">
               <p className="text-sm sm:text-base">
-                Our training programs are long-term, structured plans designed to help you achieve your specific 
-                fitness goals. Whether you want to lose weight, build muscle, improve functional strength, 
-                enhance cardiovascular endurance, rehabilitate from low back pain, or develop better mobility 
-                and stability — we have a science-based program for you.
+                Our training programs are long-term, structured plans designed to help you achieve your specific fitness goals. Whether you want to lose weight, build muscle, improve functional strength, enhance cardiovascular endurance, rehabilitate from low back pain, or develop better mobility and stability — we have a science-based program for you. These aren't just random workouts — they're strategic, periodized plans that take you from where you are to where you want to be. 
               </p>
-              <p className="text-sm sm:text-base">
-                These aren't just random workouts — they're strategic, periodized plans that take you from where you are to where you want to be.
-              </p>
+              
               <p className="text-sm sm:text-base font-semibold text-foreground text-center mt-6">
-                Unlock all training programs with a Premium plan or grab one standalone program to start your journey.
+                Unlock all programs with a Premium plan or grab one standalone program to start your journey.
               </p>
             </div>
           </div>
