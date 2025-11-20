@@ -169,26 +169,74 @@ export const ContactManager = () => {
     // Mark as read if not already read
     if (!message.read_at) {
       try {
-        const { error } = await supabase
+        // Validate admin session before update
+        const { data: { user }, error: authError } = await supabase.auth.getUser();
+        
+        if (authError || !user) {
+          console.error('[ContactManager] Auth validation failed:', authError);
+          toast({
+            title: "Authentication Error",
+            description: "Your session has expired. Please refresh and log in again.",
+            variant: "destructive",
+          });
+          return;
+        }
+
+        // Verify admin role
+        const { data: roleData, error: roleError } = await supabase
+          .from('user_roles')
+          .select('role')
+          .eq('user_id', user.id)
+          .eq('role', 'admin')
+          .single();
+
+        if (roleError || !roleData) {
+          console.error('[ContactManager] Admin role check failed:', roleError);
+          toast({
+            title: "Permission Denied",
+            description: "You do not have admin privileges.",
+            variant: "destructive",
+          });
+          return;
+        }
+
+        // Attempt to mark as read
+        const { error, data } = await supabase
           .from('contact_messages')
           .update({ read_at: new Date().toISOString(), status: 'read' })
-          .eq('id', message.id);
+          .eq('id', message.id)
+          .select();
         
         if (error) {
-          console.error('[ContactManager] Mark as read failed:', error);
+          console.error('[ContactManager] Mark as read failed - Full error details:', {
+            message: error.message,
+            code: error.code,
+            details: error.details,
+            hint: error.hint,
+            messageId: message.id,
+            userId: user.id
+          });
+          
           toast({
-            title: "Error",
-            description: "Failed to mark message as read.",
+            title: "Database Error",
+            description: `Failed to mark message as read: ${error.message || 'Unknown error'}`,
             variant: "destructive",
           });
         } else {
+          console.log('[ContactManager] Successfully marked message as read:', data);
           fetchMessages();
         }
-      } catch (e) {
-        console.error('[ContactManager] Unexpected error marking as read:', e);
+      } catch (e: any) {
+        console.error('[ContactManager] Unexpected error marking as read:', {
+          error: e,
+          message: e?.message,
+          stack: e?.stack,
+          messageId: message.id
+        });
+        
         toast({
-          title: "Error",
-          description: "Failed to mark message as read.",
+          title: "Unexpected Error",
+          description: e?.message || "An unexpected error occurred.",
           variant: "destructive",
         });
       }
@@ -197,16 +245,33 @@ export const ContactManager = () => {
 
   const handleStatusUpdate = async (messageId: string, newStatus: string) => {
     try {
+      // Validate session
+      const { data: { user }, error: authError } = await supabase.auth.getUser();
+      if (authError || !user) {
+        toast({
+          title: "Authentication Error",
+          description: "Your session has expired. Please refresh and log in again.",
+          variant: "destructive",
+        });
+        return;
+      }
+
       const { error } = await supabase
         .from('contact_messages')
         .update({ status: newStatus })
         .eq('id', messageId);
 
       if (error) {
-        console.error('[ContactManager] Status update failed:', error);
+        console.error('[ContactManager] Status update failed:', {
+          message: error.message,
+          code: error.code,
+          details: error.details,
+          messageId
+        });
+        
         toast({
-          title: "Error",
-          description: "Failed to update status",
+          title: "Database Error",
+          description: `Failed to update status: ${error.message || 'Unknown error'}`,
           variant: "destructive",
         });
         return;
@@ -217,11 +282,11 @@ export const ContactManager = () => {
         description: "Message status updated",
       });
       fetchMessages();
-    } catch (e) {
+    } catch (e: any) {
       console.error('[ContactManager] Unexpected error updating status:', e);
       toast({
-        title: "Error",
-        description: "Failed to update status",
+        title: "Unexpected Error",
+        description: e?.message || "Failed to update status",
         variant: "destructive",
       });
     }
