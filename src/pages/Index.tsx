@@ -550,43 +550,43 @@ const Index = () => {
             Who Is <span className="text-primary">SmartyGym</span> For?
           </h2>
           
-          <div className="space-y-4">
-            {/* Busy adults */}
-            <div className="flex flex-col items-center text-center">
-              <Users className="w-8 h-8 text-primary mb-2" />
-              <span className="text-sm font-semibold">Busy adults</span>
-            </div>
-            
-            {/* Parents */}
-            <div className="flex flex-col items-center text-center">
-              <Heart className="w-8 h-8 text-primary mb-2" />
-              <span className="text-sm font-semibold">Parents</span>
-            </div>
-            
-            {/* Beginners */}
-            <div className="flex flex-col items-center text-center">
-              <GraduationCap className="w-8 h-8 text-primary mb-2" />
-              <span className="text-sm font-semibold">Beginners</span>
-            </div>
-            
-            {/* Intermediate lifters */}
-            <div className="flex flex-col items-center text-center">
-              <Target className="w-8 h-8 text-primary mb-2" />
-              <span className="text-sm font-semibold">Intermediate lifters</span>
-            </div>
-            
-            {/* Travelers */}
-            <div className="flex flex-col items-center text-center">
-              <Plane className="w-8 h-8 text-primary mb-2" />
-              <span className="text-sm font-semibold">Travelers</span>
-            </div>
-            
-            {/* Gym-goers */}
-            <div className="flex flex-col items-center text-center">
-              <Dumbbell className="w-8 h-8 text-primary mb-2" />
-              <span className="text-sm font-semibold">Gym-goers</span>
-            </div>
+        <div className="space-y-4">
+          {/* Busy adults */}
+          <div className="flex items-center gap-3">
+            <Users className="w-6 h-6 text-primary flex-shrink-0" />
+            <span className="text-sm font-semibold">Busy adults</span>
           </div>
+          
+          {/* Parents */}
+          <div className="flex items-center gap-3">
+            <Heart className="w-6 h-6 text-primary flex-shrink-0" />
+            <span className="text-sm font-semibold">Parents</span>
+          </div>
+          
+          {/* Beginners */}
+          <div className="flex items-center gap-3">
+            <GraduationCap className="w-6 h-6 text-primary flex-shrink-0" />
+            <span className="text-sm font-semibold">Beginners</span>
+          </div>
+          
+          {/* Intermediate lifters */}
+          <div className="flex items-center gap-3">
+            <Target className="w-6 h-6 text-primary flex-shrink-0" />
+            <span className="text-sm font-semibold">Intermediate lifters</span>
+          </div>
+          
+          {/* Travelers */}
+          <div className="flex items-center gap-3">
+            <Plane className="w-6 h-6 text-primary flex-shrink-0" />
+            <span className="text-sm font-semibold">Travelers</span>
+          </div>
+          
+          {/* Gym-goers */}
+          <div className="flex items-center gap-3">
+            <Dumbbell className="w-6 h-6 text-primary flex-shrink-0" />
+            <span className="text-sm font-semibold">Gym-goers</span>
+          </div>
+        </div>
         </div>
           </section>
         ) : (
