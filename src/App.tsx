@@ -36,6 +36,8 @@ import ExerciseLibrary from "./pages/ExerciseLibrary";
 import Tools from "./pages/Tools";
 import FreeContent from "./pages/FreeContent";
 import Blog from "./pages/Blog";
+import About from "./pages/About";
+import FAQ from "./pages/FAQ";
 import CoachProfile from "./pages/CoachProfile";
 import Contact from "./pages/Contact";
 import Shop from "./pages/Shop";
@@ -87,6 +89,8 @@ const AppContent = () => {
                   <Route path="/joinpremium" element={<JoinPremium />} />
                   <Route path="/premiumbenefits" element={<PremiumBenefits />} />
                   <Route path="/premium-comparison" element={<PremiumComparison />} />
+                  <Route path="/about" element={<About />} />
+                  <Route path="/faq" element={<FAQ />} />
                 
                 {/* Public free content page */}
                 <Route path="/freecontent" element={<FreeContent />} />
