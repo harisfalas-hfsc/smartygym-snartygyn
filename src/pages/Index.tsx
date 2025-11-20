@@ -430,7 +430,7 @@ const Index = () => {
       <div className="min-h-screen bg-background overflow-x-hidden">
         
         {isMobile ? (
-          <section className="pt-2 pb-6 px-4">
+          <section className="pt-2 pb-2 px-4">
             {/* Mobile Carousel Headline */}
             <div className="text-center mb-6 px-4">
               <h2 className="text-2xl mb-2">
@@ -545,7 +545,7 @@ const Index = () => {
         </div>
 
         {/* Mobile Only: Who Is SmartyGym For? */}
-        <div className="mt-8 mb-6 px-4">
+        <div className="mt-8 mb-2 px-4">
           <h2 className="text-2xl font-bold text-center mb-6">
             Who Is <span className="text-primary">SmartyGym</span> For?
           </h2>
