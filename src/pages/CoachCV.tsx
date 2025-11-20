@@ -101,30 +101,30 @@ const CoachCV = () => {
               </p>
               
               <div className="space-y-4">
-                <div>
-                  <h3 className="font-semibold text-lg mb-2">Former Head Coach Roles:</h3>
-                  <ul className="space-y-2 ml-4">
-                    <li className="flex items-start gap-3">
-                      <span className="text-primary mt-1">•</span>
-                      <span>Greek National Basketball Team U16</span>
-                    </li>
-                    <li className="flex items-start gap-3">
-                      <span className="text-primary mt-1">•</span>
-                      <span>Multiple professional basketball clubs</span>
-                    </li>
-                    <li className="flex items-start gap-3">
-                      <span className="text-primary mt-1">•</span>
-                      <span>Professional volleyball teams</span>
-                    </li>
-                  </ul>
-                </div>
+              <div>
+                <h3 className="font-semibold text-lg mb-2">Professional Football Teams (Cypriot First Division):</h3>
+                <ul className="space-y-2 ml-4">
+                  <li className="flex items-start gap-3">
+                    <span className="text-primary mt-1">•</span>
+                    <span>Strength & Conditioning Coach for elite athletes</span>
+                  </li>
+                  <li className="flex items-start gap-3">
+                    <span className="text-primary mt-1">•</span>
+                    <span>Worked with multiple professional football clubs</span>
+                  </li>
+                  <li className="flex items-start gap-3">
+                    <span className="text-primary mt-1">•</span>
+                    <span>Over 20 years of hands-on experience in professional sports</span>
+                  </li>
+                </ul>
+              </div>
 
-                <div>
-                  <h3 className="font-semibold text-lg mb-2">Current Position:</h3>
-                  <p className="ml-4">
-                    Head of Strength & Conditioning at HFSC (Haris Falas Strength & Conditioning)
-                  </p>
-                </div>
+              <div>
+                <h3 className="font-semibold text-lg mb-2">Current Position:</h3>
+                <p className="ml-4">
+                  Founder and Head of Strength & Conditioning at HFSC (Haris Falas Strength & Conditioning) and Creator of SmartyGym platform
+                </p>
+              </div>
 
                 <div>
                   <h3 className="font-semibold text-lg mb-2">Training Experience:</h3>
