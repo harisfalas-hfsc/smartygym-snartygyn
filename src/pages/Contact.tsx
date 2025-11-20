@@ -540,7 +540,7 @@ const Contact = () => {
                         {!hasSubscription && <Lock className="h-4 w-4" />}
                       </CardTitle>
                       <CardDescription>
-                        Send a message directly to Haris Falas
+                        Send a message directly to <a href="/coach-profile" className="text-primary hover:underline font-medium">Haris Falas</a>
                       </CardDescription>
                     </CardHeader>
                     <CardContent className="flex-1 space-y-3">

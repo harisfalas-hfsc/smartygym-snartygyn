@@ -70,9 +70,9 @@ const TakeTour = () => {
   return (
     <>
       <Helmet>
-        <title>Take a Tour - Discover SmartyGym | Your Fitness Reimagined by Haris Falas</title>
-        <meta name="description" content="Explore smartygym.com - convenient & flexible online fitness Reimagined by Haris Falas. See how our gym works anywhere, anytime. Free workouts, premium programs & tools." />
-        <meta name="keywords" content="smartygym tour, smarty gym demo, smartygym.com features, Haris Falas, gym Reimagined, convenient fitness, flexible online gym, fitness anywhere anytime, online fitness tour" />
+        <title>Take a Tour - Discover SmartyGym | Your Fitness Re-imagined by Haris Falas</title>
+        <meta name="description" content="Explore smartygym.com - convenient & flexible online fitness Re-imagined by Haris Falas. See how our gym works anywhere, anytime. Free workouts, premium programs & tools." />
+        <meta name="keywords" content="smartygym tour, smarty gym demo, smartygym.com features, Haris Falas, gym Re-imagined, convenient fitness, flexible online gym, fitness anywhere anytime, online fitness tour" />
         
         <meta property="og:title" content="Take a Tour - SmartyGym Features" />
         <meta property="og:description" content="Discover how SmartyGym reimagines fitness - convenient, flexible training anywhere, anytime by Haris Falas" />
@@ -81,7 +81,7 @@ const TakeTour = () => {
         
         <meta property="twitter:card" content="summary_large_image" />
         <meta property="twitter:title" content="Take a Tour - SmartyGym" />
-        <meta property="twitter:description" content="Explore smartygym.com features - fitness Reimagined for convenience & flexibility" />
+        <meta property="twitter:description" content="Explore smartygym.com features - fitness Re-imagined for convenience & flexibility" />
         
         <link rel="canonical" href="https://smartygym.com/takeatour" />
       </Helmet>
@@ -118,7 +118,7 @@ const TakeTour = () => {
               Welcome to <span className="text-primary">SmartyGym</span>
             </h1>
             <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-              Your fitness Reimagined - Anywhere, anytime. Let's show you around!
+              Your fitness Re-imagined - Anywhere, anytime. Let's show you around!
             </p>
             <div className="inline-block bg-primary/20 border border-primary/30 rounded-full px-6 py-2">
               <p className="text-sm font-semibold">🎯 Science-based • 💪 Expert-designed • 🌍 Worldwide</p>
