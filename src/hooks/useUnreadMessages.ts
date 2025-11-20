@@ -7,10 +7,11 @@ export const useUnreadMessages = () => {
     queryFn: async () => {
       try {
         // Get current session (doesn't throw for guests)
-        const { data: { session } } = await supabase.auth.getSession();
+        const { data: { session }, error: sessionError } = await supabase.auth.getSession();
         
         // Return 0 for guests - this is NOT an error
         if (!session?.user) {
+          console.log('[useUnreadMessages] No active session, returning 0 (expected for guests)');
           return 0;
         }
 
@@ -24,7 +25,11 @@ export const useUnreadMessages = () => {
           .eq('is_read', false);
 
         if (systemError) {
-          console.error('[useUnreadMessages] System messages error:', systemError);
+          console.error('[useUnreadMessages] System messages error:', {
+            message: systemError.message,
+            code: systemError.code,
+            details: systemError.details
+          });
           throw systemError;
         }
 
@@ -37,24 +42,32 @@ export const useUnreadMessages = () => {
           .is('response_read_at', null);
 
         if (contactError) {
-          console.error('[useUnreadMessages] Contact messages error:', contactError);
+          console.error('[useUnreadMessages] Contact messages error:', {
+            message: contactError.message,
+            code: contactError.code,
+            details: contactError.details
+          });
           throw contactError;
         }
 
         const total = (systemCount || 0) + (contactCount || 0);
-        console.log('[useUnreadMessages] Unread count:', { systemCount, contactCount, total });
+        console.log('[useUnreadMessages] Unread count:', { systemCount, contactCount, total, userId });
         return total;
-      } catch (error) {
+      } catch (error: any) {
         // Log error but return 0 instead of breaking the UI
-        console.error('[useUnreadMessages] Query failed:', error);
+        console.error('[useUnreadMessages] Query failed:', {
+          error,
+          message: error?.message,
+          code: error?.code
+        });
         return 0;
       }
     },
     // Refetch every 30 seconds
     refetchInterval: 30000,
     // Don't retry on auth errors
-    retry: (failureCount, error) => {
-      if (error?.message?.includes('Auth')) return false;
+    retry: (failureCount, error: any) => {
+      if (error?.message?.includes('Auth') || error?.code === 'PGRST301') return false;
       return failureCount < 2;
     },
     // Cache for 25 seconds to reduce requests
