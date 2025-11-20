@@ -329,11 +329,11 @@ export const WorkoutsManager = ({ externalDialog, setExternalDialog }: WorkoutsM
               <SelectContent>
                 <SelectItem value="all">All Categories</SelectItem>
                 <SelectItem value="STRENGTH">STRENGTH</SelectItem>
+                <SelectItem value="CALORIE BURNING">CALORIE BURNING</SelectItem>
+                <SelectItem value="METABOLIC">METABOLIC</SelectItem>
                 <SelectItem value="CARDIO">CARDIO</SelectItem>
-                <SelectItem value="MOBILITY">MOBILITY</SelectItem>
-                <SelectItem value="CONDITIONING">CONDITIONING</SelectItem>
-                <SelectItem value="POWER">POWER</SelectItem>
-                <SelectItem value="RECOVERY">RECOVERY</SelectItem>
+                <SelectItem value="MOBILITY & STABILITY">MOBILITY & STABILITY</SelectItem>
+                <SelectItem value="CHALLENGE">CHALLENGE</SelectItem>
               </SelectContent>
             </Select>
             <Select value={formatFilter} onValueChange={setFormatFilter}>
