@@ -6,15 +6,17 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useNavigate } from "react-router-dom";
 import { useAccessControl } from "@/hooks/useAccessControl";
 import harisPhoto from "@/assets/haris-falas-coach.png";
-
 const CoachCV = () => {
-  const { canGoBack, goBack } = useShowBackButton();
+  const {
+    canGoBack,
+    goBack
+  } = useShowBackButton();
   const navigate = useNavigate();
-  const { userTier } = useAccessControl();
+  const {
+    userTier
+  } = useAccessControl();
   const isPremium = userTier === "premium";
-
-  return (
-    <>
+  return <>
       <Helmet>
         <title>Haris Falas - Qualifications & Experience | SmartyGym</title>
         <meta name="description" content="Certified strength and conditioning coach with BSc in Sport Science, MBA, and over 20 years of experience training elite athletes and everyday fitness enthusiasts." />
@@ -23,36 +25,22 @@ const CoachCV = () => {
 
       <main className="min-h-screen bg-gradient-to-b from-background to-background/50">
         <div className="container mx-auto px-4 py-6 max-w-4xl">
-          {canGoBack && (
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={goBack}
-              className="mb-4"
-            >
+          {canGoBack && <Button variant="ghost" size="sm" onClick={goBack} className="mb-4">
               <ArrowLeft className="mr-2 h-4 w-4" />
               Back
-            </Button>
-          )}
+            </Button>}
 
           {/* Hero Section */}
           <div className="text-center mb-12">
             <div className="w-32 h-32 mx-auto mb-6 rounded-full overflow-hidden border-4 border-primary">
-              <img
-                src={harisPhoto}
-                alt="Haris Falas - Sports Scientist & Strength & Conditioning Coach"
-                className="w-full h-full object-cover object-center"
-              />
+              <img src={harisPhoto} alt="Haris Falas - Sports Scientist & Strength & Conditioning Coach" className="w-full h-full object-cover object-center" />
             </div>
             <h1 className="text-4xl font-bold mb-2">
-              <button 
-                onClick={() => navigate("/coach-cv")}
-                className="text-primary hover:underline font-medium"
-              >
+              <button onClick={() => navigate("/coach-cv")} className="text-primary hover:underline font-medium">
                 Haris Falas
               </button>
             </h1>
-            <p className="text-xl text-muted-foreground">
+            <p className="text-muted-foreground text-base">
               Sports Scientist & Strength & Conditioning Coach
             </p>
           </div>
@@ -143,24 +131,16 @@ const CoachCV = () => {
           </Card>
 
           {/* CTA */}
-          {!isPremium && (
-            <div className="text-center space-y-4">
-              <Button 
-                size="lg" 
-                onClick={() => navigate("/premiumbenefits")}
-                className="bg-primary text-primary-foreground hover:bg-primary/90"
-              >
+          {!isPremium && <div className="text-center space-y-4">
+              <Button size="lg" onClick={() => navigate("/premiumbenefits")} className="bg-primary text-primary-foreground hover:bg-primary/90">
                 Join SmartyGym Today
               </Button>
               <p className="text-sm text-muted-foreground">
                 Train with confidence under expert guidance
               </p>
-            </div>
-          )}
+            </div>}
         </div>
       </main>
-    </>
-  );
+    </>;
 };
-
 export default CoachCV;
