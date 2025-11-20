@@ -109,9 +109,18 @@ const OneRMCalculator = () => {
     <ProtectedRoute>
       <>
         <Helmet>
-          <title>Free 1RM Calculator | One Rep Max Calculator Online | SmartyGym Cyprus | smartygym.com</title>
-          <meta name="description" content="Free online 1RM calculator at smartygym.com - Calculate your one rep max using Brzycki formula. Professional strength training tool by Sports Scientist Haris Falas Cyprus. Plan your gym training with precision. Train anywhere, anytime." />
-          <meta name="keywords" content="1rm calculator, one rep max calculator, 1 rep max calculator, strength calculator, powerlifting calculator, max calculator, training percentages, Brzycki formula, online gym tools, fitness calculators, smartygym, smartygym.com, gym Cyprus, Haris Falas, Haris Falas Cyprus, CSCS coach, strength training tools, online gym calculator, gym planning tools, bench press calculator, squat calculator, deadlift calculator, convenient fitness tools, flexible training tools" />
+          <title>Free 1RM Calculator Cyprus Greece | One Rep Max | Haris Falas HFSC | SmartyGym</title>
+          <meta name="description" content="Free 1RM calculator Cyprus Greece smartygym.com. Calculate one rep max using Brzycki formula. Professional strength tool by Sports Scientist Haris Falas HFSC Nicosia. Plan gym training Cyprus Greece. Train smart anywhere anytime" />
+          <meta name="keywords" content="1RM calculator Cyprus, one rep max calculator Cyprus, strength calculator Cyprus, personal trainer tools Cyprus, HFSC Nicosia, Haris Falas Cyprus, Sports Scientist Cyprus, 1RM calculator online, max calculator, powerlifting Cyprus, gym training Cyprus, smartygym.com, HFSC Performance, strength training tools Cyprus, γυμναστήριο calculator Κύπρος" />
+          
+          {/* Greek Language */}
+          <link rel="alternate" hrefLang="el" href="https://smartygym.com/1rmcalculator" />
+          <link rel="alternate" hrefLang="en-GB" href="https://smartygym.com/1rmcalculator" />
+          
+          {/* Geo Targeting */}
+          <meta name="geo.region" content="CY-01; GR" />
+          <meta name="geo.placename" content="Cyprus; Greece" />
+          <meta name="geo.position" content="35.1856;33.3823" />
           
           <meta property="og:title" content="Free 1RM Calculator | One Rep Max Calculator | SmartyGym" />
           <meta property="og:description" content="Calculate your one rep max with our free online 1RM calculator at smartygym.com - Professional strength training tool by Haris Falas" />

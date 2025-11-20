@@ -188,9 +188,18 @@ const MacroTrackingCalculator = () => {
   return (
     <ProtectedRoute>
       <Helmet>
-        <title>Macro Calculator Cyprus | Free Macronutrient & Nutrition Calculator | Haris Falas | smartygym.com</title>
-        <meta name="description" content="Free Macro Calculator - Calculate protein, carbs, fats for weight loss, muscle gain, maintenance. Personalized nutrition planning by Sports Scientist Haris Falas at smartygym.com Cyprus" />
-        <meta name="keywords" content="macro calculator Cyprus, macronutrient calculator, protein calculator, nutrition calculator, TDEE calculator, calorie tracker, meal planning calculator, bodybuilding nutrition, weight loss macros, muscle gain nutrition, Haris Falas Cyprus, Smarty Gym, smartygym.com, flexible dieting, IIFYM calculator, Cyprus nutrition tool" />
+        <title>Macro Calculator Cyprus Greece | Free Macronutrient Nutrition | Haris Falas HFSC | SmartyGym</title>
+        <meta name="description" content="Free macro calculator Cyprus Greece smartygym.com. Calculate protein carbs fats for weight loss muscle gain. Personalized nutrition by Sports Scientist Haris Falas HFSC Nicosia. Plan meals Cyprus Greece. Train smart anywhere anytime" />
+        <meta name="keywords" content="macro calculator Cyprus, macronutrient calculator Cyprus, nutrition calculator Cyprus, personal trainer nutrition Cyprus, HFSC Nicosia, Haris Falas Cyprus, Sports Scientist Cyprus, protein calculator, TDEE calculator Cyprus, meal planning Cyprus, nutrition planning Cyprus, smartygym.com, HFSC Performance, weight loss nutrition Cyprus, muscle gain nutrition, γυμναστήριο διατροφή Κύπρος" />
+        
+        {/* Greek Language */}
+        <link rel="alternate" hrefLang="el" href="https://smartygym.com/macrocalculator" />
+        <link rel="alternate" hrefLang="en-GB" href="https://smartygym.com/macrocalculator" />
+        
+        {/* Geo Targeting */}
+        <meta name="geo.region" content="CY-01; GR" />
+        <meta name="geo.placename" content="Cyprus; Greece" />
+        <meta name="geo.position" content="35.1856;33.3823" />
         
         <meta property="og:title" content="Macro Calculator - Smarty Gym" />
         <meta property="og:description" content="Free macronutrient calculator - convenient nutrition tool at smartygym.com" />

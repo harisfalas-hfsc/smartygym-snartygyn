@@ -18,9 +18,18 @@ const CoachCV = () => {
   const isPremium = userTier === "premium";
   return <>
       <Helmet>
-        <title>Haris Falas - Qualifications & Experience | SmartyGym</title>
-        <meta name="description" content="Certified strength and conditioning coach with BSc in Sport Science, MBA, and over 20 years of experience training elite athletes and everyday fitness enthusiasts." />
-        <meta name="keywords" content="Haris Falas, strength coach, sport science, EXOS specialist, fitness coach, personal trainer credentials" />
+        <title>Haris Falas CV Cyprus | Qualifications Experience | Sports Scientist HFSC Nicosia | SmartyGym</title>
+        <meta name="description" content="Haris Falas CV Cyprus Nicosia. BSc Sport Science, EXOS Performance Specialist, 20+ years strength conditioning. Elite football teams. Sports Scientist HFSC Performance Nicosia. Personal trainer Cyprus qualifications smartygym.com προσωπικός προπονητής βιογραφικό Κύπρος" />
+        <meta name="keywords" content="Haris Falas CV, Haris Falas qualifications Cyprus, Sports Scientist Cyprus, HFSC Nicosia, personal trainer credentials Cyprus, strength coach Cyprus, BSc Sport Science Cyprus, EXOS specialist Cyprus, fitness expert CV Cyprus, trainer experience Cyprus, smartygym.com, HFSC Performance, Cyprus fitness professional, προσωπικός προπονητής βιογραφικό Κύπρος" />
+        
+        {/* Greek Language */}
+        <link rel="alternate" hrefLang="el" href="https://smartygym.com/coach-cv" />
+        <link rel="alternate" hrefLang="en-GB" href="https://smartygym.com/coach-cv" />
+        
+        {/* Geo Targeting */}
+        <meta name="geo.region" content="CY-01" />
+        <meta name="geo.placename" content="Nicosia, Cyprus" />
+        <meta name="geo.position" content="35.1856;33.3823" />
       </Helmet>
 
       <main className="min-h-screen bg-gradient-to-b from-background to-background/50">

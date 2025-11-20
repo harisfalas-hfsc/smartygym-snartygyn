@@ -15,9 +15,18 @@ const CoachProfile = () => {
   return (
     <>
       <Helmet>
-        <title>Haris Falas | Cyprus Personal Trainer & Sports Scientist | SmartyGym</title>
-        <meta name="description" content="Haris Falas - Cyprus personal trainer and Sports Scientist with 20+ years experience. Expert in online workouts, online training programs, and online personal training. Certified strength and conditioning coach for Cyprus fitness and worldwide." />
-        <meta name="keywords" content="Haris Falas, Cyprus personal trainer, Cyprus personal trainers, Sports Scientist Cyprus, strength and conditioning coach, HFSC, Cyprus fitness expert, online personal training Cyprus, fitness in Cyprus, personal trainer Cyprus, functional training coach, Cyprus fitness professional" />
+        <title>Haris Falas | Personal Trainer Cyprus Nicosia | Sports Scientist HFSC | SmartyGym Cyprus</title>
+        <meta name="description" content="Haris Falas personal trainer Cyprus Nicosia. Sports Scientist 20+ years experience HFSC Performance. Expert online workouts training programs personal training Cyprus Greece. Strength conditioning coach Cyprus smartygym.com προσωπικός προπονητής Κύπρος" />
+        <meta name="keywords" content="Haris Falas, Haris Falas Cyprus, personal trainer Cyprus, personal trainer Nicosia, Sports Scientist Cyprus, HFSC, HFSC Nicosia, HFSC Performance, strength and conditioning coach Cyprus, fitness expert Cyprus, online personal trainer Cyprus, Cyprus fitness professional, gym coach Cyprus, training specialist Cyprus, smartygym.com, προσωπικός προπονητής Κύπρος, γυμναστής Κύπρος" />
+        
+        {/* Greek Language */}
+        <link rel="alternate" hrefLang="el" href="https://smartygym.com/coach-profile" />
+        <link rel="alternate" hrefLang="en-GB" href="https://smartygym.com/coach-profile" />
+        
+        {/* Geo Targeting */}
+        <meta name="geo.region" content="CY-01" />
+        <meta name="geo.placename" content="Nicosia, Cyprus" />
+        <meta name="geo.position" content="35.1856;33.3823" />
         
         {/* Open Graph */}
         <meta property="og:title" content="Haris Falas | Cyprus Personal Trainer & Sports Scientist" />
