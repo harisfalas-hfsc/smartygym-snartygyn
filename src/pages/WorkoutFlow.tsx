@@ -121,13 +121,9 @@ const WorkoutFlow = () => {
             <h2 className="text-xl sm:text-2xl font-bold mb-3 text-center">About Our Workouts</h2>
             <div className="space-y-2 text-muted-foreground max-w-3xl mx-auto">
               <p className="text-sm sm:text-base">
-                Our workouts are single-session training routines designed to fit your lifestyle and goals. 
-                Whether you're targeting strength, calorie burning, metabolic conditioning, cardio endurance, 
-                mobility & stability, or looking for a challenge — we have you covered.
+                Our workouts are single-session training routines designed to fit your lifestyle and goals. Whether you're targeting strength, calorie burning, metabolic conditioning, cardio endurance, mobility & stability, or looking for a challenge — we have you covered. Hit the gym without a plan? In the home? On the go? Our workouts are designed to deliver results in any setting. 
               </p>
-              <p className="text-sm sm:text-base">
-                 Hit the gym without a plan? In the home? On the go? Our workouts are designed to deliver results in any setting.
-              </p>
+              
               <p className="text-sm sm:text-base font-semibold text-foreground text-center mt-6">
                 Unlock all workouts with a Premium plan or grab one standalone session whenever you need it.
               </p>
