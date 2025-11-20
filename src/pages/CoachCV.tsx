@@ -50,7 +50,7 @@ const CoachCV = () => {
               </button>
             </h1>
             <p className="text-muted-foreground text-base">
-              Sports Scientist & Strength & Conditioning Coach
+              Sports Scientist and Strength & Conditioning Coach
             </p>
           </div>
 
