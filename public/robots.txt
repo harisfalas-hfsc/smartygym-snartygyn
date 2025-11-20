@@ -1,4 +1,4 @@
-# SmartyGym Robots.txt - Optimized for Search Engines and AI Crawlers
+# SmartyGym Robots.txt - Cyprus & Greece Online Gym Platform
 
 User-agent: Googlebot
 Allow: /
@@ -26,6 +26,7 @@ Allow: /
 
 User-agent: PerplexityBot
 Allow: /
+Crawl-delay: 1
 
 User-agent: Twitterbot
 Allow: /
@@ -41,13 +42,17 @@ Crawl-delay: 10
 
 User-agent: *
 Allow: /
-Crawl-delay: 5
+Crawl-delay: 2
 
-# Important pages
+# Important Routes
 Allow: /workout
-Allow: /training-program
+Allow: /trainingprogram
 Allow: /tools
-Allow: /about
+Allow: /coach-profile
 Allow: /contact
+Allow: /shop
+Allow: /exerciselibrary
+Allow: /blog
 
+# Sitemaps
 Sitemap: https://smartygym.com/sitemap.xml
