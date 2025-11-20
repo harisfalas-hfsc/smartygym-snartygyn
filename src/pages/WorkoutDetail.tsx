@@ -335,12 +335,11 @@ const WorkoutDetail = () => {
   // Map URL type to database category
   const categoryMap: { [key: string]: string } = {
     "strength": "STRENGTH",
-    "calorie-burning": "CARDIO",
-    "metabolic": "CONDITIONING",
+    "calorie-burning": "CALORIE BURNING",
+    "metabolic": "METABOLIC",
     "cardio": "CARDIO",
-    "mobility": "MOBILITY",
-    "power": "POWER",
-    "challenge": "CONDITIONING"
+    "mobility": "MOBILITY & STABILITY",
+    "challenge": "CHALLENGE"
   };
 
   const workoutTitles: { [key: string]: string } = {
@@ -349,7 +348,6 @@ const WorkoutDetail = () => {
     "metabolic": "Metabolic Workouts",
     "cardio": "Cardio Workouts",
     "mobility": "Mobility & Stability Workouts",
-    "power": "Power Workouts",
     "challenge": "Challenge Workouts"
   };
 
