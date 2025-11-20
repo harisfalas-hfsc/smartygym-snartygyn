@@ -434,8 +434,9 @@ const Index = () => {
             </div>
           </section>
         ) : (
-          // Desktop: Hero Section
-          <section className="relative py-8 sm:py-12 border-b border-border bg-background overflow-hidden">
+          <>
+            {/* Desktop: Hero Section */}
+            <section className="relative py-8 sm:py-12 border-b border-border bg-background overflow-hidden">
           
           <div className="container mx-auto max-w-6xl px-4 relative z-10 overflow-x-hidden">
             <ScrollReveal>
@@ -1150,6 +1151,8 @@ const Index = () => {
           </Card>
         </section>
       </div>
+          </>
+        )}
 
     </div>
     </>
