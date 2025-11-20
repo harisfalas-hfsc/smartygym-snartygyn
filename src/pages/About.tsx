@@ -94,9 +94,9 @@ const About = () => {
           {/* Hero Section */}
           <ScrollReveal>
             <div className="text-center mb-12">
-              <h1 className="text-4xl md:text-5xl font-bold mb-4 text-foreground">
-                About SmartyGym
-              </h1>
+        <h1 className="text-4xl md:text-5xl font-bold mb-4 text-foreground">
+          About <span className="text-primary md:text-foreground">SmartyGym</span>
+        </h1>
               <p className="text-lg text-muted-foreground max-w-3xl mx-auto">
                 We're redefining online fitness — making quality training accessible, flexible, and designed for real life.
               </p>
@@ -113,9 +113,9 @@ const About = () => {
                     Your Gym Re-imagined. Anywhere, Anytime.
                   </h2>
                   <div className="space-y-4 max-w-4xl mx-auto">
-                    <p className="text-base font-semibold text-center">
-                      We are not here to replace your gym. We are here to back you up when life gets in the way.
-                    </p>
+          <p className="text-base font-semibold text-center text-primary md:text-foreground">
+            We are not here to replace your gym. We are here to back you up when life gets in the way.
+          </p>
                     <p className="text-base text-muted-foreground text-center leading-relaxed">
                       Whether you're traveling, on holiday, can't make it to the gym, or your gym is closed — 
                       SmartyGym is your backup plan. Or, if you prefer training from home entirely, we've got you covered. 
