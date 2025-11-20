@@ -420,33 +420,29 @@ const Index = () => {
                   const Icon = card.icon;
                   return (
                     <CarouselItem key={card.id} className="pl-4 basis-[92%]">
-                      <Card className="h-[160px] border-2 border-primary/30 hover:border-primary transition-all">
-                        <CardContent className="h-full flex flex-row items-stretch p-4 gap-4">
+                      <Card 
+                        onClick={() => navigate(card.route)}
+                        className="h-[160px] border-2 border-primary/30 hover:border-primary hover:scale-[1.02] hover:shadow-xl hover:bg-primary/5 transition-all duration-300 cursor-pointer"
+                      >
+                        <CardContent className="h-full flex flex-row items-center p-4 gap-4">
                           
-                          {/* LEFT: Content Section (60%) */}
-                          <div className="flex-[6] flex flex-col justify-center gap-2">
-                            <div className="flex items-center gap-3">
-                              <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-primary/10 flex-shrink-0">
-                                <Icon className="w-6 h-6 text-primary" />
-                              </div>
-                              <h3 className="text-base font-bold text-foreground leading-tight">
-                                {card.title}
-                              </h3>
-                            </div>
+                          {/* Icon */}
+                          <div className="inline-flex items-center justify-center w-14 h-14 rounded-full bg-primary/10 flex-shrink-0">
+                            <Icon className="w-7 h-7 text-primary" />
+                          </div>
+                          
+                          {/* Text Content */}
+                          <div className="flex-1 flex flex-col justify-center gap-1.5">
+                            <h3 className="text-base font-bold text-foreground leading-tight">
+                              {card.title}
+                            </h3>
                             <p className="text-xs text-muted-foreground leading-snug line-clamp-2">
                               {card.description}
                             </p>
                           </div>
                           
-                          {/* RIGHT: Button Section (40%) - Fixed Position */}
-                          <div className="flex-[4] flex items-center justify-center">
-                            <Button 
-                              className="w-full h-12"
-                              onClick={() => navigate(card.route)}
-                            >
-                              {card.buttonText}
-                            </Button>
-                          </div>
+                          {/* Visual indicator that card is clickable */}
+                          <ChevronRight className="w-5 h-5 text-primary/50 flex-shrink-0" />
                           
                         </CardContent>
                       </Card>
