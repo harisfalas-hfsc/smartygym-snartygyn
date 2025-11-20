@@ -57,16 +57,20 @@ const CoachCV = () => {
             </p>
           </div>
 
-          {/* My Background */}
+          {/* Qualifications */}
           <Card className="mb-8 border-2 border-primary">
             <CardHeader>
-              <CardTitle className="text-2xl text-primary">My Background</CardTitle>
+              <CardTitle className="text-2xl text-primary">Qualifications</CardTitle>
             </CardHeader>
             <CardContent>
               <ul className="space-y-3">
                 <li className="flex items-start gap-3">
                   <span className="text-primary mt-1">•</span>
-                  <span>BSc in Sport Science</span>
+                  <span>Sports Scientist specialised in Football Performance</span>
+                </li>
+                <li className="flex items-start gap-3">
+                  <span className="text-primary mt-1">•</span>
+                  <span>Strength and Conditioning Coach</span>
                 </li>
                 <li className="flex items-start gap-3">
                   <span className="text-primary mt-1">•</span>
@@ -74,27 +78,19 @@ const CoachCV = () => {
                 </li>
                 <li className="flex items-start gap-3">
                   <span className="text-primary mt-1">•</span>
-                  <span>Strength and Conditioning Coach since 2002</span>
+                  <span>EXOS Performance and Rehab Specialist</span>
                 </li>
                 <li className="flex items-start gap-3">
                   <span className="text-primary mt-1">•</span>
-                  <span>EXOS Performance Specialist - Phase 1, 2 and 3</span>
+                  <span>FMS Specialist</span>
                 </li>
                 <li className="flex items-start gap-3">
                   <span className="text-primary mt-1">•</span>
-                  <span>EXOS Rehabilitation Specialist</span>
+                  <span>ACE Medical Exercise Specialist</span>
                 </li>
                 <li className="flex items-start gap-3">
                   <span className="text-primary mt-1">•</span>
-                  <span>FMS (Functional Movement Screen) Specialist</span>
-                </li>
-                <li className="flex items-start gap-3">
-                  <span className="text-primary mt-1">•</span>
-                  <span>Specialist in Elite and Amateur Athletes Training</span>
-                </li>
-                <li className="flex items-start gap-3">
-                  <span className="text-primary mt-1">•</span>
-                  <span>Athletes Evolution Exercise Evaluation</span>
+                  <span>NSCA CSCS (ongoing)</span>
                 </li>
               </ul>
             </CardContent>
@@ -105,47 +101,44 @@ const CoachCV = () => {
             <CardHeader>
               <CardTitle className="text-2xl text-primary">Professional Experience</CardTitle>
             </CardHeader>
+            <CardContent>
+              <ul className="space-y-3">
+                <li className="flex items-start gap-3">
+                  <span className="text-primary mt-1">•</span>
+                  <span>Strength and Conditioning Coach in elite football</span>
+                </li>
+                <li className="flex items-start gap-3">
+                  <span className="text-primary mt-1">•</span>
+                  <span>Worked with Olympiakos Nicosia, APOEL, Anorthosis, AEL, Achna and Digenis</span>
+                </li>
+                <li className="flex items-start gap-3">
+                  <span className="text-primary mt-1">•</span>
+                  <span>Designed performance programs and injury-prevention systems</span>
+                </li>
+                <li className="flex items-start gap-3">
+                  <span className="text-primary mt-1">•</span>
+                  <span>Founder and Head Coach of HFSC</span>
+                </li>
+                <li className="flex items-start gap-3">
+                  <span className="text-primary mt-1">•</span>
+                  <span>Creator of SmartyGym online training platform</span>
+                </li>
+              </ul>
+            </CardContent>
+          </Card>
+
+          {/* HFSC and SmartyGym */}
+          <Card className="mb-8 border-2 border-primary">
+            <CardHeader>
+              <CardTitle className="text-2xl text-primary">HFSC and SmartyGym</CardTitle>
+            </CardHeader>
             <CardContent className="space-y-4">
               <p>
-                I've dedicated over two decades to coaching athletes and teams across multiple sports, 
-                as well as hundreds of adults at all fitness levels — from complete beginners to experienced gym-goers.
+                At HFSC, I focus on functional strength, mobility, rehabilitation principles and real performance training for athletes and adults.
               </p>
-              
-              <div className="space-y-4">
-              <div>
-                <h3 className="font-semibold text-lg mb-2 text-primary">Professional Football Teams (Cypriot First Division):</h3>
-                <ul className="space-y-2 ml-4">
-                  <li className="flex items-start gap-3">
-                    <span className="text-primary mt-1">•</span>
-                    <span>Strength & Conditioning Coach for elite athletes</span>
-                  </li>
-                  <li className="flex items-start gap-3">
-                    <span className="text-primary mt-1">•</span>
-                    <span>Worked with multiple professional football clubs</span>
-                  </li>
-                  <li className="flex items-start gap-3">
-                    <span className="text-primary mt-1">•</span>
-                    <span>Over 20 years of hands-on experience in professional sports</span>
-                  </li>
-                </ul>
-              </div>
-
-              <div>
-                <h3 className="font-semibold text-lg mb-2 text-primary">Current Position:</h3>
-                <p className="ml-4">
-                  Founder and Head of Strength & Conditioning at HFSC (Haris Falas Strength & Conditioning) and Creator of SmartyGym platform
-                </p>
-              </div>
-
-                <div>
-                  <h3 className="font-semibold text-lg mb-2 text-primary">Training Experience:</h3>
-                  <p className="ml-4">
-                    Successfully trained hundreds of adults seeking to improve their fitness, 
-                    strength, mobility, and overall health — combining evidence-based methodology 
-                    with personalized programming.
-                  </p>
-                </div>
-              </div>
+              <p>
+                With SmartyGym, I transformed this approach into a digital platform that gives people structured workouts, programs and professional coaching anywhere, anytime.
+              </p>
             </CardContent>
           </Card>
 
