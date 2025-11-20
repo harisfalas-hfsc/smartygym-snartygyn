@@ -20,6 +20,7 @@ import smartyGymLogo from "@/assets/smarty-gym-logo.png";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { useUnreadMessages } from "@/hooks/useUnreadMessages";
 import { SafeNotificationBadge } from "@/components/NotificationBadge";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 interface SubscriptionInfo {
   subscribed: boolean;
@@ -36,6 +37,7 @@ export const Navigation = () => {
   const [subscriptionInfo, setSubscriptionInfo] = useState<SubscriptionInfo | null>(null);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const { data: unreadCount = 0, refetch: refetchUnread } = useUnreadMessages();
+  const isMobile = useIsMobile();
 
   // Listen for messages being read to update badge immediately
   useEffect(() => {
