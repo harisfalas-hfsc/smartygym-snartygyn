@@ -7,74 +7,66 @@ import { InfoRibbon } from "@/components/InfoRibbon";
 import { ArrowLeft, Dumbbell, Flame, Zap, Heart, Move, Activity, TrendingUp } from "lucide-react";
 import { SEOEnhancer } from "@/components/SEOEnhancer";
 import { generateBreadcrumbSchema } from "@/utils/seoHelpers";
-
 import { useAccessControl } from "@/hooks/useAccessControl";
 import { useShowBackButton } from "@/hooks/useShowBackButton";
 import { ScrollReveal } from "@/components/ScrollReveal";
-
 const WorkoutFlow = () => {
   const navigate = useNavigate();
-  const { canGoBack, goBack } = useShowBackButton();
-  const { userTier } = useAccessControl();
+  const {
+    canGoBack,
+    goBack
+  } = useShowBackButton();
+  const {
+    userTier
+  } = useAccessControl();
   const isPremium = userTier === "premium";
-
-  const workoutTypes = [
-    {
-      id: "strength",
-      title: "Strength",
-      description: "Build muscle and power with resistance training",
-      icon: Dumbbell,
-      level: "Beginner-Advanced",
-      equipment: "Equipment/No Equipment",
-    },
-    {
-      id: "calorie-burning",
-      title: "Calorie Burning",
-      description: "High-intensity workouts to maximize calorie burn",
-      icon: Flame,
-      level: "Beginner-Advanced",
-      equipment: "Equipment/No Equipment",
-    },
-    {
-      id: "metabolic",
-      title: "Metabolic",
-      description: "Boost your metabolism with dynamic conditioning",
-      icon: Zap,
-      level: "Beginner-Advanced",
-      equipment: "Equipment/No Equipment",
-    },
-    {
-      id: "cardio",
-      title: "Cardio",
-      description: "Improve cardiovascular endurance and stamina",
-      icon: Heart,
-      level: "Beginner-Advanced",
-      equipment: "Equipment/No Equipment",
-    },
-    {
-      id: "mobility",
-      title: "Mobility & Stability",
-      description: "Enhance flexibility and movement quality",
-      icon: Move,
-      level: "Beginner-Advanced",
-      equipment: "Equipment/No Equipment",
-    },
-    {
-      id: "challenge",
-      title: "Challenge",
-      description: "Push your limits with advanced workouts",
-      icon: Activity,
-      level: "Beginner-Advanced",
-      equipment: "Equipment/No Equipment",
-    },
-  ];
-
+  const workoutTypes = [{
+    id: "strength",
+    title: "Strength",
+    description: "Build muscle and power with resistance training",
+    icon: Dumbbell,
+    level: "Beginner-Advanced",
+    equipment: "Equipment/No Equipment"
+  }, {
+    id: "calorie-burning",
+    title: "Calorie Burning",
+    description: "High-intensity workouts to maximize calorie burn",
+    icon: Flame,
+    level: "Beginner-Advanced",
+    equipment: "Equipment/No Equipment"
+  }, {
+    id: "metabolic",
+    title: "Metabolic",
+    description: "Boost your metabolism with dynamic conditioning",
+    icon: Zap,
+    level: "Beginner-Advanced",
+    equipment: "Equipment/No Equipment"
+  }, {
+    id: "cardio",
+    title: "Cardio",
+    description: "Improve cardiovascular endurance and stamina",
+    icon: Heart,
+    level: "Beginner-Advanced",
+    equipment: "Equipment/No Equipment"
+  }, {
+    id: "mobility",
+    title: "Mobility & Stability",
+    description: "Enhance flexibility and movement quality",
+    icon: Move,
+    level: "Beginner-Advanced",
+    equipment: "Equipment/No Equipment"
+  }, {
+    id: "challenge",
+    title: "Challenge",
+    description: "Push your limits with advanced workouts",
+    icon: Activity,
+    level: "Beginner-Advanced",
+    equipment: "Equipment/No Equipment"
+  }];
   const handleWorkoutSelect = (workoutId: string) => {
     navigate(`/workout/${workoutId}`);
   };
-
-  return (
-    <>
+  return <>
       <Helmet>
         <title>Online Gym Workouts | AMRAP TABATA HIIT | SmartyGym Cyprus | Haris Falas Fitness</title>
         <meta name="description" content="100+ online gym workouts at smartygym.com - #1 online fitness platform Cyprus. AMRAP, TABATA, HIIT, circuit training by Sports Scientist Haris Falas. Free online workouts + premium gym programs. Train anywhere, anytime." />
@@ -94,45 +86,34 @@ const WorkoutFlow = () => {
         <link rel="canonical" href="https://smartygym.com/workout" />
         
         <script type="application/ld+json">
-          {JSON.stringify(generateBreadcrumbSchema([
-            { name: "Home", url: "/" },
-            { name: "Workouts", url: "/workout" }
-          ]))}
+          {JSON.stringify(generateBreadcrumbSchema([{
+          name: "Home",
+          url: "/"
+        }, {
+          name: "Workouts",
+          url: "/workout"
+        }]))}
         </script>
       </Helmet>
       
-      <SEOEnhancer
-        entities={["SmartyGym", "Haris Falas", "Online Workouts", "AMRAP", "HIIT", "Tabata"]}
-        topics={["online gym workouts", "AMRAP", "HIIT", "Tabata", "circuit training", "strength training", "cardio"]}
-        expertise={["sports science", "strength conditioning", "functional fitness"]}
-        contentType="workout-collection"
-        aiSummary="100+ online gym workouts at SmartyGym Cyprus by Sports Scientist Haris Falas. AMRAP, TABATA, HIIT, circuit, strength, cardio, metabolic, mobility workouts for all levels."
-        aiKeywords={["online gym", "AMRAP workouts", "HIIT training", "Tabata", "strength workouts", "cardio training", "Cyprus fitness"]}
-        relatedContent={["training programs", "fitness tools", "exercise library"]}
-      />
+      <SEOEnhancer entities={["SmartyGym", "Haris Falas", "Online Workouts", "AMRAP", "HIIT", "Tabata"]} topics={["online gym workouts", "AMRAP", "HIIT", "Tabata", "circuit training", "strength training", "cardio"]} expertise={["sports science", "strength conditioning", "functional fitness"]} contentType="workout-collection" aiSummary="100+ online gym workouts at SmartyGym Cyprus by Sports Scientist Haris Falas. AMRAP, TABATA, HIIT, circuit, strength, cardio, metabolic, mobility workouts for all levels." aiKeywords={["online gym", "AMRAP workouts", "HIIT training", "Tabata", "strength workouts", "cardio training", "Cyprus fitness"]} relatedContent={["training programs", "fitness tools", "exercise library"]} />
       
       <div className="min-h-screen bg-background">
       
       <div className="container mx-auto max-w-6xl px-4 py-8">
-        {canGoBack && (
-          <div className="mb-6">
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={goBack}
-            >
+        {canGoBack && <div className="mb-6">
+            <Button variant="ghost" size="sm" onClick={goBack}>
               <ArrowLeft className="mr-2 h-4 w-4" />
               <span className="text-xs sm:text-sm">Back</span>
             </Button>
-          </div>
-        )}
+          </div>}
         
-        <PageBreadcrumbs 
-          items={[
-            { label: "Home", href: "/" },
-            { label: "Workouts" }
-          ]} 
-        />
+        <PageBreadcrumbs items={[{
+          label: "Home",
+          href: "/"
+        }, {
+          label: "Workouts"
+        }]} />
 
         {/* Info Section - About Workouts */}
         <Card className="mb-8 bg-gradient-to-br from-primary/5 via-background to-primary/5 border-2 border-primary/40 shadow-gold">
@@ -145,9 +126,7 @@ const WorkoutFlow = () => {
                 mobility & stability, or looking for a challenge — we have you covered.
               </p>
               <p className="text-sm sm:text-base">
-                Each workout can be performed with bodyweight only or with equipment, making them perfect for 
-                quick training sessions anywhere you are. Hit the gym without a plan? On the go? 
-                Our workouts are designed to deliver results in any setting.
+                 Hit the gym without a plan? In the home? On the go? Our workouts are designed to deliver results in any setting.
               </p>
               <p className="text-sm sm:text-base font-semibold text-foreground text-center mt-6">
                 Unlock all workouts with a Premium plan or grab one standalone session whenever you need it.
@@ -157,56 +136,31 @@ const WorkoutFlow = () => {
         </Card>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
-          {workoutTypes.map((workout) => {
+          {workoutTypes.map(workout => {
             const Icon = workout.icon;
-            return (
-              <ScrollReveal key={workout.id}>
-                <Card
-                  itemScope
-                  itemType="https://schema.org/ExercisePlan"
-                  onClick={() => handleWorkoutSelect(workout.id)}
-                  className="group p-6 cursor-pointer transition-all duration-500 ease-out transform-gpu hover:scale-110 hover:-translate-y-3 hover:shadow-2xl hover:shadow-primary/40 hover:border-primary/60 bg-card border-2 border-border"
-                  role="button"
-                  aria-label={`${workout.title} workouts - Online gym category at Smarty Gym Cyprus - smartygym.com by Haris Falas`}
-                  data-workout-category={workout.id}
-                  data-keywords="online gym workouts, smarty gym, online fitness, smartygym.com, Haris Falas Cyprus workouts"
-                >
+            return <ScrollReveal key={workout.id}>
+                <Card itemScope itemType="https://schema.org/ExercisePlan" onClick={() => handleWorkoutSelect(workout.id)} className="group p-6 cursor-pointer transition-all duration-500 ease-out transform-gpu hover:scale-110 hover:-translate-y-3 hover:shadow-2xl hover:shadow-primary/40 hover:border-primary/60 bg-card border-2 border-border" role="button" aria-label={`${workout.title} workouts - Online gym category at Smarty Gym Cyprus - smartygym.com by Haris Falas`} data-workout-category={workout.id} data-keywords="online gym workouts, smarty gym, online fitness, smartygym.com, Haris Falas Cyprus workouts">
                   <div className="flex flex-col items-center text-center space-y-4">
-                    <div 
-                      className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center transition-transform duration-300 group-hover:scale-110"
-                      aria-hidden="true"
-                    >
+                    <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center transition-transform duration-300 group-hover:scale-110" aria-hidden="true">
                       <Icon className="w-8 h-8 text-primary transition-transform duration-300 group-hover:rotate-3" />
                     </div>
                     <div>
-                      <h3 
-                        className="font-semibold text-lg mb-2"
-                        itemProp="name"
-                      >
+                      <h3 className="font-semibold text-lg mb-2" itemProp="name">
                         {workout.title}
                       </h3>
-                      <p 
-                        className="text-sm text-muted-foreground mb-3"
-                        itemProp="description"
-                      >
+                      <p className="text-sm text-muted-foreground mb-3" itemProp="description">
                         {workout.description}
                       </p>
               <p className="text-xs text-muted-foreground/80 italic">
                 Crafted by{" "}
-                <a 
-                  href="/coach-profile" 
-                  className="text-primary hover:underline font-medium whitespace-nowrap"
-                  onClick={(e) => e.stopPropagation()}
-                >
+                <a href="/coach-profile" className="text-primary hover:underline font-medium whitespace-nowrap" onClick={e => e.stopPropagation()}>
                   Haris Falas
                 </a>
                 {" "}BSc Sports Science, EXOS Specialist, CSCS
               </p>
               
               <div className="flex gap-1 text-[10px] mt-2">
-                <span 
-                  className="bg-primary/20 text-primary border border-primary/40 px-1.5 py-0.5 rounded-full whitespace-nowrap"
-                >
+                <span className="bg-primary/20 text-primary border border-primary/40 px-1.5 py-0.5 rounded-full whitespace-nowrap">
                   Single Session
                 </span>
                 <span className="bg-green-500/20 text-green-700 dark:text-green-400 border border-green-500/40 px-1.5 py-0.5 rounded-full whitespace-nowrap">
@@ -223,14 +177,12 @@ const WorkoutFlow = () => {
                     </div>
                   </div>
                 </Card>
-              </ScrollReveal>
-            );
+              </ScrollReveal>;
           })}
         </div>
 
         {/* Bottom Premium Banner */}
-        {!isPremium && (
-          <ScrollReveal delay={700}>
+        {!isPremium && <ScrollReveal delay={700}>
             <div className="bg-card border border-border rounded-xl p-6 mt-8 text-center shadow-soft">
               <h3 className="text-xl font-semibold mb-2">Love these workouts?</h3>
               <p className="text-muted-foreground mb-4">
@@ -240,12 +192,9 @@ const WorkoutFlow = () => {
                 Join Premium
               </Button>
             </div>
-          </ScrollReveal>
-        )}
+          </ScrollReveal>}
       </div>
       </div>
-    </>
-  );
+    </>;
 };
-
 export default WorkoutFlow;
