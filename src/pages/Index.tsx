@@ -14,7 +14,8 @@ import smartyGymIcon from "@/assets/smarty-gym-icon.png";
 import harisPhoto from "@/assets/haris-falas-coach.png";
 import { MobilePhoneIllustration } from "@/components/MobilePhoneIllustration";
 import { useIsMobile } from "@/hooks/use-mobile";
-import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel";
+import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious, type CarouselApi } from "@/components/ui/carousel";
+import { cn } from "@/lib/utils";
 
 import { useAccessControl } from "@/hooks/useAccessControl";
 import { ScrollReveal } from "@/components/ScrollReveal";
@@ -46,6 +47,25 @@ const Index = () => {
   const { userTier } = useAccessControl();
   const isPremium = userTier === "premium";
   const isMobile = useIsMobile();
+
+  // Carousel state for mobile navigation dots
+  const [carouselApi, setCarouselApi] = useState<CarouselApi>();
+  const [currentSlide, setCurrentSlide] = useState(0);
+
+  useEffect(() => {
+    if (!carouselApi) return;
+    
+    const onSelect = () => {
+      setCurrentSlide(carouselApi.selectedScrollSnap());
+    };
+    
+    carouselApi.on("select", onSelect);
+    onSelect();
+    
+    return () => {
+      carouselApi.off("select", onSelect);
+    };
+  }, [carouselApi]);
 
   const heroCards = [
     { 
@@ -411,9 +431,21 @@ const Index = () => {
         
         {isMobile ? (
           <section className="py-6 px-4">
+            {/* Mobile Carousel Headline */}
+            <div className="text-center mb-6 px-4">
+              <h2 className="text-2xl mb-2">
+                <span className="font-normal text-foreground">Welcome to </span>
+                <span className="font-bold text-foreground">SmartyGym</span>
+              </h2>
+              <p className="text-base text-muted-foreground">
+                Your gym reimagined. Anywhere. Anytime.
+              </p>
+            </div>
+
             <Carousel 
               className="w-full px-12" 
               opts={{ align: "start", loop: true }}
+              setApi={setCarouselApi}
             >
               <CarouselContent className="-ml-4">
                 {heroCards.map((card) => {
@@ -455,6 +487,23 @@ const Index = () => {
               <CarouselPrevious className="-left-12 bg-background border-2 border-primary shadow-lg" />
               <CarouselNext className="-right-12 bg-background border-2 border-primary shadow-lg" />
             </Carousel>
+
+            {/* Carousel Dots */}
+            <div className="flex justify-center gap-2 mt-4">
+              {heroCards.map((_, index) => (
+                <button
+                  key={index}
+                  onClick={() => carouselApi?.scrollTo(index)}
+                  className={cn(
+                    "w-2.5 h-2.5 rounded-full border-2 transition-all duration-300",
+                    currentSlide === index
+                      ? "border-primary bg-transparent scale-125"
+                      : "border-primary/40 bg-transparent hover:border-primary/60"
+                  )}
+                  aria-label={`Go to slide ${index + 1}`}
+                />
+              ))}
+            </div>
 
         {/* Quick Access Menu */}
         <div className="mt-8 space-y-3">
