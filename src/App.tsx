@@ -39,6 +39,7 @@ import Blog from "./pages/Blog";
 import About from "./pages/About";
 import FAQ from "./pages/FAQ";
 import CoachProfile from "./pages/CoachProfile";
+import CoachCV from "./pages/CoachCV";
 import Contact from "./pages/Contact";
 import Shop from "./pages/Shop";
 import PrivacyPolicy from "./pages/PrivacyPolicy";
@@ -97,6 +98,7 @@ const AppContent = () => {
                 <Route path="/newsletter-thank-you" element={<NewsletterThankYou />} />
                 <Route path="/blog" element={<Blog />} />
                 <Route path="/coach-profile" element={<CoachProfile />} />
+                <Route path="/coach-cv" element={<CoachCV />} />
                 
                 {/* Public workout and plan flows - anyone can browse */}
                 <Route path="/workout" element={<WorkoutFlow />} />
