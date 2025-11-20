@@ -40,14 +40,21 @@ const CoachCV = () => {
                 className="w-full h-full object-cover"
               />
             </div>
-            <h1 className="text-4xl font-bold mb-2">Haris Falas</h1>
+            <h1 className="text-4xl font-bold mb-2">
+              <button 
+                onClick={() => navigate("/coach-cv")}
+                className="text-primary hover:underline font-medium"
+              >
+                Haris Falas
+              </button>
+            </h1>
             <p className="text-xl text-muted-foreground">
               Sports Scientist & Strength & Conditioning Coach
             </p>
           </div>
 
           {/* My Background */}
-          <Card className="mb-8 border-2 border-border">
+          <Card className="mb-8 border-2 border-primary">
             <CardHeader>
               <CardTitle className="text-2xl">My Background</CardTitle>
             </CardHeader>
@@ -90,7 +97,7 @@ const CoachCV = () => {
           </Card>
 
           {/* Professional Experience */}
-          <Card className="mb-8 border-2 border-border">
+          <Card className="mb-8 border-2 border-primary">
             <CardHeader>
               <CardTitle className="text-2xl">Professional Experience</CardTitle>
             </CardHeader>
