@@ -12,6 +12,7 @@ import { usePurchases } from "@/hooks/usePurchases";
 import { UserMessagesPanel } from "@/components/UserMessagesPanel";
 import { MyOrders } from "@/components/MyOrders";
 import { useQuery } from "@tanstack/react-query";
+import { useAccessControl } from "@/hooks/useAccessControl";
 import { 
   Heart, 
   CheckCircle, 
@@ -131,6 +132,8 @@ export default function UserDashboard() {
   const [workoutInteractions, setWorkoutInteractions] = useState<WorkoutInteraction[]>([]);
   const [programInteractions, setProgramInteractions] = useState<ProgramInteraction[]>([]);
   const [subscriptionInfo, setSubscriptionInfo] = useState<SubscriptionInfo | null>(null);
+  const { userTier } = useAccessControl();
+  const isPremium = userTier === "premium";
   const [stripeDetails, setStripeDetails] = useState<StripeSubscription | null>(null);
   const [favoriteExercises, setFavoriteExercises] = useState<FavoriteExercise[]>([]);
   const [oneRMHistory, setOneRMHistory] = useState<OneRMRecord[]>([]);
@@ -585,7 +588,7 @@ export default function UserDashboard() {
           <Card className="mb-6 border-primary/50 bg-gradient-to-r from-primary/5 to-primary/10">
             <CardContent className="p-4">
               {/* Free Plan with Purchases */}
-              {!subscriptionInfo.subscribed && purchases && purchases.length > 0 && (
+              {!subscriptionInfo.subscribed && purchases && purchases.length > 0 && !isPremium && (
                 <div className="space-y-3">
                   <h2 className="flex items-center gap-2 text-lg font-bold">
                     <ShoppingBag className="h-5 w-5 text-primary" />
@@ -605,7 +608,7 @@ export default function UserDashboard() {
               )}
 
               {/* Free Plan without Purchases */}
-              {!subscriptionInfo.subscribed && (!purchases || purchases.length === 0) && (
+              {!subscriptionInfo.subscribed && (!purchases || purchases.length === 0) && !isPremium && (
                 <div className="space-y-3">
                   <h2 className="flex items-center gap-2 text-lg font-bold">
                     <UserIcon className="h-5 w-5 text-muted-foreground" />
@@ -990,7 +993,7 @@ export default function UserDashboard() {
 
           {/* Workouts Tab */}
           <TabsContent value="workouts" className="space-y-6">
-            {!hasActivePlan && !hasStandalonePurchases ? (
+            {!hasActivePlan && !hasStandalonePurchases && !isPremium ? (
               <Card className="border-primary/50 bg-gradient-to-r from-primary/5 to-primary/10">
                 <CardContent className="text-center py-12">
                   <Crown className="h-12 w-12 text-primary mx-auto mb-4" />
@@ -1148,7 +1151,7 @@ export default function UserDashboard() {
 
           {/* Programs Tab */}
           <TabsContent value="programs" className="space-y-6">
-            {!hasActivePlan ? (
+            {!hasActivePlan && !isPremium ? (
               <Card className="border-primary/50 bg-gradient-to-r from-primary/5 to-primary/10">
                 <CardContent className="text-center py-12">
                   <Crown className="h-12 w-12 text-primary mx-auto mb-4" />
@@ -1560,7 +1563,7 @@ export default function UserDashboard() {
 
           {/* LogBook Tab */}
           <TabsContent value="logbook" className="space-y-6">
-            {!hasActivePlan ? (
+            {!hasActivePlan && !isPremium ? (
               <Card className="border-primary/50 bg-gradient-to-r from-primary/5 to-primary/10">
                 <CardContent className="text-center py-12">
                   <Crown className="h-12 w-12 text-primary mx-auto mb-4" />

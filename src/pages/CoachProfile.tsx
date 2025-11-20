@@ -4,10 +4,13 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { ArrowLeft, Award, GraduationCap, Building2, Target, CheckCircle, Smartphone, Shield } from "lucide-react";
 import { useShowBackButton } from "@/hooks/useShowBackButton";
+import { useAccessControl } from "@/hooks/useAccessControl";
 
 const CoachProfile = () => {
   const navigate = useNavigate();
   const { canGoBack, goBack } = useShowBackButton();
+  const { userTier } = useAccessControl();
+  const isPremium = userTier === "premium";
 
   return (
     <>
@@ -223,12 +226,14 @@ const CoachProfile = () => {
             </Card>
 
             {/* CTA Section */}
-            <div className="text-center py-8">
-              <h3 className="text-xl sm:text-2xl font-semibold mb-6">Join me inside SmartyGym and start your training today.</h3>
-              <Button size="lg" onClick={() => navigate("/premiumbenefits")} className="cta-button">
-                Start Training
-              </Button>
-            </div>
+            {!isPremium && (
+              <div className="text-center py-8">
+                <h3 className="text-xl sm:text-2xl font-semibold mb-6">Join me inside SmartyGym and start your training today.</h3>
+                <Button size="lg" onClick={() => navigate("/premiumbenefits")} className="cta-button">
+                  Start Training
+                </Button>
+              </div>
+            )}
           </article>
         </div>
       </div>
