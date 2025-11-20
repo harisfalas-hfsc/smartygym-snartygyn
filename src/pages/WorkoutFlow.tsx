@@ -117,9 +117,9 @@ const WorkoutFlow = () => {
 
         {/* Info Section - About Workouts */}
         <Card className="mb-8 bg-gradient-to-br from-primary/5 via-background to-primary/5 border-2 border-primary/40 shadow-gold">
-          <div className="p-6 sm:p-8">
-            <h2 className="text-xl sm:text-2xl font-bold mb-4 text-center">About Our Workouts</h2>
-            <div className="space-y-4 text-muted-foreground max-w-3xl mx-auto">
+          <div className="p-4 sm:p-5">
+            <h2 className="text-xl sm:text-2xl font-bold mb-3 text-center">About Our Workouts</h2>
+            <div className="space-y-2 text-muted-foreground max-w-3xl mx-auto">
               <p className="text-sm sm:text-base">
                 Our workouts are single-session training routines designed to fit your lifestyle and goals. 
                 Whether you're targeting strength, calorie burning, metabolic conditioning, cardio endurance, 

@@ -103,9 +103,9 @@ const TrainingProgramFlow = () => {
 
         {/* Info Section - About Training Programs */}
         <Card className="mb-8 bg-gradient-to-br from-primary/5 via-background to-primary/5 border-2 border-primary/40 shadow-gold">
-          <div className="p-6 sm:p-8">
-            <h2 className="text-xl sm:text-2xl font-bold mb-4 text-center">About Our Training Programs</h2>
-            <div className="space-y-4 text-muted-foreground max-w-3xl mx-auto">
+          <div className="p-4 sm:p-5">
+            <h2 className="text-xl sm:text-2xl font-bold mb-3 text-center">About Our Training Programs</h2>
+            <div className="space-y-2 text-muted-foreground max-w-3xl mx-auto">
               <p className="text-sm sm:text-base">
                 Our training programs are long-term, structured plans designed to help you achieve your specific 
                 fitness goals. Whether you want to lose weight, build muscle, improve functional strength, 
