@@ -410,6 +410,7 @@ export type Database = {
           response_read_at: string | null
           status: string
           subject: string
+          updated_at: string
           user_id: string | null
         }
         Insert: {
@@ -426,6 +427,7 @@ export type Database = {
           response_read_at?: string | null
           status?: string
           subject: string
+          updated_at?: string
           user_id?: string | null
         }
         Update: {
@@ -442,6 +444,7 @@ export type Database = {
           response_read_at?: string | null
           status?: string
           subject?: string
+          updated_at?: string
           user_id?: string | null
         }
         Relationships: []
