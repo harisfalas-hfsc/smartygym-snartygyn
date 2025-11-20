@@ -146,18 +146,7 @@ const IndividualWorkout = () => {
     return focusMap[type || ''] || 'General Fitness';
   };
 
-  // Free workouts (accessible by logged-in members)
-  const freeWorkouts = [
-    'challenge-002', 'challenge-003', 'challenge-004', 'challenge-005', 'challenge-006', 'challenge-007',
-    'power-037', 'power-038', 'power-039', 'power-040', 'power-041', 'power-042',
-    'mobility-025', 'mobility-026', 'mobility-027', 'mobility-028', 'mobility-029', 'mobility-030',
-    'metabolic-043', 'metabolic-044', 'metabolic-045', 'metabolic-046', 'metabolic-047', 'metabolic-048',
-    'strength-049', 'strength-050', 'strength-051', 'strength-052', 'strength-053', 'strength-054',
-    'calorie-055', 'calorie-056', 'calorie-057', 'calorie-058', 'calorie-059', 'calorie-060',
-    'cardio-061', 'cardio-062', 'cardio-063', 'cardio-064', 'cardio-065', 'cardio-066',
-  ];
-  const isFreeWorkout = freeWorkouts.includes(id || '');
-  
+
   // Fetch from database
   const { data: dbWorkout, isLoading: isLoadingDb } = useWorkoutData(id);
 
@@ -235,7 +224,7 @@ const IndividualWorkout = () => {
 
             <AccessGate 
               requireAuth={true} 
-              requirePremium={!isFreeWorkout} 
+              requirePremium={dbWorkout?.is_premium || false}
               contentType="workout"
               contentId={dbWorkout.id}
               contentName={dbWorkout.name}
@@ -265,7 +254,7 @@ const IndividualWorkout = () => {
                 cool_down={dbWorkout.cool_down}
                 workoutId={id}
                 workoutCategory={type || ''}
-                isFreeContent={isFreeWorkout}
+                isFreeContent={!dbWorkout.is_premium}
               />
             </AccessGate>
           </div>
@@ -4647,7 +4636,7 @@ Rest 30s between rounds`,
   let alreadyPurchased = false;
   
   if (dbWorkout) {
-    isPremium = dbWorkout.is_premium && !isFreeWorkout;
+    isPremium = dbWorkout.is_premium;
     canPurchase = dbWorkout.is_standalone_purchase && !!dbWorkout.price;
     alreadyPurchased = hasPurchased(dbWorkout.id, "workout");
     hasAccess = userTier === "premium" || alreadyPurchased || !isPremium;
@@ -4830,7 +4819,7 @@ Rest 30s between rounds`,
               workoutDetails={{ exercises: workout.exercises }}
               workoutId={id}
               workoutCategory={type || ''}
-              isFreeContent={isFreeWorkout}
+              isFreeContent={!isPremium}
             />
           </AccessGate>
         </div>
