@@ -68,9 +68,18 @@ const WorkoutFlow = () => {
   };
   return <>
       <Helmet>
-        <title>Online Gym Workouts | AMRAP TABATA HIIT | SmartyGym Cyprus | Haris Falas Fitness</title>
-        <meta name="description" content="100+ online gym workouts at smartygym.com - #1 online fitness platform Cyprus. AMRAP, TABATA, HIIT, circuit training by Sports Scientist Haris Falas. Free online workouts + premium gym programs. Train anywhere, anytime." />
-        <meta name="keywords" content="online gym workouts, gym workouts online, online fitness workouts, workout programs online, gym Cyprus, smartygym workouts, online gym, smartygym.com, Haris Falas workouts, Haris Falas Cyprus, Cyprus fitness, free gym workouts, AMRAP workouts, TABATA training, HIIT workouts, circuit training workouts, bodyweight training, no equipment gym workouts, strength training workouts, cardio workouts online, metabolic conditioning, mobility training, power workouts, challenge workouts, convenient gym, flexible training, online workouts, functional fitness, home gym workouts, online gym Cyprus, Cyprus gym workouts, virtual gym, digital gym, gym training online, workout training programs" />
+        <title>Online Gym Workouts Cyprus Greece | AMRAP TABATA HIIT | Haris Falas | SmartyGym HFSC</title>
+        <meta name="description" content="500+ online gym workouts Cyprus Greece smartygym.com. AMRAP TABATA HIIT strength cardio by Sports Scientist Haris Falas HFSC Nicosia. Home workouts Cyprus, bodyweight training, equipment workouts. Train anywhere anytime γυμναστήριο online Κύπρος" />
+        <meta name="keywords" content="online gym Cyprus, online workouts Cyprus, gym workouts Cyprus, personal trainer Cyprus, home workouts Cyprus, Cyprus fitness, online gym Greece, HFSC Nicosia, Haris Falas Cyprus, Sports Scientist Cyprus, γυμναστήριο online Κύπρος, γυμναστική από το σπίτι, AMRAP workouts, TABATA training, HIIT workouts, strength training workouts, cardio workouts, bodyweight training, home gym workouts, online gym training, smartygym.com, HFSC Performance, functional fitness Cyprus, metabolic training, mobility training" />
+        
+        {/* Greek Language */}
+        <link rel="alternate" hrefLang="el" href="https://smartygym.com/workout" />
+        <link rel="alternate" hrefLang="en-GB" href="https://smartygym.com/workout" />
+        
+        {/* Geo Targeting */}
+        <meta name="geo.region" content="CY-01; GR" />
+        <meta name="geo.placename" content="Cyprus; Greece" />
+        <meta name="geo.position" content="35.1856;33.3823" />
         
         <meta property="og:title" content="Workouts - SmartyGym | Fitness Re-imagined" />
         <meta property="og:description" content="Convenient & flexible workouts designed by Sports Scientist Haris Falas - train anywhere, anytime" />

@@ -163,9 +163,18 @@ const Blog = () => {
   return (
     <>
       <Helmet>
-        <title>Fitness Blog - Expert Training & Nutrition Advice | SmartyGym</title>
-        <meta name="description" content="Expert fitness articles by Haris Falas, Cyprus-based sports scientist. Get training tips, nutrition advice, workout guides and fitness insights for Cyprus and international athletes." />
-        <meta name="keywords" content="Haris Falas, fitness blog Cyprus, training advice Cyprus, nutrition tips, strength training, functional fitness, Cyprus fitness expert, sports scientist Cyprus, workout tips Cyprus, fitness news Cyprus, gym Cyprus, smartygym Cyprus, online fitness Cyprus" />
+        <title>Fitness Blog Cyprus Greece | Expert Articles | Haris Falas HFSC | SmartyGym</title>
+        <meta name="description" content="Fitness blog Cyprus Greece smartygym.com. Expert articles on strength training cardio nutrition by Sports Scientist Haris Falas HFSC Nicosia. Evidence-based fitness content for Cyprus Greece online gym training. Real results anywhere anytime" />
+        <meta name="keywords" content="fitness blog Cyprus, fitness articles Cyprus, personal trainer blog Cyprus, Cyprus fitness, HFSC Nicosia, Haris Falas Cyprus, Sports Scientist Cyprus, strength training articles, cardio training tips, nutrition guides Cyprus, fitness blog Greece, online gym Cyprus, workout guides, training tips, smartygym.com, HFSC Performance, evidence-based fitness, γυμναστήριο blog Κύπρος" />
+        
+        {/* Greek Language */}
+        <link rel="alternate" hrefLang="el" href="https://smartygym.com/blog" />
+        <link rel="alternate" hrefLang="en-GB" href="https://smartygym.com/blog" />
+        
+        {/* Geo Targeting */}
+        <meta name="geo.region" content="CY-01; GR" />
+        <meta name="geo.placename" content="Cyprus; Greece" />
+        <meta name="geo.position" content="35.1856;33.3823" />
         
         <meta property="og:title" content="Fitness Blog - Expert Training & Nutrition Advice by Haris Falas | SmartyGym" />
         <meta property="og:description" content="Expert fitness articles by Cyprus sports scientist Haris Falas. Training tips, nutrition advice, and performance insights." />

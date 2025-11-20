@@ -84,16 +84,29 @@ const Shop = () => {
   return (
     <>
       <Helmet>
-        <title>Recommended Fitness Gear by Haris Falas | SmartyGym</title>
-        <meta name="description" content="Hand-picked fitness equipment and gear recommended by certified strength coach Haris Falas. Quality products for home workouts and gym training." />
-        <meta name="keywords" content="fitness gear, workout equipment, home gym, resistance bands, dumbbells, yoga mats, fitness accessories, Haris Falas recommendations" />
+        <title>Fitness Equipment Shop Cyprus Greece | Haris Falas Recommendations | HFSC | SmartyGym</title>
+        <meta name="description" content="Fitness equipment shop Cyprus Greece smartygym.com. Quality gear personally recommended by Sports Scientist Haris Falas HFSC Nicosia for online gym training. Trusted equipment Cyprus Greece home workouts. Train smart anywhere anytime" />
+        <meta name="keywords" content="fitness equipment Cyprus, gym equipment Cyprus, home workout equipment Cyprus, fitness shop Cyprus, personal trainer recommendations Cyprus, HFSC Nicosia, Haris Falas Cyprus, Sports Scientist Cyprus, fitness gear Cyprus, workout equipment Greece, home gym equipment, online gym equipment, smartygym.com, HFSC Performance, training equipment Cyprus" />
+        
+        {/* Greek Language */}
+        <link rel="alternate" hrefLang="el" href="https://smartygym.com/shop" />
+        <link rel="alternate" hrefLang="en-GB" href="https://smartygym.com/shop" />
+        
+        {/* Geo Targeting */}
+        <meta name="geo.region" content="CY-01; GR" />
+        <meta name="geo.placename" content="Cyprus; Greece" />
+        <meta name="geo.position" content="35.1856;33.3823" />
       </Helmet>
       
       <SEOEnhancer
-        entities={["SmartyGym", "Haris Falas", "Fitness Equipment"]}
-        topics={["fitness gear", "home gym", "workout equipment"]}
-        expertise={["strength training equipment", "fitness accessories"]}
+        entities={["SmartyGym", "HFSC Performance", "Haris Falas", "Fitness Equipment Cyprus", "Gym Shop Cyprus"]}
+        topics={["fitness gear", "home gym equipment", "workout equipment", "training accessories"]}
+        expertise={["strength training equipment", "fitness accessories", "sports equipment"]}
         contentType="product recommendations"
+        greekKeywords={["γυμναστήριο εξοπλισμός Κύπρος", "fitness εξοπλισμός"]}
+        geoRegion="CY-01; GR"
+        geoPlacename="Cyprus; Greece"
+        geoPosition="35.1856;33.3823"
       />
       
       <main className="container mx-auto px-4 py-6 max-w-7xl">

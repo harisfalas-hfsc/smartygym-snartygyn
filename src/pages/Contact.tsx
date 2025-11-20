@@ -313,9 +313,18 @@ const Contact = () => {
   return (
     <>
       <Helmet>
-        <title>Contact SmartyGym Cyprus | Haris Falas Sports Scientist | Online Gym Support</title>
-        <meta name="description" content="Contact Cyprus' #1 online gym - SmartyGym at smartygym.com. Get expert online fitness advice from Sports Scientist Haris Falas. Online gym support, personal training inquiries, Cyprus fitness questions answered. Contact us today!" />
-        <meta name="keywords" content="contact SmartyGym, contact online gym Cyprus, Haris Falas Cyprus contact, Haris Falas contact, Cyprus online gym contact, fitness coach Cyprus, personal training Cyprus, online gym support Cyprus, smartygym contact, smartygym.com, Cyprus fitness expert, sports scientist Cyprus contact, training inquiry Cyprus, gym Cyprus contact, online fitness support, Cyprus personal trainer contact, gym support online, online gym inquiries, fitness questions Cyprus, Cyprus gym help, contact fitness coach, reach Haris Falas" />
+        <title>Contact SmartyGym Cyprus Greece | Haris Falas HFSC Nicosia | Online Gym Personal Trainer</title>
+        <meta name="description" content="Contact SmartyGym Cyprus Greece smartygym.com. Reach Sports Scientist Haris Falas HFSC Nicosia for online gym personal training Cyprus. Expert fitness advice Cyprus Greece. Contact personal trainer Cyprus. Message us anywhere anytime προσωπικός προπονητής επικοινωνία Κύπρος" />
+        <meta name="keywords" content="contact SmartyGym Cyprus, contact Haris Falas Cyprus, personal trainer contact Cyprus, HFSC Nicosia contact, Cyprus online gym contact, Sports Scientist Cyprus contact, contact personal trainer Nicosia, fitness coach Cyprus contact, online gym support Cyprus, smartygym.com contact, HFSC Performance contact, training inquiry Cyprus, προσωπικός προπονητής επικοινωνία Κύπρος" />
+        
+        {/* Greek Language */}
+        <link rel="alternate" hrefLang="el" href="https://smartygym.com/contact" />
+        <link rel="alternate" hrefLang="en-GB" href="https://smartygym.com/contact" />
+        
+        {/* Geo Targeting */}
+        <meta name="geo.region" content="CY-01; GR" />
+        <meta name="geo.placename" content="Nicosia, Cyprus; Greece" />
+        <meta name="geo.position" content="35.1856;33.3823" />
         
         <meta property="og:title" content="Contact SmartyGym.com | Haris Falas" />
         <meta property="og:description" content="Get in touch with Sports Scientist Haris Falas at SmartyGym.com for expert fitness guidance and personalized training support" />

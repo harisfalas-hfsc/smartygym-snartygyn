@@ -242,9 +242,18 @@ const Index = () => {
   return (
     <>
       <Helmet>
-        <title>Online Gym Cyprus | SmartyGym by Haris Falas | Professional Online Fitness & Personal Training</title>
-        <meta name="description" content="smartygym.com - Cyprus' leading online gym by Sports Scientist Haris Falas (BSc, CSCS). 100+ expert-designed workouts, structured training programs, professional fitness coaching. Train anywhere, anytime. Evidence-based online fitness training." />
-        <meta name="keywords" content="online gym Cyprus, Haris Falas Cyprus, Haris Falas, smartygym, smartygym.com, online gym, online fitness Cyprus, online personal training Cyprus, virtual gym Cyprus, home workouts Cyprus, online workout programs, fitness coach Cyprus, strength training Cyprus, HIIT workouts Cyprus, functional training Cyprus, bodyweight workouts, gym workouts online, personal trainer online Cyprus, online fitness coaching, virtual personal training, Cyprus fitness, Limassol fitness, Nicosia fitness, Larnaca fitness, Paphos fitness, online training programs, workout plans online, fitness programs Cyprus, sports scientist Cyprus, CSCS coach Cyprus, strength and conditioning Cyprus, online gym membership, virtual gym membership Cyprus, workout videos online, fitness videos Cyprus, exercise programs online, metabolic training, cardio workouts online, strength programs, mobility training, fat loss workouts, muscle building programs, performance training, functional fitness, AMRAP workouts, TABATA training, circuit training, interval training, bodyweight training, no equipment workouts, home gym workouts, online fitness platform, digital fitness, remote coaching, virtual training sessions" />
+        <title>SmartyGym | Online Gym Cyprus Greece | 500+ Workouts Training Programs | Haris Falas HFSC | smartygym.com</title>
+        <meta name="description" content="SmartyGym #1 online gym Cyprus Greece smartygym.com. 500+ expert workouts training programs by Sports Scientist Haris Falas HFSC Nicosia. AMRAP TABATA HIIT strength cardio home workouts Cyprus. Train anywhere anytime. 100% human zero AI. γυμναστήριο online Κύπρος" />
+        <meta name="keywords" content="smartygym, smarty gym, online gym Cyprus, online gym Greece, gym Cyprus, personal trainer Cyprus, personal trainer Nicosia, personal trainer Limassol, home workouts Cyprus, Cyprus fitness, online fitness Greece, HFSC, HFSC Nicosia, HFSC Performance, Haris Falas, Haris Falas Cyprus, Sports Scientist Cyprus, γυμναστήριο online Κύπρος, προσωπικός προπονητής, online γυμναστήριο Ελλάδα, γυμναστική από το σπίτι, AMRAP workouts, TABATA training, HIIT workouts, strength training, cardio workouts, functional training, home workouts, bodyweight workouts, online training programs, workout programs online, fitness calculators, smartygym.com, gym Cyprus, Nicosia gym, Limassol gym" />
+        
+        {/* Greek Language */}
+        <link rel="alternate" hrefLang="el" href="https://smartygym.com/" />
+        <link rel="alternate" hrefLang="en-GB" href="https://smartygym.com/" />
+        
+        {/* Geo Targeting */}
+        <meta name="geo.region" content="CY-01; GR" />
+        <meta name="geo.placename" content="Nicosia, Cyprus; Greece" />
+        <meta name="geo.position" content="35.1856;33.3823" />
         
         <meta name="semantic-keywords" content="online-fitness, home-workouts, virtual-training, digital-gym, remote-coaching, bodyweight-training, functional-fitness, strength-conditioning" />
         <meta name="workout-formats" content="AMRAP, TABATA, HIIT, circuit-training, interval-training, metabolic-conditioning, functional-training, strength-training" />

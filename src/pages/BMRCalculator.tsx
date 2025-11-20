@@ -117,9 +117,18 @@ const BMRCalculator = () => {
     <ProtectedRoute>
       <>
         <Helmet>
-          <title>Free BMR Calculator | Basal Metabolic Rate Calculator Online | SmartyGym Cyprus | smartygym.com</title>
-          <meta name="description" content="Free online BMR calculator at smartygym.com - Calculate your basal metabolic rate using Mifflin-St Jeor equation. Professional nutrition tool by Sports Scientist Haris Falas Cyprus. Calculate TDEE and daily calorie needs for weight loss, muscle gain. Train anywhere, anytime." />
-          <meta name="keywords" content="bmr calculator, basal metabolic rate calculator, BMR calc, tdee calculator, calorie calculator, metabolism calculator, daily calorie needs, Mifflin-St Jeor, online gym tools, nutrition calculators, smartygym, smartygym.com, gym Cyprus, Haris Falas, Haris Falas Cyprus, CSCS coach, nutrition tools, online gym calculator, weight loss calculator, muscle gain calculator, convenient fitness tools, flexible nutrition planning" />
+          <title>Free BMR Calculator Cyprus Greece | Basal Metabolic Rate | Haris Falas HFSC | SmartyGym</title>
+          <meta name="description" content="Free BMR calculator Cyprus Greece smartygym.com. Calculate basal metabolic rate TDEE using Mifflin-St Jeor equation. Nutrition tool by Sports Scientist Haris Falas HFSC Nicosia. Daily calorie needs Cyprus Greece. Train smart anywhere anytime" />
+          <meta name="keywords" content="BMR calculator Cyprus, basal metabolic rate Cyprus, calorie calculator Cyprus, personal trainer nutrition Cyprus, HFSC Nicosia, Haris Falas Cyprus, Sports Scientist Cyprus, BMR calculator online, TDEE calculator, metabolism calculator Cyprus, nutrition tools Cyprus, smartygym.com, HFSC Performance, calorie needs Cyprus, γυμναστήριο διατροφή Κύπρος" />
+          
+          {/* Greek Language */}
+          <link rel="alternate" hrefLang="el" href="https://smartygym.com/bmrcalculator" />
+          <link rel="alternate" hrefLang="en-GB" href="https://smartygym.com/bmrcalculator" />
+          
+          {/* Geo Targeting */}
+          <meta name="geo.region" content="CY-01; GR" />
+          <meta name="geo.placename" content="Cyprus; Greece" />
+          <meta name="geo.position" content="35.1856;33.3823" />
           
           <meta property="og:title" content="Free BMR Calculator | Basal Metabolic Rate Calculator | SmartyGym" />
           <meta property="og:description" content="Calculate your BMR and daily calorie needs with our free online calculator at smartygym.com - Professional nutrition tool by Haris Falas" />

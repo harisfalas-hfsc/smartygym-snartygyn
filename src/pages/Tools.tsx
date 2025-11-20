@@ -43,9 +43,18 @@ const Tools = () => {
   return (
     <>
       <Helmet>
-        <title>Free Fitness Calculators | Online Gym Tools | SmartyGym Cyprus | smartygym.com</title>
-        <meta name="description" content="Free online gym fitness tools at smartygym.com: 1RM Calculator, BMR Calculator, Macro Tracking Calculator. Professional fitness planning tools by Sports Scientist Haris Falas for online gym training. Convenient fitness tools for anywhere, anytime." />
-        <meta name="keywords" content="online gym tools, fitness calculators online, gym calculators, smartygym tools, smartygym.com, online gym Cyprus, gym tools Cyprus, Haris Falas tools, Haris Falas Cyprus, 1rm calculator online, bmr calculator online, macro calculator, fitness tools online, gym training tools, convenient fitness tools, gym Re-imagined, workout calculators, online fitness tools, gym planning tools, training calculators, Cyprus fitness tools, strength calculator, nutrition calculator, calorie calculator online" />
+        <title>Free Fitness Calculators Cyprus Greece | 1RM BMR Macro | Haris Falas HFSC | SmartyGym</title>
+        <meta name="description" content="Free fitness calculators Cyprus Greece smartygym.com. 1RM Calculator BMR Calculator Macro Tracking by Sports Scientist Haris Falas HFSC Nicosia. Professional gym tools online Cyprus for strength nutrition planning. Train smart anywhere anytime" />
+        <meta name="keywords" content="fitness calculators Cyprus, gym calculators Cyprus, 1RM calculator Cyprus, BMR calculator Cyprus, personal trainer tools Cyprus, online gym Cyprus, Cyprus fitness tools, HFSC Nicosia, Haris Falas Cyprus, Sports Scientist Cyprus, fitness tools online, gym training tools, macro calculator, strength calculator, nutrition calculator, smartygym.com, HFSC Performance, workout planning tools Cyprus" />
+        
+        {/* Greek Language */}
+        <link rel="alternate" hrefLang="el" href="https://smartygym.com/tools" />
+        <link rel="alternate" hrefLang="en-GB" href="https://smartygym.com/tools" />
+        
+        {/* Geo Targeting */}
+        <meta name="geo.region" content="CY-01; GR" />
+        <meta name="geo.placename" content="Cyprus; Greece" />
+        <meta name="geo.position" content="35.1856;33.3823" />
         
         <meta property="og:title" content="Fitness Tools - SmartyGym | Free Calculators" />
         <meta property="og:description" content="Free fitness calculators by Haris Falas - convenient tools for flexible training anywhere" />

@@ -68,9 +68,18 @@ const TrainingProgramFlow = () => {
   };
   return <>
       <Helmet>
-        <title>Online Gym Training Programs | Structured Plans | SmartyGym Cyprus | Haris Falas</title>
-        <meta name="description" content="Structured online gym training programs at smartygym.com - Cyprus' #1 online fitness. Long-term programs by Sports Scientist Haris Falas: cardio, strength, muscle growth, weight loss, mobility. Gym programs online for anywhere, anytime training." />
-        <meta name="keywords" content="online gym training programs, gym training programs, training programs online, online fitness programs, gym programs online, workout training programs, smartygym programs, online gym, smartygym.com, online gym Cyprus, gym Cyprus, Haris Falas programs, Haris Falas Cyprus, Cyprus fitness programs, structured training programs, long-term training programs, cardio endurance programs, functional strength training, muscle hypertrophy programs, online gym weight loss program, back pain program, mobility training program, structured gym training, progressive training programs, evidence-based gym programs, convenient fitness programs, flexible gym training, virtual gym programs, sports scientist programs, workout programs online, fitness training programs" />
+        <title>Online Training Programs Cyprus Greece | Structured Plans | Haris Falas HFSC | SmartyGym</title>
+        <meta name="description" content="Structured online training programs Cyprus Greece smartygym.com. Cardio strength muscle growth weight loss mobility programs by Sports Scientist Haris Falas HFSC Nicosia. Long-term gym programs online Cyprus anywhere anytime γυμναστήριο προγράμματα Κύπρος" />
+        <meta name="keywords" content="online training programs Cyprus, training programs Cyprus, gym programs Cyprus, personal trainer Cyprus, fitness programs Cyprus, online gym Greece, HFSC Nicosia, Haris Falas Cyprus, Sports Scientist Cyprus, γυμναστήριο προγράμματα Κύπρος, online fitness Ελλάδα, structured training programs, cardio programs, strength programs, muscle hypertrophy, weight loss programs, mobility programs, gym training online, smartygym.com, HFSC Performance, functional training Cyprus" />
+        
+        {/* Greek Language */}
+        <link rel="alternate" hrefLang="el" href="https://smartygym.com/trainingprogram" />
+        <link rel="alternate" hrefLang="en-GB" href="https://smartygym.com/trainingprogram" />
+        
+        {/* Geo Targeting */}
+        <meta name="geo.region" content="CY-01; GR" />
+        <meta name="geo.placename" content="Cyprus; Greece" />
+        <meta name="geo.position" content="35.1856;33.3823" />
         
         <meta property="og:title" content="Training Programs - SmartyGym.com" />
         <meta property="og:description" content="Structured training programs designed by Sports Scientist Haris Falas" />
