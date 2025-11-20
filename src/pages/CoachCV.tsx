@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useNavigate } from "react-router-dom";
 import { useAccessControl } from "@/hooks/useAccessControl";
+import harisPhoto from "@/assets/haris-falas-coach.png";
 
 const CoachCV = () => {
   const { canGoBack, goBack } = useShowBackButton();
@@ -38,8 +39,8 @@ const CoachCV = () => {
           <div className="text-center mb-12">
             <div className="w-32 h-32 mx-auto mb-6 rounded-full overflow-hidden border-4 border-primary">
               <img
-                src="https://cvccrvyimyzrxcwzmxwk.supabase.co/storage/v1/object/public/logos/haris-photo.png"
-                alt="Haris Falas - Professional Strength & Conditioning Coach"
+                src={harisPhoto}
+                alt="Haris Falas - Sports Scientist & Strength & Conditioning Coach"
                 className="w-full h-full object-cover object-center"
               />
             </div>
