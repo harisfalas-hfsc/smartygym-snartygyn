@@ -172,6 +172,7 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({
   const [borderWidth, setBorderWidth] = useState('1px');
   const [borderStyle, setBorderStyle] = useState('solid');
   const [cellBgColor, setCellBgColor] = useState('#ffffff');
+  const [applyToAllCells, setApplyToAllCells] = useState(false);
 
   const editor = useEditor({
     extensions: [
@@ -346,6 +347,22 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({
     }
   };
 
+  // Auto-apply border changes
+  React.useEffect(() => {
+    if (!editor || !editor.isActive('table')) return;
+    if (applyToAllCells) {
+      applyBorderToAllCells(borderColor, borderWidth, borderStyle);
+    } else {
+      applyBorderToCell(borderColor, borderWidth, borderStyle);
+    }
+  }, [borderColor, borderWidth, borderStyle, applyToAllCells]);
+
+  // Auto-apply background color changes
+  React.useEffect(() => {
+    if (!editor || !editor.isActive('table')) return;
+    applyCellBackground(cellBgColor, applyToAllCells);
+  }, [cellBgColor, applyToAllCells]);
+
   return (
     <div className="border border-input rounded-md bg-background">
       <div className="flex flex-wrap gap-1 p-2 border-b border-input">
@@ -482,7 +499,18 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="start" className="w-64 bg-background z-50">
-                <DropdownMenuLabel>Table Border Options</DropdownMenuLabel>
+                <DropdownMenuLabel className="flex items-center justify-between">
+                  Table Border Options
+                  <label className="flex items-center gap-2 text-xs font-normal cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={applyToAllCells}
+                      onChange={(e) => setApplyToAllCells(e.target.checked)}
+                      className="rounded border-gray-300"
+                    />
+                    Apply to all
+                  </label>
+                </DropdownMenuLabel>
                 <DropdownMenuSeparator />
                 
                 <div className="p-2 space-y-3">
@@ -614,19 +642,38 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({
                 </div>
 
                 <DropdownMenuSeparator />
-                
-                <DropdownMenuItem 
-                  onClick={() => applyBorderToCell(borderColor, borderWidth, borderStyle)}
-                  className="cursor-pointer"
-                >
-                  Apply to Selected Cell
-                </DropdownMenuItem>
-                <DropdownMenuItem 
-                  onClick={() => applyBorderToAllCells(borderColor, borderWidth, borderStyle)}
-                  className="cursor-pointer"
-                >
-                  Apply to All Cells
-                </DropdownMenuItem>
+                <DropdownMenuLabel>Quick Presets</DropdownMenuLabel>
+                <DropdownMenuSeparator />
+
+                <div className="p-2 space-y-2">
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={removeBordersFromTable}
+                    className="w-full text-xs justify-start"
+                  >
+                    Remove All Borders
+                  </Button>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={resetTableBorders}
+                    className="w-full text-xs justify-start"
+                  >
+                    Default Borders
+                  </Button>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={applyGoldBorders}
+                    className="w-full text-xs justify-start"
+                  >
+                    Gold Borders
+                  </Button>
+                </div>
 
                 <DropdownMenuSeparator />
                 <DropdownMenuLabel>Cell Background</DropdownMenuLabel>
@@ -680,21 +727,6 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({
                     </div>
                   </div>
                 </div>
-
-                <DropdownMenuSeparator />
-                
-                <DropdownMenuItem 
-                  onClick={() => applyCellBackground(cellBgColor, false)}
-                  className="cursor-pointer"
-                >
-                  Apply to Selected Cell
-                </DropdownMenuItem>
-                <DropdownMenuItem 
-                  onClick={() => applyCellBackground(cellBgColor, true)}
-                  className="cursor-pointer"
-                >
-                  Apply to All Cells
-                </DropdownMenuItem>
 
                 <DropdownMenuSeparator />
                 <DropdownMenuLabel className="text-xs font-normal text-muted-foreground">Quick Presets</DropdownMenuLabel>
