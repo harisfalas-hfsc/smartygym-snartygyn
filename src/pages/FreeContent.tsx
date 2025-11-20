@@ -53,13 +53,22 @@ const FreeContent = () => {
       equipment: "Bodyweight & Equipment"
     },
     {
-      id: "mobility-stability",
+      id: "mobility",
       title: "Mobility & Stability",
       description: "Enhance flexibility, balance, and movement quality",
       icon: Move,
       duration: "30-45 min",
       difficulty: "Beginner-Intermediate",
       equipment: "Bodyweight & Bands"
+    },
+    {
+      id: "power",
+      title: "Power & Explosiveness",
+      description: "Develop explosive strength and athletic performance",
+      icon: Activity,
+      duration: "30-60 min",
+      difficulty: "Intermediate-Advanced",
+      equipment: "Bodyweight & Equipment"
     },
     {
       id: "challenge",
