@@ -734,27 +734,27 @@ const Index = () => {
                           Who Is Smarty Gym For?
                         </h2>
                         <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 sm:gap-3">
-                          <div className="flex items-center gap-2 p-3 bg-primary/5 border border-primary/20 rounded-lg">
+                          <div className="flex items-center gap-2 p-3 border border-primary/20 rounded-lg">
                             <Users className="w-4 h-4 text-primary flex-shrink-0" />
                             <span className="text-sm font-semibold text-foreground">Busy adults</span>
                           </div>
-                          <div className="flex items-center gap-2 p-3 bg-primary/5 border border-primary/20 rounded-lg">
+                          <div className="flex items-center gap-2 p-3 border border-primary/20 rounded-lg">
                             <Heart className="w-4 h-4 text-primary flex-shrink-0" />
                             <span className="text-sm font-semibold text-foreground">Parents</span>
                           </div>
-                          <div className="flex items-center gap-2 p-3 bg-primary/5 border border-primary/20 rounded-lg">
+                          <div className="flex items-center gap-2 p-3 border border-primary/20 rounded-lg">
                             <GraduationCap className="w-4 h-4 text-primary flex-shrink-0" />
                             <span className="text-sm font-semibold text-foreground">Beginners</span>
                           </div>
-                          <div className="flex items-center gap-2 p-3 bg-primary/5 border border-primary/20 rounded-lg">
+                          <div className="flex items-center gap-2 p-3 border border-primary/20 rounded-lg">
                             <Target className="w-4 h-4 text-primary flex-shrink-0" />
                             <span className="text-sm font-semibold text-foreground">Intermediate lifters</span>
                           </div>
-                          <div className="flex items-center gap-2 p-3 bg-primary/5 border border-primary/20 rounded-lg">
+                          <div className="flex items-center gap-2 p-3 border border-primary/20 rounded-lg">
                             <Plane className="w-4 h-4 text-primary flex-shrink-0" />
                             <span className="text-sm font-semibold text-foreground">Travelers</span>
                           </div>
-                          <div className="flex items-center gap-2 p-3 bg-primary/5 border border-primary/20 rounded-lg">
+                          <div className="flex items-center gap-2 p-3 border border-primary/20 rounded-lg">
                             <Dumbbell className="w-4 h-4 text-primary flex-shrink-0" />
                             <span className="text-sm font-semibold text-foreground">Gym-goers</span>
                           </div>
