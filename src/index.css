@@ -187,6 +187,31 @@ All colors MUST be HSL.
   .cta-button:hover svg {
     transform: scale(1.2) rotate(5deg);
   }
+  
+  /* Make public tables (rendered via prose) match editor tables for WYSIWYG consistency */
+  .prose table {
+    border-collapse: collapse;
+    width: 100%;
+    margin: 1em 0;
+    table-layout: fixed;
+  }
+
+  .prose table td,
+  .prose table th {
+    border: 1px solid hsl(var(--border));
+    padding: 0.5em;
+    vertical-align: top;
+    position: relative;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    word-break: break-word;
+  }
+
+  .prose table th {
+    background-color: hsl(var(--muted));
+    font-weight: bold;
+    text-align: left;
+  }
 }
 
 /* Global smooth scrolling */
