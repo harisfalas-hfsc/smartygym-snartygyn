@@ -747,7 +747,88 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({
         {editor.isActive('table') && (
           <>
             <div className="w-px h-6 bg-border mx-1" />
-            {/* Table border and background customization dropdown */}
+            {/* Table operations dropdown - Structure controls FIRST */}
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button type="button" variant="ghost" size="sm">
+                  <Table2 className="h-4 w-4" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="start" className="w-56 bg-background z-50 max-h-[70vh] overflow-y-auto">
+                <DropdownMenuLabel>Table Structure</DropdownMenuLabel>
+                <DropdownMenuSeparator />
+                
+                {/* Row operations */}
+                <DropdownMenuLabel className="text-xs text-muted-foreground px-2 py-1">Rows</DropdownMenuLabel>
+                <DropdownMenuItem onSelect={() => editor.chain().focus().addRowBefore().run()} className="cursor-pointer">
+                  <Plus className="h-4 w-4 mr-2" />
+                  Add Row Above
+                </DropdownMenuItem>
+                <DropdownMenuItem onSelect={() => editor.chain().focus().addRowAfter().run()} className="cursor-pointer">
+                  <Plus className="h-4 w-4 mr-2" />
+                  Add Row Below
+                </DropdownMenuItem>
+                <DropdownMenuItem onSelect={() => editor.chain().focus().deleteRow().run()} className="cursor-pointer">
+                  <Trash className="h-4 w-4 mr-2" />
+                  Delete Row
+                </DropdownMenuItem>
+                
+                <DropdownMenuSeparator />
+                
+                {/* Column operations */}
+                <DropdownMenuLabel className="text-xs text-muted-foreground px-2 py-1">Columns</DropdownMenuLabel>
+                <DropdownMenuItem onSelect={() => editor.chain().focus().addColumnBefore().run()} className="cursor-pointer">
+                  <Plus className="h-4 w-4 mr-2" />
+                  Add Column Left
+                </DropdownMenuItem>
+                <DropdownMenuItem onSelect={() => editor.chain().focus().addColumnAfter().run()} className="cursor-pointer">
+                  <Plus className="h-4 w-4 mr-2" />
+                  Add Column Right
+                </DropdownMenuItem>
+                <DropdownMenuItem onSelect={() => editor.chain().focus().deleteColumn().run()} className="cursor-pointer">
+                  <Trash className="h-4 w-4 mr-2" />
+                  Delete Column
+                </DropdownMenuItem>
+                
+                <DropdownMenuSeparator />
+                
+                {/* Cell operations */}
+                <DropdownMenuLabel className="text-xs text-muted-foreground px-2 py-1">Cells</DropdownMenuLabel>
+                <DropdownMenuItem 
+                  onSelect={() => editor.chain().focus().mergeCells().run()}
+                  disabled={!editor.can().mergeCells()}
+                  className="cursor-pointer"
+                >
+                  <Merge className="h-4 w-4 mr-2" />
+                  Merge Cells
+                </DropdownMenuItem>
+                <DropdownMenuItem 
+                  onSelect={() => editor.chain().focus().splitCell().run()}
+                  disabled={!editor.can().splitCell()}
+                  className="cursor-pointer"
+                >
+                  <Split className="h-4 w-4 mr-2" />
+                  Split Cell
+                </DropdownMenuItem>
+                <DropdownMenuItem onSelect={() => editor.chain().focus().toggleHeaderCell().run()} className="cursor-pointer">
+                  <Grid3x3 className="h-4 w-4 mr-2" />
+                  Toggle Header Cell
+                </DropdownMenuItem>
+                
+                <DropdownMenuSeparator />
+                
+                {/* Table operations */}
+                <DropdownMenuItem 
+                  onSelect={() => editor.chain().focus().deleteTable().run()}
+                  className="cursor-pointer text-destructive"
+                >
+                  <Trash className="h-4 w-4 mr-2" />
+                  Delete Table
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+
+            {/* Table border and background customization dropdown - Style controls SECOND */}
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button
@@ -760,7 +841,7 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({
                   <Grid3x3 className="h-3 w-3" />
                 </Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="start" className="w-64 bg-background z-50">
+              <DropdownMenuContent align="start" className="w-64 bg-background z-50 max-h-[70vh] overflow-y-auto">
                 <DropdownMenuLabel className="flex items-center justify-between">
                   Table Border Options
                   <label className="flex items-center gap-2 text-xs font-normal cursor-pointer">
@@ -967,87 +1048,6 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({
                     </div>
                   </div>
                 </div>
-              </DropdownMenuContent>
-            </DropdownMenu>
-
-            {/* Table operations dropdown */}
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button type="button" variant="ghost" size="sm">
-                  <Table2 className="h-4 w-4" />
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="start" className="w-56 bg-background z-50">
-                <DropdownMenuLabel>Table Operations</DropdownMenuLabel>
-                <DropdownMenuSeparator />
-                
-                {/* Row operations */}
-                <DropdownMenuLabel className="text-xs text-muted-foreground px-2 py-1">Rows</DropdownMenuLabel>
-                <DropdownMenuItem onSelect={() => editor.chain().focus().addRowBefore().run()} className="cursor-pointer">
-                  <Plus className="h-4 w-4 mr-2" />
-                  Add Row Above
-                </DropdownMenuItem>
-                <DropdownMenuItem onSelect={() => editor.chain().focus().addRowAfter().run()} className="cursor-pointer">
-                  <Plus className="h-4 w-4 mr-2" />
-                  Add Row Below
-                </DropdownMenuItem>
-                <DropdownMenuItem onSelect={() => editor.chain().focus().deleteRow().run()} className="cursor-pointer">
-                  <Trash className="h-4 w-4 mr-2" />
-                  Delete Row
-                </DropdownMenuItem>
-                
-                <DropdownMenuSeparator />
-                
-                {/* Column operations */}
-                <DropdownMenuLabel className="text-xs text-muted-foreground px-2 py-1">Columns</DropdownMenuLabel>
-                <DropdownMenuItem onSelect={() => editor.chain().focus().addColumnBefore().run()} className="cursor-pointer">
-                  <Plus className="h-4 w-4 mr-2" />
-                  Add Column Left
-                </DropdownMenuItem>
-                <DropdownMenuItem onSelect={() => editor.chain().focus().addColumnAfter().run()} className="cursor-pointer">
-                  <Plus className="h-4 w-4 mr-2" />
-                  Add Column Right
-                </DropdownMenuItem>
-                <DropdownMenuItem onSelect={() => editor.chain().focus().deleteColumn().run()} className="cursor-pointer">
-                  <Trash className="h-4 w-4 mr-2" />
-                  Delete Column
-                </DropdownMenuItem>
-                
-                <DropdownMenuSeparator />
-                
-                {/* Cell operations */}
-                <DropdownMenuLabel className="text-xs text-muted-foreground px-2 py-1">Cells</DropdownMenuLabel>
-                <DropdownMenuItem 
-                  onSelect={() => editor.chain().focus().mergeCells().run()}
-                  disabled={!editor.can().mergeCells()}
-                  className="cursor-pointer"
-                >
-                  <Merge className="h-4 w-4 mr-2" />
-                  Merge Cells
-                </DropdownMenuItem>
-                <DropdownMenuItem 
-                  onSelect={() => editor.chain().focus().splitCell().run()}
-                  disabled={!editor.can().splitCell()}
-                  className="cursor-pointer"
-                >
-                  <Split className="h-4 w-4 mr-2" />
-                  Split Cell
-                </DropdownMenuItem>
-                <DropdownMenuItem onSelect={() => editor.chain().focus().toggleHeaderCell().run()} className="cursor-pointer">
-                  <Grid3x3 className="h-4 w-4 mr-2" />
-                  Toggle Header Cell
-                </DropdownMenuItem>
-                
-                <DropdownMenuSeparator />
-                
-                {/* Table operations */}
-                <DropdownMenuItem 
-                  onSelect={() => editor.chain().focus().deleteTable().run()}
-                  className="cursor-pointer text-destructive"
-                >
-                  <Trash className="h-4 w-4 mr-2" />
-                  Delete Table
-                </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
           </>
