@@ -190,17 +190,17 @@ All colors MUST be HSL.
   
   /* Make public tables (rendered via prose) match editor tables for WYSIWYG consistency */
   .prose table {
-    border-collapse: collapse;
-    width: 100%;
-    margin: 1em 0;
-    table-layout: fixed;
+    border-collapse: collapse !important;
+    width: 100% !important;
+    margin: 1em 0 !important;
+    table-layout: fixed !important;
   }
 
   .prose table td,
   .prose table th {
-    border: 1px solid hsl(var(--border));
-    padding: 0.5em;
-    vertical-align: top;
+    border: 1px solid hsl(var(--border)) !important;
+    padding: 0.5em !important;
+    vertical-align: top !important;
     position: relative;
     word-wrap: break-word;
     overflow-wrap: break-word;
@@ -208,9 +208,34 @@ All colors MUST be HSL.
   }
 
   .prose table th {
-    background-color: hsl(var(--muted));
-    font-weight: bold;
-    text-align: left;
+    background-color: hsl(var(--muted)) !important;
+    font-weight: bold !important;
+    text-align: left !important;
+  }
+
+  /* Mirror rules for any rich HTML areas using text-display */
+  .text-display table {
+    border-collapse: collapse !important;
+    width: 100% !important;
+    margin: 1em 0 !important;
+    table-layout: fixed !important;
+  }
+
+  .text-display table td,
+  .text-display table th {
+    border: 1px solid hsl(var(--border)) !important;
+    padding: 0.5em !important;
+    vertical-align: top !important;
+    position: relative;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    word-break: break-word;
+  }
+
+  .text-display table th {
+    background-color: hsl(var(--muted)) !important;
+    font-weight: bold !important;
+    text-align: left !important;
   }
 
   /* Column width support */
