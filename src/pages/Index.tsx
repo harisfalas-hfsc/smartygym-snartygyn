@@ -688,50 +688,65 @@ const Index = () => {
                       </div>
                     </div>
 
-                    {/* RIGHT: Three Core Message Cards */}
+                    {/* RIGHT: Four Core Message Cards */}
                     <div className="order-2 lg:order-2 flex flex-col justify-between gap-2 h-full max-h-[480px]">
                       
-                       {/* Card 1: Your Gym in Your Pocket */}
+                      {/* Card 1: Online Fitness Redefined */}
                       <Card className="flex-1 border-2 border-primary/30 hover:border-primary hover:shadow-lg transition-all cursor-pointer group bg-primary/5">
-                <CardContent className="h-full p-5 flex items-center gap-4">
-                          <div className="inline-flex items-center justify-center w-10 h-10 rounded-full bg-primary/10 group-hover:bg-primary/20 transition-all flex-shrink-0">
-                            <Smartphone className="w-5 h-5 text-primary" />
+                        <CardContent className="h-full p-3.5 flex items-center gap-3">
+                          <div className="inline-flex items-center justify-center w-9 h-9 rounded-full bg-primary/10 group-hover:bg-primary/20 transition-all flex-shrink-0">
+                            <Sparkles className="w-4 h-4 text-primary" />
                           </div>
                           <div>
-                            <h3 className="text-base font-bold text-foreground">Your Gym In Your Pocket</h3>
-                            <p className="text-xs text-muted-foreground leading-normal">
+                            <h3 className="text-sm font-bold text-foreground">Online Fitness Redefined</h3>
+                            <p className="text-xs text-muted-foreground leading-snug">
+                              We are redefining online fitness, making quality training accessible, flexible, and designed for real life.
+                            </p>
+                          </div>
+                        </CardContent>
+                      </Card>
+
+                      {/* Card 2: Your Gym in Your Pocket */}
+                      <Card className="flex-1 border-2 border-primary/30 hover:border-primary hover:shadow-lg transition-all cursor-pointer group bg-primary/5">
+                        <CardContent className="h-full p-3.5 flex items-center gap-3">
+                          <div className="inline-flex items-center justify-center w-9 h-9 rounded-full bg-primary/10 group-hover:bg-primary/20 transition-all flex-shrink-0">
+                            <Smartphone className="w-4 h-4 text-primary" />
+                          </div>
+                          <div>
+                            <h3 className="text-sm font-bold text-foreground">Your Gym In Your Pocket</h3>
+                            <p className="text-xs text-muted-foreground leading-snug">
                               Professional fitness platform with expert workouts, structured programs, and personalized coaching - accessible worldwide at smartygym.com.
                             </p>
                           </div>
                         </CardContent>
                       </Card>
 
-                      {/* Card 2: 100% Human */}
+                      {/* Card 3: 100% Human */}
                       <Card className="flex-1 border-2 border-primary/30 hover:border-primary hover:shadow-lg transition-all cursor-pointer group bg-primary/5">
-                <CardContent className="h-full p-5 flex items-center gap-4">
-                          <div className="inline-flex items-center justify-center w-10 h-10 rounded-full bg-primary/10 group-hover:bg-primary/20 transition-all flex-shrink-0">
-                            <UserCheck className="w-5 h-5 text-primary" />
+                        <CardContent className="h-full p-3.5 flex items-center gap-3">
+                          <div className="inline-flex items-center justify-center w-9 h-9 rounded-full bg-primary/10 group-hover:bg-primary/20 transition-all flex-shrink-0">
+                            <UserCheck className="w-4 h-4 text-primary" />
                           </div>
                           <div>
-                            <h3 className="text-base font-bold text-foreground">
+                            <h3 className="text-sm font-bold text-foreground">
                               <span className="text-red-600">100% Human.</span> 0% AI.
                             </h3>
-                            <p className="text-xs text-muted-foreground leading-normal">
+                            <p className="text-xs text-muted-foreground leading-snug">
                               Every workout personally designed by Sports Scientist Haris Falas with 20+ years of experience. Real expertise, not algorithms.
                             </p>
                           </div>
                         </CardContent>
                       </Card>
 
-                      {/* Card 3: Train Anywhere */}
+                      {/* Card 4: Train Anywhere */}
                       <Card className="flex-1 border-2 border-primary/30 hover:border-primary hover:shadow-lg transition-all cursor-pointer group bg-primary/5">
-                        <CardContent className="h-full p-5 flex items-center gap-4">
-                          <div className="inline-flex items-center justify-center w-10 h-10 rounded-full bg-primary/10 group-hover:bg-primary/20 transition-all flex-shrink-0">
-                            <Plane className="w-5 h-5 text-primary" />
+                        <CardContent className="h-full p-3.5 flex items-center gap-3">
+                          <div className="inline-flex items-center justify-center w-9 h-9 rounded-full bg-primary/10 group-hover:bg-primary/20 transition-all flex-shrink-0">
+                            <Plane className="w-4 h-4 text-primary" />
                           </div>
                           <div>
-                            <h3 className="text-base font-bold text-foreground">Train Anywhere, Anytime</h3>
-                            <p className="text-xs text-muted-foreground leading-normal">
+                            <h3 className="text-sm font-bold text-foreground">Train Anywhere, Anytime</h3>
+                            <p className="text-xs text-muted-foreground leading-snug">
                               Access professional workouts on any device. Flexible training that fits YOUR schedule and YOUR goals—at home, gym, or traveling.
                             </p>
                           </div>
