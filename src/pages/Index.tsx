@@ -757,42 +757,42 @@ const Index = () => {
                               <Users className="w-5 h-5 text-primary flex-shrink-0" />
                               <span className="text-sm font-semibold text-foreground">Busy adults</span>
                             </div>
-                            <p className="text-xs text-muted-foreground ml-7">Quick, effective workouts that fit your schedule</p>
+                            <p className="text-xs text-muted-foreground ml-7 leading-relaxed">Quick, effective workouts designed to fit seamlessly into your busy schedule</p>
                           </div>
                           <div className="flex flex-col gap-1 p-3">
                             <div className="flex items-center gap-2">
                               <Heart className="w-5 h-5 text-primary flex-shrink-0" />
                               <span className="text-sm font-semibold text-foreground">Parents</span>
                             </div>
-                            <p className="text-xs text-muted-foreground ml-7">Train at home while kids play nearby</p>
+                            <p className="text-xs text-muted-foreground ml-7 leading-relaxed">Train at home while kids play nearby with flexible workout options</p>
                           </div>
                           <div className="flex flex-col gap-1 p-3">
                             <div className="flex items-center gap-2">
                               <GraduationCap className="w-5 h-5 text-primary flex-shrink-0" />
                               <span className="text-sm font-semibold text-foreground">Beginners</span>
                             </div>
-                            <p className="text-xs text-muted-foreground ml-7">Start your fitness journey with guided programs</p>
+                            <p className="text-xs text-muted-foreground ml-7 leading-relaxed">Start your fitness journey with clear, guided programs built for you</p>
                           </div>
                           <div className="flex flex-col gap-1 p-3">
                             <div className="flex items-center gap-2">
                               <Target className="w-5 h-5 text-primary flex-shrink-0" />
                               <span className="text-sm font-semibold text-foreground">Intermediate lifters</span>
                             </div>
-                            <p className="text-xs text-muted-foreground ml-7">Push past plateaus with structured plans</p>
+                            <p className="text-xs text-muted-foreground ml-7 leading-relaxed">Push past plateaus with science-based structured training plans</p>
                           </div>
                           <div className="flex flex-col gap-1 p-3">
                             <div className="flex items-center gap-2">
                               <Plane className="w-5 h-5 text-primary flex-shrink-0" />
                               <span className="text-sm font-semibold text-foreground">Travelers</span>
                             </div>
-                            <p className="text-xs text-muted-foreground ml-7">Stay consistent wherever you go</p>
+                            <p className="text-xs text-muted-foreground ml-7 leading-relaxed">Stay consistent with your training wherever life takes you around the world</p>
                           </div>
                           <div className="flex flex-col gap-1 p-3">
                             <div className="flex items-center gap-2">
                               <Dumbbell className="w-5 h-5 text-primary flex-shrink-0" />
                               <span className="text-sm font-semibold text-foreground">Gym-goers</span>
                             </div>
-                            <p className="text-xs text-muted-foreground ml-7">Enhance your gym routine with expert guidance</p>
+                            <p className="text-xs text-muted-foreground ml-7 leading-relaxed">Enhance your gym routine with expert guidance and proven methods</p>
                           </div>
                         </div>
 
