@@ -838,7 +838,7 @@ const Index = () => {
                         
                         <div className="max-w-3xl mx-auto space-y-4 text-center mb-8">
                           <p className="text-lg font-semibold text-foreground">
-                            SmartyGym workouts and programs are built to fit YOUR life.
+                            <span className="text-primary font-semibold">SmartyGym</span> workouts and programs are built to fit YOUR life.
                           </p>
                           <p className="text-base leading-relaxed text-muted-foreground">
                             That's why they work — safe and efficient design by <a href="/coach-profile" className="text-primary hover:underline font-medium"><strong>Haris Falas</strong></a>, crafted by hand with care to deliver effective results at <strong>smartygym.com</strong>, <strong className="text-foreground">NOT by AI</strong>.

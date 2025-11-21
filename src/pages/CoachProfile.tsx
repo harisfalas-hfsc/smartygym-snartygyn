@@ -147,11 +147,11 @@ const CoachProfile = () => {
                   </p>
 
                   <p className="text-base leading-relaxed">
-                    That's exactly why I created SmartyGym.
+                    That's exactly why I created <span className="text-primary font-semibold">SmartyGym</span>.
                   </p>
 
                   <p className="text-base leading-relaxed">
-                    My vision is to give people the kind of coaching that makes everything simpler: structured programs, smart progressions, expert guidance, and clear workouts you can follow with confidence — whether you train at home, outdoors, or inside a gym. SmartyGym is here to support your fitness journey, not replace any part of it. If you train in a gym, you'll have a plan. If you train at home, you'll have a structure. If you're busy or traveling, you'll still know exactly what to do.
+                    My vision is to give people the kind of coaching that makes everything simpler: structured programs, smart progressions, expert guidance, and clear workouts you can follow with confidence — whether you train at home, outdoors, or inside a gym. <span className="text-primary font-semibold">SmartyGym</span> is here to support your fitness journey, not replace any part of it. If you train in a gym, you'll have a plan. If you train at home, you'll have a structure. If you're busy or traveling, you'll still know exactly what to do.
                   </p>
 
                   <p className="text-base leading-relaxed">
@@ -203,11 +203,11 @@ const CoachProfile = () => {
             {/* Why I Created SmartyGym */}
             <Card className="p-6 sm:p-8 md:p-10">
               <section>
-                <h3 className="text-xl sm:text-2xl font-semibold mb-4">Why I Created SmartyGym</h3>
+                <h3 className="text-xl sm:text-2xl font-semibold mb-4">Why I Created <span className="text-primary">SmartyGym</span></h3>
                 <div className="flex items-start gap-3">
                   <Smartphone className="w-6 h-6 sm:w-7 sm:h-7 text-primary shrink-0 mt-0.5" />
                   <p className="text-base sm:text-lg leading-relaxed text-muted-foreground">
-                    I created SmartyGym because I believe that everybody deserves fitness. Everybody deserves convenience. Everybody deserves to have access to my premium and science-based workouts and training programs. It's cost-efficient and to help people to start their fitness journey or not stop when life gets in the way.
+                    I created <span className="text-primary font-semibold">SmartyGym</span> because I believe that everybody deserves fitness. Everybody deserves convenience. Everybody deserves to have access to my premium and science-based workouts and training programs. It's cost-efficient and to help people to start their fitness journey or not stop when life gets in the way.
                   </p>
                 </div>
               </section>
@@ -237,7 +237,7 @@ const CoachProfile = () => {
             {/* CTA Section */}
             {!isPremium && (
               <div className="text-center py-8">
-                <h3 className="text-xl sm:text-2xl font-semibold mb-6">Join me inside SmartyGym and start your training today.</h3>
+                <h3 className="text-xl sm:text-2xl font-semibold mb-6">Join me inside <span className="text-primary font-semibold">SmartyGym</span> and start your training today.</h3>
                 <Button size="lg" onClick={() => navigate("/premiumbenefits")} className="cta-button">
                   Start Training
                 </Button>
