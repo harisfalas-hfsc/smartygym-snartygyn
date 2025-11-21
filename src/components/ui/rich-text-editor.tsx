@@ -523,13 +523,89 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({
           </DropdownMenuContent>
         </DropdownMenu>
 
-        {/* Text color */}
-        <Input
-          type="color"
-          onChange={(e) => editor.chain().focus().setColor(e.target.value).run()}
-          className="h-8 w-12 p-1 cursor-pointer"
-          title="Text Color"
-        />
+        {/* Text color with presets */}
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button type="button" variant="ghost" size="sm" title="Text Color">
+              <Palette className="h-4 w-4" />
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="start" className="w-56 bg-background z-50">
+            <DropdownMenuLabel>Text Color</DropdownMenuLabel>
+            <DropdownMenuSeparator />
+            
+            <div className="p-3 space-y-3">
+              {/* Preset color swatches */}
+              <div>
+                <label className="text-xs font-medium mb-2 block">Quick Colors</label>
+                <div className="flex gap-2 flex-wrap">
+                  <button
+                    type="button"
+                    className="w-8 h-8 rounded border-2 border-input bg-black hover:ring-2 hover:ring-primary transition-all"
+                    onClick={() => editor.chain().focus().setColor('#000000').run()}
+                    title="Black"
+                  />
+                  <button
+                    type="button"
+                    className="w-8 h-8 rounded border-2 border-input bg-gray-500 hover:ring-2 hover:ring-primary transition-all"
+                    onClick={() => editor.chain().focus().setColor('#6b7280').run()}
+                    title="Gray"
+                  />
+                  <button
+                    type="button"
+                    className="w-8 h-8 rounded border-2 border-input bg-blue-500 hover:ring-2 hover:ring-primary transition-all"
+                    onClick={() => editor.chain().focus().setColor('#3b82f6').run()}
+                    title="Blue"
+                  />
+                  <button
+                    type="button"
+                    className="w-8 h-8 rounded border-2 border-input bg-red-500 hover:ring-2 hover:ring-primary transition-all"
+                    onClick={() => editor.chain().focus().setColor('#ef4444').run()}
+                    title="Red"
+                  />
+                  <button
+                    type="button"
+                    className="w-8 h-8 rounded border-2 border-input hover:ring-2 hover:ring-primary transition-all"
+                    style={{ backgroundColor: 'hsl(var(--primary))' }}
+                    onClick={() => {
+                      const root = document.documentElement;
+                      const primaryHsl = getComputedStyle(root).getPropertyValue('--primary').trim();
+                      editor.chain().focus().setColor(`hsl(${primaryHsl})`).run();
+                    }}
+                    title="Gold (Brand)"
+                  />
+                  <button
+                    type="button"
+                    className="w-8 h-8 rounded border-2 border-gray-400 bg-white hover:ring-2 hover:ring-primary transition-all"
+                    onClick={() => editor.chain().focus().setColor('#ffffff').run()}
+                    title="White"
+                  />
+                </div>
+              </div>
+
+              {/* Custom color picker */}
+              <div>
+                <label className="text-xs font-medium mb-2 block">Custom Color</label>
+                <Input
+                  type="color"
+                  onChange={(e) => editor.chain().focus().setColor(e.target.value).run()}
+                  className="h-10 w-full cursor-pointer"
+                />
+              </div>
+
+              {/* Remove color button */}
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={() => editor.chain().focus().unsetColor().run()}
+                className="w-full"
+              >
+                Remove Color
+              </Button>
+            </div>
+          </DropdownMenuContent>
+        </DropdownMenu>
 
         {/* Highlight */}
         <Button
@@ -869,19 +945,31 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({
                       <div className="flex gap-1 flex-wrap flex-1">
                         <button
                           type="button"
-                          className="w-6 h-6 rounded border border-input bg-black"
+                          className="w-6 h-6 rounded border border-input bg-black hover:ring-2 hover:ring-primary transition-all"
                           onClick={() => setBorderColor('#000000')}
                           title="Black"
                         />
                         <button
                           type="button"
-                          className="w-6 h-6 rounded border border-input bg-gray-500"
+                          className="w-6 h-6 rounded border border-input bg-gray-500 hover:ring-2 hover:ring-primary transition-all"
                           onClick={() => setBorderColor('#6b7280')}
                           title="Gray"
                         />
                         <button
                           type="button"
-                          className="w-6 h-6 rounded border border-input"
+                          className="w-6 h-6 rounded border border-input bg-blue-500 hover:ring-2 hover:ring-primary transition-all"
+                          onClick={() => setBorderColor('#3b82f6')}
+                          title="Blue"
+                        />
+                        <button
+                          type="button"
+                          className="w-6 h-6 rounded border border-input bg-red-500 hover:ring-2 hover:ring-primary transition-all"
+                          onClick={() => setBorderColor('#ef4444')}
+                          title="Red"
+                        />
+                        <button
+                          type="button"
+                          className="w-6 h-6 rounded border border-input hover:ring-2 hover:ring-primary transition-all"
                           style={{ backgroundColor: 'hsl(var(--primary))' }}
                           onClick={() => {
                             const root = document.documentElement;
@@ -892,7 +980,7 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({
                         />
                         <button
                           type="button"
-                          className="w-6 h-6 rounded border border-input bg-white"
+                          className="w-6 h-6 rounded border border-input bg-white hover:ring-2 hover:ring-primary transition-all"
                           onClick={() => setBorderColor('#ffffff')}
                           title="White"
                         />
