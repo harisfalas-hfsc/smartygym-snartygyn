@@ -133,7 +133,7 @@ const FAQ = () => {
                 Frequently Asked Questions
               </h1>
               <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-                Everything you need to know about <span className="text-primary font-bold">SmartyGym</span>
+                Everything you need to know about SmartyGym
               </p>
             </div>
           </ScrollReveal>
@@ -145,10 +145,10 @@ const FAQ = () => {
                 <Accordion type="single" collapsible className="w-full">
                   
                   <AccordionItem value="item-1">
-                    <AccordionTrigger className="text-left">What is <span className="text-primary font-bold">SmartyGym</span>?</AccordionTrigger>
+                    <AccordionTrigger className="text-left">What is SmartyGym?</AccordionTrigger>
                     <AccordionContent className="py-2 leading-relaxed">
-                      <span className="text-primary font-bold">SmartyGym</span> is an online fitness platform providing functional, science-based workouts and training programs
-                      designed by certified coaches. Whether you're training at home, in the gym, or on the go, <span className="text-primary font-bold">SmartyGym</span> 
+                      SmartyGym is an online fitness platform providing functional, science-based workouts and training programs
+                      designed by certified coaches. Whether you're training at home, in the gym, or on the go, SmartyGym 
                       is your backup when life gets in the way — or your complete fitness solution if you prefer training from home. 
                       We make quality fitness accessible anywhere, anytime.
                     </AccordionContent>
@@ -160,13 +160,13 @@ const FAQ = () => {
                       <a href="/coach-profile" className="text-primary hover:underline font-medium">Haris Falas</a> is a certified Sports Scientist
                       and Strength & Conditioning Coach with over 20 years of professional experience. He has worked with elite athletes and professional 
                       football teams in the Cypriot First Division. As the founder of HFSC and 
-                      <span className="text-primary font-bold">SmartyGym</span>, <strong>Haris personally designs every single workout and program</strong> — never by AI, always with evidence-based
+                      SmartyGym, <strong>Haris personally designs every single workout and program</strong> — never by AI, always with evidence-based
                       training principles and real coaching experience.
                     </AccordionContent>
                   </AccordionItem>
 
                   <AccordionItem value="item-3">
-                    <AccordionTrigger className="text-left">What makes <span className="text-primary font-bold">SmartyGym</span> different?</AccordionTrigger>
+                    <AccordionTrigger className="text-left">What makes SmartyGym different?</AccordionTrigger>
                     <AccordionContent className="py-2 leading-relaxed">
                       <strong>We're 100% human, 0% AI.</strong> Every workout is personally designed by <a href="/coach-profile" className="text-primary hover:underline font-medium">Haris Falas</a>,
                       a qualified Sports Scientist and S&C Coach — never by algorithms or AI. You get real expertise from a real coach with 20+ years 
@@ -178,11 +178,11 @@ const FAQ = () => {
                   <AccordionItem value="item-3a">
                     <AccordionTrigger className="text-left">What's the difference between a workout and training program?</AccordionTrigger>
                     <AccordionContent className="py-2 leading-relaxed">
-                      A <a href="/workouts" className="text-primary hover:underline font-bold">workout</a> is a standalone training session designed for a specific goal — whether that's calorie burning, 
+                      A <strong>workout</strong> is a standalone training session designed for a specific goal — whether that's calorie burning, 
                       strength building, cardio conditioning, mobility work, or power development. It's perfect when you want a single, 
                       focused session or when you're mixing and matching your own training plan.<br/><br/>
                       
-                      A <a href="/training-programs" className="text-primary hover:underline font-bold">training program</a> is a complete, structured plan that spans multiple weeks (e.g., 4, 6, or 12 weeks). 
+                      A <strong>training program</strong> is a complete, structured plan that spans multiple weeks (e.g., 4, 6, or 12 weeks). 
                       It includes progressive training phases, periodization, recovery strategies, and a clear roadmap toward a specific goal 
                       (like building strength, losing fat, or improving performance). Programs are ideal if you want a full training cycle 
                       with built-in progression and accountability.
@@ -208,11 +208,11 @@ const FAQ = () => {
                   </AccordionItem>
 
                   <AccordionItem value="item-6">
-                    <AccordionTrigger className="text-left">Who is <span className="text-primary font-bold">SmartyGym</span> for?</AccordionTrigger>
+                    <AccordionTrigger className="text-left">Who is SmartyGym for?</AccordionTrigger>
                     <AccordionContent className="py-2 leading-relaxed">
-                      <span className="text-primary font-bold">SmartyGym</span> is for <strong>everyone</strong> — whether you're a complete beginner taking your first steps into fitness, 
+                      SmartyGym is for <strong>everyone</strong> — whether you're a complete beginner taking your first steps into fitness, 
                       or an experienced athlete looking for structured, science-based training. Our platform is designed to meet you where you are 
-                      and guide you forward with safe, effective programming. If you value expert coaching, flexibility, and real results, <span className="text-primary font-bold">SmartyGym</span> is for you.
+                      and guide you forward with safe, effective programming. If you value expert coaching, flexibility, and real results, SmartyGym is for you.
                     </AccordionContent>
                   </AccordionItem>
 
