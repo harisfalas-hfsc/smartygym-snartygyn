@@ -14,7 +14,7 @@ export const HTMLContent: React.FC<HTMLContentProps> = ({ content, className }) 
 
   return (
     <div
-      className={cn("prose prose-sm max-w-none", className)}
+      className={cn("prose prose-sm max-w-none text-display break-words-safe", className)}
       dangerouslySetInnerHTML={{ __html: sanitize(content) }}
       style={{
         color: 'hsl(var(--foreground))',
