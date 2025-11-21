@@ -1019,7 +1019,7 @@ const Index = () => {
             <CardContent className="p-6">
               <h3 className="text-2xl font-bold mb-6 text-center">The SmartyGym Promise</h3>
               <div className="max-w-3xl mx-auto space-y-4">
-                <p className="text-base leading-relaxed text-center text-primary">
+                <p className="text-base leading-relaxed text-center">
                   Every workout and program at SmartyGym is crafted with one goal: to help you reach YOUR fitness goals, 
                   whatever they may be. Whether you're building muscle, losing weight, improving endurance, or simply staying active, 
                   we provide the structure, guidance, and flexibility you need to succeed — on your terms, in your time, wherever you are.
