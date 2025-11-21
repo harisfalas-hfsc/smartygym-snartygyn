@@ -5,10 +5,13 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { ScrollReveal } from "@/components/ScrollReveal";
 import { CheckCircle2, Target, Heart, Users, Shield, Award, Compass, ArrowLeft, GraduationCap, Plane, Dumbbell } from "lucide-react";
 import { useShowBackButton } from "@/hooks/useShowBackButton";
+import { useAccessControl } from "@/hooks/useAccessControl";
 
 const About = () => {
   const navigate = useNavigate();
   const showBackButton = useShowBackButton();
+  const { userTier } = useAccessControl();
+  const isPremium = userTier === "premium";
 
   return (
     <>
@@ -326,13 +329,15 @@ const About = () => {
                   Join thousands of people training smarter with SmartyGym. Whether you're at home, in the gym, 
                   or on the go — we've got you covered.
                 </p>
-                <Button 
-                  size="lg" 
-                  onClick={() => navigate('/joinpremium')}
-                  className="mt-4"
-                >
-                  Start Training Today
-                </Button>
+                {!isPremium && (
+                  <Button 
+                    size="lg" 
+                    onClick={() => navigate('/joinpremium')}
+                    className="mt-4"
+                  >
+                    Start Training Today
+                  </Button>
+                )}
               </CardContent>
             </Card>
           </ScrollReveal>
