@@ -31,13 +31,13 @@ export const HumanNotAICompositeTemplate = () => {
               Smarty Gym workouts and programs are built to fit YOUR life.
             </p>
             <p className="text-xl leading-relaxed text-muted-foreground">
-              That's why they work — safe and efficient design by <strong>Haris Falas</strong>, crafted by hand with care to deliver effective results at <strong>smartygym.com</strong>, <strong className="text-foreground">NOT by AI</strong>.
+              That's why they work — safe and efficient design by <strong className="text-primary">Haris Falas</strong>, crafted by hand with care to deliver effective results at <strong>smartygym.com</strong>, <strong className="text-foreground">NOT by AI</strong>.
             </p>
             
             {/* Highlighted Box */}
             <div className="bg-background/80 backdrop-blur-sm p-6 rounded-lg border-2 border-primary/30 mt-4">
               <p className="text-xl font-bold text-primary mb-2">
-                Every workout and training program is science-based and personally created by Haris Falas.
+                Every workout and training program is science-based and personally created by <span className="font-bold">Haris Falas</span>.
               </p>
               <p className="text-lg text-muted-foreground">
                 Never by AI. Never by algorithms. Always by a real human expert who understands YOUR needs. Training designed by humans, for humans.

@@ -42,7 +42,7 @@ export const FullHeroCompositeTemplate = () => {
                 100% Human. 0% AI.
               </h2>
               <p className="text-xs text-muted-foreground leading-relaxed">
-                Every workout personally designed by Sports Scientist Haris Falas with 20+ years of experience. Real expertise, not algorithms.
+                Every workout personally designed by Sports Scientist <span className="text-primary font-semibold">Haris Falas</span> with 20+ years of experience. Real expertise, not algorithms.
               </p>
             </div>
 
@@ -84,7 +84,7 @@ export const FullHeroCompositeTemplate = () => {
                 <UserCheck className="w-4 h-4 text-primary flex-shrink-0 mt-0.5" />
                 <div>
                   <p className="font-semibold text-xs text-foreground">Personal Training</p>
-                  <p className="text-xs text-muted-foreground">Custom plans by Haris Falas</p>
+                  <p className="text-xs text-muted-foreground">Custom plans by <span className="text-primary font-semibold">Haris Falas</span></p>
                 </div>
               </div>
 
