@@ -219,15 +219,15 @@ const CoachProfile = () => {
                   <div className="space-y-3">
                     <div className="flex items-center justify-start gap-2">
                       <Shield className="w-5 h-5 sm:w-6 sm:h-6 text-primary shrink-0" />
-                      <p className="text-sm sm:text-base font-semibold">No gimmicks.</p>
+                      <p className="text-sm sm:text-base font-semibold">Only workouts and training programs. No fancy extras, no distractions—just the actual product.</p>
                     </div>
                     <div className="flex items-center justify-start gap-2">
                       <Shield className="w-5 h-5 sm:w-6 sm:h-6 text-primary shrink-0" />
-                      <p className="text-sm sm:text-base font-semibold">No shortcuts.</p>
+                      <p className="text-sm sm:text-base font-semibold">I sell 20+ years of knowledge and experience, not memberships, promotions, or motivational quotes.</p>
                     </div>
                     <div className="flex items-center justify-start gap-2">
                       <Shield className="w-5 h-5 sm:w-6 sm:h-6 text-primary shrink-0" />
-                      <p className="text-sm sm:text-base font-semibold">Just structured, science-based training that works.</p>
+                      <p className="text-sm sm:text-base font-semibold">100% training quality as if I was coaching you in person.</p>
                     </div>
                   </div>
                 </Card>
