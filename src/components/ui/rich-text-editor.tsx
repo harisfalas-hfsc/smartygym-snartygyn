@@ -183,6 +183,25 @@ const CustomTableHeader = TableHeader.extend({
   },
 });
 
+// Extended TableRow with height customization
+const CustomTableRow = TableRow.extend({
+  addAttributes() {
+    return {
+      ...this.parent?.(),
+      height: {
+        default: 'auto',
+        parseHTML: element => element.style.height || 'auto',
+        renderHTML: attributes => {
+          if (attributes.height === 'auto') return {};
+          return { 
+            style: `height: ${attributes.height};`
+          };
+        },
+      },
+    };
+  },
+});
+
 // Special characters grouped by category
 const SPECIAL_CHARS = {
   Currency: ['€', '£', '¥', '$', '¢', '₹', '₽', '₩', '₪'],
@@ -209,6 +228,8 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({
   const [tableCols, setTableCols] = useState(3);
   const [tableWithHeader, setTableWithHeader] = useState(true);
   const [showTableDialog, setShowTableDialog] = useState(false);
+  const [selectedRowHeight, setSelectedRowHeight] = useState<string>('auto');
+  const [customRowHeight, setCustomRowHeight] = useState<string>('60');
 
   const editor = useEditor({
     extensions: [
@@ -234,7 +255,7 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({
       Table.configure({
         resizable: true,
       }),
-      TableRow,
+      CustomTableRow,
       CustomTableHeader,
       CustomTableCell,
       TextAlign.configure({
@@ -891,6 +912,98 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({
                   Toggle Header Cell
                 </DropdownMenuItem>
                 
+                <DropdownMenuSeparator />
+                
+                {/* Row height controls */}
+                <div className="px-2 py-2 space-y-2">
+                  <p className="text-xs font-medium text-muted-foreground">Set Row Height</p>
+                  <div className="grid grid-cols-2 gap-2">
+                    <Button
+                      type="button"
+                      variant={selectedRowHeight === 'auto' ? 'default' : 'outline'}
+                      size="sm"
+                      onClick={() => setSelectedRowHeight('auto')}
+                      className="text-xs h-8"
+                    >
+                      Auto
+                    </Button>
+                    <Button
+                      type="button"
+                      variant={selectedRowHeight === '40px' ? 'default' : 'outline'}
+                      size="sm"
+                      onClick={() => setSelectedRowHeight('40px')}
+                      className="text-xs h-8"
+                    >
+                      Small
+                    </Button>
+                    <Button
+                      type="button"
+                      variant={selectedRowHeight === '60px' ? 'default' : 'outline'}
+                      size="sm"
+                      onClick={() => setSelectedRowHeight('60px')}
+                      className="text-xs h-8"
+                    >
+                      Medium
+                    </Button>
+                    <Button
+                      type="button"
+                      variant={selectedRowHeight === '80px' ? 'default' : 'outline'}
+                      size="sm"
+                      onClick={() => setSelectedRowHeight('80px')}
+                      className="text-xs h-8"
+                    >
+                      Large
+                    </Button>
+                    <Button
+                      type="button"
+                      variant={selectedRowHeight === '120px' ? 'default' : 'outline'}
+                      size="sm"
+                      onClick={() => setSelectedRowHeight('120px')}
+                      className="text-xs h-8"
+                    >
+                      Extra Large
+                    </Button>
+                    <Button
+                      type="button"
+                      variant={selectedRowHeight === 'custom' ? 'default' : 'outline'}
+                      size="sm"
+                      onClick={() => setSelectedRowHeight('custom')}
+                      className="text-xs h-8"
+                    >
+                      Custom
+                    </Button>
+                  </div>
+                  
+                  {selectedRowHeight === 'custom' && (
+                    <div className="flex gap-2 items-center">
+                      <Input
+                        type="number"
+                        value={customRowHeight}
+                        onChange={(e) => setCustomRowHeight(e.target.value)}
+                        placeholder="Height in px"
+                        className="h-8 text-xs"
+                        min="20"
+                        max="500"
+                      />
+                      <span className="text-xs text-muted-foreground">px</span>
+                    </div>
+                  )}
+
+                  <Button
+                    type="button"
+                    size="sm"
+                    onClick={() => {
+                      const height = selectedRowHeight === 'custom' 
+                        ? `${customRowHeight}px` 
+                        : selectedRowHeight;
+                      editor?.chain().focus().updateAttributes('tableRow', { height }).run();
+                    }}
+                    className="w-full"
+                  >
+                    Apply Row Height
+                  </Button>
+                </div>
+
                 <DropdownMenuSeparator />
                 
                 {/* Table operations */}
