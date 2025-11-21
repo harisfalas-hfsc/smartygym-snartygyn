@@ -468,7 +468,7 @@ export const ProgramEditDialog = ({ program, open, onOpenChange, onSave, isPerso
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
+      <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto overflow-x-hidden">
         <DialogHeader>
           <DialogTitle>{program ? 'Edit Program' : 'Create New Program'}</DialogTitle>
           <DialogDescription>
