@@ -12,6 +12,10 @@ import { TextStyle } from '@tiptap/extension-text-style';
 import { Underline } from '@tiptap/extension-underline';
 import { Placeholder } from '@tiptap/extension-placeholder';
 import { Image } from '@tiptap/extension-image';
+import { Highlight } from '@tiptap/extension-highlight';
+import { CodeBlock } from '@tiptap/extension-code-block';
+import { Subscript } from '@tiptap/extension-subscript';
+import { Superscript } from '@tiptap/extension-superscript';
 import { Button } from './button';
 import {
   Bold,
@@ -39,6 +43,14 @@ import {
   Merge,
   Split,
   Table2,
+  Smile,
+  Type,
+  Highlighter,
+  Quote,
+  Minus,
+  Code,
+  Subscript as SubscriptIcon,
+  Superscript as SuperscriptIcon,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import {
@@ -49,9 +61,18 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import EmojiPicker, { EmojiClickData } from 'emoji-picker-react';
 
 interface RichTextEditorProps {
   value: string;
@@ -162,6 +183,16 @@ const CustomTableHeader = TableHeader.extend({
   },
 });
 
+// Special characters grouped by category
+const SPECIAL_CHARS = {
+  Currency: ['€', '£', '¥', '$', '¢', '₹', '₽', '₩', '₪'],
+  Arrows: ['→', '←', '↑', '↓', '↔', '⇒', '⇐', '⇑', '⇓'],
+  Math: ['±', '×', '÷', '≠', '≈', '≤', '≥', '∞', '√', '∑', '∏'],
+  Symbols: ['©', '®', '™', '§', '¶', '•', '°', '†', '‡', '¤'],
+  Punctuation: ['…', '–', '—', '\u201c', '\u201d', '\u2018', '\u2019', '‹', '›', '«', '»'],
+  Misc: ['★', '☆', '♥', '♦', '♣', '♠', '✓', '✗', '✔', '✘'],
+};
+
 export const RichTextEditor: React.FC<RichTextEditorProps> = ({
   value,
   onChange,
@@ -173,13 +204,26 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({
   const [borderStyle, setBorderStyle] = useState('solid');
   const [cellBgColor, setCellBgColor] = useState('#ffffff');
   const [applyToAllCells, setApplyToAllCells] = useState(false);
+  const [showEmojiPicker, setShowEmojiPicker] = useState(false);
+  const [tableRows, setTableRows] = useState(3);
+  const [tableCols, setTableCols] = useState(3);
+  const [tableWithHeader, setTableWithHeader] = useState(true);
+  const [showTableDialog, setShowTableDialog] = useState(false);
 
   const editor = useEditor({
     extensions: [
-      StarterKit,
+      StarterKit.configure({
+        codeBlock: false, // We'll use the separate CodeBlock extension
+      }),
       Underline,
       TextStyle,
       Color,
+      Highlight.configure({
+        multicolor: true,
+      }),
+      CodeBlock,
+      Subscript,
+      Superscript,
       Image.configure({
         inline: true,
         allowBase64: true,
@@ -198,6 +242,9 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({
       }),
       Link.configure({
         openOnClick: false,
+        HTMLAttributes: {
+          class: 'text-primary hover:underline',
+        },
       }),
       Placeholder.configure({
         placeholder,
@@ -206,6 +253,17 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({
     content: value,
     onUpdate: ({ editor }) => {
       onChange(editor.getHTML());
+    },
+    editorProps: {
+      handlePaste: (view, event) => {
+        // Enhanced paste handling for Word/rich documents
+        const html = event.clipboardData ? event.clipboardData.getData('text/html') : null;
+        if (html) {
+          // Let TipTap handle it with its built-in paste rules
+          return false;
+        }
+        return false;
+      },
     },
   });
 
@@ -220,8 +278,13 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({
     }
   };
 
-  const addTable = () => {
-    editor.chain().focus().insertTable({ rows: 3, cols: 3, withHeaderRow: true }).run();
+  const insertTableWithSize = () => {
+    editor.chain().focus().insertTable({ 
+      rows: tableRows, 
+      cols: tableCols, 
+      withHeaderRow: tableWithHeader 
+    }).run();
+    setShowTableDialog(false);
   };
 
   const applyBorderToCell = (color: string, width: string, style: string) => {
@@ -271,7 +334,6 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({
     applyBorderToAllCells('hsl(var(--primary))', '2px', 'solid');
   };
 
-  // Image upload helper functions
   const insertImageFromURL = () => {
     const url = window.prompt('Enter image URL:');
     if (url) {
@@ -321,7 +383,6 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({
     input.click();
   };
 
-  // Cell background color helper functions
   const applyCellBackground = (color: string, applyToAll: boolean) => {
     if (applyToAll) {
       const { state } = editor;
@@ -347,6 +408,19 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({
     }
   };
 
+  const onEmojiClick = (emojiData: EmojiClickData) => {
+    editor.chain().focus().insertContent(emojiData.emoji).run();
+    setShowEmojiPicker(false);
+  };
+
+  const insertSpecialChar = (char: string) => {
+    editor.chain().focus().insertContent(char).run();
+  };
+
+  const setFontSize = (size: string) => {
+    editor.chain().focus().setMark('textStyle', { fontSize: size }).run();
+  };
+
   // Auto-apply border changes
   React.useEffect(() => {
     if (!editor || !editor.isActive('table')) return;
@@ -366,6 +440,7 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({
   return (
     <div className="border border-input rounded-md bg-background">
       <div className="flex flex-wrap gap-1 p-2 border-b border-input">
+        {/* Basic formatting */}
         <Button
           type="button"
           variant="ghost"
@@ -402,7 +477,74 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({
         >
           <Strikethrough className="h-4 w-4" />
         </Button>
+        <Button
+          type="button"
+          variant="ghost"
+          size="sm"
+          onClick={() => editor.chain().focus().toggleSubscript().run()}
+          className={cn(editor.isActive('subscript') && 'bg-muted')}
+        >
+          <SubscriptIcon className="h-4 w-4" />
+        </Button>
+        <Button
+          type="button"
+          variant="ghost"
+          size="sm"
+          onClick={() => editor.chain().focus().toggleSuperscript().run()}
+          className={cn(editor.isActive('superscript') && 'bg-muted')}
+        >
+          <SuperscriptIcon className="h-4 w-4" />
+        </Button>
+
         <div className="w-px h-6 bg-border mx-1" />
+
+        {/* Font size dropdown */}
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button type="button" variant="ghost" size="sm">
+              <Type className="h-4 w-4" />
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="start" className="w-40 bg-background z-50">
+            <DropdownMenuLabel>Font Size</DropdownMenuLabel>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem onClick={() => setFontSize('12px')} className="cursor-pointer">
+              <span className="text-xs">Small</span>
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={() => setFontSize('16px')} className="cursor-pointer">
+              <span className="text-base">Normal</span>
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={() => setFontSize('20px')} className="cursor-pointer">
+              <span className="text-lg">Large</span>
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={() => setFontSize('24px')} className="cursor-pointer">
+              <span className="text-xl">Extra Large</span>
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+
+        {/* Text color */}
+        <Input
+          type="color"
+          onChange={(e) => editor.chain().focus().setColor(e.target.value).run()}
+          className="h-8 w-12 p-1 cursor-pointer"
+          title="Text Color"
+        />
+
+        {/* Highlight */}
+        <Button
+          type="button"
+          variant="ghost"
+          size="sm"
+          onClick={() => editor.chain().focus().toggleHighlight({ color: '#fbbf24' }).run()}
+          className={cn(editor.isActive('highlight') && 'bg-muted')}
+        >
+          <Highlighter className="h-4 w-4" />
+        </Button>
+
+        <div className="w-px h-6 bg-border mx-1" />
+
+        {/* Headings */}
         <Button
           type="button"
           variant="ghost"
@@ -430,7 +572,10 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({
         >
           <Heading3 className="h-4 w-4" />
         </Button>
+
         <div className="w-px h-6 bg-border mx-1" />
+
+        {/* Lists */}
         <Button
           type="button"
           variant="ghost"
@@ -449,24 +594,99 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({
         >
           <ListOrdered className="h-4 w-4" />
         </Button>
-        <div className="w-px h-6 bg-border mx-1" />
+
+        {/* Blockquote */}
         <Button
           type="button"
           variant="ghost"
           size="sm"
-          onClick={addTable}
+          onClick={() => editor.chain().focus().toggleBlockquote().run()}
+          className={cn(editor.isActive('blockquote') && 'bg-muted')}
         >
-          <TableIcon className="h-4 w-4" />
+          <Quote className="h-4 w-4" />
         </Button>
+
+        {/* Code block */}
+        <Button
+          type="button"
+          variant="ghost"
+          size="sm"
+          onClick={() => editor.chain().focus().toggleCodeBlock().run()}
+          className={cn(editor.isActive('codeBlock') && 'bg-muted')}
+        >
+          <Code className="h-4 w-4" />
+        </Button>
+
+        {/* Horizontal rule */}
+        <Button
+          type="button"
+          variant="ghost"
+          size="sm"
+          onClick={() => editor.chain().focus().setHorizontalRule().run()}
+        >
+          <Minus className="h-4 w-4" />
+        </Button>
+
+        <div className="w-px h-6 bg-border mx-1" />
+
+        {/* Table with dialog for size selection */}
+        <Dialog open={showTableDialog} onOpenChange={setShowTableDialog}>
+          <DialogTrigger asChild>
+            <Button type="button" variant="ghost" size="sm">
+              <TableIcon className="h-4 w-4" />
+            </Button>
+          </DialogTrigger>
+          <DialogContent className="sm:max-w-md">
+            <DialogHeader>
+              <DialogTitle>Insert Table</DialogTitle>
+              <DialogDescription>
+                Select the number of rows and columns for your table
+              </DialogDescription>
+            </DialogHeader>
+            <div className="space-y-4 py-4">
+              <div className="space-y-2">
+                <label className="text-sm font-medium">Rows</label>
+                <Input
+                  type="number"
+                  min={1}
+                  max={10}
+                  value={tableRows}
+                  onChange={(e) => setTableRows(Math.min(10, Math.max(1, parseInt(e.target.value) || 1)))}
+                />
+              </div>
+              <div className="space-y-2">
+                <label className="text-sm font-medium">Columns</label>
+                <Input
+                  type="number"
+                  min={1}
+                  max={10}
+                  value={tableCols}
+                  onChange={(e) => setTableCols(Math.min(10, Math.max(1, parseInt(e.target.value) || 1)))}
+                />
+              </div>
+              <div className="flex items-center gap-2">
+                <input
+                  type="checkbox"
+                  id="with-header"
+                  checked={tableWithHeader}
+                  onChange={(e) => setTableWithHeader(e.target.checked)}
+                  className="rounded border-gray-300"
+                />
+                <label htmlFor="with-header" className="text-sm cursor-pointer">
+                  Include header row
+                </label>
+              </div>
+              <Button onClick={insertTableWithSize} className="w-full">
+                Insert Table
+              </Button>
+            </div>
+          </DialogContent>
+        </Dialog>
 
         {/* Image insertion dropdown */}
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button
-              type="button"
-              variant="ghost"
-              size="sm"
-            >
+            <Button type="button" variant="ghost" size="sm">
               <ImageIcon className="h-4 w-4" />
             </Button>
           </DropdownMenuTrigger>
@@ -479,6 +699,48 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({
               <Upload className="h-4 w-4 mr-2" />
               Upload from Device
             </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+
+        {/* Emoji picker */}
+        <DropdownMenu open={showEmojiPicker} onOpenChange={setShowEmojiPicker}>
+          <DropdownMenuTrigger asChild>
+            <Button type="button" variant="ghost" size="sm">
+              <Smile className="h-4 w-4" />
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="start" className="w-auto p-0 bg-background z-50">
+            <EmojiPicker onEmojiClick={onEmojiClick} width={350} height={400} />
+          </DropdownMenuContent>
+        </DropdownMenu>
+
+        {/* Special characters dropdown */}
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button type="button" variant="ghost" size="sm" title="Special Characters">
+              <span className="text-sm font-bold">Ω</span>
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="start" className="w-80 bg-background z-50 max-h-96 overflow-y-auto">
+            {Object.entries(SPECIAL_CHARS).map(([category, chars]) => (
+              <div key={category}>
+                <DropdownMenuLabel className="text-xs">{category}</DropdownMenuLabel>
+                <div className="grid grid-cols-9 gap-1 p-2">
+                  {chars.map((char) => (
+                    <button
+                      key={char}
+                      type="button"
+                      onClick={() => insertSpecialChar(char)}
+                      className="h-8 w-8 flex items-center justify-center hover:bg-muted rounded border border-transparent hover:border-primary text-lg"
+                      title={char}
+                    >
+                      {char}
+                    </button>
+                  ))}
+                </div>
+                <DropdownMenuSeparator />
+              </div>
+            ))}
           </DropdownMenuContent>
         </DropdownMenu>
 
@@ -553,14 +815,6 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({
                           onClick={() => setBorderColor('#ffffff')}
                           title="White"
                         />
-                        <button
-                          type="button"
-                          className="w-6 h-6 rounded border-2 border-red-500 bg-transparent relative"
-                          onClick={() => setBorderColor('transparent')}
-                          title="Transparent"
-                        >
-                          <span className="absolute inset-0 flex items-center justify-center text-red-500 text-xs font-bold">✕</span>
-                        </button>
                       </div>
                     </div>
                   </div>
@@ -692,14 +946,6 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({
                       <div className="flex gap-1 flex-wrap flex-1">
                         <button
                           type="button"
-                          className="w-6 h-6 rounded border-2 border-red-500 bg-transparent relative"
-                          onClick={() => setCellBgColor('transparent')}
-                          title="None"
-                        >
-                          <span className="absolute inset-0 flex items-center justify-center text-red-500 text-xs font-bold">✕</span>
-                        </button>
-                        <button
-                          type="button"
                           className="w-6 h-6 rounded border border-input bg-white"
                           onClick={() => setCellBgColor('#ffffff')}
                           title="White"
@@ -717,40 +963,17 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({
                           onClick={() => setCellBgColor('hsl(var(--primary) / 0.1)')}
                           title="Light Gold"
                         />
-                        <button
-                          type="button"
-                          className="w-6 h-6 rounded border border-input bg-black"
-                          onClick={() => setCellBgColor('#000000')}
-                          title="Black"
-                        />
                       </div>
                     </div>
                   </div>
                 </div>
-
-                <DropdownMenuSeparator />
-                <DropdownMenuLabel className="text-xs font-normal text-muted-foreground">Quick Presets</DropdownMenuLabel>
-                
-                <DropdownMenuItem onClick={removeBordersFromTable} className="cursor-pointer">
-                  Remove All Borders
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={resetTableBorders} className="cursor-pointer">
-                  Default Borders
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={applyGoldBorders} className="cursor-pointer">
-                  Gold Borders
-                </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
 
             {/* Table operations dropdown */}
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button
-                  type="button"
-                  variant="ghost"
-                  size="sm"
-                >
+                <Button type="button" variant="ghost" size="sm">
                   <Table2 className="h-4 w-4" />
                 </Button>
               </DropdownMenuTrigger>
@@ -829,6 +1052,7 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({
             </DropdownMenu>
           </>
         )}
+
         <Button
           type="button"
           variant="ghost"
@@ -838,7 +1062,10 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({
         >
           <LinkIcon className="h-4 w-4" />
         </Button>
+
         <div className="w-px h-6 bg-border mx-1" />
+
+        {/* Text alignment */}
         <Button
           type="button"
           variant="ghost"
@@ -866,7 +1093,10 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({
         >
           <AlignRight className="h-4 w-4" />
         </Button>
+
         <div className="w-px h-6 bg-border mx-1" />
+
+        {/* Undo/Redo */}
         <Button
           type="button"
           variant="ghost"
@@ -907,72 +1137,94 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({
           font-size: 2em;
           font-weight: bold;
           margin: 0.5em 0;
-          word-wrap: break-word;
-          overflow-wrap: break-word;
         }
         .ProseMirror h2 {
           font-size: 1.5em;
           font-weight: bold;
           margin: 0.5em 0;
-          word-wrap: break-word;
-          overflow-wrap: break-word;
         }
         .ProseMirror h3 {
           font-size: 1.25em;
           font-weight: bold;
           margin: 0.5em 0;
-          word-wrap: break-word;
-          overflow-wrap: break-word;
         }
         .ProseMirror ul, .ProseMirror ol {
           padding-left: 1.5em;
           margin: 0.5em 0;
         }
+        .ProseMirror blockquote {
+          border-left: 3px solid hsl(var(--primary));
+          padding-left: 1em;
+          margin: 1em 0;
+          font-style: italic;
+        }
+        .ProseMirror code {
+          background-color: hsl(var(--muted));
+          padding: 0.2em 0.4em;
+          border-radius: 3px;
+          font-family: monospace;
+        }
+        .ProseMirror pre {
+          background-color: hsl(var(--muted));
+          padding: 1em;
+          border-radius: 5px;
+          overflow-x: auto;
+          margin: 1em 0;
+        }
+        .ProseMirror pre code {
+          background: none;
+          padding: 0;
+        }
+        .ProseMirror hr {
+          border: none;
+          border-top: 2px solid hsl(var(--border));
+          margin: 2em 0;
+        }
+        .ProseMirror mark {
+          background-color: #fbbf24;
+          padding: 0.1em 0.2em;
+        }
         .ProseMirror table {
           border-collapse: collapse;
-          margin: 1em 0;
-          overflow: hidden;
-          table-layout: fixed;
           width: 100%;
+          margin: 1em 0;
         }
-        .ProseMirror table td, .ProseMirror table th {
+        .ProseMirror table td,
+        .ProseMirror table th {
           border: 1px solid hsl(var(--border));
           padding: 0.5em;
-          position: relative;
           vertical-align: top;
-          word-wrap: break-word;
-          overflow-wrap: break-word;
+          position: relative;
         }
         .ProseMirror table th {
           background-color: hsl(var(--muted));
           font-weight: bold;
           text-align: left;
         }
-        .ProseMirror a {
-          color: hsl(var(--primary));
-          text-decoration: underline;
-          word-wrap: break-word;
-          overflow-wrap: break-word;
+        .ProseMirror .selectedCell:after {
+          background: rgba(200, 200, 255, 0.4);
+          content: "";
+          left: 0;
+          right: 0;
+          top: 0;
+          bottom: 0;
+          pointer-events: none;
+          position: absolute;
+          z-index: 2;
         }
-        .ProseMirror .editor-image {
+        .ProseMirror .column-resize-handle {
+          background-color: hsl(var(--primary));
+          bottom: -2px;
+          position: absolute;
+          right: -2px;
+          pointer-events: none;
+          top: 0;
+          width: 4px;
+        }
+        .ProseMirror img {
           max-width: 100%;
           height: auto;
           border-radius: 4px;
-          cursor: pointer;
-          margin: 0.5em 0;
-        }
-        .ProseMirror .editor-image.ProseMirror-selectednode {
-          outline: 2px solid hsl(var(--primary));
-        }
-        .ProseMirror table td[data-bg-color],
-        .ProseMirror table th[data-bg-color] {
-          background-color: var(--cell-bg-color);
-        }
-        .ProseMirror table td[colspan],
-        .ProseMirror table th[colspan],
-        .ProseMirror table td[rowspan],
-        .ProseMirror table th[rowspan] {
-          border: 2px dashed hsl(var(--primary) / 0.5) !important;
         }
       `}</style>
     </div>
