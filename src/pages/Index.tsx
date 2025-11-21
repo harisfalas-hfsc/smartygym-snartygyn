@@ -728,42 +728,40 @@ const Index = () => {
 
                   {/* Who Is Smarty Gym For? Section */}
                   <div className="pt-1">
-                    <h2 className="text-xl sm:text-2xl font-bold text-center text-foreground mb-6">
-                      Who Is <span className="text-primary">SmartyGym</span> For?
-                    </h2>
-                    
-                    <div className="grid grid-cols-2 gap-x-12 gap-y-5 max-w-2xl mx-auto">
-                      {/* Column 1 */}
-                      <div className="flex items-center gap-3">
-                        <Users className="w-6 h-6 text-primary flex-shrink-0" />
-                        <span className="text-sm font-semibold">Busy adults</span>
+                    <Card className="border border-primary/30 bg-background/80">
+                      <div className="p-6 sm:p-8 space-y-4">
+                        <h2 className="text-xl sm:text-2xl font-bold text-center text-foreground">
+                          Who Is Smarty Gym For?
+                        </h2>
+                        <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 sm:gap-3">
+                          <div className="flex items-center gap-2 p-3 bg-primary/5 border border-primary/20 rounded-lg">
+                            <Users className="w-4 h-4 text-primary flex-shrink-0" />
+                            <span className="text-sm font-semibold text-foreground">Busy adults</span>
+                          </div>
+                          <div className="flex items-center gap-2 p-3 bg-primary/5 border border-primary/20 rounded-lg">
+                            <Heart className="w-4 h-4 text-primary flex-shrink-0" />
+                            <span className="text-sm font-semibold text-foreground">Parents</span>
+                          </div>
+                          <div className="flex items-center gap-2 p-3 bg-primary/5 border border-primary/20 rounded-lg">
+                            <GraduationCap className="w-4 h-4 text-primary flex-shrink-0" />
+                            <span className="text-sm font-semibold text-foreground">Beginners</span>
+                          </div>
+                          <div className="flex items-center gap-2 p-3 bg-primary/5 border border-primary/20 rounded-lg">
+                            <Target className="w-4 h-4 text-primary flex-shrink-0" />
+                            <span className="text-sm font-semibold text-foreground">Intermediate lifters</span>
+                          </div>
+                          <div className="flex items-center gap-2 p-3 bg-primary/5 border border-primary/20 rounded-lg">
+                            <Plane className="w-4 h-4 text-primary flex-shrink-0" />
+                            <span className="text-sm font-semibold text-foreground">Travelers</span>
+                          </div>
+                          <div className="flex items-center gap-2 p-3 bg-primary/5 border border-primary/20 rounded-lg">
+                            <Dumbbell className="w-4 h-4 text-primary flex-shrink-0" />
+                            <span className="text-sm font-semibold text-foreground">Gym-goers</span>
+                          </div>
+                        </div>
+
                       </div>
-                      
-                      <div className="flex items-center gap-3">
-                        <Heart className="w-6 h-6 text-primary flex-shrink-0" />
-                        <span className="text-sm font-semibold">Parents</span>
-                      </div>
-                      
-                      <div className="flex items-center gap-3">
-                        <GraduationCap className="w-6 h-6 text-primary flex-shrink-0" />
-                        <span className="text-sm font-semibold">Beginners</span>
-                      </div>
-                      
-                      <div className="flex items-center gap-3">
-                        <Target className="w-6 h-6 text-primary flex-shrink-0" />
-                        <span className="text-sm font-semibold">Intermediate lifters</span>
-                      </div>
-                      
-                      <div className="flex items-center gap-3">
-                        <Plane className="w-6 h-6 text-primary flex-shrink-0" />
-                        <span className="text-sm font-semibold">Travelers</span>
-                      </div>
-                      
-                      <div className="flex items-center gap-3">
-                        <Dumbbell className="w-6 h-6 text-primary flex-shrink-0" />
-                        <span className="text-sm font-semibold">Gym-goers</span>
-                      </div>
-                    </div>
+                    </Card>
                   </div>
 
                   {/* 100% Human. 0% AI Section */}
