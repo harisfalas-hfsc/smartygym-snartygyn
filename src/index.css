@@ -190,8 +190,12 @@ All colors MUST be HSL.
 }
 
 /* Global smooth scrolling */
-html {
+html,
+body,
+#root {
   scroll-behavior: smooth;
+  max-width: 100vw;
+  overflow-x: hidden;
 }
 
 /* Global textarea behavior - prevent horizontal scrolling */
