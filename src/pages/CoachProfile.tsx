@@ -218,15 +218,15 @@ const CoachProfile = () => {
                   <h3 className="text-xl sm:text-2xl font-semibold mb-4">My Promise</h3>
                   <div className="space-y-3">
                     <div className="flex items-center justify-start gap-2">
-                      <Shield className="w-5 h-5 sm:w-6 sm:h-6 text-primary shrink-0" />
-                      <p className="text-sm sm:text-base font-semibold">Only workouts and training programs. No fancy extras, no distractions—just the actual product.</p>
+                      <Target className="w-5 h-5 sm:w-6 sm:h-6 text-primary shrink-0" />
+                      <p className="text-sm sm:text-base font-semibold">Only workouts and training programs—just the actual product.</p>
                     </div>
                     <div className="flex items-center justify-start gap-2">
-                      <Shield className="w-5 h-5 sm:w-6 sm:h-6 text-primary shrink-0" />
-                      <p className="text-sm sm:text-base font-semibold">I sell 20+ years of knowledge and experience, not memberships, promotions, or motivational quotes.</p>
+                      <Award className="w-5 h-5 sm:w-6 sm:h-6 text-primary shrink-0" />
+                      <p className="text-sm sm:text-base font-semibold">20+ years of knowledge and experience, not promotions.</p>
                     </div>
                     <div className="flex items-center justify-start gap-2">
-                      <Shield className="w-5 h-5 sm:w-6 sm:h-6 text-primary shrink-0" />
+                      <CheckCircle className="w-5 h-5 sm:w-6 sm:h-6 text-primary shrink-0" />
                       <p className="text-sm sm:text-base font-semibold">100% training quality as if I was coaching you in person.</p>
                     </div>
                   </div>
