@@ -207,7 +207,7 @@ const CoachProfile = () => {
                 <div className="flex items-start gap-3">
                   <Smartphone className="w-6 h-6 sm:w-7 sm:h-7 text-primary shrink-0 mt-0.5" />
                   <p className="text-base sm:text-lg leading-relaxed text-muted-foreground">
-                    People need coaching beyond the gym. Not everyone can come physically to HFSC in Nicosia. Many travel, work late, or prefer training at home. SmartyGym gives them a complete training solution in their pocket. Anywhere. Anytime.
+                    I created SmartyGym because I believe that everybody deserves fitness. Everybody deserves convenience. Everybody deserves to have access to my premium and science-based workouts and training programs. It's cost-efficient and to help people to start their fitness journey or not stop when life gets in the way.
                   </p>
                 </div>
               </section>
