@@ -213,6 +213,12 @@ All colors MUST be HSL.
     text-align: left;
   }
 
+  /* Column width support */
+  .prose table td[data-colwidth],
+  .prose table th[data-colwidth] {
+    box-sizing: border-box;
+  }
+
   /* Table Style Presets */
   .prose table.table-compact td,
   .prose table.table-compact th {

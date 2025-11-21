@@ -81,11 +81,26 @@ interface RichTextEditorProps {
   minHeight?: string;
 }
 
-// Extended TableCell with border and background customization
+// Extended TableCell with border, background, and width customization
 const CustomTableCell = TableCell.extend({
   addAttributes() {
     return {
       ...this.parent?.(),
+      colwidth: {
+        default: null,
+        parseHTML: element => {
+          const width = element.getAttribute('data-colwidth') || element.style.width;
+          return width ? [parseInt(width)] : null;
+        },
+        renderHTML: attributes => {
+          if (!attributes.colwidth) return {};
+          const width = attributes.colwidth[0];
+          return { 
+            'data-colwidth': width,
+            style: `width: ${width}px !important;`
+          };
+        },
+      },
       borderColor: {
         default: null,
         parseHTML: element => element.getAttribute('data-border-color'),
@@ -132,11 +147,26 @@ const CustomTableCell = TableCell.extend({
   },
 });
 
-// Extended TableHeader with border and background customization
+// Extended TableHeader with border, background, and width customization
 const CustomTableHeader = TableHeader.extend({
   addAttributes() {
     return {
       ...this.parent?.(),
+      colwidth: {
+        default: null,
+        parseHTML: element => {
+          const width = element.getAttribute('data-colwidth') || element.style.width;
+          return width ? [parseInt(width)] : null;
+        },
+        renderHTML: attributes => {
+          if (!attributes.colwidth) return {};
+          const width = attributes.colwidth[0];
+          return { 
+            'data-colwidth': width,
+            style: `width: ${width}px !important;`
+          };
+        },
+      },
       borderColor: {
         default: null,
         parseHTML: element => element.getAttribute('data-border-color'),
@@ -251,6 +281,9 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({
   const [selectedRowHeight, setSelectedRowHeight] = useState<string>('auto');
   const [customRowHeight, setCustomRowHeight] = useState<string>('60');
   const [currentTableStyle, setCurrentTableStyle] = useState<'default' | 'compact' | 'wide' | 'striped'>('default');
+  const [columnWidth, setColumnWidth] = useState<string>('');
+  const [columnWidthUnit, setColumnWidthUnit] = useState<'px' | '%'>('px');
+  const [showTemplateDialog, setShowTemplateDialog] = useState(false);
 
   const editor = useEditor({
     extensions: [
@@ -374,6 +407,66 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({
 
   const applyGoldBorders = () => {
     applyBorderToAllCells('hsl(var(--primary))', '2px', 'solid');
+  };
+
+  const insertPricingTable = () => {
+    editor?.chain().focus().insertTable({ rows: 4, cols: 3, withHeaderRow: true }).run();
+    setTimeout(() => {
+      const { state } = editor;
+      const { tr } = state;
+      let colIndex = 0;
+      
+      state.doc.descendants((node, pos) => {
+        if (node.type.name === 'tableHeader') {
+          const headers = ['Basic', 'Pro', 'Enterprise'];
+          if (colIndex < headers.length) {
+            tr.setNodeMarkup(pos, undefined, {
+              ...node.attrs,
+              backgroundColor: 'hsl(var(--primary) / 0.1)',
+            });
+          }
+          colIndex++;
+        }
+      });
+      editor.view.dispatch(tr);
+      applyTableStyle('wide');
+    }, 100);
+    setShowTemplateDialog(false);
+  };
+
+  const insertComparisonTable = () => {
+    editor?.chain().focus().insertTable({ rows: 5, cols: 4, withHeaderRow: true }).run();
+    setTimeout(() => {
+      applyTableStyle('striped');
+    }, 100);
+    setShowTemplateDialog(false);
+  };
+
+  const insertScheduleGrid = () => {
+    editor?.chain().focus().insertTable({ rows: 6, cols: 8, withHeaderRow: true }).run();
+    setTimeout(() => {
+      const { state } = editor;
+      const { tr } = state;
+      
+      state.doc.descendants((node, pos) => {
+        if (node.type.name === 'tableHeader') {
+          tr.setNodeMarkup(pos, undefined, {
+            ...node.attrs,
+            backgroundColor: 'hsl(var(--primary) / 0.2)',
+          });
+        }
+      });
+      editor.view.dispatch(tr);
+      applyTableStyle('compact');
+    }, 100);
+    setShowTemplateDialog(false);
+  };
+
+  const applyColumnWidth = () => {
+    if (!columnWidth) return;
+    const width = columnWidthUnit === 'px' ? parseInt(columnWidth) : Math.round((parseInt(columnWidth) / 100) * 800);
+    editor?.commands.updateAttributes('tableCell', { colwidth: [width] });
+    editor?.commands.updateAttributes('tableHeader', { colwidth: [width] });
   };
 
   const applyTableStyle = (style: 'default' | 'compact' | 'wide' | 'striped') => {
@@ -878,6 +971,104 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({
               <Button onClick={insertTableWithSize} className="w-full">
                 Insert Table
               </Button>
+            </div>
+          </DialogContent>
+        </Dialog>
+
+        {/* Table Template Gallery */}
+        <Dialog open={showTemplateDialog} onOpenChange={setShowTemplateDialog}>
+          <DialogTrigger asChild>
+            <Button type="button" variant="ghost" size="sm" title="Table Templates">
+              <Grid3x3 className="h-4 w-4" />
+              <Plus className="h-3 w-3 -ml-1" />
+            </Button>
+          </DialogTrigger>
+          <DialogContent className="sm:max-w-2xl">
+            <DialogHeader>
+              <DialogTitle>Table Templates</DialogTitle>
+              <DialogDescription>
+                Choose a pre-built table layout to get started quickly
+              </DialogDescription>
+            </DialogHeader>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 py-4">
+              <button
+                onClick={insertPricingTable}
+                className="p-4 border-2 border-border rounded-lg hover:border-primary transition-colors text-left group"
+              >
+                <div className="text-lg font-semibold mb-2 group-hover:text-primary">💰 Pricing Table</div>
+                <div className="text-sm text-muted-foreground mb-3">
+                  3 columns for Basic, Pro, and Enterprise tiers
+                </div>
+                <div className="bg-muted rounded p-2 text-xs">
+                  <div className="grid grid-cols-3 gap-1 mb-1">
+                    <div className="bg-primary/20 p-1 text-center">Basic</div>
+                    <div className="bg-primary/20 p-1 text-center">Pro</div>
+                    <div className="bg-primary/20 p-1 text-center">Enterprise</div>
+                  </div>
+                  <div className="space-y-1">
+                    <div className="bg-background p-1">Features</div>
+                    <div className="bg-background p-1">Price</div>
+                    <div className="bg-background p-1">Support</div>
+                  </div>
+                </div>
+              </button>
+
+              <button
+                onClick={insertComparisonTable}
+                className="p-4 border-2 border-border rounded-lg hover:border-primary transition-colors text-left group"
+              >
+                <div className="text-lg font-semibold mb-2 group-hover:text-primary">⚖️ Comparison Table</div>
+                <div className="text-sm text-muted-foreground mb-3">
+                  4 columns with striped rows for easy scanning
+                </div>
+                <div className="bg-muted rounded p-2 text-xs">
+                  <div className="grid grid-cols-4 gap-1 mb-1">
+                    <div className="bg-primary/20 p-1 text-center">Feature</div>
+                    <div className="bg-primary/20 p-1 text-center">A</div>
+                    <div className="bg-primary/20 p-1 text-center">B</div>
+                    <div className="bg-primary/20 p-1 text-center">C</div>
+                  </div>
+                  <div className="space-y-1">
+                    <div className="bg-background p-1">Item 1</div>
+                    <div className="bg-muted/50 p-1">Item 2</div>
+                    <div className="bg-background p-1">Item 3</div>
+                  </div>
+                </div>
+              </button>
+
+              <button
+                onClick={insertScheduleGrid}
+                className="p-4 border-2 border-border rounded-lg hover:border-primary transition-colors text-left group"
+              >
+                <div className="text-lg font-semibold mb-2 group-hover:text-primary">📅 Schedule Grid</div>
+                <div className="text-sm text-muted-foreground mb-3">
+                  8 columns for weekly schedule with time slots
+                </div>
+                <div className="bg-muted rounded p-2 text-xs">
+                  <div className="grid grid-cols-8 gap-px mb-1">
+                    <div className="bg-primary/30 p-1 text-center text-[10px]">Time</div>
+                    <div className="bg-primary/30 p-1 text-center text-[10px]">Mon</div>
+                    <div className="bg-primary/30 p-1 text-center text-[10px]">Tue</div>
+                    <div className="bg-primary/30 p-1 text-center text-[10px]">Wed</div>
+                    <div className="bg-primary/30 p-1 text-center text-[10px]">Thu</div>
+                    <div className="bg-primary/30 p-1 text-center text-[10px]">Fri</div>
+                    <div className="bg-primary/30 p-1 text-center text-[10px]">Sat</div>
+                    <div className="bg-primary/30 p-1 text-center text-[10px]">Sun</div>
+                  </div>
+                  <div className="space-y-px">
+                    <div className="grid grid-cols-8 gap-px">
+                      <div className="bg-background p-1 text-[10px]">9AM</div>
+                      <div className="bg-background p-1"></div>
+                      <div className="bg-background p-1"></div>
+                      <div className="bg-background p-1"></div>
+                      <div className="bg-background p-1"></div>
+                      <div className="bg-background p-1"></div>
+                      <div className="bg-background p-1"></div>
+                      <div className="bg-background p-1"></div>
+                    </div>
+                  </div>
+                </div>
+              </button>
             </div>
           </DialogContent>
         </Dialog>
@@ -1394,6 +1585,96 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({
                     </div>
                   </div>
                 </div>
+
+                <DropdownMenuSeparator />
+                <DropdownMenuLabel>Column Width</DropdownMenuLabel>
+                <DropdownMenuSeparator />
+                
+                <div className="p-2 space-y-3">
+                  <div>
+                    <label className="text-xs font-medium mb-1 block">Set Width for Selected Column</label>
+                    <div className="flex gap-2">
+                      <Input
+                        type="number"
+                        value={columnWidth}
+                        onChange={(e) => setColumnWidth(e.target.value)}
+                        placeholder="Width"
+                        className="h-8 text-xs flex-1"
+                        min="10"
+                      />
+                      <div className="flex gap-1">
+                        <Button
+                          type="button"
+                          variant={columnWidthUnit === 'px' ? 'default' : 'outline'}
+                          size="sm"
+                          onClick={() => setColumnWidthUnit('px')}
+                          className="text-xs h-8 px-2"
+                        >
+                          px
+                        </Button>
+                        <Button
+                          type="button"
+                          variant={columnWidthUnit === '%' ? 'default' : 'outline'}
+                          size="sm"
+                          onClick={() => setColumnWidthUnit('%')}
+                          className="text-xs h-8 px-2"
+                        >
+                          %
+                        </Button>
+                      </div>
+                    </div>
+                    <Button
+                      type="button"
+                      size="sm"
+                      onClick={applyColumnWidth}
+                      className="w-full mt-2"
+                      disabled={!columnWidth}
+                    >
+                      Apply Width
+                    </Button>
+                  </div>
+                  <div className="space-y-1">
+                    <p className="text-xs text-muted-foreground">Quick presets:</p>
+                    <div className="grid grid-cols-3 gap-1">
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        onClick={() => {
+                          setColumnWidth('100');
+                          setColumnWidthUnit('px');
+                        }}
+                        className="text-xs h-7"
+                      >
+                        Narrow
+                      </Button>
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        onClick={() => {
+                          setColumnWidth('200');
+                          setColumnWidthUnit('px');
+                        }}
+                        className="text-xs h-7"
+                      >
+                        Medium
+                      </Button>
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        onClick={() => {
+                          setColumnWidth('300');
+                          setColumnWidthUnit('px');
+                        }}
+                        className="text-xs h-7"
+                      >
+                        Wide
+                      </Button>
+                    </div>
+                  </div>
+                </div>
               </DropdownMenuContent>
             </DropdownMenu>
           </>
@@ -1571,6 +1852,10 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({
           background-color: hsl(var(--muted));
           font-weight: bold;
           text-align: left;
+        }
+        .ProseMirror table td[data-colwidth],
+        .ProseMirror table th[data-colwidth] {
+          box-sizing: border-box;
         }
         .ProseMirror .selectedCell:after {
           background: rgba(200, 200, 255, 0.4);
