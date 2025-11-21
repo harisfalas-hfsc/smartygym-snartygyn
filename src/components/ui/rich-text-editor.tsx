@@ -462,6 +462,86 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({
     setShowTemplateDialog(false);
   };
 
+  const insertWorkoutScheduleTable = () => {
+    editor?.chain().focus().insertTable({ rows: 8, cols: 6, withHeaderRow: true }).run();
+    setTimeout(() => {
+      const { state } = editor;
+      const { tr } = state;
+      
+      state.doc.descendants((node, pos) => {
+        if (node.type.name === 'tableHeader') {
+          tr.setNodeMarkup(pos, undefined, {
+            ...node.attrs,
+            backgroundColor: 'hsl(var(--primary) / 0.2)',
+          });
+        }
+      });
+      editor.view.dispatch(tr);
+      applyTableStyle('default');
+    }, 100);
+    setShowTemplateDialog(false);
+  };
+
+  const insertMealPlanTable = () => {
+    editor?.chain().focus().insertTable({ rows: 6, cols: 5, withHeaderRow: true }).run();
+    setTimeout(() => {
+      const { state } = editor;
+      const { tr } = state;
+      
+      state.doc.descendants((node, pos) => {
+        if (node.type.name === 'tableHeader') {
+          tr.setNodeMarkup(pos, undefined, {
+            ...node.attrs,
+            backgroundColor: '#dcfce7',
+          });
+        }
+      });
+      editor.view.dispatch(tr);
+      applyTableStyle('striped');
+    }, 100);
+    setShowTemplateDialog(false);
+  };
+
+  const insertProgressTrackerTable = () => {
+    editor?.chain().focus().insertTable({ rows: 10, cols: 7, withHeaderRow: true }).run();
+    setTimeout(() => {
+      const { state } = editor;
+      const { tr } = state;
+      
+      state.doc.descendants((node, pos) => {
+        if (node.type.name === 'tableHeader') {
+          tr.setNodeMarkup(pos, undefined, {
+            ...node.attrs,
+            backgroundColor: '#dbeafe',
+          });
+        }
+      });
+      editor.view.dispatch(tr);
+      applyTableStyle('compact');
+    }, 100);
+    setShowTemplateDialog(false);
+  };
+
+  const insertExerciseLogTable = () => {
+    editor?.chain().focus().insertTable({ rows: 12, cols: 6, withHeaderRow: true }).run();
+    setTimeout(() => {
+      const { state } = editor;
+      const { tr } = state;
+      
+      state.doc.descendants((node, pos) => {
+        if (node.type.name === 'tableHeader') {
+          tr.setNodeMarkup(pos, undefined, {
+            ...node.attrs,
+            backgroundColor: '#fef3c7',
+          });
+        }
+      });
+      editor.view.dispatch(tr);
+      applyTableStyle('default');
+    }, 100);
+    setShowTemplateDialog(false);
+  };
+
   const applyColumnWidth = () => {
     if (!columnWidth) return;
     const width = columnWidthUnit === 'px' ? parseInt(columnWidth) : Math.round((parseInt(columnWidth) / 100) * 800);
@@ -990,7 +1070,8 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({
                 Choose a pre-built table layout to get started quickly
               </DialogDescription>
             </DialogHeader>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 py-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 py-4 max-h-[70vh] overflow-y-auto">
+              {/* General Templates */}
               <button
                 onClick={insertPricingTable}
                 className="p-4 border-2 border-border rounded-lg hover:border-primary transition-colors text-left group"
@@ -1061,6 +1142,123 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({
                       <div className="bg-background p-1"></div>
                       <div className="bg-background p-1"></div>
                       <div className="bg-background p-1"></div>
+                      <div className="bg-background p-1"></div>
+                      <div className="bg-background p-1"></div>
+                      <div className="bg-background p-1"></div>
+                      <div className="bg-background p-1"></div>
+                    </div>
+                  </div>
+                </div>
+              </button>
+
+              {/* Fitness-Specific Templates */}
+              <button
+                onClick={insertWorkoutScheduleTable}
+                className="p-4 border-2 border-border rounded-lg hover:border-primary transition-colors text-left group"
+              >
+                <div className="text-lg font-semibold mb-2 group-hover:text-primary">🏋️ Workout Schedule</div>
+                <div className="text-sm text-muted-foreground mb-3">
+                  Weekly training plan with exercises, sets, reps
+                </div>
+                <div className="bg-muted rounded p-2 text-xs">
+                  <div className="grid grid-cols-6 gap-px mb-1">
+                    <div className="bg-primary/20 p-1 text-center text-[10px]">Day</div>
+                    <div className="bg-primary/20 p-1 text-center text-[10px]">Exercise</div>
+                    <div className="bg-primary/20 p-1 text-center text-[10px]">Sets</div>
+                    <div className="bg-primary/20 p-1 text-center text-[10px]">Reps</div>
+                    <div className="bg-primary/20 p-1 text-center text-[10px]">Rest</div>
+                    <div className="bg-primary/20 p-1 text-center text-[10px]">Notes</div>
+                  </div>
+                  <div className="space-y-px">
+                    <div className="grid grid-cols-6 gap-px">
+                      <div className="bg-background p-1 text-[10px]">Mon</div>
+                      <div className="bg-background p-1 text-[10px]">Bench</div>
+                      <div className="bg-background p-1 text-[10px]">4</div>
+                      <div className="bg-background p-1 text-[10px]">8-10</div>
+                      <div className="bg-background p-1 text-[10px]">90s</div>
+                      <div className="bg-background p-1 text-[10px]"></div>
+                    </div>
+                  </div>
+                </div>
+              </button>
+
+              <button
+                onClick={insertMealPlanTable}
+                className="p-4 border-2 border-border rounded-lg hover:border-primary transition-colors text-left group"
+              >
+                <div className="text-lg font-semibold mb-2 group-hover:text-primary">🥗 Meal Plan</div>
+                <div className="text-sm text-muted-foreground mb-3">
+                  Daily nutrition tracking with macros
+                </div>
+                <div className="bg-muted rounded p-2 text-xs">
+                  <div className="grid grid-cols-5 gap-1 mb-1">
+                    <div className="bg-green-100 p-1 text-center text-[10px]">Meal</div>
+                    <div className="bg-green-100 p-1 text-center text-[10px]">Food</div>
+                    <div className="bg-green-100 p-1 text-center text-[10px]">Protein</div>
+                    <div className="bg-green-100 p-1 text-center text-[10px]">Carbs</div>
+                    <div className="bg-green-100 p-1 text-center text-[10px]">Fats</div>
+                  </div>
+                  <div className="space-y-1">
+                    <div className="bg-background p-1 text-[10px]">Breakfast</div>
+                    <div className="bg-muted/50 p-1 text-[10px]">Lunch</div>
+                    <div className="bg-background p-1 text-[10px]">Dinner</div>
+                  </div>
+                </div>
+              </button>
+
+              <button
+                onClick={insertProgressTrackerTable}
+                className="p-4 border-2 border-border rounded-lg hover:border-primary transition-colors text-left group"
+              >
+                <div className="text-lg font-semibold mb-2 group-hover:text-primary">📊 Progress Tracker</div>
+                <div className="text-sm text-muted-foreground mb-3">
+                  Track measurements, weight, body composition
+                </div>
+                <div className="bg-muted rounded p-2 text-xs">
+                  <div className="grid grid-cols-7 gap-px mb-1">
+                    <div className="bg-blue-100 p-1 text-center text-[10px]">Date</div>
+                    <div className="bg-blue-100 p-1 text-center text-[10px]">Weight</div>
+                    <div className="bg-blue-100 p-1 text-center text-[10px]">BF%</div>
+                    <div className="bg-blue-100 p-1 text-center text-[10px]">Chest</div>
+                    <div className="bg-blue-100 p-1 text-center text-[10px]">Waist</div>
+                    <div className="bg-blue-100 p-1 text-center text-[10px]">Arms</div>
+                    <div className="bg-blue-100 p-1 text-center text-[10px]">Legs</div>
+                  </div>
+                  <div className="space-y-px">
+                    <div className="grid grid-cols-7 gap-px">
+                      <div className="bg-background p-1 text-[10px]">Week 1</div>
+                      <div className="bg-background p-1"></div>
+                      <div className="bg-background p-1"></div>
+                      <div className="bg-background p-1"></div>
+                      <div className="bg-background p-1"></div>
+                      <div className="bg-background p-1"></div>
+                      <div className="bg-background p-1"></div>
+                    </div>
+                  </div>
+                </div>
+              </button>
+
+              <button
+                onClick={insertExerciseLogTable}
+                className="p-4 border-2 border-border rounded-lg hover:border-primary transition-colors text-left group"
+              >
+                <div className="text-lg font-semibold mb-2 group-hover:text-primary">📝 Exercise Log</div>
+                <div className="text-sm text-muted-foreground mb-3">
+                  Record sets, reps, weight for each exercise
+                </div>
+                <div className="bg-muted rounded p-2 text-xs">
+                  <div className="grid grid-cols-6 gap-px mb-1">
+                    <div className="bg-yellow-100 p-1 text-center text-[10px]">Exercise</div>
+                    <div className="bg-yellow-100 p-1 text-center text-[10px]">Set 1</div>
+                    <div className="bg-yellow-100 p-1 text-center text-[10px]">Set 2</div>
+                    <div className="bg-yellow-100 p-1 text-center text-[10px]">Set 3</div>
+                    <div className="bg-yellow-100 p-1 text-center text-[10px]">Set 4</div>
+                    <div className="bg-yellow-100 p-1 text-center text-[10px]">Total</div>
+                  </div>
+                  <div className="space-y-px">
+                    <div className="grid grid-cols-6 gap-px">
+                      <div className="bg-background p-1 text-[10px]">Squat</div>
+                      <div className="bg-background p-1 text-[10px]">225x5</div>
                       <div className="bg-background p-1"></div>
                       <div className="bg-background p-1"></div>
                       <div className="bg-background p-1"></div>
