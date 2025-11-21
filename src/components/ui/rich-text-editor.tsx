@@ -1317,7 +1317,7 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({
       </div>
       <EditorContent
         editor={editor}
-        className="prose prose-sm max-w-none p-3"
+        className="prose prose-sm max-w-none p-3 w-full max-w-full overflow-x-hidden break-words"
         style={{ minHeight }}
       />
       <style>{`
@@ -1328,6 +1328,7 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({
           overflow-wrap: break-word;
           white-space: normal;
           max-width: 100%;
+          overflow-x: hidden;
         }
         .ProseMirror p {
           margin: 0.5em 0;
