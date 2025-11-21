@@ -212,6 +212,35 @@ All colors MUST be HSL.
     font-weight: bold;
     text-align: left;
   }
+
+  /* Table Style Presets */
+  .prose table.table-compact td,
+  .prose table.table-compact th {
+    padding: 0.25em;
+    font-size: 0.875rem;
+  }
+
+  .prose table.table-compact {
+    margin: 0.5em 0;
+  }
+
+  .prose table.table-wide td,
+  .prose table.table-wide th {
+    padding: 1em;
+    line-height: 1.8;
+  }
+
+  .prose table.table-wide {
+    margin: 1.5em 0;
+  }
+
+  .prose table.table-striped tbody tr:nth-child(even) {
+    background-color: #f3f4f6;
+  }
+
+  .prose table.table-striped tbody tr:nth-child(odd) {
+    background-color: #ffffff;
+  }
 }
 
 /* Global smooth scrolling */

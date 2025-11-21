@@ -202,6 +202,26 @@ const CustomTableRow = TableRow.extend({
   },
 });
 
+// Extended Table with style presets
+const CustomTable = Table.extend({
+  addAttributes() {
+    return {
+      ...this.parent?.(),
+      tableStyle: {
+        default: 'default',
+        parseHTML: element => element.getAttribute('data-table-style') || 'default',
+        renderHTML: attributes => {
+          if (!attributes.tableStyle || attributes.tableStyle === 'default') return {};
+          return { 
+            'data-table-style': attributes.tableStyle,
+            'class': `table-${attributes.tableStyle}`
+          };
+        },
+      },
+    };
+  },
+});
+
 // Special characters grouped by category
 const SPECIAL_CHARS = {
   Currency: ['€', '£', '¥', '$', '¢', '₹', '₽', '₩', '₪'],
@@ -230,6 +250,7 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({
   const [showTableDialog, setShowTableDialog] = useState(false);
   const [selectedRowHeight, setSelectedRowHeight] = useState<string>('auto');
   const [customRowHeight, setCustomRowHeight] = useState<string>('60');
+  const [currentTableStyle, setCurrentTableStyle] = useState<'default' | 'compact' | 'wide' | 'striped'>('default');
 
   const editor = useEditor({
     extensions: [
@@ -252,7 +273,7 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({
           class: 'editor-image',
         },
       }),
-      Table.configure({
+      CustomTable.configure({
         resizable: true,
       }),
       CustomTableRow,
@@ -353,6 +374,87 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({
 
   const applyGoldBorders = () => {
     applyBorderToAllCells('hsl(var(--primary))', '2px', 'solid');
+  };
+
+  const applyTableStyle = (style: 'default' | 'compact' | 'wide' | 'striped') => {
+    if (!editor) return;
+    
+    editor.chain().focus().updateAttributes('table', { tableStyle: style }).run();
+    setCurrentTableStyle(style);
+    
+    // Apply style-specific formatting
+    switch(style) {
+      case 'compact':
+        // Reduce padding and use thin borders
+        applyBorderToAllCells('#6b7280', '1px', 'solid');
+        // Apply row height to all rows
+        const { state: compactState } = editor;
+        const { tr: compactTr } = compactState;
+        compactState.doc.descendants((node, pos) => {
+          if (node.type.name === 'tableRow') {
+            compactTr.setNodeMarkup(pos, undefined, {
+              ...node.attrs,
+              height: '40px',
+            });
+          }
+        });
+        editor.view.dispatch(compactTr);
+        break;
+      case 'wide':
+        // Increase padding and use thicker borders
+        applyBorderToAllCells('#000000', '2px', 'solid');
+        // Apply row height to all rows
+        const { state: wideState } = editor;
+        const { tr: wideTr } = wideState;
+        wideState.doc.descendants((node, pos) => {
+          if (node.type.name === 'tableRow') {
+            wideTr.setNodeMarkup(pos, undefined, {
+              ...node.attrs,
+              height: '80px',
+            });
+          }
+        });
+        editor.view.dispatch(wideTr);
+        break;
+      case 'striped':
+        // Apply alternating row backgrounds
+        const { state } = editor;
+        const { tr } = state;
+        let rowIndex = 0;
+        
+        state.doc.descendants((node, pos) => {
+          if (node.type.name === 'tableRow') {
+            const bgColor = rowIndex % 2 === 0 ? '#ffffff' : '#f3f4f6';
+            node.descendants((cellNode, cellPos) => {
+              if (cellNode.type.name === 'tableCell' || cellNode.type.name === 'tableHeader') {
+                tr.setNodeMarkup(pos + cellPos + 1, undefined, {
+                  ...cellNode.attrs,
+                  backgroundColor: bgColor,
+                });
+              }
+            });
+            rowIndex++;
+          }
+        });
+        editor.view.dispatch(tr);
+        break;
+      case 'default':
+        // Reset to default styling
+        resetTableBorders();
+        // Reset row heights to auto
+        const { state: defaultState } = editor;
+        const { tr: defaultTr } = defaultState;
+        defaultState.doc.descendants((node, pos) => {
+          if (node.type.name === 'tableRow') {
+            defaultTr.setNodeMarkup(pos, undefined, {
+              ...node.attrs,
+              height: 'auto',
+            });
+          }
+        });
+        editor.view.dispatch(defaultTr);
+        break;
+    }
   };
 
   const insertImageFromURL = () => {
@@ -1178,6 +1280,49 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({
                 </div>
 
                 <DropdownMenuSeparator />
+                <DropdownMenuLabel>Table Style Presets</DropdownMenuLabel>
+                <DropdownMenuSeparator />
+
+                <div className="p-2 space-y-2">
+                  <Button
+                    type="button"
+                    variant={currentTableStyle === 'default' ? 'default' : 'outline'}
+                    size="sm"
+                    onClick={() => applyTableStyle('default')}
+                    className="w-full text-xs justify-start"
+                  >
+                    <span className="mr-2">📋</span> Default
+                  </Button>
+                  <Button
+                    type="button"
+                    variant={currentTableStyle === 'compact' ? 'default' : 'outline'}
+                    size="sm"
+                    onClick={() => applyTableStyle('compact')}
+                    className="w-full text-xs justify-start"
+                  >
+                    <span className="mr-2">📏</span> Compact
+                  </Button>
+                  <Button
+                    type="button"
+                    variant={currentTableStyle === 'wide' ? 'default' : 'outline'}
+                    size="sm"
+                    onClick={() => applyTableStyle('wide')}
+                    className="w-full text-xs justify-start"
+                  >
+                    <span className="mr-2">📐</span> Wide
+                  </Button>
+                  <Button
+                    type="button"
+                    variant={currentTableStyle === 'striped' ? 'default' : 'outline'}
+                    size="sm"
+                    onClick={() => applyTableStyle('striped')}
+                    className="w-full text-xs justify-start"
+                  >
+                    <span className="mr-2">🦓</span> Striped
+                  </Button>
+                </div>
+
+                <DropdownMenuSeparator />
                 <DropdownMenuLabel>Quick Presets</DropdownMenuLabel>
                 <DropdownMenuSeparator />
 
@@ -1451,6 +1596,35 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({
           max-width: 100%;
           height: auto;
           border-radius: 4px;
+        }
+
+        /* Table style presets in editor */
+        .ProseMirror table.table-compact td,
+        .ProseMirror table.table-compact th {
+          padding: 0.25em;
+          font-size: 0.875rem;
+        }
+
+        .ProseMirror table.table-compact {
+          margin: 0.5em 0;
+        }
+
+        .ProseMirror table.table-wide td,
+        .ProseMirror table.table-wide th {
+          padding: 1em;
+          line-height: 1.8;
+        }
+
+        .ProseMirror table.table-wide {
+          margin: 1.5em 0;
+        }
+
+        .ProseMirror table.table-striped tbody tr:nth-child(even) {
+          background-color: #f3f4f6;
+        }
+
+        .ProseMirror table.table-striped tbody tr:nth-child(odd) {
+          background-color: #ffffff;
         }
       `}</style>
     </div>
