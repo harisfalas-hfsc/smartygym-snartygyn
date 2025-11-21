@@ -135,7 +135,8 @@ All colors MUST be HSL.
   
   .content-container {
     max-width: 100%;
-    overflow-x: auto;
+    overflow-x: hidden;
+    overflow-y: auto;
   }
   
   .text-display {
@@ -191,6 +192,15 @@ All colors MUST be HSL.
 /* Global smooth scrolling */
 html {
   scroll-behavior: smooth;
+}
+
+/* Global textarea behavior - prevent horizontal scrolling */
+textarea {
+  white-space: pre-wrap;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  overflow-x: hidden;
+  overflow-y: auto;
 }
 
 /* Enhanced focus states */

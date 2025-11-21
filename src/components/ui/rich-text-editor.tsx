@@ -1339,20 +1339,34 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({
           font-size: 2em;
           font-weight: bold;
           margin: 0.5em 0;
+          word-wrap: break-word;
+          overflow-wrap: break-word;
+          word-break: break-word;
         }
         .ProseMirror h2 {
           font-size: 1.5em;
           font-weight: bold;
           margin: 0.5em 0;
+          word-wrap: break-word;
+          overflow-wrap: break-word;
+          word-break: break-word;
         }
         .ProseMirror h3 {
           font-size: 1.25em;
           font-weight: bold;
           margin: 0.5em 0;
+          word-wrap: break-word;
+          overflow-wrap: break-word;
+          word-break: break-word;
         }
         .ProseMirror ul, .ProseMirror ol {
           padding-left: 1.5em;
           margin: 0.5em 0;
+        }
+        .ProseMirror li {
+          word-wrap: break-word;
+          overflow-wrap: break-word;
+          word-break: break-word;
         }
         .ProseMirror blockquote {
           border-left: 3px solid hsl(var(--primary));
@@ -1370,8 +1384,12 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({
           background-color: hsl(var(--muted));
           padding: 1em;
           border-radius: 5px;
-          overflow-x: auto;
           margin: 1em 0;
+          white-space: pre-wrap;
+          word-wrap: break-word;
+          overflow-wrap: break-word;
+          overflow-x: hidden;
+          overflow-y: auto;
         }
         .ProseMirror pre code {
           background: none;
@@ -1390,6 +1408,7 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({
           border-collapse: collapse;
           width: 100%;
           margin: 1em 0;
+          table-layout: fixed;
         }
         .ProseMirror table td,
         .ProseMirror table th {
@@ -1397,6 +1416,9 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({
           padding: 0.5em;
           vertical-align: top;
           position: relative;
+          word-wrap: break-word;
+          overflow-wrap: break-word;
+          word-break: break-word;
         }
         .ProseMirror table th {
           background-color: hsl(var(--muted));
