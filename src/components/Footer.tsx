@@ -90,7 +90,7 @@ export const Footer = () => {
 
             {/* Copyright */}
             <p className="text-center text-xs text-muted-foreground">
-              © 2025 SmartyGym
+              © 2025 <span className="text-primary font-semibold">SmartyGym</span>
             </p>
           </div>
         ) : (
@@ -179,7 +179,7 @@ export const Footer = () => {
           
           {/* Copyright */}
           <p className="text-center text-sm text-muted-foreground">
-            © 2025 SmartyGym - Your Gym Re-imagined. Anywhere, Anytime.
+            © 2025 <span className="text-primary font-semibold">SmartyGym</span> - Your Gym Re-imagined. Anywhere, Anytime.
           </p>
         </div>
         )}
@@ -194,7 +194,7 @@ export const Footer = () => {
               We've made a conscious decision not to offer email subscriptions or send promotional emails. 
               As fitness enthusiasts ourselves, we understand how overwhelming it can be to receive constant marketing emails 
               that often go unread. We don't want to contribute to inbox clutter or email fatigue. Instead, all important 
-              updates, workout notifications, and communication happen directly within your SmartyGym dashboard — 
+              updates, workout notifications, and communication happen directly within your <span className="text-primary font-semibold">SmartyGym</span> dashboard — 
               keeping everything organized in one place without distractions. If you'd like to stay connected and receive 
               updates about new content, you're welcome to follow us on social media. This approach ensures you only get 
               the information you need, when you need it, without unnecessary noise.

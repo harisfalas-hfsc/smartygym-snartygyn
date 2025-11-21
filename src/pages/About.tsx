@@ -98,7 +98,7 @@ const About = () => {
           <ScrollReveal>
             <div className="text-center mb-12">
         <h1 className="text-4xl md:text-5xl font-bold mb-4 text-foreground">
-          About <span className="text-primary md:text-foreground">SmartyGym</span>
+          About <span className="text-primary">SmartyGym</span>
         </h1>
               <p className="text-lg text-muted-foreground max-w-3xl mx-auto">
                 We're redefining online fitness — making quality training accessible, flexible, and designed for real life.
@@ -121,7 +121,7 @@ const About = () => {
           </p>
                     <p className="text-base text-muted-foreground text-center leading-relaxed">
                       Whether you're traveling, on holiday, can't make it to the gym, or your gym is closed — 
-                      SmartyGym is your backup plan. Or, if you prefer training from home entirely, we've got you covered. 
+                      <span className="text-primary font-semibold">SmartyGym</span> is your backup plan. Or, if you prefer training from home entirely, we've got you covered.
                       Or, if you go to your gym but want to follow a professional, science-based workout or training program designed by{' '}
                       <a 
                         href="/coach-profile" 
@@ -199,7 +199,7 @@ const About = () => {
               <CardContent className="p-6">
                 <div className="text-center space-y-6">
                   <Compass className="w-12 h-12 text-primary mx-auto" />
-                  <h2 className="text-2xl md:text-3xl font-bold text-foreground">The SmartyGym Promise</h2>
+                  <h2 className="text-2xl md:text-3xl font-bold text-foreground">The <span className="text-primary">SmartyGym</span> Promise</h2>
                   
                   <div className="grid md:grid-cols-3 gap-6 text-left max-w-5xl mx-auto">
                     
@@ -287,7 +287,7 @@ const About = () => {
                 <div className="text-center space-y-4">
                   <Users className="w-12 h-12 text-primary mx-auto" />
                   <h2 className="text-2xl md:text-3xl font-bold text-foreground">
-                    Who Is SmartyGym For?
+                    Who Is <span className="text-primary">SmartyGym</span> For?
                   </h2>
                   <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 max-w-4xl mx-auto mt-6">
                     <div className="flex items-center gap-2 p-3 bg-primary/5 border border-primary/20 rounded-lg">
@@ -326,7 +326,7 @@ const About = () => {
               <CardContent className="p-6 space-y-4">
                 <h2 className="text-2xl md:text-3xl font-bold">Ready to Start Your Journey?</h2>
                 <p className="text-muted-foreground max-w-2xl mx-auto">
-                  Join thousands of people training smarter with SmartyGym. Whether you're at home, in the gym, 
+                  Join thousands of people training smarter with <span className="text-primary font-semibold">SmartyGym</span>. Whether you're at home, in the gym, 
                   or on the go — we've got you covered.
                 </p>
                 {!isPremium && (
