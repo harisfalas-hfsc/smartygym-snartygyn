@@ -521,7 +521,7 @@ const Index = () => {
                 className="flex items-center gap-2.5 py-1.5 px-4 bg-primary/5 border-2 border-border rounded-lg hover:border-primary transition-all cursor-pointer hover:shadow-md"
           >
             <Info className="w-5 h-5 text-primary flex-shrink-0" />
-            <span className="text-base font-medium">About SmartyGym</span>
+            <span className="text-base font-medium">About <span className="text-primary font-bold">SmartyGym</span></span>
             <ChevronRight className="w-5 h-5 ml-auto text-muted-foreground" />
           </div>
           
@@ -556,7 +556,7 @@ const Index = () => {
         {/* Mobile Only: Who Is SmartyGym For? */}
         <div className="mt-8 mb-2 px-4">
           <h2 className="text-2xl font-bold text-center mb-6">
-            Who Is <span className="text-primary">SmartyGym</span> For?
+            Who Is <span className="text-primary font-bold">SmartyGym</span> For?
           </h2>
           
         <div className="space-y-4">
@@ -639,7 +639,7 @@ const Index = () => {
                 className="text-3xl sm:text-4xl md:text-5xl font-black text-foreground animate-fade-in"
                 itemProp="name"
               >
-                Welcome to <span className="text-primary">SmartyGym</span>
+                Welcome to <span className="text-primary font-bold">SmartyGym</span>
               </h1>
                     <p 
                       className="text-lg sm:text-xl text-muted-foreground font-medium"
@@ -749,7 +749,7 @@ const Index = () => {
                     <Card className="border border-primary/30 bg-background/80">
                       <div className="p-6 sm:p-8 space-y-4">
                         <h2 className="text-xl sm:text-2xl font-bold text-center text-foreground">
-                          Who Is Smarty Gym For?
+                          Who Is <span className="text-primary font-bold">SmartyGym</span> For?
                         </h2>
                         <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 sm:gap-3">
                           <div className="flex flex-col gap-1 p-3">
@@ -823,7 +823,7 @@ const Index = () => {
                         
                         <div className="max-w-3xl mx-auto space-y-4 text-center mb-8">
                           <p className="text-lg font-semibold text-foreground">
-                            SmartyGym workouts and programs are built to fit YOUR life.
+                            <span className="text-primary font-bold">SmartyGym</span> workouts and programs are built to fit YOUR life.
                           </p>
                           <p className="text-base leading-relaxed text-muted-foreground">
                             That's why they work — safe and efficient design by <a href="/coach-profile" className="text-primary hover:underline font-medium"><strong>Haris Falas</strong></a>, crafted by hand with care to deliver effective results at <strong>smartygym.com</strong>, <strong className="text-foreground">NOT by AI</strong>.
@@ -918,7 +918,7 @@ const Index = () => {
                 </p>
                 <p className="text-base text-muted-foreground text-center leading-relaxed">
                   Whether you're traveling, on holiday, can't make it to the gym, or your gym is closed — 
-                  SmartyGym is your backup plan. Or, if you prefer training from home entirely, we've got you covered. 
+                  <span className="text-primary font-bold">SmartyGym</span> is your backup plan. Or, if you prefer training from home entirely, we've got you covered.
                   Or, if you go to your gym but want to follow a professional, science-based workout or training program designed by{' '}
                   <a 
                     href="/coach-profile" 
@@ -1000,10 +1000,10 @@ const Index = () => {
           {/* The SmartyGym Promise */}
           <Card className="bg-gradient-to-r from-primary/5 to-accent/5 border-2 border-primary/20">
             <CardContent className="p-6">
-              <h3 className="text-2xl font-bold mb-6 text-center">The SmartyGym Promise</h3>
+              <h3 className="text-2xl font-bold mb-6 text-center">The <span className="text-primary font-bold">SmartyGym</span> Promise</h3>
               <div className="max-w-3xl mx-auto space-y-4">
                 <p className="text-base leading-relaxed text-center">
-                  Every workout and program at SmartyGym is crafted with one goal: to help you reach YOUR fitness goals, 
+                  Every workout and program at <span className="text-primary font-bold">SmartyGym</span> is crafted with one goal: to help you reach YOUR fitness goals,
                   whatever they may be. Whether you're building muscle, losing weight, improving endurance, or simply staying active, 
                   we provide the structure, guidance, and flexibility you need to succeed — on your terms, in your time, wherever you are.
                 </p>
@@ -1112,11 +1112,11 @@ const Index = () => {
               </p>
 
               <p className="text-base leading-relaxed">
-                That's exactly why I created SmartyGym.
+                That's exactly why I created <span className="text-primary font-bold">SmartyGym</span>.
               </p>
 
               <p className="text-base leading-relaxed">
-                My vision is to give people the kind of coaching that makes everything simpler: structured programs, smart progressions, expert guidance, and clear workouts you can follow with confidence — whether you train at home, outdoors, or inside a gym. SmartyGym is here to support your fitness journey, not replace any part of it. If you train in a gym, you'll have a plan. If you train at home, you'll have a structure. If you're busy or traveling, you'll still know exactly what to do.
+                My vision is to give people the kind of coaching that makes everything simpler: structured programs, smart progressions, expert guidance, and clear workouts you can follow with confidence — whether you train at home, outdoors, or inside a gym. <span className="text-primary font-bold">SmartyGym</span> is here to support your fitness journey, not replace any part of it. If you train in a gym, you'll have a plan. If you train at home, you'll have a structure. If you're busy or traveling, you'll still know exactly what to do.
               </p>
 
               <p className="text-base leading-relaxed">
@@ -1149,7 +1149,7 @@ const Index = () => {
                 </p>
                 <div className="h-px flex-grow bg-border"></div>
               </div>
-              <p className="text-center text-sm text-muted-foreground">Founder, SmartyGym</p>
+              <p className="text-center text-sm text-muted-foreground">Founder, <span className="text-primary font-bold">SmartyGym</span></p>
             </CardContent>
           </Card>
         </section>
@@ -1161,10 +1161,10 @@ const Index = () => {
             <CardContent className="p-3 sm:p-4">
               <Accordion type="single" collapsible className="w-full">
             <AccordionItem value="item-1">
-              <AccordionTrigger className="text-left">What is SmartyGym?</AccordionTrigger>
+              <AccordionTrigger className="text-left">What is <span className="text-primary font-bold">SmartyGym</span>?</AccordionTrigger>
                   <AccordionContent className="py-2 leading-relaxed">
-                    SmartyGym is an online fitness platform providing functional, science-based workouts and training programs
-                    designed by certified coaches. Whether you're training at home, in the gym, or on the go, SmartyGym 
+                    <span className="text-primary font-bold">SmartyGym</span> is an online fitness platform providing functional, science-based workouts and training programs
+                    designed by certified coaches. Whether you're training at home, in the gym, or on the go, <span className="text-primary font-bold">SmartyGym</span> 
                     is your backup when life gets in the way — or your complete fitness solution if you prefer training from home. 
                     We make quality fitness accessible anywhere, anytime.
                   </AccordionContent>
@@ -1176,13 +1176,13 @@ const Index = () => {
                     <a href="/coach-profile" className="text-primary hover:underline font-medium">Haris Falas</a> is a certified Sports Scientist
                     and Strength & Conditioning Coach with over 20 years of professional experience. He has worked with elite athletes and professional 
                     football teams in the Cypriot First Division. As the founder of HFSC and 
-                    SmartyGym, <strong>Haris personally designs every single workout and program</strong> — never by AI, always with evidence-based
+                    <span className="text-primary font-bold">SmartyGym</span>, <strong>Haris personally designs every single workout and program</strong> — never by AI, always with evidence-based
                     training principles and real coaching experience.
                   </AccordionContent>
                 </AccordionItem>
 
             <AccordionItem value="item-3">
-              <AccordionTrigger className="text-left">What makes SmartyGym different?</AccordionTrigger>
+              <AccordionTrigger className="text-left">What makes <span className="text-primary font-bold">SmartyGym</span> different?</AccordionTrigger>
                   <AccordionContent className="py-2 leading-relaxed">
                     <strong>We're 100% human, 0% AI.</strong> Every workout is personally designed by <a href="/coach-profile" className="text-primary hover:underline font-medium">Haris Falas</a>,
                     a qualified Sports Scientist and S&C Coach — never by algorithms or AI. You get real expertise from a real coach with 20+ years 
@@ -1194,11 +1194,11 @@ const Index = () => {
                 <AccordionItem value="item-3a">
                   <AccordionTrigger className="text-left">What's the difference between a workout and training program?</AccordionTrigger>
                   <AccordionContent className="py-2 leading-relaxed">
-                    A <strong>workout</strong> is a standalone training session designed for a specific goal — whether that's calorie burning, 
+                    A <a href="/workouts" className="text-primary hover:underline font-bold">workout</a> is a standalone training session designed for a specific goal — whether that's calorie burning, 
                     strength building, cardio conditioning, mobility work, or power development. It's perfect when you want a single, 
                     focused session that fits your current needs or time constraints.
                     <br />
-                    A <strong>training program</strong> is a complete, structured plan that runs up to 8 weeks and contains multiple workouts 
+                    A <a href="/training-programs" className="text-primary hover:underline font-bold">training program</a> is a complete, structured plan that runs up to 8 weeks and contains multiple workouts 
                     scheduled for every day of the week. Programs are designed with progression in mind, helping you achieve long-term 
                     fitness goals like building muscle hypertrophy, improving cardiovascular endurance, enhancing functional strength, 
                     or losing weight through systematic, progressive training over time.
@@ -1232,7 +1232,7 @@ const Index = () => {
                 </AccordionItem>
 
                 <AccordionItem value="item-4">
-                  <AccordionTrigger className="text-left">Do I need equipment to use SmartyGym?</AccordionTrigger>
+                  <AccordionTrigger className="text-left">Do I need equipment to use <span className="text-primary font-bold">SmartyGym</span>?</AccordionTrigger>
                   <AccordionContent className="py-2 leading-relaxed">
                     No! We offer both bodyweight workouts that require no equipment and equipment-based programs.
                     You can filter workouts based on what you have available — whether that's nothing, 
@@ -1249,7 +1249,7 @@ const Index = () => {
                 </AccordionItem>
 
                 <AccordionItem value="item-6">
-                  <AccordionTrigger className="text-left">Can beginners use SmartyGym?</AccordionTrigger>
+                  <AccordionTrigger className="text-left">Can beginners use <span className="text-primary font-bold">SmartyGym</span>?</AccordionTrigger>
                   <AccordionContent className="py-2 leading-relaxed">
                     Absolutely! We have workouts and programs specifically designed for all fitness levels, including beginners.
                     Each workout includes clear instructions, difficulty ratings, and modifications to match your current fitness level. 
