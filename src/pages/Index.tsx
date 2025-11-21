@@ -16,128 +16,110 @@ import { MobilePhoneIllustration } from "@/components/MobilePhoneIllustration";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious, type CarouselApi } from "@/components/ui/carousel";
 import { cn } from "@/lib/utils";
-
 import { useAccessControl } from "@/hooks/useAccessControl";
 import { ScrollReveal } from "@/components/ScrollReveal";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import {
-  Accordion,
-  AccordionContent,
-  AccordionItem,
-  AccordionTrigger,
-} from "@/components/ui/accordion";
-
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 const Index = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const { toast } = useToast();
+  const {
+    toast
+  } = useToast();
   const [user, setUser] = useState<SupabaseUser | null>(null);
-  const { userTier } = useAccessControl();
+  const {
+    userTier
+  } = useAccessControl();
   const isPremium = userTier === "premium";
   const isMobile = useIsMobile();
 
   // Carousel state for mobile navigation dots
   const [carouselApi, setCarouselApi] = useState<CarouselApi>();
   const [currentSlide, setCurrentSlide] = useState(0);
-
   useEffect(() => {
     if (!carouselApi) return;
-    
     const onSelect = () => {
       setCurrentSlide(carouselApi.selectedScrollSnap());
     };
-    
     carouselApi.on("select", onSelect);
     onSelect();
-    
     return () => {
       carouselApi.off("select", onSelect);
     };
   }, [carouselApi]);
-
-  const heroCards = [
-    { 
-      id: "workouts", 
-      title: "500+ Expert Workouts", 
-      description: "Access a vast library of professional workout routines for every fitness level and goal",
-      buttonText: "Browse Workouts",
-      icon: Dumbbell,
-      route: "/workout"
-    },
-    { 
-      id: "programs", 
-      title: "Training Programs", 
-      description: "Structured multi-week programs designed to transform your fitness journey",
-      buttonText: "View Programs",
-      icon: Calendar,
-      route: "/trainingprogram"
-    },
-    { 
-      id: "tools", 
-      title: "Smart Tools", 
-      description: "Professional fitness calculators and tracking tools to optimize your training",
-      buttonText: "Explore Tools",
-      icon: Calculator,
-      route: "/tools"
-    },
-    { 
-      id: "exercises", 
-      title: "Exercise Library", 
-      description: "Comprehensive video library with proper form demonstrations and technique guides",
-      buttonText: "View Library",
-      icon: Video,
-      route: "/exerciselibrary"
-    },
-    { 
-      id: "blog", 
-      title: "Blog & Expert Articles", 
-      description: "Evidence-based fitness articles and expert insights from professional coaches",
-      buttonText: "Read Articles",
-      icon: FileText,
-      route: "/blog"
-    },
-    { 
-      id: "coach", 
-      title: "Expert Coach Guidance", 
-      description: "Get personalized support and answers directly from experienced fitness professionals",
-      buttonText: "Contact Coach",
-      icon: GraduationCap,
-      route: "/contact"
-    },
-  ];
-
+  const heroCards = [{
+    id: "workouts",
+    title: "500+ Expert Workouts",
+    description: "Access a vast library of professional workout routines for every fitness level and goal",
+    buttonText: "Browse Workouts",
+    icon: Dumbbell,
+    route: "/workout"
+  }, {
+    id: "programs",
+    title: "Training Programs",
+    description: "Structured multi-week programs designed to transform your fitness journey",
+    buttonText: "View Programs",
+    icon: Calendar,
+    route: "/trainingprogram"
+  }, {
+    id: "tools",
+    title: "Smart Tools",
+    description: "Professional fitness calculators and tracking tools to optimize your training",
+    buttonText: "Explore Tools",
+    icon: Calculator,
+    route: "/tools"
+  }, {
+    id: "exercises",
+    title: "Exercise Library",
+    description: "Comprehensive video library with proper form demonstrations and technique guides",
+    buttonText: "View Library",
+    icon: Video,
+    route: "/exerciselibrary"
+  }, {
+    id: "blog",
+    title: "Blog & Expert Articles",
+    description: "Evidence-based fitness articles and expert insights from professional coaches",
+    buttonText: "Read Articles",
+    icon: FileText,
+    route: "/blog"
+  }, {
+    id: "coach",
+    title: "Expert Coach Guidance",
+    description: "Get personalized support and answers directly from experienced fitness professionals",
+    buttonText: "Contact Coach",
+    icon: GraduationCap,
+    route: "/contact"
+  }];
   useEffect(() => {
     // Check current session
-    supabase.auth.getSession().then(({ data: { session } }) => {
+    supabase.auth.getSession().then(({
+      data: {
+        session
+      }
+    }) => {
       setUser(session?.user ?? null);
     });
 
     // Listen for auth changes
     const {
-      data: { subscription },
+      data: {
+        subscription
+      }
     } = supabase.auth.onAuthStateChange((_event, session) => {
       setUser(session?.user ?? null);
     });
-
     return () => subscription.unsubscribe();
   }, []);
   const handleLogout = async () => {
     try {
       // Sign out with global scope to clear all sessions
-      const { error } = await supabase.auth.signOut({ scope: 'global' });
-      
+      const {
+        error
+      } = await supabase.auth.signOut({
+        scope: 'global'
+      });
       if (error) {
         console.error("Logout error:", error);
         toast({
@@ -147,13 +129,12 @@ const Index = () => {
         });
         return;
       }
-
       setUser(null);
       toast({
         title: "Logged out",
-        description: "You have been logged out successfully",
+        description: "You have been logged out successfully"
       });
-      
+
       // Force reload to clear all state
       setTimeout(() => {
         window.location.reload();
@@ -239,8 +220,7 @@ const Index = () => {
       });
     }
   };
-  return (
-    <>
+  return <>
       <Helmet>
         <title>SmartyGym | Online Gym Cyprus Greece | 500+ Workouts Training Programs | Haris Falas HFSC | smartygym.com</title>
         <meta name="description" content="SmartyGym #1 online gym Cyprus Greece smartygym.com. 500+ expert workouts training programs by Sports Scientist Haris Falas HFSC Nicosia. AMRAP TABATA HIIT strength cardio home workouts Cyprus. Train anywhere anytime. 100% human zero AI. γυμναστήριο online Κύπρος" />
@@ -298,148 +278,135 @@ const Index = () => {
         
         <script type="application/ld+json">
           {JSON.stringify({
-            "@context": "https://schema.org",
-            "@type": ["SportsActivityLocation", "HealthAndBeautyBusiness", "Organization"],
-            "name": "SmartyGym Cyprus",
-            "alternateName": ["Smarty Gym", "smartygym.com", "SmartyGym", "Online Gym Cyprus"],
-            "url": "https://smartygym.com",
-            "logo": smartyGymLogo,
-            "image": smartyGymLogo,
-            "description": "Cyprus' premier online gym offering professional fitness training by Sports Scientist Haris Falas. Evidence-based workout programs, structured training plans, and personalized coaching. Train anywhere, anytime with expert guidance.",
-            "slogan": "Your Gym Re-imagined. Anywhere, Anytime.",
-            "address": {
-              "@type": "PostalAddress",
-              "addressCountry": "CY",
-              "addressLocality": "Cyprus",
-              "addressRegion": "Cyprus"
-            },
-            "founder": {
-              "@type": "Person",
-              "name": "Haris Falas",
-              "jobTitle": "Sports Scientist & Strength and Conditioning Coach",
-              "description": "BSc Sports Science, Certified Strength and Conditioning Specialist (CSCS), EXOS Performance Specialist. 20+ years experience in functional training, strength conditioning, and online fitness coaching."
-            },
-            "areaServed": [
-              {"@type": "Country", "name": "Cyprus"},
-              {"@type": "Place", "name": "Worldwide"}
-            ],
-            "sameAs": [
-              "https://www.instagram.com/smartygymcy/",
-              "https://www.youtube.com/@TheSmartyGym",
-              "https://www.facebook.com/smartygym"
-            ],
-            "availableLanguage": ["English", "Greek"],
-            "priceRange": "€€",
-            "knowsAbout": ["Online Fitness", "Personal Training", "Workout Programs", "Strength Training", "HIIT Training", "Functional Fitness", "Sports Science", "Metabolic Conditioning", "Cardio Training", "Mobility Training"],
-            "offers": [
-              {
-                "@type": "Offer",
-                "name": "Online Workouts",
-                "description": "Professional online workouts: AMRAP, TABATA, HIIT, circuit training, strength, cardio, metabolic"
-              },
-              {
-                "@type": "Offer",
-                "name": "Online Training Programs",
-                "description": "Structured long-term training programs for specific fitness goals"
-              },
-              {
-                "@type": "Offer",
-                "name": "Online Personal Training Cyprus",
-                "description": "Personalized online personal training by Sports Scientist Haris Falas"
-              }
-            ]
-          })}
+          "@context": "https://schema.org",
+          "@type": ["SportsActivityLocation", "HealthAndBeautyBusiness", "Organization"],
+          "name": "SmartyGym Cyprus",
+          "alternateName": ["Smarty Gym", "smartygym.com", "SmartyGym", "Online Gym Cyprus"],
+          "url": "https://smartygym.com",
+          "logo": smartyGymLogo,
+          "image": smartyGymLogo,
+          "description": "Cyprus' premier online gym offering professional fitness training by Sports Scientist Haris Falas. Evidence-based workout programs, structured training plans, and personalized coaching. Train anywhere, anytime with expert guidance.",
+          "slogan": "Your Gym Re-imagined. Anywhere, Anytime.",
+          "address": {
+            "@type": "PostalAddress",
+            "addressCountry": "CY",
+            "addressLocality": "Cyprus",
+            "addressRegion": "Cyprus"
+          },
+          "founder": {
+            "@type": "Person",
+            "name": "Haris Falas",
+            "jobTitle": "Sports Scientist & Strength and Conditioning Coach",
+            "description": "BSc Sports Science, Certified Strength and Conditioning Specialist (CSCS), EXOS Performance Specialist. 20+ years experience in functional training, strength conditioning, and online fitness coaching."
+          },
+          "areaServed": [{
+            "@type": "Country",
+            "name": "Cyprus"
+          }, {
+            "@type": "Place",
+            "name": "Worldwide"
+          }],
+          "sameAs": ["https://www.instagram.com/smartygymcy/", "https://www.youtube.com/@TheSmartyGym", "https://www.facebook.com/smartygym"],
+          "availableLanguage": ["English", "Greek"],
+          "priceRange": "€€",
+          "knowsAbout": ["Online Fitness", "Personal Training", "Workout Programs", "Strength Training", "HIIT Training", "Functional Fitness", "Sports Science", "Metabolic Conditioning", "Cardio Training", "Mobility Training"],
+          "offers": [{
+            "@type": "Offer",
+            "name": "Online Workouts",
+            "description": "Professional online workouts: AMRAP, TABATA, HIIT, circuit training, strength, cardio, metabolic"
+          }, {
+            "@type": "Offer",
+            "name": "Online Training Programs",
+            "description": "Structured long-term training programs for specific fitness goals"
+          }, {
+            "@type": "Offer",
+            "name": "Online Personal Training Cyprus",
+            "description": "Personalized online personal training by Sports Scientist Haris Falas"
+          }]
+        })}
         </script>
         
         <script type="application/ld+json">
           {JSON.stringify({
-            "@context": "https://schema.org",
-            "@type": "WebSite",
-            "name": "SmartyGym Cyprus",
-            "url": "https://smartygym.com",
-            "description": "Professional online fitness training platform",
-            "potentialAction": {
-              "@type": "SearchAction",
-              "target": {
-                "@type": "EntryPoint",
-                "urlTemplate": "https://smartygym.com/workout?search={search_term_string}"
-              },
-              "query-input": "required name=search_term_string"
+          "@context": "https://schema.org",
+          "@type": "WebSite",
+          "name": "SmartyGym Cyprus",
+          "url": "https://smartygym.com",
+          "description": "Professional online fitness training platform",
+          "potentialAction": {
+            "@type": "SearchAction",
+            "target": {
+              "@type": "EntryPoint",
+              "urlTemplate": "https://smartygym.com/workout?search={search_term_string}"
+            },
+            "query-input": "required name=search_term_string"
+          }
+        })}
+        </script>
+        
+        <script type="application/ld+json">
+          {JSON.stringify({
+          "@context": "https://schema.org",
+          "@type": "ItemList",
+          "name": "SmartyGym Services",
+          "description": "Complete online fitness services",
+          "itemListElement": [{
+            "@type": "ListItem",
+            "position": 1,
+            "item": {
+              "@type": "Service",
+              "name": "Online Workouts",
+              "description": "100+ expert-designed workout sessions",
+              "url": "https://smartygym.com/workout"
             }
-          })}
+          }, {
+            "@type": "ListItem",
+            "position": 2,
+            "item": {
+              "@type": "Service",
+              "name": "Training Programs",
+              "description": "Structured multi-week training programs",
+              "url": "https://smartygym.com/trainingprogram"
+            }
+          }, {
+            "@type": "ListItem",
+            "position": 3,
+            "item": {
+              "@type": "Service",
+              "name": "Personal Training",
+              "description": "1-on-1 personalized training programs",
+              "url": "https://smartygym.com/personaltraining"
+            }
+          }, {
+            "@type": "ListItem",
+            "position": 4,
+            "item": {
+              "@type": "Service",
+              "name": "Fitness Tools",
+              "description": "Professional fitness calculators",
+              "url": "https://smartygym.com/tools"
+            }
+          }]
+        })}
         </script>
         
         <script type="application/ld+json">
           {JSON.stringify({
-            "@context": "https://schema.org",
-            "@type": "ItemList",
-            "name": "SmartyGym Services",
-            "description": "Complete online fitness services",
-            "itemListElement": [
-              {
-                "@type": "ListItem",
-                "position": 1,
-                "item": {
-                  "@type": "Service",
-                  "name": "Online Workouts",
-                  "description": "100+ expert-designed workout sessions",
-                  "url": "https://smartygym.com/workout"
-                }
-              },
-              {
-                "@type": "ListItem",
-                "position": 2,
-                "item": {
-                  "@type": "Service",
-                  "name": "Training Programs",
-                  "description": "Structured multi-week training programs",
-                  "url": "https://smartygym.com/trainingprogram"
-                }
-              },
-              {
-                "@type": "ListItem",
-                "position": 3,
-                "item": {
-                  "@type": "Service",
-                  "name": "Personal Training",
-                  "description": "1-on-1 personalized training programs",
-                  "url": "https://smartygym.com/personaltraining"
-                }
-              },
-              {
-                "@type": "ListItem",
-                "position": 4,
-                "item": {
-                  "@type": "Service",
-                  "name": "Fitness Tools",
-                  "description": "Professional fitness calculators",
-                  "url": "https://smartygym.com/tools"
-                }
-              }
-            ]
-          })}
-        </script>
-        
-        <script type="application/ld+json">
-          {JSON.stringify({
-            "@context": "https://schema.org",
-            "@type": "BreadcrumbList",
-            "itemListElement": [
-              {
-                "@type": "ListItem",
-                "position": 1,
-                "name": "Home",
-                "item": "https://smartygym.com"
-              }
-            ]
-          })}
+          "@context": "https://schema.org",
+          "@type": "BreadcrumbList",
+          "itemListElement": [{
+            "@type": "ListItem",
+            "position": 1,
+            "name": "Home",
+            "item": "https://smartygym.com"
+          }]
+        })}
         </script>
       </Helmet>
       
       <div className="min-h-screen bg-background overflow-x-hidden">
         
-        {isMobile ? (
-          <section className="pt-2 pb-2 px-4">
+        {isMobile ? <section className="pt-2 pb-2 px-4">
             {/* Mobile Carousel Headline */}
             <div className="text-center mb-6">
               <h2 className="text-2xl mb-2">
@@ -451,20 +418,15 @@ const Index = () => {
               </p>
             </div>
 
-            <Carousel 
-              className="w-full px-2" 
-              opts={{ align: "start", loop: true }}
-              setApi={setCarouselApi}
-            >
+            <Carousel className="w-full px-2" opts={{
+          align: "start",
+          loop: true
+        }} setApi={setCarouselApi}>
               <CarouselContent className="-ml-4">
-                {heroCards.map((card) => {
-                  const Icon = card.icon;
-                  return (
-                    <CarouselItem key={card.id} className="pl-4 basis-[90%]">
-                      <Card 
-                        onClick={() => navigate(card.route)}
-                        className="h-[160px] border-[3px] border-primary/40 hover:border-primary hover:scale-[1.02] hover:shadow-xl hover:bg-primary/5 transition-all duration-300 cursor-pointer"
-                      >
+                {heroCards.map(card => {
+              const Icon = card.icon;
+              return <CarouselItem key={card.id} className="pl-4 basis-[90%]">
+                      <Card onClick={() => navigate(card.route)} className="h-[160px] border-[3px] border-primary/40 hover:border-primary hover:scale-[1.02] hover:shadow-xl hover:bg-primary/5 transition-all duration-300 cursor-pointer">
                         <CardContent className="h-full flex flex-row items-center p-4 gap-4">
                           
                           {/* Icon */}
@@ -487,9 +449,8 @@ const Index = () => {
                           
                         </CardContent>
                       </Card>
-                    </CarouselItem>
-                  );
-                })}
+                    </CarouselItem>;
+            })}
               </CarouselContent>
               
               {/* Arrows positioned OUTSIDE cards */}
@@ -499,54 +460,30 @@ const Index = () => {
 
             {/* Carousel Dots */}
             <div className="flex justify-center gap-2 mt-4">
-              {heroCards.map((_, index) => (
-                <button
-                  key={index}
-                  onClick={() => carouselApi?.scrollTo(index)}
-                  className={cn(
-                    "w-2.5 h-2.5 rounded-full border-2 transition-all duration-300",
-                    currentSlide === index
-                      ? "border-primary bg-transparent scale-125"
-                      : "border-primary/40 bg-transparent hover:border-primary/60"
-                  )}
-                  aria-label={`Go to slide ${index + 1}`}
-                />
-              ))}
+              {heroCards.map((_, index) => <button key={index} onClick={() => carouselApi?.scrollTo(index)} className={cn("w-2.5 h-2.5 rounded-full border-2 transition-all duration-300", currentSlide === index ? "border-primary bg-transparent scale-125" : "border-primary/40 bg-transparent hover:border-primary/60")} aria-label={`Go to slide ${index + 1}`} />)}
             </div>
 
         {/* Quick Access Menu */}
         <div className="mt-8 space-y-3">
-              <div 
-                onClick={() => navigate('/about')}
-                className="flex items-center gap-2.5 py-1.5 px-4 bg-primary/5 border-2 border-border rounded-lg hover:border-primary transition-all cursor-pointer hover:shadow-md"
-          >
+              <div onClick={() => navigate('/about')} className="flex items-center gap-2.5 py-1.5 px-4 bg-primary/5 border-2 border-border rounded-lg hover:border-primary transition-all cursor-pointer hover:shadow-md">
             <Info className="w-5 h-5 text-primary flex-shrink-0" />
             <span className="text-base font-medium">About SmartyGym</span>
             <ChevronRight className="w-5 h-5 ml-auto text-muted-foreground" />
           </div>
           
-              <div 
-                onClick={() => navigate('/coach-profile')}
-                className="flex items-center gap-2.5 py-1.5 px-4 bg-primary/5 border-2 border-border rounded-lg hover:border-primary transition-all cursor-pointer hover:shadow-md"
-          >
+              <div onClick={() => navigate('/coach-profile')} className="flex items-center gap-2.5 py-1.5 px-4 bg-primary/5 border-2 border-border rounded-lg hover:border-primary transition-all cursor-pointer hover:shadow-md">
             <User className="w-5 h-5 text-primary flex-shrink-0" />
             <span className="text-base font-medium">Coach Haris Falas</span>
             <ChevronRight className="w-5 h-5 ml-auto text-muted-foreground" />
           </div>
           
-              <div 
-                onClick={() => navigate('/faq')}
-                className="flex items-center gap-2.5 py-1.5 px-4 bg-primary/5 border-2 border-border rounded-lg hover:border-primary transition-all cursor-pointer hover:shadow-md"
-          >
+              <div onClick={() => navigate('/faq')} className="flex items-center gap-2.5 py-1.5 px-4 bg-primary/5 border-2 border-border rounded-lg hover:border-primary transition-all cursor-pointer hover:shadow-md">
             <HelpCircle className="w-5 h-5 text-primary flex-shrink-0" />
             <span className="text-base font-medium">FAQ</span>
             <ChevronRight className="w-5 h-5 ml-auto text-muted-foreground" />
           </div>
           
-              <div 
-                onClick={() => navigate('/shop')}
-                className="flex items-center gap-2.5 py-1.5 px-4 bg-primary/5 border-2 border-border rounded-lg hover:border-primary transition-all cursor-pointer hover:shadow-md"
-          >
+              <div onClick={() => navigate('/shop')} className="flex items-center gap-2.5 py-1.5 px-4 bg-primary/5 border-2 border-border rounded-lg hover:border-primary transition-all cursor-pointer hover:shadow-md">
             <ShoppingBag className="w-5 h-5 text-primary flex-shrink-0" />
             <span className="text-base font-medium">Shop</span>
             <ChevronRight className="w-5 h-5 ml-auto text-muted-foreground" />
@@ -615,36 +552,21 @@ const Index = () => {
           </div>
         </div>
         </div>
-          </section>
-        ) : (
-          <>
+          </section> : <>
             {/* Desktop: Hero Section */}
             <section className="relative py-8 sm:py-12 border-b border-border bg-background overflow-hidden">
           
           <div className="container mx-auto max-w-6xl px-4 relative z-10 overflow-x-hidden">
             <ScrollReveal>
-              <Card 
-                itemScope
-                itemType="https://schema.org/Organization"
-                className="border-2 border-primary bg-gradient-to-br from-yellow-50/50 via-background to-yellow-50/30 backdrop-blur-sm"
-                data-hero-section="true"
-                data-keywords="smarty gym, online gym, online fitness, smartygym.com, Haris Falas Cyprus, online gym Cyprus"
-                aria-label="Smarty Gym Cyprus - Your online gym and fitness platform - smartygym.com"
-              >
+              <Card itemScope itemType="https://schema.org/Organization" className="border-2 border-primary bg-gradient-to-br from-yellow-50/50 via-background to-yellow-50/30 backdrop-blur-sm" data-hero-section="true" data-keywords="smarty gym, online gym, online fitness, smartygym.com, Haris Falas Cyprus, online gym Cyprus" aria-label="Smarty Gym Cyprus - Your online gym and fitness platform - smartygym.com">
                 <div className="p-8 sm:p-10 md:p-12 space-y-4">
                   
                   {/* Top Section: Title */}
             <div className="text-center space-y-2 mb-6">
-              <h1
-                className="text-3xl sm:text-4xl md:text-5xl font-black text-foreground animate-fade-in"
-                itemProp="name"
-              >
+              <h1 className="text-3xl sm:text-4xl md:text-5xl font-black text-foreground animate-fade-in" itemProp="name">
                 Welcome to <span className="text-primary">SmartyGym</span>
               </h1>
-                    <p 
-                      className="text-lg sm:text-xl text-muted-foreground font-medium"
-                      itemProp="slogan"
-                    >
+                    <p className="text-lg sm:text-xl text-muted-foreground font-medium" itemProp="slogan">
                       Your Gym Re-imagined. Anywhere, Anytime.
                     </p>
                     <meta itemProp="url" content="https://smartygym.com" />
@@ -658,20 +580,12 @@ const Index = () => {
                     {/* LEFT: Mobile Phone Illustration */}
                     <div className="order-1 lg:order-1 flex justify-center lg:justify-start items-stretch">
                       <div className="flex items-center h-full">
-            <MobilePhoneIllustration
-              variant="tablet"
-              className="h-full max-h-[480px] w-auto"
-            >
+            <MobilePhoneIllustration variant="tablet" className="h-full max-h-[480px] w-auto">
               {/* 3 rows × 2 columns grid of "Get Started" cards */}
               <div className="grid grid-rows-3 grid-cols-2 gap-1.5 sm:gap-2 h-full w-full p-1.5 sm:p-2">
-                {heroCards.map((card) => {
-                  const Icon = card.icon;
-                  return (
-                    <Card
-                      key={card.id}
-                      className="border-2 border-primary/30 hover:border-primary hover:shadow-lg hover:scale-105 transition-all duration-300 cursor-pointer group flex items-center justify-center hover:bg-primary/5"
-                      onClick={() => navigate(card.route)}
-                    >
+                {heroCards.map(card => {
+                              const Icon = card.icon;
+                              return <Card key={card.id} className="border-2 border-primary/30 hover:border-primary hover:shadow-lg hover:scale-105 transition-all duration-300 cursor-pointer group flex items-center justify-center hover:bg-primary/5" onClick={() => navigate(card.route)}>
                       <div className="flex flex-col items-center justify-center gap-1 p-2">
                         <div className="inline-flex items-center justify-center w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-primary/10 group-hover:bg-primary/30 group-hover:scale-110 transition-all duration-300">
                           <Icon className="w-5 h-5 sm:w-6 sm:h-6 text-primary" />
@@ -680,9 +594,8 @@ const Index = () => {
                           {card.title}
                         </h3>
                       </div>
-                    </Card>
-                  );
-                })}
+                    </Card>;
+                            })}
               </div>
             </MobilePhoneIllustration>
                       </div>
@@ -854,45 +767,21 @@ const Index = () => {
                         </div>
 
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 max-w-3xl mx-auto">
-                          <article 
-                            className="flex items-start gap-3 p-4 bg-background/50 rounded-lg border border-primary/20"
-                            itemScope
-                            itemType="https://schema.org/Thing"
-                            data-feature="smarty-gym-expertise"
-                            data-keywords="smarty gym, online gym, online fitness, smartygym.com, Haris Falas Cyprus, sports scientist"
-                            role="article"
-                            aria-label="Real expertise - SmartyGym Cyprus online fitness - smartygym.com by Haris Falas"
-                          >
+                          <article className="flex items-start gap-3 p-4 bg-background/50 rounded-lg border border-primary/20" itemScope itemType="https://schema.org/Thing" data-feature="smarty-gym-expertise" data-keywords="smarty gym, online gym, online fitness, smartygym.com, Haris Falas Cyprus, sports scientist" role="article" aria-label="Real expertise - SmartyGym Cyprus online fitness - smartygym.com by Haris Falas">
                             <CheckCircle2 className="w-5 h-5 text-primary flex-shrink-0 mt-1" aria-hidden="true" />
                             <div>
                               <p className="font-semibold text-sm mb-1" itemProp="name">Real Expertise</p>
                               <p className="text-xs text-muted-foreground" itemProp="description">Sports science degree & years of coaching</p>
                             </div>
                           </article>
-                          <article 
-                            className="flex items-start gap-3 p-4 bg-background/50 rounded-lg border border-primary/20"
-                            itemScope
-                            itemType="https://schema.org/Thing"
-                            data-feature="smarty-gym-personal-touch"
-                            data-keywords="online personal training Cyprus, smartygym, Haris Falas, online fitness, real coaching"
-                            role="article"
-                            aria-label="Personal touch - SmartyGym Cyprus online training - smartygym.com with real client feedback"
-                          >
+                          <article className="flex items-start gap-3 p-4 bg-background/50 rounded-lg border border-primary/20" itemScope itemType="https://schema.org/Thing" data-feature="smarty-gym-personal-touch" data-keywords="online personal training Cyprus, smartygym, Haris Falas, online fitness, real coaching" role="article" aria-label="Personal touch - SmartyGym Cyprus online training - smartygym.com with real client feedback">
                             <CheckCircle2 className="w-5 h-5 text-primary flex-shrink-0 mt-1" aria-hidden="true" />
                             <div>
                               <p className="font-semibold text-sm mb-1" itemProp="name">Personal Touch</p>
                               <p className="text-xs text-muted-foreground" itemProp="description">Every program refined through real client feedback</p>
                             </div>
                           </article>
-                          <article 
-                            className="flex items-start gap-3 p-4 bg-background/50 rounded-lg border border-primary/20"
-                            itemScope
-                            itemType="https://schema.org/Thing"
-                            data-feature="smarty-gym-no-ai"
-                            data-keywords="human-designed workouts, no AI fitness, smartygym.com, online gym Cyprus, real coaching"
-                            role="article"
-                            aria-label="Not a robot - SmartyGym Cyprus online gym - human-designed at smartygym.com"
-                          >
+                          <article className="flex items-start gap-3 p-4 bg-background/50 rounded-lg border border-primary/20" itemScope itemType="https://schema.org/Thing" data-feature="smarty-gym-no-ai" data-keywords="human-designed workouts, no AI fitness, smartygym.com, online gym Cyprus, real coaching" role="article" aria-label="Not a robot - SmartyGym Cyprus online gym - human-designed at smartygym.com">
                             <CheckCircle2 className="w-5 h-5 text-primary flex-shrink-0 mt-1" aria-hidden="true" />
                             <div>
                               <p className="font-semibold text-sm mb-1" itemProp="name">Not a Robot</p>
@@ -920,14 +809,13 @@ const Index = () => {
                 <h3 className="text-2xl font-bold flex-1">
                   Your Gym Re-imagined Anywhere, Anytime
                 </h3>
-                {!isPremium && (
-                  <Button
-                    onClick={() => navigate("/joinpremium", { state: { from: location.pathname } })}
-                    className="ml-4 bg-primary text-primary-foreground hover:bg-primary/90 shadow-md"
-                  >
+                {!isPremium && <Button onClick={() => navigate("/joinpremium", {
+                    state: {
+                      from: location.pathname
+                    }
+                  })} className="ml-4 bg-primary text-primary-foreground hover:bg-primary/90 shadow-md">
                     Join Now
-                  </Button>
-                )}
+                  </Button>}
               </div>
               <div className="space-y-4 max-w-3xl mx-auto">
                 <p className="text-base font-semibold text-center">
@@ -937,14 +825,10 @@ const Index = () => {
                   Whether you're traveling, on holiday, can't make it to the gym, or your gym is closed — 
                   SmartyGym is your backup plan. Or, if you prefer training from home entirely, we've got you covered. 
                   Or, if you go to your gym but want to follow a professional, science-based workout or training program designed by{' '}
-                  <a 
-                    href="/coach-profile" 
-                    onClick={(e) => {
+                  <a href="/coach-profile" onClick={e => {
                       e.preventDefault();
                       navigate('/coach-profile');
-                    }}
-                    className="text-primary hover:underline font-medium cursor-pointer"
-                  >
+                    }} className="text-primary hover:underline font-medium cursor-pointer">
                     Haris Falas
                   </a>, we provide that expert guidance.
                   Expert workouts, professional programs, and practical tools — all designed by real coaches, not algorithms.
@@ -966,7 +850,7 @@ const Index = () => {
               </CardHeader>
               <CardContent>
                 <CardDescription className="text-sm text-muted-foreground">
-                  Flexible, effective training designed for busy professionals who want results without hours at the gym.
+                  Flexible, effective training designed for busy professionals who want real results     
                 </CardDescription>
               </CardContent>
             </Card>
@@ -976,7 +860,7 @@ const Index = () => {
                 <div className="w-14 h-14 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-4">
                   <Brain className="w-7 h-7 text-primary" />
                 </div>
-                <CardTitle className="text-xl">Science-Based Approach</CardTitle>
+                <CardTitle className="text-xl">Scientific Approach</CardTitle>
               </CardHeader>
               <CardContent>
                 <CardDescription className="text-sm text-muted-foreground">
@@ -990,7 +874,7 @@ const Index = () => {
                 <div className="w-14 h-14 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-4">
                   <Users className="w-7 h-7 text-primary" />
                 </div>
-                <CardTitle className="text-xl">Accessible to Everyone</CardTitle>
+                <CardTitle className="text-xl">Accessible to All </CardTitle>
               </CardHeader>
               <CardContent>
                 <CardDescription className="text-sm text-muted-foreground">
@@ -1103,11 +987,7 @@ const Index = () => {
             <CardHeader className="relative">
               <div className="flex items-center gap-4 mb-4">
               <div className="w-20 h-20 rounded-full overflow-hidden border-2 border-primary/30">
-                <img 
-                  src={harisPhoto}
-                  alt="Haris Falas - Personal Coach" 
-                  className="w-full h-full object-cover"
-                />
+                <img src={harisPhoto} alt="Haris Falas - Personal Coach" className="w-full h-full object-cover" />
               </div>
                 <div>
                   <CardTitle className="text-2xl md:text-3xl">Message from Haris Falas</CardTitle>
@@ -1351,23 +1231,18 @@ const Index = () => {
                   <Calendar className="h-5 w-5" />
                   Explore Programs
                 </Button>
-                {!isPremium && (
-                  <Button size="lg" variant="outline" onClick={() => navigate("/premiumbenefits")} className="gap-2">
+                {!isPremium && <Button size="lg" variant="outline" onClick={() => navigate("/premiumbenefits")} className="gap-2">
                     <UserCheck className="h-5 w-5" />
                     Join Premium
-                  </Button>
-                )}
+                  </Button>}
               </div>
             </CardContent>
           </Card>
         </section>
       </div>
-          </>
-        )}
+          </>}
 
     </div>
-    </>
-  );
+    </>;
 };
-
 export default Index;
