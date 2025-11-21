@@ -905,12 +905,14 @@ const Index = () => {
                 <h3 className="text-2xl font-bold flex-1">
                   Your Gym Re-imagined Anywhere, Anytime
                 </h3>
-                <Button
-                  onClick={() => navigate("/joinpremium", { state: { from: location.pathname } })}
-                  className="ml-4 bg-primary text-primary-foreground hover:bg-primary/90 shadow-md"
-                >
-                  Join Now
-                </Button>
+                {!isPremium && (
+                  <Button
+                    onClick={() => navigate("/joinpremium", { state: { from: location.pathname } })}
+                    className="ml-4 bg-primary text-primary-foreground hover:bg-primary/90 shadow-md"
+                  >
+                    Join Now
+                  </Button>
+                )}
               </div>
               <div className="space-y-4 max-w-3xl mx-auto">
                 <p className="text-base font-semibold text-center">
@@ -1328,11 +1330,11 @@ const Index = () => {
               <div className="flex flex-wrap gap-4 justify-center pt-4">
                 <Button size="lg" onClick={() => navigate("/workout")} className="gap-2">
                   <Target className="h-5 w-5" />
-                  Try Free Workouts
+                  Browse Workouts
                 </Button>
                 <Button size="lg" variant="outline" onClick={() => navigate("/trainingprogram")} className="gap-2">
                   <Calendar className="h-5 w-5" />
-                  Try Free Training Programs
+                  Explore Programs
                 </Button>
                 {!isPremium && (
                   <Button size="lg" variant="outline" onClick={() => navigate("/premiumbenefits")} className="gap-2">
