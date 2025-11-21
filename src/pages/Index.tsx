@@ -561,39 +561,57 @@ const Index = () => {
           
         <div className="space-y-4">
           {/* Busy adults */}
-          <div className="flex items-center gap-3">
-            <Users className="w-6 h-6 text-primary flex-shrink-0" />
-            <span className="text-sm font-semibold">Busy adults</span>
+          <div className="flex flex-col gap-1">
+            <div className="flex items-center gap-3">
+              <Users className="w-6 h-6 text-primary flex-shrink-0" />
+              <span className="text-sm font-semibold">Busy adults</span>
+            </div>
+            <p className="text-xs text-muted-foreground ml-9">Quick, effective workouts that fit your schedule</p>
           </div>
           
           {/* Parents */}
-          <div className="flex items-center gap-3">
-            <Heart className="w-6 h-6 text-primary flex-shrink-0" />
-            <span className="text-sm font-semibold">Parents</span>
+          <div className="flex flex-col gap-1">
+            <div className="flex items-center gap-3">
+              <Heart className="w-6 h-6 text-primary flex-shrink-0" />
+              <span className="text-sm font-semibold">Parents</span>
+            </div>
+            <p className="text-xs text-muted-foreground ml-9">Train at home while kids play nearby</p>
           </div>
           
           {/* Beginners */}
-          <div className="flex items-center gap-3">
-            <GraduationCap className="w-6 h-6 text-primary flex-shrink-0" />
-            <span className="text-sm font-semibold">Beginners</span>
+          <div className="flex flex-col gap-1">
+            <div className="flex items-center gap-3">
+              <GraduationCap className="w-6 h-6 text-primary flex-shrink-0" />
+              <span className="text-sm font-semibold">Beginners</span>
+            </div>
+            <p className="text-xs text-muted-foreground ml-9">Start your fitness journey with guided programs</p>
           </div>
           
           {/* Intermediate lifters */}
-          <div className="flex items-center gap-3">
-            <Target className="w-6 h-6 text-primary flex-shrink-0" />
-            <span className="text-sm font-semibold">Intermediate lifters</span>
+          <div className="flex flex-col gap-1">
+            <div className="flex items-center gap-3">
+              <Target className="w-6 h-6 text-primary flex-shrink-0" />
+              <span className="text-sm font-semibold">Intermediate lifters</span>
+            </div>
+            <p className="text-xs text-muted-foreground ml-9">Push past plateaus with structured plans</p>
           </div>
           
           {/* Travelers */}
-          <div className="flex items-center gap-3">
-            <Plane className="w-6 h-6 text-primary flex-shrink-0" />
-            <span className="text-sm font-semibold">Travelers</span>
+          <div className="flex flex-col gap-1">
+            <div className="flex items-center gap-3">
+              <Plane className="w-6 h-6 text-primary flex-shrink-0" />
+              <span className="text-sm font-semibold">Travelers</span>
+            </div>
+            <p className="text-xs text-muted-foreground ml-9">Stay consistent wherever you go</p>
           </div>
           
           {/* Gym-goers */}
-          <div className="flex items-center gap-3">
-            <Dumbbell className="w-6 h-6 text-primary flex-shrink-0" />
-            <span className="text-sm font-semibold">Gym-goers</span>
+          <div className="flex flex-col gap-1">
+            <div className="flex items-center gap-3">
+              <Dumbbell className="w-6 h-6 text-primary flex-shrink-0" />
+              <span className="text-sm font-semibold">Gym-goers</span>
+            </div>
+            <p className="text-xs text-muted-foreground ml-9">Enhance your gym routine with expert guidance</p>
           </div>
         </div>
         </div>
@@ -734,29 +752,47 @@ const Index = () => {
                           Who Is Smarty Gym For?
                         </h2>
                         <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 sm:gap-3">
-                          <div className="flex items-center gap-2 p-3 border border-primary/20 rounded-lg">
-                            <Users className="w-4 h-4 text-primary flex-shrink-0" />
-                            <span className="text-sm font-semibold text-foreground">Busy adults</span>
+                          <div className="flex flex-col gap-1 p-3">
+                            <div className="flex items-center gap-2">
+                              <Users className="w-5 h-5 text-primary flex-shrink-0" />
+                              <span className="text-sm font-semibold text-foreground">Busy adults</span>
+                            </div>
+                            <p className="text-xs text-muted-foreground ml-7">Quick, effective workouts that fit your schedule</p>
                           </div>
-                          <div className="flex items-center gap-2 p-3 border border-primary/20 rounded-lg">
-                            <Heart className="w-4 h-4 text-primary flex-shrink-0" />
-                            <span className="text-sm font-semibold text-foreground">Parents</span>
+                          <div className="flex flex-col gap-1 p-3">
+                            <div className="flex items-center gap-2">
+                              <Heart className="w-5 h-5 text-primary flex-shrink-0" />
+                              <span className="text-sm font-semibold text-foreground">Parents</span>
+                            </div>
+                            <p className="text-xs text-muted-foreground ml-7">Train at home while kids play nearby</p>
                           </div>
-                          <div className="flex items-center gap-2 p-3 border border-primary/20 rounded-lg">
-                            <GraduationCap className="w-4 h-4 text-primary flex-shrink-0" />
-                            <span className="text-sm font-semibold text-foreground">Beginners</span>
+                          <div className="flex flex-col gap-1 p-3">
+                            <div className="flex items-center gap-2">
+                              <GraduationCap className="w-5 h-5 text-primary flex-shrink-0" />
+                              <span className="text-sm font-semibold text-foreground">Beginners</span>
+                            </div>
+                            <p className="text-xs text-muted-foreground ml-7">Start your fitness journey with guided programs</p>
                           </div>
-                          <div className="flex items-center gap-2 p-3 border border-primary/20 rounded-lg">
-                            <Target className="w-4 h-4 text-primary flex-shrink-0" />
-                            <span className="text-sm font-semibold text-foreground">Intermediate lifters</span>
+                          <div className="flex flex-col gap-1 p-3">
+                            <div className="flex items-center gap-2">
+                              <Target className="w-5 h-5 text-primary flex-shrink-0" />
+                              <span className="text-sm font-semibold text-foreground">Intermediate lifters</span>
+                            </div>
+                            <p className="text-xs text-muted-foreground ml-7">Push past plateaus with structured plans</p>
                           </div>
-                          <div className="flex items-center gap-2 p-3 border border-primary/20 rounded-lg">
-                            <Plane className="w-4 h-4 text-primary flex-shrink-0" />
-                            <span className="text-sm font-semibold text-foreground">Travelers</span>
+                          <div className="flex flex-col gap-1 p-3">
+                            <div className="flex items-center gap-2">
+                              <Plane className="w-5 h-5 text-primary flex-shrink-0" />
+                              <span className="text-sm font-semibold text-foreground">Travelers</span>
+                            </div>
+                            <p className="text-xs text-muted-foreground ml-7">Stay consistent wherever you go</p>
                           </div>
-                          <div className="flex items-center gap-2 p-3 border border-primary/20 rounded-lg">
-                            <Dumbbell className="w-4 h-4 text-primary flex-shrink-0" />
-                            <span className="text-sm font-semibold text-foreground">Gym-goers</span>
+                          <div className="flex flex-col gap-1 p-3">
+                            <div className="flex items-center gap-2">
+                              <Dumbbell className="w-5 h-5 text-primary flex-shrink-0" />
+                              <span className="text-sm font-semibold text-foreground">Gym-goers</span>
+                            </div>
+                            <p className="text-xs text-muted-foreground ml-7">Enhance your gym routine with expert guidance</p>
                           </div>
                         </div>
 
