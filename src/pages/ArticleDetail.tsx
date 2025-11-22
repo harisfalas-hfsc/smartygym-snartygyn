@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { ShareButtons } from "@/components/ShareButtons";
 import { Card } from "@/components/ui/card";
 import { HTMLContent } from "@/components/ui/html-content";
+import { A4Container } from "@/components/ui/a4-container";
 import { Badge } from "@/components/ui/badge";
 import { PageBreadcrumbs } from "@/components/PageBreadcrumbs";
 import { Link } from "react-router-dom";
@@ -125,7 +126,9 @@ export const ArticleDetail = () => {
             )}
 
             <div className="prose prose-lg max-w-none mb-8">
-              <HTMLContent content={article.content} />
+              <A4Container>
+                <HTMLContent content={article.content} />
+              </A4Container>
             </div>
 
             <div className="pt-6">

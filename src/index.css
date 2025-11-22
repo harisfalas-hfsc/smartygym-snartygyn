@@ -244,6 +244,71 @@ All colors MUST be HSL.
     box-sizing: border-box;
   }
 
+  /* A4 Page Container Styles */
+  .a4-page {
+    width: 210mm;
+    min-height: 297mm;
+    padding: 20mm 25mm;
+    margin: 0 auto 20mm;
+    background: white;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    box-sizing: border-box;
+  }
+
+  .a4-page-break {
+    page-break-after: always;
+    break-after: page;
+    height: 0;
+    margin: 0;
+    padding: 0;
+    border: none;
+  }
+
+  /* Print styles for A4 pages */
+  @media print {
+    .a4-page {
+      width: 210mm;
+      min-height: 297mm;
+      margin: 0;
+      padding: 20mm 25mm;
+      box-shadow: none;
+      page-break-after: always;
+    }
+
+    .a4-page:last-child {
+      page-break-after: auto;
+    }
+
+    /* Hide navigation and UI elements */
+    nav, header, footer, .no-print {
+      display: none !important;
+    }
+
+    body {
+      margin: 0;
+      padding: 0;
+    }
+  }
+
+  /* Mobile responsive - adapt A4 to screen */
+  @media (max-width: 768px) {
+    .a4-page {
+      width: 100%;
+      min-height: auto;
+      padding: 16px;
+      margin-bottom: 16px;
+      box-shadow: none;
+    }
+  }
+
+  /* Tablet responsive */
+  @media (min-width: 769px) and (max-width: 1024px) {
+    .a4-page {
+      width: 90%;
+      padding: 20px;
+    }
+  }
+
   /* Table Style Presets */
   .prose table.table-compact td,
   .prose table.table-compact th {

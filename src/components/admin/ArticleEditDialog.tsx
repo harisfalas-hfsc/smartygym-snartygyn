@@ -22,6 +22,7 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { Link } from "react-router-dom";
+import { A4Container } from "@/components/ui/a4-container";
 
 const ARTICLE_CATEGORIES = ["Fitness", "Wellness", "Nutrition"];
 
@@ -502,12 +503,14 @@ export const ArticleEditDialog = ({ article, open, onOpenChange, onSave }: Artic
 
             <div>
               <Label>Content *</Label>
-              <RichTextEditor
-                value={formData.content}
-                onChange={(content) => setFormData({ ...formData, content })}
-                placeholder="Write your article content..."
-                minHeight="300px"
-              />
+              <A4Container>
+                <RichTextEditor
+                  value={formData.content}
+                  onChange={(content) => setFormData({ ...formData, content })}
+                  placeholder="Write your article content..."
+                  minHeight="300px"
+                />
+              </A4Container>
             </div>
 
             <div className="space-y-2">
