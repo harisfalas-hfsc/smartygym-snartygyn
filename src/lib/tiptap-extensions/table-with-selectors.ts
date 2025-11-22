@@ -14,7 +14,7 @@ function numberToLetter(num: number): string {
 
 export const TableWithSelectors = Table.extend({
   addNodeView() {
-    return ({ node, HTMLAttributes, getPos }) => {
+    return ({ node, HTMLAttributes, getPos, editor }) => {
       // Create wrapper container
       const wrapper = document.createElement('div');
       wrapper.className = 'table-with-selectors';
@@ -29,12 +29,27 @@ export const TableWithSelectors = Table.extend({
       colHeader.className = 'table-col-header';
       colHeader.contentEditable = 'false';
       
+      const colSelectors: HTMLElement[] = [];
       for (let i = 0; i < colCount; i++) {
         const colSelector = document.createElement('div');
         colSelector.className = 'table-col-selector';
         colSelector.textContent = numberToLetter(i + 1);
         colSelector.setAttribute('data-col', String(i));
         colSelector.title = `Select column ${numberToLetter(i + 1)}`;
+        
+        // Attach direct event listener
+        const colIndex = i;
+        const clickHandler = (e: MouseEvent) => {
+          e.preventDefault();
+          e.stopPropagation();
+          const pos = getPos();
+          if (typeof pos === 'number') {
+            selectColumn(editor.view, pos, colIndex);
+          }
+        };
+        colSelector.addEventListener('mousedown', clickHandler);
+        colSelectors.push(colSelector);
+        
         colHeader.appendChild(colSelector);
       }
       
@@ -47,12 +62,27 @@ export const TableWithSelectors = Table.extend({
       rowNumbers.className = 'table-row-numbers';
       rowNumbers.contentEditable = 'false';
       
+      const rowSelectors: HTMLElement[] = [];
       for (let i = 0; i < rowCount; i++) {
         const rowSelector = document.createElement('div');
         rowSelector.className = 'table-row-selector';
         rowSelector.textContent = String(i + 1);
         rowSelector.setAttribute('data-row', String(i));
         rowSelector.title = `Select row ${i + 1}`;
+        
+        // Attach direct event listener
+        const rowIndex = i;
+        const clickHandler = (e: MouseEvent) => {
+          e.preventDefault();
+          e.stopPropagation();
+          const pos = getPos();
+          if (typeof pos === 'number') {
+            selectRow(editor.view, pos, rowIndex);
+          }
+        };
+        rowSelector.addEventListener('mousedown', clickHandler);
+        rowSelectors.push(rowSelector);
+        
         rowNumbers.appendChild(rowSelector);
       }
       
@@ -72,7 +102,7 @@ export const TableWithSelectors = Table.extend({
       
       return {
         dom: wrapper,
-        contentDOM: table, // This is where Tiptap will render the table content
+        contentDOM: table,
         update: (updatedNode) => {
           if (updatedNode.type.name !== 'table') return false;
           
@@ -87,6 +117,17 @@ export const TableWithSelectors = Table.extend({
           }
           
           return true; // Content changed but structure is the same
+        },
+        destroy: () => {
+          // Cleanup event listeners
+          colSelectors.forEach(el => {
+            const newEl = el.cloneNode(true);
+            el.parentNode?.replaceChild(newEl, el);
+          });
+          rowSelectors.forEach(el => {
+            const newEl = el.cloneNode(true);
+            el.parentNode?.replaceChild(newEl, el);
+          });
         },
       };
     };
