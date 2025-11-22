@@ -16,6 +16,8 @@ import { Highlight } from '@tiptap/extension-highlight';
 import { CodeBlock } from '@tiptap/extension-code-block';
 import { Subscript } from '@tiptap/extension-subscript';
 import { Superscript } from '@tiptap/extension-superscript';
+import { Extension } from '@tiptap/core';
+import { createTableSelectionPlugin } from '@/lib/tiptap-extensions/table-selection-plugin';
 import { Button } from './button';
 import {
   Bold,
@@ -134,6 +136,12 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({
       }),
       Placeholder.configure({
         placeholder,
+      }),
+      Extension.create({
+        name: 'tableSelection',
+        addProseMirrorPlugins() {
+          return [createTableSelectionPlugin()];
+        },
       }),
     ],
     content: value,
