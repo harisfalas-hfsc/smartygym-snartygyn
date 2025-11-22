@@ -144,6 +144,18 @@ export const TableWrapper = Node.create<TableWrapperOptions>({
   },
 
   addProseMirrorPlugins() {
+    let dragState: {
+      isDragging: boolean;
+      tablePos: number | null;
+      startY: number;
+      dropIndicator: HTMLElement | null;
+    } = {
+      isDragging: false,
+      tablePos: null,
+      startY: 0,
+      dropIndicator: null,
+    };
+
     return [
       new Plugin({
         key: tableSelectionPluginKey,
@@ -208,6 +220,115 @@ export const TableWrapper = Node.create<TableWrapperOptions>({
         props: {
           decorations(state) {
             return this.getState(state)?.decorations;
+          },
+
+          handleDOMEvents: {
+            mousedown(view, event) {
+              const target = event.target as HTMLElement;
+              const wrapper = target.closest('.table-wrapper.table-selected');
+              
+              // Check if clicking on drag handle
+              if (wrapper && target.matches('.table-wrapper.table-selected::before')) {
+                // Find table wrapper position
+                const wrapperElement = wrapper as HTMLElement;
+                const { state } = view;
+                let tableWrapperPos: number | null = null;
+                
+                state.doc.descendants((node, pos) => {
+                  if (node.type.name === 'tableWrapper') {
+                    const dom = view.domAtPos(pos + 1).node;
+                    if (dom && wrapperElement.contains(dom)) {
+                      tableWrapperPos = pos;
+                      return false;
+                    }
+                  }
+                });
+                
+                if (tableWrapperPos === null) return false;
+                
+                // Start drag
+                dragState.isDragging = true;
+                dragState.tablePos = tableWrapperPos;
+                dragState.startY = event.clientY;
+                
+                // Create drop indicator
+                const indicator = document.createElement('div');
+                indicator.className = 'table-drop-indicator';
+                indicator.style.position = 'absolute';
+                indicator.style.left = '0';
+                indicator.style.right = '0';
+                indicator.style.height = '3px';
+                indicator.style.background = 'hsl(var(--primary))';
+                indicator.style.pointerEvents = 'none';
+                indicator.style.zIndex = '1000';
+                document.body.appendChild(indicator);
+                dragState.dropIndicator = indicator;
+                
+                // Add dragging class
+                wrapperElement.classList.add('dragging');
+                
+                const handleMouseMove = (e: MouseEvent) => {
+                  if (!dragState.isDragging || !dragState.dropIndicator) return;
+                  
+                  // Update drop indicator position
+                  const editorRect = view.dom.getBoundingClientRect();
+                  const relativeY = e.clientY - editorRect.top + view.dom.scrollTop;
+                  
+                  dragState.dropIndicator.style.top = `${e.clientY}px`;
+                  dragState.dropIndicator.style.display = 'block';
+                };
+                
+                const handleMouseUp = (e: MouseEvent) => {
+                  if (!dragState.isDragging || dragState.tablePos === null) return;
+                  
+                  // Calculate drop position
+                  const editorRect = view.dom.getBoundingClientRect();
+                  const relativeY = e.clientY - editorRect.top + view.dom.scrollTop;
+                  
+                  // Find closest block position
+                  const $pos = view.state.doc.resolve(dragState.tablePos);
+                  const targetPos = view.posAtCoords({ left: e.clientX, top: e.clientY });
+                  
+                  if (targetPos && targetPos.pos !== dragState.tablePos) {
+                    // Move table
+                    const tableNode = view.state.doc.nodeAt(dragState.tablePos);
+                    if (tableNode) {
+                      const { tr } = view.state;
+                      
+                      // Delete from old position
+                      tr.delete(dragState.tablePos, dragState.tablePos + tableNode.nodeSize);
+                      
+                      // Insert at new position
+                      const newPos = targetPos.pos > dragState.tablePos 
+                        ? targetPos.pos - tableNode.nodeSize 
+                        : targetPos.pos;
+                      
+                      tr.insert(newPos, tableNode);
+                      view.dispatch(tr);
+                    }
+                  }
+                  
+                  // Cleanup
+                  dragState.isDragging = false;
+                  dragState.tablePos = null;
+                  if (dragState.dropIndicator) {
+                    dragState.dropIndicator.remove();
+                    dragState.dropIndicator = null;
+                  }
+                  wrapperElement.classList.remove('dragging');
+                  
+                  document.removeEventListener('mousemove', handleMouseMove);
+                  document.removeEventListener('mouseup', handleMouseUp);
+                };
+                
+                document.addEventListener('mousemove', handleMouseMove);
+                document.addEventListener('mouseup', handleMouseUp);
+                
+                return true;
+              }
+              
+              return false;
+            },
           },
         },
       }),
