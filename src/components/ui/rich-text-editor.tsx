@@ -292,6 +292,8 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({
   const [columnWidth, setColumnWidth] = useState<string>('');
   const [columnWidthUnit, setColumnWidthUnit] = useState<'px' | '%'>('px');
   const [showTemplateDialog, setShowTemplateDialog] = useState(false);
+  const [showTableStructureDialog, setShowTableStructureDialog] = useState(false);
+  const [showTableStyleDialog, setShowTableStyleDialog] = useState(false);
 
   const editor = useEditor({
     extensions: [
@@ -902,7 +904,7 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({
                   <Type className="h-4 w-4" />
                 </Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="start" className="w-40 bg-background z-50">
+              <DropdownMenuContent side="bottom" align="center" collisionPadding={8} className="w-40 bg-background z-50">
                 <DropdownMenuLabel>Font Size</DropdownMenuLabel>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem onClick={() => setFontSize('12px')} className="cursor-pointer">
@@ -932,7 +934,7 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({
                   <Palette className="h-4 w-4" />
                 </Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="start" className="w-56 bg-background z-50">
+              <DropdownMenuContent side="bottom" align="center" collisionPadding={8} className="w-56 bg-background z-50">
                 <DropdownMenuLabel>Text Color</DropdownMenuLabel>
                 <DropdownMenuSeparator />
                 
@@ -1444,7 +1446,7 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({
                   <ImageIcon className="h-4 w-4" />
                 </Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="start" className="w-48 bg-background z-50">
+              <DropdownMenuContent side="bottom" align="center" collisionPadding={8} className="w-48 bg-background z-50">
                 <DropdownMenuItem onSelect={insertImageFromURL} className="cursor-pointer">
                   <LinkIcon className="h-4 w-4 mr-2" />
                   Insert from URL
@@ -1468,7 +1470,7 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({
                   <Smile className="h-4 w-4" />
                 </Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="start" className="w-auto p-0 bg-background z-50">
+              <DropdownMenuContent side="bottom" align="center" collisionPadding={8} className="w-auto p-0 bg-background z-50">
                 <EmojiPicker onEmojiClick={onEmojiClick} width={350} height={400} />
               </DropdownMenuContent>
             </DropdownMenu>
@@ -1485,7 +1487,7 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({
                   <span className="text-sm font-bold">Ω</span>
                 </Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="start" className="w-80 bg-background z-50 max-h-96 overflow-y-auto">
+              <DropdownMenuContent side="bottom" align="center" collisionPadding={8} className="w-80 bg-background z-50 max-h-96 overflow-y-auto">
                 {Object.entries(SPECIAL_CHARS).map(([category, chars]) => (
                   <div key={category}>
                     <DropdownMenuLabel className="text-xs">{category}</DropdownMenuLabel>
@@ -1513,431 +1515,34 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({
         {editor.isActive('table') && (
           <>
             <div className="w-px h-6 bg-border mx-1" />
-            {/* Table operations dropdown - Structure controls FIRST */}
+            {/* Table operations button - Structure controls FIRST */}
             <Tooltip>
               <TooltipTrigger asChild>
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <Button type="button" variant="ghost" size="sm">
-                      <Table2 className="h-4 w-4" />
-                    </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent align="start" className="w-56 bg-background z-50 max-h-[70vh] overflow-y-auto">
-                    <DropdownMenuLabel>Table Structure</DropdownMenuLabel>
-                    <DropdownMenuSeparator />
-                    
-                    {/* Row operations */}
-                    <DropdownMenuLabel className="text-xs text-muted-foreground px-2 py-1">Rows</DropdownMenuLabel>
-                    <DropdownMenuItem onSelect={() => editor.chain().focus().addRowBefore().run()} className="cursor-pointer">
-                      <Plus className="h-4 w-4 mr-2" />
-                      Add Row Above
-                    </DropdownMenuItem>
-                    <DropdownMenuItem onSelect={() => editor.chain().focus().addRowAfter().run()} className="cursor-pointer">
-                      <Plus className="h-4 w-4 mr-2" />
-                      Add Row Below
-                    </DropdownMenuItem>
-                    <DropdownMenuItem onSelect={() => editor.chain().focus().deleteRow().run()} className="cursor-pointer">
-                      <Trash className="h-4 w-4 mr-2" />
-                      Delete Row
-                    </DropdownMenuItem>
-                    
-                    <DropdownMenuSeparator />
-                    
-                    {/* Column operations */}
-                    <DropdownMenuLabel className="text-xs text-muted-foreground px-2 py-1">Columns</DropdownMenuLabel>
-                    <DropdownMenuItem onSelect={() => editor.chain().focus().addColumnBefore().run()} className="cursor-pointer">
-                      <Plus className="h-4 w-4 mr-2" />
-                      Add Column Left
-                    </DropdownMenuItem>
-                    <DropdownMenuItem onSelect={() => editor.chain().focus().addColumnAfter().run()} className="cursor-pointer">
-                      <Plus className="h-4 w-4 mr-2" />
-                      Add Column Right
-                    </DropdownMenuItem>
-                    <DropdownMenuItem onSelect={() => editor.chain().focus().deleteColumn().run()} className="cursor-pointer">
-                      <Trash className="h-4 w-4 mr-2" />
-                      Delete Column
-                    </DropdownMenuItem>
-                    
-                    <DropdownMenuSeparator />
-                    
-                    {/* Cell operations */}
-                    <DropdownMenuLabel className="text-xs text-muted-foreground px-2 py-1">
-                      Cells
-                      <span className="block text-[10px] mt-0.5 font-normal">Select multiple cells to merge</span>
-                    </DropdownMenuLabel>
-                    <DropdownMenuItem 
-                      onSelect={() => editor.chain().focus().mergeCells().run()}
-                      disabled={!editor.can().mergeCells()}
-                      className="cursor-pointer flex items-center justify-between"
-                    >
-                      <span className="flex items-center">
-                        <Merge className="h-4 w-4 mr-2" />
-                        Merge Cells
-                      </span>
-                      {!editor.can().mergeCells() && (
-                        <span className="text-[10px] text-muted-foreground">(Select cells)</span>
-                      )}
-                    </DropdownMenuItem>
-                    <DropdownMenuItem 
-                      onSelect={() => editor.chain().focus().splitCell().run()}
-                      disabled={!editor.can().splitCell()}
-                      className="cursor-pointer"
-                    >
-                      <Split className="h-4 w-4 mr-2" />
-                      Split Cell
-                    </DropdownMenuItem>
-                    <DropdownMenuItem onSelect={() => editor.chain().focus().toggleHeaderCell().run()} className="cursor-pointer">
-                      <Grid3x3 className="h-4 w-4 mr-2" />
-                      Toggle Header Cell
-                    </DropdownMenuItem>
-                    
-                    <DropdownMenuSeparator />
-                    
-                    {/* Row height controls */}
-                    <div className="px-2 py-2 space-y-2">
-                      <p className="text-xs font-medium text-muted-foreground">Set Row Height</p>
-                      <div className="grid grid-cols-2 gap-2">
-                        <Button
-                          type="button"
-                          variant={selectedRowHeight === 'auto' ? 'default' : 'outline'}
-                          size="sm"
-                          onClick={() => setSelectedRowHeight('auto')}
-                          className="text-xs h-8"
-                        >
-                          Auto
-                        </Button>
-                        <Button
-                          type="button"
-                          variant={selectedRowHeight === '40px' ? 'default' : 'outline'}
-                          size="sm"
-                          onClick={() => setSelectedRowHeight('40px')}
-                          className="text-xs h-8"
-                        >
-                          Small
-                        </Button>
-                        <Button
-                          type="button"
-                          variant={selectedRowHeight === '60px' ? 'default' : 'outline'}
-                          size="sm"
-                          onClick={() => setSelectedRowHeight('60px')}
-                          className="text-xs h-8"
-                        >
-                          Medium
-                        </Button>
-                        <Button
-                          type="button"
-                          variant={selectedRowHeight === '80px' ? 'default' : 'outline'}
-                          size="sm"
-                          onClick={() => setSelectedRowHeight('80px')}
-                          className="text-xs h-8"
-                        >
-                          Large
-                        </Button>
-                        <Button
-                          type="button"
-                          variant={selectedRowHeight === '120px' ? 'default' : 'outline'}
-                          size="sm"
-                          onClick={() => setSelectedRowHeight('120px')}
-                          className="text-xs h-8"
-                        >
-                          Extra Large
-                        </Button>
-                        <Button
-                          type="button"
-                          variant={selectedRowHeight === 'custom' ? 'default' : 'outline'}
-                          size="sm"
-                          onClick={() => setSelectedRowHeight('custom')}
-                          className="text-xs h-8"
-                        >
-                          Custom
-                        </Button>
-                      </div>
-                      
-                      {selectedRowHeight === 'custom' && (
-                        <div className="flex gap-2 items-center">
-                          <Input
-                            type="number"
-                            value={customRowHeight}
-                            onChange={(e) => setCustomRowHeight(e.target.value)}
-                            placeholder="Height in px"
-                            className="h-8 text-xs"
-                            min="20"
-                            max="500"
-                          />
-                          <span className="text-xs text-muted-foreground">px</span>
-                        </div>
-                      )}
-
-                      <Button
-                        type="button"
-                        size="sm"
-                        onClick={() => {
-                          const height = selectedRowHeight === 'custom' 
-                            ? `${customRowHeight}px` 
-                            : selectedRowHeight;
-                          editor?.chain().focus().updateAttributes('tableRow', { height }).run();
-                        }}
-                        className="w-full"
-                      >
-                        Apply Row Height
-                      </Button>
-                    </div>
-
-                    <DropdownMenuSeparator />
-                    
-                    {/* Table operations */}
-                    <DropdownMenuItem 
-                      onSelect={() => editor.chain().focus().deleteTable().run()}
-                      className="cursor-pointer text-destructive"
-                    >
-                      <Trash className="h-4 w-4 mr-2" />
-                      Delete Table
-                    </DropdownMenuItem>
-                  </DropdownMenuContent>
-                </DropdownMenu>
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => setShowTableStructureDialog(true)}
+                >
+                  <Table2 className="h-4 w-4" />
+                </Button>
               </TooltipTrigger>
               <TooltipContent>Table Structure</TooltipContent>
             </Tooltip>
 
-            {/* Table border and background customization dropdown - Style controls SECOND */}
+            {/* Table border and background customization button - Style controls SECOND */}
             <Tooltip>
               <TooltipTrigger asChild>
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <Button
-                      type="button"
-                      variant="ghost"
-                      size="sm"
-                      className="gap-1"
-                    >
-                      <Palette className="h-4 w-4" />
-                      <Grid3x3 className="h-3 w-3" />
-                    </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent align="start" className="w-80 bg-background z-50 max-h-[70vh] overflow-y-auto">
-                    <DropdownMenuLabel className="flex items-center justify-between">
-                      Table Border Options
-                      <label className="flex items-center gap-2 text-xs font-normal cursor-pointer">
-                        <input
-                          type="checkbox"
-                          checked={applyToAllCells}
-                          onChange={(e) => setApplyToAllCells(e.target.checked)}
-                          className="rounded border-gray-300"
-                        />
-                        Apply to all
-                      </label>
-                    </DropdownMenuLabel>
-                    <DropdownMenuSeparator />
-                    
-                    <div className="p-2 space-y-3">
-                      <div>
-                        <label className="text-xs font-medium mb-1 block">Border Color</label>
-                        <div className="flex gap-2">
-                          <Input
-                            type="color"
-                            value={borderColor}
-                            onChange={(e) => setBorderColor(e.target.value)}
-                            className="h-8 w-16 p-1 cursor-pointer"
-                          />
-                          <div className="flex gap-1 flex-wrap flex-1">
-                            <button
-                              type="button"
-                              className="w-6 h-6 rounded border border-input bg-black hover:ring-2 hover:ring-primary transition-all"
-                              onClick={() => setBorderColor('#000000')}
-                              title="Black"
-                            />
-                            <button
-                              type="button"
-                              className="w-6 h-6 rounded border border-input bg-gray-500 hover:ring-2 hover:ring-primary transition-all"
-                              onClick={() => setBorderColor('#6b7280')}
-                              title="Gray"
-                            />
-                            <button
-                              type="button"
-                              className="w-6 h-6 rounded border border-input bg-blue-500 hover:ring-2 hover:ring-primary transition-all"
-                              onClick={() => setBorderColor('#3b82f6')}
-                              title="Blue"
-                            />
-                            <button
-                              type="button"
-                              className="w-6 h-6 rounded border border-input bg-red-500 hover:ring-2 hover:ring-primary transition-all"
-                              onClick={() => setBorderColor('#ef4444')}
-                              title="Red"
-                            />
-                            <button
-                              type="button"
-                              className="w-6 h-6 rounded border border-input hover:ring-2 hover:ring-primary transition-all"
-                              style={{ backgroundColor: 'hsl(var(--primary))' }}
-                              onClick={() => {
-                                const root = document.documentElement;
-                                const primaryHsl = getComputedStyle(root).getPropertyValue('--primary').trim();
-                                setBorderColor(`hsl(${primaryHsl})`);
-                              }}
-                              title="Primary/Gold"
-                            />
-                            <button
-                              type="button"
-                              className="w-6 h-6 rounded border border-input bg-white hover:ring-2 hover:ring-primary transition-all"
-                              onClick={() => setBorderColor('#ffffff')}
-                              title="White"
-                            />
-                          </div>
-                        </div>
-                      </div>
-
-                      <div>
-                        <label className="text-xs font-medium mb-1 block">Border Width</label>
-                        <div className="flex gap-2">
-                          <Button
-                            type="button"
-                            variant={borderWidth === '0px' ? 'default' : 'outline'}
-                            size="sm"
-                            onClick={() => setBorderWidth('0px')}
-                            className="flex-1 text-xs"
-                          >
-                            None
-                          </Button>
-                          <Button
-                            type="button"
-                            variant={borderWidth === '1px' ? 'default' : 'outline'}
-                            size="sm"
-                            onClick={() => setBorderWidth('1px')}
-                            className="flex-1 text-xs"
-                          >
-                            Thin
-                          </Button>
-                          <Button
-                            type="button"
-                            variant={borderWidth === '2px' ? 'default' : 'outline'}
-                            size="sm"
-                            onClick={() => setBorderWidth('2px')}
-                            className="flex-1 text-xs"
-                          >
-                            Medium
-                          </Button>
-                          <Button
-                            type="button"
-                            variant={borderWidth === '3px' ? 'default' : 'outline'}
-                            size="sm"
-                            onClick={() => setBorderWidth('3px')}
-                            className="flex-1 text-xs"
-                          >
-                            Thick
-                          </Button>
-                        </div>
-                      </div>
-
-                      <div>
-                        <label className="text-xs font-medium mb-1 block">Border Style</label>
-                        <div className="flex gap-2">
-                          <Button
-                            type="button"
-                            variant={borderStyle === 'solid' ? 'default' : 'outline'}
-                            size="sm"
-                            onClick={() => setBorderStyle('solid')}
-                            className="flex-1 text-xs"
-                          >
-                            Solid
-                          </Button>
-                          <Button
-                            type="button"
-                            variant={borderStyle === 'dashed' ? 'default' : 'outline'}
-                            size="sm"
-                            onClick={() => setBorderStyle('dashed')}
-                            className="flex-1 text-xs"
-                          >
-                            Dashed
-                          </Button>
-                          <Button
-                            type="button"
-                            variant={borderStyle === 'dotted' ? 'default' : 'outline'}
-                            size="sm"
-                            onClick={() => setBorderStyle('dotted')}
-                            className="flex-1 text-xs"
-                          >
-                            Dotted
-                          </Button>
-                        </div>
-                      </div>
-                    </div>
-
-                    <DropdownMenuSeparator />
-                    <DropdownMenuLabel>Table Style Presets</DropdownMenuLabel>
-                    <DropdownMenuSeparator />
-
-                    <div className="p-2 space-y-2">
-                      <Button
-                        type="button"
-                        variant={currentTableStyle === 'default' ? 'default' : 'outline'}
-                        size="sm"
-                        onClick={() => applyTableStyle('default')}
-                        className="w-full text-xs justify-start"
-                      >
-                        <span className="mr-2">📋</span> Default
-                      </Button>
-                      <Button
-                        type="button"
-                        variant={currentTableStyle === 'compact' ? 'default' : 'outline'}
-                        size="sm"
-                        onClick={() => applyTableStyle('compact')}
-                        className="w-full text-xs justify-start"
-                      >
-                        <span className="mr-2">📏</span> Compact
-                      </Button>
-                      <Button
-                        type="button"
-                        variant={currentTableStyle === 'wide' ? 'default' : 'outline'}
-                        size="sm"
-                        onClick={() => applyTableStyle('wide')}
-                        className="w-full text-xs justify-start"
-                      >
-                        <span className="mr-2">📐</span> Wide
-                      </Button>
-                      <Button
-                        type="button"
-                        variant={currentTableStyle === 'striped' ? 'default' : 'outline'}
-                        size="sm"
-                        onClick={() => applyTableStyle('striped')}
-                        className="w-full text-xs justify-start"
-                      >
-                        <span className="mr-2">📊</span> Striped
-                      </Button>
-                    </div>
-
-                    <DropdownMenuSeparator />
-                    <DropdownMenuLabel>Cell Background</DropdownMenuLabel>
-                    <DropdownMenuSeparator />
-
-                    <div className="p-2 space-y-2">
-                      <Input
-                        type="color"
-                        value={cellBgColor}
-                        onChange={(e) => setCellBgColor(e.target.value)}
-                        className="h-10 w-full cursor-pointer"
-                      />
-                      <Button
-                        type="button"
-                        size="sm"
-                        onClick={() => applyCellBackground(cellBgColor, applyToAllCells)}
-                        className="w-full"
-                      >
-                        Apply Background
-                      </Button>
-                      <Button
-                        type="button"
-                        variant="outline"
-                        size="sm"
-                        onClick={() => {
-                          setCellBgColor('transparent');
-                          applyCellBackground('transparent', applyToAllCells);
-                        }}
-                        className="w-full"
-                      >
-                        Remove Background
-                      </Button>
-                    </div>
-                  </DropdownMenuContent>
-                </DropdownMenu>
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="sm"
+                  className="gap-1"
+                  onClick={() => setShowTableStyleDialog(true)}
+                >
+                  <Palette className="h-4 w-4" />
+                  <Grid3x3 className="h-3 w-3" />
+                </Button>
               </TooltipTrigger>
               <TooltipContent>Table Borders & Style</TooltipContent>
             </Tooltip>
@@ -2208,6 +1813,72 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({
         }
       `}</style>
       </div>
+
+      {/* Table Structure Dialog */}
+      <Dialog open={showTableStructureDialog} onOpenChange={setShowTableStructureDialog}>
+        <DialogContent className="w-[min(90vw,640px)] max-h-[80vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>Table Structure</DialogTitle>
+            <DialogDescription>
+              Insert/delete rows and columns, merge cells, adjust row height, and delete the table.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4">
+            <section>
+              <p className="text-xs text-muted-foreground font-medium mb-2">Rows</p>
+              <div className="space-y-1">
+                <Button variant="ghost" size="sm" className="w-full justify-start" onClick={() => editor?.chain().focus().addRowBefore().run()}><Plus className="h-4 w-4 mr-2" />Add Row Above</Button>
+                <Button variant="ghost" size="sm" className="w-full justify-start" onClick={() => editor?.chain().focus().addRowAfter().run()}><Plus className="h-4 w-4 mr-2" />Add Row Below</Button>
+                <Button variant="ghost" size="sm" className="w-full justify-start text-destructive" onClick={() => editor?.chain().focus().deleteRow().run()}><Trash className="h-4 w-4 mr-2" />Delete Row</Button>
+              </div>
+            </section>
+            <section>
+              <p className="text-xs text-muted-foreground font-medium mb-2">Columns</p>
+              <div className="space-y-1">
+                <Button variant="ghost" size="sm" className="w-full justify-start" onClick={() => editor?.chain().focus().addColumnBefore().run()}><Plus className="h-4 w-4 mr-2" />Add Column Left</Button>
+                <Button variant="ghost" size="sm" className="w-full justify-start" onClick={() => editor?.chain().focus().addColumnAfter().run()}><Plus className="h-4 w-4 mr-2" />Add Column Right</Button>
+                <Button variant="ghost" size="sm" className="w-full justify-start text-destructive" onClick={() => editor?.chain().focus().deleteColumn().run()}><Trash className="h-4 w-4 mr-2" />Delete Column</Button>
+              </div>
+            </section>
+            <section>
+              <p className="text-xs text-muted-foreground font-medium mb-2">Cells</p>
+              <div className="space-y-1">
+                <Button variant="ghost" size="sm" className="w-full justify-start" onClick={() => editor?.chain().focus().mergeCells().run()} disabled={!editor?.can().mergeCells()}><Merge className="h-4 w-4 mr-2" />Merge Cells</Button>
+                <Button variant="ghost" size="sm" className="w-full justify-start" onClick={() => editor?.chain().focus().splitCell().run()} disabled={!editor?.can().splitCell()}><Split className="h-4 w-4 mr-2" />Split Cell</Button>
+                <Button variant="ghost" size="sm" className="w-full justify-start" onClick={() => editor?.chain().focus().toggleHeaderCell().run()}><Grid3x3 className="h-4 w-4 mr-2" />Toggle Header Cell</Button>
+              </div>
+            </section>
+            <section>
+              <p className="text-xs text-muted-foreground font-medium mb-2">Row Height</p>
+              <div className="grid grid-cols-2 gap-2 mb-2">
+                {[['Auto','auto'],['Small','40px'],['Medium','60px'],['Large','80px'],['XL','120px']].map(([label,h])=><Button key={h} variant={selectedRowHeight===h?'default':'outline'} size="sm" onClick={()=>{setSelectedRowHeight(h);editor?.chain().focus().updateAttributes('tableRow',{height:h}).run();}} className="text-xs">{label}</Button>)}
+              </div>
+              <div className="flex gap-2"><Input type="number" placeholder="Custom (px)" value={customRowHeight} onChange={(e)=>setCustomRowHeight(e.target.value)} className="flex-1 h-8 text-xs" min="20" max="500"/><Button variant="outline" size="sm" onClick={()=>{if(customRowHeight){setSelectedRowHeight('custom');editor?.chain().focus().updateAttributes('tableRow',{height:`${customRowHeight}px`}).run();}}}>Apply</Button></div>
+            </section>
+            <div className="border-t pt-3"><Button variant="destructive" size="sm" className="w-full" onClick={()=>{editor?.chain().focus().deleteTable().run();setShowTableStructureDialog(false);}}><Trash className="h-4 w-4 mr-2"/>Delete Table</Button></div>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Table Style Dialog */}
+      <Dialog open={showTableStyleDialog} onOpenChange={setShowTableStyleDialog}>
+        <DialogContent className="w-[min(90vw,640px)] max-h-[80vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>Table Borders & Style</DialogTitle>
+            <DialogDescription>Adjust borders, presets, and cell backgrounds.</DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div className="flex items-center gap-2"><input type="checkbox" id="applyToAll" checked={applyToAllCells} onChange={(e)=>setApplyToAllCells(e.target.checked)} className="rounded"/><label htmlFor="applyToAll" className="text-sm cursor-pointer">Apply to all cells</label></div>
+            <section><p className="text-xs text-muted-foreground font-medium mb-2">Border Color</p><div className="flex gap-2 items-center"><Input type="color" value={borderColor} onChange={(e)=>setBorderColor(e.target.value)} className="h-10 w-16 p-1 cursor-pointer"/><div className="flex gap-1">{['#000000','#6b7280','#3b82f6','#ef4444','#ffffff'].map(c=><button key={c} type="button" className="w-7 h-7 rounded border hover:ring-2 hover:ring-primary" style={{backgroundColor:c}} onClick={()=>setBorderColor(c)}/>)}</div></div></section>
+            <section><p className="text-xs text-muted-foreground font-medium mb-2">Border Width</p><div className="flex gap-2">{['0px','1px','2px','3px'].map(w=><Button key={w} variant={borderWidth===w?'default':'outline'} size="sm" onClick={()=>setBorderWidth(w)} className="flex-1 text-xs">{w==='0px'?'None':w}</Button>)}</div></section>
+            <section><p className="text-xs text-muted-foreground font-medium mb-2">Border Style</p><div className="flex gap-2">{(['solid','dashed','dotted'] as const).map(s=><Button key={s} variant={borderStyle===s?'default':'outline'} size="sm" onClick={()=>setBorderStyle(s)} className="flex-1 text-xs capitalize">{s}</Button>)}</div></section>
+            <section><p className="text-xs text-muted-foreground font-medium mb-2">Presets</p><div className="grid grid-cols-2 gap-2">{[['default','📋'],['compact','📏'],['wide','📐'],['striped','📊']].map(([style,icon])=><Button key={style} variant={currentTableStyle===style?'default':'outline'} size="sm" onClick={()=>applyTableStyle(style as any)} className="justify-start text-xs"><span className="mr-2">{icon}</span>{style}</Button>)}</div></section>
+            <section><p className="text-xs text-muted-foreground font-medium mb-2">Cell Background</p><Input type="color" value={cellBgColor} onChange={(e)=>setCellBgColor(e.target.value)} className="h-10 w-full cursor-pointer mb-2"/><div className="flex gap-2"><Button variant="default" size="sm" className="flex-1" onClick={()=>applyCellBackground(cellBgColor,applyToAllCells)}>Apply</Button><Button variant="outline" size="sm" className="flex-1" onClick={()=>{setCellBgColor('transparent');applyCellBackground('transparent',applyToAllCells);}}>Remove</Button></div></section>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
+
+export default RichTextEditor;
