@@ -455,7 +455,7 @@ export default function Dashboard() {
                         <div
                           key={workout.id}
                           className="p-3 bg-muted rounded-lg cursor-pointer hover:bg-muted/80 transition-colors"
-                          onClick={() => navigate(`/workout`)}
+                          onClick={() => navigate(`/saved-workout/${workout.id}`)}
                         >
                           <div className="flex items-start justify-between">
                             <div className="flex-1">
