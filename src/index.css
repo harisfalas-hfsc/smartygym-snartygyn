@@ -529,9 +529,9 @@ All colors MUST be HSL.
 
   /* A4 Page Container Styles */
   .a4-page {
-    /* Fill the available dialog/card width, but never exceed true A4 width */
+    /* Fill the available dialog/card width on screen */
     width: 100%;
-    max-width: 210mm;
+    max-width: 100%;
     
     /* NO min-height on screen - shrink to content height */
     /* A4 height is only enforced in print via @media print below */

@@ -1,5 +1,6 @@
 import { Table } from '@tiptap/extension-table';
 import { Plugin, PluginKey } from '@tiptap/pm/state';
+import { TextSelection } from '@tiptap/pm/state';
 
 // Helper to convert number to letter (1=A, 2=B, etc.)
 function numberToLetter(num: number): string {
@@ -160,7 +161,6 @@ export const TableWithSelectors = Table.extend({
               });
               
               if (tablePos !== null) {
-                // Select entire column
                 selectColumn(view, tablePos, colIndex);
               }
               
@@ -184,7 +184,6 @@ export const TableWithSelectors = Table.extend({
               });
               
               if (tablePos !== null) {
-                // Select entire row
                 selectRow(view, tablePos, rowIndex);
               }
               
@@ -235,7 +234,8 @@ function selectColumn(view: any, tablePos: number, colIndex: number) {
   
   if (fromPos !== null && toPos !== null) {
     // Create text selection across the column
-    tr.setSelection(state.selection.constructor.create(state.doc, fromPos, toPos));
+    const selection = TextSelection.create(state.doc, fromPos, toPos);
+    tr.setSelection(selection);
     view.dispatch(tr);
   }
 }
@@ -265,7 +265,8 @@ function selectRow(view: any, tablePos: number, rowIndex: number) {
   if (fromPos !== null && toPos !== null) {
     // Create text selection across the row
     const { tr } = state;
-    tr.setSelection(state.selection.constructor.create(state.doc, fromPos, toPos));
+    const selection = TextSelection.create(state.doc, fromPos, toPos);
+    tr.setSelection(selection);
     view.dispatch(tr);
   }
 }

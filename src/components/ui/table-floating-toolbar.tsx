@@ -9,6 +9,7 @@ import {
   ArrowLeftToLine,
   ArrowRightToLine,
   Trash2,
+  Table2,
 } from 'lucide-react';
 import {
   DropdownMenu,
@@ -205,6 +206,33 @@ export const TableFloatingToolbar: React.FC<TableFloatingToolbarProps> = ({
       </DropdownMenu>
 
       <div className="w-px h-6 bg-border mx-1" />
+
+      {/* Select Whole Table */}
+      <Button
+        variant="ghost"
+        size="sm"
+        className="h-8 w-8 p-0"
+        onClick={() => {
+          // Select all content in the table
+          const { state } = editor;
+          const { $anchor } = state.selection;
+          let depth = $anchor.depth;
+          
+          while (depth > 0) {
+            const node = $anchor.node(depth);
+            if (node.type.name === 'table') {
+              const pos = $anchor.before(depth);
+              const endPos = pos + node.nodeSize;
+              editor.commands.setTextSelection({ from: pos + 1, to: endPos - 1 });
+              break;
+            }
+            depth--;
+          }
+        }}
+        title="Select Entire Table"
+      >
+        <Table2 className="h-4 w-4" />
+      </Button>
 
       {/* Delete Table */}
       <Button

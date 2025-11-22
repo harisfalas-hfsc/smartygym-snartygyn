@@ -400,7 +400,7 @@ export const ArticleEditDialog = ({ article, open, onOpenChange, onSave }: Artic
       </AlertDialog>
 
       <Dialog open={open} onOpenChange={onOpenChange}>
-        <DialogContent className="max-w-5xl max-h-[90vh] overflow-y-auto overflow-x-hidden">
+        <DialogContent className="w-[95vw] max-w-5xl max-h-[95vh] overflow-y-auto overflow-x-hidden">
           <DialogHeader>
             <DialogTitle>{article ? 'Edit Article' : 'Create New Article'}</DialogTitle>
             <DialogDescription>
@@ -408,7 +408,7 @@ export const ArticleEditDialog = ({ article, open, onOpenChange, onSave }: Artic
             </DialogDescription>
           </DialogHeader>
 
-          <div className="space-y-4">
+          <div className="space-y-4 pb-4">
             {draftTimestamp && (
               <p className="text-xs text-muted-foreground">
                 Draft saved at {new Date(draftTimestamp).toLocaleTimeString()}

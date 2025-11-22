@@ -335,7 +335,7 @@ export const WorkoutEditDialog = ({ workout, open, onOpenChange, onSave }: Worko
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto overflow-x-hidden">
+      <DialogContent className="w-[95vw] max-w-5xl max-h-[95vh] overflow-y-auto overflow-x-hidden">
         <DialogHeader>
           <DialogTitle>{workout ? 'Edit Workout' : 'Create New Workout'}</DialogTitle>
           <DialogDescription>
@@ -343,7 +343,7 @@ export const WorkoutEditDialog = ({ workout, open, onOpenChange, onSave }: Worko
           </DialogDescription>
         </DialogHeader>
 
-        <div className="space-y-4">
+        <div className="space-y-4 pb-4">
           {/* 1. Category */}
           <div className="space-y-2">
             <Label htmlFor="category">1. Category *</Label>
