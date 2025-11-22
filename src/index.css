@@ -172,12 +172,13 @@ All colors MUST be HSL.
   }
 
   /* Table Wrapper Selection and Manipulation Styles */
-  .table-wrapper {
-    position: relative;
-    margin: 1em 0;
-    clear: both;
-    transition: all 0.2s ease;
-  }
+.table-wrapper {
+  position: relative;
+  margin: 1em 0;
+  clear: both;
+  transition: all 0.2s ease;
+  max-width: 100%;
+}
 
   .table-wrapper.table-selected {
     outline: 2px solid hsl(var(--primary));
