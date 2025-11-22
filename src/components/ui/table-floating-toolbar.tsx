@@ -207,29 +207,79 @@ export const TableFloatingToolbar: React.FC<TableFloatingToolbarProps> = ({
 
       <div className="w-px h-6 bg-border mx-1" />
 
-      {/* Select Whole Table */}
+      {/* Select Whole Table & Enable Drag */}
       <Button
         variant="ghost"
         size="sm"
         className="h-8 w-8 p-0"
         onClick={() => {
-          // Select all content in the table
-          const { state } = editor;
+          const { state, view } = editor;
           const { $anchor } = state.selection;
           let depth = $anchor.depth;
+          let tablePos: number | null = null;
+          let tableNode: any = null;
           
+          // Find the table node
           while (depth > 0) {
             const node = $anchor.node(depth);
             if (node.type.name === 'table') {
-              const pos = $anchor.before(depth);
-              const endPos = pos + node.nodeSize;
-              editor.commands.setTextSelection({ from: pos + 1, to: endPos - 1 });
+              tablePos = $anchor.before(depth);
+              tableNode = node;
               break;
             }
             depth--;
           }
+          
+          if (tablePos !== null && tableNode) {
+            // Check if table is already wrapped in tableWrapper
+            let isWrapped = false;
+            if (depth > 1) {
+              const parentNode = $anchor.node(depth - 1);
+              if (parentNode && parentNode.type.name === 'tableWrapper') {
+                isWrapped = true;
+              }
+            }
+            
+            if (!isWrapped) {
+              // Wrap table in tableWrapper for drag-and-drop
+              const tableWrapperType = state.schema.nodes.tableWrapper;
+              if (tableWrapperType) {
+                const wrapper = tableWrapperType.create(
+                  { alignment: 'left', float: 'none', width: '100%' },
+                  tableNode
+                );
+                
+                const transaction = state.tr.replaceWith(
+                  tablePos,
+                  tablePos + tableNode.nodeSize,
+                  wrapper
+                );
+                
+                view.dispatch(transaction);
+                
+                // Select the wrapped table after a short delay
+                setTimeout(() => {
+                  const newState = editor.state;
+                  const newPos = tablePos!;
+                  const wrapperNode = newState.doc.nodeAt(newPos);
+                  if (wrapperNode) {
+                    editor.commands.setTextSelection({ 
+                      from: newPos + 1, 
+                      to: newPos + wrapperNode.nodeSize - 1 
+                    });
+                  }
+                }, 10);
+              }
+            } else {
+              // Already wrapped, just select it
+              editor.commands.setTextSelection({ 
+                from: tablePos + 1, 
+                to: tablePos + tableNode.nodeSize - 1 
+              });
+            }
+          }
         }}
-        title="Select Entire Table"
+        title="Select Table (enables drag handle)"
       >
         <Table2 className="h-4 w-4" />
       </Button>

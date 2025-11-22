@@ -357,11 +357,60 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({
   };
 
   const insertTableWithSize = () => {
+    // Insert table and auto-wrap in tableWrapper for drag-and-drop
     editor.chain().focus().insertTable({ 
       rows: tableRows, 
       cols: tableCols, 
       withHeaderRow: tableWithHeader 
     }).run();
+    
+    // Wrap the newly inserted table in a tableWrapper
+    setTimeout(() => {
+      const { state } = editor;
+      const { $anchor } = state.selection;
+      const tableWrapperType = state.schema.nodes.tableWrapper;
+      
+      if (tableWrapperType) {
+        // Find the table node we just inserted
+        let tablePos: number | null = null;
+        let depth = $anchor.depth;
+        
+        while (depth > 0) {
+          const node = $anchor.node(depth);
+          if (node.type.name === 'table') {
+            tablePos = $anchor.before(depth);
+            break;
+          }
+          depth--;
+        }
+        
+        if (tablePos !== null) {
+          const tableNode = state.doc.nodeAt(tablePos);
+          if (tableNode && tableNode.type.name === 'table') {
+            // Check if not already wrapped
+            const parentPos = tablePos > 0 ? tablePos - 1 : 0;
+            const parentNode = state.doc.nodeAt(parentPos);
+            
+            if (!parentNode || parentNode.type.name !== 'tableWrapper') {
+              // Wrap in tableWrapper
+              const wrapper = tableWrapperType.create(
+                { alignment: 'left', float: 'none', width: '100%' },
+                tableNode
+              );
+              
+              const transaction = state.tr.replaceWith(
+                tablePos,
+                tablePos + tableNode.nodeSize,
+                wrapper
+              );
+              
+              editor.view.dispatch(transaction);
+            }
+          }
+        }
+      }
+    }, 10);
+    
     setShowTableDialog(false);
   };
 
@@ -1394,14 +1443,22 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({
                 <DropdownMenuSeparator />
                 
                 {/* Cell operations */}
-                <DropdownMenuLabel className="text-xs text-muted-foreground px-2 py-1">Cells</DropdownMenuLabel>
+                <DropdownMenuLabel className="text-xs text-muted-foreground px-2 py-1">
+                  Cells
+                  <span className="block text-[10px] mt-0.5 font-normal">Select multiple cells to merge</span>
+                </DropdownMenuLabel>
                 <DropdownMenuItem 
                   onSelect={() => editor.chain().focus().mergeCells().run()}
                   disabled={!editor.can().mergeCells()}
-                  className="cursor-pointer"
+                  className="cursor-pointer flex items-center justify-between"
                 >
-                  <Merge className="h-4 w-4 mr-2" />
-                  Merge Cells
+                  <span className="flex items-center">
+                    <Merge className="h-4 w-4 mr-2" />
+                    Merge Cells
+                  </span>
+                  {!editor.can().mergeCells() && (
+                    <span className="text-[10px] text-muted-foreground">(Select cells)</span>
+                  )}
                 </DropdownMenuItem>
                 <DropdownMenuItem 
                   onSelect={() => editor.chain().focus().splitCell().run()}
@@ -1534,7 +1591,7 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({
                   <Grid3x3 className="h-3 w-3" />
                 </Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="start" className="w-64 bg-background z-50 max-h-[70vh] overflow-y-auto">
+              <DropdownMenuContent align="start" className="w-80 bg-background z-50 max-h-[70vh] overflow-y-auto">
                 <DropdownMenuLabel className="flex items-center justify-between">
                   Table Border Options
                   <label className="flex items-center gap-2 text-xs font-normal cursor-pointer">
