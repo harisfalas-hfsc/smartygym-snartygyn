@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useEditor, EditorContent } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
 import { Table } from '@tiptap/extension-table';
@@ -16,6 +16,7 @@ import { Highlight } from '@tiptap/extension-highlight';
 import { CodeBlock } from '@tiptap/extension-code-block';
 import { Subscript } from '@tiptap/extension-subscript';
 import { Superscript } from '@tiptap/extension-superscript';
+import { TableWrapper } from '@/lib/tiptap-extensions/table-wrapper-extension';
 import { Button } from './button';
 import {
   Bold,
@@ -73,6 +74,7 @@ import { Input } from "@/components/ui/input";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import EmojiPicker, { EmojiClickData } from 'emoji-picker-react';
+import { TableFloatingToolbar } from './table-floating-toolbar';
 
 interface RichTextEditorProps {
   value: string;
@@ -306,6 +308,7 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({
           class: 'editor-image',
         },
       }),
+      TableWrapper,
       CustomTable.configure({
         resizable: true,
       }),
@@ -728,13 +731,23 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({
   }, [borderColor, borderWidth, borderStyle, applyToAllCells]);
 
   // Auto-apply background color changes
-  React.useEffect(() => {
+  useEffect(() => {
     if (!editor || !editor.isActive('table')) return;
     applyCellBackground(cellBgColor, applyToAllCells);
   }, [cellBgColor, applyToAllCells]);
 
+  // Check if table is currently active
+  const isTableActive = editor?.isActive('table') || false;
+
   return (
-    <div className="border border-input rounded-md bg-background">
+    <div className="border border-input rounded-md bg-background relative">
+      {/* Floating Table Toolbar */}
+      {isTableActive && (
+        <div className="absolute top-2 left-1/2 transform -translate-x-1/2 z-50">
+          <TableFloatingToolbar editor={editor} isTableActive={isTableActive} />
+        </div>
+      )}
+      
       <div className="flex flex-wrap gap-1 p-2 border-b border-input">
         {/* Basic formatting */}
         <Button
