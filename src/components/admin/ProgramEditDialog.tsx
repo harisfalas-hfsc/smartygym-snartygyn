@@ -8,6 +8,7 @@ import { RichTextEditor } from "@/components/ui/rich-text-editor";
 import { Switch } from "@/components/ui/switch";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
+import { A4Container } from "@/components/ui/a4-container";
 
 const PROGRAM_CATEGORIES = [
   "CARDIO",
@@ -603,45 +604,53 @@ export const ProgramEditDialog = ({ program, open, onOpenChange, onSave, isPerso
             <p className="text-sm text-muted-foreground">
               Enter the complete training program content. Use the toolbar to format with bold, headings, lists, tables, etc.
             </p>
-            <RichTextEditor
-              value={formData.training_program}
-              onChange={(value) => setFormData({ ...formData, training_program: value })}
-              placeholder="Enter your complete training program content here..."
-              minHeight="300px"
-            />
+            <A4Container>
+              <RichTextEditor
+                value={formData.training_program}
+                onChange={(value) => setFormData({ ...formData, training_program: value })}
+                placeholder="Enter your complete training program content here..."
+                minHeight="300px"
+              />
+            </A4Container>
           </div>
 
           {/* 8. Description */}
           <div className="space-y-2">
             <Label htmlFor="program_description">8. Description</Label>
-            <RichTextEditor
-              value={formData.program_description}
-              onChange={(value) => setFormData({ ...formData, program_description: value })}
-              placeholder="Brief description of the program"
-              minHeight="120px"
-            />
+            <A4Container>
+              <RichTextEditor
+                value={formData.program_description}
+                onChange={(value) => setFormData({ ...formData, program_description: value })}
+                placeholder="Brief description of the program"
+                minHeight="120px"
+              />
+            </A4Container>
           </div>
 
           {/* 9. Instructions */}
           <div className="space-y-2">
             <Label htmlFor="construction">9. Instructions</Label>
-            <RichTextEditor
-              value={formData.construction}
-              onChange={(value) => setFormData({ ...formData, construction: value })}
-              placeholder="Program instructions and structure details"
-              minHeight="150px"
-            />
+            <A4Container>
+              <RichTextEditor
+                value={formData.construction}
+                onChange={(value) => setFormData({ ...formData, construction: value })}
+                placeholder="Program instructions and structure details"
+                minHeight="150px"
+              />
+            </A4Container>
           </div>
 
           {/* 10. Tips */}
           <div className="space-y-2">
             <Label htmlFor="final_tips">10. Tips</Label>
-            <RichTextEditor
-              value={formData.final_tips}
-              onChange={(value) => setFormData({ ...formData, final_tips: value })}
-              placeholder="Tips and additional guidance"
-              minHeight="150px"
-            />
+            <A4Container>
+              <RichTextEditor
+                value={formData.final_tips}
+                onChange={(value) => setFormData({ ...formData, final_tips: value })}
+                placeholder="Tips and additional guidance"
+                minHeight="150px"
+              />
+            </A4Container>
           </div>
 
           {/* 11. Image Generation */}

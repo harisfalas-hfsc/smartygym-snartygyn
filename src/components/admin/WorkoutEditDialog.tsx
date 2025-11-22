@@ -8,6 +8,7 @@ import { RichTextEditor } from "@/components/ui/rich-text-editor";
 import { Switch } from "@/components/ui/switch";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
+import { A4Container } from "@/components/ui/a4-container";
 
 const CATEGORIES = [
   "STRENGTH",
@@ -472,12 +473,14 @@ export const WorkoutEditDialog = ({ workout, open, onOpenChange, onSave }: Worko
           {/* 9. Workout Content - Single Box */}
           <div className="space-y-2 pt-4 border-t">
             <Label htmlFor="main_workout">9. Workout Content *</Label>
-            <RichTextEditor
-              value={formData.main_workout}
-              onChange={(value) => setFormData({ ...formData, main_workout: value })}
-              placeholder="Enter the complete workout content here - format with bold, bullets, headings, tables, etc..."
-              minHeight="300px"
-            />
+            <A4Container>
+              <RichTextEditor
+                value={formData.main_workout}
+                onChange={(value) => setFormData({ ...formData, main_workout: value })}
+                placeholder="Enter the complete workout content here - format with bold, bullets, headings, tables, etc..."
+                minHeight="300px"
+              />
+            </A4Container>
             <p className="text-xs text-muted-foreground">
               Use the toolbar to format your content with headings, bold text, lists, tables, and more
             </p>
@@ -486,34 +489,40 @@ export const WorkoutEditDialog = ({ workout, open, onOpenChange, onSave }: Worko
           {/* 10. Description */}
           <div className="space-y-2">
             <Label htmlFor="description">10. Description</Label>
-            <RichTextEditor
-              value={formData.description}
-              onChange={(value) => setFormData({ ...formData, description: value })}
-              placeholder="Brief description of the workout..."
-              minHeight="120px"
-            />
+            <A4Container>
+              <RichTextEditor
+                value={formData.description}
+                onChange={(value) => setFormData({ ...formData, description: value })}
+                placeholder="Brief description of the workout..."
+                minHeight="120px"
+              />
+            </A4Container>
           </div>
 
           {/* 11. Instructions */}
           <div className="space-y-2">
             <Label htmlFor="instructions">11. Instructions</Label>
-            <RichTextEditor
-              value={formData.instructions}
-              onChange={(value) => setFormData({ ...formData, instructions: value })}
-              placeholder="Step-by-step instructions..."
-              minHeight="150px"
-            />
+            <A4Container>
+              <RichTextEditor
+                value={formData.instructions}
+                onChange={(value) => setFormData({ ...formData, instructions: value })}
+                placeholder="Step-by-step instructions..."
+                minHeight="150px"
+              />
+            </A4Container>
           </div>
 
           {/* 12. Tips */}
           <div className="space-y-2">
             <Label htmlFor="tips">12. Tips</Label>
-            <RichTextEditor
-              value={formData.tips}
-              onChange={(value) => setFormData({ ...formData, tips: value })}
-              placeholder="Helpful tips for this workout..."
-              minHeight="120px"
-            />
+            <A4Container>
+              <RichTextEditor
+                value={formData.tips}
+                onChange={(value) => setFormData({ ...formData, tips: value })}
+                placeholder="Helpful tips for this workout..."
+                minHeight="120px"
+              />
+            </A4Container>
           </div>
 
           {/* Image Generation */}
