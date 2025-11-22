@@ -170,6 +170,141 @@ All colors MUST be HSL.
     width: 300px;
     height: 300px;
   }
+
+  /* Table Wrapper Selection and Manipulation Styles */
+  .table-wrapper {
+    position: relative;
+    margin: 1em 0;
+    clear: both;
+    transition: all 0.2s ease;
+  }
+
+  .table-wrapper.table-selected {
+    outline: 2px solid hsl(var(--primary));
+    outline-offset: 4px;
+    border-radius: 4px;
+  }
+
+  .table-wrapper.table-selected::before {
+    content: "⋮⋮";
+    position: absolute;
+    top: -24px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 16px;
+    color: hsl(var(--primary));
+    cursor: move;
+    padding: 2px 8px;
+    background: hsl(var(--background));
+    border: 1px solid hsl(var(--primary));
+    border-radius: 4px;
+    z-index: 10;
+  }
+
+  /* Table Alignment Classes */
+  .table-wrapper[data-alignment="left"] {
+    margin-left: 0;
+    margin-right: auto;
+  }
+
+  .table-wrapper[data-alignment="center"] {
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  .table-wrapper[data-alignment="right"] {
+    margin-left: auto;
+    margin-right: 0;
+  }
+
+  /* Table Float Classes */
+  .table-wrapper[data-float="left"] {
+    float: left;
+    margin-right: 1.5rem;
+    margin-bottom: 1rem;
+    max-width: 100%;
+  }
+
+  .table-wrapper[data-float="right"] {
+    float: right;
+    margin-left: 1.5rem;
+    margin-bottom: 1rem;
+    max-width: 100%;
+  }
+
+  .table-wrapper[data-float="none"] {
+    float: none;
+    clear: both;
+  }
+
+  /* Table Width Control */
+  .table-wrapper[data-width="25%"] {
+    width: 25%;
+    min-width: 200px;
+  }
+
+  .table-wrapper[data-width="50%"] {
+    width: 50%;
+    min-width: 300px;
+  }
+
+  .table-wrapper[data-width="75%"] {
+    width: 75%;
+  }
+
+  .table-wrapper[data-width="100%"] {
+    width: 100%;
+  }
+
+  /* Mobile: No float, full width */
+  @media (max-width: 768px) {
+    .table-wrapper[data-float="left"],
+    .table-wrapper[data-float="right"] {
+      float: none;
+      margin-left: 0;
+      margin-right: 0;
+      width: 100% !important;
+    }
+  }
+
+  /* Print: Remove float */
+  @media print {
+    .table-wrapper[data-float="left"],
+    .table-wrapper[data-float="right"] {
+      float: none !important;
+      margin-left: 0 !important;
+      margin-right: 0 !important;
+    }
+
+    .table-wrapper.table-selected {
+      outline: none;
+    }
+
+    .table-wrapper.table-selected::before {
+      display: none;
+    }
+  }
+
+  /* Row and Column Selection Indicators */
+  .table-row-selector,
+  .table-col-selector {
+    cursor: pointer;
+    user-select: none;
+    transition: background-color 0.15s ease;
+  }
+
+  .table-row-selector:hover,
+  .table-col-selector:hover {
+    background-color: hsl(var(--primary) / 0.1);
+  }
+
+  /* Clearfix for floated tables */
+  .ProseMirror::after,
+  .prose::after {
+    content: "";
+    display: table;
+    clear: both;
+  }
   
   .cta-button:hover {
     box-shadow: 0 0 20px rgba(212, 175, 55, 0.4), 0 0 40px rgba(212, 175, 55, 0.2);

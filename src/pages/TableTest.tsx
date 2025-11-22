@@ -15,6 +15,188 @@ const TableTest = () => {
           <p className="text-muted-foreground">QA testing for table rendering consistency</p>
         </div>
 
+        <Card className="mb-8">
+          <CardHeader>
+            <CardTitle className="text-primary">Table Alignment Tests</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="prose prose-sm max-w-none">
+              <h3>Left-Aligned Table (Default)</h3>
+              <div className="table-wrapper" data-alignment="left" data-float="none" data-width="50%">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Exercise</th>
+                      <th>Sets</th>
+                      <th>Reps</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td>Push-ups</td>
+                      <td>3</td>
+                      <td>15</td>
+                    </tr>
+                    <tr>
+                      <td>Squats</td>
+                      <td>4</td>
+                      <td>12</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+
+              <h3>Center-Aligned Table</h3>
+              <div className="table-wrapper" data-alignment="center" data-float="none" data-width="50%">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Meal</th>
+                      <th>Calories</th>
+                      <th>Protein</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td>Breakfast</td>
+                      <td>450</td>
+                      <td>30g</td>
+                    </tr>
+                    <tr>
+                      <td>Lunch</td>
+                      <td>650</td>
+                      <td>45g</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+
+              <h3>Right-Aligned Table</h3>
+              <div className="table-wrapper" data-alignment="right" data-float="none" data-width="50%">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Day</th>
+                      <th>Focus</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td>Monday</td>
+                      <td>Chest</td>
+                    </tr>
+                    <tr>
+                      <td>Tuesday</td>
+                      <td>Back</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* FLOAT TESTS */}
+        <Card className="mb-8">
+          <CardHeader>
+            <CardTitle className="text-primary">Table Float Tests</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="prose prose-sm max-w-none">
+              <h3>Float Left + Content Wrap</h3>
+              <div className="table-wrapper" data-alignment="left" data-float="left" data-width="40%">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Week</th>
+                      <th>Focus</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td>1-2</td>
+                      <td>Build Base</td>
+                    </tr>
+                    <tr>
+                      <td>3-4</td>
+                      <td>Strength</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+              <p>This is sample text that should wrap around the floated table on the left. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris.</p>
+              <div style={{ clear: 'both' }}></div>
+
+              <h3>Float Right + Content Wrap</h3>
+              <div className="table-wrapper" data-alignment="right" data-float="right" data-width="40%">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Goal</th>
+                      <th>Duration</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td>Fat Loss</td>
+                      <td>8 weeks</td>
+                    </tr>
+                    <tr>
+                      <td>Muscle Gain</td>
+                      <td>12 weeks</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+              <p>This is sample text that should wrap around the floated table on the right. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris.</p>
+              <div style={{ clear: 'both' }}></div>
+
+              <h3>Two Tables Side-by-Side</h3>
+              <div className="table-wrapper" data-alignment="left" data-float="left" data-width="45%">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Upper Body</th>
+                      <th>Sets</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td>Bench Press</td>
+                      <td>4x8</td>
+                    </tr>
+                    <tr>
+                      <td>Rows</td>
+                      <td>4x10</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+              <div className="table-wrapper" data-alignment="right" data-float="right" data-width="45%">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Lower Body</th>
+                      <th>Sets</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td>Squats</td>
+                      <td>4x8</td>
+                    </tr>
+                    <tr>
+                      <td>Deadlifts</td>
+                      <td>3x6</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+              <div style={{ clear: 'both' }}></div>
+            </div>
+          </CardContent>
+        </Card>
+
         {/* DEFAULT STYLE TABLES */}
         <Card className="mb-8">
           <CardHeader>
