@@ -186,6 +186,13 @@ All colors MUST be HSL.
     border-radius: 4px;
   }
 
+  /* Support direct table selection without wrapper */
+  .ProseMirror table.table-selected {
+    outline: 2px solid hsl(var(--primary));
+    outline-offset: 4px;
+    border-radius: 4px;
+  }
+
   /* Table drag handle (real element, visible on selected table wrapper) */
   .table-drag-handle {
     position: absolute;
@@ -646,6 +653,57 @@ All colors MUST be HSL.
 
   .prose table.table-striped tbody tr:nth-child(odd) {
     background-color: #ffffff;
+  }
+
+  /* Global Table Border & Background Styles (for HTMLContent) */
+  .prose table.table-border-gold td,
+  .prose table.table-border-gold th {
+    border-color: hsl(var(--primary)) !important;
+  }
+
+  .prose table.table-border-black td,
+  .prose table.table-border-black th {
+    border-color: hsl(0 0% 0%) !important;
+  }
+
+  .prose table.table-border-gray td,
+  .prose table.table-border-gray th {
+    border-color: hsl(0 0% 50%) !important;
+  }
+
+  .prose table.table-border-blue td,
+  .prose table.table-border-blue th {
+    border-color: hsl(210 100% 50%) !important;
+  }
+
+  .prose table.table-border-red td,
+  .prose table.table-border-red th {
+    border-color: hsl(0 100% 50%) !important;
+  }
+
+  .prose table.table-borderless td,
+  .prose table.table-borderless th {
+    border: none !important;
+  }
+
+  .prose table.table-bg-gold {
+    background-color: hsl(var(--primary) / 0.1);
+  }
+
+  .prose table.table-bg-black {
+    background-color: hsl(0 0% 0% / 0.05);
+  }
+
+  .prose table.table-bg-gray {
+    background-color: hsl(0 0% 50% / 0.1);
+  }
+
+  .prose table.table-bg-blue {
+    background-color: hsl(210 100% 50% / 0.1);
+  }
+
+  .prose table.table-bg-red {
+    background-color: hsl(0 100% 50% / 0.1);
   }
 }
 

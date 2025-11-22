@@ -12,6 +12,7 @@ import { ContentLoadingSkeleton } from "@/components/ContentLoadingSkeleton";
 import { useAllWorkouts } from "@/hooks/useWorkoutData";
 import { useWorkoutInteractions } from "@/hooks/useWorkoutInteractions";
 import { supabase } from "@/integrations/supabase/client";
+import { stripHtmlTags } from "@/lib/text";
 import burnStartImg from "@/assets/burn-start-workout.jpg";
 import sweatCircuitImg from "@/assets/sweat-circuit-workout.jpg";
 import bodyBurnoutImg from "@/assets/body-burnout-workout.jpg";
@@ -713,7 +714,7 @@ const WorkoutDetail = () => {
                 
                 <div className="p-4 space-y-3">
                   <h3 className="font-semibold text-base sm:text-lg">{workout.name}</h3>
-                  <p className="text-xs sm:text-sm text-muted-foreground line-clamp-2">{workout.description}</p>
+                  <p className="text-xs sm:text-sm text-muted-foreground line-clamp-2">{stripHtmlTags(workout.description || "")}</p>
                   
                   {/* Status Indicators Row */}
                   {userId && (
