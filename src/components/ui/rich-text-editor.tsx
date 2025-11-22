@@ -894,123 +894,123 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({
         <div className="w-px h-6 bg-border mx-1" />
 
         {/* Font size dropdown */}
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Tooltip>
-              <TooltipTrigger asChild>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
                 <Button type="button" variant="ghost" size="sm">
                   <Type className="h-4 w-4" />
                 </Button>
-              </TooltipTrigger>
-              <TooltipContent>Font Size</TooltipContent>
-            </Tooltip>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="start" className="w-40 bg-background z-50">
-            <DropdownMenuLabel>Font Size</DropdownMenuLabel>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem onClick={() => setFontSize('12px')} className="cursor-pointer">
-              <span className="text-xs">Small</span>
-            </DropdownMenuItem>
-            <DropdownMenuItem onClick={() => setFontSize('16px')} className="cursor-pointer">
-              <span className="text-base">Normal</span>
-            </DropdownMenuItem>
-            <DropdownMenuItem onClick={() => setFontSize('20px')} className="cursor-pointer">
-              <span className="text-lg">Large</span>
-            </DropdownMenuItem>
-            <DropdownMenuItem onClick={() => setFontSize('24px')} className="cursor-pointer">
-              <span className="text-xl">Extra Large</span>
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="start" className="w-40 bg-background z-50">
+                <DropdownMenuLabel>Font Size</DropdownMenuLabel>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem onClick={() => setFontSize('12px')} className="cursor-pointer">
+                  <span className="text-xs">Small</span>
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => setFontSize('16px')} className="cursor-pointer">
+                  <span className="text-base">Normal</span>
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => setFontSize('20px')} className="cursor-pointer">
+                  <span className="text-lg">Large</span>
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => setFontSize('24px')} className="cursor-pointer">
+                  <span className="text-xl">Extra Large</span>
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </TooltipTrigger>
+          <TooltipContent>Font Size</TooltipContent>
+        </Tooltip>
 
         {/* Text color with presets */}
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Tooltip>
-              <TooltipTrigger asChild>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
                 <Button type="button" variant="ghost" size="sm">
                   <Palette className="h-4 w-4" />
                 </Button>
-              </TooltipTrigger>
-              <TooltipContent>Text Color</TooltipContent>
-            </Tooltip>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="start" className="w-56 bg-background z-50">
-            <DropdownMenuLabel>Text Color</DropdownMenuLabel>
-            <DropdownMenuSeparator />
-            
-            <div className="p-3 space-y-3">
-              {/* Preset color swatches */}
-              <div>
-                <label className="text-xs font-medium mb-2 block">Quick Colors</label>
-                <div className="flex gap-2 flex-wrap">
-                  <button
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="start" className="w-56 bg-background z-50">
+                <DropdownMenuLabel>Text Color</DropdownMenuLabel>
+                <DropdownMenuSeparator />
+                
+                <div className="p-3 space-y-3">
+                  {/* Preset color swatches */}
+                  <div>
+                    <label className="text-xs font-medium mb-2 block">Quick Colors</label>
+                    <div className="flex gap-2 flex-wrap">
+                      <button
+                        type="button"
+                        className="w-8 h-8 rounded border-2 border-input bg-black hover:ring-2 hover:ring-primary transition-all"
+                        onClick={() => editor.chain().focus().setColor('#000000').run()}
+                        title="Black"
+                      />
+                      <button
+                        type="button"
+                        className="w-8 h-8 rounded border-2 border-input bg-gray-500 hover:ring-2 hover:ring-primary transition-all"
+                        onClick={() => editor.chain().focus().setColor('#6b7280').run()}
+                        title="Gray"
+                      />
+                      <button
+                        type="button"
+                        className="w-8 h-8 rounded border-2 border-input bg-blue-500 hover:ring-2 hover:ring-primary transition-all"
+                        onClick={() => editor.chain().focus().setColor('#3b82f6').run()}
+                        title="Blue"
+                      />
+                      <button
+                        type="button"
+                        className="w-8 h-8 rounded border-2 border-input bg-red-500 hover:ring-2 hover:ring-primary transition-all"
+                        onClick={() => editor.chain().focus().setColor('#ef4444').run()}
+                        title="Red"
+                      />
+                      <button
+                        type="button"
+                        className="w-8 h-8 rounded border-2 border-input hover:ring-2 hover:ring-primary transition-all"
+                        style={{ backgroundColor: 'hsl(var(--primary))' }}
+                        onClick={() => {
+                          const root = document.documentElement;
+                          const primaryHsl = getComputedStyle(root).getPropertyValue('--primary').trim();
+                          editor.chain().focus().setColor(`hsl(${primaryHsl})`).run();
+                        }}
+                        title="Gold (Brand)"
+                      />
+                      <button
+                        type="button"
+                        className="w-8 h-8 rounded border-2 border-gray-400 bg-white hover:ring-2 hover:ring-primary transition-all"
+                        onClick={() => editor.chain().focus().setColor('#ffffff').run()}
+                        title="White"
+                      />
+                    </div>
+                  </div>
+
+                  {/* Custom color picker */}
+                  <div>
+                    <label className="text-xs font-medium mb-2 block">Custom Color</label>
+                    <Input
+                      type="color"
+                      onChange={(e) => editor.chain().focus().setColor(e.target.value).run()}
+                      className="h-10 w-full cursor-pointer"
+                    />
+                  </div>
+
+                  {/* Remove color button */}
+                  <Button
                     type="button"
-                    className="w-8 h-8 rounded border-2 border-input bg-black hover:ring-2 hover:ring-primary transition-all"
-                    onClick={() => editor.chain().focus().setColor('#000000').run()}
-                    title="Black"
-                  />
-                  <button
-                    type="button"
-                    className="w-8 h-8 rounded border-2 border-input bg-gray-500 hover:ring-2 hover:ring-primary transition-all"
-                    onClick={() => editor.chain().focus().setColor('#6b7280').run()}
-                    title="Gray"
-                  />
-                  <button
-                    type="button"
-                    className="w-8 h-8 rounded border-2 border-input bg-blue-500 hover:ring-2 hover:ring-primary transition-all"
-                    onClick={() => editor.chain().focus().setColor('#3b82f6').run()}
-                    title="Blue"
-                  />
-                  <button
-                    type="button"
-                    className="w-8 h-8 rounded border-2 border-input bg-red-500 hover:ring-2 hover:ring-primary transition-all"
-                    onClick={() => editor.chain().focus().setColor('#ef4444').run()}
-                    title="Red"
-                  />
-                  <button
-                    type="button"
-                    className="w-8 h-8 rounded border-2 border-input hover:ring-2 hover:ring-primary transition-all"
-                    style={{ backgroundColor: 'hsl(var(--primary))' }}
-                    onClick={() => {
-                      const root = document.documentElement;
-                      const primaryHsl = getComputedStyle(root).getPropertyValue('--primary').trim();
-                      editor.chain().focus().setColor(`hsl(${primaryHsl})`).run();
-                    }}
-                    title="Gold (Brand)"
-                  />
-                  <button
-                    type="button"
-                    className="w-8 h-8 rounded border-2 border-gray-400 bg-white hover:ring-2 hover:ring-primary transition-all"
-                    onClick={() => editor.chain().focus().setColor('#ffffff').run()}
-                    title="White"
-                  />
+                    variant="outline"
+                    size="sm"
+                    onClick={() => editor.chain().focus().unsetColor().run()}
+                    className="w-full"
+                  >
+                    Remove Color
+                  </Button>
                 </div>
-              </div>
-
-              {/* Custom color picker */}
-              <div>
-                <label className="text-xs font-medium mb-2 block">Custom Color</label>
-                <Input
-                  type="color"
-                  onChange={(e) => editor.chain().focus().setColor(e.target.value).run()}
-                  className="h-10 w-full cursor-pointer"
-                />
-              </div>
-
-              {/* Remove color button */}
-              <Button
-                type="button"
-                variant="outline"
-                size="sm"
-                onClick={() => editor.chain().focus().unsetColor().run()}
-                className="w-full"
-              >
-                Remove Color
-              </Button>
-            </div>
-          </DropdownMenuContent>
-        </DropdownMenu>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </TooltipTrigger>
+          <TooltipContent>Text Color</TooltipContent>
+        </Tooltip>
 
         {/* Highlight */}
         <Tooltip>
@@ -1156,555 +1156,554 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({
         <div className="w-px h-6 bg-border mx-1" />
 
         {/* Table with dialog for size selection */}
-        <Dialog open={showTableDialog} onOpenChange={setShowTableDialog}>
-          <DialogTrigger asChild>
-            <Tooltip>
-              <TooltipTrigger asChild>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Dialog open={showTableDialog} onOpenChange={setShowTableDialog}>
+              <DialogTrigger asChild>
                 <Button type="button" variant="ghost" size="sm">
                   <TableIcon className="h-4 w-4" />
                 </Button>
-              </TooltipTrigger>
-              <TooltipContent>Insert Table</TooltipContent>
-            </Tooltip>
-          </DialogTrigger>
-          <DialogContent className="sm:max-w-md">
-            <DialogHeader>
-              <DialogTitle>Insert Table</DialogTitle>
-              <DialogDescription>
-                Select the number of rows and columns for your table
-              </DialogDescription>
-            </DialogHeader>
-            <div className="space-y-4 py-4">
-              <div className="space-y-2">
-                <label className="text-sm font-medium">Rows</label>
-                <Input
-                  type="number"
-                  min={1}
-                  max={10}
-                  value={tableRows}
-                  onChange={(e) => setTableRows(Math.min(10, Math.max(1, parseInt(e.target.value) || 1)))}
-                />
-              </div>
-              <div className="space-y-2">
-                <label className="text-sm font-medium">Columns</label>
-                <Input
-                  type="number"
-                  min={1}
-                  max={10}
-                  value={tableCols}
-                  onChange={(e) => setTableCols(Math.min(10, Math.max(1, parseInt(e.target.value) || 1)))}
-                />
-              </div>
-              <div className="flex items-center gap-2">
-                <input
-                  type="checkbox"
-                  id="with-header"
-                  checked={tableWithHeader}
-                  onChange={(e) => setTableWithHeader(e.target.checked)}
-                  className="rounded border-gray-300"
-                />
-                <label htmlFor="with-header" className="text-sm cursor-pointer">
-                  Include header row
-                </label>
-              </div>
-              <Button onClick={insertTableWithSize} className="w-full">
-                Insert Table
-              </Button>
-            </div>
-          </DialogContent>
-        </Dialog>
+              </DialogTrigger>
+              <DialogContent className="sm:max-w-md">
+                <DialogHeader>
+                  <DialogTitle>Insert Table</DialogTitle>
+                  <DialogDescription>
+                    Select the number of rows and columns for your table
+                  </DialogDescription>
+                </DialogHeader>
+                <div className="space-y-4 py-4">
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium">Rows</label>
+                    <Input
+                      type="number"
+                      min={1}
+                      max={10}
+                      value={tableRows}
+                      onChange={(e) => setTableRows(Math.min(10, Math.max(1, parseInt(e.target.value) || 1)))}
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium">Columns</label>
+                    <Input
+                      type="number"
+                      min={1}
+                      max={10}
+                      value={tableCols}
+                      onChange={(e) => setTableCols(Math.min(10, Math.max(1, parseInt(e.target.value) || 1)))}
+                    />
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <input
+                      type="checkbox"
+                      id="with-header"
+                      checked={tableWithHeader}
+                      onChange={(e) => setTableWithHeader(e.target.checked)}
+                      className="rounded border-gray-300"
+                    />
+                    <label htmlFor="with-header" className="text-sm cursor-pointer">
+                      Include header row
+                    </label>
+                  </div>
+                  <Button onClick={insertTableWithSize} className="w-full">
+                    Insert Table
+                  </Button>
+                </div>
+              </DialogContent>
+            </Dialog>
+          </TooltipTrigger>
+          <TooltipContent>Insert Table</TooltipContent>
+        </Tooltip>
 
         {/* Table Template Gallery */}
-        <Dialog open={showTemplateDialog} onOpenChange={setShowTemplateDialog}>
-          <DialogTrigger asChild>
-            <Tooltip>
-              <TooltipTrigger asChild>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Dialog open={showTemplateDialog} onOpenChange={setShowTemplateDialog}>
+              <DialogTrigger asChild>
                 <Button type="button" variant="ghost" size="sm">
                   <Grid3x3 className="h-4 w-4" />
                   <Plus className="h-3 w-3 -ml-1" />
                 </Button>
-              </TooltipTrigger>
-              <TooltipContent>Table Templates</TooltipContent>
-            </Tooltip>
-          </DialogTrigger>
-          <DialogContent className="sm:max-w-2xl">
-            <DialogHeader>
-              <DialogTitle>Table Templates</DialogTitle>
-              <DialogDescription>
-                Choose a pre-built table layout to get started quickly
-              </DialogDescription>
-            </DialogHeader>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 py-4 max-h-[70vh] overflow-y-auto">
-              {/* General Templates */}
-              <button
-                onClick={insertPricingTable}
-                className="p-4 border-2 border-border rounded-lg hover:border-primary transition-colors text-left group"
-              >
-                <div className="text-lg font-semibold mb-2 group-hover:text-primary">💰 Pricing Table</div>
-                <div className="text-sm text-muted-foreground mb-3">
-                  3 columns for Basic, Pro, and Enterprise tiers
-                </div>
-                <div className="bg-muted rounded p-2 text-xs">
-                  <div className="grid grid-cols-3 gap-1 mb-1">
-                    <div className="bg-primary/20 p-1 text-center">Basic</div>
-                    <div className="bg-primary/20 p-1 text-center">Pro</div>
-                    <div className="bg-primary/20 p-1 text-center">Enterprise</div>
-                  </div>
-                  <div className="space-y-1">
-                    <div className="bg-background p-1">Features</div>
-                    <div className="bg-background p-1">Price</div>
-                    <div className="bg-background p-1">Support</div>
-                  </div>
-                </div>
-              </button>
-
-              <button
-                onClick={insertComparisonTable}
-                className="p-4 border-2 border-border rounded-lg hover:border-primary transition-colors text-left group"
-              >
-                <div className="text-lg font-semibold mb-2 group-hover:text-primary">⚖️ Comparison Table</div>
-                <div className="text-sm text-muted-foreground mb-3">
-                  4 columns with striped rows for easy scanning
-                </div>
-                <div className="bg-muted rounded p-2 text-xs">
-                  <div className="grid grid-cols-4 gap-1 mb-1">
-                    <div className="bg-primary/20 p-1 text-center">Feature</div>
-                    <div className="bg-primary/20 p-1 text-center">A</div>
-                    <div className="bg-primary/20 p-1 text-center">B</div>
-                    <div className="bg-primary/20 p-1 text-center">C</div>
-                  </div>
-                  <div className="space-y-1">
-                    <div className="bg-background p-1">Item 1</div>
-                    <div className="bg-muted/50 p-1">Item 2</div>
-                    <div className="bg-background p-1">Item 3</div>
-                  </div>
-                </div>
-              </button>
-
-              <button
-                onClick={insertScheduleGrid}
-                className="p-4 border-2 border-border rounded-lg hover:border-primary transition-colors text-left group"
-              >
-                <div className="text-lg font-semibold mb-2 group-hover:text-primary">📅 Schedule Grid</div>
-                <div className="text-sm text-muted-foreground mb-3">
-                  8 columns for weekly schedule with time slots
-                </div>
-                <div className="bg-muted rounded p-2 text-xs">
-                  <div className="grid grid-cols-8 gap-px mb-1">
-                    <div className="bg-primary/30 p-1 text-center text-[10px]">Time</div>
-                    <div className="bg-primary/30 p-1 text-center text-[10px]">Mon</div>
-                    <div className="bg-primary/30 p-1 text-center text-[10px]">Tue</div>
-                    <div className="bg-primary/30 p-1 text-center text-[10px]">Wed</div>
-                    <div className="bg-primary/30 p-1 text-center text-[10px]">Thu</div>
-                    <div className="bg-primary/30 p-1 text-center text-[10px]">Fri</div>
-                    <div className="bg-primary/30 p-1 text-center text-[10px]">Sat</div>
-                    <div className="bg-primary/30 p-1 text-center text-[10px]">Sun</div>
-                  </div>
-                  <div className="space-y-px">
-                    <div className="grid grid-cols-8 gap-px">
-                      <div className="bg-background p-1 text-[10px]">9AM</div>
-                      <div className="bg-background p-1"></div>
-                      <div className="bg-background p-1"></div>
-                      <div className="bg-background p-1"></div>
-                      <div className="bg-background p-1"></div>
-                      <div className="bg-background p-1"></div>
-                      <div className="bg-background p-1"></div>
-                      <div className="bg-background p-1"></div>
+              </DialogTrigger>
+              <DialogContent className="sm:max-w-2xl">
+                <DialogHeader>
+                  <DialogTitle>Table Templates</DialogTitle>
+                  <DialogDescription>
+                    Choose a pre-built table layout to get started quickly
+                  </DialogDescription>
+                </DialogHeader>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 py-4 max-h-[70vh] overflow-y-auto">
+                  {/* General Templates */}
+                  <button
+                    onClick={insertPricingTable}
+                    className="p-4 border-2 border-border rounded-lg hover:border-primary transition-colors text-left group"
+                  >
+                    <div className="text-lg font-semibold mb-2 group-hover:text-primary">💰 Pricing Table</div>
+                    <div className="text-sm text-muted-foreground mb-3">
+                      3 columns for Basic, Pro, and Enterprise tiers
                     </div>
-                  </div>
-                </div>
-              </button>
-
-              {/* Fitness-Specific Templates */}
-              <button
-                onClick={insertWorkoutScheduleTable}
-                className="p-4 border-2 border-border rounded-lg hover:border-primary transition-colors text-left group"
-              >
-                <div className="text-lg font-semibold mb-2 group-hover:text-primary">🏋️ Workout Schedule</div>
-                <div className="text-sm text-muted-foreground mb-3">
-                  Weekly training plan with exercises, sets, reps
-                </div>
-                <div className="bg-muted rounded p-2 text-xs">
-                  <div className="grid grid-cols-6 gap-px mb-1">
-                    <div className="bg-primary/20 p-1 text-center text-[10px]">Day</div>
-                    <div className="bg-primary/20 p-1 text-center text-[10px]">Exercise</div>
-                    <div className="bg-primary/20 p-1 text-center text-[10px]">Sets</div>
-                    <div className="bg-primary/20 p-1 text-center text-[10px]">Reps</div>
-                    <div className="bg-primary/20 p-1 text-center text-[10px]">Rest</div>
-                    <div className="bg-primary/20 p-1 text-center text-[10px]">Notes</div>
-                  </div>
-                  <div className="space-y-px">
-                    <div className="grid grid-cols-6 gap-px">
-                      <div className="bg-background p-1 text-[10px]">Mon</div>
-                      <div className="bg-background p-1 text-[10px]">Bench</div>
-                      <div className="bg-background p-1 text-[10px]">4</div>
-                      <div className="bg-background p-1 text-[10px]">8-10</div>
-                      <div className="bg-background p-1 text-[10px]">90s</div>
-                      <div className="bg-background p-1 text-[10px]"></div>
+                    <div className="bg-muted rounded p-2 text-xs">
+                      <div className="grid grid-cols-3 gap-1 mb-1">
+                        <div className="bg-primary/20 p-1 text-center">Basic</div>
+                        <div className="bg-primary/20 p-1 text-center">Pro</div>
+                        <div className="bg-primary/20 p-1 text-center">Enterprise</div>
+                      </div>
+                      <div className="space-y-1">
+                        <div className="bg-background p-1">Features</div>
+                        <div className="bg-background p-1">Price</div>
+                        <div className="bg-background p-1">Support</div>
+                      </div>
                     </div>
-                  </div>
-                </div>
-              </button>
+                  </button>
 
-              <button
-                onClick={insertMealPlanTable}
-                className="p-4 border-2 border-border rounded-lg hover:border-primary transition-colors text-left group"
-              >
-                <div className="text-lg font-semibold mb-2 group-hover:text-primary">🥗 Meal Plan</div>
-                <div className="text-sm text-muted-foreground mb-3">
-                  Daily nutrition tracking with macros
-                </div>
-                <div className="bg-muted rounded p-2 text-xs">
-                  <div className="grid grid-cols-5 gap-1 mb-1">
-                    <div className="bg-green-100 p-1 text-center text-[10px]">Meal</div>
-                    <div className="bg-green-100 p-1 text-center text-[10px]">Food</div>
-                    <div className="bg-green-100 p-1 text-center text-[10px]">Protein</div>
-                    <div className="bg-green-100 p-1 text-center text-[10px]">Carbs</div>
-                    <div className="bg-green-100 p-1 text-center text-[10px]">Fats</div>
-                  </div>
-                  <div className="space-y-1">
-                    <div className="bg-background p-1 text-[10px]">Breakfast</div>
-                    <div className="bg-muted/50 p-1 text-[10px]">Lunch</div>
-                    <div className="bg-background p-1 text-[10px]">Dinner</div>
-                  </div>
-                </div>
-              </button>
-
-              <button
-                onClick={insertProgressTrackerTable}
-                className="p-4 border-2 border-border rounded-lg hover:border-primary transition-colors text-left group"
-              >
-                <div className="text-lg font-semibold mb-2 group-hover:text-primary">📊 Progress Tracker</div>
-                <div className="text-sm text-muted-foreground mb-3">
-                  Track measurements, weight, body composition
-                </div>
-                <div className="bg-muted rounded p-2 text-xs">
-                  <div className="grid grid-cols-7 gap-px mb-1">
-                    <div className="bg-blue-100 p-1 text-center text-[10px]">Date</div>
-                    <div className="bg-blue-100 p-1 text-center text-[10px]">Weight</div>
-                    <div className="bg-blue-100 p-1 text-center text-[10px]">BF%</div>
-                    <div className="bg-blue-100 p-1 text-center text-[10px]">Chest</div>
-                    <div className="bg-blue-100 p-1 text-center text-[10px]">Waist</div>
-                    <div className="bg-blue-100 p-1 text-center text-[10px]">Arms</div>
-                    <div className="bg-blue-100 p-1 text-center text-[10px]">Legs</div>
-                  </div>
-                  <div className="space-y-px">
-                    <div className="grid grid-cols-7 gap-px">
-                      <div className="bg-background p-1 text-[10px]">Week 1</div>
-                      <div className="bg-background p-1"></div>
-                      <div className="bg-background p-1"></div>
-                      <div className="bg-background p-1"></div>
-                      <div className="bg-background p-1"></div>
-                      <div className="bg-background p-1"></div>
-                      <div className="bg-background p-1"></div>
+                  <button
+                    onClick={insertComparisonTable}
+                    className="p-4 border-2 border-border rounded-lg hover:border-primary transition-colors text-left group"
+                  >
+                    <div className="text-lg font-semibold mb-2 group-hover:text-primary">⚖️ Comparison Table</div>
+                    <div className="text-sm text-muted-foreground mb-3">
+                      4 columns with striped rows for easy scanning
                     </div>
-                  </div>
-                </div>
-              </button>
-
-              <button
-                onClick={insertExerciseLogTable}
-                className="p-4 border-2 border-border rounded-lg hover:border-primary transition-colors text-left group"
-              >
-                <div className="text-lg font-semibold mb-2 group-hover:text-primary">📝 Exercise Log</div>
-                <div className="text-sm text-muted-foreground mb-3">
-                  Record sets, reps, weight for each exercise
-                </div>
-                <div className="bg-muted rounded p-2 text-xs">
-                  <div className="grid grid-cols-6 gap-px mb-1">
-                    <div className="bg-yellow-100 p-1 text-center text-[10px]">Exercise</div>
-                    <div className="bg-yellow-100 p-1 text-center text-[10px]">Set 1</div>
-                    <div className="bg-yellow-100 p-1 text-center text-[10px]">Set 2</div>
-                    <div className="bg-yellow-100 p-1 text-center text-[10px]">Set 3</div>
-                    <div className="bg-yellow-100 p-1 text-center text-[10px]">Set 4</div>
-                    <div className="bg-yellow-100 p-1 text-center text-[10px]">Total</div>
-                  </div>
-                  <div className="space-y-px">
-                    <div className="grid grid-cols-6 gap-px">
-                      <div className="bg-background p-1 text-[10px]">Squat</div>
-                      <div className="bg-background p-1 text-[10px]">225x5</div>
-                      <div className="bg-background p-1"></div>
-                      <div className="bg-background p-1"></div>
-                      <div className="bg-background p-1"></div>
-                      <div className="bg-background p-1"></div>
+                    <div className="bg-muted rounded p-2 text-xs">
+                      <div className="grid grid-cols-4 gap-1 mb-1">
+                        <div className="bg-primary/20 p-1 text-center">Feature</div>
+                        <div className="bg-primary/20 p-1 text-center">A</div>
+                        <div className="bg-primary/20 p-1 text-center">B</div>
+                        <div className="bg-primary/20 p-1 text-center">C</div>
+                      </div>
+                      <div className="space-y-1">
+                        <div className="bg-background p-1">Item 1</div>
+                        <div className="bg-muted/50 p-1">Item 2</div>
+                        <div className="bg-background p-1">Item 3</div>
+                      </div>
                     </div>
-                  </div>
+                  </button>
+
+                  <button
+                    onClick={insertScheduleGrid}
+                    className="p-4 border-2 border-border rounded-lg hover:border-primary transition-colors text-left group"
+                  >
+                    <div className="text-lg font-semibold mb-2 group-hover:text-primary">📅 Schedule Grid</div>
+                    <div className="text-sm text-muted-foreground mb-3">
+                      8 columns for weekly schedule with time slots
+                    </div>
+                    <div className="bg-muted rounded p-2 text-xs">
+                      <div className="grid grid-cols-8 gap-px mb-1">
+                        <div className="bg-primary/30 p-1 text-center text-[10px]">Time</div>
+                        <div className="bg-primary/30 p-1 text-center text-[10px]">Mon</div>
+                        <div className="bg-primary/30 p-1 text-center text-[10px]">Tue</div>
+                        <div className="bg-primary/30 p-1 text-center text-[10px]">Wed</div>
+                        <div className="bg-primary/30 p-1 text-center text-[10px]">Thu</div>
+                        <div className="bg-primary/30 p-1 text-center text-[10px]">Fri</div>
+                        <div className="bg-primary/30 p-1 text-center text-[10px]">Sat</div>
+                        <div className="bg-primary/30 p-1 text-center text-[10px]">Sun</div>
+                      </div>
+                      <div className="space-y-px">
+                        <div className="grid grid-cols-8 gap-px">
+                          <div className="bg-background p-1 text-[10px]">9AM</div>
+                          <div className="bg-background p-1"></div>
+                          <div className="bg-background p-1"></div>
+                          <div className="bg-background p-1"></div>
+                          <div className="bg-background p-1"></div>
+                          <div className="bg-background p-1"></div>
+                          <div className="bg-background p-1"></div>
+                          <div className="bg-background p-1"></div>
+                        </div>
+                      </div>
+                    </div>
+                  </button>
+
+                  {/* Fitness-Specific Templates */}
+                  <button
+                    onClick={insertWorkoutScheduleTable}
+                    className="p-4 border-2 border-border rounded-lg hover:border-primary transition-colors text-left group"
+                  >
+                    <div className="text-lg font-semibold mb-2 group-hover:text-primary">🏋️ Workout Schedule</div>
+                    <div className="text-sm text-muted-foreground mb-3">
+                      Weekly training plan with exercises, sets, reps
+                    </div>
+                    <div className="bg-muted rounded p-2 text-xs">
+                      <div className="grid grid-cols-6 gap-px mb-1">
+                        <div className="bg-primary/20 p-1 text-center text-[10px]">Day</div>
+                        <div className="bg-primary/20 p-1 text-center text-[10px]">Exercise</div>
+                        <div className="bg-primary/20 p-1 text-center text-[10px]">Sets</div>
+                        <div className="bg-primary/20 p-1 text-center text-[10px]">Reps</div>
+                        <div className="bg-primary/20 p-1 text-center text-[10px]">Rest</div>
+                        <div className="bg-primary/20 p-1 text-center text-[10px]">Notes</div>
+                      </div>
+                      <div className="space-y-px">
+                        <div className="grid grid-cols-6 gap-px">
+                          <div className="bg-background p-1 text-[10px]">Mon</div>
+                          <div className="bg-background p-1 text-[10px]">Bench</div>
+                          <div className="bg-background p-1 text-[10px]">4</div>
+                          <div className="bg-background p-1 text-[10px]">8-10</div>
+                          <div className="bg-background p-1 text-[10px]">90s</div>
+                          <div className="bg-background p-1 text-[10px]"></div>
+                        </div>
+                      </div>
+                    </div>
+                  </button>
+
+                  <button
+                    onClick={insertMealPlanTable}
+                    className="p-4 border-2 border-border rounded-lg hover:border-primary transition-colors text-left group"
+                  >
+                    <div className="text-lg font-semibold mb-2 group-hover:text-primary">🥗 Meal Plan</div>
+                    <div className="text-sm text-muted-foreground mb-3">
+                      Daily nutrition tracking with macros
+                    </div>
+                    <div className="bg-muted rounded p-2 text-xs">
+                      <div className="grid grid-cols-5 gap-1 mb-1">
+                        <div className="bg-green-100 p-1 text-center text-[10px]">Meal</div>
+                        <div className="bg-green-100 p-1 text-center text-[10px]">Food</div>
+                        <div className="bg-green-100 p-1 text-center text-[10px]">Protein</div>
+                        <div className="bg-green-100 p-1 text-center text-[10px]">Carbs</div>
+                        <div className="bg-green-100 p-1 text-center text-[10px]">Fats</div>
+                      </div>
+                      <div className="space-y-1">
+                        <div className="bg-background p-1 text-[10px]">Breakfast</div>
+                        <div className="bg-muted/50 p-1 text-[10px]">Lunch</div>
+                        <div className="bg-background p-1 text-[10px]">Dinner</div>
+                      </div>
+                    </div>
+                  </button>
+
+                  <button
+                    onClick={insertProgressTrackerTable}
+                    className="p-4 border-2 border-border rounded-lg hover:border-primary transition-colors text-left group"
+                  >
+                    <div className="text-lg font-semibold mb-2 group-hover:text-primary">📊 Progress Tracker</div>
+                    <div className="text-sm text-muted-foreground mb-3">
+                      Track measurements, weight, body composition
+                    </div>
+                    <div className="bg-muted rounded p-2 text-xs">
+                      <div className="grid grid-cols-7 gap-px mb-1">
+                        <div className="bg-blue-100 p-1 text-center text-[10px]">Date</div>
+                        <div className="bg-blue-100 p-1 text-center text-[10px]">Weight</div>
+                        <div className="bg-blue-100 p-1 text-center text-[10px]">BF%</div>
+                        <div className="bg-blue-100 p-1 text-center text-[10px]">Chest</div>
+                        <div className="bg-blue-100 p-1 text-center text-[10px]">Waist</div>
+                        <div className="bg-blue-100 p-1 text-center text-[10px]">Arms</div>
+                        <div className="bg-blue-100 p-1 text-center text-[10px]">Legs</div>
+                      </div>
+                      <div className="space-y-px">
+                        <div className="grid grid-cols-7 gap-px">
+                          <div className="bg-background p-1 text-[10px]">Week 1</div>
+                          <div className="bg-background p-1"></div>
+                          <div className="bg-background p-1"></div>
+                          <div className="bg-background p-1"></div>
+                          <div className="bg-background p-1"></div>
+                          <div className="bg-background p-1"></div>
+                          <div className="bg-background p-1"></div>
+                        </div>
+                      </div>
+                    </div>
+                  </button>
+
+                  <button
+                    onClick={insertExerciseLogTable}
+                    className="p-4 border-2 border-border rounded-lg hover:border-primary transition-colors text-left group"
+                  >
+                    <div className="text-lg font-semibold mb-2 group-hover:text-primary">📝 Exercise Log</div>
+                    <div className="text-sm text-muted-foreground mb-3">
+                      Record sets, reps, weight for each exercise
+                    </div>
+                    <div className="bg-muted rounded p-2 text-xs">
+                      <div className="grid grid-cols-6 gap-px mb-1">
+                        <div className="bg-yellow-100 p-1 text-center text-[10px]">Exercise</div>
+                        <div className="bg-yellow-100 p-1 text-center text-[10px]">Set 1</div>
+                        <div className="bg-yellow-100 p-1 text-center text-[10px]">Set 2</div>
+                        <div className="bg-yellow-100 p-1 text-center text-[10px]">Set 3</div>
+                        <div className="bg-yellow-100 p-1 text-center text-[10px]">Set 4</div>
+                        <div className="bg-yellow-100 p-1 text-center text-[10px]">Total</div>
+                      </div>
+                      <div className="space-y-px">
+                        <div className="grid grid-cols-6 gap-px">
+                          <div className="bg-background p-1 text-[10px]">Squat</div>
+                          <div className="bg-background p-1 text-[10px]">225x5</div>
+                          <div className="bg-background p-1"></div>
+                          <div className="bg-background p-1"></div>
+                          <div className="bg-background p-1"></div>
+                          <div className="bg-background p-1"></div>
+                        </div>
+                      </div>
+                    </div>
+                  </button>
                 </div>
-              </button>
-            </div>
-          </DialogContent>
-        </Dialog>
+              </DialogContent>
+            </Dialog>
+          </TooltipTrigger>
+          <TooltipContent>Table Templates</TooltipContent>
+        </Tooltip>
 
         {/* Image insertion dropdown */}
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Tooltip>
-              <TooltipTrigger asChild>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
                 <Button type="button" variant="ghost" size="sm">
                   <ImageIcon className="h-4 w-4" />
                 </Button>
-              </TooltipTrigger>
-              <TooltipContent>Insert Image</TooltipContent>
-            </Tooltip>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="start" className="w-48 bg-background z-50">
-            <DropdownMenuItem onSelect={insertImageFromURL} className="cursor-pointer">
-              <LinkIcon className="h-4 w-4 mr-2" />
-              Insert from URL
-            </DropdownMenuItem>
-            <DropdownMenuItem onSelect={uploadImage} className="cursor-pointer">
-              <Upload className="h-4 w-4 mr-2" />
-              Upload from Device
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="start" className="w-48 bg-background z-50">
+                <DropdownMenuItem onSelect={insertImageFromURL} className="cursor-pointer">
+                  <LinkIcon className="h-4 w-4 mr-2" />
+                  Insert from URL
+                </DropdownMenuItem>
+                <DropdownMenuItem onSelect={uploadImage} className="cursor-pointer">
+                  <Upload className="h-4 w-4 mr-2" />
+                  Upload from Device
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </TooltipTrigger>
+          <TooltipContent>Insert Image</TooltipContent>
+        </Tooltip>
 
         {/* Emoji picker */}
-        <DropdownMenu open={showEmojiPicker} onOpenChange={setShowEmojiPicker}>
-          <DropdownMenuTrigger asChild>
-            <Tooltip>
-              <TooltipTrigger asChild>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <DropdownMenu open={showEmojiPicker} onOpenChange={setShowEmojiPicker}>
+              <DropdownMenuTrigger asChild>
                 <Button type="button" variant="ghost" size="sm">
                   <Smile className="h-4 w-4" />
                 </Button>
-              </TooltipTrigger>
-              <TooltipContent>Insert Emoji</TooltipContent>
-            </Tooltip>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="start" className="w-auto p-0 bg-background z-50">
-            <EmojiPicker onEmojiClick={onEmojiClick} width={350} height={400} />
-          </DropdownMenuContent>
-        </DropdownMenu>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="start" className="w-auto p-0 bg-background z-50">
+                <EmojiPicker onEmojiClick={onEmojiClick} width={350} height={400} />
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </TooltipTrigger>
+          <TooltipContent>Insert Emoji</TooltipContent>
+        </Tooltip>
 
         {/* Special characters dropdown */}
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Tooltip>
-              <TooltipTrigger asChild>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
                 <Button type="button" variant="ghost" size="sm">
                   <span className="text-sm font-bold">Ω</span>
                 </Button>
-              </TooltipTrigger>
-              <TooltipContent>Special Characters</TooltipContent>
-            </Tooltip>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="start" className="w-80 bg-background z-50 max-h-96 overflow-y-auto">
-            {Object.entries(SPECIAL_CHARS).map(([category, chars]) => (
-              <div key={category}>
-                <DropdownMenuLabel className="text-xs">{category}</DropdownMenuLabel>
-                <div className="grid grid-cols-9 gap-1 p-2">
-                  {chars.map((char) => (
-                    <button
-                      key={char}
-                      type="button"
-                      onClick={() => insertSpecialChar(char)}
-                      className="h-8 w-8 flex items-center justify-center hover:bg-muted rounded border border-transparent hover:border-primary text-lg"
-                      title={char}
-                    >
-                      {char}
-                    </button>
-                  ))}
-                </div>
-                <DropdownMenuSeparator />
-              </div>
-            ))}
-          </DropdownMenuContent>
-        </DropdownMenu>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="start" className="w-80 bg-background z-50 max-h-96 overflow-y-auto">
+                {Object.entries(SPECIAL_CHARS).map(([category, chars]) => (
+                  <div key={category}>
+                    <DropdownMenuLabel className="text-xs">{category}</DropdownMenuLabel>
+                    <div className="grid grid-cols-9 gap-1 p-2">
+                      {chars.map((char) => (
+                        <button
+                          key={char}
+                          type="button"
+                          onClick={() => insertSpecialChar(char)}
+                          className="p-2 hover:bg-accent rounded text-center transition-colors"
+                          title={char}
+                        >
+                          {char}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                ))}
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </TooltipTrigger>
+          <TooltipContent>Special Characters</TooltipContent>
+        </Tooltip>
 
         {editor.isActive('table') && (
           <>
             <div className="w-px h-6 bg-border mx-1" />
             {/* Table operations dropdown - Structure controls FIRST */}
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Tooltip>
-                  <TooltipTrigger asChild>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
                     <Button type="button" variant="ghost" size="sm">
                       <Table2 className="h-4 w-4" />
                     </Button>
-                  </TooltipTrigger>
-                  <TooltipContent>Table Structure</TooltipContent>
-                </Tooltip>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="start" className="w-56 bg-background z-50 max-h-[70vh] overflow-y-auto">
-                <DropdownMenuLabel>Table Structure</DropdownMenuLabel>
-                <DropdownMenuSeparator />
-                
-                {/* Row operations */}
-                <DropdownMenuLabel className="text-xs text-muted-foreground px-2 py-1">Rows</DropdownMenuLabel>
-                <DropdownMenuItem onSelect={() => editor.chain().focus().addRowBefore().run()} className="cursor-pointer">
-                  <Plus className="h-4 w-4 mr-2" />
-                  Add Row Above
-                </DropdownMenuItem>
-                <DropdownMenuItem onSelect={() => editor.chain().focus().addRowAfter().run()} className="cursor-pointer">
-                  <Plus className="h-4 w-4 mr-2" />
-                  Add Row Below
-                </DropdownMenuItem>
-                <DropdownMenuItem onSelect={() => editor.chain().focus().deleteRow().run()} className="cursor-pointer">
-                  <Trash className="h-4 w-4 mr-2" />
-                  Delete Row
-                </DropdownMenuItem>
-                
-                <DropdownMenuSeparator />
-                
-                {/* Column operations */}
-                <DropdownMenuLabel className="text-xs text-muted-foreground px-2 py-1">Columns</DropdownMenuLabel>
-                <DropdownMenuItem onSelect={() => editor.chain().focus().addColumnBefore().run()} className="cursor-pointer">
-                  <Plus className="h-4 w-4 mr-2" />
-                  Add Column Left
-                </DropdownMenuItem>
-                <DropdownMenuItem onSelect={() => editor.chain().focus().addColumnAfter().run()} className="cursor-pointer">
-                  <Plus className="h-4 w-4 mr-2" />
-                  Add Column Right
-                </DropdownMenuItem>
-                <DropdownMenuItem onSelect={() => editor.chain().focus().deleteColumn().run()} className="cursor-pointer">
-                  <Trash className="h-4 w-4 mr-2" />
-                  Delete Column
-                </DropdownMenuItem>
-                
-                <DropdownMenuSeparator />
-                
-                {/* Cell operations */}
-                <DropdownMenuLabel className="text-xs text-muted-foreground px-2 py-1">
-                  Cells
-                  <span className="block text-[10px] mt-0.5 font-normal">Select multiple cells to merge</span>
-                </DropdownMenuLabel>
-                <DropdownMenuItem 
-                  onSelect={() => editor.chain().focus().mergeCells().run()}
-                  disabled={!editor.can().mergeCells()}
-                  className="cursor-pointer flex items-center justify-between"
-                >
-                  <span className="flex items-center">
-                    <Merge className="h-4 w-4 mr-2" />
-                    Merge Cells
-                  </span>
-                  {!editor.can().mergeCells() && (
-                    <span className="text-[10px] text-muted-foreground">(Select cells)</span>
-                  )}
-                </DropdownMenuItem>
-                <DropdownMenuItem 
-                  onSelect={() => editor.chain().focus().splitCell().run()}
-                  disabled={!editor.can().splitCell()}
-                  className="cursor-pointer"
-                >
-                  <Split className="h-4 w-4 mr-2" />
-                  Split Cell
-                </DropdownMenuItem>
-                <DropdownMenuItem onSelect={() => editor.chain().focus().toggleHeaderCell().run()} className="cursor-pointer">
-                  <Grid3x3 className="h-4 w-4 mr-2" />
-                  Toggle Header Cell
-                </DropdownMenuItem>
-                
-                <DropdownMenuSeparator />
-                
-                {/* Row height controls */}
-                <div className="px-2 py-2 space-y-2">
-                  <p className="text-xs font-medium text-muted-foreground">Set Row Height</p>
-                  <div className="grid grid-cols-2 gap-2">
-                    <Button
-                      type="button"
-                      variant={selectedRowHeight === 'auto' ? 'default' : 'outline'}
-                      size="sm"
-                      onClick={() => setSelectedRowHeight('auto')}
-                      className="text-xs h-8"
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="start" className="w-56 bg-background z-50 max-h-[70vh] overflow-y-auto">
+                    <DropdownMenuLabel>Table Structure</DropdownMenuLabel>
+                    <DropdownMenuSeparator />
+                    
+                    {/* Row operations */}
+                    <DropdownMenuLabel className="text-xs text-muted-foreground px-2 py-1">Rows</DropdownMenuLabel>
+                    <DropdownMenuItem onSelect={() => editor.chain().focus().addRowBefore().run()} className="cursor-pointer">
+                      <Plus className="h-4 w-4 mr-2" />
+                      Add Row Above
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onSelect={() => editor.chain().focus().addRowAfter().run()} className="cursor-pointer">
+                      <Plus className="h-4 w-4 mr-2" />
+                      Add Row Below
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onSelect={() => editor.chain().focus().deleteRow().run()} className="cursor-pointer">
+                      <Trash className="h-4 w-4 mr-2" />
+                      Delete Row
+                    </DropdownMenuItem>
+                    
+                    <DropdownMenuSeparator />
+                    
+                    {/* Column operations */}
+                    <DropdownMenuLabel className="text-xs text-muted-foreground px-2 py-1">Columns</DropdownMenuLabel>
+                    <DropdownMenuItem onSelect={() => editor.chain().focus().addColumnBefore().run()} className="cursor-pointer">
+                      <Plus className="h-4 w-4 mr-2" />
+                      Add Column Left
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onSelect={() => editor.chain().focus().addColumnAfter().run()} className="cursor-pointer">
+                      <Plus className="h-4 w-4 mr-2" />
+                      Add Column Right
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onSelect={() => editor.chain().focus().deleteColumn().run()} className="cursor-pointer">
+                      <Trash className="h-4 w-4 mr-2" />
+                      Delete Column
+                    </DropdownMenuItem>
+                    
+                    <DropdownMenuSeparator />
+                    
+                    {/* Cell operations */}
+                    <DropdownMenuLabel className="text-xs text-muted-foreground px-2 py-1">
+                      Cells
+                      <span className="block text-[10px] mt-0.5 font-normal">Select multiple cells to merge</span>
+                    </DropdownMenuLabel>
+                    <DropdownMenuItem 
+                      onSelect={() => editor.chain().focus().mergeCells().run()}
+                      disabled={!editor.can().mergeCells()}
+                      className="cursor-pointer flex items-center justify-between"
                     >
-                      Auto
-                    </Button>
-                    <Button
-                      type="button"
-                      variant={selectedRowHeight === '40px' ? 'default' : 'outline'}
-                      size="sm"
-                      onClick={() => setSelectedRowHeight('40px')}
-                      className="text-xs h-8"
+                      <span className="flex items-center">
+                        <Merge className="h-4 w-4 mr-2" />
+                        Merge Cells
+                      </span>
+                      {!editor.can().mergeCells() && (
+                        <span className="text-[10px] text-muted-foreground">(Select cells)</span>
+                      )}
+                    </DropdownMenuItem>
+                    <DropdownMenuItem 
+                      onSelect={() => editor.chain().focus().splitCell().run()}
+                      disabled={!editor.can().splitCell()}
+                      className="cursor-pointer"
                     >
-                      Small
-                    </Button>
-                    <Button
-                      type="button"
-                      variant={selectedRowHeight === '60px' ? 'default' : 'outline'}
-                      size="sm"
-                      onClick={() => setSelectedRowHeight('60px')}
-                      className="text-xs h-8"
-                    >
-                      Medium
-                    </Button>
-                    <Button
-                      type="button"
-                      variant={selectedRowHeight === '80px' ? 'default' : 'outline'}
-                      size="sm"
-                      onClick={() => setSelectedRowHeight('80px')}
-                      className="text-xs h-8"
-                    >
-                      Large
-                    </Button>
-                    <Button
-                      type="button"
-                      variant={selectedRowHeight === '120px' ? 'default' : 'outline'}
-                      size="sm"
-                      onClick={() => setSelectedRowHeight('120px')}
-                      className="text-xs h-8"
-                    >
-                      Extra Large
-                    </Button>
-                    <Button
-                      type="button"
-                      variant={selectedRowHeight === 'custom' ? 'default' : 'outline'}
-                      size="sm"
-                      onClick={() => setSelectedRowHeight('custom')}
-                      className="text-xs h-8"
-                    >
-                      Custom
-                    </Button>
-                  </div>
-                  
-                  {selectedRowHeight === 'custom' && (
-                    <div className="flex gap-2 items-center">
-                      <Input
-                        type="number"
-                        value={customRowHeight}
-                        onChange={(e) => setCustomRowHeight(e.target.value)}
-                        placeholder="Height in px"
-                        className="h-8 text-xs"
-                        min="20"
-                        max="500"
-                      />
-                      <span className="text-xs text-muted-foreground">px</span>
+                      <Split className="h-4 w-4 mr-2" />
+                      Split Cell
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onSelect={() => editor.chain().focus().toggleHeaderCell().run()} className="cursor-pointer">
+                      <Grid3x3 className="h-4 w-4 mr-2" />
+                      Toggle Header Cell
+                    </DropdownMenuItem>
+                    
+                    <DropdownMenuSeparator />
+                    
+                    {/* Row height controls */}
+                    <div className="px-2 py-2 space-y-2">
+                      <p className="text-xs font-medium text-muted-foreground">Set Row Height</p>
+                      <div className="grid grid-cols-2 gap-2">
+                        <Button
+                          type="button"
+                          variant={selectedRowHeight === 'auto' ? 'default' : 'outline'}
+                          size="sm"
+                          onClick={() => setSelectedRowHeight('auto')}
+                          className="text-xs h-8"
+                        >
+                          Auto
+                        </Button>
+                        <Button
+                          type="button"
+                          variant={selectedRowHeight === '40px' ? 'default' : 'outline'}
+                          size="sm"
+                          onClick={() => setSelectedRowHeight('40px')}
+                          className="text-xs h-8"
+                        >
+                          Small
+                        </Button>
+                        <Button
+                          type="button"
+                          variant={selectedRowHeight === '60px' ? 'default' : 'outline'}
+                          size="sm"
+                          onClick={() => setSelectedRowHeight('60px')}
+                          className="text-xs h-8"
+                        >
+                          Medium
+                        </Button>
+                        <Button
+                          type="button"
+                          variant={selectedRowHeight === '80px' ? 'default' : 'outline'}
+                          size="sm"
+                          onClick={() => setSelectedRowHeight('80px')}
+                          className="text-xs h-8"
+                        >
+                          Large
+                        </Button>
+                        <Button
+                          type="button"
+                          variant={selectedRowHeight === '120px' ? 'default' : 'outline'}
+                          size="sm"
+                          onClick={() => setSelectedRowHeight('120px')}
+                          className="text-xs h-8"
+                        >
+                          Extra Large
+                        </Button>
+                        <Button
+                          type="button"
+                          variant={selectedRowHeight === 'custom' ? 'default' : 'outline'}
+                          size="sm"
+                          onClick={() => setSelectedRowHeight('custom')}
+                          className="text-xs h-8"
+                        >
+                          Custom
+                        </Button>
+                      </div>
+                      
+                      {selectedRowHeight === 'custom' && (
+                        <div className="flex gap-2 items-center">
+                          <Input
+                            type="number"
+                            value={customRowHeight}
+                            onChange={(e) => setCustomRowHeight(e.target.value)}
+                            placeholder="Height in px"
+                            className="h-8 text-xs"
+                            min="20"
+                            max="500"
+                          />
+                          <span className="text-xs text-muted-foreground">px</span>
+                        </div>
+                      )}
+
+                      <Button
+                        type="button"
+                        size="sm"
+                        onClick={() => {
+                          const height = selectedRowHeight === 'custom' 
+                            ? `${customRowHeight}px` 
+                            : selectedRowHeight;
+                          editor?.chain().focus().updateAttributes('tableRow', { height }).run();
+                        }}
+                        className="w-full"
+                      >
+                        Apply Row Height
+                      </Button>
                     </div>
-                  )}
 
-                  <Button
-                    type="button"
-                    size="sm"
-                    onClick={() => {
-                      const height = selectedRowHeight === 'custom' 
-                        ? `${customRowHeight}px` 
-                        : selectedRowHeight;
-                      editor?.chain().focus().updateAttributes('tableRow', { height }).run();
-                    }}
-                    className="w-full"
-                  >
-                    Apply Row Height
-                  </Button>
-                </div>
-
-                <DropdownMenuSeparator />
-                
-                {/* Table operations */}
-                <DropdownMenuItem 
-                  onSelect={() => editor.chain().focus().deleteTable().run()}
-                  className="cursor-pointer text-destructive"
-                >
-                  <Trash className="h-4 w-4 mr-2" />
-                  Delete Table
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
+                    <DropdownMenuSeparator />
+                    
+                    {/* Table operations */}
+                    <DropdownMenuItem 
+                      onSelect={() => editor.chain().focus().deleteTable().run()}
+                      className="cursor-pointer text-destructive"
+                    >
+                      <Trash className="h-4 w-4 mr-2" />
+                      Delete Table
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              </TooltipTrigger>
+              <TooltipContent>Table Structure</TooltipContent>
+            </Tooltip>
 
             {/* Table border and background customization dropdown - Style controls SECOND */}
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Tooltip>
-                  <TooltipTrigger asChild>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
                     <Button
                       type="button"
                       variant="ghost"
@@ -1714,364 +1713,234 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({
                       <Palette className="h-4 w-4" />
                       <Grid3x3 className="h-3 w-3" />
                     </Button>
-                  </TooltipTrigger>
-                  <TooltipContent>Table Borders & Style</TooltipContent>
-                </Tooltip>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="start" className="w-80 bg-background z-50 max-h-[70vh] overflow-y-auto">
-                <DropdownMenuLabel className="flex items-center justify-between">
-                  Table Border Options
-                  <label className="flex items-center gap-2 text-xs font-normal cursor-pointer">
-                    <input
-                      type="checkbox"
-                      checked={applyToAllCells}
-                      onChange={(e) => setApplyToAllCells(e.target.checked)}
-                      className="rounded border-gray-300"
-                    />
-                    Apply to all
-                  </label>
-                </DropdownMenuLabel>
-                <DropdownMenuSeparator />
-                
-                <div className="p-2 space-y-3">
-                  <div>
-                    <label className="text-xs font-medium mb-1 block">Border Color</label>
-                    <div className="flex gap-2">
-                      <Input
-                        type="color"
-                        value={borderColor}
-                        onChange={(e) => setBorderColor(e.target.value)}
-                        className="h-8 w-16 p-1 cursor-pointer"
-                      />
-                      <div className="flex gap-1 flex-wrap flex-1">
-                        <button
-                          type="button"
-                          className="w-6 h-6 rounded border border-input bg-black hover:ring-2 hover:ring-primary transition-all"
-                          onClick={() => setBorderColor('#000000')}
-                          title="Black"
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="start" className="w-80 bg-background z-50 max-h-[70vh] overflow-y-auto">
+                    <DropdownMenuLabel className="flex items-center justify-between">
+                      Table Border Options
+                      <label className="flex items-center gap-2 text-xs font-normal cursor-pointer">
+                        <input
+                          type="checkbox"
+                          checked={applyToAllCells}
+                          onChange={(e) => setApplyToAllCells(e.target.checked)}
+                          className="rounded border-gray-300"
                         />
-                        <button
-                          type="button"
-                          className="w-6 h-6 rounded border border-input bg-gray-500 hover:ring-2 hover:ring-primary transition-all"
-                          onClick={() => setBorderColor('#6b7280')}
-                          title="Gray"
-                        />
-                        <button
-                          type="button"
-                          className="w-6 h-6 rounded border border-input bg-blue-500 hover:ring-2 hover:ring-primary transition-all"
-                          onClick={() => setBorderColor('#3b82f6')}
-                          title="Blue"
-                        />
-                        <button
-                          type="button"
-                          className="w-6 h-6 rounded border border-input bg-red-500 hover:ring-2 hover:ring-primary transition-all"
-                          onClick={() => setBorderColor('#ef4444')}
-                          title="Red"
-                        />
-                        <button
-                          type="button"
-                          className="w-6 h-6 rounded border border-input hover:ring-2 hover:ring-primary transition-all"
-                          style={{ backgroundColor: 'hsl(var(--primary))' }}
-                          onClick={() => {
-                            const root = document.documentElement;
-                            const primaryHsl = getComputedStyle(root).getPropertyValue('--primary').trim();
-                            setBorderColor(`hsl(${primaryHsl})`);
-                          }}
-                          title="Primary/Gold"
-                        />
-                        <button
-                          type="button"
-                          className="w-6 h-6 rounded border border-input bg-white hover:ring-2 hover:ring-primary transition-all"
-                          onClick={() => setBorderColor('#ffffff')}
-                          title="White"
-                        />
+                        Apply to all
+                      </label>
+                    </DropdownMenuLabel>
+                    <DropdownMenuSeparator />
+                    
+                    <div className="p-2 space-y-3">
+                      <div>
+                        <label className="text-xs font-medium mb-1 block">Border Color</label>
+                        <div className="flex gap-2">
+                          <Input
+                            type="color"
+                            value={borderColor}
+                            onChange={(e) => setBorderColor(e.target.value)}
+                            className="h-8 w-16 p-1 cursor-pointer"
+                          />
+                          <div className="flex gap-1 flex-wrap flex-1">
+                            <button
+                              type="button"
+                              className="w-6 h-6 rounded border border-input bg-black hover:ring-2 hover:ring-primary transition-all"
+                              onClick={() => setBorderColor('#000000')}
+                              title="Black"
+                            />
+                            <button
+                              type="button"
+                              className="w-6 h-6 rounded border border-input bg-gray-500 hover:ring-2 hover:ring-primary transition-all"
+                              onClick={() => setBorderColor('#6b7280')}
+                              title="Gray"
+                            />
+                            <button
+                              type="button"
+                              className="w-6 h-6 rounded border border-input bg-blue-500 hover:ring-2 hover:ring-primary transition-all"
+                              onClick={() => setBorderColor('#3b82f6')}
+                              title="Blue"
+                            />
+                            <button
+                              type="button"
+                              className="w-6 h-6 rounded border border-input bg-red-500 hover:ring-2 hover:ring-primary transition-all"
+                              onClick={() => setBorderColor('#ef4444')}
+                              title="Red"
+                            />
+                            <button
+                              type="button"
+                              className="w-6 h-6 rounded border border-input hover:ring-2 hover:ring-primary transition-all"
+                              style={{ backgroundColor: 'hsl(var(--primary))' }}
+                              onClick={() => {
+                                const root = document.documentElement;
+                                const primaryHsl = getComputedStyle(root).getPropertyValue('--primary').trim();
+                                setBorderColor(`hsl(${primaryHsl})`);
+                              }}
+                              title="Primary/Gold"
+                            />
+                            <button
+                              type="button"
+                              className="w-6 h-6 rounded border border-input bg-white hover:ring-2 hover:ring-primary transition-all"
+                              onClick={() => setBorderColor('#ffffff')}
+                              title="White"
+                            />
+                          </div>
+                        </div>
+                      </div>
+
+                      <div>
+                        <label className="text-xs font-medium mb-1 block">Border Width</label>
+                        <div className="flex gap-2">
+                          <Button
+                            type="button"
+                            variant={borderWidth === '0px' ? 'default' : 'outline'}
+                            size="sm"
+                            onClick={() => setBorderWidth('0px')}
+                            className="flex-1 text-xs"
+                          >
+                            None
+                          </Button>
+                          <Button
+                            type="button"
+                            variant={borderWidth === '1px' ? 'default' : 'outline'}
+                            size="sm"
+                            onClick={() => setBorderWidth('1px')}
+                            className="flex-1 text-xs"
+                          >
+                            Thin
+                          </Button>
+                          <Button
+                            type="button"
+                            variant={borderWidth === '2px' ? 'default' : 'outline'}
+                            size="sm"
+                            onClick={() => setBorderWidth('2px')}
+                            className="flex-1 text-xs"
+                          >
+                            Medium
+                          </Button>
+                          <Button
+                            type="button"
+                            variant={borderWidth === '3px' ? 'default' : 'outline'}
+                            size="sm"
+                            onClick={() => setBorderWidth('3px')}
+                            className="flex-1 text-xs"
+                          >
+                            Thick
+                          </Button>
+                        </div>
+                      </div>
+
+                      <div>
+                        <label className="text-xs font-medium mb-1 block">Border Style</label>
+                        <div className="flex gap-2">
+                          <Button
+                            type="button"
+                            variant={borderStyle === 'solid' ? 'default' : 'outline'}
+                            size="sm"
+                            onClick={() => setBorderStyle('solid')}
+                            className="flex-1 text-xs"
+                          >
+                            Solid
+                          </Button>
+                          <Button
+                            type="button"
+                            variant={borderStyle === 'dashed' ? 'default' : 'outline'}
+                            size="sm"
+                            onClick={() => setBorderStyle('dashed')}
+                            className="flex-1 text-xs"
+                          >
+                            Dashed
+                          </Button>
+                          <Button
+                            type="button"
+                            variant={borderStyle === 'dotted' ? 'default' : 'outline'}
+                            size="sm"
+                            onClick={() => setBorderStyle('dotted')}
+                            className="flex-1 text-xs"
+                          >
+                            Dotted
+                          </Button>
+                        </div>
                       </div>
                     </div>
-                  </div>
 
-                  <div>
-                    <label className="text-xs font-medium mb-1 block">Border Width</label>
-                    <div className="flex gap-2">
-                      <Button
-                        type="button"
-                        variant={borderWidth === '0px' ? 'default' : 'outline'}
-                        size="sm"
-                        onClick={() => setBorderWidth('0px')}
-                        className="flex-1 text-xs"
-                      >
-                        None
-                      </Button>
-                      <Button
-                        type="button"
-                        variant={borderWidth === '1px' ? 'default' : 'outline'}
-                        size="sm"
-                        onClick={() => setBorderWidth('1px')}
-                        className="flex-1 text-xs"
-                      >
-                        Thin
-                      </Button>
-                      <Button
-                        type="button"
-                        variant={borderWidth === '2px' ? 'default' : 'outline'}
-                        size="sm"
-                        onClick={() => setBorderWidth('2px')}
-                        className="flex-1 text-xs"
-                      >
-                        Medium
-                      </Button>
-                      <Button
-                        type="button"
-                        variant={borderWidth === '3px' ? 'default' : 'outline'}
-                        size="sm"
-                        onClick={() => setBorderWidth('3px')}
-                        className="flex-1 text-xs"
-                      >
-                        Thick
-                      </Button>
-                    </div>
-                  </div>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuLabel>Table Style Presets</DropdownMenuLabel>
+                    <DropdownMenuSeparator />
 
-                  <div>
-                    <label className="text-xs font-medium mb-1 block">Border Style</label>
-                    <div className="flex gap-2">
+                    <div className="p-2 space-y-2">
                       <Button
                         type="button"
-                        variant={borderStyle === 'solid' ? 'default' : 'outline'}
+                        variant={currentTableStyle === 'default' ? 'default' : 'outline'}
                         size="sm"
-                        onClick={() => setBorderStyle('solid')}
-                        className="flex-1 text-xs"
+                        onClick={() => applyTableStyle('default')}
+                        className="w-full text-xs justify-start"
                       >
-                        Solid
+                        <span className="mr-2">📋</span> Default
                       </Button>
                       <Button
                         type="button"
-                        variant={borderStyle === 'dashed' ? 'default' : 'outline'}
+                        variant={currentTableStyle === 'compact' ? 'default' : 'outline'}
                         size="sm"
-                        onClick={() => setBorderStyle('dashed')}
-                        className="flex-1 text-xs"
+                        onClick={() => applyTableStyle('compact')}
+                        className="w-full text-xs justify-start"
                       >
-                        Dashed
+                        <span className="mr-2">📏</span> Compact
                       </Button>
                       <Button
                         type="button"
-                        variant={borderStyle === 'dotted' ? 'default' : 'outline'}
+                        variant={currentTableStyle === 'wide' ? 'default' : 'outline'}
                         size="sm"
-                        onClick={() => setBorderStyle('dotted')}
-                        className="flex-1 text-xs"
+                        onClick={() => applyTableStyle('wide')}
+                        className="w-full text-xs justify-start"
                       >
-                        Dotted
+                        <span className="mr-2">📐</span> Wide
+                      </Button>
+                      <Button
+                        type="button"
+                        variant={currentTableStyle === 'striped' ? 'default' : 'outline'}
+                        size="sm"
+                        onClick={() => applyTableStyle('striped')}
+                        className="w-full text-xs justify-start"
+                      >
+                        <span className="mr-2">📊</span> Striped
                       </Button>
                     </div>
-                  </div>
-                </div>
 
-                <DropdownMenuSeparator />
-                <DropdownMenuLabel>Table Style Presets</DropdownMenuLabel>
-                <DropdownMenuSeparator />
+                    <DropdownMenuSeparator />
+                    <DropdownMenuLabel>Cell Background</DropdownMenuLabel>
+                    <DropdownMenuSeparator />
 
-                <div className="p-2 space-y-2">
-                  <Button
-                    type="button"
-                    variant={currentTableStyle === 'default' ? 'default' : 'outline'}
-                    size="sm"
-                    onClick={() => applyTableStyle('default')}
-                    className="w-full text-xs justify-start"
-                  >
-                    <span className="mr-2">📋</span> Default
-                  </Button>
-                  <Button
-                    type="button"
-                    variant={currentTableStyle === 'compact' ? 'default' : 'outline'}
-                    size="sm"
-                    onClick={() => applyTableStyle('compact')}
-                    className="w-full text-xs justify-start"
-                  >
-                    <span className="mr-2">📏</span> Compact
-                  </Button>
-                  <Button
-                    type="button"
-                    variant={currentTableStyle === 'wide' ? 'default' : 'outline'}
-                    size="sm"
-                    onClick={() => applyTableStyle('wide')}
-                    className="w-full text-xs justify-start"
-                  >
-                    <span className="mr-2">📐</span> Wide
-                  </Button>
-                  <Button
-                    type="button"
-                    variant={currentTableStyle === 'striped' ? 'default' : 'outline'}
-                    size="sm"
-                    onClick={() => applyTableStyle('striped')}
-                    className="w-full text-xs justify-start"
-                  >
-                    <span className="mr-2">🦓</span> Striped
-                  </Button>
-                </div>
-
-                <DropdownMenuSeparator />
-                <DropdownMenuLabel>Quick Presets</DropdownMenuLabel>
-                <DropdownMenuSeparator />
-
-                <div className="p-2 space-y-2">
-                  <Button
-                    type="button"
-                    variant="outline"
-                    size="sm"
-                    onClick={removeBordersFromTable}
-                    className="w-full text-xs justify-start"
-                  >
-                    Remove All Borders
-                  </Button>
-                  <Button
-                    type="button"
-                    variant="outline"
-                    size="sm"
-                    onClick={resetTableBorders}
-                    className="w-full text-xs justify-start"
-                  >
-                    Default Borders
-                  </Button>
-                  <Button
-                    type="button"
-                    variant="outline"
-                    size="sm"
-                    onClick={applyGoldBorders}
-                    className="w-full text-xs justify-start"
-                  >
-                    Gold Borders
-                  </Button>
-                </div>
-
-                <DropdownMenuSeparator />
-                <DropdownMenuLabel>Cell Background</DropdownMenuLabel>
-                <DropdownMenuSeparator />
-                
-                <div className="p-2 space-y-3">
-                  <div>
-                    <label className="text-xs font-medium mb-1 block">Background Color</label>
-                    <div className="flex gap-2">
+                    <div className="p-2 space-y-2">
                       <Input
                         type="color"
                         value={cellBgColor}
                         onChange={(e) => setCellBgColor(e.target.value)}
-                        className="h-8 w-16 p-1 cursor-pointer"
+                        className="h-10 w-full cursor-pointer"
                       />
-                      <div className="flex gap-1 flex-wrap flex-1">
-                        <button
-                          type="button"
-                          className="w-6 h-6 rounded border border-input bg-white"
-                          onClick={() => setCellBgColor('#ffffff')}
-                          title="White"
-                        />
-                        <button
-                          type="button"
-                          className="w-6 h-6 rounded border border-input bg-gray-200"
-                          onClick={() => setCellBgColor('#e5e7eb')}
-                          title="Light Gray"
-                        />
-                        <button
-                          type="button"
-                          className="w-6 h-6 rounded border border-input"
-                          style={{ backgroundColor: 'hsl(var(--primary) / 0.1)' }}
-                          onClick={() => setCellBgColor('hsl(var(--primary) / 0.1)')}
-                          title="Light Gold"
-                        />
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                <DropdownMenuSeparator />
-                <DropdownMenuLabel>Column Width</DropdownMenuLabel>
-                <DropdownMenuSeparator />
-                
-                <div className="p-2 space-y-3">
-                  <div>
-                    <label className="text-xs font-medium mb-1 block">Set Width for Selected Column</label>
-                    <div className="flex gap-2">
-                      <Input
-                        type="number"
-                        value={columnWidth}
-                        onChange={(e) => setColumnWidth(e.target.value)}
-                        placeholder="Width"
-                        className="h-8 text-xs flex-1"
-                        min="10"
-                      />
-                      <div className="flex gap-1">
-                        <Button
-                          type="button"
-                          variant={columnWidthUnit === 'px' ? 'default' : 'outline'}
-                          size="sm"
-                          onClick={() => setColumnWidthUnit('px')}
-                          className="text-xs h-8 px-2"
-                        >
-                          px
-                        </Button>
-                        <Button
-                          type="button"
-                          variant={columnWidthUnit === '%' ? 'default' : 'outline'}
-                          size="sm"
-                          onClick={() => setColumnWidthUnit('%')}
-                          className="text-xs h-8 px-2"
-                        >
-                          %
-                        </Button>
-                      </div>
-                    </div>
-                    <Button
-                      type="button"
-                      size="sm"
-                      onClick={applyColumnWidth}
-                      className="w-full mt-2"
-                      disabled={!columnWidth}
-                    >
-                      Apply Width
-                    </Button>
-                  </div>
-                  <div className="space-y-1">
-                    <p className="text-xs text-muted-foreground">Quick presets:</p>
-                    <div className="grid grid-cols-3 gap-1">
                       <Button
                         type="button"
-                        variant="outline"
                         size="sm"
-                        onClick={() => {
-                          setColumnWidth('100');
-                          setColumnWidthUnit('px');
-                        }}
-                        className="text-xs h-7"
+                        onClick={() => applyCellBackground(cellBgColor, applyToAllCells)}
+                        className="w-full"
                       >
-                        Narrow
+                        Apply Background
                       </Button>
                       <Button
                         type="button"
                         variant="outline"
                         size="sm"
                         onClick={() => {
-                          setColumnWidth('200');
-                          setColumnWidthUnit('px');
+                          setCellBgColor('transparent');
+                          applyCellBackground('transparent', applyToAllCells);
                         }}
-                        className="text-xs h-7"
+                        className="w-full"
                       >
-                        Medium
-                      </Button>
-                      <Button
-                        type="button"
-                        variant="outline"
-                        size="sm"
-                        onClick={() => {
-                          setColumnWidth('300');
-                          setColumnWidthUnit('px');
-                        }}
-                        className="text-xs h-7"
-                      >
-                        Wide
+                        Remove Background
                       </Button>
                     </div>
-                  </div>
-                </div>
-              </DropdownMenuContent>
-            </DropdownMenu>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              </TooltipTrigger>
+              <TooltipContent>Table Borders & Style</TooltipContent>
+            </Tooltip>
           </>
         )}
 
