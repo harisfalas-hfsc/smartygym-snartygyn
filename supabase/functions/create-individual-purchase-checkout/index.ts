@@ -26,6 +26,25 @@ serve(async (req) => {
     const user = data.user;
     if (!user?.email) throw new Error("User not authenticated");
 
+    // 🚨 CRITICAL: Check if user is premium (cannot purchase standalone)
+    const { data: subscription } = await supabaseClient
+      .from('user_subscriptions')
+      .select('status, plan_type')
+      .eq('user_id', user.id)
+      .eq('status', 'active')
+      .maybeSingle();
+
+    if (subscription && (subscription.plan_type === 'gold' || subscription.plan_type === 'platinum')) {
+      return new Response(
+        JSON.stringify({ 
+          error: "Premium members have access to all content. Individual purchases are not available." 
+        }), {
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+          status: 403,
+        }
+      );
+    }
+
     const stripe = new Stripe(Deno.env.get("STRIPE_SECRET_KEY") || "", {
       apiVersion: "2025-08-27.basil",
     });

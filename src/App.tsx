@@ -7,6 +7,7 @@ import { ThemeProvider } from "next-themes";
 import { useEffect } from "react";
 import { ProtectedRoute } from "./components/ProtectedRoute";
 import { AuthenticatedLayout } from "./components/AuthenticatedLayout";
+import { AdminRoute } from "./components/AdminRoute";
 import { AccessControlProvider } from "./contexts/AccessControlContext";
 import { Navigation } from "./components/Navigation";
 import { Footer } from "./components/Footer";
@@ -122,10 +123,25 @@ const AppContent = () => {
                   <Route path="/bmrcalculator" element={<BMRCalculator />} />
                   <Route path="/macrocalculator" element={<MacroTrackingCalculator />} />
                   <Route path="/caloriecalculator" element={<MacroTrackingCalculator />} />
-                  <Route path="/admin" element={<AdminBackoffice />} />
-                  <Route path="/admin/migrate" element={<MigrateContent />} />
-                  <Route path="/admin/process-logo" element={<ProcessLogo />} />
                 </Route>
+                
+                {/* Admin Routes with Role Check */}
+                <Route path="/admin" element={
+                  <AdminRoute>
+                    <AdminBackoffice />
+                  </AdminRoute>
+                } />
+                <Route path="/admin/migrate" element={
+                  <AdminRoute>
+                    <MigrateContent />
+                  </AdminRoute>
+                } />
+                <Route path="/admin/process-logo" element={
+                  <AdminRoute>
+                    <ProcessLogo />
+                  </AdminRoute>
+                } />
+                
                 
                 {/* Public routes */}
                 
