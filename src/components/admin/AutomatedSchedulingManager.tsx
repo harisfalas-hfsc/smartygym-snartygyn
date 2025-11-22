@@ -90,13 +90,17 @@ export const AutomatedSchedulingManager = () => {
       const { data, error } = await supabase.rpc('pg_cron_enabled' as any);
       
       if (error) {
-        console.log("pg_cron check result:", error);
+        if (import.meta.env.DEV) {
+          console.log("pg_cron check result:", error);
+        }
         setCronJobsEnabled(false);
       } else {
         setCronJobsEnabled(true);
       }
     } catch (err) {
-      console.log("Error checking cron status:", err);
+      if (import.meta.env.DEV) {
+        console.log("Error checking cron status:", err);
+      }
       setCronJobsEnabled(false);
     }
     setLoading(false);
@@ -118,7 +122,9 @@ export const AutomatedSchedulingManager = () => {
         description: `${functionName} executed successfully`,
       });
       
-      console.log("Function result:", data);
+      if (import.meta.env.DEV) {
+        console.log("Function result:", data);
+      }
     } catch (error) {
       console.error("Function test error:", error);
       toast({

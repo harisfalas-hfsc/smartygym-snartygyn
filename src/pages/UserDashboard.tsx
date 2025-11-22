@@ -241,7 +241,9 @@ export default function UserDashboard() {
       ]);
       
     } catch (error) {
-      console.error("Error initializing dashboard:", error);
+      if (import.meta.env.DEV) {
+        console.error("Error initializing dashboard:", error);
+      }
       toast({
         title: "Error",
         description: "Failed to load dashboard. Please refresh the page.",
@@ -273,7 +275,9 @@ export default function UserDashboard() {
       if (error) throw error;
       if (data) setWorkoutInteractions(data);
     } catch (error) {
-      console.error("Error fetching workout interactions:", error);
+      if (import.meta.env.DEV) {
+        console.error("Error fetching workout interactions:", error);
+      }
     }
   };
 
@@ -288,7 +292,9 @@ export default function UserDashboard() {
       if (error) throw error;
       if (data) setProgramInteractions(data);
     } catch (error) {
-      console.error("Error fetching program interactions:", error);
+      if (import.meta.env.DEV) {
+        console.error("Error fetching program interactions:", error);
+      }
     }
   };
 
@@ -331,7 +337,9 @@ export default function UserDashboard() {
         setCalorieHistory(calorieResult.value.data);
       }
     } catch (error) {
-      console.error("Error fetching calculator history:", error);
+      if (import.meta.env.DEV) {
+        console.error("Error fetching calculator history:", error);
+      }
     }
   };
 
@@ -347,7 +355,9 @@ export default function UserDashboard() {
         .maybeSingle();
 
       if (dbError) {
-        console.error("Dashboard subscription error:", dbError);
+        if (import.meta.env.DEV) {
+          console.error("Dashboard subscription error:", dbError);
+        }
         return;
       }
 
@@ -376,7 +386,9 @@ export default function UserDashboard() {
         });
       }
     } catch (error) {
-      console.error("Error checking subscription:", error);
+      if (import.meta.env.DEV) {
+        console.error("Error checking subscription:", error);
+      }
     }
   };
 
@@ -425,7 +437,9 @@ export default function UserDashboard() {
 
   const handleManageSubscription = async () => {
     if (!user) {
-      console.error("No user found when trying to manage subscription");
+      if (import.meta.env.DEV) {
+        console.error("No user found when trying to manage subscription");
+      }
       toast({
         title: "Error",
         description: "Please log in to manage your subscription.",
@@ -434,7 +448,9 @@ export default function UserDashboard() {
       return;
     }
     
-    console.log("Opening customer portal for user:", user.id);
+    if (import.meta.env.DEV) {
+      console.log("Opening customer portal for user:", user.id);
+    }
     setOpeningPortal(true);
     
     try {
@@ -444,22 +460,30 @@ export default function UserDashboard() {
         throw new Error("No active session found");
       }
 
-      console.log("Invoking customer-portal function...");
+      if (import.meta.env.DEV) {
+        console.log("Invoking customer-portal function...");
+      }
       const { data, error } = await supabase.functions.invoke('customer-portal', {
         headers: {
           Authorization: `Bearer ${session.access_token}`
         }
       });
       
-      console.log("Customer portal response:", { data, error });
+      if (import.meta.env.DEV) {
+        console.log("Customer portal response:", { data, error });
+      }
       
       if (error) {
-        console.error("Customer portal error:", error);
+        if (import.meta.env.DEV) {
+          console.error("Customer portal error:", error);
+        }
         throw error;
       }
       
       if (data?.url) {
-        console.log("Opening portal URL:", data.url);
+        if (import.meta.env.DEV) {
+          console.log("Opening portal URL:", data.url);
+        }
         window.open(data.url, '_blank');
         toast({
           title: "Opening subscription portal",
@@ -475,7 +499,9 @@ export default function UserDashboard() {
         throw new Error("No portal URL returned");
       }
     } catch (error) {
-      console.error('Error opening customer portal:', error);
+      if (import.meta.env.DEV) {
+        console.error('Error opening customer portal:', error);
+      }
       
       const errorMessage = error instanceof Error ? error.message : String(error);
       const isConfigError = errorMessage.includes("No configuration") || 
@@ -519,7 +545,9 @@ export default function UserDashboard() {
         description: "Your subscription status has been updated from Stripe",
       });
     } catch (error) {
-      console.error('Error refreshing subscription:', error);
+      if (import.meta.env.DEV) {
+        console.error('Error refreshing subscription:', error);
+      }
       toast({
         title: "Error",
         description: "Failed to refresh subscription status. Please try again.",

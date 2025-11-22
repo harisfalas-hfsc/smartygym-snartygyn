@@ -91,7 +91,9 @@ export const ContactManager = () => {
               });
             }
           } catch (error) {
-            console.error('Error sending admin notification:', error);
+            if (import.meta.env.DEV) {
+              console.error('Error sending admin notification:', error);
+            }
           }
         }
       )
@@ -107,7 +109,9 @@ export const ContactManager = () => {
       const { data: { user } } = await supabase.auth.getUser();
       
       if (!user) {
-        console.error('[ContactManager] No user session');
+        if (import.meta.env.DEV) {
+          console.error('[ContactManager] No user session');
+        }
         setIsAdminVerified(false);
         return;
       }
@@ -121,7 +125,9 @@ export const ContactManager = () => {
         .maybeSingle();
 
       if (roleError || !roleData) {
-        console.error('[ContactManager] Not an admin:', roleError);
+        if (import.meta.env.DEV) {
+          console.error('[ContactManager] Not an admin:', roleError);
+        }
         setIsAdminVerified(false);
         toast({
           title: "Access Denied",
@@ -133,7 +139,9 @@ export const ContactManager = () => {
 
       setIsAdminVerified(true);
     } catch (error) {
-      console.error('[ContactManager] Error verifying admin access:', error);
+      if (import.meta.env.DEV) {
+        console.error('[ContactManager] Error verifying admin access:', error);
+      }
       setIsAdminVerified(false);
     }
   };
@@ -182,7 +190,9 @@ export const ContactManager = () => {
       .order('created_at', { ascending: false });
 
     if (error) {
-      console.error('Error fetching messages:', error);
+      if (import.meta.env.DEV) {
+        console.error('Error fetching messages:', error);
+      }
       toast({
         title: "Error",
         description: "Failed to load contact messages",
@@ -211,7 +221,9 @@ export const ContactManager = () => {
         const { data: { user }, error: authError } = await supabase.auth.getUser();
         
         if (authError || !user) {
-          console.error('[ContactManager] Auth validation failed:', authError);
+          if (import.meta.env.DEV) {
+            console.error('[ContactManager] Auth validation failed:', authError);
+          }
           toast({
             title: "Authentication Error",
             description: "Your session has expired. Please refresh and log in again.",
@@ -229,7 +241,9 @@ export const ContactManager = () => {
           .single();
 
         if (roleError || !roleData) {
-          console.error('[ContactManager] Admin role check failed:', roleError);
+          if (import.meta.env.DEV) {
+            console.error('[ContactManager] Admin role check failed:', roleError);
+          }
           toast({
             title: "Permission Denied",
             description: "You do not have admin privileges.",
@@ -246,14 +260,16 @@ export const ContactManager = () => {
           .select();
         
         if (error) {
-          console.error('[ContactManager] Mark as read failed - Full error details:', {
-            message: error.message,
-            code: error.code,
-            details: error.details,
-            hint: error.hint,
-            messageId: message.id,
-            userId: user.id
-          });
+          if (import.meta.env.DEV) {
+            console.error('[ContactManager] Mark as read failed - Full error details:', {
+              message: error.message,
+              code: error.code,
+              details: error.details,
+              hint: error.hint,
+              messageId: message.id,
+              userId: user.id
+            });
+          }
           
           toast({
             title: "Database Error",
@@ -261,16 +277,20 @@ export const ContactManager = () => {
             variant: "destructive",
           });
         } else {
-          console.log('[ContactManager] Successfully marked message as read:', data);
+          if (import.meta.env.DEV) {
+            console.log('[ContactManager] Successfully marked message as read:', data);
+          }
           fetchMessages();
         }
       } catch (e: any) {
-        console.error('[ContactManager] Unexpected error marking as read:', {
-          error: e,
-          message: e?.message,
-          stack: e?.stack,
-          messageId: message.id
-        });
+        if (import.meta.env.DEV) {
+          console.error('[ContactManager] Unexpected error marking as read:', {
+            error: e,
+            message: e?.message,
+            stack: e?.stack,
+            messageId: message.id
+          });
+        }
         
         toast({
           title: "Unexpected Error",
@@ -300,12 +320,14 @@ export const ContactManager = () => {
         .eq('id', messageId);
 
       if (error) {
-        console.error('[ContactManager] Status update failed:', {
-          message: error.message,
-          code: error.code,
-          details: error.details,
-          messageId
-        });
+        if (import.meta.env.DEV) {
+          console.error('[ContactManager] Status update failed:', {
+            message: error.message,
+            code: error.code,
+            details: error.details,
+            messageId
+          });
+        }
         
         toast({
           title: "Database Error",
@@ -321,7 +343,9 @@ export const ContactManager = () => {
       });
       fetchMessages();
     } catch (e: any) {
-      console.error('[ContactManager] Unexpected error updating status:', e);
+      if (import.meta.env.DEV) {
+        console.error('[ContactManager] Unexpected error updating status:', e);
+      }
       toast({
         title: "Unexpected Error",
         description: e?.message || "Failed to update status",
@@ -379,7 +403,9 @@ export const ContactManager = () => {
       
       fetchMessages();
     } catch (error) {
-      console.error('Upload error:', error);
+      if (import.meta.env.DEV) {
+        console.error('Upload error:', error);
+      }
       toast({
         title: "Error",
         description: "Failed to upload attachments",
@@ -407,7 +433,9 @@ export const ContactManager = () => {
         .eq('id', selectedMessage.id);
 
       if (error) {
-        console.error('[ContactManager] Save response failed:', error);
+        if (import.meta.env.DEV) {
+          console.error('[ContactManager] Save response failed:', error);
+        }
         toast({
           title: "Error",
           description: "Failed to save response",
@@ -441,7 +469,9 @@ export const ContactManager = () => {
             }
           });
         } catch (notificationError) {
-          console.error('[ContactManager] Error sending notifications:', notificationError);
+          if (import.meta.env.DEV) {
+            console.error('[ContactManager] Error sending notifications:', notificationError);
+          }
         }
       }
 
@@ -452,7 +482,9 @@ export const ContactManager = () => {
       setShowMessageDialog(false);
       fetchMessages();
     } catch (e) {
-      console.error('[ContactManager] Unexpected error sending response:', e);
+      if (import.meta.env.DEV) {
+        console.error('[ContactManager] Unexpected error sending response:', e);
+      }
       toast({
         title: "Error",
         description: "Failed to send response",

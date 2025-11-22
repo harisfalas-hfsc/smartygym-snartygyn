@@ -33,16 +33,18 @@ export const AccessGate = ({
   const navigate = useNavigate();
 
   // Debug logging for access control decisions
-  console.log('[AccessGate] Access check:', {
-    requirePremium,
-    requireAuth,
-    userTier,
-    contentId,
-    contentType,
-    contentName,
-    isLoading,
-    user: user?.id
-  });
+  if (import.meta.env.DEV) {
+    console.log('[AccessGate] Access check:', {
+      requirePremium,
+      requireAuth,
+      userTier,
+      contentId,
+      contentType,
+      contentName,
+      isLoading,
+      user: user?.id
+    });
+  }
 
   // FREE CONTENT: Skip all checks if not premium required
   if (!requirePremium) {
@@ -187,7 +189,9 @@ export const AccessGate = ({
 
   // SECURITY FIX: Block premium content for non-premium users
   if (requirePremium && userTier !== "premium") {
-    console.log('[AccessGate] BLOCKING: User tier is not premium', { userTier, requirePremium });
+    if (import.meta.env.DEV) {
+      console.log('[AccessGate] BLOCKING: User tier is not premium', { userTier, requirePremium });
+    }
     
     return (
       <div className="flex items-center justify-center min-h-[400px] p-4">
@@ -221,6 +225,8 @@ export const AccessGate = ({
     );
   }
 
-  console.log('[AccessGate] GRANTING ACCESS', { userTier, requirePremium });
+  if (import.meta.env.DEV) {
+    console.log('[AccessGate] GRANTING ACCESS', { userTier, requirePremium });
+  }
   return <>{children}</>;
 };

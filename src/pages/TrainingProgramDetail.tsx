@@ -381,7 +381,9 @@ const TrainingProgramDetail = () => {
     return program.category?.toUpperCase().includes(mappedCategory);
   });
   
-  console.log("📦 Category filtered programs:", currentTypePrograms.length);
+  if (import.meta.env.DEV) {
+    console.log("📦 Category filtered programs:", currentTypePrograms.length);
+  }
 
   // Filter and sort programs with memoization
   const filteredPrograms = useMemo(() => {
