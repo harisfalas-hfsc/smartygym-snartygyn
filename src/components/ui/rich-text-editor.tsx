@@ -89,6 +89,9 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({
   const [showImageDialog, setShowImageDialog] = useState(false);
   const [imageUrl, setImageUrl] = useState('');
   const [isUploading, setIsUploading] = useState(false);
+  const [showTableStyleDialog, setShowTableStyleDialog] = useState(false);
+  const [tableBorderColor, setTableBorderColor] = useState('default');
+  const [tableBgColor, setTableBgColor] = useState('none');
 
   const editor = useEditor({
     extensions: [
@@ -111,9 +114,12 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({
           class: 'editor-image',
         },
       }),
-      Table.configure({
-        resizable: false,
-      }),
+        Table.configure({
+          resizable: false,
+          HTMLAttributes: {
+            class: '',
+          },
+        }),
       TableRow,
       TableHeader,
       TableCell,
@@ -196,6 +202,35 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({
     if (file) {
       uploadImage(file);
     }
+  };
+
+  const applyTableStyles = () => {
+    const classes: string[] = [];
+    
+    // Border color classes
+    if (tableBorderColor === 'gold') classes.push('table-border-gold');
+    if (tableBorderColor === 'black') classes.push('table-border-black');
+    if (tableBorderColor === 'gray') classes.push('table-border-gray');
+    if (tableBorderColor === 'blue') classes.push('table-border-blue');
+    if (tableBorderColor === 'red') classes.push('table-border-red');
+    if (tableBorderColor === 'borderless') classes.push('table-borderless');
+    
+    // Background color classes
+    if (tableBgColor === 'gold') classes.push('table-bg-gold');
+    if (tableBgColor === 'black') classes.push('table-bg-black');
+    if (tableBgColor === 'gray') classes.push('table-bg-gray');
+    if (tableBgColor === 'blue') classes.push('table-bg-blue');
+    if (tableBgColor === 'red') classes.push('table-bg-red');
+    
+    // Apply the classes to the table
+    editor.chain().focus().updateAttributes('table', {
+      class: classes.join(' ')
+    }).run();
+    
+    // Close dialog and reset
+    setShowTableStyleDialog(false);
+    setTableBorderColor('default');
+    setTableBgColor('none');
   };
 
   return (
@@ -572,10 +607,13 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({
               <TooltipContent>Table Operations</TooltipContent>
             </Tooltip>
             <DropdownMenuContent side="bottom" align="center" collisionPadding={8}>
-              <DropdownMenuItem onSelect={() => setShowTableDialog(true)}>
-                Insert Table
-              </DropdownMenuItem>
-              <DropdownMenuSeparator />
+                <DropdownMenuItem onSelect={() => setShowTableDialog(true)}>
+                  Insert Table
+                </DropdownMenuItem>
+                <DropdownMenuItem onSelect={() => setShowTableStyleDialog(true)}>
+                  Table Styles...
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
               <DropdownMenuItem
                 onSelect={() => editor?.chain().focus().addRowBefore().run()}
               >
@@ -743,6 +781,215 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({
         </DialogContent>
       </Dialog>
 
+      {/* Table Style Dialog */}
+      <Dialog open={showTableStyleDialog} onOpenChange={setShowTableStyleDialog}>
+        <DialogContent className="sm:max-w-[500px]">
+          <DialogHeader>
+            <DialogTitle>Table Styles</DialogTitle>
+          </DialogHeader>
+          <div className="grid gap-6 py-4">
+            {/* Border Color Section */}
+            <div className="space-y-3">
+              <Label className="text-base font-semibold">Border Color</Label>
+              <div className="grid gap-2">
+                <label className="flex items-center space-x-3 cursor-pointer">
+                  <input
+                    type="radio"
+                    name="borderColor"
+                    value="default"
+                    checked={tableBorderColor === 'default'}
+                    onChange={(e) => setTableBorderColor(e.target.value)}
+                    className="w-4 h-4"
+                  />
+                  <span>Default (Gray Border)</span>
+                </label>
+                <label className="flex items-center space-x-3 cursor-pointer">
+                  <input
+                    type="radio"
+                    name="borderColor"
+                    value="gold"
+                    checked={tableBorderColor === 'gold'}
+                    onChange={(e) => setTableBorderColor(e.target.value)}
+                    className="w-4 h-4"
+                  />
+                  <span className="flex items-center">
+                    Gold Border
+                    <span className="ml-2 w-6 h-6 rounded border-2 border-[#D4AF37]" />
+                  </span>
+                </label>
+                <label className="flex items-center space-x-3 cursor-pointer">
+                  <input
+                    type="radio"
+                    name="borderColor"
+                    value="black"
+                    checked={tableBorderColor === 'black'}
+                    onChange={(e) => setTableBorderColor(e.target.value)}
+                    className="w-4 h-4"
+                  />
+                  <span className="flex items-center">
+                    Black Border
+                    <span className="ml-2 w-6 h-6 rounded border-2 border-black" />
+                  </span>
+                </label>
+                <label className="flex items-center space-x-3 cursor-pointer">
+                  <input
+                    type="radio"
+                    name="borderColor"
+                    value="gray"
+                    checked={tableBorderColor === 'gray'}
+                    onChange={(e) => setTableBorderColor(e.target.value)}
+                    className="w-4 h-4"
+                  />
+                  <span className="flex items-center">
+                    Gray Border
+                    <span className="ml-2 w-6 h-6 rounded border-2 border-gray-400" />
+                  </span>
+                </label>
+                <label className="flex items-center space-x-3 cursor-pointer">
+                  <input
+                    type="radio"
+                    name="borderColor"
+                    value="blue"
+                    checked={tableBorderColor === 'blue'}
+                    onChange={(e) => setTableBorderColor(e.target.value)}
+                    className="w-4 h-4"
+                  />
+                  <span className="flex items-center">
+                    Blue Border
+                    <span className="ml-2 w-6 h-6 rounded border-2 border-blue-500" />
+                  </span>
+                </label>
+                <label className="flex items-center space-x-3 cursor-pointer">
+                  <input
+                    type="radio"
+                    name="borderColor"
+                    value="red"
+                    checked={tableBorderColor === 'red'}
+                    onChange={(e) => setTableBorderColor(e.target.value)}
+                    className="w-4 h-4"
+                  />
+                  <span className="flex items-center">
+                    Red Border
+                    <span className="ml-2 w-6 h-6 rounded border-2 border-red-500" />
+                  </span>
+                </label>
+                <label className="flex items-center space-x-3 cursor-pointer">
+                  <input
+                    type="radio"
+                    name="borderColor"
+                    value="borderless"
+                    checked={tableBorderColor === 'borderless'}
+                    onChange={(e) => setTableBorderColor(e.target.value)}
+                    className="w-4 h-4"
+                  />
+                  <span>Borderless (No Border)</span>
+                </label>
+              </div>
+            </div>
+
+            <Separator />
+
+            {/* Background Color Section */}
+            <div className="space-y-3">
+              <Label className="text-base font-semibold">Background Color</Label>
+              <div className="grid gap-2">
+                <label className="flex items-center space-x-3 cursor-pointer">
+                  <input
+                    type="radio"
+                    name="bgColor"
+                    value="none"
+                    checked={tableBgColor === 'none'}
+                    onChange={(e) => setTableBgColor(e.target.value)}
+                    className="w-4 h-4"
+                  />
+                  <span>None (Transparent)</span>
+                </label>
+                <label className="flex items-center space-x-3 cursor-pointer">
+                  <input
+                    type="radio"
+                    name="bgColor"
+                    value="gold"
+                    checked={tableBgColor === 'gold'}
+                    onChange={(e) => setTableBgColor(e.target.value)}
+                    className="w-4 h-4"
+                  />
+                  <span className="flex items-center">
+                    Gold Background
+                    <span className="ml-2 w-6 h-6 rounded bg-[#FFF8DC]" />
+                  </span>
+                </label>
+                <label className="flex items-center space-x-3 cursor-pointer">
+                  <input
+                    type="radio"
+                    name="bgColor"
+                    value="black"
+                    checked={tableBgColor === 'black'}
+                    onChange={(e) => setTableBgColor(e.target.value)}
+                    className="w-4 h-4"
+                  />
+                  <span className="flex items-center">
+                    Black Background
+                    <span className="ml-2 w-6 h-6 rounded bg-gray-800" />
+                  </span>
+                </label>
+                <label className="flex items-center space-x-3 cursor-pointer">
+                  <input
+                    type="radio"
+                    name="bgColor"
+                    value="gray"
+                    checked={tableBgColor === 'gray'}
+                    onChange={(e) => setTableBgColor(e.target.value)}
+                    className="w-4 h-4"
+                  />
+                  <span className="flex items-center">
+                    Gray Background
+                    <span className="ml-2 w-6 h-6 rounded bg-gray-100" />
+                  </span>
+                </label>
+                <label className="flex items-center space-x-3 cursor-pointer">
+                  <input
+                    type="radio"
+                    name="bgColor"
+                    value="blue"
+                    checked={tableBgColor === 'blue'}
+                    onChange={(e) => setTableBgColor(e.target.value)}
+                    className="w-4 h-4"
+                  />
+                  <span className="flex items-center">
+                    Blue Background
+                    <span className="ml-2 w-6 h-6 rounded bg-blue-50" />
+                  </span>
+                </label>
+                <label className="flex items-center space-x-3 cursor-pointer">
+                  <input
+                    type="radio"
+                    name="bgColor"
+                    value="red"
+                    checked={tableBgColor === 'red'}
+                    onChange={(e) => setTableBgColor(e.target.value)}
+                    className="w-4 h-4"
+                  />
+                  <span className="flex items-center">
+                    Red Background
+                    <span className="ml-2 w-6 h-6 rounded bg-red-50" />
+                  </span>
+                </label>
+              </div>
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => {
+              setShowTableStyleDialog(false);
+              setTableBorderColor('default');
+              setTableBgColor('none');
+            }}>
+              Cancel
+            </Button>
+            <Button onClick={applyTableStyles}>Apply Styles</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
       <style>{`
         .ProseMirror {
           outline: none;
@@ -856,6 +1103,64 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({
 
         .ProseMirror.resize-cursor {
           cursor: col-resize;
+        }
+
+        /* Table Border Color Classes */
+        .ProseMirror table.table-border-gold td,
+        .ProseMirror table.table-border-gold th {
+          border-color: #D4AF37 !important;
+        }
+
+        .ProseMirror table.table-border-black td,
+        .ProseMirror table.table-border-black th {
+          border-color: #000000 !important;
+        }
+
+        .ProseMirror table.table-border-gray td,
+        .ProseMirror table.table-border-gray th {
+          border-color: #9CA3AF !important;
+        }
+
+        .ProseMirror table.table-border-blue td,
+        .ProseMirror table.table-border-blue th {
+          border-color: #3B82F6 !important;
+        }
+
+        .ProseMirror table.table-border-red td,
+        .ProseMirror table.table-border-red th {
+          border-color: #EF4444 !important;
+        }
+
+        .ProseMirror table.table-borderless td,
+        .ProseMirror table.table-borderless th {
+          border: none !important;
+        }
+
+        /* Table Background Color Classes */
+        .ProseMirror table.table-bg-gold {
+          background-color: #FFF8DC !important;
+        }
+
+        .ProseMirror table.table-bg-black {
+          background-color: #1F2937 !important;
+          color: white !important;
+        }
+
+        .ProseMirror table.table-bg-black td,
+        .ProseMirror table.table-bg-black th {
+          color: white !important;
+        }
+
+        .ProseMirror table.table-bg-gray {
+          background-color: #F3F4F6 !important;
+        }
+
+        .ProseMirror table.table-bg-blue {
+          background-color: #EFF6FF !important;
+        }
+
+        .ProseMirror table.table-bg-red {
+          background-color: #FEF2F2 !important;
         }
       `}</style>
     </div>
