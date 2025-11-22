@@ -188,32 +188,51 @@ All colors MUST be HSL.
   /* Table drag handle (real element, visible on selected table wrapper) */
   .table-drag-handle {
     position: absolute;
-    left: -24px;
-    top: 8px;
-    width: 16px;
-    height: 24px;
+    left: -36px;
+    top: 0;
+    width: 32px;
+    height: 32px;
     display: none; /* Hidden by default */
     align-items: center;
     justify-content: center;
-    color: hsl(var(--primary));
+    color: white;
     font-weight: bold;
     cursor: grab;
-    font-size: 16px;
+    font-size: 18px;
     line-height: 1;
-    background: hsl(var(--background));
-    border: 1px solid hsl(var(--primary));
-    border-radius: 4px;
-    padding: 4px;
+    background: hsl(var(--primary));
+    border: 2px solid hsl(var(--primary));
+    border-radius: 6px;
+    padding: 0;
     z-index: 10;
     user-select: none;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+    transition: all 0.2s ease;
   }
 
   .table-wrapper.table-selected .table-drag-handle {
     display: flex; /* Show only when table is selected */
+    animation: pulse-drag-handle 2s ease-in-out infinite;
+  }
+
+  @keyframes pulse-drag-handle {
+    0%, 100% {
+      opacity: 1;
+    }
+    50% {
+      opacity: 0.85;
+    }
   }
 
   .table-drag-handle:hover {
-    background: hsl(var(--primary) / 0.1);
+    background: hsl(var(--primary) / 0.9);
+    transform: scale(1.1);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+  }
+
+  .table-drag-handle:active {
+    cursor: grabbing;
+    transform: scale(1.05);
   }
 
   /* Table Alignment Classes */
