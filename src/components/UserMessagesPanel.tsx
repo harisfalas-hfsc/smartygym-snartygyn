@@ -109,32 +109,24 @@ export const UserMessagesPanel = () => {
       const message = contactMessages.find(m => m.id === messageId);
       if (message && message.response && !message.response_read_at) {
         try {
-          const { error, data } = await supabase
+          // Single atomic update
+          const { error } = await supabase
             .from('contact_messages')
             .update({ response_read_at: new Date().toISOString() })
             .eq('id', messageId)
-            .select();
+            .is('response_read_at', null);
           
           if (error) {
-            console.error('[UserMessagesPanel] Mark contact message as read failed:', {
-              message: error.message,
-              code: error.code,
-              details: error.details,
-              messageId,
-              userId: user.id
-            });
-            toast.error(`Failed to mark message as read: ${error.message || 'Unknown error'}`);
-          } else {
-            console.log('[UserMessagesPanel] Successfully marked as read:', data);
-            refetchContact();
-            window.dispatchEvent(new CustomEvent('messages-read'));
+            console.error('[UserMessagesPanel] Mark contact message as read failed:', error);
+            toast.error('Failed to mark message as read');
+            return;
           }
+
+          // Refetch to update UI
+          await refetchContact();
+          window.dispatchEvent(new CustomEvent('messages-read'));
         } catch (e: any) {
-          console.error('[UserMessagesPanel] Unexpected error marking contact message as read:', {
-            error: e,
-            message: e?.message,
-            messageId
-          });
+          console.error('[UserMessagesPanel] Unexpected error:', e);
           toast.error(e?.message || "Failed to mark message as read");
         }
       }

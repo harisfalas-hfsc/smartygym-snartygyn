@@ -53,8 +53,10 @@ export const ContactManager = () => {
   const [filterCategory, setFilterCategory] = useState("all");
   const [selectedTemplate, setSelectedTemplate] = useState<string>("");
   const [uploadingAttachments, setUploadingAttachments] = useState(false);
+  const [isAdminVerified, setIsAdminVerified] = useState(false);
 
   useEffect(() => {
+    verifyAdminAccess();
     fetchMessages();
     fetchTemplates();
 
@@ -99,6 +101,42 @@ export const ContactManager = () => {
       supabase.removeChannel(channel);
     };
   }, []);
+
+  const verifyAdminAccess = async () => {
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      
+      if (!user) {
+        console.error('[ContactManager] No user session');
+        setIsAdminVerified(false);
+        return;
+      }
+
+      // Check admin role
+      const { data: roleData, error: roleError } = await supabase
+        .from('user_roles')
+        .select('role')
+        .eq('user_id', user.id)
+        .eq('role', 'admin')
+        .maybeSingle();
+
+      if (roleError || !roleData) {
+        console.error('[ContactManager] Not an admin:', roleError);
+        setIsAdminVerified(false);
+        toast({
+          title: "Access Denied",
+          description: "Admin access required",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      setIsAdminVerified(true);
+    } catch (error) {
+      console.error('[ContactManager] Error verifying admin access:', error);
+      setIsAdminVerified(false);
+    }
+  };
 
   useEffect(() => {
     // Apply filters

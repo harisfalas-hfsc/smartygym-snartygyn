@@ -1,17 +1,18 @@
-import { useQuery } from "@tanstack/react-query";
+import { useEffect } from "react";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 
 export const useUnreadMessages = () => {
-  return useQuery({
+  const queryClient = useQueryClient();
+
+  const query = useQuery({
     queryKey: ['unread-messages-count'],
     queryFn: async () => {
       try {
-        // Get current session (doesn't throw for guests)
         const { data: { session }, error: sessionError } = await supabase.auth.getSession();
         
         // Return 0 for guests - this is NOT an error
         if (!session?.user) {
-          console.log('[useUnreadMessages] No active session, returning 0 (expected for guests)');
           return 0;
         }
 
@@ -24,14 +25,7 @@ export const useUnreadMessages = () => {
           .eq('user_id', userId)
           .eq('is_read', false);
 
-        if (systemError) {
-          console.error('[useUnreadMessages] System messages error:', {
-            message: systemError.message,
-            code: systemError.code,
-            details: systemError.details
-          });
-          throw systemError;
-        }
+        if (systemError) throw systemError;
 
         // Count unread responses in contact messages
         const { count: contactCount, error: contactError } = await supabase
@@ -41,36 +35,65 @@ export const useUnreadMessages = () => {
           .not('response', 'is', null)
           .is('response_read_at', null);
 
-        if (contactError) {
-          console.error('[useUnreadMessages] Contact messages error:', {
-            message: contactError.message,
-            code: contactError.code,
-            details: contactError.details
-          });
-          throw contactError;
-        }
+        if (contactError) throw contactError;
 
-        const total = (systemCount || 0) + (contactCount || 0);
-        console.log('[useUnreadMessages] Unread count:', { systemCount, contactCount, total, userId });
-        return total;
+        return (systemCount || 0) + (contactCount || 0);
       } catch (error: any) {
-        // Log error but return 0 instead of breaking the UI
-        console.error('[useUnreadMessages] Query failed:', {
-          error,
-          message: error?.message,
-          code: error?.code
-        });
+        console.error('[useUnreadMessages] Query failed:', error);
         return 0;
       }
     },
-    // Refetch every 30 seconds
     refetchInterval: 30000,
-    // Don't retry on auth errors
     retry: (failureCount, error: any) => {
       if (error?.message?.includes('Auth') || error?.code === 'PGRST301') return false;
       return failureCount < 2;
     },
-    // Cache for 25 seconds to reduce requests
     staleTime: 25000,
   });
+
+  // Real-time subscription
+  useEffect(() => {
+    const setupRealtimeSubscription = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session?.user) return;
+
+      const userId = session.user.id;
+
+      const channel = supabase
+        .channel(`user-messages-${userId}`)
+        .on(
+          "postgres_changes",
+          {
+            event: "*",
+            schema: "public",
+            table: "user_system_messages",
+            filter: `user_id=eq.${userId}`,
+          },
+          () => {
+            queryClient.invalidateQueries({ queryKey: ["unread-messages-count"] });
+          }
+        )
+        .on(
+          "postgres_changes",
+          {
+            event: "*",
+            schema: "public",
+            table: "contact_messages",
+            filter: `user_id=eq.${userId}`,
+          },
+          () => {
+            queryClient.invalidateQueries({ queryKey: ["unread-messages-count"] });
+          }
+        )
+        .subscribe();
+
+      return () => {
+        supabase.removeChannel(channel);
+      };
+    };
+
+    setupRealtimeSubscription();
+  }, [queryClient]);
+
+  return query;
 };

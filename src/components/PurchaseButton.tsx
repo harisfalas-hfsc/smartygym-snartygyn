@@ -25,11 +25,14 @@ export const PurchaseButton = ({
 }: PurchaseButtonProps) => {
   const [isProcessing, setIsProcessing] = useState(false);
   const { toast } = useToast();
-  const { user, hasPurchased } = useAccessControl();
+  const { user, hasPurchased, userTier } = useAccessControl();
   const navigate = useNavigate();
 
   // Check if already purchased
   const alreadyPurchased = hasPurchased(contentId, contentType);
+  
+  // NEW: Check if user is premium (cannot purchase)
+  const isPremium = userTier === "premium";
 
   const handlePurchase = async () => {
     if (!user) {
@@ -86,6 +89,15 @@ export const PurchaseButton = ({
       setIsProcessing(false);
     }
   };
+
+  // 🚨 CRITICAL: Premium users cannot purchase standalone content
+  if (isPremium) {
+    return (
+      <Button disabled className="w-full" variant="outline">
+        ✓ Included in Your Premium Plan
+      </Button>
+    );
+  }
 
   if (alreadyPurchased) {
     return (
