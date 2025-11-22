@@ -260,7 +260,15 @@ export const ProgramEditDialog = ({ program, open, onOpenChange, onSave, isPerso
       let stripeProductId = formData.stripe_product_id;
       let stripePriceId = formData.stripe_price_id;
       
-      if (!isPersonalTraining && formData.is_premium && formData.is_standalone_purchase && formData.price && parseFloat(formData.price) > 0) {
+      const shouldCreateStripeProduct =
+        !isPersonalTraining &&
+        formData.is_premium &&
+        formData.is_standalone_purchase &&
+        formData.price &&
+        parseFloat(formData.price) > 0 &&
+        (!stripeProductId || !stripePriceId);
+      
+      if (shouldCreateStripeProduct) {
         const { data: stripeData, error: stripeError } = await supabase.functions.invoke('create-stripe-product', {
           body: {
             name: formData.name,
@@ -738,9 +746,15 @@ export const ProgramEditDialog = ({ program, open, onOpenChange, onSave, isPerso
                         onChange={(e) => setFormData({ ...formData, price: e.target.value })}
                         placeholder="e.g., 29.99"
                       />
-                      <p className="text-sm text-muted-foreground">
-                        This will automatically create a Stripe product when you save
-                      </p>
+                      {!formData.stripe_product_id ? (
+                        <p className="text-sm text-muted-foreground">
+                          This will automatically create a Stripe product when you save.
+                        </p>
+                      ) : (
+                        <p className="text-sm text-muted-foreground">
+                          Stripe product already created for this program.
+                        </p>
+                      )}
                       {formData.stripe_product_id && (
                         <p className="text-xs text-green-600">
                           ✓ Stripe Product ID: {formData.stripe_product_id}
