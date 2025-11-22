@@ -213,6 +213,14 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({
   };
 
   const applyTableStyles = () => {
+    if (!editor) return;
+
+    // Check if cursor is inside a table
+    if (!editor.isActive('table')) {
+      toast.error("Please click inside a table before applying styles");
+      return;
+    }
+
     const classes: string[] = [];
     
     // Border color classes
