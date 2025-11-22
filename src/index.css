@@ -521,9 +521,16 @@ All colors MUST be HSL.
 
   /* A4 Page Container Styles */
   .a4-page {
-    width: 210mm;
+    /* Fill the available dialog/card width, but never exceed true A4 width */
+    width: 100%;
+    max-width: 210mm;
+    
+    /* Keep A4 height semantics for content & print-friendly layout */
     min-height: 297mm;
-    padding: 20mm 25mm;
+    
+    /* Slightly reduced padding to make it more compact on screen */
+    padding: 16mm 18mm;
+    
     margin: 0 auto 20mm;
     background: white;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
