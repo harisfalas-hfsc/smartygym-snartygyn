@@ -58,17 +58,23 @@ export const useAllWorkouts = () => {
     refetchOnMount: "always",
     refetchOnWindowFocus: true,
     queryFn: async () => {
-      console.log("🔍 Fetching ALL workouts...");
+      if (import.meta.env.DEV) {
+        console.log("🔍 Fetching ALL workouts...");
+      }
       const { data, error } = await supabase
         .from("admin_workouts")
         .select("*")
         .order("name");
 
-      console.log("📦 Workouts data:", data);
-      console.log("❌ Workouts error:", error);
+      if (import.meta.env.DEV) {
+        console.log("📦 Workouts data:", data);
+        console.log("❌ Workouts error:", error);
+      }
 
       if (error) {
-        console.error("Error fetching workouts:", error);
+        if (import.meta.env.DEV) {
+          console.error("Error fetching workouts:", error);
+        }
         return [];
       }
 

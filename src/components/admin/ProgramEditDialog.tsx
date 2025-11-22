@@ -377,7 +377,9 @@ export const ProgramEditDialog = ({ program, open, onOpenChange, onSave, isPerso
                 }
               });
             } catch (messageError) {
-              console.error('Error sending dashboard notification:', messageError);
+              if (import.meta.env.DEV) {
+                console.error('Error sending dashboard notification:', messageError);
+              }
             }
           }
         }
@@ -452,9 +454,13 @@ export const ProgramEditDialog = ({ program, open, onOpenChange, onSave, isPerso
                 status: 'pending'
               }]);
             
-            console.log('✅ Notification scheduled for new program:', formData.name);
+            if (import.meta.env.DEV) {
+              console.log('✅ Notification scheduled for new program:', formData.name);
+            }
           } catch (notifError) {
-            console.error('Error scheduling notification:', notifError);
+            if (import.meta.env.DEV) {
+              console.error('Error scheduling notification:', notifError);
+            }
             // Don't fail the program creation if notification fails
           }
 

@@ -293,13 +293,17 @@ const WorkoutDetail = () => {
     return () => clearTimeout(timer);
   }, [searchTerm]);
   
-  console.log("🎯 WorkoutDetail mounted - type:", type);
+  if (import.meta.env.DEV) {
+    console.log("🎯 WorkoutDetail mounted - type:", type);
+  }
   
   // Fetch current user
   useEffect(() => {
     supabase.auth.getUser().then(({ data: { user } }) => {
       setUserId(user?.id);
-      console.log("👤 User ID:", user?.id || "NOT LOGGED IN");
+      if (import.meta.env.DEV) {
+        console.log("👤 User ID:", user?.id || "NOT LOGGED IN");
+      }
     });
   }, []);
   
@@ -329,8 +333,10 @@ const WorkoutDetail = () => {
   const hasActiveFilters = searchTerm || equipmentFilter !== "all" || levelFilter !== "all" || 
     formatFilter !== "all" || durationFilter !== "all" || statusFilter !== "all" || sortBy !== "newest" || accessFilter !== "all";
   
-  console.log("📦 All Workouts:", allWorkouts.length, allWorkouts);
-  console.log("⏳ Loading:", isLoading);
+  if (import.meta.env.DEV) {
+    console.log("📦 All Workouts:", allWorkouts.length, allWorkouts);
+    console.log("⏳ Loading:", isLoading);
+  }
   
   // Map URL type to database category
   const categoryMap: { [key: string]: string } = {
@@ -364,7 +370,9 @@ const WorkoutDetail = () => {
     return categoryMatch;
   });
   
-  console.log("📦 Category filtered workouts:", currentTypeWorkouts.length);
+  if (import.meta.env.DEV) {
+    console.log("📦 Category filtered workouts:", currentTypeWorkouts.length);
+  }
 
   // Filter and sort workouts with memoization
   const filteredWorkouts = useMemo(() => {

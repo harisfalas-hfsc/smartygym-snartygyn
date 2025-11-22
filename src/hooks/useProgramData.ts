@@ -14,7 +14,9 @@ export const useProgramData = (programId: string | undefined) => {
         .single();
 
       if (error) {
-        console.error("Error fetching program:", error);
+        if (import.meta.env.DEV) {
+          console.error("Error fetching program:", error);
+        }
         return null;
       }
 
@@ -32,17 +34,23 @@ export const useAllPrograms = () => {
     refetchOnMount: "always",
     refetchOnWindowFocus: true,
     queryFn: async () => {
-      console.log("🔍 Fetching ALL programs...");
+      if (import.meta.env.DEV) {
+        console.log("🔍 Fetching ALL programs...");
+      }
       const { data, error } = await supabase
         .from("admin_training_programs")
         .select("*")
         .order("name");
 
-      console.log("📦 Programs data:", data);
-      console.log("❌ Programs error:", error);
+      if (import.meta.env.DEV) {
+        console.log("📦 Programs data:", data);
+        console.log("❌ Programs error:", error);
+      }
 
       if (error) {
-        console.error("Error fetching programs:", error);
+        if (import.meta.env.DEV) {
+          console.error("Error fetching programs:", error);
+        }
         return [];
       }
 

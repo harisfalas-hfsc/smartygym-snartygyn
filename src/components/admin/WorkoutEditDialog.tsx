@@ -312,9 +312,13 @@ export const WorkoutEditDialog = ({ workout, open, onOpenChange, onSave }: Worko
               status: 'pending'
             }]);
           
-          console.log('✅ Notification scheduled for new workout:', formData.name);
+          if (import.meta.env.DEV) {
+            console.log('✅ Notification scheduled for new workout:', formData.name);
+          }
         } catch (notifError) {
-          console.error('Error scheduling notification:', notifError);
+          if (import.meta.env.DEV) {
+            console.error('Error scheduling notification:', notifError);
+          }
           // Don't fail the workout creation if notification fails
         }
 

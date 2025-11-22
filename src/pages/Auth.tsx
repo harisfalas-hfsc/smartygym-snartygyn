@@ -37,7 +37,9 @@ export default function Auth() {
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
       if (event === 'SIGNED_OUT') {
         // User signed out, stay on auth page
-        console.log("User signed out");
+        if (import.meta.env.DEV) {
+          console.log("User signed out");
+        }
       } else if (session) {
         // User signed in
         navigate("/userdashboard");
@@ -187,7 +189,7 @@ export default function Auth() {
         // Note: Remember Me feature requires custom_session_duration column
         // To be added via database migration
         // For now, session management is handled by Supabase auth defaults
-        if (rememberMe && data.session) {
+        if (rememberMe && data.session && import.meta.env.DEV) {
           console.log('Remember Me selected - custom session handling pending migration');
         }
 
