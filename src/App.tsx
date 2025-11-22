@@ -13,6 +13,8 @@ import { Navigation } from "./components/Navigation";
 import { Footer } from "./components/Footer";
 import { ScrollToTop } from "./components/ScrollToTop";
 import { CookieConsent } from "./components/CookieConsent";
+import { ErrorBoundary } from "./components/ErrorBoundary";
+import { useSessionExpiry } from "./hooks/useSessionExpiry";
 
 import { SmartyCoach } from "./components/SmartyCoach";
 import { useAdminRole } from "./hooks/useAdminRole";
@@ -69,6 +71,7 @@ const queryClient = new QueryClient();
 
 const AppContent = () => {
   const { isAdmin, loading } = useAdminRole();
+  useSessionExpiry();
   
   useEffect(() => {
     // Track page visit on initial load

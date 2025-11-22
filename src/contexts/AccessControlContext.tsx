@@ -168,7 +168,7 @@ export const AccessControlProvider = ({ children }: { children: ReactNode }) => 
     const { userTier, purchasedContent } = state;
 
     // Public content accessible to all
-    if (contentType === "exercise-library" || contentType === "blog") {
+    if (contentType === "exercise-library" || contentType === "blog" || contentType === "article") {
       return true;
     }
 
@@ -182,17 +182,23 @@ export const AccessControlProvider = ({ children }: { children: ReactNode }) => 
       return true;
     }
 
-    // Subscribers can access free content, tools, and dashboard
-    if (userTier === "subscriber") {
-      return contentType === "free-workout" || 
-             contentType === "free-program" || 
-             contentType === "tool" || 
-             contentType === "calculator" ||
-             contentType === "dashboard";
+    // Premium users can access everything
+    if (userTier === "premium") {
+      return true;
     }
 
-    // Premium users can access everything
-    return true;
+    // Subscribers can access free content, tools, and dashboard
+    // NOTE: For workouts and programs, database verification happens at the component level
+    // via AccessGate which checks the actual is_premium flag from the database
+    if (userTier === "subscriber") {
+      return contentType === "tool" || 
+             contentType === "calculator" ||
+             contentType === "dashboard" ||
+             contentType === "workout" ||
+             contentType === "program";
+    }
+
+    return false;
   };
 
   const hasPurchased = (contentId: string, contentType: string): boolean => {
