@@ -984,6 +984,67 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({
                 </label>
               </div>
             </div>
+
+            <Separator />
+
+            {/* Preview Section */}
+            <div className="space-y-3">
+              <Label className="text-base font-semibold">Preview</Label>
+              <div className="flex justify-center p-4 bg-muted/30 rounded-md">
+                <table 
+                  className={`
+                    ${tableBorderColor === 'gold' ? 'table-border-gold' : ''}
+                    ${tableBorderColor === 'black' ? 'table-border-black' : ''}
+                    ${tableBorderColor === 'gray' ? 'table-border-gray' : ''}
+                    ${tableBorderColor === 'blue' ? 'table-border-blue' : ''}
+                    ${tableBorderColor === 'red' ? 'table-border-red' : ''}
+                    ${tableBorderColor === 'borderless' ? 'table-borderless' : ''}
+                    ${tableBgColor === 'gold' ? 'table-bg-gold' : ''}
+                    ${tableBgColor === 'black' ? 'table-bg-black' : ''}
+                    ${tableBgColor === 'gray' ? 'table-bg-gray' : ''}
+                    ${tableBgColor === 'blue' ? 'table-bg-blue' : ''}
+                    ${tableBgColor === 'red' ? 'table-bg-red' : ''}
+                  `.trim()}
+                  style={{ 
+                    borderCollapse: 'collapse',
+                    fontSize: '0.75rem',
+                    minWidth: '200px'
+                  }}
+                >
+                  <thead>
+                    <tr>
+                      <th style={{ padding: '0.5rem', border: tableBorderColor === 'borderless' ? 'none' : '1px solid' }}>
+                        Header 1
+                      </th>
+                      <th style={{ padding: '0.5rem', border: tableBorderColor === 'borderless' ? 'none' : '1px solid' }}>
+                        Header 2
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td style={{ padding: '0.5rem', border: tableBorderColor === 'borderless' ? 'none' : '1px solid' }}>
+                        Cell 1
+                      </td>
+                      <td style={{ padding: '0.5rem', border: tableBorderColor === 'borderless' ? 'none' : '1px solid' }}>
+                        Cell 2
+                      </td>
+                    </tr>
+                    <tr>
+                      <td style={{ padding: '0.5rem', border: tableBorderColor === 'borderless' ? 'none' : '1px solid' }}>
+                        Cell 3
+                      </td>
+                      <td style={{ padding: '0.5rem', border: tableBorderColor === 'borderless' ? 'none' : '1px solid' }}>
+                        Cell 4
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+              <p className="text-xs text-muted-foreground text-center">
+                This is how your table will look with the selected styles
+              </p>
+            </div>
           </div>
           <DialogFooter>
             <Button variant="outline" onClick={() => {
