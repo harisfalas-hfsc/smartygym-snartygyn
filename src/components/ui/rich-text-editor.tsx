@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useEditor, EditorContent } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
-import { Table } from '@tiptap/extension-table';
+import { TableWithSelectors } from '@/lib/tiptap-extensions/table-with-selectors';
 import { TableRow } from '@tiptap/extension-table-row';
 import { TableCell } from '@tiptap/extension-table-cell';
 import { TableHeader } from '@tiptap/extension-table-header';
@@ -234,8 +234,8 @@ const CustomTableRow = TableRow.extend({
   },
 });
 
-// Extended Table with style presets
-const CustomTable = Table.extend({
+// Extended Table with style presets and row/column selectors
+const CustomTable = TableWithSelectors.extend({
   addAttributes() {
     return {
       ...this.parent?.(),

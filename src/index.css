@@ -285,17 +285,157 @@ All colors MUST be HSL.
     }
   }
 
-  /* Row and Column Selection Indicators */
-  .table-row-selector,
-  .table-col-selector {
-    cursor: pointer;
-    user-select: none;
-    transition: background-color 0.15s ease;
+  /* Table with Selectors Container */
+  .table-with-selectors {
+    position: relative;
+    display: inline-block;
+    margin: 1em 0;
   }
 
-  .table-row-selector:hover,
+  /* Column Header Row */
+  .table-col-header {
+    display: flex;
+    padding-left: 30px;
+    margin-bottom: 4px;
+    gap: 0;
+  }
+
+  .table-col-selector {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex: 1;
+    min-width: 40px;
+    height: 24px;
+    font-size: 11px;
+    font-weight: 600;
+    color: hsl(var(--muted-foreground));
+    background: hsl(var(--muted) / 0.5);
+    border: 1px solid hsl(var(--border));
+    border-radius: 4px 4px 0 0;
+    cursor: pointer;
+    user-select: none;
+    transition: all 0.15s ease;
+  }
+
   .table-col-selector:hover {
-    background-color: hsl(var(--primary) / 0.1);
+    background-color: hsl(var(--primary) / 0.15);
+    color: hsl(var(--primary));
+    border-color: hsl(var(--primary));
+  }
+
+  .table-col-selector.selected {
+    background-color: hsl(var(--primary) / 0.25);
+    color: hsl(var(--primary));
+    font-weight: 700;
+  }
+
+  /* Row Number Column */
+  .table-container-with-rows {
+    display: flex;
+  }
+
+  .table-row-numbers {
+    display: flex;
+    flex-direction: column;
+    margin-right: 4px;
+    gap: 0;
+  }
+
+  .table-row-selector {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 24px;
+    flex: 1;
+    min-height: 40px;
+    font-size: 11px;
+    font-weight: 600;
+    color: hsl(var(--muted-foreground));
+    background: hsl(var(--muted) / 0.5);
+    border: 1px solid hsl(var(--border));
+    border-radius: 4px 0 0 4px;
+    cursor: pointer;
+    user-select: none;
+    transition: all 0.15s ease;
+  }
+
+  .table-row-selector:hover {
+    background-color: hsl(var(--primary) / 0.15);
+    color: hsl(var(--primary));
+    border-color: hsl(var(--primary));
+  }
+
+  .table-row-selector.selected {
+    background-color: hsl(var(--primary) / 0.25);
+    color: hsl(var(--primary));
+    font-weight: 700;
+  }
+
+  /* Highlight Selected Rows/Columns in Table */
+  .ProseMirror table tr.selected-row {
+    background-color: hsl(var(--primary) / 0.1) !important;
+  }
+
+  .ProseMirror table td.selected-col,
+  .ProseMirror table th.selected-col {
+    background-color: hsl(var(--primary) / 0.1) !important;
+  }
+
+  /* Drag Handle Enhancement */
+  .table-wrapper.table-selected::before {
+    cursor: move;
+    user-select: none;
+    transition: all 0.2s ease;
+  }
+
+  .table-wrapper.table-selected::before:hover {
+    background: hsl(var(--primary) / 0.1);
+    border-color: hsl(var(--primary));
+    border-width: 2px;
+    transform: translateX(-50%) scale(1.1);
+  }
+
+  /* Drag Drop Indicator */
+  .table-drop-indicator {
+    position: absolute;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: hsl(var(--primary));
+    pointer-events: none;
+    z-index: 1000;
+    transition: top 0.1s ease;
+  }
+
+  .table-drop-indicator::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: -4px;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: hsl(var(--primary));
+  }
+
+  /* Dragging State for Table */
+  .table-wrapper.dragging {
+    opacity: 0.5;
+    pointer-events: none;
+  }
+
+  /* Mobile: Hide selectors on small screens */
+  @media (max-width: 640px) {
+    .table-col-header,
+    .table-row-numbers {
+      display: none;
+    }
+    
+    .table-wrapper.table-selected::before {
+      cursor: default;
+      pointer-events: none;
+    }
   }
 
   /* Clearfix for floated tables */
