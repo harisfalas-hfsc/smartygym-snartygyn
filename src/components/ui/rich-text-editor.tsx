@@ -799,11 +799,11 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({
 
       {/* Table Style Dialog */}
       <Dialog open={showTableStyleDialog} onOpenChange={setShowTableStyleDialog}>
-        <DialogContent className="sm:max-w-[500px]">
+        <DialogContent className="sm:max-w-[500px] max-h-[85vh] grid grid-rows-[auto,1fr,auto] overflow-hidden">
           <DialogHeader>
             <DialogTitle>Table Styles</DialogTitle>
           </DialogHeader>
-          <div className="grid gap-6 py-4">
+          <div className="grid gap-6 py-4 overflow-y-auto pr-2 min-h-0">
             {/* Border Color Section */}
             <div className="space-y-3">
               <Label className="text-base font-semibold">Border Color</Label>
