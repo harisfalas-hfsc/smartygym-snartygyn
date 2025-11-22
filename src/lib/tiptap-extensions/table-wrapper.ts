@@ -50,8 +50,8 @@ export const TableWrapper = Node.create<TableWrapperOptions>({
         },
       },
       width: {
-        default: '100%',
-        parseHTML: element => element.getAttribute('data-width') || '100%',
+        default: '75%',
+        parseHTML: element => element.getAttribute('data-width') || '75%',
         renderHTML: attributes => {
           return {
             'data-width': attributes.width,

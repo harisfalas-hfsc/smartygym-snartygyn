@@ -274,7 +274,7 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({
   value,
   onChange,
   placeholder = 'Start typing...',
-  minHeight = '200px',
+  minHeight = '600px',
 }) => {
   const [borderColor, setBorderColor] = useState('#000000');
   const [borderWidth, setBorderWidth] = useState('1px');
@@ -795,14 +795,14 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({
   const isTableActive = editor?.isActive('table') || false;
 
   return (
-    <div className="border border-input rounded-md bg-background relative">
-      {/* Floating Table Toolbar */}
+    <div className="space-y-2">
       {isTableActive && (
-        <div className="absolute top-16 left-1/2 transform -translate-x-1/2 z-40">
+        <div className="flex justify-center">
           <TableFloatingToolbar editor={editor} isTableActive={isTableActive} />
         </div>
       )}
       
+      <div className="border border-input rounded-md bg-background">
       <TooltipProvider>
       <div className="flex flex-wrap gap-1 p-2 border-b border-input">
         {/* Basic formatting */}
@@ -2207,6 +2207,7 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({
           background-color: #ffffff;
         }
       `}</style>
+      </div>
     </div>
   );
 };
