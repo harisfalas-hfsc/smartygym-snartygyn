@@ -223,9 +223,12 @@ export const WorkoutDisplay = ({
         
         {/* Description - Below Title */}
         {description && (
-          <p className="text-lg text-foreground/90 leading-relaxed mb-4">
-            {description}
-          </p>
+          <div className="mb-4">
+            <HTMLContent 
+              content={description} 
+              className="prose-base text-foreground/90 leading-relaxed" 
+            />
+          </div>
         )}
         
         {/* Credit Line */}

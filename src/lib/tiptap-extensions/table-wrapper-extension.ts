@@ -80,6 +80,7 @@ export const TableWrapper = Node.create<TableWrapperOptions>({
         'data-table-wrapper': '',
         class: 'table-wrapper',
       }),
+      ['div', { class: 'table-drag-handle' }, '⋮⋮'],
       0,
     ];
   },
@@ -227,8 +228,8 @@ export const TableWrapper = Node.create<TableWrapperOptions>({
               const target = event.target as HTMLElement;
               const wrapper = target.closest('.table-wrapper.table-selected');
               
-              // Check if clicking on drag handle
-              if (wrapper && target.matches('.table-wrapper.table-selected::before')) {
+              // Check if clicking on drag handle (real element now, not pseudo)
+              if (wrapper && target.classList.contains('table-drag-handle')) {
                 // Find table wrapper position
                 const wrapperElement = wrapper as HTMLElement;
                 const { state } = view;

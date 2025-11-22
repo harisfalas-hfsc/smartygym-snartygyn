@@ -7,6 +7,7 @@ import { EmailCaptureBox } from "@/components/EmailCaptureBox";
 
 import { useShowBackButton } from "@/hooks/useShowBackButton";
 import { useAccessControl } from "@/hooks/useAccessControl";
+import { stripHtmlTags } from "@/lib/text";
 
 const FreeContent = () => {
   const navigate = useNavigate();
@@ -155,7 +156,7 @@ const FreeContent = () => {
                       </div>
                       <div>
                         <h3 className="font-semibold text-lg mb-2">{workout.title}</h3>
-                        <p className="text-sm text-muted-foreground mb-3">{workout.description}</p>
+                        <p className="text-sm text-muted-foreground mb-3">{stripHtmlTags(workout.description)}</p>
                         
                         {/* Metadata Labels */}
                         <div className="flex flex-wrap gap-2 justify-center text-xs text-muted-foreground">
@@ -196,7 +197,7 @@ const FreeContent = () => {
                       </div>
                       <div>
                         <h3 className="font-semibold text-lg mb-2">{program.title}</h3>
-                        <p className="text-sm text-muted-foreground mb-3">{program.description}</p>
+                        <p className="text-sm text-muted-foreground mb-3">{stripHtmlTags(program.description)}</p>
                         <span className="text-xs text-muted-foreground bg-muted px-3 py-1 rounded">
                           📅 {program.duration}
                         </span>

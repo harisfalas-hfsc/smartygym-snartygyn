@@ -185,20 +185,35 @@ All colors MUST be HSL.
     border-radius: 4px;
   }
 
-  .table-wrapper.table-selected::before {
-    content: "⋮⋮";
+  /* Table drag handle (real element, visible on selected table wrapper) */
+  .table-drag-handle {
     position: absolute;
-    top: -24px;
-    left: 50%;
-    transform: translateX(-50%);
-    font-size: 16px;
+    left: -24px;
+    top: 8px;
+    width: 16px;
+    height: 24px;
+    display: none; /* Hidden by default */
+    align-items: center;
+    justify-content: center;
     color: hsl(var(--primary));
-    cursor: move;
-    padding: 2px 8px;
+    font-weight: bold;
+    cursor: grab;
+    font-size: 16px;
+    line-height: 1;
     background: hsl(var(--background));
     border: 1px solid hsl(var(--primary));
     border-radius: 4px;
+    padding: 4px;
     z-index: 10;
+    user-select: none;
+  }
+
+  .table-wrapper.table-selected .table-drag-handle {
+    display: flex; /* Show only when table is selected */
+  }
+
+  .table-drag-handle:hover {
+    background: hsl(var(--primary) / 0.1);
   }
 
   /* Table Alignment Classes */
@@ -280,8 +295,15 @@ All colors MUST be HSL.
       outline: none;
     }
 
-    .table-wrapper.table-selected::before {
-      display: none;
+    .table-drag-handle {
+      display: none !important;
+    }
+  }
+
+  /* Mobile: Disable drag handle */
+  @media (max-width: 768px) {
+    .table-drag-handle {
+      display: none !important;
     }
   }
 
@@ -380,20 +402,6 @@ All colors MUST be HSL.
   .ProseMirror table td.selected-col,
   .ProseMirror table th.selected-col {
     background-color: hsl(var(--primary) / 0.1) !important;
-  }
-
-  /* Drag Handle Enhancement */
-  .table-wrapper.table-selected::before {
-    cursor: move;
-    user-select: none;
-    transition: all 0.2s ease;
-  }
-
-  .table-wrapper.table-selected::before:hover {
-    background: hsl(var(--primary) / 0.1);
-    border-color: hsl(var(--primary));
-    border-width: 2px;
-    transform: translateX(-50%) scale(1.1);
   }
 
   /* Drag Drop Indicator */
@@ -525,8 +533,8 @@ All colors MUST be HSL.
     width: 100%;
     max-width: 210mm;
     
-    /* Keep A4 height semantics for content & print-friendly layout */
-    min-height: 297mm;
+    /* NO min-height on screen - shrink to content height */
+    /* A4 height is only enforced in print via @media print below */
     
     /* Slightly reduced padding to make it more compact on screen */
     padding: 16mm 18mm;
