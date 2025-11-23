@@ -1,3 +1,4 @@
+import React from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
@@ -7,7 +8,7 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Dumbbell, Zap, Heart, Activity, Move, Trophy } from "lucide-react";
+import { Dumbbell, Zap, Heart, Activity, Move, Trophy, AlertCircle } from "lucide-react";
 import type { WorkoutGeneratorInputs } from "@/types/workoutGenerator";
 
 const formSchema = z.object({
@@ -72,6 +73,48 @@ export function WorkoutGeneratorForm({ onSubmit, isLoading }: WorkoutGeneratorFo
   const equipmentPreference = watch("equipmentPreference");
   const difficulty = watch("difficulty");
   const bodyFocus = watch("bodyFocus");
+  const currentFormat = watch("format");
+
+  // Smart validation: adjust format options based on workout type
+  const availableFormats = React.useMemo(() => {
+    if (workoutType === "strength") {
+      return [{ value: "reps_sets", label: "Reps & Sets" }];
+    }
+    if (workoutType === "cardio") {
+      return [
+        { value: "tabata", label: "Tabata (20s on / 10s off)" },
+        { value: "circuit", label: "Circuit" },
+        { value: "amrap", label: "AMRAP (As Many Rounds As Possible)" },
+        { value: "for_time", label: "For Time" },
+        { value: "emom", label: "EMOM (Every Minute On the Minute)" },
+        { value: "mix", label: "Mix (Variety)" },
+      ];
+    }
+    return [
+      { value: "tabata", label: "Tabata (20s on / 10s off)" },
+      { value: "circuit", label: "Circuit" },
+      { value: "amrap", label: "AMRAP (As Many Rounds As Possible)" },
+      { value: "for_time", label: "For Time" },
+      { value: "emom", label: "EMOM (Every Minute On the Minute)" },
+      { value: "reps_sets", label: "Reps & Sets" },
+      { value: "mix", label: "Mix (Variety)" },
+    ];
+  }, [workoutType]);
+
+  // Auto-adjust format when workout type changes
+  React.useEffect(() => {
+    const isCurrentFormatAvailable = availableFormats.some(f => f.value === currentFormat);
+    
+    if (!isCurrentFormatAvailable) {
+      setValue("format", availableFormats[0].value as any);
+    }
+  }, [workoutType, availableFormats, currentFormat, setValue]);
+
+  // Show warning for suboptimal combinations
+  const showCardioUpperBodyWarning = 
+    workoutType === "cardio" && 
+    bodyFocus?.length === 1 && 
+    bodyFocus[0] === "upper";
 
   const handleFormSubmit = (data: FormData) => {
     onSubmit(data as WorkoutGeneratorInputs);
@@ -197,15 +240,23 @@ export function WorkoutGeneratorForm({ onSubmit, isLoading }: WorkoutGeneratorFo
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="tabata">Tabata (20s on / 10s off)</SelectItem>
-              <SelectItem value="circuit">Circuit</SelectItem>
-              <SelectItem value="amrap">AMRAP (As Many Rounds As Possible)</SelectItem>
-              <SelectItem value="for_time">For Time</SelectItem>
-              <SelectItem value="emom">EMOM (Every Minute On the Minute)</SelectItem>
-              <SelectItem value="reps_sets">Reps & Sets</SelectItem>
-              <SelectItem value="mix">Mix (Variety)</SelectItem>
+              {availableFormats.map((format) => (
+                <SelectItem key={format.value} value={format.value}>
+                  {format.label}
+                </SelectItem>
+              ))}
             </SelectContent>
           </Select>
+          {workoutType === "strength" && (
+            <p className="text-xs text-muted-foreground">
+              Strength workouts use Reps & Sets format
+            </p>
+          )}
+          {workoutType === "cardio" && (
+            <p className="text-xs text-muted-foreground">
+              Cardio workouts use time-based formats
+            </p>
+          )}
         </div>
 
         <div className="space-y-2">
@@ -246,6 +297,15 @@ export function WorkoutGeneratorForm({ onSubmit, isLoading }: WorkoutGeneratorFo
           ))}
         </div>
         {errors.bodyFocus && <p className="text-sm text-destructive">{errors.bodyFocus.message}</p>}
+        {showCardioUpperBodyWarning && (
+          <div className="flex items-start gap-2 p-3 bg-yellow-500/10 border border-yellow-500/20 rounded-lg">
+            <AlertCircle className="h-4 w-4 text-yellow-600 dark:text-yellow-500 mt-0.5 flex-shrink-0" />
+            <p className="text-xs text-yellow-800 dark:text-yellow-200">
+              <strong>Note:</strong> Cardio exercises are primarily full-body or lower-body focused. 
+              Consider selecting <strong>Full Body</strong> or <strong>Lower</strong> for best results.
+            </p>
+          </div>
+        )}
       </div>
 
       {/* Submit Button */}
