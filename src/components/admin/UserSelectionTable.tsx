@@ -37,21 +37,30 @@ export function UserSelectionTable({ users, selectedUserIds, onSelectionChange }
   
   const someSelected = filteredUsers.some(user => selectedUserIds.includes(user.user_id)) && !allSelected;
 
-  const handleSelectAll = () => {
-    if (allSelected) {
-      // Deselect all filtered users
-      const filteredIds = filteredUsers.map(u => u.user_id);
-      onSelectionChange(selectedUserIds.filter(id => !filteredIds.includes(id)));
-    } else {
-      // Select all filtered users
-      const filteredIds = filteredUsers.map(u => u.user_id);
+  const headerChecked: boolean | "indeterminate" = 
+    allSelected ? true : someSelected ? "indeterminate" : false;
+
+  const handleSelectAll = (checked: boolean | "indeterminate") => {
+    const filteredIds = filteredUsers.map(u => u.user_id);
+    
+    // Treat indeterminate or true as "select all"
+    const shouldSelectAll = checked === true || checked === "indeterminate";
+    
+    if (shouldSelectAll) {
+      // Select all filtered users (add to existing selection)
       const newSelection = [...new Set([...selectedUserIds, ...filteredIds])];
       onSelectionChange(newSelection);
+    } else {
+      // Deselect all filtered users (remove from selection)
+      onSelectionChange(selectedUserIds.filter(id => !filteredIds.includes(id)));
     }
   };
 
   const handleToggleUser = (userId: string) => {
-    if (selectedUserIds.includes(userId)) {
+    const isSelected = selectedUserIds.includes(userId);
+    console.log("Toggle user", userId, "currently selected?", isSelected);
+    
+    if (isSelected) {
       onSelectionChange(selectedUserIds.filter(id => id !== userId));
     } else {
       onSelectionChange([...selectedUserIds, userId]);
@@ -90,7 +99,7 @@ export function UserSelectionTable({ users, selectedUserIds, onSelectionChange }
               <TableRow>
                 <TableHead className="w-12">
                   <Checkbox
-                    checked={allSelected}
+                    checked={headerChecked}
                     onCheckedChange={handleSelectAll}
                   />
                 </TableHead>
