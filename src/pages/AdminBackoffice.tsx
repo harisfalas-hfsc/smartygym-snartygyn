@@ -200,7 +200,7 @@ export default function AdminBackoffice() {
             
             <TabsTrigger value="communications" className="flex items-center justify-center gap-1 sm:gap-1.5 text-xs sm:text-sm px-2 sm:px-3 py-2 sm:py-2.5 whitespace-nowrap flex-shrink-0">
               <MessageSquare className="h-3 w-3 sm:h-4 sm:w-4 shrink-0" />
-              <span className="hidden sm:inline">Comms</span>
+              <span className="hidden sm:inline">Auto-Messages</span>
             </TabsTrigger>
             
             <TabsTrigger value="email" className="flex items-center justify-center gap-1 sm:gap-1.5 text-xs sm:text-sm px-2 sm:px-3 py-2 sm:py-2.5 whitespace-nowrap flex-shrink-0">

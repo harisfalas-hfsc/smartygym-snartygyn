@@ -7,8 +7,9 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
-import { Mail, Send, Users, AlertCircle, CheckCircle2, FileText } from "lucide-react";
+import { Mail, Send, Users, AlertCircle, FileText, Download } from "lucide-react";
 import { toast } from "sonner";
+import { UserSelectionTable } from "./UserSelectionTable";
 
 interface EmailTemplate {
   id: string;
@@ -24,19 +25,12 @@ interface UserData {
   full_name: string | null;
   plan_type: string;
   status: string;
-  user_type: 'registered' | 'newsletter'; // Track user type
-}
-
-interface NewsletterSubscriber {
-  id: string;
-  email: string;
-  name: string;
-  active: boolean;
 }
 
 export function EmailComposer() {
   const [users, setUsers] = useState<UserData[]>([]);
   const [filteredUsers, setFilteredUsers] = useState<UserData[]>([]);
+  const [selectedUserIds, setSelectedUserIds] = useState<string[]>([]);
   const [templates, setTemplates] = useState<EmailTemplate[]>([]);
   const [loading, setLoading] = useState(true);
   const [sending, setSending] = useState(false);
@@ -70,41 +64,21 @@ export function EmailComposer() {
 
       if (subsError) throw subsError;
 
-      // Fetch newsletter subscribers
-      const { data: newsletterSubs, error: newsletterError } = await supabase
-        .from('newsletter_subscribers')
-        .select('id, email, name, active')
-        .eq('active', true);
-
-      if (newsletterError) throw newsletterError;
-
       // Combine registered users with emails
       const registeredUsers: UserData[] = (usersData?.users || []).map((user: any) => {
         const subscription = subscriptions?.find(sub => sub.user_id === user.id);
         
-      return {
-        user_id: user.id,
-        email: user.email,
-        full_name: user.full_name || user.email,
-        plan_type: subscription?.plan_type || 'free',
-        status: subscription?.status || 'inactive',
-        user_type: 'registered' as const,
-      };
+        return {
+          user_id: user.id,
+          email: user.email,
+          full_name: user.full_name || user.email,
+          plan_type: subscription?.plan_type || 'free',
+          status: subscription?.status || 'inactive',
+        };
       });
 
-      // Add newsletter subscribers as separate user type
-    const newsletterUsers: UserData[] = (newsletterSubs || []).map(sub => ({
-      user_id: sub.id,
-      email: sub.email,
-      full_name: sub.name,
-      plan_type: 'newsletter',
-      status: 'active',
-      user_type: 'newsletter' as const,
-    }));
-
-      const allUsers = [...registeredUsers, ...newsletterUsers];
-      setUsers(allUsers);
-      setFilteredUsers(allUsers);
+      setUsers(registeredUsers);
+      setFilteredUsers(registeredUsers);
 
       // Fetch users with purchases
       const { data: purchases } = await supabase
@@ -144,32 +118,26 @@ export function EmailComposer() {
   useEffect(() => {
     let filtered = users;
 
-    // User type filter (registered vs newsletter)
+    // User type filter
     if (userTypeFilter !== "all") {
       if (userTypeFilter === "registered_with_plan") {
         filtered = filtered.filter(user => 
-          user.user_type === 'registered' && 
-          (user.plan_type === 'gold' || user.plan_type === 'platinum')
+          user.plan_type === 'gold' || user.plan_type === 'platinum'
         );
       } else if (userTypeFilter === "registered_without_plan") {
         filtered = filtered.filter(user => 
-          user.user_type === 'registered' && 
           user.plan_type === 'free'
         );
-      } else if (userTypeFilter === "registered_all") {
-        filtered = filtered.filter(user => user.user_type === 'registered');
-      } else if (userTypeFilter === "newsletter_only") {
-        filtered = filtered.filter(user => user.user_type === 'newsletter');
       }
     }
 
-    // Plan filter (only applies to registered users)
-    if (planFilter !== "all") {
+    // Plan filter (only applies when relevant)
+    if (planFilter !== "all" && userTypeFilter !== "registered_without_plan") {
       filtered = filtered.filter(user => user.plan_type === planFilter);
     }
 
-    // Status filter (only applies to registered users)
-    if (statusFilter !== "all") {
+    // Status filter (only applies to users with subscriptions)
+    if (statusFilter !== "all" && userTypeFilter !== "registered_without_plan") {
       filtered = filtered.filter(user => user.status === statusFilter);
     }
 
@@ -189,8 +157,8 @@ export function EmailComposer() {
       return;
     }
 
-    if (filteredUsers.length === 0) {
-      toast.error("No recipients selected");
+    if (selectedUserIds.length === 0) {
+      toast.error("Please select at least one recipient");
       return;
     }
 
@@ -202,19 +170,9 @@ export function EmailComposer() {
     setSending(true);
 
     try {
-      // Separate registered users and newsletter subscribers
-      const registeredUserIds = filteredUsers
-        .filter(u => u.user_type === 'registered')
-        .map(u => u.user_id);
-      
-      const newsletterEmails = filteredUsers
-        .filter(u => u.user_type === 'newsletter')
-        .map(u => ({ email: u.email!, name: u.full_name || 'Subscriber' }));
-      
       const { data, error } = await supabase.functions.invoke('send-bulk-email', {
         body: {
-          userIds: registeredUserIds,
-          newsletterRecipients: newsletterEmails,
+          userIds: selectedUserIds,
           subject,
           message,
         }
@@ -231,9 +189,10 @@ export function EmailComposer() {
           }`
         );
         
-        // Clear form
+        // Clear form and selection
         setSubject("");
         setMessage("");
+        setSelectedUserIds([]);
       } else {
         throw new Error("Failed to send emails");
       }
@@ -244,6 +203,36 @@ export function EmailComposer() {
       setSending(false);
     }
   };
+
+  const handleExportCSV = () => {
+    const selectedUsers = users.filter(u => selectedUserIds.includes(u.user_id));
+    
+    const csvContent = [
+      ['Name', 'Email', 'Plan', 'Status'].join(','),
+      ...selectedUsers.map(user => [
+        user.full_name || 'Unknown',
+        user.email || '',
+        user.plan_type,
+        user.status
+      ].map(field => `"${field}"`).join(','))
+    ].join('\n');
+
+    const blob = new Blob([csvContent], { type: 'text/csv' });
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `email-recipients-${new Date().toISOString().split('T')[0]}.csv`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    window.URL.revokeObjectURL(url);
+    
+    toast.success(`Exported ${selectedUsers.length} recipients to CSV`);
+  };
+
+  // Determine which filters should be disabled
+  const isPlanFilterDisabled = userTypeFilter === "registered_without_plan";
+  const isStatusFilterDisabled = userTypeFilter === "registered_without_plan";
 
   if (loading) {
     return (
@@ -266,28 +255,30 @@ export function EmailComposer() {
             Bulk Email Notifications
           </CardTitle>
           <CardDescription>
-            Send email notifications to users based on subscription filters
+            Send email notifications to registered users based on filters and custom selection
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-6">
           {/* Filter Section */}
           <div className="space-y-4">
-            <h3 className="text-sm font-medium">Select Recipients</h3>
+            <h3 className="text-sm font-medium">Filter Recipients</h3>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
               <Select value={userTypeFilter} onValueChange={setUserTypeFilter}>
                 <SelectTrigger>
                   <SelectValue placeholder="User Type" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="all">All Users</SelectItem>
-                  <SelectItem value="registered_all">All Registered Users</SelectItem>
-                  <SelectItem value="registered_with_plan">Registered with Plan</SelectItem>
-                  <SelectItem value="registered_without_plan">Registered without Plan</SelectItem>
-                  <SelectItem value="newsletter_only">Newsletter Subscribers</SelectItem>
+                  <SelectItem value="all">All Registered Users</SelectItem>
+                  <SelectItem value="registered_with_plan">With Premium Plan</SelectItem>
+                  <SelectItem value="registered_without_plan">Free Users Only</SelectItem>
                 </SelectContent>
               </Select>
               
-              <Select value={planFilter} onValueChange={setPlanFilter}>
+              <Select 
+                value={planFilter} 
+                onValueChange={setPlanFilter}
+                disabled={isPlanFilterDisabled}
+              >
                 <SelectTrigger>
                   <SelectValue placeholder="Plan Type" />
                 </SelectTrigger>
@@ -296,11 +287,14 @@ export function EmailComposer() {
                   <SelectItem value="free">Free Users</SelectItem>
                   <SelectItem value="gold">Gold Members</SelectItem>
                   <SelectItem value="platinum">Platinum Members</SelectItem>
-                  <SelectItem value="newsletter">Newsletter Only</SelectItem>
                 </SelectContent>
               </Select>
               
-              <Select value={statusFilter} onValueChange={setStatusFilter}>
+              <Select 
+                value={statusFilter} 
+                onValueChange={setStatusFilter}
+                disabled={isStatusFilterDisabled}
+              >
                 <SelectTrigger>
                   <SelectValue placeholder="Status" />
                 </SelectTrigger>
@@ -322,12 +316,34 @@ export function EmailComposer() {
                   <SelectItem value="without_purchases">Without Purchases</SelectItem>
                 </SelectContent>
               </Select>
-
-              <div className="flex items-center gap-2 px-4 py-2 bg-muted rounded-md">
-                <Users className="h-4 w-4 text-muted-foreground" />
-                <span className="text-sm font-medium">{filteredUsers.length} recipients</span>
-              </div>
             </div>
+
+            <div className="flex items-center gap-2 px-4 py-2 bg-muted rounded-md">
+              <Users className="h-4 w-4 text-muted-foreground" />
+              <span className="text-sm font-medium">{filteredUsers.length} users match filters</span>
+            </div>
+          </div>
+
+          {/* User Selection Table */}
+          <div className="space-y-4">
+            <div className="flex items-center justify-between">
+              <h3 className="text-sm font-medium">Select Recipients</h3>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={handleExportCSV}
+                disabled={selectedUserIds.length === 0}
+              >
+                <Download className="h-4 w-4 mr-2" />
+                Export Selected ({selectedUserIds.length})
+              </Button>
+            </div>
+            
+            <UserSelectionTable
+              users={filteredUsers}
+              selectedUserIds={selectedUserIds}
+              onSelectionChange={setSelectedUserIds}
+            />
           </div>
 
           {/* Email Content */}
@@ -384,43 +400,42 @@ export function EmailComposer() {
                 className="break-words-safe resize-none"
               />
               <p className="text-xs text-muted-foreground">
-                Use {`{{name}}`}, {`{{plan_type}}`}, {`{{renewal_date}}`} as placeholders. Plain text will be converted to HTML.
+                Plain text will be converted to HTML. Line breaks will be preserved.
               </p>
             </div>
           </div>
 
           {/* Preview Section */}
-          {filteredUsers.length > 0 && (
+          {selectedUserIds.length > 0 && (
             <div className="p-4 border rounded-lg bg-muted/50 space-y-2">
               <div className="flex items-center gap-2 text-sm">
                 <AlertCircle className="h-4 w-4 text-muted-foreground" />
                 <span className="font-medium">Email Preview</span>
               </div>
               <div className="space-y-1 text-sm text-muted-foreground">
-                <p>This email will be sent to <strong>{filteredUsers.length}</strong> recipient{filteredUsers.length !== 1 ? 's' : ''}</p>
+                <p>This email will be sent to <strong>{selectedUserIds.length}</strong> recipient{selectedUserIds.length !== 1 ? 's' : ''}</p>
                 <div className="flex flex-wrap gap-2 mt-2">
                   {userTypeFilter !== "all" && (
                     <Badge variant="secondary">
-                      {userTypeFilter === "registered_all" && "All Registered"}
-                      {userTypeFilter === "registered_with_plan" && "With Plan"}
-                      {userTypeFilter === "registered_without_plan" && "Without Plan"}
-                      {userTypeFilter === "newsletter_only" && "Newsletter Only"}
+                      {userTypeFilter === "registered_with_plan" && "Premium Users"}
+                      {userTypeFilter === "registered_without_plan" && "Free Users"}
                     </Badge>
                   )}
-                  {planFilter !== "all" && (
+                  {planFilter !== "all" && !isPlanFilterDisabled && (
                     <Badge variant="secondary">
                       {planFilter.charAt(0).toUpperCase() + planFilter.slice(1)} Plan
                     </Badge>
                   )}
-                  {statusFilter !== "all" && (
+                  {statusFilter !== "all" && !isStatusFilterDisabled && (
                     <Badge variant="secondary">
                       {statusFilter.charAt(0).toUpperCase() + statusFilter.slice(1)} Status
                     </Badge>
                   )}
-                </div>
-                <div className="text-xs mt-2 space-y-1">
-                  <p>• Registered users: {filteredUsers.filter(u => u.user_type === 'registered').length}</p>
-                  <p>• Newsletter subscribers: {filteredUsers.filter(u => u.user_type === 'newsletter').length}</p>
+                  {purchaseFilter !== "all" && (
+                    <Badge variant="secondary">
+                      {purchaseFilter === "with_purchases" ? "Has Purchases" : "No Purchases"}
+                    </Badge>
+                  )}
                 </div>
               </div>
             </div>
@@ -429,7 +444,7 @@ export function EmailComposer() {
           {/* Send Button */}
           <Button
             onClick={handleSendEmails}
-            disabled={sending || !subject.trim() || !message.trim() || filteredUsers.length === 0}
+            disabled={sending || !subject.trim() || !message.trim() || selectedUserIds.length === 0}
             className="w-full"
             size="lg"
           >
@@ -441,7 +456,7 @@ export function EmailComposer() {
             ) : (
               <>
                 <Send className="h-4 w-4 mr-2" />
-                Send to {filteredUsers.length} Recipient{filteredUsers.length !== 1 ? 's' : ''}
+                Send to {selectedUserIds.length} Recipient{selectedUserIds.length !== 1 ? 's' : ''}
               </>
             )}
           </Button>
@@ -454,7 +469,7 @@ export function EmailComposer() {
           <AlertDialogHeader>
             <AlertDialogTitle>Confirm Bulk Email</AlertDialogTitle>
             <AlertDialogDescription>
-              You are about to send an email to <strong>{filteredUsers.length}</strong> user{filteredUsers.length !== 1 ? 's' : ''}.
+              You are about to send an email to <strong>{selectedUserIds.length}</strong> user{selectedUserIds.length !== 1 ? 's' : ''}.
               <br /><br />
               <strong>Subject:</strong> {subject}
               <br /><br />
@@ -464,7 +479,6 @@ export function EmailComposer() {
           <AlertDialogFooter>
             <AlertDialogCancel>Cancel</AlertDialogCancel>
             <AlertDialogAction onClick={confirmSendEmails}>
-              <Send className="h-4 w-4 mr-2" />
               Send Emails
             </AlertDialogAction>
           </AlertDialogFooter>

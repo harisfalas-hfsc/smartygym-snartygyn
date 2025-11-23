@@ -7,7 +7,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Label } from "@/components/ui/label";
 import { PasswordInput } from "@/components/ui/password-input";
 import { Button } from "@/components/ui/button";
-import smartyGymLogo from "@/assets/smartygym-logo.webp";
+import smartyGymLogo from "@/assets/smarty-gym-logo.png";
 import { Helmet } from "react-helmet";
 
 const passwordSchema = z.string().min(6, { message: "Password must be at least 6 characters" }).max(100);
