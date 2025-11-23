@@ -202,7 +202,7 @@ const WorkoutFlow = () => {
               </p>
               
               <p className="text-sm sm:text-base">
-                This is a <span className="font-semibold text-primary">Smarty Calculator & Generator</span> — a comprehensive library built from <span className="font-semibold text-foreground">Coach Haris Falas's</span> extensive knowledge, expertise, and real-world database. Every workout protocol comes directly from his coaching practice and the methods he currently uses with all his clients.
+                This is a <span className="font-semibold text-primary">Smarty Calculator & Generator</span> — a comprehensive library built from <a href="/coach-profile" className="text-primary hover:underline font-medium">Coach Haris Falas</a>'s extensive knowledge, expertise, and real-world database. Every workout protocol comes directly from his coaching practice and the methods he currently uses with all his clients.
               </p>
               
               <p className="text-sm sm:text-base">
