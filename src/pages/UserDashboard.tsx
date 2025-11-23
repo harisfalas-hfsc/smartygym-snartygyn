@@ -1453,11 +1453,6 @@ export default function UserDashboard() {
             <UserMessagesPanel />
           </TabsContent>
 
-          {/* Messages Tab */}
-          <TabsContent value="messages">
-            <UserMessagesPanel />
-          </TabsContent>
-
           {/* Calculators Tab */}
           <TabsContent value="calculators" className="space-y-6">
             <div className="grid gap-6 md:grid-cols-3">

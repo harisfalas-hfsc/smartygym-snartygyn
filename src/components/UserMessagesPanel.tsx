@@ -285,6 +285,19 @@ export const UserMessagesPanel = () => {
                         <Zap className="h-3 w-3 mr-1" />
                         System
                       </Badge>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="ml-auto h-7 w-7"
+                        onClick={() => handleToggleRead(message.id, 'system', message.is_read)}
+                        title={message.is_read ? "Mark as unread" : "Mark as read"}
+                      >
+                        {message.is_read ? (
+                          <EyeOff className="h-4 w-4" />
+                        ) : (
+                          <Eye className="h-4 w-4" />
+                        )}
+                      </Button>
                     </div>
                     <div className="bg-muted p-4 rounded-lg text-sm text-display break-words-safe content-container mb-3">
                       {message.content}
@@ -318,6 +331,21 @@ export const UserMessagesPanel = () => {
                         <User className="h-3 w-3 mr-1" />
                         Your Message
                       </Badge>
+                      {message.response && (
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="ml-auto h-7 w-7"
+                          onClick={() => handleToggleRead(message.id, 'contact', !!message.response_read_at)}
+                          title={message.response_read_at ? "Mark response as unread" : "Mark response as read"}
+                        >
+                          {message.response_read_at ? (
+                            <EyeOff className="h-4 w-4" />
+                          ) : (
+                            <Eye className="h-4 w-4" />
+                          )}
+                        </Button>
+                      )}
                     </div>
                     <p className="text-sm text-muted-foreground line-clamp-2 mb-3">
                       {message.message}
@@ -393,6 +421,19 @@ export const UserMessagesPanel = () => {
                         <Badge variant="outline" className="text-xs">
                           {getMessageTypeLabel(message.message_type)}
                         </Badge>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="ml-auto h-7 w-7"
+                          onClick={() => handleToggleRead(message.id, 'system', message.is_read)}
+                          title={message.is_read ? "Mark as unread" : "Mark as read"}
+                        >
+                          {message.is_read ? (
+                            <EyeOff className="h-4 w-4" />
+                          ) : (
+                            <Eye className="h-4 w-4" />
+                          )}
+                        </Button>
                       </div>
                       <div className="bg-muted p-4 rounded-lg text-sm text-display break-words-safe content-container mb-3">
                         {message.content}
@@ -426,6 +467,21 @@ export const UserMessagesPanel = () => {
                       <h3 className="font-semibold">{message.subject}</h3>
                       {!message.response_read_at && message.response && (
                         <Badge variant="destructive">New Response</Badge>
+                      )}
+                      {message.response && (
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="ml-auto h-7 w-7"
+                          onClick={() => handleToggleRead(message.id, 'contact', !!message.response_read_at)}
+                          title={message.response_read_at ? "Mark response as unread" : "Mark response as read"}
+                        >
+                          {message.response_read_at ? (
+                            <EyeOff className="h-4 w-4" />
+                          ) : (
+                            <Eye className="h-4 w-4" />
+                          )}
+                        </Button>
                       )}
                     </div>
                     <div>
