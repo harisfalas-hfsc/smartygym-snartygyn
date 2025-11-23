@@ -61,6 +61,16 @@ export const TestEmailSender = () => {
   };
 
   const handleTemplateSelect = (templateId: string) => {
+    if (templateId === "no-template") {
+      setFormData(prev => ({
+        ...prev,
+        selectedTemplate: "",
+        subject: "",
+        message: "",
+      }));
+      return;
+    }
+    
     const template = templates.find(t => t.id === templateId);
     if (template) {
       setFormData(prev => ({
@@ -149,7 +159,7 @@ export const TestEmailSender = () => {
                     <SelectValue placeholder="Select a template to test" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="">No template</SelectItem>
+                    <SelectItem value="no-template">No template</SelectItem>
                     {templates.map((template) => (
                       <SelectItem key={template.id} value={template.id}>
                         {template.name}
