@@ -10,7 +10,6 @@ import { generateBreadcrumbSchema } from "@/utils/seoHelpers";
 import { useAccessControl } from "@/hooks/useAccessControl";
 import { useShowBackButton } from "@/hooks/useShowBackButton";
 import { ScrollReveal } from "@/components/ScrollReveal";
-
 const WorkoutFlow = () => {
   const navigate = useNavigate();
   const {
@@ -211,11 +210,7 @@ const WorkoutFlow = () => {
               </p>
               
               <div className="flex justify-center mt-4">
-                <Button 
-                  size="lg" 
-                  className="cta-button"
-                  onClick={() => navigate("/smartyworkout")}
-                >
+                <Button size="lg" className="cta-button" onClick={() => navigate("/smartyworkout")}>
                   Create Your Own Workout Now
                 </Button>
               </div>
@@ -228,7 +223,7 @@ const WorkoutFlow = () => {
             <div className="bg-card border border-border rounded-xl p-6 mt-8 text-center shadow-soft">
               <h3 className="text-xl font-semibold mb-2">Love these workouts?</h3>
               <p className="text-muted-foreground mb-4">
-                Unlock 100+ more exclusive sessions with SmartyGym Premium.
+                Unlock 500+ more exclusive sessions with SmartyGym Premium.
               </p>
               <Button size="lg" onClick={() => navigate("/premiumbenefits")} className="cta-button">
                 Join Premium
