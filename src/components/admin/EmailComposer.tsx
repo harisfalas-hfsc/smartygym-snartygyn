@@ -58,24 +58,14 @@ export function EmailComposer() {
       
       if (usersError) throw usersError;
 
-      const { data: subscriptions, error: subsError } = await supabase
-        .from('user_subscriptions')
-        .select('user_id, plan_type, status');
-
-      if (subsError) throw subsError;
-
-      // Combine registered users with emails
-      const registeredUsers: UserData[] = (usersData?.users || []).map((user: any) => {
-        const subscription = subscriptions?.find(sub => sub.user_id === user.id);
-        
-        return {
-          user_id: user.id,
-          email: user.email,
-          full_name: user.full_name || user.email,
-          plan_type: subscription?.plan_type || 'free',
-          status: subscription?.status || 'inactive',
-        };
-      });
+      // Map users directly from edge function response (already includes plan_type and status)
+      const registeredUsers: UserData[] = (usersData?.users || []).map((user: any) => ({
+        user_id: user.user_id,
+        email: user.email,
+        full_name: user.full_name || user.email,
+        plan_type: user.plan_type || 'free',
+        status: user.status || 'inactive',
+      }));
 
       setUsers(registeredUsers);
       setFilteredUsers(registeredUsers);
@@ -328,15 +318,25 @@ export function EmailComposer() {
           <div className="space-y-4">
             <div className="flex items-center justify-between">
               <h3 className="text-sm font-medium">Select Recipients</h3>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={handleExportCSV}
-                disabled={selectedUserIds.length === 0}
-              >
-                <Download className="h-4 w-4 mr-2" />
-                Export Selected ({selectedUserIds.length})
-              </Button>
+              <div className="flex items-center gap-2">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setSelectedUserIds([])}
+                  disabled={selectedUserIds.length === 0}
+                >
+                  Clear Selection
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={handleExportCSV}
+                  disabled={selectedUserIds.length === 0}
+                >
+                  <Download className="h-4 w-4 mr-2" />
+                  Export Selected ({selectedUserIds.length})
+                </Button>
+              </div>
             </div>
             
             <UserSelectionTable
@@ -344,6 +344,36 @@ export function EmailComposer() {
               selectedUserIds={selectedUserIds}
               onSelectionChange={setSelectedUserIds}
             />
+
+            {/* Selected Recipients Summary */}
+            {selectedUserIds.length > 0 && (
+              <div className="p-4 border rounded-lg bg-muted/50 space-y-3">
+                <div className="flex items-center gap-2">
+                  <Users className="h-4 w-4 text-primary" />
+                  <span className="text-sm font-semibold">Selected Recipients: {selectedUserIds.length}</span>
+                </div>
+                <div className="space-y-2 max-h-[200px] overflow-y-auto">
+                  {users
+                    .filter(u => selectedUserIds.includes(u.user_id))
+                    .map((user) => (
+                      <div key={user.user_id} className="flex items-center justify-between text-sm py-1 px-2 bg-background rounded">
+                        <div className="flex-1 min-w-0">
+                          <span className="font-medium">{user.full_name || 'Unknown'}</span>
+                          <span className="text-muted-foreground ml-2">({user.email})</span>
+                        </div>
+                        <div className="flex items-center gap-2 ml-4">
+                          <Badge variant={user.plan_type === 'gold' || user.plan_type === 'platinum' ? 'default' : 'outline'} className="text-xs">
+                            {user.plan_type.charAt(0).toUpperCase() + user.plan_type.slice(1)}
+                          </Badge>
+                          <Badge variant={user.status === 'active' ? 'default' : 'secondary'} className="text-xs">
+                            {user.status.charAt(0).toUpperCase() + user.status.slice(1)}
+                          </Badge>
+                        </div>
+                      </div>
+                    ))}
+                </div>
+              </div>
+            )}
           </div>
 
           {/* Email Content */}
