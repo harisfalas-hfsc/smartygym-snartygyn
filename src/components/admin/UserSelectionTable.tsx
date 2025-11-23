@@ -32,38 +32,48 @@ export function UserSelectionTable({ users, selectedUserIds, onSelectionChange }
     );
   }, [users, searchTerm]);
 
-  const allSelected = filteredUsers.length > 0 && 
-    filteredUsers.every(user => selectedUserIds.includes(user.user_id));
-  
-  const someSelected = filteredUsers.some(user => selectedUserIds.includes(user.user_id)) && !allSelected;
+  const visibleIds = useMemo(
+    () => filteredUsers.map(u => u.user_id),
+    [filteredUsers]
+  );
 
-  const headerChecked: boolean | "indeterminate" = 
-    allSelected ? true : someSelected ? "indeterminate" : false;
+  const allVisibleSelected =
+    visibleIds.length > 0 &&
+    visibleIds.every(id => selectedUserIds.includes(id));
 
-  const handleSelectAll = (checked: boolean | "indeterminate") => {
-    const filteredIds = filteredUsers.map(u => u.user_id);
-    
-    // Treat indeterminate or true as "select all"
-    const shouldSelectAll = checked === true || checked === "indeterminate";
-    
-    if (shouldSelectAll) {
-      // Select all filtered users (add to existing selection)
-      const newSelection = [...new Set([...selectedUserIds, ...filteredIds])];
-      onSelectionChange(newSelection);
+  const someVisibleSelected =
+    !allVisibleSelected &&
+    visibleIds.some(id => selectedUserIds.includes(id));
+
+  const headerChecked: boolean | "indeterminate" =
+    allVisibleSelected ? true : someVisibleSelected ? "indeterminate" : false;
+
+  const handleSelectAll = () => {
+    if (allVisibleSelected) {
+      // Deselect all visible users
+      onSelectionChange(
+        selectedUserIds.filter(id => !visibleIds.includes(id))
+      );
     } else {
-      // Deselect all filtered users (remove from selection)
-      onSelectionChange(selectedUserIds.filter(id => !filteredIds.includes(id)));
+      // Select all visible users (keep any selections from other filters too)
+      const newSelection = Array.from(
+        new Set([...selectedUserIds, ...visibleIds])
+      );
+      onSelectionChange(newSelection);
     }
   };
 
-  const handleToggleUser = (userId: string) => {
-    const isSelected = selectedUserIds.includes(userId);
-    console.log("Toggle user", userId, "currently selected?", isSelected);
-    
-    if (isSelected) {
-      onSelectionChange(selectedUserIds.filter(id => id !== userId));
+  const handleToggleUser = (userId: string, checked: boolean | "indeterminate") => {
+    if (checked) {
+      // Add user if not already selected
+      if (!selectedUserIds.includes(userId)) {
+        onSelectionChange([...selectedUserIds, userId]);
+      }
     } else {
-      onSelectionChange([...selectedUserIds, userId]);
+      // Remove user if currently selected
+      if (selectedUserIds.includes(userId)) {
+        onSelectionChange(selectedUserIds.filter(id => id !== userId));
+      }
     }
   };
 
@@ -122,7 +132,7 @@ export function UserSelectionTable({ users, selectedUserIds, onSelectionChange }
                     <TableCell>
                       <Checkbox
                         checked={selectedUserIds.includes(user.user_id)}
-                        onCheckedChange={() => handleToggleUser(user.user_id)}
+                        onCheckedChange={(checked) => handleToggleUser(user.user_id, checked)}
                       />
                     </TableCell>
                     <TableCell className="font-medium">
