@@ -207,9 +207,17 @@ export type Database = {
           id: string
           is_active: boolean | null
           is_default: boolean | null
+          last_sent_at: string | null
           message_type: Database["public"]["Enums"]["message_type"]
+          next_scheduled_time: string | null
+          recurrence_interval: string | null
+          recurrence_pattern: string | null
+          scheduled_time: string | null
+          status: string | null
           subject: string
+          target_audience: string | null
           template_name: string
+          timezone: string | null
           updated_at: string | null
         }
         Insert: {
@@ -218,9 +226,17 @@ export type Database = {
           id?: string
           is_active?: boolean | null
           is_default?: boolean | null
+          last_sent_at?: string | null
           message_type: Database["public"]["Enums"]["message_type"]
+          next_scheduled_time?: string | null
+          recurrence_interval?: string | null
+          recurrence_pattern?: string | null
+          scheduled_time?: string | null
+          status?: string | null
           subject: string
+          target_audience?: string | null
           template_name: string
+          timezone?: string | null
           updated_at?: string | null
         }
         Update: {
@@ -229,9 +245,17 @@ export type Database = {
           id?: string
           is_active?: boolean | null
           is_default?: boolean | null
+          last_sent_at?: string | null
           message_type?: Database["public"]["Enums"]["message_type"]
+          next_scheduled_time?: string | null
+          recurrence_interval?: string | null
+          recurrence_pattern?: string | null
+          scheduled_time?: string | null
+          status?: string | null
           subject?: string
+          target_audience?: string | null
           template_name?: string
+          timezone?: string | null
           updated_at?: string | null
         }
         Relationships: []

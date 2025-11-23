@@ -24,8 +24,12 @@ import {
   Crown,
   Bell,
   ThumbsUp,
-  UserX
+  UserX,
+  CalendarClock,
+  Pause,
+  Play
 } from "lucide-react";
+import { ScheduleTemplateDialog } from "./ScheduleTemplateDialog";
 import { format } from "date-fns";
 
 interface MessageTemplate {
@@ -38,6 +42,14 @@ interface MessageTemplate {
   is_default: boolean;
   created_at: string;
   updated_at: string;
+  scheduled_time?: string | null;
+  next_scheduled_time?: string | null;
+  last_sent_at?: string | null;
+  timezone?: string | null;
+  recurrence_pattern?: string | null;
+  recurrence_interval?: string | null;
+  target_audience?: string | null;
+  status?: string | null;
 }
 
 const MESSAGE_TYPES = {
@@ -58,6 +70,8 @@ export const AutomatedMessagesManager = () => {
   const [selectedType, setSelectedType] = useState("welcome");
   const [editingTemplate, setEditingTemplate] = useState<MessageTemplate | null>(null);
   const [showDialog, setShowDialog] = useState(false);
+  const [showScheduleDialog, setShowScheduleDialog] = useState(false);
+  const [schedulingTemplate, setSchedulingTemplate] = useState<MessageTemplate | null>(null);
   const [formData, setFormData] = useState({
     template_name: "",
     subject: "",
@@ -261,62 +275,229 @@ export const AutomatedMessagesManager = () => {
     }
   };
 
+  const handleToggleActive = async (templateId: string, currentState: boolean) => {
+    const { error } = await supabase
+      .from('automated_message_templates')
+      .update({ is_active: !currentState })
+      .eq('id', templateId);
+
+    if (error) {
+      toast({
+        title: "Error",
+        description: "Failed to toggle template status",
+        variant: "destructive",
+      });
+    } else {
+      toast({
+        title: "Success",
+        description: `Template ${!currentState ? 'activated' : 'deactivated'}`,
+      });
+      fetchTemplates();
+    }
+  };
+
+  const handleSchedule = (template: MessageTemplate) => {
+    setSchedulingTemplate(template);
+    setShowScheduleDialog(true);
+  };
+
+  const handlePauseSchedule = async (templateId: string) => {
+    const { error } = await supabase
+      .from('automated_message_templates')
+      .update({ status: 'paused' })
+      .eq('id', templateId);
+
+    if (error) {
+      toast({
+        title: "Error",
+        description: "Failed to pause schedule",
+        variant: "destructive",
+      });
+    } else {
+      toast({
+        title: "Success",
+        description: "Schedule paused",
+      });
+      fetchTemplates();
+    }
+  };
+
+  const handleResumeSchedule = async (templateId: string) => {
+    const { error } = await supabase
+      .from('automated_message_templates')
+      .update({ status: 'active' })
+      .eq('id', templateId);
+
+    if (error) {
+      toast({
+        title: "Error",
+        description: "Failed to resume schedule",
+        variant: "destructive",
+      });
+    } else {
+      toast({
+        title: "Success",
+        description: "Schedule resumed",
+      });
+      fetchTemplates();
+    }
+  };
+
+  const handleRemoveSchedule = async (templateId: string) => {
+    if (!confirm("Remove scheduling from this template?")) return;
+
+    const { error } = await supabase
+      .from('automated_message_templates')
+      .update({
+        scheduled_time: null,
+        next_scheduled_time: null,
+        last_sent_at: null,
+        timezone: null,
+        recurrence_pattern: null,
+        recurrence_interval: null,
+        target_audience: null,
+        status: 'active'
+      })
+      .eq('id', templateId);
+
+    if (error) {
+      toast({
+        title: "Error",
+        description: "Failed to remove schedule",
+        variant: "destructive",
+      });
+    } else {
+      toast({
+        title: "Success",
+        description: "Schedule removed",
+      });
+      fetchTemplates();
+    }
+  };
+
   const getTemplatesByType = (type: string) => {
     return templates.filter(t => t.message_type === type);
   };
 
-  const TemplateCard = ({ template }: { template: MessageTemplate }) => (
-    <Card className={template.is_default ? 'border-primary border-2' : ''}>
-      <CardContent className="pt-6">
-        <div className="space-y-4">
-          <div className="flex items-start justify-between">
-            <div className="flex-1">
-              <div className="flex items-center gap-2 mb-2">
-                <h3 className="font-semibold">{template.template_name}</h3>
-                {template.is_default && (
-                  <Badge variant="default" className="flex items-center gap-1">
-                    <Star className="h-3 w-3" />
-                    Default
-                  </Badge>
+  const TemplateCard = ({ template }: { template: MessageTemplate }) => {
+    const isScheduled = !!template.scheduled_time;
+    const isPaused = template.status === 'paused';
+    const isCompleted = template.status === 'completed';
+
+    return (
+      <Card className={`${template.is_default ? 'border-primary border-2' : ''} ${isScheduled && !isPaused && !isCompleted ? 'border-l-4 border-l-blue-500' : ''} ${!template.is_active ? 'opacity-60' : ''}`}>
+        <CardContent className="pt-6">
+          <div className="space-y-4">
+            <div className="flex items-start justify-between gap-4">
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center gap-2 mb-2 flex-wrap">
+                  <h3 className="font-semibold break-words">{template.template_name}</h3>
+                  {template.is_default && (
+                    <Badge variant="default" className="flex items-center gap-1 shrink-0">
+                      <Star className="h-3 w-3" />
+                      Default
+                    </Badge>
+                  )}
+                  {!template.is_active && (
+                    <Badge variant="destructive" className="shrink-0">Inactive</Badge>
+                  )}
+                  {isScheduled && !isCompleted && (
+                    <Badge variant="secondary" className="flex items-center gap-1 shrink-0">
+                      <CalendarClock className="h-3 w-3" />
+                      {isPaused ? 'Paused' : 'Scheduled'}
+                    </Badge>
+                  )}
+                  {isCompleted && (
+                    <Badge variant="outline" className="shrink-0">Completed</Badge>
+                  )}
+                </div>
+                <p className="text-sm font-medium text-primary mb-2 break-words">{template.subject}</p>
+                <p className="text-sm text-muted-foreground line-clamp-3 whitespace-pre-wrap break-words">
+                  {template.content}
+                </p>
+                {isScheduled && template.next_scheduled_time && !isCompleted && (
+                  <p className="text-xs text-blue-600 mt-2 flex items-center gap-1">
+                    <CalendarClock className="h-3 w-3" />
+                    Next: {format(new Date(template.next_scheduled_time), 'MMM dd, yyyy - h:mm a')} {template.timezone}
+                  </p>
                 )}
-                {!template.is_active && (
-                  <Badge variant="secondary">Inactive</Badge>
+                {template.last_sent_at && (
+                  <p className="text-xs text-muted-foreground mt-1">
+                    Last sent: {format(new Date(template.last_sent_at), 'MMM dd, yyyy - h:mm a')}
+                  </p>
                 )}
+                <p className="text-xs text-muted-foreground mt-2">
+                  Last updated: {format(new Date(template.updated_at), 'MMM dd, yyyy')}
+                </p>
               </div>
-              <p className="text-sm font-medium text-primary mb-2">{template.subject}</p>
-              <p className="text-sm text-muted-foreground line-clamp-3 whitespace-pre-wrap">
-                {template.content}
-              </p>
-              <p className="text-xs text-muted-foreground mt-2">
-                Last updated: {format(new Date(template.updated_at), 'MMM dd, yyyy')}
-              </p>
+              
+              <div className="flex items-center gap-2 shrink-0">
+                <div className="text-right">
+                  <Label htmlFor={`toggle-${template.id}`} className="text-xs text-muted-foreground cursor-pointer">
+                    {template.is_active ? 'Active' : 'Inactive'}
+                  </Label>
+                  <Switch
+                    id={`toggle-${template.id}`}
+                    checked={template.is_active}
+                    onCheckedChange={() => handleToggleActive(template.id, template.is_active)}
+                    className="mt-1"
+                  />
+                </div>
+              </div>
+            </div>
+            
+            <div className="flex gap-2 flex-wrap">
+              <Button size="sm" variant="outline" onClick={() => handleEdit(template)}>
+                <Edit className="h-4 w-4 mr-1" />
+                Edit
+              </Button>
+              {!template.is_default && (
+                <Button size="sm" variant="outline" onClick={() => handleSetDefault(template.id, template.message_type)}>
+                  <Star className="h-4 w-4 mr-1" />
+                  Set Default
+                </Button>
+              )}
+              
+              {!isScheduled ? (
+                <Button size="sm" variant="outline" onClick={() => handleSchedule(template)}>
+                  <CalendarClock className="h-4 w-4 mr-1" />
+                  Schedule
+                </Button>
+              ) : (
+                <>
+                  {!isPaused && !isCompleted && (
+                    <Button size="sm" variant="outline" onClick={() => handlePauseSchedule(template.id)}>
+                      <Pause className="h-4 w-4 mr-1" />
+                      Pause
+                    </Button>
+                  )}
+                  {isPaused && (
+                    <Button size="sm" variant="outline" onClick={() => handleResumeSchedule(template.id)}>
+                      <Play className="h-4 w-4 mr-1" />
+                      Resume
+                    </Button>
+                  )}
+                  <Button size="sm" variant="outline" onClick={() => handleRemoveSchedule(template.id)}>
+                    <Trash2 className="h-4 w-4 mr-1" />
+                    Remove Schedule
+                  </Button>
+                </>
+              )}
+              
+              <Button size="sm" variant="outline" onClick={() => handleDuplicate(template)}>
+                <Copy className="h-4 w-4 mr-1" />
+                Duplicate
+              </Button>
+              <Button size="sm" variant="destructive" onClick={() => handleDelete(template.id)}>
+                <Trash2 className="h-4 w-4 mr-1" />
+                Delete
+              </Button>
             </div>
           </div>
-          
-          <div className="flex gap-2 flex-wrap">
-            <Button size="sm" variant="outline" onClick={() => handleEdit(template)}>
-              <Edit className="h-4 w-4 mr-1" />
-              Edit
-            </Button>
-            {!template.is_default && (
-              <Button size="sm" variant="outline" onClick={() => handleSetDefault(template.id, template.message_type)}>
-                <Star className="h-4 w-4 mr-1" />
-                Set Default
-              </Button>
-            )}
-            <Button size="sm" variant="outline" onClick={() => handleDuplicate(template)}>
-              <Copy className="h-4 w-4 mr-1" />
-              Duplicate
-            </Button>
-            <Button size="sm" variant="destructive" onClick={() => handleDelete(template.id)}>
-              <Trash2 className="h-4 w-4 mr-1" />
-              Delete
-            </Button>
-          </div>
-        </div>
-      </CardContent>
-    </Card>
-  );
+        </CardContent>
+      </Card>
+    );
+  };
 
   return (
     <div className="pt-6">
@@ -392,6 +573,17 @@ export const AutomatedMessagesManager = () => {
           </Tabs>
         </CardContent>
       </Card>
+
+      {/* Schedule Dialog */}
+      {schedulingTemplate && (
+        <ScheduleTemplateDialog
+          open={showScheduleDialog}
+          onOpenChange={setShowScheduleDialog}
+          templateId={schedulingTemplate.id}
+          templateName={schedulingTemplate.template_name}
+          onSuccess={fetchTemplates}
+        />
+      )}
 
       {/* Edit/Create Dialog */}
       <Dialog open={showDialog} onOpenChange={setShowDialog}>
