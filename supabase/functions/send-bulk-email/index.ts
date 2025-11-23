@@ -9,7 +9,6 @@ const corsHeaders = {
 
 interface BulkEmailRequest {
   userIds: string[];
-  newsletterRecipients?: Array<{ email: string; name: string }>;
   subject: string;
   message: string;
 }
@@ -59,9 +58,9 @@ serve(async (req) => {
     logStep("Admin verified");
 
     // Parse request
-    const { userIds, newsletterRecipients, subject, message }: BulkEmailRequest = await req.json();
+    const { userIds, subject, message }: BulkEmailRequest = await req.json();
     
-    if ((!userIds || userIds.length === 0) && (!newsletterRecipients || newsletterRecipients.length === 0)) {
+    if (!userIds || userIds.length === 0) {
       throw new Error("No recipients provided");
     }
     if (!subject || !message) {
@@ -69,46 +68,34 @@ serve(async (req) => {
     }
 
     logStep("Request validated", { 
-      registeredUsers: userIds?.length || 0,
-      newsletterRecipients: newsletterRecipients?.length || 0
+      registeredUsers: userIds.length
     });
 
-    let recipients: Array<{ email: string; name: string }> = [];
+    // Fetch registered users
+    const { data: profiles, error: profilesError } = await supabaseClient
+      .from('profiles')
+      .select('user_id, full_name')
+      .in('user_id', userIds);
 
-    // Fetch registered users if provided
-    if (userIds && userIds.length > 0) {
-      const { data: profiles, error: profilesError } = await supabaseClient
-        .from('profiles')
-        .select('user_id, full_name')
-        .in('user_id', userIds);
+    if (profilesError) throw profilesError;
+    logStep("Profiles fetched", { count: profiles.length });
 
-      if (profilesError) throw profilesError;
-      logStep("Profiles fetched", { count: profiles.length });
+    // Get auth users to fetch emails (using service role)
+    const { data: { users: authUsers }, error: authError } = await supabaseClient.auth.admin.listUsers();
+    if (authError) throw authError;
 
-      // Get auth users to fetch emails (using service role)
-      const { data: { users: authUsers }, error: authError } = await supabaseClient.auth.admin.listUsers();
-      if (authError) throw authError;
+    // Match profiles with emails
+    const recipients = profiles
+      .map(profile => {
+        const authUser = authUsers.find(u => u.id === profile.user_id);
+        return {
+          email: authUser?.email,
+          name: profile.full_name || 'User'
+        };
+      })
+      .filter(r => r.email) as Array<{ email: string; name: string }>;
 
-      // Match profiles with emails
-      const registeredRecipients = profiles
-        .map(profile => {
-          const authUser = authUsers.find(u => u.id === profile.user_id);
-          return {
-            email: authUser?.email,
-            name: profile.full_name || 'User'
-          };
-        })
-        .filter(r => r.email) as Array<{ email: string; name: string }>;
-
-      recipients = [...recipients, ...registeredRecipients];
-      logStep("Added registered recipients", { count: registeredRecipients.length });
-    }
-
-    // Add newsletter recipients if provided
-    if (newsletterRecipients && newsletterRecipients.length > 0) {
-      recipients = [...recipients, ...newsletterRecipients];
-      logStep("Added newsletter recipients", { count: newsletterRecipients.length });
-    }
+    logStep("Recipients prepared", { count: recipients.length });
 
     if (recipients.length === 0) {
       throw new Error("No valid email addresses found");
