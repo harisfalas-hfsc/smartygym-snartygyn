@@ -186,6 +186,42 @@ const WorkoutFlow = () => {
           })}
         </div>
 
+        {/* Create Your Own Workout Card */}
+        <Card className="mt-8 bg-gradient-to-br from-primary/5 via-background to-primary/5 border-2 border-primary/40 shadow-gold">
+          <div className="p-4 sm:p-5">
+            <div className="flex items-center justify-center mb-4">
+              <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center mr-3">
+                <TrendingUp className="w-6 h-6 text-primary" />
+              </div>
+              <h2 className="text-xl sm:text-2xl font-bold text-center">Create Your Own Workout</h2>
+            </div>
+            
+            <div className="space-y-3 text-muted-foreground max-w-3xl mx-auto">
+              <p className="text-sm sm:text-base text-center">
+                This is <span className="font-semibold text-foreground">NOT</span> your ordinary AI workout generator or a robot creating generic routines.
+              </p>
+              
+              <p className="text-sm sm:text-base">
+                This is a <span className="font-semibold text-primary">Smarty Calculator & Generator</span> — a comprehensive library built from <span className="font-semibold text-foreground">Coach Haris Falas's</span> extensive knowledge, expertise, and real-world database. Every workout protocol comes directly from his coaching practice and the methods he currently uses with all his clients.
+              </p>
+              
+              <p className="text-sm sm:text-base">
+                Get a <span className="font-semibold text-foreground">tailor-made, quick workout</span> created according to YOUR specific needs, characteristics, and goals — all powered by years of sports science expertise and proven training protocols.
+              </p>
+              
+              <div className="flex justify-center mt-6">
+                <Button 
+                  size="lg" 
+                  className="cta-button"
+                  disabled
+                >
+                  Coming Soon
+                </Button>
+              </div>
+            </div>
+          </div>
+        </Card>
+
         {/* Bottom Premium Banner */}
         {!isPremium && <ScrollReveal delay={700}>
             <div className="bg-card border border-border rounded-xl p-6 mt-8 text-center shadow-soft">
