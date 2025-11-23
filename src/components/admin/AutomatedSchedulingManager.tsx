@@ -11,9 +11,8 @@ import {
   CheckCircle2, 
   Calendar,
   RefreshCw,
-  Settings,
-  Info,
   Edit,
+  Info,
   Save,
   X
 } from "lucide-react";
@@ -135,55 +134,6 @@ export const AutomatedSchedulingManager = () => {
     }
   };
 
-  const getCronSetupInstructions = () => {
-    const projectUrl = import.meta.env.VITE_SUPABASE_URL;
-    const anonKey = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY;
-
-    return `-- Step 1: Enable pg_cron and pg_net extensions (if not already enabled)
--- Run this in your Supabase SQL Editor:
-
--- Step 2: Schedule the renewal reminders (Daily at 9:00 AM)
-SELECT cron.schedule(
-  'send-renewal-reminders-daily',
-  '0 9 * * *',
-  $$
-  SELECT net.http_post(
-    url:='${projectUrl}/functions/v1/send-renewal-reminders',
-    headers:='{"Content-Type": "application/json", "Authorization": "Bearer ${anonKey}"}'::jsonb,
-    body:='{}'::jsonb
-  ) as request_id;
-  $$
-);
-
--- Step 3: Schedule the re-engagement emails (Weekly on Monday at 10:00 AM)
-SELECT cron.schedule(
-  'send-reengagement-emails-weekly',
-  '0 10 * * 1',
-  $$
-  SELECT net.http_post(
-    url:='${projectUrl}/functions/v1/send-reengagement-emails',
-    headers:='{"Content-Type": "application/json", "Authorization": "Bearer ${anonKey}"}'::jsonb,
-    body:='{}'::jsonb
-  ) as request_id;
-  $$
-);
-
--- View all scheduled jobs:
-SELECT * FROM cron.job;
-
--- To unschedule a job (if needed):
--- SELECT cron.unschedule('send-renewal-reminders-daily');
--- SELECT cron.unschedule('send-reengagement-emails-weekly');`;
-  };
-
-  const copyToClipboard = (text: string) => {
-    navigator.clipboard.writeText(text);
-    toast({
-      title: "Copied!",
-      description: "SQL commands copied to clipboard",
-    });
-  };
-
   const handleEditJob = (job: ScheduledJob) => {
     setEditingJob(job);
     setEditSchedule(job.schedule);
@@ -270,18 +220,16 @@ SELECT * FROM cron.job;
         <CardContent className="space-y-6">
           {/* Status Alert */}
           <Alert variant={cronJobsEnabled ? "default" : "destructive"}>
-            <AlertCircle className="h-4 w-4" />
-            <AlertTitle>Cron Job Status</AlertTitle>
+            {cronJobsEnabled ? <CheckCircle2 className="h-4 w-4" /> : <AlertCircle className="h-4 w-4" />}
+            <AlertTitle>Automated Scheduling Status</AlertTitle>
             <AlertDescription>
               {cronJobsEnabled ? (
                 <>
-                  ✅ pg_cron extension is enabled. Scheduled jobs can run automatically.
+                  ✅ Cron jobs are enabled and configured. Your scheduled tasks run automatically every 10 minutes.
                 </>
               ) : (
                 <>
-                  ⚠️ Automated scheduling is NOT currently active. You need to set up cron jobs manually.
-                  <br />
-                  Follow the instructions below to enable automated scheduling.
+                  ⚠️ Cron engine not available. Contact support if you need automated scheduling.
                 </>
               )}
             </AlertDescription>
@@ -345,63 +293,6 @@ SELECT * FROM cron.job;
             </div>
           </div>
 
-          {/* Setup Instructions */}
-          {!cronJobsEnabled && (
-            <Card className="border-amber-500/50 bg-amber-500/5">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2 text-amber-700">
-                  <Settings className="h-5 w-5" />
-                  Setup Instructions
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <Alert>
-                  <Info className="h-4 w-4" />
-                  <AlertTitle>How to Enable Automated Scheduling</AlertTitle>
-                  <AlertDescription className="space-y-2 mt-2">
-                    <p>
-                      To enable automated scheduling, you need to run the SQL commands below in your Supabase SQL Editor.
-                      These commands will set up cron jobs that automatically run the scheduled functions.
-                    </p>
-                    <ol className="list-decimal list-inside space-y-1 text-sm">
-                      <li>Copy the SQL commands below</li>
-                      <li>Open your Supabase SQL Editor</li>
-                      <li>Paste and run the commands</li>
-                      <li>Refresh this page to see the updated status</li>
-                    </ol>
-                  </AlertDescription>
-                </Alert>
-
-                <div className="relative">
-                  <pre className="bg-muted p-4 rounded-lg overflow-x-auto text-xs font-mono">
-                    {getCronSetupInstructions()}
-                  </pre>
-                  <Button
-                    size="sm"
-                    variant="secondary"
-                    className="absolute top-2 right-2"
-                    onClick={() => copyToClipboard(getCronSetupInstructions())}
-                  >
-                    Copy SQL
-                  </Button>
-                </div>
-
-                <Alert variant="default">
-                  <CheckCircle2 className="h-4 w-4" />
-                  <AlertTitle>Cron Schedule Format</AlertTitle>
-                  <AlertDescription className="text-xs space-y-1 mt-2">
-                    <p>Format: <code className="bg-muted px-1 py-0.5 rounded">minute hour day month day-of-week</code></p>
-                    <ul className="list-disc list-inside space-y-1">
-                      <li><code className="bg-muted px-1 py-0.5 rounded">0 9 * * *</code> = Every day at 9:00 AM</li>
-                      <li><code className="bg-muted px-1 py-0.5 rounded">0 10 * * 1</code> = Every Monday at 10:00 AM</li>
-                      <li><code className="bg-muted px-1 py-0.5 rounded">*/30 * * * *</code> = Every 30 minutes</li>
-                      <li><code className="bg-muted px-1 py-0.5 rounded">0 0 * * 0</code> = Every Sunday at midnight</li>
-                    </ul>
-                  </AlertDescription>
-                </Alert>
-              </CardContent>
-            </Card>
-          )}
 
           {/* Edit Schedule Dialog */}
           <Dialog open={editDialogOpen} onOpenChange={setEditDialogOpen}>
