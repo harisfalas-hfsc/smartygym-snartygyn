@@ -15,19 +15,9 @@ export const useAutoLogout = () => {
     try {
       await supabase.auth.signOut({ scope: 'global' });
       
-      // Preserve notification-related keys before clearing storage
-      const notificationPermission = localStorage.getItem('notification_permission');
-      const pushSubscriptionStatus = localStorage.getItem('push_subscription_status');
-      const swRegistrationTime = localStorage.getItem('sw_registration_time');
-      
       // Clear all storage
       localStorage.clear();
       sessionStorage.clear();
-      
-      // Restore notification state so users can still receive notifications
-      if (notificationPermission) localStorage.setItem('notification_permission', notificationPermission);
-      if (pushSubscriptionStatus) localStorage.setItem('push_subscription_status', pushSubscriptionStatus);
-      if (swRegistrationTime) localStorage.setItem('sw_registration_time', swRegistrationTime);
       
       navigate('/auth', { replace: true });
     } catch (error) {

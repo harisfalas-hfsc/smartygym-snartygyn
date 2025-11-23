@@ -76,25 +76,6 @@ export const ContactManager = () => {
             title: "New Contact Message",
             description: "A new message has been received",
           });
-
-          // Send push notification to admin
-          try {
-            const { data: { user } } = await supabase.auth.getUser();
-            if (user) {
-              await supabase.functions.invoke('send-push-notification', {
-                body: {
-                  userId: user.id,
-                  title: 'New Contact Message',
-                  body: `New message from ${payload.new.name}`,
-                  url: '/admin?tab=contact'
-                }
-              });
-            }
-          } catch (error) {
-            if (import.meta.env.DEV) {
-              console.error('Error sending admin notification:', error);
-            }
-          }
         }
       )
       .subscribe();
@@ -458,19 +439,9 @@ export const ContactManager = () => {
               responsePreview: responseText,
             }
           });
-
-          // Send push notification
-          await supabase.functions.invoke('send-push-notification', {
-            body: {
-              userId: selectedMessage.user_id,
-              title: 'New Response from Smarty Gym',
-              body: `${selectedMessage.name}, you have a new response to your message`,
-              url: '/userdashboard?tab=messages'
-            }
-          });
         } catch (notificationError) {
           if (import.meta.env.DEV) {
-            console.error('[ContactManager] Error sending notifications:', notificationError);
+            console.error('[ContactManager] Error sending email notification:', notificationError);
           }
         }
       }

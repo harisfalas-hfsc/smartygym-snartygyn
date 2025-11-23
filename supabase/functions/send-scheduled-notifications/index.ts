@@ -55,11 +55,10 @@ serve(async (req: Request) => {
           let targetUserIds: string[] = [];
 
           if (notification.target_audience === "all") {
-            // Get all users with active push subscriptions
+            // Get all registered users
             const { data: users } = await supabase
-              .from("push_subscriptions")
-              .select("user_id")
-              .eq("is_active", true);
+              .from("profiles")
+              .select("user_id");
             
             targetUserIds = users?.map((u) => u.user_id) || [];
           } else if (notification.target_audience === "purchasers") {
@@ -93,23 +92,21 @@ serve(async (req: Request) => {
             throw new Error("No recipients found for this notification");
           }
 
-          // Send the notification via push notification function
-          const { data: pushResult, error: pushError } = await supabase.functions.invoke(
-            "send-push-notification",
-            {
-              body: {
-                userIds: targetUserIds,
-                title: notification.title,
-                body: notification.body,
-                url: notification.url,
-                icon: notification.icon,
-                requireInteraction: false,
-              },
-            }
-          );
+          // Insert dashboard messages for all target users
+          const messagesToInsert = targetUserIds.map(userId => ({
+            user_id: userId,
+            message_type: 'announcement_update',
+            subject: notification.title,
+            content: notification.body,
+            is_read: false,
+          }));
 
-          if (pushError) {
-            throw pushError;
+          const { error: insertError } = await supabase
+            .from('user_system_messages')
+            .insert(messagesToInsert);
+
+          if (insertError) {
+            throw new Error(`Failed to insert messages: ${insertError.message}`);
           }
 
           // Update notification status and handle recurrence
@@ -160,7 +157,7 @@ serve(async (req: Request) => {
               .from('notification_audit_log')
               .insert({
                 notification_type: 'scheduled',
-                message_type: 'scheduled_notification',
+                message_type: 'announcement_update',
                 sent_by: notification.created_by,
                 recipient_filter: notification.target_audience,
                 recipient_count: targetUserIds.length,
