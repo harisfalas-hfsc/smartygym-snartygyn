@@ -1,5 +1,8 @@
 project_id = "cvccrvyimyzrxcwzmxwk"
 
+[functions.send-automated-messages]
+verify_jwt = false
+
 [functions.smarty-coach]
 verify_jwt = false
 
