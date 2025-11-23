@@ -4,13 +4,13 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { PageBreadcrumbs } from "@/components/PageBreadcrumbs";
 import { InfoRibbon } from "@/components/InfoRibbon";
-import { ArrowLeft, Dumbbell, Flame, Zap, Heart, Move, Activity, TrendingUp } from "lucide-react";
+import { ArrowLeft, Dumbbell, Flame, Zap, Heart, Move, Activity, TrendingUp, Sparkles } from "lucide-react";
 import { SEOEnhancer } from "@/components/SEOEnhancer";
 import { generateBreadcrumbSchema } from "@/utils/seoHelpers";
 import { useAccessControl } from "@/hooks/useAccessControl";
 import { useShowBackButton } from "@/hooks/useShowBackButton";
 import { ScrollReveal } from "@/components/ScrollReveal";
-import smartyGymLogo from "@/assets/smarty-gym-logo.png";
+
 const WorkoutFlow = () => {
   const navigate = useNavigate();
   const {
@@ -189,15 +189,15 @@ const WorkoutFlow = () => {
 
         {/* Create Your Own Workout Card */}
         <Card className="mt-8 bg-gradient-to-br from-primary/5 via-background to-primary/5 border-2 border-primary/40 shadow-gold">
-          <div className="p-4 sm:p-5">
-            <div className="flex items-center justify-center mb-4">
-              <div className="w-12 h-12 flex items-center justify-center mr-3">
-                <img src={smartyGymLogo} alt="SmartyGym" className="w-12 h-12 object-contain" />
+          <div className="p-3 sm:p-4">
+            <div className="flex items-center justify-center mb-3">
+              <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mr-3">
+                <Sparkles className="w-8 h-8 text-primary" />
               </div>
               <h2 className="text-xl sm:text-2xl font-bold text-center">Create Your Own Workout</h2>
             </div>
             
-            <div className="space-y-3 text-muted-foreground max-w-3xl mx-auto">
+            <div className="space-y-2 text-muted-foreground max-w-3xl mx-auto">
               <p className="text-sm sm:text-base text-center">
                 This is <span className="font-semibold text-foreground">NOT</span> your ordinary AI workout generator or a robot creating generic routines.
               </p>
@@ -210,13 +210,13 @@ const WorkoutFlow = () => {
                 Get a <span className="font-semibold text-foreground">tailor-made, quick workout</span> created according to YOUR specific needs, characteristics, and goals — all powered by years of sports science expertise and proven training protocols.
               </p>
               
-              <div className="flex justify-center mt-6">
+              <div className="flex justify-center mt-4">
                 <Button 
                   size="lg" 
                   className="cta-button"
                   onClick={() => navigate("/smartyworkout")}
                 >
-                  SmartyWorkout
+                  Create Your Own Workout Now
                 </Button>
               </div>
             </div>
