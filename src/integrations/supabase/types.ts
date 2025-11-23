@@ -1180,6 +1180,77 @@ export type Database = {
         }
         Relationships: []
       }
+      scheduled_emails: {
+        Row: {
+          body: string
+          created_at: string | null
+          created_by: string | null
+          error_message: string | null
+          id: string
+          last_sent_at: string | null
+          next_scheduled_time: string | null
+          recipient_count: number | null
+          recipient_emails: string[] | null
+          recurrence_interval: string | null
+          recurrence_pattern: string | null
+          scheduled_time: string
+          sent_at: string | null
+          status: string | null
+          subject: string
+          target_audience: string
+          template_id: string | null
+          timezone: string | null
+        }
+        Insert: {
+          body: string
+          created_at?: string | null
+          created_by?: string | null
+          error_message?: string | null
+          id?: string
+          last_sent_at?: string | null
+          next_scheduled_time?: string | null
+          recipient_count?: number | null
+          recipient_emails?: string[] | null
+          recurrence_interval?: string | null
+          recurrence_pattern?: string | null
+          scheduled_time: string
+          sent_at?: string | null
+          status?: string | null
+          subject: string
+          target_audience: string
+          template_id?: string | null
+          timezone?: string | null
+        }
+        Update: {
+          body?: string
+          created_at?: string | null
+          created_by?: string | null
+          error_message?: string | null
+          id?: string
+          last_sent_at?: string | null
+          next_scheduled_time?: string | null
+          recipient_count?: number | null
+          recipient_emails?: string[] | null
+          recurrence_interval?: string | null
+          recurrence_pattern?: string | null
+          scheduled_time?: string
+          sent_at?: string | null
+          status?: string | null
+          subject?: string
+          target_audience?: string
+          template_id?: string | null
+          timezone?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "scheduled_emails_template_id_fkey"
+            columns: ["template_id"]
+            isOneToOne: false
+            referencedRelation: "email_templates"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       scheduled_notifications: {
         Row: {
           body: string
