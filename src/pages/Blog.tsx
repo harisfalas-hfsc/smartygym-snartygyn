@@ -23,86 +23,13 @@ interface Article {
   author_name?: string;
 }
 
-const articles: Article[] = [
-  {
-    id: "1",
-    slug: "building-muscle-complete-guide",
-    title: "Building Muscle: The Complete Guide",
-    excerpt: "Everything you need to know about gaining muscle mass effectively",
-    image: "https://images.unsplash.com/photo-1581009146145-b5ef050c2e1e?auto=format&fit=crop&q=80&w=800",
-    readTime: "8 min read",
-    date: "March 15, 2024",
-    category: "Fitness",
-  },
-  {
-    id: "2",
-    slug: "hiit-vs-steady-state-cardio",
-    title: "HIIT vs Steady State Cardio",
-    excerpt: "Which cardio method is best for your fitness goals?",
-    image: "https://images.unsplash.com/photo-1538805060514-97d9cc17730c?auto=format&fit=crop&q=80&w=800",
-    readTime: "6 min read",
-    date: "March 12, 2024",
-    category: "Fitness",
-  },
-  {
-    id: "3",
-    slug: "perfect-form-squat-technique",
-    title: "Perfect Form: Squat Technique",
-    excerpt: "Master the king of all exercises with proper technique",
-    image: "https://images.unsplash.com/photo-1574680096145-d05b474e2155?auto=format&fit=crop&q=80&w=800",
-    readTime: "7 min read",
-    date: "March 10, 2024",
-    category: "Fitness",
-  },
-  {
-    id: "4",
-    slug: "recovery-strategies-athletes",
-    title: "Recovery Strategies for Athletes",
-    excerpt: "Optimize your recovery to maximize performance gains",
-    image: "https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?auto=format&fit=crop&q=80&w=800",
-    readTime: "9 min read",
-    date: "March 8, 2024",
-    category: "Wellness",
-  },
-  {
-    id: "5",
-    slug: "nutrition-timing-performance",
-    title: "Nutrition Timing for Performance",
-    excerpt: "When to eat for optimal training results",
-    image: "https://images.unsplash.com/photo-1490645935967-10de6ba17061?auto=format&fit=crop&q=80&w=800",
-    readTime: "7 min read",
-    date: "March 5, 2024",
-    category: "Nutrition",
-  },
-  {
-    id: "16",
-    slug: "creatine-performance-supplement",
-    title: "Creatine: The Ultimate Performance Supplement",
-    excerpt: "Science-backed benefits and how to use creatine effectively",
-    image: "https://images.unsplash.com/photo-1579722821273-0f6c7d44362f?auto=format&fit=crop&q=80&w=800",
-    readTime: "10 min read",
-    date: "March 18, 2024",
-    category: "Nutrition",
-  },
-  {
-    id: "17",
-    slug: "training-frequency-optimal-schedule",
-    title: "Training Frequency: Finding Your Optimal Schedule",
-    excerpt: "How often should you train for maximum results?",
-    image: "https://images.unsplash.com/photo-1517836357463-d25dfeac3438?auto=format&fit=crop&q=80&w=800",
-    readTime: "8 min read",
-    date: "March 17, 2024",
-    category: "Fitness",
-  },
-];
 
 const Blog = () => {
   const navigate = useNavigate();
   const { canGoBack, goBack } = useShowBackButton();
   const [categoryFilter, setCategoryFilter] = useState<string>("all");
   const [sortFilter, setSortFilter] = useState<string>("newest");
-  const [dbArticles, setDbArticles] = useState<Article[]>([]);
-  const [allArticles, setAllArticles] = useState<Article[]>(articles);
+  const [allArticles, setAllArticles] = useState<Article[]>([]);
 
   useEffect(() => {
     const fetchArticles = async () => {
@@ -132,15 +59,7 @@ const Blog = () => {
             author_name: article.author_name,
           }));
 
-          setDbArticles(formattedArticles);
-          
-          const combined = [...formattedArticles, ...articles].sort((a, b) => {
-            const dateA = new Date(a.date).getTime();
-            const dateB = new Date(b.date).getTime();
-            return dateB - dateA;
-          });
-          
-          setAllArticles(combined);
+          setAllArticles(formattedArticles);
         }
       } catch (error) {
         console.error('Error fetching articles:', error);
