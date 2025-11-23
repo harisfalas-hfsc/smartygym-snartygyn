@@ -52,7 +52,7 @@ serve(async (req) => {
     // Fetch all profiles
     const { data: profiles, error: profilesError } = await supabaseAdmin
       .from('profiles')
-      .select('user_id, full_name, nickname, avatar_url, created_at');
+      .select('user_id, full_name, avatar_url, created_at');
 
     if (profilesError) throw profilesError;
 
@@ -75,7 +75,6 @@ serve(async (req) => {
       return {
         user_id: profile.user_id,
         full_name: profile.full_name,
-        nickname: profile.nickname,
         avatar_url: profile.avatar_url,
         email: authUser?.email || null,
         plan_type: subscription?.plan_type || 'free',

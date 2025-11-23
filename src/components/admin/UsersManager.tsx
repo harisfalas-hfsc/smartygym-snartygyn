@@ -14,7 +14,6 @@ import { format } from "date-fns";
 interface UserData {
   user_id: string;
   full_name: string | null;
-  nickname: string | null;
   avatar_url: string | null;
   email: string | null;
   plan_type: string;
@@ -123,7 +122,6 @@ export function UsersManager() {
     if (searchTerm) {
       filtered = filtered.filter(user =>
         user.full_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        user.nickname?.toLowerCase().includes(searchTerm.toLowerCase()) ||
         user.email?.toLowerCase().includes(searchTerm.toLowerCase())
       );
     }
@@ -148,11 +146,10 @@ export function UsersManager() {
   }, [searchTerm, planFilter, statusFilter, users, userPurchases]);
 
   const exportToCSV = () => {
-    const headers = ["User ID", "Name", "Nickname", "Email", "Is Admin", "Plan", "Status", "Period Start", "Period End", "Joined"];
+    const headers = ["User ID", "Name", "Email", "Is Admin", "Plan", "Status", "Period Start", "Period End", "Joined"];
     const rows = filteredUsers.map(user => [
       user.user_id,
       user.full_name || '',
-      user.nickname || '',
       user.email || '',
       userRoles[user.user_id]?.includes('admin') ? 'Yes' : 'No',
       user.plan_type,
@@ -343,14 +340,11 @@ export function UsersManager() {
                           <Avatar>
                             <AvatarImage src={user.avatar_url || undefined} />
                             <AvatarFallback>
-                              {user.full_name?.charAt(0) || user.nickname?.charAt(0) || 'U'}
+                              {user.full_name?.charAt(0) || 'U'}
                             </AvatarFallback>
                           </Avatar>
                           <div>
-                            <p className="font-medium">{user.full_name || user.nickname || 'Anonymous'}</p>
-                            {user.nickname && user.full_name && (
-                              <p className="text-xs text-muted-foreground">@{user.nickname}</p>
-                            )}
+                            <p className="font-medium">{user.full_name || 'Anonymous'}</p>
                           </div>
                         </div>
                       </TableCell>
