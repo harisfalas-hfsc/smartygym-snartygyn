@@ -19,7 +19,6 @@ interface UserProfile {
   user_id: string;
   email: string | null;
   full_name: string | null;
-  nickname: string | null;
   plan_type: string;
 }
 
