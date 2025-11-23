@@ -34,17 +34,6 @@ interface Comment {
   display_name: string;
 }
 
-// Realistic fake names from various cultures
-const FAKE_NAMES = [
-  "Dimitris Papadopoulos", "Elena Georgiou", "Nikos Konstantinou", "Maria Vlachou",
-  "Yiannis Andreou", "Sophia Christodoulou", "Kostas Makris", "Despina Nikolaou",
-  "James Anderson", "Emma Thompson", "Oliver Williams", "Charlotte Davies",
-  "William Brown", "Sophia Miller", "George Taylor", "Isabella Wilson",
-  "Kwame Mensah", "Amara Okafor", "Jabari Nkosi", "Zara Adeyemi",
-  "Ahmed Hassan", "Fatima Ali", "Omar Ibrahim", "Leila Mohamed",
-  "Lucas Silva", "Sofia Martinez", "Diego Rodriguez", "Valentina Garcia",
-  "Raj Patel", "Priya Sharma", "Arjun Kumar", "Ananya Singh"
-];
 
 const Community = () => {
   const [workoutLeaderboard, setWorkoutLeaderboard] = useState<LeaderboardEntry[]>([]);
@@ -99,47 +88,31 @@ const Community = () => {
         .select("user_id, full_name")
         .in("user_id", allUserIds);
 
-      // Create workout leaderboard with real + fake data
+      // Create workout leaderboard with real data only
       const workoutEntries: LeaderboardEntry[] = Object.entries(workoutCounts).map(([userId, count]) => {
         const profile = profilesData?.find((p) => p.user_id === userId);
         return {
           user_id: userId,
-          display_name: profile?.full_name || FAKE_NAMES[Math.floor(Math.random() * FAKE_NAMES.length)],
+          display_name: profile?.full_name || "Anonymous User",
           total_completions: count,
         };
       });
 
-      // Add fake workout data (always add 20 fake users, real users will appear on top)
-      for (let i = 0; i < 20; i++) {
-        workoutEntries.push({
-          user_id: `fake-workout-${i}`,
-          display_name: FAKE_NAMES[i % FAKE_NAMES.length],
-          total_completions: Math.floor(Math.random() * 15) + 5,
-        });
-      }
       workoutEntries.sort((a, b) => b.total_completions - a.total_completions);
-      setWorkoutLeaderboard(workoutEntries.slice(0, 20));
+      setWorkoutLeaderboard(workoutEntries);
 
-      // Create program leaderboard with real + fake data
+      // Create program leaderboard with real data only
       const programEntries: LeaderboardEntry[] = Object.entries(programCounts).map(([userId, count]) => {
         const profile = profilesData?.find((p) => p.user_id === userId);
         return {
           user_id: userId,
-          display_name: profile?.full_name || FAKE_NAMES[Math.floor(Math.random() * FAKE_NAMES.length)],
+          display_name: profile?.full_name || "Anonymous User",
           total_completions: count,
         };
       });
 
-      // Add fake program data (always add 20 fake users, real users will appear on top)
-      for (let i = 0; i < 20; i++) {
-        programEntries.push({
-          user_id: `fake-program-${i}`,
-          display_name: FAKE_NAMES[(i + 10) % FAKE_NAMES.length],
-          total_completions: Math.floor(Math.random() * 8) + 2,
-        });
-      }
       programEntries.sort((a, b) => b.total_completions - a.total_completions);
-      setProgramLeaderboard(programEntries.slice(0, 20));
+      setProgramLeaderboard(programEntries);
       
     } catch (error) {
       console.error("Error fetching leaderboards:", error);
@@ -165,45 +138,16 @@ const Community = () => {
         .select("user_id, full_name")
         .in("user_id", userIds);
 
-      // Combine comments with display names (real or fake)
+      // Combine comments with display names (real only)
       const commentsWithNames = commentsData?.map((comment) => {
         const profile = profilesData?.find((p) => p.user_id === comment.user_id);
         return {
           ...comment,
-          display_name: profile?.full_name || FAKE_NAMES[Math.floor(Math.random() * FAKE_NAMES.length)],
+          display_name: profile?.full_name || "Anonymous User",
         };
       }) || [];
 
-      // Add fake comments (always add 20 fake comments, real ones will appear alongside)
-      const fakeCommentCount = 20;
-      const fakeComments: Comment[] = [];
-      const sampleWorkouts = ["Bodyweight Blast", "Iron Core", "Cardio Inferno", "Power Surge", "Core Flow", "Metabolic Burn", "Explosive Start"];
-      const sampleCommentTexts = [
-        "Amazing workout! Really felt the burn!",
-        "Perfect intensity for my fitness level.",
-        "Love this routine, seeing great results!",
-        "Challenging but so worth it!",
-        "Best workout I have tried in months!",
-        "Incredible program! My strength has improved dramatically.",
-        "Fantastic exercises, very well structured!",
-        "This workout is exactly what I needed. Highly recommend!",
-        "Great balance of cardio and strength training.",
-        "Excellent workout routine! Already seeing progress after two weeks.",
-      ];
-
-      for (let i = 0; i < fakeCommentCount; i++) {
-        fakeComments.push({
-          id: `fake-comment-${i}`,
-          user_id: `fake-user-${i}`,
-          workout_name: sampleWorkouts[i % sampleWorkouts.length],
-          program_name: null,
-          comment_text: sampleCommentTexts[i % sampleCommentTexts.length],
-          created_at: new Date(Date.now() - Math.random() * 7 * 24 * 60 * 60 * 1000).toISOString(),
-          display_name: FAKE_NAMES[i % FAKE_NAMES.length],
-        });
-      }
-
-      const allComments = [...commentsWithNames, ...fakeComments];
+      const allComments = commentsWithNames;
       allComments.sort((a, b) => {
         const dateA = new Date(a.created_at).getTime();
         const dateB = new Date(b.created_at).getTime();
@@ -278,6 +222,16 @@ const Community = () => {
                     <Skeleton key={i} className="h-12 w-full" />
                   ))}
                 </div>
+              ) : workoutLeaderboard.length === 0 ? (
+                <div className="text-center py-12 text-muted-foreground">
+                  <Trophy className="h-12 w-12 mx-auto mb-4 opacity-30" />
+                  <p className="text-lg font-medium mb-2">
+                    No completions yet
+                  </p>
+                  <p className="text-sm">
+                    Start your fitness journey today and be the first on the leaderboard!
+                  </p>
+                </div>
               ) : (
                 <ScrollArea className="h-[400px] md:h-[500px] pr-2 md:pr-4">
                   <div className="overflow-x-auto">
@@ -338,6 +292,16 @@ const Community = () => {
                   {[...Array(10)].map((_, i) => (
                     <Skeleton key={i} className="h-12 w-full" />
                   ))}
+                </div>
+              ) : programLeaderboard.length === 0 ? (
+                <div className="text-center py-12 text-muted-foreground">
+                  <Target className="h-12 w-12 mx-auto mb-4 opacity-30" />
+                  <p className="text-lg font-medium mb-2">
+                    No program completions yet
+                  </p>
+                  <p className="text-sm">
+                    Complete a training program and see your name here!
+                  </p>
                 </div>
               ) : (
                 <ScrollArea className="h-[400px] md:h-[500px] pr-2 md:pr-4">
