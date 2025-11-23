@@ -286,6 +286,16 @@ export const ScheduledEmailsManager = () => {
   };
 
   const handleTemplateSelect = (templateId: string) => {
+    if (templateId === "no-template") {
+      setFormData({
+        ...formData,
+        template_id: "",
+        subject: "",
+        body: "",
+      });
+      return;
+    }
+    
     const template = templates.find(t => t.id === templateId);
     if (template) {
       setFormData({
@@ -324,7 +334,7 @@ export const ScheduledEmailsManager = () => {
                     <SelectValue placeholder="Select a template" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="">No template</SelectItem>
+                    <SelectItem value="no-template">No template</SelectItem>
                     {templates.map((template) => (
                       <SelectItem key={template.id} value={template.id}>
                         {template.name}
