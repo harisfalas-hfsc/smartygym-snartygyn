@@ -1188,7 +1188,11 @@ export type Database = {
           error_message: string | null
           icon: string | null
           id: string
+          last_sent_at: string | null
+          next_scheduled_time: string | null
           recipient_count: number | null
+          recurrence_interval: string | null
+          recurrence_pattern: string | null
           scheduled_time: string
           sent_at: string | null
           status: string
@@ -1204,7 +1208,11 @@ export type Database = {
           error_message?: string | null
           icon?: string | null
           id?: string
+          last_sent_at?: string | null
+          next_scheduled_time?: string | null
           recipient_count?: number | null
+          recurrence_interval?: string | null
+          recurrence_pattern?: string | null
           scheduled_time: string
           sent_at?: string | null
           status?: string
@@ -1220,7 +1228,11 @@ export type Database = {
           error_message?: string | null
           icon?: string | null
           id?: string
+          last_sent_at?: string | null
+          next_scheduled_time?: string | null
           recipient_count?: number | null
+          recurrence_interval?: string | null
+          recurrence_pattern?: string | null
           scheduled_time?: string
           sent_at?: string | null
           status?: string
