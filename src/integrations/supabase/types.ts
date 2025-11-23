@@ -991,39 +991,6 @@ export type Database = {
         }
         Relationships: []
       }
-      push_subscriptions: {
-        Row: {
-          browser_info: string | null
-          created_at: string | null
-          device_type: string | null
-          id: string
-          is_active: boolean | null
-          subscription_data: Json
-          updated_at: string | null
-          user_id: string | null
-        }
-        Insert: {
-          browser_info?: string | null
-          created_at?: string | null
-          device_type?: string | null
-          id?: string
-          is_active?: boolean | null
-          subscription_data: Json
-          updated_at?: string | null
-          user_id?: string | null
-        }
-        Update: {
-          browser_info?: string | null
-          created_at?: string | null
-          device_type?: string | null
-          id?: string
-          is_active?: boolean | null
-          subscription_data?: Json
-          updated_at?: string | null
-          user_id?: string | null
-        }
-        Relationships: []
-      }
       rate_limits: {
         Row: {
           created_at: string
