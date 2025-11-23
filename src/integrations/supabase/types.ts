@@ -1754,6 +1754,7 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      ensure_cron_jobs: { Args: never; Returns: Json }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
@@ -1769,6 +1770,7 @@ export type Database = {
         Returns: boolean
       }
       is_user_banned: { Args: { user_id_param: string }; Returns: boolean }
+      pg_cron_enabled: { Args: never; Returns: boolean }
     }
     Enums: {
       app_role: "admin" | "moderator" | "user"
