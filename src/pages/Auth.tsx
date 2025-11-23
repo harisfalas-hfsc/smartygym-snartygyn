@@ -12,6 +12,7 @@ import { useToast } from "@/hooks/use-toast";
 import { ArrowLeft } from "lucide-react";
 import smartyGymLogo from "@/assets/smarty-gym-logo.png";
 import { AvatarSetupDialog } from "@/components/AvatarSetupDialog";
+import { ForgotPasswordDialog } from "@/components/auth/ForgotPasswordDialog";
 import { trackSocialMediaEvent } from "@/utils/socialMediaTracking";
 
 export default function Auth() {
@@ -20,6 +21,7 @@ export default function Auth() {
   const { toast } = useToast();
   const [loading, setLoading] = useState(false);
   const [showAvatarSetup, setShowAvatarSetup] = useState(false);
+  const [showForgotPassword, setShowForgotPassword] = useState(false);
   const [newUserId, setNewUserId] = useState<string | null>(null);
   
   // Get the mode from URL params, default to login
@@ -277,6 +279,15 @@ export default function Auth() {
                   required
                 />
               </div>
+              <div className="flex items-center justify-end">
+                <button
+                  type="button"
+                  onClick={() => setShowForgotPassword(true)}
+                  className="text-sm text-primary hover:underline"
+                >
+                  Forgot password?
+                </button>
+              </div>
                 <div className="flex items-center space-x-2">
                   <Checkbox
                     id="remember-me"
@@ -358,6 +369,17 @@ export default function Auth() {
           </Tabs>
         </CardContent>
       </Card>
+      
+      <AvatarSetupDialog
+        open={showAvatarSetup}
+        onOpenChange={setShowAvatarSetup}
+        userId={newUserId}
+      />
+      
+      <ForgotPasswordDialog
+        open={showForgotPassword}
+        onOpenChange={setShowForgotPassword}
+      />
       </div>
     </div>
   );

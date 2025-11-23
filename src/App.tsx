@@ -22,6 +22,7 @@ import { ArticleDetail } from "./pages/ArticleDetail";
 import { trackPageVisit } from "./utils/socialMediaTracking";
 import Index from "./pages/Index";
 import Auth from "./pages/Auth";
+import ResetPassword from "./pages/ResetPassword";
 import Dashboard from "./pages/Dashboard";
 import UserDashboard from "./pages/UserDashboard";
 import WorkoutFlow from "./pages/WorkoutFlow";
@@ -93,6 +94,7 @@ const AppContent = () => {
                 <Routes>
                   <Route path="/" element={<Index />} />
                   <Route path="/auth" element={<Auth />} />
+                  <Route path="/reset-password" element={<ResetPassword />} />
                   <Route path="/joinpremium" element={<JoinPremium />} />
                   <Route path="/premiumbenefits" element={<PremiumBenefits />} />
                   <Route path="/premium-comparison" element={<PremiumComparison />} />
