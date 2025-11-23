@@ -4,10 +4,8 @@ import { PageBreadcrumbs } from "@/components/PageBreadcrumbs";
 import { Card } from "@/components/ui/card";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { WorkoutGeneratorCard } from "@/components/workout-generator/WorkoutGeneratorCard";
-
 const SmartyWorkout = () => {
-  return (
-    <>
+  return <>
       <Helmet>
         <title>SmartyWorkout - Create Your Custom Workout | SmartyGym</title>
         <meta name="description" content="Create personalized workouts based on your needs with the SmartyWorkout generator by Coach Haris Falas" />
@@ -16,16 +14,20 @@ const SmartyWorkout = () => {
 
       <div className="min-h-screen bg-background">
         <div className="container mx-auto max-w-6xl px-4 py-8">
-          <PageBreadcrumbs items={[
-            { label: "Home", href: "/" },
-            { label: "Workouts", href: "/workout" },
-            { label: "SmartyWorkout" }
-          ]} />
+          <PageBreadcrumbs items={[{
+          label: "Home",
+          href: "/"
+        }, {
+          label: "Workouts",
+          href: "/workout"
+        }, {
+          label: "SmartyWorkout"
+        }]} />
 
           {/* Title Card */}
           <Card className="mb-8 bg-gradient-to-br from-primary/5 via-background to-primary/5 border-2 border-primary/40 shadow-gold">
             <div className="p-4 sm:p-6">
-              <h1 className="text-2xl sm:text-3xl font-bold mb-4 text-center">SmartyWorkout</h1>
+              <h1 className="text-2xl sm:text-3xl font-bold mb-4 text-center">About SmartyWorkout</h1>
               <div className="text-muted-foreground max-w-3xl mx-auto text-center">
                 <p>
                   Feeling stuck in your routine? Want to try something new? Looking for a workout that's actually built for <strong>YOU</strong> — your goals, your equipment, your vibe? SmartyWorkout is your answer. This isn't some robot throwing random exercises at you. It's a comprehensive system built from{" "}
@@ -159,8 +161,6 @@ const SmartyWorkout = () => {
           <WorkoutGeneratorCard />
         </div>
       </div>
-    </>
-  );
+    </>;
 };
-
 export default SmartyWorkout;
