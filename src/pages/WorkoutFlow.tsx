@@ -10,6 +10,7 @@ import { generateBreadcrumbSchema } from "@/utils/seoHelpers";
 import { useAccessControl } from "@/hooks/useAccessControl";
 import { useShowBackButton } from "@/hooks/useShowBackButton";
 import { ScrollReveal } from "@/components/ScrollReveal";
+import smartyGymLogo from "@/assets/smarty-gym-logo.png";
 const WorkoutFlow = () => {
   const navigate = useNavigate();
   const {
@@ -190,8 +191,8 @@ const WorkoutFlow = () => {
         <Card className="mt-8 bg-gradient-to-br from-primary/5 via-background to-primary/5 border-2 border-primary/40 shadow-gold">
           <div className="p-4 sm:p-5">
             <div className="flex items-center justify-center mb-4">
-              <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center mr-3">
-                <TrendingUp className="w-6 h-6 text-primary" />
+              <div className="w-12 h-12 flex items-center justify-center mr-3">
+                <img src={smartyGymLogo} alt="SmartyGym" className="w-12 h-12 object-contain" />
               </div>
               <h2 className="text-xl sm:text-2xl font-bold text-center">Create Your Own Workout</h2>
             </div>
@@ -213,9 +214,9 @@ const WorkoutFlow = () => {
                 <Button 
                   size="lg" 
                   className="cta-button"
-                  disabled
+                  onClick={() => navigate("/smartyworkout")}
                 >
-                  Coming Soon
+                  SmartyWorkout
                 </Button>
               </div>
             </div>
