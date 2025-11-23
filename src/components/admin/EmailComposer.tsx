@@ -22,7 +22,6 @@ interface UserData {
   user_id: string;
   email?: string;
   full_name: string | null;
-  nickname: string | null;
   plan_type: string;
   status: string;
   user_type: 'registered' | 'newsletter'; // Track user type
@@ -83,27 +82,25 @@ export function EmailComposer() {
       const registeredUsers: UserData[] = (usersData?.users || []).map((user: any) => {
         const subscription = subscriptions?.find(sub => sub.user_id === user.id);
         
-        return {
-          user_id: user.id,
-          email: user.email,
-          full_name: user.full_name || user.email,
-          nickname: user.nickname,
-          plan_type: subscription?.plan_type || 'free',
-          status: subscription?.status || 'inactive',
-          user_type: 'registered' as const,
-        };
+      return {
+        user_id: user.id,
+        email: user.email,
+        full_name: user.full_name || user.email,
+        plan_type: subscription?.plan_type || 'free',
+        status: subscription?.status || 'inactive',
+        user_type: 'registered' as const,
+      };
       });
 
       // Add newsletter subscribers as separate user type
-      const newsletterUsers: UserData[] = (newsletterSubs || []).map(sub => ({
-        user_id: sub.id,
-        email: sub.email,
-        full_name: sub.name,
-        nickname: null,
-        plan_type: 'newsletter',
-        status: 'active',
-        user_type: 'newsletter' as const,
-      }));
+    const newsletterUsers: UserData[] = (newsletterSubs || []).map(sub => ({
+      user_id: sub.id,
+      email: sub.email,
+      full_name: sub.name,
+      plan_type: 'newsletter',
+      status: 'active',
+      user_type: 'newsletter' as const,
+    }));
 
       const allUsers = [...registeredUsers, ...newsletterUsers];
       setUsers(allUsers);

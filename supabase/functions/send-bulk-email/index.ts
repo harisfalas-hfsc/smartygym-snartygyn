@@ -79,7 +79,7 @@ serve(async (req) => {
     if (userIds && userIds.length > 0) {
       const { data: profiles, error: profilesError } = await supabaseClient
         .from('profiles')
-        .select('user_id, full_name, nickname')
+        .select('user_id, full_name')
         .in('user_id', userIds);
 
       if (profilesError) throw profilesError;
@@ -95,7 +95,7 @@ serve(async (req) => {
           const authUser = authUsers.find(u => u.id === profile.user_id);
           return {
             email: authUser?.email,
-            name: profile.full_name || profile.nickname || 'User'
+            name: profile.full_name || 'User'
           };
         })
         .filter(r => r.email) as Array<{ email: string; name: string }>;
