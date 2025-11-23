@@ -112,14 +112,46 @@ serve(async (req: Request) => {
             throw pushError;
           }
 
-          // Update notification status
+          // Update notification status and handle recurrence
+          const now = new Date();
+          const updateData: any = {
+            status: notification.recurrence_pattern === "once" ? "sent" : "pending",
+            sent_at: now.toISOString(),
+            recipient_count: targetUserIds.length,
+            last_sent_at: now.toISOString(),
+          };
+
+          // Calculate next scheduled time for recurring notifications
+          if (notification.recurrence_pattern !== "once") {
+            let nextTime = new Date(now);
+            
+            switch (notification.recurrence_pattern) {
+              case "daily":
+                nextTime.setDate(nextTime.getDate() + 1);
+                break;
+              case "weekly":
+                nextTime.setDate(nextTime.getDate() + 7);
+                break;
+              case "twice_weekly":
+                nextTime.setDate(nextTime.getDate() + 3); // Every ~3.5 days
+                break;
+              case "three_times_weekly":
+                nextTime.setDate(nextTime.getDate() + 2); // Every ~2.3 days
+                break;
+              case "custom":
+                if (notification.recurrence_interval) {
+                  nextTime.setDate(nextTime.getDate() + parseInt(notification.recurrence_interval));
+                }
+                break;
+            }
+            
+            updateData.next_scheduled_time = nextTime.toISOString();
+            updateData.scheduled_time = nextTime.toISOString(); // Update main scheduled_time too
+          }
+
           await supabase
             .from("scheduled_notifications")
-            .update({
-              status: "sent",
-              sent_at: new Date().toISOString(),
-              recipient_count: targetUserIds.length,
-            })
+            .update(updateData)
             .eq("id", notification.id);
 
           // Log to notification audit
