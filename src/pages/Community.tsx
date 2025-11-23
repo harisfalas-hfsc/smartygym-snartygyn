@@ -83,10 +83,14 @@ const Community = () => {
 
       // Get user profiles
       const allUserIds = [...new Set([...Object.keys(workoutCounts), ...Object.keys(programCounts)])];
-      const { data: profilesData } = await supabase
+      const { data: profilesData, error: profilesError } = await supabase
         .from("profiles")
         .select("user_id, full_name")
         .in("user_id", allUserIds);
+
+      if (profilesError) {
+        console.error("Error fetching profiles for leaderboard:", profilesError);
+      }
 
       // Create workout leaderboard with real data only
       const workoutEntries: LeaderboardEntry[] = Object.entries(workoutCounts).map(([userId, count]) => {
@@ -133,10 +137,14 @@ const Community = () => {
 
       // Fetch profiles for comment authors
       const userIds = [...new Set(commentsData?.map((c) => c.user_id) || [])];
-      const { data: profilesData } = await supabase
+      const { data: profilesData, error: profilesError } = await supabase
         .from("profiles")
         .select("user_id, full_name")
         .in("user_id", userIds);
+
+      if (profilesError) {
+        console.error("Error fetching profiles for comments:", profilesError);
+      }
 
       // Combine comments with display names (real only)
       const commentsWithNames = commentsData?.map((comment) => {
