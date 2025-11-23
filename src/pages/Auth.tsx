@@ -3,6 +3,7 @@ import { useNavigate, useSearchParams } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { PasswordInput } from "@/components/ui/password-input";
 import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -266,17 +267,16 @@ export default function Auth() {
                     required
                   />
                 </div>
-                <div className="space-y-2">
-                  <Label htmlFor="login-password">Password</Label>
-                  <Input
-                    id="login-password"
-                    type="password"
-                    placeholder="••••••••"
-                    value={loginData.password}
-                    onChange={(e) => setLoginData({ ...loginData, password: e.target.value })}
-                    required
-                  />
-                </div>
+              <div className="space-y-2">
+                <Label htmlFor="login-password">Password</Label>
+                <PasswordInput
+                  id="login-password"
+                  placeholder="••••••••"
+                  value={loginData.password}
+                  onChange={(e) => setLoginData({ ...loginData, password: e.target.value })}
+                  required
+                />
+              </div>
                 <div className="flex items-center space-x-2">
                   <Checkbox
                     id="remember-me"
@@ -317,28 +317,26 @@ export default function Auth() {
                     required
                   />
                 </div>
-                <div className="space-y-2">
-                  <Label htmlFor="signup-password">Password</Label>
-                  <Input
-                    id="signup-password"
-                    type="password"
-                    placeholder="••••••••"
-                    value={signUpData.password}
-                    onChange={(e) => setSignUpData({ ...signUpData, password: e.target.value })}
-                    required
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="signup-confirm-password">Confirm Password</Label>
-                  <Input
-                    id="signup-confirm-password"
-                    type="password"
-                    placeholder="••••••••"
-                    value={signUpData.confirmPassword}
-                    onChange={(e) => setSignUpData({ ...signUpData, confirmPassword: e.target.value })}
-                    required
-                  />
-                </div>
+              <div className="space-y-2">
+                <Label htmlFor="signup-password">Password</Label>
+                <PasswordInput
+                  id="signup-password"
+                  placeholder="••••••••"
+                  value={signUpData.password}
+                  onChange={(e) => setSignUpData({ ...signUpData, password: e.target.value })}
+                  required
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="signup-confirm-password">Confirm Password</Label>
+                <PasswordInput
+                  id="signup-confirm-password"
+                  placeholder="••••••••"
+                  value={signUpData.confirmPassword}
+                  onChange={(e) => setSignUpData({ ...signUpData, confirmPassword: e.target.value })}
+                  required
+                />
+              </div>
                 <div className="flex items-center space-x-2">
                   <Checkbox
                     id="terms"
