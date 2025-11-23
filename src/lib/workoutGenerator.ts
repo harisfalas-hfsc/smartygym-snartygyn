@@ -11,8 +11,22 @@ export function generateWorkout(inputs: WorkoutGeneratorInputs): GeneratedWorkou
   // Filter exercises based on inputs
   const filteredExercises = filterExercises(inputs);
   
+  // Validate that we have exercises matching the criteria
+  if (filteredExercises.length === 0) {
+    throw new Error(
+      "No exercises match your selected criteria. Please try adjusting your Body Focus, changing the Format, or selecting a different Workout Type."
+    );
+  }
+  
   // Select exercises for the workout
   const selectedExercises = selectExercises(filteredExercises, inputs);
+  
+  // Double-check we have enough exercises
+  if (selectedExercises.length === 0) {
+    throw new Error(
+      "Unable to generate a workout with the selected criteria. Please try different options."
+    );
+  }
   
   // Structure the workout based on format
   const workoutPlan = structureWorkout(selectedExercises, inputs);
