@@ -1,4 +1,5 @@
 import { Helmet } from "react-helmet";
+import { Link } from "react-router-dom";
 import { PageBreadcrumbs } from "@/components/PageBreadcrumbs";
 import { Card } from "@/components/ui/card";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
@@ -25,15 +26,13 @@ const SmartyWorkout = () => {
           <Card className="mb-8 bg-gradient-to-br from-primary/5 via-background to-primary/5 border-2 border-primary/40 shadow-gold">
             <div className="p-4 sm:p-6">
               <h1 className="text-2xl sm:text-3xl font-bold mb-4 text-center">SmartyWorkout</h1>
-              <div className="space-y-3 text-muted-foreground max-w-3xl mx-auto text-center">
+              <div className="text-muted-foreground max-w-3xl mx-auto text-center">
                 <p>
-                  This is a Smarty Calculator — a comprehensive library built from Coach Haris Falas's extensive knowledge, expertise, and real-world database.
-                </p>
-                <p>
-                  Instead of relying on generic AI, this tool uses actual workout protocols, movement patterns, and training science to design a tailor-made workout that fits your needs, equipment, and characteristics.
-                </p>
-                <p>
-                  Choose your preferences below, and let's get you a workout that works.
+                  Feeling stuck in your routine? Want to try something new? Looking for a workout that's actually built for <strong>YOU</strong> — your goals, your equipment, your vibe? SmartyWorkout is your answer. This isn't some robot throwing random exercises at you. It's a comprehensive system built from{" "}
+                  <Link to="/coach-profile" className="text-primary hover:underline font-medium">
+                    Coach Haris Falas
+                  </Link>
+                  's extensive knowledge, real-world training database, and years of expertise. Every workout is crafted from actual protocols, movement patterns, and training science — tailored to fit your needs, equipment, and characteristics. Choose your preferences below, and let's get you a workout that works.
                 </p>
               </div>
             </div>
