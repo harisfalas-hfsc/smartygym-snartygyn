@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Printer, RotateCcw, Save } from "lucide-react";
+import { RotateCcw } from "lucide-react";
 import type { GeneratedWorkout } from "@/types/workoutGenerator";
 
 interface GeneratedWorkoutDisplayProps {
@@ -9,10 +9,6 @@ interface GeneratedWorkoutDisplayProps {
 }
 
 export function GeneratedWorkoutDisplay({ workout, onGenerateAnother }: GeneratedWorkoutDisplayProps) {
-  const handlePrint = () => {
-    window.print();
-  };
-
   return (
     <div className="space-y-6">
       {/* Header Card */}
@@ -119,41 +115,13 @@ export function GeneratedWorkoutDisplay({ workout, onGenerateAnother }: Generate
         </CardContent>
       </Card>
 
-      {/* Action Buttons */}
-      <div className="flex flex-wrap gap-3 print:hidden">
-        <Button onClick={onGenerateAnother} variant="default" size="lg" className="flex-1 sm:flex-none">
+      {/* Action Button */}
+      <div className="flex justify-center">
+        <Button onClick={onGenerateAnother} variant="default" size="lg" className="w-full sm:w-auto">
           <RotateCcw className="mr-2 h-4 w-4" />
           Generate Another Workout
         </Button>
-        <Button onClick={handlePrint} variant="outline" size="lg" className="flex-1 sm:flex-none">
-          <Printer className="mr-2 h-4 w-4" />
-          Print Workout
-        </Button>
-        <Button variant="outline" size="lg" className="flex-1 sm:flex-none" disabled title="Coming Soon">
-          <Save className="mr-2 h-4 w-4" />
-          Save Workout
-        </Button>
       </div>
-
-      {/* Print Styles */}
-      <style>{`
-        @media print {
-          body * {
-            visibility: hidden;
-          }
-          .print\\:hidden {
-            display: none !important;
-          }
-          /* Show only the workout content */
-          [class*="GeneratedWorkoutDisplay"] * {
-            visibility: visible;
-          }
-          /* Optimize for print */
-          body {
-            background: white;
-          }
-        }
-      `}</style>
     </div>
   );
 }
