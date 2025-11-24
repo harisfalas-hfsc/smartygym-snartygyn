@@ -41,6 +41,25 @@ serve(async (req) => {
     
     logStep("User details fetched", { email: userEmail, name: userName });
 
+    // Get automation rule configuration
+    const { data: automationRule } = await supabaseAdmin
+      .from("automation_rules")
+      .select("*")
+      .eq("automation_key", "welcome_message")
+      .eq("is_active", true)
+      .single();
+
+    if (!automationRule) {
+      logStep("Welcome automation is disabled or not configured");
+      return new Response(
+        JSON.stringify({ success: false, reason: "Welcome automation disabled" }),
+        {
+          status: 200,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        }
+      );
+    }
+
     // Check user notification preferences
     const { data: preferences } = await supabaseAdmin
       .from("notification_preferences")
@@ -60,9 +79,10 @@ serve(async (req) => {
       );
     }
 
-    // Schedule sending for 5 minutes from now
+    // Get delay from automation rule configuration
+    const delayMinutes = automationRule.trigger_config?.delay_minutes || 5;
     const sendAt = new Date();
-    sendAt.setMinutes(sendAt.getMinutes() + 5);
+    sendAt.setMinutes(sendAt.getMinutes() + delayMinutes);
 
     // Get welcome message template
     const { data: template } = await supabaseAdmin
@@ -84,32 +104,45 @@ serve(async (req) => {
       );
     }
 
-    // Schedule dashboard message for 5 minutes
-    await supabaseAdmin
-      .from("scheduled_notifications")
-      .insert({
-        title: template.subject,
-        body: template.content,
-        target_audience: `user:${record.user_id}`,
-        scheduled_time: sendAt.toISOString(),
-        status: "pending",
-        recurrence_pattern: "once",
-      });
+    // Schedule dashboard message based on automation rule config
+    if (automationRule.sends_dashboard_message) {
+      await supabaseAdmin
+        .from("scheduled_notifications")
+        .insert({
+          title: template.subject,
+          body: template.content,
+          target_audience: `user:${record.user_id}`,
+          scheduled_time: sendAt.toISOString(),
+          status: "pending",
+          recurrence_pattern: "once",
+        });
+    }
 
-    // Schedule email for 5 minutes
-    await supabaseAdmin
-      .from("scheduled_emails")
-      .insert({
-        subject: template.subject,
-        body: template.content,
-        target_audience: `user:${record.user_id}`,
-        recipient_emails: [userEmail],
-        scheduled_time: sendAt.toISOString(),
-        status: "pending",
-        recurrence_pattern: "once",
-      });
+    // Schedule email based on automation rule config
+    if (automationRule.sends_email) {
+      await supabaseAdmin
+        .from("scheduled_emails")
+        .insert({
+          subject: template.subject,
+          body: template.content,
+          target_audience: `user:${record.user_id}`,
+          recipient_emails: [userEmail],
+          scheduled_time: sendAt.toISOString(),
+          status: "pending",
+          recurrence_pattern: "once",
+        });
+    }
 
-    logStep("Welcome messages scheduled for 5 minutes", { sendAt: sendAt.toISOString() });
+    // Update automation rule execution count
+    await supabaseAdmin
+      .from("automation_rules")
+      .update({
+        last_triggered_at: new Date().toISOString(),
+        total_executions: (automationRule.total_executions || 0) + 1,
+      })
+      .eq("id", automationRule.id);
+
+    logStep("Welcome messages scheduled", { sendAt: sendAt.toISOString(), delayMinutes });
 
     return new Response(
       JSON.stringify({ success: true, message: "Welcome messages scheduled for 5 minutes" }),

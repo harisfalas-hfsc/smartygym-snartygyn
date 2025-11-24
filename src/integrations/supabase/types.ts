@@ -260,6 +260,66 @@ export type Database = {
         }
         Relationships: []
       }
+      automation_rules: {
+        Row: {
+          automation_key: string
+          created_at: string | null
+          description: string | null
+          id: string
+          is_active: boolean | null
+          last_triggered_at: string | null
+          message_type: string
+          name: string
+          next_trigger_at: string | null
+          rule_type: string
+          sends_dashboard_message: boolean | null
+          sends_email: boolean | null
+          target_audience: string | null
+          total_executions: number | null
+          trigger_config: Json | null
+          trigger_type: string
+          updated_at: string | null
+        }
+        Insert: {
+          automation_key: string
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          is_active?: boolean | null
+          last_triggered_at?: string | null
+          message_type: string
+          name: string
+          next_trigger_at?: string | null
+          rule_type: string
+          sends_dashboard_message?: boolean | null
+          sends_email?: boolean | null
+          target_audience?: string | null
+          total_executions?: number | null
+          trigger_config?: Json | null
+          trigger_type: string
+          updated_at?: string | null
+        }
+        Update: {
+          automation_key?: string
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          is_active?: boolean | null
+          last_triggered_at?: string | null
+          message_type?: string
+          name?: string
+          next_trigger_at?: string | null
+          rule_type?: string
+          sends_dashboard_message?: boolean | null
+          sends_email?: boolean | null
+          target_audience?: string | null
+          total_executions?: number | null
+          trigger_config?: Json | null
+          trigger_type?: string
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       banned_users: {
         Row: {
           banned_at: string | null

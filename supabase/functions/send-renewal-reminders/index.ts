@@ -26,6 +26,25 @@ serve(async (req) => {
       { auth: { persistSession: false } }
     );
 
+    // Get automation rule configuration
+    const { data: automationRule } = await supabaseAdmin
+      .from("automation_rules")
+      .select("*")
+      .eq("automation_key", "renewal_reminder")
+      .eq("is_active", true)
+      .single();
+
+    if (!automationRule) {
+      logStep("Renewal reminder automation is disabled");
+      return new Response(
+        JSON.stringify({ success: false, reason: "Renewal reminder automation disabled" }),
+        {
+          status: 200,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        }
+      );
+    }
+
     const resend = new Resend(Deno.env.get("RESEND_API_KEY"));
 
     // Get subscriptions expiring in 3 days
@@ -137,6 +156,15 @@ serve(async (req) => {
         logStep("Error sending to user", { userId: subscription.user_id, error: error instanceof Error ? error.message : String(error) });
       }
     }
+
+    // Update automation rule execution count
+    await supabaseAdmin
+      .from("automation_rules")
+      .update({
+        last_triggered_at: new Date().toISOString(),
+        total_executions: (automationRule.total_executions || 0) + messagesSent.length,
+      })
+      .eq("id", automationRule.id);
 
     return new Response(
       JSON.stringify({ success: true, messagesSent: messagesSent.length }),
