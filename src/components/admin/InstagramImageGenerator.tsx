@@ -83,6 +83,8 @@ import { ToolsNavCardTemplate } from "./instagram/hero/ToolsNavCardTemplate";
 import { LibraryNavCardTemplate } from "./instagram/hero/LibraryNavCardTemplate";
 import { BlogNavCardTemplate } from "./instagram/hero/BlogNavCardTemplate";
 import { CoachNavCardTemplate } from "./instagram/hero/CoachNavCardTemplate";
+import { TabletWithSixCardsTemplate } from "./instagram/hero/TabletWithSixCardsTemplate";
+import { WelcomeHeroCompositeTemplate } from "./instagram/hero/WelcomeHeroCompositeTemplate";
 
 // Audience Cards
 import { WhoIsForCompositeTemplate } from "./instagram/audience/WhoIsForCompositeTemplate";
@@ -183,6 +185,8 @@ const communityTemplates: Template[] = [
 ];
 
 const heroTemplates: Template[] = [
+  { id: "welcome-hero-composite", name: "Welcome Hero Composite", component: WelcomeHeroCompositeTemplate },
+  { id: "tablet-six-cards", name: "Tablet with 6 Cards", component: TabletWithSixCardsTemplate },
   { id: "online-fitness-redefined", name: "Online Fitness Redefined", component: OnlineFitnessRedefinedCardTemplate },
   { id: "gym-in-pocket", name: "Your Gym In Your Pocket", component: GymInPocketCardTemplate },
   { id: "human-not-ai-hero", name: "100% Human. 0% AI. (Hero)", component: HumanNotAIHeroCardTemplate },
