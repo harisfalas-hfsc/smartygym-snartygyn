@@ -242,7 +242,7 @@ async function handleSubscriptionCheckout(
     const planName = planType.charAt(0).toUpperCase() + planType.slice(1);
     
     if (isFirstTime) {
-      // Send welcome message first
+      // Send welcome message first (kept separate as requested)
       try {
         await supabase.functions.invoke('send-system-message', {
           body: {
@@ -253,27 +253,67 @@ async function handleSubscriptionCheckout(
         });
         logStep("Welcome message sent");
         
-        // Wait a moment before sending thank you
+        // Wait a moment before sending purchase confirmation
         await new Promise(resolve => setTimeout(resolve, 1000));
       } catch (welcomeError) {
         logStep("ERROR sending welcome message", { error: welcomeError });
       }
     }
     
-    // Send subscription thank you message
-    try {
-      await supabase.functions.invoke('send-system-message', {
-        body: {
-          userId: userId,
-          messageType: 'purchase_subscription',
-          customData: {
-            planName: planName
-          }
-        }
-      });
-      logStep("Subscription thank you message sent", { planName });
-    } catch (thankYouError) {
-      logStep("ERROR sending subscription thank you message", { error: thankYouError });
+    // Get user email
+    const { data: userData } = await supabase.auth.admin.getUserById(userId);
+    const userEmail = userData?.user?.email;
+    
+    if (!userEmail) {
+      logStep("ERROR: Could not get user email for purchase confirmation");
+      return;
+    }
+    
+    // Get purchase confirmation template
+    const { data: template } = await supabase
+      .from('automated_message_templates')
+      .select('subject, content')
+      .eq('message_type', 'purchase_subscription')
+      .eq('is_default', true)
+      .single();
+    
+    if (template) {
+      // Replace placeholders
+      const subject = template.subject.replace('{planName}', planName);
+      const content = template.content.replace('{planName}', planName);
+      
+      // Schedule immediate dashboard notification
+      try {
+        await supabase.from('scheduled_notifications').insert({
+          title: subject,
+          body: content,
+          target_audience: `user:${userId}`,
+          scheduled_time: new Date().toISOString(),
+          status: 'pending',
+          recurrence_pattern: 'once'
+        });
+        logStep("Subscription purchase notification scheduled");
+      } catch (notifError) {
+        logStep("ERROR scheduling subscription notification", { error: notifError });
+      }
+      
+      // Schedule immediate email
+      try {
+        await supabase.from('scheduled_emails').insert({
+          subject: subject,
+          body: content,
+          target_audience: `user:${userId}`,
+          recipient_emails: [userEmail],
+          scheduled_time: new Date().toISOString(),
+          status: 'pending',
+          recurrence_pattern: 'once'
+        });
+        logStep("Subscription purchase email scheduled", { email: userEmail });
+      } catch (emailError) {
+        logStep("ERROR scheduling subscription email", { error: emailError });
+      }
+    } else {
+      logStep("ERROR: Could not find subscription purchase template");
     }
   }
 }
@@ -317,7 +357,7 @@ async function handleOneTimePurchase(
     logStep("Checking if first-time customer for personal training", { userId, isFirstTime });
     
     if (isFirstTime) {
-      // Send welcome message first
+      // Send welcome message first (kept separate as requested)
       try {
         await supabase.functions.invoke('send-system-message', {
           body: {
@@ -328,27 +368,67 @@ async function handleOneTimePurchase(
         });
         logStep("Welcome message sent for personal training");
         
-        // Wait a moment before sending thank you
+        // Wait a moment before sending purchase confirmation
         await new Promise(resolve => setTimeout(resolve, 1000));
       } catch (welcomeError) {
         logStep("ERROR sending welcome message for personal training", { error: welcomeError });
       }
     }
     
-    // Send personal training thank you message
-    try {
-      await supabase.functions.invoke('send-system-message', {
-        body: {
-          userId: userId,
-          messageType: 'purchase_personal_training',
-          customData: {
-            contentName: 'Personal Training Program'
-          }
-        }
-      });
-      logStep("Personal training thank you message sent");
-    } catch (thankYouError) {
-      logStep("ERROR sending personal training thank you message", { error: thankYouError });
+    // Get user email
+    const { data: userData } = await supabase.auth.admin.getUserById(userId);
+    const userEmail = userData?.user?.email;
+    
+    if (!userEmail) {
+      logStep("ERROR: Could not get user email for personal training confirmation");
+      return;
+    }
+    
+    // Get personal training purchase template
+    const { data: template } = await supabase
+      .from('automated_message_templates')
+      .select('subject, content')
+      .eq('message_type', 'purchase_personal_training')
+      .eq('is_default', true)
+      .single();
+    
+    if (template) {
+      const contentName = 'Personal Training Program';
+      const subject = template.subject.replace('{contentName}', contentName);
+      const content = template.content.replace('{contentName}', contentName);
+      
+      // Schedule immediate dashboard notification
+      try {
+        await supabase.from('scheduled_notifications').insert({
+          title: subject,
+          body: content,
+          target_audience: `user:${userId}`,
+          scheduled_time: new Date().toISOString(),
+          status: 'pending',
+          recurrence_pattern: 'once'
+        });
+        logStep("Personal training purchase notification scheduled");
+      } catch (notifError) {
+        logStep("ERROR scheduling personal training notification", { error: notifError });
+      }
+      
+      // Schedule immediate email
+      try {
+        await supabase.from('scheduled_emails').insert({
+          subject: subject,
+          body: content,
+          target_audience: `user:${userId}`,
+          recipient_emails: [userEmail],
+          scheduled_time: new Date().toISOString(),
+          status: 'pending',
+          recurrence_pattern: 'once'
+        });
+        logStep("Personal training purchase email scheduled", { email: userEmail });
+      } catch (emailError) {
+        logStep("ERROR scheduling personal training email", { error: emailError });
+      }
+    } else {
+      logStep("ERROR: Could not find personal training purchase template");
     }
     
     return;
@@ -412,7 +492,7 @@ async function handleOneTimePurchase(
     logStep("Checking if first-time customer for standalone purchase", { userId, isFirstTime });
     
     if (isFirstTime) {
-      // Send welcome message first
+      // Send welcome message first (kept separate as requested)
       try {
         await supabase.functions.invoke('send-system-message', {
           body: {
@@ -423,30 +503,69 @@ async function handleOneTimePurchase(
         });
         logStep("Welcome message sent for standalone purchase");
         
-        // Wait a moment before sending thank you
+        // Wait a moment before sending purchase confirmation
         await new Promise(resolve => setTimeout(resolve, 1000));
       } catch (welcomeError) {
         logStep("ERROR sending welcome message for standalone purchase", { error: welcomeError });
       }
     }
     
+    // Get user email
+    const { data: userData } = await supabase.auth.admin.getUserById(userId);
+    const userEmail = userData?.user?.email;
+    
+    if (!userEmail) {
+      logStep("ERROR: Could not get user email for standalone purchase confirmation");
+      return;
+    }
+    
     // Determine message type based on content type
     const messageType = contentType === 'workout' ? 'purchase_workout' : 'purchase_program';
     
-    // Send standalone purchase thank you message
-    try {
-      await supabase.functions.invoke('send-system-message', {
-        body: {
-          userId: userId,
-          messageType: messageType,
-          customData: {
-            contentName: contentName
-          }
-        }
-      });
-      logStep("Standalone purchase thank you message sent", { contentType, contentName });
-    } catch (thankYouError) {
-      logStep("ERROR sending standalone purchase thank you message", { error: thankYouError });
+    // Get standalone purchase template
+    const { data: template } = await supabase
+      .from('automated_message_templates')
+      .select('subject, content')
+      .eq('message_type', messageType)
+      .eq('is_default', true)
+      .single();
+    
+    if (template) {
+      const subject = template.subject.replace('{contentName}', contentName);
+      const content = template.content.replace('{contentName}', contentName);
+      
+      // Schedule immediate dashboard notification
+      try {
+        await supabase.from('scheduled_notifications').insert({
+          title: subject,
+          body: content,
+          target_audience: `user:${userId}`,
+          scheduled_time: new Date().toISOString(),
+          status: 'pending',
+          recurrence_pattern: 'once'
+        });
+        logStep("Standalone purchase notification scheduled", { contentType });
+      } catch (notifError) {
+        logStep("ERROR scheduling standalone purchase notification", { error: notifError });
+      }
+      
+      // Schedule immediate email
+      try {
+        await supabase.from('scheduled_emails').insert({
+          subject: subject,
+          body: content,
+          target_audience: `user:${userId}`,
+          recipient_emails: [userEmail],
+          scheduled_time: new Date().toISOString(),
+          status: 'pending',
+          recurrence_pattern: 'once'
+        });
+        logStep("Standalone purchase email scheduled", { email: userEmail, contentType });
+      } catch (emailError) {
+        logStep("ERROR scheduling standalone purchase email", { error: emailError });
+      }
+    } else {
+      logStep("ERROR: Could not find standalone purchase template", { messageType });
     }
   }
 }
