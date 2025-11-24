@@ -12,7 +12,6 @@ import { Switch } from "@/components/ui/switch";
 import { FileText, Plus, Edit, Trash2, Eye, AlertTriangle } from "lucide-react";
 import { toast } from "sonner";
 import { AdvertiseTemplatesManager } from "./AdvertiseTemplatesManager";
-import { InstagramImageGenerator } from "./InstagramImageGenerator";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 
 // Error Boundary Component
@@ -289,11 +288,6 @@ export function EmailTemplatesManager() {
         <ErrorBoundary>
           <AdvertiseTemplatesManager />
         </ErrorBoundary>
-      </div>
-
-      {/* Instagram Image Generator Section */}
-      <div className="mt-6">
-        <InstagramImageGenerator />
       </div>
 
       {/* Edit/Create Dialog */}
