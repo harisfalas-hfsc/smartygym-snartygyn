@@ -72,6 +72,38 @@ import { GoalSettingBenefitTemplate } from "./instagram/features/GoalSettingBene
 import { WorkoutLeaderboardTemplate } from "./instagram/community/WorkoutLeaderboardTemplate";
 import { ProgramLeaderboardTemplate } from "./instagram/community/ProgramLeaderboardTemplate";
 
+// Hero Section Cards
+import { OnlineFitnessRedefinedCardTemplate } from "./instagram/hero/OnlineFitnessRedefinedCardTemplate";
+import { GymInPocketCardTemplate } from "./instagram/hero/GymInPocketCardTemplate";
+import { HumanNotAIHeroCardTemplate } from "./instagram/hero/HumanNotAIHeroCardTemplate";
+import { TrainAnywhereCardTemplate as TrainAnywhereHeroCardTemplate } from "./instagram/hero/TrainAnywhereCardTemplate";
+import { WorkoutsNavCardTemplate } from "./instagram/hero/WorkoutsNavCardTemplate";
+import { ProgramsNavCardTemplate } from "./instagram/hero/ProgramsNavCardTemplate";
+import { ToolsNavCardTemplate } from "./instagram/hero/ToolsNavCardTemplate";
+import { LibraryNavCardTemplate } from "./instagram/hero/LibraryNavCardTemplate";
+import { BlogNavCardTemplate } from "./instagram/hero/BlogNavCardTemplate";
+import { CoachNavCardTemplate } from "./instagram/hero/CoachNavCardTemplate";
+
+// Audience Cards
+import { WhoIsForCompositeTemplate } from "./instagram/audience/WhoIsForCompositeTemplate";
+import { BusyAdultsCardTemplate } from "./instagram/audience/BusyAdultsCardTemplate";
+import { ParentsCardTemplate } from "./instagram/audience/ParentsCardTemplate";
+import { BeginnersCardTemplate } from "./instagram/audience/BeginnersCardTemplate";
+import { IntermediateCardTemplate } from "./instagram/audience/IntermediateCardTemplate";
+import { TravelersCardTemplate } from "./instagram/audience/TravelersCardTemplate";
+import { GymGoersCardTemplate } from "./instagram/audience/GymGoersCardTemplate";
+
+// Values Cards
+import { WhatWeStandForCompositeTemplate } from "./instagram/values/WhatWeStandForCompositeTemplate";
+import { EvidenceBasedCardTemplate } from "./instagram/values/EvidenceBasedCardTemplate";
+import { StructureClarityCardTemplate } from "./instagram/values/StructureClarityCardTemplate";
+import { HumanConnectionCardTemplate } from "./instagram/values/HumanConnectionCardTemplate";
+import { ResultsDrivenCardTemplate } from "./instagram/values/ResultsDrivenCardTemplate";
+
+// Promise & Coach
+import { SmartyGymPromiseTemplate } from "./instagram/promise/SmartyGymPromiseTemplate";
+import { HarisFalasMessageTemplate } from "./instagram/coach/HarisFalasMessageTemplate";
+
 interface Template {
   id: string;
   name: string;
@@ -150,16 +182,60 @@ const communityTemplates: Template[] = [
   { id: "program-leaderboard", name: "Program Leaderboard", component: ProgramLeaderboardTemplate },
 ];
 
+const heroTemplates: Template[] = [
+  { id: "online-fitness-redefined", name: "Online Fitness Redefined", component: OnlineFitnessRedefinedCardTemplate },
+  { id: "gym-in-pocket", name: "Your Gym In Your Pocket", component: GymInPocketCardTemplate },
+  { id: "human-not-ai-hero", name: "100% Human. 0% AI. (Hero)", component: HumanNotAIHeroCardTemplate },
+  { id: "train-anywhere-hero", name: "Train Anywhere, Anytime (Hero)", component: TrainAnywhereHeroCardTemplate },
+  { id: "workouts-nav", name: "500+ Expert Workouts", component: WorkoutsNavCardTemplate },
+  { id: "programs-nav", name: "Training Programs (Nav)", component: ProgramsNavCardTemplate },
+  { id: "tools-nav", name: "Smart Tools (Nav)", component: ToolsNavCardTemplate },
+  { id: "library-nav", name: "Exercise Library (Nav)", component: LibraryNavCardTemplate },
+  { id: "blog-nav", name: "Blog & Articles (Nav)", component: BlogNavCardTemplate },
+  { id: "coach-nav", name: "Expert Coach Guidance (Nav)", component: CoachNavCardTemplate },
+];
+
+const audienceTemplates: Template[] = [
+  { id: "who-is-for-composite", name: "Who Is SmartyGym For? (Composite)", component: WhoIsForCompositeTemplate },
+  { id: "busy-adults", name: "Busy Adults", component: BusyAdultsCardTemplate },
+  { id: "parents", name: "Parents", component: ParentsCardTemplate },
+  { id: "beginners", name: "Beginners", component: BeginnersCardTemplate },
+  { id: "intermediate", name: "Intermediate Lifters", component: IntermediateCardTemplate },
+  { id: "travelers", name: "Travelers", component: TravelersCardTemplate },
+  { id: "gym-goers", name: "Gym-Goers", component: GymGoersCardTemplate },
+];
+
+const valuesTemplates: Template[] = [
+  { id: "what-we-stand-for-composite", name: "What We Stand For (Composite)", component: WhatWeStandForCompositeTemplate },
+  { id: "evidence-based", name: "Evidence-Based", component: EvidenceBasedCardTemplate },
+  { id: "structure-clarity", name: "Structure & Clarity", component: StructureClarityCardTemplate },
+  { id: "human-connection", name: "Human Connection", component: HumanConnectionCardTemplate },
+  { id: "results-driven", name: "Results-Driven", component: ResultsDrivenCardTemplate },
+];
+
+const promiseTemplates: Template[] = [
+  { id: "smartygym-promise", name: "The SmartyGym Promise", component: SmartyGymPromiseTemplate },
+];
+
+const coachTemplates: Template[] = [
+  { id: "haris-message", name: "Message from Haris Falas", component: HarisFalasMessageTemplate },
+];
+
 export const InstagramImageGenerator = () => {
   const [selectedSizes, setSelectedSizes] = useState<Record<string, InstagramSize>>(
     Object.fromEntries([
       ...compositeTemplates,
+      ...heroTemplates,
       ...serviceTemplates,
       ...brandTemplates,
       ...workoutTemplates,
       ...programTemplates,
       ...toolTemplates,
       ...featureTemplates,
+      ...audienceTemplates,
+      ...valuesTemplates,
+      ...promiseTemplates,
+      ...coachTemplates,
       ...communityTemplates,
     ].map(t => [t.id, INSTAGRAM_SIZES[0]]))
   );
@@ -261,20 +337,29 @@ export const InstagramImageGenerator = () => {
         <CardContent>
           <Tabs defaultValue="composite" className="w-full">
             <div className="w-full overflow-x-auto">
-              <TabsList className="inline-flex w-auto min-w-full lg:grid lg:w-full lg:grid-cols-8">
+              <TabsList className="inline-flex w-auto min-w-full">
                 <TabsTrigger value="composite" className="flex-shrink-0">Composite</TabsTrigger>
+                <TabsTrigger value="hero" className="flex-shrink-0">Hero Cards</TabsTrigger>
                 <TabsTrigger value="services" className="flex-shrink-0">Services</TabsTrigger>
                 <TabsTrigger value="brand" className="flex-shrink-0">Brand</TabsTrigger>
                 <TabsTrigger value="workouts" className="flex-shrink-0">Workouts</TabsTrigger>
                 <TabsTrigger value="programs" className="flex-shrink-0">Programs</TabsTrigger>
                 <TabsTrigger value="tools" className="flex-shrink-0">Tools</TabsTrigger>
                 <TabsTrigger value="features" className="flex-shrink-0">Features</TabsTrigger>
+                <TabsTrigger value="audience" className="flex-shrink-0">Audience</TabsTrigger>
+                <TabsTrigger value="values" className="flex-shrink-0">Values</TabsTrigger>
+                <TabsTrigger value="promise" className="flex-shrink-0">Promise</TabsTrigger>
+                <TabsTrigger value="coach" className="flex-shrink-0">Coach</TabsTrigger>
                 <TabsTrigger value="community" className="flex-shrink-0">Community</TabsTrigger>
               </TabsList>
             </div>
 
             <TabsContent value="composite" className="mt-6">
               {renderTemplateGrid(compositeTemplates, "Composite")}
+            </TabsContent>
+
+            <TabsContent value="hero" className="mt-6">
+              {renderTemplateGrid(heroTemplates, "Hero Cards")}
             </TabsContent>
 
             <TabsContent value="services" className="mt-6">
@@ -301,6 +386,22 @@ export const InstagramImageGenerator = () => {
               {renderTemplateGrid(featureTemplates, "Features & Benefits")}
             </TabsContent>
 
+            <TabsContent value="audience" className="mt-6">
+              {renderTemplateGrid(audienceTemplates, "Audience")}
+            </TabsContent>
+
+            <TabsContent value="values" className="mt-6">
+              {renderTemplateGrid(valuesTemplates, "Values")}
+            </TabsContent>
+
+            <TabsContent value="promise" className="mt-6">
+              {renderTemplateGrid(promiseTemplates, "Promise")}
+            </TabsContent>
+
+            <TabsContent value="coach" className="mt-6">
+              {renderTemplateGrid(coachTemplates, "Coach")}
+            </TabsContent>
+
             <TabsContent value="community" className="mt-6">
               {renderTemplateGrid(communityTemplates, "Community")}
             </TabsContent>
@@ -312,12 +413,17 @@ export const InstagramImageGenerator = () => {
       <div className="fixed -left-[9999px] -top-[9999px] pointer-events-none">
         {[
           ...compositeTemplates,
+          ...heroTemplates,
           ...serviceTemplates,
           ...brandTemplates,
           ...workoutTemplates,
           ...programTemplates,
           ...toolTemplates,
           ...featureTemplates,
+          ...audienceTemplates,
+          ...valuesTemplates,
+          ...promiseTemplates,
+          ...coachTemplates,
           ...communityTemplates,
         ].map((template) => (
           <div key={template.id} id={`export-${template.id}`}>
