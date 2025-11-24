@@ -1,0 +1,159 @@
+import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2.57.2";
+import { Resend } from "https://esm.sh/resend@2.0.0";
+
+const corsHeaders = {
+  "Access-Control-Allow-Origin": "*",
+  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
+};
+
+const logStep = (step: string, details?: any) => {
+  const detailsStr = details ? ` - ${JSON.stringify(details)}` : "";
+  console.log(`[SEND-UNIFIED-ANNOUNCEMENT] ${step}${detailsStr}`);
+};
+
+interface AnnouncementRequest {
+  userIds: string[];
+  messageType: string;
+  subject: string;
+  content: string;
+}
+
+serve(async (req) => {
+  if (req.method === "OPTIONS") {
+    return new Response(null, { headers: corsHeaders });
+  }
+
+  try {
+    logStep("Function started");
+
+    const { userIds, messageType, subject, content }: AnnouncementRequest = await req.json();
+
+    if (!userIds || userIds.length === 0) {
+      throw new Error("No recipients specified");
+    }
+
+    if (!subject || !content) {
+      throw new Error("Subject and content are required");
+    }
+
+    logStep("Processing announcement", { 
+      recipientCount: userIds.length, 
+      messageType,
+      subject 
+    });
+
+    const supabaseAdmin = createClient(
+      Deno.env.get("SUPABASE_URL") ?? "",
+      Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "",
+      { auth: { persistSession: false } }
+    );
+
+    const resend = new Resend(Deno.env.get("RESEND_API_KEY"));
+
+    let sentCount = 0;
+    let failedCount = 0;
+
+    for (const userId of userIds) {
+      try {
+        // Send dashboard message
+        try {
+          await supabaseAdmin
+            .from("user_system_messages")
+            .insert({
+              user_id: userId,
+              message_type: messageType,
+              subject: subject,
+              content: content,
+              is_read: false,
+            });
+        } catch (msgError) {
+          logStep("ERROR sending dashboard message", { userId, error: msgError });
+        }
+
+        // Get user email
+        const { data: userData } = await supabaseAdmin.auth.admin.getUserById(userId);
+        const userEmail = userData?.user?.email;
+
+        if (!userEmail) {
+          logStep("User email not found, skipping email", { userId });
+          sentCount++; // Still count as sent (dashboard message was sent)
+          continue;
+        }
+
+        // Check user notification preferences
+        const { data: preferences } = await supabaseAdmin
+          .from("notification_preferences")
+          .select("newsletter")
+          .eq("user_id", userId)
+          .single();
+
+        // Skip email if user has disabled newsletter emails
+        if (preferences && !preferences.newsletter) {
+          logStep("User has disabled newsletter emails, skipping email", { userId });
+          sentCount++; // Still count as sent (dashboard message was sent)
+          continue;
+        }
+
+        // Send email
+        try {
+          await resend.emails.send({
+            from: "SmartyGym <onboarding@resend.dev>",
+            to: [userEmail],
+            subject: subject,
+            html: content.replace(/\n/g, '<br>'),
+          });
+        } catch (emailError) {
+          logStep("ERROR sending email", { userId, error: emailError });
+        }
+
+        sentCount++;
+        logStep("Announcement sent (dashboard + email)", { userId });
+      } catch (error) {
+        failedCount++;
+        logStep("Error sending to user", { userId, error: error instanceof Error ? error.message : String(error) });
+      }
+    }
+
+    // Log to audit table
+    try {
+      await supabaseAdmin
+        .from("notification_audit_log")
+        .insert({
+          notification_type: "unified_announcement",
+          message_type: messageType,
+          subject: subject,
+          content: content,
+          recipient_count: userIds.length,
+          success_count: sentCount,
+          failed_count: failedCount,
+          sent_at: new Date().toISOString(),
+        });
+    } catch (auditError) {
+      logStep("ERROR logging to audit", { error: auditError });
+    }
+
+    return new Response(
+      JSON.stringify({ 
+        success: true, 
+        sent: sentCount, 
+        failed: failedCount, 
+        total: userIds.length 
+      }),
+      {
+        status: 200,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      }
+    );
+  } catch (error) {
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    logStep("ERROR", { message: errorMessage });
+    return new Response(
+      JSON.stringify({ error: errorMessage }),
+      {
+        status: 500,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      }
+    );
+  }
+});

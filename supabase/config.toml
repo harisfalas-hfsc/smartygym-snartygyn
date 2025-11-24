@@ -41,3 +41,9 @@ verify_jwt = false
 
 [functions.delete-stripe-product]
 verify_jwt = false
+
+[functions.send-weekly-motivation]
+verify_jwt = false
+
+[functions.send-unified-announcement]
+verify_jwt = false
