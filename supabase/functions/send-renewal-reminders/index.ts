@@ -1,5 +1,6 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.57.2";
+import { Resend } from "https://esm.sh/resend@2.0.0";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -24,6 +25,8 @@ serve(async (req) => {
       Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "",
       { auth: { persistSession: false } }
     );
+
+    const resend = new Resend(Deno.env.get("RESEND_API_KEY"));
 
     // Get subscriptions expiring in 3 days
     const threeDaysFromNow = new Date();
@@ -55,6 +58,26 @@ serve(async (req) => {
       );
     }
 
+    // Get renewal reminder template
+    const { data: template } = await supabaseAdmin
+      .from("automated_message_templates")
+      .select("subject, content")
+      .eq("message_type", "renewal_reminder")
+      .eq("is_active", true)
+      .eq("is_default", true)
+      .single();
+
+    if (!template) {
+      logStep("No active renewal reminder template found");
+      return new Response(
+        JSON.stringify({ success: false, reason: "No renewal reminder template configured" }),
+        {
+          status: 200,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        }
+      );
+    }
+
     const messagesSent = [];
 
     for (const subscription of expiringSubscriptions) {
@@ -73,6 +96,16 @@ serve(async (req) => {
         }
 
         const renewalDate = new Date(subscription.current_period_end).toLocaleDateString();
+        const planName = subscription.plan_type.charAt(0).toUpperCase() + subscription.plan_type.slice(1);
+
+        // Get user email
+        const { data: userData } = await supabaseAdmin.auth.admin.getUserById(subscription.user_id);
+        const userEmail = userData?.user?.email;
+
+        if (!userEmail) {
+          logStep("User email not found, skipping", { userId: subscription.user_id });
+          continue;
+        }
 
         // Send dashboard message
         await supabaseAdmin.functions.invoke('send-system-message', {
@@ -80,14 +113,26 @@ serve(async (req) => {
             userId: subscription.user_id,
             messageType: 'renewal_reminder',
             customData: {
-              planName: subscription.plan_type,
+              planName: planName,
               date: renewalDate
             }
           }
         });
 
+        // Send email
+        const emailContent = template.content
+          .replace(/\{planName\}/g, planName)
+          .replace(/\{date\}/g, renewalDate);
+
+        await resend.emails.send({
+          from: "SmartyGym <onboarding@resend.dev>",
+          to: [userEmail],
+          subject: template.subject,
+          html: emailContent.replace(/\n/g, '<br>'),
+        });
+
         messagesSent.push({ userId: subscription.user_id });
-        logStep("Renewal reminder sent", { userId: subscription.user_id, renewalDate });
+        logStep("Renewal reminder sent (dashboard + email)", { userId: subscription.user_id, renewalDate });
       } catch (error) {
         logStep("Error sending to user", { userId: subscription.user_id, error: error instanceof Error ? error.message : String(error) });
       }

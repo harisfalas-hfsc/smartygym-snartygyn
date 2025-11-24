@@ -1757,6 +1757,7 @@ export type Database = {
         | "announcement_update"
         | "announcement_event"
         | "purchase_shop_product"
+        | "motivational_weekly"
       plan_type: "free" | "gold" | "platinum"
       subscription_status: "active" | "canceled" | "past_due"
     }
@@ -1903,6 +1904,7 @@ export const Constants = {
         "announcement_update",
         "announcement_event",
         "purchase_shop_product",
+        "motivational_weekly",
       ],
       plan_type: ["free", "gold", "platinum"],
       subscription_status: ["active", "canceled", "past_due"],

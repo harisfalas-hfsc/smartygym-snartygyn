@@ -553,7 +553,7 @@ async function handleInvoicePaymentSucceeded(
 
   const { data: existingSub } = await supabase
     .from('user_subscriptions')
-    .select('user_id')
+    .select('user_id, plan_type')
     .eq('stripe_customer_id', customerId)
     .maybeSingle();
 
@@ -564,16 +564,76 @@ async function handleInvoicePaymentSucceeded(
 
   logStep("Invoice payment succeeded", { userId: existingSub.user_id, amount: invoice.amount_paid / 100 });
 
-  // Send renewal confirmation
+  // Schedule renewal confirmation for 5 minutes from now
+  const sendAt = new Date();
+  sendAt.setMinutes(sendAt.getMinutes() + 5);
+  
+  const planName = existingSub.plan_type.charAt(0).toUpperCase() + existingSub.plan_type.slice(1);
+  const amount = (invoice.amount_paid / 100).toFixed(2);
+
+  // Get user email
+  const { data: userData } = await supabase.auth.admin.getUserById(existingSub.user_id);
+  const userEmail = userData?.user?.email;
+
+  if (!userEmail) {
+    logStep("User email not found for renewal confirmation", { userId: existingSub.user_id });
+    return;
+  }
+
+  // Get renewal thank you template
+  const { data: template } = await supabase
+    .from("automated_message_templates")
+    .select("subject, content")
+    .eq("message_type", "renewal_thank_you")
+    .eq("is_active", true)
+    .eq("is_default", true)
+    .single();
+
+  if (!template) {
+    logStep("No renewal thank you template found, using default message");
+    // Fallback to direct message insert
+    await supabase
+      .from('user_system_messages')
+      .insert({
+        user_id: existingSub.user_id,
+        subject: 'Payment Successful',
+        message: `Your subscription payment of €${amount} has been processed successfully. Thank you for being a valued member!`,
+        message_type: 'renewal_thank_you',
+        is_read: false,
+      });
+    return;
+  }
+
+  const emailContent = template.content
+    .replace(/\{planName\}/g, planName)
+    .replace(/\{amount\}/g, amount);
+
+  // Schedule dashboard notification for 5 minutes
   await supabase
-    .from('user_system_messages')
+    .from("scheduled_notifications")
     .insert({
-      user_id: existingSub.user_id,
-      subject: 'Payment Successful',
-      message: `Your subscription payment of €${(invoice.amount_paid / 100).toFixed(2)} has been processed successfully. Thank you for being a valued member!`,
-      message_type: 'payment_success',
-      is_read: false,
+      title: template.subject,
+      body: emailContent,
+      target_audience: `user:${existingSub.user_id}`,
+      scheduled_time: sendAt.toISOString(),
+      status: "pending",
+      recurrence_pattern: "once",
     });
+
+  // Schedule email for 5 minutes
+  await supabase
+    .from("scheduled_emails")
+    .insert({
+      subject: template.subject,
+      body: emailContent,
+      target_audience: `user:${existingSub.user_id}`,
+      recipient_emails: [userEmail],
+      scheduled_time: sendAt.toISOString(),
+      status: "pending",
+      recurrence_pattern: "once",
+    });
+
+  logStep("Renewal confirmation scheduled for 5 minutes", { userId: existingSub.user_id, sendAt: sendAt.toISOString() });
 }
 
 async function handleInvoicePaymentFailed(

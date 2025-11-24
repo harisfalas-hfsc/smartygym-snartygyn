@@ -1,5 +1,6 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.57.2";
+import { Resend } from "https://esm.sh/resend@2.0.0";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -59,23 +60,59 @@ serve(async (req) => {
       );
     }
 
-    // Send welcome message to user's dashboard
-    try {
-      await supabaseAdmin.functions.invoke('send-system-message', {
-        body: {
-          userId: record.user_id,
-          messageType: 'welcome',
-          customData: {}
+    // Schedule sending for 5 minutes from now
+    const sendAt = new Date();
+    sendAt.setMinutes(sendAt.getMinutes() + 5);
+
+    // Get welcome message template
+    const { data: template } = await supabaseAdmin
+      .from("automated_message_templates")
+      .select("subject, content")
+      .eq("message_type", "welcome")
+      .eq("is_active", true)
+      .eq("is_default", true)
+      .single();
+
+    if (!template) {
+      logStep("No active welcome template found");
+      return new Response(
+        JSON.stringify({ success: false, reason: "No welcome template configured" }),
+        {
+          status: 200,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
         }
-      });
-      logStep("Welcome message sent to dashboard");
-    } catch (msgError) {
-      logStep("ERROR sending welcome message", { error: msgError });
-      throw msgError;
+      );
     }
 
+    // Schedule dashboard message for 5 minutes
+    await supabaseAdmin
+      .from("scheduled_notifications")
+      .insert({
+        title: template.subject,
+        body: template.content,
+        target_audience: `user:${record.user_id}`,
+        scheduled_time: sendAt.toISOString(),
+        status: "pending",
+        recurrence_pattern: "once",
+      });
+
+    // Schedule email for 5 minutes
+    await supabaseAdmin
+      .from("scheduled_emails")
+      .insert({
+        subject: template.subject,
+        body: template.content,
+        target_audience: `user:${record.user_id}`,
+        recipient_emails: [userEmail],
+        scheduled_time: sendAt.toISOString(),
+        status: "pending",
+        recurrence_pattern: "once",
+      });
+
+    logStep("Welcome messages scheduled for 5 minutes", { sendAt: sendAt.toISOString() });
+
     return new Response(
-      JSON.stringify({ success: true, message: "Welcome message sent to dashboard" }),
+      JSON.stringify({ success: true, message: "Welcome messages scheduled for 5 minutes" }),
       {
         status: 200,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
