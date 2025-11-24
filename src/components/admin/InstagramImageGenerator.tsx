@@ -191,12 +191,12 @@ export const InstagramImageGenerator = () => {
   const renderTemplateGrid = (templates: Template[], category: string) => (
     <div className="space-y-4">
       <div className="flex justify-end">
-        <Button onClick={() => handleDownloadAll(templates, category)} variant="outline" size="sm">
+        <Button onClick={() => handleDownloadAll(templates, category)} variant="outline" size="sm" className="w-full sm:w-auto">
           <Download className="w-4 h-4 mr-2" />
-          Download All in {category}
+          <span className="truncate">Download All in {category}</span>
         </Button>
       </div>
-      <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3">
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3">
         {templates.map((template) => {
           const TemplateComponent = template.component;
           return (
@@ -214,8 +214,8 @@ export const InstagramImageGenerator = () => {
                 </div>
               </div>
               
-              <CardContent className="p-2 space-y-1.5">
-                <h4 className="text-sm font-semibold truncate">{template.name}</h4>
+              <CardContent className="p-3 space-y-2">
+                <h4 className="text-sm font-semibold truncate" title={template.name}>{template.name}</h4>
                 <Select
                   value={selectedSizes[template.id]?.name || "square"}
                   onValueChange={(value) => {
@@ -225,12 +225,12 @@ export const InstagramImageGenerator = () => {
                     }
                   }}
                 >
-                  <SelectTrigger className="h-8 text-xs">
+                  <SelectTrigger className="h-9 text-xs">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
                     {INSTAGRAM_SIZES.map((size) => (
-                      <SelectItem key={size.name} value={size.name}>
+                      <SelectItem key={size.name} value={size.name} className="text-xs">
                         {size.label}
                       </SelectItem>
                     ))}
@@ -238,11 +238,11 @@ export const InstagramImageGenerator = () => {
                 </Select>
                 <Button 
                   onClick={() => handleDownload(template.id, template.name)}
-                  className="w-full h-8 text-xs"
+                  className="w-full h-9 text-xs"
                   size="sm"
                 >
-                  <Download className="w-3 h-3 mr-1" />
-                  Download
+                  <Download className="w-3 h-3 mr-1.5" />
+                  <span className="truncate">Download</span>
                 </Button>
               </CardContent>
             </Card>
@@ -260,16 +260,18 @@ export const InstagramImageGenerator = () => {
         </CardHeader>
         <CardContent>
           <Tabs defaultValue="composite" className="w-full">
-            <TabsList className="grid w-full grid-cols-4 lg:grid-cols-8">
-              <TabsTrigger value="composite">Composite</TabsTrigger>
-              <TabsTrigger value="services">Services</TabsTrigger>
-              <TabsTrigger value="brand">Brand</TabsTrigger>
-              <TabsTrigger value="workouts">Workouts</TabsTrigger>
-              <TabsTrigger value="programs">Programs</TabsTrigger>
-              <TabsTrigger value="tools">Tools</TabsTrigger>
-              <TabsTrigger value="features">Features</TabsTrigger>
-              <TabsTrigger value="community">Community</TabsTrigger>
-            </TabsList>
+            <div className="w-full overflow-x-auto">
+              <TabsList className="inline-flex w-auto min-w-full lg:grid lg:w-full lg:grid-cols-8">
+                <TabsTrigger value="composite" className="flex-shrink-0">Composite</TabsTrigger>
+                <TabsTrigger value="services" className="flex-shrink-0">Services</TabsTrigger>
+                <TabsTrigger value="brand" className="flex-shrink-0">Brand</TabsTrigger>
+                <TabsTrigger value="workouts" className="flex-shrink-0">Workouts</TabsTrigger>
+                <TabsTrigger value="programs" className="flex-shrink-0">Programs</TabsTrigger>
+                <TabsTrigger value="tools" className="flex-shrink-0">Tools</TabsTrigger>
+                <TabsTrigger value="features" className="flex-shrink-0">Features</TabsTrigger>
+                <TabsTrigger value="community" className="flex-shrink-0">Community</TabsTrigger>
+              </TabsList>
+            </div>
 
             <TabsContent value="composite" className="mt-6">
               {renderTemplateGrid(compositeTemplates, "Composite")}
@@ -325,16 +327,18 @@ export const InstagramImageGenerator = () => {
       </div>
 
       <Dialog open={!!previewTemplate} onOpenChange={() => setPreviewTemplate(null)}>
-        <DialogContent className="max-w-4xl max-h-[90vh] overflow-auto">
+        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
-            <DialogTitle>{previewTemplate?.name} - Full Preview</DialogTitle>
+            <DialogTitle className="text-base sm:text-lg">{previewTemplate?.name} - Full Preview</DialogTitle>
           </DialogHeader>
           {previewTemplate && (
             <div className="space-y-4">
-              <div id={`preview-${previewTemplate.id}`} className="w-full overflow-auto">
-                <previewTemplate.component />
+              <div id={`preview-${previewTemplate.id}`} className="w-full overflow-x-auto">
+                <div className="min-w-[300px]">
+                  <previewTemplate.component />
+                </div>
               </div>
-              <div className="flex gap-2 justify-end">
+              <div className="flex flex-col sm:flex-row gap-2 justify-end">
                 <Select
                   value={selectedSizes[previewTemplate.id]?.name || "square"}
                   onValueChange={(value) => {
@@ -344,7 +348,7 @@ export const InstagramImageGenerator = () => {
                     }
                   }}
                 >
-                  <SelectTrigger className="w-40">
+                  <SelectTrigger className="w-full sm:w-40">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
@@ -355,9 +359,9 @@ export const InstagramImageGenerator = () => {
                     ))}
                   </SelectContent>
                 </Select>
-                <Button onClick={() => handleDownload(previewTemplate.id, previewTemplate.name)}>
+                <Button onClick={() => handleDownload(previewTemplate.id, previewTemplate.name)} className="w-full sm:w-auto">
                   <Download className="w-4 h-4 mr-2" />
-                  Download
+                  <span className="truncate">Download</span>
                 </Button>
               </div>
             </div>
