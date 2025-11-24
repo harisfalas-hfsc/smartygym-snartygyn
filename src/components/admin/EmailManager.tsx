@@ -4,7 +4,8 @@ import { EmailComposer } from "./EmailComposer";
 import { EmailTemplatesManager } from "./EmailTemplatesManager";
 import { ScheduledEmailsManager } from "./ScheduledEmailsManager";
 import { TestEmailSender } from "./TestEmailSender";
-import { Mail, FileText, Calendar, Send } from "lucide-react";
+import { AutomationRulesManager } from "./AutomationRulesManager";
+import { Mail, FileText, Calendar, Send, Zap } from "lucide-react";
 
 export const EmailManager = () => {
   return (
@@ -20,10 +21,14 @@ export const EmailManager = () => {
       </CardHeader>
       <CardContent>
         <Tabs defaultValue="templates" className="w-full">
-          <TabsList className="grid w-full grid-cols-4">
+          <TabsList className="grid w-full grid-cols-5">
             <TabsTrigger value="templates" className="flex items-center gap-2">
               <FileText className="w-4 h-4" />
               Templates
+            </TabsTrigger>
+            <TabsTrigger value="automated" className="flex items-center gap-2">
+              <Zap className="w-4 h-4" />
+              Automated Emails
             </TabsTrigger>
             <TabsTrigger value="scheduled" className="flex items-center gap-2">
               <Calendar className="w-4 h-4" />
@@ -41,6 +46,10 @@ export const EmailManager = () => {
           
           <TabsContent value="templates">
             <EmailTemplatesManager />
+          </TabsContent>
+          
+          <TabsContent value="automated">
+            <AutomationRulesManager />
           </TabsContent>
           
           <TabsContent value="scheduled">
