@@ -26,6 +26,25 @@ serve(async (req) => {
       { auth: { persistSession: false } }
     );
 
+    // Get automation rule configuration
+    const { data: automationRule } = await supabaseAdmin
+      .from("automation_rules")
+      .select("*")
+      .eq("automation_key", "weekly_motivation")
+      .eq("is_active", true)
+      .single();
+
+    if (!automationRule) {
+      logStep("Weekly motivation automation is disabled");
+      return new Response(
+        JSON.stringify({ success: false, reason: "Weekly motivation automation disabled" }),
+        {
+          status: 200,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        }
+      );
+    }
+
     const resend = new Resend(Deno.env.get("RESEND_API_KEY"));
 
     // Get a random active motivational template
@@ -96,31 +115,35 @@ serve(async (req) => {
           continue;
         }
 
-        // Send dashboard message
-        try {
-          await supabaseAdmin
-            .from("user_system_messages")
-            .insert({
-              user_id: user.user_id,
-              message_type: "motivational_weekly",
-              subject: template.subject,
-              content: template.content,
-              is_read: false,
-            });
-        } catch (msgError) {
-          logStep("ERROR sending dashboard message", { userId: user.user_id, error: msgError });
+        // Send dashboard message if enabled
+        if (automationRule.sends_dashboard_message) {
+          try {
+            await supabaseAdmin
+              .from("user_system_messages")
+              .insert({
+                user_id: user.user_id,
+                message_type: "motivational_weekly",
+                subject: template.subject,
+                content: template.content,
+                is_read: false,
+              });
+          } catch (msgError) {
+            logStep("ERROR sending dashboard message", { userId: user.user_id, error: msgError });
+          }
         }
 
-        // Send email
-        try {
-          await resend.emails.send({
-            from: "SmartyGym <onboarding@resend.dev>",
-            to: [userEmail],
-            subject: template.subject,
-            html: template.content.replace(/\n/g, '<br>'),
-          });
-        } catch (emailError) {
-          logStep("ERROR sending email", { userId: user.user_id, error: emailError });
+        // Send email if enabled
+        if (automationRule.sends_email) {
+          try {
+            await resend.emails.send({
+              from: "SmartyGym <onboarding@resend.dev>",
+              to: [userEmail],
+              subject: template.subject,
+              html: template.content.replace(/\n/g, '<br>'),
+            });
+          } catch (emailError) {
+            logStep("ERROR sending email", { userId: user.user_id, error: emailError });
+          }
         }
 
         messagesSent++;
@@ -130,6 +153,15 @@ serve(async (req) => {
         logStep("Error sending to user", { userId: user.user_id, error: error instanceof Error ? error.message : String(error) });
       }
     }
+
+    // Update automation rule execution count
+    await supabaseAdmin
+      .from("automation_rules")
+      .update({
+        last_triggered_at: new Date().toISOString(),
+        total_executions: (automationRule.total_executions || 0) + messagesSent,
+      })
+      .eq("id", automationRule.id);
 
     return new Response(
       JSON.stringify({ 

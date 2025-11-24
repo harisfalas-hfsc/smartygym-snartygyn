@@ -5,7 +5,8 @@ import { ScheduledNotificationsManager } from "./ScheduledNotificationsManager";
 import { MassNotificationManager } from "./MassNotificationManager";
 import { TestMessageSender } from "./TestMessageSender";
 import { UnifiedAnnouncementSender } from "./UnifiedAnnouncementSender";
-import { MessageSquare, Calendar, Bell, Send, Megaphone } from "lucide-react";
+import { AutomationRulesManager } from "./AutomationRulesManager";
+import { MessageSquare, Calendar, Bell, Send, Megaphone, Settings } from "lucide-react";
 
 export const CommunicationsManager = () => {
   return (
@@ -20,15 +21,19 @@ export const CommunicationsManager = () => {
         </CardDescription>
       </CardHeader>
       <CardContent>
-        <Tabs defaultValue="automated" className="w-full">
-          <TabsList className="grid w-full grid-cols-5">
+        <Tabs defaultValue="automation-rules" className="w-full">
+          <TabsList className="grid w-full grid-cols-6">
+            <TabsTrigger value="automation-rules" className="flex items-center gap-2">
+              <Settings className="w-4 h-4" />
+              Automation Rules
+            </TabsTrigger>
             <TabsTrigger value="automated" className="flex items-center gap-2">
               <MessageSquare className="w-4 h-4" />
-              Automated Messages
+              Message Templates
             </TabsTrigger>
             <TabsTrigger value="scheduled" className="flex items-center gap-2">
               <Calendar className="w-4 h-4" />
-              Scheduled
+              Manual Scheduled
             </TabsTrigger>
             <TabsTrigger value="mass" className="flex items-center gap-2">
               <Bell className="w-4 h-4" />
@@ -43,6 +48,10 @@ export const CommunicationsManager = () => {
               Test Messages
             </TabsTrigger>
           </TabsList>
+          
+          <TabsContent value="automation-rules">
+            <AutomationRulesManager />
+          </TabsContent>
           
           <TabsContent value="automated">
             <AutomatedMessagesManager />
