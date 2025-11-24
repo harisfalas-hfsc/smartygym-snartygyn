@@ -6,7 +6,8 @@ import { MassNotificationManager } from "./MassNotificationManager";
 import { TestMessageSender } from "./TestMessageSender";
 import { UnifiedAnnouncementSender } from "./UnifiedAnnouncementSender";
 import { AutomationRulesManager } from "./AutomationRulesManager";
-import { MessageSquare, Calendar, Bell, Send, Megaphone, Settings } from "lucide-react";
+import { MessagingMonitoringDashboard } from "./MessagingMonitoringDashboard";
+import { MessageSquare, Calendar, Bell, Send, Megaphone, Settings, BarChart3 } from "lucide-react";
 
 export const CommunicationsManager = () => {
   return (
@@ -21,8 +22,12 @@ export const CommunicationsManager = () => {
         </CardDescription>
       </CardHeader>
       <CardContent>
-        <Tabs defaultValue="automation-rules" className="w-full">
-          <TabsList className="grid w-full grid-cols-6">
+        <Tabs defaultValue="monitoring" className="w-full">
+          <TabsList className="grid w-full grid-cols-7">
+            <TabsTrigger value="monitoring" className="flex items-center gap-2">
+              <BarChart3 className="w-4 h-4" />
+              Monitoring
+            </TabsTrigger>
             <TabsTrigger value="automation-rules" className="flex items-center gap-2">
               <Settings className="w-4 h-4" />
               Automation Rules
@@ -48,6 +53,10 @@ export const CommunicationsManager = () => {
               Test Messages
             </TabsTrigger>
           </TabsList>
+          
+          <TabsContent value="monitoring">
+            <MessagingMonitoringDashboard />
+          </TabsContent>
           
           <TabsContent value="automation-rules">
             <AutomationRulesManager />
