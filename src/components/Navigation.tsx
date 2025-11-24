@@ -295,7 +295,7 @@ export const Navigation = () => {
                 className="p-2 rounded-full border-2 border-primary text-primary hover:bg-primary hover:text-primary-foreground transition-colors"
                 aria-label="Facebook"
               >
-                <Facebook className="h-4 w-4" />
+                <Facebook className="h-5 w-5" />
               </a>
               <a
                 href="https://www.instagram.com/thesmartygym/"
@@ -304,7 +304,7 @@ export const Navigation = () => {
                 className="p-2 rounded-full border-2 border-primary text-primary hover:bg-primary hover:text-primary-foreground transition-colors"
                 aria-label="Instagram"
               >
-                <Instagram className="h-4 w-4" />
+                <Instagram className="h-5 w-5" />
               </a>
               <a
                 href="https://www.tiktok.com/@thesmartygym?lang=en"
@@ -313,7 +313,7 @@ export const Navigation = () => {
                 className="p-2 rounded-full border-2 border-primary text-primary hover:bg-primary hover:text-primary-foreground transition-colors"
                 aria-label="TikTok"
               >
-                <svg className="h-4 w-4" viewBox="0 0 24 24" fill="currentColor">
+                <svg className="h-5 w-5" viewBox="0 0 24 24" fill="currentColor">
                   <path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-5.2 1.74 2.89 2.89 0 0 1 2.31-4.64 2.93 2.93 0 0 1 .88.13V9.4a6.84 6.84 0 0 0-1-.05A6.33 6.33 0 0 0 5 20.1a6.34 6.34 0 0 0 10.86-4.43v-7a8.16 8.16 0 0 0 4.77 1.52v-3.4a4.85 4.85 0 0 1-1-.1z"/>
                 </svg>
               </a>
@@ -324,7 +324,7 @@ export const Navigation = () => {
                 className="p-2 rounded-full border-2 border-primary text-primary hover:bg-primary hover:text-primary-foreground transition-colors"
                 aria-label="YouTube"
               >
-                <Youtube className="h-4 w-4" />
+                <Youtube className="h-5 w-5" />
               </a>
             </div>
           </div>
@@ -338,7 +338,7 @@ export const Navigation = () => {
               <img
                 src={smartyGymLogo}
                 alt="SmartyGym"
-                className="h-20 sm:h-24 md:h-28 lg:h-32 w-auto object-contain"
+                className="h-24 sm:h-28 md:h-32 lg:h-36 w-auto object-cover scale-110 -my-2"
               />
             </div>
           </div>
@@ -365,8 +365,8 @@ export const Navigation = () => {
             {user ? (
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" className="relative h-10 w-10 rounded-full">
-                    <Avatar className={`h-10 w-10 ${subscriptionInfo?.subscribed ? 'ring-2 ring-yellow-500 ring-offset-2 ring-offset-background' : ''}`}>
+                  <Button variant="ghost" className="relative h-11 w-11 rounded-full">
+                    <Avatar className={`h-11 w-11 ${subscriptionInfo?.subscribed ? 'ring-2 ring-yellow-500 ring-offset-2 ring-offset-background' : ''}`}>
                       <AvatarImage src={avatarUrl || undefined} alt="Profile" />
                       <AvatarFallback>{getUserInitials()}</AvatarFallback>
                     </Avatar>
@@ -447,7 +447,7 @@ export const Navigation = () => {
             ) : (
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button size="sm" className="text-xs sm:text-sm">
+                  <Button size="default" className="text-sm sm:text-base">
                     Login / Sign Up
                   </Button>
                 </DropdownMenuTrigger>
