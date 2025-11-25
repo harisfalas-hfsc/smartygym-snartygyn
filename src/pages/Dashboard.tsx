@@ -403,40 +403,6 @@ export default function Dashboard() {
 
           {/* Favorites Tab */}
           <TabsContent value="favorites" className="space-y-6">
-            {/* Exercise Sync Alert - Show if no exercises synced */}
-            <Card className="bg-amber-50 dark:bg-amber-950/20 border-amber-200 dark:border-amber-800">
-              <CardContent className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 p-4 sm:p-6">
-                <div className="flex items-start sm:items-center gap-3 sm:gap-4 flex-1">
-                  <div className="p-2 sm:p-3 bg-amber-100 dark:bg-amber-900/30 rounded-full flex-shrink-0">
-                    <Youtube className="h-6 w-6 sm:h-8 sm:w-8 text-amber-600 dark:text-amber-400" />
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <h3 className="text-base sm:text-xl font-bold mb-1">Sync Your Exercise Library</h3>
-                    <p className="text-xs sm:text-sm text-muted-foreground">
-                      Click below to import exercises from your YouTube channel. This is required to generate workouts!
-                    </p>
-                  </div>
-                </div>
-                <Button 
-                  onClick={handleSyncExercises}
-                  disabled={syncingExercises}
-                  className="w-full sm:w-auto flex-shrink-0 bg-amber-600 hover:bg-amber-700"
-                >
-                  {syncingExercises ? (
-                    <>
-                      <RefreshCw className="mr-2 h-4 w-4 animate-spin" />
-                      Syncing...
-                    </>
-                  ) : (
-                    <>
-                      <RefreshCw className="mr-2 h-4 w-4" />
-                      Sync Now
-                    </>
-                  )}
-                </Button>
-              </CardContent>
-            </Card>
-
             <div className="grid gap-6 md:grid-cols-3">
               {/* Favorite Workouts */}
               <Card>
