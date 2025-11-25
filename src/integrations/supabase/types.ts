@@ -1111,45 +1111,6 @@ export type Database = {
         }
         Relationships: []
       }
-      saved_diet_plans: {
-        Row: {
-          comment: string | null
-          content: string
-          created_at: string
-          id: string
-          is_favorite: boolean | null
-          name: string
-          rating: number | null
-          status: string | null
-          updated_at: string
-          user_id: string
-        }
-        Insert: {
-          comment?: string | null
-          content: string
-          created_at?: string
-          id?: string
-          is_favorite?: boolean | null
-          name: string
-          rating?: number | null
-          status?: string | null
-          updated_at?: string
-          user_id: string
-        }
-        Update: {
-          comment?: string | null
-          content?: string
-          created_at?: string
-          id?: string
-          is_favorite?: boolean | null
-          name?: string
-          rating?: number | null
-          status?: string | null
-          updated_at?: string
-          user_id?: string
-        }
-        Relationships: []
-      }
       saved_training_programs: {
         Row: {
           comment: string | null

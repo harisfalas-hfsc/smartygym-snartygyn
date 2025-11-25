@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Dumbbell, Utensils, Target, Zap } from "lucide-react";
+import { Dumbbell, Target, Zap } from "lucide-react";
 
 interface MotivationalBannerProps {
   userName: string;
@@ -34,14 +34,6 @@ export const MotivationalBanner = ({ userName }: MotivationalBannerProps) => {
         label: "Create Workout",
         route: "/workout",
         icon: Dumbbell,
-      },
-    },
-    {
-      text: `Feeling hungry for success, ${userName}? Let's design your perfect diet plan. 🥗`,
-      action: {
-        label: "Build Diet Plan",
-        route: "/diet-plan",
-        icon: Utensils,
       },
     },
     {

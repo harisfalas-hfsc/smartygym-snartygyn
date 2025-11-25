@@ -16,7 +16,6 @@ import {
   Flame,
   Dumbbell,
   Calendar,
-  Utensils,
   ArrowLeft,
   CheckCircle,
   Clock,
@@ -42,13 +41,6 @@ interface FavoriteProgram {
   id: string;
   name: string;
   duration: string;
-  created_at: string;
-  status: string | null;
-}
-
-interface FavoriteDiet {
-  id: string;
-  name: string;
   created_at: string;
   status: string | null;
 }
@@ -94,7 +86,6 @@ export default function Dashboard() {
   // Favorites
   const [favoriteWorkouts, setFavoriteWorkouts] = useState<FavoriteWorkout[]>([]);
   const [favoritePrograms, setFavoritePrograms] = useState<FavoriteProgram[]>([]);
-  const [favoriteDiets, setFavoriteDiets] = useState<FavoriteDiet[]>([]);
 
   // All Plans with filtering
   const [allWorkouts, setAllWorkouts] = useState<FavoriteWorkout[]>([]);
@@ -165,17 +156,8 @@ export default function Dashboard() {
       .order("created_at", { ascending: false })
       .limit(5);
 
-    const { data: diets } = await supabase
-      .from("saved_diet_plans")
-      .select("id, name, created_at, status")
-      .eq("user_id", userId)
-      .eq("is_favorite", true)
-      .order("created_at", { ascending: false })
-      .limit(5);
-
     if (workouts) setFavoriteWorkouts(workouts);
     if (programs) setFavoritePrograms(programs);
-    if (diets) setFavoriteDiets(diets);
   };
 
   const fetchAllWorkouts = async (userId: string) => {
@@ -403,7 +385,7 @@ export default function Dashboard() {
 
           {/* Favorites Tab */}
           <TabsContent value="favorites" className="space-y-6">
-            <div className="grid gap-6 md:grid-cols-3">
+            <div className="grid gap-6 md:grid-cols-2">
               {/* Favorite Workouts */}
               <Card>
                 <CardHeader>
@@ -470,45 +452,6 @@ export default function Dashboard() {
                               </p>
                             </div>
                             {program.status === "Completed" ? (
-                              <CheckCircle className="h-4 w-4 text-green-500 shrink-0" />
-                            ) : (
-                              <Clock className="h-4 w-4 text-muted-foreground shrink-0" />
-                            )}
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  )}
-                </CardContent>
-              </Card>
-
-              {/* Favorite Diet Plans */}
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <Utensils className="h-5 w-5 text-primary" />
-                    Favorite Diet Plans
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  {favoriteDiets.length === 0 ? (
-                    <p className="text-sm text-muted-foreground">No favorite diet plans yet</p>
-                  ) : (
-                    <div className="space-y-3">
-                      {favoriteDiets.map((diet) => (
-                        <div
-                          key={diet.id}
-                          className="p-3 bg-muted rounded-lg cursor-pointer hover:bg-muted/80 transition-colors"
-                          onClick={() => navigate(`/diet-view/${diet.id}`)}
-                        >
-                          <div className="flex items-start justify-between">
-                            <div className="flex-1">
-                              <p className="font-medium text-sm">{diet.name}</p>
-                              <p className="text-xs text-muted-foreground mt-1">
-                                {formatDate(diet.created_at)}
-                              </p>
-                            </div>
-                            {diet.status === "Completed" ? (
                               <CheckCircle className="h-4 w-4 text-green-500 shrink-0" />
                             ) : (
                               <Clock className="h-4 w-4 text-muted-foreground shrink-0" />

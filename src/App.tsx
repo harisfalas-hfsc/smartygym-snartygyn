@@ -32,7 +32,6 @@ import SmartyWorkout from "./pages/SmartyWorkout";
 import TrainingProgramFlow from "./pages/TrainingProgramFlow";
 import TrainingProgramDetail from "./pages/TrainingProgramDetail";
 import IndividualTrainingProgram from "./pages/IndividualTrainingProgram";
-import DietPlanFlow from "./pages/DietPlanFlow";
 import OneRMCalculator from "./pages/OneRMCalculator";
 import BMRCalculator from "./pages/BMRCalculator";
 import MacroTrackingCalculator from "./pages/MacroTrackingCalculator";
@@ -116,7 +115,6 @@ const AppContent = () => {
                 <Route path="/trainingprogram" element={<TrainingProgramFlow />} />
                 <Route path="/trainingprogram/:type" element={<TrainingProgramDetail />} />
                 <Route path="/trainingprogram/:type/:id" element={<IndividualTrainingProgram />} />
-                <Route path="/dietplan" element={<DietPlanFlow />} />
                 
                 {/* Exercise library is public */}
                 <Route path="/exerciselibrary" element={<ExerciseLibrary />} />
