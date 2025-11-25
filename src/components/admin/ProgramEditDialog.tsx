@@ -219,6 +219,25 @@ export const ProgramEditDialog = ({ program, open, onOpenChange, onSave, isPerso
 
   const handleSave = async () => {
     try {
+      // Validate required fields
+      if (!formData.name || !formData.name.trim()) {
+        toast({
+          variant: "destructive",
+          title: "Validation Error",
+          description: "Program name is required. Please provide a name for this training program.",
+        });
+        return;
+      }
+
+      if (!formData.category) {
+        toast({
+          variant: "destructive",
+          title: "Validation Error",
+          description: "Category is required. Please select a category.",
+        });
+        return;
+      }
+
       // Validate that free content cannot be standalone purchase
       if (!formData.is_premium && formData.is_standalone_purchase) {
         toast({
