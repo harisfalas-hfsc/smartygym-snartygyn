@@ -99,6 +99,34 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({
     extensions: [
       StarterKit.configure({
         codeBlock: false,
+        // Explicitly configure list extensions
+        bulletList: {
+          HTMLAttributes: {
+            class: 'tiptap-bullet-list',
+          },
+          keepMarks: true,
+          keepAttributes: false,
+        },
+        orderedList: {
+          HTMLAttributes: {
+            class: 'tiptap-ordered-list',
+          },
+          keepMarks: true,
+          keepAttributes: false,
+        },
+        listItem: {
+          HTMLAttributes: {
+            class: 'tiptap-list-item',
+          },
+        },
+        heading: {
+          levels: [1, 2, 3],
+        },
+        paragraph: {
+          HTMLAttributes: {
+            class: 'tiptap-paragraph',
+          },
+        },
       }),
       Underline,
       TextStyle,
@@ -147,6 +175,61 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({
     content: value,
     onUpdate: ({ editor }) => {
       onChange(editor.getHTML());
+    },
+    // Add paste handling for Word documents and formatted content
+    editorProps: {
+      transformPastedHTML(html) {
+        console.log('🔴 RAW PASTED HTML:', html.substring(0, 200));
+        
+        let cleaned = html;
+        
+        // Remove Microsoft Word specific tags and classes
+        cleaned = cleaned.replace(/<o:p>.*?<\/o:p>/gi, '');
+        cleaned = cleaned.replace(/class="Mso[^"]*"/gi, '');
+        cleaned = cleaned.replace(/style="[^"]*mso-[^"]*"/gi, '');
+        
+        // Convert Word list markers to proper HTML lists
+        cleaned = cleaned.replace(/<p class="MsoListParagraph[^"]*"[^>]*>(.*?)<\/p>/gi, '<li>$1</li>');
+        
+        // Clean up excessive spans and formatting
+        cleaned = cleaned.replace(/<span[^>]*>(.*?)<\/span>/gi, '$1');
+        
+        // Remove empty paragraphs
+        cleaned = cleaned.replace(/<p[^>]*>\s*<\/p>/gi, '');
+        
+        // Convert Word bullets (•, -, *, etc.) at start of paragraphs to list items
+        cleaned = cleaned.replace(/<p[^>]*>[\s]*[•\-\*]\s+(.*?)<\/p>/gi, '<li>$1</li>');
+        
+        // Wrap consecutive <li> tags in <ul>
+        cleaned = cleaned.replace(/(<li>.*?<\/li>)(\s*<li>)/gi, '$1$2');
+        cleaned = cleaned.replace(/(<li>.*?<\/li>)/g, '<ul>$1</ul>');
+        cleaned = cleaned.replace(/<\/ul>\s*<ul>/gi, '');
+        
+        console.log('🟢 CLEANED HTML:', cleaned.substring(0, 200));
+        return cleaned;
+      },
+      
+      transformPastedText(text) {
+        const lines = text.split('\n');
+        const processedLines = lines.map(line => {
+          // Detect bullet points (•, -, *, ○, ▪)
+          if (/^[\s]*[•\-\*○▪]\s+/.test(line)) {
+            return line.replace(/^[\s]*[•\-\*○▪]\s+/, '');
+          }
+          // Detect numbered lists (1. 2. 3.)
+          if (/^[\s]*\d+[\.\)]\s+/.test(line)) {
+            return line.replace(/^[\s]*\d+[\.\)]\s+/, '');
+          }
+          return line;
+        });
+        
+        // Clean excessive line breaks
+        return processedLines.join('\n').replace(/\n{3,}/g, '\n\n');
+      },
+      
+      attributes: {
+        class: 'prose prose-sm max-w-none focus:outline-none',
+      },
     },
   });
 
@@ -1095,10 +1178,45 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({
           font-size: 1.17em;
         }
 
-        .ProseMirror ul,
-        .ProseMirror ol {
-          padding: 0 1.5rem;
+        /* Enhanced list styling */
+        .ProseMirror ul.tiptap-bullet-list,
+        .ProseMirror ul {
+          list-style-type: disc;
+          padding-left: 1.5rem;
           margin: 0.5rem 0;
+        }
+
+        .ProseMirror ol.tiptap-ordered-list,
+        .ProseMirror ol {
+          list-style-type: decimal;
+          padding-left: 1.5rem;
+          margin: 0.5rem 0;
+        }
+
+        .ProseMirror li.tiptap-list-item,
+        .ProseMirror li {
+          margin: 0.25rem 0;
+          padding-left: 0.25rem;
+        }
+
+        /* Nested lists */
+        .ProseMirror ul ul,
+        .ProseMirror ol ul {
+          list-style-type: circle;
+        }
+
+        .ProseMirror ul ul ul,
+        .ProseMirror ol ul ul,
+        .ProseMirror ol ol ul {
+          list-style-type: square;
+        }
+
+        .ProseMirror ol ol {
+          list-style-type: lower-alpha;
+        }
+
+        .ProseMirror ol ol ol {
+          list-style-type: lower-roman;
         }
 
         .ProseMirror blockquote {
