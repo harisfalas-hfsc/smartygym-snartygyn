@@ -1,5 +1,6 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+import { Resend } from "https://esm.sh/resend@2.0.0";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -15,7 +16,10 @@ serve(async (req: Request) => {
   try {
     const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
     const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
+    const resendApiKey = Deno.env.get("RESEND_API_KEY")!;
+    
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
+    const resend = new Resend(resendApiKey);
 
     console.log("Checking for scheduled notifications...");
 
@@ -109,6 +113,35 @@ serve(async (req: Request) => {
             throw new Error(`Failed to insert messages: ${insertError.message}`);
           }
 
+          // Send emails to all target users
+          const { data: usersWithEmails } = await supabase.auth.admin.listUsers();
+          const targetEmails = usersWithEmails?.users
+            ?.filter(u => targetUserIds.includes(u.id) && u.email)
+            .map(u => u.email) as string[] || [];
+
+          if (targetEmails.length > 0) {
+            try {
+              await resend.emails.send({
+                from: "SmartyGym <onboarding@resend.dev>",
+                to: targetEmails,
+                subject: notification.title,
+                html: `
+                  <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+                    <h1 style="color: #d4af37;">${notification.title}</h1>
+                    <p style="font-size: 16px; line-height: 1.6;">${notification.body}</p>
+                    ${notification.url ? `<p><a href="${supabaseUrl.replace('/functions/v1', '')}${notification.url}" style="display: inline-block; background: #d4af37; color: white; padding: 12px 24px; text-decoration: none; border-radius: 4px; margin-top: 16px;">View Now</a></p>` : ''}
+                    <hr style="margin: 24px 0; border: none; border-top: 1px solid #eee;">
+                    <p style="font-size: 12px; color: #666;">This email was sent from SmartyGym. You're receiving this because you subscribed to our updates.</p>
+                  </div>
+                `,
+              });
+              console.log(`✅ Sent ${targetEmails.length} emails for notification ${notification.id}`);
+            } catch (emailError) {
+              console.error(`⚠️ Failed to send emails for notification ${notification.id}:`, emailError);
+              // Don't fail the whole operation if email fails
+            }
+          }
+
           // Update notification status and handle recurrence
           const now = new Date();
           const updateData: any = {
@@ -146,10 +179,18 @@ serve(async (req: Request) => {
             updateData.scheduled_time = nextTime.toISOString(); // Update main scheduled_time too
           }
 
-          await supabase
+          const { error: updateError } = await supabase
             .from("scheduled_notifications")
             .update(updateData)
-            .eq("id", notification.id);
+            .eq("id", notification.id)
+            .single();
+
+          if (updateError) {
+            console.error(`❌ Failed to update notification ${notification.id} status:`, updateError);
+            throw new Error(`Status update failed: ${updateError.message}`);
+          }
+
+          console.log(`✅ Updated notification ${notification.id} status to: ${updateData.status}`);
 
           // Log to notification audit
           try {
