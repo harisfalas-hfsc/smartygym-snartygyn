@@ -58,7 +58,11 @@ serve(async (req: Request) => {
           // Determine target user IDs based on audience
           let targetUserIds: string[] = [];
 
-          if (notification.target_audience === "all") {
+          // Handle individual user targeting (format: "user:USER_ID")
+          if (notification.target_audience?.startsWith("user:")) {
+            const userId = notification.target_audience.split(":")[1];
+            targetUserIds = [userId];
+          } else if (notification.target_audience === "all") {
             // Get all registered users
             const { data: users } = await supabase
               .from("profiles")

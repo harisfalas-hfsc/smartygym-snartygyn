@@ -49,17 +49,57 @@ serve(async (req) => {
           throw updateError;
         }
 
-        // Send confirmation message
+        // Send confirmation via both dashboard and email
         try {
-          await supabaseClient.functions.invoke('send-system-message', {
-            body: {
-              userId: user_id,
-              messageType: 'purchase_thank_you',
-              customData: {
-                contentName: 'Personal Training Program'
-              }
-            }
-          });
+          // Get user email
+          const { data: userData, error: userError } = await supabaseClient.auth.admin.getUserById(user_id);
+          if (userError) throw userError;
+          
+          const userEmail = userData.user.email;
+          if (!userEmail) throw new Error("User email not found");
+
+          // Get the default template
+          const { data: template } = await supabaseClient
+            .from("automated_message_templates")
+            .select("subject, content")
+            .eq("message_type", "purchase_personal_training")
+            .eq("is_active", true)
+            .eq("is_default", true)
+            .single();
+
+          if (!template) {
+            console.error('No active template found for purchase_personal_training');
+            throw new Error('No active template found');
+          }
+
+          const subject = template.subject;
+          const content = template.content;
+
+          // Send dashboard message immediately
+          await supabaseClient
+            .from('user_system_messages')
+            .insert({
+              user_id: user_id,
+              message_type: 'purchase_personal_training',
+              subject: subject,
+              content: content,
+              is_read: false
+            });
+
+          // Send email immediately
+          await supabaseClient
+            .from("scheduled_emails")
+            .insert({
+              subject: subject,
+              body: content,
+              target_audience: `user:${user_id}`,
+              recipient_emails: [userEmail],
+              scheduled_time: new Date().toISOString(),
+              status: "pending",
+              recurrence_pattern: "once",
+            });
+
+          console.log('Personal training confirmation scheduled for:', user_id);
         } catch (msgError) {
           console.error('Failed to send confirmation message:', msgError);
         }
@@ -141,7 +181,7 @@ serve(async (req) => {
         }
       }
 
-      // Send purchase thank you message with correct message type
+      // Send purchase confirmation via both dashboard and email
       try {
         // Determine the correct message type based on content_type
         let messageType = 'purchase_thank_you';
@@ -153,24 +193,58 @@ serve(async (req) => {
           messageType = 'purchase_program';
         }
 
-        await supabaseClient.functions.invoke('send-system-message', {
-          body: {
-            userId: user_id,
-            messageType: messageType,
-            customData: {
-              contentName: content_name,
-              purchaseDate: new Date().toLocaleString('en-US', {
-                year: 'numeric',
-                month: 'long',
-                day: 'numeric',
-                hour: '2-digit',
-                minute: '2-digit'
-              })
-            }
-          }
-        });
+        // Get user email
+        const { data: userData, error: userError } = await supabaseClient.auth.admin.getUserById(user_id);
+        if (userError) throw userError;
+        
+        const userEmail = userData.user.email;
+        if (!userEmail) throw new Error("User email not found");
+
+        // Get the default template for this message type
+        const { data: template } = await supabaseClient
+          .from("automated_message_templates")
+          .select("subject, content")
+          .eq("message_type", messageType)
+          .eq("is_active", true)
+          .eq("is_default", true)
+          .single();
+
+        if (!template) {
+          console.error('No active template found for:', messageType);
+          throw new Error(`No active template found for ${messageType}`);
+        }
+
+        // Replace placeholders
+        const subject = template.subject.replace(/\[Content\]/g, content_name);
+        const content = template.content.replace(/\[Content\]/g, content_name);
+
+        // Send dashboard message immediately
+        await supabaseClient
+          .from('user_system_messages')
+          .insert({
+            user_id: user_id,
+            message_type: messageType,
+            subject: subject,
+            content: content,
+            is_read: false
+          });
+
+        // Send email immediately (no delay for purchase confirmations)
+        await supabaseClient
+          .from("scheduled_emails")
+          .insert({
+            subject: subject,
+            body: content,
+            target_audience: `user:${user_id}`,
+            recipient_emails: [userEmail],
+            scheduled_time: new Date().toISOString(),
+            status: "pending",
+            recurrence_pattern: "once",
+          });
+
+        console.log('Purchase confirmation scheduled for:', user_id);
       } catch (msgError) {
-        console.error('Failed to send purchase thank you message:', msgError);
+        console.error('Failed to send purchase confirmation:', msgError);
       }
 
       return new Response(JSON.stringify({ 

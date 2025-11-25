@@ -54,7 +54,20 @@ serve(async (req: Request) => {
           // Determine target user IDs based on audience
           let recipientEmails: string[] = [];
 
-          if (email.target_audience === "all") {
+          // Handle individual user targeting (format: "user:USER_ID")
+          if (email.target_audience?.startsWith("user:")) {
+            const userId = email.target_audience.split(":")[1];
+            
+            // Use provided email if available, otherwise fetch from auth
+            if (email.recipient_emails && email.recipient_emails.length > 0) {
+              recipientEmails = email.recipient_emails;
+            } else {
+              const { data: userData } = await supabase.auth.admin.getUserById(userId);
+              if (userData?.user?.email) {
+                recipientEmails = [userData.user.email];
+              }
+            }
+          } else if (email.target_audience === "all") {
             // Get all registered users
             const { data: usersData } = await supabase.functions.invoke('get-users-with-emails');
             recipientEmails = usersData?.users?.map((u: any) => u.email) || [];
