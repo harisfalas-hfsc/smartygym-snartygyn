@@ -132,10 +132,10 @@ export function WorkoutGeneratorForm({ onSubmit, isLoading }: WorkoutGeneratorFo
     <form onSubmit={handleSubmit(handleFormSubmit)} className="space-y-8">
       {/* Personal Info Section */}
       <div className="space-y-4">
-        <h3 className="text-lg font-semibold">Personal Information</h3>
+        <h3 className="text-base sm:text-lg font-semibold">Personal Information</h3>
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
           <div className="space-y-2">
-            <Label htmlFor="age">Age</Label>
+            <Label htmlFor="age" className="text-xs sm:text-sm">Age</Label>
             <Input
               id="age"
               type="number"
@@ -145,7 +145,7 @@ export function WorkoutGeneratorForm({ onSubmit, isLoading }: WorkoutGeneratorFo
             {errors.age && <p className="text-sm text-destructive">{errors.age.message}</p>}
           </div>
           <div className="space-y-2">
-            <Label htmlFor="height">Height (cm)</Label>
+            <Label htmlFor="height" className="text-xs sm:text-sm">Height (cm)</Label>
             <Input
               id="height"
               type="number"
@@ -155,7 +155,7 @@ export function WorkoutGeneratorForm({ onSubmit, isLoading }: WorkoutGeneratorFo
             {errors.height && <p className="text-sm text-destructive">{errors.height.message}</p>}
           </div>
           <div className="space-y-2">
-            <Label htmlFor="weight">Weight (kg)</Label>
+            <Label htmlFor="weight" className="text-xs sm:text-sm">Weight (kg)</Label>
             <Input
               id="weight"
               type="number"
@@ -169,7 +169,7 @@ export function WorkoutGeneratorForm({ onSubmit, isLoading }: WorkoutGeneratorFo
 
       {/* Workout Type Section */}
       <div className="space-y-4">
-        <h3 className="text-lg font-semibold">Workout Type</h3>
+        <h3 className="text-base sm:text-lg font-semibold">Workout Type</h3>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
           {workoutTypes.map((type) => {
             const Icon = type.icon;
@@ -185,8 +185,8 @@ export function WorkoutGeneratorForm({ onSubmit, isLoading }: WorkoutGeneratorFo
                 }`}
               >
                 <Icon className="w-6 h-6 mb-2 text-primary" />
-                <div className="font-medium">{type.label}</div>
-                <div className="text-sm text-muted-foreground">{type.description}</div>
+                <div className="font-medium text-sm sm:text-base">{type.label}</div>
+                <div className="text-xs sm:text-sm text-muted-foreground">{type.description}</div>
               </button>
             );
           })}
@@ -195,16 +195,16 @@ export function WorkoutGeneratorForm({ onSubmit, isLoading }: WorkoutGeneratorFo
 
       {/* Equipment Preference */}
       <div className="space-y-4">
-        <h3 className="text-lg font-semibold">Equipment Preference</h3>
+        <h3 className="text-base sm:text-lg font-semibold">Equipment Preference</h3>
         <RadioGroup value={equipmentPreference} onValueChange={(val) => setValue("equipmentPreference", val as any)}>
-          <div className="flex gap-4">
+          <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
             <div className="flex items-center space-x-2">
               <RadioGroupItem value="equipment" id="equipment" />
-              <Label htmlFor="equipment">Equipment Available</Label>
+              <Label htmlFor="equipment" className="text-xs sm:text-sm">Equipment Available</Label>
             </div>
             <div className="flex items-center space-x-2">
               <RadioGroupItem value="no_equipment" id="no_equipment" />
-              <Label htmlFor="no_equipment">No Equipment (Bodyweight Only)</Label>
+              <Label htmlFor="no_equipment" className="text-xs sm:text-sm">Bodyweight Only</Label>
             </div>
           </div>
         </RadioGroup>
@@ -212,14 +212,14 @@ export function WorkoutGeneratorForm({ onSubmit, isLoading }: WorkoutGeneratorFo
 
       {/* Difficulty Level */}
       <div className="space-y-4">
-        <h3 className="text-lg font-semibold">Difficulty Level</h3>
-        <div className="flex gap-3">
+        <h3 className="text-base sm:text-lg font-semibold">Difficulty Level</h3>
+        <div className="flex flex-wrap gap-2 sm:gap-3">
           {["beginner", "intermediate", "advanced"].map((level) => (
             <button
               key={level}
               type="button"
               onClick={() => setValue("difficulty", level as any)}
-              className={`px-6 py-2 rounded-full border-2 transition-all capitalize ${
+              className={`flex-1 min-w-[90px] px-3 py-1.5 sm:px-6 sm:py-2 rounded-full border-2 transition-all capitalize text-sm sm:text-base ${
                 difficulty === level
                   ? "border-primary bg-primary text-primary-foreground"
                   : "border-border hover:border-primary/50"
@@ -234,7 +234,7 @@ export function WorkoutGeneratorForm({ onSubmit, isLoading }: WorkoutGeneratorFo
       {/* Format and Duration */}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
         <div className="space-y-2">
-          <Label htmlFor="format">Workout Format</Label>
+          <Label htmlFor="format" className="text-xs sm:text-sm">Workout Format</Label>
           <Select value={watch("format")} onValueChange={(val) => setValue("format", val as any)}>
             <SelectTrigger id="format">
               <SelectValue />
@@ -260,7 +260,7 @@ export function WorkoutGeneratorForm({ onSubmit, isLoading }: WorkoutGeneratorFo
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="duration">Duration (minutes)</Label>
+          <Label htmlFor="duration" className="text-xs sm:text-sm">Duration (minutes)</Label>
           <Select value={watch("duration").toString()} onValueChange={(val) => setValue("duration", parseInt(val))}>
             <SelectTrigger id="duration">
               <SelectValue />
@@ -279,14 +279,14 @@ export function WorkoutGeneratorForm({ onSubmit, isLoading }: WorkoutGeneratorFo
 
       {/* Body Focus */}
       <div className="space-y-4">
-        <h3 className="text-lg font-semibold">Body Focus</h3>
-        <div className="flex flex-wrap gap-3">
+        <h3 className="text-base sm:text-lg font-semibold">Body Focus</h3>
+        <div className="flex flex-wrap gap-2 sm:gap-3">
           {bodyFocusOptions.map((option) => (
             <button
               key={option.value}
               type="button"
               onClick={() => toggleBodyFocus(option.value)}
-              className={`px-4 py-2 rounded-lg border-2 transition-all ${
+              className={`px-3 py-1.5 sm:px-4 sm:py-2 rounded-lg border-2 transition-all text-xs sm:text-sm ${
                 bodyFocus?.includes(option.value as any)
                   ? "border-primary bg-primary/10"
                   : "border-border hover:border-primary/50"

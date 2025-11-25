@@ -54,7 +54,7 @@ export function WorkoutGeneratorCard() {
   };
 
   return (
-    <Card className="p-6">
+    <Card className="p-4 sm:p-6">
       {showPremiumPrompt ? (
         <div className="space-y-6">
           <div className="flex items-start gap-4 p-6 bg-gradient-to-br from-primary/10 to-primary/5 border border-primary/20 rounded-lg">
