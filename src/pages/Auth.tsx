@@ -370,12 +370,6 @@ export default function Auth() {
         </CardContent>
       </Card>
       
-      <AvatarSetupDialog
-        open={showAvatarSetup}
-        onOpenChange={setShowAvatarSetup}
-        userId={newUserId}
-      />
-      
       <ForgotPasswordDialog
         open={showForgotPassword}
         onOpenChange={setShowForgotPassword}
