@@ -45,15 +45,15 @@ const IndividualWorkout = () => {
     return (
       <>
         <Helmet>
-          <title>{dbWorkout.name} | Online Workout by Haris Falas | SmartyGym Cyprus</title>
-          <meta name="description" content={`${dbWorkout.description || dbWorkout.name} - Professional online workout by Cyprus Sports Scientist Haris Falas. ${dbWorkout.duration} ${dbWorkout.format} workout. ${dbWorkout.equipment}.`} />
-          <meta name="keywords" content={`${dbWorkout.name}, online workouts, ${dbWorkout.format} workout, ${dbWorkout.category} training, Haris Falas, Cyprus fitness, online fitness Cyprus, ${dbWorkout.equipment} workout`} />
+          <title>{dbWorkout.name} | Online Workout by Haris Falas | SmartyGym</title>
+          <meta name="description" content={`${dbWorkout.description || dbWorkout.name} - Professional online workout by Sports Scientist Haris Falas. ${dbWorkout.duration} ${dbWorkout.format} workout. ${dbWorkout.equipment}.`} />
+          <meta name="keywords" content={`${dbWorkout.name}, online workouts, ${dbWorkout.format} workout, ${dbWorkout.category} training, Haris Falas, online fitness, ${dbWorkout.equipment} workout`} />
           
           {/* Open Graph */}
           <meta property="og:type" content="article" />
           <meta property="og:url" content={window.location.href} />
           <meta property="og:title" content={`${dbWorkout.name} | Online Workout by Haris Falas`} />
-          <meta property="og:description" content={dbWorkout.description || `Professional ${dbWorkout.format} workout designed by Cyprus Sports Scientist`} />
+          <meta property="og:description" content={dbWorkout.description || `Professional ${dbWorkout.format} workout designed by Sports Scientist`} />
           <meta property="og:image" content={dbWorkout.image_url} />
           
           {/* Twitter */}
@@ -80,7 +80,7 @@ const IndividualWorkout = () => {
                 "@type": "Person",
                 "name": "Haris Falas",
                 "jobTitle": "Sports Scientist & Strength Coach",
-                "description": "Cyprus fitness expert and personal trainer"
+                "description": "Fitness expert and personal trainer"
               },
               "identifier": dbWorkout.id
             })}

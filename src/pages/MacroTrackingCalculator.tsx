@@ -191,8 +191,6 @@ const MacroTrackingCalculator = () => {
         <title>Macro Calculator | Free Macronutrient Nutrition | Haris Falas HFSC | SmartyGym</title>
         <meta name="description" content="Free macro calculator at smartygym.com. Calculate protein carbs fats for weight loss muscle gain. Personalized nutrition by Sports Scientist Haris Falas HFSC. Plan meals. Train smart anywhere anytime" />
         <meta name="keywords" content="macro calculator, macronutrient calculator, nutrition calculator, online personal trainer nutrition, HFSC, Haris Falas, Sports Scientist, protein calculator, TDEE calculator, meal planning, nutrition planning, smartygym.com, HFSC Performance, weight loss nutrition, muscle gain nutrition" />
-        <meta name="geo.placename" content="Cyprus; Greece" />
-        <meta name="geo.position" content="35.1856;33.3823" />
         
         <meta property="og:title" content="Macro Calculator - Smarty Gym" />
         <meta property="og:description" content="Free macronutrient calculator - convenient nutrition tool at smartygym.com" />
@@ -329,14 +327,14 @@ const MacroTrackingCalculator = () => {
                   itemType="https://schema.org/MedicalWebPage"
                   className="bg-primary/10 p-6 rounded-lg text-center border-2 border-primary/20"
                   data-calculator="macro"
-                  data-keywords="smarty gym calculator, online fitness tools, smartygym.com, Haris Falas Cyprus, macro calculator"
-                  aria-label="Macro calculation result - Smarty Gym Cyprus online fitness calculator - smartygym.com"
+                  data-keywords="smarty gym calculator, online fitness tools, smartygym.com, Haris Falas, macro calculator"
+                  aria-label="Macro calculation result - SmartyGym online fitness calculator - smartygym.com"
                 >
                   <p 
                     className="text-sm text-muted-foreground mb-1"
                     itemProp="name"
                   >
-                    Daily Calorie Target - Smarty Gym Cyprus
+                    Daily Calorie Target - SmartyGym
                   </p>
                   <p 
                     className="text-4xl font-bold text-primary"
@@ -348,9 +346,9 @@ const MacroTrackingCalculator = () => {
                     className="text-xs text-muted-foreground mt-1"
                     itemProp="description"
                   >
-                    calories per day - Calculated by Smarty Gym Cyprus online fitness tools - smartygym.com
+                    calories per day - Calculated by SmartyGym online fitness tools - smartygym.com
                   </p>
-                  <meta itemProp="provider" content="Smarty Gym Cyprus - smartygym.com - Haris Falas" />
+                  <meta itemProp="provider" content="SmartyGym - smartygym.com - Haris Falas" />
                 </article>
 
                 {/* Macros Grid */}

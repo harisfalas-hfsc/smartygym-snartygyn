@@ -29,7 +29,7 @@ const CoachProfile = () => {
         <meta property="og:type" content="profile" />
         <meta property="og:url" content={window.location.href} />
         <meta property="og:image" content="https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?auto=format&fit=crop&q=80&w=1200" />
-        <meta property="og:site_name" content="SmartyGym Cyprus" />
+        <meta property="og:site_name" content="SmartyGym" />
         
         {/* Twitter */}
         <meta name="twitter:card" content="summary_large_image" />

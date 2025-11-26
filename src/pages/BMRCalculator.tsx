@@ -253,8 +253,8 @@ const BMRCalculator = () => {
                   itemType="https://schema.org/MedicalWebPage"
                   className="bg-primary/10 p-6 rounded-lg text-center"
                   data-calculator="bmr"
-                  data-keywords="smarty gym calculator, online fitness tools, smartygym.com, Haris Falas Cyprus, BMR calculator"
-                  aria-label="BMR calculation result - SmartyGym Cyprus online fitness calculator - smartygym.com"
+                  data-keywords="smarty gym calculator, online fitness tools, smartygym.com, Haris Falas, BMR calculator"
+                  aria-label="BMR calculation result - SmartyGym online fitness calculator - smartygym.com"
                 >
                   <h2 
                     className="text-lg font-semibold mb-2"
