@@ -15,13 +15,22 @@ import {
 import { Skeleton } from "@/components/ui/skeleton";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Button } from "@/components/ui/button";
-import { Trophy, MessageSquare, Calendar, User, ArrowUpDown, Dumbbell, Target, Users } from "lucide-react";
+import { Trophy, MessageSquare, Star, User, ArrowUpDown, Calendar } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
+import { CompactFilters } from "@/components/CompactFilters";
 
 interface LeaderboardEntry {
   user_id: string;
   display_name: string;
   total_completions: number;
+}
+
+interface RatedContent {
+  content_id: string;
+  content_name: string;
+  content_type: "workout" | "program";
+  average_rating: number;
+  rating_count: number;
 }
 
 interface Comment {
@@ -38,18 +47,24 @@ interface Comment {
 const Community = () => {
   const [workoutLeaderboard, setWorkoutLeaderboard] = useState<LeaderboardEntry[]>([]);
   const [programLeaderboard, setProgramLeaderboard] = useState<LeaderboardEntry[]>([]);
+  const [ratedContent, setRatedContent] = useState<RatedContent[]>([]);
   const [comments, setComments] = useState<Comment[]>([]);
   const [isLoadingLeaderboard, setIsLoadingLeaderboard] = useState(true);
+  const [isLoadingRatings, setIsLoadingRatings] = useState(true);
   const [isLoadingComments, setIsLoadingComments] = useState(true);
+  const [leaderboardFilter, setLeaderboardFilter] = useState<"workouts" | "programs">("workouts");
+  const [ratingsFilter, setRatingsFilter] = useState<"workouts" | "programs">("workouts");
+  const [commentsFilter, setCommentsFilter] = useState<"all" | "workouts" | "programs">("all");
   const [sortOrder, setSortOrder] = useState<"newest" | "oldest">("newest");
 
   useEffect(() => {
     fetchLeaderboards();
+    fetchRatedContent();
   }, []);
 
   useEffect(() => {
     fetchComments();
-  }, [sortOrder]);
+  }, [sortOrder, commentsFilter]);
 
   const fetchLeaderboards = async () => {
     try {
@@ -125,13 +140,99 @@ const Community = () => {
     }
   };
 
+  const fetchRatedContent = async () => {
+    try {
+      // Get workout ratings
+      const { data: workoutRatings, error: workoutError } = await supabase
+        .from("workout_interactions")
+        .select("workout_id, workout_name, rating")
+        .not("rating", "is", null);
+
+      if (workoutError) throw workoutError;
+
+      // Get program ratings
+      const { data: programRatings, error: programError } = await supabase
+        .from("program_interactions")
+        .select("program_id, program_name, rating")
+        .not("rating", "is", null);
+
+      if (programError) throw programError;
+
+      // Calculate workout averages
+      const workoutRatingMap: { [key: string]: { name: string; ratings: number[] } } = {};
+      (workoutRatings || []).forEach((item) => {
+        if (!workoutRatingMap[item.workout_id]) {
+          workoutRatingMap[item.workout_id] = { name: item.workout_name, ratings: [] };
+        }
+        workoutRatingMap[item.workout_id].ratings.push(item.rating);
+      });
+
+      // Calculate program averages
+      const programRatingMap: { [key: string]: { name: string; ratings: number[] } } = {};
+      (programRatings || []).forEach((item) => {
+        if (!programRatingMap[item.program_id]) {
+          programRatingMap[item.program_id] = { name: item.program_name, ratings: [] };
+        }
+        programRatingMap[item.program_id].ratings.push(item.rating);
+      });
+
+      // Create rated content array
+      const allRatedContent: RatedContent[] = [];
+
+      Object.entries(workoutRatingMap).forEach(([id, data]) => {
+        const avg = data.ratings.reduce((sum, r) => sum + r, 0) / data.ratings.length;
+        allRatedContent.push({
+          content_id: id,
+          content_name: data.name,
+          content_type: "workout",
+          average_rating: Math.round(avg * 10) / 10,
+          rating_count: data.ratings.length,
+        });
+      });
+
+      Object.entries(programRatingMap).forEach(([id, data]) => {
+        const avg = data.ratings.reduce((sum, r) => sum + r, 0) / data.ratings.length;
+        allRatedContent.push({
+          content_id: id,
+          content_name: data.name,
+          content_type: "program",
+          average_rating: Math.round(avg * 10) / 10,
+          rating_count: data.ratings.length,
+        });
+      });
+
+      // Sort by average rating (desc), then by count (desc)
+      allRatedContent.sort((a, b) => {
+        if (b.average_rating !== a.average_rating) {
+          return b.average_rating - a.average_rating;
+        }
+        return b.rating_count - a.rating_count;
+      });
+
+      setRatedContent(allRatedContent);
+    } catch (error) {
+      console.error("Error fetching rated content:", error);
+    } finally {
+      setIsLoadingRatings(false);
+    }
+  };
+
   const fetchComments = async () => {
     try {
-      const { data: commentsData, error: commentsError } = await supabase
+      let query = supabase
         .from("workout_comments")
         .select("id, user_id, workout_name, program_name, comment_text, created_at")
         .order("created_at", { ascending: sortOrder === "oldest" })
         .limit(50);
+
+      // Apply filter
+      if (commentsFilter === "workouts") {
+        query = query.not("workout_name", "is", null);
+      } else if (commentsFilter === "programs") {
+        query = query.not("program_name", "is", null);
+      }
+
+      const { data: commentsData, error: commentsError } = await query;
 
       if (commentsError) throw commentsError;
 
@@ -198,28 +299,41 @@ const Community = () => {
             ]} 
           />
 
-          {/* Workout Leaderboard Section */}
+          {/* Unified Leaderboard Section */}
           <Card 
             itemScope
             itemType="https://schema.org/ItemList"
             className="mb-6 md:mb-8 border-2 border-primary/30 shadow-lg"
-            data-leaderboard-type="workouts"
             data-keywords="smarty gym community, online gym leaderboard, online fitness community, smartygym.com, Haris Falas Cyprus"
-            aria-label="Workout leaderboard - SmartyGym Cyprus online fitness community - smartygym.com"
+            aria-label="Leaderboard - SmartyGym Cyprus online fitness community - smartygym.com"
           >
             <CardHeader className="bg-gradient-to-r from-primary/10 to-primary/5 p-4 md:p-6">
               <CardTitle 
-                className="flex items-center gap-2 text-xl md:text-2xl"
+                className="flex items-center gap-2 text-xl md:text-2xl mb-4"
                 itemProp="name"
               >
-                <Dumbbell className="h-5 w-5 md:h-6 md:w-6 text-primary" />
-                Workout Leaderboard - SmartyGym Community
+                <Trophy className="h-5 w-5 md:h-6 md:w-6 text-primary" />
+                Leaderboard - SmartyGym Community
               </CardTitle>
+              <CompactFilters
+                filters={[
+                  {
+                    name: "Type",
+                    value: leaderboardFilter,
+                    onChange: (value) => setLeaderboardFilter(value as "workouts" | "programs"),
+                    options: [
+                      { value: "workouts", label: "Workouts" },
+                      { value: "programs", label: "Training Programs" }
+                    ],
+                    placeholder: "Select type"
+                  }
+                ]}
+              />
               <p 
-                className="text-xs md:text-sm text-muted-foreground"
+                className="text-xs md:text-sm text-muted-foreground mt-2"
                 itemProp="description"
               >
-                Top members by completed workouts - Online gym community at smartygym.com
+                Top members by completed {leaderboardFilter} - Online gym community at smartygym.com
               </p>
               <meta itemProp="provider" content="SmartyGym Cyprus - smartygym.com - Haris Falas" />
             </CardHeader>
@@ -230,14 +344,17 @@ const Community = () => {
                     <Skeleton key={i} className="h-12 w-full" />
                   ))}
                 </div>
-              ) : workoutLeaderboard.length === 0 ? (
+              ) : (leaderboardFilter === "workouts" ? workoutLeaderboard : programLeaderboard).length === 0 ? (
                 <div className="text-center py-12 text-muted-foreground">
                   <Trophy className="h-12 w-12 mx-auto mb-4 opacity-30" />
                   <p className="text-lg font-medium mb-2">
                     No completions yet
                   </p>
                   <p className="text-sm">
-                    Start your fitness journey today and be the first on the leaderboard!
+                    {leaderboardFilter === "workouts" 
+                      ? "Start your fitness journey today and be the first on the leaderboard!"
+                      : "Complete a training program and see your name here!"
+                    }
                   </p>
                 </div>
               ) : (
@@ -252,7 +369,7 @@ const Community = () => {
                         </TableRow>
                       </TableHeader>
                       <TableBody>
-                        {workoutLeaderboard.map((entry, index) => (
+                        {(leaderboardFilter === "workouts" ? workoutLeaderboard : programLeaderboard).map((entry, index) => (
                           <TableRow
                             key={entry.user_id}
                             className="border-primary/20 hover:bg-primary/5"
@@ -283,32 +400,46 @@ const Community = () => {
             </CardContent>
           </Card>
 
-          {/* Program Leaderboard Section */}
+          {/* Most Rated Section */}
           <Card className="mb-6 md:mb-8 border-2 border-primary/30 shadow-lg">
             <CardHeader className="bg-gradient-to-r from-primary/10 to-primary/5 p-4 md:p-6">
-              <CardTitle className="flex items-center gap-2 text-xl md:text-2xl">
-                <Target className="h-5 w-5 md:h-6 md:w-6 text-primary" />
-                Training Program Leaderboard
+              <CardTitle className="flex items-center gap-2 text-xl md:text-2xl mb-4">
+                <Star className="h-5 w-5 md:h-6 md:w-6 text-primary" />
+                Top Rated Content
               </CardTitle>
-              <p className="text-xs md:text-sm text-muted-foreground">
-                Top members by completed training programs
+              <CompactFilters
+                filters={[
+                  {
+                    name: "Type",
+                    value: ratingsFilter,
+                    onChange: (value) => setRatingsFilter(value as "workouts" | "programs"),
+                    options: [
+                      { value: "workouts", label: "Workouts" },
+                      { value: "programs", label: "Training Programs" }
+                    ],
+                    placeholder: "Select type"
+                  }
+                ]}
+              />
+              <p className="text-xs md:text-sm text-muted-foreground mt-2">
+                Highest rated {ratingsFilter} by our community
               </p>
             </CardHeader>
             <CardContent className="p-4 md:pt-6">
-              {isLoadingLeaderboard ? (
+              {isLoadingRatings ? (
                 <div className="space-y-3">
                   {[...Array(10)].map((_, i) => (
                     <Skeleton key={i} className="h-12 w-full" />
                   ))}
                 </div>
-              ) : programLeaderboard.length === 0 ? (
+              ) : ratedContent.filter(item => item.content_type === (ratingsFilter === "workouts" ? "workout" : "program")).length === 0 ? (
                 <div className="text-center py-12 text-muted-foreground">
-                  <Target className="h-12 w-12 mx-auto mb-4 opacity-30" />
+                  <Star className="h-12 w-12 mx-auto mb-4 opacity-30" />
                   <p className="text-lg font-medium mb-2">
-                    No program completions yet
+                    No ratings yet
                   </p>
                   <p className="text-sm">
-                    Complete a training program and see your name here!
+                    Be the first to rate a {ratingsFilter === "workouts" ? "workout" : "training program"}!
                   </p>
                 </div>
               ) : (
@@ -318,34 +449,40 @@ const Community = () => {
                       <TableHeader>
                         <TableRow className="border-primary/30">
                           <TableHead className="w-12 md:w-16 text-xs md:text-sm">Rank</TableHead>
-                          <TableHead className="text-xs md:text-sm">Member</TableHead>
-                          <TableHead className="text-right text-xs md:text-sm">Completions</TableHead>
+                          <TableHead className="text-xs md:text-sm">Name</TableHead>
+                          <TableHead className="text-center text-xs md:text-sm">Rating</TableHead>
+                          <TableHead className="text-right text-xs md:text-sm">Reviews</TableHead>
                         </TableRow>
                       </TableHeader>
                       <TableBody>
-                        {programLeaderboard.map((entry, index) => (
-                          <TableRow
-                            key={entry.user_id}
-                            className="border-primary/20 hover:bg-primary/5"
-                          >
-                            <TableCell className="font-medium text-xs md:text-sm py-2 md:py-3">
-                              <div className="flex items-center gap-1 md:gap-2">
-                                <span className="text-base md:text-lg">{getMedalIcon(index) || `#${index + 1}`}</span>
-                              </div>
-                            </TableCell>
-                            <TableCell className="py-2 md:py-3">
-                              <div className="flex items-center gap-1 md:gap-2">
-                                <User className="h-3 w-3 md:h-4 md:w-4 text-muted-foreground flex-shrink-0" />
-                                <span className="font-medium text-xs md:text-sm truncate">{entry.display_name}</span>
-                              </div>
-                            </TableCell>
-                            <TableCell className="text-right py-2 md:py-3">
-                              <span className="inline-flex items-center gap-1 px-2 md:px-3 py-0.5 md:py-1 rounded-full bg-primary/10 text-primary font-semibold text-xs md:text-sm whitespace-nowrap">
-                                {entry.total_completions}
-                              </span>
-                            </TableCell>
-                          </TableRow>
-                        ))}
+                        {ratedContent
+                          .filter(item => item.content_type === (ratingsFilter === "workouts" ? "workout" : "program"))
+                          .map((item, index) => (
+                            <TableRow
+                              key={item.content_id}
+                              className="border-primary/20 hover:bg-primary/5"
+                            >
+                              <TableCell className="font-medium text-xs md:text-sm py-2 md:py-3">
+                                <div className="flex items-center gap-1 md:gap-2">
+                                  <span className="text-base md:text-lg">{getMedalIcon(index) || `#${index + 1}`}</span>
+                                </div>
+                              </TableCell>
+                              <TableCell className="py-2 md:py-3">
+                                <span className="font-medium text-xs md:text-sm truncate">{item.content_name}</span>
+                              </TableCell>
+                              <TableCell className="text-center py-2 md:py-3">
+                                <div className="flex items-center justify-center gap-1">
+                                  <Star className="h-3 w-3 md:h-4 md:w-4 fill-primary text-primary" />
+                                  <span className="font-semibold text-xs md:text-sm">{item.average_rating.toFixed(1)}</span>
+                                </div>
+                              </TableCell>
+                              <TableCell className="text-right py-2 md:py-3">
+                                <span className="inline-flex items-center gap-1 px-2 md:px-3 py-0.5 md:py-1 rounded-full bg-primary/10 text-primary font-semibold text-xs md:text-sm whitespace-nowrap">
+                                  {item.rating_count}
+                                </span>
+                              </TableCell>
+                            </TableRow>
+                          ))}
                       </TableBody>
                     </Table>
                   </div>
@@ -357,26 +494,39 @@ const Community = () => {
           {/* Comments Section */}
           <Card className="border-2 border-primary/30 shadow-lg">
             <CardHeader className="bg-gradient-to-r from-primary/10 to-primary/5 p-4 md:p-6">
-              <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-3 md:gap-0">
-                <div>
-                  <CardTitle className="flex items-center gap-2 text-xl md:text-2xl">
-                    <MessageSquare className="h-5 w-5 md:h-6 md:w-6 text-primary" />
-                    Community Comments
-                  </CardTitle>
-                  <p className="text-xs md:text-sm text-muted-foreground mt-1">
-                    Reviews and feedback from premium members
-                  </p>
-                </div>
+              <div className="flex items-center justify-between mb-4">
+                <CardTitle className="flex items-center gap-2 text-xl md:text-2xl">
+                  <MessageSquare className="h-5 w-5 md:h-6 md:w-6 text-primary" />
+                  Community Comments
+                </CardTitle>
                 <Button
                   variant="outline"
                   size="sm"
                   onClick={() => setSortOrder(sortOrder === "newest" ? "oldest" : "newest")}
-                  className="flex items-center gap-2 text-xs md:text-sm w-full md:w-auto"
+                  className="flex items-center gap-2 text-xs md:text-sm"
                 >
                   <ArrowUpDown className="h-3 w-3 md:h-4 md:w-4" />
-                  <span className="whitespace-nowrap">{sortOrder === "newest" ? "Newest First" : "Oldest First"}</span>
+                  <span className="whitespace-nowrap hidden sm:inline">{sortOrder === "newest" ? "Newest First" : "Oldest First"}</span>
                 </Button>
               </div>
+              <CompactFilters
+                filters={[
+                  {
+                    name: "Type",
+                    value: commentsFilter,
+                    onChange: (value) => setCommentsFilter(value as "all" | "workouts" | "programs"),
+                    options: [
+                      { value: "all", label: "All Comments" },
+                      { value: "workouts", label: "Workouts" },
+                      { value: "programs", label: "Training Programs" }
+                    ],
+                    placeholder: "Select type"
+                  }
+                ]}
+              />
+              <p className="text-xs md:text-sm text-muted-foreground mt-2">
+                Reviews and feedback from premium members
+              </p>
             </CardHeader>
             <CardContent className="p-4 md:pt-6">
               {isLoadingComments ? (
