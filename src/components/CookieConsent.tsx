@@ -70,7 +70,7 @@ export const CookieConsent = () => {
           
           <p className="text-xs text-muted-foreground leading-relaxed">
             We use cookies for authentication and preferences. See our{" "}
-            <Link to="/privacypolicy" className="text-primary hover:underline font-medium">
+            <Link to="/privacy-policy" className="text-primary hover:underline font-medium">
               Privacy Policy
             </Link>.
           </p>
