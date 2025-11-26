@@ -47,7 +47,7 @@ const Disclaimer = () => {
               </div>
 
               <p className="text-lg text-muted-foreground">
-                The information provided on <strong>SmartyGym</strong> (smartygym.com), founded by <strong>Haris Falas</strong> in Cyprus (the "Website" and mobile applications) is intended 
+                The information provided on <strong>SmartyGym</strong> (smartygym.com), founded by <strong>Haris Falas</strong> (the "Website" and mobile applications) is intended 
                 solely for <strong>general educational and informational purposes</strong>. While every effort has been made by our <strong>Online Fitness Platform</strong> experts 
                 to provide safe and effective guidance, <strong>SmartyGym is not a substitute for professional medical
                 advice, diagnosis, or treatment</strong>.
@@ -137,7 +137,7 @@ const Disclaimer = () => {
                 <div>
                   <h2 className="text-2xl font-bold mb-3">5. Limitation of Liability & Release of Claims</h2>
                   <p className="text-muted-foreground mb-3">
-                    To the fullest extent permitted by law in Cyprus, the European Union, and internationally:
+                    To the fullest extent permitted by law in the European Union and internationally:
                   </p>
                   <ul className="space-y-2 text-muted-foreground">
                     <li>
@@ -204,9 +204,9 @@ const Disclaimer = () => {
                 <div>
                   <h2 className="text-2xl font-bold mb-3">7. Jurisdiction & Governing Law</h2>
                   <p className="text-muted-foreground">
-                    This Disclaimer is governed by the laws of the Republic of Cyprus and applicable EU regulations. 
-                    Any disputes shall be subject to the exclusive jurisdiction of Cyprus courts. This limitation 
-                    of liability applies to the maximum extent permitted by Cyprus law and EU consumer protection 
+                    This Disclaimer is governed by applicable law and EU regulations. 
+                    Any disputes shall be subject to the jurisdiction of courts of competent jurisdiction. This limitation 
+                    of liability applies to the maximum extent permitted by applicable law and EU consumer protection 
                     directives while maintaining your statutory rights as a consumer under EU law.
                   </p>
                 </div>

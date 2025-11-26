@@ -51,47 +51,6 @@ const Tools = () => {
         <link rel="alternate" hrefLang="el" href="https://smartygym.com/tools" />
         <link rel="alternate" hrefLang="en-GB" href="https://smartygym.com/tools" />
       </Helmet>
-        
-        <meta property="og:title" content="Fitness Tools - SmartyGym | Free Calculators" />
-        <meta property="og:description" content="Free fitness calculators by Haris Falas - convenient tools for flexible training anywhere" />
-        <meta property="og:type" content="website" />
-        <meta property="og:url" content="https://smartygym.com/tools" />
-        <meta property="og:image" content="https://smartygym.com/smarty-gym-logo.png" />
-        
-        <meta name="twitter:card" content="summary_large_image" />
-        <meta name="twitter:title" content="Fitness Tools - SmartyGym" />
-        <meta name="twitter:description" content="Free fitness calculators at smartygym.com for convenient training planning" />
-        <meta name="twitter:image" content="https://smartygym.com/smarty-gym-logo.png" />
-        
-        <link rel="canonical" href="https://smartygym.com/tools" />
-        
-        <script type="application/ld+json">
-          {JSON.stringify(generateBreadcrumbSchema([
-            { name: "Home", url: "/" },
-            { name: "Tools", url: "/tools" }
-          ]))}
-        </script>
-        
-        <meta property="og:title" content="Fitness Tools - SmartyGym | Free Calculators" />
-        <meta property="og:description" content="Free fitness calculators by Haris Falas - convenient tools for flexible training anywhere" />
-        <meta property="og:type" content="website" />
-        <meta property="og:url" content="https://smartygym.com/tools" />
-        <meta property="og:image" content="https://smartygym.com/smarty-gym-logo.png" />
-        
-        <meta name="twitter:card" content="summary_large_image" />
-        <meta name="twitter:title" content="Fitness Tools - SmartyGym" />
-        <meta name="twitter:description" content="Free fitness calculators at smartygym.com for convenient training planning" />
-        <meta name="twitter:image" content="https://smartygym.com/smarty-gym-logo.png" />
-        
-        <link rel="canonical" href="https://smartygym.com/tools" />
-        
-        <script type="application/ld+json">
-          {JSON.stringify(generateBreadcrumbSchema([
-            { name: "Home", url: "/" },
-            { name: "Tools", url: "/tools" }
-          ]))}
-        </script>
-      </Helmet>
       
       <SEOEnhancer
         entities={["SmartyGym", "Haris Falas", "Fitness Calculators", "1RM Calculator", "BMR Calculator"]}

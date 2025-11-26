@@ -76,43 +76,8 @@ const TrainingProgramFlow = () => {
         <link rel="alternate" hrefLang="el" href="https://smartygym.com/trainingprogram" />
         <link rel="alternate" hrefLang="en-GB" href="https://smartygym.com/trainingprogram" />
       </Helmet>
-        
-        <meta property="og:title" content="Training Programs - SmartyGym.com" />
-        <meta property="og:description" content="Structured training programs designed by Sports Scientist Haris Falas" />
-        <meta property="og:type" content="website" />
-        <meta property="og:url" content="https://smartygym.com/training-program" />
-        
-        <meta name="twitter:card" content="summary_large_image" />
-        <meta name="twitter:title" content="Training Programs - SmartyGym" />
-        <meta name="twitter:description" content="Structured training programs designed by Sports Scientist Haris Falas" />
-        
-        <link rel="canonical" href="https://smartygym.com/training-program" />
-        
-        <meta property="og:title" content="Training Programs - SmartyGym.com" />
-        <meta property="og:description" content="Structured training programs designed by Sports Scientist Haris Falas" />
-        <meta property="og:type" content="website" />
-        <meta property="og:url" content="https://smartygym.com/training-program" />
-        
-        <meta name="twitter:card" content="summary_large_image" />
-        <meta name="twitter:title" content="Training Programs - SmartyGym" />
-        <meta name="twitter:description" content="Structured training programs designed by Sports Scientist Haris Falas" />
-        
-        <link rel="canonical" href="https://smartygym.com/training-program" />
-        
-        <script type="application/ld+json">
-          {JSON.stringify(generateBreadcrumbSchema([{
-          name: "Home",
-          url: "/"
-        }, {
-          name: "Training Programs",
-          url: "/trainingprogram"
-        }]))}
-        </script>
-      </Helmet>
       
       <div className="min-h-screen bg-background">
-      
-      <div className="container mx-auto max-w-6xl px-4 py-8">
         {canGoBack && <div className="mb-6">
             <Button variant="ghost" size="sm" onClick={goBack}>
               <ArrowLeft className="mr-2 h-4 w-4" />
@@ -147,7 +112,7 @@ const TrainingProgramFlow = () => {
           {programTypes.map(program => {
             const Icon = program.icon;
             return <ScrollReveal key={program.id}>
-                <Card itemScope itemType="https://schema.org/Course" onClick={() => handleProgramSelect(program.id)} className="group p-6 cursor-pointer transition-all duration-500 ease-out transform-gpu hover:scale-110 hover:-translate-y-3 hover:shadow-2xl hover:shadow-primary/40 hover:border-primary/60 bg-card border-2 border-border" role="button" aria-label={`${program.title} training program - Online gym program at Smarty Gym Cyprus - smartygym.com by Haris Falas`} data-program-category={program.id} data-keywords="online gym training programs, workout training programs, smarty gym, online fitness programs, smartygym.com, Haris Falas Cyprus">
+                <Card itemScope itemType="https://schema.org/Course" onClick={() => handleProgramSelect(program.id)} className="group p-6 cursor-pointer transition-all duration-500 ease-out transform-gpu hover:scale-110 hover:-translate-y-3 hover:shadow-2xl hover:shadow-primary/40 hover:border-primary/60 bg-card border-2 border-border" role="button" aria-label={`${program.title} training program - Online gym program at SmartyGym - smartygym.com by Haris Falas`} data-program-category={program.id} data-keywords="online gym training programs, workout training programs, smarty gym, online fitness programs, smartygym.com, Haris Falas">
                   <div className="flex flex-col items-center text-center space-y-4">
                     <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center transition-transform duration-300 group-hover:scale-110" aria-hidden="true">
                       <Icon className="w-8 h-8 text-primary transition-transform duration-300 group-hover:rotate-3" />
@@ -199,7 +164,6 @@ const TrainingProgramFlow = () => {
               </Button>
             </div>
           </ScrollReveal>}
-      </div>
       </div>
     </>;
 };
