@@ -62,6 +62,7 @@ import Community from "./pages/Community";
 import AdminBackoffice from "./pages/AdminBackoffice";
 import MigrateContent from "./pages/MigrateContent";
 import ProcessLogo from "./pages/ProcessLogo";
+import AppSubmission from "./pages/AppSubmission";
 import { AccessGate } from "./components/AccessGate";
 
 import { InstallPWA } from "./components/InstallPWA";
@@ -144,6 +145,11 @@ const AppContent = () => {
                 <Route path="/admin/process-logo" element={
                   <AdminRoute>
                     <ProcessLogo />
+                  </AdminRoute>
+                } />
+                <Route path="/app-submission" element={
+                  <AdminRoute>
+                    <AppSubmission />
                   </AdminRoute>
                 } />
                 
