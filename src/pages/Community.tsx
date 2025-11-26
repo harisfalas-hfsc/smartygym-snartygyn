@@ -314,7 +314,7 @@ const Community = () => {
             itemType="https://schema.org/ItemList"
             className="mb-6 md:mb-8 border-2 border-primary/30 shadow-lg"
             data-keywords="smarty gym community, online gym leaderboard, online fitness community, smartygym.com, Haris Falas Cyprus"
-            aria-label="Leaderboard - SmartyGym Cyprus online fitness community - smartygym.com"
+            aria-label="Community Leaderboard - SmartyGym Cyprus online fitness community - smartygym.com"
           >
             <CardHeader className="bg-gradient-to-r from-primary/10 to-primary/5 p-4 md:p-6">
               <CardTitle 
@@ -322,7 +322,7 @@ const Community = () => {
                 itemProp="name"
               >
                 <Trophy className="h-5 w-5 md:h-6 md:w-6 text-primary" />
-                Leaderboard - SmartyGym Community
+                Community Leaderboard
               </CardTitle>
               <CompactFilters
                 filters={[
@@ -414,7 +414,7 @@ const Community = () => {
             <CardHeader className="bg-gradient-to-r from-primary/10 to-primary/5 p-4 md:p-6">
               <CardTitle className="flex items-center gap-2 text-xl md:text-2xl mb-4">
                 <Star className="h-5 w-5 md:h-6 md:w-6 text-primary" />
-                Top Rated Content
+                Community Ratings
               </CardTitle>
               <CompactFilters
                 filters={[
