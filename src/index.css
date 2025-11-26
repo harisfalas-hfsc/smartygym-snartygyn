@@ -497,6 +497,85 @@ All colors MUST be HSL.
   .cta-button:hover svg {
     transform: scale(1.2) rotate(5deg);
   }
+
+  /* Print Styles for Checklist */
+  @media print {
+    /* Hide non-printable elements */
+    .no-print,
+    nav,
+    footer,
+    button:not(.print-checkbox),
+    .hover-lift,
+    .shadow-soft,
+    .shadow-gold {
+      display: none !important;
+    }
+
+    /* Ensure proper page structure */
+    body {
+      margin: 0;
+      padding: 0;
+      background: white !important;
+      color: black !important;
+    }
+
+    /* Print container adjustments */
+    .print-container {
+      max-width: 100% !important;
+      padding: 20px !important;
+      margin: 0 !important;
+    }
+
+    /* Page break controls */
+    .page-break-before {
+      page-break-before: always;
+    }
+
+    .page-break-avoid {
+      page-break-inside: avoid;
+    }
+
+    /* Checklist specific styles */
+    .print-checkbox {
+      width: 16px !important;
+      height: 16px !important;
+      border: 2px solid black !important;
+      margin-right: 8px !important;
+      -webkit-print-color-adjust: exact;
+      print-color-adjust: exact;
+    }
+
+    /* Copy blocks */
+    .copy-block {
+      page-break-inside: avoid;
+      margin-bottom: 16px;
+    }
+
+    .bg-muted {
+      background: #f5f5f5 !important;
+      -webkit-print-color-adjust: exact;
+      print-color-adjust: exact;
+    }
+
+    .border-primary {
+      border-color: #d4af37 !important;
+      -webkit-print-color-adjust: exact;
+      print-color-adjust: exact;
+    }
+
+    /* Ensure colors print correctly */
+    * {
+      -webkit-print-color-adjust: exact;
+      print-color-adjust: exact;
+    }
+
+    /* Remove shadows and animations */
+    * {
+      box-shadow: none !important;
+      animation: none !important;
+      transition: none !important;
+    }
+  }
   
   /* Make public tables (rendered via prose) match editor tables for WYSIWYG consistency */
   .prose table {

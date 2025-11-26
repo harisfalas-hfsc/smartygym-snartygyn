@@ -63,6 +63,7 @@ import AdminBackoffice from "./pages/AdminBackoffice";
 import MigrateContent from "./pages/MigrateContent";
 import ProcessLogo from "./pages/ProcessLogo";
 import AppSubmission from "./pages/AppSubmission";
+import AppSubmissionPrintable from "./pages/AppSubmissionPrintable";
 import { AccessGate } from "./components/AccessGate";
 
 import { InstallPWA } from "./components/InstallPWA";
@@ -150,6 +151,11 @@ const AppContent = () => {
                 <Route path="/app-submission" element={
                   <AdminRoute>
                     <AppSubmission />
+                  </AdminRoute>
+                } />
+                <Route path="/app-submission-printable" element={
+                  <AdminRoute>
+                    <AppSubmissionPrintable />
                   </AdminRoute>
                 } />
                 
