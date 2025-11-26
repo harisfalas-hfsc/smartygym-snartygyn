@@ -188,13 +188,16 @@ const WorkoutFlow = () => {
 
         {/* Create Your Own Workout Card */}
         <Card className="mt-8 bg-gradient-to-br from-primary/5 via-background to-primary/5 border-2 border-primary/40 shadow-gold">
-          <div className="p-6 sm:p-8">
-            <div className="flex flex-col items-center justify-center gap-6">
-              <div className="w-20 h-20 rounded-full bg-primary/10 flex items-center justify-center">
-                <Sparkles className="w-10 h-10 text-primary" />
+          <div className="p-4 sm:p-5">
+            <div className="flex flex-col items-center gap-3">
+              {/* Title + Icon on one line */}
+              <div className="flex items-center gap-2">
+                <h3 className="text-lg sm:text-xl font-semibold">Feeling Stuck?</h3>
+                <Sparkles className="w-5 h-5 sm:w-6 sm:h-6 text-primary" />
               </div>
               
-              <Button size="lg" className="cta-button text-base sm:text-lg px-8 py-6" onClick={() => navigate("/smartyworkout")}>
+              {/* Compact button */}
+              <Button size="default" className="cta-button" onClick={() => navigate("/smartyworkout")}>
                 Create Your Own Workout Now
               </Button>
             </div>
