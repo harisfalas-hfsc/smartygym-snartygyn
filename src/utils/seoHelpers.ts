@@ -61,15 +61,7 @@ export const generateExercisePlanSchema = (workout: WorkoutSEO & { imageUrl?: st
     },
     "image": workout.imageUrl,
     "url": `https://smartygym.com${workout.url}`,
-    "inLanguage": "en-GB",
-    "locationCreated": {
-      "@type": "Place",
-      "address": {
-        "@type": "PostalAddress",
-        "addressCountry": "CY",
-        "addressLocality": "Cyprus"
-      }
-    }
+    "inLanguage": "en-GB"
   };
 };
 
@@ -98,15 +90,7 @@ export const generateCourseSchema = (program: ProgramSEO & { imageUrl?: string; 
     },
     "image": program.imageUrl,
     "url": `https://smartygym.com${program.url}`,
-    "inLanguage": "en-GB",
-    "locationCreated": {
-      "@type": "Place",
-      "address": {
-        "@type": "PostalAddress",
-        "addressCountry": "CY",
-        "addressLocality": "Cyprus"
-      }
-    }
+    "inLanguage": "en-GB"
   };
 };
 
@@ -119,7 +103,7 @@ export const generatePersonSchema = () => {
     "@type": "Person",
     "name": "Haris Falas",
     "jobTitle": "Sports Scientist & Strength and Conditioning Coach",
-    "description": "BSc Sports Science and CSCS certified coach. Founder of SmartyGym, Cyprus' leading online fitness platform with 100% human-designed workouts and training programs.",
+    "description": "BSc Sports Science and CSCS certified coach. Founder of SmartyGym, leading online fitness platform with 100% human-designed workouts and training programs.",
     "credential": ["BSc Sports Science", "Certified Strength and Conditioning Specialist (CSCS)"],
     "knowsAbout": [
       "Strength Training",
@@ -137,12 +121,7 @@ export const generatePersonSchema = () => {
       "url": "https://smartygym.com"
     },
     "url": "https://smartygym.com",
-    "image": "https://smartygym.com/haris-falas-coach.png",
-    "address": {
-      "@type": "PostalAddress",
-      "addressCountry": "CY",
-      "addressLocality": "Cyprus"
-    }
+    "image": "https://smartygym.com/haris-falas-coach.png"
   };
 };
 
@@ -157,16 +136,11 @@ export const generateOrganizationSchema = () => {
     "alternateName": "Smarty Gym",
     "url": "https://smartygym.com",
     "logo": "https://smartygym.com/smarty-gym-logo.png",
-    "description": "Cyprus' leading online fitness platform. 100% human-designed workouts and training programs by Sports Scientist Haris Falas. Train anywhere, anytime with science-based fitness.",
+    "description": "Leading online fitness platform. 100% human-designed workouts and training programs by Sports Scientist Haris Falas. Train anywhere, anytime with science-based fitness.",
     "founder": {
       "@type": "Person",
       "name": "Haris Falas",
       "jobTitle": "Sports Scientist & Strength and Conditioning Coach"
-    },
-    "address": {
-      "@type": "PostalAddress",
-      "addressCountry": "CY",
-      "addressLocality": "Cyprus"
     },
     "contactPoint": {
       "@type": "ContactPoint",

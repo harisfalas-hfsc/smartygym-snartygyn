@@ -234,7 +234,6 @@ const Index = () => {
         
         <meta property="schema:name" content="SmartyGym" />
         <meta property="schema:founder" content="Haris Falas" />
-        <meta property="schema:location" content="Cyprus" />
         <meta property="schema:serviceType" content="Online Fitness Training" />
         
         <meta property="og:type" content="website" />

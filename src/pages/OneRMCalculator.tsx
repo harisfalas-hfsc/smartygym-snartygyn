@@ -234,8 +234,8 @@ const OneRMCalculator = () => {
                   itemType="https://schema.org/MedicalWebPage"
                   className="bg-primary/10 p-6 rounded-lg text-center"
                   data-calculator="1rm"
-                  data-keywords="smarty gym calculator, online fitness tools, smartygym.com, Haris Falas Cyprus, 1RM calculator"
-                  aria-label="1RM calculation result - Smarty Gym Cyprus online fitness calculator - smartygym.com"
+                  data-keywords="smarty gym calculator, online fitness tools, smartygym.com, Haris Falas, 1RM calculator"
+                  aria-label="1RM calculation result - SmartyGym online fitness calculator - smartygym.com"
                 >
                   <h2 
                     className="text-lg font-semibold mb-2"

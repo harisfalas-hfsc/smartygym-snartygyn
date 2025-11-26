@@ -108,26 +108,21 @@ const PremiumComparison = () => {
   return (
     <>
       <Helmet>
-        <title>Compare Plans Cyprus Greece | Free Premium Membership | Haris Falas HFSC | SmartyGym</title>
-        <meta name="description" content="Compare SmartyGym plans Cyprus Greece smartygym.com. Visitor Free Premium membership by Sports Scientist Haris Falas HFSC Nicosia. Online gym workouts training programs calculators Cyprus Greece. Choose best plan anywhere anytime σύγκριση πλάνα γυμναστήριο Κύπρος" />
-        <meta name="keywords" content="SmartyGym plans Cyprus, online gym plans Cyprus, gym membership Cyprus, free premium fitness Cyprus, HFSC Nicosia, Haris Falas Cyprus, Sports Scientist Cyprus, gym plans Greece, fitness membership Cyprus, online gym comparison Cyprus, smartygym.com plans, HFSC Performance, Cyprus gym pricing, σύγκριση πλάνα γυμναστήριο Κύπρος" />
+        <title>Compare Plans | Free Premium Membership | Haris Falas HFSC | SmartyGym</title>
+        <meta name="description" content="Compare SmartyGym plans at smartygym.com. Visitor Free Premium membership by Sports Scientist Haris Falas HFSC. Online gym workouts training programs calculators. Choose best plan anywhere anytime." />
+        <meta name="keywords" content="SmartyGym plans, online gym plans, gym membership, free premium fitness, HFSC, Haris Falas, Sports Scientist, fitness membership, online gym comparison, smartygym.com plans, HFSC Performance" />
         
         {/* Greek Language */}
         <link rel="alternate" hrefLang="el" href="https://smartygym.com/premium-comparison" />
         <link rel="alternate" hrefLang="en-GB" href="https://smartygym.com/premium-comparison" />
         
-        {/* Geo Targeting */}
-        <meta name="geo.region" content="CY-01; GR" />
-        <meta name="geo.placename" content="Cyprus; Greece" />
-        <meta name="geo.position" content="35.1856;33.3823" />
-        
-        <meta property="og:title" content="Compare Plans | SmartyGym Cyprus Online Gym" />
+        <meta property="og:title" content="Compare Plans | SmartyGym Online Gym" />
         <meta property="og:description" content="Compare Visitor, Free, and Premium access levels. Find your perfect fitness plan." />
         <meta property="og:type" content="website" />
         <meta property="og:url" content="https://smartygym.com/premium-comparison" />
         
         <meta name="twitter:card" content="summary" />
-        <meta name="twitter:title" content="Compare Plans | SmartyGym Cyprus" />
+        <meta name="twitter:title" content="Compare Plans | SmartyGym" />
         <meta name="twitter:description" content="Find the perfect plan for your fitness journey" />
         
         <link rel="canonical" href="https://smartygym.com/premium-comparison" />

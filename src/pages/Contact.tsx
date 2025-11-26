@@ -341,10 +341,6 @@ const Contact = () => {
               "name": "SmartyGym",
               "url": "https://smartygym.com",
               "email": "admin@smartygym.com",
-              "address": {
-                "@type": "PostalAddress",
-                "addressCountry": "CY"
-              },
               "founder": {
                 "@type": "Person",
                 "name": "Haris Falas",

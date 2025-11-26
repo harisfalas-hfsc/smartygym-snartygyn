@@ -28,7 +28,7 @@ const About = () => {
         
         {/* Twitter Card */}
         <meta name="twitter:card" content="summary_large_image" />
-        <meta name="twitter:title" content="About SmartyGym - Online Fitness Platform Cyprus" />
+        <meta name="twitter:title" content="About SmartyGym - Online Fitness Platform" />
         <meta name="twitter:description" content="Science-based workouts and expert coaching by certified coach Haris Falas." />
         
         {/* Canonical URL */}
