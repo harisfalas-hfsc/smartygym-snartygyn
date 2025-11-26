@@ -118,8 +118,8 @@ const BMRCalculator = () => {
       <>
         <Helmet>
           <title>Free BMR Calculator | Basal Metabolic Rate | Haris Falas HFSC | SmartyGym</title>
-          <meta name="description" content="Free BMR calculator at smartygym.com. Calculate basal metabolic rate TDEE using Mifflin-St Jeor equation. Nutrition tool by Sports Scientist Haris Falas HFSC. Daily calorie needs. Train smart anywhere anytime" />
-          <meta name="keywords" content="BMR calculator, basal metabolic rate, calorie calculator, online personal trainer nutrition, HFSC, Haris Falas, Sports Scientist, BMR calculator online, TDEE calculator, metabolism calculator, nutrition tools, smartygym.com, HFSC Performance, calorie needs" />
+        <meta name="description" content="Free BMR calculator at smartygym.com. Calculate basal metabolic rate & TDEE using Mifflin-St Jeor equation. Nutrition tool by Sports Scientist Haris Falas HFSC. Daily calorie needs. Train smart anywhere, anytime." />
+        <meta name="keywords" content="BMR calculator, basal metabolic rate, calorie calculator, online personal trainer nutrition, HFSC, Haris Falas, Sports Scientist, BMR calculator online, TDEE calculator, metabolism calculator, nutrition tools, smartygym.com, HFSC Performance, calorie needs" />
           
           <meta property="og:title" content="Free BMR Calculator | Basal Metabolic Rate Calculator | SmartyGym" />
           <meta property="og:description" content="Calculate your BMR and daily calorie needs with our free online calculator at smartygym.com - Professional nutrition tool by Haris Falas" />
@@ -272,7 +272,7 @@ const BMRCalculator = () => {
                     className="text-sm text-muted-foreground mt-2"
                     itemProp="description"
                   >
-                    Calories burned at complete rest - Calculated by SmartyGym online fitness tools - smartygym.com
+                    Calories burned at complete rest
                   </p>
                   <meta itemProp="provider" content="SmartyGym - smartygym.com - Haris Falas" />
                 </article>

@@ -7,17 +7,17 @@ const TermsOfService = () => {
   return (
     <>
       <Helmet>
-        <title>Terms of Service | SmartyGym.com Online Fitness Platform Cyprus | smartygym.com</title>
-        <meta name="description" content="Terms and Conditions for SmartyGym (smartygym.com) - Online Fitness Platform by Haris Falas Cyprus. Read our terms of service for using our evidence-based fitness programs, online workouts, training programs, and online gym services. Legal information for Cyprus online fitness." />
-        <meta name="keywords" content="smartygym terms, smartygym.com terms of service, online fitness terms Cyprus, Haris Falas legal, online fitness legal, fitness platform terms, online gym terms, SmartyGym legal, Cyprus fitness terms, workout platform terms, training program terms, online gym legal Cyprus" />
+        <title>Terms of Service | SmartyGym.com Online Fitness Platform | smartygym.com</title>
+        <meta name="description" content="Terms and Conditions for SmartyGym (smartygym.com) - Online Fitness Platform by Haris Falas. Read our terms of service for using our evidence-based fitness programs, online workouts, training programs, and online gym services." />
+        <meta name="keywords" content="smartygym terms, smartygym.com terms of service, online fitness terms, Haris Falas legal, online fitness legal, fitness platform terms, online gym terms, SmartyGym legal, workout platform terms, training program terms, online gym legal" />
         
-        <meta property="og:title" content="Terms of Service | SmartyGym.com Cyprus" />
+        <meta property="og:title" content="Terms of Service | SmartyGym.com" />
         <meta property="og:description" content="Legal terms for using SmartyGym.com Online Fitness Platform by Haris Falas" />
         <meta property="og:type" content="website" />
         <meta property="og:url" content="https://smartygym.com/terms-of-service" />
         
         <meta name="twitter:card" content="summary" />
-        <meta name="twitter:title" content="Terms of Service | SmartyGym Cyprus" />
+        <meta name="twitter:title" content="Terms of Service | SmartyGym" />
         <meta name="twitter:description" content="Legal terms for SmartyGym online fitness platform" />
         
         <link rel="canonical" href="https://smartygym.com/terms-of-service" />
@@ -72,7 +72,7 @@ const TermsOfService = () => {
               <div className="bg-muted/50 p-4 rounded-lg mb-6">
                 <p className="text-sm text-muted-foreground mb-2"><strong>Effective Date:</strong> January 2025</p>
                 <p className="text-sm text-muted-foreground mb-2"><strong>Website:</strong> smartygym.com</p>
-                <p className="text-sm text-muted-foreground"><strong>Company:</strong> SmartyGym | Founded by Haris Falas | Cyprus</p>
+                <p className="text-sm text-muted-foreground"><strong>Company:</strong> SmartyGym | Founded by Haris Falas</p>
               </div>
 
               <p className="text-lg text-muted-foreground">
@@ -98,7 +98,7 @@ const TermsOfService = () => {
                   <h2 className="text-2xl font-bold mb-3">2. Eligibility</h2>
                   <p className="text-muted-foreground">
                     You must be at least 18 years old to use our services. By creating an account, you confirm that you 
-                    are legally capable of entering into binding contracts under Cyprus and EU law.
+                    are legally capable of entering into binding contracts under applicable international law and EU regulations.
                   </p>
                 </div>
               </div>
@@ -152,7 +152,7 @@ const TermsOfService = () => {
                   <ul className="space-y-2 text-muted-foreground">
                     <li>You may cancel your subscription anytime via your account settings.</li>
                     <li>No refunds will be provided for partial subscription periods.</li>
-                    <li>If required by Cyprus consumer law, you may have a <strong>14-day right of withdrawal</strong> for digital services that have not yet started.</li>
+                    <li>If required by applicable consumer protection laws, you may have a <strong>14-day right of withdrawal</strong> for digital services that have not yet started.</li>
                   </ul>
                 </div>
               </div>
@@ -219,7 +219,7 @@ const TermsOfService = () => {
                 <div>
                   <h2 className="text-2xl font-bold mb-3">10. Limitation of Liability</h2>
                   <p className="text-muted-foreground mb-3">
-                    To the maximum extent permitted by Cyprus law and EU regulations:
+                    To the maximum extent permitted by applicable international law and EU regulations:
                   </p>
                   <ul className="space-y-2 text-muted-foreground">
                     <li>Smarty Gym provides fitness programs "as is" without warranties of any kind, express or implied.</li>
@@ -233,7 +233,7 @@ const TermsOfService = () => {
                     </li>
                     <li>
                       <strong>EU Consumer Rights:</strong> Nothing in these terms shall exclude or limit liability 
-                      that cannot be excluded or limited under Cyprus and EU law, including liability for death or 
+                      that cannot be excluded or limited under applicable EU law, including liability for death or 
                       personal injury caused by negligence.
                     </li>
                   </ul>
@@ -246,7 +246,7 @@ const TermsOfService = () => {
                   <h2 className="text-2xl font-bold mb-3">11. Privacy & Data Protection</h2>
                   <p className="text-muted-foreground">
                     Your privacy is important to us. Please review our <strong>Privacy Policy</strong>, which explains 
-                    how we collect, use, and protect your personal data in line with the <strong>GDPR</strong> and Cyprus law.
+                    how we collect, use, and protect your personal data in line with the <strong>GDPR</strong> and applicable data protection laws.
                   </p>
                 </div>
               </div>
@@ -279,18 +279,16 @@ const TermsOfService = () => {
                 <div>
                   <h2 className="text-2xl font-bold mb-3">14. Governing Law, Jurisdiction & Dispute Resolution</h2>
                   <p className="text-muted-foreground mb-3">
-                    These Terms & Conditions are governed by the laws of the Republic of Cyprus and applicable 
-                    European Union regulations, including but not limited to:
+                    These Terms & Conditions are governed by applicable international law and European Union 
+                    regulations, including but not limited to:
                   </p>
                   <ul className="space-y-2 text-muted-foreground">
                     <li>General Data Protection Regulation (GDPR) (EU) 2016/679</li>
                     <li>Consumer Rights Directive 2011/83/EU</li>
                     <li>E-Commerce Directive 2000/31/EC</li>
-                    <li>Cyprus consumer protection laws</li>
                   </ul>
                   <p className="text-muted-foreground mt-3">
-                    Any disputes arising from these terms shall be subject to the exclusive jurisdiction of the 
-                    courts of the Republic of Cyprus.
+                    Any disputes arising from these terms shall be resolved in accordance with applicable law.
                   </p>
                   <p className="text-muted-foreground mt-3">
                     <strong>Alternative Dispute Resolution:</strong> As an EU-based business, we are committed to 

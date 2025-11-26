@@ -54,15 +54,15 @@ const IndividualTrainingProgram = () => {
     return (
       <>
         <Helmet>
-          <title>{dbProgram.name} | Online Training Program by Haris Falas | SmartyGym Cyprus</title>
-          <meta name="description" content={`${dbProgram.description || dbProgram.name} - ${dbProgram.weeks} week online training program by Cyprus Sports Scientist Haris Falas. ${dbProgram.category} program. ${dbProgram.days_per_week} days per week. ${dbProgram.equipment}.`} />
-          <meta name="keywords" content={`${dbProgram.name}, online training programs, ${dbProgram.category} program, ${dbProgram.weeks} week program, Haris Falas, Cyprus fitness programs, online personal training, Cyprus personal trainers, structured training program`} />
+          <title>{dbProgram.name} | Online Training Program by Haris Falas | SmartyGym</title>
+          <meta name="description" content={`${dbProgram.description || dbProgram.name} - ${dbProgram.weeks} week online training program by Sports Scientist Haris Falas. ${dbProgram.category} program. ${dbProgram.days_per_week} days per week. ${dbProgram.equipment}.`} />
+          <meta name="keywords" content={`${dbProgram.name}, online training programs, ${dbProgram.category} program, ${dbProgram.weeks} week program, Haris Falas, online fitness programs, online personal training, structured training program`} />
           
           {/* Open Graph */}
           <meta property="og:type" content="article" />
           <meta property="og:url" content={window.location.href} />
           <meta property="og:title" content={`${dbProgram.name} | Online Training Program by Haris Falas`} />
-          <meta property="og:description" content={dbProgram.description || `${dbProgram.weeks} week ${dbProgram.category} program designed by Cyprus Sports Scientist`} />
+          <meta property="og:description" content={dbProgram.description || `${dbProgram.weeks} week ${dbProgram.category} program designed by Sports Scientist Haris Falas`} />
           <meta property="og:image" content={dbProgram.image_url} />
           
           {/* Twitter */}
@@ -91,7 +91,7 @@ const IndividualTrainingProgram = () => {
                 "@type": "Person",
                 "name": "Haris Falas",
                 "jobTitle": "Sports Scientist & Strength Coach",
-                "description": "Cyprus personal trainer specializing in structured training programs"
+                "description": "Online personal trainer specializing in structured training programs"
               },
               "identifier": dbProgram.id,
               "offers": dbProgram.is_standalone_purchase ? {

@@ -92,17 +92,17 @@ export default function JoinPremium() {
   return (
     <>
       <Helmet>
-        <title>Gold & Platinum Membership | Premium Online Gym Cyprus | SmartyGym by Haris Falas | smartygym.com</title>
-        <meta name="description" content="Join SmartyGym Premium at smartygym.com - Gold Plan €9.99/month or Platinum €89.99/year. Unlimited workouts, training programs, calculators, full dashboard access. Premium online gym Cyprus by Sports Scientist Haris Falas. Cancel anytime." />
-        <meta name="keywords" content="online gym membership Cyprus, premium fitness Cyprus, gym subscription Cyprus, online gym plans, Gold membership SmartyGym, Platinum membership SmartyGym, smartygym premium, online fitness subscription, gym membership online, Cyprus gym membership, affordable online gym, premium workouts, unlimited training programs, Haris Falas membership, smartygym.com premium" />
+        <title>Gold & Platinum Membership | Premium Online Gym | SmartyGym by Haris Falas | smartygym.com</title>
+        <meta name="description" content="Join SmartyGym Premium at smartygym.com - Gold Plan €9.99/month or Platinum €89.99/year. Unlimited workouts, training programs, calculators, full dashboard access. Premium online gym by Sports Scientist Haris Falas. Cancel anytime." />
+        <meta name="keywords" content="online gym membership, premium fitness, gym subscription, online gym plans, Gold membership SmartyGym, Platinum membership SmartyGym, smartygym premium, online fitness subscription, gym membership online, affordable online gym, premium workouts, unlimited training programs, Haris Falas membership, smartygym.com premium" />
         
-        <meta property="og:title" content="Premium Membership | SmartyGym Cyprus | smartygym.com" />
+        <meta property="og:title" content="Premium Membership | SmartyGym | smartygym.com" />
         <meta property="og:description" content="Gold €9.99/month or Platinum €89.99/year. Unlimited workouts, training programs, premium fitness tools." />
         <meta property="og:type" content="website" />
         <meta property="og:url" content="https://smartygym.com/join-premium" />
         
         <meta name="twitter:card" content="summary" />
-        <meta name="twitter:title" content="Premium Membership | SmartyGym Cyprus" />
+        <meta name="twitter:title" content="Premium Membership | SmartyGym" />
         <meta name="twitter:description" content="Gold €9.99/month or Platinum €89.99/year. Unlimited fitness access." />
         
         <link rel="canonical" href="https://smartygym.com/join-premium" />
@@ -244,8 +244,8 @@ export default function JoinPremium() {
               itemType="https://schema.org/Product"
               className="relative border-2 border-amber-500 shadow-lg flex flex-col"
               data-plan="gold"
-              data-keywords="online gym membership, smarty gym, online fitness subscription, smartygym.com, Cyprus online gym"
-              aria-label="Gold Plan - SmartyGym Cyprus online gym membership - smartygym.com"
+              data-keywords="online gym membership, smarty gym, online fitness subscription, smartygym.com"
+              aria-label="Gold Plan - SmartyGym online gym membership - smartygym.com"
             >
               <CardHeader className="text-center pb-2 sm:pb-4">
                 <div className="mb-2 sm:mb-3">
@@ -266,7 +266,7 @@ export default function JoinPremium() {
                     🔄 Auto-renews monthly
                   </p>
                 </div>
-                <meta itemProp="brand" content="SmartyGym Cyprus - smartygym.com" />
+                <meta itemProp="brand" content="SmartyGym - smartygym.com" />
                 <meta itemProp="category" content="Online Gym Membership" />
               </CardHeader>
               <CardContent className="space-y-2 sm:space-y-4 flex-1 flex flex-col">

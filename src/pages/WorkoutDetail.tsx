@@ -231,16 +231,16 @@ const WorkoutDetail = () => {
       ) : (
         <>
       <Helmet>
-        <title>{title} Online Workouts | Cyprus Fitness | Haris Falas | SmartyGym</title>
-        <meta name="description" content={`${title} online workouts by Cyprus Sports Scientist Haris Falas. Professional ${type || 'fitness'} workouts from beginner to advanced. AMRAP, HIIT, TABATA, circuit training. Free and premium online workouts for Cyprus and worldwide.`} />
-        <meta name="keywords" content={`online workouts, ${title}, ${type} workouts, Cyprus fitness, Haris Falas workouts, online fitness Cyprus, HIIT workouts, AMRAP workouts, TABATA training, circuit training, bodyweight workouts, Cyprus personal trainers, online gym Cyprus, home workouts Cyprus`} />
+        <title>{title} Online Workouts | Online Fitness | Haris Falas | SmartyGym</title>
+        <meta name="description" content={`${title} online workouts by Sports Scientist Haris Falas. Professional ${type || 'fitness'} workouts from beginner to advanced. AMRAP, HIIT, TABATA, circuit training. Free and premium online workouts for worldwide access.`} />
+        <meta name="keywords" content={`online workouts, ${title}, ${type} workouts, online fitness, Haris Falas workouts, HIIT workouts, AMRAP workouts, TABATA training, circuit training, bodyweight workouts, online gym, home workouts`} />
         
         {/* Open Graph */}
-        <meta property="og:title" content={`${title} Online Workouts | Cyprus Fitness by Haris Falas`} />
-        <meta property="og:description" content={`Professional ${title.toLowerCase()} online workouts designed by Cyprus Sports Scientist Haris Falas`} />
+        <meta property="og:title" content={`${title} Online Workouts | Online Fitness by Haris Falas`} />
+        <meta property="og:description" content={`Professional ${title.toLowerCase()} online workouts designed by Sports Scientist Haris Falas`} />
         <meta property="og:type" content="website" />
         <meta property="og:url" content={`https://smartygym.com/workout/${type || ''}`} />
-        <meta property="og:site_name" content="SmartyGym Cyprus" />
+        <meta property="og:site_name" content="SmartyGym" />
         
         {/* Twitter */}
         <meta name="twitter:card" content="summary_large_image" />
@@ -261,7 +261,7 @@ const WorkoutDetail = () => {
               "@type": "Person",
               "name": "Haris Falas",
               "jobTitle": "Sports Scientist & Personal Trainer",
-              "description": "Cyprus fitness expert specializing in functional training"
+              "description": "Online fitness expert specializing in functional training"
             },
             "itemListElement": filteredWorkouts.slice(0, 10).map((workout, index) => ({
               "@type": "ListItem",

@@ -241,7 +241,7 @@ const OneRMCalculator = () => {
                     className="text-lg font-semibold mb-2"
                     itemProp="name"
                   >
-                    Your Estimated 1RM - Smarty Gym Cyprus
+                    Your Estimated 1RM
                   </h2>
                   <p 
                     className="text-4xl font-bold text-primary"
@@ -249,10 +249,7 @@ const OneRMCalculator = () => {
                   >
                     {result} kg
                   </p>
-                  <p className="text-xs text-muted-foreground mt-2">
-                    Calculated by Smarty Gym Cyprus online fitness tools - smartygym.com - Haris Falas
-                  </p>
-                  <meta itemProp="provider" content="Smarty Gym Cyprus - smartygym.com - Haris Falas" />
+                  <meta itemProp="provider" content="SmartyGym - smartygym.com - Haris Falas" />
                   <meta itemProp="description" content="One rep max calculation using Brzycki formula - Online gym calculator at smartygym.com" />
                 </article>
 

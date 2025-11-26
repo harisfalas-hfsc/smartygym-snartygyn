@@ -407,12 +407,12 @@ const Community = () => {
   return (
     <>
       <Helmet>
-        <title>Fitness Community Cyprus | SmartyGym Leaderboard & Member Reviews | Online Gym</title>
+        <title>Online Fitness Community | SmartyGym Leaderboard & Member Reviews | Worldwide</title>
         <meta
           name="description"
-          content="Join Cyprus' #1 online gym community at smartygym.com! View online fitness leaderboards, workout rankings, training program achievements & premium member reviews. Connect with Haris Falas & fellow fitness enthusiasts."
+          content="Join the SmartyGym online gym community at smartygym.com! View fitness leaderboards, workout rankings, training program achievements & premium member reviews. Connect with Haris Falas & fellow fitness enthusiasts worldwide."
         />
-        <meta name="keywords" content="online gym community Cyprus, fitness community Cyprus, workout leaderboard, training rankings, gym reviews Cyprus, online fitness community, smartygym community, SmartyGym members, Cyprus gym community, fitness motivation Cyprus, workout achievements, training community online, gym leaderboard Cyprus, fitness reviews Cyprus, Haris Falas community" />
+        <meta name="keywords" content="online gym community, fitness community, workout leaderboard, training rankings, online fitness reviews, smartygym community, SmartyGym members, fitness motivation, workout achievements, training community online, fitness reviews, Haris Falas community" />
       </Helmet>
 
       <div className="min-h-screen bg-background">
@@ -430,8 +430,8 @@ const Community = () => {
             itemScope
             itemType="https://schema.org/ItemList"
             className="mb-6 md:mb-8 border-2 border-primary/30 shadow-lg"
-            data-keywords="smarty gym community, online gym leaderboard, online fitness community, smartygym.com, Haris Falas Cyprus"
-            aria-label="Community Leaderboard - SmartyGym Cyprus online fitness community - smartygym.com"
+            data-keywords="smarty gym community, online gym leaderboard, online fitness community, smartygym.com, Haris Falas"
+            aria-label="Community Leaderboard - SmartyGym online fitness community - smartygym.com"
           >
             <CardHeader className="bg-gradient-to-r from-primary/10 to-primary/5 p-4 md:p-6">
               <CardTitle 

@@ -224,16 +224,16 @@ const TrainingProgramDetail = () => {
       ) : (
         <>
       <Helmet>
-        <title>{title} Online Training Programs | Cyprus | Haris Falas | SmartyGym</title>
-        <meta name="description" content={`${title} online training programs by Cyprus Sports Scientist Haris Falas. Professional structured long-term ${type || 'fitness'} programs. Evidence-based training for Cyprus and worldwide. Expert online personal training approach.`} />
-        <meta name="keywords" content={`online training programs, ${title}, ${type} programs, Cyprus fitness programs, Haris Falas programs, structured training programs, online personal training, Cyprus personal trainers, 6 week programs, 8 week programs, fitness programs Cyprus, online fitness Cyprus`} />
+        <title>{title} Online Training Programs | Haris Falas | SmartyGym</title>
+        <meta name="description" content={`${title} online training programs by Sports Scientist Haris Falas. Professional structured long-term ${type || 'fitness'} programs. Evidence-based training for worldwide access. Expert online personal training approach.`} />
+        <meta name="keywords" content={`online training programs, ${title}, ${type} programs, fitness programs, Haris Falas programs, structured training programs, online personal training, 6 week programs, 8 week programs, online fitness`} />
         
         {/* Open Graph */}
-        <meta property="og:title" content={`${title} Online Training Programs | Cyprus by Haris Falas`} />
-        <meta property="og:description" content={`Structured long-term ${title.toLowerCase()} online training programs by Cyprus Sports Scientist Haris Falas`} />
+        <meta property="og:title" content={`${title} Online Training Programs | Haris Falas`} />
+        <meta property="og:description" content={`Structured long-term ${title.toLowerCase()} online training programs by Sports Scientist Haris Falas`} />
         <meta property="og:type" content="website" />
         <meta property="og:url" content={`https://smartygym.com/trainingprogram/${type || ''}`} />
-        <meta property="og:site_name" content="SmartyGym Cyprus" />
+        <meta property="og:site_name" content="SmartyGym" />
         
         {/* Twitter */}
         <meta name="twitter:card" content="summary_large_image" />
@@ -248,13 +248,13 @@ const TrainingProgramDetail = () => {
             "@context": "https://schema.org",
             "@type": "ItemList",
             "name": `${title} Online Training Programs`,
-            "description": `Collection of structured long-term ${title.toLowerCase()} training programs designed by Cyprus Sports Scientist Haris Falas`,
+            "description": `Collection of structured long-term ${title.toLowerCase()} training programs designed by Sports Scientist Haris Falas`,
             "numberOfItems": filteredPrograms.length,
             "provider": {
               "@type": "Person",
               "name": "Haris Falas",
               "jobTitle": "Sports Scientist & Personal Trainer",
-              "description": "Cyprus personal trainer with expertise in structured program design"
+              "description": "Online personal trainer with expertise in structured program design"
             },
             "itemListElement": filteredPrograms.map((program, index) => ({
               "@type": "ListItem",

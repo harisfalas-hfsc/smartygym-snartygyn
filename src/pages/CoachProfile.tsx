@@ -15,22 +15,17 @@ const CoachProfile = () => {
   return (
     <>
       <Helmet>
-        <title>Haris Falas | Personal Trainer Cyprus Nicosia | Sports Scientist HFSC | SmartyGym Cyprus</title>
-        <meta name="description" content="Haris Falas personal trainer Cyprus Nicosia. Sports Scientist 20+ years experience HFSC Performance. Expert online workouts training programs personal training Cyprus Greece. Strength conditioning coach Cyprus smartygym.com προσωπικός προπονητής Κύπρος" />
-        <meta name="keywords" content="Haris Falas, Haris Falas Cyprus, personal trainer Cyprus, personal trainer Nicosia, Sports Scientist Cyprus, HFSC, HFSC Nicosia, HFSC Performance, strength and conditioning coach Cyprus, fitness expert Cyprus, online personal trainer Cyprus, Cyprus fitness professional, gym coach Cyprus, training specialist Cyprus, smartygym.com, προσωπικός προπονητής Κύπρος, γυμναστής Κύπρος" />
+        <title>Haris Falas | Online Personal Trainer | Sports Scientist HFSC | SmartyGym</title>
+        <meta name="description" content="Haris Falas - online personal trainer & Sports Scientist with 20+ years experience at HFSC Performance. Expert online workouts, training programs, and personal training worldwide. Strength & conditioning coach at smartygym.com" />
+        <meta name="keywords" content="Haris Falas, personal trainer, online personal trainer, Sports Scientist, HFSC, HFSC Performance, strength and conditioning coach, fitness expert, online fitness professional, gym coach, training specialist, smartygym.com" />
         
         {/* Greek Language */}
         <link rel="alternate" hrefLang="el" href="https://smartygym.com/coach-profile" />
         <link rel="alternate" hrefLang="en-GB" href="https://smartygym.com/coach-profile" />
         
-        {/* Geo Targeting */}
-        <meta name="geo.region" content="CY-01" />
-        <meta name="geo.placename" content="Nicosia, Cyprus" />
-        <meta name="geo.position" content="35.1856;33.3823" />
-        
         {/* Open Graph */}
-        <meta property="og:title" content="Haris Falas | Cyprus Personal Trainer & Sports Scientist" />
-        <meta property="og:description" content="Cyprus personal trainer with 20+ years experience in strength and conditioning, sports science, and online fitness training." />
+        <meta property="og:title" content="Haris Falas | Online Personal Trainer & Sports Scientist" />
+        <meta property="og:description" content="Online personal trainer with 20+ years experience in strength and conditioning, sports science, and online fitness training." />
         <meta property="og:type" content="profile" />
         <meta property="og:url" content={window.location.href} />
         <meta property="og:image" content="https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?auto=format&fit=crop&q=80&w=1200" />
@@ -38,8 +33,8 @@ const CoachProfile = () => {
         
         {/* Twitter */}
         <meta name="twitter:card" content="summary_large_image" />
-        <meta name="twitter:title" content="Haris Falas | Cyprus Personal Trainer" />
-        <meta name="twitter:description" content="Cyprus personal trainer and Sports Scientist with 20+ years experience" />
+        <meta name="twitter:title" content="Haris Falas | Online Personal Trainer" />
+        <meta name="twitter:description" content="Online personal trainer and Sports Scientist with 20+ years experience" />
         <meta name="twitter:image" content="https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?auto=format&fit=crop&q=80&w=1200" />
         
         <link rel="canonical" href={window.location.href} />
@@ -51,7 +46,7 @@ const CoachProfile = () => {
             "@type": "Person",
             "name": "Haris Falas",
             "jobTitle": "Sports Scientist & Personal Trainer",
-            "description": "Cyprus personal trainer and Sports Scientist with over 20 years of experience in strength and conditioning, online fitness training, and athletic performance",
+            "description": "Online personal trainer and Sports Scientist with over 20 years of experience in strength and conditioning, online fitness training, and athletic performance",
             "knowsAbout": ["Strength Training", "Sports Science", "Functional Training", "Human Performance", "Online Personal Training", "Athletic Conditioning"],
             "hasCredential": {
               "@type": "EducationalOccupationalCredential",
@@ -59,15 +54,10 @@ const CoachProfile = () => {
             },
             "worksFor": {
               "@type": "Organization",
-              "name": "SmartyGym Cyprus",
-              "address": {
-                "@type": "PostalAddress",
-                "addressCountry": "CY"
-              }
+              "name": "SmartyGym",
+              "url": "https://smartygym.com"
             },
             "alumniOf": "Sports Science Certification",
-            "nationality": "Cyprus",
-            "workLocation": "Cyprus",
             "offers": [
               {
                 "@type": "Offer",
