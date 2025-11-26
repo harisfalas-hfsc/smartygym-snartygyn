@@ -100,7 +100,7 @@ const WorkoutFlow = () => {
         </script>
       </Helmet>
       
-      <SEOEnhancer entities={["SmartyGym", "Haris Falas", "Online Workouts", "AMRAP", "HIIT", "Tabata"]} topics={["online gym workouts", "AMRAP", "HIIT", "Tabata", "circuit training", "strength training", "cardio"]} expertise={["sports science", "strength conditioning", "functional fitness"]} contentType="workout-collection" aiSummary="100+ online gym workouts at SmartyGym Cyprus by Sports Scientist Haris Falas. AMRAP, TABATA, HIIT, circuit, strength, cardio, metabolic, mobility workouts for all levels." aiKeywords={["online gym", "AMRAP workouts", "HIIT training", "Tabata", "strength workouts", "cardio training", "Cyprus fitness"]} relatedContent={["training programs", "fitness tools", "exercise library"]} />
+      <SEOEnhancer entities={["SmartyGym", "Haris Falas", "Online Workouts", "AMRAP", "HIIT", "Tabata"]} topics={["online gym workouts", "AMRAP", "HIIT", "Tabata", "circuit training", "strength training", "cardio"]} expertise={["sports science", "strength conditioning", "functional fitness"]} contentType="workout-collection" aiSummary="500+ online gym workouts at SmartyGym by Sports Scientist Haris Falas. AMRAP, TABATA, HIIT, circuit, strength, cardio, metabolic, mobility workouts for all levels worldwide." aiKeywords={["online gym", "AMRAP workouts", "HIIT training", "Tabata", "strength workouts", "cardio training", "fitness app", "workout app"]} relatedContent={["training programs", "fitness tools", "exercise library"]} />
       
       <div className="min-h-screen bg-background">
       

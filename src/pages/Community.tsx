@@ -407,13 +407,44 @@ const Community = () => {
   return (
     <>
       <Helmet>
-        <title>Online Fitness Community | SmartyGym Leaderboard & Member Reviews | Worldwide</title>
-        <meta
-          name="description"
-          content="Join the SmartyGym online gym community at smartygym.com! View fitness leaderboards, workout rankings, training program achievements & premium member reviews. Connect with Haris Falas & fellow fitness enthusiasts worldwide."
-        />
-        <meta name="keywords" content="online gym community, fitness community, workout leaderboard, training rankings, online fitness reviews, smartygym community, SmartyGym members, fitness motivation, workout achievements, training community online, fitness reviews, Haris Falas community" />
+        <title>Community | Leaderboards & Reviews | SmartyGym</title>
+        <meta name="description" content="Join the SmartyGym community. View leaderboards, member reviews, and connect with fellow fitness enthusiasts. Share your progress and get inspired by others' success stories." />
+        <meta name="keywords" content="fitness community, workout leaderboards, member reviews, fitness social, training community, SmartyGym community, fitness motivation, workout reviews, online fitness community" />
+        <link rel="canonical" href="https://smartygym.com/community" />
+        
+        <script type="application/ld+json">
+          {JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "ItemList",
+            "name": "SmartyGym Community Leaderboards",
+            "description": "Community leaderboards showcasing member achievements, workout completions, and training program progress",
+            "itemListElement": [
+              {
+                "@type": "ListItem",
+                "position": 1,
+                "name": "Workout Completions Leaderboard"
+              },
+              {
+                "@type": "ListItem",
+                "position": 2,
+                "name": "Program Completions Leaderboard"
+              }
+            ]
+          })}
+        </script>
       </Helmet>
+      
+      <SEOEnhancer 
+        entities={["SmartyGym", "Fitness Community", "Community Leaderboards"]}
+        topics={["fitness community", "workout leaderboards", "member reviews", "fitness motivation", "social fitness"]}
+        expertise={["Community Building", "Fitness Motivation"]}
+        contentType="community-platform"
+        aiSummary="SmartyGym community platform features leaderboards tracking workout and program completions, member reviews and ratings, and community comments. Connect with fellow fitness enthusiasts and share your progress."
+        aiKeywords={["fitness community", "workout leaderboards", "member reviews", "fitness social", "training community", "online fitness community", "fitness motivation"]}
+        relatedContent={["Workout Library", "Training Programs", "Premium Membership", "Blog"]}
+        targetAudience="fitness enthusiasts, competitive athletes, community members"
+        pageType="CommunityPage"
+      />
 
       <div className="min-h-screen bg-background">
         <div className="container mx-auto max-w-7xl px-4 py-8">

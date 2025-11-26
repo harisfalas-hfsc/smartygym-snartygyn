@@ -4,13 +4,60 @@ import { PageBreadcrumbs } from "@/components/PageBreadcrumbs";
 import { Card } from "@/components/ui/card";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { WorkoutGeneratorCard } from "@/components/workout-generator/WorkoutGeneratorCard";
+import { SEOEnhancer } from "@/components/SEOEnhancer";
 const SmartyWorkout = () => {
   return <>
       <Helmet>
-        <title>SmartyWorkout - Create Your Custom Workout | SmartyGym</title>
-        <meta name="description" content="Create personalized workouts based on your needs with the SmartyWorkout generator by Coach Haris Falas" />
-        <link rel="canonical" href="https://smartygym.com/smartyworkout" />
+        <title>SmartyWorkout - AI Workout Generator | Custom Training Plans | SmartyGym</title>
+        <meta name="description" content="Generate personalized workouts instantly with SmartyWorkout. Customize your training by goal, equipment, duration, and difficulty. Expert-designed AI workout generator by Sports Scientist Haris Falas." />
+        <meta name="keywords" content="AI workout generator, custom workout, personalized training, workout creator, fitness AI, training plan generator, SmartyGym, Haris Falas, custom fitness plan, workout app, fitness app, online training" />
+        <link rel="canonical" href="https://smartygym.com/smarty-workout" />
+        
+        <meta property="og:title" content="SmartyWorkout - AI Workout Generator | SmartyGym" />
+        <meta property="og:description" content="Generate personalized workouts instantly. Customize by goal, equipment, duration, and difficulty. Expert AI workout generator." />
+        <meta property="og:type" content="website" />
+        <meta property="og:url" content="https://smartygym.com/smarty-workout" />
+        <meta property="og:image" content="https://smartygym.com/smarty-gym-logo.png" />
+        <meta property="og:site_name" content="SmartyGym" />
+        
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content="SmartyWorkout - AI Workout Generator" />
+        <meta name="twitter:description" content="Generate custom workouts instantly with AI" />
+        <meta name="twitter:image" content="https://smartygym.com/smarty-gym-logo.png" />
+        
+        <script type="application/ld+json">
+          {JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "SoftwareApplication",
+            "name": "SmartyWorkout Generator",
+            "applicationCategory": "HealthApplication",
+            "description": "AI-powered workout generator that creates personalized training plans based on your goals, equipment, and preferences",
+            "operatingSystem": "Web Browser",
+            "offers": {
+              "@type": "Offer",
+              "price": "0",
+              "priceCurrency": "EUR"
+            },
+            "creator": {
+              "@type": "Person",
+              "name": "Haris Falas",
+              "jobTitle": "Sports Scientist"
+            }
+          })}
+        </script>
       </Helmet>
+      
+      <SEOEnhancer 
+        entities={["SmartyGym", "SmartyWorkout", "Haris Falas", "AI Workout Generator"]}
+        topics={["workout generator", "AI fitness", "custom workouts", "personalized training"]}
+        expertise={["Sports Science", "AI Fitness Technology", "Workout Programming"]}
+        contentType="software-application"
+        aiSummary="SmartyWorkout is an AI-powered workout generator that creates personalized training plans based on your specific goals, available equipment, duration preferences, and fitness level. Built on expertise from Sports Scientist Haris Falas."
+        aiKeywords={["AI workout generator", "custom workout creator", "personalized fitness", "workout app", "training plan generator", "fitness AI", "smart workout"]}
+        relatedContent={["Workout Library", "Training Programs", "Premium Membership", "Fitness Tools"]}
+        targetAudience="fitness enthusiasts, athletes, personal trainers, home workout users"
+        pageType="WebApplication"
+      />
 
       <div className="min-h-screen bg-background">
         <div className="container mx-auto max-w-6xl px-4 py-8">
