@@ -733,15 +733,15 @@ const Community = () => {
                   <MessageSquare className="h-5 w-5 md:h-6 md:w-6 text-primary" />
                   Community Comments
                 </CardTitle>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => setSortOrder(sortOrder === "newest" ? "oldest" : "newest")}
-                  className="flex items-center gap-2 text-xs md:text-sm"
-                >
-                  <ArrowUpDown className="h-3 w-3 md:h-4 md:w-4" />
-                  <span className="whitespace-nowrap hidden sm:inline">{sortOrder === "newest" ? "Newest First" : "Oldest First"}</span>
-                </Button>
+                <Select value={sortOrder} onValueChange={(value: "newest" | "oldest") => setSortOrder(value)}>
+                  <SelectTrigger className="w-[140px] sm:w-[160px] bg-background/80 border-primary/30 hover:border-primary/50">
+                    <SelectValue placeholder="Sort by" />
+                  </SelectTrigger>
+                  <SelectContent className="bg-background border-primary/30">
+                    <SelectItem value="newest">Newest First</SelectItem>
+                    <SelectItem value="oldest">Oldest First</SelectItem>
+                  </SelectContent>
+                </Select>
               </div>
               <CompactFilters
                 filters={[
