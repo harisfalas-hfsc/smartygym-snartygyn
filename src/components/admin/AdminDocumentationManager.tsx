@@ -71,7 +71,7 @@ PHASE 1: APPMYSITE SETUP
    • Review the preview of your app
 
 □ 3. Customize App Appearance
-   • Set app name: SmartyGym - AI Fitness Coach
+   • Set app name: SmartyGym - Online Gym
    • Upload app icon (1024x1024px)
    • Choose color scheme (matches website branding)
    • Configure splash screen
@@ -111,8 +111,8 @@ PHASE 2: iOS APP STORE PREPARATION
    • iPad Pro 12.9" Display: 2048 x 2732px (3-5 screenshots)
 
 □ 8. App Store Listing Content
-   • App Name: SmartyGym - AI Fitness Coach
-   • Subtitle: Custom Workouts & Training Plans
+   • App Name: SmartyGym - Online Gym
+   • Subtitle: Expert Workouts by Haris Falas
    • Keywords: fitness, workout, training, gym, health (see full list in docs)
    • Description: (see full copy in Admin Docs → iOS App Store Copy)
    • Privacy Policy URL: https://smartygym.com/privacy-policy
@@ -143,7 +143,7 @@ PHASE 3: ANDROID PLAY STORE PREPARATION
 
 □ 12. Create App in Play Console
    • Create new app
-   • App name: SmartyGym - AI Fitness Coach
+   • App name: SmartyGym - Online Gym
    • Default language: English (United States)
    • App type: App
    • Free or Paid: Free (with in-app purchases)
@@ -238,78 +238,89 @@ SmartyGym Admin Documentation`;
 
 APP NAME
 ────────────────────────────────────────────────────────────────
-SmartyGym - AI Fitness Coach
+SmartyGym - Online Gym
 
 SUBTITLE (30 characters max)
 ────────────────────────────────────────────────────────────────
-Custom Workouts & Training Plans
+Expert Workouts by Haris Falas
 
 KEYWORDS (100 characters max, comma-separated)
 ────────────────────────────────────────────────────────────────
-fitness,workout,training,gym,health,exercise,strength,cardio,nutrition,weight,muscle,coach,plan,diet,bodybuilding
+fitness,workout,training,gym,health,exercise,strength,cardio,nutrition,weight,muscle,coach,expert,science
 
 PROMOTIONAL TEXT (170 characters max)
 ────────────────────────────────────────────────────────────────
-Start your fitness journey with AI-powered custom workouts from expert coach Haris Falas. Track progress, access premium programs, and achieve your goals!
+500+ expert workouts by Sports Scientist Haris Falas. 100% human expertise, 0% AI. Real coaching for real results. Download now and transform your fitness!
 
 FULL DESCRIPTION (4000 characters max)
 ────────────────────────────────────────────────────────────────
 
-Transform Your Fitness Journey with SmartyGym
+Transform Your Fitness with 100% Human Expertise
 
-SmartyGym is your all-in-one fitness companion, combining expert coaching from Haris Falas with cutting-edge AI technology to create personalized workout and training programs tailored specifically for you.
+SmartyGym is your complete fitness companion designed by Sports Scientist Haris Falas. Every workout, every program, every detail is crafted by a real expert with 20+ years of coaching experience. 100% Human. 0% AI. Real expertise, not algorithms.
 
 🏋️ WHAT YOU GET
 
-• 500+ Expert Workouts: From strength training to cardio blasts, meticulously designed by certified coach Haris Falas
-• Custom Training Programs: Multi-week structured plans for every goal – muscle building, fat loss, athletic performance, or general fitness
-• AI Workout Generator: Can't find what you need? Generate custom workouts based on your equipment, time, and fitness level
-• Smart Calculators: BMR, calorie needs, one-rep max, and more – all the tools you need to track progress
-• Interactive Logbook: Track every workout, program, and personal record with detailed history and completion tracking
-• Community Features: Compare progress, rate workouts, and engage with a supportive fitness community
+• 500+ Expert Workouts: Meticulously designed by CSCS-certified Sports Scientist Haris Falas—strength, HIIT, cardio, mobility, and functional training
+• Structured Training Programs: Multi-week progressive plans (4-12 weeks) for muscle building, fat loss, athletic performance, and general fitness
+• Professional Fitness Tools: BMR calculator, calorie needs, one-rep max, macro tracking—all the tools for intelligent progress
+• Interactive Logbook: Track every workout, program, and achievement with detailed history and analytics
+• Community Features: Compare progress, rate workouts, and engage with fellow fitness enthusiasts
 
-💪 WHO IS HARIS FALAS?
+💪 MEET COACH HARIS FALAS
 
-Haris Falas is a certified fitness coach with over 15 years of experience in strength training, sports performance, and body transformation. His science-backed approach has helped thousands achieve their fitness goals, from beginners taking their first steps to elite athletes pushing their limits.
+All content is designed by Haris Falas, a certified Sports Scientist (CSCS) with over 20 years of professional coaching experience:
+• Strength Training & Hypertrophy Programming
+• Sports Performance & Athletic Development
+• Body Transformation & Fat Loss Strategies
+• Sports Nutrition & Meal Planning
+• Corrective Exercise & Mobility Work
+• Advanced Periodization & Program Design
+
+His science-backed approach has helped thousands achieve real results—from complete beginners to elite athletes.
 
 📊 MEMBERSHIP OPTIONS
 
 Free Tier:
-• Access to all free workouts and programs
+• Access to all free workout content
 • Full calculator suite (BMR, calories, 1RM)
-• Community leaderboard and comments
-• Track your workout history
+• Community leaderboard and engagement
+• Track your complete workout history
 
 Gold Membership ($9.99/month):
 • Unlock ALL 500+ premium workouts
 • Access exclusive training programs
-• Unlimited AI workout generation
-• Priority support
+• Advanced progress analytics
+• Priority support from our team
 
 Platinum Membership ($19.99/month):
-• Everything in Gold
-• Personalized training program by Haris Falas (one per month)
-• Direct messaging with the coach
-• Exclusive nutrition guides and meal plans
+• Everything in Gold membership
+• Custom workout generator (complementary tool)
+• Exclusive premium content
+• Early access to new features
 
 🎯 KEY FEATURES
 
-✓ Detailed Exercise Instructions: Every workout includes clear step-by-step guidance, tips, and coaching notes
-✓ Flexible Filtering: Find exactly what you need with filters for difficulty, equipment, duration, and focus area
-✓ Offline Access: Download workouts and access them anywhere, anytime
-✓ Progress Tracking: Mark workouts complete, favorite your go-tos, and track your fitness journey
-✓ Responsive Design: Seamless experience across iPhone, iPad, and all devices
+✓ Expert Exercise Instructions: Every workout includes professional coaching cues and detailed guidance
+✓ Smart Filtering: Find exactly what you need by difficulty, equipment, duration, and body focus
+✓ Offline Access: Download workouts and train anywhere, anytime
+✓ Progress Tracking: Mark workouts complete, save favorites, and monitor your fitness journey
+✓ Beautiful Interface: Seamless experience across iPhone, iPad, and all devices
 ✓ Secure & Private: Your data is encrypted and protected
 
 🔥 WHY SMARTYGYM?
 
-Unlike generic fitness apps that rely on AI alone, SmartyGym combines the irreplaceable expertise of a real coach with modern technology. You're not just getting algorithms – you're getting Haris's 15+ years of real-world experience distilled into every workout and program.
+Unlike generic fitness apps filled with AI-generated content, SmartyGym delivers genuine coaching expertise. You're not getting algorithms—you're getting Haris Falas's 20+ years of real-world coaching experience distilled into every single workout and program.
 
-Whether you're a complete beginner or a seasoned athlete, SmartyGym adapts to YOUR needs, YOUR equipment, and YOUR schedule.
+This is professional-level content designed by a real expert who understands human physiology, progressive overload, periodization, and what actually works.
+
+Whether you're a complete beginner or a seasoned athlete, SmartyGym provides the structure and expertise you need for real results.
 
 📱 DOWNLOAD NOW
 
-Start your transformation today. Download SmartyGym and get instant access to world-class fitness coaching in your pocket.
+Your gym re-imagined. Anywhere, anytime. 100% human expertise.
+
+Start your transformation today with genuine coaching from Sports Scientist Haris Falas.
 
 ───────────────────────────────────────────────────────────────
 
@@ -327,83 +338,87 @@ Terms of Service: https://smartygym.com/terms
 
 APP TITLE
 ────────────────────────────────────────────────────────────────
-SmartyGym - AI Fitness Coach
+SmartyGym - Online Gym
 
 SHORT DESCRIPTION (80 characters max)
 ────────────────────────────────────────────────────────────────
-Custom workouts & training plans by expert coach Haris Falas. Transform today!
+500+ expert workouts by Sports Scientist Haris Falas. 100% human expertise.
 
 FULL DESCRIPTION (4000 characters max)
 ────────────────────────────────────────────────────────────────
 
-Transform Your Fitness Journey with SmartyGym
+Transform Your Fitness with 100% Human Expertise
 
-SmartyGym is your complete fitness companion, combining expert coaching from certified trainer Haris Falas with AI-powered personalization. Get custom workouts, structured training programs, and all the tools you need to achieve your fitness goals.
+SmartyGym is your complete fitness companion designed by Sports Scientist Haris Falas. Every workout, every program, every detail is crafted by a real expert with 20+ years of coaching experience. 100% Human. 0% AI. Real expertise, not algorithms.
 
 🏋️ WHAT YOU GET
 
-• 500+ Expert Workouts: Strength, cardio, mobility, and more – all designed by Haris Falas with 15+ years of coaching experience
-• Custom Training Programs: Multi-week plans for muscle building, fat loss, athletic performance, and general fitness
-• AI Workout Generator: Generate personalized workouts based on your equipment, time constraints, and fitness level
-• Smart Fitness Calculators: BMR, daily calorie needs, one-rep max calculator, and more
-• Interactive Logbook: Track every workout, program, and achievement with detailed history
+• 500+ Expert Workouts: Strength, HIIT, cardio, mobility, and functional training—all meticulously designed by CSCS-certified Sports Scientist Haris Falas
+• Structured Training Programs: Multi-week progressive plans (4-12 weeks) for muscle building, fat loss, athletic performance, and overall fitness
+• Professional Fitness Tools: BMR calculator, daily calorie needs, one-rep max, macro tracking—everything for intelligent progress
+• Interactive Logbook: Track every workout, program, and achievement with detailed history and analytics
 • Community Features: Compare progress, rate workouts, and connect with fellow fitness enthusiasts
 
-💪 MEET YOUR COACH
+💪 MEET COACH HARIS FALAS
 
-Haris Falas is a certified fitness professional specializing in:
-• Strength & Conditioning
-• Sports Performance
-• Body Transformation
-• Functional Training
-• Nutrition Coaching
+All content is designed by Haris Falas, a certified Sports Scientist (CSCS) with over 20 years of professional coaching experience specializing in:
+• Strength Training & Hypertrophy Programming
+• Sports Performance & Athletic Development
+• Body Transformation & Fat Loss Strategies
+• Sports Nutrition & Meal Planning
+• Corrective Exercise & Mobility Work
+• Advanced Periodization & Program Design
 
-With thousands of success stories and a science-backed approach, Haris brings real expertise to every workout and program in SmartyGym.
+His science-backed approach has helped thousands achieve real, sustainable results—from complete beginners to elite athletes.
 
 📊 FLEXIBLE MEMBERSHIP OPTIONS
 
 Free Tier:
-• All free workouts and programs
+• Access to all free workout content
 • Full calculator suite (BMR, calories, 1RM)
 • Community features and leaderboards
-• Workout history tracking
+• Complete workout history tracking
 
 Gold Membership ($9.99/month):
 • Unlock ALL 500+ premium workouts
 • Access exclusive training programs
-• Unlimited AI workout generation
+• Advanced progress analytics
 • Priority support from our team
 
 Platinum Membership ($19.99/month):
-• Everything in Gold
-• One personalized training program per month by Haris Falas
-• Direct coach messaging
-• Exclusive nutrition guides and meal plans
+• Everything in Gold membership
+• Custom workout generator (complementary tool)
+• Exclusive premium content
+• Early access to new features
 
 🎯 KEY FEATURES
 
-✓ Detailed Instructions: Step-by-step guidance for every exercise with coaching tips
-✓ Smart Filtering: Find workouts by difficulty, equipment, duration, focus area, and more
-✓ Offline Access: Download workouts and train anywhere
-✓ Progress Tracking: Mark completions, favorite workouts, track your journey
+✓ Expert Instructions: Step-by-step guidance for every exercise with professional coaching cues
+✓ Smart Filtering: Find workouts by difficulty, equipment, duration, body focus, and more
+✓ Offline Access: Download workouts and train anywhere, anytime
+✓ Progress Tracking: Mark completions, save favorites, monitor your fitness journey
 ✓ Cross-Device Sync: Seamless experience across phone, tablet, and web
 ✓ Secure & Private: Your data is encrypted and protected (GDPR compliant)
 
 🔥 WHY CHOOSE SMARTYGYM?
 
-Most fitness apps rely on generic AI or cookie-cutter routines. SmartyGym is different. You get:
+Unlike generic fitness apps filled with AI-generated content, SmartyGym delivers genuine coaching expertise. You're not getting algorithms—you're getting Haris Falas's 20+ years of real-world coaching experience distilled into every single workout and program.
 
-✓ Real Coach Expertise: Every workout crafted by Haris Falas, not generic algorithms
-✓ Proven Results: Based on 15+ years of real-world coaching success
-✓ Personalization: Workouts adapt to YOUR equipment, schedule, and goals
+This is professional-level content designed by a real expert who understands human physiology, progressive overload, periodization, and what actually works for real people.
+
+✓ Real Coach Expertise: Every workout crafted by Sports Scientist Haris Falas
+✓ Proven Results: Based on 20+ years of real-world coaching success
+✓ Science-Based Programming: Evidence-backed training protocols, not generic templates
 ✓ Community Support: Train alongside thousands of motivated members
-✓ No Gym Required: Home workouts, gym routines, or outdoor training – your choice
+✓ No Gym Required: Home workouts, gym routines, or outdoor training—your choice
 
-Whether you're just starting out or training for competition, SmartyGym scales to your level.
+Whether you're taking your first steps in fitness or training for athletic competition, SmartyGym provides the structure and expertise you need for real results.
 
 📱 GET STARTED TODAY
 
-Join thousands of members transforming their fitness with SmartyGym. Download now and get instant access to world-class coaching in your pocket.
+Your gym re-imagined. Anywhere, anytime. 100% human expertise.
+
+Join thousands of members transforming their fitness with genuine coaching from Sports Scientist Haris Falas. Download now and experience the difference of real expertise.
 
 ───────────────────────────────────────────────────────────────
 

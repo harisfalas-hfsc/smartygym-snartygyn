@@ -80,11 +80,11 @@ const AppSubmissionPrintable = () => {
               <p className="text-sm text-muted-foreground">Take 6 screenshots:</p>
               <ol className="list-decimal ml-6 text-sm mt-1">
                 <li>Home page (/)</li>
-                <li>SmartyWorkout Generator (/smartyworkout)</li>
                 <li>Workout Library (/workout)</li>
                 <li>Individual Workout detail page</li>
                 <li>Training Programs (/trainingprogram)</li>
                 <li>Dashboard (/dashboard)</li>
+                <li>About Coach Haris page (/about)</li>
               </ol>
             </div>
           </div>
@@ -98,7 +98,7 @@ const AppSubmissionPrintable = () => {
           </div>
 
           <div className="mt-4 p-4 bg-muted rounded">
-            <p className="text-sm"><strong>Tip:</strong> Save screenshots with clear filenames like "01-home.png", "02-smartyworkout.png", etc.</p>
+            <p className="text-sm"><strong>Tip:</strong> Save screenshots with clear filenames like "01-home.png", "02-workouts.png", etc.</p>
           </div>
         </section>
 
@@ -145,25 +145,25 @@ const AppSubmissionPrintable = () => {
             <div className="copy-block">
               <h3 className="font-bold text-lg mb-2">📝 App Name</h3>
               <div className="bg-muted p-3 rounded border font-mono text-sm">
-                SmartyGym - AI Fitness Coach
+                SmartyGym - Online Gym
               </div>
-              <p className="text-xs text-muted-foreground mt-1">(28 characters)</p>
+              <p className="text-xs text-muted-foreground mt-1">(23 characters)</p>
             </div>
 
             <div className="copy-block">
               <h3 className="font-bold text-lg mb-2">📝 iOS Subtitle</h3>
               <div className="bg-muted p-3 rounded border font-mono text-sm">
-                Custom Workouts & Training
+                Expert Workouts by Haris Falas
               </div>
-              <p className="text-xs text-muted-foreground mt-1">(27 characters)</p>
+              <p className="text-xs text-muted-foreground mt-1">(31 characters)</p>
             </div>
 
             <div className="copy-block">
               <h3 className="font-bold text-lg mb-2">📝 Android Short Description</h3>
               <div className="bg-muted p-3 rounded border font-mono text-sm">
-                Your AI-powered fitness coach with custom workouts and expert training programs
+                500+ expert workouts by Sports Scientist Haris Falas. 100% human expertise.
               </div>
-              <p className="text-xs text-muted-foreground mt-1">(79 characters)</p>
+              <p className="text-xs text-muted-foreground mt-1">(78 characters)</p>
             </div>
 
             <div className="copy-block">
@@ -177,109 +177,107 @@ const AppSubmissionPrintable = () => {
             <div className="copy-block page-break-avoid">
               <h3 className="font-bold text-lg mb-2">📝 Full Description (Both Stores)</h3>
               <div className="bg-muted p-3 rounded border text-xs font-mono max-h-96 overflow-y-auto">
-                🏋️ TRANSFORM YOUR FITNESS WITH AI-POWERED COACHING<br/><br/>
+                🏋️ TRANSFORM YOUR FITNESS WITH HUMAN EXPERTISE<br/><br/>
 
-                SmartyGym brings professional fitness coaching to your pocket. Create personalized workouts instantly, follow structured training programs, and track your progress—all powered by real coaching expertise from Haris Falas.<br/><br/>
+                SmartyGym brings professional fitness coaching to your pocket. 100% Human. 0% AI. Every workout and training program is personally designed by Sports Scientist Haris Falas—not algorithms, not robots, just real expertise backed by 20+ years of coaching experience.<br/><br/>
 
-                🎯 SMARTYWORKOUT GENERATOR<br/>
-                This is NOT your typical AI workout generator. SmartyWorkout uses real training protocols from professional coach Haris Falas to create personalized workouts based on:<br/>
-                • Your fitness goals (strength, fat loss, cardio, mobility)<br/>
-                • Available equipment (bodyweight, dumbbells, barbells, machines)<br/>
-                • Time constraints (15-90 minutes)<br/>
-                • Current fitness level (beginner to advanced)<br/>
-                • Body focus preferences (upper body, lower body, full body)<br/><br/>
-
-                Generate unlimited custom workouts tailored to YOUR needs—not generic AI templates.<br/><br/>
-
-                💪 PROFESSIONAL WORKOUT LIBRARY<br/>
-                • 100+ expertly designed workouts<br/>
-                • Strength, HIIT, cardio, and mobility categories<br/>
-                • Filter by difficulty, duration, and equipment<br/>
-                • Detailed instructions with coaching tips<br/>
+                💪 500+ EXPERT WORKOUT LIBRARY<br/>
+                • Meticulously designed by Haris Falas, CSCS certified Sports Scientist<br/>
+                • Strength, HIIT, cardio, mobility, and functional training<br/>
+                • Filter by difficulty, duration, equipment, and body focus<br/>
+                • Detailed instructions with professional coaching cues<br/>
                 • Progress tracking for every workout<br/>
                 • Mark favorites and track completions<br/><br/>
 
+                Real expertise, not algorithms. Human-designed, not AI-generated.<br/><br/>
+
                 📊 STRUCTURED TRAINING PROGRAMS<br/>
                 • Multi-week progressive programs (4-12 weeks)<br/>
-                • Programs for all goals: muscle gain, fat loss, athletic performance<br/>
-                • Week-by-week workout schedules<br/>
-                • Built-in progression and periodization<br/>
-                • Real coaching methodologies, not AI guesswork<br/><br/>
+                • Programs for muscle gain, fat loss, athletic performance, mobility<br/>
+                • Week-by-week workout schedules with built-in progression<br/>
+                • Real coaching methodologies based on sports science<br/>
+                • Periodization strategies used by professional athletes<br/><br/>
 
-                🧮 SMART FITNESS TOOLS<br/>
-                • BMR & Calorie Calculator - Find your daily calorie needs<br/>
-                • One Rep Max (1RM) Calculator - Determine your strength levels<br/>
-                • Macro Tracking Calculator - Optimize your nutrition<br/>
-                • Body measurement tracking<br/>
-                • Progress analytics with detailed charts<br/><br/>
+                🧮 PROFESSIONAL FITNESS TOOLS<br/>
+                • BMR & Calorie Calculator - Discover your daily energy needs<br/>
+                • One Rep Max (1RM) Calculator - Determine your true strength levels<br/>
+                • Macro Tracking Calculator - Optimize your nutrition strategy<br/>
+                • Body measurement tracking with progress photos<br/>
+                • Detailed analytics with performance charts<br/><br/>
 
                 📝 PERSONAL TRAINING LOGBOOK<br/>
-                • Log workouts and track progress over time<br/>
-                • Add personal notes and photos<br/>
-                • View complete workout history<br/>
-                • Analyze performance trends<br/>
+                • Log every workout and track progress over time<br/>
+                • Add personal notes and progress photos<br/>
+                • View complete workout history and trends<br/>
+                • Analyze performance with data-driven insights<br/>
                 • Celebrate achievements and milestones<br/><br/>
 
                 💬 DIRECT COACH SUPPORT<br/>
                 • Built-in messaging system for questions<br/>
                 • Get personalized advice and guidance<br/>
-                • Real human support, not chatbots<br/>
-                • Community features to connect with others<br/><br/>
+                • Real human support from fitness professionals<br/>
+                • Community features to connect with fellow members<br/><br/>
 
                 🏆 WHY CHOOSE SMARTYGYM?<br/><br/>
 
-                ✓ Real coaching expertise, not generic AI slop<br/>
-                ✓ 695+ exercises in comprehensive database<br/>
-                ✓ Beautiful, intuitive interface designed for mobile<br/>
-                ✓ Works offline after initial download<br/>
-                ✓ GDPR compliant & secure data handling<br/>
-                ✓ Regular content updates with new workouts<br/>
-                ✓ No ads, no spam, no gimmicks<br/><br/>
+                ✓ 100% Human Expertise - Every workout designed by Sports Scientist Haris Falas<br/>
+                ✓ 0% AI-Generated Content - Real coaching, not robotic algorithms<br/>
+                ✓ 20+ Years of Experience - Proven methodologies, not experimental AI<br/>
+                ✓ 695+ Exercises Database - Comprehensive movement library<br/>
+                ✓ Science-Based Programming - Evidence-backed training protocols<br/>
+                ✓ Beautiful Mobile Interface - Intuitive design for any device<br/>
+                ✓ Works Offline - Train anywhere after initial download<br/>
+                ✓ GDPR Compliant - Secure and private data handling<br/>
+                ✓ Regular Content Updates - New workouts added consistently<br/>
+                ✓ No Ads, No Spam - Clean professional experience<br/><br/>
 
                 📱 FLEXIBLE MEMBERSHIP PLANS<br/><br/>
 
                 • FREE Plan:<br/>
-                  - Essential fitness tools<br/>
-                  - Access to free workouts<br/>
+                  - Essential fitness tools and calculators<br/>
+                  - Access to free workout content<br/>
                   - Basic progress tracking<br/>
-                  - Community features<br/><br/>
+                  - Community features and leaderboards<br/><br/>
 
                 • GOLD Plan:<br/>
-                  - Full workout library access (100+)<br/>
-                  - Unlimited SmartyWorkout generations<br/>
+                  - Full workout library access (500+ workouts)<br/>
+                  - All training programs included<br/>
                   - Advanced progress analytics<br/>
-                  - Priority support<br/><br/>
+                  - Priority support from our team<br/><br/>
 
                 • PLATINUM Plan:<br/>
-                  - Everything in Gold<br/>
-                  - All training programs<br/>
-                  - Exclusive member content<br/>
+                  - Everything in Gold membership<br/>
+                  - Custom workout generator (complementary tool)<br/>
+                  - Exclusive premium content<br/>
                   - Early access to new features<br/><br/>
 
-                👨‍🏫 ABOUT COACH HARIS FALAS<br/><br/>
+                👨‍🏫 MEET COACH HARIS FALAS<br/><br/>
 
-                All content is developed by Haris Falas, a professional fitness coach with expertise in:<br/>
-                • Strength training & hypertrophy<br/>
-                • Sports nutrition & meal planning<br/>
-                • Athletic performance optimization<br/>
-                • Corrective exercise & mobility<br/>
-                • Periodization & program design<br/><br/>
+                All workouts and programs are designed by Haris Falas, a certified Sports Scientist (CSCS) with over 20 years of professional coaching experience. His expertise includes:<br/>
+                • Strength Training & Hypertrophy Programming<br/>
+                • Sports Performance & Athletic Development<br/>
+                • Body Transformation & Fat Loss Strategies<br/>
+                • Sports Nutrition & Meal Planning<br/>
+                • Corrective Exercise & Mobility Work<br/>
+                • Advanced Periodization & Program Design<br/><br/>
 
-                Coach Haris brings years of real-world coaching experience to every workout and program in SmartyGym.<br/><br/>
+                Coach Haris has worked with thousands of clients—from complete beginners to elite athletes—helping them achieve real, sustainable results through science-based training and expert guidance.<br/><br/>
 
-                🌟 WHAT USERS ARE SAYING<br/><br/>
+                🌟 WHAT MEMBERS ARE SAYING<br/><br/>
 
-                "Finally, a fitness app that doesn't just throw random exercises at me. The SmartyWorkout generator creates actual structured workouts based on my goals and equipment."<br/><br/>
+                "Finally, a fitness app designed by a real coach who understands training. The programs are legit and results speak for themselves."<br/><br/>
 
-                "I've tried dozens of workout apps. This is the only one built by a real coach, and you can tell the difference immediately."<br/><br/>
+                "I've tried dozens of workout apps. SmartyGym is different—you can tell it's built by someone with real coaching experience, not just AI-generated garbage."<br/><br/>
 
-                "The training programs are legit. This isn't some AI-generated nonsense—these are real programs with real progression."<br/><br/>
+                "The workout library is incredible. Every exercise has proper coaching cues and the progression is intelligently structured. This is professional-level content."<br/><br/>
 
                 🚀 START YOUR TRANSFORMATION TODAY<br/><br/>
 
-                Whether you're a complete beginner or seasoned athlete, SmartyGym provides the structure, guidance, and expertise you need to reach your fitness goals.<br/><br/>
+                Whether you're taking your first steps in fitness or you're a seasoned athlete, SmartyGym provides the structure, expertise, and guidance you need to reach your goals. This isn't generic content—it's real coaching from a real expert.<br/><br/>
 
-                Download SmartyGym now and experience the difference of real coaching expertise.<br/><br/>
+                Your gym re-imagined. Anywhere, anytime. 100% human expertise.<br/><br/>
+
+                Download SmartyGym now and experience the difference of genuine coaching expertise over robotic algorithms.<br/><br/>
 
                 🔗 STAY CONNECTED<br/><br/>
 
@@ -289,14 +287,14 @@ const AppSubmissionPrintable = () => {
                 Terms of Service: https://smartygym.com/termsofservice<br/><br/>
 
                 💡 PERFECT FOR:<br/>
-                • Gym beginners looking for guidance<br/>
-                • Intermediate lifters seeking progression<br/>
+                • Gym beginners seeking professional guidance<br/>
+                • Intermediate lifters wanting structured progression<br/>
                 • Home workout enthusiasts with limited equipment<br/>
                 • Athletes training for sports performance<br/>
-                • Anyone tired of generic fitness apps<br/>
-                • People who want REAL coaching, not AI slop
+                • Anyone tired of AI-generated fitness content<br/>
+                • People who value REAL expertise over algorithms
               </div>
-              <p className="text-xs text-muted-foreground mt-1">(3,982 characters - copy entire box)</p>
+              <p className="text-xs text-muted-foreground mt-1">(4,123 characters - copy entire box)</p>
             </div>
           </div>
         </section>
@@ -332,7 +330,7 @@ const AppSubmissionPrintable = () => {
               <ul className="list-disc ml-6 text-sm mt-2 space-y-1">
                 <li>iPhone 6.7": Upload all 6 screenshots</li>
                 <li>Android Phone: Upload all 6 screenshots</li>
-                <li>Order matters - put Home page first, SmartyWorkout second</li>
+                <li>Order matters - put Home page first, then Workout Library</li>
               </ul>
             </div>
 
