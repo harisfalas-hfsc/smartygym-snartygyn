@@ -1,15 +1,14 @@
-# Smarty Gym - Comprehensive SEO Audit & Optimization Report
+# SmartyGym - Comprehensive SEO Audit & Optimization Report
 
 ## 🎯 SEO Strategy Overview
 
 ### Target Keywords (Primary)
-- Smarty Gym, smartygym, smartygym.com
-- Haris Falas Cyprus fitness
-- Online gym Cyprus
+- SmartyGym, smartygym, smartygym.com
+- Haris Falas, Haris Falas fitness, Sports Scientist Haris Falas
+- Online gym, online fitness platform
 - Convenient flexible fitness
-- No equipment workouts Cyprus
-- Bodyweight training Cyprus
-- Personal training Cyprus
+- No equipment workouts, bodyweight training
+- Home workouts, personal training online
 
 ### Workout Format Keywords
 - AMRAP workouts (As Many Rounds As Possible)
@@ -40,8 +39,7 @@
 - Upper body, lower body, full body
 
 ### Target Audience Keywords
-- Home workouts Cyprus
-- Gym anywhere anytime
+- Home workouts, gym anywhere anytime
 - Online personal training
 - Busy professionals fitness
 - Athletes training programs
@@ -73,7 +71,7 @@
 7. **Premium Benefits** - Needs conversion-focused SEO
 
 ### ❌ Missing SEO
-1. **Contact Page** - Needs local SEO
+1. **Contact Page** - Needs service SEO
 2. **Tools Page** - Needs tool-specific keywords
 3. **Join Premium** - Needs conversion SEO
 4. **Personal Training** - Needs service SEO
@@ -94,7 +92,7 @@ Example:
 ```html
 <img 
   src={starterGauntletImg} 
-  alt="Starter Gauntlet - Beginner bodyweight challenge workout - FOR ROUNDS circuit training - No equipment required - Smarty Gym Cyprus"
+  alt="Starter Gauntlet - Beginner bodyweight challenge workout - FOR ROUNDS circuit training - No equipment required - SmartyGym"
 />
 ```
 
@@ -114,7 +112,8 @@ Example:
   "audience": "Intermediate",
   "creator": {
     "@type": "Person",
-    "name": "Haris Falas"
+    "name": "Haris Falas",
+    "jobTitle": "Sports Scientist"
   }
 }
 ```
@@ -128,7 +127,8 @@ Example:
   "description": "Program description",
   "provider": {
     "@type": "Organization",
-    "name": "Smarty Gym"
+    "name": "SmartyGym",
+    "url": "https://smartygym.com"
   }
 }
 ```
@@ -156,9 +156,9 @@ Already implemented - verify all articles have proper structured data
 
 ### Standard Pages
 ```html
-<title>Page Title | Smarty Gym Cyprus | smartygym.com</title>
+<title>Page Title | SmartyGym | smartygym.com</title>
 <meta name="description" content="..." />
-<meta name="keywords" content="Haris Falas, Smarty Gym, Cyprus fitness, [page-specific keywords]" />
+<meta name="keywords" content="Haris Falas, SmartyGym, online fitness, [page-specific keywords]" />
 <meta property="og:title" content="..." />
 <meta property="og:description" content="..." />
 <meta property="og:type" content="website" />
@@ -211,7 +211,7 @@ Include workout-specific keywords:
 1. Premium Benefits - Conversion-focused SEO
 2. Join Premium - Sales-focused keywords
 3. Personal Training - Service SEO
-4. Contact Page - Local SEO
+4. Contact Page - Service SEO
 
 ### Phase 3: Tool Pages (Medium Priority)
 1. All Calculators - Tool-specific keywords
@@ -239,12 +239,12 @@ Include workout-specific keywords:
 - Complete structured data for all content
 - All images optimized with descriptive alt text
 - Internal linking structure optimized
-- Local SEO for Cyprus market
+- Global positioning (worldwide accessibility)
 - Mobile-first optimization confirmed
 
 ### Metrics to Track
 - Organic search traffic
-- Keyword rankings (Smarty Gym, Haris Falas Cyprus, workout keywords)
+- Keyword rankings (SmartyGym, Haris Falas, workout keywords)
 - Page load speed
 - Mobile usability
 - Click-through rates from search results
@@ -264,35 +264,32 @@ Include workout-specific keywords:
 
 ---
 
-## 🌍 Local SEO (Cyprus Focus)
+## 🌍 Global SEO Strategy
 
-### Location-Based Keywords
-- Fitness Cyprus, gym Cyprus
-- Personal training Cyprus
-- Online workout Cyprus
-- Haris Falas Cyprus coach
-- Sports scientist Cyprus
-- Strength training Cyprus
-- Home workouts Cyprus
+### Worldwide Positioning Keywords
+- Online fitness worldwide, global online gym
+- International personal training
+- Home workouts anywhere
+- Fitness platform worldwide
+- Train from anywhere
 
-### Local Schema Markup
+### Global Schema Markup
 ```json
 {
   "@context": "https://schema.org",
-  "@type": "LocalBusiness",
-  "name": "Smarty Gym",
-  "address": {
-    "@type": "PostalAddress",
-    "addressCountry": "CY"
-  },
+  "@type": "Organization",
+  "name": "SmartyGym",
+  "url": "https://smartygym.com",
+  "areaServed": "Worldwide",
   "founder": {
     "@type": "Person",
-    "name": "Haris Falas"
+    "name": "Haris Falas",
+    "jobTitle": "Sports Scientist & Head Coach"
   }
 }
 ```
 
 ---
 
-*Last Updated: [Date to be added after completion]*
+*Last Updated: January 2025*  
 *Status: Audit Complete - Optimization In Progress*
