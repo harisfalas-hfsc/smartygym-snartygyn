@@ -15,6 +15,7 @@ import {
   BarChart
 } from "lucide-react";
 import { useAccessControl } from "@/hooks/useAccessControl";
+import { SEOEnhancer } from "@/components/SEOEnhancer";
 
 const TakeTour = () => {
   const navigate = useNavigate();
@@ -73,21 +74,64 @@ const TakeTour = () => {
   return (
     <>
       <Helmet>
-        <title>Take a Tour - Discover SmartyGym | Your Fitness Re-imagined by Haris Falas</title>
-        <meta name="description" content="Explore smartygym.com - convenient & flexible online fitness Re-imagined by Haris Falas. See how our gym works anywhere, anytime. Free workouts, premium programs & tools." />
-        <meta name="keywords" content="smartygym tour, smarty gym demo, smartygym.com features, Haris Falas, gym Re-imagined, convenient fitness, flexible online gym, fitness anywhere anytime, online fitness tour" />
+        <title>Take a Tour | Platform Overview | SmartyGym Features</title>
+        <meta name="description" content="Discover SmartyGym's comprehensive features: expert workouts, training programs, fitness calculators, progress tracking, and more. Take a guided tour of the platform." />
+        <meta name="keywords" content="SmartyGym tour, platform features, fitness platform, online gym features, workout platform, training platform, fitness tools overview, online fitness platform" />
+        <link rel="canonical" href="https://smartygym.com/take-tour" />
         
-        <meta property="og:title" content="Take a Tour - SmartyGym Features" />
-        <meta property="og:description" content="Discover how SmartyGym reimagines fitness - convenient, flexible training anywhere, anytime by Haris Falas" />
-        <meta property="og:type" content="website" />
-        <meta property="og:url" content="https://smartygym.com/takeatour" />
-        
-        <meta property="twitter:card" content="summary_large_image" />
-        <meta property="twitter:title" content="Take a Tour - SmartyGym" />
-        <meta property="twitter:description" content="Explore smartygym.com features - fitness Re-imagined for convenience & flexibility" />
-        
-        <link rel="canonical" href="https://smartygym.com/takeatour" />
+        <script type="application/ld+json">
+          {JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "HowTo",
+            "name": "How to Use SmartyGym Platform",
+            "description": "Step-by-step guide to using SmartyGym's features including workouts, programs, calculators, and progress tracking",
+            "step": [
+              {
+                "@type": "HowToStep",
+                "position": 1,
+                "name": "Explore Workout Library",
+                "text": "Browse 500+ expert-designed workouts across strength, cardio, HIIT, and mobility categories"
+              },
+              {
+                "@type": "HowToStep",
+                "position": 2,
+                "name": "Follow Training Programs",
+                "text": "Join structured multi-week programs for muscle building, fat loss, and strength development"
+              },
+              {
+                "@type": "HowToStep",
+                "position": 3,
+                "name": "Generate Custom Workouts",
+                "text": "Use SmartyWorkout AI generator to create personalized workouts based on your goals"
+              },
+              {
+                "@type": "HowToStep",
+                "position": 4,
+                "name": "Use Fitness Calculators",
+                "text": "Track progress with 1RM, BMR, and macro calculators"
+              },
+              {
+                "@type": "HowToStep",
+                "position": 5,
+                "name": "Join the Community",
+                "text": "Connect with members, view leaderboards, and share reviews"
+              }
+            ]
+          })}
+        </script>
       </Helmet>
+      
+      <SEOEnhancer 
+        entities={["SmartyGym", "Platform Tour", "Fitness Platform Features"]}
+        topics={["platform overview", "fitness tools", "online gym features", "training platform", "workout platform"]}
+        expertise={["Platform Design", "User Experience", "Fitness Technology"]}
+        contentType="platform-guide"
+        aiSummary="Take a comprehensive tour of SmartyGym platform featuring expert workouts, training programs, AI workout generator, fitness calculators, progress tracking, community features, and premium memberships. Explore all features designed by Sports Scientist Haris Falas."
+        aiKeywords={["platform tour", "fitness platform", "online gym features", "workout platform", "training tools", "fitness app features", "online coaching platform"]}
+        relatedContent={["Free Content", "Premium Membership", "Workout Library", "Training Programs"]}
+        targetAudience="new users, prospective members, fitness platform shoppers"
+        pageType="Guide"
+      />
 
       {/* Sticky CTA Bar */}
       <div className="fixed bottom-0 left-0 right-0 z-50 bg-background/95 backdrop-blur-sm border-t border-border shadow-lg">

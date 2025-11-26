@@ -68,14 +68,82 @@ const TrainingProgramFlow = () => {
   };
   return <>
       <Helmet>
-        <title>Online Training Programs | Structured Plans | Haris Falas HFSC | SmartyGym</title>
-        <meta name="description" content="Structured online training programs at smartygym.com. Cardio, strength, muscle growth, weight loss, and mobility programs by Sports Scientist Haris Falas HFSC. Long-term gym programs online - train anywhere, anytime." />
-        <meta name="keywords" content="online training programs, training programs, gym programs, personal trainer, fitness programs, online gym, HFSC, Haris Falas, Sports Scientist, structured training programs, cardio programs, strength programs, muscle hypertrophy, weight loss programs, mobility programs, gym training online, smartygym.com, HFSC Performance, functional training" />
+        <title>Training Programs | Expert Workout Programs | SmartyGym</title>
+        <meta name="description" content="Explore expert-designed training programs at SmartyGym. Structured multi-week programs for strength, muscle building, fat loss, and performance by Sports Scientist Haris Falas." />
+        <meta name="keywords" content="training programs, workout programs, fitness programs, strength program, muscle building, fat loss program, online training, SmartyGym, Haris Falas, hypertrophy program, weight loss program, online coaching" />
+        <link rel="canonical" href="https://smartygym.com/trainingprogram" />
         
-        {/* Greek Language */}
-        <link rel="alternate" hrefLang="el" href="https://smartygym.com/trainingprogram" />
-        <link rel="alternate" hrefLang="en-GB" href="https://smartygym.com/trainingprogram" />
+        <meta property="og:title" content="Training Programs | SmartyGym" />
+        <meta property="og:description" content="Expert-designed multi-week training programs for strength, muscle building, fat loss, and performance." />
+        <meta property="og:type" content="website" />
+        <meta property="og:url" content="https://smartygym.com/trainingprogram" />
+        <meta property="og:image" content="https://smartygym.com/smarty-gym-logo.png" />
+        <meta property="og:site_name" content="SmartyGym" />
+        
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content="Training Programs | SmartyGym" />
+        <meta name="twitter:description" content="Expert training programs for all fitness goals" />
+        <meta name="twitter:image" content="https://smartygym.com/smarty-gym-logo.png" />
+        
+        <script type="application/ld+json">
+          {JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "BreadcrumbList",
+            "itemListElement": [
+              {
+                "@type": "ListItem",
+                "position": 1,
+                "name": "Home",
+                "item": "https://smartygym.com"
+              },
+              {
+                "@type": "ListItem",
+                "position": 2,
+                "name": "Training Programs",
+                "item": "https://smartygym.com/trainingprogram"
+              }
+            ]
+          })}
+        </script>
+        
+        <script type="application/ld+json">
+          {JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "ItemList",
+            "name": "Training Programs Collection",
+            "description": "Expert-designed training programs for various fitness goals",
+            "itemListElement": [
+              {
+                "@type": "Course",
+                "name": "Functional Strength Programs",
+                "description": "Build real-world strength with structured multi-week programs"
+              },
+              {
+                "@type": "Course",
+                "name": "Muscle Hypertrophy Programs",
+                "description": "Hypertrophy-focused programs for muscle growth"
+              },
+              {
+                "@type": "Course",
+                "name": "Weight Loss Programs",
+                "description": "Fat loss programs combining training and nutrition"
+              }
+            ]
+          })}
+        </script>
       </Helmet>
+      
+      <SEOEnhancer 
+        entities={["SmartyGym", "Haris Falas", "Training Programs", "Workout Programs"]}
+        topics={["training programs", "muscle building", "fat loss", "strength training", "hypertrophy"]}
+        expertise={["Sports Science", "Program Design", "Periodization"]}
+        contentType="program-library"
+        aiSummary="SmartyGym offers expert-designed training programs covering strength, muscle building, fat loss, and athletic performance. Multi-week structured programs by Sports Scientist Haris Falas with progressive overload and periodization."
+        aiKeywords={["training programs", "workout programs", "muscle building", "hypertrophy", "fat loss programs", "strength programs", "online coaching", "fitness programs"]}
+        relatedContent={["Workout Library", "Free Programs", "Premium Membership", "Personal Training"]}
+        targetAudience="athletes, bodybuilders, fitness enthusiasts, strength athletes"
+        pageType="CollectionPage"
+      />
       
       <div className="min-h-screen bg-background">
         {canGoBack && <div className="mb-6">

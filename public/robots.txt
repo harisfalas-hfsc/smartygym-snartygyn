@@ -1,4 +1,4 @@
-# SmartyGym Robots.txt - Cyprus & Greece Online Gym Platform
+# SmartyGym Robots.txt - Global Online Fitness Platform
 
 User-agent: Googlebot
 Allow: /

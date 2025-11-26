@@ -4,8 +4,8 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { PageBreadcrumbs } from "@/components/PageBreadcrumbs";
 import { ArrowLeft, Youtube } from "lucide-react";
-
 import { useShowBackButton } from "@/hooks/useShowBackButton";
+import { SEOEnhancer } from "@/components/SEOEnhancer";
 
 const ExerciseLibrary = () => {
   const navigate = useNavigate();
@@ -14,25 +14,52 @@ const ExerciseLibrary = () => {
   return (
     <>
       <Helmet>
-        <title>Exercise Library | Workout Videos | Haris Falas HFSC | SmartyGym YouTube</title>
-        <meta name="description" content="Exercise library at smartygym.com. 100+ workout video demonstrations by Sports Scientist Haris Falas HFSC. Watch The Smarty Gym YouTube channel. Exercise technique videos for anywhere, anytime training." />
-        <meta name="keywords" content="exercise library, workout videos, gym exercise videos, personal trainer videos, HFSC, Haris Falas, Sports Scientist, The Smarty Gym YouTube, online gym videos, gym demonstrations, workout tutorials, smartygym.com, HFSC Performance, training videos, exercise technique" />
+        <title>Exercise Library | Video Demonstrations | The Smarty Gym YouTube</title>
+        <meta name="description" content="Watch expert exercise demonstrations and training tutorials on The Smarty Gym YouTube channel. Learn proper form, technique, and get workout inspiration from Sports Scientist Haris Falas." />
+        <meta name="keywords" content="exercise library, workout videos, exercise demonstrations, training tutorials, YouTube workouts, fitness videos, proper form, exercise technique, SmartyGym, Haris Falas, fitness education, training videos" />
+        <link rel="canonical" href="https://smartygym.com/exerciselibrary" />
         
-        {/* Greek Language */}
-        <link rel="alternate" hrefLang="el" href="https://smartygym.com/exerciselibrary" />
-        <link rel="alternate" hrefLang="en-GB" href="https://smartygym.com/exerciselibrary" />
-        
-        <meta property="og:title" content="Exercise Library - Smarty Gym | YouTube Channel" />
-        <meta property="og:description" content="Watch exercise demonstrations on The Smarty Gym YouTube channel by Haris Falas - Inside Smarty Gym" />
+        <meta property="og:title" content="Exercise Library | The Smarty Gym YouTube" />
+        <meta property="og:description" content="Expert exercise demonstrations and training tutorials by Sports Scientist Haris Falas" />
         <meta property="og:type" content="website" />
         <meta property="og:url" content="https://smartygym.com/exerciselibrary" />
+        <meta property="og:image" content="https://smartygym.com/smarty-gym-logo.png" />
         
         <meta name="twitter:card" content="summary_large_image" />
-        <meta name="twitter:title" content="Exercise Library - Smarty Gym" />
-        <meta name="twitter:description" content="Exercise videos at smartygym.com - Inside Smarty Gym by Haris Falas" />
+        <meta name="twitter:title" content="Exercise Library | The Smarty Gym" />
+        <meta name="twitter:description" content="Expert exercise demonstrations and training tutorials" />
+        <meta name="twitter:image" content="https://smartygym.com/smarty-gym-logo.png" />
         
-        <link rel="canonical" href="https://smartygym.com/exerciselibrary" />
+        <script type="application/ld+json">
+          {JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "VideoGallery",
+            "name": "The Smarty Gym Exercise Library",
+            "description": "Comprehensive video library of exercise demonstrations, training tips, and workout tutorials",
+            "publisher": {
+              "@type": "Organization",
+              "name": "SmartyGym",
+              "founder": {
+                "@type": "Person",
+                "name": "Haris Falas",
+                "jobTitle": "Sports Scientist"
+              }
+            }
+          })}
+        </script>
       </Helmet>
+      
+      <SEOEnhancer 
+        entities={["SmartyGym", "The Smarty Gym YouTube", "Haris Falas", "Exercise Library"]}
+        topics={["exercise demonstrations", "workout videos", "training tutorials", "proper form", "fitness education"]}
+        expertise={["Sports Science", "Exercise Technique", "Coaching"]}
+        contentType="video-library"
+        aiSummary="The Smarty Gym YouTube channel offers a comprehensive exercise library featuring expert demonstrations, training tips, and workout tutorials by Sports Scientist Haris Falas. Learn proper form and technique for all major exercises."
+        aiKeywords={["exercise library", "workout videos", "exercise demos", "training tutorials", "YouTube fitness", "proper form", "exercise technique", "fitness education"]}
+        relatedContent={["Workout Library", "Training Programs", "Free Content", "Blog"]}
+        targetAudience="fitness beginners, athletes, personal trainers, exercise learners"
+        pageType="VideoGallery"
+      />
       
       <div className="min-h-screen bg-background">
         
