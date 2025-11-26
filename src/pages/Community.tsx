@@ -553,7 +553,7 @@ const Community = () => {
                   </p>
                 </div>
               ) : (
-                <ScrollArea className="h-[500px] md:h-[600px] pr-2 md:pr-4">
+                <ScrollArea className="h-[630px] md:h-[700px] pr-2 md:pr-4">
                   <div className="space-y-3 md:space-y-4">
                     {comments.map((comment) => (
                       <div
