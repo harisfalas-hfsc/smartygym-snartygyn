@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { Helmet } from "react-helmet";
+import { Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { PageBreadcrumbs } from "@/components/PageBreadcrumbs";
@@ -29,6 +30,8 @@ interface RatedContent {
   content_id: string;
   content_name: string;
   content_type: "workout" | "program";
+  workout_type?: string;
+  program_type?: string;
   average_rating: number;
   rating_count: number;
 }
@@ -36,8 +39,12 @@ interface RatedContent {
 interface Comment {
   id: string;
   user_id: string;
+  workout_id: string | null;
   workout_name: string | null;
+  workout_type: string | null;
+  program_id: string | null;
   program_name: string | null;
+  program_type: string | null;
   comment_text: string;
   created_at: string;
   display_name: string;
@@ -145,7 +152,7 @@ const Community = () => {
       // Get workout ratings
       const { data: workoutRatings, error: workoutError } = await supabase
         .from("workout_interactions")
-        .select("workout_id, workout_name, rating")
+        .select("workout_id, workout_name, workout_type, rating")
         .not("rating", "is", null);
 
       if (workoutError) throw workoutError;
@@ -153,25 +160,25 @@ const Community = () => {
       // Get program ratings
       const { data: programRatings, error: programError } = await supabase
         .from("program_interactions")
-        .select("program_id, program_name, rating")
+        .select("program_id, program_name, program_type, rating")
         .not("rating", "is", null);
 
       if (programError) throw programError;
 
       // Calculate workout averages
-      const workoutRatingMap: { [key: string]: { name: string; ratings: number[] } } = {};
+      const workoutRatingMap: { [key: string]: { name: string; type: string; ratings: number[] } } = {};
       (workoutRatings || []).forEach((item) => {
         if (!workoutRatingMap[item.workout_id]) {
-          workoutRatingMap[item.workout_id] = { name: item.workout_name, ratings: [] };
+          workoutRatingMap[item.workout_id] = { name: item.workout_name, type: item.workout_type, ratings: [] };
         }
         workoutRatingMap[item.workout_id].ratings.push(item.rating);
       });
 
       // Calculate program averages
-      const programRatingMap: { [key: string]: { name: string; ratings: number[] } } = {};
+      const programRatingMap: { [key: string]: { name: string; type: string; ratings: number[] } } = {};
       (programRatings || []).forEach((item) => {
         if (!programRatingMap[item.program_id]) {
-          programRatingMap[item.program_id] = { name: item.program_name, ratings: [] };
+          programRatingMap[item.program_id] = { name: item.program_name, type: item.program_type, ratings: [] };
         }
         programRatingMap[item.program_id].ratings.push(item.rating);
       });
@@ -185,6 +192,7 @@ const Community = () => {
           content_id: id,
           content_name: data.name,
           content_type: "workout",
+          workout_type: data.type,
           average_rating: Math.round(avg * 10) / 10,
           rating_count: data.ratings.length,
         });
@@ -196,6 +204,7 @@ const Community = () => {
           content_id: id,
           content_name: data.name,
           content_type: "program",
+          program_type: data.type,
           average_rating: Math.round(avg * 10) / 10,
           rating_count: data.ratings.length,
         });
@@ -221,7 +230,7 @@ const Community = () => {
     try {
       let query = supabase
         .from("workout_comments")
-        .select("id, user_id, workout_name, program_name, comment_text, created_at")
+        .select("id, user_id, workout_id, workout_name, workout_type, program_id, program_name, program_type, comment_text, created_at")
         .order("created_at", { ascending: sortOrder === "oldest" })
         .limit(50);
 
@@ -468,7 +477,15 @@ const Community = () => {
                                 </div>
                               </TableCell>
                               <TableCell className="py-2 md:py-3">
-                                <span className="font-medium text-xs md:text-sm truncate">{item.content_name}</span>
+                                <Link 
+                                  to={item.content_type === "workout" 
+                                    ? `/workout/${item.workout_type}/${item.content_id}`
+                                    : `/training-programs/${item.program_type}/${item.content_id}`
+                                  }
+                                  className="font-medium text-xs md:text-sm truncate text-primary hover:underline"
+                                >
+                                  {item.content_name}
+                                </Link>
                               </TableCell>
                               <TableCell className="text-center py-2 md:py-3">
                                 <div className="flex items-center justify-center gap-1">
@@ -573,9 +590,27 @@ const Community = () => {
                           </div>
                         </div>
                         <p className="text-[10px] md:text-xs text-primary font-medium mb-2">
-                          {comment.workout_name
-                            ? `Workout: ${comment.workout_name}`
-                            : `Program: ${comment.program_name}`}
+                          {comment.workout_name ? (
+                            <>
+                              Workout:{" "}
+                              <Link
+                                to={`/workout/${comment.workout_type}/${comment.workout_id}`}
+                                className="hover:underline font-semibold"
+                              >
+                                {comment.workout_name}
+                              </Link>
+                            </>
+                          ) : (
+                            <>
+                              Program:{" "}
+                              <Link
+                                to={`/training-programs/${comment.program_type}/${comment.program_id}`}
+                                className="hover:underline font-semibold"
+                              >
+                                {comment.program_name}
+                              </Link>
+                            </>
+                          )}
                         </p>
                         <p className="text-xs md:text-sm leading-relaxed">{comment.comment_text}</p>
                       </div>

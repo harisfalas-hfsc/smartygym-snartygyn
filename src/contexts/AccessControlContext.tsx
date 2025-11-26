@@ -14,7 +14,7 @@ interface AccessControlState {
 
 interface AccessControlContextType extends AccessControlState {
   canAccessContent: (contentType: string, contentId?: string) => boolean;
-  canInteract: (contentType: string) => boolean;
+  canInteract: (contentType: string, contentId?: string) => boolean;
   hasPurchased: (contentId: string, contentType: string) => boolean;
   refreshAccess: () => Promise<void>;
 }
@@ -205,14 +205,19 @@ export const AccessControlProvider = ({ children }: { children: ReactNode }) => 
     return state.purchasedContent.has(`${contentType}:${contentId}`);
   };
 
-  const canInteract = (contentType: string): boolean => {
-    const { userTier } = state;
+  const canInteract = (contentType: string, contentId?: string): boolean => {
+    const { userTier, purchasedContent } = state;
 
     // Guests can't interact with anything
     if (userTier === "guest") return false;
 
     // Premium users can interact with ALL content (free and premium)
     if (userTier === "premium") return true;
+
+    // Check if user purchased this specific content
+    if (contentId && purchasedContent.has(`${contentType}:${contentId}`)) {
+      return true;
+    }
 
     // Subscribers can only interact with free content
     if (userTier === "subscriber") {

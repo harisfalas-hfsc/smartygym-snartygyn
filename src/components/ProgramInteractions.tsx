@@ -25,8 +25,8 @@ export const ProgramInteractions = ({ programId, programType, programName, isFre
   const navigate = useNavigate();
 
   // Determine content type for permission check
-  const contentType = isFreeContent ? "free-program" : "premium-program";
-  const canUserInteract = canInteract(contentType);
+  const contentType = isFreeContent ? "free-program" : "program";
+  const canUserInteract = canInteract(contentType, programId);
 
   useEffect(() => {
     loadInteractions();

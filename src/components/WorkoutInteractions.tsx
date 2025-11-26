@@ -24,8 +24,8 @@ export const WorkoutInteractions = ({ workoutId, workoutType, workoutName, isFre
   const navigate = useNavigate();
 
   // Determine content type for permission check
-  const contentType = isFreeContent ? "free-workout" : "premium-workout";
-  const canUserInteract = canInteract(contentType);
+  const contentType = isFreeContent ? "free-workout" : "workout";
+  const canUserInteract = canInteract(contentType, workoutId);
 
   useEffect(() => {
     loadInteractions();
