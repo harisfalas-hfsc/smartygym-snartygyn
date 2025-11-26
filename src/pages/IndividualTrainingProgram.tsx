@@ -5,7 +5,6 @@ import { Card } from "@/components/ui/card";
 import { ArrowLeft } from "lucide-react";
 import { WorkoutDisplay } from "@/components/WorkoutDisplay";
 import { AccessGate } from "@/components/AccessGate";
-import { CommentDialog } from "@/components/CommentDialog";
 import { PurchaseButton } from "@/components/PurchaseButton";
 import { useTrainingProgramData } from "@/hooks/useTrainingProgramData";
 import { useAccessControl } from "@/hooks/useAccessControl";
@@ -105,7 +104,7 @@ const IndividualTrainingProgram = () => {
         </Helmet>
         <div className="min-h-screen bg-background">
           <div className="container mx-auto px-4 py-8">
-            <div className="mb-6 flex items-center justify-between">
+            <div className="mb-6">
               <Button
                 variant="outline"
                 onClick={() => navigate(-1)}
@@ -114,11 +113,6 @@ const IndividualTrainingProgram = () => {
                 <ArrowLeft className="mr-2 h-4 w-4" />
                 <span className="text-xs sm:text-sm">Back</span>
               </Button>
-              <CommentDialog
-                programId={id}
-                programName={dbProgram.name}
-                programType={type}
-              />
             </div>
 
             {/* Show purchase button for standalone purchases */}

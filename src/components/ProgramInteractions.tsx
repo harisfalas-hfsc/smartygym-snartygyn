@@ -1,10 +1,11 @@
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
-import { Heart, Star, CheckCircle2, Crown } from "lucide-react";
+import { Heart, Star, CheckCircle2, Crown, MessageSquare } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useAccessControl } from "@/hooks/useAccessControl";
 import { useNavigate } from "react-router-dom";
+import { CommentDialog } from "@/components/CommentDialog";
 
 interface ProgramInteractionsProps {
   programId: string;
@@ -462,6 +463,12 @@ export const ProgramInteractions = ({ programId, programType, programName, isFre
           ))}
         </div>
       </div>
+
+      <CommentDialog
+        programId={programId}
+        programName={programName}
+        programType={programType}
+      />
     </div>
   );
 };
