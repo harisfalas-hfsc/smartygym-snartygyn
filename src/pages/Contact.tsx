@@ -16,6 +16,7 @@ import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useAccessControl } from "@/hooks/useAccessControl";
 import { cn } from "@/lib/utils";
+import { SEOEnhancer } from "@/components/SEOEnhancer";
 
 const contactSchema = z.object({
   name: z.string().trim().min(1, { message: "Name is required" }).max(100, { message: "Name must be less than 100 characters" }),
@@ -355,6 +356,18 @@ const Contact = () => {
           })}
         </script>
       </Helmet>
+
+      <SEOEnhancer
+        entities={["Contact SmartyGym", "Customer Support", "Haris Falas Contact", "Help Desk"]}
+        topics={["customer service", "contact form", "support inquiries", "coach communication"]}
+        expertise={["customer support", "fitness inquiries", "platform assistance"]}
+        contentType="Contact Page"
+        aiSummary="Contact SmartyGym: Reach Sports Scientist Haris Falas for expert fitness guidance, support inquiries, and personalized training questions. Premium members get direct coach access."
+        aiKeywords={["contact smartygym", "haris falas contact", "fitness support", "gym inquiries", "coach contact", "customer service"]}
+        relatedContent={["Coach Profile", "FAQ", "About", "Personal Training"]}
+        targetAudience="users seeking support or information"
+        pageType="ContactPage"
+      />
       
       <div className="min-h-screen bg-background">
         

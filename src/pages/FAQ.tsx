@@ -11,6 +11,7 @@ import {
 } from "@/components/ui/accordion";
 import { HelpCircle, ArrowLeft, MessageCircle } from "lucide-react";
 import { useShowBackButton } from "@/hooks/useShowBackButton";
+import { SEOEnhancer } from "@/components/SEOEnhancer";
 
 const FAQ = () => {
   const navigate = useNavigate();
@@ -109,6 +110,18 @@ const FAQ = () => {
           })}
         </script>
       </Helmet>
+
+      <SEOEnhancer
+        entities={["FAQ", "Frequently Asked Questions", "Help Center", "Support"]}
+        topics={["fitness questions", "membership help", "workout guidance", "training support"]}
+        expertise={["customer support", "fitness guidance", "platform help"]}
+        contentType="FAQ Page"
+        aiSummary="SmartyGym FAQ: Answers to common questions about online workouts, training programs, membership plans, equipment needs, and getting started with your fitness journey."
+        aiKeywords={["smartygym faq", "online fitness questions", "gym membership help", "workout questions", "training program help"]}
+        relatedContent={["Contact", "About", "Premium Membership", "Getting Started"]}
+        targetAudience="users seeking help and information"
+        pageType="FAQPage"
+      />
 
       <div className="min-h-screen bg-background">
         <div className="container mx-auto max-w-4xl px-4 py-8">

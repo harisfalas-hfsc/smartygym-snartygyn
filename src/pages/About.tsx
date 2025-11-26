@@ -6,6 +6,7 @@ import { ScrollReveal } from "@/components/ScrollReveal";
 import { CheckCircle2, Target, Heart, Users, Shield, Award, Compass, ArrowLeft, GraduationCap, Plane, Dumbbell } from "lucide-react";
 import { useShowBackButton } from "@/hooks/useShowBackButton";
 import { useAccessControl } from "@/hooks/useAccessControl";
+import { SEOEnhancer } from "@/components/SEOEnhancer";
 
 const About = () => {
   const navigate = useNavigate();
@@ -78,6 +79,18 @@ const About = () => {
           })}
         </script>
       </Helmet>
+
+      <SEOEnhancer
+        entities={["About SmartyGym", "Company Information", "Our Mission", "Haris Falas"]}
+        topics={["company background", "fitness mission", "online gym platform", "expert coaching"]}
+        expertise={["platform development", "fitness coaching", "sports science"]}
+        contentType="About Page"
+        aiSummary="About SmartyGym: Global online fitness platform founded by Sports Scientist Haris Falas. Science-based workouts, accessible training, and 100% human-designed programs. Your gym reimagined for real life."
+        aiKeywords={["about smartygym", "online fitness platform", "haris falas", "fitness mission", "company background", "gym platform"]}
+        relatedContent={["Coach Profile", "FAQ", "Contact", "Premium Membership"]}
+        targetAudience="users learning about the platform"
+        pageType="AboutPage"
+      />
 
       <div className="min-h-screen bg-background">
         <div className="container mx-auto max-w-6xl px-4 py-8">
