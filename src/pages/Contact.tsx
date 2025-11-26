@@ -313,18 +313,9 @@ const Contact = () => {
   return (
     <>
       <Helmet>
-        <title>Contact SmartyGym Cyprus Greece | Haris Falas HFSC Nicosia | Online Gym Personal Trainer</title>
-        <meta name="description" content="Contact SmartyGym Cyprus Greece smartygym.com. Reach Sports Scientist Haris Falas HFSC Nicosia for online gym personal training Cyprus. Expert fitness advice Cyprus Greece. Contact personal trainer Cyprus. Message us anywhere anytime προσωπικός προπονητής επικοινωνία Κύπρος" />
-        <meta name="keywords" content="contact SmartyGym Cyprus, contact Haris Falas Cyprus, personal trainer contact Cyprus, HFSC Nicosia contact, Cyprus online gym contact, Sports Scientist Cyprus contact, contact personal trainer Nicosia, fitness coach Cyprus contact, online gym support Cyprus, smartygym.com contact, HFSC Performance contact, training inquiry Cyprus, προσωπικός προπονητής επικοινωνία Κύπρος" />
-        
-        {/* Greek Language */}
-        <link rel="alternate" hrefLang="el" href="https://smartygym.com/contact" />
-        <link rel="alternate" hrefLang="en-GB" href="https://smartygym.com/contact" />
-        
-        {/* Geo Targeting */}
-        <meta name="geo.region" content="CY-01; GR" />
-        <meta name="geo.placename" content="Nicosia, Cyprus; Greece" />
-        <meta name="geo.position" content="35.1856;33.3823" />
+        <title>Contact SmartyGym | Haris Falas HFSC | Online Gym Personal Trainer</title>
+        <meta name="description" content="Contact SmartyGym at smartygym.com. Reach Sports Scientist Haris Falas HFSC for online gym personal training. Expert fitness advice. Contact online personal trainer. Message us anywhere anytime" />
+        <meta name="keywords" content="contact SmartyGym, contact Haris Falas, online personal trainer contact, HFSC contact, online gym contact, Sports Scientist contact, fitness coach contact, online gym support, smartygym.com contact, HFSC Performance contact, training inquiry" />
         
         <meta property="og:title" content="Contact SmartyGym.com | Haris Falas" />
         <meta property="og:description" content="Get in touch with Sports Scientist Haris Falas at SmartyGym.com for expert fitness guidance and personalized training support" />
@@ -362,7 +353,7 @@ const Contact = () => {
               "contactPoint": {
                 "@type": "ContactPoint",
                 "contactType": "Customer Service",
-                "availableLanguage": ["en", "el"]
+                "availableLanguage": ["en"]
               }
             }
           })}

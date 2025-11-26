@@ -117,18 +117,9 @@ const BMRCalculator = () => {
     <ProtectedRoute>
       <>
         <Helmet>
-          <title>Free BMR Calculator Cyprus Greece | Basal Metabolic Rate | Haris Falas HFSC | SmartyGym</title>
-          <meta name="description" content="Free BMR calculator Cyprus Greece smartygym.com. Calculate basal metabolic rate TDEE using Mifflin-St Jeor equation. Nutrition tool by Sports Scientist Haris Falas HFSC Nicosia. Daily calorie needs Cyprus Greece. Train smart anywhere anytime" />
-          <meta name="keywords" content="BMR calculator Cyprus, basal metabolic rate Cyprus, calorie calculator Cyprus, personal trainer nutrition Cyprus, HFSC Nicosia, Haris Falas Cyprus, Sports Scientist Cyprus, BMR calculator online, TDEE calculator, metabolism calculator Cyprus, nutrition tools Cyprus, smartygym.com, HFSC Performance, calorie needs Cyprus, γυμναστήριο διατροφή Κύπρος" />
-          
-          {/* Greek Language */}
-          <link rel="alternate" hrefLang="el" href="https://smartygym.com/bmrcalculator" />
-          <link rel="alternate" hrefLang="en-GB" href="https://smartygym.com/bmrcalculator" />
-          
-          {/* Geo Targeting */}
-          <meta name="geo.region" content="CY-01; GR" />
-          <meta name="geo.placename" content="Cyprus; Greece" />
-          <meta name="geo.position" content="35.1856;33.3823" />
+          <title>Free BMR Calculator | Basal Metabolic Rate | Haris Falas HFSC | SmartyGym</title>
+          <meta name="description" content="Free BMR calculator at smartygym.com. Calculate basal metabolic rate TDEE using Mifflin-St Jeor equation. Nutrition tool by Sports Scientist Haris Falas HFSC. Daily calorie needs. Train smart anywhere anytime" />
+          <meta name="keywords" content="BMR calculator, basal metabolic rate, calorie calculator, online personal trainer nutrition, HFSC, Haris Falas, Sports Scientist, BMR calculator online, TDEE calculator, metabolism calculator, nutrition tools, smartygym.com, HFSC Performance, calorie needs" />
           
           <meta property="og:title" content="Free BMR Calculator | Basal Metabolic Rate Calculator | SmartyGym" />
           <meta property="og:description" content="Calculate your BMR and daily calorie needs with our free online calculator at smartygym.com - Professional nutrition tool by Haris Falas" />
@@ -169,7 +160,7 @@ const BMRCalculator = () => {
           expertise={["sports science", "nutrition science", "exercise physiology"]}
           contentType="fitness-calculator"
           fitnessGoal="weight-management"
-          aiSummary="Free online BMR calculator for calculating basal metabolic rate and daily calorie needs using Mifflin-St Jeor equation. Professional nutrition tool by Sports Scientist Haris Falas at SmartyGym Cyprus."
+          aiSummary="Free online BMR calculator for calculating basal metabolic rate and daily calorie needs using Mifflin-St Jeor equation. Professional nutrition tool by Sports Scientist Haris Falas at SmartyGym."
           aiKeywords={["BMR", "basal metabolic rate", "TDEE", "calorie calculator", "metabolism", "nutrition planning", "weight loss", "fitness calculator"]}
           relatedContent={["weight loss programs", "nutrition planning", "macro calculator"]}
         />
@@ -281,9 +272,9 @@ const BMRCalculator = () => {
                     className="text-sm text-muted-foreground mt-2"
                     itemProp="description"
                   >
-                    Calories burned at complete rest - Calculated by SmartyGym Cyprus online fitness tools - smartygym.com
+                    Calories burned at complete rest - Calculated by SmartyGym online fitness tools - smartygym.com
                   </p>
-                  <meta itemProp="provider" content="SmartyGym Cyprus - smartygym.com - Haris Falas" />
+                  <meta itemProp="provider" content="SmartyGym - smartygym.com - Haris Falas" />
                 </article>
 
                 {user && (

@@ -16,9 +16,9 @@ export const ServiceCard = ({ icon: Icon, title, description, onClick }: Service
       onClick={onClick}
       className="p-6 cursor-pointer transition-all duration-300 hover:scale-105 hover:shadow-gold hover:-translate-y-1 bg-card border-border group"
       role="button"
-      aria-label={`${title} - Online fitness service at Smarty Gym Cyprus by Haris Falas - smartygym.com`}
+      aria-label={`${title} - Online fitness service at SmartyGym by Haris Falas - smartygym.com`}
       data-service-type={title.toLowerCase().replace(/\s+/g, '-')}
-      data-keywords="smarty gym, online gym, online fitness, smartygym.com, Haris Falas Cyprus"
+      data-keywords="smarty gym, online gym, online fitness, smartygym.com, Haris Falas"
     >
       <div className="flex flex-col items-center text-center space-y-4">
         <div 
@@ -40,9 +40,9 @@ export const ServiceCard = ({ icon: Icon, title, description, onClick }: Service
           >
             {description}
           </p>
-          <meta itemProp="provider" content="Smarty Gym Cyprus - smartygym.com" />
+          <meta itemProp="provider" content="SmartyGym - smartygym.com" />
           <meta itemProp="serviceType" content="Online Fitness" />
-          <meta itemProp="areaServed" content="Cyprus, Worldwide" />
+          <meta itemProp="areaServed" content="Worldwide" />
         </div>
       </div>
     </Card>

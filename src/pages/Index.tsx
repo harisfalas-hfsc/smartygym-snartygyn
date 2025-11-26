@@ -222,18 +222,9 @@ const Index = () => {
   };
   return <>
       <Helmet>
-        <title>SmartyGym | Online Gym Cyprus Greece | 500+ Workouts Training Programs | Haris Falas HFSC | smartygym.com</title>
-        <meta name="description" content="SmartyGym #1 online gym Cyprus Greece smartygym.com. 500+ expert workouts training programs by Sports Scientist Haris Falas HFSC Nicosia. AMRAP TABATA HIIT strength cardio home workouts Cyprus. Train anywhere anytime. 100% human zero AI. γυμναστήριο online Κύπρος" />
-        <meta name="keywords" content="smartygym, smarty gym, online gym Cyprus, online gym Greece, gym Cyprus, personal trainer Cyprus, personal trainer Nicosia, personal trainer Limassol, home workouts Cyprus, Cyprus fitness, online fitness Greece, HFSC, HFSC Nicosia, HFSC Performance, Haris Falas, Haris Falas Cyprus, Sports Scientist Cyprus, γυμναστήριο online Κύπρος, προσωπικός προπονητής, online γυμναστήριο Ελλάδα, γυμναστική από το σπίτι, AMRAP workouts, TABATA training, HIIT workouts, strength training, cardio workouts, functional training, home workouts, bodyweight workouts, online training programs, workout programs online, fitness calculators, smartygym.com, gym Cyprus, Nicosia gym, Limassol gym" />
-        
-        {/* Greek Language */}
-        <link rel="alternate" hrefLang="el" href="https://smartygym.com/" />
-        <link rel="alternate" hrefLang="en-GB" href="https://smartygym.com/" />
-        
-        {/* Geo Targeting */}
-        <meta name="geo.region" content="CY-01; GR" />
-        <meta name="geo.placename" content="Nicosia, Cyprus; Greece" />
-        <meta name="geo.position" content="35.1856;33.3823" />
+        <title>SmartyGym | Online Gym | 500+ Workouts Training Programs | Haris Falas HFSC | smartygym.com</title>
+        <meta name="description" content="SmartyGym #1 online gym smartygym.com. 500+ expert workouts training programs by Sports Scientist Haris Falas HFSC. AMRAP TABATA HIIT strength cardio home workouts. Train anywhere anytime. 100% human zero AI." />
+        <meta name="keywords" content="smartygym, smarty gym, online gym, online fitness, personal trainer, HFSC, HFSC Performance, Haris Falas, Sports Scientist, AMRAP workouts, TABATA training, HIIT workouts, strength training, cardio workouts, functional training, home workouts, bodyweight workouts, online training programs, workout programs online, fitness calculators, smartygym.com" />
         
         <meta name="semantic-keywords" content="online-fitness, home-workouts, virtual-training, digital-gym, remote-coaching, bodyweight-training, functional-fitness, strength-conditioning" />
         <meta name="workout-formats" content="AMRAP, TABATA, HIIT, circuit-training, interval-training, metabolic-conditioning, functional-training, strength-training" />
@@ -248,8 +239,8 @@ const Index = () => {
         
         <meta property="og:type" content="website" />
         <meta property="og:url" content="https://smartygym.com/" />
-        <meta property="og:title" content="Online Gym Cyprus | SmartyGym by Haris Falas | Professional Fitness Training" />
-        <meta property="og:description" content="Cyprus' premier online gym - Expert-designed workouts by Sports Scientist Haris Falas. 100+ workouts, structured programs, professional coaching at smartygym.com" />
+        <meta property="og:title" content="Online Gym | SmartyGym by Haris Falas | Professional Fitness Training" />
+        <meta property="og:description" content="Premier online gym - Expert-designed workouts by Sports Scientist Haris Falas. 100+ workouts, structured programs, professional coaching at smartygym.com" />
         <meta property="og:image" content={smartyGymLogo} />
         <meta property="og:image:width" content="1200" />
         <meta property="og:image:height" content="630" />
@@ -259,7 +250,7 @@ const Index = () => {
         
         <meta property="twitter:card" content="summary_large_image" />
         <meta property="twitter:site" content="@smartygym" />
-        <meta property="twitter:title" content="Online Gym Cyprus | SmartyGym by Haris Falas" />
+        <meta property="twitter:title" content="Online Gym | SmartyGym by Haris Falas" />
         <meta property="twitter:description" content="Professional online fitness training by Sports Scientist Haris Falas at smartygym.com - Train anywhere, anytime" />
         <meta property="twitter:image" content={smartyGymLogo} />
         
@@ -280,34 +271,25 @@ const Index = () => {
           {JSON.stringify({
           "@context": "https://schema.org",
           "@type": ["SportsActivityLocation", "HealthAndBeautyBusiness", "Organization"],
-          "name": "SmartyGym Cyprus",
-          "alternateName": ["Smarty Gym", "smartygym.com", "SmartyGym", "Online Gym Cyprus"],
+          "name": "SmartyGym",
+          "alternateName": ["Smarty Gym", "smartygym.com", "SmartyGym Online Gym"],
           "url": "https://smartygym.com",
           "logo": smartyGymLogo,
           "image": smartyGymLogo,
-          "description": "Cyprus' premier online gym offering professional fitness training by Sports Scientist Haris Falas. Evidence-based workout programs, structured training plans, and personalized coaching. Train anywhere, anytime with expert guidance.",
+          "description": "Premier online gym offering professional fitness training by Sports Scientist Haris Falas. Evidence-based workout programs, structured training plans, and personalized coaching. Train anywhere, anytime with expert guidance.",
           "slogan": "Your Gym Re-imagined. Anywhere, Anytime.",
-          "address": {
-            "@type": "PostalAddress",
-            "addressCountry": "CY",
-            "addressLocality": "Cyprus",
-            "addressRegion": "Cyprus"
-          },
           "founder": {
             "@type": "Person",
             "name": "Haris Falas",
             "jobTitle": "Sports Scientist & Strength and Conditioning Coach",
             "description": "BSc Sports Science, Certified Strength and Conditioning Specialist (CSCS), EXOS Performance Specialist. 20+ years experience in functional training, strength conditioning, and online fitness coaching."
           },
-          "areaServed": [{
-            "@type": "Country",
-            "name": "Cyprus"
-          }, {
+          "areaServed": {
             "@type": "Place",
             "name": "Worldwide"
-          }],
+          },
           "sameAs": ["https://www.instagram.com/smartygymcy/", "https://www.youtube.com/@TheSmartyGym", "https://www.facebook.com/smartygym"],
-          "availableLanguage": ["English", "Greek"],
+          "availableLanguage": ["English"],
           "priceRange": "€€",
           "knowsAbout": ["Online Fitness", "Personal Training", "Workout Programs", "Strength Training", "HIIT Training", "Functional Fitness", "Sports Science", "Metabolic Conditioning", "Cardio Training", "Mobility Training"],
           "offers": [{
@@ -320,7 +302,7 @@ const Index = () => {
             "description": "Structured long-term training programs for specific fitness goals"
           }, {
             "@type": "Offer",
-            "name": "Online Personal Training Cyprus",
+            "name": "Online Personal Training",
             "description": "Personalized online personal training by Sports Scientist Haris Falas"
           }]
         })}
@@ -330,7 +312,7 @@ const Index = () => {
           {JSON.stringify({
           "@context": "https://schema.org",
           "@type": "WebSite",
-          "name": "SmartyGym Cyprus",
+          "name": "SmartyGym",
           "url": "https://smartygym.com",
           "description": "Professional online fitness training platform",
           "potentialAction": {

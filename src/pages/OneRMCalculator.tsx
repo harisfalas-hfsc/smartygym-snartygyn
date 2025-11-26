@@ -109,18 +109,9 @@ const OneRMCalculator = () => {
     <ProtectedRoute>
       <>
         <Helmet>
-          <title>Free 1RM Calculator Cyprus Greece | One Rep Max | Haris Falas HFSC | SmartyGym</title>
-          <meta name="description" content="Free 1RM calculator Cyprus Greece smartygym.com. Calculate one rep max using Brzycki formula. Professional strength tool by Sports Scientist Haris Falas HFSC Nicosia. Plan gym training Cyprus Greece. Train smart anywhere anytime" />
-          <meta name="keywords" content="1RM calculator Cyprus, one rep max calculator Cyprus, strength calculator Cyprus, personal trainer tools Cyprus, HFSC Nicosia, Haris Falas Cyprus, Sports Scientist Cyprus, 1RM calculator online, max calculator, powerlifting Cyprus, gym training Cyprus, smartygym.com, HFSC Performance, strength training tools Cyprus, γυμναστήριο calculator Κύπρος" />
-          
-          {/* Greek Language */}
-          <link rel="alternate" hrefLang="el" href="https://smartygym.com/1rmcalculator" />
-          <link rel="alternate" hrefLang="en-GB" href="https://smartygym.com/1rmcalculator" />
-          
-          {/* Geo Targeting */}
-          <meta name="geo.region" content="CY-01; GR" />
-          <meta name="geo.placename" content="Cyprus; Greece" />
-          <meta name="geo.position" content="35.1856;33.3823" />
+          <title>Free 1RM Calculator | One Rep Max | Haris Falas HFSC | SmartyGym</title>
+          <meta name="description" content="Free 1RM calculator at smartygym.com. Calculate one rep max using Brzycki formula. Professional strength tool by Sports Scientist Haris Falas HFSC. Plan gym training. Train smart anywhere anytime" />
+          <meta name="keywords" content="1RM calculator, one rep max calculator, strength calculator, online personal trainer tools, HFSC, Haris Falas, Sports Scientist, 1RM calculator online, max calculator, powerlifting, gym training, smartygym.com, HFSC Performance, strength training tools" />
           
           <meta property="og:title" content="Free 1RM Calculator | One Rep Max Calculator | SmartyGym" />
           <meta property="og:description" content="Calculate your one rep max with our free online 1RM calculator at smartygym.com - Professional strength training tool by Haris Falas" />
@@ -161,7 +152,7 @@ const OneRMCalculator = () => {
           expertise={["sports science", "strength conditioning", "exercise science"]}
           contentType="fitness-calculator"
           fitnessGoal="strength"
-          aiSummary="Free online 1RM calculator for calculating one rep max using Brzycki formula. Professional strength training tool by Sports Scientist Haris Falas at SmartyGym Cyprus."
+          aiSummary="Free online 1RM calculator for calculating one rep max using Brzycki formula. Professional strength training tool by Sports Scientist Haris Falas at SmartyGym."
           aiKeywords={["1RM", "one rep max", "strength calculator", "powerlifting", "Brzycki formula", "training percentages", "gym tools", "fitness calculator"]}
           relatedContent={["strength training workouts", "powerlifting programs", "gym tools"]}
         />
