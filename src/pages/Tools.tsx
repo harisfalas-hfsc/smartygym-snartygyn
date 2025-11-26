@@ -43,18 +43,34 @@ const Tools = () => {
   return (
     <>
       <Helmet>
-        <title>Free Fitness Calculators Cyprus Greece | 1RM BMR Macro | Haris Falas HFSC | SmartyGym</title>
-        <meta name="description" content="Free fitness calculators Cyprus Greece smartygym.com. 1RM Calculator BMR Calculator Macro Tracking by Sports Scientist Haris Falas HFSC Nicosia. Professional gym tools online Cyprus for strength nutrition planning. Train smart anywhere anytime" />
-        <meta name="keywords" content="fitness calculators Cyprus, gym calculators Cyprus, 1RM calculator Cyprus, BMR calculator Cyprus, personal trainer tools Cyprus, online gym Cyprus, Cyprus fitness tools, HFSC Nicosia, Haris Falas Cyprus, Sports Scientist Cyprus, fitness tools online, gym training tools, macro calculator, strength calculator, nutrition calculator, smartygym.com, HFSC Performance, workout planning tools Cyprus" />
+        <title>Free Fitness Calculators | 1RM BMR Macro | Haris Falas HFSC | SmartyGym</title>
+        <meta name="description" content="Free fitness calculators at smartygym.com. 1RM Calculator, BMR Calculator, Macro Tracking by Sports Scientist Haris Falas HFSC. Professional gym tools online for strength & nutrition planning. Train smart anywhere, anytime." />
+        <meta name="keywords" content="fitness calculators, gym calculators, 1RM calculator, BMR calculator, personal trainer tools, online gym, fitness tools, HFSC, Haris Falas, Sports Scientist, fitness tools online, gym training tools, macro calculator, strength calculator, nutrition calculator, smartygym.com, HFSC Performance, workout planning tools" />
         
         {/* Greek Language */}
         <link rel="alternate" hrefLang="el" href="https://smartygym.com/tools" />
         <link rel="alternate" hrefLang="en-GB" href="https://smartygym.com/tools" />
+      </Helmet>
         
-        {/* Geo Targeting */}
-        <meta name="geo.region" content="CY-01; GR" />
-        <meta name="geo.placename" content="Cyprus; Greece" />
-        <meta name="geo.position" content="35.1856;33.3823" />
+        <meta property="og:title" content="Fitness Tools - SmartyGym | Free Calculators" />
+        <meta property="og:description" content="Free fitness calculators by Haris Falas - convenient tools for flexible training anywhere" />
+        <meta property="og:type" content="website" />
+        <meta property="og:url" content="https://smartygym.com/tools" />
+        <meta property="og:image" content="https://smartygym.com/smarty-gym-logo.png" />
+        
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content="Fitness Tools - SmartyGym" />
+        <meta name="twitter:description" content="Free fitness calculators at smartygym.com for convenient training planning" />
+        <meta name="twitter:image" content="https://smartygym.com/smarty-gym-logo.png" />
+        
+        <link rel="canonical" href="https://smartygym.com/tools" />
+        
+        <script type="application/ld+json">
+          {JSON.stringify(generateBreadcrumbSchema([
+            { name: "Home", url: "/" },
+            { name: "Tools", url: "/tools" }
+          ]))}
+        </script>
         
         <meta property="og:title" content="Fitness Tools - SmartyGym | Free Calculators" />
         <meta property="og:description" content="Free fitness calculators by Haris Falas - convenient tools for flexible training anywhere" />
@@ -82,7 +98,7 @@ const Tools = () => {
         topics={["fitness tools", "1RM calculator", "BMR calculator", "macro calculator", "strength planning", "nutrition planning"]}
         expertise={["sports science", "exercise physiology", "nutrition science"]}
         contentType="tool-collection"
-        aiSummary="Free online fitness calculators at SmartyGym Cyprus by Sports Scientist Haris Falas. 1RM, BMR, and Macro calculators for professional training planning."
+        aiSummary="Free online fitness calculators at SmartyGym by Sports Scientist Haris Falas. 1RM, BMR, and Macro calculators for professional training planning."
         aiKeywords={["fitness calculators", "1RM calculator", "BMR calculator", "macro calculator", "training tools", "nutrition tools"]}
         relatedContent={["workouts", "training programs", "nutrition guidance"]}
       />

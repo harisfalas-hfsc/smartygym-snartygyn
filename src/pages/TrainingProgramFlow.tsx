@@ -68,18 +68,14 @@ const TrainingProgramFlow = () => {
   };
   return <>
       <Helmet>
-        <title>Online Training Programs Cyprus Greece | Structured Plans | Haris Falas HFSC | SmartyGym</title>
-        <meta name="description" content="Structured online training programs Cyprus Greece smartygym.com. Cardio strength muscle growth weight loss mobility programs by Sports Scientist Haris Falas HFSC Nicosia. Long-term gym programs online Cyprus anywhere anytime γυμναστήριο προγράμματα Κύπρος" />
-        <meta name="keywords" content="online training programs Cyprus, training programs Cyprus, gym programs Cyprus, personal trainer Cyprus, fitness programs Cyprus, online gym Greece, HFSC Nicosia, Haris Falas Cyprus, Sports Scientist Cyprus, γυμναστήριο προγράμματα Κύπρος, online fitness Ελλάδα, structured training programs, cardio programs, strength programs, muscle hypertrophy, weight loss programs, mobility programs, gym training online, smartygym.com, HFSC Performance, functional training Cyprus" />
+        <title>Online Training Programs | Structured Plans | Haris Falas HFSC | SmartyGym</title>
+        <meta name="description" content="Structured online training programs at smartygym.com. Cardio, strength, muscle growth, weight loss, and mobility programs by Sports Scientist Haris Falas HFSC. Long-term gym programs online - train anywhere, anytime." />
+        <meta name="keywords" content="online training programs, training programs, gym programs, personal trainer, fitness programs, online gym, HFSC, Haris Falas, Sports Scientist, structured training programs, cardio programs, strength programs, muscle hypertrophy, weight loss programs, mobility programs, gym training online, smartygym.com, HFSC Performance, functional training" />
         
         {/* Greek Language */}
         <link rel="alternate" hrefLang="el" href="https://smartygym.com/trainingprogram" />
         <link rel="alternate" hrefLang="en-GB" href="https://smartygym.com/trainingprogram" />
-        
-        {/* Geo Targeting */}
-        <meta name="geo.region" content="CY-01; GR" />
-        <meta name="geo.placename" content="Cyprus; Greece" />
-        <meta name="geo.position" content="35.1856;33.3823" />
+      </Helmet>
         
         <meta property="og:title" content="Training Programs - SmartyGym.com" />
         <meta property="og:description" content="Structured training programs designed by Sports Scientist Haris Falas" />
@@ -91,6 +87,27 @@ const TrainingProgramFlow = () => {
         <meta name="twitter:description" content="Structured training programs designed by Sports Scientist Haris Falas" />
         
         <link rel="canonical" href="https://smartygym.com/training-program" />
+        
+        <meta property="og:title" content="Training Programs - SmartyGym.com" />
+        <meta property="og:description" content="Structured training programs designed by Sports Scientist Haris Falas" />
+        <meta property="og:type" content="website" />
+        <meta property="og:url" content="https://smartygym.com/training-program" />
+        
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content="Training Programs - SmartyGym" />
+        <meta name="twitter:description" content="Structured training programs designed by Sports Scientist Haris Falas" />
+        
+        <link rel="canonical" href="https://smartygym.com/training-program" />
+        
+        <script type="application/ld+json">
+          {JSON.stringify(generateBreadcrumbSchema([{
+          name: "Home",
+          url: "/"
+        }, {
+          name: "Training Programs",
+          url: "/trainingprogram"
+        }]))}
+        </script>
       </Helmet>
       
       <div className="min-h-screen bg-background">
@@ -160,7 +177,7 @@ const TrainingProgramFlow = () => {
                       {program.equipment}
                     </span>
                   </div>
-                      <meta itemProp="provider" content="Smarty Gym Cyprus - Online Gym - smartygym.com" />
+                      <meta itemProp="provider" content="Smarty Gym - Online Gym - smartygym.com" />
                       <meta itemProp="courseMode" content="Online" />
                       <meta itemProp="availableLanguage" content="English" />
                     </div>

@@ -314,7 +314,7 @@ const Contact = () => {
     <>
       <Helmet>
         <title>Contact SmartyGym | Haris Falas HFSC | Online Gym Personal Trainer</title>
-        <meta name="description" content="Contact SmartyGym at smartygym.com. Reach Sports Scientist Haris Falas HFSC for online gym personal training. Expert fitness advice. Contact online personal trainer. Message us anywhere anytime" />
+        <meta name="description" content="Contact SmartyGym at smartygym.com. Reach Sports Scientist Haris Falas HFSC for online gym personal training, expert fitness advice, and support." />
         <meta name="keywords" content="contact SmartyGym, contact Haris Falas, online personal trainer contact, HFSC contact, online gym contact, Sports Scientist contact, fitness coach contact, online gym support, smartygym.com contact, HFSC Performance contact, training inquiry" />
         
         <meta property="og:title" content="Contact SmartyGym.com | Haris Falas" />

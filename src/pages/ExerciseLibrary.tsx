@@ -14,18 +14,13 @@ const ExerciseLibrary = () => {
   return (
     <>
       <Helmet>
-        <title>Exercise Library Cyprus Greece | Workout Videos | Haris Falas HFSC | SmartyGym YouTube</title>
-        <meta name="description" content="Exercise library Cyprus Greece smartygym.com. 100+ workout videos demonstrations by Sports Scientist Haris Falas HFSC Nicosia. Watch The Smarty Gym YouTube channel. Exercise technique videos Cyprus Greece for anywhere anytime training γυμναστήριο videos Κύπρος" />
-        <meta name="keywords" content="exercise library Cyprus, workout videos Cyprus, gym exercise videos Cyprus, personal trainer videos Cyprus, HFSC Nicosia, Haris Falas Cyprus, Sports Scientist Cyprus, The Smarty Gym YouTube, exercise library Greece, online gym videos, gym demonstrations Cyprus, workout tutorials Cyprus, smartygym.com, HFSC Performance, training videos Cyprus, exercise technique Cyprus" />
+        <title>Exercise Library | Workout Videos | Haris Falas HFSC | SmartyGym YouTube</title>
+        <meta name="description" content="Exercise library at smartygym.com. 100+ workout video demonstrations by Sports Scientist Haris Falas HFSC. Watch The Smarty Gym YouTube channel. Exercise technique videos for anywhere, anytime training." />
+        <meta name="keywords" content="exercise library, workout videos, gym exercise videos, personal trainer videos, HFSC, Haris Falas, Sports Scientist, The Smarty Gym YouTube, online gym videos, gym demonstrations, workout tutorials, smartygym.com, HFSC Performance, training videos, exercise technique" />
         
         {/* Greek Language */}
         <link rel="alternate" hrefLang="el" href="https://smartygym.com/exerciselibrary" />
         <link rel="alternate" hrefLang="en-GB" href="https://smartygym.com/exerciselibrary" />
-        
-        {/* Geo Targeting */}
-        <meta name="geo.region" content="CY-01; GR" />
-        <meta name="geo.placename" content="Cyprus; Greece" />
-        <meta name="geo.position" content="35.1856;33.3823" />
         
         <meta property="og:title" content="Exercise Library - Smarty Gym | YouTube Channel" />
         <meta property="og:description" content="Watch exercise demonstrations on The Smarty Gym YouTube channel by Haris Falas - Inside Smarty Gym" />

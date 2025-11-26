@@ -233,21 +233,21 @@ const PersonalTraining = () => {
   return (
     <>
       <Helmet>
-        <title>Online Personal Training Cyprus | Haris Falas Sports Scientist | smartygym.com</title>
-        <meta name="description" content="Premium online personal training Cyprus by Haris Falas - BSc Sports Science, CSCS. Customized gym programs tailored to YOUR goals. #1 Cyprus personal trainer with 20+ years experience. Online fitness coaching at smartygym.com" />
-        <meta name="keywords" content="online personal training, personal training Cyprus, Cyprus personal trainers, online personal training Cyprus, Haris Falas personal training, Haris Falas Cyprus, Cyprus fitness, personal training online, online fitness coach Cyprus, Cyprus fitness trainer, personal trainer Cyprus, gym personal training Cyprus, customized workout plans, tailored training programs online, personalized gym programs, sports scientist Cyprus, strength and conditioning coach Cyprus, online gym personal training, virtual personal training Cyprus, Cyprus online fitness coaching, personal training services Cyprus, Cyprus gym trainer, online coaching Cyprus" />
+        <title>Online Personal Training | Haris Falas Sports Scientist | smartygym.com</title>
+        <meta name="description" content="Premium online personal training by Haris Falas - BSc Sports Science, CSCS. Customized gym programs tailored to YOUR goals. Expert personal trainer with 20+ years experience. Online fitness coaching at smartygym.com" />
+        <meta name="keywords" content="online personal training, personal training, Haris Falas personal training, Haris Falas, online fitness, personal trainer, fitness trainer, online gym personal training, customized workout plans, tailored training programs online, personalized gym programs, sports scientist, strength and conditioning coach, online coaching, virtual personal training, online fitness coaching, personal training services, gym trainer, coaching" />
         
         {/* Open Graph */}
         <meta property="og:type" content="website" />
         <meta property="og:url" content={window.location.href} />
-        <meta property="og:title" content="Online Personal Training Cyprus | Haris Falas" />
-        <meta property="og:description" content="Customized online personal training by Cyprus Sports Scientist Haris Falas. Professional personal trainer with proven expertise." />
-        <meta property="og:site_name" content="SmartyGym Cyprus" />
+        <meta property="og:title" content="Online Personal Training | Haris Falas" />
+        <meta property="og:description" content="Customized online personal training by Sports Scientist Haris Falas. Professional personal trainer with proven expertise." />
+        <meta property="og:site_name" content="SmartyGym" />
         
         {/* Twitter */}
         <meta name="twitter:card" content="summary_large_image" />
-        <meta name="twitter:title" content="Online Personal Training Cyprus | Haris Falas" />
-        <meta name="twitter:description" content="Customized online personal training by Cyprus Sports Scientist Haris Falas" />
+        <meta name="twitter:title" content="Online Personal Training | Haris Falas" />
+        <meta name="twitter:description" content="Customized online personal training by Sports Scientist Haris Falas" />
         
         <link rel="canonical" href={window.location.href} />
         
@@ -257,15 +257,15 @@ const PersonalTraining = () => {
             "@context": "https://schema.org",
             "@type": "Service",
             "serviceType": "Online Personal Training",
-            "name": "Online Personal Training Cyprus",
-            "description": "Customized online personal training programs designed by Sports Scientist Haris Falas for clients in Cyprus and worldwide",
+            "name": "Online Personal Training",
+            "description": "Customized online personal training programs designed by Sports Scientist Haris Falas for clients worldwide",
             "provider": {
               "@type": "Person",
               "name": "Haris Falas",
               "jobTitle": "Sports Scientist & Personal Trainer",
-              "description": "Cyprus personal trainer with 20+ years experience in strength and conditioning"
+              "description": "Online personal trainer with 20+ years experience in strength and conditioning"
             },
-            "areaServed": ["Cyprus", "Worldwide"],
+            "areaServed": "Worldwide",
             "availableLanguage": "English",
             "offers": {
               "@type": "Offer",

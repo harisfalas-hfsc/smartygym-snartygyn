@@ -68,18 +68,13 @@ const WorkoutFlow = () => {
   };
   return <>
       <Helmet>
-        <title>Online Gym Workouts Cyprus Greece | AMRAP TABATA HIIT | Haris Falas | SmartyGym HFSC</title>
-        <meta name="description" content="500+ online gym workouts Cyprus Greece smartygym.com. AMRAP TABATA HIIT strength cardio by Sports Scientist Haris Falas HFSC Nicosia. Home workouts Cyprus, bodyweight training, equipment workouts. Train anywhere anytime γυμναστήριο online Κύπρος" />
-        <meta name="keywords" content="online gym Cyprus, online workouts Cyprus, gym workouts Cyprus, personal trainer Cyprus, home workouts Cyprus, Cyprus fitness, online gym Greece, HFSC Nicosia, Haris Falas Cyprus, Sports Scientist Cyprus, γυμναστήριο online Κύπρος, γυμναστική από το σπίτι, AMRAP workouts, TABATA training, HIIT workouts, strength training workouts, cardio workouts, bodyweight training, home gym workouts, online gym training, smartygym.com, HFSC Performance, functional fitness Cyprus, metabolic training, mobility training" />
+        <title>Online Gym Workouts | AMRAP TABATA HIIT | Haris Falas | SmartyGym HFSC</title>
+        <meta name="description" content="500+ online gym workouts at smartygym.com. AMRAP, TABATA, HIIT, strength, cardio by Sports Scientist Haris Falas HFSC. Home workouts, bodyweight training, equipment workouts. Train anywhere, anytime." />
+        <meta name="keywords" content="online gym, online workouts, gym workouts, personal trainer, home workouts, online fitness, HFSC, Haris Falas, Sports Scientist, AMRAP workouts, TABATA training, HIIT workouts, strength training workouts, cardio workouts, bodyweight training, home gym workouts, online gym training, smartygym.com, HFSC Performance, functional fitness, metabolic training, mobility training" />
         
         {/* Greek Language */}
         <link rel="alternate" hrefLang="el" href="https://smartygym.com/workout" />
         <link rel="alternate" hrefLang="en-GB" href="https://smartygym.com/workout" />
-        
-        {/* Geo Targeting */}
-        <meta name="geo.region" content="CY-01; GR" />
-        <meta name="geo.placename" content="Cyprus; Greece" />
-        <meta name="geo.position" content="35.1856;33.3823" />
         
         <meta property="og:title" content="Workouts - SmartyGym | Fitness Re-imagined" />
         <meta property="og:description" content="Convenient & flexible workouts designed by Sports Scientist Haris Falas - train anywhere, anytime" />
@@ -144,7 +139,7 @@ const WorkoutFlow = () => {
           {workoutTypes.map(workout => {
             const Icon = workout.icon;
             return <ScrollReveal key={workout.id}>
-                <Card itemScope itemType="https://schema.org/ExercisePlan" onClick={() => handleWorkoutSelect(workout.id)} className="group p-6 cursor-pointer transition-all duration-500 ease-out transform-gpu hover:scale-110 hover:-translate-y-3 hover:shadow-2xl hover:shadow-primary/40 hover:border-primary/60 bg-card border-2 border-border" role="button" aria-label={`${workout.title} workouts - Online gym category at Smarty Gym Cyprus - smartygym.com by Haris Falas`} data-workout-category={workout.id} data-keywords="online gym workouts, smarty gym, online fitness, smartygym.com, Haris Falas Cyprus workouts">
+                <Card itemScope itemType="https://schema.org/ExercisePlan" onClick={() => handleWorkoutSelect(workout.id)} className="group p-6 cursor-pointer transition-all duration-500 ease-out transform-gpu hover:scale-110 hover:-translate-y-3 hover:shadow-2xl hover:shadow-primary/40 hover:border-primary/60 bg-card border-2 border-border" role="button" aria-label={`${workout.title} workouts - Online gym category at Smarty Gym Cyprus - smartygym.com by Haris Falas`} data-workout-category={workout.id} data-keywords="online gym workouts, smarty gym, online fitness, smartygym.com, Haris Falas workouts">
                   <div className="flex flex-col items-center text-center space-y-4">
                     <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center transition-transform duration-300 group-hover:scale-110" aria-hidden="true">
                       <Icon className="w-8 h-8 text-primary transition-transform duration-300 group-hover:rotate-3" />
@@ -177,7 +172,7 @@ const WorkoutFlow = () => {
               </div>
               
               <meta itemProp="exerciseType" content={workout.title} />
-              <meta itemProp="provider" content="Smarty Gym Cyprus - Online Gym - smartygym.com" />
+              <meta itemProp="provider" content="Smarty Gym - Online Gym - smartygym.com" />
               <meta itemProp="audience" content="All fitness levels" />
                     </div>
                   </div>
