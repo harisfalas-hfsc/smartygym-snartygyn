@@ -1,9 +1,11 @@
 import { useNavigate } from "react-router-dom";
+import { Helmet } from "react-helmet";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { ArrowLeft, Dumbbell, Flame, Zap, Heart, Move, Activity, Scale, User } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { EmailCaptureBox } from "@/components/EmailCaptureBox";
+import { SEOEnhancer } from "@/components/SEOEnhancer";
 
 import { useShowBackButton } from "@/hooks/useShowBackButton";
 import { useAccessControl } from "@/hooks/useAccessControl";
@@ -102,6 +104,64 @@ const FreeContent = () => {
   };
 
   return (
+    <>
+      <Helmet>
+        <title>Free Workouts & Training Programs | No Login Required | SmartyGym</title>
+        <meta name="description" content="Access free workouts and training programs at SmartyGym. No login required. Strength, cardio, metabolic, mobility workouts by Sports Scientist Haris Falas. Train anywhere, anytime." />
+        <meta name="keywords" content="free workouts, free training programs, online fitness free, home workouts free, HIIT free, strength training free, bodyweight workouts, fitness app, online gym, SmartyGym, free exercise programs, no login fitness" />
+        <link rel="canonical" href="https://smartygym.com/freecontent" />
+        
+        <meta property="og:title" content="Free Workouts & Programs | SmartyGym" />
+        <meta property="og:description" content="Access free workouts and training programs. No login required. Start your fitness journey today." />
+        <meta property="og:type" content="website" />
+        <meta property="og:url" content="https://smartygym.com/freecontent" />
+        <meta property="og:image" content="https://smartygym.com/smarty-gym-logo.png" />
+        <meta property="og:site_name" content="SmartyGym" />
+        
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content="Free Workouts | SmartyGym" />
+        <meta name="twitter:description" content="Free workouts and programs - no login required" />
+        <meta name="twitter:image" content="https://smartygym.com/smarty-gym-logo.png" />
+        
+        <script type="application/ld+json">
+          {JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "ItemList",
+            "name": "Free Workouts and Training Programs",
+            "description": "Collection of free fitness workouts and training programs accessible without login",
+            "itemListElement": [
+              {
+                "@type": "ExercisePlan",
+                "name": "Free Strength Workouts",
+                "description": "Bodyweight and resistance training for building muscle and power"
+              },
+              {
+                "@type": "ExercisePlan",
+                "name": "Free Cardio Workouts",
+                "description": "Cardiovascular endurance and stamina workouts"
+              },
+              {
+                "@type": "Course",
+                "name": "Free Training Programs",
+                "description": "Structured multi-week programs for various fitness goals"
+              }
+            ]
+          })}
+        </script>
+      </Helmet>
+      
+      <SEOEnhancer 
+        entities={["SmartyGym", "Haris Falas", "Free Workouts", "Free Programs"]}
+        topics={["free workouts", "home fitness", "bodyweight training", "free exercise programs", "no login fitness"]}
+        expertise={["Sports Science", "Exercise Programming"]}
+        contentType="workout-collection"
+        aiSummary="SmartyGym offers free workouts and training programs accessible without login. Includes strength, cardio, metabolic, and mobility workouts designed by Sports Scientist Haris Falas. Perfect for home fitness and gym training."
+        aiKeywords={["free workouts", "free training programs", "home workouts", "online fitness free", "bodyweight training", "free exercise app", "no login fitness"]}
+        relatedContent={["Premium Workouts", "Training Programs", "Exercise Library", "Fitness Tools"]}
+        targetAudience="fitness beginners, home workout enthusiasts, budget-conscious fitness seekers"
+        pageType="CollectionPage"
+      />
+
     <div className="min-h-screen bg-background">
       
       <div className="container mx-auto max-w-6xl px-4 py-8">
@@ -229,6 +289,7 @@ const FreeContent = () => {
         )}
       </div>
     </div>
+    </>
   );
 };
 

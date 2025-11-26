@@ -139,7 +139,7 @@ const WorkoutFlow = () => {
           {workoutTypes.map(workout => {
             const Icon = workout.icon;
             return <ScrollReveal key={workout.id}>
-                <Card itemScope itemType="https://schema.org/ExercisePlan" onClick={() => handleWorkoutSelect(workout.id)} className="group p-6 cursor-pointer transition-all duration-500 ease-out transform-gpu hover:scale-110 hover:-translate-y-3 hover:shadow-2xl hover:shadow-primary/40 hover:border-primary/60 bg-card border-2 border-border" role="button" aria-label={`${workout.title} workouts - Online gym category at Smarty Gym Cyprus - smartygym.com by Haris Falas`} data-workout-category={workout.id} data-keywords="online gym workouts, smarty gym, online fitness, smartygym.com, Haris Falas workouts">
+                <Card itemScope itemType="https://schema.org/ExercisePlan" onClick={() => handleWorkoutSelect(workout.id)} className="group p-6 cursor-pointer transition-all duration-500 ease-out transform-gpu hover:scale-110 hover:-translate-y-3 hover:shadow-2xl hover:shadow-primary/40 hover:border-primary/60 bg-card border-2 border-border" role="button" aria-label={`${workout.title} workouts - Online gym category at SmartyGym - smartygym.com by Haris Falas`} data-workout-category={workout.id} data-keywords="online gym workouts, smarty gym, online fitness, smartygym.com, Haris Falas workouts">
                   <div className="flex flex-col items-center text-center space-y-4">
                     <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center transition-transform duration-300 group-hover:scale-110" aria-hidden="true">
                       <Icon className="w-8 h-8 text-primary transition-transform duration-300 group-hover:rotate-3" />
