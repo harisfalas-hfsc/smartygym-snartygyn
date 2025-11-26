@@ -188,16 +188,9 @@ const MacroTrackingCalculator = () => {
   return (
     <ProtectedRoute>
       <Helmet>
-        <title>Macro Calculator Cyprus Greece | Free Macronutrient Nutrition | Haris Falas HFSC | SmartyGym</title>
-        <meta name="description" content="Free macro calculator Cyprus Greece smartygym.com. Calculate protein carbs fats for weight loss muscle gain. Personalized nutrition by Sports Scientist Haris Falas HFSC Nicosia. Plan meals Cyprus Greece. Train smart anywhere anytime" />
-        <meta name="keywords" content="macro calculator Cyprus, macronutrient calculator Cyprus, nutrition calculator Cyprus, personal trainer nutrition Cyprus, HFSC Nicosia, Haris Falas Cyprus, Sports Scientist Cyprus, protein calculator, TDEE calculator Cyprus, meal planning Cyprus, nutrition planning Cyprus, smartygym.com, HFSC Performance, weight loss nutrition Cyprus, muscle gain nutrition, γυμναστήριο διατροφή Κύπρος" />
-        
-        {/* Greek Language */}
-        <link rel="alternate" hrefLang="el" href="https://smartygym.com/macrocalculator" />
-        <link rel="alternate" hrefLang="en-GB" href="https://smartygym.com/macrocalculator" />
-        
-        {/* Geo Targeting */}
-        <meta name="geo.region" content="CY-01; GR" />
+        <title>Macro Calculator | Free Macronutrient Nutrition | Haris Falas HFSC | SmartyGym</title>
+        <meta name="description" content="Free macro calculator at smartygym.com. Calculate protein carbs fats for weight loss muscle gain. Personalized nutrition by Sports Scientist Haris Falas HFSC. Plan meals. Train smart anywhere anytime" />
+        <meta name="keywords" content="macro calculator, macronutrient calculator, nutrition calculator, online personal trainer nutrition, HFSC, Haris Falas, Sports Scientist, protein calculator, TDEE calculator, meal planning, nutrition planning, smartygym.com, HFSC Performance, weight loss nutrition, muscle gain nutrition" />
         <meta name="geo.placename" content="Cyprus; Greece" />
         <meta name="geo.position" content="35.1856;33.3823" />
         

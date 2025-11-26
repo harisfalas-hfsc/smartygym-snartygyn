@@ -82,28 +82,19 @@ const Blog = () => {
   return (
     <>
       <Helmet>
-        <title>Fitness Blog Cyprus Greece | Expert Articles | Haris Falas HFSC | SmartyGym</title>
-        <meta name="description" content="Fitness blog Cyprus Greece smartygym.com. Expert articles on strength training cardio nutrition by Sports Scientist Haris Falas HFSC Nicosia. Evidence-based fitness content for Cyprus Greece online gym training. Real results anywhere anytime" />
-        <meta name="keywords" content="fitness blog Cyprus, fitness articles Cyprus, personal trainer blog Cyprus, Cyprus fitness, HFSC Nicosia, Haris Falas Cyprus, Sports Scientist Cyprus, strength training articles, cardio training tips, nutrition guides Cyprus, fitness blog Greece, online gym Cyprus, workout guides, training tips, smartygym.com, HFSC Performance, evidence-based fitness, γυμναστήριο blog Κύπρος" />
-        
-        {/* Greek Language */}
-        <link rel="alternate" hrefLang="el" href="https://smartygym.com/blog" />
-        <link rel="alternate" hrefLang="en-GB" href="https://smartygym.com/blog" />
-        
-        {/* Geo Targeting */}
-        <meta name="geo.region" content="CY-01; GR" />
-        <meta name="geo.placename" content="Cyprus; Greece" />
-        <meta name="geo.position" content="35.1856;33.3823" />
+        <title>Fitness Blog | Expert Articles | Haris Falas HFSC | SmartyGym</title>
+        <meta name="description" content="Fitness blog at smartygym.com. Expert articles on strength training cardio nutrition by Sports Scientist Haris Falas HFSC. Evidence-based fitness content for online gym training. Real results anywhere anytime" />
+        <meta name="keywords" content="fitness blog, fitness articles, online personal trainer blog, HFSC, Haris Falas, Sports Scientist, strength training articles, cardio training tips, nutrition guides, online gym, workout guides, training tips, smartygym.com, HFSC Performance, evidence-based fitness" />
         
         <meta property="og:title" content="Fitness Blog - Expert Training & Nutrition Advice by Haris Falas | SmartyGym" />
-        <meta property="og:description" content="Expert fitness articles by Cyprus sports scientist Haris Falas. Training tips, nutrition advice, and performance insights." />
+        <meta property="og:description" content="Expert fitness articles by sports scientist Haris Falas. Training tips, nutrition advice, and performance insights." />
         <meta property="og:type" content="website" />
         <meta property="og:url" content={window.location.href} />
         <meta property="og:image" content="https://images.unsplash.com/photo-1581009146145-b5ef050c2e1e?auto=format&fit=crop&q=80&w=1200" />
         
         <meta name="twitter:card" content="summary_large_image" />
         <meta name="twitter:title" content="Fitness Blog by Haris Falas - SmartyGym.com" />
-        <meta name="twitter:description" content="Expert fitness articles by Cyprus sports scientist Haris Falas. Training tips, nutrition advice, and performance insights." />
+        <meta name="twitter:description" content="Expert fitness articles by sports scientist Haris Falas. Training tips, nutrition advice, and performance insights." />
         <meta name="twitter:image" content="https://images.unsplash.com/photo-1581009146145-b5ef050c2e1e?auto=format&fit=crop&q=80&w=1200" />
         
         <link rel="canonical" href={window.location.href} />
@@ -114,16 +105,12 @@ const Blog = () => {
             "@context": "https://schema.org",
             "@type": "Blog",
             "name": "SmartyGym Fitness Blog",
-            "description": "Expert fitness and nutrition advice by Cyprus sports scientist Haris Falas",
+            "description": "Expert fitness and nutrition advice by sports scientist Haris Falas",
             "url": "https://smartygym.com/blog",
             "author": {
               "@type": "Person",
               "name": "Haris Falas",
-              "jobTitle": "Sports Scientist & Strength and Conditioning Coach",
-              "address": {
-                "@type": "PostalAddress",
-                "addressCountry": "CY"
-              }
+              "jobTitle": "Sports Scientist & Strength and Conditioning Coach"
             },
             "inLanguage": "en",
             "publisher": {
@@ -193,13 +180,13 @@ const Blog = () => {
                 className="overflow-hidden cursor-pointer transition-all duration-300 hover:scale-105 hover:shadow-lg"
                 onClick={() => navigate(`/blog/${article.slug}`)}
                 data-article-id={article.id}
-                data-keywords="smarty gym blog, online fitness tips, smartygym.com, Haris Falas Cyprus, online gym advice"
-                aria-label={`${article.title} - SmartyGym Cyprus blog - Online fitness at smartygym.com`}
+                data-keywords="smarty gym blog, online fitness tips, smartygym.com, Haris Falas, online gym advice"
+                aria-label={`${article.title} - SmartyGym blog - Online fitness at smartygym.com`}
               >
                 <div className="relative h-48 overflow-hidden">
                   <img
                     src={article.image}
-                    alt={`${article.title} - SmartyGym Cyprus online fitness blog - smartygym.com by Haris Falas`}
+                    alt={`${article.title} - SmartyGym online fitness blog - smartygym.com by Haris Falas`}
                     className="w-full h-full object-cover"
                     loading="lazy"
                     itemProp="image"
@@ -235,8 +222,8 @@ const Blog = () => {
                       <span itemProp="datePublished">{article.date}</span>
                     </div>
                   </div>
-                  <meta itemProp="author" content="Haris Falas - SmartyGym Cyprus - smartygym.com" />
-                  <meta itemProp="publisher" content="SmartyGym Cyprus - smartygym.com" />
+                  <meta itemProp="author" content="Haris Falas - SmartyGym - smartygym.com" />
+                  <meta itemProp="publisher" content="SmartyGym - smartygym.com" />
                 </div>
               </Card>
             ))}

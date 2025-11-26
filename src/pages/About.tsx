@@ -16,9 +16,9 @@ const About = () => {
   return (
     <>
       <Helmet>
-        <title>About SmartyGym | Online Fitness Platform Cyprus | Science-Based Training</title>
-        <meta name="description" content="Learn about SmartyGym - Cyprus's leading online fitness platform. Science-based workouts, expert coaching by Haris Falas, and accessible training for everyone, anywhere." />
-        <meta name="keywords" content="about smartygym, online fitness platform cyprus, science-based training, haris falas, online personal training, functional workouts, home gym cyprus" />
+        <title>About SmartyGym | Online Fitness Platform | Science-Based Training</title>
+        <meta name="description" content="Learn about SmartyGym - Your leading online fitness platform. Science-based workouts, expert coaching by Haris Falas, and accessible training for everyone, anywhere." />
+        <meta name="keywords" content="about smartygym, online fitness platform, science-based training, haris falas, online personal training, functional workouts, home gym" />
         
         {/* Open Graph */}
         <meta property="og:title" content="About SmartyGym - Your Online Gym Re-imagined" />

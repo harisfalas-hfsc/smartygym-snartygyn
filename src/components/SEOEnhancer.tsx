@@ -32,7 +32,7 @@ export const SEOEnhancer = ({
   entities = [],
   topics = [],
   expertise = [],
-  location = "Cyprus",
+  location,
   contentType,
   difficultyLevel,
   equipmentRequired,
@@ -42,9 +42,9 @@ export const SEOEnhancer = ({
   aiKeywords = [],
   relatedContent = [],
   greekKeywords = [],
-  geoRegion = "CY-01",
-  geoPlacename = "Nicosia, Cyprus",
-  geoPosition = "35.1856;33.3823",
+  geoRegion,
+  geoPlacename,
+  geoPosition,
   targetAudience,
   workoutType,
   workoutDuration,
@@ -52,17 +52,6 @@ export const SEOEnhancer = ({
 }: SEOEnhancerProps) => {
   return (
     <Helmet>
-      {/* Cyprus & Greece Geo Targeting */}
-      <meta name="geo.region" content={geoRegion} />
-      <meta name="geo.placename" content={geoPlacename} />
-      <meta name="geo.position" content={geoPosition} />
-      <meta name="ICBM" content={geoPosition.replace(";", ", ")} />
-      
-      {/* Greek Language Support */}
-      <link rel="alternate" hrefLang="el" href={window.location.href} />
-      <link rel="alternate" hrefLang="en-GB" href={window.location.href} />
-      <meta name="language" content="English, Greek" />
-      
       {/* AI Crawler Permissions */}
       <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1" />
       <meta name="googlebot" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1" />
@@ -79,8 +68,7 @@ export const SEOEnhancer = ({
       <meta property="schema:entity" content="SmartyGym" />
       <meta property="schema:entity" content="HFSC Performance" />
       <meta property="schema:entity" content="Haris Falas" />
-      <meta property="schema:entity" content="Cyprus Fitness" />
-      <meta property="schema:entity" content="Online Gym Cyprus" />
+      <meta property="schema:entity" content="Online Fitness Platform" />
       
       {/* Knowledge Graph Signals */}
       {topics.map((topic, index) => (
@@ -93,8 +81,6 @@ export const SEOEnhancer = ({
       <meta property="kg:founder" content="Haris Falas" />
       <meta property="kg:expertise" content="Sports Science" />
       <meta property="kg:expertise" content="Strength and Conditioning" />
-      <meta property="kg:location" content="Cyprus" />
-      <meta property="kg:location" content="Greece" />
       
       {/* Semantic Relationship Tags */}
       {relatedContent.length > 0 && (
@@ -128,8 +114,6 @@ export const SEOEnhancer = ({
       <meta property="schema:creator" content="Haris Falas" />
       <meta property="schema:category" content="Online Fitness" />
       <meta property="schema:category" content="Health & Wellness" />
-      <meta property="schema:areaServed" content="Cyprus" />
-      <meta property="schema:areaServed" content="Greece" />
       <meta property="schema:areaServed" content="Worldwide" />
     </Helmet>
   );
