@@ -156,7 +156,7 @@ const AppContent = () => {
                 {/* TEMPORARILY DISABLED - Personal Training */}
                 {/* <Route path="/personal-training" element={<PersonalTraining />} /> */}
                 <Route path="/payment-success" element={<PaymentSuccess />} />
-                <Route path="/privacypolicy" element={<PrivacyPolicy />} />
+                <Route path="/privacy-policy" element={<PrivacyPolicy />} />
                 <Route path="/termsofservice" element={<TermsOfService />} />
                 <Route path="/disclaimer" element={<Disclaimer />} />
                 <Route path="/tools" element={<Tools />} />

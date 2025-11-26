@@ -67,7 +67,7 @@ export const Footer = () => {
               </button>
               <span>•</span>
               <button 
-                onClick={() => navigate("/privacypolicy")} 
+                onClick={() => navigate("/privacy-policy")} 
                 className="hover:text-primary transition-colors"
               >
                 Privacy
@@ -149,7 +149,7 @@ export const Footer = () => {
           {/* Legal Links */}
           <div className="flex flex-wrap items-center justify-center gap-4 text-sm text-muted-foreground">
             <button 
-              onClick={() => navigate("/privacypolicy")} 
+              onClick={() => navigate("/privacy-policy")} 
               className="hover:text-primary transition-colors"
             >
               Privacy Policy
