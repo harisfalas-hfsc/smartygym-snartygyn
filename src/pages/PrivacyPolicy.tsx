@@ -8,11 +8,11 @@ const PrivacyPolicy = () => {
     <>
       <Helmet>
         <title>Privacy Policy | SmartyGym.com Online Fitness Platform | smartygym.com</title>
-        <meta name="description" content="Smarty Gym (smartygym.com) Privacy Policy - Learn how Online Fitness Platform protects your personal data. Founded by Haris Falas. GDPR compliant data protection for online fitness members." />
+        <meta name="description" content="Smarty Gym (smartygym.com) Privacy Policy - Learn how Online Fitness Platform protects your personal data. Founded by Haris Falas. GDPR compliant data protection for online fitness members worldwide." />
         <meta name="keywords" content="smartygym privacy, smartygym.com privacy policy, online fitness privacy, Haris Falas, data protection, GDPR fitness platform, online fitness security" />
         
         <meta property="og:title" content="Privacy Policy - SmartyGym.com" />
-        <meta property="og:description" content="How Smarty Gym protects your data - GDPR compliant Cyprus online fitness platform" />
+        <meta property="og:description" content="How Smarty Gym protects your data - GDPR compliant online fitness platform" />
         
         <link rel="canonical" href="https://smartygym.com/privacy-policy" />
       </Helmet>
@@ -31,7 +31,7 @@ const PrivacyPolicy = () => {
                 At <strong>SmartyGym</strong> (smartygym.com), founded by <strong>Haris Falas</strong>, we value your privacy and are committed to protecting your personal data. 
                 This Privacy Policy explains how our <strong>Online Fitness Platform</strong> collects, uses, stores, and protects your information when you visit our
                 website or use our services. Our practices comply with the General Data Protection Regulation (GDPR) 
-                (EU) 2016/679 and applicable Cyprus data protection laws.
+                (EU) 2016/679 and applicable data protection laws.
               </p>
 
               <div className="flex items-start gap-3 mt-6">
@@ -105,7 +105,7 @@ const PrivacyPolicy = () => {
                 <Shield className="h-6 w-6 text-primary mt-1 flex-shrink-0" />
                 <div>
                   <h2 className="text-2xl font-bold mb-3">6. Your Rights</h2>
-                  <p className="text-muted-foreground mb-3">Under GDPR and Cyprus law, you have the right to:</p>
+                  <p className="text-muted-foreground mb-3">Under GDPR and applicable data protection laws, you have the right to:</p>
                   <ul className="space-y-2 text-muted-foreground">
                     <li>Access your personal data.</li>
                     <li>Request correction or deletion of your data.</li>
