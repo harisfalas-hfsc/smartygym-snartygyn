@@ -22,6 +22,7 @@ import { ShopOrdersManager } from "@/components/admin/ShopOrdersManager";
 import { SettingsManager } from "@/components/admin/SettingsManager";
 import { CommentModerationPanel } from "@/components/admin/CommentModerationPanel";
 import { NotificationHistoryManager } from "@/components/admin/NotificationHistoryManager";
+import { AdminDocumentationManager } from "@/components/admin/AdminDocumentationManager";
 import { supabase } from "@/integrations/supabase/client";
 
 export default function AdminBackoffice() {
@@ -247,6 +248,11 @@ export default function AdminBackoffice() {
               <ShoppingBag className="h-3 w-3 sm:h-4 sm:w-4 shrink-0" />
               <span className="hidden sm:inline">Shop</span>
             </TabsTrigger>
+
+            <TabsTrigger value="docs" className="flex items-center justify-center gap-1 sm:gap-1.5 text-xs sm:text-sm px-2 sm:px-3 py-2 sm:py-2.5 whitespace-nowrap flex-shrink-0">
+              <FileText className="h-3 w-3 sm:h-4 sm:w-4 shrink-0" />
+              <span className="hidden sm:inline">Docs</span>
+            </TabsTrigger>
           </TabsList>
 
           <div className="mt-6">
@@ -330,6 +336,10 @@ export default function AdminBackoffice() {
                   <ShopOrdersManager />
                 </TabsContent>
               </Tabs>
+            </TabsContent>
+
+            <TabsContent value="docs" className="mt-0">
+              <AdminDocumentationManager />
             </TabsContent>
           </div>
         </Tabs>
