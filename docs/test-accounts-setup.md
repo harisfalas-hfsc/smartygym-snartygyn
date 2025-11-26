@@ -376,6 +376,55 @@ For issues with test account setup:
 3. Ensure user exists in auth.users before creating subscriptions
 4. Contact dev team with error details
 
+### 7. App Store Reviewer Account
+
+**Email:** `reviewer@smartygym.com`  
+**Password:** `AppReview2025!`
+
+**Purpose:** Dedicated account for iOS/Android app store reviewers during submission process
+
+**Setup:**
+```sql
+-- See full setup instructions in scripts/create-reviewer-account.sql
+-- This script creates a Platinum account with sample activity data
+
+-- Quick setup after user signup:
+INSERT INTO public.user_subscriptions (user_id, plan_type, status, current_period_start, current_period_end)
+SELECT id, 'platinum', 'active', NOW(), NOW() + INTERVAL '1 year'
+FROM auth.users WHERE email = 'reviewer@smartygym.com';
+```
+
+**Can Access:**
+- Everything (full Platinum membership)
+- All premium workouts and training programs
+- All tools and features
+- Sample activity data pre-populated
+
+**Special Features:**
+- Pre-populated workout history (5 completed workouts)
+- Pre-populated training program progress (2 ongoing programs)
+- Sample calculator history (1RM, BMR)
+- Activity log showing 15 days of engagement
+- Long subscription expiration (1 year) to prevent expiry during review
+
+**Testing Scenarios:**
+- ✅ Full app functionality testing
+- ✅ Premium content access verification
+- ✅ Payment flow testing (Stripe test mode)
+- ✅ Dashboard and analytics verification
+
+**Important Notes:**
+- This account is ONLY for app store review purposes
+- Credentials must be provided in App Store Connect / Google Play Console
+- Keep active during entire review process
+- Can be deleted after app approval
+- All payment testing uses Stripe TEST mode
+
+**Cleanup:**
+See `scripts/create-reviewer-account.sql` for cleanup queries (commented out at bottom of file).
+
+---
+
 ## Next Steps
 
 1. ✅ Create all test accounts
