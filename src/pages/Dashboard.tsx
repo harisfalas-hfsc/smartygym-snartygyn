@@ -29,6 +29,8 @@ import {
 } from "lucide-react";
 import smartyGymLogo from "@/assets/smarty-gym-logo.png";
 import { AvatarUpload } from "@/components/AvatarUpload";
+import { Helmet } from "react-helmet";
+import { SEOEnhancer } from "@/components/SEOEnhancer";
 
 interface FavoriteWorkout {
   id: string;
@@ -321,7 +323,25 @@ export default function Dashboard() {
   }
 
   return (
-    <div className="min-h-screen bg-background">
+    <>
+      <Helmet>
+        <title>User Dashboard | SmartyGym | My Workouts & Progress</title>
+        <meta name="description" content="SmartyGym User Dashboard: Track your workouts, training programs, favorites, progress, and calculator history. Manage your fitness journey with personalized tools." />
+        <meta name="robots" content="noindex, nofollow" />
+      </Helmet>
+
+      <SEOEnhancer
+        entities={["User Dashboard", "Fitness Tracking", "Progress Monitor", "Workout History"]}
+        topics={["user portal", "fitness tracking", "workout favorites", "progress monitoring"]}
+        expertise={["user management", "fitness tracking", "progress analytics"]}
+        contentType="User Dashboard"
+        aiSummary="SmartyGym User Dashboard: Personal fitness hub for tracking workouts, training programs, favorites, calculator history, and progress. Manage your complete fitness journey in one place."
+        aiKeywords={["fitness dashboard", "workout tracking", "training progress", "user portal", "fitness history"]}
+        targetAudience="registered users"
+        pageType="ProfilePage"
+      />
+
+      <div className="min-h-screen bg-background">
       {/* Header */}
       <header className="border-b border-border py-3 sm:py-4 px-4">
         <div className="container mx-auto max-w-7xl">
@@ -851,5 +871,6 @@ export default function Dashboard() {
         </Tabs>
       </main>
     </div>
+    </>
   );
-}
+};

@@ -60,6 +60,15 @@ export const SEOEnhancer = ({
       <meta name="PerplexityBot" content="index, follow" />
       <meta name="ClaudeBot" content="index, follow" />
       <meta name="Bingbot" content="index, follow" />
+      <meta name="GoogleOther" content="index, follow" />
+      <meta name="Google-Extended" content="index, follow" />
+      <meta name="Meta-ExternalAgent" content="index, follow" />
+      <meta name="Meta-ExternalFetcher" content="index, follow" />
+      <meta name="Bytespider" content="index, follow" />
+      <meta name="Applebot" content="index, follow" />
+      <meta name="BraveBot" content="index, follow" />
+      <meta name="cohere-ai" content="index, follow" />
+      <meta name="YouBot" content="index, follow" />
       
       {/* Entity Recognition Tags */}
       {entities.map((entity, index) => (
@@ -107,6 +116,17 @@ export const SEOEnhancer = ({
       {greekKeywords.length > 0 && (
         <meta name="greek-keywords" content={greekKeywords.join(", ")} />
       )}
+      
+      {/* E-E-A-T Authority Signals */}
+      <meta name="author-credential" content="BSc Sports Science, CSCS" />
+      <meta name="author-experience" content="20+ years strength and conditioning" />
+      <meta name="content-expertise" content="Sports Science, Exercise Physiology" />
+      <meta name="publisher-type" content="Global Online Fitness Platform" />
+      
+      {/* Global Positioning */}
+      <meta name="geo.coverage" content="global" />
+      <meta name="distribution" content="global" />
+      <meta name="target" content="worldwide" />
       
       {/* Additional Context for AI Understanding */}
       <meta property="schema:brand" content="SmartyGym" />

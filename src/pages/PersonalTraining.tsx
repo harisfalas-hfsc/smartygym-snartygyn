@@ -22,6 +22,7 @@ import { ParQQuestionnaire } from "@/components/ParQQuestionnaire";
 import { PageBreadcrumbs } from "@/components/PageBreadcrumbs";
 import { Loader2, ArrowLeft, Target } from "lucide-react";
 import { useShowBackButton } from "@/hooks/useShowBackButton";
+import { SEOEnhancer } from "@/components/SEOEnhancer";
 
 const PersonalTraining = () => {
   const navigate = useNavigate();
@@ -275,6 +276,18 @@ const PersonalTraining = () => {
           })}
         </script>
       </Helmet>
+
+      <SEOEnhancer
+        entities={["Personal Training", "Customized Programs", "Online Coaching", "Haris Falas"]}
+        topics={["personal training", "online coaching", "customized workouts", "tailored programs"]}
+        expertise={["sports science", "personal training", "program design", "individual coaching"]}
+        contentType="Personal Training Service"
+        aiSummary="Online Personal Training by Sports Scientist Haris Falas. 100% customized training programs designed for your goals, fitness level, equipment, and limitations. Expert coaching with 20+ years experience."
+        aiKeywords={["online personal training", "customized workout plans", "personal trainer online", "tailored training programs", "online fitness coaching", "virtual personal training"]}
+        relatedContent={["Coach Profile", "Training Programs", "Workouts", "Premium Membership"]}
+        targetAudience="individuals seeking personalized coaching"
+        pageType="Service"
+      />
 
       <div className="min-h-screen bg-background py-8 px-4">
         <div className="container mx-auto max-w-4xl">

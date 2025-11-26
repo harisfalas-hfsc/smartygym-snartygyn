@@ -10,6 +10,7 @@ import { useShowBackButton } from "@/hooks/useShowBackButton";
 import { supabase } from "@/integrations/supabase/client";
 import { CompactFilters } from "@/components/CompactFilters";
 import { Link } from "react-router-dom";
+import { SEOEnhancer } from "@/components/SEOEnhancer";
 
 interface Article {
   id: string;
@@ -121,6 +122,18 @@ const Blog = () => {
           })}
         </script>
       </Helmet>
+
+      <SEOEnhancer
+        entities={["Fitness Blog", "Training Articles", "Workout Tips", "Nutrition Advice"]}
+        topics={["fitness education", "training science", "workout techniques", "health tips"]}
+        expertise={["sports science", "exercise physiology", "nutrition", "training methods"]}
+        contentType="Blog Articles"
+        aiSummary="SmartyGym Blog: Expert fitness articles by Sports Scientist Haris Falas. Training tips, workout techniques, nutrition advice, exercise science, and evidence-based fitness education for all levels."
+        aiKeywords={["fitness blog", "training articles", "workout tips", "exercise science", "fitness education", "sports science blog"]}
+        relatedContent={["Workouts", "Training Programs", "Exercise Library", "Fitness Tools"]}
+        targetAudience="fitness enthusiasts seeking knowledge"
+        pageType="Blog"
+      />
 
       <div className="min-h-screen bg-gradient-to-b from-background to-accent/20">
         <div className="container mx-auto max-w-6xl px-4 py-8">

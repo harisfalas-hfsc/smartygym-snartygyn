@@ -40,6 +40,34 @@ Crawl-delay: 10
 User-agent: SemrushBot
 Crawl-delay: 10
 
+User-agent: GoogleOther
+Allow: /
+
+User-agent: Google-Extended
+Allow: /
+
+User-agent: Meta-ExternalAgent
+Allow: /
+
+User-agent: Meta-ExternalFetcher
+Allow: /
+
+User-agent: Applebot
+Allow: /
+
+User-agent: cohere-ai
+Allow: /
+
+User-agent: YouBot
+Allow: /
+
+User-agent: BraveBot
+Allow: /
+
+User-agent: Bytespider
+Allow: /
+Crawl-delay: 2
+
 User-agent: *
 Allow: /
 Crawl-delay: 2

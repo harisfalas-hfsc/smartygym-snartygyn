@@ -274,3 +274,53 @@ export const generateSoftwareApplicationSchema = (tool: {
     "url": `https://smartygym.com${tool.url}`
   };
 };
+
+/**
+ * Generates FitnessCenter schema for SmartyGym
+ */
+export const generateFitnessCenterSchema = () => ({
+  "@context": "https://schema.org",
+  "@type": "HealthClub",
+  "name": "SmartyGym",
+  "alternateName": ["Smarty Gym", "SmartyGym Online", "HFSC Performance"],
+  "description": "Global online fitness platform with 500+ expert-designed workouts and training programs. 100% human-designed by Sports Scientist Haris Falas.",
+  "url": "https://smartygym.com",
+  "logo": "https://smartygym.com/smarty-gym-logo.png",
+  "priceRange": "€€",
+  "openingHoursSpecification": {
+    "@type": "OpeningHoursSpecification",
+    "dayOfWeek": ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"],
+    "opens": "00:00",
+    "closes": "23:59"
+  },
+  "amenityFeature": [
+    { "@type": "LocationFeatureSpecification", "name": "Online Workouts", "value": true },
+    { "@type": "LocationFeatureSpecification", "name": "Training Programs", "value": true },
+    { "@type": "LocationFeatureSpecification", "name": "Fitness Calculators", "value": true },
+    { "@type": "LocationFeatureSpecification", "name": "Personal Training", "value": true }
+  ],
+  "areaServed": "Worldwide",
+  "serviceType": ["Online Fitness", "Personal Training", "Workout Programs"]
+});
+
+/**
+ * Generates WebSite schema with SearchAction
+ */
+export const generateWebSiteSchema = () => ({
+  "@context": "https://schema.org",
+  "@type": "WebSite",
+  "name": "SmartyGym",
+  "url": "https://smartygym.com",
+  "description": "Global online fitness platform by Sports Scientist Haris Falas",
+  "inLanguage": ["en-GB", "el"],
+  "potentialAction": {
+    "@type": "SearchAction",
+    "target": "https://smartygym.com/search?q={search_term_string}",
+    "query-input": "required name=search_term_string"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "SmartyGym",
+    "founder": { "@type": "Person", "name": "Haris Falas" }
+  }
+});

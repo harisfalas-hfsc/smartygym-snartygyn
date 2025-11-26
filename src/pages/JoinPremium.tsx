@@ -19,6 +19,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { User } from "@supabase/supabase-js";
 import { useToast } from "@/hooks/use-toast";
 import { useShowBackButton } from "@/hooks/useShowBackButton";
+import { SEOEnhancer } from "@/components/SEOEnhancer";
 
 export default function JoinPremium() {
   const navigate = useNavigate();
@@ -175,6 +176,18 @@ export default function JoinPremium() {
           })}
         </script>
       </Helmet>
+
+      <SEOEnhancer
+        entities={["Premium Membership", "Online Gym Subscription", "Gold Plan", "Platinum Plan"]}
+        topics={["online gym membership", "fitness subscription", "premium access", "unlimited workouts"]}
+        expertise={["subscription management", "membership benefits", "premium fitness"]}
+        contentType="Membership Plans"
+        aiSummary="SmartyGym Premium Membership: Gold Plan €9.99/month or Platinum Plan €89.99/year. Unlimited access to 500+ workouts, training programs, fitness calculators, and expert coaching by Sports Scientist Haris Falas. Cancel anytime."
+        aiKeywords={["online gym membership", "fitness subscription", "premium workouts", "unlimited training programs", "fitness membership", "gym subscription online"]}
+        relatedContent={["Premium Benefits", "Workout Library", "Training Programs", "Fitness Tools"]}
+        targetAudience="fitness enthusiasts seeking unlimited access"
+        pageType="Product"
+      />
 
       <div className="min-h-screen bg-background">
         <main className="container mx-auto max-w-7xl p-4 py-8">
