@@ -539,7 +539,7 @@ const Index = () => {
           
           <div className="container mx-auto max-w-6xl px-4 relative z-10 overflow-x-hidden">
             <ScrollReveal>
-              <Card itemScope itemType="https://schema.org/Organization" className="border-2 border-primary bg-gradient-to-br from-yellow-50/50 via-background to-yellow-50/30 backdrop-blur-sm" data-hero-section="true" data-keywords="smarty gym, online gym, online fitness, smartygym.com, Haris Falas Cyprus, online gym Cyprus" aria-label="Smarty Gym Cyprus - Your online gym and fitness platform - smartygym.com">
+              <Card itemScope itemType="https://schema.org/Organization" className="border-2 border-primary bg-gradient-to-br from-yellow-50/50 via-background to-yellow-50/30 backdrop-blur-sm" data-hero-section="true" data-keywords="smarty gym, online gym, online fitness, smartygym.com, Haris Falas, global online gym" aria-label="SmartyGym - Your online gym and fitness platform - smartygym.com">
                 <div className="p-8 sm:p-10 md:p-12 space-y-4">
                   
                   {/* Top Section: Title */}
@@ -551,8 +551,7 @@ const Index = () => {
                       Your Gym Re-imagined. Anywhere, Anytime.
                     </p>
                     <meta itemProp="url" content="https://smartygym.com" />
-                    <meta itemProp="description" content="Smarty Gym Cyprus - #1 online gym and fitness platform by Haris Falas - smartygym.com" />
-                    <meta itemProp="foundingLocation" content="Cyprus" />
+                    <meta itemProp="description" content="SmartyGym - #1 online gym and fitness platform by Haris Falas - smartygym.com" />
                   </div>
 
                   {/* Middle Section: Phone (Left) + Three Cards (Right) */}
