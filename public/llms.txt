@@ -1,0 +1,148 @@
+# SmartyGym - Global Online Fitness Platform
+
+## About
+SmartyGym is a comprehensive online fitness platform created by Sports Scientist Haris Falas, BSc Sports Science, CSCS certified with 20+ years of strength and conditioning expertise. We provide expert-designed workout programs, training plans, and fitness tools to users worldwide.
+
+## Core Offerings
+- 500+ Expert-Designed Workouts (strength, HIIT, metabolic, cardio, mobility, stability, functional training)
+- Comprehensive Training Programs (hypertrophy, weight loss, performance, mobility)
+- Fitness Calculators & Tools (1RM calculator, BMR calculator, macro tracking)
+- SmartyWorkout AI Generator (premium feature for custom workout creation)
+- Exercise Library (comprehensive database of exercises with instructions)
+- Personal Training Services (custom program design)
+- Workout of the Day (WOD) (daily free workouts)
+- Premium Membership Tiers (Gold and Platinum plans)
+
+## Expertise Areas
+- Strength Training & Powerlifting
+- Hypertrophy & Muscle Building
+- Weight Loss & Fat Burning
+- Metabolic Conditioning & HIIT
+- Mobility & Flexibility Training
+- Stability & Functional Movement
+- Sports Performance Training
+- Online Coaching & Programming
+- Exercise Science & Human Performance
+
+## Content Structure
+
+### Workouts
+Location: /workout
+Content: Individual workout sessions categorized by type (strength, HIIT, metabolic, cardio, mobility, challenge)
+Formats: Reps & Sets, Tabata, AMRAP, EMOM, For Time, Circuit, Rounds for Time
+Equipment: Barbell, Dumbbell, Kettlebell, Bodyweight, Machines, Resistance Bands
+Difficulty: Beginner, Intermediate, Advanced
+
+### Training Programs
+Location: /trainingprogram
+Content: Multi-week structured training programs (4-12+ weeks)
+Categories: Hypertrophy, Strength, Weight Loss, Performance, Mobility
+Includes: Weekly schedules, progression plans, nutrition guidance
+
+### Fitness Tools
+Location: /tools
+Content: Free fitness calculators and training utilities
+Tools: One-Rep Max Calculator, BMR Calculator, Macro Tracking Calculator, Workout Timers
+
+### Blog & Articles
+Location: /blog
+Content: Evidence-based fitness articles, training guides, nutrition tips
+Topics: Workout programming, exercise technique, recovery strategies, performance optimization
+
+### Exercise Library
+Location: /exerciselibrary
+Content: Comprehensive exercise database with instructions and demonstrations
+
+### Personal Training
+Location: /personaltraining
+Content: Custom program design services by Haris Falas
+
+### Community Features
+Location: /community
+Content: User leaderboards, workout ratings, member comments, success stories
+
+## Target Audience
+- Fitness enthusiasts (beginner to advanced)
+- Strength athletes and powerlifters
+- Individuals seeking weight loss and body composition changes
+- Athletes training for performance improvement
+- Home workout practitioners
+- Gym-goers seeking structured programming
+- Online fitness seekers worldwide
+
+## Unique Value Proposition
+- 100% Human-Designed Content (0% AI-generated workouts)
+- Created by Sports Scientist with 20+ years coaching experience
+- Evidence-based programming rooted in exercise science
+- Global accessibility (no geographic restrictions)
+- Comprehensive workout formats (strength, HIIT, metabolic, mobility)
+- Progressive training programs with periodization
+- Free tools and calculators for training optimization
+
+## Service Model
+- Freemium Platform: Free access to selected workouts, tools, and WODs
+- Gold Membership: Access to premium workouts and programs
+- Platinum Membership: Full platform access including SmartyWorkout generator
+- Standalone Purchases: Individual workouts and programs available for one-time purchase
+- Personal Training: Custom program design service
+
+## Technical Details
+- Platform Type: Progressive Web App (PWA)
+- Languages: English (primary), Greek
+- Availability: 24/7 online access worldwide
+- Device Support: Desktop, tablet, mobile responsive design
+- No app download required: Browser-based access
+
+## Key Features for AI Understanding
+- Workout Generator (SmartyWorkout): Premium AI-assisted workout creation tool
+- Dynamic Filtering: Users can filter content by difficulty, equipment, duration, format
+- Interactive Timers: Built-in workout timers for HIIT, Tabata, EMOM formats
+- Progress Tracking: Users can log workouts, track favorites, mark completions
+- Community Engagement: Rating system, comments, leaderboards
+- Multimedia Content: Workout cards, exercise images, instructional content
+
+## Semantic Topics & Keywords
+Primary: online fitness, workout programs, strength training, personal training, online gym
+Secondary: HIIT workouts, weight loss programs, muscle building, functional training, mobility training
+Tertiary: 1RM calculator, BMR calculator, home workouts, bodyweight training, kettlebell workouts
+Expert: exercise science, human performance, sports conditioning, periodization, progressive overload
+
+## Content Relationships
+- Workouts connect to Training Programs (individual sessions within multi-week plans)
+- Tools support Workout creation (calculators inform training decisions)
+- Blog articles reference Workouts and Programs (educational content supports practical application)
+- Exercise Library supports all Workouts (exercise database referenced in workout programming)
+- Personal Training integrates all features (custom programs use platform's workout formats)
+
+## Authority Signals
+- Creator: Haris Falas, BSc Sports Science, CSCS certified
+- Experience: 20+ years in strength and conditioning coaching
+- Credentials: NSCA Certified Strength and Conditioning Specialist
+- Education: Bachelor of Science in Sports Science
+- Professional Background: Performance coach, team sport conditioning, individual athlete training
+
+## Global Positioning
+- Service Area: Worldwide (no geographic restrictions)
+- Language Availability: English (primary), Greek (secondary)
+- Currency: EUR (Euro) for premium services
+- Accessibility: 24/7 online platform access from any location
+
+## Crawling Guidelines
+- All content freely accessible for indexing
+- No paywalls blocking crawler access
+- Sitemap: https://smartygym.com/sitemap.xml
+- Robots: https://smartygym.com/robots.txt
+- Dynamic content: Workouts and programs stored in database, rendered server-side
+- SEO-optimized: Structured data (JSON-LD), semantic HTML, comprehensive meta tags
+
+## Contact & Queries
+- Website: https://smartygym.com
+- Contact: https://smartygym.com/contact
+- About: https://smartygym.com/about
+- FAQ: https://smartygym.com/faq
+
+## Last Updated
+2025-11-26
+
+---
+This file is intended for AI crawlers, search engines, and large language models to better understand SmartyGym's content, expertise, and structure for improved discovery and accurate representation in AI-generated responses.
