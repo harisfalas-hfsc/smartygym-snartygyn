@@ -188,32 +188,15 @@ const WorkoutFlow = () => {
 
         {/* Create Your Own Workout Card */}
         <Card className="mt-8 bg-gradient-to-br from-primary/5 via-background to-primary/5 border-2 border-primary/40 shadow-gold">
-          <div className="p-3 sm:p-4">
-            <div className="flex items-center justify-center mb-3">
-              <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mr-3">
-                <Sparkles className="w-8 h-8 text-primary" />
+          <div className="p-6 sm:p-8">
+            <div className="flex flex-col items-center justify-center gap-6">
+              <div className="w-20 h-20 rounded-full bg-primary/10 flex items-center justify-center">
+                <Sparkles className="w-10 h-10 text-primary" />
               </div>
-              <h2 className="text-xl sm:text-2xl font-bold text-center">Create Your Own Workout</h2>
-            </div>
-            
-            <div className="space-y-2 text-muted-foreground max-w-3xl mx-auto">
-              <p className="text-sm sm:text-base text-center">
-                This is <span className="font-semibold text-foreground">NOT</span> your ordinary AI workout generator or a robot creating generic routines.
-              </p>
               
-              <p className="text-sm sm:text-base">
-                This is a <span className="font-semibold text-primary">Smarty Calculator & Generator</span> — a comprehensive library built from <a href="/coach-profile" className="text-primary hover:underline font-medium">Coach Haris Falas</a>'s extensive knowledge, expertise, and real-world database. Every workout protocol comes directly from his coaching practice and the methods he currently uses with all his clients.
-              </p>
-              
-              <p className="text-sm sm:text-base">
-                Get a <span className="font-semibold text-foreground">tailor-made, quick workout</span> created according to YOUR specific needs, characteristics, and goals — all powered by years of sports science expertise and proven training protocols.
-              </p>
-              
-              <div className="flex justify-center mt-4">
-                <Button size="lg" className="cta-button" onClick={() => navigate("/smartyworkout")}>
-                  Create Your Own Workout Now
-                </Button>
-              </div>
+              <Button size="lg" className="cta-button text-base sm:text-lg px-8 py-6" onClick={() => navigate("/smartyworkout")}>
+                Create Your Own Workout Now
+              </Button>
             </div>
           </div>
         </Card>
