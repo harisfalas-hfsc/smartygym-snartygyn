@@ -1,12 +1,23 @@
 import type { CapacitorConfig } from '@capacitor/cli';
 
 const config: CapacitorConfig = {
-  appId: 'app.lovable.f0bf7ae7990c4724b9e4b9150ef73d37',
-  appName: 'smartygym',
+  appId: 'com.smartygym.app',
+  appName: 'SmartyGym',
   webDir: 'dist',
-  server: {
-    url: 'https://f0bf7ae7-990c-4724-b9e4-b9150ef73d37.lovableproject.com?forceHideBadge=true',
-    cleartext: true
+  plugins: {
+    SplashScreen: {
+      launchShowDuration: 2000,
+      launchAutoHide: true,
+      backgroundColor: "#0F0F0F",
+      androidSplashResourceName: "splash",
+      androidScaleType: "CENTER_CROP",
+      showSpinner: false,
+      androidSpinnerStyle: "large",
+      iosSpinnerStyle: "small",
+      spinnerColor: "#FFD700",
+      splashFullScreen: true,
+      splashImmersive: true,
+    }
   }
 };
 
