@@ -19,6 +19,22 @@ import { Button } from "@/components/ui/button";
 import { Trophy, MessageSquare, Star, User, ArrowUpDown, Calendar } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
 import { CompactFilters } from "@/components/CompactFilters";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
+  Pagination,
+  PaginationContent,
+  PaginationItem,
+  PaginationLink,
+  PaginationPrevious,
+  PaginationNext,
+  PaginationEllipsis,
+} from "@/components/ui/pagination";
 
 interface LeaderboardEntry {
   user_id: string;
@@ -63,6 +79,29 @@ const Community = () => {
   const [ratingsFilter, setRatingsFilter] = useState<"workouts" | "programs">("workouts");
   const [commentsFilter, setCommentsFilter] = useState<"all" | "workouts" | "programs">("all");
   const [sortOrder, setSortOrder] = useState<"newest" | "oldest">("newest");
+  
+  // Pagination state
+  const [leaderboardPage, setLeaderboardPage] = useState(1);
+  const [ratingsPage, setRatingsPage] = useState(1);
+  const [commentsPage, setCommentsPage] = useState(1);
+  const ITEMS_PER_PAGE = 10;
+  
+  // Sorting state
+  const [leaderboardSort, setLeaderboardSort] = useState<"completions-desc" | "completions-asc" | "name-asc" | "name-desc">("completions-desc");
+  const [ratingsSort, setRatingsSort] = useState<"rating-desc" | "rating-asc" | "reviews-desc" | "name-asc">("rating-desc");
+
+  // Reset pagination when filters/sort change
+  useEffect(() => {
+    setLeaderboardPage(1);
+  }, [leaderboardFilter, leaderboardSort]);
+
+  useEffect(() => {
+    setRatingsPage(1);
+  }, [ratingsFilter, ratingsSort]);
+
+  useEffect(() => {
+    setCommentsPage(1);
+  }, [commentsFilter, sortOrder]);
 
   useEffect(() => {
     fetchLeaderboards();
@@ -287,6 +326,84 @@ const Community = () => {
     return null;
   };
 
+  // Sorting and pagination logic for leaderboard
+  const getSortedLeaderboard = () => {
+    const data = leaderboardFilter === "workouts" ? workoutLeaderboard : programLeaderboard;
+    const sorted = [...data];
+    
+    switch (leaderboardSort) {
+      case "completions-desc":
+        sorted.sort((a, b) => b.total_completions - a.total_completions);
+        break;
+      case "completions-asc":
+        sorted.sort((a, b) => a.total_completions - b.total_completions);
+        break;
+      case "name-asc":
+        sorted.sort((a, b) => a.display_name.localeCompare(b.display_name));
+        break;
+      case "name-desc":
+        sorted.sort((a, b) => b.display_name.localeCompare(a.display_name));
+        break;
+    }
+    
+    return sorted;
+  };
+
+  const getPaginatedLeaderboard = () => {
+    const sorted = getSortedLeaderboard();
+    const start = (leaderboardPage - 1) * ITEMS_PER_PAGE;
+    const end = start + ITEMS_PER_PAGE;
+    return sorted.slice(start, end);
+  };
+
+  const leaderboardTotalPages = Math.ceil(getSortedLeaderboard().length / ITEMS_PER_PAGE);
+
+  // Sorting and pagination logic for ratings
+  const getSortedRatings = () => {
+    const data = ratedContent.filter(item => item.content_type === (ratingsFilter === "workouts" ? "workout" : "program"));
+    const sorted = [...data];
+    
+    switch (ratingsSort) {
+      case "rating-desc":
+        sorted.sort((a, b) => {
+          if (b.average_rating !== a.average_rating) {
+            return b.average_rating - a.average_rating;
+          }
+          return b.rating_count - a.rating_count;
+        });
+        break;
+      case "rating-asc":
+        sorted.sort((a, b) => a.average_rating - b.average_rating);
+        break;
+      case "reviews-desc":
+        sorted.sort((a, b) => b.rating_count - a.rating_count);
+        break;
+      case "name-asc":
+        sorted.sort((a, b) => a.content_name.localeCompare(b.content_name));
+        break;
+    }
+    
+    return sorted;
+  };
+
+  const getPaginatedRatings = () => {
+    const sorted = getSortedRatings();
+    const start = (ratingsPage - 1) * ITEMS_PER_PAGE;
+    const end = start + ITEMS_PER_PAGE;
+    return sorted.slice(start, end);
+  };
+
+  const ratingsTotalPages = Math.ceil(getSortedRatings().length / ITEMS_PER_PAGE);
+
+  // Pagination logic for comments
+  const getPaginatedComments = () => {
+    const start = (commentsPage - 1) * ITEMS_PER_PAGE;
+    const end = start + ITEMS_PER_PAGE;
+    return comments.slice(start, end);
+  };
+
+  const commentsTotalPages = Math.ceil(comments.length / ITEMS_PER_PAGE);
+
   return (
     <>
       <Helmet>
@@ -324,20 +441,37 @@ const Community = () => {
                 <Trophy className="h-5 w-5 md:h-6 md:w-6 text-primary" />
                 Community Leaderboard
               </CardTitle>
-              <CompactFilters
-                filters={[
-                  {
-                    name: "Type",
-                    value: leaderboardFilter,
-                    onChange: (value) => setLeaderboardFilter(value as "workouts" | "programs"),
-                    options: [
-                      { value: "workouts", label: "Workouts" },
-                      { value: "programs", label: "Training Programs" }
-                    ],
-                    placeholder: "Select type"
-                  }
-                ]}
-              />
+              <div className="flex flex-col sm:flex-row gap-3 sm:items-center">
+                <div className="flex-1">
+                  <CompactFilters
+                    filters={[
+                      {
+                        name: "Type",
+                        value: leaderboardFilter,
+                        onChange: (value) => setLeaderboardFilter(value as "workouts" | "programs"),
+                        options: [
+                          { value: "workouts", label: "Workouts" },
+                          { value: "programs", label: "Training Programs" }
+                        ],
+                        placeholder: "Select type"
+                      }
+                    ]}
+                  />
+                </div>
+                <div className="w-full sm:w-auto">
+                  <Select value={leaderboardSort} onValueChange={(value: any) => setLeaderboardSort(value)}>
+                    <SelectTrigger className="w-full sm:w-[200px] bg-background/80 border-primary/30 hover:border-primary/50">
+                      <SelectValue placeholder="Sort by" />
+                    </SelectTrigger>
+                    <SelectContent className="bg-background border-primary/30">
+                      <SelectItem value="completions-desc">Most Completions</SelectItem>
+                      <SelectItem value="completions-asc">Least Completions</SelectItem>
+                      <SelectItem value="name-asc">Name A-Z</SelectItem>
+                      <SelectItem value="name-desc">Name Z-A</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
             </CardHeader>
             <CardContent className="p-4 md:pt-6">
               {isLoadingLeaderboard ? (
@@ -371,33 +505,72 @@ const Community = () => {
                         </TableRow>
                       </TableHeader>
                       <TableBody>
-                        {(leaderboardFilter === "workouts" ? workoutLeaderboard : programLeaderboard).map((entry, index) => (
-                          <TableRow
-                            key={entry.user_id}
-                            className="border-primary/20 hover:bg-primary/5"
-                          >
-                            <TableCell className="font-medium text-xs md:text-sm py-2 md:py-3">
-                              <div className="flex items-center gap-1 md:gap-2">
-                                <span className="text-base md:text-lg">{getMedalIcon(index) || `#${index + 1}`}</span>
-                              </div>
-                            </TableCell>
-                            <TableCell className="py-2 md:py-3">
-                              <div className="flex items-center gap-1 md:gap-2">
-                                <User className="h-3 w-3 md:h-4 md:w-4 text-muted-foreground flex-shrink-0" />
-                                <span className="font-medium text-xs md:text-sm truncate">{entry.display_name}</span>
-                              </div>
-                            </TableCell>
-                            <TableCell className="text-right py-2 md:py-3">
-                              <span className="inline-flex items-center gap-1 px-2 md:px-3 py-0.5 md:py-1 rounded-full bg-primary/10 text-primary font-semibold text-xs md:text-sm whitespace-nowrap">
-                                {entry.total_completions}
-                              </span>
-                            </TableCell>
-                          </TableRow>
-                        ))}
+                        {getPaginatedLeaderboard().map((entry, index) => {
+                          const actualIndex = (leaderboardPage - 1) * ITEMS_PER_PAGE + index;
+                          return (
+                            <TableRow
+                              key={entry.user_id}
+                              className="border-primary/20 hover:bg-primary/5"
+                            >
+                              <TableCell className="font-medium text-xs md:text-sm py-2 md:py-3">
+                                <div className="flex items-center gap-1 md:gap-2">
+                                  <span className="text-base md:text-lg">{getMedalIcon(actualIndex) || `#${actualIndex + 1}`}</span>
+                                </div>
+                              </TableCell>
+                              <TableCell className="py-2 md:py-3">
+                                <div className="flex items-center gap-1 md:gap-2">
+                                  <User className="h-3 w-3 md:h-4 md:w-4 text-muted-foreground flex-shrink-0" />
+                                  <span className="font-medium text-xs md:text-sm truncate">{entry.display_name}</span>
+                                </div>
+                              </TableCell>
+                              <TableCell className="text-right py-2 md:py-3">
+                                <span className="inline-flex items-center gap-1 px-2 md:px-3 py-0.5 md:py-1 rounded-full bg-primary/10 text-primary font-semibold text-xs md:text-sm whitespace-nowrap">
+                                  {entry.total_completions}
+                                </span>
+                              </TableCell>
+                            </TableRow>
+                          );
+                        })}
                       </TableBody>
                     </Table>
                   </div>
                 </ScrollArea>
+              )}
+              {!isLoadingLeaderboard && getSortedLeaderboard().length > 0 && (
+                <div className="mt-4 flex flex-col sm:flex-row items-center justify-between gap-3 border-t border-primary/20 pt-4">
+                  <p className="text-xs md:text-sm text-muted-foreground">
+                    Showing {Math.min((leaderboardPage - 1) * ITEMS_PER_PAGE + 1, getSortedLeaderboard().length)}-{Math.min(leaderboardPage * ITEMS_PER_PAGE, getSortedLeaderboard().length)} of {getSortedLeaderboard().length}
+                  </p>
+                  {leaderboardTotalPages > 1 && (
+                    <Pagination>
+                      <PaginationContent>
+                        <PaginationItem>
+                          <PaginationPrevious 
+                            onClick={() => setLeaderboardPage(p => Math.max(1, p - 1))}
+                            className={leaderboardPage === 1 ? "pointer-events-none opacity-50" : "cursor-pointer"}
+                          />
+                        </PaginationItem>
+                        {[...Array(leaderboardTotalPages)].map((_, i) => (
+                          <PaginationItem key={i}>
+                            <PaginationLink
+                              onClick={() => setLeaderboardPage(i + 1)}
+                              isActive={leaderboardPage === i + 1}
+                              className="cursor-pointer"
+                            >
+                              {i + 1}
+                            </PaginationLink>
+                          </PaginationItem>
+                        ))}
+                        <PaginationItem>
+                          <PaginationNext 
+                            onClick={() => setLeaderboardPage(p => Math.min(leaderboardTotalPages, p + 1))}
+                            className={leaderboardPage === leaderboardTotalPages ? "pointer-events-none opacity-50" : "cursor-pointer"}
+                          />
+                        </PaginationItem>
+                      </PaginationContent>
+                    </Pagination>
+                  )}
+                </div>
               )}
             </CardContent>
           </Card>
@@ -409,20 +582,37 @@ const Community = () => {
                 <Star className="h-5 w-5 md:h-6 md:w-6 text-primary" />
                 Community Ratings
               </CardTitle>
-              <CompactFilters
-                filters={[
-                  {
-                    name: "Type",
-                    value: ratingsFilter,
-                    onChange: (value) => setRatingsFilter(value as "workouts" | "programs"),
-                    options: [
-                      { value: "workouts", label: "Workouts" },
-                      { value: "programs", label: "Training Programs" }
-                    ],
-                    placeholder: "Select type"
-                  }
-                ]}
-              />
+              <div className="flex flex-col sm:flex-row gap-3 sm:items-center">
+                <div className="flex-1">
+                  <CompactFilters
+                    filters={[
+                      {
+                        name: "Type",
+                        value: ratingsFilter,
+                        onChange: (value) => setRatingsFilter(value as "workouts" | "programs"),
+                        options: [
+                          { value: "workouts", label: "Workouts" },
+                          { value: "programs", label: "Training Programs" }
+                        ],
+                        placeholder: "Select type"
+                      }
+                    ]}
+                  />
+                </div>
+                <div className="w-full sm:w-auto">
+                  <Select value={ratingsSort} onValueChange={(value: any) => setRatingsSort(value)}>
+                    <SelectTrigger className="w-full sm:w-[200px] bg-background/80 border-primary/30 hover:border-primary/50">
+                      <SelectValue placeholder="Sort by" />
+                    </SelectTrigger>
+                    <SelectContent className="bg-background border-primary/30">
+                      <SelectItem value="rating-desc">Highest Rated</SelectItem>
+                      <SelectItem value="rating-asc">Lowest Rated</SelectItem>
+                      <SelectItem value="reviews-desc">Most Reviews</SelectItem>
+                      <SelectItem value="name-asc">Name A-Z</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
             </CardHeader>
             <CardContent className="p-4 md:pt-6">
               {isLoadingRatings ? (
@@ -454,16 +644,16 @@ const Community = () => {
                         </TableRow>
                       </TableHeader>
                       <TableBody>
-                        {ratedContent
-                          .filter(item => item.content_type === (ratingsFilter === "workouts" ? "workout" : "program"))
-                          .map((item, index) => (
+                        {getPaginatedRatings().map((item, index) => {
+                          const actualIndex = (ratingsPage - 1) * ITEMS_PER_PAGE + index;
+                          return (
                             <TableRow
                               key={item.content_id}
                               className="border-primary/20 hover:bg-primary/5"
                             >
                               <TableCell className="font-medium text-xs md:text-sm py-2 md:py-3">
                                 <div className="flex items-center gap-1 md:gap-2">
-                                  <span className="text-base md:text-lg">{getMedalIcon(index) || `#${index + 1}`}</span>
+                                  <span className="text-base md:text-lg">{getMedalIcon(actualIndex) || `#${actualIndex + 1}`}</span>
                                 </div>
                               </TableCell>
                               <TableCell className="py-2 md:py-3">
@@ -489,11 +679,48 @@ const Community = () => {
                                 </span>
                               </TableCell>
                             </TableRow>
-                          ))}
+                          );
+                        })}
                       </TableBody>
                     </Table>
                   </div>
                 </ScrollArea>
+              )}
+              {!isLoadingRatings && getSortedRatings().length > 0 && (
+                <div className="mt-4 flex flex-col sm:flex-row items-center justify-between gap-3 border-t border-primary/20 pt-4">
+                  <p className="text-xs md:text-sm text-muted-foreground">
+                    Showing {Math.min((ratingsPage - 1) * ITEMS_PER_PAGE + 1, getSortedRatings().length)}-{Math.min(ratingsPage * ITEMS_PER_PAGE, getSortedRatings().length)} of {getSortedRatings().length}
+                  </p>
+                  {ratingsTotalPages > 1 && (
+                    <Pagination>
+                      <PaginationContent>
+                        <PaginationItem>
+                          <PaginationPrevious 
+                            onClick={() => setRatingsPage(p => Math.max(1, p - 1))}
+                            className={ratingsPage === 1 ? "pointer-events-none opacity-50" : "cursor-pointer"}
+                          />
+                        </PaginationItem>
+                        {[...Array(ratingsTotalPages)].map((_, i) => (
+                          <PaginationItem key={i}>
+                            <PaginationLink
+                              onClick={() => setRatingsPage(i + 1)}
+                              isActive={ratingsPage === i + 1}
+                              className="cursor-pointer"
+                            >
+                              {i + 1}
+                            </PaginationLink>
+                          </PaginationItem>
+                        ))}
+                        <PaginationItem>
+                          <PaginationNext 
+                            onClick={() => setRatingsPage(p => Math.min(ratingsTotalPages, p + 1))}
+                            className={ratingsPage === ratingsTotalPages ? "pointer-events-none opacity-50" : "cursor-pointer"}
+                          />
+                        </PaginationItem>
+                      </PaginationContent>
+                    </Pagination>
+                  )}
+                </div>
               )}
             </CardContent>
           </Card>
@@ -555,7 +782,7 @@ const Community = () => {
               ) : (
                 <ScrollArea className="h-[630px] md:h-[700px] pr-2 md:pr-4">
                   <div className="space-y-3 md:space-y-4">
-                    {comments.map((comment) => (
+                    {getPaginatedComments().map((comment) => (
                       <div
                         key={comment.id}
                         className="p-3 md:p-4 rounded-lg border-2 border-primary/20 bg-gradient-to-r from-background to-primary/5 hover:border-primary/40 transition-colors"
@@ -604,6 +831,42 @@ const Community = () => {
                     ))}
                   </div>
                 </ScrollArea>
+              )}
+              {!isLoadingComments && comments.length > 0 && (
+                <div className="mt-4 flex flex-col sm:flex-row items-center justify-between gap-3 border-t border-primary/20 pt-4">
+                  <p className="text-xs md:text-sm text-muted-foreground">
+                    Showing {Math.min((commentsPage - 1) * ITEMS_PER_PAGE + 1, comments.length)}-{Math.min(commentsPage * ITEMS_PER_PAGE, comments.length)} of {comments.length}
+                  </p>
+                  {commentsTotalPages > 1 && (
+                    <Pagination>
+                      <PaginationContent>
+                        <PaginationItem>
+                          <PaginationPrevious 
+                            onClick={() => setCommentsPage(p => Math.max(1, p - 1))}
+                            className={commentsPage === 1 ? "pointer-events-none opacity-50" : "cursor-pointer"}
+                          />
+                        </PaginationItem>
+                        {[...Array(commentsTotalPages)].map((_, i) => (
+                          <PaginationItem key={i}>
+                            <PaginationLink
+                              onClick={() => setCommentsPage(i + 1)}
+                              isActive={commentsPage === i + 1}
+                              className="cursor-pointer"
+                            >
+                              {i + 1}
+                            </PaginationLink>
+                          </PaginationItem>
+                        ))}
+                        <PaginationItem>
+                          <PaginationNext 
+                            onClick={() => setCommentsPage(p => Math.min(commentsTotalPages, p + 1))}
+                            className={commentsPage === commentsTotalPages ? "pointer-events-none opacity-50" : "cursor-pointer"}
+                          />
+                        </PaginationItem>
+                      </PaginationContent>
+                    </Pagination>
+                  )}
+                </div>
               )}
             </CardContent>
           </Card>
