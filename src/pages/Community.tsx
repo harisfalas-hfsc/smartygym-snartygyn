@@ -338,13 +338,6 @@ const Community = () => {
                   }
                 ]}
               />
-              <p 
-                className="text-xs md:text-sm text-muted-foreground mt-2"
-                itemProp="description"
-              >
-                Top members by completed {leaderboardFilter} - Online gym community at smartygym.com
-              </p>
-              <meta itemProp="provider" content="SmartyGym Cyprus - smartygym.com - Haris Falas" />
             </CardHeader>
             <CardContent className="p-4 md:pt-6">
               {isLoadingLeaderboard ? (
@@ -430,9 +423,6 @@ const Community = () => {
                   }
                 ]}
               />
-              <p className="text-xs md:text-sm text-muted-foreground mt-2">
-                Highest rated {ratingsFilter} by our community
-              </p>
             </CardHeader>
             <CardContent className="p-4 md:pt-6">
               {isLoadingRatings ? (
@@ -541,9 +531,6 @@ const Community = () => {
                   }
                 ]}
               />
-              <p className="text-xs md:text-sm text-muted-foreground mt-2">
-                Reviews and feedback from premium members
-              </p>
             </CardHeader>
             <CardContent className="p-4 md:pt-6">
               {isLoadingComments ? (
