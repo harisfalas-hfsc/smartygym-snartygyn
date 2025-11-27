@@ -223,12 +223,19 @@ export const WorkoutDisplay = ({
         
         {/* Description - Below Title */}
         {description && (
-          <div className="mb-4">
-            <HTMLContent 
-              content={description} 
-              className="prose-base text-foreground/90 leading-relaxed" 
-            />
-          </div>
+          <Card className="border-2 border-primary/30 mb-4">
+            <CardHeader className="bg-primary/5">
+              <CardTitle className="flex items-center gap-2 text-2xl font-bold">
+                🔍 Description
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="pt-4">
+              <HTMLContent 
+                content={description} 
+                className="prose-base text-foreground/90 leading-relaxed" 
+              />
+            </CardContent>
+          </Card>
         )}
         
         {/* Credit Line */}
@@ -386,6 +393,11 @@ export const WorkoutDisplay = ({
         {/* WORKOUT CONTENT - All workout fields displayed without automatic headers */}
         {(activation || warm_up || main_workout || finisher || cool_down) && (
           <Card className="border-2 border-primary/30">
+            <CardHeader className="bg-primary/5">
+              <CardTitle className="flex items-center gap-2 text-2xl font-bold">
+                💪 Workout
+              </CardTitle>
+            </CardHeader>
             <CardContent className="content-container pt-6">
               <A4Container>
                 <div className="space-y-6">
@@ -413,6 +425,11 @@ export const WorkoutDisplay = ({
         {/* TRAINING PROGRAM CONTENT - Display exactly as written */}
         {weekly_schedule && (
           <Card className="border-2 border-primary/30">
+            <CardHeader className="bg-primary/5">
+              <CardTitle className="flex items-center gap-2 text-2xl font-bold">
+                📆 Training Program
+              </CardTitle>
+            </CardHeader>
             <CardContent className="content-container pt-6">
               <A4Container>
                 <HTMLContent content={weekly_schedule} className="text-base" />
@@ -424,6 +441,11 @@ export const WorkoutDisplay = ({
         {/* PERSONAL TRAINING PROGRAM CONTENT - Display exactly as written */}
         {programContent && (
           <Card className="border-2 border-primary/30">
+            <CardHeader className="bg-primary/5">
+              <CardTitle className="flex items-center gap-2 text-2xl font-bold">
+                📆 Training Program
+              </CardTitle>
+            </CardHeader>
             <CardContent className="content-container pt-6">
               <A4Container>
                 <HTMLContent content={programContent} className="text-base" />
@@ -435,6 +457,11 @@ export const WorkoutDisplay = ({
         {/* INSTRUCTIONS - Display exactly as written */}
         {(instructions || program_structure) && (
           <Card className="border-2 border-primary/30">
+            <CardHeader className="bg-primary/5">
+              <CardTitle className="flex items-center gap-2 text-2xl font-bold">
+                📋 Instructions
+              </CardTitle>
+            </CardHeader>
             <CardContent className="content-container pt-6">
               <A4Container>
                 <HTMLContent content={instructions || program_structure || ''} className="text-base" />
@@ -446,6 +473,11 @@ export const WorkoutDisplay = ({
         {/* TIPS - Display exactly as written */}
         {(tips || nutrition_tips) && (
           <Card className="border-2 border-primary/30">
+            <CardHeader className="bg-primary/5">
+              <CardTitle className="flex items-center gap-2 text-2xl font-bold">
+                💡 Tips
+              </CardTitle>
+            </CardHeader>
             <CardContent className="content-container pt-6">
               <A4Container>
                 <HTMLContent content={tips || nutrition_tips || ''} className="text-base" />
