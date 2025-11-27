@@ -517,24 +517,27 @@ const WorkoutDetail = () => {
                     <span className="text-xs text-muted-foreground">{workout.duration}</span>
                     <span className="text-xs text-muted-foreground">•</span>
                     {workout.is_premium ? (
-                      workout.is_standalone_purchase && workout.price ? (
-                        <Tooltip>
-                          <TooltipTrigger asChild>
-                            <span className="inline-flex items-center gap-1 bg-gradient-to-r from-green-500 to-emerald-600 text-white text-xs font-semibold px-2 py-1 rounded-full cursor-help">
-                              <ShoppingCart className="h-3 w-3 shrink-0" />
-                              BUY €{Number(workout.price).toFixed(2)}
-                            </span>
-                          </TooltipTrigger>
-                          <TooltipContent side="bottom" className="max-w-xs text-center">
-                            Purchase this workout individually without a subscription. One-time payment, lifetime access!
-                          </TooltipContent>
-                        </Tooltip>
-                      ) : (
+                      <>
+                        {/* Always show Premium badge for premium content */}
                         <span className="inline-flex items-center gap-1 bg-gradient-to-r from-yellow-400 to-orange-500 text-white text-xs font-semibold px-2 py-1 rounded-full">
                           <Crown className="h-3 w-3 shrink-0" />
                           <span className="hidden sm:inline">Premium</span>
                         </span>
-                      )
+                        {/* Additionally show Buy badge if standalone is available */}
+                        {workout.is_standalone_purchase && workout.price && (
+                          <Tooltip>
+                            <TooltipTrigger asChild>
+                              <span className="inline-flex items-center gap-1 bg-gradient-to-r from-green-500 to-emerald-600 text-white text-xs font-semibold px-2 py-1 rounded-full cursor-help">
+                                <ShoppingCart className="h-3 w-3 shrink-0" />
+                                BUY €{Number(workout.price).toFixed(2)}
+                              </span>
+                            </TooltipTrigger>
+                            <TooltipContent side="bottom" className="max-w-xs text-center">
+                              Buy this workout individually to try our coaching style before committing to a subscription.
+                            </TooltipContent>
+                          </Tooltip>
+                        )}
+                      </>
                     ) : (
                       <span className="inline-flex items-center gap-1 bg-gradient-to-r from-green-500 to-teal-600 text-white text-xs font-semibold px-2 py-1 rounded-full">
                         <Check className="h-3 w-3 shrink-0" />
