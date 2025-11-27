@@ -7,9 +7,19 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Download, Search, RefreshCw, Mail, Shield } from "lucide-react";
+import { Download, Search, RefreshCw, Mail, Crown, Gem } from "lucide-react";
 import { toast } from "sonner";
 import { format } from "date-fns";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 
 interface UserData {
   user_id: string;
@@ -23,6 +33,13 @@ interface UserData {
   created_at: string;
 }
 
+interface SubscriptionAction {
+  userId: string;
+  userName: string;
+  action: 'grant' | 'revoke';
+  planType: 'gold' | 'platinum' | 'free';
+}
+
 export function UsersManager() {
   const [users, setUsers] = useState<UserData[]>([]);
   const [filteredUsers, setFilteredUsers] = useState<UserData[]>([]);
@@ -32,6 +49,8 @@ export function UsersManager() {
   const [statusFilter, setStatusFilter] = useState<string>("all");
   const [userPurchases, setUserPurchases] = useState<string[]>([]);
   const [userRoles, setUserRoles] = useState<Record<string, string[]>>({});
+  const [pendingAction, setPendingAction] = useState<SubscriptionAction | null>(null);
+  const [actionLoading, setActionLoading] = useState(false);
   const SUPER_ADMIN_EMAIL = "harisfallas@gmail.com";
 
   const fetchUsers = async () => {
@@ -115,6 +134,37 @@ export function UsersManager() {
     }
   };
 
+  const manageSubscription = async (action: SubscriptionAction) => {
+    setActionLoading(true);
+    try {
+      const { data, error } = await supabase.functions.invoke('manage-subscription', {
+        body: { 
+          user_id: action.userId, 
+          action: action.action, 
+          plan_type: action.planType 
+        }
+      });
+
+      if (error) throw error;
+      if (!data?.success) throw new Error(data?.error || 'Unknown error');
+
+      toast.success(data.message);
+      fetchUsers(); // Refresh the list
+    } catch (error) {
+      console.error('Error managing subscription:', error);
+      toast.error(error instanceof Error ? error.message : 'Failed to update subscription');
+    } finally {
+      setActionLoading(false);
+      setPendingAction(null);
+    }
+  };
+
+  const handleConfirmAction = () => {
+    if (pendingAction) {
+      manageSubscription(pendingAction);
+    }
+  };
+
   useEffect(() => {
     let filtered = users;
 
@@ -143,7 +193,7 @@ export function UsersManager() {
     }
 
     setFilteredUsers(filtered);
-  }, [searchTerm, planFilter, statusFilter, users, userPurchases]);
+  }, [searchTerm, planFilter, statusFilter, users, userPurchases, userRoles]);
 
   const exportToCSV = () => {
     const headers = ["User ID", "Name", "Email", "Is Admin", "Plan", "Status", "Period Start", "Period End", "Joined"];
@@ -198,6 +248,26 @@ export function UsersManager() {
     }
   };
 
+  const isActivePremium = (user: UserData) => {
+    return user.status === 'active' && (user.plan_type === 'gold' || user.plan_type === 'platinum');
+  };
+
+  const getDialogTitle = () => {
+    if (!pendingAction) return '';
+    if (pendingAction.action === 'grant') {
+      return `Grant ${pendingAction.planType.charAt(0).toUpperCase() + pendingAction.planType.slice(1)} Membership`;
+    }
+    return 'Revoke Premium Access';
+  };
+
+  const getDialogDescription = () => {
+    if (!pendingAction) return '';
+    if (pendingAction.action === 'grant') {
+      return `Are you sure you want to grant ${pendingAction.planType.toUpperCase()} membership to "${pendingAction.userName}"? This will give them full premium access.`;
+    }
+    return `Are you sure you want to revoke premium access from "${pendingAction.userName}"? This will set them to the FREE plan and remove their premium benefits.`;
+  };
+
   if (loading) {
     return (
       <Card>
@@ -212,6 +282,26 @@ export function UsersManager() {
 
   return (
     <div className="pt-6">
+      {/* Confirmation Dialog */}
+      <AlertDialog open={!!pendingAction} onOpenChange={(open) => !open && setPendingAction(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>{getDialogTitle()}</AlertDialogTitle>
+            <AlertDialogDescription>{getDialogDescription()}</AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={actionLoading}>Cancel</AlertDialogCancel>
+            <AlertDialogAction 
+              onClick={handleConfirmAction} 
+              disabled={actionLoading}
+              className={pendingAction?.action === 'revoke' ? 'bg-destructive text-destructive-foreground hover:bg-destructive/90' : ''}
+            >
+              {actionLoading ? 'Processing...' : 'Confirm'}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
       <Card>
         <CardHeader>
           <div className="flex items-center justify-between">
@@ -307,7 +397,7 @@ export function UsersManager() {
         </div>
 
         {/* Users Table */}
-        <div className="border rounded-lg">
+        <div className="border rounded-lg overflow-x-auto">
           <Table>
             <TableHeader>
               <TableRow>
@@ -332,6 +422,8 @@ export function UsersManager() {
                 filteredUsers.map((user) => {
                   const hasPurchases = userPurchases.includes(user.user_id);
                   const statusLabel = getUserStatus(user, hasPurchases);
+                  const isPremium = isActivePremium(user);
+                  const userName = user.full_name || user.email || 'Anonymous';
                   
                   return (
                     <TableRow key={user.user_id}>
@@ -385,7 +477,8 @@ export function UsersManager() {
                         {format(new Date(user.created_at), 'MMM d, yyyy')}
                       </TableCell>
                       <TableCell>
-                        <div className="flex items-center gap-2">
+                        <div className="flex flex-wrap items-center gap-2">
+                          {/* Admin Toggle */}
                           <Button
                             variant={userRoles[user.user_id]?.includes('admin') ? "destructive" : "default"}
                             size="sm"
@@ -398,6 +491,89 @@ export function UsersManager() {
                           >
                             {userRoles[user.user_id]?.includes('admin') ? "Remove Admin" : "Make Admin"}
                           </Button>
+
+                          {/* Subscription Management */}
+                          {!isPremium ? (
+                            <>
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={() => setPendingAction({
+                                  userId: user.user_id,
+                                  userName,
+                                  action: 'grant',
+                                  planType: 'gold'
+                                })}
+                                className="text-amber-600 border-amber-600 hover:bg-amber-50"
+                              >
+                                <Crown className="h-4 w-4 mr-1" />
+                                Gold
+                              </Button>
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={() => setPendingAction({
+                                  userId: user.user_id,
+                                  userName,
+                                  action: 'grant',
+                                  planType: 'platinum'
+                                })}
+                                className="text-purple-600 border-purple-600 hover:bg-purple-50"
+                              >
+                                <Gem className="h-4 w-4 mr-1" />
+                                Platinum
+                              </Button>
+                            </>
+                          ) : (
+                            <>
+                              {user.plan_type === 'gold' && (
+                                <Button
+                                  variant="outline"
+                                  size="sm"
+                                  onClick={() => setPendingAction({
+                                    userId: user.user_id,
+                                    userName,
+                                    action: 'grant',
+                                    planType: 'platinum'
+                                  })}
+                                  className="text-purple-600 border-purple-600 hover:bg-purple-50"
+                                >
+                                  <Gem className="h-4 w-4 mr-1" />
+                                  Upgrade
+                                </Button>
+                              )}
+                              {user.plan_type === 'platinum' && (
+                                <Button
+                                  variant="outline"
+                                  size="sm"
+                                  onClick={() => setPendingAction({
+                                    userId: user.user_id,
+                                    userName,
+                                    action: 'grant',
+                                    planType: 'gold'
+                                  })}
+                                  className="text-amber-600 border-amber-600 hover:bg-amber-50"
+                                >
+                                  <Crown className="h-4 w-4 mr-1" />
+                                  Downgrade
+                                </Button>
+                              )}
+                              <Button
+                                variant="destructive"
+                                size="sm"
+                                onClick={() => setPendingAction({
+                                  userId: user.user_id,
+                                  userName,
+                                  action: 'revoke',
+                                  planType: 'free'
+                                })}
+                              >
+                                Revoke
+                              </Button>
+                            </>
+                          )}
+
+                          {/* Email */}
                           <Button
                             variant="ghost"
                             size="sm"
