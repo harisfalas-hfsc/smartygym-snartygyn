@@ -521,7 +521,7 @@ const WorkoutDetail = () => {
                         {/* Always show Premium badge for premium content */}
                         <span className="inline-flex items-center gap-1 bg-gradient-to-r from-yellow-400 to-orange-500 text-white text-xs font-semibold px-2 py-1 rounded-full">
                           <Crown className="h-3 w-3 shrink-0" />
-                          <span className="hidden sm:inline">Premium</span>
+                          <span>Premium</span>
                         </span>
                         {/* Additionally show Buy badge if standalone is available */}
                         {workout.is_standalone_purchase && workout.price && (
