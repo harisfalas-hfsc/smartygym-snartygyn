@@ -497,7 +497,7 @@ const TrainingProgramDetail = () => {
                       program.is_standalone_purchase && program.price ? (
                         <span className="inline-flex items-center gap-1 bg-gradient-to-r from-green-500 to-emerald-600 text-white text-xs font-semibold px-2 py-1 rounded-full">
                           <ShoppingCart className="h-3 w-3 shrink-0" />
-                          €{Number(program.price).toFixed(2)}
+                          BUY €{Number(program.price).toFixed(2)}
                         </span>
                       ) : (
                         <span className="inline-flex items-center gap-1 bg-gradient-to-r from-yellow-400 to-orange-500 text-white text-xs font-semibold px-2 py-1 rounded-full">
