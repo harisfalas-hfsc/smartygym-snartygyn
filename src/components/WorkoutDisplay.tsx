@@ -380,75 +380,29 @@ export const WorkoutDisplay = ({
       </div>
 
 
-      {/* STANDARDIZED CONTENT ORDER FOR ALL CONTENT TYPES */}
-      {/* Order: 1. Description, 2. Workout/Program Content, 3. Instructions, 4. Tips */}
+      {/* CONTENT SECTIONS - Display exactly as written, no automatic headers */}
       <div className="space-y-6 mt-8">
         
-        {/* 1. DESCRIPTION - Always First */}
-        {description && (
+        {/* WORKOUT CONTENT - All workout fields displayed without automatic headers */}
+        {(activation || warm_up || main_workout || finisher || cool_down) && (
           <Card className="border-2 border-primary/30">
-            <CardHeader className="bg-primary/5">
-              <CardTitle className="flex items-center gap-2 text-2xl font-bold">
-                🔍 Description
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="content-container">
-              <div className="border-l-4 border-primary pl-4 py-2">
-                <A4Container>
-                  <HTMLContent content={description} className="text-base" />
-                </A4Container>
-              </div>
-            </CardContent>
-          </Card>
-        )}
-
-        {/* 2A. WORKOUT CONTENT (For Workouts) */}
-        {main_workout && (
-          <Card className="border-2 border-primary/30">
-            <CardHeader className="bg-primary/5">
-              <CardTitle className="flex items-center gap-2 text-2xl font-bold">
-                💪 Workout
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="content-container">
+            <CardContent className="content-container pt-6">
               <A4Container>
-                <div className="space-y-4">
-                  {/* Activation */}
+                <div className="space-y-6">
                   {activation && (
-                    <div className="border-l-4 border-primary/50 pl-4 py-2">
-                      <h3 className="font-bold text-lg mb-2 text-primary">🔥 Activation</h3>
-                      <HTMLContent content={activation} className="text-base" />
-                    </div>
+                    <HTMLContent content={activation} className="text-base" />
                   )}
-                  
-                  {/* Warm Up */}
                   {warm_up && (
-                    <div className="border-l-4 border-primary/50 pl-4 py-2">
-                      <h3 className="font-bold text-lg mb-2 text-primary">🌡️ Warm Up</h3>
-                      <HTMLContent content={warm_up} className="text-base" />
-                    </div>
+                    <HTMLContent content={warm_up} className="text-base" />
                   )}
-                  
-                  {/* Main Workout */}
-                  <div className="border-l-4 border-primary pl-4 py-2">
-                    <h3 className="font-bold text-lg mb-2 text-primary">💪 Main Workout</h3>
+                  {main_workout && (
                     <HTMLContent content={main_workout} className="text-base" />
-                  </div>
-                  
-                  {/* Finisher */}
-                  {finisher && (
-                    <div className="border-l-4 border-primary/50 pl-4 py-2">
-                      <h3 className="font-bold text-lg mb-2 text-primary">⚡ Finisher</h3>
-                      <HTMLContent content={finisher} className="text-base" />
-                    </div>
                   )}
-                  
-                  {/* Cool Down */}
+                  {finisher && (
+                    <HTMLContent content={finisher} className="text-base" />
+                  )}
                   {cool_down && (
-                    <div className="border-l-4 border-primary/50 pl-4 py-2">
-                      <h3 className="font-bold text-lg mb-2 text-primary">❄️ Cool Down</h3>
-                      <HTMLContent content={cool_down} className="text-base" />
-                    </div>
+                    <HTMLContent content={cool_down} className="text-base" />
                   )}
                 </div>
               </A4Container>
@@ -456,74 +410,46 @@ export const WorkoutDisplay = ({
           </Card>
         )}
 
-        {/* 2B. TRAINING PROGRAM CONTENT (For Training Programs) */}
+        {/* TRAINING PROGRAM CONTENT - Display exactly as written */}
         {weekly_schedule && (
           <Card className="border-2 border-primary/30">
-            <CardHeader className="bg-primary/5">
-              <CardTitle className="flex items-center gap-2 text-2xl font-bold">
-                📆 Training Program
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="content-container">
-              <div className="border-l-4 border-primary pl-4 py-2">
-                <A4Container>
-                  <HTMLContent content={weekly_schedule} className="text-base" />
-                </A4Container>
-              </div>
+            <CardContent className="content-container pt-6">
+              <A4Container>
+                <HTMLContent content={weekly_schedule} className="text-base" />
+              </A4Container>
             </CardContent>
           </Card>
         )}
 
-        {/* 2C. PERSONAL TRAINING PROGRAM CONTENT */}
+        {/* PERSONAL TRAINING PROGRAM CONTENT - Display exactly as written */}
         {programContent && (
           <Card className="border-2 border-primary/30">
-            <CardHeader className="bg-primary/5">
-              <CardTitle className="flex items-center gap-2 text-2xl font-bold">
-                🎯 Personal Training Program
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="content-container">
-              <div className="border-l-4 border-primary pl-4 py-2">
-                <A4Container>
-                  <HTMLContent content={programContent} className="text-base" />
-                </A4Container>
-              </div>
+            <CardContent className="content-container pt-6">
+              <A4Container>
+                <HTMLContent content={programContent} className="text-base" />
+              </A4Container>
             </CardContent>
           </Card>
         )}
 
-        {/* 3. INSTRUCTIONS - Always Third */}
+        {/* INSTRUCTIONS - Display exactly as written */}
         {(instructions || program_structure) && (
           <Card className="border-2 border-primary/30">
-            <CardHeader className="bg-primary/5">
-              <CardTitle className="flex items-center gap-2 text-2xl font-bold">
-                📋 Instructions
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="content-container">
-              <div className="border-l-4 border-primary pl-4 py-2">
-                <A4Container>
-                  <HTMLContent content={instructions || program_structure || ''} className="text-base" />
-                </A4Container>
-              </div>
+            <CardContent className="content-container pt-6">
+              <A4Container>
+                <HTMLContent content={instructions || program_structure || ''} className="text-base" />
+              </A4Container>
             </CardContent>
           </Card>
         )}
 
-        {/* 4. TIPS - Always Fourth */}
+        {/* TIPS - Display exactly as written */}
         {(tips || nutrition_tips) && (
           <Card className="border-2 border-primary/30">
-            <CardHeader className="bg-primary/5">
-              <CardTitle className="flex items-center gap-2 text-2xl font-bold">
-                💡 Tips
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="content-container">
-              <div className="border-l-4 border-primary pl-4 py-2">
-                <A4Container>
-                  <HTMLContent content={tips || nutrition_tips || ''} className="text-base" />
-                </A4Container>
-              </div>
+            <CardContent className="content-container pt-6">
+              <A4Container>
+                <HTMLContent content={tips || nutrition_tips || ''} className="text-base" />
+              </A4Container>
             </CardContent>
           </Card>
         )}
