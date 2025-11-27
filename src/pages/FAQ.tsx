@@ -81,7 +81,15 @@ const FAQ = () => {
                 "name": "Is there a free trial?",
                 "acceptedAnswer": {
                   "@type": "Answer",
-                  "text": "Yes! We offer free access to selected workouts, tools, and resources so you can explore the platform before committing. Premium subscriptions unlock our full library of workouts, training programs, and advanced features."
+                  "text": "Yes! We offer free access to selected workouts, tools, and resources so you can explore the platform before committing. Additionally, you can purchase selected premium workouts or training programs as standalone items — this lets you experience our coaching philosophy and training quality before committing to a full subscription. Premium subscriptions (Gold and Platinum) unlock our full library."
+                }
+              },
+              {
+                "@type": "Question",
+                "name": "What is a standalone purchase?",
+                "acceptedAnswer": {
+                  "@type": "Answer",
+                  "text": "A standalone purchase allows you to buy individual premium workouts or training programs without committing to a subscription. This is perfect for trying our training methodology before upgrading. Simply create a free account, browse our content, click 'Buy Now' on any standalone-enabled item, complete payment, and access it immediately. You get full dashboard access for purchased content including logbook tracking, ratings, and all calculator tools."
                 }
               }
             ]
@@ -242,8 +250,29 @@ const FAQ = () => {
                     <AccordionTrigger className="text-left">Is there a free trial?</AccordionTrigger>
                     <AccordionContent className="py-2 leading-relaxed">
                       Yes! We offer <strong>free access</strong> to selected workouts, tools, and resources so you can explore the platform before committing. 
+                      Additionally, you can <strong>purchase selected premium workouts or training programs as standalone items</strong> — 
+                      this lets you experience our coaching philosophy and training quality before committing to a full subscription.
                       Premium subscriptions (Gold and Platinum) unlock our full library of workouts, training programs, and advanced features. 
                       Check out our <a href="/premium-comparison" className="text-primary hover:underline font-medium">pricing plans</a> to see what's included.
+                    </AccordionContent>
+                  </AccordionItem>
+
+                  <AccordionItem value="item-8a">
+                    <AccordionTrigger className="text-left">What is a standalone purchase?</AccordionTrigger>
+                    <AccordionContent className="py-2 leading-relaxed">
+                      A <strong>standalone purchase</strong> allows you to buy individual premium workouts or training programs without committing to a subscription. 
+                      This is perfect for trying our training methodology and coaching style before deciding to upgrade.<br/><br/>
+                      
+                      <strong>How to purchase:</strong><br/>
+                      1. <strong>Create a free account</strong> — sign up to access the platform.<br/>
+                      2. <strong>Browse</strong> our workouts or training programs.<br/>
+                      3. <strong>Click "Buy Now"</strong> on any standalone-enabled content (marked with a price).<br/>
+                      4. <strong>Complete payment</strong> securely via Stripe.<br/>
+                      5. <strong>Access immediately</strong> — your purchased content is unlocked right away.<br/><br/>
+                      
+                      <strong>What you get:</strong> Full dashboard access for your purchased content, including logbook tracking, 
+                      the ability to rate and review, mark as complete, add to favorites, and access to all our calculator tools. 
+                      It's a great way to try before you commit to a full plan!
                     </AccordionContent>
                   </AccordionItem>
 
