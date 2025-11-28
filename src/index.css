@@ -98,6 +98,14 @@ All colors MUST be HSL.
 }
 
 @layer utilities {
+  /* Preserve empty paragraphs created in rich text editor */
+  .prose .tiptap-paragraph:empty,
+  .text-display .tiptap-paragraph:empty,
+  .tiptap-paragraph:empty {
+    min-height: 1.5em;
+    display: block;
+  }
+
   .gradient-gold {
     background: var(--gradient-gold);
   }
