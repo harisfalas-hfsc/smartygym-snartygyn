@@ -1179,7 +1179,7 @@ export default function UserDashboard() {
 
           {/* Programs Tab */}
           <TabsContent value="programs" className="space-y-6">
-            {!hasActivePlan && !isPremium ? (
+            {!hasActivePlan && !hasStandalonePurchases && !isPremium ? (
               <Card className="border-primary/50 bg-gradient-to-r from-primary/5 to-primary/10">
                 <CardContent className="text-center py-12">
                   <Crown className="h-12 w-12 text-primary mx-auto mb-4" />
@@ -1586,7 +1586,7 @@ export default function UserDashboard() {
 
           {/* LogBook Tab */}
           <TabsContent value="logbook" className="space-y-6">
-            {!hasActivePlan && !isPremium ? (
+            {!hasActivePlan && !hasStandalonePurchases && !isPremium ? (
               <Card className="border-primary/50 bg-gradient-to-r from-primary/5 to-primary/10">
                 <CardContent className="text-center py-12">
                   <Crown className="h-12 w-12 text-primary mx-auto mb-4" />
