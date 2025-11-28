@@ -59,3 +59,12 @@ verify_jwt = false
 
 [functions.manage-subscription]
 verify_jwt = true
+
+[functions.generate-blog-image]
+verify_jwt = false
+
+[functions.generate-ad-image]
+verify_jwt = false
+
+[functions.fix-blog-images]
+verify_jwt = false
