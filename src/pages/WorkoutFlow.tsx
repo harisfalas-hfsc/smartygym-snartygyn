@@ -10,6 +10,7 @@ import { generateBreadcrumbSchema } from "@/utils/seoHelpers";
 import { useAccessControl } from "@/hooks/useAccessControl";
 import { useShowBackButton } from "@/hooks/useShowBackButton";
 import { ScrollReveal } from "@/components/ScrollReveal";
+import { WorkoutOfTheDay } from "@/components/WorkoutOfTheDay";
 const WorkoutFlow = () => {
   const navigate = useNavigate();
   const {
@@ -134,6 +135,9 @@ const WorkoutFlow = () => {
             </div>
           </div>
         </Card>
+
+        {/* Workout of the Day Card */}
+        <WorkoutOfTheDay />
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
           {workoutTypes.map(workout => {

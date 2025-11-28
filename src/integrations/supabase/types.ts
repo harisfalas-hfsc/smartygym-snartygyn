@@ -131,6 +131,7 @@ export type Database = {
           is_premium: boolean | null
           is_standalone_purchase: boolean | null
           is_visible: boolean | null
+          is_workout_of_day: boolean | null
           main_workout: string | null
           name: string
           notes: string | null
@@ -164,6 +165,7 @@ export type Database = {
           is_premium?: boolean | null
           is_standalone_purchase?: boolean | null
           is_visible?: boolean | null
+          is_workout_of_day?: boolean | null
           main_workout?: string | null
           name: string
           notes?: string | null
@@ -197,6 +199,7 @@ export type Database = {
           is_premium?: boolean | null
           is_standalone_purchase?: boolean | null
           is_visible?: boolean | null
+          is_workout_of_day?: boolean | null
           main_workout?: string | null
           name?: string
           notes?: string | null
@@ -1749,6 +1752,54 @@ export type Database = {
           workout_id?: string
           workout_name?: string
           workout_type?: string
+        }
+        Relationships: []
+      }
+      workout_of_day_state: {
+        Row: {
+          created_at: string | null
+          current_category: string
+          day_count: number
+          difficulty_advanced_count: number | null
+          difficulty_beginner_count: number | null
+          difficulty_intermediate_count: number | null
+          equipment_bodyweight_count: number | null
+          equipment_with_count: number | null
+          id: string
+          last_difficulty: string | null
+          last_equipment: string | null
+          last_generated_at: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          current_category?: string
+          day_count?: number
+          difficulty_advanced_count?: number | null
+          difficulty_beginner_count?: number | null
+          difficulty_intermediate_count?: number | null
+          equipment_bodyweight_count?: number | null
+          equipment_with_count?: number | null
+          id?: string
+          last_difficulty?: string | null
+          last_equipment?: string | null
+          last_generated_at?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          current_category?: string
+          day_count?: number
+          difficulty_advanced_count?: number | null
+          difficulty_beginner_count?: number | null
+          difficulty_intermediate_count?: number | null
+          equipment_bodyweight_count?: number | null
+          equipment_with_count?: number | null
+          id?: string
+          last_difficulty?: string | null
+          last_equipment?: string | null
+          last_generated_at?: string | null
+          updated_at?: string | null
         }
         Relationships: []
       }
