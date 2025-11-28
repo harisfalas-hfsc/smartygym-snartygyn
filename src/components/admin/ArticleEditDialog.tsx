@@ -240,11 +240,12 @@ export const ArticleEditDialog = ({ article, open, onOpenChange, onSave }: Artic
 
     try {
       while (attempts < maxAttempts) {
-        const { data, error } = await supabase.functions.invoke('generate-ad-image', {
+        // Use the new generate-blog-image function that uploads to storage
+        const { data, error } = await supabase.functions.invoke('generate-blog-image', {
           body: {
-            contentType: 'blog_article',
-            prompt: `Blog article about ${formData.title}, category: ${formData.category}`,
+            title: formData.title,
             category: formData.category,
+            slug: formData.slug,
           },
         });
 
@@ -257,7 +258,7 @@ export const ArticleEditDialog = ({ article, open, onOpenChange, onSave }: Artic
           setFormData({ ...formData, image_url: imageUrl });
           toast({
             title: "Success",
-            description: "Unique image generated successfully",
+            description: "Unique image generated and uploaded successfully",
           });
           return;
         }
