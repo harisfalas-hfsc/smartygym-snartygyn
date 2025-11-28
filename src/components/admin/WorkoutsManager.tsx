@@ -121,7 +121,9 @@ export const WorkoutsManager = ({ externalDialog, setExternalDialog }: WorkoutsM
     }
 
     if (sourceFilter === "ai") {
-      filtered = filtered.filter(w => w.is_ai_generated);
+      filtered = filtered.filter(w => w.is_ai_generated && !w.id.startsWith("WOD-"));
+    } else if (sourceFilter === "wod") {
+      filtered = filtered.filter(w => w.id.startsWith("WOD-"));
     } else if (sourceFilter === "manual") {
       filtered = filtered.filter(w => !w.is_ai_generated);
     }
@@ -439,6 +441,7 @@ export const WorkoutsManager = ({ externalDialog, setExternalDialog }: WorkoutsM
               <SelectContent>
                 <SelectItem value="all">All Sources</SelectItem>
                 <SelectItem value="ai">🤖 AI Generated</SelectItem>
+                <SelectItem value="wod">📅 WOD Only</SelectItem>
                 <SelectItem value="manual">👤 Manual</SelectItem>
               </SelectContent>
             </Select>
