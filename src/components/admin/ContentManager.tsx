@@ -3,7 +3,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { WorkoutsManager } from "./WorkoutsManager";
 import { ProgramsManager } from "./ProgramsManager";
-import { Dumbbell, Calendar } from "lucide-react";
+import { WODManager } from "./WODManager";
+import { Dumbbell, Calendar, Flame } from "lucide-react";
 
 interface ContentManagerProps {
   externalWorkoutDialog?: boolean;
@@ -36,12 +37,12 @@ export const ContentManager = ({
           Content Library
         </CardTitle>
         <CardDescription>
-          Manage workouts and training programs
+          Manage workouts, training programs, and Workout of the Day
         </CardDescription>
       </CardHeader>
       <CardContent>
         <Tabs value={innerTab} onValueChange={setInnerTab} className="w-full">
-          <TabsList className="grid w-full grid-cols-2">
+          <TabsList className="grid w-full grid-cols-3">
             <TabsTrigger value="workouts" className="flex items-center gap-2">
               <Dumbbell className="w-4 h-4" />
               Workouts
@@ -49,6 +50,10 @@ export const ContentManager = ({
             <TabsTrigger value="programs" className="flex items-center gap-2">
               <Calendar className="w-4 h-4" />
               Programs
+            </TabsTrigger>
+            <TabsTrigger value="wod" className="flex items-center gap-2">
+              <Flame className="w-4 h-4" />
+              WOD
             </TabsTrigger>
           </TabsList>
           
@@ -64,6 +69,10 @@ export const ContentManager = ({
               externalDialog={externalProgramDialog}
               setExternalDialog={setExternalProgramDialog}
             />
+          </TabsContent>
+
+          <TabsContent value="wod">
+            <WODManager />
           </TabsContent>
         </Tabs>
       </CardContent>
