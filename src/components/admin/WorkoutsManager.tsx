@@ -14,7 +14,6 @@ import { WorkoutEditDialog } from "./WorkoutEditDialog";
 interface Workout {
   id: string;
   name: string;
-  type: string;
   category: string;
   format: string;
   equipment: string;
@@ -259,11 +258,11 @@ export const WorkoutsManager = ({ externalDialog, setExternalDialog }: WorkoutsM
 
   const handleExport = () => {
     const csv = [
-      ['ID', 'Name', 'Type', 'Difficulty', 'Duration', 'Access', 'Source'].join(','),
+      ['ID', 'Name', 'Format', 'Difficulty', 'Duration', 'Access', 'Source'].join(','),
       ...filteredWorkouts.map(w => [
         w.id,
         `"${w.name}"`,
-        w.type,
+        w.format,
         w.difficulty,
         w.duration,
         w.is_premium ? w.tier_required || 'Premium' : 'Free',
