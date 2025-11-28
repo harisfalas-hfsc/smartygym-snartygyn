@@ -372,12 +372,7 @@ export const WorkoutsManager = ({ externalDialog, setExternalDialog }: WorkoutsM
               <SelectContent>
                 <SelectItem value="all">All Equipment</SelectItem>
                 <SelectItem value="BODYWEIGHT">BODYWEIGHT</SelectItem>
-                <SelectItem value="DUMBBELLS">DUMBBELLS</SelectItem>
-                <SelectItem value="BARBELL">BARBELL</SelectItem>
-                <SelectItem value="KETTLEBELL">KETTLEBELL</SelectItem>
-                <SelectItem value="RESISTANCE BANDS">RESISTANCE BANDS</SelectItem>
-                <SelectItem value="MIXED">MIXED</SelectItem>
-                <SelectItem value="MINIMAL">MINIMAL</SelectItem>
+                <SelectItem value="EQUIPMENT">EQUIPMENT</SelectItem>
               </SelectContent>
             </Select>
             <Select value={difficultyFilter} onValueChange={setDifficultyFilter}>
