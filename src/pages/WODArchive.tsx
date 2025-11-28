@@ -1,11 +1,14 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
+import { format } from "date-fns";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Calendar } from "@/components/ui/calendar";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { 
   Select, 
   SelectContent, 
@@ -13,8 +16,9 @@ import {
   SelectTrigger, 
   SelectValue 
 } from "@/components/ui/select";
-import { CalendarCheck, Clock, Dumbbell, Star, Crown, ShoppingBag, Archive, Filter, X } from "lucide-react";
+import { CalendarCheck, CalendarIcon, Clock, Dumbbell, Star, Crown, ShoppingBag, Archive, Filter, X } from "lucide-react";
 import { PageBreadcrumbs } from "@/components/PageBreadcrumbs";
+import { cn } from "@/lib/utils";
 
 const WOD_CATEGORIES = [
   "STRENGTH",
@@ -30,20 +34,61 @@ const DIFFICULTY_OPTIONS = ["Beginner", "Intermediate", "Advanced"];
 
 const WODArchive = () => {
   const navigate = useNavigate();
+  const [selectedDate, setSelectedDate] = useState<Date | undefined>(undefined);
   const [categoryFilter, setCategoryFilter] = useState<string>("all");
   const [equipmentFilter, setEquipmentFilter] = useState<string>("all");
   const [difficultyFilter, setDifficultyFilter] = useState<string>("all");
 
+  // Fetch date range constraints
+  const { data: dateRange } = useQuery({
+    queryKey: ["wod-date-range"],
+    queryFn: async () => {
+      // Get first WOD (oldest)
+      const { data: first } = await supabase
+        .from("admin_workouts")
+        .select("created_at")
+        .like("id", "WOD-%")
+        .order("created_at", { ascending: true })
+        .limit(1)
+        .maybeSingle();
+      
+      // Get last WOD (newest)
+      const { data: last } = await supabase
+        .from("admin_workouts")
+        .select("created_at")
+        .like("id", "WOD-%")
+        .order("created_at", { ascending: false })
+        .limit(1)
+        .maybeSingle();
+      
+      return {
+        minDate: first?.created_at ? new Date(first.created_at) : null,
+        maxDate: last?.created_at ? new Date(last.created_at) : null
+      };
+    }
+  });
+
   const { data: pastWODs, isLoading } = useQuery({
-    queryKey: ["wod-archive", categoryFilter, equipmentFilter, difficultyFilter],
+    queryKey: ["wod-archive", selectedDate?.toISOString(), categoryFilter, equipmentFilter, difficultyFilter],
     queryFn: async () => {
       let query = supabase
         .from("admin_workouts")
         .select("*")
         .like("id", "WOD-%")
-        .eq("is_workout_of_day", false)
         .eq("is_visible", true)
         .order("created_at", { ascending: false });
+      
+      // Filter by selected date
+      if (selectedDate) {
+        const startOfDay = new Date(selectedDate);
+        startOfDay.setHours(0, 0, 0, 0);
+        const endOfDay = new Date(selectedDate);
+        endOfDay.setHours(23, 59, 59, 999);
+        
+        query = query
+          .gte("created_at", startOfDay.toISOString())
+          .lte("created_at", endOfDay.toISOString());
+      }
       
       if (categoryFilter && categoryFilter !== "all") {
         query = query.eq("category", categoryFilter);
@@ -62,12 +107,13 @@ const WODArchive = () => {
   });
 
   const clearFilters = () => {
+    setSelectedDate(undefined);
     setCategoryFilter("all");
     setEquipmentFilter("all");
     setDifficultyFilter("all");
   };
 
-  const hasActiveFilters = categoryFilter !== "all" || equipmentFilter !== "all" || difficultyFilter !== "all";
+  const hasActiveFilters = selectedDate !== undefined || categoryFilter !== "all" || equipmentFilter !== "all" || difficultyFilter !== "all";
 
   const getCategorySlug = (category: string) => {
     return category?.toLowerCase().replace(/\s+/g, "-").replace(/&/g, "and") || "strength";
@@ -91,6 +137,23 @@ const WODArchive = () => {
     return Array.from({ length: stars }, (_, i) => (
       <Star key={i} className="w-3 h-3 fill-primary text-primary" />
     ));
+  };
+
+  // Function to check if a date is disabled
+  const isDateDisabled = (date: Date) => {
+    if (!dateRange?.minDate || !dateRange?.maxDate) return true;
+    
+    // Set times to start of day for accurate comparison
+    const checkDate = new Date(date);
+    checkDate.setHours(0, 0, 0, 0);
+    
+    const minDate = new Date(dateRange.minDate);
+    minDate.setHours(0, 0, 0, 0);
+    
+    const maxDate = new Date(dateRange.maxDate);
+    maxDate.setHours(23, 59, 59, 999);
+    
+    return checkDate < minDate || checkDate > maxDate;
   };
 
   return (
@@ -136,6 +199,32 @@ const WODArchive = () => {
             <Filter className="w-4 h-4" />
             <span className="text-sm font-medium">Filters:</span>
           </div>
+          
+          {/* Date Filter - PRIMARY */}
+          <Popover>
+            <PopoverTrigger asChild>
+              <Button
+                variant="outline"
+                className={cn(
+                  "w-[200px] justify-start text-left font-normal",
+                  !selectedDate && "text-muted-foreground"
+                )}
+              >
+                <CalendarIcon className="mr-2 h-4 w-4" />
+                {selectedDate ? format(selectedDate, "PPP") : "Select Date"}
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent className="w-auto p-0" align="start">
+              <Calendar
+                mode="single"
+                selected={selectedDate}
+                onSelect={setSelectedDate}
+                disabled={isDateDisabled}
+                initialFocus
+                className={cn("p-3 pointer-events-auto")}
+              />
+            </PopoverContent>
+          </Popover>
           
           <Select value={categoryFilter} onValueChange={setCategoryFilter}>
             <SelectTrigger className="w-[180px]">
@@ -184,7 +273,7 @@ const WODArchive = () => {
         {/* Results Count */}
         {!isLoading && pastWODs && (
           <p className="text-sm text-muted-foreground mb-4">
-            {pastWODs.length} archived workout{pastWODs.length !== 1 ? "s" : ""} found
+            {pastWODs.length} workout{pastWODs.length !== 1 ? "s" : ""} found
           </p>
         )}
 
@@ -214,7 +303,8 @@ const WODArchive = () => {
             {pastWODs.map((wod) => (
               <Card 
                 key={wod.id} 
-                className="overflow-hidden hover:scale-[1.02] transition-transform duration-200 border-primary/30 hover:border-primary/50"
+                className="overflow-hidden hover:scale-[1.02] transition-transform duration-200 border-primary/30 hover:border-primary/50 cursor-pointer"
+                onClick={() => navigate(`/workout/${getCategorySlug(wod.category)}/${wod.id}`)}
               >
                 {/* Image */}
                 <div className="relative h-40">
@@ -288,7 +378,10 @@ const WODArchive = () => {
                     <Button 
                       size="sm"
                       className="ml-auto"
-                      onClick={() => navigate(`/workout/${getCategorySlug(wod.category)}/${wod.id}`)}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        navigate(`/workout/${getCategorySlug(wod.category)}/${wod.id}`);
+                      }}
                     >
                       View Workout
                     </Button>
@@ -303,11 +396,11 @@ const WODArchive = () => {
         {!isLoading && pastWODs && pastWODs.length === 0 && (
           <Card className="p-12 text-center">
             <Archive className="w-16 h-16 text-muted-foreground/50 mx-auto mb-4" />
-            <h3 className="text-lg font-semibold mb-2">No Archived Workouts Yet</h3>
+            <h3 className="text-lg font-semibold mb-2">No Workouts Found</h3>
             <p className="text-muted-foreground mb-4">
               {hasActiveFilters 
                 ? "No workouts match your current filters. Try adjusting your selection."
-                : "Past Workouts of the Day will appear here after they rotate out."}
+                : "Workouts of the Day will appear here."}
             </p>
             {hasActiveFilters && (
               <Button variant="outline" onClick={clearFilters}>
