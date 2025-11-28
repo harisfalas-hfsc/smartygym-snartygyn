@@ -68,3 +68,9 @@ verify_jwt = false
 
 [functions.fix-blog-images]
 verify_jwt = false
+
+[functions.generate-workout-of-day]
+verify_jwt = false
+
+[functions.create-stripe-product]
+verify_jwt = false
