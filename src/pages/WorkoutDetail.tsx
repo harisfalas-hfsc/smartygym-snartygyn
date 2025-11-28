@@ -166,11 +166,19 @@ const WorkoutDetail = () => {
       
       // Duration filter
       if (durationFilter !== "all") {
-        const workoutDuration = workout.duration?.toLowerCase();
+        const durationNumber = workout.duration?.match(/\d+/)?.[0];
+        const standardDurations = ["15", "20", "30", "45", "60"];
+        
         if (durationFilter === "various") {
-          if (!workoutDuration?.includes("various") && !workoutDuration?.includes("varies")) return false;
+          // Show workouts that DON'T match any standard duration
+          // This catches 50 min, 25 min, 40 min, or workouts with "various"/"varies" in text
+          const workoutDuration = workout.duration?.toLowerCase();
+          const isStandardDuration = durationNumber && standardDurations.includes(durationNumber);
+          const hasVariousText = workoutDuration?.includes("various") || workoutDuration?.includes("varies");
+          
+          if (isStandardDuration && !hasVariousText) return false;
         } else {
-          const durationNumber = workout.duration?.match(/\d+/)?.[0];
+          // For specific durations (15, 20, 30, 45, 60), match exactly
           if (durationNumber !== durationFilter) return false;
         }
       }
