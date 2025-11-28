@@ -23,6 +23,7 @@ export function BlogManager() {
   const [articles, setArticles] = useState<any[]>([]);
   const [filteredArticles, setFilteredArticles] = useState<any[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
+  const [categoryFilter, setCategoryFilter] = useState("all");
   const [sourceFilter, setSourceFilter] = useState("all");
   const [selectedArticle, setSelectedArticle] = useState<any>(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
@@ -46,6 +47,10 @@ export function BlogManager() {
       );
     }
 
+    if (categoryFilter !== "all") {
+      filtered = filtered.filter(article => article.category === categoryFilter);
+    }
+
     if (sourceFilter === "ai") {
       filtered = filtered.filter(article => article.is_ai_generated);
     } else if (sourceFilter === "manual") {
@@ -53,7 +58,7 @@ export function BlogManager() {
     }
 
     setFilteredArticles(filtered);
-  }, [searchQuery, sourceFilter, articles]);
+  }, [searchQuery, categoryFilter, sourceFilter, articles]);
 
   const fetchArticles = async () => {
     try {
@@ -292,15 +297,26 @@ export function BlogManager() {
       </CardHeader>
         <CardContent>
           <div className="mb-6 flex gap-4 flex-wrap">
-            <div className="relative flex-1 min-w-[200px]">
+            <div className="relative flex-1 min-w-[150px]">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
               <Input
-                placeholder="Search articles by title, category, or content..."
+                placeholder="Search articles..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="pl-9"
               />
             </div>
+            <Select value={categoryFilter} onValueChange={setCategoryFilter}>
+              <SelectTrigger className="w-[150px]">
+                <SelectValue placeholder="Category" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Categories</SelectItem>
+                <SelectItem value="Fitness">💪 Fitness</SelectItem>
+                <SelectItem value="Nutrition">🥗 Nutrition</SelectItem>
+                <SelectItem value="Wellness">🧘 Wellness</SelectItem>
+              </SelectContent>
+            </Select>
             <Select value={sourceFilter} onValueChange={setSourceFilter}>
               <SelectTrigger className="w-[150px]">
                 <SelectValue placeholder="Source" />
