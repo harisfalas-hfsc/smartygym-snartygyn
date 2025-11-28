@@ -47,6 +47,7 @@ export const WorkoutsManager = ({ externalDialog, setExternalDialog }: WorkoutsM
   const [equipmentFilter, setEquipmentFilter] = useState("all");
   
   const [difficultyFilter, setDifficultyFilter] = useState("all");
+  const [durationFilter, setDurationFilter] = useState("all");
   const [accessFilter, setAccessFilter] = useState("all");
   const [sourceFilter, setSourceFilter] = useState("all");
   const { toast } = useToast();
@@ -57,7 +58,7 @@ export const WorkoutsManager = ({ externalDialog, setExternalDialog }: WorkoutsM
 
   useEffect(() => {
     filterWorkouts();
-  }, [workouts, searchTerm, categoryFilter, formatFilter, equipmentFilter, difficultyFilter, accessFilter, sourceFilter]);
+  }, [workouts, searchTerm, categoryFilter, formatFilter, equipmentFilter, difficultyFilter, durationFilter, accessFilter, sourceFilter]);
 
   // Watch for external dialog trigger
   useEffect(() => {
@@ -91,6 +92,26 @@ export const WorkoutsManager = ({ externalDialog, setExternalDialog }: WorkoutsM
 
     if (difficultyFilter !== "all") {
       filtered = filtered.filter(w => w.difficulty === difficultyFilter);
+    }
+
+    if (durationFilter !== "all") {
+      if (durationFilter === "various") {
+        // Show workouts that DON'T match any standard duration
+        const standardDurations = ["15", "20", "30", "45", "60"];
+        filtered = filtered.filter(w => {
+          const durationNumber = w.duration?.match(/\d+/)?.[0];
+          const workoutDuration = w.duration?.toLowerCase();
+          const isStandardDuration = durationNumber && standardDurations.includes(durationNumber);
+          const hasVariousText = workoutDuration?.includes("various") || workoutDuration?.includes("varies");
+          return !isStandardDuration || hasVariousText;
+        });
+      } else {
+        // For specific durations, match the number
+        filtered = filtered.filter(w => {
+          const durationNumber = w.duration?.match(/\d+/)?.[0];
+          return durationNumber === durationFilter;
+        });
+      }
     }
 
     if (accessFilter === "free") {
@@ -470,6 +491,20 @@ export const WorkoutsManager = ({ externalDialog, setExternalDialog }: WorkoutsM
                 <SelectItem value="Beginner">Beginner</SelectItem>
                 <SelectItem value="Intermediate">Intermediate</SelectItem>
                 <SelectItem value="Advanced">Advanced</SelectItem>
+              </SelectContent>
+            </Select>
+            <Select value={durationFilter} onValueChange={setDurationFilter}>
+              <SelectTrigger className="w-[180px]">
+                <SelectValue placeholder="Duration" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Durations</SelectItem>
+                <SelectItem value="15">15 Minutes</SelectItem>
+                <SelectItem value="20">20 Minutes</SelectItem>
+                <SelectItem value="30">30 Minutes</SelectItem>
+                <SelectItem value="45">45 Minutes</SelectItem>
+                <SelectItem value="60">60 Minutes</SelectItem>
+                <SelectItem value="various">Various</SelectItem>
               </SelectContent>
             </Select>
             <Select value={accessFilter} onValueChange={setAccessFilter}>
