@@ -68,8 +68,7 @@ export const WorkoutOfTheDay = () => {
           </h2>
           
           {/* Description */}
-          <p className="text-sm sm:text-base text-muted-foreground max-w-3xl mx-auto mb-6">
-            Every day at 7:00 AM, <span className="text-primary font-semibold">
+          <p className="text-sm sm:text-base text-muted-foreground max-w-3xl mx-auto mb-6">Every day at 7:00 AM, Your SmartyGym: the gym that never closes and never takes a holiday. delivers a fresh, expertly designed workout following a strategic periodization cycle. Each day focuses on a different training style: Strength, Calorie Burning, Metabolic, Cardio, Mobility & Stability, and Challenge rotating continuously for balanced, progressive training. It's like going to the gym and following the workout of the day — but you can do it at your local gym, at home, in your office, outdoors, or even while traveling. Your SmartyGym: the gym that never closes and never takes a holiday.<span className="text-primary font-semibold">
 Your SmartyGym: the gym that never closes and never takes a holiday.</span> delivers a fresh, expertly designed workout following a strategic periodization cycle. Each day focuses on a different training style: <strong>Strength</strong>, <strong>Calorie Burning</strong>, <strong>Metabolic</strong>, <strong>Cardio</strong>, <strong>Mobility & Stability</strong>, and <strong>Challenge</strong> — rotating continuously for balanced, progressive training. It's like going to the gym and following the workout of the day — but you can do it at your local gym, at home, in your office, outdoors, or even while traveling. <strong>Your <span className="text-primary">SmartyGym</span>: the gym that never closes and never takes a holiday.</strong>
           </p>
         </div>
