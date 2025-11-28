@@ -45,7 +45,7 @@ export const WorkoutsManager = ({ externalDialog, setExternalDialog }: WorkoutsM
   const [categoryFilter, setCategoryFilter] = useState("all");
   const [formatFilter, setFormatFilter] = useState("all");
   const [equipmentFilter, setEquipmentFilter] = useState("all");
-  const [typeFilter, setTypeFilter] = useState("all");
+  
   const [difficultyFilter, setDifficultyFilter] = useState("all");
   const [accessFilter, setAccessFilter] = useState("all");
   const [sourceFilter, setSourceFilter] = useState("all");
@@ -57,7 +57,7 @@ export const WorkoutsManager = ({ externalDialog, setExternalDialog }: WorkoutsM
 
   useEffect(() => {
     filterWorkouts();
-  }, [workouts, searchTerm, categoryFilter, formatFilter, equipmentFilter, typeFilter, difficultyFilter, accessFilter, sourceFilter]);
+  }, [workouts, searchTerm, categoryFilter, formatFilter, equipmentFilter, difficultyFilter, accessFilter, sourceFilter]);
 
   // Watch for external dialog trigger
   useEffect(() => {
@@ -87,10 +87,6 @@ export const WorkoutsManager = ({ externalDialog, setExternalDialog }: WorkoutsM
 
     if (equipmentFilter !== "all") {
       filtered = filtered.filter(w => w.equipment === equipmentFilter);
-    }
-
-    if (typeFilter !== "all") {
-      filtered = filtered.filter(w => w.type === typeFilter);
     }
 
     if (difficultyFilter !== "all") {
@@ -366,10 +362,8 @@ export const WorkoutsManager = ({ externalDialog, setExternalDialog }: WorkoutsM
                 <SelectItem value="EMOM">EMOM</SelectItem>
                 <SelectItem value="TABATA">TABATA</SelectItem>
                 <SelectItem value="REPS & SETS">REPS & SETS</SelectItem>
-                <SelectItem value="TIMED SETS">TIMED SETS</SelectItem>
-                <SelectItem value="INTERVALS">INTERVALS</SelectItem>
-                <SelectItem value="LADDER">LADDER</SelectItem>
-                <SelectItem value="COMPLEX">COMPLEX</SelectItem>
+                <SelectItem value="FOR TIME">FOR TIME</SelectItem>
+                <SelectItem value="MIX">MIX</SelectItem>
               </SelectContent>
             </Select>
             <Select value={equipmentFilter} onValueChange={setEquipmentFilter}>
@@ -385,26 +379,6 @@ export const WorkoutsManager = ({ externalDialog, setExternalDialog }: WorkoutsM
                 <SelectItem value="RESISTANCE BANDS">RESISTANCE BANDS</SelectItem>
                 <SelectItem value="MIXED">MIXED</SelectItem>
                 <SelectItem value="MINIMAL">MINIMAL</SelectItem>
-              </SelectContent>
-            </Select>
-            <Select value={typeFilter} onValueChange={setTypeFilter}>
-              <SelectTrigger className="w-[180px]">
-                <SelectValue placeholder="Type" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">All Types</SelectItem>
-                <SelectItem value="HIIT">HIIT</SelectItem>
-                <SelectItem value="STRENGTH">STRENGTH</SelectItem>
-                <SelectItem value="CARDIO">CARDIO</SelectItem>
-                <SelectItem value="MOBILITY">MOBILITY</SelectItem>
-                <SelectItem value="CIRCUIT">CIRCUIT</SelectItem>
-                <SelectItem value="AMRAP">AMRAP</SelectItem>
-                <SelectItem value="EMOM">EMOM</SelectItem>
-                <SelectItem value="TABATA">TABATA</SelectItem>
-                <SelectItem value="METCON">METCON</SelectItem>
-                <SelectItem value="ENDURANCE">ENDURANCE</SelectItem>
-                <SelectItem value="POWER">POWER</SelectItem>
-                <SelectItem value="RECOVERY">RECOVERY</SelectItem>
               </SelectContent>
             </Select>
             <Select value={difficultyFilter} onValueChange={setDifficultyFilter}>
@@ -442,7 +416,6 @@ export const WorkoutsManager = ({ externalDialog, setExternalDialog }: WorkoutsM
                 <TableHead>Source</TableHead>
                 <TableHead>Category</TableHead>
                 <TableHead>Format</TableHead>
-                <TableHead>Type</TableHead>
                 <TableHead>Difficulty</TableHead>
                 <TableHead>Duration</TableHead>
                 <TableHead>Access</TableHead>
@@ -452,7 +425,7 @@ export const WorkoutsManager = ({ externalDialog, setExternalDialog }: WorkoutsM
             <TableBody>
               {filteredWorkouts.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={10} className="text-center py-8 text-muted-foreground">
+                  <TableCell colSpan={9} className="text-center py-8 text-muted-foreground">
                     {workouts.length === 0 ? 'No workouts yet. Create your first workout!' : 'No workouts match your filters.'}
                   </TableCell>
                 </TableRow>
@@ -481,7 +454,6 @@ export const WorkoutsManager = ({ externalDialog, setExternalDialog }: WorkoutsM
                     </TableCell>
                     <TableCell><Badge variant="outline">{workout.category}</Badge></TableCell>
                     <TableCell><Badge variant="outline">{workout.format}</Badge></TableCell>
-                    <TableCell>{workout.type}</TableCell>
                     <TableCell>{workout.difficulty}</TableCell>
                     <TableCell>{workout.duration}</TableCell>
                     <TableCell>
