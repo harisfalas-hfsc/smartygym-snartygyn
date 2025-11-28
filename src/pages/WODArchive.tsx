@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { format } from "date-fns";
+import { DateRange } from "react-day-picker";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -34,13 +35,13 @@ const DIFFICULTY_OPTIONS = ["Beginner", "Intermediate", "Advanced"];
 
 const WODArchive = () => {
   const navigate = useNavigate();
-  const [selectedDate, setSelectedDate] = useState<Date | undefined>(undefined);
+  const [selectedDateRange, setSelectedDateRange] = useState<DateRange | undefined>(undefined);
   const [categoryFilter, setCategoryFilter] = useState<string>("all");
   const [equipmentFilter, setEquipmentFilter] = useState<string>("all");
   const [difficultyFilter, setDifficultyFilter] = useState<string>("all");
 
   // Fetch date range constraints
-  const { data: dateRange } = useQuery({
+  const { data: dateRange, isLoading: isLoadingDateRange } = useQuery({
     queryKey: ["wod-date-range"],
     queryFn: async () => {
       // Get first WOD (oldest)
@@ -69,7 +70,7 @@ const WODArchive = () => {
   });
 
   const { data: pastWODs, isLoading } = useQuery({
-    queryKey: ["wod-archive", selectedDate?.toISOString(), categoryFilter, equipmentFilter, difficultyFilter],
+    queryKey: ["wod-archive", selectedDateRange?.from?.toISOString(), selectedDateRange?.to?.toISOString(), categoryFilter, equipmentFilter, difficultyFilter],
     queryFn: async () => {
       let query = supabase
         .from("admin_workouts")
@@ -78,16 +79,22 @@ const WODArchive = () => {
         .eq("is_visible", true)
         .order("created_at", { ascending: false });
       
-      // Filter by selected date
-      if (selectedDate) {
-        const startOfDay = new Date(selectedDate);
+      // Filter by selected date range
+      if (selectedDateRange?.from) {
+        const startOfDay = new Date(selectedDateRange.from);
         startOfDay.setHours(0, 0, 0, 0);
-        const endOfDay = new Date(selectedDate);
-        endOfDay.setHours(23, 59, 59, 999);
+        query = query.gte("created_at", startOfDay.toISOString());
         
-        query = query
-          .gte("created_at", startOfDay.toISOString())
-          .lte("created_at", endOfDay.toISOString());
+        if (selectedDateRange.to) {
+          const endOfDay = new Date(selectedDateRange.to);
+          endOfDay.setHours(23, 59, 59, 999);
+          query = query.lte("created_at", endOfDay.toISOString());
+        } else {
+          // Single day selected - use same day as end
+          const endOfDay = new Date(selectedDateRange.from);
+          endOfDay.setHours(23, 59, 59, 999);
+          query = query.lte("created_at", endOfDay.toISOString());
+        }
       }
       
       if (categoryFilter && categoryFilter !== "all") {
@@ -107,13 +114,13 @@ const WODArchive = () => {
   });
 
   const clearFilters = () => {
-    setSelectedDate(undefined);
+    setSelectedDateRange(undefined);
     setCategoryFilter("all");
     setEquipmentFilter("all");
     setDifficultyFilter("all");
   };
 
-  const hasActiveFilters = selectedDate !== undefined || categoryFilter !== "all" || equipmentFilter !== "all" || difficultyFilter !== "all";
+  const hasActiveFilters = selectedDateRange !== undefined || categoryFilter !== "all" || equipmentFilter !== "all" || difficultyFilter !== "all";
 
   const getCategorySlug = (category: string) => {
     return category?.toLowerCase().replace(/\s+/g, "-").replace(/&/g, "and") || "strength";
@@ -139,11 +146,14 @@ const WODArchive = () => {
     ));
   };
 
-  // Function to check if a date is disabled
+  // Fix 1: Allow date selection while loading, only disable outside valid range once loaded
   const isDateDisabled = (date: Date) => {
-    if (!dateRange?.minDate || !dateRange?.maxDate) return true;
+    // Allow all dates while loading
+    if (isLoadingDateRange || !dateRange?.minDate || !dateRange?.maxDate) {
+      return false;
+    }
     
-    // Set times to start of day for accurate comparison
+    // Set times for accurate comparison
     const checkDate = new Date(date);
     checkDate.setHours(0, 0, 0, 0);
     
@@ -154,6 +164,17 @@ const WODArchive = () => {
     maxDate.setHours(23, 59, 59, 999);
     
     return checkDate < minDate || checkDate > maxDate;
+  };
+
+  // Format selected date range for display
+  const getDateRangeDisplay = () => {
+    if (!selectedDateRange?.from) return "Select Dates";
+    
+    if (selectedDateRange.to) {
+      return `${format(selectedDateRange.from, "MMM d")} - ${format(selectedDateRange.to, "MMM d, yyyy")}`;
+    }
+    
+    return format(selectedDateRange.from, "PPP");
   };
 
   return (
@@ -200,28 +221,35 @@ const WODArchive = () => {
             <span className="text-sm font-medium">Filters:</span>
           </div>
           
-          {/* Date Filter - PRIMARY */}
+          {/* Date Range Filter - PRIMARY (Fix 4: Range mode) */}
           <Popover>
             <PopoverTrigger asChild>
               <Button
                 variant="outline"
                 className={cn(
-                  "w-[200px] justify-start text-left font-normal",
-                  !selectedDate && "text-muted-foreground"
+                  "w-[240px] justify-start text-left font-normal",
+                  !selectedDateRange && "text-muted-foreground"
                 )}
               >
                 <CalendarIcon className="mr-2 h-4 w-4" />
-                {selectedDate ? format(selectedDate, "PPP") : "Select Date"}
+                {getDateRangeDisplay()}
               </Button>
             </PopoverTrigger>
             <PopoverContent className="w-auto p-0" align="start">
               <Calendar
-                mode="single"
-                selected={selectedDate}
-                onSelect={setSelectedDate}
+                mode="range"
+                selected={selectedDateRange}
+                onSelect={setSelectedDateRange}
                 disabled={isDateDisabled}
                 initialFocus
+                numberOfMonths={1}
                 className={cn("p-3 pointer-events-auto")}
+                modifiers={{
+                  today: new Date()
+                }}
+                modifiersClassNames={{
+                  today: "border-2 border-primary/50 bg-transparent font-bold"
+                }}
               />
             </PopoverContent>
           </Popover>
@@ -297,14 +325,13 @@ const WODArchive = () => {
           </div>
         )}
 
-        {/* Grid of Past WODs */}
+        {/* Grid of Past WODs (Fix 3: Removed card onClick - only button navigates) */}
         {!isLoading && pastWODs && pastWODs.length > 0 && (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {pastWODs.map((wod) => (
               <Card 
                 key={wod.id} 
-                className="overflow-hidden hover:scale-[1.02] transition-transform duration-200 border-primary/30 hover:border-primary/50 cursor-pointer"
-                onClick={() => navigate(`/workout/${getCategorySlug(wod.category)}/${wod.id}`)}
+                className="overflow-hidden hover:scale-[1.02] transition-transform duration-200 border-primary/30 hover:border-primary/50"
               >
                 {/* Image */}
                 <div className="relative h-40">
@@ -377,11 +404,8 @@ const WODArchive = () => {
                     )}
                     <Button 
                       size="sm"
-                      className="ml-auto"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        navigate(`/workout/${getCategorySlug(wod.category)}/${wod.id}`);
-                      }}
+                      className="ml-auto w-full sm:w-auto"
+                      onClick={() => navigate(`/workout/${getCategorySlug(wod.category)}/${wod.id}`)}
                     >
                       View Workout
                     </Button>
