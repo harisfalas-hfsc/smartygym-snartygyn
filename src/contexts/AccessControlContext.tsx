@@ -131,11 +131,12 @@ export const AccessControlProvider = ({ children }: { children: ReactNode }) => 
         console.error("Database subscription error:", dbError);
       }
 
-      // Fetch purchased content
+      // Fetch purchased content (only valid, non-deleted content)
       const { data: purchases } = await supabase
         .from('user_purchases')
         .select('content_id, content_type')
-        .eq('user_id', user.id);
+        .eq('user_id', user.id)
+        .eq('content_deleted', false);
 
       const purchasedContent = new Set(
         purchases?.map(p => `${p.content_type}:${p.content_id}`) || []

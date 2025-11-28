@@ -8,6 +8,7 @@ interface Purchase {
   content_name: string;
   price: number;
   purchased_at: string;
+  content_deleted?: boolean;
 }
 
 export const usePurchases = (userId: string | undefined) => {
@@ -18,7 +19,7 @@ export const usePurchases = (userId: string | undefined) => {
 
       const { data, error } = await supabase
         .from("user_purchases")
-        .select("*")
+        .select("id, content_id, content_type, content_name, price, purchased_at, content_deleted")
         .eq("user_id", userId)
         .order("purchased_at", { ascending: false });
 

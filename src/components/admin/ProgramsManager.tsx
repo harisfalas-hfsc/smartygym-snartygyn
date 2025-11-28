@@ -148,15 +148,15 @@ export const ProgramsManager = ({ externalDialog, setExternalDialog }: ProgramsM
         }
       }
 
-      // Delete related purchases to prevent orphaned records
+      // Soft-delete related purchases (preserve for accounting, but mark content as deleted)
       const { error: purchasesError } = await supabase
         .from('user_purchases')
-        .delete()
+        .update({ content_deleted: true })
         .eq('content_id', id)
         .eq('content_type', 'program');
 
       if (purchasesError) {
-        console.error('Error deleting related purchases:', purchasesError);
+        console.error('Error marking purchases as content_deleted:', purchasesError);
       }
 
       // Delete from database
@@ -318,11 +318,11 @@ export const ProgramsManager = ({ externalDialog, setExternalDialog }: ProgramsM
         }
       }
 
-      // Delete related purchases for all selected programs to prevent orphaned records
+      // Soft-delete related purchases for all selected programs (preserve for accounting)
       for (const programId of selectedPrograms) {
         await supabase
           .from('user_purchases')
-          .delete()
+          .update({ content_deleted: true })
           .eq('content_id', programId)
           .eq('content_type', 'program');
       }

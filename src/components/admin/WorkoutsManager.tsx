@@ -181,15 +181,15 @@ export const WorkoutsManager = ({ externalDialog, setExternalDialog }: WorkoutsM
         }
       }
 
-      // Delete related purchases to prevent orphaned records
+      // Soft-delete related purchases (preserve for accounting, but mark content as deleted)
       const { error: purchasesError } = await supabase
         .from('user_purchases')
-        .delete()
+        .update({ content_deleted: true })
         .eq('content_id', id)
         .eq('content_type', 'workout');
 
       if (purchasesError) {
-        console.error('Error deleting related purchases:', purchasesError);
+        console.error('Error marking purchases as content_deleted:', purchasesError);
       }
 
       // Delete from database
@@ -351,11 +351,11 @@ export const WorkoutsManager = ({ externalDialog, setExternalDialog }: WorkoutsM
         }
       }
 
-      // Delete related purchases for all selected workouts to prevent orphaned records
+      // Soft-delete related purchases for all selected workouts (preserve for accounting)
       for (const workoutId of selectedWorkouts) {
         await supabase
           .from('user_purchases')
-          .delete()
+          .update({ content_deleted: true })
           .eq('content_id', workoutId)
           .eq('content_type', 'workout');
       }

@@ -580,8 +580,9 @@ export default function UserDashboard() {
   // Premium members have Gold/Platinum subscription
   const hasActivePlan = subscriptionInfo?.subscribed && subscriptionInfo?.product_id;
   
-  // Separate flag for standalone purchases
-  const hasStandalonePurchases = purchases && purchases.length > 0;
+  // Separate flag for standalone purchases (only count non-deleted content)
+  const validPurchases = purchases?.filter(p => !p.content_deleted) || [];
+  const hasStandalonePurchases = validPurchases.length > 0;
 
   return (
     <div className="min-h-screen bg-background">
@@ -1412,22 +1413,34 @@ export default function UserDashboard() {
                 ) : (
                   <div className="space-y-4">
                     {purchases.map((purchase) => (
-                      <Card key={purchase.id} className="overflow-hidden hover:shadow-lg transition-shadow">
+                      <Card 
+                        key={purchase.id} 
+                        className={`overflow-hidden transition-shadow ${purchase.content_deleted ? 'opacity-60 bg-muted/30' : 'hover:shadow-lg'}`}
+                      >
                         <CardContent className="p-6">
                           <div className="flex flex-col sm:flex-row justify-between items-start gap-4">
                             <div className="space-y-2 flex-1">
-                              <div className="flex items-center gap-2">
+                              <div className="flex items-center gap-2 flex-wrap">
                                 <Badge variant="outline" className="text-xs">
                                   {purchase.content_type === "workout" ? "Workout" : "Program"}
                                 </Badge>
+                                {purchase.content_deleted && (
+                                  <Badge variant="destructive" className="text-xs">
+                                    Content Removed
+                                  </Badge>
+                                )}
                                 <span className="text-xs text-muted-foreground">
                                   Purchased {new Date(purchase.purchased_at).toLocaleDateString()}
                                 </span>
                               </div>
-                              <h3 className="text-lg font-semibold">{purchase.content_name}</h3>
+                              <h3 className={`text-lg font-semibold ${purchase.content_deleted ? 'line-through text-muted-foreground' : ''}`}>
+                                {purchase.content_name}
+                              </h3>
                               <p className="text-sm text-muted-foreground">€{Number(purchase.price).toFixed(2)}</p>
                             </div>
                             <Button
+                              disabled={purchase.content_deleted}
+                              variant={purchase.content_deleted ? "outline" : "default"}
                               onClick={() => {
                                 if (purchase.content_type === "workout") {
                                   navigate(`/workout/detail/${purchase.content_id}`);
@@ -1436,7 +1449,7 @@ export default function UserDashboard() {
                                 }
                               }}
                             >
-                              View Content
+                              {purchase.content_deleted ? "No Longer Available" : "View Content"}
                             </Button>
                           </div>
                         </CardContent>
