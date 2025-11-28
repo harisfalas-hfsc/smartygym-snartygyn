@@ -7,7 +7,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Badge } from "@/components/ui/badge";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Plus, Edit, Trash2, Eye, Search, Download, Filter } from "lucide-react";
+import { Plus, Edit, Trash2, Eye, Search, Download, Filter, Bot, User } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { WorkoutEditDialog } from "./WorkoutEditDialog";
 
@@ -26,6 +26,7 @@ interface Workout {
   price: number | null;
   stripe_product_id: string | null;
   stripe_price_id: string | null;
+  is_ai_generated: boolean;
 }
 
 interface WorkoutsManagerProps {
@@ -47,6 +48,7 @@ export const WorkoutsManager = ({ externalDialog, setExternalDialog }: WorkoutsM
   const [typeFilter, setTypeFilter] = useState("all");
   const [difficultyFilter, setDifficultyFilter] = useState("all");
   const [accessFilter, setAccessFilter] = useState("all");
+  const [sourceFilter, setSourceFilter] = useState("all");
   const { toast } = useToast();
 
   useEffect(() => {
@@ -55,7 +57,7 @@ export const WorkoutsManager = ({ externalDialog, setExternalDialog }: WorkoutsM
 
   useEffect(() => {
     filterWorkouts();
-  }, [workouts, searchTerm, categoryFilter, formatFilter, equipmentFilter, typeFilter, difficultyFilter, accessFilter]);
+  }, [workouts, searchTerm, categoryFilter, formatFilter, equipmentFilter, typeFilter, difficultyFilter, accessFilter, sourceFilter]);
 
   // Watch for external dialog trigger
   useEffect(() => {
@@ -99,6 +101,12 @@ export const WorkoutsManager = ({ externalDialog, setExternalDialog }: WorkoutsM
       filtered = filtered.filter(w => !w.is_premium);
     } else if (accessFilter === "premium") {
       filtered = filtered.filter(w => w.is_premium);
+    }
+
+    if (sourceFilter === "ai") {
+      filtered = filtered.filter(w => w.is_ai_generated);
+    } else if (sourceFilter === "manual") {
+      filtered = filtered.filter(w => !w.is_ai_generated);
     }
 
     setFilteredWorkouts(filtered);
@@ -255,14 +263,15 @@ export const WorkoutsManager = ({ externalDialog, setExternalDialog }: WorkoutsM
 
   const handleExport = () => {
     const csv = [
-      ['ID', 'Name', 'Type', 'Difficulty', 'Duration', 'Access'].join(','),
+      ['ID', 'Name', 'Type', 'Difficulty', 'Duration', 'Access', 'Source'].join(','),
       ...filteredWorkouts.map(w => [
         w.id,
         `"${w.name}"`,
         w.type,
         w.difficulty,
         w.duration,
-        w.is_premium ? w.tier_required || 'Premium' : 'Free'
+        w.is_premium ? w.tier_required || 'Premium' : 'Free',
+        w.is_ai_generated ? 'AI' : 'Manual'
       ].join(','))
     ].join('\n');
 
@@ -321,6 +330,16 @@ export const WorkoutsManager = ({ externalDialog, setExternalDialog }: WorkoutsM
                 />
               </div>
             </div>
+            <Select value={sourceFilter} onValueChange={setSourceFilter}>
+              <SelectTrigger className="w-[150px]">
+                <SelectValue placeholder="Source" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Sources</SelectItem>
+                <SelectItem value="ai">🤖 AI Generated</SelectItem>
+                <SelectItem value="manual">👤 Manual</SelectItem>
+              </SelectContent>
+            </Select>
             <Select value={categoryFilter} onValueChange={setCategoryFilter}>
               <SelectTrigger className="w-[180px]">
                 <Filter className="h-4 w-4 mr-2" />
@@ -420,6 +439,7 @@ export const WorkoutsManager = ({ externalDialog, setExternalDialog }: WorkoutsM
                   />
                 </TableHead>
                 <TableHead>Name</TableHead>
+                <TableHead>Source</TableHead>
                 <TableHead>Category</TableHead>
                 <TableHead>Format</TableHead>
                 <TableHead>Type</TableHead>
@@ -432,7 +452,7 @@ export const WorkoutsManager = ({ externalDialog, setExternalDialog }: WorkoutsM
             <TableBody>
               {filteredWorkouts.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={9} className="text-center py-8 text-muted-foreground">
+                  <TableCell colSpan={10} className="text-center py-8 text-muted-foreground">
                     {workouts.length === 0 ? 'No workouts yet. Create your first workout!' : 'No workouts match your filters.'}
                   </TableCell>
                 </TableRow>
@@ -446,6 +466,19 @@ export const WorkoutsManager = ({ externalDialog, setExternalDialog }: WorkoutsM
                       />
                     </TableCell>
                     <TableCell className="font-medium">{workout.name}</TableCell>
+                    <TableCell>
+                      {workout.is_ai_generated ? (
+                        <Badge variant="outline" className="bg-purple-100 text-purple-700 border-purple-300 dark:bg-purple-900/30 dark:text-purple-400 dark:border-purple-700">
+                          <Bot className="h-3 w-3 mr-1" />
+                          AI
+                        </Badge>
+                      ) : (
+                        <Badge variant="outline" className="bg-blue-100 text-blue-700 border-blue-300 dark:bg-blue-900/30 dark:text-blue-400 dark:border-blue-700">
+                          <User className="h-3 w-3 mr-1" />
+                          Manual
+                        </Badge>
+                      )}
+                    </TableCell>
                     <TableCell><Badge variant="outline">{workout.category}</Badge></TableCell>
                     <TableCell><Badge variant="outline">{workout.format}</Badge></TableCell>
                     <TableCell>{workout.type}</TableCell>

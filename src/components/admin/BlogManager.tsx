@@ -4,7 +4,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
-import { Plus, Search, Pencil, Trash2, Download, AlertTriangle, CheckCircle, Calendar, Clock, ExternalLink } from "lucide-react";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Plus, Search, Pencil, Trash2, Download, AlertTriangle, CheckCircle, Calendar, Clock, ExternalLink, Bot, User } from "lucide-react";
 import { toast } from "sonner";
 import { ArticleEditDialog } from "./ArticleEditDialog";
 import {
@@ -22,6 +23,7 @@ export function BlogManager() {
   const [articles, setArticles] = useState<any[]>([]);
   const [filteredArticles, setFilteredArticles] = useState<any[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
+  const [sourceFilter, setSourceFilter] = useState("all");
   const [selectedArticle, setSelectedArticle] = useState<any>(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
@@ -34,17 +36,24 @@ export function BlogManager() {
   }, []);
 
   useEffect(() => {
+    let filtered = articles;
+    
     if (searchQuery) {
-      const filtered = articles.filter(article =>
+      filtered = filtered.filter(article =>
         article.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
         article.category.toLowerCase().includes(searchQuery.toLowerCase()) ||
         article.excerpt.toLowerCase().includes(searchQuery.toLowerCase())
       );
-      setFilteredArticles(filtered);
-    } else {
-      setFilteredArticles(articles);
     }
-  }, [searchQuery, articles]);
+
+    if (sourceFilter === "ai") {
+      filtered = filtered.filter(article => article.is_ai_generated);
+    } else if (sourceFilter === "manual") {
+      filtered = filtered.filter(article => !article.is_ai_generated);
+    }
+
+    setFilteredArticles(filtered);
+  }, [searchQuery, sourceFilter, articles]);
 
   const fetchArticles = async () => {
     try {
@@ -143,7 +152,7 @@ export function BlogManager() {
 
   const handleExport = () => {
     const csv = [
-      ['ID', 'Slug', 'Title', 'Category', 'Author', 'Status', 'Published Date', 'Read Time'].join(','),
+      ['ID', 'Slug', 'Title', 'Category', 'Author', 'Status', 'Published Date', 'Read Time', 'Source'].join(','),
       ...filteredArticles.map(article => [
         article.id,
         article.slug,
@@ -152,7 +161,8 @@ export function BlogManager() {
         article.author_name || 'N/A',
         article.is_published ? 'Published' : 'Draft',
         article.published_at ? new Date(article.published_at).toLocaleDateString() : 'N/A',
-        article.read_time || 'N/A'
+        article.read_time || 'N/A',
+        article.is_ai_generated ? 'AI' : 'Manual'
       ].join(','))
     ].join('\n');
 
@@ -206,8 +216,8 @@ export function BlogManager() {
         </div>
       </CardHeader>
         <CardContent>
-          <div className="mb-6">
-            <div className="relative">
+          <div className="mb-6 flex gap-4 flex-wrap">
+            <div className="relative flex-1 min-w-[200px]">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
               <Input
                 placeholder="Search articles by title, category, or content..."
@@ -216,12 +226,22 @@ export function BlogManager() {
                 className="pl-9"
               />
             </div>
+            <Select value={sourceFilter} onValueChange={setSourceFilter}>
+              <SelectTrigger className="w-[150px]">
+                <SelectValue placeholder="Source" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Sources</SelectItem>
+                <SelectItem value="ai">🤖 AI Generated</SelectItem>
+                <SelectItem value="manual">👤 Manual</SelectItem>
+              </SelectContent>
+            </Select>
           </div>
 
           <div className="space-y-4">
             {filteredArticles.length === 0 ? (
               <div className="text-center py-12 text-muted-foreground">
-                {searchQuery ? 'No articles found matching your search.' : 'No articles yet. Create your first one!'}
+                {searchQuery || sourceFilter !== "all" ? 'No articles found matching your filters.' : 'No articles yet. Create your first one!'}
               </div>
             ) : (
               filteredArticles.map((article) => {
@@ -263,6 +283,17 @@ export function BlogManager() {
                         <div className="flex-1 space-y-2">
                           <div className="flex items-center gap-2 flex-wrap">
                             <h3 className="text-lg font-semibold">{article.title}</h3>
+                            {article.is_ai_generated ? (
+                              <Badge variant="outline" className="bg-purple-100 text-purple-700 border-purple-300 dark:bg-purple-900/30 dark:text-purple-400 dark:border-purple-700">
+                                <Bot className="h-3 w-3 mr-1" />
+                                AI
+                              </Badge>
+                            ) : (
+                              <Badge variant="outline" className="bg-blue-100 text-blue-700 border-blue-300 dark:bg-blue-900/30 dark:text-blue-400 dark:border-blue-700">
+                                <User className="h-3 w-3 mr-1" />
+                                Manual
+                              </Badge>
+                            )}
                             {article.is_published ? (
                               <Badge className={getCategoryColor(article.category)}>
                                 {article.category}

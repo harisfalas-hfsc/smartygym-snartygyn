@@ -27,6 +27,7 @@ export type Database = {
           expected_results: string | null
           id: string
           image_url: string | null
+          is_ai_generated: boolean | null
           is_premium: boolean | null
           is_standalone_purchase: boolean | null
           name: string
@@ -56,6 +57,7 @@ export type Database = {
           expected_results?: string | null
           id: string
           image_url?: string | null
+          is_ai_generated?: boolean | null
           is_premium?: boolean | null
           is_standalone_purchase?: boolean | null
           name: string
@@ -85,6 +87,7 @@ export type Database = {
           expected_results?: string | null
           id?: string
           image_url?: string | null
+          is_ai_generated?: boolean | null
           is_premium?: boolean | null
           is_standalone_purchase?: boolean | null
           name?: string
@@ -121,6 +124,7 @@ export type Database = {
           id: string
           image_url: string | null
           instructions: string | null
+          is_ai_generated: boolean | null
           is_premium: boolean | null
           is_standalone_purchase: boolean | null
           main_workout: string | null
@@ -152,6 +156,7 @@ export type Database = {
           id: string
           image_url?: string | null
           instructions?: string | null
+          is_ai_generated?: boolean | null
           is_premium?: boolean | null
           is_standalone_purchase?: boolean | null
           main_workout?: string | null
@@ -183,6 +188,7 @@ export type Database = {
           id?: string
           image_url?: string | null
           instructions?: string | null
+          is_ai_generated?: boolean | null
           is_premium?: boolean | null
           is_standalone_purchase?: boolean | null
           main_workout?: string | null
@@ -361,6 +367,7 @@ export type Database = {
           excerpt: string
           id: string
           image_url: string | null
+          is_ai_generated: boolean | null
           is_published: boolean | null
           published_at: string | null
           read_time: string | null
@@ -378,6 +385,7 @@ export type Database = {
           excerpt: string
           id?: string
           image_url?: string | null
+          is_ai_generated?: boolean | null
           is_published?: boolean | null
           published_at?: string | null
           read_time?: string | null
@@ -395,6 +403,7 @@ export type Database = {
           excerpt?: string
           id?: string
           image_url?: string | null
+          is_ai_generated?: boolean | null
           is_published?: boolean | null
           published_at?: string | null
           read_time?: string | null

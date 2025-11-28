@@ -7,7 +7,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Badge } from "@/components/ui/badge";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Plus, Edit, Trash2, Eye, Search, Download, Filter } from "lucide-react";
+import { Plus, Edit, Trash2, Eye, Search, Download, Filter, Bot, User } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { ProgramEditDialog } from "./ProgramEditDialog";
 
@@ -21,6 +21,7 @@ interface Program {
   is_premium: boolean;
   is_standalone_purchase: boolean;
   price: number | null;
+  is_ai_generated: boolean;
 }
 
 interface ProgramsManagerProps {
@@ -40,6 +41,7 @@ export const ProgramsManager = ({ externalDialog, setExternalDialog }: ProgramsM
   const [difficultyFilter, setDifficultyFilter] = useState("all");
   const [equipmentFilter, setEquipmentFilter] = useState("all");
   const [accessFilter, setAccessFilter] = useState("all");
+  const [sourceFilter, setSourceFilter] = useState("all");
   const { toast } = useToast();
 
   useEffect(() => {
@@ -48,7 +50,7 @@ export const ProgramsManager = ({ externalDialog, setExternalDialog }: ProgramsM
 
   useEffect(() => {
     filterPrograms();
-  }, [programs, searchTerm, categoryFilter, difficultyFilter, equipmentFilter, accessFilter]);
+  }, [programs, searchTerm, categoryFilter, difficultyFilter, equipmentFilter, accessFilter, sourceFilter]);
 
   // Watch for external dialog trigger
   useEffect(() => {
@@ -86,6 +88,12 @@ export const ProgramsManager = ({ externalDialog, setExternalDialog }: ProgramsM
       filtered = filtered.filter(p => p.is_premium);
     }
 
+    if (sourceFilter === "ai") {
+      filtered = filtered.filter(p => p.is_ai_generated);
+    } else if (sourceFilter === "manual") {
+      filtered = filtered.filter(p => !p.is_ai_generated);
+    }
+
     setFilteredPrograms(filtered);
   };
 
@@ -93,7 +101,7 @@ export const ProgramsManager = ({ externalDialog, setExternalDialog }: ProgramsM
     try {
       const { data, error } = await supabase
         .from('admin_training_programs')
-        .select('id, name, category, duration, difficulty, equipment, is_premium, is_standalone_purchase, price')
+        .select('id, name, category, duration, difficulty, equipment, is_premium, is_standalone_purchase, price, is_ai_generated')
         .order('serial_number');
 
       if (error) throw error;
@@ -240,14 +248,15 @@ export const ProgramsManager = ({ externalDialog, setExternalDialog }: ProgramsM
 
   const handleExport = () => {
     const csv = [
-      ['ID', 'Name', 'Category', 'Duration', 'Access', 'Price'].join(','),
+      ['ID', 'Name', 'Category', 'Duration', 'Access', 'Price', 'Source'].join(','),
       ...filteredPrograms.map(p => [
         p.id,
         `"${p.name}"`,
         p.category,
         p.duration || 'N/A',
         p.is_premium ? 'Premium' : 'Free',
-        p.is_standalone_purchase && p.price ? `€${p.price}` : '-'
+        p.is_standalone_purchase && p.price ? `€${p.price}` : '-',
+        p.is_ai_generated ? 'AI' : 'Manual'
       ].join(','))
     ].join('\n');
 
@@ -306,6 +315,16 @@ export const ProgramsManager = ({ externalDialog, setExternalDialog }: ProgramsM
                 />
               </div>
             </div>
+            <Select value={sourceFilter} onValueChange={setSourceFilter}>
+              <SelectTrigger className="w-[150px]">
+                <SelectValue placeholder="Source" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Sources</SelectItem>
+                <SelectItem value="ai">🤖 AI Generated</SelectItem>
+                <SelectItem value="manual">👤 Manual</SelectItem>
+              </SelectContent>
+            </Select>
             <Select value={categoryFilter} onValueChange={setCategoryFilter}>
               <SelectTrigger className="w-[180px]">
                 <Filter className="h-4 w-4 mr-2" />
@@ -368,6 +387,7 @@ export const ProgramsManager = ({ externalDialog, setExternalDialog }: ProgramsM
                   />
                 </TableHead>
                 <TableHead>Name</TableHead>
+                <TableHead>Source</TableHead>
                 <TableHead>Category</TableHead>
                 <TableHead>Difficulty</TableHead>
                 <TableHead>Equipment</TableHead>
@@ -380,7 +400,7 @@ export const ProgramsManager = ({ externalDialog, setExternalDialog }: ProgramsM
             <TableBody>
               {filteredPrograms.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={9} className="text-center py-8 text-muted-foreground">
+                  <TableCell colSpan={10} className="text-center py-8 text-muted-foreground">
                     {programs.length === 0 ? 'No programs yet. Create your first program!' : 'No programs match your filters.'}
                   </TableCell>
                 </TableRow>
@@ -394,6 +414,19 @@ export const ProgramsManager = ({ externalDialog, setExternalDialog }: ProgramsM
                       />
                     </TableCell>
                     <TableCell className="font-medium">{program.name}</TableCell>
+                    <TableCell>
+                      {program.is_ai_generated ? (
+                        <Badge variant="outline" className="bg-purple-100 text-purple-700 border-purple-300 dark:bg-purple-900/30 dark:text-purple-400 dark:border-purple-700">
+                          <Bot className="h-3 w-3 mr-1" />
+                          AI
+                        </Badge>
+                      ) : (
+                        <Badge variant="outline" className="bg-blue-100 text-blue-700 border-blue-300 dark:bg-blue-900/30 dark:text-blue-400 dark:border-blue-700">
+                          <User className="h-3 w-3 mr-1" />
+                          Manual
+                        </Badge>
+                      )}
+                    </TableCell>
                     <TableCell>{program.category}</TableCell>
                     <TableCell>{program.difficulty || 'N/A'}</TableCell>
                     <TableCell>{program.equipment || 'N/A'}</TableCell>
