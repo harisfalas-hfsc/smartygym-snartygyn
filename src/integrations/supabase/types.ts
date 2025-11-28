@@ -1535,6 +1535,7 @@ export type Database = {
       }
       user_purchases: {
         Row: {
+          content_deleted: boolean | null
           content_id: string
           content_name: string
           content_type: string
@@ -1549,6 +1550,7 @@ export type Database = {
           user_id: string
         }
         Insert: {
+          content_deleted?: boolean | null
           content_id: string
           content_name: string
           content_type: string
@@ -1563,6 +1565,7 @@ export type Database = {
           user_id: string
         }
         Update: {
+          content_deleted?: boolean | null
           content_id?: string
           content_name?: string
           content_type?: string
