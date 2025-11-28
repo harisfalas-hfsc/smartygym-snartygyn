@@ -7,7 +7,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Badge } from "@/components/ui/badge";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Plus, Edit, Trash2, Eye, Search, Download, Filter, Bot, User } from "lucide-react";
+import { Plus, Edit, Trash2, Eye, EyeOff, Search, Download, Filter, Bot, User, Copy } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { ProgramEditDialog } from "./ProgramEditDialog";
 
@@ -22,6 +22,7 @@ interface Program {
   is_standalone_purchase: boolean;
   price: number | null;
   is_ai_generated: boolean;
+  is_visible: boolean;
 }
 
 interface ProgramsManagerProps {
@@ -101,7 +102,7 @@ export const ProgramsManager = ({ externalDialog, setExternalDialog }: ProgramsM
     try {
       const { data, error } = await supabase
         .from('admin_training_programs')
-        .select('id, name, category, duration, difficulty, equipment, is_premium, is_standalone_purchase, price, is_ai_generated')
+        .select('id, name, category, duration, difficulty, equipment, is_premium, is_standalone_purchase, price, is_ai_generated, is_visible')
         .order('serial_number');
 
       if (error) throw error;
@@ -185,6 +186,90 @@ export const ProgramsManager = ({ externalDialog, setExternalDialog }: ProgramsM
     loadPrograms();
   };
 
+  const handleDuplicate = async (program: Program) => {
+    try {
+      // Get full program data
+      const { data: fullProgram, error: fetchError } = await supabase
+        .from('admin_training_programs')
+        .select('*')
+        .eq('id', program.id)
+        .single();
+
+      if (fetchError) throw fetchError;
+
+      // Create new ID and name
+      const newId = `${program.id}-copy-${Date.now()}`;
+      const newName = `${program.name} (Copy)`;
+
+      // Create duplicate without Stripe IDs (will be created fresh if needed)
+      const { error: insertError } = await supabase
+        .from('admin_training_programs')
+        .insert({
+          ...fullProgram,
+          id: newId,
+          name: newName,
+          stripe_product_id: null,
+          stripe_price_id: null,
+          is_visible: false, // Start as hidden
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString(),
+        });
+
+      if (insertError) throw insertError;
+
+      toast({
+        title: "Success",
+        description: "Program duplicated. Opening edit dialog...",
+      });
+
+      // Reload and open edit dialog for the new program
+      await loadPrograms();
+      
+      // Set the duplicated program for editing
+      const { data: newProgram } = await supabase
+        .from('admin_training_programs')
+        .select('*')
+        .eq('id', newId)
+        .single();
+
+      if (newProgram) {
+        setEditingProgram(newProgram as Program);
+        setIsDialogOpen(true);
+      }
+    } catch (error) {
+      console.error('Error duplicating program:', error);
+      toast({
+        title: "Error",
+        description: "Failed to duplicate program",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleToggleVisibility = async (programId: string, currentVisibility: boolean) => {
+    try {
+      const { error } = await supabase
+        .from('admin_training_programs')
+        .update({ is_visible: !currentVisibility })
+        .eq('id', programId);
+
+      if (error) throw error;
+
+      toast({
+        title: "Success",
+        description: `Program is now ${!currentVisibility ? 'visible' : 'hidden'}`,
+      });
+      loadPrograms();
+    } catch (error) {
+      console.error('Error toggling visibility:', error);
+      toast({
+        title: "Error",
+        description: "Failed to update visibility",
+        variant: "destructive",
+      });
+    }
+  };
+
   const toggleSelectAll = () => {
     if (selectedPrograms.length === filteredPrograms.length) {
       setSelectedPrograms([]);
@@ -248,7 +333,7 @@ export const ProgramsManager = ({ externalDialog, setExternalDialog }: ProgramsM
 
   const handleExport = () => {
     const csv = [
-      ['ID', 'Name', 'Category', 'Duration', 'Access', 'Price', 'Source'].join(','),
+      ['ID', 'Name', 'Category', 'Duration', 'Access', 'Price', 'Source', 'Visible'].join(','),
       ...filteredPrograms.map(p => [
         p.id,
         `"${p.name}"`,
@@ -256,7 +341,8 @@ export const ProgramsManager = ({ externalDialog, setExternalDialog }: ProgramsM
         p.duration || 'N/A',
         p.is_premium ? 'Premium' : 'Free',
         p.is_standalone_purchase && p.price ? `€${p.price}` : '-',
-        p.is_ai_generated ? 'AI' : 'Manual'
+        p.is_ai_generated ? 'AI' : 'Manual',
+        p.is_visible ? 'Yes' : 'No'
       ].join(','))
     ].join('\n');
 
@@ -357,13 +443,8 @@ export const ProgramsManager = ({ externalDialog, setExternalDialog }: ProgramsM
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">All Equipment</SelectItem>
-                <SelectItem value="Bodyweight">Bodyweight</SelectItem>
-                <SelectItem value="Dumbbells">Dumbbells</SelectItem>
-                <SelectItem value="Barbell">Barbell</SelectItem>
-                <SelectItem value="Resistance Bands">Resistance Bands</SelectItem>
-                <SelectItem value="Kettlebell">Kettlebell</SelectItem>
-                <SelectItem value="Pull-up Bar">Pull-up Bar</SelectItem>
-                <SelectItem value="Gym Equipment">Gym Equipment</SelectItem>
+                <SelectItem value="BODYWEIGHT">BODYWEIGHT</SelectItem>
+                <SelectItem value="EQUIPMENT">EQUIPMENT</SelectItem>
               </SelectContent>
             </Select>
             <Select value={accessFilter} onValueChange={setAccessFilter}>
@@ -406,14 +487,21 @@ export const ProgramsManager = ({ externalDialog, setExternalDialog }: ProgramsM
                 </TableRow>
               ) : (
                 filteredPrograms.map((program) => (
-                  <TableRow key={program.id}>
+                  <TableRow key={program.id} className={!program.is_visible ? 'opacity-50' : ''}>
                     <TableCell>
                       <Checkbox
                         checked={selectedPrograms.includes(program.id)}
                         onCheckedChange={() => toggleSelect(program.id)}
                       />
                     </TableCell>
-                    <TableCell className="font-medium">{program.name}</TableCell>
+                    <TableCell className="font-medium">
+                      <div className="flex items-center gap-2">
+                        {program.name}
+                        {!program.is_visible && (
+                          <Badge variant="destructive" className="text-xs">Hidden</Badge>
+                        )}
+                      </div>
+                    </TableCell>
                     <TableCell>
                       {program.is_ai_generated ? (
                         <Badge variant="outline" className="bg-purple-100 text-purple-700 border-purple-300 dark:bg-purple-900/30 dark:text-purple-400 dark:border-purple-700">
@@ -446,18 +534,36 @@ export const ProgramsManager = ({ externalDialog, setExternalDialog }: ProgramsM
                       )}
                     </TableCell>
                     <TableCell className="text-right">
-                      <div className="flex items-center justify-end gap-2">
+                      <div className="flex items-center justify-end gap-1">
                         <Button
                           variant="ghost"
                           size="icon"
                           onClick={() => window.open(`/training-program/${program.id}`, '_blank')}
+                          title="Preview"
                         >
                           <Eye className="h-4 w-4" />
                         </Button>
                         <Button
                           variant="ghost"
                           size="icon"
+                          onClick={() => handleDuplicate(program)}
+                          title="Duplicate"
+                        >
+                          <Copy className="h-4 w-4" />
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          onClick={() => handleToggleVisibility(program.id, program.is_visible)}
+                          title={program.is_visible ? 'Hide' : 'Show'}
+                        >
+                          {program.is_visible ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4 text-muted-foreground" />}
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="icon"
                           onClick={() => handleEdit(program)}
+                          title="Edit"
                         >
                           <Edit className="h-4 w-4" />
                         </Button>
@@ -465,6 +571,7 @@ export const ProgramsManager = ({ externalDialog, setExternalDialog }: ProgramsM
                           variant="ghost"
                           size="icon"
                           onClick={() => handleDelete(program.id)}
+                          title="Delete"
                         >
                           <Trash2 className="h-4 w-4" />
                         </Button>

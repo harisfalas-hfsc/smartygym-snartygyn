@@ -30,6 +30,7 @@ export type Database = {
           is_ai_generated: boolean | null
           is_premium: boolean | null
           is_standalone_purchase: boolean | null
+          is_visible: boolean | null
           name: string
           nutrition_tips: string | null
           overview: string | null
@@ -60,6 +61,7 @@ export type Database = {
           is_ai_generated?: boolean | null
           is_premium?: boolean | null
           is_standalone_purchase?: boolean | null
+          is_visible?: boolean | null
           name: string
           nutrition_tips?: string | null
           overview?: string | null
@@ -90,6 +92,7 @@ export type Database = {
           is_ai_generated?: boolean | null
           is_premium?: boolean | null
           is_standalone_purchase?: boolean | null
+          is_visible?: boolean | null
           name?: string
           nutrition_tips?: string | null
           overview?: string | null
@@ -127,6 +130,7 @@ export type Database = {
           is_ai_generated: boolean | null
           is_premium: boolean | null
           is_standalone_purchase: boolean | null
+          is_visible: boolean | null
           main_workout: string | null
           name: string
           notes: string | null
@@ -159,6 +163,7 @@ export type Database = {
           is_ai_generated?: boolean | null
           is_premium?: boolean | null
           is_standalone_purchase?: boolean | null
+          is_visible?: boolean | null
           main_workout?: string | null
           name: string
           notes?: string | null
@@ -191,6 +196,7 @@ export type Database = {
           is_ai_generated?: boolean | null
           is_premium?: boolean | null
           is_standalone_purchase?: boolean | null
+          is_visible?: boolean | null
           main_workout?: string | null
           name?: string
           notes?: string | null

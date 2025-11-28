@@ -7,7 +7,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Badge } from "@/components/ui/badge";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Plus, Edit, Trash2, Eye, Search, Download, Filter, Bot, User } from "lucide-react";
+import { Plus, Edit, Trash2, Eye, EyeOff, Search, Download, Filter, Bot, User, Copy } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { WorkoutEditDialog } from "./WorkoutEditDialog";
 
@@ -26,6 +26,7 @@ interface Workout {
   stripe_product_id: string | null;
   stripe_price_id: string | null;
   is_ai_generated: boolean;
+  is_visible: boolean;
 }
 
 interface WorkoutsManagerProps {
@@ -195,6 +196,90 @@ export const WorkoutsManager = ({ externalDialog, setExternalDialog }: WorkoutsM
     loadWorkouts();
   };
 
+  const handleDuplicate = async (workout: Workout) => {
+    try {
+      // Get full workout data
+      const { data: fullWorkout, error: fetchError } = await supabase
+        .from('admin_workouts')
+        .select('*')
+        .eq('id', workout.id)
+        .single();
+
+      if (fetchError) throw fetchError;
+
+      // Create new ID and name
+      const newId = `${workout.id}-copy-${Date.now()}`;
+      const newName = `${workout.name} (Copy)`;
+
+      // Create duplicate without Stripe IDs (will be created fresh if needed)
+      const { error: insertError } = await supabase
+        .from('admin_workouts')
+        .insert({
+          ...fullWorkout,
+          id: newId,
+          name: newName,
+          stripe_product_id: null,
+          stripe_price_id: null,
+          is_visible: false, // Start as hidden
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString(),
+        });
+
+      if (insertError) throw insertError;
+
+      toast({
+        title: "Success",
+        description: "Workout duplicated. Opening edit dialog...",
+      });
+
+      // Reload and open edit dialog for the new workout
+      await loadWorkouts();
+      
+      // Set the duplicated workout for editing
+      const { data: newWorkout } = await supabase
+        .from('admin_workouts')
+        .select('*')
+        .eq('id', newId)
+        .single();
+
+      if (newWorkout) {
+        setEditingWorkout(newWorkout as Workout);
+        setIsDialogOpen(true);
+      }
+    } catch (error) {
+      console.error('Error duplicating workout:', error);
+      toast({
+        title: "Error",
+        description: "Failed to duplicate workout",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleToggleVisibility = async (workoutId: string, currentVisibility: boolean) => {
+    try {
+      const { error } = await supabase
+        .from('admin_workouts')
+        .update({ is_visible: !currentVisibility })
+        .eq('id', workoutId);
+
+      if (error) throw error;
+
+      toast({
+        title: "Success",
+        description: `Workout is now ${!currentVisibility ? 'visible' : 'hidden'}`,
+      });
+      loadWorkouts();
+    } catch (error) {
+      console.error('Error toggling visibility:', error);
+      toast({
+        title: "Error",
+        description: "Failed to update visibility",
+        variant: "destructive",
+      });
+    }
+  };
+
   const toggleSelectAll = () => {
     if (selectedWorkouts.length === filteredWorkouts.length) {
       setSelectedWorkouts([]);
@@ -258,7 +343,7 @@ export const WorkoutsManager = ({ externalDialog, setExternalDialog }: WorkoutsM
 
   const handleExport = () => {
     const csv = [
-      ['ID', 'Name', 'Format', 'Difficulty', 'Duration', 'Access', 'Source'].join(','),
+      ['ID', 'Name', 'Format', 'Difficulty', 'Duration', 'Access', 'Source', 'Visible'].join(','),
       ...filteredWorkouts.map(w => [
         w.id,
         `"${w.name}"`,
@@ -266,7 +351,8 @@ export const WorkoutsManager = ({ externalDialog, setExternalDialog }: WorkoutsM
         w.difficulty,
         w.duration,
         w.is_premium ? w.tier_required || 'Premium' : 'Free',
-        w.is_ai_generated ? 'AI' : 'Manual'
+        w.is_ai_generated ? 'AI' : 'Manual',
+        w.is_visible ? 'Yes' : 'No'
       ].join(','))
     ].join('\n');
 
@@ -425,14 +511,21 @@ export const WorkoutsManager = ({ externalDialog, setExternalDialog }: WorkoutsM
                 </TableRow>
               ) : (
                 filteredWorkouts.map((workout) => (
-                  <TableRow key={workout.id}>
+                  <TableRow key={workout.id} className={!workout.is_visible ? 'opacity-50' : ''}>
                     <TableCell>
                       <Checkbox
                         checked={selectedWorkouts.includes(workout.id)}
                         onCheckedChange={() => toggleSelect(workout.id)}
                       />
                     </TableCell>
-                    <TableCell className="font-medium">{workout.name}</TableCell>
+                    <TableCell className="font-medium">
+                      <div className="flex items-center gap-2">
+                        {workout.name}
+                        {!workout.is_visible && (
+                          <Badge variant="destructive" className="text-xs">Hidden</Badge>
+                        )}
+                      </div>
+                    </TableCell>
                     <TableCell>
                       {workout.is_ai_generated ? (
                         <Badge variant="outline" className="bg-purple-100 text-purple-700 border-purple-300 dark:bg-purple-900/30 dark:text-purple-400 dark:border-purple-700">
@@ -465,19 +558,36 @@ export const WorkoutsManager = ({ externalDialog, setExternalDialog }: WorkoutsM
                       </div>
                     </TableCell>
                     <TableCell className="text-right">
-                      <div className="flex items-center justify-end gap-2">
+                      <div className="flex items-center justify-end gap-1">
                         <Button
                           variant="ghost"
                           size="icon"
                           onClick={() => window.open(`/workout/${workout.category.toLowerCase().replace(/\s+/g, '-')}/${workout.id}`, '_blank')}
-                          title="View workout"
+                          title="Preview"
                         >
                           <Eye className="h-4 w-4" />
                         </Button>
                         <Button
                           variant="ghost"
                           size="icon"
+                          onClick={() => handleDuplicate(workout)}
+                          title="Duplicate"
+                        >
+                          <Copy className="h-4 w-4" />
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          onClick={() => handleToggleVisibility(workout.id, workout.is_visible)}
+                          title={workout.is_visible ? 'Hide' : 'Show'}
+                        >
+                          {workout.is_visible ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4 text-muted-foreground" />}
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="icon"
                           onClick={() => handleEdit(workout)}
+                          title="Edit"
                         >
                           <Edit className="h-4 w-4" />
                         </Button>
@@ -485,6 +595,7 @@ export const WorkoutsManager = ({ externalDialog, setExternalDialog }: WorkoutsM
                           variant="ghost"
                           size="icon"
                           onClick={() => handleDelete(workout.id)}
+                          title="Delete"
                         >
                           <Trash2 className="h-4 w-4" />
                         </Button>

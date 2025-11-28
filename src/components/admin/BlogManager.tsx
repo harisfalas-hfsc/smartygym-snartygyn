@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Plus, Search, Pencil, Trash2, Download, AlertTriangle, CheckCircle, Calendar, Clock, ExternalLink, Bot, User } from "lucide-react";
+import { Plus, Search, Pencil, Trash2, Download, AlertTriangle, CheckCircle, ExternalLink, Bot, User, Copy, Eye, EyeOff } from "lucide-react";
 import { toast } from "sonner";
 import { ArticleEditDialog } from "./ArticleEditDialog";
 import {
@@ -150,6 +150,81 @@ export function BlogManager() {
     }
   };
 
+  const handleDuplicate = async (article: any) => {
+    try {
+      // Get full article data
+      const { data: fullArticle, error: fetchError } = await supabase
+        .from('blog_articles')
+        .select('*')
+        .eq('id', article.id)
+        .single();
+
+      if (fetchError) throw fetchError;
+
+      // Create new slug
+      const newSlug = `${article.slug}-copy-${Date.now()}`;
+      const newTitle = `${article.title} (Copy)`;
+
+      // Create duplicate as draft
+      const { data: newArticle, error: insertError } = await supabase
+        .from('blog_articles')
+        .insert({
+          ...fullArticle,
+          id: undefined, // Let database generate new ID
+          title: newTitle,
+          slug: newSlug,
+          is_published: false, // Start as draft
+          published_at: null,
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString(),
+        })
+        .select()
+        .single();
+
+      if (insertError) throw insertError;
+
+      toast.success("Article duplicated. Opening edit dialog...");
+
+      // Reload and open edit dialog for the new article
+      await fetchArticles();
+      
+      if (newArticle) {
+        setSelectedArticle(newArticle);
+        setIsDialogOpen(true);
+      }
+    } catch (error) {
+      console.error('Error duplicating article:', error);
+      toast.error("Failed to duplicate article");
+    }
+  };
+
+  const handleTogglePublish = async (articleId: string, currentPublished: boolean) => {
+    try {
+      const updateData: any = { 
+        is_published: !currentPublished,
+        updated_at: new Date().toISOString()
+      };
+      
+      // Set published_at when publishing for the first time
+      if (!currentPublished) {
+        updateData.published_at = new Date().toISOString();
+      }
+
+      const { error } = await supabase
+        .from('blog_articles')
+        .update(updateData)
+        .eq('id', articleId);
+
+      if (error) throw error;
+
+      toast.success(`Article ${!currentPublished ? 'published' : 'unpublished'}`);
+      fetchArticles();
+    } catch (error) {
+      console.error('Error toggling publish status:', error);
+      toast.error("Failed to update publish status");
+    }
+  };
+
   const handleExport = () => {
     const csv = [
       ['ID', 'Slug', 'Title', 'Category', 'Author', 'Status', 'Published Date', 'Read Time', 'Source'].join(','),
@@ -249,7 +324,7 @@ export function BlogManager() {
                 return (
                   <div
                     key={article.id}
-                    className="border rounded-lg p-4 hover:bg-accent/50 transition-colors"
+                    className={`border rounded-lg p-4 hover:bg-accent/50 transition-colors ${!article.is_published ? 'opacity-60' : ''}`}
                   >
                     <div className="flex items-start justify-between gap-4">
                       <div className="flex items-center gap-3 flex-1">
@@ -303,8 +378,8 @@ export function BlogManager() {
                                 <Badge className={getCategoryColor(article.category)}>
                                   {article.category}
                                 </Badge>
-                                <Badge variant="secondary" className="gap-1">
-                                  <AlertTriangle className="h-3 w-3" />
+                                <Badge variant="destructive" className="gap-1">
+                                  <EyeOff className="h-3 w-3" />
                                   Draft
                                 </Badge>
                               </>
@@ -349,34 +424,52 @@ export function BlogManager() {
                           </div>
                         </div>
                       </div>
-                      <div className="flex gap-2 flex-wrap sm:flex-nowrap">
-                  <Button
-                    size="sm"
-                    variant="ghost"
-                    onClick={() => window.open(`/blog/${article.slug}`, '_blank')}
-                    disabled={!article.is_published}
-                    className="flex-1 sm:flex-none"
-                  >
-                    <ExternalLink className="h-4 w-4 sm:mr-0" />
-                    <span className="sm:hidden ml-2">Preview</span>
-                  </Button>
+                      <div className="flex gap-1 flex-wrap sm:flex-nowrap">
+                        <Button
+                          size="sm"
+                          variant="ghost"
+                          onClick={() => window.open(`/blog/${article.slug}`, '_blank')}
+                          disabled={!article.is_published}
+                          title="Preview"
+                          className="flex-1 sm:flex-none"
+                        >
+                          <ExternalLink className="h-4 w-4" />
+                        </Button>
+                        <Button
+                          size="sm"
+                          variant="ghost"
+                          onClick={() => handleDuplicate(article)}
+                          title="Duplicate"
+                          className="flex-1 sm:flex-none"
+                        >
+                          <Copy className="h-4 w-4" />
+                        </Button>
+                        <Button
+                          size="sm"
+                          variant="ghost"
+                          onClick={() => handleTogglePublish(article.id, article.is_published)}
+                          title={article.is_published ? 'Unpublish' : 'Publish'}
+                          className="flex-1 sm:flex-none"
+                        >
+                          {article.is_published ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                        </Button>
                         <Button
                           size="sm"
                           variant="ghost"
                           onClick={() => handleEdit(article)}
+                          title="Edit"
                           className="flex-1 sm:flex-none"
                         >
-                          <Pencil className="h-4 w-4 sm:mr-0" />
-                          <span className="sm:hidden ml-2">Edit</span>
+                          <Pencil className="h-4 w-4" />
                         </Button>
                         <Button
                           size="sm"
                           variant="ghost"
                           onClick={() => handleDeleteClick(article)}
+                          title="Delete"
                           className="flex-1 sm:flex-none"
                         >
-                          <Trash2 className="h-4 w-4 sm:mr-0" />
-                          <span className="sm:hidden ml-2">Delete</span>
+                          <Trash2 className="h-4 w-4" />
                         </Button>
                       </div>
                     </div>
