@@ -330,7 +330,7 @@ export const WorkoutEditDialog = ({ workout, open, onOpenChange, onSave }: Worko
                 body: notificationBody,
                 url: `/workout/${dataToSave.id}`,
                 icon: imageUrl || '/smarty-gym-logo.png',
-                target_audience: 'subscribers',
+                target_audience: 'all',
                 scheduled_time: scheduledTime,
                 timezone: 'UTC',
                 status: 'pending',

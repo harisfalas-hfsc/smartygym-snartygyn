@@ -321,6 +321,33 @@ Respond in this EXACT JSON format:
 
     logStep("New WOD inserted", { id: workoutId, name: workoutContent.name });
 
+    // Schedule notification for new WOD (immediate - sent via cron job)
+    try {
+      const notificationBody = `Today's workout: ${workoutContent.name} (${category}). ${equipment === "BODYWEIGHT" ? "No equipment needed!" : "Equipment workout."} Available for €3.99 or included with Premium.`;
+      
+      const { error: notifError } = await supabase
+        .from('scheduled_notifications')
+        .insert([{
+          title: '🏆 New Workout of the Day!',
+          body: notificationBody,
+          url: '/workout-of-the-day',
+          icon: imageUrl || '/smarty-gym-logo.png',
+          target_audience: 'all',
+          scheduled_time: new Date().toISOString(),
+          timezone: 'UTC',
+          status: 'pending',
+          recurrence_pattern: 'once'
+        }]);
+
+      if (notifError) {
+        logStep("Failed to schedule WOD notification", { error: notifError.message });
+      } else {
+        logStep("WOD notification scheduled successfully");
+      }
+    } catch (notifError) {
+      logStep("Error scheduling WOD notification", { error: notifError });
+    }
+
     // Update state
     const newState = {
       day_count: state.day_count + 1,

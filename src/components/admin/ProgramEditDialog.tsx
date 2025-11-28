@@ -472,7 +472,7 @@ export const ProgramEditDialog = ({ program, open, onOpenChange, onSave, isPerso
                   body: notificationBody,
                   url: `/training-program/${dataToSave.id}`,
                   icon: imageUrl || '/smarty-gym-logo.png',
-                  target_audience: 'subscribers',
+                  target_audience: 'all',
                   scheduled_time: scheduledTime,
                   timezone: 'UTC',
                   status: 'pending',
