@@ -12,21 +12,27 @@ serve(async (req) => {
   }
 
   try {
-    const { productId, name, description } = await req.json();
+    const { productId, name, description, imageUrl } = await req.json();
     
-    if (!productId || !name) {
-      throw new Error("Product ID and name are required");
+    if (!productId) {
+      throw new Error("Product ID is required");
     }
 
-    console.log("Updating Stripe product:", { productId, name, description });
+    console.log("Updating Stripe product:", { productId, name, description, imageUrl });
 
     const stripe = new Stripe(Deno.env.get("STRIPE_SECRET_KEY") || "", {
       apiVersion: "2025-08-27.basil",
     });
 
-    const updateData: any = { name };
+    const updateData: any = {};
+    if (name) {
+      updateData.name = name;
+    }
     if (description) {
       updateData.description = description;
+    }
+    if (imageUrl) {
+      updateData.images = [imageUrl];
     }
 
     const product = await stripe.products.update(productId, updateData);
