@@ -148,6 +148,17 @@ export const ProgramsManager = ({ externalDialog, setExternalDialog }: ProgramsM
         }
       }
 
+      // Delete related purchases to prevent orphaned records
+      const { error: purchasesError } = await supabase
+        .from('user_purchases')
+        .delete()
+        .eq('content_id', id)
+        .eq('content_type', 'program');
+
+      if (purchasesError) {
+        console.error('Error deleting related purchases:', purchasesError);
+      }
+
       // Delete from database
       const { error } = await supabase
         .from('admin_training_programs')
@@ -305,6 +316,15 @@ export const ProgramsManager = ({ externalDialog, setExternalDialog }: ProgramsM
             body: { productId: program.stripe_product_id }
           });
         }
+      }
+
+      // Delete related purchases for all selected programs to prevent orphaned records
+      for (const programId of selectedPrograms) {
+        await supabase
+          .from('user_purchases')
+          .delete()
+          .eq('content_id', programId)
+          .eq('content_type', 'program');
       }
 
       // Delete from database

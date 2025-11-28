@@ -181,6 +181,17 @@ export const WorkoutsManager = ({ externalDialog, setExternalDialog }: WorkoutsM
         }
       }
 
+      // Delete related purchases to prevent orphaned records
+      const { error: purchasesError } = await supabase
+        .from('user_purchases')
+        .delete()
+        .eq('content_id', id)
+        .eq('content_type', 'workout');
+
+      if (purchasesError) {
+        console.error('Error deleting related purchases:', purchasesError);
+      }
+
       // Delete from database
       const { error } = await supabase
         .from('admin_workouts')
@@ -338,6 +349,15 @@ export const WorkoutsManager = ({ externalDialog, setExternalDialog }: WorkoutsM
             body: { productId: workout.stripe_product_id }
           });
         }
+      }
+
+      // Delete related purchases for all selected workouts to prevent orphaned records
+      for (const workoutId of selectedWorkouts) {
+        await supabase
+          .from('user_purchases')
+          .delete()
+          .eq('content_id', workoutId)
+          .eq('content_type', 'workout');
       }
 
       // Delete from database
