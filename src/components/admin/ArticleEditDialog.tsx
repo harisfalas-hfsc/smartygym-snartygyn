@@ -361,6 +361,46 @@ export const ArticleEditDialog = ({ article, open, onOpenChange, onSave }: Artic
           .insert([dataToSave]);
 
         if (error) throw error;
+
+        // Schedule notification for new published blog article (5 minutes from now)
+        if (formData.is_published && formData.title && formData.title.trim()) {
+          try {
+            const scheduledTime = new Date(Date.now() + 5 * 60 * 1000).toISOString();
+            
+            // Compose notification body
+            let notificationBody = `New article published: "${formData.title}". `;
+            if (formData.excerpt) {
+              const excerptPreview = formData.excerpt.length > 100 
+                ? formData.excerpt.substring(0, 100) + '...'
+                : formData.excerpt;
+              notificationBody += excerptPreview;
+            }
+            
+            // Insert scheduled notification
+            await supabase
+              .from('scheduled_notifications')
+              .insert([{
+                title: '📚 New Blog Article!',
+                body: notificationBody,
+                url: `/blog/${formData.slug}`,
+                icon: formData.image_url || '/smarty-gym-logo.png',
+                target_audience: 'all',
+                scheduled_time: scheduledTime,
+                timezone: 'UTC',
+                status: 'pending',
+                recurrence_pattern: 'once'
+              }]);
+            
+            if (import.meta.env.DEV) {
+              console.log('✅ Notification scheduled for new article:', formData.title);
+            }
+          } catch (notifError) {
+            if (import.meta.env.DEV) {
+              console.error('Error scheduling notification:', notifError);
+            }
+            // Don't fail the article creation if notification fails
+          }
+        }
       }
 
       // Clear draft on successful save
