@@ -540,14 +540,14 @@ const WorkoutDetail = () => {
                                 BUY €{Number(workout.price).toFixed(2)}
                               </span>
                             </TooltipTrigger>
-                            <TooltipContent side="bottom" className="max-w-xs text-center">
+                            <TooltipContent side="top" align="center" className="max-w-xs text-center">
                               Buy this workout individually to try our coaching style before committing to a subscription.
                             </TooltipContent>
                           </Tooltip>
                         )}
                       </>
                     ) : (
-                      <span className="inline-flex items-center gap-1 bg-gradient-to-r from-green-500 to-teal-600 text-white text-xs font-semibold px-2 py-1 rounded-full">
+                      <span className="inline-flex items-center gap-1 bg-gradient-to-r from-blue-500 to-cyan-600 text-white text-xs font-semibold px-2 py-1 rounded-full">
                         <Check className="h-3 w-3 shrink-0" />
                         FREE
                       </span>
