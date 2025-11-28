@@ -37,7 +37,7 @@ const DURATION_OPTIONS = [
   "30 MINUTES",
   "45 MINUTES",
   "60 MINUTES",
-  "VARIES"
+  "VARIOUS"
 ];
 
 const DIFFICULTY_STARS = [1, 2, 3, 4, 5, 6];
