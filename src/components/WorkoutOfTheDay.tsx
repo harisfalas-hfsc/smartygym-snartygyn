@@ -5,7 +5,7 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Flame, Clock, Dumbbell, Star, Crown, ShoppingBag } from "lucide-react";
+import { CalendarCheck, Clock, Dumbbell, Star, Crown, ShoppingBag } from "lucide-react";
 
 export const WorkoutOfTheDay = () => {
   const navigate = useNavigate();
@@ -65,22 +65,25 @@ export const WorkoutOfTheDay = () => {
   return (
     <Card className="mb-8 bg-gradient-to-br from-primary/10 via-background to-primary/10 border-2 border-primary/50 shadow-gold overflow-hidden">
       <div className="p-4 sm:p-6">
-        {/* Title */}
-        <div className="flex items-center justify-center gap-2 mb-4">
-          <Flame className="w-6 h-6 sm:w-7 sm:h-7 text-primary animate-pulse" />
-          <h2 className="text-xl sm:text-2xl font-bold text-primary">
+        {/* Icon Container (like category cards) */}
+        <div className="flex flex-col items-center text-center">
+          <div className="w-20 h-20 rounded-full bg-primary/10 flex items-center justify-center mb-4">
+            <CalendarCheck className="w-10 h-10 text-primary" />
+          </div>
+          
+          {/* Title */}
+          <h2 className="text-xl sm:text-2xl font-bold text-primary mb-4">
             Workout of the Day
           </h2>
-          <Flame className="w-6 h-6 sm:w-7 sm:h-7 text-primary animate-pulse" />
+          
+          {/* Description */}
+          <p className="text-sm sm:text-base text-muted-foreground max-w-3xl mx-auto mb-6">
+            Every day at 7:00 AM, <span className="text-primary font-semibold">SmartyGym</span> delivers a fresh, expertly designed workout following a strategic periodization cycle. Each day focuses on a different training style: Strength, Calorie Burning, Metabolic, Cardio, Mobility & Stability, and Challenge — rotating continuously for balanced, progressive training.
+          </p>
+          <p className="text-sm sm:text-base text-muted-foreground max-w-3xl mx-auto mb-6">
+            It's like going to the gym and following the workout of the day — but you can do it at your local gym, at home, in your office, outdoors, or even while traveling. Your <span className="text-primary font-semibold">SmartyGym</span>: the gym that never closes and never takes a holiday.
+          </p>
         </div>
-
-        {/* Description */}
-        <p className="text-sm sm:text-base text-muted-foreground text-center max-w-3xl mx-auto mb-6">
-          Every day at 7:00 AM, SmartyGym delivers a fresh, expertly designed workout following a strategic 
-          periodization cycle. Each day focuses on a different training style: Strength, Calorie Burning, 
-          Metabolic, Cardio, Mobility & Stability, and Challenge — rotating continuously for balanced, 
-          progressive training.
-        </p>
 
         {/* Current WOD Display */}
         {wod ? (
