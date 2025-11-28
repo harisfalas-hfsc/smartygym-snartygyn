@@ -1,0 +1,324 @@
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
+import { Card, CardContent } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Skeleton } from "@/components/ui/skeleton";
+import { 
+  Select, 
+  SelectContent, 
+  SelectItem, 
+  SelectTrigger, 
+  SelectValue 
+} from "@/components/ui/select";
+import { CalendarCheck, Clock, Dumbbell, Star, Crown, ShoppingBag, Archive, Filter, X } from "lucide-react";
+import { PageBreadcrumbs } from "@/components/PageBreadcrumbs";
+
+const WOD_CATEGORIES = [
+  "STRENGTH",
+  "CALORIE BURNING", 
+  "METABOLIC",
+  "CARDIO",
+  "MOBILITY & STABILITY",
+  "CHALLENGE"
+];
+
+const EQUIPMENT_OPTIONS = ["BODYWEIGHT", "EQUIPMENT"];
+const DIFFICULTY_OPTIONS = ["Beginner", "Intermediate", "Advanced"];
+
+const WODArchive = () => {
+  const navigate = useNavigate();
+  const [categoryFilter, setCategoryFilter] = useState<string>("all");
+  const [equipmentFilter, setEquipmentFilter] = useState<string>("all");
+  const [difficultyFilter, setDifficultyFilter] = useState<string>("all");
+
+  const { data: pastWODs, isLoading } = useQuery({
+    queryKey: ["wod-archive", categoryFilter, equipmentFilter, difficultyFilter],
+    queryFn: async () => {
+      let query = supabase
+        .from("admin_workouts")
+        .select("*")
+        .like("id", "WOD-%")
+        .eq("is_workout_of_day", false)
+        .eq("is_visible", true)
+        .order("created_at", { ascending: false });
+      
+      if (categoryFilter && categoryFilter !== "all") {
+        query = query.eq("category", categoryFilter);
+      }
+      if (equipmentFilter && equipmentFilter !== "all") {
+        query = query.eq("equipment", equipmentFilter);
+      }
+      if (difficultyFilter && difficultyFilter !== "all") {
+        query = query.eq("difficulty", difficultyFilter);
+      }
+      
+      const { data, error } = await query;
+      if (error) throw error;
+      return data || [];
+    }
+  });
+
+  const clearFilters = () => {
+    setCategoryFilter("all");
+    setEquipmentFilter("all");
+    setDifficultyFilter("all");
+  };
+
+  const hasActiveFilters = categoryFilter !== "all" || equipmentFilter !== "all" || difficultyFilter !== "all";
+
+  const getCategorySlug = (category: string) => {
+    return category?.toLowerCase().replace(/\s+/g, "-").replace(/&/g, "and") || "strength";
+  };
+
+  const getDifficultyColor = (difficulty: string | null) => {
+    switch (difficulty?.toLowerCase()) {
+      case "beginner":
+        return "bg-green-500/20 text-green-400 border-green-500/30";
+      case "intermediate":
+        return "bg-yellow-500/20 text-yellow-400 border-yellow-500/30";
+      case "advanced":
+        return "bg-red-500/20 text-red-400 border-red-500/30";
+      default:
+        return "bg-muted text-muted-foreground";
+    }
+  };
+
+  const renderStars = (count: number | null) => {
+    const stars = count || 1;
+    return Array.from({ length: stars }, (_, i) => (
+      <Star key={i} className="w-3 h-3 fill-primary text-primary" />
+    ));
+  };
+
+  return (
+    <div className="min-h-screen bg-background">
+      <div className="container mx-auto max-w-6xl px-4 py-8">
+        {/* Breadcrumbs */}
+        <PageBreadcrumbs 
+          items={[
+            { label: "Home", href: "/" },
+            { label: "Workouts", href: "/workout" },
+            { label: "WOD Archive" }
+          ]} 
+        />
+
+        {/* Header Card */}
+        <Card className="mb-8 bg-gradient-to-br from-primary/10 via-background to-primary/10 border-2 border-primary/50 shadow-gold">
+          <div className="p-4 sm:p-6 text-center">
+            <div className="w-20 h-20 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-4">
+              <Archive className="w-10 h-10 text-primary" />
+            </div>
+            <h1 className="text-2xl sm:text-3xl font-bold text-primary mb-3">
+              WOD Archive
+            </h1>
+            <p className="text-muted-foreground max-w-2xl mx-auto mb-4">
+              Browse our collection of past Workouts of the Day. Each workout was 
+              expertly designed and delivered daily following our strategic periodization cycle. 
+              Missed one? Get it here!
+            </p>
+            <Button 
+              variant="outline" 
+              onClick={() => navigate("/workout")}
+              className="border-primary/50 hover:bg-primary/10"
+            >
+              <CalendarCheck className="w-4 h-4 mr-2" />
+              View Today's WOD
+            </Button>
+          </div>
+        </Card>
+
+        {/* Filters */}
+        <div className="flex flex-wrap items-center gap-3 mb-6">
+          <div className="flex items-center gap-2 text-muted-foreground">
+            <Filter className="w-4 h-4" />
+            <span className="text-sm font-medium">Filters:</span>
+          </div>
+          
+          <Select value={categoryFilter} onValueChange={setCategoryFilter}>
+            <SelectTrigger className="w-[180px]">
+              <SelectValue placeholder="Category" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All Categories</SelectItem>
+              {WOD_CATEGORIES.map((cat) => (
+                <SelectItem key={cat} value={cat}>{cat}</SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+          
+          <Select value={equipmentFilter} onValueChange={setEquipmentFilter}>
+            <SelectTrigger className="w-[160px]">
+              <SelectValue placeholder="Equipment" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All Equipment</SelectItem>
+              {EQUIPMENT_OPTIONS.map((eq) => (
+                <SelectItem key={eq} value={eq}>{eq}</SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+          
+          <Select value={difficultyFilter} onValueChange={setDifficultyFilter}>
+            <SelectTrigger className="w-[160px]">
+              <SelectValue placeholder="Difficulty" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All Difficulties</SelectItem>
+              {DIFFICULTY_OPTIONS.map((diff) => (
+                <SelectItem key={diff} value={diff}>{diff}</SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+
+          {hasActiveFilters && (
+            <Button variant="ghost" size="sm" onClick={clearFilters} className="text-muted-foreground">
+              <X className="w-4 h-4 mr-1" />
+              Clear
+            </Button>
+          )}
+        </div>
+
+        {/* Results Count */}
+        {!isLoading && pastWODs && (
+          <p className="text-sm text-muted-foreground mb-4">
+            {pastWODs.length} archived workout{pastWODs.length !== 1 ? "s" : ""} found
+          </p>
+        )}
+
+        {/* Loading State */}
+        {isLoading && (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            {[1, 2, 3, 4, 5, 6].map((i) => (
+              <Card key={i} className="overflow-hidden">
+                <Skeleton className="h-40 w-full" />
+                <div className="p-4">
+                  <Skeleton className="h-4 w-3/4 mb-3" />
+                  <div className="flex gap-2 mb-3">
+                    <Skeleton className="h-5 w-16" />
+                    <Skeleton className="h-5 w-16" />
+                    <Skeleton className="h-5 w-16" />
+                  </div>
+                  <Skeleton className="h-8 w-full" />
+                </div>
+              </Card>
+            ))}
+          </div>
+        )}
+
+        {/* Grid of Past WODs */}
+        {!isLoading && pastWODs && pastWODs.length > 0 && (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            {pastWODs.map((wod) => (
+              <Card 
+                key={wod.id} 
+                className="overflow-hidden hover:scale-[1.02] transition-transform duration-200 border-primary/30 hover:border-primary/50"
+              >
+                {/* Image */}
+                <div className="relative h-40">
+                  {wod.image_url ? (
+                    <img 
+                      src={wod.image_url} 
+                      alt={wod.name} 
+                      className="w-full h-full object-cover"
+                    />
+                  ) : (
+                    <div className="w-full h-full bg-gradient-to-br from-primary/20 to-primary/5 flex items-center justify-center">
+                      <CalendarCheck className="w-12 h-12 text-primary/50" />
+                    </div>
+                  )}
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
+                  <div className="absolute bottom-3 left-3 right-3">
+                    <h3 className="text-white font-bold text-sm line-clamp-2">{wod.name}</h3>
+                  </div>
+                  {/* Premium Badge */}
+                  {wod.is_premium && (
+                    <div className="absolute top-2 right-2">
+                      <Badge className="bg-gradient-to-r from-primary to-yellow-500 text-primary-foreground">
+                        <Crown className="w-3 h-3 mr-1" />
+                        Premium
+                      </Badge>
+                    </div>
+                  )}
+                </div>
+                
+                {/* Details */}
+                <CardContent className="p-4">
+                  {/* Badges */}
+                  <div className="flex flex-wrap gap-1.5 mb-3">
+                    <Badge variant="outline" className="text-xs bg-primary/10 text-primary border-primary/30">
+                      {wod.category}
+                    </Badge>
+                    {wod.format && (
+                      <Badge variant="outline" className="text-xs">
+                        {wod.format}
+                      </Badge>
+                    )}
+                    {wod.difficulty && (
+                      <Badge variant="outline" className={`text-xs ${getDifficultyColor(wod.difficulty)}`}>
+                        <span className="flex items-center gap-0.5">
+                          {renderStars(wod.difficulty_stars)}
+                        </span>
+                      </Badge>
+                    )}
+                    {wod.equipment && (
+                      <Badge variant="outline" className="text-xs">
+                        <Dumbbell className="w-3 h-3 mr-1" />
+                        {wod.equipment}
+                      </Badge>
+                    )}
+                    {wod.duration && (
+                      <Badge variant="outline" className="text-xs">
+                        <Clock className="w-3 h-3 mr-1" />
+                        {wod.duration}
+                      </Badge>
+                    )}
+                  </div>
+                  
+                  {/* Price & Action */}
+                  <div className="flex items-center justify-between gap-2">
+                    {wod.price && wod.is_standalone_purchase && (
+                      <Badge className="bg-gradient-to-r from-green-500 to-emerald-500 text-white border-0">
+                        <ShoppingBag className="w-3 h-3 mr-1" />
+                        €{wod.price.toFixed(2)}
+                      </Badge>
+                    )}
+                    <Button 
+                      size="sm"
+                      className="ml-auto"
+                      onClick={() => navigate(`/workout/${getCategorySlug(wod.category)}/${wod.id}`)}
+                    >
+                      View Workout
+                    </Button>
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        )}
+
+        {/* Empty State */}
+        {!isLoading && pastWODs && pastWODs.length === 0 && (
+          <Card className="p-12 text-center">
+            <Archive className="w-16 h-16 text-muted-foreground/50 mx-auto mb-4" />
+            <h3 className="text-lg font-semibold mb-2">No Archived Workouts Yet</h3>
+            <p className="text-muted-foreground mb-4">
+              {hasActiveFilters 
+                ? "No workouts match your current filters. Try adjusting your selection."
+                : "Past Workouts of the Day will appear here after they rotate out."}
+            </p>
+            {hasActiveFilters && (
+              <Button variant="outline" onClick={clearFilters}>
+                Clear Filters
+              </Button>
+            )}
+          </Card>
+        )}
+      </div>
+    </div>
+  );
+};
+
+export default WODArchive;
