@@ -30,6 +30,7 @@ import WorkoutDetail from "./pages/WorkoutDetail";
 import IndividualWorkout from "./pages/IndividualWorkout";
 import SmartyWorkout from "./pages/SmartyWorkout";
 import WODArchive from "./pages/WODArchive";
+import WODCategory from "./pages/WODCategory";
 import TrainingProgramFlow from "./pages/TrainingProgramFlow";
 import TrainingProgramDetail from "./pages/TrainingProgramDetail";
 import IndividualTrainingProgram from "./pages/IndividualTrainingProgram";
@@ -112,6 +113,7 @@ const AppContent = () => {
                 
                 {/* Public workout and plan flows - anyone can browse */}
                 <Route path="/workout" element={<WorkoutFlow />} />
+                <Route path="/workout/wod" element={<WODCategory />} />
                 <Route path="/workout/:type" element={<WorkoutDetail />} />
                 <Route path="/workout/:type/:id" element={<IndividualWorkout />} />
                 <Route path="/wod-archive" element={<WODArchive />} />

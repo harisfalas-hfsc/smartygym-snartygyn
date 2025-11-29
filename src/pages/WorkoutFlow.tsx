@@ -4,13 +4,12 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { PageBreadcrumbs } from "@/components/PageBreadcrumbs";
 import { InfoRibbon } from "@/components/InfoRibbon";
-import { ArrowLeft, Dumbbell, Flame, Zap, Heart, Move, Activity, TrendingUp, Sparkles } from "lucide-react";
+import { ArrowLeft, Dumbbell, Flame, Zap, Heart, Move, Activity, Sparkles, CalendarCheck } from "lucide-react";
 import { SEOEnhancer } from "@/components/SEOEnhancer";
 import { generateBreadcrumbSchema } from "@/utils/seoHelpers";
 import { useAccessControl } from "@/hooks/useAccessControl";
 import { useShowBackButton } from "@/hooks/useShowBackButton";
 import { ScrollReveal } from "@/components/ScrollReveal";
-import { WorkoutOfTheDay } from "@/components/WorkoutOfTheDay";
 const WorkoutFlow = () => {
   const navigate = useNavigate();
   const {
@@ -22,6 +21,13 @@ const WorkoutFlow = () => {
   } = useAccessControl();
   const isPremium = userTier === "premium";
   const workoutTypes = [{
+    id: "wod",
+    title: "WOD",
+    description: "Workout of the Day",
+    icon: CalendarCheck,
+    level: "Beginner-Advanced",
+    equipment: "Equipment/No Equipment"
+  }, {
     id: "strength",
     title: "Strength",
     description: "Build muscle and power with resistance training",
@@ -135,9 +141,6 @@ const WorkoutFlow = () => {
             </div>
           </div>
         </Card>
-
-        {/* Workout of the Day Card */}
-        <WorkoutOfTheDay />
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
           {workoutTypes.map(workout => {
