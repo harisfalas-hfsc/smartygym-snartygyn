@@ -1,13 +1,23 @@
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { format } from "date-fns";
-import { MessageSquare, Mail, Paperclip, Download, Zap, User, Eye, EyeOff } from "lucide-react";
+import { MessageSquare, Mail, Paperclip, Download, Zap, User, Eye, EyeOff, Trash2, ExternalLink } from "lucide-react";
 import { useState } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast } from "sonner";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 
 interface ContactMessage {
   id: string;
@@ -37,6 +47,9 @@ interface SystemMessage {
 
 export const UserMessagesPanel = () => {
   const [expandedMessages, setExpandedMessages] = useState<Set<string>>(new Set());
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [messageToDelete, setMessageToDelete] = useState<{ id: string; type: 'system' | 'contact' } | null>(null);
+  const queryClient = useQueryClient();
 
   const { data: rawContactMessages = [], isLoading: contactLoading, refetch: refetchContact } = useQuery({
     queryKey: ['user-contact-messages'],
@@ -109,7 +122,6 @@ export const UserMessagesPanel = () => {
       const message = contactMessages.find(m => m.id === messageId);
       if (message && message.response && !message.response_read_at) {
         try {
-          // Single atomic update
           const { error } = await supabase
             .from('contact_messages')
             .update({ response_read_at: new Date().toISOString() })
@@ -122,7 +134,6 @@ export const UserMessagesPanel = () => {
             return;
           }
 
-          // Refetch to update UI
           await refetchContact();
           window.dispatchEvent(new CustomEvent('messages-read'));
         } catch (e: any) {
@@ -150,12 +161,7 @@ export const UserMessagesPanel = () => {
           .eq('id', messageId);
         
         if (error) {
-          console.error('[UserMessagesPanel] Toggle system message read state failed:', {
-            message: error.message,
-            code: error.code,
-            details: error.details,
-            messageId
-          });
+          console.error('[UserMessagesPanel] Toggle system message read state failed:', error);
           toast.error(`Failed to update: ${error.message || 'Unknown error'}`);
           return;
         }
@@ -169,12 +175,7 @@ export const UserMessagesPanel = () => {
           .eq('id', messageId);
         
         if (error) {
-          console.error('[UserMessagesPanel] Toggle contact message read state failed:', {
-            message: error.message,
-            code: error.code,
-            details: error.details,
-            messageId
-          });
+          console.error('[UserMessagesPanel] Toggle contact message read state failed:', error);
           toast.error(`Failed to update: ${error.message || 'Unknown error'}`);
           return;
         }
@@ -185,15 +186,58 @@ export const UserMessagesPanel = () => {
       
       window.dispatchEvent(new CustomEvent('messages-read'));
     } catch (e: any) {
-      console.error('[UserMessagesPanel] Toggle read exception:', {
-        error: e,
-        message: e?.message,
-        stack: e?.stack,
-        messageId,
-        type
-      });
+      console.error('[UserMessagesPanel] Toggle read exception:', e);
       toast.error(e?.message || "Failed to update message status");
     }
+  };
+
+  const handleDeleteClick = (messageId: string, type: 'system' | 'contact') => {
+    setMessageToDelete({ id: messageId, type });
+    setDeleteDialogOpen(true);
+  };
+
+  const handleDeleteConfirm = async () => {
+    if (!messageToDelete) return;
+
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) {
+      toast.error("Authentication failed");
+      return;
+    }
+
+    try {
+      if (messageToDelete.type === 'system') {
+        const { error } = await supabase
+          .from('user_system_messages')
+          .delete()
+          .eq('id', messageToDelete.id)
+          .eq('user_id', user.id);
+
+        if (error) {
+          console.error('[UserMessagesPanel] Delete system message failed:', error);
+          toast.error(`Failed to delete: ${error.message}`);
+          return;
+        }
+
+        toast.success("Message deleted");
+        refetchSystem();
+      }
+      // Contact messages cannot be deleted by users
+
+      window.dispatchEvent(new CustomEvent('messages-read'));
+      queryClient.invalidateQueries({ queryKey: ['unread-messages-count'] });
+    } catch (e: any) {
+      console.error('[UserMessagesPanel] Delete exception:', e);
+      toast.error(e?.message || "Failed to delete message");
+    } finally {
+      setDeleteDialogOpen(false);
+      setMessageToDelete(null);
+    }
+  };
+
+  const extractLink = (content: string): string | null => {
+    const hrefMatch = content.match(/href="([^"]+)"/);
+    return hrefMatch ? hrefMatch[1] : null;
   };
 
   const getCategoryIcon = (category: string) => {
@@ -211,16 +255,13 @@ export const UserMessagesPanel = () => {
     switch (type) {
       case 'welcome':
         return <User className="h-4 w-4 text-green-600" />;
-      case 'purchase_workout':
-      case 'purchase_program':
-      case 'purchase_personal_training':
-      case 'purchase_subscription':
-        return <MessageSquare className="h-4 w-4 text-blue-600" />;
+      case 'announcement_update':
+        return <Zap className="h-4 w-4 text-primary" />;
       case 'renewal_reminder':
       case 'renewal_thank_you':
         return <Zap className="h-4 w-4 text-yellow-600" />;
-      case 'cancellation':
-        return <MessageSquare className="h-4 w-4 text-red-600" />;
+      case 'motivational_weekly':
+        return <MessageSquare className="h-4 w-4 text-green-600" />;
       default:
         return <MessageSquare className="h-4 w-4" />;
     }
@@ -229,12 +270,10 @@ export const UserMessagesPanel = () => {
   const getMessageTypeLabel = (type: string) => {
     const labels: Record<string, string> = {
       welcome: 'Welcome',
-      purchase_workout: 'Workout Purchase',
-      purchase_program: 'Program Purchase',
-      purchase_personal_training: 'Personal Training',
-      purchase_subscription: 'Subscription',
+      announcement_update: 'Announcement',
       renewal_reminder: 'Renewal Reminder',
       renewal_thank_you: 'Thank You',
+      motivational_weekly: 'Motivation',
       cancellation: 'Cancellation'
     };
     return labels[type] || type;
@@ -257,6 +296,158 @@ export const UserMessagesPanel = () => {
     );
   }
 
+  const renderSystemMessage = (message: SystemMessage, showBorder = true) => {
+    const link = extractLink(message.content);
+    const plainContent = message.content.replace(/<[^>]*>/g, '').trim();
+    
+    return (
+      <Card key={`system-${message.id}`} className={!message.is_read && showBorder ? 'border-blue-500' : ''}>
+        <CardContent className="pt-6">
+          <div className="flex items-start gap-3">
+            {getMessageTypeIcon(message.message_type)}
+            <div className="flex-1">
+              <div className="flex items-center gap-2 mb-2 flex-wrap">
+                <h3 className="font-semibold">{message.subject}</h3>
+                {!message.is_read && <Badge variant="destructive">New</Badge>}
+                <Badge variant="outline" className="text-xs">
+                  <Zap className="h-3 w-3 mr-1" />
+                  {getMessageTypeLabel(message.message_type)}
+                </Badge>
+                <div className="ml-auto flex items-center gap-1">
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="h-7 w-7"
+                    onClick={() => handleToggleRead(message.id, 'system', message.is_read)}
+                    title={message.is_read ? "Mark as unread" : "Mark as read"}
+                  >
+                    {message.is_read ? (
+                      <EyeOff className="h-4 w-4" />
+                    ) : (
+                      <Eye className="h-4 w-4" />
+                    )}
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="h-7 w-7 text-destructive hover:text-destructive"
+                    onClick={() => handleDeleteClick(message.id, 'system')}
+                    title="Delete message"
+                  >
+                    <Trash2 className="h-4 w-4" />
+                  </Button>
+                </div>
+              </div>
+              <div className="bg-muted p-4 rounded-lg text-sm text-display break-words-safe content-container mb-3">
+                {plainContent}
+              </div>
+              <div className="flex items-center gap-4 flex-wrap">
+                <span className="text-xs text-muted-foreground">
+                  {format(new Date(message.created_at), 'MMM dd, yyyy HH:mm')}
+                </span>
+                {link && (
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="h-7"
+                    onClick={() => window.open(link, '_blank')}
+                  >
+                    <ExternalLink className="h-3 w-3 mr-1" />
+                    View Content
+                  </Button>
+                )}
+              </div>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+    );
+  };
+
+  const renderContactMessage = (message: ContactMessage, showBorder = true) => (
+    <Card key={`contact-${message.id}`} className={!message.response_read_at && message.response && showBorder ? 'border-green-500' : ''}>
+      <CardContent className="pt-6">
+        <div className="flex items-start justify-between">
+          <div className="flex-1">
+            <div className="flex items-center gap-2 mb-2 flex-wrap">
+              {getCategoryIcon(message.category)}
+              <h3 className="font-semibold">{message.subject}</h3>
+              {!message.response_read_at && message.response && (
+                <Badge variant="destructive">New Response</Badge>
+              )}
+              <Badge variant="outline" className="text-xs">
+                <User className="h-3 w-3 mr-1" />
+                Your Message
+              </Badge>
+              {message.response && (
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="ml-auto h-7 w-7"
+                  onClick={() => handleToggleRead(message.id, 'contact', !!message.response_read_at)}
+                  title={message.response_read_at ? "Mark response as unread" : "Mark response as read"}
+                >
+                  {message.response_read_at ? (
+                    <EyeOff className="h-4 w-4" />
+                  ) : (
+                    <Eye className="h-4 w-4" />
+                  )}
+                </Button>
+              )}
+            </div>
+            <p className="text-sm text-muted-foreground line-clamp-2 mb-3">
+              {message.message}
+            </p>
+            <div className="flex items-center gap-4 flex-wrap">
+              <span className="text-xs text-muted-foreground">
+                {format(new Date(message.created_at), 'MMM dd, yyyy HH:mm')}
+              </span>
+              {message.response ? (
+                <Badge variant="default" className="bg-green-600">Coach Replied</Badge>
+              ) : (
+                <Badge variant="secondary">Pending</Badge>
+              )}
+            </div>
+          </div>
+        </div>
+
+        {message.response && (
+          <div className="mt-4 pt-4 border-t">
+            <p className="text-sm font-semibold mb-2 text-green-600">Coach Response:</p>
+            <div className="bg-green-50 dark:bg-green-950 border border-green-200 dark:border-green-800 p-3 rounded-lg text-sm text-display break-words-safe content-container">
+              {message.response}
+            </div>
+            <p className="text-xs text-muted-foreground mt-2">
+              {format(new Date(message.responded_at!), 'MMM dd, yyyy HH:mm')}
+            </p>
+          </div>
+        )}
+
+        {message.attachments && message.attachments.length > 0 && (
+          <div className="mt-4 pt-4 border-t">
+            <p className="text-xs text-muted-foreground mb-2">Attachments</p>
+            <div className="flex flex-wrap gap-2">
+              {message.attachments.map((attachment: any, index: number) => (
+                <div key={index} className="flex items-center gap-1 bg-muted px-2 py-1 rounded text-xs">
+                  <Paperclip className="h-3 w-3" />
+                  <span className="truncate max-w-[150px]">{attachment.name}</span>
+                  <Button
+                    size="sm"
+                    variant="ghost"
+                    className="h-5 w-5 p-0"
+                    onClick={() => window.open(attachment.url, '_blank')}
+                  >
+                    <Download className="h-3 w-3" />
+                  </Button>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+      </CardContent>
+    </Card>
+  );
+
   return (
     <div className="space-y-4">
       <h2 className="text-2xl font-bold">My Messages</h2>
@@ -272,133 +463,8 @@ export const UserMessagesPanel = () => {
         </TabsList>
 
         <TabsContent value="all" className="space-y-4 mt-4">
-          {systemMessages.map((message) => (
-            <Card key={`system-${message.id}`} className={!message.is_read ? 'border-blue-500' : ''}>
-              <CardContent className="pt-6">
-                <div className="flex items-start gap-3">
-                  {getMessageTypeIcon(message.message_type)}
-                  <div className="flex-1">
-                    <div className="flex items-center gap-2 mb-2">
-                      <h3 className="font-semibold">{message.subject}</h3>
-                      {!message.is_read && <Badge variant="destructive">New</Badge>}
-                      <Badge variant="outline" className="text-xs">
-                        <Zap className="h-3 w-3 mr-1" />
-                        System
-                      </Badge>
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        className="ml-auto h-7 w-7"
-                        onClick={() => handleToggleRead(message.id, 'system', message.is_read)}
-                        title={message.is_read ? "Mark as unread" : "Mark as read"}
-                      >
-                        {message.is_read ? (
-                          <EyeOff className="h-4 w-4" />
-                        ) : (
-                          <Eye className="h-4 w-4" />
-                        )}
-                      </Button>
-                    </div>
-                    <div className="bg-muted p-4 rounded-lg text-sm text-display break-words-safe content-container mb-3">
-                      {message.content}
-                    </div>
-                    <div className="flex items-center gap-4">
-                      <span className="text-xs text-muted-foreground">
-                        {format(new Date(message.created_at), 'MMM dd, yyyy HH:mm')}
-                      </span>
-                      <Badge variant="secondary" className="text-xs">
-                        {getMessageTypeLabel(message.message_type)}
-                      </Badge>
-                    </div>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          ))}
-
-          {contactMessages.map((message) => (
-            <Card key={`contact-${message.id}`} className={!message.response_read_at && message.response ? 'border-green-500' : ''}>
-              <CardContent className="pt-6">
-                <div className="flex items-start justify-between">
-                  <div className="flex-1">
-                    <div className="flex items-center gap-2 mb-2">
-                      {getCategoryIcon(message.category)}
-                      <h3 className="font-semibold">{message.subject}</h3>
-                      {!message.response_read_at && message.response && (
-                        <Badge variant="destructive">New Response</Badge>
-                      )}
-                      <Badge variant="outline" className="text-xs">
-                        <User className="h-3 w-3 mr-1" />
-                        Your Message
-                      </Badge>
-                      {message.response && (
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          className="ml-auto h-7 w-7"
-                          onClick={() => handleToggleRead(message.id, 'contact', !!message.response_read_at)}
-                          title={message.response_read_at ? "Mark response as unread" : "Mark response as read"}
-                        >
-                          {message.response_read_at ? (
-                            <EyeOff className="h-4 w-4" />
-                          ) : (
-                            <Eye className="h-4 w-4" />
-                          )}
-                        </Button>
-                      )}
-                    </div>
-                    <p className="text-sm text-muted-foreground line-clamp-2 mb-3">
-                      {message.message}
-                    </p>
-                    <div className="flex items-center gap-4 flex-wrap">
-                      <span className="text-xs text-muted-foreground">
-                        {format(new Date(message.created_at), 'MMM dd, yyyy HH:mm')}
-                      </span>
-                      {message.response ? (
-                        <Badge variant="default" className="bg-green-600">Coach Replied</Badge>
-                      ) : (
-                        <Badge variant="secondary">Pending</Badge>
-                      )}
-                    </div>
-                  </div>
-                </div>
-
-                {message.response && (
-                  <div className="mt-4 pt-4 border-t">
-                    <p className="text-sm font-semibold mb-2 text-green-600">Coach Response:</p>
-                    <div className="bg-green-50 dark:bg-green-950 border border-green-200 dark:border-green-800 p-3 rounded-lg text-sm text-display break-words-safe content-container">
-                      {message.response}
-                    </div>
-                    <p className="text-xs text-muted-foreground mt-2">
-                      {format(new Date(message.responded_at!), 'MMM dd, yyyy HH:mm')}
-                    </p>
-                  </div>
-                )}
-
-                {message.attachments && message.attachments.length > 0 && (
-                  <div className="mt-4 pt-4 border-t">
-                    <p className="text-xs text-muted-foreground mb-2">Attachments</p>
-                    <div className="flex flex-wrap gap-2">
-                      {message.attachments.map((attachment: any, index: number) => (
-                        <div key={index} className="flex items-center gap-1 bg-muted px-2 py-1 rounded text-xs">
-                          <Paperclip className="h-3 w-3" />
-                          <span className="truncate max-w-[150px]">{attachment.name}</span>
-                          <Button
-                            size="sm"
-                            variant="ghost"
-                            className="h-5 w-5 p-0"
-                            onClick={() => window.open(attachment.url, '_blank')}
-                          >
-                            <Download className="h-3 w-3" />
-                          </Button>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                )}
-              </CardContent>
-            </Card>
-          ))}
+          {systemMessages.map((message) => renderSystemMessage(message))}
+          {contactMessages.map((message) => renderContactMessage(message))}
         </TabsContent>
 
         <TabsContent value="system" className="space-y-4 mt-4">
@@ -410,42 +476,7 @@ export const UserMessagesPanel = () => {
               </CardContent>
             </Card>
           ) : (
-            systemMessages.map((message) => (
-              <Card key={message.id}>
-                <CardContent className="pt-6">
-                  <div className="flex items-start gap-3">
-                    {getMessageTypeIcon(message.message_type)}
-                    <div className="flex-1">
-                      <div className="flex items-center gap-2 mb-2">
-                        <h3 className="font-semibold">{message.subject}</h3>
-                        <Badge variant="outline" className="text-xs">
-                          {getMessageTypeLabel(message.message_type)}
-                        </Badge>
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          className="ml-auto h-7 w-7"
-                          onClick={() => handleToggleRead(message.id, 'system', message.is_read)}
-                          title={message.is_read ? "Mark as unread" : "Mark as read"}
-                        >
-                          {message.is_read ? (
-                            <EyeOff className="h-4 w-4" />
-                          ) : (
-                            <Eye className="h-4 w-4" />
-                          )}
-                        </Button>
-                      </div>
-                      <div className="bg-muted p-4 rounded-lg text-sm text-display break-words-safe content-container mb-3">
-                        {message.content}
-                      </div>
-                      <p className="text-xs text-muted-foreground">
-                        {format(new Date(message.created_at), 'MMM dd, yyyy HH:mm')}
-                      </p>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            ))
+            systemMessages.map((message) => renderSystemMessage(message, false))
           )}
         </TabsContent>
 
@@ -453,68 +484,32 @@ export const UserMessagesPanel = () => {
           {contactMessages.length === 0 ? (
             <Card>
               <CardContent className="text-center py-12">
-                <MessageSquare className="h-12 w-12 mx-auto mb-4 opacity-50" />
+                <Mail className="h-12 w-12 mx-auto mb-4 opacity-50" />
                 <p className="text-muted-foreground">No contact messages yet</p>
               </CardContent>
             </Card>
           ) : (
-            contactMessages.map((message) => (
-              <Card key={message.id}>
-                <CardContent className="pt-6">
-                  <div className="space-y-3">
-                    <div className="flex items-center gap-2">
-                      {getCategoryIcon(message.category)}
-                      <h3 className="font-semibold">{message.subject}</h3>
-                      {!message.response_read_at && message.response && (
-                        <Badge variant="destructive">New Response</Badge>
-                      )}
-                      {message.response && (
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          className="ml-auto h-7 w-7"
-                          onClick={() => handleToggleRead(message.id, 'contact', !!message.response_read_at)}
-                          title={message.response_read_at ? "Mark response as unread" : "Mark response as read"}
-                        >
-                          {message.response_read_at ? (
-                            <EyeOff className="h-4 w-4" />
-                          ) : (
-                            <Eye className="h-4 w-4" />
-                          )}
-                        </Button>
-                      )}
-                    </div>
-                    <div>
-                      <p className="text-sm font-medium mb-2">Your message:</p>
-                      <p className="text-sm text-muted-foreground">{message.message}</p>
-                    </div>
-                    
-                    {message.response && (
-                      <div className="pt-3 border-t">
-                        <p className="text-sm font-semibold mb-2 text-green-600">Coach Response:</p>
-                        <div className="bg-green-50 dark:bg-green-950 border border-green-200 dark:border-green-800 p-3 rounded-lg text-sm text-display break-words-safe content-container">
-                          {message.response}
-                        </div>
-                        <p className="text-xs text-muted-foreground mt-2">
-                          {format(new Date(message.responded_at!), 'MMM dd, yyyy HH:mm')}
-                        </p>
-                      </div>
-                    )}
-
-                    {!message.response && (
-                      <Badge variant="secondary">Pending Response</Badge>
-                    )}
-
-                    <p className="text-xs text-muted-foreground">
-                      Sent: {format(new Date(message.created_at), 'MMM dd, yyyy HH:mm')}
-                    </p>
-                  </div>
-                </CardContent>
-              </Card>
-            ))
+            contactMessages.map((message) => renderContactMessage(message, false))
           )}
         </TabsContent>
       </Tabs>
+
+      <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete Message</AlertDialogTitle>
+            <AlertDialogDescription>
+              Are you sure you want to delete this message? This action cannot be undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={handleDeleteConfirm} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
+              Delete
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 };
