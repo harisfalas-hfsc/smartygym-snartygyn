@@ -7,18 +7,13 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
-const logStep = (step: string, details?: any) => {
-  const detailsStr = details ? ` - ${JSON.stringify(details)}` : "";
-  console.log(`[SEND-WEEKLY-MOTIVATION] ${step}${detailsStr}`);
-};
-
 serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
   }
 
   try {
-    logStep("Function started - Monday motivational messages");
+    console.log("[SEND-WEEKLY-MOTIVATION] Starting Monday motivational messages");
 
     const supabaseAdmin = createClient(
       Deno.env.get("SUPABASE_URL") ?? "",
@@ -30,127 +25,120 @@ serve(async (req) => {
     const { data: automationRule } = await supabaseAdmin
       .from("automation_rules")
       .select("*")
-      .eq("automation_key", "weekly_motivation")
+      .eq("automation_key", "monday_motivation")
       .eq("is_active", true)
       .single();
 
     if (!automationRule) {
-      logStep("Weekly motivation automation is disabled");
+      console.log("[SEND-WEEKLY-MOTIVATION] Automation is disabled");
       return new Response(
-        JSON.stringify({ success: false, reason: "Weekly motivation automation disabled" }),
-        {
-          status: 200,
-          headers: { ...corsHeaders, "Content-Type": "application/json" },
-        }
+        JSON.stringify({ success: false, reason: "Automation disabled" }),
+        { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
 
     const resend = new Resend(Deno.env.get("RESEND_API_KEY"));
 
-    // Get a random active motivational template
-    const { data: templates } = await supabaseAdmin
+    // Get the motivational template
+    const { data: template } = await supabaseAdmin
       .from("automated_message_templates")
       .select("subject, content")
       .eq("message_type", "motivational_weekly")
-      .eq("is_active", true);
+      .eq("is_active", true)
+      .single();
 
-    if (!templates || templates.length === 0) {
-      logStep("No active motivational templates found");
+    if (!template) {
+      console.log("[SEND-WEEKLY-MOTIVATION] No active template found");
       return new Response(
-        JSON.stringify({ success: false, reason: "No motivational templates configured" }),
-        {
-          status: 200,
-          headers: { ...corsHeaders, "Content-Type": "application/json" },
-        }
+        JSON.stringify({ success: false, reason: "No template configured" }),
+        { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
 
-    // Select a random template for variety
-    const template = templates[Math.floor(Math.random() * templates.length)];
-    logStep("Selected template", { subject: template.subject });
-
-    // Get all active users
+    // Get ALL users (visitors with accounts, subscribers, premium)
     const { data: users, error: usersError } = await supabaseAdmin
       .from("profiles")
       .select("user_id");
 
     if (usersError) throw usersError;
 
-    logStep("Found active users", { count: users?.length || 0 });
+    console.log(`[SEND-WEEKLY-MOTIVATION] Found ${users?.length || 0} users`);
 
     if (!users || users.length === 0) {
       return new Response(
-        JSON.stringify({ message: "No users to send motivational messages to" }),
-        {
-          status: 200,
-          headers: { ...corsHeaders, "Content-Type": "application/json" },
-        }
+        JSON.stringify({ message: "No users to send messages to" }),
+        { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
 
-    let messagesSent = 0;
-    let messagesFailed = 0;
+    let dashboardSent = 0;
+    let emailsSent = 0;
+    let failed = 0;
+
+    // Check for duplicates - don't send if already sent today
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    
+    const { data: existingMessages } = await supabaseAdmin
+      .from('user_system_messages')
+      .select('user_id')
+      .eq('message_type', 'motivational_weekly')
+      .gte('created_at', today.toISOString());
+
+    const alreadySentUserIds = new Set(existingMessages?.map(m => m.user_id) || []);
 
     for (const user of users) {
+      // Skip if already sent today
+      if (alreadySentUserIds.has(user.user_id)) {
+        console.log(`[SEND-WEEKLY-MOTIVATION] Skipping user ${user.user_id} - already sent today`);
+        continue;
+      }
+
       try {
-        // Check user notification preferences
-        const { data: preferences } = await supabaseAdmin
-          .from("notification_preferences")
-          .select("newsletter")
-          .eq("user_id", user.user_id)
-          .single();
-
-        // Skip if user has disabled newsletter emails
-        if (preferences && !preferences.newsletter) {
-          logStep("User has disabled newsletter emails, skipping", { userId: user.user_id });
-          continue;
-        }
-
-        // Get user email and name
-        const { data: userData } = await supabaseAdmin.auth.admin.getUserById(user.user_id);
-        const userEmail = userData?.user?.email;
-
-        if (!userEmail) {
-          logStep("User email not found, skipping", { userId: user.user_id });
-          continue;
-        }
-
-        // Send dashboard message if enabled
+        // Send dashboard message
         if (automationRule.sends_dashboard_message) {
-          try {
-            await supabaseAdmin
-              .from("user_system_messages")
-              .insert({
-                user_id: user.user_id,
-                message_type: "motivational_weekly",
-                subject: template.subject,
-                content: template.content,
-                is_read: false,
-              });
-          } catch (msgError) {
-            logStep("ERROR sending dashboard message", { userId: user.user_id, error: msgError });
-          }
-        }
-
-        // Send email if enabled
-        if (automationRule.sends_email) {
-          try {
-            await resend.emails.send({
-              from: "SmartyGym <onboarding@resend.dev>",
-              to: [userEmail],
+          const { error: msgError } = await supabaseAdmin
+            .from("user_system_messages")
+            .insert({
+              user_id: user.user_id,
+              message_type: "motivational_weekly",
               subject: template.subject,
-              html: template.content.replace(/\n/g, '<br>'),
+              content: template.content,
+              is_read: false,
             });
-          } catch (emailError) {
-            logStep("ERROR sending email", { userId: user.user_id, error: emailError });
-          }
+
+          if (!msgError) dashboardSent++;
         }
 
-        messagesSent++;
-        logStep("Motivational message sent", { userId: user.user_id });
+        // Send email
+        if (automationRule.sends_email) {
+          const { data: userData } = await supabaseAdmin.auth.admin.getUserById(user.user_id);
+          const userEmail = userData?.user?.email;
+
+          if (userEmail) {
+            try {
+              await resend.emails.send({
+                from: "SmartyGym <onboarding@resend.dev>",
+                to: [userEmail],
+                subject: template.subject,
+                html: `
+                  <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+                    <h1 style="color: #d4af37;">${template.subject}</h1>
+                    <div style="font-size: 16px; line-height: 1.6;">${template.content}</div>
+                    <hr style="margin: 24px 0; border: none; border-top: 1px solid #eee;">
+                    <p style="font-size: 12px; color: #666;">This email was sent from SmartyGym.</p>
+                  </div>
+                `,
+              });
+              emailsSent++;
+            } catch (emailError) {
+              console.error(`[SEND-WEEKLY-MOTIVATION] Email error for ${userEmail}:`, emailError);
+            }
+          }
+        }
       } catch (error) {
-        messagesFailed++;
-        logStep("Error sending to user", { userId: user.user_id, error: error instanceof Error ? error.message : String(error) });
+        failed++;
+        console.error(`[SEND-WEEKLY-MOTIVATION] Error for user ${user.user_id}:`, error);
       }
     }
 
@@ -159,31 +147,38 @@ serve(async (req) => {
       .from("automation_rules")
       .update({
         last_triggered_at: new Date().toISOString(),
-        total_executions: (automationRule.total_executions || 0) + messagesSent,
+        total_executions: (automationRule.total_executions || 0) + dashboardSent,
       })
       .eq("id", automationRule.id);
+
+    // Log to audit
+    await supabaseAdmin.from('notification_audit_log').insert({
+      notification_type: 'monday_motivation',
+      message_type: 'motivational_weekly',
+      recipient_count: users.length,
+      success_count: dashboardSent,
+      failed_count: failed,
+      subject: template.subject,
+      content: template.content,
+    });
+
+    console.log(`[SEND-WEEKLY-MOTIVATION] ✅ Completed: ${dashboardSent} dashboard, ${emailsSent} emails, ${failed} failed`);
 
     return new Response(
       JSON.stringify({ 
         success: true, 
-        messagesSent, 
-        messagesFailed,
-        templateUsed: template.subject 
+        dashboardSent, 
+        emailsSent,
+        failed
       }),
-      {
-        status: 200,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-      }
+      { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : String(error);
-    logStep("ERROR", { message: errorMessage });
+    console.error("[SEND-WEEKLY-MOTIVATION] ERROR:", errorMessage);
     return new Response(
       JSON.stringify({ error: errorMessage }),
-      {
-        status: 500,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-      }
+      { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
   }
 });

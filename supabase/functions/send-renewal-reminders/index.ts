@@ -7,18 +7,13 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
-const logStep = (step: string, details?: any) => {
-  const detailsStr = details ? ` - ${JSON.stringify(details)}` : "";
-  console.log(`[SEND-RENEWAL-REMINDERS] ${step}${detailsStr}`);
-};
-
 serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
   }
 
   try {
-    logStep("Function started");
+    console.log("[SEND-RENEWAL-REMINDERS] Starting subscription expiration check");
 
     const supabaseAdmin = createClient(
       Deno.env.get("SUPABASE_URL") ?? "",
@@ -30,50 +25,44 @@ serve(async (req) => {
     const { data: automationRule } = await supabaseAdmin
       .from("automation_rules")
       .select("*")
-      .eq("automation_key", "renewal_reminder")
+      .eq("automation_key", "subscription_expiration")
       .eq("is_active", true)
       .single();
 
     if (!automationRule) {
-      logStep("Renewal reminder automation is disabled");
+      console.log("[SEND-RENEWAL-REMINDERS] Automation is disabled");
       return new Response(
-        JSON.stringify({ success: false, reason: "Renewal reminder automation disabled" }),
-        {
-          status: 200,
-          headers: { ...corsHeaders, "Content-Type": "application/json" },
-        }
+        JSON.stringify({ success: false, reason: "Automation disabled" }),
+        { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
 
     const resend = new Resend(Deno.env.get("RESEND_API_KEY"));
 
-    // Get subscriptions expiring in 3 days
+    // Get subscriptions expiring in exactly 3 days
     const threeDaysFromNow = new Date();
     threeDaysFromNow.setDate(threeDaysFromNow.getDate() + 3);
-    const threeDaysStart = new Date(threeDaysFromNow);
-    threeDaysStart.setHours(0, 0, 0, 0);
-    const threeDaysEnd = new Date(threeDaysFromNow);
-    threeDaysEnd.setHours(23, 59, 59, 999);
+    const startOfDay = new Date(threeDaysFromNow);
+    startOfDay.setHours(0, 0, 0, 0);
+    const endOfDay = new Date(threeDaysFromNow);
+    endOfDay.setHours(23, 59, 59, 999);
 
     const { data: expiringSubscriptions, error: subsError } = await supabaseAdmin
       .from("user_subscriptions")
       .select("user_id, plan_type, current_period_end")
       .eq("status", "active")
       .neq("plan_type", "free")
-      .gte("current_period_end", threeDaysStart.toISOString())
-      .lte("current_period_end", threeDaysEnd.toISOString());
+      .gte("current_period_end", startOfDay.toISOString())
+      .lte("current_period_end", endOfDay.toISOString());
 
     if (subsError) throw subsError;
 
-    logStep("Found expiring subscriptions", { count: expiringSubscriptions?.length || 0 });
+    console.log(`[SEND-RENEWAL-REMINDERS] Found ${expiringSubscriptions?.length || 0} expiring subscriptions`);
 
     if (!expiringSubscriptions || expiringSubscriptions.length === 0) {
       return new Response(
         JSON.stringify({ message: "No subscriptions expiring in 3 days" }),
-        {
-          status: 200,
-          headers: { ...corsHeaders, "Content-Type": "application/json" },
-        }
+        { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
 
@@ -83,77 +72,92 @@ serve(async (req) => {
       .select("subject, content")
       .eq("message_type", "renewal_reminder")
       .eq("is_active", true)
-      .eq("is_default", true)
       .single();
 
     if (!template) {
-      logStep("No active renewal reminder template found");
+      console.log("[SEND-RENEWAL-REMINDERS] No active template found");
       return new Response(
-        JSON.stringify({ success: false, reason: "No renewal reminder template configured" }),
-        {
-          status: 200,
-          headers: { ...corsHeaders, "Content-Type": "application/json" },
-        }
+        JSON.stringify({ success: false, reason: "No template configured" }),
+        { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
 
-    const messagesSent = [];
+    let dashboardSent = 0;
+    let emailsSent = 0;
 
     for (const subscription of expiringSubscriptions) {
       try {
-        // Check user notification preferences
-        const { data: preferences } = await supabaseAdmin
-          .from("notification_preferences")
-          .select("renewal_reminders")
-          .eq("user_id", subscription.user_id)
-          .single();
-
-        // Skip if user has disabled renewal reminders
-        if (preferences && !preferences.renewal_reminders) {
-          logStep("User has disabled renewal reminders, skipping", { userId: subscription.user_id });
-          continue;
-        }
-
         const renewalDate = new Date(subscription.current_period_end).toLocaleDateString();
         const planName = subscription.plan_type.charAt(0).toUpperCase() + subscription.plan_type.slice(1);
 
-        // Get user email
-        const { data: userData } = await supabaseAdmin.auth.admin.getUserById(subscription.user_id);
-        const userEmail = userData?.user?.email;
+        // Replace placeholders
+        const subject = template.subject;
+        const content = template.content
+          .replace(/{planName}/g, planName)
+          .replace(/{date}/g, renewalDate);
 
-        if (!userEmail) {
-          logStep("User email not found, skipping", { userId: subscription.user_id });
+        // Check if already sent today
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        
+        const { data: existing } = await supabaseAdmin
+          .from('user_system_messages')
+          .select('id')
+          .eq('user_id', subscription.user_id)
+          .eq('message_type', 'renewal_reminder')
+          .gte('created_at', today.toISOString())
+          .limit(1);
+
+        if (existing && existing.length > 0) {
+          console.log(`[SEND-RENEWAL-REMINDERS] Skipping user ${subscription.user_id} - already notified today`);
           continue;
         }
 
         // Send dashboard message
-        await supabaseAdmin.functions.invoke('send-system-message', {
-          body: {
-            userId: subscription.user_id,
-            messageType: 'renewal_reminder',
-            customData: {
-              planName: planName,
-              date: renewalDate
-            }
-          }
-        });
+        if (automationRule.sends_dashboard_message) {
+          const { error: msgError } = await supabaseAdmin
+            .from("user_system_messages")
+            .insert({
+              user_id: subscription.user_id,
+              message_type: "renewal_reminder",
+              subject: subject,
+              content: content,
+              is_read: false,
+            });
+
+          if (!msgError) dashboardSent++;
+        }
 
         // Send email
-        const emailContent = template.content
-          .replace(/\{planName\}/g, planName)
-          .replace(/\{date\}/g, renewalDate);
+        if (automationRule.sends_email) {
+          const { data: userData } = await supabaseAdmin.auth.admin.getUserById(subscription.user_id);
+          const userEmail = userData?.user?.email;
 
-        await resend.emails.send({
-          from: "SmartyGym <onboarding@resend.dev>",
-          to: [userEmail],
-          subject: template.subject,
-          html: emailContent.replace(/\n/g, '<br>'),
-        });
+          if (userEmail) {
+            try {
+              await resend.emails.send({
+                from: "SmartyGym <onboarding@resend.dev>",
+                to: [userEmail],
+                subject: subject,
+                html: `
+                  <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+                    <h1 style="color: #d4af37;">${subject}</h1>
+                    <div style="font-size: 16px; line-height: 1.6;">${content}</div>
+                    <hr style="margin: 24px 0; border: none; border-top: 1px solid #eee;">
+                    <p style="font-size: 12px; color: #666;">This email was sent from SmartyGym.</p>
+                  </div>
+                `,
+              });
+              emailsSent++;
+            } catch (emailError) {
+              console.error(`[SEND-RENEWAL-REMINDERS] Email error for ${userEmail}:`, emailError);
+            }
+          }
+        }
 
-        messagesSent.push({ userId: subscription.user_id });
-        logStep("Renewal reminder sent (dashboard + email)", { userId: subscription.user_id, renewalDate });
+        console.log(`[SEND-RENEWAL-REMINDERS] ✅ Notified user ${subscription.user_id}`);
       } catch (error) {
-        logStep("Error sending to user", { userId: subscription.user_id, error: error instanceof Error ? error.message : String(error) });
+        console.error(`[SEND-RENEWAL-REMINDERS] Error for user ${subscription.user_id}:`, error);
       }
     }
 
@@ -162,26 +166,33 @@ serve(async (req) => {
       .from("automation_rules")
       .update({
         last_triggered_at: new Date().toISOString(),
-        total_executions: (automationRule.total_executions || 0) + messagesSent.length,
+        total_executions: (automationRule.total_executions || 0) + dashboardSent,
       })
       .eq("id", automationRule.id);
 
+    // Log to audit
+    await supabaseAdmin.from('notification_audit_log').insert({
+      notification_type: 'subscription_expiration',
+      message_type: 'renewal_reminder',
+      recipient_count: expiringSubscriptions.length,
+      success_count: dashboardSent,
+      failed_count: 0,
+      subject: template.subject,
+      content: template.content,
+    });
+
+    console.log(`[SEND-RENEWAL-REMINDERS] ✅ Completed: ${dashboardSent} dashboard, ${emailsSent} emails`);
+
     return new Response(
-      JSON.stringify({ success: true, messagesSent: messagesSent.length }),
-      {
-        status: 200,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-      }
+      JSON.stringify({ success: true, dashboardSent, emailsSent }),
+      { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : String(error);
-    logStep("ERROR", { message: errorMessage });
+    console.error("[SEND-RENEWAL-REMINDERS] ERROR:", errorMessage);
     return new Response(
       JSON.stringify({ error: errorMessage }),
-      {
-        status: 500,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-      }
+      { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
   }
 });
