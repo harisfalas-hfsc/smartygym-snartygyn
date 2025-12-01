@@ -145,29 +145,71 @@ Generate a complete workout with these specifications:
 - Difficulty: ${selectedDifficulty.name} (${selectedDifficulty.stars} stars out of 6)
 - Format: ${format}
 
-Create the workout with these EXACT sections (use HTML formatting):
+CRITICAL FORMATTING RULES (MANDATORY - FOLLOW EXACTLY):
 
-1. WORKOUT NAME: Create a catchy, motivating name (e.g., "Iron Core Ignite", "Metabolic Fury", "Beast Mode Builder")
+1. TITLE FORMAT:
+   <p class="tiptap-paragraph"><strong><u>WORKOUT TITLE</u></strong></p>
+   <p class="tiptap-paragraph"></p>
 
-2. DESCRIPTION: A compelling 2-3 sentence overview of what this workout targets and achieves.
+2. SECTION TITLES (Warm-Up, Main Workout, Cooldown, Notes):
+   <p class="tiptap-paragraph"></p>
+   <p class="tiptap-paragraph"><strong><u>Section Title (X minutes)</u></strong></p>
+   <p class="tiptap-paragraph"></p>
 
-3. WORKOUT CONTENT: The complete workout including:
-   - Warm-up (5-8 minutes)
-   - Main workout with specific exercises, sets, reps, rest periods
-   - Cool-down (3-5 minutes)
-   Use proper formatting with exercise names, sets x reps, tempo if applicable.
+3. SUB-HEADERS (Block 1, Block 2, Circuit, Round, etc.):
+   <p class="tiptap-paragraph"></p>
+   <p class="tiptap-paragraph"><strong>Sub-header Name</strong></p>
+   <p class="tiptap-paragraph"></p>
 
-4. INSTRUCTIONS: Step-by-step guidance on how to perform the workout correctly.
+4. EXERCISES (Always use bullet list):
+   <ul class="tiptap-bullet-list">
+   <li class="tiptap-list-item"><p class="tiptap-paragraph">Exercise Name – description – time/reps</p></li>
+   </ul>
+   <p class="tiptap-paragraph"></p>
 
-5. TIPS: Professional coaching tips for safety and maximizing results.
+SPACING RULES:
+- Always one empty <p class="tiptap-paragraph"></p> after title
+- Always one empty paragraph BEFORE and AFTER each section title
+- Always one empty paragraph BEFORE sub-headers
+- Always one empty paragraph AFTER each exercise list
+- Never merge sections into one paragraph
+
+CONTENT REQUIREMENTS:
+1. WORKOUT NAME: Create a catchy name (e.g., "Iron Core Ignite", "Metabolic Fury")
+2. DESCRIPTION: 2-3 compelling sentences
+3. WORKOUT: Complete with Warm-up (5-8 min), Main workout, Cool-down (3-5 min)
+4. INSTRUCTIONS: Step-by-step guidance
+5. TIPS: Professional coaching tips
+
+EXAMPLE main_workout structure:
+<p class="tiptap-paragraph"><strong><u>Warm-Up (7 minutes)</u></strong></p>
+<p class="tiptap-paragraph"></p>
+<ul class="tiptap-bullet-list">
+<li class="tiptap-list-item"><p class="tiptap-paragraph">Dynamic Arm Circles – forward/backward – 60 seconds</p></li>
+<li class="tiptap-list-item"><p class="tiptap-paragraph">Leg Swings – front & lateral – 30 seconds each leg</p></li>
+</ul>
+<p class="tiptap-paragraph"></p>
+<p class="tiptap-paragraph"><strong><u>Main Workout</u></strong></p>
+<p class="tiptap-paragraph"></p>
+<p class="tiptap-paragraph"><strong>Block 1: Lower Body Power</strong></p>
+<p class="tiptap-paragraph"></p>
+<ul class="tiptap-bullet-list">
+<li class="tiptap-list-item"><p class="tiptap-paragraph">Squat Jumps – explosive – 20 seconds work / 10 seconds rest x 8</p></li>
+</ul>
+<p class="tiptap-paragraph"></p>
+<p class="tiptap-paragraph"><strong><u>Cool-Down (5 minutes)</u></strong></p>
+<p class="tiptap-paragraph"></p>
+<ul class="tiptap-bullet-list">
+<li class="tiptap-list-item"><p class="tiptap-paragraph">Child's Pose – hold – 60 seconds</p></li>
+</ul>
 
 Respond in this EXACT JSON format:
 {
   "name": "Workout Name Here",
-  "description": "<p>Description here...</p>",
-  "main_workout": "<p><strong>Warm-Up (5 min)</strong></p><p>...</p><p><strong>Main Workout</strong></p><p>...</p><p><strong>Cool-Down (3 min)</strong></p><p>...</p>",
-  "instructions": "<p>Instructions here...</p>",
-  "tips": "<p>Tips here...</p>"
+  "description": "<p class=\\"tiptap-paragraph\\">Description here...</p>",
+  "main_workout": "[formatted HTML following rules above]",
+  "instructions": "<p class=\\"tiptap-paragraph\\">Instructions here...</p>",
+  "tips": "<p class=\\"tiptap-paragraph\\">Tips here...</p>"
 }`;
 
     logStep("Calling Lovable AI for workout content");
