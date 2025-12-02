@@ -122,11 +122,14 @@ serve(async (req) => {
                 to: [userEmail],
                 subject: template.subject,
                 html: `
-                  <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-                    <h1 style="color: #d4af37;">${template.subject}</h1>
-                    <div style="font-size: 16px; line-height: 1.6;">${template.content}</div>
-                    <hr style="margin: 24px 0; border: none; border-top: 1px solid #eee;">
-                    <p style="font-size: 12px; color: #666;">This email was sent from SmartyGym.</p>
+                  <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
+                    <h1 style="color: #d4af37; margin-bottom: 20px;">${template.subject}</h1>
+                    <div style="font-size: 16px; line-height: 1.6; margin-bottom: 24px;">${template.content}</div>
+                    <p style="margin-top: 24px;">
+                      <a href="https://smartygym.com/workout" style="display: inline-block; background: #d4af37; color: white; padding: 14px 28px; text-decoration: none; border-radius: 4px; font-weight: bold; font-size: 16px;">Browse Workouts →</a>
+                    </p>
+                    <hr style="margin: 32px 0; border: none; border-top: 1px solid #eee;">
+                    <p style="font-size: 12px; color: #999;">This email was sent from SmartyGym.</p>
                   </div>
                 `,
               });
