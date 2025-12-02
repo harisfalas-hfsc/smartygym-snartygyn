@@ -175,11 +175,21 @@ SPACING RULES:
 - Never merge sections into one paragraph
 
 CONTENT REQUIREMENTS:
-1. WORKOUT NAME: Create a catchy name (e.g., "Iron Core Ignite", "Metabolic Fury")
-2. DESCRIPTION: 2-3 compelling sentences
-3. WORKOUT: Complete with Warm-up (5-8 min), Main workout, Cool-down (3-5 min)
-4. INSTRUCTIONS: Step-by-step guidance
-5. TIPS: Professional coaching tips
+WORKOUT NAME RULES (CRITICAL):
+- Create a COMPLETELY UNIQUE name every time - never repeat past names
+- BANNED WORDS (never use): "Inferno", "Beast", "Blaze", "Fire", "Burn", "Warrior", "Titan"
+- Use creative combinations:
+  * Action + Target: "Core Crusher", "Leg Destroyer", "Power Surge", "Iron Will"
+  * Intensity + Movement: "Explosive Circuits", "Velocity Rush", "Steel Resolve"
+  * Unique themes: "Apex Challenge", "Momentum Builder", "Force Unleashed"
+- Name must reflect category and format
+- Maximum 2-3 words
+
+CONTENT REQUIREMENTS:
+1. DESCRIPTION: 2-3 compelling sentences
+2. WORKOUT: Complete with Warm-up (5-8 min), Main workout, Cool-down (3-5 min)
+3. INSTRUCTIONS: Step-by-step guidance
+4. TIPS: Professional coaching tips
 
 EXAMPLE main_workout structure:
 <p class="tiptap-paragraph"><strong><u>Warm-Up (7 minutes)</u></strong></p>
@@ -363,31 +373,42 @@ Respond in this EXACT JSON format:
 
     logStep("New WOD inserted", { id: workoutId, name: workoutContent.name });
 
-    // Schedule notification for new WOD (immediate - sent via cron job)
+    // Send WOD notification DIRECTLY to all users
     try {
-      const notificationBody = `Today's workout: ${workoutContent.name} (${category}). ${equipment === "BODYWEIGHT" ? "No equipment needed!" : "Equipment workout."} Available for €3.99 or included with Premium.`;
+      const { data: allUsers } = await supabase.from('profiles').select('user_id');
+      const userIds = allUsers?.map(u => u.user_id) || [];
+      logStep(`Sending WOD to ${userIds.length} users`);
       
-      const { error: notifError } = await supabase
-        .from('scheduled_notifications')
-        .insert([{
-          title: '🏆 New Workout of the Day!',
-          body: notificationBody,
-          url: '/workout-of-the-day',
-          icon: imageUrl || '/smarty-gym-logo.png',
-          target_audience: 'all',
-          scheduled_time: new Date().toISOString(),
-          timezone: 'UTC',
-          status: 'pending',
-          recurrence_pattern: 'once'
-        }]);
-
-      if (notifError) {
-        logStep("Failed to schedule WOD notification", { error: notifError.message });
-      } else {
-        logStep("WOD notification scheduled successfully");
+      if (userIds.length > 0) {
+        const resend = new Resend(Deno.env.get('RESEND_API_KEY'));
+        const notificationTitle = `🏆 Today's Workout: ${workoutContent.name}`;
+        const notificationContent = `<p class="tiptap-paragraph"><strong>🏆 Today's Workout of the Day</strong></p><p class="tiptap-paragraph"></p><p class="tiptap-paragraph"><strong>${workoutContent.name}</strong></p><p class="tiptap-paragraph"></p><p class="tiptap-paragraph">${categoryName} | ${format} | ${selectedEquipment} | ${selectedDifficulty.name}</p><p class="tiptap-paragraph"></p>${workoutContent.description}<p class="tiptap-paragraph"></p><p class="tiptap-paragraph">Available for €3.99 or included with Premium.</p><p class="tiptap-paragraph"></p><p class="tiptap-paragraph"><a href="https://smartygym.com/workout-of-the-day">View Today's Workout →</a></p>`;
+        
+        await supabase.from('user_system_messages').insert(userIds.map(userId => ({
+          user_id: userId,
+          message_type: 'announcement_new_workout',
+          subject: notificationTitle,
+          content: notificationContent,
+          is_read: false,
+        })));
+        
+        const { data: usersData } = await supabase.auth.admin.listUsers();
+        const userEmails = usersData?.users?.filter(u => userIds.includes(u.id) && u.email).map(u => u.email) as string[] || [];
+        
+        for (const email of userEmails) {
+          try {
+            await resend.emails.send({
+              from: 'SmartyGym <onboarding@resend.dev>',
+              to: [email],
+              subject: notificationTitle,
+              html: `<div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;"><h1 style="color: #d4af37;">🏆 Today's Workout</h1><h2 style="color: #333;">${workoutContent.name}</h2><p>${categoryName} | ${format} | ${selectedEquipment} | ${selectedDifficulty.name}</p><p style="line-height: 1.6;">${workoutContent.description}</p><p>Available for €3.99 or included with Premium.</p><p><a href="https://smartygym.com/workout-of-the-day" style="background: #d4af37; color: white; padding: 14px 28px; text-decoration: none; border-radius: 4px; font-weight: bold;">View Workout →</a></p></div>`,
+            });
+          } catch (e) {}
+        }
+        logStep(`✅ Sent to ${userIds.length} users`);
       }
-    } catch (notifError) {
-      logStep("Error scheduling WOD notification", { error: notifError });
+    } catch (e) {
+      logStep("Error sending WOD notification", { error: e });
     }
 
     // Update state

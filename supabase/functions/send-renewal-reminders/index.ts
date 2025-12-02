@@ -113,6 +113,9 @@ serve(async (req) => {
           continue;
         }
 
+        // Prepare properly formatted HTML content
+        const formattedContent = `<p class="tiptap-paragraph"><strong>⏰ Subscription Renewal Reminder</strong></p><p class="tiptap-paragraph"></p><p class="tiptap-paragraph">Your <strong>${planName}</strong> membership will renew on <strong>${renewalDate}</strong>.</p><p class="tiptap-paragraph"></p><p class="tiptap-paragraph">Your subscription will automatically renew to continue your access to all premium features.</p><p class="tiptap-paragraph"></p><p class="tiptap-paragraph">If you have any questions or need to make changes, please visit your account settings.</p><p class="tiptap-paragraph"></p><p class="tiptap-paragraph"><a href="https://smartygym.com/userdashboard?tab=membership" style="display: inline-block; background: #d4af37; color: white; padding: 12px 24px; text-decoration: none; border-radius: 4px; font-weight: bold;">Manage Subscription →</a></p><p class="tiptap-paragraph"></p><p class="tiptap-paragraph"><strong>The SmartyGym Team</strong></p>`;
+        
         // Send dashboard message
         if (automationRule.sends_dashboard_message) {
           const { error: msgError } = await supabaseAdmin
@@ -121,7 +124,7 @@ serve(async (req) => {
               user_id: subscription.user_id,
               message_type: "renewal_reminder",
               subject: subject,
-              content: content,
+              content: formattedContent,
               is_read: false,
             });
 
@@ -140,11 +143,16 @@ serve(async (req) => {
                 to: [userEmail],
                 subject: subject,
                 html: `
-                  <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-                    <h1 style="color: #d4af37;">${subject}</h1>
-                    <div style="font-size: 16px; line-height: 1.6;">${content}</div>
-                    <hr style="margin: 24px 0; border: none; border-top: 1px solid #eee;">
-                    <p style="font-size: 12px; color: #666;">This email was sent from SmartyGym.</p>
+                  <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
+                    <h1 style="color: #d4af37; margin-bottom: 20px;">⏰ Subscription Renewal Reminder</h1>
+                    <p style="font-size: 16px; line-height: 1.6; margin-bottom: 16px;">Your <strong>${planName}</strong> membership will renew on <strong>${renewalDate}</strong>.</p>
+                    <p style="font-size: 16px; line-height: 1.6; margin-bottom: 16px;">Your subscription will automatically renew to continue your access to all premium features.</p>
+                    <p style="font-size: 16px; line-height: 1.6; margin-bottom: 24px;">If you have any questions or need to make changes, please visit your account settings.</p>
+                    <p style="margin-top: 24px;">
+                      <a href="https://smartygym.com/userdashboard?tab=membership" style="display: inline-block; background: #d4af37; color: white; padding: 14px 28px; text-decoration: none; border-radius: 4px; font-weight: bold; font-size: 16px;">Manage Subscription →</a>
+                    </p>
+                    <hr style="margin: 32px 0; border: none; border-top: 1px solid #eee;">
+                    <p style="font-size: 12px; color: #999;">This email was sent from SmartyGym.</p>
                   </div>
                 `,
               });
