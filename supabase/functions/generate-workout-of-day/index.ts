@@ -8,7 +8,7 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
-// Category rotation cycle (6 days)
+// Category rotation cycle (6 days) - Each category appears once per week
 const CATEGORY_CYCLE = [
   "STRENGTH",
   "CALORIE BURNING", 
@@ -18,25 +18,35 @@ const CATEGORY_CYCLE = [
   "CHALLENGE"
 ];
 
-// Valid formats per category
+// Training philosophy: Format rules per category (STRICT)
 const FORMATS_BY_CATEGORY: Record<string, string[]> = {
-  "STRENGTH": ["REPS & SETS"],
-  "CALORIE BURNING": ["CIRCUIT", "TABATA", "AMRAP", "EMOM", "FOR TIME"],
-  "METABOLIC": ["CIRCUIT", "TABATA", "AMRAP", "EMOM", "FOR TIME"],
-  "CARDIO": ["CIRCUIT", "EMOM", "FOR TIME"],
-  "MOBILITY & STABILITY": ["MIX", "CIRCUIT"],
-  "CHALLENGE": ["CIRCUIT", "TABATA", "AMRAP", "EMOM", "FOR TIME", "REPS & SETS", "MIX"]
+  "STRENGTH": ["REPS & SETS"], // Strength MUST be Reps & Sets only
+  "CALORIE BURNING": ["CIRCUIT", "TABATA", "AMRAP"], // High intensity intervals
+  "METABOLIC": ["CIRCUIT", "AMRAP", "EMOM", "FOR TIME"], // Metabolic conditioning
+  "CARDIO": ["CIRCUIT", "EMOM", "FOR TIME"], // Sustained cardio work
+  "MOBILITY & STABILITY": ["MIX", "CIRCUIT"], // Flexibility and control
+  "CHALLENGE": ["CIRCUIT", "TABATA", "AMRAP", "EMOM", "FOR TIME", "REPS & SETS", "MIX"] // Any format
 };
 
-// Difficulty levels with stars
-const DIFFICULTIES = [
+// Difficulty cycle over 12 days (2 weeks) - ensures all levels covered
+// Each difficulty level (1-6 stars) appears twice in a 12-day cycle
+const DIFFICULTY_CYCLE = [
   { name: "Beginner", stars: 1 },
   { name: "Beginner", stars: 2 },
   { name: "Intermediate", stars: 3 },
   { name: "Intermediate", stars: 4 },
   { name: "Advanced", stars: 5 },
-  { name: "Advanced", stars: 6 }
+  { name: "Advanced", stars: 6 },
+  { name: "Beginner", stars: 2 },
+  { name: "Beginner", stars: 1 },
+  { name: "Intermediate", stars: 4 },
+  { name: "Intermediate", stars: 3 },
+  { name: "Advanced", stars: 6 },
+  { name: "Advanced", stars: 5 }
 ];
+
+// Equipment cycle - alternates to ensure 50/50 balance
+const EQUIPMENT_CYCLE = ["BODYWEIGHT", "EQUIPMENT"];
 
 function logStep(step: string, details?: any) {
   const detailsStr = details ? ` - ${JSON.stringify(details)}` : '';
@@ -122,29 +132,78 @@ serve(async (req) => {
     const category = CATEGORY_CYCLE[categoryIndex];
     logStep("Today's category", { category, dayCount: state.day_count });
 
-    // Determine equipment (aim for 50/50 balance)
-    const shouldBeBodyweight = state.equipment_bodyweight_count <= state.equipment_with_count;
-    const equipment = shouldBeBodyweight ? "BODYWEIGHT" : "EQUIPMENT";
-    logStep("Selected equipment", { equipment, shouldBeBodyweight });
+    // Determine equipment (alternating cycle for perfect 50/50 balance)
+    const equipmentIndex = state.day_count % EQUIPMENT_CYCLE.length;
+    const equipment = EQUIPMENT_CYCLE[equipmentIndex];
+    logStep("Selected equipment", { equipment, dayCount: state.day_count });
 
-    // Determine difficulty (aim for even distribution)
-    const difficultyIndex = Math.floor(Math.random() * DIFFICULTIES.length);
-    const selectedDifficulty = DIFFICULTIES[difficultyIndex];
-    logStep("Selected difficulty", selectedDifficulty);
+    // Determine difficulty (12-day cycle ensures all 6 levels covered twice per 2 weeks)
+    const difficultyIndex = state.day_count % DIFFICULTY_CYCLE.length;
+    const selectedDifficulty = DIFFICULTY_CYCLE[difficultyIndex];
+    logStep("Selected difficulty", { ...selectedDifficulty, dayCount: state.day_count });
 
-    // Determine format
+    // Determine format (strictly follows training philosophy)
     const validFormats = FORMATS_BY_CATEGORY[category] || ["CIRCUIT"];
     const format = validFormats[Math.floor(Math.random() * validFormats.length)];
-    logStep("Selected format", { format });
+    logStep("Selected format", { format, category, validFormats });
 
     // Generate workout content using Lovable AI
-    const workoutPrompt = `You are a professional fitness trainer creating a premium Workout of the Day.
+    const workoutPrompt = `You are Haris Falas, a Sports Scientist with 20+ years of coaching experience (CSCS Certified), creating a premium Workout of the Day for SmartyGym members worldwide.
 
 Generate a complete workout with these specifications:
 - Category: ${category}
 - Equipment: ${equipment}
 - Difficulty: ${selectedDifficulty.name} (${selectedDifficulty.stars} stars out of 6)
 - Format: ${format}
+
+TRAINING PHILOSOPHY (CRITICAL - MUST FOLLOW):
+${category === "STRENGTH" ? `
+STRENGTH WORKOUTS:
+- Focus on compound movements and progressive overload
+- Use Reps & Sets format with clear rest periods
+- Include barbell, dumbbell, or kettlebell exercises (if equipment) or advanced calisthenics (if bodyweight)
+- Target muscle hypertrophy and strength gains
+- Appropriate for gym-goers wanting to build muscle and power` : ""}
+${category === "CALORIE BURNING" ? `
+CALORIE BURNING WORKOUTS:
+- High-intensity interval training to maximize calorie expenditure
+- Fast-paced circuits with minimal rest
+- Full-body movements that elevate heart rate
+- Perfect for fat loss and conditioning
+- Suitable for home, gym, or outdoor training` : ""}
+${category === "METABOLIC" ? `
+METABOLIC CONDITIONING WORKOUTS:
+- Combination of strength and cardio for metabolic stress
+- Work-to-rest ratios that challenge energy systems
+- Compound movements with lighter weights at higher volume
+- Builds work capacity and burns calories post-workout
+- Great for athletes and fitness enthusiasts` : ""}
+${category === "CARDIO" ? `
+CARDIO WORKOUTS:
+- Sustained elevated heart rate for cardiovascular health
+- Mix of locomotion, plyometrics, and conditioning
+- Focus on endurance and stamina building
+- Scalable intensity for all fitness levels
+- Perfect for improving heart health and lung capacity` : ""}
+${category === "MOBILITY & STABILITY" ? `
+MOBILITY & STABILITY WORKOUTS:
+- Focus on joint health, flexibility, and core stability
+- Controlled movements with proper breathing
+- Active recovery and injury prevention
+- Essential for long-term fitness and performance
+- Perfect for rest days or complementing intense training` : ""}
+${category === "CHALLENGE" ? `
+CHALLENGE WORKOUTS:
+- Push your limits with advanced programming
+- Test mental and physical toughness
+- Complex movements and demanding protocols
+- For experienced athletes seeking new challenges
+- Celebrate completion as a badge of honor` : ""}
+
+DIFFICULTY LEVEL ${selectedDifficulty.stars}/6 (${selectedDifficulty.name}):
+${selectedDifficulty.stars <= 2 ? "- Suitable for beginners or those returning to fitness\n- Focus on foundational movements with proper form\n- Moderate intensity with adequate rest periods" : ""}
+${selectedDifficulty.stars >= 3 && selectedDifficulty.stars <= 4 ? "- For regular exercisers with good fitness base\n- Increased complexity and intensity\n- Challenging but achievable for consistent trainers" : ""}
+${selectedDifficulty.stars >= 5 ? "- Advanced level for experienced athletes\n- High intensity, complex movements, minimal rest\n- Requires excellent form and fitness foundation" : ""}
 
 CRITICAL FORMATTING RULES (MANDATORY - FOLLOW EXACTLY):
 
@@ -175,44 +234,30 @@ SPACING RULES:
 - Always one empty paragraph AFTER each exercise list
 - Never merge sections into one paragraph
 
-CONTENT REQUIREMENTS:
 WORKOUT NAME RULES (CRITICAL):
 - Create a COMPLETELY UNIQUE name every time - never repeat past names
-- BANNED WORDS (never use): "Inferno", "Beast", "Blaze", "Fire", "Burn", "Warrior", "Titan"
-- Use creative combinations:
-  * Action + Target: "Core Crusher", "Leg Destroyer", "Power Surge", "Iron Will"
-  * Intensity + Movement: "Explosive Circuits", "Velocity Rush", "Steel Resolve"
-  * Unique themes: "Apex Challenge", "Momentum Builder", "Force Unleashed"
-- Name must reflect category and format
+- BANNED WORDS (never use): "Inferno", "Beast", "Blaze", "Fire", "Burn", "Warrior", "Titan", "Crusher", "Destroyer"
+- Use creative combinations that reflect the category:
+  * STRENGTH: "Iron Protocol", "Steel Foundation", "Power Complex", "Barbell Symphony"
+  * CALORIE BURNING: "Sweat Storm", "Torch Session", "Meltdown Express", "Caloric Chaos"
+  * METABOLIC: "Metabolic Mayhem", "Conditioning Crucible", "Engine Builder", "Capacity Test"
+  * CARDIO: "Heart Racer", "Endurance Edge", "Pulse Pounder", "Cardio Quest"
+  * MOBILITY: "Flow State", "Flexibility Fusion", "Joint Liberation", "Balance Blueprint"
+  * CHALLENGE: "Ultimate Test", "Apex Trial", "Gauntlet Series", "Peak Performance"
 - Maximum 2-3 words
 
-CONTENT REQUIREMENTS:
-1. DESCRIPTION: 2-3 compelling sentences
-2. WORKOUT: Complete with Warm-up (5-8 min), Main workout, Cool-down (3-5 min)
-3. INSTRUCTIONS: Step-by-step guidance
-4. TIPS: Professional coaching tips
+DESCRIPTION REQUIREMENTS:
+- Write 2-3 compelling sentences that:
+  * Explain WHO this workout is for (fitness level, goals)
+  * Describe WHAT they'll experience (intensity, focus areas)
+  * Mention the BENEFIT they'll gain (strength, fat loss, mobility, etc.)
+- Sound professional and motivating, like expert coaching
 
-EXAMPLE main_workout structure:
-<p class="tiptap-paragraph"><strong><u>Warm-Up (7 minutes)</u></strong></p>
-<p class="tiptap-paragraph"></p>
-<ul class="tiptap-bullet-list">
-<li class="tiptap-list-item"><p class="tiptap-paragraph">Dynamic Arm Circles – forward/backward – 60 seconds</p></li>
-<li class="tiptap-list-item"><p class="tiptap-paragraph">Leg Swings – front & lateral – 30 seconds each leg</p></li>
-</ul>
-<p class="tiptap-paragraph"></p>
-<p class="tiptap-paragraph"><strong><u>Main Workout</u></strong></p>
-<p class="tiptap-paragraph"></p>
-<p class="tiptap-paragraph"><strong>Block 1: Lower Body Power</strong></p>
-<p class="tiptap-paragraph"></p>
-<ul class="tiptap-bullet-list">
-<li class="tiptap-list-item"><p class="tiptap-paragraph">Squat Jumps – explosive – 20 seconds work / 10 seconds rest x 8</p></li>
-</ul>
-<p class="tiptap-paragraph"></p>
-<p class="tiptap-paragraph"><strong><u>Cool-Down (5 minutes)</u></strong></p>
-<p class="tiptap-paragraph"></p>
-<ul class="tiptap-bullet-list">
-<li class="tiptap-list-item"><p class="tiptap-paragraph">Child's Pose – hold – 60 seconds</p></li>
-</ul>
+CONTENT STRUCTURE:
+1. DESCRIPTION: 2-3 professional sentences (see above)
+2. WORKOUT: Complete with Warm-up (5-8 min), Main workout, Cool-down (3-5 min)
+3. INSTRUCTIONS: Clear step-by-step guidance
+4. TIPS: Expert coaching tips for form and performance
 
 Respond in this EXACT JSON format:
 {
