@@ -428,7 +428,7 @@ Respond in this EXACT JSON format:
       if (userIds.length > 0) {
         const resendClient = new Resend(Deno.env.get('RESEND_API_KEY'));
         const notificationTitle = `🏆 Today's Workout: ${workoutContent.name}`;
-        const notificationContent = `<p class="tiptap-paragraph"><strong>🏆 Today's Workout of the Day</strong></p><p class="tiptap-paragraph"></p><p class="tiptap-paragraph"><strong>${workoutContent.name}</strong></p><p class="tiptap-paragraph"></p><p class="tiptap-paragraph">${category} | ${format} | ${equipment} | ${selectedDifficulty.name}</p><p class="tiptap-paragraph"></p>${workoutContent.description}<p class="tiptap-paragraph"></p><p class="tiptap-paragraph">Available for €3.99 or included with Premium.</p><p class="tiptap-paragraph"></p><p class="tiptap-paragraph"><a href="https://smartygym.com/workout-of-the-day">View Today's Workout →</a></p>`;
+        const notificationContent = `<p class="tiptap-paragraph"><strong>🏆 Today's Workout of the Day</strong></p><p class="tiptap-paragraph"></p><p class="tiptap-paragraph"><strong>${workoutContent.name}</strong></p><p class="tiptap-paragraph"></p><p class="tiptap-paragraph">${category} | ${format} | ${equipment} | ${selectedDifficulty.name}</p><p class="tiptap-paragraph"></p>${workoutContent.description}<p class="tiptap-paragraph"></p><p class="tiptap-paragraph">Available for €3.99 or included with Premium.</p><p class="tiptap-paragraph"></p><p class="tiptap-paragraph"><a href="https://smartygym.com/workout/wod">View Today's Workout →</a></p>`;
         
         await supabase.from('user_system_messages').insert(userIds.map(userId => ({
           user_id: userId,
@@ -447,7 +447,7 @@ Respond in this EXACT JSON format:
               from: 'SmartyGym <onboarding@resend.dev>',
               to: [email],
               subject: notificationTitle,
-              html: `<div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;"><h1 style="color: #d4af37;">🏆 Today's Workout</h1><h2 style="color: #333;">${workoutContent.name}</h2><p>${category} | ${format} | ${equipment} | ${selectedDifficulty.name}</p><p style="line-height: 1.6;">${workoutContent.description}</p><p>Available for €3.99 or included with Premium.</p><p><a href="https://smartygym.com/workout-of-the-day" style="background: #d4af37; color: white; padding: 14px 28px; text-decoration: none; border-radius: 4px; font-weight: bold;">View Workout →</a></p></div>`,
+              html: `<div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;"><h1 style="color: #d4af37;">🏆 Today's Workout</h1><h2 style="color: #333;">${workoutContent.name}</h2><p>${category} | ${format} | ${equipment} | ${selectedDifficulty.name}</p><p style="line-height: 1.6;">${workoutContent.description}</p><p>Available for €3.99 or included with Premium.</p><p><a href="https://smartygym.com/workout/wod" style="background: #d4af37; color: white; padding: 14px 28px; text-decoration: none; border-radius: 4px; font-weight: bold;">View Workout →</a></p></div>`,
             });
           } catch (e) {
             logStep("Email send error", { email, error: e });
