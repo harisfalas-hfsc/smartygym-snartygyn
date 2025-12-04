@@ -64,7 +64,7 @@ export const WorkoutOfTheDay = () => {
       >
         {/* Image */}
         {wod.image_url && (
-          <div className="relative w-full h-24 rounded-md overflow-hidden mb-2">
+          <div className="relative w-full h-20 rounded-md overflow-hidden mb-2">
             <img 
               src={wod.image_url} 
               alt={wod.name || "Workout"} 
@@ -101,12 +101,8 @@ export const WorkoutOfTheDay = () => {
           </div>
         </div>
 
-        {/* Row 2: Equipment + Premium + BUY badges */}
+        {/* Row 2: Premium + BUY badges only */}
         <div className="flex flex-wrap items-center gap-1">
-          <Badge className={`${bgColor} text-white border-0 text-xs py-0`}>
-            {equipmentIcon}
-            <span className="ml-0.5">{isBodyweight ? "Home" : "Gym"}</span>
-          </Badge>
           <Badge className="bg-gradient-to-r from-yellow-400 to-orange-500 text-white border-0 text-xs py-0">
             <Crown className="w-2.5 h-2.5 mr-0.5" />
             Premium
