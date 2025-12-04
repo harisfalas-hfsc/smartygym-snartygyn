@@ -587,6 +587,20 @@ async function handleSubscriptionCancellation(
 
   logStep("Cancelling subscription", { userId: existingSub.user_id });
 
+  // Get user email for sending cancellation email
+  const { data: userData, error: userError } = await supabase.auth.admin.getUserById(existingSub.user_id);
+  const userEmail = userData?.user?.email;
+  logStep("Fetched user email for cancellation", { email: userEmail });
+
+  // Calculate subscription end date
+  const endDate = subscription.current_period_end 
+    ? new Date(subscription.current_period_end * 1000).toLocaleDateString('en-US', {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric'
+      })
+    : 'the end of your billing period';
+
   // Update subscription status
   const { error } = await supabase
     .from('user_subscriptions')
@@ -601,16 +615,79 @@ async function handleSubscriptionCancellation(
   } else {
     logStep("Subscription cancelled successfully");
     
-    // Send cancellation message
+    // Get cancellation template
+    const { data: template } = await supabase
+      .from('automated_message_templates')
+      .select('subject, content')
+      .eq('template_name', 'Subscription Cancellation')
+      .eq('is_active', true)
+      .maybeSingle();
+
+    const subject = template?.subject || '😢 We\'re Sorry to See You Go';
+    let content = template?.content || '<p class="tiptap-paragraph">Your subscription has been cancelled. You will continue to have access until the end of your current billing period.</p>';
+    
+    // Replace placeholder with actual end date
+    content = content.replace('{endDate}', endDate);
+
+    // Send dashboard notification
     await supabase
       .from('user_system_messages')
       .insert({
         user_id: existingSub.user_id,
-        subject: 'Subscription Cancelled',
-        content: '<p class="tiptap-paragraph">Your subscription has been cancelled. You will continue to have access until the end of your current billing period.</p><p class="tiptap-paragraph"></p><p class="tiptap-paragraph">We hope to see you again soon!</p>',
+        subject: subject,
+        content: content,
         message_type: 'cancellation',
         is_read: false,
       });
+    logStep("Dashboard cancellation notification sent");
+
+    // Send cancellation email
+    if (userEmail) {
+      try {
+        const resendKey = Deno.env.get("RESEND_API_KEY");
+        if (resendKey) {
+          const resend = new Resend(resendKey);
+          
+          const htmlEmail = `
+            <!DOCTYPE html>
+            <html>
+            <head>
+              <meta charset="utf-8">
+              <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            </head>
+            <body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 20px;">
+              <div style="text-align: center; margin-bottom: 30px;">
+                <h1 style="color: #d4af37; margin: 0;">SmartyGym</h1>
+              </div>
+              <div style="background: #f9f9f9; border-radius: 8px; padding: 30px;">
+                <h2 style="margin-top: 0;">Your Subscription Has Been Cancelled</h2>
+                <p>We're sorry to see you go. Your subscription has been successfully cancelled.</p>
+                <p><strong>What Happens Next:</strong></p>
+                <p>You will continue to have full access to all your premium content until <strong>${endDate}</strong>. After that date, your account will revert to free tier access.</p>
+                <p><strong>We'd Love to Have You Back:</strong></p>
+                <p>If you ever decide to return, your fitness journey awaits. All our expert-designed workouts and training programs will be here for you.</p>
+                <div style="text-align: center; margin: 30px 0;">
+                  <a href="https://smartygym.com/pricing" style="display: inline-block; background: #d4af37; color: white; padding: 14px 28px; text-decoration: none; border-radius: 6px; font-weight: bold;">Resubscribe Anytime →</a>
+                </div>
+                <p>Thank you for being part of the SmartyGym family. We wish you all the best in your fitness journey!</p>
+                <p><em>The SmartyGym Team</em></p>
+              </div>
+            </body>
+            </html>
+          `;
+
+          await resend.emails.send({
+            from: "SmartyGym <notifications@smartygym.com>",
+            to: [userEmail],
+            subject: subject,
+            html: htmlEmail,
+          });
+          logStep("Cancellation email sent successfully", { email: userEmail });
+        }
+      } catch (emailError) {
+        logStep("ERROR: Failed to send cancellation email", { error: emailError });
+      }
+    }
   }
 }
 
