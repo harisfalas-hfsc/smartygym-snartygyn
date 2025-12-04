@@ -214,10 +214,9 @@ const WODCategory = () => {
               <Card className="mb-8 bg-gradient-to-br from-primary/5 via-background to-primary/5 border-2 border-primary/40 shadow-gold">
                 <div className="p-4 sm:p-6">
                   <h1 className="text-xl sm:text-2xl font-bold mb-3 text-center">About Workout of the Day</h1>
-                  <div className="space-y-2 text-muted-foreground max-w-3xl mx-auto">
-                    <p className="text-sm sm:text-base text-center">Every day SmartyGym delivers TWO fresh, expertly designed workouts following a strategic periodization cycle — one with equipment and one without. Each day focuses on a different training style: Strength, Calorie Burning, Metabolic, Cardio, Mobility & Stability, and Challenge. Choose based on your situation: at home, traveling, in your office, or at the gym.<span className="text-primary font-semibold">SmartyGym</span> delivers <strong>TWO</strong> fresh, expertly designed workouts following a strategic periodization cycle — one with equipment and one without. Each day focuses on a different training style: <strong>Strength</strong>, <strong>Calorie Burning</strong>, <strong>Metabolic</strong>, <strong>Cardio</strong>, <strong>Mobility & Stability</strong>, and <strong>Challenge</strong>. Choose based on your situation: at home, traveling, in your office, or at the gym. <strong className="text-primary">Your SmartyGym: the gym that never closes and never takes a holiday.</strong> Unlock all daily workouts with a Premium plan or buy them individually for €3.99.
-                    </p>
-                  </div>
+                  <p className="text-sm sm:text-base text-center text-muted-foreground max-w-3xl mx-auto">
+                    Every day SmartyGym delivers TWO fresh, expertly designed workouts following a strategic periodization cycle — one with equipment and one without. Each day focuses on a different training style: Strength, Calorie Burning, Metabolic, Cardio, Mobility & Stability, and Challenge. Choose based on your situation: at home, traveling, in your office, or at the gym.
+                  </p>
                 </div>
               </Card>
 
