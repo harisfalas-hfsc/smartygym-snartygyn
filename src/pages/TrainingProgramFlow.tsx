@@ -133,16 +133,6 @@ const TrainingProgramFlow = () => {
         targetAudience="athletes, bodybuilders, fitness enthusiasts, strength athletes, weight loss seekers"
         pageType="CollectionPage"
       />
-        entities={["SmartyGym", "Haris Falas", "Training Programs", "Workout Programs"]}
-        topics={["training programs", "muscle building", "fat loss", "strength training", "hypertrophy"]}
-        expertise={["Sports Science", "Program Design", "Periodization"]}
-        contentType="program-library"
-        aiSummary="SmartyGym offers expert-designed training programs covering strength, muscle building, fat loss, and athletic performance. Multi-week structured programs by Sports Scientist Haris Falas with progressive overload and periodization."
-        aiKeywords={["training programs", "workout programs", "muscle building", "hypertrophy", "fat loss programs", "strength programs", "online coaching", "fitness programs"]}
-        relatedContent={["Workout Library", "Free Programs", "Premium Membership", "Personal Training"]}
-        targetAudience="athletes, bodybuilders, fitness enthusiasts, strength athletes"
-        pageType="CollectionPage"
-      />
       
       <div className="min-h-screen bg-background">
         {canGoBack && <div className="mb-6">
