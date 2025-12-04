@@ -3,318 +3,308 @@
         xmlns:image="http://www.google.com/schemas/sitemap-image/1.1"
         xmlns:video="http://www.google.com/schemas/sitemap-video/1.1">
   
+  <!-- Homepage - Highest Priority -->
   <url>
     <loc>https://smartygym.com/</loc>
-    <lastmod>2025-01-16</lastmod>
+    <lastmod>2025-12-04</lastmod>
     <changefreq>daily</changefreq>
     <priority>1.0</priority>
     <image:image>
       <image:loc>https://smartygym.com/smarty-gym-logo.png</image:loc>
-      <image:title>SmartyGym - Global Online Fitness Platform</image:title>
-      <image:caption>Professional online fitness training by Haris Falas - Worldwide</image:caption>
+      <image:title>SmartyGym - Global Online Fitness Platform by Haris Falas</image:title>
+      <image:caption>Professional online gym with 500+ workouts and training programs by Sports Scientist Haris Falas</image:caption>
     </image:image>
   </url>
   
-  <!-- Main Pages -->
+  <!-- Core Pages -->
   <url>
     <loc>https://smartygym.com/about</loc>
-    <lastmod>2025-01-01</lastmod>
+    <lastmod>2025-12-01</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   
   <url>
     <loc>https://smartygym.com/contact</loc>
-    <lastmod>2025-01-01</lastmod>
+    <lastmod>2025-12-01</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   
   <url>
     <loc>https://smartygym.com/coach-profile</loc>
-    <lastmod>2025-01-01</lastmod>
+    <lastmod>2025-12-01</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.9</priority>
+    <image:image>
+      <image:loc>https://smartygym.com/haris-falas-coach.png</image:loc>
+      <image:title>Haris Falas - Sports Scientist and Founder of SmartyGym</image:title>
+      <image:caption>BSc Sports Science, CSCS certified strength and conditioning coach with 20+ years experience</image:caption>
+    </image:image>
   </url>
   
-  <!-- Workouts -->
+  <url>
+    <loc>https://smartygym.com/coach-cv</loc>
+    <lastmod>2025-12-01</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  
+  <!-- Workouts Section -->
   <url>
     <loc>https://smartygym.com/workout</loc>
-    <lastmod>2025-01-01</lastmod>
-    <changefreq>weekly</changefreq>
+    <lastmod>2025-12-04</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.95</priority>
+    <image:image>
+      <image:loc>https://smartygym.com/smarty-gym-logo.png</image:loc>
+      <image:title>500+ Online Workouts - AMRAP TABATA HIIT Strength Cardio</image:title>
+      <image:caption>Professional workout library by Sports Scientist Haris Falas - Train anywhere anytime</image:caption>
+    </image:image>
+  </url>
+  
+  <url>
+    <loc>https://smartygym.com/workout/wod</loc>
+    <lastmod>2025-12-04</lastmod>
+    <changefreq>daily</changefreq>
     <priority>0.9</priority>
+    <image:image>
+      <image:loc>https://smartygym.com/smarty-gym-logo.png</image:loc>
+      <image:title>Workout of the Day - Daily Fresh Workouts at SmartyGym</image:title>
+      <image:caption>Two fresh expert-designed workouts delivered daily - bodyweight and equipment options</image:caption>
+    </image:image>
   </url>
   
   <url>
     <loc>https://smartygym.com/workout/strength</loc>
-    <lastmod>2025-01-01</lastmod>
+    <lastmod>2025-12-04</lastmod>
     <changefreq>weekly</changefreq>
-    <priority>0.8</priority>
+    <priority>0.85</priority>
   </url>
   
   <url>
     <loc>https://smartygym.com/workout/calorie-burning</loc>
-    <lastmod>2025-01-01</lastmod>
+    <lastmod>2025-12-04</lastmod>
     <changefreq>weekly</changefreq>
-    <priority>0.8</priority>
+    <priority>0.85</priority>
   </url>
   
   <url>
     <loc>https://smartygym.com/workout/metabolic</loc>
-    <lastmod>2025-01-01</lastmod>
+    <lastmod>2025-12-04</lastmod>
     <changefreq>weekly</changefreq>
-    <priority>0.8</priority>
+    <priority>0.85</priority>
   </url>
   
   <url>
     <loc>https://smartygym.com/workout/cardio</loc>
-    <lastmod>2025-01-01</lastmod>
+    <lastmod>2025-12-04</lastmod>
     <changefreq>weekly</changefreq>
-    <priority>0.8</priority>
+    <priority>0.85</priority>
   </url>
   
   <url>
     <loc>https://smartygym.com/workout/mobility</loc>
-    <lastmod>2025-01-01</lastmod>
+    <lastmod>2025-12-04</lastmod>
     <changefreq>weekly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  
-  <url>
-    <loc>https://smartygym.com/workout/power</loc>
-    <lastmod>2025-01-01</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.8</priority>
+    <priority>0.85</priority>
   </url>
   
   <url>
     <loc>https://smartygym.com/workout/challenge</loc>
-    <lastmod>2025-01-01</lastmod>
+    <lastmod>2025-12-04</lastmod>
     <changefreq>weekly</changefreq>
+    <priority>0.85</priority>
+  </url>
+  
+  <url>
+    <loc>https://smartygym.com/wod-archive</loc>
+    <lastmod>2025-12-04</lastmod>
+    <changefreq>daily</changefreq>
     <priority>0.8</priority>
   </url>
   
-  <!-- Training Programs -->
+  <!-- Training Programs Section -->
   <url>
     <loc>https://smartygym.com/trainingprogram</loc>
-    <lastmod>2025-01-01</lastmod>
+    <lastmod>2025-12-04</lastmod>
     <changefreq>weekly</changefreq>
-    <priority>0.9</priority>
+    <priority>0.95</priority>
+    <image:image>
+      <image:loc>https://smartygym.com/smarty-gym-logo.png</image:loc>
+      <image:title>Expert Training Programs - Muscle Building Weight Loss Strength</image:title>
+      <image:caption>Multi-week structured programs by Sports Scientist Haris Falas</image:caption>
+    </image:image>
   </url>
   
   <url>
     <loc>https://smartygym.com/trainingprogram/cardio-endurance</loc>
-    <lastmod>2025-01-01</lastmod>
+    <lastmod>2025-12-01</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   
   <url>
     <loc>https://smartygym.com/trainingprogram/functional-strength</loc>
-    <lastmod>2025-01-15</lastmod>
+    <lastmod>2025-12-01</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
-  </url>
-  
-  <!-- Functional Strength Programs -->
-  <url>
-    <loc>https://smartygym.com/trainingprogram/functional-strength/T-F001</loc>
-    <lastmod>2025-01-15</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.7</priority>
-  </url>
-  
-  <url>
-    <loc>https://smartygym.com/trainingprogram/functional-strength/T-F002</loc>
-    <lastmod>2025-01-15</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.7</priority>
-  </url>
-  
-  <url>
-    <loc>https://smartygym.com/trainingprogram/functional-strength/T-F003</loc>
-    <lastmod>2025-01-15</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.7</priority>
-  </url>
-  
-  <url>
-    <loc>https://smartygym.com/trainingprogram/functional-strength/T-F004</loc>
-    <lastmod>2025-01-15</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.7</priority>
   </url>
   
   <url>
     <loc>https://smartygym.com/trainingprogram/muscle-hypertrophy</loc>
-    <lastmod>2025-01-15</lastmod>
+    <lastmod>2025-12-01</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
-  </url>
-  
-  <!-- Muscle Hypertrophy Programs -->
-  <url>
-    <loc>https://smartygym.com/trainingprogram/muscle-hypertrophy/T-H001</loc>
-    <lastmod>2025-01-15</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.7</priority>
-  </url>
-  
-  <url>
-    <loc>https://smartygym.com/trainingprogram/muscle-hypertrophy/T-H002</loc>
-    <lastmod>2025-01-15</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.7</priority>
-  </url>
-  
-  <url>
-    <loc>https://smartygym.com/trainingprogram/muscle-hypertrophy/T-H003</loc>
-    <lastmod>2025-01-15</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.7</priority>
-  </url>
-  
-  <url>
-    <loc>https://smartygym.com/trainingprogram/muscle-hypertrophy/T-H004</loc>
-    <lastmod>2025-01-15</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.7</priority>
   </url>
   
   <url>
     <loc>https://smartygym.com/trainingprogram/weight-loss</loc>
-    <lastmod>2025-01-15</lastmod>
+    <lastmod>2025-12-01</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   
-  <!-- Weight Loss Programs -->
-  <url>
-    <loc>https://smartygym.com/trainingprogram/weight-loss/T-W001</loc>
-    <lastmod>2025-01-15</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.7</priority>
-  </url>
-  
-  <url>
-    <loc>https://smartygym.com/trainingprogram/weight-loss/T-W002</loc>
-    <lastmod>2025-01-15</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.7</priority>
-  </url>
-  
-  <url>
-    <loc>https://smartygym.com/trainingprogram/weight-loss/T-W003</loc>
-    <lastmod>2025-01-15</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.7</priority>
-  </url>
-  
-  <url>
-    <loc>https://smartygym.com/trainingprogram/weight-loss/T-W004</loc>
-    <lastmod>2025-01-15</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.7</priority>
-  </url>
-  
   <url>
     <loc>https://smartygym.com/trainingprogram/low-back-pain</loc>
-    <lastmod>2025-01-01</lastmod>
+    <lastmod>2025-12-01</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   
   <url>
     <loc>https://smartygym.com/trainingprogram/mobility-stability</loc>
-    <lastmod>2025-01-01</lastmod>
+    <lastmod>2025-12-01</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   
   <!-- Tools & Calculators -->
   <url>
+    <loc>https://smartygym.com/tools</loc>
+    <lastmod>2025-12-01</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  
+  <url>
     <loc>https://smartygym.com/exerciselibrary</loc>
-    <lastmod>2025-01-01</lastmod>
+    <lastmod>2025-12-01</lastmod>
     <changefreq>weekly</changefreq>
-    <priority>0.7</priority>
+    <priority>0.8</priority>
   </url>
   
   <url>
     <loc>https://smartygym.com/1rmcalculator</loc>
-    <lastmod>2025-01-01</lastmod>
+    <lastmod>2025-12-01</lastmod>
     <changefreq>monthly</changefreq>
-    <priority>0.7</priority>
+    <priority>0.75</priority>
   </url>
   
   <url>
     <loc>https://smartygym.com/bmrcalculator</loc>
-    <lastmod>2025-01-01</lastmod>
+    <lastmod>2025-12-01</lastmod>
     <changefreq>monthly</changefreq>
-    <priority>0.7</priority>
+    <priority>0.75</priority>
   </url>
   
   <url>
     <loc>https://smartygym.com/macrocalculator</loc>
-    <lastmod>2025-01-01</lastmod>
+    <lastmod>2025-12-01</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.75</priority>
+  </url>
+  
+  <url>
+    <loc>https://smartygym.com/smartyworkout</loc>
+    <lastmod>2025-12-01</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   
   <!-- Premium & Services -->
   <url>
-    <loc>https://smartygym.com/premiumbenefits</loc>
-    <lastmod>2025-01-01</lastmod>
+    <loc>https://smartygym.com/join-premium</loc>
+    <lastmod>2025-12-01</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.9</priority>
   </url>
   
   <url>
-    <loc>https://smartygym.com/personal-training</loc>
-    <lastmod>2025-01-01</lastmod>
+    <loc>https://smartygym.com/premiumbenefits</loc>
+    <lastmod>2025-12-01</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  
+  <url>
+    <loc>https://smartygym.com/premiumcomparison</loc>
+    <lastmod>2025-12-01</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   
-  <!-- Other Pages -->
+  <!-- Content Pages -->
   <url>
     <loc>https://smartygym.com/blog</loc>
-    <lastmod>2025-01-01</lastmod>
+    <lastmod>2025-12-04</lastmod>
     <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  
+  <url>
+    <loc>https://smartygym.com/community</loc>
+    <lastmod>2025-12-04</lastmod>
+    <changefreq>daily</changefreq>
     <priority>0.7</priority>
   </url>
   
   <url>
     <loc>https://smartygym.com/freecontent</loc>
-    <lastmod>2025-01-01</lastmod>
+    <lastmod>2025-12-01</lastmod>
     <changefreq>weekly</changefreq>
-    <priority>0.7</priority>
+    <priority>0.75</priority>
   </url>
   
   <url>
     <loc>https://smartygym.com/takeatour</loc>
-    <lastmod>2025-01-01</lastmod>
+    <lastmod>2025-12-01</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
+  </url>
+  
+  <url>
+    <loc>https://smartygym.com/faq</loc>
+    <lastmod>2025-12-01</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  
+  <url>
+    <loc>https://smartygym.com/shop</loc>
+    <lastmod>2025-12-01</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
   </url>
   
   <!-- Legal Pages -->
   <url>
     <loc>https://smartygym.com/privacypolicy</loc>
-    <lastmod>2025-01-01</lastmod>
+    <lastmod>2025-12-01</lastmod>
     <changefreq>yearly</changefreq>
     <priority>0.3</priority>
   </url>
   
   <url>
     <loc>https://smartygym.com/termsofservice</loc>
-    <lastmod>2025-01-01</lastmod>
+    <lastmod>2025-12-01</lastmod>
     <changefreq>yearly</changefreq>
     <priority>0.3</priority>
   </url>
   
   <url>
     <loc>https://smartygym.com/disclaimer</loc>
-    <lastmod>2025-01-01</lastmod>
+    <lastmod>2025-12-01</lastmod>
     <changefreq>yearly</changefreq>
     <priority>0.3</priority>
   </url>

@@ -75,39 +75,57 @@ const WorkoutFlow = () => {
   };
   return <>
       <Helmet>
-        <title>Online Gym Workouts | AMRAP TABATA HIIT | Haris Falas | SmartyGym HFSC</title>
-        <meta name="description" content="500+ online gym workouts at smartygym.com. AMRAP, TABATA, HIIT, strength, cardio by Sports Scientist Haris Falas HFSC. Home workouts, bodyweight training, equipment workouts. Train anywhere, anytime." />
-        <meta name="keywords" content="online gym, online workouts, gym workouts, personal trainer, home workouts, online fitness, HFSC, Haris Falas, Sports Scientist, AMRAP workouts, TABATA training, HIIT workouts, strength training workouts, cardio workouts, bodyweight training, home gym workouts, online gym training, smartygym.com, HFSC Performance, functional fitness, metabolic training, mobility training" />
+        <title>Online Workouts | AMRAP TABATA HIIT Strength Cardio | Haris Falas | SmartyGym</title>
+        <meta name="description" content="500+ online gym workouts at smartygym.com. AMRAP, TABATA, HIIT, circuit training, strength, cardio, metabolic, mobility workouts by Sports Scientist Haris Falas. Home workouts, bodyweight training, equipment workouts. Train anywhere, anytime." />
+        <meta name="keywords" content="online gym, online workouts, gym workouts, home workouts, online fitness, HFSC, Haris Falas, Sports Scientist, AMRAP workouts, TABATA training, HIIT workouts, circuit training, strength training workouts, cardio workouts, bodyweight training, metabolic training, mobility training, calorie burning workouts, challenge workouts, smartygym.com, workout of the day, WOD" />
         
-        {/* Greek Language */}
         <link rel="alternate" hrefLang="el" href="https://smartygym.com/workout" />
         <link rel="alternate" hrefLang="en-GB" href="https://smartygym.com/workout" />
+        <link rel="canonical" href="https://smartygym.com/workout" />
         
-        <meta property="og:title" content="Workouts - SmartyGym | Fitness Re-imagined" />
-        <meta property="og:description" content="Convenient & flexible workouts designed by Sports Scientist Haris Falas - train anywhere, anytime" />
+        <meta property="og:title" content="500+ Online Workouts | AMRAP TABATA HIIT | SmartyGym by Haris Falas" />
+        <meta property="og:description" content="Professional workout library by Sports Scientist Haris Falas - Strength, Cardio, Metabolic, Mobility workouts. Train anywhere, anytime." />
         <meta property="og:type" content="website" />
         <meta property="og:url" content="https://smartygym.com/workout" />
         <meta property="og:image" content="https://smartygym.com/smarty-gym-logo.png" />
         
         <meta name="twitter:card" content="summary_large_image" />
-        <meta name="twitter:title" content="Workouts - SmartyGym" />
-        <meta name="twitter:description" content="Convenient & flexible workouts by Haris Falas at smartygym.com" />
+        <meta name="twitter:title" content="500+ Online Workouts | SmartyGym" />
+        <meta name="twitter:description" content="Expert workouts by Haris Falas - AMRAP, TABATA, HIIT, strength, cardio at smartygym.com" />
         <meta name="twitter:image" content="https://smartygym.com/smarty-gym-logo.png" />
         
-        <link rel="canonical" href="https://smartygym.com/workout" />
+        <script type="application/ld+json">
+          {JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "CollectionPage",
+            "name": "SmartyGym Workout Library",
+            "description": "500+ expert-designed workouts including AMRAP, TABATA, HIIT, strength, cardio, metabolic, and mobility sessions by Sports Scientist Haris Falas",
+            "url": "https://smartygym.com/workout",
+            "numberOfItems": 500,
+            "mainEntity": {
+              "@type": "ItemList",
+              "name": "Workout Categories",
+              "itemListElement": [
+                { "@type": "ListItem", "position": 1, "name": "Workout of the Day", "url": "https://smartygym.com/workout/wod" },
+                { "@type": "ListItem", "position": 2, "name": "Strength Workouts", "url": "https://smartygym.com/workout/strength" },
+                { "@type": "ListItem", "position": 3, "name": "Calorie Burning Workouts", "url": "https://smartygym.com/workout/calorie-burning" },
+                { "@type": "ListItem", "position": 4, "name": "Metabolic Workouts", "url": "https://smartygym.com/workout/metabolic" },
+                { "@type": "ListItem", "position": 5, "name": "Cardio Workouts", "url": "https://smartygym.com/workout/cardio" },
+                { "@type": "ListItem", "position": 6, "name": "Mobility & Stability", "url": "https://smartygym.com/workout/mobility" },
+                { "@type": "ListItem", "position": 7, "name": "Challenge Workouts", "url": "https://smartygym.com/workout/challenge" }
+              ]
+            },
+            "author": { "@type": "Person", "name": "Haris Falas", "jobTitle": "Sports Scientist" },
+            "provider": { "@type": "Organization", "name": "SmartyGym", "url": "https://smartygym.com" }
+          })}
+        </script>
         
         <script type="application/ld+json">
-          {JSON.stringify(generateBreadcrumbSchema([{
-          name: "Home",
-          url: "/"
-        }, {
-          name: "Workouts",
-          url: "/workout"
-        }]))}
+          {JSON.stringify(generateBreadcrumbSchema([{ name: "Home", url: "/" }, { name: "Workouts", url: "/workout" }]))}
         </script>
       </Helmet>
       
-      <SEOEnhancer entities={["SmartyGym", "Haris Falas", "Online Workouts", "AMRAP", "HIIT", "Tabata"]} topics={["online gym workouts", "AMRAP", "HIIT", "Tabata", "circuit training", "strength training", "cardio"]} expertise={["sports science", "strength conditioning", "functional fitness"]} contentType="workout-collection" aiSummary="500+ online gym workouts at SmartyGym by Sports Scientist Haris Falas. AMRAP, TABATA, HIIT, circuit, strength, cardio, metabolic, mobility workouts for all levels worldwide." aiKeywords={["online gym", "AMRAP workouts", "HIIT training", "Tabata", "strength workouts", "cardio training", "fitness app", "workout app"]} relatedContent={["training programs", "fitness tools", "exercise library"]} />
+      <SEOEnhancer entities={["SmartyGym", "Haris Falas", "Online Workouts", "AMRAP", "HIIT", "Tabata", "Circuit Training"]} topics={["online gym workouts", "AMRAP", "HIIT", "Tabata", "circuit training", "strength training", "cardio workouts", "metabolic conditioning", "mobility training"]} expertise={["sports science", "strength conditioning", "functional fitness", "exercise programming"]} contentType="workout-collection" aiSummary="SmartyGym Workout Library: 500+ online gym workouts by Sports Scientist Haris Falas. Categories include Workout of the Day (WOD), Strength, Calorie Burning, Metabolic, Cardio, Mobility & Stability, and Challenge. Formats include AMRAP, TABATA, HIIT, Circuit, EMOM, For Time. Suitable for all levels worldwide." aiKeywords={["online gym", "AMRAP workouts", "HIIT training", "Tabata", "strength workouts", "cardio training", "home workouts", "bodyweight workouts", "gym workouts"]} relatedContent={["training programs", "fitness tools", "exercise library", "workout of the day"]} />
       
       <div className="min-h-screen bg-background">
       
