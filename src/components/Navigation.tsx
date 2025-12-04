@@ -225,15 +225,6 @@ export const Navigation = () => {
                     <ListChecks className="mr-2 h-4 w-4" />
                     Programs
                   </Button>
-                  {/* TEMPORARILY DISABLED - Personal Training
-                  <Button
-                    variant="ghost"
-                    onClick={() => handleNavigate("/personal-training")}
-                    className={`justify-start font-semibold transition-all duration-200 ${location.pathname === '/personal-training' ? 'text-primary underline underline-offset-4 bg-yellow-100/50' : 'text-foreground hover:bg-yellow-100/80 hover:text-foreground'}`}
-                  >
-                    Personal Training
-                  </Button>
-                  */}
                   <Button
                     variant="ghost"
                     onClick={() => handleNavigate("/tools")}

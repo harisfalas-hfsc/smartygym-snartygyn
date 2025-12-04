@@ -9,7 +9,6 @@ import { Users, DollarSign, TrendingUp, Star, Activity, RefreshCw } from "lucide
 import { toast } from "sonner";
 import { RevenueAnalytics } from "./RevenueAnalytics";
 import { PurchaseAnalytics } from "./PurchaseAnalytics";
-import { PersonalTrainingAnalytics } from "./PersonalTrainingAnalytics";
 import { ContactAnalytics } from "./ContactAnalytics";
 import { ShopAnalytics } from "./ShopAnalytics";
 
@@ -107,19 +106,11 @@ export function AnalyticsDashboard() {
         .select("price, purchased_at");
       const standaloneRevenue = purchases?.reduce((sum, p) => sum + Number(p.price || 0), 0) || 0;
 
-      // Fetch personal training revenue
-      const { data: ptRequests } = await supabase
-        .from("personal_training_requests")
-        .select("created_at")
-        .eq("stripe_payment_status", "paid");
-      const personalTrainingRevenue = (ptRequests?.length || 0) * 100; // Assuming $100 per PT request
-
       // Create unified revenue comparison data
       revenueChartData = [
         { name: "Gold Plans", value: goldRevenue * 15 }, // €15/month
         { name: "Platinum Plans", value: platinumRevenue * 25 }, // €25/month
-        { name: "Standalone Purchases", value: standaloneRevenue },
-        { name: "Personal Training", value: personalTrainingRevenue }
+        { name: "Standalone Purchases", value: standaloneRevenue }
       ];
 
       // Create revenue distribution pie chart data
@@ -160,18 +151,11 @@ export function AnalyticsDashboard() {
         }) || [];
         const monthPurchaseRevenue = monthPurchases.reduce((sum, p) => sum + Number(p.price || 0), 0);
 
-        // Count PT requests for that month
-        const monthPT = ptRequests?.filter(pt => {
-          const ptDate = new Date(pt.created_at);
-          return ptDate >= monthStart && ptDate <= monthEnd;
-        }).length || 0;
-
         trendsData.push({
           name: monthName,
           "Gold Plans": goldCount * 15,
           "Platinum Plans": platinumCount * 25,
-          "Standalone Purchases": monthPurchaseRevenue,
-          "Personal Training": monthPT * 100
+          "Standalone Purchases": monthPurchaseRevenue
         });
       }
 
@@ -361,7 +345,6 @@ export function AnalyticsDashboard() {
           <TabsList className="inline-flex w-auto min-w-full h-auto p-1">
             <TabsTrigger value="revenue" className="flex-shrink-0 whitespace-nowrap text-xs sm:text-sm px-2 sm:px-3 py-2">Revenue</TabsTrigger>
             <TabsTrigger value="purchases" className="flex-shrink-0 whitespace-nowrap text-xs sm:text-sm px-2 sm:px-3 py-2">Purchases</TabsTrigger>
-            <TabsTrigger value="personal-training" className="flex-shrink-0 whitespace-nowrap text-xs sm:text-sm px-2 sm:px-3 py-2">PT</TabsTrigger>
             <TabsTrigger value="communications" className="flex-shrink-0 whitespace-nowrap text-xs sm:text-sm px-2 sm:px-3 py-2">Messages</TabsTrigger>
             <TabsTrigger value="growth" className="flex-shrink-0 whitespace-nowrap text-xs sm:text-sm px-2 sm:px-3 py-2">Growth</TabsTrigger>
             <TabsTrigger value="completion" className="flex-shrink-0 whitespace-nowrap text-xs sm:text-sm px-2 sm:px-3 py-2">Completion</TabsTrigger>
@@ -455,9 +438,6 @@ export function AnalyticsDashboard() {
           <ShopAnalytics />
         </TabsContent>
 
-        <TabsContent value="personal-training" className="space-y-4">
-          <PersonalTrainingAnalytics />
-        </TabsContent>
 
         <TabsContent value="communications" className="space-y-4">
           <ContactAnalytics />
