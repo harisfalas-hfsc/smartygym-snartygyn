@@ -139,40 +139,46 @@ const WODCategory = () => {
         </div>
 
         {/* Card Content */}
-        <CardContent className="p-4 sm:p-5">
+        <CardContent className="p-3 sm:p-4">
           {/* Title */}
-          <h3 className="text-lg sm:text-xl font-bold text-foreground mb-2 group-hover:text-primary transition-colors line-clamp-1">
+          <h3 className="text-lg sm:text-xl font-bold text-foreground mb-1.5 group-hover:text-primary transition-colors line-clamp-1">
             {wod.name}
           </h3>
 
           {/* Description */}
           {wod.description && (
-            <p className="text-muted-foreground text-sm mb-3 line-clamp-2">
+            <p className="text-muted-foreground text-sm mb-2 line-clamp-2">
               {stripHtml(wod.description).substring(0, 120)}...
             </p>
           )}
 
           {/* Compact Metadata Display - Horizontal Layout */}
-          <div className="space-y-1.5 mb-3 text-sm">
-            {/* Row 1: Format + Difficulty */}
-            <div className="flex flex-wrap items-center gap-x-4 gap-y-1">
-              <div className="flex items-center gap-1.5">
-                <Flame className="w-3.5 h-3.5 text-primary" />
+          <div className="space-y-1.5 mb-2 text-sm">
+            {/* Row 1: Format + Difficulty + Duration */}
+            <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs sm:text-sm">
+              <div className="flex items-center gap-1">
+                <Flame className="w-3 h-3 text-primary" />
                 <span className="text-muted-foreground">{wod.format || "Standard"}</span>
               </div>
-              <div className="flex items-center gap-1.5">
-                <TrendingUp className="w-3.5 h-3.5 text-primary" />
+              <span className="text-muted-foreground/50">•</span>
+              <div className="flex items-center gap-1">
+                <TrendingUp className="w-3 h-3 text-primary" />
                 <span className="text-muted-foreground">
                   {wod.difficulty || "All Levels"} {wod.difficulty_stars && `(${wod.difficulty_stars}⭐)`}
                 </span>
               </div>
-            </div>
-            {/* Row 2: Duration + Badges */}
-            <div className="flex flex-wrap items-center gap-2">
-              <div className="flex items-center gap-1.5">
-                <Clock className="w-3.5 h-3.5 text-primary" />
+              <span className="text-muted-foreground/50">•</span>
+              <div className="flex items-center gap-1">
+                <Clock className="w-3 h-3 text-primary" />
                 <span className="text-muted-foreground">{wod.duration || "45-60 min"}</span>
               </div>
+            </div>
+            {/* Row 2: All Badges */}
+            <div className="flex flex-wrap items-center gap-1.5">
+              <Badge className={`${isBodyweight ? 'bg-blue-500' : 'bg-orange-500'} text-white border-0 text-xs py-0.5`}>
+                {isBodyweight ? <Home className="w-3 h-3 mr-1" /> : <Dumbbell className="w-3 h-3 mr-1" />}
+                {equipmentLabel}
+              </Badge>
               <Badge className="bg-gradient-to-r from-yellow-400 to-orange-500 text-white border-0 text-xs py-0.5">
                 <Crown className="w-3 h-3 mr-1" />
                 Premium
