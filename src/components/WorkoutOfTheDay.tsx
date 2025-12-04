@@ -5,7 +5,7 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
-import { CalendarCheck, Clock, Dumbbell, Star, Crown, ShoppingBag, Archive, Home } from "lucide-react";
+import { CalendarCheck, Clock, Dumbbell, Star, Crown, ShoppingBag, Archive, Home, Flame, TrendingUp } from "lucide-react";
 
 export const WorkoutOfTheDay = () => {
   const navigate = useNavigate();
@@ -83,25 +83,38 @@ export const WorkoutOfTheDay = () => {
           {wod.name}
         </h4>
 
-        {/* Mini Badges */}
-        <div className="flex flex-wrap gap-1 mb-2">
-          {wod.format && (
-            <Badge variant="outline" className="text-xs py-0 px-1.5">
-              {wod.format}
-            </Badge>
-          )}
-          <Badge variant="outline" className={`text-xs py-0 px-1.5 ${getDifficultyColor(wod.difficulty_stars)}`}>
-            {wod.difficulty_stars}⭐
-          </Badge>
+        {/* Row 1: Format + Difficulty + Duration */}
+        <div className="flex flex-wrap items-center gap-x-2 gap-y-1 text-xs mb-1.5">
+          <div className="flex items-center gap-1">
+            <Flame className="w-2.5 h-2.5 text-primary" />
+            <span className="text-muted-foreground">{wod.format || "Standard"}</span>
+          </div>
+          <span className="text-muted-foreground/50">•</span>
+          <div className="flex items-center gap-1">
+            <TrendingUp className="w-2.5 h-2.5 text-primary" />
+            <span className="text-muted-foreground">{wod.difficulty_stars}⭐</span>
+          </div>
+          <span className="text-muted-foreground/50">•</span>
+          <div className="flex items-center gap-1">
+            <Clock className="w-2.5 h-2.5 text-primary" />
+            <span className="text-muted-foreground">{wod.duration || "45-60 min"}</span>
+          </div>
         </div>
 
-        {/* Price */}
-        <div className="flex items-center justify-between">
-          <Badge className="bg-gradient-to-r from-green-500 to-emerald-500 text-white border-0 text-xs">
-            <ShoppingBag className="w-3 h-3 mr-1" />
+        {/* Row 2: Equipment + Premium + BUY badges */}
+        <div className="flex flex-wrap items-center gap-1">
+          <Badge className={`${bgColor} text-white border-0 text-xs py-0`}>
+            {equipmentIcon}
+            <span className="ml-0.5">{isBodyweight ? "Home" : "Gym"}</span>
+          </Badge>
+          <Badge className="bg-gradient-to-r from-yellow-400 to-orange-500 text-white border-0 text-xs py-0">
+            <Crown className="w-2.5 h-2.5 mr-0.5" />
+            Premium
+          </Badge>
+          <Badge className="bg-gradient-to-r from-green-500 to-emerald-500 text-white border-0 text-xs py-0">
+            <ShoppingBag className="w-2.5 h-2.5 mr-0.5" />
             €{wod.price?.toFixed(2)}
           </Badge>
-          <span className="text-xs text-muted-foreground">{equipmentLabel}</span>
         </div>
       </div>
     );
