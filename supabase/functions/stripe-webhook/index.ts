@@ -301,7 +301,7 @@ async function handleSubscriptionCheckout(
         try {
           const resend = new Resend(Deno.env.get('RESEND_API_KEY'));
           await resend.emails.send({
-            from: 'SmartyGym <onboarding@resend.dev>',
+            from: 'SmartyGym <notifications@smartygym.com>',
             to: [userEmail],
             subject: subject,
             html: `
@@ -424,7 +424,7 @@ async function handleOneTimePurchase(
         try {
           const resend = new Resend(Deno.env.get('RESEND_API_KEY'));
           await resend.emails.send({
-            from: 'SmartyGym <onboarding@resend.dev>',
+            from: 'SmartyGym <notifications@smartygym.com>',
             to: [userEmail],
             subject: subject,
             html: `
@@ -569,7 +569,7 @@ async function handleOneTimePurchase(
         try {
           const resend = new Resend(Deno.env.get('RESEND_API_KEY'));
           await resend.emails.send({
-            from: 'SmartyGym <onboarding@resend.dev>',
+            from: 'SmartyGym <notifications@smartygym.com>',
             to: [userEmail],
             subject: subject,
             html: `

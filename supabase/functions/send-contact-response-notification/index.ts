@@ -98,7 +98,7 @@ serve(async (req) => {
 
     // Send email
     const emailResponse = await resend.emails.send({
-      from: "SmartyGym <onboarding@resend.dev>",
+      from: "SmartyGym <notifications@smartygym.com>",
       to: [userEmail],
       subject: `New Response to Your Message: ${subject}`,
       html: htmlBody,

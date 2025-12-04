@@ -120,7 +120,7 @@ serve(async (req) => {
       const batchPromises = batch.map(async (recipient) => {
         try {
           const emailResponse = await resend.emails.send({
-            from: "SmartyGym <onboarding@resend.dev>",
+            from: "SmartyGym <notifications@smartygym.com>",
             to: [recipient.email!],
             subject: subject,
             html: `

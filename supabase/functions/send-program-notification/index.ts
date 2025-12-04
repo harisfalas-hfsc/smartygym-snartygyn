@@ -149,7 +149,7 @@ serve(async (req) => {
 
     // Send email
     const emailResponse = await resend.emails.send({
-      from: "SmartyGym <onboarding@resend.dev>",
+      from: "SmartyGym <notifications@smartygym.com>",
       to: [userEmail],
       subject: subject,
       html: htmlBody,

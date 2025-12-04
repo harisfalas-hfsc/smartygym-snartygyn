@@ -128,7 +128,7 @@ const handler = async (req: Request): Promise<Response> => {
     console.log(`Sending email from ${email} to ${recipientEmail}`);
 
     const emailResponse = await resend.emails.send({
-      from: "Smarty Gym Contact <onboarding@resend.dev>",
+      from: "SmartyGym Contact <notifications@smartygym.com>",
       to: [recipientEmail],
       replyTo: email,
       subject: `[Smarty Gym Contact] ${safeSubject}`,
