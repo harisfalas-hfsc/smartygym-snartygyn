@@ -252,34 +252,38 @@ ${selectedDifficulty.stars <= 2 ? "- Suitable for beginners or those returning t
 ${selectedDifficulty.stars >= 3 && selectedDifficulty.stars <= 4 ? "- For regular exercisers with good fitness base\n- Increased complexity and intensity\n- Challenging but achievable for consistent trainers" : ""}
 ${selectedDifficulty.stars >= 5 ? "- Advanced level for experienced athletes\n- High intensity, complex movements, minimal rest\n- Requires excellent form and fitness foundation" : ""}
 
-CRITICAL FORMATTING RULES (MANDATORY - FOLLOW EXACTLY):
+CRITICAL FORMATTING RULES (MANDATORY - FOLLOW EXACTLY FOR COMPACT, READABLE CONTENT):
 
-1. TITLE FORMAT:
-   <p class="tiptap-paragraph"><strong><u>WORKOUT TITLE</u></strong></p>
-   <p class="tiptap-paragraph"></p>
+1. NO WORKOUT TITLE - Users already know which workout they're viewing. Start directly with content.
 
-2. SECTION TITLES (Warm-Up, Main Workout, Cooldown, Notes):
-   <p class="tiptap-paragraph"></p>
+2. SECTION TITLES (Warm-Up, Main Workout, Cool-Down, Notes):
    <p class="tiptap-paragraph"><strong><u>Section Title (X minutes)</u></strong></p>
    <p class="tiptap-paragraph"></p>
+   [Content starts immediately after ONE empty line]
 
 3. SUB-HEADERS (Block 1, Block 2, Circuit, Round, etc.):
    <p class="tiptap-paragraph"></p>
    <p class="tiptap-paragraph"><strong>Sub-header Name</strong></p>
-   <p class="tiptap-paragraph"></p>
+   [Exercises start immediately - NO empty line after sub-header]
 
-4. EXERCISES (Always use bullet list):
+4. EXERCISES (Numbered list with NO gaps between items):
    <ul class="tiptap-bullet-list">
-   <li class="tiptap-list-item"><p class="tiptap-paragraph">Exercise Name – description – time/reps</p></li>
+   <li class="tiptap-list-item"><p class="tiptap-paragraph"><strong>1. Exercise Name</strong> – description – time/reps</p></li>
+   <li class="tiptap-list-item"><p class="tiptap-paragraph"><strong>2. Exercise Name</strong> – description – time/reps</p></li>
+   <li class="tiptap-list-item"><p class="tiptap-paragraph"><strong>3. Exercise Name</strong> – description – time/reps</p></li>
    </ul>
-   <p class="tiptap-paragraph"></p>
 
-SPACING RULES:
-- Always one empty <p class="tiptap-paragraph"></p> after title
-- Always one empty paragraph BEFORE and AFTER each section title
-- Always one empty paragraph BEFORE sub-headers
-- Always one empty paragraph AFTER each exercise list
-- Never merge sections into one paragraph
+5. REST INSTRUCTIONS (inline paragraph after exercises):
+   <p class="tiptap-paragraph">Rest: 60-90 seconds between sets.</p>
+
+SPACING RULES (CRITICAL - KEEP CONTENT COMPACT):
+- ONE empty paragraph after section title ONLY
+- ONE empty paragraph BEFORE next section or sub-header ONLY
+- NEVER put empty paragraphs between exercises in a list
+- NEVER put empty paragraphs after bullet/numbered lists
+- NEVER end content with empty paragraphs
+- NEVER start content with empty paragraphs
+- Goal: User sees workout overview in 2-3 seconds WITHOUT scrolling
 
 WORKOUT NAME RULES (CRITICAL):
 - Create a COMPLETELY UNIQUE name every time - never repeat past names
