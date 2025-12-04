@@ -64,11 +64,11 @@ const TrainingProgramDetail = () => {
   const { data: allPrograms = [], isLoading } = useAllPrograms();
   const { data: interactions = [] } = useProgramInteractions(userId);
 
-  // Helper function to check if program is new (created within last 7 days)
+  // Helper function to check if program is new (created within last 2 days)
   const isNew = (createdAt: string | undefined) => {
     if (!createdAt) return false;
     const daysSinceCreation = (Date.now() - new Date(createdAt).getTime()) / (1000 * 60 * 60 * 24);
-    return daysSinceCreation <= 7;
+    return daysSinceCreation <= 2;
   };
 
   // Clear all filters

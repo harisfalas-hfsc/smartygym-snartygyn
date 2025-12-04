@@ -152,31 +152,28 @@ const WODCategory = () => {
             </p>
           )}
 
-          {/* Prominent Metadata Display */}
-          <div className="space-y-2 mb-4 text-sm">
-            <div className="flex items-center gap-2">
-              <Flame className="w-4 h-4 text-primary" />
-              <span className="font-medium text-foreground">Format:</span>
-              <span className="text-muted-foreground">{wod.format || "Standard"}</span>
+          {/* Compact Metadata Display - Horizontal Layout */}
+          <div className="space-y-1.5 mb-3 text-sm">
+            {/* Row 1: Format + Difficulty */}
+            <div className="flex flex-wrap items-center gap-x-4 gap-y-1">
+              <div className="flex items-center gap-1.5">
+                <Flame className="w-3.5 h-3.5 text-primary" />
+                <span className="text-muted-foreground">{wod.format || "Standard"}</span>
+              </div>
+              <div className="flex items-center gap-1.5">
+                <TrendingUp className="w-3.5 h-3.5 text-primary" />
+                <span className="text-muted-foreground">
+                  {wod.difficulty || "All Levels"} {wod.difficulty_stars && `(${wod.difficulty_stars}⭐)`}
+                </span>
+              </div>
             </div>
-            <div className="flex items-center gap-2">
-              <TrendingUp className="w-4 h-4 text-primary" />
-              <span className="font-medium text-foreground">Difficulty:</span>
-              <span className="text-muted-foreground">
-                {wod.difficulty || "All Levels"} {wod.difficulty_stars && `(${wod.difficulty_stars}⭐)`}
-              </span>
-            </div>
-            <div className="flex items-center gap-2">
-              <Clock className="w-4 h-4 text-primary" />
-              <span className="font-medium text-foreground">Duration:</span>
-              <span className="text-muted-foreground">{wod.duration || "45-60 min"}</span>
-            </div>
-          </div>
-
-          {/* Access & Price Row */}
-          <div className="flex items-center justify-between mb-4">
-            <div className="flex items-center gap-2">
-              <Badge className="bg-gradient-to-r from-yellow-400 to-orange-500 text-white border-0">
+            {/* Row 2: Duration + Badges */}
+            <div className="flex flex-wrap items-center gap-2">
+              <div className="flex items-center gap-1.5">
+                <Clock className="w-3.5 h-3.5 text-primary" />
+                <span className="text-muted-foreground">{wod.duration || "45-60 min"}</span>
+              </div>
+              <Badge className="bg-gradient-to-r from-yellow-400 to-orange-500 text-white border-0 text-xs py-0.5">
                 <Crown className="w-3 h-3 mr-1" />
                 Premium
               </Badge>
@@ -184,7 +181,7 @@ const WODCategory = () => {
                 <TooltipProvider>
                   <Tooltip>
                     <TooltipTrigger asChild>
-                      <Badge className="bg-gradient-to-r from-green-500 to-emerald-600 text-white border-0 cursor-help">
+                      <Badge className="bg-gradient-to-r from-green-500 to-emerald-600 text-white border-0 cursor-help text-xs py-0.5">
                         <ShoppingCart className="w-3 h-3 mr-1" />
                         BUY €{wod.price.toFixed(2)}
                       </Badge>
