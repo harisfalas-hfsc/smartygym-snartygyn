@@ -48,11 +48,38 @@ CRITICAL RULES:
 3. Do NOT suggest any exercises not in the list
 4. If the list doesn't have enough exercises for the goal, use available exercises creatively
 
-Format the response as a structured workout plan with:
-- Warm-up section
-- Main workout with sets, reps, and rest periods
-- Cool-down section
-- Each exercise name must match the list EXACTLY (will be auto-linked to demonstration videos)`;
+CRITICAL FORMATTING RULES (MANDATORY - FOLLOW EXACTLY FOR COMPACT, READABLE CONTENT):
+
+1. NO WORKOUT TITLE - Users already know which workout they're viewing. Start directly with content.
+
+2. SECTION TITLES (Warm-Up, Main Workout, Cool-Down, Notes):
+   <p class="tiptap-paragraph"><strong><u>Section Title (X minutes)</u></strong></p>
+   <p class="tiptap-paragraph"></p>
+   [Content starts immediately after ONE empty line]
+
+3. SUB-HEADERS (Block 1, Block 2, Circuit, Round, etc.):
+   <p class="tiptap-paragraph"></p>
+   <p class="tiptap-paragraph"><strong>Sub-header Name</strong></p>
+   [Exercises start immediately - NO empty line after sub-header]
+
+4. EXERCISES (Numbered list with exercise NAME in bold - NO gaps between items):
+   <ul class="tiptap-bullet-list">
+   <li class="tiptap-list-item"><p class="tiptap-paragraph"><strong>1. Exercise Name</strong> – description – time/reps</p></li>
+   <li class="tiptap-list-item"><p class="tiptap-paragraph"><strong>2. Exercise Name</strong> – description – time/reps</p></li>
+   <li class="tiptap-list-item"><p class="tiptap-paragraph"><strong>3. Exercise Name</strong> – description – time/reps</p></li>
+   </ul>
+
+5. REST INSTRUCTIONS (inline paragraph after exercises):
+   <p class="tiptap-paragraph">Rest: 60-90 seconds between sets.</p>
+
+SPACING RULES (CRITICAL - KEEP CONTENT COMPACT):
+- ONE empty paragraph after section title ONLY
+- ONE empty paragraph BEFORE next section or sub-header ONLY
+- NEVER put empty paragraphs between exercises in a list
+- NEVER put empty paragraphs after bullet/numbered lists
+- NEVER end content with empty paragraphs
+- NEVER start content with empty paragraphs
+- Goal: User sees workout overview in 2-3 seconds WITHOUT scrolling`;
       
       userPrompt = `Create a workout plan for:
       - Age: ${data.age}
@@ -74,10 +101,43 @@ CRITICAL RULES:
 3. Do NOT suggest any exercises not in the list
 4. If the list doesn't have enough exercises, use available exercises creatively with progressive overload
 
+CRITICAL FORMATTING RULES (MANDATORY - FOLLOW EXACTLY FOR COMPACT, READABLE CONTENT):
+
+1. NO PROGRAM TITLE - Users already know which program they're viewing. Start directly with content.
+
+2. SECTION TITLES (Week 1, Day 1, Overview, etc.):
+   <p class="tiptap-paragraph"><strong><u>Section Title</u></strong></p>
+   <p class="tiptap-paragraph"></p>
+   [Content starts immediately after ONE empty line]
+
+3. SUB-HEADERS (Block 1, Block 2, Circuit, etc.):
+   <p class="tiptap-paragraph"></p>
+   <p class="tiptap-paragraph"><strong>Sub-header Name</strong></p>
+   [Exercises start immediately - NO empty line after sub-header]
+
+4. EXERCISES (Numbered list with exercise NAME in bold - NO gaps between items):
+   <ul class="tiptap-bullet-list">
+   <li class="tiptap-list-item"><p class="tiptap-paragraph"><strong>1. Exercise Name</strong> – description – sets x reps</p></li>
+   <li class="tiptap-list-item"><p class="tiptap-paragraph"><strong>2. Exercise Name</strong> – description – sets x reps</p></li>
+   <li class="tiptap-list-item"><p class="tiptap-paragraph"><strong>3. Exercise Name</strong> – description – sets x reps</p></li>
+   </ul>
+
+5. REST INSTRUCTIONS (inline paragraph after exercises):
+   <p class="tiptap-paragraph">Rest: 60-90 seconds between sets.</p>
+
+SPACING RULES (CRITICAL - KEEP CONTENT COMPACT):
+- ONE empty paragraph after section title ONLY
+- ONE empty paragraph BEFORE next section or sub-header ONLY
+- NEVER put empty paragraphs between exercises in a list
+- NEVER put empty paragraphs after bullet/numbered lists
+- NEVER end content with empty paragraphs
+- NEVER start content with empty paragraphs
+- Goal: User sees content overview quickly WITHOUT excessive scrolling
+
 Format as a comprehensive program with:
 - Weekly breakdowns
 - Progressive overload principles
-- Each exercise name must match the list EXACTLY (will be auto-linked to demonstration videos)`;
+- Each exercise name must match the list EXACTLY`;
       
        userPrompt = `Create a training program for:
         - Age: ${data.age}
