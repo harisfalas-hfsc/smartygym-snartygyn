@@ -47,11 +47,11 @@ const WODCategory = () => {
     return interactions.find(i => i.workout_id === workoutId);
   };
 
-  // Helper function to check if workout is new (created within last 7 days)
+  // Helper function to check if workout is new (created within last 2 days)
   const isNew = (createdAt: string | null | undefined) => {
     if (!createdAt) return false;
     const daysSinceCreation = (Date.now() - new Date(createdAt).getTime()) / (1000 * 60 * 60 * 24);
-    return daysSinceCreation <= 7;
+    return daysSinceCreation <= 2;
   };
 
   // Strip HTML tags from description
@@ -288,12 +288,6 @@ const WODCategory = () => {
                 </Card>
               )}
 
-              {/* Archive Link */}
-              <div className="mt-8 text-center">
-                <Button variant="outline" onClick={() => navigate("/wod-archive")} className="border-primary/50">
-                  Browse Past Workouts of the Day
-                </Button>
-              </div>
             </div>
           </div>
         </>
