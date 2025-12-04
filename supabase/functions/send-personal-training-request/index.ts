@@ -183,7 +183,7 @@ const handler = async (req: Request): Promise<Response> => {
     `;
 
     const emailResponse = await resend.emails.send({
-      from: "Smarty Gym <onboarding@resend.dev>",
+      from: "SmartyGym <notifications@smartygym.com>",
       to: ["haris@smartygym.com"],
       subject: `New Personal Training Request - ${safeName}`,
       html: emailHtml,

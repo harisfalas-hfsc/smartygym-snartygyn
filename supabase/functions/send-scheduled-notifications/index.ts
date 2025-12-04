@@ -139,7 +139,7 @@ serve(async (req: Request) => {
               // Send emails in batches to avoid rate limits
               for (const email of targetEmails) {
                 await resend.emails.send({
-                  from: "SmartyGym <onboarding@resend.dev>",
+                  from: "SmartyGym <notifications@smartygym.com>",
                   to: [email],
                   subject: notification.title,
                   html: `

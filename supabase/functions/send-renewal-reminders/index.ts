@@ -139,7 +139,7 @@ serve(async (req) => {
           if (userEmail) {
             try {
               await resend.emails.send({
-                from: "SmartyGym <onboarding@resend.dev>",
+                from: "SmartyGym <notifications@smartygym.com>",
                 to: [userEmail],
                 subject: subject,
                 html: `

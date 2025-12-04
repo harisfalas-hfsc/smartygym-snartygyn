@@ -163,7 +163,7 @@ serve(async (req: Request) => {
     for (const user of targetEmails) {
       try {
         await resend.emails.send({
-          from: "SmartyGym <onboarding@resend.dev>",
+          from: "SmartyGym <notifications@smartygym.com>",
           to: [user.email],
           subject: subject,
           html: `

@@ -120,7 +120,7 @@ serve(async (req) => {
       
       try {
         await resend.emails.send({
-          from: "SmartyGym <onboarding@resend.dev>",
+          from: "SmartyGym <notifications@smartygym.com>",
           to: [userEmail],
           subject: template.subject,
           html: `

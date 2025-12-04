@@ -444,7 +444,7 @@ Respond in this EXACT JSON format:
         for (const email of userEmails) {
           try {
             await resendClient.emails.send({
-              from: 'SmartyGym <onboarding@resend.dev>',
+              from: 'SmartyGym <notifications@smartygym.com>',
               to: [email],
               subject: notificationTitle,
               html: `<div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;"><h1 style="color: #d4af37;">🏆 Today's Workout</h1><h2 style="color: #333;">${workoutContent.name}</h2><p>${category} | ${format} | ${equipment} | ${selectedDifficulty.name}</p><p style="line-height: 1.6;">${workoutContent.description}</p><p>Available for €3.99 or included with Premium.</p><p><a href="https://smartygym.com/workout/wod" style="background: #d4af37; color: white; padding: 14px 28px; text-decoration: none; border-radius: 4px; font-weight: bold;">View Workout →</a></p></div>`,
