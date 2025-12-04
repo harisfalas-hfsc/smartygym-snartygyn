@@ -1768,6 +1768,7 @@ export type Database = {
           difficulty_intermediate_count: number | null
           equipment_bodyweight_count: number | null
           equipment_with_count: number | null
+          format_usage: Json | null
           id: string
           last_difficulty: string | null
           last_equipment: string | null
@@ -1783,6 +1784,7 @@ export type Database = {
           difficulty_intermediate_count?: number | null
           equipment_bodyweight_count?: number | null
           equipment_with_count?: number | null
+          format_usage?: Json | null
           id?: string
           last_difficulty?: string | null
           last_equipment?: string | null
@@ -1798,6 +1800,7 @@ export type Database = {
           difficulty_intermediate_count?: number | null
           equipment_bodyweight_count?: number | null
           equipment_with_count?: number | null
+          format_usage?: Json | null
           id?: string
           last_difficulty?: string | null
           last_equipment?: string | null
