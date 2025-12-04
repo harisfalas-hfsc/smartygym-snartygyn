@@ -225,7 +225,7 @@ async function handleSubscriptionCheckout(
         .insert({
           user_id: userId,
           session_id: `subscription_${subscriptionId}`,
-          referral_source: 'direct', // Will be updated if we have referral data
+          referral_source: 'direct',
           event_type: 'subscription_purchase',
           event_value: subscription.items.data[0]?.price?.unit_amount ? (subscription.items.data[0].price.unit_amount / 100) : 0,
           landing_page: '/checkout',
@@ -235,31 +235,8 @@ async function handleSubscriptionCheckout(
       logStep("ERROR: Failed to track subscription in analytics", { error: analyticsError });
     }
     
-    // Send automated messages to user
-    const isFirstTime = await isFirstTimeCustomer(userId, supabase);
-    logStep("Checking if first-time customer", { userId, isFirstTime });
-    
     // Capitalize plan type for display (gold -> Gold, platinum -> Platinum)
     const planName = planType.charAt(0).toUpperCase() + planType.slice(1);
-    
-    if (isFirstTime) {
-      // Send welcome message first (kept separate as requested)
-      try {
-        await supabase.functions.invoke('send-system-message', {
-          body: {
-            userId: userId,
-            messageType: 'welcome',
-            customData: {}
-          }
-        });
-        logStep("Welcome message sent");
-        
-        // Wait a moment before sending purchase confirmation
-        await new Promise(resolve => setTimeout(resolve, 1000));
-      } catch (welcomeError) {
-        logStep("ERROR sending welcome message", { error: welcomeError });
-      }
-    }
     
     // Get user email
     const { data: userData } = await supabase.auth.admin.getUserById(userId);
@@ -270,60 +247,60 @@ async function handleSubscriptionCheckout(
       return;
     }
     
-      // Get purchase confirmation template
-      const { data: template } = await supabase
-        .from('automated_message_templates')
-        .select('subject, content')
-        .eq('message_type', 'purchase_subscription')
-        .eq('is_default', true)
-        .single();
+    // Get purchase confirmation template
+    const { data: template } = await supabase
+      .from('automated_message_templates')
+      .select('subject, content')
+      .eq('message_type', 'purchase_subscription')
+      .eq('is_default', true)
+      .single();
+    
+    if (template) {
+      // Replace placeholders
+      const subject = template.subject.replace('{planName}', planName);
+      const contentText = template.content.replace('{planName}', planName);
       
-      if (template) {
-        // Replace placeholders
-        const subject = template.subject.replace('{planName}', planName);
-        const contentText = template.content.replace('{planName}', planName);
-        
-        // Send dashboard notification immediately
-        try {
-          await supabase.from('user_system_messages').insert({
-            user_id: userId,
-            message_type: 'purchase_subscription',
-            subject: subject,
-            content: contentText,
-            is_read: false,
-          });
-          logStep("✅ Subscription purchase dashboard message sent");
-        } catch (notifError) {
-          logStep("ERROR sending subscription notification", { error: notifError });
-        }
-        
-        // Send email immediately
-        try {
-          const resend = new Resend(Deno.env.get('RESEND_API_KEY'));
-          await resend.emails.send({
-            from: 'SmartyGym <notifications@smartygym.com>',
-            to: [userEmail],
-            subject: subject,
-            html: `
-              <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
-                <h1 style="color: #d4af37; margin-bottom: 20px;">Welcome to ${planName}! 🎉</h1>
-                <p style="font-size: 16px; line-height: 1.6; margin-bottom: 16px;">Thank you for subscribing to the <strong>${planName}</strong> plan!</p>
-                <p style="font-size: 16px; line-height: 1.6; margin-bottom: 24px;">You now have full access to all premium features.</p>
-                <p style="margin-top: 24px;">
-                  <a href="https://smartygym.com/dashboard" style="display: inline-block; background: #d4af37; color: white; padding: 14px 28px; text-decoration: none; border-radius: 4px; font-weight: bold; font-size: 16px;">Go to Dashboard →</a>
-                </p>
-                <hr style="margin: 32px 0; border: none; border-top: 1px solid #eee;">
-                <p style="font-size: 12px; color: #999;">This email was sent from SmartyGym.</p>
-              </div>
-            `,
-          });
-          logStep("✅ Subscription purchase email sent", { email: userEmail });
-        } catch (emailError) {
-          logStep("ERROR sending subscription email", { error: emailError });
-        }
-      } else {
-        logStep("ERROR: Could not find subscription purchase template");
+      // Send dashboard notification immediately
+      try {
+        await supabase.from('user_system_messages').insert({
+          user_id: userId,
+          message_type: 'purchase_subscription',
+          subject: subject,
+          content: contentText,
+          is_read: false,
+        });
+        logStep("✅ Subscription purchase dashboard message sent");
+      } catch (notifError) {
+        logStep("ERROR sending subscription notification", { error: notifError });
       }
+      
+      // Send email immediately
+      try {
+        const resend = new Resend(Deno.env.get('RESEND_API_KEY'));
+        await resend.emails.send({
+          from: 'SmartyGym <notifications@smartygym.com>',
+          to: [userEmail],
+          subject: subject,
+          html: `
+            <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
+              <h1 style="color: #d4af37; margin-bottom: 20px;">Welcome to ${planName}! 🎉</h1>
+              <p style="font-size: 16px; line-height: 1.6; margin-bottom: 16px;">Thank you for subscribing to the <strong>${planName}</strong> plan!</p>
+              <p style="font-size: 16px; line-height: 1.6; margin-bottom: 24px;">You now have full access to all premium features.</p>
+              <p style="margin-top: 24px;">
+                <a href="https://smartygym.com/dashboard" style="display: inline-block; background: #d4af37; color: white; padding: 14px 28px; text-decoration: none; border-radius: 4px; font-weight: bold; font-size: 16px;">Go to Dashboard →</a>
+              </p>
+              <hr style="margin: 32px 0; border: none; border-top: 1px solid #eee;">
+              <p style="font-size: 12px; color: #999;">This email was sent from SmartyGym.</p>
+            </div>
+          `,
+        });
+        logStep("✅ Subscription purchase email sent", { email: userEmail });
+      } catch (emailError) {
+        logStep("ERROR sending subscription email", { error: emailError });
+      }
+    } else {
+      logStep("ERROR: Could not find subscription purchase template");
+    }
   }
 }
 
@@ -345,123 +322,17 @@ async function handleOneTimePurchase(
   const paymentIntent = await stripe.paymentIntents.retrieve(paymentIntentId);
   const amount = paymentIntent.amount / 100; // Convert from cents
 
-  // Check if this is a personal training purchase
-  if (productType === 'personal_training') {
-    logStep("Recording personal training purchase", { userId, amount });
-    
-    // Update personal training request status
-    const { error: updateError } = await supabase
-      .from('personal_training_requests')
-      .update({ status: 'paid' })
-      .eq('user_id', userId)
-      .order('created_at', { ascending: false })
-      .limit(1);
-
-    if (updateError) {
-      logStep("ERROR: Failed to update personal training request", { error: updateError });
-    }
-
-    // Send automated messages for personal training
-    const isFirstTime = await isFirstTimeCustomer(userId, supabase);
-    logStep("Checking if first-time customer for personal training", { userId, isFirstTime });
-    
-    if (isFirstTime) {
-      // Send welcome message first (kept separate as requested)
-      try {
-        await supabase.functions.invoke('send-system-message', {
-          body: {
-            userId: userId,
-            messageType: 'welcome',
-            customData: {}
-          }
-        });
-        logStep("Welcome message sent for personal training");
-        
-        // Wait a moment before sending purchase confirmation
-        await new Promise(resolve => setTimeout(resolve, 1000));
-      } catch (welcomeError) {
-        logStep("ERROR sending welcome message for personal training", { error: welcomeError });
-      }
-    }
-    
-    // Get user email
-    const { data: userData } = await supabase.auth.admin.getUserById(userId);
-    const userEmail = userData?.user?.email;
-    
-    if (!userEmail) {
-      logStep("ERROR: Could not get user email for personal training confirmation");
-      return;
-    }
-    
-      // Get personal training purchase template
-      const { data: template } = await supabase
-        .from('automated_message_templates')
-        .select('subject, content')
-        .eq('message_type', 'purchase_personal_training')
-        .eq('is_default', true)
-        .single();
-      
-      if (template) {
-        const contentName = 'Personal Training Program';
-        const subject = template.subject.replace('{contentName}', contentName);
-        const contentText = template.content.replace('{contentName}', contentName);
-        
-        // Send dashboard notification immediately
-        try {
-          await supabase.from('user_system_messages').insert({
-            user_id: userId,
-            message_type: 'purchase_personal_training',
-            subject: subject,
-            content: contentText,
-            is_read: false,
-          });
-          logStep("✅ Personal training purchase dashboard message sent");
-        } catch (notifError) {
-          logStep("ERROR sending personal training notification", { error: notifError });
-        }
-        
-        // Send email immediately
-        try {
-          const resend = new Resend(Deno.env.get('RESEND_API_KEY'));
-          await resend.emails.send({
-            from: 'SmartyGym <notifications@smartygym.com>',
-            to: [userEmail],
-            subject: subject,
-            html: `
-              <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
-                <h1 style="color: #d4af37; margin-bottom: 20px;">Purchase Confirmed! 🎉</h1>
-                <p style="font-size: 16px; line-height: 1.6; margin-bottom: 16px;">Thank you for purchasing <strong>${contentName}</strong>!</p>
-                <p style="font-size: 16px; line-height: 1.6; margin-bottom: 24px;">Your personalized training program will be prepared by our expert coach.</p>
-                <p style="margin-top: 24px;">
-                  <a href="https://smartygym.com/dashboard" style="display: inline-block; background: #d4af37; color: white; padding: 14px 28px; text-decoration: none; border-radius: 4px; font-weight: bold; font-size: 16px;">Go to Dashboard →</a>
-                </p>
-                <hr style="margin: 32px 0; border: none; border-top: 1px solid #eee;">
-                <p style="font-size: 12px; color: #999;">This email was sent from SmartyGym.</p>
-              </div>
-            `,
-          });
-          logStep("✅ Personal training purchase email sent", { email: userEmail });
-        } catch (emailError) {
-          logStep("ERROR sending personal training email", { error: emailError });
-        }
-      } else {
-        logStep("ERROR: Could not find personal training purchase template");
-      }
-    
-    return;
-  }
-
-  // Handle standalone workout/program purchases
+  // Handle standalone workout/program/shop product purchases
   const contentType = session.metadata?.content_type;
   const contentId = session.metadata?.content_id;
   const contentName = session.metadata?.content_name;
 
   if (!contentType || !contentId) {
-    logStep("ERROR: Missing metadata for standalone purchase", { contentType, contentId });
+    logStep("ERROR: Missing metadata for purchase", { contentType, contentId });
     return;
   }
 
-  logStep("Recording standalone purchase", { userId, contentType, contentId, amount });
+  logStep("Recording purchase", { userId, contentType, contentId, amount });
 
   // Record purchase in database
   const { error } = await supabase
@@ -478,120 +349,97 @@ async function handleOneTimePurchase(
 
   if (error) {
     logStep("ERROR: Failed to record purchase", { error });
-  } else {
-    logStep("Purchase recorded successfully");
-    
-    // Track standalone purchase for social media analytics
-    try {
-      await supabase
-        .from('social_media_analytics')
-        .insert({
-          user_id: userId,
-          session_id: session.id,
-          referral_source: 'direct', // Will be updated if we have referral data
-          event_type: 'standalone_purchase',
-          event_value: amount,
-          landing_page: '/checkout',
-        });
-      logStep("Standalone purchase tracked in analytics");
-    } catch (analyticsError) {
-      logStep("ERROR: Failed to track purchase in analytics", { error: analyticsError });
-    }
+    return;
+  }
+  
+  logStep("Purchase recorded successfully");
+  
+  // Track purchase for social media analytics
+  try {
+    await supabase
+      .from('social_media_analytics')
+      .insert({
+        user_id: userId,
+        session_id: session.id,
+        referral_source: 'direct',
+        event_type: 'standalone_purchase',
+        event_value: amount,
+        landing_page: '/checkout',
+      });
+    logStep("Purchase tracked in analytics");
+  } catch (analyticsError) {
+    logStep("ERROR: Failed to track purchase in analytics", { error: analyticsError });
   }
 
-  if (error) {
-    logStep("ERROR: Failed to record purchase", { error });
+  // Get user email
+  const { data: userData } = await supabase.auth.admin.getUserById(userId);
+  const userEmail = userData?.user?.email;
+  
+  if (!userEmail) {
+    logStep("ERROR: Could not get user email for purchase confirmation");
+    return;
+  }
+  
+  // Determine message type based on content type
+  let messageType = 'purchase_workout';
+  if (contentType === 'program') {
+    messageType = 'purchase_program';
+  } else if (contentType === 'shop_product') {
+    messageType = 'purchase_shop_product';
+  }
+  
+  // Get purchase template
+  const { data: template } = await supabase
+    .from('automated_message_templates')
+    .select('subject, content')
+    .eq('message_type', messageType)
+    .eq('is_default', true)
+    .single();
+  
+  if (template) {
+    const subject = template.subject.replace('{contentName}', contentName);
+    const contentText = template.content.replace('{contentName}', contentName);
+    
+    // Send dashboard notification immediately
+    try {
+      await supabase.from('user_system_messages').insert({
+        user_id: userId,
+        message_type: messageType,
+        subject: subject,
+        content: contentText,
+        is_read: false,
+      });
+      logStep("✅ Purchase dashboard message sent", { contentType });
+    } catch (notifError) {
+      logStep("ERROR sending purchase notification", { error: notifError });
+    }
+    
+    // Send email immediately
+    try {
+      const resend = new Resend(Deno.env.get('RESEND_API_KEY'));
+      await resend.emails.send({
+        from: 'SmartyGym <notifications@smartygym.com>',
+        to: [userEmail],
+        subject: subject,
+        html: `
+          <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
+            <h1 style="color: #d4af37; margin-bottom: 20px;">Purchase Confirmed! 🎉</h1>
+            <p style="font-size: 16px; line-height: 1.6; margin-bottom: 16px;">Thank you for your purchase of <strong>${contentName}</strong>!</p>
+            <p style="font-size: 16px; line-height: 1.6; margin-bottom: 24px;">Your content is now available in your dashboard.</p>
+            <p style="margin-top: 24px;">
+              <a href="https://smartygym.com/dashboard" style="display: inline-block; background: #d4af37; color: white; padding: 14px 28px; text-decoration: none; border-radius: 4px; font-weight: bold; font-size: 16px;">Go to Dashboard →</a>
+            </p>
+            <hr style="margin: 32px 0; border: none; border-top: 1px solid #eee;">
+            <p style="font-size: 12px; color: #999;">This email was sent from SmartyGym.</p>
+          </div>
+        `,
+      });
+      logStep("✅ Purchase email sent", { email: userEmail, contentType });
+    } catch (emailError) {
+      logStep("ERROR sending purchase email", { error: emailError });
+    }
   } else {
-    logStep("Purchase recorded successfully");
-    
-    // Send automated messages for standalone purchase
-    const isFirstTime = await isFirstTimeCustomer(userId, supabase);
-    logStep("Checking if first-time customer for standalone purchase", { userId, isFirstTime });
-    
-    if (isFirstTime) {
-      // Send welcome message first (kept separate as requested)
-      try {
-        await supabase.functions.invoke('send-system-message', {
-          body: {
-            userId: userId,
-            messageType: 'welcome',
-            customData: {}
-          }
-        });
-        logStep("Welcome message sent for standalone purchase");
-        
-        // Wait a moment before sending purchase confirmation
-        await new Promise(resolve => setTimeout(resolve, 1000));
-      } catch (welcomeError) {
-        logStep("ERROR sending welcome message for standalone purchase", { error: welcomeError });
-      }
-    }
-    
-    // Get user email
-    const { data: userData } = await supabase.auth.admin.getUserById(userId);
-    const userEmail = userData?.user?.email;
-    
-    if (!userEmail) {
-      logStep("ERROR: Could not get user email for standalone purchase confirmation");
-      return;
-    }
-    
-    // Determine message type based on content type
-    const messageType = contentType === 'workout' ? 'purchase_workout' : 'purchase_program';
-    
-      // Get standalone purchase template
-      const { data: template } = await supabase
-        .from('automated_message_templates')
-        .select('subject, content')
-        .eq('message_type', messageType)
-        .eq('is_default', true)
-        .single();
-      
-      if (template) {
-        const subject = template.subject.replace('{contentName}', contentName);
-        const contentText = template.content.replace('{contentName}', contentName);
-        
-        // Send dashboard notification immediately
-        try {
-          await supabase.from('user_system_messages').insert({
-            user_id: userId,
-            message_type: messageType,
-            subject: subject,
-            content: contentText,
-            is_read: false,
-          });
-          logStep("✅ Standalone purchase dashboard message sent", { contentType });
-        } catch (notifError) {
-          logStep("ERROR sending standalone purchase notification", { error: notifError });
-        }
-        
-        // Send email immediately
-        try {
-          const resend = new Resend(Deno.env.get('RESEND_API_KEY'));
-          await resend.emails.send({
-            from: 'SmartyGym <notifications@smartygym.com>',
-            to: [userEmail],
-            subject: subject,
-            html: `
-              <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
-                <h1 style="color: #d4af37; margin-bottom: 20px;">Purchase Confirmed! 🎉</h1>
-                <p style="font-size: 16px; line-height: 1.6; margin-bottom: 16px;">Thank you for your purchase of <strong>${contentName}</strong>!</p>
-                <p style="font-size: 16px; line-height: 1.6; margin-bottom: 24px;">Your content is now available in your dashboard.</p>
-                <p style="margin-top: 24px;">
-                  <a href="https://smartygym.com/dashboard" style="display: inline-block; background: #d4af37; color: white; padding: 14px 28px; text-decoration: none; border-radius: 4px; font-weight: bold; font-size: 16px;">Go to Dashboard →</a>
-                </p>
-                <hr style="margin: 32px 0; border: none; border-top: 1px solid #eee;">
-                <p style="font-size: 12px; color: #999;">This email was sent from SmartyGym.</p>
-              </div>
-            `,
-          });
-          logStep("✅ Standalone purchase email sent", { email: userEmail, contentType });
-        } catch (emailError) {
-          logStep("ERROR sending standalone purchase email", { error: emailError });
-        }
-      } else {
-        logStep("ERROR: Could not find standalone purchase template", { messageType });
-      }
+    logStep("ERROR: Could not find purchase template", { messageType });
   }
 }
 
@@ -676,8 +524,8 @@ async function handleSubscriptionCancellation(
       .insert({
         user_id: existingSub.user_id,
         subject: 'Subscription Cancelled',
-        message: 'Your subscription has been cancelled. You will continue to have access until the end of your current billing period. We hope to see you again soon!',
-        message_type: 'subscription_cancelled',
+        content: '<p class="tiptap-paragraph">Your subscription has been cancelled. You will continue to have access until the end of your current billing period.</p><p class="tiptap-paragraph"></p><p class="tiptap-paragraph">We hope to see you again soon!</p>',
+        message_type: 'cancellation',
         is_read: false,
       });
   }
@@ -751,10 +599,7 @@ async function handleInvoicePaymentSucceeded(
   const subject = template.subject.replace(/\{planName\}/g, planName).replace(/\{amount\}/g, amount);
   const contentText = template.content.replace(/\{planName\}/g, planName).replace(/\{amount\}/g, amount);
 
-  // Send dashboard notification immediately (with 5 min delay via scheduled_notifications)
-  const renewalSendAt = new Date();
-  renewalSendAt.setMinutes(renewalSendAt.getMinutes() + 5);
-  
+  // Send dashboard notification with 5 min delay via scheduled_notifications
   await supabase
     .from("scheduled_notifications")
     .insert({
@@ -813,8 +658,8 @@ async function handleInvoicePaymentFailed(
     .insert({
       user_id: existingSub.user_id,
       subject: 'Payment Failed',
-      message: 'We were unable to process your subscription payment. Please update your payment method to continue your subscription.',
-      message_type: 'payment_failed',
+      content: '<p class="tiptap-paragraph">We were unable to process your subscription payment.</p><p class="tiptap-paragraph"></p><p class="tiptap-paragraph">Please update your payment method to continue your subscription.</p>',
+      message_type: 'renewal_reminder',
       is_read: false,
     });
 }
