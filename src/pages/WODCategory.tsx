@@ -173,12 +173,8 @@ const WODCategory = () => {
                 <span className="text-muted-foreground">{wod.duration || "45-60 min"}</span>
               </div>
             </div>
-            {/* Row 2: All Badges */}
+            {/* Row 2: Premium + BUY badges only */}
             <div className="flex flex-wrap items-center gap-1.5">
-              <Badge className={`${isBodyweight ? 'bg-blue-500' : 'bg-orange-500'} text-white border-0 text-xs py-0.5`}>
-                {isBodyweight ? <Home className="w-3 h-3 mr-1" /> : <Dumbbell className="w-3 h-3 mr-1" />}
-                {equipmentLabel}
-              </Badge>
               <Badge className="bg-gradient-to-r from-yellow-400 to-orange-500 text-white border-0 text-xs py-0.5">
                 <Crown className="w-3 h-3 mr-1" />
                 Premium
