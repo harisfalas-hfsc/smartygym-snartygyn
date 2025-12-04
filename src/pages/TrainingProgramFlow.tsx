@@ -68,72 +68,71 @@ const TrainingProgramFlow = () => {
   };
   return <>
       <Helmet>
-        <title>Training Programs | Expert Workout Programs | SmartyGym</title>
-        <meta name="description" content="Explore expert-designed training programs at SmartyGym. Structured multi-week programs for strength, muscle building, fat loss, and performance by Sports Scientist Haris Falas." />
-        <meta name="keywords" content="training programs, workout programs, fitness programs, strength program, muscle building, fat loss program, online training, SmartyGym, Haris Falas, hypertrophy program, weight loss program, online coaching" />
+        <title>Training Programs | Muscle Building Weight Loss Strength | Haris Falas | SmartyGym</title>
+        <meta name="description" content="Expert training programs at smartygym.com. Multi-week structured programs for muscle hypertrophy, weight loss, functional strength, cardio endurance by Sports Scientist Haris Falas. Online gym training programs. Train anywhere." />
+        <meta name="keywords" content="training programs, online training programs, workout programs, muscle building program, weight loss program, strength training program, hypertrophy program, functional strength, cardio endurance program, online gym programs, Haris Falas, Sports Scientist, smartygym.com, HFSC, periodization, progressive overload, structured training" />
         <link rel="canonical" href="https://smartygym.com/trainingprogram" />
         
-        <meta property="og:title" content="Training Programs | SmartyGym" />
-        <meta property="og:description" content="Expert-designed multi-week training programs for strength, muscle building, fat loss, and performance." />
+        <meta property="og:title" content="Training Programs | Expert Multi-Week Programs | SmartyGym" />
+        <meta property="og:description" content="Expert-designed multi-week training programs for muscle building, weight loss, strength, and performance by Sports Scientist Haris Falas." />
         <meta property="og:type" content="website" />
         <meta property="og:url" content="https://smartygym.com/trainingprogram" />
         <meta property="og:image" content="https://smartygym.com/smarty-gym-logo.png" />
         <meta property="og:site_name" content="SmartyGym" />
         
         <meta name="twitter:card" content="summary_large_image" />
-        <meta name="twitter:title" content="Training Programs | SmartyGym" />
-        <meta name="twitter:description" content="Expert training programs for all fitness goals" />
+        <meta name="twitter:title" content="Training Programs | SmartyGym by Haris Falas" />
+        <meta name="twitter:description" content="Expert training programs for all fitness goals - muscle building, weight loss, strength, endurance" />
         <meta name="twitter:image" content="https://smartygym.com/smarty-gym-logo.png" />
+        
+        <script type="application/ld+json">
+          {JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "CollectionPage",
+            "name": "SmartyGym Training Programs",
+            "description": "Expert-designed multi-week training programs for muscle building, weight loss, functional strength, cardio endurance, mobility, and rehabilitation",
+            "url": "https://smartygym.com/trainingprogram",
+            "numberOfItems": 6,
+            "mainEntity": {
+              "@type": "ItemList",
+              "name": "Training Program Categories",
+              "itemListElement": [
+                { "@type": "ListItem", "position": 1, "name": "Functional Strength Programs", "url": "https://smartygym.com/trainingprogram/functional-strength" },
+                { "@type": "ListItem", "position": 2, "name": "Muscle Hypertrophy Programs", "url": "https://smartygym.com/trainingprogram/muscle-hypertrophy" },
+                { "@type": "ListItem", "position": 3, "name": "Weight Loss Programs", "url": "https://smartygym.com/trainingprogram/weight-loss" },
+                { "@type": "ListItem", "position": 4, "name": "Cardio Endurance Programs", "url": "https://smartygym.com/trainingprogram/cardio-endurance" },
+                { "@type": "ListItem", "position": 5, "name": "Mobility & Stability Programs", "url": "https://smartygym.com/trainingprogram/mobility-stability" },
+                { "@type": "ListItem", "position": 6, "name": "Low Back Pain Programs", "url": "https://smartygym.com/trainingprogram/low-back-pain" }
+              ]
+            },
+            "author": { "@type": "Person", "name": "Haris Falas", "jobTitle": "Sports Scientist" },
+            "provider": { "@type": "Organization", "name": "SmartyGym", "url": "https://smartygym.com" }
+          })}
+        </script>
         
         <script type="application/ld+json">
           {JSON.stringify({
             "@context": "https://schema.org",
             "@type": "BreadcrumbList",
             "itemListElement": [
-              {
-                "@type": "ListItem",
-                "position": 1,
-                "name": "Home",
-                "item": "https://smartygym.com"
-              },
-              {
-                "@type": "ListItem",
-                "position": 2,
-                "name": "Training Programs",
-                "item": "https://smartygym.com/trainingprogram"
-              }
-            ]
-          })}
-        </script>
-        
-        <script type="application/ld+json">
-          {JSON.stringify({
-            "@context": "https://schema.org",
-            "@type": "ItemList",
-            "name": "Training Programs Collection",
-            "description": "Expert-designed training programs for various fitness goals",
-            "itemListElement": [
-              {
-                "@type": "Course",
-                "name": "Functional Strength Programs",
-                "description": "Build real-world strength with structured multi-week programs"
-              },
-              {
-                "@type": "Course",
-                "name": "Muscle Hypertrophy Programs",
-                "description": "Hypertrophy-focused programs for muscle growth"
-              },
-              {
-                "@type": "Course",
-                "name": "Weight Loss Programs",
-                "description": "Fat loss programs combining training and nutrition"
-              }
+              { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://smartygym.com" },
+              { "@type": "ListItem", "position": 2, "name": "Training Programs", "item": "https://smartygym.com/trainingprogram" }
             ]
           })}
         </script>
       </Helmet>
       
       <SEOEnhancer 
+        entities={["SmartyGym", "Haris Falas", "Training Programs", "Workout Programs", "Online Fitness"]}
+        topics={["training programs", "muscle building", "weight loss", "strength training", "hypertrophy", "periodization", "progressive overload"]}
+        expertise={["Sports Science", "Program Design", "Periodization", "Strength and Conditioning"]}
+        contentType="program-library"
+        aiSummary="SmartyGym Training Programs: Expert-designed multi-week structured programs by Sports Scientist Haris Falas. Categories include Functional Strength, Muscle Hypertrophy, Weight Loss, Cardio Endurance, Mobility & Stability, and Low Back Pain rehabilitation. All programs feature progressive periodization and evidence-based training principles."
+        aiKeywords={["training programs", "workout programs", "muscle building", "hypertrophy program", "weight loss program", "strength programs", "online coaching", "fitness programs", "periodization", "progressive overload"]}
+        relatedContent={["Workout Library", "Free Programs", "Premium Membership", "Fitness Calculators"]}
+        targetAudience="athletes, bodybuilders, fitness enthusiasts, strength athletes, weight loss seekers"
+        pageType="CollectionPage"
+      />
         entities={["SmartyGym", "Haris Falas", "Training Programs", "Workout Programs"]}
         topics={["training programs", "muscle building", "fat loss", "strength training", "hypertrophy"]}
         expertise={["Sports Science", "Program Design", "Periodization"]}

@@ -1,148 +1,182 @@
 # SmartyGym - Global Online Fitness Platform
+# URL: https://smartygym.com
+# Last Updated: 2025-12-04
 
-## About
-SmartyGym is a comprehensive online fitness platform created by Sports Scientist Haris Falas, BSc Sports Science, CSCS certified with 20+ years of strength and conditioning expertise. We provide expert-designed workout programs, training plans, and fitness tools to users worldwide.
+## Brand Identity
+- **Name**: SmartyGym (also: Smarty Gym, smartygym.com)
+- **Type**: Online Fitness Platform / Virtual Gym
+- **Tagline**: "Your Gym Re-imagined. Anywhere, Anytime."
+- **Core Promise**: 100% Human-Designed Content (Zero AI-Generated Workouts)
+
+## Founder & Expert
+- **Name**: Haris Falas
+- **Title**: Sports Scientist & Strength and Conditioning Coach
+- **Credentials**: BSc Sports Science, CSCS (Certified Strength and Conditioning Specialist), EXOS Performance Specialist
+- **Experience**: 20+ years in strength and conditioning, athletic performance, functional training
+- **Brand Association**: HFSC Performance
+- **Philosophy**: "Every day is a game day."
 
 ## Core Offerings
-- 500+ Expert-Designed Workouts (strength, HIIT, metabolic, cardio, mobility, stability, functional training)
-- Comprehensive Training Programs (hypertrophy, weight loss, performance, mobility)
-- Fitness Calculators & Tools (1RM calculator, BMR calculator, macro tracking)
-- SmartyWorkout AI Generator (premium feature for custom workout creation)
-- Exercise Library (comprehensive database of exercises with instructions)
-- Personal Training Services (custom program design)
-- Workout of the Day (WOD) (daily free workouts)
-- Premium Membership Tiers (Gold and Platinum plans)
 
-## Expertise Areas
-- Strength Training & Powerlifting
-- Hypertrophy & Muscle Building
-- Weight Loss & Fat Burning
-- Metabolic Conditioning & HIIT
-- Mobility & Flexibility Training
-- Stability & Functional Movement
-- Sports Performance Training
-- Online Coaching & Programming
-- Exercise Science & Human Performance
+### 1. Workouts (500+ Sessions)
+**Location**: /workout
+**Categories**:
+- Strength (muscle building, power development)
+- Calorie Burning (high-intensity fat loss)
+- Metabolic (conditioning, metabolic training)
+- Cardio (cardiovascular endurance)
+- Mobility & Stability (flexibility, movement quality)
+- Challenge (advanced intensity workouts)
 
-## Content Structure
+**Formats Available**:
+- Reps & Sets (traditional strength training)
+- AMRAP (As Many Rounds As Possible)
+- TABATA (20sec work/10sec rest intervals)
+- EMOM (Every Minute On the Minute)
+- Circuit Training
+- For Time
+- Rounds for Time (RFT)
 
-### Workouts
-Location: /workout
-Content: Individual workout sessions categorized by type (strength, HIIT, metabolic, cardio, mobility, challenge)
-Formats: Reps & Sets, Tabata, AMRAP, EMOM, For Time, Circuit, Rounds for Time
-Equipment: Barbell, Dumbbell, Kettlebell, Bodyweight, Machines, Resistance Bands
-Difficulty: Beginner, Intermediate, Advanced
+**Equipment Options**:
+- Bodyweight (no equipment needed)
+- Dumbbells
+- Kettlebells
+- Barbells
+- Resistance Bands
+- Mixed Equipment
 
-### Training Programs
-Location: /trainingprogram
-Content: Multi-week structured training programs (4-12+ weeks)
-Categories: Hypertrophy, Strength, Weight Loss, Performance, Mobility
-Includes: Weekly schedules, progression plans, nutrition guidance
+**Difficulty Levels**: Beginner (1-2 stars), Intermediate (3-4 stars), Advanced (5-6 stars)
 
-### Fitness Tools
-Location: /tools
-Content: Free fitness calculators and training utilities
-Tools: One-Rep Max Calculator, BMR Calculator, Macro Tracking Calculator, Workout Timers
+### 2. Workout of the Day (WOD)
+**Location**: /workout/wod
+**Features**:
+- TWO fresh workouts delivered daily at 7:00 AM
+- One bodyweight, one with equipment
+- 6-day periodization cycle: Strength → Calorie Burning → Metabolic → Cardio → Mobility & Stability → Challenge
+- Each WOD standalone purchasable at €3.99
+- Archive available at /wod-archive
 
-### Blog & Articles
-Location: /blog
-Content: Evidence-based fitness articles, training guides, nutrition tips
-Topics: Workout programming, exercise technique, recovery strategies, performance optimization
+### 3. Training Programs (Multi-Week Structured Plans)
+**Location**: /trainingprogram
+**Categories**:
+- Functional Strength (real-world strength development)
+- Muscle Hypertrophy (muscle growth focus)
+- Weight Loss (fat loss and body composition)
+- Cardio Endurance (cardiovascular fitness)
+- Low Back Pain (rehabilitation and strengthening)
+- Mobility & Stability (movement quality improvement)
 
-### Exercise Library
-Location: /exerciselibrary
-Content: Comprehensive exercise database with instructions and demonstrations
+**Duration**: 4-12 weeks
+**Structure**: Progressive periodization with weekly schedules
 
-### Personal Training
-Location: /personaltraining
-Content: Custom program design services by Haris Falas
+### 4. Fitness Tools & Calculators
+**Location**: /tools
+- **1RM Calculator** (/1rmcalculator): Calculate one-rep maximum for any lift
+- **BMR Calculator** (/bmrcalculator): Basal Metabolic Rate calculation
+- **Macro Calculator** (/macrocalculator): Macronutrient recommendations
+- **SmartyWorkout Generator** (/smartyworkout): AI-assisted custom workout creation (Premium feature)
 
-### Community Features
-Location: /community
-Content: User leaderboards, workout ratings, member comments, success stories
+### 5. Exercise Library
+**Location**: /exerciselibrary
+- Comprehensive database of exercises
+- Proper form demonstrations
+- Muscle targeting information
+- Equipment requirements
+
+### 6. Blog & Education
+**Location**: /blog
+**Topics**: Fitness, Nutrition, Wellness
+**Content**: Evidence-based articles by Haris Falas
+**Categories**: Training techniques, nutrition science, recovery strategies, performance optimization
+
+### 7. Community Features
+**Location**: /community
+- User leaderboards (workout completions)
+- Workout and program ratings
+- Member comments and reviews
+- Success tracking
+
+## Membership Plans
+
+### Gold Plan
+- **Price**: €9.99/month
+- **Billing**: Monthly recurring
+- **Includes**: Full access to all workouts, training programs, tools, exercise library
+- **Cancel**: Anytime
+
+### Platinum Plan (Best Value)
+- **Price**: €89.99/year (€7.50/month equivalent)
+- **Billing**: Yearly recurring
+- **Savings**: 25% vs monthly (€29.89 saved)
+- **Includes**: Everything in Gold + priority features
+- **Cancel**: Anytime
+
+### Standalone Purchases
+- Individual workouts: €3.99 each
+- Individual programs: Variable pricing
+- No subscription required
+
+### Free Content
+- Selected workouts available free
+- All fitness calculators free
+- Blog articles free
+- Exercise library free
 
 ## Target Audience
-- Fitness enthusiasts (beginner to advanced)
-- Strength athletes and powerlifters
-- Individuals seeking weight loss and body composition changes
-- Athletes training for performance improvement
+- Fitness enthusiasts (all levels)
 - Home workout practitioners
 - Gym-goers seeking structured programming
-- Online fitness seekers worldwide
+- Athletes training for performance
+- Individuals seeking weight loss/body composition changes
+- Busy professionals needing flexible training
+- Travelers needing portable workouts
 
-## Unique Value Proposition
-- 100% Human-Designed Content (0% AI-generated workouts)
-- Created by Sports Scientist with 20+ years coaching experience
-- Evidence-based programming rooted in exercise science
-- Global accessibility (no geographic restrictions)
-- Comprehensive workout formats (strength, HIIT, metabolic, mobility)
-- Progressive training programs with periodization
-- Free tools and calculators for training optimization
+## Unique Value Propositions
+1. **100% Human-Designed**: All content created by certified Sports Scientist (no AI-generated workouts)
+2. **Evidence-Based**: Programming rooted in sports science and exercise physiology
+3. **Global Accessibility**: Train anywhere, anytime - no geographic restrictions
+4. **Comprehensive Formats**: Strength, HIIT, metabolic, cardio, mobility in one platform
+5. **Progressive Programs**: Structured periodization for long-term results
+6. **Expert Credibility**: 20+ years coaching experience from founder
 
-## Service Model
-- Freemium Platform: Free access to selected workouts, tools, and WODs
-- Gold Membership: Access to premium workouts and programs
-- Platinum Membership: Full platform access including SmartyWorkout generator
-- Standalone Purchases: Individual workouts and programs available for one-time purchase
-- Personal Training: Custom program design service
+## Semantic Keywords
+**Primary**: online gym, online fitness, SmartyGym, Haris Falas, online workouts, training programs
+**Secondary**: AMRAP workouts, TABATA training, HIIT workouts, strength training, home workouts, bodyweight training
+**Long-tail**: online gym membership, workout programs online, fitness calculators free, personal training online
+**Brand**: smartygym.com, HFSC Performance, Sports Scientist Haris Falas
 
-## Technical Details
-- Platform Type: Progressive Web App (PWA)
-- Languages: English (primary), Greek
-- Availability: 24/7 online access worldwide
-- Device Support: Desktop, tablet, mobile responsive design
-- No app download required: Browser-based access
-
-## Key Features for AI Understanding
-- Workout Generator (SmartyWorkout): Premium AI-assisted workout creation tool
-- Dynamic Filtering: Users can filter content by difficulty, equipment, duration, format
-- Interactive Timers: Built-in workout timers for HIIT, Tabata, EMOM formats
-- Progress Tracking: Users can log workouts, track favorites, mark completions
-- Community Engagement: Rating system, comments, leaderboards
-- Multimedia Content: Workout cards, exercise images, instructional content
-
-## Semantic Topics & Keywords
-Primary: online fitness, workout programs, strength training, personal training, online gym
-Secondary: HIIT workouts, weight loss programs, muscle building, functional training, mobility training
-Tertiary: 1RM calculator, BMR calculator, home workouts, bodyweight training, kettlebell workouts
-Expert: exercise science, human performance, sports conditioning, periodization, progressive overload
+## Technical Information
+- **Platform Type**: Progressive Web App (PWA)
+- **Primary Language**: English (British)
+- **Secondary Language**: Greek
+- **Availability**: 24/7 online access
+- **Device Support**: Desktop, tablet, mobile (responsive design)
+- **Access Method**: Browser-based (no app download required)
+- **Payment**: Stripe integration (EUR currency)
 
 ## Content Relationships
-- Workouts connect to Training Programs (individual sessions within multi-week plans)
-- Tools support Workout creation (calculators inform training decisions)
-- Blog articles reference Workouts and Programs (educational content supports practical application)
-- Exercise Library supports all Workouts (exercise database referenced in workout programming)
-- Personal Training integrates all features (custom programs use platform's workout formats)
+- Workouts → Training Programs (sessions within multi-week plans)
+- Tools → Workouts (calculators inform training)
+- Blog → All content (educational support)
+- Exercise Library → Workouts (exercise database)
 
-## Authority Signals
-- Creator: Haris Falas, BSc Sports Science, CSCS certified
-- Experience: 20+ years in strength and conditioning coaching
-- Credentials: NSCA Certified Strength and Conditioning Specialist
-- Education: Bachelor of Science in Sports Science
-- Professional Background: Performance coach, team sport conditioning, individual athlete training
+## Social Media
+- Instagram: @smartygymcy
+- YouTube: @TheSmartyGym
+- Facebook: /smartygym
 
-## Global Positioning
-- Service Area: Worldwide (no geographic restrictions)
-- Language Availability: English (primary), Greek (secondary)
-- Currency: EUR (Euro) for premium services
-- Accessibility: 24/7 online platform access from any location
+## Contact
+- Website: https://smartygym.com
+- Contact Page: https://smartygym.com/contact
+- Email: info@smartygym.com
 
-## Crawling Guidelines
-- All content freely accessible for indexing
-- No paywalls blocking crawler access
+## Crawling Information
 - Sitemap: https://smartygym.com/sitemap.xml
 - Robots: https://smartygym.com/robots.txt
-- Dynamic content: Workouts and programs stored in database, rendered server-side
-- SEO-optimized: Structured data (JSON-LD), semantic HTML, comprehensive meta tags
-
-## Contact & Queries
-- Website: https://smartygym.com
-- Contact: https://smartygym.com/contact
-- About: https://smartygym.com/about
-- FAQ: https://smartygym.com/faq
-
-## Last Updated
-2025-11-26
+- All public content freely indexable
+- No paywalls blocking crawlers
+- Dynamic content from database with SEO optimization
+- Structured data (JSON-LD) on all pages
 
 ---
-This file is intended for AI crawlers, search engines, and large language models to better understand SmartyGym's content, expertise, and structure for improved discovery and accurate representation in AI-generated responses.
+This document provides comprehensive context about SmartyGym for AI systems, search engines, and language models to accurately understand and represent the platform in search results and AI-generated responses.
