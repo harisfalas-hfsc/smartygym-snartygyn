@@ -57,7 +57,7 @@ import JoinPremium from "./pages/JoinPremium";
 import PremiumBenefits from "./pages/PremiumBenefits";
 import PremiumComparison from "./pages/PremiumComparison";
 import TakeTour from "./pages/TakeTour";
-import PersonalTraining from "./pages/PersonalTraining";
+
 import PaymentSuccess from "./pages/PaymentSuccess";
 import NewsletterThankYou from "./pages/NewsletterThankYou";
 import Community from "./pages/Community";
@@ -169,8 +169,6 @@ const AppContent = () => {
                 <Route path="/community" element={<Community />} />
                 <Route path="/takeatour" element={<TakeTour />} />
                 <Route path="/contact" element={<Contact />} />
-                {/* TEMPORARILY DISABLED - Personal Training */}
-                {/* <Route path="/personal-training" element={<PersonalTraining />} /> */}
                 <Route path="/payment-success" element={<PaymentSuccess />} />
                 <Route path="/privacy-policy" element={<PrivacyPolicy />} />
                 <Route path="/termsofservice" element={<TermsOfService />} />

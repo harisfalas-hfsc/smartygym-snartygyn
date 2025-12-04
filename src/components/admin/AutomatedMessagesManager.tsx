@@ -56,7 +56,6 @@ const MESSAGE_TYPES = {
   welcome: { label: "Welcome Message", icon: UserPlus, color: "text-green-600" },
   purchase_workout: { label: "Workout Purchase", icon: ShoppingBag, color: "text-blue-600" },
   purchase_program: { label: "Program Purchase", icon: Calendar, color: "text-purple-600" },
-  purchase_personal_training: { label: "Personal Training", icon: UserPlus, color: "text-orange-600" },
   purchase_subscription: { label: "Subscription", icon: Crown, color: "text-yellow-600" },
   renewal_reminder: { label: "Renewal Reminder", icon: Bell, color: "text-cyan-600" },
   renewal_thank_you: { label: "Renewal Thank You", icon: ThumbsUp, color: "text-emerald-600" },
