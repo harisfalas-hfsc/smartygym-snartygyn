@@ -4,12 +4,13 @@ import { Helmet } from "react-helmet";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { ArrowLeft, Eye, Check, Heart, Crown, ShoppingCart, Clock, Dumbbell, Flame, Star, Home } from "lucide-react";
+import { ArrowLeft, Eye, Check, Heart, Crown, ShoppingCart, Clock, Dumbbell, Flame, Star, Home, TrendingUp } from "lucide-react";
 import { PageBreadcrumbs } from "@/components/PageBreadcrumbs";
 import { ContentLoadingSkeleton } from "@/components/ContentLoadingSkeleton";
 import { useAllWorkouts } from "@/hooks/useWorkoutData";
 import { useWorkoutInteractions } from "@/hooks/useWorkoutInteractions";
 import { supabase } from "@/integrations/supabase/client";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 
 const WODCategory = () => {
   const navigate = useNavigate();
@@ -151,25 +152,50 @@ const WODCategory = () => {
             </p>
           )}
 
-          {/* Metadata Badges */}
-          <div className="flex flex-wrap gap-1.5 mb-4">
-            {wod.format && (
-              <Badge variant="outline" className="text-xs">
-                {wod.format}
+          {/* Prominent Metadata Display */}
+          <div className="space-y-2 mb-4 text-sm">
+            <div className="flex items-center gap-2">
+              <Flame className="w-4 h-4 text-primary" />
+              <span className="font-medium text-foreground">Format:</span>
+              <span className="text-muted-foreground">{wod.format || "Standard"}</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <TrendingUp className="w-4 h-4 text-primary" />
+              <span className="font-medium text-foreground">Difficulty:</span>
+              <span className="text-muted-foreground">
+                {wod.difficulty || "All Levels"} {wod.difficulty_stars && `(${wod.difficulty_stars}⭐)`}
+              </span>
+            </div>
+            <div className="flex items-center gap-2">
+              <Clock className="w-4 h-4 text-primary" />
+              <span className="font-medium text-foreground">Duration:</span>
+              <span className="text-muted-foreground">{wod.duration || "45-60 min"}</span>
+            </div>
+          </div>
+
+          {/* Access & Price Row */}
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center gap-2">
+              <Badge className="bg-gradient-to-r from-yellow-400 to-orange-500 text-white border-0">
+                <Crown className="w-3 h-3 mr-1" />
+                Premium
               </Badge>
-            )}
-            {wod.difficulty && (
-              <Badge variant="outline" className="text-xs">
-                <Star className="w-3 h-3 mr-1" />
-                {wod.difficulty_stars}⭐
-              </Badge>
-            )}
-            {wod.duration && (
-              <Badge variant="outline" className="text-xs">
-                <Clock className="w-3 h-3 mr-1" />
-                {wod.duration}
-              </Badge>
-            )}
+              {wod.is_standalone_purchase && wod.price && (
+                <TooltipProvider>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <Badge className="bg-gradient-to-r from-green-500 to-emerald-600 text-white border-0 cursor-help">
+                        <ShoppingCart className="w-3 h-3 mr-1" />
+                        BUY €{wod.price.toFixed(2)}
+                      </Badge>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p>Buy this workout individually to try our coaching style</p>
+                    </TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
+              )}
+            </div>
           </div>
 
           {/* CTA Button */}
@@ -224,7 +250,7 @@ const WODCategory = () => {
                   <h1 className="text-xl sm:text-2xl font-bold mb-3 text-center">About Workout of the Day</h1>
                   <div className="space-y-2 text-muted-foreground max-w-3xl mx-auto">
                     <p className="text-sm sm:text-base text-center">
-                      Every day <span className="text-primary font-semibold">SmartyGym</span> delivers <strong>TWO</strong> fresh, expertly designed workouts following a strategic periodization cycle — one with equipment and one without. Each day focuses on a different training style: <strong>Strength</strong>, <strong>Calorie Burning</strong>, <strong>Metabolic</strong>, <strong>Cardio</strong>, <strong>Mobility & Stability</strong>, and <strong>Challenge</strong>. Choose based on your situation: at home, traveling, in your office, or at the gym. <strong className="text-primary">Your SmartyGym: the gym that never closes and never takes a holiday.</strong>
+                      Every day <span className="text-primary font-semibold">SmartyGym</span> delivers <strong>TWO</strong> fresh, expertly designed workouts following a strategic periodization cycle — one with equipment and one without. Each day focuses on a different training style: <strong>Strength</strong>, <strong>Calorie Burning</strong>, <strong>Metabolic</strong>, <strong>Cardio</strong>, <strong>Mobility & Stability</strong>, and <strong>Challenge</strong>. Choose based on your situation: at home, traveling, in your office, or at the gym. <strong className="text-primary">Your SmartyGym: the gym that never closes and never takes a holiday.</strong> Unlock all daily workouts with a Premium plan or buy them individually for €3.99.
                     </p>
                   </div>
                 </div>
