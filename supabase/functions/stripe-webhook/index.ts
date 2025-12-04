@@ -170,6 +170,71 @@ async function isFirstTimeCustomer(userId: string, supabase: any): Promise<boole
   }
 }
 
+// Helper function to send first-purchase welcome message
+async function sendFirstPurchaseWelcome(userId: string, userEmail: string, supabase: any) {
+  logStep("Sending first-purchase welcome message", { userId, email: userEmail });
+  
+  // Get the first-purchase welcome template
+  const { data: template } = await supabase
+    .from('automated_message_templates')
+    .select('subject, content')
+    .eq('template_name', 'First Purchase Welcome')
+    .eq('is_active', true)
+    .single();
+  
+  const subject = template?.subject || '🎉 Welcome to the SmartyGym Family!';
+  const content = template?.content || '<p class="tiptap-paragraph"><strong>Welcome to the SmartyGym Family!</strong></p><p class="tiptap-paragraph">Thank you for making your first purchase! We\'re thrilled to have you with us.</p>';
+  
+  // Send dashboard notification
+  try {
+    await supabase.from('user_system_messages').insert({
+      user_id: userId,
+      message_type: 'welcome',
+      subject: subject,
+      content: content,
+      is_read: false,
+    });
+    logStep("✅ First-purchase welcome dashboard message sent");
+  } catch (notifError) {
+    logStep("ERROR sending first-purchase welcome notification", { error: notifError });
+  }
+  
+  // Send email
+  try {
+    const resend = new Resend(Deno.env.get('RESEND_API_KEY'));
+    await resend.emails.send({
+      from: 'SmartyGym <notifications@smartygym.com>',
+      to: [userEmail],
+      subject: subject,
+      html: `
+        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
+          <h1 style="color: #d4af37; margin-bottom: 20px;">Welcome to the SmartyGym Family! 🎉</h1>
+          <p style="font-size: 16px; line-height: 1.6; margin-bottom: 16px;">Thank you for making your first purchase and trusting SmartyGym with your fitness journey. This is a big step, and we're honored to be part of it.</p>
+          <h2 style="color: #333; font-size: 18px; margin-top: 24px;">What Makes SmartyGym Different</h2>
+          <p style="font-size: 16px; line-height: 1.6; margin-bottom: 16px;">Every workout and training program on SmartyGym is expertly designed by <strong>Haris Falas</strong>, a Sports Scientist with over 20 years of coaching experience and CSCS certification. You're not getting generic AI-generated content – you're getting real expertise from a real professional.</p>
+          <h2 style="color: #333; font-size: 18px; margin-top: 24px;">What You Now Have Access To</h2>
+          <ul style="font-size: 16px; line-height: 1.8; margin-bottom: 24px;">
+            <li>Expert-designed workouts crafted for real results</li>
+            <li>Strategic training programs based on proven methodologies</li>
+            <li>Daily Workout of the Day following smart periodization</li>
+            <li>A community of like-minded fitness enthusiasts</li>
+          </ul>
+          <p style="margin-top: 24px;">
+            <a href="https://smartygym.com/dashboard" style="display: inline-block; background: #d4af37; color: white; padding: 14px 28px; text-decoration: none; border-radius: 4px; font-weight: bold; font-size: 16px;">Go to Dashboard →</a>
+          </p>
+          <p style="font-size: 16px; line-height: 1.6; margin-top: 24px;">Welcome aboard – let's make it happen!</p>
+          <p style="font-size: 16px; margin-top: 16px;"><em>The SmartyGym Team</em></p>
+          <hr style="margin: 32px 0; border: none; border-top: 1px solid #eee;">
+          <p style="font-size: 12px; color: #999;">This email was sent from SmartyGym.</p>
+        </div>
+      `,
+    });
+    logStep("✅ First-purchase welcome email sent", { email: userEmail });
+  } catch (emailError) {
+    logStep("ERROR sending first-purchase welcome email", { error: emailError });
+  }
+}
+
 async function handleSubscriptionCheckout(
   session: Stripe.Checkout.Session,
   supabase: any,
@@ -182,6 +247,10 @@ async function handleSubscriptionCheckout(
     logStep("ERROR: No user_id in session metadata");
     return;
   }
+
+  // Check if this is a first-time customer BEFORE creating subscription
+  const isFirstTime = await isFirstTimeCustomer(userId, supabase);
+  logStep("First-time customer check", { userId, isFirstTime });
 
   // Get subscription details
   const subscriptionId = session.subscription as string;
@@ -301,6 +370,11 @@ async function handleSubscriptionCheckout(
     } else {
       logStep("ERROR: Could not find subscription purchase template");
     }
+    
+    // If first-time customer, also send the special first-purchase welcome message
+    if (isFirstTime) {
+      await sendFirstPurchaseWelcome(userId, userEmail, supabase);
+    }
   }
 }
 
@@ -316,6 +390,10 @@ async function handleOneTimePurchase(
     logStep("ERROR: Missing user_id in metadata");
     return;
   }
+
+  // Check if this is a first-time customer BEFORE recording purchase
+  const isFirstTime = await isFirstTimeCustomer(userId, supabase);
+  logStep("First-time customer check (standalone)", { userId, isFirstTime });
 
   // Get payment intent to get amount
   const paymentIntentId = session.payment_intent as string;
@@ -440,6 +518,11 @@ async function handleOneTimePurchase(
     }
   } else {
     logStep("ERROR: Could not find purchase template", { messageType });
+  }
+  
+  // If first-time customer, also send the special first-purchase welcome message
+  if (isFirstTime) {
+    await sendFirstPurchaseWelcome(userId, userEmail, supabase);
   }
 }
 
