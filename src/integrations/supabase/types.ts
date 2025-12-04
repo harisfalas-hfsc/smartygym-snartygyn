@@ -773,6 +773,33 @@ export type Database = {
         }
         Relationships: []
       }
+      pending_content_notifications: {
+        Row: {
+          content_category: string | null
+          content_id: string
+          content_name: string
+          content_type: string
+          created_at: string | null
+          id: string
+        }
+        Insert: {
+          content_category?: string | null
+          content_id: string
+          content_name: string
+          content_type: string
+          created_at?: string | null
+          id?: string
+        }
+        Update: {
+          content_category?: string | null
+          content_id?: string
+          content_name?: string
+          content_type?: string
+          created_at?: string | null
+          id?: string
+        }
+        Relationships: []
+      }
       plan_generation_usage: {
         Row: {
           generated_at: string
