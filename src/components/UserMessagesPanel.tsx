@@ -5,6 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { format } from "date-fns";
 import { MessageSquare, Mail, Paperclip, Download, Zap, User, Eye, EyeOff, Trash2, ExternalLink } from "lucide-react";
+import { HTMLContent } from "@/components/ui/html-content";
 import { useState } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast } from "sonner";
@@ -298,7 +299,6 @@ export const UserMessagesPanel = () => {
 
   const renderSystemMessage = (message: SystemMessage, showBorder = true) => {
     const link = extractLink(message.content);
-    const plainContent = message.content.replace(/<[^>]*>/g, '').trim();
     
     return (
       <Card key={`system-${message.id}`} className={!message.is_read && showBorder ? 'border-blue-500' : ''}>
@@ -338,8 +338,8 @@ export const UserMessagesPanel = () => {
                   </Button>
                 </div>
               </div>
-              <div className="bg-muted p-4 rounded-lg text-sm text-display break-words-safe content-container mb-3">
-                {plainContent}
+              <div className="bg-muted p-4 rounded-lg text-sm content-container mb-3">
+                <HTMLContent content={message.content} />
               </div>
               <div className="flex items-center gap-4 flex-wrap">
                 <span className="text-xs text-muted-foreground">
