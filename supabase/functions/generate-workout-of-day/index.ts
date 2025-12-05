@@ -360,31 +360,59 @@ Respond in this EXACT JSON format:
       const equipSuffix = equipment === "BODYWEIGHT" ? "BW" : "EQ";
       const workoutId = `WOD-${prefix}-${equipSuffix}-${timestamp}`;
 
-      // Generate image
+      // Generate image with retry logic
       logStep(`Generating image for ${equipment} workout`);
       
-      const imageResponse = await fetch(`${supabaseUrl}/functions/v1/generate-workout-image`, {
-        method: "POST",
-        headers: {
-          "Authorization": `Bearer ${supabaseServiceKey}`,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          name: workoutContent.name,
-          category: category,
-          format: format,
-          difficulty_stars: selectedDifficulty.stars,
-          equipment: equipment
-        }),
-      });
-
       let imageUrl = null;
-      if (imageResponse.ok) {
-        const imageData = await imageResponse.json();
-        imageUrl = imageData.imageUrl || imageData.image_url;
-        logStep(`Image generated for ${equipment}`, { imageUrl });
-      } else {
-        logStep(`Image generation failed for ${equipment}`, { status: imageResponse.status });
+      const maxRetries = 2;
+      
+      for (let attempt = 1; attempt <= maxRetries; attempt++) {
+        try {
+          const imageResponse = await fetch(`${supabaseUrl}/functions/v1/generate-workout-image`, {
+            method: "POST",
+            headers: {
+              "Authorization": `Bearer ${supabaseServiceKey}`,
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              name: workoutContent.name,
+              category: category,
+              format: format,
+              difficulty_stars: selectedDifficulty.stars,
+              equipment: equipment
+            }),
+          });
+
+          if (imageResponse.ok) {
+            const imageData = await imageResponse.json();
+            imageUrl = imageData.imageUrl || imageData.image_url;
+            
+            if (imageUrl) {
+              logStep(`Image generated for ${equipment} (attempt ${attempt})`, { imageUrl: imageUrl.substring(0, 80) + "..." });
+              break; // Success, exit retry loop
+            } else {
+              logStep(`Image response OK but no URL returned for ${equipment} (attempt ${attempt})`, { imageData });
+            }
+          } else {
+            const errorText = await imageResponse.text();
+            logStep(`Image generation HTTP error for ${equipment} (attempt ${attempt})`, { 
+              status: imageResponse.status, 
+              error: errorText.substring(0, 200) 
+            });
+          }
+        } catch (imgError: any) {
+          logStep(`Image generation exception for ${equipment} (attempt ${attempt})`, { error: imgError.message });
+        }
+        
+        // Wait before retry
+        if (attempt < maxRetries) {
+          logStep(`Retrying image generation for ${equipment}...`);
+          await new Promise(r => setTimeout(r, 2000));
+        }
+      }
+      
+      if (!imageUrl) {
+        logStep(`WARNING: All image generation attempts failed for ${equipment} - Stripe product will have no image`);
       }
 
       // Create Stripe product

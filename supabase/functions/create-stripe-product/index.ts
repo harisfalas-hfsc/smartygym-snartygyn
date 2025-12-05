@@ -18,7 +18,17 @@ serve(async (req) => {
       throw new Error("Name and price are required");
     }
 
-    console.log("Creating Stripe product:", { name, price, contentType, imageUrl });
+    // Enhanced logging for debugging image issues
+    console.log("[CREATE-STRIPE-PRODUCT] Request received:", { 
+      name, 
+      price, 
+      contentType, 
+      imageUrl: imageUrl ? `${imageUrl.substring(0, 50)}...` : "NULL/MISSING" 
+    });
+
+    if (!imageUrl) {
+      console.warn("[CREATE-STRIPE-PRODUCT] WARNING: No imageUrl provided - Stripe product will be created WITHOUT an image");
+    }
 
     const stripe = new Stripe(Deno.env.get("STRIPE_SECRET_KEY") || "", {
       apiVersion: "2025-08-27.basil",
@@ -33,6 +43,9 @@ serve(async (req) => {
     // Add image if provided
     if (imageUrl) {
       productData.images = [imageUrl];
+      console.log("[CREATE-STRIPE-PRODUCT] Image will be added to product");
+    } else {
+      console.log("[CREATE-STRIPE-PRODUCT] No image - product created without image");
     }
 
     const product = await stripe.products.create(productData);
