@@ -36,24 +36,24 @@ serve(async (req) => {
     ];
 
     // Build difficulty label
-    let difficultyLabel = "Beginner";
-    if (difficulty_stars > 4) difficultyLabel = "Advanced";
-    else if (difficulty_stars > 2) difficultyLabel = "Intermediate";
+    let difficultyLabel = "beginner";
+    if (difficulty_stars > 4) difficultyLabel = "advanced";
+    else if (difficulty_stars > 2) difficultyLabel = "intermediate";
 
-    // Create a detailed prompt for image generation
-    const imagePrompt = `Create a professional fitness workout cover image for "${name}". 
-Style: Modern, energetic, and motivating fitness photography.
-Category: ${category}
-Format: ${format}
-Difficulty: ${difficultyLabel}
-Requirements:
-- High-energy, dynamic composition
-- Professional fitness setting
-- Clean, vibrant colors
-- No text or watermarks
-- Focus on the type of movement/exercise related to ${category} and ${format}
-- Should look unique and different from these existing workouts: ${existingImagePrompts.slice(0, 10).join(", ")}
-Aspect ratio: 16:9 landscape format suitable for a workout cover image.`;
+    // Create a prompt that prevents text overlays - NO metadata as key:value pairs
+    const imagePrompt = `Create a professional fitness workout cover image.
+
+CRITICAL REQUIREMENT: Generate ONLY a photograph with NO TEXT whatsoever. Absolutely NO words, NO labels, NO titles, NO overlays, NO watermarks, NO captions of any kind. Pure photography only.
+
+Visual Direction:
+- Show a dynamic ${difficultyLabel}-level fitness scene that captures the energy of "${name}"
+- The exercise style should visually reflect ${category.toLowerCase()} training with ${format.toLowerCase()} workout energy
+- High-energy, professional fitness photography in a gym, outdoor, or home workout setting
+- Clean, vibrant colors with excellent lighting
+- 16:9 landscape aspect ratio suitable for a cover image
+- Completely unique composition, different from: ${existingImagePrompts.slice(0, 10).join(", ")}
+
+Remember: ZERO text or writing of any kind on the image. Only show people exercising or fitness equipment/environments.`;
 
     console.log("Generating image with prompt:", imagePrompt);
 
