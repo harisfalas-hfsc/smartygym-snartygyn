@@ -13,6 +13,7 @@ import { UserMessagesPanel } from "@/components/UserMessagesPanel";
 import { MyOrders } from "@/components/MyOrders";
 import { useQuery } from "@tanstack/react-query";
 import { useAccessControl } from "@/hooks/useAccessControl";
+import { useShowBackButton } from "@/hooks/useShowBackButton";
 import { 
   Heart, 
   CheckCircle, 
@@ -125,6 +126,7 @@ export default function UserDashboard() {
   const location = useLocation();
   const [searchParams] = useSearchParams();
   const { toast } = useToast();
+  const { goBack } = useShowBackButton();
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
   const [managingSubscription, setManagingSubscription] = useState(false);
@@ -558,6 +560,30 @@ export default function UserDashboard() {
     }
   };
 
+  // Helper function to get route type from content ID prefix
+  const getRouteTypeFromId = (contentType: string, contentId: string): string => {
+    if (contentType === "workout") {
+      if (contentId.startsWith("WOD-")) return "wod";
+      if (contentId.startsWith("S-")) return "strength";
+      if (contentId.startsWith("CB-")) return "calorie-burning";
+      if (contentId.startsWith("M-")) return "metabolic";
+      if (contentId.startsWith("C-")) return "cardio";
+      if (contentId.startsWith("MB-")) return "mobility";
+      if (contentId.startsWith("P-")) return "power";
+      if (contentId.startsWith("CH-")) return "challenge";
+      return "strength"; // default fallback
+    } else {
+      // programs
+      if (contentId.startsWith("HY-")) return "hypertrophy";
+      if (contentId.startsWith("FS-")) return "functional-strength";
+      if (contentId.startsWith("CA-")) return "cardio";
+      if (contentId.startsWith("WL-")) return "weight-loss";
+      if (contentId.startsWith("LB-")) return "back-care";
+      if (contentId.startsWith("MS-")) return "mobility";
+      return "strength"; // default fallback
+    }
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -590,7 +616,7 @@ export default function UserDashboard() {
         <Button
           variant="ghost"
           size="sm"
-          onClick={() => navigate(-1)}
+          onClick={goBack}
           className="mb-6"
         >
           <ArrowLeft className="mr-2 h-4 w-4" />
@@ -1442,10 +1468,11 @@ export default function UserDashboard() {
                               disabled={purchase.content_deleted}
                               variant={purchase.content_deleted ? "outline" : "default"}
                               onClick={() => {
+                                const routeType = getRouteTypeFromId(purchase.content_type, purchase.content_id);
                                 if (purchase.content_type === "workout") {
-                                  navigate(`/workout/detail/${purchase.content_id}`);
+                                  navigate(`/workout/${routeType}/${purchase.content_id}`);
                                 } else {
-                                  navigate(`/trainingprogram/detail/${purchase.content_id}`);
+                                  navigate(`/trainingprogram/${routeType}/${purchase.content_id}`);
                                 }
                               }}
                             >

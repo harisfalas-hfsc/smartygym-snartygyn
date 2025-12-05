@@ -1,7 +1,7 @@
-import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { AlertCircle, ArrowLeft, Search } from "lucide-react";
+import { useShowBackButton } from "@/hooks/useShowBackButton";
 
 interface ContentNotFoundProps {
   contentType: "workout" | "program";
@@ -9,10 +9,10 @@ interface ContentNotFoundProps {
 }
 
 export const ContentNotFound = ({ contentType, contentId }: ContentNotFoundProps) => {
-  const navigate = useNavigate();
+  const { goBack } = useShowBackButton();
   
   const contentTypeLabel = contentType === "workout" ? "Workout" : "Training Program";
-  const libraryPath = contentType === "workout" ? "/workouts" : "/training-programs";
+  const libraryPath = contentType === "workout" ? "/workout" : "/trainingprogram";
 
   return (
     <div className="min-h-screen bg-background flex items-center justify-center p-4">
@@ -33,7 +33,7 @@ export const ContentNotFound = ({ contentType, contentId }: ContentNotFoundProps
 
           <div className="pt-6 space-y-3">
             <Button 
-              onClick={() => navigate(libraryPath)} 
+              onClick={() => window.location.href = libraryPath} 
               className="w-full max-w-sm" 
               size="lg"
             >
@@ -42,7 +42,7 @@ export const ContentNotFound = ({ contentType, contentId }: ContentNotFoundProps
             </Button>
             
             <Button 
-              onClick={() => navigate(-1)} 
+              onClick={goBack} 
               variant="outline" 
               className="w-full max-w-sm"
             >

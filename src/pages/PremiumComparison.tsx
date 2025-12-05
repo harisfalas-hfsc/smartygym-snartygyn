@@ -12,7 +12,7 @@ import { useAccessControl } from "@/hooks/useAccessControl";
 
 const PremiumComparison = () => {
   const navigate = useNavigate();
-  useShowBackButton();
+  const { goBack } = useShowBackButton();
   const [user, setUser] = useState<User | null>(null);
   const { userTier } = useAccessControl();
   const isPremium = userTier === "premium";
@@ -155,7 +155,7 @@ const PremiumComparison = () => {
           <Button
             variant="ghost"
             size="sm"
-            onClick={() => navigate(-1)}
+            onClick={goBack}
             className="mb-6"
           >
             <ArrowLeft className="w-4 h-4 mr-2" />

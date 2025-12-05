@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Lock, Crown } from "lucide-react";
 import { useAccessControl } from "@/hooks/useAccessControl";
 import { PurchaseButton } from "@/components/PurchaseButton";
+import { useShowBackButton } from "@/hooks/useShowBackButton";
 
 interface AccessGateProps {
   children: ReactNode;
@@ -31,6 +32,7 @@ export const AccessGate = ({
 }: AccessGateProps) => {
   const { user, userTier, isLoading, hasPurchased } = useAccessControl();
   const navigate = useNavigate();
+  const { goBack } = useShowBackButton();
 
   // Debug logging for access control decisions
   if (import.meta.env.DEV) {
@@ -69,7 +71,7 @@ export const AccessGate = ({
                   Log In / Sign Up
                 </Button>
                 <Button 
-                  onClick={() => navigate(-1)} 
+                  onClick={goBack} 
                   variant="outline" 
                   className="w-full"
                 >
@@ -118,7 +120,7 @@ export const AccessGate = ({
                 Log In / Sign Up
               </Button>
               <Button 
-                onClick={() => navigate(-1)} 
+                onClick={goBack} 
                 variant="outline" 
                 className="w-full"
               >
@@ -174,7 +176,7 @@ export const AccessGate = ({
                 View Premium Plans
               </Button>
               <Button 
-                onClick={() => navigate(-1)} 
+                onClick={goBack} 
                 variant="outline" 
                 className="w-full"
               >
@@ -212,7 +214,7 @@ export const AccessGate = ({
                 View Premium Plans
               </Button>
               <Button 
-                onClick={() => navigate(-1)} 
+                onClick={goBack} 
                 variant="outline" 
                 className="w-full"
               >

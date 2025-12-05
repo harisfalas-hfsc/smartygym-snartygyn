@@ -1,4 +1,4 @@
-import { useNavigate, useParams } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import { Helmet } from "react-helmet";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft } from "lucide-react";
@@ -7,11 +7,12 @@ import { AccessGate } from "@/components/AccessGate";
 import { useWorkoutData } from "@/hooks/useWorkoutData";
 import { useAccessControl } from "@/hooks/useAccessControl";
 import { ContentNotFound } from "@/components/ContentNotFound";
+import { useShowBackButton } from "@/hooks/useShowBackButton";
 
 const IndividualWorkout = () => {
-  const navigate = useNavigate();
   const { type, id } = useParams();
   const { userTier, hasPurchased } = useAccessControl();
+  const { goBack } = useShowBackButton();
   
   // Helper function to format focus label
   const getFocusLabel = (type: string | undefined): string => {
@@ -91,7 +92,7 @@ const IndividualWorkout = () => {
             <div className="mb-6">
               <Button
                 variant="outline"
-                onClick={() => navigate(-1)}
+                onClick={goBack}
                 className="gap-2"
               >
                 <ArrowLeft className="mr-2 h-4 w-4" />
