@@ -36,25 +36,25 @@ serve(async (req) => {
     ];
 
     // Build difficulty label
-    let difficultyLabel = "Beginner";
-    if (difficulty_stars > 4) difficultyLabel = "Advanced";
-    else if (difficulty_stars > 2) difficultyLabel = "Intermediate";
+    let difficultyLabel = "beginner";
+    if (difficulty_stars > 4) difficultyLabel = "advanced";
+    else if (difficulty_stars > 2) difficultyLabel = "intermediate";
 
-    // Create a detailed prompt for image generation
-    const imagePrompt = `Create a professional fitness training program cover image for "${name}". 
-Style: Modern, inspiring, and motivating fitness photography showing progression and dedication.
-Category: ${category}
-Duration: ${weeks} weeks
-Difficulty: ${difficultyLabel}
-Requirements:
-- High-quality, inspirational composition showing fitness journey/transformation
-- Professional fitness or gym setting
+    // Create a prompt that prevents text overlays - NO metadata as key:value pairs
+    const imagePrompt = `Create a professional fitness training program cover image.
+
+CRITICAL REQUIREMENT: Generate ONLY a photograph with NO TEXT whatsoever. Absolutely NO words, NO labels, NO titles, NO overlays, NO watermarks, NO captions of any kind. Pure photography only.
+
+Visual Direction:
+- Show an inspiring ${difficultyLabel}-level fitness journey scene that captures the essence of "${name}"
+- The training style should visually reflect ${category.toLowerCase()} programming with a sense of ${weeks}-week progression
+- High-quality, inspirational composition showing fitness dedication and transformation
+- Professional fitness or gym setting with excellent lighting
 - Clean, vibrant, energetic colors
-- No text or watermarks
-- Focus on the type of training related to ${category}
-- Should look completely unique and different from these existing programs and workouts: ${existingImagePrompts.slice(0, 10).join(", ")}
-- Convey a sense of structured program and long-term commitment
-Aspect ratio: 16:9 landscape format suitable for a training program cover image.`;
+- 16:9 landscape aspect ratio suitable for a program cover image
+- Completely unique composition, different from: ${existingImagePrompts.slice(0, 10).join(", ")}
+
+Remember: ZERO text or writing of any kind on the image. Only show people training, fitness equipment, or inspiring gym/workout environments.`;
 
     console.log("Generating program image with prompt:", imagePrompt);
 
