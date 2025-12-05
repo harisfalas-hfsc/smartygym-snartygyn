@@ -7,7 +7,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Badge } from "@/components/ui/badge";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Plus, Edit, Trash2, Eye, EyeOff, Search, Download, Filter, Bot, User, Copy } from "lucide-react";
+import { Plus, Edit, Trash2, Eye, EyeOff, Search, Download, Filter, Bot, User, Copy, Loader2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { ProgramEditDialog } from "./ProgramEditDialog";
 
@@ -34,7 +34,8 @@ export const ProgramsManager = ({ externalDialog, setExternalDialog }: ProgramsM
   const [programs, setPrograms] = useState<Program[]>([]);
   const [filteredPrograms, setFilteredPrograms] = useState<Program[]>([]);
   const [loading, setLoading] = useState(true);
-  const [editingProgram, setEditingProgram] = useState<Program | null>(null);
+  const [editLoading, setEditLoading] = useState(false);
+  const [editingProgram, setEditingProgram] = useState<any>(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [selectedPrograms, setSelectedPrograms] = useState<string[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
@@ -182,9 +183,29 @@ export const ProgramsManager = ({ externalDialog, setExternalDialog }: ProgramsM
     }
   };
 
-  const handleEdit = (program: Program) => {
-    setEditingProgram(program);
-    setIsDialogOpen(true);
+  const handleEdit = async (program: Program) => {
+    setEditLoading(true);
+    try {
+      const { data: fullProgram, error } = await supabase
+        .from('admin_training_programs')
+        .select('*')
+        .eq('id', program.id)
+        .single();
+
+      if (error) throw error;
+      
+      setEditingProgram(fullProgram);
+      setIsDialogOpen(true);
+    } catch (error) {
+      console.error('Error fetching program details:', error);
+      toast({
+        title: "Error",
+        description: "Failed to load program details",
+        variant: "destructive",
+      });
+    } finally {
+      setEditLoading(false);
+    }
   };
 
   const handleNew = () => {
@@ -584,8 +605,9 @@ export const ProgramsManager = ({ externalDialog, setExternalDialog }: ProgramsM
                           size="icon"
                           onClick={() => handleEdit(program)}
                           title="Edit"
+                          disabled={editLoading}
                         >
-                          <Edit className="h-4 w-4" />
+                          {editLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Edit className="h-4 w-4" />}
                         </Button>
                         <Button
                           variant="ghost"
