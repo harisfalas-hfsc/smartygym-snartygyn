@@ -26,7 +26,20 @@ serve(async (req) => {
       imageUrl: imageUrl ? `${imageUrl.substring(0, 50)}...` : "NULL/MISSING" 
     });
 
-    if (!imageUrl) {
+    // CRITICAL: URL validation - reject invalid URLs to prevent Stripe products without images
+    let validatedImageUrl = null;
+    if (imageUrl) {
+      if (imageUrl.startsWith('https://')) {
+        validatedImageUrl = imageUrl;
+        console.log("[CREATE-STRIPE-PRODUCT] Image URL validated successfully");
+      } else if (imageUrl.startsWith('http://')) {
+        console.warn("[CREATE-STRIPE-PRODUCT] WARNING: HTTP URL provided, converting to HTTPS");
+        validatedImageUrl = imageUrl.replace('http://', 'https://');
+      } else {
+        console.error("[CREATE-STRIPE-PRODUCT] REJECTED: Invalid image URL format (not absolute URL):", imageUrl.substring(0, 100));
+        throw new Error(`Invalid image URL format: URL must start with https:// - received: ${imageUrl.substring(0, 50)}...`);
+      }
+    } else {
       console.warn("[CREATE-STRIPE-PRODUCT] WARNING: No imageUrl provided - Stripe product will be created WITHOUT an image");
     }
 
@@ -40,12 +53,12 @@ serve(async (req) => {
       description: `${contentType}: ${name}`,
     };
 
-    // Add image if provided
-    if (imageUrl) {
-      productData.images = [imageUrl];
-      console.log("[CREATE-STRIPE-PRODUCT] Image will be added to product");
+    // Add validated image if provided
+    if (validatedImageUrl) {
+      productData.images = [validatedImageUrl];
+      console.log("[CREATE-STRIPE-PRODUCT] Image will be added to product:", validatedImageUrl.substring(0, 80));
     } else {
-      console.log("[CREATE-STRIPE-PRODUCT] No image - product created without image");
+      console.log("[CREATE-STRIPE-PRODUCT] No valid image - product created without image");
     }
 
     const product = await stripe.products.create(productData);

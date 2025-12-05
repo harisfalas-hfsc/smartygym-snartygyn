@@ -440,6 +440,23 @@ Respond in this EXACT JSON format:
         stripeProductId = stripeData.product_id;
         stripePriceId = stripeData.price_id;
         logStep(`Stripe product created for ${equipment}`, { stripeProductId, stripePriceId });
+        
+        // POST-CREATION VERIFICATION: Verify Stripe product has image
+        if (stripeProductId && imageUrl) {
+          try {
+            const product = await stripe.products.retrieve(stripeProductId);
+            if (!product.images || product.images.length === 0) {
+              logStep(`CRITICAL WARNING: Stripe product ${stripeProductId} created WITHOUT image despite imageUrl being provided`);
+              // Attempt to fix by updating with image
+              await stripe.products.update(stripeProductId, { images: [imageUrl] });
+              logStep(`Image fix attempted for ${stripeProductId}`);
+            } else {
+              logStep(`✅ Verified: Stripe product ${stripeProductId} has image: ${product.images[0].substring(0, 50)}...`);
+            }
+          } catch (verifyError: any) {
+            logStep(`Failed to verify/fix Stripe product image for ${equipment}`, { error: verifyError.message });
+          }
+        }
       } else {
         logStep(`Stripe product creation failed for ${equipment}`, { status: stripeResponse.status });
       }
