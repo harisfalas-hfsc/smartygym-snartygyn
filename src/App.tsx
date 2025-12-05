@@ -9,6 +9,7 @@ import { ProtectedRoute } from "./components/ProtectedRoute";
 import { AuthenticatedLayout } from "./components/AuthenticatedLayout";
 import { AdminRoute } from "./components/AdminRoute";
 import { AccessControlProvider } from "./contexts/AccessControlContext";
+import { NavigationHistoryProvider } from "./contexts/NavigationHistoryContext";
 import { Navigation } from "./components/Navigation";
 import { Footer } from "./components/Footer";
 import { ScrollToTop } from "./components/ScrollToTop";
@@ -203,7 +204,9 @@ const App = () => (
         <Toaster />
         <Sonner />
         <BrowserRouter>
-          <AppContent />
+          <NavigationHistoryProvider>
+            <AppContent />
+          </NavigationHistoryProvider>
         </BrowserRouter>
       </TooltipProvider>
     </ThemeProvider>
