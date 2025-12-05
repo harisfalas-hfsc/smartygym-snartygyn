@@ -9,13 +9,14 @@ import { Progress } from "@/components/ui/progress";
 import { Skeleton } from "@/components/ui/skeleton";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { toast } from "sonner";
-import { Flame, Play, RefreshCw, Calendar, Dumbbell, Star, TrendingUp, Clock, ExternalLink, AlertTriangle } from "lucide-react";
+import { Flame, Play, RefreshCw, Calendar, Dumbbell, Star, TrendingUp, Clock, ExternalLink, AlertTriangle, ImageIcon } from "lucide-react";
 import { format } from "date-fns";
 
 const CATEGORY_CYCLE = ["STRENGTH", "CALORIE BURNING", "METABOLIC", "CARDIO", "MOBILITY & STABILITY", "CHALLENGE"];
 
 export const WODManager = () => {
   const [isGenerating, setIsGenerating] = useState(false);
+  const [isSyncingImages, setIsSyncingImages] = useState(false);
   const queryClient = useQueryClient();
 
   // Fetch WOD state
@@ -92,6 +93,47 @@ export const WODManager = () => {
     }
   };
 
+  const handleSyncStripeImages = async () => {
+    setIsSyncingImages(true);
+    try {
+      const { data, error } = await supabase.functions.invoke("sync-stripe-images", {
+        body: {},
+      });
+
+      if (error) throw error;
+
+      const results = data.results;
+      const totalUpdated = results.workouts.updated + results.programs.updated;
+      const totalSkipped = results.workouts.skipped + results.programs.skipped;
+      const totalFailed = results.workouts.failed + results.programs.failed;
+
+      if (totalUpdated > 0) {
+        toast.success(`Synced ${totalUpdated} Stripe product images`, {
+          description: `${totalSkipped} already up-to-date, ${totalFailed} failed`,
+        });
+      } else if (totalSkipped > 0) {
+        toast.info("All Stripe images already up-to-date", {
+          description: `${totalSkipped} products checked`,
+        });
+      } else {
+        toast.warning("No products to sync", {
+          description: "No workouts or programs with Stripe products found",
+        });
+      }
+
+      // Refresh queries
+      queryClient.invalidateQueries({ queryKey: ["wod-history"] });
+      queryClient.invalidateQueries({ queryKey: ["current-wod"] });
+    } catch (error: any) {
+      console.error("Stripe image sync error:", error);
+      toast.error("Failed to sync Stripe images", {
+        description: error.message || "Please try again",
+      });
+    } finally {
+      setIsSyncingImages(false);
+    }
+  };
+
   const getNextCategory = () => {
     if (!wodState) return CATEGORY_CYCLE[0];
     return CATEGORY_CYCLE[wodState.day_count % 6];
@@ -134,47 +176,63 @@ export const WODManager = () => {
           </p>
         </div>
         
-        <AlertDialog>
-          <AlertDialogTrigger asChild>
-            <Button 
-              className="flex items-center gap-2"
-              disabled={isGenerating}
-            >
-              {isGenerating ? (
-                <RefreshCw className="h-4 w-4 animate-spin" />
-              ) : (
-                <Play className="h-4 w-4" />
-              )}
-              {isGenerating ? "Generating..." : "Generate New WOD"}
-            </Button>
-          </AlertDialogTrigger>
-          <AlertDialogContent>
-            <AlertDialogHeader>
-              <AlertDialogTitle className="flex items-center gap-2">
-                <AlertTriangle className="h-5 w-5 text-yellow-500" />
-                Generate New Workout of the Day?
-              </AlertDialogTitle>
-              <AlertDialogDescription className="space-y-2">
-                <p>This will:</p>
-                <ul className="list-disc list-inside space-y-1 text-sm">
-                  <li>Move the current WOD to its category (if exists)</li>
-                  <li>Generate a new <strong>{getNextCategory()}</strong> workout</li>
-                  <li>Create a Stripe product for €3.99</li>
-                  <li>Generate a unique workout image</li>
-                </ul>
-                <p className="text-yellow-500 mt-2">
-                  Note: The daily cron job runs at 7:00 AM UTC automatically.
-                </p>
-              </AlertDialogDescription>
-            </AlertDialogHeader>
-            <AlertDialogFooter>
-              <AlertDialogCancel>Cancel</AlertDialogCancel>
-              <AlertDialogAction onClick={handleGenerateWOD}>
-                Generate WOD
-              </AlertDialogAction>
-            </AlertDialogFooter>
-          </AlertDialogContent>
-        </AlertDialog>
+        <div className="flex items-center gap-2">
+          <Button 
+            variant="outline"
+            className="flex items-center gap-2"
+            disabled={isSyncingImages}
+            onClick={handleSyncStripeImages}
+          >
+            {isSyncingImages ? (
+              <RefreshCw className="h-4 w-4 animate-spin" />
+            ) : (
+              <ImageIcon className="h-4 w-4" />
+            )}
+            {isSyncingImages ? "Syncing..." : "Sync Stripe Images"}
+          </Button>
+          
+          <AlertDialog>
+            <AlertDialogTrigger asChild>
+              <Button 
+                className="flex items-center gap-2"
+                disabled={isGenerating}
+              >
+                {isGenerating ? (
+                  <RefreshCw className="h-4 w-4 animate-spin" />
+                ) : (
+                  <Play className="h-4 w-4" />
+                )}
+                {isGenerating ? "Generating..." : "Generate New WOD"}
+              </Button>
+            </AlertDialogTrigger>
+            <AlertDialogContent>
+              <AlertDialogHeader>
+                <AlertDialogTitle className="flex items-center gap-2">
+                  <AlertTriangle className="h-5 w-5 text-yellow-500" />
+                  Generate New Workout of the Day?
+                </AlertDialogTitle>
+                <AlertDialogDescription className="space-y-2">
+                  <p>This will:</p>
+                  <ul className="list-disc list-inside space-y-1 text-sm">
+                    <li>Move the current WOD to its category (if exists)</li>
+                    <li>Generate a new <strong>{getNextCategory()}</strong> workout</li>
+                    <li>Create a Stripe product for €3.99</li>
+                    <li>Generate a unique workout image</li>
+                  </ul>
+                  <p className="text-yellow-500 mt-2">
+                    Note: The daily cron job runs at 7:00 AM UTC automatically.
+                  </p>
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogCancel>Cancel</AlertDialogCancel>
+                <AlertDialogAction onClick={handleGenerateWOD}>
+                  Generate WOD
+                </AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
+        </div>
       </div>
 
       {/* Statistics Cards */}
