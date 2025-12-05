@@ -83,3 +83,6 @@ verify_jwt = false
 
 [functions.sync-stripe-images]
 verify_jwt = false
+
+[functions.fix-program-images]
+verify_jwt = false
