@@ -282,6 +282,26 @@ export const WorkoutEditDialog = ({ workout, open, onOpenChange, onSave }: Worko
           .eq('id', workout.id);
 
         if (error) throw error;
+
+        // Sync image to Stripe if image changed and Stripe product exists
+        if (stripeProductId && imageUrl && imageUrl !== workout.image_url) {
+          try {
+            const { error: stripeUpdateError } = await supabase.functions.invoke('update-stripe-product', {
+              body: {
+                productId: stripeProductId,
+                imageUrl: imageUrl
+              }
+            });
+            if (stripeUpdateError) {
+              console.error('Failed to sync image to Stripe:', stripeUpdateError);
+            } else {
+              console.log('✅ Image synced to Stripe product');
+            }
+          } catch (syncError) {
+            console.error('Error syncing image to Stripe:', syncError);
+          }
+        }
+
         toast({ title: "Success", description: "Workout updated successfully" });
       } else {
         // Insert new
