@@ -1,11 +1,9 @@
 import { useParams } from "react-router-dom";
 import { Helmet } from "react-helmet";
 import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
 import { ArrowLeft } from "lucide-react";
 import { WorkoutDisplay } from "@/components/WorkoutDisplay";
 import { AccessGate } from "@/components/AccessGate";
-import { PurchaseButton } from "@/components/PurchaseButton";
 import { useTrainingProgramData } from "@/hooks/useTrainingProgramData";
 import { useAccessControl } from "@/hooks/useAccessControl";
 import { ContentNotFound } from "@/components/ContentNotFound";
@@ -116,36 +114,6 @@ const IndividualTrainingProgram = () => {
               </Button>
             </div>
 
-            {/* Show purchase button for standalone purchases */}
-            {canPurchase && !hasAccess && (
-              <div className="mb-6">
-                <Card className="border-primary/50 bg-gradient-to-r from-primary/5 to-primary/10">
-                  <div className="p-6 text-center space-y-4">
-                    <h3 className="text-xl font-semibold">
-                      {alreadyPurchased ? "You Own This Program" : "Get Instant Access"}
-                    </h3>
-                    <p className="text-muted-foreground">
-                      {alreadyPurchased 
-                        ? "This program is in your library" 
-                        : "Purchase this program once and own it forever"}
-                    </p>
-                    <div className="text-3xl font-bold text-primary">
-                      €{Number(dbProgram.price).toFixed(2)}
-                    </div>
-                    {!alreadyPurchased && (
-                      <PurchaseButton
-                        contentId={dbProgram.id}
-                        contentType="program"
-                        contentName={dbProgram.name}
-                        price={Number(dbProgram.price) || 0}
-                        stripeProductId={dbProgram.stripe_product_id}
-                        stripePriceId={dbProgram.stripe_price_id}
-                      />
-                    )}
-                  </div>
-                </Card>
-              </div>
-            )}
 
             <AccessGate 
               requireAuth={true} 
