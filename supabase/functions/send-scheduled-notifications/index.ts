@@ -1,6 +1,7 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 import { Resend } from "https://esm.sh/resend@2.0.0";
+import { wrapInEmailTemplate } from "../_shared/email-utils.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -136,21 +137,22 @@ serve(async (req: Request) => {
 
           if (targetEmails.length > 0) {
             try {
+              // Use the email utility to convert tiptap HTML to email-compatible HTML
+              const ctaUrl = notification.url ? `https://smartygym.com${notification.url}` : undefined;
+              const emailHtml = wrapInEmailTemplate(
+                notification.title,
+                notification.body,
+                ctaUrl,
+                ctaUrl ? "View Now" : undefined
+              );
+
               // Send emails in batches to avoid rate limits
               for (const email of targetEmails) {
                 await resend.emails.send({
                   from: "SmartyGym <notifications@smartygym.com>",
                   to: [email],
                   subject: notification.title,
-                  html: `
-                    <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-                      <h1 style="color: #d4af37;">${notification.title}</h1>
-                      <div style="font-size: 16px; line-height: 1.6;">${notification.body}</div>
-                      ${notification.url ? `<p style="margin-top: 24px;"><a href="https://smartygym.com${notification.url}" style="display: inline-block; background: #d4af37; color: white; padding: 12px 24px; text-decoration: none; border-radius: 4px;">View Now</a></p>` : ''}
-                      <hr style="margin: 24px 0; border: none; border-top: 1px solid #eee;">
-                      <p style="font-size: 12px; color: #666;">This email was sent from SmartyGym.</p>
-                    </div>
-                  `,
+                  html: emailHtml,
                 });
               }
               console.log(`[SEND-SCHEDULED-NOTIFICATIONS] ✅ Sent ${targetEmails.length} emails`);

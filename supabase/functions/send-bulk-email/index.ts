@@ -1,6 +1,7 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.57.2";
 import { Resend } from "https://esm.sh/resend@3.5.0";
+import { convertTiptapToEmailHtml } from "../_shared/email-utils.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -109,6 +110,9 @@ serve(async (req) => {
     
     const resend = new Resend(resendApiKey);
 
+    // Convert tiptap HTML to email-compatible HTML
+    const emailContent = convertTiptapToEmailHtml(message);
+
     // Send emails (in batches to avoid rate limits)
     const results = [];
     const batchSize = 10;
@@ -124,13 +128,13 @@ serve(async (req) => {
             to: [recipient.email!],
             subject: subject,
             html: `
-              <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-                <h2>Hello ${recipient.name}!</h2>
-                <div style="line-height: 1.6; color: #333;">
-                  ${message.replace(/\n/g, '<br>')}
+              <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
+                <h2 style="color: #d4af37; margin-bottom: 16px;">Hello ${recipient.name}!</h2>
+                <div style="line-height: 1.6; color: #333333; font-size: 16px;">
+                  ${emailContent}
                 </div>
-                <hr style="margin: 30px 0; border: none; border-top: 1px solid #eee;">
-                <p style="font-size: 12px; color: #999;">
+                <hr style="margin: 30px 0; border: none; border-top: 1px solid #eeeeee;">
+                <p style="font-size: 12px; color: #999999;">
                   This email was sent from SmartyGym Admin. If you believe this was sent in error, please contact support.
                 </p>
               </div>

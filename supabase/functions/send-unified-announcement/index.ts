@@ -1,6 +1,7 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.57.2";
 import { Resend } from "https://esm.sh/resend@2.0.0";
+import { wrapInEmailTemplate } from "../_shared/email-utils.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -54,6 +55,9 @@ serve(async (req) => {
     let sentCount = 0;
     let failedCount = 0;
 
+    // Prepare email HTML once (same for all recipients)
+    const emailHtml = wrapInEmailTemplate(subject, content);
+
     for (const userId of userIds) {
       try {
         // Send dashboard message
@@ -95,13 +99,13 @@ serve(async (req) => {
           continue;
         }
 
-        // Send email
+        // Send email with properly formatted HTML
         try {
           await resend.emails.send({
             from: "SmartyGym <notifications@smartygym.com>",
             to: [userEmail],
             subject: subject,
-            html: content.replace(/\n/g, '<br>'),
+            html: emailHtml,
           });
         } catch (emailError) {
           logStep("ERROR sending email", { userId, error: emailError });
