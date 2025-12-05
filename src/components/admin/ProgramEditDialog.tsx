@@ -283,12 +283,18 @@ export const ProgramEditDialog = ({ program, open, onOpenChange, onSave }: Progr
         (!stripeProductId || !stripePriceId);
       
       if (shouldCreateStripeProduct) {
+        // Convert relative image path to absolute URL for Stripe
+        let stripeImageUrl = imageUrl;
+        if (imageUrl && imageUrl.startsWith('/')) {
+          stripeImageUrl = `${window.location.origin}${imageUrl}`;
+        }
+        
         const { data: stripeData, error: stripeError } = await supabase.functions.invoke('create-stripe-product', {
           body: {
             name: formData.name,
             price: formData.price,
             contentType: "Training Program",
-            imageUrl: imageUrl
+            imageUrl: stripeImageUrl
           }
         });
 
@@ -358,10 +364,16 @@ export const ProgramEditDialog = ({ program, open, onOpenChange, onSave }: Progr
           // Sync image to Stripe if image changed and Stripe product exists
           if (stripeProductId && imageUrl && imageUrl !== program.image_url) {
             try {
+              // Convert relative image path to absolute URL for Stripe
+              let stripeUpdateImageUrl = imageUrl;
+              if (imageUrl && imageUrl.startsWith('/')) {
+                stripeUpdateImageUrl = `${window.location.origin}${imageUrl}`;
+              }
+              
               const { error: stripeUpdateError } = await supabase.functions.invoke('update-stripe-product', {
                 body: {
                   productId: stripeProductId,
-                  imageUrl: imageUrl
+                  imageUrl: stripeUpdateImageUrl
                 }
               });
               if (stripeUpdateError) {
