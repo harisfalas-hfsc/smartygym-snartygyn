@@ -92,7 +92,7 @@ const TrainingProgramDetail = () => {
     "muscle-hypertrophy": "MUSCLE HYPERTROPHY",
     "weight-loss": "WEIGHT LOSS",
     "low-back-pain": "LOW BACK PAIN",
-    "mobility-stability": "MOBILITY/STABILITY"
+    "mobility-stability": "MOBILITY & STABILITY"
   };
 
   const programTitles: { [key: string]: string } = {
