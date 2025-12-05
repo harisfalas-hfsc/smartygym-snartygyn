@@ -692,7 +692,7 @@ const Community = () => {
                                 <Link 
                                   to={item.content_type === "workout" 
                                     ? `/workout/${item.workout_type}/${item.content_id}`
-                                    : `/training-programs/${item.program_type}/${item.content_id}`
+                                    : `/trainingprogram/${item.program_type}/${item.content_id}`
                                   }
                                   className="font-medium text-xs md:text-sm truncate text-primary hover:underline"
                                 >
@@ -850,7 +850,7 @@ const Community = () => {
                             <>
                               Program:{" "}
                               <Link
-                                to={`/training-programs/${comment.program_type}/${comment.program_id}`}
+                                to={`/trainingprogram/${comment.program_type}/${comment.program_id}`}
                                 className="hover:underline font-semibold"
                               >
                                 {comment.program_name}

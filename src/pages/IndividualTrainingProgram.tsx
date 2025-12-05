@@ -1,4 +1,4 @@
-import { useNavigate, useParams } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import { Helmet } from "react-helmet";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -9,11 +9,12 @@ import { PurchaseButton } from "@/components/PurchaseButton";
 import { useTrainingProgramData } from "@/hooks/useTrainingProgramData";
 import { useAccessControl } from "@/hooks/useAccessControl";
 import { ContentNotFound } from "@/components/ContentNotFound";
+import { useShowBackButton } from "@/hooks/useShowBackButton";
 
 const IndividualTrainingProgram = () => {
-  const navigate = useNavigate();
   const { type, id } = useParams();
   const { userTier, hasPurchased } = useAccessControl();
+  const { goBack } = useShowBackButton();
   
   // Helper function to format focus label
   const getFocusLabel = (type: string | undefined): string => {
@@ -107,7 +108,7 @@ const IndividualTrainingProgram = () => {
             <div className="mb-6">
               <Button
                 variant="outline"
-                onClick={() => navigate(-1)}
+                onClick={goBack}
                 className="gap-2"
               >
                 <ArrowLeft className="mr-2 h-4 w-4" />

@@ -96,10 +96,10 @@ const About = () => {
         <div className="container mx-auto max-w-6xl px-4 py-8">
           
           {/* Back Button */}
-          {showBackButton && (
+          {showBackButton.canGoBack && (
             <Button 
               variant="ghost" 
-              onClick={() => navigate(-1)}
+              onClick={showBackButton.goBack}
               className="mb-6 gap-2"
             >
               <ArrowLeft className="w-4 h-4" />

@@ -14,10 +14,12 @@ import { User } from "@supabase/supabase-js";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
 import { SEOEnhancer } from "@/components/SEOEnhancer";
 import { generateSoftwareApplicationSchema, generateBreadcrumbSchema } from "@/utils/seoHelpers";
+import { useShowBackButton } from "@/hooks/useShowBackButton";
 
 const MacroTrackingCalculator = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { goBack } = useShowBackButton();
   const [age, setAge] = useState("");
   const [weight, setWeight] = useState("");
   const [height, setHeight] = useState("");
@@ -209,7 +211,7 @@ const MacroTrackingCalculator = () => {
         <Button
           variant="ghost"
           size="sm"
-          onClick={() => navigate(-1)}
+          onClick={goBack}
           className="mb-4"
         >
           <ArrowLeft className="mr-2 h-4 w-4" />

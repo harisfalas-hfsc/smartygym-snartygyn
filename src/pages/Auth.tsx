@@ -14,6 +14,7 @@ import smartyGymLogo from "@/assets/smarty-gym-logo.png";
 import { AvatarSetupDialog } from "@/components/AvatarSetupDialog";
 import { ForgotPasswordDialog } from "@/components/auth/ForgotPasswordDialog";
 import { trackSocialMediaEvent } from "@/utils/socialMediaTracking";
+import { useShowBackButton } from "@/hooks/useShowBackButton";
 
 export default function Auth() {
   const navigate = useNavigate();
@@ -23,6 +24,7 @@ export default function Auth() {
   const [showAvatarSetup, setShowAvatarSetup] = useState(false);
   const [showForgotPassword, setShowForgotPassword] = useState(false);
   const [newUserId, setNewUserId] = useState<string | null>(null);
+  const { goBack } = useShowBackButton();
   
   // Get the mode from URL params, default to login
   const defaultTab = searchParams.get("mode") === "signup" ? "signup" : "login";
@@ -234,7 +236,7 @@ export default function Auth() {
       <div className="w-full max-w-md">
         <Button
           variant="ghost"
-          onClick={() => navigate(-1)}
+          onClick={goBack}
           className="mb-4"
         >
           <ArrowLeft className="mr-2 h-4 w-4" />
