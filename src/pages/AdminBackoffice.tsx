@@ -6,7 +6,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
-import { ArrowLeft, Folder, Users, Mail, FileText, Settings, BarChart3, BookOpen, MessageSquare, Inbox, Image, TrendingUp, Plus, Dumbbell, Calendar, Bell, ShoppingBag } from "lucide-react";
+import { ArrowLeft, Folder, Users, Mail, FileText, Settings, BarChart3, BookOpen, MessageSquare, Inbox, Image, TrendingUp, Plus, Dumbbell, Calendar, Bell, ShoppingBag, Sparkles } from "lucide-react";
 import { ContentManager } from "@/components/admin/ContentManager";
 import { CommunicationsManager } from "@/components/admin/CommunicationsManager";
 import { EmailManager } from "@/components/admin/EmailManager";
@@ -32,6 +32,7 @@ export default function AdminBackoffice() {
   const [contentInnerTab, setContentInnerTab] = useState("workouts");
   const [showWorkoutDialog, setShowWorkoutDialog] = useState(false);
   const [showProgramDialog, setShowProgramDialog] = useState(false);
+  const [showRitualDialog, setShowRitualDialog] = useState(false);
   const [newContactCount, setNewContactCount] = useState(0);
 
   useEffect(() => {
@@ -163,6 +164,17 @@ export default function AdminBackoffice() {
                   <Calendar className="h-4 w-4 mr-2" />
                   New Training Program
                 </DropdownMenuItem>
+                <DropdownMenuItem 
+                  onClick={() => {
+                    setActiveTab("content");
+                    setContentInnerTab("rituals");
+                    setTimeout(() => setShowRitualDialog(true), 100);
+                  }}
+                  className="cursor-pointer"
+                >
+                  <Sparkles className="h-4 w-4 mr-2" />
+                  New Ritual
+                </DropdownMenuItem>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem 
                   onClick={() => setActiveTab("content")}
@@ -262,6 +274,8 @@ export default function AdminBackoffice() {
                 setExternalWorkoutDialog={setShowWorkoutDialog}
                 externalProgramDialog={showProgramDialog}
                 setExternalProgramDialog={setShowProgramDialog}
+                externalRitualDialog={showRitualDialog}
+                setExternalRitualDialog={setShowRitualDialog}
                 activeInnerTab={contentInnerTab}
               />
             </TabsContent>
