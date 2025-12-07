@@ -209,38 +209,23 @@ const DailySmartyRitual = () => {
 
           {/* Main Card */}
           <Card className="overflow-hidden">
-            {/* Header Section */}
-            <div className="bg-gradient-to-r from-primary/10 to-primary/5 p-6 relative">
-              <div className="flex items-start justify-between">
-                <div className="flex-1">
-                  <div className="flex items-center gap-2 mb-2">
-                    {ritual && (
-                      <Badge variant="secondary" className="bg-primary text-primary-foreground">
-                        Day {ritual.day_number}
-                      </Badge>
-                    )}
-                    {isPremium && (
-                      <Badge variant="outline" className="border-yellow-500 text-yellow-600">
-                        <Crown className="h-3 w-3 mr-1" />
-                        Premium
-                      </Badge>
-                    )}
-                  </div>
-                  <h1 className="text-2xl md:text-3xl font-bold mb-2 text-center">
-                    Daily <span className="text-primary">Smarty</span> Ritual
-                  </h1>
-                  <p className="text-muted-foreground text-center">
-                    Your all-day game plan for movement, recovery, and performance
-                  </p>
-                </div>
-                {/* Haris Photo - visible on all viewports */}
-                <div className="flex-shrink-0">
+            {/* Header Section - Elegant Centered Layout */}
+            <div className="bg-gradient-to-r from-primary/10 to-primary/5 p-8 relative">
+              <div className="flex flex-col items-center text-center">
+                {/* Haris Photo - centered above title */}
+                <div className="mb-4">
                   <img 
                     src={harisPhoto} 
                     alt="Haris Falas" 
-                    className="w-16 h-16 md:w-24 md:h-24 rounded-full object-cover border-4 border-primary/20"
+                    className="w-20 h-20 md:w-24 md:h-24 rounded-full object-cover border-4 border-primary/20 shadow-lg"
                   />
                 </div>
+                <h1 className="text-2xl md:text-3xl font-bold mb-3">
+                  Daily <span className="text-primary">Smarty</span> Ritual
+                </h1>
+                <p className="text-muted-foreground max-w-md">
+                  Your all-day game plan for movement, recovery, and performance
+                </p>
               </div>
             </div>
 
