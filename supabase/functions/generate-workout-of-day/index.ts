@@ -190,12 +190,18 @@ serve(async (req) => {
     // Generate TWO workouts - one BODYWEIGHT, one EQUIPMENT
     const equipmentTypes = ["BODYWEIGHT", "EQUIPMENT"];
     const generatedWorkouts: any[] = [];
+    let firstWorkoutName = ""; // Track first workout's name to prevent duplicates
 
     for (const equipment of equipmentTypes) {
       logStep(`Generating ${equipment} workout`);
 
+      // Build the banned name instruction for the second workout
+      const bannedNameInstruction = firstWorkoutName 
+        ? `\n\nCRITICAL - AVOID DUPLICATE NAME: The bodyweight workout for today is named "${firstWorkoutName}". You MUST create a COMPLETELY DIFFERENT name. DO NOT use "${firstWorkoutName}" or any variation of it.`
+        : "";
+
       // Generate workout content using Lovable AI
-      const workoutPrompt = `You are Haris Falas, a Sports Scientist with 20+ years of coaching experience (CSCS Certified), creating a premium Workout of the Day for SmartyGym members worldwide.
+      const workoutPrompt = `You are Haris Falas, a Sports Scientist with 20+ years of coaching experience (CSCS Certified), creating a premium Workout of the Day for SmartyGym members worldwide.${bannedNameInstruction}
 
 Generate a complete workout with these specifications:
 - Category: ${category}
@@ -355,6 +361,12 @@ Respond in this EXACT JSON format:
       }
 
       logStep(`${equipment} workout content generated`, { name: workoutContent.name });
+
+      // Store the first workout's name to prevent duplicates
+      if (equipment === "BODYWEIGHT") {
+        firstWorkoutName = workoutContent.name;
+        logStep("Stored first workout name for duplicate prevention", { firstWorkoutName });
+      }
 
       // Generate unique ID with equipment indicator
       const equipSuffix = equipment === "BODYWEIGHT" ? "BW" : "EQ";
