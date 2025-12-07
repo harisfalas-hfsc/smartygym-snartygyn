@@ -12,7 +12,7 @@ serve(async (req) => {
   }
 
   try {
-    const { productId, name, description, imageUrl } = await req.json();
+    const { productId, name, description, imageUrl, active } = await req.json();
     
     if (!productId) {
       throw new Error("Product ID is required");
@@ -22,6 +22,7 @@ serve(async (req) => {
       productId, 
       name, 
       description, 
+      active,
       imageUrl: imageUrl ? `${imageUrl.substring(0, 50)}...` : "NULL/MISSING" 
     });
 
@@ -54,6 +55,10 @@ serve(async (req) => {
     if (validatedImageUrl) {
       updateData.images = [validatedImageUrl];
       console.log("[UPDATE-STRIPE-PRODUCT] Image will be updated:", validatedImageUrl.substring(0, 80));
+    }
+    if (typeof active === 'boolean') {
+      updateData.active = active;
+      console.log("[UPDATE-STRIPE-PRODUCT] Active status will be updated:", active);
     }
 
     const product = await stripe.products.update(productId, updateData);

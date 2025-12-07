@@ -62,6 +62,13 @@ export default function PremiumBenefits() {
       premium: "Full access"
     },
     {
+      category: "Daily Smarty Ritual",
+      icon: Sparkles,
+      visitor: false,
+      subscriber: false,
+      premium: "Full access"
+    },
+    {
       category: "Dashboard",
       icon: LayoutDashboard,
       visitor: false,
