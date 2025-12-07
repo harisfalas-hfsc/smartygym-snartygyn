@@ -4,7 +4,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { WorkoutsManager } from "./WorkoutsManager";
 import { ProgramsManager } from "./ProgramsManager";
 import { WODManager } from "./WODManager";
-import { Dumbbell, Calendar, Flame } from "lucide-react";
+import { RitualsManager } from "./RitualsManager";
+import { Dumbbell, Calendar, Flame, Sparkles } from "lucide-react";
 
 interface ContentManagerProps {
   externalWorkoutDialog?: boolean;
@@ -37,12 +38,12 @@ export const ContentManager = ({
           Content Library
         </CardTitle>
         <CardDescription>
-          Manage workouts, training programs, and Workout of the Day
+          Manage workouts, training programs, WOD, and Daily Smarty Rituals
         </CardDescription>
       </CardHeader>
       <CardContent>
         <Tabs value={innerTab} onValueChange={setInnerTab} className="w-full">
-          <TabsList className="grid w-full grid-cols-3">
+          <TabsList className="grid w-full grid-cols-4">
             <TabsTrigger value="workouts" className="flex items-center gap-2">
               <Dumbbell className="w-4 h-4" />
               Workouts
@@ -54,6 +55,10 @@ export const ContentManager = ({
             <TabsTrigger value="wod" className="flex items-center gap-2">
               <Flame className="w-4 h-4" />
               WOD
+            </TabsTrigger>
+            <TabsTrigger value="rituals" className="flex items-center gap-2">
+              <Sparkles className="w-4 h-4" />
+              Rituals
             </TabsTrigger>
           </TabsList>
           
@@ -73,6 +78,10 @@ export const ContentManager = ({
 
           <TabsContent value="wod">
             <WODManager />
+          </TabsContent>
+
+          <TabsContent value="rituals">
+            <RitualsManager />
           </TabsContent>
         </Tabs>
       </CardContent>
