@@ -12,6 +12,8 @@ interface ContentManagerProps {
   setExternalWorkoutDialog?: (value: boolean) => void;
   externalProgramDialog?: boolean;
   setExternalProgramDialog?: (value: boolean) => void;
+  externalRitualDialog?: boolean;
+  setExternalRitualDialog?: (value: boolean) => void;
   activeInnerTab?: string;
 }
 
@@ -20,6 +22,8 @@ export const ContentManager = ({
   setExternalWorkoutDialog,
   externalProgramDialog,
   setExternalProgramDialog,
+  externalRitualDialog,
+  setExternalRitualDialog,
   activeInnerTab,
 }: ContentManagerProps) => {
   const [innerTab, setInnerTab] = useState(activeInnerTab || "workouts");
@@ -81,7 +85,10 @@ export const ContentManager = ({
           </TabsContent>
 
           <TabsContent value="rituals">
-            <RitualsManager />
+            <RitualsManager 
+              externalDialog={externalRitualDialog}
+              setExternalDialog={setExternalRitualDialog}
+            />
           </TabsContent>
         </Tabs>
       </CardContent>

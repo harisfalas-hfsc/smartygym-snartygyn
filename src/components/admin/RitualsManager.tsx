@@ -22,7 +22,12 @@ interface Ritual {
   created_at: string;
 }
 
-export const RitualsManager = () => {
+interface RitualsManagerProps {
+  externalDialog?: boolean;
+  setExternalDialog?: (value: boolean) => void;
+}
+
+export const RitualsManager = ({ externalDialog, setExternalDialog }: RitualsManagerProps) => {
   const [rituals, setRituals] = useState<Ritual[]>([]);
   const [filteredRituals, setFilteredRituals] = useState<Ritual[]>([]);
   const [loading, setLoading] = useState(true);
@@ -31,6 +36,15 @@ export const RitualsManager = () => {
   const [selectedRituals, setSelectedRituals] = useState<string[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
   const { toast } = useToast();
+
+  // Handle external dialog control
+  useEffect(() => {
+    if (externalDialog) {
+      setEditingRitual(null);
+      setIsDialogOpen(true);
+      setExternalDialog?.(false);
+    }
+  }, [externalDialog, setExternalDialog]);
 
   useEffect(() => {
     loadRituals();
