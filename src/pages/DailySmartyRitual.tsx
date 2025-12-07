@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
-import { ArrowLeft, Sun, Cloud, Moon, Share2, Lock, Crown, Clock, Loader2, Sparkles } from "lucide-react";
+import { ArrowLeft, Sunrise, Sun, Moon, Share2, Lock, Crown, Clock, Loader2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAccessControl } from "@/hooks/useAccessControl";
 import { useShowBackButton } from "@/hooks/useShowBackButton";
@@ -179,37 +179,32 @@ const DailySmartyRitual = () => {
           </div>
 
           {/* Description Card */}
-          <Card className="mb-6 bg-gradient-to-r from-primary/5 to-primary/10 border-primary/20">
-            <CardContent className="p-6">
-              <div className="flex flex-col items-center gap-4">
-                <div className="p-3 rounded-full bg-primary/10">
-                  <Sparkles className="h-6 w-6 text-primary" />
-                </div>
-                <div className="text-center flex-1">
-                  <h2 className="text-xl font-bold mb-2">Smarty Ritual</h2>
-                  <p className="text-muted-foreground mb-3">
-                    Your all-day game plan for movement, recovery, and performance. Each day brings a fresh ritual with three expertly designed phases:
-                  </p>
-                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 justify-items-center">
-                    <div className="flex items-center gap-2">
-                      <Sun className="h-4 w-4 text-yellow-600" />
-                      <span className="text-sm"><strong>Morning:</strong> Activation</span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <Cloud className="h-4 w-4 text-blue-600" />
-                      <span className="text-sm"><strong>Midday:</strong> Reset</span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <Moon className="h-4 w-4 text-purple-600" />
-                      <span className="text-sm"><strong>Evening:</strong> Unwind</span>
-                    </div>
+          <Card className="mb-8 bg-gradient-to-br from-primary/5 via-background to-primary/5 border-2 border-primary/40 shadow-gold">
+            <div className="p-4 sm:p-5">
+              <h2 className="text-xl sm:text-2xl font-bold mb-3 text-center">About Smarty Ritual</h2>
+              <div className="space-y-2 text-muted-foreground max-w-3xl mx-auto">
+                <p className="text-sm sm:text-base">
+                  Your all-day game plan for movement, recovery, and performance. Each day brings a fresh ritual with three expertly designed phases:
+                </p>
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 justify-items-center mt-4">
+                  <div className="flex items-center gap-2">
+                    <Sunrise className="h-4 w-4 text-orange-500" />
+                    <span className="text-sm"><strong>Morning:</strong> Activation</span>
                   </div>
-                  <p className="text-sm text-muted-foreground mt-3">
-                    Designed by <a href="/about" className="text-primary hover:underline font-semibold">Haris Falas</a> (Sports Scientist, CSCS) to keep you energized, mobile, and performing at your best.
-                  </p>
+                  <div className="flex items-center gap-2">
+                    <Sun className="h-4 w-4 text-yellow-600" />
+                    <span className="text-sm"><strong>Midday:</strong> Reset</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Moon className="h-4 w-4 text-purple-600" />
+                    <span className="text-sm"><strong>Evening:</strong> Unwind</span>
+                  </div>
                 </div>
+                <p className="text-sm sm:text-base font-semibold text-foreground text-center mt-4">
+                  Designed by <a href="/about" className="text-primary hover:underline">Haris Falas</a> (Sports Scientist, CSCS) to keep you energized, mobile, and performing at your best.
+                </p>
               </div>
-            </CardContent>
+            </div>
           </Card>
 
           {/* Main Card */}
@@ -295,8 +290,8 @@ const DailySmartyRitual = () => {
                 {/* Morning Ritual */}
                 <div className="space-y-4">
                   <div className="flex items-center gap-3">
-                    <div className="p-2 rounded-full bg-yellow-100 dark:bg-yellow-900/20">
-                      <Sun className="h-6 w-6 text-yellow-600" />
+                    <div className="p-2 rounded-full bg-orange-100 dark:bg-orange-900/20">
+                      <Sunrise className="h-6 w-6 text-orange-500" />
                     </div>
                     <div>
                       <h2 className="text-xl font-bold">Morning Ritual</h2>
@@ -313,8 +308,8 @@ const DailySmartyRitual = () => {
                 {/* Midday Ritual */}
                 <div className="space-y-4">
                   <div className="flex items-center gap-3">
-                    <div className="p-2 rounded-full bg-blue-100 dark:bg-blue-900/20">
-                      <Cloud className="h-6 w-6 text-blue-600" />
+                    <div className="p-2 rounded-full bg-yellow-100 dark:bg-yellow-900/20">
+                      <Sun className="h-6 w-6 text-yellow-600" />
                     </div>
                     <div>
                       <h2 className="text-xl font-bold">Midday Ritual</h2>
