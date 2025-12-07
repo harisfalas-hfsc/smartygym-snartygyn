@@ -12,6 +12,7 @@ import { useShowBackButton } from "@/hooks/useShowBackButton";
 import { HTMLContent } from "@/components/HTMLContent";
 import { RitualCalendarButton } from "@/components/ritual/RitualCalendarButton";
 import { RitualShareDialog } from "@/components/ritual/RitualShareDialog";
+import { RitualArchive } from "@/components/ritual/RitualArchive";
 import harisPhoto from "@/assets/haris-falas-coach.png";
 
 interface DailyRitual {
@@ -180,16 +181,16 @@ const DailySmartyRitual = () => {
           {/* Description Card */}
           <Card className="mb-6 bg-gradient-to-r from-primary/5 to-primary/10 border-primary/20">
             <CardContent className="p-6">
-              <div className="flex items-start gap-4">
-                <div className="p-3 rounded-full bg-primary/10 shrink-0">
+              <div className="flex flex-col items-center gap-4">
+                <div className="p-3 rounded-full bg-primary/10">
                   <Sparkles className="h-6 w-6 text-primary" />
                 </div>
-                <div>
-                  <h2 className="text-xl font-bold mb-2">What is the Daily Smarty Ritual?</h2>
+                <div className="text-center flex-1">
+                  <h2 className="text-xl font-bold mb-2">Smarty Ritual</h2>
                   <p className="text-muted-foreground mb-3">
                     Your all-day game plan for movement, recovery, and performance. Each day brings a fresh ritual with three expertly designed phases:
                   </p>
-                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 justify-items-center">
                     <div className="flex items-center gap-2">
                       <Sun className="h-4 w-4 text-yellow-600" />
                       <span className="text-sm"><strong>Morning:</strong> Activation</span>
@@ -204,7 +205,7 @@ const DailySmartyRitual = () => {
                     </div>
                   </div>
                   <p className="text-sm text-muted-foreground mt-3">
-                    Designed by <strong>Haris Falas</strong> (Sports Scientist, CSCS) to keep you energized, mobile, and performing at your best.
+                    Designed by <a href="/about" className="text-primary hover:underline font-semibold">Haris Falas</a> (Sports Scientist, CSCS) to keep you energized, mobile, and performing at your best.
                   </p>
                 </div>
               </div>
@@ -230,7 +231,7 @@ const DailySmartyRitual = () => {
                       </Badge>
                     )}
                   </div>
-                  <h1 className="text-2xl md:text-3xl font-bold mb-2">
+                  <h1 className="text-2xl md:text-3xl font-bold mb-2 text-center">
                     Daily <span className="text-primary">Smarty</span> Ritual
                   </h1>
                   <p className="text-muted-foreground">
@@ -361,6 +362,9 @@ const DailySmartyRitual = () => {
               </CardContent>
             )}
           </Card>
+
+          {/* Calendar Archive for Premium Users */}
+          {isPremium && <RitualArchive />}
         </div>
       </div>
 
