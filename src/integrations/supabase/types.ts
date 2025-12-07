@@ -1273,6 +1273,87 @@ export type Database = {
         }
         Relationships: []
       }
+      seo_metadata: {
+        Row: {
+          content_id: string
+          content_type: string
+          created_at: string | null
+          id: string
+          image_alt_text: string | null
+          internal_links: string[] | null
+          json_ld: Json | null
+          keywords: string[] | null
+          last_refreshed_at: string | null
+          meta_description: string | null
+          meta_title: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          content_id: string
+          content_type: string
+          created_at?: string | null
+          id?: string
+          image_alt_text?: string | null
+          internal_links?: string[] | null
+          json_ld?: Json | null
+          keywords?: string[] | null
+          last_refreshed_at?: string | null
+          meta_description?: string | null
+          meta_title?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          content_id?: string
+          content_type?: string
+          created_at?: string | null
+          id?: string
+          image_alt_text?: string | null
+          internal_links?: string[] | null
+          json_ld?: Json | null
+          keywords?: string[] | null
+          last_refreshed_at?: string | null
+          meta_description?: string | null
+          meta_title?: string | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+      seo_refresh_log: {
+        Row: {
+          completed_at: string | null
+          error_message: string | null
+          id: string
+          items_scanned: number | null
+          items_updated: number | null
+          metadata: Json | null
+          refresh_type: string
+          sitemap_generated: boolean | null
+          started_at: string | null
+        }
+        Insert: {
+          completed_at?: string | null
+          error_message?: string | null
+          id?: string
+          items_scanned?: number | null
+          items_updated?: number | null
+          metadata?: Json | null
+          refresh_type: string
+          sitemap_generated?: boolean | null
+          started_at?: string | null
+        }
+        Update: {
+          completed_at?: string | null
+          error_message?: string | null
+          id?: string
+          items_scanned?: number | null
+          items_updated?: number | null
+          metadata?: Json | null
+          refresh_type?: string
+          sitemap_generated?: boolean | null
+          started_at?: string | null
+        }
+        Relationships: []
+      }
       shop_products: {
         Row: {
           amazon_url: string | null

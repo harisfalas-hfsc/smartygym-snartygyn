@@ -1,8 +1,5 @@
 project_id = "cvccrvyimyzrxcwzmxwk"
 
-[functions.send-automated-messages]
-verify_jwt = false
-
 [functions.smarty-coach]
 verify_jwt = false
 
@@ -31,9 +28,6 @@ verify_jwt = false
 verify_jwt = false
 
 [functions.send-reengagement-emails]
-verify_jwt = false
-
-[functions.send-scheduled-notifications]
 verify_jwt = false
 
 [functions.delete-stripe-product]
@@ -91,4 +85,10 @@ verify_jwt = false
 verify_jwt = false
 
 [functions.upload-ritual-image]
+verify_jwt = false
+
+[functions.refresh-seo-metadata]
+verify_jwt = false
+
+[functions.generate-sitemap]
 verify_jwt = false
