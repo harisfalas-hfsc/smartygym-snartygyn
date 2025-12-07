@@ -7,29 +7,41 @@ const corsHeaders = {
 };
 
 const logStep = (step: string, details?: any) => {
-  console.log(`[NEW-CONTENT-NOTIFICATIONS] ${step}`, details ? JSON.stringify(details) : '');
+  const detailsStr = details ? ` - ${JSON.stringify(details)}` : "";
+  console.log(`[NEW-CONTENT-NOTIFICATIONS] ${step}${detailsStr}`);
 };
 
 const RESEND_API_KEY = Deno.env.get("RESEND_API_KEY");
 
-async function sendEmail(to: string, subject: string, html: string) {
-  if (!RESEND_API_KEY) return null;
+async function sendEmail(to: string, subject: string, html: string): Promise<{ success: boolean; error?: string }> {
+  if (!RESEND_API_KEY) {
+    return { success: false, error: "RESEND_API_KEY not configured" };
+  }
   
-  const res = await fetch("https://api.resend.com/emails", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${RESEND_API_KEY}`,
-    },
-    body: JSON.stringify({
-      from: "SmartyGym <notifications@smartygym.com>",
-      to: [to],
-      subject,
-      html,
-    }),
-  });
-  
-  return res.ok;
+  try {
+    const res = await fetch("https://api.resend.com/emails", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${RESEND_API_KEY}`,
+      },
+      body: JSON.stringify({
+        from: "SmartyGym <notifications@smartygym.com>",
+        to: [to],
+        subject,
+        html,
+      }),
+    });
+    
+    if (!res.ok) {
+      const errorBody = await res.text();
+      return { success: false, error: `HTTP ${res.status}: ${errorBody}` };
+    }
+    
+    return { success: true };
+  } catch (error: any) {
+    return { success: false, error: error.message || String(error) };
+  }
 }
 
 serve(async (req) => {
@@ -43,10 +55,11 @@ serve(async (req) => {
 
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
-    logStep("Starting new content notification processing");
+    logStep("🚀 Starting new content notification processing");
 
     // Get pending notifications older than 5 minutes (buffered)
     const fiveMinutesAgo = new Date(Date.now() - 5 * 60 * 1000).toISOString();
+    logStep("📅 Looking for items older than", { fiveMinutesAgo });
     
     const { data: pendingItems, error: fetchError } = await supabase
       .from("pending_content_notifications")
@@ -54,17 +67,18 @@ serve(async (req) => {
       .lt("created_at", fiveMinutesAgo);
 
     if (fetchError) {
+      logStep("❌ Error fetching pending notifications", { error: fetchError.message });
       throw new Error(`Failed to fetch pending notifications: ${fetchError.message}`);
     }
 
     if (!pendingItems || pendingItems.length === 0) {
-      logStep("No pending content notifications to process");
+      logStep("📭 No pending content notifications to process");
       return new Response(JSON.stringify({ success: true, message: "No pending notifications" }), {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
 
-    logStep("Found pending items", { count: pendingItems.length });
+    logStep("📦 Found pending items", { count: pendingItems.length, items: pendingItems.map(i => ({ type: i.content_type, name: i.content_name })) });
 
     // Group by content type
     const workouts = pendingItems.filter(item => item.content_type === 'workout');
@@ -78,6 +92,8 @@ serve(async (req) => {
 
     const workoutCount = workouts.length;
     const programCount = programs.length;
+
+    logStep("📊 Content breakdown", { workoutCount, programCount });
 
     if (workoutCount > 0 && programCount > 0) {
       // Mixed content
@@ -184,19 +200,22 @@ serve(async (req) => {
     }
 
     // Get all users to notify
+    logStep("🔍 Fetching all users");
     const { data: authUsers, error: authError } = await supabase.auth.admin.listUsers();
     
     if (authError) {
+      logStep("❌ Error fetching users", { error: authError.message });
       throw new Error(`Failed to fetch users: ${authError.message}`);
     }
 
     const users = authUsers?.users || [];
-    logStep("Found users to notify", { count: users.length });
+    logStep("👥 Found users to notify", { count: users.length });
 
     let dashboardSuccess = 0;
     let emailSuccess = 0;
     let dashboardFailed = 0;
     let emailFailed = 0;
+    const emailErrors: { email: string; error: string }[] = [];
 
     // Send notifications to all users
     for (const user of users) {
@@ -212,7 +231,7 @@ serve(async (req) => {
         });
 
       if (msgError) {
-        logStep("Failed to insert dashboard message", { userId: user.id, error: msgError.message });
+        logStep("❌ Dashboard message failed", { userId: user.id, error: msgError.message });
         dashboardFailed++;
       } else {
         dashboardSuccess++;
@@ -220,44 +239,46 @@ serve(async (req) => {
 
       // Email
       if (user.email) {
-        try {
-          // Check notification preferences
-          const { data: profile } = await supabase
-            .from("profiles")
-            .select("notification_preferences")
-            .eq("user_id", user.id)
-            .single();
+        // Check notification preferences
+        const { data: profile } = await supabase
+          .from("profiles")
+          .select("notification_preferences")
+          .eq("user_id", user.id)
+          .single();
 
-          const prefs = profile?.notification_preferences as any;
-          const emailEnabled = prefs?.email_notifications !== false && prefs?.newsletter !== false;
+        const prefs = profile?.notification_preferences as any;
+        const emailEnabled = prefs?.email_notifications !== false && prefs?.newsletter !== false;
 
-          if (emailEnabled) {
-            const sent = await sendEmail(user.email, subject, emailHtml);
-            if (sent) {
-              emailSuccess++;
-            } else {
-              emailFailed++;
-            }
+        if (emailEnabled) {
+          const result = await sendEmail(user.email, subject, emailHtml);
+          if (result.success) {
+            emailSuccess++;
+          } else {
+            emailFailed++;
+            emailErrors.push({ email: user.email, error: result.error || "Unknown error" });
+            logStep("❌ Email failed", { email: user.email, error: result.error });
           }
-        } catch (emailErr: any) {
-          logStep("Failed to send email", { userId: user.id, error: emailErr.message });
-          emailFailed++;
+        } else {
+          logStep("⏭️ Email disabled for user", { userId: user.id });
         }
       }
     }
 
     // Delete processed pending notifications
     const idsToDelete = pendingItems.map(item => item.id);
+    logStep("🗑️ Deleting processed items", { count: idsToDelete.length });
+    
     const { error: deleteError } = await supabase
       .from("pending_content_notifications")
       .delete()
       .in("id", idsToDelete);
 
     if (deleteError) {
-      logStep("Warning: Failed to delete processed items", { error: deleteError.message });
+      logStep("⚠️ Warning: Failed to delete processed items", { error: deleteError.message });
     }
 
     // Log to audit
+    logStep("📝 Logging to audit");
     await supabase.from("notification_audit_log").insert({
       notification_type: "automated",
       message_type: messageType,
@@ -271,14 +292,17 @@ serve(async (req) => {
         programs_count: programCount,
         email_success: emailSuccess,
         email_failed: emailFailed,
+        email_errors: emailErrors.length > 0 ? emailErrors : undefined,
       },
     });
 
-    logStep("Completed notification processing", {
+    logStep("🎉 Completed notification processing", {
+      totalUsers: users.length,
       dashboardSuccess,
       dashboardFailed,
       emailSuccess,
       emailFailed,
+      emailErrorCount: emailErrors.length
     });
 
     return new Response(
@@ -288,12 +312,15 @@ serve(async (req) => {
         workouts: workoutCount,
         programs: programCount,
         dashboardSent: dashboardSuccess,
+        dashboardFailed,
         emailsSent: emailSuccess,
+        emailsFailed: emailFailed,
+        emailErrors: emailErrors.length > 0 ? emailErrors : undefined,
       }),
       { headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
   } catch (error: any) {
-    logStep("Error in send-new-content-notifications", { error: error.message });
+    logStep("💥 FATAL ERROR", { error: error.message, stack: error.stack });
     return new Response(
       JSON.stringify({ success: false, error: error.message }),
       { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
