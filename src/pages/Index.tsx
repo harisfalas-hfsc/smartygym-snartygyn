@@ -85,12 +85,12 @@ const Index = () => {
     icon: FileText,
     route: "/blog"
   }, {
-    id: "coach",
-    title: "Expert Coach Guidance",
-    description: "Get personalized support and answers directly from experienced fitness professionals",
-    buttonText: "Contact Coach",
-    icon: GraduationCap,
-    route: "/contact"
+    id: "exerciselibrary",
+    title: "Exercise Library",
+    description: "Comprehensive video library with proper form demonstrations and technique guides",
+    buttonText: "Browse Library",
+    icon: Video,
+    route: "/exerciselibrary"
   }];
   useEffect(() => {
     // Check current session
