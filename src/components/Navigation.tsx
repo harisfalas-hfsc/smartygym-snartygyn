@@ -14,7 +14,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { User as UserIcon, Settings, LogOut, LayoutDashboard, Crown, Menu, Bell, Facebook, Instagram, Youtube, ShoppingBag, Info, Dumbbell, ListChecks, Wrench, BookOpen, Users, Newspaper, Mail } from "lucide-react";
+import { User as UserIcon, Settings, LogOut, LayoutDashboard, Crown, Menu, Bell, Facebook, Instagram, Youtube, ShoppingBag, Info, Dumbbell, ListChecks, Wrench, BookOpen, Users, Newspaper, Mail, Sparkles } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import smartyGymLogo from "@/assets/smarty-gym-logo.png";
 import { ThemeToggle } from "@/components/ThemeToggle";
@@ -227,11 +227,19 @@ export const Navigation = () => {
                   </Button>
                   <Button
                     variant="ghost"
+                    onClick={() => handleNavigate("/daily-ritual")}
+                    className={`justify-start font-semibold transition-all duration-200 ${location.pathname === '/daily-ritual' ? 'text-primary underline underline-offset-4 bg-yellow-100/50' : 'text-foreground hover:bg-yellow-100/80 hover:text-foreground'}`}
+                  >
+                    <Sparkles className="mr-2 h-4 w-4" />
+                    Daily Ritual
+                  </Button>
+                  <Button
+                    variant="ghost"
                     onClick={() => handleNavigate("/tools")}
                     className={`justify-start font-semibold transition-all duration-200 ${location.pathname === '/tools' ? 'text-primary underline underline-offset-4 bg-yellow-100/50' : 'text-foreground hover:bg-yellow-100/80 hover:text-foreground'}`}
                   >
                     <Wrench className="mr-2 h-4 w-4" />
-                    Tools
+                    Smarty Tools
                   </Button>
                   <Button
                     variant="ghost"

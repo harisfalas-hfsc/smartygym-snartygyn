@@ -31,6 +31,7 @@ import WorkoutDetail from "./pages/WorkoutDetail";
 import IndividualWorkout from "./pages/IndividualWorkout";
 import SmartyWorkout from "./pages/SmartyWorkout";
 import WODArchive from "./pages/WODArchive";
+import DailySmartyRitual from "./pages/DailySmartyRitual";
 import WODCategory from "./pages/WODCategory";
 import TrainingProgramFlow from "./pages/TrainingProgramFlow";
 import TrainingProgramDetail from "./pages/TrainingProgramDetail";
@@ -118,6 +119,7 @@ const AppContent = () => {
                 <Route path="/workout/:type" element={<WorkoutDetail />} />
                 <Route path="/workout/:type/:id" element={<IndividualWorkout />} />
                 <Route path="/wod-archive" element={<WODArchive />} />
+                <Route path="/daily-ritual" element={<DailySmartyRitual />} />
                 <Route path="/smartyworkout" element={<SmartyWorkout />} />
                 <Route path="/trainingprogram" element={<TrainingProgramFlow />} />
                 <Route path="/trainingprogram/:type" element={<TrainingProgramDetail />} />

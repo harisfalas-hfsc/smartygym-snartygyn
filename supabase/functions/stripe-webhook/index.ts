@@ -400,7 +400,7 @@ async function handleOneTimePurchase(
   const paymentIntent = await stripe.paymentIntents.retrieve(paymentIntentId);
   const amount = paymentIntent.amount / 100; // Convert from cents
 
-  // Handle standalone workout/program/shop product purchases
+  // Handle standalone workout/program/shop product/ritual purchases
   const contentType = session.metadata?.content_type;
   const contentId = session.metadata?.content_id;
   const contentName = session.metadata?.content_name;
@@ -411,6 +411,26 @@ async function handleOneTimePurchase(
   }
 
   logStep("Recording purchase", { userId, contentType, contentId, amount });
+
+  // Handle ritual purchases separately
+  if (contentType === 'ritual') {
+    const ritualDate = session.metadata?.ritual_date;
+    const { error: ritualError } = await supabase
+      .from('ritual_purchases')
+      .insert({
+        user_id: userId,
+        ritual_date: ritualDate,
+        stripe_payment_intent_id: paymentIntentId,
+        stripe_checkout_session_id: session.id,
+      });
+    
+    if (ritualError) {
+      logStep("ERROR: Failed to record ritual purchase", { error: ritualError });
+    } else {
+      logStep("Ritual purchase recorded successfully", { ritualDate });
+    }
+    return;
+  }
 
   // Record purchase in database
   const { error } = await supabase
