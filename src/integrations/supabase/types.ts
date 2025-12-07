@@ -587,6 +587,39 @@ export type Database = {
         }
         Relationships: []
       }
+      daily_smarty_rituals: {
+        Row: {
+          created_at: string | null
+          day_number: number
+          evening_content: string
+          id: string
+          is_visible: boolean | null
+          midday_content: string
+          morning_content: string
+          ritual_date: string
+        }
+        Insert: {
+          created_at?: string | null
+          day_number: number
+          evening_content: string
+          id?: string
+          is_visible?: boolean | null
+          midday_content: string
+          morning_content: string
+          ritual_date: string
+        }
+        Update: {
+          created_at?: string | null
+          day_number?: number
+          evening_content?: string
+          id?: string
+          is_visible?: boolean | null
+          midday_content?: string
+          morning_content?: string
+          ritual_date?: string
+        }
+        Relationships: []
+      }
       email_campaign_log: {
         Row: {
           campaign_type: string
@@ -995,6 +1028,33 @@ export type Database = {
           name?: string
           subject?: string
           updated_at?: string
+        }
+        Relationships: []
+      }
+      ritual_purchases: {
+        Row: {
+          id: string
+          purchased_at: string | null
+          ritual_date: string
+          stripe_checkout_session_id: string | null
+          stripe_payment_intent_id: string | null
+          user_id: string
+        }
+        Insert: {
+          id?: string
+          purchased_at?: string | null
+          ritual_date: string
+          stripe_checkout_session_id?: string | null
+          stripe_payment_intent_id?: string | null
+          user_id: string
+        }
+        Update: {
+          id?: string
+          purchased_at?: string | null
+          ritual_date?: string
+          stripe_checkout_session_id?: string | null
+          stripe_payment_intent_id?: string | null
+          user_id?: string
         }
         Relationships: []
       }

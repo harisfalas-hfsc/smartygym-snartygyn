@@ -64,19 +64,19 @@ const Index = () => {
     icon: Calendar,
     route: "/trainingprogram"
   }, {
+    id: "ritual",
+    title: "Smarty Ritual",
+    description: "Your daily movement ritual for optimal performance - Morning, Midday, and Evening phases",
+    buttonText: "View Ritual",
+    icon: Sparkles,
+    route: "/daily-ritual"
+  }, {
     id: "tools",
-    title: "Smart Tools",
+    title: "Smarty Tools",
     description: "Professional fitness calculators and tracking tools to optimize your training",
     buttonText: "Explore Tools",
     icon: Calculator,
     route: "/tools"
-  }, {
-    id: "exercises",
-    title: "Exercise Library",
-    description: "Comprehensive video library with proper form demonstrations and technique guides",
-    buttonText: "View Library",
-    icon: Video,
-    route: "/exerciselibrary"
   }, {
     id: "blog",
     title: "Blog & Expert Articles",
