@@ -201,7 +201,7 @@ const DailySmartyRitual = () => {
                   </div>
                 </div>
                 <p className="text-sm sm:text-base font-semibold text-foreground text-center mt-4">
-                  Designed by <a href="/about" className="text-primary hover:underline">Haris Falas</a> (Sports Scientist, CSCS) to keep you energized, mobile, and performing at your best.
+                  Designed by <a href="/coach-profile" className="text-primary hover:underline">Haris Falas</a> (Sports Scientist, CSCS) to keep you energized, mobile, and performing at your best.
                 </p>
               </div>
             </div>
@@ -229,7 +229,7 @@ const DailySmartyRitual = () => {
                   <h1 className="text-2xl md:text-3xl font-bold mb-2 text-center">
                     Daily <span className="text-primary">Smarty</span> Ritual
                   </h1>
-                  <p className="text-muted-foreground">
+                  <p className="text-muted-foreground text-center">
                     Your all-day game plan for movement, recovery, and performance
                   </p>
                 </div>
