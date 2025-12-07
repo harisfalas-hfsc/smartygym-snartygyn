@@ -201,7 +201,7 @@ const DailySmartyRitual = () => {
                   </div>
                 </div>
                 <p className="text-sm sm:text-base font-semibold text-foreground text-center mt-4">
-                  Designed by <a href="/coach-profile" className="text-primary hover:underline">Haris Falas</a> (Sports Scientist, CSCS) to keep you energized, mobile, and performing at your best.
+                  Designed by <a href="/coach-profile" className="text-primary hover:underline">Haris Falas</a> to keep you energized, mobile, and performing at your best.
                 </p>
               </div>
             </div>
@@ -233,12 +233,12 @@ const DailySmartyRitual = () => {
                     Your all-day game plan for movement, recovery, and performance
                   </p>
                 </div>
-                {/* Haris Photo */}
-                <div className="hidden md:block">
+                {/* Haris Photo - visible on all viewports */}
+                <div className="flex-shrink-0">
                   <img 
                     src={harisPhoto} 
                     alt="Haris Falas" 
-                    className="w-24 h-24 rounded-full object-cover border-4 border-primary/20"
+                    className="w-16 h-16 md:w-24 md:h-24 rounded-full object-cover border-4 border-primary/20"
                   />
                 </div>
               </div>
@@ -350,8 +350,7 @@ const DailySmartyRitual = () => {
                   />
                   <div className="text-left">
                     <p className="text-sm text-muted-foreground">Designed by</p>
-                    <p className="font-semibold">Haris Falas</p>
-                    <p className="text-xs text-muted-foreground">Sports Scientist • CSCS</p>
+                    <a href="/coach-profile" className="font-semibold text-primary hover:underline">Haris Falas</a>
                   </div>
                 </div>
               </CardContent>
