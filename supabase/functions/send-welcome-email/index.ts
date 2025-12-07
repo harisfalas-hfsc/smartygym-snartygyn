@@ -18,10 +18,30 @@ serve(async (req) => {
   }
 
   try {
-    logStep("Function started");
+    logStep("🚀 Function invoked - starting welcome email process");
 
-    const { record } = await req.json();
-    logStep("Processing new user", { userId: record.user_id });
+    let record: any;
+    try {
+      const body = await req.json();
+      record = body.record;
+      logStep("📦 Request body parsed", { hasRecord: !!record, body: JSON.stringify(body).substring(0, 200) });
+    } catch (parseError) {
+      logStep("❌ Failed to parse request body", { error: String(parseError) });
+      return new Response(
+        JSON.stringify({ error: "Invalid request body" }),
+        { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
+    if (!record || !record.user_id) {
+      logStep("⚠️ No user_id in record", { record });
+      return new Response(
+        JSON.stringify({ error: "No user_id provided" }),
+        { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
+    logStep("👤 Processing new user", { userId: record.user_id, fullName: record.full_name });
 
     const supabaseAdmin = createClient(
       Deno.env.get("SUPABASE_URL") ?? "",
@@ -30,37 +50,51 @@ serve(async (req) => {
     );
 
     // Get user email
+    logStep("🔍 Fetching user email from auth");
     const { data: userData, error: userError } = await supabaseAdmin.auth.admin.getUserById(record.user_id);
-    if (userError) throw userError;
+    if (userError) {
+      logStep("❌ Error fetching user", { error: userError.message });
+      throw userError;
+    }
     
     const userEmail = userData.user.email;
-    if (!userEmail) throw new Error("User email not found");
+    if (!userEmail) {
+      logStep("❌ User email not found");
+      throw new Error("User email not found");
+    }
     
     const userName = record.full_name || "there";
-    
-    logStep("User details fetched", { email: userEmail, name: userName });
+    logStep("✅ User details fetched", { email: userEmail, name: userName });
 
     // Get automation rule configuration
-    const { data: automationRule } = await supabaseAdmin
+    logStep("🔍 Fetching automation rule");
+    const { data: automationRule, error: ruleError } = await supabaseAdmin
       .from("automation_rules")
       .select("*")
       .eq("automation_key", "welcome_message")
       .eq("is_active", true)
       .single();
 
+    if (ruleError) {
+      logStep("⚠️ Error fetching automation rule", { error: ruleError.message });
+    }
+
     if (!automationRule) {
-      logStep("Welcome automation is disabled or not configured");
+      logStep("⚠️ Welcome automation is disabled or not configured");
       return new Response(
         JSON.stringify({ success: false, reason: "Welcome automation disabled" }),
-        {
-          status: 200,
-          headers: { ...corsHeaders, "Content-Type": "application/json" },
-        }
+        { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
 
+    logStep("✅ Automation rule found", { 
+      sendsDashboard: automationRule.sends_dashboard_message, 
+      sendsEmail: automationRule.sends_email 
+    });
+
     // Get welcome message template
-    const { data: template } = await supabaseAdmin
+    logStep("🔍 Fetching welcome template");
+    const { data: template, error: templateError } = await supabaseAdmin
       .from("automated_message_templates")
       .select("subject, content")
       .eq("message_type", "welcome")
@@ -68,35 +102,47 @@ serve(async (req) => {
       .eq("is_default", true)
       .single();
 
+    if (templateError) {
+      logStep("⚠️ Error fetching template", { error: templateError.message });
+    }
+
     if (!template) {
-      logStep("No active welcome template found");
+      logStep("⚠️ No active welcome template found");
       return new Response(
         JSON.stringify({ success: false, reason: "No welcome template configured" }),
-        {
-          status: 200,
-          headers: { ...corsHeaders, "Content-Type": "application/json" },
-        }
+        { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
 
+    logStep("✅ Template found", { subject: template.subject });
+
     // Check if user already received welcome message
-    const { data: existing } = await supabaseAdmin
+    logStep("🔍 Checking for existing welcome message");
+    const { data: existing, error: existingError } = await supabaseAdmin
       .from('user_system_messages')
       .select('id')
       .eq('user_id', record.user_id)
       .eq('message_type', 'welcome')
       .limit(1);
 
+    if (existingError) {
+      logStep("⚠️ Error checking existing messages", { error: existingError.message });
+    }
+
     if (existing && existing.length > 0) {
-      logStep("User already received welcome message, skipping");
+      logStep("⚠️ User already received welcome message, skipping");
       return new Response(
         JSON.stringify({ success: false, reason: "Welcome message already sent" }),
         { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
 
+    let dashboardSent = false;
+    let emailSent = false;
+
     // Send dashboard message immediately
     if (automationRule.sends_dashboard_message) {
+      logStep("📤 Sending dashboard message");
       const { error: msgError } = await supabaseAdmin
         .from("user_system_messages")
         .insert({
@@ -108,52 +154,62 @@ serve(async (req) => {
         });
 
       if (msgError) {
-        logStep("ERROR inserting dashboard message", { error: msgError });
+        logStep("❌ Error inserting dashboard message", { error: msgError.message });
       } else {
-        logStep("✅ Dashboard message sent");
+        dashboardSent = true;
+        logStep("✅ Dashboard message sent successfully");
       }
     }
 
     // Send email immediately
     if (automationRule.sends_email) {
-      const resend = new Resend(Deno.env.get("RESEND_API_KEY"));
+      logStep("📧 Sending welcome email");
+      const resendApiKey = Deno.env.get("RESEND_API_KEY");
       
-      try {
-        await resend.emails.send({
-          from: "SmartyGym <notifications@smartygym.com>",
-          to: [userEmail],
-          subject: template.subject,
-          html: `
-            <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
-              <h1 style="color: #d4af37; margin-bottom: 20px;">Welcome to SmartyGym! 🎉</h1>
-              <p style="font-size: 16px; line-height: 1.6; margin-bottom: 16px;">Hi ${userName},</p>
-              <p style="font-size: 16px; line-height: 1.6; margin-bottom: 16px;">We're thrilled to have you join our community of fitness enthusiasts.</p>
-              <p style="font-size: 16px; line-height: 1.6; margin-bottom: 12px;"><strong>Here's what you can do right now:</strong></p>
-              <ul style="font-size: 16px; line-height: 1.8; margin-bottom: 24px; padding-left: 20px;">
-                <li><strong>Browse 500+ Expert Workouts</strong> – From strength to cardio, we have everything</li>
-                <li><strong>Follow Structured Training Programs</strong> – Achieve your goals with proven plans</li>
-                <li><strong>Track Your Progress</strong> – Save favorites, mark completed workouts</li>
-                <li><strong>Get Daily Workout of the Day</strong> – Fresh workout every morning at 7:00 AM</li>
-              </ul>
-              <p style="font-size: 16px; line-height: 1.6; margin-bottom: 24px;">Ready to start your fitness journey?</p>
-              <p style="margin-top: 24px;">
-                <a href="https://smartygym.com/dashboard" style="display: inline-block; background: #d4af37; color: white; padding: 14px 28px; text-decoration: none; border-radius: 4px; font-weight: bold; font-size: 16px;">Go to Your Dashboard →</a>
-              </p>
-              <p style="font-size: 16px; line-height: 1.6; margin-top: 24px;">Let's make every workout count!</p>
-              <p style="font-size: 16px; font-weight: bold; margin-top: 20px;">– The SmartyGym Team</p>
-              <hr style="margin: 32px 0; border: none; border-top: 1px solid #eee;">
-              <p style="font-size: 12px; color: #999;">This email was sent from SmartyGym.</p>
-            </div>
-          `,
-        });
-        logStep("✅ Email sent");
-      } catch (emailError) {
-        logStep("ERROR sending email", { error: emailError });
+      if (!resendApiKey) {
+        logStep("❌ RESEND_API_KEY not configured");
+      } else {
+        const resend = new Resend(resendApiKey);
+        
+        try {
+          const emailResult = await resend.emails.send({
+            from: "SmartyGym <notifications@smartygym.com>",
+            to: [userEmail],
+            subject: template.subject,
+            html: `
+              <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
+                <h1 style="color: #d4af37; margin-bottom: 20px;">Welcome to SmartyGym! 🎉</h1>
+                <p style="font-size: 16px; line-height: 1.6; margin-bottom: 16px;">Hi ${userName},</p>
+                <p style="font-size: 16px; line-height: 1.6; margin-bottom: 16px;">We're thrilled to have you join our community of fitness enthusiasts.</p>
+                <p style="font-size: 16px; line-height: 1.6; margin-bottom: 12px;"><strong>Here's what you can do right now:</strong></p>
+                <ul style="font-size: 16px; line-height: 1.8; margin-bottom: 24px; padding-left: 20px;">
+                  <li><strong>Browse 500+ Expert Workouts</strong> – From strength to cardio, we have everything</li>
+                  <li><strong>Follow Structured Training Programs</strong> – Achieve your goals with proven plans</li>
+                  <li><strong>Track Your Progress</strong> – Save favorites, mark completed workouts</li>
+                  <li><strong>Get Daily Workout of the Day</strong> – Fresh workout every morning at 7:00 AM</li>
+                </ul>
+                <p style="font-size: 16px; line-height: 1.6; margin-bottom: 24px;">Ready to start your fitness journey?</p>
+                <p style="margin-top: 24px;">
+                  <a href="https://smartygym.com/dashboard" style="display: inline-block; background: #d4af37; color: white; padding: 14px 28px; text-decoration: none; border-radius: 4px; font-weight: bold; font-size: 16px;">Go to Your Dashboard →</a>
+                </p>
+                <p style="font-size: 16px; line-height: 1.6; margin-top: 24px;">Let's make every workout count!</p>
+                <p style="font-size: 16px; font-weight: bold; margin-top: 20px;">– The SmartyGym Team</p>
+                <hr style="margin: 32px 0; border: none; border-top: 1px solid #eee;">
+                <p style="font-size: 12px; color: #999;">This email was sent from SmartyGym.</p>
+              </div>
+            `,
+          });
+          emailSent = true;
+          logStep("✅ Email sent successfully", { emailId: emailResult?.data?.id });
+        } catch (emailError: any) {
+          logStep("❌ Error sending email", { error: emailError.message || String(emailError) });
+        }
       }
     }
 
     // Update automation rule execution count
-    await supabaseAdmin
+    logStep("📊 Updating automation rule stats");
+    const { error: updateError } = await supabaseAdmin
       .from("automation_rules")
       .update({
         last_triggered_at: new Date().toISOString(),
@@ -161,24 +217,45 @@ serve(async (req) => {
       })
       .eq("id", automationRule.id);
 
-    logStep("Welcome message sent successfully");
+    if (updateError) {
+      logStep("⚠️ Error updating automation rule", { error: updateError.message });
+    }
+
+    // Log to audit
+    logStep("📝 Logging to audit");
+    await supabaseAdmin.from('notification_audit_log').insert({
+      notification_type: 'welcome_email',
+      message_type: 'welcome',
+      subject: template.subject,
+      content: template.content,
+      recipient_count: 1,
+      success_count: (dashboardSent ? 1 : 0) + (emailSent ? 1 : 0),
+      failed_count: (!dashboardSent && automationRule.sends_dashboard_message ? 1 : 0) + (!emailSent && automationRule.sends_email ? 1 : 0),
+      metadata: {
+        user_id: record.user_id,
+        user_email: userEmail,
+        dashboard_sent: dashboardSent,
+        email_sent: emailSent
+      }
+    });
+
+    logStep("🎉 Welcome message process completed", { dashboardSent, emailSent });
 
     return new Response(
-      JSON.stringify({ success: true, message: "Welcome message sent immediately" }),
-      {
-        status: 200,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-      }
+      JSON.stringify({ 
+        success: true, 
+        message: "Welcome message sent", 
+        dashboardSent, 
+        emailSent 
+      }),
+      { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : String(error);
-    logStep("ERROR", { message: errorMessage });
+    logStep("💥 FATAL ERROR", { message: errorMessage, stack: error instanceof Error ? error.stack : undefined });
     return new Response(
       JSON.stringify({ error: errorMessage }),
-      {
-        status: 500,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-      }
+      { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
   }
 });
