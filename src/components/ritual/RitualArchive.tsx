@@ -3,7 +3,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Calendar } from "@/components/ui/calendar";
 import { Badge } from "@/components/ui/badge";
-import { CalendarDays, Sun, Cloud, Moon } from "lucide-react";
+import { CalendarDays, Sunrise, Sun, Moon } from "lucide-react";
 import { HTMLContent } from "@/components/HTMLContent";
 import { Separator } from "@/components/ui/separator";
 import { format } from "date-fns";
@@ -150,7 +150,7 @@ export const RitualArchive = () => {
                 {/* Morning */}
                 <div className="space-y-2">
                   <div className="flex items-center gap-2">
-                    <Sun className="h-4 w-4 text-yellow-600" />
+                    <Sunrise className="h-4 w-4 text-orange-500" />
                     <span className="font-semibold text-sm">Morning</span>
                   </div>
                   <div className="pl-6 text-sm">
@@ -163,7 +163,7 @@ export const RitualArchive = () => {
                 {/* Midday */}
                 <div className="space-y-2">
                   <div className="flex items-center gap-2">
-                    <Cloud className="h-4 w-4 text-blue-600" />
+                    <Sun className="h-4 w-4 text-yellow-600" />
                     <span className="font-semibold text-sm">Midday</span>
                   </div>
                   <div className="pl-6 text-sm">
