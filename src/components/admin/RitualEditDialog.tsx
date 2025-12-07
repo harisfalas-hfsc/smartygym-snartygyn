@@ -7,7 +7,7 @@ import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
-import { Loader2, Sun, Cloud, Moon } from "lucide-react";
+import { Loader2, Sunrise, Sun, Moon } from "lucide-react";
 import { RichTextEditor } from "@/components/ui/rich-text-editor";
 
 interface Ritual {
@@ -182,11 +182,11 @@ export const RitualEditDialog = ({ open, onOpenChange, ritual, onSave }: RitualE
           <Tabs defaultValue="morning" className="w-full">
             <TabsList className="grid w-full grid-cols-3">
               <TabsTrigger value="morning" className="flex items-center gap-2">
-                <Sun className="h-4 w-4 text-yellow-600" />
+                <Sunrise className="h-4 w-4 text-orange-500" />
                 Morning
               </TabsTrigger>
               <TabsTrigger value="midday" className="flex items-center gap-2">
-                <Cloud className="h-4 w-4 text-blue-600" />
+                <Sun className="h-4 w-4 text-yellow-600" />
                 Midday
               </TabsTrigger>
               <TabsTrigger value="evening" className="flex items-center gap-2">
