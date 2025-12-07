@@ -88,9 +88,9 @@ const DailySmartyRitual = () => {
           .select("*")
           .eq("ritual_date", today)
           .eq("is_visible", true)
-          .single();
+          .maybeSingle();
 
-        if (error || !data) {
+        if (!data) {
           // If no ritual for today, show countdown
           setCountdown("Coming soon...");
           setLoading(false);
@@ -108,7 +108,7 @@ const DailySmartyRitual = () => {
               .select("id")
               .eq("user_id", user.id)
               .eq("ritual_date", today)
-              .single();
+              .maybeSingle();
 
             setHasPurchased(!!purchase);
           }
