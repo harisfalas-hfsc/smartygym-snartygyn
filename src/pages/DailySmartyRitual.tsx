@@ -1,15 +1,14 @@
 import { useState, useEffect } from "react";
-import { useNavigate, useSearchParams } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { Helmet } from "react-helmet";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
-import { ArrowLeft, Sun, Cloud, Moon, Calendar, Share2, Lock, Crown, Clock, Loader2 } from "lucide-react";
+import { ArrowLeft, Sun, Cloud, Moon, Share2, Lock, Crown, Clock, Loader2, Sparkles } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAccessControl } from "@/hooks/useAccessControl";
 import { useShowBackButton } from "@/hooks/useShowBackButton";
-import { useToast } from "@/hooks/use-toast";
 import { HTMLContent } from "@/components/HTMLContent";
 import { RitualCalendarButton } from "@/components/ritual/RitualCalendarButton";
 import { RitualShareDialog } from "@/components/ritual/RitualShareDialog";
@@ -26,37 +25,18 @@ interface DailyRitual {
 
 const DailySmartyRitual = () => {
   const navigate = useNavigate();
-  const [searchParams] = useSearchParams();
-  const { toast } = useToast();
   const { userTier, isLoading: accessLoading } = useAccessControl();
   const { canGoBack, goBack } = useShowBackButton();
   
   const [ritual, setRitual] = useState<DailyRitual | null>(null);
   const [loading, setLoading] = useState(true);
-  const [hasPurchased, setHasPurchased] = useState(false);
-  const [purchasing, setPurchasing] = useState(false);
-  const [user, setUser] = useState<any>(null);
-  
-  const isAuthenticated = userTier !== "guest";
   const [countdown, setCountdown] = useState<string | null>(null);
   const [showShareDialog, setShowShareDialog] = useState(false);
 
+  const isAuthenticated = userTier !== "guest";
   const isPremium = userTier === "premium";
-  const isSubscriber = userTier === "subscriber";
-  const canAccess = isPremium || hasPurchased;
 
-  // Check for purchase success
-  useEffect(() => {
-    if (searchParams.get('purchase') === 'success') {
-      toast({
-        title: "Purchase Successful!",
-        description: "You now have access to today's ritual.",
-      });
-      setHasPurchased(true);
-    }
-  }, [searchParams, toast]);
-
-  // Fetch ritual and check access
+  // Fetch ritual
   useEffect(() => {
     const fetchRitual = async () => {
       try {
@@ -98,22 +78,6 @@ const DailySmartyRitual = () => {
         }
 
         setRitual(data);
-
-        // Check if user has purchased this date (for non-premium)
-        if (isAuthenticated && !isPremium) {
-          const { data: { user } } = await supabase.auth.getUser();
-          if (user) {
-            const { data: purchase } = await supabase
-              .from("ritual_purchases")
-              .select("id")
-              .eq("user_id", user.id)
-              .eq("ritual_date", today)
-              .maybeSingle();
-
-            setHasPurchased(!!purchase);
-          }
-        }
-
         setLoading(false);
       } catch (err) {
         console.error("Error fetching ritual:", err);
@@ -124,38 +88,7 @@ const DailySmartyRitual = () => {
     if (!accessLoading) {
       fetchRitual();
     }
-  }, [accessLoading, isAuthenticated, isPremium]);
-
-  const handlePurchase = async () => {
-    if (!isAuthenticated) {
-      navigate("/auth");
-      return;
-    }
-
-    if (!ritual) return;
-
-    setPurchasing(true);
-    try {
-      const { data, error } = await supabase.functions.invoke('create-ritual-purchase-checkout', {
-        body: { ritual_date: ritual.ritual_date }
-      });
-
-      if (error) throw error;
-
-      if (data?.url) {
-        window.open(data.url, '_blank');
-      }
-    } catch (err) {
-      console.error("Purchase error:", err);
-      toast({
-        title: "Error",
-        description: "Failed to start purchase. Please try again.",
-        variant: "destructive",
-      });
-    } finally {
-      setPurchasing(false);
-    }
-  };
+  }, [accessLoading]);
 
   if (loading || accessLoading) {
     return (
@@ -187,11 +120,28 @@ const DailySmartyRitual = () => {
                 <Clock className="h-16 w-16 text-primary mx-auto mb-6" />
                 <h1 className="text-3xl font-bold mb-4">Next Ritual Arriving Soon</h1>
                 <p className="text-xl text-muted-foreground mb-6">
-                  Your Daily Smarty Ritual will be available at 07:00 Cyprus time
+                  Your Daily Smarty Ritual will be available at 07:00
                 </p>
                 <Badge variant="outline" className="text-lg px-6 py-2">
                   {countdown}
                 </Badge>
+                
+                {/* Premium-only messaging */}
+                {!isPremium && (
+                  <div className="mt-8 p-4 bg-muted/50 rounded-lg">
+                    <div className="flex items-center justify-center gap-2 mb-2">
+                      <Crown className="h-5 w-5 text-primary" />
+                      <span className="font-semibold">Premium Feature</span>
+                    </div>
+                    <p className="text-sm text-muted-foreground mb-4">
+                      The Daily Smarty Ritual is exclusively available for Premium members
+                    </p>
+                    <Button onClick={() => navigate("/joinpremium")}>
+                      <Crown className="mr-2 h-4 w-4" />
+                      Upgrade to Premium
+                    </Button>
+                  </div>
+                )}
               </CardContent>
             </Card>
           </div>
@@ -203,7 +153,7 @@ const DailySmartyRitual = () => {
   return (
     <>
       <Helmet>
-        <title>Daily Smarty Ritual - Day {ritual?.day_number} | SmartyGym</title>
+        <title>Daily Smarty Ritual{ritual ? ` - Day ${ritual.day_number}` : ''} | SmartyGym</title>
         <meta name="description" content="Your daily movement ritual for optimal performance - Morning, Midday, and Evening phases designed by Haris Falas" />
       </Helmet>
 
@@ -218,16 +168,48 @@ const DailySmartyRitual = () => {
               </Button>
             )}
             <div className="flex items-center gap-2">
-              {canAccess && (
-                <>
-                  <Button variant="outline" size="sm" onClick={() => setShowShareDialog(true)}>
-                    <Share2 className="mr-2 h-4 w-4" />
-                    Share
-                  </Button>
-                </>
+              {isPremium && ritual && (
+                <Button variant="outline" size="sm" onClick={() => setShowShareDialog(true)}>
+                  <Share2 className="mr-2 h-4 w-4" />
+                  Share
+                </Button>
               )}
             </div>
           </div>
+
+          {/* Description Card */}
+          <Card className="mb-6 bg-gradient-to-r from-primary/5 to-primary/10 border-primary/20">
+            <CardContent className="p-6">
+              <div className="flex items-start gap-4">
+                <div className="p-3 rounded-full bg-primary/10 shrink-0">
+                  <Sparkles className="h-6 w-6 text-primary" />
+                </div>
+                <div>
+                  <h2 className="text-xl font-bold mb-2">What is the Daily Smarty Ritual?</h2>
+                  <p className="text-muted-foreground mb-3">
+                    Your all-day game plan for movement, recovery, and performance. Each day brings a fresh ritual with three expertly designed phases:
+                  </p>
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                    <div className="flex items-center gap-2">
+                      <Sun className="h-4 w-4 text-yellow-600" />
+                      <span className="text-sm"><strong>Morning:</strong> Activation</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <Cloud className="h-4 w-4 text-blue-600" />
+                      <span className="text-sm"><strong>Midday:</strong> Reset</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <Moon className="h-4 w-4 text-purple-600" />
+                      <span className="text-sm"><strong>Evening:</strong> Unwind</span>
+                    </div>
+                  </div>
+                  <p className="text-sm text-muted-foreground mt-3">
+                    Designed by <strong>Haris Falas</strong> (Sports Scientist, CSCS) to keep you energized, mobile, and performing at your best.
+                  </p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
 
           {/* Main Card */}
           <Card className="overflow-hidden">
@@ -236,9 +218,11 @@ const DailySmartyRitual = () => {
               <div className="flex items-start justify-between">
                 <div className="flex-1">
                   <div className="flex items-center gap-2 mb-2">
-                    <Badge variant="secondary" className="bg-primary text-primary-foreground">
-                      Day {ritual?.day_number}
-                    </Badge>
+                    {ritual && (
+                      <Badge variant="secondary" className="bg-primary text-primary-foreground">
+                        Day {ritual.day_number}
+                      </Badge>
+                    )}
                     {isPremium && (
                       <Badge variant="outline" className="border-yellow-500 text-yellow-600">
                         <Crown className="h-3 w-3 mr-1" />
@@ -264,39 +248,24 @@ const DailySmartyRitual = () => {
               </div>
             </div>
 
-            {/* Access Gate for non-premium/non-purchased */}
-            {!canAccess && (
+            {/* Access Gate for non-premium */}
+            {!isPremium && (
               <div className="p-6 bg-muted/50">
-                <div className="flex items-center justify-center gap-4 text-center">
-                  <Lock className="h-8 w-8 text-muted-foreground" />
+                <div className="flex flex-col items-center justify-center gap-4 text-center">
+                  <Lock className="h-12 w-12 text-muted-foreground" />
                   <div>
-                    <h3 className="font-semibold mb-1">Premium Content</h3>
-                    <p className="text-sm text-muted-foreground mb-4">
-                      {isSubscriber 
-                        ? "Unlock today's ritual for €1.99 or upgrade to Premium for full access"
-                        : "Sign in to access the Daily Smarty Ritual"}
+                    <h3 className="text-xl font-semibold mb-2">Premium Exclusive Feature</h3>
+                    <p className="text-muted-foreground mb-4 max-w-md">
+                      The Daily Smarty Ritual is exclusively available for Premium members. Upgrade now to unlock daily movement rituals designed for optimal health and performance.
                     </p>
-                    <div className="flex flex-col sm:flex-row gap-2 justify-center">
-                      {isSubscriber ? (
-                        <>
-                          <Button onClick={handlePurchase} disabled={purchasing}>
-                            {purchasing ? (
-                              <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Processing...</>
-                            ) : (
-                              "Unlock for €1.99"
-                            )}
-                          </Button>
-                          <Button variant="outline" onClick={() => navigate("/joinpremium")}>
-                            <Crown className="mr-2 h-4 w-4" />
-                            Upgrade to Premium
-                          </Button>
-                        </>
-                      ) : !isAuthenticated ? (
+                    <div className="flex flex-col sm:flex-row gap-3 justify-center">
+                      {!isAuthenticated ? (
                         <>
                           <Button onClick={() => navigate("/auth")}>
                             Sign In
                           </Button>
                           <Button variant="outline" onClick={() => navigate("/joinpremium")}>
+                            <Crown className="mr-2 h-4 w-4" />
                             View Premium Plans
                           </Button>
                         </>
@@ -313,7 +282,7 @@ const DailySmartyRitual = () => {
             )}
 
             {/* Ritual Content */}
-            {canAccess && ritual && (
+            {isPremium && ritual && (
               <CardContent className="p-6 space-y-8">
                 {/* Calendar Integration */}
                 <div className="flex justify-center">
@@ -396,12 +365,14 @@ const DailySmartyRitual = () => {
       </div>
 
       {/* Share Dialog */}
-      <RitualShareDialog 
-        open={showShareDialog} 
-        onOpenChange={setShowShareDialog}
-        ritualDate={ritual?.ritual_date || ''}
-        dayNumber={ritual?.day_number || 0}
-      />
+      {ritual && (
+        <RitualShareDialog 
+          open={showShareDialog} 
+          onOpenChange={setShowShareDialog}
+          ritualDate={ritual.ritual_date}
+          dayNumber={ritual.day_number}
+        />
+      )}
     </>
   );
 };
