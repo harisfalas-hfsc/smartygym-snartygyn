@@ -11,12 +11,12 @@ import { useToast } from "@/hooks/use-toast";
 import { A4Container } from "@/components/ui/a4-container";
 
 const PROGRAM_CATEGORIES = [
-  "CARDIO",
+  "CARDIO ENDURANCE",
   "FUNCTIONAL STRENGTH",
   "MUSCLE HYPERTROPHY",
   "WEIGHT LOSS",
   "LOW BACK PAIN",
-  "MOBILITY/STABILITY"
+  "MOBILITY & STABILITY"
 ];
 
 const DIFFICULTY_LEVELS = ["Beginner", "Intermediate", "Advanced"];
@@ -71,12 +71,12 @@ export const ProgramEditDialog = ({ program, open, onOpenChange, onSave }: Progr
 
   const getCategoryPrefix = (category: string) => {
     const prefixMap: { [key: string]: string } = {
-      'CARDIO': 'C',
+      'CARDIO ENDURANCE': 'C',
       'FUNCTIONAL STRENGTH': 'F',
       'MUSCLE HYPERTROPHY': 'M',
       'WEIGHT LOSS': 'W',
       'LOW BACK PAIN': 'L',
-      'MOBILITY/STABILITY': 'MS',
+      'MOBILITY & STABILITY': 'MS',
     };
     return prefixMap[category] || 'P';
   };
