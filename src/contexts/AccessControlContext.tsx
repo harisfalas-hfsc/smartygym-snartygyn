@@ -142,15 +142,47 @@ export const AccessControlProvider = ({ children }: { children: ReactNode }) => 
         purchases?.map(p => `${p.content_type}:${p.content_id}`) || []
       );
 
-      // User is premium if they have gold or platinum plan with active status
-      const isSubscribed = dbData?.status === 'active' && 
+      // Check if user is a corporate admin (has active corporate subscription)
+      const { data: corpAdmin } = await supabase
+        .from('corporate_subscriptions')
+        .select('id, plan_type, status')
+        .eq('admin_user_id', user.id)
+        .eq('status', 'active')
+        .maybeSingle();
+
+      // Check if user is a corporate member (added by a corporate admin)
+      const { data: corpMember } = await supabase
+        .from('corporate_members')
+        .select('id, corporate_subscription_id')
+        .eq('user_id', user.id)
+        .maybeSingle();
+
+      // Verify corporate member's subscription is still active
+      let isCorporateMemberActive = false;
+      if (corpMember) {
+        const { data: corpSubStatus } = await supabase
+          .from('corporate_subscriptions')
+          .select('status')
+          .eq('id', corpMember.corporate_subscription_id)
+          .eq('status', 'active')
+          .maybeSingle();
+        isCorporateMemberActive = !!corpSubStatus;
+      }
+
+      // User is premium if they have:
+      // 1. Gold or Platinum plan with active status, OR
+      // 2. Active corporate admin subscription, OR
+      // 3. Active corporate member status
+      const isPersonalPremium = dbData?.status === 'active' && 
                          (dbData?.plan_type === 'gold' || dbData?.plan_type === 'platinum');
+      const isCorporatePremium = !!corpAdmin || isCorporateMemberActive;
+      const isPremium = isPersonalPremium || isCorporatePremium;
       
       setState({
         user,
-        userTier: isSubscribed ? "premium" : "subscriber",
+        userTier: isPremium ? "premium" : "subscriber",
         isLoading: false,
-        productId: dbData?.plan_type || null,
+        productId: dbData?.plan_type || (isCorporatePremium ? 'platinum' : null),
         purchasedContent,
       });
     } catch (error) {

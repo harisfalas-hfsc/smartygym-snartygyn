@@ -381,27 +381,96 @@ async function handleSubscriptionCheckout(
 
   logStep("Creating subscription record", { userId, planType, subscriptionId });
 
-  // Upsert subscription in database
-  const { error } = await supabase
-    .from('user_subscriptions')
-    .upsert({
-      user_id: userId,
-      stripe_customer_id: customerId,
-      stripe_subscription_id: subscriptionId,
-      stripe_price_id: priceId,
-      plan_type: planType,
-      status: subscription.status,
-      current_period_start: new Date(subscription.current_period_start * 1000).toISOString(),
-      current_period_end: new Date(subscription.current_period_end * 1000).toISOString(),
-      cancel_at_period_end: subscription.cancel_at_period_end,
-    }, {
-      onConflict: 'user_id'
-    });
+  // Check if user is a corporate admin or member - protect their access
+  const { data: corpAdmin } = await supabase
+    .from('corporate_subscriptions')
+    .select('id')
+    .eq('admin_user_id', userId)
+    .eq('status', 'active')
+    .maybeSingle();
 
-  if (error) {
-    logStep("ERROR: Failed to update subscription", { error });
+  const { data: corpMember } = await supabase
+    .from('corporate_members')
+    .select('id')
+    .eq('user_id', userId)
+    .maybeSingle();
+
+  // If corporate user, only update Stripe IDs without changing plan_type
+  // This allows personal subscriptions to coexist with corporate access
+  if (corpAdmin || corpMember) {
+    logStep("User is corporate admin/member - updating Stripe IDs only, preserving access", { corpAdmin: !!corpAdmin, corpMember: !!corpMember });
+    
+    // First check if user has existing subscription record
+    const { data: existingSub } = await supabase
+      .from('user_subscriptions')
+      .select('id, plan_type')
+      .eq('user_id', userId)
+      .maybeSingle();
+
+    if (existingSub) {
+      // Update only Stripe-related fields, preserve plan_type
+      const { error } = await supabase
+        .from('user_subscriptions')
+        .update({
+          stripe_customer_id: customerId,
+          stripe_subscription_id: subscriptionId,
+          stripe_price_id: priceId,
+          status: subscription.status,
+          current_period_start: new Date(subscription.current_period_start * 1000).toISOString(),
+          current_period_end: new Date(subscription.current_period_end * 1000).toISOString(),
+          cancel_at_period_end: subscription.cancel_at_period_end,
+        })
+        .eq('user_id', userId);
+
+      if (error) {
+        logStep("ERROR: Failed to update subscription for corporate user", { error });
+      } else {
+        logStep("Subscription Stripe IDs updated for corporate user (plan_type preserved)");
+      }
+    } else {
+      // No existing record - create new one with the new plan
+      const { error } = await supabase
+        .from('user_subscriptions')
+        .insert({
+          user_id: userId,
+          stripe_customer_id: customerId,
+          stripe_subscription_id: subscriptionId,
+          stripe_price_id: priceId,
+          plan_type: planType,
+          status: subscription.status,
+          current_period_start: new Date(subscription.current_period_start * 1000).toISOString(),
+          current_period_end: new Date(subscription.current_period_end * 1000).toISOString(),
+          cancel_at_period_end: subscription.cancel_at_period_end,
+        });
+
+      if (error) {
+        logStep("ERROR: Failed to create subscription for corporate user", { error });
+      } else {
+        logStep("New subscription created for corporate user");
+      }
+    }
   } else {
-    logStep("Subscription created successfully");
+    // Normal upsert for non-corporate users
+    const { error } = await supabase
+      .from('user_subscriptions')
+      .upsert({
+        user_id: userId,
+        stripe_customer_id: customerId,
+        stripe_subscription_id: subscriptionId,
+        stripe_price_id: priceId,
+        plan_type: planType,
+        status: subscription.status,
+        current_period_start: new Date(subscription.current_period_start * 1000).toISOString(),
+        current_period_end: new Date(subscription.current_period_end * 1000).toISOString(),
+        cancel_at_period_end: subscription.cancel_at_period_end,
+      }, {
+        onConflict: 'user_id'
+      });
+
+    if (error) {
+      logStep("ERROR: Failed to update subscription", { error });
+    } else {
+      logStep("Subscription created successfully");
     
     // Track subscription purchase for social media analytics
     try {
@@ -490,6 +559,7 @@ async function handleSubscriptionCheckout(
     // If first-time customer, also send the special first-purchase welcome message
     if (isFirstTime) {
       await sendFirstPurchaseWelcome(userId, userEmail, supabase);
+    }
     }
   }
 }
@@ -671,7 +741,7 @@ async function handleSubscriptionUpdate(
   // Find user by customer ID
   const { data: existingSub } = await supabase
     .from('user_subscriptions')
-    .select('user_id')
+    .select('user_id, plan_type')
     .eq('stripe_customer_id', customerId)
     .maybeSingle();
 
@@ -680,27 +750,66 @@ async function handleSubscriptionUpdate(
     return;
   }
 
+  const userId = existingSub.user_id;
   const priceId = subscription.items.data[0].price.id;
 
-  logStep("Updating subscription", { userId: existingSub.user_id, status: subscription.status });
+  logStep("Updating subscription", { userId, status: subscription.status });
 
-  // Update subscription
-  const { error } = await supabase
-    .from('user_subscriptions')
-    .update({
-      stripe_subscription_id: subscription.id,
-      stripe_price_id: priceId,
-      status: subscription.status,
-      current_period_start: new Date(subscription.current_period_start * 1000).toISOString(),
-      current_period_end: new Date(subscription.current_period_end * 1000).toISOString(),
-      cancel_at_period_end: subscription.cancel_at_period_end,
-    })
-    .eq('user_id', existingSub.user_id);
+  // Check if user is a corporate admin or member - protect their access
+  const { data: corpAdmin } = await supabase
+    .from('corporate_subscriptions')
+    .select('id')
+    .eq('admin_user_id', userId)
+    .eq('status', 'active')
+    .maybeSingle();
 
-  if (error) {
-    logStep("ERROR: Failed to update subscription", { error });
+  const { data: corpMember } = await supabase
+    .from('corporate_members')
+    .select('id')
+    .eq('user_id', userId)
+    .maybeSingle();
+
+  // For corporate users, don't update plan_type - only update Stripe-related fields
+  if (corpAdmin || corpMember) {
+    logStep("User is corporate admin/member - updating Stripe fields only, preserving plan_type", { corpAdmin: !!corpAdmin, corpMember: !!corpMember });
+    
+    const { error } = await supabase
+      .from('user_subscriptions')
+      .update({
+        stripe_subscription_id: subscription.id,
+        stripe_price_id: priceId,
+        status: subscription.status,
+        current_period_start: new Date(subscription.current_period_start * 1000).toISOString(),
+        current_period_end: new Date(subscription.current_period_end * 1000).toISOString(),
+        cancel_at_period_end: subscription.cancel_at_period_end,
+        // NOTE: plan_type is intentionally NOT updated for corporate users
+      })
+      .eq('user_id', userId);
+
+    if (error) {
+      logStep("ERROR: Failed to update subscription for corporate user", { error });
+    } else {
+      logStep("Subscription updated for corporate user (plan_type preserved)");
+    }
   } else {
-    logStep("Subscription updated successfully");
+    // Normal update for non-corporate users
+    const { error } = await supabase
+      .from('user_subscriptions')
+      .update({
+        stripe_subscription_id: subscription.id,
+        stripe_price_id: priceId,
+        status: subscription.status,
+        current_period_start: new Date(subscription.current_period_start * 1000).toISOString(),
+        current_period_end: new Date(subscription.current_period_end * 1000).toISOString(),
+        cancel_at_period_end: subscription.cancel_at_period_end,
+      })
+      .eq('user_id', userId);
+
+    if (error) {
+      logStep("ERROR: Failed to update subscription", { error });
+    } else {
+      logStep("Subscription updated successfully");
+    }
   }
 }
 
