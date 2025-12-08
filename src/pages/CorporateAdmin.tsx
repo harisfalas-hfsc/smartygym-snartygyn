@@ -7,23 +7,6 @@ import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
-import {
   AlertDialog,
   AlertDialogAction,
   AlertDialogCancel,
@@ -43,10 +26,11 @@ import {
   Trash2,
   Calendar,
   RefreshCw,
-  ExternalLink,
   Copy,
   Eye,
   EyeOff,
+  UserCheck,
+  UserPlus,
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { User } from "@supabase/supabase-js";
@@ -83,7 +67,7 @@ export default function CorporateAdmin() {
   const [subscription, setSubscription] = useState<CorporateSubscription | null>(null);
   const [members, setMembers] = useState<CorporateMember[]>([]);
   const [addingMember, setAddingMember] = useState(false);
-  const [dialogOpen, setDialogOpen] = useState(false);
+  const [activeSlotIndex, setActiveSlotIndex] = useState<number | null>(null);
   const [showPassword, setShowPassword] = useState(false);
   
   // Form state
@@ -150,7 +134,7 @@ export default function CorporateAdmin() {
             created_at
           `)
           .eq('corporate_subscription_id', corpSub.id)
-          .order('created_at', { ascending: false });
+          .order('created_at', { ascending: true });
 
         if (membersError) {
           console.error('Error fetching members:', membersError);
@@ -214,10 +198,7 @@ export default function CorporateAdmin() {
       }
 
       // Reset form
-      setNewMemberEmail("");
-      setNewMemberName("");
-      setNewMemberPassword("");
-      setDialogOpen(false);
+      resetForm();
 
     } catch (error) {
       console.error('Error adding member:', error);
@@ -285,6 +266,14 @@ export default function CorporateAdmin() {
     toast({ title: "Password Copied", description: "Password copied to clipboard." });
   };
 
+  const resetForm = () => {
+    setNewMemberEmail("");
+    setNewMemberName("");
+    setNewMemberPassword("");
+    setActiveSlotIndex(null);
+    setShowPassword(false);
+  };
+
   const getPlanDisplayName = (planType: string) => {
     const names: Record<string, string> = {
       dynamic: 'Smarty Dynamic',
@@ -342,8 +331,17 @@ export default function CorporateAdmin() {
   }
 
   const isActive = subscription.status === 'active';
+  const displayMaxUsers = subscription.max_users === 9999 ? 50 : subscription.max_users; // Cap display at 50 for enterprise
   const usagePercentage = (subscription.current_users_count / subscription.max_users) * 100;
   const canAddMore = subscription.current_users_count < subscription.max_users;
+
+  // Create slots array for visual display
+  const slots = Array.from({ length: displayMaxUsers }, (_, index) => {
+    return members[index] || null;
+  });
+
+  // Find the first empty slot index
+  const firstEmptySlotIndex = slots.findIndex(slot => slot === null);
 
   return (
     <>
@@ -373,7 +371,7 @@ export default function CorporateAdmin() {
             </div>
           </div>
 
-          {/* Subscription Info Card */}
+          {/* Subscription Info Cards */}
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
             <Card>
               <CardHeader className="pb-2">
@@ -423,170 +421,78 @@ export default function CorporateAdmin() {
                     <p>Ends: <span className="font-semibold">{format(new Date(subscription.current_period_end), 'MMM dd, yyyy')}</span></p>
                   </div>
                 </div>
+                <p className="text-xs text-muted-foreground mt-2">
+                  All team members have access until this date
+                </p>
               </CardContent>
             </Card>
           </div>
 
-          {/* Add Member Card */}
-          <Card className="mb-8">
-            <CardHeader>
-              <div className="flex items-center justify-between">
-                <div>
-                  <CardTitle className="flex items-center gap-2">
-                    <Plus className="h-5 w-5 text-primary" />
-                    Add Team Member
-                  </CardTitle>
-                  <CardDescription>
-                    Create accounts for your team members with Platinum access
-                  </CardDescription>
-                </div>
-                <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-                  <DialogTrigger asChild>
-                    <Button disabled={!canAddMore || !isActive}>
-                      <Plus className="h-4 w-4 mr-2" />
-                      Add Member
-                    </Button>
-                  </DialogTrigger>
-                  <DialogContent>
-                    <DialogHeader>
-                      <DialogTitle>Add New Team Member</DialogTitle>
-                      <DialogDescription>
-                        Create a new account for your team member. They will receive login credentials via email.
-                      </DialogDescription>
-                    </DialogHeader>
-                    <div className="space-y-4 py-4">
-                      <div className="space-y-2">
-                        <Label htmlFor="email">Email Address</Label>
-                        <Input
-                          id="email"
-                          type="email"
-                          placeholder="member@company.com"
-                          value={newMemberEmail}
-                          onChange={(e) => setNewMemberEmail(e.target.value)}
-                        />
-                      </div>
-                      <div className="space-y-2">
-                        <Label htmlFor="name">Full Name</Label>
-                        <Input
-                          id="name"
-                          placeholder="John Smith"
-                          value={newMemberName}
-                          onChange={(e) => setNewMemberName(e.target.value)}
-                        />
-                      </div>
-                      <div className="space-y-2">
-                        <div className="flex items-center justify-between">
-                          <Label htmlFor="password">Password (Optional)</Label>
-                          <Button
-                            type="button"
-                            variant="ghost"
-                            size="sm"
-                            onClick={generateRandomPassword}
-                          >
-                            Generate
-                          </Button>
-                        </div>
-                        <div className="relative">
-                          <Input
-                            id="password"
-                            type={showPassword ? "text" : "password"}
-                            placeholder="Leave empty for auto-generated password"
-                            value={newMemberPassword}
-                            onChange={(e) => setNewMemberPassword(e.target.value)}
-                          />
-                          <div className="absolute right-2 top-1/2 -translate-y-1/2 flex gap-1">
-                            {newMemberPassword && (
-                              <Button
-                                type="button"
-                                variant="ghost"
-                                size="icon"
-                                className="h-7 w-7"
-                                onClick={copyPassword}
-                              >
-                                <Copy className="h-4 w-4" />
-                              </Button>
-                            )}
-                            <Button
-                              type="button"
-                              variant="ghost"
-                              size="icon"
-                              className="h-7 w-7"
-                              onClick={() => setShowPassword(!showPassword)}
-                            >
-                              {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-                            </Button>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                    <DialogFooter>
-                      <Button variant="outline" onClick={() => setDialogOpen(false)}>
-                        Cancel
-                      </Button>
-                      <Button onClick={handleAddMember} disabled={addingMember}>
-                        {addingMember ? "Creating..." : "Create Account"}
-                      </Button>
-                    </DialogFooter>
-                  </DialogContent>
-                </Dialog>
-              </div>
-            </CardHeader>
-            {!canAddMore && (
-              <CardContent>
-                <p className="text-sm text-amber-600 bg-amber-50 dark:bg-amber-900/20 p-3 rounded-lg">
-                  You've reached your member limit ({subscription.max_users} users). 
-                  Upgrade your plan to add more team members.
-                </p>
-              </CardContent>
-            )}
-          </Card>
-
-          {/* Members Table */}
+          {/* Team Member Slots */}
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <Users className="h-5 w-5 text-primary" />
-                Team Members ({members.length})
+                Team Member Slots ({subscription.current_users_count}/{subscription.max_users === 9999 ? '∞' : subscription.max_users} used)
               </CardTitle>
+              <CardDescription>
+                Manage your team members. Each slot represents one Platinum access account.
+              </CardDescription>
             </CardHeader>
             <CardContent>
-              {members.length === 0 ? (
-                <div className="text-center py-8 text-muted-foreground">
-                  <Users className="h-12 w-12 mx-auto mb-4 opacity-50" />
-                  <p>No team members yet. Add your first member above.</p>
-                </div>
-              ) : (
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>Name</TableHead>
-                      <TableHead>Email</TableHead>
-                      <TableHead>Added</TableHead>
-                      <TableHead>Access</TableHead>
-                      <TableHead className="text-right">Actions</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {members.map((member) => (
-                      <TableRow key={member.id}>
-                        <TableCell className="font-medium">
-                          {member.profile?.full_name || 'N/A'}
-                        </TableCell>
-                        <TableCell>{member.email}</TableCell>
-                        <TableCell>
-                          {format(new Date(member.created_at), 'MMM dd, yyyy')}
-                        </TableCell>
-                        <TableCell>
-                          <Badge className="bg-primary/20 text-primary">
-                            <Crown className="h-3 w-3 mr-1" />
-                            Platinum
-                          </Badge>
-                        </TableCell>
-                        <TableCell className="text-right">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {slots.map((member, index) => (
+                  <div
+                    key={index}
+                    className={`border rounded-lg p-4 transition-all ${
+                      member 
+                        ? 'bg-green-50 dark:bg-green-900/20 border-green-200 dark:border-green-800' 
+                        : activeSlotIndex === index 
+                          ? 'bg-primary/5 border-primary' 
+                          : 'bg-muted/30 border-dashed border-muted-foreground/30'
+                    }`}
+                  >
+                    {/* Slot Header */}
+                    <div className="flex items-center justify-between mb-2">
+                      <span className="text-xs font-medium text-muted-foreground">
+                        SLOT {index + 1}
+                      </span>
+                      {member && (
+                        <Badge className="bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200 text-xs">
+                          <UserCheck className="h-3 w-3 mr-1" />
+                          Active
+                        </Badge>
+                      )}
+                    </div>
+
+                    {member ? (
+                      // Filled Slot - Show member info
+                      <div className="space-y-2">
+                        <div className="flex items-center gap-2">
+                          <div className="h-8 w-8 rounded-full bg-primary/20 flex items-center justify-center">
+                            <span className="text-sm font-bold text-primary">
+                              {member.profile?.full_name?.charAt(0) || member.email.charAt(0).toUpperCase()}
+                            </span>
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <p className="font-medium truncate">
+                              {member.profile?.full_name || 'No Name'}
+                            </p>
+                            <p className="text-xs text-muted-foreground truncate">
+                              {member.email}
+                            </p>
+                          </div>
+                        </div>
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center gap-2">
+                            <Crown className="h-3 w-3 text-primary" />
+                            <span className="text-xs text-muted-foreground">Platinum Access</span>
+                          </div>
                           <AlertDialog>
                             <AlertDialogTrigger asChild>
-                              <Button variant="ghost" size="icon" className="text-destructive hover:text-destructive">
-                                <Trash2 className="h-4 w-4" />
+                              <Button variant="ghost" size="sm" className="text-destructive hover:text-destructive h-7 px-2">
+                                <Trash2 className="h-3 w-3 mr-1" />
+                                Remove
                               </Button>
                             </AlertDialogTrigger>
                             <AlertDialogContent>
@@ -607,11 +513,126 @@ export default function CorporateAdmin() {
                               </AlertDialogFooter>
                             </AlertDialogContent>
                           </AlertDialog>
-                        </TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
+                        </div>
+                      </div>
+                    ) : activeSlotIndex === index ? (
+                      // Active empty slot - Show form
+                      <div className="space-y-3">
+                        <div className="space-y-2">
+                          <Label htmlFor={`name-${index}`} className="text-xs">Full Name</Label>
+                          <Input
+                            id={`name-${index}`}
+                            placeholder="John Smith"
+                            value={newMemberName}
+                            onChange={(e) => setNewMemberName(e.target.value)}
+                            className="h-8 text-sm"
+                          />
+                        </div>
+                        <div className="space-y-2">
+                          <Label htmlFor={`email-${index}`} className="text-xs">Email Address</Label>
+                          <Input
+                            id={`email-${index}`}
+                            type="email"
+                            placeholder="member@company.com"
+                            value={newMemberEmail}
+                            onChange={(e) => setNewMemberEmail(e.target.value)}
+                            className="h-8 text-sm"
+                          />
+                        </div>
+                        <div className="space-y-2">
+                          <div className="flex items-center justify-between">
+                            <Label htmlFor={`password-${index}`} className="text-xs">Password</Label>
+                            <Button
+                              type="button"
+                              variant="ghost"
+                              size="sm"
+                              onClick={generateRandomPassword}
+                              className="h-5 text-xs px-2"
+                            >
+                              Generate
+                            </Button>
+                          </div>
+                          <div className="relative">
+                            <Input
+                              id={`password-${index}`}
+                              type={showPassword ? "text" : "password"}
+                              placeholder="Auto-generated if empty"
+                              value={newMemberPassword}
+                              onChange={(e) => setNewMemberPassword(e.target.value)}
+                              className="h-8 text-sm pr-16"
+                            />
+                            <div className="absolute right-1 top-1/2 -translate-y-1/2 flex gap-0.5">
+                              {newMemberPassword && (
+                                <Button
+                                  type="button"
+                                  variant="ghost"
+                                  size="icon"
+                                  className="h-6 w-6"
+                                  onClick={copyPassword}
+                                >
+                                  <Copy className="h-3 w-3" />
+                                </Button>
+                              )}
+                              <Button
+                                type="button"
+                                variant="ghost"
+                                size="icon"
+                                className="h-6 w-6"
+                                onClick={() => setShowPassword(!showPassword)}
+                              >
+                                {showPassword ? <EyeOff className="h-3 w-3" /> : <Eye className="h-3 w-3" />}
+                              </Button>
+                            </div>
+                          </div>
+                        </div>
+                        <div className="flex gap-2 pt-1">
+                          <Button
+                            size="sm"
+                            onClick={handleAddMember}
+                            disabled={addingMember || !newMemberEmail || !newMemberName}
+                            className="flex-1 h-8"
+                          >
+                            {addingMember ? "Adding..." : "Add Member"}
+                          </Button>
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={resetForm}
+                            className="h-8"
+                          >
+                            Cancel
+                          </Button>
+                        </div>
+                      </div>
+                    ) : (
+                      // Empty slot - Show add button
+                      <div className="flex flex-col items-center justify-center py-4">
+                        <div className="h-10 w-10 rounded-full border-2 border-dashed border-muted-foreground/30 flex items-center justify-center mb-2">
+                          <UserPlus className="h-5 w-5 text-muted-foreground/50" />
+                        </div>
+                        <p className="text-sm text-muted-foreground mb-2">Empty Slot</p>
+                        {isActive && canAddMore && index === firstEmptySlotIndex && (
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={() => setActiveSlotIndex(index)}
+                            className="h-7 text-xs"
+                          >
+                            <Plus className="h-3 w-3 mr-1" />
+                            Add Member
+                          </Button>
+                        )}
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </div>
+
+              {/* Enterprise plan note */}
+              {subscription.max_users === 9999 && (
+                <p className="text-sm text-muted-foreground mt-4 text-center">
+                  Showing first 50 slots. Your Enterprise plan supports unlimited team members.
+                </p>
               )}
             </CardContent>
           </Card>
