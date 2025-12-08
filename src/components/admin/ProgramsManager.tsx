@@ -459,12 +459,12 @@ export const ProgramsManager = ({ externalDialog, setExternalDialog }: ProgramsM
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">All Categories</SelectItem>
-                <SelectItem value="CARDIO">Cardio</SelectItem>
+                <SelectItem value="CARDIO ENDURANCE">Cardio Endurance</SelectItem>
                 <SelectItem value="FUNCTIONAL STRENGTH">Functional Strength</SelectItem>
                 <SelectItem value="MUSCLE HYPERTROPHY">Muscle Hypertrophy</SelectItem>
                 <SelectItem value="WEIGHT LOSS">Weight Loss</SelectItem>
                 <SelectItem value="LOW BACK PAIN">Low Back Pain</SelectItem>
-                <SelectItem value="MOBILITY/STABILITY">Mobility/Stability</SelectItem>
+                <SelectItem value="MOBILITY & STABILITY">Mobility & Stability</SelectItem>
               </SelectContent>
             </Select>
             <Select value={difficultyFilter} onValueChange={setDifficultyFilter}>
