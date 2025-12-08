@@ -104,3 +104,6 @@ verify_jwt = false
 
 [functions.upload-corporate-icons]
 verify_jwt = false
+
+[functions.grant-corporate-admin]
+verify_jwt = true
