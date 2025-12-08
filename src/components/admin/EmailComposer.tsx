@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -7,7 +7,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
-import { Mail, Send, Users, AlertCircle, FileText, Download } from "lucide-react";
+import { Mail, Send, Users, AlertCircle, FileText, Download, Building2 } from "lucide-react";
 import { toast } from "sonner";
 import { UserSelectionTable } from "./UserSelectionTable";
 
@@ -25,6 +25,13 @@ interface UserData {
   full_name: string | null;
   plan_type: string;
   status: string;
+  // Corporate fields
+  is_corporate_admin?: boolean;
+  corporate_admin_org?: string | null;
+  corporate_admin_plan?: string | null;
+  is_corporate_member?: boolean;
+  corporate_member_org?: string | null;
+  corporate_member_plan?: string | null;
 }
 
 export function EmailComposer() {
@@ -41,6 +48,8 @@ export function EmailComposer() {
   const [planFilter, setPlanFilter] = useState<string>("all");
   const [statusFilter, setStatusFilter] = useState<string>("all");
   const [purchaseFilter, setPurchaseFilter] = useState<string>("all");
+  const [corporateFilter, setCorporateFilter] = useState<string>("all");
+  const [organizationFilter, setOrganizationFilter] = useState<string>("all");
   
   // Email content
   const [subject, setSubject] = useState("");
@@ -50,27 +59,40 @@ export function EmailComposer() {
   // Confirmation dialog
   const [showConfirm, setShowConfirm] = useState(false);
 
+  // Get unique organizations for filter dropdown
+  const organizations = useMemo(() => {
+    const orgs = new Set<string>();
+    users.forEach(user => {
+      if (user.corporate_admin_org) orgs.add(user.corporate_admin_org);
+      if (user.corporate_member_org) orgs.add(user.corporate_member_org);
+    });
+    return Array.from(orgs).sort();
+  }, [users]);
+
   const fetchUsers = async () => {
     setLoading(true);
     try {
-      // Fetch registered users with emails from edge function
       const { data: usersData, error: usersError } = await supabase.functions.invoke('get-users-with-emails');
       
       if (usersError) throw usersError;
 
-      // Map users directly from edge function response (already includes plan_type and status)
       const registeredUsers: UserData[] = (usersData?.users || []).map((user: any) => ({
         user_id: user.user_id,
         email: user.email,
         full_name: user.full_name || user.email,
         plan_type: user.plan_type || 'free',
         status: user.status || 'inactive',
+        is_corporate_admin: user.is_corporate_admin || false,
+        corporate_admin_org: user.corporate_admin_org || null,
+        corporate_admin_plan: user.corporate_admin_plan || null,
+        is_corporate_member: user.is_corporate_member || false,
+        corporate_member_org: user.corporate_member_org || null,
+        corporate_member_plan: user.corporate_member_plan || null,
       }));
 
       setUsers(registeredUsers);
       setFilteredUsers(registeredUsers);
 
-      // Fetch users with purchases
       const { data: purchases } = await supabase
         .from('user_purchases')
         .select('user_id');
@@ -121,12 +143,12 @@ export function EmailComposer() {
       }
     }
 
-    // Plan filter (only applies when relevant)
+    // Plan filter
     if (planFilter !== "all" && userTypeFilter !== "registered_without_plan") {
       filtered = filtered.filter(user => user.plan_type === planFilter);
     }
 
-    // Status filter (only applies to users with subscriptions)
+    // Status filter
     if (statusFilter !== "all" && userTypeFilter !== "registered_without_plan") {
       filtered = filtered.filter(user => user.status === statusFilter);
     }
@@ -138,8 +160,27 @@ export function EmailComposer() {
       filtered = filtered.filter(user => !userPurchases.includes(user.user_id));
     }
 
+    // Corporate filter
+    if (corporateFilter === "corporate_admins") {
+      filtered = filtered.filter(user => user.is_corporate_admin);
+    } else if (corporateFilter === "corporate_members") {
+      filtered = filtered.filter(user => user.is_corporate_member);
+    } else if (corporateFilter === "corporate_all") {
+      filtered = filtered.filter(user => user.is_corporate_admin || user.is_corporate_member);
+    } else if (corporateFilter === "non_corporate") {
+      filtered = filtered.filter(user => !user.is_corporate_admin && !user.is_corporate_member);
+    }
+
+    // Organization filter
+    if (organizationFilter !== "all") {
+      filtered = filtered.filter(user => 
+        user.corporate_admin_org === organizationFilter || 
+        user.corporate_member_org === organizationFilter
+      );
+    }
+
     setFilteredUsers(filtered);
-  }, [userTypeFilter, planFilter, statusFilter, purchaseFilter, users, userPurchases]);
+  }, [userTypeFilter, planFilter, statusFilter, purchaseFilter, corporateFilter, organizationFilter, users, userPurchases]);
 
   const handleSendEmails = async () => {
     if (!subject.trim() || !message.trim()) {
@@ -179,7 +220,6 @@ export function EmailComposer() {
           }`
         );
         
-        // Clear form and selection
         setSubject("");
         setMessage("");
         setSelectedUserIds([]);
@@ -198,13 +238,19 @@ export function EmailComposer() {
     const selectedUsers = users.filter(u => selectedUserIds.includes(u.user_id));
     
     const csvContent = [
-      ['Name', 'Email', 'Plan', 'Status'].join(','),
-      ...selectedUsers.map(user => [
-        user.full_name || 'Unknown',
-        user.email || '',
-        user.plan_type,
-        user.status
-      ].map(field => `"${field}"`).join(','))
+      ['Name', 'Email', 'Plan', 'Status', 'Corporate Role', 'Organization'].join(','),
+      ...selectedUsers.map(user => {
+        const corpRole = user.is_corporate_admin ? 'Admin' : user.is_corporate_member ? 'Member' : '';
+        const org = user.corporate_admin_org || user.corporate_member_org || '';
+        return [
+          user.full_name || 'Unknown',
+          user.email || '',
+          user.plan_type,
+          user.status,
+          corpRole,
+          org
+        ].map(field => `"${field}"`).join(',');
+      })
     ].join('\n');
 
     const blob = new Blob([csvContent], { type: 'text/csv' });
@@ -220,9 +266,28 @@ export function EmailComposer() {
     toast.success(`Exported ${selectedUsers.length} recipients to CSV`);
   };
 
-  // Determine which filters should be disabled
   const isPlanFilterDisabled = userTypeFilter === "registered_without_plan";
   const isStatusFilterDisabled = userTypeFilter === "registered_without_plan";
+
+  const renderCorporateBadge = (user: UserData) => {
+    if (user.is_corporate_admin) {
+      return (
+        <Badge variant="default" className="text-xs bg-blue-600 hover:bg-blue-700 flex items-center gap-1">
+          <Building2 className="h-3 w-3" />
+          Admin: {user.corporate_admin_org}
+        </Badge>
+      );
+    }
+    if (user.is_corporate_member) {
+      return (
+        <Badge variant="secondary" className="text-xs flex items-center gap-1">
+          <Users className="h-3 w-3" />
+          Member: {user.corporate_member_org}
+        </Badge>
+      );
+    }
+    return null;
+  };
 
   if (loading) {
     return (
@@ -252,7 +317,7 @@ export function EmailComposer() {
           {/* Filter Section */}
           <div className="space-y-4">
             <h3 className="text-sm font-medium">Filter Recipients</h3>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
               <Select value={userTypeFilter} onValueChange={setUserTypeFilter}>
                 <SelectTrigger>
                   <SelectValue placeholder="User Type" />
@@ -306,6 +371,35 @@ export function EmailComposer() {
                   <SelectItem value="without_purchases">Without Purchases</SelectItem>
                 </SelectContent>
               </Select>
+
+              <Select value={corporateFilter} onValueChange={setCorporateFilter}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Corporate Status" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All Users</SelectItem>
+                  <SelectItem value="corporate_admins">🏢 Corporate Admins Only</SelectItem>
+                  <SelectItem value="corporate_members">👥 Corporate Members Only</SelectItem>
+                  <SelectItem value="corporate_all">🏢 All Corporate Users</SelectItem>
+                  <SelectItem value="non_corporate">Non-Corporate Users</SelectItem>
+                </SelectContent>
+              </Select>
+
+              {organizations.length > 0 && (
+                <Select value={organizationFilter} onValueChange={setOrganizationFilter}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Organization" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All Organizations</SelectItem>
+                    {organizations.map(org => (
+                      <SelectItem key={org} value={org}>
+                        {org}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              )}
             </div>
 
             <div className="flex items-center gap-2 px-4 py-2 bg-muted rounded-md">
@@ -361,13 +455,11 @@ export function EmailComposer() {
                           <span className="font-medium">{user.full_name || 'Unknown'}</span>
                           <span className="text-muted-foreground ml-2">({user.email})</span>
                         </div>
-                        <div className="flex items-center gap-2 ml-4">
+                        <div className="flex items-center gap-2 ml-4 flex-wrap justify-end">
                           <Badge variant={user.plan_type === 'gold' || user.plan_type === 'platinum' ? 'default' : 'outline'} className="text-xs">
                             {user.plan_type.charAt(0).toUpperCase() + user.plan_type.slice(1)}
                           </Badge>
-                          <Badge variant={user.status === 'active' ? 'default' : 'secondary'} className="text-xs">
-                            {user.status.charAt(0).toUpperCase() + user.status.slice(1)}
-                          </Badge>
+                          {renderCorporateBadge(user)}
                         </div>
                       </div>
                     ))}
@@ -456,14 +548,18 @@ export function EmailComposer() {
                       {planFilter.charAt(0).toUpperCase() + planFilter.slice(1)} Plan
                     </Badge>
                   )}
-                  {statusFilter !== "all" && !isStatusFilterDisabled && (
-                    <Badge variant="secondary">
-                      {statusFilter.charAt(0).toUpperCase() + statusFilter.slice(1)} Status
+                  {corporateFilter !== "all" && (
+                    <Badge variant="secondary" className="flex items-center gap-1">
+                      <Building2 className="h-3 w-3" />
+                      {corporateFilter === "corporate_admins" && "Corporate Admins"}
+                      {corporateFilter === "corporate_members" && "Corporate Members"}
+                      {corporateFilter === "corporate_all" && "All Corporate"}
+                      {corporateFilter === "non_corporate" && "Non-Corporate"}
                     </Badge>
                   )}
-                  {purchaseFilter !== "all" && (
+                  {organizationFilter !== "all" && (
                     <Badge variant="secondary">
-                      {purchaseFilter === "with_purchases" ? "Has Purchases" : "No Purchases"}
+                      Org: {organizationFilter}
                     </Badge>
                   )}
                 </div>
@@ -473,47 +569,38 @@ export function EmailComposer() {
 
           {/* Send Button */}
           <Button
-            onClick={handleSendEmails}
-            disabled={sending || !subject.trim() || !message.trim() || selectedUserIds.length === 0}
             className="w-full"
             size="lg"
+            onClick={handleSendEmails}
+            disabled={sending || !subject || !message || selectedUserIds.length === 0}
           >
-            {sending ? (
-              <>
-                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2" />
-                Sending Emails...
-              </>
-            ) : (
-              <>
-                <Send className="h-4 w-4 mr-2" />
-                Send to {selectedUserIds.length} Recipient{selectedUserIds.length !== 1 ? 's' : ''}
-              </>
-            )}
+            <Send className="h-4 w-4 mr-2" />
+            {sending ? "Sending..." : `Send Email to ${selectedUserIds.length} Recipient${selectedUserIds.length !== 1 ? 's' : ''}`}
           </Button>
+
+          {/* Confirmation Dialog */}
+          <AlertDialog open={showConfirm} onOpenChange={setShowConfirm}>
+            <AlertDialogContent>
+              <AlertDialogHeader>
+                <AlertDialogTitle>Confirm Email Sending</AlertDialogTitle>
+                <AlertDialogDescription>
+                  You are about to send an email to {selectedUserIds.length} recipient{selectedUserIds.length !== 1 ? 's' : ''}.
+                  <br /><br />
+                  <strong>Subject:</strong> {subject}
+                  <br /><br />
+                  This action cannot be undone. Are you sure you want to proceed?
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogCancel>Cancel</AlertDialogCancel>
+                <AlertDialogAction onClick={confirmSendEmails}>
+                  Send Emails
+                </AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
         </CardContent>
       </Card>
-
-      {/* Confirmation Dialog */}
-      <AlertDialog open={showConfirm} onOpenChange={setShowConfirm}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Confirm Bulk Email</AlertDialogTitle>
-            <AlertDialogDescription>
-              You are about to send an email to <strong>{selectedUserIds.length}</strong> user{selectedUserIds.length !== 1 ? 's' : ''}.
-              <br /><br />
-              <strong>Subject:</strong> {subject}
-              <br /><br />
-              This action cannot be undone. Are you sure you want to proceed?
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction onClick={confirmSendEmails}>
-              Send Emails
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
     </div>
   );
 }

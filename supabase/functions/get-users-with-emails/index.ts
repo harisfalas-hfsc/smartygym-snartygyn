@@ -63,14 +63,39 @@ serve(async (req) => {
 
     if (subsError) throw subsError;
 
+    // Fetch corporate subscriptions (for corporate admins)
+    const { data: corporateSubs, error: corpSubsError } = await supabaseAdmin
+      .from('corporate_subscriptions')
+      .select('id, admin_user_id, organization_name, plan_type, status, current_period_end');
+
+    if (corpSubsError) throw corpSubsError;
+    logStep("Corporate subscriptions fetched", { count: corporateSubs?.length || 0 });
+
+    // Fetch corporate members
+    const { data: corporateMembers, error: corpMembersError } = await supabaseAdmin
+      .from('corporate_members')
+      .select('user_id, corporate_subscription_id, email');
+
+    if (corpMembersError) throw corpMembersError;
+    logStep("Corporate members fetched", { count: corporateMembers?.length || 0 });
+
     // Fetch all auth users to get emails
     const { data: { users: authUsers }, error: authError } = await supabaseAdmin.auth.admin.listUsers();
     if (authError) throw authError;
 
-    // Combine data
+    // Combine data with corporate info
     const combinedData = profiles.map(profile => {
       const subscription = subscriptions?.find(sub => sub.user_id === profile.user_id);
       const authUser = authUsers.find(u => u.id === profile.user_id);
+      
+      // Check if user is corporate admin
+      const corporateAdmin = corporateSubs?.find(cs => cs.admin_user_id === profile.user_id);
+      
+      // Check if user is corporate member
+      const corporateMember = corporateMembers?.find(cm => cm.user_id === profile.user_id);
+      const memberCorporateSub = corporateMember 
+        ? corporateSubs?.find(cs => cs.id === corporateMember.corporate_subscription_id)
+        : null;
       
       return {
         user_id: profile.user_id,
@@ -81,11 +106,21 @@ serve(async (req) => {
         status: subscription?.status || 'inactive',
         current_period_start: subscription?.current_period_start || null,
         current_period_end: subscription?.current_period_end || null,
-        created_at: profile.created_at, // Profile creation (joined platform)
-        subscription_created_at: subscription?.created_at || null, // First subscribed
-        subscription_updated_at: subscription?.updated_at || null, // Last modification
+        created_at: profile.created_at,
+        subscription_created_at: subscription?.created_at || null,
+        subscription_updated_at: subscription?.updated_at || null,
         stripe_customer_id: subscription?.stripe_customer_id || null,
         stripe_subscription_id: subscription?.stripe_subscription_id || null,
+        // Corporate admin info
+        is_corporate_admin: !!corporateAdmin,
+        corporate_admin_org: corporateAdmin?.organization_name || null,
+        corporate_admin_plan: corporateAdmin?.plan_type || null,
+        corporate_admin_status: corporateAdmin?.status || null,
+        corporate_admin_end: corporateAdmin?.current_period_end || null,
+        // Corporate member info
+        is_corporate_member: !!corporateMember,
+        corporate_member_org: memberCorporateSub?.organization_name || null,
+        corporate_member_plan: memberCorporateSub?.plan_type || null,
       };
     });
 

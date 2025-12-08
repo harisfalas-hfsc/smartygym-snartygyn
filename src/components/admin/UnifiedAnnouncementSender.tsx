@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -7,7 +7,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
-import { Megaphone, Send, Users, AlertCircle } from "lucide-react";
+import { Megaphone, Send, Users, AlertCircle, Building2 } from "lucide-react";
 import { toast } from "sonner";
 import { UserSelectionTable } from "./UserSelectionTable";
 
@@ -17,6 +17,13 @@ interface UserData {
   full_name: string | null;
   plan_type: string;
   status: string;
+  // Corporate fields
+  is_corporate_admin?: boolean;
+  corporate_admin_org?: string | null;
+  corporate_admin_plan?: string | null;
+  is_corporate_member?: boolean;
+  corporate_member_org?: string | null;
+  corporate_member_plan?: string | null;
 }
 
 export function UnifiedAnnouncementSender() {
@@ -29,6 +36,8 @@ export function UnifiedAnnouncementSender() {
   // Filters
   const [userTypeFilter, setUserTypeFilter] = useState<string>("all");
   const [planFilter, setPlanFilter] = useState<string>("all");
+  const [corporateFilter, setCorporateFilter] = useState<string>("all");
+  const [organizationFilter, setOrganizationFilter] = useState<string>("all");
   
   // Announcement content
   const [announcementType, setAnnouncementType] = useState<string>("");
@@ -37,6 +46,16 @@ export function UnifiedAnnouncementSender() {
   
   // Confirmation dialog
   const [showConfirm, setShowConfirm] = useState(false);
+
+  // Get unique organizations for filter dropdown
+  const organizations = useMemo(() => {
+    const orgs = new Set<string>();
+    users.forEach(user => {
+      if (user.corporate_admin_org) orgs.add(user.corporate_admin_org);
+      if (user.corporate_member_org) orgs.add(user.corporate_member_org);
+    });
+    return Array.from(orgs).sort();
+  }, [users]);
 
   const fetchUsers = async () => {
     setLoading(true);
@@ -51,6 +70,12 @@ export function UnifiedAnnouncementSender() {
         full_name: user.full_name || user.email,
         plan_type: user.plan_type || 'free',
         status: user.status || 'inactive',
+        is_corporate_admin: user.is_corporate_admin || false,
+        corporate_admin_org: user.corporate_admin_org || null,
+        corporate_admin_plan: user.corporate_admin_plan || null,
+        is_corporate_member: user.is_corporate_member || false,
+        corporate_member_org: user.corporate_member_org || null,
+        corporate_member_plan: user.corporate_member_plan || null,
       }));
 
       setUsers(registeredUsers);
@@ -84,8 +109,27 @@ export function UnifiedAnnouncementSender() {
       filtered = filtered.filter(user => user.plan_type === planFilter);
     }
 
+    // Corporate filter
+    if (corporateFilter === "corporate_admins") {
+      filtered = filtered.filter(user => user.is_corporate_admin);
+    } else if (corporateFilter === "corporate_members") {
+      filtered = filtered.filter(user => user.is_corporate_member);
+    } else if (corporateFilter === "corporate_all") {
+      filtered = filtered.filter(user => user.is_corporate_admin || user.is_corporate_member);
+    } else if (corporateFilter === "non_corporate") {
+      filtered = filtered.filter(user => !user.is_corporate_admin && !user.is_corporate_member);
+    }
+
+    // Organization filter
+    if (organizationFilter !== "all") {
+      filtered = filtered.filter(user => 
+        user.corporate_admin_org === organizationFilter || 
+        user.corporate_member_org === organizationFilter
+      );
+    }
+
     setFilteredUsers(filtered);
-  }, [userTypeFilter, planFilter, users]);
+  }, [userTypeFilter, planFilter, corporateFilter, organizationFilter, users]);
 
   const handleSendAnnouncement = async () => {
     if (!announcementType) {
@@ -131,7 +175,6 @@ export function UnifiedAnnouncementSender() {
           } via dashboard messages and email`
         );
         
-        // Clear form
         setAnnouncementType("");
         setSubject("");
         setMessage("");
@@ -192,7 +235,7 @@ export function UnifiedAnnouncementSender() {
         {/* Filter Recipients */}
         <div className="space-y-4">
           <h3 className="text-sm font-medium">Filter Recipients</h3>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
             <Select value={userTypeFilter} onValueChange={setUserTypeFilter}>
               <SelectTrigger>
                 <SelectValue placeholder="User Type" />
@@ -215,6 +258,35 @@ export function UnifiedAnnouncementSender() {
                 <SelectItem value="platinum">Platinum</SelectItem>
               </SelectContent>
             </Select>
+
+            <Select value={corporateFilter} onValueChange={setCorporateFilter}>
+              <SelectTrigger>
+                <SelectValue placeholder="Corporate Status" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Users</SelectItem>
+                <SelectItem value="corporate_admins">🏢 Corporate Admins Only</SelectItem>
+                <SelectItem value="corporate_members">👥 Corporate Members Only</SelectItem>
+                <SelectItem value="corporate_all">🏢 All Corporate Users</SelectItem>
+                <SelectItem value="non_corporate">Non-Corporate Users</SelectItem>
+              </SelectContent>
+            </Select>
+
+            {organizations.length > 0 && (
+              <Select value={organizationFilter} onValueChange={setOrganizationFilter}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Organization" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All Organizations</SelectItem>
+                  {organizations.map(org => (
+                    <SelectItem key={org} value={org}>
+                      {org}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            )}
           </div>
 
           <div className="flex items-center gap-2 px-4 py-2 bg-muted rounded-md">
@@ -283,11 +355,25 @@ export function UnifiedAnnouncementSender() {
             </div>
             <div className="space-y-1 text-sm text-muted-foreground">
               <p>This announcement will be sent to <strong>{selectedUserIds.length}</strong> recipient{selectedUserIds.length !== 1 ? 's' : ''}</p>
-              <p className="flex items-center gap-2">
+              <div className="flex flex-wrap gap-2 mt-2">
                 <Badge variant="secondary">Dashboard Message</Badge>
                 <span>+</span>
                 <Badge variant="secondary">Email</Badge>
-              </p>
+                {corporateFilter !== "all" && (
+                  <Badge variant="secondary" className="flex items-center gap-1">
+                    <Building2 className="h-3 w-3" />
+                    {corporateFilter === "corporate_admins" && "Corporate Admins"}
+                    {corporateFilter === "corporate_members" && "Corporate Members"}
+                    {corporateFilter === "corporate_all" && "All Corporate"}
+                    {corporateFilter === "non_corporate" && "Non-Corporate"}
+                  </Badge>
+                )}
+                {organizationFilter !== "all" && (
+                  <Badge variant="secondary">
+                    Org: {organizationFilter}
+                  </Badge>
+                )}
+              </div>
             </div>
           </div>
         )}

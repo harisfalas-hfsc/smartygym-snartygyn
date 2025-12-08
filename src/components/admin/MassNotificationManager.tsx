@@ -69,7 +69,10 @@ export function MassNotificationManager() {
     { value: "gold", label: "Gold Members Only" },
     { value: "platinum", label: "Platinum Members Only" },
     { value: "purchasers", label: "Users with Purchases" },
-    { value: "free", label: "Free Users Only" }
+    { value: "free", label: "Free Users Only" },
+    { value: "corporate_admins", label: "🏢 Corporate Admins Only" },
+    { value: "corporate_members", label: "👥 Corporate Members Only" },
+    { value: "corporate_all", label: "🏢 All Corporate Users" }
   ];
 
   const handleSendNotification = async () => {
