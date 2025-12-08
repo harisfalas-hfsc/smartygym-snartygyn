@@ -92,3 +92,9 @@ verify_jwt = false
 
 [functions.generate-sitemap]
 verify_jwt = false
+
+[functions.create-corporate-checkout]
+verify_jwt = true
+
+[functions.create-corporate-member]
+verify_jwt = true

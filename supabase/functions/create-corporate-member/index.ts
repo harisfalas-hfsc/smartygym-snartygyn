@@ -1,0 +1,243 @@
+import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2.57.2";
+import { Resend } from "https://esm.sh/resend@2.0.0";
+
+const corsHeaders = {
+  "Access-Control-Allow-Origin": "*",
+  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
+};
+
+const logStep = (step: string, details?: any) => {
+  const detailsStr = details ? ` - ${JSON.stringify(details)}` : '';
+  console.log(`[CREATE-CORPORATE-MEMBER] ${step}${detailsStr}`);
+};
+
+serve(async (req) => {
+  if (req.method === "OPTIONS") {
+    return new Response(null, { headers: corsHeaders });
+  }
+
+  try {
+    logStep("Function started");
+
+    // Use service role for admin operations
+    const supabase = createClient(
+      Deno.env.get("SUPABASE_URL") ?? "",
+      Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "",
+      { auth: { persistSession: false } }
+    );
+
+    // Authenticate user
+    const authHeader = req.headers.get("Authorization");
+    if (!authHeader) {
+      throw new Error("No authorization header provided");
+    }
+
+    const token = authHeader.replace("Bearer ", "");
+    const { data: userData, error: userError } = await supabase.auth.getUser(token);
+    
+    if (userError || !userData.user) {
+      throw new Error("User not authenticated");
+    }
+
+    const adminUser = userData.user;
+    logStep("Admin user authenticated", { userId: adminUser.id });
+
+    // Verify user is a corporate admin
+    const { data: corpSub, error: corpError } = await supabase
+      .from('corporate_subscriptions')
+      .select('*')
+      .eq('admin_user_id', adminUser.id)
+      .eq('status', 'active')
+      .single();
+
+    if (corpError || !corpSub) {
+      throw new Error("You are not a corporate admin or your subscription is not active");
+    }
+
+    logStep("Corporate subscription verified", { 
+      orgName: corpSub.organization_name, 
+      maxUsers: corpSub.max_users,
+      currentUsers: corpSub.current_users_count 
+    });
+
+    // Check user limit
+    if (corpSub.current_users_count >= corpSub.max_users) {
+      throw new Error(`User limit reached. Your plan allows up to ${corpSub.max_users} users.`);
+    }
+
+    // Parse request body
+    const { email, fullName, password } = await req.json();
+    
+    if (!email || !email.includes('@')) {
+      throw new Error("Valid email is required");
+    }
+
+    if (!fullName || fullName.trim().length < 2) {
+      throw new Error("Full name is required");
+    }
+
+    // Generate random password if not provided
+    const memberPassword = password || Math.random().toString(36).slice(-12) + 'Aa1!';
+
+    logStep("Creating member account", { email, fullName });
+
+    // Create user in Supabase Auth
+    const { data: newUser, error: createError } = await supabase.auth.admin.createUser({
+      email: email.trim().toLowerCase(),
+      password: memberPassword,
+      email_confirm: true,
+      user_metadata: {
+        full_name: fullName.trim(),
+        corporate_member: true,
+        organization_name: corpSub.organization_name,
+      },
+    });
+
+    if (createError) {
+      if (createError.message.includes('already registered')) {
+        throw new Error("A user with this email already exists");
+      }
+      throw new Error(`Failed to create user: ${createError.message}`);
+    }
+
+    if (!newUser.user) {
+      throw new Error("Failed to create user account");
+    }
+
+    logStep("User created in Auth", { newUserId: newUser.user.id });
+
+    // Create profile
+    await supabase
+      .from('profiles')
+      .upsert({
+        user_id: newUser.user.id,
+        full_name: fullName.trim(),
+      }, {
+        onConflict: 'user_id'
+      });
+
+    logStep("Profile created");
+
+    // Create user subscription with platinum access
+    await supabase
+      .from('user_subscriptions')
+      .upsert({
+        user_id: newUser.user.id,
+        plan_type: 'platinum',
+        status: 'active',
+        current_period_start: corpSub.current_period_start,
+        current_period_end: corpSub.current_period_end,
+      }, {
+        onConflict: 'user_id'
+      });
+
+    logStep("Platinum subscription created for member");
+
+    // Add to corporate members table
+    const { error: memberError } = await supabase
+      .from('corporate_members')
+      .insert({
+        corporate_subscription_id: corpSub.id,
+        user_id: newUser.user.id,
+        email: email.trim().toLowerCase(),
+        created_by: adminUser.id,
+      });
+
+    if (memberError) {
+      logStep("ERROR inserting corporate member", { error: memberError });
+      throw new Error("Failed to add member to corporate subscription");
+    }
+
+    // Increment user count
+    const { error: updateError } = await supabase
+      .from('corporate_subscriptions')
+      .update({
+        current_users_count: corpSub.current_users_count + 1,
+        updated_at: new Date().toISOString(),
+      })
+      .eq('id', corpSub.id);
+
+    if (updateError) {
+      logStep("ERROR updating user count", { error: updateError });
+    }
+
+    logStep("Corporate member added", { newCount: corpSub.current_users_count + 1 });
+
+    // Send welcome email to new member
+    try {
+      const resendKey = Deno.env.get("RESEND_API_KEY");
+      if (resendKey) {
+        const resend = new Resend(resendKey);
+        
+        await resend.emails.send({
+          from: "SmartyGym <notifications@smartygym.com>",
+          to: [email.trim().toLowerCase()],
+          subject: `🎉 Welcome to SmartyGym - ${corpSub.organization_name}`,
+          html: `
+            <!DOCTYPE html>
+            <html>
+            <head>
+              <meta charset="utf-8">
+              <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            </head>
+            <body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 20px;">
+              <div style="text-align: center; margin-bottom: 30px;">
+                <h1 style="color: #d4af37; margin: 0;">SmartyGym</h1>
+              </div>
+              <div style="background: #f9f9f9; border-radius: 8px; padding: 30px;">
+                <h2 style="margin-top: 0;">Welcome to the Team, ${fullName.trim()}! 🎉</h2>
+                <p>You've been added to <strong>${corpSub.organization_name}</strong>'s SmartyGym corporate account!</p>
+                <p>You now have <strong>Platinum-level access</strong> to all SmartyGym features:</p>
+                <ul style="padding-left: 20px;">
+                  <li>500+ expert-designed workouts</li>
+                  <li>Premium training programs</li>
+                  <li>Daily Smarty Ritual</li>
+                  <li>All fitness tools and calculators</li>
+                  <li>Community features</li>
+                </ul>
+                <div style="background: #fff3cd; border: 1px solid #ffc107; border-radius: 6px; padding: 15px; margin: 20px 0;">
+                  <strong>Your Login Credentials:</strong><br>
+                  Email: ${email.trim().toLowerCase()}<br>
+                  Password: ${memberPassword}
+                </div>
+                <p style="color: #666; font-size: 14px;">We recommend changing your password after your first login.</p>
+                <div style="text-align: center; margin: 30px 0;">
+                  <a href="https://smartygym.com/auth" style="display: inline-block; background: #d4af37; color: white; padding: 14px 28px; text-decoration: none; border-radius: 6px; font-weight: bold;">Login to SmartyGym →</a>
+                </div>
+                <p>Let's make every workout count!</p>
+                <p><em>The SmartyGym Team</em></p>
+              </div>
+            </body>
+            </html>
+          `,
+        });
+        logStep("Welcome email sent to member", { email });
+      }
+    } catch (emailError) {
+      logStep("ERROR sending welcome email", { error: emailError });
+    }
+
+    return new Response(JSON.stringify({ 
+      success: true,
+      member: {
+        id: newUser.user.id,
+        email: email.trim().toLowerCase(),
+        fullName: fullName.trim(),
+      },
+      usersCount: corpSub.current_users_count + 1,
+      maxUsers: corpSub.max_users,
+    }), {
+      headers: { ...corsHeaders, "Content-Type": "application/json" },
+      status: 200,
+    });
+
+  } catch (error) {
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    logStep("ERROR", { message: errorMessage });
+    return new Response(JSON.stringify({ error: errorMessage }), {
+      headers: { ...corsHeaders, "Content-Type": "application/json" },
+      status: 500,
+    });
+  }
+});

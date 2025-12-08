@@ -4,6 +4,16 @@ import { Helmet } from "react-helmet";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { 
   Building2, 
   Check, 
@@ -58,6 +68,9 @@ export default function SmartyCorporate() {
   const { canGoBack, goBack } = useShowBackButton();
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState<string | null>(null);
+  const [orgDialogOpen, setOrgDialogOpen] = useState(false);
+  const [selectedPlan, setSelectedPlan] = useState<keyof typeof CORPORATE_PLANS | null>(null);
+  const [organizationName, setOrganizationName] = useState("");
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
@@ -73,18 +86,34 @@ export default function SmartyCorporate() {
     return () => subscription.unsubscribe();
   }, []);
 
-  const handleGetStarted = async (planKey: keyof typeof CORPORATE_PLANS) => {
+  const handleGetStarted = (planKey: keyof typeof CORPORATE_PLANS) => {
     if (!user) {
       navigate('/auth');
       return;
     }
+    setSelectedPlan(planKey);
+    setOrgDialogOpen(true);
+  };
 
-    setLoading(planKey);
-    const plan = CORPORATE_PLANS[planKey];
+  const handleProceedToCheckout = async () => {
+    if (!selectedPlan || !organizationName.trim()) {
+      toast({
+        title: "Organization name required",
+        description: "Please enter your organization name to continue.",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    setLoading(selectedPlan);
+    setOrgDialogOpen(false);
 
     try {
-      const { data, error } = await supabase.functions.invoke('create-checkout', {
-        body: { priceId: plan.priceId }
+      const { data, error } = await supabase.functions.invoke('create-corporate-checkout', {
+        body: { 
+          planType: selectedPlan,
+          organizationName: organizationName.trim()
+        }
       });
 
       if (error) throw error;
@@ -100,11 +129,13 @@ export default function SmartyCorporate() {
       console.error('Error creating checkout:', error);
       toast({
         title: "Error",
-        description: "Failed to start checkout process. Please try again.",
+        description: error instanceof Error ? error.message : "Failed to start checkout process. Please try again.",
         variant: "destructive"
       });
     } finally {
       setLoading(null);
+      setOrganizationName("");
+      setSelectedPlan(null);
     }
   };
 
@@ -223,14 +254,16 @@ export default function SmartyCorporate() {
             {/* Smarty Dynamic - 10 users */}
             <Card className="relative border-2 border-border hover:border-primary/50 transition-colors flex flex-col">
               <CardHeader className="text-center pb-2">
-                <div className="flex items-center justify-center gap-2 mb-2">
-                  <Users className="h-5 w-5 text-primary" />
+                <div className="flex items-center justify-center gap-2 min-h-[56px]">
+                  <Users className="h-5 w-5 text-primary shrink-0" />
                   <h2 className="text-xl font-bold">Smarty Dynamic</h2>
                 </div>
-                <Badge className="bg-primary/20 text-primary mx-auto mb-3">
-                  Up to 10 Users
-                </Badge>
-                <CardTitle className="text-3xl font-bold">€399</CardTitle>
+                <div className="min-h-[28px] flex items-center justify-center">
+                  <Badge className="bg-primary/20 text-primary">
+                    Up to 10 Users
+                  </Badge>
+                </div>
+                <CardTitle className="text-3xl font-bold mt-3">€399</CardTitle>
                 <p className="text-sm text-muted-foreground">per year</p>
               </CardHeader>
               <CardContent className="space-y-4 flex-1 flex flex-col">
@@ -265,14 +298,16 @@ export default function SmartyCorporate() {
             {/* Smarty Power - 20 users */}
             <Card className="relative border-2 border-border hover:border-primary/50 transition-colors flex flex-col">
               <CardHeader className="text-center pb-2">
-                <div className="flex items-center justify-center gap-2 mb-2">
-                  <Users className="h-5 w-5 text-primary" />
+                <div className="flex items-center justify-center gap-2 min-h-[56px]">
+                  <Users className="h-5 w-5 text-primary shrink-0" />
                   <h2 className="text-xl font-bold">Smarty Power</h2>
                 </div>
-                <Badge className="bg-primary/20 text-primary mx-auto mb-3">
-                  Up to 20 Users
-                </Badge>
-                <CardTitle className="text-3xl font-bold">€499</CardTitle>
+                <div className="min-h-[28px] flex items-center justify-center">
+                  <Badge className="bg-primary/20 text-primary">
+                    Up to 20 Users
+                  </Badge>
+                </div>
+                <CardTitle className="text-3xl font-bold mt-3">€499</CardTitle>
                 <p className="text-sm text-muted-foreground">per year</p>
               </CardHeader>
               <CardContent className="space-y-4 flex-1 flex flex-col">
@@ -307,14 +342,16 @@ export default function SmartyCorporate() {
             {/* Smarty Elite - 30 users */}
             <Card className="relative border-2 border-border hover:border-primary/50 transition-colors flex flex-col">
               <CardHeader className="text-center pb-2">
-                <div className="flex items-center justify-center gap-2 mb-2">
-                  <Users className="h-5 w-5 text-primary" />
+                <div className="flex items-center justify-center gap-2 min-h-[56px]">
+                  <Users className="h-5 w-5 text-primary shrink-0" />
                   <h2 className="text-xl font-bold">Smarty Elite</h2>
                 </div>
-                <Badge className="bg-primary/20 text-primary mx-auto mb-3">
-                  Up to 30 Users
-                </Badge>
-                <CardTitle className="text-3xl font-bold">€599</CardTitle>
+                <div className="min-h-[28px] flex items-center justify-center">
+                  <Badge className="bg-primary/20 text-primary">
+                    Up to 30 Users
+                  </Badge>
+                </div>
+                <CardTitle className="text-3xl font-bold mt-3">€599</CardTitle>
                 <p className="text-sm text-muted-foreground">per year</p>
               </CardHeader>
               <CardContent className="space-y-4 flex-1 flex flex-col">
@@ -352,14 +389,16 @@ export default function SmartyCorporate() {
                 BEST VALUE
               </Badge>
               <CardHeader className="text-center pb-2 pt-4">
-                <div className="flex items-center justify-center gap-2 mb-2">
-                  <Building2 className="h-5 w-5 text-primary" />
+                <div className="flex items-center justify-center gap-2 min-h-[56px]">
+                  <Building2 className="h-5 w-5 text-primary shrink-0" />
                   <h2 className="text-xl font-bold text-primary">Smarty Enterprise</h2>
                 </div>
-                <Badge className="bg-primary text-primary-foreground mx-auto mb-3">
-                  Unlimited Users
-                </Badge>
-                <CardTitle className="text-3xl font-bold">€699</CardTitle>
+                <div className="min-h-[28px] flex items-center justify-center">
+                  <Badge className="bg-primary text-primary-foreground">
+                    Unlimited Users
+                  </Badge>
+                </div>
+                <CardTitle className="text-3xl font-bold mt-3">€699</CardTitle>
                 <p className="text-sm text-muted-foreground">per year</p>
               </CardHeader>
               <CardContent className="space-y-4 flex-1 flex flex-col">
@@ -391,6 +430,36 @@ export default function SmartyCorporate() {
               </CardContent>
             </Card>
           </div>
+
+          {/* Organization Name Dialog */}
+          <Dialog open={orgDialogOpen} onOpenChange={setOrgDialogOpen}>
+            <DialogContent>
+              <DialogHeader>
+                <DialogTitle>Enter Your Organization Name</DialogTitle>
+                <DialogDescription>
+                  This name will be displayed to your team members and used in your corporate dashboard.
+                </DialogDescription>
+              </DialogHeader>
+              <div className="py-4">
+                <Label htmlFor="orgName">Organization Name</Label>
+                <Input
+                  id="orgName"
+                  placeholder="e.g., Acme Corporation"
+                  value={organizationName}
+                  onChange={(e) => setOrganizationName(e.target.value)}
+                  className="mt-2"
+                />
+              </div>
+              <DialogFooter>
+                <Button variant="outline" onClick={() => setOrgDialogOpen(false)}>
+                  Cancel
+                </Button>
+                <Button onClick={handleProceedToCheckout} disabled={!organizationName.trim()}>
+                  Continue to Payment
+                </Button>
+              </DialogFooter>
+            </DialogContent>
+          </Dialog>
 
           {/* Contact CTA */}
           <Card className="bg-muted/50">
