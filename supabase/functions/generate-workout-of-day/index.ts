@@ -556,7 +556,7 @@ Respond in this EXACT JSON format:
         
         for (const email of userEmails) {
           try {
-            await resendClient.emails.send({
+            const emailResult = await resendClient.emails.send({
               from: 'SmartyGym <notifications@smartygym.com>',
               to: [email],
               subject: notificationTitle,
@@ -573,6 +573,13 @@ Respond in this EXACT JSON format:
 <p style="margin-top: 20px;"><a href="https://smartygym.com/workout/wod" style="background: #d4af37; color: white; padding: 14px 28px; text-decoration: none; border-radius: 4px; font-weight: bold; display: inline-block;">View Workouts →</a></p>
 </div>`,
             });
+            
+            if (emailResult.error) {
+              logStep("Email API error", { email, error: emailResult.error });
+            } else {
+              // Rate limiting: 600ms delay to respect Resend's 2 requests/second limit
+              await new Promise(resolve => setTimeout(resolve, 600));
+            }
           } catch (e) {
             logStep("Email send error", { email, error: e });
           }
