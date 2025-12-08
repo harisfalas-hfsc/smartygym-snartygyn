@@ -138,15 +138,21 @@ export default function Dashboard() {
     }
 
     // Fetch corporate subscription if user is a corporate admin
-    const { data: corpSub } = await supabase
+    console.log('[Dashboard] Fetching corporate subscription for user:', session.user.id, session.user.email);
+    const { data: corpSub, error: corpError } = await supabase
       .from('corporate_subscriptions')
       .select('plan_type, current_users_count, max_users, organization_name, current_period_end, status')
       .eq('admin_user_id', session.user.id)
       .eq('status', 'active')
       .maybeSingle();
     
+    console.log('[Dashboard] Corporate subscription result:', corpSub, 'Error:', corpError);
+    
     if (corpSub) {
+      console.log('[Dashboard] Setting corporate subscription state');
       setCorporateSubscription(corpSub);
+    } else {
+      console.log('[Dashboard] No corporate subscription found for this user');
     }
     
     await fetchAllData(session.user.id);
