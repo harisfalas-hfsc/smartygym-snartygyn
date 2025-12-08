@@ -10,16 +10,13 @@ import { generateBreadcrumbSchema } from "@/utils/seoHelpers";
 import { useAccessControl } from "@/hooks/useAccessControl";
 import { useShowBackButton } from "@/hooks/useShowBackButton";
 import { ScrollReveal } from "@/components/ScrollReveal";
+
 const WorkoutFlow = () => {
   const navigate = useNavigate();
-  const {
-    canGoBack,
-    goBack
-  } = useShowBackButton();
-  const {
-    userTier
-  } = useAccessControl();
+  const { canGoBack, goBack } = useShowBackButton();
+  const { userTier } = useAccessControl();
   const isPremium = userTier === "premium";
+
   const workoutTypes = [{
     id: "wod",
     title: "WOD",
@@ -70,10 +67,13 @@ const WorkoutFlow = () => {
     level: "Beginner-Advanced",
     equipment: "Equipment/No Equipment"
   }];
+
   const handleWorkoutSelect = (workoutId: string) => {
     navigate(`/workout/${workoutId}`);
   };
-  return <>
+
+  return (
+    <>
       <Helmet>
         <title>Online Workouts | AMRAP TABATA HIIT Strength Cardio | Haris Falas | SmartyGym</title>
         <meta name="description" content="500+ online gym workouts at smartygym.com. AMRAP, TABATA, HIIT, circuit training, strength, cardio, metabolic, mobility workouts by Sports Scientist Haris Falas. Home workouts, bodyweight training, equipment workouts. Train anywhere, anytime." />
@@ -125,119 +125,143 @@ const WorkoutFlow = () => {
         </script>
       </Helmet>
       
-      <SEOEnhancer entities={["SmartyGym", "Haris Falas", "Online Workouts", "AMRAP", "HIIT", "Tabata", "Circuit Training"]} topics={["online gym workouts", "AMRAP", "HIIT", "Tabata", "circuit training", "strength training", "cardio workouts", "metabolic conditioning", "mobility training"]} expertise={["sports science", "strength conditioning", "functional fitness", "exercise programming"]} contentType="workout-collection" aiSummary="SmartyGym Workout Library: 500+ online gym workouts by Sports Scientist Haris Falas. Categories include Workout of the Day (WOD), Strength, Calorie Burning, Metabolic, Cardio, Mobility & Stability, and Challenge. Formats include AMRAP, TABATA, HIIT, Circuit, EMOM, For Time. Suitable for all levels worldwide." aiKeywords={["online gym", "AMRAP workouts", "HIIT training", "Tabata", "strength workouts", "cardio training", "home workouts", "bodyweight workouts", "gym workouts"]} relatedContent={["training programs", "fitness tools", "exercise library", "workout of the day"]} />
+      <SEOEnhancer 
+        entities={["SmartyGym", "Haris Falas", "Online Workouts", "AMRAP", "HIIT", "Tabata", "Circuit Training"]} 
+        topics={["online gym workouts", "AMRAP", "HIIT", "Tabata", "circuit training", "strength training", "cardio workouts", "metabolic conditioning", "mobility training"]} 
+        expertise={["sports science", "strength conditioning", "functional fitness", "exercise programming"]} 
+        contentType="workout-collection" 
+        aiSummary="SmartyGym Workout Library: 500+ online gym workouts by Sports Scientist Haris Falas. Categories include Workout of the Day (WOD), Strength, Calorie Burning, Metabolic, Cardio, Mobility & Stability, and Challenge. Formats include AMRAP, TABATA, HIIT, Circuit, EMOM, For Time. Suitable for all levels worldwide." 
+        aiKeywords={["online gym", "AMRAP workouts", "HIIT training", "Tabata", "strength workouts", "cardio training", "home workouts", "bodyweight workouts", "gym workouts"]} 
+        relatedContent={["training programs", "fitness tools", "exercise library", "workout of the day"]} 
+      />
       
       <div className="min-h-screen bg-background">
-      
-      <div className="container mx-auto max-w-6xl px-4 py-8">
-        {canGoBack && <div className="mb-6">
-            <Button variant="ghost" size="sm" onClick={goBack}>
-              <ArrowLeft className="mr-2 h-4 w-4" />
-              <span className="text-xs sm:text-sm">Back</span>
-            </Button>
-          </div>}
-        
-        <PageBreadcrumbs items={[{
-          label: "Home",
-          href: "/"
-        }, {
-          label: "Workouts"
-        }]} />
-
-        {/* Info Section - About Workouts */}
-        <Card className="mb-8 bg-gradient-to-br from-primary/5 via-background to-primary/5 border-2 border-primary/40 shadow-gold">
-          <div className="p-4 sm:p-5">
-            <h2 className="text-xl sm:text-2xl font-bold mb-3 text-center">About Our Workouts</h2>
-            <div className="space-y-2 text-muted-foreground max-w-3xl mx-auto">
-              <p className="text-sm sm:text-base">
-                Our workouts are single-session training routines designed to fit your lifestyle and goals. Whether you're targeting strength, calorie burning, metabolic conditioning, cardio endurance, mobility & stability, or looking for a challenge — we have you covered. Hit the gym without a plan? In the home? On the go? Our workouts are designed to deliver results in any setting. 
-              </p>
-              
-              <p className="text-sm sm:text-base font-semibold text-foreground text-center mt-6">
-                Unlock all workouts with a Premium plan or grab one standalone session whenever you need it.
-              </p>
+        <div className="container mx-auto max-w-6xl px-4 py-8">
+          {canGoBack && (
+            <div className="mb-6">
+              <Button variant="ghost" size="sm" onClick={goBack}>
+                <ArrowLeft className="mr-2 h-4 w-4" />
+                <span className="text-xs sm:text-sm">Back</span>
+              </Button>
             </div>
-          </div>
-        </Card>
+          )}
+          
+          <PageBreadcrumbs items={[{
+            label: "Home",
+            href: "/"
+          }, {
+            label: "Smarty Workouts"
+          }]} />
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
-          {workoutTypes.map(workout => {
-            const Icon = workout.icon;
-            return <ScrollReveal key={workout.id}>
-                <Card itemScope itemType="https://schema.org/ExercisePlan" onClick={() => handleWorkoutSelect(workout.id)} className="group p-6 cursor-pointer transition-all duration-500 ease-out transform-gpu hover:scale-110 hover:-translate-y-3 hover:shadow-2xl hover:shadow-primary/40 hover:border-primary/60 bg-card border-2 border-border" role="button" aria-label={`${workout.title} workouts - Online gym category at SmartyGym - smartygym.com by Haris Falas`} data-workout-category={workout.id} data-keywords="online gym workouts, smarty gym, online fitness, smartygym.com, Haris Falas workouts">
-                  <div className="flex flex-col items-center text-center space-y-4">
-                    <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center transition-transform duration-300 group-hover:scale-110" aria-hidden="true">
-                      <Icon className="w-8 h-8 text-primary transition-transform duration-300 group-hover:rotate-3" />
-                    </div>
-                    <div>
-                      <h3 className="font-semibold text-lg mb-2" itemProp="name">
-                        {workout.title}
-                      </h3>
-                      <p className="text-sm text-muted-foreground mb-3" itemProp="description">
-                        {workout.description}
-                      </p>
-              <p className="text-xs text-muted-foreground/80 italic">
-                Crafted by{" "}
-                <a href="/coach-profile" className="text-primary hover:underline font-medium whitespace-nowrap" onClick={e => e.stopPropagation()}>
-                  Haris Falas
-                </a>
-                {" "}BSc Sports Science, EXOS Specialist, CSCS
-              </p>
-              
-              <div className="flex gap-1 text-[10px] mt-2">
-                <span className="bg-primary/20 text-primary border border-primary/40 px-1.5 py-0.5 rounded-full whitespace-nowrap">
-                  Single Session
-                </span>
-                <span className="bg-green-500/20 text-green-700 dark:text-green-400 border border-green-500/40 px-1.5 py-0.5 rounded-full whitespace-nowrap">
-                  {workout.level}
-                </span>
-                <span className="bg-orange-500/20 text-orange-700 dark:text-orange-400 border border-orange-500/40 px-1.5 py-0.5 rounded-full whitespace-nowrap">
-                  {workout.equipment}
-                </span>
+          {/* Info Section - About Smarty Workouts */}
+          <Card className="mb-8 bg-gradient-to-br from-primary/5 via-background to-primary/5 border-2 border-primary/40 shadow-gold">
+            <div className="p-4 sm:p-5">
+              <h2 className="text-xl sm:text-2xl font-bold mb-3 text-center">About Smarty Workouts</h2>
+              <div className="space-y-2 text-muted-foreground max-w-3xl mx-auto">
+                <p className="text-sm sm:text-base">
+                  Smarty Workouts are single-session training routines designed to fit your lifestyle and goals. Whether you're targeting strength, calorie burning, metabolic conditioning, cardio endurance, mobility & stability, or looking for a challenge — we have you covered. Hit the gym without a plan? In the home? On the go? Smarty Workouts are designed to deliver results in any setting.
+                </p>
+                
+                <p className="text-sm sm:text-base font-semibold text-foreground text-center mt-6">
+                  Unlock all workouts with a Premium plan or grab one standalone session whenever you need it.
+                </p>
               </div>
-              
-              <meta itemProp="exerciseType" content={workout.title} />
-              <meta itemProp="provider" content="Smarty Gym - Online Gym - smartygym.com" />
-              <meta itemProp="audience" content="All fitness levels" />
+            </div>
+          </Card>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+            {workoutTypes.map(workout => {
+              const Icon = workout.icon;
+              return (
+                <ScrollReveal key={workout.id}>
+                  <Card 
+                    itemScope 
+                    itemType="https://schema.org/ExercisePlan" 
+                    onClick={() => handleWorkoutSelect(workout.id)} 
+                    className="group p-6 cursor-pointer transition-all duration-500 ease-out transform-gpu hover:scale-110 hover:-translate-y-3 hover:shadow-2xl hover:shadow-primary/40 hover:border-primary/60 bg-card border-2 border-border" 
+                    role="button" 
+                    aria-label={`${workout.title} workouts - Online gym category at SmartyGym - smartygym.com by Haris Falas`} 
+                    data-workout-category={workout.id} 
+                    data-keywords="online gym workouts, smarty gym, online fitness, smartygym.com, Haris Falas workouts"
+                  >
+                    <div className="flex flex-col items-center text-center space-y-4">
+                      <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center transition-transform duration-300 group-hover:scale-110" aria-hidden="true">
+                        <Icon className="w-8 h-8 text-primary transition-transform duration-300 group-hover:rotate-3" />
+                      </div>
+                      <div>
+                        <h3 className="font-semibold text-lg mb-2" itemProp="name">
+                          {workout.title}
+                        </h3>
+                        <p className="text-sm text-muted-foreground mb-3" itemProp="description">
+                          {workout.description}
+                        </p>
+                        <p className="text-xs text-muted-foreground/80 italic">
+                          Crafted by{" "}
+                          <a href="/coach-profile" className="text-primary hover:underline font-medium whitespace-nowrap" onClick={e => e.stopPropagation()}>
+                            Haris Falas
+                          </a>
+                          {" "}BSc Sports Science, EXOS Specialist, CSCS
+                        </p>
+                        
+                        <div className="flex gap-1 text-[10px] mt-2">
+                          <span className="bg-primary/20 text-primary border border-primary/40 px-1.5 py-0.5 rounded-full whitespace-nowrap">
+                            Single Session
+                          </span>
+                          <span className="bg-green-500/20 text-green-700 dark:text-green-400 border border-green-500/40 px-1.5 py-0.5 rounded-full whitespace-nowrap">
+                            {workout.level}
+                          </span>
+                          <span className="bg-orange-500/20 text-orange-700 dark:text-orange-400 border border-orange-500/40 px-1.5 py-0.5 rounded-full whitespace-nowrap">
+                            {workout.equipment}
+                          </span>
+                        </div>
+                        
+                        <meta itemProp="exerciseType" content={workout.title} />
+                        <meta itemProp="provider" content="Smarty Gym - Online Gym - smartygym.com" />
+                        <meta itemProp="audience" content="All fitness levels" />
+                      </div>
                     </div>
-                  </div>
-                </Card>
-              </ScrollReveal>;
-          })}
+                  </Card>
+                </ScrollReveal>
+              );
+            })}
+          </div>
+
+          {/* Create Your Own Workout Card */}
+          <Card className="mt-8 bg-gradient-to-br from-primary/5 via-background to-primary/5 border-2 border-primary/40 shadow-gold">
+            <div className="p-4 sm:p-5">
+              <div className="flex flex-col items-center gap-3">
+                {/* Title + Icon on one line */}
+                <div className="flex items-center gap-2">
+                  <h3 className="text-lg sm:text-xl font-semibold">Feeling Stuck?</h3>
+                  <Sparkles className="w-5 h-5 sm:w-6 sm:h-6 text-primary" />
+                </div>
+                
+                {/* Compact button */}
+                <Button size="default" className="cta-button" onClick={() => navigate("/smartyworkout")}>
+                  Create Your Own Workout Now
+                </Button>
+              </div>
+            </div>
+          </Card>
+
+          {/* Bottom Premium Banner */}
+          {!isPremium && (
+            <ScrollReveal delay={700}>
+              <div className="bg-card border border-border rounded-xl p-6 mt-8 text-center shadow-soft">
+                <h3 className="text-xl font-semibold mb-2">Love these workouts?</h3>
+                <p className="text-muted-foreground mb-4">
+                  Unlock 500+ more exclusive sessions with SmartyGym Premium.
+                </p>
+                <Button size="lg" onClick={() => navigate("/premiumbenefits")} className="cta-button">
+                  Join Premium
+                </Button>
+              </div>
+            </ScrollReveal>
+          )}
         </div>
-
-        {/* Create Your Own Workout Card */}
-        <Card className="mt-8 bg-gradient-to-br from-primary/5 via-background to-primary/5 border-2 border-primary/40 shadow-gold">
-          <div className="p-4 sm:p-5">
-            <div className="flex flex-col items-center gap-3">
-              {/* Title + Icon on one line */}
-              <div className="flex items-center gap-2">
-                <h3 className="text-lg sm:text-xl font-semibold">Feeling Stuck?</h3>
-                <Sparkles className="w-5 h-5 sm:w-6 sm:h-6 text-primary" />
-              </div>
-              
-              {/* Compact button */}
-              <Button size="default" className="cta-button" onClick={() => navigate("/smartyworkout")}>
-                Create Your Own Workout Now
-              </Button>
-            </div>
-          </div>
-        </Card>
-
-        {/* Bottom Premium Banner */}
-        {!isPremium && <ScrollReveal delay={700}>
-            <div className="bg-card border border-border rounded-xl p-6 mt-8 text-center shadow-soft">
-              <h3 className="text-xl font-semibold mb-2">Love these workouts?</h3>
-              <p className="text-muted-foreground mb-4">
-                Unlock 500+ more exclusive sessions with SmartyGym Premium.
-              </p>
-              <Button size="lg" onClick={() => navigate("/premiumbenefits")} className="cta-button">
-                Join Premium
-              </Button>
-            </div>
-          </ScrollReveal>}
       </div>
-      </div>
-    </>;
+    </>
+  );
 };
+
 export default WorkoutFlow;

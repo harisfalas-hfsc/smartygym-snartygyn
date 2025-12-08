@@ -99,12 +99,12 @@ const DailySmartyRitual = () => {
     );
   }
 
-  // Countdown display
+  // Countdown display - show description card + countdown
   if (countdown) {
     return (
       <>
         <Helmet>
-          <title>Daily Smarty Ritual | SmartyGym</title>
+          <title>Smarty Ritual | SmartyGym</title>
           <meta name="description" content="Your daily movement ritual for optimal performance - Morning, Midday, and Evening phases designed by Haris Falas" />
         </Helmet>
         <div className="min-h-screen bg-background">
@@ -115,13 +115,42 @@ const DailySmartyRitual = () => {
                 Back
               </Button>
             )}
+
+            {/* Description Card - Always visible */}
+            <Card className="mb-8 bg-gradient-to-br from-primary/5 via-background to-primary/5 border-2 border-primary/40 shadow-gold">
+              <div className="p-4 sm:p-5">
+                <h2 className="text-xl sm:text-2xl font-bold mb-3 text-center">About Smarty Ritual</h2>
+                <div className="space-y-2 text-muted-foreground max-w-3xl mx-auto">
+                  <p className="text-sm sm:text-base">
+                    Your all-day game plan for movement, recovery, and performance. Each day brings a fresh ritual with three expertly designed phases:
+                  </p>
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 justify-items-center mt-4">
+                    <div className="flex items-center gap-2">
+                      <Sunrise className="h-4 w-4 text-orange-500" />
+                      <span className="text-sm"><strong>Morning:</strong> Activation</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <Sun className="h-4 w-4 text-yellow-600" />
+                      <span className="text-sm"><strong>Midday:</strong> Reset</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <Moon className="h-4 w-4 text-purple-600" />
+                      <span className="text-sm"><strong>Evening:</strong> Unwind</span>
+                    </div>
+                  </div>
+                  <p className="text-sm sm:text-base font-semibold text-foreground text-center mt-4">
+                    Designed by <a href="/coach-profile" className="text-primary hover:underline">Haris Falas</a> to keep you energized, mobile, and performing at your best.
+                  </p>
+                </div>
+              </div>
+            </Card>
             
             <Card className="text-center py-16">
               <CardContent>
                 <Clock className="h-16 w-16 text-primary mx-auto mb-6" />
                 <h1 className="text-3xl font-bold mb-4">Next Ritual Arriving Soon</h1>
                 <p className="text-xl text-muted-foreground mb-6">
-                  Your Daily Smarty Ritual will be available at 07:00
+                  Your Smarty Ritual will be available at 07:00
                 </p>
                 <Badge variant="outline" className="text-lg px-6 py-2">
                   {countdown}
@@ -135,7 +164,7 @@ const DailySmartyRitual = () => {
                       <span className="font-semibold">Premium Feature</span>
                     </div>
                     <p className="text-sm text-muted-foreground mb-4">
-                      The Daily Smarty Ritual is exclusively available for Premium members
+                      Smarty Ritual is exclusively available for Premium members
                     </p>
                     <Button onClick={() => navigate("/joinpremium")}>
                       <Crown className="mr-2 h-4 w-4" />
@@ -178,7 +207,7 @@ const DailySmartyRitual = () => {
             </div>
           </div>
 
-          {/* Description Card */}
+          {/* Description Card - Always visible */}
           <Card className="mb-8 bg-gradient-to-br from-primary/5 via-background to-primary/5 border-2 border-primary/40 shadow-gold">
             <div className="p-4 sm:p-5">
               <h2 className="text-xl sm:text-2xl font-bold mb-3 text-center">About Smarty Ritual</h2>

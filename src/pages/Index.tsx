@@ -51,14 +51,14 @@ const Index = () => {
   }, [carouselApi]);
   const heroCards = [{
     id: "workouts",
-    title: "500+ Expert Workouts",
-    description: "Access a vast library of professional workout routines for every fitness level and goal",
+    title: "Smarty Workouts",
+    description: "500+ expert-designed workout routines for every fitness level and goal",
     buttonText: "Browse Workouts",
     icon: Dumbbell,
     route: "/workout"
   }, {
     id: "programs",
-    title: "Training Programs",
+    title: "Smarty Programs",
     description: "Structured multi-week programs designed to transform your fitness journey",
     buttonText: "View Programs",
     icon: Calendar,

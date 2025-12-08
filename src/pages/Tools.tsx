@@ -87,10 +87,10 @@ const Tools = () => {
         {/* Info Section */}
         <Card className="mb-8 bg-gradient-to-br from-primary/5 via-background to-primary/5 border-2 border-primary/40 shadow-gold">
           <div className="p-5">
-            <h2 className="text-2xl font-bold mb-3 text-center">About These Tools</h2>
+            <h2 className="text-2xl font-bold mb-3 text-center">About Smarty Tools</h2>
             <div className="space-y-2 text-muted-foreground max-w-3xl mx-auto">
               <p>
-                Our fitness calculators are designed to help you understand your body and optimize your training. 
+                Smarty Tools are fitness calculators designed to help you understand your body and optimize your training. 
                 All tools use scientifically validated formulas and equations.
               </p>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
