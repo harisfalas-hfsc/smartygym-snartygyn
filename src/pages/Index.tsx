@@ -146,12 +146,12 @@ const Index = () => {
   const services = [{
     id: "workout",
     icon: Dumbbell,
-    title: "Workouts",
+    title: "Smarty Workouts",
     description: "Access hundreds of professionally designed workouts for all levels"
   }, {
     id: "trainingprogram",
     icon: Calendar,
-    title: "Training Programs",
+    title: "Smarty Programs",
     description: "Structured training programs to achieve your long-term specific goals"
   }, {
     id: "exerciselibrary",
@@ -161,17 +161,17 @@ const Index = () => {
   }, {
     id: "1rmcalculator",
     icon: Calculator,
-    title: "1RM Calculator",
+    title: "Smarty 1RM Calculator",
     description: "Calculate your one-rep maximum"
   }, {
     id: "bmrcalculator",
     icon: Activity,
-    title: "BMR Calculator",
+    title: "Smarty BMR Calculator",
     description: "Calculate your basal metabolic rate"
   }, {
     id: "macrocalculator",
     icon: Flame,
-    title: "Macro Calculator",
+    title: "Smarty Macro Calculator",
     description: "Get personalized nutrition recommendations"
   }];
   const handleServiceSelect = (serviceId: string) => {

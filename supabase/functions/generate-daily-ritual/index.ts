@@ -385,10 +385,10 @@ async function sendRitualNotifications(supabase: any, dayNumber: number, date: s
         continue;
       }
 
-      // Send email
+      // Send email with rate limiting (Resend allows 2 req/sec, so wait 600ms between sends)
       if (userEmail) {
         try {
-          await resend.emails.send({
+          const emailResult = await resend.emails.send({
             from: 'SmartyGym <notifications@smartygym.com>',
             to: [userEmail],
             subject: subject,
@@ -410,10 +410,19 @@ async function sendRitualNotifications(supabase: any, dayNumber: number, date: s
               </div>
             `,
           });
-          logStep("Email sent successfully", { email: userEmail });
-          sentCount++;
+          
+          if (emailResult.error) {
+            logStep("ERROR sending email", { email: userEmail, error: emailResult.error });
+            failedCount++;
+          } else {
+            logStep("Email sent successfully", { email: userEmail, emailId: emailResult.data?.id });
+            sentCount++;
+          }
+          
+          // Rate limiting: wait 600ms between emails to stay under Resend's 2 req/sec limit
+          await new Promise(resolve => setTimeout(resolve, 600));
         } catch (emailErr: any) {
-          logStep("ERROR sending email", { email: userEmail, error: emailErr.message || emailErr });
+          logStep("ERROR sending email", { email: userEmail, error: emailErr.message || emailErr, fullError: JSON.stringify(emailErr) });
           failedCount++;
         }
       } else {
