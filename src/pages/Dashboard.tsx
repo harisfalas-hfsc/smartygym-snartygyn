@@ -110,6 +110,8 @@ export default function Dashboard() {
     current_users_count: number;
     max_users: number;
     organization_name: string;
+    current_period_end: string;
+    status: string;
   } | null>(null);
 
   useEffect(() => {
@@ -138,7 +140,7 @@ export default function Dashboard() {
     // Fetch corporate subscription if user is a corporate admin
     const { data: corpSub } = await supabase
       .from('corporate_subscriptions')
-      .select('plan_type, current_users_count, max_users, organization_name')
+      .select('plan_type, current_users_count, max_users, organization_name, current_period_end, status')
       .eq('admin_user_id', session.user.id)
       .eq('status', 'active')
       .maybeSingle();
@@ -397,7 +399,7 @@ export default function Dashboard() {
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="grid gap-2 sm:grid-cols-3 mb-4">
+              <div className="grid gap-2 sm:grid-cols-4 mb-4">
                 <div>
                   <p className="text-xs text-muted-foreground">Plan</p>
                   <p className="font-medium">Smarty {corporateSubscription.plan_type.charAt(0).toUpperCase() + corporateSubscription.plan_type.slice(1)}</p>
@@ -411,6 +413,12 @@ export default function Dashboard() {
                 <div>
                   <p className="text-xs text-muted-foreground">Organization</p>
                   <p className="font-medium truncate">{corporateSubscription.organization_name}</p>
+                </div>
+                <div>
+                  <p className="text-xs text-muted-foreground">Expires</p>
+                  <p className="font-medium">
+                    {new Date(corporateSubscription.current_period_end).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+                  </p>
                 </div>
               </div>
               <Button onClick={() => navigate('/corporate-admin')} className="w-full sm:w-auto">
