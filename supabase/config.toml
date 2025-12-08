@@ -110,3 +110,6 @@ verify_jwt = true
 
 [functions.revoke-corporate-admin]
 verify_jwt = true
+
+[functions.revoke-corporate-member]
+verify_jwt = true
