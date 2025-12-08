@@ -116,24 +116,10 @@ serve(async (req) => {
     }
     logStep("Corporate subscription created", { id: corpSub.id });
 
-    // Grant Platinum access to the admin
-    const { error: subError } = await supabaseAdmin
-      .from('user_subscriptions')
-      .upsert({
-        user_id: user_id,
-        plan_type: 'platinum',
-        status: 'active',
-        current_period_start: periodStart,
-        current_period_end: periodEnd,
-      }, {
-        onConflict: 'user_id'
-      });
-
-    if (subError) {
-      logStep("Error granting platinum access", { error: subError.message });
-      throw new Error(`Failed to grant platinum access: ${subError.message}`);
-    }
-    logStep("Platinum access granted to admin");
+    // NOTE: We no longer update user_subscriptions here.
+    // Corporate admin access is now derived solely from corporate_subscriptions table.
+    // This allows users to have BOTH a personal subscription AND corporate admin status independently.
+    logStep("Corporate admin status granted - access derived from corporate_subscriptions table");
 
     return new Response(
       JSON.stringify({ 

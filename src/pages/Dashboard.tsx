@@ -436,9 +436,17 @@ export default function Dashboard() {
         )}
 
         <div className="mb-8">
-          <h2 className="text-3xl font-bold mb-2">
-            {isNewUser() ? `Welcome to SmartyGym, ${user?.user_metadata?.full_name || "User"}!` : `Welcome back, ${user?.user_metadata?.full_name || "User"}!`}
-          </h2>
+          <div className="flex items-center gap-3 flex-wrap mb-2">
+            <h2 className="text-3xl font-bold">
+              {isNewUser() ? `Welcome to SmartyGym, ${user?.user_metadata?.full_name || "User"}!` : `Welcome back, ${user?.user_metadata?.full_name || "User"}!`}
+            </h2>
+            {corporateSubscription && (
+              <span className="inline-flex items-center gap-1.5 bg-gradient-to-r from-blue-500 to-blue-700 text-white text-xs font-semibold px-3 py-1 rounded-full shadow-sm">
+                <Building2 className="h-3 w-3" />
+                Corp Admin
+              </span>
+            )}
+          </div>
           <p className="text-muted-foreground">
             {isNewUser() ? "We're excited to have you here! Let's start your fitness journey." : "Here's your fitness overview"}
           </p>
