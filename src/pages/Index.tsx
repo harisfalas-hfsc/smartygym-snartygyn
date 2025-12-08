@@ -38,6 +38,11 @@ const Index = () => {
   // Carousel state for mobile navigation dots
   const [carouselApi, setCarouselApi] = useState<CarouselApi>();
   const [currentSlide, setCurrentSlide] = useState(0);
+  
+  // Auto-cycling state for tablet hero cards
+  const [highlightedCardIndex, setHighlightedCardIndex] = useState(0);
+  const [isHoveringTablet, setIsHoveringTablet] = useState(false);
+  
   useEffect(() => {
     if (!carouselApi) return;
     const onSelect = () => {
@@ -49,6 +54,17 @@ const Index = () => {
       carouselApi.off("select", onSelect);
     };
   }, [carouselApi]);
+  
+  // Auto-cycle through tablet hero cards every 2.5 seconds
+  useEffect(() => {
+    if (isHoveringTablet) return; // Pause when hovering
+    
+    const interval = setInterval(() => {
+      setHighlightedCardIndex((prev) => (prev + 1) % 6);
+    }, 2500);
+    
+    return () => clearInterval(interval);
+  }, [isHoveringTablet]);
   const heroCards = [{
     id: "workouts",
     title: "Smarty Workouts",
@@ -562,20 +578,44 @@ const Index = () => {
                       <div className="flex items-center h-full">
             <MobilePhoneIllustration variant="tablet" className="h-full max-h-[480px] w-auto">
               {/* 3 rows × 2 columns grid of "Get Started" cards */}
-              <div className="grid grid-rows-3 grid-cols-2 gap-1.5 sm:gap-2 h-full w-full p-1.5 sm:p-2">
-                {heroCards.map(card => {
-                              const Icon = card.icon;
-                              return <Card key={card.id} className="border-2 border-primary/30 hover:border-primary hover:shadow-lg hover:scale-105 transition-all duration-300 cursor-pointer group flex items-center justify-center hover:bg-primary/5" onClick={() => navigate(card.route)}>
+              <div 
+                className="grid grid-rows-3 grid-cols-2 gap-1.5 sm:gap-2 h-full w-full p-1.5 sm:p-2"
+                onMouseLeave={() => setIsHoveringTablet(false)}
+              >
+                {heroCards.map((card, index) => {
+                  const Icon = card.icon;
+                  const isHighlighted = isHoveringTablet ? false : highlightedCardIndex === index;
+                  return (
+                    <Card 
+                      key={card.id} 
+                      className={cn(
+                        "border-2 transition-all duration-300 cursor-pointer group flex items-center justify-center",
+                        isHighlighted 
+                          ? "border-primary shadow-lg scale-105 bg-primary/5" 
+                          : "border-primary/30 hover:border-primary hover:shadow-lg hover:scale-105 hover:bg-primary/5"
+                      )}
+                      onClick={() => navigate(card.route)}
+                      onMouseEnter={() => {
+                        setIsHoveringTablet(true);
+                        setHighlightedCardIndex(index);
+                      }}
+                    >
                       <div className="flex flex-col items-center justify-center gap-1 p-2">
-                        <div className="inline-flex items-center justify-center w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-primary/10 group-hover:bg-primary/30 group-hover:scale-110 transition-all duration-300">
+                        <div className={cn(
+                          "inline-flex items-center justify-center w-10 h-10 sm:w-12 sm:h-12 rounded-full transition-all duration-300",
+                          isHighlighted 
+                            ? "bg-primary/30 scale-110" 
+                            : "bg-primary/10 group-hover:bg-primary/30 group-hover:scale-110"
+                        )}>
                           <Icon className="w-5 h-5 sm:w-6 sm:h-6 text-primary" />
                         </div>
                         <h3 className="text-xs font-bold text-center leading-tight">
                           {card.title}
                         </h3>
                       </div>
-                    </Card>;
-                            })}
+                    </Card>
+                  );
+                })}
               </div>
             </MobilePhoneIllustration>
                       </div>
