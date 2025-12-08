@@ -473,14 +473,16 @@ Respond in this EXACT JSON format:
         logStep(`Stripe product creation failed for ${equipment}`, { status: stripeResponse.status });
       }
 
-      // Insert workout
+      // Insert workout - focus MUST match one of 6 categories
+      const focusValue = category.toLowerCase().replace(/ & /g, "-").replace(/ /g, "-");
       const { error: insertError } = await supabase
         .from("admin_workouts")
         .insert({
           id: workoutId,
           name: workoutContent.name,
           category: category,
-          type: category.toLowerCase().replace(/ & /g, "-").replace(/ /g, "-"),
+          type: focusValue,
+          focus: focusValue, // CRITICAL: Set focus to match category
           format: format,
           difficulty: selectedDifficulty.name,
           difficulty_stars: selectedDifficulty.stars,

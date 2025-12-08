@@ -14,19 +14,27 @@ const IndividualWorkout = () => {
   const { userTier, hasPurchased } = useAccessControl();
   const { goBack } = useShowBackButton();
   
-  // Helper function to format focus label
-  const getFocusLabel = (type: string | undefined): string => {
-    const focusMap: { [key: string]: string } = {
+  // Helper function to get category label from database category field
+  const getCategoryLabel = (category: string | undefined | null): string => {
+    if (!category) return '';
+    const categoryMap: { [key: string]: string } = {
+      'STRENGTH': 'Strength',
+      'CALORIE BURNING': 'Calorie Burning',
+      'METABOLIC': 'Metabolic',
+      'CARDIO': 'Cardio',
+      'CARDIO ENDURANCE': 'Cardio Endurance',
+      'MOBILITY & STABILITY': 'Mobility & Stability',
+      'CHALLENGE': 'Challenge',
+      // Lowercase versions for focus field
       'strength': 'Strength',
-      'calorie': 'Calorie Burning',
       'calorie-burning': 'Calorie Burning',
       'metabolic': 'Metabolic',
       'cardio': 'Cardio',
-      'mobility': 'Mobility & Stability',
-      'power': 'Power',
+      'cardio-endurance': 'Cardio Endurance',
+      'mobility-stability': 'Mobility & Stability',
       'challenge': 'Challenge'
     };
-    return focusMap[type || ''] || 'General Fitness';
+    return categoryMap[category] || category;
   };
 
 
@@ -115,7 +123,7 @@ const IndividualWorkout = () => {
                 planContent=""
                 title={dbWorkout.name}
                 serial={dbWorkout.id}
-                focus={dbWorkout.focus || getFocusLabel(type)}
+                focus={getCategoryLabel(dbWorkout.category)}
                 difficulty={dbWorkout.difficulty_stars || 3}
                 workoutType={dbWorkout.format}
                 imageUrl={dbWorkout.image_url}
