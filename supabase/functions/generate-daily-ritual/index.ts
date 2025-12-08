@@ -107,6 +107,18 @@ serve(async (req) => {
   try {
     logStep("Starting Daily Smarty Ritual generation");
 
+    // Parse request body for resend_notifications flag
+    let resendNotifications = false;
+    try {
+      const body = await req.json();
+      resendNotifications = body?.resend_notifications === true;
+      if (resendNotifications) {
+        logStep("Resend notifications mode enabled");
+      }
+    } catch (e) {
+      // No body or invalid JSON, continue normally
+    }
+
     const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
     const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
     const lovableApiKey = Deno.env.get("LOVABLE_API_KEY");
@@ -123,11 +135,25 @@ serve(async (req) => {
     // Check if ritual already exists for today
     const { data: existingRitual } = await supabase
       .from("daily_smarty_rituals")
-      .select("id")
+      .select("id, day_number")
       .eq("ritual_date", today)
       .single();
 
     if (existingRitual) {
+      // If resend_notifications is true, send notifications for existing ritual
+      if (resendNotifications) {
+        logStep("Resending notifications for existing ritual", { date: today, dayNumber: existingRitual.day_number });
+        await sendRitualNotifications(supabase, existingRitual.day_number, today);
+        return new Response(JSON.stringify({ 
+          success: true, 
+          message: "Notifications resent for existing ritual",
+          dayNumber: existingRitual.day_number,
+          date: today
+        }), {
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+      
       logStep("Ritual already exists for today", { date: today });
       return new Response(JSON.stringify({ success: true, message: "Ritual already exists" }), {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
@@ -305,7 +331,12 @@ async function sendRitualNotifications(supabase: any, dayNumber: number, date: s
     // Generate ICS content for email attachment link
     const ritualDate = date;
     const icsContent = generateICSForEmail(dayNumber, ritualDate);
-    const icsBase64 = btoa(icsContent);
+    // Encode ICS to base64 properly for Unicode content
+    const encoder = new TextEncoder();
+    const uint8Array = encoder.encode(icsContent);
+    let binaryString = '';
+    uint8Array.forEach(byte => binaryString += String.fromCharCode(byte));
+    const icsBase64 = btoa(binaryString);
     const icsDataUri = `data:text/calendar;base64,${icsBase64}`;
     
     const content = `<p class="tiptap-paragraph"><strong>Day ${dayNumber} of Smarty Ritual is here!</strong></p>
