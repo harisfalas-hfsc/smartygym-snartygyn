@@ -11,7 +11,7 @@ export const MobilePhoneIllustration = ({ imageUrl, className, variant = 'phone'
       {/* Tablet/Phone frame */}
       <div className={`relative h-full mx-auto border-foreground shadow-2xl bg-background overflow-hidden ${
         variant === 'tablet' 
-          ? 'max-h-[480px] aspect-[3/4] border-[6px] rounded-[1.5rem]'
+          ? 'max-h-[480px] aspect-[3/4] lg:aspect-[5/5] border-[6px] rounded-[1.5rem]'
           : 'max-h-[480px] aspect-[9/19] border-[8px] rounded-[2.5rem]'
       }`}>
         {/* Notch - ONLY FOR PHONE */}
