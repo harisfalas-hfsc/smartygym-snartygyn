@@ -561,7 +561,7 @@ const Index = () => {
                       opts={{ align: "center", loop: true }}
                       plugins={[
                         Autoplay({
-                          delay: 4000,
+                          delay: 3000,
                           stopOnMouseEnter: true,
                           stopOnInteraction: false
                         })
@@ -572,7 +572,7 @@ const Index = () => {
                         {heroCards.map(card => {
                           const Icon = card.icon;
                           return (
-                            <CarouselItem key={card.id} className="basis-[65%] pl-2">
+                            <CarouselItem key={card.id} className="basis-[45%] pl-2">
                               <Card className="border-2 border-primary/30 hover:border-primary hover:shadow-xl transition-all duration-300 bg-primary/5">
                                 <CardContent className="p-4 sm:p-5 flex flex-col items-center text-center gap-2">
                                   <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-primary/10">
@@ -593,8 +593,8 @@ const Index = () => {
                           );
                         })}
                       </CarouselContent>
-                      <CarouselPrevious className="-left-10 h-12 w-12 bg-primary text-primary-foreground hover:bg-primary/90 border-0 [&>svg]:h-6 [&>svg]:w-6" />
-                      <CarouselNext className="-right-10 h-12 w-12 bg-primary text-primary-foreground hover:bg-primary/90 border-0 [&>svg]:h-6 [&>svg]:w-6" />
+                      <CarouselPrevious className="-left-12 bg-transparent border-0 text-primary hover:text-primary/80 hover:bg-transparent [&>svg]:h-8 [&>svg]:w-8" />
+                      <CarouselNext className="-right-12 bg-transparent border-0 text-primary hover:text-primary/80 hover:bg-transparent [&>svg]:h-8 [&>svg]:w-8" />
                     </Carousel>
                   </div>
 
