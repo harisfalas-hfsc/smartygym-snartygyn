@@ -12,7 +12,7 @@ import { useShowBackButton } from "@/hooks/useShowBackButton";
 import { HTMLContent } from "@/components/HTMLContent";
 import { RitualCalendarButton } from "@/components/ritual/RitualCalendarButton";
 import { RitualShareDialog } from "@/components/ritual/RitualShareDialog";
-import { RitualArchive } from "@/components/ritual/RitualArchive";
+
 import harisPhoto from "@/assets/haris-falas-coach.png";
 
 interface DailyRitual {
@@ -213,13 +213,16 @@ const DailySmartyRitual = () => {
             <div className="bg-gradient-to-r from-primary/10 to-primary/5 p-8 relative">
               <div className="flex flex-col items-center text-center">
                 {/* Haris Photo - centered above title */}
-                <div className="mb-4">
+                <div className="mb-3">
                   <img 
                     src={harisPhoto} 
                     alt="Haris Falas" 
                     className="w-20 h-20 md:w-24 md:h-24 rounded-full object-cover border-4 border-primary/20 shadow-lg"
                   />
                 </div>
+                <p className="text-sm text-muted-foreground mb-3">
+                  Designed by <a href="/coach-profile" className="text-primary font-semibold hover:underline">Haris Falas</a>
+                </p>
                 <h1 className="text-2xl md:text-3xl font-bold mb-3">
                   Daily <span className="text-primary">Smarty</span> Ritual
                 </h1>
@@ -265,9 +268,15 @@ const DailySmartyRitual = () => {
             {/* Ritual Content */}
             {isPremium && ritual && (
               <CardContent className="p-6 space-y-8">
-                {/* Calendar Integration */}
+                {/* Calendar Integration - pass full content */}
                 <div className="flex justify-center">
-                  <RitualCalendarButton ritual={ritual} />
+                  <RitualCalendarButton ritual={{
+                    ritual_date: ritual.ritual_date,
+                    day_number: ritual.day_number,
+                    morning_content: ritual.morning_content,
+                    midday_content: ritual.midday_content,
+                    evening_content: ritual.evening_content,
+                  }} />
                 </div>
 
                 <Separator />
@@ -324,26 +333,10 @@ const DailySmartyRitual = () => {
                   </div>
                 </div>
 
-                <Separator />
-
-                {/* Author Credit */}
-                <div className="flex items-center justify-center gap-4 pt-4 text-center">
-                  <img 
-                    src={harisPhoto} 
-                    alt="Haris Falas" 
-                    className="w-12 h-12 rounded-full object-cover border-2 border-primary/20"
-                  />
-                  <div className="text-left">
-                    <p className="text-sm text-muted-foreground">Designed by</p>
-                    <a href="/coach-profile" className="font-semibold text-primary hover:underline">Haris Falas</a>
-                  </div>
-                </div>
               </CardContent>
             )}
           </Card>
 
-          {/* Calendar Archive for Premium Users */}
-          {isPremium && <RitualArchive />}
         </div>
       </div>
 
