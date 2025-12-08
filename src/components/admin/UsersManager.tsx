@@ -7,7 +7,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Download, Search, RefreshCw, Mail, Crown, Gem, Building2 } from "lucide-react";
+import { Download, Search, RefreshCw, Mail, Crown, Gem, Building2, UserMinus } from "lucide-react";
 import { toast } from "sonner";
 import { format } from "date-fns";
 import {
@@ -43,6 +43,8 @@ interface SubscriptionAction {
 interface CorporateInfo {
   adminPlanType: string | null;
   memberPlanType: string | null;
+  organizationName: string | null;
+  corporateSubscriptionId: string | null;
 }
 
 export function UsersManager() {
@@ -58,6 +60,13 @@ export function UsersManager() {
   const [pendingAction, setPendingAction] = useState<SubscriptionAction | null>(null);
   const [pendingCorpAction, setPendingCorpAction] = useState<{userId: string; userName: string; planType: string} | null>(null);
   const [pendingCorpRevoke, setPendingCorpRevoke] = useState<{userId: string; userName: string; planType: string} | null>(null);
+  const [pendingMemberRevoke, setPendingMemberRevoke] = useState<{
+    userId: string;
+    userName: string;
+    organizationName: string;
+    planType: string;
+    corporateSubscriptionId: string;
+  } | null>(null);
   const [actionLoading, setActionLoading] = useState(false);
   const SUPER_ADMIN_EMAIL = "harisfallas@gmail.com";
 
@@ -94,30 +103,42 @@ export function UsersManager() {
         rolesMap[r.user_id].push(r.role);
       });
 
-      // Fetch corporate subscriptions with plan type
+      // Fetch corporate subscriptions with plan type and organization name
       const { data: corpSubs } = await supabase
         .from('corporate_subscriptions')
-        .select('admin_user_id, plan_type');
+        .select('id, admin_user_id, plan_type, organization_name');
       
-      // Fetch corporate members with their subscription's plan type
+      // Fetch corporate members with their subscription's plan type and organization name
       const { data: corpMembers } = await supabase
         .from('corporate_members')
-        .select('user_id, corporate_subscription_id, corporate_subscriptions(plan_type)');
+        .select('user_id, corporate_subscription_id, corporate_subscriptions(id, plan_type, organization_name)');
       
       // Build corporate info map
       const corpInfoMap: Record<string, CorporateInfo> = {};
       corpSubs?.forEach(s => {
         corpInfoMap[s.admin_user_id] = { 
           adminPlanType: s.plan_type, 
-          memberPlanType: null 
+          memberPlanType: null,
+          organizationName: s.organization_name,
+          corporateSubscriptionId: s.id
         };
       });
       corpMembers?.forEach(m => {
-        const planType = (m.corporate_subscriptions as any)?.plan_type || null;
+        const corpData = m.corporate_subscriptions as any;
+        const planType = corpData?.plan_type || null;
+        const orgName = corpData?.organization_name || null;
+        const corpSubId = corpData?.id || m.corporate_subscription_id;
         if (!corpInfoMap[m.user_id]) {
-          corpInfoMap[m.user_id] = { adminPlanType: null, memberPlanType: planType };
+          corpInfoMap[m.user_id] = { 
+            adminPlanType: null, 
+            memberPlanType: planType,
+            organizationName: orgName,
+            corporateSubscriptionId: corpSubId
+          };
         } else {
           corpInfoMap[m.user_id].memberPlanType = planType;
+          corpInfoMap[m.user_id].organizationName = orgName;
+          corpInfoMap[m.user_id].corporateSubscriptionId = corpSubId;
         }
       });
       
@@ -253,6 +274,33 @@ export function UsersManager() {
   const handleConfirmCorpRevoke = () => {
     if (pendingCorpRevoke) {
       revokeCorporateAdmin(pendingCorpRevoke.userId);
+    }
+  };
+
+  const revokeCorporateMember = async (userId: string, corporateSubscriptionId: string) => {
+    setActionLoading(true);
+    try {
+      const { data, error } = await supabase.functions.invoke('revoke-corporate-member', {
+        body: { member_user_id: userId, corporate_subscription_id: corporateSubscriptionId }
+      });
+
+      if (error) throw error;
+      if (!data?.success) throw new Error(data?.error || 'Unknown error');
+
+      toast.success(data.message);
+      fetchUsers();
+    } catch (error) {
+      console.error('Error revoking corporate member:', error);
+      toast.error(error instanceof Error ? error.message : 'Failed to revoke corporate member');
+    } finally {
+      setActionLoading(false);
+      setPendingMemberRevoke(null);
+    }
+  };
+
+  const handleConfirmMemberRevoke = () => {
+    if (pendingMemberRevoke) {
+      revokeCorporateMember(pendingMemberRevoke.userId, pendingMemberRevoke.corporateSubscriptionId);
     }
   };
 
@@ -451,6 +499,35 @@ export function UsersManager() {
         </AlertDialogContent>
       </AlertDialog>
 
+      {/* Revoke Corporate Member Confirmation Dialog */}
+      <AlertDialog open={!!pendingMemberRevoke} onOpenChange={(open) => !open && setPendingMemberRevoke(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle className="text-destructive">
+              Revoke Corporate Member Access
+            </AlertDialogTitle>
+            <AlertDialogDescription>
+              Are you sure you want to revoke corporate member access from "{pendingMemberRevoke?.userName}"?
+              <br /><br />
+              <strong>Organization:</strong> {pendingMemberRevoke?.organizationName}<br />
+              <strong>Plan:</strong> {pendingMemberRevoke?.planType?.toUpperCase()}
+              <br /><br />
+              This will remove their Platinum access and set their subscription to FREE.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={actionLoading}>Cancel</AlertDialogCancel>
+            <AlertDialogAction 
+              onClick={handleConfirmMemberRevoke} 
+              disabled={actionLoading}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              {actionLoading ? 'Processing...' : 'Revoke Member'}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
       <Card>
         <CardHeader>
           <div className="flex items-center justify-between">
@@ -629,14 +706,28 @@ export function UsersManager() {
                             </Badge>
                           )}
                           {isCorporateAdmin && (
-                            <Badge variant="default" className="text-xs bg-blue-600">
-                              🏢 Corp Admin ({corpInfo.adminPlanType})
-                            </Badge>
+                            <>
+                              <Badge variant="default" className="text-xs bg-blue-600">
+                                🏢 Corp Admin ({corpInfo.adminPlanType})
+                              </Badge>
+                              {corpInfo.organizationName && (
+                                <Badge variant="outline" className="text-xs border-teal-600 text-teal-600">
+                                  🏛️ {corpInfo.organizationName}
+                                </Badge>
+                              )}
+                            </>
                           )}
                           {isCorporateMember && (
-                            <Badge variant="outline" className="text-xs border-blue-600 text-blue-600">
-                              👥 Corp Member ({corpInfo.memberPlanType})
-                            </Badge>
+                            <>
+                              <Badge variant="outline" className="text-xs border-blue-600 text-blue-600">
+                                👥 Corp Member ({corpInfo.memberPlanType})
+                              </Badge>
+                              {corpInfo.organizationName && (
+                                <Badge variant="outline" className="text-xs border-teal-600 text-teal-600">
+                                  🏛️ {corpInfo.organizationName}
+                                </Badge>
+                              )}
+                            </>
                           )}
                         </div>
                       </TableCell>
@@ -813,6 +904,22 @@ export function UsersManager() {
                             >
                               <Building2 className="h-3 w-3 mr-1" />
                               Revoke Corp
+                            </Button>
+                          ) : isCorporateMember ? (
+                            <Button
+                              variant="destructive"
+                              size="sm"
+                              className="text-xs px-2 py-1 h-7 mt-1"
+                              onClick={() => setPendingMemberRevoke({ 
+                                userId: user.user_id, 
+                                userName, 
+                                organizationName: corpInfo.organizationName || 'Unknown',
+                                planType: corpInfo.memberPlanType || '',
+                                corporateSubscriptionId: corpInfo.corporateSubscriptionId || ''
+                              })}
+                            >
+                              <UserMinus className="h-3 w-3 mr-1" />
+                              Revoke Member
                             </Button>
                           ) : null}
                         </div>
