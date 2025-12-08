@@ -555,7 +555,7 @@ const Index = () => {
                   </div>
 
                   {/* Middle Section: Phone (Left) + Three Cards (Right) */}
-                  <div className="grid grid-cols-1 lg:grid-cols-[1.3fr_1fr] gap-3 items-stretch lg:items-stretch">
+                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 items-stretch lg:items-stretch">
                     
                     {/* LEFT: Mobile Phone Illustration */}
                     <div className="order-1 lg:order-1 flex justify-center lg:justify-start items-stretch">
