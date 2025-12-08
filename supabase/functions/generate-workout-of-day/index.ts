@@ -28,8 +28,8 @@ const FORMATS_BY_CATEGORY: Record<string, string[]> = {
   "CHALLENGE": ["CIRCUIT", "TABATA", "AMRAP", "EMOM", "FOR TIME", "REPS & SETS", "MIX"] // Any format
 };
 
-// Simplified 6-day difficulty cycle - each star level appears exactly once
-const DIFFICULTY_CYCLE = [
+// All difficulty levels available (6 levels)
+const DIFFICULTY_LEVELS = [
   { name: "Beginner", stars: 1 },
   { name: "Beginner", stars: 2 },
   { name: "Intermediate", stars: 3 },
@@ -38,9 +38,47 @@ const DIFFICULTY_CYCLE = [
   { name: "Advanced", stars: 6 }
 ];
 
+// Duration options based on format and difficulty
+const DURATION_OPTIONS = ["30 min", "45 min", "60 min"];
+
 function logStep(step: string, details?: any) {
   const detailsStr = details ? ` - ${JSON.stringify(details)}` : '';
   console.log(`[GENERATE-WOD] ${step}${detailsStr}`);
+}
+
+// Helper to get next difficulty with rotation logic (prevents consecutive high-intensity)
+function getNextDifficulty(
+  lastDifficultyStars: number | null, 
+  usedDifficulties: number[]
+): { name: string; stars: number } {
+  // Get available difficulties (not used in current cycle)
+  let availableDifficulties = DIFFICULTY_LEVELS.filter(d => !usedDifficulties.includes(d.stars));
+  
+  // If all used, reset cycle
+  if (availableDifficulties.length === 0) {
+    availableDifficulties = [...DIFFICULTY_LEVELS];
+  }
+  
+  // Apply rotation rule: prevent consecutive high-intensity (5-6 stars)
+  if (lastDifficultyStars && lastDifficultyStars >= 5) {
+    // Last was advanced (5-6), next MUST be 1-4 for recovery
+    const recoveryOptions = availableDifficulties.filter(d => d.stars <= 4);
+    if (recoveryOptions.length > 0) {
+      availableDifficulties = recoveryOptions;
+    }
+  }
+  
+  // Random selection from available options
+  const selected = availableDifficulties[Math.floor(Math.random() * availableDifficulties.length)];
+  
+  logStep("Difficulty rotation applied", { 
+    lastStars: lastDifficultyStars, 
+    usedInCycle: usedDifficulties,
+    selectedStars: selected.stars,
+    reason: lastDifficultyStars && lastDifficultyStars >= 5 ? "Recovery after advanced" : "Normal rotation"
+  });
+  
+  return selected;
 }
 
 // Helper to get next format for a category with tracking
@@ -153,27 +191,49 @@ serve(async (req) => {
     const category = CATEGORY_CYCLE[categoryIndex];
     logStep("Today's category (shared)", { category, dayCount: state.day_count });
 
-    // Determine difficulty (6-day cycle ensures all 6 levels covered)
-    const difficultyIndex = state.day_count % DIFFICULTY_CYCLE.length;
-    const selectedDifficulty = DIFFICULTY_CYCLE[difficultyIndex];
-    logStep("Selected difficulty (shared)", { ...selectedDifficulty, dayCount: state.day_count });
+    // Determine difficulty with rotation logic (prevents consecutive high-intensity)
+    const usedDifficultiesInCycle = state.used_difficulties_in_cycle || [];
+    const lastDifficultyStars = state.last_difficulty_stars || null;
+    const selectedDifficulty = getNextDifficulty(lastDifficultyStars, usedDifficultiesInCycle);
+    
+    // Update used difficulties tracking (reset if all 6 used)
+    let newUsedDifficulties = [...usedDifficultiesInCycle, selectedDifficulty.stars];
+    if (newUsedDifficulties.length >= 6) {
+      newUsedDifficulties = [selectedDifficulty.stars]; // Reset cycle
+    }
+    logStep("Selected difficulty (shared)", { 
+      ...selectedDifficulty, 
+      dayCount: state.day_count,
+      usedInCycle: newUsedDifficulties
+    });
 
     // Determine format with tracking (same for both workouts)
     const formatUsage = state.format_usage || {};
     const { format, updatedUsage } = getNextFormat(category, formatUsage);
     logStep("Selected format (shared)", { format, category, usedFormats: formatUsage[category] });
 
-    // Duration based on format
-    const durationMap: Record<string, string> = {
-      "REPS & SETS": "45-60 min",
-      "CIRCUIT": "30-40 min",
-      "TABATA": "20-30 min",
-      "AMRAP": "25-35 min",
-      "EMOM": "20-30 min",
-      "FOR TIME": "25-35 min",
-      "MIX": "35-45 min"
+    // Duration based on format and difficulty
+    const getDuration = (format: string, stars: number): string => {
+      // Base duration by format
+      const baseDurations: Record<string, number[]> = {
+        "REPS & SETS": [45, 60],   // Strength needs more time
+        "CIRCUIT": [30, 45],
+        "TABATA": [20, 30],
+        "AMRAP": [25, 35],
+        "EMOM": [20, 30],
+        "FOR TIME": [25, 35],
+        "MIX": [35, 45]
+      };
+      
+      const [minDuration, maxDuration] = baseDurations[format] || [30, 45];
+      
+      // Adjust by difficulty: higher difficulty = longer duration
+      if (stars <= 2) return `${minDuration} min`;
+      if (stars <= 4) return `${Math.round((minDuration + maxDuration) / 2)} min`;
+      return `${maxDuration} min`;
     };
-    const duration = durationMap[format] || "30-45 min";
+    
+    const duration = getDuration(format, selectedDifficulty.stars);
 
     // Category prefixes for IDs
     const categoryPrefixes: Record<string, string> = {
@@ -209,146 +269,301 @@ Generate a complete workout with these specifications:
 - Difficulty: ${selectedDifficulty.name} (${selectedDifficulty.stars} stars out of 6)
 - Format: ${format}
 
+═══════════════════════════════════════════════════════════════════════════════
+FORMAT DEFINITIONS (MUST FOLLOW EXACTLY):
+═══════════════════════════════════════════════════════════════════════════════
+- Tabata: 20 seconds work, 10 seconds rest, 8 rounds per exercise
+- Circuit: 4-6 exercises repeated 3-5 rounds with minimal rest between exercises
+- AMRAP: As Many Rounds As Possible in a given time (e.g., 15 min AMRAP)
+- For Time: Complete all exercises as fast as possible (record time)
+- EMOM: Every Minute On the Minute - perform set at start of each minute, rest remainder
+- Reps & Sets: Classic strength format (e.g., 4 sets x 8 reps) with defined rest
+- Mix: Combination of two or more formats (e.g., EMOM warm-up + Tabata finisher)
+
+YOUR FORMAT TODAY: ${format}
+- You MUST structure the workout using the ${format} format rules defined above
+
+═══════════════════════════════════════════════════════════════════════════════
 CATEGORY-SPECIFIC TRAINING PHILOSOPHY (CRITICAL - MUST FOLLOW EXACTLY):
+═══════════════════════════════════════════════════════════════════════════════
+
 ${category === "STRENGTH" ? `
-══════════════════════════════════════════════════════════════
-STRENGTH WORKOUTS - BUILD MUSCLE & POWER
-══════════════════════════════════════════════════════════════
+╔══════════════════════════════════════════════════════════════════════════════╗
+║ CATEGORY 1: STRENGTH - BUILD MUSCLE, INCREASE FORCE, IMPROVE FUNCTIONAL STRENGTH ║
+╚══════════════════════════════════════════════════════════════════════════════╝
 
-✅ MUST INCLUDE (MANDATORY):
-- Compound lifts: squats, deadlifts, bench press, overhead press, rows, pull-ups
-- Reps & Sets format ONLY (e.g., 4 sets x 8 reps)
-- Clear rest periods between sets (60-120 seconds)
-- Progressive overload focus - building muscle and maximal strength
-- ${equipment === "EQUIPMENT" ? "Barbell, dumbbell, or kettlebell exercises with heavy loads" : "Advanced calisthenics: pull-ups, dips, pistol squats, muscle-up progressions, handstand push-ups, weighted holds"}
+GOAL: Build muscle, increase force production, improve functional strength.
+INTENSITY: Controlled tempo, structured sets, progressive overload.
+FORMAT: Reps & Sets, supersets, EMOM strength, pyramids, upper-lower split, push-pull-legs, compound lifts.
 
-❌ MUST NOT INCLUDE (FORBIDDEN):
-- High-rep cardio-style exercises (burpees, jumping jacks, mountain climbers)
-- Heart rate elevation as primary goal
-- EMOM, Tabata, AMRAP, or time-based formats
-- Running, jumping, or locomotion exercises
-- Minimal rest or circuit-style training
-- Any exercise primarily designed to burn calories
+${equipment === "EQUIPMENT" ? `
+✅ EQUIPMENT WORKOUTS - ALLOWED EXERCISES (PICK FROM THESE):
+• Goblet squats
+• Kettlebell deadlifts
+• Romanian deadlifts
+• Front squats
+• Bench press variations
+• Dumbbell row
+• Bent-over row
+• Push press
+• Landmine press
+• Split squats
+• Hip hinges
+• Weighted carries` : `
+✅ BODYWEIGHT ONLY - ALLOWED EXERCISES (PICK FROM THESE):
+• Push-up variations (diamond, archer, decline, incline)
+• Slow tempo squats (3-4 second eccentric)
+• Pistol squat regressions (assisted, box pistols)
+• Glute bridges and hip thrusts (single-leg progressions)
+• Plank variations (RKC plank, side plank with rotation)
+• Pull-ups (wide grip, close grip, chin-ups)
+• Dips (parallel bar, bench dips, Korean dips)
+• Isometrics (wall sits, dead hangs, L-sits)
+• Slow tempo lunges (walking, reverse, Bulgarian split squat)
+• Handstand progressions (wall holds, pike push-ups)`}
 
-FOCUS: Muscle hypertrophy, maximal strength, progressive overload, proper form with adequate rest.` : ""}
-${category === "CALORIE BURNING" ? `
-══════════════════════════════════════════════════════════════
-CALORIE BURNING WORKOUTS - MAXIMUM FAT LOSS
-══════════════════════════════════════════════════════════════
+❌ ABSOLUTE RULES - FORBIDDEN EXERCISES (NEVER INCLUDE):
+• High knees
+• Skipping
+• Burpees
+• Mountain climbers
+• Jumping jacks
+• Sprints
+• Any cardio-based exercise
+• EMOM, Tabata, AMRAP, or time-based formats
+• Running, jumping, or locomotion exercises
+• Minimal rest or circuit-style training
 
-✅ MUST INCLUDE (MANDATORY):
-- High-intensity interval training (HIIT)
-- Full-body explosive movements that elevate heart rate significantly
-- Fast-paced circuits with minimal rest (15-30 seconds between exercises)
-- ${equipment === "EQUIPMENT" ? "Kettlebell swings, dumbbell thrusters, battle rope slams, jump rope, medicine ball throws" : "Burpees, mountain climbers, jumping jacks, high knees, jump squats, tuck jumps, squat thrusts"}
-- Formats: Circuit, AMRAP, For Time, or Interval-based
+FOCUS: Muscle hypertrophy, maximal strength, progressive overload, proper form with adequate rest (60-120 seconds).
+STRENGTH WORKOUTS MUST STAY STRENGTH.` : ""}
 
-❌ MUST NOT INCLUDE (FORBIDDEN):
-- Slow, controlled strength movements with long rest
-- Heavy barbell lifts focused on muscle building
-- Long rest periods (over 45 seconds)
-- Mobility, stretching, or flexibility exercises
-- Low-intensity steady-state cardio
-
-FOCUS: Maximize calorie expenditure, elevate heart rate, minimal rest, fat burning, conditioning.` : ""}
-${category === "METABOLIC" ? `
-══════════════════════════════════════════════════════════════
-METABOLIC CONDITIONING - STRENGTH + CARDIO FUSION
-══════════════════════════════════════════════════════════════
-
-✅ MUST INCLUDE (MANDATORY):
-- Combination of strength AND cardio in structured stations/circuits
-- Work-to-rest ratios that stress multiple energy systems (e.g., 40 work/20 rest)
-- Formats: EMOM, Circuit, Tabata, or Station-based training
-- Compound movements at moderate-high volume (not maximal weight)
-- ${equipment === "EQUIPMENT" ? "Thrusters, kettlebell swings, dumbbell complexes, rowing, battle ropes, sled pushes" : "Burpee variations, squat jumps, push-up complexes, plank jacks, bodyweight thrusters"}
-- CRITICAL: Keep equipment CONSISTENT throughout (all bodyweight OR all equipment - never mixed)
-
-❌ MUST NOT INCLUDE (FORBIDDEN):
-- Pure cardio only (running laps without resistance)
-- Pure strength only (heavy singles, doubles, or triples)
-- Long rest periods (over 60 seconds)
-- Mobility or flexibility-focused exercises
-- Isolated single-joint exercises
-
-FOCUS: Metabolic stress, work capacity, combination of strength and cardio, post-workout calorie burn (EPOC).` : ""}
 ${category === "CARDIO" ? `
-══════════════════════════════════════════════════════════════
-CARDIO WORKOUTS - HEART HEALTH & ENDURANCE
-══════════════════════════════════════════════════════════════
+╔══════════════════════════════════════════════════════════════════════════════╗
+║ CATEGORY 2: CARDIO - IMPROVE HEART RATE CAPACITY, AEROBIC & ANAEROBIC       ║
+╚══════════════════════════════════════════════════════════════════════════════╝
 
-✅ MUST INCLUDE (MANDATORY):
-- Sustained elevated heart rate throughout the workout
-- Locomotion: running, jogging, skipping, shuffling, crawling (bear crawls, crab walks)
-- Plyometrics: box jumps, jump rope, bounding, lateral hops, broad jumps
-- Conditioning: ${equipment === "EQUIPMENT" ? "rowing, assault bike, battle ropes, ski erg, weighted carries" : "high knees, butt kicks, lateral shuffles, jumping jacks, mountain climbers, star jumps"}
-- Focus on endurance, stamina, and cardiovascular health
+GOAL: Improve heart rate capacity, aerobic and anaerobic conditioning.
+FORMAT: Circuits, AMRAP, EMOM, Tabata, For Time.
+INTENSITY: Mostly bodyweight but can include cardio machines or light tools. Minimal load, fast pace.
 
-❌ MUST NOT INCLUDE (FORBIDDEN):
-- Heavy strength exercises focused on muscle building
-- Long rest periods between sets
-- Slow mobility or flexibility work
-- Low-rep, high-weight training
-- Static holds or isometric exercises
+✅ ALLOWED EXERCISES (PICK FROM THESE):
+• Jogging / Running
+• Jump rope
+• Treadmill runs
+• Rowing machine
+• Assault bike
+• High knees
+• Skipping
+• Jumping jacks
+• Burpees
+• Mountain climbers
+• Butt kicks
+• Lateral shuffles
+• Step-ups (fast tempo)
+• Shadow boxing
+• Bear crawls / Crab walks
+• Star jumps / Broad jumps
+
+❌ DO NOT INCLUDE (FORBIDDEN):
+• Heavy lifting
+• Slow tempo strength movements
+• Long rest periods between sets
+• Low-rep, high-weight training
+• Static holds or isometric exercises
 
 FOCUS: Cardiovascular endurance, stamina building, sustained heart rate elevation, aerobic and anaerobic conditioning.` : ""}
+
+${category === "METABOLIC" ? `
+╔══════════════════════════════════════════════════════════════════════════════╗
+║ CATEGORY 3: METABOLIC - HIGH-INTENSITY FULL-BODY CONDITIONING               ║
+╚══════════════════════════════════════════════════════════════════════════════╝
+
+GOAL: High-intensity, full-body conditioning using strength tools and bodyweight.
+Similar to cardio but MORE POWER, MORE MUSCULAR DEMAND, MORE TOOLS.
+FORMAT: Circuits, AMRAP, EMOM, Tabata, For Time.
+
+${equipment === "EQUIPMENT" ? `
+✅ EQUIPMENT WORKOUTS - ALLOWED EXERCISES:
+• Kettlebell swings
+• Battle ropes
+• Sandbags
+• Medicine ball slams
+• Box jumps
+• Kettlebell clean and press
+• Sled push (if available)
+• Thrusters (kettlebell or dumbbell)
+• Rowing machine intervals
+• Dumbbell complexes` : `
+✅ BODYWEIGHT ONLY - ALLOWED EXERCISES:
+• Burpees (all variations)
+• Squat thrusts
+• Fast lunges (jump lunges, walking lunges)
+• Skater jumps
+• Mountain climbers
+• Jump squats
+• Push-up complexes
+• Plank jacks
+• Bodyweight thrusters`}
+
+❌ DON'T INCLUDE (FORBIDDEN):
+• Slow strength tempo
+• Isometrics
+• Static planks (unless part of active recovery)
+• Pure cardio only (running laps without resistance)
+• Pure strength only (heavy singles, doubles, or triples)
+• Long rest periods (over 60 seconds)
+• Isolated single-joint exercises
+
+CRITICAL: Keep equipment CONSISTENT throughout (all bodyweight OR all equipment - never mixed).
+FOCUS: Metabolic stress, work capacity, combination of strength and cardio, post-workout calorie burn (EPOC).` : ""}
+
+${category === "CALORIE BURNING" ? `
+╔══════════════════════════════════════════════════════════════════════════════╗
+║ CATEGORY 4: CALORIE BURNING - HIGH-EFFORT, SIMPLE, NON-TECHNICAL            ║
+╚══════════════════════════════════════════════════════════════════════════════╝
+
+GOAL: High-effort, simple, non-technical exercises that maintain high output.
+FORMAT: Circuit, AMRAP, Tabata, For Time.
+INTENSITY: Flexible but ALWAYS keep the heart rate HIGH.
+
+${equipment === "EQUIPMENT" ? `
+✅ EQUIPMENT WORKOUTS - ALLOWED EXERCISES:
+• Kettlebell swings
+• Battle ropes (simple patterns)
+• Rower
+• Bike (assault bike, spin)
+• Slam ball
+• Light dumbbells for full-body complexes` : `
+✅ BODYWEIGHT ONLY - ALLOWED EXERCISES:
+• Squat jumps
+• Burpees
+• High knees
+• Lunges (all variations)
+• Mountain climbers
+• Step-ups
+• Frog hops
+• Jumping jacks
+• Tuck jumps`}
+
+❌ DON'T INCLUDE (FORBIDDEN):
+• Technical Olympic lifts
+• Slow strength sets
+• Heavy loading
+• Complicated sequences
+• Long rest periods (over 45 seconds)
+• Mobility, stretching, or flexibility exercises
+
+FOCUS: Maximize calorie expenditure, elevate heart rate, minimal rest, fat burning, conditioning.` : ""}
+
 ${category === "MOBILITY & STABILITY" ? `
-══════════════════════════════════════════════════════════════
-MOBILITY & STABILITY - FLEXIBILITY & JOINT HEALTH
-══════════════════════════════════════════════════════════════
+╔══════════════════════════════════════════════════════════════════════════════╗
+║ CATEGORY 5: MOBILITY & STABILITY - JOINT MOBILITY, CORE STABILITY, FLEXIBILITY ║
+╚══════════════════════════════════════════════════════════════════════════════╝
 
-✅ MUST INCLUDE (MANDATORY):
-- Hip mobility: hip circles, 90/90 stretches, pigeon pose, hip flexor stretches, frog stretch
-- Spine flexibility: cat-cow, thoracic rotations, spinal twists, cobra stretch
-- Shoulder mobility: arm circles, wall slides, shoulder dislocates, thread the needle
-- Core stability: planks, dead bugs, bird dogs, Pallof press holds, hollow body holds
-- Controlled movements with proper breathing cues (inhale/exhale instructions)
-- ${equipment === "EQUIPMENT" ? "Resistance bands, foam rollers, stability balls, yoga blocks, light dumbbells for mobility" : "Bodyweight flows, yoga-inspired sequences, active stretching, controlled holds (30-60 seconds)"}
+GOAL: Increase joint mobility, core stability, flexibility, controlled movement.
+FORMAT: Circuits, Reps & Sets, Flow, or Time-based mobility.
+INTENSITY: Low to moderate - focus on QUALITY over speed.
 
-❌ MUST NOT INCLUDE (FORBIDDEN):
-- High-intensity exercises that elevate heart rate significantly
-- Explosive or ballistic movements
-- Time pressure, racing, or competitive elements
-- Heavy resistance training
-- Burpees, jumping, running, or any high-impact exercises
+✅ ALLOWED EXERCISES (PICK FROM THESE):
+• Cat-cow
+• Thoracic rotations
+• World's greatest stretch
+• 90/90 hip rotation
+• Dead bug
+• Bird dog
+• Glute bridges (controlled)
+• Pallof press (if equipment)
+• Side planks (holds, not dynamic)
+• Copenhagen holds
+• Ankle mobility drills
+• Shoulder CARs (Controlled Articular Rotations)
+• Hip CARs
+• Breathing protocols
+• Pigeon pose
+• Hip flexor stretches
+• Thread the needle
+• Foam rolling (if equipment)
+${equipment === "EQUIPMENT" ? `• Resistance band stretches
+• Stability ball exercises
+• Yoga blocks for supported stretches
+• Light dumbbells for mobility work` : `• Yoga-inspired sequences
+• Active stretching
+• Controlled holds (30-60 seconds)`}
+
+❌ NEVER INCLUDE (FORBIDDEN):
+• Burpees
+• Jumps (any type)
+• Running
+• Skipping
+• Anything explosive
+• Anything heavy
+• High-intensity exercises that elevate heart rate significantly
+• Time pressure, racing, or competitive elements
 
 FOCUS: Joint health, flexibility, injury prevention, controlled breathing, active recovery, movement quality over speed.` : ""}
+
 ${category === "CHALLENGE" ? `
-══════════════════════════════════════════════════════════════
-CHALLENGE WORKOUTS - TEST YOUR LIMITS
-══════════════════════════════════════════════════════════════
+╔══════════════════════════════════════════════════════════════════════════════╗
+║ CATEGORY 6: CHALLENGE - TOUGH SESSION TESTING ENDURANCE, STRENGTH, MENTAL TOUGHNESS ║
+╚══════════════════════════════════════════════════════════════════════════════╝
 
-✅ MUST INCLUDE (MANDATORY):
-- Race-against-the-clock challenges (e.g., "Complete 100 burpees as fast as possible")
-- Benchmark workouts with specific rep targets and time goals
-- Complex format combinations (e.g., Tabata + EMOM together, descending ladder + AMRAP)
-- Mental and physical toughness tests that push to the limit
-- Advanced movements for experienced athletes only
-- ${equipment === "EQUIPMENT" ? "Complex barbell/kettlebell/dumbbell combinations, heavy carries, compound movements" : "High-rep challenges (100 burpees, 200 squats), advanced calisthenics (muscle-ups, pistols), bodyweight complexes"}
-- Clear scoring or time-based success metrics (e.g., "Beat 15 minutes", "Complete all rounds")
+GOAL: Tough session that tests endurance, strength, or mental toughness.
+FORMAT: EVERY FORMAT ALLOWED - be creative!
+INTENSITY: VERY HIGH - this is meant to push limits.
 
-EXAMPLE CHALLENGE FORMATS TO USE:
-- "Death by..." - Minute 1: 1 rep, Minute 2: 2 reps, continue until failure
-- "100 Rep Challenge" - Complete 100 reps of X exercise as fast as possible
-- "Descending Ladder" - 10-9-8-7-6-5-4-3-2-1 of two exercises alternating
-- "EMOM + Tabata Combo" - 10-minute EMOM followed by 8 rounds Tabata
-- "For Time with Cap" - Complete workout under time cap (e.g., 20 minutes)
-- "Pyramid" - 1-2-3-4-5-4-3-2-1 rep scheme
-- "Chipper" - Long list of exercises, complete all reps before moving on
+${equipment === "EQUIPMENT" ? `
+✅ EQUIPMENT CHALLENGE EXAMPLES:
+• Kettlebell complex challenge (5 exercises, 5 reps each, 10 rounds)
+• Dumbbell chipper (long list of exercises, high reps)
+• Rowing machine distance challenge (5000m for time)
+• Weighted vest bodyweight challenge
+• Barbell complex (clean + front squat + push press + back squat + lunges)
+• Heavy carry challenges (farmer's walks, suitcase carries)` : `
+✅ BODYWEIGHT CHALLENGE EXAMPLES:
+• 100 burpees challenge (for time)
+• 10-minute AMRAP (max rounds of 10 push-ups, 15 squats, 20 sit-ups)
+• Descending ladders (10-9-8-7-6-5-4-3-2-1 of 2 exercises)
+• Bodyweight chippers (100 squats, 80 lunges, 60 sit-ups, 40 push-ups, 20 burpees)
+• EMOM increasing reps (minute 1: 1 burpee, minute 2: 2 burpees, continue until failure)
+• Advanced calisthenics (muscle-up attempts, pistol squat ladder, handstand holds)`}
 
-❌ MUST NOT INCLUDE (FORBIDDEN):
-- Basic beginner-level exercises without challenge element
-- Long rest periods (over 30 seconds unless strategically placed)
-- Simple rep schemes without competitive/benchmark elements
-- Easy modifications or scaled options
-- Slow-paced, controlled workouts
+CHALLENGE FORMAT IDEAS (USE THESE):
+• "Death by..." - Minute 1: 1 rep, Minute 2: 2 reps, continue until failure
+• "100 Rep Challenge" - Complete 100 reps of X exercise as fast as possible
+• "Descending Ladder" - 10-9-8-7-6-5-4-3-2-1 of two exercises alternating
+• "EMOM + Tabata Combo" - 10-minute EMOM followed by 8 rounds Tabata
+• "For Time with Cap" - Complete workout under time cap (e.g., 20 minutes)
+• "Pyramid" - 1-2-3-4-5-4-3-2-1 rep scheme
+• "Chipper" - Long list of exercises, complete all reps before moving on
+
+❌ AVOID (FORBIDDEN):
+• Mobility exercises
+• Slow technical lifts
+• Low-intensity movements
+• Basic beginner-level exercises without challenge element
+• Long rest periods (over 30 seconds unless strategically placed)
+• Easy modifications or scaled options
 
 FOCUS: Mental toughness, personal records, benchmark performance, competition against the clock, pushing limits.` : ""}
 
+═══════════════════════════════════════════════════════════════════════════════
 DIFFICULTY LEVEL ${selectedDifficulty.stars}/6 (${selectedDifficulty.name}):
-${selectedDifficulty.stars <= 2 ? "- Suitable for beginners or those returning to fitness\n- Focus on foundational movements with proper form\n- Moderate intensity with adequate rest periods" : ""}
-${selectedDifficulty.stars >= 3 && selectedDifficulty.stars <= 4 ? "- For regular exercisers with good fitness base\n- Increased complexity and intensity\n- Challenging but achievable for consistent trainers" : ""}
-${selectedDifficulty.stars >= 5 ? "- Advanced level for experienced athletes\n- High intensity, complex movements, minimal rest\n- Requires excellent form and fitness foundation" : ""}
+═══════════════════════════════════════════════════════════════════════════════
+${selectedDifficulty.stars <= 2 ? `• Suitable for beginners or those returning to fitness
+• Focus on foundational movements with proper form
+• Moderate intensity with adequate rest periods
+• Use regression options when available (knee push-ups, assisted squats)
+• Duration: ${duration}` : ""}
+${selectedDifficulty.stars >= 3 && selectedDifficulty.stars <= 4 ? `• For regular exercisers with good fitness base
+• Increased complexity and intensity
+• Challenging but achievable for consistent trainers
+• Standard exercise progressions
+• Duration: ${duration}` : ""}
+${selectedDifficulty.stars >= 5 ? `• Advanced level for experienced athletes
+• High intensity, complex movements, minimal rest
+• Requires excellent form and fitness foundation
+• Use advanced progressions (pistol squats, muscle-up preps, handstand push-ups)
+• Duration: ${duration}` : ""}
 
 CRITICAL FORMATTING RULES (MANDATORY - FOLLOW EXACTLY FOR COMPACT, READABLE CONTENT):
 
@@ -684,12 +899,14 @@ Respond in this EXACT JSON format:
       logStep("Error sending WOD notification", { error: e });
     }
 
-    // Update state
+    // Update state with difficulty rotation tracking
     const newState = {
       day_count: state.day_count + 1,
       current_category: CATEGORY_CYCLE[(state.day_count + 1) % CATEGORY_CYCLE.length],
       last_equipment: "BOTH",
       last_difficulty: selectedDifficulty.name,
+      last_difficulty_stars: selectedDifficulty.stars, // Track for rotation logic
+      used_difficulties_in_cycle: newUsedDifficulties, // Track which difficulties used in current cycle
       format_usage: updatedUsage,
       equipment_bodyweight_count: (state.equipment_bodyweight_count || 0) + 1,
       equipment_with_count: (state.equipment_with_count || 0) + 1,
