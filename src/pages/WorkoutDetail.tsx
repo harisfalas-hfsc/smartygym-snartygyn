@@ -240,7 +240,7 @@ const WorkoutDetail = () => {
       ) : (
         <>
       <Helmet>
-        <title>{title} Online Workouts | Online Fitness | Haris Falas | SmartyGym</title>
+        <title>Smarty Workouts | {title} | Online Fitness | Haris Falas | SmartyGym</title>
         <meta name="description" content={`${title} online workouts by Sports Scientist Haris Falas. Professional ${type || 'fitness'} workouts from beginner to advanced. AMRAP, HIIT, TABATA, circuit training. Free and premium online workouts for worldwide access.`} />
         <meta name="keywords" content={`online workouts, ${title}, ${type} workouts, online fitness, Haris Falas workouts, HIIT workouts, AMRAP workouts, TABATA training, circuit training, bodyweight workouts, online gym, home workouts`} />
         
@@ -303,7 +303,7 @@ const WorkoutDetail = () => {
         <PageBreadcrumbs 
           items={[
             { label: "Home", href: "/" },
-            { label: "Workouts", href: "/workout" },
+            { label: "Smarty Workouts", href: "/workout" },
             { label: title }
           ]} 
         />

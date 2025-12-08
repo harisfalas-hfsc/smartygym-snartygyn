@@ -180,7 +180,7 @@ const WODCategory = () => {
           </div>
         </div> : <>
           <Helmet>
-            <title>Workout of the Day | Daily Expert Workouts | SmartyGym</title>
+            <title>Smarty Workouts | Workout of the Day | Daily Expert Workouts | SmartyGym</title>
             <meta name="description" content="Two daily expert-designed workouts at 7:00 AM - one with equipment, one without. Following a 6-day periodization cycle. Your SmartyGym: the gym that never closes." />
             <meta name="keywords" content="workout of the day, WOD, daily workouts, bodyweight workout, equipment workout, online gym, periodization, Haris Falas" />
             <meta property="og:title" content="Workout of the Day | SmartyGym" />
@@ -204,7 +204,7 @@ const WODCategory = () => {
             label: "Home",
             href: "/"
           }, {
-            label: "Workouts",
+            label: "Smarty Workouts",
             href: "/workout"
           }, {
             label: "WOD"
