@@ -164,6 +164,33 @@ serve(async (req) => {
 
     logStep("Corporate member added", { newCount: corpSub.current_users_count + 1 });
 
+    // Insert dashboard welcome message for the corporate member
+    try {
+      await supabase
+        .from('user_system_messages')
+        .insert({
+          user_id: newUser.user.id,
+          message_type: 'welcome',
+          subject: `🎉 Welcome to SmartyGym - ${corpSub.organization_name}!`,
+          content: `<p class="tiptap-paragraph">Welcome to the team, <strong>${fullName.trim()}</strong>! 🎉</p>
+<p class="tiptap-paragraph">You've been added to <strong>${corpSub.organization_name}</strong>'s SmartyGym corporate account with <strong>Platinum-level access</strong>.</p>
+<p class="tiptap-paragraph">You now have full access to all premium features:</p>
+<ul>
+<li>500+ expert-designed workouts by Haris Falas</li>
+<li>Premium training programs</li>
+<li>Daily Smarty Ritual</li>
+<li>All fitness tools and calculators</li>
+<li>Community features and leaderboards</li>
+</ul>
+<p class="tiptap-paragraph">Start exploring your dashboard and let's make every workout count!</p>
+<p class="tiptap-paragraph"><a href="https://smartygym.com/dashboard" style="color: #d4af37;">Go to Your Dashboard →</a></p>`,
+          is_read: false,
+        });
+      logStep("Dashboard welcome message inserted for member");
+    } catch (msgError) {
+      logStep("ERROR inserting dashboard message", { error: msgError });
+    }
+
     // Send welcome email to new member
     try {
       const resendKey = Deno.env.get("RESEND_API_KEY");
