@@ -602,62 +602,62 @@ const Index = () => {
                   <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mt-8">
                     {/* Card 1: Online Fitness Redefined */}
                     <Card className="border-2 border-primary/30 hover:border-primary hover:shadow-lg transition-all bg-primary/5 h-full">
-                      <CardHeader className="text-center pb-2">
-                        <div className="w-14 h-14 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-3">
-                          <Sparkles className="w-7 h-7 text-primary" />
+                      <CardHeader className="text-center py-3 pb-1">
+                        <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-2">
+                          <Sparkles className="w-5 h-5 text-primary" />
                         </div>
-                        <CardTitle className="text-lg">Online Fitness Redefined</CardTitle>
+                        <CardTitle className="text-lg whitespace-nowrap">Online Fitness Redefined</CardTitle>
                       </CardHeader>
-                      <CardContent className="text-center pt-0">
+                      <CardContent className="text-center pt-0 pb-3">
                         <p className="text-sm text-muted-foreground">
-                          We are redefining online fitness, making quality training accessible, flexible, and designed for real life.
+                          Quality training made accessible and flexible. Designed for real life, not just the gym.
                         </p>
                       </CardContent>
                     </Card>
 
                     {/* Card 2: Your Gym in Your Pocket */}
                     <Card className="border-2 border-primary/30 hover:border-primary hover:shadow-lg transition-all bg-primary/5 h-full">
-                      <CardHeader className="text-center pb-2">
-                        <div className="w-14 h-14 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-3">
-                          <Smartphone className="w-7 h-7 text-primary" />
+                      <CardHeader className="text-center py-3 pb-1">
+                        <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-2">
+                          <Smartphone className="w-5 h-5 text-primary" />
                         </div>
-                        <CardTitle className="text-lg">Your Gym In Your Pocket</CardTitle>
+                        <CardTitle className="text-lg whitespace-nowrap">Your Gym In Your Pocket</CardTitle>
                       </CardHeader>
-                      <CardContent className="text-center pt-0">
+                      <CardContent className="text-center pt-0 pb-3">
                         <p className="text-sm text-muted-foreground">
-                          Professional fitness platform with expert workouts, structured programs, and personalized coaching.
+                          Expert workouts and structured programs. Professional coaching, wherever you are.
                         </p>
                       </CardContent>
                     </Card>
 
                     {/* Card 3: 100% Human */}
                     <Card className="border-2 border-primary/30 hover:border-primary hover:shadow-lg transition-all bg-primary/5 h-full">
-                      <CardHeader className="text-center pb-2">
-                        <div className="w-14 h-14 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-3">
-                          <UserCheck className="w-7 h-7 text-primary" />
+                      <CardHeader className="text-center py-3 pb-1">
+                        <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-2">
+                          <UserCheck className="w-5 h-5 text-primary" />
                         </div>
-                        <CardTitle className="text-lg">
+                        <CardTitle className="text-lg whitespace-nowrap">
                           <span className="text-red-600">100% Human.</span> 0% AI.
                         </CardTitle>
                       </CardHeader>
-                      <CardContent className="text-center pt-0">
+                      <CardContent className="text-center pt-0 pb-3">
                         <p className="text-sm text-muted-foreground">
-                          Every workout designed by Sports Scientist <span className="text-primary font-semibold">Haris Falas</span> with 20+ years experience.
+                          Every workout by <span className="text-primary font-semibold">Haris Falas</span>. 20+ years of real coaching experience.
                         </p>
                       </CardContent>
                     </Card>
 
                     {/* Card 4: Train Anywhere */}
                     <Card className="border-2 border-primary/30 hover:border-primary hover:shadow-lg transition-all bg-primary/5 h-full">
-                      <CardHeader className="text-center pb-2">
-                        <div className="w-14 h-14 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-3">
-                          <Plane className="w-7 h-7 text-primary" />
+                      <CardHeader className="text-center py-3 pb-1">
+                        <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-2">
+                          <Plane className="w-5 h-5 text-primary" />
                         </div>
-                        <CardTitle className="text-lg">Train Anywhere, Anytime</CardTitle>
+                        <CardTitle className="text-lg whitespace-nowrap">Train Anywhere, Anytime</CardTitle>
                       </CardHeader>
-                      <CardContent className="text-center pt-0">
+                      <CardContent className="text-center pt-0 pb-3">
                         <p className="text-sm text-muted-foreground">
-                          Access professional workouts on any device. Flexible training that fits YOUR schedule and goals.
+                          Access workouts on any device, anytime. Flexible training that fits YOUR schedule.
                         </p>
                       </CardContent>
                     </Card>
