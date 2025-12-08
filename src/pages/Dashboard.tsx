@@ -411,7 +411,7 @@ export default function Dashboard() {
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
                     <Dumbbell className="h-5 w-5 text-primary" />
-                    Favorite Workouts
+                    Favorite Smarty Workouts
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
@@ -450,7 +450,7 @@ export default function Dashboard() {
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
                     <Calendar className="h-5 w-5 text-primary" />
-                    Favorite Programs
+                    Favorite Smarty Programs
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
@@ -493,7 +493,7 @@ export default function Dashboard() {
                 <CardTitle className="flex items-center justify-between flex-wrap gap-4">
                   <div className="flex items-center gap-2">
                     <Dumbbell className="h-5 w-5 text-primary" />
-                    All Workouts
+                    All Smarty Workouts
                   </div>
                   <div className="flex gap-2 flex-wrap">
                     <Select value={workoutStatusFilter} onValueChange={setWorkoutStatusFilter}>
@@ -565,7 +565,7 @@ export default function Dashboard() {
                 <CardTitle className="flex items-center justify-between flex-wrap gap-4">
                   <div className="flex items-center gap-2">
                     <Calendar className="h-5 w-5 text-primary" />
-                    All Training Programs
+                    All Smarty Programs
                   </div>
                   <div className="flex gap-2 flex-wrap">
                     <Select value={programStatusFilter} onValueChange={setProgramStatusFilter}>
