@@ -209,49 +209,141 @@ Generate a complete workout with these specifications:
 - Difficulty: ${selectedDifficulty.name} (${selectedDifficulty.stars} stars out of 6)
 - Format: ${format}
 
-TRAINING PHILOSOPHY (CRITICAL - MUST FOLLOW):
+CATEGORY-SPECIFIC TRAINING PHILOSOPHY (CRITICAL - MUST FOLLOW EXACTLY):
 ${category === "STRENGTH" ? `
-STRENGTH WORKOUTS:
-- Focus on compound movements and progressive overload
-- Use Reps & Sets format with clear rest periods
-- ${equipment === "EQUIPMENT" ? "Include barbell, dumbbell, or kettlebell exercises" : "Use advanced calisthenics and bodyweight strength moves like pull-ups, dips, pistol squats, muscle-ups progressions"}
-- Target muscle hypertrophy and strength gains
-- Appropriate for gym-goers wanting to build muscle and power` : ""}
+══════════════════════════════════════════════════════════════
+STRENGTH WORKOUTS - BUILD MUSCLE & POWER
+══════════════════════════════════════════════════════════════
+
+✅ MUST INCLUDE (MANDATORY):
+- Compound lifts: squats, deadlifts, bench press, overhead press, rows, pull-ups
+- Reps & Sets format ONLY (e.g., 4 sets x 8 reps)
+- Clear rest periods between sets (60-120 seconds)
+- Progressive overload focus - building muscle and maximal strength
+- ${equipment === "EQUIPMENT" ? "Barbell, dumbbell, or kettlebell exercises with heavy loads" : "Advanced calisthenics: pull-ups, dips, pistol squats, muscle-up progressions, handstand push-ups, weighted holds"}
+
+❌ MUST NOT INCLUDE (FORBIDDEN):
+- High-rep cardio-style exercises (burpees, jumping jacks, mountain climbers)
+- Heart rate elevation as primary goal
+- EMOM, Tabata, AMRAP, or time-based formats
+- Running, jumping, or locomotion exercises
+- Minimal rest or circuit-style training
+- Any exercise primarily designed to burn calories
+
+FOCUS: Muscle hypertrophy, maximal strength, progressive overload, proper form with adequate rest.` : ""}
 ${category === "CALORIE BURNING" ? `
-CALORIE BURNING WORKOUTS:
-- High-intensity interval training to maximize calorie expenditure
-- Fast-paced circuits with minimal rest
-- Full-body movements that elevate heart rate
-- ${equipment === "EQUIPMENT" ? "Use kettlebells, dumbbells, jump rope, or battle ropes" : "Bodyweight moves like burpees, mountain climbers, jumping jacks, high knees"}
-- Perfect for fat loss and conditioning` : ""}
+══════════════════════════════════════════════════════════════
+CALORIE BURNING WORKOUTS - MAXIMUM FAT LOSS
+══════════════════════════════════════════════════════════════
+
+✅ MUST INCLUDE (MANDATORY):
+- High-intensity interval training (HIIT)
+- Full-body explosive movements that elevate heart rate significantly
+- Fast-paced circuits with minimal rest (15-30 seconds between exercises)
+- ${equipment === "EQUIPMENT" ? "Kettlebell swings, dumbbell thrusters, battle rope slams, jump rope, medicine ball throws" : "Burpees, mountain climbers, jumping jacks, high knees, jump squats, tuck jumps, squat thrusts"}
+- Formats: Circuit, AMRAP, For Time, or Interval-based
+
+❌ MUST NOT INCLUDE (FORBIDDEN):
+- Slow, controlled strength movements with long rest
+- Heavy barbell lifts focused on muscle building
+- Long rest periods (over 45 seconds)
+- Mobility, stretching, or flexibility exercises
+- Low-intensity steady-state cardio
+
+FOCUS: Maximize calorie expenditure, elevate heart rate, minimal rest, fat burning, conditioning.` : ""}
 ${category === "METABOLIC" ? `
-METABOLIC CONDITIONING WORKOUTS:
-- Combination of strength and cardio for metabolic stress
-- Work-to-rest ratios that challenge energy systems
-- ${equipment === "EQUIPMENT" ? "Compound movements with lighter weights at higher volume (kettlebells, dumbbells, barbells)" : "Bodyweight compound movements at high volume"}
-- Builds work capacity and burns calories post-workout
-- Great for athletes and fitness enthusiasts` : ""}
+══════════════════════════════════════════════════════════════
+METABOLIC CONDITIONING - STRENGTH + CARDIO FUSION
+══════════════════════════════════════════════════════════════
+
+✅ MUST INCLUDE (MANDATORY):
+- Combination of strength AND cardio in structured stations/circuits
+- Work-to-rest ratios that stress multiple energy systems (e.g., 40 work/20 rest)
+- Formats: EMOM, Circuit, Tabata, or Station-based training
+- Compound movements at moderate-high volume (not maximal weight)
+- ${equipment === "EQUIPMENT" ? "Thrusters, kettlebell swings, dumbbell complexes, rowing, battle ropes, sled pushes" : "Burpee variations, squat jumps, push-up complexes, plank jacks, bodyweight thrusters"}
+- CRITICAL: Keep equipment CONSISTENT throughout (all bodyweight OR all equipment - never mixed)
+
+❌ MUST NOT INCLUDE (FORBIDDEN):
+- Pure cardio only (running laps without resistance)
+- Pure strength only (heavy singles, doubles, or triples)
+- Long rest periods (over 60 seconds)
+- Mobility or flexibility-focused exercises
+- Isolated single-joint exercises
+
+FOCUS: Metabolic stress, work capacity, combination of strength and cardio, post-workout calorie burn (EPOC).` : ""}
 ${category === "CARDIO" ? `
-CARDIO WORKOUTS:
-- Sustained elevated heart rate for cardiovascular health
-- Mix of locomotion, plyometrics, and conditioning
-- ${equipment === "EQUIPMENT" ? "Use rowing, battle ropes, bike, or weighted carries" : "Running, jumping, crawling, and plyometric bodyweight exercises"}
-- Focus on endurance and stamina building
-- Scalable intensity for all fitness levels` : ""}
+══════════════════════════════════════════════════════════════
+CARDIO WORKOUTS - HEART HEALTH & ENDURANCE
+══════════════════════════════════════════════════════════════
+
+✅ MUST INCLUDE (MANDATORY):
+- Sustained elevated heart rate throughout the workout
+- Locomotion: running, jogging, skipping, shuffling, crawling (bear crawls, crab walks)
+- Plyometrics: box jumps, jump rope, bounding, lateral hops, broad jumps
+- Conditioning: ${equipment === "EQUIPMENT" ? "rowing, assault bike, battle ropes, ski erg, weighted carries" : "high knees, butt kicks, lateral shuffles, jumping jacks, mountain climbers, star jumps"}
+- Focus on endurance, stamina, and cardiovascular health
+
+❌ MUST NOT INCLUDE (FORBIDDEN):
+- Heavy strength exercises focused on muscle building
+- Long rest periods between sets
+- Slow mobility or flexibility work
+- Low-rep, high-weight training
+- Static holds or isometric exercises
+
+FOCUS: Cardiovascular endurance, stamina building, sustained heart rate elevation, aerobic and anaerobic conditioning.` : ""}
 ${category === "MOBILITY & STABILITY" ? `
-MOBILITY & STABILITY WORKOUTS:
-- Focus on joint health, flexibility, and core stability
-- Controlled movements with proper breathing
-- ${equipment === "EQUIPMENT" ? "Use resistance bands, foam rollers, stability balls, or light weights" : "Bodyweight mobility flows, yoga-inspired movements, and controlled holds"}
-- Active recovery and injury prevention
-- Essential for long-term fitness and performance` : ""}
+══════════════════════════════════════════════════════════════
+MOBILITY & STABILITY - FLEXIBILITY & JOINT HEALTH
+══════════════════════════════════════════════════════════════
+
+✅ MUST INCLUDE (MANDATORY):
+- Hip mobility: hip circles, 90/90 stretches, pigeon pose, hip flexor stretches, frog stretch
+- Spine flexibility: cat-cow, thoracic rotations, spinal twists, cobra stretch
+- Shoulder mobility: arm circles, wall slides, shoulder dislocates, thread the needle
+- Core stability: planks, dead bugs, bird dogs, Pallof press holds, hollow body holds
+- Controlled movements with proper breathing cues (inhale/exhale instructions)
+- ${equipment === "EQUIPMENT" ? "Resistance bands, foam rollers, stability balls, yoga blocks, light dumbbells for mobility" : "Bodyweight flows, yoga-inspired sequences, active stretching, controlled holds (30-60 seconds)"}
+
+❌ MUST NOT INCLUDE (FORBIDDEN):
+- High-intensity exercises that elevate heart rate significantly
+- Explosive or ballistic movements
+- Time pressure, racing, or competitive elements
+- Heavy resistance training
+- Burpees, jumping, running, or any high-impact exercises
+
+FOCUS: Joint health, flexibility, injury prevention, controlled breathing, active recovery, movement quality over speed.` : ""}
 ${category === "CHALLENGE" ? `
-CHALLENGE WORKOUTS:
-- Push your limits with advanced programming
-- Test mental and physical toughness
-- ${equipment === "EQUIPMENT" ? "Complex movements combining multiple tools (barbells, kettlebells, dumbbells)" : "Advanced bodyweight skills and high-rep challenges"}
-- Complex movements and demanding protocols
-- For experienced athletes seeking new challenges` : ""}
+══════════════════════════════════════════════════════════════
+CHALLENGE WORKOUTS - TEST YOUR LIMITS
+══════════════════════════════════════════════════════════════
+
+✅ MUST INCLUDE (MANDATORY):
+- Race-against-the-clock challenges (e.g., "Complete 100 burpees as fast as possible")
+- Benchmark workouts with specific rep targets and time goals
+- Complex format combinations (e.g., Tabata + EMOM together, descending ladder + AMRAP)
+- Mental and physical toughness tests that push to the limit
+- Advanced movements for experienced athletes only
+- ${equipment === "EQUIPMENT" ? "Complex barbell/kettlebell/dumbbell combinations, heavy carries, compound movements" : "High-rep challenges (100 burpees, 200 squats), advanced calisthenics (muscle-ups, pistols), bodyweight complexes"}
+- Clear scoring or time-based success metrics (e.g., "Beat 15 minutes", "Complete all rounds")
+
+EXAMPLE CHALLENGE FORMATS TO USE:
+- "Death by..." - Minute 1: 1 rep, Minute 2: 2 reps, continue until failure
+- "100 Rep Challenge" - Complete 100 reps of X exercise as fast as possible
+- "Descending Ladder" - 10-9-8-7-6-5-4-3-2-1 of two exercises alternating
+- "EMOM + Tabata Combo" - 10-minute EMOM followed by 8 rounds Tabata
+- "For Time with Cap" - Complete workout under time cap (e.g., 20 minutes)
+- "Pyramid" - 1-2-3-4-5-4-3-2-1 rep scheme
+- "Chipper" - Long list of exercises, complete all reps before moving on
+
+❌ MUST NOT INCLUDE (FORBIDDEN):
+- Basic beginner-level exercises without challenge element
+- Long rest periods (over 30 seconds unless strategically placed)
+- Simple rep schemes without competitive/benchmark elements
+- Easy modifications or scaled options
+- Slow-paced, controlled workouts
+
+FOCUS: Mental toughness, personal records, benchmark performance, competition against the clock, pushing limits.` : ""}
 
 DIFFICULTY LEVEL ${selectedDifficulty.stars}/6 (${selectedDifficulty.name}):
 ${selectedDifficulty.stars <= 2 ? "- Suitable for beginners or those returning to fitness\n- Focus on foundational movements with proper form\n- Moderate intensity with adequate rest periods" : ""}
