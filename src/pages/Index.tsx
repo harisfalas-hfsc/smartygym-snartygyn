@@ -5,7 +5,7 @@ import { ServiceCard } from "@/components/ServiceCard";
 import { Button } from "@/components/ui/button";
 import { Card, CardHeader, CardTitle, CardContent, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Dumbbell, Calendar, BookOpen, Calculator, Activity, Flame, Instagram, Facebook, Youtube, UserCheck, Wrench, Video, FileText, Smartphone, Users, Target, Heart, Zap, Plane, GraduationCap, Check, Crown, ChevronDown, ChevronRight, Move, Ban, Brain, CheckCircle2, Award, Shield, Compass, Sparkles, Info, User, HelpCircle, ShoppingBag, ArrowRight } from "lucide-react";
+import { Dumbbell, Calendar, BookOpen, Calculator, Activity, Flame, Instagram, Facebook, Youtube, UserCheck, Wrench, Video, FileText, Smartphone, Users, Target, Heart, Zap, Plane, GraduationCap, Check, Crown, ChevronDown, ChevronRight, Move, Ban, Brain, CheckCircle2, Award, Shield, Compass, Sparkles, Info, User, HelpCircle, ShoppingBag } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { User as SupabaseUser } from "@supabase/supabase-js";
 import { useToast } from "@/hooks/use-toast";
@@ -15,7 +15,6 @@ import harisPhoto from "@/assets/haris-falas-coach.png";
 import { MobilePhoneIllustration } from "@/components/MobilePhoneIllustration";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious, type CarouselApi } from "@/components/ui/carousel";
-import Autoplay from "embla-carousel-autoplay";
 import { cn } from "@/lib/utils";
 import { useAccessControl } from "@/hooks/useAccessControl";
 import { ScrollReveal } from "@/components/ScrollReveal";
@@ -555,112 +554,99 @@ const Index = () => {
                     <meta itemProp="description" content="SmartyGym - #1 online gym and fitness platform by Haris Falas - smartygym.com" />
                   </div>
 
-                  {/* Feature Cards Carousel */}
-                  <div className="w-full px-12">
-                    <Carousel 
-                      opts={{ align: "center", loop: true }}
-                      plugins={[
-                        Autoplay({
-                          delay: 3000,
-                          stopOnMouseEnter: true,
-                          stopOnInteraction: false
-                        })
-                      ]}
-                      className="w-full max-w-5xl mx-auto"
-                    >
-                      <CarouselContent className="-ml-2">
-                        {heroCards.map(card => {
-                          const Icon = card.icon;
-                          return (
-                            <CarouselItem key={card.id} className="basis-[45%] pl-2">
-                              <Card className="border-2 border-primary/30 hover:border-primary hover:shadow-xl transition-all duration-300 bg-primary/5">
-                                <CardContent className="p-4 sm:p-5 flex flex-col items-center text-center gap-2">
-                                  <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-primary/10">
-                                    <Icon className="w-6 h-6 text-primary" />
-                                  </div>
-                                  <h3 className="text-lg font-bold text-foreground">{card.title}</h3>
-                                  <p className="text-sm text-muted-foreground max-w-md">{card.description}</p>
-                                  <Button 
-                                    onClick={() => navigate(card.route)}
-                                    size="sm"
-                                    className="mt-1"
-                                  >
-                                    Explore <ArrowRight className="w-3 h-3 ml-1" />
-                                  </Button>
-                                </CardContent>
-                              </Card>
-                            </CarouselItem>
-                          );
-                        })}
-                      </CarouselContent>
-                      <CarouselPrevious className="-left-12 bg-transparent border-0 text-primary hover:text-primary/80 hover:bg-transparent [&>svg]:h-8 [&>svg]:w-8" />
-                      <CarouselNext className="-right-12 bg-transparent border-0 text-primary hover:text-primary/80 hover:bg-transparent [&>svg]:h-8 [&>svg]:w-8" />
-                    </Carousel>
-                  </div>
-
-                  {/* Four Core Message Cards Grid */}
-                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mt-8">
-                    {/* Card 1: Online Fitness Redefined */}
-                    <Card className="border-2 border-primary/30 hover:border-primary hover:shadow-lg transition-all bg-primary/5 h-full">
-                      <CardHeader className="text-center py-3 pb-1">
-                        <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-2">
-                          <Sparkles className="w-5 h-5 text-primary" />
+                  {/* Middle Section: Phone (Left) + Three Cards (Right) */}
+                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 items-stretch lg:items-stretch">
+                    
+                    {/* LEFT: Mobile Phone Illustration */}
+                    <div className="order-1 lg:order-1 flex justify-center lg:justify-start items-stretch">
+                      <div className="flex items-center h-full">
+            <MobilePhoneIllustration variant="tablet" className="h-full max-h-[480px] w-auto">
+              {/* 3 rows × 2 columns grid of "Get Started" cards */}
+              <div className="grid grid-rows-3 grid-cols-2 gap-1.5 sm:gap-2 h-full w-full p-1.5 sm:p-2">
+                {heroCards.map(card => {
+                              const Icon = card.icon;
+                              return <Card key={card.id} className="border-2 border-primary/30 hover:border-primary hover:shadow-lg hover:scale-105 transition-all duration-300 cursor-pointer group flex items-center justify-center hover:bg-primary/5" onClick={() => navigate(card.route)}>
+                      <div className="flex flex-col items-center justify-center gap-1 p-2">
+                        <div className="inline-flex items-center justify-center w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-primary/10 group-hover:bg-primary/30 group-hover:scale-110 transition-all duration-300">
+                          <Icon className="w-5 h-5 sm:w-6 sm:h-6 text-primary" />
                         </div>
-                        <CardTitle className="text-lg whitespace-nowrap">Online Fitness Redefined</CardTitle>
-                      </CardHeader>
-                      <CardContent className="text-center pt-0 pb-3">
-                        <p className="text-sm text-muted-foreground">
-                          Quality training made accessible and flexible. Designed for real life, not just the gym.
-                        </p>
-                      </CardContent>
-                    </Card>
+                        <h3 className="text-xs font-bold text-center leading-tight">
+                          {card.title}
+                        </h3>
+                      </div>
+                    </Card>;
+                            })}
+              </div>
+            </MobilePhoneIllustration>
+                      </div>
+                    </div>
 
-                    {/* Card 2: Your Gym in Your Pocket */}
-                    <Card className="border-2 border-primary/30 hover:border-primary hover:shadow-lg transition-all bg-primary/5 h-full">
-                      <CardHeader className="text-center py-3 pb-1">
-                        <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-2">
-                          <Smartphone className="w-5 h-5 text-primary" />
-                        </div>
-                        <CardTitle className="text-lg whitespace-nowrap">Your Gym In Your Pocket</CardTitle>
-                      </CardHeader>
-                      <CardContent className="text-center pt-0 pb-3">
-                        <p className="text-sm text-muted-foreground">
-                          Expert workouts and structured programs. Professional coaching, wherever you are.
-                        </p>
-                      </CardContent>
-                    </Card>
+                    {/* RIGHT: Four Core Message Cards */}
+                    <div className="order-2 lg:order-2 flex flex-col justify-between gap-2 h-full max-h-[480px]">
+                      
+                      {/* Card 1: Online Fitness Redefined */}
+                      <Card className="flex-1 border-2 border-primary/30 hover:border-primary hover:shadow-lg transition-all cursor-pointer group bg-primary/5">
+                        <CardContent className="h-full p-3.5 flex items-center gap-3">
+                          <div className="inline-flex items-center justify-center w-9 h-9 rounded-full bg-primary/10 group-hover:bg-primary/20 transition-all flex-shrink-0">
+                            <Sparkles className="w-4 h-4 text-primary" />
+                          </div>
+                          <div>
+                            <h3 className="text-sm font-bold text-foreground">Online Fitness Redefined</h3>
+                            <p className="text-xs text-muted-foreground leading-snug">
+                              We are redefining online fitness, making quality training accessible, flexible, and designed for real life.
+                            </p>
+                          </div>
+                        </CardContent>
+                      </Card>
 
-                    {/* Card 3: 100% Human */}
-                    <Card className="border-2 border-primary/30 hover:border-primary hover:shadow-lg transition-all bg-primary/5 h-full">
-                      <CardHeader className="text-center py-3 pb-1">
-                        <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-2">
-                          <UserCheck className="w-5 h-5 text-primary" />
-                        </div>
-                        <CardTitle className="text-lg whitespace-nowrap">
-                          <span className="text-red-600">100% Human.</span> 0% AI.
-                        </CardTitle>
-                      </CardHeader>
-                      <CardContent className="text-center pt-0 pb-3">
-                        <p className="text-sm text-muted-foreground">
-                          Every workout by <span className="text-primary font-semibold">Haris Falas</span>. 20+ years of real coaching experience.
-                        </p>
-                      </CardContent>
-                    </Card>
+                      {/* Card 2: Your Gym in Your Pocket */}
+                      <Card className="flex-1 border-2 border-primary/30 hover:border-primary hover:shadow-lg transition-all cursor-pointer group bg-primary/5">
+                        <CardContent className="h-full p-3.5 flex items-center gap-3">
+                          <div className="inline-flex items-center justify-center w-9 h-9 rounded-full bg-primary/10 group-hover:bg-primary/20 transition-all flex-shrink-0">
+                            <Smartphone className="w-4 h-4 text-primary" />
+                          </div>
+                          <div>
+                            <h3 className="text-sm font-bold text-foreground">Your Gym In Your Pocket</h3>
+                            <p className="text-xs text-muted-foreground leading-snug">
+                              Professional fitness platform with expert workouts, structured programs, and personalized coaching - accessible worldwide at smartygym.com.
+                            </p>
+                          </div>
+                        </CardContent>
+                      </Card>
 
-                    {/* Card 4: Train Anywhere */}
-                    <Card className="border-2 border-primary/30 hover:border-primary hover:shadow-lg transition-all bg-primary/5 h-full">
-                      <CardHeader className="text-center py-3 pb-1">
-                        <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-2">
-                          <Plane className="w-5 h-5 text-primary" />
-                        </div>
-                        <CardTitle className="text-lg whitespace-nowrap">Train Anywhere, Anytime</CardTitle>
-                      </CardHeader>
-                      <CardContent className="text-center pt-0 pb-3">
-                        <p className="text-sm text-muted-foreground">
-                          Access workouts on any device, anytime. Flexible training that fits YOUR schedule.
-                        </p>
-                      </CardContent>
-                    </Card>
+                      {/* Card 3: 100% Human */}
+                      <Card className="flex-1 border-2 border-primary/30 hover:border-primary hover:shadow-lg transition-all cursor-pointer group bg-primary/5">
+                        <CardContent className="h-full p-3.5 flex items-center gap-3">
+                          <div className="inline-flex items-center justify-center w-9 h-9 rounded-full bg-primary/10 group-hover:bg-primary/20 transition-all flex-shrink-0">
+                            <UserCheck className="w-4 h-4 text-primary" />
+                          </div>
+                          <div>
+                            <h3 className="text-sm font-bold text-foreground">
+                              <span className="text-red-600">100% Human.</span> 0% AI.
+                            </h3>
+                            <p className="text-xs text-muted-foreground leading-snug">
+                              Every workout personally designed by Sports Scientist <span className="text-primary font-semibold">Haris Falas</span> with 20+ years of experience. Real expertise, not algorithms.
+                            </p>
+                          </div>
+                        </CardContent>
+                      </Card>
+
+                      {/* Card 4: Train Anywhere */}
+                      <Card className="flex-1 border-2 border-primary/30 hover:border-primary hover:shadow-lg transition-all cursor-pointer group bg-primary/5">
+                        <CardContent className="h-full p-3.5 flex items-center gap-3">
+                          <div className="inline-flex items-center justify-center w-9 h-9 rounded-full bg-primary/10 group-hover:bg-primary/20 transition-all flex-shrink-0">
+                            <Plane className="w-4 h-4 text-primary" />
+                          </div>
+                          <div>
+                            <h3 className="text-sm font-bold text-foreground">Train Anywhere, Anytime</h3>
+                            <p className="text-xs text-muted-foreground leading-snug">
+                              Access professional workouts on any device. Flexible training that fits YOUR schedule and YOUR goals—at home, gym, or traveling.
+                            </p>
+                          </div>
+                        </CardContent>
+                      </Card>
+
+                    </div>
                   </div>
 
 
