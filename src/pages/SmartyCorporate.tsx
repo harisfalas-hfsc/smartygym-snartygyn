@@ -256,7 +256,7 @@ export default function SmartyCorporate() {
               <CardHeader className="text-center pb-2">
                 <div className="flex items-center justify-center gap-2 min-h-[56px]">
                   <Users className="h-5 w-5 text-primary shrink-0" />
-                  <h2 className="text-xl font-bold">Smarty Dynamic</h2>
+                  <h2 className="text-lg font-bold whitespace-nowrap">Smarty Dynamic</h2>
                 </div>
                 <div className="min-h-[28px] flex items-center justify-center">
                   <Badge className="bg-primary/20 text-primary">
@@ -300,7 +300,7 @@ export default function SmartyCorporate() {
               <CardHeader className="text-center pb-2">
                 <div className="flex items-center justify-center gap-2 min-h-[56px]">
                   <Users className="h-5 w-5 text-primary shrink-0" />
-                  <h2 className="text-xl font-bold">Smarty Power</h2>
+                  <h2 className="text-lg font-bold whitespace-nowrap">Smarty Power</h2>
                 </div>
                 <div className="min-h-[28px] flex items-center justify-center">
                   <Badge className="bg-primary/20 text-primary">
@@ -344,7 +344,7 @@ export default function SmartyCorporate() {
               <CardHeader className="text-center pb-2">
                 <div className="flex items-center justify-center gap-2 min-h-[56px]">
                   <Users className="h-5 w-5 text-primary shrink-0" />
-                  <h2 className="text-xl font-bold">Smarty Elite</h2>
+                  <h2 className="text-lg font-bold whitespace-nowrap">Smarty Elite</h2>
                 </div>
                 <div className="min-h-[28px] flex items-center justify-center">
                   <Badge className="bg-primary/20 text-primary">
@@ -391,7 +391,7 @@ export default function SmartyCorporate() {
               <CardHeader className="text-center pb-2 pt-4">
                 <div className="flex items-center justify-center gap-2 min-h-[56px]">
                   <Building2 className="h-5 w-5 text-primary shrink-0" />
-                  <h2 className="text-xl font-bold text-primary">Smarty Enterprise</h2>
+                  <h2 className="text-lg font-bold text-primary whitespace-nowrap">Smarty Enterprise</h2>
                 </div>
                 <div className="min-h-[28px] flex items-center justify-center">
                   <Badge className="bg-primary text-primary-foreground">
