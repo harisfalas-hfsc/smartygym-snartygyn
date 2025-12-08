@@ -201,8 +201,8 @@ export default function SmartyCorporate() {
 
           {/* About Card */}
           <Card className="mb-8">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
+            <CardHeader className="text-center">
+              <CardTitle className="flex items-center justify-center gap-2">
                 <Building2 className="h-5 w-5 text-primary" />
                 About Smarty Corporate
               </CardTitle>
@@ -245,7 +245,7 @@ export default function SmartyCorporate() {
           {/* Info Ribbon */}
           <div className="bg-primary/10 border border-primary/20 rounded-lg p-4 mb-8 text-center">
             <p className="text-sm text-muted-foreground">
-              <strong>All plans include 1-year subscription.</strong> Team members receive Platinum access from the date they are added by the administrator.
+              <strong>All plans include 1-year subscription.</strong> Team members receive Platinum access from the date the administrator purchases the plan until the subscription expires.
             </p>
           </div>
 
