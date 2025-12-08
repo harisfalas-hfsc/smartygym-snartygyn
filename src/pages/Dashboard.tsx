@@ -25,7 +25,8 @@ import {
   Youtube,
   Filter,
   Star,
-  Users
+  Users,
+  Building2
 } from "lucide-react";
 import smartyGymLogo from "@/assets/smarty-gym-logo.png";
 import { AvatarUpload } from "@/components/AvatarUpload";
@@ -104,6 +105,12 @@ export default function Dashboard() {
 
   const [syncingExercises, setSyncingExercises] = useState(false);
   const [profileAvatarUrl, setProfileAvatarUrl] = useState<string | null>(null);
+  const [corporateSubscription, setCorporateSubscription] = useState<{
+    plan_type: string;
+    current_users_count: number;
+    max_users: number;
+    organization_name: string;
+  } | null>(null);
 
   useEffect(() => {
     checkAuth();
@@ -126,6 +133,18 @@ export default function Dashboard() {
     
     if (profile) {
       setProfileAvatarUrl(profile.avatar_url);
+    }
+
+    // Fetch corporate subscription if user is a corporate admin
+    const { data: corpSub } = await supabase
+      .from('corporate_subscriptions')
+      .select('plan_type, current_users_count, max_users, organization_name')
+      .eq('admin_user_id', session.user.id)
+      .eq('status', 'active')
+      .maybeSingle();
+    
+    if (corpSub) {
+      setCorporateSubscription(corpSub);
     }
     
     await fetchAllData(session.user.id);
@@ -368,6 +387,40 @@ export default function Dashboard() {
 
       {/* Main Content */}
       <main className="container mx-auto max-w-7xl p-4 py-8">
+        {/* Corporate Admin Card */}
+        {corporateSubscription && (
+          <Card className="mb-6 border-blue-200 bg-blue-50/50 dark:border-blue-800 dark:bg-blue-900/20">
+            <CardHeader className="pb-3">
+              <CardTitle className="flex items-center gap-2 text-blue-700 dark:text-blue-300">
+                <Building2 className="h-5 w-5" />
+                Smarty Corporate Administrator
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="grid gap-2 sm:grid-cols-3 mb-4">
+                <div>
+                  <p className="text-xs text-muted-foreground">Plan</p>
+                  <p className="font-medium">Smarty {corporateSubscription.plan_type.charAt(0).toUpperCase() + corporateSubscription.plan_type.slice(1)}</p>
+                </div>
+                <div>
+                  <p className="text-xs text-muted-foreground">Team Members</p>
+                  <p className="font-medium">
+                    {corporateSubscription.current_users_count} / {corporateSubscription.max_users === 9999 ? '∞' : corporateSubscription.max_users}
+                  </p>
+                </div>
+                <div>
+                  <p className="text-xs text-muted-foreground">Organization</p>
+                  <p className="font-medium truncate">{corporateSubscription.organization_name}</p>
+                </div>
+              </div>
+              <Button onClick={() => navigate('/corporate-admin')} className="w-full sm:w-auto">
+                <Users className="mr-2 h-4 w-4" />
+                Manage Team Members
+              </Button>
+            </CardContent>
+          </Card>
+        )}
+
         <div className="mb-8">
           <h2 className="text-3xl font-bold mb-2">
             {isNewUser() ? `Welcome to SmartyGym, ${user?.user_metadata?.full_name || "User"}!` : `Welcome back, ${user?.user_metadata?.full_name || "User"}!`}
