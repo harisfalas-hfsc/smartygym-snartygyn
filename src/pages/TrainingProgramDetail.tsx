@@ -225,7 +225,7 @@ const TrainingProgramDetail = () => {
       ) : (
         <>
       <Helmet>
-        <title>{title} Online Training Programs | Haris Falas | SmartyGym</title>
+        <title>Smarty Programs | {title} | Haris Falas | SmartyGym</title>
         <meta name="description" content={`${title} online training programs by Sports Scientist Haris Falas. Professional structured long-term ${type || 'fitness'} programs. Evidence-based training for worldwide access. Expert online personal training approach.`} />
         <meta name="keywords" content={`online training programs, ${title}, ${type} programs, fitness programs, Haris Falas programs, structured training programs, online personal training, 6 week programs, 8 week programs, online fitness`} />
         
@@ -289,7 +289,7 @@ const TrainingProgramDetail = () => {
         <PageBreadcrumbs 
           items={[
             { label: "Home", href: "/" },
-            { label: "Training Programs", href: "/trainingprogram" },
+            { label: "Smarty Programs", href: "/trainingprogram" },
             { label: title }
           ]} 
         />

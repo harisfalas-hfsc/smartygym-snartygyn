@@ -184,7 +184,7 @@ const WODArchive = () => {
         <PageBreadcrumbs 
           items={[
             { label: "Home", href: "/" },
-            { label: "Workouts", href: "/workout" },
+            { label: "Smarty Workouts", href: "/workout" },
             { label: "WOD Archive" }
           ]} 
         />

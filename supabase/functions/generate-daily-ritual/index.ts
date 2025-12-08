@@ -273,18 +273,32 @@ Use <p class="tiptap-paragraph"> for paragraphs and proper HTML formatting.`;
 });
 
 async function sendRitualNotifications(supabase: any, dayNumber: number, date: string) {
-  logStep("Sending ritual notifications");
+  logStep("Starting sendRitualNotifications", { dayNumber, date });
   
   try {
-    const resend = new Resend(Deno.env.get('RESEND_API_KEY'));
+    const resendApiKey = Deno.env.get('RESEND_API_KEY');
+    if (!resendApiKey) {
+      logStep("ERROR: RESEND_API_KEY not configured");
+      return;
+    }
+    
+    const resend = new Resend(resendApiKey);
+    logStep("Resend client initialized");
     
     // Get all users
     const { data: users, error: usersError } = await supabase.auth.admin.listUsers();
     
     if (usersError) {
-      logStep("ERROR fetching users", { error: usersError });
+      logStep("ERROR fetching users", { error: usersError.message || usersError });
       return;
     }
+
+    if (!users || !users.users || users.users.length === 0) {
+      logStep("No users found to notify");
+      return;
+    }
+
+    logStep("Users fetched successfully", { count: users.users.length });
 
     const subject = "☀️ Your all day game – plan is ready";
     
@@ -294,29 +308,35 @@ async function sendRitualNotifications(supabase: any, dayNumber: number, date: s
     const icsBase64 = btoa(icsContent);
     const icsDataUri = `data:text/calendar;base64,${icsBase64}`;
     
-    const content = `<p class="tiptap-paragraph"><strong>Day ${dayNumber} of Daily Smarty Ritual is here!</strong></p>
+    const content = `<p class="tiptap-paragraph"><strong>Day ${dayNumber} of Smarty Ritual is here!</strong></p>
 <p class="tiptap-paragraph">Your personalized daily ritual is ready. Start with the Morning Ritual to energize your day, reset at Midday, and unwind in the Evening.</p>
 <p class="tiptap-paragraph">Three simple phases. Maximum impact. Your daily game plan for movement, recovery, and performance.</p>
-<p class="tiptap-paragraph"><a href="https://smartygym.com/daily-ritual" style="color: #d4af37; font-weight: bold;">View Your Daily Ritual →</a></p>`;
+<p class="tiptap-paragraph"><a href="https://smartygym.com/daily-ritual" style="color: #d4af37; font-weight: bold;">View Your Smarty Ritual →</a></p>`;
 
     let sentCount = 0;
     let failedCount = 0;
 
-    for (const user of users.users || []) {
+    for (const user of users.users) {
       const userId = user.id;
       const userEmail = user.email;
 
       // Send dashboard notification
       try {
-        await supabase.from('user_system_messages').insert({
+        const { error: insertError } = await supabase.from('user_system_messages').insert({
           user_id: userId,
           message_type: 'announcement_update',
           subject: subject,
           content: content,
           is_read: false,
         });
-      } catch (err) {
-        logStep("ERROR sending dashboard notification", { userId, error: err });
+        
+        if (insertError) {
+          logStep("ERROR inserting dashboard notification", { userId, error: insertError.message });
+          failedCount++;
+          continue;
+        }
+      } catch (err: any) {
+        logStep("ERROR sending dashboard notification", { userId, error: err.message || err });
         failedCount++;
         continue;
       }
@@ -343,12 +363,12 @@ async function sendRitualNotifications(supabase: any, dayNumber: number, date: s
             subject: subject,
             html: `
               <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
-                <h1 style="color: #d4af37; margin-bottom: 20px;">☀️ Your Daily Ritual is Ready!</h1>
-                <p style="font-size: 16px; line-height: 1.6; margin-bottom: 16px;"><strong>Day ${dayNumber}</strong> of Daily Smarty Ritual is here!</p>
+                <h1 style="color: #d4af37; margin-bottom: 20px;">☀️ Your Smarty Ritual is Ready!</h1>
+                <p style="font-size: 16px; line-height: 1.6; margin-bottom: 16px;"><strong>Day ${dayNumber}</strong> of Smarty Ritual is here!</p>
                 <p style="font-size: 16px; line-height: 1.6; margin-bottom: 16px;">Your personalized daily ritual is ready. Start with the Morning Ritual to energize your day, reset at Midday, and unwind in the Evening.</p>
                 <p style="font-size: 16px; line-height: 1.6; margin-bottom: 24px;">Three simple phases. Maximum impact. Your daily game plan for movement, recovery, and performance.</p>
                 <div style="margin: 24px 0; text-align: center;">
-                  <a href="https://smartygym.com/daily-ritual" style="display: inline-block; background: #d4af37; color: white; padding: 14px 28px; text-decoration: none; border-radius: 4px; font-weight: bold; font-size: 16px; margin-right: 12px;">View Your Daily Ritual →</a>
+                  <a href="https://smartygym.com/daily-ritual" style="display: inline-block; background: #d4af37; color: white; padding: 14px 28px; text-decoration: none; border-radius: 4px; font-weight: bold; font-size: 16px; margin-right: 12px;">View Your Smarty Ritual →</a>
                 </div>
                 <div style="margin: 24px 0; padding: 16px; background: #f8f8f8; border-radius: 8px; text-align: center;">
                   <p style="font-size: 14px; color: #666; margin-bottom: 12px;">📅 Add all 3 phases to your calendar with reminders:</p>
@@ -359,9 +379,10 @@ async function sendRitualNotifications(supabase: any, dayNumber: number, date: s
               </div>
             `,
           });
+          logStep("Email sent successfully", { email: userEmail });
           sentCount++;
-        } catch (emailErr) {
-          logStep("ERROR sending email", { email: userEmail, error: emailErr });
+        } catch (emailErr: any) {
+          logStep("ERROR sending email", { email: userEmail, error: emailErr.message || emailErr });
           failedCount++;
         }
       } else {
@@ -370,18 +391,27 @@ async function sendRitualNotifications(supabase: any, dayNumber: number, date: s
     }
 
     // Log to audit
-    await supabase.from('notification_audit_log').insert({
-      notification_type: 'daily_ritual',
-      message_type: 'announcement_update',
-      subject: subject,
-      content: content,
-      recipient_filter: 'all',
-      success_count: sentCount,
-      failed_count: failedCount,
-    });
+    try {
+      const { error: auditError } = await supabase.from('notification_audit_log').insert({
+        notification_type: 'daily_ritual',
+        message_type: 'announcement_update',
+        subject: subject,
+        content: content,
+        recipient_filter: 'all',
+        recipient_count: users.users.length,
+        success_count: sentCount,
+        failed_count: failedCount,
+      });
+      
+      if (auditError) {
+        logStep("ERROR inserting audit log", { error: auditError.message });
+      }
+    } catch (auditErr: any) {
+      logStep("ERROR in audit logging", { error: auditErr.message || auditErr });
+    }
 
-    logStep("Notifications sent", { sent: sentCount, failed: failedCount });
-  } catch (error) {
-    logStep("ERROR in sendRitualNotifications", { error });
+    logStep("Notifications completed", { sent: sentCount, failed: failedCount, total: users.users.length });
+  } catch (error: any) {
+    logStep("CRITICAL ERROR in sendRitualNotifications", { error: error.message || error, stack: error.stack });
   }
 }

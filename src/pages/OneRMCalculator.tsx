@@ -111,7 +111,7 @@ const OneRMCalculator = () => {
     <ProtectedRoute>
       <>
         <Helmet>
-          <title>Free 1RM Calculator | One Rep Max | Haris Falas HFSC | SmartyGym</title>
+          <title>Smarty Tools | Free 1RM Calculator | One Rep Max | Haris Falas | SmartyGym</title>
           <meta name="description" content="Free 1RM calculator at smartygym.com. Calculate one rep max using Brzycki formula. Professional strength tool by Sports Scientist Haris Falas HFSC. Plan gym training. Train smart anywhere anytime" />
           <meta name="keywords" content="1RM calculator, one rep max calculator, strength calculator, online personal trainer tools, HFSC, Haris Falas, Sports Scientist, 1RM calculator online, max calculator, powerlifting, gym training, smartygym.com, HFSC Performance, strength training tools" />
           
@@ -175,7 +175,7 @@ const OneRMCalculator = () => {
         <PageBreadcrumbs 
           items={[
             { label: "Home", href: "/" },
-            { label: "Tools", href: "/tools" },
+            { label: "Smarty Tools", href: "/tools" },
             { label: "1RM Calculator" }
           ]} 
         />

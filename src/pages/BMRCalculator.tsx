@@ -119,7 +119,7 @@ const BMRCalculator = () => {
     <ProtectedRoute>
       <>
         <Helmet>
-          <title>Free BMR Calculator | Basal Metabolic Rate | Haris Falas HFSC | SmartyGym</title>
+          <title>Smarty Tools | Free BMR Calculator | Basal Metabolic Rate | Haris Falas | SmartyGym</title>
         <meta name="description" content="Free BMR calculator at smartygym.com. Calculate basal metabolic rate & TDEE using Mifflin-St Jeor equation. Nutrition tool by Sports Scientist Haris Falas HFSC. Daily calorie needs. Train smart anywhere, anytime." />
         <meta name="keywords" content="BMR calculator, basal metabolic rate, calorie calculator, online personal trainer nutrition, HFSC, Haris Falas, Sports Scientist, BMR calculator online, TDEE calculator, metabolism calculator, nutrition tools, smartygym.com, HFSC Performance, calorie needs" />
           
@@ -183,7 +183,7 @@ const BMRCalculator = () => {
         <PageBreadcrumbs 
           items={[
             { label: "Home", href: "/" },
-            { label: "Tools", href: "/tools" },
+            { label: "Smarty Tools", href: "/tools" },
             { label: "BMR Calculator" }
           ]} 
         />

@@ -12,6 +12,7 @@ import { useShowBackButton } from "@/hooks/useShowBackButton";
 import { HTMLContent } from "@/components/HTMLContent";
 import { RitualCalendarButton } from "@/components/ritual/RitualCalendarButton";
 import { RitualShareDialog } from "@/components/ritual/RitualShareDialog";
+import { PageBreadcrumbs } from "@/components/PageBreadcrumbs";
 
 import harisPhoto from "@/assets/haris-falas-coach.png";
 
@@ -104,7 +105,7 @@ const DailySmartyRitual = () => {
     return (
       <>
         <Helmet>
-          <title>Smarty Ritual | SmartyGym</title>
+          <title>Smarty Ritual | Daily Movement Ritual | Haris Falas | SmartyGym</title>
           <meta name="description" content="Your daily movement ritual for optimal performance - Morning, Midday, and Evening phases designed by Haris Falas" />
         </Helmet>
         <div className="min-h-screen bg-background">
@@ -115,6 +116,13 @@ const DailySmartyRitual = () => {
                 Back
               </Button>
             )}
+
+            <PageBreadcrumbs 
+              items={[
+                { label: "Home", href: "/" },
+                { label: "Smarty Ritual" }
+              ]} 
+            />
 
             {/* Description Card - Always visible */}
             <Card className="mb-8 bg-gradient-to-br from-primary/5 via-background to-primary/5 border-2 border-primary/40 shadow-gold">
@@ -183,7 +191,7 @@ const DailySmartyRitual = () => {
   return (
     <>
       <Helmet>
-        <title>Daily Smarty Ritual{ritual ? ` - Day ${ritual.day_number}` : ''} | SmartyGym</title>
+        <title>Smarty Ritual{ritual ? ` - Day ${ritual.day_number}` : ''} | Daily Movement Ritual | Haris Falas | SmartyGym</title>
         <meta name="description" content="Your daily movement ritual for optimal performance - Morning, Midday, and Evening phases designed by Haris Falas" />
       </Helmet>
 
@@ -206,6 +214,13 @@ const DailySmartyRitual = () => {
               )}
             </div>
           </div>
+
+          <PageBreadcrumbs 
+            items={[
+              { label: "Home", href: "/" },
+              { label: "Smarty Ritual" }
+            ]} 
+          />
 
           {/* Description Card - Always visible */}
           <Card className="mb-8 bg-gradient-to-br from-primary/5 via-background to-primary/5 border-2 border-primary/40 shadow-gold">
