@@ -69,7 +69,6 @@ const DailySmartyRitual = () => {
           .from("daily_smarty_rituals")
           .select("*")
           .eq("ritual_date", today)
-          .eq("is_visible", true)
           .maybeSingle();
 
         if (!data) {
@@ -191,7 +190,7 @@ const DailySmartyRitual = () => {
   return (
     <>
       <Helmet>
-        <title>Smarty Ritual{ritual ? ` - Day ${ritual.day_number}` : ''} | Daily Movement Ritual | Haris Falas | SmartyGym</title>
+        <title>Smarty Ritual | Daily Movement Ritual | Haris Falas | SmartyGym</title>
         <meta name="description" content="Your daily movement ritual for optimal performance - Morning, Midday, and Evening phases designed by Haris Falas" />
       </Helmet>
 
