@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Plus, Edit, Trash2, Eye, EyeOff, Search, Copy, Loader2 } from "lucide-react";
+import { Plus, Edit, Trash2, Search, Copy, Loader2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { RitualEditDialog } from "./RitualEditDialog";
 import { format } from "date-fns";
@@ -18,7 +18,6 @@ interface Ritual {
   morning_content: string;
   midday_content: string;
   evening_content: string;
-  is_visible: boolean;
   created_at: string;
 }
 
@@ -148,7 +147,6 @@ export const RitualsManager = ({ externalDialog, setExternalDialog }: RitualsMan
           morning_content: ritual.morning_content,
           midday_content: ritual.midday_content,
           evening_content: ritual.evening_content,
-          is_visible: false,
         });
 
       if (insertError) throw insertError;
@@ -163,30 +161,6 @@ export const RitualsManager = ({ externalDialog, setExternalDialog }: RitualsMan
       toast({
         title: "Error",
         description: "Failed to duplicate ritual",
-        variant: "destructive",
-      });
-    }
-  };
-
-  const handleToggleVisibility = async (ritualId: string, currentVisibility: boolean) => {
-    try {
-      const { error } = await supabase
-        .from('daily_smarty_rituals')
-        .update({ is_visible: !currentVisibility })
-        .eq('id', ritualId);
-
-      if (error) throw error;
-
-      toast({
-        title: "Success",
-        description: `Ritual is now ${!currentVisibility ? 'visible' : 'hidden'}`,
-      });
-      loadRituals();
-    } catch (error) {
-      console.error('Error toggling visibility:', error);
-      toast({
-        title: "Error",
-        description: "Failed to update visibility",
         variant: "destructive",
       });
     }
@@ -309,7 +283,6 @@ export const RitualsManager = ({ externalDialog, setExternalDialog }: RitualsMan
                   <TableHead className="hidden md:table-cell">Morning</TableHead>
                   <TableHead className="hidden md:table-cell">Midday</TableHead>
                   <TableHead className="hidden md:table-cell">Evening</TableHead>
-                  <TableHead>Visible</TableHead>
                   <TableHead className="text-right">Actions</TableHead>
                 </TableRow>
               </TableHeader>
@@ -337,23 +310,8 @@ export const RitualsManager = ({ externalDialog, setExternalDialog }: RitualsMan
                     <TableCell className="hidden md:table-cell max-w-[150px]">
                       <span className="text-sm text-muted-foreground">{truncate(ritual.evening_content)}</span>
                     </TableCell>
-                    <TableCell>
-                      {ritual.is_visible ? (
-                        <Badge variant="default" className="bg-green-600">Visible</Badge>
-                      ) : (
-                        <Badge variant="secondary">Hidden</Badge>
-                      )}
-                    </TableCell>
                     <TableCell className="text-right">
                       <div className="flex gap-1 justify-end flex-wrap">
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => handleToggleVisibility(ritual.id, ritual.is_visible)}
-                          title={ritual.is_visible ? "Hide" : "Show"}
-                        >
-                          {ritual.is_visible ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-                        </Button>
                         <Button
                           variant="ghost"
                           size="sm"
@@ -385,7 +343,7 @@ export const RitualsManager = ({ externalDialog, setExternalDialog }: RitualsMan
                 ))}
                 {filteredRituals.length === 0 && (
                   <TableRow>
-                    <TableCell colSpan={8} className="text-center py-8 text-muted-foreground">
+                    <TableCell colSpan={7} className="text-center py-8 text-muted-foreground">
                       No rituals found
                     </TableCell>
                   </TableRow>

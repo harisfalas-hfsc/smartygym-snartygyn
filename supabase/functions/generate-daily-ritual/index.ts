@@ -191,7 +191,7 @@ NUTRITION PHILOSOPHY (mention in Smarty Tips):
 STRUCTURE FOR EACH PHASE:
 
 MORNING RITUAL:
-1. 🌅 Welcome message (1 sentence)
+1. 🌅 MUST start with: "Good morning, Smarty!" followed by a warm greeting (1 sentence)
 2. 🏋️ Joint Unlock (4 movements, 20-30s each)
 3. 🔑 Light Activation (3 exercises)
 4. 💡 Smarty Tip (nutrition/hydration for morning)

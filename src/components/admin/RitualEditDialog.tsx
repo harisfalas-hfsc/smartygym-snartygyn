@@ -4,7 +4,6 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Switch } from "@/components/ui/switch";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
 import { Loader2, Sunrise, Sun, Moon } from "lucide-react";
@@ -17,7 +16,6 @@ interface Ritual {
   morning_content: string;
   midday_content: string;
   evening_content: string;
-  is_visible: boolean;
   created_at: string;
 }
 
@@ -36,7 +34,6 @@ export const RitualEditDialog = ({ open, onOpenChange, ritual, onSave }: RitualE
     morning_content: "",
     midday_content: "",
     evening_content: "",
-    is_visible: true,
   });
   const { toast } = useToast();
 
@@ -48,7 +45,6 @@ export const RitualEditDialog = ({ open, onOpenChange, ritual, onSave }: RitualE
         morning_content: ritual.morning_content,
         midday_content: ritual.midday_content,
         evening_content: ritual.evening_content,
-        is_visible: ritual.is_visible,
       });
     } else {
       // Default for new ritual
@@ -59,7 +55,6 @@ export const RitualEditDialog = ({ open, onOpenChange, ritual, onSave }: RitualE
         morning_content: "",
         midday_content: "",
         evening_content: "",
-        is_visible: true,
       });
     }
   }, [ritual, open]);
@@ -95,7 +90,6 @@ export const RitualEditDialog = ({ open, onOpenChange, ritual, onSave }: RitualE
             morning_content: formData.morning_content,
             midday_content: formData.midday_content,
             evening_content: formData.evening_content,
-            is_visible: formData.is_visible,
           })
           .eq('id', ritual.id);
 
@@ -115,7 +109,6 @@ export const RitualEditDialog = ({ open, onOpenChange, ritual, onSave }: RitualE
             morning_content: formData.morning_content,
             midday_content: formData.midday_content,
             evening_content: formData.evening_content,
-            is_visible: formData.is_visible,
           });
 
         if (error) throw error;
@@ -148,7 +141,7 @@ export const RitualEditDialog = ({ open, onOpenChange, ritual, onSave }: RitualE
 
         <div className="space-y-6 py-4">
           {/* Basic Info */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-2">
               <Label htmlFor="ritual_date">Date</Label>
               <Input
@@ -167,14 +160,6 @@ export const RitualEditDialog = ({ open, onOpenChange, ritual, onSave }: RitualE
                 value={formData.day_number}
                 onChange={(e) => setFormData(prev => ({ ...prev, day_number: parseInt(e.target.value) || 1 }))}
               />
-            </div>
-            <div className="flex items-center space-x-2 pt-8">
-              <Switch
-                id="is_visible"
-                checked={formData.is_visible}
-                onCheckedChange={(checked) => setFormData(prev => ({ ...prev, is_visible: checked }))}
-              />
-              <Label htmlFor="is_visible">Visible to users</Label>
             </div>
           </div>
 
