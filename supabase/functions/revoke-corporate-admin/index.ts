@@ -69,7 +69,34 @@ serve(async (req) => {
       throw new Error("User is not a corporate admin");
     }
 
-    // Delete all corporate members first
+    // Get all member user_ids before deleting
+    const { data: members } = await supabaseAdmin
+      .from('corporate_members')
+      .select('user_id')
+      .eq('corporate_subscription_id', corpSub.id);
+
+    const memberUserIds = members?.map(m => m.user_id) || [];
+    logStep("Found team members to revoke", { count: memberUserIds.length });
+
+    // Revoke all team members' platinum access BEFORE deleting from corporate_members
+    if (memberUserIds.length > 0) {
+      const { error: memberSubError } = await supabaseAdmin
+        .from('user_subscriptions')
+        .update({
+          plan_type: 'free',
+          status: 'canceled',
+          current_period_end: new Date().toISOString(),
+        })
+        .in('user_id', memberUserIds);
+
+      if (memberSubError) {
+        logStep("Warning: Error revoking member subscriptions", { error: memberSubError.message });
+      } else {
+        logStep("Revoked subscriptions for team members", { count: memberUserIds.length });
+      }
+    }
+
+    // Delete all corporate members
     const { error: membersError } = await supabaseAdmin
       .from('corporate_members')
       .delete()

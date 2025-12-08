@@ -760,7 +760,8 @@ export function UsersManager() {
                           </Button>
 
                           {/* Corporate Admin Buttons - show grant buttons or revoke button */}
-                          {!isCorporateAdmin ? (
+                          {/* Hide corporate buttons for users who are already corporate members */}
+                          {!isCorporateAdmin && !isCorporateMember ? (
                             <div className="flex flex-wrap gap-1 mt-1">
                               <Button
                                 variant="outline"
@@ -799,7 +800,7 @@ export function UsersManager() {
                                 Enterprise
                               </Button>
                             </div>
-                          ) : (
+                          ) : isCorporateAdmin ? (
                             <Button
                               variant="destructive"
                               size="sm"
@@ -813,7 +814,7 @@ export function UsersManager() {
                               <Building2 className="h-3 w-3 mr-1" />
                               Revoke Corp
                             </Button>
-                          )}
+                          ) : null}
                         </div>
                       </TableCell>
                     </TableRow>
