@@ -11,9 +11,9 @@ import {
   Calendar, 
   Calculator,
   BookOpen,
-  Users,
   ArrowLeft,
-  Zap
+  Zap,
+  Sparkles
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { User } from "@supabase/supabase-js";
@@ -83,9 +83,10 @@ export default function JoinPremium() {
   };
 
   const features = [
-    { icon: Dumbbell, text: "Unlimited personalized workouts" },
-    { icon: Calendar, text: "Structured training programs" },
-    { icon: Calculator, text: "Advanced fitness calculators" },
+    { icon: Dumbbell, text: "Unlimited Smarty Workouts" },
+    { icon: Calendar, text: "Structured Smarty Programs" },
+    { icon: Sparkles, text: "Daily Smarty Ritual" },
+    { icon: Calculator, text: "Advanced Smarty Tools" },
     { icon: BookOpen, text: "Complete exercise library" },
     { icon: Zap, text: "Priority support" }
   ];
@@ -286,15 +287,19 @@ export default function JoinPremium() {
                 <div className="space-y-1.5 sm:space-y-2 flex-1">
                   <div className="flex items-start gap-2">
                     <Check className="h-4 w-4 sm:h-5 sm:w-5 text-green-500 shrink-0 mt-0.5" />
-                    <span className="text-xs sm:text-sm">Full access to all workouts</span>
+                    <span className="text-xs sm:text-sm">Full access to all Smarty Workouts</span>
                   </div>
                   <div className="flex items-start gap-2">
                     <Check className="h-4 w-4 sm:h-5 sm:w-5 text-green-500 shrink-0 mt-0.5" />
-                    <span className="text-xs sm:text-sm">Full access to all training programs</span>
+                    <span className="text-xs sm:text-sm">Full access to all Smarty Programs</span>
                   </div>
                   <div className="flex items-start gap-2">
                     <Check className="h-4 w-4 sm:h-5 sm:w-5 text-green-500 shrink-0 mt-0.5" />
-                    <span className="text-xs sm:text-sm">Full access to training tools</span>
+                    <span className="text-xs sm:text-sm">Full access to Smarty Ritual</span>
+                  </div>
+                  <div className="flex items-start gap-2">
+                    <Check className="h-4 w-4 sm:h-5 sm:w-5 text-green-500 shrink-0 mt-0.5" />
+                    <span className="text-xs sm:text-sm">Full access to Smarty Tools</span>
                   </div>
                   <div className="flex items-start gap-2">
                     <Check className="h-4 w-4 sm:h-5 sm:w-5 text-green-500 shrink-0 mt-0.5" />
@@ -358,15 +363,19 @@ export default function JoinPremium() {
                 <div className="space-y-1.5 sm:space-y-2 flex-1">
                   <div className="flex items-start gap-2">
                     <Check className="h-4 w-4 sm:h-5 sm:w-5 text-green-500 shrink-0 mt-0.5" />
-                    <span className="text-xs sm:text-sm">Full access to all workouts</span>
+                    <span className="text-xs sm:text-sm">Full access to all Smarty Workouts</span>
                   </div>
                   <div className="flex items-start gap-2">
                     <Check className="h-4 w-4 sm:h-5 sm:w-5 text-green-500 shrink-0 mt-0.5" />
-                    <span className="text-xs sm:text-sm">Full access to all training programs</span>
+                    <span className="text-xs sm:text-sm">Full access to all Smarty Programs</span>
                   </div>
                   <div className="flex items-start gap-2">
                     <Check className="h-4 w-4 sm:h-5 sm:w-5 text-green-500 shrink-0 mt-0.5" />
-                    <span className="text-xs sm:text-sm">Full access to training tools</span>
+                    <span className="text-xs sm:text-sm">Full access to Smarty Ritual</span>
+                  </div>
+                  <div className="flex items-start gap-2">
+                    <Check className="h-4 w-4 sm:h-5 sm:w-5 text-green-500 shrink-0 mt-0.5" />
+                    <span className="text-xs sm:text-sm">Full access to Smarty Tools</span>
                   </div>
                   <div className="flex items-start gap-2">
                     <Check className="h-4 w-4 sm:h-5 sm:w-5 text-green-500 shrink-0 mt-0.5" />
