@@ -253,6 +253,8 @@ serve(async (req) => {
           const result = await sendEmail(user.email, subject, emailHtml);
           if (result.success) {
             emailSuccess++;
+            // Rate limiting: 600ms delay to respect Resend's 2 requests/second limit
+            await new Promise(resolve => setTimeout(resolve, 600));
           } else {
             emailFailed++;
             emailErrors.push({ email: user.email, error: result.error || "Unknown error" });

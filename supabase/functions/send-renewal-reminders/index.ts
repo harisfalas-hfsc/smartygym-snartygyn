@@ -138,7 +138,7 @@ serve(async (req) => {
 
           if (userEmail) {
             try {
-              await resend.emails.send({
+              const emailResult = await resend.emails.send({
                 from: "SmartyGym <notifications@smartygym.com>",
                 to: [userEmail],
                 subject: subject,
@@ -156,7 +156,14 @@ serve(async (req) => {
                   </div>
                 `,
               });
-              emailsSent++;
+              
+              if (emailResult.error) {
+                console.error(`[SEND-RENEWAL-REMINDERS] Email API error for ${userEmail}:`, emailResult.error);
+              } else {
+                emailsSent++;
+                // Rate limiting: 600ms delay to respect Resend's 2 requests/second limit
+                await new Promise(resolve => setTimeout(resolve, 600));
+              }
             } catch (emailError) {
               console.error(`[SEND-RENEWAL-REMINDERS] Email error for ${userEmail}:`, emailError);
             }

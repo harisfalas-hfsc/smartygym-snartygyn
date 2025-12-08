@@ -200,13 +200,21 @@ serve(async (req) => {
                 "Browse Workouts →"
               );
 
-              await resend.emails.send({
+              const emailResult = await resend.emails.send({
                 from: "SmartyGym <notifications@smartygym.com>",
                 to: [userEmail],
                 subject: template.subject,
                 html: emailHtml,
               });
-              emailsSent++;
+              
+              if (emailResult.error) {
+                logStep("❌ Email API error", { userId: user.user_id, email: userEmail, error: emailResult.error });
+                emailErrors.push(`${userEmail}: ${emailResult.error.message || String(emailResult.error)}`);
+              } else {
+                emailsSent++;
+                // Rate limiting: 600ms delay to respect Resend's 2 requests/second limit
+                await new Promise(resolve => setTimeout(resolve, 600));
+              }
             } catch (emailError: any) {
               const errorMsg = emailError.message || String(emailError);
               logStep("❌ Email send error", { userId: user.user_id, email: userEmail, error: errorMsg });

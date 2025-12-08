@@ -101,12 +101,19 @@ serve(async (req) => {
 
         // Send email with properly formatted HTML
         try {
-          await resend.emails.send({
+          const emailResult = await resend.emails.send({
             from: "SmartyGym <notifications@smartygym.com>",
             to: [userEmail],
             subject: subject,
             html: emailHtml,
           });
+          
+          if (emailResult.error) {
+            logStep("ERROR sending email", { userId, error: emailResult.error });
+          } else {
+            // Rate limiting: 600ms delay to respect Resend's 2 requests/second limit
+            await new Promise(resolve => setTimeout(resolve, 600));
+          }
         } catch (emailError) {
           logStep("ERROR sending email", { userId, error: emailError });
         }
