@@ -40,6 +40,11 @@ interface SubscriptionAction {
   planType: 'gold' | 'platinum' | 'free';
 }
 
+interface CorporateInfo {
+  adminPlanType: string | null;
+  memberPlanType: string | null;
+}
+
 export function UsersManager() {
   const [users, setUsers] = useState<UserData[]>([]);
   const [filteredUsers, setFilteredUsers] = useState<UserData[]>([]);
@@ -49,9 +54,9 @@ export function UsersManager() {
   const [statusFilter, setStatusFilter] = useState<string>("all");
   const [userPurchases, setUserPurchases] = useState<string[]>([]);
   const [userRoles, setUserRoles] = useState<Record<string, string[]>>({});
-  const [corporateMembers, setCorporateMembers] = useState<string[]>([]);
-  const [corporateAdmins, setCorporateAdmins] = useState<string[]>([]);
+  const [corporateInfo, setCorporateInfo] = useState<Record<string, CorporateInfo>>({});
   const [pendingAction, setPendingAction] = useState<SubscriptionAction | null>(null);
+  const [pendingCorpAction, setPendingCorpAction] = useState<{userId: string; userName: string; planType: string} | null>(null);
   const [actionLoading, setActionLoading] = useState(false);
   const SUPER_ADMIN_EMAIL = "harisfallas@gmail.com";
 
@@ -88,17 +93,34 @@ export function UsersManager() {
         rolesMap[r.user_id].push(r.role);
       });
 
-      // Fetch corporate subscriptions and members
+      // Fetch corporate subscriptions with plan type
       const { data: corpSubs } = await supabase
         .from('corporate_subscriptions')
-        .select('admin_user_id');
+        .select('admin_user_id, plan_type');
       
+      // Fetch corporate members with their subscription's plan type
       const { data: corpMembers } = await supabase
         .from('corporate_members')
-        .select('user_id');
+        .select('user_id, corporate_subscription_id, corporate_subscriptions(plan_type)');
       
-      setCorporateAdmins(corpSubs?.map(s => s.admin_user_id) || []);
-      setCorporateMembers(corpMembers?.map(m => m.user_id) || []);
+      // Build corporate info map
+      const corpInfoMap: Record<string, CorporateInfo> = {};
+      corpSubs?.forEach(s => {
+        corpInfoMap[s.admin_user_id] = { 
+          adminPlanType: s.plan_type, 
+          memberPlanType: null 
+        };
+      });
+      corpMembers?.forEach(m => {
+        const planType = (m.corporate_subscriptions as any)?.plan_type || null;
+        if (!corpInfoMap[m.user_id]) {
+          corpInfoMap[m.user_id] = { adminPlanType: null, memberPlanType: planType };
+        } else {
+          corpInfoMap[m.user_id].memberPlanType = planType;
+        }
+      });
+      
+      setCorporateInfo(corpInfoMap);
       setUserRoles(rolesMap);
     } catch (error) {
       console.error('Error fetching users:', error);
@@ -173,9 +195,36 @@ export function UsersManager() {
     }
   };
 
+  const grantCorporateAdmin = async (userId: string, planType: string) => {
+    setActionLoading(true);
+    try {
+      const { data, error } = await supabase.functions.invoke('grant-corporate-admin', {
+        body: { user_id: userId, plan_type: planType }
+      });
+
+      if (error) throw error;
+      if (!data?.success) throw new Error(data?.error || 'Unknown error');
+
+      toast.success(data.message);
+      fetchUsers();
+    } catch (error) {
+      console.error('Error granting corporate admin:', error);
+      toast.error(error instanceof Error ? error.message : 'Failed to grant corporate admin');
+    } finally {
+      setActionLoading(false);
+      setPendingCorpAction(null);
+    }
+  };
+
   const handleConfirmAction = () => {
     if (pendingAction) {
       manageSubscription(pendingAction);
+    }
+  };
+
+  const handleConfirmCorpAction = () => {
+    if (pendingCorpAction) {
+      grantCorporateAdmin(pendingCorpAction.userId, pendingCorpAction.planType);
     }
   };
 
@@ -194,7 +243,7 @@ export function UsersManager() {
     if (planFilter !== "all") {
       if (planFilter === "corporate") {
         filtered = filtered.filter(user => 
-          corporateMembers.includes(user.user_id) || corporateAdmins.includes(user.user_id)
+          corporateInfo[user.user_id]?.adminPlanType || corporateInfo[user.user_id]?.memberPlanType
         );
       } else {
         filtered = filtered.filter(user => user.plan_type === planFilter);
@@ -211,11 +260,11 @@ export function UsersManager() {
     } else if (statusFilter === "admins_only") {
       filtered = filtered.filter(user => userRoles[user.user_id]?.includes('admin'));
     } else if (statusFilter === "corporate_admins") {
-      filtered = filtered.filter(user => corporateAdmins.includes(user.user_id));
+      filtered = filtered.filter(user => corporateInfo[user.user_id]?.adminPlanType);
     }
 
     setFilteredUsers(filtered);
-  }, [searchTerm, planFilter, statusFilter, users, userPurchases, userRoles, corporateMembers, corporateAdmins]);
+  }, [searchTerm, planFilter, statusFilter, users, userPurchases, userRoles, corporateInfo]);
 
   const exportToCSV = () => {
     const headers = ["User ID", "Name", "Email", "Is Admin", "Plan", "Status", "Period Start", "Period End", "Joined"];
@@ -324,6 +373,30 @@ export function UsersManager() {
         </AlertDialogContent>
       </AlertDialog>
 
+      {/* Corporate Admin Confirmation Dialog */}
+      <AlertDialog open={!!pendingCorpAction} onOpenChange={(open) => !open && setPendingCorpAction(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>
+              Grant Corporate Admin ({pendingCorpAction?.planType?.charAt(0).toUpperCase()}{pendingCorpAction?.planType?.slice(1)})
+            </AlertDialogTitle>
+            <AlertDialogDescription>
+              Are you sure you want to make "{pendingCorpAction?.userName}" a Corporate Administrator for the{' '}
+              {pendingCorpAction?.planType?.toUpperCase()} plan? They will receive Platinum access and can manage up to{' '}
+              {pendingCorpAction?.planType === 'dynamic' ? '10' : 
+               pendingCorpAction?.planType === 'power' ? '20' : 
+               pendingCorpAction?.planType === 'elite' ? '30' : 'unlimited'} team members.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={actionLoading}>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={handleConfirmCorpAction} disabled={actionLoading}>
+              {actionLoading ? 'Processing...' : 'Confirm'}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
       <Card>
         <CardHeader>
           <div className="flex items-center justify-between">
@@ -423,7 +496,7 @@ export function UsersManager() {
               <Building2 className="h-3 w-3" /> Corporate Users
             </p>
             <p className="text-2xl font-bold">
-              {corporateMembers.length + corporateAdmins.length}
+              {Object.keys(corporateInfo).length}
             </p>
           </div>
         </div>
@@ -456,6 +529,9 @@ export function UsersManager() {
                   const statusLabel = getUserStatus(user, hasPurchases);
                   const isPremium = isActivePremium(user);
                   const userName = user.full_name || user.email || 'Anonymous';
+                  const corpInfo = corporateInfo[user.user_id];
+                  const isCorporateAdmin = !!corpInfo?.adminPlanType;
+                  const isCorporateMember = !!corpInfo?.memberPlanType;
                   
                   return (
                     <TableRow key={user.user_id}>
@@ -489,13 +565,23 @@ export function UsersManager() {
                         </Badge>
                       </TableCell>
                       <TableCell>
-                        <div className="flex items-center gap-2">
+                        <div className="flex flex-wrap items-center gap-1">
                           <Badge variant={getStatusBadgeVariant(statusLabel)}>
                             {statusLabel}
                           </Badge>
                           {hasPurchases && (
                             <Badge variant="outline" className="text-xs">
                               💳 Purchases
+                            </Badge>
+                          )}
+                          {isCorporateAdmin && (
+                            <Badge variant="default" className="text-xs bg-blue-600">
+                              🏢 Corp Admin ({corpInfo.adminPlanType})
+                            </Badge>
+                          )}
+                          {isCorporateMember && (
+                            <Badge variant="outline" className="text-xs border-blue-600 text-blue-600">
+                              👥 Corp Member ({corpInfo.memberPlanType})
                             </Badge>
                           )}
                         </div>
@@ -618,6 +704,48 @@ export function UsersManager() {
                           >
                             <Mail className="h-4 w-4" />
                           </Button>
+
+                          {/* Corporate Admin Buttons - only show if user is not already a corporate admin */}
+                          {!isCorporateAdmin && (
+                            <div className="flex flex-wrap gap-1 mt-1">
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                className="text-xs px-2 py-1 h-7 text-blue-600 border-blue-600 hover:bg-blue-50"
+                                onClick={() => setPendingCorpAction({ userId: user.user_id, userName, planType: 'dynamic' })}
+                              >
+                                <Building2 className="h-3 w-3 mr-1" />
+                                Dynamic
+                              </Button>
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                className="text-xs px-2 py-1 h-7 text-blue-600 border-blue-600 hover:bg-blue-50"
+                                onClick={() => setPendingCorpAction({ userId: user.user_id, userName, planType: 'power' })}
+                              >
+                                <Building2 className="h-3 w-3 mr-1" />
+                                Power
+                              </Button>
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                className="text-xs px-2 py-1 h-7 text-blue-600 border-blue-600 hover:bg-blue-50"
+                                onClick={() => setPendingCorpAction({ userId: user.user_id, userName, planType: 'elite' })}
+                              >
+                                <Building2 className="h-3 w-3 mr-1" />
+                                Elite
+                              </Button>
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                className="text-xs px-2 py-1 h-7 text-blue-600 border-blue-600 hover:bg-blue-50"
+                                onClick={() => setPendingCorpAction({ userId: user.user_id, userName, planType: 'enterprise' })}
+                              >
+                                <Building2 className="h-3 w-3 mr-1" />
+                                Enterprise
+                              </Button>
+                            </div>
+                          )}
                         </div>
                       </TableCell>
                     </TableRow>
