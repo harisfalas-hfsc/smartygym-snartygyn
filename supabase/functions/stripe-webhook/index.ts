@@ -69,8 +69,11 @@ serve(async (req) => {
         const session = event.data.object as Stripe.Checkout.Session;
         logStep("Processing checkout.session.completed", { sessionId: session.id, mode: session.mode });
 
-        if (session.mode === "subscription") {
-          // Handle subscription checkout
+        // Check if this is a corporate subscription
+        if (session.metadata?.corporate_plan_type) {
+          await handleCorporateSubscriptionCheckout(session, supabase, stripe);
+        } else if (session.mode === "subscription") {
+          // Handle regular subscription checkout
           await handleSubscriptionCheckout(session, supabase, stripe);
         } else if (session.mode === "payment") {
           // Handle one-time purchase
@@ -232,6 +235,119 @@ async function sendFirstPurchaseWelcome(userId: string, userEmail: string, supab
     logStep("✅ First-purchase welcome email sent", { email: userEmail });
   } catch (emailError) {
     logStep("ERROR sending first-purchase welcome email", { error: emailError });
+  }
+}
+
+// Handle corporate subscription checkout
+async function handleCorporateSubscriptionCheckout(
+  session: Stripe.Checkout.Session,
+  supabase: any,
+  stripe: Stripe
+) {
+  const userId = session.metadata?.user_id;
+  const planType = session.metadata?.corporate_plan_type;
+  const organizationName = session.metadata?.organization_name;
+  const maxUsers = parseInt(session.metadata?.max_users || '10');
+  const customerId = session.customer as string;
+  const subscriptionId = session.subscription as string;
+
+  if (!userId || !planType || !organizationName) {
+    logStep("ERROR: Missing corporate metadata", { userId, planType, organizationName });
+    return;
+  }
+
+  logStep("Processing corporate subscription", { userId, planType, organizationName, maxUsers });
+
+  // Get subscription details
+  const subscription = await stripe.subscriptions.retrieve(subscriptionId);
+  
+  const periodEnd = new Date(subscription.current_period_end * 1000);
+
+  // Create corporate subscription record
+  const { data: corpSub, error: corpError } = await supabase
+    .from('corporate_subscriptions')
+    .insert({
+      admin_user_id: userId,
+      organization_name: organizationName,
+      plan_type: planType,
+      max_users: maxUsers,
+      current_users_count: 0,
+      current_period_start: new Date(subscription.current_period_start * 1000).toISOString(),
+      current_period_end: periodEnd.toISOString(),
+      stripe_subscription_id: subscriptionId,
+      stripe_customer_id: customerId,
+      status: 'active',
+    })
+    .select()
+    .single();
+
+  if (corpError) {
+    logStep("ERROR: Failed to create corporate subscription", { error: corpError });
+    return;
+  }
+
+  logStep("Corporate subscription created", { corpSubId: corpSub.id });
+
+  // Also create/update the admin's personal subscription to platinum
+  await supabase
+    .from('user_subscriptions')
+    .upsert({
+      user_id: userId,
+      stripe_customer_id: customerId,
+      stripe_subscription_id: subscriptionId,
+      plan_type: 'platinum',
+      status: 'active',
+      current_period_start: new Date(subscription.current_period_start * 1000).toISOString(),
+      current_period_end: periodEnd.toISOString(),
+    }, {
+      onConflict: 'user_id'
+    });
+
+  logStep("Admin user subscription set to platinum");
+
+  // Get user email for sending welcome email
+  const { data: userData } = await supabase.auth.admin.getUserById(userId);
+  const userEmail = userData?.user?.email;
+
+  if (userEmail) {
+    // Send dashboard notification
+    await supabase.from('user_system_messages').insert({
+      user_id: userId,
+      message_type: 'purchase_subscription',
+      subject: '🎉 Welcome to Smarty Corporate!',
+      content: `<p class="tiptap-paragraph"><strong>Your corporate subscription is now active!</strong></p><p class="tiptap-paragraph"></p><p class="tiptap-paragraph">Organization: ${organizationName}</p><p class="tiptap-paragraph">Plan: Smarty ${planType.charAt(0).toUpperCase() + planType.slice(1)}</p><p class="tiptap-paragraph">Team Limit: ${maxUsers === 9999 ? 'Unlimited' : maxUsers} members</p><p class="tiptap-paragraph"></p><p class="tiptap-paragraph">Head to your <a href="/corporate-admin">Corporate Admin Dashboard</a> to start adding team members!</p>`,
+      is_read: false,
+    });
+
+    // Send welcome email
+    try {
+      const resend = new Resend(Deno.env.get('RESEND_API_KEY'));
+      await resend.emails.send({
+        from: 'SmartyGym <notifications@smartygym.com>',
+        to: [userEmail],
+        subject: '🎉 Welcome to Smarty Corporate!',
+        html: `
+          <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
+            <h1 style="color: #d4af37; margin-bottom: 20px;">Welcome to Smarty Corporate! 🏢</h1>
+            <p style="font-size: 16px; line-height: 1.6; margin-bottom: 16px;">Congratulations! Your corporate subscription is now active.</p>
+            <div style="background: #f9f9f9; border-radius: 8px; padding: 20px; margin: 20px 0;">
+              <p style="margin: 0 0 10px;"><strong>Organization:</strong> ${organizationName}</p>
+              <p style="margin: 0 0 10px;"><strong>Plan:</strong> Smarty ${planType.charAt(0).toUpperCase() + planType.slice(1)}</p>
+              <p style="margin: 0;"><strong>Team Limit:</strong> ${maxUsers === 9999 ? 'Unlimited' : maxUsers} members</p>
+            </div>
+            <p style="font-size: 16px; line-height: 1.6; margin-bottom: 24px;">All your team members will receive Platinum-level access to the entire SmartyGym platform.</p>
+            <p style="margin-top: 24px;">
+              <a href="https://smartygym.com/corporate-admin" style="display: inline-block; background: #d4af37; color: white; padding: 14px 28px; text-decoration: none; border-radius: 4px; font-weight: bold; font-size: 16px;">Add Team Members →</a>
+            </p>
+            <hr style="margin: 32px 0; border: none; border-top: 1px solid #eee;">
+            <p style="font-size: 12px; color: #999;">This email was sent from SmartyGym.</p>
+          </div>
+        `,
+      });
+      logStep("Corporate welcome email sent", { email: userEmail });
+    } catch (emailError) {
+      logStep("ERROR sending corporate welcome email", { error: emailError });
+    }
   }
 }
 

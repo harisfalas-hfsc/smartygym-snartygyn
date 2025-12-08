@@ -1,4 +1,5 @@
 import { Toaster } from "@/components/ui/toaster";
+import { lazy, Suspense } from "react";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
@@ -40,6 +41,7 @@ import OneRMCalculator from "./pages/OneRMCalculator";
 import BMRCalculator from "./pages/BMRCalculator";
 import MacroTrackingCalculator from "./pages/MacroTrackingCalculator";
 import ExerciseLibrary from "./pages/ExerciseLibrary";
+import CorporateAdmin from "./pages/CorporateAdmin";
 
 import Tools from "./pages/Tools";
 import FreeContent from "./pages/FreeContent";
@@ -128,6 +130,7 @@ const AppContent = () => {
                 
                 {/* Corporate page is public */}
                 <Route path="/corporate" element={<SmartyCorporate />} />
+                <Route path="/corporate-admin" element={<ProtectedRoute><CorporateAdmin /></ProtectedRoute>} />
                 
                 {/* Exercise library is public */}
                 <Route path="/exerciselibrary" element={<ExerciseLibrary />} />
