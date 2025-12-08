@@ -95,6 +95,26 @@ All colors MUST be HSL.
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
   }
+
+  /* Prose link styling - Make all links inside HTML content visible as gold/primary */
+  .prose a,
+  .prose-sm a,
+  .prose-invert a,
+  .text-display a {
+    color: hsl(var(--primary));
+    text-decoration: underline;
+    text-decoration-color: hsl(var(--primary) / 0.4);
+    text-underline-offset: 2px;
+    transition: all 0.2s ease;
+  }
+
+  .prose a:hover,
+  .prose-sm a:hover,
+  .prose-invert a:hover,
+  .text-display a:hover {
+    color: hsl(var(--primary-hover));
+    text-decoration-color: hsl(var(--primary));
+  }
 }
 
 @layer utilities {
