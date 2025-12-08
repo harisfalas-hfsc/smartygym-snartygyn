@@ -7,7 +7,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Download, Search, RefreshCw, Mail, Crown, Gem } from "lucide-react";
+import { Download, Search, RefreshCw, Mail, Crown, Gem, Building2 } from "lucide-react";
 import { toast } from "sonner";
 import { format } from "date-fns";
 import {
@@ -49,6 +49,8 @@ export function UsersManager() {
   const [statusFilter, setStatusFilter] = useState<string>("all");
   const [userPurchases, setUserPurchases] = useState<string[]>([]);
   const [userRoles, setUserRoles] = useState<Record<string, string[]>>({});
+  const [corporateMembers, setCorporateMembers] = useState<string[]>([]);
+  const [corporateAdmins, setCorporateAdmins] = useState<string[]>([]);
   const [pendingAction, setPendingAction] = useState<SubscriptionAction | null>(null);
   const [actionLoading, setActionLoading] = useState(false);
   const SUPER_ADMIN_EMAIL = "harisfallas@gmail.com";
@@ -85,6 +87,18 @@ export function UsersManager() {
         if (!rolesMap[r.user_id]) rolesMap[r.user_id] = [];
         rolesMap[r.user_id].push(r.role);
       });
+
+      // Fetch corporate subscriptions and members
+      const { data: corpSubs } = await supabase
+        .from('corporate_subscriptions')
+        .select('admin_user_id');
+      
+      const { data: corpMembers } = await supabase
+        .from('corporate_members')
+        .select('user_id');
+      
+      setCorporateAdmins(corpSubs?.map(s => s.admin_user_id) || []);
+      setCorporateMembers(corpMembers?.map(m => m.user_id) || []);
       setUserRoles(rolesMap);
     } catch (error) {
       console.error('Error fetching users:', error);
@@ -178,7 +192,13 @@ export function UsersManager() {
 
     // Plan filter
     if (planFilter !== "all") {
-      filtered = filtered.filter(user => user.plan_type === planFilter);
+      if (planFilter === "corporate") {
+        filtered = filtered.filter(user => 
+          corporateMembers.includes(user.user_id) || corporateAdmins.includes(user.user_id)
+        );
+      } else {
+        filtered = filtered.filter(user => user.plan_type === planFilter);
+      }
     }
 
     // Status filter
@@ -190,10 +210,12 @@ export function UsersManager() {
       filtered = filtered.filter(user => userPurchases.includes(user.user_id));
     } else if (statusFilter === "admins_only") {
       filtered = filtered.filter(user => userRoles[user.user_id]?.includes('admin'));
+    } else if (statusFilter === "corporate_admins") {
+      filtered = filtered.filter(user => corporateAdmins.includes(user.user_id));
     }
 
     setFilteredUsers(filtered);
-  }, [searchTerm, planFilter, statusFilter, users, userPurchases, userRoles]);
+  }, [searchTerm, planFilter, statusFilter, users, userPurchases, userRoles, corporateMembers, corporateAdmins]);
 
   const exportToCSV = () => {
     const headers = ["User ID", "Name", "Email", "Is Admin", "Plan", "Status", "Period Start", "Period End", "Joined"];
@@ -342,6 +364,7 @@ export function UsersManager() {
               <SelectItem value="free">Free</SelectItem>
               <SelectItem value="gold">Gold</SelectItem>
               <SelectItem value="platinum">Platinum</SelectItem>
+              <SelectItem value="corporate">Corporate</SelectItem>
             </SelectContent>
           </Select>
           <Select value={statusFilter} onValueChange={setStatusFilter}>
@@ -354,6 +377,7 @@ export function UsersManager() {
               <SelectItem value="canceled">Canceled</SelectItem>
               <SelectItem value="with_purchases">With Purchases</SelectItem>
               <SelectItem value="admins_only">Admins Only</SelectItem>
+              <SelectItem value="corporate_admins">Corporate Admins</SelectItem>
             </SelectContent>
           </Select>
         </div>
@@ -392,6 +416,14 @@ export function UsersManager() {
             <p className="text-sm text-muted-foreground">Administrators</p>
             <p className="text-2xl font-bold">
               {Object.values(userRoles).filter(roles => roles.includes('admin')).length}
+            </p>
+          </div>
+          <div className="bg-muted/50 p-4 rounded-lg">
+            <p className="text-sm text-muted-foreground flex items-center gap-1">
+              <Building2 className="h-3 w-3" /> Corporate Users
+            </p>
+            <p className="text-2xl font-bold">
+              {corporateMembers.length + corporateAdmins.length}
             </p>
           </div>
         </div>

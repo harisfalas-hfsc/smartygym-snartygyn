@@ -587,6 +587,89 @@ export type Database = {
         }
         Relationships: []
       }
+      corporate_members: {
+        Row: {
+          corporate_subscription_id: string
+          created_at: string
+          created_by: string
+          email: string
+          id: string
+          user_id: string
+        }
+        Insert: {
+          corporate_subscription_id: string
+          created_at?: string
+          created_by: string
+          email: string
+          id?: string
+          user_id: string
+        }
+        Update: {
+          corporate_subscription_id?: string
+          created_at?: string
+          created_by?: string
+          email?: string
+          id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "corporate_members_corporate_subscription_id_fkey"
+            columns: ["corporate_subscription_id"]
+            isOneToOne: false
+            referencedRelation: "corporate_subscriptions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      corporate_subscriptions: {
+        Row: {
+          admin_user_id: string
+          created_at: string
+          current_period_end: string
+          current_period_start: string
+          current_users_count: number
+          id: string
+          max_users: number
+          organization_name: string
+          plan_type: Database["public"]["Enums"]["corporate_plan_type"]
+          status: string
+          stripe_customer_id: string | null
+          stripe_subscription_id: string | null
+          updated_at: string
+        }
+        Insert: {
+          admin_user_id: string
+          created_at?: string
+          current_period_end: string
+          current_period_start?: string
+          current_users_count?: number
+          id?: string
+          max_users: number
+          organization_name: string
+          plan_type: Database["public"]["Enums"]["corporate_plan_type"]
+          status?: string
+          stripe_customer_id?: string | null
+          stripe_subscription_id?: string | null
+          updated_at?: string
+        }
+        Update: {
+          admin_user_id?: string
+          created_at?: string
+          current_period_end?: string
+          current_period_start?: string
+          current_users_count?: number
+          id?: string
+          max_users?: number
+          organization_name?: string
+          plan_type?: Database["public"]["Enums"]["corporate_plan_type"]
+          status?: string
+          stripe_customer_id?: string | null
+          stripe_subscription_id?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
       daily_smarty_rituals: {
         Row: {
           created_at: string | null
@@ -1844,6 +1927,7 @@ export type Database = {
     }
     Enums: {
       app_role: "admin" | "moderator" | "user"
+      corporate_plan_type: "dynamic" | "power" | "elite" | "enterprise"
       message_type:
         | "welcome"
         | "purchase_workout"
@@ -1991,6 +2075,7 @@ export const Constants = {
   public: {
     Enums: {
       app_role: ["admin", "moderator", "user"],
+      corporate_plan_type: ["dynamic", "power", "elite", "enterprise"],
       message_type: [
         "welcome",
         "purchase_workout",

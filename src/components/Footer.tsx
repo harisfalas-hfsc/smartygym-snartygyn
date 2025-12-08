@@ -67,6 +67,13 @@ export const Footer = () => {
               </button>
               <span>•</span>
               <button 
+                onClick={() => navigate("/corporate")} 
+                className="hover:text-primary transition-colors"
+              >
+                Corporate
+              </button>
+              <span>•</span>
+              <button 
                 onClick={() => navigate("/privacy-policy")} 
                 className="hover:text-primary transition-colors"
               >
@@ -148,6 +155,13 @@ export const Footer = () => {
           
           {/* Legal Links */}
           <div className="flex flex-wrap items-center justify-center gap-4 text-sm text-muted-foreground">
+            <button 
+              onClick={() => navigate("/corporate")} 
+              className="hover:text-primary transition-colors"
+            >
+              Smarty Corporate
+            </button>
+            <span>•</span>
             <button 
               onClick={() => navigate("/privacy-policy")} 
               className="hover:text-primary transition-colors"
