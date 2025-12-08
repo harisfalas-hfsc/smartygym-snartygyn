@@ -40,7 +40,9 @@ interface UserData {
   status: string;
   current_period_start: string | null;
   current_period_end: string | null;
-  created_at: string;
+  created_at: string; // Profile creation date (joined platform)
+  subscription_created_at?: string | null; // When first subscribed
+  subscription_updated_at?: string | null; // Last subscription modification
   stripe_customer_id?: string | null;
   stripe_subscription_id?: string | null;
 }
@@ -366,21 +368,41 @@ export function UserDetailModal({
                       </Badge>
                     </div>
                     <div>
-                      <p className="text-muted-foreground">Started</p>
+                      <p className="text-muted-foreground">Joined Platform</p>
+                      <p>{format(new Date(user.created_at), 'MMM d, yyyy')}</p>
+                    </div>
+                    <div>
+                      <p className="text-muted-foreground">First Subscribed</p>
+                      <p>{user.subscription_created_at 
+                        ? format(new Date(user.subscription_created_at), 'MMM d, yyyy')
+                        : 'N/A'}</p>
+                    </div>
+                    <div>
+                      <p className="text-muted-foreground">Current Plan Since</p>
                       <p>{user.current_period_start 
                         ? format(new Date(user.current_period_start), 'MMM d, yyyy')
                         : 'N/A'}</p>
                     </div>
                     <div>
-                      <p className="text-muted-foreground">Ends</p>
+                      <p className="text-muted-foreground">Plan Expires</p>
                       <p>{user.current_period_end 
                         ? format(new Date(user.current_period_end), 'MMM d, yyyy')
-                        : 'N/A'}</p>
+                        : (!user.stripe_subscription_id && user.plan_type !== 'free' 
+                          ? 'Never (Admin Granted)' 
+                          : 'N/A')}</p>
                     </div>
                     <div>
-                      <p className="text-muted-foreground">Joined</p>
-                      <p>{format(new Date(user.created_at), 'MMM d, yyyy')}</p>
+                      <p className="text-muted-foreground">Last Modified</p>
+                      <p>{user.subscription_updated_at 
+                        ? format(new Date(user.subscription_updated_at), 'MMM d, yyyy')
+                        : 'N/A'}</p>
                     </div>
+                    {user.stripe_customer_id && (
+                      <div className="col-span-2">
+                        <p className="text-muted-foreground">Stripe Customer</p>
+                        <code className="text-xs bg-muted px-1 rounded">{user.stripe_customer_id}</code>
+                      </div>
+                    )}
                   </div>
                 </CardContent>
               </Card>

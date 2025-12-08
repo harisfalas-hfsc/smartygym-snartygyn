@@ -32,6 +32,10 @@ interface UserData {
   current_period_start: string | null;
   current_period_end: string | null;
   created_at: string;
+  subscription_created_at?: string | null;
+  subscription_updated_at?: string | null;
+  stripe_customer_id?: string | null;
+  stripe_subscription_id?: string | null;
 }
 
 interface SubscriptionAction {
