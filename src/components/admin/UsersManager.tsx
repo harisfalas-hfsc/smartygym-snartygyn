@@ -68,6 +68,8 @@ export function UsersManager() {
     corporateSubscriptionId: string;
   } | null>(null);
   const [actionLoading, setActionLoading] = useState(false);
+  const [organizationFilter, setOrganizationFilter] = useState<string>("all");
+  const [organizations, setOrganizations] = useState<string[]>([]);
   const SUPER_ADMIN_EMAIL = "harisfallas@gmail.com";
 
   const fetchUsers = async () => {
@@ -115,6 +117,8 @@ export function UsersManager() {
       
       // Build corporate info map
       const corpInfoMap: Record<string, CorporateInfo> = {};
+      const orgNames: Set<string> = new Set();
+      
       corpSubs?.forEach(s => {
         corpInfoMap[s.admin_user_id] = { 
           adminPlanType: s.plan_type, 
@@ -122,6 +126,7 @@ export function UsersManager() {
           organizationName: s.organization_name,
           corporateSubscriptionId: s.id
         };
+        if (s.organization_name) orgNames.add(s.organization_name);
       });
       corpMembers?.forEach(m => {
         const corpData = m.corporate_subscriptions as any;
@@ -140,9 +145,11 @@ export function UsersManager() {
           corpInfoMap[m.user_id].organizationName = orgName;
           corpInfoMap[m.user_id].corporateSubscriptionId = corpSubId;
         }
+        if (orgName) orgNames.add(orgName);
       });
       
       setCorporateInfo(corpInfoMap);
+      setOrganizations(Array.from(orgNames).sort());
       setUserRoles(rolesMap);
     } catch (error) {
       console.error('Error fetching users:', error);
@@ -337,10 +344,17 @@ export function UsersManager() {
       filtered = filtered.filter(user => userRoles[user.user_id]?.includes('admin'));
     } else if (statusFilter === "corporate_admins") {
       filtered = filtered.filter(user => corporateInfo[user.user_id]?.adminPlanType);
+    } else if (statusFilter === "corporate_members") {
+      filtered = filtered.filter(user => corporateInfo[user.user_id]?.memberPlanType && !corporateInfo[user.user_id]?.adminPlanType);
+    }
+
+    // Organization filter
+    if (organizationFilter !== "all") {
+      filtered = filtered.filter(user => corporateInfo[user.user_id]?.organizationName === organizationFilter);
     }
 
     setFilteredUsers(filtered);
-  }, [searchTerm, planFilter, statusFilter, users, userPurchases, userRoles, corporateInfo]);
+  }, [searchTerm, planFilter, statusFilter, organizationFilter, users, userPurchases, userRoles, corporateInfo]);
 
   const exportToCSV = () => {
     const headers = ["User ID", "Name", "Email", "Is Admin", "Plan", "Status", "Period Start", "Period End", "Joined"];
@@ -582,8 +596,24 @@ export function UsersManager() {
               <SelectItem value="with_purchases">With Purchases</SelectItem>
               <SelectItem value="admins_only">Admins Only</SelectItem>
               <SelectItem value="corporate_admins">Corporate Admins</SelectItem>
+              <SelectItem value="corporate_members">Corporate Members</SelectItem>
             </SelectContent>
           </Select>
+          {organizations.length > 0 && (
+            <Select value={organizationFilter} onValueChange={setOrganizationFilter}>
+              <SelectTrigger className="w-full sm:w-[200px]">
+                <SelectValue placeholder="Filter by organization" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Organizations</SelectItem>
+                {organizations.map((org) => (
+                  <SelectItem key={org} value={org}>
+                    🏛️ {org}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          )}
         </div>
 
         {/* Stats */}
@@ -711,7 +741,11 @@ export function UsersManager() {
                                 🏢 Corp Admin ({corpInfo.adminPlanType})
                               </Badge>
                               {corpInfo.organizationName && (
-                                <Badge variant="outline" className="text-xs border-teal-600 text-teal-600">
+                                <Badge 
+                                  variant="outline" 
+                                  className="text-xs border-teal-600 text-teal-600 cursor-pointer hover:bg-teal-50"
+                                  onClick={() => setOrganizationFilter(corpInfo.organizationName!)}
+                                >
                                   🏛️ {corpInfo.organizationName}
                                 </Badge>
                               )}
@@ -723,7 +757,11 @@ export function UsersManager() {
                                 👥 Corp Member ({corpInfo.memberPlanType})
                               </Badge>
                               {corpInfo.organizationName && (
-                                <Badge variant="outline" className="text-xs border-teal-600 text-teal-600">
+                                <Badge 
+                                  variant="outline" 
+                                  className="text-xs border-teal-600 text-teal-600 cursor-pointer hover:bg-teal-50"
+                                  onClick={() => setOrganizationFilter(corpInfo.organizationName!)}
+                                >
                                   🏛️ {corpInfo.organizationName}
                                 </Badge>
                               )}
