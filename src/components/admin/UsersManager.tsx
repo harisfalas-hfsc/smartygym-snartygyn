@@ -57,6 +57,7 @@ export function UsersManager() {
   const [corporateInfo, setCorporateInfo] = useState<Record<string, CorporateInfo>>({});
   const [pendingAction, setPendingAction] = useState<SubscriptionAction | null>(null);
   const [pendingCorpAction, setPendingCorpAction] = useState<{userId: string; userName: string; planType: string} | null>(null);
+  const [pendingCorpRevoke, setPendingCorpRevoke] = useState<{userId: string; userName: string; planType: string} | null>(null);
   const [actionLoading, setActionLoading] = useState(false);
   const SUPER_ADMIN_EMAIL = "harisfallas@gmail.com";
 
@@ -228,6 +229,33 @@ export function UsersManager() {
     }
   };
 
+  const revokeCorporateAdmin = async (userId: string) => {
+    setActionLoading(true);
+    try {
+      const { data, error } = await supabase.functions.invoke('revoke-corporate-admin', {
+        body: { user_id: userId }
+      });
+
+      if (error) throw error;
+      if (!data?.success) throw new Error(data?.error || 'Unknown error');
+
+      toast.success(data.message);
+      fetchUsers();
+    } catch (error) {
+      console.error('Error revoking corporate admin:', error);
+      toast.error(error instanceof Error ? error.message : 'Failed to revoke corporate admin');
+    } finally {
+      setActionLoading(false);
+      setPendingCorpRevoke(null);
+    }
+  };
+
+  const handleConfirmCorpRevoke = () => {
+    if (pendingCorpRevoke) {
+      revokeCorporateAdmin(pendingCorpRevoke.userId);
+    }
+  };
+
   useEffect(() => {
     let filtered = users;
 
@@ -392,6 +420,32 @@ export function UsersManager() {
             <AlertDialogCancel disabled={actionLoading}>Cancel</AlertDialogCancel>
             <AlertDialogAction onClick={handleConfirmCorpAction} disabled={actionLoading}>
               {actionLoading ? 'Processing...' : 'Confirm'}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      {/* Revoke Corporate Admin Confirmation Dialog */}
+      <AlertDialog open={!!pendingCorpRevoke} onOpenChange={(open) => !open && setPendingCorpRevoke(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle className="text-destructive">
+              Revoke Corporate Admin Status
+            </AlertDialogTitle>
+            <AlertDialogDescription>
+              Are you sure you want to revoke corporate admin status from "{pendingCorpRevoke?.userName}"? 
+              This will remove their {pendingCorpRevoke?.planType?.toUpperCase()} plan, delete all their team members, 
+              and set their subscription to FREE.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={actionLoading}>Cancel</AlertDialogCancel>
+            <AlertDialogAction 
+              onClick={handleConfirmCorpRevoke} 
+              disabled={actionLoading}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              {actionLoading ? 'Processing...' : 'Revoke'}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
@@ -705,8 +759,8 @@ export function UsersManager() {
                             <Mail className="h-4 w-4" />
                           </Button>
 
-                          {/* Corporate Admin Buttons - only show if user is not already a corporate admin */}
-                          {!isCorporateAdmin && (
+                          {/* Corporate Admin Buttons - show grant buttons or revoke button */}
+                          {!isCorporateAdmin ? (
                             <div className="flex flex-wrap gap-1 mt-1">
                               <Button
                                 variant="outline"
@@ -745,6 +799,20 @@ export function UsersManager() {
                                 Enterprise
                               </Button>
                             </div>
+                          ) : (
+                            <Button
+                              variant="destructive"
+                              size="sm"
+                              className="text-xs px-2 py-1 h-7 mt-1"
+                              onClick={() => setPendingCorpRevoke({ 
+                                userId: user.user_id, 
+                                userName, 
+                                planType: corpInfo.adminPlanType || '' 
+                              })}
+                            >
+                              <Building2 className="h-3 w-3 mr-1" />
+                              Revoke Corp
+                            </Button>
                           )}
                         </div>
                       </TableCell>
