@@ -1,0 +1,170 @@
+# WOD Generation Master Instructions
+
+This document captures the complete merged workout generation instructions for the Workout of the Day (WOD) system.
+
+## General Workflow
+
+Every day the system creates 2 workouts:
+1. **1 Bodyweight** workout
+2. **1 Equipment** workout
+
+Both workouts share the same:
+- Category
+- Difficulty level
+- Format
+
+## 6-Day Category Cycle
+
+Across 6 days, all 6 categories must be completed:
+1. Strength
+2. Calorie Burning
+3. Metabolic
+4. Cardio
+5. Mobility & Stability
+6. Challenge
+
+After the 6 categories are completed, the cycle restarts.
+
+## Critical Rules
+
+- **Never mix categories** - each workout must strictly follow its category's training philosophy
+- **Never add exercises that don't fit** the category's purpose
+- **Always respect** training logic, intensity, and movement patterns
+
+## Difficulty Rotation Logic
+
+The system uses 6 difficulty levels (1-6 stars):
+- 1-2 stars: Beginner
+- 3-4 stars: Intermediate
+- 5-6 stars: Advanced
+
+**Rotation Rule**: Prevent consecutive high-intensity (5-6 stars) workouts. After an advanced workout, the next must be 1-4 stars for recovery.
+
+Example valid sequence: 1 star → 5 stars → 2 stars → 6 stars → 3 stars → 4 stars
+
+## Duration Options (Expanded Range)
+
+Available durations: **15 min, 20 min, 30 min, 45 min, 60 min, or Various**
+
+### Duration Selection Guidelines:
+- **15-20 min**: Express sessions - Tabata, short AMRAP, quick EMOM, mobility flows
+- **30 min**: Standard balanced workout - most categories, moderate intensity
+- **45 min**: Extended session - more exercises, additional warm-up/cool-down, strength with full rest
+- **60 min**: Comprehensive workout - full programming with extended main section
+- **Various**: Flexible timing - "Complete as fast as possible", "At your own pace", challenge-style, For Time workouts
+
+### Duration-Format Matching:
+- Tabata → 15-30 min
+- Circuit/AMRAP → 20-45 min
+- Reps & Sets (Strength) → 45-60 min
+- Mobility & Stability → 20-45 min
+- Challenge → Various or 30-45 min
+- For Time → Various
+- EMOM → 15-30 min
+
+## Format Definitions (Must Follow Exactly)
+
+- **Tabata**: 20 seconds work, 10 seconds rest, 8 rounds per exercise
+- **Circuit**: 4-6 exercises repeated 3-5 rounds with minimal rest between exercises
+- **AMRAP**: As Many Rounds As Possible in a given time
+- **For Time**: Complete all exercises as fast as possible (record time)
+- **EMOM**: Every Minute On the Minute - perform set at start of each minute, rest remainder
+- **Reps & Sets**: Classic strength format (e.g., 4 sets x 8 reps) with defined rest
+- **Mix**: Combination of two or more formats
+
+## Category-Specific Rules
+
+### CATEGORY 1: STRENGTH
+**Goal**: Build muscle, increase force production, improve functional strength
+**Intensity**: Controlled tempo, structured sets, progressive overload
+**Format**: REPS & SETS ONLY
+
+**Equipment Allowed**: Goblet squats, Kettlebell deadlifts, Romanian deadlifts, Front squats, Bench press variations, Dumbbell row, Bent-over row, Push press, Landmine press, Split squats, Hip hinges, Weighted carries
+
+**Bodyweight Allowed**: Push-up variations, Slow tempo squats, Pistol squat regressions, Glute bridges/hip thrusts, Plank variations, Pull-ups, Dips, Isometrics, Slow tempo lunges, Handstand progressions
+
+**FORBIDDEN**: High knees, Skipping, Burpees, Mountain climbers, Jumping jacks, Sprints, Any cardio-based exercise, EMOM/Tabata/AMRAP formats
+
+### CATEGORY 2: CARDIO
+**Goal**: Improve heart rate capacity, aerobic and anaerobic conditioning
+**Format**: Circuits, AMRAP, EMOM, Tabata, For Time
+**Intensity**: Minimal load, fast pace
+
+**Allowed**: Jogging, Running, Jump rope, Treadmill runs, Rowing machine, Assault bike, High knees, Skipping, Jumping jacks, Burpees, Mountain climbers, Butt kicks, Lateral shuffles, Step-ups (fast), Shadow boxing, Bear crawls, Crab walks
+
+**FORBIDDEN**: Heavy lifting, Slow tempo strength movements, Long rest periods
+
+### CATEGORY 3: METABOLIC
+**Goal**: High-intensity, full-body conditioning using strength tools and bodyweight
+**Format**: Circuits, AMRAP, EMOM, Tabata, For Time
+**Key**: More power, more muscular demand than cardio
+
+**Equipment Allowed**: Kettlebell swings, Battle ropes, Sandbags, Medicine ball slams, Box jumps, Kettlebell clean and press, Thrusters, Rowing intervals
+
+**Bodyweight Allowed**: Burpees, Squat thrusts, Fast lunges, Skater jumps, Mountain climbers, Jump squats, Push-up complexes
+
+**FORBIDDEN**: Slow strength tempo, Isometrics, Static planks, Mixed equipment (keep consistent)
+
+### CATEGORY 4: CALORIE BURNING
+**Goal**: High-effort, simple, non-technical exercises that maintain high output
+**Format**: Circuit, AMRAP, Tabata, For Time
+**Key**: Always keep heart rate HIGH
+
+**Equipment Allowed**: Kettlebell swings, Battle ropes, Rower, Bike, Slam ball, Light dumbbells
+
+**Bodyweight Allowed**: Squat jumps, Burpees, High knees, Lunges, Mountain climbers, Step-ups, Frog hops, Jumping jacks, Tuck jumps
+
+**FORBIDDEN**: Technical Olympic lifts, Slow strength sets, Heavy loading, Complicated sequences
+
+### CATEGORY 5: MOBILITY & STABILITY
+**Goal**: Increase joint mobility, core stability, flexibility, controlled movement
+**Format**: Circuits, Reps & Sets, Flow, Time-based mobility
+**Intensity**: Low to moderate - quality over speed
+
+**Allowed**: Cat-cow, Thoracic rotations, World's greatest stretch, 90/90 hip rotation, Dead bug, Bird dog, Glute bridges, Pallof press, Side planks, Copenhagen holds, Ankle/Shoulder/Hip CARs, Breathing protocols, Pigeon pose, Hip flexor stretches
+
+**FORBIDDEN**: Burpees, Jumps, Running, Skipping, Anything explosive, Anything heavy
+
+### CATEGORY 6: CHALLENGE
+**Goal**: Tough session testing endurance, strength, or mental toughness
+**Format**: EVERY FORMAT ALLOWED
+**Intensity**: VERY HIGH
+
+**Examples**: 100 burpees challenge, 10-min AMRAP, Descending ladders, Bodyweight chippers, EMOM increasing reps, Kettlebell complexes, Rowing distance challenges, Weighted vest challenges
+
+**Challenge Formats**: "Death by...", "100 Rep Challenge", "Descending Ladder", "EMOM + Tabata Combo", "For Time with Cap", "Pyramid", "Chipper"
+
+**FORBIDDEN**: Mobility exercises, Slow technical lifts, Low-intensity movements
+
+## Exercise Variety Rule (Critical)
+
+The exercise banks listed above are **EXAMPLES and GUIDELINES**, NOT strict limitations.
+
+### ✅ YOU MAY:
+- Use SIMILAR exercises that serve the same purpose
+- Create VARIATIONS of listed exercises (e.g., close-grip push-ups, sumo deadlifts)
+- Find alternatives that match the category's GOAL and INTENSITY
+- Introduce variety to keep workouts fresh and engaging
+
+### ❌ YOU MAY NOT:
+- Use exercises from a DIFFERENT category's allowed list
+- Violate the FORBIDDEN exercises list for each category
+- Mix equipment types when consistency is required (especially Metabolic)
+- Deviate from the category's training philosophy
+
+**Goal**: Create VARIETY while respecting each category's PURPOSE, INTENSITY, and MOVEMENT PATTERNS.
+
+## Bodyweight vs Equipment Logic
+
+- **Bodyweight workouts**: Must rely ONLY on bodyweight exercises
+- **Equipment workouts**: Can mix bodyweight with equipment tools but must feature equipment as the core
+
+## Output Quality
+
+All generated workouts must be:
+- Safe
+- Professional
+- Based on functional training principles
+- Suitable for adults
+- Compatible with SmartyGym's identity
+- Without unnecessary complexity
