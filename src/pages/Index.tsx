@@ -1077,152 +1077,142 @@ const Index = () => {
           <Card>
             <CardContent className="p-3 sm:p-4">
               <Accordion type="single" collapsible className="w-full">
-            <AccordionItem value="item-1">
-              <AccordionTrigger className="text-left">What is SmartyGym?</AccordionTrigger>
-                  <AccordionContent className="py-2 leading-relaxed">
-                    SmartyGym is an online fitness platform providing functional, science-based workouts and training programs
-                    designed by certified coaches. Whether you're training at home, in the gym, or on the go, SmartyGym 
-                    is your backup when life gets in the way — or your complete fitness solution if you prefer training from home. 
-                    We make quality fitness accessible anywhere, anytime.
-                  </AccordionContent>
-                </AccordionItem>
+                  
+                  <AccordionItem value="item-1">
+                    <AccordionTrigger className="text-left">What is SmartyGym?</AccordionTrigger>
+                    <AccordionContent className="py-2 leading-relaxed">
+                      SmartyGym is an online fitness platform providing functional, science-based workouts and training programs
+                      designed by certified coaches. Whether you're training at home, in the gym, or on the go, SmartyGym 
+                      is your backup when life gets in the way — or your complete fitness solution if you prefer training from home. 
+                      We make quality fitness accessible anywhere, anytime.
+                    </AccordionContent>
+                  </AccordionItem>
 
-            <AccordionItem value="item-2">
-              <AccordionTrigger className="text-left">Who is Haris Falas?</AccordionTrigger>
-                  <AccordionContent className="py-2 leading-relaxed">
-                    <a href="/coach-profile" className="text-primary hover:underline font-medium">Haris Falas</a> is a certified Sports Scientist
-                    and Strength & Conditioning Coach with over 20 years of professional experience. He has worked with elite athletes and professional 
-                    football teams in the Cypriot First Division. As the founder of HFSC and 
-                    SmartyGym, <strong>Haris personally designs every single workout and program</strong> — never by AI, always with evidence-based
-                    training principles and real coaching experience.
-                  </AccordionContent>
-                </AccordionItem>
+                  <AccordionItem value="item-2">
+                    <AccordionTrigger className="text-left">Who is Haris Falas?</AccordionTrigger>
+                    <AccordionContent className="py-2 leading-relaxed">
+                      <a href="/coach-profile" className="text-primary hover:underline font-medium">Haris Falas</a> is a certified Sports Scientist
+                      and Strength & Conditioning Coach with over 20 years of professional experience. He has worked with elite athletes and professional 
+                      football teams in the Cypriot First Division. As the founder of HFSC and 
+                      SmartyGym, <strong>Haris personally designs every single workout and program</strong> — never by AI, always with evidence-based
+                      training principles and real coaching experience.
+                    </AccordionContent>
+                  </AccordionItem>
 
-            <AccordionItem value="item-3">
-              <AccordionTrigger className="text-left">What makes SmartyGym different?</AccordionTrigger>
-                  <AccordionContent className="py-2 leading-relaxed">
-                    <strong>We're 100% human, 0% AI.</strong> Every workout is personally designed by <a href="/coach-profile" className="text-primary hover:underline font-medium">Haris Falas</a>,
-                    a qualified Sports Scientist and S&C Coach — never by algorithms or AI. You get real expertise from a real coach with 20+ years 
-                    of experience, real support, and direct access to the person who created your program. We focus on sustainable, functional training 
-                    that fits into your real life — not quick fixes or unrealistic promises.
-                  </AccordionContent>
-                </AccordionItem>
+                  <AccordionItem value="item-3">
+                    <AccordionTrigger className="text-left">What makes SmartyGym different?</AccordionTrigger>
+                    <AccordionContent className="py-2 leading-relaxed">
+                      <strong>We're 100% human, 0% AI.</strong> Every workout is personally designed by <a href="/coach-profile" className="text-primary hover:underline font-medium">Haris Falas</a>,
+                      a qualified Sports Scientist and S&C Coach — never by algorithms or AI. You get real expertise from a real coach with 20+ years 
+                      of experience, real support, and direct access to the person who created your program. We focus on sustainable, functional training 
+                      that fits into your real life — not quick fixes or unrealistic promises.
+                    </AccordionContent>
+                  </AccordionItem>
 
-                <AccordionItem value="item-3a">
-                  <AccordionTrigger className="text-left">What's the difference between a workout and training program?</AccordionTrigger>
-                  <AccordionContent className="py-2 leading-relaxed">
-                    A <strong>workout</strong> is a standalone training session designed for a specific goal — whether that's calorie burning, 
-                    strength building, cardio conditioning, mobility work, or power development. It's perfect when you want a single, 
-                    focused session that fits your current needs or time constraints.
-                    <br />
-                    A <strong>training program</strong> is a complete, structured plan that runs up to 8 weeks and contains multiple workouts 
-                    scheduled for every day of the week. Programs are designed with progression in mind, helping you achieve long-term 
-                    fitness goals like building muscle hypertrophy, improving cardiovascular endurance, enhancing functional strength, 
-                    or losing weight through systematic, progressive training over time.
-                  </AccordionContent>
-                </AccordionItem>
+                  <AccordionItem value="item-3a">
+                    <AccordionTrigger className="text-left">What's the difference between a workout and training program?</AccordionTrigger>
+                    <AccordionContent className="py-2 leading-relaxed">
+                      A <strong>workout</strong> is a standalone training session designed for a specific goal — whether that's calorie burning, 
+                      strength building, cardio conditioning, mobility work, or power development. It's perfect when you want a single, 
+                      focused session or when you're mixing and matching your own training plan.<br/><br/>
+                      
+                      A <strong>training program</strong> is a complete, structured plan that spans multiple weeks (e.g., 4, 6, or 12 weeks). 
+                      It includes progressive training phases, periodization, recovery strategies, and a clear roadmap toward a specific goal 
+                      (like building strength, losing fat, or improving performance). Programs are ideal if you want a full training cycle 
+                      with built-in progression and accountability.
+                    </AccordionContent>
+                  </AccordionItem>
 
-                <AccordionItem value="item-3b">
-                  <AccordionTrigger className="text-left">How do I choose between a workout and training program?</AccordionTrigger>
-                  <AccordionContent className="py-2 leading-relaxed">
-                    <strong>Choose a workout if:</strong>
-                    <ul className="list-disc pl-6 mt-1 space-y-1">
-                      <li>You want flexibility to train when it fits your schedule</li>
-                      <li>You're looking for variety and mixing different training styles</li>
-                      <li>You have limited time and need quick, focused sessions</li>
-                      <li>You're maintaining fitness rather than pursuing specific long-term goals</li>
-                      <li>You're seeking a quick sweat or daily movement session to kickstart or complete your day</li>
-                    </ul>
-                    <br />
-                    <strong>Choose a training program if:</strong>
-                    <ul className="list-disc pl-6 mt-1 space-y-1">
-                      <li>You have a specific goal like building muscle, losing weight, or improving endurance</li>
-                      <li>You want structured progression and accountability</li>
-                      <li>You can commit to 4-8 weeks of consistent training</li>
-                      <li>You prefer having your training planned out with clear weekly schedules</li>
-                      <li>You want to see measurable results through systematic training</li>
-                    </ul>
-                    <br />
-                    <strong>Pro tip:</strong> Many members use both — following a program for their main goal while adding individual 
-                    workouts for extra sessions or when they want to focus on something specific!
-                  </AccordionContent>
-                </AccordionItem>
+                  <AccordionItem value="item-4">
+                    <AccordionTrigger className="text-left">What kind of workouts do you offer?</AccordionTrigger>
+                    <AccordionContent className="py-2 leading-relaxed">
+                      We offer a wide variety of training styles to match your goals and preferences: Strength Training, Hypertrophy (Muscle Building), 
+                      Metabolic Conditioning, HIIT, Cardio, Mobility & Flexibility, Functional Training, Endurance, Core & Stability, Power & Explosiveness, 
+                      and Sport-Specific workouts. All workouts are categorized by difficulty level (beginner, intermediate, advanced), duration, and equipment requirements.
+                    </AccordionContent>
+                  </AccordionItem>
 
-                <AccordionItem value="item-4">
-                  <AccordionTrigger className="text-left">Do I need equipment to use SmartyGym?</AccordionTrigger>
-                  <AccordionContent className="py-2 leading-relaxed">
-                    No! We offer both bodyweight workouts that require no equipment and equipment-based programs.
-                    You can filter workouts based on what you have available — whether that's nothing, 
-                    resistance bands, dumbbells, or full gym access. Train anywhere with whatever you have.
-                  </AccordionContent>
-                </AccordionItem>
+                  <AccordionItem value="item-5">
+                    <AccordionTrigger className="text-left">Do I need gym equipment?</AccordionTrigger>
+                    <AccordionContent className="py-2 leading-relaxed">
+                      Not necessarily. We offer a wide variety of workouts and programs designed for different equipment scenarios: <strong>bodyweight only</strong>, 
+                      <strong>minimal equipment</strong> (resistance bands, dumbbells), and <strong>full gym access</strong>. You can filter content based on what you have available. 
+                      Whether you're training at home, in a hotel room, or at a fully equipped gym, there's something for you.
+                    </AccordionContent>
+                  </AccordionItem>
 
-                <AccordionItem value="item-5">
-                  <AccordionTrigger className="text-left">How long are the workouts?</AccordionTrigger>
-                  <AccordionContent className="py-2 leading-relaxed">
-                    Our workouts range from quick 10-minute sessions to comprehensive 60-minute full workouts.
-                    You can filter by duration to find what fits your schedule — whether you have just 10 minutes or a full hour to train.
-                  </AccordionContent>
-                </AccordionItem>
+                  <AccordionItem value="item-6">
+                    <AccordionTrigger className="text-left">Who is SmartyGym for?</AccordionTrigger>
+                    <AccordionContent className="py-2 leading-relaxed">
+                      SmartyGym is for <strong>everyone</strong> — whether you're a complete beginner taking your first steps into fitness, 
+                      or an experienced athlete looking for structured, science-based training. Our platform is designed to meet you where you are 
+                      and guide you forward with safe, effective programming. If you value expert coaching, flexibility, and real results, SmartyGym is for you.
+                    </AccordionContent>
+                  </AccordionItem>
 
-                <AccordionItem value="item-6">
-                  <AccordionTrigger className="text-left">Can beginners use SmartyGym?</AccordionTrigger>
-                  <AccordionContent className="py-2 leading-relaxed">
-                    Absolutely! We have workouts and programs specifically designed for all fitness levels, including beginners.
-                    Each workout includes clear instructions, difficulty ratings, and modifications to match your current fitness level. 
-                    Start where you are and progress at your own pace with safe, effective programming.
-                  </AccordionContent>
-                </AccordionItem>
+                  <AccordionItem value="item-7">
+                    <AccordionTrigger className="text-left">Can I really get results training from home?</AccordionTrigger>
+                    <AccordionContent className="py-2 leading-relaxed">
+                      Absolutely. Results come from consistency, proper programming, and progressive overload — not from expensive equipment or gym memberships. 
+                      Our home-based workouts are designed using the same science-based principles as gym-based training. Whether you're using bodyweight, 
+                      resistance bands, or a pair of dumbbells, you can build strength, lose fat, improve fitness, and reach your goals with the right guidance.
+                    </AccordionContent>
+                  </AccordionItem>
 
-                <AccordionItem value="item-7">
-                  <AccordionTrigger className="text-left">Why should I go premium?</AccordionTrigger>
-                  <AccordionContent className="py-2 leading-relaxed">
-                    Premium membership unlocks unlimited access to all workouts and training programs, full dashboard access with progress tracking,
-                    complete workout and program history, ability to favorite and rate all content, and direct WhatsApp support from the coaching team. 
-                    Free subscribers can access selected free workouts, programs, calculators, and the exercise library, but Premium gives you the full 
-                    SmartyGym experience with structured training programs for long-term goals and personalized support. Choose monthly (€9.99/month) or save 25% with yearly (€89.99/year, only €7.50/month).
-                  </AccordionContent>
-                </AccordionItem>
+                  <AccordionItem value="item-8">
+                    <AccordionTrigger className="text-left">Is there a free trial?</AccordionTrigger>
+                    <AccordionContent className="py-2 leading-relaxed">
+                      Yes! We offer <strong>free access</strong> to selected workouts, tools, and resources so you can explore the platform before committing. 
+                      Additionally, you can <strong>purchase selected premium workouts or training programs as standalone items</strong> — 
+                      this lets you experience our coaching philosophy and training quality before committing to a full subscription.
+                      Premium subscriptions (Gold and Platinum) unlock our full library of workouts, training programs, and advanced features. 
+                      Check out our <a href="/premium-comparison" className="text-primary hover:underline font-medium">pricing plans</a> to see what's included.
+                    </AccordionContent>
+                  </AccordionItem>
 
-                <AccordionItem value="item-8">
-                  <AccordionTrigger className="text-left">What's the difference between free and premium access?</AccordionTrigger>
-                  <AccordionContent className="py-2 leading-relaxed">
-                    <strong>Visitors (no login)</strong> can view the exercise library and blog. <strong>Free subscribers</strong> get access to selected free workouts and programs,
-                    full calculators (1RM, BMR, Macro), and limited dashboard features. <strong>Premium members</strong> get unlimited access to all workouts and training programs, 
-                    full dashboard with comprehensive progress tracking, complete workout/program favorites and history, and direct WhatsApp support from our coaching team.
-                  </AccordionContent>
-                </AccordionItem>
+                  <AccordionItem value="item-8a">
+                    <AccordionTrigger className="text-left">What is a standalone purchase?</AccordionTrigger>
+                    <AccordionContent className="py-2 leading-relaxed">
+                      A <strong>standalone purchase</strong> allows you to buy individual premium workouts or training programs without committing to a subscription. 
+                      This is perfect for trying our training methodology and coaching style before deciding to upgrade.<br/><br/>
+                      
+                      <strong>How to purchase:</strong><br/>
+                      1. <strong>Create a free account</strong> — sign up to access the platform.<br/>
+                      2. <strong>Browse</strong> our workouts or training programs.<br/>
+                      3. <strong>Click "Buy Now"</strong> on any standalone-enabled content (marked with a price).<br/>
+                      4. <strong>Complete payment</strong> securely via Stripe.<br/>
+                      5. <strong>Access immediately</strong> — your purchased content is unlocked right away.<br/><br/>
+                      
+                      <strong>What you get:</strong> Full dashboard access for your purchased content, including logbook tracking, 
+                      the ability to rate and review, mark as complete, add to favorites, and access to all our calculator tools. 
+                      It's a great way to try before you commit to a full plan!
+                    </AccordionContent>
+                  </AccordionItem>
 
-                <AccordionItem value="item-9">
-                  <AccordionTrigger className="text-left">Can I cancel my subscription anytime?</AccordionTrigger>
-                  <AccordionContent className="py-2 leading-relaxed">
-                    Yes! You can cancel your subscription at any time with no long-term commitments or cancellation fees.
-                    Your premium access continues until the end of your current billing period, so you get full value for what you've paid.
-                  </AccordionContent>
-                </AccordionItem>
+                  <AccordionItem value="item-9">
+                    <AccordionTrigger className="text-left">How do I get started?</AccordionTrigger>
+                    <AccordionContent className="py-2 leading-relaxed">
+                      Getting started is simple:<br/>
+                      1. <strong>Browse</strong> our free workouts and tools to get a feel for the platform.<br/>
+                      2. <strong>Sign up</strong> for a free account to save your progress and track your training.<br/>
+                      3. <strong>Upgrade</strong> to a premium plan if you want full access to all workouts, training programs, and exclusive content.<br/>
+                      4. <strong>Start training</strong> — pick a workout or program and get moving!<br/><br/>
+                      
+                      If you need guidance, check out our <a href="/taketour" className="text-primary hover:underline font-medium">Take a Tour</a> page 
+                      or <a href="/contact" className="text-primary hover:underline font-medium">contact us</a> directly.
+                    </AccordionContent>
+                  </AccordionItem>
 
-                <AccordionItem value="item-10">
-                  <AccordionTrigger className="text-left">How do I get support or contact the coach?</AccordionTrigger>
-                  <AccordionContent className="py-2 leading-relaxed">
-                    Premium members get direct WhatsApp support from our coaching team for personalized guidance and questions.
-                    All users can also reach out through our <a href="/contact" className="text-primary hover:underline font-medium">contact page</a>. 
-                    Unlike AI-generated programs, you're working with real people who care about your progress and are here to help.
-              </AccordionContent>
-            </AccordionItem>
+                  <AccordionItem value="item-10">
+                    <AccordionTrigger className="text-left">How can I contact you?</AccordionTrigger>
+                    <AccordionContent className="py-2 leading-relaxed">
+                      We're here to help! You can reach us through our <a href="/contact" className="text-primary hover:underline font-medium">Contact page</a>, 
+                      where you can send a message or get direct access to coach <a href="/coach-profile" className="text-primary hover:underline font-medium">Haris Falas</a>. 
+                      We typically respond within 24 hours. You can also follow us on social media for updates, tips, and community support.
+                    </AccordionContent>
+                  </AccordionItem>
 
-            <AccordionItem value="item-13">
-              <AccordionTrigger className="text-left">Can I subscribe to receive email updates?</AccordionTrigger>
-              <AccordionContent className="py-2 leading-relaxed">
-                We've made a conscious decision not to offer email subscriptions or send promotional emails.
-                As fitness enthusiasts ourselves, we understand how overwhelming it can be to receive constant marketing emails 
-                that often go unread. We don't want to contribute to inbox clutter or email fatigue. Instead, all important 
-                updates, workout notifications, and communication happen directly within your SmartyGym dashboard — 
-                keeping everything organized in one place without distractions. If you'd like to stay connected and receive 
-                updates about new content, you're welcome to follow us on social media. This approach ensures you only get 
-                the information you need, when you need it, without unnecessary noise.
-              </AccordionContent>
-            </AccordionItem>
-          </Accordion>
+                </Accordion>
             </CardContent>
           </Card>
         </section>
