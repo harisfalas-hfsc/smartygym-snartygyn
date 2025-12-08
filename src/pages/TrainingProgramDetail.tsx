@@ -13,6 +13,7 @@ import { ContentLoadingSkeleton } from "@/components/ContentLoadingSkeleton";
 import { useAllPrograms } from "@/hooks/useProgramData";
 import { useProgramInteractions } from "@/hooks/useProgramInteractions";
 import { supabase } from "@/integrations/supabase/client";
+import { stripHtmlTags } from "@/lib/text";
 
 type EquipmentFilter = "all" | "bodyweight" | "equipment";
 type LevelFilter = "all" | "beginner" | "intermediate" | "advanced";
@@ -452,7 +453,7 @@ const TrainingProgramDetail = () => {
                 
                 <div className="p-4 space-y-3">
                   <h3 className="font-semibold text-base sm:text-lg">{program.name}</h3>
-                  <p className="text-xs sm:text-sm text-muted-foreground line-clamp-2">{program.description}</p>
+                  <p className="text-xs sm:text-sm text-muted-foreground line-clamp-2">{stripHtmlTags(program.description || "")}</p>
                   
                   {/* Status Indicators Row */}
                   {userId && (
@@ -491,7 +492,7 @@ const TrainingProgramDetail = () => {
                   <div className="flex items-center gap-2">
                     <div className="flex items-center gap-1 text-xs text-muted-foreground">
                       <Calendar className="h-3 w-3 shrink-0" />
-                      <span>{program.duration.toString()} weeks</span>
+                      <span>{program.weeks} Weeks / {program.days_per_week} Days per Week</span>
                     </div>
                     <span className="text-xs text-muted-foreground">•</span>
                     {program.is_premium ? (
