@@ -215,7 +215,7 @@ export const Navigation = () => {
                     className={`justify-start font-semibold transition-all duration-200 ${location.pathname === '/workout' ? 'text-primary underline underline-offset-4 bg-yellow-100/50' : 'text-foreground hover:bg-yellow-100/80 hover:text-foreground'}`}
                   >
                     <Dumbbell className="mr-2 h-4 w-4" />
-                    Workouts
+                    Smarty Workouts
                   </Button>
                   <Button
                     variant="ghost"
@@ -223,7 +223,7 @@ export const Navigation = () => {
                     className={`justify-start font-semibold transition-all duration-200 ${location.pathname === '/trainingprogram' ? 'text-primary underline underline-offset-4 bg-yellow-100/50' : 'text-foreground hover:bg-yellow-100/80 hover:text-foreground'}`}
                   >
                     <ListChecks className="mr-2 h-4 w-4" />
-                    Programs
+                    Smarty Programs
                   </Button>
                   <Button
                     variant="ghost"
@@ -231,7 +231,7 @@ export const Navigation = () => {
                     className={`justify-start font-semibold transition-all duration-200 ${location.pathname === '/daily-ritual' ? 'text-primary underline underline-offset-4 bg-yellow-100/50' : 'text-foreground hover:bg-yellow-100/80 hover:text-foreground'}`}
                   >
                     <Sparkles className="mr-2 h-4 w-4" />
-                    Daily Ritual
+                    Smarty Ritual
                   </Button>
                   <Button
                     variant="ghost"
