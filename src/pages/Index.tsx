@@ -15,6 +15,7 @@ import harisPhoto from "@/assets/haris-falas-coach.png";
 import { MobilePhoneIllustration } from "@/components/MobilePhoneIllustration";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious, type CarouselApi } from "@/components/ui/carousel";
+import Autoplay from "embla-carousel-autoplay";
 import { cn } from "@/lib/utils";
 import { useAccessControl } from "@/hooks/useAccessControl";
 import { ScrollReveal } from "@/components/ScrollReveal";
@@ -555,28 +556,36 @@ const Index = () => {
                   </div>
 
                   {/* Feature Cards Carousel */}
-                  <div className="w-full">
+                  <div className="w-full px-12">
                     <Carousel 
                       opts={{ align: "center", loop: true }}
-                      className="w-full max-w-4xl mx-auto"
+                      plugins={[
+                        Autoplay({
+                          delay: 4000,
+                          stopOnMouseEnter: true,
+                          stopOnInteraction: false
+                        })
+                      ]}
+                      className="w-full max-w-5xl mx-auto"
                     >
-                      <CarouselContent>
+                      <CarouselContent className="-ml-2">
                         {heroCards.map(card => {
                           const Icon = card.icon;
                           return (
-                            <CarouselItem key={card.id} className="basis-full">
-                              <Card className="border-2 border-primary/30 hover:border-primary hover:shadow-xl transition-all duration-300 bg-primary/5 mx-4">
-                                <CardContent className="p-8 sm:p-10 flex flex-col items-center text-center gap-4">
-                                  <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-primary/10">
-                                    <Icon className="w-10 h-10 text-primary" />
+                            <CarouselItem key={card.id} className="basis-[65%] pl-2">
+                              <Card className="border-2 border-primary/30 hover:border-primary hover:shadow-xl transition-all duration-300 bg-primary/5">
+                                <CardContent className="p-4 sm:p-5 flex flex-col items-center text-center gap-2">
+                                  <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-primary/10">
+                                    <Icon className="w-6 h-6 text-primary" />
                                   </div>
-                                  <h3 className="text-2xl font-bold text-foreground">{card.title}</h3>
-                                  <p className="text-muted-foreground max-w-md">{card.description}</p>
+                                  <h3 className="text-lg font-bold text-foreground">{card.title}</h3>
+                                  <p className="text-sm text-muted-foreground max-w-md">{card.description}</p>
                                   <Button 
                                     onClick={() => navigate(card.route)}
-                                    className="mt-2"
+                                    size="sm"
+                                    className="mt-1"
                                   >
-                                    Explore <ArrowRight className="w-4 h-4 ml-2" />
+                                    Explore <ArrowRight className="w-3 h-3 ml-1" />
                                   </Button>
                                 </CardContent>
                               </Card>
@@ -584,8 +593,8 @@ const Index = () => {
                           );
                         })}
                       </CarouselContent>
-                      <CarouselPrevious className="-left-4 sm:-left-6" />
-                      <CarouselNext className="-right-4 sm:-right-6" />
+                      <CarouselPrevious className="-left-10 h-12 w-12 bg-primary text-primary-foreground hover:bg-primary/90 border-0 [&>svg]:h-6 [&>svg]:w-6" />
+                      <CarouselNext className="-right-10 h-12 w-12 bg-primary text-primary-foreground hover:bg-primary/90 border-0 [&>svg]:h-6 [&>svg]:w-6" />
                     </Carousel>
                   </div>
 
