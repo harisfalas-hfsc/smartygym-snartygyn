@@ -56,10 +56,10 @@ serve(async (req) => {
 
     if (profilesError) throw profilesError;
 
-    // Fetch all subscriptions
+    // Fetch all subscriptions with all needed fields
     const { data: subscriptions, error: subsError } = await supabaseAdmin
       .from('user_subscriptions')
-      .select('user_id, plan_type, status, current_period_start, current_period_end');
+      .select('user_id, plan_type, status, current_period_start, current_period_end, created_at, updated_at, stripe_customer_id, stripe_subscription_id');
 
     if (subsError) throw subsError;
 
@@ -81,7 +81,11 @@ serve(async (req) => {
         status: subscription?.status || 'inactive',
         current_period_start: subscription?.current_period_start || null,
         current_period_end: subscription?.current_period_end || null,
-        created_at: profile.created_at,
+        created_at: profile.created_at, // Profile creation (joined platform)
+        subscription_created_at: subscription?.created_at || null, // First subscribed
+        subscription_updated_at: subscription?.updated_at || null, // Last modification
+        stripe_customer_id: subscription?.stripe_customer_id || null,
+        stripe_subscription_id: subscription?.stripe_subscription_id || null,
       };
     });
 
