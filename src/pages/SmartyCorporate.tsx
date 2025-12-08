@@ -388,7 +388,7 @@ export default function SmartyCorporate() {
               <Badge className="absolute -top-2 right-2 bg-green-600 text-white px-2 py-1 text-xs shadow-md z-10">
                 BEST VALUE
               </Badge>
-              <CardHeader className="text-center pb-2 pt-4">
+              <CardHeader className="text-center pb-2">
                 <div className="flex items-center justify-center gap-2 min-h-[56px]">
                   <Building2 className="h-5 w-5 text-primary shrink-0" />
                   <h2 className="text-lg font-bold text-primary whitespace-nowrap">Smarty Enterprise</h2>
