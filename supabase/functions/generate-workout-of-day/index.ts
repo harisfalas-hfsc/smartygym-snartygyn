@@ -212,24 +212,29 @@ serve(async (req) => {
     const { format, updatedUsage } = getNextFormat(category, formatUsage);
     logStep("Selected format (shared)", { format, category, usedFormats: formatUsage[category] });
 
-    // Duration based on format and difficulty
+    // Duration based on format and difficulty - EXPANDED RANGE (15, 20, 30, 45, 60 min, Various)
     const getDuration = (format: string, stars: number): string => {
-      // Base duration by format
+      // Base duration ranges by format [min, mid, max]
       const baseDurations: Record<string, number[]> = {
-        "REPS & SETS": [45, 60],   // Strength needs more time
-        "CIRCUIT": [30, 45],
-        "TABATA": [20, 30],
-        "AMRAP": [25, 35],
-        "EMOM": [20, 30],
-        "FOR TIME": [25, 35],
-        "MIX": [35, 45]
+        "REPS & SETS": [45, 50, 60],   // Strength needs more time
+        "CIRCUIT": [20, 30, 45],       // Flexible circuit length
+        "TABATA": [15, 20, 30],        // Quick intense sessions
+        "AMRAP": [15, 25, 45],         // Flexible based on complexity
+        "EMOM": [15, 20, 30],          // Every minute format
+        "FOR TIME": [0, 0, 0],         // Special: "Various" for race-against-clock
+        "MIX": [30, 40, 60]            // Combo formats need more time
       };
       
-      const [minDuration, maxDuration] = baseDurations[format] || [30, 45];
+      // FOR TIME format uses "Various" (complete as fast as possible)
+      if (format === "FOR TIME") {
+        return "Various";
+      }
       
-      // Adjust by difficulty: higher difficulty = longer duration
+      const [minDuration, midDuration, maxDuration] = baseDurations[format] || [20, 30, 45];
+      
+      // Adjust by difficulty: lower difficulty = shorter duration, higher = longer
       if (stars <= 2) return `${minDuration} min`;
-      if (stars <= 4) return `${Math.round((minDuration + maxDuration) / 2)} min`;
+      if (stars <= 4) return `${midDuration} min`;
       return `${maxDuration} min`;
     };
     
@@ -545,6 +550,50 @@ CHALLENGE FORMAT IDEAS (USE THESE):
 • Easy modifications or scaled options
 
 FOCUS: Mental toughness, personal records, benchmark performance, competition against the clock, pushing limits.` : ""}
+
+═══════════════════════════════════════════════════════════════════════════════
+EXERCISE VARIETY RULE (CRITICAL - READ CAREFULLY):
+═══════════════════════════════════════════════════════════════════════════════
+The exercise banks listed above are EXAMPLES and GUIDELINES, NOT strict limitations.
+
+✅ YOU MAY:
+• Use SIMILAR exercises that serve the same purpose as listed exercises
+• Create VARIATIONS of listed exercises (e.g., close-grip push-ups, sumo deadlifts, archer push-ups)
+• Find alternatives that match the category's GOAL and INTENSITY
+• Introduce variety to keep workouts fresh, engaging, and unpredictable
+• Adapt exercises for the specified equipment type (bodyweight variations or equipment variations)
+
+❌ YOU MAY NOT:
+• Use exercises from a DIFFERENT category's allowed list (e.g., burpees in Strength, isometrics in Challenge)
+• Violate the FORBIDDEN exercises list for each category
+• Mix equipment types when consistency is required (especially Metabolic category)
+• Deviate from the category's training philosophy, intensity, or movement patterns
+
+GOAL: Create VARIETY while respecting each category's PURPOSE, INTENSITY, and MOVEMENT PATTERNS.
+Every workout should feel unique while staying true to its category identity.
+
+═══════════════════════════════════════════════════════════════════════════════
+DURATION OPTIONS (EXPANDED RANGE):
+═══════════════════════════════════════════════════════════════════════════════
+Available durations: 15 min, 20 min, 30 min, 45 min, 60 min, or Various
+
+DURATION SELECTION GUIDELINES:
+• 15-20 min: Express sessions - Tabata, short AMRAP, quick EMOM, mobility flows
+• 30 min: Standard balanced workout - most categories, moderate intensity
+• 45 min: Extended session - more exercises, additional warm-up/cool-down, strength with full rest
+• 60 min: Comprehensive workout - full programming with extended main section
+• Various: Flexible timing - "Complete as fast as possible", "At your own pace", challenge-style, For Time workouts
+
+Match duration to FORMAT and CATEGORY:
+- Tabata → 15-30 min (quick, intense bursts)
+- Circuit/AMRAP → 20-45 min (scalable rounds)
+- Reps & Sets (Strength) → 45-60 min (rest periods matter)
+- Mobility & Stability → 20-45 min (quality over speed)
+- Challenge → Various or 30-45 min (race against clock or time cap)
+- For Time → Various (complete workout, record time)
+- EMOM → 15-30 min (structured minute-by-minute)
+
+YOUR DURATION TODAY: ${duration}
 
 ═══════════════════════════════════════════════════════════════════════════════
 DIFFICULTY LEVEL ${selectedDifficulty.stars}/6 (${selectedDifficulty.name}):
