@@ -1,12 +1,5 @@
-import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { Calendar, Download, ExternalLink } from "lucide-react";
+import { Calendar } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
 interface RitualCalendarButtonProps {
@@ -39,7 +32,6 @@ const htmlToPlainText = (html: string): string => {
 
 export const RitualCalendarButton = ({ ritual }: RitualCalendarButtonProps) => {
   const { toast } = useToast();
-  const [isOpen, setIsOpen] = useState(false);
 
   // Cyprus reference times converted to user's local timezone
   const getLocalTimes = () => {
@@ -99,9 +91,9 @@ export const RitualCalendarButton = ({ ritual }: RitualCalendarButtonProps) => {
       {
         title: `☀️ Morning Ritual - Day ${dayNum}`,
         start: times.morning,
-        duration: 15, // 15 minutes
+        duration: 15,
         description: morningDesc + "\n\nView full ritual: https://smartygym.com/daily-ritual",
-        reminder: 10, // 10 minutes before
+        reminder: 10,
       },
       {
         title: `🌤️ Midday Ritual - Day ${dayNum}`,
@@ -168,54 +160,12 @@ END:VEVENT
       title: "Calendar file downloaded",
       description: "Open the file to add all 3 ritual events with reminders to your calendar",
     });
-    setIsOpen(false);
-  };
-
-  const openGoogleCalendar = () => {
-    const times = getLocalTimes();
-    const dayNum = ritual.day_number;
-
-    // Get morning content description
-    const morningDesc = ritual.morning_content 
-      ? htmlToPlainText(ritual.morning_content).substring(0, 500)
-      : "Joint unlock, light activation, and morning prep. Start your day strong!";
-
-    // Create Google Calendar URL for morning event (primary)
-    const morningUrl = new URL('https://calendar.google.com/calendar/render');
-    morningUrl.searchParams.set('action', 'TEMPLATE');
-    morningUrl.searchParams.set('text', `☀️ Morning Ritual - Day ${dayNum}`);
-    morningUrl.searchParams.set('dates', 
-      `${formatICSDate(times.morning).replace('Z', '')}/${formatICSDate(new Date(times.morning.getTime() + 15 * 60000)).replace('Z', '')}`
-    );
-    morningUrl.searchParams.set('details', morningDesc + '\n\nView full ritual: https://smartygym.com/daily-ritual\n\nNote: Download the .ics file to add all 3 phases at once.');
-    
-    window.open(morningUrl.toString(), '_blank');
-
-    toast({
-      title: "Opening Google Calendar",
-      description: "For all 3 events, use 'Download Calendar File' option instead",
-    });
-    setIsOpen(false);
   };
 
   return (
-    <DropdownMenu open={isOpen} onOpenChange={setIsOpen}>
-      <DropdownMenuTrigger asChild>
-        <Button variant="outline" className="gap-2">
-          <Calendar className="h-4 w-4" />
-          Add to Your Calendar
-        </Button>
-      </DropdownMenuTrigger>
-      <DropdownMenuContent align="center" className="w-56">
-        <DropdownMenuItem onClick={downloadICS}>
-          <Download className="mr-2 h-4 w-4" />
-          Download Calendar File (.ics)
-        </DropdownMenuItem>
-        <DropdownMenuItem onClick={openGoogleCalendar}>
-          <ExternalLink className="mr-2 h-4 w-4" />
-          Open in Google Calendar
-        </DropdownMenuItem>
-      </DropdownMenuContent>
-    </DropdownMenu>
+    <Button variant="outline" className="gap-2" onClick={downloadICS}>
+      <Calendar className="h-4 w-4" />
+      Add All 3 Rituals to Calendar
+    </Button>
   );
 };
