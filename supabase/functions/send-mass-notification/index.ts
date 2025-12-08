@@ -75,10 +75,45 @@ serve(async (req) => {
       recipientError = purchaseErr;
       
       if (purchaseData) {
-        // Get unique user IDs
         const uniqueUserIds = [...new Set(purchaseData.map(p => p.user_id))];
         recipients = uniqueUserIds.map(user_id => ({ user_id }));
       }
+    } else if (recipientFilter === 'corporate_admins') {
+      // Query corporate_subscriptions for admins
+      const { data: corpData, error: corpErr } = await supabaseAdmin
+        .from('corporate_subscriptions')
+        .select('admin_user_id');
+      
+      recipientError = corpErr;
+      if (corpData) {
+        recipients = corpData.map(c => ({ user_id: c.admin_user_id }));
+      }
+    } else if (recipientFilter === 'corporate_members') {
+      // Query corporate_members
+      const { data: membersData, error: membersErr } = await supabaseAdmin
+        .from('corporate_members')
+        .select('user_id');
+      
+      recipientError = membersErr;
+      if (membersData) {
+        recipients = membersData.map(m => ({ user_id: m.user_id }));
+      }
+    } else if (recipientFilter === 'corporate_all') {
+      // Query both corporate admins and members
+      const { data: corpData, error: corpErr } = await supabaseAdmin
+        .from('corporate_subscriptions')
+        .select('admin_user_id');
+      
+      const { data: membersData, error: membersErr } = await supabaseAdmin
+        .from('corporate_members')
+        .select('user_id');
+      
+      recipientError = corpErr || membersErr;
+      
+      const adminIds = (corpData || []).map(c => c.admin_user_id);
+      const memberIds = (membersData || []).map(m => m.user_id);
+      const allIds = [...new Set([...adminIds, ...memberIds])];
+      recipients = allIds.map(user_id => ({ user_id }));
     } else {
       // Query user_subscriptions table
       let recipientQuery = supabaseAdmin

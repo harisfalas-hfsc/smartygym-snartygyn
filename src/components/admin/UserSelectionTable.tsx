@@ -3,7 +3,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
-import { Search } from "lucide-react";
+import { Search, Building2, Users } from "lucide-react";
 
 interface UserData {
   user_id: string;
@@ -11,6 +11,13 @@ interface UserData {
   full_name: string | null;
   plan_type: string;
   status: string;
+  // Corporate fields
+  is_corporate_admin?: boolean;
+  corporate_admin_org?: string | null;
+  corporate_admin_plan?: string | null;
+  is_corporate_member?: boolean;
+  corporate_member_org?: string | null;
+  corporate_member_plan?: string | null;
 }
 
 interface UserSelectionTableProps {
@@ -28,7 +35,9 @@ export function UserSelectionTable({ users, selectedUserIds, onSelectionChange }
     const term = searchTerm.toLowerCase();
     return users.filter(user => 
       user.full_name?.toLowerCase().includes(term) ||
-      user.email?.toLowerCase().includes(term)
+      user.email?.toLowerCase().includes(term) ||
+      user.corporate_admin_org?.toLowerCase().includes(term) ||
+      user.corporate_member_org?.toLowerCase().includes(term)
     );
   }, [users, searchTerm]);
 
@@ -50,12 +59,10 @@ export function UserSelectionTable({ users, selectedUserIds, onSelectionChange }
 
   const handleSelectAll = () => {
     if (allVisibleSelected) {
-      // Deselect all visible users
       onSelectionChange(
         selectedUserIds.filter(id => !visibleIds.includes(id))
       );
     } else {
-      // Select all visible users (keep any selections from other filters too)
       const newSelection = Array.from(
         new Set([...selectedUserIds, ...visibleIds])
       );
@@ -65,12 +72,10 @@ export function UserSelectionTable({ users, selectedUserIds, onSelectionChange }
 
   const handleToggleUser = (userId: string, checked: boolean | "indeterminate") => {
     if (checked) {
-      // Add user if not already selected
       if (!selectedUserIds.includes(userId)) {
         onSelectionChange([...selectedUserIds, userId]);
       }
     } else {
-      // Remove user if currently selected
       if (selectedUserIds.includes(userId)) {
         onSelectionChange(selectedUserIds.filter(id => id !== userId));
       }
@@ -85,13 +90,37 @@ export function UserSelectionTable({ users, selectedUserIds, onSelectionChange }
     }
   };
 
+  const renderCorporateBadges = (user: UserData) => {
+    const badges = [];
+    
+    if (user.is_corporate_admin) {
+      badges.push(
+        <Badge key="corp-admin" variant="default" className="text-xs bg-blue-600 hover:bg-blue-700 flex items-center gap-1">
+          <Building2 className="h-3 w-3" />
+          Admin: {user.corporate_admin_org}
+        </Badge>
+      );
+    }
+    
+    if (user.is_corporate_member) {
+      badges.push(
+        <Badge key="corp-member" variant="secondary" className="text-xs flex items-center gap-1">
+          <Users className="h-3 w-3" />
+          Member: {user.corporate_member_org}
+        </Badge>
+      );
+    }
+    
+    return badges;
+  };
+
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
         <div className="relative flex-1 max-w-sm">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <Input
-            placeholder="Search by name or email..."
+            placeholder="Search by name, email, or organization..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             className="pl-9"
@@ -141,10 +170,13 @@ export function UserSelectionTable({ users, selectedUserIds, onSelectionChange }
                     <TableCell className="text-muted-foreground">
                       {user.email || 'No email'}
                     </TableCell>
-                    <TableCell className="text-center">
-                      <Badge variant={getPlanBadgeVariant(user.plan_type)}>
-                        {user.plan_type.charAt(0).toUpperCase() + user.plan_type.slice(1)}
-                      </Badge>
+                    <TableCell>
+                      <div className="flex flex-col items-center gap-1">
+                        <Badge variant={getPlanBadgeVariant(user.plan_type)}>
+                          {user.plan_type.charAt(0).toUpperCase() + user.plan_type.slice(1)}
+                        </Badge>
+                        {renderCorporateBadges(user)}
+                      </div>
                     </TableCell>
                     <TableCell className="text-center">
                       <Badge variant={user.status === 'active' ? 'default' : 'secondary'}>
