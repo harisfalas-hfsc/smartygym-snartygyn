@@ -56,6 +56,7 @@ import TermsOfService from "./pages/TermsOfService";
 import Disclaimer from "./pages/Disclaimer";
 import NotFound from "./pages/NotFound";
 import JoinPremium from "./pages/JoinPremium";
+import SmartyCorporate from "./pages/SmartyCorporate";
 import PremiumBenefits from "./pages/PremiumBenefits";
 import PremiumComparison from "./pages/PremiumComparison";
 import TakeTour from "./pages/TakeTour";
@@ -124,6 +125,9 @@ const AppContent = () => {
                 <Route path="/trainingprogram" element={<TrainingProgramFlow />} />
                 <Route path="/trainingprogram/:type" element={<TrainingProgramDetail />} />
                 <Route path="/trainingprogram/:type/:id" element={<IndividualTrainingProgram />} />
+                
+                {/* Corporate page is public */}
+                <Route path="/corporate" element={<SmartyCorporate />} />
                 
                 {/* Exercise library is public */}
                 <Route path="/exerciselibrary" element={<ExerciseLibrary />} />
