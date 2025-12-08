@@ -28,6 +28,11 @@ interface SubscriptionInfo {
   subscription_end: string | null;
 }
 
+interface CorporateSubscriptionInfo {
+  plan_type: string;
+  status: string;
+}
+
 export const Navigation = () => {
   const navigate = useNavigate();
   const location = useLocation();
@@ -35,6 +40,7 @@ export const Navigation = () => {
   const [user, setUser] = useState<User | null>(null);
   const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
   const [subscriptionInfo, setSubscriptionInfo] = useState<SubscriptionInfo | null>(null);
+  const [corporateSubscription, setCorporateSubscription] = useState<CorporateSubscriptionInfo | null>(null);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const { data: unreadCount = 0, refetch: refetchUnread } = useUnreadMessages();
   const isMobile = useIsMobile();
@@ -89,6 +95,30 @@ export const Navigation = () => {
     if (profile) {
       setAvatarUrl(profile.avatar_url);
     }
+
+    // Check for corporate subscription
+    const { data: corpSub } = await supabase
+      .from('corporate_subscriptions')
+      .select('plan_type, status')
+      .eq('admin_user_id', userId)
+      .eq('status', 'active')
+      .maybeSingle();
+
+    if (corpSub) {
+      setCorporateSubscription(corpSub);
+    } else {
+      setCorporateSubscription(null);
+    }
+  };
+
+  const getCorporatePlanName = (planType: string) => {
+    const names: Record<string, string> = {
+      'dynamic': 'Dynamic',
+      'power': 'Power',
+      'elite': 'Elite',
+      'enterprise': 'Enterprise'
+    };
+    return names[planType.toLowerCase()] || planType;
   };
 
   const checkSubscription = async () => {
@@ -373,13 +403,20 @@ export const Navigation = () => {
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <Button variant="ghost" className="relative h-11 w-11 rounded-full">
-                    <Avatar className={`h-11 w-11 ${subscriptionInfo?.subscribed ? 'ring-2 ring-yellow-500 ring-offset-2 ring-offset-background' : ''}`}>
+                    <Avatar className={`h-11 w-11 ${subscriptionInfo?.subscribed ? 'ring-2 ring-yellow-500 ring-offset-2 ring-offset-background' : ''} ${corporateSubscription ? 'ring-2 ring-blue-500 ring-offset-2 ring-offset-background' : ''}`}>
                       <AvatarImage src={avatarUrl || undefined} alt="Profile" />
                       <AvatarFallback>{getUserInitials()}</AvatarFallback>
                     </Avatar>
+                    {/* Premium Badge */}
                     {subscriptionInfo?.subscribed && (
                       <div className="absolute -top-1 -right-1 h-4 w-4 rounded-full bg-yellow-500 flex items-center justify-center">
                         <Crown className="h-2.5 w-2.5 text-white" />
+                      </div>
+                    )}
+                    {/* Corporate Admin Badge */}
+                    {corporateSubscription && (
+                      <div className={`absolute ${subscriptionInfo?.subscribed ? '-bottom-1' : '-top-1'} -right-1 h-4 w-4 rounded-full bg-blue-500 flex items-center justify-center`}>
+                        <Building2 className="h-2.5 w-2.5 text-white" />
                       </div>
                     )}
                   </Button>
@@ -431,8 +468,38 @@ export const Navigation = () => {
                       <DropdownMenuSeparator />
                     </>
                   )}
+
+                  {/* Corporate Admin Section */}
+                  {corporateSubscription && (
+                    <>
+                      <DropdownMenuLabel className="font-normal">
+                        <div className="flex items-center gap-2">
+                          <Building2 className="h-4 w-4 text-blue-500" />
+                          <div className="flex flex-col space-y-1 flex-1">
+                            <div className="flex items-center gap-2">
+                              <p className="text-sm font-medium leading-none">
+                                Corporate Admin
+                              </p>
+                              <Badge variant="outline" className="text-[10px] bg-gradient-to-r from-blue-500/20 to-blue-600/20 text-blue-600 dark:text-blue-400 border-blue-500/30 px-1.5 py-0">
+                                {getCorporatePlanName(corporateSubscription.plan_type)}
+                              </Badge>
+                            </div>
+                          </div>
+                        </div>
+                      </DropdownMenuLabel>
+                      <DropdownMenuItem 
+                        onSelect={() => {
+                          handleProfileNavigate("/corporate-admin");
+                        }}
+                      >
+                        <Users className="mr-2 h-4 w-4" />
+                        <span>Manage Team</span>
+                      </DropdownMenuItem>
+                      <DropdownMenuSeparator />
+                    </>
+                  )}
                   
-                  <DropdownMenuItem 
+                  <DropdownMenuItem
                     onSelect={() => {
                       handleProfileNavigate("/userdashboard");
                     }}

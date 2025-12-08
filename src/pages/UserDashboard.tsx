@@ -37,7 +37,9 @@ import {
   Sparkles,
   Quote,
   User as UserIcon,
-  Scale
+  Scale,
+  Building2,
+  Users
 } from "lucide-react";
 import { LogBookFilters } from "@/components/logbook/LogBookFilters";
 import { LogBookCalendar } from "@/components/logbook/LogBookCalendar";
@@ -115,6 +117,16 @@ interface SubscriptionInfo {
   subscription_end: string | null;
 }
 
+interface CorporateSubscriptionInfo {
+  id: string;
+  plan_type: string;
+  current_users_count: number;
+  max_users: number;
+  organization_name: string;
+  current_period_end: string;
+  status: string;
+}
+
 interface StripeSubscription {
   current_period_start: number;
   current_period_end: number;
@@ -137,6 +149,7 @@ export default function UserDashboard() {
   const { userTier } = useAccessControl();
   const isPremium = userTier === "premium";
   const [stripeDetails, setStripeDetails] = useState<StripeSubscription | null>(null);
+  const [corporateSubscription, setCorporateSubscription] = useState<CorporateSubscriptionInfo | null>(null);
   const [favoriteExercises, setFavoriteExercises] = useState<FavoriteExercise[]>([]);
   const [oneRMHistory, setOneRMHistory] = useState<OneRMRecord[]>([]);
   const [bmrHistory, setBMRHistory] = useState<BMRRecord[]>([]);
@@ -239,7 +252,8 @@ export default function UserDashboard() {
       // Fetch all data in parallel with individual error handling
       await Promise.allSettled([
         fetchAllData(session.user.id),
-        checkSubscription(session.user.id)
+        checkSubscription(session.user.id),
+        fetchCorporateSubscription(session.user.id)
       ]);
       
     } catch (error) {
@@ -303,6 +317,51 @@ export default function UserDashboard() {
   const fetchFavoriteExercises = async (userId: string) => {
     // Favorite exercises feature removed
     setFavoriteExercises([]);
+  };
+
+  const fetchCorporateSubscription = async (userId: string) => {
+    try {
+      const { data, error } = await supabase
+        .from('corporate_subscriptions')
+        .select('id, plan_type, current_users_count, max_users, organization_name, current_period_end, status')
+        .eq('admin_user_id', userId)
+        .eq('status', 'active')
+        .maybeSingle();
+
+      if (error) {
+        if (import.meta.env.DEV) {
+          console.error("Error fetching corporate subscription:", error);
+        }
+        return;
+      }
+
+      if (data) {
+        setCorporateSubscription(data);
+      }
+    } catch (error) {
+      if (import.meta.env.DEV) {
+        console.error("Error fetching corporate subscription:", error);
+      }
+    }
+  };
+
+  const getCorporatePlanDisplayName = (planType: string) => {
+    const names: Record<string, string> = {
+      'dynamic': 'Dynamic',
+      'power': 'Power',
+      'elite': 'Elite',
+      'enterprise': 'Enterprise'
+    };
+    return names[planType.toLowerCase()] || planType;
+  };
+
+  const getCorporateDaysRemaining = () => {
+    if (!corporateSubscription?.current_period_end) return null;
+    const endDate = new Date(corporateSubscription.current_period_end);
+    const today = new Date();
+    const diffTime = endDate.getTime() - today.getTime();
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+    return diffDays;
   };
 
   const fetchCalculatorHistory = async (userId: string) => {
@@ -863,6 +922,122 @@ export default function UserDashboard() {
                   </div>
                 </div>
               )}
+            </CardContent>
+          </Card>
+        )}
+
+        {/* Corporate Admin Subscription Card */}
+        {corporateSubscription && (
+          <Card className="mb-6 border-blue-500/50 bg-gradient-to-r from-blue-500/5 to-blue-500/10">
+            <CardContent className="p-4">
+              <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
+                {/* LEFT COLUMN - Corporate Admin Info */}
+                <div className="col-span-1 md:col-span-2 space-y-3">
+                  <h2 className="flex items-center gap-2 text-lg font-bold">
+                    <Building2 className="h-5 w-5 text-blue-500" />
+                    Corporate Administrator
+                  </h2>
+                  
+                  {/* Plan Status */}
+                  <div className="space-y-1">
+                    <h3 className="text-sm font-semibold">{corporateSubscription.organization_name}</h3>
+                    <div className="flex flex-wrap gap-1.5">
+                      <Badge variant="outline" className="text-xs h-5 px-1.5 bg-gradient-to-r from-blue-500/20 to-blue-600/20 text-blue-600 dark:text-blue-400 border-blue-500/30">
+                        <Building2 className="h-3 w-3 mr-1" />
+                        {getCorporatePlanDisplayName(corporateSubscription.plan_type)} Plan
+                      </Badge>
+                      <Badge variant="outline" className="text-xs h-5 px-1.5 bg-green-500/10 text-green-600 dark:text-green-400 border-green-500/20">
+                        Active
+                      </Badge>
+                    </div>
+                  </div>
+
+                  {/* Corporate Subscription Details */}
+                  <div className="space-y-1 text-sm">
+                    <div className="flex justify-between">
+                      <span className="text-muted-foreground">Team Members:</span>
+                      <span className="font-medium">{corporateSubscription.current_users_count} / {corporateSubscription.max_users}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-muted-foreground">Expires:</span>
+                      <span className="font-medium">{formatDate(corporateSubscription.current_period_end)}</span>
+                    </div>
+                    {getCorporateDaysRemaining() !== null && (
+                      <div className="flex justify-between">
+                        <span className="text-muted-foreground">Days Left:</span>
+                        <span className="font-medium text-blue-500">{getCorporateDaysRemaining()} days</span>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Action Buttons */}
+                  <div className="flex gap-2 pt-1">
+                    <Button
+                      onClick={() => navigate("/corporate-admin")}
+                      className="h-7 px-2 text-xs bg-blue-500 hover:bg-blue-600"
+                    >
+                      <Users className="h-3 w-3 mr-1" />
+                      Manage Team
+                    </Button>
+                  </div>
+                </div>
+
+                {/* RIGHT COLUMN - Team Access Info */}
+                <div className="col-span-1 md:col-span-3 bg-gradient-to-br from-blue-500/5 to-blue-500/10 rounded-lg p-3 border border-blue-500/20">
+                  <h4 className="text-xs font-semibold uppercase text-muted-foreground mb-2 tracking-wide">
+                    Team Benefits
+                  </h4>
+                  <div className="grid grid-cols-2 lg:grid-cols-3 gap-2">
+                    <div className="bg-white/50 dark:bg-gray-800/50 rounded-md p-2 border border-blue-500/10 hover:border-blue-500/30 transition-colors">
+                      <div className="flex flex-col items-center text-center gap-1">
+                        <Users className="h-5 w-5 text-blue-500" />
+                        <span className="text-xs font-semibold">{corporateSubscription.max_users}</span>
+                        <span className="text-xs font-medium">Team Slots</span>
+                      </div>
+                    </div>
+                    
+                    <div className="bg-white/50 dark:bg-gray-800/50 rounded-md p-2 border border-blue-500/10 hover:border-blue-500/30 transition-colors">
+                      <div className="flex flex-col items-center text-center gap-1">
+                        <Crown className="h-5 w-5 text-blue-500" />
+                        <span className="text-xs font-semibold">Platinum</span>
+                        <span className="text-xs font-medium">Access</span>
+                      </div>
+                    </div>
+                    
+                    <div className="bg-white/50 dark:bg-gray-800/50 rounded-md p-2 border border-blue-500/10 hover:border-blue-500/30 transition-colors">
+                      <div className="flex flex-col items-center text-center gap-1">
+                        <Dumbbell className="h-5 w-5 text-blue-500" />
+                        <span className="text-xs font-semibold">All Content</span>
+                        <span className="text-xs font-medium">Included</span>
+                      </div>
+                    </div>
+                    
+                    <div className="bg-white/50 dark:bg-gray-800/50 rounded-md p-2 border border-blue-500/10 hover:border-blue-500/30 transition-colors">
+                      <div className="flex flex-col items-center text-center gap-1">
+                        <Building2 className="h-5 w-5 text-blue-500" />
+                        <span className="text-xs font-semibold">Central</span>
+                        <span className="text-xs font-medium">Billing</span>
+                      </div>
+                    </div>
+                    
+                    <div className="bg-white/50 dark:bg-gray-800/50 rounded-md p-2 border border-blue-500/10 hover:border-blue-500/30 transition-colors">
+                      <div className="flex flex-col items-center text-center gap-1">
+                        <ClipboardList className="h-5 w-5 text-blue-500" />
+                        <span className="text-xs font-semibold">Team</span>
+                        <span className="text-xs font-medium">Management</span>
+                      </div>
+                    </div>
+                    
+                    <div className="bg-white/50 dark:bg-gray-800/50 rounded-md p-2 border border-blue-500/10 hover:border-blue-500/30 transition-colors">
+                      <div className="flex flex-col items-center text-center gap-1">
+                        <Headphones className="h-5 w-5 text-blue-500" />
+                        <span className="text-xs font-semibold">Priority</span>
+                        <span className="text-xs font-medium">Support</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
             </CardContent>
           </Card>
         )}
