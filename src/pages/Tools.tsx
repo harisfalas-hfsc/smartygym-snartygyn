@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { PageBreadcrumbs } from "@/components/PageBreadcrumbs";
 import { InfoRibbon } from "@/components/InfoRibbon";
-import { ArrowLeft, Calculator, Activity, Flame } from "lucide-react";
+import { ArrowLeft, Calculator, Activity, Flame, Wand2 } from "lucide-react";
 import { useShowBackButton } from "@/hooks/useShowBackButton";
 import { useAccessControl } from "@/hooks/useAccessControl";
 import { SEOEnhancer } from "@/components/SEOEnhancer";
@@ -37,6 +37,13 @@ const Tools = () => {
       title: "Macro Tracking Calculator",
       description: "Get personalized nutrition and macro recommendations",
       route: "/macrocalculator"
+    },
+    {
+      id: "smarty-workout",
+      icon: Wand2,
+      title: "SmartyWorkout",
+      description: "Generate personalized workouts by goal, equipment, duration and difficulty",
+      route: "/smartyworkout"
     }
   ];
 
@@ -93,7 +100,7 @@ const Tools = () => {
                 Smarty Tools are fitness calculators designed to help you understand your body and optimize your training. 
                 All tools use scientifically validated formulas and equations.
               </p>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mt-4">
                 <div>
                   <h3 className="font-semibold text-foreground mb-2">1RM Calculator</h3>
                   <p className="text-sm">
@@ -106,10 +113,16 @@ const Tools = () => {
                     Uses the Mifflin-St Jeor equation to calculate your basal metabolic rate — the calories you burn at rest.
                   </p>
                 </div>
-                <div>
+              <div>
                   <h3 className="font-semibold text-foreground mb-2">Macro Tracking Calculator</h3>
                   <p className="text-sm">
                     Get complete nutrition recommendations including calories, macros, fiber, water, and meal frequency.
+                  </p>
+                </div>
+                <div>
+                  <h3 className="font-semibold text-foreground mb-2">SmartyWorkout Generator</h3>
+                  <p className="text-sm">
+                    AI-powered workout creator that generates custom training plans based on your preferences.
                   </p>
                 </div>
               </div>
@@ -117,7 +130,7 @@ const Tools = () => {
           </div>
         </Card>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           {tools.map((tool) => {
             const Icon = tool.icon;
             return (
