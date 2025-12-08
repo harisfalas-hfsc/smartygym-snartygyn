@@ -13,8 +13,29 @@ interface RitualCalendarButtonProps {
   ritual: {
     ritual_date: string;
     day_number: number;
+    morning_content?: string;
+    midday_content?: string;
+    evening_content?: string;
   };
 }
+
+// Convert HTML to plain text for calendar descriptions
+const htmlToPlainText = (html: string): string => {
+  if (!html) return "";
+  return html
+    .replace(/<br\s*\/?>/gi, '\n')
+    .replace(/<\/p>/gi, '\n\n')
+    .replace(/<\/li>/gi, '\n')
+    .replace(/<li[^>]*>/gi, '• ')
+    .replace(/<[^>]+>/g, '')
+    .replace(/&nbsp;/g, ' ')
+    .replace(/&amp;/g, '&')
+    .replace(/&lt;/g, '<')
+    .replace(/&gt;/g, '>')
+    .replace(/&quot;/g, '"')
+    .replace(/\n{3,}/g, '\n\n')
+    .trim();
+};
 
 export const RitualCalendarButton = ({ ritual }: RitualCalendarButtonProps) => {
   const { toast } = useToast();
@@ -48,28 +69,53 @@ export const RitualCalendarButton = ({ ritual }: RitualCalendarButtonProps) => {
     return date.toISOString().replace(/[-:]/g, '').split('.')[0] + 'Z';
   };
 
+  // Escape special characters for ICS format
+  const escapeICSText = (text: string): string => {
+    return text
+      .replace(/\\/g, '\\\\')
+      .replace(/;/g, '\\;')
+      .replace(/,/g, '\\,')
+      .replace(/\n/g, '\\n');
+  };
+
   const generateICSContent = () => {
     const times = getLocalTimes();
     const dayNum = ritual.day_number;
+
+    // Get full content descriptions
+    const morningDesc = ritual.morning_content 
+      ? htmlToPlainText(ritual.morning_content)
+      : "Joint unlock, light activation, and morning prep. Start your day strong!";
+    
+    const middayDesc = ritual.midday_content
+      ? htmlToPlainText(ritual.midday_content)
+      : "Desk reset, anti-stiffness movements, and breathing reset. Reset & Reload!";
+    
+    const eveningDesc = ritual.evening_content
+      ? htmlToPlainText(ritual.evening_content)
+      : "Decompression, stress release, and pre-bed guidance. Unwind!";
 
     const events = [
       {
         title: `☀️ Morning Ritual - Day ${dayNum}`,
         start: times.morning,
         duration: 15, // 15 minutes
-        description: "Joint unlock, light activation, and morning prep. Start your day strong!",
+        description: morningDesc + "\n\nView full ritual: https://smartygym.com/daily-ritual",
+        reminder: 10, // 10 minutes before
       },
       {
         title: `🌤️ Midday Ritual - Day ${dayNum}`,
         start: times.midday,
         duration: 10,
-        description: "Desk reset, anti-stiffness movements, and breathing reset. Reset & Reload!",
+        description: middayDesc + "\n\nView full ritual: https://smartygym.com/daily-ritual",
+        reminder: 10,
       },
       {
         title: `🌙 Evening Ritual - Day ${dayNum}`,
         start: times.evening,
         duration: 15,
-        description: "Decompression, stress release, and pre-bed guidance. Unwind!",
+        description: eveningDesc + "\n\nView full ritual: https://smartygym.com/daily-ritual",
+        reminder: 10,
       },
     ];
 
@@ -78,18 +124,26 @@ VERSION:2.0
 PRODID:-//SmartyGym//Daily Ritual//EN
 CALSCALE:GREGORIAN
 METHOD:PUBLISH
+X-WR-CALNAME:SmartyGym Daily Ritual
 `;
 
     events.forEach((event, index) => {
       const endTime = new Date(event.start.getTime() + event.duration * 60000);
+      const alarmTime = event.reminder;
+      
       icsContent += `BEGIN:VEVENT
 UID:ritual-${ritual.ritual_date}-${index}@smartygym.com
 DTSTAMP:${formatICSDate(new Date())}
 DTSTART:${formatICSDate(event.start)}
 DTEND:${formatICSDate(endTime)}
-SUMMARY:${event.title}
-DESCRIPTION:${event.description}\\n\\nView full ritual: https://smartygym.com/daily-ritual
+SUMMARY:${escapeICSText(event.title)}
+DESCRIPTION:${escapeICSText(event.description)}
 URL:https://smartygym.com/daily-ritual
+BEGIN:VALARM
+TRIGGER:-PT${alarmTime}M
+ACTION:DISPLAY
+DESCRIPTION:${escapeICSText(event.title)} starts in ${alarmTime} minutes
+END:VALARM
 END:VEVENT
 `;
     });
@@ -112,7 +166,7 @@ END:VEVENT
 
     toast({
       title: "Calendar file downloaded",
-      description: "Open the file to add events to your calendar",
+      description: "Open the file to add all 3 ritual events with reminders to your calendar",
     });
     setIsOpen(false);
   };
@@ -121,20 +175,25 @@ END:VEVENT
     const times = getLocalTimes();
     const dayNum = ritual.day_number;
 
-    // Create Google Calendar URL for morning event
+    // Get morning content description
+    const morningDesc = ritual.morning_content 
+      ? htmlToPlainText(ritual.morning_content).substring(0, 500)
+      : "Joint unlock, light activation, and morning prep. Start your day strong!";
+
+    // Create Google Calendar URL for morning event (primary)
     const morningUrl = new URL('https://calendar.google.com/calendar/render');
     morningUrl.searchParams.set('action', 'TEMPLATE');
     morningUrl.searchParams.set('text', `☀️ Morning Ritual - Day ${dayNum}`);
     morningUrl.searchParams.set('dates', 
       `${formatICSDate(times.morning).replace('Z', '')}/${formatICSDate(new Date(times.morning.getTime() + 15 * 60000)).replace('Z', '')}`
     );
-    morningUrl.searchParams.set('details', 'Joint unlock, light activation, and morning prep. Start your day strong!\\n\\nView full ritual: https://smartygym.com/daily-ritual');
+    morningUrl.searchParams.set('details', morningDesc + '\n\nView full ritual: https://smartygym.com/daily-ritual\n\nNote: Download the .ics file to add all 3 phases at once.');
     
     window.open(morningUrl.toString(), '_blank');
 
     toast({
       title: "Opening Google Calendar",
-      description: "Add all 3 ritual events one by one",
+      description: "For all 3 events, use 'Download Calendar File' option instead",
     });
     setIsOpen(false);
   };
