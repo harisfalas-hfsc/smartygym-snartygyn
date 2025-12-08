@@ -20,6 +20,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import { UserDetailModal } from "./UserDetailModal";
 
 interface UserData {
   user_id: string;
@@ -70,6 +71,8 @@ export function UsersManager() {
   const [actionLoading, setActionLoading] = useState(false);
   const [organizationFilter, setOrganizationFilter] = useState<string>("all");
   const [organizations, setOrganizations] = useState<string[]>([]);
+  const [selectedUser, setSelectedUser] = useState<UserData | null>(null);
+  const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
   const SUPER_ADMIN_EMAIL = "harisfallas@gmail.com";
 
   const fetchUsers = async () => {
@@ -695,7 +698,14 @@ export function UsersManager() {
                   const isCorporateMember = !!corpInfo?.memberPlanType;
                   
                   return (
-                    <TableRow key={user.user_id}>
+                    <TableRow 
+                      key={user.user_id} 
+                      className="cursor-pointer hover:bg-muted/50"
+                      onClick={() => {
+                        setSelectedUser(user);
+                        setIsDetailModalOpen(true);
+                      }}
+                    >
                       <TableCell>
                         <div className="flex items-center gap-3">
                           <Avatar>
@@ -971,6 +981,19 @@ export function UsersManager() {
         </div>
       </CardContent>
     </Card>
+
+      {/* User Detail Modal */}
+      <UserDetailModal
+        user={selectedUser}
+        isOpen={isDetailModalOpen}
+        onClose={() => {
+          setIsDetailModalOpen(false);
+          setSelectedUser(null);
+        }}
+        corporateInfo={selectedUser ? corporateInfo[selectedUser.user_id] : undefined}
+        isAdmin={selectedUser ? userRoles[selectedUser.user_id]?.includes('admin') : false}
+        onRefresh={fetchUsers}
+      />
     </div>
   );
 }
