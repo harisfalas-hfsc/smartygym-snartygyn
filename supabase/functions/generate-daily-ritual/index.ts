@@ -196,6 +196,7 @@ MORNING RITUAL:
 3. 🔑 Light Activation (3 exercises)
 4. 💡 Smarty Tip (nutrition/hydration for morning)
 5. 🏃 WOD Note (if training morning, add prep suggestion with link)
+6. ✅ Check-in Note: Add this styled paragraph at the end - "Don't forget to complete your <a href="https://smartygym.com/userdashboard?tab=checkins" style="color: #d4af37; font-weight: bold;">Morning Check-in</a> to track your progress and build your streak!"
 
 MIDDAY RITUAL:
 1. 🪑 Desk/Midday Reset (3-4 movements)
@@ -210,6 +211,7 @@ EVENING RITUAL:
 3. 🌿 Pre-Bed Guidance (sleep hygiene tip)
 4. 💡 Smarty Tip (dinner/recovery/gratitude)
 5. 🏃 WOD Note (if training evening, keep intensity moderate with link)
+6. ✅ Check-in Note: Add this styled paragraph at the end - "Don't forget to complete your <a href="https://smartygym.com/userdashboard?tab=checkins" style="color: #d4af37; font-weight: bold;">Night Check-in</a> before bed to reflect on your day!"
 
 Return ONLY valid JSON with this exact structure:
 {
