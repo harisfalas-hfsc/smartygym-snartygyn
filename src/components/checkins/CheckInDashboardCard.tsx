@@ -18,7 +18,7 @@ import { useCheckInWindow } from '@/hooks/useCheckInWindow';
 interface CheckInDashboardCardProps {
   todayCheckin: CheckinRecord | null;
   stats: CheckinStats | null;
-  onOpenCheckins: () => void;
+  onOpenCheckins?: () => void;
   onOpenMorning?: () => void;
   onOpenNight?: () => void;
 }

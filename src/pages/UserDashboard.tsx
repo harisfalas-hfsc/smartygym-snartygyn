@@ -7,6 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { useToast } from "@/hooks/use-toast";
 import { usePurchases } from "@/hooks/usePurchases";
 import { UserMessagesPanel } from "@/components/UserMessagesPanel";
@@ -39,13 +40,22 @@ import {
   User as UserIcon,
   Scale,
   Building2,
-  Users
+  Users,
+  ClipboardCheck
 } from "lucide-react";
 import { LogBookFilters } from "@/components/logbook/LogBookFilters";
 import { LogBookCalendar } from "@/components/logbook/LogBookCalendar";
 import { LogBookAdvancedCharts } from "@/components/logbook/LogBookAdvancedCharts";
 import { LogBookAdvancedExport } from "@/components/logbook/LogBookAdvancedExport";
 import { MeasurementDialog } from "@/components/logbook/MeasurementDialog";
+import { CheckInModalManager, useCheckInBanner } from "@/components/checkins/CheckInModalManager";
+import { CheckInBanner } from "@/components/checkins/CheckInBanner";
+import { CheckInDashboardCard } from "@/components/checkins/CheckInDashboardCard";
+import { SmartyCheckinsTab } from "@/components/checkins/SmartyCheckinsTab";
+import { MorningCheckInForm } from "@/components/checkins/MorningCheckInForm";
+import { NightCheckInForm } from "@/components/checkins/NightCheckInForm";
+import { useCheckins } from "@/hooks/useCheckins";
+import { useCheckInWindow } from "@/hooks/useCheckInWindow";
 
 interface WorkoutInteraction {
   id: string;
@@ -156,6 +166,13 @@ export default function UserDashboard() {
   const [calorieHistory, setCalorieHistory] = useState<CalorieRecord[]>([]);
   const [measurementHistory, setMeasurementHistory] = useState<any[]>([]);
   const [isMeasurementDialogOpen, setIsMeasurementDialogOpen] = useState(false);
+  const [showMorningForm, setShowMorningForm] = useState(false);
+  const [showNightForm, setShowNightForm] = useState(false);
+  
+  // Check-in hooks
+  const { bannerState, handleBannerStateChange } = useCheckInBanner();
+  const { todayCheckin, stats, submitMorningCheckin, submitNightCheckin, fetchTodayCheckin } = useCheckins();
+  const { isMorningWindow, isNightWindow, morningWindowEnd, nightWindowEnd } = useCheckInWindow();
   
   // Get tab from URL or default to "overview"
   const tabParam = searchParams.get('tab');
@@ -672,6 +689,26 @@ export default function UserDashboard() {
   return (
     <div className="min-h-screen bg-background">
       <main className="container mx-auto max-w-7xl p-4 py-8">
+        {/* Check-in Modal Manager - shows pop-up during time windows */}
+        {isPremium && (
+          <CheckInModalManager onBannerStateChange={handleBannerStateChange} />
+        )}
+        
+        {/* Check-in Banner - shows when user clicked "Later" on modal */}
+        {isPremium && bannerState.show && bannerState.type && (
+          <div className="mb-4">
+            <CheckInBanner 
+              type={bannerState.type} 
+              windowEnd={bannerState.type === 'morning' ? morningWindowEnd : nightWindowEnd}
+              currentStreak={stats?.currentStreak}
+              onCheckIn={() => {
+                if (bannerState.type === 'morning') setShowMorningForm(true);
+                else setShowNightForm(true);
+              }} 
+            />
+          </div>
+        )}
+
         <Button
           variant="ghost"
           size="sm"
@@ -1936,10 +1973,30 @@ export default function UserDashboard() {
             </div>
                 </div>
 
-                {/* Calculator History */}
+                {/* Check-Ins & Measurements */}
                 <div>
-                  <h3 className="text-lg font-semibold mb-2">Calculator History</h3>
-                  <div className="grid gap-2 md:grid-cols-4 mb-3">
+                  <h3 className="text-lg font-semibold mb-2 flex items-center gap-2">
+                    <ClipboardCheck className="h-5 w-5 text-primary" />
+                    Check-Ins & Measurements
+                  </h3>
+                  <div className="grid gap-2 md:grid-cols-5 mb-3">
+                    {/* Smarty Check-ins Card */}
+                    <Card className="border-primary/20">
+                      <CardHeader className="pb-0 pt-3">
+                        <CardTitle className="text-sm font-medium flex items-center gap-2">
+                          <ClipboardCheck className="h-4 w-4 text-primary" />
+                          Smarty Check-ins
+                        </CardTitle>
+                      </CardHeader>
+                      <CardContent className="py-2 px-3">
+                        <CheckInDashboardCard
+                          todayCheckin={todayCheckin}
+                          stats={stats}
+                          onOpenMorning={() => setShowMorningForm(true)}
+                          onOpenNight={() => setShowNightForm(true)}
+                        />
+                      </CardContent>
+                    </Card>
                     {/* 1RM Calculator */}
                     <Card>
                       <CardHeader className="pb-0 pt-3">
@@ -2113,6 +2170,22 @@ export default function UserDashboard() {
                   </div>
                 </div>
 
+                {/* Full Smarty Check-ins Section */}
+                {isPremium && (
+                  <div className="mt-6">
+                    <Card>
+                      <CardHeader>
+                        <CardTitle className="flex items-center gap-2">
+                          <ClipboardCheck className="h-5 w-5 text-primary" />
+                          Smarty Check-ins
+                        </CardTitle>
+                      </CardHeader>
+                      <CardContent>
+                        <SmartyCheckinsTab />
+                      </CardContent>
+                    </Card>
+                  </div>
+                )}
                 
                 {/* Calendar - Always shows ALL activity */}
                 <div id="logbook-calendar">
@@ -2124,7 +2197,7 @@ export default function UserDashboard() {
                 
                 <div id="logbook-charts">
                   <LogBookAdvancedCharts 
-                    userId={user!.id} 
+                    userId={user!.id}
                     primaryFilter={logBookFilter}
                     onPrimaryFilterChange={(filter) => setLogBookFilter(filter as any)}
                     secondaryFilter={logBookSecondaryFilter}
@@ -2157,6 +2230,42 @@ export default function UserDashboard() {
         onClose={() => setIsMeasurementDialogOpen(false)}
         userId={user?.id || ''}
       />
+
+      {/* Morning Check-in Form Dialog */}
+      <Dialog open={showMorningForm} onOpenChange={setShowMorningForm}>
+        <DialogContent className="max-w-md max-h-[90vh] overflow-y-auto">
+          <MorningCheckInForm
+            onSubmit={async (data) => {
+              const success = await submitMorningCheckin(data);
+              if (success) {
+                setShowMorningForm(false);
+                fetchTodayCheckin();
+              }
+              return success;
+            }}
+            isWindowOpen={isMorningWindow}
+            windowEnd={morningWindowEnd}
+          />
+        </DialogContent>
+      </Dialog>
+
+      {/* Night Check-in Form Dialog */}
+      <Dialog open={showNightForm} onOpenChange={setShowNightForm}>
+        <DialogContent className="max-w-md max-h-[90vh] overflow-y-auto">
+          <NightCheckInForm
+            onSubmit={async (data) => {
+              const success = await submitNightCheckin(data);
+              if (success) {
+                setShowNightForm(false);
+                fetchTodayCheckin();
+              }
+              return success;
+            }}
+            isWindowOpen={isNightWindow}
+            windowEnd={nightWindowEnd}
+          />
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
