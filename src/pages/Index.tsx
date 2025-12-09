@@ -1159,6 +1159,45 @@ const Index = () => {
                     </AccordionContent>
                   </AccordionItem>
 
+                  <AccordionItem value="item-7a">
+                    <AccordionTrigger className="text-left">What is Smarty Ritual?</AccordionTrigger>
+                    <AccordionContent className="py-2 leading-relaxed">
+                      <strong>Smarty Ritual</strong> is your all-day game plan for movement, recovery, and performance. 
+                      Each day, Premium members receive a fresh ritual with three expertly designed phases:<br/><br/>
+                      
+                      <strong>🌅 Morning Ritual (~8:00 AM):</strong> Wake up your body with joint unlock movements, light activation exercises, 
+                      and a nutrition tip to start your day strong.<br/><br/>
+                      
+                      <strong>☀️ Midday Ritual (~1:00 PM):</strong> Reset and recharge with desk-friendly micro movements, 
+                      breathing exercises, and a quick energy boost.<br/><br/>
+                      
+                      <strong>🌙 Evening Ritual (~5:00 PM):</strong> Unwind with decompression stretches, stress release techniques, 
+                      and pre-bed guidance for quality sleep.<br/><br/>
+                      
+                      Every ritual is personally designed by <a href="/coach-profile" className="text-primary hover:underline font-medium">Haris Falas</a> and delivered fresh each morning at 7:00 AM. You can even add the ritual phases to your calendar with one click. 
+                      Smarty Ritual is exclusively available for <a href="/joinpremium" className="text-primary hover:underline font-medium">Premium members</a>.
+                    </AccordionContent>
+                  </AccordionItem>
+
+                  <AccordionItem value="item-7b">
+                    <AccordionTrigger className="text-left">What is Smarty Check-ins?</AccordionTrigger>
+                    <AccordionContent className="py-2 leading-relaxed">
+                      <strong>Smarty Check-ins</strong> is a daily self-assessment feature that helps you track your overall wellness and stay accountable to your fitness journey.<br/><br/>
+                      
+                      <strong>🌅 Morning Check-in (6:00 AM - 9:00 AM):</strong> Rate your sleep quality, energy levels, motivation, 
+                      and readiness to train — setting the tone for your day.<br/><br/>
+                      
+                      <strong>🌙 Night Check-in (6:00 PM - 9:00 PM):</strong> Reflect on your nutrition, hydration, activity level, 
+                      stress, and overall day before winding down.<br/><br/>
+                      
+                      Each check-in generates a <strong>Daily Smarty Score</strong> (0-100) that tracks your progress over time. 
+                      Build streaks, earn badges, view your history in graphs, and export your data for deeper analysis. 
+                      Your scores also appear on the LogBook calendar with color-coded indicators so you can spot patterns at a glance.<br/><br/>
+                      
+                      Smarty Check-ins is available in your <a href="/userdashboard?tab=checkins" className="text-primary hover:underline font-medium">Dashboard</a> and helps you understand the connection between your daily habits and your fitness results.
+                    </AccordionContent>
+                  </AccordionItem>
+
                   <AccordionItem value="item-8">
                     <AccordionTrigger className="text-left">Is there a free trial?</AccordionTrigger>
                     <AccordionContent className="py-2 leading-relaxed">
