@@ -38,11 +38,10 @@ const Index = () => {
   // Carousel state for mobile navigation dots
   const [carouselApi, setCarouselApi] = useState<CarouselApi>();
   const [currentSlide, setCurrentSlide] = useState(0);
-  
+
   // Auto-cycling state for tablet hero cards
   const [highlightedCardIndex, setHighlightedCardIndex] = useState(0);
   const [isHoveringTablet, setIsHoveringTablet] = useState(false);
-  
   useEffect(() => {
     if (!carouselApi) return;
     const onSelect = () => {
@@ -54,15 +53,14 @@ const Index = () => {
       carouselApi.off("select", onSelect);
     };
   }, [carouselApi]);
-  
+
   // Auto-cycle through tablet hero cards every 2.5 seconds
   useEffect(() => {
     if (isHoveringTablet) return; // Pause when hovering
-    
+
     const interval = setInterval(() => {
-      setHighlightedCardIndex((prev) => (prev + 1) % 6);
+      setHighlightedCardIndex(prev => (prev + 1) % 6);
     }, 2500);
-    
     return () => clearInterval(interval);
   }, [isHoveringTablet]);
   const heroCards = [{
@@ -576,46 +574,26 @@ const Index = () => {
                     {/* LEFT: Mobile Phone Illustration */}
                     <div className="order-1 lg:order-1 flex justify-center lg:justify-start items-stretch">
                       <div className="flex items-center h-full">
-            <MobilePhoneIllustration variant="tablet" className="h-full max-h-[480px] w-auto">
+            <MobilePhoneIllustration variant="tablet" className="h-full max-h-[480px] w-auto my-0 mx-0 px-0 pr-[55px]">
               {/* 3 rows × 2 columns grid of "Get Started" cards */}
-              <div 
-                className="grid grid-rows-3 grid-cols-2 gap-1.5 sm:gap-2 h-full w-full p-1.5 sm:p-2"
-                onMouseLeave={() => setIsHoveringTablet(false)}
-              >
+              <div className="grid grid-rows-3 grid-cols-2 gap-1.5 sm:gap-2 h-full w-full p-1.5 sm:p-2" onMouseLeave={() => setIsHoveringTablet(false)}>
                 {heroCards.map((card, index) => {
-                  const Icon = card.icon;
-                  const isHighlighted = isHoveringTablet ? false : highlightedCardIndex === index;
-                  return (
-                    <Card 
-                      key={card.id} 
-                      className={cn(
-                        "border-2 transition-all duration-300 cursor-pointer group flex items-center justify-center",
-                        isHighlighted 
-                          ? "border-primary shadow-lg scale-105 bg-primary/5" 
-                          : "border-primary/30 hover:border-primary hover:shadow-lg hover:scale-105 hover:bg-primary/5"
-                      )}
-                      onClick={() => navigate(card.route)}
-                      onMouseEnter={() => {
-                        setIsHoveringTablet(true);
-                        setHighlightedCardIndex(index);
-                      }}
-                    >
+                              const Icon = card.icon;
+                              const isHighlighted = isHoveringTablet ? false : highlightedCardIndex === index;
+                              return <Card key={card.id} className={cn("border-2 transition-all duration-300 cursor-pointer group flex items-center justify-center", isHighlighted ? "border-primary shadow-lg scale-105 bg-primary/5" : "border-primary/30 hover:border-primary hover:shadow-lg hover:scale-105 hover:bg-primary/5")} onClick={() => navigate(card.route)} onMouseEnter={() => {
+                                setIsHoveringTablet(true);
+                                setHighlightedCardIndex(index);
+                              }}>
                       <div className="flex flex-col items-center justify-center gap-1 p-2">
-                        <div className={cn(
-                          "inline-flex items-center justify-center w-10 h-10 sm:w-12 sm:h-12 rounded-full transition-all duration-300",
-                          isHighlighted 
-                            ? "bg-primary/30 scale-110" 
-                            : "bg-primary/10 group-hover:bg-primary/30 group-hover:scale-110"
-                        )}>
+                        <div className={cn("inline-flex items-center justify-center w-10 h-10 sm:w-12 sm:h-12 rounded-full transition-all duration-300", isHighlighted ? "bg-primary/30 scale-110" : "bg-primary/10 group-hover:bg-primary/30 group-hover:scale-110")}>
                           <Icon className="w-5 h-5 sm:w-6 sm:h-6 text-primary" />
                         </div>
                         <h3 className="text-xs font-bold text-center leading-tight">
                           {card.title}
                         </h3>
                       </div>
-                    </Card>
-                  );
-                })}
+                    </Card>;
+                            })}
               </div>
             </MobilePhoneIllustration>
                       </div>
@@ -1114,7 +1092,7 @@ const Index = () => {
                     <AccordionContent className="py-2 leading-relaxed">
                       A <strong>workout</strong> is a standalone training session designed for a specific goal — whether that's calorie burning, 
                       strength building, cardio conditioning, mobility work, or power development. It's perfect when you want a single, 
-                      focused session or when you're mixing and matching your own training plan.<br/><br/>
+                      focused session or when you're mixing and matching your own training plan.<br /><br />
                       
                       A <strong>training program</strong> is a complete, structured plan that spans multiple weeks (e.g., 4, 6, or 12 weeks). 
                       It includes progressive training phases, periodization, recovery strategies, and a clear roadmap toward a specific goal 
@@ -1163,16 +1141,16 @@ const Index = () => {
                     <AccordionTrigger className="text-left">What is Smarty Ritual?</AccordionTrigger>
                     <AccordionContent className="py-2 leading-relaxed">
                       <strong>Smarty Ritual</strong> is your all-day game plan for movement, recovery, and performance. 
-                      Each day, Premium members receive a fresh ritual with three expertly designed phases:<br/><br/>
+                      Each day, Premium members receive a fresh ritual with three expertly designed phases:<br /><br />
                       
                       <strong>🌅 Morning Ritual (~8:00 AM):</strong> Wake up your body with joint unlock movements, light activation exercises, 
-                      and a nutrition tip to start your day strong.<br/><br/>
+                      and a nutrition tip to start your day strong.<br /><br />
                       
                       <strong>☀️ Midday Ritual (~1:00 PM):</strong> Reset and recharge with desk-friendly micro movements, 
-                      breathing exercises, and a quick energy boost.<br/><br/>
+                      breathing exercises, and a quick energy boost.<br /><br />
                       
                       <strong>🌙 Evening Ritual (~5:00 PM):</strong> Unwind with decompression stretches, stress release techniques, 
-                      and pre-bed guidance for quality sleep.<br/><br/>
+                      and pre-bed guidance for quality sleep.<br /><br />
                       
                       Every ritual is personally designed by <a href="/coach-profile" className="text-primary hover:underline font-medium">Haris Falas</a> and delivered fresh each morning at 7:00 AM. You can even add the ritual phases to your calendar with one click. 
                       Smarty Ritual is exclusively available for <a href="/joinpremium" className="text-primary hover:underline font-medium">Premium members</a>.
@@ -1182,17 +1160,17 @@ const Index = () => {
                   <AccordionItem value="item-7b">
                     <AccordionTrigger className="text-left">What is Smarty Check-ins?</AccordionTrigger>
                     <AccordionContent className="py-2 leading-relaxed">
-                      <strong>Smarty Check-ins</strong> is a daily self-assessment feature that helps you track your overall wellness and stay accountable to your fitness journey.<br/><br/>
+                      <strong>Smarty Check-ins</strong> is a daily self-assessment feature that helps you track your overall wellness and stay accountable to your fitness journey.<br /><br />
                       
                       <strong>🌅 Morning Check-in (6:00 AM - 9:00 AM):</strong> Rate your sleep quality, energy levels, motivation, 
-                      and readiness to train — setting the tone for your day.<br/><br/>
+                      and readiness to train — setting the tone for your day.<br /><br />
                       
                       <strong>🌙 Night Check-in (6:00 PM - 9:00 PM):</strong> Reflect on your nutrition, hydration, activity level, 
-                      stress, and overall day before winding down.<br/><br/>
+                      stress, and overall day before winding down.<br /><br />
                       
                       Each check-in generates a <strong>Daily Smarty Score</strong> (0-100) that tracks your progress over time. 
                       Build streaks, earn badges, view your history in graphs, and export your data for deeper analysis. 
-                      Your scores also appear on the LogBook calendar with color-coded indicators so you can spot patterns at a glance.<br/><br/>
+                      Your scores also appear on the LogBook calendar with color-coded indicators so you can spot patterns at a glance.<br /><br />
                       
                       Smarty Check-ins is available in your <a href="/userdashboard?tab=checkins" className="text-primary hover:underline font-medium">Dashboard</a> and helps you understand the connection between your daily habits and your fitness results.
                     </AccordionContent>
@@ -1213,14 +1191,14 @@ const Index = () => {
                     <AccordionTrigger className="text-left">What is a standalone purchase?</AccordionTrigger>
                     <AccordionContent className="py-2 leading-relaxed">
                       A <strong>standalone purchase</strong> allows you to buy individual premium workouts or training programs without committing to a subscription. 
-                      This is perfect for trying our training methodology and coaching style before deciding to upgrade.<br/><br/>
+                      This is perfect for trying our training methodology and coaching style before deciding to upgrade.<br /><br />
                       
-                      <strong>How to purchase:</strong><br/>
-                      1. <strong>Create a free account</strong> — sign up to access the platform.<br/>
-                      2. <strong>Browse</strong> our workouts or training programs.<br/>
-                      3. <strong>Click "Buy Now"</strong> on any standalone-enabled content (marked with a price).<br/>
-                      4. <strong>Complete payment</strong> securely via Stripe.<br/>
-                      5. <strong>Access immediately</strong> — your purchased content is unlocked right away.<br/><br/>
+                      <strong>How to purchase:</strong><br />
+                      1. <strong>Create a free account</strong> — sign up to access the platform.<br />
+                      2. <strong>Browse</strong> our workouts or training programs.<br />
+                      3. <strong>Click "Buy Now"</strong> on any standalone-enabled content (marked with a price).<br />
+                      4. <strong>Complete payment</strong> securely via Stripe.<br />
+                      5. <strong>Access immediately</strong> — your purchased content is unlocked right away.<br /><br />
                       
                       <strong>What you get:</strong> Full dashboard access for your purchased content, including logbook tracking, 
                       the ability to rate and review, mark as complete, add to favorites, and access to all our calculator tools. 
@@ -1231,11 +1209,11 @@ const Index = () => {
                   <AccordionItem value="item-9">
                     <AccordionTrigger className="text-left">How do I get started?</AccordionTrigger>
                     <AccordionContent className="py-2 leading-relaxed">
-                      Getting started is simple:<br/>
-                      1. <strong>Browse</strong> our free workouts and tools to get a feel for the platform.<br/>
-                      2. <strong>Sign up</strong> for a free account to save your progress and track your training.<br/>
-                      3. <strong>Upgrade</strong> to a premium plan if you want full access to all workouts, training programs, and exclusive content.<br/>
-                      4. <strong>Start training</strong> — pick a workout or program and get moving!<br/><br/>
+                      Getting started is simple:<br />
+                      1. <strong>Browse</strong> our free workouts and tools to get a feel for the platform.<br />
+                      2. <strong>Sign up</strong> for a free account to save your progress and track your training.<br />
+                      3. <strong>Upgrade</strong> to a premium plan if you want full access to all workouts, training programs, and exclusive content.<br />
+                      4. <strong>Start training</strong> — pick a workout or program and get moving!<br /><br />
                       
                       If you need guidance, check out our <a href="/taketour" className="text-primary hover:underline font-medium">Take a Tour</a> page 
                       or <a href="/contact" className="text-primary hover:underline font-medium">contact us</a> directly.
