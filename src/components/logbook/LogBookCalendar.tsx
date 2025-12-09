@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { useActivitiesByDate } from "@/hooks/useActivityLog";
+import { useCheckinScoresByDate } from "@/hooks/useCheckinScoresByDate";
 import { DailyActivityModal } from "./DailyActivityModal";
 
 interface LogBookCalendarProps {
@@ -16,6 +17,7 @@ export const LogBookCalendar = ({ userId, filter }: LogBookCalendarProps) => {
   const [currentDate, setCurrentDate] = useState(new Date());
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
   const { activitiesByDate, isLoading } = useActivitiesByDate(userId, filter);
+  const { scoresByDate } = useCheckinScoresByDate(userId);
 
   const getDaysInMonth = (date: Date) => {
     const year = date.getFullYear();
@@ -46,6 +48,19 @@ export const LogBookCalendar = ({ userId, filter }: LogBookCalendarProps) => {
   const firstDay = getFirstDayOfMonth(currentDate);
   const monthName = monthNames[currentDate.getMonth()];
   const year = currentDate.getFullYear();
+
+  const getCheckinScore = (day: number) => {
+    const dateStr = `${year}-${String(currentDate.getMonth() + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+    return scoresByDate[dateStr] || null;
+  };
+
+  const getScoreColor = (score: number | null): string => {
+    if (score === null) return '';
+    if (score >= 80) return 'bg-green-500';
+    if (score >= 60) return 'bg-yellow-500';
+    if (score >= 40) return 'bg-orange-500';
+    return 'bg-red-500';
+  };
 
   const getActivityBadges = (day: number) => {
     const dateStr = `${year}-${String(currentDate.getMonth() + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
@@ -206,7 +221,8 @@ export const LogBookCalendar = ({ userId, filter }: LogBookCalendarProps) => {
             {[...Array(daysInMonth)].map((_, i) => {
               const day = i + 1;
               const badges = getActivityBadges(day);
-              const hasActivity = badges.length > 0;
+              const checkinData = getCheckinScore(day);
+              const hasActivity = badges.length > 0 || checkinData !== null;
               const dateStr = `${year}-${String(currentDate.getMonth() + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
             const today = new Date();
             const todayStr = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
@@ -223,6 +239,20 @@ export const LogBookCalendar = ({ userId, filter }: LogBookCalendarProps) => {
                   `}
                 >
                   <div className="text-sm font-medium mb-1">{day}</div>
+                  
+                  {/* Check-in Score Indicator */}
+                  {checkinData && checkinData.score !== null && (
+                    <div className="flex justify-center mb-1">
+                      <div 
+                        className={`text-[10px] font-bold text-white px-1.5 py-0.5 rounded ${getScoreColor(checkinData.score)}`}
+                        title={`Smarty Score: ${checkinData.score}`}
+                      >
+                        {checkinData.score}
+                      </div>
+                    </div>
+                  )}
+                  
+                  {/* Activity Badges */}
                   {badges.length > 0 && (
                     <div className="flex gap-1 justify-center flex-wrap">
                       {badges.map((badge, idx) => (
@@ -240,7 +270,33 @@ export const LogBookCalendar = ({ userId, filter }: LogBookCalendarProps) => {
 
           {/* Legend */}
           <div className="mt-6 pt-6 border-t">
-            <h3 className="text-sm font-medium mb-3">Activity Legend</h3>
+            <h3 className="text-sm font-medium mb-3">Legend</h3>
+            
+            {/* Smarty Score Legend */}
+            <div className="mb-4">
+              <p className="text-xs text-muted-foreground mb-2">Smarty Check-in Score</p>
+              <div className="flex flex-wrap gap-2 text-xs">
+                <div className="flex items-center gap-1">
+                  <div className="px-1.5 py-0.5 rounded bg-green-500 text-white text-[10px] font-bold">80+</div>
+                  <span>Excellent</span>
+                </div>
+                <div className="flex items-center gap-1">
+                  <div className="px-1.5 py-0.5 rounded bg-yellow-500 text-white text-[10px] font-bold">60+</div>
+                  <span>Good</span>
+                </div>
+                <div className="flex items-center gap-1">
+                  <div className="px-1.5 py-0.5 rounded bg-orange-500 text-white text-[10px] font-bold">40+</div>
+                  <span>Fair</span>
+                </div>
+                <div className="flex items-center gap-1">
+                  <div className="px-1.5 py-0.5 rounded bg-red-500 text-white text-[10px] font-bold">&lt;40</div>
+                  <span>Needs Work</span>
+                </div>
+              </div>
+            </div>
+            
+            {/* Activity Legend */}
+            <p className="text-xs text-muted-foreground mb-2">Activity Indicators</p>
             <div className="grid grid-cols-2 md:grid-cols-3 gap-2 text-xs">
               <div className="flex items-center gap-2">
                 <div className="w-3 h-3 rounded-full bg-gray-400" />
