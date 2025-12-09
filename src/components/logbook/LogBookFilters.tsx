@@ -1,7 +1,7 @@
 import { Button } from "@/components/ui/button";
-import { Dumbbell, Calendar, User, Calculator, Scale } from "lucide-react";
+import { Dumbbell, Calendar, User, Calculator, Scale, ClipboardCheck } from "lucide-react";
 
-type FilterType = 'all' | 'workout' | 'program' | 'tool' | 'measurement';
+type FilterType = 'all' | 'workout' | 'program' | 'tool' | 'measurement' | 'checkin';
 
 interface LogBookFiltersProps {
   activeFilter: FilterType;
@@ -15,6 +15,7 @@ export const LogBookFilters = ({ activeFilter, onFilterChange }: LogBookFiltersP
     { value: 'program' as FilterType, label: 'Programs', icon: Calendar },
     { value: 'tool' as FilterType, label: 'Tools', icon: Calculator },
     { value: 'measurement' as FilterType, label: 'Measurements', icon: Scale },
+    { value: 'checkin' as FilterType, label: 'Check-ins', icon: ClipboardCheck },
   ];
 
   return (

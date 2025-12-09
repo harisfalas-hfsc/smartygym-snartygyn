@@ -10,6 +10,7 @@ const CHART_COLORS = {
   tool: 'hsl(24, 95%, 53%)',
   measurement: 'hsl(280, 100%, 70%)',
   personal_training: 'hsl(340, 75%, 55%)',
+  checkin: 'hsl(172, 66%, 50%)',
   completed: 'hsl(142, 76%, 36%)',
   viewed: 'hsl(217, 91%, 60%)',
   favorites: 'hsl(45, 93%, 47%)',
@@ -21,6 +22,8 @@ const CHART_COLORS = {
   'weight': 'hsl(280, 100%, 70%)',
   'body_fat': 'hsl(340, 75%, 55%)',
   'measurements': 'hsl(45, 93%, 47%)',
+  'morning_checkin': 'hsl(172, 66%, 50%)',
+  'night_checkin': 'hsl(172, 66%, 40%)',
 };
 
 export const useAdvancedActivityLog = (
@@ -183,6 +186,7 @@ export const useAdvancedActivityLog = (
         dataPoint['Programs'] = counts.program || 0;
         dataPoint['Tools'] = counts.tool || 0;
         dataPoint['Measurements'] = counts.measurement || 0;
+        dataPoint['Check-ins'] = counts.checkin || 0;
       } else {
         // Count activities for this bucket
         dataPoint['Count'] = bucketActivities.length;

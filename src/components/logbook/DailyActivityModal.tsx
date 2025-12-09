@@ -1,7 +1,7 @@
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Dumbbell, Calendar, User, Calculator, Scale } from "lucide-react";
+import { Dumbbell, Calendar, User, Calculator, Scale, ClipboardCheck } from "lucide-react";
 import { useActivityLog } from "@/hooks/useActivityLog";
 import { format } from "date-fns";
 
@@ -23,6 +23,7 @@ export const DailyActivityModal = ({ date, isOpen, onClose, userId }: DailyActiv
   const personalTraining = dayActivities.filter(a => a.content_type === 'personal_training');
   const tools = dayActivities.filter(a => a.content_type === 'tool');
   const measurements = dayActivities.filter(a => a.content_type === 'measurement');
+  const checkins = dayActivities.filter(a => a.content_type === 'checkin');
 
   const getBadgeVariant = (actionType: string): "default" | "secondary" | "outline" => {
     if (actionType.includes('completed')) return 'default';
@@ -236,6 +237,43 @@ export const DailyActivityModal = ({ date, isOpen, onClose, userId }: DailyActiv
                             </p>
                           </div>
                           <Badge variant="outline">Recorded</Badge>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Check-ins Section */}
+            {checkins.length > 0 && (
+              <div>
+                <h3 className="font-semibold mb-3 flex items-center gap-2">
+                  <ClipboardCheck className="h-4 w-4 text-teal-500" />
+                  Check-ins ({checkins.length})
+                </h3>
+                <div className="space-y-2">
+                  {checkins.map(activity => (
+                    <Card key={activity.id}>
+                      <CardContent className="p-3">
+                        <div className="flex items-center justify-between">
+                          <div className="flex-1">
+                            <p className="font-medium">{activity.item_name}</p>
+                            {activity.tool_result && (
+                              <div className="text-sm text-muted-foreground mt-1">
+                                {activity.tool_result.score && (
+                                  <p>Smarty Score: {activity.tool_result.score}</p>
+                                )}
+                                {activity.tool_result.category && (
+                                  <p>Category: {activity.tool_result.category}</p>
+                                )}
+                              </div>
+                            )}
+                            <p className="text-xs text-muted-foreground mt-1">
+                              {format(new Date(activity.created_at), 'h:mm a')}
+                            </p>
+                          </div>
+                          <Badge variant="default" className="bg-teal-500">Completed</Badge>
                         </div>
                       </CardContent>
                     </Card>
