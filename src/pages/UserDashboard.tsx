@@ -15,34 +15,7 @@ import { MyOrders } from "@/components/MyOrders";
 import { useQuery } from "@tanstack/react-query";
 import { useAccessControl } from "@/hooks/useAccessControl";
 import { useShowBackButton } from "@/hooks/useShowBackButton";
-import { 
-  Heart, 
-  CheckCircle, 
-  Clock,
-  Star,
-  Play,
-  Dumbbell,
-  Calendar,
-  Crown,
-  ArrowLeft,
-  Calculator,
-  ShoppingBag,
-  MessageSquare,
-  Loader2,
-  RefreshCw,
-  ExternalLink,
-  ClipboardList,
-  TrendingUp,
-  BookOpen,
-  Headphones,
-  Sparkles,
-  Quote,
-  User as UserIcon,
-  Scale,
-  Building2,
-  Users,
-  ClipboardCheck
-} from "lucide-react";
+import { Heart, CheckCircle, Clock, Star, Play, Dumbbell, Calendar, Crown, ArrowLeft, Calculator, ShoppingBag, MessageSquare, Loader2, RefreshCw, ExternalLink, ClipboardList, TrendingUp, BookOpen, Headphones, Sparkles, Quote, User as UserIcon, Scale, Building2, Users, ClipboardCheck } from "lucide-react";
 import { LogBookFilters } from "@/components/logbook/LogBookFilters";
 import { LogBookCalendar } from "@/components/logbook/LogBookCalendar";
 import { LogBookAdvancedCharts } from "@/components/logbook/LogBookAdvancedCharts";
@@ -56,7 +29,6 @@ import { MorningCheckInForm } from "@/components/checkins/MorningCheckInForm";
 import { NightCheckInForm } from "@/components/checkins/NightCheckInForm";
 import { useCheckins } from "@/hooks/useCheckins";
 import { useCheckInWindow } from "@/hooks/useCheckInWindow";
-
 interface WorkoutInteraction {
   id: string;
   workout_id: string;
@@ -69,7 +41,6 @@ interface WorkoutInteraction {
   created_at: string;
   updated_at: string;
 }
-
 interface ProgramInteraction {
   id: string;
   program_id: string;
@@ -83,25 +54,21 @@ interface ProgramInteraction {
   created_at: string;
   updated_at: string;
 }
-
 interface FavoriteExercise {
   id: string;
   exercise_name: string;
   created_at: string;
 }
-
 interface CalculatorRecord {
   id: string;
   created_at: string;
 }
-
 interface OneRMRecord extends CalculatorRecord {
   weight_lifted: number;
   reps: number;
   one_rm_result: number;
   exercise_name: string | null;
 }
-
 interface BMRRecord extends CalculatorRecord {
   age: number;
   weight: number;
@@ -109,7 +76,6 @@ interface BMRRecord extends CalculatorRecord {
   gender: string;
   bmr_result: number;
 }
-
 interface CalorieRecord extends CalculatorRecord {
   age: number;
   weight: number;
@@ -120,13 +86,11 @@ interface CalorieRecord extends CalculatorRecord {
   maintenance_calories: number;
   target_calories: number;
 }
-
 interface SubscriptionInfo {
   subscribed: boolean;
   product_id: string | null;
   subscription_end: string | null;
 }
-
 interface CorporateSubscriptionInfo {
   id: string;
   plan_type: string;
@@ -136,19 +100,21 @@ interface CorporateSubscriptionInfo {
   current_period_end: string;
   status: string;
 }
-
 interface StripeSubscription {
   current_period_start: number;
   current_period_end: number;
   cancel_at_period_end: boolean;
 }
-
 export default function UserDashboard() {
   const navigate = useNavigate();
   const location = useLocation();
   const [searchParams] = useSearchParams();
-  const { toast } = useToast();
-  const { goBack } = useShowBackButton();
+  const {
+    toast
+  } = useToast();
+  const {
+    goBack
+  } = useShowBackButton();
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
   const [managingSubscription, setManagingSubscription] = useState(false);
@@ -156,7 +122,9 @@ export default function UserDashboard() {
   const [workoutInteractions, setWorkoutInteractions] = useState<WorkoutInteraction[]>([]);
   const [programInteractions, setProgramInteractions] = useState<ProgramInteraction[]>([]);
   const [subscriptionInfo, setSubscriptionInfo] = useState<SubscriptionInfo | null>(null);
-  const { userTier } = useAccessControl();
+  const {
+    userTier
+  } = useAccessControl();
   const isPremium = userTier === "premium";
   const [stripeDetails, setStripeDetails] = useState<StripeSubscription | null>(null);
   const [corporateSubscription, setCorporateSubscription] = useState<CorporateSubscriptionInfo | null>(null);
@@ -168,78 +136,86 @@ export default function UserDashboard() {
   const [isMeasurementDialogOpen, setIsMeasurementDialogOpen] = useState(false);
   const [showMorningForm, setShowMorningForm] = useState(false);
   const [showNightForm, setShowNightForm] = useState(false);
-  
+
   // Check-in hooks
-  const { bannerState, handleBannerStateChange } = useCheckInBanner();
-  const { todayCheckin, stats, submitMorningCheckin, submitNightCheckin, fetchTodayCheckin } = useCheckins();
-  const { isMorningWindow, isNightWindow, morningWindowEnd, nightWindowEnd } = useCheckInWindow();
-  
+  const {
+    bannerState,
+    handleBannerStateChange
+  } = useCheckInBanner();
+  const {
+    todayCheckin,
+    stats,
+    submitMorningCheckin,
+    submitNightCheckin,
+    fetchTodayCheckin
+  } = useCheckins();
+  const {
+    isMorningWindow,
+    isNightWindow,
+    morningWindowEnd,
+    nightWindowEnd
+  } = useCheckInWindow();
+
   // Get tab from URL or default to "overview"
   const tabParam = searchParams.get('tab');
   const [activeTab, setActiveTab] = useState(tabParam || 'overview');
-  
+
   // LogBook filter state
   const [logBookFilter, setLogBookFilter] = useState<'all' | 'workout' | 'program' | 'tool' | 'measurement'>('all');
   const [logBookSecondaryFilter, setLogBookSecondaryFilter] = useState("all");
   const [logBookTimeFilter, setLogBookTimeFilter] = useState<'last_month' | 'last_12_months' | 'last_6_months' | 'custom'>('last_6_months');
   const [logBookCustomStartDate, setLogBookCustomStartDate] = useState<Date | undefined>();
   const [logBookCustomEndDate, setLogBookCustomEndDate] = useState<Date | undefined>();
-  
+
   // Fetch user purchases
-  const { data: purchases = [], isLoading: purchasesLoading } = usePurchases(user?.id);
+  const {
+    data: purchases = [],
+    isLoading: purchasesLoading
+  } = usePurchases(user?.id);
 
   // Fetch unread messages count (both contact and system)
-  const { data: unreadCount = 0, refetch: refetchUnreadCount } = useQuery({
+  const {
+    data: unreadCount = 0,
+    refetch: refetchUnreadCount
+  } = useQuery({
     queryKey: ['unread-messages-count', user?.id],
     queryFn: async () => {
       if (!user) return 0;
-
-      const [contactResult, systemResult] = await Promise.all([
-        supabase
-          .from('contact_messages')
-          .select('*', { count: 'exact', head: true })
-          .eq('user_id', user.id)
-          .not('response', 'is', null)
-          .is('response_read_at', null),
-        supabase
-          .from('user_system_messages')
-          .select('*', { count: 'exact', head: true })
-          .eq('user_id', user.id)
-          .eq('is_read', false)
-      ]);
-
+      const [contactResult, systemResult] = await Promise.all([supabase.from('contact_messages').select('*', {
+        count: 'exact',
+        head: true
+      }).eq('user_id', user.id).not('response', 'is', null).is('response_read_at', null), supabase.from('user_system_messages').select('*', {
+        count: 'exact',
+        head: true
+      }).eq('user_id', user.id).eq('is_read', false)]);
       const contactCount = contactResult.count || 0;
       const systemCount = systemResult.count || 0;
-
       return contactCount + systemCount;
     },
-    enabled: !!user,
+    enabled: !!user
   });
-
   useEffect(() => {
     initDashboard();
 
     // Listen for auth state changes to handle session updates after refresh
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      (event, session) => {
-        if (event === 'SIGNED_OUT' || !session?.user) {
-          setUser(null);
-          setLoading(false);
-          navigate('/auth');
-        } else if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') {
-          // Defer Supabase calls to prevent deadlock
-          setUser(session.user);
-          setTimeout(async () => {
-            await Promise.allSettled([
-              fetchAllData(session.user.id),
-              checkSubscription(session.user.id)
-            ]);
-            setLoading(false);
-          }, 0);
-        }
+    const {
+      data: {
+        subscription
       }
-    );
-
+    } = supabase.auth.onAuthStateChange((event, session) => {
+      if (event === 'SIGNED_OUT' || !session?.user) {
+        setUser(null);
+        setLoading(false);
+        navigate('/auth');
+      } else if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') {
+        // Defer Supabase calls to prevent deadlock
+        setUser(session.user);
+        setTimeout(async () => {
+          await Promise.allSettled([fetchAllData(session.user.id), checkSubscription(session.user.id)]);
+          setLoading(false);
+        }, 0);
+      }
+    });
     return () => subscription.unsubscribe();
   }, []);
 
@@ -250,29 +226,25 @@ export default function UserDashboard() {
         fetchAllData(user.id);
       }
     };
-
     window.addEventListener('purchase-verified', handlePurchaseVerified);
     return () => window.removeEventListener('purchase-verified', handlePurchaseVerified);
   }, [user]);
-
   const initDashboard = async () => {
     try {
-      const { data: { session } } = await supabase.auth.getSession();
+      const {
+        data: {
+          session
+        }
+      } = await supabase.auth.getSession();
       if (!session?.user) {
         setLoading(false);
         navigate('/auth');
         return;
       }
-
       setUser(session.user);
-      
+
       // Fetch all data in parallel with individual error handling
-      await Promise.allSettled([
-        fetchAllData(session.user.id),
-        checkSubscription(session.user.id),
-        fetchCorporateSubscription(session.user.id)
-      ]);
-      
+      await Promise.allSettled([fetchAllData(session.user.id), checkSubscription(session.user.id), fetchCorporateSubscription(session.user.id)]);
     } catch (error) {
       if (import.meta.env.DEV) {
         console.error("Error initializing dashboard:", error);
@@ -286,25 +258,18 @@ export default function UserDashboard() {
       setLoading(false);
     }
   };
-
   const fetchAllData = async (userId: string) => {
     // Use allSettled so individual failures don't block others
-    await Promise.allSettled([
-      fetchWorkoutInteractions(userId),
-      fetchProgramInteractions(userId),
-      fetchFavoriteExercises(userId),
-      fetchCalculatorHistory(userId),
-    ]);
+    await Promise.allSettled([fetchWorkoutInteractions(userId), fetchProgramInteractions(userId), fetchFavoriteExercises(userId), fetchCalculatorHistory(userId)]);
   };
-
   const fetchWorkoutInteractions = async (userId: string) => {
     try {
-      const { data, error } = await supabase
-        .from("workout_interactions")
-        .select("*")
-        .eq("user_id", userId)
-        .order("updated_at", { ascending: false });
-
+      const {
+        data,
+        error
+      } = await supabase.from("workout_interactions").select("*").eq("user_id", userId).order("updated_at", {
+        ascending: false
+      });
       if (error) throw error;
       if (data) setWorkoutInteractions(data);
     } catch (error) {
@@ -313,15 +278,14 @@ export default function UserDashboard() {
       }
     }
   };
-
   const fetchProgramInteractions = async (userId: string) => {
     try {
-      const { data, error } = await supabase
-        .from("program_interactions")
-        .select("*")
-        .eq("user_id", userId)
-        .order("updated_at", { ascending: false });
-
+      const {
+        data,
+        error
+      } = await supabase.from("program_interactions").select("*").eq("user_id", userId).order("updated_at", {
+        ascending: false
+      });
       if (error) throw error;
       if (data) setProgramInteractions(data);
     } catch (error) {
@@ -330,28 +294,22 @@ export default function UserDashboard() {
       }
     }
   };
-
   const fetchFavoriteExercises = async (userId: string) => {
     // Favorite exercises feature removed
     setFavoriteExercises([]);
   };
-
   const fetchCorporateSubscription = async (userId: string) => {
     try {
-      const { data, error } = await supabase
-        .from('corporate_subscriptions')
-        .select('id, plan_type, current_users_count, max_users, organization_name, current_period_end, status')
-        .eq('admin_user_id', userId)
-        .eq('status', 'active')
-        .maybeSingle();
-
+      const {
+        data,
+        error
+      } = await supabase.from('corporate_subscriptions').select('id, plan_type, current_users_count, max_users, organization_name, current_period_end, status').eq('admin_user_id', userId).eq('status', 'active').maybeSingle();
       if (error) {
         if (import.meta.env.DEV) {
           console.error("Error fetching corporate subscription:", error);
         }
         return;
       }
-
       if (data) {
         setCorporateSubscription(data);
       }
@@ -361,7 +319,6 @@ export default function UserDashboard() {
       }
     }
   };
-
   const getCorporatePlanDisplayName = (planType: string) => {
     const names: Record<string, string> = {
       'dynamic': 'Dynamic',
@@ -371,7 +328,6 @@ export default function UserDashboard() {
     };
     return names[planType.toLowerCase()] || planType;
   };
-
   const getCorporateDaysRemaining = () => {
     if (!corporateSubscription?.current_period_end) return null;
     const endDate = new Date(corporateSubscription.current_period_end);
@@ -380,31 +336,16 @@ export default function UserDashboard() {
     const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
     return diffDays;
   };
-
   const fetchCalculatorHistory = async (userId: string) => {
     try {
       // Fetch all calculator histories in parallel
-      const [onermResult, bmrResult, calorieResult] = await Promise.allSettled([
-        supabase
-          .from("onerm_history")
-          .select("*")
-          .eq("user_id", userId)
-          .order("created_at", { ascending: false })
-          .limit(5),
-        supabase
-          .from("bmr_history")
-          .select("*")
-          .eq("user_id", userId)
-          .order("created_at", { ascending: false })
-          .limit(5),
-        supabase
-          .from("calorie_history")
-          .select("*")
-          .eq("user_id", userId)
-          .order("created_at", { ascending: false })
-          .limit(5)
-      ]);
-
+      const [onermResult, bmrResult, calorieResult] = await Promise.allSettled([supabase.from("onerm_history").select("*").eq("user_id", userId).order("created_at", {
+        ascending: false
+      }).limit(5), supabase.from("bmr_history").select("*").eq("user_id", userId).order("created_at", {
+        ascending: false
+      }).limit(5), supabase.from("calorie_history").select("*").eq("user_id", userId).order("created_at", {
+        ascending: false
+      }).limit(5)]);
       if (onermResult.status === 'fulfilled' && onermResult.value.data) {
         setOneRMHistory(onermResult.value.data);
       }
@@ -420,25 +361,20 @@ export default function UserDashboard() {
       }
     }
   };
-
   const checkSubscription = async (userId?: string) => {
     try {
       const uid = userId || user?.id;
       if (!uid) return;
-
-      const { data: dbData, error: dbError } = await supabase
-        .from('user_subscriptions')
-        .select('plan_type, status, current_period_end, current_period_start, stripe_subscription_id, cancel_at_period_end')
-        .eq('user_id', uid)
-        .maybeSingle();
-
+      const {
+        data: dbData,
+        error: dbError
+      } = await supabase.from('user_subscriptions').select('plan_type, status, current_period_end, current_period_start, stripe_subscription_id, cancel_at_period_end').eq('user_id', uid).maybeSingle();
       if (dbError) {
         if (import.meta.env.DEV) {
           console.error("Dashboard subscription error:", dbError);
         }
         return;
       }
-
       if (!dbData) {
         setSubscriptionInfo({
           subscribed: false,
@@ -447,15 +383,12 @@ export default function UserDashboard() {
         });
         return;
       }
-
       const isSubscribed = dbData?.status === 'active' && (dbData.plan_type === 'gold' || dbData.plan_type === 'platinum');
-
       setSubscriptionInfo({
         subscribed: isSubscribed,
         product_id: dbData?.plan_type || null,
         subscription_end: dbData?.current_period_end || null
       });
-
       if (dbData?.current_period_start && dbData?.current_period_end) {
         setStripeDetails({
           current_period_start: new Date(dbData.current_period_start).getTime() / 1000,
@@ -469,7 +402,6 @@ export default function UserDashboard() {
       }
     }
   };
-
   const getPlanName = (productId: string | null) => {
     if (!productId) return "Free";
     // Use plan_type from database (gold, platinum, free)
@@ -479,7 +411,6 @@ export default function UserDashboard() {
     if (planType === "free") return "Free";
     return "Premium";
   };
-
   const getDaysRemaining = () => {
     if (!subscriptionInfo?.subscription_end) return null;
     const endDate = new Date(subscriptionInfo.subscription_end);
@@ -488,31 +419,26 @@ export default function UserDashboard() {
     const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
     return diffDays;
   };
-
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString("en-US", {
       month: "short",
       day: "numeric",
-      year: "numeric",
+      year: "numeric"
     });
   };
-
   const formatTimestamp = (timestamp: number) => {
     return new Date(timestamp * 1000).toLocaleDateString("en-US", {
       month: "short",
       day: "numeric",
-      year: "numeric",
+      year: "numeric"
     });
   };
-
   const handleNavigateToWorkout = (workoutType: string, workoutId: string) => {
     navigate(`/workout/${workoutType}/${workoutId}`);
   };
-
   const handleNavigateToProgram = (programType: string, programId: string) => {
     navigate(`/trainingprogram/${programType}/${programId}`);
   };
-
   const handleManageSubscription = async () => {
     if (!user) {
       if (import.meta.env.DEV) {
@@ -525,39 +451,42 @@ export default function UserDashboard() {
       });
       return;
     }
-    
     if (import.meta.env.DEV) {
       console.log("Opening customer portal for user:", user.id);
     }
     setOpeningPortal(true);
-    
     try {
-      const { data: { session } } = await supabase.auth.getSession();
-      
+      const {
+        data: {
+          session
+        }
+      } = await supabase.auth.getSession();
       if (!session) {
         throw new Error("No active session found");
       }
-
       if (import.meta.env.DEV) {
         console.log("Invoking customer-portal function...");
       }
-      const { data, error } = await supabase.functions.invoke('customer-portal', {
+      const {
+        data,
+        error
+      } = await supabase.functions.invoke('customer-portal', {
         headers: {
           Authorization: `Bearer ${session.access_token}`
         }
       });
-      
       if (import.meta.env.DEV) {
-        console.log("Customer portal response:", { data, error });
+        console.log("Customer portal response:", {
+          data,
+          error
+        });
       }
-      
       if (error) {
         if (import.meta.env.DEV) {
           console.error("Customer portal error:", error);
         }
         throw error;
       }
-      
       if (data?.url) {
         if (import.meta.env.DEV) {
           console.log("Opening portal URL:", data.url);
@@ -565,7 +494,7 @@ export default function UserDashboard() {
         window.open(data.url, '_blank');
         toast({
           title: "Opening subscription portal",
-          description: "Manage your subscription in the new tab",
+          description: "Manage your subscription in the new tab"
         });
       } else if (data?.portalNotConfigured) {
         toast({
@@ -580,11 +509,8 @@ export default function UserDashboard() {
       if (import.meta.env.DEV) {
         console.error('Error opening customer portal:', error);
       }
-      
       const errorMessage = error instanceof Error ? error.message : String(error);
-      const isConfigError = errorMessage.includes("No configuration") || 
-                           errorMessage.includes("default configuration");
-      
+      const isConfigError = errorMessage.includes("No configuration") || errorMessage.includes("default configuration");
       if (isConfigError) {
         toast({
           title: "Portal Setup Required",
@@ -602,25 +528,24 @@ export default function UserDashboard() {
       setOpeningPortal(false);
     }
   };
-
   const handleRefreshSubscription = async () => {
     if (!user) return;
-    
     setLoading(true);
     try {
       // Force refresh from Stripe
-      const { data, error } = await supabase.functions.invoke('check-subscription');
-      
+      const {
+        data,
+        error
+      } = await supabase.functions.invoke('check-subscription');
       if (error) {
         throw error;
       }
-      
+
       // Reload subscription data
       await checkSubscription();
-      
       toast({
         title: "Subscription refreshed",
-        description: "Your subscription status has been updated from Stripe",
+        description: "Your subscription status has been updated from Stripe"
       });
     } catch (error) {
       if (import.meta.env.DEV) {
@@ -659,20 +584,15 @@ export default function UserDashboard() {
       return "strength"; // default fallback
     }
   };
-
   if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
+    return <div className="min-h-screen flex items-center justify-center">
         <div className="animate-pulse text-lg">Loading dashboard...</div>
-      </div>
-    );
+      </div>;
   }
-
   const favoriteWorkouts = workoutInteractions.filter(w => w.is_favorite);
   const completedWorkouts = workoutInteractions.filter(w => w.is_completed);
   const viewedWorkouts = workoutInteractions.filter(w => w.has_viewed);
   const ratedWorkouts = workoutInteractions.filter(w => w.rating && w.rating > 0);
-  
   const favoritePrograms = programInteractions.filter(p => p.is_favorite);
   const completedPrograms = programInteractions.filter(p => p.is_completed);
   const viewedPrograms = programInteractions.filter(p => p.has_viewed);
@@ -681,40 +601,23 @@ export default function UserDashboard() {
 
   // Premium members have Gold/Platinum subscription
   const hasActivePlan = subscriptionInfo?.subscribed && subscriptionInfo?.product_id;
-  
+
   // Separate flag for standalone purchases (only count non-deleted content)
   const validPurchases = purchases?.filter(p => !p.content_deleted) || [];
   const hasStandalonePurchases = validPurchases.length > 0;
-
-  return (
-    <div className="min-h-screen bg-background">
+  return <div className="min-h-screen bg-background">
       <main className="container mx-auto max-w-7xl p-4 py-8">
         {/* Check-in Modal Manager - shows pop-up during time windows */}
-        {isPremium && (
-          <CheckInModalManager onBannerStateChange={handleBannerStateChange} />
-        )}
+        {isPremium && <CheckInModalManager onBannerStateChange={handleBannerStateChange} />}
         
         {/* Check-in Banner - shows when user clicked "Later" on modal */}
-        {isPremium && bannerState.show && bannerState.type && (
-          <div className="mb-4">
-            <CheckInBanner 
-              type={bannerState.type} 
-              windowEnd={bannerState.type === 'morning' ? morningWindowEnd : nightWindowEnd}
-              currentStreak={stats?.currentStreak}
-              onCheckIn={() => {
-                if (bannerState.type === 'morning') setShowMorningForm(true);
-                else setShowNightForm(true);
-              }} 
-            />
-          </div>
-        )}
+        {isPremium && bannerState.show && bannerState.type && <div className="mb-4">
+            <CheckInBanner type={bannerState.type} windowEnd={bannerState.type === 'morning' ? morningWindowEnd : nightWindowEnd} currentStreak={stats?.currentStreak} onCheckIn={() => {
+          if (bannerState.type === 'morning') setShowMorningForm(true);else setShowNightForm(true);
+        }} />
+          </div>}
 
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={goBack}
-          className="mb-6"
-        >
+        <Button variant="ghost" size="sm" onClick={goBack} className="mb-6">
           <ArrowLeft className="mr-2 h-4 w-4" />
           <span className="text-xs sm:text-sm">Back</span>
         </Button>
@@ -735,12 +638,10 @@ export default function UserDashboard() {
         </div>
 
         {/* Subscription Info */}
-        {subscriptionInfo && (
-          <Card className="mb-6 border-primary/50 bg-gradient-to-r from-primary/5 to-primary/10">
+        {subscriptionInfo && <Card className="mb-6 border-primary/50 bg-gradient-to-r from-primary/5 to-primary/10">
             <CardContent className="p-4">
               {/* Free Plan with Purchases */}
-              {!subscriptionInfo.subscribed && purchases && purchases.length > 0 && !isPremium && (
-                <div className="space-y-3">
+              {!subscriptionInfo.subscribed && purchases && purchases.length > 0 && !isPremium && <div className="space-y-3">
                   <h2 className="flex items-center gap-2 text-lg font-bold">
                     <ShoppingBag className="h-5 w-5 text-primary" />
                     Your Active Membership
@@ -755,12 +656,10 @@ export default function UserDashboard() {
                   <Button onClick={() => navigate("/premiumbenefits")} className="w-full sm:w-auto cta-button">
                     Upgrade to Premium
                   </Button>
-                </div>
-              )}
+                </div>}
 
               {/* Free Plan without Purchases */}
-              {!subscriptionInfo.subscribed && (!purchases || purchases.length === 0) && !isPremium && (
-                <div className="space-y-3">
+              {!subscriptionInfo.subscribed && (!purchases || purchases.length === 0) && !isPremium && <div className="space-y-3">
                   <h2 className="flex items-center gap-2 text-lg font-bold">
                     <UserIcon className="h-5 w-5 text-muted-foreground" />
                     Your Free Membership
@@ -774,12 +673,10 @@ export default function UserDashboard() {
                   <Button onClick={() => navigate("/premiumbenefits")} className="w-full sm:w-auto cta-button">
                     Upgrade Now
                   </Button>
-                </div>
-              )}
+                </div>}
 
               {/* Premium Plan - Two Column Layout with Title in Left Column */}
-            {subscriptionInfo.subscribed && (
-              <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
+            {subscriptionInfo.subscribed && <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
                   {/* LEFT COLUMN - Title + Plan Info & Actions */}
                   <div className="col-span-1 md:col-span-2 space-y-3">
                     {/* Title at top of left column */}
@@ -799,68 +696,45 @@ export default function UserDashboard() {
                         <Badge variant="outline" className="text-xs h-5 px-1.5 bg-green-500/10 text-green-600 dark:text-green-400 border-green-500/20">
                           Active
                         </Badge>
-                        {stripeDetails?.cancel_at_period_end && (
-                          <Badge variant="outline" className="text-xs h-5 px-1.5 bg-orange-500/10 text-orange-600 dark:text-orange-400 border-orange-500/20">
+                        {stripeDetails?.cancel_at_period_end && <Badge variant="outline" className="text-xs h-5 px-1.5 bg-orange-500/10 text-orange-600 dark:text-orange-400 border-orange-500/20">
                             Cancels at period end
-                          </Badge>
-                        )}
+                          </Badge>}
                       </div>
                     </div>
 
                     {/* Subscription Details */}
-                    {subscriptionInfo.subscription_end && (
-                      <div className="space-y-1 text-sm">
+                    {subscriptionInfo.subscription_end && <div className="space-y-1 text-sm">
                         <div className="flex justify-between">
                           <span className="text-muted-foreground">
                             {stripeDetails?.cancel_at_period_end ? "Expires:" : "Next Billing:"}
                           </span>
                           <span className="font-medium">{formatDate(subscriptionInfo.subscription_end)}</span>
                         </div>
-                        {getDaysRemaining() !== null && (
-                          <div className="flex justify-between">
+                        {getDaysRemaining() !== null && <div className="flex justify-between">
                             <span className="text-muted-foreground">Days Left:</span>
                             <span className="font-medium text-primary">{getDaysRemaining()} days</span>
-                          </div>
-                        )}
+                          </div>}
                         <div className="flex justify-between">
                           <span className="text-muted-foreground">Billing:</span>
                           <span className="font-medium">
                             {stripeDetails?.cancel_at_period_end ? "One-time" : "Auto-renewing"}
                           </span>
                         </div>
-                      </div>
-                    )}
+                      </div>}
 
                     {/* Action Buttons */}
                     <div className="flex gap-2 pt-1">
-                      <Button
-                        onClick={handleRefreshSubscription}
-                        disabled={loading}
-                        variant="outline"
-                        className="h-7 px-2 text-xs"
-                      >
-                        {loading ? (
-                          <Loader2 className="h-3 w-3 animate-spin" />
-                        ) : (
-                          <>
+                      <Button onClick={handleRefreshSubscription} disabled={loading} variant="outline" className="h-7 px-2 text-xs">
+                        {loading ? <Loader2 className="h-3 w-3 animate-spin" /> : <>
                             <RefreshCw className="h-3 w-3 mr-1" />
                             Refresh
-                          </>
-                        )}
+                          </>}
                       </Button>
-                      <Button
-                        onClick={handleManageSubscription}
-                        disabled={openingPortal}
-                        className="h-7 px-2 text-xs"
-                      >
-                        {openingPortal ? (
-                          <Loader2 className="h-3 w-3 animate-spin" />
-                        ) : (
-                          <>
+                      <Button onClick={handleManageSubscription} disabled={openingPortal} className="h-7 px-2 text-xs">
+                        {openingPortal ? <Loader2 className="h-3 w-3 animate-spin" /> : <>
                             <ExternalLink className="h-3 w-3 mr-1" />
                             Manage
-                          </>
-                        )}
+                          </>}
                       </Button>
                     </div>
 
@@ -888,10 +762,7 @@ export default function UserDashboard() {
                           {/* Coach signature - clickable */}
                           <div className="flex items-center gap-1.5 pt-0.5">
                             <div className="h-px flex-1 bg-primary/20"></div>
-                            <button
-                              onClick={() => navigate("/coach-profile")}
-                              className="text-[10px] font-semibold text-primary hover:text-primary/80 transition-colors flex items-center gap-0.5 group"
-                            >
+                            <button onClick={() => navigate("/coach-profile")} className="text-[10px] font-semibold text-primary hover:text-primary/80 transition-colors flex items-center gap-0.5 group">
                               <span>Haris Falas</span>
                               <ExternalLink className="h-2.5 w-2.5 opacity-0 group-hover:opacity-100 transition-opacity" />
                             </button>
@@ -957,15 +828,12 @@ export default function UserDashboard() {
                       </div>
                     </div>
                   </div>
-                </div>
-              )}
+                </div>}
             </CardContent>
-          </Card>
-        )}
+          </Card>}
 
         {/* Corporate Admin Subscription Card */}
-        {corporateSubscription && (
-          <Card className="mb-6 border-blue-500/50 bg-gradient-to-r from-blue-500/5 to-blue-500/10">
+        {corporateSubscription && <Card className="mb-6 border-blue-500/50 bg-gradient-to-r from-blue-500/5 to-blue-500/10">
             <CardContent className="p-4">
               <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
                 {/* LEFT COLUMN - Corporate Admin Info */}
@@ -999,20 +867,15 @@ export default function UserDashboard() {
                       <span className="text-muted-foreground">Expires:</span>
                       <span className="font-medium">{formatDate(corporateSubscription.current_period_end)}</span>
                     </div>
-                    {getCorporateDaysRemaining() !== null && (
-                      <div className="flex justify-between">
+                    {getCorporateDaysRemaining() !== null && <div className="flex justify-between">
                         <span className="text-muted-foreground">Days Left:</span>
                         <span className="font-medium text-blue-500">{getCorporateDaysRemaining()} days</span>
-                      </div>
-                    )}
+                      </div>}
                   </div>
 
                   {/* Action Buttons */}
                   <div className="flex gap-2 pt-1">
-                    <Button
-                      onClick={() => navigate("/corporate-admin")}
-                      className="h-7 px-2 text-xs bg-blue-500 hover:bg-blue-600"
-                    >
+                    <Button onClick={() => navigate("/corporate-admin")} className="h-7 px-2 text-xs bg-blue-500 hover:bg-blue-600">
                       <Users className="h-3 w-3 mr-1" />
                       Manage Team
                     </Button>
@@ -1076,8 +939,7 @@ export default function UserDashboard() {
                 </div>
               </div>
             </CardContent>
-          </Card>
-        )}
+          </Card>}
 
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
           <div className="w-full overflow-x-auto">
@@ -1101,14 +963,9 @@ export default function UserDashboard() {
               <TabsTrigger value="messages" className="flex-shrink-0">
                 <MessageSquare className="mr-2 h-4 w-4" />
                 <span className="whitespace-nowrap">Messages</span>
-                {unreadCount > 0 && (
-                  <Badge 
-                    variant="destructive" 
-                    className="ml-2 h-5 min-w-5 flex items-center justify-center rounded-full p-1 text-xs"
-                  >
+                {unreadCount > 0 && <Badge variant="destructive" className="ml-2 h-5 min-w-5 flex items-center justify-center rounded-full p-1 text-xs">
                     {unreadCount}
-                  </Badge>
-                )}
+                  </Badge>}
               </TabsTrigger>
               <TabsTrigger value="calculators" className="flex-shrink-0">
                 <Calculator className="mr-2 h-4 w-4" />
@@ -1135,19 +992,13 @@ export default function UserDashboard() {
               <CardContent>
                 <div className="space-y-4">
                   {/* Recent Workouts */}
-                  {completedWorkouts.slice(0, 3).length > 0 ? (
-                    <div>
+                  {completedWorkouts.slice(0, 3).length > 0 ? <div>
                       <h4 className="text-sm font-semibold mb-2 flex items-center gap-2">
                         <CheckCircle className="h-4 w-4 text-green-500" />
                         Recently Completed Workouts
                       </h4>
                       <div className="space-y-2">
-                        {completedWorkouts.slice(0, 3).map((workout) => (
-                          <div 
-                            key={workout.id}
-                            className="flex items-center justify-between p-3 rounded-lg bg-muted/50 hover:bg-muted cursor-pointer transition-colors"
-                            onClick={() => handleNavigateToWorkout(workout.workout_type, workout.workout_id)}
-                          >
+                        {completedWorkouts.slice(0, 3).map(workout => <div key={workout.id} className="flex items-center justify-between p-3 rounded-lg bg-muted/50 hover:bg-muted cursor-pointer transition-colors" onClick={() => handleNavigateToWorkout(workout.workout_type, workout.workout_id)}>
                             <div className="flex items-center gap-3">
                               <Dumbbell className="h-4 w-4 text-muted-foreground" />
                               <div>
@@ -1155,37 +1006,25 @@ export default function UserDashboard() {
                                 <p className="text-xs text-muted-foreground">{formatDate(workout.updated_at)}</p>
                               </div>
                             </div>
-                            {workout.rating && workout.rating > 0 && (
-                              <div className="flex items-center gap-1">
+                            {workout.rating && workout.rating > 0 && <div className="flex items-center gap-1">
                                 <Star className="h-3 w-3 fill-yellow-500 text-yellow-500" />
                                 <span className="text-xs">{workout.rating}</span>
-                              </div>
-                            )}
-                          </div>
-                        ))}
+                              </div>}
+                          </div>)}
                       </div>
-                    </div>
-                  ) : (
-                    <div className="text-center py-8 text-muted-foreground">
+                    </div> : <div className="text-center py-8 text-muted-foreground">
                       <ClipboardList className="h-12 w-12 mx-auto mb-3 opacity-50" />
                       <p className="text-sm">No recent activity yet. Start your fitness journey today!</p>
-                    </div>
-                  )}
+                    </div>}
 
                   {/* Recent Programs */}
-                  {completedPrograms.slice(0, 2).length > 0 && (
-                    <div>
+                  {completedPrograms.slice(0, 2).length > 0 && <div>
                       <h4 className="text-sm font-semibold mb-2 flex items-center gap-2">
                         <CheckCircle className="h-4 w-4 text-blue-500" />
                         Recently Completed Programs
                       </h4>
                       <div className="space-y-2">
-                        {completedPrograms.slice(0, 2).map((program) => (
-                          <div 
-                            key={program.id}
-                            className="flex items-center justify-between p-3 rounded-lg bg-muted/50 hover:bg-muted cursor-pointer transition-colors"
-                            onClick={() => handleNavigateToProgram(program.program_type, program.program_id)}
-                          >
+                        {completedPrograms.slice(0, 2).map(program => <div key={program.id} className="flex items-center justify-between p-3 rounded-lg bg-muted/50 hover:bg-muted cursor-pointer transition-colors" onClick={() => handleNavigateToProgram(program.program_type, program.program_id)}>
                             <div className="flex items-center gap-3">
                               <Calendar className="h-4 w-4 text-muted-foreground" />
                               <div>
@@ -1193,17 +1032,13 @@ export default function UserDashboard() {
                                 <p className="text-xs text-muted-foreground">{formatDate(program.updated_at)}</p>
                               </div>
                             </div>
-                            {program.rating && program.rating > 0 && (
-                              <div className="flex items-center gap-1">
+                            {program.rating && program.rating > 0 && <div className="flex items-center gap-1">
                                 <Star className="h-3 w-3 fill-yellow-500 text-yellow-500" />
                                 <span className="text-xs">{program.rating}</span>
-                              </div>
-                            )}
-                          </div>
-                        ))}
+                              </div>}
+                          </div>)}
                       </div>
-                    </div>
-                  )}
+                    </div>}
                 </div>
               </CardContent>
             </Card>
@@ -1218,38 +1053,22 @@ export default function UserDashboard() {
               </CardHeader>
               <CardContent>
                 <div className="grid gap-3 md:grid-cols-2 lg:grid-cols-4">
-                  <Button 
-                    variant="outline" 
-                    className="h-auto py-4 flex flex-col items-center gap-2"
-                    onClick={() => navigate("/workout")}
-                  >
+                  <Button variant="outline" className="h-auto py-4 flex flex-col items-center gap-2" onClick={() => navigate("/workout")}>
                     <Dumbbell className="h-6 w-6" />
                     <span className="text-sm font-medium">Browse Workouts</span>
                   </Button>
                   
-                  <Button 
-                    variant="outline" 
-                    className="h-auto py-4 flex flex-col items-center gap-2"
-                    onClick={() => navigate("/trainingprogram")}
-                  >
+                  <Button variant="outline" className="h-auto py-4 flex flex-col items-center gap-2" onClick={() => navigate("/trainingprogram")}>
                     <Calendar className="h-6 w-6" />
                     <span className="text-sm font-medium">Browse Programs</span>
                   </Button>
                   
-                  <Button 
-                    variant="outline" 
-                    className="h-auto py-4 flex flex-col items-center gap-2"
-                    onClick={() => navigate("/tools")}
-                  >
+                  <Button variant="outline" className="h-auto py-4 flex flex-col items-center gap-2" onClick={() => navigate("/tools")}>
                     <Calculator className="h-6 w-6" />
                     <span className="text-sm font-medium">Fitness Tools</span>
                   </Button>
                   
-                  <Button 
-                    variant="outline" 
-                    className="h-auto py-4 flex flex-col items-center gap-2"
-                    onClick={() => navigate("/exerciselibrary")}
-                  >
+                  <Button variant="outline" className="h-auto py-4 flex flex-col items-center gap-2" onClick={() => navigate("/exerciselibrary")}>
                     <BookOpen className="h-6 w-6" />
                     <span className="text-sm font-medium">Exercise Library</span>
                   </Button>
@@ -1260,8 +1079,7 @@ export default function UserDashboard() {
 
           {/* Workouts Tab */}
           <TabsContent value="workouts" className="space-y-6">
-            {!hasActivePlan && !hasStandalonePurchases && !isPremium ? (
-              <Card className="border-primary/50 bg-gradient-to-r from-primary/5 to-primary/10">
+            {!hasActivePlan && !hasStandalonePurchases && !isPremium ? <Card className="border-primary/50 bg-gradient-to-r from-primary/5 to-primary/10">
                 <CardContent className="text-center py-12">
                   <Crown className="h-12 w-12 text-primary mx-auto mb-4" />
                   <h3 className="text-xl font-bold mb-2">Premium Feature</h3>
@@ -1272,9 +1090,7 @@ export default function UserDashboard() {
                     Upgrade to Premium
                   </Button>
                 </CardContent>
-              </Card>
-            ) : (
-              <>
+              </Card> : <>
                 <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
               <Card>
                 <CardHeader className="pb-3">
@@ -1333,17 +1149,9 @@ export default function UserDashboard() {
                   <CardTitle>Favorite Workouts</CardTitle>
                 </CardHeader>
                 <CardContent>
-                  {favoriteWorkouts.length === 0 ? (
-                    <p className="text-sm text-muted-foreground">No favorite workouts yet</p>
-                  ) : (
-                    <ScrollArea className="max-h-[400px] pr-4">
+                  {favoriteWorkouts.length === 0 ? <p className="text-sm text-muted-foreground">No favorite workouts yet</p> : <ScrollArea className="max-h-[400px] pr-4">
                       <div className="space-y-2">
-                        {favoriteWorkouts.map((workout) => (
-                          <div
-                            key={workout.id}
-                            className="p-3 bg-muted rounded-lg cursor-pointer hover:bg-muted/80 transition-colors"
-                            onClick={() => handleNavigateToWorkout(workout.workout_type, workout.workout_id)}
-                          >
+                        {favoriteWorkouts.map(workout => <div key={workout.id} className="p-3 bg-muted rounded-lg cursor-pointer hover:bg-muted/80 transition-colors" onClick={() => handleNavigateToWorkout(workout.workout_type, workout.workout_id)}>
                             <div className="flex items-center justify-between">
                               <div className="flex-1">
                                 <p className="font-medium text-sm">{workout.workout_name}</p>
@@ -1351,23 +1159,17 @@ export default function UserDashboard() {
                                   <Badge variant="outline" className="text-xs">
                                     {workout.workout_type}
                                   </Badge>
-                                  {workout.rating && (
-                                    <div className="flex items-center gap-1">
+                                  {workout.rating && <div className="flex items-center gap-1">
                                       <Star className="h-3 w-3 fill-yellow-500 text-yellow-500" />
                                       <span className="text-xs">{workout.rating}</span>
-                                    </div>
-                                  )}
+                                    </div>}
                                 </div>
                               </div>
-                              {workout.is_completed && (
-                                <CheckCircle className="h-4 w-4 text-green-500 ml-2" />
-                              )}
+                              {workout.is_completed && <CheckCircle className="h-4 w-4 text-green-500 ml-2" />}
                             </div>
-                          </div>
-                        ))}
+                          </div>)}
                       </div>
-                    </ScrollArea>
-                  )}
+                    </ScrollArea>}
                 </CardContent>
               </Card>
 
@@ -1377,17 +1179,9 @@ export default function UserDashboard() {
                   <CardTitle>Completed Workouts</CardTitle>
                 </CardHeader>
                 <CardContent>
-                  {completedWorkouts.length === 0 ? (
-                    <p className="text-sm text-muted-foreground">No completed workouts yet</p>
-                  ) : (
-                    <ScrollArea className="max-h-[400px] pr-4">
+                  {completedWorkouts.length === 0 ? <p className="text-sm text-muted-foreground">No completed workouts yet</p> : <ScrollArea className="max-h-[400px] pr-4">
                       <div className="space-y-2">
-                        {completedWorkouts.map((workout) => (
-                          <div
-                            key={workout.id}
-                            className="p-3 bg-muted rounded-lg cursor-pointer hover:bg-muted/80 transition-colors"
-                            onClick={() => handleNavigateToWorkout(workout.workout_type, workout.workout_id)}
-                          >
+                        {completedWorkouts.map(workout => <div key={workout.id} className="p-3 bg-muted rounded-lg cursor-pointer hover:bg-muted/80 transition-colors" onClick={() => handleNavigateToWorkout(workout.workout_type, workout.workout_id)}>
                             <div className="flex items-center justify-between">
                               <div className="flex-1">
                                 <p className="font-medium text-sm">{workout.workout_name}</p>
@@ -1395,31 +1189,25 @@ export default function UserDashboard() {
                                   <Badge variant="outline" className="text-xs">
                                     {workout.workout_type}
                                   </Badge>
-                                  {workout.rating && (
-                                    <div className="flex items-center gap-1">
+                                  {workout.rating && <div className="flex items-center gap-1">
                                       <Star className="h-3 w-3 fill-yellow-500 text-yellow-500" />
                                       <span className="text-xs">{workout.rating}</span>
-                                    </div>
-                                  )}
+                                    </div>}
                                 </div>
                               </div>
                             </div>
-                          </div>
-                        ))}
+                          </div>)}
                       </div>
-                    </ScrollArea>
-                  )}
+                    </ScrollArea>}
                 </CardContent>
               </Card>
             </div>
-            </>
-            )}
+            </>}
           </TabsContent>
 
           {/* Programs Tab */}
           <TabsContent value="programs" className="space-y-6">
-            {!hasActivePlan && !hasStandalonePurchases && !isPremium ? (
-              <Card className="border-primary/50 bg-gradient-to-r from-primary/5 to-primary/10">
+            {!hasActivePlan && !hasStandalonePurchases && !isPremium ? <Card className="border-primary/50 bg-gradient-to-r from-primary/5 to-primary/10">
                 <CardContent className="text-center py-12">
                   <Crown className="h-12 w-12 text-primary mx-auto mb-4" />
                   <h3 className="text-xl font-bold mb-2">Premium Feature</h3>
@@ -1430,9 +1218,7 @@ export default function UserDashboard() {
                     Upgrade to Premium
                   </Button>
                 </CardContent>
-              </Card>
-            ) : (
-              <>
+              </Card> : <>
                 <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
               <Card>
                 <CardHeader className="pb-3">
@@ -1491,16 +1277,8 @@ export default function UserDashboard() {
                   <CardTitle>Favorite Programs</CardTitle>
                 </CardHeader>
                 <CardContent>
-                  {favoritePrograms.length === 0 ? (
-                    <p className="text-sm text-muted-foreground">No favorite programs yet</p>
-                  ) : (
-                    <div className="space-y-2">
-                      {favoritePrograms.map((program) => (
-                        <div
-                          key={program.id}
-                          className="p-3 bg-muted rounded-lg cursor-pointer hover:bg-muted/80 transition-colors"
-                          onClick={() => handleNavigateToProgram(program.program_type, program.program_id)}
-                        >
+                  {favoritePrograms.length === 0 ? <p className="text-sm text-muted-foreground">No favorite programs yet</p> : <div className="space-y-2">
+                      {favoritePrograms.map(program => <div key={program.id} className="p-3 bg-muted rounded-lg cursor-pointer hover:bg-muted/80 transition-colors" onClick={() => handleNavigateToProgram(program.program_type, program.program_id)}>
                           <div className="flex items-center justify-between">
                             <div className="flex-1">
                               <p className="font-medium text-sm">{program.program_name}</p>
@@ -1508,22 +1286,16 @@ export default function UserDashboard() {
                                 <Badge variant="outline" className="text-xs">
                                   {program.program_type}
                                 </Badge>
-                                {program.rating && (
-                                  <div className="flex items-center gap-1">
+                                {program.rating && <div className="flex items-center gap-1">
                                     <Star className="h-3 w-3 fill-yellow-500 text-yellow-500" />
                                     <span className="text-xs">{program.rating}</span>
-                                  </div>
-                                )}
+                                  </div>}
                               </div>
                             </div>
-                            {program.is_completed && (
-                              <CheckCircle className="h-4 w-4 text-green-500 ml-2" />
-                            )}
+                            {program.is_completed && <CheckCircle className="h-4 w-4 text-green-500 ml-2" />}
                           </div>
-                        </div>
-                      ))}
-                    </div>
-                  )}
+                        </div>)}
+                    </div>}
                 </CardContent>
               </Card>
 
@@ -1533,16 +1305,8 @@ export default function UserDashboard() {
                   <CardTitle>Completed Programs</CardTitle>
                 </CardHeader>
                 <CardContent>
-                  {completedPrograms.length === 0 ? (
-                    <p className="text-sm text-muted-foreground">No completed programs yet</p>
-                  ) : (
-                    <div className="space-y-2">
-                      {completedPrograms.map((program) => (
-                        <div
-                          key={program.id}
-                          className="p-3 bg-muted rounded-lg cursor-pointer hover:bg-muted/80 transition-colors"
-                          onClick={() => handleNavigateToProgram(program.program_type, program.program_id)}
-                        >
+                  {completedPrograms.length === 0 ? <p className="text-sm text-muted-foreground">No completed programs yet</p> : <div className="space-y-2">
+                      {completedPrograms.map(program => <div key={program.id} className="p-3 bg-muted rounded-lg cursor-pointer hover:bg-muted/80 transition-colors" onClick={() => handleNavigateToProgram(program.program_type, program.program_id)}>
                           <div className="flex items-center justify-between">
                             <div className="flex-1">
                               <p className="font-medium text-sm">{program.program_name}</p>
@@ -1550,34 +1314,26 @@ export default function UserDashboard() {
                                 <Badge variant="outline" className="text-xs">
                                   {program.program_type}
                                 </Badge>
-                                {program.rating && (
-                                  <div className="flex items-center gap-1">
+                                {program.rating && <div className="flex items-center gap-1">
                                     <Star className="h-3 w-3 fill-yellow-500 text-yellow-500" />
                                     <span className="text-xs">{program.rating}</span>
-                                  </div>
-                                )}
+                                  </div>}
                               </div>
                             </div>
-                            {program.is_favorite && (
-                              <Heart className="h-4 w-4 fill-red-500 text-red-500 ml-2" />
-                            )}
+                            {program.is_favorite && <Heart className="h-4 w-4 fill-red-500 text-red-500 ml-2" />}
                           </div>
-                        </div>
-                      ))}
-                    </div>
-                  )}
+                        </div>)}
+                    </div>}
                 </CardContent>
               </Card>
             </div>
-            </>
-            )}
+            </>}
           </TabsContent>
 
           {/* My Purchases Tab */}
           <TabsContent value="purchases" className="space-y-6">
             {/* Premium Member Special Message */}
-            {hasActivePlan && (
-              <Card className="border-primary bg-gradient-to-br from-primary/10 via-primary/5 to-background overflow-hidden">
+            {hasActivePlan && <Card className="border-primary bg-gradient-to-br from-primary/10 via-primary/5 to-background overflow-hidden">
                 <CardContent className="text-center py-12 px-6 relative">
                   <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-primary to-transparent"></div>
                   <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-primary/10 mb-4">
@@ -1601,12 +1357,10 @@ export default function UserDashboard() {
                     Enjoy your complete fitness experience!
                   </p>
                 </CardContent>
-              </Card>
-            )}
+              </Card>}
 
             {/* Free User with Purchases Message */}
-            {!hasActivePlan && hasStandalonePurchases && (
-              <Card className="border-border bg-accent/10">
+            {!hasActivePlan && hasStandalonePurchases && <Card className="border-border bg-accent/10">
                 <CardContent className="text-center py-8 px-6">
                   <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-primary/10 mb-3">
                     <ShoppingBag className="h-8 w-8 text-primary" />
@@ -1616,8 +1370,7 @@ export default function UserDashboard() {
                     View and access your individually purchased content below
                   </p>
                 </CardContent>
-              </Card>
-            )}
+              </Card>}
 
             <Card>
               <CardHeader>
@@ -1627,12 +1380,8 @@ export default function UserDashboard() {
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                {purchasesLoading ? (
-                  <p className="text-center text-muted-foreground py-8">Loading purchases...</p>
-                ) : purchases.length === 0 ? (
-                  <div className="text-center py-8 space-y-4">
-                    {!hasActivePlan && (
-                      <>
+                {purchasesLoading ? <p className="text-center text-muted-foreground py-8">Loading purchases...</p> : purchases.length === 0 ? <div className="text-center py-8 space-y-4">
+                    {!hasActivePlan && <>
                         <p className="text-muted-foreground">You haven't purchased any individual content yet</p>
                         <div className="flex flex-col sm:flex-row gap-3 justify-center">
                           <Button onClick={() => navigate("/workout/strength")}>
@@ -1642,19 +1391,10 @@ export default function UserDashboard() {
                             Browse Programs
                           </Button>
                         </div>
-                      </>
-                    )}
-                    {hasActivePlan && (
-                      <p className="text-muted-foreground">No individual purchases — but you have full access to everything as a premium member!</p>
-                    )}
-                  </div>
-                ) : (
-                  <div className="space-y-4">
-                    {purchases.map((purchase) => (
-                      <Card 
-                        key={purchase.id} 
-                        className={`overflow-hidden transition-shadow ${purchase.content_deleted ? 'opacity-60 bg-muted/30' : 'hover:shadow-lg'}`}
-                      >
+                      </>}
+                    {hasActivePlan && <p className="text-muted-foreground">No individual purchases — but you have full access to everything as a premium member!</p>}
+                  </div> : <div className="space-y-4">
+                    {purchases.map(purchase => <Card key={purchase.id} className={`overflow-hidden transition-shadow ${purchase.content_deleted ? 'opacity-60 bg-muted/30' : 'hover:shadow-lg'}`}>
                         <CardContent className="p-6">
                           <div className="flex flex-col sm:flex-row justify-between items-start gap-4">
                             <div className="space-y-2 flex-1">
@@ -1662,11 +1402,9 @@ export default function UserDashboard() {
                                 <Badge variant="outline" className="text-xs">
                                   {purchase.content_type === "workout" ? "Workout" : "Program"}
                                 </Badge>
-                                {purchase.content_deleted && (
-                                  <Badge variant="destructive" className="text-xs">
+                                {purchase.content_deleted && <Badge variant="destructive" className="text-xs">
                                     Content Removed
-                                  </Badge>
-                                )}
+                                  </Badge>}
                                 <span className="text-xs text-muted-foreground">
                                   Purchased {new Date(purchase.purchased_at).toLocaleDateString()}
                                 </span>
@@ -1676,26 +1414,20 @@ export default function UserDashboard() {
                               </h3>
                               <p className="text-sm text-muted-foreground">€{Number(purchase.price).toFixed(2)}</p>
                             </div>
-                            <Button
-                              disabled={purchase.content_deleted}
-                              variant={purchase.content_deleted ? "outline" : "default"}
-                              onClick={() => {
-                                const routeType = getRouteTypeFromId(purchase.content_type, purchase.content_id);
-                                if (purchase.content_type === "workout") {
-                                  navigate(`/workout/${routeType}/${purchase.content_id}`);
-                                } else {
-                                  navigate(`/trainingprogram/${routeType}/${purchase.content_id}`);
-                                }
-                              }}
-                            >
+                            <Button disabled={purchase.content_deleted} variant={purchase.content_deleted ? "outline" : "default"} onClick={() => {
+                        const routeType = getRouteTypeFromId(purchase.content_type, purchase.content_id);
+                        if (purchase.content_type === "workout") {
+                          navigate(`/workout/${routeType}/${purchase.content_id}`);
+                        } else {
+                          navigate(`/trainingprogram/${routeType}/${purchase.content_id}`);
+                        }
+                      }}>
                               {purchase.content_deleted ? "No Longer Available" : "View Content"}
                             </Button>
                           </div>
                         </CardContent>
-                      </Card>
-                    ))}
-                  </div>
-                )}
+                      </Card>)}
+                  </div>}
               </CardContent>
             </Card>
           </TabsContent>
@@ -1714,39 +1446,26 @@ export default function UserDashboard() {
                   <CardTitle className="text-sm font-medium">1RM Calculator</CardTitle>
                 </CardHeader>
                 <CardContent>
-                  {oneRMHistory.length === 0 ? (
-                    <div className="text-center py-4">
+                  {oneRMHistory.length === 0 ? <div className="text-center py-4">
                       <p className="text-xs text-muted-foreground mb-2">No history yet</p>
                       <Button size="sm" variant="outline" onClick={() => navigate("/1rmcalculator")}>
                         Calculate Now
                       </Button>
-                    </div>
-                  ) : (
-                    <div className="space-y-2">
-                      {oneRMHistory.map((record) => (
-                        <div key={record.id} className="p-2 bg-muted rounded text-xs">
+                    </div> : <div className="space-y-2">
+                      {oneRMHistory.map(record => <div key={record.id} className="p-2 bg-muted rounded text-xs">
                           <div className="font-semibold">{record.one_rm_result.toFixed(1)} kg</div>
-                          {record.exercise_name && (
-                            <div className="text-muted-foreground">{record.exercise_name}</div>
-                          )}
+                          {record.exercise_name && <div className="text-muted-foreground">{record.exercise_name}</div>}
                           <div className="text-muted-foreground">
                             {record.weight_lifted}kg × {record.reps} reps
                           </div>
                           <div className="text-muted-foreground mt-1">
                             {formatDate(record.created_at)}
                           </div>
-                        </div>
-                      ))}
-                      <Button 
-                        size="sm" 
-                        variant="outline" 
-                        className="w-full mt-2"
-                        onClick={() => navigate("/1rmcalculator")}
-                      >
+                        </div>)}
+                      <Button size="sm" variant="outline" className="w-full mt-2" onClick={() => navigate("/1rmcalculator")}>
                         View All / Add New
                       </Button>
-                    </div>
-                  )}
+                    </div>}
                 </CardContent>
               </Card>
 
@@ -1756,17 +1475,13 @@ export default function UserDashboard() {
                   <CardTitle className="text-sm font-medium">BMR Calculator</CardTitle>
                 </CardHeader>
                 <CardContent>
-                  {bmrHistory.length === 0 ? (
-                    <div className="text-center py-4">
+                  {bmrHistory.length === 0 ? <div className="text-center py-4">
                       <p className="text-xs text-muted-foreground mb-2">No history yet</p>
                       <Button size="sm" variant="outline" onClick={() => navigate("/bmrcalculator")}>
                         Calculate Now
                       </Button>
-                    </div>
-                  ) : (
-                    <div className="space-y-2">
-                      {bmrHistory.map((record) => (
-                        <div key={record.id} className="p-2 bg-muted rounded text-xs">
+                    </div> : <div className="space-y-2">
+                      {bmrHistory.map(record => <div key={record.id} className="p-2 bg-muted rounded text-xs">
                           <div className="font-semibold">{record.bmr_result} cal/day</div>
                           <div className="text-muted-foreground">
                             {record.age}y • {record.weight}kg • {record.height}cm
@@ -1777,18 +1492,11 @@ export default function UserDashboard() {
                           <div className="text-muted-foreground mt-1">
                             {formatDate(record.created_at)}
                           </div>
-                        </div>
-                      ))}
-                      <Button 
-                        size="sm" 
-                        variant="outline" 
-                        className="w-full mt-2"
-                        onClick={() => navigate("/bmrcalculator")}
-                      >
+                        </div>)}
+                      <Button size="sm" variant="outline" className="w-full mt-2" onClick={() => navigate("/bmrcalculator")}>
                         View All / Add New
                       </Button>
-                    </div>
-                  )}
+                    </div>}
                 </CardContent>
               </Card>
 
@@ -1798,17 +1506,13 @@ export default function UserDashboard() {
                   <CardTitle className="text-sm font-medium">Macro Calculator</CardTitle>
                 </CardHeader>
                 <CardContent>
-                  {calorieHistory.length === 0 ? (
-                    <div className="text-center py-4">
+                  {calorieHistory.length === 0 ? <div className="text-center py-4">
                       <p className="text-xs text-muted-foreground mb-2">No history yet</p>
                       <Button size="sm" variant="outline" onClick={() => navigate("/macrocalculator")}>
                         Calculate Now
                       </Button>
-                    </div>
-                  ) : (
-                    <div className="space-y-2">
-                      {calorieHistory.map((record) => (
-                        <div key={record.id} className="p-2 bg-muted rounded text-xs">
+                    </div> : <div className="space-y-2">
+                      {calorieHistory.map(record => <div key={record.id} className="p-2 bg-muted rounded text-xs">
                           <div className="font-semibold">{record.target_calories} cal/day</div>
                           <div className="text-muted-foreground capitalize">
                             Goal: {record.goal.replace('_', ' ')}
@@ -1819,18 +1523,11 @@ export default function UserDashboard() {
                           <div className="text-muted-foreground mt-1">
                             {formatDate(record.created_at)}
                           </div>
-                        </div>
-                      ))}
-                      <Button 
-                        size="sm" 
-                        variant="outline" 
-                        className="w-full mt-2"
-                        onClick={() => navigate("/macrocalculator")}
-                      >
+                        </div>)}
+                      <Button size="sm" variant="outline" className="w-full mt-2" onClick={() => navigate("/macrocalculator")}>
                         View All / Add New
                       </Button>
-                    </div>
-                  )}
+                    </div>}
                 </CardContent>
             </Card>
           </div>
@@ -1838,8 +1535,7 @@ export default function UserDashboard() {
 
           {/* LogBook Tab */}
           <TabsContent value="logbook" className="space-y-6">
-            {!hasActivePlan && !hasStandalonePurchases && !isPremium ? (
-              <Card className="border-primary/50 bg-gradient-to-r from-primary/5 to-primary/10">
+            {!hasActivePlan && !hasStandalonePurchases && !isPremium ? <Card className="border-primary/50 bg-gradient-to-r from-primary/5 to-primary/10">
                 <CardContent className="text-center py-12">
                   <Crown className="h-12 w-12 text-primary mx-auto mb-4" />
                   <h3 className="text-xl font-bold mb-2">Premium Feature</h3>
@@ -1850,9 +1546,7 @@ export default function UserDashboard() {
                     Upgrade to Premium
                   </Button>
                 </CardContent>
-              </Card>
-            ) : (
-              <>
+              </Card> : <>
                 {/* Workout Activity Stats */}
                 <div>
             <h3 className="text-lg font-semibold mb-2">Workout Activity</h3>
@@ -1981,7 +1675,7 @@ export default function UserDashboard() {
                   </h3>
                   <div className="grid gap-2 md:grid-cols-5 mb-3">
                     {/* Smarty Check-ins Card */}
-                    <Card className="border-primary/20">
+                    <Card className="border-primary">
                       <CardHeader className="pb-0 pt-3">
                         <CardTitle className="text-sm font-medium flex items-center gap-2">
                           <ClipboardCheck className="h-4 w-4 text-primary" />
@@ -1989,12 +1683,7 @@ export default function UserDashboard() {
                         </CardTitle>
                       </CardHeader>
                       <CardContent className="py-2 px-3">
-                        <CheckInDashboardCard
-                          todayCheckin={todayCheckin}
-                          stats={stats}
-                          onOpenMorning={() => setShowMorningForm(true)}
-                          onOpenNight={() => setShowNightForm(true)}
-                        />
+                        <CheckInDashboardCard todayCheckin={todayCheckin} stats={stats} onOpenMorning={() => setShowMorningForm(true)} onOpenNight={() => setShowNightForm(true)} />
                       </CardContent>
                     </Card>
                     {/* 1RM Calculator */}
@@ -2003,39 +1692,26 @@ export default function UserDashboard() {
                         <CardTitle className="text-sm font-medium">1RM Calculator</CardTitle>
                       </CardHeader>
                       <CardContent className="py-2 px-3">
-                        {oneRMHistory.length === 0 ? (
-                          <div className="text-center py-1">
+                        {oneRMHistory.length === 0 ? <div className="text-center py-1">
                             <p className="text-xs text-muted-foreground mb-2">No history yet</p>
                             <Button size="sm" variant="outline" onClick={() => navigate("/one-rm-calculator")}>
                               Calculate Now
                             </Button>
-                          </div>
-                        ) : (
-                          <div className="space-y-0.5">
-                            {oneRMHistory.slice(0, 3).map((record) => (
-                              <div key={record.id} className="p-1 bg-muted rounded text-xs">
+                          </div> : <div className="space-y-0.5">
+                            {oneRMHistory.slice(0, 3).map(record => <div key={record.id} className="p-1 bg-muted rounded text-xs">
                                 <div className="font-semibold">{record.one_rm_result.toFixed(1)} kg</div>
-                                {record.exercise_name && (
-                                  <div className="text-muted-foreground">{record.exercise_name}</div>
-                                )}
+                                {record.exercise_name && <div className="text-muted-foreground">{record.exercise_name}</div>}
                                 <div className="text-muted-foreground">
                                   {record.weight_lifted}kg × {record.reps} reps
                                 </div>
                                 <div className="text-muted-foreground mt-1">
                                   {formatDate(record.created_at)}
                                 </div>
-                              </div>
-                            ))}
-                            <Button 
-                              size="sm" 
-                              variant="outline" 
-                              className="w-full mt-1"
-                              onClick={() => navigate("/one-rm-calculator")}
-                            >
+                              </div>)}
+                            <Button size="sm" variant="outline" className="w-full mt-1" onClick={() => navigate("/one-rm-calculator")}>
                               View All / Add New
                             </Button>
-                          </div>
-                        )}
+                          </div>}
                       </CardContent>
                     </Card>
 
@@ -2045,17 +1721,13 @@ export default function UserDashboard() {
                         <CardTitle className="text-sm font-medium">BMR Calculator</CardTitle>
                       </CardHeader>
                       <CardContent className="py-2 px-3">
-                        {bmrHistory.length === 0 ? (
-                          <div className="text-center py-1">
+                        {bmrHistory.length === 0 ? <div className="text-center py-1">
                             <p className="text-xs text-muted-foreground mb-2">No history yet</p>
                             <Button size="sm" variant="outline" onClick={() => navigate("/bmr-calculator")}>
                               Calculate Now
                             </Button>
-                          </div>
-                        ) : (
-                          <div className="space-y-0.5">
-                            {bmrHistory.slice(0, 3).map((record) => (
-                              <div key={record.id} className="p-1 bg-muted rounded text-xs">
+                          </div> : <div className="space-y-0.5">
+                            {bmrHistory.slice(0, 3).map(record => <div key={record.id} className="p-1 bg-muted rounded text-xs">
                                 <div className="font-semibold">{record.bmr_result.toFixed(0)} cal/day</div>
                                 <div className="text-muted-foreground">
                                   {record.gender === "male" ? "Male" : "Female"}, {record.age} years
@@ -2066,18 +1738,11 @@ export default function UserDashboard() {
                                 <div className="text-muted-foreground mt-1">
                                   {formatDate(record.created_at)}
                                 </div>
-                              </div>
-                            ))}
-                            <Button 
-                              size="sm" 
-                              variant="outline" 
-                              className="w-full mt-1"
-                              onClick={() => navigate("/bmr-calculator")}
-                            >
+                              </div>)}
+                            <Button size="sm" variant="outline" className="w-full mt-1" onClick={() => navigate("/bmr-calculator")}>
                               View All / Add New
                             </Button>
-                          </div>
-                        )}
+                          </div>}
                       </CardContent>
                     </Card>
 
@@ -2087,17 +1752,13 @@ export default function UserDashboard() {
                         <CardTitle className="text-sm font-medium">Macro Calculator</CardTitle>
                       </CardHeader>
                       <CardContent className="py-2 px-3">
-                        {calorieHistory.length === 0 ? (
-                          <div className="text-center py-1">
+                        {calorieHistory.length === 0 ? <div className="text-center py-1">
                             <p className="text-xs text-muted-foreground mb-2">No history yet</p>
                             <Button size="sm" variant="outline" onClick={() => navigate("/macro-tracking-calculator")}>
                               Calculate Now
                             </Button>
-                          </div>
-                        ) : (
-                          <div className="space-y-0.5">
-                            {calorieHistory.slice(0, 3).map((record) => (
-                              <div key={record.id} className="p-1 bg-muted rounded text-xs">
+                          </div> : <div className="space-y-0.5">
+                            {calorieHistory.slice(0, 3).map(record => <div key={record.id} className="p-1 bg-muted rounded text-xs">
                                 <div className="font-semibold">{record.target_calories.toFixed(0)} cal/day</div>
                                 <div className="text-muted-foreground capitalize">
                                   Goal: {record.goal}
@@ -2108,18 +1769,11 @@ export default function UserDashboard() {
                                 <div className="text-muted-foreground mt-1">
                                   {formatDate(record.created_at)}
                                 </div>
-                              </div>
-                            ))}
-                            <Button 
-                              size="sm" 
-                              variant="outline" 
-                              className="w-full mt-1"
-                              onClick={() => navigate("/macro-tracking-calculator")}
-                            >
+                              </div>)}
+                            <Button size="sm" variant="outline" className="w-full mt-1" onClick={() => navigate("/macro-tracking-calculator")}>
                               View All / Add New
                             </Button>
-                          </div>
-                        )}
+                          </div>}
                       </CardContent>
                     </Card>
 
@@ -2132,17 +1786,13 @@ export default function UserDashboard() {
                         </CardTitle>
                       </CardHeader>
                       <CardContent className="py-2 px-3">
-                        {measurementHistory.length === 0 ? (
-                          <div className="text-center py-1">
+                        {measurementHistory.length === 0 ? <div className="text-center py-1">
                             <p className="text-xs text-muted-foreground mb-2">Track your body measurements</p>
                             <Button size="sm" variant="outline" onClick={() => setIsMeasurementDialogOpen(true)}>
                               Add Measurement
                             </Button>
-                          </div>
-                        ) : (
-                          <div className="space-y-0.5">
-                            {measurementHistory.slice(0, 3).map((record) => (
-                              <div key={record.id} className="p-1 bg-muted rounded text-xs">
+                          </div> : <div className="space-y-0.5">
+                            {measurementHistory.slice(0, 3).map(record => <div key={record.id} className="p-1 bg-muted rounded text-xs">
                                 <div className="font-semibold">
                                   {record.tool_result?.weight && `${record.tool_result.weight} kg`}
                                   {record.tool_result?.weight && (record.tool_result?.body_fat || record.tool_result?.muscle_mass) && ' | '}
@@ -2153,26 +1803,18 @@ export default function UserDashboard() {
                                 <div className="text-muted-foreground mt-1">
                                   {formatDate(record.created_at)}
                                 </div>
-                              </div>
-                            ))}
-                            <Button 
-                              size="sm" 
-                              variant="outline" 
-                              className="w-full mt-1"
-                              onClick={() => setIsMeasurementDialogOpen(true)}
-                            >
+                              </div>)}
+                            <Button size="sm" variant="outline" className="w-full mt-1" onClick={() => setIsMeasurementDialogOpen(true)}>
                               View All / Add New
                             </Button>
-                          </div>
-                        )}
+                          </div>}
                       </CardContent>
                     </Card>
                   </div>
                 </div>
 
                 {/* Full Smarty Check-ins Section */}
-                {isPremium && (
-                  <div className="mt-6">
+                {isPremium && <div className="mt-6">
                     <Card>
                       <CardHeader>
                         <CardTitle className="flex items-center gap-2">
@@ -2184,88 +1826,51 @@ export default function UserDashboard() {
                         <SmartyCheckinsTab />
                       </CardContent>
                     </Card>
-                  </div>
-                )}
+                  </div>}
                 
                 {/* Calendar - Always shows ALL activity */}
                 <div id="logbook-calendar">
-                  <LogBookCalendar 
-                    userId={user!.id} 
-                    filter="all"
-                  />
+                  <LogBookCalendar userId={user!.id} filter="all" />
                 </div>
                 
                 <div id="logbook-charts">
-                  <LogBookAdvancedCharts 
-                    userId={user!.id}
-                    primaryFilter={logBookFilter}
-                    onPrimaryFilterChange={(filter) => setLogBookFilter(filter as any)}
-                    secondaryFilter={logBookSecondaryFilter}
-                    onSecondaryFilterChange={(filter) => setLogBookSecondaryFilter(filter)}
-                    timeFilter={logBookTimeFilter}
-                    onTimeFilterChange={(filter) => setLogBookTimeFilter(filter as any)}
-                    customStartDate={logBookCustomStartDate}
-                    onCustomStartDateChange={setLogBookCustomStartDate}
-                    customEndDate={logBookCustomEndDate}
-                    onCustomEndDateChange={setLogBookCustomEndDate}
-                  />
+                  <LogBookAdvancedCharts userId={user!.id} primaryFilter={logBookFilter} onPrimaryFilterChange={filter => setLogBookFilter(filter as any)} secondaryFilter={logBookSecondaryFilter} onSecondaryFilterChange={filter => setLogBookSecondaryFilter(filter)} timeFilter={logBookTimeFilter} onTimeFilterChange={filter => setLogBookTimeFilter(filter as any)} customStartDate={logBookCustomStartDate} onCustomStartDateChange={setLogBookCustomStartDate} customEndDate={logBookCustomEndDate} onCustomEndDateChange={setLogBookCustomEndDate} />
                 </div>
 
-                  <LogBookAdvancedExport 
-                    userId={user!.id} 
-                    primaryFilter={logBookFilter}
-                    secondaryFilter={logBookSecondaryFilter}
-                    timeFilter={logBookTimeFilter}
-                    customStartDate={logBookCustomStartDate}
-                    customEndDate={logBookCustomEndDate}
-                  />
-              </>
-            )}
+                  <LogBookAdvancedExport userId={user!.id} primaryFilter={logBookFilter} secondaryFilter={logBookSecondaryFilter} timeFilter={logBookTimeFilter} customStartDate={logBookCustomStartDate} customEndDate={logBookCustomEndDate} />
+              </>}
           </TabsContent>
         </Tabs>
       </main>
 
-      <MeasurementDialog
-        isOpen={isMeasurementDialogOpen}
-        onClose={() => setIsMeasurementDialogOpen(false)}
-        userId={user?.id || ''}
-      />
+      <MeasurementDialog isOpen={isMeasurementDialogOpen} onClose={() => setIsMeasurementDialogOpen(false)} userId={user?.id || ''} />
 
       {/* Morning Check-in Form Dialog */}
       <Dialog open={showMorningForm} onOpenChange={setShowMorningForm}>
         <DialogContent className="max-w-md max-h-[90vh] overflow-y-auto">
-          <MorningCheckInForm
-            onSubmit={async (data) => {
-              const success = await submitMorningCheckin(data);
-              if (success) {
-                setShowMorningForm(false);
-                fetchTodayCheckin();
-              }
-              return success;
-            }}
-            isWindowOpen={isMorningWindow}
-            windowEnd={morningWindowEnd}
-          />
+          <MorningCheckInForm onSubmit={async data => {
+          const success = await submitMorningCheckin(data);
+          if (success) {
+            setShowMorningForm(false);
+            fetchTodayCheckin();
+          }
+          return success;
+        }} isWindowOpen={isMorningWindow} windowEnd={morningWindowEnd} />
         </DialogContent>
       </Dialog>
 
       {/* Night Check-in Form Dialog */}
       <Dialog open={showNightForm} onOpenChange={setShowNightForm}>
         <DialogContent className="max-w-md max-h-[90vh] overflow-y-auto">
-          <NightCheckInForm
-            onSubmit={async (data) => {
-              const success = await submitNightCheckin(data);
-              if (success) {
-                setShowNightForm(false);
-                fetchTodayCheckin();
-              }
-              return success;
-            }}
-            isWindowOpen={isNightWindow}
-            windowEnd={nightWindowEnd}
-          />
+          <NightCheckInForm onSubmit={async data => {
+          const success = await submitNightCheckin(data);
+          if (success) {
+            setShowNightForm(false);
+            fetchTodayCheckin();
+          }
+          return success;
+        }} isWindowOpen={isNightWindow} windowEnd={nightWindowEnd} />
         </DialogContent>
       </Dialog>
-    </div>
-  );
+    </div>;
 }
