@@ -85,61 +85,57 @@ export function CheckInDashboardCard({
         </div>
       )}
 
-      {/* Today's Status */}
-      <div className="grid grid-cols-2 gap-2">
-        <div className="flex items-center gap-2 p-2 rounded-lg bg-muted/50">
-          <Sun className="h-4 w-4 text-amber-500 flex-shrink-0" />
-          <span className="text-xs sm:text-sm truncate">Morning</span>
+      {/* Today's Status - Compact inline display */}
+      <div className="flex items-center justify-center gap-4 py-1">
+        <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
+          <Sun className="h-3.5 w-3.5 text-amber-500" />
           <StatusIcon status={morningStatus} />
         </div>
-        <div className="flex items-center gap-2 p-2 rounded-lg bg-muted/50">
-          <Moon className="h-4 w-4 text-indigo-500 flex-shrink-0" />
-          <span className="text-xs sm:text-sm truncate">Night</span>
+        <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
+          <Moon className="h-3.5 w-3.5 text-indigo-500" />
           <StatusIcon status={nightStatus} />
         </div>
       </div>
 
       {/* Today's Score */}
       {todayCheckin?.daily_smarty_score !== null && todayCheckin?.daily_smarty_score !== undefined && (
-        <div className="flex items-center justify-between p-2 rounded-lg bg-muted/30">
-          <span className="text-xs sm:text-sm font-medium">Today's Score</span>
+        <div className="flex items-center justify-center">
           <Badge className={getScoreColor(todayCheckin.daily_smarty_score)}>
-            {todayCheckin.daily_smarty_score}/100
+            Score: {todayCheckin.daily_smarty_score}/100
           </Badge>
         </div>
       )}
 
-      {/* Action Buttons */}
+      {/* Action Buttons - Outline style matching other cards */}
       <div className="flex flex-col gap-2">
         {showMorningButton && onOpenMorning && (
           <Button 
             onClick={onOpenMorning}
-            className="w-full bg-amber-600 hover:bg-amber-700 text-xs sm:text-sm"
+            variant="outline"
+            className="w-full border-amber-500 text-amber-600 hover:bg-amber-500/10"
             size="sm"
           >
-            <Sun className="h-3.5 w-3.5 mr-1.5 flex-shrink-0" />
-            Complete Morning Check-in
+            Morning Check-in
           </Button>
         )}
         {showNightButton && onOpenNight && (
           <Button 
             onClick={onOpenNight}
-            className="w-full bg-indigo-600 hover:bg-indigo-700 text-xs sm:text-sm"
+            variant="outline"
+            className="w-full border-indigo-500 text-indigo-600 hover:bg-indigo-500/10"
             size="sm"
           >
-            <Moon className="h-3.5 w-3.5 mr-1.5 flex-shrink-0" />
-            Complete Night Check-in
+            Night Check-in
           </Button>
         )}
         {onOpenCheckins && (
           <Button 
             onClick={onOpenCheckins}
             variant="outline"
-            className="w-full text-xs sm:text-sm"
+            className="w-full"
             size="sm"
           >
             View Check-ins
-            <ArrowRight className="h-3.5 w-3.5 ml-1.5 flex-shrink-0" />
           </Button>
         )}
       </div>
