@@ -91,6 +91,22 @@ const FAQ = () => {
                   "@type": "Answer",
                   "text": "A standalone purchase allows you to buy individual premium workouts or training programs without committing to a subscription. This is perfect for trying our training methodology before upgrading. Simply create a free account, browse our content, click 'Buy Now' on any standalone-enabled item, complete payment, and access it immediately. You get full dashboard access for purchased content including logbook tracking, ratings, and all calculator tools."
                 }
+              },
+              {
+                "@type": "Question",
+                "name": "What is Smarty Ritual?",
+                "acceptedAnswer": {
+                  "@type": "Answer",
+                  "text": "Smarty Ritual is your all-day game plan for movement, recovery, and performance. Each day, Premium members receive a fresh ritual with three phases: Morning Ritual for activation, Midday Ritual for reset and recharge, and Evening Ritual for unwinding. Every ritual is designed by Haris Falas and delivered fresh each morning at 7:00 AM."
+                }
+              },
+              {
+                "@type": "Question",
+                "name": "What is Smarty Check-ins?",
+                "acceptedAnswer": {
+                  "@type": "Answer",
+                  "text": "Smarty Check-ins is a daily self-assessment feature helping you track wellness and stay accountable. Complete Morning Check-ins (6-9 AM) rating sleep, energy, and motivation, and Night Check-ins (6-9 PM) reflecting on nutrition, hydration, and stress. Each generates a Daily Smarty Score (0-100) to track progress, build streaks, and earn badges."
+                }
               }
             ]
           })}
@@ -237,12 +253,53 @@ const FAQ = () => {
                     </AccordionContent>
                   </AccordionItem>
 
-                  <AccordionItem value="item-7">
+              <AccordionItem value="item-7">
                     <AccordionTrigger className="text-left">Can I really get results training from home?</AccordionTrigger>
                     <AccordionContent className="py-2 leading-relaxed">
                       Absolutely. Results come from consistency, proper programming, and progressive overload — not from expensive equipment or gym memberships. 
                       Our home-based workouts are designed using the same science-based principles as gym-based training. Whether you're using bodyweight, 
                       resistance bands, or a pair of dumbbells, you can build strength, lose fat, improve fitness, and reach your goals with the right guidance.
+                    </AccordionContent>
+                  </AccordionItem>
+
+                  <AccordionItem value="item-7a">
+                    <AccordionTrigger className="text-left">What is Smarty Ritual?</AccordionTrigger>
+                    <AccordionContent className="py-2 leading-relaxed">
+                      <strong>Smarty Ritual</strong> is your all-day game plan for movement, recovery, and performance. 
+                      Each day, Premium members receive a fresh ritual with three expertly designed phases:<br/><br/>
+                      
+                      <strong>🌅 Morning Ritual (~8:00 AM):</strong> Wake up your body with joint unlock movements, light activation exercises, 
+                      and a nutrition tip to start your day strong.<br/><br/>
+                      
+                      <strong>☀️ Midday Ritual (~1:00 PM):</strong> Reset and recharge with desk-friendly micro movements, 
+                      breathing exercises, and a quick energy boost.<br/><br/>
+                      
+                      <strong>🌙 Evening Ritual (~5:00 PM):</strong> Unwind with decompression stretches, stress release techniques, 
+                      and pre-bed guidance for quality sleep.<br/><br/>
+                      
+                      Every ritual is personally designed by <a href="/coach-profile" className="text-primary hover:underline font-medium">Haris Falas</a> and 
+                      delivered fresh each morning at 7:00 AM. You can even add the ritual phases to your calendar with one click. 
+                      Smarty Ritual is exclusively available for <a href="/joinpremium" className="text-primary hover:underline font-medium">Premium members</a>.
+                    </AccordionContent>
+                  </AccordionItem>
+
+                  <AccordionItem value="item-7b">
+                    <AccordionTrigger className="text-left">What is Smarty Check-ins?</AccordionTrigger>
+                    <AccordionContent className="py-2 leading-relaxed">
+                      <strong>Smarty Check-ins</strong> is a daily self-assessment feature that helps you track your overall wellness and stay accountable to your fitness journey.<br/><br/>
+                      
+                      <strong>🌅 Morning Check-in (6:00 AM - 9:00 AM):</strong> Rate your sleep quality, energy levels, motivation, 
+                      and readiness to train — setting the tone for your day.<br/><br/>
+                      
+                      <strong>🌙 Night Check-in (6:00 PM - 9:00 PM):</strong> Reflect on your nutrition, hydration, activity level, 
+                      stress, and overall day before winding down.<br/><br/>
+                      
+                      Each check-in generates a <strong>Daily Smarty Score</strong> (0-100) that tracks your progress over time. 
+                      Build streaks, earn badges, view your history in graphs, and export your data for deeper analysis. 
+                      Your scores also appear on the LogBook calendar with color-coded indicators so you can spot patterns at a glance.<br/><br/>
+                      
+                      Smarty Check-ins is available in your <a href="/userdashboard?tab=checkins" className="text-primary hover:underline font-medium">Dashboard</a> and 
+                      helps you understand the connection between your daily habits and your fitness results.
                     </AccordionContent>
                   </AccordionItem>
 
