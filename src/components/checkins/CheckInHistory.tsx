@@ -54,9 +54,9 @@ export function CheckInHistory({ checkins }: CheckInHistoryProps) {
   };
 
   const StatusIcon = ({ completed, missed }: { completed: boolean; missed?: boolean }) => {
-    if (completed) return <CheckCircle2 className="h-4 w-4 text-green-600" />;
-    if (missed) return <XCircle className="h-4 w-4 text-destructive" />;
-    return <Circle className="h-4 w-4 text-muted-foreground" />;
+    if (completed) return <CheckCircle2 className="h-4 w-4 text-green-600 flex-shrink-0" />;
+    if (missed) return <XCircle className="h-4 w-4 text-destructive flex-shrink-0" />;
+    return <Circle className="h-4 w-4 text-muted-foreground flex-shrink-0" />;
   };
 
   const modifiers = {
@@ -98,18 +98,19 @@ export function CheckInHistory({ checkins }: CheckInHistoryProps) {
 
   return (
     <>
-      <Card>
-        <CardHeader className="pb-3">
-          <div className="flex items-center justify-between">
-            <CardTitle className="flex items-center gap-2 text-lg">
-              <CalendarIcon className="h-5 w-5" />
-              Check-in History
+      <Card className="overflow-hidden">
+        <CardHeader className="pb-3 px-4 sm:px-6">
+          <div className="flex items-center justify-between gap-2">
+            <CardTitle className="flex items-center gap-2 text-base sm:text-lg">
+              <CalendarIcon className="h-5 w-5 flex-shrink-0" />
+              <span className="truncate">Check-in History</span>
             </CardTitle>
-            <div className="flex gap-1">
+            <div className="flex gap-1 flex-shrink-0">
               <Button
                 variant={viewMode === 'calendar' ? 'default' : 'ghost'}
                 size="sm"
                 onClick={() => setViewMode('calendar')}
+                className="h-8 w-8 p-0"
               >
                 <CalendarIcon className="h-4 w-4" />
               </Button>
@@ -117,15 +118,16 @@ export function CheckInHistory({ checkins }: CheckInHistoryProps) {
                 variant={viewMode === 'list' ? 'default' : 'ghost'}
                 size="sm"
                 onClick={() => setViewMode('list')}
+                className="h-8 w-8 p-0"
               >
                 <List className="h-4 w-4" />
               </Button>
             </div>
           </div>
         </CardHeader>
-        <CardContent>
+        <CardContent className="px-4 sm:px-6">
           {viewMode === 'calendar' ? (
-            <div className="flex justify-center">
+            <div className="flex justify-center overflow-x-auto">
               <Calendar
                 mode="single"
                 selected={selectedDate}
@@ -148,22 +150,22 @@ export function CheckInHistory({ checkins }: CheckInHistoryProps) {
                     onClick={() => setDetailCheckin(checkin)}
                     className="w-full flex items-center justify-between p-3 rounded-lg bg-muted/50 hover:bg-muted transition-colors text-left"
                   >
-                    <div className="flex items-center gap-3">
-                      <div className={`w-3 h-3 rounded-full ${getScoreBadgeClass(checkin.daily_smarty_score)}`} />
-                      <div>
-                        <p className="font-medium">
+                    <div className="flex items-center gap-3 min-w-0">
+                      <div className={`w-3 h-3 rounded-full flex-shrink-0 ${getScoreBadgeClass(checkin.daily_smarty_score)}`} />
+                      <div className="min-w-0">
+                        <p className="font-medium text-sm sm:text-base truncate">
                           {format(new Date(checkin.checkin_date), 'EEE, MMM d')}
                         </p>
                         <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                          <Sun className="h-3 w-3" />
+                          <Sun className="h-3 w-3 flex-shrink-0" />
                           <StatusIcon completed={checkin.morning_completed} />
-                          <Moon className="h-3 w-3 ml-1" />
+                          <Moon className="h-3 w-3 ml-1 flex-shrink-0" />
                           <StatusIcon completed={checkin.night_completed} />
                         </div>
                       </div>
                     </div>
                     {checkin.daily_smarty_score !== null && (
-                      <Badge className={getScoreBadgeClass(checkin.daily_smarty_score)}>
+                      <Badge className={`flex-shrink-0 ${getScoreBadgeClass(checkin.daily_smarty_score)}`}>
                         {checkin.daily_smarty_score}
                       </Badge>
                     )}
@@ -174,17 +176,17 @@ export function CheckInHistory({ checkins }: CheckInHistoryProps) {
           )}
 
           {/* Legend */}
-          <div className="flex flex-wrap gap-4 mt-4 pt-4 border-t text-xs text-muted-foreground">
+          <div className="flex flex-wrap gap-3 sm:gap-4 mt-4 pt-4 border-t text-xs text-muted-foreground">
             <div className="flex items-center gap-1">
-              <div className="w-3 h-3 rounded-full bg-primary/20" />
+              <div className="w-3 h-3 rounded-full bg-primary/20 flex-shrink-0" />
               <span>Complete</span>
             </div>
             <div className="flex items-center gap-1">
-              <div className="w-3 h-3 rounded-full bg-yellow-500/20" />
+              <div className="w-3 h-3 rounded-full bg-yellow-500/20 flex-shrink-0" />
               <span>Partial</span>
             </div>
             <div className="flex items-center gap-1">
-              <div className="w-3 h-3 rounded-full bg-destructive/20" />
+              <div className="w-3 h-3 rounded-full bg-destructive/20 flex-shrink-0" />
               <span>Missed</span>
             </div>
           </div>
@@ -193,9 +195,9 @@ export function CheckInHistory({ checkins }: CheckInHistoryProps) {
 
       {/* Detail Modal */}
       <Dialog open={!!detailCheckin} onOpenChange={() => setDetailCheckin(null)}>
-        <DialogContent className="max-w-md">
+        <DialogContent className="max-w-md max-h-[90vh] overflow-y-auto">
           <DialogHeader>
-            <DialogTitle>
+            <DialogTitle className="text-base sm:text-lg">
               {detailCheckin && format(new Date(detailCheckin.checkin_date), 'EEEE, MMMM d, yyyy')}
             </DialogTitle>
           </DialogHeader>
@@ -206,7 +208,7 @@ export function CheckInHistory({ checkins }: CheckInHistoryProps) {
               {detailCheckin.daily_smarty_score !== null && (
                 <div className="text-center p-4 rounded-lg bg-muted">
                   <p className="text-sm text-muted-foreground mb-1">Daily Smarty Score</p>
-                  <p className="text-4xl font-bold">{detailCheckin.daily_smarty_score}</p>
+                  <p className="text-3xl sm:text-4xl font-bold">{detailCheckin.daily_smarty_score}</p>
                   <Badge className={`mt-2 ${getScoreBadgeClass(detailCheckin.daily_smarty_score)}`}>
                     {getScoreLabel(detailCheckin.score_category)}
                   </Badge>
@@ -215,8 +217,8 @@ export function CheckInHistory({ checkins }: CheckInHistoryProps) {
 
               {/* Morning Data */}
               <div className="space-y-2">
-                <h4 className="font-medium flex items-center gap-2">
-                  <Sun className="h-4 w-4 text-amber-500" />
+                <h4 className="font-medium flex items-center gap-2 text-sm sm:text-base">
+                  <Sun className="h-4 w-4 text-amber-500 flex-shrink-0" />
                   Morning Check-in
                   <StatusIcon completed={detailCheckin.morning_completed} />
                 </h4>
@@ -250,8 +252,8 @@ export function CheckInHistory({ checkins }: CheckInHistoryProps) {
 
               {/* Night Data */}
               <div className="space-y-2">
-                <h4 className="font-medium flex items-center gap-2">
-                  <Moon className="h-4 w-4 text-indigo-500" />
+                <h4 className="font-medium flex items-center gap-2 text-sm sm:text-base">
+                  <Moon className="h-4 w-4 text-indigo-500 flex-shrink-0" />
                   Night Check-in
                   <StatusIcon completed={detailCheckin.night_completed} />
                 </h4>
@@ -284,39 +286,39 @@ export function CheckInHistory({ checkins }: CheckInHistoryProps) {
               {/* Sub-scores */}
               {detailCheckin.status === 'complete' && (
                 <div className="space-y-2">
-                  <h4 className="font-medium">Category Scores</h4>
-                  <div className="grid grid-cols-4 gap-2 text-sm">
-                    <div className="text-center p-2 rounded bg-muted">
-                      <p className="text-muted-foreground text-xs">Sleep</p>
-                      <p className="font-bold">{detailCheckin.sleep_score}</p>
+                  <h4 className="font-medium text-sm sm:text-base">Category Scores</h4>
+                  <div className="grid grid-cols-4 gap-1.5 sm:gap-2 text-sm">
+                    <div className="text-center p-1.5 sm:p-2 rounded bg-muted">
+                      <p className="text-muted-foreground text-[10px] sm:text-xs">Sleep</p>
+                      <p className="font-bold text-sm sm:text-base">{detailCheckin.sleep_score}</p>
                     </div>
-                    <div className="text-center p-2 rounded bg-muted">
-                      <p className="text-muted-foreground text-xs">Ready</p>
-                      <p className="font-bold">{detailCheckin.readiness_score_norm}</p>
+                    <div className="text-center p-1.5 sm:p-2 rounded bg-muted">
+                      <p className="text-muted-foreground text-[10px] sm:text-xs">Ready</p>
+                      <p className="font-bold text-sm sm:text-base">{detailCheckin.readiness_score_norm}</p>
                     </div>
-                    <div className="text-center p-2 rounded bg-muted">
-                      <p className="text-muted-foreground text-xs">Move</p>
-                      <p className="font-bold">{detailCheckin.movement_score}</p>
+                    <div className="text-center p-1.5 sm:p-2 rounded bg-muted">
+                      <p className="text-muted-foreground text-[10px] sm:text-xs">Move</p>
+                      <p className="font-bold text-sm sm:text-base">{detailCheckin.movement_score}</p>
                     </div>
-                    <div className="text-center p-2 rounded bg-muted">
-                      <p className="text-muted-foreground text-xs">Hydrate</p>
-                      <p className="font-bold">{detailCheckin.hydration_score}</p>
+                    <div className="text-center p-1.5 sm:p-2 rounded bg-muted">
+                      <p className="text-muted-foreground text-[10px] sm:text-xs">Hydrate</p>
+                      <p className="font-bold text-sm sm:text-base">{detailCheckin.hydration_score}</p>
                     </div>
-                    <div className="text-center p-2 rounded bg-muted">
-                      <p className="text-muted-foreground text-xs">Protein</p>
-                      <p className="font-bold">{detailCheckin.protein_score_norm}</p>
+                    <div className="text-center p-1.5 sm:p-2 rounded bg-muted">
+                      <p className="text-muted-foreground text-[10px] sm:text-xs">Protein</p>
+                      <p className="font-bold text-sm sm:text-base">{detailCheckin.protein_score_norm}</p>
                     </div>
-                    <div className="text-center p-2 rounded bg-muted">
-                      <p className="text-muted-foreground text-xs">Mood</p>
-                      <p className="font-bold">{detailCheckin.mood_score}</p>
+                    <div className="text-center p-1.5 sm:p-2 rounded bg-muted">
+                      <p className="text-muted-foreground text-[10px] sm:text-xs">Mood</p>
+                      <p className="font-bold text-sm sm:text-base">{detailCheckin.mood_score}</p>
                     </div>
-                    <div className="text-center p-2 rounded bg-muted">
-                      <p className="text-muted-foreground text-xs">Strain</p>
-                      <p className="font-bold">{detailCheckin.day_strain_score}</p>
+                    <div className="text-center p-1.5 sm:p-2 rounded bg-muted">
+                      <p className="text-muted-foreground text-[10px] sm:text-xs">Strain</p>
+                      <p className="font-bold text-sm sm:text-base">{detailCheckin.day_strain_score}</p>
                     </div>
-                    <div className="text-center p-2 rounded bg-muted">
-                      <p className="text-muted-foreground text-xs">Sore</p>
-                      <p className="font-bold">{detailCheckin.soreness_score}</p>
+                    <div className="text-center p-1.5 sm:p-2 rounded bg-muted">
+                      <p className="text-muted-foreground text-[10px] sm:text-xs">Sore</p>
+                      <p className="font-bold text-sm sm:text-base">{detailCheckin.soreness_score}</p>
                     </div>
                   </div>
                 </div>
