@@ -69,7 +69,7 @@ export function MorningCheckInForm({
 
   if (!isWindowOpen) {
     return (
-      <Card className="border-amber-200 dark:border-amber-800">
+      <Card className="border-amber-200 dark:border-amber-800 overflow-hidden">
         <CardContent className="py-8 text-center">
           <Sun className="h-12 w-12 mx-auto mb-4 text-muted-foreground" />
           <p className="text-muted-foreground">
@@ -84,23 +84,23 @@ export function MorningCheckInForm({
   }
 
   return (
-    <Card className="border-amber-200 dark:border-amber-800">
-      <CardHeader className="pb-4">
-        <CardTitle className="flex items-center gap-2">
-          <Sun className="h-5 w-5 text-amber-500" />
+    <Card className="border-amber-200 dark:border-amber-800 overflow-hidden">
+      <CardHeader className="pb-4 px-4 sm:px-6">
+        <CardTitle className="flex items-center gap-2 text-base sm:text-lg">
+          <Sun className="h-5 w-5 text-amber-500 flex-shrink-0" />
           Morning Check-in
         </CardTitle>
-        <CardDescription>
+        <CardDescription className="text-xs sm:text-sm">
           Window open until {windowEnd}. Takes 30 seconds.
         </CardDescription>
       </CardHeader>
-      <CardContent className="space-y-6">
+      <CardContent className="space-y-5 px-4 sm:px-6 pb-4 sm:pb-6">
         {/* Sleep Duration */}
-        <div className="space-y-3">
+        <div className="space-y-2">
           <label className="text-sm font-medium">
             How many hours did you sleep last night?
           </label>
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-3">
             <Slider
               value={[sleepHours]}
               onValueChange={([val]) => setSleepHours(val)}
@@ -109,7 +109,7 @@ export function MorningCheckInForm({
               step={0.5}
               className="flex-1"
             />
-            <span className="w-16 text-center font-semibold text-lg">
+            <span className="w-12 text-center font-semibold text-base flex-shrink-0">
               {sleepHours}h
             </span>
           </div>
@@ -120,36 +120,36 @@ export function MorningCheckInForm({
         </div>
 
         {/* Sleep Quality */}
-        <div className="space-y-3">
+        <div className="space-y-2">
           <label className="text-sm font-medium">
             How was your sleep quality?
           </label>
-          <div className="flex justify-between gap-2">
+          <div className="grid grid-cols-5 gap-1.5 sm:gap-2">
             {sleepQualityEmojis.map(({ value, emoji, label }) => (
               <button
                 key={value}
                 type="button"
                 onClick={() => setSleepQuality(value)}
                 className={`
-                  flex flex-col items-center p-2 rounded-lg transition-all flex-1
+                  flex flex-col items-center p-1.5 sm:p-2 rounded-lg transition-all
                   ${sleepQuality === value 
                     ? 'bg-primary text-primary-foreground ring-2 ring-primary' 
                     : 'bg-muted hover:bg-muted/80'}
                 `}
               >
-                <span className="text-2xl">{emoji}</span>
-                <span className="text-xs mt-1 hidden sm:block">{label}</span>
+                <span className="text-lg sm:text-2xl">{emoji}</span>
+                <span className="text-[10px] sm:text-xs mt-0.5 hidden sm:block truncate w-full text-center">{label}</span>
               </button>
             ))}
           </div>
         </div>
 
         {/* Readiness */}
-        <div className="space-y-3">
+        <div className="space-y-2">
           <label className="text-sm font-medium">
             How ready do you feel for today?
           </label>
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-3">
             <Slider
               value={[readinessScore]}
               onValueChange={([val]) => setReadinessScore(val)}
@@ -158,7 +158,7 @@ export function MorningCheckInForm({
               step={1}
               className="flex-1"
             />
-            <span className="w-20 text-center text-sm font-medium">
+            <span className="w-16 sm:w-20 text-center text-xs sm:text-sm font-medium flex-shrink-0">
               {readinessLabels[readinessScore]}
             </span>
           </div>
@@ -169,11 +169,11 @@ export function MorningCheckInForm({
         </div>
 
         {/* Soreness */}
-        <div className="space-y-3">
+        <div className="space-y-2">
           <label className="text-sm font-medium">
             How does your body feel this morning?
           </label>
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-3">
             <Slider
               value={[sorenessRating]}
               onValueChange={([val]) => setSorenessRating(val)}
@@ -182,7 +182,7 @@ export function MorningCheckInForm({
               step={1}
               className="flex-1"
             />
-            <span className="w-20 text-center text-sm font-medium">
+            <span className="w-16 sm:w-20 text-center text-xs sm:text-sm font-medium flex-shrink-0">
               {sorenessLabels[sorenessRating]}
             </span>
           </div>
@@ -193,25 +193,25 @@ export function MorningCheckInForm({
         </div>
 
         {/* Mood */}
-        <div className="space-y-3">
+        <div className="space-y-2">
           <label className="text-sm font-medium">
             How is your mood right now?
           </label>
-          <div className="flex justify-between gap-2">
+          <div className="grid grid-cols-5 gap-1.5 sm:gap-2">
             {moodEmojis.map(({ value, emoji, label }) => (
               <button
                 key={value}
                 type="button"
                 onClick={() => setMoodRating(value)}
                 className={`
-                  flex flex-col items-center p-2 rounded-lg transition-all flex-1
+                  flex flex-col items-center p-1.5 sm:p-2 rounded-lg transition-all
                   ${moodRating === value 
                     ? 'bg-primary text-primary-foreground ring-2 ring-primary' 
                     : 'bg-muted hover:bg-muted/80'}
                 `}
               >
-                <span className="text-2xl">{emoji}</span>
-                <span className="text-xs mt-1 hidden sm:block">{label}</span>
+                <span className="text-lg sm:text-2xl">{emoji}</span>
+                <span className="text-[10px] sm:text-xs mt-0.5 hidden sm:block truncate w-full text-center">{label}</span>
               </button>
             ))}
           </div>

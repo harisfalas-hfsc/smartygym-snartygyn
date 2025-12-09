@@ -1,5 +1,4 @@
 import React from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { 
@@ -9,7 +8,6 @@ import {
   Sun, 
   Moon, 
   Flame,
-  TrendingUp,
   ArrowRight
 } from 'lucide-react';
 import { CheckinRecord, CheckinStats } from '@/hooks/useCheckins';
@@ -54,13 +52,13 @@ export function CheckInDashboardCard({
   const StatusIcon = ({ status }: { status: string }) => {
     switch (status) {
       case 'done':
-        return <CheckCircle2 className="h-4 w-4 text-green-600" />;
+        return <CheckCircle2 className="h-4 w-4 text-green-600 flex-shrink-0" />;
       case 'pending':
-        return <Circle className="h-4 w-4 text-amber-500 animate-pulse" />;
+        return <Circle className="h-4 w-4 text-amber-500 animate-pulse flex-shrink-0" />;
       case 'missed':
-        return <XCircle className="h-4 w-4 text-destructive" />;
+        return <XCircle className="h-4 w-4 text-destructive flex-shrink-0" />;
       default:
-        return <Circle className="h-4 w-4 text-muted-foreground" />;
+        return <Circle className="h-4 w-4 text-muted-foreground flex-shrink-0" />;
     }
   };
 
@@ -76,76 +74,75 @@ export function CheckInDashboardCard({
   const showNightButton = windowStatus.isNightWindow && !todayCheckin?.night_completed;
 
   return (
-    <Card className="border-primary/20">
-      <CardHeader className="pb-3">
-        <CardTitle className="flex items-center justify-between text-lg">
-          <span className="flex items-center gap-2">
-            <TrendingUp className="h-5 w-5 text-primary" />
-            Smarty Check-ins
-          </span>
-          {stats && stats.currentStreak > 0 && (
-            <Badge variant="secondary" className="flex items-center gap-1">
-              <Flame className="h-3 w-3 text-primary" />
-              {stats.currentStreak} day streak
-            </Badge>
-          )}
-        </CardTitle>
-      </CardHeader>
-      <CardContent className="space-y-4">
-        {/* Today's Status */}
-        <div className="grid grid-cols-2 gap-3">
-          <div className="flex items-center gap-2 p-2 rounded-lg bg-muted/50">
-            <Sun className="h-4 w-4 text-amber-500" />
-            <span className="text-sm">Morning</span>
-            <StatusIcon status={morningStatus} />
-          </div>
-          <div className="flex items-center gap-2 p-2 rounded-lg bg-muted/50">
-            <Moon className="h-4 w-4 text-indigo-500" />
-            <span className="text-sm">Night</span>
-            <StatusIcon status={nightStatus} />
-          </div>
+    <div className="space-y-3">
+      {/* Streak Badge */}
+      {stats && stats.currentStreak > 0 && (
+        <div className="flex justify-center">
+          <Badge variant="secondary" className="flex items-center gap-1">
+            <Flame className="h-3 w-3 text-primary" />
+            {stats.currentStreak} day streak
+          </Badge>
         </div>
+      )}
 
-        {/* Today's Score */}
-        {todayCheckin?.daily_smarty_score !== null && todayCheckin?.daily_smarty_score !== undefined && (
-          <div className="flex items-center justify-between p-3 rounded-lg bg-muted/30">
-            <span className="text-sm font-medium">Today's Score</span>
-            <Badge className={getScoreColor(todayCheckin.daily_smarty_score)}>
-              {todayCheckin.daily_smarty_score}/100
-            </Badge>
-          </div>
+      {/* Today's Status */}
+      <div className="grid grid-cols-2 gap-2">
+        <div className="flex items-center gap-2 p-2 rounded-lg bg-muted/50">
+          <Sun className="h-4 w-4 text-amber-500 flex-shrink-0" />
+          <span className="text-xs sm:text-sm truncate">Morning</span>
+          <StatusIcon status={morningStatus} />
+        </div>
+        <div className="flex items-center gap-2 p-2 rounded-lg bg-muted/50">
+          <Moon className="h-4 w-4 text-indigo-500 flex-shrink-0" />
+          <span className="text-xs sm:text-sm truncate">Night</span>
+          <StatusIcon status={nightStatus} />
+        </div>
+      </div>
+
+      {/* Today's Score */}
+      {todayCheckin?.daily_smarty_score !== null && todayCheckin?.daily_smarty_score !== undefined && (
+        <div className="flex items-center justify-between p-2 rounded-lg bg-muted/30">
+          <span className="text-xs sm:text-sm font-medium">Today's Score</span>
+          <Badge className={getScoreColor(todayCheckin.daily_smarty_score)}>
+            {todayCheckin.daily_smarty_score}/100
+          </Badge>
+        </div>
+      )}
+
+      {/* Action Buttons */}
+      <div className="flex flex-col gap-2">
+        {showMorningButton && onOpenMorning && (
+          <Button 
+            onClick={onOpenMorning}
+            className="w-full bg-amber-600 hover:bg-amber-700 text-xs sm:text-sm"
+            size="sm"
+          >
+            <Sun className="h-3.5 w-3.5 mr-1.5 flex-shrink-0" />
+            Complete Morning Check-in
+          </Button>
         )}
-
-        {/* Action Buttons */}
-        <div className="flex flex-col gap-2">
-          {showMorningButton && onOpenMorning && (
-            <Button 
-              onClick={onOpenMorning}
-              className="w-full bg-amber-600 hover:bg-amber-700"
-            >
-              <Sun className="h-4 w-4 mr-2" />
-              Complete Morning Check-in
-            </Button>
-          )}
-          {showNightButton && onOpenNight && (
-            <Button 
-              onClick={onOpenNight}
-              className="w-full bg-indigo-600 hover:bg-indigo-700"
-            >
-              <Moon className="h-4 w-4 mr-2" />
-              Complete Night Check-in
-            </Button>
-          )}
+        {showNightButton && onOpenNight && (
+          <Button 
+            onClick={onOpenNight}
+            className="w-full bg-indigo-600 hover:bg-indigo-700 text-xs sm:text-sm"
+            size="sm"
+          >
+            <Moon className="h-3.5 w-3.5 mr-1.5 flex-shrink-0" />
+            Complete Night Check-in
+          </Button>
+        )}
+        {onOpenCheckins && (
           <Button 
             onClick={onOpenCheckins}
             variant="outline"
-            className="w-full"
+            className="w-full text-xs sm:text-sm"
+            size="sm"
           >
             View Check-ins
-            <ArrowRight className="h-4 w-4 ml-2" />
+            <ArrowRight className="h-3.5 w-3.5 ml-1.5 flex-shrink-0" />
           </Button>
-        </div>
-      </CardContent>
-    </Card>
+        )}
+      </div>
+    </div>
   );
 }
