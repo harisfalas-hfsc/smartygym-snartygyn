@@ -330,16 +330,8 @@ async function sendRitualNotifications(supabase: any, dayNumber: number, date: s
 
     const subject = "☀️ Your all day game – plan is ready";
     
-    // Generate ICS content for email attachment link
-    const ritualDate = date;
-    const icsContent = generateICSForEmail(dayNumber, ritualDate);
-    // Encode ICS to base64 properly for Unicode content
-    const encoder = new TextEncoder();
-    const uint8Array = encoder.encode(icsContent);
-    let binaryString = '';
-    uint8Array.forEach(byte => binaryString += String.fromCharCode(byte));
-    const icsBase64 = btoa(binaryString);
-    const icsDataUri = `data:text/calendar;base64,${icsBase64}`;
+    // Generate calendar download URL (using edge function instead of data URI for email compatibility)
+    const calendarDownloadUrl = `https://cvccrvyimyzrxcwzmxwk.supabase.co/functions/v1/download-ritual-calendar?date=${date}`;
     
     const content = `<p class="tiptap-paragraph"><strong>Your Smarty Ritual is here!</strong></p>
 <p class="tiptap-paragraph">Your personalized daily ritual is ready. Start with the Morning Ritual to energize your day, reset at Midday, and unwind in the Evening.</p>
@@ -405,7 +397,7 @@ async function sendRitualNotifications(supabase: any, dayNumber: number, date: s
                 </div>
                 <div style="margin: 24px 0; padding: 16px; background: #f8f8f8; border-radius: 8px; text-align: center;">
                   <p style="font-size: 14px; color: #666; margin-bottom: 12px;">📅 Add all 3 phases to your calendar with reminders:</p>
-                  <a href="${icsDataUri}" download="smarty-ritual.ics" style="display: inline-block; background: #333; color: white; padding: 10px 20px; text-decoration: none; border-radius: 4px; font-size: 14px;">📥 Download Calendar File (.ics)</a>
+                  <a href="${calendarDownloadUrl}" style="display: inline-block; background: #333; color: white; padding: 10px 20px; text-decoration: none; border-radius: 4px; font-size: 14px;">📥 Download Calendar File (.ics)</a>
                 </div>
                 <hr style="margin: 32px 0; border: none; border-top: 1px solid #eee;">
                 <p style="font-size: 12px; color: #999; text-align: center;">Designed by Haris Falas</p>
