@@ -30,6 +30,7 @@ const CHART_COLORS = {
   tool: 'hsl(24, 95%, 53%)',
   measurement: 'hsl(280, 100%, 70%)',
   personal_training: 'hsl(340, 75%, 55%)',
+  checkin: 'hsl(172, 66%, 50%)',
   completed: 'hsl(142, 76%, 36%)',
   viewed: 'hsl(217, 91%, 60%)',
   favorites: 'hsl(45, 93%, 47%)',
@@ -65,6 +66,11 @@ const SECONDARY_FILTERS = {
     { value: 'weight', label: 'Weight' },
     { value: 'body_fat', label: 'Body Fat %' },
     { value: 'measurements', label: 'Body Measurements' },
+  ],
+  checkin: [
+    { value: 'all', label: 'All Check-ins' },
+    { value: 'morning', label: 'Morning Check-ins' },
+    { value: 'night', label: 'Night Check-ins' },
   ],
 };
 
@@ -172,6 +178,7 @@ export const LogBookAdvancedCharts = ({
             <SelectItem value="program">Training Programs</SelectItem>
             <SelectItem value="tool">Tools</SelectItem>
             <SelectItem value="measurement">Measurements</SelectItem>
+            <SelectItem value="checkin">Check-ins</SelectItem>
           </SelectContent>
         </Select>
 

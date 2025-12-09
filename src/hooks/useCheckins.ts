@@ -263,6 +263,20 @@ export function useCheckins() {
         });
       }
 
+      // Log activity for morning check-in
+      const { data: { user } } = await supabase.auth.getUser();
+      if (user) {
+        await supabase.from('user_activity_log').insert({
+          user_id: user.id,
+          content_type: 'checkin',
+          item_id: checkin.id,
+          item_name: 'Morning Check-in',
+          action_type: 'completed',
+          activity_date: getTodayDate(),
+          tool_result: { type: 'morning' }
+        });
+      }
+
       await fetchTodayCheckin();
       toast({
         title: "Morning check-in completed!",
@@ -278,7 +292,7 @@ export function useCheckins() {
       });
       return false;
     }
-  }, [createOrGetTodayCheckin, fetchTodayCheckin, toast]);
+  }, [createOrGetTodayCheckin, fetchTodayCheckin, toast, getTodayDate]);
 
   const submitNightCheckin = useCallback(async (data: NightCheckinData): Promise<boolean> => {
     try {
@@ -299,10 +313,31 @@ export function useCheckins() {
       // Calculate scores
       const { data: { session } } = await supabase.auth.getSession();
       if (session) {
-        await supabase.functions.invoke('calculate-checkin-scores', {
+        const response = await supabase.functions.invoke('calculate-checkin-scores', {
           body: { checkin_id: checkin.id },
           headers: { Authorization: `Bearer ${session.access_token}` }
         });
+        
+        // Get the updated checkin with scores
+        const updatedCheckin = await fetchTodayCheckin();
+        
+        // Log activity for night check-in with score
+        const { data: { user } } = await supabase.auth.getUser();
+        if (user && updatedCheckin) {
+          await supabase.from('user_activity_log').insert({
+            user_id: user.id,
+            content_type: 'checkin',
+            item_id: checkin.id,
+            item_name: 'Night Check-in',
+            action_type: 'completed',
+            activity_date: getTodayDate(),
+            tool_result: { 
+              type: 'night',
+              score: updatedCheckin.daily_smarty_score,
+              category: updatedCheckin.score_category
+            }
+          });
+        }
       }
 
       await fetchTodayCheckin();
@@ -320,7 +355,7 @@ export function useCheckins() {
       });
       return false;
     }
-  }, [createOrGetTodayCheckin, fetchTodayCheckin, toast]);
+  }, [createOrGetTodayCheckin, fetchTodayCheckin, toast, getTodayDate]);
 
   const markModalShown = useCallback(async (type: 'morning' | 'night') => {
     try {

@@ -1977,7 +1977,7 @@ export default function UserDashboard() {
                 <div>
                   <h3 className="text-lg font-semibold mb-2 flex items-center gap-2">
                     <ClipboardCheck className="h-5 w-5 text-primary" />
-                    Check-Ins & Measurements
+                    Check-ins, Calculators, and Measurements
                   </h3>
                   <div className="grid gap-2 md:grid-cols-5 mb-3">
                     {/* Smarty Check-ins Card */}
