@@ -160,21 +160,6 @@ const TakeTour = () => {
       </div>
 
       <div className="min-h-screen bg-background pb-24">
-        {/* Hero Section */}
-        <section className="relative py-12 px-4 bg-gradient-to-br from-primary/10 via-background to-primary/5 border-b border-border">
-          <div className="container mx-auto max-w-4xl text-center space-y-6 animate-fade-in">
-            <h1 className="text-3xl sm:text-4xl font-bold mb-4">
-              Welcome to <span className="text-primary">SmartyGym</span>
-            </h1>
-            <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-              Your fitness Re-imagined - Anywhere, anytime. Let's show you around!
-            </p>
-            <div className="inline-block bg-primary/20 border border-primary/30 rounded-full px-6 py-2">
-              <p className="text-sm font-semibold">🎯 Science-based • 💪 Expert-designed • 🌍 Worldwide</p>
-            </div>
-          </div>
-        </section>
-
         {/* How It Works - Step by Step */}
         <section className="py-16 px-4">
           <div className="container mx-auto max-w-6xl">
