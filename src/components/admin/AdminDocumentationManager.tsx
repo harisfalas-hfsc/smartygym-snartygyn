@@ -584,6 +584,218 @@ For full testing documentation, see:
 /docs/qa_manual_checklist.md
 /docs/DEPLOYMENT_CHECKLIST.md`;
 
+  // Individual User Promotional Presentation
+  const individualPresentation = `════════════════════════════════════════════════════════════════════════════════
+                              🏋️ SMARTYGYM
+                         Your Personal Online Gym
+                        100% Human. 0% AI Nonsense.
+════════════════════════════════════════════════════════════════════════════════
+
+                              [SmartyGym Logo]
+
+────────────────────────────────────────────────────────────────────────────────
+                     TRAIN ANYWHERE. ANYTIME. EXPERTLY.
+────────────────────────────────────────────────────────────────────────────────
+
+SmartyGym is your complete online fitness platform, designed by Sports Scientist 
+and CSCS-certified coach Haris Falas with over 20 years of experience. No algorithms. 
+No AI-generated fluff. Just real expertise, proven methods, and results that matter.
+
+═══════════════════════════════════════════════════════════════════════════════
+                              OUR FEATURES
+═══════════════════════════════════════════════════════════════════════════════
+
+🏋️ SMARTY WORKOUTS                    📋 SMARTY PROGRAMS
+────────────────────────                ────────────────────────
+• 500+ expert-designed workouts        • Multi-week structured programs
+• Strength, Cardio, HIIT, Mobility     • Progressive training plans
+• Bodyweight & equipment options        • Category-specific goals
+• Daily Workout of the Day (WOD)       • Step-by-step guidance
+
+✨ SMARTY RITUAL                        🔧 SMARTY TOOLS
+────────────────────────                ────────────────────────
+• Daily morning activation             • BMR Calculator
+• Midday desk reset routines           • 1RM Strength Calculator
+• Evening decompression                • Macro Tracking Calculator
+• Movement + recovery + performance    • Body Measurements Tracker
+
+📊 SMARTY CHECK-INS                    📚 BLOG & COMMUNITY
+────────────────────────                ────────────────────────
+• Morning & evening check-ins          • Expert fitness articles
+• Track sleep, mood, recovery          • Nutrition & wellness guides
+• Build consistency streaks            • Community leaderboards
+• Daily Smarty Score                   • Member achievements
+
+═══════════════════════════════════════════════════════════════════════════════
+                           MEMBERSHIP PLANS
+═══════════════════════════════════════════════════════════════════════════════
+
+┌─────────────────────┬─────────────────────┬─────────────────────┐
+│       FREE          │        GOLD         │      PLATINUM       │
+├─────────────────────┼─────────────────────┼─────────────────────┤
+│                     │                     │                     │
+│ ✓ Free Workouts     │ ✓ Everything Free   │ ✓ Everything Gold   │
+│ ✓ Free Programs     │ ✓ All Premium       │ ✓ Smarty Ritual     │
+│ ✓ Smarty Tools      │   Workouts          │ ✓ Smarty Check-ins  │
+│ ✓ Blog Access       │ ✓ All Premium       │ ✓ Priority Support  │
+│ ✓ Community         │   Programs          │ ✓ Advanced Tools    │
+│                     │ ✓ Daily WOD         │ ✓ Full Logbook      │
+│                     │                     │                     │
+│      FREE           │   €9.99/month       │   €19.99/month      │
+│                     │   or €99/year       │   or €199/year      │
+└─────────────────────┴─────────────────────┴─────────────────────┘
+
+═══════════════════════════════════════════════════════════════════════════════
+                            MEET YOUR COACH
+═══════════════════════════════════════════════════════════════════════════════
+
+                           [Photo: Haris Falas]
+
+                            HARIS FALAS
+                     Sports Scientist | CSCS Certified
+                      20+ Years Coaching Experience
+
+"Real fitness comes from real expertise. Every workout, every program, 
+every piece of advice on SmartyGym is crafted from decades of hands-on 
+experience helping people transform their lives."
+
+═══════════════════════════════════════════════════════════════════════════════
+                          START YOUR JOURNEY
+═══════════════════════════════════════════════════════════════════════════════
+
+🌐 Website: smartygym.com
+📧 Email: info@smartygym.com
+📱 Instagram: @smartygym
+📘 Facebook: SmartyGym
+
+────────────────────────────────────────────────────────────────────────────────
+                     JOIN SMARTYGYM TODAY!
+             The gym that never closes and never takes a holiday.
+────────────────────────────────────────────────────────────────────────────────
+
+© 2024 SmartyGym. All Rights Reserved.`;
+
+  // Corporate Promotional Presentation
+  const corporatePresentation = `════════════════════════════════════════════════════════════════════════════════
+                           🏢 SMARTY CORPORATE
+                    Enterprise Fitness for Your Team
+                       100% Human. 0% AI Nonsense.
+════════════════════════════════════════════════════════════════════════════════
+
+                              [SmartyGym Logo]
+
+────────────────────────────────────────────────────────────────────────────────
+               EMPOWER YOUR WORKFORCE. ELEVATE PERFORMANCE.
+────────────────────────────────────────────────────────────────────────────────
+
+Smarty Corporate brings SmartyGym's expert-designed fitness platform to your 
+organization. One subscription, unlimited potential. Designed by Sports Scientist 
+Haris Falas with 20+ years of experience, your team gets access to proven 
+training methods that boost productivity, reduce stress, and improve wellbeing.
+
+═══════════════════════════════════════════════════════════════════════════════
+                        WHY SMARTY CORPORATE?
+═══════════════════════════════════════════════════════════════════════════════
+
+✓ CENTRALIZED TEAM MANAGEMENT          ✓ PLATINUM ACCESS FOR ALL MEMBERS
+  One admin controls everything           Full premium features included
+
+✓ FLEXIBLE TEAM SIZE                    ✓ SIMPLIFIED BILLING
+  Scale from 10 to unlimited users        One annual invoice
+
+✓ EMPLOYEE WELLNESS SOLUTION            ✓ REAL EXPERTISE, NOT AI
+  Boost productivity & morale             Coach-designed content only
+
+═══════════════════════════════════════════════════════════════════════════════
+                    WHAT YOUR TEAM GETS (PLATINUM ACCESS)
+═══════════════════════════════════════════════════════════════════════════════
+
+🏋️ SMARTY WORKOUTS                    📋 SMARTY PROGRAMS
+────────────────────────                ────────────────────────
+• 500+ expert-designed workouts        • Multi-week structured programs
+• Strength, Cardio, HIIT, Mobility     • Progressive training plans
+• Bodyweight & equipment options        • Category-specific goals
+• Daily Workout of the Day (WOD)       • Perfect for any fitness level
+
+✨ SMARTY RITUAL                        🔧 SMARTY TOOLS
+────────────────────────                ────────────────────────
+• Daily morning activation             • BMR Calculator
+• Midday desk reset (anti-sitting!)    • 1RM Strength Calculator
+• Evening stress relief                • Macro Tracking Calculator
+• Perfect for desk workers             • Body Measurements Tracker
+
+📊 SMARTY CHECK-INS                    📚 BLOG & COMMUNITY
+────────────────────────                ────────────────────────
+• Morning & evening wellness tracking  • Expert fitness articles
+• Sleep, mood, recovery metrics        • Nutrition & wellness guides
+• Build team consistency streaks       • Organization leaderboards
+• Daily Smarty Score                   • Foster healthy competition
+
+═══════════════════════════════════════════════════════════════════════════════
+                       CORPORATE SUBSCRIPTION PLANS
+═══════════════════════════════════════════════════════════════════════════════
+
+┌───────────────────┬───────────────────┬───────────────────┬───────────────────┐
+│  SMARTY DYNAMIC   │   SMARTY POWER    │   SMARTY ELITE    │ SMARTY ENTERPRISE │
+├───────────────────┼───────────────────┼───────────────────┼───────────────────┤
+│                   │                   │                   │                   │
+│  Up to 10 Users   │  Up to 20 Users   │  Up to 30 Users   │  Unlimited Users  │
+│                   │                   │                   │                   │
+│  Full Platinum    │  Full Platinum    │  Full Platinum    │  Full Platinum    │
+│  Access           │  Access           │  Access           │  Access           │
+│                   │                   │                   │                   │
+│  Admin Dashboard  │  Admin Dashboard  │  Admin Dashboard  │  Admin Dashboard  │
+│                   │                   │                   │                   │
+│  Team Management  │  Team Management  │  Team Management  │  Team Management  │
+│                   │                   │                   │                   │
+│   €399/year       │    €499/year      │    €599/year      │    €699/year      │
+│                   │                   │                   │                   │
+│  €39.90/user/yr   │  €24.95/user/yr   │  €19.97/user/yr   │  Best Value!      │
+└───────────────────┴───────────────────┴───────────────────┴───────────────────┘
+
+                     All plans include 12-month subscription period.
+            Team members receive full Platinum access from day one.
+
+═══════════════════════════════════════════════════════════════════════════════
+                    ADMIN DASHBOARD FEATURES
+═══════════════════════════════════════════════════════════════════════════════
+
+📊 Visual Slots Management              👥 Easy Member Addition
+   See all seats at a glance               Add members with email & password
+
+📈 Subscription Overview                🔄 Flexible Management
+   Period dates, plan type, status         Remove/add members as needed
+
+═══════════════════════════════════════════════════════════════════════════════
+                         DESIGNED BY AN EXPERT
+═══════════════════════════════════════════════════════════════════════════════
+
+                           [Photo: Haris Falas]
+
+                            HARIS FALAS
+                     Sports Scientist | CSCS Certified
+                      20+ Years Coaching Experience
+
+"Corporate wellness isn't about gimmicks—it's about sustainable, 
+science-backed movement that fits into busy professional lives."
+
+═══════════════════════════════════════════════════════════════════════════════
+                       GET STARTED TODAY
+═══════════════════════════════════════════════════════════════════════════════
+
+📞 CONTACT US FOR A DEMO
+
+🌐 Website: smartygym.com/corporate
+📧 Email: corporate@smartygym.com
+📱 Phone: [Contact Number]
+
+────────────────────────────────────────────────────────────────────────────────
+                 INVEST IN YOUR TEAM'S WELLNESS
+             SmartyGym: The gym that works when your team works.
+────────────────────────────────────────────────────────────────────────────────
+
+© 2024 SmartyGym. All Rights Reserved.`
+
   return (
     <div className="space-y-6">
       {/* Header */}
@@ -838,6 +1050,77 @@ For full testing documentation, see:
               >
                 <ExternalLink className="h-4 w-4" />
                 View on GitHub
+              </Button>
+            </div>
+          </div>
+
+        </CardContent>
+      </Card>
+
+      {/* Promotional Materials Section */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2 text-2xl">
+            📣 Promotional Materials
+          </CardTitle>
+          <CardDescription>
+            Marketing flyers, brochures, and presentations for individuals and organizations
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          
+          {/* Individual User Presentation */}
+          <div className="border rounded-lg p-4 space-y-3">
+            <div>
+              <h3 className="font-semibold text-lg">Individual User Presentation</h3>
+              <p className="text-sm text-muted-foreground">2-page A4 brochure for individual premium plans</p>
+            </div>
+            <div className="flex flex-wrap gap-2">
+              <Button
+                variant="default"
+                size="sm"
+                onClick={() => downloadAsText(individualPresentation, 'SmartyGym-Individual-Presentation.txt')}
+                className="gap-2"
+              >
+                <Download className="h-4 w-4" />
+                Download TXT
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => printDocument(individualPresentation, 'SmartyGym - Individual User Presentation')}
+                className="gap-2"
+              >
+                <Printer className="h-4 w-4" />
+                Print/PDF
+              </Button>
+            </div>
+          </div>
+
+          {/* Corporate Presentation */}
+          <div className="border rounded-lg p-4 space-y-3">
+            <div>
+              <h3 className="font-semibold text-lg">Corporate & Organizations Presentation</h3>
+              <p className="text-sm text-muted-foreground">2-page A4 brochure for Smarty Corporate plans</p>
+            </div>
+            <div className="flex flex-wrap gap-2">
+              <Button
+                variant="default"
+                size="sm"
+                onClick={() => downloadAsText(corporatePresentation, 'SmartyGym-Corporate-Presentation.txt')}
+                className="gap-2"
+              >
+                <Download className="h-4 w-4" />
+                Download TXT
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => printDocument(corporatePresentation, 'SmartyGym - Corporate Presentation')}
+                className="gap-2"
+              >
+                <Printer className="h-4 w-4" />
+                Print/PDF
               </Button>
             </div>
           </div>

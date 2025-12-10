@@ -328,7 +328,7 @@ async function sendRitualNotifications(supabase: any, dayNumber: number, date: s
 
     logStep("Users fetched successfully", { count: users.users.length });
 
-    const subject = "☀️ Your all day game – plan is ready";
+const subject = "☀️ Your all day game – plan is ready";
     
     // Generate calendar download URL (using edge function instead of data URI for email compatibility)
     const calendarDownloadUrl = `https://cvccrvyimyzrxcwzmxwk.supabase.co/functions/v1/download-ritual-calendar?date=${date}`;
@@ -336,7 +336,8 @@ async function sendRitualNotifications(supabase: any, dayNumber: number, date: s
     const content = `<p class="tiptap-paragraph"><strong>Your Smarty Ritual is here!</strong></p>
 <p class="tiptap-paragraph">Your personalized daily ritual is ready. Start with the Morning Ritual to energize your day, reset at Midday, and unwind in the Evening.</p>
 <p class="tiptap-paragraph">Three simple phases. Maximum impact. Your daily game plan for movement, recovery, and performance.</p>
-<p class="tiptap-paragraph"><a href="https://smartygym.com/daily-ritual" style="color: #d4af37; font-weight: bold;">View Your Smarty Ritual →</a></p>`;
+<p class="tiptap-paragraph"><a href="https://smartygym.com/daily-ritual" style="color: #d4af37; font-weight: bold;">View Your Smarty Ritual →</a></p>
+<p class="tiptap-paragraph">💡 <strong>Don't forget to track your progress!</strong> Complete your <a href="https://smartygym.com/userdashboard?tab=checkins" style="color: #d4af37; font-weight: bold;">Smarty Check-ins</a> (morning & evening) to monitor your sleep, mood, recovery, and build your consistency streak.</p>`;
 
     let sentCount = 0;
     let failedCount = 0;
@@ -382,7 +383,7 @@ async function sendRitualNotifications(supabase: any, dayNumber: number, date: s
       // Send email with rate limiting (Resend allows 2 req/sec, so wait 600ms between sends)
       if (userEmail) {
         try {
-          const emailResult = await resend.emails.send({
+const emailResult = await resend.emails.send({
             from: 'SmartyGym <notifications@smartygym.com>',
             to: [userEmail],
             subject: subject,
@@ -398,6 +399,10 @@ async function sendRitualNotifications(supabase: any, dayNumber: number, date: s
                 <div style="margin: 24px 0; padding: 16px; background: #f8f8f8; border-radius: 8px; text-align: center;">
                   <p style="font-size: 14px; color: #666; margin-bottom: 12px;">📅 Add all 3 phases to your calendar with reminders:</p>
                   <a href="${calendarDownloadUrl}" style="display: inline-block; background: #333; color: white; padding: 10px 20px; text-decoration: none; border-radius: 4px; font-size: 14px;">📥 Download Calendar File (.ics)</a>
+                </div>
+                <div style="margin: 24px 0; padding: 16px; background: #fff8e6; border-radius: 8px; border-left: 4px solid #d4af37;">
+                  <p style="font-size: 14px; color: #333; margin: 0;">💡 <strong>Track Your Progress!</strong></p>
+                  <p style="font-size: 14px; color: #666; margin: 8px 0 0 0;">Complete your <a href="https://smartygym.com/userdashboard?tab=checkins" style="color: #d4af37; font-weight: bold;">Smarty Check-ins</a> (morning & evening) to monitor your sleep, mood, recovery, and build your consistency streak.</p>
                 </div>
                 <hr style="margin: 32px 0; border: none; border-top: 1px solid #eee;">
                 <p style="font-size: 12px; color: #999; text-align: center;">Designed by Haris Falas</p>
