@@ -2,6 +2,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Download, Printer, Copy, FileText, ExternalLink } from "lucide-react";
 import { toast } from "sonner";
+import { IndividualBrochure } from "./IndividualBrochure";
+import { CorporateBrochure } from "./CorporateBrochure";
 
 export const AdminDocumentationManager = () => {
   
@@ -50,6 +52,12 @@ export const AdminDocumentationManager = () => {
       printWindow.document.close();
       printWindow.print();
     }
+  };
+
+  const openBrochure = (type: 'individual' | 'corporate') => {
+    const path = type === 'individual' ? '/admin/brochure-individual' : '/admin/brochure-corporate';
+    window.open(path, '_blank');
+    toast.success(`Opening ${type} brochure in new tab`);
   };
 
   // App Store Submission Checklist

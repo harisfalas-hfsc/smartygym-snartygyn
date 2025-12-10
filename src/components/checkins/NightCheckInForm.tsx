@@ -186,8 +186,8 @@ export function NightCheckInForm({
               step={1}
               className="flex-1"
             />
-            <span className="w-16 sm:w-20 text-center text-xs sm:text-sm font-medium flex-shrink-0">
-              {strainLabels[dayStrain]}
+            <span className="w-20 sm:w-28 text-center text-xs sm:text-sm font-medium flex-shrink-0">
+              <span className="text-primary font-bold">{dayStrain}</span> – {strainLabels[dayStrain]}
             </span>
           </div>
           <div className="flex justify-between text-xs text-muted-foreground">
