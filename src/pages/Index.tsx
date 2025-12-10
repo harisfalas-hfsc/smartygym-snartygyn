@@ -618,8 +618,37 @@ const Index = () => {
                     </div>
                   </div>
 
-
-
+                  {/* CTA Buttons - Only visible for non-logged-in visitors */}
+                  {!user && (
+                    <div className="flex flex-wrap justify-center gap-4 pt-6">
+                      <Button 
+                        variant="destructive" 
+                        size="lg"
+                        onClick={() => navigate('/premiumbenefits')}
+                        className="font-semibold"
+                      >
+                        Get Started
+                      </Button>
+                      <Button 
+                        variant="destructive" 
+                        size="lg"
+                        onClick={() => navigate('/about')}
+                        className="font-semibold"
+                      >
+                        Take a Tour
+                      </Button>
+                      <Button 
+                        variant="destructive" 
+                        size="lg"
+                        onClick={() => {
+                          document.getElementById('faq-section')?.scrollIntoView({ behavior: 'smooth' });
+                        }}
+                        className="font-semibold"
+                      >
+                        Frequently Asked Questions
+                      </Button>
+                    </div>
+                  )}
 
                   {/* Who Is Smarty Gym For? Section */}
                   <div className="pt-1">
@@ -1003,7 +1032,7 @@ const Index = () => {
         </section>
 
         {/* FAQ Section */}
-        <section className="mb-12">
+        <section id="faq-section" className="mb-12">
           <h2 className="text-2xl md:text-3xl font-semibold mb-6 text-center md:text-left">Frequently Asked Questions</h2>
           <Card>
             <CardContent className="p-3 sm:p-4">
