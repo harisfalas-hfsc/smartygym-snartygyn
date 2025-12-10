@@ -623,8 +623,10 @@ const Index = () => {
 
                   {/* Who Is Smarty Gym For? Section */}
                   <div className="pt-1">
-                    <Card className="border border-primary/30 bg-background/80">
-                      <div className="p-6 sm:p-8 space-y-4">
+                    <Card className="border-2 border-primary bg-gradient-to-br from-primary/5 to-accent/10 overflow-hidden relative">
+                      <div className="absolute top-0 right-0 w-32 h-32 bg-primary/10 rounded-full -mr-16 -mt-16" aria-hidden="true"></div>
+                      <div className="absolute bottom-0 left-0 w-24 h-24 bg-accent/20 rounded-full -ml-12 -mb-12" aria-hidden="true"></div>
+                      <div className="p-6 sm:p-8 space-y-4 relative">
                         <h2 className="text-xl sm:text-2xl font-bold text-center text-foreground">
                           Who Is Smarty Gym For?
                         </h2>
