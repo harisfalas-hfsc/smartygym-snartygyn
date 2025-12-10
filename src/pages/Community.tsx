@@ -17,7 +17,7 @@ import {
 import { Skeleton } from "@/components/ui/skeleton";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Button } from "@/components/ui/button";
-import { Trophy, MessageSquare, Star, User, ArrowUpDown, Calendar } from "lucide-react";
+import { Trophy, MessageSquare, Star, User, ArrowUpDown, Calendar, ClipboardCheck } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
 import { CompactFilters } from "@/components/CompactFilters";
 import {
@@ -71,12 +71,13 @@ interface Comment {
 const Community = () => {
   const [workoutLeaderboard, setWorkoutLeaderboard] = useState<LeaderboardEntry[]>([]);
   const [programLeaderboard, setProgramLeaderboard] = useState<LeaderboardEntry[]>([]);
+  const [checkinLeaderboard, setCheckinLeaderboard] = useState<LeaderboardEntry[]>([]);
   const [ratedContent, setRatedContent] = useState<RatedContent[]>([]);
   const [comments, setComments] = useState<Comment[]>([]);
   const [isLoadingLeaderboard, setIsLoadingLeaderboard] = useState(true);
   const [isLoadingRatings, setIsLoadingRatings] = useState(true);
   const [isLoadingComments, setIsLoadingComments] = useState(true);
-  const [leaderboardFilter, setLeaderboardFilter] = useState<"workouts" | "programs">("workouts");
+  const [leaderboardFilter, setLeaderboardFilter] = useState<"workouts" | "programs" | "checkins">("workouts");
   const [ratingsFilter, setRatingsFilter] = useState<"workouts" | "programs">("workouts");
   const [commentsFilter, setCommentsFilter] = useState<"all" | "workouts" | "programs">("all");
   const [sortOrder, setSortOrder] = useState<"newest" | "oldest">("newest");
@@ -143,8 +144,26 @@ const Community = () => {
         programCounts[item.user_id] = (programCounts[item.user_id] || 0) + 1;
       });
 
+// Get check-in data for consistency leaderboard
+      const { data: checkinData, error: checkinError } = await supabase
+        .from("smarty_checkins")
+        .select("user_id, morning_completed, night_completed");
+
+      if (checkinError) throw checkinError;
+
+      // Count check-in completions per user (morning + night = 2 per day max)
+      const checkinCounts: { [key: string]: number } = {};
+      (checkinData || []).forEach((item) => {
+        let count = 0;
+        if (item.morning_completed) count++;
+        if (item.night_completed) count++;
+        if (count > 0) {
+          checkinCounts[item.user_id] = (checkinCounts[item.user_id] || 0) + count;
+        }
+      });
+
       // Get user profiles
-      const allUserIds = [...new Set([...Object.keys(workoutCounts), ...Object.keys(programCounts)])];
+      const allUserIds = [...new Set([...Object.keys(workoutCounts), ...Object.keys(programCounts), ...Object.keys(checkinCounts)])];
       const { data: profilesData, error: profilesError } = await supabase
         .from("profiles")
         .select("user_id, full_name")
@@ -177,8 +196,21 @@ const Community = () => {
         };
       });
 
-      programEntries.sort((a, b) => b.total_completions - a.total_completions);
+programEntries.sort((a, b) => b.total_completions - a.total_completions);
       setProgramLeaderboard(programEntries);
+
+      // Create check-in leaderboard with real data only
+      const checkinEntries: LeaderboardEntry[] = Object.entries(checkinCounts).map(([userId, count]) => {
+        const profile = profilesData?.find((p) => p.user_id === userId);
+        return {
+          user_id: userId,
+          display_name: profile?.full_name || "Anonymous User",
+          total_completions: count,
+        };
+      });
+
+      checkinEntries.sort((a, b) => b.total_completions - a.total_completions);
+      setCheckinLeaderboard(checkinEntries);
       
     } catch (error) {
       console.error("Error fetching leaderboards:", error);
@@ -327,9 +359,16 @@ const Community = () => {
     return null;
   };
 
-  // Sorting and pagination logic for leaderboard
+// Sorting and pagination logic for leaderboard
   const getSortedLeaderboard = () => {
-    const data = leaderboardFilter === "workouts" ? workoutLeaderboard : programLeaderboard;
+    let data: LeaderboardEntry[];
+    if (leaderboardFilter === "workouts") {
+      data = workoutLeaderboard;
+    } else if (leaderboardFilter === "programs") {
+      data = programLeaderboard;
+    } else {
+      data = checkinLeaderboard;
+    }
     const sorted = [...data];
     
     switch (leaderboardSort) {
@@ -475,15 +514,16 @@ const Community = () => {
               </CardTitle>
               <div className="flex flex-col sm:flex-row gap-3 sm:items-center">
                 <div className="flex-1">
-                  <CompactFilters
+<CompactFilters
                     filters={[
                       {
                         name: "Type",
                         value: leaderboardFilter,
-                        onChange: (value) => setLeaderboardFilter(value as "workouts" | "programs"),
+                        onChange: (value) => setLeaderboardFilter(value as "workouts" | "programs" | "checkins"),
                         options: [
                           { value: "workouts", label: "Workouts" },
-                          { value: "programs", label: "Training Programs" }
+                          { value: "programs", label: "Training Programs" },
+                          { value: "checkins", label: "Check-ins" }
                         ],
                         placeholder: "Select type"
                       }
@@ -512,16 +552,22 @@ const Community = () => {
                     <Skeleton key={i} className="h-12 w-full" />
                   ))}
                 </div>
-              ) : (leaderboardFilter === "workouts" ? workoutLeaderboard : programLeaderboard).length === 0 ? (
+) : (leaderboardFilter === "workouts" ? workoutLeaderboard : leaderboardFilter === "programs" ? programLeaderboard : checkinLeaderboard).length === 0 ? (
                 <div className="text-center py-12 text-muted-foreground">
-                  <Trophy className="h-12 w-12 mx-auto mb-4 opacity-30" />
+                  {leaderboardFilter === "checkins" ? (
+                    <ClipboardCheck className="h-12 w-12 mx-auto mb-4 opacity-30" />
+                  ) : (
+                    <Trophy className="h-12 w-12 mx-auto mb-4 opacity-30" />
+                  )}
                   <p className="text-lg font-medium mb-2">
-                    No completions yet
+                    {leaderboardFilter === "checkins" ? "No check-ins yet" : "No completions yet"}
                   </p>
                   <p className="text-sm">
                     {leaderboardFilter === "workouts" 
                       ? "Start your fitness journey today and be the first on the leaderboard!"
-                      : "Complete a training program and see your name here!"
+                      : leaderboardFilter === "programs"
+                      ? "Complete a training program and see your name here!"
+                      : "Start your morning & evening check-ins to track your progress and build consistency!"
                     }
                   </p>
                 </div>
@@ -533,7 +579,7 @@ const Community = () => {
                         <TableRow className="border-primary/30">
                           <TableHead className="w-12 md:w-16 text-xs md:text-sm">Rank</TableHead>
                           <TableHead className="text-xs md:text-sm">Member</TableHead>
-                          <TableHead className="text-right text-xs md:text-sm">Completions</TableHead>
+                          <TableHead className="text-right text-xs md:text-sm">{leaderboardFilter === "checkins" ? "Check-ins" : "Completions"}</TableHead>
                         </TableRow>
                       </TableHeader>
                       <TableBody>
