@@ -572,7 +572,7 @@ const Index = () => {
                   <div className="space-y-6">
                     
                     {/* Standalone Feature Carousel */}
-                    <div className="max-w-3xl mx-auto px-8">
+                    <div className="max-w-3xl mx-auto px-20">
                       <Carousel
                         opts={{
                           align: "start",
@@ -624,8 +624,8 @@ const Index = () => {
                             );
                           })}
                         </CarouselContent>
-                        <CarouselPrevious className="-left-4 bg-background border-primary text-primary hover:bg-primary hover:text-primary-foreground" />
-                        <CarouselNext className="-right-4 bg-background border-primary text-primary hover:bg-primary hover:text-primary-foreground" />
+                        <CarouselPrevious className="-left-14 w-12 h-12 z-10 bg-background border-2 border-primary text-primary hover:bg-primary hover:text-primary-foreground shadow-lg" />
+                        <CarouselNext className="-right-14 w-12 h-12 z-10 bg-background border-2 border-primary text-primary hover:bg-primary hover:text-primary-foreground shadow-lg" />
                       </Carousel>
                     </div>
 
