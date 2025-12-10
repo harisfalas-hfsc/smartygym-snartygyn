@@ -93,7 +93,7 @@ export const AnnouncementManager = () => {
       // Start 60 second timer
       setTimeout(() => {
         setShowRitualModal(true);
-      }, 60000); // 60 seconds
+      }, 40000); // 40 seconds
     }
   }, [isLoggedIn, hasCheckedIn]);
 
