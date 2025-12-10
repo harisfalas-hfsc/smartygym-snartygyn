@@ -572,11 +572,11 @@ const Index = () => {
                   <div className="space-y-6">
                     
                     {/* Standalone Feature Carousel */}
-                    <div className="max-w-5xl mx-auto px-20">
+                    <div className="max-w-5xl mx-auto px-8">
                       <Carousel
                         setApi={setCarouselApi}
                         opts={{
-                          align: "start",
+                          align: "center",
                           loop: true,
                         }}
                         className="w-full"
@@ -588,7 +588,7 @@ const Index = () => {
                             return (
                               <CarouselItem 
                                 key={card.id} 
-                                className="pl-4 basis-[42%]"
+                                className="pl-4 basis-[50%]"
                               >
                                 <Card 
                                   className={cn(
