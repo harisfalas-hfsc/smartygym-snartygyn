@@ -1081,26 +1081,26 @@ science-backed movement that fits into busy professional lives."
           <div className="border rounded-lg p-4 space-y-3">
             <div>
               <h3 className="font-semibold text-lg">Individual User Presentation</h3>
-              <p className="text-sm text-muted-foreground">2-page A4 brochure for individual premium plans</p>
+              <p className="text-sm text-muted-foreground">Professional A4 brochure with logo, colors, and design for individual premium plans</p>
             </div>
             <div className="flex flex-wrap gap-2">
               <Button
                 variant="default"
+                size="sm"
+                onClick={() => openBrochure('individual')}
+                className="gap-2"
+              >
+                <ExternalLink className="h-4 w-4" />
+                Open Brochure
+              </Button>
+              <Button
+                variant="outline"
                 size="sm"
                 onClick={() => downloadAsText(individualPresentation, 'SmartyGym-Individual-Presentation.txt')}
                 className="gap-2"
               >
                 <Download className="h-4 w-4" />
                 Download TXT
-              </Button>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => printDocument(individualPresentation, 'SmartyGym - Individual User Presentation')}
-                className="gap-2"
-              >
-                <Printer className="h-4 w-4" />
-                Print/PDF
               </Button>
             </div>
           </div>
@@ -1109,26 +1109,26 @@ science-backed movement that fits into busy professional lives."
           <div className="border rounded-lg p-4 space-y-3">
             <div>
               <h3 className="font-semibold text-lg">Corporate & Organizations Presentation</h3>
-              <p className="text-sm text-muted-foreground">2-page A4 brochure for Smarty Corporate plans</p>
+              <p className="text-sm text-muted-foreground">Professional A4 brochure with logo, colors, and design for Smarty Corporate plans</p>
             </div>
             <div className="flex flex-wrap gap-2">
               <Button
                 variant="default"
+                size="sm"
+                onClick={() => openBrochure('corporate')}
+                className="gap-2"
+              >
+                <ExternalLink className="h-4 w-4" />
+                Open Brochure
+              </Button>
+              <Button
+                variant="outline"
                 size="sm"
                 onClick={() => downloadAsText(corporatePresentation, 'SmartyGym-Corporate-Presentation.txt')}
                 className="gap-2"
               >
                 <Download className="h-4 w-4" />
                 Download TXT
-              </Button>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => printDocument(corporatePresentation, 'SmartyGym - Corporate Presentation')}
-                className="gap-2"
-              >
-                <Printer className="h-4 w-4" />
-                Print/PDF
               </Button>
             </div>
           </div>
