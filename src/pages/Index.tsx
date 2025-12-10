@@ -568,94 +568,53 @@ const Index = () => {
                     <meta itemProp="description" content="SmartyGym - #1 online gym and fitness platform by Haris Falas - smartygym.com" />
                   </div>
 
-                  {/* Middle Section: Feature Carousel + Message Cards Below */}
-                  <div className="space-y-6">
-                    
-                    {/* Feature Cards Grid - 2 Rows x 3 Columns */}
-                    <div className="max-w-5xl mx-auto px-4">
-                      <div className="grid grid-cols-3 gap-4">
-                        {heroCards.map((card) => {
-                          const Icon = card.icon;
-                          return (
-                            <Card 
-                              key={card.id}
-                              className="border-2 border-primary/30 hover:border-primary hover:shadow-lg hover:scale-105 hover:bg-primary/5 transition-all duration-300 cursor-pointer group"
-                              onClick={() => navigate(card.route)}
-                            >
-                              <div className="flex flex-col items-center justify-center gap-3 p-5">
-                                <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-primary/10 group-hover:bg-primary/30 group-hover:scale-110 transition-all duration-300">
-                                  <Icon className="w-8 h-8 text-primary" />
-                                </div>
-                                <h3 className="text-base font-bold text-center leading-tight">
-                                  {card.title}
-                                </h3>
-                                <p className="text-xs text-muted-foreground text-center leading-snug">
-                                  {card.description}
-                                </p>
-                              </div>
-                            </Card>
-                          );
-                        })}
-                      </div>
+                  {/* Four Core Messages - Horizontal Text Row */}
+                  <div className="flex flex-wrap justify-center items-center gap-x-8 gap-y-3 mt-2 mb-6">
+                    <div className="flex items-center gap-2">
+                      <Sparkles className="w-5 h-5 text-primary" />
+                      <span className="text-sm font-semibold">Online Fitness Redefined</span>
                     </div>
+                    <div className="flex items-center gap-2">
+                      <Smartphone className="w-5 h-5 text-primary" />
+                      <span className="text-sm font-semibold">Your Gym In Your Pocket</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <UserCheck className="w-5 h-5 text-primary" />
+                      <span className="text-sm font-semibold">
+                        <span className="text-red-600">100% Human.</span> 0% AI.
+                      </span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <Plane className="w-5 h-5 text-primary" />
+                      <span className="text-sm font-semibold">Train Anywhere, Anytime</span>
+                    </div>
+                  </div>
 
-                    {/* Four Core Message Cards - Horizontal Row Below */}
-                    <div className="grid grid-cols-2 lg:grid-cols-4 gap-2">
-                      
-                      {/* Card 1: Online Fitness Redefined */}
-                      <Card className="border border-primary/30 hover:border-primary hover:shadow-md transition-all cursor-pointer group bg-primary/5">
-                        <CardContent className="p-2.5 flex flex-col items-center text-center gap-1.5">
-                          <div className="inline-flex items-center justify-center w-7 h-7 rounded-full bg-primary/10 group-hover:bg-primary/20 transition-all">
-                            <Sparkles className="w-3.5 h-3.5 text-primary" />
-                          </div>
-                          <h3 className="text-xs font-bold text-foreground leading-tight">Online Fitness Redefined</h3>
-                          <p className="text-[10px] text-muted-foreground leading-snug">
-                            Quality training accessible, flexible, and designed for real life.
-                          </p>
-                        </CardContent>
-                      </Card>
-
-                      {/* Card 2: Your Gym in Your Pocket */}
-                      <Card className="border border-primary/30 hover:border-primary hover:shadow-md transition-all cursor-pointer group bg-primary/5">
-                        <CardContent className="p-2.5 flex flex-col items-center text-center gap-1.5">
-                          <div className="inline-flex items-center justify-center w-7 h-7 rounded-full bg-primary/10 group-hover:bg-primary/20 transition-all">
-                            <Smartphone className="w-3.5 h-3.5 text-primary" />
-                          </div>
-                          <h3 className="text-xs font-bold text-foreground leading-tight">Your Gym In Your Pocket</h3>
-                          <p className="text-[10px] text-muted-foreground leading-snug">
-                            Professional platform accessible worldwide at smartygym.com.
-                          </p>
-                        </CardContent>
-                      </Card>
-
-                      {/* Card 3: 100% Human */}
-                      <Card className="border border-primary/30 hover:border-primary hover:shadow-md transition-all cursor-pointer group bg-primary/5">
-                        <CardContent className="p-2.5 flex flex-col items-center text-center gap-1.5">
-                          <div className="inline-flex items-center justify-center w-7 h-7 rounded-full bg-primary/10 group-hover:bg-primary/20 transition-all">
-                            <UserCheck className="w-3.5 h-3.5 text-primary" />
-                          </div>
-                          <h3 className="text-xs font-bold text-foreground leading-tight">
-                            <span className="text-red-600">100% Human.</span> 0% AI.
-                          </h3>
-                          <p className="text-[10px] text-muted-foreground leading-snug">
-                            Designed by <span className="text-primary font-semibold">Haris Falas</span>, 20+ years experience.
-                          </p>
-                        </CardContent>
-                      </Card>
-
-                      {/* Card 4: Train Anywhere */}
-                      <Card className="border border-primary/30 hover:border-primary hover:shadow-md transition-all cursor-pointer group bg-primary/5">
-                        <CardContent className="p-2.5 flex flex-col items-center text-center gap-1.5">
-                          <div className="inline-flex items-center justify-center w-7 h-7 rounded-full bg-primary/10 group-hover:bg-primary/20 transition-all">
-                            <Plane className="w-3.5 h-3.5 text-primary" />
-                          </div>
-                          <h3 className="text-xs font-bold text-foreground leading-tight">Train Anywhere, Anytime</h3>
-                          <p className="text-[10px] text-muted-foreground leading-snug">
-                            Flexible training that fits YOUR schedule—home, gym, or traveling.
-                          </p>
-                        </CardContent>
-                      </Card>
-
+                  {/* Feature Cards Grid - 2 Rows x 3 Columns */}
+                  <div className="max-w-5xl mx-auto">
+                    <div className="grid grid-cols-3 gap-4">
+                      {heroCards.map((card) => {
+                        const Icon = card.icon;
+                        return (
+                          <Card 
+                            key={card.id}
+                            className="border-2 border-primary/30 hover:border-primary hover:shadow-lg hover:scale-105 hover:bg-primary/5 transition-all duration-300 cursor-pointer group"
+                            onClick={() => navigate(card.route)}
+                          >
+                            <div className="flex flex-col items-center justify-center gap-3 p-5">
+                              <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-primary/10 group-hover:bg-primary/30 group-hover:scale-110 transition-all duration-300">
+                                <Icon className="w-8 h-8 text-primary" />
+                              </div>
+                              <h3 className="text-base font-bold text-center leading-tight">
+                                {card.title}
+                              </h3>
+                              <p className="text-xs text-muted-foreground text-center leading-snug">
+                                {card.description}
+                              </p>
+                            </div>
+                          </Card>
+                        );
+                      })}
                     </div>
                   </div>
 
