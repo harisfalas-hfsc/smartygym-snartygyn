@@ -574,13 +574,12 @@ const Index = () => {
                     {/* Feature Cards Grid - 2 Rows x 3 Columns */}
                     <div className="max-w-5xl mx-auto px-4">
                       <div className="grid grid-cols-3 gap-4">
-                        {heroCards.map((card, index) => {
+                        {heroCards.map((card) => {
                           const Icon = card.icon;
                           return (
                             <Card 
                               key={card.id}
-                              className="border-2 border-primary/30 hover:border-primary hover:shadow-lg hover:scale-105 hover:bg-primary/5 transition-all duration-300 cursor-pointer group opacity-0 animate-fade-in"
-                              style={{ animationDelay: `${index * 100}ms`, animationFillMode: 'forwards' }}
+                              className="border-2 border-primary/30 hover:border-primary hover:shadow-lg hover:scale-105 hover:bg-primary/5 transition-all duration-300 cursor-pointer group"
                               onClick={() => navigate(card.route)}
                             >
                               <div className="flex flex-col items-center justify-center gap-3 p-5">
