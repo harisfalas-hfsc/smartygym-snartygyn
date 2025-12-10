@@ -78,6 +78,7 @@ import { AccessGate } from "./components/AccessGate";
 import { InstallPWA } from "./components/InstallPWA";
 import { PageTransition } from "./components/PageTransition";
 import { LoadingBar } from "./components/LoadingBar";
+import { AnnouncementManager } from "./components/announcements/AnnouncementManager";
 
 const queryClient = new QueryClient();
 
@@ -96,6 +97,7 @@ const AppContent = () => {
       <CookieConsent />
       <InstallPWA />
       <AccessControlProvider>
+        <AnnouncementManager />
         <ScrollToTop />
         <div className="flex flex-col min-h-screen">
           <Navigation />

@@ -66,38 +66,49 @@ export const AnnouncementManager = () => {
   }, [checkTodayCheckin]);
 
   // Handle WOD modal close - start timer for Ritual modal
-  const handleWODClose = useCallback(() => {
+  const handleWODClose = useCallback((dontShowAgain?: boolean) => {
     setShowWODModal(false);
     
-    // Mark WOD modal as shown today
+    // Mark WOD modal as shown today (or permanently for today if checkbox checked)
     const wodShownKey = getTodayKey("wod_announcement_shown");
     localStorage.setItem(wodShownKey, "true");
+    
+    if (dontShowAgain) {
+      const wodDontShowKey = getTodayKey("wod_dont_show");
+      localStorage.setItem(wodDontShowKey, "true");
+    }
 
     // Check if Ritual modal should show
     const ritualShownKey = getTodayKey("ritual_announcement_shown");
     const ritualAlreadyShown = localStorage.getItem(ritualShownKey) === "true";
+    const ritualDontShow = localStorage.getItem(getTodayKey("ritual_dont_show")) === "true";
 
-    if (ritualAlreadyShown) return;
+    if (ritualAlreadyShown || ritualDontShow) return;
 
     // Determine if we should show Ritual modal
     // Show if: NOT logged in, OR logged in but hasn't done check-in today
     const shouldShowRitual = isLoggedIn === false || (isLoggedIn === true && hasCheckedIn === false);
 
     if (shouldShowRitual) {
-      // Start 2 minute timer (120000ms)
+      // Start 60 second timer
       setTimeout(() => {
         setShowRitualModal(true);
-      }, 120000); // 2 minutes
+      }, 60000); // 60 seconds
     }
   }, [isLoggedIn, hasCheckedIn]);
 
   // Handle Ritual modal close
-  const handleRitualClose = useCallback(() => {
+  const handleRitualClose = useCallback((dontShowAgain?: boolean) => {
     setShowRitualModal(false);
     
     // Mark Ritual modal as shown today
     const ritualShownKey = getTodayKey("ritual_announcement_shown");
     localStorage.setItem(ritualShownKey, "true");
+    
+    if (dontShowAgain) {
+      const ritualDontShowKey = getTodayKey("ritual_dont_show");
+      localStorage.setItem(ritualDontShowKey, "true");
+    }
   }, []);
 
   return (
