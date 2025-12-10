@@ -574,20 +574,21 @@ const Index = () => {
                     {/* Standalone Feature Carousel */}
                     <div className="max-w-3xl mx-auto px-20">
                       <Carousel
+                        setApi={setCarouselApi}
                         opts={{
                           align: "start",
                           loop: true,
                         }}
                         className="w-full"
                       >
-                        <CarouselContent className="-ml-3">
+                        <CarouselContent className="-ml-4">
                           {heroCards.map((card, index) => {
                             const Icon = card.icon;
                             const isHighlighted = isHoveringTablet ? false : highlightedCardIndex === index;
                             return (
                               <CarouselItem 
                                 key={card.id} 
-                                className="pl-3 basis-[38%]"
+                                className="pl-4 basis-[42%]"
                               >
                                 <Card 
                                   className={cn(
@@ -627,6 +628,22 @@ const Index = () => {
                         <CarouselPrevious className="-left-14 w-12 h-12 z-10 bg-background border-2 border-primary text-primary hover:bg-primary hover:text-primary-foreground shadow-lg" />
                         <CarouselNext className="-right-14 w-12 h-12 z-10 bg-background border-2 border-primary text-primary hover:bg-primary hover:text-primary-foreground shadow-lg" />
                       </Carousel>
+                      {/* Dot Indicators */}
+                      <div className="flex justify-center gap-2 mt-4">
+                        {heroCards.map((_, index) => (
+                          <button
+                            key={index}
+                            onClick={() => carouselApi?.scrollTo(index)}
+                            className={cn(
+                              "w-2.5 h-2.5 rounded-full transition-all duration-300",
+                              highlightedCardIndex === index
+                                ? "bg-primary scale-125"
+                                : "bg-primary/30 hover:bg-primary/50"
+                            )}
+                            aria-label={`Go to slide ${index + 1}`}
+                          />
+                        ))}
+                      </div>
                     </div>
 
                     {/* Four Core Message Cards - Horizontal Row Below */}
