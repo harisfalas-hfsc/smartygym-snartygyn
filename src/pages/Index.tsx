@@ -632,7 +632,7 @@ const Index = () => {
                       <Button 
                         variant="destructive" 
                         size="lg"
-                        onClick={() => navigate('/about')}
+                        onClick={() => navigate('/takeatour')}
                         className="font-semibold"
                       >
                         Take a Tour
