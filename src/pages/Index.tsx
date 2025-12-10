@@ -569,7 +569,7 @@ const Index = () => {
                   </div>
 
                   {/* Four Core Messages - Horizontal Text Row */}
-                  <div className="flex flex-wrap justify-center items-center gap-x-8 gap-y-3 mt-8 mb-6">
+                  <div className="flex flex-wrap justify-center items-center gap-x-8 gap-y-3 mt-2 mb-6">
                     <div className="flex items-center gap-2">
                       <Sparkles className="w-5 h-5 text-primary" />
                       <span className="text-sm font-semibold">Online Fitness Redefined</span>
@@ -593,17 +593,13 @@ const Index = () => {
                   {/* Feature Cards Grid - 2 Rows x 3 Columns */}
                   <div className="max-w-5xl mx-auto">
                     <div className="grid grid-cols-3 gap-4">
-                      {heroCards.map((card, index) => {
+                      {heroCards.map((card) => {
                         const Icon = card.icon;
-                        const isActive = highlightedCardIndex === index;
                         return (
                           <Card 
                             key={card.id}
-                            className={`border-2 border-primary/30 hover:border-primary hover:shadow-lg hover:scale-110 hover:bg-primary/5 transition-all duration-300 cursor-pointer group
-                              ${isActive ? 'scale-110 border-primary shadow-lg bg-primary/5' : ''}`}
+                            className="border-2 border-primary/30 hover:border-primary hover:shadow-lg hover:scale-105 hover:bg-primary/5 transition-all duration-300 cursor-pointer group"
                             onClick={() => navigate(card.route)}
-                            onMouseEnter={() => setIsHoveringTablet(true)}
-                            onMouseLeave={() => setIsHoveringTablet(false)}
                           >
                             <div className="flex flex-col items-center justify-center gap-3 p-5">
                               <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-primary/10 group-hover:bg-primary/30 group-hover:scale-110 transition-all duration-300">
