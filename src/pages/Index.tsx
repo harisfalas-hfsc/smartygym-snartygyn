@@ -568,66 +568,65 @@ const Index = () => {
                     <meta itemProp="description" content="SmartyGym - #1 online gym and fitness platform by Haris Falas - smartygym.com" />
                   </div>
 
-                  {/* Middle Section: Tablet Carousel + Message Cards Below */}
+                  {/* Middle Section: Feature Carousel + Message Cards Below */}
                   <div className="space-y-6">
                     
-                    {/* Tablet with Carousel */}
-                    <div className="flex justify-center">
-                      <MobilePhoneIllustration variant="tablet" className="max-h-[280px] w-auto">
-                        <div className="h-full w-full p-2">
-                          <Carousel
-                            opts={{
-                              align: "start",
-                              loop: true,
-                            }}
-                            className="w-full h-full"
-                          >
-                            <CarouselContent className="-ml-2 h-full">
-                              {heroCards.map((card, index) => {
-                                const Icon = card.icon;
-                                const isHighlighted = isHoveringTablet ? false : highlightedCardIndex === index;
-                                return (
-                                  <CarouselItem 
-                                    key={card.id} 
-                                    className="pl-2 basis-[40%] h-full"
-                                  >
-                                    <Card 
-                                      className={cn(
-                                        "border-2 transition-all duration-300 cursor-pointer group h-full flex items-center justify-center",
-                                        isHighlighted 
-                                          ? "border-primary shadow-lg scale-105 bg-primary/5" 
-                                          : "border-primary/30 hover:border-primary hover:shadow-lg hover:scale-105 hover:bg-primary/5"
-                                      )} 
-                                      onClick={() => navigate(card.route)} 
-                                      onMouseEnter={() => {
-                                        setIsHoveringTablet(true);
-                                        setHighlightedCardIndex(index);
-                                      }}
-                                      onMouseLeave={() => setIsHoveringTablet(false)}
-                                    >
-                                      <div className="flex flex-col items-center justify-center gap-2 p-3">
-                                        <div className={cn(
-                                          "inline-flex items-center justify-center w-12 h-12 rounded-full transition-all duration-300",
-                                          isHighlighted 
-                                            ? "bg-primary/30 scale-110" 
-                                            : "bg-primary/10 group-hover:bg-primary/30 group-hover:scale-110"
-                                        )}>
-                                          <Icon className="w-6 h-6 text-primary" />
-                                        </div>
-                                        <h3 className="text-sm font-bold text-center leading-tight">
-                                          {card.title}
-                                        </h3>
-                                      </div>
-                                    </Card>
-                                  </CarouselItem>
-                                );
-                              })}
-                            </CarouselContent>
-                            <CarouselPrevious className="left-0 -translate-x-1/2 bg-background border-primary text-primary hover:bg-primary hover:text-primary-foreground" />
-                            <CarouselNext className="right-0 translate-x-1/2 bg-background border-primary text-primary hover:bg-primary hover:text-primary-foreground" />
-                          </Carousel>
-                        </div>
-                      </MobilePhoneIllustration>
+                    {/* Standalone Feature Carousel */}
+                    <div className="max-w-3xl mx-auto px-8">
+                      <Carousel
+                        opts={{
+                          align: "start",
+                          loop: true,
+                        }}
+                        className="w-full"
+                      >
+                        <CarouselContent className="-ml-3">
+                          {heroCards.map((card, index) => {
+                            const Icon = card.icon;
+                            const isHighlighted = isHoveringTablet ? false : highlightedCardIndex === index;
+                            return (
+                              <CarouselItem 
+                                key={card.id} 
+                                className="pl-3 basis-[38%]"
+                              >
+                                <Card 
+                                  className={cn(
+                                    "border-2 transition-all duration-300 cursor-pointer group",
+                                    isHighlighted 
+                                      ? "border-primary shadow-lg scale-105 bg-primary/5" 
+                                      : "border-primary/30 hover:border-primary hover:shadow-lg hover:scale-105 hover:bg-primary/5"
+                                  )} 
+                                  onClick={() => navigate(card.route)} 
+                                  onMouseEnter={() => {
+                                    setIsHoveringTablet(true);
+                                    setHighlightedCardIndex(index);
+                                  }}
+                                  onMouseLeave={() => setIsHoveringTablet(false)}
+                                >
+                                  <div className="flex flex-col items-center justify-center gap-3 p-5">
+                                    <div className={cn(
+                                      "inline-flex items-center justify-center w-16 h-16 rounded-full transition-all duration-300",
+                                      isHighlighted 
+                                        ? "bg-primary/30 scale-110" 
+                                        : "bg-primary/10 group-hover:bg-primary/30 group-hover:scale-110"
+                                    )}>
+                                      <Icon className="w-8 h-8 text-primary" />
+                                    </div>
+                                    <h3 className="text-base font-bold text-center leading-tight">
+                                      {card.title}
+                                    </h3>
+                                    <p className="text-xs text-muted-foreground text-center leading-snug">
+                                      {card.description}
+                                    </p>
+                                  </div>
+                                </Card>
+                              </CarouselItem>
+                            );
+                          })}
+                        </CarouselContent>
+                        <CarouselPrevious className="-left-4 bg-background border-primary text-primary hover:bg-primary hover:text-primary-foreground" />
+                        <CarouselNext className="-right-4 bg-background border-primary text-primary hover:bg-primary hover:text-primary-foreground" />
+                      </Carousel>
                     </div>
 
                     {/* Four Core Message Cards - Horizontal Row Below */}
