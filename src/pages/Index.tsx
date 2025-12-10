@@ -23,7 +23,6 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { AnnouncementManager } from "@/components/announcements/AnnouncementManager";
-
 const Index = () => {
   const navigate = useNavigate();
   const location = useLocation();
@@ -554,11 +553,11 @@ const Index = () => {
         </div>
           </section> : <>
             {/* Desktop: Hero Section */}
-            <section className="relative py-8 sm:py-12 border-b border-border bg-background overflow-hidden">
+            <section className="relative py-8 sm:py-12 border-b border-border bg-background overflow-hidden my-0">
           
           <div className="container mx-auto max-w-6xl px-4 relative z-10 overflow-x-hidden">
             <ScrollReveal>
-              <Card itemScope itemType="https://schema.org/Organization" className="border-2 border-primary bg-gradient-to-br from-yellow-50/50 via-background to-yellow-50/30 backdrop-blur-sm" data-hero-section="true" data-keywords="smarty gym, online gym, online fitness, smartygym.com, Haris Falas, global online gym" aria-label="SmartyGym - Your online gym and fitness platform - smartygym.com">
+              <Card itemScope itemType="https://schema.org/Organization" data-hero-section="true" data-keywords="smarty gym, online gym, online fitness, smartygym.com, Haris Falas, global online gym" aria-label="SmartyGym - Your online gym and fitness platform - smartygym.com" className="border-2 border-primary bg-gradient-to-br from-yellow-50/50 via-background to-yellow-50/30 backdrop-blur-sm my-0 mb-0 mt-0">
                 <div className="p-8 sm:p-10 md:p-12 space-y-4">
                   
                   {/* Top Section: Title */}
@@ -598,14 +597,9 @@ const Index = () => {
                   {/* Feature Cards Grid - 2 Rows x 3 Columns */}
                   <div className="max-w-5xl mx-auto">
                     <div className="grid grid-cols-3 gap-4">
-                      {heroCards.map((card) => {
+                      {heroCards.map(card => {
                         const Icon = card.icon;
-                        return (
-                          <Card 
-                            key={card.id}
-                            className="border-2 border-primary/30 hover:border-primary hover:shadow-lg hover:scale-105 hover:bg-primary/5 transition-all duration-300 cursor-pointer group"
-                            onClick={() => navigate(card.route)}
-                          >
+                        return <Card key={card.id} className="border-2 border-primary/30 hover:border-primary hover:shadow-lg hover:scale-105 hover:bg-primary/5 transition-all duration-300 cursor-pointer group" onClick={() => navigate(card.route)}>
                             <div className="flex flex-col items-center justify-center gap-3 p-5">
                               <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-primary/10 group-hover:bg-primary/30 group-hover:scale-110 transition-all duration-300">
                                 <Icon className="w-8 h-8 text-primary" />
@@ -617,43 +611,27 @@ const Index = () => {
                                 {card.description}
                               </p>
                             </div>
-                          </Card>
-                        );
+                          </Card>;
                       })}
                     </div>
                   </div>
 
                   {/* CTA Buttons - Only visible for non-logged-in visitors */}
-                  {!user && (
-                    <div className="flex flex-wrap justify-center gap-4 pt-6">
-                      <Button 
-                        variant="outline" 
-                        size="lg"
-                        onClick={() => navigate('/premiumbenefits')}
-                        className="font-semibold min-w-[140px]"
-                      >
+                  {!user && <div className="flex flex-wrap justify-center gap-4 pt-6">
+                      <Button variant="outline" size="lg" onClick={() => navigate('/premiumbenefits')} className="font-semibold min-w-[140px]">
                         Get Started
                       </Button>
-                      <Button 
-                        variant="outline" 
-                        size="lg"
-                        onClick={() => navigate('/takeatour')}
-                        className="font-semibold min-w-[140px]"
-                      >
+                      <Button variant="outline" size="lg" onClick={() => navigate('/takeatour')} className="font-semibold min-w-[140px]">
                         Take a Tour
                       </Button>
-                      <Button 
-                        variant="outline" 
-                        size="lg"
-                        onClick={() => {
-                          document.getElementById('faq-section')?.scrollIntoView({ behavior: 'smooth' });
-                        }}
-                        className="font-semibold min-w-[140px]"
-                      >
+                      <Button variant="outline" size="lg" onClick={() => {
+                      document.getElementById('faq-section')?.scrollIntoView({
+                        behavior: 'smooth'
+                      });
+                    }} className="font-semibold min-w-[140px]">
                         FAQ
                       </Button>
-                    </div>
-                  )}
+                    </div>}
 
                   {/* Who Is Smarty Gym For? Section */}
                   <div className="pt-1">
