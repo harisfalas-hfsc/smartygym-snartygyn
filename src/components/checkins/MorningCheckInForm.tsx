@@ -158,8 +158,8 @@ export function MorningCheckInForm({
               step={1}
               className="flex-1"
             />
-            <span className="w-16 sm:w-20 text-center text-xs sm:text-sm font-medium flex-shrink-0">
-              {readinessLabels[readinessScore]}
+            <span className="w-20 sm:w-28 text-center text-xs sm:text-sm font-medium flex-shrink-0">
+              <span className="text-primary font-bold">{readinessScore}</span> – {readinessLabels[readinessScore]}
             </span>
           </div>
           <div className="flex justify-between text-xs text-muted-foreground">
@@ -182,8 +182,8 @@ export function MorningCheckInForm({
               step={1}
               className="flex-1"
             />
-            <span className="w-16 sm:w-20 text-center text-xs sm:text-sm font-medium flex-shrink-0">
-              {sorenessLabels[sorenessRating]}
+            <span className="w-20 sm:w-28 text-center text-xs sm:text-sm font-medium flex-shrink-0">
+              <span className="text-primary font-bold">{sorenessRating}</span> – {sorenessLabels[sorenessRating]}
             </span>
           </div>
           <div className="flex justify-between text-xs text-muted-foreground">

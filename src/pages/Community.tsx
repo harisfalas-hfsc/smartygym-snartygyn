@@ -144,21 +144,74 @@ const Community = () => {
         programCounts[item.user_id] = (programCounts[item.user_id] || 0) + 1;
       });
 
-// Get check-in data for consistency leaderboard
+      // Get check-in data for consistency leaderboard
       const { data: checkinData, error: checkinError } = await supabase
         .from("smarty_checkins")
-        .select("user_id, morning_completed, night_completed");
+        .select("user_id, morning_completed, night_completed, checkin_date")
+        .order("checkin_date", { ascending: true });
 
       if (checkinError) throw checkinError;
 
-      // Count check-in completions per user (morning + night = 2 per day max)
+      // Calculate consistency score per user
+      // Score = (full days * 2) + (partial days * 1) + (streak bonus)
+      // Full day = both morning AND night completed
+      // Partial day = only morning OR only night completed
+      // Streak bonus = consecutive days with at least one check-in
       const checkinCounts: { [key: string]: number } = {};
+      const userCheckinsByDate: { [userId: string]: { [date: string]: { morning: boolean; night: boolean } } } = {};
+      
       (checkinData || []).forEach((item) => {
-        let count = 0;
-        if (item.morning_completed) count++;
-        if (item.night_completed) count++;
-        if (count > 0) {
-          checkinCounts[item.user_id] = (checkinCounts[item.user_id] || 0) + count;
+        if (!userCheckinsByDate[item.user_id]) {
+          userCheckinsByDate[item.user_id] = {};
+        }
+        if (!userCheckinsByDate[item.user_id][item.checkin_date]) {
+          userCheckinsByDate[item.user_id][item.checkin_date] = { morning: false, night: false };
+        }
+        if (item.morning_completed) userCheckinsByDate[item.user_id][item.checkin_date].morning = true;
+        if (item.night_completed) userCheckinsByDate[item.user_id][item.checkin_date].night = true;
+      });
+
+      // Calculate consistency score for each user
+      Object.entries(userCheckinsByDate).forEach(([userId, dateMap]) => {
+        let consistencyScore = 0;
+        const dates = Object.keys(dateMap).sort();
+        let currentStreak = 0;
+        let maxStreak = 0;
+        let prevDate: Date | null = null;
+
+        dates.forEach((dateStr) => {
+          const { morning, night } = dateMap[dateStr];
+          const currentDate = new Date(dateStr);
+          
+          // Points for completions
+          if (morning && night) {
+            consistencyScore += 3; // Full day bonus
+          } else if (morning || night) {
+            consistencyScore += 1; // Partial day
+          }
+
+          // Track streaks (consecutive days)
+          if (prevDate) {
+            const dayDiff = Math.round((currentDate.getTime() - prevDate.getTime()) / (1000 * 60 * 60 * 24));
+            if (dayDiff === 1) {
+              currentStreak++;
+            } else {
+              maxStreak = Math.max(maxStreak, currentStreak);
+              currentStreak = 1;
+            }
+          } else {
+            currentStreak = 1;
+          }
+          prevDate = currentDate;
+        });
+        
+        maxStreak = Math.max(maxStreak, currentStreak);
+        
+        // Add streak bonus (1 point per day in longest streak)
+        consistencyScore += Math.floor(maxStreak * 0.5);
+        
+        if (consistencyScore > 0) {
+          checkinCounts[userId] = consistencyScore;
         }
       });
 
@@ -579,7 +632,7 @@ programEntries.sort((a, b) => b.total_completions - a.total_completions);
                         <TableRow className="border-primary/30">
                           <TableHead className="w-12 md:w-16 text-xs md:text-sm">Rank</TableHead>
                           <TableHead className="text-xs md:text-sm">Member</TableHead>
-                          <TableHead className="text-right text-xs md:text-sm">{leaderboardFilter === "checkins" ? "Check-ins" : "Completions"}</TableHead>
+                          <TableHead className="text-right text-xs md:text-sm">{leaderboardFilter === "checkins" ? "Consistency Score" : "Completions"}</TableHead>
                         </TableRow>
                       </TableHeader>
                       <TableBody>

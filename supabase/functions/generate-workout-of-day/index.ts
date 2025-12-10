@@ -46,7 +46,7 @@ function logStep(step: string, details?: any) {
   console.log(`[GENERATE-WOD] ${step}${detailsStr}`);
 }
 
-// Helper to get next difficulty with rotation logic (prevents consecutive high-intensity)
+// Helper to get next difficulty with rotation logic (prevents consecutive same-difficulty)
 function getNextDifficulty(
   lastDifficultyStars: number | null, 
   usedDifficulties: number[]
@@ -59,7 +59,15 @@ function getNextDifficulty(
     availableDifficulties = [...DIFFICULTY_LEVELS];
   }
   
-  // Apply rotation rule: prevent consecutive high-intensity (5-6 stars)
+  // RULE 1: Prevent consecutive same-difficulty (if last was X stars, next cannot be X stars)
+  if (lastDifficultyStars !== null) {
+    const differentOptions = availableDifficulties.filter(d => d.stars !== lastDifficultyStars);
+    if (differentOptions.length > 0) {
+      availableDifficulties = differentOptions;
+    }
+  }
+  
+  // RULE 2: Prevent consecutive high-intensity (5-6 stars) - recovery after advanced
   if (lastDifficultyStars && lastDifficultyStars >= 5) {
     // Last was advanced (5-6), next MUST be 1-4 for recovery
     const recoveryOptions = availableDifficulties.filter(d => d.stars <= 4);
@@ -68,14 +76,32 @@ function getNextDifficulty(
     }
   }
   
+  // RULE 3: Prevent consecutive low-intensity (1-2 stars) - progression after beginner
+  if (lastDifficultyStars && lastDifficultyStars <= 2) {
+    // Last was beginner (1-2), prefer 3+ for progression
+    const progressionOptions = availableDifficulties.filter(d => d.stars >= 3);
+    if (progressionOptions.length > 0) {
+      availableDifficulties = progressionOptions;
+    }
+  }
+  
   // Random selection from available options
   const selected = availableDifficulties[Math.floor(Math.random() * availableDifficulties.length)];
+  
+  let reason = "Normal rotation";
+  if (lastDifficultyStars && lastDifficultyStars >= 5) {
+    reason = "Recovery after advanced (5-6 stars)";
+  } else if (lastDifficultyStars && lastDifficultyStars <= 2) {
+    reason = "Progression after beginner (1-2 stars)";
+  } else if (lastDifficultyStars !== null) {
+    reason = "Variation from previous difficulty";
+  }
   
   logStep("Difficulty rotation applied", { 
     lastStars: lastDifficultyStars, 
     usedInCycle: usedDifficulties,
     selectedStars: selected.stars,
-    reason: lastDifficultyStars && lastDifficultyStars >= 5 ? "Recovery after advanced" : "Normal rotation"
+    reason: reason
   });
   
   return selected;
