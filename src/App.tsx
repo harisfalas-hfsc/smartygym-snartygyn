@@ -71,6 +71,8 @@ import MigrateContent from "./pages/MigrateContent";
 import ProcessLogo from "./pages/ProcessLogo";
 import AppSubmission from "./pages/AppSubmission";
 import AppSubmissionPrintable from "./pages/AppSubmissionPrintable";
+import BrochureIndividual from "./pages/BrochureIndividual";
+import BrochureCorporate from "./pages/BrochureCorporate";
 import { AccessGate } from "./components/AccessGate";
 
 import { InstallPWA } from "./components/InstallPWA";
@@ -170,6 +172,16 @@ const AppContent = () => {
                 <Route path="/app-submission-printable" element={
                   <AdminRoute>
                     <AppSubmissionPrintable />
+                  </AdminRoute>
+                } />
+                <Route path="/admin/brochure-individual" element={
+                  <AdminRoute>
+                    <BrochureIndividual />
+                  </AdminRoute>
+                } />
+                <Route path="/admin/brochure-corporate" element={
+                  <AdminRoute>
+                    <BrochureCorporate />
                   </AdminRoute>
                 } />
                 
