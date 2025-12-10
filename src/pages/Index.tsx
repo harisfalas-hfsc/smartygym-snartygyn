@@ -568,99 +568,122 @@ const Index = () => {
                     <meta itemProp="description" content="SmartyGym - #1 online gym and fitness platform by Haris Falas - smartygym.com" />
                   </div>
 
-                  {/* Middle Section: Phone (Left) + Three Cards (Right) */}
-                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 items-stretch lg:items-stretch">
+                  {/* Middle Section: Tablet Carousel + Message Cards Below */}
+                  <div className="space-y-6">
                     
-                    {/* LEFT: Mobile Phone Illustration */}
-                    <div className="order-1 lg:order-1 flex justify-center lg:justify-start items-stretch">
-                      <div className="flex items-center h-full">
-            <MobilePhoneIllustration variant="tablet" className="h-full max-h-[480px] w-auto my-0 mx-0 px-0 pr-[55px]">
-              {/* 3 rows × 2 columns grid of "Get Started" cards */}
-              <div className="grid grid-rows-3 grid-cols-2 gap-1.5 sm:gap-2 h-full w-full p-1.5 sm:p-2" onMouseLeave={() => setIsHoveringTablet(false)}>
-                {heroCards.map((card, index) => {
-                              const Icon = card.icon;
-                              const isHighlighted = isHoveringTablet ? false : highlightedCardIndex === index;
-                              return <Card key={card.id} className={cn("border-2 transition-all duration-300 cursor-pointer group flex items-center justify-center", isHighlighted ? "border-primary shadow-lg scale-105 bg-primary/5" : "border-primary/30 hover:border-primary hover:shadow-lg hover:scale-105 hover:bg-primary/5")} onClick={() => navigate(card.route)} onMouseEnter={() => {
-                                setIsHoveringTablet(true);
-                                setHighlightedCardIndex(index);
-                              }}>
-                      <div className="flex flex-col items-center justify-center gap-1 p-2">
-                        <div className={cn("inline-flex items-center justify-center w-10 h-10 sm:w-12 sm:h-12 rounded-full transition-all duration-300", isHighlighted ? "bg-primary/30 scale-110" : "bg-primary/10 group-hover:bg-primary/30 group-hover:scale-110")}>
-                          <Icon className="w-5 h-5 sm:w-6 sm:h-6 text-primary" />
+                    {/* Tablet with Carousel */}
+                    <div className="flex justify-center">
+                      <MobilePhoneIllustration variant="tablet" className="max-h-[280px] w-auto">
+                        <div className="h-full w-full p-2">
+                          <Carousel
+                            opts={{
+                              align: "start",
+                              loop: true,
+                            }}
+                            className="w-full h-full"
+                          >
+                            <CarouselContent className="-ml-2 h-full">
+                              {heroCards.map((card, index) => {
+                                const Icon = card.icon;
+                                const isHighlighted = isHoveringTablet ? false : highlightedCardIndex === index;
+                                return (
+                                  <CarouselItem 
+                                    key={card.id} 
+                                    className="pl-2 basis-[40%] h-full"
+                                  >
+                                    <Card 
+                                      className={cn(
+                                        "border-2 transition-all duration-300 cursor-pointer group h-full flex items-center justify-center",
+                                        isHighlighted 
+                                          ? "border-primary shadow-lg scale-105 bg-primary/5" 
+                                          : "border-primary/30 hover:border-primary hover:shadow-lg hover:scale-105 hover:bg-primary/5"
+                                      )} 
+                                      onClick={() => navigate(card.route)} 
+                                      onMouseEnter={() => {
+                                        setIsHoveringTablet(true);
+                                        setHighlightedCardIndex(index);
+                                      }}
+                                      onMouseLeave={() => setIsHoveringTablet(false)}
+                                    >
+                                      <div className="flex flex-col items-center justify-center gap-2 p-3">
+                                        <div className={cn(
+                                          "inline-flex items-center justify-center w-12 h-12 rounded-full transition-all duration-300",
+                                          isHighlighted 
+                                            ? "bg-primary/30 scale-110" 
+                                            : "bg-primary/10 group-hover:bg-primary/30 group-hover:scale-110"
+                                        )}>
+                                          <Icon className="w-6 h-6 text-primary" />
+                                        </div>
+                                        <h3 className="text-sm font-bold text-center leading-tight">
+                                          {card.title}
+                                        </h3>
+                                      </div>
+                                    </Card>
+                                  </CarouselItem>
+                                );
+                              })}
+                            </CarouselContent>
+                            <CarouselPrevious className="left-0 -translate-x-1/2 bg-background border-primary text-primary hover:bg-primary hover:text-primary-foreground" />
+                            <CarouselNext className="right-0 translate-x-1/2 bg-background border-primary text-primary hover:bg-primary hover:text-primary-foreground" />
+                          </Carousel>
                         </div>
-                        <h3 className="text-xs font-bold text-center leading-tight">
-                          {card.title}
-                        </h3>
-                      </div>
-                    </Card>;
-                            })}
-              </div>
-            </MobilePhoneIllustration>
-                      </div>
+                      </MobilePhoneIllustration>
                     </div>
 
-                    {/* RIGHT: Four Core Message Cards */}
-                    <div className="order-2 lg:order-2 flex flex-col justify-between gap-2 h-full max-h-[480px]">
+                    {/* Four Core Message Cards - Horizontal Row Below */}
+                    <div className="grid grid-cols-2 lg:grid-cols-4 gap-2">
                       
                       {/* Card 1: Online Fitness Redefined */}
-                      <Card className="flex-1 border-2 border-primary/30 hover:border-primary hover:shadow-lg transition-all cursor-pointer group bg-primary/5">
-                        <CardContent className="h-full p-3.5 flex items-center gap-3">
-                          <div className="inline-flex items-center justify-center w-9 h-9 rounded-full bg-primary/10 group-hover:bg-primary/20 transition-all flex-shrink-0">
-                            <Sparkles className="w-4 h-4 text-primary" />
+                      <Card className="border border-primary/30 hover:border-primary hover:shadow-md transition-all cursor-pointer group bg-primary/5">
+                        <CardContent className="p-2.5 flex flex-col items-center text-center gap-1.5">
+                          <div className="inline-flex items-center justify-center w-7 h-7 rounded-full bg-primary/10 group-hover:bg-primary/20 transition-all">
+                            <Sparkles className="w-3.5 h-3.5 text-primary" />
                           </div>
-                          <div>
-                            <h3 className="text-sm font-bold text-foreground">Online Fitness Redefined</h3>
-                            <p className="text-xs text-muted-foreground leading-snug">
-                              We are redefining online fitness, making quality training accessible, flexible, and designed for real life.
-                            </p>
-                          </div>
+                          <h3 className="text-xs font-bold text-foreground leading-tight">Online Fitness Redefined</h3>
+                          <p className="text-[10px] text-muted-foreground leading-snug">
+                            Quality training accessible, flexible, and designed for real life.
+                          </p>
                         </CardContent>
                       </Card>
 
                       {/* Card 2: Your Gym in Your Pocket */}
-                      <Card className="flex-1 border-2 border-primary/30 hover:border-primary hover:shadow-lg transition-all cursor-pointer group bg-primary/5">
-                        <CardContent className="h-full p-3.5 flex items-center gap-3">
-                          <div className="inline-flex items-center justify-center w-9 h-9 rounded-full bg-primary/10 group-hover:bg-primary/20 transition-all flex-shrink-0">
-                            <Smartphone className="w-4 h-4 text-primary" />
+                      <Card className="border border-primary/30 hover:border-primary hover:shadow-md transition-all cursor-pointer group bg-primary/5">
+                        <CardContent className="p-2.5 flex flex-col items-center text-center gap-1.5">
+                          <div className="inline-flex items-center justify-center w-7 h-7 rounded-full bg-primary/10 group-hover:bg-primary/20 transition-all">
+                            <Smartphone className="w-3.5 h-3.5 text-primary" />
                           </div>
-                          <div>
-                            <h3 className="text-sm font-bold text-foreground">Your Gym In Your Pocket</h3>
-                            <p className="text-xs text-muted-foreground leading-snug">
-                              Professional fitness platform with expert workouts, structured programs, and personalized coaching - accessible worldwide at smartygym.com.
-                            </p>
-                          </div>
+                          <h3 className="text-xs font-bold text-foreground leading-tight">Your Gym In Your Pocket</h3>
+                          <p className="text-[10px] text-muted-foreground leading-snug">
+                            Professional platform accessible worldwide at smartygym.com.
+                          </p>
                         </CardContent>
                       </Card>
 
                       {/* Card 3: 100% Human */}
-                      <Card className="flex-1 border-2 border-primary/30 hover:border-primary hover:shadow-lg transition-all cursor-pointer group bg-primary/5">
-                        <CardContent className="h-full p-3.5 flex items-center gap-3">
-                          <div className="inline-flex items-center justify-center w-9 h-9 rounded-full bg-primary/10 group-hover:bg-primary/20 transition-all flex-shrink-0">
-                            <UserCheck className="w-4 h-4 text-primary" />
+                      <Card className="border border-primary/30 hover:border-primary hover:shadow-md transition-all cursor-pointer group bg-primary/5">
+                        <CardContent className="p-2.5 flex flex-col items-center text-center gap-1.5">
+                          <div className="inline-flex items-center justify-center w-7 h-7 rounded-full bg-primary/10 group-hover:bg-primary/20 transition-all">
+                            <UserCheck className="w-3.5 h-3.5 text-primary" />
                           </div>
-                          <div>
-                            <h3 className="text-sm font-bold text-foreground">
-                              <span className="text-red-600">100% Human.</span> 0% AI.
-                            </h3>
-                            <p className="text-xs text-muted-foreground leading-snug">
-                              Every workout personally designed by Sports Scientist <span className="text-primary font-semibold">Haris Falas</span> with 20+ years of experience. Real expertise, not algorithms.
-                            </p>
-                          </div>
+                          <h3 className="text-xs font-bold text-foreground leading-tight">
+                            <span className="text-red-600">100% Human.</span> 0% AI.
+                          </h3>
+                          <p className="text-[10px] text-muted-foreground leading-snug">
+                            Designed by <span className="text-primary font-semibold">Haris Falas</span>, 20+ years experience.
+                          </p>
                         </CardContent>
                       </Card>
 
                       {/* Card 4: Train Anywhere */}
-                      <Card className="flex-1 border-2 border-primary/30 hover:border-primary hover:shadow-lg transition-all cursor-pointer group bg-primary/5">
-                        <CardContent className="h-full p-3.5 flex items-center gap-3">
-                          <div className="inline-flex items-center justify-center w-9 h-9 rounded-full bg-primary/10 group-hover:bg-primary/20 transition-all flex-shrink-0">
-                            <Plane className="w-4 h-4 text-primary" />
+                      <Card className="border border-primary/30 hover:border-primary hover:shadow-md transition-all cursor-pointer group bg-primary/5">
+                        <CardContent className="p-2.5 flex flex-col items-center text-center gap-1.5">
+                          <div className="inline-flex items-center justify-center w-7 h-7 rounded-full bg-primary/10 group-hover:bg-primary/20 transition-all">
+                            <Plane className="w-3.5 h-3.5 text-primary" />
                           </div>
-                          <div>
-                            <h3 className="text-sm font-bold text-foreground">Train Anywhere, Anytime</h3>
-                            <p className="text-xs text-muted-foreground leading-snug">
-                              Access professional workouts on any device. Flexible training that fits YOUR schedule and YOUR goals—at home, gym, or traveling.
-                            </p>
-                          </div>
+                          <h3 className="text-xs font-bold text-foreground leading-tight">Train Anywhere, Anytime</h3>
+                          <p className="text-[10px] text-muted-foreground leading-snug">
+                            Flexible training that fits YOUR schedule—home, gym, or traveling.
+                          </p>
                         </CardContent>
                       </Card>
 
