@@ -572,7 +572,7 @@ const Index = () => {
                   <div className="space-y-6">
                     
                     {/* Standalone Feature Carousel */}
-                    <div className="max-w-5xl mx-auto px-10">
+                    <div className="max-w-5xl mx-auto px-20">
                       <Carousel
                         setApi={setCarouselApi}
                         opts={{
@@ -625,8 +625,8 @@ const Index = () => {
                             );
                           })}
                         </CarouselContent>
-                        <CarouselPrevious className="-left-8 w-12 h-12 z-10 bg-background border-2 border-primary text-primary hover:bg-primary hover:text-primary-foreground shadow-lg" />
-                        <CarouselNext className="-right-8 w-12 h-12 z-10 bg-background border-2 border-primary text-primary hover:bg-primary hover:text-primary-foreground shadow-lg" />
+                        <CarouselPrevious className="-left-16 w-12 h-12 z-10 bg-background border-2 border-primary text-primary hover:bg-primary hover:text-primary-foreground shadow-lg" />
+                        <CarouselNext className="-right-16 w-12 h-12 z-10 bg-background border-2 border-primary text-primary hover:bg-primary hover:text-primary-foreground shadow-lg" />
                       </Carousel>
                       {/* Dot Indicators */}
                       <div className="flex justify-center gap-2 mt-4">
