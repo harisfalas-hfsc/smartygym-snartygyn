@@ -622,30 +622,30 @@ const Index = () => {
                   {!user && (
                     <div className="flex flex-wrap justify-center gap-4 pt-6">
                       <Button 
-                        variant="destructive" 
+                        variant="outline" 
                         size="lg"
                         onClick={() => navigate('/premiumbenefits')}
-                        className="font-semibold"
+                        className="font-semibold min-w-[140px]"
                       >
                         Get Started
                       </Button>
                       <Button 
-                        variant="destructive" 
+                        variant="outline" 
                         size="lg"
                         onClick={() => navigate('/takeatour')}
-                        className="font-semibold"
+                        className="font-semibold min-w-[140px]"
                       >
                         Take a Tour
                       </Button>
                       <Button 
-                        variant="destructive" 
+                        variant="outline" 
                         size="lg"
                         onClick={() => {
                           document.getElementById('faq-section')?.scrollIntoView({ behavior: 'smooth' });
                         }}
-                        className="font-semibold"
+                        className="font-semibold min-w-[140px]"
                       >
-                        Frequently Asked Questions
+                        FAQ
                       </Button>
                     </div>
                   )}

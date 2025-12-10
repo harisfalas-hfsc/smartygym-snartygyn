@@ -160,6 +160,13 @@ const TakeTour = () => {
       </div>
 
       <div className="min-h-screen bg-background pb-24">
+        {/* Page Title Badge */}
+        <div className="text-center pt-12 pb-4 px-4">
+          <div className="inline-block bg-primary/10 border border-primary/30 rounded-full px-6 py-2">
+            <p className="text-sm font-semibold text-primary">🎯 Platform Overview</p>
+          </div>
+        </div>
+
         {/* How It Works - Step by Step */}
         <section className="py-16 px-4">
           <div className="container mx-auto max-w-6xl">
