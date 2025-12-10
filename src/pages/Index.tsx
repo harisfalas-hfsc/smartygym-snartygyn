@@ -571,78 +571,31 @@ const Index = () => {
                   {/* Middle Section: Feature Carousel + Message Cards Below */}
                   <div className="space-y-6">
                     
-                    {/* Standalone Feature Carousel */}
-                    <div className="max-w-5xl mx-auto px-8">
-                      <Carousel
-                        setApi={setCarouselApi}
-                        opts={{
-                          align: "center",
-                          loop: true,
-                        }}
-                        className="w-full"
-                      >
-                        <CarouselContent className="-ml-4">
-                          {heroCards.map((card, index) => {
-                            const Icon = card.icon;
-                            const isHighlighted = isHoveringTablet ? false : highlightedCardIndex === index;
-                            return (
-                              <CarouselItem 
-                                key={card.id} 
-                                className="pl-4 basis-[50%]"
-                              >
-                                <Card 
-                                  className={cn(
-                                    "border-2 transition-all duration-300 cursor-pointer group",
-                                    isHighlighted 
-                                      ? "border-primary shadow-lg scale-105 bg-primary/5" 
-                                      : "border-primary/30 hover:border-primary hover:shadow-lg hover:scale-105 hover:bg-primary/5"
-                                  )} 
-                                  onClick={() => navigate(card.route)} 
-                                  onMouseEnter={() => {
-                                    setIsHoveringTablet(true);
-                                    setHighlightedCardIndex(index);
-                                  }}
-                                  onMouseLeave={() => setIsHoveringTablet(false)}
-                                >
-                                  <div className="flex flex-col items-center justify-center gap-3 p-5">
-                                    <div className={cn(
-                                      "inline-flex items-center justify-center w-16 h-16 rounded-full transition-all duration-300",
-                                      isHighlighted 
-                                        ? "bg-primary/30 scale-110" 
-                                        : "bg-primary/10 group-hover:bg-primary/30 group-hover:scale-110"
-                                    )}>
-                                      <Icon className="w-8 h-8 text-primary" />
-                                    </div>
-                                    <h3 className="text-base font-bold text-center leading-tight">
-                                      {card.title}
-                                    </h3>
-                                    <p className="text-xs text-muted-foreground text-center leading-snug">
-                                      {card.description}
-                                    </p>
-                                  </div>
-                                </Card>
-                              </CarouselItem>
-                            );
-                          })}
-                        </CarouselContent>
-                        <CarouselPrevious className="-left-16 w-12 h-12 z-10 bg-background border-2 border-primary text-primary hover:bg-primary hover:text-primary-foreground shadow-lg" />
-                        <CarouselNext className="-right-16 w-12 h-12 z-10 bg-background border-2 border-primary text-primary hover:bg-primary hover:text-primary-foreground shadow-lg" />
-                      </Carousel>
-                      {/* Dot Indicators */}
-                      <div className="flex justify-center gap-2 mt-4">
-                        {heroCards.map((_, index) => (
-                          <button
-                            key={index}
-                            onClick={() => carouselApi?.scrollTo(index)}
-                            className={cn(
-                              "w-2.5 h-2.5 rounded-full transition-all duration-300",
-                              highlightedCardIndex === index
-                                ? "bg-primary scale-125"
-                                : "bg-primary/30 hover:bg-primary/50"
-                            )}
-                            aria-label={`Go to slide ${index + 1}`}
-                          />
-                        ))}
+                    {/* Feature Cards Grid - 2 Rows x 3 Columns */}
+                    <div className="max-w-5xl mx-auto px-4">
+                      <div className="grid grid-cols-3 gap-4">
+                        {heroCards.map((card) => {
+                          const Icon = card.icon;
+                          return (
+                            <Card 
+                              key={card.id}
+                              className="border-2 border-primary/30 hover:border-primary hover:shadow-lg hover:scale-105 hover:bg-primary/5 transition-all duration-300 cursor-pointer group"
+                              onClick={() => navigate(card.route)}
+                            >
+                              <div className="flex flex-col items-center justify-center gap-3 p-5">
+                                <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-primary/10 group-hover:bg-primary/30 group-hover:scale-110 transition-all duration-300">
+                                  <Icon className="w-8 h-8 text-primary" />
+                                </div>
+                                <h3 className="text-base font-bold text-center leading-tight">
+                                  {card.title}
+                                </h3>
+                                <p className="text-xs text-muted-foreground text-center leading-snug">
+                                  {card.description}
+                                </p>
+                              </div>
+                            </Card>
+                          );
+                        })}
                       </div>
                     </div>
 
