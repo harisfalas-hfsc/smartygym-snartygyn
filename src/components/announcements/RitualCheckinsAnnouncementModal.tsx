@@ -1,34 +1,42 @@
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
 import { Sparkles, ClipboardCheck, Sun, Moon, Sunrise, Activity, TrendingUp, X } from "lucide-react";
 
 interface RitualCheckinsAnnouncementModalProps {
   open: boolean;
-  onClose: () => void;
+  onClose: (dontShowAgain?: boolean) => void;
 }
 
 export const RitualCheckinsAnnouncementModal = ({ open, onClose }: RitualCheckinsAnnouncementModalProps) => {
   const navigate = useNavigate();
+  const [dontShowAgain, setDontShowAgain] = useState(false);
+
+  const handleClose = () => {
+    onClose(dontShowAgain);
+    setDontShowAgain(false);
+  };
 
   const handleRitualClick = () => {
-    onClose();
+    handleClose();
     navigate("/daily-ritual");
   };
 
   const handleCheckinsClick = () => {
-    onClose();
+    handleClose();
     navigate("/userdashboard?tab=checkins");
   };
 
   return (
-    <Dialog open={open} onOpenChange={(isOpen) => !isOpen && onClose()}>
+    <Dialog open={open} onOpenChange={(isOpen) => !isOpen && handleClose()}>
       <DialogContent className="max-w-lg border-2 border-primary/60 bg-gradient-to-br from-primary/5 via-background to-primary/5 shadow-[0_0_40px_rgba(212,175,55,0.15)] p-0 gap-0 animate-scale-in">
         {/* Header */}
         <div className="relative p-4 pb-2">
           {/* Close button */}
           <button 
-            onClick={onClose}
+            onClick={handleClose}
             className="absolute right-3 top-3 p-1.5 rounded-full hover:bg-muted transition-colors"
           >
             <X className="w-4 h-4 text-muted-foreground" />
@@ -125,6 +133,19 @@ export const RitualCheckinsAnnouncementModal = ({ open, onClose }: RitualCheckin
               <ClipboardCheck className="w-4 h-4 mr-2" />
               Check-in Now
             </Button>
+          </div>
+
+          {/* Don't show again checkbox */}
+          <div className="flex items-center gap-2 justify-center mt-3 pt-3 border-t border-green-500/20">
+            <Checkbox 
+              id="dont-show-ritual" 
+              checked={dontShowAgain}
+              onCheckedChange={(checked) => setDontShowAgain(checked === true)}
+              className="border-green-500/50 data-[state=checked]:bg-green-500 data-[state=checked]:border-green-500"
+            />
+            <label htmlFor="dont-show-ritual" className="text-xs text-muted-foreground cursor-pointer">
+              Don't show again today
+            </label>
           </div>
         </div>
       </DialogContent>

@@ -4,17 +4,19 @@ import { useQuery } from "@tanstack/react-query";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { Checkbox } from "@/components/ui/checkbox";
 import { CalendarCheck, Clock, Dumbbell, Flame, Home, Crown, ShoppingBag, X, TrendingUp } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 
 interface WODAnnouncementModalProps {
   open: boolean;
-  onClose: () => void;
+  onClose: (dontShowAgain?: boolean) => void;
 }
 
 export const WODAnnouncementModal = ({ open, onClose }: WODAnnouncementModalProps) => {
   const navigate = useNavigate();
   const [countdown, setCountdown] = useState(15);
+  const [dontShowAgain, setDontShowAgain] = useState(false);
 
   const { data: wods } = useQuery({
     queryKey: ["wod-announcement"],
@@ -41,6 +43,7 @@ export const WODAnnouncementModal = ({ open, onClose }: WODAnnouncementModalProp
   useEffect(() => {
     if (!open) {
       setCountdown(15);
+      setDontShowAgain(false);
       return;
     }
 
@@ -48,7 +51,7 @@ export const WODAnnouncementModal = ({ open, onClose }: WODAnnouncementModalProp
       setCountdown(prev => {
         if (prev <= 1) {
           clearInterval(timer);
-          onClose();
+          onClose(dontShowAgain);
           return 0;
         }
         return prev - 1;
@@ -56,7 +59,11 @@ export const WODAnnouncementModal = ({ open, onClose }: WODAnnouncementModalProp
     }, 1000);
 
     return () => clearInterval(timer);
-  }, [open, onClose]);
+  }, [open, onClose, dontShowAgain]);
+
+  const handleClose = () => {
+    onClose(dontShowAgain);
+  };
 
   const handleCardClick = (workoutId: string) => {
     onClose();
@@ -129,13 +136,13 @@ export const WODAnnouncementModal = ({ open, onClose }: WODAnnouncementModalProp
   };
 
   return (
-    <Dialog open={open} onOpenChange={(isOpen) => !isOpen && onClose()}>
+    <Dialog open={open} onOpenChange={(isOpen) => !isOpen && handleClose()}>
       <DialogContent className="max-w-lg border-2 border-primary/60 bg-gradient-to-br from-primary/5 via-background to-primary/5 shadow-[0_0_40px_rgba(212,175,55,0.15)] p-0 gap-0 animate-scale-in">
         {/* Header */}
         <div className="relative p-4 pb-2">
           {/* Close button */}
           <button 
-            onClick={onClose}
+            onClick={handleClose}
             className="absolute right-3 top-3 p-1.5 rounded-full hover:bg-muted transition-colors"
           >
             <X className="w-4 h-4 text-muted-foreground" />
@@ -179,12 +186,25 @@ export const WODAnnouncementModal = ({ open, onClose }: WODAnnouncementModalProp
 
           {/* CTA Button */}
           <Button 
-            onClick={() => { onClose(); navigate("/workout/wod"); }}
+            onClick={() => { handleClose(); navigate("/workout/wod"); }}
             className="w-full cta-button"
           >
             <CalendarCheck className="w-4 h-4 mr-2" />
             View All Today's Workouts
           </Button>
+
+          {/* Don't show again checkbox */}
+          <div className="flex items-center gap-2 justify-center mt-3 pt-3 border-t border-primary/20">
+            <Checkbox 
+              id="dont-show-wod" 
+              checked={dontShowAgain}
+              onCheckedChange={(checked) => setDontShowAgain(checked === true)}
+              className="border-primary/50 data-[state=checked]:bg-primary data-[state=checked]:border-primary"
+            />
+            <label htmlFor="dont-show-wod" className="text-xs text-muted-foreground cursor-pointer">
+              Don't show again today
+            </label>
+          </div>
         </div>
       </DialogContent>
     </Dialog>

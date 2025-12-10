@@ -22,7 +22,7 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/comp
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
-import { AnnouncementManager } from "@/components/announcements/AnnouncementManager";
+
 const Index = () => {
   const navigate = useNavigate();
   const location = useLocation();
@@ -399,9 +399,6 @@ const Index = () => {
         })}
         </script>
       </Helmet>
-      
-      {/* Global Announcement Pop-ups */}
-      <AnnouncementManager />
       
       <div className="min-h-screen bg-background overflow-x-hidden">
         
