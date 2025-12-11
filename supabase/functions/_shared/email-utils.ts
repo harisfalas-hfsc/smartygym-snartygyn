@@ -1,4 +1,47 @@
 /**
+ * Email utility functions for SmartyGym
+ * Provides email deliverability improvements including proper headers, footers, and HTML conversion
+ */
+
+/**
+ * Generates email headers for improved deliverability
+ * Includes List-Unsubscribe for one-click unsubscribe support (required by Gmail/Yahoo)
+ */
+export function getEmailHeaders(userEmail: string): Record<string, string> {
+  const unsubscribeUrl = `https://smartygym.com/unsubscribe?email=${encodeURIComponent(userEmail)}`;
+  return {
+    "List-Unsubscribe": `<${unsubscribeUrl}>, <mailto:unsubscribe@smartygym.com?subject=Unsubscribe>`,
+    "List-Unsubscribe-Post": "List-Unsubscribe=One-Click",
+    "X-Entity-Ref-ID": crypto.randomUUID(),
+  };
+}
+
+/**
+ * Generates a professional email footer with physical address and unsubscribe link
+ * Required for CAN-SPAM and GDPR compliance
+ */
+export function getEmailFooter(userEmail: string): string {
+  const unsubscribeUrl = `https://smartygym.com/unsubscribe?email=${encodeURIComponent(userEmail)}`;
+  return `
+    <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="margin-top: 32px;">
+      <tr>
+        <td style="border-top: 1px solid #eeeeee; padding-top: 24px;">
+          <p style="font-size: 13px; color: #666666; line-height: 1.6; margin: 0 0 12px 0; text-align: center;">
+            SmartyGym – Your Expert Fitness Partner<br>
+            Designed by Haris Falas, Sports Scientist (CSCS Certified)
+          </p>
+          <p style="font-size: 12px; color: #999999; line-height: 1.5; margin: 0; text-align: center;">
+            <a href="${unsubscribeUrl}" style="color: #999999; text-decoration: underline;">Unsubscribe</a> · 
+            <a href="https://smartygym.com/privacy-policy" style="color: #999999; text-decoration: underline;">Privacy Policy</a> · 
+            <a href="https://smartygym.com/userdashboard" style="color: #999999; text-decoration: underline;">Notification Settings</a>
+          </p>
+        </td>
+      </tr>
+    </table>
+  `;
+}
+
+/**
  * Converts tiptap HTML classes to inline-styled email HTML
  * Email clients don't understand CSS classes, so we need inline styles
  */
@@ -50,7 +93,7 @@ export function convertTiptapToEmailHtml(content: string): string {
 }
 
 /**
- * Wraps content in a professional email template
+ * Wraps content in a professional email template with proper footer
  */
 export function wrapInEmailTemplate(subject: string, content: string, ctaUrl?: string, ctaText?: string): string {
   const emailContent = convertTiptapToEmailHtml(content);
@@ -74,5 +117,114 @@ export function wrapInEmailTemplate(subject: string, content: string, ctaUrl?: s
       <hr style="margin: 32px 0; border: none; border-top: 1px solid #eeeeee;">
       <p style="font-size: 12px; color: #999999;">This email was sent from SmartyGym.</p>
     </div>
+  `;
+}
+
+/**
+ * Wraps content in a professional email template with proper footer and unsubscribe link
+ * Use this for all user-facing emails for deliverability
+ */
+export function wrapInEmailTemplateWithFooter(
+  subject: string, 
+  content: string, 
+  userEmail: string,
+  ctaUrl?: string, 
+  ctaText?: string
+): string {
+  const emailContent = convertTiptapToEmailHtml(content);
+  const footer = getEmailFooter(userEmail);
+  
+  let ctaButton = '';
+  if (ctaUrl && ctaText) {
+    ctaButton = `
+      <p style="margin-top: 24px; margin-bottom: 24px;">
+        <a href="${ctaUrl}" style="display: inline-block; background: #d4af37; color: #ffffff; padding: 14px 28px; text-decoration: none; border-radius: 4px; font-weight: bold; font-size: 16px;">${ctaText}</a>
+      </p>
+    `;
+  }
+  
+  return `
+    <!DOCTYPE html>
+    <html>
+    <head>
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <title>${subject}</title>
+    </head>
+    <body style="margin: 0; padding: 0; font-family: Arial, sans-serif; background-color: #f5f5f5;">
+      <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="background-color: #f5f5f5;">
+        <tr>
+          <td style="padding: 20px;">
+            <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="600" style="margin: 0 auto; background-color: #ffffff; border-radius: 8px;">
+              <tr>
+                <td style="padding: 32px;">
+                  <h1 style="color: #d4af37; margin: 0 0 24px 0; font-size: 24px; font-weight: bold;">${subject}</h1>
+                  <div style="font-size: 16px; line-height: 1.6; color: #333333;">
+                    ${emailContent}
+                  </div>
+                  ${ctaButton}
+                  ${footer}
+                </td>
+              </tr>
+            </table>
+          </td>
+        </tr>
+      </table>
+    </body>
+    </html>
+  `;
+}
+
+/**
+ * Builds a complete email HTML document with header, content, and footer
+ * For use in content notification emails
+ */
+export function buildCompleteEmailHtml(
+  title: string,
+  bodyContent: string,
+  userEmail: string,
+  buttons?: { text: string; url: string }[]
+): string {
+  const footer = getEmailFooter(userEmail);
+  
+  const buttonHtml = buttons?.map(btn => `
+    <a href="${btn.url}" style="display: inline-block; background: linear-gradient(135deg, #D4AF37, #F4D03F); color: #1a1a1a; padding: 14px 28px; text-decoration: none; border-radius: 8px; font-weight: bold; font-size: 16px; margin-right: 10px; margin-bottom: 10px;">${btn.text}</a>
+  `).join("") || "";
+
+  return `
+    <!DOCTYPE html>
+    <html>
+    <head>
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <title>${title}</title>
+    </head>
+    <body style="margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f5f5f5;">
+      <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="background-color: #f5f5f5;">
+        <tr>
+          <td style="padding: 40px 20px;">
+            <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="600" style="margin: 0 auto; background-color: #ffffff; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 20px rgba(0,0,0,0.1);">
+              <!-- Header -->
+              <tr>
+                <td style="background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%); padding: 30px; text-align: center;">
+                  <h1 style="color: #D4AF37; margin: 0; font-size: 28px; font-weight: bold;">SmartyGym</h1>
+                  <p style="color: #999; margin: 8px 0 0 0; font-size: 14px;">Expert Fitness by Haris Falas</p>
+                </td>
+              </tr>
+              <!-- Content -->
+              <tr>
+                <td style="padding: 40px 30px;">
+                  <h2 style="color: #1a1a1a; margin: 0 0 20px 0; font-size: 24px;">${title}</h2>
+                  ${bodyContent}
+                  ${buttonHtml ? `<div style="margin-top: 30px;">${buttonHtml}</div>` : ""}
+                  ${footer}
+                </td>
+              </tr>
+            </table>
+          </td>
+        </tr>
+      </table>
+    </body>
+    </html>
   `;
 }

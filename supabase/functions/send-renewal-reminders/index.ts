@@ -1,6 +1,7 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.57.2";
 import { Resend } from "https://esm.sh/resend@2.0.0";
+import { getEmailHeaders, getEmailFooter } from "../_shared/email-utils.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -114,7 +115,7 @@ serve(async (req) => {
         }
 
         // Prepare properly formatted HTML content
-        const formattedContent = `<p class="tiptap-paragraph"><strong>⏰ Subscription Renewal Reminder</strong></p><p class="tiptap-paragraph"></p><p class="tiptap-paragraph">Your <strong>${planName}</strong> membership will renew on <strong>${renewalDate}</strong>.</p><p class="tiptap-paragraph"></p><p class="tiptap-paragraph">Your subscription will automatically renew to continue your access to all premium features.</p><p class="tiptap-paragraph"></p><p class="tiptap-paragraph">If you have any questions or need to make changes, please visit your account settings.</p><p class="tiptap-paragraph"></p><p class="tiptap-paragraph"><a href="https://smartygym.com/userdashboard?tab=membership" style="display: inline-block; background: #d4af37; color: white; padding: 12px 24px; text-decoration: none; border-radius: 4px; font-weight: bold;">Manage Subscription →</a></p><p class="tiptap-paragraph"></p><p class="tiptap-paragraph"><strong>The SmartyGym Team</strong></p>`;
+        const formattedContent = `<p class="tiptap-paragraph"><strong>Subscription Renewal Reminder</strong></p><p class="tiptap-paragraph"></p><p class="tiptap-paragraph">Your <strong>${planName}</strong> membership will renew on <strong>${renewalDate}</strong>.</p><p class="tiptap-paragraph"></p><p class="tiptap-paragraph">Your subscription will automatically renew to continue your access to all premium features.</p><p class="tiptap-paragraph"></p><p class="tiptap-paragraph">If you have any questions or need to make changes, please visit your account settings.</p><p class="tiptap-paragraph"></p><p class="tiptap-paragraph"><a href="https://smartygym.com/userdashboard?tab=membership" style="display: inline-block; background: #d4af37; color: white; padding: 12px 24px; text-decoration: none; border-radius: 4px; font-weight: bold;">Manage Subscription</a></p><p class="tiptap-paragraph"></p><p class="tiptap-paragraph"><strong>The SmartyGym Team</strong></p>`;
         
         // Send dashboard message
         if (automationRule.sends_dashboard_message) {
@@ -138,22 +139,44 @@ serve(async (req) => {
 
           if (userEmail) {
             try {
+              const footer = getEmailFooter(userEmail);
+              
               const emailResult = await resend.emails.send({
                 from: "SmartyGym <notifications@smartygym.com>",
+                reply_to: "support@smartygym.com",
                 to: [userEmail],
                 subject: subject,
+                headers: getEmailHeaders(userEmail),
                 html: `
-                  <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
-                    <h1 style="color: #d4af37; margin-bottom: 20px;">⏰ Subscription Renewal Reminder</h1>
-                    <p style="font-size: 16px; line-height: 1.6; margin-bottom: 16px;">Your <strong>${planName}</strong> membership will renew on <strong>${renewalDate}</strong>.</p>
-                    <p style="font-size: 16px; line-height: 1.6; margin-bottom: 16px;">Your subscription will automatically renew to continue your access to all premium features.</p>
-                    <p style="font-size: 16px; line-height: 1.6; margin-bottom: 24px;">If you have any questions or need to make changes, please visit your account settings.</p>
-                    <p style="margin-top: 24px;">
-                      <a href="https://smartygym.com/userdashboard?tab=membership" style="display: inline-block; background: #d4af37; color: white; padding: 14px 28px; text-decoration: none; border-radius: 4px; font-weight: bold; font-size: 16px;">Manage Subscription →</a>
-                    </p>
-                    <hr style="margin: 32px 0; border: none; border-top: 1px solid #eee;">
-                    <p style="font-size: 12px; color: #999;">This email was sent from SmartyGym.</p>
-                  </div>
+                  <!DOCTYPE html>
+                  <html>
+                  <head>
+                    <meta charset="utf-8">
+                    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                  </head>
+                  <body style="margin: 0; padding: 0; font-family: Arial, sans-serif; background-color: #f5f5f5;">
+                    <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="background-color: #f5f5f5;">
+                      <tr>
+                        <td style="padding: 20px;">
+                          <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="600" style="margin: 0 auto; background-color: #ffffff; border-radius: 8px;">
+                            <tr>
+                              <td style="padding: 32px;">
+                                <h1 style="color: #d4af37; margin-bottom: 20px;">Subscription Renewal Reminder</h1>
+                                <p style="font-size: 16px; line-height: 1.6; margin-bottom: 16px;">Your <strong>${planName}</strong> membership will renew on <strong>${renewalDate}</strong>.</p>
+                                <p style="font-size: 16px; line-height: 1.6; margin-bottom: 16px;">Your subscription will automatically renew to continue your access to all premium features.</p>
+                                <p style="font-size: 16px; line-height: 1.6; margin-bottom: 24px;">If you have any questions or need to make changes, please visit your account settings.</p>
+                                <p style="margin-top: 24px;">
+                                  <a href="https://smartygym.com/userdashboard?tab=membership" style="display: inline-block; background: #d4af37; color: white; padding: 14px 28px; text-decoration: none; border-radius: 4px; font-weight: bold; font-size: 16px;">Manage Subscription</a>
+                                </p>
+                                ${footer}
+                              </td>
+                            </tr>
+                          </table>
+                        </td>
+                      </tr>
+                    </table>
+                  </body>
+                  </html>
                 `,
               });
               
@@ -170,7 +193,7 @@ serve(async (req) => {
           }
         }
 
-        console.log(`[SEND-RENEWAL-REMINDERS] ✅ Notified user ${subscription.user_id}`);
+        console.log(`[SEND-RENEWAL-REMINDERS] Notified user ${subscription.user_id}`);
       } catch (error) {
         console.error(`[SEND-RENEWAL-REMINDERS] Error for user ${subscription.user_id}:`, error);
       }
@@ -196,7 +219,7 @@ serve(async (req) => {
       content: template.content,
     });
 
-    console.log(`[SEND-RENEWAL-REMINDERS] ✅ Completed: ${dashboardSent} dashboard, ${emailsSent} emails`);
+    console.log(`[SEND-RENEWAL-REMINDERS] Completed: ${dashboardSent} dashboard, ${emailsSent} emails`);
 
     return new Response(
       JSON.stringify({ success: true, dashboardSent, emailsSent }),

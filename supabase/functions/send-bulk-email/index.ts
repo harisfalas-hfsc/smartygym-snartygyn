@@ -1,7 +1,7 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.57.2";
 import { Resend } from "https://esm.sh/resend@3.5.0";
-import { convertTiptapToEmailHtml } from "../_shared/email-utils.ts";
+import { convertTiptapToEmailHtml, getEmailHeaders, getEmailFooter } from "../_shared/email-utils.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -123,21 +123,41 @@ serve(async (req) => {
 
       const batchPromises = batch.map(async (recipient) => {
         try {
+          const footer = getEmailFooter(recipient.email!);
+          
           const emailResponse = await resend.emails.send({
             from: "SmartyGym <notifications@smartygym.com>",
+            reply_to: "support@smartygym.com",
             to: [recipient.email!],
             subject: subject,
+            headers: getEmailHeaders(recipient.email!),
             html: `
-              <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
-                <h2 style="color: #d4af37; margin-bottom: 16px;">Hello ${recipient.name}!</h2>
-                <div style="line-height: 1.6; color: #333333; font-size: 16px;">
-                  ${emailContent}
-                </div>
-                <hr style="margin: 30px 0; border: none; border-top: 1px solid #eeeeee;">
-                <p style="font-size: 12px; color: #999999;">
-                  This email was sent from SmartyGym Admin. If you believe this was sent in error, please contact support.
-                </p>
-              </div>
+              <!DOCTYPE html>
+              <html>
+              <head>
+                <meta charset="utf-8">
+                <meta name="viewport" content="width=device-width, initial-scale=1.0">
+              </head>
+              <body style="margin: 0; padding: 0; font-family: Arial, sans-serif; background-color: #f5f5f5;">
+                <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="background-color: #f5f5f5;">
+                  <tr>
+                    <td style="padding: 20px;">
+                      <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="600" style="margin: 0 auto; background-color: #ffffff; border-radius: 8px;">
+                        <tr>
+                          <td style="padding: 32px;">
+                            <h2 style="color: #d4af37; margin-bottom: 16px;">Hello ${recipient.name}</h2>
+                            <div style="line-height: 1.6; color: #333333; font-size: 16px;">
+                              ${emailContent}
+                            </div>
+                            ${footer}
+                          </td>
+                        </tr>
+                      </table>
+                    </td>
+                  </tr>
+                </table>
+              </body>
+              </html>
             `,
           });
 

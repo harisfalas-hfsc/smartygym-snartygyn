@@ -1,7 +1,7 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.57.2";
 import { Resend } from "https://esm.sh/resend@2.0.0";
-import { wrapInEmailTemplate } from "../_shared/email-utils.ts";
+import { wrapInEmailTemplateWithFooter, getEmailHeaders } from "../_shared/email-utils.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -19,8 +19,8 @@ serve(async (req) => {
   }
 
   try {
-    logStep("🚀 Function invoked - starting Monday motivational messages");
-    logStep("📅 Current time", { now: new Date().toISOString(), dayOfWeek: new Date().getDay() });
+    logStep("Function invoked - starting Monday motivational messages");
+    logStep("Current time", { now: new Date().toISOString(), dayOfWeek: new Date().getDay() });
 
     const supabaseAdmin = createClient(
       Deno.env.get("SUPABASE_URL") ?? "",
@@ -29,7 +29,7 @@ serve(async (req) => {
     );
 
     // Get automation rule configuration
-    logStep("🔍 Fetching automation rule for monday_motivation");
+    logStep("Fetching automation rule for monday_motivation");
     const { data: automationRule, error: ruleError } = await supabaseAdmin
       .from("automation_rules")
       .select("*")
@@ -38,18 +38,18 @@ serve(async (req) => {
       .single();
 
     if (ruleError) {
-      logStep("❌ Error fetching automation rule", { error: ruleError.message });
+      logStep("Error fetching automation rule", { error: ruleError.message });
     }
 
     if (!automationRule) {
-      logStep("⚠️ Monday motivation automation is disabled or not found");
+      logStep("Monday motivation automation is disabled or not found");
       return new Response(
         JSON.stringify({ success: false, reason: "Automation disabled" }),
         { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
 
-    logStep("✅ Automation rule found", { 
+    logStep("Automation rule found", { 
       id: automationRule.id,
       sendsDashboard: automationRule.sends_dashboard_message, 
       sendsEmail: automationRule.sends_email,
@@ -58,7 +58,7 @@ serve(async (req) => {
     });
 
     // Get the motivational template
-    logStep("🔍 Fetching motivational_weekly template");
+    logStep("Fetching motivational_weekly template");
     const { data: template, error: templateError } = await supabaseAdmin
       .from("automated_message_templates")
       .select("subject, content")
@@ -67,31 +67,31 @@ serve(async (req) => {
       .single();
 
     if (templateError) {
-      logStep("❌ Error fetching template", { error: templateError.message });
+      logStep("Error fetching template", { error: templateError.message });
     }
 
     if (!template) {
-      logStep("⚠️ No active motivational template found");
+      logStep("No active motivational template found");
       return new Response(
         JSON.stringify({ success: false, reason: "No template configured" }),
         { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
 
-    logStep("✅ Template found", { subject: template.subject });
+    logStep("Template found", { subject: template.subject });
 
     // Get ALL users
-    logStep("🔍 Fetching all users");
+    logStep("Fetching all users");
     const { data: users, error: usersError } = await supabaseAdmin
       .from("profiles")
       .select("user_id, full_name");
 
     if (usersError) {
-      logStep("❌ Error fetching users", { error: usersError.message });
+      logStep("Error fetching users", { error: usersError.message });
       throw usersError;
     }
 
-    logStep("👥 Found users", { count: users?.length || 0 });
+    logStep("Found users", { count: users?.length || 0 });
 
     if (!users || users.length === 0) {
       return new Response(
@@ -110,7 +110,7 @@ serve(async (req) => {
     const today = new Date();
     today.setHours(0, 0, 0, 0);
     
-    logStep("🔍 Checking for messages already sent today", { todayStart: today.toISOString() });
+    logStep("Checking for messages already sent today", { todayStart: today.toISOString() });
     
     const { data: existingMessages, error: existingError } = await supabaseAdmin
       .from('user_system_messages')
@@ -119,18 +119,18 @@ serve(async (req) => {
       .gte('created_at', today.toISOString());
 
     if (existingError) {
-      logStep("⚠️ Error checking existing messages", { error: existingError.message });
+      logStep("Error checking existing messages", { error: existingError.message });
     }
 
     const alreadySentUserIds = new Set(existingMessages?.map(m => m.user_id) || []);
-    logStep("📊 Already sent today", { count: alreadySentUserIds.size });
+    logStep("Already sent today", { count: alreadySentUserIds.size });
 
     // Initialize Resend if sending emails
     let resend: Resend | null = null;
     if (automationRule.sends_email) {
       const resendApiKey = Deno.env.get("RESEND_API_KEY");
       if (!resendApiKey) {
-        logStep("❌ RESEND_API_KEY not configured - emails will not be sent");
+        logStep("RESEND_API_KEY not configured - emails will not be sent");
       } else {
         resend = new Resend(resendApiKey);
       }
@@ -157,7 +157,7 @@ serve(async (req) => {
             });
 
           if (msgError) {
-            logStep("❌ Dashboard message error", { userId: user.user_id, error: msgError.message });
+            logStep("Dashboard message error", { userId: user.user_id, error: msgError.message });
             failed++;
           } else {
             dashboardSent++;
@@ -169,7 +169,7 @@ serve(async (req) => {
           const { data: userData, error: userDataError } = await supabaseAdmin.auth.admin.getUserById(user.user_id);
           
           if (userDataError) {
-            logStep("⚠️ Error fetching user email", { userId: user.user_id, error: userDataError.message });
+            logStep("Error fetching user email", { userId: user.user_id, error: userDataError.message });
             continue;
           }
           
@@ -185,30 +185,33 @@ serve(async (req) => {
                 .single();
 
               const prefs = profile?.notification_preferences as any;
-              const emailEnabled = prefs?.email_notifications !== false && prefs?.newsletter !== false;
+              const emailEnabled = prefs?.email_notifications !== false && prefs?.newsletter !== false && prefs?.opt_out_all !== true;
 
               if (!emailEnabled) {
-                logStep("⏭️ Email disabled for user", { userId: user.user_id });
+                logStep("Email disabled for user", { userId: user.user_id });
                 continue;
               }
 
               // Use the email utility to convert tiptap HTML to email-compatible HTML
-              const emailHtml = wrapInEmailTemplate(
+              const emailHtml = wrapInEmailTemplateWithFooter(
                 template.subject,
                 template.content,
+                userEmail,
                 "https://smartygym.com/workout",
-                "Browse Workouts →"
+                "Browse Workouts"
               );
 
               const emailResult = await resend.emails.send({
                 from: "SmartyGym <notifications@smartygym.com>",
+                reply_to: "support@smartygym.com",
                 to: [userEmail],
                 subject: template.subject,
+                headers: getEmailHeaders(userEmail),
                 html: emailHtml,
               });
               
               if (emailResult.error) {
-                logStep("❌ Email API error", { userId: user.user_id, email: userEmail, error: emailResult.error });
+                logStep("Email API error", { userId: user.user_id, email: userEmail, error: emailResult.error });
                 emailErrors.push(`${userEmail}: ${emailResult.error.message || String(emailResult.error)}`);
               } else {
                 emailsSent++;
@@ -217,19 +220,19 @@ serve(async (req) => {
               }
             } catch (emailError: any) {
               const errorMsg = emailError.message || String(emailError);
-              logStep("❌ Email send error", { userId: user.user_id, email: userEmail, error: errorMsg });
+              logStep("Email send error", { userId: user.user_id, email: userEmail, error: errorMsg });
               emailErrors.push(`${userEmail}: ${errorMsg}`);
             }
           }
         }
       } catch (error: any) {
         failed++;
-        logStep("❌ Error processing user", { userId: user.user_id, error: error.message });
+        logStep("Error processing user", { userId: user.user_id, error: error.message });
       }
     }
 
     // Update automation rule execution count
-    logStep("📊 Updating automation rule stats");
+    logStep("Updating automation rule stats");
     const { error: updateError } = await supabaseAdmin
       .from("automation_rules")
       .update({
@@ -239,11 +242,11 @@ serve(async (req) => {
       .eq("id", automationRule.id);
 
     if (updateError) {
-      logStep("⚠️ Error updating automation rule", { error: updateError.message });
+      logStep("Error updating automation rule", { error: updateError.message });
     }
 
     // Log to audit
-    logStep("📝 Logging to audit");
+    logStep("Logging to audit");
     await supabaseAdmin.from('notification_audit_log').insert({
       notification_type: 'monday_motivation',
       message_type: 'motivational_weekly',
@@ -259,7 +262,7 @@ serve(async (req) => {
       }
     });
 
-    logStep("🎉 Processing completed", { 
+    logStep("Processing completed", { 
       totalUsers: users.length,
       dashboardSent, 
       emailsSent, 
@@ -282,7 +285,7 @@ serve(async (req) => {
     );
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : String(error);
-    logStep("💥 FATAL ERROR", { message: errorMessage, stack: error instanceof Error ? error.stack : undefined });
+    logStep("FATAL ERROR", { message: errorMessage, stack: error instanceof Error ? error.stack : undefined });
     return new Response(
       JSON.stringify({ error: errorMessage }),
       { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }

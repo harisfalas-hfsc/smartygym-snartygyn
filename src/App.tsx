@@ -65,6 +65,7 @@ import TakeTour from "./pages/TakeTour";
 
 import PaymentSuccess from "./pages/PaymentSuccess";
 import NewsletterThankYou from "./pages/NewsletterThankYou";
+import Unsubscribe from "./pages/Unsubscribe";
 import Community from "./pages/Community";
 import AdminBackoffice from "./pages/AdminBackoffice";
 import MigrateContent from "./pages/MigrateContent";
@@ -116,6 +117,7 @@ const AppContent = () => {
                 {/* Public free content page */}
                 <Route path="/freecontent" element={<FreeContent />} />
                 <Route path="/newsletter-thank-you" element={<NewsletterThankYou />} />
+                <Route path="/unsubscribe" element={<Unsubscribe />} />
                 <Route path="/blog" element={<Blog />} />
                 <Route path="/coach-profile" element={<CoachProfile />} />
                 <Route path="/coach-cv" element={<CoachCV />} />
