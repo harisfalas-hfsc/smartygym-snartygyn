@@ -107,21 +107,21 @@ export const LogBookCalendar = ({ userId, filter }: LogBookCalendarProps) => {
 
   const getBadgeColor = (badge: string) => {
     const colors: Record<string, string> = {
-      'workout-viewed': 'bg-gray-400',
-      'workout-completed': 'bg-green-500',
+      'workout-viewed': 'bg-slate-400',
+      'workout-completed': 'bg-emerald-500',
       'workout-purchased': 'bg-amber-500',
-      'program-viewed': 'bg-gray-400',
+      'program-viewed': 'bg-slate-400',
       'program-ongoing': 'bg-orange-500',
-      'program-completed': 'bg-blue-500',
+      'program-completed': 'bg-sky-500',
       'program-purchased': 'bg-amber-600',
-      'pt-viewed': 'bg-gray-400',
-      'pt-ongoing': 'bg-orange-400',
-      'pt-completed': 'bg-purple-500',
-      'tool': 'bg-pink-500',
-      'measurement': 'bg-purple-500',
-      'checkin': 'bg-teal-500',
+      'pt-viewed': 'bg-slate-400',
+      'pt-ongoing': 'bg-rose-400',
+      'pt-completed': 'bg-violet-600',
+      'tool': 'bg-fuchsia-500',
+      'measurement': 'bg-indigo-500',
+      'checkin': 'bg-cyan-500',
     };
-    return colors[badge] || 'bg-gray-400';
+    return colors[badge] || 'bg-slate-400';
   };
 
   const handleDayClick = (day: number) => {
@@ -302,11 +302,11 @@ export const LogBookCalendar = ({ userId, filter }: LogBookCalendarProps) => {
             <p className="text-xs text-muted-foreground mb-2">Activity Indicators</p>
             <div className="grid grid-cols-2 md:grid-cols-3 gap-2 text-xs">
               <div className="flex items-center gap-2">
-                <div className="w-3 h-3 rounded-full bg-gray-400" />
+                <div className="w-3 h-3 rounded-full bg-slate-400" />
                 <span>Viewed</span>
               </div>
               <div className="flex items-center gap-2">
-                <div className="w-3 h-3 rounded-full bg-green-500" />
+                <div className="w-3 h-3 rounded-full bg-emerald-500" />
                 <span>Workout Completed</span>
               </div>
               <div className="flex items-center gap-2">
@@ -314,23 +314,27 @@ export const LogBookCalendar = ({ userId, filter }: LogBookCalendarProps) => {
                 <span>Program Ongoing</span>
               </div>
               <div className="flex items-center gap-2">
-                <div className="w-3 h-3 rounded-full bg-blue-500" />
+                <div className="w-3 h-3 rounded-full bg-sky-500" />
                 <span>Program Completed</span>
               </div>
               <div className="flex items-center gap-2">
-                <div className="w-3 h-3 rounded-full bg-purple-500" />
+                <div className="w-3 h-3 rounded-full bg-rose-400" />
+                <span>PT Ongoing</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <div className="w-3 h-3 rounded-full bg-violet-600" />
                 <span>PT Completed</span>
               </div>
               <div className="flex items-center gap-2">
-                <div className="w-3 h-3 rounded-full bg-pink-500" />
+                <div className="w-3 h-3 rounded-full bg-fuchsia-500" />
                 <span>Tool Used</span>
               </div>
               <div className="flex items-center gap-2">
-                <div className="w-3 h-3 rounded-full bg-purple-500" />
+                <div className="w-3 h-3 rounded-full bg-indigo-500" />
                 <span>Measurement</span>
               </div>
               <div className="flex items-center gap-2">
-                <div className="w-3 h-3 rounded-full bg-teal-500" />
+                <div className="w-3 h-3 rounded-full bg-cyan-500" />
                 <span>Check-in</span>
               </div>
             </div>
