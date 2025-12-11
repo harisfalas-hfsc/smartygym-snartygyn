@@ -577,12 +577,12 @@ const Index = () => {
 
           {/* Tagline/Slogan Card */}
           <div className="flex justify-center mt-4 mb-8">
-            <div className="inline-flex items-center gap-2 px-4 py-2 bg-primary/5 border border-primary/20 rounded-full">
-              <Sparkles className="h-4 w-4 text-primary flex-shrink-0" />
-              <p className="text-base sm:text-lg font-semibold text-primary italic text-center">
+            <div className="inline-flex items-center gap-2 px-3 md:px-4 py-1.5 md:py-2 bg-primary/5 border border-primary/20 rounded-full">
+              <Sparkles className="h-3 w-3 md:h-4 md:w-4 text-primary flex-shrink-0" />
+              <p className="text-sm md:text-base lg:text-lg font-semibold text-primary italic text-center">
                 Where Science Meets Convenience. Where Real Coaches guide Real people.
               </p>
-              <Sparkles className="h-4 w-4 text-primary flex-shrink-0" />
+              <Sparkles className="h-3 w-3 md:h-4 md:w-4 text-primary flex-shrink-0" />
             </div>
           </div>
 
