@@ -95,9 +95,8 @@ export const HeroThreeColumns = () => {
   return (
     <div className="flex flex-col lg:flex-row lg:items-start gap-8 lg:gap-0 mt-8">
       {/* Column 1: Explore */}
-      <div className="lg:border-r lg:border-primary/30 lg:pr-4">
-        <h3 className="text-lg font-bold text-foreground mb-4 flex items-center gap-2">
-          <span className="w-2 h-2 rounded-full bg-primary"></span>
+      <div className="lg:pr-4">
+        <h3 className="text-lg font-bold text-foreground mb-4 underline">
           Explore
         </h3>
         <div className="space-y-3">
@@ -116,10 +115,9 @@ export const HeroThreeColumns = () => {
       </div>
 
       {/* Column 2: Who is SmartyGym For? */}
-      <div className="lg:border-r lg:border-primary/30 lg:pl-4 lg:pr-4">
-        <h3 className="text-lg font-bold text-foreground mb-4 flex items-center gap-2">
-          <span className="w-2 h-2 rounded-full bg-primary"></span>
-          Who is <span className="text-primary ml-1">SmartyGym</span> <span className="ml-1">For?</span>
+      <div className="lg:pl-4 lg:pr-4">
+        <h3 className="text-lg font-bold text-foreground mb-4 underline">
+          Who is <span className="text-primary">SmartyGym</span> For?
         </h3>
         <div className="space-y-3">
           {whoIsFor.map((item, index) => (
@@ -136,8 +134,7 @@ export const HeroThreeColumns = () => {
 
       {/* Column 3: Why SmartyGym */}
       <div className="lg:pl-4">
-        <h3 className="text-lg font-bold text-foreground mb-4 flex items-center gap-2">
-          <span className="w-2 h-2 rounded-full bg-primary"></span>
+        <h3 className="text-lg font-bold text-foreground mb-4 underline">
           Why SmartyGym
         </h3>
         <div className="space-y-3">
