@@ -1,5 +1,9 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.57.2";
+import { Resend } from "https://esm.sh/resend@3.5.0";
+import { getEmailHeaders, getEmailFooter, wrapInEmailTemplateWithFooter } from "../_shared/email-utils.ts";
+
+const resend = new Resend(Deno.env.get("RESEND_API_KEY"));
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -75,7 +79,7 @@ serve(async (req) => {
       content = content.replace(/\[Content\]/g, customData.contentName);
     }
 
-    // Insert system message for the user
+    // Insert system message for the user (dashboard)
     const { error: insertError } = await supabaseAdmin
       .from('user_system_messages')
       .insert({
@@ -91,7 +95,53 @@ serve(async (req) => {
       throw insertError;
     }
 
-    console.log('[SEND-SYSTEM-MESSAGE] Message sent successfully to user:', userId);
+    console.log('[SEND-SYSTEM-MESSAGE] Dashboard message sent successfully to user:', userId);
+
+    // Send email as well
+    let emailSent = false;
+    try {
+      // Get user email
+      const { data: userData, error: userError } = await supabaseAdmin.auth.admin.getUserById(userId);
+      
+      if (userError || !userData?.user?.email) {
+        console.error('[SEND-SYSTEM-MESSAGE] Could not fetch user email:', userError);
+      } else {
+        const userEmail = userData.user.email;
+        
+        // Check notification preferences
+        const { data: preferences } = await supabaseAdmin
+          .from('notification_preferences')
+          .select('promotional_emails')
+          .eq('user_id', userId)
+          .single();
+        
+        if (preferences && !preferences.promotional_emails) {
+          console.log('[SEND-SYSTEM-MESSAGE] User has disabled promotional emails, skipping email');
+        } else {
+          // Send email with headers and footer
+          const emailHtml = wrapInEmailTemplateWithFooter(
+            subject,
+            content,
+            userEmail,
+            'https://smartygym.com/userdashboard',
+            'Go to Dashboard'
+          );
+
+          const emailResponse = await resend.emails.send({
+            from: "SmartyGym <notifications@smartygym.com>",
+            to: [userEmail],
+            subject: subject,
+            html: emailHtml,
+            headers: getEmailHeaders(userEmail),
+          });
+
+          console.log('[SEND-SYSTEM-MESSAGE] Email sent successfully:', emailResponse.data?.id);
+          emailSent = true;
+        }
+      }
+    } catch (emailError) {
+      console.error('[SEND-SYSTEM-MESSAGE] Email sending failed:', emailError);
+    }
 
     // Log to notification audit
     try {
@@ -107,14 +157,14 @@ serve(async (req) => {
           failed_count: 0,
           subject: subject,
           content: content,
-          metadata: { userId, template_id: template.id }
+          metadata: { userId, template_id: template.id, email_sent: emailSent }
         });
     } catch (auditError) {
       console.error('[SEND-SYSTEM-MESSAGE] Failed to log audit:', auditError);
     }
 
     return new Response(
-      JSON.stringify({ success: true, message: "System message sent successfully" }),
+      JSON.stringify({ success: true, message: "System message sent successfully", emailSent }),
       {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
         status: 200,
