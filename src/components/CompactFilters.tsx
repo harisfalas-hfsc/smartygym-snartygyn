@@ -24,7 +24,7 @@ interface CompactFiltersProps {
 
 export const CompactFilters = ({ filters }: CompactFiltersProps) => {
   return (
-    <div className="bg-gradient-to-r from-primary/10 via-primary/5 to-primary/10 border-2 border-primary/40 rounded-lg p-4 mb-8">
+    <div className="bg-gradient-to-r from-primary/10 via-primary/5 to-primary/10 border-2 border-primary/40 rounded-lg p-4">
       <div className="flex items-center gap-3 flex-wrap">
         <div className="flex items-center gap-2 text-sm font-semibold text-foreground">
           <Filter className="h-4 w-4 text-primary" />

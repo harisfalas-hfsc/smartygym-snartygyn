@@ -576,38 +576,33 @@ programEntries.sort((a, b) => b.total_completions - a.total_completions);
                 <Trophy className="h-5 w-5 md:h-6 md:w-6 text-primary" />
                 Community Leaderboard
               </CardTitle>
-              <div className="flex flex-col sm:flex-row gap-3 sm:items-center">
-                <div className="flex-1">
-<CompactFilters
-                    filters={[
-                      {
-                        name: "Type",
-                        value: leaderboardFilter,
-                        onChange: (value) => setLeaderboardFilter(value as "workouts" | "programs" | "checkins"),
-                        options: [
-                          { value: "workouts", label: "Workouts" },
-                          { value: "programs", label: "Training Programs" },
-                          { value: "checkins", label: "Check-ins" }
-                        ],
-                        placeholder: "Select type"
-                      }
-                    ]}
-                  />
-                </div>
-                <div className="w-full sm:w-auto">
-                  <Select value={leaderboardSort} onValueChange={(value: any) => setLeaderboardSort(value)}>
-                    <SelectTrigger className="w-full sm:w-[200px] bg-background/80 border-primary/30 hover:border-primary/50">
-                      <SelectValue placeholder="Sort by" />
-                    </SelectTrigger>
-                    <SelectContent className="bg-background border-primary/30">
-                      <SelectItem value="completions-desc">Most Completions</SelectItem>
-                      <SelectItem value="completions-asc">Least Completions</SelectItem>
-                      <SelectItem value="name-asc">Name A-Z</SelectItem>
-                      <SelectItem value="name-desc">Name Z-A</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-              </div>
+              <CompactFilters
+                filters={[
+                  {
+                    name: "Type",
+                    value: leaderboardFilter,
+                    onChange: (value) => setLeaderboardFilter(value as "workouts" | "programs" | "checkins"),
+                    options: [
+                      { value: "workouts", label: "Workouts" },
+                      { value: "programs", label: "Training Programs" },
+                      { value: "checkins", label: "Check-ins" }
+                    ],
+                    placeholder: "Select type"
+                  },
+                  {
+                    name: "Sort",
+                    value: leaderboardSort,
+                    onChange: (value) => setLeaderboardSort(value as any),
+                    options: [
+                      { value: "completions-desc", label: "Most Completions" },
+                      { value: "completions-asc", label: "Least Completions" },
+                      { value: "name-asc", label: "Name A-Z" },
+                      { value: "name-desc", label: "Name Z-A" }
+                    ],
+                    placeholder: "Sort by"
+                  }
+                ]}
+              />
             </CardHeader>
             <CardContent className="p-4 md:pt-6">
               {isLoadingLeaderboard ? (
@@ -724,37 +719,32 @@ programEntries.sort((a, b) => b.total_completions - a.total_completions);
                 <Star className="h-5 w-5 md:h-6 md:w-6 text-primary" />
                 Community Ratings
               </CardTitle>
-              <div className="flex flex-col sm:flex-row gap-3 sm:items-center">
-                <div className="flex-1">
-                  <CompactFilters
-                    filters={[
-                      {
-                        name: "Type",
-                        value: ratingsFilter,
-                        onChange: (value) => setRatingsFilter(value as "workouts" | "programs"),
-                        options: [
-                          { value: "workouts", label: "Workouts" },
-                          { value: "programs", label: "Training Programs" }
-                        ],
-                        placeholder: "Select type"
-                      }
-                    ]}
-                  />
-                </div>
-                <div className="w-full sm:w-auto">
-                  <Select value={ratingsSort} onValueChange={(value: any) => setRatingsSort(value)}>
-                    <SelectTrigger className="w-full sm:w-[200px] bg-background/80 border-primary/30 hover:border-primary/50">
-                      <SelectValue placeholder="Sort by" />
-                    </SelectTrigger>
-                    <SelectContent className="bg-background border-primary/30">
-                      <SelectItem value="rating-desc">Highest Rated</SelectItem>
-                      <SelectItem value="rating-asc">Lowest Rated</SelectItem>
-                      <SelectItem value="reviews-desc">Most Reviews</SelectItem>
-                      <SelectItem value="name-asc">Name A-Z</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-              </div>
+              <CompactFilters
+                filters={[
+                  {
+                    name: "Type",
+                    value: ratingsFilter,
+                    onChange: (value) => setRatingsFilter(value as "workouts" | "programs"),
+                    options: [
+                      { value: "workouts", label: "Workouts" },
+                      { value: "programs", label: "Training Programs" }
+                    ],
+                    placeholder: "Select type"
+                  },
+                  {
+                    name: "Sort",
+                    value: ratingsSort,
+                    onChange: (value) => setRatingsSort(value as any),
+                    options: [
+                      { value: "rating-desc", label: "Highest Rated" },
+                      { value: "rating-asc", label: "Lowest Rated" },
+                      { value: "reviews-desc", label: "Most Reviews" },
+                      { value: "name-asc", label: "Name A-Z" }
+                    ],
+                    placeholder: "Sort by"
+                  }
+                ]}
+              />
             </CardHeader>
             <CardContent className="p-4 md:pt-6">
               {isLoadingRatings ? (
@@ -870,21 +860,10 @@ programEntries.sort((a, b) => b.total_completions - a.total_completions);
           {/* Comments Section */}
           <Card className="border-2 border-primary/30 shadow-lg">
             <CardHeader className="bg-gradient-to-r from-primary/10 to-primary/5 p-4 md:p-6">
-              <div className="flex items-center justify-between mb-4">
-                <CardTitle className="flex items-center gap-2 text-xl md:text-2xl">
-                  <MessageSquare className="h-5 w-5 md:h-6 md:w-6 text-primary" />
-                  Community Comments
-                </CardTitle>
-                <Select value={sortOrder} onValueChange={(value: "newest" | "oldest") => setSortOrder(value)}>
-                  <SelectTrigger className="w-[140px] sm:w-[160px] bg-background/80 border-primary/30 hover:border-primary/50">
-                    <SelectValue placeholder="Sort by" />
-                  </SelectTrigger>
-                  <SelectContent className="bg-background border-primary/30">
-                    <SelectItem value="newest">Newest First</SelectItem>
-                    <SelectItem value="oldest">Oldest First</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
+              <CardTitle className="flex items-center gap-2 text-xl md:text-2xl mb-4">
+                <MessageSquare className="h-5 w-5 md:h-6 md:w-6 text-primary" />
+                Community Comments
+              </CardTitle>
               <CompactFilters
                 filters={[
                   {
@@ -897,6 +876,16 @@ programEntries.sort((a, b) => b.total_completions - a.total_completions);
                       { value: "programs", label: "Training Programs" }
                     ],
                     placeholder: "Select type"
+                  },
+                  {
+                    name: "Sort",
+                    value: sortOrder,
+                    onChange: (value) => setSortOrder(value as "newest" | "oldest"),
+                    options: [
+                      { value: "newest", label: "Newest First" },
+                      { value: "oldest", label: "Oldest First" }
+                    ],
+                    placeholder: "Sort by"
                   }
                 ]}
               />
