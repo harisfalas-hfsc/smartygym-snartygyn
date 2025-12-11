@@ -91,12 +91,12 @@ export const HeroThreeColumns = () => {
   }, []);
 
   const exploreLinks = [
-    { text: "Smarty Workouts", subtitle: "multi workouts", icon: <Dumbbell className="w-5 h-5 text-primary" />, route: "/workout" },
-    { text: "Smarty Programs", subtitle: "multi programs", icon: <Calendar className="w-5 h-5 text-primary" />, route: "/trainingprogram" },
-    { text: "Smarty Ritual", subtitle: "multi rituals", icon: <Sparkles className="w-5 h-5 text-primary" />, route: "/daily-ritual" },
-    { text: "Smarty Tools", subtitle: "multi tools", icon: <Calculator className="w-5 h-5 text-primary" />, route: "/tools" },
-    { text: "Blog & Expert Articles", subtitle: "expert articles", icon: <FileText className="w-5 h-5 text-primary" />, route: "/blog" },
-    { text: "Exercise Library", subtitle: "500+ exercises", icon: <Video className="w-5 h-5 text-primary" />, route: "/exerciselibrary" },
+    { text: "Smarty Workouts", subtitle: "500+ workouts", icon: <Dumbbell className="w-5 h-5 text-primary" />, route: "/workout" },
+    { text: "Smarty Programs", subtitle: "structured long-term plans", icon: <Calendar className="w-5 h-5 text-primary" />, route: "/trainingprogram" },
+    { text: "Smarty Ritual", subtitle: "daily wellness guide", icon: <Sparkles className="w-5 h-5 text-primary" />, route: "/daily-ritual" },
+    { text: "Smarty Tools", subtitle: "fitness calculators", icon: <Calculator className="w-5 h-5 text-primary" />, route: "/tools" },
+    { text: "Blog & Expert Articles", subtitle: "designed by Haris Falas", icon: <FileText className="w-5 h-5 text-primary" />, route: "/blog" },
+    { text: "Exercise Library", subtitle: "demonstration videos", icon: <Video className="w-5 h-5 text-primary" />, route: "/exerciselibrary" },
   ];
 
   const whoIsFor = [
