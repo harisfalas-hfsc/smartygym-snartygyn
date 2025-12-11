@@ -249,11 +249,22 @@ export const LogBookAdvancedCharts = ({
           </CardHeader>
           <CardContent>
             {lineChartData.length > 0 ? (
-              <ResponsiveContainer width="100%" height={300}>
-                <LineChart data={lineChartData}>
+              <ResponsiveContainer width="100%" height={320}>
+                <LineChart data={lineChartData} margin={{ top: 5, right: 20, left: 10, bottom: 60 }}>
                   <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis dataKey="name" />
-                  <YAxis />
+                  <XAxis 
+                    dataKey="name" 
+                    tick={{ fontSize: 11 }}
+                    angle={-45}
+                    textAnchor="end"
+                    height={60}
+                    interval={0}
+                  />
+                  <YAxis 
+                    tick={{ fontSize: 11 }}
+                    allowDecimals={false}
+                    width={40}
+                  />
                   <Tooltip content={<CustomTooltip />} />
                   <Legend />
                   {Object.keys(lineChartData[0] || {}).filter(key => key !== 'name').map((key, index) => (
@@ -288,11 +299,12 @@ export const LogBookAdvancedCharts = ({
                 <PieChart>
                   <Pie
                     data={pieChartData}
-                    cx="50%"
+                    cx="35%"
                     cy="50%"
                     labelLine={false}
-                    label={({ name, percent }) => `${name}: ${(percent * 100).toFixed(0)}%`}
+                    label={false}
                     outerRadius={80}
+                    innerRadius={40}
                     fill="#8884d8"
                     dataKey="value"
                   >
@@ -301,6 +313,17 @@ export const LogBookAdvancedCharts = ({
                     ))}
                   </Pie>
                   <Tooltip content={<PieTooltip />} />
+                  <Legend 
+                    layout="vertical"
+                    align="right"
+                    verticalAlign="middle"
+                    formatter={(value, entry: any) => {
+                      const data = entry.payload;
+                      const percent = ((data.value / data.total) * 100).toFixed(0);
+                      return `${value}: ${percent}%`;
+                    }}
+                    wrapperStyle={{ fontSize: '12px', paddingLeft: '10px' }}
+                  />
                 </PieChart>
               </ResponsiveContainer>
             ) : (
