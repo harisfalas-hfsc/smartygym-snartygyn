@@ -1,6 +1,7 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.57.2";
 import { Resend } from "https://esm.sh/resend@2.0.0";
+import { getEmailHeaders, getEmailFooter } from "../_shared/email-utils.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -387,6 +388,7 @@ const emailResult = await resend.emails.send({
             from: 'SmartyGym <notifications@smartygym.com>',
             to: [userEmail],
             subject: subject,
+            headers: getEmailHeaders(userEmail),
             html: `
               <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
                 <h1 style="color: #d4af37; margin-bottom: 20px;">☀️ Your Smarty Ritual is Ready!</h1>
@@ -406,6 +408,7 @@ const emailResult = await resend.emails.send({
                 </div>
                 <hr style="margin: 32px 0; border: none; border-top: 1px solid #eee;">
                 <p style="font-size: 12px; color: #999; text-align: center;">Designed by Haris Falas</p>
+                ${getEmailFooter(userEmail)}
               </div>
             `,
           });
