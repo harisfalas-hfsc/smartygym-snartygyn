@@ -553,7 +553,7 @@ const Index = () => {
         </div>
           </section> : <>
             {/* Desktop: Hero Section */}
-            <section className="relative py-8 sm:py-12 border-b border-border bg-background overflow-hidden my-0">
+            <section className="relative py-2 sm:py-2 border-b border-border bg-background overflow-hidden my-0">
           
           <div className="container mx-auto max-w-6xl px-4 relative z-10 overflow-x-hidden">
             <ScrollReveal>
