@@ -572,10 +572,16 @@ const Index = () => {
               </div>
             </div>
 
-                  {/* Tagline/Slogan */}
-                  <p className="text-center text-lg sm:text-xl font-semibold text-primary mt-4 mb-10">
-                    Where Science Meets Convenience. Where Real Coaches guide Real people.
-                  </p>
+                  {/* Tagline/Slogan Card */}
+                  <div className="flex justify-center mt-4 mb-10">
+                    <div className="inline-flex items-center gap-3 px-6 py-3 bg-primary/5 border border-primary/20 rounded-full">
+                      <Sparkles className="h-5 w-5 text-primary flex-shrink-0" />
+                      <p className="text-lg sm:text-xl font-semibold text-primary italic text-center">
+                        Where Science Meets Convenience. Where Real Coaches guide Real people.
+                      </p>
+                      <Sparkles className="h-5 w-5 text-primary flex-shrink-0" />
+                    </div>
+                  </div>
 
                   {/* Three Column Layout: Explore | Who is SmartyGym For? | Credentials */}
                   <HeroThreeColumns />
