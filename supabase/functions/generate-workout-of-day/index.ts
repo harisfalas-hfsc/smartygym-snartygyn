@@ -2,6 +2,7 @@ import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.57.2";
 import Stripe from "https://esm.sh/stripe@18.5.0";
 import { Resend } from "https://esm.sh/resend@2.0.0";
+import { getEmailHeaders, getEmailFooter } from "../_shared/email-utils.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -944,6 +945,7 @@ Respond in this EXACT JSON format:
               from: 'SmartyGym <notifications@smartygym.com>',
               to: [email],
               subject: notificationTitle,
+              headers: getEmailHeaders(email),
               html: `<div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
 <h1 style="color: #d4af37;">🏆 Today's Workouts</h1>
 <p style="font-size: 16px;">Today we have <strong>TWO</strong> workout options for ${category} day:</p>
@@ -955,6 +957,7 @@ Respond in this EXACT JSON format:
 <p style="color: #666;">Choose based on your situation: at home, traveling, or at the gym!</p>
 <p style="margin-top: 20px;">Available for €3.99 each or included with Premium.</p>
 <p style="margin-top: 20px;"><a href="https://smartygym.com/workout/wod" style="background: #d4af37; color: white; padding: 14px 28px; text-decoration: none; border-radius: 4px; font-weight: bold; display: inline-block;">View Workouts →</a></p>
+${getEmailFooter(email)}
 </div>`,
             });
             
