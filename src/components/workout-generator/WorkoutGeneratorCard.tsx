@@ -69,7 +69,7 @@ export function WorkoutGeneratorCard() {
                 Premium Feature Required
               </h3>
               <p className="text-muted-foreground">
-                SmartyWorkout is an exclusive tool available only to Premium members. 
+                Smarty Coach is an exclusive tool available only to Premium members. 
                 Unlock unlimited access to personalized workout generation powered by Coach Haris Falas's expertise.
               </p>
               <div className="flex flex-wrap gap-3 pt-2">
@@ -114,7 +114,7 @@ export function WorkoutGeneratorCard() {
       ) : !workout ? (
         <>
           <div className="mb-6">
-            <h2 className="text-2xl font-bold mb-2">Workout Generator</h2>
+            <h2 className="text-2xl font-bold mb-2">Your Smarty Coach is asking...</h2>
             <p className="text-muted-foreground">
               Fill in your preferences below to generate your personalized workout
             </p>
