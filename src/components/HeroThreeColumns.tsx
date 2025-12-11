@@ -96,7 +96,7 @@ export const HeroThreeColumns = () => {
     <div className="flex flex-col lg:flex-row lg:items-start gap-8 lg:gap-0 mt-8">
       {/* Column 1: Explore */}
       <div className="lg:pr-4">
-        <h3 className="text-lg font-bold text-foreground mb-4 underline">
+        <h3 className="text-lg font-bold text-foreground mb-4">
           Explore
         </h3>
         <div className="space-y-3">
@@ -116,7 +116,7 @@ export const HeroThreeColumns = () => {
 
       {/* Column 2: Who is SmartyGym For? */}
       <div className="lg:pl-4 lg:pr-4">
-        <h3 className="text-lg font-bold text-foreground mb-4 underline">
+        <h3 className="text-lg font-bold text-foreground mb-4">
           Who is <span className="text-primary">SmartyGym</span> For?
         </h3>
         <div className="space-y-3">
@@ -134,7 +134,7 @@ export const HeroThreeColumns = () => {
 
       {/* Column 3: Why SmartyGym */}
       <div className="lg:pl-4">
-        <h3 className="text-lg font-bold text-foreground mb-4 underline">
+        <h3 className="text-lg font-bold text-foreground mb-4">
           Why SmartyGym
         </h3>
         <div className="space-y-3">
