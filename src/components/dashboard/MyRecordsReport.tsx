@@ -8,14 +8,22 @@ import { Badge } from "@/components/ui/badge";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { format, subDays, subMonths, startOfDay, endOfDay } from "date-fns";
-import { Download, CalendarIcon, Dumbbell, Calendar as CalendarIconLucide, ClipboardCheck, Calculator, TrendingUp, Star, Heart, CheckCircle, Eye, Loader2 } from "lucide-react";
+import { Download, CalendarIcon, Dumbbell, Calendar as CalendarIconLucide, ClipboardCheck, Calculator, TrendingUp, TrendingDown, Star, Heart, CheckCircle, Eye, Loader2, Minus } from "lucide-react";
 import html2canvas from "html2canvas";
+import smartyGymLogo from "@/assets/smarty-gym-logo.png";
 
 interface MyRecordsReportProps {
   userId: string | undefined;
 }
 
 type TimePeriod = "week" | "month" | "quarter" | "6months" | "year" | "custom";
+
+interface PeriodData {
+  workouts: { viewed: number; favorited: number; completed: number; rated: number };
+  programs: { viewed: number; favorited: number; completed: number; rated: number; ongoing: number };
+  checkins: { morning: number; night: number; total: number; avgScore: number };
+  calculators: { oneRM: number; bmr: number; calories: number };
+}
 
 export function MyRecordsReport({ userId }: MyRecordsReportProps) {
   const [timePeriod, setTimePeriod] = useState<TimePeriod>("month");
@@ -56,9 +64,19 @@ export function MyRecordsReport({ userId }: MyRecordsReportProps) {
     return { startDate, endDate };
   };
 
-  const { startDate, endDate } = getDateRange();
+  // Get previous period for comparison
+  const getPreviousPeriodDateRange = () => {
+    const { startDate, endDate } = getDateRange();
+    const periodLength = endDate.getTime() - startDate.getTime();
+    const previousStart = new Date(startDate.getTime() - periodLength);
+    const previousEnd = new Date(startDate.getTime() - 1);
+    return { previousStart, previousEnd };
+  };
 
-  // Fetch workout interactions
+  const { startDate, endDate } = getDateRange();
+  const { previousStart, previousEnd } = getPreviousPeriodDateRange();
+
+  // Fetch workout interactions - current period
   const { data: workoutData } = useQuery({
     queryKey: ["records-workouts", userId, startDate.toISOString(), endDate.toISOString()],
     queryFn: async () => {
@@ -83,7 +101,32 @@ export function MyRecordsReport({ userId }: MyRecordsReportProps) {
     enabled: !!userId,
   });
 
-  // Fetch program interactions
+  // Fetch workout interactions - previous period
+  const { data: prevWorkoutData } = useQuery({
+    queryKey: ["records-workouts-prev", userId, previousStart.toISOString(), previousEnd.toISOString()],
+    queryFn: async () => {
+      if (!userId) return { viewed: 0, favorited: 0, completed: 0, rated: 0 };
+      
+      const { data, error } = await supabase
+        .from("workout_interactions")
+        .select("*")
+        .eq("user_id", userId)
+        .gte("updated_at", previousStart.toISOString())
+        .lte("updated_at", previousEnd.toISOString());
+
+      if (error) return { viewed: 0, favorited: 0, completed: 0, rated: 0 };
+
+      return {
+        viewed: data?.filter(w => w.has_viewed).length || 0,
+        favorited: data?.filter(w => w.is_favorite).length || 0,
+        completed: data?.filter(w => w.is_completed).length || 0,
+        rated: data?.filter(w => w.rating && w.rating > 0).length || 0,
+      };
+    },
+    enabled: !!userId,
+  });
+
+  // Fetch program interactions - current period
   const { data: programData } = useQuery({
     queryKey: ["records-programs", userId, startDate.toISOString(), endDate.toISOString()],
     queryFn: async () => {
@@ -109,7 +152,33 @@ export function MyRecordsReport({ userId }: MyRecordsReportProps) {
     enabled: !!userId,
   });
 
-  // Fetch check-ins
+  // Fetch program interactions - previous period
+  const { data: prevProgramData } = useQuery({
+    queryKey: ["records-programs-prev", userId, previousStart.toISOString(), previousEnd.toISOString()],
+    queryFn: async () => {
+      if (!userId) return { viewed: 0, favorited: 0, completed: 0, rated: 0, ongoing: 0 };
+      
+      const { data, error } = await supabase
+        .from("program_interactions")
+        .select("*")
+        .eq("user_id", userId)
+        .gte("updated_at", previousStart.toISOString())
+        .lte("updated_at", previousEnd.toISOString());
+
+      if (error) return { viewed: 0, favorited: 0, completed: 0, rated: 0, ongoing: 0 };
+
+      return {
+        viewed: data?.filter(p => p.has_viewed).length || 0,
+        favorited: data?.filter(p => p.is_favorite).length || 0,
+        completed: data?.filter(p => p.is_completed).length || 0,
+        rated: data?.filter(p => p.rating && p.rating > 0).length || 0,
+        ongoing: data?.filter(p => p.is_ongoing).length || 0,
+      };
+    },
+    enabled: !!userId,
+  });
+
+  // Fetch check-ins - current period
   const { data: checkInData } = useQuery({
     queryKey: ["records-checkins", userId, startDate.toISOString(), endDate.toISOString()],
     queryFn: async () => {
@@ -139,7 +208,37 @@ export function MyRecordsReport({ userId }: MyRecordsReportProps) {
     enabled: !!userId,
   });
 
-  // Fetch calculator usage
+  // Fetch check-ins - previous period
+  const { data: prevCheckInData } = useQuery({
+    queryKey: ["records-checkins-prev", userId, previousStart.toISOString(), previousEnd.toISOString()],
+    queryFn: async () => {
+      if (!userId) return { morning: 0, night: 0, total: 0, avgScore: 0 };
+      
+      const { data, error } = await supabase
+        .from("smarty_checkins")
+        .select("*")
+        .eq("user_id", userId)
+        .gte("checkin_date", format(previousStart, "yyyy-MM-dd"))
+        .lte("checkin_date", format(previousEnd, "yyyy-MM-dd"));
+
+      if (error) return { morning: 0, night: 0, total: 0, avgScore: 0 };
+
+      const morningCount = data?.filter(c => c.morning_completed).length || 0;
+      const nightCount = data?.filter(c => c.night_completed).length || 0;
+      const scores = data?.filter(c => c.daily_smarty_score).map(c => c.daily_smarty_score as number) || [];
+      const avgScore = scores.length > 0 ? scores.reduce((a, b) => a + b, 0) / scores.length : 0;
+
+      return {
+        morning: morningCount,
+        night: nightCount,
+        total: morningCount + nightCount,
+        avgScore: Math.round(avgScore),
+      };
+    },
+    enabled: !!userId,
+  });
+
+  // Fetch calculator usage - current period
   const { data: calculatorData } = useQuery({
     queryKey: ["records-calculators", userId, startDate.toISOString(), endDate.toISOString()],
     queryFn: async () => {
@@ -162,6 +261,50 @@ export function MyRecordsReport({ userId }: MyRecordsReportProps) {
     },
     enabled: !!userId,
   });
+
+  // Fetch calculator usage - previous period
+  const { data: prevCalculatorData } = useQuery({
+    queryKey: ["records-calculators-prev", userId, previousStart.toISOString(), previousEnd.toISOString()],
+    queryFn: async () => {
+      if (!userId) return { oneRM: 0, bmr: 0, calories: 0 };
+      
+      const [oneRM, bmr, calories] = await Promise.all([
+        supabase.from("onerm_history").select("id", { count: "exact" }).eq("user_id", userId)
+          .gte("created_at", previousStart.toISOString()).lte("created_at", previousEnd.toISOString()),
+        supabase.from("bmr_history").select("id", { count: "exact" }).eq("user_id", userId)
+          .gte("created_at", previousStart.toISOString()).lte("created_at", previousEnd.toISOString()),
+        supabase.from("calorie_history").select("id", { count: "exact" }).eq("user_id", userId)
+          .gte("created_at", previousStart.toISOString()).lte("created_at", previousEnd.toISOString()),
+      ]);
+
+      return {
+        oneRM: oneRM.count || 0,
+        bmr: bmr.count || 0,
+        calories: calories.count || 0,
+      };
+    },
+    enabled: !!userId,
+  });
+
+  // Comparison badge component
+  const ComparisonBadge = ({ current, previous }: { current: number; previous: number }) => {
+    const diff = current - previous;
+    if (diff === 0) {
+      return (
+        <div className="text-xs mt-1 flex items-center justify-center gap-1 text-gray-400">
+          <Minus className="h-3 w-3" />
+          <span>same</span>
+        </div>
+      );
+    }
+    const isPositive = diff > 0;
+    return (
+      <div className={`text-xs mt-1 flex items-center justify-center gap-1 ${isPositive ? 'text-green-500' : 'text-red-500'}`}>
+        {isPositive ? <TrendingUp className="h-3 w-3" /> : <TrendingDown className="h-3 w-3" />}
+        <span>{isPositive ? '+' : ''}{diff} vs prev</span>
+      </div>
+    );
+  };
 
   // Generate motivational message based on activity
   const getMotivationalMessage = () => {
@@ -190,10 +333,24 @@ export function MyRecordsReport({ userId }: MyRecordsReportProps) {
     
     setExporting(true);
     try {
+      // Wait for all images to load before capturing
+      const images = reportRef.current.querySelectorAll('img');
+      await Promise.all(
+        Array.from(images).map(img => {
+          if (img.complete) return Promise.resolve();
+          return new Promise((resolve) => {
+            img.onload = resolve;
+            img.onerror = resolve;
+          });
+        })
+      );
+
       const canvas = await html2canvas(reportRef.current, {
         scale: 2,
         backgroundColor: "#ffffff",
         useCORS: true,
+        allowTaint: true,
+        logging: false,
       });
       
       const link = document.createElement("a");
@@ -288,8 +445,13 @@ export function MyRecordsReport({ userId }: MyRecordsReportProps) {
       <div ref={reportRef} className="bg-white p-6 rounded-lg">
         {/* Header with Logo */}
         <div className="text-center mb-8">
-          <h1 className="text-4xl font-bold text-primary mb-2">SmartyGym</h1>
-          <p className="text-sm text-gray-500 mb-4">Your gym reimagined anywhere, anytime</p>
+          <img 
+            src={smartyGymLogo} 
+            alt="SmartyGym" 
+            className="h-24 mx-auto mb-4"
+            crossOrigin="anonymous"
+          />
+          <p className="text-sm font-medium mb-4" style={{ color: '#D4AF37' }}>Your Gym Re-imagined. Anywhere, Anytime.</p>
           <h2 className="text-2xl font-bold text-gray-900">Activity Report</h2>
           <p className="text-gray-600">{getPeriodLabel()}</p>
         </div>
@@ -309,6 +471,7 @@ export function MyRecordsReport({ userId }: MyRecordsReportProps) {
                   <span className="text-sm">Viewed</span>
                 </div>
                 <p className="text-2xl font-bold">{workoutData?.viewed || 0}</p>
+                {prevWorkoutData && <ComparisonBadge current={workoutData?.viewed || 0} previous={prevWorkoutData.viewed} />}
               </div>
               <div className="p-4 text-center">
                 <div className="flex items-center justify-center gap-1 text-muted-foreground mb-1">
@@ -316,6 +479,7 @@ export function MyRecordsReport({ userId }: MyRecordsReportProps) {
                   <span className="text-sm">Favorited</span>
                 </div>
                 <p className="text-2xl font-bold">{workoutData?.favorited || 0}</p>
+                {prevWorkoutData && <ComparisonBadge current={workoutData?.favorited || 0} previous={prevWorkoutData.favorited} />}
               </div>
               <div className="p-4 text-center">
                 <div className="flex items-center justify-center gap-1 text-muted-foreground mb-1">
@@ -323,6 +487,7 @@ export function MyRecordsReport({ userId }: MyRecordsReportProps) {
                   <span className="text-sm">Completed</span>
                 </div>
                 <p className="text-2xl font-bold text-green-600">{workoutData?.completed || 0}</p>
+                {prevWorkoutData && <ComparisonBadge current={workoutData?.completed || 0} previous={prevWorkoutData.completed} />}
               </div>
               <div className="p-4 text-center">
                 <div className="flex items-center justify-center gap-1 text-muted-foreground mb-1">
@@ -330,6 +495,7 @@ export function MyRecordsReport({ userId }: MyRecordsReportProps) {
                   <span className="text-sm">Rated</span>
                 </div>
                 <p className="text-2xl font-bold">{workoutData?.rated || 0}</p>
+                {prevWorkoutData && <ComparisonBadge current={workoutData?.rated || 0} previous={prevWorkoutData.rated} />}
               </div>
             </div>
           </div>
@@ -347,6 +513,7 @@ export function MyRecordsReport({ userId }: MyRecordsReportProps) {
                   <span className="text-sm">Viewed</span>
                 </div>
                 <p className="text-2xl font-bold">{programData?.viewed || 0}</p>
+                {prevProgramData && <ComparisonBadge current={programData?.viewed || 0} previous={prevProgramData.viewed} />}
               </div>
               <div className="p-4 text-center">
                 <div className="flex items-center justify-center gap-1 text-muted-foreground mb-1">
@@ -354,6 +521,7 @@ export function MyRecordsReport({ userId }: MyRecordsReportProps) {
                   <span className="text-sm">Favorited</span>
                 </div>
                 <p className="text-2xl font-bold">{programData?.favorited || 0}</p>
+                {prevProgramData && <ComparisonBadge current={programData?.favorited || 0} previous={prevProgramData.favorited} />}
               </div>
               <div className="p-4 text-center">
                 <div className="flex items-center justify-center gap-1 text-muted-foreground mb-1">
@@ -361,6 +529,7 @@ export function MyRecordsReport({ userId }: MyRecordsReportProps) {
                   <span className="text-sm">Ongoing</span>
                 </div>
                 <p className="text-2xl font-bold text-blue-600">{programData?.ongoing || 0}</p>
+                {prevProgramData && <ComparisonBadge current={programData?.ongoing || 0} previous={prevProgramData.ongoing} />}
               </div>
               <div className="p-4 text-center">
                 <div className="flex items-center justify-center gap-1 text-muted-foreground mb-1">
@@ -368,6 +537,7 @@ export function MyRecordsReport({ userId }: MyRecordsReportProps) {
                   <span className="text-sm">Completed</span>
                 </div>
                 <p className="text-2xl font-bold text-green-600">{programData?.completed || 0}</p>
+                {prevProgramData && <ComparisonBadge current={programData?.completed || 0} previous={prevProgramData.completed} />}
               </div>
               <div className="p-4 text-center">
                 <div className="flex items-center justify-center gap-1 text-muted-foreground mb-1">
@@ -375,6 +545,7 @@ export function MyRecordsReport({ userId }: MyRecordsReportProps) {
                   <span className="text-sm">Rated</span>
                 </div>
                 <p className="text-2xl font-bold">{programData?.rated || 0}</p>
+                {prevProgramData && <ComparisonBadge current={programData?.rated || 0} previous={prevProgramData.rated} />}
               </div>
             </div>
           </div>
@@ -389,18 +560,22 @@ export function MyRecordsReport({ userId }: MyRecordsReportProps) {
               <div className="p-4 text-center">
                 <div className="text-muted-foreground text-sm mb-1">Morning</div>
                 <p className="text-2xl font-bold">{checkInData?.morning || 0}</p>
+                {prevCheckInData && <ComparisonBadge current={checkInData?.morning || 0} previous={prevCheckInData.morning} />}
               </div>
               <div className="p-4 text-center">
                 <div className="text-muted-foreground text-sm mb-1">Night</div>
                 <p className="text-2xl font-bold">{checkInData?.night || 0}</p>
+                {prevCheckInData && <ComparisonBadge current={checkInData?.night || 0} previous={prevCheckInData.night} />}
               </div>
               <div className="p-4 text-center">
                 <div className="text-muted-foreground text-sm mb-1">Total</div>
                 <p className="text-2xl font-bold text-primary">{checkInData?.total || 0}</p>
+                {prevCheckInData && <ComparisonBadge current={checkInData?.total || 0} previous={prevCheckInData.total} />}
               </div>
               <div className="p-4 text-center">
                 <div className="text-muted-foreground text-sm mb-1">Avg Score</div>
                 <p className="text-2xl font-bold">{checkInData?.avgScore || 0}</p>
+                {prevCheckInData && <ComparisonBadge current={checkInData?.avgScore || 0} previous={prevCheckInData.avgScore} />}
               </div>
             </div>
           </div>
@@ -415,14 +590,17 @@ export function MyRecordsReport({ userId }: MyRecordsReportProps) {
               <div className="p-4 text-center">
                 <div className="text-muted-foreground text-sm mb-1">1RM Calculations</div>
                 <p className="text-2xl font-bold">{calculatorData?.oneRM || 0}</p>
+                {prevCalculatorData && <ComparisonBadge current={calculatorData?.oneRM || 0} previous={prevCalculatorData.oneRM} />}
               </div>
               <div className="p-4 text-center">
                 <div className="text-muted-foreground text-sm mb-1">BMR Calculations</div>
                 <p className="text-2xl font-bold">{calculatorData?.bmr || 0}</p>
+                {prevCalculatorData && <ComparisonBadge current={calculatorData?.bmr || 0} previous={prevCalculatorData.bmr} />}
               </div>
               <div className="p-4 text-center">
                 <div className="text-muted-foreground text-sm mb-1">Macro Calculations</div>
                 <p className="text-2xl font-bold">{calculatorData?.calories || 0}</p>
+                {prevCalculatorData && <ComparisonBadge current={calculatorData?.calories || 0} previous={prevCalculatorData.calories} />}
               </div>
             </div>
           </div>
@@ -446,7 +624,7 @@ export function MyRecordsReport({ userId }: MyRecordsReportProps) {
         {/* Footer */}
         <div className="text-center mt-6 text-sm text-gray-500">
           <p>Generated on {format(new Date(), "MMMM d, yyyy 'at' h:mm a")}</p>
-          <p className="text-xs mt-1 text-primary font-medium">SmartyGym - Your gym reimagined anywhere, anytime</p>
+          <p className="text-xs mt-1 font-medium" style={{ color: '#D4AF37' }}>SmartyGym - Your Gym Re-imagined. Anywhere, Anytime.</p>
         </div>
       </div>
     </div>
