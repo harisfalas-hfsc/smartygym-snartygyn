@@ -9,6 +9,7 @@ interface NightCheckInFormProps {
   onSubmit: (data: NightCheckinData) => Promise<boolean>;
   isWindowOpen: boolean;
   windowEnd: string;
+  isCompleted?: boolean;
 }
 
 const stepBuckets = [
@@ -39,7 +40,8 @@ const strainLabels: Record<number, string> = {
 export function NightCheckInForm({ 
   onSubmit, 
   isWindowOpen,
-  windowEnd 
+  windowEnd,
+  isCompleted 
 }: NightCheckInFormProps) {
   const [stepsBucket, setStepsBucket] = useState<number>(3);
   const [hydrationLiters, setHydrationLiters] = useState<number>(2.0);
@@ -57,6 +59,20 @@ export function NightCheckInForm({
     });
     setSubmitting(false);
   };
+
+  if (isCompleted) {
+    return (
+      <Card className="border-green-200 dark:border-green-800 overflow-hidden">
+        <CardContent className="py-8 text-center">
+          <Moon className="h-12 w-12 mx-auto mb-4 text-green-600" />
+          <p className="font-medium text-lg">Night check-in complete!</p>
+          <p className="text-sm text-muted-foreground mt-2">
+            You've already completed your night check-in today.
+          </p>
+        </CardContent>
+      </Card>
+    );
+  }
 
   if (!isWindowOpen) {
     return (

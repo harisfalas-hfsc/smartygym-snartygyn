@@ -154,6 +154,7 @@ export function CheckInModalManager({ onBannerStateChange }: CheckInModalManager
             onSubmit={handleMorningSubmit}
             isWindowOpen={windowStatus.isMorningWindow}
             windowEnd={windowStatus.morningWindowEnd}
+            isCompleted={todayCheckin?.morning_completed}
           />
         </DialogContent>
       </Dialog>
@@ -165,6 +166,7 @@ export function CheckInModalManager({ onBannerStateChange }: CheckInModalManager
             onSubmit={handleNightSubmit}
             isWindowOpen={windowStatus.isNightWindow}
             windowEnd={windowStatus.nightWindowEnd}
+            isCompleted={todayCheckin?.night_completed}
           />
         </DialogContent>
       </Dialog>

@@ -203,6 +203,7 @@ export function SmartyCheckinsTab() {
                   onSubmit={submitMorningCheckin}
                   isWindowOpen={windowStatus.isMorningWindow}
                   windowEnd={windowStatus.morningWindowEnd}
+                  isCompleted={todayCheckin?.morning_completed}
                 />
               )}
               
@@ -212,6 +213,7 @@ export function SmartyCheckinsTab() {
                   onSubmit={submitNightCheckin}
                   isWindowOpen={windowStatus.isNightWindow}
                   windowEnd={windowStatus.nightWindowEnd}
+                  isCompleted={todayCheckin?.night_completed}
                 />
               )}
 
