@@ -25,12 +25,12 @@ interface AnimatedBulletProps {
   isLink?: boolean;
   isVisible: boolean;
   highlight?: boolean;
-  isActive?: boolean;
   subtitle?: string;
 }
 
-const AnimatedBullet = ({ icon, text, delay, onClick, isLink, isVisible, highlight, isActive, subtitle }: AnimatedBulletProps) => {
+const AnimatedBullet = ({ icon, text, delay, onClick, isLink, isVisible, highlight, subtitle }: AnimatedBulletProps) => {
   const [show, setShow] = useState(false);
+  const [isHovered, setIsHovered] = useState(false);
 
   useEffect(() => {
     if (isVisible) {
@@ -46,9 +46,11 @@ const AnimatedBullet = ({ icon, text, delay, onClick, isLink, isVisible, highlig
         isLink && "cursor-pointer hover:text-primary hover:bg-primary/10 group",
         !isLink && "hover:bg-muted/50",
         show ? "opacity-100 translate-y-0" : "opacity-0 translate-y-2",
-        isActive && "bg-primary/10 scale-[1.02]"
+        isHovered && "bg-primary/10 scale-[1.02]"
       )}
       onClick={onClick}
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
     >
       <span className="flex-shrink-0">{icon}</span>
       <div className="flex flex-col">
@@ -56,14 +58,14 @@ const AnimatedBullet = ({ icon, text, delay, onClick, isLink, isVisible, highlig
           "text-sm font-medium",
           isLink && "group-hover:text-primary transition-colors",
           highlight && "text-red-600",
-          isActive && "text-primary"
+          isHovered && "text-primary"
         )}>
           {text}
         </span>
         {subtitle && (
           <span className={cn(
             "text-xs text-muted-foreground transition-all duration-300",
-            isActive ? "opacity-100 max-h-5" : "opacity-0 max-h-0 overflow-hidden"
+            isHovered ? "opacity-100 max-h-5" : "opacity-0 max-h-0 overflow-hidden"
           )}>
             {subtitle}
           </span>
@@ -76,18 +78,9 @@ const AnimatedBullet = ({ icon, text, delay, onClick, isLink, isVisible, highlig
 export const HeroThreeColumns = () => {
   const navigate = useNavigate();
   const [isVisible, setIsVisible] = useState(false);
-  const [activeExploreIndex, setActiveExploreIndex] = useState(0);
 
   useEffect(() => {
     setIsVisible(true);
-  }, []);
-
-  // Auto-cycle through explore items every 2.5 seconds
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setActiveExploreIndex((prev) => (prev + 1) % 6);
-    }, 2500);
-    return () => clearInterval(interval);
   }, []);
 
   const exploreLinks = [
@@ -133,7 +126,6 @@ export const HeroThreeColumns = () => {
               onClick={() => navigate(item.route)}
               isLink
               isVisible={isVisible}
-              isActive={activeExploreIndex === index}
             />
           ))}
         </div>
