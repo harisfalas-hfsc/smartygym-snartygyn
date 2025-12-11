@@ -406,15 +406,13 @@ const Index = () => {
         {isMobile ? <section className="pt-2 pb-2 px-4">
             {/* Mobile Carousel Headline */}
             <div className="text-center mb-6">
-              <div className="inline-block p-4 bg-background/70 rounded-xl border-2 border-primary/40">
-                <h2 className="text-2xl mb-2">
-                  <span className="font-normal text-foreground">Welcome to </span>
-                  <span className="font-bold text-primary">SmartyGym</span>
-                </h2>
-                <p className="text-base text-muted-foreground">
-                  Your gym Re-imagined. Anywhere. Anytime.
-                </p>
-              </div>
+              <h2 className="text-2xl mb-2">
+                <span className="font-normal text-foreground">Welcome to </span>
+                <span className="font-bold text-primary">SmartyGym</span>
+              </h2>
+              <p className="text-base text-muted-foreground">
+                Your gym Re-imagined. Anywhere. Anytime.
+              </p>
             </div>
 
             <Carousel className="w-full px-2" opts={{
