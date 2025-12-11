@@ -439,6 +439,7 @@ const handler = async (req: Request): Promise<Response> => {
             headers: {
               "List-Unsubscribe": `<https://smartygym.com/unsubscribe?email=${encodeURIComponent(user.email)}>`,
               "List-Unsubscribe-Post": "List-Unsubscribe=One-Click",
+              "Reply-To": "admin@smartygym.com",
             },
           }),
         });
