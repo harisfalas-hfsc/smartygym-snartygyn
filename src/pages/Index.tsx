@@ -23,7 +23,6 @@ import { HeroThreeColumns } from "@/components/HeroThreeColumns";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
-
 const Index = () => {
   const navigate = useNavigate();
   const location = useLocation();
@@ -414,7 +413,7 @@ const Index = () => {
                 Your gym Re-imagined. Anywhere. Anytime.
               </p>
               <p className="text-sm text-primary italic mt-3 px-2">
-                Where Science Meets Convenience. Where Real Coaches guide Real People.
+                Where Science Meets Convenience. Where Real Coaches Guide Real People.
               </p>
             </div>
 
