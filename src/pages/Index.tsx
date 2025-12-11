@@ -406,13 +406,15 @@ const Index = () => {
         {isMobile ? <section className="pt-2 pb-2 px-4">
             {/* Mobile Carousel Headline */}
             <div className="text-center mb-6">
-              <h2 className="text-2xl mb-2">
-                <span className="font-normal text-foreground">Welcome to </span>
-                <span className="font-bold text-primary">SmartyGym</span>
-              </h2>
-              <p className="text-base text-muted-foreground">
-                Your gym Re-imagined. Anywhere. Anytime.
-              </p>
+              <div className="inline-block p-4 bg-background/50 rounded-xl border border-primary/20">
+                <h2 className="text-2xl mb-2">
+                  <span className="font-normal text-foreground">Welcome to </span>
+                  <span className="font-bold text-primary">SmartyGym</span>
+                </h2>
+                <p className="text-base text-muted-foreground">
+                  Your gym Re-imagined. Anywhere. Anytime.
+                </p>
+              </div>
             </div>
 
             <Carousel className="w-full px-2" opts={{
@@ -559,16 +561,18 @@ const Index = () => {
                 <div className="p-8 sm:p-10 md:p-12 space-y-4">
                   
                   {/* Top Section: Title */}
-            <div className="text-center space-y-2 mb-6">
-              <h1 className="text-3xl sm:text-4xl md:text-5xl font-black text-foreground animate-fade-in" itemProp="name">
-                Welcome to <span className="text-primary">SmartyGym</span>
-              </h1>
-                    <p className="text-lg sm:text-xl text-muted-foreground font-medium" itemProp="slogan">
-                      Your Gym Re-imagined. Anywhere, Anytime.
-                    </p>
-                    <meta itemProp="url" content="https://smartygym.com" />
-                    <meta itemProp="description" content="SmartyGym - #1 online gym and fitness platform by Haris Falas - smartygym.com" />
-                  </div>
+            <div className="text-center mb-6">
+              <div className="inline-block p-6 sm:p-8 bg-background/50 rounded-xl border border-primary/20">
+                <h1 className="text-3xl sm:text-4xl md:text-5xl font-black text-foreground animate-fade-in" itemProp="name">
+                  Welcome to <span className="text-primary">SmartyGym</span>
+                </h1>
+                <p className="text-lg sm:text-xl text-muted-foreground font-medium mt-3" itemProp="slogan">
+                  Your Gym Re-imagined. Anywhere, Anytime.
+                </p>
+                <meta itemProp="url" content="https://smartygym.com" />
+                <meta itemProp="description" content="SmartyGym - #1 online gym and fitness platform by Haris Falas - smartygym.com" />
+              </div>
+            </div>
 
                   {/* Three Column Layout: Explore | Who is SmartyGym For? | Credentials */}
                   <HeroThreeColumns />
