@@ -108,7 +108,7 @@ const DailySmartyRitual = () => {
           <meta name="description" content="Your daily movement ritual for optimal performance - Morning, Midday, and Evening phases designed by Haris Falas" />
         </Helmet>
         <div className="min-h-screen bg-background">
-          <div className="container mx-auto max-w-4xl px-4 py-8">
+          <div className="container mx-auto max-w-4xl px-4 pb-8">
             {canGoBack && (
               <Button variant="ghost" size="sm" onClick={goBack} className="mb-6">
                 <ArrowLeft className="mr-2 h-4 w-4" />
@@ -195,7 +195,7 @@ const DailySmartyRitual = () => {
       </Helmet>
 
       <div className="min-h-screen bg-background">
-        <div className="container mx-auto max-w-4xl px-4 py-8">
+        <div className="container mx-auto max-w-4xl px-4 pb-8">
           {/* Header */}
           <div className="flex items-center justify-between mb-6">
             {canGoBack && (

@@ -176,7 +176,7 @@ export default function SmartyCorporate() {
       />
 
       <div className="min-h-screen bg-background">
-        <main className="container mx-auto max-w-7xl p-4 py-8">
+        <main className="container mx-auto max-w-7xl p-4 pb-8">
           {canGoBack && (
             <Button
               variant="ghost"

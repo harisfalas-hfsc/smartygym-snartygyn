@@ -540,7 +540,7 @@ programEntries.sort((a, b) => b.total_completions - a.total_completions);
       />
 
       <div className="min-h-screen bg-background">
-        <div className="container mx-auto max-w-7xl px-4 py-8">
+        <div className="container mx-auto max-w-7xl px-4 pb-8">
           
           <PageBreadcrumbs 
             items={[
