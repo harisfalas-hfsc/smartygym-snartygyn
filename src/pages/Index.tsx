@@ -413,6 +413,9 @@ const Index = () => {
               <p className="text-base text-muted-foreground">
                 Your gym Re-imagined. Anywhere. Anytime.
               </p>
+              <p className="text-sm text-primary italic mt-3 px-2">
+                Where Science Meets Convenience. Where Real Coaches guide Real people.
+              </p>
             </div>
 
             <Carousel className="w-full px-2" opts={{
