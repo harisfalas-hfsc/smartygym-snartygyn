@@ -383,63 +383,59 @@ export function MyRecordsReport({ userId }: MyRecordsReportProps) {
   return (
     <div className="space-y-6">
       {/* Controls */}
-      <Card>
-        <CardContent className="pt-6">
-          <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
-            <div className="flex flex-col sm:flex-row gap-3 items-start sm:items-center">
-              <Select value={timePeriod} onValueChange={(v) => setTimePeriod(v as TimePeriod)}>
-                <SelectTrigger className="w-[180px]">
-                  <SelectValue placeholder="Select period" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="week">Last Week</SelectItem>
-                  <SelectItem value="month">Last Month</SelectItem>
-                  <SelectItem value="quarter">Last 3 Months</SelectItem>
-                  <SelectItem value="6months">Last 6 Months</SelectItem>
-                  <SelectItem value="year">Last Year</SelectItem>
-                  <SelectItem value="custom">Custom Period</SelectItem>
-                </SelectContent>
-              </Select>
+      <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between mb-6">
+        <div className="flex flex-col sm:flex-row gap-3 items-start sm:items-center">
+          <Select value={timePeriod} onValueChange={(v) => setTimePeriod(v as TimePeriod)}>
+            <SelectTrigger className="w-[180px]">
+              <SelectValue placeholder="Select period" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="week">Last Week</SelectItem>
+              <SelectItem value="month">Last Month</SelectItem>
+              <SelectItem value="quarter">Last 3 Months</SelectItem>
+              <SelectItem value="6months">Last 6 Months</SelectItem>
+              <SelectItem value="year">Last Year</SelectItem>
+              <SelectItem value="custom">Custom Period</SelectItem>
+            </SelectContent>
+          </Select>
 
-              {timePeriod === "custom" && (
-                <div className="flex gap-2">
-                  <Popover>
-                    <PopoverTrigger asChild>
-                      <Button variant="outline" size="sm" className="w-[130px]">
-                        <CalendarIcon className="mr-2 h-4 w-4" />
-                        {customStartDate ? format(customStartDate, "MMM d, yyyy") : "Start"}
-                      </Button>
-                    </PopoverTrigger>
-                    <PopoverContent className="w-auto p-0">
-                      <Calendar mode="single" selected={customStartDate} onSelect={setCustomStartDate} />
-                    </PopoverContent>
-                  </Popover>
-                  <Popover>
-                    <PopoverTrigger asChild>
-                      <Button variant="outline" size="sm" className="w-[130px]">
-                        <CalendarIcon className="mr-2 h-4 w-4" />
-                        {customEndDate ? format(customEndDate, "MMM d, yyyy") : "End"}
-                      </Button>
-                    </PopoverTrigger>
-                    <PopoverContent className="w-auto p-0">
-                      <Calendar mode="single" selected={customEndDate} onSelect={setCustomEndDate} />
-                    </PopoverContent>
-                  </Popover>
-                </div>
-              )}
+          {timePeriod === "custom" && (
+            <div className="flex gap-2">
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Button variant="outline" size="sm" className="w-[130px]">
+                    <CalendarIcon className="mr-2 h-4 w-4" />
+                    {customStartDate ? format(customStartDate, "MMM d, yyyy") : "Start"}
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-auto p-0">
+                  <Calendar mode="single" selected={customStartDate} onSelect={setCustomStartDate} />
+                </PopoverContent>
+              </Popover>
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Button variant="outline" size="sm" className="w-[130px]">
+                    <CalendarIcon className="mr-2 h-4 w-4" />
+                    {customEndDate ? format(customEndDate, "MMM d, yyyy") : "End"}
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-auto p-0">
+                  <Calendar mode="single" selected={customEndDate} onSelect={setCustomEndDate} />
+                </PopoverContent>
+              </Popover>
             </div>
+          )}
+        </div>
 
-            <Button onClick={handleExport} disabled={exporting} className="cta-button">
-              {exporting ? (
-                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-              ) : (
-                <Download className="mr-2 h-4 w-4" />
-              )}
-              Export Report
-            </Button>
-          </div>
-        </CardContent>
-      </Card>
+        <Button onClick={handleExport} disabled={exporting} className="cta-button">
+          {exporting ? (
+            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+          ) : (
+            <Download className="mr-2 h-4 w-4" />
+          )}
+          Export Report
+        </Button>
+      </div>
 
       {/* Report Content */}
       <div ref={reportRef} className="bg-white p-6 rounded-lg">
