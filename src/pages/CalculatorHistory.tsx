@@ -176,9 +176,15 @@ export default function CalculatorHistory() {
       .select("id, created_at, tool_result")
       .eq("user_id", userId)
       .eq("content_type", "measurement")
+      .not("tool_result", "is", null)
       .order("created_at", { ascending: false });
     if (data) {
-      const typedData = data.map((d: MeasurementData) => ({
+      // Filter out records without actual measurement values
+      const validData = data.filter((d: MeasurementData) => {
+        const result = d.tool_result as MeasurementRecord['tool_result'];
+        return result && (result.weight || result.body_fat || result.muscle_mass);
+      });
+      const typedData = validData.map((d: MeasurementData) => ({
         id: d.id,
         created_at: d.created_at,
         tool_result: d.tool_result as MeasurementRecord['tool_result'],
