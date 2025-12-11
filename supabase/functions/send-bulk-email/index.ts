@@ -104,6 +104,26 @@ serve(async (req) => {
 
     logStep("Total recipients prepared", { count: recipients.length });
 
+    // Insert dashboard messages for all users
+    logStep("Inserting dashboard messages");
+    const dashboardInserts = userIds.map(userId => ({
+      user_id: userId,
+      message_type: 'announcement_update',
+      subject: subject,
+      content: message,
+      is_read: false
+    }));
+
+    const { error: dashboardError } = await supabaseClient
+      .from('user_system_messages')
+      .insert(dashboardInserts);
+
+    if (dashboardError) {
+      console.error("Failed to insert dashboard messages:", dashboardError);
+    } else {
+      logStep("Dashboard messages inserted", { count: dashboardInserts.length });
+    }
+
     // Initialize Resend
     const resendApiKey = Deno.env.get("RESEND_API_KEY");
     if (!resendApiKey) throw new Error("RESEND_API_KEY not configured");
@@ -200,6 +220,7 @@ serve(async (req) => {
         total: results.length,
         sent: successCount,
         failed: failCount,
+        dashboardMessages: userIds.length,
         results: results
       }),
       {
