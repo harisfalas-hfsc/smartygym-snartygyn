@@ -285,16 +285,13 @@ export function MyRecordsReport({ userId }: MyRecordsReportProps) {
       </Card>
 
       {/* Report Content */}
-      <div ref={reportRef} className="bg-background p-6 rounded-lg">
+      <div ref={reportRef} className="bg-white p-6 rounded-lg">
         {/* Header with Logo */}
         <div className="text-center mb-8">
-          <img 
-            src="/lovable-uploads/ae0b0f02-6f4e-4d2a-8c8d-9e99c9fc9c63.png" 
-            alt="SmartyGym" 
-            className="h-12 mx-auto mb-4"
-          />
-          <h2 className="text-2xl font-bold">Activity Report</h2>
-          <p className="text-muted-foreground">{getPeriodLabel()}</p>
+          <h1 className="text-4xl font-bold text-primary mb-2">SmartyGym</h1>
+          <p className="text-sm text-gray-500 mb-4">Your gym reimagined anywhere, anytime</p>
+          <h2 className="text-2xl font-bold text-gray-900">Activity Report</h2>
+          <p className="text-gray-600">{getPeriodLabel()}</p>
         </div>
 
         {/* Activity Summary Table */}
@@ -447,9 +444,9 @@ export function MyRecordsReport({ userId }: MyRecordsReportProps) {
         </Card>
 
         {/* Footer */}
-        <div className="text-center mt-6 text-sm text-muted-foreground">
+        <div className="text-center mt-6 text-sm text-gray-500">
           <p>Generated on {format(new Date(), "MMMM d, yyyy 'at' h:mm a")}</p>
-          <p className="text-xs mt-1">SmartyGym - Your Gym In Your Pocket</p>
+          <p className="text-xs mt-1 text-primary font-medium">SmartyGym - Your gym reimagined anywhere, anytime</p>
         </div>
       </div>
     </div>

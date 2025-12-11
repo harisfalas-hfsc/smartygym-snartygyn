@@ -781,56 +781,56 @@ export default function UserDashboard() {
                   </div>
 
                   {/* RIGHT COLUMN - Membership Benefits (aligned with title) */}
-                  <div className="col-span-1 md:col-span-3 bg-gradient-to-br from-primary/5 to-primary/10 rounded-lg p-3 border border-primary/20">
-                    <h4 className="text-xs font-semibold uppercase text-muted-foreground mb-2 tracking-wide">
+                  <div className="col-span-1 md:col-span-3 bg-gradient-to-br from-primary/5 to-primary/10 rounded-lg p-4 border border-primary/20 flex flex-col h-full">
+                    <h4 className="text-xs font-semibold uppercase text-muted-foreground mb-3 tracking-wide">
                       Membership Benefits
                     </h4>
-                    <div className="grid grid-cols-2 lg:grid-cols-3 gap-2">
-                      <div className="bg-white/50 dark:bg-gray-800/50 rounded-md p-2 border border-primary/10 hover:border-primary/30 transition-colors">
+                    <div className="grid grid-cols-2 lg:grid-cols-3 gap-3 flex-1">
+                      <div className="bg-white/50 dark:bg-gray-800/50 rounded-md p-3 border border-primary/10 hover:border-primary/30 transition-colors flex items-center justify-center">
                         <div className="flex flex-col items-center text-center gap-1">
-                          <Dumbbell className="h-5 w-5 text-primary" />
-                          <span className="text-xs font-semibold">500+ Premium</span>
-                          <span className="text-xs font-medium">Workouts</span>
+                          <Dumbbell className="h-6 w-6 text-primary" />
+                          <span className="text-sm font-semibold">500+ Premium</span>
+                          <span className="text-xs font-medium text-muted-foreground">Workouts</span>
                         </div>
                       </div>
                       
-                      <div className="bg-white/50 dark:bg-gray-800/50 rounded-md p-2 border border-primary/10 hover:border-primary/30 transition-colors">
+                      <div className="bg-white/50 dark:bg-gray-800/50 rounded-md p-3 border border-primary/10 hover:border-primary/30 transition-colors flex items-center justify-center">
                         <div className="flex flex-col items-center text-center gap-1">
-                          <ClipboardList className="h-5 w-5 text-primary" />
-                          <span className="text-xs font-semibold">Training</span>
-                          <span className="text-xs font-medium">Programs</span>
+                          <ClipboardList className="h-6 w-6 text-primary" />
+                          <span className="text-sm font-semibold">Training</span>
+                          <span className="text-xs font-medium text-muted-foreground">Programs</span>
                         </div>
                       </div>
                       
-                      <div className="bg-white/50 dark:bg-gray-800/50 rounded-md p-2 border border-primary/10 hover:border-primary/30 transition-colors">
+                      <div className="bg-white/50 dark:bg-gray-800/50 rounded-md p-3 border border-primary/10 hover:border-primary/30 transition-colors flex items-center justify-center">
                         <div className="flex flex-col items-center text-center gap-1">
-                          <TrendingUp className="h-5 w-5 text-primary" />
-                          <span className="text-xs font-semibold">Progress</span>
-                          <span className="text-xs font-medium">Tracking</span>
+                          <TrendingUp className="h-6 w-6 text-primary" />
+                          <span className="text-sm font-semibold">Progress</span>
+                          <span className="text-xs font-medium text-muted-foreground">Tracking</span>
                         </div>
                       </div>
                       
-                      <div className="bg-white/50 dark:bg-gray-800/50 rounded-md p-2 border border-primary/10 hover:border-primary/30 transition-colors">
+                      <div className="bg-white/50 dark:bg-gray-800/50 rounded-md p-3 border border-primary/10 hover:border-primary/30 transition-colors flex items-center justify-center">
                         <div className="flex flex-col items-center text-center gap-1">
-                          <Calculator className="h-5 w-5 text-primary" />
-                          <span className="text-xs font-semibold">Fitness</span>
-                          <span className="text-xs font-medium">Calculators</span>
+                          <Calculator className="h-6 w-6 text-primary" />
+                          <span className="text-sm font-semibold">Fitness</span>
+                          <span className="text-xs font-medium text-muted-foreground">Calculators</span>
                         </div>
                       </div>
                       
-                      <div className="bg-white/50 dark:bg-gray-800/50 rounded-md p-2 border border-primary/10 hover:border-primary/30 transition-colors">
+                      <div className="bg-white/50 dark:bg-gray-800/50 rounded-md p-3 border border-primary/10 hover:border-primary/30 transition-colors flex items-center justify-center">
                         <div className="flex flex-col items-center text-center gap-1">
-                          <BookOpen className="h-5 w-5 text-primary" />
-                          <span className="text-xs font-semibold">Exercise</span>
-                          <span className="text-xs font-medium">Library</span>
+                          <BookOpen className="h-6 w-6 text-primary" />
+                          <span className="text-sm font-semibold">Exercise</span>
+                          <span className="text-xs font-medium text-muted-foreground">Library</span>
                         </div>
                       </div>
                       
-                      <div className="bg-white/50 dark:bg-gray-800/50 rounded-md p-2 border border-primary/10 hover:border-primary/30 transition-colors">
+                      <div className="bg-white/50 dark:bg-gray-800/50 rounded-md p-3 border border-primary/10 hover:border-primary/30 transition-colors flex items-center justify-center">
                         <div className="flex flex-col items-center text-center gap-1">
-                          <Headphones className="h-5 w-5 text-primary" />
-                          <span className="text-xs font-semibold">Premium</span>
-                          <span className="text-xs font-medium">Support</span>
+                          <Headphones className="h-6 w-6 text-primary" />
+                          <span className="text-sm font-semibold">Premium</span>
+                          <span className="text-xs font-medium text-muted-foreground">Support</span>
                         </div>
                       </div>
                     </div>
