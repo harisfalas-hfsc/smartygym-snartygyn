@@ -40,8 +40,9 @@ const AnimatedBullet = ({ icon, text, delay, onClick, isLink, isVisible, highlig
   return (
     <div 
       className={cn(
-        "flex items-center gap-3 transition-all duration-500",
-        isLink && "cursor-pointer hover:text-primary group",
+        "flex items-center gap-3 transition-all duration-300 rounded-md px-2 py-1 -mx-2",
+        isLink && "cursor-pointer hover:text-primary hover:bg-primary/5 group",
+        !isLink && "hover:bg-muted/50",
         show ? "opacity-100 translate-y-0" : "opacity-0 translate-y-2"
       )}
       onClick={onClick}
