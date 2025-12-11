@@ -111,7 +111,7 @@ export const HeroThreeColumns = () => {
   return (
     <div className="flex flex-col md:flex-row md:items-start gap-6 md:gap-0 mt-6">
       {/* Column 1: Explore */}
-      <div className="md:pr-6 lg:pr-12">
+      <div className="pt-8 md:pr-6 lg:pr-12">
         <h3 className="text-lg font-bold text-foreground mb-4">
           Explore
         </h3>
@@ -132,7 +132,7 @@ export const HeroThreeColumns = () => {
       </div>
 
       {/* Column 2: Who is SmartyGym For? */}
-      <div className="md:pl-6 md:pr-6 lg:pl-12 lg:pr-12">
+      <div className="pt-8 md:pl-6 md:pr-6 lg:pl-12 lg:pr-12">
         <h3 className="text-lg font-bold text-foreground mb-4">
           Who is <span className="text-primary">SmartyGym</span> For?
         </h3>
@@ -150,7 +150,7 @@ export const HeroThreeColumns = () => {
       </div>
 
       {/* Column 3: Why SmartyGym */}
-      <div className="md:pl-6 lg:pl-12">
+      <div className="pt-8 md:pl-6 lg:pl-12">
         <h3 className="text-lg font-bold text-foreground mb-4">
           Why SmartyGym
         </h3>
