@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { PageBreadcrumbs } from "@/components/PageBreadcrumbs";
 import { InfoRibbon } from "@/components/InfoRibbon";
-import { ArrowLeft, Dumbbell, Flame, Zap, Heart, Move, Activity, Sparkles, CalendarCheck } from "lucide-react";
+import { ArrowLeft, Dumbbell, Flame, Zap, Heart, Move, Activity, CalendarCheck } from "lucide-react";
 import { SEOEnhancer } from "@/components/SEOEnhancer";
 import { generateBreadcrumbSchema } from "@/utils/seoHelpers";
 import { useAccessControl } from "@/hooks/useAccessControl";
@@ -225,24 +225,6 @@ const WorkoutFlow = () => {
               );
             })}
           </div>
-
-          {/* Create Your Own Workout Card */}
-          <Card className="mt-8 bg-gradient-to-br from-primary/5 via-background to-primary/5 border-2 border-primary/40 shadow-gold">
-            <div className="p-4 sm:p-5">
-              <div className="flex flex-col items-center gap-3">
-                {/* Title + Icon on one line */}
-                <div className="flex items-center gap-2">
-                  <h3 className="text-lg sm:text-xl font-semibold">Feeling Stuck?</h3>
-                  <Sparkles className="w-5 h-5 sm:w-6 sm:h-6 text-primary" />
-                </div>
-                
-                {/* Compact button */}
-                <Button size="default" className="cta-button" onClick={() => navigate("/smartyworkout")}>
-                  Create Your Own Workout Now
-                </Button>
-              </div>
-            </div>
-          </Card>
 
           {/* Bottom Premium Banner */}
           {!isPremium && (

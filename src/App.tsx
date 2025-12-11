@@ -18,7 +18,6 @@ import { CookieConsent } from "./components/CookieConsent";
 import { ErrorBoundary } from "./components/ErrorBoundary";
 import { useSessionExpiry } from "./hooks/useSessionExpiry";
 
-import { SmartyCoach } from "./components/SmartyCoach";
 import { useAdminRole } from "./hooks/useAdminRole";
 import { ArticleDetail } from "./pages/ArticleDetail";
 import { trackPageVisit } from "./utils/socialMediaTracking";
@@ -30,7 +29,6 @@ import UserDashboard from "./pages/UserDashboard";
 import WorkoutFlow from "./pages/WorkoutFlow";
 import WorkoutDetail from "./pages/WorkoutDetail";
 import IndividualWorkout from "./pages/IndividualWorkout";
-import SmartyWorkout from "./pages/SmartyWorkout";
 import WODArchive from "./pages/WODArchive";
 import DailySmartyRitual from "./pages/DailySmartyRitual";
 import WODCategory from "./pages/WODCategory";
@@ -61,7 +59,6 @@ import JoinPremium from "./pages/JoinPremium";
 import SmartyCorporate from "./pages/SmartyCorporate";
 import PremiumBenefits from "./pages/PremiumBenefits";
 import PremiumComparison from "./pages/PremiumComparison";
-import TakeTour from "./pages/TakeTour";
 
 import PaymentSuccess from "./pages/PaymentSuccess";
 import NewsletterThankYou from "./pages/NewsletterThankYou";
@@ -129,7 +126,6 @@ const AppContent = () => {
                 <Route path="/workout/:type/:id" element={<IndividualWorkout />} />
                 <Route path="/wod-archive" element={<WODArchive />} />
                 <Route path="/daily-ritual" element={<DailySmartyRitual />} />
-                <Route path="/smartyworkout" element={<SmartyWorkout />} />
                 <Route path="/trainingprogram" element={<TrainingProgramFlow />} />
                 <Route path="/trainingprogram/:type" element={<TrainingProgramDetail />} />
                 <Route path="/trainingprogram/:type/:id" element={<IndividualTrainingProgram />} />
@@ -193,7 +189,6 @@ const AppContent = () => {
                 {/* Public routes */}
                 
                 <Route path="/community" element={<Community />} />
-                <Route path="/takeatour" element={<TakeTour />} />
                 <Route path="/contact" element={<Contact />} />
                 <Route path="/payment-success" element={<PaymentSuccess />} />
                 <Route path="/privacy-policy" element={<PrivacyPolicy />} />
@@ -209,8 +204,6 @@ const AppContent = () => {
             </PageTransition>
           </div>
           <Footer />
-          {/* {!loading && isAdmin && <SmartyCoach />} */}
-          
         </div>
       </AccessControlProvider>
     </>
