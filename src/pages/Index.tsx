@@ -572,6 +572,11 @@ const Index = () => {
               </div>
             </div>
 
+                  {/* Tagline/Slogan */}
+                  <p className="text-center text-lg sm:text-xl font-semibold text-muted-foreground mt-4 mb-6">
+                    Where Science Meets Convenience. Where Real Coaches guide Real people.
+                  </p>
+
                   {/* Three Column Layout: Explore | Who is SmartyGym For? | Credentials */}
                   <HeroThreeColumns />
 
