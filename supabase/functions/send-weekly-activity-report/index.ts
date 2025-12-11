@@ -303,7 +303,7 @@ function generateEmailHtml(data: UserActivityData, weekStart: string, weekEnd: s
           <!-- CTA -->
           <tr>
             <td style="padding: 0 30px 30px 30px; text-align: center;">
-              <a href="https://smartygym.com/userdashboard?tab=records" style="display: inline-block; background: linear-gradient(135deg, #D4AF37 0%, #B8960C 100%); color: #ffffff; text-decoration: none; padding: 14px 30px; border-radius: 8px; font-weight: bold; font-size: 16px;">View Full Report in Dashboard</a>
+              <a href="https://smartygym.com/userdashboard?tab=logbook" style="display: inline-block; background: linear-gradient(135deg, #D4AF37 0%, #B8960C 100%); color: #ffffff; text-decoration: none; padding: 14px 30px; border-radius: 8px; font-weight: bold; font-size: 16px;">View Full Report in Dashboard</a>
             </td>
           </tr>
 
@@ -342,7 +342,7 @@ function generateDashboardMessage(data: UserActivityData, weekStart: string, wee
 
 <p class="tiptap-paragraph"><strong>📈 Progress Summary:</strong> ${motivationalMessage}</p>
 
-<p class="tiptap-paragraph"><a href="/userdashboard?tab=records" style="color: #D4AF37;">View your full activity report →</a></p>
+<p class="tiptap-paragraph"><a href="/userdashboard?tab=logbook" style="color: #D4AF37;">View your full activity report →</a></p>
   `.trim();
 }
 
