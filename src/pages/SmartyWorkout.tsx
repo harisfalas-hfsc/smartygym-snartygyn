@@ -80,7 +80,7 @@ const SmartyWorkout = () => {
                   This is not the ordinary AI workout generator or a robot creating generic routines you are seeing everywhere.
                 </p>
                 <p className="text-center">
-                  Feeling stuck in your routine? Want to try something new? Looking for a workout that's actually built for <strong>YOU</strong> — your goals, your equipment, your vibe? SmartyWorkout is your answer. This isn't some robot throwing random exercises at you. It's a comprehensive system built from{" "}
+                  Feeling stuck in your routine? Want to try something new? Looking for a workout that's actually built for <strong>YOU</strong> — your goals, your equipment, your vibe? Smarty Coach is your answer. This isn't some robot throwing random exercises at you. It's a comprehensive system built from{" "}
                   <Link to="/coach-profile" className="text-primary hover:underline font-medium">
                     Coach Haris Falas
                   </Link>
