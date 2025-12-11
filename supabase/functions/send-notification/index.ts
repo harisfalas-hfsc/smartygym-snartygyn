@@ -1,6 +1,7 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 import { Resend } from "https://esm.sh/resend@2.0.0";
+import { getEmailHeaders, getEmailFooter } from "../_shared/email-utils.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -162,20 +163,25 @@ serve(async (req: Request) => {
     let emailsSent = 0;
     for (const user of targetEmails) {
       try {
+        const emailHtml = `
+          <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+            <h1 style="color: #d4af37;">${subject}</h1>
+            <div style="font-size: 16px; line-height: 1.6;">${content}</div>
+            ${getEmailFooter(user.email)}
+          </div>
+        `;
+
         await resend.emails.send({
           from: "SmartyGym <notifications@smartygym.com>",
           to: [user.email],
           subject: subject,
-          html: `
-            <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-              <h1 style="color: #d4af37;">${subject}</h1>
-              <div style="font-size: 16px; line-height: 1.6;">${content}</div>
-              <hr style="margin: 24px 0; border: none; border-top: 1px solid #eee;">
-              <p style="font-size: 12px; color: #666;">This email was sent from SmartyGym.</p>
-            </div>
-          `,
+          html: emailHtml,
+          headers: getEmailHeaders(user.email),
         });
         emailsSent++;
+
+        // Rate limiting: 600ms delay between emails
+        await new Promise(resolve => setTimeout(resolve, 600));
       } catch (emailError) {
         console.error(`[SEND-NOTIFICATION] Email error for ${user.email}:`, emailError);
       }

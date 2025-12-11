@@ -1,6 +1,7 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.57.2";
 import { Resend } from "https://esm.sh/resend@3.5.0";
+import { getEmailHeaders, getEmailFooter } from "../_shared/email-utils.ts";
 
 const resend = new Resend(Deno.env.get("RESEND_API_KEY"));
 
@@ -59,7 +60,8 @@ serve(async (req) => {
       );
     }
 
-    const dashboardUrl = `${Deno.env.get("SUPABASE_URL")?.replace('supabase.co', 'lovable.app') || '#'}/dashboard`;
+    const dashboardUrl = 'https://smartygym.com/userdashboard';
+    const emailSubject = `New Response to Your Message: ${subject}`;
 
     const htmlBody = `
       <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
@@ -87,21 +89,34 @@ serve(async (req) => {
           <strong>The SmartyGym Team</strong>
         </p>
 
-        <hr style="margin: 30px 0; border: none; border-top: 1px solid #eee;" />
-        
-        <p style="color: #999; font-size: 12px;">
-          You're receiving this email because you contacted us through SmartyGym. 
-          To manage your notification preferences, visit your dashboard settings.
-        </p>
+        ${getEmailFooter(userEmail)}
       </div>
     `;
+
+    // Insert dashboard message first
+    const { error: dashboardError } = await supabaseAdmin
+      .from('user_system_messages')
+      .insert({
+        user_id: userId,
+        message_type: 'announcement_update',
+        subject: emailSubject,
+        content: `<p>Hi ${userName},</p><p>Great news! We've responded to your message regarding "<strong>${subject}</strong>".</p><p>"${responsePreview.substring(0, 150)}${responsePreview.length > 150 ? '...' : ''}"</p><p>View the full response in your contact messages.</p>`,
+        is_read: false
+      });
+
+    if (dashboardError) {
+      logStep("Dashboard message insert error", { error: dashboardError });
+    } else {
+      logStep("Dashboard message sent successfully");
+    }
 
     // Send email
     const emailResponse = await resend.emails.send({
       from: "SmartyGym <notifications@smartygym.com>",
       to: [userEmail],
-      subject: `New Response to Your Message: ${subject}`,
+      subject: emailSubject,
       html: htmlBody,
+      headers: getEmailHeaders(userEmail),
     });
 
     logStep("Notification email sent", { emailId: emailResponse.data?.id });

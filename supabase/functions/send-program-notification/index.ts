@@ -1,6 +1,7 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.57.2";
 import { Resend } from "https://esm.sh/resend@3.5.0";
+import { getEmailHeaders, getEmailFooter } from "../_shared/email-utils.ts";
 
 const resend = new Resend(Deno.env.get("RESEND_API_KEY"));
 
@@ -62,9 +63,12 @@ serve(async (req) => {
 
     let subject = "";
     let htmlBody = "";
+    let dashboardContent = "";
+    const dashboardUrl = 'https://smartygym.com/userdashboard';
 
     if (notificationType === 'program_delivered') {
       subject = `Your Personal Training Program is Ready! 🎉`;
+      dashboardContent = `<p>Hi ${userName},</p><p>Great news! Your custom personal training program "<strong>${programName}</strong>" has been created and is now available in your dashboard.</p><p>Navigate to "My Purchases" in your dashboard to start your personalized fitness journey!</p>`;
       htmlBody = `
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
           <h1 style="color: #D4AF37;">Your Personal Training Program is Ready!</h1>
@@ -83,7 +87,7 @@ serve(async (req) => {
           <p>This program has been specifically designed for you based on your goals, fitness level, and available equipment.</p>
           
           <p style="margin-top: 30px;">
-            <a href="${Deno.env.get("SUPABASE_URL")?.replace('supabase.co', 'lovable.app') || '#'}" 
+            <a href="${dashboardUrl}" 
                style="background-color: #D4AF37; color: white; padding: 12px 24px; text-decoration: none; border-radius: 5px; display: inline-block;">
               View Your Program
             </a>
@@ -95,14 +99,17 @@ serve(async (req) => {
           
           <p style="color: #666;">
             Best regards,<br>
-            <strong>Coach Harris Phalas</strong><br>
+            <strong>Coach Haris Falas</strong><br>
             SmartyGym Personal Training
           </p>
+
+          ${getEmailFooter(userEmail)}
         </div>
       `;
     } else if (notificationType === 'status_update') {
       if (newStatus === 'in_progress') {
         subject = `Your Personal Training Request - Work Started`;
+        dashboardContent = `<p>Hi ${userName},</p><p>Good news! We've started working on your custom personal training program.</p><p>Your program is being carefully crafted to match your specific goals and requirements. We'll notify you as soon as it's ready!</p><p>Expected delivery: <strong>Within 48-72 hours</strong></p>`;
         htmlBody = `
           <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
             <h1 style="color: #D4AF37;">We're Working On Your Program!</h1>
@@ -117,13 +124,16 @@ serve(async (req) => {
             
             <p style="margin-top: 30px; color: #666;">
               Best regards,<br>
-              <strong>Coach Harris Phalas</strong><br>
+              <strong>Coach Haris Falas</strong><br>
               SmartyGym Personal Training
             </p>
+
+            ${getEmailFooter(userEmail)}
           </div>
         `;
       } else if (newStatus === 'completed') {
         subject = `Your Personal Training Program is Complete!`;
+        dashboardContent = `<p>Hi ${userName},</p><p>Your custom personal training program has been completed and is now available in your dashboard.</p><p>Access it now to start your personalized fitness journey!</p>`;
         htmlBody = `
           <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
             <h1 style="color: #D4AF37;">Your Program is Complete!</h1>
@@ -131,7 +141,7 @@ serve(async (req) => {
             <p>Your custom personal training program has been completed and is now available in your dashboard.</p>
             
             <p style="margin-top: 30px;">
-              <a href="${Deno.env.get("SUPABASE_URL")?.replace('supabase.co', 'lovable.app') || '#'}" 
+              <a href="${dashboardUrl}" 
                  style="background-color: #D4AF37; color: white; padding: 12px 24px; text-decoration: none; border-radius: 5px; display: inline-block;">
                 Access Your Program
               </a>
@@ -139,11 +149,32 @@ serve(async (req) => {
             
             <p style="margin-top: 30px; color: #666;">
               Best regards,<br>
-              <strong>Coach Harris Phalas</strong><br>
+              <strong>Coach Haris Falas</strong><br>
               SmartyGym Personal Training
             </p>
+
+            ${getEmailFooter(userEmail)}
           </div>
         `;
+      }
+    }
+
+    // Insert dashboard message first
+    if (dashboardContent) {
+      const { error: dashboardError } = await supabaseAdmin
+        .from('user_system_messages')
+        .insert({
+          user_id: userId,
+          message_type: 'announcement_update',
+          subject: subject,
+          content: dashboardContent,
+          is_read: false
+        });
+
+      if (dashboardError) {
+        logStep("Dashboard message insert error", { error: dashboardError });
+      } else {
+        logStep("Dashboard message sent successfully");
       }
     }
 
@@ -153,6 +184,7 @@ serve(async (req) => {
       to: [userEmail],
       subject: subject,
       html: htmlBody,
+      headers: getEmailHeaders(userEmail),
     });
 
     logStep("Notification email sent", { emailId: emailResponse.data?.id });
