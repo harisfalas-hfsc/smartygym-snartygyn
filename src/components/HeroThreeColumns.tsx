@@ -92,9 +92,9 @@ export const HeroThreeColumns = () => {
   ];
 
   return (
-    <div className="flex flex-col lg:flex-row lg:items-start gap-8 lg:gap-0 mt-8">
+    <div className="flex flex-col md:flex-row md:flex-wrap lg:flex-nowrap lg:items-start gap-8 md:gap-6 lg:gap-0 mt-8">
       {/* Column 1: Explore */}
-      <div className="lg:border-r lg:border-primary/30 lg:pr-4">
+      <div className="md:w-[calc(50%-12px)] lg:w-auto md:border-r md:border-primary/30 md:pr-4 lg:border-r lg:border-primary/30 lg:pr-4">
         <h3 className="text-lg font-bold text-foreground mb-4 flex items-center gap-2">
           <span className="w-2 h-2 rounded-full bg-primary"></span>
           Explore
@@ -115,7 +115,7 @@ export const HeroThreeColumns = () => {
       </div>
 
       {/* Column 2: Who is SmartyGym For? */}
-      <div className="lg:border-r lg:border-primary/30 lg:pl-4 lg:pr-4">
+      <div className="md:w-[calc(50%-12px)] lg:w-auto lg:border-r lg:border-primary/30 lg:pl-4 lg:pr-4">
         <h3 className="text-lg font-bold text-foreground mb-4 flex items-center gap-2">
           <span className="w-2 h-2 rounded-full bg-primary"></span>
           Who is <span className="text-primary ml-1">SmartyGym</span> <span className="ml-1">For?</span>
@@ -134,7 +134,7 @@ export const HeroThreeColumns = () => {
       </div>
 
       {/* Column 3: Why SmartyGym */}
-      <div className="lg:pl-4">
+      <div className="md:w-full lg:w-auto lg:pl-4">
         <h3 className="text-lg font-bold text-foreground mb-4 flex items-center gap-2">
           <span className="w-2 h-2 rounded-full bg-primary"></span>
           Why SmartyGym
