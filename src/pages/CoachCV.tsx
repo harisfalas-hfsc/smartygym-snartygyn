@@ -6,6 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useNavigate } from "react-router-dom";
 import { useAccessControl } from "@/hooks/useAccessControl";
 import harisPhoto from "@/assets/haris-falas-coach.png";
+import { PageBreadcrumbs } from "@/components/PageBreadcrumbs";
 const CoachCV = () => {
   const {
     canGoBack,
@@ -33,6 +34,12 @@ const CoachCV = () => {
               <ArrowLeft className="mr-2 h-4 w-4" />
               Back
             </Button>}
+
+          <PageBreadcrumbs items={[
+            { label: "Home", href: "/" },
+            { label: "Coach Profile", href: "/coach-profile" },
+            { label: "Coach CV" }
+          ]} />
 
           {/* Hero Section */}
           <div className="text-center mb-12">

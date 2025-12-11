@@ -8,6 +8,7 @@ import { useWorkoutData } from "@/hooks/useWorkoutData";
 import { useAccessControl } from "@/hooks/useAccessControl";
 import { ContentNotFound } from "@/components/ContentNotFound";
 import { useShowBackButton } from "@/hooks/useShowBackButton";
+import { PageBreadcrumbs } from "@/components/PageBreadcrumbs";
 
 const IndividualWorkout = () => {
   const { type, id } = useParams();
@@ -97,9 +98,10 @@ const IndividualWorkout = () => {
         </Helmet>
         <div className="min-h-screen bg-background">
           <div className="container mx-auto px-4 py-8">
-            <div className="mb-6">
+            <div className="mb-4">
               <Button
-                variant="outline"
+                variant="ghost"
+                size="sm"
                 onClick={goBack}
                 className="gap-2"
               >
@@ -107,6 +109,12 @@ const IndividualWorkout = () => {
                 <span className="text-xs sm:text-sm">Back</span>
               </Button>
             </div>
+
+            <PageBreadcrumbs items={[
+              { label: "Home", href: "/" },
+              { label: "Smarty Workouts", href: "/workout" },
+              { label: dbWorkout.name }
+            ]} />
 
             <AccessGate 
               requireAuth={true} 

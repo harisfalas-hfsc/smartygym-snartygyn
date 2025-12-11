@@ -9,6 +9,7 @@ import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { User } from "@supabase/supabase-js";
 import { useAccessControl } from "@/hooks/useAccessControl";
+import { PageBreadcrumbs } from "@/components/PageBreadcrumbs";
 
 const PremiumComparison = () => {
   const navigate = useNavigate();
@@ -156,11 +157,16 @@ const PremiumComparison = () => {
             variant="ghost"
             size="sm"
             onClick={goBack}
-            className="mb-6"
+            className="mb-4"
           >
             <ArrowLeft className="w-4 h-4 mr-2" />
             Back
           </Button>
+
+          <PageBreadcrumbs items={[
+            { label: "Home", href: "/" },
+            { label: "Compare Plans" }
+          ]} />
 
           <div className="text-center mb-8">
             <h1 className="text-3xl sm:text-4xl font-bold mb-4">

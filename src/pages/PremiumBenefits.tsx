@@ -28,6 +28,7 @@ import { useShowBackButton } from "@/hooks/useShowBackButton";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { User } from "@supabase/supabase-js";
+import { PageBreadcrumbs } from "@/components/PageBreadcrumbs";
 
 export default function PremiumBenefits() {
   const navigate = useNavigate();
@@ -162,12 +163,17 @@ export default function PremiumBenefits() {
               variant="ghost"
               size="sm"
               onClick={goBack}
-              className="mb-6"
+              className="mb-4"
             >
               <ArrowLeft className="mr-2 h-4 w-4" />
               <span className="text-xs sm:text-sm">Back</span>
             </Button>
           )}
+
+          <PageBreadcrumbs items={[
+            { label: "Home", href: "/" },
+            { label: "Premium Benefits" }
+          ]} />
 
           <div className="text-center mb-8">
             <Crown className="h-16 w-16 text-primary mx-auto mb-4" />

@@ -7,6 +7,7 @@ import { CheckCircle2, Target, Heart, Users, Shield, Award, Compass, ArrowLeft, 
 import { useShowBackButton } from "@/hooks/useShowBackButton";
 import { useAccessControl } from "@/hooks/useAccessControl";
 import { SEOEnhancer } from "@/components/SEOEnhancer";
+import { PageBreadcrumbs } from "@/components/PageBreadcrumbs";
 
 const About = () => {
   const navigate = useNavigate();
@@ -100,12 +101,17 @@ const About = () => {
             <Button 
               variant="ghost" 
               onClick={showBackButton.goBack}
-              className="mb-6 gap-2"
+              className="mb-4 gap-2"
             >
               <ArrowLeft className="w-4 h-4" />
               Back
             </Button>
           )}
+
+          <PageBreadcrumbs items={[
+            { label: "Home", href: "/" },
+            { label: "About" }
+          ]} />
 
           {/* Hero Section */}
           <ScrollReveal>

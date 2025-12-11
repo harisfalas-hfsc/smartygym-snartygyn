@@ -12,6 +12,7 @@ import {
 import { HelpCircle, ArrowLeft, MessageCircle } from "lucide-react";
 import { useShowBackButton } from "@/hooks/useShowBackButton";
 import { SEOEnhancer } from "@/components/SEOEnhancer";
+import { PageBreadcrumbs } from "@/components/PageBreadcrumbs";
 
 const FAQ = () => {
   const navigate = useNavigate();
@@ -155,12 +156,17 @@ const FAQ = () => {
             <Button 
               variant="ghost" 
               onClick={showBackButton.goBack}
-              className="mb-6 gap-2"
+              className="mb-4 gap-2"
             >
               <ArrowLeft className="w-4 h-4" />
               Back
             </Button>
           )}
+
+          <PageBreadcrumbs items={[
+            { label: "Home", href: "/" },
+            { label: "FAQ" }
+          ]} />
 
           {/* Hero Section */}
           <ScrollReveal>

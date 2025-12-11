@@ -20,6 +20,7 @@ import { User } from "@supabase/supabase-js";
 import { useToast } from "@/hooks/use-toast";
 import { useShowBackButton } from "@/hooks/useShowBackButton";
 import { SEOEnhancer } from "@/components/SEOEnhancer";
+import { PageBreadcrumbs } from "@/components/PageBreadcrumbs";
 
 export default function JoinPremium() {
   const navigate = useNavigate();
@@ -197,12 +198,17 @@ export default function JoinPremium() {
               variant="ghost"
               size="sm"
               onClick={goBack}
-              className="mb-6"
+              className="mb-4"
             >
               <ArrowLeft className="mr-2 h-4 w-4" />
               <span className="text-xs sm:text-sm">Back</span>
             </Button>
           )}
+
+          <PageBreadcrumbs items={[
+            { label: "Home", href: "/" },
+            { label: "Premium Plans" }
+          ]} />
 
           <h1 className="text-3xl sm:text-4xl font-bold text-center mb-2">Join Premium</h1>
           <p className="text-center text-muted-foreground mb-4">

@@ -3,8 +3,11 @@ import { Helmet } from "react-helmet";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { CheckCircle2, ArrowLeft } from "lucide-react";
+import { PageBreadcrumbs } from "@/components/PageBreadcrumbs";
+import { useShowBackButton } from "@/hooks/useShowBackButton";
 
 const NewsletterThankYou = () => {
+  const { canGoBack, goBack } = useShowBackButton();
   const navigate = useNavigate();
 
   return (
@@ -15,7 +18,22 @@ const NewsletterThankYou = () => {
         <link rel="canonical" href="https://smartygym.com/newsletter-thank-you" />
       </Helmet>
       
-      <div className="min-h-screen bg-background flex items-center justify-center px-4">
+      <div className="min-h-screen bg-background px-4 py-8">
+        <div className="container mx-auto max-w-lg">
+          {canGoBack && (
+            <Button variant="ghost" size="sm" onClick={goBack} className="mb-4">
+              <ArrowLeft className="mr-2 h-4 w-4" />
+              Back
+            </Button>
+          )}
+
+          <PageBreadcrumbs items={[
+            { label: "Home", href: "/" },
+            { label: "Newsletter" }
+          ]} />
+        </div>
+        
+        <div className="flex items-center justify-center" style={{ minHeight: 'calc(100vh - 200px)' }}>
         <Card className="max-w-lg w-full p-8 text-center space-y-6 animate-fade-in">
           <div className="flex justify-center">
             <CheckCircle2 className="w-16 h-16 text-primary" />
@@ -37,6 +55,7 @@ const NewsletterThankYou = () => {
             </Button>
           </div>
         </Card>
+        </div>
       </div>
     </>
   );

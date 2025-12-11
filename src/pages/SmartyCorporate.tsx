@@ -29,6 +29,7 @@ import { User } from "@supabase/supabase-js";
 import { useToast } from "@/hooks/use-toast";
 import { useShowBackButton } from "@/hooks/useShowBackButton";
 import { SEOEnhancer } from "@/components/SEOEnhancer";
+import { PageBreadcrumbs } from "@/components/PageBreadcrumbs";
 
 // Stripe product and price IDs for corporate plans
 const CORPORATE_PLANS = {
@@ -181,12 +182,17 @@ export default function SmartyCorporate() {
               variant="ghost"
               size="sm"
               onClick={goBack}
-              className="mb-6"
+              className="mb-4"
             >
               <ArrowLeft className="mr-2 h-4 w-4" />
               <span className="text-xs sm:text-sm">Back</span>
             </Button>
           )}
+
+          <PageBreadcrumbs items={[
+            { label: "Home", href: "/" },
+            { label: "Smarty Corporate" }
+          ]} />
 
           {/* Header */}
           <div className="text-center mb-8">

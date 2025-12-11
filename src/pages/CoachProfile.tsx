@@ -5,6 +5,7 @@ import { Card } from "@/components/ui/card";
 import { ArrowLeft, Award, GraduationCap, Building2, Target, CheckCircle, Smartphone, Shield } from "lucide-react";
 import { useShowBackButton } from "@/hooks/useShowBackButton";
 import { useAccessControl } from "@/hooks/useAccessControl";
+import { PageBreadcrumbs } from "@/components/PageBreadcrumbs";
 
 const CoachProfile = () => {
   const navigate = useNavigate();
@@ -95,12 +96,17 @@ const CoachProfile = () => {
               variant="ghost"
               size="sm"
               onClick={goBack}
-              className="mb-6"
+              className="mb-4"
             >
               <ArrowLeft className="mr-2 h-4 w-4" />
               Back
             </Button>
           )}
+
+          <PageBreadcrumbs items={[
+            { label: "Home", href: "/" },
+            { label: "Coach Profile" }
+          ]} />
 
           <article className="space-y-8">
             {/* Hero Section */}
