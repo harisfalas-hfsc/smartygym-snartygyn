@@ -15,7 +15,17 @@ import { MyOrders } from "@/components/MyOrders";
 import { useQuery } from "@tanstack/react-query";
 import { useAccessControl } from "@/hooks/useAccessControl";
 import { useShowBackButton } from "@/hooks/useShowBackButton";
-import { Heart, CheckCircle, Clock, Star, Play, Dumbbell, Calendar, Crown, ArrowLeft, Calculator, ShoppingBag, MessageSquare, Loader2, RefreshCw, ExternalLink, ClipboardList, TrendingUp, BookOpen, Headphones, Sparkles, Quote, User as UserIcon, Scale, Building2, Users, ClipboardCheck, FileText } from "lucide-react";
+import { Heart, CheckCircle, Clock, Star, Play, Dumbbell, Calendar, Crown, ArrowLeft, Calculator, ShoppingBag, MessageSquare, Loader2, RefreshCw, ExternalLink, ClipboardList, TrendingUp, BookOpen, Headphones, Sparkles, Quote, User as UserIcon, Scale, Building2, Users, ClipboardCheck, FileText, Trash2 } from "lucide-react";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { MyRecordsReport } from "@/components/dashboard/MyRecordsReport";
 import { LogBookFilters } from "@/components/logbook/LogBookFilters";
 import { LogBookCalendar } from "@/components/logbook/LogBookCalendar";
@@ -138,6 +148,7 @@ export default function UserDashboard() {
   const [isMeasurementDialogOpen, setIsMeasurementDialogOpen] = useState(false);
   const [showMorningForm, setShowMorningForm] = useState(false);
   const [showNightForm, setShowNightForm] = useState(false);
+  const [deleteDialog, setDeleteDialog] = useState<{ open: boolean; type: string; id: string } | null>(null);
 
   // Check-in hooks
   const {
@@ -381,6 +392,39 @@ export default function UserDashboard() {
       }
     }
   };
+
+  const handleDeleteRecord = async () => {
+    if (!deleteDialog || !user) return;
+    
+    const { type, id } = deleteDialog;
+    let error = null;
+
+    if (type === "1rm") {
+      const result = await supabase.from("onerm_history").delete().eq("id", id);
+      error = result.error;
+      if (!error) await fetchCalculatorHistory(user.id);
+    } else if (type === "bmr") {
+      const result = await supabase.from("bmr_history").delete().eq("id", id);
+      error = result.error;
+      if (!error) await fetchCalculatorHistory(user.id);
+    } else if (type === "macro") {
+      const result = await supabase.from("calorie_history").delete().eq("id", id);
+      error = result.error;
+      if (!error) await fetchCalculatorHistory(user.id);
+    } else if (type === "measurement") {
+      const result = await supabase.from("user_activity_log").delete().eq("id", id);
+      error = result.error;
+      if (!error) await fetchMeasurementHistory(user.id);
+    }
+
+    if (error) {
+      toast({ title: "Error", description: "Failed to delete record", variant: "destructive" });
+    } else {
+      toast({ title: "Deleted", description: "Record deleted successfully" });
+    }
+    setDeleteDialog(null);
+  };
+
   const checkSubscription = async (userId?: string) => {
     try {
       const uid = userId || user?.id;
@@ -1625,17 +1669,27 @@ export default function UserDashboard() {
                               Calculate Now
                             </Button>
                           </div> : <div className="space-y-1">
-                            <div className="p-2 bg-muted rounded text-xs">
-                              <div className="font-semibold">{oneRMHistory[0].one_rm_result.toFixed(1)} kg</div>
-                              {oneRMHistory[0].exercise_name && <div className="text-muted-foreground">{oneRMHistory[0].exercise_name}</div>}
-                              <div className="text-muted-foreground">
-                                {oneRMHistory[0].weight_lifted}kg × {oneRMHistory[0].reps} reps
+                            <div className="flex items-start justify-between gap-1">
+                              <div className="p-2 bg-muted rounded text-xs flex-1">
+                                <div className="font-semibold">{oneRMHistory[0].one_rm_result.toFixed(1)} kg</div>
+                                {oneRMHistory[0].exercise_name && <div className="text-muted-foreground">{oneRMHistory[0].exercise_name}</div>}
+                                <div className="text-muted-foreground">
+                                  {oneRMHistory[0].weight_lifted}kg × {oneRMHistory[0].reps} reps
+                                </div>
+                                <div className="text-muted-foreground mt-1">
+                                  {formatDate(oneRMHistory[0].created_at)}
+                                </div>
                               </div>
-                              <div className="text-muted-foreground mt-1">
-                                {formatDate(oneRMHistory[0].created_at)}
-                              </div>
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                className="h-6 w-6 text-muted-foreground hover:text-destructive flex-shrink-0"
+                                onClick={() => setDeleteDialog({ open: true, type: "1rm", id: oneRMHistory[0].id })}
+                              >
+                                <Trash2 className="h-3 w-3" />
+                              </Button>
                             </div>
-                            <Button size="sm" variant="outline" className="w-full" onClick={() => navigate("/one-rm-calculator")}>
+                            <Button size="sm" variant="outline" className="w-full" onClick={() => navigate("/calculator-history?tab=1rm")}>
                               View All / Add New
                             </Button>
                           </div>}
@@ -1654,19 +1708,29 @@ export default function UserDashboard() {
                               Calculate Now
                             </Button>
                           </div> : <div className="space-y-1">
-                            <div className="p-2 bg-muted rounded text-xs">
-                              <div className="font-semibold">{bmrHistory[0].bmr_result.toFixed(0)} cal/day</div>
-                              <div className="text-muted-foreground">
-                                {bmrHistory[0].gender === "male" ? "Male" : "Female"}, {bmrHistory[0].age} years
+                            <div className="flex items-start justify-between gap-1">
+                              <div className="p-2 bg-muted rounded text-xs flex-1">
+                                <div className="font-semibold">{bmrHistory[0].bmr_result.toFixed(0)} cal/day</div>
+                                <div className="text-muted-foreground">
+                                  {bmrHistory[0].gender === "male" ? "Male" : "Female"}, {bmrHistory[0].age} years
+                                </div>
+                                <div className="text-muted-foreground">
+                                  {bmrHistory[0].height}cm, {bmrHistory[0].weight}kg
+                                </div>
+                                <div className="text-muted-foreground mt-1">
+                                  {formatDate(bmrHistory[0].created_at)}
+                                </div>
                               </div>
-                              <div className="text-muted-foreground">
-                                {bmrHistory[0].height}cm, {bmrHistory[0].weight}kg
-                              </div>
-                              <div className="text-muted-foreground mt-1">
-                                {formatDate(bmrHistory[0].created_at)}
-                              </div>
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                className="h-6 w-6 text-muted-foreground hover:text-destructive flex-shrink-0"
+                                onClick={() => setDeleteDialog({ open: true, type: "bmr", id: bmrHistory[0].id })}
+                              >
+                                <Trash2 className="h-3 w-3" />
+                              </Button>
                             </div>
-                            <Button size="sm" variant="outline" className="w-full" onClick={() => navigate("/bmr-calculator")}>
+                            <Button size="sm" variant="outline" className="w-full" onClick={() => navigate("/calculator-history?tab=bmr")}>
                               View All / Add New
                             </Button>
                           </div>}
@@ -1685,19 +1749,29 @@ export default function UserDashboard() {
                               Calculate Now
                             </Button>
                           </div> : <div className="space-y-1">
-                            <div className="p-2 bg-muted rounded text-xs">
-                              <div className="font-semibold">{calorieHistory[0].target_calories.toFixed(0)} cal/day</div>
-                              <div className="text-muted-foreground capitalize">
-                                Goal: {calorieHistory[0].goal}
+                            <div className="flex items-start justify-between gap-1">
+                              <div className="p-2 bg-muted rounded text-xs flex-1">
+                                <div className="font-semibold">{calorieHistory[0].target_calories.toFixed(0)} cal/day</div>
+                                <div className="text-muted-foreground capitalize">
+                                  Goal: {calorieHistory[0].goal}
+                                </div>
+                                <div className="text-muted-foreground">
+                                  Activity: {calorieHistory[0].activity_level.replace('_', ' ')}
+                                </div>
+                                <div className="text-muted-foreground mt-1">
+                                  {formatDate(calorieHistory[0].created_at)}
+                                </div>
                               </div>
-                              <div className="text-muted-foreground">
-                                Activity: {calorieHistory[0].activity_level.replace('_', ' ')}
-                              </div>
-                              <div className="text-muted-foreground mt-1">
-                                {formatDate(calorieHistory[0].created_at)}
-                              </div>
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                className="h-6 w-6 text-muted-foreground hover:text-destructive flex-shrink-0"
+                                onClick={() => setDeleteDialog({ open: true, type: "macro", id: calorieHistory[0].id })}
+                              >
+                                <Trash2 className="h-3 w-3" />
+                              </Button>
                             </div>
-                            <Button size="sm" variant="outline" className="w-full" onClick={() => navigate("/macro-tracking-calculator")}>
+                            <Button size="sm" variant="outline" className="w-full" onClick={() => navigate("/calculator-history?tab=macro")}>
                               View All / Add New
                             </Button>
                           </div>}
@@ -1719,19 +1793,29 @@ export default function UserDashboard() {
                               Add Measurement
                             </Button>
                           </div> : <div className="space-y-1">
-                            <div className="p-2 bg-muted rounded text-xs">
-                              <div className="font-semibold">
-                                {measurementHistory[0].tool_result?.weight && `${measurementHistory[0].tool_result.weight} kg`}
-                                {measurementHistory[0].tool_result?.weight && (measurementHistory[0].tool_result?.body_fat || measurementHistory[0].tool_result?.muscle_mass) && ' | '}
-                                {measurementHistory[0].tool_result?.body_fat && `BF: ${measurementHistory[0].tool_result.body_fat}%`}
-                                {measurementHistory[0].tool_result?.body_fat && measurementHistory[0].tool_result?.muscle_mass && ' | '}
-                                {measurementHistory[0].tool_result?.muscle_mass && `MM: ${measurementHistory[0].tool_result.muscle_mass} kg`}
+                            <div className="flex items-start justify-between gap-1">
+                              <div className="p-2 bg-muted rounded text-xs flex-1">
+                                <div className="font-semibold">
+                                  {measurementHistory[0].tool_result?.weight && `${measurementHistory[0].tool_result.weight} kg`}
+                                  {measurementHistory[0].tool_result?.weight && (measurementHistory[0].tool_result?.body_fat || measurementHistory[0].tool_result?.muscle_mass) && ' | '}
+                                  {measurementHistory[0].tool_result?.body_fat && `BF: ${measurementHistory[0].tool_result.body_fat}%`}
+                                  {measurementHistory[0].tool_result?.body_fat && measurementHistory[0].tool_result?.muscle_mass && ' | '}
+                                  {measurementHistory[0].tool_result?.muscle_mass && `MM: ${measurementHistory[0].tool_result.muscle_mass} kg`}
+                                </div>
+                                <div className="text-muted-foreground mt-1">
+                                  {formatDate(measurementHistory[0].created_at)}
+                                </div>
                               </div>
-                              <div className="text-muted-foreground mt-1">
-                                {formatDate(measurementHistory[0].created_at)}
-                              </div>
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                className="h-6 w-6 text-muted-foreground hover:text-destructive flex-shrink-0"
+                                onClick={() => setDeleteDialog({ open: true, type: "measurement", id: measurementHistory[0].id })}
+                              >
+                                <Trash2 className="h-3 w-3" />
+                              </Button>
                             </div>
-                            <Button size="sm" variant="outline" className="w-full" onClick={() => setIsMeasurementDialogOpen(true)}>
+                            <Button size="sm" variant="outline" className="w-full" onClick={() => navigate("/calculator-history?tab=measurements")}>
                               View All / Add New
                             </Button>
                           </div>}
@@ -1742,7 +1826,7 @@ export default function UserDashboard() {
 
                 {/* Full Smarty Check-ins Section */}
                 {isPremium && <div className="mt-6">
-                    <Card>
+                    <Card className="bg-primary/5 border-primary/20">
                       <CardHeader>
                         <CardTitle className="flex items-center gap-2">
                           <ClipboardCheck className="h-5 w-5 text-primary" />
@@ -1756,7 +1840,7 @@ export default function UserDashboard() {
                   </div>}
                 
                 {/* Calendar - Always shows ALL activity */}
-                <div id="logbook-calendar">
+                <div id="logbook-calendar" className="p-4 rounded-lg bg-primary/5 border border-primary/20">
                   <LogBookCalendar userId={user!.id} filter="all" />
                 </div>
                 
@@ -1804,5 +1888,23 @@ export default function UserDashboard() {
         }} isWindowOpen={isNightWindow} windowEnd={nightWindowEnd} />
         </DialogContent>
       </Dialog>
+
+      {/* Delete Confirmation Dialog */}
+      <AlertDialog open={deleteDialog?.open || false} onOpenChange={(open) => !open && setDeleteDialog(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete Record</AlertDialogTitle>
+            <AlertDialogDescription>
+              Are you sure you want to delete this record? This action cannot be undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={handleDeleteRecord} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
+              Delete
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>;
 }
