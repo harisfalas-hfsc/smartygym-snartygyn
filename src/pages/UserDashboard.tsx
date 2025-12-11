@@ -1012,7 +1012,7 @@ export default function UserDashboard() {
 
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
           <div className="w-full overflow-x-auto">
-            <TabsList className="w-full inline-flex sm:grid sm:grid-cols-7 min-w-max sm:min-w-0">
+            <TabsList className="w-full inline-flex sm:grid sm:grid-cols-6 min-w-max sm:min-w-0">
               <TabsTrigger value="workouts" className="flex-shrink-0">
                 <Dumbbell className="mr-2 h-4 w-4" />
                 <span className="whitespace-nowrap">Workouts</span>
@@ -1039,10 +1039,6 @@ export default function UserDashboard() {
               <TabsTrigger value="logbook" className="flex-shrink-0">
                 <BookOpen className="mr-2 h-4 w-4" />
                 <span className="whitespace-nowrap">My LogBook</span>
-              </TabsTrigger>
-              <TabsTrigger value="records" className="flex-shrink-0">
-                <FileText className="mr-2 h-4 w-4" />
-                <span className="whitespace-nowrap">My Records</span>
               </TabsTrigger>
             </TabsList>
           </div>
@@ -1848,13 +1844,21 @@ export default function UserDashboard() {
                   <LogBookAdvancedCharts userId={user!.id} primaryFilter={logBookFilter} onPrimaryFilterChange={filter => setLogBookFilter(filter as any)} secondaryFilter={logBookSecondaryFilter} onSecondaryFilterChange={filter => setLogBookSecondaryFilter(filter)} timeFilter={logBookTimeFilter} onTimeFilterChange={filter => setLogBookTimeFilter(filter as any)} customStartDate={logBookCustomStartDate} onCustomStartDateChange={setLogBookCustomStartDate} customEndDate={logBookCustomEndDate} onCustomEndDateChange={setLogBookCustomEndDate} />
                 </div>
 
-                  <LogBookAdvancedExport userId={user!.id} primaryFilter={logBookFilter} secondaryFilter={logBookSecondaryFilter} timeFilter={logBookTimeFilter} customStartDate={logBookCustomStartDate} customEndDate={logBookCustomEndDate} />
-              </>}
-          </TabsContent>
+                {/* My Records Section */}
+                <Card className="bg-primary/5 border-primary/20">
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2">
+                      <FileText className="h-5 w-5 text-primary" />
+                      My Records
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <MyRecordsReport userId={user?.id} />
+                  </CardContent>
+                </Card>
 
-          {/* My Records Tab */}
-          <TabsContent value="records" className="space-y-6">
-            <MyRecordsReport userId={user?.id} />
+                <LogBookAdvancedExport userId={user!.id} primaryFilter={logBookFilter} secondaryFilter={logBookSecondaryFilter} timeFilter={logBookTimeFilter} customStartDate={logBookCustomStartDate} customEndDate={logBookCustomEndDate} />
+              </>}
           </TabsContent>
         </Tabs>
       </main>

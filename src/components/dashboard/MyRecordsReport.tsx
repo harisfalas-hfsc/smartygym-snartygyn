@@ -443,8 +443,8 @@ export function MyRecordsReport({ userId }: MyRecordsReportProps) {
 
       {/* Report Content */}
       <div ref={reportRef} className="bg-white p-6 rounded-lg">
-        {/* Header with Logo */}
-        <div className="text-center mb-8">
+        {/* Header with Logo - Only visible during export */}
+        <div className={`text-center mb-8 ${exporting ? '' : 'hidden'}`} id="export-header">
           <img 
             src={smartyGymLogo} 
             alt="SmartyGym" 
@@ -621,8 +621,8 @@ export function MyRecordsReport({ userId }: MyRecordsReportProps) {
           </CardContent>
         </Card>
 
-        {/* Footer */}
-        <div className="text-center mt-6 text-sm text-gray-500">
+        {/* Footer - Only visible during export */}
+        <div className={`text-center mt-6 text-sm text-gray-500 ${exporting ? '' : 'hidden'}`}>
           <p>Generated on {format(new Date(), "MMMM d, yyyy 'at' h:mm a")}</p>
           <p className="text-xs mt-1 font-medium" style={{ color: '#D4AF37' }}>SmartyGym - Your Gym Re-imagined. Anywhere, Anytime.</p>
         </div>
