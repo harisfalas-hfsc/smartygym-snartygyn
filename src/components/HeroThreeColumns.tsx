@@ -143,7 +143,7 @@ export const HeroThreeColumns = () => {
   return (
     <div className="flex flex-col lg:flex-row lg:items-start gap-8 lg:gap-0 mt-8">
       {/* Column 1: Explore */}
-      <div className="lg:pr-8 lg:border-r lg:border-primary/30">
+      <div className="lg:border-r lg:border-primary/30">
         <h3 className="text-lg font-bold text-foreground mb-4 flex items-center gap-2">
           <span className="w-2 h-2 rounded-full bg-primary"></span>
           Explore
@@ -167,7 +167,7 @@ export const HeroThreeColumns = () => {
       <div className="hidden lg:block lg:flex-1 lg:min-w-12" />
 
       {/* Column 2: Who is SmartyGym For? */}
-      <div className="lg:pr-8 lg:border-r lg:border-primary/30">
+      <div className="lg:border-r lg:border-primary/30">
         <h3 className="text-lg font-bold text-foreground mb-4 flex items-center gap-2">
           <span className="w-2 h-2 rounded-full bg-primary"></span>
           Who is <span className="text-primary ml-1">SmartyGym</span> <span className="ml-1">For?</span>
