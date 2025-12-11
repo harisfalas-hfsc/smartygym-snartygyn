@@ -164,7 +164,7 @@ export const HeroThreeColumns = () => {
       </div>
 
       {/* Gold Divider 1 */}
-      <div className="hidden lg:block w-[2px] bg-gradient-to-b from-primary/20 via-primary to-primary/20 self-stretch" />
+      <div className="hidden lg:block w-px bg-primary/30 self-stretch" />
 
       {/* Column 2: Who is SmartyGym For? */}
       <div className="space-y-4">
@@ -187,7 +187,7 @@ export const HeroThreeColumns = () => {
       </div>
 
       {/* Gold Divider 2 */}
-      <div className="hidden lg:block w-[2px] bg-gradient-to-b from-primary/20 via-primary to-primary/20 self-stretch" />
+      <div className="hidden lg:block w-px bg-primary/30 self-stretch" />
 
       {/* Column 3: Credentials */}
       <div className="space-y-4">
