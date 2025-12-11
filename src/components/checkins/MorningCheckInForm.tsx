@@ -9,6 +9,7 @@ interface MorningCheckInFormProps {
   onSubmit: (data: MorningCheckinData) => Promise<boolean>;
   isWindowOpen: boolean;
   windowEnd: string;
+  isCompleted?: boolean;
 }
 
 const sleepQualityEmojis = [
@@ -46,7 +47,8 @@ const sorenessLabels: Record<number, string> = {
 export function MorningCheckInForm({ 
   onSubmit, 
   isWindowOpen,
-  windowEnd 
+  windowEnd,
+  isCompleted 
 }: MorningCheckInFormProps) {
   const [sleepHours, setSleepHours] = useState<number>(7);
   const [sleepQuality, setSleepQuality] = useState<number>(3);
@@ -66,6 +68,20 @@ export function MorningCheckInForm({
     });
     setSubmitting(false);
   };
+
+  if (isCompleted) {
+    return (
+      <Card className="border-green-200 dark:border-green-800 overflow-hidden">
+        <CardContent className="py-8 text-center">
+          <Sun className="h-12 w-12 mx-auto mb-4 text-green-600" />
+          <p className="font-medium text-lg">Morning check-in complete!</p>
+          <p className="text-sm text-muted-foreground mt-2">
+            You've already completed your morning check-in today.
+          </p>
+        </CardContent>
+      </Card>
+    );
+  }
 
   if (!isWindowOpen) {
     return (

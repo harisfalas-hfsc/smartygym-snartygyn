@@ -243,6 +243,15 @@ export function useCheckins() {
       const checkin = await createOrGetTodayCheckin();
       if (!checkin) throw new Error('Could not create check-in record');
 
+      // Guard against duplicate submissions
+      if (checkin.morning_completed) {
+        toast({
+          title: "Already completed",
+          description: "You've already completed your morning check-in today."
+        });
+        return false;
+      }
+
       const { error: updateError } = await supabase
         .from('smarty_checkins')
         .update({
@@ -298,6 +307,15 @@ export function useCheckins() {
     try {
       const checkin = await createOrGetTodayCheckin();
       if (!checkin) throw new Error('Could not create check-in record');
+
+      // Guard against duplicate submissions
+      if (checkin.night_completed) {
+        toast({
+          title: "Already completed",
+          description: "You've already completed your night check-in today."
+        });
+        return false;
+      }
 
       const { error: updateError } = await supabase
         .from('smarty_checkins')
