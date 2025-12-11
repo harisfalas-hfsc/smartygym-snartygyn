@@ -205,32 +205,45 @@ export const RecordDetailDialog = ({
 
       case "measurement": {
         const r = record as MeasurementRecord;
+        const hasValues = r.weight || r.bodyFat || r.muscleMass;
+        
         return (
           <div className="space-y-4">
             <div className="flex items-center gap-2 text-primary">
               <Scale className="h-5 w-5" />
               <span className="font-semibold text-lg">Body Measurement</span>
             </div>
-            <div className="space-y-3">
-              {r.weight && (
-                <div className="p-4 bg-muted rounded-lg">
-                  <p className="text-xs text-muted-foreground">Weight</p>
-                  <p className="text-2xl font-bold">{r.weight} kg</p>
-                </div>
-              )}
-              {r.bodyFat && (
-                <div className="p-4 bg-muted rounded-lg">
-                  <p className="text-xs text-muted-foreground">Body Fat</p>
-                  <p className="text-2xl font-bold">{r.bodyFat}%</p>
-                </div>
-              )}
-              {r.muscleMass && (
-                <div className="p-4 bg-muted rounded-lg">
-                  <p className="text-xs text-muted-foreground">Muscle Mass</p>
-                  <p className="text-2xl font-bold">{r.muscleMass} kg</p>
-                </div>
-              )}
-            </div>
+            
+            {!hasValues ? (
+              <div className="p-4 bg-muted rounded-lg text-center">
+                <p className="text-muted-foreground">No measurement values recorded</p>
+                <p className="text-xs text-muted-foreground mt-1">
+                  This record has no data
+                </p>
+              </div>
+            ) : (
+              <div className="space-y-3">
+                {r.weight && (
+                  <div className="p-4 bg-muted rounded-lg">
+                    <p className="text-xs text-muted-foreground">Weight</p>
+                    <p className="text-2xl font-bold">{r.weight} kg</p>
+                  </div>
+                )}
+                {r.bodyFat && (
+                  <div className="p-4 bg-muted rounded-lg">
+                    <p className="text-xs text-muted-foreground">Body Fat</p>
+                    <p className="text-2xl font-bold">{r.bodyFat}%</p>
+                  </div>
+                )}
+                {r.muscleMass && (
+                  <div className="p-4 bg-muted rounded-lg">
+                    <p className="text-xs text-muted-foreground">Muscle Mass</p>
+                    <p className="text-2xl font-bold">{r.muscleMass} kg</p>
+                  </div>
+                )}
+              </div>
+            )}
+            
             <div className="text-sm text-muted-foreground">
               Recorded: {format(new Date(r.date), "PPP")}
             </div>
