@@ -262,7 +262,7 @@ export default function UserDashboard() {
   };
   const fetchAllData = async (userId: string) => {
     // Use allSettled so individual failures don't block others
-    await Promise.allSettled([fetchWorkoutInteractions(userId), fetchProgramInteractions(userId), fetchFavoriteExercises(userId), fetchCalculatorHistory(userId)]);
+    await Promise.allSettled([fetchWorkoutInteractions(userId), fetchProgramInteractions(userId), fetchFavoriteExercises(userId), fetchCalculatorHistory(userId), fetchMeasurementHistory(userId)]);
   };
   const fetchWorkoutInteractions = async (userId: string) => {
     try {
@@ -360,6 +360,24 @@ export default function UserDashboard() {
     } catch (error) {
       if (import.meta.env.DEV) {
         console.error("Error fetching calculator history:", error);
+      }
+    }
+  };
+  const fetchMeasurementHistory = async (userId: string) => {
+    try {
+      const { data, error } = await supabase
+        .from("user_activity_log")
+        .select("*")
+        .eq("user_id", userId)
+        .eq("content_type", "measurement")
+        .order("created_at", { ascending: false })
+        .limit(5);
+      
+      if (error) throw error;
+      if (data) setMeasurementHistory(data);
+    } catch (error) {
+      if (import.meta.env.DEV) {
+        console.error("Error fetching measurements:", error);
       }
     }
   };
@@ -1606,18 +1624,18 @@ export default function UserDashboard() {
                             <Button size="sm" variant="outline" onClick={() => navigate("/one-rm-calculator")}>
                               Calculate Now
                             </Button>
-                          </div> : <div className="space-y-0.5">
-                            {oneRMHistory.slice(0, 3).map(record => <div key={record.id} className="p-1 bg-muted rounded text-xs">
-                                <div className="font-semibold">{record.one_rm_result.toFixed(1)} kg</div>
-                                {record.exercise_name && <div className="text-muted-foreground">{record.exercise_name}</div>}
-                                <div className="text-muted-foreground">
-                                  {record.weight_lifted}kg × {record.reps} reps
-                                </div>
-                                <div className="text-muted-foreground mt-1">
-                                  {formatDate(record.created_at)}
-                                </div>
-                              </div>)}
-                            <Button size="sm" variant="outline" className="w-full mt-1" onClick={() => navigate("/one-rm-calculator")}>
+                          </div> : <div className="space-y-1">
+                            <div className="p-2 bg-muted rounded text-xs">
+                              <div className="font-semibold">{oneRMHistory[0].one_rm_result.toFixed(1)} kg</div>
+                              {oneRMHistory[0].exercise_name && <div className="text-muted-foreground">{oneRMHistory[0].exercise_name}</div>}
+                              <div className="text-muted-foreground">
+                                {oneRMHistory[0].weight_lifted}kg × {oneRMHistory[0].reps} reps
+                              </div>
+                              <div className="text-muted-foreground mt-1">
+                                {formatDate(oneRMHistory[0].created_at)}
+                              </div>
+                            </div>
+                            <Button size="sm" variant="outline" className="w-full" onClick={() => navigate("/one-rm-calculator")}>
                               View All / Add New
                             </Button>
                           </div>}
@@ -1635,20 +1653,20 @@ export default function UserDashboard() {
                             <Button size="sm" variant="outline" onClick={() => navigate("/bmr-calculator")}>
                               Calculate Now
                             </Button>
-                          </div> : <div className="space-y-0.5">
-                            {bmrHistory.slice(0, 3).map(record => <div key={record.id} className="p-1 bg-muted rounded text-xs">
-                                <div className="font-semibold">{record.bmr_result.toFixed(0)} cal/day</div>
-                                <div className="text-muted-foreground">
-                                  {record.gender === "male" ? "Male" : "Female"}, {record.age} years
-                                </div>
-                                <div className="text-muted-foreground">
-                                  {record.height}cm, {record.weight}kg
-                                </div>
-                                <div className="text-muted-foreground mt-1">
-                                  {formatDate(record.created_at)}
-                                </div>
-                              </div>)}
-                            <Button size="sm" variant="outline" className="w-full mt-1" onClick={() => navigate("/bmr-calculator")}>
+                          </div> : <div className="space-y-1">
+                            <div className="p-2 bg-muted rounded text-xs">
+                              <div className="font-semibold">{bmrHistory[0].bmr_result.toFixed(0)} cal/day</div>
+                              <div className="text-muted-foreground">
+                                {bmrHistory[0].gender === "male" ? "Male" : "Female"}, {bmrHistory[0].age} years
+                              </div>
+                              <div className="text-muted-foreground">
+                                {bmrHistory[0].height}cm, {bmrHistory[0].weight}kg
+                              </div>
+                              <div className="text-muted-foreground mt-1">
+                                {formatDate(bmrHistory[0].created_at)}
+                              </div>
+                            </div>
+                            <Button size="sm" variant="outline" className="w-full" onClick={() => navigate("/bmr-calculator")}>
                               View All / Add New
                             </Button>
                           </div>}
@@ -1666,20 +1684,20 @@ export default function UserDashboard() {
                             <Button size="sm" variant="outline" onClick={() => navigate("/macro-tracking-calculator")}>
                               Calculate Now
                             </Button>
-                          </div> : <div className="space-y-0.5">
-                            {calorieHistory.slice(0, 3).map(record => <div key={record.id} className="p-1 bg-muted rounded text-xs">
-                                <div className="font-semibold">{record.target_calories.toFixed(0)} cal/day</div>
-                                <div className="text-muted-foreground capitalize">
-                                  Goal: {record.goal}
-                                </div>
-                                <div className="text-muted-foreground">
-                                  Activity: {record.activity_level.replace('_', ' ')}
-                                </div>
-                                <div className="text-muted-foreground mt-1">
-                                  {formatDate(record.created_at)}
-                                </div>
-                              </div>)}
-                            <Button size="sm" variant="outline" className="w-full mt-1" onClick={() => navigate("/macro-tracking-calculator")}>
+                          </div> : <div className="space-y-1">
+                            <div className="p-2 bg-muted rounded text-xs">
+                              <div className="font-semibold">{calorieHistory[0].target_calories.toFixed(0)} cal/day</div>
+                              <div className="text-muted-foreground capitalize">
+                                Goal: {calorieHistory[0].goal}
+                              </div>
+                              <div className="text-muted-foreground">
+                                Activity: {calorieHistory[0].activity_level.replace('_', ' ')}
+                              </div>
+                              <div className="text-muted-foreground mt-1">
+                                {formatDate(calorieHistory[0].created_at)}
+                              </div>
+                            </div>
+                            <Button size="sm" variant="outline" className="w-full" onClick={() => navigate("/macro-tracking-calculator")}>
                               View All / Add New
                             </Button>
                           </div>}
@@ -1700,20 +1718,20 @@ export default function UserDashboard() {
                             <Button size="sm" variant="outline" onClick={() => setIsMeasurementDialogOpen(true)}>
                               Add Measurement
                             </Button>
-                          </div> : <div className="space-y-0.5">
-                            {measurementHistory.slice(0, 3).map(record => <div key={record.id} className="p-1 bg-muted rounded text-xs">
-                                <div className="font-semibold">
-                                  {record.tool_result?.weight && `${record.tool_result.weight} kg`}
-                                  {record.tool_result?.weight && (record.tool_result?.body_fat || record.tool_result?.muscle_mass) && ' | '}
-                                  {record.tool_result?.body_fat && `BF: ${record.tool_result.body_fat}%`}
-                                  {record.tool_result?.body_fat && record.tool_result?.muscle_mass && ' | '}
-                                  {record.tool_result?.muscle_mass && `MM: ${record.tool_result.muscle_mass} kg`}
-                                </div>
-                                <div className="text-muted-foreground mt-1">
-                                  {formatDate(record.created_at)}
-                                </div>
-                              </div>)}
-                            <Button size="sm" variant="outline" className="w-full mt-1" onClick={() => setIsMeasurementDialogOpen(true)}>
+                          </div> : <div className="space-y-1">
+                            <div className="p-2 bg-muted rounded text-xs">
+                              <div className="font-semibold">
+                                {measurementHistory[0].tool_result?.weight && `${measurementHistory[0].tool_result.weight} kg`}
+                                {measurementHistory[0].tool_result?.weight && (measurementHistory[0].tool_result?.body_fat || measurementHistory[0].tool_result?.muscle_mass) && ' | '}
+                                {measurementHistory[0].tool_result?.body_fat && `BF: ${measurementHistory[0].tool_result.body_fat}%`}
+                                {measurementHistory[0].tool_result?.body_fat && measurementHistory[0].tool_result?.muscle_mass && ' | '}
+                                {measurementHistory[0].tool_result?.muscle_mass && `MM: ${measurementHistory[0].tool_result.muscle_mass} kg`}
+                              </div>
+                              <div className="text-muted-foreground mt-1">
+                                {formatDate(measurementHistory[0].created_at)}
+                              </div>
+                            </div>
+                            <Button size="sm" variant="outline" className="w-full" onClick={() => setIsMeasurementDialogOpen(true)}>
                               View All / Add New
                             </Button>
                           </div>}
@@ -1757,7 +1775,7 @@ export default function UserDashboard() {
         </Tabs>
       </main>
 
-      <MeasurementDialog isOpen={isMeasurementDialogOpen} onClose={() => setIsMeasurementDialogOpen(false)} userId={user?.id || ''} />
+      <MeasurementDialog isOpen={isMeasurementDialogOpen} onClose={() => setIsMeasurementDialogOpen(false)} userId={user?.id || ''} onSaved={() => user && fetchMeasurementHistory(user.id)} />
 
       {/* Morning Check-in Form Dialog */}
       <Dialog open={showMorningForm} onOpenChange={setShowMorningForm}>
