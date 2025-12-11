@@ -346,16 +346,41 @@ serve(async (req) => {
     }
 
     itemsScanned = allContent.length;
-    console.log(`Scanned ${itemsScanned} content items`);
+    console.log(`Scanned ${itemsScanned} total content items`);
 
-    // Process each item (with rate limiting)
-    for (const item of allContent) {
+    // Get all existing SEO entries to avoid reprocessing
+    const { data: existingSEO, error: existingSEOError } = await supabase
+      .from('seo_metadata')
+      .select('content_type, content_id');
+
+    if (existingSEOError) {
+      console.error('Error fetching existing SEO entries:', existingSEOError);
+    }
+
+    // Create a Set of already-optimized content IDs for fast lookup
+    const existingKeys = new Set(
+      (existingSEO || []).map(e => `${e.content_type}:${e.content_id}`)
+    );
+
+    const alreadyOptimized = existingKeys.size;
+    console.log(`Found ${alreadyOptimized} items already optimized`);
+
+    // Filter to only NEW items that don't have SEO yet
+    const newContent = allContent.filter(item => 
+      !existingKeys.has(`${item.content_type}:${item.id}`)
+    );
+
+    console.log(`Found ${newContent.length} NEW items to optimize`);
+
+    // Process only NEW items (with rate limiting)
+    for (const item of newContent) {
       try {
         const seoData = await generateSEOMetadata(item);
 
-        const { error: upsertError } = await supabase
+        // INSERT only (not upsert) since we know these are new items
+        const { error: insertError } = await supabase
           .from('seo_metadata')
-          .upsert({
+          .insert({
             content_type: item.content_type,
             content_id: item.id,
             meta_title: seoData.meta_title,
@@ -363,16 +388,14 @@ serve(async (req) => {
             keywords: seoData.keywords,
             json_ld: seoData.json_ld,
             image_alt_text: seoData.image_alt_text,
-            last_refreshed_at: new Date().toISOString(),
-            updated_at: new Date().toISOString()
-          }, {
-            onConflict: 'content_type,content_id'
+            last_refreshed_at: new Date().toISOString()
           });
 
-        if (!upsertError) {
+        if (!insertError) {
           itemsUpdated++;
+          console.log(`✓ Optimized NEW item: ${item.name}`);
         } else {
-          console.error(`Failed to upsert SEO for ${item.name}:`, upsertError);
+          console.error(`Failed to insert SEO for ${item.name}:`, insertError);
         }
 
         // Small delay to avoid rate limits
@@ -396,17 +419,21 @@ serve(async (req) => {
           items_updated: itemsUpdated,
           sitemap_generated: true,
           metadata: {
-            sitemap_urls_count: (sitemapXml.match(/<url>/g) || []).length
+            sitemap_urls_count: (sitemapXml.match(/<url>/g) || []).length,
+            already_optimized: alreadyOptimized,
+            new_items_found: newContent.length
           }
         })
         .eq('id', logEntry.id);
     }
 
-    console.log(`SEO refresh complete: ${itemsScanned} scanned, ${itemsUpdated} updated`);
+    console.log(`SEO refresh complete: ${itemsScanned} total, ${alreadyOptimized} already optimized, ${itemsUpdated} NEW items processed`);
 
     return new Response(JSON.stringify({
       success: true,
       items_scanned: itemsScanned,
+      already_optimized: alreadyOptimized,
+      new_items_found: newContent.length,
       items_updated: itemsUpdated,
       sitemap_generated: true,
       sitemap_preview: sitemapXml.substring(0, 500) + '...'
