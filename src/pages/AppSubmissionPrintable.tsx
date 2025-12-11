@@ -388,11 +388,10 @@ const AppSubmissionPrintable = () => {
                 This account has Premium Platinum access and sample data pre-loaded.<br/><br/>
                 
                 Key features to test:<br/>
-                1. SmartyWorkout Generator (/smartyworkout) - Creates custom workouts<br/>
-                2. Workout Library (/workout) - Browse 100+ workouts<br/>
-                3. Training Programs (/trainingprogram) - Multi-week programs<br/>
-                4. Dashboard (/dashboard) - View progress and favorites<br/>
-                5. Fitness Calculators - BMR, 1RM, Macro tracking<br/><br/>
+                1. Workout Library (/workout) - Browse 500+ workouts<br/>
+                2. Training Programs (/trainingprogram) - Multi-week programs<br/>
+                3. Dashboard (/dashboard) - View progress and favorites<br/>
+                4. Fitness Calculators - BMR, 1RM, Macro tracking<br/><br/>
                 
                 All content is developed by professional coach Haris Falas.<br/>
                 Payments are handled securely through Stripe.

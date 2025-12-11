@@ -342,8 +342,7 @@ const FAQ = () => {
                       3. <strong>Upgrade</strong> to a premium plan if you want full access to all workouts, training programs, and exclusive content.<br/>
                       4. <strong>Start training</strong> — pick a workout or program and get moving!<br/><br/>
                       
-                      If you need guidance, check out our <a href="/taketour" className="text-primary hover:underline font-medium">Take a Tour</a> page 
-                      or <a href="/contact" className="text-primary hover:underline font-medium">contact us</a> directly.
+                      If you need guidance, <a href="/contact" className="text-primary hover:underline font-medium">contact us</a> directly.
                     </AccordionContent>
                   </AccordionItem>
 

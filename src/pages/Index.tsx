@@ -618,9 +618,6 @@ const Index = () => {
                       <Button variant="outline" size="lg" onClick={() => navigate('/premiumbenefits')} className="font-semibold min-w-[140px]">
                         Get Started
                       </Button>
-                      <Button variant="outline" size="lg" onClick={() => navigate('/takeatour')} className="font-semibold min-w-[140px]">
-                        Take a Tour
-                      </Button>
                       <Button variant="outline" size="lg" onClick={() => {
                       document.getElementById('faq-section')?.scrollIntoView({
                         behavior: 'smooth'
