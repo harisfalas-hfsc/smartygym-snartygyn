@@ -586,7 +586,7 @@ const Index = () => {
           </div>
 
                   {/* Three Column Layout: Explore | Who is SmartyGym For? | Credentials */}
-                  <HeroThreeColumns className="py-[25px]" />
+                  <HeroThreeColumns />
 
                   {/* 100% Human. 0% AI Section */}
                   <div className="pt-6">
