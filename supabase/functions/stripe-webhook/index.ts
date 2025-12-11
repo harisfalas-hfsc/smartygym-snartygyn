@@ -2,6 +2,7 @@ import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import Stripe from "https://esm.sh/stripe@18.5.0";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.57.2";
 import { Resend } from "https://esm.sh/resend@2.0.0";
+import { getEmailHeaders, getEmailFooter } from "../_shared/email-utils.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -209,6 +210,7 @@ async function sendFirstPurchaseWelcome(userId: string, userEmail: string, supab
       from: 'SmartyGym <notifications@smartygym.com>',
       to: [userEmail],
       subject: subject,
+      headers: getEmailHeaders(userEmail),
       html: `
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
           <h1 style="color: #d4af37; margin-bottom: 20px;">Welcome to the SmartyGym Family! 🎉</h1>
@@ -227,8 +229,7 @@ async function sendFirstPurchaseWelcome(userId: string, userEmail: string, supab
           </p>
           <p style="font-size: 16px; line-height: 1.6; margin-top: 24px;">Welcome aboard – let's make it happen!</p>
           <p style="font-size: 16px; margin-top: 16px;"><em>The SmartyGym Team</em></p>
-          <hr style="margin: 32px 0; border: none; border-top: 1px solid #eee;">
-          <p style="font-size: 12px; color: #999;">This email was sent from SmartyGym.</p>
+          ${getEmailFooter(userEmail)}
         </div>
       `,
     });
@@ -326,6 +327,7 @@ async function handleCorporateSubscriptionCheckout(
         from: 'SmartyGym <notifications@smartygym.com>',
         to: [userEmail],
         subject: '🎉 Welcome to Smarty Corporate!',
+        headers: getEmailHeaders(userEmail),
         html: `
           <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
             <h1 style="color: #d4af37; margin-bottom: 20px;">Welcome to Smarty Corporate! 🏢</h1>
@@ -339,8 +341,7 @@ async function handleCorporateSubscriptionCheckout(
             <p style="margin-top: 24px;">
               <a href="https://smartygym.com/corporate-admin" style="display: inline-block; background: #d4af37; color: white; padding: 14px 28px; text-decoration: none; border-radius: 4px; font-weight: bold; font-size: 16px;">Add Team Members →</a>
             </p>
-            <hr style="margin: 32px 0; border: none; border-top: 1px solid #eee;">
-            <p style="font-size: 12px; color: #999;">This email was sent from SmartyGym.</p>
+            ${getEmailFooter(userEmail)}
           </div>
         `,
       });
@@ -535,6 +536,7 @@ async function handleSubscriptionCheckout(
           from: 'SmartyGym <notifications@smartygym.com>',
           to: [userEmail],
           subject: subject,
+          headers: getEmailHeaders(userEmail),
           html: `
             <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
               <h1 style="color: #d4af37; margin-bottom: 20px;">Welcome to ${planName}! 🎉</h1>
@@ -543,8 +545,7 @@ async function handleSubscriptionCheckout(
               <p style="margin-top: 24px;">
                 <a href="https://smartygym.com/dashboard" style="display: inline-block; background: #d4af37; color: white; padding: 14px 28px; text-decoration: none; border-radius: 4px; font-weight: bold; font-size: 16px;">Go to Dashboard →</a>
               </p>
-              <hr style="margin: 32px 0; border: none; border-top: 1px solid #eee;">
-              <p style="font-size: 12px; color: #999;">This email was sent from SmartyGym.</p>
+              ${getEmailFooter(userEmail)}
             </div>
           `,
         });
@@ -705,6 +706,7 @@ async function handleOneTimePurchase(
         from: 'SmartyGym <notifications@smartygym.com>',
         to: [userEmail],
         subject: subject,
+        headers: getEmailHeaders(userEmail),
         html: `
           <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
             <h1 style="color: #d4af37; margin-bottom: 20px;">Purchase Confirmed! 🎉</h1>
@@ -713,8 +715,7 @@ async function handleOneTimePurchase(
             <p style="margin-top: 24px;">
               <a href="https://smartygym.com/dashboard" style="display: inline-block; background: #d4af37; color: white; padding: 14px 28px; text-decoration: none; border-radius: 4px; font-weight: bold; font-size: 16px;">Go to Dashboard →</a>
             </p>
-            <hr style="margin: 32px 0; border: none; border-top: 1px solid #eee;">
-            <p style="font-size: 12px; color: #999;">This email was sent from SmartyGym.</p>
+            ${getEmailFooter(userEmail)}
           </div>
         `,
       });
@@ -925,7 +926,8 @@ async function handleSubscriptionCancellation(
             from: "SmartyGym <notifications@smartygym.com>",
             to: [userEmail],
             subject: subject,
-            html: htmlEmail,
+            headers: getEmailHeaders(userEmail),
+            html: htmlEmail.replace('</body>', `${getEmailFooter(userEmail)}</body>`),
           });
           logStep("Cancellation email sent successfully", { email: userEmail });
         }
@@ -1051,20 +1053,53 @@ async function handleInvoicePaymentFailed(
 
   logStep("Invoice payment failed", { userId: existingSub.user_id });
 
+  // Get user email
+  const { data: userData } = await supabase.auth.admin.getUserById(existingSub.user_id);
+  const userEmail = userData?.user?.email;
+
   // Update subscription status to past_due
   await supabase
     .from('user_subscriptions')
     .update({ status: 'past_due' })
     .eq('user_id', existingSub.user_id);
 
-  // Send payment failure notification
+  // Send payment failure dashboard notification
   await supabase
     .from('user_system_messages')
     .insert({
       user_id: existingSub.user_id,
-      subject: 'Payment Failed',
-      content: '<p class="tiptap-paragraph">We were unable to process your subscription payment.</p><p class="tiptap-paragraph"></p><p class="tiptap-paragraph">Please update your payment method to continue your subscription.</p>',
+      subject: '⚠️ Payment Failed',
+      content: '<p class="tiptap-paragraph">We were unable to process your subscription payment.</p><p class="tiptap-paragraph"></p><p class="tiptap-paragraph">Please update your payment method to continue your subscription and maintain access to your premium features.</p><p class="tiptap-paragraph"></p><p class="tiptap-paragraph"><a href="/pricing" style="color: #D4AF37;">Update Payment Method →</a></p>',
       message_type: 'renewal_reminder',
       is_read: false,
     });
+  logStep("Payment failure dashboard notification sent");
+
+  // Send payment failure email
+  if (userEmail) {
+    try {
+      const resend = new Resend(Deno.env.get('RESEND_API_KEY'));
+      await resend.emails.send({
+        from: 'SmartyGym <notifications@smartygym.com>',
+        to: [userEmail],
+        subject: '⚠️ Payment Failed - Action Required',
+        headers: getEmailHeaders(userEmail),
+        html: `
+          <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
+            <h1 style="color: #d4af37; margin-bottom: 20px;">Payment Failed</h1>
+            <p style="font-size: 16px; line-height: 1.6; margin-bottom: 16px;">We were unable to process your subscription payment.</p>
+            <p style="font-size: 16px; line-height: 1.6; margin-bottom: 16px;">To continue enjoying your premium features and avoid any interruption to your service, please update your payment method as soon as possible.</p>
+            <p style="font-size: 16px; line-height: 1.6; margin-bottom: 24px;">If you have any questions or need assistance, please don't hesitate to contact us.</p>
+            <p style="margin-top: 24px;">
+              <a href="https://smartygym.com/pricing" style="display: inline-block; background: #d4af37; color: white; padding: 14px 28px; text-decoration: none; border-radius: 4px; font-weight: bold; font-size: 16px;">Update Payment Method →</a>
+            </p>
+            ${getEmailFooter(userEmail)}
+          </div>
+        `,
+      });
+      logStep("✅ Payment failure email sent", { email: userEmail });
+    } catch (emailError) {
+      logStep("ERROR sending payment failure email", { error: emailError });
+    }
+  }
 }
