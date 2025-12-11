@@ -141,9 +141,9 @@ export const HeroThreeColumns = () => {
   ];
 
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-[1fr_2px_1fr_2px_1fr] gap-6 lg:gap-8 mt-8">
+    <div className="flex flex-col lg:flex-row lg:items-start gap-8 lg:gap-0 mt-8">
       {/* Column 1: Explore */}
-      <div className="space-y-4">
+      <div className="lg:pr-8 lg:border-r lg:border-primary/30">
         <h3 className="text-lg font-bold text-foreground mb-4 flex items-center gap-2">
           <span className="w-2 h-2 rounded-full bg-primary"></span>
           Explore
@@ -163,11 +163,11 @@ export const HeroThreeColumns = () => {
         </div>
       </div>
 
-      {/* Gold Divider 1 */}
-      <div className="hidden lg:block w-px bg-primary/30 self-stretch" />
+      {/* Flexible Spacer 1 */}
+      <div className="hidden lg:block lg:flex-1 lg:min-w-12" />
 
       {/* Column 2: Who is SmartyGym For? */}
-      <div className="space-y-4">
+      <div className="lg:pr-8 lg:border-r lg:border-primary/30">
         <h3 className="text-lg font-bold text-foreground mb-4 flex items-center gap-2">
           <span className="w-2 h-2 rounded-full bg-primary"></span>
           Who is <span className="text-primary ml-1">SmartyGym</span> <span className="ml-1">For?</span>
@@ -186,11 +186,11 @@ export const HeroThreeColumns = () => {
         </div>
       </div>
 
-      {/* Gold Divider 2 */}
-      <div className="hidden lg:block w-px bg-primary/30 self-stretch" />
+      {/* Flexible Spacer 2 */}
+      <div className="hidden lg:block lg:flex-1 lg:min-w-12" />
 
       {/* Column 3: Credentials */}
-      <div className="space-y-4">
+      <div>
         <h3 className="text-lg font-bold text-foreground mb-4 flex items-center gap-2">
           <span className="w-2 h-2 rounded-full bg-primary"></span>
           Why SmartyGym
