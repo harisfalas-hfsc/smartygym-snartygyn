@@ -579,7 +579,7 @@ const Index = () => {
             <div className="inline-flex items-center gap-2 px-3 md:px-4 py-1.5 md:py-2 bg-primary/5 border border-primary/20 rounded-full">
               <Sparkles className="h-3 w-3 md:h-4 md:w-4 text-primary flex-shrink-0" />
               <p className="text-sm md:text-base lg:text-lg font-semibold text-primary italic text-center">
-                Where Science Meets Convenience. Where Real Coaches guide Real People.
+                Where Science Meets Convenience. Where Real Coaches Guide Real People.
               </p>
               <Sparkles className="h-3 w-3 md:h-4 md:w-4 text-primary flex-shrink-0" />
             </div>
