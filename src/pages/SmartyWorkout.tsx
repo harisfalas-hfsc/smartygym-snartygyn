@@ -74,7 +74,7 @@ const SmartyWorkout = () => {
           {/* Title Card */}
           <Card className="mb-8 bg-gradient-to-br from-primary/5 via-background to-primary/5 border-2 border-primary/40 shadow-gold">
             <div className="p-4 sm:p-6">
-              <h1 className="text-2xl sm:text-3xl font-bold mb-4 text-center text-primary">About SmartyWorkout</h1>
+              <h1 className="text-2xl sm:text-3xl font-bold mb-4 text-center text-primary">About Smarty Coach</h1>
               <div className="text-muted-foreground max-w-3xl mx-auto text-center space-y-3">
                 <p className="font-bold text-foreground sm:text-lg text-sm">
                   This is not the ordinary AI workout generator or a robot creating generic routines you are seeing everywhere.
