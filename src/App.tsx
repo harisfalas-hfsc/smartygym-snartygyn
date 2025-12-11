@@ -40,6 +40,7 @@ import BMRCalculator from "./pages/BMRCalculator";
 import MacroTrackingCalculator from "./pages/MacroTrackingCalculator";
 import ExerciseLibrary from "./pages/ExerciseLibrary";
 import CorporateAdmin from "./pages/CorporateAdmin";
+import CalculatorHistory from "./pages/CalculatorHistory";
 
 import Tools from "./pages/Tools";
 import FreeContent from "./pages/FreeContent";
@@ -146,6 +147,7 @@ const AppContent = () => {
                   <Route path="/bmrcalculator" element={<BMRCalculator />} />
                   <Route path="/macrocalculator" element={<MacroTrackingCalculator />} />
                   <Route path="/caloriecalculator" element={<MacroTrackingCalculator />} />
+                  <Route path="/calculator-history" element={<CalculatorHistory />} />
                 </Route>
                 
                 {/* Admin Routes with Role Check */}
