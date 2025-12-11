@@ -19,6 +19,7 @@ import { cn } from "@/lib/utils";
 import { useAccessControl } from "@/hooks/useAccessControl";
 import { ScrollReveal } from "@/components/ScrollReveal";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { HeroThreeColumns } from "@/components/HeroThreeColumns";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
@@ -569,121 +570,8 @@ const Index = () => {
                     <meta itemProp="description" content="SmartyGym - #1 online gym and fitness platform by Haris Falas - smartygym.com" />
                   </div>
 
-                  {/* Four Core Messages - Horizontal Text Row */}
-                  <div className="flex flex-wrap justify-center items-center gap-x-8 gap-y-3 mt-2 mb-6">
-                    <div className="flex items-center gap-2">
-                      <Sparkles className="w-5 h-5 text-primary" />
-                      <span className="text-sm font-semibold">Online Fitness Redefined</span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <Smartphone className="w-5 h-5 text-primary" />
-                      <span className="text-sm font-semibold">Your Gym In Your Pocket</span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <UserCheck className="w-5 h-5 text-primary" />
-                      <span className="text-sm font-semibold">
-                        <span className="text-red-600">100% Human.</span> 0% AI.
-                      </span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <Plane className="w-5 h-5 text-primary" />
-                      <span className="text-sm font-semibold">Train Anywhere, Anytime</span>
-                    </div>
-                  </div>
-
-                  {/* Feature Cards Grid - 2 Rows x 3 Columns */}
-                  <div className="max-w-5xl mx-auto">
-                    <div className="grid grid-cols-3 gap-4">
-                      {heroCards.map(card => {
-                        const Icon = card.icon;
-                        return <Card key={card.id} className="border-2 border-primary/30 hover:border-primary hover:shadow-lg hover:scale-105 hover:bg-primary/5 transition-all duration-300 cursor-pointer group" onClick={() => navigate(card.route)}>
-                            <div className="flex flex-col items-center justify-center gap-3 p-5">
-                              <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-primary/10 group-hover:bg-primary/30 group-hover:scale-110 transition-all duration-300">
-                                <Icon className="w-8 h-8 text-primary" />
-                              </div>
-                              <h3 className="text-base font-bold text-center leading-tight">
-                                {card.title}
-                              </h3>
-                              <p className="text-xs text-muted-foreground text-center leading-snug">
-                                {card.description}
-                              </p>
-                            </div>
-                          </Card>;
-                      })}
-                    </div>
-                  </div>
-
-                  {/* CTA Buttons - Only visible for non-logged-in visitors */}
-                  {!user && <div className="flex flex-wrap justify-center gap-4 pt-6">
-                      <Button variant="outline" size="lg" onClick={() => navigate('/premiumbenefits')} className="font-semibold min-w-[140px]">
-                        Get Started
-                      </Button>
-                      <Button variant="outline" size="lg" onClick={() => {
-                      document.getElementById('faq-section')?.scrollIntoView({
-                        behavior: 'smooth'
-                      });
-                    }} className="font-semibold min-w-[140px]">
-                        FAQ
-                      </Button>
-                    </div>}
-
-                  {/* Who Is Smarty Gym For? Section */}
-                  <div className="pt-1">
-                    <Card className="border-2 border-primary bg-gradient-to-br from-primary/5 to-accent/10 overflow-hidden relative">
-                      <div className="absolute top-0 right-0 w-32 h-32 bg-primary/10 rounded-full -mr-16 -mt-16" aria-hidden="true"></div>
-                      <div className="absolute bottom-0 left-0 w-24 h-24 bg-accent/20 rounded-full -ml-12 -mb-12" aria-hidden="true"></div>
-                      <div className="p-6 sm:p-8 space-y-4 relative">
-                        <h2 className="text-xl sm:text-2xl font-bold text-center text-foreground">
-                          Who Is Smarty Gym For?
-                        </h2>
-                        <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 sm:gap-3">
-                          <div className="flex flex-col gap-1 p-3">
-                            <div className="flex items-center gap-2">
-                              <Users className="w-5 h-5 text-primary flex-shrink-0" />
-                              <span className="text-sm font-semibold text-foreground">Busy adults</span>
-                            </div>
-                            <p className="text-xs text-muted-foreground ml-7">Quick, effective workouts that fit your schedule</p>
-                          </div>
-                          <div className="flex flex-col gap-1 p-3">
-                            <div className="flex items-center gap-2">
-                              <Heart className="w-5 h-5 text-primary flex-shrink-0" />
-                              <span className="text-sm font-semibold text-foreground">Parents</span>
-                            </div>
-                            <p className="text-xs text-muted-foreground ml-7">Train at home while kids play nearby</p>
-                          </div>
-                          <div className="flex flex-col gap-1 p-3">
-                            <div className="flex items-center gap-2">
-                              <GraduationCap className="w-5 h-5 text-primary flex-shrink-0" />
-                              <span className="text-sm font-semibold text-foreground">Beginners</span>
-                            </div>
-                            <p className="text-xs text-muted-foreground ml-7">Start your fitness journey with guided programs</p>
-                          </div>
-                          <div className="flex flex-col gap-1 p-3">
-                            <div className="flex items-center gap-2">
-                              <Target className="w-5 h-5 text-primary flex-shrink-0" />
-                              <span className="text-sm font-semibold text-foreground">Intermediate lifters</span>
-                            </div>
-                            <p className="text-xs text-muted-foreground ml-7">Push past plateaus with structured plans</p>
-                          </div>
-                          <div className="flex flex-col gap-1 p-3">
-                            <div className="flex items-center gap-2">
-                              <Plane className="w-5 h-5 text-primary flex-shrink-0" />
-                              <span className="text-sm font-semibold text-foreground">Travelers</span>
-                            </div>
-                            <p className="text-xs text-muted-foreground ml-7">Stay consistent wherever you go</p>
-                          </div>
-                          <div className="flex flex-col gap-1 p-3">
-                            <div className="flex items-center gap-2">
-                              <Dumbbell className="w-5 h-5 text-primary flex-shrink-0" />
-                              <span className="text-sm font-semibold text-foreground">Gym-goers</span>
-                            </div>
-                            <p className="text-xs text-muted-foreground ml-7">Enhance your gym routine with expert guidance</p>
-                          </div>
-                        </div>
-
-                      </div>
-                    </Card>
-                  </div>
+                  {/* Three Column Layout: Explore | Who is SmartyGym For? | Credentials */}
+                  <HeroThreeColumns />
 
                   {/* 100% Human. 0% AI Section */}
                   <div className="pt-6">
