@@ -1,10 +1,14 @@
 import { Helmet } from "react-helmet";
 import { Card } from "@/components/ui/card";
-import { AlertTriangle, Heart, Scale, Shield, Users, FileCheck } from "lucide-react";
-
+import { Button } from "@/components/ui/button";
+import { AlertTriangle, Heart, Scale, Shield, Users, FileCheck, ArrowLeft } from "lucide-react";
 import { ParQQuestionnaire } from "@/components/ParQQuestionnaire";
+import { PageBreadcrumbs } from "@/components/PageBreadcrumbs";
+import { useShowBackButton } from "@/hooks/useShowBackButton";
 
 const Disclaimer = () => {
+  const { canGoBack, goBack } = useShowBackButton();
+
   return (
     <>
       <Helmet>
@@ -19,8 +23,19 @@ const Disclaimer = () => {
       </Helmet>
 
       <div className="min-h-screen bg-background">
-        
-        <div className="container mx-auto px-4 py-16 max-w-4xl">
+        <div className="container mx-auto px-4 py-8 max-w-4xl">
+          {canGoBack && (
+            <Button variant="ghost" size="sm" onClick={goBack} className="mb-4">
+              <ArrowLeft className="mr-2 h-4 w-4" />
+              Back
+            </Button>
+          )}
+          
+          <PageBreadcrumbs items={[
+            { label: "Home", href: "/" },
+            { label: "Disclaimer" }
+          ]} />
+
           <div className="flex items-center gap-3 mb-8">
             <AlertTriangle className="h-10 w-10 text-primary" />
             <h1 className="text-4xl font-bold">Disclaimer - SmartyGym.com</h1>

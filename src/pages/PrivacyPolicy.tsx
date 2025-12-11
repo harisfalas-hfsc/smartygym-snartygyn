@@ -1,9 +1,13 @@
 import { Helmet } from "react-helmet";
 import { Card } from "@/components/ui/card";
-import { Shield, Lock, Eye, FileText, Users, AlertCircle } from "lucide-react";
-
+import { Button } from "@/components/ui/button";
+import { Shield, Lock, Eye, FileText, Users, AlertCircle, ArrowLeft } from "lucide-react";
+import { PageBreadcrumbs } from "@/components/PageBreadcrumbs";
+import { useShowBackButton } from "@/hooks/useShowBackButton";
 
 const PrivacyPolicy = () => {
+  const { canGoBack, goBack } = useShowBackButton();
+
   return (
     <>
       <Helmet>
@@ -18,8 +22,19 @@ const PrivacyPolicy = () => {
       </Helmet>
 
       <div className="min-h-screen bg-background">
-        
-        <div className="container mx-auto px-4 py-16 max-w-4xl">
+        <div className="container mx-auto px-4 py-8 max-w-4xl">
+          {canGoBack && (
+            <Button variant="ghost" size="sm" onClick={goBack} className="mb-4">
+              <ArrowLeft className="mr-2 h-4 w-4" />
+              Back
+            </Button>
+          )}
+          
+          <PageBreadcrumbs items={[
+            { label: "Home", href: "/" },
+            { label: "Privacy Policy" }
+          ]} />
+
           <div className="flex items-center gap-3 mb-8">
             <Shield className="h-10 w-10 text-primary" />
             <h1 className="text-4xl font-bold">Privacy Policy - SmartyGym.com</h1>
