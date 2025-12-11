@@ -573,7 +573,7 @@ const Index = () => {
             </div>
 
                   {/* Tagline/Slogan */}
-                  <p className="text-center text-lg sm:text-xl font-semibold text-muted-foreground mt-4 mb-6">
+                  <p className="text-center text-lg sm:text-xl font-semibold text-primary mt-4 mb-10">
                     Where Science Meets Convenience. Where Real Coaches guide Real people.
                   </p>
 
