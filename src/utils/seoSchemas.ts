@@ -1,6 +1,7 @@
 /**
  * Comprehensive SEO Schema Generators for SmartyGym
  * All JSON-LD structured data for Google, AI search, and rich results
+ * Enhanced for global markets: US, UK, EU, AU, CA
  */
 
 // FAQ Schema for FAQ pages
@@ -45,14 +46,15 @@ export const generateHowToSchema = (howTo: {
   }
 });
 
-// Fitness Center / Health Club Schema
+// Fitness Center / Health Club Schema (Full)
 export const generateFitnessCenterSchemaFull = () => ({
   "@context": "https://schema.org",
   "@type": "HealthClub",
   "@id": "https://smartygym.com/#organization",
   "name": "SmartyGym",
   "alternateName": ["Smarty Gym", "SmartyGym Online", "HFSC Performance", "smartygym.com"],
-  "description": "Global online fitness platform with 500+ expert-designed workouts and training programs. 100% human-designed by Sports Scientist Haris Falas. Train anywhere, anytime.",
+  "description": "Global online fitness platform with 500+ expert-designed workouts and training programs. 100% human-designed by Sports Scientist Haris Falas. Train anywhere, anytime. Zero AI.",
+  "slogan": "100% Human. 0% AI.",
   "url": "https://smartygym.com",
   "logo": {
     "@type": "ImageObject",
@@ -74,13 +76,23 @@ export const generateFitnessCenterSchemaFull = () => ({
     "@type": "Place",
     "name": "Worldwide"
   },
-  "serviceType": ["Online Fitness Training", "Workout Programs", "Training Programs", "Fitness Calculators"],
+  "serviceType": [
+    "Online Fitness Training", 
+    "Workout Programs", 
+    "Training Programs", 
+    "Daily Movement Rituals",
+    "Fitness Calculators",
+    "Corporate Wellness"
+  ],
   "amenityFeature": [
     { "@type": "LocationFeatureSpecification", "name": "500+ Expert Workouts", "value": true },
     { "@type": "LocationFeatureSpecification", "name": "Multi-Week Training Programs", "value": true },
+    { "@type": "LocationFeatureSpecification", "name": "Daily Workout of the Day", "value": true },
+    { "@type": "LocationFeatureSpecification", "name": "Daily Smarty Ritual", "value": true },
     { "@type": "LocationFeatureSpecification", "name": "Fitness Calculators", "value": true },
     { "@type": "LocationFeatureSpecification", "name": "Exercise Library", "value": true },
-    { "@type": "LocationFeatureSpecification", "name": "Daily Workout of the Day", "value": true }
+    { "@type": "LocationFeatureSpecification", "name": "Community Features", "value": true },
+    { "@type": "LocationFeatureSpecification", "name": "Corporate Plans", "value": true }
   ],
   "founder": {
     "@type": "Person",
@@ -110,12 +122,13 @@ export const generateHarisFalasSchema = () => ({
   "name": "Haris Falas",
   "alternateName": ["Coach Haris", "HFSC"],
   "jobTitle": "Sports Scientist & Strength and Conditioning Coach",
-  "description": "BSc Sports Science and CSCS certified coach with 20+ years experience. Founder of SmartyGym - leading online fitness platform with 100% human-designed workouts and training programs.",
+  "description": "BSc Sports Science and CSCS certified coach with 20+ years experience. Founder of SmartyGym - leading global online fitness platform with 100% human-designed workouts and training programs. Zero AI.",
   "image": "https://smartygym.com/haris-falas-coach.png",
   "url": "https://smartygym.com/coach-profile",
   "sameAs": [
     "https://smartygym.com",
-    "https://www.instagram.com/smartygymcy/"
+    "https://www.instagram.com/smartygymcy/",
+    "https://www.youtube.com/@TheSmartyGym"
   ],
   "hasCredential": [
     {
@@ -135,18 +148,13 @@ export const generateHarisFalasSchema = () => ({
     }
   ],
   "knowsAbout": [
-    "Strength Training",
-    "Sports Science",
-    "Functional Fitness",
-    "Exercise Physiology",
-    "Program Design",
-    "Metabolic Conditioning",
-    "Mobility Training",
-    "HIIT Training",
-    "Athletic Performance",
-    "Evidence-Based Training",
-    "Periodization",
-    "Progressive Overload"
+    "Strength Training", "Sports Science", "Functional Fitness",
+    "Exercise Physiology", "Program Design", "Metabolic Conditioning",
+    "Mobility Training", "HIIT Training", "Athletic Performance",
+    "Evidence-Based Training", "Periodization", "Progressive Overload",
+    "Bodyweight Training", "Weight Loss Programming", "Muscle Hypertrophy",
+    "Cardio Endurance", "Low Back Rehabilitation", "Online Coaching",
+    "Corporate Wellness", "Daily Movement Optimization"
   ],
   "worksFor": {
     "@type": "Organization",
@@ -170,6 +178,14 @@ export const generateHarisFalasSchema = () => ({
         "name": "Training Programs",
         "description": "Multi-week structured training programs"
       }
+    },
+    {
+      "@type": "Offer",
+      "itemOffered": {
+        "@type": "Service",
+        "name": "Daily Smarty Ritual",
+        "description": "All-day movement, recovery, and performance system"
+      }
     }
   ]
 });
@@ -179,14 +195,14 @@ export const generateSubscriptionProductSchema = (plan: 'gold' | 'platinum') => 
   const plans = {
     gold: {
       name: "SmartyGym Gold Plan",
-      description: "Monthly premium membership with unlimited access to 500+ workouts, all training programs, fitness calculators, and exercise library. Cancel anytime.",
+      description: "Monthly premium membership with unlimited access to 500+ workouts, all training programs, Daily Smarty Ritual, fitness calculators, and exercise library. 100% human-designed by Sports Scientist Haris Falas. Cancel anytime.",
       price: "9.99",
       billingDuration: "P1M",
-      features: ["Unlimited Workouts", "All Training Programs", "Fitness Calculators", "Exercise Library", "Flexible Monthly Billing"]
+      features: ["Unlimited Workouts", "All Training Programs", "Daily Smarty Ritual", "Fitness Calculators", "Exercise Library", "Flexible Monthly Billing"]
     },
     platinum: {
       name: "SmartyGym Platinum Plan",
-      description: "Yearly premium membership with unlimited access to everything in Gold plus 25% savings. Best value for committed fitness enthusiasts.",
+      description: "Yearly premium membership with unlimited access to everything in Gold plus 25% savings. Best value for committed fitness enthusiasts. 100% human-designed content.",
       price: "89.99",
       billingDuration: "P1Y",
       features: ["Everything in Gold", "25% Savings", "Lock in Rate for 12 Months", "Priority Support", "Best Value"]
@@ -365,10 +381,14 @@ export const generateNavigationSchema = () => ({
   "@type": "SiteNavigationElement",
   "name": "Main Navigation",
   "hasPart": [
-    { "@type": "WebPage", "name": "Workouts", "url": "https://smartygym.com/workout" },
-    { "@type": "WebPage", "name": "Training Programs", "url": "https://smartygym.com/trainingprogram" },
-    { "@type": "WebPage", "name": "Tools", "url": "https://smartygym.com/tools" },
+    { "@type": "WebPage", "name": "Smarty Workouts", "url": "https://smartygym.com/workout" },
+    { "@type": "WebPage", "name": "Smarty Programs", "url": "https://smartygym.com/trainingprogram" },
+    { "@type": "WebPage", "name": "Smarty Ritual", "url": "https://smartygym.com/daily-ritual" },
+    { "@type": "WebPage", "name": "Smarty Tools", "url": "https://smartygym.com/tools" },
+    { "@type": "WebPage", "name": "Smarty Corporate", "url": "https://smartygym.com/corporate" },
     { "@type": "WebPage", "name": "Blog", "url": "https://smartygym.com/blog" },
+    { "@type": "WebPage", "name": "Community", "url": "https://smartygym.com/community" },
+    { "@type": "WebPage", "name": "Exercise Library", "url": "https://smartygym.com/exerciselibrary" },
     { "@type": "WebPage", "name": "Coach Profile", "url": "https://smartygym.com/coach-profile" },
     { "@type": "WebPage", "name": "Premium", "url": "https://smartygym.com/join-premium" }
   ]
@@ -380,7 +400,7 @@ export const generateWebAppSchema = () => ({
   "@type": "WebApplication",
   "name": "SmartyGym",
   "alternateName": "SmartyGym Online Fitness Platform",
-  "description": "Global online fitness platform with 500+ workouts and training programs by Sports Scientist Haris Falas",
+  "description": "Global online fitness platform with 500+ workouts and training programs by Sports Scientist Haris Falas. 100% Human. 0% AI.",
   "url": "https://smartygym.com",
   "applicationCategory": "HealthApplication",
   "operatingSystem": "Web Browser",
@@ -400,9 +420,133 @@ export const generateWebAppSchema = () => ({
   "featureList": [
     "500+ Expert Workouts",
     "Multi-Week Training Programs",
+    "Daily Workout of the Day",
+    "Daily Smarty Ritual",
     "Fitness Calculators",
     "Exercise Library",
-    "Daily Workout of the Day",
-    "Progress Tracking"
+    "Progress Tracking",
+    "Community Features",
+    "Corporate Plans"
   ]
+});
+
+// Service Array Schema for all SmartyGym services
+export const generateServicesArraySchema = () => ({
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "Service",
+      "name": "Smarty Workouts",
+      "description": "500+ expert-designed single-session workouts including AMRAP, TABATA, HIIT, strength, cardio, metabolic, mobility, and challenge workouts.",
+      "url": "https://smartygym.com/workout",
+      "serviceType": "Online Workout Library",
+      "provider": { "@type": "Organization", "name": "SmartyGym" }
+    },
+    {
+      "@type": "Service",
+      "name": "Smarty Programs",
+      "description": "Multi-week structured training programs for muscle hypertrophy, weight loss, functional strength, cardio endurance, mobility, and rehabilitation.",
+      "url": "https://smartygym.com/trainingprogram",
+      "serviceType": "Training Programs",
+      "provider": { "@type": "Organization", "name": "SmartyGym" }
+    },
+    {
+      "@type": "Service",
+      "name": "Smarty Ritual",
+      "description": "Daily movement, recovery, and performance system with Morning, Midday, and Evening phases for all-day wellbeing.",
+      "url": "https://smartygym.com/daily-ritual",
+      "serviceType": "Wellness Program",
+      "provider": { "@type": "Organization", "name": "SmartyGym" }
+    },
+    {
+      "@type": "Service",
+      "name": "Smarty Tools",
+      "description": "Free fitness calculators including 1RM Calculator, BMR Calculator, and Macro Tracking Calculator.",
+      "url": "https://smartygym.com/tools",
+      "serviceType": "Fitness Tools",
+      "provider": { "@type": "Organization", "name": "SmartyGym" }
+    },
+    {
+      "@type": "Service",
+      "name": "Smarty Corporate",
+      "description": "Corporate fitness subscription plans for teams, businesses, and organizations with centralized billing and team management.",
+      "url": "https://smartygym.com/corporate",
+      "serviceType": "Corporate Wellness",
+      "provider": { "@type": "Organization", "name": "SmartyGym" }
+    }
+  ]
+});
+
+// Blog Schema
+export const generateBlogSchema = () => ({
+  "@context": "https://schema.org",
+  "@type": "Blog",
+  "name": "SmartyGym Fitness Blog",
+  "description": "Expert fitness, wellness, and nutrition articles by Sports Scientist Haris Falas. Evidence-based content for optimal health and performance.",
+  "url": "https://smartygym.com/blog",
+  "author": {
+    "@type": "Person",
+    "name": "Haris Falas",
+    "jobTitle": "Sports Scientist & Strength and Conditioning Coach",
+    "url": "https://smartygym.com/coach-profile"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "SmartyGym",
+    "url": "https://smartygym.com",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "https://smartygym.com/smarty-gym-logo.png"
+    }
+  },
+  "blogPost": [],
+  "inLanguage": "en",
+  "mainEntityOfPage": "https://smartygym.com/blog"
+});
+
+// Community Page Schema
+export const generateCommunitySchema = () => ({
+  "@context": "https://schema.org",
+  "@type": "WebPage",
+  "name": "SmartyGym Community",
+  "description": "Join the SmartyGym fitness community. View leaderboards, member ratings, comments, and connect with fellow fitness enthusiasts worldwide.",
+  "url": "https://smartygym.com/community",
+  "isPartOf": {
+    "@type": "WebSite",
+    "name": "SmartyGym",
+    "url": "https://smartygym.com"
+  },
+  "mainEntity": {
+    "@type": "ItemList",
+    "name": "Community Leaderboards",
+    "description": "Workout completions, program completions, and check-in consistency leaderboards",
+    "itemListOrder": "https://schema.org/ItemListOrderDescending"
+  }
+});
+
+// Check-in Tool Schema
+export const generateCheckInToolSchema = () => ({
+  "@context": "https://schema.org",
+  "@type": "SoftwareApplication",
+  "name": "Smarty Check-ins",
+  "description": "Daily morning and evening check-in system to track sleep, readiness, mood, hydration, and activity. Get your Daily Smarty Score.",
+  "applicationCategory": "HealthApplication",
+  "operatingSystem": "Web Browser",
+  "offers": {
+    "@type": "Offer",
+    "price": "0",
+    "priceCurrency": "EUR",
+    "availability": "https://schema.org/InStock"
+  },
+  "featureList": [
+    "Morning Check-in",
+    "Evening Check-in", 
+    "Daily Smarty Score",
+    "Streak Tracking",
+    "Wellness Insights"
+  ],
+  "creator": {
+    "@type": "Organization",
+    "name": "SmartyGym"
+  }
 });

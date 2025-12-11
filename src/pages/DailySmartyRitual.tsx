@@ -13,6 +13,7 @@ import { HTMLContent } from "@/components/HTMLContent";
 import { RitualCalendarButton } from "@/components/ritual/RitualCalendarButton";
 import { RitualShareDialog } from "@/components/ritual/RitualShareDialog";
 import { PageBreadcrumbs } from "@/components/PageBreadcrumbs";
+import { SEOEnhancer } from "@/components/SEOEnhancer";
 
 import harisPhoto from "@/assets/haris-falas-coach.png";
 
@@ -103,10 +104,22 @@ const DailySmartyRitual = () => {
   if (countdown) {
     return (
       <>
-        <Helmet>
-          <title>Smarty Ritual | Daily Movement Ritual | Haris Falas | SmartyGym</title>
-          <meta name="description" content="Your daily movement ritual for optimal performance - Morning, Midday, and Evening phases designed by Haris Falas" />
-        </Helmet>
+      <Helmet>
+        <title>Smarty Ritual | Daily Movement System | Morning Midday Evening Routine | Haris Falas | SmartyGym</title>
+        <meta name="description" content="Daily Smarty Ritual - All-day movement, recovery, and performance system by Sports Scientist Haris Falas. Morning activation, Midday reset, Evening unwind. 100% human-designed wellness routine. Train your lifestyle." />
+        <meta name="keywords" content="daily movement ritual, morning routine workout, midday movement, evening recovery, wellness routine, daily fitness habit, movement system, recovery routine, performance optimization, Haris Falas, SmartyGym, daily wellness, lifestyle fitness, morning activation, mobility routine" />
+        <link rel="canonical" href="https://smartygym.com/daily-ritual" />
+        
+        <meta property="og:title" content="Smarty Ritual | Daily Movement System | SmartyGym" />
+        <meta property="og:description" content="All-day movement, recovery, and performance system with Morning, Midday, and Evening phases by Sports Scientist Haris Falas" />
+        <meta property="og:type" content="website" />
+        <meta property="og:url" content="https://smartygym.com/daily-ritual" />
+        <meta property="og:image" content="https://smartygym.com/smarty-gym-logo.png" />
+        
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content="Smarty Ritual | Daily Movement System" />
+        <meta name="twitter:description" content="Morning, Midday, and Evening wellness phases designed by Haris Falas" />
+      </Helmet>
         <div className="min-h-screen bg-background">
           <div className="container mx-auto max-w-4xl px-4 pb-8">
             {canGoBack && (
@@ -190,9 +203,66 @@ const DailySmartyRitual = () => {
   return (
     <>
       <Helmet>
-        <title>Smarty Ritual | Daily Movement Ritual | Haris Falas | SmartyGym</title>
-        <meta name="description" content="Your daily movement ritual for optimal performance - Morning, Midday, and Evening phases designed by Haris Falas" />
+        <title>Smarty Ritual | Daily Movement System | Morning Midday Evening Routine | Haris Falas | SmartyGym</title>
+        <meta name="description" content="Daily Smarty Ritual - All-day movement, recovery, and performance system by Sports Scientist Haris Falas. Morning activation, Midday reset, Evening unwind. 100% human-designed wellness routine. Train your lifestyle." />
+        <meta name="keywords" content="daily movement ritual, morning routine workout, midday movement, evening recovery, wellness routine, daily fitness habit, movement system, recovery routine, performance optimization, Haris Falas, SmartyGym, daily wellness, lifestyle fitness, morning activation, mobility routine" />
+        <link rel="canonical" href="https://smartygym.com/daily-ritual" />
+        
+        <meta property="og:title" content="Smarty Ritual | Daily Movement System | SmartyGym" />
+        <meta property="og:description" content="All-day movement, recovery, and performance system with Morning, Midday, and Evening phases by Sports Scientist Haris Falas" />
+        <meta property="og:type" content="website" />
+        <meta property="og:url" content="https://smartygym.com/daily-ritual" />
+        <meta property="og:image" content="https://smartygym.com/smarty-gym-logo.png" />
+        
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content="Smarty Ritual | Daily Movement System" />
+        <meta name="twitter:description" content="Morning, Midday, and Evening wellness phases designed by Haris Falas" />
+        
+        <script type="application/ld+json">
+          {JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "Service",
+            "name": "Smarty Ritual - Daily Movement System",
+            "description": "All-day movement, recovery, and performance system with Morning, Midday, and Evening phases designed by Sports Scientist Haris Falas.",
+            "serviceType": "Wellness & Movement Program",
+            "url": "https://smartygym.com/daily-ritual",
+            "provider": {
+              "@type": "Organization",
+              "name": "SmartyGym",
+              "url": "https://smartygym.com"
+            },
+            "creator": {
+              "@type": "Person",
+              "name": "Haris Falas",
+              "jobTitle": "Sports Scientist"
+            },
+            "areaServed": { "@type": "Place", "name": "Worldwide" }
+          })}
+        </script>
+        
+        <script type="application/ld+json">
+          {JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "BreadcrumbList",
+            "itemListElement": [
+              { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://smartygym.com" },
+              { "@type": "ListItem", "position": 2, "name": "Smarty Ritual", "item": "https://smartygym.com/daily-ritual" }
+            ]
+          })}
+        </script>
       </Helmet>
+      
+      <SEOEnhancer 
+        entities={["SmartyGym", "Haris Falas", "Daily Smarty Ritual", "Movement System", "Wellness Routine"]}
+        topics={["daily movement ritual", "morning routine", "midday reset", "evening recovery", "wellness optimization", "lifestyle fitness"]}
+        expertise={["Sports Science", "Movement Optimization", "Recovery", "Wellness"]}
+        contentType="wellness-service"
+        aiSummary="Smarty Ritual: Daily all-day movement, recovery, and performance system by Sports Scientist Haris Falas. Three phases: Morning (activation, joint unlock), Midday (desk reset, micro movements), Evening (decompression, sleep hygiene). 100% human-designed for optimal daily wellbeing."
+        aiKeywords={["daily movement ritual", "morning activation", "midday movement", "evening recovery", "wellness routine", "lifestyle fitness", "movement system", "daily wellness"]}
+        relatedContent={["Smarty Workouts", "Smarty Programs", "Smarty Check-ins", "Fitness Tools"]}
+        targetAudience="adults seeking daily movement, desk workers, busy professionals, wellness enthusiasts"
+        pageType="Service"
+      />
 
       <div className="min-h-screen bg-background">
         <div className="container mx-auto max-w-4xl px-4 pb-8">
