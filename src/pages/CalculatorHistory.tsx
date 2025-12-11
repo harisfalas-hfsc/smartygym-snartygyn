@@ -5,11 +5,14 @@ import { User } from "@supabase/supabase-js";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Progress } from "@/components/ui/progress";
 import { useToast } from "@/hooks/use-toast";
-import { ArrowLeft, Trash2, Calculator, Scale, TrendingUp } from "lucide-react";
+import { ArrowLeft, Trash2, Calculator, Scale, TrendingUp, Target, Plus } from "lucide-react";
 import { PageBreadcrumbs } from "@/components/PageBreadcrumbs";
 import { useShowBackButton } from "@/hooks/useShowBackButton";
 import { MeasurementDialog } from "@/components/logbook/MeasurementDialog";
+import { MeasurementGoalDialog } from "@/components/logbook/MeasurementGoalDialog";
+import { RecordDetailDialog } from "@/components/calculators/RecordDetailDialog";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -29,6 +32,7 @@ import {
   Tooltip,
   ResponsiveContainer,
   Legend,
+  ReferenceLine,
 } from "recharts";
 
 interface OneRMRecord {
@@ -73,11 +77,21 @@ interface MeasurementRecord {
   } | null;
 }
 
+interface MeasurementGoal {
+  id: string;
+  target_weight: number | null;
+  target_body_fat: number | null;
+  target_muscle_mass: number | null;
+  target_date: string | null;
+}
+
 type MeasurementData = {
   id: string;
   created_at: string;
   tool_result: unknown;
 };
+
+type RecordType = "1rm" | "bmr" | "macro" | "measurement";
 
 export default function CalculatorHistory() {
   const navigate = useNavigate();
@@ -92,9 +106,17 @@ export default function CalculatorHistory() {
   const [bmrHistory, setBMRHistory] = useState<BMRRecord[]>([]);
   const [calorieHistory, setCalorieHistory] = useState<CalorieRecord[]>([]);
   const [measurementHistory, setMeasurementHistory] = useState<MeasurementRecord[]>([]);
+  const [measurementGoal, setMeasurementGoal] = useState<MeasurementGoal | null>(null);
   
   const [deleteDialog, setDeleteDialog] = useState<{ open: boolean; type: string; id: string } | null>(null);
   const [isMeasurementDialogOpen, setIsMeasurementDialogOpen] = useState(false);
+  const [isGoalDialogOpen, setIsGoalDialogOpen] = useState(false);
+  
+  // Record detail dialog state
+  const [selectedRecord, setSelectedRecord] = useState<{
+    type: RecordType;
+    record: OneRMRecord | BMRRecord | CalorieRecord | { id: string; date: string; weight: number | null; bodyFat: number | null; muscleMass: number | null; } | null;
+  } | null>(null);
 
   useEffect(() => {
     checkAuth();
@@ -117,6 +139,7 @@ export default function CalculatorHistory() {
       fetchBMRHistory(userId),
       fetchCalorieHistory(userId),
       fetchMeasurementHistory(userId),
+      fetchMeasurementGoal(userId),
     ]);
   };
 
@@ -164,6 +187,17 @@ export default function CalculatorHistory() {
     }
   };
 
+  const fetchMeasurementGoal = async (userId: string) => {
+    const { data } = await supabase
+      .from("user_measurement_goals")
+      .select("*")
+      .eq("user_id", userId)
+      .order("created_at", { ascending: false })
+      .limit(1)
+      .single();
+    if (data) setMeasurementGoal(data);
+  };
+
   const handleDelete = async () => {
     if (!deleteDialog || !user) return;
     
@@ -194,6 +228,7 @@ export default function CalculatorHistory() {
       toast({ title: "Deleted", description: "Record deleted successfully" });
     }
     setDeleteDialog(null);
+    setSelectedRecord(null);
   };
 
   const formatDate = (dateString: string) => {
@@ -209,6 +244,33 @@ export default function CalculatorHistory() {
       month: "short",
       day: "numeric",
     });
+  };
+
+  // Get latest measurement for goal progress
+  const latestMeasurement = measurementHistory[0];
+  const currentWeight = latestMeasurement?.tool_result?.weight;
+  const currentBodyFat = latestMeasurement?.tool_result?.body_fat;
+  const currentMuscleMass = latestMeasurement?.tool_result?.muscle_mass;
+
+  // Calculate goal progress
+  const calculateProgress = (current: number | undefined, target: number | null, isDecrease: boolean = false) => {
+    if (!current || !target) return null;
+    if (isDecrease) {
+      // For decreasing goals (like body fat), higher current = less progress
+      const diff = current - target;
+      if (diff <= 0) return 100; // Already at or below target
+      // Assume starting point was 10 units higher than target for progress calc
+      const startingPoint = target + 10;
+      const progress = ((startingPoint - current) / (startingPoint - target)) * 100;
+      return Math.max(0, Math.min(100, progress));
+    } else {
+      // For increasing goals (like muscle mass)
+      if (current >= target) return 100;
+      // Assume starting point was 10 units lower than target
+      const startingPoint = target - 10;
+      const progress = ((current - startingPoint) / (target - startingPoint)) * 100;
+      return Math.max(0, Math.min(100, progress));
+    }
   };
 
   // Prepare chart data
@@ -236,6 +298,31 @@ export default function CalculatorHistory() {
     bodyFat: r.tool_result?.body_fat || 0,
     muscleMass: r.tool_result?.muscle_mass || 0,
   }));
+
+  // Handle record click
+  const handleRecordClick = (type: RecordType, record: OneRMRecord | BMRRecord | CalorieRecord | MeasurementRecord) => {
+    if (type === "measurement") {
+      const m = record as MeasurementRecord;
+      setSelectedRecord({
+        type,
+        record: {
+          id: m.id,
+          date: m.created_at,
+          weight: m.tool_result?.weight || null,
+          bodyFat: m.tool_result?.body_fat || null,
+          muscleMass: m.tool_result?.muscle_mass || null,
+        }
+      });
+    } else {
+      setSelectedRecord({ type, record: record as OneRMRecord | BMRRecord | CalorieRecord });
+    }
+  };
+
+  const handleDeleteFromDialog = () => {
+    if (selectedRecord) {
+      setDeleteDialog({ open: true, type: selectedRecord.type, id: selectedRecord.record?.id || "" });
+    }
+  };
 
   if (loading) {
     return (
@@ -306,7 +393,11 @@ export default function CalculatorHistory() {
 
           <div className="space-y-2">
             {oneRMHistory.map((record) => (
-              <Card key={record.id}>
+              <Card 
+                key={record.id} 
+                className="cursor-pointer hover:bg-muted/50 transition-colors"
+                onClick={() => handleRecordClick("1rm", record)}
+              >
                 <CardContent className="p-4 flex items-center justify-between">
                   <div>
                     <div className="font-semibold">{record.one_rm_result.toFixed(1)} kg</div>
@@ -320,7 +411,10 @@ export default function CalculatorHistory() {
                     variant="ghost"
                     size="icon"
                     className="text-muted-foreground hover:text-destructive"
-                    onClick={() => setDeleteDialog({ open: true, type: "1rm", id: record.id })}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setDeleteDialog({ open: true, type: "1rm", id: record.id });
+                    }}
                   >
                     <Trash2 className="h-4 w-4" />
                   </Button>
@@ -373,7 +467,11 @@ export default function CalculatorHistory() {
 
           <div className="space-y-2">
             {bmrHistory.map((record) => (
-              <Card key={record.id}>
+              <Card 
+                key={record.id} 
+                className="cursor-pointer hover:bg-muted/50 transition-colors"
+                onClick={() => handleRecordClick("bmr", record)}
+              >
                 <CardContent className="p-4 flex items-center justify-between">
                   <div>
                     <div className="font-semibold">{record.bmr_result.toFixed(0)} cal/day</div>
@@ -389,7 +487,10 @@ export default function CalculatorHistory() {
                     variant="ghost"
                     size="icon"
                     className="text-muted-foreground hover:text-destructive"
-                    onClick={() => setDeleteDialog({ open: true, type: "bmr", id: record.id })}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setDeleteDialog({ open: true, type: "bmr", id: record.id });
+                    }}
                   >
                     <Trash2 className="h-4 w-4" />
                   </Button>
@@ -442,7 +543,11 @@ export default function CalculatorHistory() {
 
           <div className="space-y-2">
             {calorieHistory.map((record) => (
-              <Card key={record.id}>
+              <Card 
+                key={record.id} 
+                className="cursor-pointer hover:bg-muted/50 transition-colors"
+                onClick={() => handleRecordClick("macro", record)}
+              >
                 <CardContent className="p-4 flex items-center justify-between">
                   <div>
                     <div className="font-semibold">{record.target_calories.toFixed(0)} cal/day</div>
@@ -456,7 +561,10 @@ export default function CalculatorHistory() {
                     variant="ghost"
                     size="icon"
                     className="text-muted-foreground hover:text-destructive"
-                    onClick={() => setDeleteDialog({ open: true, type: "macro", id: record.id })}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setDeleteDialog({ open: true, type: "macro", id: record.id });
+                    }}
                   >
                     <Trash2 className="h-4 w-4" />
                   </Button>
@@ -475,13 +583,112 @@ export default function CalculatorHistory() {
 
         {/* Measurements Tab */}
         <TabsContent value="measurements" className="space-y-6">
-          <div className="flex justify-between items-center">
+          <div className="flex justify-between items-center flex-wrap gap-2">
             <h2 className="text-lg font-semibold flex items-center gap-2">
               <Scale className="h-5 w-5 text-primary" />
               Measurements ({measurementHistory.length} records)
             </h2>
-            <Button onClick={() => setIsMeasurementDialogOpen(true)}>Add New</Button>
+            <div className="flex gap-2">
+              <Button variant="outline" onClick={() => setIsGoalDialogOpen(true)}>
+                <Target className="h-4 w-4 mr-2" />
+                {measurementGoal ? "Edit Goals" : "Set Goals"}
+              </Button>
+              <Button onClick={() => setIsMeasurementDialogOpen(true)}>
+                <Plus className="h-4 w-4 mr-2" />
+                Add New
+              </Button>
+            </div>
           </div>
+
+          {/* Goal Progress Section */}
+          {measurementGoal && (measurementGoal.target_weight || measurementGoal.target_body_fat || measurementGoal.target_muscle_mass) && (
+            <Card className="border-primary/30 bg-primary/5">
+              <CardHeader className="pb-2">
+                <CardTitle className="text-base flex items-center gap-2">
+                  <Target className="h-4 w-4 text-primary" />
+                  Goal Progress
+                  {measurementGoal.target_date && (
+                    <span className="text-xs font-normal text-muted-foreground ml-auto">
+                      Target: {formatDate(measurementGoal.target_date)}
+                    </span>
+                  )}
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                {measurementGoal.target_weight && (
+                  <div className="space-y-2">
+                    <div className="flex justify-between text-sm">
+                      <span className="text-muted-foreground">Weight</span>
+                      <span className="font-medium">
+                        {currentWeight ? `${currentWeight} kg` : "No data"} → {measurementGoal.target_weight} kg
+                      </span>
+                    </div>
+                    <Progress 
+                      value={currentWeight && measurementGoal.target_weight 
+                        ? (currentWeight > measurementGoal.target_weight 
+                          ? calculateProgress(currentWeight, measurementGoal.target_weight, true) 
+                          : calculateProgress(currentWeight, measurementGoal.target_weight, false))
+                        : 0} 
+                      className="h-2"
+                    />
+                    {currentWeight && measurementGoal.target_weight && (
+                      <p className="text-xs text-muted-foreground">
+                        {currentWeight === measurementGoal.target_weight 
+                          ? "🎉 Target reached!" 
+                          : currentWeight > measurementGoal.target_weight 
+                            ? `${(currentWeight - measurementGoal.target_weight).toFixed(1)} kg to lose`
+                            : `${(measurementGoal.target_weight - currentWeight).toFixed(1)} kg to gain`}
+                      </p>
+                    )}
+                  </div>
+                )}
+
+                {measurementGoal.target_body_fat && (
+                  <div className="space-y-2">
+                    <div className="flex justify-between text-sm">
+                      <span className="text-muted-foreground">Body Fat</span>
+                      <span className="font-medium">
+                        {currentBodyFat ? `${currentBodyFat}%` : "No data"} → {measurementGoal.target_body_fat}%
+                      </span>
+                    </div>
+                    <Progress 
+                      value={calculateProgress(currentBodyFat, measurementGoal.target_body_fat, true) || 0} 
+                      className="h-2"
+                    />
+                    {currentBodyFat && measurementGoal.target_body_fat && (
+                      <p className="text-xs text-muted-foreground">
+                        {currentBodyFat <= measurementGoal.target_body_fat 
+                          ? "🎉 Target reached!" 
+                          : `${(currentBodyFat - measurementGoal.target_body_fat).toFixed(1)}% to lose`}
+                      </p>
+                    )}
+                  </div>
+                )}
+
+                {measurementGoal.target_muscle_mass && (
+                  <div className="space-y-2">
+                    <div className="flex justify-between text-sm">
+                      <span className="text-muted-foreground">Muscle Mass</span>
+                      <span className="font-medium">
+                        {currentMuscleMass ? `${currentMuscleMass} kg` : "No data"} → {measurementGoal.target_muscle_mass} kg
+                      </span>
+                    </div>
+                    <Progress 
+                      value={calculateProgress(currentMuscleMass, measurementGoal.target_muscle_mass, false) || 0} 
+                      className="h-2"
+                    />
+                    {currentMuscleMass && measurementGoal.target_muscle_mass && (
+                      <p className="text-xs text-muted-foreground">
+                        {currentMuscleMass >= measurementGoal.target_muscle_mass 
+                          ? "🎉 Target reached!" 
+                          : `${(measurementGoal.target_muscle_mass - currentMuscleMass).toFixed(1)} kg to gain`}
+                      </p>
+                    )}
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          )}
 
           {measurementHistory.length > 1 && (
             <Card className="bg-primary/5 border-primary/20">
@@ -502,6 +709,16 @@ export default function CalculatorHistory() {
                     <Line type="monotone" dataKey="weight" stroke="hsl(var(--primary))" strokeWidth={2} name="Weight (kg)" />
                     <Line type="monotone" dataKey="bodyFat" stroke="hsl(var(--destructive))" strokeWidth={2} name="Body Fat (%)" />
                     <Line type="monotone" dataKey="muscleMass" stroke="hsl(var(--chart-2))" strokeWidth={2} name="Muscle Mass (kg)" />
+                    {/* Goal reference lines */}
+                    {measurementGoal?.target_weight && (
+                      <ReferenceLine y={measurementGoal.target_weight} stroke="hsl(var(--primary))" strokeDasharray="5 5" label={{ value: `Goal: ${measurementGoal.target_weight}kg`, fill: 'hsl(var(--primary))', fontSize: 10 }} />
+                    )}
+                    {measurementGoal?.target_body_fat && (
+                      <ReferenceLine y={measurementGoal.target_body_fat} stroke="hsl(var(--destructive))" strokeDasharray="5 5" label={{ value: `Goal: ${measurementGoal.target_body_fat}%`, fill: 'hsl(var(--destructive))', fontSize: 10 }} />
+                    )}
+                    {measurementGoal?.target_muscle_mass && (
+                      <ReferenceLine y={measurementGoal.target_muscle_mass} stroke="hsl(var(--chart-2))" strokeDasharray="5 5" label={{ value: `Goal: ${measurementGoal.target_muscle_mass}kg`, fill: 'hsl(var(--chart-2))', fontSize: 10 }} />
+                    )}
                   </LineChart>
                 </ResponsiveContainer>
               </CardContent>
@@ -510,7 +727,11 @@ export default function CalculatorHistory() {
 
           <div className="space-y-2">
             {measurementHistory.map((record) => (
-              <Card key={record.id}>
+              <Card 
+                key={record.id} 
+                className="cursor-pointer hover:bg-muted/50 transition-colors"
+                onClick={() => handleRecordClick("measurement", record)}
+              >
                 <CardContent className="p-4 flex items-center justify-between">
                   <div>
                     <div className="font-semibold">
@@ -526,7 +747,10 @@ export default function CalculatorHistory() {
                     variant="ghost"
                     size="icon"
                     className="text-muted-foreground hover:text-destructive"
-                    onClick={() => setDeleteDialog({ open: true, type: "measurement", id: record.id })}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setDeleteDialog({ open: true, type: "measurement", id: record.id });
+                    }}
                   >
                     <Trash2 className="h-4 w-4" />
                   </Button>
@@ -568,6 +792,24 @@ export default function CalculatorHistory() {
         onClose={() => setIsMeasurementDialogOpen(false)}
         userId={user?.id || ""}
         onSaved={() => user && fetchMeasurementHistory(user.id)}
+      />
+
+      {/* Measurement Goal Dialog */}
+      <MeasurementGoalDialog
+        isOpen={isGoalDialogOpen}
+        onClose={() => setIsGoalDialogOpen(false)}
+        userId={user?.id || ""}
+        currentGoal={measurementGoal}
+        onSaved={() => user && fetchMeasurementGoal(user.id)}
+      />
+
+      {/* Record Detail Dialog */}
+      <RecordDetailDialog
+        isOpen={!!selectedRecord}
+        onClose={() => setSelectedRecord(null)}
+        recordType={selectedRecord?.type || "1rm"}
+        record={selectedRecord?.record || null}
+        onDelete={handleDeleteFromDialog}
       />
     </div>
   );

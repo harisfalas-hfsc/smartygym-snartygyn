@@ -1761,6 +1761,39 @@ export type Database = {
         }
         Relationships: []
       }
+      user_measurement_goals: {
+        Row: {
+          created_at: string
+          id: string
+          target_body_fat: number | null
+          target_date: string | null
+          target_muscle_mass: number | null
+          target_weight: number | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          target_body_fat?: number | null
+          target_date?: string | null
+          target_muscle_mass?: number | null
+          target_weight?: number | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          target_body_fat?: number | null
+          target_date?: string | null
+          target_muscle_mass?: number | null
+          target_weight?: number | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       user_purchases: {
         Row: {
           content_deleted: boolean | null
