@@ -13,6 +13,7 @@ export function getEmailHeaders(userEmail: string): Record<string, string> {
     "List-Unsubscribe": `<${unsubscribeUrl}>, <mailto:unsubscribe@smartygym.com?subject=Unsubscribe>`,
     "List-Unsubscribe-Post": "List-Unsubscribe=One-Click",
     "X-Entity-Ref-ID": crypto.randomUUID(),
+    "Reply-To": "admin@smartygym.com",
   };
 }
 

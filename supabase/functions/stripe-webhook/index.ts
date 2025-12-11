@@ -752,9 +752,10 @@ async function handleSubscriptionUpdate(
   }
 
   const userId = existingSub.user_id;
+  const oldPlanType = existingSub.plan_type;
   const priceId = subscription.items.data[0].price.id;
 
-  logStep("Updating subscription", { userId, status: subscription.status });
+  logStep("Updating subscription", { userId, status: subscription.status, oldPlan: oldPlanType });
 
   // Check if user is a corporate admin or member - protect their access
   const { data: corpAdmin } = await supabase
@@ -810,6 +811,69 @@ async function handleSubscriptionUpdate(
       logStep("ERROR: Failed to update subscription", { error });
     } else {
       logStep("Subscription updated successfully");
+    }
+  }
+
+  // Send subscription update notification to user
+  const { data: userData } = await supabase.auth.admin.getUserById(userId);
+  const userEmail = userData?.user?.email;
+
+  if (userEmail) {
+    const nextBillingDate = new Date(subscription.current_period_end * 1000).toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric'
+    });
+
+    const statusText = subscription.status === 'active' ? 'active' : subscription.status;
+    const cancelAtPeriodEnd = subscription.cancel_at_period_end;
+
+    let subject = '📋 Subscription Update';
+    let dashboardContent = `<p class="tiptap-paragraph"><strong>Your subscription has been updated.</strong></p><p class="tiptap-paragraph"></p><p class="tiptap-paragraph">Status: ${statusText}</p><p class="tiptap-paragraph">Next billing date: ${nextBillingDate}</p>`;
+    
+    if (cancelAtPeriodEnd) {
+      subject = '📋 Subscription Set to Cancel';
+      dashboardContent = `<p class="tiptap-paragraph"><strong>Your subscription is set to cancel.</strong></p><p class="tiptap-paragraph"></p><p class="tiptap-paragraph">You will continue to have access until ${nextBillingDate}.</p><p class="tiptap-paragraph"></p><p class="tiptap-paragraph">Changed your mind? <a href="/pricing" style="color: #D4AF37;">Resubscribe anytime →</a></p>`;
+    }
+
+    // Send dashboard notification
+    await supabase.from('user_system_messages').insert({
+      user_id: userId,
+      message_type: 'renewal_reminder',
+      subject: subject,
+      content: dashboardContent,
+      is_read: false,
+    });
+    logStep("Subscription update dashboard notification sent");
+
+    // Send email notification
+    try {
+      const resend = new Resend(Deno.env.get('RESEND_API_KEY'));
+      await resend.emails.send({
+        from: 'SmartyGym <notifications@smartygym.com>',
+        to: [userEmail],
+        subject: subject,
+        headers: getEmailHeaders(userEmail),
+        html: `
+          <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
+            <h1 style="color: #d4af37; margin-bottom: 20px;">Subscription Update</h1>
+            <p style="font-size: 16px; line-height: 1.6; margin-bottom: 16px;">Your subscription has been updated.</p>
+            <div style="background: #f9f9f9; border-radius: 8px; padding: 20px; margin: 20px 0;">
+              <p style="margin: 0 0 10px;"><strong>Status:</strong> ${statusText}</p>
+              <p style="margin: 0;"><strong>Next billing date:</strong> ${nextBillingDate}</p>
+              ${cancelAtPeriodEnd ? '<p style="margin: 10px 0 0; color: #e74c3c;"><strong>Note:</strong> Your subscription is set to cancel at the end of the billing period.</p>' : ''}
+            </div>
+            <p style="font-size: 16px; line-height: 1.6; margin-bottom: 24px;">If you have any questions about your subscription, please don't hesitate to contact us.</p>
+            <p style="margin-top: 24px;">
+              <a href="https://smartygym.com/userdashboard" style="display: inline-block; background: #d4af37; color: white; padding: 14px 28px; text-decoration: none; border-radius: 4px; font-weight: bold; font-size: 16px;">Go to Dashboard →</a>
+            </p>
+            ${getEmailFooter(userEmail)}
+          </div>
+        `,
+      });
+      logStep("✅ Subscription update email sent", { email: userEmail });
+    } catch (emailError) {
+      logStep("ERROR sending subscription update email", { error: emailError });
     }
   }
 }
@@ -963,10 +1027,6 @@ async function handleInvoicePaymentSucceeded(
 
   logStep("Invoice payment succeeded", { userId: existingSub.user_id, amount: invoice.amount_paid / 100 });
 
-  // Schedule renewal confirmation for 5 minutes from now
-  const renewalDelayTime = new Date();
-  renewalDelayTime.setMinutes(renewalDelayTime.getMinutes() + 5);
-  
   const planName = existingSub.plan_type.charAt(0).toUpperCase() + existingSub.plan_type.slice(1);
   const amount = (invoice.amount_paid / 100).toFixed(2);
 
@@ -988,50 +1048,53 @@ async function handleInvoicePaymentSucceeded(
     .eq("is_default", true)
     .single();
 
-  if (!template) {
-    logStep("No renewal thank you template found, using default message");
-    // Fallback to direct message insert
-    await supabase
-      .from('user_system_messages')
-      .insert({
-        user_id: existingSub.user_id,
-        message_type: 'renewal_thank_you',
-        subject: 'Payment Successful',
-        content: '<p class="tiptap-paragraph"><strong>Payment Successful! 🎉</strong></p><p class="tiptap-paragraph"></p><p class="tiptap-paragraph">Your subscription payment of €' + amount + ' has been processed successfully.</p><p class="tiptap-paragraph"></p><p class="tiptap-paragraph">Thank you for being a valued member!</p>',
-        is_read: false,
-      });
-    return;
+  let subject = '✅ Payment Successful - Thank You!';
+  let contentText = `<p class="tiptap-paragraph"><strong>Payment Successful!</strong></p><p class="tiptap-paragraph"></p><p class="tiptap-paragraph">Your ${planName} subscription payment of €${amount} has been processed successfully.</p><p class="tiptap-paragraph"></p><p class="tiptap-paragraph">Thank you for being a valued SmartyGym member! Your premium access continues uninterrupted.</p>`;
+
+  if (template) {
+    subject = template.subject.replace(/\{planName\}/g, planName).replace(/\{amount\}/g, amount);
+    contentText = template.content.replace(/\{planName\}/g, planName).replace(/\{amount\}/g, amount);
   }
 
-  const subject = template.subject.replace(/\{planName\}/g, planName).replace(/\{amount\}/g, amount);
-  const contentText = template.content.replace(/\{planName\}/g, planName).replace(/\{amount\}/g, amount);
+  // Send dashboard notification directly (not via scheduled_notifications)
+  await supabase.from('user_system_messages').insert({
+    user_id: existingSub.user_id,
+    message_type: 'renewal_thank_you',
+    subject: subject,
+    content: contentText,
+    is_read: false,
+  });
+  logStep("✅ Renewal thank you dashboard notification sent", { userId: existingSub.user_id });
 
-  // Send dashboard notification with 5 min delay via scheduled_notifications
-  await supabase
-    .from("scheduled_notifications")
-    .insert({
-      title: subject,
-      body: contentText,
-      target_audience: `user:${existingSub.user_id}`,
-      scheduled_time: renewalDelayTime.toISOString(),
-      status: "pending",
-      recurrence_pattern: "once",
-    });
-
-  // Schedule email for 5 minutes
-  await supabase
-    .from("scheduled_emails")
-    .insert({
+  // Send email directly via Resend
+  try {
+    const resend = new Resend(Deno.env.get('RESEND_API_KEY'));
+    await resend.emails.send({
+      from: 'SmartyGym <notifications@smartygym.com>',
+      to: [userEmail],
       subject: subject,
-      body: contentText,
-      target_audience: `user:${existingSub.user_id}`,
-      recipient_emails: [userEmail],
-      scheduled_time: renewalDelayTime.toISOString(),
-      status: "pending",
-      recurrence_pattern: "once",
+      headers: getEmailHeaders(userEmail),
+      html: `
+        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
+          <h1 style="color: #d4af37; margin-bottom: 20px;">Payment Successful!</h1>
+          <p style="font-size: 16px; line-height: 1.6; margin-bottom: 16px;">Your ${planName} subscription payment of <strong>€${amount}</strong> has been processed successfully.</p>
+          <p style="font-size: 16px; line-height: 1.6; margin-bottom: 16px;">Thank you for being a valued SmartyGym member! Your premium access continues uninterrupted.</p>
+          <div style="background: #f9f9f9; border-radius: 8px; padding: 20px; margin: 20px 0;">
+            <p style="margin: 0 0 10px;"><strong>Plan:</strong> ${planName}</p>
+            <p style="margin: 0;"><strong>Amount:</strong> €${amount}</p>
+          </div>
+          <p style="font-size: 16px; line-height: 1.6; margin-bottom: 24px;">Keep up the great work on your fitness journey!</p>
+          <p style="margin-top: 24px;">
+            <a href="https://smartygym.com/userdashboard" style="display: inline-block; background: #d4af37; color: white; padding: 14px 28px; text-decoration: none; border-radius: 4px; font-weight: bold; font-size: 16px;">Go to Dashboard →</a>
+          </p>
+          ${getEmailFooter(userEmail)}
+        </div>
+      `,
     });
-
-  logStep("Renewal confirmation scheduled for 5 minutes", { userId: existingSub.user_id, sendAt: renewalDelayTime.toISOString() });
+    logStep("✅ Renewal thank you email sent", { email: userEmail });
+  } catch (emailError) {
+    logStep("ERROR sending renewal thank you email", { error: emailError });
+  }
 }
 
 async function handleInvoicePaymentFailed(
