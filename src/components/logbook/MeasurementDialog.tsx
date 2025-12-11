@@ -13,9 +13,10 @@ interface MeasurementDialogProps {
   isOpen: boolean;
   onClose: () => void;
   userId: string;
+  onSaved?: () => void;
 }
 
-export const MeasurementDialog = ({ isOpen, onClose, userId }: MeasurementDialogProps) => {
+export const MeasurementDialog = ({ isOpen, onClose, userId, onSaved }: MeasurementDialogProps) => {
   const [weight, setWeight] = useState("");
   const [bodyFat, setBodyFat] = useState("");
   const [muscleMass, setMuscleMass] = useState("");
@@ -69,6 +70,7 @@ export const MeasurementDialog = ({ isOpen, onClose, userId }: MeasurementDialog
       setWeight("");
       setBodyFat("");
       setMuscleMass("");
+      onSaved?.();
       onClose();
     } catch (error) {
       console.error('Error saving measurements:', error);
