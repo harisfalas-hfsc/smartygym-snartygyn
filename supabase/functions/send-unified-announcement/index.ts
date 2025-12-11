@@ -1,7 +1,7 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.57.2";
 import { Resend } from "https://esm.sh/resend@2.0.0";
-import { wrapInEmailTemplate } from "../_shared/email-utils.ts";
+import { wrapInEmailTemplate, getEmailHeaders, getEmailFooter } from "../_shared/email-utils.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -99,13 +99,14 @@ serve(async (req) => {
           continue;
         }
 
-        // Send email with properly formatted HTML
+        // Send email with properly formatted HTML, headers, and footer
         try {
           const emailResult = await resend.emails.send({
             from: "SmartyGym <notifications@smartygym.com>",
             to: [userEmail],
             subject: subject,
-            html: emailHtml,
+            headers: getEmailHeaders(userEmail),
+            html: `${emailHtml}${getEmailFooter(userEmail)}`,
           });
           
           if (emailResult.error) {

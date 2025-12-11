@@ -1,6 +1,7 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.57.2";
 import { Resend } from "https://esm.sh/resend@2.0.0";
+import { getEmailHeaders, getEmailFooter } from "../_shared/email-utils.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -197,10 +198,12 @@ serve(async (req) => {
       if (resendKey) {
         const resend = new Resend(resendKey);
         
+        const memberEmail = email.trim().toLowerCase();
         await resend.emails.send({
           from: "SmartyGym <notifications@smartygym.com>",
-          to: [email.trim().toLowerCase()],
+          to: [memberEmail],
           subject: `🎉 Welcome to SmartyGym - ${corpSub.organization_name}`,
+          headers: getEmailHeaders(memberEmail),
           html: `
             <!DOCTYPE html>
             <html>
@@ -225,7 +228,7 @@ serve(async (req) => {
                 </ul>
                 <div style="background: #fff3cd; border: 1px solid #ffc107; border-radius: 6px; padding: 15px; margin: 20px 0;">
                   <strong>Your Login Credentials:</strong><br>
-                  Email: ${email.trim().toLowerCase()}<br>
+                  Email: ${memberEmail}<br>
                   Password: ${memberPassword}
                 </div>
                 <p style="color: #666; font-size: 14px;">We recommend changing your password after your first login.</p>
@@ -235,6 +238,7 @@ serve(async (req) => {
                 <p>Let's make every workout count!</p>
                 <p><em>The SmartyGym Team</em></p>
               </div>
+              ${getEmailFooter(memberEmail)}
             </body>
             </html>
           `,
