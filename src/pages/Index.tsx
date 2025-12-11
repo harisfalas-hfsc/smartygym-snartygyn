@@ -414,7 +414,7 @@ const Index = () => {
                 Your gym Re-imagined. Anywhere. Anytime.
               </p>
               <p className="text-sm text-primary italic mt-3 px-2">
-                Where Science Meets Convenience. Where Real Coaches guide Real people.
+                Where Science Meets Convenience. Where Real Coaches guide Real People.
               </p>
             </div>
 
@@ -580,7 +580,7 @@ const Index = () => {
             <div className="inline-flex items-center gap-2 px-3 md:px-4 py-1.5 md:py-2 bg-primary/5 border border-primary/20 rounded-full">
               <Sparkles className="h-3 w-3 md:h-4 md:w-4 text-primary flex-shrink-0" />
               <p className="text-sm md:text-base lg:text-lg font-semibold text-primary italic text-center">
-                Where Science Meets Convenience. Where Real Coaches guide Real people.
+                Where Science Meets Convenience. Where Real Coaches guide Real People.
               </p>
               <Sparkles className="h-3 w-3 md:h-4 md:w-4 text-primary flex-shrink-0" />
             </div>
