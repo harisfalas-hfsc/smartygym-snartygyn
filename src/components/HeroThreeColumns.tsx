@@ -25,9 +25,11 @@ interface AnimatedBulletProps {
   isLink?: boolean;
   isVisible: boolean;
   highlight?: boolean;
+  isActive?: boolean;
+  subtitle?: string;
 }
 
-const AnimatedBullet = ({ icon, text, delay, onClick, isLink, isVisible, highlight }: AnimatedBulletProps) => {
+const AnimatedBullet = ({ icon, text, delay, onClick, isLink, isVisible, highlight, isActive, subtitle }: AnimatedBulletProps) => {
   const [show, setShow] = useState(false);
 
   useEffect(() => {
@@ -40,21 +42,33 @@ const AnimatedBullet = ({ icon, text, delay, onClick, isLink, isVisible, highlig
   return (
     <div 
       className={cn(
-        "flex items-center gap-3 transition-all duration-300 rounded-md px-2 py-1 -mx-2",
-        isLink && "cursor-pointer hover:text-primary hover:bg-primary/5 group",
+        "flex items-center gap-3 transition-all duration-300 rounded-md px-2 py-1.5 -mx-2",
+        isLink && "cursor-pointer hover:text-primary hover:bg-primary/10 group",
         !isLink && "hover:bg-muted/50",
-        show ? "opacity-100 translate-y-0" : "opacity-0 translate-y-2"
+        show ? "opacity-100 translate-y-0" : "opacity-0 translate-y-2",
+        isActive && "bg-primary/10 scale-[1.02]"
       )}
       onClick={onClick}
     >
       <span className="flex-shrink-0">{icon}</span>
-      <span className={cn(
-        "text-sm font-medium",
-        isLink && "group-hover:text-primary transition-colors",
-        highlight && "text-red-600"
-      )}>
-        {text}
-      </span>
+      <div className="flex flex-col">
+        <span className={cn(
+          "text-sm font-medium",
+          isLink && "group-hover:text-primary transition-colors",
+          highlight && "text-red-600",
+          isActive && "text-primary"
+        )}>
+          {text}
+        </span>
+        {subtitle && (
+          <span className={cn(
+            "text-xs text-muted-foreground transition-all duration-300",
+            isActive ? "opacity-100 max-h-5" : "opacity-0 max-h-0 overflow-hidden"
+          )}>
+            {subtitle}
+          </span>
+        )}
+      </div>
     </div>
   );
 };
@@ -62,18 +76,27 @@ const AnimatedBullet = ({ icon, text, delay, onClick, isLink, isVisible, highlig
 export const HeroThreeColumns = () => {
   const navigate = useNavigate();
   const [isVisible, setIsVisible] = useState(false);
+  const [activeExploreIndex, setActiveExploreIndex] = useState(0);
 
   useEffect(() => {
     setIsVisible(true);
   }, []);
 
+  // Auto-cycle through explore items every 2.5 seconds
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setActiveExploreIndex((prev) => (prev + 1) % 6);
+    }, 2500);
+    return () => clearInterval(interval);
+  }, []);
+
   const exploreLinks = [
-    { text: "Smarty Workouts", icon: <Dumbbell className="w-5 h-5 text-primary" />, route: "/workout" },
-    { text: "Smarty Programs", icon: <Calendar className="w-5 h-5 text-primary" />, route: "/trainingprogram" },
-    { text: "Smarty Ritual", icon: <Sparkles className="w-5 h-5 text-primary" />, route: "/daily-ritual" },
-    { text: "Smarty Tools", icon: <Calculator className="w-5 h-5 text-primary" />, route: "/tools" },
-    { text: "Blog & Expert Articles", icon: <FileText className="w-5 h-5 text-primary" />, route: "/blog" },
-    { text: "Exercise Library", icon: <Video className="w-5 h-5 text-primary" />, route: "/exerciselibrary" },
+    { text: "Smarty Workouts", subtitle: "multi workouts", icon: <Dumbbell className="w-5 h-5 text-primary" />, route: "/workout" },
+    { text: "Smarty Programs", subtitle: "multi programs", icon: <Calendar className="w-5 h-5 text-primary" />, route: "/trainingprogram" },
+    { text: "Smarty Ritual", subtitle: "multi rituals", icon: <Sparkles className="w-5 h-5 text-primary" />, route: "/daily-ritual" },
+    { text: "Smarty Tools", subtitle: "multi tools", icon: <Calculator className="w-5 h-5 text-primary" />, route: "/tools" },
+    { text: "Blog & Expert Articles", subtitle: "expert articles", icon: <FileText className="w-5 h-5 text-primary" />, route: "/blog" },
+    { text: "Exercise Library", subtitle: "500+ exercises", icon: <Video className="w-5 h-5 text-primary" />, route: "/exerciselibrary" },
   ];
 
   const whoIsFor = [
@@ -105,10 +128,12 @@ export const HeroThreeColumns = () => {
               key={item.text}
               icon={item.icon}
               text={item.text}
+              subtitle={item.subtitle}
               delay={100 + index * 100}
               onClick={() => navigate(item.route)}
               isLink
               isVisible={isVisible}
+              isActive={activeExploreIndex === index}
             />
           ))}
         </div>
