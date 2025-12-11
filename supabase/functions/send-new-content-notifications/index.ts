@@ -1,5 +1,7 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+import { Resend } from "https://esm.sh/resend@2.0.0";
+import { getEmailHeaders, getEmailFooter } from "../_shared/email-utils.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -19,24 +21,14 @@ async function sendEmail(to: string, subject: string, html: string): Promise<{ s
   }
   
   try {
-    const res = await fetch("https://api.resend.com/emails", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${RESEND_API_KEY}`,
-      },
-      body: JSON.stringify({
-        from: "SmartyGym <notifications@smartygym.com>",
-        to: [to],
-        subject,
-        html,
-      }),
+    const resend = new Resend(RESEND_API_KEY);
+    await resend.emails.send({
+      from: "SmartyGym <notifications@smartygym.com>",
+      to: [to],
+      subject,
+      headers: getEmailHeaders(to),
+      html: html.replace('</body>', `${getEmailFooter(to)}</body>`),
     });
-    
-    if (!res.ok) {
-      const errorBody = await res.text();
-      return { success: false, error: `HTTP ${res.status}: ${errorBody}` };
-    }
     
     return { success: true };
   } catch (error: any) {
