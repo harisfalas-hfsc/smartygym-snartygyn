@@ -1,5 +1,7 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.57.2";
+import { Resend } from "https://esm.sh/resend@2.0.0";
+import { getEmailHeaders, getEmailFooter, wrapInEmailTemplate } from "../_shared/email-utils.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -36,6 +38,8 @@ serve(async (req) => {
       Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "",
       { auth: { persistSession: false } }
     );
+
+    const resend = new Resend(Deno.env.get("RESEND_API_KEY"));
 
     // Verify the requester is an admin
     const authHeader = req.headers.get("Authorization");
@@ -181,7 +185,62 @@ serve(async (req) => {
       throw insertError;
     }
 
-    console.log('[MASS-NOTIFICATION] Messages sent successfully to', recipients.length, 'users');
+    console.log('[MASS-NOTIFICATION] Dashboard messages sent to', recipients.length, 'users');
+
+    // Send emails to all recipients
+    let emailsSent = 0;
+    let emailsFailed = 0;
+
+    // Prepare email HTML once
+    const emailHtml = wrapInEmailTemplate(finalSubject, finalContent);
+
+    for (const recipient of recipients) {
+      try {
+        // Get user email
+        const { data: userInfo } = await supabaseAdmin.auth.admin.getUserById(recipient.user_id);
+        const userEmail = userInfo?.user?.email;
+
+        if (!userEmail) {
+          console.log('[MASS-NOTIFICATION] No email for user:', recipient.user_id);
+          continue;
+        }
+
+        // Check notification preferences
+        const { data: preferences } = await supabaseAdmin
+          .from('notification_preferences')
+          .select('newsletter')
+          .eq('user_id', recipient.user_id)
+          .single();
+
+        if (preferences && !preferences.newsletter) {
+          console.log('[MASS-NOTIFICATION] User opted out of emails:', recipient.user_id);
+          continue;
+        }
+
+        // Send email with headers and footer
+        const emailResult = await resend.emails.send({
+          from: "SmartyGym <notifications@smartygym.com>",
+          to: [userEmail],
+          subject: finalSubject,
+          headers: getEmailHeaders(userEmail),
+          html: `${emailHtml}${getEmailFooter(userEmail)}`,
+        });
+
+        if (emailResult.error) {
+          console.error('[MASS-NOTIFICATION] Email error for', userEmail, emailResult.error);
+          emailsFailed++;
+        } else {
+          emailsSent++;
+          // Rate limiting: 600ms delay to respect Resend's 2 requests/second limit
+          await new Promise(resolve => setTimeout(resolve, 600));
+        }
+      } catch (emailError) {
+        console.error('[MASS-NOTIFICATION] Email send error:', emailError);
+        emailsFailed++;
+      }
+    }
+
+    console.log('[MASS-NOTIFICATION] Emails sent:', emailsSent, 'failed:', emailsFailed);
 
     // Log to notification audit
     try {
@@ -194,10 +253,10 @@ serve(async (req) => {
           recipient_filter: recipientFilter,
           recipient_count: recipients.length,
           success_count: recipients.length,
-          failed_count: 0,
+          failed_count: emailsFailed,
           subject: finalSubject,
           content: finalContent,
-          metadata: {}
+          metadata: { emails_sent: emailsSent, emails_failed: emailsFailed }
         });
     } catch (auditError) {
       console.error('[MASS-NOTIFICATION] Failed to log audit:', auditError);
@@ -207,7 +266,9 @@ serve(async (req) => {
       JSON.stringify({ 
         success: true, 
         recipientCount: recipients.length,
-        message: `Notification sent to ${recipients.length} users` 
+        emailsSent,
+        emailsFailed,
+        message: `Notification sent to ${recipients.length} users (${emailsSent} emails sent)` 
       }),
       {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
