@@ -225,7 +225,7 @@ async function sendFirstPurchaseWelcome(userId: string, userEmail: string, supab
             <li>A community of like-minded fitness enthusiasts</li>
           </ul>
           <p style="margin-top: 24px;">
-            <a href="https://smartygym.com/dashboard" style="display: inline-block; background: #d4af37; color: white; padding: 14px 28px; text-decoration: none; border-radius: 4px; font-weight: bold; font-size: 16px;">Go to Dashboard →</a>
+            <a href="https://smartygym.com/userdashboard" style="display: inline-block; background: #d4af37; color: white; padding: 14px 28px; text-decoration: none; border-radius: 4px; font-weight: bold; font-size: 16px;">Go to Dashboard →</a>
           </p>
           <p style="font-size: 16px; line-height: 1.6; margin-top: 24px;">Welcome aboard – let's make it happen!</p>
           <p style="font-size: 16px; margin-top: 16px;"><em>The SmartyGym Team</em></p>
@@ -543,7 +543,7 @@ async function handleSubscriptionCheckout(
               <p style="font-size: 16px; line-height: 1.6; margin-bottom: 16px;">Thank you for subscribing to the <strong>${planName}</strong> plan!</p>
               <p style="font-size: 16px; line-height: 1.6; margin-bottom: 24px;">You now have full access to all premium features.</p>
               <p style="margin-top: 24px;">
-                <a href="https://smartygym.com/dashboard" style="display: inline-block; background: #d4af37; color: white; padding: 14px 28px; text-decoration: none; border-radius: 4px; font-weight: bold; font-size: 16px;">Go to Dashboard →</a>
+                <a href="https://smartygym.com/userdashboard" style="display: inline-block; background: #d4af37; color: white; padding: 14px 28px; text-decoration: none; border-radius: 4px; font-weight: bold; font-size: 16px;">Go to Dashboard →</a>
               </p>
               ${getEmailFooter(userEmail)}
             </div>
@@ -713,7 +713,7 @@ async function handleOneTimePurchase(
             <p style="font-size: 16px; line-height: 1.6; margin-bottom: 16px;">Thank you for your purchase of <strong>${contentName}</strong>!</p>
             <p style="font-size: 16px; line-height: 1.6; margin-bottom: 24px;">Your content is now available in your dashboard.</p>
             <p style="margin-top: 24px;">
-              <a href="https://smartygym.com/dashboard" style="display: inline-block; background: #d4af37; color: white; padding: 14px 28px; text-decoration: none; border-radius: 4px; font-weight: bold; font-size: 16px;">Go to Dashboard →</a>
+              <a href="https://smartygym.com/userdashboard" style="display: inline-block; background: #d4af37; color: white; padding: 14px 28px; text-decoration: none; border-radius: 4px; font-weight: bold; font-size: 16px;">Go to Dashboard →</a>
             </p>
             ${getEmailFooter(userEmail)}
           </div>

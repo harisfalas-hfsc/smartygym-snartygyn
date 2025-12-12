@@ -206,7 +206,7 @@ serve(async (req) => {
                             </ul>
                             <p style="font-size: 16px; line-height: 1.6; margin-bottom: 24px;">Ready to start your fitness journey?</p>
                             <p style="margin-top: 24px;">
-                              <a href="https://smartygym.com/dashboard" style="display: inline-block; background: #d4af37; color: white; padding: 14px 28px; text-decoration: none; border-radius: 4px; font-weight: bold; font-size: 16px;">Go to Your Dashboard</a>
+                              <a href="https://smartygym.com/userdashboard" style="display: inline-block; background: #d4af37; color: white; padding: 14px 28px; text-decoration: none; border-radius: 4px; font-weight: bold; font-size: 16px;">Go to Your Dashboard</a>
                             </p>
                             <p style="font-size: 16px; line-height: 1.6; margin-top: 24px;">Let's make every workout count.</p>
                             <p style="font-size: 16px; font-weight: bold; margin-top: 20px;">– The SmartyGym Team</p>

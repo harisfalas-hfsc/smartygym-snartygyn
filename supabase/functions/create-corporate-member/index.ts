@@ -184,7 +184,7 @@ serve(async (req) => {
 <li>Community features and leaderboards</li>
 </ul>
 <p class="tiptap-paragraph">Start exploring your dashboard and let's make every workout count!</p>
-<p class="tiptap-paragraph"><a href="https://smartygym.com/dashboard" style="color: #d4af37;">Go to Your Dashboard →</a></p>`,
+<p class="tiptap-paragraph"><a href="https://smartygym.com/userdashboard" style="color: #d4af37;">Go to Your Dashboard →</a></p>`,
           is_read: false,
         });
       logStep("Dashboard welcome message inserted for member");
