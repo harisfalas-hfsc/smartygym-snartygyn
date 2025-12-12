@@ -136,6 +136,25 @@ const Contact = () => {
 
       // Get current user session
       const { data: { session } } = await supabase.auth.getSession();
+      
+      // Determine user_id - if not logged in, try to match email to existing user
+      let userId = session?.user?.id || null;
+      
+      if (!userId && validatedData.email) {
+        try {
+          const { data: lookupResult } = await supabase.functions.invoke('lookup-user-by-email', {
+            body: { email: validatedData.email }
+          });
+          
+          if (lookupResult?.found && lookupResult?.user_id) {
+            userId = lookupResult.user_id;
+            console.log('Matched email to existing user:', userId);
+          }
+        } catch (lookupError) {
+          console.error('Error looking up user by email:', lookupError);
+          // Continue without user_id if lookup fails
+        }
+      }
 
       // Upload attachments if any
       let attachmentData: any[] = [];
@@ -159,7 +178,7 @@ const Contact = () => {
       const { error } = await supabase
         .from('contact_messages')
         .insert([{
-          user_id: session?.user?.id || null,
+          user_id: userId,
           name: validatedData.name,
           email: validatedData.email,
           subject: validatedData.subject,
