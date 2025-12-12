@@ -14,11 +14,13 @@ import { supabase } from "@/integrations/supabase/client";
 import { useQuery } from "@tanstack/react-query";
 import { ContentLoadingSkeleton } from "@/components/ContentLoadingSkeleton";
 import { ReaderModeDialog } from "@/components/ReaderModeDialog";
+import { useShowBackButton } from "@/hooks/useShowBackButton";
 
 export const ArticleDetail = () => {
   const [readerModeOpen, setReaderModeOpen] = useState(false);
   const { slug } = useParams<{ slug: string }>();
   const navigate = useNavigate();
+  const { canGoBack, goBack } = useShowBackButton();
 
   const { data: article, isLoading, error } = useQuery({
     queryKey: ['article', slug],
@@ -72,8 +74,20 @@ export const ArticleDetail = () => {
         {article.image_url && <meta property="og:image" content={article.image_url} />}
       </Helmet>
 
-      <div className="min-h-screen bg-background py-12">
+      <div className="min-h-screen bg-background py-2">
         <article className="container mx-auto px-4 max-w-4xl">
+          {/* Back Button */}
+          {canGoBack && (
+            <Button
+              variant="ghost"
+              onClick={goBack}
+              className="mb-4 gap-2 text-muted-foreground hover:text-foreground"
+            >
+              <ArrowLeft className="h-4 w-4" />
+              Back
+            </Button>
+          )}
+
           <div className="flex items-center justify-between mb-4">
             <PageBreadcrumbs
               items={[
