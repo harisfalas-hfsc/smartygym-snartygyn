@@ -161,10 +161,21 @@ export const ReaderModeDialog = ({
 
             {/* Main Content */}
             <div 
-              className={`prose max-w-none ${isDarkMode ? 'prose-invert' : ''}`}
-              style={{ fontSize: `${fontSize}px`, lineHeight: 1.7 }}
+              className="prose max-w-none"
+              style={{ 
+                fontSize: `${fontSize}px`, 
+                lineHeight: 1.7,
+                color: isDarkMode ? '#f4f4f5' : '#18181b'
+              }}
             >
-              {content}
+              {typeof content === 'string' ? (
+                <div 
+                  dangerouslySetInnerHTML={{ __html: content }}
+                  style={{ color: 'inherit' }}
+                />
+              ) : (
+                <div style={{ color: 'inherit' }}>{content}</div>
+              )}
             </div>
           </article>
         </div>
