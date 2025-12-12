@@ -881,15 +881,17 @@ export const ContactManager = () => {
                     Mark as Read
                   </Button>
                 )}
+                {/* Send to Dashboard - only for registered users */}
                 {selectedMessage.user_id && selectedMessage.status !== 'closed' && !selectedMessage.response && (
                   <Button onClick={handleSendResponse} disabled={isResponding || !responseText.trim()}>
                     <Send className="h-4 w-4 mr-2" />
-                    {isResponding ? "Saving..." : "Send Response to Dashboard"}
+                    {isResponding ? "Saving..." : "Send to Dashboard"}
                   </Button>
                 )}
-                {!selectedMessage.user_id && !selectedMessage.response && (
+                {/* Send via Email - available for ALL messages (registered or visitor) */}
+                {!selectedMessage.response && (
                   <Button
-                    variant="default"
+                    variant={selectedMessage.user_id ? "outline" : "default"}
                     onClick={() => {
                       const subject = encodeURIComponent(`Re: ${selectedMessage.subject}`);
                       const body = encodeURIComponent(responseText || `Dear ${selectedMessage.name},\n\nThank you for contacting SmartyGym.\n\n[Your response here]\n\nBest regards,\nThe SmartyGym Team`);
