@@ -519,7 +519,7 @@ const Index = () => {
                     </span>
                   )}
                   {currentMobileWod.category && (
-                    <span className="text-muted-foreground">{currentMobileWod.category}</span>
+                    <span className="text-red-600 dark:text-red-400 font-medium">{currentMobileWod.category}</span>
                   )}
                 </div>
               </div>
