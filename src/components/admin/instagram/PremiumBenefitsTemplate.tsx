@@ -3,14 +3,15 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 export const PremiumBenefitsTemplate = () => {
   const benefits = [
-    "Unlimited access to all workouts",
-    "Full training program library",
-    "Professional exercise tutorials",
-    "Advanced fitness calculators",
-    "Personalized recommendations",
-    "Priority support",
-    "Ad-free experience",
-    "New content every week",
+    "Unlimited Smarty Workouts",
+    "Structured Training Programs",
+    "Track Favorites & Progress",
+    "Goal Setting & Tracking",
+    "Complete Exercise Library",
+    "Advanced Fitness Calculators",
+    "Smarty Rituals & Check-ins",
+    "Priority Support",
+    "New Content Every Week",
   ];
 
   return (
