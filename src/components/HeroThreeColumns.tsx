@@ -237,9 +237,9 @@ export const HeroThreeColumns = () => {
               className="mt-2 text-center space-y-1 animate-fade-in"
             >
               <p className="text-sm font-semibold text-foreground">{currentWod.name}</p>
-              <p className="text-xs text-muted-foreground">{currentWod.category}</p>
+              <p className="text-xs text-red-600 dark:text-red-400 font-medium">{currentWod.category}</p>
               <div className="flex items-center justify-center gap-2 text-xs text-muted-foreground">
-                {currentWod.format && <span>{currentWod.format}</span>}
+                {currentWod.format && <span className="text-emerald-600 dark:text-emerald-400 font-medium">{currentWod.format}</span>}
                 {currentWod.difficulty_stars && (
                   <>
                     <span>•</span>
