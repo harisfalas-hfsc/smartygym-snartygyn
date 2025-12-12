@@ -88,6 +88,11 @@ serve(async (req) => {
       }
       revenueByPlan[productId] += amountInCurrency;
 
+      // Safely handle current_period_end which may be undefined
+      const periodEnd = subscription.current_period_end 
+        ? new Date(subscription.current_period_end * 1000).toISOString()
+        : null;
+
       subscriptionDetails.push({
         id: subscription.id,
         customer: subscription.customer,
@@ -96,7 +101,7 @@ serve(async (req) => {
         priceId,
         productId,
         status: subscription.status,
-        currentPeriodEnd: new Date(subscription.current_period_end * 1000).toISOString(),
+        currentPeriodEnd: periodEnd,
       });
     }
 
