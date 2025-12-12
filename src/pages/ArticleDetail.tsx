@@ -1,6 +1,7 @@
+import { useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { Helmet } from "react-helmet";
-import { ArrowLeft, Clock, Calendar } from "lucide-react";
+import { ArrowLeft, Clock, Calendar, BookOpen } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ShareButtons } from "@/components/ShareButtons";
 import { Card } from "@/components/ui/card";
@@ -12,8 +13,10 @@ import { Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useQuery } from "@tanstack/react-query";
 import { ContentLoadingSkeleton } from "@/components/ContentLoadingSkeleton";
+import { ReaderModeDialog } from "@/components/ReaderModeDialog";
 
 export const ArticleDetail = () => {
+  const [readerModeOpen, setReaderModeOpen] = useState(false);
   const { slug } = useParams<{ slug: string }>();
   const navigate = useNavigate();
 
@@ -71,12 +74,40 @@ export const ArticleDetail = () => {
 
       <div className="min-h-screen bg-background py-12">
         <article className="container mx-auto px-4 max-w-4xl">
-          <PageBreadcrumbs
-            items={[
-              { label: "Home", href: "/" },
-              { label: "Blog", href: "/blog" },
-              { label: article.title },
-            ]}
+          <div className="flex items-center justify-between mb-4">
+            <PageBreadcrumbs
+              items={[
+                { label: "Home", href: "/" },
+                { label: "Blog", href: "/blog" },
+                { label: article.title },
+              ]}
+            />
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setReaderModeOpen(true)}
+              className="gap-2"
+            >
+              <BookOpen className="h-4 w-4" />
+              <span className="hidden sm:inline">Reader Mode</span>
+            </Button>
+          </div>
+
+          <ReaderModeDialog
+            open={readerModeOpen}
+            onOpenChange={setReaderModeOpen}
+            title={article.title}
+            metadata={{
+              author: article.author_name || undefined,
+              date: new Date(article.published_at || article.created_at).toLocaleDateString('en-US', {
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric'
+              }),
+              readTime: article.read_time || '5 min read',
+              category: article.category
+            }}
+            content={<HTMLContent content={article.content} />}
           />
 
           <Card className="p-6 md:p-8">
