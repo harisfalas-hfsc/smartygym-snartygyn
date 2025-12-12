@@ -14,7 +14,7 @@ export const SubscriptionGate = ({ open, onOpenChange, isAuthenticated }: Subscr
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-md">
+      <DialogContent className="sm:max-w-md max-h-[85vh] overflow-y-auto">
         <DialogHeader>
           <div className="flex justify-center mb-4">
             <div className="p-3 rounded-full bg-primary/10">
