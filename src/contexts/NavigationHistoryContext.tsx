@@ -1,5 +1,8 @@
-import { createContext, useContext, useEffect, useRef, ReactNode } from "react";
+import { createContext, useContext, useEffect, useState, ReactNode } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
+
+// Pages that should NOT be tracked in navigation history
+const EXCLUDED_PATHS = ['/auth', '/reset-password', '/payment-success', '/payment-cancelled'];
 
 interface NavigationHistoryContextType {
   history: string[];
@@ -12,36 +15,57 @@ const NavigationHistoryContext = createContext<NavigationHistoryContextType | un
 export const NavigationHistoryProvider = ({ children }: { children: ReactNode }) => {
   const location = useLocation();
   const navigate = useNavigate();
-  const historyRef = useRef<string[]>([]);
+  const [history, setHistory] = useState<string[]>([]);
 
   useEffect(() => {
     const currentPath = location.pathname;
-    const lastPath = historyRef.current[historyRef.current.length - 1];
+
+    // Skip excluded paths (auth-related, payment confirmations)
+    if (EXCLUDED_PATHS.includes(currentPath)) {
+      return;
+    }
 
     // Only add if it's a new path (not the same as last)
-    if (currentPath !== lastPath) {
-      historyRef.current = [...historyRef.current, currentPath];
-    }
+    setHistory(prev => {
+      if (prev[prev.length - 1] !== currentPath) {
+        return [...prev, currentPath];
+      }
+      return prev;
+    });
   }, [location.pathname]);
 
   const goBack = () => {
-    if (historyRef.current.length > 1) {
+    if (history.length > 1) {
+      // Create a copy to work with
+      const newHistory = [...history];
       // Remove current page
-      historyRef.current.pop();
-      // Get previous page
-      const previousPath = historyRef.current[historyRef.current.length - 1];
-      navigate(previousPath);
+      newHistory.pop();
+      
+      // Skip any excluded paths when going back
+      while (newHistory.length > 0 && EXCLUDED_PATHS.includes(newHistory[newHistory.length - 1])) {
+        newHistory.pop();
+      }
+      
+      if (newHistory.length > 0) {
+        const previousPath = newHistory[newHistory.length - 1];
+        setHistory(newHistory);
+        navigate(previousPath);
+      } else {
+        // No valid history, go to homepage
+        setHistory(["/"]);
+        navigate("/");
+      }
     } else {
       // No history, go to homepage
-      historyRef.current = ["/"];
+      setHistory(["/"]);
       navigate("/");
     }
   };
 
-  const canGoBack = historyRef.current.length > 1;
+  const canGoBack = history.length > 1;
 
   return (
-    <NavigationHistoryContext.Provider value={{ history: historyRef.current, goBack, canGoBack }}>
+    <NavigationHistoryContext.Provider value={{ history, goBack, canGoBack }}>
       {children}
     </NavigationHistoryContext.Provider>
   );
