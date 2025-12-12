@@ -370,7 +370,7 @@ function buildEmailHtml(
                 <td style="background-color: #f9f9f9; padding: 25px 30px; border-top: 1px solid #eee;">
                   <p style="color: #666; font-size: 13px; margin: 0; line-height: 1.5;">
                     You're receiving this email because you're a SmartyGym member.<br>
-                    <a href="https://smartygym.com/dashboard" style="color: #D4AF37;">Manage your notification preferences</a>
+                    <a href="https://smartygym.com/userdashboard" style="color: #D4AF37;">Manage your notification preferences</a>
                   </p>
                 </td>
               </tr>
