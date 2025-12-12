@@ -97,6 +97,8 @@ export const LogBookAdvancedCharts = ({
     customStartDate,
     customEndDate
   );
+  
+  const isMobile = useIsMobile();
 
   const getSecondaryFilters = () => {
     return SECONDARY_FILTERS[primaryFilter as keyof typeof SECONDARY_FILTERS] || [];
@@ -163,8 +165,6 @@ export const LogBookAdvancedCharts = ({
       </div>
     );
   }
-
-  const isMobile = useIsMobile();
 
   return (
     <div className="space-y-6">
