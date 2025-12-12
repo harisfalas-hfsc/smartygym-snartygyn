@@ -214,15 +214,15 @@ export const HeroThreeColumns = () => {
         >
           {/* Gold Circle with Dumbbell */}
           <div className="relative">
-            <div className="w-20 h-20 rounded-full bg-gradient-to-br from-primary via-yellow-500 to-primary 
+            <div className="w-20 h-20 rounded-full bg-primary/10 
                             flex items-center justify-center shadow-lg
                             group-hover:scale-110 transition-transform duration-300
                             ring-4 ring-emerald-500 dark:ring-emerald-400 ring-offset-2 ring-offset-background">
-              <Dumbbell className="w-10 h-10 text-white" />
+              <Dumbbell className="w-10 h-10 text-primary" />
             </div>
             
             {/* Glow effect */}
-            <div className="absolute inset-0 w-20 h-20 rounded-full bg-primary/30 blur-xl -z-10" />
+            <div className="absolute inset-0 w-20 h-20 rounded-full bg-primary/10 blur-xl -z-10" />
           </div>
           
           {/* Title */}
