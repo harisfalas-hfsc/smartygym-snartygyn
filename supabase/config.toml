@@ -122,3 +122,6 @@ verify_jwt = false
 
 [functions.send-weekly-activity-report]
 verify_jwt = false
+
+[functions.lookup-user-by-email]
+verify_jwt = false
