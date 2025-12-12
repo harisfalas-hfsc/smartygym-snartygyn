@@ -89,7 +89,7 @@ serve(async (req: Request) => {
           <p>Hey ${userName}!</p>
           <p>Your ${reminderType} check-in window opens soon at <strong>${windowTime}</strong>.</p>
           <p>Take a moment to track your wellness and keep your streak going!</p>
-          <p><a href="https://smartygym.com/dashboard" style="color: #D4AF37;">Go to Dashboard →</a></p>
+          <p><a href="https://smartygym.com/userdashboard" style="color: #D4AF37;">Go to Dashboard →</a></p>
         `,
         is_read: false
       };
@@ -140,7 +140,7 @@ serve(async (req: Request) => {
                     </p>
                   </div>
                   
-                  <a href="https://smartygym.com/dashboard" style="display: inline-block; background: linear-gradient(135deg, #D4AF37 0%, #B8860B 100%); color: #000000; text-decoration: none; padding: 14px 32px; border-radius: 8px; font-weight: 600; font-size: 14px; margin: 20px 0;">
+                  <a href="https://smartygym.com/userdashboard" style="display: inline-block; background: linear-gradient(135deg, #D4AF37 0%, #B8860B 100%); color: #000000; text-decoration: none; padding: 14px 32px; border-radius: 8px; font-weight: 600; font-size: 14px; margin: 20px 0;">
                     Go to Dashboard
                   </a>
                   
