@@ -12,11 +12,11 @@ export const LogBookComparison = ({ userId }: LogBookComparisonProps) => {
 
   if (isLoading) {
     return (
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-5 mb-6">
+      <div className="grid gap-3 grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 mb-6">
         {[...Array(5)].map((_, i) => (
           <Card key={i}>
-            <CardContent className="p-4">
-              <Skeleton className="h-20 w-full" />
+            <CardContent className="p-3 sm:p-4">
+              <Skeleton className="h-16 w-full" />
             </CardContent>
           </Card>
         ))}
@@ -70,7 +70,7 @@ export const LogBookComparison = ({ userId }: LogBookComparisonProps) => {
   return (
     <div className="mb-6">
       <h3 className="text-lg font-semibold mb-4">Month Comparison</h3>
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-5">
+      <div className="grid gap-3 grid-cols-2 sm:grid-cols-3 lg:grid-cols-5">
         {comparisonCards.map((card, index) => {
           const Icon = card.icon;
           const changeColor =
@@ -84,18 +84,18 @@ export const LogBookComparison = ({ userId }: LogBookComparisonProps) => {
 
           return (
             <Card key={index}>
-              <CardContent className="p-4">
+              <CardContent className="p-3 sm:p-4">
                 <div className="flex items-center justify-between mb-2">
-                  <Icon className={`h-5 w-5 ${card.color}`} />
+                  <Icon className={`h-4 w-4 sm:h-5 sm:w-5 ${card.color}`} />
                   <span className={`text-xs font-semibold ${changeColor}`}>
                     {changeIcon} {Math.abs(card.change).toFixed(1)}%
                   </span>
                 </div>
                 <div className="space-y-1">
-                  <p className="text-2xl font-bold">{card.current}</p>
-                  <p className="text-xs text-muted-foreground">{card.title}</p>
+                  <p className="text-xl sm:text-2xl font-bold">{card.current}</p>
+                  <p className="text-xs text-muted-foreground truncate">{card.title}</p>
                   <p className="text-xs text-muted-foreground">
-                    Last month: {card.previous}
+                    Last: {card.previous}
                   </p>
                 </div>
               </CardContent>

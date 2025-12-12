@@ -29,14 +29,14 @@ export const LogBookStats = ({ userId }: LogBookStatsProps) => {
 
   if (isLoading) {
     return (
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-6">
-        {[...Array(6)].map((_, i) => (
+      <div className="grid gap-3 grid-cols-2 sm:grid-cols-3 lg:grid-cols-5">
+        {[...Array(5)].map((_, i) => (
           <Card key={i} className="animate-pulse">
-            <CardHeader className="pb-2">
-              <div className="h-4 bg-muted rounded w-24" />
+            <CardHeader className="pb-2 p-3 sm:p-4">
+              <div className="h-4 bg-muted rounded w-20" />
             </CardHeader>
-            <CardContent>
-              <div className="h-8 bg-muted rounded w-16" />
+            <CardContent className="p-3 sm:p-4 pt-0">
+              <div className="h-7 bg-muted rounded w-12" />
             </CardContent>
           </Card>
         ))}
@@ -79,21 +79,21 @@ export const LogBookStats = ({ userId }: LogBookStatsProps) => {
   ];
 
   return (
-    <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-5">
+    <div className="grid gap-3 grid-cols-2 sm:grid-cols-3 lg:grid-cols-5">
       {statCards.map((stat) => {
         const Icon = stat.icon;
         return (
           <Card key={stat.title}>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 p-3 sm:p-4">
+              <CardTitle className="text-xs sm:text-sm font-medium truncate pr-2">
                 {stat.title}
               </CardTitle>
-              <Icon className={`h-4 w-4 ${stat.color}`} />
+              <Icon className={`h-4 w-4 flex-shrink-0 ${stat.color}`} />
             </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">
+            <CardContent className="p-3 sm:p-4 pt-0">
+              <div className="text-xl sm:text-2xl font-bold">
                 {stat.value}
-                {stat.suffix && <span className="text-sm font-normal text-muted-foreground">{stat.suffix}</span>}
+                {stat.suffix && <span className="text-xs sm:text-sm font-normal text-muted-foreground">{stat.suffix}</span>}
               </div>
             </CardContent>
           </Card>

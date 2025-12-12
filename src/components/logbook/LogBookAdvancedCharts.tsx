@@ -4,12 +4,13 @@ import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { ScrollArea } from "@/components/ui/scroll-area";
 import { format } from "date-fns";
 import { CalendarIcon } from "lucide-react";
 import { LineChart, Line, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from "recharts";
 import { useAdvancedActivityLog } from "@/hooks/useAdvancedActivityLog";
 import { cn } from "@/lib/utils";
-
+import { useIsMobile } from "@/hooks/use-mobile";
 interface LogBookAdvancedChartsProps {
   userId: string;
   primaryFilter: string;
@@ -163,13 +164,15 @@ export const LogBookAdvancedCharts = ({
     );
   }
 
+  const isMobile = useIsMobile();
+
   return (
     <div className="space-y-6">
       {/* Filter Controls */}
-      <div className="flex gap-4 flex-wrap items-center">
+      <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 sm:flex-wrap sm:items-center">
         {/* Primary Filter */}
         <Select value={primaryFilter} onValueChange={onPrimaryFilterChange}>
-          <SelectTrigger className="w-48">
+          <SelectTrigger className="w-full sm:w-48">
             <SelectValue placeholder="Activity Type" />
           </SelectTrigger>
           <SelectContent>
@@ -185,7 +188,7 @@ export const LogBookAdvancedCharts = ({
         {/* Secondary Filter */}
         {getSecondaryFilters().length > 0 && (
           <Select value={secondaryFilter} onValueChange={onSecondaryFilterChange}>
-            <SelectTrigger className="w-48">
+            <SelectTrigger className="w-full sm:w-48">
               <SelectValue placeholder="Filter by..." />
             </SelectTrigger>
             <SelectContent>
@@ -200,7 +203,7 @@ export const LogBookAdvancedCharts = ({
 
         {/* Time Filter */}
         <Select value={timeFilter} onValueChange={(value: any) => onTimeFilterChange(value)}>
-          <SelectTrigger className="w-48">
+          <SelectTrigger className="w-full sm:w-48">
             <SelectValue placeholder="Time period" />
           </SelectTrigger>
           <SelectContent>
@@ -212,10 +215,10 @@ export const LogBookAdvancedCharts = ({
 
         {/* Custom Date Range */}
         {timeFilter === 'custom' && (
-          <>
+          <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 w-full sm:w-auto">
             <Popover>
               <PopoverTrigger asChild>
-                <Button variant="outline" className={cn("w-48 justify-start text-left font-normal", !customStartDate && "text-muted-foreground")}>
+                <Button variant="outline" className={cn("w-full sm:w-48 justify-start text-left font-normal", !customStartDate && "text-muted-foreground")}>
                   <CalendarIcon className="mr-2 h-4 w-4" />
                   {customStartDate ? format(customStartDate, "PPP") : "Start date"}
                 </Button>
@@ -227,7 +230,7 @@ export const LogBookAdvancedCharts = ({
 
             <Popover>
               <PopoverTrigger asChild>
-                <Button variant="outline" className={cn("w-48 justify-start text-left font-normal", !customEndDate && "text-muted-foreground")}>
+                <Button variant="outline" className={cn("w-full sm:w-48 justify-start text-left font-normal", !customEndDate && "text-muted-foreground")}>
                   <CalendarIcon className="mr-2 h-4 w-4" />
                   {customEndDate ? format(customEndDate, "PPP") : "End date"}
                 </Button>
@@ -236,7 +239,7 @@ export const LogBookAdvancedCharts = ({
                 <Calendar mode="single" selected={customEndDate} onSelect={onCustomEndDateChange} initialFocus />
               </PopoverContent>
             </Popover>
-          </>
+          </div>
         )}
       </div>
 
@@ -289,43 +292,54 @@ export const LogBookAdvancedCharts = ({
         </Card>
 
         {/* Pie Chart */}
-        <Card>
+        <Card className="overflow-hidden">
           <CardHeader>
             <CardTitle>Activity Distribution</CardTitle>
           </CardHeader>
-          <CardContent>
+          <CardContent className="p-4">
             {pieChartData.length > 0 ? (
-              <ResponsiveContainer width="100%" height={300}>
-                <PieChart>
-                  <Pie
-                    data={pieChartData}
-                    cx="35%"
-                    cy="50%"
-                    labelLine={false}
-                    label={false}
-                    outerRadius={80}
-                    innerRadius={40}
-                    fill="#8884d8"
-                    dataKey="value"
-                  >
-                    {pieChartData.map((entry, index) => (
-                      <Cell key={`cell-${index}`} fill={entry.color} />
-                    ))}
-                  </Pie>
-                  <Tooltip content={<PieTooltip />} />
-                  <Legend 
-                    layout="vertical"
-                    align="right"
-                    verticalAlign="middle"
-                    formatter={(value, entry: any) => {
-                      const data = entry.payload;
-                      const percent = ((data.value / data.total) * 100).toFixed(0);
-                      return `${value}: ${percent}%`;
-                    }}
-                    wrapperStyle={{ fontSize: '12px', paddingLeft: '10px' }}
-                  />
-                </PieChart>
-              </ResponsiveContainer>
+              <div className="flex flex-col">
+                {/* Pie Chart - Centered on mobile, with legend on desktop */}
+                <ResponsiveContainer width="100%" height={isMobile ? 200 : 250}>
+                  <PieChart>
+                    <Pie
+                      data={pieChartData}
+                      cx="50%"
+                      cy="50%"
+                      labelLine={false}
+                      label={false}
+                      outerRadius={isMobile ? 70 : 80}
+                      innerRadius={isMobile ? 35 : 40}
+                      fill="#8884d8"
+                      dataKey="value"
+                    >
+                      {pieChartData.map((entry, index) => (
+                        <Cell key={`cell-${index}`} fill={entry.color} />
+                      ))}
+                    </Pie>
+                    <Tooltip content={<PieTooltip />} />
+                  </PieChart>
+                </ResponsiveContainer>
+                
+                {/* Legend - Scrollable list below chart */}
+                <ScrollArea className="h-[150px] mt-4 border rounded-md p-2">
+                  <div className="space-y-1">
+                    {pieChartData.map((entry, index) => {
+                      const percent = ((entry.value / entry.total) * 100).toFixed(0);
+                      return (
+                        <div key={index} className="flex items-center gap-2 text-xs py-1">
+                          <div 
+                            className="w-3 h-3 rounded-sm flex-shrink-0" 
+                            style={{ backgroundColor: entry.color }}
+                          />
+                          <span className="truncate flex-1">{entry.name}</span>
+                          <span className="text-muted-foreground flex-shrink-0">{percent}%</span>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </ScrollArea>
+              </div>
             ) : (
               <div className="h-[300px] flex items-center justify-center text-muted-foreground">
                 No data to display

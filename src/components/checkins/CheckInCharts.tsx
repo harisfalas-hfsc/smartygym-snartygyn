@@ -14,6 +14,7 @@ import {
 import { CheckinRecord } from '@/hooks/useCheckins';
 import { format } from 'date-fns';
 import { TrendingUp } from 'lucide-react';
+import { useIsMobile } from '@/hooks/use-mobile';
 
 interface CheckInChartsProps {
   checkins: CheckinRecord[];
@@ -25,6 +26,7 @@ type ChartType = 'score' | 'sleep' | 'hydration' | 'movement' | 'categories';
 export function CheckInCharts({ checkins }: CheckInChartsProps) {
   const [dateRange, setDateRange] = useState<DateRange>('30');
   const [chartType, setChartType] = useState<ChartType>('score');
+  const isMobile = useIsMobile();
 
   const filteredCheckins = useMemo(() => {
     const days = parseInt(dateRange);
@@ -38,7 +40,7 @@ export function CheckInCharts({ checkins }: CheckInChartsProps) {
 
   const chartData = useMemo(() => {
     return filteredCheckins.map(c => ({
-      date: format(new Date(c.checkin_date), 'MMM d'),
+      date: format(new Date(c.checkin_date), isMobile ? 'M/d' : 'MMM d'),
       fullDate: c.checkin_date,
       score: c.daily_smarty_score,
       sleepHours: c.sleep_hours,
@@ -52,22 +54,26 @@ export function CheckInCharts({ checkins }: CheckInChartsProps) {
       strain: c.day_strain_score,
       soreness: c.soreness_score
     }));
-  }, [filteredCheckins]);
+  }, [filteredCheckins, isMobile]);
+
+  const chartHeight = isMobile ? 220 : 300;
+  const chartMargin = isMobile ? { top: 5, right: 5, left: -15, bottom: 5 } : { top: 5, right: 20, left: 0, bottom: 5 };
 
   const renderChart = () => {
     switch (chartType) {
       case 'score':
         return (
-          <ResponsiveContainer width="100%" height={300}>
-            <LineChart data={chartData}>
+          <ResponsiveContainer width="100%" height={chartHeight}>
+            <LineChart data={chartData} margin={chartMargin}>
               <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
-              <XAxis dataKey="date" className="text-xs" />
-              <YAxis domain={[0, 100]} className="text-xs" />
+              <XAxis dataKey="date" tick={{ fontSize: isMobile ? 9 : 12 }} />
+              <YAxis domain={[0, 100]} tick={{ fontSize: isMobile ? 9 : 12 }} width={isMobile ? 30 : 40} />
               <Tooltip 
                 contentStyle={{ 
                   backgroundColor: 'hsl(var(--card))',
                   border: '1px solid hsl(var(--border))',
-                  borderRadius: '8px'
+                  borderRadius: '8px',
+                  fontSize: isMobile ? '11px' : '14px'
                 }}
               />
               <Line 
@@ -75,7 +81,7 @@ export function CheckInCharts({ checkins }: CheckInChartsProps) {
                 dataKey="score" 
                 stroke="hsl(var(--primary))" 
                 strokeWidth={2}
-                dot={{ fill: 'hsl(var(--primary))' }}
+                dot={{ fill: 'hsl(var(--primary))', r: isMobile ? 2 : 4 }}
                 name="Daily Score"
                 connectNulls
               />
@@ -85,20 +91,21 @@ export function CheckInCharts({ checkins }: CheckInChartsProps) {
 
       case 'sleep':
         return (
-          <ResponsiveContainer width="100%" height={300}>
-            <LineChart data={chartData}>
+          <ResponsiveContainer width="100%" height={chartHeight}>
+            <LineChart data={chartData} margin={chartMargin}>
               <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
-              <XAxis dataKey="date" className="text-xs" />
-              <YAxis yAxisId="hours" domain={[0, 12]} className="text-xs" />
-              <YAxis yAxisId="score" orientation="right" domain={[0, 10]} className="text-xs" />
+              <XAxis dataKey="date" tick={{ fontSize: isMobile ? 9 : 12 }} />
+              <YAxis yAxisId="hours" domain={[0, 12]} tick={{ fontSize: isMobile ? 9 : 12 }} width={isMobile ? 25 : 40} />
+              <YAxis yAxisId="score" orientation="right" domain={[0, 10]} tick={{ fontSize: isMobile ? 9 : 12 }} width={isMobile ? 25 : 40} />
               <Tooltip 
                 contentStyle={{ 
                   backgroundColor: 'hsl(var(--card))',
                   border: '1px solid hsl(var(--border))',
-                  borderRadius: '8px'
+                  borderRadius: '8px',
+                  fontSize: isMobile ? '11px' : '14px'
                 }}
               />
-              <Legend />
+              {!isMobile && <Legend />}
               <Line 
                 type="monotone" 
                 dataKey="sleepHours" 
@@ -107,6 +114,7 @@ export function CheckInCharts({ checkins }: CheckInChartsProps) {
                 yAxisId="hours"
                 name="Hours"
                 connectNulls
+                dot={{ r: isMobile ? 2 : 4 }}
               />
               <Line 
                 type="monotone" 
@@ -116,6 +124,7 @@ export function CheckInCharts({ checkins }: CheckInChartsProps) {
                 yAxisId="score"
                 name="Score"
                 connectNulls
+                dot={{ r: isMobile ? 2 : 4 }}
               />
             </LineChart>
           </ResponsiveContainer>
@@ -123,16 +132,17 @@ export function CheckInCharts({ checkins }: CheckInChartsProps) {
 
       case 'hydration':
         return (
-          <ResponsiveContainer width="100%" height={300}>
-            <LineChart data={chartData}>
+          <ResponsiveContainer width="100%" height={chartHeight}>
+            <LineChart data={chartData} margin={chartMargin}>
               <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
-              <XAxis dataKey="date" className="text-xs" />
-              <YAxis domain={[0, 6]} className="text-xs" />
+              <XAxis dataKey="date" tick={{ fontSize: isMobile ? 9 : 12 }} />
+              <YAxis domain={[0, 6]} tick={{ fontSize: isMobile ? 9 : 12 }} width={isMobile ? 30 : 40} />
               <Tooltip 
                 contentStyle={{ 
                   backgroundColor: 'hsl(var(--card))',
                   border: '1px solid hsl(var(--border))',
-                  borderRadius: '8px'
+                  borderRadius: '8px',
+                  fontSize: isMobile ? '11px' : '14px'
                 }}
               />
               <Line 
@@ -140,7 +150,7 @@ export function CheckInCharts({ checkins }: CheckInChartsProps) {
                 dataKey="hydration" 
                 stroke="#0ea5e9" 
                 strokeWidth={2}
-                dot={{ fill: '#0ea5e9' }}
+                dot={{ fill: '#0ea5e9', r: isMobile ? 2 : 4 }}
                 name="Liters"
                 connectNulls
               />
@@ -150,16 +160,17 @@ export function CheckInCharts({ checkins }: CheckInChartsProps) {
 
       case 'movement':
         return (
-          <ResponsiveContainer width="100%" height={300}>
-            <LineChart data={chartData}>
+          <ResponsiveContainer width="100%" height={chartHeight}>
+            <LineChart data={chartData} margin={chartMargin}>
               <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
-              <XAxis dataKey="date" className="text-xs" />
-              <YAxis domain={[0, 10]} className="text-xs" />
+              <XAxis dataKey="date" tick={{ fontSize: isMobile ? 9 : 12 }} />
+              <YAxis domain={[0, 10]} tick={{ fontSize: isMobile ? 9 : 12 }} width={isMobile ? 30 : 40} />
               <Tooltip 
                 contentStyle={{ 
                   backgroundColor: 'hsl(var(--card))',
                   border: '1px solid hsl(var(--border))',
-                  borderRadius: '8px'
+                  borderRadius: '8px',
+                  fontSize: isMobile ? '11px' : '14px'
                 }}
               />
               <Line 
@@ -167,7 +178,7 @@ export function CheckInCharts({ checkins }: CheckInChartsProps) {
                 dataKey="movement" 
                 stroke="#22c55e" 
                 strokeWidth={2}
-                dot={{ fill: '#22c55e' }}
+                dot={{ fill: '#22c55e', r: isMobile ? 2 : 4 }}
                 name="Movement Score"
                 connectNulls
               />
@@ -177,24 +188,25 @@ export function CheckInCharts({ checkins }: CheckInChartsProps) {
 
       case 'categories':
         return (
-          <ResponsiveContainer width="100%" height={350}>
-            <LineChart data={chartData}>
+          <ResponsiveContainer width="100%" height={isMobile ? 260 : 350}>
+            <LineChart data={chartData} margin={chartMargin}>
               <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
-              <XAxis dataKey="date" className="text-xs" />
-              <YAxis domain={[0, 10]} className="text-xs" />
+              <XAxis dataKey="date" tick={{ fontSize: isMobile ? 9 : 12 }} />
+              <YAxis domain={[0, 10]} tick={{ fontSize: isMobile ? 9 : 12 }} width={isMobile ? 30 : 40} />
               <Tooltip 
                 contentStyle={{ 
                   backgroundColor: 'hsl(var(--card))',
                   border: '1px solid hsl(var(--border))',
-                  borderRadius: '8px'
+                  borderRadius: '8px',
+                  fontSize: isMobile ? '11px' : '14px'
                 }}
               />
-              <Legend />
-              <Line type="monotone" dataKey="sleepScore" stroke="#f59e0b" name="Sleep" connectNulls />
-              <Line type="monotone" dataKey="hydrationScore" stroke="#0ea5e9" name="Hydration" connectNulls />
-              <Line type="monotone" dataKey="protein" stroke="#8b5cf6" name="Protein" connectNulls />
-              <Line type="monotone" dataKey="movement" stroke="#22c55e" name="Movement" connectNulls />
-              <Line type="monotone" dataKey="mood" stroke="#ec4899" name="Mood" connectNulls />
+              {!isMobile && <Legend />}
+              <Line type="monotone" dataKey="sleepScore" stroke="#f59e0b" name="Sleep" connectNulls dot={{ r: isMobile ? 1 : 3 }} />
+              <Line type="monotone" dataKey="hydrationScore" stroke="#0ea5e9" name="Hydration" connectNulls dot={{ r: isMobile ? 1 : 3 }} />
+              <Line type="monotone" dataKey="protein" stroke="#8b5cf6" name="Protein" connectNulls dot={{ r: isMobile ? 1 : 3 }} />
+              <Line type="monotone" dataKey="movement" stroke="#22c55e" name="Movement" connectNulls dot={{ r: isMobile ? 1 : 3 }} />
+              <Line type="monotone" dataKey="mood" stroke="#ec4899" name="Mood" connectNulls dot={{ r: isMobile ? 1 : 3 }} />
             </LineChart>
           </ResponsiveContainer>
         );
