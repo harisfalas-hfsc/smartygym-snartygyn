@@ -125,3 +125,6 @@ verify_jwt = false
 
 [functions.lookup-user-by-email]
 verify_jwt = false
+
+[functions.send-checkin-reminders]
+verify_jwt = false

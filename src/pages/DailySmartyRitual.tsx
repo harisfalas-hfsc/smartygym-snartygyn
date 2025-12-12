@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
-import { ArrowLeft, Sunrise, Sun, Moon, Share2, Lock, Crown, Clock, Loader2 } from "lucide-react";
+import { ArrowLeft, Sunrise, Sun, Moon, Share2, Lock, Crown, Clock, Loader2, BookOpen } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAccessControl } from "@/hooks/useAccessControl";
 import { useShowBackButton } from "@/hooks/useShowBackButton";
@@ -14,6 +14,7 @@ import { RitualCalendarButton } from "@/components/ritual/RitualCalendarButton";
 import { RitualShareDialog } from "@/components/ritual/RitualShareDialog";
 import { PageBreadcrumbs } from "@/components/PageBreadcrumbs";
 import { SEOEnhancer } from "@/components/SEOEnhancer";
+import { ReaderModeDialog } from "@/components/ReaderModeDialog";
 
 import harisPhoto from "@/assets/haris-falas-coach.png";
 
@@ -35,6 +36,7 @@ const DailySmartyRitual = () => {
   const [loading, setLoading] = useState(true);
   const [countdown, setCountdown] = useState<string | null>(null);
   const [showShareDialog, setShowShareDialog] = useState(false);
+  const [showReaderMode, setShowReaderMode] = useState(false);
 
   const isAuthenticated = userTier !== "guest";
   const isPremium = userTier === "premium";
@@ -276,10 +278,16 @@ const DailySmartyRitual = () => {
             )}
             <div className="flex items-center gap-2">
               {isPremium && ritual && (
-                <Button variant="outline" size="sm" onClick={() => setShowShareDialog(true)}>
-                  <Share2 className="mr-2 h-4 w-4" />
-                  Share
-                </Button>
+                <>
+                  <Button variant="outline" size="sm" onClick={() => setShowReaderMode(true)}>
+                    <BookOpen className="mr-2 h-4 w-4" />
+                    Reader Mode
+                  </Button>
+                  <Button variant="outline" size="sm" onClick={() => setShowShareDialog(true)}>
+                    <Share2 className="mr-2 h-4 w-4" />
+                    Share
+                  </Button>
+                </>
               )}
             </div>
           </div>
@@ -460,6 +468,26 @@ const DailySmartyRitual = () => {
           onOpenChange={setShowShareDialog}
           ritualDate={ritual.ritual_date}
           dayNumber={ritual.day_number}
+        />
+      )}
+
+      {/* Reader Mode Dialog */}
+      {ritual && (
+        <ReaderModeDialog
+          open={showReaderMode}
+          onOpenChange={setShowReaderMode}
+          title={`Daily Smarty Ritual - Day ${ritual.day_number}`}
+          content={`
+            <h2>🌅 Morning Ritual</h2>
+            ${ritual.morning_content}
+            <hr style="margin: 24px 0; border-color: rgba(212, 175, 55, 0.3);" />
+            <h2>☀️ Midday Ritual</h2>
+            ${ritual.midday_content}
+            <hr style="margin: 24px 0; border-color: rgba(212, 175, 55, 0.3);" />
+            <h2>🌙 Evening Ritual</h2>
+            ${ritual.evening_content}
+          `}
+          metadata={{ author: "Haris Falas", date: ritual.ritual_date }}
         />
       )}
     </>

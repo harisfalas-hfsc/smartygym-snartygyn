@@ -1,6 +1,6 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { FileText, Image } from "lucide-react";
+import { FileText } from "lucide-react";
 import html2canvas from "html2canvas";
 import { useAdvancedActivityLog } from "@/hooks/useAdvancedActivityLog";
 import { toast } from "sonner";
@@ -161,56 +161,6 @@ export const LogBookAdvancedExport = ({
     }
   };
 
-  const exportCalendarImage = async () => {
-    try {
-      toast.info("Generating calendar image...");
-      
-      const calendarElement = document.getElementById('logbook-calendar');
-      if (!calendarElement) {
-        toast.error("Could not find calendar");
-        return;
-      }
-
-      const canvas = await html2canvas(calendarElement, { scale: 2 });
-      const image = canvas.toDataURL('image/png');
-      
-      const link = document.createElement('a');
-      link.download = `logbook-calendar-${new Date().toISOString().split('T')[0]}.png`;
-      link.href = image;
-      link.click();
-      
-      toast.success("Calendar image downloaded");
-    } catch (error) {
-      console.error('Export error:', error);
-      toast.error("Failed to export calendar");
-    }
-  };
-
-  const exportChartsImage = async () => {
-    try {
-      toast.info("Generating charts image...");
-      
-      const chartsElement = document.getElementById('logbook-charts');
-      if (!chartsElement) {
-        toast.error("Could not find charts");
-        return;
-      }
-
-      const canvas = await html2canvas(chartsElement, { scale: 2 });
-      const image = canvas.toDataURL('image/png');
-      
-      const link = document.createElement('a');
-      link.download = `logbook-charts-${primaryFilter}-${secondaryFilter}-${new Date().toISOString().split('T')[0]}.png`;
-      link.href = image;
-      link.click();
-      
-      toast.success("Charts image downloaded");
-    } catch (error) {
-      console.error('Export error:', error);
-      toast.error("Failed to export charts");
-    }
-  };
-
   if (isLoading) {
     return (
       <Card className="animate-pulse">
@@ -234,20 +184,10 @@ export const LogBookAdvancedExport = ({
         <CardTitle>Export LogBook</CardTitle>
       </CardHeader>
       <CardContent>
-        <div className="flex gap-2 flex-wrap">
-          <Button onClick={exportToPDF} variant="outline">
-            <FileText className="mr-2 h-4 w-4" />
-            Export as PDF
-          </Button>
-          <Button onClick={exportCalendarImage} variant="outline">
-            <Image className="mr-2 h-4 w-4" />
-            Export Calendar
-          </Button>
-          <Button onClick={exportChartsImage} variant="outline">
-            <Image className="mr-2 h-4 w-4" />
-            Export Charts
-          </Button>
-        </div>
+        <Button onClick={exportToPDF} variant="outline">
+          <FileText className="mr-2 h-4 w-4" />
+          Export as PDF
+        </Button>
       </CardContent>
     </Card>
   );

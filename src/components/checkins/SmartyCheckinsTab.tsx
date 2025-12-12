@@ -23,6 +23,7 @@ import { CheckInCharts } from './CheckInCharts';
 import { CheckInBadges } from './CheckInBadges';
 import { CheckInExport } from './CheckInExport';
 import { CheckInFeedback } from './CheckInFeedback';
+import { CheckinReminderSubscription } from './CheckinReminderSubscription';
 
 export function SmartyCheckinsTab() {
   const [activeTab, setActiveTab] = useState('today');
@@ -244,6 +245,9 @@ export function SmartyCheckinsTab() {
                   </CardContent>
                 </Card>
               )}
+
+              {/* Reminder Subscription */}
+              <CheckinReminderSubscription />
             </div>
           </div>
 
