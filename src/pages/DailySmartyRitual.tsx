@@ -75,8 +75,13 @@ const DailySmartyRitual = () => {
           .maybeSingle();
 
         if (!data) {
-          // If no ritual for today, show countdown
-          setCountdown("Coming soon...");
+          // For non-premium users, RLS blocks the data but ritual likely exists
+          // Only show "coming soon" for premium users who should have access
+          // Non-premium users should see the locked premium card instead
+          if (isPremium) {
+            setCountdown("Coming soon...");
+          }
+          // For non-premium, ritual is null but we proceed to show the locked card
           setLoading(false);
           return;
         }
