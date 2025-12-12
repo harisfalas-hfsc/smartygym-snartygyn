@@ -18,6 +18,9 @@ import { ShopAnalytics } from "./ShopAnalytics";
 import { WebsiteAnalytics } from "./analytics/WebsiteAnalytics";
 import { CorporateAnalytics } from "./analytics/CorporateAnalytics";
 import { AnalyticsMetricCard } from "./analytics/AnalyticsMetricCard";
+import { CompletionAnalytics } from "./analytics/CompletionAnalytics";
+import { GrowthAnalytics } from "./analytics/GrowthAnalytics";
+import { PopularAnalytics } from "./analytics/PopularAnalytics";
 import html2canvas from "html2canvas";
 
 interface AnalyticsData {

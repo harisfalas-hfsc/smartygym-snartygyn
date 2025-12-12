@@ -1,11 +1,11 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { BarChart, Bar, LineChart, Line, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from "recharts";
-import { Globe, Monitor, Smartphone, Tablet, Clock, MapPin, Eye, TrendingUp, RefreshCw } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { LineChart, Line, BarChart, Bar, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from "recharts";
+import { Globe, Monitor, Smartphone, Tablet, Eye, TrendingUp } from "lucide-react";
 import { toast } from "sonner";
+import { ChartFilterBar } from "./ChartFilterBar";
+import html2canvas from "html2canvas";
 
 interface PageViewData {
   page: string;
@@ -34,6 +34,8 @@ interface DailyVisitorData {
 
 export function WebsiteAnalytics() {
   const [timeFilter, setTimeFilter] = useState("30");
+  const [customStartDate, setCustomStartDate] = useState<Date>();
+  const [customEndDate, setCustomEndDate] = useState<Date>();
   const [loading, setLoading] = useState(true);
   const [totalVisitors, setTotalVisitors] = useState(0);
   const [uniqueSessions, setUniqueSessions] = useState(0);
@@ -42,24 +44,35 @@ export function WebsiteAnalytics() {
   const [trafficSources, setTrafficSources] = useState<TrafficSourceData[]>([]);
   const [dailyVisitors, setDailyVisitors] = useState<DailyVisitorData[]>([]);
   const [avgPagesPerSession, setAvgPagesPerSession] = useState(0);
+  const chartRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     fetchWebsiteAnalytics();
-  }, [timeFilter]);
+  }, [timeFilter, customStartDate, customEndDate]);
+
+  const getDateRange = () => {
+    const endDate = new Date();
+    let startDate = new Date();
+
+    if (timeFilter === "custom" && customStartDate && customEndDate) {
+      return { startDate: customStartDate, endDate: customEndDate };
+    }
+
+    startDate.setDate(startDate.getDate() - parseInt(timeFilter));
+    return { startDate, endDate };
+  };
 
   const fetchWebsiteAnalytics = async () => {
     try {
       setLoading(true);
-
-      const endDate = new Date();
-      const startDate = new Date();
-      startDate.setDate(startDate.getDate() - parseInt(timeFilter));
+      const { startDate, endDate } = getDateRange();
 
       // Fetch all website analytics data
       const { data: analyticsData, error } = await supabase
         .from("social_media_analytics")
         .select("*")
         .gte("created_at", startDate.toISOString())
+        .lte("created_at", endDate.toISOString())
         .order("created_at", { ascending: true });
 
       if (error) throw error;
@@ -82,7 +95,7 @@ export function WebsiteAnalytics() {
       const totalPageViews = Object.values(pageViewCounts).reduce((a, b) => a + b, 0);
       const pageViewsData = Object.entries(pageViewCounts)
         .map(([page, views]) => ({
-          page: page.length > 30 ? page.substring(0, 30) + "..." : page,
+          page: page.length > 25 ? page.substring(0, 25) + "..." : page,
           views,
           percentage: totalPageViews > 0 ? Math.round((views / totalPageViews) * 100) : 0
         }))
@@ -162,18 +175,28 @@ export function WebsiteAnalytics() {
     }
   };
 
-  const COLORS = ["hsl(var(--primary))", "hsl(var(--secondary))", "hsl(var(--accent))", "hsl(var(--muted))", "#8884d8", "#82ca9d"];
+  const handleExport = async () => {
+    if (!chartRef.current) return;
+    try {
+      const canvas = await html2canvas(chartRef.current, { backgroundColor: "#ffffff", scale: 2 });
+      const link = document.createElement("a");
+      link.download = `website-analytics-${new Date().toISOString().split("T")[0]}.png`;
+      link.href = canvas.toDataURL("image/png");
+      link.click();
+      toast.success("Chart exported!");
+    } catch (error) {
+      toast.error("Failed to export chart");
+    }
+  };
+
+  const COLORS = ["hsl(var(--primary))", "hsl(var(--chart-2))", "hsl(var(--chart-3))", "hsl(var(--chart-4))"];
 
   const getDeviceIcon = (device: string) => {
     switch (device.toLowerCase()) {
-      case "desktop":
-        return <Monitor className="h-4 w-4" />;
-      case "mobile":
-        return <Smartphone className="h-4 w-4" />;
-      case "tablet":
-        return <Tablet className="h-4 w-4" />;
-      default:
-        return <Globe className="h-4 w-4" />;
+      case "desktop": return <Monitor className="h-4 w-4" />;
+      case "mobile": return <Smartphone className="h-4 w-4" />;
+      case "tablet": return <Tablet className="h-4 w-4" />;
+      default: return <Globe className="h-4 w-4" />;
     }
   };
 
@@ -186,31 +209,7 @@ export function WebsiteAnalytics() {
   }
 
   return (
-    <div className="space-y-6">
-      {/* Filter */}
-      <Card>
-        <CardContent className="pt-6">
-          <div className="flex gap-4">
-            <Select value={timeFilter} onValueChange={setTimeFilter}>
-              <SelectTrigger className="w-[200px]">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="7">Last 7 Days</SelectItem>
-                <SelectItem value="30">Last 30 Days</SelectItem>
-                <SelectItem value="90">Last 90 Days</SelectItem>
-                <SelectItem value="180">Last 6 Months</SelectItem>
-                <SelectItem value="365">Last Year</SelectItem>
-              </SelectContent>
-            </Select>
-            <Button onClick={fetchWebsiteAnalytics} disabled={loading}>
-              <RefreshCw className={`h-4 w-4 mr-2 ${loading ? "animate-spin" : ""}`} />
-              {loading ? "Loading..." : "Refresh"}
-            </Button>
-          </div>
-        </CardContent>
-      </Card>
-
+    <div className="space-y-6" ref={chartRef}>
       {/* Overview Cards */}
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
         <Card>
@@ -238,7 +237,7 @@ export function WebsiteAnalytics() {
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Avg. Events/Session</CardTitle>
-            <Clock className="h-4 w-4 text-muted-foreground" />
+            <TrendingUp className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{avgPagesPerSession}</div>
@@ -258,22 +257,31 @@ export function WebsiteAnalytics() {
         </Card>
       </div>
 
-      {/* Daily Visitors Chart */}
+      {/* Daily Visitors Chart with Filter */}
       <Card>
-        <CardHeader>
+        <CardHeader className="pb-2">
           <CardTitle>Daily Visitors Trend</CardTitle>
           <CardDescription>Visits and unique sessions over time</CardDescription>
         </CardHeader>
         <CardContent>
-          <ResponsiveContainer width="100%" height={300}>
+          <ChartFilterBar
+            timeFilter={timeFilter}
+            onTimeFilterChange={setTimeFilter}
+            customStartDate={customStartDate}
+            onStartDateChange={setCustomStartDate}
+            customEndDate={customEndDate}
+            onEndDateChange={setCustomEndDate}
+            onExport={handleExport}
+          />
+          <ResponsiveContainer width="100%" height={280}>
             <LineChart data={dailyVisitors}>
-              <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="date" />
-              <YAxis />
-              <Tooltip />
+              <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
+              <XAxis dataKey="date" tick={{ fontSize: 11 }} />
+              <YAxis tick={{ fontSize: 11 }} />
+              <Tooltip contentStyle={{ backgroundColor: "hsl(var(--card))", border: "1px solid hsl(var(--border))" }} />
               <Legend />
-              <Line type="monotone" dataKey="visits" name="Page Visits" stroke="hsl(var(--primary))" strokeWidth={2} />
-              <Line type="monotone" dataKey="uniqueSessions" name="Unique Sessions" stroke="hsl(var(--secondary))" strokeWidth={2} />
+              <Line type="monotone" dataKey="visits" name="Page Visits" stroke="hsl(var(--primary))" strokeWidth={2} dot={{ r: 3 }} />
+              <Line type="monotone" dataKey="uniqueSessions" name="Unique Sessions" stroke="hsl(var(--chart-2))" strokeWidth={2} dot={{ r: 3 }} />
             </LineChart>
           </ResponsiveContainer>
         </CardContent>
@@ -282,26 +290,25 @@ export function WebsiteAnalytics() {
       <div className="grid gap-4 md:grid-cols-2">
         {/* Top Pages */}
         <Card>
-          <CardHeader>
+          <CardHeader className="pb-2">
             <CardTitle>Most Visited Pages</CardTitle>
             <CardDescription>Top landing pages by visit count</CardDescription>
           </CardHeader>
           <CardContent>
-            <ResponsiveContainer width="100%" height={300}>
-              <BarChart data={pageViews} layout="vertical">
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis type="number" />
-                <YAxis type="category" dataKey="page" width={120} />
-                <Tooltip />
-                <Bar dataKey="views" name="Views" fill="hsl(var(--primary))" />
+            <ResponsiveContainer width="100%" height={250}>
+              <BarChart data={pageViews} layout="vertical" barSize={12}>
+                <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
+                <XAxis type="number" tick={{ fontSize: 10 }} />
+                <YAxis type="category" dataKey="page" width={100} tick={{ fontSize: 10 }} />
+                <Tooltip contentStyle={{ backgroundColor: "hsl(var(--card))", border: "1px solid hsl(var(--border))" }} />
+                <Bar dataKey="views" name="Views" fill="hsl(var(--primary))" radius={[0, 4, 4, 0]} />
               </BarChart>
             </ResponsiveContainer>
             
-            {/* Detailed list below chart */}
-            <div className="mt-4 space-y-2 border-t pt-4">
+            <div className="mt-3 space-y-1 border-t pt-3 max-h-[150px] overflow-y-auto">
               {pageViews.map((page, idx) => (
-                <div key={idx} className="flex justify-between items-center text-sm">
-                  <span className="text-muted-foreground truncate max-w-[200px]">{page.page}</span>
+                <div key={idx} className="flex justify-between items-center text-xs">
+                  <span className="text-muted-foreground truncate max-w-[180px]">{page.page}</span>
                   <span className="font-medium">{page.views} ({page.percentage}%)</span>
                 </div>
               ))}
@@ -311,34 +318,34 @@ export function WebsiteAnalytics() {
 
         {/* Device Breakdown */}
         <Card>
-          <CardHeader>
+          <CardHeader className="pb-2">
             <CardTitle>Device Distribution</CardTitle>
             <CardDescription>Visitors by device type</CardDescription>
           </CardHeader>
           <CardContent>
-            <ResponsiveContainer width="100%" height={300}>
+            <ResponsiveContainer width="100%" height={250}>
               <PieChart>
                 <Pie
                   data={deviceData}
                   cx="50%"
                   cy="50%"
-                  outerRadius={100}
+                  outerRadius={80}
                   fill="hsl(var(--primary))"
                   dataKey="count"
                   label={({ device, percentage }) => `${device}: ${percentage}%`}
+                  labelLine={{ strokeWidth: 1 }}
                 >
                   {deviceData.map((entry, index) => (
                     <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                   ))}
                 </Pie>
-                <Tooltip />
+                <Tooltip contentStyle={{ backgroundColor: "hsl(var(--card))", border: "1px solid hsl(var(--border))" }} />
               </PieChart>
             </ResponsiveContainer>
 
-            {/* Detailed list below chart */}
-            <div className="mt-4 space-y-2 border-t pt-4">
+            <div className="mt-3 space-y-1 border-t pt-3">
               {deviceData.map((device, idx) => (
-                <div key={idx} className="flex justify-between items-center text-sm">
+                <div key={idx} className="flex justify-between items-center text-xs">
                   <span className="flex items-center gap-2 text-muted-foreground">
                     {getDeviceIcon(device.device)}
                     {device.device}
@@ -353,29 +360,29 @@ export function WebsiteAnalytics() {
 
       {/* Traffic Sources */}
       <Card>
-        <CardHeader>
+        <CardHeader className="pb-2">
           <CardTitle>Traffic Sources Performance</CardTitle>
           <CardDescription>Visits, signups, and conversion rates by source</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="overflow-x-auto">
-            <table className="w-full">
+            <table className="w-full text-sm">
               <thead>
                 <tr className="border-b">
-                  <th className="text-left py-3 px-2 font-medium">Source</th>
-                  <th className="text-right py-3 px-2 font-medium">Visits</th>
-                  <th className="text-right py-3 px-2 font-medium">Signups</th>
-                  <th className="text-right py-3 px-2 font-medium">Conversion Rate</th>
+                  <th className="text-left py-2 px-2 font-medium">Source</th>
+                  <th className="text-right py-2 px-2 font-medium">Visits</th>
+                  <th className="text-right py-2 px-2 font-medium">Signups</th>
+                  <th className="text-right py-2 px-2 font-medium">Conversion</th>
                 </tr>
               </thead>
               <tbody>
                 {trafficSources.map((source, idx) => (
                   <tr key={idx} className="border-b last:border-0">
-                    <td className="py-3 px-2 font-medium">{source.source}</td>
-                    <td className="text-right py-3 px-2">{source.visits.toLocaleString()}</td>
-                    <td className="text-right py-3 px-2">{source.signups}</td>
-                    <td className="text-right py-3 px-2">
-                      <span className={source.conversionRate > 5 ? "text-green-600" : "text-muted-foreground"}>
+                    <td className="py-2 px-2 font-medium">{source.source}</td>
+                    <td className="text-right py-2 px-2">{source.visits.toLocaleString()}</td>
+                    <td className="text-right py-2 px-2">{source.signups}</td>
+                    <td className="text-right py-2 px-2">
+                      <span className={source.conversionRate > 5 ? "text-green-600 font-medium" : "text-muted-foreground"}>
                         {source.conversionRate}%
                       </span>
                     </td>
