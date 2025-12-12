@@ -1,7 +1,8 @@
+import { useState } from "react";
 import { useParams } from "react-router-dom";
 import { Helmet } from "react-helmet";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, BookOpen } from "lucide-react";
 import { WorkoutDisplay } from "@/components/WorkoutDisplay";
 import { AccessGate } from "@/components/AccessGate";
 import { useWorkoutData } from "@/hooks/useWorkoutData";
@@ -9,8 +10,11 @@ import { useAccessControl } from "@/hooks/useAccessControl";
 import { ContentNotFound } from "@/components/ContentNotFound";
 import { useShowBackButton } from "@/hooks/useShowBackButton";
 import { PageBreadcrumbs } from "@/components/PageBreadcrumbs";
+import { ReaderModeDialog } from "@/components/ReaderModeDialog";
+import { HTMLContent } from "@/components/ui/html-content";
 
 const IndividualWorkout = () => {
+  const [readerModeOpen, setReaderModeOpen] = useState(false);
   const { type, id } = useParams();
   const { userTier, hasPurchased } = useAccessControl();
   const { goBack } = useShowBackButton();
@@ -98,7 +102,7 @@ const IndividualWorkout = () => {
         </Helmet>
         <div className="min-h-screen bg-background">
           <div className="container mx-auto px-4 py-8">
-            <div className="mb-4">
+            <div className="mb-4 flex items-center justify-between">
               <Button
                 variant="ghost"
                 size="sm"
@@ -108,6 +112,15 @@ const IndividualWorkout = () => {
                 <ArrowLeft className="mr-2 h-4 w-4" />
                 <span className="text-xs sm:text-sm">Back</span>
               </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setReaderModeOpen(true)}
+                className="gap-2"
+              >
+                <BookOpen className="h-4 w-4" />
+                <span className="hidden sm:inline">Reader Mode</span>
+              </Button>
             </div>
 
             <PageBreadcrumbs items={[
@@ -115,6 +128,69 @@ const IndividualWorkout = () => {
               { label: "Smarty Workouts", href: "/workout" },
               { label: dbWorkout.name }
             ]} />
+
+            <ReaderModeDialog
+              open={readerModeOpen}
+              onOpenChange={setReaderModeOpen}
+              title={dbWorkout.name}
+              metadata={{
+                duration: dbWorkout.duration || undefined,
+                equipment: dbWorkout.equipment || undefined,
+                category: getCategoryLabel(dbWorkout.category)
+              }}
+              content={
+                <div className="space-y-6">
+                  {dbWorkout.description && (
+                    <div>
+                      <h2 className="text-lg font-semibold mb-2">Description</h2>
+                      <HTMLContent content={dbWorkout.description} />
+                    </div>
+                  )}
+                  {dbWorkout.warm_up && (
+                    <div>
+                      <h2 className="text-lg font-semibold mb-2">Warm Up</h2>
+                      <HTMLContent content={dbWorkout.warm_up} />
+                    </div>
+                  )}
+                  {dbWorkout.activation && (
+                    <div>
+                      <h2 className="text-lg font-semibold mb-2">Activation</h2>
+                      <HTMLContent content={dbWorkout.activation} />
+                    </div>
+                  )}
+                  {dbWorkout.main_workout && (
+                    <div>
+                      <h2 className="text-lg font-semibold mb-2">Main Workout</h2>
+                      <HTMLContent content={dbWorkout.main_workout} />
+                    </div>
+                  )}
+                  {dbWorkout.finisher && (
+                    <div>
+                      <h2 className="text-lg font-semibold mb-2">Finisher</h2>
+                      <HTMLContent content={dbWorkout.finisher} />
+                    </div>
+                  )}
+                  {dbWorkout.cool_down && (
+                    <div>
+                      <h2 className="text-lg font-semibold mb-2">Cool Down</h2>
+                      <HTMLContent content={dbWorkout.cool_down} />
+                    </div>
+                  )}
+                  {dbWorkout.instructions && (
+                    <div>
+                      <h2 className="text-lg font-semibold mb-2">Instructions</h2>
+                      <HTMLContent content={dbWorkout.instructions} />
+                    </div>
+                  )}
+                  {dbWorkout.tips && (
+                    <div>
+                      <h2 className="text-lg font-semibold mb-2">Tips</h2>
+                      <HTMLContent content={dbWorkout.tips} />
+                    </div>
+                  )}
+                </div>
+              }
+            />
 
             <AccessGate 
               requireAuth={true} 
