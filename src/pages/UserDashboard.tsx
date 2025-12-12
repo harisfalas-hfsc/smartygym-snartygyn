@@ -1046,7 +1046,7 @@ export default function UserDashboard() {
 
           {/* Workouts Tab */}
           <TabsContent value="workouts" className="space-y-6">
-            {!hasActivePlan && !hasStandalonePurchases && !isPremium ? <Card className="border-primary/50 bg-gradient-to-r from-primary/5 to-primary/10">
+            {!isPremium ? <Card className="border-primary/50 bg-gradient-to-r from-primary/5 to-primary/10">
                 <CardContent className="text-center py-12">
                   <Crown className="h-12 w-12 text-primary mx-auto mb-4" />
                   <h3 className="text-xl font-bold mb-2">Premium Feature</h3>
@@ -1174,7 +1174,7 @@ export default function UserDashboard() {
 
           {/* Programs Tab */}
           <TabsContent value="programs" className="space-y-6">
-            {!hasActivePlan && !hasStandalonePurchases && !isPremium ? <Card className="border-primary/50 bg-gradient-to-r from-primary/5 to-primary/10">
+            {!isPremium ? <Card className="border-primary/50 bg-gradient-to-r from-primary/5 to-primary/10">
                 <CardContent className="text-center py-12">
                   <Crown className="h-12 w-12 text-primary mx-auto mb-4" />
                   <h3 className="text-xl font-bold mb-2">Premium Feature</h3>
@@ -1502,7 +1502,7 @@ export default function UserDashboard() {
 
           {/* LogBook Tab */}
           <TabsContent value="logbook" className="space-y-6">
-            {!hasActivePlan && !hasStandalonePurchases && !isPremium ? <Card className="border-primary/50 bg-gradient-to-r from-primary/5 to-primary/10">
+            {!isPremium ? <Card className="border-primary/50 bg-gradient-to-r from-primary/5 to-primary/10">
                 <CardContent className="text-center py-12">
                   <Crown className="h-12 w-12 text-primary mx-auto mb-4" />
                   <h3 className="text-xl font-bold mb-2">Premium Feature</h3>
