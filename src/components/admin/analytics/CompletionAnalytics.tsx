@@ -1,7 +1,9 @@
 import { useState, useEffect, useRef } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 import { LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from "recharts";
+import { Download } from "lucide-react";
 import { toast } from "sonner";
 import { ChartFilterBar } from "./ChartFilterBar";
 import html2canvas from "html2canvas";
@@ -12,6 +14,8 @@ interface CompletionData {
   programRate: number;
   workoutCount: number;
   programCount: number;
+  workoutTotal: number;
+  programTotal: number;
 }
 
 export function CompletionAnalytics() {
@@ -22,6 +26,8 @@ export function CompletionAnalytics() {
   const [completionData, setCompletionData] = useState<CompletionData[]>([]);
   const [overallWorkoutRate, setOverallWorkoutRate] = useState(0);
   const [overallProgramRate, setOverallProgramRate] = useState(0);
+  const [totalWorkoutInteractions, setTotalWorkoutInteractions] = useState(0);
+  const [totalProgramInteractions, setTotalProgramInteractions] = useState(0);
   const chartRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -70,6 +76,8 @@ export function CompletionAnalytics() {
 
       setOverallWorkoutRate(workoutRate);
       setOverallProgramRate(programRate);
+      setTotalWorkoutInteractions(totalWorkouts);
+      setTotalProgramInteractions(totalPrograms);
 
       // Group by month for trend chart
       const monthlyStats: { [key: string]: { workoutTotal: number; workoutCompleted: number; programTotal: number; programCompleted: number } } = {};
@@ -104,6 +112,8 @@ export function CompletionAnalytics() {
           programRate: stats.programTotal > 0 ? Math.round((stats.programCompleted / stats.programTotal) * 100) : 0,
           workoutCount: stats.workoutCompleted,
           programCount: stats.programCompleted,
+          workoutTotal: stats.workoutTotal,
+          programTotal: stats.programTotal,
         };
       });
 
@@ -131,6 +141,29 @@ export function CompletionAnalytics() {
     }
   };
 
+  const exportTableAsCSV = (filename: string) => {
+    if (completionData.length === 0) {
+      toast.error("No data to export");
+      return;
+    }
+    const headers = ["Period", "Workout Rate %", "Program Rate %", "Workouts Completed", "Programs Completed", "Total Workout Interactions", "Total Program Interactions"];
+    const csvContent = [
+      headers.join(','),
+      ...completionData.map(row => 
+        [row.period, row.workoutRate, row.programRate, row.workoutCount, row.programCount, row.workoutTotal, row.programTotal].join(',')
+      )
+    ].join('\n');
+    
+    const blob = new Blob([csvContent], { type: 'text/csv' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `${filename}-${new Date().toISOString().split("T")[0]}.csv`;
+    link.click();
+    URL.revokeObjectURL(url);
+    toast.success("Data exported as CSV!");
+  };
+
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
@@ -142,7 +175,7 @@ export function CompletionAnalytics() {
   return (
     <div className="space-y-6" ref={chartRef}>
       {/* Overview */}
-      <div className="grid gap-4 md:grid-cols-2">
+      <div className="grid gap-4 md:grid-cols-4">
         <Card className="bg-blue-50/50 border-blue-200">
           <CardHeader className="pb-2">
             <CardTitle className="text-sm">Workout Completion Rate</CardTitle>
@@ -161,13 +194,38 @@ export function CompletionAnalytics() {
             <p className="text-xs text-muted-foreground">Average across all programs</p>
           </CardContent>
         </Card>
+        <Card>
+          <CardHeader className="pb-2">
+            <CardTitle className="text-sm">Total Workout Interactions</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="text-3xl font-bold">{totalWorkoutInteractions}</div>
+            <p className="text-xs text-muted-foreground">In selected period</p>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardHeader className="pb-2">
+            <CardTitle className="text-sm">Total Program Interactions</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="text-3xl font-bold">{totalProgramInteractions}</div>
+            <p className="text-xs text-muted-foreground">In selected period</p>
+          </CardContent>
+        </Card>
       </div>
 
       {/* Completion Trends */}
       <Card>
         <CardHeader className="pb-2">
-          <CardTitle>Completion Rate Trends</CardTitle>
-          <CardDescription>Workouts vs Programs completion over time</CardDescription>
+          <div className="flex justify-between items-start">
+            <div>
+              <CardTitle>Completion Rate Trends</CardTitle>
+              <CardDescription>Workouts vs Programs completion over time</CardDescription>
+            </div>
+            <Button variant="outline" size="sm" onClick={() => exportTableAsCSV('completion-rates')}>
+              <Download className="h-3 w-3 mr-1" /> Export CSV
+            </Button>
+          </div>
         </CardHeader>
         <CardContent>
           <ChartFilterBar
@@ -215,17 +273,51 @@ export function CompletionAnalytics() {
                 </LineChart>
               </ResponsiveContainer>
 
-              {/* Detailed breakdown */}
-              <div className="mt-4 space-y-2 border-t pt-4">
-                {completionData.map((item, idx) => (
-                  <div key={idx} className="flex justify-between items-center text-xs">
-                    <span className="text-muted-foreground">{item.period}</span>
-                    <div className="flex items-center gap-4">
-                      <span className="text-blue-600">{item.workoutRate}% workouts</span>
-                      <span className="text-green-600">{item.programRate}% programs</span>
-                    </div>
-                  </div>
-                ))}
+              {/* Detailed Data Table */}
+              <div className="mt-4 border-t pt-4">
+                <div className="flex justify-between items-center mb-2">
+                  <span className="text-sm font-medium">Detailed Breakdown</span>
+                </div>
+                <div className="max-h-[200px] overflow-y-auto">
+                  <table className="w-full text-sm">
+                    <thead className="sticky top-0 bg-background">
+                      <tr className="border-b bg-muted/50">
+                        <th className="text-left py-2 px-2 font-medium">Period</th>
+                        <th className="text-right py-2 px-2 font-medium">Workout Rate</th>
+                        <th className="text-right py-2 px-2 font-medium">Program Rate</th>
+                        <th className="text-right py-2 px-2 font-medium">Workouts Done</th>
+                        <th className="text-right py-2 px-2 font-medium">Programs Done</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {completionData.map((item, idx) => (
+                        <tr key={idx} className="border-b last:border-0 hover:bg-muted/30">
+                          <td className="py-1.5 px-2 font-medium">{item.period}</td>
+                          <td className="text-right py-1.5 px-2">
+                            <span className={item.workoutRate >= 50 ? "text-blue-600 font-medium" : "text-muted-foreground"}>
+                              {item.workoutRate}%
+                            </span>
+                          </td>
+                          <td className="text-right py-1.5 px-2">
+                            <span className={item.programRate >= 50 ? "text-green-600 font-medium" : "text-muted-foreground"}>
+                              {item.programRate}%
+                            </span>
+                          </td>
+                          <td className="text-right py-1.5 px-2">{item.workoutCount}/{item.workoutTotal}</td>
+                          <td className="text-right py-1.5 px-2">{item.programCount}/{item.programTotal}</td>
+                        </tr>
+                      ))}
+                      {/* Totals Row */}
+                      <tr className="bg-muted/50 font-medium">
+                        <td className="py-2 px-2">Total</td>
+                        <td className="text-right py-2 px-2 text-blue-600">{overallWorkoutRate}%</td>
+                        <td className="text-right py-2 px-2 text-green-600">{overallProgramRate}%</td>
+                        <td className="text-right py-2 px-2">{completionData.reduce((sum, d) => sum + d.workoutCount, 0)}</td>
+                        <td className="text-right py-2 px-2">{completionData.reduce((sum, d) => sum + d.programCount, 0)}</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
               </div>
             </>
           )}
@@ -235,8 +327,8 @@ export function CompletionAnalytics() {
       {/* Completed Counts */}
       <Card>
         <CardHeader className="pb-2">
-          <CardTitle>Completed Content</CardTitle>
-          <CardDescription>Number of completions by type</CardDescription>
+          <CardTitle>Completed Content Volume</CardTitle>
+          <CardDescription>Number of completions by type over time</CardDescription>
         </CardHeader>
         <CardContent>
           <ResponsiveContainer width="100%" height={250}>
