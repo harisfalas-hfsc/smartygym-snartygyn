@@ -236,7 +236,8 @@ export const HeroThreeColumns = () => {
               key={currentWod.id}
               className="mt-2 text-center space-y-1 animate-fade-in"
             >
-              <p className="text-sm font-medium text-foreground">{currentWod.category}</p>
+              <p className="text-sm font-semibold text-foreground">{currentWod.name}</p>
+              <p className="text-xs text-muted-foreground">{currentWod.category}</p>
               <div className="flex items-center justify-center gap-2 text-xs text-muted-foreground">
                 {currentWod.format && <span>{currentWod.format}</span>}
                 {currentWod.difficulty_stars && (
