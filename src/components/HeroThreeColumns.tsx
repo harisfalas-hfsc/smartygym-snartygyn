@@ -83,24 +83,37 @@ const AnimatedBullet = ({ icon, text, delay, onClick, isLink, isVisible, highlig
 export const HeroThreeColumns = () => {
   const navigate = useNavigate();
   const [isVisible, setIsVisible] = useState(false);
+  const [currentWodIndex, setCurrentWodIndex] = useState(0);
 
   useEffect(() => {
     setIsVisible(true);
   }, []);
 
-  // Fetch WOD data for the banner
-  const { data: wod } = useQuery({
+  // Fetch both WODs for the banner
+  const { data: wods } = useQuery({
     queryKey: ["wod-hero-banner"],
     queryFn: async () => {
       const { data } = await supabase
         .from("admin_workouts")
-        .select("name, category, difficulty_stars, format, duration")
+        .select("id, name, category, difficulty_stars, format, duration")
         .eq("is_workout_of_day", true)
-        .limit(1);
-      return data?.[0] || null;
+        .limit(2);
+      return data || [];
     },
     staleTime: 1000 * 60 * 5,
   });
+
+  // Rotate between WODs every 5 seconds
+  useEffect(() => {
+    if (wods && wods.length > 1) {
+      const interval = setInterval(() => {
+        setCurrentWodIndex((prev) => (prev === 0 ? 1 : 0));
+      }, 5000);
+      return () => clearInterval(interval);
+    }
+  }, [wods]);
+
+  const currentWod = wods?.[currentWodIndex] || wods?.[0];
 
   const exploreLinks = [
     { text: "Smarty Workouts", subtitle: "500+ workouts", icon: <Dumbbell className="w-4 h-4 text-primary" />, route: "/workout" },
@@ -199,14 +212,13 @@ export const HeroThreeColumns = () => {
           onClick={() => navigate("/workout/wod")}
           className="cursor-pointer group flex flex-col items-center"
         >
-          {/* Animated Gold Circle */}
+          {/* Gold Circle with Dumbbell */}
           <div className="relative">
             <div className="w-20 h-20 rounded-full bg-gradient-to-br from-primary via-yellow-500 to-primary 
                             flex items-center justify-center shadow-lg
                             group-hover:scale-110 transition-transform duration-300
-                            ring-4 ring-primary/30 ring-offset-2 ring-offset-background
-                            animate-pulse">
-              <CalendarCheck className="w-10 h-10 text-white" />
+                            ring-4 ring-primary/30 ring-offset-2 ring-offset-background">
+              <Dumbbell className="w-10 h-10 text-white" />
             </div>
             
             {/* Glow effect */}
@@ -218,22 +230,25 @@ export const HeroThreeColumns = () => {
             Workout of the Day
           </h3>
           
-          {/* WOD Details */}
-          {wod && (
-            <div className="mt-2 text-center space-y-1">
-              <p className="text-sm font-medium text-foreground">{wod.category}</p>
+          {/* WOD Details - rotates between WODs */}
+          {currentWod && (
+            <div 
+              key={currentWod.id}
+              className="mt-2 text-center space-y-1 animate-fade-in"
+            >
+              <p className="text-sm font-medium text-foreground">{currentWod.category}</p>
               <div className="flex items-center justify-center gap-2 text-xs text-muted-foreground">
-                {wod.format && <span>{wod.format}</span>}
-                {wod.difficulty_stars && (
+                {currentWod.format && <span>{currentWod.format}</span>}
+                {currentWod.difficulty_stars && (
                   <>
                     <span>•</span>
-                    <span className="flex items-center gap-0.5">{renderStars(wod.difficulty_stars)}</span>
+                    <span className="flex items-center gap-0.5">{renderStars(currentWod.difficulty_stars)}</span>
                   </>
                 )}
-                {wod.duration && (
+                {currentWod.duration && (
                   <>
                     <span>•</span>
-                    <span>{wod.duration}</span>
+                    <span>{currentWod.duration}</span>
                   </>
                 )}
               </div>
