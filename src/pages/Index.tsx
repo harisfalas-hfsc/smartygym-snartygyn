@@ -498,9 +498,9 @@ const Index = () => {
           {currentMobileWod && (
             <div 
               onClick={() => navigate('/workout/wod')} 
-              className="flex items-center gap-2.5 py-2 px-4 bg-emerald-50 dark:bg-emerald-950/20 border-2 border-emerald-400 dark:border-emerald-500 rounded-lg hover:border-emerald-500 dark:hover:border-emerald-400 transition-all cursor-pointer hover:shadow-md"
+              className="flex items-center gap-2.5 py-2 px-4 bg-primary/5 border-2 border-emerald-400 dark:border-emerald-500 rounded-lg hover:border-emerald-500 dark:hover:border-emerald-400 transition-all cursor-pointer hover:shadow-md"
             >
-              <Dumbbell className="w-5 h-5 text-emerald-500 dark:text-emerald-400 flex-shrink-0" />
+              <Dumbbell className="w-5 h-5 text-primary flex-shrink-0" />
               <div 
                 key={currentMobileWod.id} 
                 className="flex-1 animate-fade-in"
