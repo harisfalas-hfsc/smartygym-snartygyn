@@ -13,7 +13,10 @@ import {
   BookOpen,
   ArrowLeft,
   Zap,
-  Sparkles
+  Sparkles,
+  Heart,
+  TrendingUp,
+  Target
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { User } from "@supabase/supabase-js";
@@ -84,12 +87,15 @@ export default function JoinPremium() {
   };
 
   const features = [
-    { icon: Dumbbell, text: "Unlimited Smarty Workouts" },
-    { icon: Calendar, text: "Structured Smarty Programs" },
-    { icon: Sparkles, text: "Daily Smarty Ritual" },
-    { icon: Calculator, text: "Advanced Smarty Tools" },
-    { icon: BookOpen, text: "Complete exercise library" },
-    { icon: Zap, text: "Priority support" }
+    { icon: Dumbbell, title: "Unlimited Workouts", description: "Access to all personalized workout plans" },
+    { icon: Calendar, title: "Training Programs", description: "Structured training programs to achieve long-term goals" },
+    { icon: Heart, title: "Track Favorites", description: "Save and organize your favorite workouts" },
+    { icon: TrendingUp, title: "Progress Tracking", description: "Monitor completed workouts and achievements" },
+    { icon: Target, title: "Goal Setting", description: "Set and track your fitness goals" },
+    { icon: BookOpen, title: "Exercise Library", description: "Complete exercise database with videos" },
+    { icon: Calculator, title: "Fitness Tools", description: "BMR, 1RM, and macro calculators with history" },
+    { icon: Sparkles, title: "Smarty Rituals & Check-ins", description: "Daily wellness routines and fitness tracking check-ins" },
+    { icon: Zap, title: "Priority Support", description: "Get help when you need it" }
   ];
 
   return (
@@ -249,7 +255,10 @@ export default function JoinPremium() {
                     <div className="p-2 bg-primary/10 rounded-full">
                       <feature.icon className="h-5 w-5 text-primary" />
                     </div>
-                    <span className="text-sm font-medium">{feature.text}</span>
+                    <div className="flex flex-col">
+                      <span className="text-sm font-medium">{feature.title}</span>
+                      <span className="text-xs text-muted-foreground">{feature.description}</span>
+                    </div>
                   </div>
                 ))}
               </div>
