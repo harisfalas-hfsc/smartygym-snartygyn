@@ -1,5 +1,7 @@
 import { useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
 import { 
   Dumbbell, 
   Calendar, 
@@ -13,7 +15,10 @@ import {
   Target,
   Plane,
   Smartphone,
-  UserCheck
+  UserCheck,
+  CalendarCheck,
+  ChevronRight,
+  Star
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -83,6 +88,20 @@ export const HeroThreeColumns = () => {
     setIsVisible(true);
   }, []);
 
+  // Fetch WOD data for the banner
+  const { data: wod } = useQuery({
+    queryKey: ["wod-hero-banner"],
+    queryFn: async () => {
+      const { data } = await supabase
+        .from("admin_workouts")
+        .select("name, category, difficulty_stars, format, duration")
+        .eq("is_workout_of_day", true)
+        .limit(1);
+      return data?.[0] || null;
+    },
+    staleTime: 1000 * 60 * 5,
+  });
+
   const exploreLinks = [
     { text: "Smarty Workouts", subtitle: "500+ workouts", icon: <Dumbbell className="w-4 h-4 text-primary" />, route: "/workout" },
     { text: "Smarty Programs", subtitle: "structured long-term plans", icon: <Calendar className="w-4 h-4 text-primary" />, route: "/trainingprogram" },
@@ -108,10 +127,16 @@ export const HeroThreeColumns = () => {
     { text: "Train Anywhere, Anytime", icon: <Plane className="w-4 h-4 text-primary" /> },
   ];
 
+  const renderStars = (count: number) => {
+    return Array.from({ length: count }, (_, i) => (
+      <Star key={i} className="w-3 h-3 fill-primary text-primary" />
+    ));
+  };
+
   return (
-    <div className="flex flex-col md:flex-row md:items-start gap-6 md:gap-0 mt-6">
+    <div className="flex flex-col lg:flex-row lg:items-start gap-6 lg:gap-0 mt-6">
       {/* Column 1: Explore */}
-      <div className="pt-8 md:pr-6 lg:pr-12">
+      <div className="pt-8 lg:pr-6 xl:pr-12">
         <h3 className="text-lg font-bold text-foreground mb-4">
           Explore
         </h3>
@@ -132,7 +157,7 @@ export const HeroThreeColumns = () => {
       </div>
 
       {/* Column 2: Who is SmartyGym For? */}
-      <div className="pt-8 md:pl-6 md:pr-6 lg:pl-12 lg:pr-12">
+      <div className="pt-8 lg:pl-6 lg:pr-6 xl:pl-12 xl:pr-12">
         <h3 className="text-lg font-bold text-foreground mb-4">
           Who is <span className="text-primary">SmartyGym</span> For?
         </h3>
@@ -150,7 +175,7 @@ export const HeroThreeColumns = () => {
       </div>
 
       {/* Column 3: Why SmartyGym */}
-      <div className="pt-8 md:pl-6 lg:pl-12">
+      <div className="pt-8 lg:pl-6 xl:pl-12">
         <h3 className="text-lg font-bold text-foreground mb-4">
           Why SmartyGym
         </h3>
@@ -165,6 +190,62 @@ export const HeroThreeColumns = () => {
               highlight={item.highlight}
             />
           ))}
+        </div>
+      </div>
+
+      {/* Column 4: WOD Promotional Banner */}
+      <div className="pt-8 lg:pl-6 xl:pl-12 lg:ml-auto">
+        <div 
+          onClick={() => navigate("/workout/wod")}
+          className="cursor-pointer group flex flex-col items-center"
+        >
+          {/* Animated Gold Circle */}
+          <div className="relative">
+            <div className="w-20 h-20 rounded-full bg-gradient-to-br from-primary via-yellow-500 to-primary 
+                            flex items-center justify-center shadow-lg
+                            group-hover:scale-110 transition-transform duration-300
+                            ring-4 ring-primary/30 ring-offset-2 ring-offset-background
+                            animate-pulse">
+              <CalendarCheck className="w-10 h-10 text-white" />
+            </div>
+            
+            {/* Glow effect */}
+            <div className="absolute inset-0 w-20 h-20 rounded-full bg-primary/30 blur-xl -z-10" />
+          </div>
+          
+          {/* Title */}
+          <h3 className="text-lg font-bold text-primary text-center mt-4 group-hover:underline transition-all">
+            Workout of the Day
+          </h3>
+          
+          {/* WOD Details */}
+          {wod && (
+            <div className="mt-2 text-center space-y-1">
+              <p className="text-sm font-medium text-foreground">{wod.category}</p>
+              <div className="flex items-center justify-center gap-2 text-xs text-muted-foreground">
+                {wod.format && <span>{wod.format}</span>}
+                {wod.difficulty_stars && (
+                  <>
+                    <span>•</span>
+                    <span className="flex items-center gap-0.5">{renderStars(wod.difficulty_stars)}</span>
+                  </>
+                )}
+                {wod.duration && (
+                  <>
+                    <span>•</span>
+                    <span>{wod.duration}</span>
+                  </>
+                )}
+              </div>
+            </div>
+          )}
+          
+          {/* CTA */}
+          <div className="flex items-center justify-center gap-1 mt-3 text-primary text-sm font-medium 
+                          group-hover:gap-2 transition-all">
+            View Today's WOD
+            <ChevronRight className="w-4 h-4" />
+          </div>
         </div>
       </div>
     </div>
