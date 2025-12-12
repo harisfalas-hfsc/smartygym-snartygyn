@@ -5,7 +5,7 @@ import { ServiceCard } from "@/components/ServiceCard";
 import { Button } from "@/components/ui/button";
 import { Card, CardHeader, CardTitle, CardContent, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Dumbbell, Calendar, BookOpen, Calculator, Activity, Flame, Instagram, Facebook, Youtube, UserCheck, Wrench, Video, FileText, Smartphone, Users, Target, Heart, Zap, Plane, GraduationCap, Check, Crown, ChevronDown, ChevronRight, Move, Ban, Brain, CheckCircle2, Award, Shield, Compass, Sparkles, Info, User, HelpCircle, ShoppingBag } from "lucide-react";
+import { Dumbbell, Calendar, BookOpen, Calculator, Activity, Flame, Instagram, Facebook, Youtube, UserCheck, Wrench, Video, FileText, Smartphone, Users, Target, Heart, Zap, Plane, GraduationCap, Check, Crown, ChevronDown, ChevronRight, Move, Ban, Brain, CheckCircle2, Award, Shield, Compass, Sparkles, Info, User, HelpCircle, ShoppingBag, Star } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { User as SupabaseUser } from "@supabase/supabase-js";
@@ -498,15 +498,30 @@ const Index = () => {
           {currentMobileWod && (
             <div 
               onClick={() => navigate('/workout/wod')} 
-              className="flex items-center gap-2.5 py-1.5 px-4 bg-primary/5 border-2 border-border rounded-lg hover:border-primary transition-all cursor-pointer hover:shadow-md"
+              className="flex items-center gap-2.5 py-2 px-4 bg-primary/5 border-2 border-border rounded-lg hover:border-primary transition-all cursor-pointer hover:shadow-md"
             >
               <Dumbbell className="w-5 h-5 text-primary flex-shrink-0" />
               <div 
                 key={currentMobileWod.id} 
                 className="flex-1 animate-fade-in"
               >
-                <span className="text-base font-medium">Your Workout of the Day</span>
-                <p className="text-xs text-muted-foreground">{currentMobileWod.name}</p>
+                <span className="text-sm font-medium text-muted-foreground">Your Workout of the Day</span>
+                <p className="text-base font-semibold text-foreground">{currentMobileWod.name}</p>
+                <div className="flex items-center gap-2 text-xs mt-0.5">
+                  {currentMobileWod.format && (
+                    <span className="text-emerald-600 dark:text-emerald-400 font-medium">{currentMobileWod.format}</span>
+                  )}
+                  {currentMobileWod.difficulty_stars && (
+                    <span className="flex items-center gap-0.5">
+                      {Array.from({ length: currentMobileWod.difficulty_stars }, (_, i) => (
+                        <Star key={i} className="w-3 h-3 fill-primary text-primary" />
+                      ))}
+                    </span>
+                  )}
+                  {currentMobileWod.category && (
+                    <span className="text-muted-foreground">{currentMobileWod.category}</span>
+                  )}
+                </div>
               </div>
               <ChevronRight className="w-5 h-5 ml-auto text-muted-foreground" />
             </div>
