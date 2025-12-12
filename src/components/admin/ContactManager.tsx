@@ -723,15 +723,15 @@ export const ContactManager = () => {
                   <p className="text-sm font-semibold">Email</p>
                   <a 
                     href={`mailto:${selectedMessage.email}?subject=Re: ${encodeURIComponent(selectedMessage.subject)}`}
-                    className="text-sm text-primary hover:underline cursor-pointer flex items-center gap-1"
+                    className="text-sm text-primary hover:underline cursor-pointer flex items-center gap-1 font-medium"
                   >
                     <Mail className="h-3 w-3" />
                     {selectedMessage.email}
                   </a>
                   {!selectedMessage.user_id && (
-                    <p className="text-xs text-muted-foreground mt-1">
-                      This is a visitor message - click email to respond directly
-                    </p>
+                    <Badge variant="secondary" className="mt-1 text-xs">
+                      Visitor Message
+                    </Badge>
                   )}
                 </div>
                 <div>
@@ -810,14 +810,20 @@ export const ContactManager = () => {
                     <Label htmlFor="template">Use Template (Optional)</Label>
                     <Select value={selectedTemplate} onValueChange={handleTemplateSelect}>
                       <SelectTrigger>
-                        <SelectValue placeholder="Select a template..." />
+                        <SelectValue placeholder={templates.length > 0 ? "Select a template..." : "No templates available"} />
                       </SelectTrigger>
                       <SelectContent>
-                        {templates.map((template) => (
-                          <SelectItem key={template.id} value={template.id}>
-                            {template.name}
-                          </SelectItem>
-                        ))}
+                        {templates.length > 0 ? (
+                          templates.map((template) => (
+                            <SelectItem key={template.id} value={template.id}>
+                              {template.name}
+                            </SelectItem>
+                          ))
+                        ) : (
+                          <div className="px-2 py-1.5 text-sm text-muted-foreground">
+                            Create templates in Response Templates Manager
+                          </div>
+                        )}
                       </SelectContent>
                     </Select>
                   </div>
@@ -881,12 +887,18 @@ export const ContactManager = () => {
                     {isResponding ? "Saving..." : "Send Response to Dashboard"}
                   </Button>
                 )}
-                {!selectedMessage.user_id && (
-                  <div className="bg-blue-50 dark:bg-blue-950 border border-blue-200 dark:border-blue-800 p-3 rounded-lg flex-1">
-                    <p className="text-sm text-blue-900 dark:text-blue-100">
-                      💡 This is a visitor message. Respond via email: <strong>{selectedMessage.email}</strong>
-                    </p>
-                  </div>
+                {!selectedMessage.user_id && !selectedMessage.response && (
+                  <Button
+                    variant="default"
+                    onClick={() => {
+                      const subject = encodeURIComponent(`Re: ${selectedMessage.subject}`);
+                      const body = encodeURIComponent(responseText || `Dear ${selectedMessage.name},\n\nThank you for contacting SmartyGym.\n\n[Your response here]\n\nBest regards,\nThe SmartyGym Team`);
+                      window.open(`mailto:${selectedMessage.email}?subject=${subject}&body=${body}`, '_blank');
+                    }}
+                  >
+                    <Mail className="h-4 w-4 mr-2" />
+                    Send via Email
+                  </Button>
                 )}
                 {selectedMessage.status !== 'closed' && (
                   <Button 
