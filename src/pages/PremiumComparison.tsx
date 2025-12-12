@@ -3,7 +3,7 @@ import { Helmet } from "react-helmet";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Check, X, ArrowLeft, Eye, UserCheck, Crown, Dumbbell, BookOpen, Calculator, Users, Heart, Sparkles, Flame, LayoutDashboard, MessageCircle } from "lucide-react";
+import { Check, X, ArrowLeft, Eye, UserCheck, Crown, Dumbbell, BookOpen, Calculator, Users, Heart, Sparkles, Flame, LayoutDashboard, MessageCircle, ClipboardCheck } from "lucide-react";
 import { useShowBackButton } from "@/hooks/useShowBackButton";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
@@ -43,6 +43,20 @@ const PremiumComparison = () => {
       icon: Flame,
       visitor: false,
       subscriber: "Free programs",
+      premium: "Full access"
+    },
+    {
+      category: "Daily Smarty Ritual",
+      icon: Sparkles,
+      visitor: false,
+      subscriber: false,
+      premium: "Full access"
+    },
+    {
+      category: "Smarty Check-ins",
+      icon: ClipboardCheck,
+      visitor: false,
+      subscriber: false,
       premium: "Full access"
     },
     {
