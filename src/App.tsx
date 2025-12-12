@@ -24,7 +24,6 @@ import { trackPageVisit } from "./utils/socialMediaTracking";
 import Index from "./pages/Index";
 import Auth from "./pages/Auth";
 import ResetPassword from "./pages/ResetPassword";
-import Dashboard from "./pages/Dashboard";
 import UserDashboard from "./pages/UserDashboard";
 import WorkoutFlow from "./pages/WorkoutFlow";
 import WorkoutDetail from "./pages/WorkoutDetail";
@@ -141,7 +140,6 @@ const AppContent = () => {
                 
                 {/* Authenticated routes with motivational banner */}
                 <Route element={<ProtectedRoute><AuthenticatedLayout /></ProtectedRoute>}>
-                  <Route path="/dashboard" element={<Dashboard />} />
                   <Route path="/userdashboard" element={<UserDashboard />} />
                   <Route path="/1rmcalculator" element={<OneRMCalculator />} />
                   <Route path="/bmrcalculator" element={<BMRCalculator />} />
