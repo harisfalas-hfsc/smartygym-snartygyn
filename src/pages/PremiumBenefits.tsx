@@ -22,7 +22,8 @@ import {
   Flame,
   LayoutDashboard,
   MessageCircle,
-  X
+  X,
+  ClipboardCheck
 } from "lucide-react";
 import { useShowBackButton } from "@/hooks/useShowBackButton";
 import { useEffect, useState } from "react";
@@ -65,6 +66,13 @@ export default function PremiumBenefits() {
     {
       category: "Daily Smarty Ritual",
       icon: Sparkles,
+      visitor: false,
+      subscriber: false,
+      premium: "Full access"
+    },
+    {
+      category: "Smarty Check-ins",
+      icon: ClipboardCheck,
       visitor: false,
       subscriber: false,
       premium: "Full access"
@@ -138,6 +146,7 @@ export default function PremiumBenefits() {
     { icon: Target, title: "Goal Setting", description: "Set and track your fitness goals" },
     { icon: BookOpen, title: "Exercise Library", description: "Complete exercise database with videos" },
     { icon: Calculator, title: "Fitness Tools", description: "BMR, 1RM, and macro calculators with history" },
+    { icon: Sparkles, title: "Smarty Rituals & Check-ins", description: "Daily wellness routines and fitness tracking check-ins" },
     { icon: Zap, title: "Priority Support", description: "Get help when you need it" }
   ];
 
