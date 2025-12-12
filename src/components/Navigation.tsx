@@ -14,13 +14,14 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { User as UserIcon, Settings, LogOut, LayoutDashboard, Crown, Menu, Bell, Facebook, Instagram, Youtube, ShoppingBag, Info, Dumbbell, ListChecks, Wrench, BookOpen, Users, Newspaper, Mail, Sparkles, Building2 } from "lucide-react";
+import { User as UserIcon, Settings, LogOut, LayoutDashboard, Crown, Menu, Bell, Facebook, Instagram, Youtube, ShoppingBag, Info, Dumbbell, ListChecks, Wrench, BookOpen, Users, Newspaper, Mail, Sparkles, Building2, Shield } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import smartyGymLogo from "@/assets/smarty-gym-logo.png";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { useUnreadMessages } from "@/hooks/useUnreadMessages";
 import { SafeNotificationBadge } from "@/components/NotificationBadge";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { useAdminRole } from "@/hooks/useAdminRole";
 
 interface SubscriptionInfo {
   subscribed: boolean;
@@ -44,6 +45,7 @@ export const Navigation = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const { data: unreadCount = 0, refetch: refetchUnread } = useUnreadMessages();
   const isMobile = useIsMobile();
+  const { isAdmin } = useAdminRole();
 
   // Listen for messages being read to update badge immediately
   useEffect(() => {
@@ -323,6 +325,19 @@ export const Navigation = () => {
                     <Mail className="mr-2 h-4 w-4 text-indigo-500" />
                     Contact
                   </Button>
+                  {isAdmin && (
+                    <Button
+                      variant="ghost"
+                      onClick={() => {
+                        window.open('/admin', '_blank', 'noopener,noreferrer');
+                        setMobileMenuOpen(false);
+                      }}
+                      className="justify-start font-semibold transition-all duration-200 text-red-600 hover:bg-red-100/80 hover:text-red-700"
+                    >
+                      <Shield className="mr-2 h-4 w-4 text-red-600" />
+                      Admin
+                    </Button>
+                  )}
                 </nav>
               </SheetContent>
             </Sheet>
@@ -386,6 +401,18 @@ export const Navigation = () => {
 
           {/* Right Side - Auth */}
           <div className="flex items-center gap-2">
+            {/* Admin Button - only visible to admins */}
+            {isAdmin && (
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => window.open('/admin', '_blank', 'noopener,noreferrer')}
+                className="hidden sm:flex items-center gap-1.5 border-red-500/50 text-red-600 hover:bg-red-50 hover:text-red-700 dark:hover:bg-red-950/30"
+              >
+                <Shield className="h-4 w-4" />
+                Admin
+              </Button>
+            )}
             <ThemeToggle />
             
             {user && unreadCount > 0 && (
