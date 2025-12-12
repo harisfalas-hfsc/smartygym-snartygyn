@@ -40,6 +40,12 @@ const detectReferralSource = (): { source: string; utmParams: any } => {
     if (referrer.includes('youtube.com') || referrer.includes('youtu.be')) return { source: 'youtube', utmParams };
     if (referrer.includes('twitter.com') || referrer.includes('x.com')) return { source: 'twitter', utmParams };
     if (referrer.includes('linkedin.com')) return { source: 'linkedin', utmParams };
+    // Organic search engines
+    if (referrer.includes('google.com') || referrer.includes('google.')) return { source: 'google', utmParams };
+    if (referrer.includes('bing.com')) return { source: 'bing', utmParams };
+    if (referrer.includes('yahoo.com')) return { source: 'yahoo', utmParams };
+    if (referrer.includes('duckduckgo.com')) return { source: 'duckduckgo', utmParams };
+    if (referrer.includes('ecosia.org')) return { source: 'ecosia', utmParams };
     if (referrer) return { source: 'other', utmParams };
   }
 

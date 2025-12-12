@@ -1,8 +1,10 @@
 import { useEffect, useState, useRef } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Button } from "@/components/ui/button";
 import { LineChart, Line, BarChart, Bar, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from "recharts";
-import { Globe, Monitor, Smartphone, Tablet, Eye, TrendingUp } from "lucide-react";
+import { Globe, Monitor, Smartphone, Tablet, Eye, TrendingUp, Download } from "lucide-react";
 import { toast } from "sonner";
 import { ChartFilterBar } from "./ChartFilterBar";
 import html2canvas from "html2canvas";
@@ -34,6 +36,7 @@ interface DailyVisitorData {
 
 export function WebsiteAnalytics() {
   const [timeFilter, setTimeFilter] = useState("30");
+  const [sourceFilter, setSourceFilter] = useState("all");
   const [customStartDate, setCustomStartDate] = useState<Date>();
   const [customEndDate, setCustomEndDate] = useState<Date>();
   const [loading, setLoading] = useState(true);
@@ -44,11 +47,13 @@ export function WebsiteAnalytics() {
   const [trafficSources, setTrafficSources] = useState<TrafficSourceData[]>([]);
   const [dailyVisitors, setDailyVisitors] = useState<DailyVisitorData[]>([]);
   const [avgPagesPerSession, setAvgPagesPerSession] = useState(0);
+  const [availableSources, setAvailableSources] = useState<string[]>([]);
   const chartRef = useRef<HTMLDivElement>(null);
+  const tableRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     fetchWebsiteAnalytics();
-  }, [timeFilter, customStartDate, customEndDate]);
+  }, [timeFilter, sourceFilter, customStartDate, customEndDate]);
 
   const getDateRange = () => {
     const endDate = new Date();
@@ -68,14 +73,30 @@ export function WebsiteAnalytics() {
       const { startDate, endDate } = getDateRange();
 
       // Fetch all website analytics data
-      const { data: analyticsData, error } = await supabase
+      let query = supabase
         .from("social_media_analytics")
         .select("*")
         .gte("created_at", startDate.toISOString())
         .lte("created_at", endDate.toISOString())
         .order("created_at", { ascending: true });
 
+      if (sourceFilter !== "all") {
+        query = query.eq("referral_source", sourceFilter);
+      }
+
+      const { data: analyticsData, error } = await query;
+
       if (error) throw error;
+
+      // Get all unique sources for the filter dropdown
+      const { data: allSourcesData } = await supabase
+        .from("social_media_analytics")
+        .select("referral_source")
+        .gte("created_at", startDate.toISOString())
+        .lte("created_at", endDate.toISOString());
+      
+      const uniqueSources = [...new Set(allSourcesData?.map(d => d.referral_source) || [])].sort();
+      setAvailableSources(uniqueSources);
 
       // Total visitors (visits)
       const visits = analyticsData?.filter(d => d.event_type === "visit") || [];
@@ -96,6 +117,7 @@ export function WebsiteAnalytics() {
       const pageViewsData = Object.entries(pageViewCounts)
         .map(([page, views]) => ({
           page: page.length > 25 ? page.substring(0, 25) + "..." : page,
+          fullPage: page,
           views,
           percentage: totalPageViews > 0 ? Math.round((views / totalPageViews) * 100) : 0
         }))
@@ -120,9 +142,15 @@ export function WebsiteAnalytics() {
         .sort((a, b) => b.count - a.count);
       setDeviceData(deviceDataArray);
 
-      // Traffic sources
+      // Traffic sources (use all data, not filtered by source for this view)
+      const { data: allData } = await supabase
+        .from("social_media_analytics")
+        .select("*")
+        .gte("created_at", startDate.toISOString())
+        .lte("created_at", endDate.toISOString());
+
       const sourceCounts: { [key: string]: { visits: number; signups: number } } = {};
-      analyticsData?.forEach(d => {
+      allData?.forEach(d => {
         const source = d.referral_source || "direct";
         if (!sourceCounts[source]) {
           sourceCounts[source] = { visits: 0, signups: 0 };
@@ -133,7 +161,8 @@ export function WebsiteAnalytics() {
       
       const trafficSourcesData = Object.entries(sourceCounts)
         .map(([source, data]) => ({
-          source: source.charAt(0).toUpperCase() + source.slice(1),
+          source: formatSourceName(source),
+          rawSource: source,
           visits: data.visits,
           signups: data.signups,
           conversionRate: data.visits > 0 ? Math.round((data.signups / data.visits) * 100) : 0
@@ -175,6 +204,25 @@ export function WebsiteAnalytics() {
     }
   };
 
+  const formatSourceName = (source: string): string => {
+    const sourceMap: { [key: string]: string } = {
+      'direct': 'Direct Traffic',
+      'google': 'Google (Organic)',
+      'bing': 'Bing (Organic)',
+      'yahoo': 'Yahoo (Organic)',
+      'duckduckgo': 'DuckDuckGo (Organic)',
+      'ecosia': 'Ecosia (Organic)',
+      'facebook': 'Facebook',
+      'instagram': 'Instagram',
+      'twitter': 'Twitter/X',
+      'linkedin': 'LinkedIn',
+      'youtube': 'YouTube',
+      'tiktok': 'TikTok',
+      'other': 'Other Referrals'
+    };
+    return sourceMap[source.toLowerCase()] || source.charAt(0).toUpperCase() + source.slice(1);
+  };
+
   const handleExport = async () => {
     if (!chartRef.current) return;
     try {
@@ -189,7 +237,28 @@ export function WebsiteAnalytics() {
     }
   };
 
-  const COLORS = ["hsl(var(--primary))", "hsl(var(--chart-2))", "hsl(var(--chart-3))", "hsl(var(--chart-4))"];
+  const exportTableAsCSV = (data: any[], filename: string) => {
+    if (data.length === 0) {
+      toast.error("No data to export");
+      return;
+    }
+    const headers = Object.keys(data[0]).filter(k => k !== 'fullPage' && k !== 'rawSource');
+    const csvContent = [
+      headers.join(','),
+      ...data.map(row => headers.map(h => `"${row[h]}"`).join(','))
+    ].join('\n');
+    
+    const blob = new Blob([csvContent], { type: 'text/csv' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `${filename}-${new Date().toISOString().split("T")[0]}.csv`;
+    link.click();
+    URL.revokeObjectURL(url);
+    toast.success("Data exported as CSV!");
+  };
+
+  const COLORS = ["hsl(var(--primary))", "hsl(var(--chart-2))", "hsl(var(--chart-3))", "hsl(var(--chart-4))", "hsl(var(--chart-5))"];
 
   const getDeviceIcon = (device: string) => {
     switch (device.toLowerCase()) {
@@ -260,8 +329,27 @@ export function WebsiteAnalytics() {
       {/* Daily Visitors Chart with Filter */}
       <Card>
         <CardHeader className="pb-2">
-          <CardTitle>Daily Visitors Trend</CardTitle>
-          <CardDescription>Visits and unique sessions over time</CardDescription>
+          <div className="flex flex-wrap justify-between items-start gap-2">
+            <div>
+              <CardTitle>Daily Visitors Trend</CardTitle>
+              <CardDescription>Visits and unique sessions over time</CardDescription>
+            </div>
+            <div className="flex gap-2">
+              <Select value={sourceFilter} onValueChange={setSourceFilter}>
+                <SelectTrigger className="w-[160px]">
+                  <SelectValue placeholder="All Sources" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All Sources</SelectItem>
+                  {availableSources.map(source => (
+                    <SelectItem key={source} value={source}>
+                      {formatSourceName(source)}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
         </CardHeader>
         <CardContent>
           <ChartFilterBar
@@ -284,6 +372,36 @@ export function WebsiteAnalytics() {
               <Line type="monotone" dataKey="uniqueSessions" name="Unique Sessions" stroke="hsl(var(--chart-2))" strokeWidth={2} dot={{ r: 3 }} />
             </LineChart>
           </ResponsiveContainer>
+
+          {/* Detailed Data Table */}
+          <div className="mt-4 border-t pt-4">
+            <div className="flex justify-between items-center mb-2">
+              <span className="text-sm font-medium">Daily Breakdown</span>
+              <Button variant="outline" size="sm" onClick={() => exportTableAsCSV(dailyVisitors, 'daily-visitors')}>
+                <Download className="h-3 w-3 mr-1" /> Export CSV
+              </Button>
+            </div>
+            <div className="max-h-[200px] overflow-y-auto">
+              <table className="w-full text-sm">
+                <thead className="sticky top-0 bg-background">
+                  <tr className="border-b">
+                    <th className="text-left py-2 px-2 font-medium">Date</th>
+                    <th className="text-right py-2 px-2 font-medium">Visits</th>
+                    <th className="text-right py-2 px-2 font-medium">Sessions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {dailyVisitors.map((day, idx) => (
+                    <tr key={idx} className="border-b last:border-0">
+                      <td className="py-1.5 px-2">{day.date}</td>
+                      <td className="text-right py-1.5 px-2">{day.visits}</td>
+                      <td className="text-right py-1.5 px-2">{day.uniqueSessions}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
         </CardContent>
       </Card>
 
@@ -291,21 +409,28 @@ export function WebsiteAnalytics() {
         {/* Top Pages */}
         <Card>
           <CardHeader className="pb-2">
-            <CardTitle>Most Visited Pages</CardTitle>
-            <CardDescription>Top landing pages by visit count</CardDescription>
+            <div className="flex justify-between items-center">
+              <div>
+                <CardTitle>Most Visited Pages</CardTitle>
+                <CardDescription>Top landing pages by visit count</CardDescription>
+              </div>
+              <Button variant="outline" size="sm" onClick={() => exportTableAsCSV(pageViews, 'page-views')}>
+                <Download className="h-3 w-3 mr-1" /> CSV
+              </Button>
+            </div>
           </CardHeader>
           <CardContent>
-            <ResponsiveContainer width="100%" height={250}>
-              <BarChart data={pageViews} layout="vertical" barSize={12}>
+            <ResponsiveContainer width="100%" height={200}>
+              <BarChart data={pageViews} layout="vertical" barSize={10}>
                 <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
                 <XAxis type="number" tick={{ fontSize: 10 }} />
-                <YAxis type="category" dataKey="page" width={100} tick={{ fontSize: 10 }} />
+                <YAxis type="category" dataKey="page" width={100} tick={{ fontSize: 9 }} />
                 <Tooltip contentStyle={{ backgroundColor: "hsl(var(--card))", border: "1px solid hsl(var(--border))" }} />
                 <Bar dataKey="views" name="Views" fill="hsl(var(--primary))" radius={[0, 4, 4, 0]} />
               </BarChart>
             </ResponsiveContainer>
             
-            <div className="mt-3 space-y-1 border-t pt-3 max-h-[150px] overflow-y-auto">
+            <div className="mt-3 space-y-1 border-t pt-3 max-h-[120px] overflow-y-auto">
               {pageViews.map((page, idx) => (
                 <div key={idx} className="flex justify-between items-center text-xs">
                   <span className="text-muted-foreground truncate max-w-[180px]">{page.page}</span>
@@ -319,17 +444,24 @@ export function WebsiteAnalytics() {
         {/* Device Breakdown */}
         <Card>
           <CardHeader className="pb-2">
-            <CardTitle>Device Distribution</CardTitle>
-            <CardDescription>Visitors by device type</CardDescription>
+            <div className="flex justify-between items-center">
+              <div>
+                <CardTitle>Device Distribution</CardTitle>
+                <CardDescription>Visitors by device type</CardDescription>
+              </div>
+              <Button variant="outline" size="sm" onClick={() => exportTableAsCSV(deviceData, 'device-data')}>
+                <Download className="h-3 w-3 mr-1" /> CSV
+              </Button>
+            </div>
           </CardHeader>
           <CardContent>
-            <ResponsiveContainer width="100%" height={250}>
+            <ResponsiveContainer width="100%" height={200}>
               <PieChart>
                 <Pie
                   data={deviceData}
                   cx="50%"
                   cy="50%"
-                  outerRadius={80}
+                  outerRadius={70}
                   fill="hsl(var(--primary))"
                   dataKey="count"
                   label={({ device, percentage }) => `${device}: ${percentage}%`}
@@ -358,36 +490,66 @@ export function WebsiteAnalytics() {
         </Card>
       </div>
 
-      {/* Traffic Sources */}
+      {/* Traffic Sources with Full Details */}
       <Card>
         <CardHeader className="pb-2">
-          <CardTitle>Traffic Sources Performance</CardTitle>
-          <CardDescription>Visits, signups, and conversion rates by source</CardDescription>
+          <div className="flex justify-between items-center">
+            <div>
+              <CardTitle>Traffic Sources Performance</CardTitle>
+              <CardDescription>Visits, signups, and conversion rates by source (including organic search)</CardDescription>
+            </div>
+            <Button variant="outline" size="sm" onClick={() => exportTableAsCSV(trafficSources, 'traffic-sources')}>
+              <Download className="h-3 w-3 mr-1" /> Export CSV
+            </Button>
+          </div>
         </CardHeader>
         <CardContent>
-          <div className="overflow-x-auto">
+          <ResponsiveContainer width="100%" height={200}>
+            <BarChart data={trafficSources} barSize={20}>
+              <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
+              <XAxis dataKey="source" tick={{ fontSize: 10 }} interval={0} angle={-20} textAnchor="end" height={60} />
+              <YAxis tick={{ fontSize: 10 }} />
+              <Tooltip contentStyle={{ backgroundColor: "hsl(var(--card))", border: "1px solid hsl(var(--border))" }} />
+              <Legend />
+              <Bar dataKey="visits" name="Visits" fill="hsl(var(--primary))" />
+              <Bar dataKey="signups" name="Signups" fill="hsl(var(--chart-2))" />
+            </BarChart>
+          </ResponsiveContainer>
+
+          <div className="mt-4 border-t pt-4 overflow-x-auto" ref={tableRef}>
             <table className="w-full text-sm">
               <thead>
-                <tr className="border-b">
-                  <th className="text-left py-2 px-2 font-medium">Source</th>
-                  <th className="text-right py-2 px-2 font-medium">Visits</th>
-                  <th className="text-right py-2 px-2 font-medium">Signups</th>
-                  <th className="text-right py-2 px-2 font-medium">Conversion</th>
+                <tr className="border-b bg-muted/50">
+                  <th className="text-left py-2 px-3 font-medium">Source</th>
+                  <th className="text-right py-2 px-3 font-medium">Visits</th>
+                  <th className="text-right py-2 px-3 font-medium">Signups</th>
+                  <th className="text-right py-2 px-3 font-medium">Conversion Rate</th>
                 </tr>
               </thead>
               <tbody>
                 {trafficSources.map((source, idx) => (
-                  <tr key={idx} className="border-b last:border-0">
-                    <td className="py-2 px-2 font-medium">{source.source}</td>
-                    <td className="text-right py-2 px-2">{source.visits.toLocaleString()}</td>
-                    <td className="text-right py-2 px-2">{source.signups}</td>
-                    <td className="text-right py-2 px-2">
-                      <span className={source.conversionRate > 5 ? "text-green-600 font-medium" : "text-muted-foreground"}>
+                  <tr key={idx} className="border-b last:border-0 hover:bg-muted/30">
+                    <td className="py-2 px-3 font-medium">{source.source}</td>
+                    <td className="text-right py-2 px-3">{source.visits.toLocaleString()}</td>
+                    <td className="text-right py-2 px-3">{source.signups}</td>
+                    <td className="text-right py-2 px-3">
+                      <span className={source.conversionRate > 5 ? "text-green-600 font-medium" : source.conversionRate > 0 ? "text-primary font-medium" : "text-muted-foreground"}>
                         {source.conversionRate}%
                       </span>
                     </td>
                   </tr>
                 ))}
+                {/* Totals Row */}
+                <tr className="bg-muted/50 font-medium">
+                  <td className="py-2 px-3">Total</td>
+                  <td className="text-right py-2 px-3">{trafficSources.reduce((sum, s) => sum + s.visits, 0).toLocaleString()}</td>
+                  <td className="text-right py-2 px-3">{trafficSources.reduce((sum, s) => sum + s.signups, 0)}</td>
+                  <td className="text-right py-2 px-3">
+                    {trafficSources.reduce((sum, s) => sum + s.visits, 0) > 0 
+                      ? Math.round((trafficSources.reduce((sum, s) => sum + s.signups, 0) / trafficSources.reduce((sum, s) => sum + s.visits, 0)) * 100)
+                      : 0}%
+                  </td>
+                </tr>
               </tbody>
             </table>
           </div>
