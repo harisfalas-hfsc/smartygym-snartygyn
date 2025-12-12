@@ -21,6 +21,7 @@ import { AnalyticsMetricCard } from "./analytics/AnalyticsMetricCard";
 import { CompletionAnalytics } from "./analytics/CompletionAnalytics";
 import { GrowthAnalytics } from "./analytics/GrowthAnalytics";
 import { PopularAnalytics } from "./analytics/PopularAnalytics";
+import { BusinessReportExport } from "./analytics/BusinessReportExport";
 import html2canvas from "html2canvas";
 
 interface AnalyticsData {
@@ -438,10 +439,13 @@ export function AnalyticsDashboard() {
             Refresh
           </Button>
         </div>
-        <Button onClick={handleExport} variant="outline">
-          <Download className="h-4 w-4 mr-2" />
-          Export
-        </Button>
+        <div className="flex gap-2">
+          <Button onClick={handleExport} variant="outline">
+            <Download className="h-4 w-4 mr-2" />
+            Quick Export
+          </Button>
+          <BusinessReportExport dashboardRef={dashboardRef} />
+        </div>
       </div>
 
       {/* Key Metrics Cards - Row 1: Users & Subscriptions */}
@@ -751,139 +755,15 @@ export function AnalyticsDashboard() {
         </TabsContent>
 
         <TabsContent value="growth" className="space-y-4">
-          <Card>
-            <CardHeader>
-              <CardTitle>User Growth Over Time</CardTitle>
-              <CardDescription>New user registrations by month</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <ResponsiveContainer width="100%" height={350}>
-                <LineChart data={userGrowth}>
-                  <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis dataKey="name" />
-                  <YAxis />
-                  <Tooltip />
-                  <Legend />
-                  <Line type="monotone" dataKey="value" name="New Users" stroke="hsl(var(--primary))" strokeWidth={2} />
-                </LineChart>
-              </ResponsiveContainer>
-              
-              {/* Detailed breakdown */}
-              <div className="mt-4 space-y-2 border-t pt-4">
-                {userGrowth.map((item, idx) => (
-                  <div key={idx} className="flex justify-between items-center text-sm">
-                    <span className="text-muted-foreground">{item.name}</span>
-                    <span className="font-medium">{item.value} new users</span>
-                  </div>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader>
-              <CardTitle>Subscription Distribution</CardTitle>
-              <CardDescription>Active subscriptions by plan type</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <ResponsiveContainer width="100%" height={350}>
-                <PieChart>
-                  <Pie
-                    data={subscriptionDistribution}
-                    cx="50%"
-                    cy="50%"
-                    labelLine={false}
-                    label={({ name, percent }) => `${name}: ${(percent * 100).toFixed(0)}%`}
-                    outerRadius={100}
-                    fill="hsl(var(--primary))"
-                    dataKey="value"
-                  >
-                    {subscriptionDistribution.map((entry, index) => (
-                      <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                    ))}
-                  </Pie>
-                  <Tooltip />
-                </PieChart>
-              </ResponsiveContainer>
-              
-              {/* Detailed breakdown */}
-              <div className="mt-4 space-y-2 border-t pt-4">
-                {subscriptionDistribution.map((item, idx) => (
-                  <div key={idx} className="flex justify-between items-center text-sm">
-                    <span className="text-muted-foreground">{item.name}</span>
-                    <span className="font-medium">{item.value} subscribers</span>
-                  </div>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
+          <GrowthAnalytics />
         </TabsContent>
 
         <TabsContent value="completion" className="space-y-4">
-          <Card>
-            <CardHeader>
-              <CardTitle>Workout Completion Rates</CardTitle>
-              <CardDescription>Top 5 workouts by completion percentage</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <ResponsiveContainer width="100%" height={350}>
-                <BarChart data={completionData} layout="vertical">
-                  <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis type="number" domain={[0, 100]} />
-                  <YAxis type="category" dataKey="name" width={150} />
-                  <Tooltip formatter={(value) => `${value}%`} />
-                  <Legend />
-                  <Bar dataKey="value" name="Completion %" fill="hsl(var(--primary))" />
-                </BarChart>
-              </ResponsiveContainer>
-              
-              {/* Detailed breakdown */}
-              <div className="mt-4 space-y-2 border-t pt-4">
-                {completionData.map((item, idx) => (
-                  <div key={idx} className="flex justify-between items-center text-sm">
-                    <span className="text-muted-foreground">{item.name}</span>
-                    <span className={`font-medium ${item.value >= 75 ? "text-green-600" : item.value >= 50 ? "text-yellow-600" : "text-red-600"}`}>
-                      {item.value}% completion
-                    </span>
-                  </div>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
+          <CompletionAnalytics />
         </TabsContent>
 
         <TabsContent value="popular" className="space-y-4">
-          <Card>
-            <CardHeader>
-              <CardTitle>Most Popular Workouts</CardTitle>
-              <CardDescription>Top 10 most completed workouts</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <ResponsiveContainer width="100%" height={400}>
-                <BarChart data={popularWorkouts} layout="vertical">
-                  <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis type="number" />
-                  <YAxis type="category" dataKey="name" width={150} />
-                  <Tooltip />
-                  <Legend />
-                  <Bar dataKey="value" name="Completions" fill="hsl(var(--primary))" />
-                </BarChart>
-              </ResponsiveContainer>
-              
-              {/* Detailed breakdown */}
-              <div className="mt-4 space-y-2 border-t pt-4">
-                {popularWorkouts.map((item, idx) => (
-                  <div key={idx} className="flex justify-between items-center text-sm">
-                    <span className="flex items-center gap-2">
-                      <span className="text-muted-foreground">#{idx + 1}</span>
-                      <span>{item.name}</span>
-                    </span>
-                    <span className="font-medium">{item.value} completions</span>
-                  </div>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
+          <PopularAnalytics />
         </TabsContent>
 
         <TabsContent value="website" className="space-y-4">
