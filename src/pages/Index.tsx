@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardHeader, CardTitle, CardContent, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Dumbbell, Calendar, BookOpen, Calculator, Activity, Flame, Instagram, Facebook, Youtube, UserCheck, Wrench, Video, FileText, Smartphone, Users, Target, Heart, Zap, Plane, GraduationCap, Check, Crown, ChevronDown, ChevronRight, Move, Ban, Brain, CheckCircle2, Award, Shield, Compass, Sparkles, Info, User, HelpCircle, ShoppingBag } from "lucide-react";
+import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { User as SupabaseUser } from "@supabase/supabase-js";
 import { useToast } from "@/hooks/use-toast";
@@ -43,6 +44,35 @@ const Index = () => {
   // Auto-cycling state for tablet hero cards
   const [highlightedCardIndex, setHighlightedCardIndex] = useState(0);
   const [isHoveringTablet, setIsHoveringTablet] = useState(false);
+
+  // Mobile WOD card rotation state
+  const [mobileWodIndex, setMobileWodIndex] = useState(0);
+
+  // Fetch WODs for mobile card
+  const { data: mobileWods } = useQuery({
+    queryKey: ["wod-mobile-banner"],
+    queryFn: async () => {
+      const { data } = await supabase
+        .from("admin_workouts")
+        .select("id, name, category, difficulty_stars, format, duration")
+        .eq("is_workout_of_day", true)
+        .limit(2);
+      return data || [];
+    },
+    staleTime: 1000 * 60 * 5,
+  });
+
+  // Rotate mobile WOD every 3 seconds
+  useEffect(() => {
+    if (mobileWods && mobileWods.length > 1) {
+      const interval = setInterval(() => {
+        setMobileWodIndex((prev) => (prev === 0 ? 1 : 0));
+      }, 3000);
+      return () => clearInterval(interval);
+    }
+  }, [mobileWods]);
+
+  const currentMobileWod = mobileWods?.[mobileWodIndex] || mobileWods?.[0];
   useEffect(() => {
     if (!carouselApi) return;
     const onSelect = () => {
@@ -464,7 +494,25 @@ const Index = () => {
 
         {/* Quick Access Menu */}
         <div className="mt-8 space-y-3">
-              <div onClick={() => navigate('/about')} className="flex items-center gap-2.5 py-1.5 px-4 bg-primary/5 border-2 border-border rounded-lg hover:border-primary transition-all cursor-pointer hover:shadow-md">
+          {/* WOD Card - rotates every 3 seconds */}
+          {currentMobileWod && (
+            <div 
+              onClick={() => navigate('/workout/wod')} 
+              className="flex items-center gap-2.5 py-1.5 px-4 bg-primary/5 border-2 border-border rounded-lg hover:border-primary transition-all cursor-pointer hover:shadow-md"
+            >
+              <Dumbbell className="w-5 h-5 text-primary flex-shrink-0" />
+              <div 
+                key={currentMobileWod.id} 
+                className="flex-1 animate-fade-in"
+              >
+                <span className="text-base font-medium">Your Workout of the Day</span>
+                <p className="text-xs text-muted-foreground">{currentMobileWod.name}</p>
+              </div>
+              <ChevronRight className="w-5 h-5 ml-auto text-muted-foreground" />
+            </div>
+          )}
+
+          <div onClick={() => navigate('/about')} className="flex items-center gap-2.5 py-1.5 px-4 bg-primary/5 border-2 border-border rounded-lg hover:border-primary transition-all cursor-pointer hover:shadow-md">
             <Info className="w-5 h-5 text-primary flex-shrink-0" />
             <span className="text-base font-medium">About SmartyGym</span>
             <ChevronRight className="w-5 h-5 ml-auto text-muted-foreground" />
