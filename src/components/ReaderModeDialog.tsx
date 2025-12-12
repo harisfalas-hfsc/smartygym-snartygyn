@@ -1,8 +1,7 @@
 import { useState, useEffect } from "react";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { X, Printer, Plus, Minus, Sun, Moon } from "lucide-react";
-
+import { X, Plus, Minus, Sun, Moon } from "lucide-react";
 interface ReaderModeDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
@@ -46,10 +45,6 @@ export const ReaderModeDialog = ({
 
   const increaseFontSize = () => setFontSize((prev) => Math.min(prev + 2, 28));
   const decreaseFontSize = () => setFontSize((prev) => Math.max(prev - 2, 14));
-
-  const handlePrint = () => {
-    window.print();
-  };
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -140,27 +135,6 @@ export const ReaderModeDialog = ({
                 <Moon className="h-4 w-4" />
               )}
             </Button>
-
-            {/* Print Button */}
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={handlePrint}
-              className={`h-8 w-8 ${
-                isDarkMode
-                  ? "hover:bg-zinc-700 text-zinc-300"
-                  : "hover:bg-amber-200 text-zinc-700"
-              }`}
-              title="Print"
-            >
-              <Printer className="h-4 w-4" />
-            </Button>
-
-            <div
-              className={`w-px h-6 mx-2 ${
-                isDarkMode ? "bg-zinc-600" : "bg-amber-300"
-              }`}
-            />
 
             {/* Close Button */}
             <Button
@@ -253,27 +227,6 @@ export const ReaderModeDialog = ({
           .reader-mode-dark.prose,
           .reader-mode-dark.prose * {
             color: #f4f4f5 !important;
-          }
-
-          @media print {
-            body * {
-              visibility: hidden;
-            }
-            [role="dialog"], [role="dialog"] * {
-              visibility: visible;
-            }
-            [role="dialog"] {
-              position: absolute;
-              left: 0;
-              top: 0;
-              width: 100%;
-              height: auto;
-              background: white !important;
-              color: black !important;
-            }
-            [role="dialog"] > div:first-child {
-              display: none !important;
-            }
           }
         `}</style>
       </DialogContent>
