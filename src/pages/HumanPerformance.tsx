@@ -249,7 +249,7 @@ export default function HumanPerformance() {
           <div ref={contentRef} className="bg-background">
 
           {/* Description Card */}
-          <Card className="mb-8 border-2 border-primary/30">
+          <Card data-pdf-section className="mb-8 border-2 border-primary/30">
             <CardHeader className="text-center">
               <CardTitle className="flex items-center justify-center gap-2">
                 <Heart className="h-5 w-5 text-primary" />
@@ -271,7 +271,7 @@ export default function HumanPerformance() {
             <CardContent className="p-6 sm:p-8 space-y-10">
               
               {/* Section 1: Foundation of Human Performance */}
-              <section>
+              <section data-pdf-section>
                 <div className="flex items-center gap-3 mb-4">
                   <div className="p-2 bg-primary/20 rounded-full">
                     <Brain className="h-6 w-6 text-primary" />
@@ -307,7 +307,7 @@ export default function HumanPerformance() {
               </section>
 
               {/* Section 2: Exercise & Mental Health Chart */}
-              <section>
+              <section data-pdf-section>
                 <div className="flex items-center gap-3 mb-4">
                   <div className="p-2 bg-primary/20 rounded-full">
                     <Smile className="h-6 w-6 text-primary" />
@@ -341,7 +341,7 @@ export default function HumanPerformance() {
               </section>
 
               {/* Section 3: The Modern Fitness Challenge */}
-              <section>
+              <section data-pdf-section>
                 <div className="flex items-center gap-3 mb-4">
                   <div className="p-2 bg-amber-500/20 rounded-full">
                     <Zap className="h-6 w-6 text-amber-500" />
@@ -387,7 +387,7 @@ export default function HumanPerformance() {
               </section>
 
               {/* Section 4: Consistency Science */}
-              <section>
+              <section data-pdf-section>
                 <div className="flex items-center gap-3 mb-4">
                   <div className="p-2 bg-primary/20 rounded-full">
                     <BarChart3 className="h-6 w-6 text-primary" />
@@ -435,7 +435,7 @@ export default function HumanPerformance() {
               </section>
 
               {/* Section 5: Adherence Rates */}
-              <section>
+              <section data-pdf-section>
                 <div className="flex items-center gap-3 mb-4">
                   <div className="p-2 bg-primary/20 rounded-full">
                     <CheckCircle2 className="h-6 w-6 text-primary" />
@@ -477,7 +477,7 @@ export default function HumanPerformance() {
               </section>
 
               {/* Section 6: Impact on Life Roles */}
-              <section>
+              <section data-pdf-section>
                 <div className="flex items-center gap-3 mb-4">
                   <div className="p-2 bg-primary/20 rounded-full">
                     <Users className="h-6 w-6 text-primary" />
@@ -523,7 +523,7 @@ export default function HumanPerformance() {
               </section>
 
               {/* Section 7: The SmartyGym Ecosystem */}
-              <section>
+              <section data-pdf-section>
                 <div className="flex items-center gap-3 mb-4">
                   <div className="p-2 bg-primary/20 rounded-full">
                     <Award className="h-6 w-6 text-primary" />
@@ -596,7 +596,7 @@ export default function HumanPerformance() {
               </section>
 
               {/* Section 8: Physical Inactivity Crisis */}
-              <section>
+              <section data-pdf-section>
                 <div className="flex items-center gap-3 mb-4">
                   <div className="p-2 bg-destructive/20 rounded-full">
                     <Activity className="h-6 w-6 text-destructive" />
@@ -640,7 +640,7 @@ export default function HumanPerformance() {
               </section>
 
               {/* Section 9: Accessibility */}
-              <section>
+              <section data-pdf-section>
                 <div className="flex items-center gap-3 mb-4">
                   <div className="p-2 bg-primary/20 rounded-full">
                     <Smartphone className="h-6 w-6 text-primary" />
@@ -677,7 +677,7 @@ export default function HumanPerformance() {
           </Card>
 
           {/* CTA Section */}
-          <Card className="mt-8 border-2 border-primary/30 bg-gradient-to-br from-primary/10 to-background">
+          <Card data-pdf-section className="mt-8 border-2 border-primary/30 bg-gradient-to-br from-primary/10 to-background">
             <CardContent className="p-6 text-center">
               <Crown className="h-12 w-12 text-primary mx-auto mb-4" />
               <h2 className="text-2xl font-bold mb-2">Ready to Transform Your Performance?</h2>
@@ -702,7 +702,7 @@ export default function HumanPerformance() {
           </Card>
 
           {/* References Section */}
-          <Card className="mt-8 border border-muted">
+          <Card data-pdf-section className="mt-8 border border-muted">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <BookOpen className="h-5 w-5 text-primary" />

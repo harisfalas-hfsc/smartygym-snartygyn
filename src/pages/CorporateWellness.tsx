@@ -241,7 +241,7 @@ export default function CorporateWellness() {
           <div ref={contentRef} className="bg-background">
 
           {/* Description Card */}
-          <Card className="mb-8 border-2 border-green-500/30">
+          <Card data-pdf-section className="mb-8 border-2 border-green-500/30">
             <CardHeader className="text-center">
               <CardTitle className="flex items-center justify-center gap-2">
                 <Heart className="h-5 w-5 text-green-500" />
@@ -262,7 +262,7 @@ export default function CorporateWellness() {
             <CardContent className="p-6 sm:p-8 space-y-10">
               
               {/* Section 1: Human Capital */}
-              <section>
+              <section data-pdf-section>
                 <div className="flex items-center gap-3 mb-4">
                   <div className="p-2 bg-green-500/20 rounded-full">
                     <Users className="h-6 w-6 text-green-500" />
@@ -284,7 +284,7 @@ export default function CorporateWellness() {
               </section>
 
               {/* NEW: ROI Section with Chart */}
-              <section>
+              <section data-pdf-section>
                 <div className="flex items-center gap-3 mb-4">
                   <div className="p-2 bg-green-500/20 rounded-full">
                     <DollarSign className="h-6 w-6 text-green-500" />
@@ -338,7 +338,7 @@ export default function CorporateWellness() {
               </section>
 
               {/* Section 2: Modern Challenges */}
-              <section>
+              <section data-pdf-section>
                 <div className="flex items-center gap-3 mb-4">
                   <div className="p-2 bg-amber-500/20 rounded-full">
                     <Clock className="h-6 w-6 text-amber-500" />
@@ -384,7 +384,7 @@ export default function CorporateWellness() {
               </section>
 
               {/* NEW: Global Stress Data with Chart */}
-              <section>
+              <section data-pdf-section>
                 <div className="flex items-center gap-3 mb-4">
                   <div className="p-2 bg-amber-500/20 rounded-full">
                     <AlertTriangle className="h-6 w-6 text-amber-500" />
@@ -436,7 +436,7 @@ export default function CorporateWellness() {
               </section>
 
               {/* Section 3: Health Beyond Work */}
-              <section>
+              <section data-pdf-section>
                 <div className="flex items-center gap-3 mb-4">
                   <div className="p-2 bg-blue-500/20 rounded-full">
                     <Heart className="h-6 w-6 text-blue-500" />
@@ -473,7 +473,7 @@ export default function CorporateWellness() {
               </section>
 
               {/* Section 4: Workplace Impact Stats - UPDATED WITH REAL DATA */}
-              <section>
+              <section data-pdf-section>
                 <div className="flex items-center gap-3 mb-4">
                   <div className="p-2 bg-red-500/20 rounded-full">
                     <BarChart3 className="h-6 w-6 text-red-500" />
@@ -538,7 +538,7 @@ export default function CorporateWellness() {
               </section>
 
               {/* NEW: Burnout & Retention Crisis */}
-              <section>
+              <section data-pdf-section>
                 <div className="flex items-center gap-3 mb-4">
                   <div className="p-2 bg-red-500/20 rounded-full">
                     <TrendingDown className="h-6 w-6 text-red-500" />
@@ -578,7 +578,7 @@ export default function CorporateWellness() {
               </section>
 
               {/* NEW: Global Health Impact (WHO Data) */}
-              <section>
+              <section data-pdf-section>
                 <div className="flex items-center gap-3 mb-4">
                   <div className="p-2 bg-blue-500/20 rounded-full">
                     <Activity className="h-6 w-6 text-blue-500" />
@@ -614,7 +614,7 @@ export default function CorporateWellness() {
               </section>
 
               {/* NEW: Impact of Wellness Programs Pie Chart */}
-              <section>
+              <section data-pdf-section>
                 <div className="flex items-center gap-3 mb-4">
                   <div className="p-2 bg-green-500/20 rounded-full">
                     <TrendingUp className="h-6 w-6 text-green-500" />
@@ -654,7 +654,7 @@ export default function CorporateWellness() {
               </section>
 
               {/* Section 5: Benefits of Exercise */}
-              <section>
+              <section data-pdf-section>
                 <div className="flex items-center gap-3 mb-4">
                   <div className="p-2 bg-green-500/20 rounded-full">
                     <Activity className="h-6 w-6 text-green-500" />
@@ -706,7 +706,7 @@ export default function CorporateWellness() {
               </section>
 
               {/* Section 6: Exercise as a Gift */}
-              <section>
+              <section data-pdf-section>
                 <div className="flex items-center gap-3 mb-4">
                   <div className="p-2 bg-primary/20 rounded-full">
                     <Gift className="h-6 w-6 text-primary" />
@@ -734,7 +734,7 @@ export default function CorporateWellness() {
               </section>
 
               {/* Section 7: Team Effect */}
-              <section>
+              <section data-pdf-section>
                 <div className="flex items-center gap-3 mb-4">
                   <div className="p-2 bg-purple-500/20 rounded-full">
                     <Users className="h-6 w-6 text-purple-500" />
@@ -776,7 +776,7 @@ export default function CorporateWellness() {
               </section>
 
               {/* CTA Section */}
-              <section className="mt-12 pt-8 border-t border-green-500/30">
+              <section data-pdf-section className="mt-12 pt-8 border-t border-green-500/30">
                 <div className="text-center space-y-6">
                   <div className="flex items-center justify-center gap-3">
                     <Building2 className="h-8 w-8 text-green-500" />
@@ -806,7 +806,7 @@ export default function CorporateWellness() {
           </Card>
 
           {/* References Section */}
-          <Card className="mt-8 border-2 border-muted">
+          <Card data-pdf-section className="mt-8 border-2 border-muted">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <BookOpen className="h-5 w-5 text-muted-foreground" />
