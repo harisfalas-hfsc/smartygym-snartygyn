@@ -35,8 +35,8 @@ import { SEOEnhancer } from "@/components/SEOEnhancer";
 import { PageBreadcrumbs } from "@/components/PageBreadcrumbs";
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
 import { ReaderModeDialog } from "@/components/ReaderModeDialog";
-import html2canvas from "html2canvas";
 import { toast } from "sonner";
+import { exportToPDF } from "@/utils/pdfExport";
 import { 
   BarChart, 
   Bar, 
@@ -102,18 +102,11 @@ export default function CorporateWellness() {
     toast.loading("Generating PDF...", { id: "pdf-export" });
     
     try {
-      const canvas = await html2canvas(contentRef.current, {
-        scale: 2,
-        useCORS: true,
-        backgroundColor: "#ffffff",
-        logging: false,
+      await exportToPDF(contentRef.current, {
+        title: "Why Invest in Corporate Wellness?",
+        filename: "Why-Invest-in-Corporate-Wellness",
+        accentColor: "#22c55e"
       });
-      
-      const imgData = canvas.toDataURL("image/png");
-      const link = document.createElement("a");
-      link.href = imgData;
-      link.download = "Why-Invest-in-Corporate-Wellness.png";
-      link.click();
       
       toast.success("PDF exported successfully!", { id: "pdf-export" });
     } catch (error) {
