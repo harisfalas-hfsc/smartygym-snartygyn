@@ -546,10 +546,9 @@ const Index = () => {
           </div>
           
           {!isPremium && (
-              <div onClick={() => navigate('/joinpremium')} className="flex items-center gap-2.5 py-1.5 px-4 bg-primary/10 border-2 border-primary rounded-lg hover:bg-primary/20 transition-all cursor-pointer hover:shadow-md">
+              <div onClick={() => navigate('/joinpremium')} className="flex items-center gap-2.5 py-1.5 px-4 bg-primary/10 border-2 border-green-500 rounded-lg hover:bg-primary/20 transition-all cursor-pointer hover:shadow-md">
               <Crown className="w-5 h-5 text-primary flex-shrink-0" />
               <span className="text-base font-medium text-primary">Transform Your Fitness</span>
-              <ChevronRight className="w-5 h-5 ml-auto text-primary" />
             </div>
           )}
         </div>
@@ -664,7 +663,7 @@ const Index = () => {
                         {!isPremium && (
                           <Button 
                             onClick={() => navigate("/joinpremium")} 
-                            className="absolute top-4 left-4 bg-primary text-primary-foreground hover:bg-primary/90 text-sm"
+                            className="absolute top-4 left-4 bg-primary text-primary-foreground hover:bg-primary/90 text-sm border-2 border-green-500"
                           >
                             <Crown className="mr-2 h-4 w-4" />
                             Transform Your Fitness
