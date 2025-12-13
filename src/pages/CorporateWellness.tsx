@@ -91,11 +91,11 @@ export default function CorporateWellness() {
   return (
     <>
       <Helmet>
-        <title>Why Invest in Employee Wellness? | Corporate Research | SmartyGym</title>
+        <title>Why Invest in Corporate Wellness? | Corporate Research | SmartyGym</title>
         <meta name="description" content="Discover the research-backed benefits of corporate wellness programs. Learn how investing in employee health improves productivity, reduces costs, and builds stronger teams." />
         <meta name="keywords" content="corporate wellness research, employee health benefits, workplace fitness, productivity improvement, team building, Forbes wellness, healthy employees" />
         
-        <meta property="og:title" content="Why Invest in Employee Wellness? | SmartyGym Corporate" />
+        <meta property="og:title" content="Why Invest in Corporate Wellness? | SmartyGym Corporate" />
         <meta property="og:description" content="Research-backed insights on why corporate wellness programs improve productivity, reduce healthcare costs, and create happier, healthier teams." />
         <meta property="og:type" content="article" />
         <meta property="og:url" content="https://smartygym.com/corporate-wellness" />
@@ -132,14 +132,14 @@ export default function CorporateWellness() {
           <PageBreadcrumbs items={[
             { label: "Home", href: "/" },
             { label: "Smarty Corporate", href: "/corporate" },
-            { label: "Why Invest in Wellness?" }
+            { label: "Why Invest in Corporate Wellness?" }
           ]} />
 
           {/* Header */}
           <div className="text-center mb-8">
             <div className="flex items-center justify-center gap-3 mb-2">
               <Lightbulb className="h-8 w-8 text-green-500" />
-              <h1 className="text-3xl sm:text-4xl font-bold">Why Invest in Employee Wellness?</h1>
+              <h1 className="text-3xl sm:text-4xl font-bold">Why Invest in Corporate Wellness?</h1>
             </div>
             <p className="text-muted-foreground max-w-2xl mx-auto">
               Research-backed insights on the transformative power of corporate fitness programs

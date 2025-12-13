@@ -148,7 +148,7 @@ export default function SmartyCorporate() {
     { icon: Crown, text: "Platinum-level access for all members" },
     { icon: Shield, text: "1-year subscription period" },
     { icon: Headphones, text: "Priority support for organizations" },
-    { icon: Lightbulb, text: "Why Invest in Wellness?", isLink: true, href: "/corporate-wellness" },
+    { icon: Lightbulb, text: "Why Invest in Corporate Wellness?", isLink: true, href: "/corporate-wellness" },
   ];
 
   return (
@@ -226,7 +226,7 @@ export default function SmartyCorporate() {
                 All team members enjoy the same benefits as individual Platinum subscribers for the duration of the subscription. 
                 The administrator has access to a dedicated dashboard to manage team members, monitor usage, and control access.{' '}
                 <Link to="/corporate-wellness" className="text-green-500 hover:text-green-600 hover:underline font-medium">
-                  Learn More
+                  Why Invest in Corporate Wellness?
                 </Link>
               </p>
             </CardContent>

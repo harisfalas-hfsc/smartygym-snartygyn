@@ -95,11 +95,11 @@ export default function HumanPerformance() {
   return (
     <>
       <Helmet>
-        <title>Why Invest in Your Fitness? | Human Performance Research | SmartyGym</title>
+        <title>Why Invest in SmartyGym? | Human Performance Research | SmartyGym</title>
         <meta name="description" content="Discover the science behind why structured fitness programs transform your performance as an employee, parent, and person. Research-backed insights on exercise, mental health, and the SmartyGym ecosystem." />
         <meta name="keywords" content="human performance, fitness research, exercise benefits, mental health fitness, structured workout programs, consistency training, SmartyGym" />
         
-        <meta property="og:title" content="Why Invest in Your Fitness? | Human Performance | SmartyGym" />
+        <meta property="og:title" content="Why Invest in SmartyGym? | Human Performance | SmartyGym" />
         <meta property="og:description" content="Research-backed insights on how structured fitness elevates your performance in every aspect of life - work, family, hobbies, and mental wellbeing." />
         <meta property="og:type" content="article" />
         <meta property="og:url" content="https://smartygym.com/human-performance" />
@@ -135,14 +135,14 @@ export default function HumanPerformance() {
 
           <PageBreadcrumbs items={[
             { label: "Home", href: "/" },
-            { label: "Why Invest in Your Fitness?" }
+            { label: "Why Invest in SmartyGym?" }
           ]} />
 
           {/* Header */}
           <div className="text-center mb-8">
             <div className="flex items-center justify-center gap-3 mb-2">
               <TrendingUp className="h-8 w-8 text-primary" />
-              <h1 className="text-3xl sm:text-4xl font-bold">Why Invest in Your Fitness?</h1>
+              <h1 className="text-3xl sm:text-4xl font-bold">Why Invest in SmartyGym?</h1>
             </div>
             <p className="text-muted-foreground max-w-2xl mx-auto">
               The science of how structured training transforms your performance in work, family, and life
