@@ -211,7 +211,7 @@ const WODCategory = () => {
           }]} />
 
               {/* About Workout of the Day Card */}
-              <Card className="mb-8 bg-gradient-to-br from-primary/5 via-background to-primary/5 border-2 border-primary/40 shadow-gold">
+              <Card className="mb-8 bg-gradient-to-br from-primary/5 via-background to-primary/5 border-2 border-primary/40 shadow-primary">
                 <div className="p-4 sm:p-6">
                   <h1 className="text-xl sm:text-2xl font-bold mb-3 text-center">About Workout of the Day</h1>
                   <p className="text-sm sm:text-base text-center text-muted-foreground max-w-3xl mx-auto">

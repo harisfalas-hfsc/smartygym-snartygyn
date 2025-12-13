@@ -76,7 +76,7 @@ export const MotivationalBanner = ({ userName }: MotivationalBannerProps) => {
   const currentMessage = messages[currentMessageIndex];
 
   return (
-    <div className="relative overflow-hidden border-b border-primary/30 bg-gradient-to-r from-primary/5 via-amber-500/10 to-primary/5 animate-gradient-xy">
+    <div className="relative overflow-hidden border-b border-primary/30 bg-gradient-to-r from-primary/5 via-sky-500/10 to-primary/5 animate-gradient-xy">
       <style>{`
         @keyframes gradient-x {
           0%, 100% {
@@ -122,11 +122,11 @@ export const MotivationalBanner = ({ userName }: MotivationalBannerProps) => {
         >
           <div className="flex items-center justify-center gap-2 sm:gap-3 text-center max-w-full px-2">
             <div className="relative flex-shrink-0 hidden sm:block">
-              <Zap className="h-5 w-5 sm:h-7 sm:w-7 text-primary animate-bounce drop-shadow-[0_0_10px_rgba(212,175,55,0.6)]" />
-              <Zap className="h-5 w-5 sm:h-7 sm:w-7 text-amber-400 absolute inset-0 animate-ping opacity-75" />
+              <Zap className="h-5 w-5 sm:h-7 sm:w-7 text-primary animate-bounce drop-shadow-[0_0_10px_rgba(56,189,248,0.6)]" />
+              <Zap className="h-5 w-5 sm:h-7 sm:w-7 text-sky-400 absolute inset-0 animate-ping opacity-75" />
             </div>
             <p
-              className="text-xs sm:text-base md:text-xl font-bold bg-gradient-to-r from-primary via-amber-500 to-primary bg-clip-text text-transparent leading-tight sm:leading-normal"
+              className="text-xs sm:text-base md:text-xl font-bold bg-gradient-to-r from-primary via-sky-500 to-primary bg-clip-text text-transparent leading-tight sm:leading-normal"
               style={{ 
                 fontFamily: 'Helvetica Neue, Helvetica, Arial, sans-serif',
                 backgroundSize: '200% auto',
@@ -135,8 +135,8 @@ export const MotivationalBanner = ({ userName }: MotivationalBannerProps) => {
               {currentMessage.text}
             </p>
             <div className="relative flex-shrink-0 hidden sm:block">
-              <Zap className="h-5 w-5 sm:h-7 sm:w-7 text-primary animate-bounce drop-shadow-[0_0_10px_rgba(212,175,55,0.6)]" style={{ animationDelay: '0.2s' }} />
-              <Zap className="h-5 w-5 sm:h-7 sm:w-7 text-amber-400 absolute inset-0 animate-ping opacity-75" style={{ animationDelay: '0.2s' }} />
+              <Zap className="h-5 w-5 sm:h-7 sm:w-7 text-primary animate-bounce drop-shadow-[0_0_10px_rgba(56,189,248,0.6)]" style={{ animationDelay: '0.2s' }} />
+              <Zap className="h-5 w-5 sm:h-7 sm:w-7 text-sky-400 absolute inset-0 animate-ping opacity-75" style={{ animationDelay: '0.2s' }} />
             </div>
           </div>
           
@@ -146,7 +146,7 @@ export const MotivationalBanner = ({ userName }: MotivationalBannerProps) => {
                 onClick={() => navigate(currentMessage.action!.route)}
                 variant="default"
                 size="sm"
-                className="shadow-gold hover:scale-105 transition-all duration-300 bg-gradient-to-r from-primary to-amber-500 font-bold text-xs sm:text-base px-4 sm:px-8"
+                className="shadow-primary hover:scale-105 transition-all duration-300 bg-gradient-to-r from-primary to-sky-500 font-bold text-xs sm:text-base px-4 sm:px-8"
               >
                 <currentMessage.action.icon className="mr-1 sm:mr-2 h-4 w-4 sm:h-5 sm:w-5" />
                 {currentMessage.action.label}

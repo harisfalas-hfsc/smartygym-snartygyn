@@ -118,7 +118,7 @@ export const WorkoutOfTheDay = () => {
 
   if (isLoading) {
     return (
-      <Card className="mb-8 bg-gradient-to-br from-primary/10 via-background to-primary/10 border-2 border-primary/50 shadow-gold overflow-hidden">
+      <Card className="mb-8 bg-gradient-to-br from-primary/10 via-background to-primary/10 border-2 border-primary/50 shadow-primary overflow-hidden">
         <div className="p-4 sm:p-6">
           <div className="flex flex-col items-center gap-4">
             <Skeleton className="h-8 w-64" />
@@ -134,7 +134,7 @@ export const WorkoutOfTheDay = () => {
   }
 
   return (
-    <Card className="mb-8 bg-gradient-to-br from-primary/10 via-background to-primary/10 border-2 border-primary/50 shadow-gold overflow-hidden">
+    <Card className="mb-8 bg-gradient-to-br from-primary/10 via-background to-primary/10 border-2 border-primary/50 shadow-primary overflow-hidden">
       <div className="p-4 sm:p-6">
         {/* Icon Container */}
         <div className="flex flex-col items-center text-center">

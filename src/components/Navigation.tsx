@@ -469,7 +469,7 @@ export const Navigation = () => {
                     <>
                       <DropdownMenuLabel className="font-normal">
                         <div className="flex items-center gap-2">
-                          <Crown className={`h-4 w-4 ${subscriptionInfo.subscribed ? 'text-yellow-500' : 'text-muted-foreground'}`} />
+                          <Crown className={`h-4 w-4 ${subscriptionInfo.subscribed ? 'text-primary' : 'text-muted-foreground'}`} />
                           <div className="flex flex-col space-y-1 flex-1">
                             <div className="flex items-center gap-2">
                               <p className="text-sm font-medium leading-none">
@@ -478,7 +478,7 @@ export const Navigation = () => {
                                   : "Free Plan"}
                               </p>
                               {subscriptionInfo.subscribed && (
-                                <Badge variant="outline" className="text-[10px] bg-gradient-to-r from-yellow-500/20 to-amber-500/20 text-yellow-600 dark:text-yellow-400 border-yellow-500/30 px-1.5 py-0">
+                                <Badge variant="outline" className="text-[10px] bg-gradient-to-r from-primary/20 to-sky-500/20 text-primary border-primary/30 px-1.5 py-0">
                                   Premium
                                 </Badge>
                               )}

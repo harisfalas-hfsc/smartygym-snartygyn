@@ -271,7 +271,7 @@ export default function JoinPremium() {
             <Card 
               itemScope
               itemType="https://schema.org/Product"
-              className="relative border-2 border-amber-500 shadow-lg flex flex-col"
+              className="relative border-2 border-primary shadow-lg flex flex-col"
               data-plan="gold"
               data-keywords="online gym membership, smarty gym, online fitness subscription, smartygym.com"
               aria-label="Gold Plan - SmartyGym online gym membership - smartygym.com"
@@ -279,19 +279,19 @@ export default function JoinPremium() {
               <CardHeader className="text-center pb-2 sm:pb-4">
                 <div className="mb-2 sm:mb-3">
                   <h2 
-                    className="text-xl sm:text-2xl font-bold text-amber-600 dark:text-amber-400"
+                    className="text-xl sm:text-2xl font-bold text-primary"
                     itemProp="name"
                   >
                     Gold Plan
                   </h2>
                 </div>
-                <Badge className="bg-amber-500 text-white mx-auto mb-3 sm:mb-4 text-xs sm:text-sm">
+                <Badge className="bg-primary text-white mx-auto mb-3 sm:mb-4 text-xs sm:text-sm">
                   MONTHLY
                 </Badge>
                 <CardTitle className="text-2xl sm:text-3xl font-bold" itemProp="offers">€9.99</CardTitle>
                 <p className="text-xs sm:text-sm text-muted-foreground h-4 sm:h-5" itemProp="description">per month</p>
                 <div className="h-10 sm:h-14 flex flex-col justify-center">
-                  <p className="text-xs text-amber-600 dark:text-amber-400 font-semibold">
+                  <p className="text-xs text-primary font-semibold">
                     🔄 Auto-renews monthly
                   </p>
                 </div>
@@ -350,7 +350,7 @@ export default function JoinPremium() {
             </Card>
 
             {/* Platinum Plan */}
-            <Card className="relative border-2 border-primary shadow-lg flex flex-col bg-gradient-to-br from-primary/5 to-amber-500/5">
+            <Card className="relative border-2 border-primary shadow-lg flex flex-col bg-gradient-to-br from-primary/5 to-sky-500/5">
               <Badge className="absolute -top-2 right-2 sm:-top-3 sm:right-3 bg-green-600 text-white px-2 sm:px-3 py-1 text-xs sm:text-sm shadow-md z-10">
                 BEST VALUE
               </Badge>
@@ -407,7 +407,7 @@ export default function JoinPremium() {
                 </div>
                 <div className="space-y-3 sm:space-y-4 mt-auto">
                   <Button 
-                    className="w-full text-sm sm:text-lg py-4 sm:py-6 bg-gradient-to-r from-primary to-amber-600 hover:from-primary/90 hover:to-amber-600/90" 
+                    className="w-full text-sm sm:text-lg py-4 sm:py-6 bg-gradient-to-r from-primary to-sky-600 hover:from-primary/90 hover:to-sky-600/90" 
                     onClick={() => handleSubscribe('platinum')}
                     disabled={loading}
                   >

@@ -340,40 +340,40 @@ export default function CorporateWellness() {
               {/* Section 2: Modern Challenges */}
               <section data-pdf-section>
                 <div className="flex items-center gap-3 mb-4">
-                  <div className="p-2 bg-amber-500/20 rounded-full">
-                    <Clock className="h-6 w-6 text-amber-500" />
+                  <div className="p-2 bg-primary/20 rounded-full">
+                    <Clock className="h-6 w-6 text-primary" />
                   </div>
                   <h2 className="text-2xl font-bold">The Modern Challenge</h2>
                 </div>
-                <div className="space-y-4 pl-4 border-l-2 border-amber-500/30">
+                <div className="space-y-4 pl-4 border-l-2 border-primary/30">
                   <p>
                     We live in unprecedented times. The modern employee faces a complex web of pressures that previous generations 
                     never encountered. Understanding these challenges is the first step toward addressing them.
                   </p>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4 my-6">
                     <div className="flex items-start gap-3 p-3 bg-muted/50 rounded-lg">
-                      <Briefcase className="h-5 w-5 text-amber-500 shrink-0 mt-1" />
+                      <Briefcase className="h-5 w-5 text-primary shrink-0 mt-1" />
                       <div>
                         <strong className="block">Economic Pressures</strong>
                         <span className="text-sm text-muted-foreground">Rising costs of living, financial uncertainty, and job market volatility create constant stress</span>
                       </div>
                     </div>
                     <div className="flex items-start gap-3 p-3 bg-muted/50 rounded-lg">
-                      <Clock className="h-5 w-5 text-amber-500 shrink-0 mt-1" />
+                      <Clock className="h-5 w-5 text-primary shrink-0 mt-1" />
                       <div>
                         <strong className="block">Time Scarcity</strong>
                         <span className="text-sm text-muted-foreground">Long commutes, extended work hours, and always-on digital culture leave little time for self-care</span>
                       </div>
                     </div>
                     <div className="flex items-start gap-3 p-3 bg-muted/50 rounded-lg">
-                      <Home className="h-5 w-5 text-amber-500 shrink-0 mt-1" />
+                      <Home className="h-5 w-5 text-primary shrink-0 mt-1" />
                       <div>
                         <strong className="block">Family Responsibilities</strong>
                         <span className="text-sm text-muted-foreground">Balancing childcare, eldercare, and household duties with professional demands</span>
                       </div>
                     </div>
                     <div className="flex items-start gap-3 p-3 bg-muted/50 rounded-lg">
-                      <Brain className="h-5 w-5 text-amber-500 shrink-0 mt-1" />
+                      <Brain className="h-5 w-5 text-primary shrink-0 mt-1" />
                       <div>
                         <strong className="block">Mental Load</strong>
                         <span className="text-sm text-muted-foreground">Information overload, decision fatigue, and the pressure to constantly perform</span>
@@ -386,12 +386,12 @@ export default function CorporateWellness() {
               {/* NEW: Global Stress Data with Chart */}
               <section data-pdf-section>
                 <div className="flex items-center gap-3 mb-4">
-                  <div className="p-2 bg-amber-500/20 rounded-full">
-                    <AlertTriangle className="h-6 w-6 text-amber-500" />
+                  <div className="p-2 bg-primary/20 rounded-full">
+                    <AlertTriangle className="h-6 w-6 text-primary" />
                   </div>
                   <h2 className="text-2xl font-bold">Global Workplace Stress Crisis</h2>
                 </div>
-                <div className="space-y-4 pl-4 border-l-2 border-amber-500/30">
+                <div className="space-y-4 pl-4 border-l-2 border-primary/30">
                   <p>
                     According to the <strong>Gallup 2024 State of the Global Workplace Report</strong>, workplace stress has reached 
                     record highs across all regions. The data reveals a concerning trend that demands immediate attention from employers.

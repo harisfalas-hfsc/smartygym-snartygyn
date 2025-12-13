@@ -343,40 +343,40 @@ export default function HumanPerformance() {
               {/* Section 3: The Modern Fitness Challenge */}
               <section data-pdf-section>
                 <div className="flex items-center gap-3 mb-4">
-                  <div className="p-2 bg-amber-500/20 rounded-full">
-                    <Zap className="h-6 w-6 text-amber-500" />
+                  <div className="p-2 bg-primary/20 rounded-full">
+                    <Zap className="h-6 w-6 text-primary" />
                   </div>
                   <h2 className="text-2xl font-bold">The Modern Fitness Challenge</h2>
                 </div>
-                <div className="space-y-4 pl-4 border-l-2 border-amber-500/30">
+                <div className="space-y-4 pl-4 border-l-2 border-primary/30">
                   <p>
                     Despite knowing that exercise is beneficial, most people struggle to maintain a consistent routine. 
                     The reasons are systemic, not personal failures:
                   </p>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4 my-6">
                     <div className="flex items-start gap-3 p-3 bg-muted/50 rounded-lg">
-                      <Smartphone className="h-5 w-5 text-amber-500 shrink-0 mt-1" />
+                      <Smartphone className="h-5 w-5 text-primary shrink-0 mt-1" />
                       <div>
                         <strong className="block">Information Overload</strong>
                         <span className="text-sm text-muted-foreground">YouTube, Instagram, TikTok—endless conflicting advice with no coherent philosophy</span>
                       </div>
                     </div>
                     <div className="flex items-start gap-3 p-3 bg-muted/50 rounded-lg">
-                      <Target className="h-5 w-5 text-amber-500 shrink-0 mt-1" />
+                      <Target className="h-5 w-5 text-primary shrink-0 mt-1" />
                       <div>
                         <strong className="block">Lack of Structure</strong>
                         <span className="text-sm text-muted-foreground">Random workouts without progressive overload or long-term planning</span>
                       </div>
                     </div>
                     <div className="flex items-start gap-3 p-3 bg-muted/50 rounded-lg">
-                      <Clock className="h-5 w-5 text-amber-500 shrink-0 mt-1" />
+                      <Clock className="h-5 w-5 text-primary shrink-0 mt-1" />
                       <div>
                         <strong className="block">Time Scarcity</strong>
                         <span className="text-sm text-muted-foreground">Work, family, commute—no time for a "real" gym routine</span>
                       </div>
                     </div>
                     <div className="flex items-start gap-3 p-3 bg-muted/50 rounded-lg">
-                      <Plane className="h-5 w-5 text-amber-500 shrink-0 mt-1" />
+                      <Plane className="h-5 w-5 text-primary shrink-0 mt-1" />
                       <div>
                         <strong className="block">Accessibility Gaps</strong>
                         <span className="text-sm text-muted-foreground">Traveling? No equipment? The routine breaks down</span>

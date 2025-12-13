@@ -758,7 +758,7 @@ export default function UserDashboard() {
                     <div className="space-y-1">
                       <h3 className="text-sm font-semibold">{getPlanName(subscriptionInfo.product_id)} Plan</h3>
                       <div className="flex flex-wrap gap-1.5">
-                        <Badge variant="outline" className="text-xs h-5 px-1.5 bg-gradient-to-r from-yellow-500/20 to-amber-500/20 text-yellow-600 dark:text-yellow-400 border-yellow-500/30">
+                        <Badge variant="outline" className="text-xs h-5 px-1.5 bg-gradient-to-r from-primary/20 to-sky-500/20 text-primary border-primary/30">
                           <Crown className="h-3 w-3 mr-1" />
                           Premium Member
                         </Badge>

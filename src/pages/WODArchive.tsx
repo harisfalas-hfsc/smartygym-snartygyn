@@ -190,7 +190,7 @@ const WODArchive = () => {
         />
 
         {/* Header Card */}
-        <Card className="mb-8 bg-gradient-to-br from-primary/10 via-background to-primary/10 border-2 border-primary/50 shadow-gold">
+        <Card className="mb-8 bg-gradient-to-br from-primary/10 via-background to-primary/10 border-2 border-primary/50 shadow-primary">
           <div className="p-4 sm:p-6 text-center">
             <div className="w-20 h-20 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-4">
               <Archive className="w-10 h-10 text-primary" />

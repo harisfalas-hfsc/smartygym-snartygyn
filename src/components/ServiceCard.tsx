@@ -14,7 +14,7 @@ export const ServiceCard = ({ icon: Icon, title, description, onClick }: Service
       itemScope
       itemType="https://schema.org/Service"
       onClick={onClick}
-      className="p-6 cursor-pointer transition-all duration-300 hover:scale-105 hover:shadow-gold hover:-translate-y-1 bg-card border-border group"
+      className="p-6 cursor-pointer transition-all duration-300 hover:scale-105 hover:shadow-primary hover:-translate-y-1 bg-card border-border group"
       role="button"
       aria-label={`${title} - Online fitness service at SmartyGym by Haris Falas - smartygym.com`}
       data-service-type={title.toLowerCase().replace(/\s+/g, '-')}
