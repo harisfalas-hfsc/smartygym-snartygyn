@@ -206,16 +206,14 @@ export const HeroThreeColumns = () => {
           ))}
         </div>
         
-        {/* Compact CTA Button */}
+        {/* Simple CTA Link */}
         <div 
           onClick={() => navigate("/human-performance")}
-          className="mt-4 cursor-pointer group"
+          className="mt-3 flex items-center gap-2 cursor-pointer group hover:text-primary transition-colors rounded-md px-2 py-1 -mx-2 hover:bg-primary/10"
         >
-          <div className="flex items-center gap-2 px-3 py-2 rounded-lg border border-primary/40 bg-primary/10 hover:bg-primary/20 hover:border-primary transition-all">
-            <TrendingUp className="w-4 h-4 text-primary" />
-            <span className="text-sm font-semibold text-primary group-hover:underline">Why Invest in SmartyGym?</span>
-            <ChevronRight className="w-4 h-4 text-primary group-hover:translate-x-0.5 transition-transform" />
-          </div>
+          <TrendingUp className="w-4 h-4 text-primary flex-shrink-0" />
+          <span className="text-sm font-medium group-hover:text-primary transition-colors">Why Invest in SmartyGym?</span>
+          <ChevronRight className="w-3 h-3 text-primary group-hover:translate-x-0.5 transition-transform" />
         </div>
       </div>
 
