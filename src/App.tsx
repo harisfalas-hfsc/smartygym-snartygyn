@@ -57,6 +57,7 @@ import Disclaimer from "./pages/Disclaimer";
 import NotFound from "./pages/NotFound";
 import JoinPremium from "./pages/JoinPremium";
 import SmartyCorporate from "./pages/SmartyCorporate";
+import CorporateWellness from "./pages/CorporateWellness";
 import PremiumBenefits from "./pages/PremiumBenefits";
 import PremiumComparison from "./pages/PremiumComparison";
 
@@ -132,6 +133,7 @@ const AppContent = () => {
                 
                 {/* Corporate page is public */}
                 <Route path="/corporate" element={<SmartyCorporate />} />
+                <Route path="/corporate-wellness" element={<CorporateWellness />} />
                 <Route path="/corporate-admin" element={<ProtectedRoute><CorporateAdmin /></ProtectedRoute>} />
                 
                 {/* Exercise library is public */}
