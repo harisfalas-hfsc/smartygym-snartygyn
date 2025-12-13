@@ -40,6 +40,14 @@ export const Footer = () => {
                 Corporate
               </button>
               <span>•</span>
+              <button onClick={() => navigate("/human-performance")} className="hover:text-primary transition-colors">
+                Why SmartyGym?
+              </button>
+              <span>•</span>
+              <button onClick={() => navigate("/corporate-wellness")} className="hover:text-primary transition-colors">
+                Why Wellness?
+              </button>
+              <span>•</span>
               <button onClick={() => navigate("/privacy-policy")} className="hover:text-primary transition-colors">
                 Privacy
               </button>
@@ -85,6 +93,14 @@ export const Footer = () => {
           <div className="flex flex-wrap items-center justify-center gap-4 text-sm text-muted-foreground">
             <button onClick={() => navigate("/corporate")} className="transition-colors text-primary">
               Smarty Corporate
+            </button>
+            <span>•</span>
+            <button onClick={() => navigate("/human-performance")} className="hover:text-primary transition-colors">
+              Why SmartyGym?
+            </button>
+            <span>•</span>
+            <button onClick={() => navigate("/corporate-wellness")} className="hover:text-primary transition-colors">
+              Why Corporate Wellness?
             </button>
             <span>•</span>
             <button onClick={() => navigate("/privacy-policy")} className="hover:text-primary transition-colors">
