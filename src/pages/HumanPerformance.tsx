@@ -1,3 +1,4 @@
+import { useState, useRef } from "react";
 import { Helmet } from "react-helmet";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -30,12 +31,17 @@ import {
   Smartphone,
   Plane,
   Timer,
-  Crown
+  Crown,
+  BookOpenText,
+  Download
 } from "lucide-react";
 import { useShowBackButton } from "@/hooks/useShowBackButton";
 import { SEOEnhancer } from "@/components/SEOEnhancer";
 import { PageBreadcrumbs } from "@/components/PageBreadcrumbs";
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
+import { ReaderModeDialog } from "@/components/ReaderModeDialog";
+import html2canvas from "html2canvas";
+import { toast } from "sonner";
 import { 
   BarChart, 
   Bar, 
@@ -91,6 +97,81 @@ const chartConfig = {
 
 export default function HumanPerformance() {
   const { canGoBack, goBack } = useShowBackButton();
+  const [readerModeOpen, setReaderModeOpen] = useState(false);
+  const contentRef = useRef<HTMLDivElement>(null);
+
+  const handleExportPDF = async () => {
+    if (!contentRef.current) return;
+    
+    toast.loading("Generating PDF...", { id: "pdf-export" });
+    
+    try {
+      const canvas = await html2canvas(contentRef.current, {
+        scale: 2,
+        useCORS: true,
+        backgroundColor: "#ffffff",
+        logging: false,
+      });
+      
+      const imgData = canvas.toDataURL("image/png");
+      const link = document.createElement("a");
+      link.href = imgData;
+      link.download = "Why-Invest-in-SmartyGym.png";
+      link.click();
+      
+      toast.success("PDF exported successfully!", { id: "pdf-export" });
+    } catch (error) {
+      console.error("PDF export error:", error);
+      toast.error("Failed to export PDF", { id: "pdf-export" });
+    }
+  };
+
+  const getReaderContent = () => {
+    return `
+      <h2>Your Body, Your Greatest Asset</h2>
+      <p>In a world of endless fitness advice on YouTube, conflicting information on social media, and generic gym memberships that lead nowhere, finding a structured path to real results has never been harder. This research explores why expert-designed, human-crafted fitness programs deliver transformative results—and how SmartyGym provides the ecosystem you need to elevate every aspect of your performance.</p>
+      
+      <h2>The Foundation of Human Performance</h2>
+      <p>Physical fitness isn't just about looking good—it's the bedrock upon which all other performance is built. Research from the American College of Sports Medicine consistently shows that regular exercise improves cognitive function, emotional regulation, and energy levels across all age groups.</p>
+      <p>According to a Harvard Medical School study, just 20 minutes of moderate exercise can boost brain function for up to 12 hours afterward. The implications for work productivity, parenting patience, and creative pursuits are profound.</p>
+      <ul>
+        <li><strong>23%</strong> Increase in cognitive performance</li>
+        <li><strong>32%</strong> Boost in creative problem-solving</li>
+        <li><strong>40%</strong> Improvement in stress resilience</li>
+      </ul>
+      
+      <h2>Exercise & Mental Health</h2>
+      <p>The National Institute of Mental Health and countless peer-reviewed studies have established that regular physical activity is one of the most effective interventions for mental health—often matching or exceeding the effects of medication for mild to moderate conditions.</p>
+      
+      <h2>The Modern Fitness Challenge</h2>
+      <p>Despite knowing that exercise is beneficial, most people struggle to maintain a consistent routine. The reasons are systemic, not personal failures:</p>
+      <ul>
+        <li><strong>Information Overload:</strong> YouTube, Instagram, TikTok—endless conflicting advice with no coherent philosophy</li>
+        <li><strong>Lack of Structure:</strong> Random workouts without progressive overload or long-term planning</li>
+        <li><strong>Time Scarcity:</strong> Work, family, commute—no time for a "real" gym routine</li>
+        <li><strong>Accessibility Gaps:</strong> Traveling? No equipment? The routine breaks down</li>
+      </ul>
+      
+      <h2>The Science of Consistency & Progressive Overload</h2>
+      <p>Research from the Journal of Strength and Conditioning demonstrates that structured programs with progressive overload produce results 3-5x greater than random workouts over a 24-week period.</p>
+      
+      <h2>Why Expert-Designed Programs Win</h2>
+      <p>The RAND Corporation study on fitness program adherence found that programs designed by certified professionals have a 67% long-term adherence rate, compared to just 23% for self-guided approaches.</p>
+      
+      <h2>The SmartyGym Ecosystem</h2>
+      <p>SmartyGym was built to solve the modern fitness challenge. Created by Sports Scientist and CSCS-certified coach Haris Falas with over 20 years of experience, every workout and program is designed with purpose, progression, and real-world constraints in mind.</p>
+      <ul>
+        <li><strong>500+ Expert Workouts:</strong> Professionally designed, categorized, and progressive</li>
+        <li><strong>Multi-Week Programs:</strong> Structured journeys from 4-12 weeks with clear goals</li>
+        <li><strong>Smarty Rituals:</strong> Daily wellness protocols for morning, midday, and evening</li>
+        <li><strong>Smarty Check-ins:</strong> Track your readiness, sleep, and recovery</li>
+        <li><strong>Smarty Tools:</strong> Calculators for 1RM, BMR, macros, and body measurements</li>
+      </ul>
+      
+      <h2>Conclusion</h2>
+      <p>Investing in SmartyGym means investing in every role you play—employee, parent, friend, athlete, and human being. The research is clear: structured, expert-designed fitness programs deliver results that random approaches simply cannot match.</p>
+    `;
+  };
 
   return (
     <>
@@ -147,7 +228,32 @@ export default function HumanPerformance() {
             <p className="text-muted-foreground max-w-2xl mx-auto">
               The science of how structured training transforms your performance in work, family, and life
             </p>
+            
+            {/* Reader Mode & PDF Export Buttons */}
+            <div className="flex items-center justify-center gap-3 mt-4">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setReaderModeOpen(true)}
+                className="gap-2"
+              >
+                <BookOpenText className="h-4 w-4" />
+                Reader Mode
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={handleExportPDF}
+                className="gap-2"
+              >
+                <Download className="h-4 w-4" />
+                Export PDF
+              </Button>
+            </div>
           </div>
+          
+          {/* Content wrapper for PDF export */}
+          <div ref={contentRef} className="bg-background">
 
           {/* Description Card */}
           <Card className="mb-8 border-2 border-primary/30">
@@ -687,9 +793,22 @@ export default function HumanPerformance() {
               </ol>
             </CardContent>
           </Card>
+          
+          </div> {/* End content wrapper */}
 
         </main>
       </div>
+      
+      <ReaderModeDialog
+        open={readerModeOpen}
+        onOpenChange={setReaderModeOpen}
+        title="Why Invest in SmartyGym?"
+        content={getReaderContent()}
+        metadata={{
+          author: "SmartyGym Research",
+          category: "Fitness Science"
+        }}
+      />
     </>
   );
 }

@@ -1,3 +1,4 @@
+import { useState, useRef } from "react";
 import { Helmet } from "react-helmet";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -25,12 +26,17 @@ import {
   BookOpen,
   ExternalLink,
   TrendingDown,
-  AlertTriangle
+  AlertTriangle,
+  BookOpenText,
+  Download
 } from "lucide-react";
 import { useShowBackButton } from "@/hooks/useShowBackButton";
 import { SEOEnhancer } from "@/components/SEOEnhancer";
 import { PageBreadcrumbs } from "@/components/PageBreadcrumbs";
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
+import { ReaderModeDialog } from "@/components/ReaderModeDialog";
+import html2canvas from "html2canvas";
+import { toast } from "sonner";
 import { 
   BarChart, 
   Bar, 
@@ -87,6 +93,76 @@ const chartConfig = {
 
 export default function CorporateWellness() {
   const { canGoBack, goBack } = useShowBackButton();
+  const [readerModeOpen, setReaderModeOpen] = useState(false);
+  const contentRef = useRef<HTMLDivElement>(null);
+
+  const handleExportPDF = async () => {
+    if (!contentRef.current) return;
+    
+    toast.loading("Generating PDF...", { id: "pdf-export" });
+    
+    try {
+      const canvas = await html2canvas(contentRef.current, {
+        scale: 2,
+        useCORS: true,
+        backgroundColor: "#ffffff",
+        logging: false,
+      });
+      
+      const imgData = canvas.toDataURL("image/png");
+      const link = document.createElement("a");
+      link.href = imgData;
+      link.download = "Why-Invest-in-Corporate-Wellness.png";
+      link.click();
+      
+      toast.success("PDF exported successfully!", { id: "pdf-export" });
+    } catch (error) {
+      console.error("PDF export error:", error);
+      toast.error("Failed to export PDF", { id: "pdf-export" });
+    }
+  };
+
+  const getReaderContent = () => {
+    return `
+      <h2>The Business Case for Wellness</h2>
+      <p>In today's competitive business landscape, forward-thinking companies recognize that their most valuable asset isn't technology, infrastructure, or capital—it's their people. This comprehensive analysis explores why investing in employee wellness isn't just an ethical choice, but a strategic business decision with measurable returns.</p>
+      
+      <h2>The Human Capital Advantage</h2>
+      <p>Every successful organization is built on the foundation of its workforce. The skills, creativity, dedication, and energy of employees drive innovation, customer satisfaction, and ultimately, business success.</p>
+      <p>According to Harvard Business Review, companies like Johnson & Johnson have demonstrated that comprehensive wellness programs can yield a return of $2.71 for every dollar spent, with cumulative savings reaching $250 million on healthcare costs over a decade.</p>
+      
+      <h2>The ROI of Wellness Programs</h2>
+      <ul>
+        <li><strong>$2.71</strong> Return per $1 spent (Johnson & Johnson)</li>
+        <li><strong>$250M</strong> Saved by J&J over 10 years</li>
+        <li><strong>25%</strong> Reduction in sick leave</li>
+      </ul>
+      
+      <h2>The Modern Challenge</h2>
+      <p>We live in unprecedented times. The modern employee faces a complex web of pressures that previous generations never encountered:</p>
+      <ul>
+        <li><strong>Economic Pressures:</strong> Rising costs of living, financial uncertainty, and job market volatility</li>
+        <li><strong>Time Scarcity:</strong> Long commutes, extended work hours, and always-on digital culture</li>
+        <li><strong>Family Responsibilities:</strong> Balancing childcare, eldercare, and household duties</li>
+        <li><strong>Mental Load:</strong> Information overload, decision fatigue, and the pressure to constantly perform</li>
+      </ul>
+      
+      <h2>Global Workplace Stress Crisis</h2>
+      <p>According to the Gallup 2024 State of the Global Workplace Report, workplace stress has reached record highs across all regions. Middle East & North Africa leads at 52%, followed by US & Canada at 49%.</p>
+      
+      <h2>Health Beyond Work</h2>
+      <p>When we discuss employee wellness, we must recognize that employees don't exist in a vacuum. They are parents, partners, friends, and community members. Their health affects not just their work performance but their entire life ecosystem.</p>
+      
+      <h2>The Science of Exercise & Performance</h2>
+      <p>Research from the American College of Sports Medicine shows that regular physical activity improves cognitive function by up to 23%, reduces anxiety symptoms by 40%, and increases productivity by 21%.</p>
+      
+      <h2>Forbes Business Case</h2>
+      <p>Forbes research indicates that employees with access to wellness programs report 28% higher job satisfaction, 32% lower intention to leave, and 41% lower absenteeism rates.</p>
+      
+      <h2>Conclusion</h2>
+      <p>Investing in corporate wellness is not an expense—it's a strategic investment that pays dividends in productivity, retention, healthcare savings, and company culture. The research is clear: healthy employees build healthy businesses.</p>
+    `;
+  };
 
   return (
     <>
@@ -144,7 +220,32 @@ export default function CorporateWellness() {
             <p className="text-muted-foreground max-w-2xl mx-auto">
               Research-backed insights on the transformative power of corporate fitness programs
             </p>
+            
+            {/* Reader Mode & PDF Export Buttons */}
+            <div className="flex items-center justify-center gap-3 mt-4">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setReaderModeOpen(true)}
+                className="gap-2"
+              >
+                <BookOpenText className="h-4 w-4" />
+                Reader Mode
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={handleExportPDF}
+                className="gap-2"
+              >
+                <Download className="h-4 w-4" />
+                Export PDF
+              </Button>
+            </div>
           </div>
+          
+          {/* Content wrapper for PDF export */}
+          <div ref={contentRef} className="bg-background">
 
           {/* Description Card */}
           <Card className="mb-8 border-2 border-green-500/30">
@@ -837,9 +938,22 @@ export default function CorporateWellness() {
               </p>
             </CardContent>
           </Card>
+          
+          </div> {/* End content wrapper */}
 
         </main>
       </div>
+      
+      <ReaderModeDialog
+        open={readerModeOpen}
+        onOpenChange={setReaderModeOpen}
+        title="Why Invest in Corporate Wellness?"
+        content={getReaderContent()}
+        metadata={{
+          author: "SmartyGym Research",
+          category: "Corporate Wellness"
+        }}
+      />
     </>
   );
 }
