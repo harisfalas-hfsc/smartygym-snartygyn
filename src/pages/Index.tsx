@@ -570,7 +570,7 @@ const Index = () => {
           {/* Busy adults */}
           <div className="flex flex-col gap-1">
             <div className="flex items-center gap-3">
-              <Users className="w-6 h-6 text-primary flex-shrink-0" />
+              <Users className="w-6 h-6 text-blue-500 flex-shrink-0" />
               <span className="text-sm font-semibold">Busy adults</span>
             </div>
             <p className="text-xs text-muted-foreground ml-9">Quick, effective workouts that fit your schedule</p>
@@ -579,7 +579,7 @@ const Index = () => {
           {/* Parents */}
           <div className="flex flex-col gap-1">
             <div className="flex items-center gap-3">
-              <Heart className="w-6 h-6 text-primary flex-shrink-0" />
+              <Heart className="w-6 h-6 text-pink-500 flex-shrink-0" />
               <span className="text-sm font-semibold">Parents</span>
             </div>
             <p className="text-xs text-muted-foreground ml-9">Train at home while kids play nearby</p>
@@ -588,7 +588,7 @@ const Index = () => {
           {/* Beginners */}
           <div className="flex flex-col gap-1">
             <div className="flex items-center gap-3">
-              <GraduationCap className="w-6 h-6 text-primary flex-shrink-0" />
+              <GraduationCap className="w-6 h-6 text-emerald-500 flex-shrink-0" />
               <span className="text-sm font-semibold">Beginners</span>
             </div>
             <p className="text-xs text-muted-foreground ml-9">Start your fitness journey with guided programs</p>
@@ -597,7 +597,7 @@ const Index = () => {
           {/* Intermediate lifters */}
           <div className="flex flex-col gap-1">
             <div className="flex items-center gap-3">
-              <Target className="w-6 h-6 text-primary flex-shrink-0" />
+              <Target className="w-6 h-6 text-orange-500 flex-shrink-0" />
               <span className="text-sm font-semibold">Intermediate lifters</span>
             </div>
             <p className="text-xs text-muted-foreground ml-9">Push past plateaus with structured plans</p>
@@ -606,7 +606,7 @@ const Index = () => {
           {/* Travelers */}
           <div className="flex flex-col gap-1">
             <div className="flex items-center gap-3">
-              <Plane className="w-6 h-6 text-primary flex-shrink-0" />
+              <Plane className="w-6 h-6 text-cyan-500 flex-shrink-0" />
               <span className="text-sm font-semibold">Travelers</span>
             </div>
             <p className="text-xs text-muted-foreground ml-9">Stay consistent wherever you go</p>
@@ -615,7 +615,7 @@ const Index = () => {
           {/* Gym-goers */}
           <div className="flex flex-col gap-1">
             <div className="flex items-center gap-3">
-              <Dumbbell className="w-6 h-6 text-primary flex-shrink-0" />
+              <Dumbbell className="w-6 h-6 text-purple-500 flex-shrink-0" />
               <span className="text-sm font-semibold">Gym-goers</span>
             </div>
             <p className="text-xs text-muted-foreground ml-9">Enhance your gym routine with expert guidance</p>
