@@ -262,37 +262,37 @@ const About = () => {
         <div className="space-y-4 mt-6">
           {/* Busy adults */}
           <div className="flex items-center gap-3">
-            <Users className="w-6 h-6 text-primary flex-shrink-0" />
+            <Users className="w-6 h-6 text-blue-500 flex-shrink-0" />
             <span className="text-sm font-semibold text-foreground">Busy adults</span>
           </div>
           
           {/* Parents */}
           <div className="flex items-center gap-3">
-            <Heart className="w-6 h-6 text-primary flex-shrink-0" />
+            <Heart className="w-6 h-6 text-pink-500 flex-shrink-0" />
             <span className="text-sm font-semibold text-foreground">Parents</span>
           </div>
           
           {/* Beginners */}
           <div className="flex items-center gap-3">
-            <GraduationCap className="w-6 h-6 text-primary flex-shrink-0" />
+            <GraduationCap className="w-6 h-6 text-emerald-500 flex-shrink-0" />
             <span className="text-sm font-semibold text-foreground">Beginners</span>
           </div>
           
           {/* Intermediate lifters */}
           <div className="flex items-center gap-3">
-            <Target className="w-6 h-6 text-primary flex-shrink-0" />
+            <Target className="w-6 h-6 text-orange-500 flex-shrink-0" />
             <span className="text-sm font-semibold text-foreground">Intermediate lifters</span>
           </div>
           
           {/* Travelers */}
           <div className="flex items-center gap-3">
-            <Plane className="w-6 h-6 text-primary flex-shrink-0" />
+            <Plane className="w-6 h-6 text-cyan-500 flex-shrink-0" />
             <span className="text-sm font-semibold text-foreground">Travelers</span>
           </div>
           
           {/* Gym-goers */}
           <div className="flex items-center gap-3">
-            <Dumbbell className="w-6 h-6 text-primary flex-shrink-0" />
+            <Dumbbell className="w-6 h-6 text-purple-500 flex-shrink-0" />
             <span className="text-sm font-semibold text-foreground">Gym-goers</span>
           </div>
         </div>
