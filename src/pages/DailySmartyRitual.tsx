@@ -467,7 +467,7 @@ const DailySmartyRitual = () => {
       </div>
 
       {/* Share Dialog */}
-      {ritual && (
+      {isPremium && ritual && (
         <RitualShareDialog 
           open={showShareDialog} 
           onOpenChange={setShowShareDialog}
@@ -476,8 +476,8 @@ const DailySmartyRitual = () => {
         />
       )}
 
-      {/* Reader Mode Dialog */}
-      {ritual && (
+      {/* Reader Mode Dialog - only for premium users with access */}
+      {isPremium && ritual && (
         <ReaderModeDialog
           open={showReaderMode}
           onOpenChange={setShowReaderMode}

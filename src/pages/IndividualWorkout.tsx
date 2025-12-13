@@ -102,95 +102,108 @@ const IndividualWorkout = () => {
         </Helmet>
         <div className="min-h-screen bg-background">
           <div className="container mx-auto px-4 py-8">
-            <div className="mb-4 flex items-center justify-between">
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={goBack}
-                className="gap-2"
-              >
-                <ArrowLeft className="mr-2 h-4 w-4" />
-                <span className="text-xs sm:text-sm">Back</span>
-              </Button>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => setReaderModeOpen(true)}
-                className="gap-2"
-              >
-                <BookOpen className="h-4 w-4" />
-                <span className="hidden sm:inline">Reader Mode</span>
-              </Button>
-            </div>
+            {/* Calculate access for Reader Mode */}
+            {(() => {
+              const hasAccess = userTier === "premium" || hasPurchased(dbWorkout.id, "workout") || !dbWorkout.is_premium;
+              return (
+                <>
+                  <div className="mb-4 flex items-center justify-between">
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={goBack}
+                      className="gap-2"
+                    >
+                      <ArrowLeft className="mr-2 h-4 w-4" />
+                      <span className="text-xs sm:text-sm">Back</span>
+                    </Button>
+                    {hasAccess && (
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => setReaderModeOpen(true)}
+                        className="gap-2"
+                      >
+                        <BookOpen className="h-4 w-4" />
+                        <span className="hidden sm:inline">Reader Mode</span>
+                      </Button>
+                    )}
+                  </div>
 
-            <PageBreadcrumbs items={[
-              { label: "Home", href: "/" },
-              { label: "Smarty Workouts", href: "/workout" },
-              { label: dbWorkout.name }
-            ]} />
+                  <PageBreadcrumbs items={[
+                    { label: "Home", href: "/" },
+                    { label: "Smarty Workouts", href: "/workout" },
+                    { label: dbWorkout.name }
+                  ]} />
 
-            <ReaderModeDialog
-              open={readerModeOpen}
-              onOpenChange={setReaderModeOpen}
-              title={dbWorkout.name}
-              metadata={{
-                duration: dbWorkout.duration || undefined,
-                equipment: dbWorkout.equipment || undefined,
-                category: getCategoryLabel(dbWorkout.category)
-              }}
-              content={
-                <div className="space-y-6">
-                  {dbWorkout.description && (
-                    <div>
-                      <h2 className="text-lg font-semibold mb-2">Description</h2>
-                      <HTMLContent content={dbWorkout.description} />
-                    </div>
+                  {hasAccess && (
+                    <ReaderModeDialog
+                      open={readerModeOpen}
+                      onOpenChange={setReaderModeOpen}
+                      title={dbWorkout.name}
+                      metadata={{
+                        duration: dbWorkout.duration || undefined,
+                        equipment: dbWorkout.equipment || undefined,
+                        category: getCategoryLabel(dbWorkout.category)
+                      }}
+                      content={
+                        <div className="space-y-6">
+                          {dbWorkout.description && (
+                            <div>
+                              <h2 className="text-lg font-semibold mb-2">Description</h2>
+                              <HTMLContent content={dbWorkout.description} />
+                            </div>
+                          )}
+                          {dbWorkout.warm_up && (
+                            <div>
+                              <h2 className="text-lg font-semibold mb-2">Warm Up</h2>
+                              <HTMLContent content={dbWorkout.warm_up} />
+                            </div>
+                          )}
+                          {dbWorkout.activation && (
+                            <div>
+                              <h2 className="text-lg font-semibold mb-2">Activation</h2>
+                              <HTMLContent content={dbWorkout.activation} />
+                            </div>
+                          )}
+                          {dbWorkout.main_workout && (
+                            <div>
+                              <h2 className="text-lg font-semibold mb-2">Main Workout</h2>
+                              <HTMLContent content={dbWorkout.main_workout} />
+                            </div>
+                          )}
+                          {dbWorkout.finisher && (
+                            <div>
+                              <h2 className="text-lg font-semibold mb-2">Finisher</h2>
+                              <HTMLContent content={dbWorkout.finisher} />
+                            </div>
+                          )}
+                          {dbWorkout.cool_down && (
+                            <div>
+                              <h2 className="text-lg font-semibold mb-2">Cool Down</h2>
+                              <HTMLContent content={dbWorkout.cool_down} />
+                            </div>
+                          )}
+                          {dbWorkout.instructions && (
+                            <div>
+                              <h2 className="text-lg font-semibold mb-2">Instructions</h2>
+                              <HTMLContent content={dbWorkout.instructions} />
+                            </div>
+                          )}
+                          {dbWorkout.tips && (
+                            <div>
+                              <h2 className="text-lg font-semibold mb-2">Tips</h2>
+                              <HTMLContent content={dbWorkout.tips} />
+                            </div>
+                          )}
+                        </div>
+                      }
+                    />
                   )}
-                  {dbWorkout.warm_up && (
-                    <div>
-                      <h2 className="text-lg font-semibold mb-2">Warm Up</h2>
-                      <HTMLContent content={dbWorkout.warm_up} />
-                    </div>
-                  )}
-                  {dbWorkout.activation && (
-                    <div>
-                      <h2 className="text-lg font-semibold mb-2">Activation</h2>
-                      <HTMLContent content={dbWorkout.activation} />
-                    </div>
-                  )}
-                  {dbWorkout.main_workout && (
-                    <div>
-                      <h2 className="text-lg font-semibold mb-2">Main Workout</h2>
-                      <HTMLContent content={dbWorkout.main_workout} />
-                    </div>
-                  )}
-                  {dbWorkout.finisher && (
-                    <div>
-                      <h2 className="text-lg font-semibold mb-2">Finisher</h2>
-                      <HTMLContent content={dbWorkout.finisher} />
-                    </div>
-                  )}
-                  {dbWorkout.cool_down && (
-                    <div>
-                      <h2 className="text-lg font-semibold mb-2">Cool Down</h2>
-                      <HTMLContent content={dbWorkout.cool_down} />
-                    </div>
-                  )}
-                  {dbWorkout.instructions && (
-                    <div>
-                      <h2 className="text-lg font-semibold mb-2">Instructions</h2>
-                      <HTMLContent content={dbWorkout.instructions} />
-                    </div>
-                  )}
-                  {dbWorkout.tips && (
-                    <div>
-                      <h2 className="text-lg font-semibold mb-2">Tips</h2>
-                      <HTMLContent content={dbWorkout.tips} />
-                    </div>
-                  )}
-                </div>
-              }
-            />
+                </>
+              );
+            })()}
+
 
             <AccessGate 
               requireAuth={true} 
