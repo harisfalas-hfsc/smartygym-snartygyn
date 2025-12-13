@@ -116,79 +116,83 @@ const IndividualTrainingProgram = () => {
                 <ArrowLeft className="mr-2 h-4 w-4" />
                 <span className="text-xs sm:text-sm">Back</span>
               </Button>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => setReaderModeOpen(true)}
-                className="gap-2"
-              >
-                <BookOpen className="h-4 w-4" />
-                <span className="hidden sm:inline">Reader Mode</span>
-              </Button>
+              {hasAccess && (
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setReaderModeOpen(true)}
+                  className="gap-2"
+                >
+                  <BookOpen className="h-4 w-4" />
+                  <span className="hidden sm:inline">Reader Mode</span>
+                </Button>
+              )}
             </div>
 
-            <ReaderModeDialog
-              open={readerModeOpen}
-              onOpenChange={setReaderModeOpen}
-              title={dbProgram.name}
-              metadata={{
-                duration: `${dbProgram.weeks} weeks / ${dbProgram.days_per_week} days per week`,
-                equipment: dbProgram.equipment || undefined,
-                category: dbProgram.category || undefined
-              }}
-              content={
-                <div className="space-y-6">
-                  {dbProgram.description && (
-                    <div>
-                      <h2 className="text-lg font-semibold mb-2">Description</h2>
-                      <HTMLContent content={dbProgram.description} />
-                    </div>
-                  )}
-                  {dbProgram.overview && (
-                    <div>
-                      <h2 className="text-lg font-semibold mb-2">Overview</h2>
-                      <HTMLContent content={dbProgram.overview} />
-                    </div>
-                  )}
-                  {dbProgram.target_audience && (
-                    <div>
-                      <h2 className="text-lg font-semibold mb-2">Target Audience</h2>
-                      <HTMLContent content={dbProgram.target_audience} />
-                    </div>
-                  )}
-                  {dbProgram.program_structure && (
-                    <div>
-                      <h2 className="text-lg font-semibold mb-2">Program Structure</h2>
-                      <HTMLContent content={dbProgram.program_structure} />
-                    </div>
-                  )}
-                  {dbProgram.weekly_schedule && (
-                    <div>
-                      <h2 className="text-lg font-semibold mb-2">Weekly Schedule</h2>
-                      <HTMLContent content={dbProgram.weekly_schedule} />
-                    </div>
-                  )}
-                  {dbProgram.progression_plan && (
-                    <div>
-                      <h2 className="text-lg font-semibold mb-2">Progression Plan</h2>
-                      <HTMLContent content={dbProgram.progression_plan} />
-                    </div>
-                  )}
-                  {dbProgram.nutrition_tips && (
-                    <div>
-                      <h2 className="text-lg font-semibold mb-2">Nutrition Tips</h2>
-                      <HTMLContent content={dbProgram.nutrition_tips} />
-                    </div>
-                  )}
-                  {dbProgram.expected_results && (
-                    <div>
-                      <h2 className="text-lg font-semibold mb-2">Expected Results</h2>
-                      <HTMLContent content={dbProgram.expected_results} />
-                    </div>
-                  )}
-                </div>
-              }
-            />
+            {hasAccess && (
+              <ReaderModeDialog
+                open={readerModeOpen}
+                onOpenChange={setReaderModeOpen}
+                title={dbProgram.name}
+                metadata={{
+                  duration: `${dbProgram.weeks} weeks / ${dbProgram.days_per_week} days per week`,
+                  equipment: dbProgram.equipment || undefined,
+                  category: dbProgram.category || undefined
+                }}
+                content={
+                  <div className="space-y-6">
+                    {dbProgram.description && (
+                      <div>
+                        <h2 className="text-lg font-semibold mb-2">Description</h2>
+                        <HTMLContent content={dbProgram.description} />
+                      </div>
+                    )}
+                    {dbProgram.overview && (
+                      <div>
+                        <h2 className="text-lg font-semibold mb-2">Overview</h2>
+                        <HTMLContent content={dbProgram.overview} />
+                      </div>
+                    )}
+                    {dbProgram.target_audience && (
+                      <div>
+                        <h2 className="text-lg font-semibold mb-2">Target Audience</h2>
+                        <HTMLContent content={dbProgram.target_audience} />
+                      </div>
+                    )}
+                    {dbProgram.program_structure && (
+                      <div>
+                        <h2 className="text-lg font-semibold mb-2">Program Structure</h2>
+                        <HTMLContent content={dbProgram.program_structure} />
+                      </div>
+                    )}
+                    {dbProgram.weekly_schedule && (
+                      <div>
+                        <h2 className="text-lg font-semibold mb-2">Weekly Schedule</h2>
+                        <HTMLContent content={dbProgram.weekly_schedule} />
+                      </div>
+                    )}
+                    {dbProgram.progression_plan && (
+                      <div>
+                        <h2 className="text-lg font-semibold mb-2">Progression Plan</h2>
+                        <HTMLContent content={dbProgram.progression_plan} />
+                      </div>
+                    )}
+                    {dbProgram.nutrition_tips && (
+                      <div>
+                        <h2 className="text-lg font-semibold mb-2">Nutrition Tips</h2>
+                        <HTMLContent content={dbProgram.nutrition_tips} />
+                      </div>
+                    )}
+                    {dbProgram.expected_results && (
+                      <div>
+                        <h2 className="text-lg font-semibold mb-2">Expected Results</h2>
+                        <HTMLContent content={dbProgram.expected_results} />
+                      </div>
+                    )}
+                  </div>
+                }
+              />
+            )}
 
 
             <AccessGate 
