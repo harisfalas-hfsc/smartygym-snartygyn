@@ -5,7 +5,7 @@ import { ServiceCard } from "@/components/ServiceCard";
 import { Button } from "@/components/ui/button";
 import { Card, CardHeader, CardTitle, CardContent, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Dumbbell, Calendar, BookOpen, Calculator, Activity, Flame, Instagram, Facebook, Youtube, UserCheck, Wrench, Video, FileText, Smartphone, Users, Target, Heart, Zap, Plane, GraduationCap, Check, Crown, ChevronDown, ChevronRight, Move, Ban, Brain, CheckCircle2, Award, Shield, Compass, Sparkles, Info, User, HelpCircle, ShoppingBag, Star } from "lucide-react";
+import { Dumbbell, Calendar, BookOpen, Calculator, Activity, Flame, Instagram, Facebook, Youtube, UserCheck, Wrench, Video, FileText, Smartphone, Users, Target, Heart, Zap, Plane, GraduationCap, Check, Crown, ChevronDown, ChevronRight, Move, Ban, Brain, CheckCircle2, Award, Shield, Compass, Sparkles, Info, User, HelpCircle, ShoppingBag, Star, TrendingUp } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { User as SupabaseUser } from "@supabase/supabase-js";
@@ -542,6 +542,12 @@ const Index = () => {
               <div onClick={() => navigate('/faq')} className="flex items-center gap-2.5 py-1.5 px-4 bg-primary/5 border-2 border-border rounded-lg hover:border-primary transition-all cursor-pointer hover:shadow-md">
             <HelpCircle className="w-5 h-5 text-primary flex-shrink-0" />
             <span className="text-base font-medium">FAQ</span>
+            <ChevronRight className="w-5 h-5 ml-auto text-muted-foreground" />
+          </div>
+          
+          <div onClick={() => navigate('/human-performance')} className="flex items-center gap-2.5 py-1.5 px-4 bg-primary/5 border-2 border-border rounded-lg hover:border-primary transition-all cursor-pointer hover:shadow-md">
+            <TrendingUp className="w-5 h-5 text-primary flex-shrink-0" />
+            <span className="text-base font-medium">Why SmartyGym?</span>
             <ChevronRight className="w-5 h-5 ml-auto text-muted-foreground" />
           </div>
           
