@@ -118,27 +118,27 @@ export const HeroThreeColumns = () => {
 
   const exploreLinks = [
     { text: "Smarty Workouts", subtitle: "500+ workouts", icon: <Dumbbell className="w-4 h-4 text-primary" />, route: "/workout" },
-    { text: "Smarty Programs", subtitle: "structured long-term plans", icon: <Calendar className="w-4 h-4 text-primary" />, route: "/trainingprogram" },
-    { text: "Smarty Ritual", subtitle: "daily wellness guide", icon: <Sparkles className="w-4 h-4 text-primary" />, route: "/daily-ritual" },
-    { text: "Smarty Tools", subtitle: "fitness calculators", icon: <Calculator className="w-4 h-4 text-primary" />, route: "/tools" },
-    { text: "Blog & Expert Articles", subtitle: "designed by Haris Falas", icon: <FileText className="w-4 h-4 text-primary" />, route: "/blog" },
-    { text: "Exercise Library", subtitle: "demonstration videos", icon: <Video className="w-4 h-4 text-primary" />, route: "/exerciselibrary" },
+    { text: "Smarty Programs", subtitle: "structured long-term plans", icon: <Calendar className="w-4 h-4 text-blue-500" />, route: "/trainingprogram" },
+    { text: "Smarty Ritual", subtitle: "daily wellness guide", icon: <Sparkles className="w-4 h-4 text-purple-500" />, route: "/daily-ritual" },
+    { text: "Smarty Tools", subtitle: "fitness calculators", icon: <Calculator className="w-4 h-4 text-orange-500" />, route: "/tools" },
+    { text: "Blog & Expert Articles", subtitle: "designed by Haris Falas", icon: <FileText className="w-4 h-4 text-red-500" />, route: "/blog" },
+    { text: "Exercise Library", subtitle: "demonstration videos", icon: <Video className="w-4 h-4 text-emerald-500" />, route: "/exerciselibrary" },
   ];
 
   const whoIsFor = [
-    { text: "Busy Adults", icon: <Users className="w-4 h-4 text-primary" /> },
-    { text: "Parents", icon: <Heart className="w-4 h-4 text-primary" /> },
-    { text: "Beginners", icon: <GraduationCap className="w-4 h-4 text-primary" /> },
-    { text: "Intermediate Lifters", icon: <Target className="w-4 h-4 text-primary" /> },
-    { text: "Travelers", icon: <Plane className="w-4 h-4 text-primary" /> },
-    { text: "Gym-Goers", icon: <Dumbbell className="w-4 h-4 text-primary" /> },
+    { text: "Busy Adults", icon: <Users className="w-4 h-4 text-blue-500" /> },
+    { text: "Parents", icon: <Heart className="w-4 h-4 text-pink-500" /> },
+    { text: "Beginners", icon: <GraduationCap className="w-4 h-4 text-emerald-500" /> },
+    { text: "Intermediate Lifters", icon: <Target className="w-4 h-4 text-orange-500" /> },
+    { text: "Travelers", icon: <Plane className="w-4 h-4 text-cyan-500" /> },
+    { text: "Gym-Goers", icon: <Dumbbell className="w-4 h-4 text-purple-500" /> },
   ];
 
   const credentials = [
-    { text: "Online Fitness Redefined", icon: <Sparkles className="w-4 h-4 text-primary" /> },
-    { text: "Your Gym In Your Pocket", icon: <Smartphone className="w-4 h-4 text-primary" /> },
-    { text: "100% Human. 0% AI.", icon: <UserCheck className="w-4 h-4 text-primary" />, highlight: true },
-    { text: "Train Anywhere, Anytime", icon: <Plane className="w-4 h-4 text-primary" /> },
+    { text: "Online Fitness Redefined", icon: <Sparkles className="w-4 h-4 text-purple-500" /> },
+    { text: "Your Gym In Your Pocket", icon: <Smartphone className="w-4 h-4 text-cyan-500" /> },
+    { text: "100% Human. 0% AI.", icon: <UserCheck className="w-4 h-4 text-red-500" />, highlight: true },
+    { text: "Train Anywhere, Anytime", icon: <Plane className="w-4 h-4 text-emerald-500" /> },
   ];
 
   const renderStars = (count: number) => {
@@ -209,9 +209,9 @@ export const HeroThreeColumns = () => {
         {/* Simple CTA Link */}
         <div 
           onClick={() => navigate("/human-performance")}
-          className="mt-3 flex items-center gap-2 cursor-pointer group hover:text-primary transition-colors rounded-md px-2 py-1 -mx-2 border border-primary/60 hover:border-primary bg-primary/10 hover:bg-primary/20"
+          className="mt-3 flex items-center gap-2 cursor-pointer group hover:text-primary transition-colors rounded-md px-2 py-1 -mx-2 border border-green-500 hover:border-green-400 bg-primary/10 hover:bg-primary/20"
         >
-          <TrendingUp className="w-4 h-4 text-primary flex-shrink-0" />
+          <TrendingUp className="w-4 h-4 text-green-500 flex-shrink-0" />
           <span className="text-sm underline group-hover:text-primary transition-colors">Why Invest in SmartyGym?</span>
         </div>
       </div>
