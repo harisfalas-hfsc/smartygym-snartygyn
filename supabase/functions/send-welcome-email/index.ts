@@ -194,7 +194,7 @@ serve(async (req) => {
                       <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="600" style="margin: 0 auto; background-color: #ffffff; border-radius: 8px;">
                         <tr>
                           <td style="padding: 32px;">
-                            <h1 style="color: #d4af37; margin-bottom: 20px;">Welcome to SmartyGym</h1>
+                            <h1 style="color: #29B6D2; margin-bottom: 20px;">Welcome to SmartyGym</h1>
                             <p style="font-size: 16px; line-height: 1.6; margin-bottom: 16px;">Hi ${userName},</p>
                             <p style="font-size: 16px; line-height: 1.6; margin-bottom: 16px;">We're glad to have you join our community of fitness enthusiasts.</p>
                             <p style="font-size: 16px; line-height: 1.6; margin-bottom: 12px;"><strong>Here's what you can explore:</strong></p>
@@ -206,7 +206,7 @@ serve(async (req) => {
                             </ul>
                             <p style="font-size: 16px; line-height: 1.6; margin-bottom: 24px;">Ready to start your fitness journey?</p>
                             <p style="margin-top: 24px;">
-                              <a href="https://smartygym.com/userdashboard" style="display: inline-block; background: #d4af37; color: white; padding: 14px 28px; text-decoration: none; border-radius: 4px; font-weight: bold; font-size: 16px;">Go to Your Dashboard</a>
+                              <a href="https://smartygym.com/userdashboard" style="display: inline-block; background: #29B6D2; color: white; padding: 14px 28px; text-decoration: none; border-radius: 4px; font-weight: bold; font-size: 16px;">Go to Your Dashboard</a>
                             </p>
                             <p style="font-size: 16px; line-height: 1.6; margin-top: 24px;">Let's make every workout count.</p>
                             <p style="font-size: 16px; font-weight: bold; margin-top: 20px;">– The SmartyGym Team</p>

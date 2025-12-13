@@ -912,8 +912,8 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({
                     className="w-4 h-4"
                   />
                   <span className="flex items-center">
-                    Gold Border
-                    <span className="ml-2 w-6 h-6 rounded border-2 border-[#D4AF37]" />
+                    Blue Border
+                    <span className="ml-2 w-6 h-6 rounded border-2 border-primary" />
                   </span>
                 </label>
                 <label className="flex items-center space-x-3 cursor-pointer">
@@ -1303,7 +1303,7 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({
         /* Table Border Color Classes */
         .ProseMirror table.table-border-gold td,
         .ProseMirror table.table-border-gold th {
-          border-color: #D4AF37 !important;
+          border-color: hsl(var(--primary)) !important;
         }
 
         .ProseMirror table.table-border-black td,

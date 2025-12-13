@@ -68,8 +68,8 @@ export function convertTiptapToEmailHtml(content: string): string {
   html = html.replace(/<u>/g, '<u style="text-decoration: underline;">');
   
   // Convert heading tags
-  html = html.replace(/<h1[^>]*>/g, '<h1 style="font-size: 24px; font-weight: bold; margin: 0 0 16px 0; color: #d4af37;">');
-  html = html.replace(/<h2[^>]*>/g, '<h2 style="font-size: 20px; font-weight: bold; margin: 0 0 14px 0; color: #d4af37;">');
+  html = html.replace(/<h1[^>]*>/g, '<h1 style="font-size: 24px; font-weight: bold; margin: 0 0 16px 0; color: #29B6D2;">');
+  html = html.replace(/<h2[^>]*>/g, '<h2 style="font-size: 20px; font-weight: bold; margin: 0 0 14px 0; color: #29B6D2;">');
   html = html.replace(/<h3[^>]*>/g, '<h3 style="font-size: 18px; font-weight: bold; margin: 0 0 12px 0;">');
   
   // Convert lists
@@ -77,13 +77,13 @@ export function convertTiptapToEmailHtml(content: string): string {
   html = html.replace(/<ol[^>]*>/g, '<ol style="margin: 0 0 16px 0; padding-left: 24px;">');
   html = html.replace(/<li[^>]*>/g, '<li style="margin-bottom: 8px;">');
   
-  // Convert links - make them gold colored
-  html = html.replace(/<a /g, '<a style="color: #d4af37; text-decoration: underline;" ');
-  
+  // Convert links - make them light blue colored
+  html = html.replace(/<a /g, '<a style="color: #29B6D2; text-decoration: underline;" ');
+
   // Handle button-like links (CTA buttons in templates)
   html = html.replace(
-    /style="[^"]*background[^"]*#d4af37[^"]*"/g,
-    'style="display: inline-block; background: #d4af37; color: white; padding: 14px 28px; text-decoration: none; border-radius: 4px; font-weight: bold; font-size: 16px;"'
+    /style="[^"]*background[^"]*#d4af37[^"]*"/gi,
+    'style="display: inline-block; background: #29B6D2; color: white; padding: 14px 28px; text-decoration: none; border-radius: 4px; font-weight: bold; font-size: 16px;"'
   );
   
   // Remove any remaining class attributes that email clients won't understand
@@ -103,14 +103,14 @@ export function wrapInEmailTemplate(subject: string, content: string, ctaUrl?: s
   if (ctaUrl && ctaText) {
     ctaButton = `
       <p style="margin-top: 24px;">
-        <a href="${ctaUrl}" style="display: inline-block; background: #d4af37; color: white; padding: 14px 28px; text-decoration: none; border-radius: 4px; font-weight: bold; font-size: 16px;">${ctaText}</a>
+        <a href="${ctaUrl}" style="display: inline-block; background: #29B6D2; color: white; padding: 14px 28px; text-decoration: none; border-radius: 4px; font-weight: bold; font-size: 16px;">${ctaText}</a>
       </p>
     `;
   }
   
   return `
     <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; background: #ffffff;">
-      <h1 style="color: #d4af37; margin-bottom: 20px; font-size: 24px;">${subject}</h1>
+      <h1 style="color: #29B6D2; margin-bottom: 20px; font-size: 24px;">${subject}</h1>
       <div style="font-size: 16px; line-height: 1.6; color: #333333;">
         ${emailContent}
       </div>
@@ -139,7 +139,7 @@ export function wrapInEmailTemplateWithFooter(
   if (ctaUrl && ctaText) {
     ctaButton = `
       <p style="margin-top: 24px; margin-bottom: 24px;">
-        <a href="${ctaUrl}" style="display: inline-block; background: #d4af37; color: #ffffff; padding: 14px 28px; text-decoration: none; border-radius: 4px; font-weight: bold; font-size: 16px;">${ctaText}</a>
+        <a href="${ctaUrl}" style="display: inline-block; background: #29B6D2; color: #ffffff; padding: 14px 28px; text-decoration: none; border-radius: 4px; font-weight: bold; font-size: 16px;">${ctaText}</a>
       </p>
     `;
   }
@@ -159,7 +159,7 @@ export function wrapInEmailTemplateWithFooter(
             <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="600" style="margin: 0 auto; background-color: #ffffff; border-radius: 8px;">
               <tr>
                 <td style="padding: 32px;">
-                  <h1 style="color: #d4af37; margin: 0 0 24px 0; font-size: 24px; font-weight: bold;">${subject}</h1>
+                  <h1 style="color: #29B6D2; margin: 0 0 24px 0; font-size: 24px; font-weight: bold;">${subject}</h1>
                   <div style="font-size: 16px; line-height: 1.6; color: #333333;">
                     ${emailContent}
                   </div>
@@ -189,7 +189,7 @@ export function buildCompleteEmailHtml(
   const footer = getEmailFooter(userEmail);
   
   const buttonHtml = buttons?.map(btn => `
-    <a href="${btn.url}" style="display: inline-block; background: linear-gradient(135deg, #D4AF37, #F4D03F); color: #1a1a1a; padding: 14px 28px; text-decoration: none; border-radius: 8px; font-weight: bold; font-size: 16px; margin-right: 10px; margin-bottom: 10px;">${btn.text}</a>
+    <a href="${btn.url}" style="display: inline-block; background: linear-gradient(135deg, #29B6D2, #5CD3E8); color: #ffffff; padding: 14px 28px; text-decoration: none; border-radius: 8px; font-weight: bold; font-size: 16px; margin-right: 10px; margin-bottom: 10px;">${btn.text}</a>
   `).join("") || "";
 
   return `
@@ -208,7 +208,7 @@ export function buildCompleteEmailHtml(
               <!-- Header -->
               <tr>
                 <td style="background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%); padding: 30px; text-align: center;">
-                  <h1 style="color: #D4AF37; margin: 0; font-size: 28px; font-weight: bold;">SmartyGym</h1>
+                  <h1 style="color: #29B6D2; margin: 0; font-size: 28px; font-weight: bold;">SmartyGym</h1>
                   <p style="color: #999; margin: 8px 0 0 0; font-size: 14px;">Expert Fitness by Haris Falas</p>
                 </td>
               </tr>

@@ -109,7 +109,7 @@ export default function HumanPerformance() {
       await exportToPDF(contentRef.current, {
         title: "Why Invest in SmartyGym?",
         filename: "Why-Invest-in-SmartyGym",
-        accentColor: "#D4AF37"
+        accentColor: "#29B6D2"
       });
       
       toast.success("PDF exported successfully!", { id: "pdf-export" });

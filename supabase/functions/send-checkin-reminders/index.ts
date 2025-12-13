@@ -89,7 +89,7 @@ serve(async (req: Request) => {
           <p>Hey ${userName}!</p>
           <p>Your ${reminderType} check-in window opens soon at <strong>${windowTime}</strong>.</p>
           <p>Take a moment to track your wellness and keep your streak going!</p>
-          <p><a href="https://smartygym.com/userdashboard" style="color: #D4AF37;">Go to Dashboard →</a></p>
+          <p><a href="https://smartygym.com/userdashboard" style="color: #29B6D2;">Go to Dashboard →</a></p>
         `,
         is_read: false
       };
@@ -124,7 +124,7 @@ serve(async (req: Request) => {
               <div style="max-width: 600px; margin: 0 auto; padding: 20px;">
                 <div style="background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%); border-radius: 16px; padding: 40px; text-align: center;">
                   <img src="https://smartygym.com/smarty-gym-logo.png" alt="SmartyGym" style="height: 60px; margin-bottom: 20px;" />
-                  <p style="color: #D4AF37; font-size: 14px; margin: 0 0 30px 0;">Your Gym Re-imagined. Anywhere, Anytime.</p>
+                  <p style="color: #29B6D2; font-size: 14px; margin: 0 0 30px 0;">Your Gym Re-imagined. Anywhere, Anytime.</p>
                   
                   <h1 style="color: #ffffff; font-size: 24px; margin: 0 0 20px 0;">
                     ${reminderIcon} ${reminderType === 'morning' ? 'Morning' : 'Night'} Check-in Time!
@@ -133,20 +133,20 @@ serve(async (req: Request) => {
                   <div style="background: rgba(255,255,255,0.05); border-radius: 12px; padding: 24px; margin: 20px 0; text-align: left;">
                     <p style="color: #ffffff; font-size: 16px; margin: 0 0 16px 0;">Hey ${userName}!</p>
                     <p style="color: #cccccc; font-size: 14px; line-height: 1.6; margin: 0 0 16px 0;">
-                      Your ${reminderType} check-in window opens soon at <strong style="color: #D4AF37;">${windowTime}</strong>.
+                      Your ${reminderType} check-in window opens soon at <strong style="color: #29B6D2;">${windowTime}</strong>.
                     </p>
                     <p style="color: #cccccc; font-size: 14px; line-height: 1.6; margin: 0;">
                       Take a moment to track your wellness and keep your streak going!
                     </p>
                   </div>
                   
-                  <a href="https://smartygym.com/userdashboard" style="display: inline-block; background: linear-gradient(135deg, #D4AF37 0%, #B8860B 100%); color: #000000; text-decoration: none; padding: 14px 32px; border-radius: 8px; font-weight: 600; font-size: 14px; margin: 20px 0;">
+                  <a href="https://smartygym.com/userdashboard" style="display: inline-block; background: linear-gradient(135deg, #29B6D2 0%, #1E9CB8 100%); color: #ffffff; text-decoration: none; padding: 14px 32px; border-radius: 8px; font-weight: 600; font-size: 14px; margin: 20px 0;">
                     Go to Dashboard
                   </a>
                   
                   <p style="color: #888888; font-size: 12px; margin: 30px 0 0 0;">
                     You're receiving this because you subscribed to check-in reminders.<br/>
-                    <a href="https://smartygym.com/unsubscribe" style="color: #D4AF37;">Unsubscribe</a>
+                    <a href="https://smartygym.com/unsubscribe" style="color: #29B6D2;">Unsubscribe</a>
                   </p>
                 </div>
               </div>

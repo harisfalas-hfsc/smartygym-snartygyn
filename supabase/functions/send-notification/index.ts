@@ -165,7 +165,7 @@ serve(async (req: Request) => {
       try {
         const emailHtml = `
           <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-            <h1 style="color: #d4af37;">${subject}</h1>
+            <h1 style="color: #29B6D2;">${subject}</h1>
             <div style="font-size: 16px; line-height: 1.6;">${content}</div>
             ${getEmailFooter(user.email)}
           </div>
