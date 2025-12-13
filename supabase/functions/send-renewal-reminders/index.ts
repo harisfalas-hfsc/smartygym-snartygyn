@@ -115,7 +115,7 @@ serve(async (req) => {
         }
 
         // Prepare properly formatted HTML content
-        const formattedContent = `<p class="tiptap-paragraph"><strong>Subscription Renewal Reminder</strong></p><p class="tiptap-paragraph"></p><p class="tiptap-paragraph">Your <strong>${planName}</strong> membership will renew on <strong>${renewalDate}</strong>.</p><p class="tiptap-paragraph"></p><p class="tiptap-paragraph">Your subscription will automatically renew to continue your access to all premium features.</p><p class="tiptap-paragraph"></p><p class="tiptap-paragraph">If you have any questions or need to make changes, please visit your account settings.</p><p class="tiptap-paragraph"></p><p class="tiptap-paragraph"><a href="https://smartygym.com/userdashboard?tab=membership" style="display: inline-block; background: #d4af37; color: white; padding: 12px 24px; text-decoration: none; border-radius: 4px; font-weight: bold;">Manage Subscription</a></p><p class="tiptap-paragraph"></p><p class="tiptap-paragraph"><strong>The SmartyGym Team</strong></p>`;
+        const formattedContent = `<p class="tiptap-paragraph"><strong>Subscription Renewal Reminder</strong></p><p class="tiptap-paragraph"></p><p class="tiptap-paragraph">Your <strong>${planName}</strong> membership will renew on <strong>${renewalDate}</strong>.</p><p class="tiptap-paragraph"></p><p class="tiptap-paragraph">Your subscription will automatically renew to continue your access to all premium features.</p><p class="tiptap-paragraph"></p><p class="tiptap-paragraph">If you have any questions or need to make changes, please visit your account settings.</p><p class="tiptap-paragraph"></p><p class="tiptap-paragraph"><a href="https://smartygym.com/userdashboard?tab=membership" style="display: inline-block; background: #29B6D2; color: white; padding: 12px 24px; text-decoration: none; border-radius: 4px; font-weight: bold;">Manage Subscription</a></p><p class="tiptap-paragraph"></p><p class="tiptap-paragraph"><strong>The SmartyGym Team</strong></p>`;
         
         // Send dashboard message
         if (automationRule.sends_dashboard_message) {
@@ -161,12 +161,12 @@ serve(async (req) => {
                           <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="600" style="margin: 0 auto; background-color: #ffffff; border-radius: 8px;">
                             <tr>
                               <td style="padding: 32px;">
-                                <h1 style="color: #d4af37; margin-bottom: 20px;">Subscription Renewal Reminder</h1>
+                                <h1 style="color: #29B6D2; margin-bottom: 20px;">Subscription Renewal Reminder</h1>
                                 <p style="font-size: 16px; line-height: 1.6; margin-bottom: 16px;">Your <strong>${planName}</strong> membership will renew on <strong>${renewalDate}</strong>.</p>
                                 <p style="font-size: 16px; line-height: 1.6; margin-bottom: 16px;">Your subscription will automatically renew to continue your access to all premium features.</p>
                                 <p style="font-size: 16px; line-height: 1.6; margin-bottom: 24px;">If you have any questions or need to make changes, please visit your account settings.</p>
                                 <p style="margin-top: 24px;">
-                                  <a href="https://smartygym.com/userdashboard?tab=membership" style="display: inline-block; background: #d4af37; color: white; padding: 14px 28px; text-decoration: none; border-radius: 4px; font-weight: bold; font-size: 16px;">Manage Subscription</a>
+                                  <a href="https://smartygym.com/userdashboard?tab=membership" style="display: inline-block; background: #29B6D2; color: white; padding: 14px 28px; text-decoration: none; border-radius: 4px; font-weight: bold; font-size: 16px;">Manage Subscription</a>
                                 </p>
                                 ${footer}
                               </td>

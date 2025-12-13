@@ -65,11 +65,11 @@ serve(async (req) => {
 
     const htmlBody = `
       <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-        <h1 style="color: #D4AF37;">You Have a New Response! 💬</h1>
+        <h1 style="color: #29B6D2;">You Have a New Response! 💬</h1>
         <p>Hi ${userName},</p>
         <p>Great news! We've responded to your message regarding "<strong>${subject}</strong>".</p>
         
-        <div style="background-color: #f5f5f5; padding: 20px; border-radius: 10px; margin: 20px 0; border-left: 4px solid #D4AF37;">
+        <div style="background-color: #f5f5f5; padding: 20px; border-radius: 10px; margin: 20px 0; border-left: 4px solid #29B6D2;">
           <p style="margin: 0; color: #666; font-style: italic;">
             "${responsePreview.substring(0, 150)}${responsePreview.length > 150 ? '...' : ''}"
           </p>
@@ -79,7 +79,7 @@ serve(async (req) => {
         
         <p style="margin-top: 30px;">
           <a href="${dashboardUrl}" 
-             style="background-color: #D4AF37; color: white; padding: 12px 24px; text-decoration: none; border-radius: 5px; display: inline-block;">
+             style="background-color: #29B6D2; color: white; padding: 12px 24px; text-decoration: none; border-radius: 5px; display: inline-block;">
             View Response in Dashboard
           </a>
         </p>

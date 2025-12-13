@@ -102,8 +102,8 @@ serve(async (req) => {
       dashboardContent = `
         <p class="tiptap-paragraph">Great news! We've just added ${workoutText} and ${programText} to the SmartyGym library.</p>
         <p class="tiptap-paragraph">Explore our expanded collection of expert-designed content by Sports Scientist Haris Falas and take your training to the next level.</p>
-        <p class="tiptap-paragraph"><a href="/workout" style="color: #D4AF37; text-decoration: underline;">Browse Workouts →</a></p>
-        <p class="tiptap-paragraph"><a href="/trainingprogram" style="color: #D4AF37; text-decoration: underline;">Browse Training Programs →</a></p>
+        <p class="tiptap-paragraph"><a href="/workout" style="color: #29B6D2; text-decoration: underline;">Browse Workouts →</a></p>
+        <p class="tiptap-paragraph"><a href="/trainingprogram" style="color: #29B6D2; text-decoration: underline;">Browse Training Programs →</a></p>
       `;
 
       emailHtml = buildEmailHtml(
@@ -126,12 +126,12 @@ serve(async (req) => {
           <p class="tiptap-paragraph">A new workout has been added to the SmartyGym library!</p>
           <p class="tiptap-paragraph"><strong>${workout.content_name}</strong>${workout.content_category ? ` in ${workout.content_category}` : ''}</p>
           <p class="tiptap-paragraph">Designed by Sports Scientist Haris Falas to help you achieve your fitness goals.</p>
-          <p class="tiptap-paragraph"><a href="/workout" style="color: #D4AF37; text-decoration: underline;">View Workout →</a></p>
+          <p class="tiptap-paragraph"><a href="/workout" style="color: #29B6D2; text-decoration: underline;">View Workout →</a></p>
         `;
         emailHtml = buildEmailHtml(
           "New Workout Added!",
           `<p style="font-size: 16px; line-height: 1.6; color: #333; margin-bottom: 15px;">A new workout has been added to the SmartyGym library!</p>
-          <p style="font-size: 18px; font-weight: bold; color: #D4AF37; margin-bottom: 15px;">${workout.content_name}</p>
+          <p style="font-size: 18px; font-weight: bold; color: #29B6D2; margin-bottom: 15px;">${workout.content_name}</p>
           <p style="font-size: 16px; line-height: 1.6; color: #333; margin-bottom: 20px;">Designed by Sports Scientist Haris Falas to help you achieve your fitness goals.</p>`,
           [{ text: "View Workout", url: "https://smartygym.com/workout" }]
         );
@@ -143,7 +143,7 @@ serve(async (req) => {
         dashboardContent = `
           <p class="tiptap-paragraph">${workoutCount} new workouts have been added to the SmartyGym library${categoryText}!</p>
           <p class="tiptap-paragraph">Expand your training options with our latest expert-designed workouts by Sports Scientist Haris Falas.</p>
-          <p class="tiptap-paragraph"><a href="/workout" style="color: #D4AF37; text-decoration: underline;">Browse All Workouts →</a></p>
+          <p class="tiptap-paragraph"><a href="/workout" style="color: #29B6D2; text-decoration: underline;">Browse All Workouts →</a></p>
         `;
         emailHtml = buildEmailHtml(
           `${workoutCount} New Workouts Added!`,
@@ -163,12 +163,12 @@ serve(async (req) => {
           <p class="tiptap-paragraph">A new training program has been added to the SmartyGym library!</p>
           <p class="tiptap-paragraph"><strong>${program.content_name}</strong>${program.content_category ? ` in ${program.content_category}` : ''}</p>
           <p class="tiptap-paragraph">Structured programming by Sports Scientist Haris Falas for maximum results.</p>
-          <p class="tiptap-paragraph"><a href="/trainingprogram" style="color: #D4AF37; text-decoration: underline;">View Program →</a></p>
+          <p class="tiptap-paragraph"><a href="/trainingprogram" style="color: #29B6D2; text-decoration: underline;">View Program →</a></p>
         `;
         emailHtml = buildEmailHtml(
           "New Training Program Added!",
           `<p style="font-size: 16px; line-height: 1.6; color: #333; margin-bottom: 15px;">A new training program has been added to the SmartyGym library!</p>
-          <p style="font-size: 18px; font-weight: bold; color: #D4AF37; margin-bottom: 15px;">${program.content_name}</p>
+          <p style="font-size: 18px; font-weight: bold; color: #29B6D2; margin-bottom: 15px;">${program.content_name}</p>
           <p style="font-size: 16px; line-height: 1.6; color: #333; margin-bottom: 20px;">Structured programming by Sports Scientist Haris Falas for maximum results.</p>`,
           [{ text: "View Program", url: "https://smartygym.com/trainingprogram" }]
         );
@@ -180,7 +180,7 @@ serve(async (req) => {
         dashboardContent = `
           <p class="tiptap-paragraph">${programCount} new training programs have been added to the SmartyGym library${categoryText}!</p>
           <p class="tiptap-paragraph">Transform your fitness with our latest structured programs by Sports Scientist Haris Falas.</p>
-          <p class="tiptap-paragraph"><a href="/trainingprogram" style="color: #D4AF37; text-decoration: underline;">Browse All Programs →</a></p>
+          <p class="tiptap-paragraph"><a href="/trainingprogram" style="color: #29B6D2; text-decoration: underline;">Browse All Programs →</a></p>
         `;
         emailHtml = buildEmailHtml(
           `${programCount} New Training Programs Added!`,
@@ -330,7 +330,7 @@ function buildEmailHtml(
   const buttonHtml = buttons
     .map(
       (btn) => `
-      <a href="${btn.url}" style="display: inline-block; background: linear-gradient(135deg, #D4AF37, #F4D03F); color: #1a1a1a; padding: 14px 28px; text-decoration: none; border-radius: 8px; font-weight: bold; font-size: 16px; margin-right: 10px; margin-bottom: 10px;">${btn.text}</a>
+      <a href="${btn.url}" style="display: inline-block; background: linear-gradient(135deg, #29B6D2, #5CD3E8); color: #ffffff; padding: 14px 28px; text-decoration: none; border-radius: 8px; font-weight: bold; font-size: 16px; margin-right: 10px; margin-bottom: 10px;">${btn.text}</a>
     `
     )
     .join("");
@@ -351,7 +351,7 @@ function buildEmailHtml(
               <!-- Header -->
               <tr>
                 <td style="background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%); padding: 30px; text-align: center;">
-                  <h1 style="color: #D4AF37; margin: 0; font-size: 28px; font-weight: bold;">SmartyGym</h1>
+                  <h1 style="color: #29B6D2; margin: 0; font-size: 28px; font-weight: bold;">SmartyGym</h1>
                   <p style="color: #999; margin: 8px 0 0 0; font-size: 14px;">Expert Fitness by Haris Falas</p>
                 </td>
               </tr>
@@ -370,7 +370,7 @@ function buildEmailHtml(
                 <td style="background-color: #f9f9f9; padding: 25px 30px; border-top: 1px solid #eee;">
                   <p style="color: #666; font-size: 13px; margin: 0; line-height: 1.5;">
                     You're receiving this email because you're a SmartyGym member.<br>
-                    <a href="https://smartygym.com/userdashboard" style="color: #D4AF37;">Manage your notification preferences</a>
+                    <a href="https://smartygym.com/userdashboard" style="color: #29B6D2;">Manage your notification preferences</a>
                   </p>
                 </td>
               </tr>

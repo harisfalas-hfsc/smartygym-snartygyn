@@ -140,7 +140,7 @@ serve(async (req) => {
             <p style="color: #333; margin-bottom: 25px;">If you'd like to continue your fitness journey with us, you can resubscribe anytime to regain full access to all premium content.</p>
             
             <div style="text-align: center; margin: 30px 0;">
-              <a href="https://smartygym.com/pricing" style="display: inline-block; background-color: #D4AF37; color: #18181b; padding: 14px 30px; text-decoration: none; border-radius: 8px; font-weight: bold;">Resubscribe Now</a>
+              <a href="https://smartygym.com/pricing" style="display: inline-block; background-color: #29B6D2; color: #ffffff; padding: 14px 30px; text-decoration: none; border-radius: 8px; font-weight: bold;">Resubscribe Now</a>
             </div>
             
             <p style="color: #333; margin-bottom: 15px;">We'd love to have you back!</p>

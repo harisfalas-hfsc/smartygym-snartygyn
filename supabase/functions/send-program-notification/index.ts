@@ -71,7 +71,7 @@ serve(async (req) => {
       dashboardContent = `<p>Hi ${userName},</p><p>Great news! Your custom personal training program "<strong>${programName}</strong>" has been created and is now available in your dashboard.</p><p>Navigate to "My Purchases" in your dashboard to start your personalized fitness journey!</p>`;
       htmlBody = `
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-          <h1 style="color: #D4AF37;">Your Personal Training Program is Ready!</h1>
+          <h1 style="color: #29B6D2;">Your Personal Training Program is Ready!</h1>
           <p>Hi ${userName},</p>
           <p>Great news! Your custom personal training program "<strong>${programName}</strong>" has been created and is now available in your dashboard.</p>
           
@@ -88,7 +88,7 @@ serve(async (req) => {
           
           <p style="margin-top: 30px;">
             <a href="${dashboardUrl}" 
-               style="background-color: #D4AF37; color: white; padding: 12px 24px; text-decoration: none; border-radius: 5px; display: inline-block;">
+               style="background-color: #29B6D2; color: white; padding: 12px 24px; text-decoration: none; border-radius: 5px; display: inline-block;">
               View Your Program
             </a>
           </p>
@@ -112,7 +112,7 @@ serve(async (req) => {
         dashboardContent = `<p>Hi ${userName},</p><p>Good news! We've started working on your custom personal training program.</p><p>Your program is being carefully crafted to match your specific goals and requirements. We'll notify you as soon as it's ready!</p><p>Expected delivery: <strong>Within 48-72 hours</strong></p>`;
         htmlBody = `
           <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-            <h1 style="color: #D4AF37;">We're Working On Your Program!</h1>
+            <h1 style="color: #29B6D2;">We're Working On Your Program!</h1>
             <p>Hi ${userName},</p>
             <p>Good news! We've started working on your custom personal training program.</p>
             
@@ -136,13 +136,13 @@ serve(async (req) => {
         dashboardContent = `<p>Hi ${userName},</p><p>Your custom personal training program has been completed and is now available in your dashboard.</p><p>Access it now to start your personalized fitness journey!</p>`;
         htmlBody = `
           <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-            <h1 style="color: #D4AF37;">Your Program is Complete!</h1>
+            <h1 style="color: #29B6D2;">Your Program is Complete!</h1>
             <p>Hi ${userName},</p>
             <p>Your custom personal training program has been completed and is now available in your dashboard.</p>
             
             <p style="margin-top: 30px;">
               <a href="${dashboardUrl}" 
-                 style="background-color: #D4AF37; color: white; padding: 12px 24px; text-decoration: none; border-radius: 5px; display: inline-block;">
+                 style="background-color: #29B6D2; color: white; padding: 12px 24px; text-decoration: none; border-radius: 5px; display: inline-block;">
                 Access Your Program
               </a>
             </p>

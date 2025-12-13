@@ -184,7 +184,7 @@ serve(async (req) => {
 <li>Community features and leaderboards</li>
 </ul>
 <p class="tiptap-paragraph">Start exploring your dashboard and let's make every workout count!</p>
-<p class="tiptap-paragraph"><a href="https://smartygym.com/userdashboard" style="color: #d4af37;">Go to Your Dashboard →</a></p>`,
+<p class="tiptap-paragraph"><a href="https://smartygym.com/userdashboard" style="color: #29B6D2;">Go to Your Dashboard →</a></p>`,
           is_read: false,
         });
       logStep("Dashboard welcome message inserted for member");
@@ -213,7 +213,7 @@ serve(async (req) => {
             </head>
             <body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 20px;">
               <div style="text-align: center; margin-bottom: 30px;">
-                <h1 style="color: #d4af37; margin: 0;">SmartyGym</h1>
+                <h1 style="color: #29B6D2; margin: 0;">SmartyGym</h1>
               </div>
               <div style="background: #f9f9f9; border-radius: 8px; padding: 30px;">
                 <h2 style="margin-top: 0;">Welcome to the Team, ${fullName.trim()}! 🎉</h2>
@@ -233,7 +233,7 @@ serve(async (req) => {
                 </div>
                 <p style="color: #666; font-size: 14px;">We recommend changing your password after your first login.</p>
                 <div style="text-align: center; margin: 30px 0;">
-                  <a href="https://smartygym.com/auth" style="display: inline-block; background: #d4af37; color: white; padding: 14px 28px; text-decoration: none; border-radius: 6px; font-weight: bold;">Login to SmartyGym →</a>
+                  <a href="https://smartygym.com/auth" style="display: inline-block; background: #29B6D2; color: white; padding: 14px 28px; text-decoration: none; border-radius: 6px; font-weight: bold;">Login to SmartyGym →</a>
                 </div>
                 <p>Let's make every workout count!</p>
                 <p><em>The SmartyGym Team</em></p>
