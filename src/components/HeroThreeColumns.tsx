@@ -18,7 +18,8 @@ import {
   UserCheck,
   CalendarCheck,
   ChevronRight,
-  Star
+  Star,
+  TrendingUp
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -203,6 +204,23 @@ export const HeroThreeColumns = () => {
               highlight={item.highlight}
             />
           ))}
+        </div>
+        
+        {/* Human Performance Banner */}
+        <div 
+          onClick={() => navigate("/human-performance")}
+          className="mt-6 cursor-pointer group"
+        >
+          <div className="flex items-center gap-3 p-3 rounded-lg border-2 border-primary/30 bg-primary/5 hover:bg-primary/10 hover:border-primary/50 transition-all duration-300">
+            <div className="p-2 bg-primary/20 rounded-full group-hover:scale-110 transition-transform">
+              <TrendingUp className="w-5 h-5 text-primary" />
+            </div>
+            <div className="flex-1">
+              <p className="text-sm font-semibold text-primary group-hover:underline">Why Invest in Your Fitness?</p>
+              <p className="text-xs text-muted-foreground">Research-backed human performance</p>
+            </div>
+            <ChevronRight className="w-4 h-4 text-primary group-hover:translate-x-1 transition-transform" />
+          </div>
         </div>
       </div>
 
