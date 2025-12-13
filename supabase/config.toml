@@ -128,3 +128,6 @@ verify_jwt = false
 
 [functions.send-checkin-reminders]
 verify_jwt = false
+
+[functions.send-subscription-expired-notifications]
+verify_jwt = false
