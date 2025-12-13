@@ -447,7 +447,7 @@ export function MyRecordsReport({ userId }: MyRecordsReportProps) {
             className="h-24 mx-auto mb-4"
             crossOrigin="anonymous"
           />
-          <p className="text-sm font-medium mb-4" style={{ color: '#D4AF37' }}>Your Gym Re-imagined. Anywhere, Anytime.</p>
+          <p className="text-sm font-medium mb-4" style={{ color: '#29B6D2' }}>Your Gym Re-imagined. Anywhere, Anytime.</p>
           <h2 className="text-2xl font-bold text-gray-900">Activity Report</h2>
           <p className="text-gray-600">{getPeriodLabel()}</p>
         </div>
@@ -620,7 +620,7 @@ export function MyRecordsReport({ userId }: MyRecordsReportProps) {
         {/* Footer - Only visible during export */}
         <div className={`text-center mt-6 text-sm text-gray-500 ${exporting ? '' : 'hidden'}`}>
           <p>Generated on {format(new Date(), "MMMM d, yyyy 'at' h:mm a")}</p>
-          <p className="text-xs mt-1 font-medium" style={{ color: '#D4AF37' }}>SmartyGym - Your Gym Re-imagined. Anywhere, Anytime.</p>
+          <p className="text-xs mt-1 font-medium" style={{ color: '#29B6D2' }}>SmartyGym - Your Gym Re-imagined. Anywhere, Anytime.</p>
         </div>
       </div>
     </div>

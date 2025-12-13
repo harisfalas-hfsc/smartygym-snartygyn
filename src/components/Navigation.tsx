@@ -248,7 +248,7 @@ export const Navigation = () => {
                   <Button
                     variant="ghost"
                     onClick={() => handleNavigate("/workout")}
-                    className={`justify-start font-semibold transition-all duration-200 ${location.pathname === '/workout' ? 'text-primary underline underline-offset-4 bg-yellow-100/50' : 'text-foreground hover:bg-yellow-100/80 hover:text-foreground'}`}
+                    className={`justify-start font-semibold transition-all duration-200 ${location.pathname === '/workout' ? 'text-primary underline underline-offset-4 bg-primary/10' : 'text-foreground hover:bg-primary/10 hover:text-foreground'}`}
                   >
                     <Dumbbell className="mr-2 h-4 w-4 text-primary" />
                     Smarty Workouts
@@ -256,7 +256,7 @@ export const Navigation = () => {
                   <Button
                     variant="ghost"
                     onClick={() => handleNavigate("/trainingprogram")}
-                    className={`justify-start font-semibold transition-all duration-200 ${location.pathname === '/trainingprogram' ? 'text-primary underline underline-offset-4 bg-yellow-100/50' : 'text-foreground hover:bg-yellow-100/80 hover:text-foreground'}`}
+                    className={`justify-start font-semibold transition-all duration-200 ${location.pathname === '/trainingprogram' ? 'text-primary underline underline-offset-4 bg-primary/10' : 'text-foreground hover:bg-primary/10 hover:text-foreground'}`}
                   >
                     <ListChecks className="mr-2 h-4 w-4 text-blue-500" />
                     Smarty Programs
@@ -264,7 +264,7 @@ export const Navigation = () => {
                   <Button
                     variant="ghost"
                     onClick={() => handleNavigate("/daily-ritual")}
-                    className={`justify-start font-semibold transition-all duration-200 ${location.pathname === '/daily-ritual' ? 'text-primary underline underline-offset-4 bg-yellow-100/50' : 'text-foreground hover:bg-yellow-100/80 hover:text-foreground'}`}
+                    className={`justify-start font-semibold transition-all duration-200 ${location.pathname === '/daily-ritual' ? 'text-primary underline underline-offset-4 bg-primary/10' : 'text-foreground hover:bg-primary/10 hover:text-foreground'}`}
                   >
                     <Sparkles className="mr-2 h-4 w-4 text-purple-500" />
                     Smarty Ritual
@@ -272,7 +272,7 @@ export const Navigation = () => {
                   <Button
                     variant="ghost"
                     onClick={() => handleNavigate("/tools")}
-                    className={`justify-start font-semibold transition-all duration-200 ${location.pathname === '/tools' ? 'text-primary underline underline-offset-4 bg-yellow-100/50' : 'text-foreground hover:bg-yellow-100/80 hover:text-foreground'}`}
+                    className={`justify-start font-semibold transition-all duration-200 ${location.pathname === '/tools' ? 'text-primary underline underline-offset-4 bg-primary/10' : 'text-foreground hover:bg-primary/10 hover:text-foreground'}`}
                   >
                     <Wrench className="mr-2 h-4 w-4 text-orange-500" />
                     Smarty Tools
@@ -280,7 +280,7 @@ export const Navigation = () => {
                   <Button
                     variant="ghost"
                     onClick={() => handleNavigate("/corporate")}
-                    className={`justify-start font-semibold transition-all duration-200 ${location.pathname === '/corporate' ? 'text-primary underline underline-offset-4 bg-yellow-100/50' : 'text-foreground hover:bg-yellow-100/80 hover:text-foreground'}`}
+                    className={`justify-start font-semibold transition-all duration-200 ${location.pathname === '/corporate' ? 'text-primary underline underline-offset-4 bg-primary/10' : 'text-foreground hover:bg-primary/10 hover:text-foreground'}`}
                   >
                     <Building2 className="mr-2 h-4 w-4 text-sky-500" />
                     Smarty Corporate
@@ -288,7 +288,7 @@ export const Navigation = () => {
                   <Button
                     variant="ghost"
                     onClick={() => handleNavigate("/exerciselibrary")}
-                    className={`justify-start font-semibold transition-all duration-200 ${location.pathname === '/exerciselibrary' ? 'text-primary underline underline-offset-4 bg-yellow-100/50' : 'text-foreground hover:bg-yellow-100/80 hover:text-foreground'}`}
+                    className={`justify-start font-semibold transition-all duration-200 ${location.pathname === '/exerciselibrary' ? 'text-primary underline underline-offset-4 bg-primary/10' : 'text-foreground hover:bg-primary/10 hover:text-foreground'}`}
                   >
                     <BookOpen className="mr-2 h-4 w-4 text-emerald-500" />
                     Exercise Library
@@ -296,7 +296,7 @@ export const Navigation = () => {
                   <Button
                     variant="ghost"
                     onClick={() => handleNavigate("/shop")}
-                    className={`justify-start font-semibold transition-all duration-200 ${location.pathname === '/shop' ? 'text-primary underline underline-offset-4 bg-yellow-100/50' : 'text-foreground hover:bg-yellow-100/80 hover:text-foreground'}`}
+                    className={`justify-start font-semibold transition-all duration-200 ${location.pathname === '/shop' ? 'text-primary underline underline-offset-4 bg-primary/10' : 'text-foreground hover:bg-primary/10 hover:text-foreground'}`}
                   >
                     <ShoppingBag className="mr-2 h-4 w-4 text-pink-500" />
                     Shop
@@ -304,7 +304,7 @@ export const Navigation = () => {
                   <Button
                     variant="ghost"
                     onClick={() => handleNavigate("/community")}
-                    className={`justify-start font-semibold transition-all duration-200 ${location.pathname === '/community' ? 'text-primary underline underline-offset-4 bg-yellow-100/50' : 'text-foreground hover:bg-yellow-100/80 hover:text-foreground'}`}
+                    className={`justify-start font-semibold transition-all duration-200 ${location.pathname === '/community' ? 'text-primary underline underline-offset-4 bg-primary/10' : 'text-foreground hover:bg-primary/10 hover:text-foreground'}`}
                   >
                     <Users className="mr-2 h-4 w-4 text-cyan-500" />
                     Community
@@ -312,7 +312,7 @@ export const Navigation = () => {
                   <Button
                     variant="ghost"
                     onClick={() => handleNavigate("/blog")}
-                    className={`justify-start font-semibold transition-all duration-200 ${location.pathname === '/blog' ? 'text-primary underline underline-offset-4 bg-yellow-100/50' : 'text-foreground hover:bg-yellow-100/80 hover:text-foreground'}`}
+                    className={`justify-start font-semibold transition-all duration-200 ${location.pathname === '/blog' ? 'text-primary underline underline-offset-4 bg-primary/10' : 'text-foreground hover:bg-primary/10 hover:text-foreground'}`}
                   >
                     <Newspaper className="mr-2 h-4 w-4 text-red-500" />
                     Blog
@@ -320,7 +320,7 @@ export const Navigation = () => {
                   <Button
                     variant="ghost"
                     onClick={() => handleNavigate("/contact")}
-                    className={`justify-start font-semibold transition-all duration-200 ${location.pathname === '/contact' ? 'text-primary underline underline-offset-4 bg-yellow-100/50' : 'text-foreground hover:bg-yellow-100/80 hover:text-foreground'}`}
+                    className={`justify-start font-semibold transition-all duration-200 ${location.pathname === '/contact' ? 'text-primary underline underline-offset-4 bg-primary/10' : 'text-foreground hover:bg-primary/10 hover:text-foreground'}`}
                   >
                     <Mail className="mr-2 h-4 w-4 text-indigo-500" />
                     Contact
