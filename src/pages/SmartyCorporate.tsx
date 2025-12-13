@@ -224,7 +224,10 @@ export default function SmartyCorporate() {
               </p>
               <p>
                 All team members enjoy the same benefits as individual Platinum subscribers for the duration of the subscription. 
-                The administrator has access to a dedicated dashboard to manage team members, monitor usage, and control access.
+                The administrator has access to a dedicated dashboard to manage team members, monitor usage, and control access.{' '}
+                <Link to="/corporate-wellness" className="text-green-500 hover:text-green-600 hover:underline font-medium">
+                  Learn More
+                </Link>
               </p>
             </CardContent>
           </Card>
