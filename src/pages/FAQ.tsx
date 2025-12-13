@@ -344,8 +344,8 @@ const FAQ = () => {
                     <AccordionContent className="py-2 leading-relaxed">
                       Getting started is simple:<br/>
                       1. <strong>Browse</strong> our free workouts and tools to get a feel for the platform.<br/>
-                      2. <strong>Sign up</strong> for a free account to save your progress and track your training.<br/>
-                      3. <strong>Upgrade</strong> to a premium plan if you want full access to all workouts, training programs, and exclusive content.<br/>
+                      2. <a href="/auth?mode=signup" className="text-primary hover:underline font-medium"><strong>Sign up</strong></a> for a free account to save your progress and track your training.<br/>
+                      3. <a href="/joinpremium" className="text-primary hover:underline font-medium"><strong>Upgrade</strong></a> to a premium plan if you want full access to all workouts, training programs, and exclusive content.<br/>
                       4. <strong>Start training</strong> — pick a workout or program and get moving!<br/><br/>
                       
                       If you need guidance, <a href="/contact" className="text-primary hover:underline font-medium">contact us</a> directly.
