@@ -197,7 +197,7 @@ MORNING RITUAL:
 3. 🔑 Light Activation (3 exercises)
 4. 💡 Smarty Tip (nutrition/hydration for morning)
 5. 🏃 WOD Note (if training morning, add prep suggestion with link)
-6. ✅ Check-in Note: Add this styled paragraph at the end - "Don't forget to complete your <a href="https://smartygym.com/userdashboard?tab=checkins" style="color: #d4af37; font-weight: bold;">Morning Check-in</a> to track your progress and build your streak!"
+6. ✅ Check-in Note: Add this styled paragraph at the end - "Don't forget to complete your <a href="https://smartygym.com/userdashboard?tab=checkins" style="color: #29B6D2; font-weight: bold;">Morning Check-in</a> to track your progress and build your streak!"
 
 MIDDAY RITUAL:
 1. 🪑 Desk/Midday Reset (3-4 movements)
@@ -212,7 +212,7 @@ EVENING RITUAL:
 3. 🌿 Pre-Bed Guidance (sleep hygiene tip)
 4. 💡 Smarty Tip (dinner/recovery/gratitude)
 5. 🏃 WOD Note (if training evening, keep intensity moderate with link)
-6. ✅ Check-in Note: Add this styled paragraph at the end - "Don't forget to complete your <a href="https://smartygym.com/userdashboard?tab=checkins" style="color: #d4af37; font-weight: bold;">Night Check-in</a> before bed to reflect on your day!"
+6. ✅ Check-in Note: Add this styled paragraph at the end - "Don't forget to complete your <a href="https://smartygym.com/userdashboard?tab=checkins" style="color: #29B6D2; font-weight: bold;">Night Check-in</a> before bed to reflect on your day!"
 
 Return ONLY valid JSON with this exact structure:
 {
@@ -337,8 +337,8 @@ const subject = "☀️ Your all day game – plan is ready";
     const content = `<p class="tiptap-paragraph"><strong>Your Smarty Ritual is here!</strong></p>
 <p class="tiptap-paragraph">Your personalized daily ritual is ready. Start with the Morning Ritual to energize your day, reset at Midday, and unwind in the Evening.</p>
 <p class="tiptap-paragraph">Three simple phases. Maximum impact. Your daily game plan for movement, recovery, and performance.</p>
-<p class="tiptap-paragraph"><a href="https://smartygym.com/daily-ritual" style="color: #d4af37; font-weight: bold;">View Your Smarty Ritual →</a></p>
-<p class="tiptap-paragraph">💡 <strong>Don't forget to track your progress!</strong> Complete your <a href="https://smartygym.com/userdashboard?tab=checkins" style="color: #d4af37; font-weight: bold;">Smarty Check-ins</a> (morning & evening) to monitor your sleep, mood, recovery, and build your consistency streak.</p>`;
+<p class="tiptap-paragraph"><a href="https://smartygym.com/daily-ritual" style="color: #29B6D2; font-weight: bold;">View Your Smarty Ritual →</a></p>
+<p class="tiptap-paragraph">💡 <strong>Don't forget to track your progress!</strong> Complete your <a href="https://smartygym.com/userdashboard?tab=checkins" style="color: #29B6D2; font-weight: bold;">Smarty Check-ins</a> (morning & evening) to monitor your sleep, mood, recovery, and build your consistency streak.</p>`;
 
     let sentCount = 0;
     let failedCount = 0;
@@ -391,20 +391,20 @@ const emailResult = await resend.emails.send({
             headers: getEmailHeaders(userEmail),
             html: `
               <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
-                <h1 style="color: #d4af37; margin-bottom: 20px;">☀️ Your Smarty Ritual is Ready!</h1>
+                <h1 style="color: #29B6D2; margin-bottom: 20px;">☀️ Your Smarty Ritual is Ready!</h1>
                 <p style="font-size: 16px; line-height: 1.6; margin-bottom: 16px;">Your <strong>Smarty Ritual</strong> is here!</p>
                 <p style="font-size: 16px; line-height: 1.6; margin-bottom: 16px;">Your personalized daily ritual is ready. Start with the Morning Ritual to energize your day, reset at Midday, and unwind in the Evening.</p>
                 <p style="font-size: 16px; line-height: 1.6; margin-bottom: 24px;">Three simple phases. Maximum impact. Your daily game plan for movement, recovery, and performance.</p>
                 <div style="margin: 24px 0; text-align: center;">
-                  <a href="https://smartygym.com/daily-ritual" style="display: inline-block; background: #d4af37; color: white; padding: 14px 28px; text-decoration: none; border-radius: 4px; font-weight: bold; font-size: 16px; margin-right: 12px;">View Your Smarty Ritual →</a>
+                  <a href="https://smartygym.com/daily-ritual" style="display: inline-block; background: #29B6D2; color: white; padding: 14px 28px; text-decoration: none; border-radius: 4px; font-weight: bold; font-size: 16px; margin-right: 12px;">View Your Smarty Ritual →</a>
                 </div>
                 <div style="margin: 24px 0; padding: 16px; background: #f8f8f8; border-radius: 8px; text-align: center;">
                   <p style="font-size: 14px; color: #666; margin-bottom: 12px;">📅 Add all 3 phases to your calendar with reminders:</p>
                   <a href="${calendarDownloadUrl}" style="display: inline-block; background: #333; color: white; padding: 10px 20px; text-decoration: none; border-radius: 4px; font-size: 14px;">📥 Download Calendar File (.ics)</a>
                 </div>
-                <div style="margin: 24px 0; padding: 16px; background: #fff8e6; border-radius: 8px; border-left: 4px solid #d4af37;">
+                <div style="margin: 24px 0; padding: 16px; background: #e6f7fa; border-radius: 8px; border-left: 4px solid #29B6D2;">
                   <p style="font-size: 14px; color: #333; margin: 0;">💡 <strong>Track Your Progress!</strong></p>
-                  <p style="font-size: 14px; color: #666; margin: 8px 0 0 0;">Complete your <a href="https://smartygym.com/userdashboard?tab=checkins" style="color: #d4af37; font-weight: bold;">Smarty Check-ins</a> (morning & evening) to monitor your sleep, mood, recovery, and build your consistency streak.</p>
+                  <p style="font-size: 14px; color: #666; margin: 8px 0 0 0;">Complete your <a href="https://smartygym.com/userdashboard?tab=checkins" style="color: #29B6D2; font-weight: bold;">Smarty Check-ins</a> (morning & evening) to monitor your sleep, mood, recovery, and build your consistency streak.</p>
                 </div>
                 <hr style="margin: 32px 0; border: none; border-top: 1px solid #eee;">
                 <p style="font-size: 12px; color: #999; text-align: center;">Designed by Haris Falas</p>

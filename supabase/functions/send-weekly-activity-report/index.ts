@@ -134,7 +134,7 @@ function generateEmailHtml(data: UserActivityData, weekStart: string, weekEnd: s
         <table width="600" cellpadding="0" cellspacing="0" style="background-color: #ffffff; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
           <!-- Header -->
           <tr>
-            <td style="background: linear-gradient(135deg, #D4AF37 0%, #B8960C 100%); padding: 30px; text-align: center;">
+            <td style="background: linear-gradient(135deg, #29B6D2 0%, #1E9AB0 100%); padding: 30px; text-align: center;">
               <h1 style="color: #ffffff; margin: 0; font-size: 32px; font-weight: bold;">SmartyGym</h1>
               <p style="color: rgba(255,255,255,0.9); margin: 5px 0 0 0; font-size: 14px;">Your gym reimagined anywhere, anytime</p>
             </td>
@@ -153,9 +153,9 @@ function generateEmailHtml(data: UserActivityData, weekStart: string, weekEnd: s
           <tr>
             <td style="padding: 0 30px 30px 30px;">
               <!-- Workouts -->
-              <table width="100%" cellpadding="0" cellspacing="0" style="border: 2px solid #D4AF37; border-radius: 8px; margin-bottom: 15px; overflow: hidden;">
+              <table width="100%" cellpadding="0" cellspacing="0" style="border: 2px solid #29B6D2; border-radius: 8px; margin-bottom: 15px; overflow: hidden;">
                 <tr>
-                  <td style="background-color: rgba(212, 175, 55, 0.1); padding: 12px 15px; border-bottom: 1px solid rgba(212, 175, 55, 0.3);">
+                  <td style="background-color: rgba(41, 182, 210, 0.1); padding: 12px 15px; border-bottom: 1px solid rgba(41, 182, 210, 0.3);">
                     <strong style="color: #333333;">💪 Smarty Workouts</strong>
                   </td>
                 </tr>
@@ -167,15 +167,15 @@ function generateEmailHtml(data: UserActivityData, weekStart: string, weekEnd: s
                           <div style="color: #666666; font-size: 12px;">Viewed</div>
                           <div style="font-size: 24px; font-weight: bold; color: #333333;">${data.workouts.viewed}</div>
                         </td>
-                        <td width="25%" style="text-align: center; padding: 10px; border-left: 1px solid rgba(212, 175, 55, 0.2);">
+                        <td width="25%" style="text-align: center; padding: 10px; border-left: 1px solid rgba(41, 182, 210, 0.2);">
                           <div style="color: #666666; font-size: 12px;">Favorited</div>
                           <div style="font-size: 24px; font-weight: bold; color: #333333;">${data.workouts.favorited}</div>
                         </td>
-                        <td width="25%" style="text-align: center; padding: 10px; border-left: 1px solid rgba(212, 175, 55, 0.2);">
+                        <td width="25%" style="text-align: center; padding: 10px; border-left: 1px solid rgba(41, 182, 210, 0.2);">
                           <div style="color: #666666; font-size: 12px;">Completed</div>
                           <div style="font-size: 24px; font-weight: bold; color: #16a34a;">${data.workouts.completed}</div>
                         </td>
-                        <td width="25%" style="text-align: center; padding: 10px; border-left: 1px solid rgba(212, 175, 55, 0.2);">
+                        <td width="25%" style="text-align: center; padding: 10px; border-left: 1px solid rgba(41, 182, 210, 0.2);">
                           <div style="color: #666666; font-size: 12px;">Rated</div>
                           <div style="font-size: 24px; font-weight: bold; color: #333333;">${data.workouts.rated}</div>
                         </td>
@@ -186,9 +186,9 @@ function generateEmailHtml(data: UserActivityData, weekStart: string, weekEnd: s
               </table>
 
               <!-- Programs -->
-              <table width="100%" cellpadding="0" cellspacing="0" style="border: 2px solid #D4AF37; border-radius: 8px; margin-bottom: 15px; overflow: hidden;">
+              <table width="100%" cellpadding="0" cellspacing="0" style="border: 2px solid #29B6D2; border-radius: 8px; margin-bottom: 15px; overflow: hidden;">
                 <tr>
-                  <td style="background-color: rgba(212, 175, 55, 0.1); padding: 12px 15px; border-bottom: 1px solid rgba(212, 175, 55, 0.3);">
+                  <td style="background-color: rgba(41, 182, 210, 0.1); padding: 12px 15px; border-bottom: 1px solid rgba(41, 182, 210, 0.3);">
                     <strong style="color: #333333;">📋 Smarty Programs</strong>
                   </td>
                 </tr>
@@ -200,19 +200,19 @@ function generateEmailHtml(data: UserActivityData, weekStart: string, weekEnd: s
                           <div style="color: #666666; font-size: 12px;">Viewed</div>
                           <div style="font-size: 24px; font-weight: bold; color: #333333;">${data.programs.viewed}</div>
                         </td>
-                        <td width="20%" style="text-align: center; padding: 10px; border-left: 1px solid rgba(212, 175, 55, 0.2);">
+                        <td width="20%" style="text-align: center; padding: 10px; border-left: 1px solid rgba(41, 182, 210, 0.2);">
                           <div style="color: #666666; font-size: 12px;">Favorited</div>
                           <div style="font-size: 24px; font-weight: bold; color: #333333;">${data.programs.favorited}</div>
                         </td>
-                        <td width="20%" style="text-align: center; padding: 10px; border-left: 1px solid rgba(212, 175, 55, 0.2);">
+                        <td width="20%" style="text-align: center; padding: 10px; border-left: 1px solid rgba(41, 182, 210, 0.2);">
                           <div style="color: #666666; font-size: 12px;">Ongoing</div>
                           <div style="font-size: 24px; font-weight: bold; color: #2563eb;">${data.programs.ongoing}</div>
                         </td>
-                        <td width="20%" style="text-align: center; padding: 10px; border-left: 1px solid rgba(212, 175, 55, 0.2);">
+                        <td width="20%" style="text-align: center; padding: 10px; border-left: 1px solid rgba(41, 182, 210, 0.2);">
                           <div style="color: #666666; font-size: 12px;">Completed</div>
                           <div style="font-size: 24px; font-weight: bold; color: #16a34a;">${data.programs.completed}</div>
                         </td>
-                        <td width="20%" style="text-align: center; padding: 10px; border-left: 1px solid rgba(212, 175, 55, 0.2);">
+                        <td width="20%" style="text-align: center; padding: 10px; border-left: 1px solid rgba(41, 182, 210, 0.2);">
                           <div style="color: #666666; font-size: 12px;">Rated</div>
                           <div style="font-size: 24px; font-weight: bold; color: #333333;">${data.programs.rated}</div>
                         </td>
@@ -223,9 +223,9 @@ function generateEmailHtml(data: UserActivityData, weekStart: string, weekEnd: s
               </table>
 
               <!-- Check-ins -->
-              <table width="100%" cellpadding="0" cellspacing="0" style="border: 2px solid #D4AF37; border-radius: 8px; margin-bottom: 15px; overflow: hidden;">
+              <table width="100%" cellpadding="0" cellspacing="0" style="border: 2px solid #29B6D2; border-radius: 8px; margin-bottom: 15px; overflow: hidden;">
                 <tr>
-                  <td style="background-color: rgba(212, 175, 55, 0.1); padding: 12px 15px; border-bottom: 1px solid rgba(212, 175, 55, 0.3);">
+                  <td style="background-color: rgba(41, 182, 210, 0.1); padding: 12px 15px; border-bottom: 1px solid rgba(41, 182, 210, 0.3);">
                     <strong style="color: #333333;">✅ Smarty Check-ins</strong>
                   </td>
                 </tr>
@@ -237,15 +237,15 @@ function generateEmailHtml(data: UserActivityData, weekStart: string, weekEnd: s
                           <div style="color: #666666; font-size: 12px;">Morning</div>
                           <div style="font-size: 24px; font-weight: bold; color: #333333;">${data.checkins.morning}</div>
                         </td>
-                        <td width="25%" style="text-align: center; padding: 10px; border-left: 1px solid rgba(212, 175, 55, 0.2);">
+                        <td width="25%" style="text-align: center; padding: 10px; border-left: 1px solid rgba(41, 182, 210, 0.2);">
                           <div style="color: #666666; font-size: 12px;">Night</div>
                           <div style="font-size: 24px; font-weight: bold; color: #333333;">${data.checkins.night}</div>
                         </td>
-                        <td width="25%" style="text-align: center; padding: 10px; border-left: 1px solid rgba(212, 175, 55, 0.2);">
+                        <td width="25%" style="text-align: center; padding: 10px; border-left: 1px solid rgba(41, 182, 210, 0.2);">
                           <div style="color: #666666; font-size: 12px;">Total</div>
-                          <div style="font-size: 24px; font-weight: bold; color: #D4AF37;">${data.checkins.total}</div>
+                          <div style="font-size: 24px; font-weight: bold; color: #29B6D2;">${data.checkins.total}</div>
                         </td>
-                        <td width="25%" style="text-align: center; padding: 10px; border-left: 1px solid rgba(212, 175, 55, 0.2);">
+                        <td width="25%" style="text-align: center; padding: 10px; border-left: 1px solid rgba(41, 182, 210, 0.2);">
                           <div style="color: #666666; font-size: 12px;">Avg Score</div>
                           <div style="font-size: 24px; font-weight: bold; color: #333333;">${data.checkins.avgScore}</div>
                         </td>
@@ -256,9 +256,9 @@ function generateEmailHtml(data: UserActivityData, weekStart: string, weekEnd: s
               </table>
 
               <!-- Calculators -->
-              <table width="100%" cellpadding="0" cellspacing="0" style="border: 2px solid #D4AF37; border-radius: 8px; overflow: hidden;">
+              <table width="100%" cellpadding="0" cellspacing="0" style="border: 2px solid #29B6D2; border-radius: 8px; overflow: hidden;">
                 <tr>
-                  <td style="background-color: rgba(212, 175, 55, 0.1); padding: 12px 15px; border-bottom: 1px solid rgba(212, 175, 55, 0.3);">
+                  <td style="background-color: rgba(41, 182, 210, 0.1); padding: 12px 15px; border-bottom: 1px solid rgba(41, 182, 210, 0.3);">
                     <strong style="color: #333333;">🧮 Smarty Tools</strong>
                   </td>
                 </tr>
@@ -270,11 +270,11 @@ function generateEmailHtml(data: UserActivityData, weekStart: string, weekEnd: s
                           <div style="color: #666666; font-size: 12px;">1RM Calculations</div>
                           <div style="font-size: 24px; font-weight: bold; color: #333333;">${data.calculators.oneRM}</div>
                         </td>
-                        <td width="33%" style="text-align: center; padding: 10px; border-left: 1px solid rgba(212, 175, 55, 0.2);">
+                        <td width="33%" style="text-align: center; padding: 10px; border-left: 1px solid rgba(41, 182, 210, 0.2);">
                           <div style="color: #666666; font-size: 12px;">BMR Calculations</div>
                           <div style="font-size: 24px; font-weight: bold; color: #333333;">${data.calculators.bmr}</div>
                         </td>
-                        <td width="34%" style="text-align: center; padding: 10px; border-left: 1px solid rgba(212, 175, 55, 0.2);">
+                        <td width="34%" style="text-align: center; padding: 10px; border-left: 1px solid rgba(41, 182, 210, 0.2);">
                           <div style="color: #666666; font-size: 12px;">Macro Calculations</div>
                           <div style="font-size: 24px; font-weight: bold; color: #333333;">${data.calculators.calories}</div>
                         </td>
@@ -289,7 +289,7 @@ function generateEmailHtml(data: UserActivityData, weekStart: string, weekEnd: s
           <!-- Motivational Message -->
           <tr>
             <td style="padding: 0 30px 30px 30px;">
-              <table width="100%" cellpadding="0" cellspacing="0" style="background: linear-gradient(135deg, rgba(212, 175, 55, 0.1) 0%, rgba(212, 175, 55, 0.05) 100%); border-radius: 8px; border: 1px solid rgba(212, 175, 55, 0.3);">
+              <table width="100%" cellpadding="0" cellspacing="0" style="background: linear-gradient(135deg, rgba(41, 182, 210, 0.1) 0%, rgba(41, 182, 210, 0.05) 100%); border-radius: 8px; border: 1px solid rgba(41, 182, 210, 0.3);">
                 <tr>
                   <td style="padding: 20px;">
                     <p style="margin: 0 0 5px 0; font-weight: bold; color: #333333;">📈 Your Progress Summary</p>
@@ -303,14 +303,14 @@ function generateEmailHtml(data: UserActivityData, weekStart: string, weekEnd: s
           <!-- CTA -->
           <tr>
             <td style="padding: 0 30px 30px 30px; text-align: center;">
-              <a href="https://smartygym.com/userdashboard?tab=logbook" style="display: inline-block; background: linear-gradient(135deg, #D4AF37 0%, #B8960C 100%); color: #ffffff; text-decoration: none; padding: 14px 30px; border-radius: 8px; font-weight: bold; font-size: 16px;">View Full Report in Dashboard</a>
+              <a href="https://smartygym.com/userdashboard?tab=logbook" style="display: inline-block; background: linear-gradient(135deg, #29B6D2 0%, #1E9AB0 100%); color: #ffffff; text-decoration: none; padding: 14px 30px; border-radius: 8px; font-weight: bold; font-size: 16px;">View Full Report in Dashboard</a>
             </td>
           </tr>
 
           <!-- Footer -->
           <tr>
             <td style="background-color: #f8f8f8; padding: 20px 30px; text-align: center; border-top: 1px solid #eeeeee;">
-              <p style="margin: 0 0 10px 0; color: #D4AF37; font-weight: bold; font-size: 14px;">SmartyGym - Your gym reimagined anywhere, anytime</p>
+              <p style="margin: 0 0 10px 0; color: #29B6D2; font-weight: bold; font-size: 14px;">SmartyGym - Your gym reimagined anywhere, anytime</p>
               <p style="margin: 0; color: #999999; font-size: 12px;">
                 <a href="https://smartygym.com/unsubscribe?email=${encodeURIComponent(data.email)}" style="color: #999999;">Unsubscribe</a> | 
                 <a href="https://smartygym.com/privacy" style="color: #999999;">Privacy Policy</a>
