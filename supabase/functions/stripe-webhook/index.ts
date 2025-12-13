@@ -213,20 +213,20 @@ async function sendFirstPurchaseWelcome(userId: string, userEmail: string, supab
       headers: getEmailHeaders(userEmail),
       html: `
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
-          <h1 style="color: #d4af37; margin-bottom: 20px;">Welcome to the SmartyGym Family! 🎉</h1>
-          <p style="font-size: 16px; line-height: 1.6; margin-bottom: 16px;">Thank you for making your first purchase and trusting SmartyGym with your fitness journey. This is a big step, and we're honored to be part of it.</p>
-          <h2 style="color: #333; font-size: 18px; margin-top: 24px;">What Makes SmartyGym Different</h2>
-          <p style="font-size: 16px; line-height: 1.6; margin-bottom: 16px;">Every workout and training program on SmartyGym is expertly designed by <strong>Haris Falas</strong>, a Sports Scientist with over 20 years of coaching experience and CSCS certification. You're not getting generic AI-generated content – you're getting real expertise from a real professional.</p>
-          <h2 style="color: #333; font-size: 18px; margin-top: 24px;">What You Now Have Access To</h2>
-          <ul style="font-size: 16px; line-height: 1.8; margin-bottom: 24px;">
-            <li>Expert-designed workouts crafted for real results</li>
-            <li>Strategic training programs based on proven methodologies</li>
-            <li>Daily Workout of the Day following smart periodization</li>
-            <li>A community of like-minded fitness enthusiasts</li>
-          </ul>
-          <p style="margin-top: 24px;">
-            <a href="https://smartygym.com/userdashboard" style="display: inline-block; background: #d4af37; color: white; padding: 14px 28px; text-decoration: none; border-radius: 4px; font-weight: bold; font-size: 16px;">Go to Dashboard →</a>
-          </p>
+            <h1 style="color: #29B6D2; margin-bottom: 20px;">Welcome to the SmartyGym Family! 🎉</h1>
+            <p style="font-size: 16px; line-height: 1.6; margin-bottom: 16px;">Thank you for making your first purchase and trusting SmartyGym with your fitness journey. This is a big step, and we're honored to be part of it.</p>
+            <h2 style="color: #333; font-size: 18px; margin-top: 24px;">What Makes SmartyGym Different</h2>
+            <p style="font-size: 16px; line-height: 1.6; margin-bottom: 16px;">Every workout and training program on SmartyGym is expertly designed by <strong>Haris Falas</strong>, a Sports Scientist with over 20 years of coaching experience and CSCS certification. You're not getting generic AI-generated content – you're getting real expertise from a real professional.</p>
+            <h2 style="color: #333; font-size: 18px; margin-top: 24px;">What You Now Have Access To</h2>
+            <ul style="font-size: 16px; line-height: 1.8; margin-bottom: 24px;">
+              <li>Expert-designed workouts crafted for real results</li>
+              <li>Strategic training programs based on proven methodologies</li>
+              <li>Daily Workout of the Day following smart periodization</li>
+              <li>A community of like-minded fitness enthusiasts</li>
+            </ul>
+            <p style="margin-top: 24px;">
+              <a href="https://smartygym.com/userdashboard" style="display: inline-block; background: #29B6D2; color: white; padding: 14px 28px; text-decoration: none; border-radius: 4px; font-weight: bold; font-size: 16px;">Go to Dashboard →</a>
+            </p>
           <p style="font-size: 16px; line-height: 1.6; margin-top: 24px;">Welcome aboard – let's make it happen!</p>
           <p style="font-size: 16px; margin-top: 16px;"><em>The SmartyGym Team</em></p>
           ${getEmailFooter(userEmail)}
@@ -330,7 +330,7 @@ async function handleCorporateSubscriptionCheckout(
         headers: getEmailHeaders(userEmail),
         html: `
           <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
-            <h1 style="color: #d4af37; margin-bottom: 20px;">Welcome to Smarty Corporate! 🏢</h1>
+            <h1 style="color: #29B6D2; margin-bottom: 20px;">Welcome to Smarty Corporate! 🏢</h1>
             <p style="font-size: 16px; line-height: 1.6; margin-bottom: 16px;">Congratulations! Your corporate subscription is now active.</p>
             <div style="background: #f9f9f9; border-radius: 8px; padding: 20px; margin: 20px 0;">
               <p style="margin: 0 0 10px;"><strong>Organization:</strong> ${organizationName}</p>
@@ -339,7 +339,7 @@ async function handleCorporateSubscriptionCheckout(
             </div>
             <p style="font-size: 16px; line-height: 1.6; margin-bottom: 24px;">All your team members will receive Platinum-level access to the entire SmartyGym platform.</p>
             <p style="margin-top: 24px;">
-              <a href="https://smartygym.com/corporate-admin" style="display: inline-block; background: #d4af37; color: white; padding: 14px 28px; text-decoration: none; border-radius: 4px; font-weight: bold; font-size: 16px;">Add Team Members →</a>
+              <a href="https://smartygym.com/corporate-admin" style="display: inline-block; background: #29B6D2; color: white; padding: 14px 28px; text-decoration: none; border-radius: 4px; font-weight: bold; font-size: 16px;">Add Team Members →</a>
             </p>
             ${getEmailFooter(userEmail)}
           </div>
@@ -539,12 +539,12 @@ async function handleSubscriptionCheckout(
           headers: getEmailHeaders(userEmail),
           html: `
             <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
-              <h1 style="color: #d4af37; margin-bottom: 20px;">Welcome to ${planName}! 🎉</h1>
-              <p style="font-size: 16px; line-height: 1.6; margin-bottom: 16px;">Thank you for subscribing to the <strong>${planName}</strong> plan!</p>
-              <p style="font-size: 16px; line-height: 1.6; margin-bottom: 24px;">You now have full access to all premium features.</p>
-              <p style="margin-top: 24px;">
-                <a href="https://smartygym.com/userdashboard" style="display: inline-block; background: #d4af37; color: white; padding: 14px 28px; text-decoration: none; border-radius: 4px; font-weight: bold; font-size: 16px;">Go to Dashboard →</a>
-              </p>
+            <h1 style="color: #29B6D2; margin-bottom: 20px;">Welcome to ${planName}! 🎉</h1>
+            <p style="font-size: 16px; line-height: 1.6; margin-bottom: 16px;">Thank you for subscribing to the <strong>${planName}</strong> plan!</p>
+            <p style="font-size: 16px; line-height: 1.6; margin-bottom: 24px;">You now have full access to all premium features.</p>
+            <p style="margin-top: 24px;">
+              <a href="https://smartygym.com/userdashboard" style="display: inline-block; background: #29B6D2; color: white; padding: 14px 28px; text-decoration: none; border-radius: 4px; font-weight: bold; font-size: 16px;">Go to Dashboard →</a>
+            </p>
               ${getEmailFooter(userEmail)}
             </div>
           `,
@@ -709,11 +709,11 @@ async function handleOneTimePurchase(
         headers: getEmailHeaders(userEmail),
         html: `
           <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
-            <h1 style="color: #d4af37; margin-bottom: 20px;">Purchase Confirmed! 🎉</h1>
+            <h1 style="color: #29B6D2; margin-bottom: 20px;">Purchase Confirmed! 🎉</h1>
             <p style="font-size: 16px; line-height: 1.6; margin-bottom: 16px;">Thank you for your purchase of <strong>${contentName}</strong>!</p>
             <p style="font-size: 16px; line-height: 1.6; margin-bottom: 24px;">Your content is now available in your dashboard.</p>
             <p style="margin-top: 24px;">
-              <a href="https://smartygym.com/userdashboard" style="display: inline-block; background: #d4af37; color: white; padding: 14px 28px; text-decoration: none; border-radius: 4px; font-weight: bold; font-size: 16px;">Go to Dashboard →</a>
+              <a href="https://smartygym.com/userdashboard" style="display: inline-block; background: #29B6D2; color: white; padding: 14px 28px; text-decoration: none; border-radius: 4px; font-weight: bold; font-size: 16px;">Go to Dashboard →</a>
             </p>
             ${getEmailFooter(userEmail)}
           </div>
@@ -833,7 +833,7 @@ async function handleSubscriptionUpdate(
     
     if (cancelAtPeriodEnd) {
       subject = '📋 Subscription Set to Cancel';
-      dashboardContent = `<p class="tiptap-paragraph"><strong>Your subscription is set to cancel.</strong></p><p class="tiptap-paragraph"></p><p class="tiptap-paragraph">You will continue to have access until ${nextBillingDate}.</p><p class="tiptap-paragraph"></p><p class="tiptap-paragraph">Changed your mind? <a href="/pricing" style="color: #D4AF37;">Resubscribe anytime →</a></p>`;
+      dashboardContent = `<p class="tiptap-paragraph"><strong>Your subscription is set to cancel.</strong></p><p class="tiptap-paragraph"></p><p class="tiptap-paragraph">You will continue to have access until ${nextBillingDate}.</p><p class="tiptap-paragraph"></p><p class="tiptap-paragraph">Changed your mind? <a href="/pricing" style="color: #29B6D2;">Resubscribe anytime →</a></p>`;
     }
 
     // Send dashboard notification
@@ -856,7 +856,7 @@ async function handleSubscriptionUpdate(
         headers: getEmailHeaders(userEmail),
         html: `
           <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
-            <h1 style="color: #d4af37; margin-bottom: 20px;">Subscription Update</h1>
+            <h1 style="color: #29B6D2; margin-bottom: 20px;">Subscription Update</h1>
             <p style="font-size: 16px; line-height: 1.6; margin-bottom: 16px;">Your subscription has been updated.</p>
             <div style="background: #f9f9f9; border-radius: 8px; padding: 20px; margin: 20px 0;">
               <p style="margin: 0 0 10px;"><strong>Status:</strong> ${statusText}</p>
@@ -865,7 +865,7 @@ async function handleSubscriptionUpdate(
             </div>
             <p style="font-size: 16px; line-height: 1.6; margin-bottom: 24px;">If you have any questions about your subscription, please don't hesitate to contact us.</p>
             <p style="margin-top: 24px;">
-              <a href="https://smartygym.com/userdashboard" style="display: inline-block; background: #d4af37; color: white; padding: 14px 28px; text-decoration: none; border-radius: 4px; font-weight: bold; font-size: 16px;">Go to Dashboard →</a>
+              <a href="https://smartygym.com/userdashboard" style="display: inline-block; background: #29B6D2; color: white; padding: 14px 28px; text-decoration: none; border-radius: 4px; font-weight: bold; font-size: 16px;">Go to Dashboard →</a>
             </p>
             ${getEmailFooter(userEmail)}
           </div>
@@ -967,7 +967,7 @@ async function handleSubscriptionCancellation(
             </head>
             <body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 20px;">
               <div style="text-align: center; margin-bottom: 30px;">
-                <h1 style="color: #d4af37; margin: 0;">SmartyGym</h1>
+                <h1 style="color: #29B6D2; margin: 0;">SmartyGym</h1>
               </div>
               <div style="background: #f9f9f9; border-radius: 8px; padding: 30px;">
                 <h2 style="margin-top: 0;">Your Subscription Has Been Cancelled</h2>
@@ -977,7 +977,7 @@ async function handleSubscriptionCancellation(
                 <p><strong>We'd Love to Have You Back:</strong></p>
                 <p>If you ever decide to return, your fitness journey awaits. All our expert-designed workouts and training programs will be here for you.</p>
                 <div style="text-align: center; margin: 30px 0;">
-                  <a href="https://smartygym.com/pricing" style="display: inline-block; background: #d4af37; color: white; padding: 14px 28px; text-decoration: none; border-radius: 6px; font-weight: bold;">Resubscribe Anytime →</a>
+                  <a href="https://smartygym.com/pricing" style="display: inline-block; background: #29B6D2; color: white; padding: 14px 28px; text-decoration: none; border-radius: 6px; font-weight: bold;">Resubscribe Anytime →</a>
                 </div>
                 <p>Thank you for being part of the SmartyGym family. We wish you all the best in your fitness journey!</p>
                 <p><em>The SmartyGym Team</em></p>

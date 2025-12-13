@@ -947,7 +947,7 @@ Respond in this EXACT JSON format:
               subject: notificationTitle,
               headers: getEmailHeaders(email),
               html: `<div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
-<h1 style="color: #d4af37;">🏆 Today's Workouts</h1>
+<h1 style="color: #29B6D2;">🏆 Today's Workouts</h1>
 <p style="font-size: 16px;">Today we have <strong>TWO</strong> workout options for ${category} day:</p>
 <div style="background: #f9f9f9; padding: 20px; border-radius: 8px; margin: 20px 0;">
   <p style="margin: 10px 0;"><strong>🏠 No Equipment:</strong> ${bodyweightWod?.name || "Bodyweight Workout"}</p>
@@ -956,7 +956,7 @@ Respond in this EXACT JSON format:
 <p><strong>Format:</strong> ${format} | <strong>Difficulty:</strong> ${selectedDifficulty.name} (${selectedDifficulty.stars}⭐)</p>
 <p style="color: #666;">Choose based on your situation: at home, traveling, or at the gym!</p>
 <p style="margin-top: 20px;">Available for €3.99 each or included with Premium.</p>
-<p style="margin-top: 20px;"><a href="https://smartygym.com/workout/wod" style="background: #d4af37; color: white; padding: 14px 28px; text-decoration: none; border-radius: 4px; font-weight: bold; display: inline-block;">View Workouts →</a></p>
+<p style="margin-top: 20px;"><a href="https://smartygym.com/workout/wod" style="background: #29B6D2; color: white; padding: 14px 28px; text-decoration: none; border-radius: 4px; font-weight: bold; display: inline-block;">View Workouts →</a></p>
 ${getEmailFooter(email)}
 </div>`,
             });
