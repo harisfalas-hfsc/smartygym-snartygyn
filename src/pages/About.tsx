@@ -170,7 +170,7 @@ const About = () => {
                 
                 <Card className="border-2 border-border hover:border-primary transition-all">
                   <CardContent className="p-6 text-center space-y-3">
-                    <Heart className="w-10 h-10 text-primary mx-auto" />
+                    <Heart className="w-10 h-10 text-orange-500 mx-auto" />
                     <h3 className="font-bold text-lg">Built for Real Life</h3>
                     <p className="text-sm text-muted-foreground">
                       Flexible training that fits your schedule, location, and lifestyle — not the other way around.
@@ -180,7 +180,7 @@ const About = () => {
 
                 <Card className="border-2 border-border hover:border-primary transition-all">
                   <CardContent className="p-6 text-center space-y-3">
-                    <Award className="w-10 h-10 text-primary mx-auto" />
+                    <Award className="w-10 h-10 text-purple-500 mx-auto" />
                     <h3 className="font-bold text-lg">Science-Based Approach</h3>
                     <p className="text-sm text-muted-foreground">
                       Every workout is designed using evidence-based training principles, not trends or fads.
@@ -190,7 +190,7 @@ const About = () => {
 
                 <Card className="border-2 border-border hover:border-primary transition-all">
                   <CardContent className="p-6 text-center space-y-3">
-                    <Users className="w-10 h-10 text-primary mx-auto" />
+                    <Users className="w-10 h-10 text-emerald-500 mx-auto" />
                     <h3 className="font-bold text-lg">Accessible to Everyone</h3>
                     <p className="text-sm text-muted-foreground">
                       From beginners to advanced athletes, everyone deserves access to quality fitness guidance.
@@ -200,7 +200,7 @@ const About = () => {
 
                 <Card className="border-2 border-border hover:border-primary transition-all">
                   <CardContent className="p-6 text-center space-y-3">
-                    <Shield className="w-10 h-10 text-primary mx-auto" />
+                    <Shield className="w-10 h-10 text-blue-500 mx-auto" />
                     <h3 className="font-bold text-lg">Safe and Effective</h3>
                     <p className="text-sm text-muted-foreground">
                       Proper technique, realistic progressions, and injury prevention are at the core of everything we do.

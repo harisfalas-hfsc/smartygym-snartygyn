@@ -786,7 +786,7 @@ const Index = () => {
             <Card className="border-2 border-border text-center hover:shadow-lg transition-all hover:-translate-y-1">
               <CardHeader>
                 <div className="w-14 h-14 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-4">
-                  <Target className="w-7 h-7 text-primary" />
+                  <Target className="w-7 h-7 text-orange-500" />
                 </div>
                 <CardTitle className="text-xl">Built for Real Life</CardTitle>
               </CardHeader>
@@ -800,7 +800,7 @@ const Index = () => {
             <Card className="border-2 border-border text-center hover:shadow-lg transition-all hover:-translate-y-1">
               <CardHeader>
                 <div className="w-14 h-14 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-4">
-                  <Brain className="w-7 h-7 text-primary" />
+                  <Brain className="w-7 h-7 text-purple-500" />
                 </div>
                 <CardTitle className="text-xl">Scientific Approach</CardTitle>
               </CardHeader>
@@ -814,7 +814,7 @@ const Index = () => {
             <Card className="border-2 border-border text-center hover:shadow-lg transition-all hover:-translate-y-1">
               <CardHeader>
                 <div className="w-14 h-14 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-4">
-                  <Users className="w-7 h-7 text-primary" />
+                  <Users className="w-7 h-7 text-emerald-500" />
                 </div>
                 <CardTitle className="text-xl">Accessible to All </CardTitle>
               </CardHeader>
@@ -828,7 +828,7 @@ const Index = () => {
             <Card className="border-2 border-border text-center hover:shadow-lg transition-all hover:-translate-y-1">
               <CardHeader>
                 <div className="w-14 h-14 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-4">
-                  <Shield className="w-7 h-7 text-primary" />
+                  <Shield className="w-7 h-7 text-blue-500" />
                 </div>
                 <CardTitle className="text-xl">Safe & Effective</CardTitle>
               </CardHeader>
@@ -865,7 +865,7 @@ const Index = () => {
             <Card className="border-2 border-border text-center hover:shadow-lg transition-all hover:-translate-y-1">
               <CardHeader>
                 <div className="w-14 h-14 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-4">
-                  <Award className="w-7 h-7 text-primary" />
+                  <Award className="w-7 h-7 text-cyan-500" />
                 </div>
                 <CardTitle className="text-xl">Evidence-Based</CardTitle>
               </CardHeader>
@@ -879,7 +879,7 @@ const Index = () => {
             <Card className="border-2 border-border text-center hover:shadow-lg transition-all hover:-translate-y-1">
               <CardHeader>
                 <div className="w-14 h-14 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-4">
-                  <CheckCircle2 className="w-7 h-7 text-primary" />
+                  <CheckCircle2 className="w-7 h-7 text-pink-500" />
                 </div>
                 <CardTitle className="text-xl">Structure & Clarity</CardTitle>
               </CardHeader>
@@ -893,7 +893,7 @@ const Index = () => {
             <Card className="border-2 border-border text-center hover:shadow-lg transition-all hover:-translate-y-1">
               <CardHeader>
                 <div className="w-14 h-14 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-4">
-                  <Heart className="w-7 h-7 text-primary" />
+                  <Heart className="w-7 h-7 text-red-500" />
                 </div>
                 <CardTitle className="text-xl">Human Connection</CardTitle>
               </CardHeader>
@@ -907,7 +907,7 @@ const Index = () => {
             <Card className="border-2 border-border text-center hover:shadow-lg transition-all hover:-translate-y-1">
               <CardHeader>
                 <div className="w-14 h-14 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-4">
-                  <Target className="w-7 h-7 text-primary" />
+                  <Target className="w-7 h-7 text-green-500" />
                 </div>
                 <CardTitle className="text-xl">Results-Driven</CardTitle>
               </CardHeader>
