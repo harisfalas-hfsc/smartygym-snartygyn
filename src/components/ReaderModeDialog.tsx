@@ -52,7 +52,7 @@ export const ReaderModeDialog = ({
         className={`max-w-4xl w-[95vw] h-[90vh] p-0 overflow-hidden flex flex-col ${
           isDarkMode
             ? "bg-zinc-900 text-zinc-100"
-            : "bg-amber-50 text-zinc-900"
+            : "bg-sky-50 text-zinc-900"
         }`}
       >
         {/* Control Bar */}
@@ -60,7 +60,7 @@ export const ReaderModeDialog = ({
           className={`flex items-center justify-between px-4 py-3 border-b ${
             isDarkMode
               ? "border-zinc-700 bg-zinc-800"
-              : "border-amber-200 bg-amber-100"
+              : "border-sky-200 bg-sky-100"
           }`}
         >
           <div className="flex items-center gap-2">
@@ -82,7 +82,7 @@ export const ReaderModeDialog = ({
               className={`h-8 w-8 ${
                 isDarkMode
                   ? "hover:bg-zinc-700 text-zinc-300"
-                  : "hover:bg-amber-200 text-zinc-700"
+                  : "hover:bg-sky-200 text-zinc-700"
               }`}
               title="Decrease font size"
             >
@@ -102,7 +102,7 @@ export const ReaderModeDialog = ({
               className={`h-8 w-8 ${
                 isDarkMode
                   ? "hover:bg-zinc-700 text-zinc-300"
-                  : "hover:bg-amber-200 text-zinc-700"
+                  : "hover:bg-sky-200 text-zinc-700"
               }`}
               title="Increase font size"
             >
@@ -111,7 +111,7 @@ export const ReaderModeDialog = ({
 
             <div
               className={`w-px h-6 mx-2 ${
-                isDarkMode ? "bg-zinc-600" : "bg-amber-300"
+                isDarkMode ? "bg-zinc-600" : "bg-sky-300"
               }`}
             />
 
@@ -123,7 +123,7 @@ export const ReaderModeDialog = ({
               className={`h-8 w-8 ${
                 isDarkMode
                   ? "hover:bg-zinc-700 text-zinc-300"
-                  : "hover:bg-amber-200 text-zinc-700"
+                  : "hover:bg-sky-200 text-zinc-700"
               }`}
               title={
                 isDarkMode ? "Switch to light mode" : "Switch to dark mode"
@@ -144,7 +144,7 @@ export const ReaderModeDialog = ({
               className={`h-8 w-8 ${
                 isDarkMode
                   ? "hover:bg-zinc-700 text-zinc-300"
-                  : "hover:bg-amber-200 text-zinc-700"
+                  : "hover:bg-sky-200 text-zinc-700"
               }`}
               title="Close"
             >
@@ -172,7 +172,7 @@ export const ReaderModeDialog = ({
                 className={`flex flex-wrap gap-3 mb-8 pb-6 border-b text-sm ${
                   isDarkMode
                     ? "border-zinc-700 text-zinc-400"
-                    : "border-amber-200 text-zinc-600"
+                    : "border-sky-200 text-zinc-600"
                 }`}
               >
                 {metadata.author && (
