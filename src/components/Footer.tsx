@@ -32,32 +32,32 @@ export const Footer = () => {
 
             {/* Contact + Legal in one row */}
             <div className="flex flex-wrap items-center justify-center gap-1.5 text-sm text-muted-foreground">
-              <button onClick={() => navigate("/contact")} className="hover:text-primary transition-colors underline decoration-dotted">
-                Contact
-              </button>
-              <span>•</span>
-              <button onClick={() => navigate("/corporate")} className="hover:text-primary transition-colors">
-                Corporate
-              </button>
-              <span>•</span>
               <button onClick={() => navigate("/human-performance")} className="hover:text-primary transition-colors">
                 Why SmartyGym?
               </button>
               <span>•</span>
+              <button onClick={() => navigate("/corporate")} className="hover:text-primary transition-colors">
+                Smarty Corporate
+              </button>
+              <span>•</span>
               <button onClick={() => navigate("/corporate-wellness")} className="hover:text-primary transition-colors">
-                Why Wellness?
+                Why Corporate Wellness?
               </button>
               <span>•</span>
               <button onClick={() => navigate("/privacy-policy")} className="hover:text-primary transition-colors">
-                Privacy
+                Privacy Policy
               </button>
               <span>•</span>
               <button onClick={() => navigate("/termsofservice")} className="hover:text-primary transition-colors">
-                Terms
+                Terms of Service
               </button>
               <span>•</span>
               <button onClick={() => navigate("/disclaimer")} className="hover:text-primary transition-colors">
                 Disclaimer
+              </button>
+              <span>•</span>
+              <button onClick={() => navigate("/contact")} className="hover:text-primary transition-colors">
+                Contact
               </button>
             </div>
 
@@ -91,12 +91,12 @@ export const Footer = () => {
           
           {/* Legal Links */}
           <div className="flex flex-wrap items-center justify-center gap-4 text-sm text-muted-foreground">
-            <button onClick={() => navigate("/corporate")} className="transition-colors text-primary">
-              Smarty Corporate
-            </button>
-            <span>•</span>
             <button onClick={() => navigate("/human-performance")} className="hover:text-primary transition-colors">
               Why SmartyGym?
+            </button>
+            <span>•</span>
+            <button onClick={() => navigate("/corporate")} className="hover:text-primary transition-colors">
+              Smarty Corporate
             </button>
             <span>•</span>
             <button onClick={() => navigate("/corporate-wellness")} className="hover:text-primary transition-colors">
