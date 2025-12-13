@@ -271,7 +271,7 @@ export default function JoinPremium() {
             <Card 
               itemScope
               itemType="https://schema.org/Product"
-              className="relative border-2 border-primary shadow-lg flex flex-col"
+              className="relative border-2 border-[#D4AF37] shadow-lg flex flex-col"
               data-plan="gold"
               data-keywords="online gym membership, smarty gym, online fitness subscription, smartygym.com"
               aria-label="Gold Plan - SmartyGym online gym membership - smartygym.com"
@@ -279,19 +279,19 @@ export default function JoinPremium() {
               <CardHeader className="text-center pb-2 sm:pb-4">
                 <div className="mb-2 sm:mb-3">
                   <h2 
-                    className="text-xl sm:text-2xl font-bold text-primary"
+                    className="text-xl sm:text-2xl font-bold text-[#D4AF37]"
                     itemProp="name"
                   >
                     Gold Plan
                   </h2>
                 </div>
-                <Badge className="bg-primary text-white mx-auto mb-3 sm:mb-4 text-xs sm:text-sm">
+                <Badge className="bg-[#D4AF37] text-white mx-auto mb-3 sm:mb-4 text-xs sm:text-sm">
                   MONTHLY
                 </Badge>
                 <CardTitle className="text-2xl sm:text-3xl font-bold" itemProp="offers">€9.99</CardTitle>
                 <p className="text-xs sm:text-sm text-muted-foreground h-4 sm:h-5" itemProp="description">per month</p>
                 <div className="h-10 sm:h-14 flex flex-col justify-center">
-                  <p className="text-xs text-primary font-semibold">
+                  <p className="text-xs text-[#D4AF37] font-semibold">
                     🔄 Auto-renews monthly
                   </p>
                 </div>
@@ -331,7 +331,7 @@ export default function JoinPremium() {
                 </div>
                 <div className="space-y-3 sm:space-y-4 mt-auto">
                   <Button 
-                    className="w-full text-sm sm:text-lg py-4 sm:py-6" 
+                    className="w-full text-sm sm:text-lg py-4 sm:py-6 bg-[#D4AF37] hover:bg-[#C9A431] text-white" 
                     onClick={() => handleSubscribe('gold')}
                     disabled={loading}
                   >
@@ -350,17 +350,17 @@ export default function JoinPremium() {
             </Card>
 
             {/* Platinum Plan */}
-            <Card className="relative border-2 border-primary shadow-lg flex flex-col bg-gradient-to-br from-primary/5 to-sky-500/5">
+            <Card className="relative border-2 border-[#A8A9AD] shadow-lg flex flex-col bg-gradient-to-br from-[#A8A9AD]/5 to-[#C0C0C0]/10">
               <Badge className="absolute -top-2 right-2 sm:-top-3 sm:right-3 bg-green-600 text-white px-2 sm:px-3 py-1 text-xs sm:text-sm shadow-md z-10">
                 BEST VALUE
               </Badge>
               
               <CardHeader className="text-center pb-2 sm:pb-4 pt-4 sm:pt-6">
                 <div className="flex items-center justify-center gap-2 mb-2 sm:mb-3">
-                  <Crown className="h-5 w-5 sm:h-6 sm:w-6 text-primary" />
-                  <h2 className="text-xl sm:text-2xl font-bold text-primary">Platinum</h2>
+                  <Crown className="h-5 w-5 sm:h-6 sm:w-6 text-[#A8A9AD]" />
+                  <h2 className="text-xl sm:text-2xl font-bold text-[#A8A9AD]">Platinum</h2>
                 </div>
-                <Badge className="bg-primary text-primary-foreground mx-auto mb-3 sm:mb-4 text-xs sm:text-sm">
+                <Badge className="bg-[#A8A9AD] text-white mx-auto mb-3 sm:mb-4 text-xs sm:text-sm">
                   YEARLY
                 </Badge>
                 <CardTitle className="text-2xl sm:text-3xl font-bold">€89.99</CardTitle>
@@ -394,20 +394,20 @@ export default function JoinPremium() {
                   </div>
                   <div className="flex items-start gap-2">
                     <Check className="h-4 w-4 sm:h-5 sm:w-5 text-green-500 shrink-0 mt-0.5" />
-                    <span className="text-xs sm:text-sm"><strong>25% savings</strong> vs monthly</span>
-                  </div>
-                  <div className="flex items-start gap-2 hidden sm:flex">
-                    <Check className="h-5 w-5 text-green-500 shrink-0 mt-0.5" />
-                    <span className="text-sm">Lock in rate for 12 months</span>
+                    <span className="text-xs sm:text-sm font-bold text-green-600">25% savings vs monthly</span>
                   </div>
                   <div className="flex items-start gap-2 hidden sm:flex">
                     <Check className="h-5 w-5 text-green-500 shrink-0 mt-0.5" />
                     <span className="text-sm">Cancel anytime</span>
                   </div>
+                  <div className="flex items-start gap-2 hidden sm:flex">
+                    <Check className="h-5 w-5 text-green-500 shrink-0 mt-0.5" />
+                    <span className="text-sm">Best for committed fitness goals</span>
+                  </div>
                 </div>
                 <div className="space-y-3 sm:space-y-4 mt-auto">
                   <Button 
-                    className="w-full text-sm sm:text-lg py-4 sm:py-6 bg-gradient-to-r from-primary to-sky-600 hover:from-primary/90 hover:to-sky-600/90" 
+                    className="w-full text-sm sm:text-lg py-4 sm:py-6 bg-[#A8A9AD] hover:bg-[#9A9B9F] text-white" 
                     onClick={() => handleSubscribe('platinum')}
                     disabled={loading}
                   >
@@ -419,7 +419,7 @@ export default function JoinPremium() {
                     )}
                   </Button>
                   <p className="text-xs text-center text-muted-foreground">
-                    Best value • Auto-renews each year
+                    Auto-renews each year
                   </p>
                 </div>
               </CardContent>
