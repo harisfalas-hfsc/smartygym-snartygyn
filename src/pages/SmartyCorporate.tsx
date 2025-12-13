@@ -22,8 +22,10 @@ import {
   ArrowLeft,
   CreditCard,
   Shield,
-  Headphones
+  Headphones,
+  Lightbulb
 } from "lucide-react";
+import { Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { User } from "@supabase/supabase-js";
 import { useToast } from "@/hooks/use-toast";
@@ -146,6 +148,7 @@ export default function SmartyCorporate() {
     { icon: Crown, text: "Platinum-level access for all members" },
     { icon: Shield, text: "1-year subscription period" },
     { icon: Headphones, text: "Priority support for organizations" },
+    { icon: Lightbulb, text: "Why Invest in Wellness?", isLink: true, href: "/corporate-wellness" },
   ];
 
   return (
@@ -236,14 +239,33 @@ export default function SmartyCorporate() {
             </CardHeader>
             <CardContent>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                {benefits.map((benefit, index) => (
-                  <div key={index} className="flex items-center gap-3 p-3 bg-muted rounded-lg">
-                    <div className="p-2 bg-primary/10 rounded-full">
-                      <benefit.icon className="h-5 w-5 text-primary" />
+                {benefits.map((benefit, index) => {
+                  const isGreenCard = 'isLink' in benefit && benefit.isLink;
+                  
+                  if (isGreenCard && 'href' in benefit) {
+                    return (
+                      <Link
+                        key={index}
+                        to={benefit.href}
+                        className="flex items-center gap-3 p-3 bg-green-500/10 border-2 border-green-500 rounded-lg hover:bg-green-500/20 transition-colors group"
+                      >
+                        <div className="p-2 bg-green-500/20 rounded-full">
+                          <benefit.icon className="h-5 w-5 text-green-500" />
+                        </div>
+                        <span className="text-sm font-medium text-green-600 dark:text-green-400 group-hover:underline">{benefit.text}</span>
+                      </Link>
+                    );
+                  }
+                  
+                  return (
+                    <div key={index} className="flex items-center gap-3 p-3 bg-muted rounded-lg">
+                      <div className="p-2 bg-primary/10 rounded-full">
+                        <benefit.icon className="h-5 w-5 text-primary" />
+                      </div>
+                      <span className="text-sm font-medium">{benefit.text}</span>
                     </div>
-                    <span className="text-sm font-medium">{benefit.text}</span>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
             </CardContent>
           </Card>
