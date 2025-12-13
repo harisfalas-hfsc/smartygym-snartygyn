@@ -429,7 +429,7 @@ const TrainingProgramDetail = () => {
             return (
               <Card
                 key={program.id}
-                className="overflow-hidden cursor-pointer transition-all duration-300 hover:scale-105 hover:shadow-gold bg-card border-border relative"
+                className="overflow-hidden cursor-pointer transition-all duration-300 hover:scale-105 hover:shadow-primary bg-card border-border relative"
                 onClick={() => navigate(`/trainingprogram/${type}/${program.id}`)}
               >
                 {/* NEW Badge */}

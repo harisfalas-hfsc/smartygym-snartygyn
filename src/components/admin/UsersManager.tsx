@@ -819,7 +819,7 @@ export function UsersManager() {
                                   action: 'grant',
                                   planType: 'gold'
                                 })}
-                                className="text-amber-600 border-amber-600 hover:bg-amber-50"
+                                className="text-primary border-primary hover:bg-primary/10"
                               >
                                 <Crown className="h-4 w-4 mr-1" />
                                 Gold
@@ -867,7 +867,7 @@ export function UsersManager() {
                                     action: 'grant',
                                     planType: 'gold'
                                   })}
-                                  className="text-amber-600 border-amber-600 hover:bg-amber-50"
+                                  className="text-primary border-primary hover:bg-primary/10"
                                 >
                                   <Crown className="h-4 w-4 mr-1" />
                                   Downgrade

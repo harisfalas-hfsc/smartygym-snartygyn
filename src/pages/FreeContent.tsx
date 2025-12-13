@@ -214,7 +214,7 @@ const FreeContent = () => {
                   <Card
                     key={workout.id}
                     onClick={() => handleWorkoutSelect(workout.id)}
-                    className="p-6 cursor-pointer transition-all duration-300 hover:scale-105 hover:shadow-gold bg-card border-border"
+                    className="p-6 cursor-pointer transition-all duration-300 hover:scale-105 hover:shadow-primary bg-card border-border"
                   >
                     <div className="flex flex-col items-center text-center space-y-4">
                       <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center">
@@ -255,7 +255,7 @@ const FreeContent = () => {
                   <Card
                     key={program.id}
                     onClick={() => handleProgramSelect(program.id)}
-                    className="p-6 cursor-pointer transition-all duration-300 hover:scale-105 hover:shadow-gold bg-card border-border"
+                    className="p-6 cursor-pointer transition-all duration-300 hover:scale-105 hover:shadow-primary bg-card border-border"
                   >
                     <div className="flex flex-col items-center text-center space-y-4">
                       <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center">

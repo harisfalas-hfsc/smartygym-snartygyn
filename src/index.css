@@ -17,12 +17,12 @@ All colors MUST be HSL.
     --popover: 0 0% 100%;
     --popover-foreground: 0 0% 15%;
 
-    /* Premium Gold - Primary Brand Color */
-    --primary: 43 74% 49%;
+    /* Light Blue - Primary Brand Color */
+    --primary: 195 82% 55%;
     --primary-foreground: 0 0% 100%;
     
-    /* Lighter gold for hover states */
-    --primary-hover: 43 74% 56%;
+    /* Lighter blue for hover states */
+    --primary-hover: 195 82% 62%;
 
     /* Silver - Secondary Color */
     --secondary: 0 0% 75%;
@@ -31,7 +31,7 @@ All colors MUST be HSL.
     --muted: 0 0% 96%;
     --muted-foreground: 0 0% 45%;
 
-    --accent: 43 74% 49%;
+    --accent: 195 82% 55%;
     --accent-foreground: 0 0% 15%;
 
     --destructive: 0 84% 60%;
@@ -39,16 +39,16 @@ All colors MUST be HSL.
 
     --border: 0 0% 90%;
     --input: 0 0% 90%;
-    --ring: 43 74% 49%;
+    --ring: 195 82% 55%;
 
     --radius: 0.75rem;
 
     /* Premium gradient for hero sections */
-    --gradient-gold: linear-gradient(135deg, hsl(43, 74%, 49%) 0%, hsl(43, 74%, 60%) 100%);
+    --gradient-primary: linear-gradient(135deg, hsl(195, 82%, 55%) 0%, hsl(195, 82%, 65%) 100%);
     
     /* Subtle shadow for cards */
     --shadow-soft: 0 4px 20px rgba(0, 0, 0, 0.08);
-    --shadow-gold: 0 4px 20px rgba(212, 175, 55, 0.3);
+    --shadow-primary: 0 4px 20px rgba(56, 189, 248, 0.3);
   }
 
   .dark {
@@ -61,10 +61,10 @@ All colors MUST be HSL.
     --popover: 0 0% 16%;
     --popover-foreground: 0 0% 95%;
 
-    --primary: 43 74% 49%;
+    --primary: 195 82% 55%;
     --primary-foreground: 0 0% 100%;
     
-    --primary-hover: 43 74% 56%;
+    --primary-hover: 195 82% 62%;
 
     --secondary: 0 0% 30%;
     --secondary-foreground: 0 0% 95%;
@@ -72,7 +72,7 @@ All colors MUST be HSL.
     --muted: 0 0% 20%;
     --muted-foreground: 0 0% 65%;
 
-    --accent: 43 74% 49%;
+    --accent: 195 82% 55%;
     --accent-foreground: 0 0% 15%;
 
     --destructive: 0 84% 60%;
@@ -80,7 +80,7 @@ All colors MUST be HSL.
 
     --border: 0 0% 25%;
     --input: 0 0% 25%;
-    --ring: 43 74% 49%;
+    --ring: 195 82% 55%;
   }
 }
 
@@ -126,16 +126,16 @@ All colors MUST be HSL.
     display: block;
   }
 
-  .gradient-gold {
-    background: var(--gradient-gold);
+  .gradient-primary {
+    background: var(--gradient-primary);
   }
   
   .shadow-soft {
     box-shadow: var(--shadow-soft);
   }
   
-  .shadow-gold {
-    box-shadow: var(--shadow-gold);
+  .shadow-primary {
+    box-shadow: var(--shadow-primary);
   }
   
   /* Premium smooth transitions */
@@ -535,7 +535,7 @@ All colors MUST be HSL.
     button:not(.print-checkbox),
     .hover-lift,
     .shadow-soft,
-    .shadow-gold {
+    .shadow-primary {
       display: none !important;
     }
 
@@ -586,7 +586,7 @@ All colors MUST be HSL.
     }
 
     .border-primary {
-      border-color: #d4af37 !important;
+      border-color: #38bdf8 !important;
       -webkit-print-color-adjust: exact;
       print-color-adjust: exact;
     }

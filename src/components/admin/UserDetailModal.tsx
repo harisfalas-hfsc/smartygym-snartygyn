@@ -527,7 +527,7 @@ export function UserDetailModal({
                         size="sm"
                         onClick={() => manageSubscription('grant', 'gold')}
                         disabled={actionLoading}
-                        className="text-amber-600 border-amber-600 hover:bg-amber-50"
+                        className="text-primary border-primary hover:bg-primary/10"
                       >
                         <Crown className="h-4 w-4 mr-2" />
                         Grant Gold
@@ -563,7 +563,7 @@ export function UserDetailModal({
                           size="sm"
                           onClick={() => manageSubscription('grant', 'gold')}
                           disabled={actionLoading}
-                          className="text-amber-600 border-amber-600 hover:bg-amber-50"
+                          className="text-primary border-primary hover:bg-primary/10"
                         >
                           <Crown className="h-4 w-4 mr-2" />
                           Downgrade to Gold

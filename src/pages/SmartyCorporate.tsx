@@ -415,7 +415,7 @@ export default function SmartyCorporate() {
             </Card>
 
             {/* Smarty Enterprise - Unlimited */}
-            <Card className="relative border-2 border-primary shadow-lg flex flex-col bg-gradient-to-br from-primary/5 to-amber-500/5">
+            <Card className="relative border-2 border-primary shadow-lg flex flex-col bg-gradient-to-br from-primary/5 to-sky-500/5">
               <Badge className="absolute -top-2 right-2 bg-green-600 text-white px-2 py-1 text-xs shadow-md z-10">
                 BEST VALUE
               </Badge>
