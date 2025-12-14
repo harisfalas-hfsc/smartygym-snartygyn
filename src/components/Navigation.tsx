@@ -394,7 +394,7 @@ export const Navigation = () => {
               <img
                 src={smartyGymLogo}
                 alt="SmartyGym"
-                className="h-24 sm:h-28 md:h-32 lg:h-36 w-auto object-cover scale-110 -my-2"
+                className="h-14 xs:h-16 sm:h-28 md:h-32 lg:h-36 w-auto object-contain dark:bg-transparent"
               />
             </div>
           </div>
@@ -552,7 +552,7 @@ export const Navigation = () => {
             ) : (
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button size="default" className="text-sm sm:text-base">
+                  <Button size="sm" className="text-xs sm:text-sm px-2 sm:px-4">
                     Login / Sign Up
                   </Button>
                 </DropdownMenuTrigger>
