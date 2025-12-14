@@ -2,7 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
-import { ChevronLeft, ChevronRight, Star, Flame, Clock } from "lucide-react";
+import { ChevronLeft, ChevronRight, Star } from "lucide-react";
 import { format, subDays, addDays } from "date-fns";
 
 // 7-DAY CATEGORY CYCLE
@@ -37,7 +37,6 @@ const FORMATS_BY_CATEGORY: Record<string, string[]> = {
 };
 
 const getDayInCycle = (dayCount: number): number => (dayCount % 7) + 1;
-const getWeekNumber = (dayCount: number): number => Math.floor(dayCount / 7) + 1;
 
 const getCategoryForDay = (dayInCycle: number): string => CATEGORY_CYCLE_7DAY[dayInCycle - 1];
 
@@ -50,17 +49,17 @@ const getDifficultyForDay = (dayInCycle: number, weekNumber: number): { level: s
   };
 };
 
-const getDifficultyColor = (level: string) => {
-  if (level === "Beginner") return "text-green-500";
-  if (level === "Intermediate") return "text-yellow-500";
-  return "text-red-500";
+const getDifficultyBadgeClass = (level: string) => {
+  if (level === "Beginner") return "bg-green-500/20 text-green-700 dark:text-green-400 border-green-500/30";
+  if (level === "Intermediate") return "bg-yellow-500/20 text-yellow-700 dark:text-yellow-400 border-yellow-500/30";
+  return "bg-red-500/20 text-red-700 dark:text-red-400 border-red-500/30";
 };
 
 export const WODTimeline = () => {
   const yesterday = subDays(new Date(), 1);
   const tomorrow = addDays(new Date(), 1);
   
-  // Fetch yesterday's WOD
+  // Fetch yesterday's WOD with caching
   const { data: yesterdayWOD, isLoading: loadingYesterday } = useQuery({
     queryKey: ["yesterday-wod"],
     queryFn: async () => {
@@ -78,9 +77,11 @@ export const WODTimeline = () => {
       if (error) throw error;
       return data?.[0] || null;
     },
+    staleTime: 60000,
+    refetchOnWindowFocus: false,
   });
 
-  // Fetch current WODs (today)
+  // Fetch current WODs (today) with caching
   const { data: todayWODs, isLoading: loadingToday } = useQuery({
     queryKey: ["today-wods-timeline"],
     queryFn: async () => {
@@ -93,9 +94,11 @@ export const WODTimeline = () => {
       if (error) throw error;
       return data?.[0] || null;
     },
+    staleTime: 60000,
+    refetchOnWindowFocus: false,
   });
 
-  // Fetch WOD state for tomorrow calculation
+  // Fetch WOD state for tomorrow calculation with caching
   const { data: wodState, isLoading: loadingState } = useQuery({
     queryKey: ["wod-state-timeline"],
     queryFn: async () => {
@@ -108,20 +111,27 @@ export const WODTimeline = () => {
       if (error) throw error;
       return data;
     },
+    staleTime: 60000,
+    refetchOnWindowFocus: false,
   });
 
-  // Calculate tomorrow's WOD info
+  // Calculate tomorrow's WOD info - always returns data
   const getTomorrowInfo = () => {
-    if (!wodState) return null;
+    // Default fallback calculation using day 1 of cycle
+    const defaultDayCount = 0;
+    const defaultWeekNumber = 1;
     
-    const tomorrowDayCount = (wodState.day_count || 0) + 1;
+    const dayCount = wodState?.day_count ?? defaultDayCount;
+    const weekNumber = wodState?.week_number ?? defaultWeekNumber;
+    
+    const tomorrowDayCount = dayCount + 1;
     const tomorrowDayInCycle = getDayInCycle(tomorrowDayCount);
     const tomorrowWeekNumber = tomorrowDayInCycle === 1 
-      ? (wodState.week_number || 1) + 1 
-      : (wodState.week_number || 1);
+      ? weekNumber + 1 
+      : weekNumber;
     
     const tomorrowDateStr = format(tomorrow, "yyyy-MM-dd");
-    const overrides = (wodState.manual_overrides as Record<string, any>) || {};
+    const overrides = (wodState?.manual_overrides as Record<string, any>) || {};
     const override = overrides[tomorrowDateStr];
     
     const category = override?.category || getCategoryForDay(tomorrowDayInCycle);
@@ -143,94 +153,83 @@ export const WODTimeline = () => {
 
   if (isLoading) {
     return (
-      <div className="mb-6 p-4 rounded-lg border border-primary/30 bg-primary/5">
-        <div className="grid grid-cols-3 gap-4">
-          <Skeleton className="h-24" />
-          <Skeleton className="h-24" />
-          <Skeleton className="h-24" />
+      <div className="mb-4 p-2 rounded-lg border border-border bg-muted/30">
+        <div className="grid grid-cols-3 gap-2">
+          <Skeleton className="h-14" />
+          <Skeleton className="h-14" />
+          <Skeleton className="h-14" />
         </div>
       </div>
     );
   }
 
   return (
-    <div className="mb-6 rounded-lg border border-primary/30 bg-gradient-to-r from-muted/50 via-primary/5 to-muted/50 overflow-hidden">
-      <div className="grid grid-cols-1 md:grid-cols-3">
+    <div className="mb-4 rounded-lg border border-border bg-muted/30 overflow-hidden">
+      <div className="grid grid-cols-3">
         {/* Yesterday */}
-        <div className="p-4 border-b md:border-b-0 md:border-r border-border/50 opacity-70">
-          <div className="flex items-center gap-2 mb-2 text-muted-foreground">
-            <ChevronLeft className="h-4 w-4" />
-            <span className="text-xs uppercase tracking-wide">Yesterday</span>
+        <div className="p-2 md:p-3 border-r border-border/50 opacity-70">
+          <div className="flex items-center gap-1 mb-1 text-muted-foreground">
+            <ChevronLeft className="h-3 w-3" />
+            <span className="text-[10px] md:text-xs uppercase tracking-wide">Yesterday</span>
           </div>
           {yesterdayWOD ? (
-            <div className="space-y-1">
-              <p className="font-semibold text-sm">{yesterdayWOD.category}</p>
-              <div className="flex flex-wrap gap-1">
-                <Badge variant="outline" className="text-xs">
+            <div>
+              <p className="font-semibold text-xs md:text-sm truncate">{yesterdayWOD.category}</p>
+              <div className="flex flex-wrap gap-1 mt-1">
+                <Badge variant="outline" className="text-[10px] md:text-xs px-1 py-0">
                   {yesterdayWOD.format}
                 </Badge>
-                <Badge variant="outline" className={`text-xs ${getDifficultyColor(yesterdayWOD.difficulty || "")}`}>
-                  {yesterdayWOD.difficulty} ({yesterdayWOD.difficulty_stars}★)
+                <Badge variant="outline" className={`text-[10px] md:text-xs px-1 py-0 ${getDifficultyBadgeClass(yesterdayWOD.difficulty || "")}`}>
+                  {yesterdayWOD.difficulty_stars}★
                 </Badge>
               </div>
-              <p className="text-xs text-muted-foreground">{format(yesterday, "MMM d")}</p>
             </div>
           ) : (
-            <p className="text-sm text-muted-foreground">No data</p>
+            <p className="text-xs text-muted-foreground">No data</p>
           )}
         </div>
 
-        {/* Today - Highlighted */}
-        <div className="p-4 bg-primary/10 border-b md:border-b-0 md:border-r border-border/50">
-          <div className="flex items-center justify-center gap-2 mb-2">
-            <Star className="h-4 w-4 text-primary" />
-            <span className="text-xs uppercase tracking-wide font-bold text-primary">Today</span>
-            <Star className="h-4 w-4 text-primary" />
+        {/* Today - Highlighted with proper contrast */}
+        <div className="p-2 md:p-3 bg-card border-x-2 border-primary shadow-sm">
+          <div className="flex items-center justify-center gap-1 mb-1">
+            <Star className="h-3 w-3 text-primary fill-primary" />
+            <span className="text-[10px] md:text-xs uppercase tracking-wide font-bold text-primary">Today</span>
+            <Star className="h-3 w-3 text-primary fill-primary" />
           </div>
           {todayWODs ? (
-            <div className="text-center space-y-1">
-              <p className="font-bold text-lg text-primary">{todayWODs.category}</p>
-              <div className="flex flex-wrap justify-center gap-1">
-                <Badge className="bg-primary/20 text-primary border-primary/30 text-xs">
-                  <Flame className="h-3 w-3 mr-1" />
+            <div className="text-center">
+              <p className="font-bold text-sm md:text-base text-foreground truncate">{todayWODs.category}</p>
+              <div className="flex flex-wrap justify-center gap-1 mt-1">
+                <Badge className="bg-primary text-primary-foreground text-[10px] md:text-xs px-1 py-0">
                   {todayWODs.format}
                 </Badge>
-                <Badge className={`text-xs ${getDifficultyColor(todayWODs.difficulty || "")}`}>
-                  {todayWODs.difficulty} ({todayWODs.difficulty_stars}★)
+                <Badge className={`text-[10px] md:text-xs px-1 py-0 ${getDifficultyBadgeClass(todayWODs.difficulty || "")}`}>
+                  {todayWODs.difficulty_stars}★
                 </Badge>
               </div>
-              <p className="text-xs text-muted-foreground">{format(new Date(), "MMM d")}</p>
             </div>
           ) : (
-            <div className="text-center">
-              <Clock className="h-8 w-8 mx-auto text-muted-foreground mb-2" />
-              <p className="text-sm text-muted-foreground">Generating at 7:00 AM</p>
-            </div>
+            <p className="text-xs text-muted-foreground text-center">@ 7:00 AM</p>
           )}
         </div>
 
         {/* Tomorrow */}
-        <div className="p-4 opacity-70">
-          <div className="flex items-center justify-end gap-2 mb-2 text-muted-foreground">
-            <span className="text-xs uppercase tracking-wide">Tomorrow</span>
-            <ChevronRight className="h-4 w-4" />
+        <div className="p-2 md:p-3 border-l border-border/50 opacity-70">
+          <div className="flex items-center justify-end gap-1 mb-1 text-muted-foreground">
+            <span className="text-[10px] md:text-xs uppercase tracking-wide">Tomorrow</span>
+            <ChevronRight className="h-3 w-3" />
           </div>
-          {tomorrowInfo ? (
-            <div className="text-right space-y-1">
-              <p className="font-semibold text-sm">{tomorrowInfo.category}</p>
-              <div className="flex flex-wrap justify-end gap-1">
-                <Badge variant="outline" className="text-xs">
-                  {tomorrowInfo.format}
-                </Badge>
-                <Badge variant="outline" className={`text-xs ${getDifficultyColor(tomorrowInfo.difficultyLevel)}`}>
-                  {tomorrowInfo.difficultyLevel} ({tomorrowInfo.difficultyRange[0]}-{tomorrowInfo.difficultyRange[1]}★)
-                </Badge>
-              </div>
-              <p className="text-xs text-muted-foreground">{format(tomorrow, "MMM d")} @ 7:00 AM</p>
+          <div className="text-right">
+            <p className="font-semibold text-xs md:text-sm truncate">{tomorrowInfo.category}</p>
+            <div className="flex flex-wrap justify-end gap-1 mt-1">
+              <Badge variant="outline" className="text-[10px] md:text-xs px-1 py-0">
+                {tomorrowInfo.format}
+              </Badge>
+              <Badge variant="outline" className={`text-[10px] md:text-xs px-1 py-0 ${getDifficultyBadgeClass(tomorrowInfo.difficultyLevel)}`}>
+                {tomorrowInfo.difficultyRange[0]}-{tomorrowInfo.difficultyRange[1]}★
+              </Badge>
             </div>
-          ) : (
-            <p className="text-sm text-muted-foreground text-right">Calculating...</p>
-          )}
+          </div>
         </div>
       </div>
     </div>
