@@ -61,6 +61,7 @@ import CorporateWellness from "./pages/CorporateWellness";
 import HumanPerformance from "./pages/HumanPerformance";
 import PremiumBenefits from "./pages/PremiumBenefits";
 import PremiumComparison from "./pages/PremiumComparison";
+import SmartyPlans from "./pages/SmartyPlans";
 
 import PaymentSuccess from "./pages/PaymentSuccess";
 import NewsletterThankYou from "./pages/NewsletterThankYou";
@@ -110,6 +111,7 @@ const AppContent = () => {
                   <Route path="/joinpremium" element={<JoinPremium />} />
                   <Route path="/premiumbenefits" element={<PremiumBenefits />} />
                   <Route path="/premium-comparison" element={<PremiumComparison />} />
+                  <Route path="/smarty-plans" element={<SmartyPlans />} />
                   <Route path="/about" element={<About />} />
                   <Route path="/faq" element={<FAQ />} />
                 
