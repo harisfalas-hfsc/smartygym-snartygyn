@@ -217,7 +217,31 @@ serve(async (req) => {
   }
 
   try {
-    logStep("Starting Dual Workout of the Day generation (BODYWEIGHT + EQUIPMENT) - 7-DAY CYCLE");
+    // Parse request body for targetDate parameter (for pre-generation)
+    let targetDate: string | null = null;
+    let skipNotifications = false;
+    
+    try {
+      const body = await req.json();
+      targetDate = body?.targetDate || null;
+      skipNotifications = body?.skipNotifications || false;
+    } catch {
+      // No body or invalid JSON - use defaults
+    }
+    
+    const today = new Date();
+    const todayStr = today.toISOString().split('T')[0];
+    
+    // Determine the effective date for generation
+    const effectiveDate = targetDate || todayStr;
+    const isPreGeneration = targetDate && targetDate !== todayStr;
+    
+    logStep("Starting WOD generation", { 
+      effectiveDate, 
+      isPreGeneration,
+      targetDate,
+      todayStr
+    });
 
     const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
     const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
@@ -230,30 +254,113 @@ serve(async (req) => {
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
     const stripe = new Stripe(stripeKey, { apiVersion: "2025-08-27.basil" });
 
-    // SAME-DAY GENERATION GUARD: Check if today's WOD already exists
-    const today = new Date();
-    const todayStr = today.toISOString().split('T')[0];
-    const todayStart = new Date(today.getFullYear(), today.getMonth(), today.getDate()).toISOString();
-    const todayEnd = new Date(today.getFullYear(), today.getMonth(), today.getDate() + 1).toISOString();
+    // Check if WODs already exist for the effective date
+    // For pre-generated WODs, check generated_for_date column
+    // For same-day generation, check created_at date range
     
-    const { data: existingTodayWODs } = await supabase
-      .from("admin_workouts")
-      .select("id, name, category")
-      .eq("is_workout_of_day", true)
-      .gte("created_at", todayStart)
-      .lt("created_at", todayEnd);
-    
-    if (existingTodayWODs && existingTodayWODs.length >= 2) {
-      logStep("SKIPPING: Today's WODs already exist", { count: existingTodayWODs.length, wods: existingTodayWODs });
-      return new Response(
-        JSON.stringify({ 
-          success: true, 
-          skipped: true, 
-          message: "Today's WODs already generated",
-          existingWODs: existingTodayWODs 
-        }),
-        { headers: { ...corsHeaders, "Content-Type": "application/json" }, status: 200 }
-      );
+    if (isPreGeneration) {
+      // Check for pre-generated WODs for this future date
+      const { data: existingPreGenWODs } = await supabase
+        .from("admin_workouts")
+        .select("id, name, category")
+        .eq("generated_for_date", effectiveDate)
+        .eq("is_workout_of_day", true);
+      
+      if (existingPreGenWODs && existingPreGenWODs.length >= 2) {
+        logStep("SKIPPING: WODs already pre-generated for this date", { 
+          date: effectiveDate, 
+          count: existingPreGenWODs.length, 
+          wods: existingPreGenWODs 
+        });
+        return new Response(
+          JSON.stringify({ 
+            success: true, 
+            skipped: true, 
+            message: `WODs already pre-generated for ${effectiveDate}`,
+            existingWODs: existingPreGenWODs 
+          }),
+          { headers: { ...corsHeaders, "Content-Type": "application/json" }, status: 200 }
+        );
+      }
+    } else {
+      // SAME-DAY GENERATION GUARD: Check if today's WOD already exists
+      // First check for pre-generated WODs for today
+      const { data: preGenForToday } = await supabase
+        .from("admin_workouts")
+        .select("id, name, category")
+        .eq("generated_for_date", todayStr)
+        .eq("is_workout_of_day", true);
+      
+      if (preGenForToday && preGenForToday.length >= 2) {
+        logStep("SKIPPING: WODs were pre-generated for today", { 
+          count: preGenForToday.length, 
+          wods: preGenForToday 
+        });
+        
+        // Still increment day_count to maintain periodization!
+        const { data: stateData } = await supabase
+          .from("workout_of_day_state")
+          .select("*")
+          .limit(1)
+          .single();
+        
+        if (stateData) {
+          const newDayCount = (stateData.day_count || 0) + 1;
+          const newDayInCycle = (newDayCount % 7) + 1;
+          const newWeekNumber = newDayInCycle === 1 ? (stateData.week_number || 1) + 1 : stateData.week_number;
+          
+          await supabase
+            .from("workout_of_day_state")
+            .update({ 
+              day_count: newDayCount,
+              week_number: newWeekNumber,
+              used_stars_in_week: newDayInCycle === 1 ? {} : stateData.used_stars_in_week,
+              last_generated_at: new Date().toISOString(),
+              current_category: CATEGORY_CYCLE_7DAY[newDayInCycle - 1]
+            })
+            .eq("id", stateData.id);
+          
+          logStep("Day count incremented despite skip (pre-gen)", { 
+            oldDayCount: stateData.day_count, 
+            newDayCount 
+          });
+        }
+        
+        return new Response(
+          JSON.stringify({ 
+            success: true, 
+            skipped: true, 
+            message: "WODs were pre-generated for today, day_count incremented",
+            existingWODs: preGenForToday 
+          }),
+          { headers: { ...corsHeaders, "Content-Type": "application/json" }, status: 200 }
+        );
+      }
+      
+      // Then check for same-day created WODs
+      const todayStart = new Date(today.getFullYear(), today.getMonth(), today.getDate()).toISOString();
+      const todayEnd = new Date(today.getFullYear(), today.getMonth(), today.getDate() + 1).toISOString();
+      
+      const { data: existingTodayWODs } = await supabase
+        .from("admin_workouts")
+        .select("id, name, category")
+        .eq("is_workout_of_day", true)
+        .is("generated_for_date", null) // Only check non-pre-generated WODs
+        .gte("created_at", todayStart)
+        .lt("created_at", todayEnd);
+      
+      if (existingTodayWODs && existingTodayWODs.length >= 2) {
+        logStep("SKIPPING: Today's WODs already exist", { count: existingTodayWODs.length, wods: existingTodayWODs });
+        return new Response(
+          JSON.stringify({ 
+            success: true, 
+            skipped: true, 
+            message: "Today's WODs already generated",
+            existingWODs: existingTodayWODs 
+          }),
+          { headers: { ...corsHeaders, "Content-Type": "application/json" }, status: 200 }
+        );
+      }
     }
 
     // Get current state
@@ -614,7 +721,7 @@ RESPONSE FORMAT (JSON ONLY - NO MARKDOWN):
       const stripePriceId = stripePrice.id;
       logStep(`${equipment} Stripe product created`, { productId: stripeProductId });
 
-      // Insert workout
+      // Insert workout with generated_for_date for pre-generation tracking
       const { error: insertError } = await supabase
         .from("admin_workouts")
         .insert({
@@ -640,7 +747,8 @@ RESPONSE FORMAT (JSON ONLY - NO MARKDOWN):
           is_workout_of_day: true,
           is_ai_generated: true,
           is_visible: true,
-          serial_number: null
+          serial_number: null,
+          generated_for_date: isPreGeneration ? effectiveDate : null
         });
 
       if (insertError) {
@@ -664,10 +772,10 @@ RESPONSE FORMAT (JSON ONLY - NO MARKDOWN):
     // Update used stars tracking
     const newUsedStarsInWeek = { ...usedStarsInWeek, [String(selectedDifficulty.stars)]: true };
     
-    // Remove used override if any
+    // Remove used override if any (for the effective date, not just today)
     const newManualOverrides = { ...manualOverrides };
-    if (newManualOverrides[todayStr]) {
-      delete newManualOverrides[todayStr];
+    if (newManualOverrides[effectiveDate]) {
+      delete newManualOverrides[effectiveDate];
     }
     
     // Calculate new week number (increment if completing day 7)
