@@ -12,6 +12,7 @@ import { useWorkoutInteractions } from "@/hooks/useWorkoutInteractions";
 import { supabase } from "@/integrations/supabase/client";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { WODTimeline } from "@/components/WODTimeline";
+import { WODCycleCalendar } from "@/components/WODCycleCalendar";
 const WODCategory = () => {
   const navigate = useNavigate();
   const [userId, setUserId] = useState<string | undefined>();
@@ -228,6 +229,9 @@ const WODCategory = () => {
 
               {/* Yesterday/Today/Tomorrow Timeline */}
               <WODTimeline />
+
+              {/* 7-Day Periodization Cycle Calendar */}
+              <WODCycleCalendar />
 
               {/* Two WOD Cards Side by Side */}
               {bodyweightWOD || equipmentWOD ? <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
