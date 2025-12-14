@@ -89,9 +89,16 @@ export const WODManager = () => {
 
       if (error) throw error;
 
-      toast.success("Workout of the Day generated successfully!", {
-        description: `${data.name} - ${data.category}`,
-      });
+      // Check if WOD was skipped (already exists for today)
+      if (data?.skipped) {
+        toast.info("WOD already exists for today", {
+          description: "No new WOD generated - use Edit to modify the current one",
+        });
+      } else {
+        toast.success("Workout of the Day generated successfully!", {
+          description: `${data?.name || 'New WOD'} - ${data?.category || 'Generated'}`,
+        });
+      }
 
       // Refresh all queries
       queryClient.invalidateQueries({ queryKey: ["wod-state"] });
@@ -407,15 +414,36 @@ export const WODManager = () => {
       </div>
 
       {/* Current WOD */}
-      {currentWOD && (
-        <Card className="border-primary/50">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2 text-primary">
-              <Flame className="h-5 w-5" />
-              Current Workout of the Day
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
+      <Card className="border-primary/50">
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2 text-primary">
+            <Flame className="h-5 w-5" />
+            Current Workout of the Day
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          {wodLoading ? (
+            <div className="flex items-center gap-4">
+              <Skeleton className="w-48 h-32 rounded-lg" />
+              <div className="flex-1 space-y-2">
+                <Skeleton className="h-6 w-48" />
+                <Skeleton className="h-4 w-32" />
+                <Skeleton className="h-4 w-full" />
+              </div>
+            </div>
+          ) : !currentWOD ? (
+            <div className="text-center py-8 space-y-4">
+              <div className="flex justify-center">
+                <Flame className="h-12 w-12 text-muted-foreground/50" />
+              </div>
+              <div>
+                <p className="text-muted-foreground font-medium">No Active WOD</p>
+                <p className="text-sm text-muted-foreground">
+                  Click "Generate New WOD" above to create today's workout
+                </p>
+              </div>
+            </div>
+          ) : (
             <div className="flex flex-col md:flex-row gap-4">
               {currentWOD.image_url && (
                 <img 
@@ -461,9 +489,9 @@ export const WODManager = () => {
                 </div>
               </div>
             </div>
-          </CardContent>
-        </Card>
-      )}
+          )}
+        </CardContent>
+      </Card>
 
       {/* Generation History */}
       <Card>
