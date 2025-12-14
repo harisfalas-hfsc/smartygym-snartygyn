@@ -35,48 +35,56 @@ const EMAIL_OPTIONS = [
     key: "email_wod" as keyof EmailPreferences,
     label: "Workout of the Day",
     description: "Daily WOD delivered to your inbox every morning",
+    timing: "Sent daily at 7:00 AM",
     icon: Dumbbell,
   },
   {
     key: "email_ritual" as keyof EmailPreferences,
     label: "Smarty Ritual",
     description: "Daily morning, midday, and evening ritual notifications",
+    timing: "Sent daily at 7:05 AM",
     icon: Sun,
   },
   {
     key: "email_monday_motivation" as keyof EmailPreferences,
     label: "Monday Motivation",
     description: "Weekly motivational message every Monday",
+    timing: "Sent every Monday at 10:00 AM",
     icon: Zap,
   },
   {
     key: "email_new_workout" as keyof EmailPreferences,
     label: "New Workouts",
     description: "Get notified when new workouts are added",
+    timing: "Sent within 5 minutes of publication",
     icon: Plus,
   },
   {
     key: "email_new_program" as keyof EmailPreferences,
     label: "New Training Programs",
     description: "Get notified when new programs are added",
+    timing: "Sent within 5 minutes of publication",
     icon: BookOpen,
   },
   {
     key: "email_new_article" as keyof EmailPreferences,
     label: "New Blog Articles",
     description: "Get notified when new articles are published",
+    timing: "Sent within 5 minutes of publication",
     icon: FileText,
   },
   {
     key: "email_weekly_activity" as keyof EmailPreferences,
     label: "Weekly Activity Report",
     description: "Your weekly fitness activity summary every Monday",
+    timing: "Sent every Monday at 10:00 AM",
     icon: BarChart3,
   },
   {
     key: "email_checkin_reminders" as keyof EmailPreferences,
     label: "Check-in Reminders",
     description: "Morning and evening check-in reminders",
+    timing: "Sent at 8:00 AM & 8:00 PM daily",
     icon: Bell,
   },
 ];
@@ -214,6 +222,9 @@ export const EmailSubscriptionManager = () => {
                   </Label>
                   <p className="text-xs text-muted-foreground">
                     {option.description}
+                  </p>
+                  <p className="text-xs text-primary font-medium">
+                    {option.timing}
                   </p>
                 </div>
               </div>

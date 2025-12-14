@@ -45,10 +45,10 @@ serve(async (req: Request) => {
       throw profilesError;
     }
 
-    // Filter users with checkin_reminders enabled
+    // Filter users with checkin_reminders enabled (check both old and new preference keys)
     const subscribedUsers = profiles?.filter(p => {
       const prefs = p.notification_preferences as Record<string, boolean>;
-      return prefs?.checkin_reminders === true;
+      return prefs?.checkin_reminders === true || prefs?.email_checkin_reminders === true;
     }) || [];
 
     console.log(`Found ${subscribedUsers.length} users subscribed to check-in reminders`);
