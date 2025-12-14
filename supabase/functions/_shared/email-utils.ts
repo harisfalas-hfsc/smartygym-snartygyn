@@ -3,12 +3,24 @@
  * Provides email deliverability improvements including proper headers, footers, and HTML conversion
  */
 
+// Email type mapping for specific unsubscribe links
+export type EmailType = 
+  | 'wod' 
+  | 'ritual' 
+  | 'monday_motivation' 
+  | 'new_workout' 
+  | 'new_program' 
+  | 'new_article' 
+  | 'weekly_activity' 
+  | 'checkin_reminders';
+
 /**
  * Generates email headers for improved deliverability
  * Includes List-Unsubscribe for one-click unsubscribe support (required by Gmail/Yahoo)
  */
-export function getEmailHeaders(userEmail: string): Record<string, string> {
-  const unsubscribeUrl = `https://smartygym.com/unsubscribe?email=${encodeURIComponent(userEmail)}`;
+export function getEmailHeaders(userEmail: string, emailType?: EmailType): Record<string, string> {
+  const typeParam = emailType ? `&type=${emailType}` : '';
+  const unsubscribeUrl = `https://smartygym.com/unsubscribe?email=${encodeURIComponent(userEmail)}${typeParam}`;
   return {
     "List-Unsubscribe": `<${unsubscribeUrl}>, <mailto:unsubscribe@smartygym.com?subject=Unsubscribe>`,
     "List-Unsubscribe-Post": "List-Unsubscribe=One-Click",
@@ -21,8 +33,11 @@ export function getEmailHeaders(userEmail: string): Record<string, string> {
  * Generates a professional email footer with physical address and unsubscribe link
  * Required for CAN-SPAM and GDPR compliance
  */
-export function getEmailFooter(userEmail: string): string {
-  const unsubscribeUrl = `https://smartygym.com/unsubscribe?email=${encodeURIComponent(userEmail)}`;
+export function getEmailFooter(userEmail: string, emailType?: EmailType): string {
+  const typeParam = emailType ? `&type=${emailType}` : '';
+  const unsubscribeUrl = `https://smartygym.com/unsubscribe?email=${encodeURIComponent(userEmail)}${typeParam}`;
+  const manageUrl = `https://smartygym.com/userdashboard?tab=messages`;
+  
   return `
     <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="margin-top: 32px;">
       <tr>
@@ -32,9 +47,9 @@ export function getEmailFooter(userEmail: string): string {
             Designed by Haris Falas, Sports Scientist (CSCS Certified)
           </p>
           <p style="font-size: 12px; color: #999999; line-height: 1.5; margin: 0; text-align: center;">
-            <a href="${unsubscribeUrl}" style="color: #999999; text-decoration: underline;">Unsubscribe</a> · 
-            <a href="https://smartygym.com/privacy-policy" style="color: #999999; text-decoration: underline;">Privacy Policy</a> · 
-            <a href="https://smartygym.com/userdashboard" style="color: #999999; text-decoration: underline;">Notification Settings</a>
+            <a href="${unsubscribeUrl}" style="color: #999999; text-decoration: underline;">Unsubscribe from this email</a> · 
+            <a href="${manageUrl}" style="color: #999999; text-decoration: underline;">Manage all preferences</a> · 
+            <a href="https://smartygym.com/privacy-policy" style="color: #999999; text-decoration: underline;">Privacy Policy</a>
           </p>
         </td>
       </tr>
@@ -130,10 +145,11 @@ export function wrapInEmailTemplateWithFooter(
   content: string, 
   userEmail: string,
   ctaUrl?: string, 
-  ctaText?: string
+  ctaText?: string,
+  emailType?: EmailType
 ): string {
   const emailContent = convertTiptapToEmailHtml(content);
-  const footer = getEmailFooter(userEmail);
+  const footer = getEmailFooter(userEmail, emailType);
   
   let ctaButton = '';
   if (ctaUrl && ctaText) {
@@ -184,9 +200,10 @@ export function buildCompleteEmailHtml(
   title: string,
   bodyContent: string,
   userEmail: string,
-  buttons?: { text: string; url: string }[]
+  buttons?: { text: string; url: string }[],
+  emailType?: EmailType
 ): string {
-  const footer = getEmailFooter(userEmail);
+  const footer = getEmailFooter(userEmail, emailType);
   
   const buttonHtml = buttons?.map(btn => `
     <a href="${btn.url}" style="display: inline-block; background: linear-gradient(135deg, #29B6D2, #5CD3E8); color: #ffffff; padding: 14px 28px; text-decoration: none; border-radius: 8px; font-weight: bold; font-size: 16px; margin-right: 10px; margin-bottom: 10px;">${btn.text}</a>
@@ -228,4 +245,29 @@ export function buildCompleteEmailHtml(
     </body>
     </html>
   `;
+}
+
+/**
+ * Checks if user has opted out of a specific email type
+ * Returns true if user should NOT receive this email type
+ */
+export function isOptedOut(
+  prefs: Record<string, any> | null | undefined,
+  emailType: EmailType
+): boolean {
+  if (!prefs) return false;
+  
+  // Check global opt-out first
+  if (prefs.opt_out_all === true) return true;
+  
+  // Map email type to preference key
+  const prefKey = `email_${emailType}`;
+  
+  // If preference is explicitly set to false, user is opted out
+  if (prefs[prefKey] === false) return true;
+  
+  // Legacy support for checkin_reminders
+  if (emailType === 'checkin_reminders' && prefs.checkin_reminders === false) return true;
+  
+  return false;
 }

@@ -6,13 +6,37 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
+// Email type mapping for preference keys
+const EMAIL_TYPE_TO_PREF_KEY: Record<string, string> = {
+  wod: "email_wod",
+  ritual: "email_ritual",
+  monday_motivation: "email_monday_motivation",
+  new_workout: "email_new_workout",
+  new_program: "email_new_program",
+  new_article: "email_new_article",
+  weekly_activity: "email_weekly_activity",
+  checkin_reminders: "email_checkin_reminders",
+};
+
+// Friendly names for email types
+const EMAIL_TYPE_NAMES: Record<string, string> = {
+  wod: "Workout of the Day",
+  ritual: "Smarty Ritual",
+  monday_motivation: "Monday Motivation",
+  new_workout: "New Workout Notifications",
+  new_program: "New Training Program Notifications",
+  new_article: "New Blog Article Notifications",
+  weekly_activity: "Weekly Activity Report",
+  checkin_reminders: "Check-in Reminders",
+};
+
 serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
   }
 
   try {
-    const { email } = await req.json();
+    const { email, type } = await req.json();
 
     if (!email) {
       return new Response(
@@ -21,7 +45,10 @@ serve(async (req) => {
       );
     }
 
-    console.log(`[UNSUBSCRIBE] Processing unsubscribe for: ${email}`);
+    const emailType = type as string | undefined;
+    const isTypeSpecific = emailType && EMAIL_TYPE_TO_PREF_KEY[emailType];
+
+    console.log(`[UNSUBSCRIBE] Processing ${isTypeSpecific ? `type-specific (${emailType})` : 'global'} unsubscribe for: ${email}`);
 
     const supabaseAdmin = createClient(
       Deno.env.get("SUPABASE_URL") ?? "",
@@ -77,22 +104,84 @@ serve(async (req) => {
 
     const currentPrefs = (profile?.notification_preferences as Record<string, any>) || {};
     
-    // Check if already unsubscribed
+    // Handle type-specific unsubscribe
+    if (isTypeSpecific) {
+      const prefKey = EMAIL_TYPE_TO_PREF_KEY[emailType];
+      
+      // Check if already unsubscribed from this type
+      if (currentPrefs[prefKey] === false) {
+        console.log(`[UNSUBSCRIBE] User already unsubscribed from ${emailType}: ${email}`);
+        return new Response(
+          JSON.stringify({ 
+            success: true, 
+            already_unsubscribed: true,
+            type: emailType,
+            type_name: EMAIL_TYPE_NAMES[emailType]
+          }),
+          { headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        );
+      }
+
+      // Update only the specific preference
+      const updatedPrefs = {
+        ...currentPrefs,
+        [prefKey]: false,
+        [`${prefKey}_unsubscribed_at`]: new Date().toISOString(),
+      };
+
+      // Also update legacy field for checkin_reminders
+      if (emailType === 'checkin_reminders') {
+        updatedPrefs.checkin_reminders = false;
+      }
+
+      const { error: updateError } = await supabaseAdmin
+        .from("profiles")
+        .update({ notification_preferences: updatedPrefs })
+        .eq("user_id", user.id);
+
+      if (updateError) {
+        console.error("[UNSUBSCRIBE] Error updating preferences:", updateError);
+        throw updateError;
+      }
+
+      console.log(`[UNSUBSCRIBE] User unsubscribed from ${emailType}: ${email}`);
+
+      return new Response(
+        JSON.stringify({ 
+          success: true,
+          type: emailType,
+          type_name: EMAIL_TYPE_NAMES[emailType]
+        }),
+        { headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
+    // Handle global unsubscribe (no type specified)
+    // Check if already unsubscribed from all
     if (currentPrefs.opt_out_all === true) {
-      console.log(`[UNSUBSCRIBE] User already unsubscribed: ${email}`);
+      console.log(`[UNSUBSCRIBE] User already unsubscribed from all: ${email}`);
       return new Response(
         JSON.stringify({ success: true, already_unsubscribed: true }),
         { headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
 
-    // Update preferences to opt out
+    // Update preferences to opt out of all
     const updatedPrefs = {
       ...currentPrefs,
       opt_out_all: true,
       email_notifications: false,
       newsletter: false,
       promotional_emails: false,
+      email_wod: false,
+      email_ritual: false,
+      email_monday_motivation: false,
+      email_new_workout: false,
+      email_new_program: false,
+      email_new_article: false,
+      email_weekly_activity: false,
+      email_checkin_reminders: false,
+      checkin_reminders: false,
       unsubscribed_at: new Date().toISOString(),
     };
 
@@ -115,7 +204,7 @@ serve(async (req) => {
         renewal_reminders: false,
       }, { onConflict: "user_id" });
 
-    console.log(`[UNSUBSCRIBE] User unsubscribed successfully: ${email}`);
+    console.log(`[UNSUBSCRIBE] User unsubscribed from all: ${email}`);
 
     return new Response(
       JSON.stringify({ success: true }),
