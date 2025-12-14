@@ -3,14 +3,19 @@ import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 import { LineChart, Line, BarChart, Bar, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from "recharts";
-import { Globe, Monitor, Smartphone, Tablet, Eye, TrendingUp, Download } from "lucide-react";
+import { Globe, Monitor, Smartphone, Tablet, Eye, TrendingUp, TrendingDown, Download, RefreshCw, FileText, Calendar as CalendarIcon, ArrowUpRight, ArrowDownRight, Minus } from "lucide-react";
 import { toast } from "sonner";
-import { ChartFilterBar } from "./ChartFilterBar";
+import { Calendar } from "@/components/ui/calendar";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { format, subDays } from "date-fns";
 import html2canvas from "html2canvas";
+import { cn } from "@/lib/utils";
 
 interface PageViewData {
   page: string;
+  fullPage?: string;
   views: number;
   percentage: number;
 }
@@ -23,6 +28,7 @@ interface DeviceData {
 
 interface TrafficSourceData {
   source: string;
+  rawSource?: string;
   visits: number;
   signups: number;
   conversionRate: number;
@@ -30,30 +36,53 @@ interface TrafficSourceData {
 
 interface DailyVisitorData {
   date: string;
+  fullDate: string;
   visits: number;
   uniqueSessions: number;
 }
 
+interface PeriodSummary {
+  totalVisits: number;
+  uniqueSessions: number;
+  avgEventsPerSession: number;
+  bounceRate: number;
+  prevTotalVisits: number;
+  prevUniqueSessions: number;
+  prevAvgEventsPerSession: number;
+  prevBounceRate: number;
+}
+
 export function WebsiteAnalytics() {
+  // Unified filters at top
   const [timeFilter, setTimeFilter] = useState("30");
   const [sourceFilter, setSourceFilter] = useState("all");
+  const [deviceFilter, setDeviceFilter] = useState("all");
   const [customStartDate, setCustomStartDate] = useState<Date>();
   const [customEndDate, setCustomEndDate] = useState<Date>();
+  
   const [loading, setLoading] = useState(true);
-  const [totalVisitors, setTotalVisitors] = useState(0);
-  const [uniqueSessions, setUniqueSessions] = useState(0);
+  const [periodSummary, setPeriodSummary] = useState<PeriodSummary>({
+    totalVisits: 0,
+    uniqueSessions: 0,
+    avgEventsPerSession: 0,
+    bounceRate: 0,
+    prevTotalVisits: 0,
+    prevUniqueSessions: 0,
+    prevAvgEventsPerSession: 0,
+    prevBounceRate: 0,
+  });
   const [pageViews, setPageViews] = useState<PageViewData[]>([]);
   const [deviceData, setDeviceData] = useState<DeviceData[]>([]);
   const [trafficSources, setTrafficSources] = useState<TrafficSourceData[]>([]);
   const [dailyVisitors, setDailyVisitors] = useState<DailyVisitorData[]>([]);
-  const [avgPagesPerSession, setAvgPagesPerSession] = useState(0);
   const [availableSources, setAvailableSources] = useState<string[]>([]);
-  const chartRef = useRef<HTMLDivElement>(null);
-  const tableRef = useRef<HTMLDivElement>(null);
+  const [availableDevices, setAvailableDevices] = useState<string[]>([]);
+  
+  const reportRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     fetchWebsiteAnalytics();
-  }, [timeFilter, sourceFilter, customStartDate, customEndDate]);
+  }, [timeFilter, sourceFilter, deviceFilter, customStartDate, customEndDate]);
 
   const getDateRange = () => {
     const endDate = new Date();
@@ -63,16 +92,28 @@ export function WebsiteAnalytics() {
       return { startDate: customStartDate, endDate: customEndDate };
     }
 
-    startDate.setDate(startDate.getDate() - parseInt(timeFilter));
+    const days = parseInt(timeFilter);
+    startDate.setDate(startDate.getDate() - days);
     return { startDate, endDate };
+  };
+
+  const getPreviousPeriodRange = () => {
+    const { startDate, endDate } = getDateRange();
+    const periodLength = Math.ceil((endDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24));
+    const prevEndDate = new Date(startDate);
+    prevEndDate.setDate(prevEndDate.getDate() - 1);
+    const prevStartDate = new Date(prevEndDate);
+    prevStartDate.setDate(prevStartDate.getDate() - periodLength);
+    return { prevStartDate, prevEndDate };
   };
 
   const fetchWebsiteAnalytics = async () => {
     try {
       setLoading(true);
       const { startDate, endDate } = getDateRange();
+      const { prevStartDate, prevEndDate } = getPreviousPeriodRange();
 
-      // Fetch all website analytics data
+      // Build query with filters - exclude admin/preview traffic
       let query = supabase
         .from("social_media_analytics")
         .select("*")
@@ -80,33 +121,84 @@ export function WebsiteAnalytics() {
         .lte("created_at", endDate.toISOString())
         .order("created_at", { ascending: true });
 
+      // Exclude preview/sandbox visits (Lovable preview iframe)
+      query = query.not("browser_info", "ilike", "%lovable%");
+      
       if (sourceFilter !== "all") {
         query = query.eq("referral_source", sourceFilter);
       }
+      if (deviceFilter !== "all") {
+        query = query.eq("device_type", deviceFilter);
+      }
 
       const { data: analyticsData, error } = await query;
-
       if (error) throw error;
 
-      // Get all unique sources for the filter dropdown
+      // Fetch previous period data for comparison
+      let prevQuery = supabase
+        .from("social_media_analytics")
+        .select("*")
+        .gte("created_at", prevStartDate.toISOString())
+        .lte("created_at", prevEndDate.toISOString())
+        .not("browser_info", "ilike", "%lovable%");
+
+      if (sourceFilter !== "all") {
+        prevQuery = prevQuery.eq("referral_source", sourceFilter);
+      }
+      if (deviceFilter !== "all") {
+        prevQuery = prevQuery.eq("device_type", deviceFilter);
+      }
+
+      const { data: prevData } = await prevQuery;
+
+      // Get available filters
       const { data: allSourcesData } = await supabase
         .from("social_media_analytics")
-        .select("referral_source")
+        .select("referral_source, device_type")
         .gte("created_at", startDate.toISOString())
         .lte("created_at", endDate.toISOString());
       
-      const uniqueSources = [...new Set(allSourcesData?.map(d => d.referral_source) || [])].sort();
+      const uniqueSources = [...new Set(allSourcesData?.map(d => d.referral_source) || [])].filter(Boolean).sort();
+      const uniqueDevices = [...new Set(allSourcesData?.map(d => d.device_type) || [])].filter(Boolean).sort();
       setAvailableSources(uniqueSources);
+      setAvailableDevices(uniqueDevices);
 
-      // Total visitors (visits)
+      // Calculate current period metrics
       const visits = analyticsData?.filter(d => d.event_type === "visit") || [];
-      setTotalVisitors(visits.length);
-
-      // Unique sessions
       const uniqueSessionIds = new Set(analyticsData?.map(d => d.session_id));
-      setUniqueSessions(uniqueSessionIds.size);
+      const allEvents = analyticsData?.length || 0;
+      const sessionsCount = uniqueSessionIds.size || 1;
+      const singleEventSessions = analyticsData 
+        ? new Set(analyticsData.filter((_, i, arr) => 
+            arr.filter(a => a.session_id === analyticsData[i].session_id).length === 1
+          ).map(d => d.session_id)).size
+        : 0;
+      const bounceRate = uniqueSessionIds.size > 0 ? Math.round((singleEventSessions / uniqueSessionIds.size) * 100) : 0;
 
-      // Page views by landing page
+      // Calculate previous period metrics
+      const prevVisits = prevData?.filter(d => d.event_type === "visit") || [];
+      const prevUniqueSessionIds = new Set(prevData?.map(d => d.session_id));
+      const prevAllEvents = prevData?.length || 0;
+      const prevSessionsCount = prevUniqueSessionIds.size || 1;
+      const prevSingleEventSessions = prevData 
+        ? new Set(prevData.filter((_, i, arr) => 
+            arr.filter(a => a.session_id === prevData[i].session_id).length === 1
+          ).map(d => d.session_id)).size
+        : 0;
+      const prevBounceRate = prevUniqueSessionIds.size > 0 ? Math.round((prevSingleEventSessions / prevUniqueSessionIds.size) * 100) : 0;
+
+      setPeriodSummary({
+        totalVisits: visits.length,
+        uniqueSessions: uniqueSessionIds.size,
+        avgEventsPerSession: Math.round((allEvents / sessionsCount) * 10) / 10,
+        bounceRate,
+        prevTotalVisits: prevVisits.length,
+        prevUniqueSessions: prevUniqueSessionIds.size,
+        prevAvgEventsPerSession: Math.round((prevAllEvents / prevSessionsCount) * 10) / 10,
+        prevBounceRate,
+      });
+
+      // Page views
       const pageViewCounts: { [key: string]: number } = {};
       visits.forEach(v => {
         const page = v.landing_page || "/";
@@ -116,7 +208,7 @@ export function WebsiteAnalytics() {
       const totalPageViews = Object.values(pageViewCounts).reduce((a, b) => a + b, 0);
       const pageViewsData = Object.entries(pageViewCounts)
         .map(([page, views]) => ({
-          page: page.length > 25 ? page.substring(0, 25) + "..." : page,
+          page: page.length > 30 ? page.substring(0, 30) + "..." : page,
           fullPage: page,
           views,
           percentage: totalPageViews > 0 ? Math.round((views / totalPageViews) * 100) : 0
@@ -142,15 +234,16 @@ export function WebsiteAnalytics() {
         .sort((a, b) => b.count - a.count);
       setDeviceData(deviceDataArray);
 
-      // Traffic sources (use all data, not filtered by source for this view)
-      const { data: allData } = await supabase
+      // Traffic sources - fetch unfiltered to show all sources
+      const { data: allTrafficData } = await supabase
         .from("social_media_analytics")
         .select("*")
         .gte("created_at", startDate.toISOString())
-        .lte("created_at", endDate.toISOString());
+        .lte("created_at", endDate.toISOString())
+        .not("browser_info", "ilike", "%lovable%");
 
       const sourceCounts: { [key: string]: { visits: number; signups: number } } = {};
-      allData?.forEach(d => {
+      allTrafficData?.forEach(d => {
         const source = d.referral_source || "direct";
         if (!sourceCounts[source]) {
           sourceCounts[source] = { visits: 0, signups: 0 };
@@ -171,30 +264,28 @@ export function WebsiteAnalytics() {
       setTrafficSources(trafficSourcesData);
 
       // Daily visitors trend
-      const dailyStats: { [key: string]: { visits: number; sessions: Set<string> } } = {};
+      const dailyStats: { [key: string]: { visits: number; sessions: Set<string>; fullDate: string } } = {};
       analyticsData?.forEach(d => {
-        const date = new Date(d.created_at).toLocaleDateString("en-US", { month: "short", day: "numeric" });
-        if (!dailyStats[date]) {
-          dailyStats[date] = { visits: 0, sessions: new Set() };
+        const dateObj = new Date(d.created_at);
+        const dateKey = format(dateObj, "MMM d");
+        const fullDate = format(dateObj, "MMMM d, yyyy");
+        if (!dailyStats[dateKey]) {
+          dailyStats[dateKey] = { visits: 0, sessions: new Set(), fullDate };
         }
         if (d.event_type === "visit") {
-          dailyStats[date].visits++;
+          dailyStats[dateKey].visits++;
         }
-        dailyStats[date].sessions.add(d.session_id);
+        dailyStats[dateKey].sessions.add(d.session_id);
       });
       
       const dailyData = Object.entries(dailyStats)
         .map(([date, data]) => ({
           date,
+          fullDate: data.fullDate,
           visits: data.visits,
           uniqueSessions: data.sessions.size
         }));
       setDailyVisitors(dailyData);
-
-      // Average pages per session
-      const allEvents = analyticsData?.length || 0;
-      const sessionsCount = uniqueSessionIds.size || 1;
-      setAvgPagesPerSession(Math.round((allEvents / sessionsCount) * 10) / 10);
 
     } catch (error) {
       console.error("Error fetching website analytics:", error);
@@ -210,8 +301,8 @@ export function WebsiteAnalytics() {
       'google': 'Google (Organic)',
       'bing': 'Bing (Organic)',
       'yahoo': 'Yahoo (Organic)',
-      'duckduckgo': 'DuckDuckGo (Organic)',
-      'ecosia': 'Ecosia (Organic)',
+      'duckduckgo': 'DuckDuckGo',
+      'ecosia': 'Ecosia',
       'facebook': 'Facebook',
       'instagram': 'Instagram',
       'twitter': 'Twitter/X',
@@ -223,26 +314,79 @@ export function WebsiteAnalytics() {
     return sourceMap[source.toLowerCase()] || source.charAt(0).toUpperCase() + source.slice(1);
   };
 
-  const handleExport = async () => {
-    if (!chartRef.current) return;
+  const exportFullReport = async () => {
+    if (!reportRef.current) return;
     try {
-      const canvas = await html2canvas(chartRef.current, { backgroundColor: "#ffffff", scale: 2 });
+      toast.loading("Generating report...");
+      const canvas = await html2canvas(reportRef.current, { 
+        backgroundColor: "#ffffff", 
+        scale: 2,
+        logging: false,
+        useCORS: true 
+      });
       const link = document.createElement("a");
-      link.download = `website-analytics-${new Date().toISOString().split("T")[0]}.png`;
+      link.download = `website-analytics-report-${format(new Date(), "yyyy-MM-dd")}.png`;
       link.href = canvas.toDataURL("image/png");
       link.click();
-      toast.success("Chart exported!");
+      toast.dismiss();
+      toast.success("Full report exported!");
     } catch (error) {
-      toast.error("Failed to export chart");
+      toast.dismiss();
+      toast.error("Failed to export report");
     }
   };
 
-  const exportTableAsCSV = (data: any[], filename: string) => {
+  const exportAllDataAsCSV = () => {
+    // Combine all data into one comprehensive CSV
+    const rows: string[] = [];
+    
+    // Summary section
+    rows.push("=== PERIOD SUMMARY ===");
+    rows.push(`Total Visits,${periodSummary.totalVisits}`);
+    rows.push(`Unique Sessions,${periodSummary.uniqueSessions}`);
+    rows.push(`Avg Events/Session,${periodSummary.avgEventsPerSession}`);
+    rows.push(`Bounce Rate,${periodSummary.bounceRate}%`);
+    rows.push("");
+    
+    // Daily visitors
+    rows.push("=== DAILY VISITORS ===");
+    rows.push("Date,Visits,Unique Sessions");
+    dailyVisitors.forEach(d => rows.push(`${d.fullDate},${d.visits},${d.uniqueSessions}`));
+    rows.push("");
+    
+    // Traffic sources
+    rows.push("=== TRAFFIC SOURCES ===");
+    rows.push("Source,Visits,Signups,Conversion Rate");
+    trafficSources.forEach(s => rows.push(`${s.source},${s.visits},${s.signups},${s.conversionRate}%`));
+    rows.push("");
+    
+    // Pages
+    rows.push("=== TOP PAGES ===");
+    rows.push("Page,Views,Percentage");
+    pageViews.forEach(p => rows.push(`${p.fullPage || p.page},${p.views},${p.percentage}%`));
+    rows.push("");
+    
+    // Devices
+    rows.push("=== DEVICE DISTRIBUTION ===");
+    rows.push("Device,Count,Percentage");
+    deviceData.forEach(d => rows.push(`${d.device},${d.count},${d.percentage}%`));
+    
+    const blob = new Blob([rows.join("\n")], { type: "text/csv" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = `website-analytics-full-${format(new Date(), "yyyy-MM-dd")}.csv`;
+    link.click();
+    URL.revokeObjectURL(url);
+    toast.success("Full data exported as CSV!");
+  };
+
+  const exportSectionCSV = (data: any[], filename: string) => {
     if (data.length === 0) {
       toast.error("No data to export");
       return;
     }
-    const headers = Object.keys(data[0]).filter(k => k !== 'fullPage' && k !== 'rawSource');
+    const headers = Object.keys(data[0]).filter(k => !['fullPage', 'rawSource', 'fullDate'].includes(k));
     const csvContent = [
       headers.join(','),
       ...data.map(row => headers.map(h => `"${row[h]}"`).join(','))
@@ -252,10 +396,10 @@ export function WebsiteAnalytics() {
     const url = URL.createObjectURL(blob);
     const link = document.createElement('a');
     link.href = url;
-    link.download = `${filename}-${new Date().toISOString().split("T")[0]}.csv`;
+    link.download = `${filename}-${format(new Date(), "yyyy-MM-dd")}.csv`;
     link.click();
     URL.revokeObjectURL(url);
-    toast.success("Data exported as CSV!");
+    toast.success("Data exported!");
   };
 
   const COLORS = ["hsl(var(--primary))", "hsl(var(--chart-2))", "hsl(var(--chart-3))", "hsl(var(--chart-4))", "hsl(var(--chart-5))"];
@@ -269,6 +413,30 @@ export function WebsiteAnalytics() {
     }
   };
 
+  const getChangeIndicator = (current: number, previous: number) => {
+    const diff = current - previous;
+    const percentChange = previous > 0 ? Math.round((diff / previous) * 100) : (current > 0 ? 100 : 0);
+    
+    if (diff > 0) {
+      return (
+        <span className="flex items-center text-green-600 text-xs">
+          <ArrowUpRight className="h-3 w-3" />
+          +{percentChange}%
+        </span>
+      );
+    } else if (diff < 0) {
+      return (
+        <span className="flex items-center text-red-600 text-xs">
+          <ArrowDownRight className="h-3 w-3" />
+          {percentChange}%
+        </span>
+      );
+    }
+    return <span className="flex items-center text-muted-foreground text-xs"><Minus className="h-3 w-3" /> 0%</span>;
+  };
+
+  const { startDate, endDate } = getDateRange();
+
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
@@ -278,283 +446,357 @@ export function WebsiteAnalytics() {
   }
 
   return (
-    <div className="space-y-6" ref={chartRef}>
-      {/* Overview Cards */}
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total Visitors</CardTitle>
-            <Eye className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{totalVisitors.toLocaleString()}</div>
-            <p className="text-xs text-muted-foreground">Page visits tracked</p>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Unique Sessions</CardTitle>
-            <Globe className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{uniqueSessions.toLocaleString()}</div>
-            <p className="text-xs text-muted-foreground">Distinct user sessions</p>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Avg. Events/Session</CardTitle>
-            <TrendingUp className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{avgPagesPerSession}</div>
-            <p className="text-xs text-muted-foreground">Engagement depth</p>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Traffic Sources</CardTitle>
-            <TrendingUp className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{trafficSources.length}</div>
-            <p className="text-xs text-muted-foreground">Referral channels</p>
-          </CardContent>
-        </Card>
-      </div>
-
-      {/* Daily Visitors Chart with Filter */}
-      <Card>
-        <CardHeader className="pb-2">
-          <div className="flex flex-wrap justify-between items-start gap-2">
-            <div>
-              <CardTitle>Daily Visitors Trend</CardTitle>
-              <CardDescription>Visits and unique sessions over time</CardDescription>
+    <div className="space-y-6">
+      {/* ===== UNIFIED FILTER BAR ===== */}
+      <Card className="border-primary/20">
+        <CardContent className="pt-4">
+          <div className="flex flex-wrap items-center gap-3">
+            <div className="flex items-center gap-2">
+              <span className="text-sm font-medium text-muted-foreground">Period:</span>
+              <Select value={timeFilter} onValueChange={setTimeFilter}>
+                <SelectTrigger className="w-[120px] h-9">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="7">7 Days</SelectItem>
+                  <SelectItem value="30">30 Days</SelectItem>
+                  <SelectItem value="90">90 Days</SelectItem>
+                  <SelectItem value="180">6 Months</SelectItem>
+                  <SelectItem value="365">1 Year</SelectItem>
+                  <SelectItem value="custom">Custom</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
-            <div className="flex gap-2">
+
+            {timeFilter === "custom" && (
+              <div className="flex items-center gap-2">
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <Button variant="outline" size="sm" className="h-9">
+                      <CalendarIcon className="mr-2 h-3 w-3" />
+                      {customStartDate ? format(customStartDate, "MMM d") : "Start"}
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-auto p-0" align="start">
+                    <Calendar mode="single" selected={customStartDate} onSelect={setCustomStartDate} initialFocus className="pointer-events-auto" />
+                  </PopoverContent>
+                </Popover>
+                <span className="text-muted-foreground">→</span>
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <Button variant="outline" size="sm" className="h-9">
+                      <CalendarIcon className="mr-2 h-3 w-3" />
+                      {customEndDate ? format(customEndDate, "MMM d") : "End"}
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-auto p-0" align="start">
+                    <Calendar mode="single" selected={customEndDate} onSelect={setCustomEndDate} initialFocus className="pointer-events-auto" />
+                  </PopoverContent>
+                </Popover>
+              </div>
+            )}
+
+            <div className="flex items-center gap-2">
+              <span className="text-sm font-medium text-muted-foreground">Source:</span>
               <Select value={sourceFilter} onValueChange={setSourceFilter}>
-                <SelectTrigger className="w-[160px]">
-                  <SelectValue placeholder="All Sources" />
+                <SelectTrigger className="w-[140px] h-9">
+                  <SelectValue placeholder="All" />
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="all">All Sources</SelectItem>
                   {availableSources.map(source => (
-                    <SelectItem key={source} value={source}>
-                      {formatSourceName(source)}
-                    </SelectItem>
+                    <SelectItem key={source} value={source}>{formatSourceName(source)}</SelectItem>
                   ))}
                 </SelectContent>
               </Select>
             </div>
-          </div>
-        </CardHeader>
-        <CardContent>
-          <ChartFilterBar
-            timeFilter={timeFilter}
-            onTimeFilterChange={setTimeFilter}
-            customStartDate={customStartDate}
-            onStartDateChange={setCustomStartDate}
-            customEndDate={customEndDate}
-            onEndDateChange={setCustomEndDate}
-            onExport={handleExport}
-          />
-          <ResponsiveContainer width="100%" height={280}>
-            <LineChart data={dailyVisitors}>
-              <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
-              <XAxis dataKey="date" tick={{ fontSize: 11 }} />
-              <YAxis tick={{ fontSize: 11 }} />
-              <Tooltip contentStyle={{ backgroundColor: "hsl(var(--card))", border: "1px solid hsl(var(--border))" }} />
-              <Legend />
-              <Line type="monotone" dataKey="visits" name="Page Visits" stroke="hsl(var(--primary))" strokeWidth={2} dot={{ r: 3 }} />
-              <Line type="monotone" dataKey="uniqueSessions" name="Unique Sessions" stroke="hsl(var(--chart-2))" strokeWidth={2} dot={{ r: 3 }} />
-            </LineChart>
-          </ResponsiveContainer>
 
-          {/* Detailed Data Table */}
-          <div className="mt-4 border-t pt-4">
-            <div className="flex justify-between items-center mb-2">
-              <span className="text-sm font-medium">Daily Breakdown</span>
-              <Button variant="outline" size="sm" onClick={() => exportTableAsCSV(dailyVisitors, 'daily-visitors')}>
-                <Download className="h-3 w-3 mr-1" /> Export CSV
-              </Button>
-            </div>
-            <div className="max-h-[200px] overflow-y-auto">
-              <table className="w-full text-sm">
-                <thead className="sticky top-0 bg-background">
-                  <tr className="border-b">
-                    <th className="text-left py-2 px-2 font-medium">Date</th>
-                    <th className="text-right py-2 px-2 font-medium">Visits</th>
-                    <th className="text-right py-2 px-2 font-medium">Sessions</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {dailyVisitors.map((day, idx) => (
-                    <tr key={idx} className="border-b last:border-0">
-                      <td className="py-1.5 px-2">{day.date}</td>
-                      <td className="text-right py-1.5 px-2">{day.visits}</td>
-                      <td className="text-right py-1.5 px-2">{day.uniqueSessions}</td>
-                    </tr>
+            <div className="flex items-center gap-2">
+              <span className="text-sm font-medium text-muted-foreground">Device:</span>
+              <Select value={deviceFilter} onValueChange={setDeviceFilter}>
+                <SelectTrigger className="w-[120px] h-9">
+                  <SelectValue placeholder="All" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All Devices</SelectItem>
+                  {availableDevices.map(device => (
+                    <SelectItem key={device} value={device}>{device.charAt(0).toUpperCase() + device.slice(1)}</SelectItem>
                   ))}
-                </tbody>
-              </table>
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div className="flex items-center gap-2 ml-auto">
+              <Button variant="outline" size="sm" onClick={fetchWebsiteAnalytics} className="h-9">
+                <RefreshCw className="h-3 w-3 mr-1" /> Refresh
+              </Button>
+              <Button variant="default" size="sm" onClick={exportFullReport} className="h-9">
+                <FileText className="h-3 w-3 mr-1" /> Export Report
+              </Button>
+              <Button variant="outline" size="sm" onClick={exportAllDataAsCSV} className="h-9">
+                <Download className="h-3 w-3 mr-1" /> CSV
+              </Button>
             </div>
           </div>
         </CardContent>
       </Card>
 
-      <div className="grid gap-4 md:grid-cols-2">
-        {/* Top Pages */}
+      {/* ===== REPORT CONTENT ===== */}
+      <div ref={reportRef} className="space-y-6 bg-background p-4 rounded-lg">
+        {/* ===== PERIOD SUMMARY CARD ===== */}
+        <Card className="border-primary/30 bg-gradient-to-r from-primary/5 to-transparent">
+          <CardHeader className="pb-2">
+            <div className="flex justify-between items-center">
+              <div>
+                <CardTitle className="text-lg">Period Summary</CardTitle>
+                <CardDescription>
+                  {format(startDate, "MMMM d, yyyy")} — {format(endDate, "MMMM d, yyyy")}
+                </CardDescription>
+              </div>
+              <Badge variant="outline" className="text-xs">
+                vs. previous {timeFilter === "custom" ? "period" : `${timeFilter} days`}
+              </Badge>
+            </div>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+              <div className="text-center p-3 bg-background rounded-lg border">
+                <div className="text-2xl font-bold">{periodSummary.totalVisits.toLocaleString()}</div>
+                <div className="text-xs text-muted-foreground">Total Visits</div>
+                <div className="mt-1">{getChangeIndicator(periodSummary.totalVisits, periodSummary.prevTotalVisits)}</div>
+              </div>
+              <div className="text-center p-3 bg-background rounded-lg border">
+                <div className="text-2xl font-bold">{periodSummary.uniqueSessions.toLocaleString()}</div>
+                <div className="text-xs text-muted-foreground">Unique Sessions</div>
+                <div className="mt-1">{getChangeIndicator(periodSummary.uniqueSessions, periodSummary.prevUniqueSessions)}</div>
+              </div>
+              <div className="text-center p-3 bg-background rounded-lg border">
+                <div className="text-2xl font-bold">{periodSummary.avgEventsPerSession}</div>
+                <div className="text-xs text-muted-foreground">Avg Events/Session</div>
+                <div className="mt-1">{getChangeIndicator(periodSummary.avgEventsPerSession, periodSummary.prevAvgEventsPerSession)}</div>
+              </div>
+              <div className="text-center p-3 bg-background rounded-lg border">
+                <div className="text-2xl font-bold">{periodSummary.bounceRate}%</div>
+                <div className="text-xs text-muted-foreground">Bounce Rate</div>
+                <div className="mt-1">{getChangeIndicator(-periodSummary.bounceRate, -periodSummary.prevBounceRate)}</div>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* ===== SECTION 1: DAILY VISITORS TREND ===== */}
         <Card>
           <CardHeader className="pb-2">
             <div className="flex justify-between items-center">
               <div>
-                <CardTitle>Most Visited Pages</CardTitle>
-                <CardDescription>Top landing pages by visit count</CardDescription>
+                <CardTitle>Daily Visitors Trend</CardTitle>
+                <CardDescription>Visits and unique sessions over time</CardDescription>
               </div>
-              <Button variant="outline" size="sm" onClick={() => exportTableAsCSV(pageViews, 'page-views')}>
+              <Button variant="outline" size="sm" onClick={() => exportSectionCSV(dailyVisitors, 'daily-visitors')}>
                 <Download className="h-3 w-3 mr-1" /> CSV
               </Button>
             </div>
           </CardHeader>
           <CardContent>
-            <ResponsiveContainer width="100%" height={200}>
-              <BarChart data={pageViews} layout="vertical" barSize={10}>
+            <ResponsiveContainer width="100%" height={280}>
+              <LineChart data={dailyVisitors}>
                 <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
-                <XAxis type="number" tick={{ fontSize: 10 }} />
-                <YAxis type="category" dataKey="page" width={100} tick={{ fontSize: 9 }} />
+                <XAxis dataKey="date" tick={{ fontSize: 11 }} />
+                <YAxis tick={{ fontSize: 11 }} />
+                <Tooltip 
+                  contentStyle={{ backgroundColor: "hsl(var(--card))", border: "1px solid hsl(var(--border))" }}
+                  labelFormatter={(label, payload) => payload?.[0]?.payload?.fullDate || label}
+                />
+                <Legend />
+                <Line type="monotone" dataKey="visits" name="Page Visits" stroke="hsl(var(--primary))" strokeWidth={2} dot={{ r: 3 }} />
+                <Line type="monotone" dataKey="uniqueSessions" name="Unique Sessions" stroke="hsl(var(--chart-2))" strokeWidth={2} dot={{ r: 3 }} />
+              </LineChart>
+            </ResponsiveContainer>
+
+            {/* Data Table */}
+            <div className="mt-4 border-t pt-4">
+              <div className="text-sm font-medium mb-2">Daily Breakdown</div>
+              <div className="max-h-[200px] overflow-y-auto border rounded-lg">
+                <table className="w-full text-sm">
+                  <thead className="sticky top-0 bg-muted">
+                    <tr>
+                      <th className="text-left py-2 px-3 font-medium">Date</th>
+                      <th className="text-right py-2 px-3 font-medium">Visits</th>
+                      <th className="text-right py-2 px-3 font-medium">Sessions</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {dailyVisitors.map((day, idx) => (
+                      <tr key={idx} className="border-t">
+                        <td className="py-2 px-3">{day.fullDate}</td>
+                        <td className="text-right py-2 px-3 font-medium">{day.visits}</td>
+                        <td className="text-right py-2 px-3">{day.uniqueSessions}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* ===== SECTION 2: TRAFFIC SOURCES ===== */}
+        <Card>
+          <CardHeader className="pb-2">
+            <div className="flex justify-between items-center">
+              <div>
+                <CardTitle>Traffic Sources Performance</CardTitle>
+                <CardDescription>Visits, signups, and conversion rates by source</CardDescription>
+              </div>
+              <Button variant="outline" size="sm" onClick={() => exportSectionCSV(trafficSources, 'traffic-sources')}>
+                <Download className="h-3 w-3 mr-1" /> CSV
+              </Button>
+            </div>
+          </CardHeader>
+          <CardContent>
+            <ResponsiveContainer width="100%" height={220}>
+              <BarChart data={trafficSources} barSize={24}>
+                <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
+                <XAxis dataKey="source" tick={{ fontSize: 10 }} interval={0} angle={-15} textAnchor="end" height={60} />
+                <YAxis tick={{ fontSize: 10 }} />
                 <Tooltip contentStyle={{ backgroundColor: "hsl(var(--card))", border: "1px solid hsl(var(--border))" }} />
-                <Bar dataKey="views" name="Views" fill="hsl(var(--primary))" radius={[0, 4, 4, 0]} />
+                <Legend />
+                <Bar dataKey="visits" name="Visits" fill="hsl(var(--primary))" />
+                <Bar dataKey="signups" name="Signups" fill="hsl(var(--chart-2))" />
               </BarChart>
             </ResponsiveContainer>
-            
-            <div className="mt-3 space-y-1 border-t pt-3 max-h-[120px] overflow-y-auto">
-              {pageViews.map((page, idx) => (
-                <div key={idx} className="flex justify-between items-center text-xs">
-                  <span className="text-muted-foreground truncate max-w-[180px]">{page.page}</span>
-                  <span className="font-medium">{page.views} ({page.percentage}%)</span>
-                </div>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
 
-        {/* Device Breakdown */}
-        <Card>
-          <CardHeader className="pb-2">
-            <div className="flex justify-between items-center">
-              <div>
-                <CardTitle>Device Distribution</CardTitle>
-                <CardDescription>Visitors by device type</CardDescription>
+            {/* Data Table */}
+            <div className="mt-4 border-t pt-4">
+              <div className="text-sm font-medium mb-2">Source Breakdown</div>
+              <div className="border rounded-lg overflow-hidden">
+                <table className="w-full text-sm">
+                  <thead className="bg-muted">
+                    <tr>
+                      <th className="text-left py-2 px-3 font-medium">Source</th>
+                      <th className="text-right py-2 px-3 font-medium">Visits</th>
+                      <th className="text-right py-2 px-3 font-medium">Signups</th>
+                      <th className="text-right py-2 px-3 font-medium">Conversion</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {trafficSources.map((source, idx) => (
+                      <tr key={idx} className="border-t">
+                        <td className="py-2 px-3 font-medium">{source.source}</td>
+                        <td className="text-right py-2 px-3">{source.visits.toLocaleString()}</td>
+                        <td className="text-right py-2 px-3">{source.signups}</td>
+                        <td className="text-right py-2 px-3">
+                          <Badge variant={source.conversionRate > 5 ? "default" : "secondary"} className="text-xs">
+                            {source.conversionRate}%
+                          </Badge>
+                        </td>
+                      </tr>
+                    ))}
+                    <tr className="border-t bg-muted/50 font-medium">
+                      <td className="py-2 px-3">Total</td>
+                      <td className="text-right py-2 px-3">{trafficSources.reduce((sum, s) => sum + s.visits, 0).toLocaleString()}</td>
+                      <td className="text-right py-2 px-3">{trafficSources.reduce((sum, s) => sum + s.signups, 0)}</td>
+                      <td className="text-right py-2 px-3">
+                        {trafficSources.reduce((sum, s) => sum + s.visits, 0) > 0 
+                          ? Math.round((trafficSources.reduce((sum, s) => sum + s.signups, 0) / trafficSources.reduce((sum, s) => sum + s.visits, 0)) * 100)
+                          : 0}%
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
               </div>
-              <Button variant="outline" size="sm" onClick={() => exportTableAsCSV(deviceData, 'device-data')}>
-                <Download className="h-3 w-3 mr-1" /> CSV
-              </Button>
-            </div>
-          </CardHeader>
-          <CardContent>
-            <ResponsiveContainer width="100%" height={200}>
-              <PieChart>
-                <Pie
-                  data={deviceData}
-                  cx="50%"
-                  cy="50%"
-                  outerRadius={70}
-                  fill="hsl(var(--primary))"
-                  dataKey="count"
-                  label={({ device, percentage }) => `${device}: ${percentage}%`}
-                  labelLine={{ strokeWidth: 1 }}
-                >
-                  {deviceData.map((entry, index) => (
-                    <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                  ))}
-                </Pie>
-                <Tooltip contentStyle={{ backgroundColor: "hsl(var(--card))", border: "1px solid hsl(var(--border))" }} />
-              </PieChart>
-            </ResponsiveContainer>
-
-            <div className="mt-3 space-y-1 border-t pt-3">
-              {deviceData.map((device, idx) => (
-                <div key={idx} className="flex justify-between items-center text-xs">
-                  <span className="flex items-center gap-2 text-muted-foreground">
-                    {getDeviceIcon(device.device)}
-                    {device.device}
-                  </span>
-                  <span className="font-medium">{device.count} ({device.percentage}%)</span>
-                </div>
-              ))}
             </div>
           </CardContent>
         </Card>
-      </div>
 
-      {/* Traffic Sources with Full Details */}
-      <Card>
-        <CardHeader className="pb-2">
-          <div className="flex justify-between items-center">
-            <div>
-              <CardTitle>Traffic Sources Performance</CardTitle>
-              <CardDescription>Visits, signups, and conversion rates by source (including organic search)</CardDescription>
-            </div>
-            <Button variant="outline" size="sm" onClick={() => exportTableAsCSV(trafficSources, 'traffic-sources')}>
-              <Download className="h-3 w-3 mr-1" /> Export CSV
-            </Button>
-          </div>
-        </CardHeader>
-        <CardContent>
-          <ResponsiveContainer width="100%" height={200}>
-            <BarChart data={trafficSources} barSize={20}>
-              <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
-              <XAxis dataKey="source" tick={{ fontSize: 10 }} interval={0} angle={-20} textAnchor="end" height={60} />
-              <YAxis tick={{ fontSize: 10 }} />
-              <Tooltip contentStyle={{ backgroundColor: "hsl(var(--card))", border: "1px solid hsl(var(--border))" }} />
-              <Legend />
-              <Bar dataKey="visits" name="Visits" fill="hsl(var(--primary))" />
-              <Bar dataKey="signups" name="Signups" fill="hsl(var(--chart-2))" />
-            </BarChart>
-          </ResponsiveContainer>
+        <div className="grid gap-6 md:grid-cols-2">
+          {/* ===== SECTION 3: TOP PAGES ===== */}
+          <Card>
+            <CardHeader className="pb-2">
+              <div className="flex justify-between items-center">
+                <div>
+                  <CardTitle>Most Visited Pages</CardTitle>
+                  <CardDescription>Top 10 landing pages</CardDescription>
+                </div>
+                <Button variant="outline" size="sm" onClick={() => exportSectionCSV(pageViews, 'page-views')}>
+                  <Download className="h-3 w-3 mr-1" /> CSV
+                </Button>
+              </div>
+            </CardHeader>
+            <CardContent>
+              <ResponsiveContainer width="100%" height={200}>
+                <BarChart data={pageViews} layout="vertical" barSize={12}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
+                  <XAxis type="number" tick={{ fontSize: 10 }} />
+                  <YAxis type="category" dataKey="page" width={110} tick={{ fontSize: 9 }} />
+                  <Tooltip 
+                    contentStyle={{ backgroundColor: "hsl(var(--card))", border: "1px solid hsl(var(--border))" }} 
+                    formatter={(value, name, props) => [value, props.payload.fullPage]}
+                  />
+                  <Bar dataKey="views" name="Views" fill="hsl(var(--primary))" radius={[0, 4, 4, 0]} />
+                </BarChart>
+              </ResponsiveContainer>
 
-          <div className="mt-4 border-t pt-4 overflow-x-auto" ref={tableRef}>
-            <table className="w-full text-sm">
-              <thead>
-                <tr className="border-b bg-muted/50">
-                  <th className="text-left py-2 px-3 font-medium">Source</th>
-                  <th className="text-right py-2 px-3 font-medium">Visits</th>
-                  <th className="text-right py-2 px-3 font-medium">Signups</th>
-                  <th className="text-right py-2 px-3 font-medium">Conversion Rate</th>
-                </tr>
-              </thead>
-              <tbody>
-                {trafficSources.map((source, idx) => (
-                  <tr key={idx} className="border-b last:border-0 hover:bg-muted/30">
-                    <td className="py-2 px-3 font-medium">{source.source}</td>
-                    <td className="text-right py-2 px-3">{source.visits.toLocaleString()}</td>
-                    <td className="text-right py-2 px-3">{source.signups}</td>
-                    <td className="text-right py-2 px-3">
-                      <span className={source.conversionRate > 5 ? "text-green-600 font-medium" : source.conversionRate > 0 ? "text-primary font-medium" : "text-muted-foreground"}>
-                        {source.conversionRate}%
-                      </span>
-                    </td>
-                  </tr>
+              <div className="mt-3 border-t pt-3 max-h-[150px] overflow-y-auto">
+                {pageViews.map((page, idx) => (
+                  <div key={idx} className="flex justify-between items-center text-xs py-1 border-b last:border-0">
+                    <span className="text-muted-foreground truncate max-w-[200px]" title={page.fullPage}>{page.page}</span>
+                    <span className="font-medium">{page.views} ({page.percentage}%)</span>
+                  </div>
                 ))}
-                {/* Totals Row */}
-                <tr className="bg-muted/50 font-medium">
-                  <td className="py-2 px-3">Total</td>
-                  <td className="text-right py-2 px-3">{trafficSources.reduce((sum, s) => sum + s.visits, 0).toLocaleString()}</td>
-                  <td className="text-right py-2 px-3">{trafficSources.reduce((sum, s) => sum + s.signups, 0)}</td>
-                  <td className="text-right py-2 px-3">
-                    {trafficSources.reduce((sum, s) => sum + s.visits, 0) > 0 
-                      ? Math.round((trafficSources.reduce((sum, s) => sum + s.signups, 0) / trafficSources.reduce((sum, s) => sum + s.visits, 0)) * 100)
-                      : 0}%
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-        </CardContent>
-      </Card>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* ===== SECTION 4: DEVICE DISTRIBUTION ===== */}
+          <Card>
+            <CardHeader className="pb-2">
+              <div className="flex justify-between items-center">
+                <div>
+                  <CardTitle>Device Distribution</CardTitle>
+                  <CardDescription>Visitors by device type</CardDescription>
+                </div>
+                <Button variant="outline" size="sm" onClick={() => exportSectionCSV(deviceData, 'device-data')}>
+                  <Download className="h-3 w-3 mr-1" /> CSV
+                </Button>
+              </div>
+            </CardHeader>
+            <CardContent>
+              <ResponsiveContainer width="100%" height={200}>
+                <PieChart>
+                  <Pie
+                    data={deviceData}
+                    cx="50%"
+                    cy="50%"
+                    outerRadius={70}
+                    fill="hsl(var(--primary))"
+                    dataKey="count"
+                    label={({ device, percentage }) => `${device}: ${percentage}%`}
+                    labelLine={{ strokeWidth: 1 }}
+                  >
+                    {deviceData.map((entry, index) => (
+                      <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                    ))}
+                  </Pie>
+                  <Tooltip contentStyle={{ backgroundColor: "hsl(var(--card))", border: "1px solid hsl(var(--border))" }} />
+                </PieChart>
+              </ResponsiveContainer>
+
+              <div className="mt-3 border-t pt-3">
+                {deviceData.map((device, idx) => (
+                  <div key={idx} className="flex justify-between items-center text-xs py-1.5 border-b last:border-0">
+                    <span className="flex items-center gap-2 text-muted-foreground">
+                      {getDeviceIcon(device.device)}
+                      {device.device}
+                    </span>
+                    <span className="font-medium">{device.count.toLocaleString()} ({device.percentage}%)</span>
+                  </div>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      </div>
     </div>
   );
 }

@@ -73,8 +73,30 @@ interface TrackEventParams {
   userId?: string;
 }
 
+// Check if current context should be excluded from tracking
+const shouldExcludeFromTracking = (): boolean => {
+  // Exclude Lovable preview iframe
+  if (window.location.hostname.includes('lovableproject.com') || 
+      window.location.hostname.includes('lovable.app') ||
+      window.self !== window.top) {
+    return true;
+  }
+  
+  // Exclude if admin exclusion cookie is set
+  if (document.cookie.includes('sm_exclude_tracking=true')) {
+    return true;
+  }
+  
+  return false;
+};
+
 export const trackSocialMediaEvent = async ({ eventType, eventValue = 0, userId }: TrackEventParams) => {
   try {
+    // Skip tracking for excluded contexts
+    if (shouldExcludeFromTracking()) {
+      return;
+    }
+    
     const sessionId = getSessionId();
     const { source, utmParams } = detectReferralSource();
     const deviceInfo = getDeviceInfo();
