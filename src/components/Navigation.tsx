@@ -231,11 +231,11 @@ export const Navigation = () => {
       <div className="container mx-auto max-w-7xl">
         <div className="flex justify-between items-center gap-4">
           {/* LEFT SECTION - Hamburger Menu + Social Media Icons */}
-          <div className="flex items-center gap-3">
-            {/* Hamburger Menu */}
+          <div className="flex items-center gap-2">
+            {/* Hamburger Menu - pushed to far left */}
             <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
               <SheetTrigger asChild>
-              <Button variant="ghost" size="icon" className="h-12 w-12">
+              <Button variant="ghost" size="icon" className="h-12 w-12 -ml-2">
                   <svg className="h-8 w-8" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
                     <line x1="3" y1="4" x2="21" y2="4" />
                     <line x1="3" y1="12" x2="21" y2="12" />
@@ -394,7 +394,7 @@ export const Navigation = () => {
               <img
                 src={smartyGymLogo}
                 alt="SmartyGym"
-                className="h-14 xs:h-16 sm:h-28 md:h-32 lg:h-36 w-auto object-contain dark:bg-transparent"
+                className="h-20 xs:h-24 sm:h-28 md:h-32 lg:h-36 w-auto object-contain dark:[filter:invert(1)_hue-rotate(180deg)]"
               />
             </div>
           </div>
