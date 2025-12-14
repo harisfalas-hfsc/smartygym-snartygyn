@@ -1,4 +1,4 @@
-import { createContext, useContext, useEffect, useState, ReactNode } from "react";
+import { createContext, useContext, useEffect, useState, useRef, ReactNode } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 
 // Pages that should NOT be tracked in navigation history
@@ -16,12 +16,21 @@ export const NavigationHistoryProvider = ({ children }: { children: ReactNode })
   const location = useLocation();
   const navigate = useNavigate();
   const [history, setHistory] = useState<string[]>([]);
+  
+  // Track when we're going back to prevent re-adding to history
+  const isGoingBack = useRef(false);
 
   useEffect(() => {
     const currentPath = location.pathname;
 
     // Skip excluded paths (auth-related, payment confirmations)
     if (EXCLUDED_PATHS.includes(currentPath)) {
+      return;
+    }
+
+    // Skip if we're in the middle of a back navigation
+    if (isGoingBack.current) {
+      isGoingBack.current = false;
       return;
     }
 
@@ -36,9 +45,7 @@ export const NavigationHistoryProvider = ({ children }: { children: ReactNode })
 
   const goBack = () => {
     if (history.length > 1) {
-      // Create a copy to work with
       const newHistory = [...history];
-      // Remove current page
       newHistory.pop();
       
       // Skip any excluded paths when going back
@@ -48,15 +55,16 @@ export const NavigationHistoryProvider = ({ children }: { children: ReactNode })
       
       if (newHistory.length > 0) {
         const previousPath = newHistory[newHistory.length - 1];
+        isGoingBack.current = true;
         setHistory(newHistory);
         navigate(previousPath);
       } else {
-        // No valid history, go to homepage
+        isGoingBack.current = true;
         setHistory(["/"]);
         navigate("/");
       }
     } else {
-      // No history, go to homepage
+      isGoingBack.current = true;
       setHistory(["/"]);
       navigate("/");
     }
