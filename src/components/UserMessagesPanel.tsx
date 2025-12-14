@@ -4,12 +4,13 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { format } from "date-fns";
-import { MessageSquare, Mail, Paperclip, Download, Zap, User, Eye, EyeOff, Trash2, ExternalLink, CheckSquare, Square } from "lucide-react";
+import { MessageSquare, Mail, Paperclip, Download, Zap, User, Eye, EyeOff, Trash2, ExternalLink, CheckSquare, Square, Settings2 } from "lucide-react";
 import { HTMLContent } from "@/components/ui/html-content";
 import { useState, useMemo } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast } from "sonner";
 import { Checkbox } from "@/components/ui/checkbox";
+import { EmailSubscriptionManager } from "@/components/EmailSubscriptionManager";
 import {
   Select,
   SelectContent,
@@ -713,10 +714,14 @@ export const UserMessagesPanel = () => {
       <Tabs defaultValue="all" className="w-full" onValueChange={setActiveTab}>
         {/* Header row with tabs, filter, and bulk actions */}
         <div className="flex flex-col sm:flex-row sm:items-center gap-3 mb-4">
-          <TabsList className="w-full sm:w-auto">
+          <TabsList className="w-full sm:w-auto grid grid-cols-4">
             <TabsTrigger value="all">All ({contactMessages.length + systemMessages.length})</TabsTrigger>
             <TabsTrigger value="system">System ({systemMessages.length})</TabsTrigger>
             <TabsTrigger value="contact">My Requests ({contactMessages.length})</TabsTrigger>
+            <TabsTrigger value="subscriptions" className="gap-1">
+              <Settings2 className="h-3 w-3" />
+              <span className="hidden sm:inline">Subscriptions</span>
+            </TabsTrigger>
           </TabsList>
           
           <div className="flex items-center gap-2 sm:ml-auto">
@@ -841,6 +846,10 @@ export const UserMessagesPanel = () => {
           ) : (
             filteredContactMessages.map((message) => renderContactMessage(message, false))
           )}
+        </TabsContent>
+
+        <TabsContent value="subscriptions" className="mt-0">
+          <EmailSubscriptionManager />
         </TabsContent>
       </Tabs>
 

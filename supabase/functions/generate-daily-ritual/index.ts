@@ -375,20 +375,21 @@ const subject = "☀️ Your all day game – plan is ready";
         .eq('user_id', userId)
         .single();
 
-      const prefs = profile?.notification_preferences || {};
-      if (prefs.opt_out_newsletter === true) {
+      const prefs = (profile?.notification_preferences as Record<string, any>) || {};
+      
+      // Check if user has opted out of ritual emails
+      if (prefs.opt_out_all === true || prefs.email_ritual === false || prefs.opt_out_newsletter === true) {
         sentCount++;
         continue;
       }
 
-      // Send email with rate limiting (Resend allows 2 req/sec, so wait 600ms between sends)
       if (userEmail) {
         try {
 const emailResult = await resend.emails.send({
             from: 'SmartyGym <notifications@smartygym.com>',
             to: [userEmail],
             subject: subject,
-            headers: getEmailHeaders(userEmail),
+            headers: getEmailHeaders(userEmail, 'ritual'),
             html: `
               <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
                 <h1 style="color: #29B6D2; margin-bottom: 20px;">☀️ Your Smarty Ritual is Ready!</h1>
@@ -408,7 +409,7 @@ const emailResult = await resend.emails.send({
                 </div>
                 <hr style="margin: 32px 0; border: none; border-top: 1px solid #eee;">
                 <p style="font-size: 12px; color: #999; text-align: center;">Designed by Haris Falas</p>
-                ${getEmailFooter(userEmail)}
+                ${getEmailFooter(userEmail, 'ritual')}
               </div>
             `,
           });

@@ -937,15 +937,31 @@ Respond in this EXACT JSON format:
         })));
         
         const { data: usersData } = await supabase.auth.admin.listUsers();
-        const userEmails = usersData?.users?.filter(u => userIds.includes(u.id) && u.email).map(u => u.email) as string[] || [];
         
-        for (const email of userEmails) {
+        // Get all profiles with notification preferences
+        const { data: allProfiles } = await supabase
+          .from('profiles')
+          .select('user_id, notification_preferences');
+        
+        const profilesMap = new Map(allProfiles?.map(p => [p.user_id, p.notification_preferences]) || []);
+        
+        for (const authUser of usersData?.users || []) {
+          if (!authUser.email || !userIds.includes(authUser.id)) continue;
+          
+          const prefs = (profilesMap.get(authUser.id) as Record<string, any>) || {};
+          
+          // Check if user has opted out of WOD emails
+          if (prefs.opt_out_all === true || prefs.email_wod === false) {
+            logStep(`Skipping WOD email for ${authUser.email} (opted out)`);
+            continue;
+          }
+          
           try {
             const emailResult = await resendClient.emails.send({
               from: 'SmartyGym <notifications@smartygym.com>',
-              to: [email],
+              to: [authUser.email],
               subject: notificationTitle,
-              headers: getEmailHeaders(email),
+              headers: getEmailHeaders(authUser.email, 'wod'),
               html: `<div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
 <h1 style="color: #29B6D2;">🏆 Today's Workouts</h1>
 <p style="font-size: 16px;">Today we have <strong>TWO</strong> workout options for ${category} day:</p>
@@ -957,18 +973,18 @@ Respond in this EXACT JSON format:
 <p style="color: #666;">Choose based on your situation: at home, traveling, or at the gym!</p>
 <p style="margin-top: 20px;">Available for €3.99 each or included with Premium.</p>
 <p style="margin-top: 20px;"><a href="https://smartygym.com/workout/wod" style="background: #29B6D2; color: white; padding: 14px 28px; text-decoration: none; border-radius: 4px; font-weight: bold; display: inline-block;">View Workouts →</a></p>
-${getEmailFooter(email)}
+${getEmailFooter(authUser.email, 'wod')}
 </div>`,
             });
             
             if (emailResult.error) {
-              logStep("Email API error", { email, error: emailResult.error });
+              logStep("Email API error", { email: authUser.email, error: emailResult.error });
             } else {
               // Rate limiting: 600ms delay to respect Resend's 2 requests/second limit
               await new Promise(resolve => setTimeout(resolve, 600));
             }
           } catch (e) {
-            logStep("Email send error", { email, error: e });
+            logStep("Email send error", { email: authUser.email, error: e });
           }
         }
         logStep(`✅ Sent to ${userIds.length} users`);
