@@ -1857,7 +1857,7 @@ export default function UserDashboard() {
                   </CardContent>
                 </Card>
 
-                <LogBookAdvancedExport userId={user!.id} primaryFilter={logBookFilter} secondaryFilter={logBookSecondaryFilter} timeFilter={logBookTimeFilter} customStartDate={logBookCustomStartDate} customEndDate={logBookCustomEndDate} />
+                <LogBookAdvancedExport userId={user!.id} />
               </>}
           </TabsContent>
         </Tabs>
