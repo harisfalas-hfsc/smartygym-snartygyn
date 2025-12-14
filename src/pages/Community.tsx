@@ -19,6 +19,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Button } from "@/components/ui/button";
 import { Trophy, MessageSquare, Star, User, ArrowUpDown, Calendar, ClipboardCheck, ArrowLeft } from "lucide-react";
+import { TestimonialsSection } from "@/components/community/TestimonialsSection";
 import { formatDistanceToNow } from "date-fns";
 import { CompactFilters } from "@/components/CompactFilters";
 import {
@@ -1001,6 +1002,11 @@ programEntries.sort((a, b) => b.total_completions - a.total_completions);
               )}
             </CardContent>
           </Card>
+
+          {/* Testimonials Section */}
+          <div className="mt-6 md:mt-8">
+            <TestimonialsSection />
+          </div>
         </div>
       </div>
     </>

@@ -44,6 +44,10 @@ export const Footer = () => {
                 Why Corporate Wellness?
               </button>
               <span>•</span>
+              <button onClick={() => navigate("/smarty-plans")} className="hover:text-primary transition-colors">
+                Smarty Plans
+              </button>
+              <span>•</span>
               <button onClick={() => navigate("/privacy-policy")} className="hover:text-primary transition-colors">
                 Privacy Policy
               </button>
@@ -101,6 +105,10 @@ export const Footer = () => {
             <span>•</span>
             <button onClick={() => navigate("/corporate-wellness")} className="hover:text-primary transition-colors">
               Why Corporate Wellness?
+            </button>
+            <span>•</span>
+            <button onClick={() => navigate("/smarty-plans")} className="hover:text-primary transition-colors">
+              Smarty Plans
             </button>
             <span>•</span>
             <button onClick={() => navigate("/privacy-policy")} className="hover:text-primary transition-colors">
