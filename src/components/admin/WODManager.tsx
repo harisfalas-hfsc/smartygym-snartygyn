@@ -7,13 +7,13 @@ import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Progress } from "@/components/ui/progress";
 import { Skeleton } from "@/components/ui/skeleton";
-import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { toast } from "sonner";
-import { Flame, Play, RefreshCw, Calendar, Dumbbell, Star, TrendingUp, Clock, ExternalLink, AlertTriangle, ImageIcon, BookOpen, Edit } from "lucide-react";
+import { Flame, Play, RefreshCw, Calendar, Dumbbell, Star, TrendingUp, Clock, ExternalLink, ImageIcon, BookOpen, Edit } from "lucide-react";
 import { format } from "date-fns";
 import { WODSchedulePreview } from "./WODSchedulePreview";
 import { PeriodizationSystemDialog } from "./PeriodizationSystemDialog";
 import { WorkoutEditDialog } from "./WorkoutEditDialog";
+import { GenerateWODDialog } from "./GenerateWODDialog";
 
 // 7-DAY CATEGORY CYCLE
 const CATEGORY_CYCLE_7DAY = [
@@ -30,6 +30,7 @@ export const WODManager = () => {
   const [isGenerating, setIsGenerating] = useState(false);
   const [isSyncingImages, setIsSyncingImages] = useState(false);
   const [periodizationDialogOpen, setPeriodizationDialogOpen] = useState(false);
+  const [generateDialogOpen, setGenerateDialogOpen] = useState(false);
   const [editDialogOpen, setEditDialogOpen] = useState(false);
   const [editingWorkout, setEditingWorkout] = useState<any>(null);
   const queryClient = useQueryClient();
@@ -80,23 +81,24 @@ export const WODManager = () => {
     },
   });
 
-  const handleGenerateWOD = async () => {
+  const handleGenerateWOD = async (targetDate?: string) => {
     setIsGenerating(true);
     try {
       const { data, error } = await supabase.functions.invoke("generate-workout-of-day", {
-        body: {},
+        body: { targetDate },
       });
 
       if (error) throw error;
 
-      // Check if WOD was skipped (already exists for today)
+      // Check if WOD was skipped (already exists)
       if (data?.skipped) {
-        toast.info("WOD already exists for today", {
-          description: "No new WOD generated - use Edit to modify the current one",
+        toast.info(data.message || "WOD already exists", {
+          description: "No new WOD generated - use Edit to modify the existing one",
         });
       } else {
-        toast.success("Workout of the Day generated successfully!", {
-          description: `${data?.name || 'New WOD'} - ${data?.category || 'Generated'}`,
+        const dateLabel = targetDate ? `for ${targetDate}` : "for today";
+        toast.success(`Workout of the Day generated ${dateLabel}!`, {
+          description: `${data?.workouts?.[0]?.name || 'New WOD'} - ${data?.shared?.category || 'Generated'}`,
         });
       }
 
@@ -105,6 +107,7 @@ export const WODManager = () => {
       queryClient.invalidateQueries({ queryKey: ["current-wod"] });
       queryClient.invalidateQueries({ queryKey: ["wod-history"] });
       queryClient.invalidateQueries({ queryKey: ["workoutOfDay"] });
+      queryClient.invalidateQueries({ queryKey: ["wod-schedule"] });
     } catch (error: any) {
       console.error("WOD generation error:", error);
       toast.error("Failed to generate WOD", {
@@ -228,47 +231,27 @@ export const WODManager = () => {
             {isSyncingImages ? "Syncing..." : "Sync Stripe Images"}
           </Button>
           
-          <AlertDialog>
-            <AlertDialogTrigger asChild>
-              <Button 
-                className="flex items-center gap-2"
-                disabled={isGenerating}
-              >
-                {isGenerating ? (
-                  <RefreshCw className="h-4 w-4 animate-spin" />
-                ) : (
-                  <Play className="h-4 w-4" />
-                )}
-                {isGenerating ? "Generating..." : "Generate New WOD"}
-              </Button>
-            </AlertDialogTrigger>
-            <AlertDialogContent>
-              <AlertDialogHeader>
-                <AlertDialogTitle className="flex items-center gap-2">
-                  <AlertTriangle className="h-5 w-5 text-yellow-500" />
-                  Generate New Workout of the Day?
-                </AlertDialogTitle>
-                <AlertDialogDescription className="space-y-2">
-                  <p>This will:</p>
-                  <ul className="list-disc list-inside space-y-1 text-sm">
-                    <li>Move the current WOD to its category (if exists)</li>
-                    <li>Generate a new <strong>{getNextCategory()}</strong> workout</li>
-                    <li>Create a Stripe product for €3.99</li>
-                    <li>Generate a unique workout image</li>
-                  </ul>
-                  <p className="text-yellow-500 mt-2">
-                    Note: The daily cron job runs at 7:00 AM UTC automatically.
-                  </p>
-                </AlertDialogDescription>
-              </AlertDialogHeader>
-              <AlertDialogFooter>
-                <AlertDialogCancel>Cancel</AlertDialogCancel>
-                <AlertDialogAction onClick={handleGenerateWOD}>
-                  Generate WOD
-                </AlertDialogAction>
-              </AlertDialogFooter>
-            </AlertDialogContent>
-          </AlertDialog>
+          <Button 
+            className="flex items-center gap-2"
+            disabled={isGenerating}
+            onClick={() => setGenerateDialogOpen(true)}
+          >
+            {isGenerating ? (
+              <RefreshCw className="h-4 w-4 animate-spin" />
+            ) : (
+              <Play className="h-4 w-4" />
+            )}
+            {isGenerating ? "Generating..." : "Generate New WOD"}
+          </Button>
+          
+          <GenerateWODDialog
+            open={generateDialogOpen}
+            onOpenChange={setGenerateDialogOpen}
+            onGenerate={handleGenerateWOD}
+            isGenerating={isGenerating}
+            nextCategory={getNextCategory()}
+            dayInCycle={getDayInCycle()}
+          />
         </div>
       </div>
 

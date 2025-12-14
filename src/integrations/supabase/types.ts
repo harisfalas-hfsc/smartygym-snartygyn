@@ -124,6 +124,7 @@ export type Database = {
           finisher: string | null
           focus: string | null
           format: string | null
+          generated_for_date: string | null
           id: string
           image_url: string | null
           instructions: string | null
@@ -158,6 +159,7 @@ export type Database = {
           finisher?: string | null
           focus?: string | null
           format?: string | null
+          generated_for_date?: string | null
           id: string
           image_url?: string | null
           instructions?: string | null
@@ -192,6 +194,7 @@ export type Database = {
           finisher?: string | null
           focus?: string | null
           format?: string | null
+          generated_for_date?: string | null
           id?: string
           image_url?: string | null
           instructions?: string | null
