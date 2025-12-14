@@ -269,18 +269,20 @@ export const WODSchedulePreview = () => {
                     <Button 
                       variant="ghost" 
                       size="sm"
+                      className="text-destructive hover:text-destructive"
                       onClick={() => handleRemoveOverride(day.dateStr)}
                     >
-                      Remove
+                      Remove Override
                     </Button>
                   )}
                   <Button 
-                    variant="outline" 
+                    variant="default" 
                     size="sm"
+                    className="bg-primary hover:bg-primary/90"
                     onClick={() => handleOpenOverride(day.dateStr, day.category)}
                   >
                     <Edit2 className="h-4 w-4 mr-1" />
-                    Override
+                    {day.hasOverride ? "Edit Override" : "Set Override"}
                   </Button>
                 </div>
               </div>
