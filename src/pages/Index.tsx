@@ -560,65 +560,47 @@ const Index = () => {
           )}
         </div>
 
-        {/* Mobile Only: Who Is SmartyGym For? */}
+        {/* Mobile Only: What We Stand For */}
         <div className="mt-8 mb-2 px-4">
           <h2 className="text-2xl font-bold text-center mb-6">
-            Who Is <span className="text-primary">SmartyGym</span> For?
+            What We <span className="text-primary">Stand For</span>
           </h2>
           
         <div className="space-y-4">
-          {/* Busy adults */}
+          {/* Built for Real Life */}
           <div className="flex flex-col gap-1">
             <div className="flex items-center gap-3">
-              <Users className="w-6 h-6 text-blue-500 flex-shrink-0" />
-              <span className="text-sm font-semibold">Busy adults</span>
+              <Heart className="w-6 h-6 text-orange-500 flex-shrink-0" />
+              <span className="text-sm font-semibold">Built for Real Life</span>
             </div>
-            <p className="text-xs text-muted-foreground ml-9">Quick, effective workouts that fit your schedule</p>
+            <p className="text-xs text-muted-foreground ml-9">Flexible training that fits your schedule, location, and lifestyle — not the other way around.</p>
           </div>
           
-          {/* Parents */}
+          {/* Science-Based Approach */}
           <div className="flex flex-col gap-1">
             <div className="flex items-center gap-3">
-              <Heart className="w-6 h-6 text-pink-500 flex-shrink-0" />
-              <span className="text-sm font-semibold">Parents</span>
+              <Award className="w-6 h-6 text-purple-500 flex-shrink-0" />
+              <span className="text-sm font-semibold">Science-Based Approach</span>
             </div>
-            <p className="text-xs text-muted-foreground ml-9">Train at home while kids play nearby</p>
+            <p className="text-xs text-muted-foreground ml-9">Every workout is designed using evidence-based training principles, not trends or fads.</p>
           </div>
           
-          {/* Beginners */}
+          {/* Accessible to Everyone */}
           <div className="flex flex-col gap-1">
             <div className="flex items-center gap-3">
-              <GraduationCap className="w-6 h-6 text-emerald-500 flex-shrink-0" />
-              <span className="text-sm font-semibold">Beginners</span>
+              <Users className="w-6 h-6 text-emerald-500 flex-shrink-0" />
+              <span className="text-sm font-semibold">Accessible to Everyone</span>
             </div>
-            <p className="text-xs text-muted-foreground ml-9">Start your fitness journey with guided programs</p>
+            <p className="text-xs text-muted-foreground ml-9">From beginners to advanced athletes, everyone deserves access to quality fitness guidance.</p>
           </div>
           
-          {/* Intermediate lifters */}
+          {/* Safe and Effective */}
           <div className="flex flex-col gap-1">
             <div className="flex items-center gap-3">
-              <Target className="w-6 h-6 text-orange-500 flex-shrink-0" />
-              <span className="text-sm font-semibold">Intermediate lifters</span>
+              <Shield className="w-6 h-6 text-blue-500 flex-shrink-0" />
+              <span className="text-sm font-semibold">Safe and Effective</span>
             </div>
-            <p className="text-xs text-muted-foreground ml-9">Push past plateaus with structured plans</p>
-          </div>
-          
-          {/* Travelers */}
-          <div className="flex flex-col gap-1">
-            <div className="flex items-center gap-3">
-              <Plane className="w-6 h-6 text-cyan-500 flex-shrink-0" />
-              <span className="text-sm font-semibold">Travelers</span>
-            </div>
-            <p className="text-xs text-muted-foreground ml-9">Stay consistent wherever you go</p>
-          </div>
-          
-          {/* Gym-goers */}
-          <div className="flex flex-col gap-1">
-            <div className="flex items-center gap-3">
-              <Dumbbell className="w-6 h-6 text-purple-500 flex-shrink-0" />
-              <span className="text-sm font-semibold">Gym-goers</span>
-            </div>
-            <p className="text-xs text-muted-foreground ml-9">Enhance your gym routine with expert guidance</p>
+            <p className="text-xs text-muted-foreground ml-9">Proper technique, realistic progressions, and injury prevention are at the core of everything we do.</p>
           </div>
         </div>
         </div>
