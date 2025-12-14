@@ -172,27 +172,19 @@ const About = () => {
                 <CardContent className="p-6 text-center space-y-4">
                   <UserCheck className="w-12 h-12 text-red-500 mx-auto" />
                   <h3 className="text-xl font-bold text-foreground">100% Human. 0% AI.</h3>
-                  <div className="space-y-3 text-sm text-muted-foreground">
-                    <p>
-                      Every workout and training program is science-based and personally created by{' '}
-                      <a 
-                        href="/coach-profile" 
-                        onClick={(e) => {
-                          e.preventDefault();
-                          navigate('/coach-profile');
-                        }}
-                        className="text-primary hover:underline font-semibold cursor-pointer"
-                      >
-                        Haris Falas
-                      </a>.
-                    </p>
-                    <p>
-                      Never by AI. Never by algorithms. Always by a real human expert who understands YOUR needs.
-                    </p>
-                    <p className="font-semibold text-foreground">
-                      Training designed by humans, for humans.
-                    </p>
-                  </div>
+                  <p className="text-sm text-muted-foreground">
+                    Every workout and training program is science-based and personally created by{' '}
+                    <a 
+                      href="/coach-profile" 
+                      onClick={(e) => {
+                        e.preventDefault();
+                        navigate('/coach-profile');
+                      }}
+                      className="text-primary hover:underline font-semibold cursor-pointer"
+                    >
+                      Haris Falas
+                    </a>. Never by AI. Never by algorithms.
+                  </p>
                 </CardContent>
               </Card>
 
