@@ -235,7 +235,7 @@ export const Navigation = () => {
             {/* Hamburger Menu - pushed to far left */}
             <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
               <SheetTrigger asChild>
-              <Button variant="ghost" size="icon" className="h-12 w-12 -ml-2">
+              <Button variant="ghost" size="icon" className="h-12 w-12 -ml-4">
                   <svg className="h-8 w-8" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
                     <line x1="3" y1="4" x2="21" y2="4" />
                     <line x1="3" y1="12" x2="21" y2="12" />
@@ -386,7 +386,7 @@ export const Navigation = () => {
           </div>
 
           {/* CENTER SECTION - Logo */}
-          <div className="flex-1 flex justify-center">
+          <div className="flex-1 flex justify-center max-w-[50%] sm:max-w-none">
             <div
               onClick={() => handleNavigate("/")}
               className="cursor-pointer flex-shrink-0"
@@ -394,7 +394,7 @@ export const Navigation = () => {
               <img
                 src={smartyGymLogo}
                 alt="SmartyGym"
-                className="h-20 xs:h-24 sm:h-28 md:h-32 lg:h-36 w-auto object-contain dark:mix-blend-lighten"
+                className="h-28 xs:h-32 sm:h-36 md:h-40 lg:h-44 w-auto object-contain dark:mix-blend-lighten"
               />
             </div>
           </div>
