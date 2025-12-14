@@ -80,7 +80,7 @@ export const WODSchedulePreview = () => {
     },
   });
 
-  // Calculate next 3 days schedule
+  // Calculate next 7 days schedule
   const getUpcomingSchedule = () => {
     if (!wodState) return [];
     
@@ -89,7 +89,7 @@ export const WODSchedulePreview = () => {
     const currentWeekNumber = wodState.week_number || getWeekNumber(currentDayCount);
     const manualOverrides = (wodState.manual_overrides as Record<string, any>) || {};
     
-    for (let i = 1; i <= 3; i++) {
+    for (let i = 1; i <= 7; i++) {
       const futureDayCount = currentDayCount + i;
       const futureDayInCycle = getDayInCycle(futureDayCount);
       const futureWeekNumber = futureDayInCycle === 1 && i > 0 ? currentWeekNumber + 1 : currentWeekNumber;
@@ -206,7 +206,7 @@ export const WODSchedulePreview = () => {
         <CardHeader>
           <CardTitle className="flex items-center gap-2 text-sm">
             <Calendar className="h-4 w-4 text-primary" />
-            Upcoming WOD Schedule (Next 3 Days)
+            Upcoming WOD Schedule (Next 7 Days)
           </CardTitle>
           <CardDescription>
             <span className="block">Preview future WODs and set overrides. The "Day X/7" shows position in the 7-day category rotation cycle (not calendar days).</span>
