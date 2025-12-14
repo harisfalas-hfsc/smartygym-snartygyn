@@ -9,9 +9,10 @@ import { Progress } from "@/components/ui/progress";
 import { Skeleton } from "@/components/ui/skeleton";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { toast } from "sonner";
-import { Flame, Play, RefreshCw, Calendar, Dumbbell, Star, TrendingUp, Clock, ExternalLink, AlertTriangle, ImageIcon } from "lucide-react";
+import { Flame, Play, RefreshCw, Calendar, Dumbbell, Star, TrendingUp, Clock, ExternalLink, AlertTriangle, ImageIcon, BookOpen } from "lucide-react";
 import { format } from "date-fns";
 import { WODSchedulePreview } from "./WODSchedulePreview";
+import { PeriodizationSystemDialog } from "./PeriodizationSystemDialog";
 
 // 7-DAY CATEGORY CYCLE
 const CATEGORY_CYCLE_7DAY = [
@@ -27,6 +28,7 @@ const CATEGORY_CYCLE_7DAY = [
 export const WODManager = () => {
   const [isGenerating, setIsGenerating] = useState(false);
   const [isSyncingImages, setIsSyncingImages] = useState(false);
+  const [periodizationDialogOpen, setPeriodizationDialogOpen] = useState(false);
   const queryClient = useQueryClient();
 
   // Fetch WOD state
@@ -193,6 +195,15 @@ export const WODManager = () => {
         </div>
         
         <div className="flex items-center gap-2">
+          <Button 
+            variant="outline"
+            className="flex items-center gap-2"
+            onClick={() => setPeriodizationDialogOpen(true)}
+          >
+            <BookOpen className="h-4 w-4" />
+            View Periodization
+          </Button>
+          
           <Button 
             variant="outline"
             className="flex items-center gap-2"
@@ -517,6 +528,13 @@ export const WODManager = () => {
           )}
         </CardContent>
       </Card>
+
+      {/* Periodization System Dialog */}
+      <PeriodizationSystemDialog 
+        open={periodizationDialogOpen} 
+        onOpenChange={setPeriodizationDialogOpen}
+        wodState={wodState}
+      />
     </div>
   );
 };
