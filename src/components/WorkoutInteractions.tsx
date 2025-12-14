@@ -40,12 +40,12 @@ export const WorkoutInteractions = ({ workoutId, workoutType, workoutName, isFre
         return;
       }
 
+      // Query by workout_id only to ensure status syncs across all pages (WOD, category pages, etc.)
       const { data, error } = await supabase
         .from('workout_interactions')
         .select('*')
         .eq('user_id', session.user.id)
         .eq('workout_id', workoutId)
-        .eq('workout_type', workoutType)
         .single();
 
       if (error && error.code !== 'PGRST116') throw error;
@@ -67,6 +67,7 @@ export const WorkoutInteractions = ({ workoutId, workoutType, workoutName, isFre
       const { data: { session } } = await supabase.auth.getSession();
       if (!session) return;
 
+      // Use workout_id only for conflict to prevent duplicate records with different workout_type
       await supabase
         .from('workout_interactions')
         .upsert({
@@ -76,7 +77,7 @@ export const WorkoutInteractions = ({ workoutId, workoutType, workoutName, isFre
           workout_name: workoutName,
           has_viewed: true,
         }, {
-          onConflict: 'user_id,workout_id,workout_type'
+          onConflict: 'user_id,workout_id'
         });
 
       // Log to activity log
@@ -133,7 +134,7 @@ export const WorkoutInteractions = ({ workoutId, workoutType, workoutName, isFre
           workout_name: workoutName,
           is_favorite: newFavoriteStatus,
         }, {
-          onConflict: 'user_id,workout_id,workout_type'
+          onConflict: 'user_id,workout_id'
         });
 
       setIsFavorite(newFavoriteStatus);
@@ -172,7 +173,7 @@ export const WorkoutInteractions = ({ workoutId, workoutType, workoutName, isFre
           workout_name: workoutName,
           is_completed: newCompletedStatus,
         }, {
-          onConflict: 'user_id,workout_id,workout_type'
+          onConflict: 'user_id,workout_id'
         });
 
       // Log to activity log
@@ -223,7 +224,7 @@ export const WorkoutInteractions = ({ workoutId, workoutType, workoutName, isFre
           workout_name: workoutName,
           rating: newRating,
         }, {
-          onConflict: 'user_id,workout_id,workout_type'
+          onConflict: 'user_id,workout_id'
         });
 
       setRating(newRating);
