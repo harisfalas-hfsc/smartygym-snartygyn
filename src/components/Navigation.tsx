@@ -319,6 +319,14 @@ export const Navigation = () => {
                   </Button>
                   <Button
                     variant="ghost"
+                    onClick={() => handleNavigate("/smarty-plans")}
+                    className={`justify-start font-semibold transition-all duration-200 ${location.pathname === '/smarty-plans' ? 'text-primary underline underline-offset-4 bg-primary/10' : 'text-foreground hover:bg-primary/10 hover:text-foreground'}`}
+                  >
+                    <Crown className="mr-2 h-4 w-4 text-yellow-500" />
+                    Smarty Plans
+                  </Button>
+                  <Button
+                    variant="ghost"
                     onClick={() => handleNavigate("/contact")}
                     className={`justify-start font-semibold transition-all duration-200 ${location.pathname === '/contact' ? 'text-primary underline underline-offset-4 bg-primary/10' : 'text-foreground hover:bg-primary/10 hover:text-foreground'}`}
                   >

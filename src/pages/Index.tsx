@@ -651,7 +651,7 @@ const Index = () => {
                         {/* CTA Button for non-premium users - positioned top left */}
                         {!isPremium && (
                           <Button 
-                            onClick={() => navigate("/joinpremium")} 
+                            onClick={() => navigate("/smarty-plans")} 
                             className="absolute top-4 left-4 bg-primary text-primary-foreground hover:bg-primary/90 text-sm"
                           >
                             <Crown className="mr-2 h-4 w-4" />
@@ -1184,7 +1184,7 @@ const Index = () => {
                   <Calendar className="h-5 w-5" />
                   Explore Programs
                 </Button>
-                {!isPremium && <Button size="lg" variant="outline" onClick={() => navigate("/premiumbenefits")} className="gap-2">
+                {!isPremium && <Button size="lg" variant="outline" onClick={() => navigate("/smarty-plans")} className="gap-2">
                     <UserCheck className="h-5 w-5" />
                     Join Premium
                   </Button>}
