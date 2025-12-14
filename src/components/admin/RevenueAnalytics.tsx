@@ -3,13 +3,15 @@ import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, BarChart, Bar, PieChart, Pie, Cell } from "recharts";
-import { DollarSign, Download, TrendingUp, CreditCard, Building2, ShoppingBag } from "lucide-react";
+import { DollarSign, Download, TrendingUp, CreditCard, Building2, ShoppingBag, AlertCircle } from "lucide-react";
 import { toast } from "sonner";
 import { ChartFilterBar } from "./analytics/ChartFilterBar";
 import { Button } from "@/components/ui/button";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Badge } from "@/components/ui/badge";
 import html2canvas from "html2canvas";
+import { SUBSCRIPTION_PRICES, CORPORATE_PRICES } from "@/config/pricing";
 
 interface RevenueData {
   period: string;
@@ -29,6 +31,7 @@ interface SubscriptionDetail {
   created_at: string;
   current_period_end: string | null;
   monthly_revenue: number;
+  is_paid: boolean;  // Has stripe_subscription_id
 }
 
 interface PurchaseDetail {
@@ -49,6 +52,7 @@ interface CorporateDetail {
   status: string;
   current_period_end: string;
   annual_revenue: number;
+  is_paid: boolean;  // Has stripe_subscription_id AND stripe_customer_id
 }
 
 const COLORS = [
@@ -58,13 +62,6 @@ const COLORS = [
   "hsl(var(--chart-4))",
   "hsl(var(--chart-5))",
 ];
-
-const CORPORATE_PRICING: Record<string, number> = {
-  dynamic: 399,
-  power: 499,
-  elite: 599,
-  enterprise: 699,
-};
 
 export function RevenueAnalytics() {
   const [timeFilter, setTimeFilter] = useState<string>("90");
@@ -106,11 +103,11 @@ export function RevenueAnalytics() {
       const purDetails: PurchaseDetail[] = [];
       const corpDetails: CorporateDetail[] = [];
 
-      // Fetch subscriptions with user emails
+      // Fetch subscriptions with user emails - ONLY PAID (has stripe_subscription_id)
       if (planFilter === "all" || planFilter === "gold" || planFilter === "platinum") {
         let subQuery = supabase
           .from("user_subscriptions")
-          .select("id, user_id, plan_type, status, created_at, current_period_end")
+          .select("id, user_id, plan_type, status, created_at, current_period_end, stripe_subscription_id")
           .eq("status", "active")
           .gte("created_at", startDate.toISOString())
           .lte("created_at", endDate.toISOString());
@@ -124,8 +121,6 @@ export function RevenueAnalytics() {
         if (subscriptions) {
           // Get user emails
           const userIds = [...new Set(subscriptions.map(s => s.user_id))];
-          const { data: authUsers } = await supabase.auth.admin.listUsers();
-          const userEmailMap: Record<string, string> = {};
           
           // Fallback to profiles if admin API not available
           const { data: profiles } = await supabase
@@ -133,11 +128,13 @@ export function RevenueAnalytics() {
             .select("user_id, full_name")
             .in("user_id", userIds);
           
+          const userEmailMap: Record<string, string> = {};
           profiles?.forEach(p => {
             userEmailMap[p.user_id] = p.full_name || "Unknown";
           });
 
           subscriptions.forEach((sub) => {
+            const isPaid = !!sub.stripe_subscription_id;
             const month = new Date(sub.created_at).toLocaleDateString("en-US", {
               year: "numeric",
               month: "short",
@@ -147,9 +144,15 @@ export function RevenueAnalytics() {
               revenueByMonth[month] = { gold: 0, platinum: 0, standalone: 0, personal_training: 0, corporate: 0 };
             }
 
-            const monthlyRevenue = sub.plan_type === "gold" ? 15 : sub.plan_type === "platinum" ? 25 : 0;
-            revenueByMonth[month][sub.plan_type as "gold" | "platinum"] += monthlyRevenue;
-            total += monthlyRevenue;
+            // Use CORRECT prices from config - only count PAID subscriptions
+            const monthlyRevenue = isPaid 
+              ? (sub.plan_type === "gold" ? SUBSCRIPTION_PRICES.gold : sub.plan_type === "platinum" ? SUBSCRIPTION_PRICES.platinum : 0)
+              : 0;
+            
+            if (isPaid) {
+              revenueByMonth[month][sub.plan_type as "gold" | "platinum"] += monthlyRevenue;
+              total += monthlyRevenue;
+            }
 
             subDetails.push({
               id: sub.id,
@@ -159,6 +162,7 @@ export function RevenueAnalytics() {
               created_at: sub.created_at,
               current_period_end: sub.current_period_end,
               monthly_revenue: monthlyRevenue,
+              is_paid: isPaid,
             });
           });
         }
@@ -258,16 +262,17 @@ export function RevenueAnalytics() {
         }
       }
 
-      // Fetch corporate subscriptions
+      // Fetch corporate subscriptions - ONLY PAID (has stripe_subscription_id AND stripe_customer_id)
       if (planFilter === "all" || planFilter === "corporate") {
         const { data: corporateSubs } = await supabase
           .from("corporate_subscriptions")
-          .select("*")
+          .select("*, stripe_subscription_id, stripe_customer_id")
           .eq("status", "active")
           .gte("created_at", startDate.toISOString())
           .lte("created_at", endDate.toISOString());
 
         corporateSubs?.forEach((corp) => {
+          const isPaid = !!(corp.stripe_subscription_id && corp.stripe_customer_id);
           const month = new Date(corp.created_at).toLocaleDateString("en-US", {
             year: "numeric",
             month: "short",
@@ -277,9 +282,13 @@ export function RevenueAnalytics() {
             revenueByMonth[month] = { gold: 0, platinum: 0, standalone: 0, personal_training: 0, corporate: 0 };
           }
 
-          const annualRevenue = CORPORATE_PRICING[corp.plan_type] || 0;
-          revenueByMonth[month].corporate += annualRevenue;
-          total += annualRevenue;
+          // Only count revenue for PAID corporate plans
+          const annualRevenue = isPaid ? (CORPORATE_PRICES[corp.plan_type as keyof typeof CORPORATE_PRICES] || 0) : 0;
+          
+          if (isPaid) {
+            revenueByMonth[month].corporate += annualRevenue;
+            total += annualRevenue;
+          }
 
           corpDetails.push({
             id: corp.id,
@@ -290,6 +299,7 @@ export function RevenueAnalytics() {
             status: corp.status,
             current_period_end: corp.current_period_end,
             annual_revenue: annualRevenue,
+            is_paid: isPaid,
           });
         });
       }
@@ -367,12 +377,17 @@ export function RevenueAnalytics() {
   }), { gold: 0, platinum: 0, standalone: 0, personal_training: 0, corporate: 0 });
 
   const pieData = [
-    { name: "Gold Plans", value: totals.gold },
-    { name: "Platinum Plans", value: totals.platinum },
+    { name: `Gold (€${SUBSCRIPTION_PRICES.gold}/mo)`, value: totals.gold },
+    { name: `Platinum (€${SUBSCRIPTION_PRICES.platinum}/yr)`, value: totals.platinum },
     { name: "Standalone", value: totals.standalone },
     { name: "Personal Training", value: totals.personal_training },
     { name: "Corporate", value: totals.corporate },
   ].filter(d => d.value > 0);
+
+  const paidSubscriptionsCount = subscriptionDetails.filter(s => s.is_paid).length;
+  const freeSubscriptionsCount = subscriptionDetails.filter(s => !s.is_paid).length;
+  const paidCorporateCount = corporateDetails.filter(c => c.is_paid).length;
+  const freeCorporateCount = corporateDetails.filter(c => !c.is_paid).length;
 
   return (
     <div className="space-y-6">
@@ -417,16 +432,19 @@ export function RevenueAnalytics() {
               <CardContent className="p-4">
                 <div className="flex items-center gap-2 text-sm text-muted-foreground mb-1">
                   <TrendingUp className="h-4 w-4" />
-                  Total Revenue
+                  Paid Revenue Only
                 </div>
                 <p className="text-2xl font-bold">€{totalRevenue.toFixed(2)}</p>
+                <p className="text-xs text-muted-foreground">Excludes complimentary</p>
               </CardContent>
             </Card>
             <Card>
               <CardContent className="p-4">
                 <div className="text-sm text-muted-foreground mb-1">Subscriptions</div>
                 <p className="text-xl font-bold">€{(totals.gold + totals.platinum).toFixed(2)}</p>
-                <p className="text-xs text-muted-foreground">{subscriptionDetails.length} active</p>
+                <p className="text-xs text-muted-foreground">
+                  {paidSubscriptionsCount} paid • {freeSubscriptionsCount} free
+                </p>
               </CardContent>
             </Card>
             <Card>
@@ -447,7 +465,9 @@ export function RevenueAnalytics() {
               <CardContent className="p-4">
                 <div className="text-sm text-muted-foreground mb-1">Corporate</div>
                 <p className="text-xl font-bold">€{totals.corporate.toFixed(2)}</p>
-                <p className="text-xs text-muted-foreground">{corporateDetails.length} plans</p>
+                <p className="text-xs text-muted-foreground">
+                  {paidCorporateCount} paid • {freeCorporateCount} free
+                </p>
               </CardContent>
             </Card>
           </div>
@@ -598,15 +618,15 @@ export function RevenueAnalytics() {
                           <TableRow>
                             <TableHead>User</TableHead>
                             <TableHead>Plan</TableHead>
-                            <TableHead>Status</TableHead>
+                            <TableHead>Payment</TableHead>
                             <TableHead>Start Date</TableHead>
                             <TableHead>Renewal</TableHead>
-                            <TableHead className="text-right">Monthly Revenue</TableHead>
+                            <TableHead className="text-right">Revenue</TableHead>
                           </TableRow>
                         </TableHeader>
                         <TableBody>
                           {subscriptionDetails.map((sub) => (
-                            <TableRow key={sub.id}>
+                            <TableRow key={sub.id} className={!sub.is_paid ? "opacity-60" : ""}>
                               <TableCell className="font-medium">{sub.user_email}</TableCell>
                               <TableCell>
                                 <span className={`px-2 py-1 rounded text-xs ${sub.plan_type === "platinum" ? "bg-purple-100 text-purple-800" : "bg-primary/20 text-primary"}`}>
@@ -614,13 +634,20 @@ export function RevenueAnalytics() {
                                 </span>
                               </TableCell>
                               <TableCell>
-                                <span className="px-2 py-1 rounded text-xs bg-green-100 text-green-800">
-                                  {sub.status}
-                                </span>
+                                {sub.is_paid ? (
+                                  <Badge variant="default" className="bg-green-600">Paid</Badge>
+                                ) : (
+                                  <Badge variant="outline" className="text-orange-600 border-orange-600">
+                                    <AlertCircle className="h-3 w-3 mr-1" />
+                                    Free/Manual
+                                  </Badge>
+                                )}
                               </TableCell>
                               <TableCell>{new Date(sub.created_at).toLocaleDateString()}</TableCell>
                               <TableCell>{sub.current_period_end ? new Date(sub.current_period_end).toLocaleDateString() : "-"}</TableCell>
-                              <TableCell className="text-right font-medium">€{sub.monthly_revenue.toFixed(2)}</TableCell>
+                              <TableCell className="text-right font-medium">
+                                {sub.is_paid ? `€${sub.monthly_revenue.toFixed(2)}` : "€0.00"}
+                              </TableCell>
                             </TableRow>
                           ))}
                         </TableBody>
@@ -709,14 +736,14 @@ export function RevenueAnalytics() {
                             <TableHead>Organization</TableHead>
                             <TableHead>Plan</TableHead>
                             <TableHead>Users</TableHead>
-                            <TableHead>Status</TableHead>
+                            <TableHead>Payment</TableHead>
                             <TableHead>Renewal</TableHead>
-                            <TableHead className="text-right">Annual Revenue</TableHead>
+                            <TableHead className="text-right">Revenue</TableHead>
                           </TableRow>
                         </TableHeader>
                         <TableBody>
                           {corporateDetails.map((corp) => (
-                            <TableRow key={corp.id}>
+                            <TableRow key={corp.id} className={!corp.is_paid ? "opacity-60" : ""}>
                               <TableCell className="font-medium">{corp.organization_name}</TableCell>
                               <TableCell>
                                 <span className="px-2 py-1 rounded text-xs bg-primary/20 text-primary">
@@ -725,12 +752,19 @@ export function RevenueAnalytics() {
                               </TableCell>
                               <TableCell>{corp.current_users_count}/{corp.max_users}</TableCell>
                               <TableCell>
-                                <span className={`px-2 py-1 rounded text-xs ${corp.status === "active" ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800"}`}>
-                                  {corp.status}
-                                </span>
+                                {corp.is_paid ? (
+                                  <Badge variant="default" className="bg-green-600">Paid</Badge>
+                                ) : (
+                                  <Badge variant="outline" className="text-orange-600 border-orange-600">
+                                    <AlertCircle className="h-3 w-3 mr-1" />
+                                    Complimentary
+                                  </Badge>
+                                )}
                               </TableCell>
                               <TableCell>{new Date(corp.current_period_end).toLocaleDateString()}</TableCell>
-                              <TableCell className="text-right font-medium">€{corp.annual_revenue.toFixed(2)}</TableCell>
+                              <TableCell className="text-right font-medium">
+                                {corp.is_paid ? `€${corp.annual_revenue.toFixed(2)}` : "€0.00"}
+                              </TableCell>
                             </TableRow>
                           ))}
                         </TableBody>

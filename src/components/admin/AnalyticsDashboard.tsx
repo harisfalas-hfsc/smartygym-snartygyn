@@ -23,14 +23,19 @@ import { GrowthAnalytics } from "./analytics/GrowthAnalytics";
 import { PopularAnalytics } from "./analytics/PopularAnalytics";
 import { BusinessReportExport } from "./analytics/BusinessReportExport";
 import html2canvas from "html2canvas";
+import { SUBSCRIPTION_PRICES, SUBSCRIPTION_BILLING_PERIODS, CORPORATE_PRICES } from "@/config/pricing";
 
 interface AnalyticsData {
   totalUsers: number;
   activeSubscribers: number;
+  paidSubscribers: number;       // Only with stripe_subscription_id
+  manualSubscribers: number;     // Manual/complimentary (no stripe_subscription_id)
   goldSubscribers: number;
+  goldPaid: number;
   platinumSubscribers: number;
+  platinumPaid: number;
   freeUsers: number;
-  totalRevenue: number;
+  totalRevenue: number;          // Only from PAID subscriptions
   avgWorkoutCompletionRate: number;
   avgProgramCompletionRate: number;
   totalWorkouts: number;
@@ -42,6 +47,8 @@ interface AnalyticsData {
   standaloneWorkoutsSold: number;
   standaloneProgramsSold: number;
   corporatePlansSold: number;
+  corporatePaid: number;         // Only with stripe_subscription_id
+  corporateFree: number;         // Complimentary
   bestSellingWorkout: string;
   bestSellingProgram: string;
   bestSellingCorporatePlan: string;
@@ -61,8 +68,12 @@ export function AnalyticsDashboard() {
   const [analytics, setAnalytics] = useState<AnalyticsData>({
     totalUsers: 0,
     activeSubscribers: 0,
+    paidSubscribers: 0,
+    manualSubscribers: 0,
     goldSubscribers: 0,
+    goldPaid: 0,
     platinumSubscribers: 0,
+    platinumPaid: 0,
     freeUsers: 0,
     totalRevenue: 0,
     avgWorkoutCompletionRate: 0,
@@ -76,6 +87,8 @@ export function AnalyticsDashboard() {
     standaloneWorkoutsSold: 0,
     standaloneProgramsSold: 0,
     corporatePlansSold: 0,
+    corporatePaid: 0,
+    corporateFree: 0,
     bestSellingWorkout: "-",
     bestSellingProgram: "-",
     bestSellingCorporatePlan: "-",
@@ -129,26 +142,31 @@ export function AnalyticsDashboard() {
       });
       const userGrowthData = Object.entries(usersByMonth).map(([name, value]) => ({ name, value }));
 
-      // Fetch subscription data
+      // Fetch subscription data - include stripe_subscription_id to identify paid vs manual
       const { data: subscriptions } = await supabase
         .from("user_subscriptions")
-        .select("plan_type, status, created_at, current_period_end");
+        .select("plan_type, status, created_at, current_period_end, stripe_subscription_id");
 
       const activeSubscribers = subscriptions?.filter(s => s.status === "active" && s.plan_type !== "free").length || 0;
+      
+      // PAID = has stripe_subscription_id (real Stripe payment)
+      // MANUAL = no stripe_subscription_id (admin granted, complimentary)
+      const paidSubscribers = subscriptions?.filter(s => s.status === "active" && s.plan_type !== "free" && s.stripe_subscription_id).length || 0;
+      const manualSubscribers = subscriptions?.filter(s => s.status === "active" && s.plan_type !== "free" && !s.stripe_subscription_id).length || 0;
+      
       const goldSubscribers = subscriptions?.filter(s => s.status === "active" && s.plan_type === "gold").length || 0;
+      const goldPaid = subscriptions?.filter(s => s.status === "active" && s.plan_type === "gold" && s.stripe_subscription_id).length || 0;
+      
       const platinumSubscribers = subscriptions?.filter(s => s.status === "active" && s.plan_type === "platinum").length || 0;
+      const platinumPaid = subscriptions?.filter(s => s.status === "active" && s.plan_type === "platinum" && s.stripe_subscription_id).length || 0;
+      
       const freeUsers = subscriptions?.filter(s => s.plan_type === "free" || s.status !== "active").length || 0;
 
-      // Fetch real revenue from Stripe
-      let totalRevenue = 0;
-      try {
-        const { data: stripeData, error: revenueError } = await supabase.functions.invoke('get-stripe-revenue');
-        if (!revenueError && stripeData) {
-          totalRevenue = stripeData.totalRevenue || 0;
-        }
-      } catch (error) {
-        console.error("Error fetching Stripe revenue:", error);
-      }
+      // Calculate ACTUAL revenue from PAID subscriptions only
+      // Gold = €9.99/month, Platinum = €89.89/year
+      const goldRevenue = goldPaid * SUBSCRIPTION_PRICES.gold;
+      const platinumRevenue = platinumPaid * SUBSCRIPTION_PRICES.platinum;
+      let totalRevenue = goldRevenue + platinumRevenue;
 
       // Fetch purchases for standalone sales
       const { data: purchases } = await supabase
@@ -173,10 +191,10 @@ export function AnalyticsDashboard() {
       });
       const bestSellingProgram = Object.entries(programSales).sort((a, b) => b[1] - a[1])[0]?.[0] || "-";
 
-      // Revenue chart data
+      // Revenue chart data - use CORRECT prices and PAID subscribers only
       const revenueChartData = [
-        { name: "Gold Plans", value: goldSubscribers * 15 },
-        { name: "Platinum Plans", value: platinumSubscribers * 25 },
+        { name: `Gold Plans (€${SUBSCRIPTION_PRICES.gold}/mo)`, value: goldPaid * SUBSCRIPTION_PRICES.gold },
+        { name: `Platinum Plans (€${SUBSCRIPTION_PRICES.platinum}/yr)`, value: platinumPaid * SUBSCRIPTION_PRICES.platinum },
         { name: "Standalone Purchases", value: standaloneRevenue }
       ];
 
@@ -197,15 +215,16 @@ export function AnalyticsDashboard() {
         const monthStart = new Date(monthDate.getFullYear(), monthDate.getMonth(), 1);
         const monthEnd = new Date(monthDate.getFullYear(), monthDate.getMonth() + 1, 0);
 
+        // Only count PAID subscriptions (with stripe_subscription_id)
         const goldCount = subscriptions?.filter(s => {
           const startDate = new Date(s.created_at);
-          return s.plan_type === "gold" && startDate <= monthEnd && 
+          return s.plan_type === "gold" && s.stripe_subscription_id && startDate <= monthEnd && 
                  (!s.current_period_end || new Date(s.current_period_end) >= monthStart);
         }).length || 0;
 
         const platinumCount = subscriptions?.filter(s => {
           const startDate = new Date(s.created_at);
-          return s.plan_type === "platinum" && startDate <= monthEnd && 
+          return s.plan_type === "platinum" && s.stripe_subscription_id && startDate <= monthEnd && 
                  (!s.current_period_end || new Date(s.current_period_end) >= monthStart);
         }).length || 0;
 
@@ -217,8 +236,8 @@ export function AnalyticsDashboard() {
 
         trendsData.push({
           name: monthName,
-          "Gold Plans": goldCount * 15,
-          "Platinum Plans": platinumCount * 25,
+          "Gold Plans": goldCount * SUBSCRIPTION_PRICES.gold,
+          "Platinum Plans": platinumCount * SUBSCRIPTION_PRICES.platinum,
           "Standalone Purchases": monthPurchaseRevenue
         });
       }
@@ -327,16 +346,24 @@ export function AnalyticsDashboard() {
         .eq("event_type", "visit")
         .gte("created_at", startDate.toISOString());
 
-      // Fetch corporate subscriptions
+      // Fetch corporate subscriptions - include stripe fields to identify paid vs free
       const { data: corporateSubs } = await supabase
         .from("corporate_subscriptions")
-        .select("plan_type, status");
+        .select("plan_type, status, stripe_subscription_id, stripe_customer_id");
 
       const corporatePlansSold = corporateSubs?.filter(c => c.status === "active").length || 0;
+      // PAID = has stripe_subscription_id AND stripe_customer_id
+      const corporatePaid = corporateSubs?.filter(c => c.status === "active" && c.stripe_subscription_id && c.stripe_customer_id).length || 0;
+      const corporateFree = corporateSubs?.filter(c => c.status === "active" && (!c.stripe_subscription_id || !c.stripe_customer_id)).length || 0;
       
-      // Best selling corporate plan
+      // Add corporate revenue only for PAID corporate plans
+      const paidCorporatePlans = corporateSubs?.filter(c => c.status === "active" && c.stripe_subscription_id && c.stripe_customer_id) || [];
+      const corporateRevenue = paidCorporatePlans.reduce((sum, c) => sum + (CORPORATE_PRICES[c.plan_type as keyof typeof CORPORATE_PRICES] || 0), 0);
+      totalRevenue += corporateRevenue;
+      
+      // Best selling corporate plan (only count PAID)
       const corporatePlanCounts: { [key: string]: number } = {};
-      corporateSubs?.forEach(c => {
+      paidCorporatePlans.forEach(c => {
         corporatePlanCounts[c.plan_type] = (corporatePlanCounts[c.plan_type] || 0) + 1;
       });
       const bestSellingCorporatePlan = Object.entries(corporatePlanCounts)
@@ -345,8 +372,12 @@ export function AnalyticsDashboard() {
       setAnalytics({
         totalUsers,
         activeSubscribers,
+        paidSubscribers,
+        manualSubscribers,
         goldSubscribers,
+        goldPaid,
         platinumSubscribers,
+        platinumPaid,
         freeUsers,
         totalRevenue,
         avgWorkoutCompletionRate,
@@ -360,6 +391,8 @@ export function AnalyticsDashboard() {
         standaloneWorkoutsSold,
         standaloneProgramsSold,
         corporatePlansSold,
+        corporatePaid,
+        corporateFree,
         bestSellingWorkout,
         bestSellingProgram,
         bestSellingCorporatePlan,
@@ -464,14 +497,14 @@ export function AnalyticsDashboard() {
         />
         <AnalyticsMetricCard 
           title="Gold Members" 
-          value={analytics.goldSubscribers} 
-          subtitle="€15/month plan"
+          value={`${analytics.goldPaid} paid`} 
+          subtitle={`€${SUBSCRIPTION_PRICES.gold}/month • ${analytics.goldSubscribers - analytics.goldPaid} free`}
           icon={Award}
         />
         <AnalyticsMetricCard 
           title="Platinum Members" 
-          value={analytics.platinumSubscribers} 
-          subtitle="€25/month plan"
+          value={`${analytics.platinumPaid} paid`} 
+          subtitle={`€${SUBSCRIPTION_PRICES.platinum}/year • ${analytics.platinumSubscribers - analytics.platinumPaid} free`}
           icon={Star}
         />
         <AnalyticsMetricCard 
@@ -481,9 +514,9 @@ export function AnalyticsDashboard() {
           icon={Users}
         />
         <AnalyticsMetricCard 
-          title="Monthly Revenue" 
-          value={`€${analytics.totalRevenue.toLocaleString()}`} 
-          subtitle="From subscriptions"
+          title="Paid Revenue" 
+          value={`€${analytics.totalRevenue.toFixed(2)}`} 
+          subtitle={`${analytics.paidSubscribers} paid subs • ${analytics.manualSubscribers} free`}
           icon={DollarSign}
         />
       </div>
