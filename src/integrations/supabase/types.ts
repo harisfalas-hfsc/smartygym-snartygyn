@@ -2104,6 +2104,7 @@ export type Database = {
       }
       is_user_banned: { Args: { user_id_param: string }; Returns: boolean }
       pg_cron_enabled: { Args: never; Returns: boolean }
+      update_wod_cron_schedule: { Args: { new_hour: number }; Returns: Json }
     }
     Enums: {
       app_role: "admin" | "moderator" | "user"
