@@ -8,13 +8,14 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Progress } from "@/components/ui/progress";
 import { Skeleton } from "@/components/ui/skeleton";
 import { toast } from "sonner";
-import { Flame, Play, RefreshCw, Calendar, Dumbbell, Star, TrendingUp, Clock, ExternalLink, ImageIcon, BookOpen, Edit } from "lucide-react";
-import { format } from "date-fns";
+import { Flame, Play, RefreshCw, Calendar, Dumbbell, Star, TrendingUp, Clock, ExternalLink, ImageIcon, BookOpen, Edit, Settings } from "lucide-react";
+import { format, addDays } from "date-fns";
 import { WODSchedulePreview } from "./WODSchedulePreview";
 import { PeriodizationSystemDialog } from "./PeriodizationSystemDialog";
 import { WODCycleCalendar } from "@/components/WODCycleCalendar";
 import { WorkoutEditDialog } from "./WorkoutEditDialog";
 import { GenerateWODDialog } from "./GenerateWODDialog";
+import { CronTimeConfigDialog } from "./CronTimeConfigDialog";
 
 // 7-DAY CATEGORY CYCLE
 const CATEGORY_CYCLE_7DAY = [
@@ -34,6 +35,7 @@ export const WODManager = () => {
   const [generateDialogOpen, setGenerateDialogOpen] = useState(false);
   const [editDialogOpen, setEditDialogOpen] = useState(false);
   const [editingWorkout, setEditingWorkout] = useState<any>(null);
+  const [cronDialogOpen, setCronDialogOpen] = useState(false);
   const queryClient = useQueryClient();
 
   // Fetch WOD state
@@ -46,8 +48,25 @@ export const WODManager = () => {
         .limit(1)
         .single();
       
-      if (error) throw error;
+      if (error) {
+        console.error("Error fetching WOD state:", error);
+        return null;
+      }
       return data;
+    },
+  });
+
+  // Fetch total WOD count from admin_workouts
+  const { data: totalWodCount } = useQuery({
+    queryKey: ["total-wod-count"],
+    queryFn: async () => {
+      const { count, error } = await supabase
+        .from("admin_workouts")
+        .select("*", { count: "exact", head: true })
+        .eq("is_workout_of_day", true);
+      
+      if (error) throw error;
+      return count || 0;
     },
   });
 
@@ -161,15 +180,23 @@ export const WODManager = () => {
     }
   };
 
-  const getNextCategory = () => {
+  // Get tomorrow's category (what will be generated next)
+  const getTomorrowCategory = () => {
     if (!wodState) return CATEGORY_CYCLE_7DAY[0];
-    const dayInCycle = (wodState.day_count % 7);
-    return CATEGORY_CYCLE_7DAY[dayInCycle];
+    const tomorrowDayInCycle = ((wodState.day_count || 0) % 7);
+    return CATEGORY_CYCLE_7DAY[tomorrowDayInCycle];
   };
   
   const getDayInCycle = () => {
     if (!wodState) return 1;
-    return (wodState.day_count % 7) + 1;
+    return ((wodState.day_count || 0) % 7) + 1;
+  };
+
+  // Get current day's category (what was generated today)
+  const getTodayCategory = () => {
+    if (!wodState || !wodState.day_count) return null;
+    const todayDayInCycle = ((wodState.day_count - 1 + 7) % 7);
+    return CATEGORY_CYCLE_7DAY[todayDayInCycle];
   };
 
   const getDifficultyColor = (stars: number | null) => {
@@ -251,7 +278,7 @@ export const WODManager = () => {
             onOpenChange={setGenerateDialogOpen}
             onGenerate={handleGenerateWOD}
             isGenerating={isGenerating}
-            nextCategory={getNextCategory()}
+            nextCategory={getTomorrowCategory()}
             dayInCycle={getDayInCycle()}
           />
         </div>
@@ -264,33 +291,38 @@ export const WODManager = () => {
           <CardHeader className="pb-2">
             <CardDescription className="flex items-center gap-2">
               <TrendingUp className="h-4 w-4" />
-              Total Generated
+              Total WODs Generated
             </CardDescription>
           </CardHeader>
           <CardContent>
             {stateLoading ? (
               <Skeleton className="h-8 w-16" />
             ) : (
-              <p className="text-2xl font-bold">{wodState?.day_count || 0}</p>
+              <p className="text-2xl font-bold">{totalWodCount || 0}</p>
             )}
           </CardContent>
         </Card>
 
-        {/* Next Category */}
+        {/* Tomorrow's Category */}
         <Card>
           <CardHeader className="pb-2">
             <CardDescription className="flex items-center gap-2">
               <Calendar className="h-4 w-4" />
-              Next Category
+              Tomorrow's Category
             </CardDescription>
           </CardHeader>
           <CardContent>
             {stateLoading ? (
               <Skeleton className="h-8 w-32" />
             ) : (
-              <Badge variant="outline" className="text-sm font-semibold">
-                {getNextCategory()}
-              </Badge>
+              <div className="space-y-1">
+                <Badge variant="outline" className="text-sm font-semibold">
+                  {getTomorrowCategory()}
+                </Badge>
+                <p className="text-xs text-muted-foreground">
+                  {format(addDays(new Date(), 1), "EEE, MMM d")} • Day {getDayInCycle()}/7
+                </p>
+              </div>
             )}
           </CardContent>
         </Card>
@@ -307,16 +339,23 @@ export const WODManager = () => {
             {stateLoading ? (
               <Skeleton className="h-8 w-32" />
             ) : (
-              <p className="text-sm font-medium">
-                {wodState?.last_generated_at 
-                  ? format(new Date(wodState.last_generated_at), "MMM d, yyyy HH:mm")
-                  : "Never"}
-              </p>
+              <div className="space-y-1">
+                <p className="text-sm font-medium">
+                  {wodState?.last_generated_at 
+                    ? format(new Date(wodState.last_generated_at), "MMM d, yyyy HH:mm")
+                    : "Never"}
+                </p>
+                {getTodayCategory() && (
+                  <p className="text-xs text-muted-foreground">
+                    Today: {getTodayCategory()}
+                  </p>
+                )}
+              </div>
             )}
           </CardContent>
         </Card>
 
-        {/* Cron Status */}
+        {/* Cron Status with Change Button */}
         <Card>
           <CardHeader className="pb-2">
             <CardDescription className="flex items-center gap-2">
@@ -325,10 +364,21 @@ export const WODManager = () => {
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <div className="flex items-center gap-2">
-              <div className="h-2 w-2 rounded-full bg-green-500 animate-pulse" />
-              <p className="text-sm font-medium">Daily at 7:00 AM UTC</p>
+            <div className="flex items-center justify-between gap-2">
+              <div className="flex items-center gap-2">
+                <div className="h-2 w-2 rounded-full bg-green-500 animate-pulse" />
+                <p className="text-sm font-medium">05:00 UTC</p>
+              </div>
+              <Button 
+                variant="ghost" 
+                size="sm" 
+                className="h-7 px-2"
+                onClick={() => setCronDialogOpen(true)}
+              >
+                <Settings className="h-3 w-3" />
+              </Button>
             </div>
+            <p className="text-xs text-muted-foreground mt-1">07:00 Cyprus</p>
           </CardContent>
         </Card>
       </div>
@@ -665,6 +715,13 @@ export const WODManager = () => {
           setEditDialogOpen(false);
           setEditingWorkout(null);
         }}
+      />
+
+      {/* Cron Time Configuration Dialog */}
+      <CronTimeConfigDialog
+        open={cronDialogOpen}
+        onOpenChange={setCronDialogOpen}
+        currentHour={5}
       />
     </div>
   );
