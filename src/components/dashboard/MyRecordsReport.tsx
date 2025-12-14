@@ -4,11 +4,10 @@ import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { Badge } from "@/components/ui/badge";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { format, subDays, subMonths, startOfDay, endOfDay } from "date-fns";
-import { Download, CalendarIcon, Dumbbell, Calendar as CalendarIconLucide, ClipboardCheck, Calculator, TrendingUp, TrendingDown, Star, Heart, CheckCircle, Eye, Loader2, Minus } from "lucide-react";
+import { Download, CalendarIcon, Dumbbell, Calendar as CalendarIconLucide, ClipboardCheck, Calculator, TrendingUp, TrendingDown, Star, Heart, CheckCircle, Eye, Loader2, Minus, Scale } from "lucide-react";
 import html2canvas from "html2canvas";
 import smartyGymLogo from "@/assets/smarty-gym-logo.png";
 
@@ -17,13 +16,6 @@ interface MyRecordsReportProps {
 }
 
 type TimePeriod = "week" | "month" | "quarter" | "6months" | "year" | "custom";
-
-interface PeriodData {
-  workouts: { viewed: number; favorited: number; completed: number; rated: number };
-  programs: { viewed: number; favorited: number; completed: number; rated: number; ongoing: number };
-  checkins: { morning: number; night: number; total: number; avgScore: number };
-  calculators: { oneRM: number; bmr: number; calories: number };
-}
 
 export function MyRecordsReport({ userId }: MyRecordsReportProps) {
   const [timePeriod, setTimePeriod] = useState<TimePeriod>("month");
@@ -64,7 +56,6 @@ export function MyRecordsReport({ userId }: MyRecordsReportProps) {
     return { startDate, endDate };
   };
 
-  // Get previous period for comparison
   const getPreviousPeriodDateRange = () => {
     const { startDate, endDate } = getDateRange();
     const periodLength = endDate.getTime() - startDate.getTime();
@@ -286,6 +277,67 @@ export function MyRecordsReport({ userId }: MyRecordsReportProps) {
     enabled: !!userId,
   });
 
+  // Fetch measurements - current period
+  const { data: measurementData } = useQuery({
+    queryKey: ["records-measurements", userId, startDate.toISOString(), endDate.toISOString()],
+    queryFn: async () => {
+      if (!userId) return { weightLogs: 0, bodyFatLogs: 0, muscleMassLogs: 0, totalLogs: 0, latestWeight: null, latestBodyFat: null, latestMuscleMass: null };
+      
+      const { data, error } = await supabase
+        .from("user_activity_log")
+        .select("*")
+        .eq("user_id", userId)
+        .eq("content_type", "measurement")
+        .gte("activity_date", format(startDate, "yyyy-MM-dd"))
+        .lte("activity_date", format(endDate, "yyyy-MM-dd"))
+        .order("activity_date", { ascending: false });
+
+      if (error) return { weightLogs: 0, bodyFatLogs: 0, muscleMassLogs: 0, totalLogs: 0, latestWeight: null, latestBodyFat: null, latestMuscleMass: null };
+
+      const weightLogs = data?.filter(m => (m.tool_result as any)?.weight).length || 0;
+      const bodyFatLogs = data?.filter(m => (m.tool_result as any)?.body_fat).length || 0;
+      const muscleMassLogs = data?.filter(m => (m.tool_result as any)?.muscle_mass).length || 0;
+      
+      const latestWeight = data?.find(m => (m.tool_result as any)?.weight);
+      const latestBodyFat = data?.find(m => (m.tool_result as any)?.body_fat);
+      const latestMuscleMass = data?.find(m => (m.tool_result as any)?.muscle_mass);
+
+      return {
+        weightLogs,
+        bodyFatLogs,
+        muscleMassLogs,
+        totalLogs: data?.length || 0,
+        latestWeight: latestWeight ? (latestWeight.tool_result as any).weight : null,
+        latestBodyFat: latestBodyFat ? (latestBodyFat.tool_result as any).body_fat : null,
+        latestMuscleMass: latestMuscleMass ? (latestMuscleMass.tool_result as any).muscle_mass : null,
+      };
+    },
+    enabled: !!userId,
+  });
+
+  // Fetch measurements - previous period
+  const { data: prevMeasurementData } = useQuery({
+    queryKey: ["records-measurements-prev", userId, previousStart.toISOString(), previousEnd.toISOString()],
+    queryFn: async () => {
+      if (!userId) return { totalLogs: 0 };
+      
+      const { data, error } = await supabase
+        .from("user_activity_log")
+        .select("id")
+        .eq("user_id", userId)
+        .eq("content_type", "measurement")
+        .gte("activity_date", format(previousStart, "yyyy-MM-dd"))
+        .lte("activity_date", format(previousEnd, "yyyy-MM-dd"));
+
+      if (error) return { totalLogs: 0 };
+
+      return {
+        totalLogs: data?.length || 0,
+      };
+    },
+    enabled: !!userId,
+  });
+
   // Comparison badge component
   const ComparisonBadge = ({ current, previous }: { current: number; previous: number }) => {
     const diff = current - previous;
@@ -333,7 +385,6 @@ export function MyRecordsReport({ userId }: MyRecordsReportProps) {
     
     setExporting(true);
     try {
-      // Wait for all images to load before capturing
       const images = reportRef.current.querySelectorAll('img');
       await Promise.all(
         Array.from(images).map(img => {
@@ -577,7 +628,7 @@ export function MyRecordsReport({ userId }: MyRecordsReportProps) {
           </div>
 
           {/* Calculators Section */}
-          <div>
+          <div className="border-b border-primary/30">
             <div className="bg-primary/10 px-4 py-3 flex items-center gap-2">
               <Calculator className="h-5 w-5 text-primary" />
               <h3 className="font-semibold">Smarty Tools</h3>
@@ -599,6 +650,59 @@ export function MyRecordsReport({ userId }: MyRecordsReportProps) {
                 {prevCalculatorData && <ComparisonBadge current={calculatorData?.calories || 0} previous={prevCalculatorData.calories} />}
               </div>
             </div>
+          </div>
+
+          {/* Measurements Section */}
+          <div>
+            <div className="bg-primary/10 px-4 py-3 flex items-center gap-2">
+              <Scale className="h-5 w-5 text-primary" />
+              <h3 className="font-semibold">Body Measurements</h3>
+            </div>
+            <div className="grid grid-cols-2 md:grid-cols-4 divide-x divide-primary/20">
+              <div className="p-4 text-center">
+                <div className="text-muted-foreground text-sm mb-1">Weight Logs</div>
+                <p className="text-2xl font-bold">{measurementData?.weightLogs || 0}</p>
+              </div>
+              <div className="p-4 text-center">
+                <div className="text-muted-foreground text-sm mb-1">Body Fat Logs</div>
+                <p className="text-2xl font-bold">{measurementData?.bodyFatLogs || 0}</p>
+              </div>
+              <div className="p-4 text-center">
+                <div className="text-muted-foreground text-sm mb-1">Muscle Mass Logs</div>
+                <p className="text-2xl font-bold">{measurementData?.muscleMassLogs || 0}</p>
+              </div>
+              <div className="p-4 text-center">
+                <div className="text-muted-foreground text-sm mb-1">Total Entries</div>
+                <p className="text-2xl font-bold text-primary">{measurementData?.totalLogs || 0}</p>
+                {prevMeasurementData && <ComparisonBadge current={measurementData?.totalLogs || 0} previous={prevMeasurementData.totalLogs} />}
+              </div>
+            </div>
+            {/* Latest Values */}
+            {(measurementData?.latestWeight || measurementData?.latestBodyFat || measurementData?.latestMuscleMass) && (
+              <div className="border-t border-primary/20 p-4 bg-muted/30">
+                <p className="text-xs text-muted-foreground mb-2">Latest Recorded Values</p>
+                <div className="flex flex-wrap gap-4 justify-center">
+                  {measurementData?.latestWeight && (
+                    <div className="text-center">
+                      <p className="text-lg font-bold text-primary">{measurementData.latestWeight} kg</p>
+                      <p className="text-xs text-muted-foreground">Weight</p>
+                    </div>
+                  )}
+                  {measurementData?.latestBodyFat && (
+                    <div className="text-center">
+                      <p className="text-lg font-bold text-primary">{measurementData.latestBodyFat}%</p>
+                      <p className="text-xs text-muted-foreground">Body Fat</p>
+                    </div>
+                  )}
+                  {measurementData?.latestMuscleMass && (
+                    <div className="text-center">
+                      <p className="text-lg font-bold text-primary">{measurementData.latestMuscleMass} kg</p>
+                      <p className="text-xs text-muted-foreground">Muscle Mass</p>
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
           </div>
         </div>
 
