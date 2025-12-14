@@ -4,11 +4,11 @@ import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
-import { Calendar, Edit2, Clock, Star, Flame, Save } from "lucide-react";
+import { Calendar, Edit2, Clock, Star, Flame, Save, Dumbbell, User } from "lucide-react";
 import { format, addDays } from "date-fns";
 
 // 7-DAY CATEGORY CYCLE
@@ -246,6 +246,21 @@ export const WODSchedulePreview = () => {
                       <Star className="h-3 w-3 mr-1" />
                       {day.difficultyLevel} ({day.difficultyRange[0]}-{day.difficultyRange[1]}★)
                     </Badge>
+                  </div>
+                  
+                  {/* Equipment/Bodyweight versions indicator */}
+                  <div className="flex items-center gap-4 mt-2 pt-2 border-t border-border/50">
+                    <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
+                      <Dumbbell className="h-3 w-3" />
+                      <span>With Equipment</span>
+                    </div>
+                    <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
+                      <User className="h-3 w-3" />
+                      <span>Bodyweight</span>
+                    </div>
+                    <span className="text-xs text-muted-foreground/70 italic">
+                      — Same settings for both versions
+                    </span>
                   </div>
                 </div>
                 
