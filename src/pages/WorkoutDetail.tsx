@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
-import { ArrowLeft, Eye, CheckCircle, Search, X, Sparkles, Star, Crown, ShoppingCart, Check } from "lucide-react";
+import { ArrowLeft, Eye, CheckCircle, Search, X, Sparkles, Star, Crown, ShoppingCart, Check, Home, Dumbbell, Flame, TrendingUp, Clock } from "lucide-react";
 import { AccessGate } from "@/components/AccessGate";
 import { CompactFilters } from "@/components/CompactFilters";
 import { PageBreadcrumbs } from "@/components/PageBreadcrumbs";
@@ -464,17 +464,47 @@ const WorkoutDetail = () => {
                 className="overflow-hidden cursor-pointer transition-all duration-300 hover:scale-105 hover:shadow-primary bg-card border-border relative"
                 onClick={() => navigate(`/workout/${type}/${workout.id}`)}
               >
-                {/* NEW Badge */}
-                {isNewWorkout && (
-                  <div className="absolute top-2 right-2 z-10">
-                    <span className="inline-flex items-center gap-1 bg-gradient-to-r from-yellow-400 to-orange-500 text-white text-xs font-bold px-2 py-1 rounded-full shadow-lg animate-pulse">
-                      <Sparkles className="h-3 w-3 shrink-0" />
-                      NEW
-                    </span>
-                  </div>
-                )}
-
                 <div className="relative h-48 w-full overflow-hidden">
+                  {/* Equipment Badge - Top Left */}
+                  <div className="absolute top-2 left-2 z-10">
+                    {workout.equipment === 'BODYWEIGHT' ? (
+                      <span className="inline-flex items-center gap-1 bg-blue-500/90 text-white text-xs font-semibold px-2 py-1 rounded-full shadow-lg backdrop-blur-sm">
+                        <Home className="h-3 w-3 shrink-0" />
+                        No Equipment
+                      </span>
+                    ) : (
+                      <span className="inline-flex items-center gap-1 bg-orange-500/90 text-white text-xs font-semibold px-2 py-1 rounded-full shadow-lg backdrop-blur-sm">
+                        <Dumbbell className="h-3 w-3 shrink-0" />
+                        With Equipment
+                      </span>
+                    )}
+                  </div>
+
+                  {/* NEW Badge - Top Right */}
+                  {isNewWorkout && (
+                    <div className="absolute top-2 right-2 z-10">
+                      <span className="inline-flex items-center gap-1 bg-gradient-to-r from-yellow-400 to-orange-500 text-white text-xs font-bold px-2 py-1 rounded-full shadow-lg animate-pulse">
+                        <Sparkles className="h-3 w-3 shrink-0" />
+                        NEW
+                      </span>
+                    </div>
+                  )}
+
+                  {/* Premium/Free Badge - Bottom Right */}
+                  <div className="absolute bottom-2 right-2 z-10">
+                    {workout.is_premium ? (
+                      <span className="inline-flex items-center gap-1 bg-gradient-to-r from-yellow-400 to-orange-500 text-white text-xs font-semibold px-2 py-1 rounded-full shadow-lg">
+                        <Crown className="h-3 w-3 shrink-0" />
+                        Premium
+                      </span>
+                    ) : (
+                      <span className="inline-flex items-center gap-1 bg-gradient-to-r from-blue-500 to-cyan-600 text-white text-xs font-semibold px-2 py-1 rounded-full shadow-lg">
+                        <Check className="h-3 w-3 shrink-0" />
+                        FREE
+                      </span>
+                    )}
+                  </div>
+
                   <img 
                     src={workout.image_url} 
                     alt={`${workout.name} - ${workout.duration} ${workout.difficulty} ${workout.equipment === 'BODYWEIGHT' ? 'bodyweight' : 'equipment-based'} ${workout.format} workout by Haris Falas Sports Scientist at SmartyGym.com`}
@@ -487,8 +517,37 @@ const WorkoutDetail = () => {
                   <h3 className="font-semibold text-base sm:text-lg">{workout.name}</h3>
                   <p className="text-xs sm:text-sm text-muted-foreground line-clamp-2">{stripHtmlTags(workout.description || "")}</p>
                   
+                  {/* Details Row - Format, Difficulty, Duration */}
+                  <div className="flex items-center gap-2 flex-wrap text-xs text-muted-foreground">
+                    {workout.format && (
+                      <>
+                        <div className="flex items-center gap-1">
+                          <Flame className="h-3 w-3 shrink-0 text-orange-500" />
+                          <span className="uppercase font-medium">{workout.format}</span>
+                        </div>
+                        <span>•</span>
+                      </>
+                    )}
+                    {workout.difficulty && (
+                      <>
+                        <div className="flex items-center gap-1">
+                          <TrendingUp className="h-3 w-3 shrink-0 text-primary" />
+                          <span className="capitalize">{workout.difficulty}</span>
+                          {workout.difficulty_stars && (
+                            <span className="text-yellow-500">({workout.difficulty_stars}★)</span>
+                          )}
+                        </div>
+                        <span>•</span>
+                      </>
+                    )}
+                    <div className="flex items-center gap-1">
+                      <Clock className="h-3 w-3 shrink-0" />
+                      <span>{workout.duration}</span>
+                    </div>
+                  </div>
+                  
                   {/* Status Indicators Row */}
-                  {userId && (
+                  {userId && (isCompleted || isViewed || isFavorite) && (
                     <div className="flex items-center gap-2 flex-wrap">
                       {isCompleted && (
                         <div className="flex items-center gap-1 text-xs text-green-600 dark:text-green-400">
@@ -510,49 +569,25 @@ const WorkoutDetail = () => {
                           <span className="hidden sm:inline">Favorite</span>
                         </div>
                       )}
-                      
-                      {isNewWorkout && (
-                        <div className="flex items-center gap-1 text-xs text-orange-600 dark:text-orange-400 font-semibold">
-                          <Sparkles className="h-3 w-3 sm:h-4 sm:w-4 shrink-0" />
-                          <span>NEW</span>
-                        </div>
-                      )}
                     </div>
                   )}
                   
-                  {/* Access Badge */}
-                  <div className="flex items-center gap-2">
-                    <span className="text-xs text-muted-foreground">{workout.duration}</span>
-                    <span className="text-xs text-muted-foreground">•</span>
-                    {workout.is_premium ? (
-                      <>
-                        {/* Always show Premium badge for premium content */}
-                        <span className="inline-flex items-center gap-1 bg-gradient-to-r from-yellow-400 to-orange-500 text-white text-xs font-semibold px-2 py-1 rounded-full">
-                          <Crown className="h-3 w-3 shrink-0" />
-                          <span>Premium</span>
-                        </span>
-                        {/* Additionally show Buy badge if standalone is available */}
-                        {workout.is_standalone_purchase && workout.price && (
-                          <Tooltip>
-                            <TooltipTrigger asChild>
-                              <span className="inline-flex items-center gap-1 bg-gradient-to-r from-green-500 to-emerald-600 text-white text-xs font-semibold px-2 py-1 rounded-full cursor-help">
-                                <ShoppingCart className="h-3 w-3 shrink-0" />
-                                BUY €{Number(workout.price).toFixed(2)}
-                              </span>
-                            </TooltipTrigger>
-                            <TooltipContent side="top" align="center" className="max-w-xs text-center">
-                              Buy this workout individually to try our coaching style before committing to a subscription.
-                            </TooltipContent>
-                          </Tooltip>
-                        )}
-                      </>
-                    ) : (
-                      <span className="inline-flex items-center gap-1 bg-gradient-to-r from-blue-500 to-cyan-600 text-white text-xs font-semibold px-2 py-1 rounded-full">
-                        <Check className="h-3 w-3 shrink-0" />
-                        FREE
-                      </span>
-                    )}
-                  </div>
+                  {/* Buy Badge - Only if standalone purchasable */}
+                  {workout.is_standalone_purchase && workout.price && (
+                    <div className="flex items-center">
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <span className="inline-flex items-center gap-1 bg-gradient-to-r from-green-500 to-emerald-600 text-white text-xs font-semibold px-2 py-1 rounded-full cursor-help">
+                            <ShoppingCart className="h-3 w-3 shrink-0" />
+                            BUY €{Number(workout.price).toFixed(2)}
+                          </span>
+                        </TooltipTrigger>
+                        <TooltipContent side="top" align="center" className="max-w-xs text-center">
+                          Buy this workout individually to try our coaching style before committing to a subscription.
+                        </TooltipContent>
+                      </Tooltip>
+                    </div>
+                  )}
                 </div>
               </Card>
             );
