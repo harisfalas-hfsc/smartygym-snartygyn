@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { ScrollReveal } from "@/components/ScrollReveal";
-import { CheckCircle2, Target, Heart, Users, Shield, Award, Compass, ArrowLeft, GraduationCap, Plane, Dumbbell } from "lucide-react";
+import { CheckCircle2, Target, Heart, Users, Shield, Award, Compass, ArrowLeft, GraduationCap, Plane, Dumbbell, UserCheck } from "lucide-react";
 import { useShowBackButton } from "@/hooks/useShowBackButton";
 import { useAccessControl } from "@/hooks/useAccessControl";
 import { SEOEnhancer } from "@/components/SEOEnhancer";
@@ -166,6 +166,36 @@ const About = () => {
           <ScrollReveal>
             <section className="mb-12">
               <h2 className="text-2xl md:text-3xl font-bold mb-6 text-center">What We Stand For</h2>
+              
+              {/* Mobile Only: 100% Human. 0% AI. Card */}
+              <Card className="mb-6 border-2 border-primary md:hidden">
+                <CardContent className="p-6 text-center space-y-4">
+                  <UserCheck className="w-12 h-12 text-red-500 mx-auto" />
+                  <h3 className="text-xl font-bold text-foreground">100% Human. 0% AI.</h3>
+                  <div className="space-y-3 text-sm text-muted-foreground">
+                    <p>
+                      Every workout and training program is science-based and personally created by{' '}
+                      <a 
+                        href="/coach-profile" 
+                        onClick={(e) => {
+                          e.preventDefault();
+                          navigate('/coach-profile');
+                        }}
+                        className="text-primary hover:underline font-semibold cursor-pointer"
+                      >
+                        Haris Falas
+                      </a>.
+                    </p>
+                    <p>
+                      Never by AI. Never by algorithms. Always by a real human expert who understands YOUR needs.
+                    </p>
+                    <p className="font-semibold text-foreground">
+                      Training designed by humans, for humans.
+                    </p>
+                  </div>
+                </CardContent>
+              </Card>
+
               <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
                 
                 <Card className="border-2 border-border hover:border-primary transition-all">
