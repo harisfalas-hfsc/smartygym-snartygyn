@@ -748,7 +748,7 @@ RESPONSE FORMAT (JSON ONLY - NO MARKDOWN):
           is_ai_generated: true,
           is_visible: true,
           serial_number: null,
-          generated_for_date: isPreGeneration ? effectiveDate : null
+          generated_for_date: effectiveDate
         });
 
       if (insertError) {
