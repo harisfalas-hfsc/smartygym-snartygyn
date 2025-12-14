@@ -60,28 +60,27 @@ export const WODTimeline = () => {
   const tomorrow = addDays(new Date(), 1);
   
   // Fetch yesterday's WOD with caching
+  // Fetch yesterday's WOD using generated_for_date for fast indexed lookup
   const { data: yesterdayWOD, isLoading: loadingYesterday } = useQuery({
-    queryKey: ["yesterday-wod"],
+    queryKey: ["yesterday-wod", format(yesterday, "yyyy-MM-dd")],
     queryFn: async () => {
-      const startOfDay = new Date(yesterday.getFullYear(), yesterday.getMonth(), yesterday.getDate()).toISOString();
-      const endOfDay = new Date(yesterday.getFullYear(), yesterday.getMonth(), yesterday.getDate() + 1).toISOString();
+      const yesterdayDateStr = format(yesterday, "yyyy-MM-dd");
       
       const { data, error } = await supabase
         .from("admin_workouts")
         .select("category, format, difficulty, difficulty_stars")
-        .like("id", "WOD-%")
-        .gte("created_at", startOfDay)
-        .lt("created_at", endOfDay)
+        .eq("generated_for_date", yesterdayDateStr)
+        .eq("is_workout_of_day", true)
         .limit(1);
       
       if (error) throw error;
       return data?.[0] || null;
     },
-    staleTime: 60000,
+    staleTime: 5 * 60 * 1000, // 5 minutes cache
     refetchOnWindowFocus: false,
   });
 
-  // Fetch current WODs (today) with caching
+  // Fetch current WODs (today) with longer cache
   const { data: todayWODs, isLoading: loadingToday } = useQuery({
     queryKey: ["today-wods-timeline"],
     queryFn: async () => {
@@ -94,11 +93,11 @@ export const WODTimeline = () => {
       if (error) throw error;
       return data?.[0] || null;
     },
-    staleTime: 60000,
+    staleTime: 5 * 60 * 1000, // 5 minutes cache
     refetchOnWindowFocus: false,
   });
 
-  // Fetch WOD state for tomorrow calculation with caching
+  // Fetch WOD state for tomorrow calculation with longer cache
   const { data: wodState, isLoading: loadingState } = useQuery({
     queryKey: ["wod-state-timeline"],
     queryFn: async () => {
@@ -111,7 +110,7 @@ export const WODTimeline = () => {
       if (error) throw error;
       return data;
     },
-    staleTime: 60000,
+    staleTime: 5 * 60 * 1000, // 5 minutes cache
     refetchOnWindowFocus: false,
   });
 
