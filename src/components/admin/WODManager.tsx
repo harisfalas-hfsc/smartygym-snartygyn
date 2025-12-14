@@ -203,7 +203,7 @@ export const WODManager = () => {
             Workout of the Day Management
           </h3>
           <p className="text-sm text-muted-foreground">
-            Generate and manage daily workouts
+            Generate, edit, and manage daily workouts. WODs auto-generate at 7:00 AM UTC (9:00 AM Cyprus).
           </p>
         </div>
         
@@ -399,10 +399,23 @@ export const WODManager = () => {
       {/* Current WOD */}
       <Card className="border-primary/50">
         <CardHeader>
-          <CardTitle className="flex items-center gap-2 text-primary">
-            <Flame className="h-5 w-5" />
-            Current Workout of the Day
-          </CardTitle>
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+            <div>
+              <CardTitle className="flex items-center gap-2 text-primary">
+                <Flame className="h-5 w-5" />
+                Today's Active WOD — {format(new Date(), "EEEE, MMMM d, yyyy")}
+              </CardTitle>
+              <CardDescription className="mt-1">
+                This is what users see at <strong>/workout/wod</strong> right now
+              </CardDescription>
+            </div>
+            <Button variant="outline" size="sm" asChild>
+              <a href="/workout/wod" target="_blank" rel="noopener noreferrer">
+                <ExternalLink className="h-4 w-4 mr-2" />
+                View on Site
+              </a>
+            </Button>
+          </div>
         </CardHeader>
         <CardContent>
           {wodLoading ? (
@@ -480,7 +493,9 @@ export const WODManager = () => {
       <Card>
         <CardHeader>
           <CardTitle className="text-sm">Generation History</CardTitle>
-          <CardDescription>Last 30 generated workouts of the day</CardDescription>
+          <CardDescription>
+            Last 30 generated WODs. Past WODs remain in the workout library and can be edited anytime.
+          </CardDescription>
         </CardHeader>
         <CardContent>
           {historyLoading ? (

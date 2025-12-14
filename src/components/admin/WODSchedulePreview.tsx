@@ -209,7 +209,8 @@ export const WODSchedulePreview = () => {
             Upcoming WOD Schedule (Next 3 Days)
           </CardTitle>
           <CardDescription>
-            Preview and override future WOD settings. Overrides don't affect rotation sequence.
+            <span className="block">Preview future WODs and set overrides. The "Day X/7" shows position in the 7-day category rotation cycle (not calendar days).</span>
+            <span className="block mt-1 text-xs">💡 <strong>What is Day 1/7?</strong> The system rotates through 7 workout categories. Day 1 = Challenge, Day 2 = Strength, etc. This cycle repeats continuously.</span>
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-3">
