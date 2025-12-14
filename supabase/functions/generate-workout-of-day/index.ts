@@ -9,24 +9,45 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
-// Category rotation cycle (6 days) - Each category appears once per week
-const CATEGORY_CYCLE = [
-  "STRENGTH",
-  "CALORIE BURNING", 
-  "METABOLIC",
-  "CARDIO",
-  "MOBILITY & STABILITY",
-  "CHALLENGE"
+// ═══════════════════════════════════════════════════════════════════════════════
+// NEW 7-DAY CATEGORY CYCLE (User's exact specification)
+// ═══════════════════════════════════════════════════════════════════════════════
+const CATEGORY_CYCLE_7DAY = [
+  "CHALLENGE",            // Day 1
+  "STRENGTH",             // Day 2 (REPS & SETS only)
+  "CARDIO",               // Day 3
+  "MOBILITY & STABILITY", // Day 4 (REPS & SETS only)
+  "STRENGTH",             // Day 5 (REPS & SETS only)
+  "METABOLIC",            // Day 6
+  "CALORIE BURNING"       // Day 7
 ];
 
-// Training philosophy: Format rules per category (STRICT)
+// ═══════════════════════════════════════════════════════════════════════════════
+// DIFFICULTY PATTERN - Rotates weekly to prevent category-difficulty pairing
+// ═══════════════════════════════════════════════════════════════════════════════
+// Week 1: [3-4, 5-6, 1-2, 5-6, 3-4, 1-2, 5-6] -> Day 1 Intermediate, Day 2 Advanced...
+// Week 2: [5-6, 3-4, 5-6, 1-2, 5-6, 3-4, 1-2] -> Shifts by 1
+// Week 3: [1-2, 5-6, 3-4, 5-6, 1-2, 5-6, 3-4] -> Shifts by 1 again...
+const DIFFICULTY_PATTERN_BASE = [
+  { level: "Intermediate", range: [3, 4] }, // Day 1
+  { level: "Advanced", range: [5, 6] },     // Day 2
+  { level: "Beginner", range: [1, 2] },     // Day 3
+  { level: "Advanced", range: [5, 6] },     // Day 4
+  { level: "Intermediate", range: [3, 4] }, // Day 5
+  { level: "Beginner", range: [1, 2] },     // Day 6
+  { level: "Advanced", range: [5, 6] }      // Day 7
+];
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// FORMAT RULES BY CATEGORY (STRICT)
+// ═══════════════════════════════════════════════════════════════════════════════
 const FORMATS_BY_CATEGORY: Record<string, string[]> = {
-  "STRENGTH": ["REPS & SETS"], // Strength MUST be Reps & Sets only
-  "CALORIE BURNING": ["CIRCUIT", "TABATA", "AMRAP"], // High intensity intervals
-  "METABOLIC": ["CIRCUIT", "AMRAP", "EMOM", "FOR TIME"], // Metabolic conditioning
-  "CARDIO": ["CIRCUIT", "EMOM", "FOR TIME"], // Sustained cardio work
-  "MOBILITY & STABILITY": ["MIX", "CIRCUIT"], // Flexibility and control
-  "CHALLENGE": ["CIRCUIT", "TABATA", "AMRAP", "EMOM", "FOR TIME", "REPS & SETS", "MIX"] // Any format
+  "STRENGTH": ["REPS & SETS"], // ONLY Reps & Sets
+  "MOBILITY & STABILITY": ["REPS & SETS"], // ONLY Reps & Sets
+  "CARDIO": ["CIRCUIT", "EMOM", "FOR TIME", "AMRAP", "TABATA"], // NO Reps & Sets
+  "METABOLIC": ["CIRCUIT", "AMRAP", "EMOM", "FOR TIME", "TABATA"], // NO Reps & Sets
+  "CALORIE BURNING": ["CIRCUIT", "TABATA", "AMRAP", "FOR TIME", "EMOM"], // NO Reps & Sets
+  "CHALLENGE": ["CIRCUIT", "TABATA", "AMRAP", "EMOM", "FOR TIME", "MIX"] // Any except Reps & Sets
 };
 
 // All difficulty levels available (6 levels)
@@ -39,77 +60,74 @@ const DIFFICULTY_LEVELS = [
   { name: "Advanced", stars: 6 }
 ];
 
-// Duration options based on format and difficulty
-const DURATION_OPTIONS = ["30 min", "45 min", "60 min"];
-
 function logStep(step: string, details?: any) {
   const detailsStr = details ? ` - ${JSON.stringify(details)}` : '';
   console.log(`[GENERATE-WOD] ${step}${detailsStr}`);
 }
 
-// Helper to get next difficulty with rotation logic (prevents consecutive same-difficulty)
-function getNextDifficulty(
-  lastDifficultyStars: number | null, 
-  usedDifficulties: number[]
-): { name: string; stars: number } {
-  // Get available difficulties (not used in current cycle)
-  let availableDifficulties = DIFFICULTY_LEVELS.filter(d => !usedDifficulties.includes(d.stars));
-  
-  // If all used, reset cycle
-  if (availableDifficulties.length === 0) {
-    availableDifficulties = [...DIFFICULTY_LEVELS];
-  }
-  
-  // RULE 1: Prevent consecutive same-difficulty (if last was X stars, next cannot be X stars)
-  if (lastDifficultyStars !== null) {
-    const differentOptions = availableDifficulties.filter(d => d.stars !== lastDifficultyStars);
-    if (differentOptions.length > 0) {
-      availableDifficulties = differentOptions;
-    }
-  }
-  
-  // RULE 2: Prevent consecutive high-intensity (5-6 stars) - recovery after advanced
-  if (lastDifficultyStars && lastDifficultyStars >= 5) {
-    // Last was advanced (5-6), next MUST be 1-4 for recovery
-    const recoveryOptions = availableDifficulties.filter(d => d.stars <= 4);
-    if (recoveryOptions.length > 0) {
-      availableDifficulties = recoveryOptions;
-    }
-  }
-  
-  // RULE 3: Prevent consecutive low-intensity (1-2 stars) - progression after beginner
-  if (lastDifficultyStars && lastDifficultyStars <= 2) {
-    // Last was beginner (1-2), prefer 3+ for progression
-    const progressionOptions = availableDifficulties.filter(d => d.stars >= 3);
-    if (progressionOptions.length > 0) {
-      availableDifficulties = progressionOptions;
-    }
-  }
-  
-  // Random selection from available options
-  const selected = availableDifficulties[Math.floor(Math.random() * availableDifficulties.length)];
-  
-  let reason = "Normal rotation";
-  if (lastDifficultyStars && lastDifficultyStars >= 5) {
-    reason = "Recovery after advanced (5-6 stars)";
-  } else if (lastDifficultyStars && lastDifficultyStars <= 2) {
-    reason = "Progression after beginner (1-2 stars)";
-  } else if (lastDifficultyStars !== null) {
-    reason = "Variation from previous difficulty";
-  }
-  
-  logStep("Difficulty rotation applied", { 
-    lastStars: lastDifficultyStars, 
-    usedInCycle: usedDifficulties,
-    selectedStars: selected.stars,
-    reason: reason
-  });
-  
-  return selected;
+// ═══════════════════════════════════════════════════════════════════════════════
+// NEW ROTATION LOGIC FUNCTIONS
+// ═══════════════════════════════════════════════════════════════════════════════
+
+// Get day 1-7 in current 7-day cycle
+function getDayInCycle(dayCount: number): number {
+  return (dayCount % 7) + 1;
 }
 
-// Helper to get next format for a category with tracking
-function getNextFormat(category: string, formatUsage: Record<string, string[]>): { format: string; updatedUsage: Record<string, string[]> } {
+// Get week number (for difficulty rotation shift)
+function getWeekNumber(dayCount: number): number {
+  return Math.floor(dayCount / 7) + 1;
+}
+
+// Get category for a specific day in cycle (1-7)
+function getCategoryForDay(dayInCycle: number): string {
+  return CATEGORY_CYCLE_7DAY[dayInCycle - 1];
+}
+
+// Get difficulty for day with weekly rotation shift and star alternation
+function getDifficultyForDay(
+  dayInCycle: number, 
+  weekNumber: number, 
+  usedStarsInWeek: Record<string, boolean>
+): { name: string; stars: number } {
+  // Shift the difficulty pattern by (weekNumber - 1) positions
+  const shiftAmount = (weekNumber - 1) % 7;
+  const shiftedIndex = ((dayInCycle - 1) + shiftAmount) % 7;
+  const pattern = DIFFICULTY_PATTERN_BASE[shiftedIndex];
+  
+  const [star1, star2] = pattern.range;
+  
+  // Alternate stars: if star1 used this week, use star2
+  // This prevents duplicate stars in the 7-day period
+  let selectedStars: number;
+  if (usedStarsInWeek[String(star1)]) {
+    selectedStars = star2;
+  } else if (usedStarsInWeek[String(star2)]) {
+    selectedStars = star1;
+  } else {
+    // Neither used, pick star1 first
+    selectedStars = star1;
+  }
+  
+  logStep("Difficulty calculation", {
+    dayInCycle,
+    weekNumber,
+    shiftAmount,
+    shiftedIndex,
+    pattern: pattern.level,
+    range: pattern.range,
+    usedStars: Object.keys(usedStarsInWeek),
+    selectedStars
+  });
+  
+  return { name: pattern.level, stars: selectedStars };
+}
+
+// Get format for category with rotation and validation
+function getFormatForCategory(
+  category: string, 
+  formatUsage: Record<string, string[]>
+): { format: string; updatedUsage: Record<string, string[]> } {
   const validFormats = FORMATS_BY_CATEGORY[category] || ["CIRCUIT"];
   const usedFormats = formatUsage[category] || [];
   
@@ -124,10 +142,17 @@ function getNextFormat(category: string, formatUsage: Record<string, string[]>):
     selectedFormat = availableFormats[Math.floor(Math.random() * availableFormats.length)];
     newUsedFormats = [...usedFormats, selectedFormat];
   } else {
-    // All formats used, reset and pick first one
+    // All formats used, reset and pick one
     selectedFormat = validFormats[Math.floor(Math.random() * validFormats.length)];
     newUsedFormats = [selectedFormat];
   }
+  
+  logStep("Format selection", {
+    category,
+    validFormats,
+    usedFormats,
+    selectedFormat
+  });
   
   return {
     format: selectedFormat,
@@ -138,13 +163,61 @@ function getNextFormat(category: string, formatUsage: Record<string, string[]>):
   };
 }
 
+// Check for manual override for a specific date
+function checkManualOverride(
+  dateStr: string, 
+  overrides: Record<string, any>
+): { category?: string; format?: string; difficulty?: number } | null {
+  if (overrides && overrides[dateStr]) {
+    return overrides[dateStr];
+  }
+  return null;
+}
+
+// Calculate future WOD schedule for admin preview
+export function calculateFutureWODSchedule(
+  currentDayCount: number,
+  currentWeekNumber: number,
+  usedStarsInWeek: Record<string, boolean>,
+  formatUsage: Record<string, string[]>,
+  daysAhead: number = 3
+): Array<{ date: string; dayInCycle: number; category: string; difficulty: { name: string; stars: number }; formats: string[] }> {
+  const schedule = [];
+  
+  for (let i = 1; i <= daysAhead; i++) {
+    const futureDayCount = currentDayCount + i;
+    const futureDayInCycle = getDayInCycle(futureDayCount);
+    const futureWeekNumber = getWeekNumber(futureDayCount);
+    
+    // Reset used stars if entering new week
+    const futureUsedStars = futureDayInCycle === 1 ? {} : usedStarsInWeek;
+    
+    const category = getCategoryForDay(futureDayInCycle);
+    const difficulty = getDifficultyForDay(futureDayInCycle, futureWeekNumber, futureUsedStars);
+    const formats = FORMATS_BY_CATEGORY[category] || ["CIRCUIT"];
+    
+    const futureDate = new Date();
+    futureDate.setDate(futureDate.getDate() + i);
+    
+    schedule.push({
+      date: futureDate.toISOString().split('T')[0],
+      dayInCycle: futureDayInCycle,
+      category,
+      difficulty,
+      formats
+    });
+  }
+  
+  return schedule;
+}
+
 serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
   }
 
   try {
-    logStep("Starting Dual Workout of the Day generation (BODYWEIGHT + EQUIPMENT)");
+    logStep("Starting Dual Workout of the Day generation (BODYWEIGHT + EQUIPMENT) - 7-DAY CYCLE");
 
     const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
     const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
@@ -159,6 +232,7 @@ serve(async (req) => {
 
     // SAME-DAY GENERATION GUARD: Check if today's WOD already exists
     const today = new Date();
+    const todayStr = today.toISOString().split('T')[0];
     const todayStart = new Date(today.getFullYear(), today.getMonth(), today.getDate()).toISOString();
     const todayEnd = new Date(today.getFullYear(), today.getMonth(), today.getDate() + 1).toISOString();
     
@@ -195,6 +269,9 @@ serve(async (req) => {
 
     let state = stateData || {
       day_count: 0,
+      week_number: 1,
+      used_stars_in_week: {},
+      manual_overrides: {},
       equipment_bodyweight_count: 0,
       equipment_with_count: 0,
       difficulty_beginner_count: 0,
@@ -205,7 +282,7 @@ serve(async (req) => {
 
     logStep("Current state", state);
 
-    // Move ALL previous WODs to their categories (there should be 2)
+    // Move ALL previous WODs to their categories
     const { data: previousWODs } = await supabase
       .from("admin_workouts")
       .select("*")
@@ -215,7 +292,6 @@ serve(async (req) => {
       for (const previousWOD of previousWODs) {
         logStep("Moving previous WOD to category", { id: previousWOD.id, category: previousWOD.category });
         
-        const categoryPrefix = previousWOD.category?.charAt(0).toUpperCase() || "W";
         const { data: existingWorkouts } = await supabase
           .from("admin_workouts")
           .select("serial_number")
@@ -238,53 +314,79 @@ serve(async (req) => {
       }
     }
 
-    // Determine today's category (same for both workouts)
-    const categoryIndex = state.day_count % CATEGORY_CYCLE.length;
-    const category = CATEGORY_CYCLE[categoryIndex];
-    logStep("Today's category (shared)", { category, dayCount: state.day_count });
-
-    // Determine difficulty with rotation logic (prevents consecutive high-intensity)
-    const usedDifficultiesInCycle = state.used_difficulties_in_cycle || [];
-    const lastDifficultyStars = state.last_difficulty_stars || null;
-    const selectedDifficulty = getNextDifficulty(lastDifficultyStars, usedDifficultiesInCycle);
+    // ═══════════════════════════════════════════════════════════════════════════════
+    // CALCULATE TODAY'S WOD PARAMETERS (7-DAY CYCLE)
+    // ═══════════════════════════════════════════════════════════════════════════════
     
-    // Update used difficulties tracking (reset if all 6 used)
-    let newUsedDifficulties = [...usedDifficultiesInCycle, selectedDifficulty.stars];
-    if (newUsedDifficulties.length >= 6) {
-      newUsedDifficulties = [selectedDifficulty.stars]; // Reset cycle
+    const dayInCycle = getDayInCycle(state.day_count);
+    const weekNumber = state.week_number || getWeekNumber(state.day_count);
+    let usedStarsInWeek = state.used_stars_in_week || {};
+    const manualOverrides = state.manual_overrides || {};
+    
+    // Check if we're starting a new week (day 1) - reset used stars
+    if (dayInCycle === 1) {
+      usedStarsInWeek = {};
+      logStep("New 7-day cycle started, resetting used stars");
     }
-    logStep("Selected difficulty (shared)", { 
-      ...selectedDifficulty, 
-      dayCount: state.day_count,
-      usedInCycle: newUsedDifficulties
+    
+    logStep("7-Day Cycle Parameters", { 
+      dayCount: state.day_count, 
+      dayInCycle, 
+      weekNumber,
+      usedStarsInWeek 
     });
 
-    // Determine format with tracking (same for both workouts)
-    const formatUsage = state.format_usage || {};
-    const { format, updatedUsage } = getNextFormat(category, formatUsage);
-    logStep("Selected format (shared)", { format, category, usedFormats: formatUsage[category] });
+    // Check for manual override for today
+    const override = checkManualOverride(todayStr, manualOverrides);
+    
+    let category: string;
+    let selectedDifficulty: { name: string; stars: number };
+    let format: string;
+    let updatedUsage: Record<string, string[]>;
+    
+    if (override) {
+      logStep("USING MANUAL OVERRIDE", override);
+      category = override.category || getCategoryForDay(dayInCycle);
+      selectedDifficulty = override.difficulty 
+        ? { 
+            name: override.difficulty <= 2 ? "Beginner" : override.difficulty <= 4 ? "Intermediate" : "Advanced",
+            stars: override.difficulty 
+          }
+        : getDifficultyForDay(dayInCycle, weekNumber, usedStarsInWeek);
+      format = override.format || getFormatForCategory(category, state.format_usage || {}).format;
+      updatedUsage = state.format_usage || {};
+    } else {
+      // Normal calculation
+      category = getCategoryForDay(dayInCycle);
+      selectedDifficulty = getDifficultyForDay(dayInCycle, weekNumber, usedStarsInWeek);
+      const formatResult = getFormatForCategory(category, state.format_usage || {});
+      format = formatResult.format;
+      updatedUsage = formatResult.updatedUsage;
+    }
+    
+    logStep("Today's WOD specs", { 
+      category, 
+      difficulty: selectedDifficulty, 
+      format,
+      isOverride: !!override
+    });
 
-    // Duration based on format and difficulty - EXPANDED RANGE (15, 20, 30, 45, 60 min, Various)
-    const getDuration = (format: string, stars: number): string => {
-      // Base duration ranges by format [min, mid, max]
+    // Duration based on format and difficulty
+    const getDuration = (fmt: string, stars: number): string => {
       const baseDurations: Record<string, number[]> = {
-        "REPS & SETS": [45, 50, 60],   // Strength needs more time
-        "CIRCUIT": [20, 30, 45],       // Flexible circuit length
-        "TABATA": [15, 20, 30],        // Quick intense sessions
-        "AMRAP": [15, 25, 45],         // Flexible based on complexity
-        "EMOM": [15, 20, 30],          // Every minute format
-        "FOR TIME": [0, 0, 0],         // Special: "Various" for race-against-clock
-        "MIX": [30, 40, 60]            // Combo formats need more time
+        "REPS & SETS": [45, 50, 60],
+        "CIRCUIT": [20, 30, 45],
+        "TABATA": [15, 20, 30],
+        "AMRAP": [15, 25, 45],
+        "EMOM": [15, 20, 30],
+        "FOR TIME": [0, 0, 0],
+        "MIX": [30, 40, 60]
       };
       
-      // FOR TIME format uses "Various" (complete as fast as possible)
-      if (format === "FOR TIME") {
-        return "Various";
-      }
+      if (fmt === "FOR TIME") return "Various";
       
-      const [minDuration, midDuration, maxDuration] = baseDurations[format] || [20, 30, 45];
+      const [minDuration, midDuration, maxDuration] = baseDurations[fmt] || [20, 30, 45];
       
-      // Adjust by difficulty: lower difficulty = shorter duration, higher = longer
       if (stars <= 2) return `${minDuration} min`;
       if (stars <= 4) return `${midDuration} min`;
       return `${maxDuration} min`;
@@ -307,12 +409,11 @@ serve(async (req) => {
     // Generate TWO workouts - one BODYWEIGHT, one EQUIPMENT
     const equipmentTypes = ["BODYWEIGHT", "EQUIPMENT"];
     const generatedWorkouts: any[] = [];
-    let firstWorkoutName = ""; // Track first workout's name to prevent duplicates
+    let firstWorkoutName = "";
 
     for (const equipment of equipmentTypes) {
       logStep(`Generating ${equipment} workout`);
 
-      // Build the banned name instruction for the second workout
       const bannedNameInstruction = firstWorkoutName 
         ? `\n\nCRITICAL - AVOID DUPLICATE NAME: The bodyweight workout for today is named "${firstWorkoutName}". You MUST create a COMPLETELY DIFFERENT name. DO NOT use "${firstWorkoutName}" or any variation of it.`
         : "";
@@ -346,555 +447,185 @@ CATEGORY-SPECIFIC TRAINING PHILOSOPHY (CRITICAL - MUST FOLLOW EXACTLY):
 
 ${category === "STRENGTH" ? `
 ╔══════════════════════════════════════════════════════════════════════════════╗
-║ CATEGORY 1: STRENGTH - BUILD MUSCLE, INCREASE FORCE, IMPROVE FUNCTIONAL STRENGTH ║
+║ CATEGORY: STRENGTH - BUILD MUSCLE, INCREASE FORCE, IMPROVE FUNCTIONAL STRENGTH ║
 ╚══════════════════════════════════════════════════════════════════════════════╝
 
 GOAL: Build muscle, increase force production, improve functional strength.
 INTENSITY: Controlled tempo, structured sets, progressive overload.
-FORMAT: Reps & Sets, supersets, EMOM strength, pyramids, upper-lower split, push-pull-legs, compound lifts.
+FORMAT: MUST BE REPS & SETS - Classic strength format with defined rest (60-120 seconds).
 
 ${equipment === "EQUIPMENT" ? `
 ✅ EQUIPMENT WORKOUTS - ALLOWED EXERCISES (PICK FROM THESE):
-• Goblet squats
-• Kettlebell deadlifts
-• Romanian deadlifts
-• Front squats
-• Bench press variations
-• Dumbbell row
-• Bent-over row
-• Push press
-• Landmine press
-• Split squats
-• Hip hinges
-• Weighted carries` : `
+• Goblet squats, Kettlebell deadlifts, Romanian deadlifts, Front squats
+• Bench press variations, Dumbbell row, Bent-over row
+• Push press, Landmine press, Split squats, Hip hinges, Weighted carries` : `
 ✅ BODYWEIGHT ONLY - ALLOWED EXERCISES (PICK FROM THESE):
 • Push-up variations (diamond, archer, decline, incline)
 • Slow tempo squats (3-4 second eccentric)
 • Pistol squat regressions (assisted, box pistols)
 • Glute bridges and hip thrusts (single-leg progressions)
 • Plank variations (RKC plank, side plank with rotation)
-• Pull-ups (wide grip, close grip, chin-ups)
-• Dips (parallel bar, bench dips, Korean dips)
-• Isometrics (wall sits, dead hangs, L-sits)
-• Slow tempo lunges (walking, reverse, Bulgarian split squat)
-• Handstand progressions (wall holds, pike push-ups)`}
+• Pull-ups, Dips, Isometrics, Slow tempo lunges, Handstand progressions`}
 
-❌ ABSOLUTE RULES - FORBIDDEN EXERCISES (NEVER INCLUDE):
-• High knees
-• Skipping
-• Burpees
-• Mountain climbers
-• Jumping jacks
-• Sprints
-• Any cardio-based exercise
-• EMOM, Tabata, AMRAP, or time-based formats
-• Running, jumping, or locomotion exercises
-• Minimal rest or circuit-style training
-
-FOCUS: Muscle hypertrophy, maximal strength, progressive overload, proper form with adequate rest (60-120 seconds).
-STRENGTH WORKOUTS MUST STAY STRENGTH.` : ""}
+❌ FORBIDDEN: Burpees, Mountain climbers, Jumping jacks, Sprints, any cardio exercise.
+FOCUS: Muscle hypertrophy, maximal strength, progressive overload with adequate rest.` : ""}
 
 ${category === "CARDIO" ? `
 ╔══════════════════════════════════════════════════════════════════════════════╗
-║ CATEGORY 2: CARDIO - IMPROVE HEART RATE CAPACITY, AEROBIC & ANAEROBIC       ║
+║ CATEGORY: CARDIO - IMPROVE HEART RATE CAPACITY, AEROBIC & ANAEROBIC          ║
 ╚══════════════════════════════════════════════════════════════════════════════╝
 
 GOAL: Improve heart rate capacity, aerobic and anaerobic conditioning.
-FORMAT: Circuits, AMRAP, EMOM, Tabata, For Time.
-INTENSITY: Mostly bodyweight but can include cardio machines or light tools. Minimal load, fast pace.
+FORMAT: ${format} (NOT Reps & Sets)
+INTENSITY: Fast pace, minimal load, sustained heart rate elevation.
 
-✅ ALLOWED EXERCISES (PICK FROM THESE):
-• Jogging / Running
-• Jump rope
-• Treadmill runs
-• Rowing machine
-• Assault bike
-• High knees
-• Skipping
-• Jumping jacks
-• Burpees
-• Mountain climbers
-• Butt kicks
-• Lateral shuffles
-• Step-ups (fast tempo)
-• Shadow boxing
-• Bear crawls / Crab walks
-• Star jumps / Broad jumps
+✅ ALLOWED EXERCISES: Jogging, Jump rope, High knees, Butt kicks, Jumping jacks, Burpees, Mountain climbers, Box jumps, Skaters, Bear crawls.
 
-❌ DO NOT INCLUDE (FORBIDDEN):
-• Heavy lifting
-• Slow tempo strength movements
-• Long rest periods between sets
-• Low-rep, high-weight training
-• Static holds or isometric exercises
-
-FOCUS: Cardiovascular endurance, stamina building, sustained heart rate elevation, aerobic and anaerobic conditioning.` : ""}
-
-${category === "METABOLIC" ? `
-╔══════════════════════════════════════════════════════════════════════════════╗
-║ CATEGORY 3: METABOLIC - HIGH-INTENSITY FULL-BODY CONDITIONING               ║
-╚══════════════════════════════════════════════════════════════════════════════╝
-
-GOAL: High-intensity, full-body conditioning using strength tools and bodyweight.
-Similar to cardio but MORE POWER, MORE MUSCULAR DEMAND, MORE TOOLS.
-FORMAT: Circuits, AMRAP, EMOM, Tabata, For Time.
-
-${equipment === "EQUIPMENT" ? `
-✅ EQUIPMENT WORKOUTS - ALLOWED EXERCISES:
-• Kettlebell swings
-• Battle ropes
-• Sandbags
-• Medicine ball slams
-• Box jumps
-• Kettlebell clean and press
-• Sled push (if available)
-• Thrusters (kettlebell or dumbbell)
-• Rowing machine intervals
-• Dumbbell complexes` : `
-✅ BODYWEIGHT ONLY - ALLOWED EXERCISES:
-• Burpees (all variations)
-• Squat thrusts
-• Fast lunges (jump lunges, walking lunges)
-• Skater jumps
-• Mountain climbers
-• Jump squats
-• Push-up complexes
-• Plank jacks
-• Bodyweight thrusters`}
-
-❌ DON'T INCLUDE (FORBIDDEN):
-• Slow strength tempo
-• Isometrics
-• Static planks (unless part of active recovery)
-• Pure cardio only (running laps without resistance)
-• Pure strength only (heavy singles, doubles, or triples)
-• Long rest periods (over 60 seconds)
-• Isolated single-joint exercises
-
-CRITICAL: Keep equipment CONSISTENT throughout (all bodyweight OR all equipment - never mixed).
-FOCUS: Metabolic stress, work capacity, combination of strength and cardio, post-workout calorie burn (EPOC).` : ""}
-
-${category === "CALORIE BURNING" ? `
-╔══════════════════════════════════════════════════════════════════════════════╗
-║ CATEGORY 4: CALORIE BURNING - HIGH-EFFORT, SIMPLE, NON-TECHNICAL            ║
-╚══════════════════════════════════════════════════════════════════════════════╝
-
-GOAL: High-effort, simple, non-technical exercises that maintain high output.
-FORMAT: Circuit, AMRAP, Tabata, For Time.
-INTENSITY: Flexible but ALWAYS keep the heart rate HIGH.
-
-${equipment === "EQUIPMENT" ? `
-✅ EQUIPMENT WORKOUTS - ALLOWED EXERCISES:
-• Kettlebell swings
-• Battle ropes (simple patterns)
-• Rower
-• Bike (assault bike, spin)
-• Slam ball
-• Light dumbbells for full-body complexes` : `
-✅ BODYWEIGHT ONLY - ALLOWED EXERCISES:
-• Squat jumps
-• Burpees
-• High knees
-• Lunges (all variations)
-• Mountain climbers
-• Step-ups
-• Frog hops
-• Jumping jacks
-• Tuck jumps`}
-
-❌ DON'T INCLUDE (FORBIDDEN):
-• Technical Olympic lifts
-• Slow strength sets
-• Heavy loading
-• Complicated sequences
-• Long rest periods (over 45 seconds)
-• Mobility, stretching, or flexibility exercises
-
-FOCUS: Maximize calorie expenditure, elevate heart rate, minimal rest, fat burning, conditioning.` : ""}
+❌ FORBIDDEN: Heavy lifting, slow strength exercises, Reps & Sets format.` : ""}
 
 ${category === "MOBILITY & STABILITY" ? `
 ╔══════════════════════════════════════════════════════════════════════════════╗
-║ CATEGORY 5: MOBILITY & STABILITY - JOINT MOBILITY, CORE STABILITY, FLEXIBILITY ║
+║ CATEGORY: MOBILITY & STABILITY - FLEXIBILITY, CONTROL, INJURY PREVENTION     ║
 ╚══════════════════════════════════════════════════════════════════════════════╝
 
-GOAL: Increase joint mobility, core stability, flexibility, controlled movement.
-FORMAT: Circuits, Reps & Sets, Flow, or Time-based mobility.
-INTENSITY: Low to moderate - focus on QUALITY over speed.
+GOAL: Improve flexibility, joint mobility, core stability, injury prevention.
+FORMAT: MUST BE REPS & SETS - Controlled movements with focus on form and range.
+INTENSITY: Slow, controlled, deliberate movement patterns.
 
-✅ ALLOWED EXERCISES (PICK FROM THESE):
-• Cat-cow
-• Thoracic rotations
-• World's greatest stretch
-• 90/90 hip rotation
-• Dead bug
-• Bird dog
-• Glute bridges (controlled)
-• Pallof press (if equipment)
-• Side planks (holds, not dynamic)
-• Copenhagen holds
-• Ankle mobility drills
-• Shoulder CARs (Controlled Articular Rotations)
-• Hip CARs
-• Breathing protocols
-• Pigeon pose
-• Hip flexor stretches
-• Thread the needle
-• Foam rolling (if equipment)
-${equipment === "EQUIPMENT" ? `• Resistance band stretches
-• Stability ball exercises
-• Yoga blocks for supported stretches
-• Light dumbbells for mobility work` : `• Yoga-inspired sequences
-• Active stretching
-• Controlled holds (30-60 seconds)`}
+✅ ALLOWED EXERCISES: World's greatest stretch, Cat-cow, Thread the needle, Hip circles, Shoulder CARs, Deep squats, Yoga flows, Core stability holds, Balance work.
 
-❌ NEVER INCLUDE (FORBIDDEN):
-• Burpees
-• Jumps (any type)
-• Running
-• Skipping
-• Anything explosive
-• Anything heavy
-• High-intensity exercises that elevate heart rate significantly
-• Time pressure, racing, or competitive elements
+❌ FORBIDDEN: High-intensity intervals, explosive movements, speed work.` : ""}
 
-FOCUS: Joint health, flexibility, injury prevention, controlled breathing, active recovery, movement quality over speed.` : ""}
+${category === "METABOLIC" ? `
+╔══════════════════════════════════════════════════════════════════════════════╗
+║ CATEGORY: METABOLIC - BURN CALORIES, BOOST METABOLISM, HIIT CONDITIONING     ║
+╚══════════════════════════════════════════════════════════════════════════════╝
+
+GOAL: Maximize calorie burn, boost metabolism, improve work capacity.
+FORMAT: ${format} (High-intensity intervals)
+INTENSITY: High effort, minimal rest, full-body movements.
+
+✅ ALLOWED EXERCISES: Burpees, Thrusters, Kettlebell swings, Box jumps, Battle ropes, Sled work, Rowing sprints, Assault bike intervals.
+
+❌ FORBIDDEN: Reps & Sets format, long rest periods, isolation exercises.` : ""}
+
+${category === "CALORIE BURNING" ? `
+╔══════════════════════════════════════════════════════════════════════════════╗
+║ CATEGORY: CALORIE BURNING - MAXIMUM CALORIE EXPENDITURE, FAT LOSS FOCUS      ║
+╚══════════════════════════════════════════════════════════════════════════════╝
+
+GOAL: Maximize calorie expenditure through sustained high-output work.
+FORMAT: ${format}
+INTENSITY: Sustained effort, compound movements, elevated heart rate throughout.
+
+✅ ALLOWED EXERCISES: Mountain climbers, Burpees, Jump squats, High knees, Jumping lunges, Speed skaters, Tuck jumps, Plank jacks.
+
+❌ FORBIDDEN: Reps & Sets format, long rest periods, isolated strength work.` : ""}
 
 ${category === "CHALLENGE" ? `
 ╔══════════════════════════════════════════════════════════════════════════════╗
-║ CATEGORY 6: CHALLENGE - TOUGH SESSION TESTING ENDURANCE, STRENGTH, MENTAL TOUGHNESS ║
+║ CATEGORY: CHALLENGE - TEST YOUR LIMITS, MENTAL TOUGHNESS, FULL-BODY EFFORT   ║
 ╚══════════════════════════════════════════════════════════════════════════════╝
 
-GOAL: Tough session that tests endurance, strength, or mental toughness.
-FORMAT: EVERY FORMAT ALLOWED - be creative!
-INTENSITY: VERY HIGH - this is meant to push limits.
+GOAL: Push physical and mental limits with demanding full-body challenges.
+FORMAT: ${format}
+INTENSITY: Maximum effort, minimal rest, benchmark-style workout.
 
-${equipment === "EQUIPMENT" ? `
-✅ EQUIPMENT CHALLENGE EXAMPLES:
-• Kettlebell complex challenge (5 exercises, 5 reps each, 10 rounds)
-• Dumbbell chipper (long list of exercises, high reps)
-• Rowing machine distance challenge (5000m for time)
-• Weighted vest bodyweight challenge
-• Barbell complex (clean + front squat + push press + back squat + lunges)
-• Heavy carry challenges (farmer's walks, suitcase carries)` : `
-✅ BODYWEIGHT CHALLENGE EXAMPLES:
-• 100 burpees challenge (for time)
-• 10-minute AMRAP (max rounds of 10 push-ups, 15 squats, 20 sit-ups)
-• Descending ladders (10-9-8-7-6-5-4-3-2-1 of 2 exercises)
-• Bodyweight chippers (100 squats, 80 lunges, 60 sit-ups, 40 push-ups, 20 burpees)
-• EMOM increasing reps (minute 1: 1 burpee, minute 2: 2 burpees, continue until failure)
-• Advanced calisthenics (muscle-up attempts, pistol squat ladder, handstand holds)`}
+✅ ALLOWED: Any exercise that challenges the athlete - compound movements, high-rep work, time-based challenges, chipper-style workouts.
 
-CHALLENGE FORMAT IDEAS (USE THESE):
-• "Death by..." - Minute 1: 1 rep, Minute 2: 2 reps, continue until failure
-• "100 Rep Challenge" - Complete 100 reps of X exercise as fast as possible
-• "Descending Ladder" - 10-9-8-7-6-5-4-3-2-1 of two exercises alternating
-• "EMOM + Tabata Combo" - 10-minute EMOM followed by 8 rounds Tabata
-• "For Time with Cap" - Complete workout under time cap (e.g., 20 minutes)
-• "Pyramid" - 1-2-3-4-5-4-3-2-1 rep scheme
-• "Chipper" - Long list of exercises, complete all reps before moving on
-
-❌ AVOID (FORBIDDEN):
-• Mobility exercises
-• Slow technical lifts
-• Low-intensity movements
-• Basic beginner-level exercises without challenge element
-• Long rest periods (over 30 seconds unless strategically placed)
-• Easy modifications or scaled options
-
-FOCUS: Mental toughness, personal records, benchmark performance, competition against the clock, pushing limits.` : ""}
+FOCUS: Mental fortitude, work capacity, competitive spirit.` : ""}
 
 ═══════════════════════════════════════════════════════════════════════════════
-EXERCISE VARIETY RULE (CRITICAL - READ CAREFULLY):
+RESPONSE FORMAT (JSON ONLY - NO MARKDOWN):
 ═══════════════════════════════════════════════════════════════════════════════
-The exercise banks listed above are EXAMPLES and GUIDELINES, NOT strict limitations.
-
-✅ YOU MAY:
-• Use SIMILAR exercises that serve the same purpose as listed exercises
-• Create VARIATIONS of listed exercises (e.g., close-grip push-ups, sumo deadlifts, archer push-ups)
-• Find alternatives that match the category's GOAL and INTENSITY
-• Introduce variety to keep workouts fresh, engaging, and unpredictable
-• Adapt exercises for the specified equipment type (bodyweight variations or equipment variations)
-
-❌ YOU MAY NOT:
-• Use exercises from a DIFFERENT category's allowed list (e.g., burpees in Strength, isometrics in Challenge)
-• Violate the FORBIDDEN exercises list for each category
-• Mix equipment types when consistency is required (especially Metabolic category)
-• Deviate from the category's training philosophy, intensity, or movement patterns
-
-GOAL: Create VARIETY while respecting each category's PURPOSE, INTENSITY, and MOVEMENT PATTERNS.
-Every workout should feel unique while staying true to its category identity.
-
-═══════════════════════════════════════════════════════════════════════════════
-DURATION OPTIONS (EXPANDED RANGE):
-═══════════════════════════════════════════════════════════════════════════════
-Available durations: 15 min, 20 min, 30 min, 45 min, 60 min, or Various
-
-DURATION SELECTION GUIDELINES:
-• 15-20 min: Express sessions - Tabata, short AMRAP, quick EMOM, mobility flows
-• 30 min: Standard balanced workout - most categories, moderate intensity
-• 45 min: Extended session - more exercises, additional warm-up/cool-down, strength with full rest
-• 60 min: Comprehensive workout - full programming with extended main section
-• Various: Flexible timing - "Complete as fast as possible", "At your own pace", challenge-style, For Time workouts
-
-Match duration to FORMAT and CATEGORY:
-- Tabata → 15-30 min (quick, intense bursts)
-- Circuit/AMRAP → 20-45 min (scalable rounds)
-- Reps & Sets (Strength) → 45-60 min (rest periods matter)
-- Mobility & Stability → 20-45 min (quality over speed)
-- Challenge → Various or 30-45 min (race against clock or time cap)
-- For Time → Various (complete workout, record time)
-- EMOM → 15-30 min (structured minute-by-minute)
-
-YOUR DURATION TODAY: ${duration}
-
-═══════════════════════════════════════════════════════════════════════════════
-DIFFICULTY LEVEL ${selectedDifficulty.stars}/6 (${selectedDifficulty.name}):
-═══════════════════════════════════════════════════════════════════════════════
-${selectedDifficulty.stars <= 2 ? `• Suitable for beginners or those returning to fitness
-• Focus on foundational movements with proper form
-• Moderate intensity with adequate rest periods
-• Use regression options when available (knee push-ups, assisted squats)
-• Duration: ${duration}` : ""}
-${selectedDifficulty.stars >= 3 && selectedDifficulty.stars <= 4 ? `• For regular exercisers with good fitness base
-• Increased complexity and intensity
-• Challenging but achievable for consistent trainers
-• Standard exercise progressions
-• Duration: ${duration}` : ""}
-${selectedDifficulty.stars >= 5 ? `• Advanced level for experienced athletes
-• High intensity, complex movements, minimal rest
-• Requires excellent form and fitness foundation
-• Use advanced progressions (pistol squats, muscle-up preps, handstand push-ups)
-• Duration: ${duration}` : ""}
-
-CRITICAL FORMATTING RULES (MANDATORY - FOLLOW EXACTLY FOR COMPACT, READABLE CONTENT):
-
-1. NO WORKOUT TITLE - Users already know which workout they're viewing. Start directly with content.
-
-2. SECTION TITLES (Warm-Up, Main Workout, Cool-Down, Notes):
-   <p class="tiptap-paragraph"><strong><u>Section Title (X minutes)</u></strong></p>
-   <p class="tiptap-paragraph"></p>
-   [Content starts immediately after ONE empty line]
-
-3. SUB-HEADERS (Block 1, Block 2, Circuit, Round, etc.):
-   <p class="tiptap-paragraph"></p>
-   <p class="tiptap-paragraph"><strong>Sub-header Name</strong></p>
-   [Exercises start immediately - NO empty line after sub-header]
-
-4. EXERCISES (Numbered list with NO gaps between items):
-   <ul class="tiptap-bullet-list">
-   <li class="tiptap-list-item"><p class="tiptap-paragraph"><strong>1. Exercise Name</strong> – description – time/reps</p></li>
-   <li class="tiptap-list-item"><p class="tiptap-paragraph"><strong>2. Exercise Name</strong> – description – time/reps</p></li>
-   <li class="tiptap-list-item"><p class="tiptap-paragraph"><strong>3. Exercise Name</strong> – description – time/reps</p></li>
-   </ul>
-
-5. REST INSTRUCTIONS (inline paragraph after exercises):
-   <p class="tiptap-paragraph">Rest: 60-90 seconds between sets.</p>
-
-SPACING RULES (CRITICAL - KEEP CONTENT COMPACT):
-- ONE empty paragraph after section title ONLY
-- ONE empty paragraph BEFORE next section or sub-header ONLY
-- NEVER put empty paragraphs between exercises in a list
-- NEVER put empty paragraphs after bullet/numbered lists
-- NEVER end content with empty paragraphs
-- NEVER start content with empty paragraphs
-- Goal: User sees workout overview in 2-3 seconds WITHOUT scrolling
-
-WORKOUT NAME RULES (CRITICAL):
-- Create a COMPLETELY UNIQUE name every time - never repeat past names
-- BANNED WORDS (never use): "Inferno", "Beast", "Blaze", "Fire", "Burn", "Warrior", "Titan", "Crusher", "Destroyer"
-- The name should reflect ${equipment === "BODYWEIGHT" ? "bodyweight/no equipment training" : "equipment-based training"}
-- Use creative combinations that reflect the category:
-  * STRENGTH: "Iron Protocol", "Steel Foundation", "Power Complex", "Barbell Symphony"
-  * CALORIE BURNING: "Sweat Storm", "Torch Session", "Meltdown Express", "Caloric Chaos"
-  * METABOLIC: "Metabolic Mayhem", "Conditioning Crucible", "Engine Builder", "Capacity Test"
-  * CARDIO: "Heart Racer", "Endurance Edge", "Pulse Pounder", "Cardio Quest"
-  * MOBILITY: "Flow State", "Flexibility Fusion", "Joint Liberation", "Balance Blueprint"
-  * CHALLENGE: "Ultimate Test", "Apex Trial", "Gauntlet Series", "Peak Performance"
-- Maximum 2-3 words
-
-DESCRIPTION REQUIREMENTS:
-- Write 2-3 compelling sentences that:
-  * Mention this is a ${equipment === "BODYWEIGHT" ? "NO EQUIPMENT needed" : "equipment-based"} workout
-  * Explain WHO this workout is for (fitness level, goals)
-  * Describe WHAT they'll experience (intensity, focus areas)
-  * Mention the BENEFIT they'll gain (strength, fat loss, mobility, etc.)
-- Sound professional and motivating, like expert coaching
-
-CONTENT STRUCTURE:
-1. DESCRIPTION: 2-3 professional sentences (see above)
-2. WORKOUT: Complete with Warm-up (5-8 min), Main workout, Cool-down (3-5 min)
-3. INSTRUCTIONS: Clear step-by-step guidance
-4. TIPS: Expert coaching tips for form and performance
-
-Respond in this EXACT JSON format:
 {
-  "name": "Workout Name Here",
-  "description": "<p class=\\"tiptap-paragraph\\">Description here...</p>",
-  "main_workout": "[formatted HTML following rules above]",
-  "instructions": "<p class=\\"tiptap-paragraph\\">Instructions here...</p>",
-  "tips": "<p class=\\"tiptap-paragraph\\">Tips here...</p>"
+  "name": "Creative, motivating workout name (3-5 words, unique)",
+  "description": "2-3 sentence HTML description with <p class='tiptap-paragraph'> tags",
+  "main_workout": "Complete workout with exercises, sets, reps, rest in HTML format",
+  "instructions": "Step-by-step guidance for the workout in HTML format",
+  "tips": "2-3 coaching tips for optimal performance in HTML format"
 }`;
 
-      logStep(`Calling Lovable AI for ${equipment} workout content`);
-      
-      const aiResponse = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+      const aiResponse = await fetch("https://api.lovable.ai/v1/chat/completions", {
         method: "POST",
         headers: {
           "Authorization": `Bearer ${lovableApiKey}`,
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          model: "google/gemini-2.5-flash",
+          model: "gpt-4o",
           messages: [
-            { role: "system", content: "You are a professional fitness trainer. Always respond with valid JSON only, no markdown." },
+            { role: "system", content: "You are an expert fitness coach. Return ONLY valid JSON, no markdown." },
             { role: "user", content: workoutPrompt }
           ],
+          temperature: 0.8,
         }),
       });
 
       if (!aiResponse.ok) {
-        throw new Error(`AI request failed: ${aiResponse.status}`);
+        throw new Error(`AI API error: ${aiResponse.status}`);
       }
 
       const aiData = await aiResponse.json();
       let workoutContent;
       
       try {
-        const rawContent = aiData.choices[0].message.content;
-        const cleanContent = rawContent.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
-        workoutContent = JSON.parse(cleanContent);
-      } catch (e) {
-        logStep("Failed to parse AI response", { error: e, raw: aiData.choices[0].message.content });
-        throw new Error(`Failed to parse AI workout content for ${equipment}`);
+        let content = aiData.choices[0].message.content;
+        content = content.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
+        workoutContent = JSON.parse(content);
+      } catch (parseError) {
+        logStep("Error parsing AI response", { error: parseError, raw: aiData.choices[0].message.content });
+        throw new Error("Failed to parse workout content");
       }
 
-      logStep(`${equipment} workout content generated`, { name: workoutContent.name });
-
-      // Store the first workout's name to prevent duplicates
       if (equipment === "BODYWEIGHT") {
         firstWorkoutName = workoutContent.name;
-        logStep("Stored first workout name for duplicate prevention", { firstWorkoutName });
       }
 
-      // Generate unique ID with equipment indicator
-      const equipSuffix = equipment === "BODYWEIGHT" ? "BW" : "EQ";
-      const workoutId = `WOD-${prefix}-${equipSuffix}-${timestamp}`;
+      logStep(`${equipment} workout generated`, { name: workoutContent.name });
 
-      // Generate image with retry logic
-      logStep(`Generating image for ${equipment} workout`);
-      
-      let imageUrl = null;
-      const maxRetries = 2;
-      
-      for (let attempt = 1; attempt <= maxRetries; attempt++) {
-        try {
-          const imageResponse = await fetch(`${supabaseUrl}/functions/v1/generate-workout-image`, {
-            method: "POST",
-            headers: {
-              "Authorization": `Bearer ${supabaseServiceKey}`,
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-              name: workoutContent.name,
-              category: category,
-              format: format,
-              difficulty_stars: selectedDifficulty.stars,
-              equipment: equipment
-            }),
-          });
+      // Generate image
+      const imagePrompt = `Professional fitness photography: Athletic person performing ${category.toLowerCase()} ${equipment.toLowerCase() === "bodyweight" ? "bodyweight" : "with gym equipment"} workout, ${selectedDifficulty.name.toLowerCase()} difficulty, dynamic action shot, modern gym or outdoor setting, dramatic lighting, motivational atmosphere, no text`;
 
-          if (imageResponse.ok) {
-            const imageData = await imageResponse.json();
-            imageUrl = imageData.imageUrl || imageData.image_url;
-            
-            if (imageUrl) {
-              logStep(`Image generated for ${equipment} (attempt ${attempt})`, { imageUrl: imageUrl.substring(0, 80) + "..." });
-              break; // Success, exit retry loop
-            } else {
-              logStep(`Image response OK but no URL returned for ${equipment} (attempt ${attempt})`, { imageData });
-            }
-          } else {
-            const errorText = await imageResponse.text();
-            logStep(`Image generation HTTP error for ${equipment} (attempt ${attempt})`, { 
-              status: imageResponse.status, 
-              error: errorText.substring(0, 200) 
-            });
-          }
-        } catch (imgError: any) {
-          logStep(`Image generation exception for ${equipment} (attempt ${attempt})`, { error: imgError.message });
-        }
-        
-        // Wait before retry
-        if (attempt < maxRetries) {
-          logStep(`Retrying image generation for ${equipment}...`);
-          await new Promise(r => setTimeout(r, 2000));
-        }
-      }
-      
-      if (!imageUrl) {
-        logStep(`WARNING: All image generation attempts failed for ${equipment} - Stripe product will have no image`);
-      }
-
-      // Create Stripe product
-      logStep(`Creating Stripe product for ${equipment} workout`);
-      
-      const stripeResponse = await fetch(`${supabaseUrl}/functions/v1/create-stripe-product`, {
-        method: "POST",
-        headers: {
-          "Authorization": `Bearer ${supabaseServiceKey}`,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          name: `${workoutContent.name} (${equipment === "BODYWEIGHT" ? "No Equipment" : "With Equipment"})`,
-          price: "3.99",
-          contentType: "Workout",
-          imageUrl: imageUrl
-        }),
+      const { data: imageData } = await supabase.functions.invoke("generate-image", {
+        body: { prompt: imagePrompt, width: 1024, height: 576 }
       });
 
-      let stripeProductId = null;
-      let stripePriceId = null;
-      
-      if (stripeResponse.ok) {
-        const stripeData = await stripeResponse.json();
-        stripeProductId = stripeData.product_id;
-        stripePriceId = stripeData.price_id;
-        logStep(`Stripe product created for ${equipment}`, { stripeProductId, stripePriceId });
-        
-        // POST-CREATION VERIFICATION: Verify Stripe product has image
-        if (stripeProductId && imageUrl) {
-          try {
-            const product = await stripe.products.retrieve(stripeProductId);
-            if (!product.images || product.images.length === 0) {
-              logStep(`CRITICAL WARNING: Stripe product ${stripeProductId} created WITHOUT image despite imageUrl being provided`);
-              // Attempt to fix by updating with image
-              await stripe.products.update(stripeProductId, { images: [imageUrl] });
-              logStep(`Image fix attempted for ${stripeProductId}`);
-            } else {
-              logStep(`✅ Verified: Stripe product ${stripeProductId} has image: ${product.images[0].substring(0, 50)}...`);
-            }
-          } catch (verifyError: any) {
-            logStep(`Failed to verify/fix Stripe product image for ${equipment}`, { error: verifyError.message });
-          }
-        }
-      } else {
-        logStep(`Stripe product creation failed for ${equipment}`, { status: stripeResponse.status });
-      }
+      const imageUrl = imageData?.imageUrl || null;
+      logStep(`${equipment} image generated`, { hasImage: !!imageUrl });
 
-      // Insert workout - focus MUST match one of 6 categories
-      const focusValue = category.toLowerCase().replace(/ & /g, "-").replace(/ /g, "-");
+      // Create Stripe product
+      const workoutId = `WOD-${prefix}-${equipment.charAt(0)}-${timestamp}`;
+      
+      const stripeProduct = await stripe.products.create({
+        name: `WOD: ${workoutContent.name}`,
+        description: `Workout of the Day - ${category} (${equipment})`,
+        images: imageUrl ? [imageUrl] : [],
+        metadata: { workout_id: workoutId, type: "wod", category: category, equipment: equipment }
+      });
+
+      const stripePrice = await stripe.prices.create({
+        product: stripeProduct.id,
+        unit_amount: 399,
+        currency: "eur",
+      });
+
+      const stripeProductId = stripeProduct.id;
+      const stripePriceId = stripePrice.id;
+      logStep(`${equipment} Stripe product created`, { productId: stripeProductId });
+
+      // Insert workout
       const { error: insertError } = await supabase
         .from("admin_workouts")
         .insert({
           id: workoutId,
           name: workoutContent.name,
+          type: "wod",
           category: category,
-          type: focusValue,
-          focus: focusValue, // CRITICAL: Set focus to match category
           format: format,
+          equipment: equipment,
           difficulty: selectedDifficulty.name,
           difficulty_stars: selectedDifficulty.stars,
-          equipment: equipment,
           duration: duration,
           description: workoutContent.description,
           main_workout: workoutContent.main_workout,
@@ -926,15 +657,31 @@ Respond in this EXACT JSON format:
       });
     }
 
-    // ========== CRITICAL: UPDATE STATE IMMEDIATELY AFTER WORKOUT GENERATION ==========
-    // This ensures state is updated even if notification sending times out
+    // ═══════════════════════════════════════════════════════════════════════════════
+    // UPDATE STATE - Track used stars, remove override if used
+    // ═══════════════════════════════════════════════════════════════════════════════
+    
+    // Update used stars tracking
+    const newUsedStarsInWeek = { ...usedStarsInWeek, [String(selectedDifficulty.stars)]: true };
+    
+    // Remove used override if any
+    const newManualOverrides = { ...manualOverrides };
+    if (newManualOverrides[todayStr]) {
+      delete newManualOverrides[todayStr];
+    }
+    
+    // Calculate new week number (increment if completing day 7)
+    const newWeekNumber = dayInCycle === 7 ? weekNumber + 1 : weekNumber;
+    
     const newState = {
       day_count: state.day_count + 1,
-      current_category: CATEGORY_CYCLE[(state.day_count + 1) % CATEGORY_CYCLE.length],
+      week_number: newWeekNumber,
+      used_stars_in_week: dayInCycle === 7 ? {} : newUsedStarsInWeek,
+      manual_overrides: newManualOverrides,
+      current_category: getCategoryForDay(getDayInCycle(state.day_count + 1)),
       last_equipment: "BOTH",
       last_difficulty: selectedDifficulty.name,
       last_difficulty_stars: selectedDifficulty.stars,
-      used_difficulties_in_cycle: newUsedDifficulties,
       format_usage: updatedUsage,
       equipment_bodyweight_count: (state.equipment_bodyweight_count || 0) + 1,
       equipment_with_count: (state.equipment_with_count || 0) + 1,
@@ -960,7 +707,12 @@ Respond in this EXACT JSON format:
         if (updateError) {
           logStep("ERROR updating state", { error: updateError.message });
         } else {
-          logStep("State updated BEFORE notifications", newState);
+          logStep("State updated BEFORE notifications", { 
+            newDayCount: newState.day_count,
+            nextDayInCycle: getDayInCycle(newState.day_count),
+            nextCategory: newState.current_category,
+            weekNumber: newState.week_number
+          });
         }
       } else {
         const { error: insertError } = await supabase
@@ -976,7 +728,7 @@ Respond in this EXACT JSON format:
       logStep("CRITICAL: State update failed", { error: stateUpdateError });
     }
 
-    // Send single notification for both workouts (now happens AFTER state update)
+    // Send notification
     try {
       const { data: allUsers } = await supabase.from('profiles').select('user_id');
       const userIds = allUsers?.map(u => u.user_id) || [];
@@ -1013,7 +765,6 @@ Respond in this EXACT JSON format:
         
         const { data: usersData } = await supabase.auth.admin.listUsers();
         
-        // Get all profiles with notification preferences
         const { data: allProfiles } = await supabase
           .from('profiles')
           .select('user_id, notification_preferences');
@@ -1025,7 +776,6 @@ Respond in this EXACT JSON format:
           
           const prefs = (profilesMap.get(authUser.id) as Record<string, any>) || {};
           
-          // Check if user has opted out of WOD emails
           if (prefs.opt_out_all === true || prefs.email_wod === false) {
             logStep(`Skipping WOD email for ${authUser.email} (opted out)`);
             continue;
@@ -1055,7 +805,6 @@ ${getEmailFooter(authUser.email, 'wod')}
             if (emailResult.error) {
               logStep("Email API error", { email: authUser.email, error: emailResult.error });
             } else {
-              // Rate limiting: 600ms delay to respect Resend's 2 requests/second limit
               await new Promise(resolve => setTimeout(resolve, 600));
             }
           } catch (e) {
@@ -1068,14 +817,14 @@ ${getEmailFooter(authUser.email, 'wod')}
       logStep("Error sending WOD notification", { error: e });
     }
 
-    // State already updated before notifications (see line 931)
-
     return new Response(
       JSON.stringify({
         success: true,
         workouts: generatedWorkouts,
         shared: {
           category: category,
+          dayInCycle: dayInCycle,
+          weekNumber: weekNumber,
           difficulty: selectedDifficulty.name,
           difficulty_stars: selectedDifficulty.stars,
           format: format
