@@ -9,10 +9,11 @@ import { Progress } from "@/components/ui/progress";
 import { Skeleton } from "@/components/ui/skeleton";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { toast } from "sonner";
-import { Flame, Play, RefreshCw, Calendar, Dumbbell, Star, TrendingUp, Clock, ExternalLink, AlertTriangle, ImageIcon, BookOpen } from "lucide-react";
+import { Flame, Play, RefreshCw, Calendar, Dumbbell, Star, TrendingUp, Clock, ExternalLink, AlertTriangle, ImageIcon, BookOpen, Edit } from "lucide-react";
 import { format } from "date-fns";
 import { WODSchedulePreview } from "./WODSchedulePreview";
 import { PeriodizationSystemDialog } from "./PeriodizationSystemDialog";
+import { WorkoutEditDialog } from "./WorkoutEditDialog";
 
 // 7-DAY CATEGORY CYCLE
 const CATEGORY_CYCLE_7DAY = [
@@ -29,6 +30,8 @@ export const WODManager = () => {
   const [isGenerating, setIsGenerating] = useState(false);
   const [isSyncingImages, setIsSyncingImages] = useState(false);
   const [periodizationDialogOpen, setPeriodizationDialogOpen] = useState(false);
+  const [editDialogOpen, setEditDialogOpen] = useState(false);
+  const [editingWorkout, setEditingWorkout] = useState<any>(null);
   const queryClient = useQueryClient();
 
   // Fetch WOD state
@@ -437,12 +440,25 @@ export const WODManager = () => {
                 <p className="text-sm text-muted-foreground line-clamp-2">
                   {currentWOD.description?.replace(/<[^>]*>/g, '').substring(0, 150)}...
                 </p>
-                <Button variant="outline" size="sm" asChild>
-                  <a href={`/workout/${currentWOD.type}/${currentWOD.id}`} target="_blank" rel="noopener noreferrer">
-                    <ExternalLink className="h-4 w-4 mr-2" />
-                    View Workout
-                  </a>
-                </Button>
+                <div className="flex gap-2">
+                  <Button variant="outline" size="sm" asChild>
+                    <a href={`/workout/${currentWOD.type}/${currentWOD.id}`} target="_blank" rel="noopener noreferrer">
+                      <ExternalLink className="h-4 w-4 mr-2" />
+                      View Workout
+                    </a>
+                  </Button>
+                  <Button 
+                    variant="outline" 
+                    size="sm"
+                    onClick={() => {
+                      setEditingWorkout(currentWOD);
+                      setEditDialogOpen(true);
+                    }}
+                  >
+                    <Edit className="h-4 w-4 mr-2" />
+                    Edit WOD
+                  </Button>
+                </div>
               </div>
             </div>
           </CardContent>
@@ -474,6 +490,7 @@ export const WODManager = () => {
                     <TableHead>Equipment</TableHead>
                     <TableHead>Difficulty</TableHead>
                     <TableHead>Status</TableHead>
+                    <TableHead>Actions</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -516,6 +533,18 @@ export const WODManager = () => {
                           </Badge>
                         )}
                       </TableCell>
+                      <TableCell>
+                        <Button 
+                          variant="ghost" 
+                          size="sm"
+                          onClick={() => {
+                            setEditingWorkout(wod);
+                            setEditDialogOpen(true);
+                          }}
+                        >
+                          <Edit className="h-4 w-4" />
+                        </Button>
+                      </TableCell>
                     </TableRow>
                   ))}
                 </TableBody>
@@ -534,6 +563,23 @@ export const WODManager = () => {
         open={periodizationDialogOpen} 
         onOpenChange={setPeriodizationDialogOpen}
         wodState={wodState}
+      />
+
+      {/* Edit WOD Dialog */}
+      <WorkoutEditDialog
+        workout={editingWorkout}
+        open={editDialogOpen}
+        onOpenChange={(open) => {
+          setEditDialogOpen(open);
+          if (!open) setEditingWorkout(null);
+        }}
+        onSave={() => {
+          queryClient.invalidateQueries({ queryKey: ["current-wod"] });
+          queryClient.invalidateQueries({ queryKey: ["wod-history"] });
+          queryClient.invalidateQueries({ queryKey: ["workoutOfDay"] });
+          setEditDialogOpen(false);
+          setEditingWorkout(null);
+        }}
       />
     </div>
   );
