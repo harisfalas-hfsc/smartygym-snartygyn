@@ -50,18 +50,19 @@ export const WODManager = () => {
     },
   });
 
-  // Fetch current WOD
-  const { data: currentWOD, isLoading: wodLoading } = useQuery({
+  // Fetch current WODs (both bodyweight and equipment versions)
+  const { data: currentWODs, isLoading: wodLoading } = useQuery({
     queryKey: ["current-wod"],
     queryFn: async () => {
+      const today = format(new Date(), "yyyy-MM-dd");
       const { data, error } = await supabase
         .from("admin_workouts")
         .select("*")
         .eq("is_workout_of_day", true)
-        .maybeSingle();
+        .eq("generated_for_date", today);
       
       if (error) throw error;
-      return data;
+      return data || [];
     },
   });
 
@@ -427,7 +428,7 @@ export const WODManager = () => {
                 <Skeleton className="h-4 w-full" />
               </div>
             </div>
-          ) : !currentWOD ? (
+          ) : !currentWODs || currentWODs.length === 0 ? (
             <div className="text-center py-8 space-y-4">
               <div className="flex justify-center">
                 <Flame className="h-12 w-12 text-muted-foreground/50" />
@@ -440,47 +441,97 @@ export const WODManager = () => {
               </div>
             </div>
           ) : (
-            <div className="flex flex-col md:flex-row gap-4">
-              {currentWOD.image_url && (
-                <img 
-                  src={currentWOD.image_url} 
-                  alt={currentWOD.name}
-                  className="w-full md:w-48 h-32 object-cover rounded-lg"
-                />
-              )}
-              <div className="flex-1 space-y-2">
-                <h4 className="font-semibold text-lg">{currentWOD.name}</h4>
-                <div className="flex flex-wrap gap-2">
-                  <Badge variant="secondary">{currentWOD.category}</Badge>
-                  <Badge variant="outline">{currentWOD.format}</Badge>
-                  <Badge variant="outline">{currentWOD.equipment}</Badge>
-                  <Badge className={getDifficultyColor(currentWOD.difficulty_stars)}>
-                    {getDifficultyLabel(currentWOD.difficulty_stars)} ({currentWOD.difficulty_stars}★)
-                  </Badge>
-                  <Badge className="bg-primary/20 text-primary border-primary/30">
-                    €{currentWOD.price?.toFixed(2)}
-                  </Badge>
-                </div>
-                <p className="text-sm text-muted-foreground line-clamp-2">
-                  {currentWOD.description?.replace(/<[^>]*>/g, '').substring(0, 150)}...
-                </p>
-                <div className="flex gap-2">
-                  <Button variant="outline" size="sm" asChild>
-                    <a href={`/workout/${currentWOD.type}/${currentWOD.id}`} target="_blank" rel="noopener noreferrer">
-                      <ExternalLink className="h-4 w-4 mr-2" />
-                      View Workout
-                    </a>
-                  </Button>
+            <div className="space-y-4">
+              {/* Show both WOD versions */}
+              <div className="grid gap-4 md:grid-cols-2">
+                {currentWODs.map((wod) => {
+                  const isBodyweight = wod.equipment === "Bodyweight";
+                  return (
+                    <div key={wod.id} className="border rounded-lg p-4 space-y-3">
+                      <div className="flex items-center gap-2">
+                        {isBodyweight ? (
+                          <span className="text-lg">🤸</span>
+                        ) : (
+                          <span className="text-lg">🏋️</span>
+                        )}
+                        <span className="font-semibold text-sm">
+                          {isBodyweight ? "Bodyweight Version" : "Equipment Version"}
+                        </span>
+                      </div>
+                      
+                      {wod.image_url && (
+                        <img 
+                          src={wod.image_url} 
+                          alt={wod.name}
+                          className="w-full h-24 object-cover rounded-lg"
+                        />
+                      )}
+                      
+                      <h4 className="font-semibold">{wod.name}</h4>
+                      
+                      <div className="flex flex-wrap gap-1">
+                        <Badge variant="secondary" className="text-xs">{wod.category}</Badge>
+                        <Badge variant="outline" className="text-xs">{wod.format}</Badge>
+                        <Badge className={`text-xs ${getDifficultyColor(wod.difficulty_stars)}`}>
+                          {wod.difficulty_stars}★
+                        </Badge>
+                        <Badge className="bg-primary/20 text-primary border-primary/30 text-xs">
+                          €{wod.price?.toFixed(2)}
+                        </Badge>
+                      </div>
+                      
+                      <div className="flex gap-2">
+                        <Button variant="outline" size="sm" className="flex-1" asChild>
+                          <a href={`/workout/${wod.type}/${wod.id}`} target="_blank" rel="noopener noreferrer">
+                            <ExternalLink className="h-3 w-3 mr-1" />
+                            View
+                          </a>
+                        </Button>
+                        <Button 
+                          variant="outline" 
+                          size="sm"
+                          className="flex-1"
+                          onClick={() => {
+                            setEditingWorkout(wod);
+                            setEditDialogOpen(true);
+                          }}
+                        >
+                          <Edit className="h-3 w-3 mr-1" />
+                          Edit
+                        </Button>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+              
+              {/* Regenerate option */}
+              <div className="pt-2 border-t">
+                <div className="flex items-center justify-between">
+                  <p className="text-xs text-muted-foreground">
+                    Want to regenerate today's WODs with new content?
+                  </p>
                   <Button 
                     variant="outline" 
                     size="sm"
-                    onClick={() => {
-                      setEditingWorkout(currentWOD);
-                      setEditDialogOpen(true);
+                    onClick={async () => {
+                      if (!confirm("This will delete the current WODs and generate new ones. Continue?")) return;
+                      
+                      // Delete existing WODs for today
+                      const today = format(new Date(), "yyyy-MM-dd");
+                      await supabase
+                        .from("admin_workouts")
+                        .delete()
+                        .eq("is_workout_of_day", true)
+                        .eq("generated_for_date", today);
+                      
+                      // Generate new WODs
+                      await handleGenerateWOD();
                     }}
+                    disabled={isGenerating}
                   >
-                    <Edit className="h-4 w-4 mr-2" />
-                    Edit WOD
+                    <RefreshCw className="h-3 w-3 mr-1" />
+                    Regenerate
                   </Button>
                 </div>
               </div>
