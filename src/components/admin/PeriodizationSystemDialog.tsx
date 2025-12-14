@@ -1,9 +1,16 @@
+import { useState } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Calendar, Star, Dumbbell, Info, Settings } from "lucide-react";
+import { Calendar, Star, Dumbbell, Info, Settings, RotateCcw, Save, AlertTriangle } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
+import { useQueryClient } from "@tanstack/react-query";
 
 // 7-DAY CATEGORY CYCLE
 const CATEGORY_CYCLE_7DAY = [
@@ -43,6 +50,7 @@ interface PeriodizationSystemDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   wodState: {
+    id: string;
     day_count: number;
     week_number?: number | null;
     used_stars_in_week?: Json | null;
@@ -56,8 +64,134 @@ export const PeriodizationSystemDialog = ({
   onOpenChange, 
   wodState 
 }: PeriodizationSystemDialogProps) => {
+  const queryClient = useQueryClient();
+  const [isEditing, setIsEditing] = useState(false);
+  const [editDayCount, setEditDayCount] = useState<number>(0);
+  const [editWeekNumber, setEditWeekNumber] = useState<number>(1);
+  const [isSaving, setIsSaving] = useState(false);
+
   const dayInCycle = wodState ? (wodState.day_count % 7) + 1 : 1;
   const weekNumber = wodState?.week_number || Math.floor((wodState?.day_count || 0) / 7) + 1;
+
+  const handleStartEdit = () => {
+    setEditDayCount(wodState?.day_count || 0);
+    setEditWeekNumber(wodState?.week_number || 1);
+    setIsEditing(true);
+  };
+
+  const handleCancelEdit = () => {
+    setIsEditing(false);
+  };
+
+  const handleSaveEdit = async () => {
+    if (!wodState?.id) return;
+    
+    setIsSaving(true);
+    try {
+      const { error } = await supabase
+        .from("workout_of_day_state")
+        .update({
+          day_count: editDayCount,
+          week_number: editWeekNumber,
+          updated_at: new Date().toISOString()
+        })
+        .eq("id", wodState.id);
+
+      if (error) throw error;
+
+      toast.success("Periodization updated", {
+        description: `Day count: ${editDayCount}, Week: ${editWeekNumber}`
+      });
+      
+      queryClient.invalidateQueries({ queryKey: ["wod-state"] });
+      setIsEditing(false);
+    } catch (error: any) {
+      toast.error("Failed to update", { description: error.message });
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  const handleResetToDay = async (targetDay: number) => {
+    if (!wodState?.id) return;
+    
+    const newDayCount = targetDay - 1; // Day 1 = day_count 0
+    
+    setIsSaving(true);
+    try {
+      const { error } = await supabase
+        .from("workout_of_day_state")
+        .update({
+          day_count: newDayCount,
+          updated_at: new Date().toISOString()
+        })
+        .eq("id", wodState.id);
+
+      if (error) throw error;
+
+      toast.success(`Reset to Day ${targetDay}`, {
+        description: `Next WOD will be ${CATEGORY_CYCLE_7DAY[newDayCount % 7]}`
+      });
+      
+      queryClient.invalidateQueries({ queryKey: ["wod-state"] });
+    } catch (error: any) {
+      toast.error("Failed to reset", { description: error.message });
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  const handleClearFormatUsage = async () => {
+    if (!wodState?.id) return;
+    
+    setIsSaving(true);
+    try {
+      const { error } = await supabase
+        .from("workout_of_day_state")
+        .update({
+          format_usage: {},
+          updated_at: new Date().toISOString()
+        })
+        .eq("id", wodState.id);
+
+      if (error) throw error;
+
+      toast.success("Format usage cleared");
+      queryClient.invalidateQueries({ queryKey: ["wod-state"] });
+    } catch (error: any) {
+      toast.error("Failed to clear", { description: error.message });
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  const handleResetWeekStars = async () => {
+    if (!wodState?.id) return;
+    
+    setIsSaving(true);
+    try {
+      const { error } = await supabase
+        .from("workout_of_day_state")
+        .update({
+          used_stars_in_week: {},
+          updated_at: new Date().toISOString()
+        })
+        .eq("id", wodState.id);
+
+      if (error) throw error;
+
+      toast.success("Week stars reset");
+      queryClient.invalidateQueries({ queryKey: ["wod-state"] });
+    } catch (error: any) {
+      toast.error("Failed to reset", { description: error.message });
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  // Preview what the new settings would result in
+  const previewDayInCycle = (editDayCount % 7) + 1;
+  const previewCategory = CATEGORY_CYCLE_7DAY[editDayCount % 7];
   
   // Calculate shifted pattern for current week
   const shiftAmount = (weekNumber - 1) % 7;
@@ -261,30 +395,124 @@ export const PeriodizationSystemDialog = ({
           <TabsContent value="state" className="space-y-4">
             <Card>
               <CardHeader className="pb-2">
-                <CardTitle className="text-sm flex items-center gap-2">
-                  <Info className="h-4 w-4" />
-                  Current System State
+                <CardTitle className="text-sm flex items-center gap-2 justify-between">
+                  <div className="flex items-center gap-2">
+                    <Info className="h-4 w-4" />
+                    Current System State
+                  </div>
+                  {!isEditing ? (
+                    <Button variant="outline" size="sm" onClick={handleStartEdit}>
+                      <Settings className="h-3 w-3 mr-1" />
+                      Edit
+                    </Button>
+                  ) : (
+                    <div className="flex gap-2">
+                      <Button variant="ghost" size="sm" onClick={handleCancelEdit} disabled={isSaving}>
+                        Cancel
+                      </Button>
+                      <Button size="sm" onClick={handleSaveEdit} disabled={isSaving}>
+                        <Save className="h-3 w-3 mr-1" />
+                        Save
+                      </Button>
+                    </div>
+                  )}
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="p-3 bg-muted/30 rounded-lg">
-                    <p className="text-xs text-muted-foreground">Total Day Count</p>
-                    <p className="text-xl font-bold">{wodState?.day_count || 0}</p>
+                {isEditing ? (
+                  <>
+                    <div className="p-3 bg-yellow-500/10 border border-yellow-500/30 rounded-lg flex items-start gap-2">
+                      <AlertTriangle className="h-4 w-4 text-yellow-500 mt-0.5" />
+                      <p className="text-sm text-yellow-400">
+                        Changing these values will affect the WOD rotation. Use with caution.
+                      </p>
+                    </div>
+                    
+                    <div className="grid grid-cols-2 gap-4">
+                      <div className="space-y-2">
+                        <Label>Total Day Count</Label>
+                        <Input
+                          type="number"
+                          min={0}
+                          value={editDayCount}
+                          onChange={(e) => setEditDayCount(parseInt(e.target.value) || 0)}
+                        />
+                        <p className="text-xs text-muted-foreground">
+                          Day in cycle: {previewDayInCycle}/7 → {previewCategory}
+                        </p>
+                      </div>
+                      <div className="space-y-2">
+                        <Label>Week Number</Label>
+                        <Input
+                          type="number"
+                          min={1}
+                          value={editWeekNumber}
+                          onChange={(e) => setEditWeekNumber(parseInt(e.target.value) || 1)}
+                        />
+                        <p className="text-xs text-muted-foreground">
+                          Affects difficulty pattern shift
+                        </p>
+                      </div>
+                    </div>
+                  </>
+                ) : (
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="p-3 bg-muted/30 rounded-lg">
+                      <p className="text-xs text-muted-foreground">Total Day Count</p>
+                      <p className="text-xl font-bold">{wodState?.day_count || 0}</p>
+                    </div>
+                    <div className="p-3 bg-muted/30 rounded-lg">
+                      <p className="text-xs text-muted-foreground">Day in Cycle</p>
+                      <p className="text-xl font-bold">{dayInCycle} / 7</p>
+                    </div>
+                    <div className="p-3 bg-muted/30 rounded-lg">
+                      <p className="text-xs text-muted-foreground">Week Number</p>
+                      <p className="text-xl font-bold">{weekNumber}</p>
+                    </div>
+                    <div className="p-3 bg-muted/30 rounded-lg">
+                      <p className="text-xs text-muted-foreground">Next Category</p>
+                      <Badge variant="secondary" className="mt-1">
+                        {CATEGORY_CYCLE_7DAY[(wodState?.day_count || 0) % 7]}
+                      </Badge>
+                    </div>
                   </div>
-                  <div className="p-3 bg-muted/30 rounded-lg">
-                    <p className="text-xs text-muted-foreground">Day in Cycle</p>
-                    <p className="text-xl font-bold">{dayInCycle} / 7</p>
+                )}
+
+                {/* Quick Reset Buttons */}
+                <div className="p-3 bg-muted/30 rounded-lg space-y-3">
+                  <p className="text-sm font-medium">Quick Actions:</p>
+                  <div className="flex flex-wrap gap-2">
+                    {[1, 2, 3, 4, 5, 6, 7].map((day) => (
+                      <Button
+                        key={day}
+                        variant="outline"
+                        size="sm"
+                        onClick={() => handleResetToDay(day)}
+                        disabled={isSaving}
+                        className="text-xs"
+                      >
+                        <RotateCcw className="h-3 w-3 mr-1" />
+                        Reset to Day {day}
+                      </Button>
+                    ))}
                   </div>
-                  <div className="p-3 bg-muted/30 rounded-lg">
-                    <p className="text-xs text-muted-foreground">Week Number</p>
-                    <p className="text-xl font-bold">{weekNumber}</p>
-                  </div>
-                  <div className="p-3 bg-muted/30 rounded-lg">
-                    <p className="text-xs text-muted-foreground">Next Category</p>
-                    <Badge variant="secondary" className="mt-1">
-                      {CATEGORY_CYCLE_7DAY[(wodState?.day_count || 0) % 7]}
-                    </Badge>
+                  <div className="flex gap-2 pt-2 border-t border-border/50">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={handleClearFormatUsage}
+                      disabled={isSaving}
+                    >
+                      Clear Format Usage
+                    </Button>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={handleResetWeekStars}
+                      disabled={isSaving}
+                    >
+                      Reset Week Stars
+                    </Button>
                   </div>
                 </div>
 
