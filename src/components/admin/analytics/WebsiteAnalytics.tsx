@@ -242,7 +242,20 @@ export function WebsiteAnalytics() {
         .lte("created_at", endDate.toISOString())
         .not("browser_info", "ilike", "%lovable%");
 
+      // All tracked social platforms - always show these
+      const allTrackedSources = [
+        'direct', 'google', 'facebook', 'instagram', 'tiktok', 
+        'youtube', 'twitter', 'linkedin', 'bing', 'other'
+      ];
+
       const sourceCounts: { [key: string]: { visits: number; signups: number } } = {};
+      
+      // Initialize all tracked sources with zero
+      allTrackedSources.forEach(source => {
+        sourceCounts[source] = { visits: 0, signups: 0 };
+      });
+      
+      // Count actual data
       allTrafficData?.forEach(d => {
         const source = d.referral_source || "direct";
         if (!sourceCounts[source]) {
@@ -681,14 +694,26 @@ export function WebsiteAnalytics() {
                   </thead>
                   <tbody>
                     {trafficSources.map((source, idx) => (
-                      <tr key={idx} className="border-t">
+                      <tr key={idx} className={cn("border-t", source.visits === 0 && "text-muted-foreground bg-muted/30")}>
                         <td className="py-2 px-3 font-medium">{source.source}</td>
-                        <td className="text-right py-2 px-3">{source.visits.toLocaleString()}</td>
-                        <td className="text-right py-2 px-3">{source.signups}</td>
                         <td className="text-right py-2 px-3">
-                          <Badge variant={source.conversionRate > 5 ? "default" : "secondary"} className="text-xs">
-                            {source.conversionRate}%
-                          </Badge>
+                          {source.visits === 0 ? (
+                            <span className="text-xs italic">No data yet</span>
+                          ) : (
+                            source.visits.toLocaleString()
+                          )}
+                        </td>
+                        <td className="text-right py-2 px-3">
+                          {source.visits === 0 ? "—" : source.signups}
+                        </td>
+                        <td className="text-right py-2 px-3">
+                          {source.visits === 0 ? (
+                            <Badge variant="outline" className="text-xs text-muted-foreground">—</Badge>
+                          ) : (
+                            <Badge variant={source.conversionRate > 5 ? "default" : "secondary"} className="text-xs">
+                              {source.conversionRate}%
+                            </Badge>
+                          )}
                         </td>
                       </tr>
                     ))}
