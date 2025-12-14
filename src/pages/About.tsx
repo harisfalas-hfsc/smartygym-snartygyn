@@ -361,27 +361,23 @@ const About = () => {
             </Card>
           </ScrollReveal>
 
-          {/* CTA */}
-          <ScrollReveal>
-            <Card className="border-2 border-primary bg-primary/5 text-center">
-              <CardContent className="p-6 space-y-4">
-                <h2 className="text-2xl md:text-3xl font-bold">Ready to Start Your Journey?</h2>
-                <p className="text-muted-foreground max-w-2xl mx-auto">
-                  Join thousands of people training smarter with <span className="text-primary font-semibold">SmartyGym</span>. Whether you're at home, in the gym, 
-                  or on the go — we've got you covered.
-                </p>
-                {!isPremium && (
+          {/* CTA - Only visible to non-premium users */}
+          {!isPremium && (
+            <ScrollReveal>
+              <Card className="border-2 border-primary bg-primary/5 text-center">
+                <CardContent className="p-6 space-y-4">
+                  <h2 className="text-2xl md:text-3xl font-bold">Ready to Start Your Journey?</h2>
                   <Button 
                     size="lg" 
                     onClick={() => navigate('/joinpremium')}
                     className="mt-4"
                   >
-                    Start Training Today
+                    Start Now
                   </Button>
-                )}
-              </CardContent>
-            </Card>
-          </ScrollReveal>
+                </CardContent>
+              </Card>
+            </ScrollReveal>
+          )}
 
         </div>
       </div>
