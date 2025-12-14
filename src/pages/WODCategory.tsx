@@ -11,6 +11,7 @@ import { useAllWorkouts } from "@/hooks/useWorkoutData";
 import { useWorkoutInteractions } from "@/hooks/useWorkoutInteractions";
 import { supabase } from "@/integrations/supabase/client";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { WODTimeline } from "@/components/WODTimeline";
 const WODCategory = () => {
   const navigate = useNavigate();
   const [userId, setUserId] = useState<string | undefined>();
@@ -220,14 +221,8 @@ const WODCategory = () => {
                 </div>
               </Card>
 
-              {/* Shared Info Banner (if both WODs exist) */}
-              {bodyweightWOD && equipmentWOD && <div className="mb-6 p-4 bg-primary/10 rounded-lg border border-primary/30 text-center">
-                  <p className="text-sm text-muted-foreground">
-                    <span className="font-semibold text-primary">{bodyweightWOD.category}</span> Day • 
-                    <span className="ml-2">{bodyweightWOD.format}</span> • 
-                    <span className="ml-2">{bodyweightWOD.difficulty} ({bodyweightWOD.difficulty_stars}⭐)</span>
-                  </p>
-                </div>}
+              {/* Yesterday/Today/Tomorrow Timeline */}
+              <WODTimeline />
 
               {/* Two WOD Cards Side by Side */}
               {bodyweightWOD || equipmentWOD ? <div className="grid grid-cols-1 md:grid-cols-2 gap-6">

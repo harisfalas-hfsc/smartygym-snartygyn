@@ -11,8 +11,18 @@ import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, 
 import { toast } from "sonner";
 import { Flame, Play, RefreshCw, Calendar, Dumbbell, Star, TrendingUp, Clock, ExternalLink, AlertTriangle, ImageIcon } from "lucide-react";
 import { format } from "date-fns";
+import { WODSchedulePreview } from "./WODSchedulePreview";
 
-const CATEGORY_CYCLE = ["STRENGTH", "CALORIE BURNING", "METABOLIC", "CARDIO", "MOBILITY & STABILITY", "CHALLENGE"];
+// 7-DAY CATEGORY CYCLE
+const CATEGORY_CYCLE_7DAY = [
+  "CHALLENGE",
+  "STRENGTH", 
+  "CARDIO",
+  "MOBILITY & STABILITY",
+  "STRENGTH",
+  "METABOLIC",
+  "CALORIE BURNING"
+];
 
 export const WODManager = () => {
   const [isGenerating, setIsGenerating] = useState(false);
@@ -135,8 +145,14 @@ export const WODManager = () => {
   };
 
   const getNextCategory = () => {
-    if (!wodState) return CATEGORY_CYCLE[0];
-    return CATEGORY_CYCLE[wodState.day_count % 6];
+    if (!wodState) return CATEGORY_CYCLE_7DAY[0];
+    const dayInCycle = (wodState.day_count % 7);
+    return CATEGORY_CYCLE_7DAY[dayInCycle];
+  };
+  
+  const getDayInCycle = () => {
+    if (!wodState) return 1;
+    return (wodState.day_count % 7) + 1;
   };
 
   const getDifficultyColor = (stars: number | null) => {
@@ -310,6 +326,9 @@ export const WODManager = () => {
           </CardContent>
         </Card>
       </div>
+
+      {/* Upcoming WOD Schedule Preview */}
+      <WODSchedulePreview />
 
       {/* Distribution Stats */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">

@@ -2034,7 +2034,10 @@ export type Database = {
           last_difficulty: string | null
           last_equipment: string | null
           last_generated_at: string | null
+          manual_overrides: Json | null
           updated_at: string | null
+          used_stars_in_week: Json | null
+          week_number: number | null
         }
         Insert: {
           created_at?: string | null
@@ -2050,7 +2053,10 @@ export type Database = {
           last_difficulty?: string | null
           last_equipment?: string | null
           last_generated_at?: string | null
+          manual_overrides?: Json | null
           updated_at?: string | null
+          used_stars_in_week?: Json | null
+          week_number?: number | null
         }
         Update: {
           created_at?: string | null
@@ -2066,7 +2072,10 @@ export type Database = {
           last_difficulty?: string | null
           last_equipment?: string | null
           last_generated_at?: string | null
+          manual_overrides?: Json | null
           updated_at?: string | null
+          used_stars_in_week?: Json | null
+          week_number?: number | null
         }
         Relationships: []
       }
