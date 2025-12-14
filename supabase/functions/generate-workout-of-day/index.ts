@@ -157,6 +157,31 @@ serve(async (req) => {
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
     const stripe = new Stripe(stripeKey, { apiVersion: "2025-08-27.basil" });
 
+    // SAME-DAY GENERATION GUARD: Check if today's WOD already exists
+    const today = new Date();
+    const todayStart = new Date(today.getFullYear(), today.getMonth(), today.getDate()).toISOString();
+    const todayEnd = new Date(today.getFullYear(), today.getMonth(), today.getDate() + 1).toISOString();
+    
+    const { data: existingTodayWODs } = await supabase
+      .from("admin_workouts")
+      .select("id, name, category")
+      .eq("is_workout_of_day", true)
+      .gte("created_at", todayStart)
+      .lt("created_at", todayEnd);
+    
+    if (existingTodayWODs && existingTodayWODs.length >= 2) {
+      logStep("SKIPPING: Today's WODs already exist", { count: existingTodayWODs.length, wods: existingTodayWODs });
+      return new Response(
+        JSON.stringify({ 
+          success: true, 
+          skipped: true, 
+          message: "Today's WODs already generated",
+          existingWODs: existingTodayWODs 
+        }),
+        { headers: { ...corsHeaders, "Content-Type": "application/json" }, status: 200 }
+      );
+    }
+
     // Get current state
     const { data: stateData, error: stateError } = await supabase
       .from("workout_of_day_state")
@@ -901,7 +926,57 @@ Respond in this EXACT JSON format:
       });
     }
 
-    // Send single notification for both workouts
+    // ========== CRITICAL: UPDATE STATE IMMEDIATELY AFTER WORKOUT GENERATION ==========
+    // This ensures state is updated even if notification sending times out
+    const newState = {
+      day_count: state.day_count + 1,
+      current_category: CATEGORY_CYCLE[(state.day_count + 1) % CATEGORY_CYCLE.length],
+      last_equipment: "BOTH",
+      last_difficulty: selectedDifficulty.name,
+      last_difficulty_stars: selectedDifficulty.stars,
+      used_difficulties_in_cycle: newUsedDifficulties,
+      format_usage: updatedUsage,
+      equipment_bodyweight_count: (state.equipment_bodyweight_count || 0) + 1,
+      equipment_with_count: (state.equipment_with_count || 0) + 1,
+      difficulty_beginner_count: selectedDifficulty.name === "Beginner"
+        ? (state.difficulty_beginner_count || 0) + 1
+        : (state.difficulty_beginner_count || 0),
+      difficulty_intermediate_count: selectedDifficulty.name === "Intermediate"
+        ? (state.difficulty_intermediate_count || 0) + 1
+        : (state.difficulty_intermediate_count || 0),
+      difficulty_advanced_count: selectedDifficulty.name === "Advanced"
+        ? (state.difficulty_advanced_count || 0) + 1
+        : (state.difficulty_advanced_count || 0),
+      last_generated_at: new Date().toISOString(),
+      updated_at: new Date().toISOString()
+    };
+
+    try {
+      if (stateData) {
+        const { error: updateError } = await supabase
+          .from("workout_of_day_state")
+          .update(newState)
+          .eq("id", stateData.id);
+        if (updateError) {
+          logStep("ERROR updating state", { error: updateError.message });
+        } else {
+          logStep("State updated BEFORE notifications", newState);
+        }
+      } else {
+        const { error: insertError } = await supabase
+          .from("workout_of_day_state")
+          .insert(newState);
+        if (insertError) {
+          logStep("ERROR inserting state", { error: insertError.message });
+        } else {
+          logStep("State inserted BEFORE notifications", newState);
+        }
+      }
+    } catch (stateUpdateError) {
+      logStep("CRITICAL: State update failed", { error: stateUpdateError });
+    }
+
+    // Send single notification for both workouts (now happens AFTER state update)
     try {
       const { data: allUsers } = await supabase.from('profiles').select('user_id');
       const userIds = allUsers?.map(u => u.user_id) || [];
@@ -993,42 +1068,7 @@ ${getEmailFooter(authUser.email, 'wod')}
       logStep("Error sending WOD notification", { error: e });
     }
 
-    // Update state with difficulty rotation tracking
-    const newState = {
-      day_count: state.day_count + 1,
-      current_category: CATEGORY_CYCLE[(state.day_count + 1) % CATEGORY_CYCLE.length],
-      last_equipment: "BOTH",
-      last_difficulty: selectedDifficulty.name,
-      last_difficulty_stars: selectedDifficulty.stars, // Track for rotation logic
-      used_difficulties_in_cycle: newUsedDifficulties, // Track which difficulties used in current cycle
-      format_usage: updatedUsage,
-      equipment_bodyweight_count: (state.equipment_bodyweight_count || 0) + 1,
-      equipment_with_count: (state.equipment_with_count || 0) + 1,
-      difficulty_beginner_count: selectedDifficulty.name === "Beginner"
-        ? (state.difficulty_beginner_count || 0) + 1
-        : (state.difficulty_beginner_count || 0),
-      difficulty_intermediate_count: selectedDifficulty.name === "Intermediate"
-        ? (state.difficulty_intermediate_count || 0) + 1
-        : (state.difficulty_intermediate_count || 0),
-      difficulty_advanced_count: selectedDifficulty.name === "Advanced"
-        ? (state.difficulty_advanced_count || 0) + 1
-        : (state.difficulty_advanced_count || 0),
-      last_generated_at: new Date().toISOString(),
-      updated_at: new Date().toISOString()
-    };
-
-    if (stateData) {
-      await supabase
-        .from("workout_of_day_state")
-        .update(newState)
-        .eq("id", stateData.id);
-    } else {
-      await supabase
-        .from("workout_of_day_state")
-        .insert(newState);
-    }
-
-    logStep("State updated", newState);
+    // State already updated before notifications (see line 931)
 
     return new Response(
       JSON.stringify({
