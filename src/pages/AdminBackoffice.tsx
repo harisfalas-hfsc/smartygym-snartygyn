@@ -191,7 +191,7 @@ export default function AdminBackoffice() {
 
         {/* Main Content */}
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="w-full h-auto p-1 sm:p-2 flex flex-nowrap overflow-x-auto gap-0.5 sm:gap-1 bg-background border border-border rounded-lg">
+          <TabsList className="w-full h-auto p-1 sm:p-2 flex flex-nowrap overflow-x-auto gap-0.5 sm:gap-1 bg-background border border-border rounded-lg scrollbar-thin scrollbar-thumb-muted scrollbar-track-transparent" style={{ scrollbarWidth: 'thin' }}>
             <TabsTrigger value="content" className="flex items-center justify-center gap-1 sm:gap-1.5 text-xs sm:text-sm px-2 sm:px-3 py-2 sm:py-2.5 whitespace-nowrap flex-shrink-0">
               <Folder className="h-3 w-3 sm:h-4 sm:w-4 shrink-0" />
               <span>Content</span>
