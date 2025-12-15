@@ -83,7 +83,7 @@ serve(async (req: Request) => {
       // Create dashboard notification
       const dashboardMessage = {
         user_id: profile.user_id,
-        message_type: 'motivational_weekly',
+        message_type: 'announcement_update',
         subject: `${reminderIcon} ${reminderType === 'morning' ? 'Morning' : 'Night'} Check-in Reminder`,
         content: `
           <p>Hey ${userName}!</p>
