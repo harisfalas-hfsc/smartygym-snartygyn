@@ -14,7 +14,7 @@ import smartyGymLogo from "@/assets/smarty-gym-logo.png";
 import smartyGymIcon from "@/assets/smarty-gym-icon.png";
 import harisPhoto from "@/assets/haris-falas-coach.png";
 import { MobilePhoneIllustration } from "@/components/MobilePhoneIllustration";
-import { useIsMobile } from "@/hooks/use-mobile";
+import { useIsPortraitMode } from "@/hooks/useIsPortraitMode";
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious, type CarouselApi } from "@/components/ui/carousel";
 import { cn } from "@/lib/utils";
 import { useAccessControl } from "@/hooks/useAccessControl";
@@ -35,7 +35,7 @@ const Index = () => {
     userTier
   } = useAccessControl();
   const isPremium = userTier === "premium";
-  const isMobile = useIsMobile();
+  const isMobile = useIsPortraitMode();
 
   // Carousel state for mobile navigation dots
   const [carouselApi, setCarouselApi] = useState<CarouselApi>();
