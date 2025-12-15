@@ -1,5 +1,6 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+import { MESSAGE_TYPES } from "../_shared/notification-types.ts";
 
 const RESEND_API_KEY = Deno.env.get("RESEND_API_KEY");
 
@@ -458,7 +459,7 @@ const handler = async (req: Request): Promise<Response> => {
           .from("user_system_messages")
           .insert({
             user_id: user.id,
-            message_type: "weekly_activity_report",
+            message_type: MESSAGE_TYPES.WEEKLY_ACTIVITY_REPORT,
             subject: `📊 Your Weekly Activity Report (${weekStart} - ${weekEnd})`,
             content: dashboardContent,
             is_read: false,

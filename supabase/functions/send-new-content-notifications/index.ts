@@ -2,6 +2,7 @@ import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 import { Resend } from "https://esm.sh/resend@2.0.0";
 import { getEmailHeaders, getEmailFooter } from "../_shared/email-utils.ts";
+import { MESSAGE_TYPES } from "../_shared/notification-types.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -80,7 +81,7 @@ serve(async (req) => {
     let subject = "";
     let dashboardContent = "";
     let emailHtml = "";
-    let messageType: string = "announcement_update";
+    let messageType: string = MESSAGE_TYPES.CONTENT_UPDATE;
 
     const workoutCount = workouts.length;
     const programCount = programs.length;
@@ -90,7 +91,7 @@ serve(async (req) => {
     if (workoutCount > 0 && programCount > 0) {
       // Mixed content
       subject = `🆕 New Content Added to SmartyGym!`;
-      messageType = "announcement_update";
+      messageType = MESSAGE_TYPES.CONTENT_UPDATE;
       
       const workoutText = workoutCount === 1 
         ? `1 new workout` 
@@ -117,7 +118,7 @@ serve(async (req) => {
       );
     } else if (workoutCount > 0) {
       // Only workouts
-      messageType = "announcement_new_workout";
+      messageType = MESSAGE_TYPES.NEW_WORKOUT;
       
       if (workoutCount === 1) {
         const workout = workouts[0];
@@ -154,7 +155,7 @@ serve(async (req) => {
       }
     } else if (programCount > 0) {
       // Only programs
-      messageType = "announcement_new_program";
+      messageType = MESSAGE_TYPES.NEW_PROGRAM;
       
       if (programCount === 1) {
         const program = programs[0];

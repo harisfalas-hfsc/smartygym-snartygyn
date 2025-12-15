@@ -2,6 +2,7 @@ import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.57.2";
 import { Resend } from "https://esm.sh/resend@2.0.0";
 import { wrapInEmailTemplateWithFooter, getEmailHeaders } from "../_shared/email-utils.ts";
+import { MESSAGE_TYPES } from "../_shared/notification-types.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -115,7 +116,7 @@ serve(async (req) => {
     const { data: existingMessages, error: existingError } = await supabaseAdmin
       .from('user_system_messages')
       .select('user_id')
-      .eq('message_type', 'motivational_weekly')
+      .eq('message_type', MESSAGE_TYPES.MONDAY_MOTIVATION)
       .gte('created_at', today.toISOString());
 
     if (existingError) {
@@ -150,7 +151,7 @@ serve(async (req) => {
             .from("user_system_messages")
             .insert({
               user_id: user.user_id,
-              message_type: "motivational_weekly",
+              message_type: MESSAGE_TYPES.MONDAY_MOTIVATION,
               subject: template.subject,
               content: template.content,
               is_read: false,

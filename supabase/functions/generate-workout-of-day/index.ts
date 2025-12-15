@@ -3,6 +3,7 @@ import { createClient } from "https://esm.sh/@supabase/supabase-js@2.57.2";
 import Stripe from "https://esm.sh/stripe@18.5.0";
 import { Resend } from "https://esm.sh/resend@2.0.0";
 import { getEmailHeaders, getEmailFooter } from "../_shared/email-utils.ts";
+import { MESSAGE_TYPES } from "../_shared/notification-types.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -964,7 +965,7 @@ RESPONSE FORMAT (JSON ONLY - NO MARKDOWN):
         
         await supabase.from('user_system_messages').insert(userIds.map(userId => ({
           user_id: userId,
-          message_type: 'wod_notification',
+          message_type: MESSAGE_TYPES.WOD_NOTIFICATION,
           subject: notificationTitle,
           content: notificationContent,
           is_read: false,
@@ -972,8 +973,8 @@ RESPONSE FORMAT (JSON ONLY - NO MARKDOWN):
         
         // Add audit log entry for WOD notification
         await supabase.from('notification_audit_log').insert({
-          notification_type: 'wod_notification',
-          message_type: 'wod_notification',
+          notification_type: MESSAGE_TYPES.WOD_NOTIFICATION,
+          message_type: MESSAGE_TYPES.WOD_NOTIFICATION,
           recipient_count: userIds.length,
           success_count: userIds.length,
           failed_count: 0,

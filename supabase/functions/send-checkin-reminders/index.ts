@@ -1,6 +1,7 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 import { Resend } from "https://esm.sh/resend@2.0.0";
+import { MESSAGE_TYPES } from "../_shared/notification-types.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -83,7 +84,7 @@ serve(async (req: Request) => {
       // Create dashboard notification
       const dashboardMessage = {
         user_id: profile.user_id,
-        message_type: 'announcement_update',
+        message_type: MESSAGE_TYPES.CHECKIN_REMINDER,
         subject: `${reminderIcon} ${reminderType === 'morning' ? 'Morning' : 'Night'} Check-in Reminder`,
         content: `
           <p>Hey ${userName}!</p>

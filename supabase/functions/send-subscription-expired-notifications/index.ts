@@ -2,6 +2,7 @@ import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.57.2";
 import { Resend } from "https://esm.sh/resend@2.0.0";
 import { getEmailHeaders, getEmailFooter } from "../_shared/email-utils.ts";
+import { MESSAGE_TYPES } from "../_shared/notification-types.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -60,7 +61,7 @@ serve(async (req) => {
         .from("user_system_messages")
         .select("id")
         .eq("user_id", user_id)
-        .eq("message_type", "cancellation")
+        .eq("message_type", MESSAGE_TYPES.SUBSCRIPTION_EXPIRED)
         .gte("created_at", yesterday.toISOString())
         .limit(1);
 
@@ -101,7 +102,7 @@ serve(async (req) => {
         .from("user_system_messages")
         .insert({
           user_id,
-          message_type: "cancellation",
+          message_type: MESSAGE_TYPES.SUBSCRIPTION_EXPIRED,
           subject: dashboardSubject,
           content: dashboardContent,
           is_read: false
