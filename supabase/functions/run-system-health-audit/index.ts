@@ -488,11 +488,14 @@ const handler = async (req: Request): Promise<Response> => {
     // ============================================
     console.log("🔔 Checking notification integrity...");
 
-    // Define expected message types per notification source
+    // Define expected message types per notification source (UNIQUE per notification type)
     const expectedMessageTypes: Record<string, { source: string; schedule: string }> = {
       'motivational_weekly': { source: 'send-weekly-motivation', schedule: 'Mondays 08:00 UTC' },
-      'announcement_update': { source: 'Multiple (Activity Reports, Check-in Reminders, etc.)', schedule: 'Various' },
-      'announcement_new_workout': { source: 'generate-workout-of-day / send-new-content-notifications', schedule: 'Daily 07:00 UTC' },
+      'weekly_activity_report': { source: 'send-weekly-activity-report', schedule: 'Mondays 07:00 UTC' },
+      'wod_notification': { source: 'generate-workout-of-day', schedule: 'Daily 07:00 UTC' },
+      'daily_ritual': { source: 'generate-daily-ritual', schedule: 'Daily 05:00 UTC' },
+      'checkin_reminder': { source: 'send-checkin-reminders', schedule: 'Daily 06:00 & 18:00 UTC' },
+      'announcement_new_workout': { source: 'send-new-content-notifications (bulk workouts)', schedule: 'On new content' },
       'welcome': { source: 'send-welcome-email', schedule: 'On signup' },
       'renewal_reminder': { source: 'send-renewal-reminders', schedule: 'Daily 09:00 UTC' },
       'cancellation': { source: 'stripe-webhook', schedule: 'On cancellation' },
@@ -571,50 +574,51 @@ const handler = async (req: Request): Promise<Response> => {
       .order('sent_at', { ascending: false });
 
     if (auditLogs && auditLogs.length > 0) {
-      // Expected daily notifications
+      // Expected daily notifications with UNIQUE message_type identifiers
       const expectedDaily = [
-        { key: 'wod', patterns: ['WOD', 'Workout of the Day'] },
-        { key: 'ritual', patterns: ['Ritual', 'Daily Smarty Ritual'] },
+        { key: 'wod_notification', patterns: ['WOD', 'Workout of the Day', 'wod_notification'] },
+        { key: 'daily_ritual', patterns: ['Ritual', 'Daily Smarty Ritual', 'daily_ritual'] },
       ];
 
       // Check if today is Monday for weekly motivation
       const isMonday = new Date().getDay() === 1;
       if (isMonday) {
-        expectedDaily.push({ key: 'monday_motivation', patterns: ['Monday Motivation', 'Motivational'] });
-        expectedDaily.push({ key: 'weekly_activity', patterns: ['Weekly Activity', 'Activity Report'] });
+        expectedDaily.push({ key: 'motivational_weekly', patterns: ['Monday Motivation', 'Motivational', 'motivational_weekly'] });
+        expectedDaily.push({ key: 'weekly_activity_report', patterns: ['Weekly Activity', 'Activity Report', 'weekly_activity_report'] });
       }
 
       for (const expected of expectedDaily) {
         const found = auditLogs.some(log => 
           expected.patterns.some(pattern => 
             log.subject?.toLowerCase().includes(pattern.toLowerCase()) ||
-            log.message_type?.toLowerCase().includes(expected.key.toLowerCase())
+            log.message_type?.toLowerCase() === expected.key.toLowerCase() ||
+            log.notification_type?.toLowerCase() === expected.key.toLowerCase()
           )
         );
 
-        if (expected.key === 'monday_motivation' && isMonday) {
+        if (expected.key === 'motivational_weekly' && isMonday) {
           addCheck('Notifications', 'Monday Motivation Sent', 
             'Weekly motivation should be sent on Mondays', 
             found ? 'pass' : 'fail',
             found ? 'Sent successfully' : 'NOT SENT! Check if another notification blocked it with same message_type'
           );
-        } else if (expected.key === 'weekly_activity' && isMonday) {
+        } else if (expected.key === 'weekly_activity_report' && isMonday) {
           addCheck('Notifications', 'Weekly Activity Report Sent', 
             'Activity reports should be sent on Mondays', 
             found ? 'pass' : 'warning',
             found ? 'Sent successfully' : 'Not sent yet (scheduled at 07:00 UTC)'
           );
-        } else if (expected.key === 'wod') {
+        } else if (expected.key === 'wod_notification') {
           addCheck('Notifications', 'WOD Notification Sent', 
             'Daily WOD notification should be sent', 
             found ? 'pass' : 'fail',
-            found ? 'Sent successfully' : 'NOT SENT!'
+            found ? 'Found in audit log' : 'NOT FOUND in audit log!'
           );
-        } else if (expected.key === 'ritual') {
+        } else if (expected.key === 'daily_ritual') {
           addCheck('Notifications', 'Daily Ritual Notification Sent', 
             'Daily Ritual notification should be sent', 
             found ? 'pass' : 'warning',
-            found ? 'Sent successfully' : 'Not found in audit log'
+            found ? 'Found in audit log' : 'Not found in audit log'
           );
         }
       }

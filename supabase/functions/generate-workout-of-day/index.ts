@@ -964,11 +964,24 @@ RESPONSE FORMAT (JSON ONLY - NO MARKDOWN):
         
         await supabase.from('user_system_messages').insert(userIds.map(userId => ({
           user_id: userId,
-          message_type: 'announcement_new_workout',
+          message_type: 'wod_notification',
           subject: notificationTitle,
           content: notificationContent,
           is_read: false,
         })));
+        
+        // Add audit log entry for WOD notification
+        await supabase.from('notification_audit_log').insert({
+          notification_type: 'wod_notification',
+          message_type: 'wod_notification',
+          recipient_count: userIds.length,
+          success_count: userIds.length,
+          failed_count: 0,
+          subject: notificationTitle,
+          content: 'WOD notification sent to all users',
+          sent_at: new Date().toISOString(),
+        });
+        logStep("Audit log entry created for WOD notification");
         
         const { data: usersData } = await supabase.auth.admin.listUsers();
         
