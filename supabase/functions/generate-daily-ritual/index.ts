@@ -438,7 +438,7 @@ const emailResult = await resend.emails.send({
     try {
       const { error: auditError } = await supabase.from('notification_audit_log').insert({
         notification_type: 'daily_ritual',
-        message_type: 'announcement_update',
+        message_type: MESSAGE_TYPES.DAILY_RITUAL,
         subject: subject,
         content: content,
         recipient_filter: 'all',

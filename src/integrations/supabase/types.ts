@@ -2198,6 +2198,18 @@ export type Database = {
         | "announcement_event"
         | "purchase_shop_product"
         | "motivational_weekly"
+        | "daily_ritual"
+        | "weekly_activity_report"
+        | "wod_notification"
+        | "checkin_reminder"
+        | "subscription_expired"
+        | "reactivation"
+        | "support"
+        | "mass_notification"
+        | "new_workout"
+        | "new_program"
+        | "new_article"
+        | "program_delivered"
       plan_type: "free" | "gold" | "platinum"
       subscription_status: "active" | "canceled" | "past_due"
     }
@@ -2346,6 +2358,18 @@ export const Constants = {
         "announcement_event",
         "purchase_shop_product",
         "motivational_weekly",
+        "daily_ritual",
+        "weekly_activity_report",
+        "wod_notification",
+        "checkin_reminder",
+        "subscription_expired",
+        "reactivation",
+        "support",
+        "mass_notification",
+        "new_workout",
+        "new_program",
+        "new_article",
+        "program_delivered",
       ],
       plan_type: ["free", "gold", "platinum"],
       subscription_status: ["active", "canceled", "past_due"],
