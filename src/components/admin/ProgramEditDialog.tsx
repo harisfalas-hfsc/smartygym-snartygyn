@@ -158,25 +158,40 @@ export const ProgramEditDialog = ({ program, open, onOpenChange, onSave }: Progr
     }
   }, [program]);
 
-  // Auto-generate serial number when category changes
+  // Auto-generate serial number when category changes using persistent counters
   useEffect(() => {
     if (!program && formData.category) {
       const generateSerialNumber = async () => {
         const prefix = getCategoryPrefix(formData.category);
-        const { data } = await supabase
-          .from('admin_training_programs')
-          .select('id, serial_number')
-          .like('id', `${prefix}-%`)
-          .order('serial_number', { ascending: false })
-          .limit(1);
         
-        let nextSerial = 1;
-        if (data && data.length > 0 && data[0].serial_number) {
-          const currentSerial = typeof data[0].serial_number === 'string' 
-            ? parseInt(data[0].serial_number) 
-            : data[0].serial_number;
-          nextSerial = currentSerial + 1;
+        // Fetch persistent counter from system_settings
+        const { data: settings, error: settingsError } = await supabase
+          .from('system_settings')
+          .select('setting_value')
+          .eq('setting_key', 'serial_number_counters')
+          .single();
+        
+        if (settingsError) {
+          console.error('Error fetching serial counters:', settingsError);
+          // Fallback to old logic if counters not found
+          const { data } = await supabase
+            .from('admin_training_programs')
+            .select('serial_number')
+            .eq('category', formData.category)
+            .order('serial_number', { ascending: false, nullsFirst: false })
+            .limit(1);
+          
+          const nextSerial = (data?.[0]?.serial_number || 0) + 1;
+          setFormData(prev => ({
+            ...prev,
+            serial_number: nextSerial,
+            id: `${prefix}-${nextSerial.toString().padStart(3, '0')}`
+          }));
+          return;
         }
+        
+        const counters = settings?.setting_value as { programs?: Record<string, number> } || { programs: {} };
+        const nextSerial = counters.programs?.[formData.category] || 1;
         
         setFormData(prev => ({
           ...prev,
@@ -271,49 +286,6 @@ export const ProgramEditDialog = ({ program, open, onOpenChange, onSave }: Progr
         }
       }
 
-      // Create Stripe product if premium + standalone purchase with price (not for personal training)
-      let stripeProductId = formData.stripe_product_id;
-      let stripePriceId = formData.stripe_price_id;
-      
-      const shouldCreateStripeProduct =
-        formData.is_premium &&
-        formData.is_standalone_purchase &&
-        formData.price &&
-        parseFloat(formData.price) > 0 &&
-        (!stripeProductId || !stripePriceId);
-      
-      if (shouldCreateStripeProduct) {
-        // Convert relative image path to absolute URL for Stripe
-        let stripeImageUrl = imageUrl;
-        if (imageUrl && imageUrl.startsWith('/')) {
-          stripeImageUrl = `${window.location.origin}${imageUrl}`;
-        }
-        
-        const { data: stripeData, error: stripeError } = await supabase.functions.invoke('create-stripe-product', {
-          body: {
-            name: formData.name,
-            price: formData.price,
-            contentType: "Training Program",
-            imageUrl: stripeImageUrl
-          }
-        });
-
-        if (stripeError) {
-          console.error('Error creating Stripe product:', stripeError);
-          toast({
-            title: "Error",
-            description: "Failed to create Stripe product. Please try again.",
-            variant: "destructive",
-          });
-          return;
-        }
-
-        if (stripeData) {
-          stripeProductId = stripeData.product_id;
-          stripePriceId = stripeData.price_id;
-        }
-      }
-      
       const duration = `${formData.weeks} Weeks / ${formData.days_per_week} Days per Week`;
       
       // Map difficulty stars to difficulty level
@@ -340,122 +312,188 @@ export const ProgramEditDialog = ({ program, open, onOpenChange, onSave }: Progr
         program_structure: formData.construction,
         nutrition_tips: formData.final_tips,
         image_url: imageUrl,
-      };
-
-      // Regular training programs with premium/standalone options
-      const dataToSave = {
-        ...baseData,
         is_premium: formData.is_premium,
         tier_required: null,
         is_standalone_purchase: formData.is_premium && formData.is_standalone_purchase,
         price: formData.is_premium && formData.price ? parseFloat(formData.price) : null,
-        stripe_product_id: stripeProductId,
-        stripe_price_id: stripePriceId,
       };
 
-        if (program) {
-          const { error } = await supabase
-            .from('admin_training_programs')
-            .update(dataToSave)
-            .eq('id', program.id);
+      if (program) {
+        // Update existing program
+        const { error } = await supabase
+          .from('admin_training_programs')
+          .update({
+            ...baseData,
+            stripe_product_id: formData.stripe_product_id,
+            stripe_price_id: formData.stripe_price_id,
+          })
+          .eq('id', program.id);
 
-          if (error) throw error;
+        if (error) throw error;
 
-          // Sync image to Stripe if image changed and Stripe product exists
-          if (stripeProductId && imageUrl && imageUrl !== program.image_url) {
-            try {
-              // Convert relative image path to absolute URL for Stripe
-              let stripeUpdateImageUrl = imageUrl;
-              if (imageUrl && imageUrl.startsWith('/')) {
-                stripeUpdateImageUrl = `${window.location.origin}${imageUrl}`;
-              }
-              
-              const { error: stripeUpdateError } = await supabase.functions.invoke('update-stripe-product', {
-                body: {
-                  productId: stripeProductId,
-                  imageUrl: stripeUpdateImageUrl
-                }
-              });
-              if (stripeUpdateError) {
-                console.error('Failed to sync image to Stripe:', stripeUpdateError);
-              } else {
-                console.log('✅ Image synced to Stripe product');
-              }
-            } catch (syncError) {
-              console.error('Error syncing image to Stripe:', syncError);
+        // Sync image to Stripe if image changed and Stripe product exists
+        if (formData.stripe_product_id && imageUrl && imageUrl !== program.image_url) {
+          try {
+            let stripeUpdateImageUrl = imageUrl;
+            if (imageUrl && imageUrl.startsWith('/')) {
+              stripeUpdateImageUrl = `${window.location.origin}${imageUrl}`;
             }
-          }
-
-          toast({ title: "Success", description: "Program updated successfully" });
-        } else {
-          const { error } = await supabase
-            .from('admin_training_programs')
-            .insert([dataToSave]);
-
-          if (error) throw error;
-
-          // Schedule notification for new program (5 minutes from now) - only if name is provided
-          if (formData.name && formData.name.trim()) {
-            try {
-              const scheduledTime = new Date(Date.now() + 5 * 60 * 1000).toISOString();
-              
-              // Helper function to strip HTML tags
-              const stripHtml = (html: string) => html.replace(/<[^>]*>/g, '').trim();
-              
-              // Compose notification body
-              let notificationBody = `New training program available: ${formData.name}. `;
-              
-              // Add description preview (strip HTML first)
-              if (formData.program_description) {
-                const cleanDescription = stripHtml(formData.program_description);
-                const descPreview = cleanDescription.length > 100 
-                  ? cleanDescription.substring(0, 100) + '...'
-                  : cleanDescription;
-                notificationBody += descPreview + ' ';
+            
+            const { error: stripeUpdateError } = await supabase.functions.invoke('update-stripe-product', {
+              body: {
+                productId: formData.stripe_product_id,
+                imageUrl: stripeUpdateImageUrl
               }
-              
-              // Add duration info
-              notificationBody += `${formData.weeks} weeks, ${formData.days_per_week} days per week. `;
-              
-              // Add access information
-              if (dataToSave.is_premium) {
-                if (dataToSave.is_standalone_purchase && dataToSave.price) {
-                  notificationBody += `Available as standalone purchase for €${dataToSave.price.toFixed(2)} or included in Premium subscription.`;
-                } else {
-                  notificationBody += 'Exclusive for Premium subscribers.';
-                }
-              } else {
-                notificationBody += 'Free for all users!';
-              }
-              
-              // Insert scheduled notification
-              await supabase
-                .from('scheduled_notifications')
-                .insert([{
-                  title: '💪 New Training Program Added!',
-                  body: notificationBody,
-                  url: `/training-program/${dataToSave.id}`,
-                  icon: imageUrl || '/smarty-gym-logo.png',
-                  target_audience: 'all',
-                  scheduled_time: scheduledTime,
-                  timezone: 'UTC',
-                  status: 'pending',
-                  recurrence_pattern: 'once'
-                }]);
-              
-              if (import.meta.env.DEV) {
-                console.log('✅ Notification scheduled for new program:', formData.name);
-              }
-            } catch (notifError) {
-              if (import.meta.env.DEV) {
-                console.error('Error scheduling notification:', notifError);
-              }
-              // Don't fail the program creation if notification fails
+            });
+            if (stripeUpdateError) {
+              console.error('Failed to sync image to Stripe:', stripeUpdateError);
+            } else {
+              console.log('✅ Image synced to Stripe product');
             }
+          } catch (syncError) {
+            console.error('Error syncing image to Stripe:', syncError);
           }
-
-          toast({ title: "Success", description: "Program created successfully and notification scheduled!" });
         }
+
+        toast({ title: "Success", description: "Program updated successfully" });
+      } else {
+        // NEW PROGRAM: First increment counter, then save to DB, then create Stripe product
+        
+        // Step 1: Increment counter atomically BEFORE saving
+        const { data: counterSettings, error: counterError } = await supabase
+          .from('system_settings')
+          .select('setting_value')
+          .eq('setting_key', 'serial_number_counters')
+          .single();
+        
+        if (!counterError && counterSettings) {
+          const counters = counterSettings.setting_value as { workouts?: Record<string, number>, programs?: Record<string, number> };
+          const currentSerial = counters.programs?.[formData.category] || 1;
+          
+          // Increment for next use
+          counters.programs = counters.programs || {};
+          counters.programs[formData.category] = currentSerial + 1;
+          
+          await supabase
+            .from('system_settings')
+            .update({ setting_value: counters, updated_at: new Date().toISOString() })
+            .eq('setting_key', 'serial_number_counters');
+          
+          console.log(`✅ Counter incremented: ${formData.category} now at ${currentSerial + 1}`);
+        }
+        
+        // Step 2: Save to database FIRST (before Stripe)
+        const { error: insertError } = await supabase
+          .from('admin_training_programs')
+          .insert([{
+            ...baseData,
+            stripe_product_id: null,
+            stripe_price_id: null,
+          }]);
+
+        if (insertError) throw insertError;
+        
+        // Step 3: Create Stripe product AFTER DB save succeeds
+        let stripeProductId = null;
+        let stripePriceId = null;
+        
+        const shouldCreateStripeProduct =
+          formData.is_premium &&
+          formData.is_standalone_purchase &&
+          formData.price &&
+          parseFloat(formData.price) > 0;
+        
+        if (shouldCreateStripeProduct) {
+          let stripeImageUrl = imageUrl;
+          if (imageUrl && imageUrl.startsWith('/')) {
+            stripeImageUrl = `${window.location.origin}${imageUrl}`;
+          }
+          
+          const { data: stripeData, error: stripeError } = await supabase.functions.invoke('create-stripe-product', {
+            body: {
+              name: formData.name,
+              price: formData.price,
+              contentType: "Training Program",
+              imageUrl: stripeImageUrl
+            }
+          });
+
+          if (stripeError) {
+            console.error('Error creating Stripe product:', stripeError);
+            toast({
+              title: "Warning",
+              description: "Program saved but Stripe product creation failed. You can retry from the edit dialog.",
+              variant: "destructive",
+            });
+          } else if (stripeData) {
+            stripeProductId = stripeData.product_id;
+            stripePriceId = stripeData.price_id;
+            
+            // Step 4: Update program with Stripe IDs
+            await supabase
+              .from('admin_training_programs')
+              .update({
+                stripe_product_id: stripeProductId,
+                stripe_price_id: stripePriceId,
+              })
+              .eq('id', baseData.id);
+          }
+        }
+
+        // Schedule notification for new program
+        if (formData.name && formData.name.trim()) {
+          try {
+            const scheduledTime = new Date(Date.now() + 5 * 60 * 1000).toISOString();
+            const stripHtml = (html: string) => html.replace(/<[^>]*>/g, '').trim();
+            
+            let notificationBody = `New training program available: ${formData.name}. `;
+            
+            if (formData.program_description) {
+              const cleanDescription = stripHtml(formData.program_description);
+              const descPreview = cleanDescription.length > 100 
+                ? cleanDescription.substring(0, 100) + '...'
+                : cleanDescription;
+              notificationBody += descPreview + ' ';
+            }
+            
+            notificationBody += `${formData.weeks} weeks, ${formData.days_per_week} days per week. `;
+            
+            if (baseData.is_premium) {
+              if (baseData.is_standalone_purchase && baseData.price) {
+                notificationBody += `Available as standalone purchase for €${baseData.price.toFixed(2)} or included in Premium subscription.`;
+              } else {
+                notificationBody += 'Exclusive for Premium subscribers.';
+              }
+            } else {
+              notificationBody += 'Free for all users!';
+            }
+            
+            await supabase
+              .from('scheduled_notifications')
+              .insert([{
+                title: '💪 New Training Program Added!',
+                body: notificationBody,
+                url: `/training-program/${baseData.id}`,
+                icon: imageUrl || '/smarty-gym-logo.png',
+                target_audience: 'all',
+                scheduled_time: scheduledTime,
+                timezone: 'UTC',
+                status: 'pending',
+                recurrence_pattern: 'once'
+              }]);
+            
+            if (import.meta.env.DEV) {
+              console.log('✅ Notification scheduled for new program:', formData.name);
+            }
+          } catch (notifError) {
+            if (import.meta.env.DEV) {
+              console.error('Error scheduling notification:', notifError);
+            }
+          }
+        }
+
+        toast({ title: "Success", description: "Program created successfully and notification scheduled!" });
+      }
       onSave();
       onOpenChange(false);
     } catch (error) {

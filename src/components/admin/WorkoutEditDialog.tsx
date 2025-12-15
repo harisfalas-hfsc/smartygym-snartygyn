@@ -132,40 +132,41 @@ export const WorkoutEditDialog = ({ workout, open, onOpenChange, onSave }: Worko
     }
   }, [workout]);
 
-  // Auto-generate serial number when category changes
+  // Auto-generate serial number when category changes using persistent counters
   useEffect(() => {
     if (!workout && formData.category) {
       const generateSerialNumber = async () => {
         const prefix = getCategoryPrefix(formData.category);
         
-        // Fetch multiple workouts to handle NULL serial_number values
-        const { data } = await supabase
-          .from('admin_workouts')
-          .select('id, serial_number')
-          .like('id', `${prefix}-%`)
-          .not('id', 'like', 'WOD-%')
-          .order('serial_number', { ascending: false, nullsFirst: false })
-          .limit(20);
+        // Fetch persistent counter from system_settings
+        const { data: settings, error: settingsError } = await supabase
+          .from('system_settings')
+          .select('setting_value')
+          .eq('setting_key', 'serial_number_counters')
+          .single();
         
-        let nextSerial = 1;
-        if (data && data.length > 0) {
-          // Find highest serial number from serial_number field or extract from ID
-          let maxFound = 0;
-          for (const workout of data) {
-            if (workout.serial_number && workout.serial_number > maxFound) {
-              maxFound = workout.serial_number;
-            }
-            // Also extract number from ID as fallback (e.g., "S-005" -> 5)
-            const match = workout.id.match(new RegExp(`^${prefix}-(\\d+)$`));
-            if (match) {
-              const idNum = parseInt(match[1], 10);
-              if (idNum > maxFound) {
-                maxFound = idNum;
-              }
-            }
-          }
-          nextSerial = maxFound + 1;
+        if (settingsError) {
+          console.error('Error fetching serial counters:', settingsError);
+          // Fallback to old logic if counters not found
+          const { data } = await supabase
+            .from('admin_workouts')
+            .select('serial_number')
+            .eq('category', formData.category)
+            .eq('is_workout_of_day', false)
+            .order('serial_number', { ascending: false, nullsFirst: false })
+            .limit(1);
+          
+          const nextSerial = (data?.[0]?.serial_number || 0) + 1;
+          setFormData(prev => ({
+            ...prev,
+            serial_number: nextSerial,
+            id: `${prefix}-${nextSerial.toString().padStart(3, '0')}`
+          }));
+          return;
         }
+        
+        const counters = settings?.setting_value as { workouts?: Record<string, number> } || { workouts: {} };
+        const nextSerial = counters.workouts?.[formData.category] || 1;
         
         setFormData(prev => ({
           ...prev,
@@ -242,75 +243,34 @@ export const WorkoutEditDialog = ({ workout, open, onOpenChange, onSave }: Worko
         }
       }
 
-      // Create Stripe product if standalone purchase with price
-      let stripeProductId = formData.stripe_product_id;
-      let stripePriceId = formData.stripe_price_id;
-      
-      const shouldCreateStripeProduct =
-        formData.is_standalone_purchase &&
-        formData.price &&
-        parseFloat(formData.price) > 0 &&
-        (!stripeProductId || !stripePriceId);
-      
-      if (shouldCreateStripeProduct) {
-        // Convert relative image path to absolute URL for Stripe
-        let stripeImageUrl = imageUrl;
-        if (imageUrl && imageUrl.startsWith('/')) {
-          stripeImageUrl = `${window.location.origin}${imageUrl}`;
-        }
-        
-        const { data: stripeData, error: stripeError } = await supabase.functions.invoke('create-stripe-product', {
-          body: {
-            name: formData.name,
-            price: formData.price,
-            contentType: "Workout",
-            imageUrl: stripeImageUrl
-          }
-        });
-
-        if (stripeError) {
-          console.error('Error creating Stripe product:', stripeError);
-          toast({
-            title: "Error",
-            description: "Failed to create Stripe product. Please try again.",
-            variant: "destructive",
-          });
-          return;
-        }
-
-        if (stripeData) {
-          stripeProductId = stripeData.product_id;
-          stripePriceId = stripeData.price_id;
-        }
-      }
-
       // Prepare data with backward compatibility
       const saveData = {
         ...formData,
         image_url: imageUrl,
         type: formData.format || formData.category,
         difficulty: getDifficultyLabel(formData.difficulty_stars),
-        stripe_product_id: stripeProductId,
-        stripe_price_id: stripePriceId,
         price: formData.price ? parseFloat(formData.price) : null,
       };
 
       // Remove the generate_unique_image flag before saving
-      const { generate_unique_image, ...dataToSave } = saveData;
+      const { generate_unique_image, stripe_product_id: existingStripeProductId, stripe_price_id: existingStripePriceId, ...dataToSave } = saveData;
 
       if (workout) {
-        // Update existing
+        // Update existing workout
         const { error } = await supabase
           .from('admin_workouts')
-          .update(dataToSave)
+          .update({
+            ...dataToSave,
+            stripe_product_id: formData.stripe_product_id,
+            stripe_price_id: formData.stripe_price_id,
+          })
           .eq('id', workout.id);
 
         if (error) throw error;
 
         // Sync image to Stripe if image changed and Stripe product exists
-        if (stripeProductId && imageUrl && imageUrl !== workout.image_url) {
+        if (formData.stripe_product_id && imageUrl && imageUrl !== workout.image_url) {
           try {
-            // Convert relative image path to absolute URL for Stripe
             let stripeUpdateImageUrl = imageUrl;
             if (imageUrl && imageUrl.startsWith('/')) {
               stripeUpdateImageUrl = `${window.location.origin}${imageUrl}`;
@@ -318,7 +278,7 @@ export const WorkoutEditDialog = ({ workout, open, onOpenChange, onSave }: Worko
             
             const { error: stripeUpdateError } = await supabase.functions.invoke('update-stripe-product', {
               body: {
-                productId: stripeProductId,
+                productId: formData.stripe_product_id,
                 imageUrl: stripeUpdateImageUrl
               }
             });
@@ -334,25 +294,96 @@ export const WorkoutEditDialog = ({ workout, open, onOpenChange, onSave }: Worko
 
         toast({ title: "Success", description: "Workout updated successfully" });
       } else {
-        // Insert new
-        const { error } = await supabase
+        // NEW WORKOUT: First increment the counter, then save to DB, then create Stripe product
+        
+        // Step 1: Increment counter atomically BEFORE saving
+        const { data: counterSettings, error: counterError } = await supabase
+          .from('system_settings')
+          .select('setting_value')
+          .eq('setting_key', 'serial_number_counters')
+          .single();
+        
+        if (!counterError && counterSettings) {
+          const counters = counterSettings.setting_value as { workouts?: Record<string, number>, programs?: Record<string, number> };
+          const currentSerial = counters.workouts?.[formData.category] || 1;
+          
+          // Increment for next use
+          counters.workouts = counters.workouts || {};
+          counters.workouts[formData.category] = currentSerial + 1;
+          
+          await supabase
+            .from('system_settings')
+            .update({ setting_value: counters, updated_at: new Date().toISOString() })
+            .eq('setting_key', 'serial_number_counters');
+          
+          console.log(`✅ Counter incremented: ${formData.category} now at ${currentSerial + 1}`);
+        }
+        
+        // Step 2: Save to database FIRST (before Stripe)
+        const { error: insertError } = await supabase
           .from('admin_workouts')
-          .insert([dataToSave]);
+          .insert([{
+            ...dataToSave,
+            stripe_product_id: null,
+            stripe_price_id: null,
+          }]);
 
-        if (error) throw error;
+        if (insertError) throw insertError;
+        
+        // Step 3: Create Stripe product AFTER DB save succeeds
+        let stripeProductId = null;
+        let stripePriceId = null;
+        
+        const shouldCreateStripeProduct =
+          formData.is_standalone_purchase &&
+          formData.price &&
+          parseFloat(formData.price) > 0;
+        
+        if (shouldCreateStripeProduct) {
+          let stripeImageUrl = imageUrl;
+          if (imageUrl && imageUrl.startsWith('/')) {
+            stripeImageUrl = `${window.location.origin}${imageUrl}`;
+          }
+          
+          const { data: stripeData, error: stripeError } = await supabase.functions.invoke('create-stripe-product', {
+            body: {
+              name: formData.name,
+              price: formData.price,
+              contentType: "Workout",
+              imageUrl: stripeImageUrl
+            }
+          });
 
-        // Schedule notification for new workout (5 minutes from now) - only if name is provided
+          if (stripeError) {
+            console.error('Error creating Stripe product:', stripeError);
+            toast({
+              title: "Warning",
+              description: "Workout saved but Stripe product creation failed. You can retry from the edit dialog.",
+              variant: "destructive",
+            });
+          } else if (stripeData) {
+            stripeProductId = stripeData.product_id;
+            stripePriceId = stripeData.price_id;
+            
+            // Step 4: Update workout with Stripe IDs
+            await supabase
+              .from('admin_workouts')
+              .update({
+                stripe_product_id: stripeProductId,
+                stripe_price_id: stripePriceId,
+              })
+              .eq('id', dataToSave.id);
+          }
+        }
+
+        // Schedule notification for new workout
         if (formData.name && formData.name.trim()) {
           try {
             const scheduledTime = new Date(Date.now() + 5 * 60 * 1000).toISOString();
-            
-            // Helper function to strip HTML tags
             const stripHtml = (html: string) => html.replace(/<[^>]*>/g, '').trim();
             
-            // Compose notification body
             let notificationBody = `New workout available: ${formData.name}. `;
             
-            // Add description preview (strip HTML first)
             if (dataToSave.description) {
               const cleanDescription = stripHtml(dataToSave.description);
               const descPreview = cleanDescription.length > 100 
@@ -361,7 +392,6 @@ export const WorkoutEditDialog = ({ workout, open, onOpenChange, onSave }: Worko
               notificationBody += descPreview + ' ';
             }
             
-            // Add access information
             if (dataToSave.is_premium) {
               if (dataToSave.is_standalone_purchase && dataToSave.price) {
                 notificationBody += `Available as standalone purchase for €${dataToSave.price} or included in Premium subscription.`;
@@ -372,7 +402,6 @@ export const WorkoutEditDialog = ({ workout, open, onOpenChange, onSave }: Worko
               notificationBody += 'Free for all users!';
             }
             
-            // Insert scheduled notification
             await supabase
               .from('scheduled_notifications')
               .insert([{
@@ -394,7 +423,6 @@ export const WorkoutEditDialog = ({ workout, open, onOpenChange, onSave }: Worko
             if (import.meta.env.DEV) {
               console.error('Error scheduling notification:', notifError);
             }
-            // Don't fail the workout creation if notification fails
           }
         }
 
@@ -405,7 +433,7 @@ export const WorkoutEditDialog = ({ workout, open, onOpenChange, onSave }: Worko
       console.error('Error saving workout:', error);
       toast({
         title: "Error",
-        description: "Failed to save workout",
+        description: error instanceof Error ? error.message : "Failed to save workout",
         variant: "destructive",
       });
     } finally {
