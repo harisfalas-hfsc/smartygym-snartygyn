@@ -760,8 +760,22 @@ RESPONSE FORMAT (JSON ONLY - NO MARKDOWN):
       
       logStep(`${equipment} image generated`, { hasImage: !!imageUrl, imageUrl });
 
+      // CRITICAL: Validate image before Stripe product creation
+      if (!imageUrl) {
+        console.error(`[WOD-GENERATION] ⚠️ CRITICAL WARNING: No image URL for ${equipment} workout "${workoutContent.name}". Stripe product will be created WITHOUT an image!`);
+        logStep(`⚠️ WARNING: Creating Stripe product WITHOUT image`, { workout: workoutContent.name, equipment });
+      } else {
+        logStep(`✅ Image validated for Stripe`, { imageUrl: imageUrl.substring(0, 80) });
+      }
+
       // Create Stripe product
       const workoutId = `WOD-${prefix}-${equipment.charAt(0)}-${timestamp}`;
+      
+      logStep(`Creating Stripe product`, { 
+        name: workoutContent.name, 
+        hasImage: !!imageUrl, 
+        imageUrl: imageUrl ? imageUrl.substring(0, 80) : 'NONE' 
+      });
       
       const stripeProduct = await stripe.products.create({
         name: `WOD: ${workoutContent.name}`,
@@ -778,7 +792,11 @@ RESPONSE FORMAT (JSON ONLY - NO MARKDOWN):
 
       const stripeProductId = stripeProduct.id;
       const stripePriceId = stripePrice.id;
-      logStep(`${equipment} Stripe product created`, { productId: stripeProductId });
+      logStep(`${equipment} Stripe product created`, { 
+        productId: stripeProductId, 
+        hasImage: !!imageUrl,
+        imageIncluded: imageUrl ? 'YES' : 'NO - CHECK LOGS ABOVE'
+      });
 
       // Insert workout with generated_for_date for pre-generation tracking
       const { error: insertError } = await supabase
