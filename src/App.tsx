@@ -1,11 +1,10 @@
 import { Toaster } from "@/components/ui/toaster";
-import { lazy, Suspense } from "react";
+import { lazy, Suspense, useEffect, useRef } from "react";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { ThemeProvider } from "next-themes";
-import { useEffect } from "react";
 import { ProtectedRoute } from "./components/ProtectedRoute";
 import { AuthenticatedLayout } from "./components/AuthenticatedLayout";
 import { AdminRoute } from "./components/AdminRoute";
@@ -17,6 +16,7 @@ import { ScrollToTop } from "./components/ScrollToTop";
 import { CookieConsent } from "./components/CookieConsent";
 import { ErrorBoundary } from "./components/ErrorBoundary";
 import { useSessionExpiry } from "./hooks/useSessionExpiry";
+import { useIsPortraitMode } from "./hooks/useIsPortraitMode";
 
 import { useAdminRole } from "./hooks/useAdminRole";
 import { ArticleDetail } from "./pages/ArticleDetail";
@@ -85,12 +85,42 @@ const queryClient = new QueryClient();
 
 const AppContent = () => {
   const { isAdmin, loading } = useAdminRole();
+  const { isPhoneLandscape } = useIsPortraitMode();
+  const viewportContentRef = useRef<string | null>(null);
+
   useSessionExpiry();
-  
+
   useEffect(() => {
     // Track page visit on initial load
     trackPageVisit();
   }, []);
+
+  useEffect(() => {
+    const meta = document.querySelector(
+      'meta[name="viewport"]'
+    ) as HTMLMetaElement | null;
+    if (!meta) return;
+
+    if (viewportContentRef.current === null) {
+      viewportContentRef.current = meta.getAttribute("content") || "";
+    }
+
+    if (isPhoneLandscape) {
+      const scale = Number((window.innerWidth / 1024).toFixed(3));
+      meta.setAttribute(
+        "content",
+        `width=1024, initial-scale=${scale}, maximum-scale=5.0, user-scalable=yes, viewport-fit=cover`
+      );
+    } else {
+      meta.setAttribute("content", viewportContentRef.current);
+    }
+
+    return () => {
+      if (viewportContentRef.current !== null) {
+        meta.setAttribute("content", viewportContentRef.current);
+      }
+    };
+  }, [isPhoneLandscape]);
 
   return (
     <>
