@@ -389,15 +389,17 @@ serve(async (req) => {
 
     logStep("Current state", state);
 
-    // Move ALL previous WODs to their categories
+    // Move ONLY previous WODs to their categories (exclude today's WODs)
+    // This prevents race condition where today's WODs get moved before new generation
     const { data: previousWODs } = await supabase
       .from("admin_workouts")
       .select("*")
-      .eq("is_workout_of_day", true);
+      .eq("is_workout_of_day", true)
+      .neq("generated_for_date", effectiveDate); // Exclude WODs for today/target date
 
     if (previousWODs && previousWODs.length > 0) {
       for (const previousWOD of previousWODs) {
-        logStep("Moving previous WOD to category", { id: previousWOD.id, category: previousWOD.category });
+        logStep("Moving previous WOD to category", { id: previousWOD.id, category: previousWOD.category, generated_for_date: previousWOD.generated_for_date });
         
         const { data: existingWorkouts } = await supabase
           .from("admin_workouts")
