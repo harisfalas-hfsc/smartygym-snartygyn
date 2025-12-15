@@ -1,14 +1,19 @@
 import * as React from "react";
 
 /**
- * Hook that returns true when device is in portrait orientation,
- * and false when in landscape orientation.
+ * Hook that returns orientation info for responsive layouts.
  * 
  * Portrait mode = Mobile view (height > width)
  * Landscape mode = Desktop view (width >= height)
+ * 
+ * Also detects if device is a phone in landscape (small screen height)
+ * to enable scaling of desktop content.
  */
 export function useIsPortraitMode() {
-  const [isPortrait, setIsPortrait] = React.useState<boolean | undefined>(undefined);
+  const [state, setState] = React.useState({
+    isPortrait: true,
+    isPhoneLandscape: false,
+  });
 
   React.useEffect(() => {
     const checkOrientation = () => {
@@ -17,7 +22,13 @@ export function useIsPortraitMode() {
       
       // Portrait: height > width
       // Landscape: width >= height
-      setIsPortrait(height > width);
+      const isPortrait = height > width;
+      
+      // Phone in landscape: not portrait AND screen height is small (< 500px)
+      // This helps detect when we're on a phone vs tablet in landscape
+      const isPhoneLandscape = !isPortrait && height < 500;
+      
+      setState({ isPortrait, isPhoneLandscape });
     };
 
     checkOrientation();
@@ -30,5 +41,8 @@ export function useIsPortraitMode() {
     };
   }, []);
 
-  return !!isPortrait;
+  return {
+    isPortrait: state.isPortrait,
+    isPhoneLandscape: state.isPhoneLandscape,
+  };
 }

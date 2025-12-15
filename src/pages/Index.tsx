@@ -35,7 +35,7 @@ const Index = () => {
     userTier
   } = useAccessControl();
   const isPremium = userTier === "premium";
-  const isMobile = useIsPortraitMode();
+  const { isPortrait: isMobile, isPhoneLandscape } = useIsPortraitMode();
 
   // Carousel state for mobile navigation dots
   const [carouselApi, setCarouselApi] = useState<CarouselApi>();
@@ -604,7 +604,15 @@ const Index = () => {
           </div>
         </div>
         </div>
-          </section> : <>
+          </section> : <div
+            style={isPhoneLandscape ? {
+              transform: 'scale(0.55)',
+              transformOrigin: 'top center',
+              width: '181.82%',
+              marginLeft: '-40.91%',
+              minHeight: '100vh',
+            } : undefined}
+          >
             {/* Desktop: Hero Section */}
             <section className="relative py-2 sm:py-2 border-b border-border bg-background overflow-hidden my-0">
           
@@ -1193,7 +1201,7 @@ const Index = () => {
           </Card>
         </section>
       </div>
-          </>}
+          </div>}
 
     </div>
     </>;
