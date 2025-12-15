@@ -57,6 +57,12 @@ export const MESSAGE_TYPES = {
   /** Re-engagement for expired users */
   REACTIVATION: 'reactivation',
   
+  /** Renewal thank you after successful payment */
+  RENEWAL_THANK_YOU: 'renewal_thank_you',
+  
+  /** Payment failed notification */
+  PAYMENT_FAILED: 'payment_failed',
+  
   // ============================================
   // USER LIFECYCLE NOTIFICATIONS
   // ============================================
@@ -66,6 +72,25 @@ export const MESSAGE_TYPES = {
   
   /** First purchase thank you */
   FIRST_PURCHASE: 'first_purchase',
+  
+  // ============================================
+  // PURCHASE NOTIFICATIONS
+  // ============================================
+  
+  /** Subscription purchase confirmation */
+  PURCHASE_SUBSCRIPTION: 'purchase_subscription',
+  
+  /** Workout purchase confirmation */
+  PURCHASE_WORKOUT: 'purchase_workout',
+  
+  /** Program purchase confirmation */
+  PURCHASE_PROGRAM: 'purchase_program',
+  
+  /** Ritual purchase confirmation */
+  PURCHASE_RITUAL: 'purchase_ritual',
+  
+  /** Shop product purchase confirmation */
+  PURCHASE_SHOP_PRODUCT: 'purchase_shop_product',
   
   // ============================================
   // CONTENT NOTIFICATIONS (Bulk/New Content)
@@ -84,20 +109,20 @@ export const MESSAGE_TYPES = {
   CONTENT_UPDATE: 'announcement_update',
   
   // ============================================
-  // PURCHASE NOTIFICATIONS
+  // LEGACY PURCHASE NOTIFICATIONS (for templates)
   // ============================================
   
-  /** Workout purchase confirmation */
-  PURCHASE_WORKOUT: 'purchase_confirmation_workout',
+  /** Legacy workout purchase confirmation template */
+  PURCHASE_CONFIRMATION_WORKOUT: 'purchase_confirmation_workout',
   
-  /** Program purchase confirmation */
-  PURCHASE_PROGRAM: 'purchase_confirmation_program',
+  /** Legacy program purchase confirmation template */
+  PURCHASE_CONFIRMATION_PROGRAM: 'purchase_confirmation_program',
   
-  /** Ritual purchase confirmation */
-  PURCHASE_RITUAL: 'purchase_confirmation_ritual',
+  /** Legacy ritual purchase confirmation template */
+  PURCHASE_CONFIRMATION_RITUAL: 'purchase_confirmation_ritual',
   
-  /** Shop product purchase confirmation */
-  PURCHASE_PRODUCT: 'purchase_confirmation_product',
+  /** Legacy shop product purchase confirmation template */
+  PURCHASE_CONFIRMATION_PRODUCT: 'purchase_confirmation_product',
   
   // ============================================
   // PROGRAM/DELIVERY NOTIFICATIONS
