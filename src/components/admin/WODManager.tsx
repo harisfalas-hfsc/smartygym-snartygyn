@@ -29,6 +29,9 @@ const CATEGORY_CYCLE_7DAY = [
 ];
 
 export const WODManager = () => {
+  // 🏥 DIAGNOSTIC: v3 - Health Check button should be visible
+  console.log("🏥 WODManager v3 loaded - Health Check button should be visible");
+  
   const [isGenerating, setIsGenerating] = useState(false);
   const [isSyncingImages, setIsSyncingImages] = useState(false);
   const [isRunningHealthCheck, setIsRunningHealthCheck] = useState(false);
@@ -357,16 +360,16 @@ export const WODManager = () => {
         <div className="flex items-center gap-2 flex-wrap">
           <Button 
             variant="outline"
-            className="flex items-center gap-2"
+            className="flex items-center gap-2 border-green-500"
             disabled={isRunningHealthCheck}
             onClick={handleHealthCheck}
           >
             {isRunningHealthCheck ? (
               <RefreshCw className="h-4 w-4 animate-spin" />
             ) : (
-              <HeartPulse className="h-4 w-4" />
+              <HeartPulse className="h-4 w-4 text-green-500" />
             )}
-            {isRunningHealthCheck ? "Checking..." : "Health Check"}
+            {isRunningHealthCheck ? "Checking..." : "🏥 Health Check"}
           </Button>
           
           <Button 
