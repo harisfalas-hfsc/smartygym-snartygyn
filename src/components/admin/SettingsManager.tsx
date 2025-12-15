@@ -28,8 +28,6 @@ export const SettingsManager = () => {
   const [dailyAnalyticsSummary, setDailyAnalyticsSummary] = useState(false);
 
   // System Configuration
-  const [senderEmail, setSenderEmail] = useState("noreply@smartygym.com");
-  const [replyToEmail, setReplyToEmail] = useState("support@smartygym.com");
   const [maxImageSize, setMaxImageSize] = useState("5");
   const [allowGuestPurchases, setAllowGuestPurchases] = useState(true);
 
@@ -378,26 +376,6 @@ export const SettingsManager = () => {
               </CardHeader>
               <CardContent className="space-y-6">
                 <div className="space-y-3 sm:space-y-4">
-                  <div className="space-y-2">
-                    <Label className="text-xs sm:text-sm">Sender Email</Label>
-                    <Input
-                      type="email"
-                      value={senderEmail}
-                      onChange={(e) => setSenderEmail(e.target.value)}
-                      placeholder="noreply@smartygym.com"
-                      className="text-sm"
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label className="text-xs sm:text-sm">Reply-To Email</Label>
-                    <Input
-                      type="email"
-                      value={replyToEmail}
-                      onChange={(e) => setReplyToEmail(e.target.value)}
-                      placeholder="support@smartygym.com"
-                      className="text-sm"
-                    />
-                  </div>
                   <div className="space-y-2">
                     <Label className="text-xs sm:text-sm">Max Upload Size (MB)</Label>
                     <Input
