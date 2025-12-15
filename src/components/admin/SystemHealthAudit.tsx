@@ -23,7 +23,8 @@ import {
   Users,
   CreditCard,
   FileText,
-  Clock
+  Clock,
+  Bell
 } from "lucide-react";
 
 interface HealthCheck {
@@ -139,6 +140,7 @@ export const SystemHealthAudit = () => {
       'Users': <Users className="h-4 w-4" />,
       'Stripe': <CreditCard className="h-4 w-4" />,
       'Email': <Mail className="h-4 w-4" />,
+      'Notifications': <Bell className="h-4 w-4" />,
       'Contact': <Mail className="h-4 w-4" />,
       'Storage': <Database className="h-4 w-4" />,
       'Cron Jobs': <Clock className="h-4 w-4" />,
