@@ -735,15 +735,30 @@ RESPONSE FORMAT (JSON ONLY - NO MARKDOWN):
 
       logStep(`${equipment} workout generated`, { name: workoutContent.name });
 
-      // Generate image
-      const imagePrompt = `Professional fitness photography: Athletic person performing ${category.toLowerCase()} ${equipment.toLowerCase() === "bodyweight" ? "bodyweight" : "with gym equipment"} workout, ${selectedDifficulty.name.toLowerCase()} difficulty, dynamic action shot, modern gym or outdoor setting, dramatic lighting, motivational atmosphere, no text`;
+      // Generate image using the correct generate-workout-image function
+      logStep(`Generating image for ${equipment} workout`, { name: workoutContent.name, category, format });
+      
+      let imageUrl: string | null = null;
+      try {
+        const { data: imageData, error: imageError } = await supabase.functions.invoke("generate-workout-image", {
+          body: { 
+            name: workoutContent.name, 
+            category: category, 
+            format: format, 
+            difficulty_stars: selectedDifficulty.stars 
+          }
+        });
 
-      const { data: imageData } = await supabase.functions.invoke("generate-image", {
-        body: { prompt: imagePrompt, width: 1024, height: 576 }
-      });
-
-      const imageUrl = imageData?.imageUrl || null;
-      logStep(`${equipment} image generated`, { hasImage: !!imageUrl });
+        if (imageError) {
+          logStep(`Image generation error for ${equipment}`, { error: imageError.message });
+        } else {
+          imageUrl = imageData?.image_url || null;
+        }
+      } catch (imgErr: any) {
+        logStep(`Image generation failed for ${equipment}`, { error: imgErr.message });
+      }
+      
+      logStep(`${equipment} image generated`, { hasImage: !!imageUrl, imageUrl });
 
       // Create Stripe product
       const workoutId = `WOD-${prefix}-${equipment.charAt(0)}-${timestamp}`;
