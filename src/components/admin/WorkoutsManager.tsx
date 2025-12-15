@@ -27,6 +27,7 @@ interface Workout {
   stripe_price_id: string | null;
   is_ai_generated: boolean;
   is_visible: boolean;
+  created_at: string | null;
 }
 
 interface WorkoutsManagerProps {
@@ -598,10 +599,17 @@ export const WorkoutsManager = ({ externalDialog, setExternalDialog }: WorkoutsM
                       />
                     </TableCell>
                     <TableCell className="font-medium">
-                      <div className="flex items-center gap-2">
-                        {workout.name}
-                        {!workout.is_visible && (
-                          <Badge variant="destructive" className="text-xs">Hidden</Badge>
+                      <div className="flex flex-col">
+                        <div className="flex items-center gap-2">
+                          {workout.name}
+                          {!workout.is_visible && (
+                            <Badge variant="destructive" className="text-xs">Hidden</Badge>
+                          )}
+                        </div>
+                        {workout.created_at && (
+                          <span className="text-xs text-muted-foreground">
+                            Created: {new Date(workout.created_at).toLocaleDateString()}
+                          </span>
                         )}
                       </div>
                     </TableCell>
