@@ -23,6 +23,7 @@ interface Program {
   price: number | null;
   is_ai_generated: boolean;
   is_visible: boolean;
+  created_at: string | null;
 }
 
 interface ProgramsManagerProps {
@@ -103,7 +104,7 @@ export const ProgramsManager = ({ externalDialog, setExternalDialog }: ProgramsM
     try {
       const { data, error } = await supabase
         .from('admin_training_programs')
-        .select('id, name, category, duration, difficulty, equipment, is_premium, is_standalone_purchase, price, is_ai_generated, is_visible')
+        .select('id, name, category, duration, difficulty, equipment, is_premium, is_standalone_purchase, price, is_ai_generated, is_visible, created_at')
         .order('serial_number');
 
       if (error) throw error;
@@ -536,10 +537,17 @@ export const ProgramsManager = ({ externalDialog, setExternalDialog }: ProgramsM
                       />
                     </TableCell>
                     <TableCell className="font-medium">
-                      <div className="flex items-center gap-2">
-                        {program.name}
-                        {!program.is_visible && (
-                          <Badge variant="destructive" className="text-xs">Hidden</Badge>
+                      <div className="flex flex-col">
+                        <div className="flex items-center gap-2">
+                          {program.name}
+                          {!program.is_visible && (
+                            <Badge variant="destructive" className="text-xs">Hidden</Badge>
+                          )}
+                        </div>
+                        {program.created_at && (
+                          <span className="text-xs text-muted-foreground">
+                            Created: {new Date(program.created_at).toLocaleDateString()}
+                          </span>
                         )}
                       </div>
                     </TableCell>
