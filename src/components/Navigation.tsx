@@ -243,8 +243,8 @@ export const Navigation = () => {
                   </svg>
                 </Button>
               </SheetTrigger>
-              <SheetContent side="left" className="w-64">
-                <nav className="flex flex-col gap-2 mt-8">
+              <SheetContent side="left" className="w-64 overflow-y-auto max-h-screen">
+                <nav className="flex flex-col gap-2 mt-8 pb-8">
                   <Button
                     variant="ghost"
                     onClick={() => handleNavigate("/workout")}
