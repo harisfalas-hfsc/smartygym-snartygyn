@@ -184,7 +184,7 @@ export const SystemHealthAudit = () => {
                 {isRunning ? "Running Audit..." : "🏥 Check System Health"}
               </Button>
             </DialogTrigger>
-            <DialogContent className="max-w-5xl max-h-[90vh] overflow-hidden">
+            <DialogContent className="max-w-5xl max-h-[90vh] overflow-y-auto">
               <DialogHeader>
                 <DialogTitle className="flex items-center gap-2">
                   <HeartPulse className="h-5 w-5 text-green-500" />

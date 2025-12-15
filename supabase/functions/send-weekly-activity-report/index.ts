@@ -458,7 +458,7 @@ const handler = async (req: Request): Promise<Response> => {
           .from("user_system_messages")
           .insert({
             user_id: user.id,
-            message_type: "announcement_update",
+            message_type: "weekly_activity_report",
             subject: `📊 Your Weekly Activity Report (${weekStart} - ${weekEnd})`,
             content: dashboardContent,
             is_read: false,
