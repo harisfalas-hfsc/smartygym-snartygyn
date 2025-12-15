@@ -667,7 +667,7 @@ async function handleOneTimePurchase(
   }
   
   // Determine message type based on content type (using centralized MESSAGE_TYPES)
-  let messageType = MESSAGE_TYPES.PURCHASE_WORKOUT;
+  let messageType: string = MESSAGE_TYPES.PURCHASE_WORKOUT;
   if (contentType === 'program') {
     messageType = MESSAGE_TYPES.PURCHASE_PROGRAM;
   } else if (contentType === 'shop_product') {

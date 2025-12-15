@@ -60,8 +60,6 @@ export const MESSAGE_TYPES = {
   /** Renewal thank you after successful payment */
   RENEWAL_THANK_YOU: 'renewal_thank_you',
   
-  /** Payment failed notification */
-  PAYMENT_FAILED: 'payment_failed',
   
   // ============================================
   // USER LIFECYCLE NOTIFICATIONS
