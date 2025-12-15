@@ -128,10 +128,11 @@ const WorkoutDetail = () => {
   const title = workoutTitles[type || ""] || "Workout";
   const mappedCategory = categoryMap[type || "strength"];
   
-  // First filter by category from URL
+  // First filter by category from URL - EXCLUDE active WODs (they should only appear on WOD page)
   const currentTypeWorkouts = allWorkouts.filter(workout => {
     const categoryMatch = workout.category?.toUpperCase().includes(mappedCategory);
-    return categoryMatch;
+    const isNotActiveWOD = workout.is_workout_of_day !== true; // Exclude active WODs from category galleries
+    return categoryMatch && isNotActiveWOD;
   });
   
   if (import.meta.env.DEV) {
