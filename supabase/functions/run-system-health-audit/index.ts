@@ -351,11 +351,7 @@ const handler = async (req: Request): Promise<Response> => {
       recentEmails && recentEmails > 0 ? 'pass' : 'warning'
     );
 
-    // Email templates
-    const { count: emailTemplates } = await supabase.from('email_templates').select('*', { count: 'exact', head: true });
-    addCheck('Email', 'Email Templates', `${emailTemplates || 0} templates configured`, 
-      emailTemplates && emailTemplates > 0 ? 'pass' : 'warning'
-    );
+    // Note: Email templates table not used - templates are hardcoded in edge functions
 
     // ============================================
     // CATEGORY 8: CONTACT SYSTEM (5 checks)
