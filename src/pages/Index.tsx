@@ -604,15 +604,7 @@ const Index = () => {
           </div>
         </div>
         </div>
-          </section> : <div
-            style={isPhoneLandscape ? {
-              transform: 'scale(0.55)',
-              transformOrigin: 'top center',
-              width: '181.82%',
-              marginLeft: '-40.91%',
-              minHeight: '100vh',
-            } : undefined}
-          >
+          </section> : <>
             {/* Desktop: Hero Section */}
             <section className="relative py-2 sm:py-2 border-b border-border bg-background overflow-hidden my-0">
           
@@ -1201,7 +1193,7 @@ const Index = () => {
           </Card>
         </section>
       </div>
-          </div>}
+          </>}
 
     </div>
     </>;
