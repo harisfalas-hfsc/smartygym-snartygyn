@@ -137,16 +137,34 @@ export const WorkoutEditDialog = ({ workout, open, onOpenChange, onSave }: Worko
     if (!workout && formData.category) {
       const generateSerialNumber = async () => {
         const prefix = getCategoryPrefix(formData.category);
+        
+        // Fetch multiple workouts to handle NULL serial_number values
         const { data } = await supabase
           .from('admin_workouts')
           .select('id, serial_number')
           .like('id', `${prefix}-%`)
-          .order('serial_number', { ascending: false })
-          .limit(1);
+          .not('id', 'like', 'WOD-%')
+          .order('serial_number', { ascending: false, nullsFirst: false })
+          .limit(20);
         
         let nextSerial = 1;
-        if (data && data.length > 0 && data[0].serial_number) {
-          nextSerial = data[0].serial_number + 1;
+        if (data && data.length > 0) {
+          // Find highest serial number from serial_number field or extract from ID
+          let maxFound = 0;
+          for (const workout of data) {
+            if (workout.serial_number && workout.serial_number > maxFound) {
+              maxFound = workout.serial_number;
+            }
+            // Also extract number from ID as fallback (e.g., "S-005" -> 5)
+            const match = workout.id.match(new RegExp(`^${prefix}-(\\d+)$`));
+            if (match) {
+              const idNum = parseInt(match[1], 10);
+              if (idNum > maxFound) {
+                maxFound = idNum;
+              }
+            }
+          }
+          nextSerial = maxFound + 1;
         }
         
         setFormData(prev => ({
