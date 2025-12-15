@@ -502,7 +502,8 @@ const handler = async (req: Request): Promise<Response> => {
       [MESSAGE_TYPES.CANCELLATION]: { source: 'stripe-webhook', schedule: 'On cancellation' },
     };
 
-    // Check for message type collisions in today's messages
+    // Check for REAL message type collisions - when different notification SOURCES use same type
+    // NOT when same source sends multiple notifications (e.g., batch new workout announcements)
     const todayStart = new Date();
     todayStart.setHours(0, 0, 0, 0);
     
@@ -512,7 +513,7 @@ const handler = async (req: Request): Promise<Response> => {
       .gte('created_at', todayStart.toISOString());
 
     if (todayMessages && todayMessages.length > 0) {
-      // Group by message_type and check for collisions
+      // Group by message_type
       const messagesByType: Record<string, { subjects: Set<string>; count: number }> = {};
       
       for (const msg of todayMessages) {
@@ -524,29 +525,55 @@ const handler = async (req: Request): Promise<Response> => {
         messagesByType[type].count++;
       }
 
-      // Check for collisions (same message_type with different subjects)
+      // Check for REAL collisions - different notification SOURCES using same message_type
+      // Define subject patterns that indicate different sources
+      const sourcePatterns: Record<string, RegExp[]> = {
+        'wod_source': [/Today.*Workouts.*Choose/i, /Workout of the Day/i],
+        'new_workout_source': [/New Workouts? Added/i],
+        'ritual_source': [/all day game|Daily.*Ritual/i],
+        'motivation_source': [/Start Your Week Strong|Monday Motivation/i],
+        'activity_source': [/Activity Report|Weekly Summary/i],
+        'welcome_source': [/Welcome to SmartyGym/i],
+        'renewal_source': [/Renewal|Subscription.*Expir/i],
+      };
+
       let collisionDetected = false;
       let collisionDetails: string[] = [];
 
       for (const [type, data] of Object.entries(messagesByType)) {
         if (data.subjects.size > 1) {
-          collisionDetected = true;
+          // Check if different subjects belong to DIFFERENT sources
           const subjects = Array.from(data.subjects);
-          collisionDetails.push(`"${type}" used by ${data.subjects.size} different notifications: ${subjects.slice(0, 3).map(s => `"${s.substring(0, 30)}..."`).join(', ')}`);
+          const detectedSources = new Set<string>();
+          
+          for (const subject of subjects) {
+            for (const [source, patterns] of Object.entries(sourcePatterns)) {
+              if (patterns.some(p => p.test(subject))) {
+                detectedSources.add(source);
+                break;
+              }
+            }
+          }
+          
+          // Only flag as collision if multiple SOURCES detected for same message_type
+          if (detectedSources.size > 1) {
+            collisionDetected = true;
+            collisionDetails.push(`"${type}" used by ${detectedSources.size} different sources: ${Array.from(detectedSources).join(', ')}`);
+          }
         }
       }
 
       if (collisionDetected) {
         addCheck('Notifications', 'Message Type Collision', 
-          'Different notifications using same message_type identifier', 
+          'Different notification sources using same message_type', 
           'fail',
           `⚠️ COLLISION DETECTED: ${collisionDetails.join(' | ')}. This causes notifications to block each other! FIX: Assign unique message_type to each notification source.`
         );
       } else {
         addCheck('Notifications', 'Message Type Collision', 
-          'Each notification type has unique identifier', 
+          'Each notification source has unique message_type', 
           'pass',
-          `${Object.keys(messagesByType).length} unique message types used correctly today`
+          `${Object.keys(messagesByType).length} message types correctly mapped to their sources`
         );
       }
 
