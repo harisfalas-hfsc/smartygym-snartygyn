@@ -402,15 +402,44 @@ serve(async (req) => {
       for (const previousWOD of previousWODs) {
         logStep("Moving previous WOD to category", { id: previousWOD.id, category: previousWOD.category, generated_for_date: previousWOD.generated_for_date });
         
-        const { data: existingWorkouts } = await supabase
-          .from("admin_workouts")
-          .select("serial_number")
-          .eq("category", previousWOD.category)
-          .eq("is_workout_of_day", false)
-          .order("serial_number", { ascending: false })
-          .limit(1);
+        // Use persistent counter from system_settings
+        const { data: counterSettings, error: counterError } = await supabase
+          .from("system_settings")
+          .select("setting_value")
+          .eq("setting_key", "serial_number_counters")
+          .single();
+        
+        let nextSerialNumber = 1;
+        
+        if (!counterError && counterSettings) {
+          const counters = counterSettings.setting_value as { workouts?: Record<string, number>, programs?: Record<string, number> } || { workouts: {} };
+          nextSerialNumber = counters.workouts?.[previousWOD.category] || 1;
+          
+          // Increment counter for next use
+          counters.workouts = counters.workouts || {};
+          counters.workouts[previousWOD.category] = nextSerialNumber + 1;
+          
+          await supabase
+            .from("system_settings")
+            .update({ setting_value: counters, updated_at: new Date().toISOString() })
+            .eq("setting_key", "serial_number_counters");
+          
+          logStep("Counter incremented for category", { 
+            category: previousWOD.category, 
+            nextSerial: nextSerialNumber + 1 
+          });
+        } else {
+          // Fallback to old logic if counter not found
+          const { data: existingWorkouts } = await supabase
+            .from("admin_workouts")
+            .select("serial_number")
+            .eq("category", previousWOD.category)
+            .eq("is_workout_of_day", false)
+            .order("serial_number", { ascending: false })
+            .limit(1);
 
-        const nextSerialNumber = (existingWorkouts?.[0]?.serial_number || 0) + 1;
+          nextSerialNumber = (existingWorkouts?.[0]?.serial_number || 0) + 1;
+        }
 
         await supabase
           .from("admin_workouts")
