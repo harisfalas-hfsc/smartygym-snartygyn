@@ -1,5 +1,8 @@
 project_id = "cvccrvyimyzrxcwzmxwk"
 
+[functions.run-system-health-audit]
+verify_jwt = false
+
 [functions.smarty-coach]
 verify_jwt = false
 

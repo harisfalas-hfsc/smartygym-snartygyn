@@ -8,7 +8,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
-import { Settings, Bell, Mail, Database, Shield, Download } from "lucide-react";
+import { Settings, Bell, Mail, Database, Shield, Download, HeartPulse } from "lucide-react";
+import { SystemHealthAudit } from "./SystemHealthAudit";
 
 export const SettingsManager = () => {
   const { toast } = useToast();
@@ -366,59 +367,64 @@ export const SettingsManager = () => {
 
         {/* System Configuration */}
         <TabsContent value="system">
-          <Card>
-            <CardHeader>
-              <CardTitle>System Configuration</CardTitle>
-              <CardDescription>Configure email and system settings</CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-6">
-              <div className="space-y-3 sm:space-y-4">
-                <div className="space-y-2">
-                  <Label className="text-xs sm:text-sm">Sender Email</Label>
-                  <Input
-                    type="email"
-                    value={senderEmail}
-                    onChange={(e) => setSenderEmail(e.target.value)}
-                    placeholder="noreply@smartygym.com"
-                    className="text-sm"
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label className="text-xs sm:text-sm">Reply-To Email</Label>
-                  <Input
-                    type="email"
-                    value={replyToEmail}
-                    onChange={(e) => setReplyToEmail(e.target.value)}
-                    placeholder="support@smartygym.com"
-                    className="text-sm"
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label className="text-xs sm:text-sm">Max Upload Size (MB)</Label>
-                  <Input
-                    type="number"
-                    value={maxImageSize}
-                    onChange={(e) => setMaxImageSize(e.target.value)}
-                    className="text-sm"
-                  />
-                </div>
-                <div className="flex items-start sm:items-center justify-between gap-3">
-                  <div className="space-y-0.5 flex-1 min-w-0">
-                    <Label className="text-xs sm:text-sm">Guest Purchases</Label>
-                    <p className="text-xs text-muted-foreground">Allow non-registered purchases</p>
+          <div className="space-y-6">
+            {/* System Health Audit */}
+            <SystemHealthAudit />
+
+            <Card>
+              <CardHeader>
+                <CardTitle>System Configuration</CardTitle>
+                <CardDescription>Configure email and system settings</CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-6">
+                <div className="space-y-3 sm:space-y-4">
+                  <div className="space-y-2">
+                    <Label className="text-xs sm:text-sm">Sender Email</Label>
+                    <Input
+                      type="email"
+                      value={senderEmail}
+                      onChange={(e) => setSenderEmail(e.target.value)}
+                      placeholder="noreply@smartygym.com"
+                      className="text-sm"
+                    />
                   </div>
-                  <Switch
-                    checked={allowGuestPurchases}
-                    onCheckedChange={setAllowGuestPurchases}
-                    className="shrink-0"
-                  />
+                  <div className="space-y-2">
+                    <Label className="text-xs sm:text-sm">Reply-To Email</Label>
+                    <Input
+                      type="email"
+                      value={replyToEmail}
+                      onChange={(e) => setReplyToEmail(e.target.value)}
+                      placeholder="support@smartygym.com"
+                      className="text-sm"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label className="text-xs sm:text-sm">Max Upload Size (MB)</Label>
+                    <Input
+                      type="number"
+                      value={maxImageSize}
+                      onChange={(e) => setMaxImageSize(e.target.value)}
+                      className="text-sm"
+                    />
+                  </div>
+                  <div className="flex items-start sm:items-center justify-between gap-3">
+                    <div className="space-y-0.5 flex-1 min-w-0">
+                      <Label className="text-xs sm:text-sm">Guest Purchases</Label>
+                      <p className="text-xs text-muted-foreground">Allow non-registered purchases</p>
+                    </div>
+                    <Switch
+                      checked={allowGuestPurchases}
+                      onCheckedChange={setAllowGuestPurchases}
+                      className="shrink-0"
+                    />
+                  </div>
                 </div>
-              </div>
-              <Button onClick={handleSaveSystem} disabled={loading}>
-                Save System Settings
-              </Button>
-            </CardContent>
-          </Card>
+                <Button onClick={handleSaveSystem} disabled={loading}>
+                  Save System Settings
+                </Button>
+              </CardContent>
+            </Card>
+          </div>
         </TabsContent>
 
         {/* Access Control */}

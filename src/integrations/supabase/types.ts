@@ -1659,6 +1659,48 @@ export type Database = {
         }
         Relationships: []
       }
+      system_health_audits: {
+        Row: {
+          audit_date: string
+          created_at: string
+          critical_issues: string[] | null
+          duration_ms: number | null
+          failed_checks: number
+          id: string
+          passed_checks: number
+          results: Json | null
+          skipped_checks: number
+          total_checks: number
+          warning_checks: number
+        }
+        Insert: {
+          audit_date?: string
+          created_at?: string
+          critical_issues?: string[] | null
+          duration_ms?: number | null
+          failed_checks?: number
+          id?: string
+          passed_checks?: number
+          results?: Json | null
+          skipped_checks?: number
+          total_checks?: number
+          warning_checks?: number
+        }
+        Update: {
+          audit_date?: string
+          created_at?: string
+          critical_issues?: string[] | null
+          duration_ms?: number | null
+          failed_checks?: number
+          id?: string
+          passed_checks?: number
+          results?: Json | null
+          skipped_checks?: number
+          total_checks?: number
+          warning_checks?: number
+        }
+        Relationships: []
+      }
       system_settings: {
         Row: {
           created_at: string | null
