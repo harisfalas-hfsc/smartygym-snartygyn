@@ -655,19 +655,18 @@ RESPONSE FORMAT (JSON ONLY - NO MARKDOWN):
   "tips": "2-3 coaching tips for optimal performance in HTML format"
 }`;
 
-      const aiResponse = await fetch("https://api.lovable.ai/v1/chat/completions", {
+      const aiResponse = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
         method: "POST",
         headers: {
           "Authorization": `Bearer ${lovableApiKey}`,
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          model: "gpt-4o",
+          model: "google/gemini-2.5-flash",
           messages: [
             { role: "system", content: "You are an expert fitness coach. Return ONLY valid JSON, no markdown." },
             { role: "user", content: workoutPrompt }
           ],
-          temperature: 0.8,
         }),
       });
 
