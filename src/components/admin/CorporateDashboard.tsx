@@ -297,23 +297,23 @@ export function CorporateDashboard() {
                   <Card className="border-2">
                     <CollapsibleTrigger asChild>
                       <CardHeader className="cursor-pointer hover:bg-muted/50 transition-colors">
-                        <div className="flex items-center justify-between">
+                        <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
                           <div className="flex items-center gap-4">
-                            <div className="p-2 bg-blue-100 rounded-lg">
+                            <div className="p-2 bg-blue-100 rounded-lg flex-shrink-0">
                               <Building2 className="h-5 w-5 text-blue-600" />
                             </div>
-                            <div>
-                              <CardTitle className="text-lg">{sub.organization_name}</CardTitle>
-                              <CardDescription>
+                            <div className="min-w-0">
+                              <CardTitle className="text-lg truncate">{sub.organization_name}</CardTitle>
+                              <CardDescription className="truncate">
                                 Admin: {sub.adminName || sub.adminEmail || 'Unknown'}
                               </CardDescription>
                             </div>
                           </div>
-                          <div className="flex items-center gap-4">
+                          <div className="flex flex-wrap items-center gap-2 lg:gap-4">
                             <Badge className={getPlanColor(sub.plan_type)}>
                               {sub.plan_type.toUpperCase()}
                             </Badge>
-                            <div className="text-right">
+                            <div className="text-left lg:text-right">
                               <p className="text-sm font-medium">
                                 {sub.members.length} / {getMaxUsers(sub.plan_type)} members
                               </p>
@@ -325,9 +325,9 @@ export function CorporateDashboard() {
                               {sub.status}
                             </Badge>
                             {expandedOrgs.has(sub.id) ? (
-                              <ChevronUp className="h-5 w-5 text-muted-foreground" />
+                              <ChevronUp className="h-5 w-5 text-muted-foreground flex-shrink-0" />
                             ) : (
-                              <ChevronDown className="h-5 w-5 text-muted-foreground" />
+                              <ChevronDown className="h-5 w-5 text-muted-foreground flex-shrink-0" />
                             )}
                           </div>
                         </div>

@@ -21,28 +21,35 @@ export const EmailManager = () => {
       </CardHeader>
       <CardContent>
         <Tabs defaultValue="templates" className="w-full">
-          <TabsList className="grid w-full grid-cols-5">
-            <TabsTrigger value="templates" className="flex items-center gap-2">
-              <FileText className="w-4 h-4" />
-              Templates
-            </TabsTrigger>
-            <TabsTrigger value="automated" className="flex items-center gap-2">
-              <Zap className="w-4 h-4" />
-              Automated Emails
-            </TabsTrigger>
-            <TabsTrigger value="scheduled" className="flex items-center gap-2">
-              <Calendar className="w-4 h-4" />
-              Scheduled
-            </TabsTrigger>
-            <TabsTrigger value="mass" className="flex items-center gap-2">
-              <Mail className="w-4 h-4" />
-              Mass Email
-            </TabsTrigger>
-            <TabsTrigger value="test" className="flex items-center gap-2">
-              <Send className="w-4 h-4" />
-              Test Email
-            </TabsTrigger>
-          </TabsList>
+          <div className="overflow-x-auto scrollbar-thin scrollbar-thumb-muted scrollbar-track-transparent">
+            <TabsList className="inline-flex w-auto min-w-full sm:grid sm:w-full sm:grid-cols-5 gap-1">
+              <TabsTrigger value="templates" className="flex items-center gap-1 sm:gap-2 whitespace-nowrap text-xs sm:text-sm px-2 sm:px-3">
+                <FileText className="w-3 h-3 sm:w-4 sm:h-4" />
+                <span className="hidden sm:inline">Templates</span>
+                <span className="sm:hidden">Temp.</span>
+              </TabsTrigger>
+              <TabsTrigger value="automated" className="flex items-center gap-1 sm:gap-2 whitespace-nowrap text-xs sm:text-sm px-2 sm:px-3">
+                <Zap className="w-3 h-3 sm:w-4 sm:h-4" />
+                <span className="hidden sm:inline">Automated Emails</span>
+                <span className="sm:hidden">Auto</span>
+              </TabsTrigger>
+              <TabsTrigger value="scheduled" className="flex items-center gap-1 sm:gap-2 whitespace-nowrap text-xs sm:text-sm px-2 sm:px-3">
+                <Calendar className="w-3 h-3 sm:w-4 sm:h-4" />
+                <span className="hidden sm:inline">Scheduled</span>
+                <span className="sm:hidden">Sched.</span>
+              </TabsTrigger>
+              <TabsTrigger value="mass" className="flex items-center gap-1 sm:gap-2 whitespace-nowrap text-xs sm:text-sm px-2 sm:px-3">
+                <Mail className="w-3 h-3 sm:w-4 sm:h-4" />
+                <span className="hidden sm:inline">Mass Email</span>
+                <span className="sm:hidden">Mass</span>
+              </TabsTrigger>
+              <TabsTrigger value="test" className="flex items-center gap-1 sm:gap-2 whitespace-nowrap text-xs sm:text-sm px-2 sm:px-3">
+                <Send className="w-3 h-3 sm:w-4 sm:h-4" />
+                <span className="hidden sm:inline">Test Email</span>
+                <span className="sm:hidden">Test</span>
+              </TabsTrigger>
+            </TabsList>
+          </div>
           
           <TabsContent value="templates">
             <EmailTemplatesManager />
