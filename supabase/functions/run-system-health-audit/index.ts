@@ -484,7 +484,169 @@ const handler = async (req: Request): Promise<Response> => {
     });
 
     // ============================================
-    // CATEGORY 12: EDGE FUNCTIONS (10 checks)
+    // CATEGORY 12: NOTIFICATION INTEGRITY (NEW - Critical for detecting collisions)
+    // ============================================
+    console.log("🔔 Checking notification integrity...");
+
+    // Define expected message types per notification source
+    const expectedMessageTypes: Record<string, { source: string; schedule: string }> = {
+      'motivational_weekly': { source: 'send-weekly-motivation', schedule: 'Mondays 08:00 UTC' },
+      'announcement_update': { source: 'Multiple (Activity Reports, Check-in Reminders, etc.)', schedule: 'Various' },
+      'announcement_new_workout': { source: 'generate-workout-of-day / send-new-content-notifications', schedule: 'Daily 07:00 UTC' },
+      'welcome': { source: 'send-welcome-email', schedule: 'On signup' },
+      'renewal_reminder': { source: 'send-renewal-reminders', schedule: 'Daily 09:00 UTC' },
+      'cancellation': { source: 'stripe-webhook', schedule: 'On cancellation' },
+    };
+
+    // Check for message type collisions in today's messages
+    const todayStart = new Date();
+    todayStart.setHours(0, 0, 0, 0);
+    
+    const { data: todayMessages } = await supabase
+      .from('user_system_messages')
+      .select('id, message_type, subject, created_at')
+      .gte('created_at', todayStart.toISOString());
+
+    if (todayMessages && todayMessages.length > 0) {
+      // Group by message_type and check for collisions
+      const messagesByType: Record<string, { subjects: Set<string>; count: number }> = {};
+      
+      for (const msg of todayMessages) {
+        const type = msg.message_type as string;
+        if (!messagesByType[type]) {
+          messagesByType[type] = { subjects: new Set(), count: 0 };
+        }
+        messagesByType[type].subjects.add(msg.subject);
+        messagesByType[type].count++;
+      }
+
+      // Check for collisions (same message_type with different subjects)
+      let collisionDetected = false;
+      let collisionDetails: string[] = [];
+
+      for (const [type, data] of Object.entries(messagesByType)) {
+        if (data.subjects.size > 1) {
+          collisionDetected = true;
+          const subjects = Array.from(data.subjects);
+          collisionDetails.push(`"${type}" used by ${data.subjects.size} different notifications: ${subjects.slice(0, 3).map(s => `"${s.substring(0, 30)}..."`).join(', ')}`);
+        }
+      }
+
+      if (collisionDetected) {
+        addCheck('Notifications', 'Message Type Collision', 
+          'Different notifications using same message_type identifier', 
+          'fail',
+          `⚠️ COLLISION DETECTED: ${collisionDetails.join(' | ')}. This causes notifications to block each other! FIX: Assign unique message_type to each notification source.`
+        );
+      } else {
+        addCheck('Notifications', 'Message Type Collision', 
+          'Each notification type has unique identifier', 
+          'pass',
+          `${Object.keys(messagesByType).length} unique message types used correctly today`
+        );
+      }
+
+      addCheck('Notifications', 'Today Message Count', 
+        `${todayMessages.length} notifications sent today`, 
+        todayMessages.length > 0 ? 'pass' : 'warning',
+        `Message types: ${Object.keys(messagesByType).join(', ')}`
+      );
+    } else {
+      addCheck('Notifications', 'Message Type Collision', 
+        'No messages today to check for collisions', 
+        'skip'
+      );
+      addCheck('Notifications', 'Today Message Count', 
+        'No notifications sent today', 
+        'warning',
+        'Expected at least WOD and Daily Ritual notifications'
+      );
+    }
+
+    // Check notification audit log for today's function executions
+    const { data: auditLogs } = await supabase
+      .from('notification_audit_log')
+      .select('*')
+      .gte('sent_at', todayStart.toISOString())
+      .order('sent_at', { ascending: false });
+
+    if (auditLogs && auditLogs.length > 0) {
+      // Expected daily notifications
+      const expectedDaily = [
+        { key: 'wod', patterns: ['WOD', 'Workout of the Day'] },
+        { key: 'ritual', patterns: ['Ritual', 'Daily Smarty Ritual'] },
+      ];
+
+      // Check if today is Monday for weekly motivation
+      const isMonday = new Date().getDay() === 1;
+      if (isMonday) {
+        expectedDaily.push({ key: 'monday_motivation', patterns: ['Monday Motivation', 'Motivational'] });
+        expectedDaily.push({ key: 'weekly_activity', patterns: ['Weekly Activity', 'Activity Report'] });
+      }
+
+      for (const expected of expectedDaily) {
+        const found = auditLogs.some(log => 
+          expected.patterns.some(pattern => 
+            log.subject?.toLowerCase().includes(pattern.toLowerCase()) ||
+            log.message_type?.toLowerCase().includes(expected.key.toLowerCase())
+          )
+        );
+
+        if (expected.key === 'monday_motivation' && isMonday) {
+          addCheck('Notifications', 'Monday Motivation Sent', 
+            'Weekly motivation should be sent on Mondays', 
+            found ? 'pass' : 'fail',
+            found ? 'Sent successfully' : 'NOT SENT! Check if another notification blocked it with same message_type'
+          );
+        } else if (expected.key === 'weekly_activity' && isMonday) {
+          addCheck('Notifications', 'Weekly Activity Report Sent', 
+            'Activity reports should be sent on Mondays', 
+            found ? 'pass' : 'warning',
+            found ? 'Sent successfully' : 'Not sent yet (scheduled at 07:00 UTC)'
+          );
+        } else if (expected.key === 'wod') {
+          addCheck('Notifications', 'WOD Notification Sent', 
+            'Daily WOD notification should be sent', 
+            found ? 'pass' : 'fail',
+            found ? 'Sent successfully' : 'NOT SENT!'
+          );
+        } else if (expected.key === 'ritual') {
+          addCheck('Notifications', 'Daily Ritual Notification Sent', 
+            'Daily Ritual notification should be sent', 
+            found ? 'pass' : 'warning',
+            found ? 'Sent successfully' : 'Not found in audit log'
+          );
+        }
+      }
+
+      // Check for dual-channel delivery (both dashboard + email)
+      const dashboardCount = auditLogs.filter(l => l.notification_type === 'dashboard' || l.notification_type === 'both').length;
+      const emailCount = auditLogs.filter(l => l.notification_type === 'email' || l.notification_type === 'both').length;
+
+      addCheck('Notifications', 'Dual-Channel Delivery', 
+        'Notifications sent via both dashboard and email', 
+        dashboardCount > 0 && emailCount > 0 ? 'pass' : 'warning',
+        `Dashboard: ${dashboardCount}, Email: ${emailCount} in audit log today`
+      );
+
+      // Check for failed sends
+      const failedSends = auditLogs.filter(l => l.failed_count && l.failed_count > 0);
+      addCheck('Notifications', 'Send Failures', 
+        'Check for failed notification sends', 
+        failedSends.length === 0 ? 'pass' : 'warning',
+        failedSends.length === 0 ? 'No failures today' : `${failedSends.length} notifications had failures`
+      );
+
+    } else {
+      addCheck('Notifications', 'Audit Log Activity', 
+        'No notification audit logs today', 
+        'warning',
+        'Expected logs from WOD, Ritual, and other scheduled notifications'
+      );
+    }
+
+    // ============================================
+    // CATEGORY 13: EDGE FUNCTIONS (10 checks)
     // ============================================
     console.log("⚡ Checking edge functions...");
 
