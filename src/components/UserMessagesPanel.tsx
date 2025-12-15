@@ -320,7 +320,9 @@ export const UserMessagesPanel = () => {
       const contactIds: string[] = [];
 
       validSelectedMessages.forEach(key => {
-        const [type, id] = key.split('-');
+        const dashIndex = key.indexOf('-');
+        const type = key.substring(0, dashIndex);
+        const id = key.substring(dashIndex + 1);
         if (type === 'system') {
           const msg = systemMessages.find(m => m.id === id);
           if (msg && !msg.is_read) systemIds.push(id);
@@ -374,7 +376,9 @@ export const UserMessagesPanel = () => {
       const contactIds: string[] = [];
 
       validSelectedMessages.forEach(key => {
-        const [type, id] = key.split('-');
+        const dashIndex = key.indexOf('-');
+        const type = key.substring(0, dashIndex);
+        const id = key.substring(dashIndex + 1);
         if (type === 'system') {
           const msg = systemMessages.find(m => m.id === id);
           if (msg && msg.is_read) systemIds.push(id);
