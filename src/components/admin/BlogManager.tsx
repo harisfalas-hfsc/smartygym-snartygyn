@@ -278,7 +278,7 @@ export function BlogManager() {
     <div className="pt-6">
       <Card>
       <CardHeader>
-        <div className="flex items-center justify-between">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
           <div>
             <CardTitle>Blog Articles</CardTitle>
             <CardDescription>Manage your blog content across all categories</CardDescription>
