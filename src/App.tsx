@@ -13,7 +13,7 @@ import { ScrollToTop } from "./components/ScrollToTop";
 import { CookieConsent } from "./components/CookieConsent";
 import { ErrorBoundary } from "./components/ErrorBoundary";
 import { useSessionExpiry } from "./hooks/useSessionExpiry";
-import { useIsPortraitMode } from "./hooks/useIsPortraitMode";
+
 import { AccessControlProvider } from "./contexts/AccessControlContext";
 import { NavigationHistoryProvider } from "./contexts/NavigationHistoryContext";
 import { Navigation } from "./components/Navigation";
@@ -84,7 +84,6 @@ const queryClient = new QueryClient();
 
 const AppContent = () => {
   const { isAdmin, loading } = useAdminRole();
-  const { isPhoneLandscape } = useIsPortraitMode();
   useSessionExpiry();
 
   useEffect(() => {
@@ -92,29 +91,16 @@ const AppContent = () => {
     trackPageVisit();
   }, []);
 
-  // CSS rotation style for phone landscape to lock to portrait view
-  const phoneLandscapeStyle = isPhoneLandscape ? {
-    transform: 'rotate(-90deg)',
-    transformOrigin: 'left top',
-    width: '100vh',
-    height: '100vw',
-    position: 'absolute' as const,
-    top: '100%',
-    left: '0',
-    overflow: 'auto',
-  } : undefined;
-
   return (
     <>
       <LoadingBar />
       <CookieConsent />
       <InstallPWA />
-      <div style={phoneLandscapeStyle}>
-        <AccessControlProvider>
-          <AnnouncementManager />
-          <ScrollToTop />
-          <div className="flex flex-col min-h-screen">
-            <Navigation />
+      <AccessControlProvider>
+        <AnnouncementManager />
+        <ScrollToTop />
+        <div className="flex flex-col min-h-screen">
+          <Navigation />
             <div className="flex-1 pt-[120px] xs:pt-[136px] sm:pt-[152px] md:pt-[168px] lg:pt-[184px]">
             <PageTransition>
                 <Routes>
@@ -222,10 +208,9 @@ const AppContent = () => {
               </Routes>
             </PageTransition>
           </div>
-          <Footer />
-        </div>
-      </AccessControlProvider>
+        <Footer />
       </div>
+    </AccessControlProvider>
     </>
   );
 };
