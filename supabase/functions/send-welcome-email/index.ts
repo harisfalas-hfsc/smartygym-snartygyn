@@ -2,6 +2,7 @@ import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.57.2";
 import { Resend } from "https://esm.sh/resend@2.0.0";
 import { getEmailHeaders, getEmailFooter } from "../_shared/email-utils.ts";
+import { MESSAGE_TYPES } from "../_shared/notification-types.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -98,7 +99,7 @@ serve(async (req) => {
     const { data: template, error: templateError } = await supabaseAdmin
       .from("automated_message_templates")
       .select("subject, content")
-      .eq("message_type", "welcome")
+      .eq("message_type", MESSAGE_TYPES.WELCOME)
       .eq("is_active", true)
       .eq("is_default", true)
       .single();
@@ -123,7 +124,7 @@ serve(async (req) => {
       .from('user_system_messages')
       .select('id')
       .eq('user_id', record.user_id)
-      .eq('message_type', 'welcome')
+      .eq('message_type', MESSAGE_TYPES.WELCOME)
       .limit(1);
 
     if (existingError) {
@@ -148,7 +149,7 @@ serve(async (req) => {
         .from("user_system_messages")
         .insert({
           user_id: record.user_id,
-          message_type: "welcome",
+          message_type: MESSAGE_TYPES.WELCOME,
           subject: template.subject,
           content: template.content,
           is_read: false,
@@ -247,7 +248,7 @@ serve(async (req) => {
     logStep("Logging to audit");
     await supabaseAdmin.from('notification_audit_log').insert({
       notification_type: 'welcome_email',
-      message_type: 'welcome',
+      message_type: MESSAGE_TYPES.WELCOME,
       subject: template.subject,
       content: template.content,
       recipient_count: 1,

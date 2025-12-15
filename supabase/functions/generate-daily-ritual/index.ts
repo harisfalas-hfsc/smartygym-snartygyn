@@ -2,6 +2,7 @@ import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.57.2";
 import { Resend } from "https://esm.sh/resend@2.0.0";
 import { getEmailHeaders, getEmailFooter } from "../_shared/email-utils.ts";
+import { MESSAGE_TYPES } from "../_shared/notification-types.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -351,7 +352,7 @@ const subject = "☀️ Your all day game – plan is ready";
       try {
         const { error: insertError } = await supabase.from('user_system_messages').insert({
           user_id: userId,
-          message_type: 'announcement_update',
+          message_type: MESSAGE_TYPES.DAILY_RITUAL,
           subject: subject,
           content: content,
           is_read: false,

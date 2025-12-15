@@ -1,6 +1,7 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 import { Resend } from "https://esm.sh/resend@2.0.0";
+import { MESSAGE_TYPES, MESSAGE_TYPE_SOURCES } from "../_shared/notification-types.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -488,17 +489,17 @@ const handler = async (req: Request): Promise<Response> => {
     // ============================================
     console.log("🔔 Checking notification integrity...");
 
-    // Define expected message types per notification source (UNIQUE per notification type)
+    // Use central registry for expected message types
     const expectedMessageTypes: Record<string, { source: string; schedule: string }> = {
-      'motivational_weekly': { source: 'send-weekly-motivation', schedule: 'Mondays 08:00 UTC' },
-      'weekly_activity_report': { source: 'send-weekly-activity-report', schedule: 'Mondays 07:00 UTC' },
-      'wod_notification': { source: 'generate-workout-of-day', schedule: 'Daily 07:00 UTC' },
-      'daily_ritual': { source: 'generate-daily-ritual', schedule: 'Daily 05:00 UTC' },
-      'checkin_reminder': { source: 'send-checkin-reminders', schedule: 'Daily 06:00 & 18:00 UTC' },
-      'announcement_new_workout': { source: 'send-new-content-notifications (bulk workouts)', schedule: 'On new content' },
-      'welcome': { source: 'send-welcome-email', schedule: 'On signup' },
-      'renewal_reminder': { source: 'send-renewal-reminders', schedule: 'Daily 09:00 UTC' },
-      'cancellation': { source: 'stripe-webhook', schedule: 'On cancellation' },
+      [MESSAGE_TYPES.MONDAY_MOTIVATION]: { source: 'send-weekly-motivation', schedule: 'Mondays 08:00 UTC' },
+      [MESSAGE_TYPES.WEEKLY_ACTIVITY_REPORT]: { source: 'send-weekly-activity-report', schedule: 'Mondays 07:00 UTC' },
+      [MESSAGE_TYPES.WOD_NOTIFICATION]: { source: 'generate-workout-of-day', schedule: 'Daily 07:00 UTC' },
+      [MESSAGE_TYPES.DAILY_RITUAL]: { source: 'generate-daily-ritual', schedule: 'Daily 05:00 UTC' },
+      [MESSAGE_TYPES.CHECKIN_REMINDER]: { source: 'send-checkin-reminders', schedule: 'Daily 06:00 & 18:00 UTC' },
+      [MESSAGE_TYPES.NEW_WORKOUT]: { source: 'send-new-content-notifications (bulk workouts)', schedule: 'On new content' },
+      [MESSAGE_TYPES.WELCOME]: { source: 'send-welcome-email', schedule: 'On signup' },
+      [MESSAGE_TYPES.RENEWAL_REMINDER]: { source: 'send-renewal-reminders', schedule: 'Daily 09:00 UTC' },
+      [MESSAGE_TYPES.CANCELLATION]: { source: 'stripe-webhook', schedule: 'On cancellation' },
     };
 
     // Check for message type collisions in today's messages
