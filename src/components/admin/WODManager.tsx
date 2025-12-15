@@ -8,7 +8,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Progress } from "@/components/ui/progress";
 import { Skeleton } from "@/components/ui/skeleton";
 import { toast } from "sonner";
-import { Flame, Play, RefreshCw, Calendar, Dumbbell, Star, TrendingUp, Clock, ExternalLink, ImageIcon, BookOpen, Edit, Settings } from "lucide-react";
+import { Flame, Play, RefreshCw, Calendar, Dumbbell, Star, TrendingUp, Clock, ExternalLink, ImageIcon, BookOpen, Edit, Settings, HeartPulse, CheckCircle, AlertTriangle, XCircle } from "lucide-react";
 import { format, addDays } from "date-fns";
 import { WODSchedulePreview } from "./WODSchedulePreview";
 import { PeriodizationSystemDialog } from "./PeriodizationSystemDialog";
@@ -31,6 +31,7 @@ const CATEGORY_CYCLE_7DAY = [
 export const WODManager = () => {
   const [isGenerating, setIsGenerating] = useState(false);
   const [isSyncingImages, setIsSyncingImages] = useState(false);
+  const [isRunningHealthCheck, setIsRunningHealthCheck] = useState(false);
   const [periodizationDialogOpen, setPeriodizationDialogOpen] = useState(false);
   const [generateDialogOpen, setGenerateDialogOpen] = useState(false);
   const [editDialogOpen, setEditDialogOpen] = useState(false);
@@ -180,6 +181,123 @@ export const WODManager = () => {
     }
   };
 
+  // Health Check: Verify WOD system integrity
+  const handleHealthCheck = async () => {
+    setIsRunningHealthCheck(true);
+    try {
+      const today = format(new Date(), "yyyy-MM-dd");
+      const issues: string[] = [];
+      const passed: string[] = [];
+
+      // Check 1: Today's WODs exist
+      const { data: todayWods, error: wodError } = await supabase
+        .from("admin_workouts")
+        .select("id, name, image_url, stripe_product_id, stripe_price_id, equipment, generated_for_date, is_workout_of_day, category")
+        .eq("is_workout_of_day", true)
+        .eq("generated_for_date", today);
+
+      if (wodError) {
+        issues.push(`Database error: ${wodError.message}`);
+      } else if (!todayWods || todayWods.length === 0) {
+        issues.push("No WODs found for today");
+      } else if (todayWods.length < 2) {
+        issues.push(`Only ${todayWods.length} WOD(s) found - expected 2 (bodyweight + equipment)`);
+      } else {
+        passed.push(`✅ Today's WODs exist: ${todayWods.length} workouts`);
+      }
+
+      // Check 2: All WODs have images
+      if (todayWods && todayWods.length > 0) {
+        const wodsWithoutImages = todayWods.filter(w => !w.image_url);
+        if (wodsWithoutImages.length > 0) {
+          issues.push(`${wodsWithoutImages.length} WOD(s) missing images: ${wodsWithoutImages.map(w => w.name).join(", ")}`);
+        } else {
+          passed.push("✅ All WODs have images in database");
+        }
+      }
+
+      // Check 3: All WODs have Stripe products
+      if (todayWods && todayWods.length > 0) {
+        const wodsWithoutStripe = todayWods.filter(w => !w.stripe_product_id || !w.stripe_price_id);
+        if (wodsWithoutStripe.length > 0) {
+          issues.push(`${wodsWithoutStripe.length} WOD(s) missing Stripe products: ${wodsWithoutStripe.map(w => w.name).join(", ")}`);
+        } else {
+          passed.push("✅ All WODs have Stripe products");
+        }
+      }
+
+      // Check 4: WOD State integrity
+      const { data: stateData, error: stateError } = await supabase
+        .from("workout_of_day_state")
+        .select("*")
+        .limit(1)
+        .single();
+
+      if (stateError) {
+        issues.push(`State error: ${stateError.message}`);
+      } else if (!stateData) {
+        issues.push("WOD state not found");
+      } else {
+        const dayInCycle = ((stateData.day_count || 0) % 7) + 1;
+        const expectedCategory = CATEGORY_CYCLE_7DAY[(stateData.day_count - 1 + 7) % 7];
+        passed.push(`✅ State valid: Day ${stateData.day_count} (${dayInCycle}/7), Week ${stateData.week_number}`);
+        
+        // Verify category matches
+        if (todayWods && todayWods.length > 0) {
+          const wodCategory = todayWods[0].category;
+          if (wodCategory !== expectedCategory) {
+            issues.push(`Category mismatch: WOD is ${wodCategory}, expected ${expectedCategory}`);
+          } else {
+            passed.push(`✅ Category matches: ${expectedCategory}`);
+          }
+        }
+      }
+
+      // Check 5: No duplicate active WODs from previous days
+      const { data: allActiveWods } = await supabase
+        .from("admin_workouts")
+        .select("id, name, generated_for_date")
+        .eq("is_workout_of_day", true);
+
+      if (allActiveWods && allActiveWods.length > 2) {
+        const oldWods = allActiveWods.filter(w => w.generated_for_date !== today);
+        if (oldWods.length > 0) {
+          issues.push(`${oldWods.length} old WOD(s) still marked as active: ${oldWods.map(w => `${w.name} (${w.generated_for_date})`).join(", ")}`);
+        }
+      } else {
+        passed.push("✅ No duplicate active WODs from previous days");
+      }
+
+      // Display results
+      if (issues.length === 0) {
+        toast.success("WOD Health Check Passed!", {
+          description: passed.join("\n"),
+          duration: 8000,
+        });
+      } else {
+        toast.error(`Health Check: ${issues.length} issue(s) found`, {
+          description: issues.join("\n"),
+          duration: 10000,
+        });
+        // Also log passed items
+        if (passed.length > 0) {
+          console.log("[WOD Health Check] Passed items:", passed);
+        }
+      }
+
+      console.log("[WOD Health Check] Issues:", issues);
+      console.log("[WOD Health Check] Passed:", passed);
+
+    } catch (error: any) {
+      console.error("Health check error:", error);
+      toast.error("Health check failed", {
+        description: error.message || "Please try again",
+      });
+    } finally {
+      setIsRunningHealthCheck(false);
+    }
+  };
+
   // Get tomorrow's category (what will be generated next)
   const getTomorrowCategory = () => {
     if (!wodState) return CATEGORY_CYCLE_7DAY[0];
@@ -236,7 +354,21 @@ export const WODManager = () => {
           </p>
         </div>
         
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 flex-wrap">
+          <Button 
+            variant="outline"
+            className="flex items-center gap-2"
+            disabled={isRunningHealthCheck}
+            onClick={handleHealthCheck}
+          >
+            {isRunningHealthCheck ? (
+              <RefreshCw className="h-4 w-4 animate-spin" />
+            ) : (
+              <HeartPulse className="h-4 w-4" />
+            )}
+            {isRunningHealthCheck ? "Checking..." : "Health Check"}
+          </Button>
+          
           <Button 
             variant="outline"
             className="flex items-center gap-2"
