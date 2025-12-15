@@ -2,6 +2,7 @@ import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.57.2";
 import { Resend } from "https://esm.sh/resend@2.0.0";
 import { getEmailHeaders, getEmailFooter } from "../_shared/email-utils.ts";
+import { MESSAGE_TYPES } from "../_shared/notification-types.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -165,13 +166,13 @@ serve(async (req) => {
 
     logStep("Corporate member added", { newCount: corpSub.current_users_count + 1 });
 
-    // Insert dashboard welcome message for the corporate member
+    // Insert dashboard welcome message for the corporate member (using centralized MESSAGE_TYPES)
     try {
       await supabase
         .from('user_system_messages')
         .insert({
           user_id: newUser.user.id,
-          message_type: 'welcome',
+          message_type: MESSAGE_TYPES.CORPORATE_MEMBER_ADDED,
           subject: `🎉 Welcome to SmartyGym - ${corpSub.organization_name}!`,
           content: `<p class="tiptap-paragraph">Welcome to the team, <strong>${fullName.trim()}</strong>! 🎉</p>
 <p class="tiptap-paragraph">You've been added to <strong>${corpSub.organization_name}</strong>'s SmartyGym corporate account with <strong>Platinum-level access</strong>.</p>

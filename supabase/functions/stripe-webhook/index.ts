@@ -3,6 +3,7 @@ import Stripe from "https://esm.sh/stripe@18.5.0";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.57.2";
 import { Resend } from "https://esm.sh/resend@2.0.0";
 import { getEmailHeaders, getEmailFooter } from "../_shared/email-utils.ts";
+import { MESSAGE_TYPES } from "../_shared/notification-types.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -193,7 +194,7 @@ async function sendFirstPurchaseWelcome(userId: string, userEmail: string, supab
   try {
     await supabase.from('user_system_messages').insert({
       user_id: userId,
-      message_type: 'welcome',
+      message_type: MESSAGE_TYPES.FIRST_PURCHASE,
       subject: subject,
       content: content,
       is_read: false,
@@ -314,7 +315,7 @@ async function handleCorporateSubscriptionCheckout(
     // Send dashboard notification
     await supabase.from('user_system_messages').insert({
       user_id: userId,
-      message_type: 'purchase_subscription',
+      message_type: MESSAGE_TYPES.CORPORATE_SUBSCRIPTION,
       subject: '🎉 Welcome to Smarty Corporate!',
       content: `<p class="tiptap-paragraph"><strong>Your corporate subscription is now active!</strong></p><p class="tiptap-paragraph"></p><p class="tiptap-paragraph">Organization: ${organizationName}</p><p class="tiptap-paragraph">Plan: Smarty ${planType.charAt(0).toUpperCase() + planType.slice(1)}</p><p class="tiptap-paragraph">Team Limit: ${maxUsers === 9999 ? 'Unlimited' : maxUsers} members</p><p class="tiptap-paragraph"></p><p class="tiptap-paragraph">Head to your <a href="/corporate-admin">Corporate Admin Dashboard</a> to start adding team members!</p>`,
       is_read: false,
@@ -506,7 +507,7 @@ async function handleSubscriptionCheckout(
     const { data: template } = await supabase
       .from('automated_message_templates')
       .select('subject, content')
-      .eq('message_type', 'purchase_subscription')
+      .eq('message_type', MESSAGE_TYPES.PURCHASE_SUBSCRIPTION)
       .eq('is_default', true)
       .single();
     
@@ -519,7 +520,7 @@ async function handleSubscriptionCheckout(
       try {
         await supabase.from('user_system_messages').insert({
           user_id: userId,
-          message_type: 'purchase_subscription',
+          message_type: MESSAGE_TYPES.PURCHASE_SUBSCRIPTION,
           subject: subject,
           content: contentText,
           is_read: false,
@@ -665,12 +666,12 @@ async function handleOneTimePurchase(
     return;
   }
   
-  // Determine message type based on content type
-  let messageType = 'purchase_workout';
+  // Determine message type based on content type (using centralized MESSAGE_TYPES)
+  let messageType = MESSAGE_TYPES.PURCHASE_WORKOUT;
   if (contentType === 'program') {
-    messageType = 'purchase_program';
+    messageType = MESSAGE_TYPES.PURCHASE_PROGRAM;
   } else if (contentType === 'shop_product') {
-    messageType = 'purchase_shop_product';
+    messageType = MESSAGE_TYPES.PURCHASE_SHOP_PRODUCT;
   }
   
   // Get purchase template
@@ -839,7 +840,7 @@ async function handleSubscriptionUpdate(
     // Send dashboard notification
     await supabase.from('user_system_messages').insert({
       user_id: userId,
-      message_type: 'renewal_reminder',
+      message_type: MESSAGE_TYPES.RENEWAL_REMINDER,
       subject: subject,
       content: dashboardContent,
       is_read: false,
@@ -946,7 +947,7 @@ async function handleSubscriptionCancellation(
         user_id: existingSub.user_id,
         subject: subject,
         content: content,
-        message_type: 'cancellation',
+        message_type: MESSAGE_TYPES.CANCELLATION,
         is_read: false,
       });
     logStep("Dashboard cancellation notification sent");
@@ -1043,7 +1044,7 @@ async function handleInvoicePaymentSucceeded(
   const { data: template } = await supabase
     .from("automated_message_templates")
     .select("subject, content")
-    .eq("message_type", "renewal_thank_you")
+    .eq("message_type", MESSAGE_TYPES.RENEWAL_THANK_YOU)
     .eq("is_active", true)
     .eq("is_default", true)
     .single();
@@ -1059,7 +1060,7 @@ async function handleInvoicePaymentSucceeded(
   // Send dashboard notification directly (not via scheduled_notifications)
   await supabase.from('user_system_messages').insert({
     user_id: existingSub.user_id,
-    message_type: 'renewal_thank_you',
+    message_type: MESSAGE_TYPES.RENEWAL_THANK_YOU,
     subject: subject,
     content: contentText,
     is_read: false,
@@ -1133,7 +1134,7 @@ async function handleInvoicePaymentFailed(
       user_id: existingSub.user_id,
       subject: '⚠️ Payment Failed',
       content: '<p class="tiptap-paragraph">We were unable to process your subscription payment.</p><p class="tiptap-paragraph"></p><p class="tiptap-paragraph">Please update your payment method to continue your subscription and maintain access to your premium features.</p><p class="tiptap-paragraph"></p><p class="tiptap-paragraph"><a href="/pricing" style="color: #D4AF37;">Update Payment Method →</a></p>',
-      message_type: 'renewal_reminder',
+      message_type: MESSAGE_TYPES.PAYMENT_FAILED,
       is_read: false,
     });
   logStep("Payment failure dashboard notification sent");
