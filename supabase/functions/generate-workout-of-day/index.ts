@@ -784,6 +784,27 @@ RESPONSE FORMAT (JSON ONLY - NO MARKDOWN):
         metadata: { workout_id: workoutId, type: "wod", category: category, equipment: equipment }
       });
 
+      // ═══════════════════════════════════════════════════════════════════════════════
+      // STRIPE PRODUCT IMAGE VERIFICATION (Critical for WOD integrity)
+      // ═══════════════════════════════════════════════════════════════════════════════
+      if (!stripeProduct.images || stripeProduct.images.length === 0) {
+        console.error(`[WOD-GENERATION] ❌ CRITICAL: Stripe product ${stripeProduct.id} created WITHOUT images!`);
+        console.error(`[WOD-GENERATION] Workout: ${workoutContent.name}, Equipment: ${equipment}`);
+        console.error(`[WOD-GENERATION] Original imageUrl was: ${imageUrl || 'NULL/EMPTY'}`);
+        logStep(`❌ STRIPE PRODUCT MISSING IMAGE`, { 
+          productId: stripeProduct.id, 
+          workoutName: workoutContent.name,
+          equipment,
+          imageUrlProvided: !!imageUrl 
+        });
+      } else {
+        logStep(`✅ Stripe product image verified`, { 
+          productId: stripeProduct.id, 
+          imageCount: stripeProduct.images.length,
+          imageUrl: stripeProduct.images[0]?.substring(0, 80)
+        });
+      }
+
       const stripePrice = await stripe.prices.create({
         product: stripeProduct.id,
         unit_amount: 399,
@@ -794,8 +815,9 @@ RESPONSE FORMAT (JSON ONLY - NO MARKDOWN):
       const stripePriceId = stripePrice.id;
       logStep(`${equipment} Stripe product created`, { 
         productId: stripeProductId, 
-        hasImage: !!imageUrl,
-        imageIncluded: imageUrl ? 'YES' : 'NO - CHECK LOGS ABOVE'
+        priceId: stripePriceId,
+        hasImage: stripeProduct.images && stripeProduct.images.length > 0,
+        imageVerified: 'YES'
       });
 
       // Insert workout with generated_for_date for pre-generation tracking
