@@ -655,23 +655,66 @@ RESPONSE FORMAT (JSON ONLY - NO MARKDOWN):
   "tips": "2-3 coaching tips for optimal performance in HTML format"
 }`;
 
-      const aiResponse = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
-        method: "POST",
-        headers: {
-          "Authorization": `Bearer ${lovableApiKey}`,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          model: "google/gemini-2.5-flash",
-          messages: [
-            { role: "system", content: "You are an expert fitness coach. Return ONLY valid JSON, no markdown." },
-            { role: "user", content: workoutPrompt }
-          ],
-        }),
-      });
+      // Retry mechanism: 3 attempts with 2-second delays
+      let aiResponse: Response | null = null;
+      let lastError: Error | null = null;
+      const maxRetries = 3;
+      const retryDelayMs = 2000;
 
-      if (!aiResponse.ok) {
-        throw new Error(`AI API error: ${aiResponse.status}`);
+      for (let attempt = 1; attempt <= maxRetries; attempt++) {
+        try {
+          logStep(`AI API call attempt ${attempt}/${maxRetries}`, { equipment });
+          
+          aiResponse = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+            method: "POST",
+            headers: {
+              "Authorization": `Bearer ${lovableApiKey}`,
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              model: "google/gemini-2.5-flash",
+              messages: [
+                { role: "system", content: "You are an expert fitness coach. Return ONLY valid JSON, no markdown." },
+                { role: "user", content: workoutPrompt }
+              ],
+            }),
+          });
+
+          if (aiResponse.ok) {
+            logStep(`AI API call succeeded on attempt ${attempt}`, { equipment });
+            break;
+          } else {
+            const errorText = await aiResponse.text();
+            lastError = new Error(`AI API error: ${aiResponse.status} - ${errorText}`);
+            logStep(`AI API call failed on attempt ${attempt}`, { 
+              status: aiResponse.status, 
+              error: errorText,
+              willRetry: attempt < maxRetries 
+            });
+          }
+        } catch (fetchError: any) {
+          lastError = fetchError;
+          logStep(`AI API network error on attempt ${attempt}`, { 
+            error: fetchError.message,
+            willRetry: attempt < maxRetries 
+          });
+        }
+
+        // Wait before retry (except on last attempt)
+        if (attempt < maxRetries) {
+          logStep(`Waiting ${retryDelayMs}ms before retry...`);
+          await new Promise(resolve => setTimeout(resolve, retryDelayMs));
+        }
+      }
+
+      if (!aiResponse || !aiResponse.ok) {
+        logStep("AI API failed after all retries", { 
+          maxRetries, 
+          lastError: lastError?.message,
+          equipment,
+          category 
+        });
+        throw lastError || new Error("AI API failed after all retries");
       }
 
       const aiData = await aiResponse.json();
