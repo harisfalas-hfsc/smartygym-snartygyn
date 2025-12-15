@@ -2,6 +2,7 @@ import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.57.2";
 import { Resend } from "https://esm.sh/resend@3.5.0";
 import { getEmailHeaders, getEmailFooter } from "../_shared/email-utils.ts";
+import { MESSAGE_TYPES } from "../_shared/notification-types.ts";
 
 const resend = new Resend(Deno.env.get("RESEND_API_KEY"));
 
@@ -165,7 +166,7 @@ serve(async (req) => {
         .from('user_system_messages')
         .insert({
           user_id: userId,
-          message_type: 'announcement_update',
+          message_type: MESSAGE_TYPES.PROGRAM_DELIVERED,
           subject: subject,
           content: dashboardContent,
           is_read: false
