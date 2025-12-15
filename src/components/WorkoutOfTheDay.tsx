@@ -13,10 +13,14 @@ export const WorkoutOfTheDay = () => {
   const { data: wods, isLoading } = useQuery({
     queryKey: ["workout-of-the-day-dual"],
     queryFn: async () => {
+      // Get today's date in YYYY-MM-DD format for defensive filtering
+      const today = new Date().toISOString().split('T')[0];
+      
       const { data, error } = await supabase
         .from("admin_workouts")
         .select("*")
-        .eq("is_workout_of_day", true);
+        .eq("is_workout_of_day", true)
+        .eq("generated_for_date", today); // DEFENSIVE: Only show today's WODs
       
       if (error && error.code !== "PGRST116") {
         console.error("Error fetching WODs:", error);
