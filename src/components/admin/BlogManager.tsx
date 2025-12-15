@@ -342,7 +342,7 @@ export function BlogManager() {
                     key={article.id}
                     className={`border rounded-lg p-4 hover:bg-accent/50 transition-colors ${!article.is_published ? 'opacity-60' : ''}`}
                   >
-                    <div className="flex items-start justify-between gap-4">
+                    <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
                       <div className="flex items-center gap-3 flex-1">
                         {article.image_url ? (
                           <div className="relative flex-shrink-0">
