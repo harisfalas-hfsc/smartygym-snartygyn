@@ -627,15 +627,11 @@ const Index = () => {
               </div>
             </div>
 
-          {/* Tagline/Slogan Card */}
+          {/* Tagline/Slogan */}
           <div className="flex justify-center mt-4 mb-8 lg:mb-16">
-            <div className="inline-flex items-center gap-2 px-3 md:px-4 py-1.5 md:py-2 bg-primary/5 border border-green-500 rounded-full">
-              <Sparkles className="h-3 w-3 md:h-4 md:w-4 text-primary flex-shrink-0" />
-              <p className="text-sm md:text-base lg:text-lg font-semibold text-center" style={{ color: 'hsl(195, 85%, 45%)' }}>
-                Where Science Meets Convenience. Where Real Coaches Guide Real People.
-              </p>
-              <Sparkles className="h-3 w-3 md:h-4 md:w-4 text-primary flex-shrink-0" />
-            </div>
+            <p className="text-xs md:text-sm lg:text-base font-semibold text-center whitespace-nowrap" style={{ color: 'hsl(195, 85%, 45%)' }}>
+              Where Science Meets Convenience. Where Real Coaches Guide Real People.
+            </p>
           </div>
 
                   {/* Three Column Layout: Explore | Who is SmartyGym For? | Credentials */}
