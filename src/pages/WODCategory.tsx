@@ -9,11 +9,8 @@ import { PageBreadcrumbs } from "@/components/PageBreadcrumbs";
 import { ContentLoadingSkeleton } from "@/components/ContentLoadingSkeleton";
 import { useAllWorkouts } from "@/hooks/useWorkoutData";
 import { useWorkoutInteractions } from "@/hooks/useWorkoutInteractions";
-import { useWODState } from "@/hooks/useWODState";
 import { supabase } from "@/integrations/supabase/client";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
-import { WODTimeline } from "@/components/WODTimeline";
-import { WODCycleCalendar } from "@/components/WODCycleCalendar";
 const WODCategory = () => {
   const navigate = useNavigate();
   const [userId, setUserId] = useState<string | undefined>();
@@ -37,9 +34,6 @@ const WODCategory = () => {
   const {
     data: interactions = []
   } = useWorkoutInteractions(userId);
-  const {
-    data: wodState
-  } = useWODState();
 
   // Get BOTH current WODs (is_workout_of_day = true)
   const currentWODs = allWorkouts.filter(workout => workout.is_workout_of_day === true);
@@ -230,22 +224,6 @@ const WODCategory = () => {
                   </p>
                 </div>
               </Card>
-
-              {/* 7-Day Cycle Calendar (Public - no export) - Only render when data loaded */}
-              {wodState ? (
-                <div className="mb-6">
-                  <WODCycleCalendar 
-                    compact 
-                    dayCount={wodState.day_count} 
-                    weekNumber={wodState.week_number || 1} 
-                  />
-                </div>
-              ) : (
-                <div className="mb-6 h-20 bg-muted/30 rounded-lg animate-pulse" />
-              )}
-
-              {/* Yesterday/Today/Tomorrow Timeline */}
-              <WODTimeline />
 
               {/* Two WOD Cards Side by Side */}
               {bodyweightWOD || equipmentWOD ? <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
