@@ -49,7 +49,7 @@ interface WODCycleCalendarProps {
   compact?: boolean;
 }
 
-const getDayInCycle = (dayCount: number): number => (dayCount % 7) + 1;
+const getDayInCycle = (dayCount: number): number => ((dayCount - 1) % 7) + 1 || 7;
 const getWeekNumber = (dayCount: number): number => Math.floor(dayCount / 7) + 1;
 const getCategoryForDay = (dayInCycle: number): string => CATEGORY_CYCLE_7DAY[dayInCycle - 1];
 
@@ -70,26 +70,24 @@ export const WODCycleCalendar = ({
 }: WODCycleCalendarProps) => {
   const currentWeekNumber = weekNumber || getWeekNumber(dayCount);
   
-  // Generate 7-day schedule
+  // Generate 7-day schedule starting from yesterday
   const schedule = [];
-  for (let i = 0; i < 7; i++) {
-    const futureDayCount = dayCount + i;
-    const futureDayInCycle = getDayInCycle(futureDayCount);
-    const futureWeekNum = futureDayInCycle === 1 && i > 0 
-      ? currentWeekNumber + Math.floor((dayCount + i) / 7) - Math.floor(dayCount / 7)
-      : currentWeekNumber + Math.floor((dayCount + i) / 7) - Math.floor(dayCount / 7);
+  for (let i = -1; i < 6; i++) {
+    const offsetDayCount = dayCount + i;
+    const dayInCycle = getDayInCycle(offsetDayCount);
+    const weekNum = currentWeekNumber + Math.floor((offsetDayCount - 1) / 7) - Math.floor((dayCount - 1) / 7);
     
-    const futureDate = addDays(new Date(), i);
-    const category = getCategoryForDay(futureDayInCycle);
-    const difficultyInfo = getDifficultyForDay(futureDayInCycle, futureWeekNum);
+    const date = addDays(new Date(), i);
+    const category = getCategoryForDay(dayInCycle);
+    const difficultyInfo = getDifficultyForDay(dayInCycle, weekNum);
     
     schedule.push({
-      date: futureDate,
-      dateStr: format(futureDate, "yyyy-MM-dd"),
-      dayLabel: format(futureDate, "EEE"),
-      dayNumber: format(futureDate, "d"),
-      monthLabel: format(futureDate, "MMM"),
-      dayInCycle: futureDayInCycle,
+      date,
+      dateStr: format(date, "yyyy-MM-dd"),
+      dayLabel: format(date, "EEE"),
+      dayNumber: format(date, "d"),
+      monthLabel: format(date, "MMM"),
+      dayInCycle,
       category,
       difficultyLevel: difficultyInfo.level,
       difficultyRange: difficultyInfo.range,

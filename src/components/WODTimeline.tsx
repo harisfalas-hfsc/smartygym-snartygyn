@@ -36,7 +36,7 @@ const FORMATS_BY_CATEGORY: Record<string, string[]> = {
   "CHALLENGE": ["CIRCUIT", "TABATA", "AMRAP", "EMOM", "FOR TIME", "MIX"]
 };
 
-const getDayInCycle = (dayCount: number): number => (dayCount % 7) + 1;
+const getDayInCycle = (dayCount: number): number => ((dayCount - 1) % 7) + 1 || 7;
 
 const getCategoryForDay = (dayInCycle: number): string => CATEGORY_CYCLE_7DAY[dayInCycle - 1];
 
@@ -59,8 +59,7 @@ export const WODTimeline = () => {
   const yesterday = subDays(new Date(), 1);
   const tomorrow = addDays(new Date(), 1);
   
-  // Fetch yesterday's WOD with caching
-  // Fetch yesterday's WOD using generated_for_date for fast indexed lookup
+  // Fetch yesterday's WOD using generated_for_date (no is_workout_of_day filter since past WODs get flag cleared)
   const { data: yesterdayWOD, isLoading: loadingYesterday } = useQuery({
     queryKey: ["yesterday-wod", format(yesterday, "yyyy-MM-dd")],
     queryFn: async () => {
@@ -70,7 +69,6 @@ export const WODTimeline = () => {
         .from("admin_workouts")
         .select("category, format, difficulty, difficulty_stars")
         .eq("generated_for_date", yesterdayDateStr)
-        .eq("is_workout_of_day", true)
         .limit(1);
       
       if (error) throw error;
@@ -169,7 +167,7 @@ export const WODTimeline = () => {
         <div className="p-2 md:p-3 border-r border-border/50 opacity-70">
           <div className="flex items-center gap-1 mb-1 text-muted-foreground">
             <ChevronLeft className="h-3 w-3" />
-            <span className="text-[10px] md:text-xs uppercase tracking-wide">Yesterday</span>
+            <span className="text-[10px] md:text-xs uppercase tracking-wide">Yesterday ({format(yesterday, "MMM d")})</span>
           </div>
           {yesterdayWOD ? (
             <div>
