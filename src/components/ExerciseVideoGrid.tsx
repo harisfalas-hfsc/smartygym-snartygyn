@@ -92,6 +92,7 @@ const ExerciseVideoGrid = () => {
         onClose={() => setSelectedVideo(null)}
         videoId={selectedVideo?.youtube_video_id || null}
         title={selectedVideo?.title || ''}
+        description={selectedVideo?.description}
       />
     </>
   );
