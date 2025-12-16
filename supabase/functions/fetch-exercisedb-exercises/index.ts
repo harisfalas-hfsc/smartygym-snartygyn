@@ -72,11 +72,17 @@ serve(async (req) => {
     const data = await response.json();
     console.log(`ExerciseDB response for ${endpoint}:`, Array.isArray(data) ? `${data.length} items` : 'single item');
 
-    // Helper to add image URL to each exercise
+    // Helper to ensure each exercise has a browser-loadable gifUrl (do NOT overwrite if API already provides one)
     const addImageUrl = (exercise: any) => {
-      if (exercise && exercise.id) {
-        exercise.gifUrl = `https://exercisedb.p.rapidapi.com/image?exerciseId=${exercise.id}&resolution=360&rapidapi-key=${apiKey}`;
+      if (!exercise || !exercise.id) return exercise;
+
+      // Preserve a valid URL coming from the API (common case)
+      if (typeof exercise.gifUrl === 'string' && exercise.gifUrl.trim().length > 0) {
+        return exercise;
       }
+
+      // Fallback to the public CDN format (no headers / no API key required)
+      exercise.gifUrl = `https://v2.exercisedb.io/image/${exercise.id}.gif`;
       return exercise;
     };
 
