@@ -6,7 +6,7 @@ export const MUSCLE_CATEGORIES: Record<string, string[]> = {
     'Pectoralis Minor',
     'Latissimus Dorsi',
     'Trapezius',
-    'Deltoids',
+    'Shoulders (Deltoids)',
     'Biceps Brachii',
     'Triceps Brachii',
     'Brachialis',
