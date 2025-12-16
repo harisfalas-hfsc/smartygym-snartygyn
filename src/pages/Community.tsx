@@ -16,28 +16,11 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Skeleton } from "@/components/ui/skeleton";
-import { ScrollArea } from "@/components/ui/scroll-area";
 import { Button } from "@/components/ui/button";
-import { Trophy, MessageSquare, Star, User, ArrowUpDown, Calendar, ClipboardCheck, ArrowLeft } from "lucide-react";
+import { Trophy, MessageSquare, Star, User, Calendar, ClipboardCheck, ArrowLeft } from "lucide-react";
 import { TestimonialsSection } from "@/components/community/TestimonialsSection";
 import { formatDistanceToNow } from "date-fns";
 import { CompactFilters } from "@/components/CompactFilters";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import {
-  Pagination,
-  PaginationContent,
-  PaginationItem,
-  PaginationLink,
-  PaginationPrevious,
-  PaginationNext,
-  PaginationEllipsis,
-} from "@/components/ui/pagination";
 
 interface LeaderboardEntry {
   user_id: string;
@@ -85,17 +68,12 @@ const Community = () => {
   const [commentsFilter, setCommentsFilter] = useState<"all" | "workouts" | "programs">("all");
   const [sortOrder, setSortOrder] = useState<"newest" | "oldest">("newest");
   
-  // Pagination state (only for comments now)
-  const [commentsPage, setCommentsPage] = useState(1);
-  const ITEMS_PER_PAGE = 10;
+  
   
   // Sorting state
   const [leaderboardSort, setLeaderboardSort] = useState<"completions-desc" | "completions-asc" | "name-asc" | "name-desc">("completions-desc");
   const [ratingsSort, setRatingsSort] = useState<"rating-desc" | "rating-asc" | "reviews-desc" | "name-asc">("rating-desc");
 
-  useEffect(() => {
-    setCommentsPage(1);
-  }, [commentsFilter, sortOrder]);
 
   useEffect(() => {
     fetchLeaderboards();
@@ -480,14 +458,10 @@ programEntries.sort((a, b) => b.total_completions - a.total_completions);
     return sorted.slice(0, 6); // Only top 6
   };
 
-  // Pagination logic for comments
-  const getPaginatedComments = () => {
-    const start = (commentsPage - 1) * ITEMS_PER_PAGE;
-    const end = start + ITEMS_PER_PAGE;
-    return comments.slice(start, end);
+  // Get top 6 comments
+  const getTopComments = () => {
+    return comments.slice(0, 6);
   };
-
-  const commentsTotalPages = Math.ceil(comments.length / ITEMS_PER_PAGE);
 
   return (
     <>
@@ -801,7 +775,7 @@ programEntries.sort((a, b) => b.total_completions - a.total_completions);
             <CardContent className="p-4 md:pt-6">
               {isLoadingComments ? (
                 <div className="space-y-4">
-                  {[...Array(5)].map((_, i) => (
+                  {[...Array(6)].map((_, i) => (
                     <div key={i} className="space-y-2">
                       <Skeleton className="h-6 w-3/4" />
                       <Skeleton className="h-16 w-full" />
@@ -819,92 +793,54 @@ programEntries.sort((a, b) => b.total_completions - a.total_completions);
                   </p>
                 </div>
               ) : (
-                <ScrollArea className="h-[630px] md:h-[700px] pr-2 md:pr-4">
-                  <div className="space-y-3 md:space-y-4">
-                    {getPaginatedComments().map((comment) => (
-                      <div
-                        key={comment.id}
-                        className="p-3 md:p-4 rounded-lg border-2 border-primary/20 bg-gradient-to-r from-background to-primary/5 hover:border-primary/40 transition-colors"
-                      >
-                        <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-2 mb-2">
-                          <div className="flex items-center gap-2">
-                            <User className="h-3 w-3 md:h-4 md:w-4 text-primary flex-shrink-0" />
-                            <span className="font-semibold text-xs md:text-sm truncate">
-                              {comment.display_name}
-                            </span>
-                          </div>
-                          <div className="flex items-center gap-1 text-xs text-muted-foreground whitespace-nowrap">
-                            <Calendar className="h-3 w-3" />
-                            <span className="text-[10px] md:text-xs">
-                              {formatDistanceToNow(new Date(comment.created_at), {
-                                addSuffix: true,
-                              })}
-                            </span>
-                          </div>
+                <div className="space-y-3 md:space-y-4">
+                  {getTopComments().map((comment) => (
+                    <div
+                      key={comment.id}
+                      className="p-3 md:p-4 rounded-lg border-2 border-primary/20 bg-gradient-to-r from-background to-primary/5 hover:border-primary/40 transition-colors"
+                    >
+                      <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-2 mb-2">
+                        <div className="flex items-center gap-2">
+                          <User className="h-3 w-3 md:h-4 md:w-4 text-primary flex-shrink-0" />
+                          <span className="font-semibold text-xs md:text-sm truncate">
+                            {comment.display_name}
+                          </span>
                         </div>
-                        <p className="text-[10px] md:text-xs text-primary font-medium mb-2">
-                          {comment.workout_name ? (
-                            <>
-                              Workout:{" "}
-                              <Link
-                                to={`/workout/${comment.workout_type}/${comment.workout_id}`}
-                                className="hover:underline font-semibold"
-                              >
-                                {comment.workout_name}
-                              </Link>
-                            </>
-                          ) : (
-                            <>
-                              Program:{" "}
-                              <Link
-                                to={`/trainingprogram/${comment.program_type}/${comment.program_id}`}
-                                className="hover:underline font-semibold"
-                              >
-                                {comment.program_name}
-                              </Link>
-                            </>
-                          )}
-                        </p>
-                        <p className="text-xs md:text-sm leading-relaxed">{comment.comment_text}</p>
+                        <div className="flex items-center gap-1 text-xs text-muted-foreground whitespace-nowrap">
+                          <Calendar className="h-3 w-3" />
+                          <span className="text-[10px] md:text-xs">
+                            {formatDistanceToNow(new Date(comment.created_at), {
+                              addSuffix: true,
+                            })}
+                          </span>
+                        </div>
                       </div>
-                    ))}
-                  </div>
-                </ScrollArea>
-              )}
-              {!isLoadingComments && comments.length > 0 && (
-                <div className="mt-4 flex flex-col sm:flex-row items-center justify-between gap-3 border-t border-primary/20 pt-4">
-                  <p className="text-xs md:text-sm text-muted-foreground">
-                    Showing {Math.min((commentsPage - 1) * ITEMS_PER_PAGE + 1, comments.length)}-{Math.min(commentsPage * ITEMS_PER_PAGE, comments.length)} of {comments.length}
-                  </p>
-                  {commentsTotalPages > 1 && (
-                    <Pagination>
-                      <PaginationContent>
-                        <PaginationItem>
-                          <PaginationPrevious 
-                            onClick={() => setCommentsPage(p => Math.max(1, p - 1))}
-                            className={commentsPage === 1 ? "pointer-events-none opacity-50" : "cursor-pointer"}
-                          />
-                        </PaginationItem>
-                        {[...Array(commentsTotalPages)].map((_, i) => (
-                          <PaginationItem key={i}>
-                            <PaginationLink
-                              onClick={() => setCommentsPage(i + 1)}
-                              isActive={commentsPage === i + 1}
-                              className="cursor-pointer"
+                      <p className="text-[10px] md:text-xs text-primary font-medium mb-2">
+                        {comment.workout_name ? (
+                          <>
+                            Workout:{" "}
+                            <Link
+                              to={`/workout/${comment.workout_type}/${comment.workout_id}`}
+                              className="hover:underline font-semibold"
                             >
-                              {i + 1}
-                            </PaginationLink>
-                          </PaginationItem>
-                        ))}
-                        <PaginationItem>
-                          <PaginationNext 
-                            onClick={() => setCommentsPage(p => Math.min(commentsTotalPages, p + 1))}
-                            className={commentsPage === commentsTotalPages ? "pointer-events-none opacity-50" : "cursor-pointer"}
-                          />
-                        </PaginationItem>
-                      </PaginationContent>
-                    </Pagination>
-                  )}
+                              {comment.workout_name}
+                            </Link>
+                          </>
+                        ) : (
+                          <>
+                            Program:{" "}
+                            <Link
+                              to={`/trainingprogram/${comment.program_type}/${comment.program_id}`}
+                              className="hover:underline font-semibold"
+                            >
+                              {comment.program_name}
+                            </Link>
+                          </>
+                        )}
+                      </p>
+                      <p className="text-xs md:text-sm leading-relaxed">{comment.comment_text}</p>
+                    </div>
+                  ))}
                 </div>
               )}
             </CardContent>
