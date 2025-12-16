@@ -442,7 +442,7 @@ const Index = () => {
               <p className="text-base text-muted-foreground">
                 Your gym Re-imagined. Anywhere. Anytime.
               </p>
-            <p className="text-[11px] mt-3 px-1 font-medium whitespace-nowrap" style={{ color: 'hsl(195, 85%, 45%)' }}>
+            <p className="hidden sm:block text-sm mt-3 px-1 font-medium" style={{ color: 'hsl(195, 85%, 45%)' }}>
               Where Science Meets Convenience. Where Real Coaches Guide Real People.
             </p>
             </div>
