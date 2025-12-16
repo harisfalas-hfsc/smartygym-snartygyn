@@ -129,7 +129,7 @@ const ExerciseVideoGrid = () => {
             placeholder="Search exercises by name..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="pl-10"
+            className="pl-10 border-blue-400"
           />
         </div>
       </div>
@@ -144,7 +144,7 @@ const ExerciseVideoGrid = () => {
         {/* Grouped Filters */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           {/* Muscle Targeting Group */}
-          <div className="border border-border/50 rounded-lg p-3 bg-muted/20">
+          <div className="border border-green-500 rounded-lg p-3">
             <p className="text-xs font-medium text-muted-foreground mb-2">Muscle Targeting</p>
             <div className="flex flex-col gap-2">
               <Select
@@ -181,7 +181,7 @@ const ExerciseVideoGrid = () => {
           </div>
 
           {/* Workout Context Group */}
-          <div className="border border-border/50 rounded-lg p-3 bg-muted/20">
+          <div className="border border-purple-500 rounded-lg p-3">
             <p className="text-xs font-medium text-muted-foreground mb-2">Workout Context</p>
             <div className="flex flex-col gap-2">
               <Select
@@ -217,7 +217,7 @@ const ExerciseVideoGrid = () => {
           </div>
 
           {/* Program Context Group */}
-          <div className="border border-border/50 rounded-lg p-3 bg-muted/20">
+          <div className="border border-orange-500 rounded-lg p-3">
             <p className="text-xs font-medium text-muted-foreground mb-2">Program Context</p>
             <Select
               value={filters.programCategory || 'all'}
