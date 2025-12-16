@@ -29,6 +29,17 @@ import { TestimonialsSection } from "@/components/community/TestimonialsSection"
 import { formatDistanceToNow } from "date-fns";
 import { CompactFilters } from "@/components/CompactFilters";
 
+// Mapping for fake comment user IDs to display names
+const FAKE_USER_DISPLAY_NAMES: Record<string, string> = {
+  '00000000-0000-0000-0000-000000000012': 'Alexandra Mitchell',
+  '00000000-0000-0000-0000-000000000013': 'Thomas Anderson',
+  '00000000-0000-0000-0000-000000000014': 'Sophia Williams',
+  '00000000-0000-0000-0000-000000000015': 'Marcus Chen',
+  '00000000-0000-0000-0000-000000000016': 'Emma Richardson',
+  '00000000-0000-0000-0000-000000000017': 'Daniel Foster',
+  '00000000-0000-0000-0000-000000000018': 'Rachel Torres',
+};
+
 interface LeaderboardEntry {
   user_id: string;
   display_name: string;
@@ -356,12 +367,13 @@ programEntries.sort((a, b) => b.total_completions - a.total_completions);
         console.error("Error fetching profiles for comments:", profilesError);
       }
 
-      // Combine comments with display names (real only)
+      // Combine comments with display names (check fake names first, then profiles)
       const commentsWithNames = commentsData?.map((comment) => {
+        const fakeName = FAKE_USER_DISPLAY_NAMES[comment.user_id];
         const profile = profilesData?.find((p) => p.user_id === comment.user_id);
         return {
           ...comment,
-          display_name: profile?.full_name || "Anonymous User",
+          display_name: fakeName || profile?.full_name || "Anonymous User",
         };
       }) || [];
 
