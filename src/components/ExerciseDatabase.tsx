@@ -84,7 +84,7 @@ const ExerciseDatabase = () => {
         throw new Error(data.error);
       }
 
-      setExercises(Array.isArray(data) ? data : []);
+      setExercises(Array.isArray(data?.results) ? data.results : []);
       setHasSearched(true);
     } catch (error: any) {
       console.error('Error fetching exercises:', error);
