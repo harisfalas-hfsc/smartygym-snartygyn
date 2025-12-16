@@ -137,3 +137,6 @@ verify_jwt = false
 
 [functions.fetch-gym-fit-exercises]
 verify_jwt = false
+
+[functions.fetch-exercisedb-exercises]
+verify_jwt = false
