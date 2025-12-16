@@ -25,43 +25,57 @@ serve(async (req) => {
     }
 
     // Build the API URL based on endpoint type
-    let apiUrl = `https://${RAPIDAPI_HOST}`;
+    let apiUrl = `https://${RAPIDAPI_HOST}/v1`;
     
     switch (endpoint) {
-      case 'exercises':
-        apiUrl += '/exercises';
+      // Exercise endpoints
+      case 'searchExercises':
+        // GET /v1/exercises/search?limit=50&offset=0&bodyPart=X&equipment=X&type=X
+        apiUrl += '/exercises/search';
+        const searchParams = new URLSearchParams();
+        if (params?.limit) searchParams.set('limit', String(params.limit));
+        if (params?.offset) searchParams.set('offset', String(params.offset || 0));
+        if (params?.bodyPart) searchParams.set('bodyPart', params.bodyPart);
+        if (params?.equipment) searchParams.set('equipment', params.equipment);
+        if (params?.type) searchParams.set('type', params.type);
+        if (searchParams.toString()) {
+          apiUrl += `?${searchParams.toString()}`;
+        }
         break;
-      case 'bodyPart':
-        apiUrl += `/exercises/bodyPart/${encodeURIComponent(params.bodyPart)}`;
+        
+      case 'getExercise':
+        // GET /v1/exercises/{id}
+        if (!params?.id) throw new Error('Exercise ID is required');
+        apiUrl += `/exercises/${encodeURIComponent(params.id)}`;
         break;
-      case 'equipment':
-        apiUrl += `/exercises/equipment/${encodeURIComponent(params.equipment)}`;
+        
+      case 'getAlternatives':
+        // GET /v1/exercises/{id}/alternatives
+        if (!params?.id) throw new Error('Exercise ID is required');
+        apiUrl += `/exercises/${encodeURIComponent(params.id)}/alternatives`;
         break;
-      case 'target':
-        apiUrl += `/exercises/target/${encodeURIComponent(params.target)}`;
+        
+      // Muscle endpoints
+      case 'searchMuscles':
+        // GET /v1/muscles/search?number=50&offset=0
+        apiUrl += '/muscles/search';
+        const muscleParams = new URLSearchParams();
+        if (params?.number) muscleParams.set('number', String(params.number));
+        if (params?.offset) muscleParams.set('offset', String(params.offset || 0));
+        if (muscleParams.toString()) {
+          apiUrl += `?${muscleParams.toString()}`;
+        }
         break;
-      case 'search':
-        apiUrl += `/exercises/name/${encodeURIComponent(params.name)}`;
+        
+      case 'getMuscle':
+        // GET /v1/muscles/{id}
+        if (!params?.id) throw new Error('Muscle ID is required');
+        apiUrl += `/muscles/${encodeURIComponent(params.id)}`;
         break;
-      case 'bodyPartList':
-        apiUrl += '/exercises/bodyPartList';
-        break;
-      case 'equipmentList':
-        apiUrl += '/exercises/equipmentList';
-        break;
-      case 'targetList':
-        apiUrl += '/exercises/targetList';
-        break;
+        
       default:
-        apiUrl += '/exercises';
-    }
-
-    // Add pagination params if provided
-    if (params?.limit) {
-      apiUrl += `?limit=${params.limit}`;
-      if (params.offset) {
-        apiUrl += `&offset=${params.offset}`;
-      }
+        // Default to exercise search
+        apiUrl += '/exercises/search?limit=50&offset=0';
     }
 
     console.log('Fetching from:', apiUrl);
@@ -81,7 +95,7 @@ serve(async (req) => {
     }
 
     const data = await response.json();
-    console.log('Gym Fit API response received, items:', Array.isArray(data) ? data.length : 'single');
+    console.log('Gym Fit API response received, items:', Array.isArray(data) ? data.length : 'single object');
 
     return new Response(JSON.stringify(data), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
