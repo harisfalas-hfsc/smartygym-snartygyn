@@ -412,6 +412,14 @@ programEntries.sort((a, b) => b.total_completions - a.total_completions);
     if (index === 0) return "🥇";
     if (index === 1) return "🥈";
     if (index === 2) return "🥉";
+    // Ranks 4-6: styled circular badges
+    if (index < 6) {
+      return (
+        <span className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-muted border border-border text-xs font-bold">
+          {index + 1}
+        </span>
+      );
+    }
     return null;
   };
 
@@ -482,14 +490,10 @@ programEntries.sort((a, b) => b.total_completions - a.total_completions);
     return sorted;
   };
 
-  const getPaginatedRatings = () => {
+  const getTopRatings = () => {
     const sorted = getSortedRatings();
-    const start = (ratingsPage - 1) * ITEMS_PER_PAGE;
-    const end = start + ITEMS_PER_PAGE;
-    return sorted.slice(start, end);
+    return sorted.slice(0, 6); // Only top 6
   };
-
-  const ratingsTotalPages = Math.ceil(getSortedRatings().length / ITEMS_PER_PAGE);
 
   // Pagination logic for comments
   const getPaginatedComments = () => {
@@ -750,11 +754,11 @@ programEntries.sort((a, b) => b.total_completions - a.total_completions);
             <CardContent className="p-4 md:pt-6">
               {isLoadingRatings ? (
                 <div className="space-y-3">
-                  {[...Array(10)].map((_, i) => (
+                  {[...Array(6)].map((_, i) => (
                     <Skeleton key={i} className="h-12 w-full" />
                   ))}
                 </div>
-              ) : ratedContent.filter(item => item.content_type === (ratingsFilter === "workouts" ? "workout" : "program")).length === 0 ? (
+              ) : getTopRatings().length === 0 ? (
                 <div className="text-center py-12 text-muted-foreground">
                   <Star className="h-12 w-12 mx-auto mb-4 opacity-30" />
                   <p className="text-lg font-medium mb-2">
@@ -765,94 +769,53 @@ programEntries.sort((a, b) => b.total_completions - a.total_completions);
                   </p>
                 </div>
               ) : (
-                <ScrollArea className="h-[400px] md:h-[500px] pr-2 md:pr-4">
-                  <div className="overflow-x-auto">
-                    <Table>
-                      <TableHeader>
-                        <TableRow className="border-primary/30">
-                          <TableHead className="w-12 md:w-16 text-xs md:text-sm">Rank</TableHead>
-                          <TableHead className="text-xs md:text-sm">Name</TableHead>
-                          <TableHead className="text-center text-xs md:text-sm">Rating</TableHead>
-                          <TableHead className="text-right text-xs md:text-sm">Reviews</TableHead>
+                <div className="overflow-x-auto">
+                  <Table>
+                    <TableHeader>
+                      <TableRow className="border-primary/30">
+                        <TableHead className="w-12 md:w-16 text-xs md:text-sm">Rank</TableHead>
+                        <TableHead className="text-xs md:text-sm">Name</TableHead>
+                        <TableHead className="text-center text-xs md:text-sm">Rating</TableHead>
+                        <TableHead className="text-right text-xs md:text-sm">Reviews</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {getTopRatings().map((item, index) => (
+                        <TableRow
+                          key={item.content_id}
+                          className="border-primary/20 hover:bg-primary/5"
+                        >
+                          <TableCell className="font-medium text-xs md:text-sm py-2 md:py-3">
+                            <div className="flex items-center gap-1 md:gap-2">
+                              <span className="text-base md:text-lg">{getMedalIcon(index)}</span>
+                            </div>
+                          </TableCell>
+                          <TableCell className="py-2 md:py-3">
+                            <Link 
+                              to={item.content_type === "workout" 
+                                ? `/workout/${item.workout_type}/${item.content_id}`
+                                : `/trainingprogram/${item.program_type}/${item.content_id}`
+                              }
+                              className="font-medium text-xs md:text-sm truncate text-primary hover:underline"
+                            >
+                              {item.content_name}
+                            </Link>
+                          </TableCell>
+                          <TableCell className="text-center py-2 md:py-3">
+                            <div className="flex items-center justify-center gap-1">
+                              <Star className="h-3 w-3 md:h-4 md:w-4 fill-primary text-primary" />
+                              <span className="font-semibold text-xs md:text-sm">{item.average_rating.toFixed(1)}</span>
+                            </div>
+                          </TableCell>
+                          <TableCell className="text-right py-2 md:py-3">
+                            <span className="inline-flex items-center gap-1 px-2 md:px-3 py-0.5 md:py-1 rounded-full bg-primary/10 text-primary font-semibold text-xs md:text-sm whitespace-nowrap">
+                              {item.rating_count}
+                            </span>
+                          </TableCell>
                         </TableRow>
-                      </TableHeader>
-                      <TableBody>
-                        {getPaginatedRatings().map((item, index) => {
-                          const actualIndex = (ratingsPage - 1) * ITEMS_PER_PAGE + index;
-                          return (
-                            <TableRow
-                              key={item.content_id}
-                              className="border-primary/20 hover:bg-primary/5"
-                            >
-                              <TableCell className="font-medium text-xs md:text-sm py-2 md:py-3">
-                                <div className="flex items-center gap-1 md:gap-2">
-                                  <span className="text-base md:text-lg">{getMedalIcon(actualIndex) || `#${actualIndex + 1}`}</span>
-                                </div>
-                              </TableCell>
-                              <TableCell className="py-2 md:py-3">
-                                <Link 
-                                  to={item.content_type === "workout" 
-                                    ? `/workout/${item.workout_type}/${item.content_id}`
-                                    : `/trainingprogram/${item.program_type}/${item.content_id}`
-                                  }
-                                  className="font-medium text-xs md:text-sm truncate text-primary hover:underline"
-                                >
-                                  {item.content_name}
-                                </Link>
-                              </TableCell>
-                              <TableCell className="text-center py-2 md:py-3">
-                                <div className="flex items-center justify-center gap-1">
-                                  <Star className="h-3 w-3 md:h-4 md:w-4 fill-primary text-primary" />
-                                  <span className="font-semibold text-xs md:text-sm">{item.average_rating.toFixed(1)}</span>
-                                </div>
-                              </TableCell>
-                              <TableCell className="text-right py-2 md:py-3">
-                                <span className="inline-flex items-center gap-1 px-2 md:px-3 py-0.5 md:py-1 rounded-full bg-primary/10 text-primary font-semibold text-xs md:text-sm whitespace-nowrap">
-                                  {item.rating_count}
-                                </span>
-                              </TableCell>
-                            </TableRow>
-                          );
-                        })}
-                      </TableBody>
-                    </Table>
-                  </div>
-                </ScrollArea>
-              )}
-              {!isLoadingRatings && getSortedRatings().length > 0 && (
-                <div className="mt-4 flex flex-col sm:flex-row items-center justify-between gap-3 border-t border-primary/20 pt-4">
-                  <p className="text-xs md:text-sm text-muted-foreground">
-                    Showing {Math.min((ratingsPage - 1) * ITEMS_PER_PAGE + 1, getSortedRatings().length)}-{Math.min(ratingsPage * ITEMS_PER_PAGE, getSortedRatings().length)} of {getSortedRatings().length}
-                  </p>
-                  {ratingsTotalPages > 1 && (
-                    <Pagination>
-                      <PaginationContent>
-                        <PaginationItem>
-                          <PaginationPrevious 
-                            onClick={() => setRatingsPage(p => Math.max(1, p - 1))}
-                            className={ratingsPage === 1 ? "pointer-events-none opacity-50" : "cursor-pointer"}
-                          />
-                        </PaginationItem>
-                        {[...Array(ratingsTotalPages)].map((_, i) => (
-                          <PaginationItem key={i}>
-                            <PaginationLink
-                              onClick={() => setRatingsPage(i + 1)}
-                              isActive={ratingsPage === i + 1}
-                              className="cursor-pointer"
-                            >
-                              {i + 1}
-                            </PaginationLink>
-                          </PaginationItem>
-                        ))}
-                        <PaginationItem>
-                          <PaginationNext 
-                            onClick={() => setRatingsPage(p => Math.min(ratingsTotalPages, p + 1))}
-                            className={ratingsPage === ratingsTotalPages ? "pointer-events-none opacity-50" : "cursor-pointer"}
-                          />
-                        </PaginationItem>
-                      </PaginationContent>
-                    </Pagination>
-                  )}
+                      ))}
+                    </TableBody>
+                  </Table>
                 </div>
               )}
             </CardContent>
