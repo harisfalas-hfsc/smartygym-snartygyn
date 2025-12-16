@@ -144,7 +144,7 @@ const ExerciseVideoGrid = () => {
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <Input
             type="text"
-            placeholder="Search exercises by name..."
+            placeholder="Search video by name"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             className="pl-10 border-blue-400"
@@ -161,9 +161,27 @@ const ExerciseVideoGrid = () => {
         
         {/* Grouped Filters */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+          {/* Promotional Context Group - FIRST */}
+          <div className="border border-pink-500 rounded-lg p-3">
+            <p className="text-xs font-medium text-muted-foreground mb-2">Search promotional video context</p>
+            <Select
+              value={filters.promotionalSort}
+              onValueChange={(value) => setFilters(prev => ({ ...prev, promotionalSort: value as 'all' | 'latest' | 'oldest' }))}
+            >
+              <SelectTrigger className="h-8 text-sm">
+                <SelectValue placeholder="View Promotional" />
+              </SelectTrigger>
+              <SelectContent side="bottom">
+                <SelectItem value="all">All Videos</SelectItem>
+                <SelectItem value="latest">Promotional (Latest)</SelectItem>
+                <SelectItem value="oldest">Promotional (Oldest)</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
           {/* Muscle Targeting Group */}
           <div className="border border-green-500 rounded-lg p-3">
-            <p className="text-xs font-medium text-muted-foreground mb-2">Muscle Targeting</p>
+            <p className="text-xs font-medium text-muted-foreground mb-2">Search videos by muscle targeting</p>
             <div className="flex flex-col gap-2">
               <Select
                 value={filters.muscleGroup || 'all'}
@@ -200,7 +218,7 @@ const ExerciseVideoGrid = () => {
 
           {/* Workout Context Group */}
           <div className="border border-purple-500 rounded-lg p-3">
-            <p className="text-xs font-medium text-muted-foreground mb-2">Workout Context</p>
+            <p className="text-xs font-medium text-muted-foreground mb-2">Search video by workout context</p>
             <div className="flex flex-col gap-2">
               <Select
                 value={filters.workoutPhase || 'all'}
@@ -236,7 +254,7 @@ const ExerciseVideoGrid = () => {
 
           {/* Program Context Group */}
           <div className="border border-orange-500 rounded-lg p-3">
-            <p className="text-xs font-medium text-muted-foreground mb-2">Program Context</p>
+            <p className="text-xs font-medium text-muted-foreground mb-2">Search videos by program context</p>
             <Select
               value={filters.programCategory || 'all'}
               onValueChange={(value) => setFilters(prev => ({ ...prev, programCategory: value === 'all' ? '' : value }))}
@@ -249,24 +267,6 @@ const ExerciseVideoGrid = () => {
                 {PROGRAM_CATEGORIES.map((cat) => (
                   <SelectItem key={cat} value={cat}>{cat}</SelectItem>
                 ))}
-              </SelectContent>
-            </Select>
-          </div>
-
-          {/* Promotional Context Group */}
-          <div className="border border-pink-500 rounded-lg p-3">
-            <p className="text-xs font-medium text-muted-foreground mb-2">Promotional Context</p>
-            <Select
-              value={filters.promotionalSort}
-              onValueChange={(value) => setFilters(prev => ({ ...prev, promotionalSort: value as 'all' | 'latest' | 'oldest' }))}
-            >
-              <SelectTrigger className="h-8 text-sm">
-                <SelectValue placeholder="View Promotional" />
-              </SelectTrigger>
-              <SelectContent side="bottom">
-                <SelectItem value="all">All Videos</SelectItem>
-                <SelectItem value="latest">Promotional (Latest)</SelectItem>
-                <SelectItem value="oldest">Promotional (Oldest)</SelectItem>
               </SelectContent>
             </Select>
           </div>
