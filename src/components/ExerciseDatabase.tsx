@@ -1,11 +1,27 @@
 import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Loader2, Search, X, Dumbbell, Activity } from "lucide-react";
 import ExerciseDetailModal from "./ExerciseDetailModal";
 import { useToast } from "@/hooks/use-toast";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+
+// Exact valid API values
+const BODY_PARTS = ['Legs', 'Back', 'Chest', 'Shoulders', 'Arms', 'Core'];
+const EQUIPMENT = [
+  'Barbell', 'Dumbbell', 'Machine', 'Bodyweight', 'Kettlebell', 
+  'ResistanceBand', 'BattleRope', 'MedicineBall', 'BosuBall', 
+  'PowerSled', 'SmithMachine', 'StabilityBall', 'TrapBar', 
+  'Stepper', 'WheelRoller', 'Towel', 'Landmine', 'Cable'
+];
+const TYPES = ['Compound', 'Isolation'];
 
 // Interface matching exact Gym Fit API search response
 interface ExerciseSearchResult {
@@ -54,9 +70,9 @@ const ExerciseDatabase = () => {
     try {
       const params: Record<string, string | number> = { limit: 50, offset: 0 };
       
-      if (bodyPartFilter.trim()) params.bodyPart = bodyPartFilter.trim();
-      if (equipmentFilter.trim()) params.equipment = equipmentFilter.trim();
-      if (typeFilter.trim()) params.type = typeFilter.trim();
+      if (bodyPartFilter && bodyPartFilter !== "all") params.bodyPart = bodyPartFilter;
+      if (equipmentFilter && equipmentFilter !== "all") params.equipment = equipmentFilter;
+      if (typeFilter && typeFilter !== "all") params.type = typeFilter;
 
       const { data, error } = await supabase.functions.invoke('fetch-gym-fit-exercises', {
         body: { endpoint: 'searchExercises', params }
@@ -126,17 +142,13 @@ const ExerciseDatabase = () => {
     fetchExerciseDetail(exercise.id);
   };
 
-  const handleKeyPress = (e: React.KeyboardEvent) => {
-    if (e.key === 'Enter') {
-      handleSearch();
-    }
-  };
-
-  const hasFilters = bodyPartFilter || equipmentFilter || typeFilter;
+  const hasFilters = (bodyPartFilter && bodyPartFilter !== "all") || 
+                     (equipmentFilter && equipmentFilter !== "all") || 
+                     (typeFilter && typeFilter !== "all");
 
   return (
     <div className="space-y-6">
-      {/* Filters - Text inputs for exact API values */}
+      {/* Filters - Dropdown selects with exact API values */}
       <div className="flex flex-col gap-4">
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
           {/* Body Part Filter */}
@@ -145,13 +157,17 @@ const ExerciseDatabase = () => {
               <Activity className="h-3 w-3 text-green-500" />
               Body Part
             </label>
-            <Input
-              placeholder="e.g., Chest, Back, Legs..."
-              value={bodyPartFilter}
-              onChange={(e) => setBodyPartFilter(e.target.value)}
-              onKeyPress={handleKeyPress}
-              className="border-green-500/50"
-            />
+            <Select value={bodyPartFilter} onValueChange={setBodyPartFilter}>
+              <SelectTrigger className="border-green-500/50">
+                <SelectValue placeholder="All Body Parts" />
+              </SelectTrigger>
+              <SelectContent side="bottom">
+                <SelectItem value="all">All Body Parts</SelectItem>
+                {BODY_PARTS.map((part) => (
+                  <SelectItem key={part} value={part}>{part}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
 
           {/* Equipment Filter */}
@@ -160,13 +176,17 @@ const ExerciseDatabase = () => {
               <Dumbbell className="h-3 w-3 text-purple-500" />
               Equipment
             </label>
-            <Input
-              placeholder="e.g., Barbell, Dumbbell..."
-              value={equipmentFilter}
-              onChange={(e) => setEquipmentFilter(e.target.value)}
-              onKeyPress={handleKeyPress}
-              className="border-purple-500/50"
-            />
+            <Select value={equipmentFilter} onValueChange={setEquipmentFilter}>
+              <SelectTrigger className="border-purple-500/50">
+                <SelectValue placeholder="All Equipment" />
+              </SelectTrigger>
+              <SelectContent side="bottom">
+                <SelectItem value="all">All Equipment</SelectItem>
+                {EQUIPMENT.map((eq) => (
+                  <SelectItem key={eq} value={eq}>{eq}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
 
           {/* Type Filter */}
@@ -175,13 +195,17 @@ const ExerciseDatabase = () => {
               <Search className="h-3 w-3 text-orange-500" />
               Type
             </label>
-            <Input
-              placeholder="e.g., Compound, Isolation..."
-              value={typeFilter}
-              onChange={(e) => setTypeFilter(e.target.value)}
-              onKeyPress={handleKeyPress}
-              className="border-orange-500/50"
-            />
+            <Select value={typeFilter} onValueChange={setTypeFilter}>
+              <SelectTrigger className="border-orange-500/50">
+                <SelectValue placeholder="All Types" />
+              </SelectTrigger>
+              <SelectContent side="bottom">
+                <SelectItem value="all">All Types</SelectItem>
+                {TYPES.map((type) => (
+                  <SelectItem key={type} value={type}>{type}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
         </div>
 
@@ -203,19 +227,19 @@ const ExerciseDatabase = () => {
       {/* Active Filters Display */}
       {hasFilters && (
         <div className="flex flex-wrap gap-2">
-          {bodyPartFilter && (
+          {bodyPartFilter && bodyPartFilter !== "all" && (
             <Badge variant="outline" className="border-green-500 text-green-600 dark:text-green-400">
               <Activity className="h-3 w-3 mr-1" />
               {bodyPartFilter}
             </Badge>
           )}
-          {equipmentFilter && (
+          {equipmentFilter && equipmentFilter !== "all" && (
             <Badge variant="outline" className="border-purple-500 text-purple-600 dark:text-purple-400">
               <Dumbbell className="h-3 w-3 mr-1" />
               {equipmentFilter}
             </Badge>
           )}
-          {typeFilter && (
+          {typeFilter && typeFilter !== "all" && (
             <Badge variant="outline" className="border-orange-500 text-orange-600 dark:text-orange-400">
               <Search className="h-3 w-3 mr-1" />
               {typeFilter}
@@ -260,14 +284,12 @@ const ExerciseDatabase = () => {
       ) : hasSearched ? (
         <div className="text-center py-12 text-muted-foreground">
           <Dumbbell className="h-12 w-12 mx-auto mb-4 opacity-50" />
-          <p>No exercises found. Try different filter values.</p>
-          <p className="text-sm mt-2">The API accepts specific values for bodyPart, equipment, and type.</p>
+          <p>No exercises found with those filters.</p>
         </div>
       ) : (
         <div className="text-center py-12 text-muted-foreground">
           <Dumbbell className="h-12 w-12 mx-auto mb-4 opacity-50" />
-          <p>Enter filter values and click Search to browse exercises</p>
-          <p className="text-sm mt-2">Try: Body Part = "Chest", Equipment = "Barbell", Type = "Compound"</p>
+          <p>Select filters and click Search to browse exercises</p>
         </div>
       )}
 
