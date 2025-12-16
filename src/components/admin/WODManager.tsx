@@ -12,7 +12,6 @@ import { Flame, Play, RefreshCw, Calendar, Dumbbell, Star, TrendingUp, Clock, Ex
 import { format, addDays } from "date-fns";
 import { WODSchedulePreview } from "./WODSchedulePreview";
 import { PeriodizationSystemDialog } from "./PeriodizationSystemDialog";
-import { WODCycleCalendar } from "@/components/WODCycleCalendar";
 import { WorkoutEditDialog } from "./WorkoutEditDialog";
 import { GenerateWODDialog } from "./GenerateWODDialog";
 import { CronTimeConfigDialog } from "./CronTimeConfigDialog";
@@ -517,13 +516,6 @@ export const WODManager = () => {
           </CardContent>
         </Card>
       </div>
-
-      {/* 7-Day Cycle Calendar with Export */}
-      <WODCycleCalendar 
-        dayCount={wodState?.day_count || 0} 
-        weekNumber={wodState?.week_number} 
-        showExport={true} 
-      />
 
       {/* Upcoming WOD Schedule Preview */}
       <WODSchedulePreview />
