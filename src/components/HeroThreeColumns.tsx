@@ -212,7 +212,7 @@ export const HeroThreeColumns = () => {
           className="mt-1.5 flex items-center gap-2 cursor-pointer group hover:text-primary transition-colors rounded-md px-2 py-1 -mx-2 hover:bg-primary/10"
         >
           <CircleDollarSign className="w-4 h-4 text-green-500 flex-shrink-0" />
-          <span className="text-sm underline text-green-500 group-hover:text-primary transition-colors">Why Invest in SmartyGym?</span>
+          <span className="text-sm font-bold text-green-500 group-hover:text-primary transition-colors">Why Invest in SmartyGym?</span>
         </div>
       </div>
 
@@ -220,23 +220,25 @@ export const HeroThreeColumns = () => {
       <div className="pt-8 lg:pl-6 xl:pl-12 lg:ml-auto">
         <div 
           onClick={() => navigate("/workout/wod")}
-          className="cursor-pointer group flex flex-col items-center"
+          className="cursor-pointer group border-2 border-green-500 rounded-xl p-4 
+                     hover:border-primary hover:shadow-lg transition-all duration-300
+                     flex flex-col items-center"
         >
           {/* Gold Circle with Dumbbell */}
           <div className="relative">
-            <div className="w-20 h-20 rounded-full bg-primary/10 
-                            flex items-center justify-center shadow-lg
+            <div className="w-14 h-14 rounded-full bg-primary/10 
+                            flex items-center justify-center shadow-md
                             group-hover:scale-110 transition-transform duration-300
-                            ring-4 ring-emerald-500 dark:ring-emerald-400 ring-offset-2 ring-offset-background">
-              <Dumbbell className="w-10 h-10 text-primary" />
+                            ring-2 ring-emerald-500 dark:ring-emerald-400 ring-offset-2 ring-offset-background">
+              <Dumbbell className="w-7 h-7 text-primary" />
             </div>
             
             {/* Glow effect */}
-            <div className="absolute inset-0 w-20 h-20 rounded-full bg-primary/10 blur-xl -z-10" />
+            <div className="absolute inset-0 w-14 h-14 rounded-full bg-primary/10 blur-xl -z-10" />
           </div>
           
           {/* Title */}
-          <h3 className="text-lg font-bold text-primary text-center mt-4 group-hover:underline transition-all">
+          <h3 className="text-base font-bold text-primary text-center mt-3 group-hover:underline transition-all">
             Workout of the Day
           </h3>
           
@@ -244,7 +246,7 @@ export const HeroThreeColumns = () => {
           {currentWod && (
             <div 
               key={currentWod.id}
-              className="mt-2 text-center space-y-1 animate-fade-in"
+              className="mt-1.5 text-center space-y-0.5 animate-fade-in"
             >
               <p className="text-sm font-semibold text-foreground">{currentWod.name}</p>
               <p className="text-xs text-red-600 dark:text-red-400 font-medium">{currentWod.category}</p>
@@ -267,7 +269,7 @@ export const HeroThreeColumns = () => {
           )}
           
           {/* CTA */}
-          <div className="flex items-center justify-center gap-1 mt-3 text-primary text-sm font-medium 
+          <div className="flex items-center justify-center gap-1 mt-2 text-primary text-sm font-medium 
                           group-hover:gap-2 transition-all">
             View Today's WOD
             <ChevronRight className="w-4 h-4" />
