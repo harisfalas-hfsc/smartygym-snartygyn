@@ -85,24 +85,13 @@ const Community = () => {
   const [commentsFilter, setCommentsFilter] = useState<"all" | "workouts" | "programs">("all");
   const [sortOrder, setSortOrder] = useState<"newest" | "oldest">("newest");
   
-  // Pagination state
-  const [leaderboardPage, setLeaderboardPage] = useState(1);
-  const [ratingsPage, setRatingsPage] = useState(1);
+  // Pagination state (only for comments now)
   const [commentsPage, setCommentsPage] = useState(1);
   const ITEMS_PER_PAGE = 10;
   
   // Sorting state
   const [leaderboardSort, setLeaderboardSort] = useState<"completions-desc" | "completions-asc" | "name-asc" | "name-desc">("completions-desc");
   const [ratingsSort, setRatingsSort] = useState<"rating-desc" | "rating-asc" | "reviews-desc" | "name-asc">("rating-desc");
-
-  // Reset pagination when filters/sort change
-  useEffect(() => {
-    setLeaderboardPage(1);
-  }, [leaderboardFilter, leaderboardSort]);
-
-  useEffect(() => {
-    setRatingsPage(1);
-  }, [ratingsFilter, ratingsSort]);
 
   useEffect(() => {
     setCommentsPage(1);
@@ -453,14 +442,10 @@ programEntries.sort((a, b) => b.total_completions - a.total_completions);
     return sorted;
   };
 
-  const getPaginatedLeaderboard = () => {
+  const getTopLeaderboard = () => {
     const sorted = getSortedLeaderboard();
-    const start = (leaderboardPage - 1) * ITEMS_PER_PAGE;
-    const end = start + ITEMS_PER_PAGE;
-    return sorted.slice(start, end);
+    return sorted.slice(0, 6); // Only top 6
   };
-
-  const leaderboardTotalPages = Math.ceil(getSortedLeaderboard().length / ITEMS_PER_PAGE);
 
   // Sorting and pagination logic for ratings
   const getSortedRatings = () => {
@@ -612,11 +597,11 @@ programEntries.sort((a, b) => b.total_completions - a.total_completions);
             <CardContent className="p-4 md:pt-6">
               {isLoadingLeaderboard ? (
                 <div className="space-y-3">
-                  {[...Array(10)].map((_, i) => (
+                  {[...Array(6)].map((_, i) => (
                     <Skeleton key={i} className="h-12 w-full" />
                   ))}
                 </div>
-) : (leaderboardFilter === "workouts" ? workoutLeaderboard : leaderboardFilter === "programs" ? programLeaderboard : checkinLeaderboard).length === 0 ? (
+              ) : (leaderboardFilter === "workouts" ? workoutLeaderboard : leaderboardFilter === "programs" ? programLeaderboard : checkinLeaderboard).length === 0 ? (
                 <div className="text-center py-12 text-muted-foreground">
                   {leaderboardFilter === "checkins" ? (
                     <ClipboardCheck className="h-12 w-12 mx-auto mb-4 opacity-30" />
@@ -636,82 +621,41 @@ programEntries.sort((a, b) => b.total_completions - a.total_completions);
                   </p>
                 </div>
               ) : (
-                <ScrollArea className="h-[400px] md:h-[500px] pr-2 md:pr-4">
-                  <div className="overflow-x-auto">
-                    <Table>
-                      <TableHeader>
-                        <TableRow className="border-primary/30">
-                          <TableHead className="w-12 md:w-16 text-xs md:text-sm">Rank</TableHead>
-                          <TableHead className="text-xs md:text-sm">Member</TableHead>
-                          <TableHead className="text-right text-xs md:text-sm">{leaderboardFilter === "checkins" ? "Consistency Score" : "Completions"}</TableHead>
+                <div className="overflow-x-auto">
+                  <Table>
+                    <TableHeader>
+                      <TableRow className="border-primary/30">
+                        <TableHead className="w-12 md:w-16 text-xs md:text-sm">Rank</TableHead>
+                        <TableHead className="text-xs md:text-sm">Member</TableHead>
+                        <TableHead className="text-right text-xs md:text-sm">{leaderboardFilter === "checkins" ? "Consistency Score" : "Completions"}</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {getTopLeaderboard().map((entry, index) => (
+                        <TableRow
+                          key={entry.user_id}
+                          className="border-primary/20 hover:bg-primary/5"
+                        >
+                          <TableCell className="font-medium text-xs md:text-sm py-2 md:py-3">
+                            <div className="flex items-center gap-1 md:gap-2">
+                              <span className="text-base md:text-lg">{getMedalIcon(index)}</span>
+                            </div>
+                          </TableCell>
+                          <TableCell className="py-2 md:py-3">
+                            <div className="flex items-center gap-1 md:gap-2">
+                              <User className="h-3 w-3 md:h-4 md:w-4 text-muted-foreground flex-shrink-0" />
+                              <span className="font-medium text-xs md:text-sm truncate">{entry.display_name}</span>
+                            </div>
+                          </TableCell>
+                          <TableCell className="text-right py-2 md:py-3">
+                            <span className="inline-flex items-center gap-1 px-2 md:px-3 py-0.5 md:py-1 rounded-full bg-primary/10 text-primary font-semibold text-xs md:text-sm whitespace-nowrap">
+                              {entry.total_completions}
+                            </span>
+                          </TableCell>
                         </TableRow>
-                      </TableHeader>
-                      <TableBody>
-                        {getPaginatedLeaderboard().map((entry, index) => {
-                          const actualIndex = (leaderboardPage - 1) * ITEMS_PER_PAGE + index;
-                          return (
-                            <TableRow
-                              key={entry.user_id}
-                              className="border-primary/20 hover:bg-primary/5"
-                            >
-                              <TableCell className="font-medium text-xs md:text-sm py-2 md:py-3">
-                                <div className="flex items-center gap-1 md:gap-2">
-                                  <span className="text-base md:text-lg">{getMedalIcon(actualIndex) || `#${actualIndex + 1}`}</span>
-                                </div>
-                              </TableCell>
-                              <TableCell className="py-2 md:py-3">
-                                <div className="flex items-center gap-1 md:gap-2">
-                                  <User className="h-3 w-3 md:h-4 md:w-4 text-muted-foreground flex-shrink-0" />
-                                  <span className="font-medium text-xs md:text-sm truncate">{entry.display_name}</span>
-                                </div>
-                              </TableCell>
-                              <TableCell className="text-right py-2 md:py-3">
-                                <span className="inline-flex items-center gap-1 px-2 md:px-3 py-0.5 md:py-1 rounded-full bg-primary/10 text-primary font-semibold text-xs md:text-sm whitespace-nowrap">
-                                  {entry.total_completions}
-                                </span>
-                              </TableCell>
-                            </TableRow>
-                          );
-                        })}
-                      </TableBody>
-                    </Table>
-                  </div>
-                </ScrollArea>
-              )}
-              {!isLoadingLeaderboard && getSortedLeaderboard().length > 0 && (
-                <div className="mt-4 flex flex-col sm:flex-row items-center justify-between gap-3 border-t border-primary/20 pt-4">
-                  <p className="text-xs md:text-sm text-muted-foreground">
-                    Showing {Math.min((leaderboardPage - 1) * ITEMS_PER_PAGE + 1, getSortedLeaderboard().length)}-{Math.min(leaderboardPage * ITEMS_PER_PAGE, getSortedLeaderboard().length)} of {getSortedLeaderboard().length}
-                  </p>
-                  {leaderboardTotalPages > 1 && (
-                    <Pagination>
-                      <PaginationContent>
-                        <PaginationItem>
-                          <PaginationPrevious 
-                            onClick={() => setLeaderboardPage(p => Math.max(1, p - 1))}
-                            className={leaderboardPage === 1 ? "pointer-events-none opacity-50" : "cursor-pointer"}
-                          />
-                        </PaginationItem>
-                        {[...Array(leaderboardTotalPages)].map((_, i) => (
-                          <PaginationItem key={i}>
-                            <PaginationLink
-                              onClick={() => setLeaderboardPage(i + 1)}
-                              isActive={leaderboardPage === i + 1}
-                              className="cursor-pointer"
-                            >
-                              {i + 1}
-                            </PaginationLink>
-                          </PaginationItem>
-                        ))}
-                        <PaginationItem>
-                          <PaginationNext 
-                            onClick={() => setLeaderboardPage(p => Math.min(leaderboardTotalPages, p + 1))}
-                            className={leaderboardPage === leaderboardTotalPages ? "pointer-events-none opacity-50" : "cursor-pointer"}
-                          />
-                        </PaginationItem>
-                      </PaginationContent>
-                    </Pagination>
-                  )}
+                      ))}
+                    </TableBody>
+                  </Table>
                 </div>
               )}
             </CardContent>
