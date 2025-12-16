@@ -1,8 +1,8 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Loader2, Search, X, Dumbbell, Activity, ChevronLeft, ChevronRight } from "lucide-react";
+import { Loader2, Search, X, Dumbbell, Activity } from "lucide-react";
 import ExerciseDetailModal from "./ExerciseDetailModal";
 import { useToast } from "@/hooks/use-toast";
 import {
@@ -12,12 +12,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import {
-  Pagination,
-  PaginationContent,
-  PaginationItem,
-  PaginationLink,
-} from "@/components/ui/pagination";
 
 // Exact valid API values
 const BODY_PARTS = ['Legs', 'Back', 'Chest', 'Shoulders', 'Arms', 'Core'];
@@ -59,8 +53,6 @@ interface ExerciseDetail {
   }[];
 }
 
-type ItemsPerPage = 12 | 24 | 'all';
-
 const ExerciseDatabase = () => {
   const [exercises, setExercises] = useState<ExerciseSearchResult[]>([]);
   const [loading, setLoading] = useState(false);
@@ -73,18 +65,10 @@ const ExerciseDatabase = () => {
   const [hasSearched, setHasSearched] = useState(false);
   const { toast } = useToast();
 
-  // Pagination state
-  const [itemsPerPage, setItemsPerPage] = useState<ItemsPerPage>(12);
-  const [currentPage, setCurrentPage] = useState(1);
-  const [totalCount, setTotalCount] = useState(0);
-
-  const fetchExercises = async (page: number = 1) => {
+  const fetchExercises = async () => {
     setLoading(true);
     try {
-      const limit = itemsPerPage === 'all' ? 500 : itemsPerPage;
-      const offset = itemsPerPage === 'all' ? 0 : (page - 1) * itemsPerPage;
-      
-      const params: Record<string, string | number> = { limit, offset };
+      const params: Record<string, string | number> = { limit: 50, offset: 0 };
       
       if (bodyPartFilter && bodyPartFilter !== "all") params.bodyPart = bodyPartFilter;
       if (equipmentFilter && equipmentFilter !== "all") params.equipment = equipmentFilter;
@@ -101,8 +85,6 @@ const ExerciseDatabase = () => {
       }
 
       setExercises(Array.isArray(data?.results) ? data.results : []);
-      setTotalCount(data?.total || 0);
-      setCurrentPage(page);
       setHasSearched(true);
     } catch (error: any) {
       console.error('Error fetching exercises:', error);
@@ -112,7 +94,6 @@ const ExerciseDatabase = () => {
         variant: "destructive",
       });
       setExercises([]);
-      setTotalCount(0);
     } finally {
       setLoading(false);
     }
@@ -146,8 +127,7 @@ const ExerciseDatabase = () => {
   };
 
   const handleSearch = () => {
-    setCurrentPage(1);
-    fetchExercises(1);
+    fetchExercises();
   };
 
   const clearFilters = () => {
@@ -156,40 +136,15 @@ const ExerciseDatabase = () => {
     setTypeFilter("");
     setExercises([]);
     setHasSearched(false);
-    setCurrentPage(1);
-    setTotalCount(0);
   };
 
   const handleExerciseClick = (exercise: ExerciseSearchResult) => {
     fetchExerciseDetail(exercise.id);
   };
 
-  const handleItemsPerPageChange = (value: ItemsPerPage) => {
-    setItemsPerPage(value);
-    if (hasSearched) {
-      setCurrentPage(1);
-      // Will refetch in useEffect
-    }
-  };
-
-  // Refetch when itemsPerPage changes (only if already searched)
-  useEffect(() => {
-    if (hasSearched) {
-      fetchExercises(1);
-    }
-  }, [itemsPerPage]);
-
-  const handlePageChange = (page: number) => {
-    if (page >= 1 && page <= totalPages) {
-      fetchExercises(page);
-    }
-  };
-
   const hasFilters = (bodyPartFilter && bodyPartFilter !== "all") || 
                      (equipmentFilter && equipmentFilter !== "all") || 
                      (typeFilter && typeFilter !== "all");
-
-  const totalPages = itemsPerPage === 'all' ? 1 : Math.ceil(totalCount / itemsPerPage);
 
   return (
     <div className="space-y-6">
@@ -293,34 +248,6 @@ const ExerciseDatabase = () => {
         </div>
       )}
 
-      {/* Results Header with Show Selector */}
-      {hasSearched && exercises.length > 0 && (
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 pb-2 border-b border-border">
-          <p className="text-sm text-muted-foreground">
-            <span className="font-medium text-foreground">{totalCount}</span> exercises found
-            {itemsPerPage !== 'all' && totalCount > itemsPerPage && (
-              <span> • Showing {Math.min(exercises.length, itemsPerPage)} per page</span>
-            )}
-          </p>
-          <div className="flex items-center gap-2">
-            <span className="text-sm text-muted-foreground">Show:</span>
-            <div className="flex gap-1">
-              {([12, 24, 'all'] as ItemsPerPage[]).map((value) => (
-                <Button
-                  key={value}
-                  variant={itemsPerPage === value ? "default" : "outline"}
-                  size="sm"
-                  onClick={() => handleItemsPerPageChange(value)}
-                  className="h-7 px-3 text-xs"
-                >
-                  {value === 'all' ? 'All' : value}
-                </Button>
-              ))}
-            </div>
-          </div>
-        </div>
-      )}
-
       {/* Results */}
       {loading ? (
         <div className="flex items-center justify-center py-12">
@@ -328,7 +255,7 @@ const ExerciseDatabase = () => {
           <span className="ml-2 text-muted-foreground">Loading exercises...</span>
         </div>
       ) : exercises.length > 0 ? (
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 max-h-[300px] overflow-y-auto pr-2">
           {exercises.map((exercise) => (
             <div
               key={exercise.id}
@@ -363,70 +290,6 @@ const ExerciseDatabase = () => {
         <div className="text-center py-12 text-muted-foreground">
           <Dumbbell className="h-12 w-12 mx-auto mb-4 opacity-50" />
           <p>Select filters and click Search to browse exercises</p>
-        </div>
-      )}
-
-      {/* Pagination Controls */}
-      {hasSearched && exercises.length > 0 && itemsPerPage !== 'all' && totalPages > 1 && (
-        <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-4">
-          <Pagination>
-            <PaginationContent>
-              <PaginationItem>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => handlePageChange(currentPage - 1)}
-                  disabled={currentPage === 1 || loading}
-                  className="gap-1"
-                >
-                  <ChevronLeft className="h-4 w-4" />
-                  Previous
-                </Button>
-              </PaginationItem>
-              
-              {/* Page numbers */}
-              {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
-                let pageNum: number;
-                if (totalPages <= 5) {
-                  pageNum = i + 1;
-                } else if (currentPage <= 3) {
-                  pageNum = i + 1;
-                } else if (currentPage >= totalPages - 2) {
-                  pageNum = totalPages - 4 + i;
-                } else {
-                  pageNum = currentPage - 2 + i;
-                }
-                return (
-                  <PaginationItem key={pageNum}>
-                    <PaginationLink
-                      onClick={() => handlePageChange(pageNum)}
-                      isActive={currentPage === pageNum}
-                      className="cursor-pointer"
-                    >
-                      {pageNum}
-                    </PaginationLink>
-                  </PaginationItem>
-                );
-              })}
-
-              <PaginationItem>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => handlePageChange(currentPage + 1)}
-                  disabled={currentPage === totalPages || loading}
-                  className="gap-1"
-                >
-                  Next
-                  <ChevronRight className="h-4 w-4" />
-                </Button>
-              </PaginationItem>
-            </PaginationContent>
-          </Pagination>
-          
-          <p className="text-sm text-muted-foreground">
-            Page {currentPage} of {totalPages}
-          </p>
         </div>
       )}
 
