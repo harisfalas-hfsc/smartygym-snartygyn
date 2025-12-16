@@ -148,7 +148,7 @@ export const HeroThreeColumns = () => {
   };
 
   return (
-    <div className="flex flex-col lg:flex-row lg:items-start gap-6 lg:gap-0 mt-6">
+    <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-6 lg:gap-4 mt-6">
       {/* Column 1: Explore */}
       <div className="pt-8 lg:pr-6 xl:pr-12">
         <h3 className="text-lg font-bold text-foreground mb-4">
@@ -217,7 +217,7 @@ export const HeroThreeColumns = () => {
       </div>
 
       {/* Column 4: WOD Promotional Banner */}
-      <div className="pt-8 lg:pl-6 xl:pl-12 lg:ml-auto">
+      <div className="pt-8">
         <div 
           onClick={() => navigate("/workout/wod")}
           className="cursor-pointer group border-2 border-green-500 rounded-xl p-4 
