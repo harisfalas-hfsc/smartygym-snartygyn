@@ -8,7 +8,6 @@ import { useShowBackButton } from "@/hooks/useShowBackButton";
 import { SEOEnhancer } from "@/components/SEOEnhancer";
 import ExerciseVideoGrid from "@/components/ExerciseVideoGrid";
 import ExerciseDatabase from "@/components/ExerciseDatabase";
-import { ExerciseDemonstrations } from "@/components/ExerciseDemonstrations";
 
 const ExerciseLibrary = () => {
   const navigate = useNavigate();
@@ -86,11 +85,6 @@ const ExerciseLibrary = () => {
               { label: "Exercise Library" }
             ]} 
           />
-
-          {/* Exercise Demonstrations Card - ExerciseDB API */}
-          <div className="mb-6">
-            <ExerciseDemonstrations />
-          </div>
 
           {/* Exercise Database Card - Gym Fit API */}
           <Card className="border-2 border-primary/30 shadow-lg mb-6">

@@ -255,7 +255,7 @@ const ExerciseDatabase = () => {
           <span className="ml-2 text-muted-foreground">Loading exercises...</span>
         </div>
       ) : exercises.length > 0 ? (
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 max-h-[300px] overflow-y-auto pr-2">
           {exercises.map((exercise) => (
             <div
               key={exercise.id}
