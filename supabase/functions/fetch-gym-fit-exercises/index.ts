@@ -38,8 +38,6 @@ serve(async (req) => {
         if (params?.bodyPart) searchParams.set('bodyPart', params.bodyPart);
         if (params?.equipment) searchParams.set('equipment', params.equipment);
         if (params?.type) searchParams.set('type', params.type);
-        // Test name search parameter
-        if (params?.name) searchParams.set('name', params.name);
         if (searchParams.toString()) {
           apiUrl += `?${searchParams.toString()}`;
         }

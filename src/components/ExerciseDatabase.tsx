@@ -70,10 +70,9 @@ const ExerciseDatabase = () => {
   const fetchExercises = async () => {
     setLoading(true);
     try {
-      const params: Record<string, string | number> = { limit: 100, offset: 0 };
+      const params: Record<string, string | number> = { limit: 50, offset: 0 };
       
-      // Add name search if provided
-      if (nameSearch.trim()) params.name = nameSearch.trim();
+      // Only send supported filters to API (not name - it's not supported)
       if (bodyPartFilter && bodyPartFilter !== "all") params.bodyPart = bodyPartFilter;
       if (equipmentFilter && equipmentFilter !== "all") params.equipment = equipmentFilter;
       if (typeFilter && typeFilter !== "all") params.type = typeFilter;
