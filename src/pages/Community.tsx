@@ -16,6 +16,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Skeleton } from "@/components/ui/skeleton";
+import { ScrollArea } from "@/components/ui/scroll-area";
 import { Button } from "@/components/ui/button";
 import { Trophy, MessageSquare, Star, User, Calendar, ClipboardCheck, ArrowLeft } from "lucide-react";
 import { TestimonialsSection } from "@/components/community/TestimonialsSection";
@@ -453,14 +454,13 @@ programEntries.sort((a, b) => b.total_completions - a.total_completions);
     return sorted;
   };
 
-  const getTopRatings = () => {
-    const sorted = getSortedRatings();
-    return sorted.slice(0, 6); // Only top 6
+  const getAllRatings = () => {
+    return getSortedRatings(); // Return ALL ratings for scrolling
   };
 
-  // Get top 6 comments
-  const getTopComments = () => {
-    return comments.slice(0, 6);
+  // Get all comments for scrolling
+  const getAllComments = () => {
+    return comments;
   };
 
   return (
@@ -676,7 +676,7 @@ programEntries.sort((a, b) => b.total_completions - a.total_completions);
                     <Skeleton key={i} className="h-12 w-full" />
                   ))}
                 </div>
-              ) : getTopRatings().length === 0 ? (
+              ) : getAllRatings().length === 0 ? (
                 <div className="text-center py-12 text-muted-foreground">
                   <Star className="h-12 w-12 mx-auto mb-4 opacity-30" />
                   <p className="text-lg font-medium mb-2">
@@ -687,54 +687,56 @@ programEntries.sort((a, b) => b.total_completions - a.total_completions);
                   </p>
                 </div>
               ) : (
-                <div className="overflow-x-auto">
-                  <Table>
-                    <TableHeader>
-                      <TableRow className="border-primary/30">
-                        <TableHead className="w-12 md:w-16 text-xs md:text-sm">Rank</TableHead>
-                        <TableHead className="text-xs md:text-sm">Name</TableHead>
-                        <TableHead className="text-center text-xs md:text-sm">Rating</TableHead>
-                        <TableHead className="text-right text-xs md:text-sm">Reviews</TableHead>
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                      {getTopRatings().map((item, index) => (
-                        <TableRow
-                          key={item.content_id}
-                          className="border-primary/20 hover:bg-primary/5"
-                        >
-                          <TableCell className="font-medium text-xs md:text-sm py-2 md:py-3">
-                            <div className="flex items-center gap-1 md:gap-2">
-                              <span className="text-base md:text-lg">{getMedalIcon(index)}</span>
-                            </div>
-                          </TableCell>
-                          <TableCell className="py-2 md:py-3">
-                            <Link 
-                              to={item.content_type === "workout" 
-                                ? `/workout/${item.workout_type}/${item.content_id}`
-                                : `/trainingprogram/${item.program_type}/${item.content_id}`
-                              }
-                              className="font-medium text-xs md:text-sm truncate text-primary hover:underline"
-                            >
-                              {item.content_name}
-                            </Link>
-                          </TableCell>
-                          <TableCell className="text-center py-2 md:py-3">
-                            <div className="flex items-center justify-center gap-1">
-                              <Star className="h-3 w-3 md:h-4 md:w-4 fill-primary text-primary" />
-                              <span className="font-semibold text-xs md:text-sm">{item.average_rating.toFixed(1)}</span>
-                            </div>
-                          </TableCell>
-                          <TableCell className="text-right py-2 md:py-3">
-                            <span className="inline-flex items-center gap-1 px-2 md:px-3 py-0.5 md:py-1 rounded-full bg-primary/10 text-primary font-semibold text-xs md:text-sm whitespace-nowrap">
-                              {item.rating_count}
-                            </span>
-                          </TableCell>
+                <ScrollArea className="h-[350px]">
+                  <div className="overflow-x-auto">
+                    <Table>
+                      <TableHeader>
+                        <TableRow className="border-primary/30">
+                          <TableHead className="w-12 md:w-16 text-xs md:text-sm">Rank</TableHead>
+                          <TableHead className="text-xs md:text-sm">Name</TableHead>
+                          <TableHead className="text-center text-xs md:text-sm">Rating</TableHead>
+                          <TableHead className="text-right text-xs md:text-sm">Reviews</TableHead>
                         </TableRow>
-                      ))}
-                    </TableBody>
-                  </Table>
-                </div>
+                      </TableHeader>
+                      <TableBody>
+                        {getAllRatings().map((item, index) => (
+                          <TableRow
+                            key={item.content_id}
+                            className="border-primary/20 hover:bg-primary/5"
+                          >
+                            <TableCell className="font-medium text-xs md:text-sm py-2 md:py-3">
+                              <div className="flex items-center gap-1 md:gap-2">
+                                <span className="text-base md:text-lg">{getMedalIcon(index)}</span>
+                              </div>
+                            </TableCell>
+                            <TableCell className="py-2 md:py-3">
+                              <Link 
+                                to={item.content_type === "workout" 
+                                  ? `/workout/${item.workout_type}/${item.content_id}`
+                                  : `/trainingprogram/${item.program_type}/${item.content_id}`
+                                }
+                                className="font-medium text-xs md:text-sm truncate text-primary hover:underline"
+                              >
+                                {item.content_name}
+                              </Link>
+                            </TableCell>
+                            <TableCell className="text-center py-2 md:py-3">
+                              <div className="flex items-center justify-center gap-1">
+                                <Star className="h-3 w-3 md:h-4 md:w-4 fill-primary text-primary" />
+                                <span className="font-semibold text-xs md:text-sm">{item.average_rating.toFixed(1)}</span>
+                              </div>
+                            </TableCell>
+                            <TableCell className="text-right py-2 md:py-3">
+                              <span className="inline-flex items-center gap-1 px-2 md:px-3 py-0.5 md:py-1 rounded-full bg-primary/10 text-primary font-semibold text-xs md:text-sm whitespace-nowrap">
+                                {item.rating_count}
+                              </span>
+                            </TableCell>
+                          </TableRow>
+                        ))}
+                      </TableBody>
+                    </Table>
+                  </div>
+                </ScrollArea>
               )}
             </CardContent>
           </Card>
@@ -793,55 +795,57 @@ programEntries.sort((a, b) => b.total_completions - a.total_completions);
                   </p>
                 </div>
               ) : (
-                <div className="space-y-3 md:space-y-4">
-                  {getTopComments().map((comment) => (
-                    <div
-                      key={comment.id}
-                      className="p-3 md:p-4 rounded-lg border-2 border-primary/20 bg-gradient-to-r from-background to-primary/5 hover:border-primary/40 transition-colors"
-                    >
-                      <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-2 mb-2">
-                        <div className="flex items-center gap-2">
-                          <User className="h-3 w-3 md:h-4 md:w-4 text-primary flex-shrink-0" />
-                          <span className="font-semibold text-xs md:text-sm truncate">
-                            {comment.display_name}
-                          </span>
+                <ScrollArea className="h-[400px]">
+                  <div className="space-y-3 md:space-y-4 pr-4">
+                    {getAllComments().map((comment) => (
+                      <div
+                        key={comment.id}
+                        className="p-3 md:p-4 rounded-lg border-2 border-primary/20 bg-gradient-to-r from-background to-primary/5 hover:border-primary/40 transition-colors"
+                      >
+                        <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-2 mb-2">
+                          <div className="flex items-center gap-2">
+                            <User className="h-3 w-3 md:h-4 md:w-4 text-primary flex-shrink-0" />
+                            <span className="font-semibold text-xs md:text-sm truncate">
+                              {comment.display_name}
+                            </span>
+                          </div>
+                          <div className="flex items-center gap-1 text-xs text-muted-foreground whitespace-nowrap">
+                            <Calendar className="h-3 w-3" />
+                            <span className="text-[10px] md:text-xs">
+                              {formatDistanceToNow(new Date(comment.created_at), {
+                                addSuffix: true,
+                              })}
+                            </span>
+                          </div>
                         </div>
-                        <div className="flex items-center gap-1 text-xs text-muted-foreground whitespace-nowrap">
-                          <Calendar className="h-3 w-3" />
-                          <span className="text-[10px] md:text-xs">
-                            {formatDistanceToNow(new Date(comment.created_at), {
-                              addSuffix: true,
-                            })}
-                          </span>
-                        </div>
+                        <p className="text-[10px] md:text-xs text-primary font-medium mb-2">
+                          {comment.workout_name ? (
+                            <>
+                              Workout:{" "}
+                              <Link
+                                to={`/workout/${comment.workout_type}/${comment.workout_id}`}
+                                className="hover:underline font-semibold"
+                              >
+                                {comment.workout_name}
+                              </Link>
+                            </>
+                          ) : (
+                            <>
+                              Program:{" "}
+                              <Link
+                                to={`/trainingprogram/${comment.program_type}/${comment.program_id}`}
+                                className="hover:underline font-semibold"
+                              >
+                                {comment.program_name}
+                              </Link>
+                            </>
+                          )}
+                        </p>
+                        <p className="text-xs md:text-sm leading-relaxed">{comment.comment_text}</p>
                       </div>
-                      <p className="text-[10px] md:text-xs text-primary font-medium mb-2">
-                        {comment.workout_name ? (
-                          <>
-                            Workout:{" "}
-                            <Link
-                              to={`/workout/${comment.workout_type}/${comment.workout_id}`}
-                              className="hover:underline font-semibold"
-                            >
-                              {comment.workout_name}
-                            </Link>
-                          </>
-                        ) : (
-                          <>
-                            Program:{" "}
-                            <Link
-                              to={`/trainingprogram/${comment.program_type}/${comment.program_id}`}
-                              className="hover:underline font-semibold"
-                            >
-                              {comment.program_name}
-                            </Link>
-                          </>
-                        )}
-                      </p>
-                      <p className="text-xs md:text-sm leading-relaxed">{comment.comment_text}</p>
-                    </div>
-                  ))}
-                </div>
+                    ))}
+                  </div>
+                </ScrollArea>
               )}
             </CardContent>
           </Card>
