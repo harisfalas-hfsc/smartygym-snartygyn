@@ -447,14 +447,14 @@ const Index = () => {
               </p>
             </div>
 
-            <Carousel className="w-full px-2" opts={{
-          align: "start",
+            <Carousel className="w-full px-6" opts={{
+          align: "center",
           loop: true
         }} setApi={setCarouselApi}>
               <CarouselContent className="-ml-4">
                 {heroCards.map(card => {
               const Icon = card.icon;
-              return <CarouselItem key={card.id} className="pl-4 basis-[90%]">
+              return <CarouselItem key={card.id} className="pl-4 basis-[70%]">
                       <Card onClick={() => navigate(card.route)} className="h-[160px] border-[3px] border-primary/40 hover:border-primary hover:scale-[1.02] hover:shadow-xl hover:bg-primary/5 transition-all duration-300 cursor-pointer">
                         <CardContent className="h-full flex flex-row items-center p-4 gap-4">
                           
