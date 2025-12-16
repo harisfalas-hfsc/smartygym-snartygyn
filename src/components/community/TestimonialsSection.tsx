@@ -20,7 +20,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Star, User, Calendar, Pencil, Trash2, Quote } from "lucide-react";
+import { Star, User, Calendar, Pencil, Trash2, Quote, Eye } from "lucide-react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { format } from "date-fns";
 import { toast } from "sonner";
@@ -56,6 +56,7 @@ export const TestimonialsSection = () => {
   // Delete confirmation
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [testimonialToDelete, setTestimonialToDelete] = useState<string | null>(null);
+  const [showViewAllModal, setShowViewAllModal] = useState(false);
 
   useEffect(() => {
     fetchTestimonials();
@@ -208,8 +209,8 @@ export const TestimonialsSection = () => {
     );
   };
 
-  const getAllTestimonials = () => {
-    return testimonials; // Return ALL testimonials for scrolling
+  const getTopTestimonials = () => {
+    return testimonials.slice(0, 6);
   };
 
   return (
@@ -273,9 +274,9 @@ export const TestimonialsSection = () => {
             <p className="text-sm">Be the first premium member to share your experience!</p>
           </div>
         ) : (
-          <ScrollArea className="h-[400px]">
-            <div className="space-y-3 md:space-y-4 pr-4">
-              {getAllTestimonials().map((testimonial) => (
+          <>
+            <div className="space-y-3 md:space-y-4">
+              {getTopTestimonials().map((testimonial) => (
                 <div
                   key={testimonial.id}
                   className="p-3 md:p-4 rounded-lg border-2 border-primary/20 bg-gradient-to-r from-background to-primary/5 hover:border-primary/40 transition-colors"
@@ -325,7 +326,20 @@ export const TestimonialsSection = () => {
                 </div>
               ))}
             </div>
-          </ScrollArea>
+            {testimonials.length > 6 && (
+              <div className="mt-4 text-center">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setShowViewAllModal(true)}
+                  className="gap-2"
+                >
+                  <Eye className="h-4 w-4" />
+                  View All ({testimonials.length})
+                </Button>
+              </div>
+            )}
+          </>
         )}
       </CardContent>
 
@@ -398,6 +412,77 @@ export const TestimonialsSection = () => {
               Delete
             </Button>
           </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* View All Testimonials Modal */}
+      <Dialog open={showViewAllModal} onOpenChange={setShowViewAllModal}>
+        <DialogContent className="max-w-2xl max-h-[80vh]">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Quote className="h-5 w-5 text-primary" />
+              All Community Testimonials
+            </DialogTitle>
+          </DialogHeader>
+          <ScrollArea className="h-[60vh] pr-4">
+            <div className="space-y-3 md:space-y-4">
+              {testimonials.map((testimonial) => (
+                <div
+                  key={testimonial.id}
+                  className="p-3 md:p-4 rounded-lg border-2 border-primary/20 bg-gradient-to-r from-background to-primary/5"
+                >
+                  <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-2 mb-2">
+                    <div className="flex items-center gap-2">
+                      <User className="h-3 w-3 md:h-4 md:w-4 text-primary flex-shrink-0" />
+                      <span className="font-semibold text-xs md:text-sm truncate">
+                        {testimonial.display_name}
+                      </span>
+                      {renderStars(testimonial.rating)}
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <div className="flex items-center gap-1 text-xs text-muted-foreground whitespace-nowrap">
+                        <Calendar className="h-3 w-3" />
+                        <span className="text-[10px] md:text-xs">
+                          {format(new Date(testimonial.created_at), "MMM d, yyyy 'at' h:mm a")}
+                        </span>
+                      </div>
+                      
+                      {/* Edit/Delete buttons - only for owner */}
+                      {user?.id === testimonial.user_id && (
+                        <div className="flex items-center gap-1 ml-2">
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => {
+                              setShowViewAllModal(false);
+                              handleEdit(testimonial);
+                            }}
+                            className="h-7 w-7 p-0 hover:bg-primary/10"
+                          >
+                            <Pencil className="h-3 w-3 text-muted-foreground hover:text-primary" />
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => {
+                              setShowViewAllModal(false);
+                              handleDeleteClick(testimonial.id);
+                            }}
+                            className="h-7 w-7 p-0 hover:bg-destructive/10"
+                          >
+                            <Trash2 className="h-3 w-3 text-muted-foreground hover:text-destructive" />
+                          </Button>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                  <p className="text-xs md:text-sm leading-relaxed text-foreground/90">
+                    "{testimonial.testimonial_text}"
+                  </p>
+                </div>
+              ))}
+            </div>
+          </ScrollArea>
         </DialogContent>
       </Dialog>
     </Card>
