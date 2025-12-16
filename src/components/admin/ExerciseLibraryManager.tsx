@@ -10,9 +10,10 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Plus, Pencil, Trash2, Video, Eye, EyeOff, ExternalLink } from "lucide-react";
+import { Plus, Pencil, Trash2, Video, ExternalLink } from "lucide-react";
 import { toast } from "sonner";
 import { extractYouTubeId, getYouTubeThumbnail, isValidYouTubeUrl, getRestrictedEmbedUrl } from "@/utils/youtube";
+import { MUSCLE_CATEGORIES, MUSCLE_GROUPS, WORKOUT_CATEGORIES, PROGRAM_CATEGORIES } from "@/constants/exerciseCategories";
 
 interface ExerciseVideo {
   id: string;
@@ -22,22 +23,14 @@ interface ExerciseVideo {
   youtube_url: string;
   thumbnail_url: string | null;
   category: string;
+  muscle_group: string | null;
+  target_muscle: string | null;
+  workout_category: string | null;
+  program_category: string | null;
   display_order: number;
   is_visible: boolean;
   created_at: string;
 }
-
-const CATEGORIES = [
-  'Upper Body',
-  'Lower Body',
-  'Core',
-  'Full Body',
-  'Cardio',
-  'Mobility',
-  'Warm-Up',
-  'Cool-Down',
-  'General'
-];
 
 const ExerciseLibraryManager = () => {
   const queryClient = useQueryClient();
@@ -50,7 +43,10 @@ const ExerciseLibraryManager = () => {
     title: '',
     description: '',
     youtube_url: '',
-    category: 'General',
+    muscle_group: '',
+    target_muscle: '',
+    workout_category: '',
+    program_category: '',
     display_order: 0,
     is_visible: true
   });
@@ -83,7 +79,11 @@ const ExerciseLibraryManager = () => {
           youtube_url: data.youtube_url,
           youtube_video_id: videoId,
           thumbnail_url: getYouTubeThumbnail(videoId, 'hq'),
-          category: data.category,
+          category: data.muscle_group || 'General',
+          muscle_group: data.muscle_group || null,
+          target_muscle: data.target_muscle || null,
+          workout_category: data.workout_category || null,
+          program_category: data.program_category || null,
           display_order: data.display_order,
           is_visible: data.is_visible
         });
@@ -114,7 +114,11 @@ const ExerciseLibraryManager = () => {
           youtube_url: data.youtube_url,
           youtube_video_id: videoId,
           thumbnail_url: getYouTubeThumbnail(videoId, 'hq'),
-          category: data.category,
+          category: data.muscle_group || 'General',
+          muscle_group: data.muscle_group || null,
+          target_muscle: data.target_muscle || null,
+          workout_category: data.workout_category || null,
+          program_category: data.program_category || null,
           display_order: data.display_order,
           is_visible: data.is_visible
         })
@@ -176,7 +180,10 @@ const ExerciseLibraryManager = () => {
       title: '',
       description: '',
       youtube_url: '',
-      category: 'General',
+      muscle_group: '',
+      target_muscle: '',
+      workout_category: '',
+      program_category: '',
       display_order: 0,
       is_visible: true
     });
@@ -188,7 +195,10 @@ const ExerciseLibraryManager = () => {
       title: video.title,
       description: video.description || '',
       youtube_url: video.youtube_url,
-      category: video.category,
+      muscle_group: video.muscle_group || '',
+      target_muscle: video.target_muscle || '',
+      workout_category: video.workout_category || '',
+      program_category: video.program_category || '',
       display_order: video.display_order,
       is_visible: video.is_visible
     });
@@ -200,6 +210,14 @@ const ExerciseLibraryManager = () => {
     setFormData(prev => ({ ...prev, youtube_url: url }));
     const videoId = extractYouTubeId(url);
     setPreviewVideoId(videoId);
+  };
+
+  const handleMuscleGroupChange = (value: string) => {
+    setFormData(prev => ({ 
+      ...prev, 
+      muscle_group: value === 'none' ? '' : value,
+      target_muscle: '' // Reset target muscle when group changes
+    }));
   };
 
   const handleSubmit = () => {
@@ -218,6 +236,10 @@ const ExerciseLibraryManager = () => {
       createMutation.mutate(formData);
     }
   };
+
+  const availableMuscles = formData.muscle_group && formData.muscle_group !== 'none'
+    ? MUSCLE_CATEGORIES[formData.muscle_group as keyof typeof MUSCLE_CATEGORIES] || []
+    : [];
 
   return (
     <div className="space-y-6">
@@ -255,7 +277,9 @@ const ExerciseLibraryManager = () => {
                   <TableRow>
                     <TableHead>Thumbnail</TableHead>
                     <TableHead>Title</TableHead>
-                    <TableHead>Category</TableHead>
+                    <TableHead>Muscle</TableHead>
+                    <TableHead>Workout</TableHead>
+                    <TableHead>Program</TableHead>
                     <TableHead>Order</TableHead>
                     <TableHead>Visible</TableHead>
                     <TableHead className="text-right">Actions</TableHead>
@@ -277,7 +301,23 @@ const ExerciseLibraryManager = () => {
                           {new Date(video.created_at).toLocaleDateString()}
                         </p>
                       </TableCell>
-                      <TableCell>{video.category}</TableCell>
+                      <TableCell>
+                        <div className="text-sm">
+                          {video.muscle_group && (
+                            <p className="font-medium">{video.muscle_group}</p>
+                          )}
+                          {video.target_muscle && (
+                            <p className="text-xs text-muted-foreground">{video.target_muscle}</p>
+                          )}
+                          {!video.muscle_group && <span className="text-muted-foreground">-</span>}
+                        </div>
+                      </TableCell>
+                      <TableCell>
+                        <span className="text-sm">{video.workout_category || '-'}</span>
+                      </TableCell>
+                      <TableCell>
+                        <span className="text-sm">{video.program_category || '-'}</span>
+                      </TableCell>
                       <TableCell>{video.display_order}</TableCell>
                       <TableCell>
                         <Switch
@@ -381,24 +421,89 @@ const ExerciseLibraryManager = () => {
               />
             </div>
 
+            {/* Muscle Category Section */}
+            <div className="border rounded-lg p-4 space-y-4 bg-muted/30">
+              <h4 className="font-semibold text-sm">Muscle Category (for exercises)</h4>
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label>Body Region</Label>
+                  <Select
+                    value={formData.muscle_group || 'none'}
+                    onValueChange={handleMuscleGroupChange}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select body region" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="none">None</SelectItem>
+                      {MUSCLE_GROUPS.map((group) => (
+                        <SelectItem key={group} value={group}>{group}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <div className="space-y-2">
+                  <Label>Target Muscle</Label>
+                  <Select
+                    value={formData.target_muscle || 'none'}
+                    onValueChange={(value) => setFormData(prev => ({ ...prev, target_muscle: value === 'none' ? '' : value }))}
+                    disabled={!formData.muscle_group}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select muscle" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="none">None</SelectItem>
+                      {availableMuscles.map((muscle) => (
+                        <SelectItem key={muscle} value={muscle}>{muscle}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+            </div>
+
+            {/* Workout & Program Categories */}
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label htmlFor="category">Category</Label>
+                <Label>Workout Category</Label>
                 <Select
-                  value={formData.category}
-                  onValueChange={(value) => setFormData(prev => ({ ...prev, category: value }))}
+                  value={formData.workout_category || 'none'}
+                  onValueChange={(value) => setFormData(prev => ({ ...prev, workout_category: value === 'none' ? '' : value }))}
                 >
                   <SelectTrigger>
-                    <SelectValue />
+                    <SelectValue placeholder="Select workout category" />
                   </SelectTrigger>
                   <SelectContent>
-                    {CATEGORIES.map((cat) => (
+                    <SelectItem value="none">None</SelectItem>
+                    {WORKOUT_CATEGORIES.map((cat) => (
                       <SelectItem key={cat} value={cat}>{cat}</SelectItem>
                     ))}
                   </SelectContent>
                 </Select>
               </div>
 
+              <div className="space-y-2">
+                <Label>Program Category</Label>
+                <Select
+                  value={formData.program_category || 'none'}
+                  onValueChange={(value) => setFormData(prev => ({ ...prev, program_category: value === 'none' ? '' : value }))}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select program category" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="none">None</SelectItem>
+                    {PROGRAM_CATEGORIES.map((cat) => (
+                      <SelectItem key={cat} value={cat}>{cat}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label htmlFor="display_order">Display Order</Label>
                 <Input
@@ -408,15 +513,14 @@ const ExerciseLibraryManager = () => {
                   onChange={(e) => setFormData(prev => ({ ...prev, display_order: parseInt(e.target.value) || 0 }))}
                 />
               </div>
-            </div>
-
-            <div className="flex items-center space-x-2">
-              <Switch
-                id="is_visible"
-                checked={formData.is_visible}
-                onCheckedChange={(checked) => setFormData(prev => ({ ...prev, is_visible: checked }))}
-              />
-              <Label htmlFor="is_visible">Visible to users</Label>
+              <div className="flex items-center space-x-2 pt-7">
+                <Switch
+                  id="is_visible"
+                  checked={formData.is_visible}
+                  onCheckedChange={(checked) => setFormData(prev => ({ ...prev, is_visible: checked }))}
+                />
+                <Label htmlFor="is_visible">Visible to users</Label>
+              </div>
             </div>
           </div>
 
