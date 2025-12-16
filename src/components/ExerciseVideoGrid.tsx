@@ -1,11 +1,12 @@
 import { useState, useMemo } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { Play, Video, X, Filter } from "lucide-react";
+import { Play, Video, X, Filter, Search } from "lucide-react";
 import { getYouTubeThumbnail } from "@/utils/youtube";
 import ExerciseVideoModal from "./ExerciseVideoModal";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
 import { MUSCLE_CATEGORIES, MUSCLE_GROUPS, WORKOUT_CATEGORIES, PROGRAM_CATEGORIES, WORKOUT_PHASES } from "@/constants/exerciseCategories";
@@ -34,6 +35,7 @@ interface Filters {
 
 const ExerciseVideoGrid = () => {
   const [selectedVideo, setSelectedVideo] = useState<ExerciseVideo | null>(null);
+  const [searchQuery, setSearchQuery] = useState('');
   const [filters, setFilters] = useState<Filters>({
     muscleGroup: '',
     targetMuscle: '',
@@ -61,6 +63,11 @@ const ExerciseVideoGrid = () => {
     if (!videos) return [];
     
     return videos.filter(video => {
+      // Search by title (case-insensitive)
+      if (searchQuery) {
+        const query = searchQuery.toLowerCase();
+        if (!video.title.toLowerCase().includes(query)) return false;
+      }
       if (filters.muscleGroup && video.muscle_group !== filters.muscleGroup) return false;
       if (filters.targetMuscle && video.target_muscle !== filters.targetMuscle) return false;
       if (filters.workoutPhase && video.workout_phase !== filters.workoutPhase) return false;
@@ -68,7 +75,7 @@ const ExerciseVideoGrid = () => {
       if (filters.programCategory && video.program_category !== filters.programCategory) return false;
       return true;
     });
-  }, [videos, filters]);
+  }, [videos, filters, searchQuery]);
 
   const availableMuscles = filters.muscleGroup
     ? MUSCLE_CATEGORIES[filters.muscleGroup as keyof typeof MUSCLE_CATEGORIES] || []
@@ -83,6 +90,7 @@ const ExerciseVideoGrid = () => {
   };
 
   const clearFilters = () => {
+    setSearchQuery('');
     setFilters({
       muscleGroup: '',
       targetMuscle: '',
@@ -92,7 +100,7 @@ const ExerciseVideoGrid = () => {
     });
   };
 
-  const hasActiveFilters = filters.muscleGroup || filters.targetMuscle || filters.workoutPhase || filters.workoutCategory || filters.programCategory;
+  const hasActiveFilters = searchQuery || filters.muscleGroup || filters.targetMuscle || filters.workoutPhase || filters.workoutCategory || filters.programCategory;
 
   if (isLoading) {
     return (
@@ -112,6 +120,20 @@ const ExerciseVideoGrid = () => {
 
   return (
     <>
+      {/* Search Bar */}
+      <div className="mb-4">
+        <div className="relative">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+          <Input
+            type="text"
+            placeholder="Search exercises by name..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="pl-10"
+          />
+        </div>
+      </div>
+
       {/* Filter Bar */}
       <div className="mb-6 space-y-4">
         <div className="flex items-center gap-2 text-sm text-muted-foreground">
@@ -218,6 +240,12 @@ const ExerciseVideoGrid = () => {
         {hasActiveFilters && (
           <div className="flex flex-wrap items-center gap-2">
             <span className="text-sm text-muted-foreground">Active filters:</span>
+            {searchQuery && (
+              <Badge variant="secondary" className="gap-1">
+                Search: "{searchQuery}"
+                <X className="h-3 w-3 cursor-pointer" onClick={() => setSearchQuery('')} />
+              </Badge>
+            )}
             {filters.muscleGroup && (
               <Badge variant="secondary" className="gap-1">
                 {filters.muscleGroup}
