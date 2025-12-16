@@ -8,6 +8,7 @@ import { useShowBackButton } from "@/hooks/useShowBackButton";
 import { SEOEnhancer } from "@/components/SEOEnhancer";
 import ExerciseVideoGrid from "@/components/ExerciseVideoGrid";
 import ExerciseDatabase from "@/components/ExerciseDatabase";
+import { ExerciseDemonstrations } from "@/components/ExerciseDemonstrations";
 
 const ExerciseLibrary = () => {
   const navigate = useNavigate();
@@ -86,6 +87,11 @@ const ExerciseLibrary = () => {
             ]} 
           />
 
+          {/* Exercise Demonstrations Card - ExerciseDB API */}
+          <div className="mb-6">
+            <ExerciseDemonstrations />
+          </div>
+
           {/* Exercise Database Card - Gym Fit API */}
           <Card className="border-2 border-primary/30 shadow-lg mb-6">
             <CardContent className="p-6">
@@ -94,7 +100,7 @@ const ExerciseLibrary = () => {
                 <h2 className="text-xl font-semibold text-foreground">Exercise Database</h2>
               </div>
               <p className="text-muted-foreground mb-6">
-                Browse hundreds of exercises with animated demonstrations, detailed instructions, and filtering by body part or equipment
+                Browse hundreds of exercises with detailed instructions and filtering by body part or equipment
               </p>
               <ExerciseDatabase />
             </CardContent>
