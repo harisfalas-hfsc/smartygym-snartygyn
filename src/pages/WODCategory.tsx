@@ -231,14 +231,18 @@ const WODCategory = () => {
                 </div>
               </Card>
 
-              {/* 7-Day Cycle Calendar (Public - no export) */}
-              <div className="mb-6">
-                <WODCycleCalendar 
-                  compact 
-                  dayCount={wodState?.day_count || 1} 
-                  weekNumber={wodState?.week_number || 1} 
-                />
-              </div>
+              {/* 7-Day Cycle Calendar (Public - no export) - Only render when data loaded */}
+              {wodState ? (
+                <div className="mb-6">
+                  <WODCycleCalendar 
+                    compact 
+                    dayCount={wodState.day_count} 
+                    weekNumber={wodState.week_number || 1} 
+                  />
+                </div>
+              ) : (
+                <div className="mb-6 h-20 bg-muted/30 rounded-lg animate-pulse" />
+              )}
 
               {/* Yesterday/Today/Tomorrow Timeline */}
               <WODTimeline />
