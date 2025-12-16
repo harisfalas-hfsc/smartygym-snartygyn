@@ -30,6 +30,7 @@ interface ExerciseVideo {
   workout_phase: string | null;
   display_order: number;
   is_visible: boolean;
+  is_promotional: boolean;
   created_at: string;
 }
 
@@ -50,7 +51,8 @@ const ExerciseLibraryManager = () => {
     workout_category: '',
     program_category: '',
     display_order: 0,
-    is_visible: true
+    is_visible: true,
+    is_promotional: false
   });
   const [previewVideoId, setPreviewVideoId] = useState<string | null>(null);
 
@@ -88,7 +90,8 @@ const ExerciseLibraryManager = () => {
           workout_category: data.workout_category || null,
           program_category: data.program_category || null,
           display_order: data.display_order,
-          is_visible: data.is_visible
+          is_visible: data.is_visible,
+          is_promotional: data.is_promotional
         });
 
       if (error) throw error;
@@ -124,7 +127,8 @@ const ExerciseLibraryManager = () => {
           workout_category: data.workout_category || null,
           program_category: data.program_category || null,
           display_order: data.display_order,
-          is_visible: data.is_visible
+          is_visible: data.is_visible,
+          is_promotional: data.is_promotional
         })
         .eq('id', id);
 
@@ -190,7 +194,8 @@ const ExerciseLibraryManager = () => {
       workout_category: '',
       program_category: '',
       display_order: 0,
-      is_visible: true
+      is_visible: true,
+      is_promotional: false
     });
   };
 
@@ -206,7 +211,8 @@ const ExerciseLibraryManager = () => {
       workout_category: video.workout_category || '',
       program_category: video.program_category || '',
       display_order: video.display_order,
-      is_visible: video.is_visible
+      is_visible: video.is_visible,
+      is_promotional: video.is_promotional || false
     });
     setPreviewVideoId(video.youtube_video_id);
     setIsDialogOpen(true);
@@ -287,6 +293,7 @@ const ExerciseLibraryManager = () => {
                     <TableHead>Phase</TableHead>
                     <TableHead>Workout</TableHead>
                     <TableHead>Program</TableHead>
+                    <TableHead>Promo</TableHead>
                     <TableHead>Order</TableHead>
                     <TableHead>Visible</TableHead>
                     <TableHead className="text-right">Actions</TableHead>
@@ -327,6 +334,15 @@ const ExerciseLibraryManager = () => {
                       </TableCell>
                       <TableCell>
                         <span className="text-sm">{video.program_category || '-'}</span>
+                      </TableCell>
+                      <TableCell>
+                        {video.is_promotional ? (
+                          <span className="text-xs bg-pink-100 text-pink-800 dark:bg-pink-900 dark:text-pink-200 px-2 py-0.5 rounded">
+                            Yes
+                          </span>
+                        ) : (
+                          <span className="text-muted-foreground">-</span>
+                        )}
                       </TableCell>
                       <TableCell>{video.display_order}</TableCell>
                       <TableCell>
@@ -535,6 +551,21 @@ const ExerciseLibraryManager = () => {
                     ))}
                   </SelectContent>
                 </Select>
+              </div>
+            </div>
+
+            {/* Promotional Context Section */}
+            <div className="border border-pink-500 rounded-lg p-4 space-y-4 bg-pink-50/30 dark:bg-pink-950/20">
+              <h4 className="font-semibold text-sm text-pink-700 dark:text-pink-300">Promotional Context</h4>
+              <div className="flex items-center space-x-2">
+                <Switch
+                  id="is_promotional"
+                  checked={formData.is_promotional}
+                  onCheckedChange={(checked) => setFormData(prev => ({ ...prev, is_promotional: checked }))}
+                />
+                <Label htmlFor="is_promotional" className="text-sm">
+                  Mark as Promotional Video (Instagram, Facebook, TikTok)
+                </Label>
               </div>
             </div>
 

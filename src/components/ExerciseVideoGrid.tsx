@@ -23,6 +23,8 @@ interface ExerciseVideo {
   program_category: string | null;
   workout_phase: string | null;
   display_order: number;
+  is_promotional: boolean;
+  created_at: string;
 }
 
 interface Filters {
@@ -31,6 +33,7 @@ interface Filters {
   workoutPhase: string;
   workoutCategory: string;
   programCategory: string;
+  promotionalSort: 'all' | 'latest' | 'oldest';
 }
 
 const ExerciseVideoGrid = () => {
@@ -41,7 +44,8 @@ const ExerciseVideoGrid = () => {
     targetMuscle: '',
     workoutPhase: '',
     workoutCategory: '',
-    programCategory: ''
+    programCategory: '',
+    promotionalSort: 'all'
   });
 
   const { data: videos, isLoading } = useQuery({
@@ -62,12 +66,16 @@ const ExerciseVideoGrid = () => {
   const filteredVideos = useMemo(() => {
     if (!videos) return [];
     
-    return videos.filter(video => {
+    let result = videos.filter(video => {
       // Search by title (case-insensitive)
       if (searchQuery) {
         const query = searchQuery.toLowerCase();
         if (!video.title.toLowerCase().includes(query)) return false;
       }
+      
+      // Promotional filter - when not 'all', only show promotional videos
+      if (filters.promotionalSort !== 'all' && !video.is_promotional) return false;
+      
       if (filters.muscleGroup && video.muscle_group !== filters.muscleGroup) return false;
       if (filters.targetMuscle && video.target_muscle !== filters.targetMuscle) return false;
       if (filters.workoutPhase && video.workout_phase !== filters.workoutPhase) return false;
@@ -75,6 +83,15 @@ const ExerciseVideoGrid = () => {
       if (filters.programCategory && video.program_category !== filters.programCategory) return false;
       return true;
     });
+
+    // Sort promotional videos by date
+    if (filters.promotionalSort === 'latest') {
+      result = [...result].sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
+    } else if (filters.promotionalSort === 'oldest') {
+      result = [...result].sort((a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime());
+    }
+
+    return result;
   }, [videos, filters, searchQuery]);
 
   const availableMuscles = filters.muscleGroup
@@ -96,11 +113,12 @@ const ExerciseVideoGrid = () => {
       targetMuscle: '',
       workoutPhase: '',
       workoutCategory: '',
-      programCategory: ''
+      programCategory: '',
+      promotionalSort: 'all'
     });
   };
 
-  const hasActiveFilters = searchQuery || filters.muscleGroup || filters.targetMuscle || filters.workoutPhase || filters.workoutCategory || filters.programCategory;
+  const hasActiveFilters = searchQuery || filters.muscleGroup || filters.targetMuscle || filters.workoutPhase || filters.workoutCategory || filters.programCategory || filters.promotionalSort !== 'all';
 
   if (isLoading) {
     return (
@@ -142,7 +160,7 @@ const ExerciseVideoGrid = () => {
         </div>
         
         {/* Grouped Filters */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
           {/* Muscle Targeting Group */}
           <div className="border border-green-500 rounded-lg p-3">
             <p className="text-xs font-medium text-muted-foreground mb-2">Muscle Targeting</p>
@@ -234,6 +252,24 @@ const ExerciseVideoGrid = () => {
               </SelectContent>
             </Select>
           </div>
+
+          {/* Promotional Context Group */}
+          <div className="border border-pink-500 rounded-lg p-3">
+            <p className="text-xs font-medium text-muted-foreground mb-2">Promotional Context</p>
+            <Select
+              value={filters.promotionalSort}
+              onValueChange={(value) => setFilters(prev => ({ ...prev, promotionalSort: value as 'all' | 'latest' | 'oldest' }))}
+            >
+              <SelectTrigger className="h-8 text-sm">
+                <SelectValue placeholder="View Promotional" />
+              </SelectTrigger>
+              <SelectContent side="bottom">
+                <SelectItem value="all">All Videos</SelectItem>
+                <SelectItem value="latest">Promotional (Latest)</SelectItem>
+                <SelectItem value="oldest">Promotional (Oldest)</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
         </div>
 
         {/* Active Filters & Clear */}
@@ -274,6 +310,12 @@ const ExerciseVideoGrid = () => {
               <Badge variant="secondary" className="gap-1">
                 {filters.programCategory}
                 <X className="h-3 w-3 cursor-pointer" onClick={() => setFilters(prev => ({ ...prev, programCategory: '' }))} />
+              </Badge>
+            )}
+            {filters.promotionalSort !== 'all' && (
+              <Badge variant="secondary" className="gap-1 bg-pink-100 text-pink-800 dark:bg-pink-900 dark:text-pink-200">
+                Promotional ({filters.promotionalSort})
+                <X className="h-3 w-3 cursor-pointer" onClick={() => setFilters(prev => ({ ...prev, promotionalSort: 'all' }))} />
               </Badge>
             )}
             <Button variant="ghost" size="sm" onClick={clearFilters} className="h-6 text-xs">
@@ -323,6 +365,12 @@ const ExerciseVideoGrid = () => {
                     <Play className="h-6 w-6 text-primary-foreground fill-current" />
                   </div>
                 </div>
+                {/* Promotional badge */}
+                {video.is_promotional && (
+                  <div className="absolute top-2 right-2 bg-pink-500 text-white text-xs px-2 py-0.5 rounded">
+                    Promo
+                  </div>
+                )}
                 {/* Show most relevant category badge */}
                 <div className="absolute bottom-2 left-2 bg-black/70 text-white text-xs px-2 py-1 rounded">
                   {video.target_muscle || video.muscle_group || video.workout_phase || video.workout_category || video.program_category || 'General'}
