@@ -9,6 +9,7 @@ import { PageBreadcrumbs } from "@/components/PageBreadcrumbs";
 import { ContentLoadingSkeleton } from "@/components/ContentLoadingSkeleton";
 import { useAllWorkouts } from "@/hooks/useWorkoutData";
 import { useWorkoutInteractions } from "@/hooks/useWorkoutInteractions";
+import { useWODState } from "@/hooks/useWODState";
 import { supabase } from "@/integrations/supabase/client";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { WODTimeline } from "@/components/WODTimeline";
@@ -28,7 +29,7 @@ const WODCategory = () => {
     });
   }, []);
 
-  // Fetch workouts and interactions from database
+  // Fetch workouts, interactions, and WOD state from database
   const {
     data: allWorkouts = [],
     isLoading
@@ -36,6 +37,9 @@ const WODCategory = () => {
   const {
     data: interactions = []
   } = useWorkoutInteractions(userId);
+  const {
+    data: wodState
+  } = useWODState();
 
   // Get BOTH current WODs (is_workout_of_day = true)
   const currentWODs = allWorkouts.filter(workout => workout.is_workout_of_day === true);
@@ -229,7 +233,11 @@ const WODCategory = () => {
 
               {/* 7-Day Cycle Calendar (Public - no export) */}
               <div className="mb-6">
-                <WODCycleCalendar compact />
+                <WODCycleCalendar 
+                  compact 
+                  dayCount={wodState?.day_count || 1} 
+                  weekNumber={wodState?.week_number || 1} 
+                />
               </div>
 
               {/* Yesterday/Today/Tomorrow Timeline */}
