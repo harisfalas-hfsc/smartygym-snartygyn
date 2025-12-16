@@ -13,17 +13,11 @@ import {
   DialogDescription,
   DialogFooter,
 } from "@/components/ui/dialog";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { Star, User, Calendar, Pencil, Trash2, Quote, Eye } from "lucide-react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { format } from "date-fns";
 import { toast } from "sonner";
+import { CompactFilters } from "@/components/CompactFilters";
 
 interface Testimonial {
   id: string;
@@ -216,13 +210,13 @@ export const TestimonialsSection = () => {
   return (
     <Card className="border-2 border-primary/30 shadow-lg">
       <CardHeader className="bg-gradient-to-r from-primary/10 to-primary/5 p-4 md:p-6">
-        <CardTitle className="flex items-center gap-2 text-xl md:text-2xl mb-4">
+        <CardTitle className="flex items-center gap-2 text-xl md:text-2xl">
           <Quote className="h-5 w-5 md:h-6 md:w-6 text-primary" />
           Community Testimonials
         </CardTitle>
         
-        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
-          {/* Write testimonial button - only for premium users without existing testimonial */}
+        {/* Write testimonial button or status message - on its own line */}
+        <div className="mt-3">
           {isPremium && !userTestimonial && (
             <Button
               onClick={() => setShowForm(true)}
@@ -243,17 +237,24 @@ export const TestimonialsSection = () => {
               You have already shared your testimonial
             </div>
           )}
-          
-          {/* Sort filter */}
-          <Select value={sortOrder} onValueChange={(v) => setSortOrder(v as "newest" | "oldest")}>
-            <SelectTrigger className="w-full sm:w-[150px]">
-              <SelectValue placeholder="Sort by" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="newest">Newest First</SelectItem>
-              <SelectItem value="oldest">Oldest First</SelectItem>
-            </SelectContent>
-          </Select>
+        </div>
+        
+        {/* CompactFilters - below the button, matching other sections */}
+        <div className="mt-3">
+          <CompactFilters
+            filters={[
+              {
+                name: "Sort",
+                value: sortOrder,
+                onChange: (value) => setSortOrder(value as "newest" | "oldest"),
+                options: [
+                  { value: "newest", label: "Newest First" },
+                  { value: "oldest", label: "Oldest First" }
+                ],
+                placeholder: "Sort by"
+              }
+            ]}
+          />
         </div>
       </CardHeader>
       
