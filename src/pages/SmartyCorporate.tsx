@@ -6,25 +6,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
-import { 
-  Building2, 
-  Check, 
-  Users, 
-  Crown,
-  ArrowLeft,
-  CreditCard,
-  Shield,
-  Headphones,
-  Lightbulb
-} from "lucide-react";
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Building2, Check, Users, Crown, ArrowLeft, CreditCard, Shield, Headphones, Lightbulb } from "lucide-react";
 import { Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { User } from "@supabase/supabase-js";
@@ -40,55 +23,61 @@ const CORPORATE_PLANS = {
     maxUsers: 10,
     price: 399,
     priceId: "price_1Sc28CIxQYg9inGKfoqZgtXZ",
-    productId: "prod_TZATAcAlqgc1P7",
+    productId: "prod_TZATAcAlqgc1P7"
   },
   power: {
     name: "Smarty Power",
     maxUsers: 20,
     price: 499,
     priceId: "price_1Sc28EIxQYg9inGKCDUA4ii8",
-    productId: "prod_TZATDsKcDvMtHc",
+    productId: "prod_TZATDsKcDvMtHc"
   },
   elite: {
     name: "Smarty Elite",
     maxUsers: 30,
     price: 599,
     priceId: "price_1Sc28GIxQYg9inGKS8NkWB11",
-    productId: "prod_TZATGTAsKalmCn",
+    productId: "prod_TZATGTAsKalmCn"
   },
   enterprise: {
     name: "Smarty Enterprise",
     maxUsers: 9999,
     price: 699,
     priceId: "price_1Sc28HIxQYg9inGK3YzEE4YR",
-    productId: "prod_TZATUtaS2jhgtK",
-  },
+    productId: "prod_TZATUtaS2jhgtK"
+  }
 };
-
 export default function SmartyCorporate() {
   const navigate = useNavigate();
-  const { toast } = useToast();
-  const { canGoBack, goBack } = useShowBackButton();
+  const {
+    toast
+  } = useToast();
+  const {
+    canGoBack,
+    goBack
+  } = useShowBackButton();
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState<string | null>(null);
   const [orgDialogOpen, setOrgDialogOpen] = useState(false);
   const [selectedPlan, setSelectedPlan] = useState<keyof typeof CORPORATE_PLANS | null>(null);
   const [organizationName, setOrganizationName] = useState("");
-
   useEffect(() => {
-    supabase.auth.getSession().then(({ data: { session } }) => {
+    supabase.auth.getSession().then(({
+      data: {
+        session
+      }
+    }) => {
       setUser(session?.user ?? null);
     });
-
     const {
-      data: { subscription },
+      data: {
+        subscription
+      }
     } = supabase.auth.onAuthStateChange((_event, session) => {
       setUser(session?.user ?? null);
     });
-
     return () => subscription.unsubscribe();
   }, []);
-
   const handleGetStarted = (planKey: keyof typeof CORPORATE_PLANS) => {
     if (!user) {
       navigate('/auth');
@@ -97,7 +86,6 @@ export default function SmartyCorporate() {
     setSelectedPlan(planKey);
     setOrgDialogOpen(true);
   };
-
   const handleProceedToCheckout = async () => {
     if (!selectedPlan || !organizationName.trim()) {
       toast({
@@ -107,25 +95,24 @@ export default function SmartyCorporate() {
       });
       return;
     }
-
     setLoading(selectedPlan);
     setOrgDialogOpen(false);
-
     try {
-      const { data, error } = await supabase.functions.invoke('create-corporate-checkout', {
-        body: { 
+      const {
+        data,
+        error
+      } = await supabase.functions.invoke('create-corporate-checkout', {
+        body: {
           planType: selectedPlan,
           organizationName: organizationName.trim()
         }
       });
-
       if (error) throw error;
-
       if (data?.url) {
         window.open(data.url, '_blank');
         toast({
           title: "Checkout opened",
-          description: "Complete your purchase in the new tab",
+          description: "Complete your purchase in the new tab"
         });
       }
     } catch (error) {
@@ -141,18 +128,28 @@ export default function SmartyCorporate() {
       setSelectedPlan(null);
     }
   };
-
-  const benefits = [
-    { icon: CreditCard, text: "Centralized billing for your organization" },
-    { icon: Users, text: "Admin dashboard to manage team members" },
-    { icon: Crown, text: "Platinum-level access for all members" },
-    { icon: Shield, text: "1-year subscription period" },
-    { icon: Headphones, text: "Priority support for organizations" },
-    { icon: Lightbulb, text: "Why Invest in Corporate Wellness?", isLink: true, href: "/corporate-wellness" },
-  ];
-
-  return (
-    <>
+  const benefits = [{
+    icon: CreditCard,
+    text: "Centralized billing for your organization"
+  }, {
+    icon: Users,
+    text: "Admin dashboard to manage team members"
+  }, {
+    icon: Crown,
+    text: "Platinum-level access for all members"
+  }, {
+    icon: Shield,
+    text: "1-year subscription period"
+  }, {
+    icon: Headphones,
+    text: "Priority support for organizations"
+  }, {
+    icon: Lightbulb,
+    text: "Why Invest in Corporate Wellness?",
+    isLink: true,
+    href: "/corporate-wellness"
+  }];
+  return <>
       <Helmet>
         <title>Smarty Corporate | Team & Business Plans | SmartyGym</title>
         <meta name="description" content="SmartyGym Corporate plans for teams, businesses, and organizations. Get Platinum access for 10-unlimited team members. Centralized billing, admin dashboard, priority support." />
@@ -166,36 +163,21 @@ export default function SmartyCorporate() {
         <link rel="canonical" href="https://smartygym.com/corporate" />
       </Helmet>
 
-      <SEOEnhancer
-        entities={["Corporate Fitness", "Team Membership", "Business Wellness"]}
-        topics={["corporate fitness plans", "team training", "business wellness programs"]}
-        expertise={["corporate wellness", "team fitness management"]}
-        contentType="Corporate Plans"
-        aiSummary="SmartyGym Corporate: Premium fitness access for teams and organizations. Plans from €399/year (10 users) to €699/year (unlimited). All members get Platinum access with admin dashboard for team management."
-        aiKeywords={["corporate fitness", "team membership", "business wellness", "group fitness"]}
-        relatedContent={["Premium Benefits", "Workout Library", "Training Programs"]}
-        targetAudience="businesses and organizations seeking team fitness solutions"
-        pageType="Product"
-      />
+      <SEOEnhancer entities={["Corporate Fitness", "Team Membership", "Business Wellness"]} topics={["corporate fitness plans", "team training", "business wellness programs"]} expertise={["corporate wellness", "team fitness management"]} contentType="Corporate Plans" aiSummary="SmartyGym Corporate: Premium fitness access for teams and organizations. Plans from €399/year (10 users) to €699/year (unlimited). All members get Platinum access with admin dashboard for team management." aiKeywords={["corporate fitness", "team membership", "business wellness", "group fitness"]} relatedContent={["Premium Benefits", "Workout Library", "Training Programs"]} targetAudience="businesses and organizations seeking team fitness solutions" pageType="Product" />
 
       <div className="min-h-screen bg-background">
         <main className="container mx-auto max-w-7xl p-4 pb-8">
-          {canGoBack && (
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={goBack}
-              className="mb-4"
-            >
+          {canGoBack && <Button variant="ghost" size="sm" onClick={goBack} className="mb-4">
               <ArrowLeft className="mr-2 h-4 w-4" />
               <span className="text-xs sm:text-sm">Back</span>
-            </Button>
-          )}
+            </Button>}
 
-          <PageBreadcrumbs items={[
-            { label: "Home", href: "/" },
-            { label: "Smarty Corporate" }
-          ]} />
+          <PageBreadcrumbs items={[{
+          label: "Home",
+          href: "/"
+        }, {
+          label: "Smarty Corporate"
+        }]} />
 
           {/* Header */}
           <div className="text-center mb-8">
@@ -225,8 +207,8 @@ export default function SmartyCorporate() {
               <p>
                 All team members enjoy the same benefits as individual Platinum subscribers for the duration of the subscription. 
                 The administrator has access to a dedicated dashboard to manage team members, monitor usage, and control access.{' '}
-                <Link to="/corporate-wellness" className="text-green-500 hover:text-green-600 hover:underline font-medium">
-                  Why Invest in Corporate Wellness?
+                <Link to="/corporate-wellness" className="hover:underline font-medium text-green-500">
+                  Why Invest in Corporate Wellness
                 </Link>
               </p>
             </CardContent>
@@ -243,32 +225,22 @@ export default function SmartyCorporate() {
             <CardContent>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 {benefits.map((benefit, index) => {
-                  const isGreenCard = 'isLink' in benefit && benefit.isLink;
-                  
-                  if (isGreenCard && 'href' in benefit) {
-                    return (
-                      <Link
-                        key={index}
-                        to={benefit.href}
-                        className="flex items-center gap-3 p-3 bg-green-500/10 border-2 border-green-500 rounded-lg hover:bg-green-500/20 transition-colors group"
-                      >
+                const isGreenCard = 'isLink' in benefit && benefit.isLink;
+                if (isGreenCard && 'href' in benefit) {
+                  return <Link key={index} to={benefit.href} className="flex items-center gap-3 p-3 bg-green-500/10 border-2 border-green-500 rounded-lg hover:bg-green-500/20 transition-colors group">
                         <div className="p-2 bg-green-500/20 rounded-full">
                           <benefit.icon className="h-5 w-5 text-green-500" />
                         </div>
                         <span className="text-sm font-medium text-green-600 dark:text-green-400 group-hover:underline">{benefit.text}</span>
-                      </Link>
-                    );
-                  }
-                  
-                  return (
-                    <div key={index} className="flex items-center gap-3 p-3 bg-muted rounded-lg">
+                      </Link>;
+                }
+                return <div key={index} className="flex items-center gap-3 p-3 bg-muted rounded-lg">
                       <div className="p-2 bg-primary/10 rounded-full">
                         <benefit.icon className="h-5 w-5 text-primary" />
                       </div>
                       <span className="text-sm font-medium">{benefit.text}</span>
-                    </div>
-                  );
-                })}
+                    </div>;
+              })}
               </div>
             </CardContent>
           </Card>
@@ -316,11 +288,7 @@ export default function SmartyCorporate() {
                     <span className="text-sm">1-year subscription</span>
                   </div>
                 </div>
-                <Button 
-                  className="w-full mt-auto" 
-                  onClick={() => handleGetStarted('dynamic')}
-                  disabled={loading === 'dynamic'}
-                >
+                <Button className="w-full mt-auto" onClick={() => handleGetStarted('dynamic')} disabled={loading === 'dynamic'}>
                   {loading === 'dynamic' ? "Processing..." : "Get Started"}
                 </Button>
               </CardContent>
@@ -360,11 +328,7 @@ export default function SmartyCorporate() {
                     <span className="text-sm">1-year subscription</span>
                   </div>
                 </div>
-                <Button 
-                  className="w-full mt-auto" 
-                  onClick={() => handleGetStarted('power')}
-                  disabled={loading === 'power'}
-                >
+                <Button className="w-full mt-auto" onClick={() => handleGetStarted('power')} disabled={loading === 'power'}>
                   {loading === 'power' ? "Processing..." : "Get Started"}
                 </Button>
               </CardContent>
@@ -404,11 +368,7 @@ export default function SmartyCorporate() {
                     <span className="text-sm">1-year subscription</span>
                   </div>
                 </div>
-                <Button 
-                  className="w-full mt-auto" 
-                  onClick={() => handleGetStarted('elite')}
-                  disabled={loading === 'elite'}
-                >
+                <Button className="w-full mt-auto" onClick={() => handleGetStarted('elite')} disabled={loading === 'elite'}>
                   {loading === 'elite' ? "Processing..." : "Get Started"}
                 </Button>
               </CardContent>
@@ -451,11 +411,7 @@ export default function SmartyCorporate() {
                     <span className="text-sm">Priority enterprise support</span>
                   </div>
                 </div>
-                <Button 
-                  className="w-full mt-auto" 
-                  onClick={() => handleGetStarted('enterprise')}
-                  disabled={loading === 'enterprise'}
-                >
+                <Button className="w-full mt-auto" onClick={() => handleGetStarted('enterprise')} disabled={loading === 'enterprise'}>
                   {loading === 'enterprise' ? "Processing..." : "Get Started"}
                 </Button>
               </CardContent>
@@ -473,13 +429,7 @@ export default function SmartyCorporate() {
               </DialogHeader>
               <div className="py-4">
                 <Label htmlFor="orgName">Organization Name</Label>
-                <Input
-                  id="orgName"
-                  placeholder="e.g., Acme Corporation"
-                  value={organizationName}
-                  onChange={(e) => setOrganizationName(e.target.value)}
-                  className="mt-2"
-                />
+                <Input id="orgName" placeholder="e.g., Acme Corporation" value={organizationName} onChange={e => setOrganizationName(e.target.value)} className="mt-2" />
               </div>
               <DialogFooter>
                 <Button variant="outline" onClick={() => setOrgDialogOpen(false)}>
@@ -506,6 +456,5 @@ export default function SmartyCorporate() {
           </Card>
         </main>
       </div>
-    </>
-  );
+    </>;
 }
