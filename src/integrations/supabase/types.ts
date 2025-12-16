@@ -770,6 +770,7 @@ export type Database = {
           description: string | null
           display_order: number | null
           id: string
+          is_promotional: boolean | null
           is_visible: boolean | null
           muscle_group: string | null
           program_category: string | null
@@ -788,6 +789,7 @@ export type Database = {
           description?: string | null
           display_order?: number | null
           id?: string
+          is_promotional?: boolean | null
           is_visible?: boolean | null
           muscle_group?: string | null
           program_category?: string | null
@@ -806,6 +808,7 @@ export type Database = {
           description?: string | null
           display_order?: number | null
           id?: string
+          is_promotional?: boolean | null
           is_visible?: boolean | null
           muscle_group?: string | null
           program_category?: string | null
