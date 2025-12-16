@@ -17,6 +17,7 @@ export const MUSCLE_CATEGORIES: Record<string, string[]> = {
     'Gluteus Maximus',
     'Gluteus Medius',
     'Gluteus Minimus',
+    'Hip Flexors',
     'Quadriceps',
     'Hamstrings',
     'Adductors',
