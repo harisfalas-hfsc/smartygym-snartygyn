@@ -135,17 +135,45 @@ export const WODScheduleInfo = () => {
     { label: "Tomorrow", dayCount: currentDayCount + 1, dateStr: null } // Tomorrow not generated yet
   ];
 
+  // Get card styling based on day
+  const getDayCardStyle = (label: string) => {
+    switch (label) {
+      case "Yesterday":
+        return "bg-green-500/10 dark:bg-green-500/20 border-2 border-green-500 shadow-md";
+      case "Today":
+        return "bg-primary/10 dark:bg-primary/20 border-2 border-primary shadow-md";
+      case "Tomorrow":
+        return "bg-amber-500/10 dark:bg-amber-500/20 border-2 border-amber-500 shadow-md";
+      default:
+        return "bg-muted/30 border border-border/50";
+    }
+  };
+
+  // Get day label text color based on day
+  const getDayLabelColor = (label: string) => {
+    switch (label) {
+      case "Yesterday":
+        return "text-green-600 dark:text-green-400";
+      case "Today":
+        return "text-primary";
+      case "Tomorrow":
+        return "text-amber-600 dark:text-amber-400";
+      default:
+        return "text-muted-foreground";
+    }
+  };
+
   return (
     <Card className="mb-8 bg-gradient-to-br from-primary/5 via-background to-primary/5 border-2 border-primary/40">
       <CardContent className="p-4">
         <h2 className="text-lg font-bold text-center mb-3">WOD Schedule</h2>
-        <div className="grid grid-cols-3 gap-2 sm:gap-3">
+        {/* Stack on mobile, 3 columns on sm+ */}
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
           {days.map((day) => {
             const dayInCycle = getDayInCycle(day.dayCount);
             const weekNumber = getWeekNumber(day.dayCount);
             const scheduledCategory = getCategoryForDay(dayInCycle);
             const scheduledDifficulty = getDifficultyForDay(dayInCycle, weekNumber);
-            const isToday = day.label === "Today";
             const isTomorrow = day.label === "Tomorrow";
 
             // Get actual data from database for yesterday and today
@@ -157,32 +185,25 @@ export const WODScheduleInfo = () => {
             return (
               <div
                 key={day.label}
-                className={`rounded-lg p-2 sm:p-3 text-center transition-all ${
-                  isToday
-                    ? "bg-primary/10 border-2 border-primary shadow-md"
-                    : "bg-muted/30 border border-border/50"
-                }`}
+                className={`rounded-lg p-3 text-center transition-all ${getDayCardStyle(day.label)}`}
               >
                 {/* Day Label + Difficulty + Stars on one line */}
-                <div className={`text-xs font-medium mb-1.5 ${isToday ? "text-primary" : "text-muted-foreground"}`}>
-                  <span>{day.label}</span>
+                <div className={`text-xs font-medium mb-1.5 ${getDayLabelColor(day.label)}`}>
+                  <span className="font-semibold">{day.label}</span>
                   <span className="mx-1">•</span>
                   <span className={`${
-                    difficultyLevel === "Beginner" ? "text-green-600" :
-                    difficultyLevel === "Intermediate" ? "text-yellow-600" :
-                    difficultyLevel === "Advanced" ? "text-red-600" : ""
+                    difficultyLevel === "Beginner" ? "text-green-600 dark:text-green-400" :
+                    difficultyLevel === "Intermediate" ? "text-yellow-600 dark:text-yellow-400" :
+                    difficultyLevel === "Advanced" ? "text-red-600 dark:text-red-400" : ""
                   }`}>
                     {difficultyLevel}
                   </span>
                   <span className="ml-1">
                     {isTomorrow ? (
-                      // Tomorrow: show range since not generated yet
                       <span className="text-muted-foreground">({scheduledDifficulty.range[0]}-{scheduledDifficulty.range[1]}★)</span>
                     ) : exactStars ? (
-                      // Yesterday/Today: show exact stars from database
-                      <span className="text-primary">{exactStars}★</span>
+                      <span className={getDayLabelColor(day.label)}>{exactStars}★</span>
                     ) : (
-                      // Fallback to range if no data
                       <span className="text-muted-foreground">({scheduledDifficulty.range[0]}-{scheduledDifficulty.range[1]}★)</span>
                     )}
                   </span>
