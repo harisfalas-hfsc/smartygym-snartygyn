@@ -1,7 +1,10 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Star, ChevronLeft, ChevronRight } from "lucide-react";
+import { Star } from "lucide-react";
 import { useWODState } from "@/hooks/useWODState";
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
+import { format, subDays, addDays } from "date-fns";
 
 // 7-DAY CATEGORY CYCLE (same as admin WODSchedulePreview)
 const CATEGORY_CYCLE_7DAY = [
@@ -65,15 +68,51 @@ const getCategoryColor = (category: string) => {
 };
 
 export const WODScheduleInfo = () => {
-  const { data: wodState, isLoading } = useWODState();
+  const { data: wodState, isLoading: stateLoading } = useWODState();
 
-  if (isLoading || !wodState) {
+  // Fetch actual WODs for yesterday and today to get exact difficulty stars
+  const { data: actualWods } = useQuery({
+    queryKey: ["wod-schedule-actual"],
+    queryFn: async () => {
+      const today = new Date();
+      const yesterday = subDays(today, 1);
+      const todayStr = format(today, "yyyy-MM-dd");
+      const yesterdayStr = format(yesterday, "yyyy-MM-dd");
+
+      const { data, error } = await supabase
+        .from("admin_workouts")
+        .select("generated_for_date, difficulty_stars, difficulty, category")
+        .eq("is_workout_of_day", true)
+        .in("generated_for_date", [yesterdayStr, todayStr]);
+
+      if (error) {
+        console.error("Error fetching actual WODs:", error);
+        return {};
+      }
+
+      // Create lookup by date
+      const lookup: Record<string, { stars: number | null; difficulty: string | null; category: string | null }> = {};
+      data?.forEach(wod => {
+        if (wod.generated_for_date) {
+          lookup[wod.generated_for_date] = {
+            stars: wod.difficulty_stars,
+            difficulty: wod.difficulty,
+            category: wod.category
+          };
+        }
+      });
+      return lookup;
+    },
+    staleTime: 5 * 60 * 1000,
+  });
+
+  if (stateLoading || !wodState) {
     return (
-      <Card className="mb-8 border border-border/50">
+      <Card className="mb-8 bg-gradient-to-br from-primary/5 via-background to-primary/5 border-2 border-primary/40">
         <CardContent className="p-4">
           <div className="animate-pulse flex justify-around gap-4">
             {[1, 2, 3].map((i) => (
-              <div key={i} className="flex-1 h-24 bg-muted rounded-lg" />
+              <div key={i} className="flex-1 h-16 bg-muted rounded-lg" />
             ))}
           </div>
         </CardContent>
@@ -82,66 +121,77 @@ export const WODScheduleInfo = () => {
   }
 
   const currentDayCount = wodState.day_count;
+  const today = new Date();
+  const yesterday = subDays(today, 1);
+  const tomorrow = addDays(today, 1);
 
-  // Calculate yesterday, today, tomorrow
+  const todayStr = format(today, "yyyy-MM-dd");
+  const yesterdayStr = format(yesterday, "yyyy-MM-dd");
+
+  // Calculate schedule data for each day
   const days = [
-    { label: "Yesterday", dayCount: currentDayCount - 1, icon: ChevronLeft },
-    { label: "Today", dayCount: currentDayCount, icon: null },
-    { label: "Tomorrow", dayCount: currentDayCount + 1, icon: ChevronRight }
+    { label: "Yesterday", dayCount: currentDayCount - 1, dateStr: yesterdayStr },
+    { label: "Today", dayCount: currentDayCount, dateStr: todayStr },
+    { label: "Tomorrow", dayCount: currentDayCount + 1, dateStr: null } // Tomorrow not generated yet
   ];
 
   return (
-    <Card className="mb-8 border border-border/50">
-      <CardContent className="p-4 sm:p-6">
-        <h2 className="text-lg sm:text-xl font-bold text-center mb-4">WOD Schedule</h2>
-        <div className="grid grid-cols-3 gap-2 sm:gap-4">
-          {days.map((day, index) => {
+    <Card className="mb-8 bg-gradient-to-br from-primary/5 via-background to-primary/5 border-2 border-primary/40">
+      <CardContent className="p-4">
+        <h2 className="text-lg font-bold text-center mb-3">WOD Schedule</h2>
+        <div className="grid grid-cols-3 gap-2 sm:gap-3">
+          {days.map((day) => {
             const dayInCycle = getDayInCycle(day.dayCount);
             const weekNumber = getWeekNumber(day.dayCount);
-            const category = getCategoryForDay(dayInCycle);
-            const difficulty = getDifficultyForDay(dayInCycle, weekNumber);
+            const scheduledCategory = getCategoryForDay(dayInCycle);
+            const scheduledDifficulty = getDifficultyForDay(dayInCycle, weekNumber);
             const isToday = day.label === "Today";
+            const isTomorrow = day.label === "Tomorrow";
+
+            // Get actual data from database for yesterday and today
+            const actualData = day.dateStr ? actualWods?.[day.dateStr] : null;
+            const category = actualData?.category || scheduledCategory;
+            const difficultyLevel = actualData?.difficulty || scheduledDifficulty.level;
+            const exactStars = actualData?.stars;
 
             return (
               <div
                 key={day.label}
-                className={`rounded-lg p-3 sm:p-4 text-center transition-all ${
+                className={`rounded-lg p-2 sm:p-3 text-center transition-all ${
                   isToday
                     ? "bg-primary/10 border-2 border-primary shadow-md"
                     : "bg-muted/30 border border-border/50"
                 }`}
               >
-                {/* Day Label */}
-                <div className={`text-xs sm:text-sm font-medium mb-2 ${isToday ? "text-primary" : "text-muted-foreground"}`}>
-                  {day.label}
+                {/* Day Label + Difficulty + Stars on one line */}
+                <div className={`text-xs font-medium mb-1.5 ${isToday ? "text-primary" : "text-muted-foreground"}`}>
+                  <span>{day.label}</span>
+                  <span className="mx-1">•</span>
+                  <span className={`${
+                    difficultyLevel === "Beginner" ? "text-green-600" :
+                    difficultyLevel === "Intermediate" ? "text-yellow-600" :
+                    difficultyLevel === "Advanced" ? "text-red-600" : ""
+                  }`}>
+                    {difficultyLevel}
+                  </span>
+                  <span className="ml-1">
+                    {isTomorrow ? (
+                      // Tomorrow: show range since not generated yet
+                      <span className="text-muted-foreground">({scheduledDifficulty.range[0]}-{scheduledDifficulty.range[1]}★)</span>
+                    ) : exactStars ? (
+                      // Yesterday/Today: show exact stars from database
+                      <span className="text-primary">{exactStars}★</span>
+                    ) : (
+                      // Fallback to range if no data
+                      <span className="text-muted-foreground">({scheduledDifficulty.range[0]}-{scheduledDifficulty.range[1]}★)</span>
+                    )}
+                  </span>
                 </div>
 
                 {/* Category Badge */}
-                <Badge className={`${getCategoryColor(category)} text-xs mb-2 px-2 py-1`}>
+                <Badge className={`${getCategoryColor(category)} text-xs px-2 py-0.5`}>
                   {category}
                 </Badge>
-
-                {/* Difficulty */}
-                <div className="mt-2">
-                  <Badge variant="outline" className={`${getDifficultyColor(difficulty.level)} text-xs px-2 py-0.5`}>
-                    {difficulty.level}
-                  </Badge>
-                  <div className="flex items-center justify-center gap-0.5 mt-1">
-                    {[...Array(6)].map((_, i) => (
-                      <Star
-                        key={i}
-                        className={`w-3 h-3 ${
-                          i >= difficulty.range[0] - 1 && i < difficulty.range[1]
-                            ? "fill-primary text-primary"
-                            : "text-muted-foreground/30"
-                        }`}
-                      />
-                    ))}
-                  </div>
-                  <span className="text-xs text-muted-foreground mt-1 block">
-                    ({difficulty.range[0]}-{difficulty.range[1]}★)
-                  </span>
-                </div>
               </div>
             );
           })}
