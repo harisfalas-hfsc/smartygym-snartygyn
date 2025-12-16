@@ -19,7 +19,7 @@ import {
   CalendarCheck,
   ChevronRight,
   Star,
-  TrendingUp
+  CircleDollarSign
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -211,7 +211,7 @@ export const HeroThreeColumns = () => {
           onClick={() => navigate("/human-performance")}
           className="mt-1.5 flex items-center gap-2 cursor-pointer group hover:text-primary transition-colors rounded-md px-2 py-1 -mx-2 hover:bg-primary/10"
         >
-          <TrendingUp className="w-4 h-4 text-green-500 flex-shrink-0" />
+          <CircleDollarSign className="w-4 h-4 text-green-500 flex-shrink-0" />
           <span className="text-sm font-bold underline text-green-500 group-hover:text-primary transition-colors">Why Invest in SmartyGym?</span>
         </div>
       </div>
