@@ -24,7 +24,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { Trophy, MessageSquare, Star, User, Calendar, ClipboardCheck, ArrowLeft, Eye } from "lucide-react";
+import { Trophy, MessageSquare, Star, User, Calendar, ClipboardCheck, ArrowLeft, Eye, Award } from "lucide-react";
 import { TestimonialsSection } from "@/components/community/TestimonialsSection";
 import { formatDistanceToNow } from "date-fns";
 import { CompactFilters } from "@/components/CompactFilters";
@@ -385,13 +385,19 @@ programEntries.sort((a, b) => b.total_completions - a.total_completions);
     if (index === 1) return "🥈";
     if (index === 2) return "🥉";
     if (index === 3) return (
-      <span className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-amber-100 dark:bg-amber-900/30 border-2 border-amber-400 text-amber-700 dark:text-amber-400 text-xs font-bold">4</span>
+      <span className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-amber-100 dark:bg-amber-900/30">
+        <Award className="h-4 w-4 text-amber-600 dark:text-amber-400" />
+      </span>
     );
     if (index === 4) return (
-      <span className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-slate-100 dark:bg-slate-800 border-2 border-slate-400 text-slate-700 dark:text-slate-400 text-xs font-bold">5</span>
+      <span className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-slate-100 dark:bg-slate-800">
+        <Award className="h-4 w-4 text-slate-600 dark:text-slate-400" />
+      </span>
     );
     if (index === 5) return (
-      <span className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-orange-100 dark:bg-orange-900/30 border-2 border-orange-400 text-orange-700 dark:text-orange-400 text-xs font-bold">6</span>
+      <span className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-orange-100 dark:bg-orange-900/30">
+        <Award className="h-4 w-4 text-orange-600 dark:text-orange-400" />
+      </span>
     );
     return null;
   };
