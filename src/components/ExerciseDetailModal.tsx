@@ -13,6 +13,7 @@ import { Separator } from "@/components/ui/separator";
 interface ExerciseDetail {
   name: string;
   bodyPart: string;
+  image?: string;
   muscles: {
     role: string;
     name: string;
@@ -60,6 +61,17 @@ const ExerciseDetailModal = ({ exercise, open, onOpenChange }: ExerciseDetailMod
         
         <ScrollArea className="max-h-[70vh] pr-4">
           <div className="space-y-6">
+            {/* Exercise Image */}
+            {exercise.image && exercise.image !== "image_coming_soon" && (
+              <div className="w-full aspect-video rounded-lg overflow-hidden bg-muted">
+                <img 
+                  src={exercise.image} 
+                  alt={exercise.name}
+                  className="w-full h-full object-contain"
+                />
+              </div>
+            )}
+
             {/* Body Part Badge */}
             <div className="flex flex-wrap gap-2">
               <Badge variant="outline" className="border-green-500 text-green-600 dark:text-green-400">
