@@ -4,7 +4,6 @@ import { useAccessControl } from "@/hooks/useAccessControl";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import { ScrollArea } from "@/components/ui/scroll-area";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
   Dialog,
@@ -21,14 +20,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import {
-  Pagination,
-  PaginationContent,
-  PaginationItem,
-  PaginationLink,
-  PaginationPrevious,
-  PaginationNext,
-} from "@/components/ui/pagination";
 import { Star, User, Calendar, Pencil, Trash2, Quote } from "lucide-react";
 import { format } from "date-fns";
 import { toast } from "sonner";
@@ -43,8 +34,6 @@ interface Testimonial {
   updated_at: string;
 }
 
-const ITEMS_PER_PAGE = 8;
-
 export const TestimonialsSection = () => {
   const { user, userTier } = useAccessControl();
   const isPremium = userTier === "premium";
@@ -52,7 +41,6 @@ export const TestimonialsSection = () => {
   const [testimonials, setTestimonials] = useState<Testimonial[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [sortOrder, setSortOrder] = useState<"newest" | "oldest">("newest");
-  const [currentPage, setCurrentPage] = useState(1);
   
   // Form state
   const [showForm, setShowForm] = useState(false);
@@ -79,9 +67,6 @@ export const TestimonialsSection = () => {
     }
   }, [user?.id, testimonials]);
 
-  useEffect(() => {
-    setCurrentPage(1);
-  }, [sortOrder]);
 
   const fetchTestimonials = async () => {
     try {
@@ -222,13 +207,9 @@ export const TestimonialsSection = () => {
     );
   };
 
-  const getPaginatedTestimonials = () => {
-    const start = (currentPage - 1) * ITEMS_PER_PAGE;
-    const end = start + ITEMS_PER_PAGE;
-    return testimonials.slice(start, end);
+  const getTopTestimonials = () => {
+    return testimonials.slice(0, 6);
   };
-
-  const totalPages = Math.ceil(testimonials.length / ITEMS_PER_PAGE);
 
   return (
     <Card className="border-2 border-primary/30 shadow-lg">
@@ -277,7 +258,7 @@ export const TestimonialsSection = () => {
       <CardContent className="p-4 md:pt-6">
         {isLoading ? (
           <div className="space-y-4">
-            {[...Array(4)].map((_, i) => (
+            {[...Array(6)].map((_, i) => (
               <div key={i} className="space-y-2">
                 <Skeleton className="h-6 w-1/3" />
                 <Skeleton className="h-20 w-full" />
@@ -291,95 +272,56 @@ export const TestimonialsSection = () => {
             <p className="text-sm">Be the first premium member to share your experience!</p>
           </div>
         ) : (
-          <ScrollArea className="h-[550px] md:h-[600px] pr-2 md:pr-4">
-            <div className="space-y-3 md:space-y-4">
-              {getPaginatedTestimonials().map((testimonial) => (
-                <div
-                  key={testimonial.id}
-                  className="p-3 md:p-4 rounded-lg border-2 border-primary/20 bg-gradient-to-r from-background to-primary/5 hover:border-primary/40 transition-colors"
-                >
-                  <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-2 mb-2">
-                    <div className="flex items-center gap-2">
-                      <User className="h-3 w-3 md:h-4 md:w-4 text-primary flex-shrink-0" />
-                      <span className="font-semibold text-xs md:text-sm truncate">
-                        {testimonial.display_name}
-                      </span>
-                      {renderStars(testimonial.rating)}
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <div className="flex items-center gap-1 text-xs text-muted-foreground whitespace-nowrap">
-                        <Calendar className="h-3 w-3" />
-                        <span className="text-[10px] md:text-xs">
-                          {format(new Date(testimonial.created_at), "MMM d, yyyy 'at' h:mm a")}
-                        </span>
-                      </div>
-                      
-                      {/* Edit/Delete buttons - only for owner */}
-                      {user?.id === testimonial.user_id && (
-                        <div className="flex items-center gap-1 ml-2">
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => handleEdit(testimonial)}
-                            className="h-7 w-7 p-0 hover:bg-primary/10"
-                          >
-                            <Pencil className="h-3 w-3 text-muted-foreground hover:text-primary" />
-                          </Button>
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => handleDeleteClick(testimonial.id)}
-                            className="h-7 w-7 p-0 hover:bg-destructive/10"
-                          >
-                            <Trash2 className="h-3 w-3 text-muted-foreground hover:text-destructive" />
-                          </Button>
-                        </div>
-                      )}
-                    </div>
+          <div className="space-y-3 md:space-y-4">
+            {getTopTestimonials().map((testimonial) => (
+              <div
+                key={testimonial.id}
+                className="p-3 md:p-4 rounded-lg border-2 border-primary/20 bg-gradient-to-r from-background to-primary/5 hover:border-primary/40 transition-colors"
+              >
+                <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-2 mb-2">
+                  <div className="flex items-center gap-2">
+                    <User className="h-3 w-3 md:h-4 md:w-4 text-primary flex-shrink-0" />
+                    <span className="font-semibold text-xs md:text-sm truncate">
+                      {testimonial.display_name}
+                    </span>
+                    {renderStars(testimonial.rating)}
                   </div>
-                  <p className="text-xs md:text-sm leading-relaxed text-foreground/90">
-                    "{testimonial.testimonial_text}"
-                  </p>
+                  <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-1 text-xs text-muted-foreground whitespace-nowrap">
+                      <Calendar className="h-3 w-3" />
+                      <span className="text-[10px] md:text-xs">
+                        {format(new Date(testimonial.created_at), "MMM d, yyyy 'at' h:mm a")}
+                      </span>
+                    </div>
+                    
+                    {/* Edit/Delete buttons - only for owner */}
+                    {user?.id === testimonial.user_id && (
+                      <div className="flex items-center gap-1 ml-2">
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => handleEdit(testimonial)}
+                          className="h-7 w-7 p-0 hover:bg-primary/10"
+                        >
+                          <Pencil className="h-3 w-3 text-muted-foreground hover:text-primary" />
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => handleDeleteClick(testimonial.id)}
+                          className="h-7 w-7 p-0 hover:bg-destructive/10"
+                        >
+                          <Trash2 className="h-3 w-3 text-muted-foreground hover:text-destructive" />
+                        </Button>
+                      </div>
+                    )}
+                  </div>
                 </div>
-              ))}
-            </div>
-          </ScrollArea>
-        )}
-        
-        {!isLoading && testimonials.length > 0 && (
-          <div className="mt-4 flex flex-col sm:flex-row items-center justify-between gap-3 border-t border-primary/20 pt-4">
-            <p className="text-xs md:text-sm text-muted-foreground">
-              Showing {Math.min((currentPage - 1) * ITEMS_PER_PAGE + 1, testimonials.length)}-{Math.min(currentPage * ITEMS_PER_PAGE, testimonials.length)} of {testimonials.length}
-            </p>
-            {totalPages > 1 && (
-              <Pagination>
-                <PaginationContent>
-                  <PaginationItem>
-                    <PaginationPrevious
-                      onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
-                      className={currentPage === 1 ? "pointer-events-none opacity-50" : "cursor-pointer"}
-                    />
-                  </PaginationItem>
-                  {[...Array(totalPages)].map((_, i) => (
-                    <PaginationItem key={i}>
-                      <PaginationLink
-                        onClick={() => setCurrentPage(i + 1)}
-                        isActive={currentPage === i + 1}
-                        className="cursor-pointer"
-                      >
-                        {i + 1}
-                      </PaginationLink>
-                    </PaginationItem>
-                  ))}
-                  <PaginationItem>
-                    <PaginationNext
-                      onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
-                      className={currentPage === totalPages ? "pointer-events-none opacity-50" : "cursor-pointer"}
-                    />
-                  </PaginationItem>
-                </PaginationContent>
-              </Pagination>
-            )}
+                <p className="text-xs md:text-sm leading-relaxed text-foreground/90">
+                  "{testimonial.testimonial_text}"
+                </p>
+              </div>
+            ))}
           </div>
         )}
       </CardContent>
