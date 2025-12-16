@@ -442,9 +442,9 @@ const Index = () => {
               <p className="text-base text-muted-foreground">
                 Your gym Re-imagined. Anywhere. Anytime.
               </p>
-              <p className="text-sm mt-3 px-2 font-medium" style={{ color: 'hsl(195, 85%, 45%)' }}>
-                Where Science Meets Convenience. Where Real Coaches Guide Real People.
-              </p>
+            <p className="text-[10px] mt-3 px-1 font-medium whitespace-nowrap" style={{ color: 'hsl(195, 85%, 45%)' }}>
+              Where Science Meets Convenience. Where Real Coaches Guide Real People.
+            </p>
             </div>
 
             <Carousel className="w-full px-6" opts={{
