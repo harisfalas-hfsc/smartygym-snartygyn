@@ -123,7 +123,7 @@ const ExerciseVideoGrid = () => {
             <SelectTrigger className="h-9">
               <SelectValue placeholder="Body Region" />
             </SelectTrigger>
-            <SelectContent>
+            <SelectContent side="bottom">
               <SelectItem value="all">All Body Regions</SelectItem>
               {MUSCLE_GROUPS.map((group) => (
                 <SelectItem key={group} value={group}>{group}</SelectItem>
@@ -140,7 +140,7 @@ const ExerciseVideoGrid = () => {
             <SelectTrigger className="h-9">
               <SelectValue placeholder="Target Muscle" />
             </SelectTrigger>
-            <SelectContent>
+            <SelectContent side="bottom">
               <SelectItem value="all">All Muscles</SelectItem>
               {availableMuscles.map((muscle) => (
                 <SelectItem key={muscle} value={muscle}>{muscle}</SelectItem>
@@ -156,7 +156,7 @@ const ExerciseVideoGrid = () => {
             <SelectTrigger className="h-9">
               <SelectValue placeholder="Workout Type" />
             </SelectTrigger>
-            <SelectContent>
+            <SelectContent side="bottom">
               <SelectItem value="all">All Workout Types</SelectItem>
               {WORKOUT_CATEGORIES.map((cat) => (
                 <SelectItem key={cat} value={cat}>{cat}</SelectItem>
@@ -172,7 +172,7 @@ const ExerciseVideoGrid = () => {
             <SelectTrigger className="h-9">
               <SelectValue placeholder="Program Type" />
             </SelectTrigger>
-            <SelectContent>
+            <SelectContent side="bottom">
               <SelectItem value="all">All Program Types</SelectItem>
               {PROGRAM_CATEGORIES.map((cat) => (
                 <SelectItem key={cat} value={cat}>{cat}</SelectItem>
