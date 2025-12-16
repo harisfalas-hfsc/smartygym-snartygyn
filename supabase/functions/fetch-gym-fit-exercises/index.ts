@@ -30,7 +30,7 @@ serve(async (req) => {
     switch (endpoint) {
       // Exercise endpoints
       case 'searchExercises':
-        // GET /v1/exercises/search?limit=50&offset=0&bodyPart=X&equipment=X&type=X
+        // GET /v1/exercises/search?limit=50&offset=0&bodyPart=X&equipment=X&type=X&name=X
         apiUrl += '/exercises/search';
         const searchParams = new URLSearchParams();
         if (params?.limit) searchParams.set('limit', String(params.limit));
@@ -38,6 +38,8 @@ serve(async (req) => {
         if (params?.bodyPart) searchParams.set('bodyPart', params.bodyPart);
         if (params?.equipment) searchParams.set('equipment', params.equipment);
         if (params?.type) searchParams.set('type', params.type);
+        // Test name search parameter
+        if (params?.name) searchParams.set('name', params.name);
         if (searchParams.toString()) {
           apiUrl += `?${searchParams.toString()}`;
         }
