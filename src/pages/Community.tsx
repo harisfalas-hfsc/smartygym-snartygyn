@@ -395,8 +395,8 @@ programEntries.sort((a, b) => b.total_completions - a.total_completions);
       </span>
     );
     if (index === 5) return (
-      <span className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-orange-100 dark:bg-orange-900/30">
-        <Award className="h-4 w-4 text-orange-600 dark:text-orange-400" />
+      <span className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-primary/10 dark:bg-primary/20">
+        <Award className="h-4 w-4 text-primary" />
       </span>
     );
     return null;
