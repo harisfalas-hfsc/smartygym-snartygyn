@@ -43,8 +43,8 @@ const FORMATS_BY_CATEGORY: Record<string, string[]> = {
   "CHALLENGE": ["CIRCUIT", "TABATA", "AMRAP", "EMOM", "FOR TIME", "MIX"]
 };
 
-const getDayInCycle = (dayCount: number): number => (dayCount % 7) + 1;
-const getWeekNumber = (dayCount: number): number => Math.floor(dayCount / 7) + 1;
+const getDayInCycle = (dayCount: number): number => ((dayCount - 1) % 7) + 1 || 7;
+const getWeekNumber = (dayCount: number): number => Math.floor((dayCount - 1) / 7) + 1;
 
 const getCategoryForDay = (dayInCycle: number): string => CATEGORY_CYCLE_7DAY[dayInCycle - 1];
 
