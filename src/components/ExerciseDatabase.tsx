@@ -2,6 +2,7 @@ import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { Input } from "@/components/ui/input";
 import { Loader2, Search, X, Dumbbell, Activity } from "lucide-react";
 import ExerciseDetailModal from "./ExerciseDetailModal";
 import { useToast } from "@/hooks/use-toast";
@@ -57,6 +58,7 @@ const ExerciseDatabase = () => {
   const [exercises, setExercises] = useState<ExerciseSearchResult[]>([]);
   const [loading, setLoading] = useState(false);
   const [detailLoading, setDetailLoading] = useState(false);
+  const [nameSearch, setNameSearch] = useState("");
   const [bodyPartFilter, setBodyPartFilter] = useState("");
   const [equipmentFilter, setEquipmentFilter] = useState("");
   const [typeFilter, setTypeFilter] = useState("");
@@ -68,8 +70,10 @@ const ExerciseDatabase = () => {
   const fetchExercises = async () => {
     setLoading(true);
     try {
-      const params: Record<string, string | number> = { limit: 50, offset: 0 };
+      const params: Record<string, string | number> = { limit: 100, offset: 0 };
       
+      // Add name search if provided
+      if (nameSearch.trim()) params.name = nameSearch.trim();
       if (bodyPartFilter && bodyPartFilter !== "all") params.bodyPart = bodyPartFilter;
       if (equipmentFilter && equipmentFilter !== "all") params.equipment = equipmentFilter;
       if (typeFilter && typeFilter !== "all") params.type = typeFilter;
@@ -84,7 +88,21 @@ const ExerciseDatabase = () => {
         throw new Error(data.error);
       }
 
-      setExercises(Array.isArray(data?.results) ? data.results : []);
+      let results = Array.isArray(data?.results) ? data.results : [];
+      
+      // Client-side filtering fallback if API doesn't support name search
+      if (nameSearch.trim() && results.length > 0) {
+        const searchLower = nameSearch.trim().toLowerCase();
+        const filtered = results.filter((ex: ExerciseSearchResult) => 
+          ex.name.toLowerCase().includes(searchLower)
+        );
+        // Only use filtered if it found matches (otherwise API might have handled it)
+        if (filtered.length > 0 || results.length === 0) {
+          results = filtered;
+        }
+      }
+
+      setExercises(results);
       setHasSearched(true);
     } catch (error: any) {
       console.error('Error fetching exercises:', error);
@@ -131,6 +149,7 @@ const ExerciseDatabase = () => {
   };
 
   const clearFilters = () => {
+    setNameSearch("");
     setBodyPartFilter("");
     setEquipmentFilter("");
     setTypeFilter("");
@@ -142,12 +161,29 @@ const ExerciseDatabase = () => {
     fetchExerciseDetail(exercise.id);
   };
 
-  const hasFilters = (bodyPartFilter && bodyPartFilter !== "all") || 
+  const hasFilters = nameSearch.trim() ||
+                     (bodyPartFilter && bodyPartFilter !== "all") || 
                      (equipmentFilter && equipmentFilter !== "all") || 
                      (typeFilter && typeFilter !== "all");
 
   return (
     <div className="space-y-6">
+      {/* Search Bar */}
+      <div className="space-y-1">
+        <label className="text-xs text-muted-foreground flex items-center gap-1">
+          <Search className="h-3 w-3 text-primary" />
+          Search by Name
+        </label>
+        <Input
+          type="text"
+          placeholder="Search exercise by name (e.g., Squat, Bench Press)"
+          value={nameSearch}
+          onChange={(e) => setNameSearch(e.target.value)}
+          onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
+          className="border-primary/50"
+        />
+      </div>
+
       {/* Filters - Dropdown selects with exact API values */}
       <div className="flex flex-col gap-4">
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
@@ -227,6 +263,12 @@ const ExerciseDatabase = () => {
       {/* Active Filters Display */}
       {hasFilters && (
         <div className="flex flex-wrap gap-2">
+          {nameSearch.trim() && (
+            <Badge variant="outline" className="border-primary text-primary">
+              <Search className="h-3 w-3 mr-1" />
+              "{nameSearch}"
+            </Badge>
+          )}
           {bodyPartFilter && bodyPartFilter !== "all" && (
             <Badge variant="outline" className="border-green-500 text-green-600 dark:text-green-400">
               <Activity className="h-3 w-3 mr-1" />
