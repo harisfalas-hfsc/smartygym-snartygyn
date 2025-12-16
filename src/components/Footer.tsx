@@ -34,31 +34,24 @@ export const Footer = () => {
             <button onClick={() => navigate("/human-performance")} className="hover:text-primary transition-colors">
               Why SmartyGym
             </button>
-            <span>•</span>
             <button onClick={() => navigate("/corporate")} className="hover:text-primary transition-colors">
               Smarty Corporate
             </button>
-            <span>•</span>
             <button onClick={() => navigate("/corporate-wellness")} className="hover:text-primary transition-colors">
               Why Smarty Corporate
             </button>
-            <span>•</span>
             <button onClick={() => navigate("/smarty-plans")} className="hover:text-primary transition-colors">
               Smarty Plans
             </button>
-            <span>•</span>
             <button onClick={() => navigate("/privacy-policy")} className="hover:text-primary transition-colors">
               Privacy Policy
             </button>
-            <span>•</span>
             <button onClick={() => navigate("/termsofservice")} className="hover:text-primary transition-colors">
               Terms of Service
             </button>
-            <span>•</span>
             <button onClick={() => navigate("/disclaimer")} className="hover:text-primary transition-colors">
               Disclaimer
             </button>
-            <span>•</span>
             <button onClick={() => navigate("/contact")} className="hover:text-primary transition-colors">
               Contact
             </button>
