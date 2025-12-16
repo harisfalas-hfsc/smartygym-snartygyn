@@ -181,7 +181,7 @@ const ExerciseVideoGrid = () => {
 
           {/* Muscle Targeting Group */}
           <div className="border border-green-500 rounded-lg p-3">
-            <p className="text-xs font-medium text-muted-foreground mb-2">Search videos by muscle targeting</p>
+            <p className="text-xs font-medium text-muted-foreground mb-2">Search video by muscle targeting</p>
             <div className="flex flex-col gap-2">
               <Select
                 value={filters.muscleGroup || 'all'}
@@ -254,7 +254,7 @@ const ExerciseVideoGrid = () => {
 
           {/* Program Context Group */}
           <div className="border border-orange-500 rounded-lg p-3">
-            <p className="text-xs font-medium text-muted-foreground mb-2">Search videos by program context</p>
+            <p className="text-xs font-medium text-muted-foreground mb-2">Search video by program context</p>
             <Select
               value={filters.programCategory || 'all'}
               onValueChange={(value) => setFilters(prev => ({ ...prev, programCategory: value === 'all' ? '' : value }))}
