@@ -76,13 +76,7 @@ const Community = () => {
   const [sortOrder, setSortOrder] = useState<"newest" | "oldest">("newest");
   
   
-  
-  // Sorting state
-  const [leaderboardSort, setLeaderboardSort] = useState<"completions-desc" | "completions-asc" | "name-asc" | "name-desc">("completions-desc");
-  const [ratingsSort, setRatingsSort] = useState<"rating-desc" | "rating-asc" | "reviews-desc" | "name-asc">("rating-desc");
-  
-  // Modal state
-  const [showRatingsModal, setShowRatingsModal] = useState(false);
+  // Modal state for comments only (Leaderboard and Ratings are top 6 competitions)
   const [showCommentsModal, setShowCommentsModal] = useState(false);
 
 
@@ -390,19 +384,20 @@ programEntries.sort((a, b) => b.total_completions - a.total_completions);
     if (index === 0) return "🥇";
     if (index === 1) return "🥈";
     if (index === 2) return "🥉";
-    // Ranks 4-6: styled circular badges
-    if (index < 6) {
-      return (
-        <span className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-muted border border-border text-xs font-bold">
-          {index + 1}
-        </span>
-      );
-    }
+    if (index === 3) return (
+      <span className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-amber-100 dark:bg-amber-900/30 border-2 border-amber-400 text-amber-700 dark:text-amber-400 text-xs font-bold">4</span>
+    );
+    if (index === 4) return (
+      <span className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-slate-100 dark:bg-slate-800 border-2 border-slate-400 text-slate-700 dark:text-slate-400 text-xs font-bold">5</span>
+    );
+    if (index === 5) return (
+      <span className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-orange-100 dark:bg-orange-900/30 border-2 border-orange-400 text-orange-700 dark:text-orange-400 text-xs font-bold">6</span>
+    );
     return null;
   };
 
-// Sorting and pagination logic for leaderboard
-  const getSortedLeaderboard = () => {
+  // Top 6 competition logic for leaderboard (always sorted by most completions)
+  const getLeaderboardWithPlaceholders = (): (LeaderboardEntry | null)[] => {
     let data: LeaderboardEntry[];
     if (leaderboardFilter === "workouts") {
       data = workoutLeaderboard;
@@ -411,61 +406,38 @@ programEntries.sort((a, b) => b.total_completions - a.total_completions);
     } else {
       data = checkinLeaderboard;
     }
-    const sorted = [...data];
     
-    switch (leaderboardSort) {
-      case "completions-desc":
-        sorted.sort((a, b) => b.total_completions - a.total_completions);
-        break;
-      case "completions-asc":
-        sorted.sort((a, b) => a.total_completions - b.total_completions);
-        break;
-      case "name-asc":
-        sorted.sort((a, b) => a.display_name.localeCompare(b.display_name));
-        break;
-      case "name-desc":
-        sorted.sort((a, b) => b.display_name.localeCompare(a.display_name));
-        break;
+    // Always sort by most completions (descending)
+    const sorted = [...data].sort((a, b) => b.total_completions - a.total_completions);
+    
+    // Fill with placeholders for 6 positions
+    const result: (LeaderboardEntry | null)[] = [];
+    for (let i = 0; i < 6; i++) {
+      result.push(sorted[i] || null);
     }
-    
-    return sorted;
+    return result;
   };
 
-  const getTopLeaderboard = () => {
-    const sorted = getSortedLeaderboard();
-    return sorted.slice(0, 6); // Only top 6
-  };
-
-  // Sorting and pagination logic for ratings
-  const getSortedRatings = () => {
-    const data = ratedContent.filter(item => item.content_type === (ratingsFilter === "workouts" ? "workout" : "program"));
-    const sorted = [...data];
+  // Top 6 competition logic for ratings (always sorted by highest rating)
+  const getRatingsWithPlaceholders = (): (RatedContent | null)[] => {
+    const data = ratedContent.filter(item => 
+      item.content_type === (ratingsFilter === "workouts" ? "workout" : "program")
+    );
     
-    switch (ratingsSort) {
-      case "rating-desc":
-        sorted.sort((a, b) => {
-          if (b.average_rating !== a.average_rating) {
-            return b.average_rating - a.average_rating;
-          }
-          return b.rating_count - a.rating_count;
-        });
-        break;
-      case "rating-asc":
-        sorted.sort((a, b) => a.average_rating - b.average_rating);
-        break;
-      case "reviews-desc":
-        sorted.sort((a, b) => b.rating_count - a.rating_count);
-        break;
-      case "name-asc":
-        sorted.sort((a, b) => a.content_name.localeCompare(b.content_name));
-        break;
+    // Always sort by highest rating (descending), then by review count
+    const sorted = [...data].sort((a, b) => {
+      if (b.average_rating !== a.average_rating) {
+        return b.average_rating - a.average_rating;
+      }
+      return b.rating_count - a.rating_count;
+    });
+    
+    // Fill with placeholders for 6 positions
+    const result: (RatedContent | null)[] = [];
+    for (let i = 0; i < 6; i++) {
+      result.push(sorted[i] || null);
     }
-    
-    return sorted;
-  };
-
-  const getTopRatings = () => {
-    return getSortedRatings().slice(0, 6);
+    return result;
   };
 
   // Get top 6 comments
@@ -562,18 +534,6 @@ programEntries.sort((a, b) => b.total_completions - a.total_completions);
                       { value: "checkins", label: "Check-ins" }
                     ],
                     placeholder: "Select type"
-                  },
-                  {
-                    name: "Sort",
-                    value: leaderboardSort,
-                    onChange: (value) => setLeaderboardSort(value as any),
-                    options: [
-                      { value: "completions-desc", label: "Most Completions" },
-                      { value: "completions-asc", label: "Least Completions" },
-                      { value: "name-asc", label: "Name A-Z" },
-                      { value: "name-desc", label: "Name Z-A" }
-                    ],
-                    placeholder: "Sort by"
                   }
                 ]}
               />
@@ -584,25 +544,6 @@ programEntries.sort((a, b) => b.total_completions - a.total_completions);
                   {[...Array(6)].map((_, i) => (
                     <Skeleton key={i} className="h-12 w-full" />
                   ))}
-                </div>
-              ) : (leaderboardFilter === "workouts" ? workoutLeaderboard : leaderboardFilter === "programs" ? programLeaderboard : checkinLeaderboard).length === 0 ? (
-                <div className="text-center py-12 text-muted-foreground">
-                  {leaderboardFilter === "checkins" ? (
-                    <ClipboardCheck className="h-12 w-12 mx-auto mb-4 opacity-30" />
-                  ) : (
-                    <Trophy className="h-12 w-12 mx-auto mb-4 opacity-30" />
-                  )}
-                  <p className="text-lg font-medium mb-2">
-                    {leaderboardFilter === "checkins" ? "No check-ins yet" : "No completions yet"}
-                  </p>
-                  <p className="text-sm">
-                    {leaderboardFilter === "workouts" 
-                      ? "Start your fitness journey today and be the first on the leaderboard!"
-                      : leaderboardFilter === "programs"
-                      ? "Complete a training program and see your name here!"
-                      : "Start your morning & evening check-ins to track your progress and build consistency!"
-                    }
-                  </p>
                 </div>
               ) : (
                 <div className="overflow-x-auto">
@@ -615,9 +556,9 @@ programEntries.sort((a, b) => b.total_completions - a.total_completions);
                       </TableRow>
                     </TableHeader>
                     <TableBody>
-                      {getTopLeaderboard().map((entry, index) => (
+                      {getLeaderboardWithPlaceholders().map((entry, index) => (
                         <TableRow
-                          key={entry.user_id}
+                          key={entry?.user_id || `empty-${index}`}
                           className="border-primary/20 hover:bg-primary/5"
                         >
                           <TableCell className="font-medium text-xs md:text-sm py-2 md:py-3">
@@ -626,15 +567,23 @@ programEntries.sort((a, b) => b.total_completions - a.total_completions);
                             </div>
                           </TableCell>
                           <TableCell className="py-2 md:py-3">
-                            <div className="flex items-center gap-1 md:gap-2">
-                              <User className="h-3 w-3 md:h-4 md:w-4 text-muted-foreground flex-shrink-0" />
-                              <span className="font-medium text-xs md:text-sm truncate">{entry.display_name}</span>
-                            </div>
+                            {entry ? (
+                              <div className="flex items-center gap-1 md:gap-2">
+                                <User className="h-3 w-3 md:h-4 md:w-4 text-muted-foreground flex-shrink-0" />
+                                <span className="font-medium text-xs md:text-sm truncate">{entry.display_name}</span>
+                              </div>
+                            ) : (
+                              <span className="text-muted-foreground italic text-xs md:text-sm">Awaiting competitor...</span>
+                            )}
                           </TableCell>
                           <TableCell className="text-right py-2 md:py-3">
-                            <span className="inline-flex items-center gap-1 px-2 md:px-3 py-0.5 md:py-1 rounded-full bg-primary/10 text-primary font-semibold text-xs md:text-sm whitespace-nowrap">
-                              {entry.total_completions}
-                            </span>
+                            {entry ? (
+                              <span className="inline-flex items-center gap-1 px-2 md:px-3 py-0.5 md:py-1 rounded-full bg-primary/10 text-primary font-semibold text-xs md:text-sm whitespace-nowrap">
+                                {entry.total_completions}
+                              </span>
+                            ) : (
+                              <span className="text-muted-foreground">---</span>
+                            )}
                           </TableCell>
                         </TableRow>
                       ))}
@@ -663,18 +612,6 @@ programEntries.sort((a, b) => b.total_completions - a.total_completions);
                       { value: "programs", label: "Training Programs" }
                     ],
                     placeholder: "Select type"
-                  },
-                  {
-                    name: "Sort",
-                    value: ratingsSort,
-                    onChange: (value) => setRatingsSort(value as any),
-                    options: [
-                      { value: "rating-desc", label: "Highest Rated" },
-                      { value: "rating-asc", label: "Lowest Rated" },
-                      { value: "reviews-desc", label: "Most Reviews" },
-                      { value: "name-asc", label: "Name A-Z" }
-                    ],
-                    placeholder: "Sort by"
                   }
                 ]}
               />
@@ -686,40 +623,30 @@ programEntries.sort((a, b) => b.total_completions - a.total_completions);
                     <Skeleton key={i} className="h-12 w-full" />
                   ))}
                 </div>
-              ) : getSortedRatings().length === 0 ? (
-                <div className="text-center py-12 text-muted-foreground">
-                  <Star className="h-12 w-12 mx-auto mb-4 opacity-30" />
-                  <p className="text-lg font-medium mb-2">
-                    No ratings yet
-                  </p>
-                  <p className="text-sm">
-                    Be the first to rate a {ratingsFilter === "workouts" ? "workout" : "training program"}!
-                  </p>
-                </div>
               ) : (
-                <>
-                  <div className="overflow-x-auto">
-                    <Table>
-                      <TableHeader>
-                        <TableRow className="border-primary/30">
-                          <TableHead className="w-12 md:w-16 text-xs md:text-sm">Rank</TableHead>
-                          <TableHead className="text-xs md:text-sm">Name</TableHead>
-                          <TableHead className="text-center text-xs md:text-sm">Rating</TableHead>
-                          <TableHead className="text-right text-xs md:text-sm">Reviews</TableHead>
-                        </TableRow>
-                      </TableHeader>
-                      <TableBody>
-                        {getTopRatings().map((item, index) => (
-                          <TableRow
-                            key={item.content_id}
-                            className="border-primary/20 hover:bg-primary/5"
-                          >
-                            <TableCell className="font-medium text-xs md:text-sm py-2 md:py-3">
-                              <div className="flex items-center gap-1 md:gap-2">
-                                <span className="text-base md:text-lg">{getMedalIcon(index)}</span>
-                              </div>
-                            </TableCell>
-                            <TableCell className="py-2 md:py-3">
+                <div className="overflow-x-auto">
+                  <Table>
+                    <TableHeader>
+                      <TableRow className="border-primary/30">
+                        <TableHead className="w-12 md:w-16 text-xs md:text-sm">Rank</TableHead>
+                        <TableHead className="text-xs md:text-sm">Name</TableHead>
+                        <TableHead className="text-center text-xs md:text-sm">Rating</TableHead>
+                        <TableHead className="text-right text-xs md:text-sm">Reviews</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {getRatingsWithPlaceholders().map((item, index) => (
+                        <TableRow
+                          key={item?.content_id || `empty-${index}`}
+                          className="border-primary/20 hover:bg-primary/5"
+                        >
+                          <TableCell className="font-medium text-xs md:text-sm py-2 md:py-3">
+                            <div className="flex items-center gap-1 md:gap-2">
+                              <span className="text-base md:text-lg">{getMedalIcon(index)}</span>
+                            </div>
+                          </TableCell>
+                          <TableCell className="py-2 md:py-3">
+                            {item ? (
                               <Link 
                                 to={item.content_type === "workout" 
                                   ? `/workout/${item.workout_type}/${item.content_id}`
@@ -729,37 +656,34 @@ programEntries.sort((a, b) => b.total_completions - a.total_completions);
                               >
                                 {item.content_name}
                               </Link>
-                            </TableCell>
-                            <TableCell className="text-center py-2 md:py-3">
+                            ) : (
+                              <span className="text-muted-foreground italic text-xs md:text-sm">Awaiting rating...</span>
+                            )}
+                          </TableCell>
+                          <TableCell className="text-center py-2 md:py-3">
+                            {item ? (
                               <div className="flex items-center justify-center gap-1">
                                 <Star className="h-3 w-3 md:h-4 md:w-4 fill-primary text-primary" />
                                 <span className="font-semibold text-xs md:text-sm">{item.average_rating.toFixed(1)}</span>
                               </div>
-                            </TableCell>
-                            <TableCell className="text-right py-2 md:py-3">
+                            ) : (
+                              <span className="text-muted-foreground">---</span>
+                            )}
+                          </TableCell>
+                          <TableCell className="text-right py-2 md:py-3">
+                            {item ? (
                               <span className="inline-flex items-center gap-1 px-2 md:px-3 py-0.5 md:py-1 rounded-full bg-primary/10 text-primary font-semibold text-xs md:text-sm whitespace-nowrap">
                                 {item.rating_count}
                               </span>
-                            </TableCell>
-                          </TableRow>
-                        ))}
-                      </TableBody>
-                    </Table>
-                  </div>
-                  {getSortedRatings().length > 6 && (
-                    <div className="mt-4 text-center">
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => setShowRatingsModal(true)}
-                        className="gap-2"
-                      >
-                        <Eye className="h-4 w-4" />
-                        View All ({getSortedRatings().length})
-                      </Button>
-                    </div>
-                  )}
-                </>
+                            ) : (
+                              <span className="text-muted-foreground">---</span>
+                            )}
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </div>
               )}
             </CardContent>
           </Card>
@@ -892,67 +816,6 @@ programEntries.sort((a, b) => b.total_completions - a.total_completions);
           </div>
         </div>
       </div>
-
-      {/* Ratings Modal */}
-      <Dialog open={showRatingsModal} onOpenChange={setShowRatingsModal}>
-        <DialogContent className="max-w-2xl max-h-[80vh]">
-          <DialogHeader>
-            <DialogTitle className="flex items-center gap-2">
-              <Star className="h-5 w-5 text-primary" />
-              All {ratingsFilter === "workouts" ? "Workout" : "Program"} Ratings
-            </DialogTitle>
-          </DialogHeader>
-          <ScrollArea className="h-[60vh] pr-4">
-            <Table>
-              <TableHeader>
-                <TableRow className="border-primary/30">
-                  <TableHead className="w-12 md:w-16 text-xs md:text-sm">Rank</TableHead>
-                  <TableHead className="text-xs md:text-sm">Name</TableHead>
-                  <TableHead className="text-center text-xs md:text-sm">Rating</TableHead>
-                  <TableHead className="text-right text-xs md:text-sm">Reviews</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {getSortedRatings().map((item, index) => (
-                  <TableRow
-                    key={item.content_id}
-                    className="border-primary/20 hover:bg-primary/5"
-                  >
-                    <TableCell className="font-medium text-xs md:text-sm py-2 md:py-3">
-                      <div className="flex items-center gap-1 md:gap-2">
-                        <span className="text-base md:text-lg">{getMedalIcon(index)}</span>
-                      </div>
-                    </TableCell>
-                    <TableCell className="py-2 md:py-3">
-                      <Link 
-                        to={item.content_type === "workout" 
-                          ? `/workout/${item.workout_type}/${item.content_id}`
-                          : `/trainingprogram/${item.program_type}/${item.content_id}`
-                        }
-                        className="font-medium text-xs md:text-sm truncate text-primary hover:underline"
-                        onClick={() => setShowRatingsModal(false)}
-                      >
-                        {item.content_name}
-                      </Link>
-                    </TableCell>
-                    <TableCell className="text-center py-2 md:py-3">
-                      <div className="flex items-center justify-center gap-1">
-                        <Star className="h-3 w-3 md:h-4 md:w-4 fill-primary text-primary" />
-                        <span className="font-semibold text-xs md:text-sm">{item.average_rating.toFixed(1)}</span>
-                      </div>
-                    </TableCell>
-                    <TableCell className="text-right py-2 md:py-3">
-                      <span className="inline-flex items-center gap-1 px-2 md:px-3 py-0.5 md:py-1 rounded-full bg-primary/10 text-primary font-semibold text-xs md:text-sm whitespace-nowrap">
-                        {item.rating_count}
-                      </span>
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </ScrollArea>
-        </DialogContent>
-      </Dialog>
 
       {/* Comments Modal */}
       <Dialog open={showCommentsModal} onOpenChange={setShowCommentsModal}>
