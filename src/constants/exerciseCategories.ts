@@ -56,6 +56,14 @@ export const PROGRAM_CATEGORIES = [
   'Mobility and Stability'
 ] as const;
 
+export const WORKOUT_PHASES = [
+  'Warm-up',
+  'Main Workout',
+  'Cool-down',
+  'General'
+] as const;
+
 export type MuscleGroup = keyof typeof MUSCLE_CATEGORIES;
 export type WorkoutCategory = typeof WORKOUT_CATEGORIES[number];
 export type ProgramCategory = typeof PROGRAM_CATEGORIES[number];
+export type WorkoutPhase = typeof WORKOUT_PHASES[number];

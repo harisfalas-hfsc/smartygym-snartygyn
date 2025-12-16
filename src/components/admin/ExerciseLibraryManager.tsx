@@ -13,7 +13,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Plus, Pencil, Trash2, Video, ExternalLink } from "lucide-react";
 import { toast } from "sonner";
 import { extractYouTubeId, getYouTubeThumbnail, isValidYouTubeUrl, getRestrictedEmbedUrl } from "@/utils/youtube";
-import { MUSCLE_CATEGORIES, MUSCLE_GROUPS, WORKOUT_CATEGORIES, PROGRAM_CATEGORIES } from "@/constants/exerciseCategories";
+import { MUSCLE_CATEGORIES, MUSCLE_GROUPS, WORKOUT_CATEGORIES, PROGRAM_CATEGORIES, WORKOUT_PHASES } from "@/constants/exerciseCategories";
 
 interface ExerciseVideo {
   id: string;
@@ -27,6 +27,7 @@ interface ExerciseVideo {
   target_muscle: string | null;
   workout_category: string | null;
   program_category: string | null;
+  workout_phase: string | null;
   display_order: number;
   is_visible: boolean;
   created_at: string;
@@ -45,6 +46,7 @@ const ExerciseLibraryManager = () => {
     youtube_url: '',
     muscle_group: '',
     target_muscle: '',
+    workout_phase: '',
     workout_category: '',
     program_category: '',
     display_order: 0,
@@ -82,6 +84,7 @@ const ExerciseLibraryManager = () => {
           category: data.muscle_group || 'General',
           muscle_group: data.muscle_group || null,
           target_muscle: data.target_muscle || null,
+          workout_phase: data.workout_phase || null,
           workout_category: data.workout_category || null,
           program_category: data.program_category || null,
           display_order: data.display_order,
@@ -117,6 +120,7 @@ const ExerciseLibraryManager = () => {
           category: data.muscle_group || 'General',
           muscle_group: data.muscle_group || null,
           target_muscle: data.target_muscle || null,
+          workout_phase: data.workout_phase || null,
           workout_category: data.workout_category || null,
           program_category: data.program_category || null,
           display_order: data.display_order,
@@ -182,6 +186,7 @@ const ExerciseLibraryManager = () => {
       youtube_url: '',
       muscle_group: '',
       target_muscle: '',
+      workout_phase: '',
       workout_category: '',
       program_category: '',
       display_order: 0,
@@ -197,6 +202,7 @@ const ExerciseLibraryManager = () => {
       youtube_url: video.youtube_url,
       muscle_group: video.muscle_group || '',
       target_muscle: video.target_muscle || '',
+      workout_phase: video.workout_phase || '',
       workout_category: video.workout_category || '',
       program_category: video.program_category || '',
       display_order: video.display_order,
@@ -278,6 +284,7 @@ const ExerciseLibraryManager = () => {
                     <TableHead>Thumbnail</TableHead>
                     <TableHead>Title</TableHead>
                     <TableHead>Muscle</TableHead>
+                    <TableHead>Phase</TableHead>
                     <TableHead>Workout</TableHead>
                     <TableHead>Program</TableHead>
                     <TableHead>Order</TableHead>
@@ -311,6 +318,9 @@ const ExerciseLibraryManager = () => {
                           )}
                           {!video.muscle_group && <span className="text-muted-foreground">-</span>}
                         </div>
+                      </TableCell>
+                      <TableCell>
+                        <span className="text-sm">{video.workout_phase || '-'}</span>
                       </TableCell>
                       <TableCell>
                         <span className="text-sm">{video.workout_category || '-'}</span>
@@ -423,7 +433,7 @@ const ExerciseLibraryManager = () => {
 
             {/* Muscle Category Section */}
             <div className="border rounded-lg p-4 space-y-4 bg-muted/30">
-              <h4 className="font-semibold text-sm">Muscle Category (for exercises)</h4>
+              <h4 className="font-semibold text-sm">Muscle Targeting</h4>
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label>Body Region</Label>
@@ -464,26 +474,51 @@ const ExerciseLibraryManager = () => {
               </div>
             </div>
 
-            {/* Workout & Program Categories */}
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label>Workout Category</Label>
-                <Select
-                  value={formData.workout_category || 'none'}
-                  onValueChange={(value) => setFormData(prev => ({ ...prev, workout_category: value === 'none' ? '' : value }))}
-                >
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select workout category" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="none">None</SelectItem>
-                    {WORKOUT_CATEGORIES.map((cat) => (
-                      <SelectItem key={cat} value={cat}>{cat}</SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
+            {/* Workout Context Section */}
+            <div className="border rounded-lg p-4 space-y-4 bg-muted/30">
+              <h4 className="font-semibold text-sm">Workout Context</h4>
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label>Workout Phase</Label>
+                  <Select
+                    value={formData.workout_phase || 'none'}
+                    onValueChange={(value) => setFormData(prev => ({ ...prev, workout_phase: value === 'none' ? '' : value }))}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select phase" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="none">None</SelectItem>
+                      {WORKOUT_PHASES.map((phase) => (
+                        <SelectItem key={phase} value={phase}>{phase}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
 
+                <div className="space-y-2">
+                  <Label>Workout Category</Label>
+                  <Select
+                    value={formData.workout_category || 'none'}
+                    onValueChange={(value) => setFormData(prev => ({ ...prev, workout_category: value === 'none' ? '' : value }))}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select workout category" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="none">None</SelectItem>
+                      {WORKOUT_CATEGORIES.map((cat) => (
+                        <SelectItem key={cat} value={cat}>{cat}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+            </div>
+
+            {/* Program Context Section */}
+            <div className="border rounded-lg p-4 space-y-4 bg-muted/30">
+              <h4 className="font-semibold text-sm">Program Context</h4>
               <div className="space-y-2">
                 <Label>Program Category</Label>
                 <Select
