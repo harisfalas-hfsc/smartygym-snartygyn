@@ -771,9 +771,13 @@ export type Database = {
           display_order: number | null
           id: string
           is_visible: boolean | null
+          muscle_group: string | null
+          program_category: string | null
+          target_muscle: string | null
           thumbnail_url: string | null
           title: string
           updated_at: string | null
+          workout_category: string | null
           youtube_url: string
           youtube_video_id: string
         }
@@ -784,9 +788,13 @@ export type Database = {
           display_order?: number | null
           id?: string
           is_visible?: boolean | null
+          muscle_group?: string | null
+          program_category?: string | null
+          target_muscle?: string | null
           thumbnail_url?: string | null
           title: string
           updated_at?: string | null
+          workout_category?: string | null
           youtube_url: string
           youtube_video_id: string
         }
@@ -797,9 +805,13 @@ export type Database = {
           display_order?: number | null
           id?: string
           is_visible?: boolean | null
+          muscle_group?: string | null
+          program_category?: string | null
+          target_muscle?: string | null
           thumbnail_url?: string | null
           title?: string
           updated_at?: string | null
+          workout_category?: string | null
           youtube_url?: string
           youtube_video_id?: string
         }
