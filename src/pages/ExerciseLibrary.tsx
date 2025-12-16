@@ -90,7 +90,7 @@ const ExerciseLibrary = () => {
             <CardContent className="p-6">
               <div className="flex items-center gap-3 mb-4">
                 <Video className="h-6 w-6 text-primary" />
-                <h2 className="text-xl font-semibold text-foreground">Workouts & Training Programs Demonstration</h2>
+                <h2 className="text-xl font-semibold text-foreground">Exercises, Workouts & Training Programs Demonstration</h2>
               </div>
               <p className="text-muted-foreground mb-6">
                 Watch expert demonstrations of exercises and workout techniques
