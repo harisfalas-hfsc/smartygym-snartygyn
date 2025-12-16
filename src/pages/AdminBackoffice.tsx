@@ -6,7 +6,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
-import { ArrowLeft, Folder, Users, Mail, FileText, Settings, BarChart3, BookOpen, MessageSquare, Inbox, Image, TrendingUp, Plus, Dumbbell, Calendar, Bell, ShoppingBag, Sparkles, Building2 } from "lucide-react";
+import { ArrowLeft, Folder, Users, Mail, FileText, Settings, BarChart3, BookOpen, MessageSquare, Inbox, Image, TrendingUp, Plus, Dumbbell, Calendar, Bell, ShoppingBag, Sparkles, Building2, Video } from "lucide-react";
 import { ContentManager } from "@/components/admin/ContentManager";
 import { CommunicationsManager } from "@/components/admin/CommunicationsManager";
 import { EmailManager } from "@/components/admin/EmailManager";
@@ -24,6 +24,7 @@ import { CommentModerationPanel } from "@/components/admin/CommentModerationPane
 import { NotificationHistoryManager } from "@/components/admin/NotificationHistoryManager";
 import { AdminDocumentationManager } from "@/components/admin/AdminDocumentationManager";
 import { CorporateDashboard } from "@/components/admin/CorporateDashboard";
+import ExerciseLibraryManager from "@/components/admin/ExerciseLibraryManager";
 import { supabase } from "@/integrations/supabase/client";
 
 export default function AdminBackoffice() {
@@ -267,6 +268,11 @@ export default function AdminBackoffice() {
               <span className="hidden sm:inline">Shop</span>
             </TabsTrigger>
 
+            <TabsTrigger value="exercise-library" className="flex items-center justify-center gap-1 sm:gap-1.5 text-xs sm:text-sm px-2 sm:px-3 py-2 sm:py-2.5 whitespace-nowrap flex-shrink-0">
+              <Video className="h-3 w-3 sm:h-4 sm:w-4 shrink-0" />
+              <span className="hidden sm:inline">Exercise Library</span>
+            </TabsTrigger>
+
             <TabsTrigger value="docs" className="flex items-center justify-center gap-1 sm:gap-1.5 text-xs sm:text-sm px-2 sm:px-3 py-2 sm:py-2.5 whitespace-nowrap flex-shrink-0">
               <FileText className="h-3 w-3 sm:h-4 sm:w-4 shrink-0" />
               <span className="hidden sm:inline">Docs</span>
@@ -360,6 +366,10 @@ export default function AdminBackoffice() {
                   <ShopOrdersManager />
                 </TabsContent>
               </Tabs>
+            </TabsContent>
+
+            <TabsContent value="exercise-library" className="mt-0">
+              <ExerciseLibraryManager />
             </TabsContent>
 
             <TabsContent value="docs" className="mt-0">

@@ -3,9 +3,10 @@ import { Helmet } from "react-helmet";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { PageBreadcrumbs } from "@/components/PageBreadcrumbs";
-import { ArrowLeft, Youtube } from "lucide-react";
+import { ArrowLeft, Youtube, Video } from "lucide-react";
 import { useShowBackButton } from "@/hooks/useShowBackButton";
 import { SEOEnhancer } from "@/components/SEOEnhancer";
+import ExerciseVideoGrid from "@/components/ExerciseVideoGrid";
 
 const ExerciseLibrary = () => {
   const navigate = useNavigate();
@@ -83,6 +84,20 @@ const ExerciseLibrary = () => {
               { label: "Exercise Library" }
             ]} 
           />
+
+          {/* Workouts & Training Programs Demonstration Card */}
+          <Card className="border-2 border-primary/30 shadow-lg mb-6">
+            <CardContent className="p-6">
+              <div className="flex items-center gap-3 mb-4">
+                <Video className="h-6 w-6 text-primary" />
+                <h2 className="text-xl font-semibold text-foreground">Workouts & Training Programs Demonstration</h2>
+              </div>
+              <p className="text-muted-foreground mb-6">
+                Watch expert demonstrations of exercises and workout techniques
+              </p>
+              <ExerciseVideoGrid />
+            </CardContent>
+          </Card>
 
           {/* YouTube Channel Card */}
           <Card className="border-2 border-primary/30 shadow-lg">
