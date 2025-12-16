@@ -778,6 +778,7 @@ export type Database = {
           title: string
           updated_at: string | null
           workout_category: string | null
+          workout_phase: string | null
           youtube_url: string
           youtube_video_id: string
         }
@@ -795,6 +796,7 @@ export type Database = {
           title: string
           updated_at?: string | null
           workout_category?: string | null
+          workout_phase?: string | null
           youtube_url: string
           youtube_video_id: string
         }
@@ -812,6 +814,7 @@ export type Database = {
           title?: string
           updated_at?: string | null
           workout_category?: string | null
+          workout_phase?: string | null
           youtube_url?: string
           youtube_video_id?: string
         }

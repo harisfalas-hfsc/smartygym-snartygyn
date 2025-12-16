@@ -8,7 +8,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
-import { MUSCLE_CATEGORIES, MUSCLE_GROUPS, WORKOUT_CATEGORIES, PROGRAM_CATEGORIES } from "@/constants/exerciseCategories";
+import { MUSCLE_CATEGORIES, MUSCLE_GROUPS, WORKOUT_CATEGORIES, PROGRAM_CATEGORIES, WORKOUT_PHASES } from "@/constants/exerciseCategories";
 
 interface ExerciseVideo {
   id: string;
@@ -20,12 +20,14 @@ interface ExerciseVideo {
   target_muscle: string | null;
   workout_category: string | null;
   program_category: string | null;
+  workout_phase: string | null;
   display_order: number;
 }
 
 interface Filters {
   muscleGroup: string;
   targetMuscle: string;
+  workoutPhase: string;
   workoutCategory: string;
   programCategory: string;
 }
@@ -35,6 +37,7 @@ const ExerciseVideoGrid = () => {
   const [filters, setFilters] = useState<Filters>({
     muscleGroup: '',
     targetMuscle: '',
+    workoutPhase: '',
     workoutCategory: '',
     programCategory: ''
   });
@@ -60,6 +63,7 @@ const ExerciseVideoGrid = () => {
     return videos.filter(video => {
       if (filters.muscleGroup && video.muscle_group !== filters.muscleGroup) return false;
       if (filters.targetMuscle && video.target_muscle !== filters.targetMuscle) return false;
+      if (filters.workoutPhase && video.workout_phase !== filters.workoutPhase) return false;
       if (filters.workoutCategory && video.workout_category !== filters.workoutCategory) return false;
       if (filters.programCategory && video.program_category !== filters.programCategory) return false;
       return true;
@@ -82,12 +86,13 @@ const ExerciseVideoGrid = () => {
     setFilters({
       muscleGroup: '',
       targetMuscle: '',
+      workoutPhase: '',
       workoutCategory: '',
       programCategory: ''
     });
   };
 
-  const hasActiveFilters = filters.muscleGroup || filters.targetMuscle || filters.workoutCategory || filters.programCategory;
+  const hasActiveFilters = filters.muscleGroup || filters.targetMuscle || filters.workoutPhase || filters.workoutCategory || filters.programCategory;
 
   if (isLoading) {
     return (
@@ -114,71 +119,99 @@ const ExerciseVideoGrid = () => {
           <span>Filter by:</span>
         </div>
         
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-          {/* Muscle Group Filter */}
-          <Select
-            value={filters.muscleGroup || 'all'}
-            onValueChange={handleMuscleGroupChange}
-          >
-            <SelectTrigger className="h-9">
-              <SelectValue placeholder="Body Region" />
-            </SelectTrigger>
-            <SelectContent side="bottom">
-              <SelectItem value="all">All Body Regions</SelectItem>
-              {MUSCLE_GROUPS.map((group) => (
-                <SelectItem key={group} value={group}>{group}</SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+        {/* Grouped Filters */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          {/* Muscle Targeting Group */}
+          <div className="border border-border/50 rounded-lg p-3 bg-muted/20">
+            <p className="text-xs font-medium text-muted-foreground mb-2">Muscle Targeting</p>
+            <div className="flex flex-col gap-2">
+              <Select
+                value={filters.muscleGroup || 'all'}
+                onValueChange={handleMuscleGroupChange}
+              >
+                <SelectTrigger className="h-8 text-sm">
+                  <SelectValue placeholder="Body Region" />
+                </SelectTrigger>
+                <SelectContent side="bottom">
+                  <SelectItem value="all">All Body Regions</SelectItem>
+                  {MUSCLE_GROUPS.map((group) => (
+                    <SelectItem key={group} value={group}>{group}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
 
-          {/* Target Muscle Filter */}
-          <Select
-            value={filters.targetMuscle || 'all'}
-            onValueChange={(value) => setFilters(prev => ({ ...prev, targetMuscle: value === 'all' ? '' : value }))}
-            disabled={!filters.muscleGroup}
-          >
-            <SelectTrigger className="h-9">
-              <SelectValue placeholder="Target Muscle" />
-            </SelectTrigger>
-            <SelectContent side="bottom">
-              <SelectItem value="all">All Muscles</SelectItem>
-              {availableMuscles.map((muscle) => (
-                <SelectItem key={muscle} value={muscle}>{muscle}</SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+              <Select
+                value={filters.targetMuscle || 'all'}
+                onValueChange={(value) => setFilters(prev => ({ ...prev, targetMuscle: value === 'all' ? '' : value }))}
+                disabled={!filters.muscleGroup}
+              >
+                <SelectTrigger className="h-8 text-sm">
+                  <SelectValue placeholder="Target Muscle" />
+                </SelectTrigger>
+                <SelectContent side="bottom">
+                  <SelectItem value="all">All Muscles</SelectItem>
+                  {availableMuscles.map((muscle) => (
+                    <SelectItem key={muscle} value={muscle}>{muscle}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
 
-          {/* Workout Category Filter */}
-          <Select
-            value={filters.workoutCategory || 'all'}
-            onValueChange={(value) => setFilters(prev => ({ ...prev, workoutCategory: value === 'all' ? '' : value }))}
-          >
-            <SelectTrigger className="h-9">
-              <SelectValue placeholder="Workout Type" />
-            </SelectTrigger>
-            <SelectContent side="bottom">
-              <SelectItem value="all">All Workout Types</SelectItem>
-              {WORKOUT_CATEGORIES.map((cat) => (
-                <SelectItem key={cat} value={cat}>{cat}</SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+          {/* Workout Context Group */}
+          <div className="border border-border/50 rounded-lg p-3 bg-muted/20">
+            <p className="text-xs font-medium text-muted-foreground mb-2">Workout Context</p>
+            <div className="flex flex-col gap-2">
+              <Select
+                value={filters.workoutPhase || 'all'}
+                onValueChange={(value) => setFilters(prev => ({ ...prev, workoutPhase: value === 'all' ? '' : value }))}
+              >
+                <SelectTrigger className="h-8 text-sm">
+                  <SelectValue placeholder="Workout Phase" />
+                </SelectTrigger>
+                <SelectContent side="bottom">
+                  <SelectItem value="all">All Phases</SelectItem>
+                  {WORKOUT_PHASES.map((phase) => (
+                    <SelectItem key={phase} value={phase}>{phase}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
 
-          {/* Program Category Filter */}
-          <Select
-            value={filters.programCategory || 'all'}
-            onValueChange={(value) => setFilters(prev => ({ ...prev, programCategory: value === 'all' ? '' : value }))}
-          >
-            <SelectTrigger className="h-9">
-              <SelectValue placeholder="Program Type" />
-            </SelectTrigger>
-            <SelectContent side="bottom">
-              <SelectItem value="all">All Program Types</SelectItem>
-              {PROGRAM_CATEGORIES.map((cat) => (
-                <SelectItem key={cat} value={cat}>{cat}</SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+              <Select
+                value={filters.workoutCategory || 'all'}
+                onValueChange={(value) => setFilters(prev => ({ ...prev, workoutCategory: value === 'all' ? '' : value }))}
+              >
+                <SelectTrigger className="h-8 text-sm">
+                  <SelectValue placeholder="Workout Type" />
+                </SelectTrigger>
+                <SelectContent side="bottom">
+                  <SelectItem value="all">All Workout Types</SelectItem>
+                  {WORKOUT_CATEGORIES.map((cat) => (
+                    <SelectItem key={cat} value={cat}>{cat}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+
+          {/* Program Context Group */}
+          <div className="border border-border/50 rounded-lg p-3 bg-muted/20">
+            <p className="text-xs font-medium text-muted-foreground mb-2">Program Context</p>
+            <Select
+              value={filters.programCategory || 'all'}
+              onValueChange={(value) => setFilters(prev => ({ ...prev, programCategory: value === 'all' ? '' : value }))}
+            >
+              <SelectTrigger className="h-8 text-sm">
+                <SelectValue placeholder="Program Type" />
+              </SelectTrigger>
+              <SelectContent side="bottom">
+                <SelectItem value="all">All Program Types</SelectItem>
+                {PROGRAM_CATEGORIES.map((cat) => (
+                  <SelectItem key={cat} value={cat}>{cat}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
         </div>
 
         {/* Active Filters & Clear */}
@@ -195,6 +228,12 @@ const ExerciseVideoGrid = () => {
               <Badge variant="secondary" className="gap-1">
                 {filters.targetMuscle}
                 <X className="h-3 w-3 cursor-pointer" onClick={() => setFilters(prev => ({ ...prev, targetMuscle: '' }))} />
+              </Badge>
+            )}
+            {filters.workoutPhase && (
+              <Badge variant="secondary" className="gap-1">
+                {filters.workoutPhase}
+                <X className="h-3 w-3 cursor-pointer" onClick={() => setFilters(prev => ({ ...prev, workoutPhase: '' }))} />
               </Badge>
             )}
             {filters.workoutCategory && (
@@ -258,7 +297,7 @@ const ExerciseVideoGrid = () => {
                 </div>
                 {/* Show most relevant category badge */}
                 <div className="absolute bottom-2 left-2 bg-black/70 text-white text-xs px-2 py-1 rounded">
-                  {video.target_muscle || video.muscle_group || video.workout_category || video.program_category || 'General'}
+                  {video.target_muscle || video.muscle_group || video.workout_phase || video.workout_category || video.program_category || 'General'}
                 </div>
               </div>
               <p className="mt-2 text-sm font-medium line-clamp-2 group-hover:text-primary transition-colors">
