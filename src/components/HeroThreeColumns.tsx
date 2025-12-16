@@ -222,7 +222,7 @@ export const HeroThreeColumns = () => {
           onClick={() => navigate("/workout/wod")}
           className="cursor-pointer group border-2 border-green-500 rounded-xl p-4 
                      hover:border-primary hover:shadow-lg transition-all duration-300
-                     flex flex-col items-center min-h-[180px] w-[200px]"
+                     flex flex-col items-center min-h-[210px] w-[250px]"
         >
           {/* Gold Circle with Dumbbell */}
           <div className="relative">
@@ -246,11 +246,11 @@ export const HeroThreeColumns = () => {
           {currentWod && (
             <div 
               key={currentWod.id}
-              className="mt-1.5 text-center space-y-0.5 animate-fade-in h-[60px]"
+              className="mt-2 text-center space-y-1 animate-fade-in"
             >
-              <p className="text-sm font-semibold text-foreground line-clamp-2 max-w-[160px] leading-tight">{currentWod.name}</p>
+              <p className="text-sm font-semibold text-foreground line-clamp-2 max-w-[200px] leading-tight">{currentWod.name}</p>
               <p className="text-xs text-red-600 dark:text-red-400 font-medium">{currentWod.category}</p>
-              <div className="flex items-center justify-center gap-2 text-xs text-muted-foreground">
+              <div className="flex flex-wrap items-center justify-center gap-1.5 text-xs text-muted-foreground">
                 {currentWod.format && <span className="text-emerald-600 dark:text-emerald-400 font-medium">{currentWod.format}</span>}
                 {currentWod.difficulty_stars && (
                   <>
