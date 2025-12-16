@@ -442,7 +442,7 @@ const Index = () => {
               <p className="text-base text-muted-foreground">
                 Your gym Re-imagined. Anywhere. Anytime.
               </p>
-              <p className="text-sm text-primary italic mt-3 px-2">
+              <p className="text-sm mt-3 px-2 font-medium" style={{ color: 'hsl(195, 85%, 45%)' }}>
                 Where Science Meets Convenience. Where Real Coaches Guide Real People.
               </p>
             </div>
@@ -631,7 +631,7 @@ const Index = () => {
           <div className="flex justify-center mt-4 mb-8 lg:mb-16">
             <div className="inline-flex items-center gap-2 px-3 md:px-4 py-1.5 md:py-2 bg-primary/5 border border-green-500 rounded-full">
               <Sparkles className="h-3 w-3 md:h-4 md:w-4 text-primary flex-shrink-0" />
-              <p className="text-sm md:text-base lg:text-lg font-semibold text-primary italic text-center">
+              <p className="text-sm md:text-base lg:text-lg font-semibold text-center" style={{ color: 'hsl(195, 85%, 45%)' }}>
                 Where Science Meets Convenience. Where Real Coaches Guide Real People.
               </p>
               <Sparkles className="h-3 w-3 md:h-4 md:w-4 text-primary flex-shrink-0" />
