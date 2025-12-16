@@ -86,20 +86,6 @@ const ExerciseLibrary = () => {
             ]} 
           />
 
-          {/* Workouts & Training Programs Demonstration Card */}
-          <Card className="border-2 border-primary/30 shadow-lg mb-6">
-            <CardContent className="p-6">
-              <div className="flex items-center gap-3 mb-4">
-                <Video className="h-6 w-6 text-primary" />
-                <h2 className="text-xl font-semibold text-foreground">Exercises, Workouts & Training Programs Demonstration</h2>
-              </div>
-              <p className="text-muted-foreground mb-6">
-                Watch expert demonstrations of exercises and workout techniques
-              </p>
-              <ExerciseVideoGrid />
-            </CardContent>
-          </Card>
-
           {/* Exercise Database Card - Gym Fit API */}
           <Card className="border-2 border-primary/30 shadow-lg mb-6">
             <CardContent className="p-6">
@@ -111,6 +97,19 @@ const ExerciseLibrary = () => {
                 Browse hundreds of exercises with animated demonstrations, detailed instructions, and filtering by body part or equipment
               </p>
               <ExerciseDatabase />
+            </CardContent>
+          </Card>
+
+          {/* SmartyGym Video Gallery Card */}
+          <Card className="border-2 border-primary/30 shadow-lg mb-6">
+            <CardContent className="p-6">
+              <div className="flex items-center gap-3 mb-4">
+                <Video className="h-6 w-6 text-primary" />
+                <h2 className="text-xl font-semibold text-foreground">
+                  <span className="text-primary">SmartyGym</span> Video Gallery
+                </h2>
+              </div>
+              <ExerciseVideoGrid />
             </CardContent>
           </Card>
 
