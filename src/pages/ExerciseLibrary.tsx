@@ -121,9 +121,6 @@ const ExerciseLibrary = () => {
                   <Youtube className="h-6 w-6 text-primary flex-shrink-0" />
                   <h2 className="text-xl font-semibold text-foreground text-center">The Smarty Gym YouTube Channel</h2>
                 </div>
-                <p className="text-center text-muted-foreground mb-4">
-                  Browse all exercise videos, tutorials, and demonstrations
-                </p>
                 <div className="flex justify-center">
                   <Button
                     asChild
@@ -138,39 +135,57 @@ const ExerciseLibrary = () => {
                 </div>
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
                 <Card className="border border-border">
-                  <CardContent className="p-4">
-                    <h3 className="font-semibold mb-2 text-foreground">💪 Exercise Demonstrations</h3>
-                    <p className="text-sm text-muted-foreground">
-                      Watch proper form and technique for hundreds of exercises
+                  <CardContent className="p-3">
+                    <h3 className="font-semibold mb-1 text-foreground text-sm">💪 Exercise Demonstrations & Technique Breakdown</h3>
+                    <p className="text-xs text-muted-foreground">
+                      Proper form and detailed technique analysis
                     </p>
                   </CardContent>
                 </Card>
                 
                 <Card className="border border-border">
-                  <CardContent className="p-4">
-                    <h3 className="font-semibold mb-2 text-foreground">🎯 Training Tips</h3>
-                    <p className="text-sm text-muted-foreground">
-                      Learn from expert coaching and training methodology
+                  <CardContent className="p-3">
+                    <h3 className="font-semibold mb-1 text-foreground text-sm">🎯 Training Tips & Educational Talks</h3>
+                    <p className="text-xs text-muted-foreground">
+                      Expert coaching insights and fitness education
                     </p>
                   </CardContent>
                 </Card>
                 
                 <Card className="border border-border">
-                  <CardContent className="p-4">
-                    <h3 className="font-semibold mb-2 text-foreground">📚 Tutorial Videos</h3>
-                    <p className="text-sm text-muted-foreground">
-                      Step-by-step guides for mastering complex movements
+                  <CardContent className="p-3">
+                    <h3 className="font-semibold mb-1 text-foreground text-sm">🔥 Workout Previews & Program Walkthroughs</h3>
+                    <p className="text-xs text-muted-foreground">
+                      Preview workouts and see program breakdowns
                     </p>
                   </CardContent>
                 </Card>
                 
                 <Card className="border border-border">
-                  <CardContent className="p-4">
-                    <h3 className="font-semibold mb-2 text-foreground">🔥 Workout Previews</h3>
-                    <p className="text-sm text-muted-foreground">
-                      Preview workouts and see what to expect from each session
+                  <CardContent className="p-3">
+                    <h3 className="font-semibold mb-1 text-foreground text-sm">🎓 Master Classes, Webinars & Workshops</h3>
+                    <p className="text-xs text-muted-foreground">
+                      In-depth educational sessions and live events
+                    </p>
+                  </CardContent>
+                </Card>
+                
+                <Card className="border border-border">
+                  <CardContent className="p-3">
+                    <h3 className="font-semibold mb-1 text-foreground text-sm">📋 Training Tips</h3>
+                    <p className="text-xs text-muted-foreground">
+                      Quick tips and coaching methodology
+                    </p>
+                  </CardContent>
+                </Card>
+                
+                <Card className="border border-border">
+                  <CardContent className="p-3">
+                    <h3 className="font-semibold mb-1 text-foreground text-sm">📚 Tutorial Videos</h3>
+                    <p className="text-xs text-muted-foreground">
+                      Step-by-step guides for complex movements
                     </p>
                   </CardContent>
                 </Card>
