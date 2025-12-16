@@ -72,7 +72,25 @@ serve(async (req) => {
     const data = await response.json();
     console.log(`ExerciseDB response for ${endpoint}:`, Array.isArray(data) ? `${data.length} items` : 'single item');
 
-    return new Response(JSON.stringify(data), {
+    // Helper to add image URL to each exercise
+    const addImageUrl = (exercise: any) => {
+      if (exercise && exercise.id) {
+        exercise.gifUrl = `https://exercisedb.p.rapidapi.com/image?exerciseId=${exercise.id}&resolution=360&rapidapi-key=${apiKey}`;
+      }
+      return exercise;
+    };
+
+    // Process response to add image URLs
+    let processedData;
+    if (Array.isArray(data)) {
+      processedData = data.map(addImageUrl);
+    } else if (data && data.id) {
+      processedData = addImageUrl(data);
+    } else {
+      processedData = data;
+    }
+
+    return new Response(JSON.stringify(processedData), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     });
   } catch (error: unknown) {
