@@ -72,17 +72,13 @@ serve(async (req) => {
     const data = await response.json();
     console.log(`ExerciseDB response for ${endpoint}:`, Array.isArray(data) ? `${data.length} items` : 'single item');
 
-    // Helper to ensure each exercise has a browser-loadable gifUrl (do NOT overwrite if API already provides one)
+    // Helper to ensure each exercise has a browser-loadable gifUrl.
+    // ExerciseDB's public CDN expects 4-digit, zero-padded IDs (e.g. 79 -> 0079).
     const addImageUrl = (exercise: any) => {
-      if (!exercise || !exercise.id) return exercise;
+      if (!exercise || exercise.id == null) return exercise;
 
-      // Preserve a valid URL coming from the API (common case)
-      if (typeof exercise.gifUrl === 'string' && exercise.gifUrl.trim().length > 0) {
-        return exercise;
-      }
-
-      // Fallback to the public CDN format (no headers / no API key required)
-      exercise.gifUrl = `https://v2.exercisedb.io/image/${exercise.id}.gif`;
+      const normalizedId = String(exercise.id).padStart(4, '0');
+      exercise.gifUrl = `https://v2.exercisedb.io/image/${normalizedId}.gif`;
       return exercise;
     };
 

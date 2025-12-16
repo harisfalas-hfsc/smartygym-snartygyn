@@ -8,6 +8,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/u
 import { Badge } from '@/components/ui/badge';
 import { PlayCircle, Search, X, Loader2, Dumbbell } from 'lucide-react';
 import { toast } from 'sonner';
+import { ExerciseGif } from '@/components/ExerciseGif';
 
 interface Exercise {
   id: string;
