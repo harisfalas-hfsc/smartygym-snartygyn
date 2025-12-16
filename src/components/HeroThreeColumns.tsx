@@ -209,10 +209,10 @@ export const HeroThreeColumns = () => {
         {/* Simple CTA Link */}
         <div 
           onClick={() => navigate("/human-performance")}
-          className="mt-3 flex items-center gap-2 cursor-pointer group hover:text-primary transition-colors rounded-md px-2 py-1 -mx-2 hover:bg-primary/10"
+          className="mt-1.5 flex items-center gap-2 cursor-pointer group hover:text-primary transition-colors rounded-md px-2 py-1 -mx-2 hover:bg-primary/10"
         >
           <TrendingUp className="w-4 h-4 text-green-500 flex-shrink-0" />
-          <span className="text-sm font-bold underline group-hover:text-primary transition-colors">Why Invest in SmartyGym?</span>
+          <span className="text-sm font-bold underline text-green-500 group-hover:text-primary transition-colors">Why Invest in SmartyGym?</span>
         </div>
       </div>
 
