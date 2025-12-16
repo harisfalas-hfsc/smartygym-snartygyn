@@ -221,15 +221,16 @@ export const HeroThreeColumns = () => {
         <div 
           onClick={() => navigate("/workout/wod")}
           className="cursor-pointer group border-2 border-green-500 rounded-xl p-4 
-                     hover:border-primary hover:shadow-lg transition-all duration-300
+                     hover:border-primary hover:shadow-xl hover:scale-105 hover:-translate-y-1 
+                     transition-all duration-300
                      flex flex-col items-center h-[220px] w-[250px] overflow-hidden"
         >
           {/* Gold Circle with Dumbbell */}
           <div className="relative">
-            <div className="w-14 h-14 rounded-full bg-primary/10 
+            <div className="w-14 h-14 rounded-full 
                             flex items-center justify-center shadow-md
                             group-hover:scale-110 transition-transform duration-300
-                            ring-2 ring-emerald-500 dark:ring-emerald-400 ring-offset-2 ring-offset-background">
+                            ring-2 ring-red-500 dark:ring-red-400 ring-offset-2 ring-offset-background">
               <Dumbbell className="w-7 h-7 text-primary" />
             </div>
             
