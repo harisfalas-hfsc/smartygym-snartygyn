@@ -1023,12 +1023,28 @@ export default function CalculatorHistory() {
                 <CardTitle className="text-base flex items-center gap-2">
                   <Target className="h-4 w-4 text-primary" />
                   Goal Progress
-                  {measurementGoal.target_date && (
-                    <span className="text-xs font-normal text-muted-foreground ml-auto">
+                </CardTitle>
+                {measurementGoal.target_date && (
+                  <div className="flex items-center justify-between text-sm">
+                    <span className="text-muted-foreground">
                       Target: {formatDate(measurementGoal.target_date)}
                     </span>
-                  )}
-                </CardTitle>
+                    <span className="font-medium text-primary">
+                      {(() => {
+                        const targetDate = new Date(measurementGoal.target_date);
+                        const today = new Date();
+                        today.setHours(0, 0, 0, 0);
+                        targetDate.setHours(0, 0, 0, 0);
+                        const diffTime = targetDate.getTime() - today.getTime();
+                        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+                        if (diffDays < 0) return "Target date passed";
+                        if (diffDays === 0) return "Today!";
+                        if (diffDays === 1) return "1 day remaining";
+                        return `${diffDays} days remaining`;
+                      })()}
+                    </span>
+                  </div>
+                )}
               </CardHeader>
               <CardContent className="space-y-4">
                 {measurementGoal.target_weight && (
