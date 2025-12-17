@@ -7,14 +7,10 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Progress } from "@/components/ui/progress";
 import { useToast } from "@/hooks/use-toast";
-import { ArrowLeft, Trash2, Calculator, Scale, TrendingUp, Target, Plus } from "lucide-react";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+import { ArrowLeft, Trash2, Calculator, Scale, TrendingUp, Target, Plus, ChevronDown } from "lucide-react";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Separator } from "@/components/ui/separator";
 import { PageBreadcrumbs } from "@/components/PageBreadcrumbs";
 import { useShowBackButton } from "@/hooks/useShowBackButton";
 import { MeasurementDialog } from "@/components/logbook/MeasurementDialog";
@@ -125,7 +121,7 @@ export default function CalculatorHistory() {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState(searchParams.get("tab") || "1rm");
-  const [exerciseFilter, setExerciseFilter] = useState<string>("all");
+  const [selectedExercises, setSelectedExercises] = useState<string[]>([]);
   
   const [oneRMHistory, setOneRMHistory] = useState<OneRMRecord[]>([]);
   const [bmrHistory, setBMRHistory] = useState<BMRRecord[]>([]);
@@ -307,36 +303,31 @@ export default function CalculatorHistory() {
   // Get unique exercises for filter
   const uniqueExercises = [...new Set(oneRMHistory.map(r => r.exercise_name).filter(Boolean))] as string[];
 
-  // Prepare chart data with exercise filter
-  const filteredOneRMHistory = exerciseFilter === "all" 
+  // Prepare chart data with selected exercises filter
+  const filteredOneRMHistory = selectedExercises.length === 0 
     ? oneRMHistory 
-    : oneRMHistory.filter(r => r.exercise_name === exerciseFilter);
+    : oneRMHistory.filter(r => r.exercise_name && selectedExercises.includes(r.exercise_name));
 
   // Transform data for multi-exercise progress chart
   const prepareOneRMProgressData = () => {
     const sortedData = [...filteredOneRMHistory].reverse();
+    const exercisesToShow = selectedExercises.length === 0 ? uniqueExercises : selectedExercises;
     
-    if (exerciseFilter === "all") {
-      // Group by date and create data points with all exercises
-      const dateMap = new Map<string, Record<string, number>>();
-      
-      sortedData.forEach(r => {
-        const dateKey = formatShortDate(r.created_at);
-        if (!dateMap.has(dateKey)) {
-          dateMap.set(dateKey, { date: dateKey } as any);
-        }
-        const exerciseName = r.exercise_name || "Unknown";
+    // Group by date and create data points with all selected exercises
+    const dateMap = new Map<string, Record<string, number | string>>();
+    
+    sortedData.forEach(r => {
+      const dateKey = formatShortDate(r.created_at);
+      if (!dateMap.has(dateKey)) {
+        dateMap.set(dateKey, { date: dateKey });
+      }
+      const exerciseName = r.exercise_name || "Unknown";
+      if (exercisesToShow.includes(exerciseName)) {
         dateMap.get(dateKey)![exerciseName] = r.one_rm_result;
-      });
-      
-      return Array.from(dateMap.values());
-    } else {
-      // Single exercise filter - simple line
-      return sortedData.map(r => ({
-        date: formatShortDate(r.created_at),
-        [exerciseFilter]: r.one_rm_result,
-      }));
-    }
+      }
+    });
+    
+    return Array.from(dateMap.values());
   };
 
   const oneRMProgressData = prepareOneRMProgressData();
@@ -432,19 +423,52 @@ export default function CalculatorHistory() {
                     <TrendingUp className="h-4 w-4" />
                     1RM Progress Over Time
                   </CardTitle>
-                  <Select value={exerciseFilter} onValueChange={setExerciseFilter}>
-                    <SelectTrigger className="w-full sm:w-[200px]">
-                      <SelectValue placeholder="Filter by exercise" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="all">All Exercises</SelectItem>
-                      {uniqueExercises.map((exercise) => (
-                        <SelectItem key={exercise} value={exercise}>
-                          {exercise}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <Button variant="outline" className="w-full sm:w-[250px] justify-between">
+                        {selectedExercises.length === 0 
+                          ? "All Exercises" 
+                          : `${selectedExercises.length} exercise${selectedExercises.length > 1 ? 's' : ''} selected`}
+                        <ChevronDown className="h-4 w-4 opacity-50" />
+                      </Button>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-[280px] p-3 max-h-[300px] overflow-y-auto">
+                      <div className="space-y-2">
+                        <Button 
+                          variant="ghost" 
+                          size="sm" 
+                          className="w-full justify-start text-primary"
+                          onClick={() => setSelectedExercises([])}
+                        >
+                          Show All Exercises
+                        </Button>
+                        <Separator />
+                        <div className="space-y-2 pt-1">
+                          {uniqueExercises.map((exercise) => (
+                            <div key={exercise} className="flex items-center space-x-2">
+                              <Checkbox
+                                id={`exercise-${exercise}`}
+                                checked={selectedExercises.includes(exercise)}
+                                onCheckedChange={(checked) => {
+                                  if (checked) {
+                                    setSelectedExercises([...selectedExercises, exercise]);
+                                  } else {
+                                    setSelectedExercises(selectedExercises.filter(e => e !== exercise));
+                                  }
+                                }}
+                              />
+                              <label 
+                                htmlFor={`exercise-${exercise}`} 
+                                className="text-sm cursor-pointer flex-1"
+                              >
+                                {exercise}
+                              </label>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    </PopoverContent>
+                  </Popover>
                 </div>
               </CardHeader>
               <CardContent>
@@ -455,27 +479,17 @@ export default function CalculatorHistory() {
                     <YAxis className="text-xs" />
                     <Tooltip />
                     <Legend />
-                    {exerciseFilter === "all" ? (
-                      uniqueExercises.map((exercise) => (
-                        <Line 
-                          key={exercise}
-                          type="monotone" 
-                          dataKey={exercise} 
-                          stroke={EXERCISE_COLORS[exercise] || "hsl(var(--primary))"} 
-                          strokeWidth={2} 
-                          name={`${exercise} (kg)`}
-                          connectNulls
-                        />
-                      ))
-                    ) : (
+                    {(selectedExercises.length === 0 ? uniqueExercises : selectedExercises).map((exercise) => (
                       <Line 
+                        key={exercise}
                         type="monotone" 
-                        dataKey={exerciseFilter} 
-                        stroke={EXERCISE_COLORS[exerciseFilter] || "hsl(var(--primary))"} 
+                        dataKey={exercise} 
+                        stroke={EXERCISE_COLORS[exercise] || "hsl(var(--primary))"} 
                         strokeWidth={2} 
-                        name={`${exerciseFilter} (kg)`}
+                        name={`${exercise} (kg)`}
+                        connectNulls
                       />
-                    )}
+                    ))}
                   </LineChart>
                 </ResponsiveContainer>
               </CardContent>
