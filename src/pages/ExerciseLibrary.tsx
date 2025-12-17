@@ -86,6 +86,21 @@ const ExerciseLibrary = () => {
             ]} 
           />
 
+          {/* About Exercise Library */}
+          <Card className="mb-8 bg-gradient-to-br from-primary/5 via-background to-primary/5 border-2 border-primary/40 shadow-primary">
+            <CardContent className="p-4 sm:p-5">
+              <h2 className="text-xl sm:text-2xl font-bold mb-3 text-center">About Exercise Library</h2>
+              <div className="space-y-2 text-muted-foreground max-w-3xl mx-auto">
+                <p className="text-sm sm:text-base">
+                  Your comprehensive resource for learning exercises through video demonstrations and detailed instructions. 
+                  Browse the Exercise Database with hundreds of movements, watch curated videos in the SmartyGym Video Gallery, 
+                  and explore The Smarty Gym YouTube channel for expert tutorials by Sports Scientist Haris Falas. 
+                  Master proper form and technique to train safely and effectively.
+                </p>
+              </div>
+            </CardContent>
+          </Card>
+
           {/* Exercise Database Card - Gym Fit API */}
           <Card className="border-2 border-primary/30 shadow-lg mb-6">
             <CardContent className="p-6">

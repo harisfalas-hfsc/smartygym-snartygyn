@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Helmet } from "react-helmet";
 import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { PageBreadcrumbs } from "@/components/PageBreadcrumbs";
 import { InfoRibbon } from "@/components/InfoRibbon";
 import { ArrowLeft, Clock, Calendar } from "lucide-react";
@@ -156,6 +156,21 @@ const Blog = () => {
               { label: "Blog" }
             ]} 
           />
+
+          {/* About Expert Articles */}
+          <Card className="mb-8 bg-gradient-to-br from-primary/5 via-background to-primary/5 border-2 border-primary/40 shadow-primary">
+            <CardContent className="p-4 sm:p-5">
+              <h2 className="text-xl sm:text-2xl font-bold mb-3 text-center">About Expert Articles</h2>
+              <div className="space-y-2 text-muted-foreground max-w-3xl mx-auto">
+                <p className="text-sm sm:text-base">
+                  Evidence-based fitness articles written by Sports Scientist Haris Falas (CSCS Certified). 
+                  Explore in-depth content on Fitness, Nutrition, and Wellness designed to educate and empower 
+                  your training journey. From strength training science to nutrition strategies, 
+                  get expert insights to make informed decisions about your health and performance.
+                </p>
+              </div>
+            </CardContent>
+          </Card>
 
           <CompactFilters
             filters={[
