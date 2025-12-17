@@ -149,3 +149,6 @@ verify_jwt = false
 
 [functions.send-ritual-notifications]
 verify_jwt = false
+
+[functions.send-morning-notifications]
+verify_jwt = false

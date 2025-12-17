@@ -19,10 +19,13 @@ export const MESSAGE_TYPES = {
   // DAILY AUTOMATED NOTIFICATIONS
   // ============================================
   
-  /** Daily Workout of the Day notification (Daily 07:00 UTC) */
+  /** Combined Morning Notification - WOD + Ritual (Daily 07:00 Cyprus / 05:00 UTC) */
+  MORNING_NOTIFICATION: 'morning_notification',
+  
+  /** Daily Workout of the Day notification (Legacy - use MORNING_NOTIFICATION) */
   WOD_NOTIFICATION: 'wod_notification',
   
-  /** Daily Smarty Ritual notification (Daily 05:00 UTC) */
+  /** Daily Smarty Ritual notification (Legacy - use MORNING_NOTIFICATION) */
   DAILY_RITUAL: 'daily_ritual',
   
   /** Check-in reminder notifications (Daily 06:00 & 18:00 UTC) */
@@ -166,8 +169,9 @@ export type MessageType = typeof MESSAGE_TYPES[keyof typeof MESSAGE_TYPES];
  * Mapping of message types to their sources for audit verification
  */
 export const MESSAGE_TYPE_SOURCES: Record<string, { source: string; schedule: string }> = {
-  [MESSAGE_TYPES.WOD_NOTIFICATION]: { source: 'generate-workout-of-day', schedule: 'Daily 07:00 UTC' },
-  [MESSAGE_TYPES.DAILY_RITUAL]: { source: 'generate-daily-ritual', schedule: 'Daily 05:00 UTC' },
+  [MESSAGE_TYPES.MORNING_NOTIFICATION]: { source: 'send-morning-notifications', schedule: 'Daily 05:00 UTC (07:00 Cyprus)' },
+  [MESSAGE_TYPES.WOD_NOTIFICATION]: { source: 'send-wod-notifications (legacy)', schedule: 'Merged into morning notification' },
+  [MESSAGE_TYPES.DAILY_RITUAL]: { source: 'send-ritual-notifications (legacy)', schedule: 'Merged into morning notification' },
   [MESSAGE_TYPES.CHECKIN_REMINDER]: { source: 'send-checkin-reminders', schedule: 'Daily 06:00 & 18:00 UTC' },
   [MESSAGE_TYPES.MONDAY_MOTIVATION]: { source: 'send-weekly-motivation', schedule: 'Mondays 08:00 UTC' },
   [MESSAGE_TYPES.WEEKLY_ACTIVITY_REPORT]: { source: 'send-weekly-activity-report', schedule: 'Mondays 07:00 UTC' },
