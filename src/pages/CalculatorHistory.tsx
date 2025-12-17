@@ -7,7 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Progress } from "@/components/ui/progress";
 import { useToast } from "@/hooks/use-toast";
-import { ArrowLeft, Trash2, Calculator, Scale, TrendingUp, Target, Plus, ChevronDown } from "lucide-react";
+import { ArrowLeft, Trash2, Calculator, Scale, TrendingUp, Target, Plus, ChevronDown, CalendarIcon } from "lucide-react";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Separator } from "@/components/ui/separator";
@@ -16,6 +16,10 @@ import { useShowBackButton } from "@/hooks/useShowBackButton";
 import { MeasurementDialog } from "@/components/logbook/MeasurementDialog";
 import { MeasurementGoalDialog } from "@/components/logbook/MeasurementGoalDialog";
 import { RecordDetailDialog } from "@/components/calculators/RecordDetailDialog";
+import { Calendar } from "@/components/ui/calendar";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { format, subMonths, subDays } from "date-fns";
+import { cn } from "@/lib/utils";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -139,6 +143,9 @@ export default function CalculatorHistory() {
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState(searchParams.get("tab") || "1rm");
   const [selectedExercises, setSelectedExercises] = useState<string[]>([]);
+  const [timeFilter, setTimeFilter] = useState<string>("all");
+  const [customStartDate, setCustomStartDate] = useState<Date | undefined>();
+  const [customEndDate, setCustomEndDate] = useState<Date | undefined>();
   
   const [oneRMHistory, setOneRMHistory] = useState<OneRMRecord[]>([]);
   const [bmrHistory, setBMRHistory] = useState<BMRRecord[]>([]);
@@ -320,10 +327,44 @@ export default function CalculatorHistory() {
   // Get unique exercises for filter
   const uniqueExercises = [...new Set(oneRMHistory.map(r => r.exercise_name).filter(Boolean))] as string[];
 
-  // Prepare chart data with selected exercises filter
+  // Get time filter date range
+  const getTimeFilteredHistory = (history: OneRMRecord[]) => {
+    const now = new Date();
+    let startDate: Date | null = null;
+    
+    switch (timeFilter) {
+      case "30":
+        startDate = subDays(now, 30);
+        break;
+      case "90":
+        startDate = subMonths(now, 3);
+        break;
+      case "180":
+        startDate = subMonths(now, 6);
+        break;
+      case "custom":
+        if (customStartDate && customEndDate) {
+          return history.filter(r => {
+            const recordDate = new Date(r.created_at);
+            return recordDate >= customStartDate && recordDate <= customEndDate;
+          });
+        }
+        return history;
+      default:
+        return history;
+    }
+    
+    if (startDate) {
+      return history.filter(r => new Date(r.created_at) >= startDate!);
+    }
+    return history;
+  };
+
+  // Prepare chart data with time and exercise filters
+  const timeFilteredHistory = getTimeFilteredHistory(oneRMHistory);
   const filteredOneRMHistory = selectedExercises.length === 0 
-    ? oneRMHistory 
-    : oneRMHistory.filter(r => r.exercise_name && selectedExercises.includes(r.exercise_name));
+    ? timeFilteredHistory 
+    : timeFilteredHistory.filter(r => r.exercise_name && selectedExercises.includes(r.exercise_name));
 
   // Transform data for multi-exercise progress chart
   const prepareOneRMProgressData = () => {
@@ -435,57 +476,115 @@ export default function CalculatorHistory() {
           {oneRMHistory.length > 1 && (
             <Card className="bg-primary/5 border-primary/20">
               <CardHeader>
-                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                <div className="flex flex-col gap-3">
                   <CardTitle className="text-base flex items-center gap-2">
                     <TrendingUp className="h-4 w-4" />
                     1RM Progress Over Time
                   </CardTitle>
-                  <Popover>
-                    <PopoverTrigger asChild>
-                      <Button variant="outline" className="w-full sm:w-[250px] justify-between">
-                        {selectedExercises.length === 0 
-                          ? "All Exercises" 
-                          : `${selectedExercises.length} exercise${selectedExercises.length > 1 ? 's' : ''} selected`}
-                        <ChevronDown className="h-4 w-4 opacity-50" />
-                      </Button>
-                    </PopoverTrigger>
-                    <PopoverContent className="w-[280px] p-3 max-h-[300px] overflow-y-auto">
-                      <div className="space-y-2">
-                        <Button 
-                          variant="ghost" 
-                          size="sm" 
-                          className="w-full justify-start text-primary"
-                          onClick={() => setSelectedExercises([])}
-                        >
-                          Show All Exercises
+                  <div className="flex flex-wrap items-center gap-2">
+                    {/* Time Period Filter */}
+                    <Select value={timeFilter} onValueChange={setTimeFilter}>
+                      <SelectTrigger className="w-[140px]">
+                        <SelectValue placeholder="Time period" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="all">All Time</SelectItem>
+                        <SelectItem value="30">1 Month</SelectItem>
+                        <SelectItem value="90">3 Months</SelectItem>
+                        <SelectItem value="180">6 Months</SelectItem>
+                        <SelectItem value="custom">Custom</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    
+                    {/* Custom Date Range */}
+                    {timeFilter === "custom" && (
+                      <>
+                        <Popover>
+                          <PopoverTrigger asChild>
+                            <Button variant="outline" size="sm" className={cn("w-[130px] justify-start text-left font-normal", !customStartDate && "text-muted-foreground")}>
+                              <CalendarIcon className="mr-2 h-4 w-4" />
+                              {customStartDate ? format(customStartDate, "MMM d, yyyy") : "Start date"}
+                            </Button>
+                          </PopoverTrigger>
+                          <PopoverContent className="w-auto p-0" align="start">
+                            <Calendar
+                              mode="single"
+                              selected={customStartDate}
+                              onSelect={setCustomStartDate}
+                              initialFocus
+                              className="pointer-events-auto"
+                            />
+                          </PopoverContent>
+                        </Popover>
+                        <span className="text-muted-foreground">to</span>
+                        <Popover>
+                          <PopoverTrigger asChild>
+                            <Button variant="outline" size="sm" className={cn("w-[130px] justify-start text-left font-normal", !customEndDate && "text-muted-foreground")}>
+                              <CalendarIcon className="mr-2 h-4 w-4" />
+                              {customEndDate ? format(customEndDate, "MMM d, yyyy") : "End date"}
+                            </Button>
+                          </PopoverTrigger>
+                          <PopoverContent className="w-auto p-0" align="start">
+                            <Calendar
+                              mode="single"
+                              selected={customEndDate}
+                              onSelect={setCustomEndDate}
+                              initialFocus
+                              className="pointer-events-auto"
+                            />
+                          </PopoverContent>
+                        </Popover>
+                      </>
+                    )}
+                    
+                    {/* Exercise Filter */}
+                    <Popover>
+                      <PopoverTrigger asChild>
+                        <Button variant="outline" className="w-full sm:w-[200px] justify-between">
+                          {selectedExercises.length === 0
+                            ? "All Exercises" 
+                            : `${selectedExercises.length} exercise${selectedExercises.length > 1 ? 's' : ''} selected`}
+                          <ChevronDown className="h-4 w-4 opacity-50" />
                         </Button>
-                        <Separator />
-                        <div className="space-y-2 pt-1">
-                          {EXERCISES.map((exercise) => (
-                            <div key={exercise} className="flex items-center space-x-2">
-                              <Checkbox
-                                id={`exercise-${exercise}`}
-                                checked={selectedExercises.includes(exercise)}
-                                onCheckedChange={(checked) => {
-                                  if (checked) {
-                                    setSelectedExercises([...selectedExercises, exercise]);
-                                  } else {
-                                    setSelectedExercises(selectedExercises.filter(e => e !== exercise));
-                                  }
-                                }}
-                              />
-                              <label 
-                                htmlFor={`exercise-${exercise}`} 
-                                className="text-sm cursor-pointer flex-1"
-                              >
-                                {exercise}
-                              </label>
-                            </div>
-                          ))}
+                      </PopoverTrigger>
+                      <PopoverContent className="w-[280px] p-3 max-h-[300px] overflow-y-auto">
+                        <div className="space-y-2">
+                          <Button 
+                            variant="ghost" 
+                            size="sm" 
+                            className="w-full justify-start text-primary"
+                            onClick={() => setSelectedExercises([])}
+                          >
+                            Show All Exercises
+                          </Button>
+                          <Separator />
+                          <div className="space-y-2 pt-1">
+                            {EXERCISES.map((exercise) => (
+                              <div key={exercise} className="flex items-center space-x-2">
+                                <Checkbox
+                                  id={`exercise-${exercise}`}
+                                  checked={selectedExercises.includes(exercise)}
+                                  onCheckedChange={(checked) => {
+                                    if (checked) {
+                                      setSelectedExercises([...selectedExercises, exercise]);
+                                    } else {
+                                      setSelectedExercises(selectedExercises.filter(e => e !== exercise));
+                                    }
+                                  }}
+                                />
+                                <label 
+                                  htmlFor={`exercise-${exercise}`} 
+                                  className="text-sm cursor-pointer flex-1"
+                                >
+                                  {exercise}
+                                </label>
+                              </div>
+                            ))}
+                          </div>
                         </div>
-                      </div>
-                    </PopoverContent>
-                  </Popover>
+                      </PopoverContent>
+                    </Popover>
+                  </div>
                 </div>
               </CardHeader>
               <CardContent>
