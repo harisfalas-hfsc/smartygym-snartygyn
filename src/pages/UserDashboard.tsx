@@ -41,7 +41,7 @@ import { NightCheckInForm } from "@/components/checkins/NightCheckInForm";
 import { useCheckins } from "@/hooks/useCheckins";
 import { useCheckInWindow } from "@/hooks/useCheckInWindow";
 import { PageBreadcrumbs } from "@/components/PageBreadcrumbs";
-import { GoogleCalendarConnect } from "@/components/GoogleCalendarConnect";
+
 import { ExportActivitiesDialog } from "@/components/ExportActivitiesDialog";
 interface WorkoutInteraction {
   id: string;
@@ -1516,9 +1516,8 @@ export default function UserDashboard() {
                   </Button>
                 </CardContent>
               </Card> : <>
-                {/* Google Calendar Integration */}
-                <div className="grid gap-4 md:grid-cols-2">
-                  <GoogleCalendarConnect />
+                {/* Export to Google Calendar */}
+                <div className="mb-4">
                   <ExportActivitiesDialog />
                 </div>
 

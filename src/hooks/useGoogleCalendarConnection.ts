@@ -47,7 +47,8 @@ export const useGoogleCalendarConnection = () => {
     content_type: 'workout' | 'program';
     notes?: string;
   }, scheduled_workout_id?: string) => {
-    if (!isConnected || !autoSyncEnabled) {
+    // Only check if connected - allow manual sync even when auto-sync is disabled
+    if (!isConnected) {
       return { synced: false, event_id: null };
     }
 

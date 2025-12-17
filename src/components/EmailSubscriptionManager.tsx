@@ -184,18 +184,25 @@ export const EmailSubscriptionManager = () => {
         return;
       }
 
-      const { data, error } = await supabase.functions.invoke("google-calendar-oauth", {
-        body: { action: "get_auth_url" },
-      });
+      const currentUrl = window.location.origin + window.location.pathname;
 
-      if (error) {
-        console.error("Error getting auth URL:", error);
-        toast.error("Failed to initiate Google Calendar connection");
-        return;
-      }
+      const response = await fetch(
+        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/google-calendar-oauth?action=connect&redirect_url=${encodeURIComponent(currentUrl)}`,
+        {
+          method: 'GET',
+          headers: {
+            'Authorization': `Bearer ${session.access_token}`,
+            'Content-Type': 'application/json'
+          }
+        }
+      );
 
-      if (data?.url) {
-        window.location.href = data.url;
+      const data = await response.json();
+
+      if (data.auth_url) {
+        window.location.href = data.auth_url;
+      } else {
+        throw new Error(data.error || 'Failed to get authorization URL');
       }
     } catch (err) {
       console.error("Error connecting calendar:", err);
