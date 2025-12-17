@@ -693,6 +693,177 @@ serve(async (req) => {
       });
     }
 
+    // Action: Create recurring ritual reminders
+    if (action === 'create-ritual-reminders') {
+      console.log('Creating recurring ritual reminders...');
+
+      // Get tomorrow's date for the recurrence start
+      const tomorrow = new Date();
+      tomorrow.setDate(tomorrow.getDate() + 1);
+      const dateStr = tomorrow.toISOString().split('T')[0];
+
+      // Morning ritual reminder (8:00 AM Cyprus time)
+      const morningEvent = {
+        summary: '☀️ Morning Smarty Ritual',
+        description: 'Time for your Morning Smarty Ritual! Start your day with joint unlock, light activation, and morning prep.\n\nView your ritual: https://smartygym.com/daily-ritual',
+        start: {
+          dateTime: `${dateStr}T08:00:00`,
+          timeZone: 'Europe/Nicosia'
+        },
+        end: {
+          dateTime: `${dateStr}T08:15:00`,
+          timeZone: 'Europe/Nicosia'
+        },
+        recurrence: ['RRULE:FREQ=DAILY'],
+        reminders: {
+          useDefault: false,
+          overrides: [
+            { method: 'popup', minutes: 10 }
+          ]
+        }
+      };
+
+      // Midday ritual reminder (1:00 PM Cyprus time)
+      const middayEvent = {
+        summary: '🌤️ Midday Smarty Ritual',
+        description: 'Time for your Midday Smarty Ritual! Reset with desk mobility, anti-stiffness movements, and breathing.\n\nView your ritual: https://smartygym.com/daily-ritual',
+        start: {
+          dateTime: `${dateStr}T13:00:00`,
+          timeZone: 'Europe/Nicosia'
+        },
+        end: {
+          dateTime: `${dateStr}T13:10:00`,
+          timeZone: 'Europe/Nicosia'
+        },
+        recurrence: ['RRULE:FREQ=DAILY'],
+        reminders: {
+          useDefault: false,
+          overrides: [
+            { method: 'popup', minutes: 10 }
+          ]
+        }
+      };
+
+      // Evening ritual reminder (5:00 PM Cyprus time)
+      const eveningEvent = {
+        summary: '🌙 Evening Smarty Ritual',
+        description: 'Time for your Evening Smarty Ritual! Unwind with decompression, stress release, and pre-bed guidance.\n\nView your ritual: https://smartygym.com/daily-ritual',
+        start: {
+          dateTime: `${dateStr}T17:00:00`,
+          timeZone: 'Europe/Nicosia'
+        },
+        end: {
+          dateTime: `${dateStr}T17:15:00`,
+          timeZone: 'Europe/Nicosia'
+        },
+        recurrence: ['RRULE:FREQ=DAILY'],
+        reminders: {
+          useDefault: false,
+          overrides: [
+            { method: 'popup', minutes: 10 }
+          ]
+        }
+      };
+
+      const { id: morningEventId, error: morningError } = await createCalendarEvent(accessToken, morningEvent);
+      if (!morningEventId) {
+        console.error('Failed to create morning ritual event:', morningError);
+        return new Response(JSON.stringify({ success: false, error: morningError }), {
+          status: 500,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+        });
+      }
+
+      const { id: middayEventId, error: middayError } = await createCalendarEvent(accessToken, middayEvent);
+      if (!middayEventId) {
+        await deleteCalendarEvent(accessToken, morningEventId);
+        console.error('Failed to create midday ritual event:', middayError);
+        return new Response(JSON.stringify({ success: false, error: middayError }), {
+          status: 500,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+        });
+      }
+
+      const { id: eveningEventId, error: eveningError } = await createCalendarEvent(accessToken, eveningEvent);
+      if (!eveningEventId) {
+        await deleteCalendarEvent(accessToken, morningEventId);
+        await deleteCalendarEvent(accessToken, middayEventId);
+        console.error('Failed to create evening ritual event:', eveningError);
+        return new Response(JSON.stringify({ success: false, error: eveningError }), {
+          status: 500,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+        });
+      }
+
+      // Store the event IDs in database
+      await supabase
+        .from('user_calendar_connections')
+        .update({
+          ritual_reminder_event_ids: {
+            morning_event_id: morningEventId,
+            midday_event_id: middayEventId,
+            evening_event_id: eveningEventId
+          },
+          updated_at: new Date().toISOString()
+        })
+        .eq('user_id', user.id)
+        .eq('provider', 'google');
+
+      console.log('Ritual reminders created:', { morningEventId, middayEventId, eveningEventId });
+      return new Response(JSON.stringify({
+        success: true,
+        morning_event_id: morningEventId,
+        midday_event_id: middayEventId,
+        evening_event_id: eveningEventId
+      }), {
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+      });
+    }
+
+    // Action: Delete recurring ritual reminders
+    if (action === 'delete-ritual-reminders') {
+      console.log('Deleting recurring ritual reminders...');
+
+      // Get stored event IDs
+      const { data: connection } = await supabase
+        .from('user_calendar_connections')
+        .select('ritual_reminder_event_ids')
+        .eq('user_id', user.id)
+        .eq('provider', 'google')
+        .single();
+
+      const eventIds = connection?.ritual_reminder_event_ids as { 
+        morning_event_id?: string; 
+        midday_event_id?: string; 
+        evening_event_id?: string; 
+      } | null;
+
+      if (eventIds?.morning_event_id) {
+        await deleteCalendarEvent(accessToken, eventIds.morning_event_id);
+      }
+      if (eventIds?.midday_event_id) {
+        await deleteCalendarEvent(accessToken, eventIds.midday_event_id);
+      }
+      if (eventIds?.evening_event_id) {
+        await deleteCalendarEvent(accessToken, eventIds.evening_event_id);
+      }
+
+      // Clear stored event IDs
+      await supabase
+        .from('user_calendar_connections')
+        .update({
+          ritual_reminder_event_ids: null,
+          updated_at: new Date().toISOString()
+        })
+        .eq('user_id', user.id)
+        .eq('provider', 'google');
+
+      console.log('Ritual reminders deleted');
+      return new Response(JSON.stringify({ success: true }), {
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+      });
+    }
+
     // Action: Sync all scheduled workouts without calendar events
     if (action === 'sync-scheduled-workouts') {
       console.log('Syncing scheduled workouts...');

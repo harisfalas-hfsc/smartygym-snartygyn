@@ -1958,6 +1958,7 @@ export type Database = {
           is_active: boolean | null
           provider: string
           refresh_token: string
+          ritual_reminder_event_ids: Json | null
           token_expires_at: string
           updated_at: string | null
           user_id: string
@@ -1972,6 +1973,7 @@ export type Database = {
           is_active?: boolean | null
           provider?: string
           refresh_token: string
+          ritual_reminder_event_ids?: Json | null
           token_expires_at: string
           updated_at?: string | null
           user_id: string
@@ -1986,6 +1988,7 @@ export type Database = {
           is_active?: boolean | null
           provider?: string
           refresh_token?: string
+          ritual_reminder_event_ids?: Json | null
           token_expires_at?: string
           updated_at?: string | null
           user_id?: string
