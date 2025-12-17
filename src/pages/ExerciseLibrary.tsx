@@ -93,8 +93,8 @@ const ExerciseLibrary = () => {
               <div className="space-y-2 text-muted-foreground max-w-3xl mx-auto">
                 <p className="text-sm sm:text-base">
                   Your comprehensive resource for learning exercises through video demonstrations and detailed instructions. 
-                  Browse the Exercise Database with hundreds of movements, watch curated videos in the SmartyGym Video Gallery, 
-                  and explore The Smarty Gym YouTube channel for expert tutorials by Sports Scientist Haris Falas. 
+                  Browse the Exercise Database with hundreds of movements, watch curated videos in the <span className="text-primary font-semibold">SmartyGym</span> Video Gallery, 
+                  and explore The <span className="text-primary font-semibold">SmartyGym</span> YouTube channel for expert tutorials by Sports Scientist <a href="/coach-profile" className="text-primary hover:underline font-semibold">Haris Falas</a>. 
                   Master proper form and technique to train safely and effectively.
                 </p>
               </div>

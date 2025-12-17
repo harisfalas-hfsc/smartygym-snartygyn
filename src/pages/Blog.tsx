@@ -163,7 +163,7 @@ const Blog = () => {
               <h2 className="text-xl sm:text-2xl font-bold mb-3 text-center">About Expert Articles</h2>
               <div className="space-y-2 text-muted-foreground max-w-3xl mx-auto">
                 <p className="text-sm sm:text-base">
-                  Evidence-based fitness articles written by Sports Scientist Haris Falas (CSCS Certified). 
+                  Evidence-based fitness articles written by Sports Scientist <a href="/coach-profile" className="text-primary hover:underline font-semibold">Haris Falas</a> (CSCS Certified). 
                   Explore in-depth content on Fitness, Nutrition, and Wellness designed to educate and empower 
                   your training journey. From strength training science to nutrition strategies, 
                   get expert insights to make informed decisions about your health and performance.
