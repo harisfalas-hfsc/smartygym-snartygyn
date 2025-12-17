@@ -79,11 +79,36 @@ export const useGoogleCalendarConnection = () => {
     }
   };
 
+  const setAutoSync = async (enabled: boolean) => {
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) return false;
+
+      const { error } = await supabase
+        .from('user_calendar_connections')
+        .update({ auto_sync_enabled: enabled })
+        .eq('user_id', session.user.id)
+        .eq('provider', 'google');
+
+      if (error) {
+        console.error('Error updating auto-sync:', error);
+        return false;
+      }
+
+      setAutoSyncEnabled(enabled);
+      return true;
+    } catch (error) {
+      console.error('Failed to update auto-sync:', error);
+      return false;
+    }
+  };
+
   return {
     isConnected,
     autoSyncEnabled,
     isLoading,
     checkConnection,
-    syncToCalendar
+    syncToCalendar,
+    setAutoSync
   };
 };
