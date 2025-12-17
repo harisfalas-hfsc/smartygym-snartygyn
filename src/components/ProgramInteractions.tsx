@@ -1,17 +1,20 @@
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
-import { Heart, Star, CheckCircle2, Crown, MessageSquare } from "lucide-react";
+import { Heart, Star, CheckCircle2, Crown, CalendarClock } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useAccessControl } from "@/hooks/useAccessControl";
 import { useNavigate } from "react-router-dom";
 import { CommentDialog } from "@/components/CommentDialog";
+import { ScheduleWorkoutDialog } from "@/components/ScheduleWorkoutDialog";
+import { useScheduledWorkoutForContent } from "@/hooks/useScheduledWorkouts";
+import { format } from "date-fns";
 
 interface ProgramInteractionsProps {
   programId: string;
   programType: string;
   programName: string;
-  isFreeContent: boolean; // Add this to determine if content is free or premium
+  isFreeContent: boolean;
 }
 
 export const ProgramInteractions = ({ programId, programType, programName, isFreeContent }: ProgramInteractionsProps) => {
@@ -20,9 +23,12 @@ export const ProgramInteractions = ({ programId, programType, programName, isFre
   const [isOngoing, setIsOngoing] = useState(false);
   const [rating, setRating] = useState<number>(0);
   const [isLoading, setIsLoading] = useState(true);
+  const [isScheduleDialogOpen, setIsScheduleDialogOpen] = useState(false);
   const { toast } = useToast();
   const { userTier, canInteract } = useAccessControl();
   const navigate = useNavigate();
+
+  const { scheduledWorkout, refetch: refetchScheduled } = useScheduledWorkoutForContent(programId, 'program');
 
   // Determine content type for permission check
   const contentType = isFreeContent ? "free-program" : "program";
@@ -164,7 +170,6 @@ export const ProgramInteractions = ({ programId, programType, programName, isFre
           onConflict: 'user_id,program_id,program_type'
         });
 
-      // Log to activity log
       await supabase.from('user_activity_log').insert({
         user_id: session.user.id,
         content_type: programType,
@@ -213,6 +218,15 @@ export const ProgramInteractions = ({ programId, programType, programName, isFre
         }, {
           onConflict: 'user_id,program_id,program_type'
         });
+
+      // Mark scheduled program as completed if exists
+      if (scheduledWorkout) {
+        await supabase
+          .from('scheduled_workouts')
+          .update({ status: 'completed' })
+          .eq('id', scheduledWorkout.id);
+        refetchScheduled();
+      }
 
       setIsCompleted(true);
       setIsOngoing(false);
@@ -271,45 +285,6 @@ export const ProgramInteractions = ({ programId, programType, programName, isFre
     }
   };
 
-  const toggleCompleted = async () => {
-    if (!canUserInteract) {
-      showUpgradePrompt();
-      return;
-    }
-
-    try {
-      const { data: { session } } = await supabase.auth.getSession();
-      if (!session) return;
-
-      const newCompletedStatus = !isCompleted;
-      
-      await supabase
-        .from('program_interactions')
-        .upsert({
-          user_id: session.user.id,
-          program_id: programId,
-          program_type: programType,
-          program_name: programName,
-          is_completed: newCompletedStatus,
-        }, {
-          onConflict: 'user_id,program_id,program_type'
-        });
-
-      setIsCompleted(newCompletedStatus);
-      toast({
-        title: newCompletedStatus ? "Marked as Completed" : "Marked as Incomplete",
-        description: newCompletedStatus ? "Great job! Keep it up!" : "Program marked as incomplete",
-      });
-    } catch (error) {
-      console.error('Error toggling completed:', error);
-      toast({
-        title: "Error",
-        description: "Failed to update completion status",
-        variant: "destructive",
-      });
-    }
-  };
-
   const handleRating = async (newRating: number) => {
     if (!canUserInteract) {
       showUpgradePrompt();
@@ -347,6 +322,14 @@ export const ProgramInteractions = ({ programId, programType, programName, isFre
     }
   };
 
+  const handleScheduleClick = () => {
+    if (!canUserInteract) {
+      showUpgradePrompt();
+      return;
+    }
+    setIsScheduleDialogOpen(true);
+  };
+
   if (isLoading) {
     return null;
   }
@@ -374,101 +357,125 @@ export const ProgramInteractions = ({ programId, programType, programName, isFre
   }
 
   return (
-    <div className="flex flex-wrap items-center gap-4 p-4 bg-muted rounded-lg">
-      <Button
-        onClick={toggleFavorite}
-        variant={isFavorite ? "default" : "outline"}
-        size="sm"
-        className="gap-2"
-      >
-        <Heart className={`w-4 h-4 ${isFavorite ? 'fill-current' : ''}`} />
-        {isFavorite ? 'Favorited' : 'Add to Favorites'}
-      </Button>
-
-      {/* 3-State Program Progress Toggle */}
-      {!isOngoing && !isCompleted && (
+    <>
+      <div className="flex flex-wrap items-center gap-4 p-4 bg-muted rounded-lg">
         <Button
-          onClick={startProgram}
-          variant="ghost"
+          onClick={toggleFavorite}
+          variant={isFavorite ? "default" : "outline"}
           size="sm"
           className="gap-2"
         >
-          <CheckCircle2 className="w-4 h-4" />
-          Start Program
+          <Heart className={`w-4 h-4 ${isFavorite ? 'fill-current' : ''}`} />
+          {isFavorite ? 'Favorited' : 'Add to Favorites'}
         </Button>
-      )}
 
-      {isOngoing && !isCompleted && (
-        <>
-          <Button
-            variant="default"
-            size="sm"
-            className="gap-2 bg-orange-500 hover:bg-orange-600"
-            disabled
-          >
-            <CheckCircle2 className="w-4 h-4 fill-current" />
-            In Progress 🔥
-          </Button>
-          <Button
-            onClick={markComplete}
-            variant="outline"
-            size="sm"
-            className="gap-2"
-          >
-            <CheckCircle2 className="w-4 h-4" />
-            Complete
-          </Button>
-        </>
-      )}
+        <Button
+          onClick={handleScheduleClick}
+          variant={scheduledWorkout ? "default" : "outline"}
+          size="sm"
+          className="gap-2"
+        >
+          <CalendarClock className="w-4 h-4" />
+          {scheduledWorkout 
+            ? `Scheduled: ${format(new Date(scheduledWorkout.scheduled_date), 'MMM d')}`
+            : 'Schedule'
+          }
+        </Button>
 
-      {isCompleted && (
-        <>
+        {/* 3-State Program Progress Toggle */}
+        {!isOngoing && !isCompleted && (
           <Button
-            variant="default"
-            size="sm"
-            className="gap-2 bg-green-500 hover:bg-green-600"
-            disabled
-          >
-            <CheckCircle2 className="w-4 h-4 fill-current" />
-            Completed ✓
-          </Button>
-          <Button
-            onClick={resetProgram}
+            onClick={startProgram}
             variant="ghost"
             size="sm"
             className="gap-2"
           >
-            Reset
+            <CheckCircle2 className="w-4 h-4" />
+            Start Program
           </Button>
-        </>
-      )}
+        )}
 
-      <div className="flex items-center gap-2">
-        <span className="text-sm font-semibold">Rate:</span>
-        <div className="flex gap-1">
-          {[1, 2, 3, 4, 5].map((star) => (
-            <button
-              key={star}
-              onClick={() => handleRating(star)}
-              className="focus:outline-none transition-transform hover:scale-110"
+        {isOngoing && !isCompleted && (
+          <>
+            <Button
+              variant="default"
+              size="sm"
+              className="gap-2 bg-orange-500 hover:bg-orange-600"
+              disabled
             >
-              <Star
-                className={`w-5 h-5 ${
-                  star <= rating
-                    ? 'fill-yellow-500 text-yellow-500'
-                    : 'text-gray-300'
-                }`}
-              />
-            </button>
-          ))}
+              <CheckCircle2 className="w-4 h-4 fill-current" />
+              In Progress 🔥
+            </Button>
+            <Button
+              onClick={markComplete}
+              variant="outline"
+              size="sm"
+              className="gap-2"
+            >
+              <CheckCircle2 className="w-4 h-4" />
+              Complete
+            </Button>
+          </>
+        )}
+
+        {isCompleted && (
+          <>
+            <Button
+              variant="default"
+              size="sm"
+              className="gap-2 bg-green-500 hover:bg-green-600"
+              disabled
+            >
+              <CheckCircle2 className="w-4 h-4 fill-current" />
+              Completed ✓
+            </Button>
+            <Button
+              onClick={resetProgram}
+              variant="ghost"
+              size="sm"
+              className="gap-2"
+            >
+              Reset
+            </Button>
+          </>
+        )}
+
+        <div className="flex items-center gap-2">
+          <span className="text-sm font-semibold">Rate:</span>
+          <div className="flex gap-1">
+            {[1, 2, 3, 4, 5].map((star) => (
+              <button
+                key={star}
+                onClick={() => handleRating(star)}
+                className="focus:outline-none transition-transform hover:scale-110"
+              >
+                <Star
+                  className={`w-5 h-5 ${
+                    star <= rating
+                      ? 'fill-yellow-500 text-yellow-500'
+                      : 'text-gray-300'
+                  }`}
+                />
+              </button>
+            ))}
+          </div>
         </div>
+
+        <CommentDialog
+          programId={programId}
+          programName={programName}
+          programType={programType}
+        />
       </div>
 
-      <CommentDialog
-        programId={programId}
-        programName={programName}
-        programType={programType}
+      <ScheduleWorkoutDialog
+        isOpen={isScheduleDialogOpen}
+        onClose={() => setIsScheduleDialogOpen(false)}
+        contentId={programId}
+        contentName={programName}
+        contentType="program"
+        onScheduled={refetchScheduled}
       />
-    </div>
+    </>
   );
 };
