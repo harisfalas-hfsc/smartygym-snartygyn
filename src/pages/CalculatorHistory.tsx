@@ -558,7 +558,7 @@ export default function CalculatorHistory() {
                       <>
                         <Popover>
                           <PopoverTrigger asChild>
-                            <Button variant="ghost" size="sm" className={cn("w-[130px] justify-start text-left font-normal border border-input bg-background hover:bg-accent", !customStartDate && "text-muted-foreground")}>
+                            <Button variant="ghost" size="sm" className={cn("w-[130px] justify-start text-left font-normal border border-input bg-background text-foreground hover:bg-accent hover:text-foreground", !customStartDate && "text-muted-foreground")}>
                               <CalendarIcon className="mr-2 h-4 w-4" />
                               {customStartDate ? format(customStartDate, "MMM d, yyyy") : "Start date"}
                             </Button>
@@ -576,7 +576,7 @@ export default function CalculatorHistory() {
                         <span className="text-muted-foreground">to</span>
                         <Popover>
                           <PopoverTrigger asChild>
-                            <Button variant="ghost" size="sm" className={cn("w-[130px] justify-start text-left font-normal border border-input bg-background hover:bg-accent", !customEndDate && "text-muted-foreground")}>
+                            <Button variant="ghost" size="sm" className={cn("w-[130px] justify-start text-left font-normal border border-input bg-background text-foreground hover:bg-accent hover:text-foreground", !customEndDate && "text-muted-foreground")}>
                               <CalendarIcon className="mr-2 h-4 w-4" />
                               {customEndDate ? format(customEndDate, "MMM d, yyyy") : "End date"}
                             </Button>
@@ -597,9 +597,12 @@ export default function CalculatorHistory() {
                     {/* Exercise Filter */}
                     <Popover>
                       <PopoverTrigger asChild>
-                    <Button variant="ghost" className="w-full sm:w-[200px] justify-between border border-input bg-background hover:bg-accent">
-                          {selectedExercises.length === 0
-                            ? "All Exercises" 
+                    <Button
+                      variant="ghost"
+                      className="w-full sm:w-[200px] justify-between border border-input bg-background text-foreground hover:bg-accent hover:text-foreground"
+                    >
+                      {selectedExercises.length === 0
+                        ? "All Exercises"
                             : `${selectedExercises.length} exercise${selectedExercises.length > 1 ? 's' : ''} selected`}
                           <ChevronDown className="h-4 w-4 opacity-50" />
                         </Button>
@@ -609,7 +612,7 @@ export default function CalculatorHistory() {
                         <Button 
                           variant="ghost" 
                           size="sm" 
-                          className="w-full justify-start"
+                          className="w-full justify-start text-foreground hover:bg-muted hover:text-foreground"
                           onClick={() => setSelectedExercises([])}
                         >
                           Show All Exercises
@@ -751,7 +754,7 @@ export default function CalculatorHistory() {
                     <div className="flex flex-wrap items-center gap-2">
                       <Popover>
                         <PopoverTrigger asChild>
-                          <Button variant="ghost" size="sm" className={cn("w-[130px] justify-start text-left font-normal border border-input bg-background hover:bg-accent", !bmrCustomStartDate && "text-muted-foreground")}>
+                          <Button variant="ghost" size="sm" className={cn("w-[130px] justify-start text-left font-normal border border-input bg-background text-foreground hover:bg-accent hover:text-foreground", !bmrCustomStartDate && "text-muted-foreground")}>
                             <CalendarIcon className="mr-2 h-4 w-4" />
                             {bmrCustomStartDate ? format(bmrCustomStartDate, "MMM d, yyyy") : "Start date"}
                           </Button>
@@ -769,7 +772,7 @@ export default function CalculatorHistory() {
                       <span className="text-muted-foreground">to</span>
                       <Popover>
                         <PopoverTrigger asChild>
-                          <Button variant="ghost" size="sm" className={cn("w-[130px] justify-start text-left font-normal border border-input bg-background hover:bg-accent", !bmrCustomEndDate && "text-muted-foreground")}>
+                          <Button variant="ghost" size="sm" className={cn("w-[130px] justify-start text-left font-normal border border-input bg-background text-foreground hover:bg-accent hover:text-foreground", !bmrCustomEndDate && "text-muted-foreground")}>
                             <CalendarIcon className="mr-2 h-4 w-4" />
                             {bmrCustomEndDate ? format(bmrCustomEndDate, "MMM d, yyyy") : "End date"}
                           </Button>
@@ -1041,9 +1044,12 @@ export default function CalculatorHistory() {
                   {/* Measurement Type Filter */}
                   <Popover>
                     <PopoverTrigger asChild>
-                      <Button variant="ghost" className="w-full sm:w-[200px] justify-between border border-input bg-background hover:bg-accent">
+                      <Button
+                        variant="ghost"
+                        className="w-full sm:w-[200px] justify-between border border-input bg-background text-foreground hover:bg-accent hover:text-foreground"
+                      >
                         {selectedMeasurementTypes.length === 0
-                          ? "All Measurements" 
+                          ? "All Measurements"
                           : `${selectedMeasurementTypes.length} type${selectedMeasurementTypes.length > 1 ? 's' : ''} selected`}
                         <ChevronDown className="h-4 w-4 opacity-50" />
                       </Button>
@@ -1053,7 +1059,7 @@ export default function CalculatorHistory() {
                         <Button 
                           variant="ghost" 
                           size="sm" 
-                          className="w-full justify-start"
+                          className="w-full justify-start text-foreground hover:bg-muted hover:text-foreground"
                           onClick={() => setSelectedMeasurementTypes([])}
                         >
                           Show All Measurements
@@ -1091,7 +1097,7 @@ export default function CalculatorHistory() {
                     <div className="flex flex-wrap items-center gap-2">
                       <Popover>
                         <PopoverTrigger asChild>
-                          <Button variant="ghost" size="sm" className={cn("w-[130px] justify-start text-left font-normal border border-input bg-background hover:bg-accent", !measurementCustomStartDate && "text-muted-foreground")}>
+                          <Button variant="ghost" size="sm" className={cn("w-[130px] justify-start text-left font-normal border border-input bg-background text-foreground hover:bg-accent hover:text-foreground", !measurementCustomStartDate && "text-muted-foreground")}>
                             <CalendarIcon className="mr-2 h-4 w-4" />
                             {measurementCustomStartDate ? format(measurementCustomStartDate, "MMM d, yyyy") : "Start date"}
                           </Button>
@@ -1109,7 +1115,7 @@ export default function CalculatorHistory() {
                       <span className="text-muted-foreground">to</span>
                       <Popover>
                         <PopoverTrigger asChild>
-                          <Button variant="ghost" size="sm" className={cn("w-[130px] justify-start text-left font-normal border border-input bg-background hover:bg-accent", !measurementCustomEndDate && "text-muted-foreground")}>
+                          <Button variant="ghost" size="sm" className={cn("w-[130px] justify-start text-left font-normal border border-input bg-background text-foreground hover:bg-accent hover:text-foreground", !measurementCustomEndDate && "text-muted-foreground")}>
                             <CalendarIcon className="mr-2 h-4 w-4" />
                             {measurementCustomEndDate ? format(measurementCustomEndDate, "MMM d, yyyy") : "End date"}
                           </Button>
