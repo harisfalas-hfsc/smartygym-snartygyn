@@ -5,6 +5,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { useActivitiesByDate } from "@/hooks/useActivityLog";
 import { useCheckinScoresByDate } from "@/hooks/useCheckinScoresByDate";
+import { useScheduledWorkouts } from "@/hooks/useScheduledWorkouts";
 import { DailyActivityModal } from "./DailyActivityModal";
 
 interface LogBookCalendarProps {
@@ -18,6 +19,7 @@ export const LogBookCalendar = ({ userId, filter }: LogBookCalendarProps) => {
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
   const { activitiesByDate, isLoading } = useActivitiesByDate(userId, filter);
   const { scoresByDate } = useCheckinScoresByDate(userId);
+  const { scheduledByDate, isLoading: isLoadingScheduled } = useScheduledWorkouts(userId);
 
   const getDaysInMonth = (date: Date) => {
     const year = date.getFullYear();
@@ -62,11 +64,23 @@ export const LogBookCalendar = ({ userId, filter }: LogBookCalendarProps) => {
     return 'bg-red-500';
   };
 
+  const getScheduledItems = (day: number) => {
+    const dateStr = `${year}-${String(currentDate.getMonth() + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+    return scheduledByDate[dateStr] || [];
+  };
+
   const getActivityBadges = (day: number) => {
     const dateStr = `${year}-${String(currentDate.getMonth() + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
     const activities = activitiesByDate[dateStr] || [];
+    const scheduledItems = getScheduledItems(day);
     
     const badges = new Set<string>();
+    
+    // Add scheduled badge if there are scheduled items
+    if (scheduledItems.length > 0) {
+      badges.add('scheduled');
+    }
+    
     activities.forEach(activity => {
       const actionType = activity.action_type as string;
       if (activity.content_type === 'workout') {
@@ -107,6 +121,7 @@ export const LogBookCalendar = ({ userId, filter }: LogBookCalendarProps) => {
 
   const getBadgeColor = (badge: string) => {
     const colors: Record<string, string> = {
+      'scheduled': 'bg-purple-500',
       'workout-viewed': 'bg-slate-400',
       'workout-completed': 'bg-emerald-500',
       'workout-purchased': 'bg-amber-500',
@@ -129,7 +144,7 @@ export const LogBookCalendar = ({ userId, filter }: LogBookCalendarProps) => {
     setSelectedDate(date);
   };
 
-  if (isLoading) {
+  if (isLoading || isLoadingScheduled) {
     return (
       <Card>
         <CardContent className="p-6">
@@ -188,7 +203,7 @@ export const LogBookCalendar = ({ userId, filter }: LogBookCalendarProps) => {
                 </SelectTrigger>
                 <SelectContent>
                   {Array.from({ length: 10 }, (_, i) => {
-                    const yearOption = new Date().getFullYear() - 5 + i;
+                    const yearOption = new Date().getFullYear() - 2 + i;
                     return (
                       <SelectItem key={yearOption} value={String(yearOption)}>
                         {yearOption}
@@ -225,11 +240,13 @@ export const LogBookCalendar = ({ userId, filter }: LogBookCalendarProps) => {
               const day = i + 1;
               const badges = getActivityBadges(day);
               const checkinData = getCheckinScore(day);
+              const scheduledItems = getScheduledItems(day);
               const hasActivity = badges.length > 0 || checkinData !== null;
               const dateStr = `${year}-${String(currentDate.getMonth() + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
-            const today = new Date();
-            const todayStr = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
-            const isToday = todayStr === dateStr;
+              const today = new Date();
+              const todayStr = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
+              const isToday = todayStr === dateStr;
+              const isFuture = new Date(dateStr) > today;
 
               return (
                 <button
@@ -239,9 +256,10 @@ export const LogBookCalendar = ({ userId, filter }: LogBookCalendarProps) => {
                     relative p-2 rounded-lg text-center transition-all
                     ${hasActivity ? 'bg-primary/5 hover:bg-primary/10' : 'hover:bg-muted'}
                     ${isToday ? 'ring-2 ring-primary' : ''}
+                    ${isFuture && scheduledItems.length > 0 ? 'bg-purple-500/10' : ''}
                   `}
                 >
-                  <div className="text-sm font-medium mb-1">{day}</div>
+                  <div className={`text-sm font-medium mb-1 ${isFuture ? 'text-muted-foreground' : ''}`}>{day}</div>
                   
                   {/* Check-in Score Indicator */}
                   {checkinData && checkinData.score !== null && (
@@ -262,6 +280,7 @@ export const LogBookCalendar = ({ userId, filter }: LogBookCalendarProps) => {
                         <div
                           key={idx}
                           className={`w-2 h-2 rounded-full ${getBadgeColor(badge)}`}
+                          title={badge === 'scheduled' ? `${scheduledItems.length} scheduled` : badge}
                         />
                       ))}
                     </div>
@@ -301,6 +320,10 @@ export const LogBookCalendar = ({ userId, filter }: LogBookCalendarProps) => {
             {/* Activity Legend */}
             <p className="text-xs text-muted-foreground mb-2">Activity Indicators</p>
             <div className="grid grid-cols-2 md:grid-cols-3 gap-2 text-xs">
+              <div className="flex items-center gap-2">
+                <div className="w-3 h-3 rounded-full bg-purple-500" />
+                <span>Scheduled</span>
+              </div>
               <div className="flex items-center gap-2">
                 <div className="w-3 h-3 rounded-full bg-slate-400" />
                 <span>Viewed</span>

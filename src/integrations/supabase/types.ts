@@ -1422,6 +1422,57 @@ export type Database = {
         }
         Relationships: []
       }
+      scheduled_workouts: {
+        Row: {
+          content_id: string
+          content_name: string
+          content_type: string
+          created_at: string
+          google_calendar_event_id: string | null
+          id: string
+          notes: string | null
+          reminder_before_minutes: number | null
+          reminder_sent: boolean | null
+          scheduled_date: string
+          scheduled_time: string | null
+          status: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          content_id: string
+          content_name: string
+          content_type: string
+          created_at?: string
+          google_calendar_event_id?: string | null
+          id?: string
+          notes?: string | null
+          reminder_before_minutes?: number | null
+          reminder_sent?: boolean | null
+          scheduled_date: string
+          scheduled_time?: string | null
+          status?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          content_id?: string
+          content_name?: string
+          content_type?: string
+          created_at?: string
+          google_calendar_event_id?: string | null
+          id?: string
+          notes?: string | null
+          reminder_before_minutes?: number | null
+          reminder_sent?: boolean | null
+          scheduled_date?: string
+          scheduled_time?: string | null
+          status?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       seo_metadata: {
         Row: {
           content_id: string
