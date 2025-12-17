@@ -166,6 +166,90 @@ async function deleteCalendarEvent(accessToken: string, eventId: string): Promis
   }
 }
 
+// Sync all scheduled workouts without calendar events
+async function syncScheduledWorkouts(supabase: any, accessToken: string, userId: string): Promise<{ synced: number; failed: number }> {
+  let synced = 0;
+  let failed = 0;
+
+  // Get scheduled workouts without google_calendar_event_id
+  const { data: workouts, error } = await supabase
+    .from('scheduled_workouts')
+    .select('*')
+    .eq('user_id', userId)
+    .eq('status', 'scheduled')
+    .is('google_calendar_event_id', null)
+    .gte('scheduled_date', new Date().toISOString().split('T')[0]);
+
+  if (error) {
+    console.error('Error fetching scheduled workouts:', error);
+    return { synced: 0, failed: 0 };
+  }
+
+  if (!workouts || workouts.length === 0) {
+    console.log('No scheduled workouts without calendar events');
+    return { synced: 0, failed: 0 };
+  }
+
+  console.log(`Found ${workouts.length} scheduled workouts to sync`);
+
+  for (const workout of workouts) {
+    try {
+      const startDate = workout.scheduled_date;
+      const startTime = workout.scheduled_time || '09:00';
+      
+      // Create event data
+      const eventData = {
+        summary: `🏋️ ${workout.content_name}`,
+        description: `SmartyGym ${workout.content_type === 'workout' ? 'Workout' : 'Training Program'}\n\n${workout.notes || ''}`,
+        start: {
+          dateTime: `${startDate}T${startTime}:00`,
+          timeZone: 'Europe/Nicosia'
+        },
+        end: {
+          dateTime: `${startDate}T${addMinutes(startTime, 60)}:00`,
+          timeZone: 'Europe/Nicosia'
+        },
+        reminders: {
+          useDefault: false,
+          overrides: [
+            { method: 'popup', minutes: workout.reminder_before_minutes || 30 }
+          ]
+        }
+      };
+
+      const result = await createCalendarEvent(accessToken, eventData);
+      
+      if (result.id) {
+        // Update the scheduled workout with the event ID
+        await supabase
+          .from('scheduled_workouts')
+          .update({ google_calendar_event_id: result.id })
+          .eq('id', workout.id);
+        
+        synced++;
+        console.log(`Synced scheduled workout: ${workout.content_name}`);
+      } else {
+        failed++;
+        console.error(`Failed to sync workout: ${workout.content_name}`, result.error);
+      }
+    } catch (err) {
+      failed++;
+      console.error(`Error syncing workout ${workout.id}:`, err);
+    }
+  }
+
+  return { synced, failed };
+}
+
+// Helper to add minutes to time string
+function addMinutes(time: string, minutes: number): string {
+  const [hours, mins] = time.split(':').map(Number);
+  const totalMinutes = hours * 60 + mins + minutes;
+  const newHours = Math.floor(totalMinutes / 60) % 24;
+  const newMins = totalMinutes % 60;
+  return `${String(newHours).padStart(2, '0')}:${String(newMins).padStart(2, '0')}`;
+}
+
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
@@ -605,6 +689,21 @@ serve(async (req) => {
 
       console.log('Check-in reminders deleted');
       return new Response(JSON.stringify({ success: true }), {
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+      });
+    }
+
+    // Action: Sync all scheduled workouts without calendar events
+    if (action === 'sync-scheduled-workouts') {
+      console.log('Syncing scheduled workouts...');
+      
+      const result = await syncScheduledWorkouts(supabase, accessToken, user.id);
+      
+      return new Response(JSON.stringify({
+        success: true,
+        synced: result.synced,
+        failed: result.failed
+      }), {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' }
       });
     }
