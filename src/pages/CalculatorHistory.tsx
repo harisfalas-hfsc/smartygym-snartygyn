@@ -8,6 +8,13 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Progress } from "@/components/ui/progress";
 import { useToast } from "@/hooks/use-toast";
 import { ArrowLeft, Trash2, Calculator, Scale, TrendingUp, Target, Plus } from "lucide-react";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { PageBreadcrumbs } from "@/components/PageBreadcrumbs";
 import { useShowBackButton } from "@/hooks/useShowBackButton";
 import { MeasurementDialog } from "@/components/logbook/MeasurementDialog";
@@ -93,6 +100,23 @@ type MeasurementData = {
 
 type RecordType = "1rm" | "bmr" | "macro" | "measurement";
 
+// Exercise colors for multi-line chart
+const EXERCISE_COLORS: Record<string, string> = {
+  "Bench Press": "hsl(195, 82%, 55%)",
+  "Back Squats": "hsl(142, 71%, 45%)",
+  "Deadlifts": "hsl(24, 95%, 53%)",
+  "Bulgarian Split Squats, Right Leg": "hsl(262, 83%, 58%)",
+  "Bulgarian Split Squats, Left Leg": "hsl(280, 87%, 65%)",
+  "Shoulder Press, Right Arm": "hsl(43, 96%, 56%)",
+  "Shoulder Press, Left Arm": "hsl(45, 93%, 47%)",
+  "Military Presses": "hsl(173, 80%, 40%)",
+  "Single Leg RDL, Right Leg": "hsl(340, 75%, 55%)",
+  "Single Leg RDL, Left Leg": "hsl(330, 65%, 45%)",
+  "Barbell Bicep Curls": "hsl(210, 70%, 50%)",
+  "Concentrated Bicep Curls, Right Arm": "hsl(16, 85%, 45%)",
+  "Concentrated Bicep Curls, Left Arm": "hsl(10, 78%, 54%)",
+};
+
 export default function CalculatorHistory() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
@@ -101,6 +125,7 @@ export default function CalculatorHistory() {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState(searchParams.get("tab") || "1rm");
+  const [exerciseFilter, setExerciseFilter] = useState<string>("all");
   
   const [oneRMHistory, setOneRMHistory] = useState<OneRMRecord[]>([]);
   const [bmrHistory, setBMRHistory] = useState<BMRRecord[]>([]);
@@ -279,23 +304,47 @@ export default function CalculatorHistory() {
     }
   };
 
-  // Prepare chart data
-  const oneRMChartData = [...oneRMHistory].reverse().map((r) => ({
-    date: formatShortDate(r.created_at),
-    result: r.one_rm_result,
-    exercise: r.exercise_name || "Unknown",
-  }));
+  // Get unique exercises for filter
+  const uniqueExercises = [...new Set(oneRMHistory.map(r => r.exercise_name).filter(Boolean))] as string[];
+
+  // Prepare chart data with exercise filter
+  const filteredOneRMHistory = exerciseFilter === "all" 
+    ? oneRMHistory 
+    : oneRMHistory.filter(r => r.exercise_name === exerciseFilter);
+
+  // Transform data for multi-exercise progress chart
+  const prepareOneRMProgressData = () => {
+    const sortedData = [...filteredOneRMHistory].reverse();
+    
+    if (exerciseFilter === "all") {
+      // Group by date and create data points with all exercises
+      const dateMap = new Map<string, Record<string, number>>();
+      
+      sortedData.forEach(r => {
+        const dateKey = formatShortDate(r.created_at);
+        if (!dateMap.has(dateKey)) {
+          dateMap.set(dateKey, { date: dateKey } as any);
+        }
+        const exerciseName = r.exercise_name || "Unknown";
+        dateMap.get(dateKey)![exerciseName] = r.one_rm_result;
+      });
+      
+      return Array.from(dateMap.values());
+    } else {
+      // Single exercise filter - simple line
+      return sortedData.map(r => ({
+        date: formatShortDate(r.created_at),
+        [exerciseFilter]: r.one_rm_result,
+      }));
+    }
+  };
+
+  const oneRMProgressData = prepareOneRMProgressData();
 
   const bmrChartData = [...bmrHistory].reverse().map((r) => ({
     date: formatShortDate(r.created_at),
     bmr: r.bmr_result,
     weight: r.weight,
-  }));
-
-  const macroChartData = [...calorieHistory].reverse().map((r) => ({
-    date: formatShortDate(r.created_at),
-    target: r.target_calories,
-    maintenance: r.maintenance_calories,
   }));
 
   const measurementChartData = [...measurementHistory].reverse().map((r) => ({
@@ -378,19 +427,55 @@ export default function CalculatorHistory() {
           {oneRMHistory.length > 1 && (
             <Card className="bg-primary/5 border-primary/20">
               <CardHeader>
-                <CardTitle className="text-base flex items-center gap-2">
-                  <TrendingUp className="h-4 w-4" />
-                  1RM Trend Over Time
-                </CardTitle>
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                  <CardTitle className="text-base flex items-center gap-2">
+                    <TrendingUp className="h-4 w-4" />
+                    1RM Progress Over Time
+                  </CardTitle>
+                  <Select value={exerciseFilter} onValueChange={setExerciseFilter}>
+                    <SelectTrigger className="w-full sm:w-[200px]">
+                      <SelectValue placeholder="Filter by exercise" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">All Exercises</SelectItem>
+                      {uniqueExercises.map((exercise) => (
+                        <SelectItem key={exercise} value={exercise}>
+                          {exercise}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
               </CardHeader>
               <CardContent>
                 <ResponsiveContainer width="100%" height={250}>
-                  <LineChart data={oneRMChartData}>
+                  <LineChart data={oneRMProgressData}>
                     <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
                     <XAxis dataKey="date" className="text-xs" />
                     <YAxis className="text-xs" />
                     <Tooltip />
-                    <Line type="monotone" dataKey="result" stroke="hsl(var(--primary))" strokeWidth={2} name="1RM (kg)" />
+                    <Legend />
+                    {exerciseFilter === "all" ? (
+                      uniqueExercises.map((exercise) => (
+                        <Line 
+                          key={exercise}
+                          type="monotone" 
+                          dataKey={exercise} 
+                          stroke={EXERCISE_COLORS[exercise] || "hsl(var(--primary))"} 
+                          strokeWidth={2} 
+                          name={`${exercise} (kg)`}
+                          connectNulls
+                        />
+                      ))
+                    ) : (
+                      <Line 
+                        type="monotone" 
+                        dataKey={exerciseFilter} 
+                        stroke={EXERCISE_COLORS[exerciseFilter] || "hsl(var(--primary))"} 
+                        strokeWidth={2} 
+                        name={`${exerciseFilter} (kg)`}
+                      />
+                    )}
                   </LineChart>
                 </ResponsiveContainer>
               </CardContent>
@@ -452,7 +537,7 @@ export default function CalculatorHistory() {
               <CardHeader>
                 <CardTitle className="text-base flex items-center gap-2">
                   <TrendingUp className="h-4 w-4" />
-                  BMR Trend Over Time
+                  BMR Progress Over Time
                 </CardTitle>
               </CardHeader>
               <CardContent>
@@ -522,30 +607,6 @@ export default function CalculatorHistory() {
             </h2>
             <Button onClick={() => navigate("/macrocalculator")}>Add New</Button>
           </div>
-
-          {calorieHistory.length > 1 && (
-            <Card className="bg-primary/5 border-primary/20">
-              <CardHeader>
-                <CardTitle className="text-base flex items-center gap-2">
-                  <TrendingUp className="h-4 w-4" />
-                  Calorie Target Trend Over Time
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <ResponsiveContainer width="100%" height={250}>
-                  <LineChart data={macroChartData}>
-                    <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
-                    <XAxis dataKey="date" className="text-xs" />
-                    <YAxis className="text-xs" />
-                    <Tooltip />
-                    <Legend />
-                    <Line type="monotone" dataKey="target" stroke="hsl(var(--primary))" strokeWidth={2} name="Target (cal)" />
-                    <Line type="monotone" dataKey="maintenance" stroke="hsl(var(--muted-foreground))" strokeWidth={2} name="Maintenance (cal)" />
-                  </LineChart>
-                </ResponsiveContainer>
-              </CardContent>
-            </Card>
-          )}
 
           <div className="space-y-2">
             {calorieHistory.map((record) => (
