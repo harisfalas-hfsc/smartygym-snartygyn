@@ -10,7 +10,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAccessControl } from "@/hooks/useAccessControl";
 import { useShowBackButton } from "@/hooks/useShowBackButton";
 import { HTMLContent } from "@/components/HTMLContent";
-import { RitualCalendarButton } from "@/components/ritual/RitualCalendarButton";
+import { RitualCalendarSync } from "@/components/ritual/RitualCalendarSync";
 import { RitualShareDialog } from "@/components/ritual/RitualShareDialog";
 import { PageBreadcrumbs } from "@/components/PageBreadcrumbs";
 import { SEOEnhancer } from "@/components/SEOEnhancer";
@@ -290,16 +290,8 @@ const DailySmartyRitual = () => {
             {/* Ritual Content */}
             {isPremium && ritual && (
               <CardContent className="p-6 space-y-8">
-                {/* Calendar Integration - pass full content */}
-                <div className="flex justify-center">
-                  <RitualCalendarButton ritual={{
-                    ritual_date: ritual.ritual_date,
-                    day_number: ritual.day_number,
-                    morning_content: ritual.morning_content,
-                    midday_content: ritual.midday_content,
-                    evening_content: ritual.evening_content,
-                  }} />
-                </div>
+                {/* Calendar Integration - Google Calendar sync */}
+                <RitualCalendarSync />
 
                 <Separator />
 

@@ -29,77 +29,7 @@ function logStep(step: string, details?: any) {
   console.log(`[GENERATE-RITUAL] ${step}${detailsStr}`);
 }
 
-// Generate ICS content for email
-function generateICSForEmail(dayNumber: number, ritualDate: string): string {
-  const formatICSDate = (date: Date): string => {
-    return date.toISOString().replace(/[-:]/g, '').split('.')[0] + 'Z';
-  };
-
-  const date = new Date(ritualDate);
-  
-  // Morning: 08:00
-  const morning = new Date(date);
-  morning.setHours(8, 0, 0, 0);
-  
-  // Midday: 13:00
-  const midday = new Date(date);
-  midday.setHours(13, 0, 0, 0);
-  
-  // Evening: 17:00
-  const evening = new Date(date);
-  evening.setHours(17, 0, 0, 0);
-
-  const events = [
-    {
-      title: `☀️ Morning Smarty Ritual`,
-      start: morning,
-      duration: 15,
-      description: "Start your day with joint unlock, light activation, and morning prep. View full ritual at https://smartygym.com/daily-ritual",
-    },
-    {
-      title: `🌤️ Midday Smarty Ritual`,
-      start: midday,
-      duration: 10,
-      description: "Reset with desk mobility, anti-stiffness movements, and breathing. View full ritual at https://smartygym.com/daily-ritual",
-    },
-    {
-      title: `🌙 Evening Smarty Ritual`,
-      start: evening,
-      duration: 15,
-      description: "Unwind with decompression, stress release, and pre-bed guidance. View full ritual at https://smartygym.com/daily-ritual",
-    },
-  ];
-
-  let ics = `BEGIN:VCALENDAR
-VERSION:2.0
-PRODID:-//SmartyGym//Daily Ritual//EN
-CALSCALE:GREGORIAN
-METHOD:PUBLISH
-X-WR-CALNAME:SmartyGym Daily Ritual
-`;
-
-  events.forEach((event, index) => {
-    const endTime = new Date(event.start.getTime() + event.duration * 60000);
-    ics += `BEGIN:VEVENT
-UID:ritual-${ritualDate}-${index}@smartygym.com
-DTSTAMP:${formatICSDate(new Date())}
-DTSTART:${formatICSDate(event.start)}
-DTEND:${formatICSDate(endTime)}
-SUMMARY:${event.title}
-DESCRIPTION:${event.description.replace(/\n/g, '\\n')}
-URL:https://smartygym.com/daily-ritual
-BEGIN:VALARM
-TRIGGER:-PT10M
-ACTION:DISPLAY
-DESCRIPTION:${event.title} starts in 10 minutes
-END:VALARM
-END:VEVENT
-`;
-  });
-
-  ics += 'END:VCALENDAR';
-  return ics;
-}
+// ICS generation removed - users now sync via Google Calendar integration
 
 serve(async (req) => {
   if (req.method === "OPTIONS") {
@@ -341,9 +271,6 @@ async function sendRitualNotifications(supabase: any, dayNumber: number, date: s
 
 const subject = "☀️ Your all day game – plan is ready";
     
-    // Generate calendar download URL (using edge function instead of data URI for email compatibility)
-    const calendarDownloadUrl = `https://cvccrvyimyzrxcwzmxwk.supabase.co/functions/v1/download-ritual-calendar?date=${date}`;
-    
     const content = `<p class="tiptap-paragraph"><strong>Your Smarty Ritual is here!</strong></p>
 <p class="tiptap-paragraph">Your personalized daily ritual is ready. Start with the Morning Ritual to energize your day, reset at Midday, and unwind in the Evening.</p>
 <p class="tiptap-paragraph">Three simple phases. Maximum impact. Your daily game plan for movement, recovery, and performance.</p>
@@ -407,11 +334,7 @@ const emailResult = await resend.emails.send({
                 <p style="font-size: 16px; line-height: 1.6; margin-bottom: 16px;">Your personalized daily ritual is ready. Start with the Morning Ritual to energize your day, reset at Midday, and unwind in the Evening.</p>
                 <p style="font-size: 16px; line-height: 1.6; margin-bottom: 24px;">Three simple phases. Maximum impact. Your daily game plan for movement, recovery, and performance.</p>
                 <div style="margin: 24px 0; text-align: center;">
-                  <a href="https://smartygym.com/daily-ritual" style="display: inline-block; background: #29B6D2; color: white; padding: 14px 28px; text-decoration: none; border-radius: 4px; font-weight: bold; font-size: 16px; margin-right: 12px;">View Your Smarty Ritual →</a>
-                </div>
-                <div style="margin: 24px 0; padding: 16px; background: #f8f8f8; border-radius: 8px; text-align: center;">
-                  <p style="font-size: 14px; color: #666; margin-bottom: 12px;">📅 Add all 3 phases to your calendar with reminders:</p>
-                  <a href="${calendarDownloadUrl}" style="display: inline-block; background: #333; color: white; padding: 10px 20px; text-decoration: none; border-radius: 4px; font-size: 14px;">📥 Download Calendar File (.ics)</a>
+                  <a href="https://smartygym.com/daily-ritual" style="display: inline-block; background: #29B6D2; color: white; padding: 14px 28px; text-decoration: none; border-radius: 4px; font-weight: bold; font-size: 16px;">View Your Smarty Ritual →</a>
                 </div>
                 <div style="margin: 24px 0; padding: 16px; background: #e6f7fa; border-radius: 8px; border-left: 4px solid #29B6D2;">
                   <p style="font-size: 14px; color: #333; margin: 0;">💡 <strong>Track Your Progress!</strong></p>
