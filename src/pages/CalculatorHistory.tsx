@@ -134,6 +134,23 @@ const EXERCISE_COLORS: Record<string, string> = {
   "Concentrated Bicep Curls, Left Arm": "hsl(10, 78%, 54%)",
 };
 
+// Stroke dash patterns for line differentiation
+const EXERCISE_STROKE_PATTERNS: Record<string, string> = {
+  "Bench Press": "0",
+  "Back Squats": "8 4",
+  "Deadlifts": "4 4",
+  "Bulgarian Split Squats, Right Leg": "12 4",
+  "Bulgarian Split Squats, Left Leg": "12 4 4 4",
+  "Shoulder Press, Right Arm": "2 2",
+  "Shoulder Press, Left Arm": "6 2 2 2",
+  "Military Presses": "16 4",
+  "Single Leg RDL, Right Leg": "8 2",
+  "Single Leg RDL, Left Leg": "8 2 4 2",
+  "Barbell Bicep Curls": "4 8",
+  "Concentrated Bicep Curls, Right Arm": "10 2 2 2 2 2",
+  "Concentrated Bicep Curls, Left Arm": "6 6",
+};
+
 export default function CalculatorHistory() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
@@ -145,6 +162,16 @@ export default function CalculatorHistory() {
   const [selectedExercises, setSelectedExercises] = useState<string[]>([]);
   const [timeFilter, setTimeFilter] = useState<string>("all");
   const [customStartDate, setCustomStartDate] = useState<Date | undefined>();
+  
+  // BMR time filter state
+  const [bmrTimeFilter, setBmrTimeFilter] = useState<string>("all");
+  const [bmrCustomStartDate, setBmrCustomStartDate] = useState<Date | undefined>();
+  const [bmrCustomEndDate, setBmrCustomEndDate] = useState<Date | undefined>();
+  
+  // Measurement time filter state
+  const [measurementTimeFilter, setMeasurementTimeFilter] = useState<string>("all");
+  const [measurementCustomStartDate, setMeasurementCustomStartDate] = useState<Date | undefined>();
+  const [measurementCustomEndDate, setMeasurementCustomEndDate] = useState<Date | undefined>();
   const [customEndDate, setCustomEndDate] = useState<Date | undefined>();
   
   const [oneRMHistory, setOneRMHistory] = useState<OneRMRecord[]>([]);
@@ -327,12 +354,17 @@ export default function CalculatorHistory() {
   // Get unique exercises for filter
   const uniqueExercises = [...new Set(oneRMHistory.map(r => r.exercise_name).filter(Boolean))] as string[];
 
-  // Get time filter date range
-  const getTimeFilteredHistory = (history: OneRMRecord[]) => {
+  // Generic time filter function
+  const applyTimeFilter = <T extends { created_at: string }>(
+    history: T[],
+    filter: string,
+    customStart?: Date,
+    customEnd?: Date
+  ): T[] => {
     const now = new Date();
     let startDate: Date | null = null;
     
-    switch (timeFilter) {
+    switch (filter) {
       case "30":
         startDate = subDays(now, 30);
         break;
@@ -343,10 +375,10 @@ export default function CalculatorHistory() {
         startDate = subMonths(now, 6);
         break;
       case "custom":
-        if (customStartDate && customEndDate) {
+        if (customStart && customEnd) {
           return history.filter(r => {
             const recordDate = new Date(r.created_at);
-            return recordDate >= customStartDate && recordDate <= customEndDate;
+            return recordDate >= customStart && recordDate <= customEnd;
           });
         }
         return history;
@@ -358,6 +390,11 @@ export default function CalculatorHistory() {
       return history.filter(r => new Date(r.created_at) >= startDate!);
     }
     return history;
+  };
+
+  // Get time filtered 1RM history
+  const getTimeFilteredHistory = (history: OneRMRecord[]) => {
+    return applyTimeFilter(history, timeFilter, customStartDate, customEndDate);
   };
 
   // Prepare chart data with time and exercise filters
@@ -390,13 +427,19 @@ export default function CalculatorHistory() {
 
   const oneRMProgressData = prepareOneRMProgressData();
 
-  const bmrChartData = [...bmrHistory].reverse().map((r) => ({
+  // Filter BMR history by time
+  const filteredBMRHistory = applyTimeFilter(bmrHistory, bmrTimeFilter, bmrCustomStartDate, bmrCustomEndDate);
+  
+  const bmrChartData = [...filteredBMRHistory].reverse().map((r) => ({
     date: formatShortDate(r.created_at),
     bmr: r.bmr_result,
     weight: r.weight,
   }));
 
-  const measurementChartData = [...measurementHistory].reverse().map((r) => ({
+  // Filter Measurement history by time
+  const filteredMeasurementHistory = applyTimeFilter(measurementHistory, measurementTimeFilter, measurementCustomStartDate, measurementCustomEndDate);
+
+  const measurementChartData = [...filteredMeasurementHistory].reverse().map((r) => ({
     date: formatShortDate(r.created_at),
     weight: r.tool_result?.weight || 0,
     bodyFat: r.tool_result?.body_fat || 0,
@@ -465,10 +508,10 @@ export default function CalculatorHistory() {
 
         {/* 1RM Tab */}
         <TabsContent value="1rm" className="space-y-6">
-          <div className="flex justify-between items-center">
+          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
             <h2 className="text-lg font-semibold flex items-center gap-2">
               <Calculator className="h-5 w-5 text-primary" />
-              1RM History ({oneRMHistory.length} records)
+              1RM History ({filteredOneRMHistory.length} of {oneRMHistory.length} records)
             </h2>
             <Button onClick={() => navigate("/1rmcalculator")}>Add New</Button>
           </div>
@@ -481,10 +524,10 @@ export default function CalculatorHistory() {
                     <TrendingUp className="h-4 w-4" />
                     1RM Progress Over Time
                   </CardTitle>
-                  <div className="flex flex-wrap items-center gap-2">
+                  <div className="flex flex-col sm:flex-row flex-wrap items-start sm:items-center gap-2">
                     {/* Time Period Filter */}
                     <Select value={timeFilter} onValueChange={setTimeFilter}>
-                      <SelectTrigger className="w-[140px]">
+                      <SelectTrigger className="w-full sm:w-[140px]">
                         <SelectValue placeholder="Time period" />
                       </SelectTrigger>
                       <SelectContent>
@@ -588,22 +631,25 @@ export default function CalculatorHistory() {
                 </div>
               </CardHeader>
               <CardContent>
-                <ResponsiveContainer width="100%" height={250}>
+                <ResponsiveContainer width="100%" height={350}>
                   <LineChart data={oneRMProgressData}>
                     <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
                     <XAxis dataKey="date" className="text-xs" />
                     <YAxis className="text-xs" />
                     <Tooltip />
-                    <Legend />
+                    <Legend wrapperStyle={{ fontSize: '12px' }} />
                     {(selectedExercises.length === 0 ? [...EXERCISES] : selectedExercises).map((exercise) => (
                       <Line 
                         key={exercise}
                         type="monotone" 
                         dataKey={exercise} 
                         stroke={EXERCISE_COLORS[exercise] || "hsl(var(--primary))"} 
-                        strokeWidth={2} 
+                        strokeWidth={2.5} 
+                        strokeDasharray={EXERCISE_STROKE_PATTERNS[exercise] || "0"}
                         name={`${exercise} (kg)`}
                         connectNulls
+                        dot={{ r: 3 }}
+                        activeDot={{ r: 5 }}
                       />
                     ))}
                   </LineChart>
@@ -613,7 +659,7 @@ export default function CalculatorHistory() {
           )}
 
           <div className="space-y-2">
-            {oneRMHistory.map((record) => (
+            {filteredOneRMHistory.map((record) => (
               <Card 
                 key={record.id} 
                 className="cursor-pointer hover:bg-muted/50 transition-colors"
@@ -642,10 +688,12 @@ export default function CalculatorHistory() {
                 </CardContent>
               </Card>
             ))}
-            {oneRMHistory.length === 0 && (
+            {filteredOneRMHistory.length === 0 && (
               <Card>
                 <CardContent className="p-8 text-center text-muted-foreground">
-                  No 1RM calculations yet. Start by calculating your first one!
+                  {oneRMHistory.length === 0 
+                    ? "No 1RM calculations yet. Start by calculating your first one!"
+                    : "No records match your current filters."}
                 </CardContent>
               </Card>
             )}
@@ -654,10 +702,10 @@ export default function CalculatorHistory() {
 
         {/* BMR Tab */}
         <TabsContent value="bmr" className="space-y-6">
-          <div className="flex justify-between items-center">
+          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
             <h2 className="text-lg font-semibold flex items-center gap-2">
               <Calculator className="h-5 w-5 text-primary" />
-              BMR History ({bmrHistory.length} records)
+              BMR History ({filteredBMRHistory.length} of {bmrHistory.length} records)
             </h2>
             <Button onClick={() => navigate("/bmrcalculator")}>Add New</Button>
           </div>
@@ -665,21 +713,79 @@ export default function CalculatorHistory() {
           {bmrHistory.length > 1 && (
             <Card className="bg-primary/5 border-primary/20">
               <CardHeader>
-                <CardTitle className="text-base flex items-center gap-2">
-                  <TrendingUp className="h-4 w-4" />
-                  BMR Progress Over Time
-                </CardTitle>
+                <div className="flex flex-col gap-3">
+                  <CardTitle className="text-base flex items-center gap-2">
+                    <TrendingUp className="h-4 w-4" />
+                    BMR Progress Over Time
+                  </CardTitle>
+                  <div className="flex flex-col sm:flex-row flex-wrap items-start sm:items-center gap-2">
+                    {/* Time Period Filter */}
+                    <Select value={bmrTimeFilter} onValueChange={setBmrTimeFilter}>
+                      <SelectTrigger className="w-full sm:w-[140px]">
+                        <SelectValue placeholder="Time period" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="all">All Time</SelectItem>
+                        <SelectItem value="30">1 Month</SelectItem>
+                        <SelectItem value="90">3 Months</SelectItem>
+                        <SelectItem value="180">6 Months</SelectItem>
+                        <SelectItem value="custom">Custom</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    
+                    {/* Custom Date Range */}
+                    {bmrTimeFilter === "custom" && (
+                      <div className="flex flex-wrap items-center gap-2">
+                        <Popover>
+                          <PopoverTrigger asChild>
+                            <Button variant="outline" size="sm" className={cn("w-[130px] justify-start text-left font-normal", !bmrCustomStartDate && "text-muted-foreground")}>
+                              <CalendarIcon className="mr-2 h-4 w-4" />
+                              {bmrCustomStartDate ? format(bmrCustomStartDate, "MMM d, yyyy") : "Start date"}
+                            </Button>
+                          </PopoverTrigger>
+                          <PopoverContent className="w-auto p-0" align="start">
+                            <Calendar
+                              mode="single"
+                              selected={bmrCustomStartDate}
+                              onSelect={setBmrCustomStartDate}
+                              initialFocus
+                              className="pointer-events-auto"
+                            />
+                          </PopoverContent>
+                        </Popover>
+                        <span className="text-muted-foreground">to</span>
+                        <Popover>
+                          <PopoverTrigger asChild>
+                            <Button variant="outline" size="sm" className={cn("w-[130px] justify-start text-left font-normal", !bmrCustomEndDate && "text-muted-foreground")}>
+                              <CalendarIcon className="mr-2 h-4 w-4" />
+                              {bmrCustomEndDate ? format(bmrCustomEndDate, "MMM d, yyyy") : "End date"}
+                            </Button>
+                          </PopoverTrigger>
+                          <PopoverContent className="w-auto p-0" align="start">
+                            <Calendar
+                              mode="single"
+                              selected={bmrCustomEndDate}
+                              onSelect={setBmrCustomEndDate}
+                              initialFocus
+                              className="pointer-events-auto"
+                            />
+                          </PopoverContent>
+                        </Popover>
+                      </div>
+                    )}
+                  </div>
+                </div>
               </CardHeader>
               <CardContent>
-                <ResponsiveContainer width="100%" height={250}>
+                <ResponsiveContainer width="100%" height={350}>
                   <LineChart data={bmrChartData}>
                     <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
                     <XAxis dataKey="date" className="text-xs" />
                     <YAxis className="text-xs" />
                     <Tooltip />
                     <Legend />
-                    <Line type="monotone" dataKey="bmr" stroke="hsl(var(--primary))" strokeWidth={2} name="BMR (cal)" />
-                    <Line type="monotone" dataKey="weight" stroke="hsl(var(--muted-foreground))" strokeWidth={2} name="Weight (kg)" />
+                    <Line type="monotone" dataKey="bmr" stroke="hsl(var(--primary))" strokeWidth={2.5} name="BMR (cal)" dot={{ r: 3 }} activeDot={{ r: 5 }} />
+                    <Line type="monotone" dataKey="weight" stroke="hsl(var(--muted-foreground))" strokeWidth={2.5} strokeDasharray="8 4" name="Weight (kg)" dot={{ r: 3 }} activeDot={{ r: 5 }} />
                   </LineChart>
                 </ResponsiveContainer>
               </CardContent>
@@ -687,7 +793,7 @@ export default function CalculatorHistory() {
           )}
 
           <div className="space-y-2">
-            {bmrHistory.map((record) => (
+            {filteredBMRHistory.map((record) => (
               <Card 
                 key={record.id} 
                 className="cursor-pointer hover:bg-muted/50 transition-colors"
@@ -718,10 +824,12 @@ export default function CalculatorHistory() {
                 </CardContent>
               </Card>
             ))}
-            {bmrHistory.length === 0 && (
+            {filteredBMRHistory.length === 0 && (
               <Card>
                 <CardContent className="p-8 text-center text-muted-foreground">
-                  No BMR calculations yet. Start by calculating your first one!
+                  {bmrHistory.length === 0 
+                    ? "No BMR calculations yet. Start by calculating your first one!"
+                    : "No records match your current filters."}
                 </CardContent>
               </Card>
             )}
@@ -780,12 +888,12 @@ export default function CalculatorHistory() {
 
         {/* Measurements Tab */}
         <TabsContent value="measurements" className="space-y-6">
-          <div className="flex justify-between items-center flex-wrap gap-2">
+          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center flex-wrap gap-2">
             <h2 className="text-lg font-semibold flex items-center gap-2">
               <Scale className="h-5 w-5 text-primary" />
-              Measurements ({measurementHistory.length} records)
+              Measurements ({filteredMeasurementHistory.length} of {measurementHistory.length} records)
             </h2>
-            <div className="flex gap-2">
+            <div className="flex flex-wrap gap-2">
               <Button variant="outline" onClick={() => setIsGoalDialogOpen(true)}>
                 <Target className="h-4 w-4 mr-2" />
                 {measurementGoal ? "Edit Goals" : "Set Goals"}
@@ -890,22 +998,80 @@ export default function CalculatorHistory() {
           {measurementHistory.length > 1 && (
             <Card className="bg-primary/5 border-primary/20">
               <CardHeader>
-                <CardTitle className="text-base flex items-center gap-2">
-                  <TrendingUp className="h-4 w-4" />
-                  Body Measurements Over Time
-                </CardTitle>
+                <div className="flex flex-col gap-3">
+                  <CardTitle className="text-base flex items-center gap-2">
+                    <TrendingUp className="h-4 w-4" />
+                    Body Measurements Over Time
+                  </CardTitle>
+                  <div className="flex flex-col sm:flex-row flex-wrap items-start sm:items-center gap-2">
+                    {/* Time Period Filter */}
+                    <Select value={measurementTimeFilter} onValueChange={setMeasurementTimeFilter}>
+                      <SelectTrigger className="w-full sm:w-[140px]">
+                        <SelectValue placeholder="Time period" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="all">All Time</SelectItem>
+                        <SelectItem value="30">1 Month</SelectItem>
+                        <SelectItem value="90">3 Months</SelectItem>
+                        <SelectItem value="180">6 Months</SelectItem>
+                        <SelectItem value="custom">Custom</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    
+                    {/* Custom Date Range */}
+                    {measurementTimeFilter === "custom" && (
+                      <div className="flex flex-wrap items-center gap-2">
+                        <Popover>
+                          <PopoverTrigger asChild>
+                            <Button variant="outline" size="sm" className={cn("w-[130px] justify-start text-left font-normal", !measurementCustomStartDate && "text-muted-foreground")}>
+                              <CalendarIcon className="mr-2 h-4 w-4" />
+                              {measurementCustomStartDate ? format(measurementCustomStartDate, "MMM d, yyyy") : "Start date"}
+                            </Button>
+                          </PopoverTrigger>
+                          <PopoverContent className="w-auto p-0" align="start">
+                            <Calendar
+                              mode="single"
+                              selected={measurementCustomStartDate}
+                              onSelect={setMeasurementCustomStartDate}
+                              initialFocus
+                              className="pointer-events-auto"
+                            />
+                          </PopoverContent>
+                        </Popover>
+                        <span className="text-muted-foreground">to</span>
+                        <Popover>
+                          <PopoverTrigger asChild>
+                            <Button variant="outline" size="sm" className={cn("w-[130px] justify-start text-left font-normal", !measurementCustomEndDate && "text-muted-foreground")}>
+                              <CalendarIcon className="mr-2 h-4 w-4" />
+                              {measurementCustomEndDate ? format(measurementCustomEndDate, "MMM d, yyyy") : "End date"}
+                            </Button>
+                          </PopoverTrigger>
+                          <PopoverContent className="w-auto p-0" align="start">
+                            <Calendar
+                              mode="single"
+                              selected={measurementCustomEndDate}
+                              onSelect={setMeasurementCustomEndDate}
+                              initialFocus
+                              className="pointer-events-auto"
+                            />
+                          </PopoverContent>
+                        </Popover>
+                      </div>
+                    )}
+                  </div>
+                </div>
               </CardHeader>
               <CardContent>
-                <ResponsiveContainer width="100%" height={250}>
+                <ResponsiveContainer width="100%" height={350}>
                   <LineChart data={measurementChartData}>
                     <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
                     <XAxis dataKey="date" className="text-xs" />
                     <YAxis className="text-xs" />
                     <Tooltip />
                     <Legend />
-                    <Line type="monotone" dataKey="weight" stroke="hsl(var(--primary))" strokeWidth={2} name="Weight (kg)" />
-                    <Line type="monotone" dataKey="bodyFat" stroke="hsl(var(--destructive))" strokeWidth={2} name="Body Fat (%)" />
-                    <Line type="monotone" dataKey="muscleMass" stroke="hsl(var(--chart-2))" strokeWidth={2} name="Muscle Mass (kg)" />
+                    <Line type="monotone" dataKey="weight" stroke="hsl(var(--primary))" strokeWidth={2.5} name="Weight (kg)" dot={{ r: 3 }} activeDot={{ r: 5 }} />
+                    <Line type="monotone" dataKey="bodyFat" stroke="hsl(var(--destructive))" strokeWidth={2.5} strokeDasharray="8 4" name="Body Fat (%)" dot={{ r: 3 }} activeDot={{ r: 5 }} />
+                    <Line type="monotone" dataKey="muscleMass" stroke="hsl(var(--chart-2))" strokeWidth={2.5} strokeDasharray="4 4" name="Muscle Mass (kg)" dot={{ r: 3 }} activeDot={{ r: 5 }} />
                     {/* Goal reference lines */}
                     {measurementGoal?.target_weight && (
                       <ReferenceLine y={measurementGoal.target_weight} stroke="hsl(var(--primary))" strokeDasharray="5 5" label={{ value: `Goal: ${measurementGoal.target_weight}kg`, fill: 'hsl(var(--primary))', fontSize: 10 }} />
@@ -923,7 +1089,7 @@ export default function CalculatorHistory() {
           )}
 
           <div className="space-y-2">
-            {measurementHistory.map((record) => (
+            {filteredMeasurementHistory.map((record) => (
               <Card 
                 key={record.id} 
                 className="cursor-pointer hover:bg-muted/50 transition-colors"
@@ -954,10 +1120,12 @@ export default function CalculatorHistory() {
                 </CardContent>
               </Card>
             ))}
-            {measurementHistory.length === 0 && (
+            {filteredMeasurementHistory.length === 0 && (
               <Card>
                 <CardContent className="p-8 text-center text-muted-foreground">
-                  No measurements yet. Start tracking your body measurements!
+                  {measurementHistory.length === 0 
+                    ? "No measurements yet. Start tracking your body measurements!"
+                    : "No records match your current filters."}
                 </CardContent>
               </Card>
             )}
