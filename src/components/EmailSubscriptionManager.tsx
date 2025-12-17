@@ -402,11 +402,17 @@ export const EmailSubscriptionManager = () => {
             {!isCalendarLoading && (
               isCalendarConnected ? (
                 <div className="flex items-center gap-3">
-                  <Switch
-                    checked={autoSyncEnabled}
-                    onCheckedChange={handleAutoSyncToggle}
-                    disabled={isCalendarSaving}
-                  />
+                  <div className="flex items-center gap-2">
+                    <Switch
+                      id="auto-sync-toggle"
+                      checked={autoSyncEnabled}
+                      onCheckedChange={handleAutoSyncToggle}
+                      disabled={isCalendarSaving}
+                    />
+                    <Label htmlFor="auto-sync-toggle" className="text-xs text-muted-foreground cursor-pointer">
+                      Auto-sync
+                    </Label>
+                  </div>
                   <Button
                     variant="ghost"
                     size="sm"
