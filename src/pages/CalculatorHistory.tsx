@@ -372,7 +372,7 @@ export default function CalculatorHistory() {
               <Calculator className="h-5 w-5 text-primary" />
               1RM History ({oneRMHistory.length} records)
             </h2>
-            <Button onClick={() => navigate("/one-rm-calculator")}>Add New</Button>
+            <Button onClick={() => navigate("/1rmcalculator")}>Add New</Button>
           </div>
 
           {oneRMHistory.length > 1 && (
@@ -444,7 +444,7 @@ export default function CalculatorHistory() {
               <Calculator className="h-5 w-5 text-primary" />
               BMR History ({bmrHistory.length} records)
             </h2>
-            <Button onClick={() => navigate("/bmr-calculator")}>Add New</Button>
+            <Button onClick={() => navigate("/bmrcalculator")}>Add New</Button>
           </div>
 
           {bmrHistory.length > 1 && (
@@ -520,7 +520,7 @@ export default function CalculatorHistory() {
               <Calculator className="h-5 w-5 text-primary" />
               Macro History ({calorieHistory.length} records)
             </h2>
-            <Button onClick={() => navigate("/macro-tracking-calculator")}>Add New</Button>
+            <Button onClick={() => navigate("/macrocalculator")}>Add New</Button>
           </div>
 
           {calorieHistory.length > 1 && (
