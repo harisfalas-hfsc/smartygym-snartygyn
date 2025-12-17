@@ -117,6 +117,9 @@ const EXERCISES = [
   "Concentrated Bicep Curls, Left Arm"
 ] as const;
 
+// Measurement types for filter
+const MEASUREMENT_TYPES = ["Weight", "Body Fat", "Muscle Mass"] as const;
+
 // Exercise colors for multi-line chart
 const EXERCISE_COLORS: Record<string, string> = {
   "Bench Press": "hsl(195, 82%, 55%)",
@@ -160,6 +163,7 @@ export default function CalculatorHistory() {
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState(searchParams.get("tab") || "1rm");
   const [selectedExercises, setSelectedExercises] = useState<string[]>([]);
+  const [selectedMeasurementTypes, setSelectedMeasurementTypes] = useState<string[]>([]);
   const [timeFilter, setTimeFilter] = useState<string>("all");
   const [customStartDate, setCustomStartDate] = useState<Date | undefined>();
   
@@ -437,7 +441,17 @@ export default function CalculatorHistory() {
   }));
 
   // Filter Measurement history by time
-  const filteredMeasurementHistory = applyTimeFilter(measurementHistory, measurementTimeFilter, measurementCustomStartDate, measurementCustomEndDate);
+  const timeFilteredMeasurementHistory = applyTimeFilter(measurementHistory, measurementTimeFilter, measurementCustomStartDate, measurementCustomEndDate);
+  
+  // Filter by measurement type
+  const filteredMeasurementHistory = selectedMeasurementTypes.length === 0 
+    ? timeFilteredMeasurementHistory
+    : timeFilteredMeasurementHistory.filter(r => {
+        const hasWeight = r.tool_result?.weight && selectedMeasurementTypes.includes("Weight");
+        const hasBodyFat = r.tool_result?.body_fat && selectedMeasurementTypes.includes("Body Fat");
+        const hasMuscleMass = r.tool_result?.muscle_mass && selectedMeasurementTypes.includes("Muscle Mass");
+        return hasWeight || hasBodyFat || hasMuscleMass;
+      });
 
   const measurementChartData = [...filteredMeasurementHistory].reverse().map((r) => ({
     date: formatShortDate(r.created_at),
@@ -710,73 +724,73 @@ export default function CalculatorHistory() {
             <Button onClick={() => navigate("/bmrcalculator")}>Add New</Button>
           </div>
 
-          {bmrHistory.length > 1 && (
-            <Card className="bg-primary/5 border-primary/20">
-              <CardHeader>
-                <div className="flex flex-col gap-3">
-                  <CardTitle className="text-base flex items-center gap-2">
-                    <TrendingUp className="h-4 w-4" />
-                    BMR Progress Over Time
-                  </CardTitle>
-                  <div className="flex flex-col sm:flex-row flex-wrap items-start sm:items-center gap-2">
-                    {/* Time Period Filter */}
-                    <Select value={bmrTimeFilter} onValueChange={setBmrTimeFilter}>
-                      <SelectTrigger className="w-full sm:w-[140px]">
-                        <SelectValue placeholder="Time period" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="all">All Time</SelectItem>
-                        <SelectItem value="30">1 Month</SelectItem>
-                        <SelectItem value="90">3 Months</SelectItem>
-                        <SelectItem value="180">6 Months</SelectItem>
-                        <SelectItem value="custom">Custom</SelectItem>
-                      </SelectContent>
-                    </Select>
-                    
-                    {/* Custom Date Range */}
-                    {bmrTimeFilter === "custom" && (
-                      <div className="flex flex-wrap items-center gap-2">
-                        <Popover>
-                          <PopoverTrigger asChild>
-                            <Button variant="outline" size="sm" className={cn("w-[130px] justify-start text-left font-normal", !bmrCustomStartDate && "text-muted-foreground")}>
-                              <CalendarIcon className="mr-2 h-4 w-4" />
-                              {bmrCustomStartDate ? format(bmrCustomStartDate, "MMM d, yyyy") : "Start date"}
-                            </Button>
-                          </PopoverTrigger>
-                          <PopoverContent className="w-auto p-0" align="start">
-                            <Calendar
-                              mode="single"
-                              selected={bmrCustomStartDate}
-                              onSelect={setBmrCustomStartDate}
-                              initialFocus
-                              className="pointer-events-auto"
-                            />
-                          </PopoverContent>
-                        </Popover>
-                        <span className="text-muted-foreground">to</span>
-                        <Popover>
-                          <PopoverTrigger asChild>
-                            <Button variant="outline" size="sm" className={cn("w-[130px] justify-start text-left font-normal", !bmrCustomEndDate && "text-muted-foreground")}>
-                              <CalendarIcon className="mr-2 h-4 w-4" />
-                              {bmrCustomEndDate ? format(bmrCustomEndDate, "MMM d, yyyy") : "End date"}
-                            </Button>
-                          </PopoverTrigger>
-                          <PopoverContent className="w-auto p-0" align="start">
-                            <Calendar
-                              mode="single"
-                              selected={bmrCustomEndDate}
-                              onSelect={setBmrCustomEndDate}
-                              initialFocus
-                              className="pointer-events-auto"
-                            />
-                          </PopoverContent>
-                        </Popover>
-                      </div>
-                    )}
-                  </div>
+          <Card className="bg-primary/5 border-primary/20">
+            <CardHeader>
+              <div className="flex flex-col gap-3">
+                <CardTitle className="text-base flex items-center gap-2">
+                  <TrendingUp className="h-4 w-4" />
+                  BMR Progress Over Time
+                </CardTitle>
+                <div className="flex flex-col sm:flex-row flex-wrap items-start sm:items-center gap-2">
+                  {/* Time Period Filter */}
+                  <Select value={bmrTimeFilter} onValueChange={setBmrTimeFilter}>
+                    <SelectTrigger className="w-full sm:w-[140px]">
+                      <SelectValue placeholder="Time period" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">All Time</SelectItem>
+                      <SelectItem value="30">1 Month</SelectItem>
+                      <SelectItem value="90">3 Months</SelectItem>
+                      <SelectItem value="180">6 Months</SelectItem>
+                      <SelectItem value="custom">Custom</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  
+                  {/* Custom Date Range */}
+                  {bmrTimeFilter === "custom" && (
+                    <div className="flex flex-wrap items-center gap-2">
+                      <Popover>
+                        <PopoverTrigger asChild>
+                          <Button variant="outline" size="sm" className={cn("w-[130px] justify-start text-left font-normal", !bmrCustomStartDate && "text-muted-foreground")}>
+                            <CalendarIcon className="mr-2 h-4 w-4" />
+                            {bmrCustomStartDate ? format(bmrCustomStartDate, "MMM d, yyyy") : "Start date"}
+                          </Button>
+                        </PopoverTrigger>
+                        <PopoverContent className="w-auto p-0" align="start">
+                          <Calendar
+                            mode="single"
+                            selected={bmrCustomStartDate}
+                            onSelect={setBmrCustomStartDate}
+                            initialFocus
+                            className="pointer-events-auto"
+                          />
+                        </PopoverContent>
+                      </Popover>
+                      <span className="text-muted-foreground">to</span>
+                      <Popover>
+                        <PopoverTrigger asChild>
+                          <Button variant="outline" size="sm" className={cn("w-[130px] justify-start text-left font-normal", !bmrCustomEndDate && "text-muted-foreground")}>
+                            <CalendarIcon className="mr-2 h-4 w-4" />
+                            {bmrCustomEndDate ? format(bmrCustomEndDate, "MMM d, yyyy") : "End date"}
+                          </Button>
+                        </PopoverTrigger>
+                        <PopoverContent className="w-auto p-0" align="start">
+                          <Calendar
+                            mode="single"
+                            selected={bmrCustomEndDate}
+                            onSelect={setBmrCustomEndDate}
+                            initialFocus
+                            className="pointer-events-auto"
+                          />
+                        </PopoverContent>
+                      </Popover>
+                    </div>
+                  )}
                 </div>
-              </CardHeader>
-              <CardContent>
+              </div>
+            </CardHeader>
+            <CardContent>
+              {filteredBMRHistory.length > 0 ? (
                 <ResponsiveContainer width="100%" height={350}>
                   <LineChart data={bmrChartData}>
                     <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
@@ -788,9 +802,16 @@ export default function CalculatorHistory() {
                     <Line type="monotone" dataKey="weight" stroke="hsl(var(--muted-foreground))" strokeWidth={2.5} strokeDasharray="8 4" name="Weight (kg)" dot={{ r: 3 }} activeDot={{ r: 5 }} />
                   </LineChart>
                 </ResponsiveContainer>
-              </CardContent>
-            </Card>
-          )}
+              ) : (
+                <div className="h-[350px] flex items-center justify-center text-muted-foreground">
+                  <div className="text-center">
+                    <Calculator className="h-12 w-12 mx-auto mb-3 opacity-50" />
+                    <p>No BMR data yet. Calculate your first BMR to see your progress!</p>
+                  </div>
+                </div>
+              )}
+            </CardContent>
+          </Card>
 
           <div className="space-y-2">
             {filteredBMRHistory.map((record) => (
@@ -995,73 +1016,121 @@ export default function CalculatorHistory() {
             </Card>
           )}
 
-          {measurementHistory.length > 1 && (
-            <Card className="bg-primary/5 border-primary/20">
-              <CardHeader>
-                <div className="flex flex-col gap-3">
-                  <CardTitle className="text-base flex items-center gap-2">
-                    <TrendingUp className="h-4 w-4" />
-                    Body Measurements Over Time
-                  </CardTitle>
-                  <div className="flex flex-col sm:flex-row flex-wrap items-start sm:items-center gap-2">
-                    {/* Time Period Filter */}
-                    <Select value={measurementTimeFilter} onValueChange={setMeasurementTimeFilter}>
-                      <SelectTrigger className="w-full sm:w-[140px]">
-                        <SelectValue placeholder="Time period" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="all">All Time</SelectItem>
-                        <SelectItem value="30">1 Month</SelectItem>
-                        <SelectItem value="90">3 Months</SelectItem>
-                        <SelectItem value="180">6 Months</SelectItem>
-                        <SelectItem value="custom">Custom</SelectItem>
-                      </SelectContent>
-                    </Select>
-                    
-                    {/* Custom Date Range */}
-                    {measurementTimeFilter === "custom" && (
-                      <div className="flex flex-wrap items-center gap-2">
-                        <Popover>
-                          <PopoverTrigger asChild>
-                            <Button variant="outline" size="sm" className={cn("w-[130px] justify-start text-left font-normal", !measurementCustomStartDate && "text-muted-foreground")}>
-                              <CalendarIcon className="mr-2 h-4 w-4" />
-                              {measurementCustomStartDate ? format(measurementCustomStartDate, "MMM d, yyyy") : "Start date"}
-                            </Button>
-                          </PopoverTrigger>
-                          <PopoverContent className="w-auto p-0" align="start">
-                            <Calendar
-                              mode="single"
-                              selected={measurementCustomStartDate}
-                              onSelect={setMeasurementCustomStartDate}
-                              initialFocus
-                              className="pointer-events-auto"
-                            />
-                          </PopoverContent>
-                        </Popover>
-                        <span className="text-muted-foreground">to</span>
-                        <Popover>
-                          <PopoverTrigger asChild>
-                            <Button variant="outline" size="sm" className={cn("w-[130px] justify-start text-left font-normal", !measurementCustomEndDate && "text-muted-foreground")}>
-                              <CalendarIcon className="mr-2 h-4 w-4" />
-                              {measurementCustomEndDate ? format(measurementCustomEndDate, "MMM d, yyyy") : "End date"}
-                            </Button>
-                          </PopoverTrigger>
-                          <PopoverContent className="w-auto p-0" align="start">
-                            <Calendar
-                              mode="single"
-                              selected={measurementCustomEndDate}
-                              onSelect={setMeasurementCustomEndDate}
-                              initialFocus
-                              className="pointer-events-auto"
-                            />
-                          </PopoverContent>
-                        </Popover>
+          <Card className="bg-primary/5 border-primary/20">
+            <CardHeader>
+              <div className="flex flex-col gap-3">
+                <CardTitle className="text-base flex items-center gap-2">
+                  <TrendingUp className="h-4 w-4" />
+                  Body Measurements Over Time
+                </CardTitle>
+                <div className="flex flex-col sm:flex-row flex-wrap items-start sm:items-center gap-2">
+                  {/* Time Period Filter */}
+                  <Select value={measurementTimeFilter} onValueChange={setMeasurementTimeFilter}>
+                    <SelectTrigger className="w-full sm:w-[140px]">
+                      <SelectValue placeholder="Time period" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">All Time</SelectItem>
+                      <SelectItem value="30">1 Month</SelectItem>
+                      <SelectItem value="90">3 Months</SelectItem>
+                      <SelectItem value="180">6 Months</SelectItem>
+                      <SelectItem value="custom">Custom</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  
+                  {/* Measurement Type Filter */}
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <Button variant="outline" className="w-full sm:w-[200px] justify-between">
+                        {selectedMeasurementTypes.length === 0
+                          ? "All Measurements" 
+                          : `${selectedMeasurementTypes.length} type${selectedMeasurementTypes.length > 1 ? 's' : ''} selected`}
+                        <ChevronDown className="h-4 w-4 opacity-50" />
+                      </Button>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-[220px] p-3">
+                      <div className="space-y-2">
+                        <Button 
+                          variant="ghost" 
+                          size="sm" 
+                          className="w-full justify-start text-primary"
+                          onClick={() => setSelectedMeasurementTypes([])}
+                        >
+                          Show All Measurements
+                        </Button>
+                        <Separator />
+                        <div className="space-y-2 pt-1">
+                          {MEASUREMENT_TYPES.map((type) => (
+                            <div key={type} className="flex items-center space-x-2">
+                              <Checkbox
+                                id={`measurement-${type}`}
+                                checked={selectedMeasurementTypes.includes(type)}
+                                onCheckedChange={(checked) => {
+                                  if (checked) {
+                                    setSelectedMeasurementTypes([...selectedMeasurementTypes, type]);
+                                  } else {
+                                    setSelectedMeasurementTypes(selectedMeasurementTypes.filter(t => t !== type));
+                                  }
+                                }}
+                              />
+                              <label 
+                                htmlFor={`measurement-${type}`} 
+                                className="text-sm cursor-pointer flex-1"
+                              >
+                                {type}
+                              </label>
+                            </div>
+                          ))}
+                        </div>
                       </div>
-                    )}
-                  </div>
+                    </PopoverContent>
+                  </Popover>
+                  
+                  {/* Custom Date Range */}
+                  {measurementTimeFilter === "custom" && (
+                    <div className="flex flex-wrap items-center gap-2">
+                      <Popover>
+                        <PopoverTrigger asChild>
+                          <Button variant="outline" size="sm" className={cn("w-[130px] justify-start text-left font-normal", !measurementCustomStartDate && "text-muted-foreground")}>
+                            <CalendarIcon className="mr-2 h-4 w-4" />
+                            {measurementCustomStartDate ? format(measurementCustomStartDate, "MMM d, yyyy") : "Start date"}
+                          </Button>
+                        </PopoverTrigger>
+                        <PopoverContent className="w-auto p-0" align="start">
+                          <Calendar
+                            mode="single"
+                            selected={measurementCustomStartDate}
+                            onSelect={setMeasurementCustomStartDate}
+                            initialFocus
+                            className="pointer-events-auto"
+                          />
+                        </PopoverContent>
+                      </Popover>
+                      <span className="text-muted-foreground">to</span>
+                      <Popover>
+                        <PopoverTrigger asChild>
+                          <Button variant="outline" size="sm" className={cn("w-[130px] justify-start text-left font-normal", !measurementCustomEndDate && "text-muted-foreground")}>
+                            <CalendarIcon className="mr-2 h-4 w-4" />
+                            {measurementCustomEndDate ? format(measurementCustomEndDate, "MMM d, yyyy") : "End date"}
+                          </Button>
+                        </PopoverTrigger>
+                        <PopoverContent className="w-auto p-0" align="start">
+                          <Calendar
+                            mode="single"
+                            selected={measurementCustomEndDate}
+                            onSelect={setMeasurementCustomEndDate}
+                            initialFocus
+                            className="pointer-events-auto"
+                          />
+                        </PopoverContent>
+                      </Popover>
+                    </div>
+                  )}
                 </div>
-              </CardHeader>
-              <CardContent>
+              </div>
+            </CardHeader>
+            <CardContent>
+              {filteredMeasurementHistory.length > 0 ? (
                 <ResponsiveContainer width="100%" height={350}>
                   <LineChart data={measurementChartData}>
                     <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
@@ -1069,24 +1138,37 @@ export default function CalculatorHistory() {
                     <YAxis className="text-xs" />
                     <Tooltip />
                     <Legend />
-                    <Line type="monotone" dataKey="weight" stroke="hsl(var(--primary))" strokeWidth={2.5} name="Weight (kg)" dot={{ r: 3 }} activeDot={{ r: 5 }} />
-                    <Line type="monotone" dataKey="bodyFat" stroke="hsl(var(--destructive))" strokeWidth={2.5} strokeDasharray="8 4" name="Body Fat (%)" dot={{ r: 3 }} activeDot={{ r: 5 }} />
-                    <Line type="monotone" dataKey="muscleMass" stroke="hsl(var(--chart-2))" strokeWidth={2.5} strokeDasharray="4 4" name="Muscle Mass (kg)" dot={{ r: 3 }} activeDot={{ r: 5 }} />
+                    {(selectedMeasurementTypes.length === 0 || selectedMeasurementTypes.includes("Weight")) && (
+                      <Line type="monotone" dataKey="weight" stroke="hsl(var(--primary))" strokeWidth={2.5} name="Weight (kg)" dot={{ r: 3 }} activeDot={{ r: 5 }} />
+                    )}
+                    {(selectedMeasurementTypes.length === 0 || selectedMeasurementTypes.includes("Body Fat")) && (
+                      <Line type="monotone" dataKey="bodyFat" stroke="hsl(var(--destructive))" strokeWidth={2.5} strokeDasharray="8 4" name="Body Fat (%)" dot={{ r: 3 }} activeDot={{ r: 5 }} />
+                    )}
+                    {(selectedMeasurementTypes.length === 0 || selectedMeasurementTypes.includes("Muscle Mass")) && (
+                      <Line type="monotone" dataKey="muscleMass" stroke="hsl(var(--chart-2))" strokeWidth={2.5} strokeDasharray="4 4" name="Muscle Mass (kg)" dot={{ r: 3 }} activeDot={{ r: 5 }} />
+                    )}
                     {/* Goal reference lines */}
-                    {measurementGoal?.target_weight && (
+                    {(selectedMeasurementTypes.length === 0 || selectedMeasurementTypes.includes("Weight")) && measurementGoal?.target_weight && (
                       <ReferenceLine y={measurementGoal.target_weight} stroke="hsl(var(--primary))" strokeDasharray="5 5" label={{ value: `Goal: ${measurementGoal.target_weight}kg`, fill: 'hsl(var(--primary))', fontSize: 10 }} />
                     )}
-                    {measurementGoal?.target_body_fat && (
+                    {(selectedMeasurementTypes.length === 0 || selectedMeasurementTypes.includes("Body Fat")) && measurementGoal?.target_body_fat && (
                       <ReferenceLine y={measurementGoal.target_body_fat} stroke="hsl(var(--destructive))" strokeDasharray="5 5" label={{ value: `Goal: ${measurementGoal.target_body_fat}%`, fill: 'hsl(var(--destructive))', fontSize: 10 }} />
                     )}
-                    {measurementGoal?.target_muscle_mass && (
+                    {(selectedMeasurementTypes.length === 0 || selectedMeasurementTypes.includes("Muscle Mass")) && measurementGoal?.target_muscle_mass && (
                       <ReferenceLine y={measurementGoal.target_muscle_mass} stroke="hsl(var(--chart-2))" strokeDasharray="5 5" label={{ value: `Goal: ${measurementGoal.target_muscle_mass}kg`, fill: 'hsl(var(--chart-2))', fontSize: 10 }} />
                     )}
                   </LineChart>
                 </ResponsiveContainer>
-              </CardContent>
-            </Card>
-          )}
+              ) : (
+                <div className="h-[350px] flex items-center justify-center text-muted-foreground">
+                  <div className="text-center">
+                    <Scale className="h-12 w-12 mx-auto mb-3 opacity-50" />
+                    <p>No measurement data yet. Start tracking your body measurements!</p>
+                  </div>
+                </div>
+              )}
+            </CardContent>
+          </Card>
 
           <div className="space-y-2">
             {filteredMeasurementHistory.map((record) => (
