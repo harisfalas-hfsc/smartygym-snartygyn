@@ -530,7 +530,7 @@ programEntries.sort((a, b) => b.total_completions - a.total_completions);
               <h2 className="text-xl sm:text-2xl font-bold mb-3 text-center">About Community</h2>
               <div className="space-y-2 text-muted-foreground max-w-3xl mx-auto">
                 <p className="text-sm sm:text-base">
-                  Welcome to the SmartyGym Community! Track your progress on leaderboards for workout completions, 
+                  Welcome to the <span className="text-primary font-semibold">SmartyGym</span> Community! Track your progress on leaderboards for workout completions, 
                   training programs, and daily check-ins. Discover top-rated content through member ratings, 
                   read community comments and testimonials, and get inspired by fellow members' achievements. 
                   Connect, compete, and celebrate your fitness journey together.
