@@ -271,10 +271,13 @@ async function sendRitualNotifications(supabase: any, dayNumber: number, date: s
 
 const subject = "☀️ Your all day game – plan is ready";
     
+    const googleCalendarUrl = 'https://calendar.google.com/calendar/render?action=TEMPLATE&text=%E2%98%80%EF%B8%8F+Daily+Smarty+Ritual&recur=RRULE:FREQ%3DDAILY&details=Time+for+your+Smarty+Ritual!+View+your+personalized+ritual+at+https://smartygym.com/daily-ritual';
+    
     const content = `<p class="tiptap-paragraph"><strong>Your Smarty Ritual is here!</strong></p>
 <p class="tiptap-paragraph">Your personalized daily ritual is ready. Start with the Morning Ritual to energize your day, reset at Midday, and unwind in the Evening.</p>
 <p class="tiptap-paragraph">Three simple phases. Maximum impact. Your daily game plan for movement, recovery, and performance.</p>
 <p class="tiptap-paragraph"><a href="https://smartygym.com/daily-ritual" style="color: #29B6D2; font-weight: bold;">View Your Smarty Ritual →</a></p>
+<p class="tiptap-paragraph"><a href="${googleCalendarUrl}" target="_blank" style="color: #22c55e; font-weight: bold;">📅 Add Ritual Reminders to Google Calendar</a></p>
 <p class="tiptap-paragraph">💡 <strong>Don't forget to track your progress!</strong> Complete your <a href="https://smartygym.com/userdashboard?tab=checkins" style="color: #29B6D2; font-weight: bold;">Smarty Check-ins</a> (morning & evening) to monitor your sleep, mood, recovery, and build your consistency streak.</p>`;
 
     let sentCount = 0;
@@ -335,6 +338,9 @@ const emailResult = await resend.emails.send({
                 <p style="font-size: 16px; line-height: 1.6; margin-bottom: 24px;">Three simple phases. Maximum impact. Your daily game plan for movement, recovery, and performance.</p>
                 <div style="margin: 24px 0; text-align: center;">
                   <a href="https://smartygym.com/daily-ritual" style="display: inline-block; background: #29B6D2; color: white; padding: 14px 28px; text-decoration: none; border-radius: 4px; font-weight: bold; font-size: 16px;">View Your Smarty Ritual →</a>
+                </div>
+                <div style="margin: 16px 0; text-align: center;">
+                  <a href="${googleCalendarUrl}" target="_blank" style="display: inline-block; background: #22c55e; color: white; padding: 12px 24px; text-decoration: none; border-radius: 4px; font-weight: bold; font-size: 14px;">📅 Add to Google Calendar</a>
                 </div>
                 <div style="margin: 24px 0; padding: 16px; background: #e6f7fa; border-radius: 8px; border-left: 4px solid #29B6D2;">
                   <p style="font-size: 14px; color: #333; margin: 0;">💡 <strong>Track Your Progress!</strong></p>
