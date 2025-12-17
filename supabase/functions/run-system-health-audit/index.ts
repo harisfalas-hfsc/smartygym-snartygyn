@@ -195,15 +195,18 @@ const handler = async (req: Request): Promise<Response> => {
     if (wodState) {
       addCheck('WOD System', 'WOD State Tracking', `Day ${wodState.day_count}, Category: ${wodState.current_category}`, 'pass');
       
-      // Periodization check
+      // Periodization check - compare ACTUAL WOD category (not state table which stores NEXT category)
       const expectedCategories = ['Challenge', 'Strength', 'Cardio', 'Mobility & Stability', 'Strength', 'Metabolic', 'Calorie Burning'];
       const dayIndex = ((wodState.day_count - 1) % 7);
       const expectedCategory = expectedCategories[dayIndex];
-      const categoryMatch = wodState.current_category?.toLowerCase().includes(expectedCategory.toLowerCase().split(' ')[0]);
+      
+      // Use actual today's WOD category, not state table (which may have rotated to next)
+      const actualTodayCategory = todayWods?.[0]?.category || wodState.current_category;
+      const categoryMatch = actualTodayCategory?.toLowerCase().includes(expectedCategory.toLowerCase().split(' ')[0]);
       
       addCheck('WOD System', 'Periodization Cycle', `Day ${wodState.day_count} should be ${expectedCategory}`, 
         categoryMatch ? 'pass' : 'warning',
-        categoryMatch ? 'Category matches schedule' : `Expected ${expectedCategory}, got ${wodState.current_category}`
+        categoryMatch ? `Actual WOD category matches: ${actualTodayCategory}` : `Expected ${expectedCategory}, actual WOD: ${actualTodayCategory}`
       );
 
       addCheck('WOD System', 'Last Generation Time', wodState.last_generated_at ? `Last generated: ${wodState.last_generated_at}` : 'Never generated', 
@@ -616,13 +619,19 @@ const handler = async (req: Request): Promise<Response> => {
       }
 
       for (const expected of expectedDaily) {
-        const found = auditLogs.some(log => 
-          expected.patterns.some(pattern => 
-            log.subject?.toLowerCase().includes(pattern.toLowerCase()) ||
-            log.message_type?.toLowerCase() === expected.key.toLowerCase() ||
-            log.notification_type?.toLowerCase() === expected.key.toLowerCase()
-          )
-        );
+        // Check both message_type and subject patterns, including 'morning_notification' as alt type for WOD
+        const found = auditLogs.some(log => {
+          // Direct message_type match
+          if (log.message_type?.toLowerCase() === expected.key.toLowerCase()) return true;
+          
+          // Check alternate types (WOD can be 'morning_notification' with new architecture)
+          if (expected.key === 'wod_notification' && log.message_type === 'morning_notification') return true;
+          
+          // Subject pattern match
+          return expected.patterns.some(pattern => 
+            log.subject?.toLowerCase().includes(pattern.toLowerCase())
+          );
+        });
 
         if (expected.key === 'motivational_weekly' && isMonday) {
           addCheck('Notifications', 'Monday Motivation Sent', 
@@ -640,7 +649,7 @@ const handler = async (req: Request): Promise<Response> => {
           addCheck('Notifications', 'WOD Notification Sent', 
             'Daily WOD notification should be sent', 
             found ? 'pass' : 'fail',
-            found ? 'Found in audit log' : 'NOT FOUND in audit log!'
+            found ? 'Found in audit log (wod_notification or morning_notification)' : 'NOT FOUND in audit log! Check morning notification schedule.'
           );
         } else if (expected.key === 'daily_ritual') {
           addCheck('Notifications', 'Daily Ritual Notification Sent', 
@@ -651,14 +660,16 @@ const handler = async (req: Request): Promise<Response> => {
         }
       }
 
-      // Check for dual-channel delivery (both dashboard + email)
-      const dashboardCount = auditLogs.filter(l => l.notification_type === 'dashboard' || l.notification_type === 'both').length;
-      const emailCount = auditLogs.filter(l => l.notification_type === 'email' || l.notification_type === 'both').length;
+      // Check for dual-channel delivery - count dashboard messages separately from emails
+      // Dashboard = user_system_messages created today
+      // Email = audit log entries with recipient_count > 0 (indicates emails were sent)
+      const dashboardMessageCount = todayMessages?.length || 0;
+      const emailsSentCount = auditLogs.filter(l => (l.recipient_count || 0) > 0).length;
 
       addCheck('Notifications', 'Dual-Channel Delivery', 
         'Notifications sent via both dashboard and email', 
-        dashboardCount > 0 && emailCount > 0 ? 'pass' : 'warning',
-        `Dashboard: ${dashboardCount}, Email: ${emailCount} in audit log today`
+        dashboardMessageCount > 0 && emailsSentCount > 0 ? 'pass' : 'warning',
+        `Dashboard messages: ${dashboardMessageCount}, Email sends in audit: ${emailsSentCount}`
       );
 
       // Check for failed sends
