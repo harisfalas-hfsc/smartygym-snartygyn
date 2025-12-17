@@ -32,6 +32,7 @@ import { LogBookCalendar } from "@/components/logbook/LogBookCalendar";
 import { LogBookAdvancedCharts } from "@/components/logbook/LogBookAdvancedCharts";
 import { LogBookAdvancedExport } from "@/components/logbook/LogBookAdvancedExport";
 import { MeasurementDialog } from "@/components/logbook/MeasurementDialog";
+import { GoalsSummaryCard } from "@/components/dashboard/GoalsSummaryCard";
 
 import { CheckInModalManager, useCheckInBanner } from "@/components/checkins/CheckInModalManager";
 import { CheckInBanner } from "@/components/checkins/CheckInBanner";
@@ -1012,6 +1013,13 @@ export default function UserDashboard() {
               </div>
             </CardContent>
           </Card>}
+
+        {/* Goals Summary Card - Show for premium users */}
+        {isPremium && user && (
+          <div className="mb-6">
+            <GoalsSummaryCard userId={user.id} />
+          </div>
+        )}
 
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
           <div className="w-full overflow-x-auto">
