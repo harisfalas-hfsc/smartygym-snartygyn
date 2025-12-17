@@ -82,7 +82,6 @@ export const WODScheduleInfo = () => {
       const { data, error } = await supabase
         .from("admin_workouts")
         .select("generated_for_date, difficulty_stars, difficulty, category")
-        .eq("is_workout_of_day", true)
         .in("generated_for_date", [yesterdayStr, todayStr]);
 
       if (error) {
