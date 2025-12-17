@@ -32,6 +32,7 @@ import { LogBookCalendar } from "@/components/logbook/LogBookCalendar";
 import { LogBookAdvancedCharts } from "@/components/logbook/LogBookAdvancedCharts";
 import { LogBookAdvancedExport } from "@/components/logbook/LogBookAdvancedExport";
 import { MeasurementDialog } from "@/components/logbook/MeasurementDialog";
+import { LogBookCalendarSync } from "@/components/logbook/LogBookCalendarSync";
 import { CheckInModalManager, useCheckInBanner } from "@/components/checkins/CheckInModalManager";
 import { CheckInBanner } from "@/components/checkins/CheckInBanner";
 import { CheckInDashboardCard } from "@/components/checkins/CheckInDashboardCard";
@@ -1569,7 +1570,7 @@ export default function UserDashboard() {
                       <CardContent className="py-2 px-3">
                         {oneRMHistory.length === 0 ? <div className="text-center py-1">
                             <p className="text-xs text-muted-foreground mb-2">No history yet</p>
-                            <Button size="sm" variant="outline" onClick={() => navigate("/one-rm-calculator")}>
+                            <Button size="sm" variant="outline" onClick={() => navigate("/1rmcalculator")}>
                               Calculate Now
                             </Button>
                           </div> : <div className="space-y-1">
@@ -1608,7 +1609,7 @@ export default function UserDashboard() {
                       <CardContent className="py-2 px-3">
                         {bmrHistory.length === 0 ? <div className="text-center py-1">
                             <p className="text-xs text-muted-foreground mb-2">No history yet</p>
-                            <Button size="sm" variant="outline" onClick={() => navigate("/bmr-calculator")}>
+                            <Button size="sm" variant="outline" onClick={() => navigate("/bmrcalculator")}>
                               Calculate Now
                             </Button>
                           </div> : <div className="space-y-1">
@@ -1649,7 +1650,7 @@ export default function UserDashboard() {
                       <CardContent className="py-2 px-3">
                         {calorieHistory.length === 0 ? <div className="text-center py-1">
                             <p className="text-xs text-muted-foreground mb-2">No history yet</p>
-                            <Button size="sm" variant="outline" onClick={() => navigate("/macro-tracking-calculator")}>
+                            <Button size="sm" variant="outline" onClick={() => navigate("/macrocalculator")}>
                               Calculate Now
                             </Button>
                           </div> : <div className="space-y-1">
@@ -1726,8 +1727,15 @@ export default function UserDashboard() {
                       </CardContent>
                     </Card>
                   </div>
+                  
+                  {/* Google Calendar Sync for Calculators & Measurements */}
+                  <LogBookCalendarSync 
+                    oneRMHistory={oneRMHistory}
+                    bmrHistory={bmrHistory}
+                    calorieHistory={calorieHistory}
+                    measurementHistory={measurementHistory}
+                  />
                 </div>
-
                 {/* Full Smarty Check-ins Section */}
                 {isPremium && <div className="mt-6">
                     <Card className="bg-primary/5 border-primary/20">
