@@ -96,6 +96,23 @@ type MeasurementData = {
 
 type RecordType = "1rm" | "bmr" | "macro" | "measurement";
 
+// Predefined exercises list for 1RM Calculator
+const EXERCISES = [
+  "Bench Press",
+  "Back Squats",
+  "Deadlifts",
+  "Bulgarian Split Squats, Right Leg",
+  "Bulgarian Split Squats, Left Leg",
+  "Shoulder Press, Right Arm",
+  "Shoulder Press, Left Arm",
+  "Military Presses",
+  "Single Leg RDL, Right Leg",
+  "Single Leg RDL, Left Leg",
+  "Barbell Bicep Curls",
+  "Concentrated Bicep Curls, Right Arm",
+  "Concentrated Bicep Curls, Left Arm"
+] as const;
+
 // Exercise colors for multi-line chart
 const EXERCISE_COLORS: Record<string, string> = {
   "Bench Press": "hsl(195, 82%, 55%)",
@@ -311,7 +328,7 @@ export default function CalculatorHistory() {
   // Transform data for multi-exercise progress chart
   const prepareOneRMProgressData = () => {
     const sortedData = [...filteredOneRMHistory].reverse();
-    const exercisesToShow = selectedExercises.length === 0 ? uniqueExercises : selectedExercises;
+    const exercisesToShow = selectedExercises.length === 0 ? [...EXERCISES] : selectedExercises;
     
     // Group by date and create data points with all selected exercises
     const dateMap = new Map<string, Record<string, number | string>>();
@@ -444,7 +461,7 @@ export default function CalculatorHistory() {
                         </Button>
                         <Separator />
                         <div className="space-y-2 pt-1">
-                          {uniqueExercises.map((exercise) => (
+                          {EXERCISES.map((exercise) => (
                             <div key={exercise} className="flex items-center space-x-2">
                               <Checkbox
                                 id={`exercise-${exercise}`}
@@ -479,7 +496,7 @@ export default function CalculatorHistory() {
                     <YAxis className="text-xs" />
                     <Tooltip />
                     <Legend />
-                    {(selectedExercises.length === 0 ? uniqueExercises : selectedExercises).map((exercise) => (
+                    {(selectedExercises.length === 0 ? [...EXERCISES] : selectedExercises).map((exercise) => (
                       <Line 
                         key={exercise}
                         type="monotone" 
