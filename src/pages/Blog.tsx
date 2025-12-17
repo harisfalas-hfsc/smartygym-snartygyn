@@ -11,7 +11,6 @@ import { supabase } from "@/integrations/supabase/client";
 import { CompactFilters } from "@/components/CompactFilters";
 import { Link } from "react-router-dom";
 import { SEOEnhancer } from "@/components/SEOEnhancer";
-
 interface Article {
   id: string;
   slug: string;
@@ -23,26 +22,25 @@ interface Article {
   category: string;
   author_name?: string;
 }
-
-
 const Blog = () => {
   const navigate = useNavigate();
-  const { canGoBack, goBack } = useShowBackButton();
+  const {
+    canGoBack,
+    goBack
+  } = useShowBackButton();
   const [categoryFilter, setCategoryFilter] = useState<string>("all");
   const [sortFilter, setSortFilter] = useState<string>("newest");
   const [allArticles, setAllArticles] = useState<Article[]>([]);
-
   useEffect(() => {
     const fetchArticles = async () => {
       try {
-        const { data, error } = await supabase
-          .from('blog_articles')
-          .select('*')
-          .eq('is_published', true)
-          .order('published_at', { ascending: false });
-
+        const {
+          data,
+          error
+        } = await supabase.from('blog_articles').select('*').eq('is_published', true).order('published_at', {
+          ascending: false
+        });
         if (error) throw error;
-
         if (data && data.length > 0) {
           const formattedArticles: Article[] = data.map((article: any) => ({
             id: article.id,
@@ -51,37 +49,28 @@ const Blog = () => {
             excerpt: article.excerpt,
             image: article.image_url || 'https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?auto=format&fit=crop&q=80&w=800',
             readTime: article.read_time || '5 min read',
-            date: new Date(article.published_at || article.created_at).toLocaleDateString('en-US', { 
-              year: 'numeric', 
-              month: 'long', 
-              day: 'numeric' 
+            date: new Date(article.published_at || article.created_at).toLocaleDateString('en-US', {
+              year: 'numeric',
+              month: 'long',
+              day: 'numeric'
             }),
             category: article.category,
-            author_name: article.author_name,
+            author_name: article.author_name
           }));
-
           setAllArticles(formattedArticles);
         }
       } catch (error) {
         console.error('Error fetching articles:', error);
       }
     };
-
     fetchArticles();
   }, []);
-
-  const filteredArticles = allArticles
-    .filter((article) =>
-      categoryFilter === "all" || article.category.toLowerCase() === categoryFilter.toLowerCase()
-    )
-    .sort((a, b) => {
-      const dateA = new Date(a.date).getTime();
-      const dateB = new Date(b.date).getTime();
-      return sortFilter === "newest" ? dateB - dateA : dateA - dateB;
-    });
-
-  return (
-    <>
+  const filteredArticles = allArticles.filter(article => categoryFilter === "all" || article.category.toLowerCase() === categoryFilter.toLowerCase()).sort((a, b) => {
+    const dateA = new Date(a.date).getTime();
+    const dateB = new Date(b.date).getTime();
+    return sortFilter === "newest" ? dateB - dateA : dateA - dateB;
+  });
+  return <>
       <Helmet>
         <title>Fitness Blog | Expert Articles | Haris Falas HFSC | SmartyGym</title>
         <meta name="description" content="Fitness blog at smartygym.com. Expert articles on strength training cardio nutrition by Sports Scientist Haris Falas HFSC. Evidence-based fitness content for online gym training. Real results anywhere anytime" />
@@ -103,67 +92,50 @@ const Blog = () => {
         {/* Structured Data for Blog */}
         <script type="application/ld+json">
           {JSON.stringify({
-            "@context": "https://schema.org",
-            "@type": "Blog",
-            "name": "SmartyGym Fitness Blog",
-            "description": "Expert fitness and nutrition advice by sports scientist Haris Falas",
-            "url": "https://smartygym.com/blog",
-            "author": {
-              "@type": "Person",
-              "name": "Haris Falas",
-              "jobTitle": "Sports Scientist & Strength and Conditioning Coach"
-            },
-            "inLanguage": "en",
-            "publisher": {
-              "@type": "Organization",
-              "name": "SmartyGym",
-              "url": "https://smartygym.com"
-            }
-          })}
+          "@context": "https://schema.org",
+          "@type": "Blog",
+          "name": "SmartyGym Fitness Blog",
+          "description": "Expert fitness and nutrition advice by sports scientist Haris Falas",
+          "url": "https://smartygym.com/blog",
+          "author": {
+            "@type": "Person",
+            "name": "Haris Falas",
+            "jobTitle": "Sports Scientist & Strength and Conditioning Coach"
+          },
+          "inLanguage": "en",
+          "publisher": {
+            "@type": "Organization",
+            "name": "SmartyGym",
+            "url": "https://smartygym.com"
+          }
+        })}
         </script>
       </Helmet>
 
-      <SEOEnhancer
-        entities={["Fitness Blog", "Training Articles", "Workout Tips", "Nutrition Advice"]}
-        topics={["fitness education", "training science", "workout techniques", "health tips"]}
-        expertise={["sports science", "exercise physiology", "nutrition", "training methods"]}
-        contentType="Blog Articles"
-        aiSummary="SmartyGym Blog: Expert fitness articles by Sports Scientist Haris Falas. Training tips, workout techniques, nutrition advice, exercise science, and evidence-based fitness education for all levels."
-        aiKeywords={["fitness blog", "training articles", "workout tips", "exercise science", "fitness education", "sports science blog"]}
-        relatedContent={["Workouts", "Training Programs", "Exercise Library", "Fitness Tools"]}
-        targetAudience="fitness enthusiasts seeking knowledge"
-        pageType="Blog"
-      />
+      <SEOEnhancer entities={["Fitness Blog", "Training Articles", "Workout Tips", "Nutrition Advice"]} topics={["fitness education", "training science", "workout techniques", "health tips"]} expertise={["sports science", "exercise physiology", "nutrition", "training methods"]} contentType="Blog Articles" aiSummary="SmartyGym Blog: Expert fitness articles by Sports Scientist Haris Falas. Training tips, workout techniques, nutrition advice, exercise science, and evidence-based fitness education for all levels." aiKeywords={["fitness blog", "training articles", "workout tips", "exercise science", "fitness education", "sports science blog"]} relatedContent={["Workouts", "Training Programs", "Exercise Library", "Fitness Tools"]} targetAudience="fitness enthusiasts seeking knowledge" pageType="Blog" />
 
       <div className="min-h-screen bg-gradient-to-b from-background to-accent/20">
         <div className="container mx-auto max-w-6xl px-4 pb-8">
-          {canGoBack && (
-            <div className="mb-6">
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={goBack}
-              >
+          {canGoBack && <div className="mb-6">
+              <Button variant="ghost" size="sm" onClick={goBack}>
                 <ArrowLeft className="mr-2 h-4 w-4" />
                 Back
               </Button>
-            </div>
-          )}
+            </div>}
 
-          <PageBreadcrumbs 
-            items={[
-              { label: "Home", href: "/" },
-              { label: "Blog" }
-            ]} 
-          />
+          <PageBreadcrumbs items={[{
+          label: "Home",
+          href: "/"
+        }, {
+          label: "Blog"
+        }]} />
 
           {/* About Expert Articles */}
           <Card className="mb-8 bg-gradient-to-br from-primary/5 via-background to-primary/5 border-2 border-primary/40 shadow-primary">
             <CardContent className="p-4 sm:p-5">
               <h2 className="text-xl sm:text-2xl font-bold mb-3 text-center">About Expert Articles</h2>
               <div className="space-y-2 text-muted-foreground max-w-3xl mx-auto">
-                <p className="text-sm sm:text-base">
-                  Evidence-based fitness articles written by Sports Scientist <a href="/coach-profile" className="text-primary hover:underline font-semibold">Haris Falas</a> (CSCS Certified). 
+                <p className="text-sm sm:text-base">Evidence-based articles written by Sports Scientist Haris Falas (CSCS Certified). Explore in-depth content on Fitness, Nutrition, and Wellness designed to educate and empower your training journey. From strength training science to nutrition strategies, get expert insights to make informed decisions about your health and performance.<a href="/coach-profile" className="text-primary hover:underline font-semibold">Haris Falas</a> (CSCS Certified). 
                   Explore in-depth content on Fitness, Nutrition, and Wellness designed to educate and empower 
                   your training journey. From strength training science to nutrition strategies, 
                   get expert insights to make informed decisions about your health and performance.
@@ -172,53 +144,42 @@ const Blog = () => {
             </CardContent>
           </Card>
 
-          <CompactFilters
-            filters={[
-              {
-                name: "Sort by",
-                value: sortFilter,
-                onChange: setSortFilter,
-                options: [
-                  { value: "newest", label: "Newest" },
-                  { value: "oldest", label: "Oldest" }
-                ],
-                placeholder: "Sort"
-              },
-              {
-                name: "Category",
-                value: categoryFilter,
-                onChange: setCategoryFilter,
-                options: [
-                  { value: "all", label: "All" },
-                  { value: "fitness", label: "Fitness" },
-                  { value: "wellness", label: "Wellness" },
-                  { value: "nutrition", label: "Nutrition" }
-                ],
-                placeholder: "Category"
-              }
-            ]}
-          />
+          <CompactFilters filters={[{
+          name: "Sort by",
+          value: sortFilter,
+          onChange: setSortFilter,
+          options: [{
+            value: "newest",
+            label: "Newest"
+          }, {
+            value: "oldest",
+            label: "Oldest"
+          }],
+          placeholder: "Sort"
+        }, {
+          name: "Category",
+          value: categoryFilter,
+          onChange: setCategoryFilter,
+          options: [{
+            value: "all",
+            label: "All"
+          }, {
+            value: "fitness",
+            label: "Fitness"
+          }, {
+            value: "wellness",
+            label: "Wellness"
+          }, {
+            value: "nutrition",
+            label: "Nutrition"
+          }],
+          placeholder: "Category"
+        }]} />
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {filteredArticles.map((article) => (
-              <Card
-                key={article.id}
-                itemScope
-                itemType="https://schema.org/BlogPosting"
-                className="overflow-hidden cursor-pointer transition-all duration-300 hover:scale-105 hover:shadow-lg"
-                onClick={() => navigate(`/blog/${article.slug}`)}
-                data-article-id={article.id}
-                data-keywords="smarty gym blog, online fitness tips, smartygym.com, Haris Falas, online gym advice"
-                aria-label={`${article.title} - SmartyGym blog - Online fitness at smartygym.com`}
-              >
+            {filteredArticles.map(article => <Card key={article.id} itemScope itemType="https://schema.org/BlogPosting" className="overflow-hidden cursor-pointer transition-all duration-300 hover:scale-105 hover:shadow-lg" onClick={() => navigate(`/blog/${article.slug}`)} data-article-id={article.id} data-keywords="smarty gym blog, online fitness tips, smartygym.com, Haris Falas, online gym advice" aria-label={`${article.title} - SmartyGym blog - Online fitness at smartygym.com`}>
                 <div className="relative h-48 overflow-hidden">
-                  <img
-                    src={article.image}
-                    alt={`${article.title} - SmartyGym online fitness blog - smartygym.com by Haris Falas`}
-                    className="w-full h-full object-cover"
-                    loading="lazy"
-                    itemProp="image"
-                  />
+                  <img src={article.image} alt={`${article.title} - SmartyGym online fitness blog - smartygym.com by Haris Falas`} className="w-full h-full object-cover" loading="lazy" itemProp="image" />
                   <div className="absolute top-3 right-3">
                     <span className="bg-primary text-primary-foreground px-3 py-1 rounded-full text-xs font-medium">
                       {article.category}
@@ -227,16 +188,10 @@ const Blog = () => {
                 </div>
                 
                 <div className="p-5">
-                  <h2 
-                    className="text-xl font-bold mb-2 line-clamp-2"
-                    itemProp="headline"
-                  >
+                  <h2 className="text-xl font-bold mb-2 line-clamp-2" itemProp="headline">
                 {article.title}
                   </h2>
-                  <p 
-                    className="text-muted-foreground text-sm mb-4 line-clamp-2"
-                    itemProp="description"
-                  >
+                  <p className="text-muted-foreground text-sm mb-4 line-clamp-2" itemProp="description">
                     {article.excerpt}
                   </p>
                   
@@ -253,13 +208,10 @@ const Blog = () => {
                   <meta itemProp="author" content="Haris Falas - SmartyGym - smartygym.com" />
                   <meta itemProp="publisher" content="SmartyGym - smartygym.com" />
                 </div>
-              </Card>
-            ))}
+              </Card>)}
           </div>
         </div>
       </div>
-    </>
-  );
+    </>;
 };
-
 export default Blog;
