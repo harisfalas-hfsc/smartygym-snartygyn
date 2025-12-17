@@ -32,7 +32,7 @@ import { LogBookCalendar } from "@/components/logbook/LogBookCalendar";
 import { LogBookAdvancedCharts } from "@/components/logbook/LogBookAdvancedCharts";
 import { LogBookAdvancedExport } from "@/components/logbook/LogBookAdvancedExport";
 import { MeasurementDialog } from "@/components/logbook/MeasurementDialog";
-import { LogBookCalendarSync } from "@/components/logbook/LogBookCalendarSync";
+
 import { CheckInModalManager, useCheckInBanner } from "@/components/checkins/CheckInModalManager";
 import { CheckInBanner } from "@/components/checkins/CheckInBanner";
 import { CheckInDashboardCard } from "@/components/checkins/CheckInDashboardCard";
@@ -1727,14 +1727,6 @@ export default function UserDashboard() {
                       </CardContent>
                     </Card>
                   </div>
-                  
-                  {/* Google Calendar Sync for Calculators & Measurements */}
-                  <LogBookCalendarSync 
-                    oneRMHistory={oneRMHistory}
-                    bmrHistory={bmrHistory}
-                    calorieHistory={calorieHistory}
-                    measurementHistory={measurementHistory}
-                  />
                 </div>
                 {/* Full Smarty Check-ins Section */}
                 {isPremium && <div className="mt-6">
