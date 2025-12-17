@@ -1034,10 +1034,6 @@ export default function UserDashboard() {
                     {unreadCount}
                   </Badge>}
               </TabsTrigger>
-              <TabsTrigger value="calculators" className="flex-shrink-0">
-                <Calculator className="mr-2 h-4 w-4" />
-                <span className="whitespace-nowrap">My Calculators</span>
-              </TabsTrigger>
               <TabsTrigger value="logbook" className="flex-shrink-0">
                 <BookOpen className="mr-2 h-4 w-4" />
                 <span className="whitespace-nowrap">My LogBook</span>
@@ -1406,101 +1402,6 @@ export default function UserDashboard() {
             <UserMessagesPanel />
           </TabsContent>
 
-          {/* Calculators Tab */}
-          <TabsContent value="calculators" className="space-y-6">
-            <div className="grid gap-6 md:grid-cols-3">
-              {/* 1RM Calculator History */}
-              <Card>
-                <CardHeader>
-                  <CardTitle className="text-sm font-medium">1RM Calculator</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  {oneRMHistory.length === 0 ? <div className="text-center py-4">
-                      <p className="text-xs text-muted-foreground mb-2">No history yet</p>
-                      <Button size="sm" variant="outline" onClick={() => navigate("/1rmcalculator")}>
-                        Calculate Now
-                      </Button>
-                    </div> : <div className="space-y-2">
-                      {oneRMHistory.map(record => <div key={record.id} className="p-2 bg-muted rounded text-xs">
-                          <div className="font-semibold">{record.one_rm_result.toFixed(1)} kg</div>
-                          {record.exercise_name && <div className="text-muted-foreground">{record.exercise_name}</div>}
-                          <div className="text-muted-foreground">
-                            {record.weight_lifted}kg × {record.reps} reps
-                          </div>
-                          <div className="text-muted-foreground mt-1">
-                            {formatDate(record.created_at)}
-                          </div>
-                        </div>)}
-                      <Button size="sm" variant="outline" className="w-full mt-2" onClick={() => navigate("/1rmcalculator")}>
-                        View All / Add New
-                      </Button>
-                    </div>}
-                </CardContent>
-              </Card>
-
-              {/* BMR Calculator History */}
-              <Card>
-                <CardHeader>
-                  <CardTitle className="text-sm font-medium">BMR Calculator</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  {bmrHistory.length === 0 ? <div className="text-center py-4">
-                      <p className="text-xs text-muted-foreground mb-2">No history yet</p>
-                      <Button size="sm" variant="outline" onClick={() => navigate("/bmrcalculator")}>
-                        Calculate Now
-                      </Button>
-                    </div> : <div className="space-y-2">
-                      {bmrHistory.map(record => <div key={record.id} className="p-2 bg-muted rounded text-xs">
-                          <div className="font-semibold">{record.bmr_result} cal/day</div>
-                          <div className="text-muted-foreground">
-                            {record.age}y • {record.weight}kg • {record.height}cm
-                          </div>
-                          <div className="text-muted-foreground capitalize">
-                            {record.gender}
-                          </div>
-                          <div className="text-muted-foreground mt-1">
-                            {formatDate(record.created_at)}
-                          </div>
-                        </div>)}
-                      <Button size="sm" variant="outline" className="w-full mt-2" onClick={() => navigate("/bmrcalculator")}>
-                        View All / Add New
-                      </Button>
-                    </div>}
-                </CardContent>
-              </Card>
-
-              {/* Macro Tracking Calculator History */}
-              <Card>
-                <CardHeader>
-                  <CardTitle className="text-sm font-medium">Macro Calculator</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  {calorieHistory.length === 0 ? <div className="text-center py-4">
-                      <p className="text-xs text-muted-foreground mb-2">No history yet</p>
-                      <Button size="sm" variant="outline" onClick={() => navigate("/macrocalculator")}>
-                        Calculate Now
-                      </Button>
-                    </div> : <div className="space-y-2">
-                      {calorieHistory.map(record => <div key={record.id} className="p-2 bg-muted rounded text-xs">
-                          <div className="font-semibold">{record.target_calories} cal/day</div>
-                          <div className="text-muted-foreground capitalize">
-                            Goal: {record.goal.replace('_', ' ')}
-                          </div>
-                          <div className="text-muted-foreground">
-                            Maintenance: {record.maintenance_calories} cal
-                          </div>
-                          <div className="text-muted-foreground mt-1">
-                            {formatDate(record.created_at)}
-                          </div>
-                        </div>)}
-                      <Button size="sm" variant="outline" className="w-full mt-2" onClick={() => navigate("/macrocalculator")}>
-                        View All / Add New
-                      </Button>
-                    </div>}
-                </CardContent>
-            </Card>
-          </div>
-                </TabsContent>
 
           {/* LogBook Tab */}
           <TabsContent value="logbook" className="space-y-6">
