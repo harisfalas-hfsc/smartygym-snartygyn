@@ -153,7 +153,7 @@ export const WorkoutOfTheDay = () => {
           
           {/* Description */}
           <p className="text-xs sm:text-sm text-muted-foreground max-w-2xl mx-auto mb-4">
-            Every day at 7:00 AM, <span className="text-primary font-semibold">SmartyGym</span> delivers <strong>TWO</strong> fresh workouts — one with equipment, one without. Choose based on where you are!
+            Every day at midnight, <span className="text-primary font-semibold">SmartyGym</span> delivers <strong>TWO</strong> fresh workouts — one with equipment, one without. Choose based on where you are!
           </p>
         </div>
 
@@ -186,7 +186,7 @@ export const WorkoutOfTheDay = () => {
               No Workouts of the Day available yet.
             </p>
             <p className="text-sm text-muted-foreground/70">
-              Check back at 7:00 AM for today's fresh workouts!
+              Check back at <span className="text-primary font-semibold">midnight (00:00)</span> for today's fresh workouts!
             </p>
           </div>
         )}

@@ -164,7 +164,7 @@ export const WODAnnouncementModal = ({ open, onClose }: WODAnnouncementModalProp
               🔥 Fresh Workouts Just Dropped!
             </h2>
             <p className="text-sm text-muted-foreground max-w-sm">
-              Every day at 7:00 AM, <span className="text-primary font-semibold">SmartyGym</span> delivers <strong>TWO</strong> fresh workouts — pick based on your location!
+              Every day at midnight, <span className="text-primary font-semibold">SmartyGym</span> delivers <strong>TWO</strong> fresh workouts — pick based on your location!
             </p>
           </div>
         </div>
@@ -179,7 +179,7 @@ export const WODAnnouncementModal = ({ open, onClose }: WODAnnouncementModalProp
           ) : (
             <div className="bg-background/80 rounded-xl p-4 border border-primary/30 text-center mb-4">
               <p className="text-muted-foreground text-sm">
-                No Workouts of the Day available yet. Check back at 7:00 AM!
+                No Workouts of the Day available yet. Check back at <span className="text-primary font-semibold">midnight (00:00)</span>!
               </p>
             </div>
           )}
