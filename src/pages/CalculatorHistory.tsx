@@ -79,8 +79,8 @@ interface MeasurementRecord {
   created_at: string;
   tool_result: {
     weight?: number;
-    body_fat?: number;
-    muscle_mass?: number;
+    bodyFat?: number;
+    muscleMass?: number;
   } | null;
 }
 
@@ -258,7 +258,7 @@ export default function CalculatorHistory() {
       // Filter out records without actual measurement values
       const validData = data.filter((d: MeasurementData) => {
         const result = d.tool_result as MeasurementRecord['tool_result'];
-        return result && (result.weight || result.body_fat || result.muscle_mass);
+        return result && (result.weight || result.bodyFat || result.muscleMass);
       });
       const typedData = validData.map((d: MeasurementData) => ({
         id: d.id,
@@ -331,8 +331,8 @@ export default function CalculatorHistory() {
   // Get latest measurement for goal progress
   const latestMeasurement = measurementHistory[0];
   const currentWeight = latestMeasurement?.tool_result?.weight;
-  const currentBodyFat = latestMeasurement?.tool_result?.body_fat;
-  const currentMuscleMass = latestMeasurement?.tool_result?.muscle_mass;
+  const currentBodyFat = latestMeasurement?.tool_result?.bodyFat;
+  const currentMuscleMass = latestMeasurement?.tool_result?.muscleMass;
 
   // Calculate goal progress
   const calculateProgress = (current: number | undefined, target: number | null, isDecrease: boolean = false) => {
@@ -448,16 +448,16 @@ export default function CalculatorHistory() {
     ? timeFilteredMeasurementHistory
     : timeFilteredMeasurementHistory.filter(r => {
         const hasWeight = r.tool_result?.weight && selectedMeasurementTypes.includes("Weight");
-        const hasBodyFat = r.tool_result?.body_fat && selectedMeasurementTypes.includes("Body Fat");
-        const hasMuscleMass = r.tool_result?.muscle_mass && selectedMeasurementTypes.includes("Muscle Mass");
+        const hasBodyFat = r.tool_result?.bodyFat && selectedMeasurementTypes.includes("Body Fat");
+        const hasMuscleMass = r.tool_result?.muscleMass && selectedMeasurementTypes.includes("Muscle Mass");
         return hasWeight || hasBodyFat || hasMuscleMass;
       });
 
   const measurementChartData = [...filteredMeasurementHistory].reverse().map((r) => ({
     date: formatShortDate(r.created_at),
     weight: r.tool_result?.weight || 0,
-    bodyFat: r.tool_result?.body_fat || 0,
-    muscleMass: r.tool_result?.muscle_mass || 0,
+    bodyFat: r.tool_result?.bodyFat || 0,
+    muscleMass: r.tool_result?.muscleMass || 0,
   }));
 
   // Handle record click
@@ -470,8 +470,8 @@ export default function CalculatorHistory() {
           id: m.id,
           date: m.created_at,
           weight: m.tool_result?.weight || null,
-          bodyFat: m.tool_result?.body_fat || null,
-          muscleMass: m.tool_result?.muscle_mass || null,
+          bodyFat: m.tool_result?.bodyFat || null,
+          muscleMass: m.tool_result?.muscleMass || null,
         }
       });
     } else {
@@ -558,7 +558,7 @@ export default function CalculatorHistory() {
                       <>
                         <Popover>
                           <PopoverTrigger asChild>
-                            <Button variant="outline" size="sm" className={cn("w-[130px] justify-start text-left font-normal", !customStartDate && "text-muted-foreground")}>
+                            <Button variant="ghost" size="sm" className={cn("w-[130px] justify-start text-left font-normal border border-input bg-background hover:bg-accent", !customStartDate && "text-muted-foreground")}>
                               <CalendarIcon className="mr-2 h-4 w-4" />
                               {customStartDate ? format(customStartDate, "MMM d, yyyy") : "Start date"}
                             </Button>
@@ -576,7 +576,7 @@ export default function CalculatorHistory() {
                         <span className="text-muted-foreground">to</span>
                         <Popover>
                           <PopoverTrigger asChild>
-                            <Button variant="outline" size="sm" className={cn("w-[130px] justify-start text-left font-normal", !customEndDate && "text-muted-foreground")}>
+                            <Button variant="ghost" size="sm" className={cn("w-[130px] justify-start text-left font-normal border border-input bg-background hover:bg-accent", !customEndDate && "text-muted-foreground")}>
                               <CalendarIcon className="mr-2 h-4 w-4" />
                               {customEndDate ? format(customEndDate, "MMM d, yyyy") : "End date"}
                             </Button>
@@ -597,7 +597,7 @@ export default function CalculatorHistory() {
                     {/* Exercise Filter */}
                     <Popover>
                       <PopoverTrigger asChild>
-                        <Button variant="outline" className="w-full sm:w-[200px] justify-between">
+                    <Button variant="ghost" className="w-full sm:w-[200px] justify-between border border-input bg-background hover:bg-accent">
                           {selectedExercises.length === 0
                             ? "All Exercises" 
                             : `${selectedExercises.length} exercise${selectedExercises.length > 1 ? 's' : ''} selected`}
@@ -751,7 +751,7 @@ export default function CalculatorHistory() {
                     <div className="flex flex-wrap items-center gap-2">
                       <Popover>
                         <PopoverTrigger asChild>
-                          <Button variant="outline" size="sm" className={cn("w-[130px] justify-start text-left font-normal", !bmrCustomStartDate && "text-muted-foreground")}>
+                          <Button variant="ghost" size="sm" className={cn("w-[130px] justify-start text-left font-normal border border-input bg-background hover:bg-accent", !bmrCustomStartDate && "text-muted-foreground")}>
                             <CalendarIcon className="mr-2 h-4 w-4" />
                             {bmrCustomStartDate ? format(bmrCustomStartDate, "MMM d, yyyy") : "Start date"}
                           </Button>
@@ -769,7 +769,7 @@ export default function CalculatorHistory() {
                       <span className="text-muted-foreground">to</span>
                       <Popover>
                         <PopoverTrigger asChild>
-                          <Button variant="outline" size="sm" className={cn("w-[130px] justify-start text-left font-normal", !bmrCustomEndDate && "text-muted-foreground")}>
+                          <Button variant="ghost" size="sm" className={cn("w-[130px] justify-start text-left font-normal border border-input bg-background hover:bg-accent", !bmrCustomEndDate && "text-muted-foreground")}>
                             <CalendarIcon className="mr-2 h-4 w-4" />
                             {bmrCustomEndDate ? format(bmrCustomEndDate, "MMM d, yyyy") : "End date"}
                           </Button>
@@ -1041,7 +1041,7 @@ export default function CalculatorHistory() {
                   {/* Measurement Type Filter */}
                   <Popover>
                     <PopoverTrigger asChild>
-                      <Button variant="outline" className="w-full sm:w-[200px] justify-between">
+                      <Button variant="ghost" className="w-full sm:w-[200px] justify-between border border-input bg-background hover:bg-accent">
                         {selectedMeasurementTypes.length === 0
                           ? "All Measurements" 
                           : `${selectedMeasurementTypes.length} type${selectedMeasurementTypes.length > 1 ? 's' : ''} selected`}
@@ -1091,7 +1091,7 @@ export default function CalculatorHistory() {
                     <div className="flex flex-wrap items-center gap-2">
                       <Popover>
                         <PopoverTrigger asChild>
-                          <Button variant="outline" size="sm" className={cn("w-[130px] justify-start text-left font-normal", !measurementCustomStartDate && "text-muted-foreground")}>
+                          <Button variant="ghost" size="sm" className={cn("w-[130px] justify-start text-left font-normal border border-input bg-background hover:bg-accent", !measurementCustomStartDate && "text-muted-foreground")}>
                             <CalendarIcon className="mr-2 h-4 w-4" />
                             {measurementCustomStartDate ? format(measurementCustomStartDate, "MMM d, yyyy") : "Start date"}
                           </Button>
@@ -1109,7 +1109,7 @@ export default function CalculatorHistory() {
                       <span className="text-muted-foreground">to</span>
                       <Popover>
                         <PopoverTrigger asChild>
-                          <Button variant="outline" size="sm" className={cn("w-[130px] justify-start text-left font-normal", !measurementCustomEndDate && "text-muted-foreground")}>
+                          <Button variant="ghost" size="sm" className={cn("w-[130px] justify-start text-left font-normal border border-input bg-background hover:bg-accent", !measurementCustomEndDate && "text-muted-foreground")}>
                             <CalendarIcon className="mr-2 h-4 w-4" />
                             {measurementCustomEndDate ? format(measurementCustomEndDate, "MMM d, yyyy") : "End date"}
                           </Button>
@@ -1181,10 +1181,10 @@ export default function CalculatorHistory() {
                   <div>
                     <div className="font-semibold">
                       {record.tool_result?.weight && `${record.tool_result.weight} kg`}
-                      {record.tool_result?.weight && (record.tool_result?.body_fat || record.tool_result?.muscle_mass) && " | "}
-                      {record.tool_result?.body_fat && `BF: ${record.tool_result.body_fat}%`}
-                      {record.tool_result?.body_fat && record.tool_result?.muscle_mass && " | "}
-                      {record.tool_result?.muscle_mass && `MM: ${record.tool_result.muscle_mass} kg`}
+                      {record.tool_result?.weight && (record.tool_result?.bodyFat || record.tool_result?.muscleMass) && " | "}
+                      {record.tool_result?.bodyFat && `BF: ${record.tool_result.bodyFat}%`}
+                      {record.tool_result?.bodyFat && record.tool_result?.muscleMass && " | "}
+                      {record.tool_result?.muscleMass && `MM: ${record.tool_result.muscleMass} kg`}
                     </div>
                     <div className="text-xs text-muted-foreground mt-1">{formatDate(record.created_at)}</div>
                   </div>
