@@ -13,6 +13,7 @@ const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY');
 
 async function refreshAccessToken(refreshToken: string): Promise<{ access_token: string; expires_in: number } | null> {
   try {
+    console.log('Attempting to refresh access token...');
     const response = await fetch('https://oauth2.googleapis.com/token', {
       method: 'POST',
       headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
@@ -26,10 +27,11 @@ async function refreshAccessToken(refreshToken: string): Promise<{ access_token:
 
     const data = await response.json();
     if (data.error) {
-      console.error('Token refresh error:', data);
+      console.error('Token refresh error:', data.error, data.error_description);
       return null;
     }
 
+    console.log('Token refreshed successfully');
     return { access_token: data.access_token, expires_in: data.expires_in };
   } catch (error) {
     console.error('Failed to refresh token:', error);
@@ -37,7 +39,9 @@ async function refreshAccessToken(refreshToken: string): Promise<{ access_token:
   }
 }
 
-async function getValidAccessToken(supabase: any, userId: string): Promise<string | null> {
+async function getValidAccessToken(supabase: any, userId: string): Promise<{ token: string | null; error?: string }> {
+  console.log('Getting valid access token for user:', userId);
+  
   const { data: connection, error } = await supabase
     .from('user_calendar_connections')
     .select('*')
@@ -47,12 +51,14 @@ async function getValidAccessToken(supabase: any, userId: string): Promise<strin
     .single();
 
   if (error || !connection) {
-    console.error('No calendar connection found');
-    return null;
+    console.error('No calendar connection found:', error);
+    return { token: null, error: 'No calendar connection found. Please reconnect your Google Calendar.' };
   }
 
   const tokenExpiry = new Date(connection.token_expires_at);
   const now = new Date();
+
+  console.log('Token expiry:', tokenExpiry.toISOString(), 'Now:', now.toISOString());
 
   // If token is expired or about to expire (within 5 minutes), refresh it
   if (tokenExpiry.getTime() - now.getTime() < 5 * 60 * 1000) {
@@ -60,12 +66,13 @@ async function getValidAccessToken(supabase: any, userId: string): Promise<strin
     const newToken = await refreshAccessToken(connection.refresh_token);
 
     if (!newToken) {
+      console.log('Token refresh failed, marking connection as inactive');
       // Mark connection as inactive if refresh fails
       await supabase
         .from('user_calendar_connections')
         .update({ is_active: false })
         .eq('id', connection.id);
-      return null;
+      return { token: null, error: 'Calendar connection expired. Please reconnect your Google Calendar.' };
     }
 
     // Update token in database
@@ -79,14 +86,15 @@ async function getValidAccessToken(supabase: any, userId: string): Promise<strin
       })
       .eq('id', connection.id);
 
-    return newToken.access_token;
+    return { token: newToken.access_token };
   }
 
-  return connection.access_token;
+  return { token: connection.access_token };
 }
 
-async function createCalendarEvent(accessToken: string, eventData: any): Promise<string | null> {
+async function createCalendarEvent(accessToken: string, eventData: any): Promise<{ id: string | null; error?: string }> {
   try {
+    console.log('Creating calendar event:', eventData.summary);
     const response = await fetch('https://www.googleapis.com/calendar/v3/calendars/primary/events', {
       method: 'POST',
       headers: {
@@ -97,16 +105,17 @@ async function createCalendarEvent(accessToken: string, eventData: any): Promise
     });
 
     const data = await response.json();
-    if (data.error) {
-      console.error('Google Calendar API error:', data.error);
-      return null;
+    
+    if (!response.ok) {
+      console.error('Google Calendar API error:', response.status, data.error);
+      return { id: null, error: data.error?.message || 'Failed to create event' };
     }
 
-    console.log('Event created:', data.id);
-    return data.id;
+    console.log('Event created successfully:', data.id);
+    return { id: data.id };
   } catch (error) {
     console.error('Failed to create calendar event:', error);
-    return null;
+    return { id: null, error: 'Network error creating event' };
   }
 }
 
@@ -122,7 +131,7 @@ async function updateCalendarEvent(accessToken: string, eventId: string, eventDa
     });
 
     const data = await response.json();
-    if (data.error) {
+    if (!response.ok) {
       console.error('Google Calendar update error:', data.error);
       return false;
     }
@@ -165,6 +174,7 @@ serve(async (req) => {
   try {
     const authHeader = req.headers.get('Authorization');
     if (!authHeader) {
+      console.error('No authorization header');
       return new Response(JSON.stringify({ error: 'No authorization header' }), {
         status: 401,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' }
@@ -176,6 +186,7 @@ serve(async (req) => {
     const { data: { user }, error: userError } = await supabase.auth.getUser(token);
 
     if (userError || !user) {
+      console.error('Invalid user token:', userError);
       return new Response(JSON.stringify({ error: 'Invalid user token' }), {
         status: 401,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' }
@@ -185,12 +196,18 @@ serve(async (req) => {
     const body = await req.json();
     const { action, scheduled_workout_id, event_data, activities } = body;
 
-    console.log('Sync Google Calendar - Action:', action, 'User:', user.id);
+    console.log('=== Sync Google Calendar ===');
+    console.log('Action:', action);
+    console.log('User:', user.id);
 
     // Get valid access token
-    const accessToken = await getValidAccessToken(supabase, user.id);
+    const { token: accessToken, error: tokenError } = await getValidAccessToken(supabase, user.id);
     if (!accessToken) {
-      return new Response(JSON.stringify({ error: 'No valid calendar connection', reconnect_required: true }), {
+      console.error('Failed to get valid access token:', tokenError);
+      return new Response(JSON.stringify({ 
+        error: tokenError || 'No valid calendar connection', 
+        reconnect_required: true 
+      }), {
         status: 400,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' }
       });
@@ -199,6 +216,8 @@ serve(async (req) => {
     // Action: Create event for scheduled workout
     if (action === 'create') {
       const { scheduled_date, scheduled_time, content_name, content_type, notes } = event_data;
+
+      console.log('Creating event for:', content_name, 'on', scheduled_date);
 
       // Build event start/end times
       const startDateTime = scheduled_time
@@ -209,8 +228,10 @@ serve(async (req) => {
       const endDate = new Date(startDate.getTime() + 60 * 60 * 1000); // 1 hour duration
 
       const calendarEvent = {
-        summary: `🏋️ ${content_name}`,
-        description: `SmartyGym ${content_type === 'workout' ? 'Workout' : 'Program'}${notes ? `\n\nNotes: ${notes}` : ''}`,
+        summary: content_name.startsWith('✅') || content_name.startsWith('🏆') || content_name.startsWith('📊')
+          ? content_name
+          : `🏋️ ${content_name}`,
+        description: notes || `SmartyGym ${content_type === 'workout' ? 'Workout' : content_type === 'program' ? 'Program' : 'Activity'}`,
         start: {
           dateTime: startDate.toISOString(),
           timeZone: 'Europe/Nicosia'
@@ -227,10 +248,11 @@ serve(async (req) => {
         }
       };
 
-      const eventId = await createCalendarEvent(accessToken, calendarEvent);
+      const { id: eventId, error: createError } = await createCalendarEvent(accessToken, calendarEvent);
 
       if (!eventId) {
-        return new Response(JSON.stringify({ error: 'Failed to create calendar event' }), {
+        console.error('Failed to create event:', createError);
+        return new Response(JSON.stringify({ error: createError || 'Failed to create calendar event' }), {
           status: 500,
           headers: { ...corsHeaders, 'Content-Type': 'application/json' }
         });
@@ -244,6 +266,7 @@ serve(async (req) => {
           .eq('id', scheduled_workout_id);
       }
 
+      console.log('Event created successfully:', eventId);
       return new Response(JSON.stringify({ success: true, event_id: eventId }), {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' }
       });
@@ -308,9 +331,12 @@ serve(async (req) => {
       const { activity_types, start_date, end_date } = activities;
       const results = { exported: 0, failed: 0, events: [] as string[] };
 
+      console.log('Bulk export - Types:', activity_types, 'Date range:', start_date, 'to', end_date);
+
       // Export completed workouts
       if (activity_types.includes('workouts')) {
-        const { data: workouts } = await supabase
+        console.log('Fetching completed workouts...');
+        const { data: workouts, error: workoutsError } = await supabase
           .from('workout_interactions')
           .select('*')
           .eq('user_id', user.id)
@@ -318,37 +344,44 @@ serve(async (req) => {
           .gte('updated_at', start_date)
           .lte('updated_at', end_date);
 
-        for (const workout of workouts || []) {
-          const completedDate = new Date(workout.updated_at);
-          const event = {
-            summary: `✅ ${workout.workout_name}`,
-            description: `Completed SmartyGym Workout`,
-            start: {
-              dateTime: completedDate.toISOString(),
-              timeZone: 'Europe/Nicosia'
-            },
-            end: {
-              dateTime: new Date(completedDate.getTime() + 60 * 60 * 1000).toISOString(),
-              timeZone: 'Europe/Nicosia'
+        if (workoutsError) {
+          console.error('Error fetching workouts:', workoutsError);
+        } else {
+          console.log(`Found ${workouts?.length || 0} completed workouts`);
+          
+          for (const workout of workouts || []) {
+            const completedDate = new Date(workout.updated_at);
+            const event = {
+              summary: `✅ ${workout.workout_name}`,
+              description: `Completed SmartyGym Workout`,
+              start: {
+                dateTime: completedDate.toISOString(),
+                timeZone: 'Europe/Nicosia'
+              },
+              end: {
+                dateTime: new Date(completedDate.getTime() + 60 * 60 * 1000).toISOString(),
+                timeZone: 'Europe/Nicosia'
+              }
+            };
+
+            const { id: eventId } = await createCalendarEvent(accessToken, event);
+            if (eventId) {
+              results.exported++;
+              results.events.push(eventId);
+            } else {
+              results.failed++;
             }
-          };
 
-          const eventId = await createCalendarEvent(accessToken, event);
-          if (eventId) {
-            results.exported++;
-            results.events.push(eventId);
-          } else {
-            results.failed++;
+            // Rate limiting for Google API
+            await new Promise(resolve => setTimeout(resolve, 250));
           }
-
-          // Rate limiting
-          await new Promise(resolve => setTimeout(resolve, 200));
         }
       }
 
       // Export completed programs
       if (activity_types.includes('programs')) {
-        const { data: programs } = await supabase
+        console.log('Fetching completed programs...');
+        const { data: programs, error: programsError } = await supabase
           .from('program_interactions')
           .select('*')
           .eq('user_id', user.id)
@@ -356,71 +389,85 @@ serve(async (req) => {
           .gte('updated_at', start_date)
           .lte('updated_at', end_date);
 
-        for (const program of programs || []) {
-          const completedDate = new Date(program.updated_at);
-          const event = {
-            summary: `🏆 ${program.program_name} - Completed!`,
-            description: `Completed SmartyGym Training Program`,
-            start: {
-              dateTime: completedDate.toISOString(),
-              timeZone: 'Europe/Nicosia'
-            },
-            end: {
-              dateTime: new Date(completedDate.getTime() + 60 * 60 * 1000).toISOString(),
-              timeZone: 'Europe/Nicosia'
+        if (programsError) {
+          console.error('Error fetching programs:', programsError);
+        } else {
+          console.log(`Found ${programs?.length || 0} completed programs`);
+          
+          for (const program of programs || []) {
+            const completedDate = new Date(program.updated_at);
+            const event = {
+              summary: `🏆 ${program.program_name} - Completed!`,
+              description: `Completed SmartyGym Training Program`,
+              start: {
+                dateTime: completedDate.toISOString(),
+                timeZone: 'Europe/Nicosia'
+              },
+              end: {
+                dateTime: new Date(completedDate.getTime() + 60 * 60 * 1000).toISOString(),
+                timeZone: 'Europe/Nicosia'
+              }
+            };
+
+            const { id: eventId } = await createCalendarEvent(accessToken, event);
+            if (eventId) {
+              results.exported++;
+              results.events.push(eventId);
+            } else {
+              results.failed++;
             }
-          };
 
-          const eventId = await createCalendarEvent(accessToken, event);
-          if (eventId) {
-            results.exported++;
-            results.events.push(eventId);
-          } else {
-            results.failed++;
+            await new Promise(resolve => setTimeout(resolve, 250));
           }
-
-          await new Promise(resolve => setTimeout(resolve, 200));
         }
       }
 
       // Export check-ins
       if (activity_types.includes('checkins')) {
-        const { data: checkins } = await supabase
+        console.log('Fetching check-ins...');
+        const { data: checkins, error: checkinsError } = await supabase
           .from('smarty_checkins')
           .select('*')
           .eq('user_id', user.id)
           .gte('checkin_date', start_date)
           .lte('checkin_date', end_date);
 
-        for (const checkin of checkins || []) {
-          const checkinDate = new Date(checkin.checkin_date);
-          checkinDate.setHours(8, 0, 0, 0);
+        if (checkinsError) {
+          console.error('Error fetching check-ins:', checkinsError);
+        } else {
+          console.log(`Found ${checkins?.length || 0} check-ins`);
+          
+          for (const checkin of checkins || []) {
+            const checkinDate = new Date(checkin.checkin_date);
+            checkinDate.setHours(8, 0, 0, 0);
 
-          const event = {
-            summary: `📊 Daily Check-in (Score: ${checkin.daily_smarty_score || 'N/A'})`,
-            description: `SmartyGym Daily Check-in\nCategory: ${checkin.score_category || 'N/A'}`,
-            start: {
-              dateTime: checkinDate.toISOString(),
-              timeZone: 'Europe/Nicosia'
-            },
-            end: {
-              dateTime: new Date(checkinDate.getTime() + 30 * 60 * 1000).toISOString(),
-              timeZone: 'Europe/Nicosia'
+            const event = {
+              summary: `📊 Daily Check-in (Score: ${checkin.daily_smarty_score || 'N/A'})`,
+              description: `SmartyGym Daily Check-in\nCategory: ${checkin.score_category || 'N/A'}`,
+              start: {
+                dateTime: checkinDate.toISOString(),
+                timeZone: 'Europe/Nicosia'
+              },
+              end: {
+                dateTime: new Date(checkinDate.getTime() + 30 * 60 * 1000).toISOString(),
+                timeZone: 'Europe/Nicosia'
+              }
+            };
+
+            const { id: eventId } = await createCalendarEvent(accessToken, event);
+            if (eventId) {
+              results.exported++;
+              results.events.push(eventId);
+            } else {
+              results.failed++;
             }
-          };
 
-          const eventId = await createCalendarEvent(accessToken, event);
-          if (eventId) {
-            results.exported++;
-            results.events.push(eventId);
-          } else {
-            results.failed++;
+            await new Promise(resolve => setTimeout(resolve, 250));
           }
-
-          await new Promise(resolve => setTimeout(resolve, 200));
         }
       }
 
+      console.log('Bulk export complete:', results);
       return new Response(JSON.stringify({
         success: true,
         exported: results.exported,

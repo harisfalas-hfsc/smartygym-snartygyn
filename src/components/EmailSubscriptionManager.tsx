@@ -4,8 +4,9 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
-import { Loader2, Dumbbell, Sun, Zap, Plus, BookOpen, FileText, BarChart3, Bell, Calendar } from "lucide-react";
+import { Loader2, Dumbbell, Sun, Zap, Plus, BookOpen, FileText, BarChart3, Bell, Calendar, RefreshCw } from "lucide-react";
 import { toast } from "sonner";
+import { Progress } from "@/components/ui/progress";
 
 interface EmailPreferences {
   email_wod: boolean;
@@ -100,6 +101,9 @@ export const EmailSubscriptionManager = () => {
   const [autoSyncEnabled, setAutoSyncEnabled] = useState(false);
   const [isCalendarLoading, setIsCalendarLoading] = useState(true);
   const [isCalendarSaving, setIsCalendarSaving] = useState(false);
+  const [isExporting, setIsExporting] = useState(false);
+  const [exportProgress, setExportProgress] = useState(0);
+  const [exportMessage, setExportMessage] = useState("");
 
   useEffect(() => {
     fetchPreferences();
@@ -241,6 +245,82 @@ export const EmailSubscriptionManager = () => {
     }
   };
 
+  const bulkExportActivities = async () => {
+    setIsExporting(true);
+    setExportProgress(0);
+    setExportMessage("Starting export...");
+    
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) {
+        toast.error("Please log in to export activities");
+        return;
+      }
+
+      setExportProgress(20);
+      setExportMessage("Fetching your activities...");
+
+      // Get date range (last 6 months to today)
+      const endDate = new Date().toISOString().split('T')[0];
+      const startDate = new Date();
+      startDate.setMonth(startDate.getMonth() - 6);
+      const startDateStr = startDate.toISOString().split('T')[0];
+
+      setExportProgress(40);
+      setExportMessage("Syncing to Google Calendar...");
+
+      const response = await supabase.functions.invoke('sync-google-calendar', {
+        body: {
+          action: 'bulk-export',
+          activities: {
+            activity_types: ['workouts', 'programs', 'checkins'],
+            start_date: startDateStr,
+            end_date: endDate
+          }
+        }
+      });
+
+      setExportProgress(100);
+
+      if (response.error) {
+        console.error('Bulk export error:', response.error);
+        
+        if (response.data?.reconnect_required) {
+          toast.error('Please reconnect your Google Calendar', {
+            description: 'Your calendar connection has expired'
+          });
+          setIsCalendarConnected(false);
+          return;
+        }
+        
+        toast.error('Failed to export activities', {
+          description: response.error.message
+        });
+        return;
+      }
+
+      const exported = response.data?.exported || 0;
+      const failed = response.data?.failed || 0;
+
+      if (exported > 0) {
+        toast.success(`Exported ${exported} activities to Google Calendar`, {
+          description: failed > 0 ? `${failed} failed to export` : 'All activities synced successfully!'
+        });
+      } else {
+        toast.info('No activities to export', {
+          description: 'Complete some workouts or check-ins first'
+        });
+      }
+    } catch (err) {
+      console.error("Error exporting activities:", err);
+      toast.error("Failed to export activities");
+    } finally {
+      setIsExporting(false);
+      setExportProgress(0);
+      setExportMessage("");
+    }
+  };
+
   const handleAutoSyncToggle = async (enabled: boolean) => {
     setIsCalendarSaving(true);
     try {
@@ -260,7 +340,20 @@ export const EmailSubscriptionManager = () => {
       }
 
       setAutoSyncEnabled(enabled);
-      toast.success(enabled ? "Auto-sync enabled" : "Auto-sync disabled");
+      
+      if (enabled) {
+        toast.success("Auto-sync enabled", {
+          description: "New activities will automatically sync to your calendar"
+        });
+        
+        // Auto-export past activities when enabling
+        toast.info("Exporting your past activities...", {
+          description: "This may take a moment"
+        });
+        await bulkExportActivities();
+      } else {
+        toast.success("Auto-sync disabled");
+      }
     } catch (err) {
       console.error("Error updating auto-sync:", err);
       toast.error("Failed to update auto-sync setting");
@@ -388,7 +481,10 @@ export const EmailSubscriptionManager = () => {
                 Google Calendar Integration
               </Label>
               <p className="text-xs text-muted-foreground">
-                Sync scheduled workouts with your Google Calendar
+                {isCalendarConnected 
+                  ? "Sync your workouts and activities with Google Calendar"
+                  : "Connect to sync scheduled workouts with your Google Calendar"
+                }
               </p>
               <p className="text-xs text-primary font-medium">
                 {isCalendarLoading ? "Checking..." : isCalendarConnected ? "✓ Connected" : "Not connected"}
@@ -401,16 +497,32 @@ export const EmailSubscriptionManager = () => {
             )}
             {!isCalendarLoading && (
               isCalendarConnected ? (
-                <div className="flex items-center gap-2">
-                  <Switch
-                    id="auto-sync-toggle"
-                    checked={autoSyncEnabled}
-                    onCheckedChange={handleAutoSyncToggle}
-                    disabled={isCalendarSaving}
-                  />
-                  <Label htmlFor="auto-sync-toggle" className="text-xs text-muted-foreground cursor-pointer">
-                    Auto-sync
-                  </Label>
+                <div className="flex items-center gap-3">
+                  <div className="flex items-center gap-2">
+                    <Switch
+                      id="auto-sync-toggle"
+                      checked={autoSyncEnabled}
+                      onCheckedChange={handleAutoSyncToggle}
+                      disabled={isCalendarSaving || isExporting}
+                    />
+                    <Label htmlFor="auto-sync-toggle" className="text-xs text-muted-foreground cursor-pointer">
+                      Auto-sync
+                    </Label>
+                  </div>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={bulkExportActivities}
+                    disabled={isCalendarSaving || isExporting}
+                    className="text-xs"
+                  >
+                    {isExporting ? (
+                      <Loader2 className="h-3 w-3 animate-spin mr-1" />
+                    ) : (
+                      <RefreshCw className="h-3 w-3 mr-1" />
+                    )}
+                    Sync Now
+                  </Button>
                 </div>
               ) : (
                 <Button
@@ -425,6 +537,17 @@ export const EmailSubscriptionManager = () => {
             )}
           </div>
         </div>
+
+        {/* Export Progress */}
+        {isExporting && (
+          <div className="py-4 space-y-2">
+            <div className="flex items-center justify-between text-xs text-muted-foreground">
+              <span>{exportMessage}</span>
+              <span>{exportProgress}%</span>
+            </div>
+            <Progress value={exportProgress} className="h-2" />
+          </div>
+        )}
 
         {preferences.opt_out_all && (
           <div className="mt-4 p-4 bg-destructive/10 rounded-lg">
