@@ -152,3 +152,9 @@ verify_jwt = false
 
 [functions.send-morning-notifications]
 verify_jwt = false
+
+[functions.google-calendar-oauth]
+verify_jwt = false
+
+[functions.sync-google-calendar]
+verify_jwt = true
