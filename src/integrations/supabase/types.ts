@@ -1952,6 +1952,7 @@ export type Database = {
           access_token: string
           auto_sync_enabled: boolean | null
           calendar_id: string | null
+          checkin_reminder_event_ids: Json | null
           created_at: string | null
           id: string
           is_active: boolean | null
@@ -1965,6 +1966,7 @@ export type Database = {
           access_token: string
           auto_sync_enabled?: boolean | null
           calendar_id?: string | null
+          checkin_reminder_event_ids?: Json | null
           created_at?: string | null
           id?: string
           is_active?: boolean | null
@@ -1978,6 +1980,7 @@ export type Database = {
           access_token?: string
           auto_sync_enabled?: boolean | null
           calendar_id?: string | null
+          checkin_reminder_event_ids?: Json | null
           created_at?: string | null
           id?: string
           is_active?: boolean | null

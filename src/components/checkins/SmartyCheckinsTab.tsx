@@ -24,6 +24,7 @@ import { CheckInBadges } from './CheckInBadges';
 import { CheckInExport } from './CheckInExport';
 import { CheckInFeedback } from './CheckInFeedback';
 import { CheckinReminderSubscription } from './CheckinReminderSubscription';
+import { CheckinCalendarSync } from './CheckinCalendarSync';
 
 export function SmartyCheckinsTab() {
   const [activeTab, setActiveTab] = useState('today');
@@ -248,6 +249,9 @@ export function SmartyCheckinsTab() {
 
               {/* Reminder Subscription */}
               <CheckinReminderSubscription />
+              
+              {/* Google Calendar Sync for Check-ins */}
+              <CheckinCalendarSync />
             </div>
           </div>
 
