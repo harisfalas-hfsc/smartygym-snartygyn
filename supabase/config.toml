@@ -140,3 +140,12 @@ verify_jwt = false
 
 [functions.fetch-exercisedb-exercises]
 verify_jwt = false
+
+[functions.archive-old-wods]
+verify_jwt = false
+
+[functions.send-wod-notifications]
+verify_jwt = false
+
+[functions.send-ritual-notifications]
+verify_jwt = false
