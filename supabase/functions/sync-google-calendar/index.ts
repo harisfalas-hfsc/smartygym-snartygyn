@@ -708,6 +708,55 @@ serve(async (req) => {
       });
     }
 
+    // Action: Sync logbook data (calculators & measurements) as calendar events
+    if (action === 'sync-logbook-data') {
+      console.log('Syncing logbook data to calendar...');
+      
+      let synced = 0;
+      let failed = 0;
+
+      for (const activity of activities || []) {
+        try {
+          const activityDate = new Date(activity.date);
+          
+          const calendarEvent = {
+            summary: activity.summary,
+            description: activity.description || 'SmartyGym Record',
+            start: {
+              dateTime: `${activity.date}T12:00:00`,
+              timeZone: 'Europe/Nicosia'
+            },
+            end: {
+              dateTime: `${activity.date}T12:30:00`,
+              timeZone: 'Europe/Nicosia'
+            }
+          };
+
+          const { id: eventId, error: createError } = await createCalendarEvent(accessToken, calendarEvent);
+          
+          if (eventId) {
+            synced++;
+            console.log(`Created calendar event for ${activity.type}:`, eventId);
+          } else {
+            failed++;
+            console.error(`Failed to create event for ${activity.type}:`, createError);
+          }
+        } catch (err) {
+          failed++;
+          console.error(`Error creating event for ${activity.type}:`, err);
+        }
+      }
+
+      console.log(`Logbook sync complete: ${synced} synced, ${failed} failed`);
+      return new Response(JSON.stringify({
+        success: true,
+        synced,
+        failed
+      }), {
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+      });
+    }
+
     return new Response(JSON.stringify({ error: 'Invalid action' }), {
       status: 400,
       headers: { ...corsHeaders, 'Content-Type': 'application/json' }
