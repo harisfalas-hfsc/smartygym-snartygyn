@@ -401,27 +401,16 @@ export const EmailSubscriptionManager = () => {
             )}
             {!isCalendarLoading && (
               isCalendarConnected ? (
-                <div className="flex items-center gap-3">
-                  <div className="flex items-center gap-2">
-                    <Switch
-                      id="auto-sync-toggle"
-                      checked={autoSyncEnabled}
-                      onCheckedChange={handleAutoSyncToggle}
-                      disabled={isCalendarSaving}
-                    />
-                    <Label htmlFor="auto-sync-toggle" className="text-xs text-muted-foreground cursor-pointer">
-                      Auto-sync
-                    </Label>
-                  </div>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={handleCalendarDisconnect}
+                <div className="flex items-center gap-2">
+                  <Switch
+                    id="auto-sync-toggle"
+                    checked={autoSyncEnabled}
+                    onCheckedChange={handleAutoSyncToggle}
                     disabled={isCalendarSaving}
-                    className="text-xs text-muted-foreground hover:text-destructive"
-                  >
-                    Disconnect
-                  </Button>
+                  />
+                  <Label htmlFor="auto-sync-toggle" className="text-xs text-muted-foreground cursor-pointer">
+                    Auto-sync
+                  </Label>
                 </div>
               ) : (
                 <Button
