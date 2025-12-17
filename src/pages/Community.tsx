@@ -524,6 +524,21 @@ programEntries.sort((a, b) => b.total_completions - a.total_completions);
             ]} 
           />
 
+          {/* About Community */}
+          <Card className="mb-8 bg-gradient-to-br from-primary/5 via-background to-primary/5 border-2 border-primary/40 shadow-primary">
+            <CardContent className="p-4 sm:p-5">
+              <h2 className="text-xl sm:text-2xl font-bold mb-3 text-center">About Community</h2>
+              <div className="space-y-2 text-muted-foreground max-w-3xl mx-auto">
+                <p className="text-sm sm:text-base">
+                  Welcome to the SmartyGym Community! Track your progress on leaderboards for workout completions, 
+                  training programs, and daily check-ins. Discover top-rated content through member ratings, 
+                  read community comments and testimonials, and get inspired by fellow members' achievements. 
+                  Connect, compete, and celebrate your fitness journey together.
+                </p>
+              </div>
+            </CardContent>
+          </Card>
+
           {/* Unified Leaderboard Section */}
           <Card 
             itemScope
