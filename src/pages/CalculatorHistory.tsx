@@ -513,11 +513,11 @@ export default function CalculatorHistory() {
       </div>
 
       <Tabs value={activeTab} onValueChange={setActiveTab}>
-        <TabsList className="grid w-full grid-cols-4 mb-6">
-          <TabsTrigger value="1rm">1RM Calculator</TabsTrigger>
-          <TabsTrigger value="bmr">BMR Calculator</TabsTrigger>
-          <TabsTrigger value="macro">Macro Calculator</TabsTrigger>
-          <TabsTrigger value="measurements">Measurements</TabsTrigger>
+        <TabsList className="grid w-full grid-cols-2 sm:grid-cols-4 mb-6 h-auto">
+          <TabsTrigger value="1rm" className="text-xs sm:text-sm py-2">1RM Calculator</TabsTrigger>
+          <TabsTrigger value="bmr" className="text-xs sm:text-sm py-2">BMR Calculator</TabsTrigger>
+          <TabsTrigger value="macro" className="text-xs sm:text-sm py-2">Macro Calculator</TabsTrigger>
+          <TabsTrigger value="measurements" className="text-xs sm:text-sm py-2">Measurements</TabsTrigger>
         </TabsList>
 
         {/* 1RM Tab */}
@@ -606,14 +606,14 @@ export default function CalculatorHistory() {
                       </PopoverTrigger>
                       <PopoverContent className="w-[280px] p-3 max-h-[300px] overflow-y-auto">
                         <div className="space-y-2">
-                          <Button 
-                            variant="ghost" 
-                            size="sm" 
-                            className="w-full justify-start text-primary"
-                            onClick={() => setSelectedExercises([])}
-                          >
-                            Show All Exercises
-                          </Button>
+                        <Button 
+                          variant="ghost" 
+                          size="sm" 
+                          className="w-full justify-start"
+                          onClick={() => setSelectedExercises([])}
+                        >
+                          Show All Exercises
+                        </Button>
                           <Separator />
                           <div className="space-y-2 pt-1">
                             {EXERCISES.map((exercise) => (
@@ -645,7 +645,7 @@ export default function CalculatorHistory() {
                 </div>
               </CardHeader>
               <CardContent>
-                <ResponsiveContainer width="100%" height={350}>
+                <ResponsiveContainer width="100%" height={300}>
                   <LineChart data={oneRMProgressData}>
                     <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
                     <XAxis dataKey="date" className="text-xs" />
@@ -791,7 +791,7 @@ export default function CalculatorHistory() {
             </CardHeader>
             <CardContent>
               {filteredBMRHistory.length > 0 ? (
-                <ResponsiveContainer width="100%" height={350}>
+                <ResponsiveContainer width="100%" height={300}>
                   <LineChart data={bmrChartData}>
                     <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
                     <XAxis dataKey="date" className="text-xs" />
@@ -803,7 +803,7 @@ export default function CalculatorHistory() {
                   </LineChart>
                 </ResponsiveContainer>
               ) : (
-                <div className="h-[350px] flex items-center justify-center text-muted-foreground">
+                <div className="h-[300px] flex items-center justify-center text-muted-foreground">
                   <div className="text-center">
                     <Calculator className="h-12 w-12 mx-auto mb-3 opacity-50" />
                     <p>No BMR data yet. Calculate your first BMR to see your progress!</p>
@@ -1053,7 +1053,7 @@ export default function CalculatorHistory() {
                         <Button 
                           variant="ghost" 
                           size="sm" 
-                          className="w-full justify-start text-primary"
+                          className="w-full justify-start"
                           onClick={() => setSelectedMeasurementTypes([])}
                         >
                           Show All Measurements
@@ -1131,7 +1131,7 @@ export default function CalculatorHistory() {
             </CardHeader>
             <CardContent>
               {filteredMeasurementHistory.length > 0 ? (
-                <ResponsiveContainer width="100%" height={350}>
+                <ResponsiveContainer width="100%" height={300}>
                   <LineChart data={measurementChartData}>
                     <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
                     <XAxis dataKey="date" className="text-xs" />
@@ -1160,7 +1160,7 @@ export default function CalculatorHistory() {
                   </LineChart>
                 </ResponsiveContainer>
               ) : (
-                <div className="h-[350px] flex items-center justify-center text-muted-foreground">
+                <div className="h-[300px] flex items-center justify-center text-muted-foreground">
                   <div className="text-center">
                     <Scale className="h-12 w-12 mx-auto mb-3 opacity-50" />
                     <p>No measurement data yet. Start tracking your body measurements!</p>
