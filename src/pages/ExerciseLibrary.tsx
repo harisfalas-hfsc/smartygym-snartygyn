@@ -94,7 +94,7 @@ const ExerciseLibrary = () => {
                 <p className="text-sm sm:text-base">
                   Your comprehensive resource for learning exercises through video demonstrations and detailed instructions. 
                   Browse the Exercise Database with hundreds of movements, watch curated videos in the <span className="text-primary font-semibold">SmartyGym</span> Video Gallery, 
-                  and explore The <span className="text-primary font-semibold">SmartyGym</span> YouTube channel for expert tutorials by Sports Scientist <a href="/coach-profile" className="text-primary hover:underline font-semibold">Haris Falas</a>. 
+                  and explore The <span className="text-primary font-semibold">SmartyGym</span> YouTube channel for expert tutorials by Sports Scientist <a href="/coach-profile" className="text-primary hover:underline font-semibold whitespace-nowrap">Haris Falas</a>. 
                   Master proper form and technique to train safely and effectively.
                 </p>
               </div>
