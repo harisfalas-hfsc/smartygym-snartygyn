@@ -14,6 +14,7 @@ import { Separator } from "@/components/ui/separator";
 import { PageBreadcrumbs } from "@/components/PageBreadcrumbs";
 import { useShowBackButton } from "@/hooks/useShowBackButton";
 import { MeasurementDialog } from "@/components/logbook/MeasurementDialog";
+import { GoalsSummaryCard } from "@/components/dashboard/GoalsSummaryCard";
 import { MeasurementGoalDialog } from "@/components/logbook/MeasurementGoalDialog";
 import { RecordDetailDialog } from "@/components/calculators/RecordDetailDialog";
 import { Calendar } from "@/components/ui/calendar";
@@ -998,6 +999,8 @@ export default function CalculatorHistory() {
 
         {/* Measurements Tab */}
         <TabsContent value="measurements" className="space-y-6">
+          {/* Goals Summary Card */}
+          {user && <GoalsSummaryCard userId={user.id} />}
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center flex-wrap gap-2">
             <h2 className="text-lg font-semibold flex items-center gap-2">
               <Scale className="h-5 w-5 text-primary" />
