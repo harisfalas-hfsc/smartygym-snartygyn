@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
-import { ArrowLeft, Sunrise, Sun, Moon, Share2, Lock, Crown, Clock, Loader2, BookOpen } from "lucide-react";
+import { ArrowLeft, Sunrise, Sun, Moon, Share2, Lock, Crown, Loader2, BookOpen } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAccessControl } from "@/hooks/useAccessControl";
 import { useShowBackButton } from "@/hooks/useShowBackButton";
@@ -34,14 +34,13 @@ const DailySmartyRitual = () => {
   
   const [ritual, setRitual] = useState<DailyRitual | null>(null);
   const [loading, setLoading] = useState(true);
-  const [countdown, setCountdown] = useState<string | null>(null);
   const [showShareDialog, setShowShareDialog] = useState(false);
   const [showReaderMode, setShowReaderMode] = useState(false);
 
   const isAuthenticated = userTier !== "guest";
   const isPremium = userTier === "premium";
 
-  // Fetch ritual
+  // Fetch ritual - rituals are generated at 00:05 Cyprus time and available immediately
   useEffect(() => {
     const fetchRitual = async () => {
       try {
@@ -49,25 +48,8 @@ const DailySmartyRitual = () => {
         const now = new Date();
         const cyprusTime = new Date(now.toLocaleString("en-US", { timeZone: "Europe/Nicosia" }));
         const today = cyprusTime.toISOString().split('T')[0];
-        const hour = cyprusTime.getHours();
-        const minute = cyprusTime.getMinutes();
 
-        // Check if we're in the "countdown" window (04:30 - 07:00)
-        const isCountdownWindow = (hour === 4 && minute >= 30) || (hour === 5) || (hour === 6);
-        
-        if (isCountdownWindow) {
-          // Calculate countdown to 07:00
-          const targetTime = new Date(cyprusTime);
-          targetTime.setHours(7, 0, 0, 0);
-          const diff = targetTime.getTime() - cyprusTime.getTime();
-          const hours = Math.floor(diff / (1000 * 60 * 60));
-          const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-          setCountdown(`${hours}h ${minutes}m`);
-          setLoading(false);
-          return;
-        }
-
-        // Fetch today's ritual
+        // Fetch today's ritual (generated at 00:05, available all day)
         const { data, error } = await supabase
           .from("daily_smarty_rituals")
           .select("*")
@@ -76,12 +58,8 @@ const DailySmartyRitual = () => {
 
         if (!data) {
           // For non-premium users, RLS blocks the data but ritual likely exists
-          // Only show "coming soon" for premium users who should have access
           // Non-premium users should see the locked premium card instead
-          if (isPremium) {
-            setCountdown("Coming soon...");
-          }
-          // For non-premium, ritual is null but we proceed to show the locked card
+          // For premium users without data, ritual may not be generated yet (rare edge case)
           setLoading(false);
           return;
         }
@@ -104,106 +82,6 @@ const DailySmartyRitual = () => {
       <div className="min-h-screen bg-background flex items-center justify-center">
         <Loader2 className="h-8 w-8 animate-spin text-primary" />
       </div>
-    );
-  }
-
-  // Countdown display - show description card + countdown
-  if (countdown) {
-    return (
-      <>
-      <Helmet>
-        <title>Smarty Ritual | Daily Movement System | Morning Midday Evening Routine | Haris Falas | SmartyGym</title>
-        <meta name="description" content="Daily Smarty Ritual - All-day movement, recovery, and performance system by Sports Scientist Haris Falas. Morning activation, Midday reset, Evening unwind. 100% human-designed wellness routine. Train your lifestyle." />
-        <meta name="keywords" content="daily movement ritual, morning routine workout, midday movement, evening recovery, wellness routine, daily fitness habit, movement system, recovery routine, performance optimization, Haris Falas, SmartyGym, daily wellness, lifestyle fitness, morning activation, mobility routine" />
-        <link rel="canonical" href="https://smartygym.com/daily-ritual" />
-        
-        <meta property="og:title" content="Smarty Ritual | Daily Movement System | SmartyGym" />
-        <meta property="og:description" content="All-day movement, recovery, and performance system with Morning, Midday, and Evening phases by Sports Scientist Haris Falas" />
-        <meta property="og:type" content="website" />
-        <meta property="og:url" content="https://smartygym.com/daily-ritual" />
-        <meta property="og:image" content="https://smartygym.com/smarty-gym-logo.png" />
-        
-        <meta name="twitter:card" content="summary_large_image" />
-        <meta name="twitter:title" content="Smarty Ritual | Daily Movement System" />
-        <meta name="twitter:description" content="Morning, Midday, and Evening wellness phases designed by Haris Falas" />
-      </Helmet>
-        <div className="min-h-screen bg-background">
-          <div className="container mx-auto max-w-4xl px-4 pb-8">
-            {canGoBack && (
-              <Button variant="ghost" size="sm" onClick={goBack} className="mb-6">
-                <ArrowLeft className="mr-2 h-4 w-4" />
-                Back
-              </Button>
-            )}
-
-            <PageBreadcrumbs 
-              items={[
-                { label: "Home", href: "/" },
-                { label: "Smarty Ritual" }
-              ]} 
-            />
-
-            {/* Description Card - Always visible */}
-            <Card className="mb-8 bg-gradient-to-br from-primary/5 via-background to-primary/5 border-2 border-primary/40 shadow-primary">
-              <div className="p-4 sm:p-5">
-                <h2 className="text-xl sm:text-2xl font-bold mb-3 text-center">About Smarty Ritual</h2>
-                <div className="space-y-2 text-muted-foreground max-w-3xl mx-auto">
-                  <p className="text-sm sm:text-base">
-                    Your all-day game plan for movement, recovery, and performance. Each day brings a fresh ritual with three expertly designed phases:
-                  </p>
-                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 justify-items-center mt-4">
-                    <div className="flex items-center gap-2">
-                      <Sunrise className="h-4 w-4 text-orange-500" />
-                      <span className="text-sm"><strong>Morning:</strong> Activation</span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <Sun className="h-4 w-4 text-yellow-600" />
-                      <span className="text-sm"><strong>Midday:</strong> Reset</span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <Moon className="h-4 w-4 text-purple-600" />
-                      <span className="text-sm"><strong>Evening:</strong> Unwind</span>
-                    </div>
-                  </div>
-                  <p className="text-sm sm:text-base font-semibold text-foreground text-center mt-4">
-                    Designed by <a href="/coach-profile" className="text-primary hover:underline">Haris Falas</a> to keep you energized, mobile, and performing at your best.
-                  </p>
-                </div>
-              </div>
-            </Card>
-            
-            <Card className="text-center py-16">
-              <CardContent>
-                <Clock className="h-16 w-16 text-primary mx-auto mb-6" />
-                <h1 className="text-3xl font-bold mb-4">Next Ritual Arriving Soon</h1>
-                <p className="text-xl text-muted-foreground mb-6">
-                  Your Smarty Ritual will be available at 07:00
-                </p>
-                <Badge variant="outline" className="text-lg px-6 py-2">
-                  {countdown}
-                </Badge>
-                
-                {/* Premium-only messaging */}
-                {!isPremium && (
-                  <div className="mt-8 p-4 bg-muted/50 rounded-lg">
-                    <div className="flex items-center justify-center gap-2 mb-2">
-                      <Crown className="h-5 w-5 text-primary" />
-                      <span className="font-semibold">Premium Feature</span>
-                    </div>
-                    <p className="text-sm text-muted-foreground mb-4">
-                      Smarty Ritual is exclusively available for Premium members
-                    </p>
-                    <Button onClick={() => navigate("/joinpremium")}>
-                      <Crown className="mr-2 h-4 w-4" />
-                      Upgrade to Premium
-                    </Button>
-                  </div>
-                )}
-              </CardContent>
-            </Card>
-          </div>
-        </div>
-      </>
     );
   }
 
