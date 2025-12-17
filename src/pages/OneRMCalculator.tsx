@@ -14,6 +14,29 @@ import { ProtectedRoute } from "@/components/ProtectedRoute";
 import { SEOEnhancer } from "@/components/SEOEnhancer";
 import { generateSoftwareApplicationSchema, generateBreadcrumbSchema } from "@/utils/seoHelpers";
 import { useShowBackButton } from "@/hooks/useShowBackButton";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+
+const EXERCISES = [
+  "Bench Press",
+  "Back Squats",
+  "Deadlifts",
+  "Bulgarian Split Squats, Right Leg",
+  "Bulgarian Split Squats, Left Leg",
+  "Shoulder Press, Right Arm",
+  "Shoulder Press, Left Arm",
+  "Military Presses",
+  "Single Leg RDL, Right Leg",
+  "Single Leg RDL, Left Leg",
+  "Barbell Bicep Curls",
+  "Concentrated Bicep Curls, Right Arm",
+  "Concentrated Bicep Curls, Left Arm",
+] as const;
 
 const OneRMCalculator = () => {
   const navigate = useNavigate();
@@ -189,14 +212,19 @@ const OneRMCalculator = () => {
           <CardContent className="p-4 sm:p-6 space-y-6">
             <div className="space-y-4">
               <div>
-                <Label htmlFor="exerciseName">Exercise Name (Optional)</Label>
-                <Input
-                  id="exerciseName"
-                  type="text"
-                  value={exerciseName}
-                  onChange={(e) => setExerciseName(e.target.value)}
-                  placeholder="e.g., Bench Press, Squat"
-                />
+                <Label htmlFor="exerciseName">Exercise Name</Label>
+                <Select value={exerciseName} onValueChange={setExerciseName}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select exercise..." />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {EXERCISES.map((exercise) => (
+                      <SelectItem key={exercise} value={exercise}>
+                        {exercise}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </div>
 
               <div>
