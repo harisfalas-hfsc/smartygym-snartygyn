@@ -91,7 +91,7 @@ const ExerciseLibrary = () => {
             <CardContent className="p-4 sm:p-5">
               <h2 className="text-xl sm:text-2xl font-bold mb-3 text-center">About Exercise Library</h2>
               <div className="space-y-2 text-muted-foreground max-w-3xl mx-auto">
-                <p className="text-sm sm:text-base">
+                <p className="text-sm sm:text-base text-center">
                   Your comprehensive resource for learning exercises through video demonstrations and detailed instructions. 
                   Browse the Exercise Database with hundreds of movements, watch curated videos in the <span className="text-primary font-semibold">SmartyGym</span> Video Gallery, 
                   and explore The <span className="text-primary font-semibold">SmartyGym</span> YouTube channel for expert tutorials by Sports Scientist <a href="/coach-profile" className="text-primary hover:underline font-semibold whitespace-nowrap">Haris Falas</a>. 

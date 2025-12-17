@@ -135,7 +135,7 @@ const Blog = () => {
             <CardContent className="p-4 sm:p-5">
               <h2 className="text-xl sm:text-2xl font-bold mb-3 text-center">About Blog</h2>
               <div className="space-y-2 text-muted-foreground max-w-3xl mx-auto">
-                <p className="text-sm sm:text-base">
+                <p className="text-sm sm:text-base text-center">
                   Evidence-based articles written by <a href="/coach-profile" className="text-primary hover:underline font-semibold">Haris Falas</a>. Explore in-depth content on Fitness, Nutrition, and Wellness designed to educate and empower your training journey. Get expert insights to make informed decisions about your health and performance.
                 </p>
               </div>

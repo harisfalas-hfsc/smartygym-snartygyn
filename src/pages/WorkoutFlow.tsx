@@ -158,7 +158,7 @@ const WorkoutFlow = () => {
             <div className="p-4 sm:p-5">
               <h2 className="text-xl sm:text-2xl font-bold mb-3 text-center">About Smarty Workouts</h2>
               <div className="space-y-2 text-muted-foreground max-w-3xl mx-auto">
-                <p className="text-sm sm:text-base">
+                <p className="text-sm sm:text-base text-center">
                   Smarty Workouts are single-session training routines designed to fit your lifestyle and goals. Whether you're targeting strength, calorie burning, metabolic conditioning, cardio endurance, mobility & stability, or looking for a challenge — we have you covered. Hit the gym without a plan? In the home? On the go? Smarty Workouts are designed to deliver results in any setting.
                 </p>
                 
