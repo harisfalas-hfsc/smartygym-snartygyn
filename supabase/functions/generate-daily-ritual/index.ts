@@ -109,13 +109,18 @@ serve(async (req) => {
   try {
     logStep("Starting Daily Smarty Ritual generation");
 
-    // Parse request body for resend_notifications flag
+    // Parse request body for flags
     let resendNotifications = false;
+    let skipNotifications = false;
     try {
       const body = await req.json();
       resendNotifications = body?.resend_notifications === true;
+      skipNotifications = body?.skipNotifications === true;
       if (resendNotifications) {
         logStep("Resend notifications mode enabled");
+      }
+      if (skipNotifications) {
+        logStep("Skip notifications mode enabled - notifications will be sent separately at 7AM");
       }
     } catch (e) {
       // No body or invalid JSON, continue normally
@@ -281,8 +286,12 @@ Use <p class="tiptap-paragraph"> for paragraphs and proper HTML formatting.`;
 
     logStep("Ritual saved to database", { dayNumber, date: today });
 
-    // Send notifications to all users
-    await sendRitualNotifications(supabase, dayNumber, today);
+    // Send notifications to all users (unless skipNotifications is true)
+    if (!skipNotifications) {
+      await sendRitualNotifications(supabase, dayNumber, today);
+    } else {
+      logStep("Skipping notifications (skipNotifications=true) - will be sent separately at 7AM");
+    }
 
     return new Response(JSON.stringify({ 
       success: true, 
