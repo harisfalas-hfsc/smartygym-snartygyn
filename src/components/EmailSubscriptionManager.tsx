@@ -3,7 +3,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
-import { Loader2, Dumbbell, Sun, Zap, Plus, BookOpen, FileText, BarChart3, Bell } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Loader2, Dumbbell, Sun, Zap, Plus, BookOpen, FileText, BarChart3, Bell, Calendar } from "lucide-react";
 import { toast } from "sonner";
 
 interface EmailPreferences {
@@ -93,9 +94,16 @@ export const EmailSubscriptionManager = () => {
   const [preferences, setPreferences] = useState<EmailPreferences>(DEFAULT_PREFERENCES);
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState<string | null>(null);
+  
+  // Google Calendar state
+  const [isCalendarConnected, setIsCalendarConnected] = useState(false);
+  const [autoSyncEnabled, setAutoSyncEnabled] = useState(false);
+  const [isCalendarLoading, setIsCalendarLoading] = useState(true);
+  const [isCalendarSaving, setIsCalendarSaving] = useState(false);
 
   useEffect(() => {
     fetchPreferences();
+    checkCalendarConnection();
   }, []);
 
   const fetchPreferences = async () => {
@@ -132,6 +140,125 @@ export const EmailSubscriptionManager = () => {
       console.error("Error fetching preferences:", err);
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const checkCalendarConnection = async () => {
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) {
+        setIsCalendarLoading(false);
+        return;
+      }
+
+      const { data, error } = await supabase
+        .from("user_calendar_connections")
+        .select("is_active, auto_sync_enabled")
+        .eq("user_id", user.id)
+        .eq("provider", "google")
+        .maybeSingle();
+
+      if (error) {
+        console.error("Error checking calendar connection:", error);
+        setIsCalendarLoading(false);
+        return;
+      }
+
+      if (data) {
+        setIsCalendarConnected(data.is_active ?? false);
+        setAutoSyncEnabled(data.auto_sync_enabled ?? false);
+      }
+    } catch (err) {
+      console.error("Error checking calendar connection:", err);
+    } finally {
+      setIsCalendarLoading(false);
+    }
+  };
+
+  const handleCalendarConnect = async () => {
+    setIsCalendarSaving(true);
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) {
+        toast.error("Please log in to connect your calendar");
+        return;
+      }
+
+      const { data, error } = await supabase.functions.invoke("google-calendar-oauth", {
+        body: { action: "get_auth_url" },
+      });
+
+      if (error) {
+        console.error("Error getting auth URL:", error);
+        toast.error("Failed to initiate Google Calendar connection");
+        return;
+      }
+
+      if (data?.url) {
+        window.location.href = data.url;
+      }
+    } catch (err) {
+      console.error("Error connecting calendar:", err);
+      toast.error("Failed to connect Google Calendar");
+    } finally {
+      setIsCalendarSaving(false);
+    }
+  };
+
+  const handleCalendarDisconnect = async () => {
+    setIsCalendarSaving(true);
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
+
+      const { error } = await supabase
+        .from("user_calendar_connections")
+        .delete()
+        .eq("user_id", user.id)
+        .eq("provider", "google");
+
+      if (error) {
+        console.error("Error disconnecting calendar:", error);
+        toast.error("Failed to disconnect calendar");
+        return;
+      }
+
+      setIsCalendarConnected(false);
+      setAutoSyncEnabled(false);
+      toast.success("Google Calendar disconnected");
+    } catch (err) {
+      console.error("Error disconnecting calendar:", err);
+      toast.error("Failed to disconnect calendar");
+    } finally {
+      setIsCalendarSaving(false);
+    }
+  };
+
+  const handleAutoSyncToggle = async (enabled: boolean) => {
+    setIsCalendarSaving(true);
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
+
+      const { error } = await supabase
+        .from("user_calendar_connections")
+        .update({ auto_sync_enabled: enabled })
+        .eq("user_id", user.id)
+        .eq("provider", "google");
+
+      if (error) {
+        console.error("Error updating auto-sync:", error);
+        toast.error("Failed to update auto-sync setting");
+        return;
+      }
+
+      setAutoSyncEnabled(enabled);
+      toast.success(enabled ? "Auto-sync enabled" : "Auto-sync disabled");
+    } catch (err) {
+      console.error("Error updating auto-sync:", err);
+      toast.error("Failed to update auto-sync setting");
+    } finally {
+      setIsCalendarSaving(false);
     }
   };
 
@@ -242,6 +369,60 @@ export const EmailSubscriptionManager = () => {
             </div>
           );
         })}
+
+        {/* Google Calendar Integration Row */}
+        <div className="flex items-center justify-between py-4 border-b">
+          <div className="flex items-start gap-3">
+            <div className="mt-0.5 p-2 rounded-lg bg-primary/10">
+              <Calendar className="h-4 w-4 text-primary" />
+            </div>
+            <div className="space-y-0.5">
+              <Label className="text-sm font-medium">
+                Google Calendar Integration
+              </Label>
+              <p className="text-xs text-muted-foreground">
+                Sync scheduled workouts with your Google Calendar
+              </p>
+              <p className="text-xs text-primary font-medium">
+                {isCalendarLoading ? "Checking..." : isCalendarConnected ? "✓ Connected" : "Not connected"}
+              </p>
+            </div>
+          </div>
+          <div className="flex items-center gap-2">
+            {(isCalendarLoading || isCalendarSaving) && (
+              <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />
+            )}
+            {!isCalendarLoading && (
+              isCalendarConnected ? (
+                <div className="flex items-center gap-3">
+                  <Switch
+                    checked={autoSyncEnabled}
+                    onCheckedChange={handleAutoSyncToggle}
+                    disabled={isCalendarSaving}
+                  />
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={handleCalendarDisconnect}
+                    disabled={isCalendarSaving}
+                    className="text-xs text-muted-foreground hover:text-destructive"
+                  >
+                    Disconnect
+                  </Button>
+                </div>
+              ) : (
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={handleCalendarConnect}
+                  disabled={isCalendarSaving}
+                >
+                  Connect
+                </Button>
+              )
+            )}
+          </div>
+        </div>
 
         {preferences.opt_out_all && (
           <div className="mt-4 p-4 bg-destructive/10 rounded-lg">
