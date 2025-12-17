@@ -65,7 +65,7 @@ const OneRMCalculator = () => {
         user_id: user.id,
         content_type: 'tool',
         item_id: '1rm-calculator',
-        item_name: '1RM Calculator',
+        item_name: exerciseName ? `1RM Calculator – ${exerciseName}` : '1RM Calculator',
         action_type: 'calculated',
         tool_input: {
           weight: parseFloat(weight),
