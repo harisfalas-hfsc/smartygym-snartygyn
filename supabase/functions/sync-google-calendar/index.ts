@@ -478,6 +478,137 @@ serve(async (req) => {
       });
     }
 
+    // Action: Create recurring check-in reminders
+    if (action === 'create-checkin-reminders') {
+      console.log('Creating recurring check-in reminders...');
+
+      // Get tomorrow's date for the recurrence start
+      const tomorrow = new Date();
+      tomorrow.setDate(tomorrow.getDate() + 1);
+      const dateStr = tomorrow.toISOString().split('T')[0].replace(/-/g, '');
+
+      // Morning check-in reminder (8:00 AM Cyprus time)
+      const morningEvent = {
+        summary: '☀️ SmartyGym Morning Check-in',
+        description: 'Time for your morning check-in! Track your sleep, readiness, and set up for a great day.',
+        start: {
+          dateTime: `${tomorrow.toISOString().split('T')[0]}T08:00:00`,
+          timeZone: 'Europe/Nicosia'
+        },
+        end: {
+          dateTime: `${tomorrow.toISOString().split('T')[0]}T08:30:00`,
+          timeZone: 'Europe/Nicosia'
+        },
+        recurrence: ['RRULE:FREQ=DAILY'],
+        reminders: {
+          useDefault: false,
+          overrides: [
+            { method: 'popup', minutes: 15 }
+          ]
+        }
+      };
+
+      // Night check-in reminder (8:00 PM Cyprus time)
+      const nightEvent = {
+        summary: '🌙 SmartyGym Night Check-in',
+        description: 'Time for your night check-in! Reflect on your day, track your activity and nutrition.',
+        start: {
+          dateTime: `${tomorrow.toISOString().split('T')[0]}T20:00:00`,
+          timeZone: 'Europe/Nicosia'
+        },
+        end: {
+          dateTime: `${tomorrow.toISOString().split('T')[0]}T20:30:00`,
+          timeZone: 'Europe/Nicosia'
+        },
+        recurrence: ['RRULE:FREQ=DAILY'],
+        reminders: {
+          useDefault: false,
+          overrides: [
+            { method: 'popup', minutes: 15 }
+          ]
+        }
+      };
+
+      const { id: morningEventId, error: morningError } = await createCalendarEvent(accessToken, morningEvent);
+      if (!morningEventId) {
+        console.error('Failed to create morning event:', morningError);
+        return new Response(JSON.stringify({ success: false, error: morningError }), {
+          status: 500,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+        });
+      }
+
+      const { id: nightEventId, error: nightError } = await createCalendarEvent(accessToken, nightEvent);
+      if (!nightEventId) {
+        // Clean up morning event if night fails
+        await deleteCalendarEvent(accessToken, morningEventId);
+        console.error('Failed to create night event:', nightError);
+        return new Response(JSON.stringify({ success: false, error: nightError }), {
+          status: 500,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+        });
+      }
+
+      // Store the event IDs in database
+      await supabase
+        .from('user_calendar_connections')
+        .update({
+          checkin_reminder_event_ids: {
+            morning_event_id: morningEventId,
+            night_event_id: nightEventId
+          },
+          updated_at: new Date().toISOString()
+        })
+        .eq('user_id', user.id)
+        .eq('provider', 'google');
+
+      console.log('Check-in reminders created:', { morningEventId, nightEventId });
+      return new Response(JSON.stringify({
+        success: true,
+        morning_event_id: morningEventId,
+        night_event_id: nightEventId
+      }), {
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+      });
+    }
+
+    // Action: Delete recurring check-in reminders
+    if (action === 'delete-checkin-reminders') {
+      console.log('Deleting recurring check-in reminders...');
+
+      // Get stored event IDs
+      const { data: connection } = await supabase
+        .from('user_calendar_connections')
+        .select('checkin_reminder_event_ids')
+        .eq('user_id', user.id)
+        .eq('provider', 'google')
+        .single();
+
+      const eventIds = connection?.checkin_reminder_event_ids as { morning_event_id?: string; night_event_id?: string } | null;
+
+      if (eventIds?.morning_event_id) {
+        await deleteCalendarEvent(accessToken, eventIds.morning_event_id);
+      }
+      if (eventIds?.night_event_id) {
+        await deleteCalendarEvent(accessToken, eventIds.night_event_id);
+      }
+
+      // Clear stored event IDs
+      await supabase
+        .from('user_calendar_connections')
+        .update({
+          checkin_reminder_event_ids: null,
+          updated_at: new Date().toISOString()
+        })
+        .eq('user_id', user.id)
+        .eq('provider', 'google');
+
+      console.log('Check-in reminders deleted');
+      return new Response(JSON.stringify({ success: true }), {
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+      });
+    }
+
     return new Response(JSON.stringify({ error: 'Invalid action' }), {
       status: 400,
       headers: { ...corsHeaders, 'Content-Type': 'application/json' }
