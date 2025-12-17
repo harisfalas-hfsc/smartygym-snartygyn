@@ -183,7 +183,7 @@ const WODCategory = () => {
         </div> : <>
           <Helmet>
             <title>Smarty Workouts | Workout of the Day | Daily Expert Workouts | SmartyGym</title>
-            <meta name="description" content="Two daily expert-designed workouts at 7:00 AM - one with equipment, one without. Following a 6-day periodization cycle. Your SmartyGym: the gym that never closes." />
+            <meta name="description" content="Two daily expert-designed workouts at midnight - one with equipment, one without. Following a 6-day periodization cycle. Your SmartyGym: the gym that never closes." />
             <meta name="keywords" content="workout of the day, WOD, daily workouts, bodyweight workout, equipment workout, online gym, periodization, Haris Falas" />
             <meta property="og:title" content="Workout of the Day | SmartyGym" />
             <meta property="og:description" content="Two daily expert-designed workouts - choose equipment or bodyweight" />
@@ -191,7 +191,7 @@ const WODCategory = () => {
             <meta property="og:url" content="https://smartygym.com/workout/wod" />
             <meta name="twitter:card" content="summary_large_image" />
             <meta name="twitter:title" content="Workout of the Day | SmartyGym" />
-            <meta name="twitter:description" content="Fresh workouts every day at 7:00 AM" />
+            <meta name="twitter:description" content="Fresh workouts every day at midnight" />
             <link rel="canonical" href="https://smartygym.com/workout/wod" />
           </Helmet>
 
@@ -242,7 +242,7 @@ const WODCategory = () => {
                       Today's Workouts are Being Prepared
                     </h2>
                     <p className="text-muted-foreground">
-                      Check back at <span className="text-primary font-semibold">7:00 AM</span> for your fresh Workouts of the Day!
+                      Check back at <span className="text-primary font-semibold">midnight (00:00)</span> for your fresh Workouts of the Day!
                     </p>
                   </CardContent>
                 </Card>)}

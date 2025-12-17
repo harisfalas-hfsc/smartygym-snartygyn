@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
-import { ArrowLeft, Sunrise, Sun, Moon, Share2, Lock, Crown, Loader2, BookOpen } from "lucide-react";
+import { ArrowLeft, Sunrise, Sun, Moon, Share2, Lock, Crown, Loader2, BookOpen, Clock } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAccessControl } from "@/hooks/useAccessControl";
 import { useShowBackButton } from "@/hooks/useShowBackButton";
@@ -264,6 +264,24 @@ const DailySmartyRitual = () => {
                         </Button>
                       )}
                     </div>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Empty state for premium users when ritual not yet generated */}
+            {isPremium && !ritual && (
+              <div className="p-6 bg-muted/50">
+                <div className="flex flex-col items-center justify-center gap-4 text-center">
+                  <Clock className="h-12 w-12 text-muted-foreground" />
+                  <div>
+                    <h3 className="text-xl font-semibold mb-2">Today's Ritual is Being Prepared</h3>
+                    <p className="text-muted-foreground max-w-md">
+                      Your Daily Smarty Ritual will be available at <span className="text-primary font-semibold">00:05 AM</span> Cyprus time.
+                    </p>
+                    <p className="text-sm text-muted-foreground/70 mt-2">
+                      Check back shortly!
+                    </p>
                   </div>
                 </div>
               </div>
