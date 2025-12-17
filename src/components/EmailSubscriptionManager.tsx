@@ -245,31 +245,55 @@ export const EmailSubscriptionManager = () => {
     }
   };
 
-  const bulkExportActivities = async () => {
+  const syncAllToCalendar = async () => {
     setIsExporting(true);
     setExportProgress(0);
-    setExportMessage("Starting export...");
+    setExportMessage("Starting sync...");
     
     try {
       const { data: { session } } = await supabase.auth.getSession();
       if (!session) {
-        toast.error("Please log in to export activities");
+        toast.error("Please log in to sync activities");
         return;
       }
 
-      setExportProgress(20);
-      setExportMessage("Fetching your activities...");
+      let totalSynced = 0;
+      let totalFailed = 0;
 
-      // Get date range (last 6 months to today)
+      // Step 1: Sync scheduled workouts (future)
+      setExportProgress(20);
+      setExportMessage("Syncing scheduled workouts...");
+      console.log('Starting sync-scheduled-workouts...');
+
+      const scheduledResponse = await supabase.functions.invoke('sync-google-calendar', {
+        body: { action: 'sync-scheduled-workouts' }
+      });
+
+      console.log('sync-scheduled-workouts response:', scheduledResponse);
+
+      if (scheduledResponse.error) {
+        console.error('Scheduled workouts sync error:', scheduledResponse.error);
+        if (scheduledResponse.data?.reconnect_required) {
+          toast.error('Please reconnect your Google Calendar');
+          setIsCalendarConnected(false);
+          return;
+        }
+      } else {
+        totalSynced += scheduledResponse.data?.synced || 0;
+        totalFailed += scheduledResponse.data?.failed || 0;
+      }
+
+      // Step 2: Export past activities
+      setExportProgress(50);
+      setExportMessage("Syncing past activities...");
+      console.log('Starting bulk-export...');
+
       const endDate = new Date().toISOString().split('T')[0];
       const startDate = new Date();
       startDate.setMonth(startDate.getMonth() - 6);
       const startDateStr = startDate.toISOString().split('T')[0];
 
-      setExportProgress(40);
-      setExportMessage("Syncing to Google Calendar...");
-
-      const response = await supabase.functions.invoke('sync-google-calendar', {
+      const exportResponse = await supabase.functions.invoke('sync-google-calendar', {
         body: {
           action: 'bulk-export',
           activities: {
@@ -280,40 +304,37 @@ export const EmailSubscriptionManager = () => {
         }
       });
 
-      setExportProgress(100);
+      console.log('bulk-export response:', exportResponse);
 
-      if (response.error) {
-        console.error('Bulk export error:', response.error);
-        
-        if (response.data?.reconnect_required) {
-          toast.error('Please reconnect your Google Calendar', {
-            description: 'Your calendar connection has expired'
-          });
+      if (exportResponse.error) {
+        console.error('Bulk export error:', exportResponse.error);
+        if (exportResponse.data?.reconnect_required) {
+          toast.error('Please reconnect your Google Calendar');
           setIsCalendarConnected(false);
           return;
         }
-        
-        toast.error('Failed to export activities', {
-          description: response.error.message
-        });
-        return;
+      } else {
+        totalSynced += exportResponse.data?.exported || 0;
+        totalFailed += exportResponse.data?.failed || 0;
       }
 
-      const exported = response.data?.exported || 0;
-      const failed = response.data?.failed || 0;
+      setExportProgress(100);
+      setExportMessage("Sync complete!");
 
-      if (exported > 0) {
-        toast.success(`Exported ${exported} activities to Google Calendar`, {
-          description: failed > 0 ? `${failed} failed to export` : 'All activities synced successfully!'
+      if (totalSynced > 0) {
+        toast.success(`Synced ${totalSynced} items to Google Calendar`, {
+          description: totalFailed > 0 ? `${totalFailed} failed` : 'All items synced successfully!'
         });
+      } else if (totalFailed > 0) {
+        toast.error(`Failed to sync ${totalFailed} items`);
       } else {
-        toast.info('No activities to export', {
-          description: 'Complete some workouts or check-ins first'
+        toast.info('No items to sync', {
+          description: 'Schedule workouts or complete activities first'
         });
       }
     } catch (err) {
-      console.error("Error exporting activities:", err);
-      toast.error("Failed to export activities");
+      console.error("Error syncing to calendar:", err);
+      toast.error("Failed to sync to calendar");
     } finally {
       setIsExporting(false);
       setExportProgress(0);
@@ -347,10 +368,10 @@ export const EmailSubscriptionManager = () => {
         });
         
         // Auto-export past activities when enabling
-        toast.info("Exporting your past activities...", {
+        toast.info("Syncing your activities...", {
           description: "This may take a moment"
         });
-        await bulkExportActivities();
+        await syncAllToCalendar();
       } else {
         toast.success("Auto-sync disabled");
       }
@@ -509,10 +530,10 @@ export const EmailSubscriptionManager = () => {
                       Auto-sync
                     </Label>
                   </div>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={bulkExportActivities}
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={syncAllToCalendar}
                     disabled={isCalendarSaving || isExporting}
                     className="text-xs"
                   >
