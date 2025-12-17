@@ -117,6 +117,16 @@ const EXERCISES = [
   "Concentrated Bicep Curls, Left Arm"
 ] as const;
 
+// Exercise categories for grouped selection
+const EXERCISE_CATEGORIES = {
+  "Compound Lifts": ["Bench Press", "Back Squats", "Deadlifts", "Military Presses"],
+  "Single Leg": ["Bulgarian Split Squats, Right Leg", "Bulgarian Split Squats, Left Leg", "Single Leg RDL, Right Leg", "Single Leg RDL, Left Leg"],
+  "Arms": ["Shoulder Press, Right Arm", "Shoulder Press, Left Arm", "Barbell Bicep Curls", "Concentrated Bicep Curls, Right Arm", "Concentrated Bicep Curls, Left Arm"],
+} as const;
+
+// Maximum exercises to display for readability
+const MAX_EXERCISES_DISPLAY = 5;
+
 // Measurement types for filter
 const MEASUREMENT_TYPES = ["Weight", "Body Fat", "Muscle Mass"] as const;
 
@@ -162,7 +172,8 @@ export default function CalculatorHistory() {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState(searchParams.get("tab") || "1rm");
-  const [selectedExercises, setSelectedExercises] = useState<string[]>([]);
+  const [selectedExercises, setSelectedExercises] = useState<string[]>(["Bench Press"]);
+  const [hoveredExercise, setHoveredExercise] = useState<string | null>(null);
   const [selectedMeasurementTypes, setSelectedMeasurementTypes] = useState<string[]>([]);
   const [timeFilter, setTimeFilter] = useState<string>("all");
   const [customStartDate, setCustomStartDate] = useState<Date | undefined>();
@@ -602,45 +613,86 @@ export default function CalculatorHistory() {
                       className="w-full sm:w-[200px] justify-between border border-input bg-background text-foreground hover:bg-accent hover:text-foreground"
                     >
                       {selectedExercises.length === 0
-                        ? "All Exercises"
-                            : `${selectedExercises.length} exercise${selectedExercises.length > 1 ? 's' : ''} selected`}
+                        ? "Select Exercise"
+                            : selectedExercises.length === 1 
+                              ? selectedExercises[0].split(',')[0]
+                              : `${selectedExercises.length} exercises`}
                           <ChevronDown className="h-4 w-4 opacity-50" />
                         </Button>
                       </PopoverTrigger>
-                      <PopoverContent className="w-[280px] p-3 max-h-[300px] overflow-y-auto">
-                        <div className="space-y-2">
-                        <Button 
-                          variant="ghost" 
-                          size="sm" 
-                          className="w-full justify-start text-foreground hover:bg-muted hover:text-foreground"
-                          onClick={() => setSelectedExercises([])}
-                        >
-                          Show All Exercises
-                        </Button>
-                          <Separator />
-                          <div className="space-y-2 pt-1">
-                            {EXERCISES.map((exercise) => (
-                              <div key={exercise} className="flex items-center space-x-2">
-                                <Checkbox
-                                  id={`exercise-${exercise}`}
-                                  checked={selectedExercises.includes(exercise)}
-                                  onCheckedChange={(checked) => {
-                                    if (checked) {
-                                      setSelectedExercises([...selectedExercises, exercise]);
-                                    } else {
-                                      setSelectedExercises(selectedExercises.filter(e => e !== exercise));
-                                    }
+                      <PopoverContent className="w-[320px] p-3 max-h-[400px] overflow-y-auto">
+                        <div className="space-y-3">
+                          {/* Warning when max exceeded */}
+                          {selectedExercises.length >= MAX_EXERCISES_DISPLAY && (
+                            <div className="bg-amber-500/10 border border-amber-500/30 rounded-md p-2 text-xs text-amber-600 dark:text-amber-400">
+                              ⚠️ Displaying {MAX_EXERCISES_DISPLAY}+ exercises reduces chart readability
+                            </div>
+                          )}
+                          
+                          {/* Category Quick Select */}
+                          <div className="space-y-1">
+                            <span className="text-xs font-medium text-muted-foreground">Quick Select</span>
+                            <div className="flex flex-wrap gap-1">
+                              {Object.entries(EXERCISE_CATEGORIES).map(([category, exercises]) => (
+                                <Button
+                                  key={category}
+                                  variant="outline"
+                                  size="sm"
+                                  className="text-xs h-7 px-2"
+                                  onClick={() => {
+                                    const newSelection = [...new Set([...selectedExercises, ...exercises])];
+                                    setSelectedExercises(newSelection);
                                   }}
-                                />
-                                <label 
-                                  htmlFor={`exercise-${exercise}`} 
-                                  className="text-sm cursor-pointer flex-1"
                                 >
-                                  {exercise}
-                                </label>
-                              </div>
-                            ))}
+                                  {category}
+                                </Button>
+                              ))}
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                className="text-xs h-7 px-2 text-destructive border-destructive/30 hover:bg-destructive/10"
+                                onClick={() => setSelectedExercises([])}
+                              >
+                                Clear All
+                              </Button>
+                            </div>
                           </div>
+                          
+                          <Separator />
+                          
+                          {/* Individual exercises by category */}
+                          {Object.entries(EXERCISE_CATEGORIES).map(([category, exercises]) => (
+                            <div key={category} className="space-y-1">
+                              <span className="text-xs font-medium text-muted-foreground">{category}</span>
+                              <div className="space-y-1">
+                                {exercises.map((exercise) => (
+                                  <div key={exercise} className="flex items-center space-x-2">
+                                    <Checkbox
+                                      id={`exercise-${exercise}`}
+                                      checked={selectedExercises.includes(exercise)}
+                                      onCheckedChange={(checked) => {
+                                        if (checked) {
+                                          setSelectedExercises([...selectedExercises, exercise]);
+                                        } else {
+                                          setSelectedExercises(selectedExercises.filter(e => e !== exercise));
+                                        }
+                                      }}
+                                    />
+                                    <label 
+                                      htmlFor={`exercise-${exercise}`} 
+                                      className="text-sm cursor-pointer flex-1 flex items-center gap-2"
+                                    >
+                                      <span 
+                                        className="w-3 h-3 rounded-full flex-shrink-0" 
+                                        style={{ backgroundColor: EXERCISE_COLORS[exercise] }}
+                                      />
+                                      {exercise}
+                                    </label>
+                                  </div>
+                                ))}
+                              </div>
+                            </div>
+                          ))}
                         </div>
                       </PopoverContent>
                     </Popover>
@@ -648,29 +700,63 @@ export default function CalculatorHistory() {
                 </div>
               </CardHeader>
               <CardContent>
-                <ResponsiveContainer width="100%" height={300}>
-                  <LineChart data={oneRMProgressData}>
-                    <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
-                    <XAxis dataKey="date" className="text-xs" />
-                    <YAxis className="text-xs" />
-                    <Tooltip />
-                    <Legend wrapperStyle={{ fontSize: '12px' }} />
-                    {(selectedExercises.length === 0 ? [...EXERCISES] : selectedExercises).map((exercise) => (
-                      <Line 
-                        key={exercise}
-                        type="monotone" 
-                        dataKey={exercise} 
-                        stroke={EXERCISE_COLORS[exercise] || "hsl(var(--primary))"} 
-                        strokeWidth={2.5} 
-                        strokeDasharray={EXERCISE_STROKE_PATTERNS[exercise] || "0"}
-                        name={`${exercise} (kg)`}
-                        connectNulls
-                        dot={{ r: 3 }}
-                        activeDot={{ r: 5 }}
+                {selectedExercises.length === 0 ? (
+                  <div className="h-[300px] flex items-center justify-center text-muted-foreground">
+                    <div className="text-center">
+                      <Calculator className="h-12 w-12 mx-auto mb-3 opacity-50" />
+                      <p>Select an exercise from the dropdown to view progress</p>
+                    </div>
+                  </div>
+                ) : (
+                  <ResponsiveContainer width="100%" height={300}>
+                    <LineChart data={oneRMProgressData}>
+                      <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
+                      <XAxis dataKey="date" className="text-xs" />
+                      <YAxis className="text-xs" />
+                      <Tooltip 
+                        contentStyle={{ 
+                          backgroundColor: 'hsl(var(--background))', 
+                          border: '1px solid hsl(var(--border))',
+                          borderRadius: '8px',
+                          fontSize: '12px'
+                        }}
                       />
-                    ))}
-                  </LineChart>
-                </ResponsiveContainer>
+                      <Legend 
+                        wrapperStyle={{ fontSize: '11px', paddingTop: '10px' }}
+                        onMouseEnter={(e) => setHoveredExercise(e.dataKey as string)}
+                        onMouseLeave={() => setHoveredExercise(null)}
+                        formatter={(value, entry) => (
+                          <span 
+                            style={{ 
+                              opacity: hoveredExercise && hoveredExercise !== entry.dataKey ? 0.3 : 1,
+                              cursor: 'pointer',
+                              transition: 'opacity 0.2s'
+                            }}
+                          >
+                            {value}
+                          </span>
+                        )}
+                      />
+                      {selectedExercises.map((exercise) => (
+                        <Line 
+                          key={exercise}
+                          type="monotone" 
+                          dataKey={exercise} 
+                          stroke={EXERCISE_COLORS[exercise] || "hsl(var(--primary))"} 
+                          strokeWidth={hoveredExercise === exercise ? 4 : hoveredExercise ? 1 : 2.5} 
+                          strokeOpacity={hoveredExercise && hoveredExercise !== exercise ? 0.2 : 1}
+                          strokeDasharray={EXERCISE_STROKE_PATTERNS[exercise] || "0"}
+                          name={`${exercise} (kg)`}
+                          connectNulls
+                          dot={{ r: hoveredExercise === exercise ? 5 : 3 }}
+                          activeDot={{ r: 6 }}
+                          onMouseEnter={() => setHoveredExercise(exercise)}
+                          onMouseLeave={() => setHoveredExercise(null)}
+                        />
+                      ))}
+                    </LineChart>
+                  </ResponsiveContainer>
+                )}
               </CardContent>
             </Card>
           )}
