@@ -34,9 +34,6 @@ export const Footer = () => {
             <button onClick={() => navigate("/human-performance")} className="hover:text-primary transition-colors">
               Why SmartyGym
             </button>
-            <button onClick={() => navigate("/corporate")} className="hover:text-primary transition-colors">
-              Smarty Corporate
-            </button>
             <button onClick={() => navigate("/corporate-wellness")} className="hover:text-primary transition-colors">
               Why Smarty Corporate
             </button>
