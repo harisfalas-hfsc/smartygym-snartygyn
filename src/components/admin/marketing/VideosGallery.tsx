@@ -1,11 +1,10 @@
 import { useState, useRef, useCallback } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Play, Download, Eye, Film } from "lucide-react";
+import { Play, Download, Eye, Film, Upload, ExternalLink } from "lucide-react";
 import { VideoPlayer } from "./VideoPlayer";
-import { SampleVideo, SampleVideoRef } from "./videos/SampleVideo";
 import { useToast } from "@/hooks/use-toast";
-import { createRoot, Root } from "react-dom/client";
+import { Link } from "react-router-dom";
 
 interface VideoItem {
   id: string;
@@ -13,6 +12,7 @@ interface VideoItem {
   description: string;
   duration: string;
   component: "sample";
+  videoUrl?: string; // URL to the actual video file in storage
 }
 
 const videos: VideoItem[] = [
@@ -22,13 +22,13 @@ const videos: VideoItem[] = [
     description: "Reference template video - 8 scenes showcasing SmartyGym brand",
     duration: "20-25 sec",
     component: "sample",
+    // Add videoUrl here once you upload a real video file
+    // videoUrl: "https://cvccrvyimyzrxcwzmxwk.supabase.co/storage/v1/object/public/promotional-videos/sample-promo.mp4"
   },
 ];
 
 export const VideosGallery = () => {
   const [selectedVideo, setSelectedVideo] = useState<VideoItem | null>(null);
-  const [isRecording, setIsRecording] = useState(false);
-  const [recordingProgress, setRecordingProgress] = useState(0);
   const { toast } = useToast();
 
   const handlePreview = (video: VideoItem) => {
@@ -36,156 +36,31 @@ export const VideosGallery = () => {
   };
 
   const handleDownload = useCallback(async (video: VideoItem) => {
-    setIsRecording(true);
-    setRecordingProgress(0);
-    
-    toast({
-      title: "Recording video...",
-      description: "Please wait while we capture the video. This takes about 25 seconds.",
-    });
-
-    try {
-      // Create offscreen container for recording
-      const container = document.createElement("div");
-      container.style.position = "fixed";
-      container.style.left = "-9999px";
-      container.style.top = "0";
-      container.style.width = "360px";
-      container.style.height = "640px";
-      container.style.backgroundColor = "#0a0a0a";
-      document.body.appendChild(container);
-
-      // Create a canvas for capturing frames
-      const canvas = document.createElement("canvas");
-      canvas.width = 360;
-      canvas.height = 640;
-      const ctx = canvas.getContext("2d");
-
-      if (!ctx) {
-        throw new Error("Could not get canvas context");
-      }
-
-      // Render the video component
-      const videoContainer = document.createElement("div");
-      videoContainer.style.width = "360px";
-      videoContainer.style.height = "640px";
-      container.appendChild(videoContainer);
-
-      let reactRoot: Root | null = null;
-      let videoCompleted = false;
-
-      // Create a promise that resolves when the video completes
-      const videoPromise = new Promise<void>((resolve) => {
-        reactRoot = createRoot(videoContainer);
-        reactRoot.render(
-          <SampleVideo 
-            isPlaying={true} 
-            onComplete={() => {
-              videoCompleted = true;
-              resolve();
-            }} 
-          />
-        );
-      });
-
-      // Set up MediaRecorder with canvas stream
-      const stream = canvas.captureStream(30);
-      const mediaRecorder = new MediaRecorder(stream, {
-        mimeType: "video/webm;codecs=vp9",
-        videoBitsPerSecond: 5000000,
-      });
-
-      const chunks: Blob[] = [];
-      mediaRecorder.ondataavailable = (e) => {
-        if (e.data.size > 0) {
-          chunks.push(e.data);
-        }
-      };
-
-      mediaRecorder.start(100);
-
-      // Capture frames using html2canvas
-      const { default: html2canvas } = await import("html2canvas");
+    if (video.videoUrl) {
+      // Direct download from storage - instant!
+      const link = document.createElement("a");
+      link.href = video.videoUrl;
+      link.download = `${video.name.toLowerCase().replace(/\s+/g, "-")}-promo.mp4`;
+      link.target = "_blank";
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
       
-      const captureFrame = async () => {
-        try {
-          const frameCanvas = await html2canvas(videoContainer, {
-            width: 360,
-            height: 640,
-            scale: 1,
-            backgroundColor: "#0a0a0a",
-            logging: false,
-            useCORS: true,
-          });
-          ctx.drawImage(frameCanvas, 0, 0, 360, 640);
-        } catch (err) {
-          console.warn("Frame capture error:", err);
-        }
-      };
-
-      // Start frame capture loop
-      const totalDuration = 26000; // 26 seconds
-      const frameInterval = 33; // ~30fps
-      let elapsed = 0;
-
-      const captureLoop = setInterval(async () => {
-        await captureFrame();
-        elapsed += frameInterval;
-        setRecordingProgress(Math.min((elapsed / totalDuration) * 100, 100));
-        
-        if (videoCompleted || elapsed >= totalDuration) {
-          clearInterval(captureLoop);
-        }
-      }, frameInterval);
-
-      // Wait for video to complete
-      await videoPromise;
-      
-      // Give a small buffer to ensure last frames are captured
-      await new Promise(resolve => setTimeout(resolve, 500));
-      clearInterval(captureLoop);
-
-      // Stop recording
-      mediaRecorder.stop();
-
-      // Wait for the recording to finalize
-      await new Promise<void>((resolve) => {
-        mediaRecorder.onstop = () => resolve();
-      });
-
-      // Create and download the video file
-      const blob = new Blob(chunks, { type: "video/webm" });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = `${video.name.toLowerCase().replace(/\s+/g, "-")}-promo.webm`;
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-      URL.revokeObjectURL(url);
-
-      // Cleanup
-      if (reactRoot) {
-        reactRoot.unmount();
-      }
-      document.body.removeChild(container);
-
       toast({
-        title: "Video downloaded!",
-        description: "Your promotional video has been saved.",
+        title: "Download started!",
+        description: "Your video is downloading.",
       });
-    } catch (error) {
-      console.error("Recording error:", error);
+    } else {
+      // No video file uploaded yet - direct to export page
       toast({
-        title: "Recording failed",
-        description: "There was an error recording the video. Please try again.",
+        title: "No video file available",
+        description: "Please record and upload the video first using the Export Video page.",
         variant: "destructive",
       });
-    } finally {
-      setIsRecording(false);
-      setRecordingProgress(0);
     }
   }, [toast]);
+
+  const hasVideoFiles = videos.some(v => v.videoUrl);
 
   return (
     <div className="space-y-6">
@@ -196,7 +71,31 @@ export const VideosGallery = () => {
             Preview and download marketing videos
           </p>
         </div>
+        <Button asChild variant="outline" size="sm">
+          <Link to="/admin/export-video">
+            <Upload className="h-4 w-4 mr-2" />
+            Export Videos
+          </Link>
+        </Button>
       </div>
+
+      {!hasVideoFiles && (
+        <div className="bg-muted/50 border border-dashed rounded-lg p-4">
+          <div className="flex items-start gap-3">
+            <Film className="h-5 w-5 text-muted-foreground mt-0.5" />
+            <div className="space-y-1">
+              <p className="text-sm font-medium">No video files uploaded yet</p>
+              <p className="text-xs text-muted-foreground">
+                To enable instant downloads, go to the{" "}
+                <Link to="/admin/export-video" className="text-primary underline">
+                  Export Video page
+                </Link>
+                , record your video using screen capture software, then upload the MP4 file.
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Compact grid: 2 cols on mobile, up to 5 on large screens */}
       <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
@@ -211,6 +110,19 @@ export const VideosGallery = () => {
               <div className="absolute inset-0 flex flex-col items-center justify-center">
                 <Film className="h-8 w-8 text-primary/60 mb-1" />
                 <span className="text-xs text-muted-foreground">9:16</span>
+              </div>
+              
+              {/* Status badge */}
+              <div className="absolute top-2 right-2">
+                {video.videoUrl ? (
+                  <span className="text-xs bg-green-500/20 text-green-400 px-2 py-0.5 rounded-full">
+                    Ready
+                  </span>
+                ) : (
+                  <span className="text-xs bg-yellow-500/20 text-yellow-400 px-2 py-0.5 rounded-full">
+                    Preview only
+                  </span>
+                )}
               </div>
               
               {/* Play icon overlay */}
@@ -237,6 +149,7 @@ export const VideosGallery = () => {
                       e.stopPropagation();
                       handlePreview(video);
                     }}
+                    title="Preview"
                   >
                     <Eye className="h-3.5 w-3.5" />
                   </Button>
@@ -248,23 +161,13 @@ export const VideosGallery = () => {
                       e.stopPropagation();
                       handleDownload(video);
                     }}
-                    disabled={isRecording}
+                    disabled={!video.videoUrl}
+                    title={video.videoUrl ? "Download MP4" : "No video file - use Export page first"}
                   >
                     <Download className="h-3.5 w-3.5" />
                   </Button>
                 </div>
               </div>
-              {isRecording && (
-                <div className="mt-2">
-                  <div className="h-1 bg-muted rounded-full overflow-hidden">
-                    <div 
-                      className="h-full bg-primary transition-all duration-100"
-                      style={{ width: `${recordingProgress}%` }}
-                    />
-                  </div>
-                  <span className="text-xs text-muted-foreground">Recording... {Math.round(recordingProgress)}%</span>
-                </div>
-              )}
             </CardContent>
           </Card>
         ))}
