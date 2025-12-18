@@ -278,7 +278,7 @@ const About = () => {
           <div className="mb-12 md:hidden">
             <div className="text-center space-y-6">
               <h2 className="text-2xl font-bold text-foreground">
-                Who Is <span className="text-primary">SmartyGym</span> For?
+                Who Is <span className="text-primary">SmartyGym</span> For
               </h2>
               
         <div className="space-y-4 mt-6">
@@ -328,7 +328,7 @@ const About = () => {
                 <div className="text-center space-y-4">
                   <Users className="w-12 h-12 text-primary mx-auto" />
                   <h2 className="text-2xl md:text-3xl font-bold text-foreground">
-                    Who Is <span className="text-primary">SmartyGym</span> For?
+                    Who Is <span className="text-primary">SmartyGym</span> For
                   </h2>
                   <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 max-w-4xl mx-auto mt-6">
                     <div className="flex items-center gap-2 p-3 bg-primary/5 border border-primary/20 rounded-lg">

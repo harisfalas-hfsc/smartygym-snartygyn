@@ -9,7 +9,7 @@ export const WhoIsForCompositeTemplate = () => {
           {/* Title */}
           <div className="text-center">
             <h2 className="text-5xl font-bold text-foreground mb-2">
-              Who Is SmartyGym For?
+              Who Is SmartyGym For
             </h2>
             <p className="text-xl text-muted-foreground">Professional fitness training for everyone</p>
           </div>
