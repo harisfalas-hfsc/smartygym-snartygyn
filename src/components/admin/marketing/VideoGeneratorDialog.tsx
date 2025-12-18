@@ -13,7 +13,6 @@ import {
 } from "./videos/CanvasVideoRenderer";
 import smartyGymLogo from "@/assets/smarty-gym-logo.png";
 
-// Get the best supported MIME type for video recording
 const getSupportedMimeType = (): string | null => {
   const types = ["video/webm;codecs=vp8,opus", "video/webm;codecs=vp8", "video/webm"];
   return types.find((type) => MediaRecorder.isTypeSupported(type)) || null;
@@ -36,17 +35,29 @@ export const VideoGeneratorDialog = ({
   const [downloadUrl, setDownloadUrl] = useState<string | null>(null);
   const [browserSupported, setBrowserSupported] = useState(true);
 
-  const previewCanvasRef = useRef<HTMLCanvasElement | null>(null);
+  const canvasRef = useRef<HTMLCanvasElement | null>(null);
+  const rendererRef = useRef<CanvasVideoRenderer | null>(null);
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const chunksRef = useRef<Blob[]>([]);
-  const isGeneratingRef = useRef(false);
-  const rendererRef = useRef<CanvasVideoRenderer | null>(null);
+  const animationRef = useRef<number | null>(null);
+  const isRecordingRef = useRef(false);
 
   const { toast } = useToast();
 
-  const cleanup = useCallback(() => {
-    isGeneratingRef.current = false;
+  // Check browser support
+  useEffect(() => {
+    setBrowserSupported(getSupportedMimeType() !== null);
+  }, []);
 
+  // Cleanup function
+  const cleanup = useCallback(() => {
+    isRecordingRef.current = false;
+    
+    if (animationRef.current) {
+      cancelAnimationFrame(animationRef.current);
+      animationRef.current = null;
+    }
+    
     if (mediaRecorderRef.current?.state === "recording") {
       try {
         mediaRecorderRef.current.stop();
@@ -54,18 +65,11 @@ export const VideoGeneratorDialog = ({
         // ignore
       }
     }
-
     mediaRecorderRef.current = null;
     chunksRef.current = [];
   }, []);
 
-  // Check browser support on mount
-  useEffect(() => {
-    const mimeType = getSupportedMimeType();
-    setBrowserSupported(mimeType !== null);
-  }, []);
-
-  // Reset state when dialog opens/closes
+  // Initialize on dialog open
   useEffect(() => {
     if (open) {
       setIsGenerating(false);
@@ -75,151 +79,165 @@ export const VideoGeneratorDialog = ({
       setDownloadUrl(null);
       cleanup();
 
-      // Pass logo URL from Vite import (works in React component context)
+      // Create renderer with logo
       rendererRef.current = new CanvasVideoRenderer(smartyGymLogo);
 
-      // Wait for logo to load before drawing preview
-      rendererRef.current.ready().then(() => {
-        if (previewCanvasRef.current && rendererRef.current) {
-          previewCanvasRef.current.width = VIDEO_WIDTH;
-          previewCanvasRef.current.height = VIDEO_HEIGHT;
-
-          const ctx = previewCanvasRef.current.getContext("2d");
+      // Draw initial frame after a short delay for logo to load
+      setTimeout(() => {
+        const canvas = canvasRef.current;
+        const renderer = rendererRef.current;
+        if (canvas && renderer) {
+          canvas.width = VIDEO_WIDTH;
+          canvas.height = VIDEO_HEIGHT;
+          const ctx = canvas.getContext("2d");
           if (ctx) {
-            ctx.fillStyle = "hsl(0, 0%, 4%)";
-            ctx.fillRect(0, 0, VIDEO_WIDTH, VIDEO_HEIGHT);
-            rendererRef.current.drawFrame(ctx, 0);
+            renderer.drawFrame(ctx, 0);
           }
         }
-      });
+      }, 500);
     } else {
       cleanup();
     }
 
-    return () => {
-      // when closing/unmounting
-      cleanup();
-    };
+    return cleanup;
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open]);
 
   const startGeneration = useCallback(async () => {
-    const canvas = previewCanvasRef.current;
-    if (!canvas) return;
+    const canvas = canvasRef.current;
+    if (!canvas) {
+      console.error("No canvas");
+      return;
+    }
 
     const mimeType = getSupportedMimeType();
     if (!mimeType) {
       toast({
         title: "Browser not supported",
-        description: "Your browser doesn't support video recording. Try Chrome or Firefox.",
+        description: "Try Chrome or Firefox.",
         variant: "destructive",
       });
       return;
     }
 
-    // Create renderer with logo URL from Vite import
-    const renderer = rendererRef.current ?? new CanvasVideoRenderer(smartyGymLogo);
+    // Create fresh renderer
+    const renderer = new CanvasVideoRenderer(smartyGymLogo);
     rendererRef.current = renderer;
 
-    // Reset everything
+    // Wait for logo
+    console.log("⏳ Waiting for logo to load...");
+    await renderer.waitForLogo();
+    console.log("✅ Logo ready:", renderer.isReady());
+
+    // Reset state
     if (downloadUrl) URL.revokeObjectURL(downloadUrl);
     setDownloadUrl(null);
     setIsComplete(false);
     setProgress(0);
     setIsGenerating(true);
-    isGeneratingRef.current = true;
+    isRecordingRef.current = true;
     chunksRef.current = [];
 
-    try {
-      const ctx = canvas.getContext("2d");
-      if (!ctx) throw new Error("Could not get canvas context");
-
-      await renderer.ready();
-
-      // Draw first frame
-      renderer.drawFrame(ctx, 0);
-
-      const stream = canvas.captureStream(VIDEO_FPS);
-      const mediaRecorder = new MediaRecorder(stream, {
-        mimeType,
-        videoBitsPerSecond: 6_000_000,
-      });
-
-      mediaRecorderRef.current = mediaRecorder;
-
-      mediaRecorder.ondataavailable = (e) => {
-        if (e.data.size > 0) chunksRef.current.push(e.data);
-      };
-
-      mediaRecorder.onstop = () => {
-        if (chunksRef.current.length === 0) {
-          setIsGenerating(false);
-          toast({
-            title: "Generation failed",
-            description: "No video data was captured.",
-            variant: "destructive",
-          });
-          return;
-        }
-
-        const blob = new Blob(chunksRef.current, { type: mimeType });
-        const url = URL.createObjectURL(blob);
-        setDownloadUrl(url);
-        setIsComplete(true);
-        setIsGenerating(false);
-        setProgress(100);
-
-        toast({
-          title: "Video generated!",
-          description: "Your video is ready to download.",
-        });
-      };
-
-      mediaRecorder.start(500);
-
-      const frameDurationMs = 1000 / VIDEO_FPS;
-      const totalFrames = Math.ceil(VIDEO_DURATION_MS / frameDurationMs);
-      const startAt = performance.now();
-
-      for (let frame = 0; frame < totalFrames; frame++) {
-        if (!isGeneratingRef.current) break;
-
-        const tMs = frame * frameDurationMs;
-        renderer.drawFrame(ctx, tMs);
-
-        const pct = Math.min((tMs / VIDEO_DURATION_MS) * 100, 99);
-        setProgress(pct);
-
-        const nextAt = startAt + (frame + 1) * frameDurationMs;
-        const sleepFor = Math.max(0, nextAt - performance.now());
-        // eslint-disable-next-line no-await-in-loop
-        await new Promise((r) => setTimeout(r, sleepFor));
-      }
-
-      setProgress(100);
-      isGeneratingRef.current = false;
-
-      if (mediaRecorder.state === "recording") {
-        mediaRecorder.stop();
-      }
-    } catch (error) {
-      console.error("Video generation error:", error);
-      cleanup();
+    // Setup canvas
+    canvas.width = VIDEO_WIDTH;
+    canvas.height = VIDEO_HEIGHT;
+    const ctx = canvas.getContext("2d", { alpha: false });
+    
+    if (!ctx) {
+      console.error("No context");
       setIsGenerating(false);
-      toast({
-        title: "Generation failed",
-        description: "Could not generate video. Please try again.",
-        variant: "destructive",
-      });
+      return;
     }
-  }, [toast, cleanup, downloadUrl]);
+
+    // Draw first frame
+    renderer.drawFrame(ctx, 0);
+
+    // Create stream and recorder
+    const stream = canvas.captureStream(VIDEO_FPS);
+    const mediaRecorder = new MediaRecorder(stream, {
+      mimeType,
+      videoBitsPerSecond: 8_000_000,
+    });
+    mediaRecorderRef.current = mediaRecorder;
+
+    // Collect chunks
+    mediaRecorder.ondataavailable = (e) => {
+      if (e.data.size > 0) {
+        chunksRef.current.push(e.data);
+        console.log("📦 Chunk received:", e.data.size, "bytes");
+      }
+    };
+
+    // Handle recording stop
+    mediaRecorder.onstop = () => {
+      console.log("🛑 Recording stopped, chunks:", chunksRef.current.length);
+      
+      if (chunksRef.current.length === 0) {
+        setIsGenerating(false);
+        toast({
+          title: "Generation failed",
+          description: "No video data captured.",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      const blob = new Blob(chunksRef.current, { type: mimeType });
+      console.log("📼 Video blob size:", blob.size);
+      
+      const url = URL.createObjectURL(blob);
+      setDownloadUrl(url);
+      setIsComplete(true);
+      setIsGenerating(false);
+      setProgress(100);
+
+      toast({
+        title: "Video generated!",
+        description: "Ready to download.",
+      });
+    };
+
+    // Start recording with frequent data collection
+    mediaRecorder.start(100);
+    console.log("🎬 Recording started");
+
+    // Animation loop using requestAnimationFrame
+    const startTime = performance.now();
+
+    const animate = () => {
+      if (!isRecordingRef.current) {
+        return;
+      }
+
+      const elapsed = performance.now() - startTime;
+      const pct = Math.min((elapsed / VIDEO_DURATION_MS) * 100, 100);
+      setProgress(pct);
+
+      // Draw current frame
+      renderer.drawFrame(ctx, elapsed);
+
+      if (elapsed < VIDEO_DURATION_MS) {
+        animationRef.current = requestAnimationFrame(animate);
+      } else {
+        // Done - stop recording
+        console.log("✅ Animation complete");
+        isRecordingRef.current = false;
+        
+        if (mediaRecorder.state === "recording") {
+          mediaRecorder.stop();
+        }
+      }
+    };
+
+    // Start animation
+    animationRef.current = requestAnimationFrame(animate);
+
+  }, [toast, downloadUrl, cleanup]);
 
   const handleDownload = () => {
     if (!downloadUrl) return;
 
-    const mimeType = getSupportedMimeType() ?? "video/webm";
-    const ext = mimeType.includes("webm") ? "webm" : "mp4";
-
+    const ext = "webm";
     const link = document.createElement("a");
     link.href = downloadUrl;
     link.download = `${videoName.toLowerCase().replace(/\s+/g, "-")}-promo.${ext}`;
@@ -234,6 +252,7 @@ export const VideoGeneratorDialog = ({
   };
 
   const handleRetry = () => {
+    cleanup();
     setIsComplete(false);
     if (downloadUrl) URL.revokeObjectURL(downloadUrl);
     setDownloadUrl(null);
@@ -252,29 +271,28 @@ export const VideoGeneratorDialog = ({
           {!browserSupported && (
             <div className="flex items-center gap-2 p-3 bg-destructive/10 text-destructive rounded-lg">
               <AlertTriangle className="h-5 w-5" />
-              <span className="text-sm">
-                Your browser doesn't support video recording. Try Chrome or Firefox.
-              </span>
+              <span className="text-sm">Browser not supported. Try Chrome or Firefox.</span>
             </div>
           )}
 
-          {/* Video canvas (9:16 preview; recorded at 1080x1920) */}
-          <div className="relative mx-auto rounded-lg overflow-hidden shadow-2xl w-[360px] h-[640px] bg-background">
+          <div className="relative mx-auto rounded-lg overflow-hidden shadow-2xl w-[360px] h-[640px] bg-black">
             <canvas
-              ref={previewCanvasRef}
+              ref={canvasRef}
               className="w-full h-full"
-              aria-label="Promotional video preview"
+              aria-label="Video preview"
             />
           </div>
 
           {isGenerating && (
             <div className="space-y-2">
               <div className="flex items-center justify-between text-sm">
-                <span className="text-muted-foreground">Generating video...</span>
+                <span className="text-muted-foreground">Generating...</span>
                 <span className="font-medium">{Math.round(progress)}%</span>
               </div>
               <Progress value={progress} className="h-2" />
-              <p className="text-xs text-muted-foreground text-center">Please wait, this takes about 25 seconds</p>
+              <p className="text-xs text-muted-foreground text-center">
+                Please wait ~25 seconds
+              </p>
             </div>
           )}
 
