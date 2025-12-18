@@ -1,7 +1,7 @@
 import { Document, Packer, Paragraph, TextRun, HeadingLevel, AlignmentType } from 'docx';
 import { saveAs } from 'file-saver';
 
-interface ContentSection {
+export interface ContentSection {
   type: 'heading' | 'paragraph' | 'bullet';
   content: string;
   level?: 1 | 2 | 3;
