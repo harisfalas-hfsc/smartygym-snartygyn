@@ -102,6 +102,51 @@ export default {
           "0%, 100%": { boxShadow: "0 0 20px hsl(var(--primary) / 0.3)" },
           "50%": { boxShadow: "0 0 40px hsl(var(--primary) / 0.6)" },
         },
+        "expand-up": {
+          "0%": { transform: "translateY(100%) scale(0.8)", opacity: "0" },
+          "100%": { transform: "translateY(0) scale(1)", opacity: "1" },
+        },
+        "slide-in-left": {
+          "0%": { transform: "translateX(-100%)", opacity: "0" },
+          "100%": { transform: "translateX(0)", opacity: "1" },
+        },
+        "slide-out-left": {
+          "0%": { transform: "translateX(0)", opacity: "1" },
+          "100%": { transform: "translateX(-100%)", opacity: "0" },
+        },
+        "slide-out-right": {
+          "0%": { transform: "translateX(0)", opacity: "1" },
+          "100%": { transform: "translateX(100%)", opacity: "0" },
+        },
+        "slide-down-out": {
+          "0%": { transform: "translateY(0)", opacity: "1" },
+          "100%": { transform: "translateY(100%)", opacity: "0" },
+        },
+        "zoom-in-slow": {
+          "0%": { transform: "scale(1)" },
+          "100%": { transform: "scale(1.1)" },
+        },
+        "pop-in": {
+          "0%": { transform: "scale(0)", opacity: "0" },
+          "70%": { transform: "scale(1.1)", opacity: "1" },
+          "100%": { transform: "scale(1)", opacity: "1" },
+        },
+        "pop-out": {
+          "0%": { transform: "scale(1)", opacity: "1" },
+          "100%": { transform: "scale(0)", opacity: "0" },
+        },
+        "glow-pulse": {
+          "0%, 100%": { filter: "drop-shadow(0 0 10px rgba(100, 181, 246, 0.4))" },
+          "50%": { filter: "drop-shadow(0 0 30px rgba(100, 181, 246, 0.8))" },
+        },
+        "card-center-in": {
+          "0%": { transform: "scale(0.8)", opacity: "0" },
+          "100%": { transform: "scale(1)", opacity: "1" },
+        },
+        "fade-out": {
+          "0%": { opacity: "1" },
+          "100%": { opacity: "0" },
+        },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
@@ -113,6 +158,17 @@ export default {
         "bounce-in": "bounce-in 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55) forwards",
         "fade-in": "fade-in 0.4s ease-out forwards",
         "pulse-glow": "pulse-glow 2s ease-in-out infinite",
+        "expand-up": "expand-up 1s cubic-bezier(0.16, 1, 0.3, 1) forwards",
+        "slide-in-left": "slide-in-left 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards",
+        "slide-out-left": "slide-out-left 0.4s ease-in forwards",
+        "slide-out-right": "slide-out-right 0.4s ease-in forwards",
+        "slide-down-out": "slide-down-out 0.4s ease-in forwards",
+        "zoom-in-slow": "zoom-in-slow 4s ease-out forwards",
+        "pop-in": "pop-in 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55) forwards",
+        "pop-out": "pop-out 0.2s ease-in forwards",
+        "glow-pulse": "glow-pulse 1.5s ease-in-out infinite",
+        "card-center-in": "card-center-in 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards",
+        "fade-out": "fade-out 0.5s ease-out forwards",
       },
     },
   },
