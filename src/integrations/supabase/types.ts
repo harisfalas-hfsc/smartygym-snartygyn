@@ -1120,6 +1120,59 @@ export type Database = {
         }
         Relationships: []
       }
+      promotional_videos: {
+        Row: {
+          component_code: string | null
+          component_name: string | null
+          created_at: string | null
+          description: string | null
+          duration: string | null
+          id: string
+          is_current: boolean
+          name: string
+          parent_version_id: string | null
+          updated_at: string | null
+          version: number
+          video_url: string | null
+        }
+        Insert: {
+          component_code?: string | null
+          component_name?: string | null
+          created_at?: string | null
+          description?: string | null
+          duration?: string | null
+          id?: string
+          is_current?: boolean
+          name: string
+          parent_version_id?: string | null
+          updated_at?: string | null
+          version?: number
+          video_url?: string | null
+        }
+        Update: {
+          component_code?: string | null
+          component_name?: string | null
+          created_at?: string | null
+          description?: string | null
+          duration?: string | null
+          id?: string
+          is_current?: boolean
+          name?: string
+          parent_version_id?: string | null
+          updated_at?: string | null
+          version?: number
+          video_url?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "promotional_videos_parent_version_id_fkey"
+            columns: ["parent_version_id"]
+            isOneToOne: false
+            referencedRelation: "promotional_videos"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       rate_limits: {
         Row: {
           created_at: string
