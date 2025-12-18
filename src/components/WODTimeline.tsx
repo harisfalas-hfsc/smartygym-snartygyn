@@ -78,13 +78,15 @@ export const WODTimeline = () => {
     refetchOnWindowFocus: false,
   });
 
-  // Fetch current WODs (today) with longer cache
+  // Fetch current WODs (today) with longer cache - FILTER BY generated_for_date
   const { data: todayWODs, isLoading: loadingToday } = useQuery({
-    queryKey: ["today-wods-timeline"],
+    queryKey: ["today-wods-timeline", format(new Date(), "yyyy-MM-dd")],
     queryFn: async () => {
+      const todayDateStr = format(new Date(), "yyyy-MM-dd");
       const { data, error } = await supabase
         .from("admin_workouts")
         .select("category, format, difficulty, difficulty_stars")
+        .eq("generated_for_date", todayDateStr)
         .eq("is_workout_of_day", true)
         .limit(1);
       
