@@ -701,12 +701,63 @@ FOCUS: Mental fortitude, work capacity, competitive spirit.` : ""}
 ═══════════════════════════════════════════════════════════════════════════════
 RESPONSE FORMAT (JSON ONLY - NO MARKDOWN):
 ═══════════════════════════════════════════════════════════════════════════════
+
+CRITICAL HTML FORMATTING RULES (FOLLOW EXACTLY - THIS IS NON-NEGOTIABLE):
+
+1. SECTION TITLES: Bold + Underlined with duration in title
+   Format: <p class="tiptap-paragraph"><strong><u>Warm Up 15'</u></strong></p>
+   
+2. EXERCISE LISTS: MUST use bullet lists, NOT numbered lists or <br> separators
+   Format:
+   <ul class="tiptap-bullet-list">
+   <li class="tiptap-list-item"><p class="tiptap-paragraph">Run 5 minutes</p></li>
+   <li class="tiptap-list-item"><p class="tiptap-paragraph">Jumping Rope 5 Minutes</p></li>
+   </ul>
+
+3. CIRCUIT/ROUND HEADERS: Bullet point with bold only (no underline)
+   Format: <li class="tiptap-list-item"><p class="tiptap-paragraph"><strong>8 Rounds of:</strong></p></li>
+
+4. CIRCUIT EXERCISE SETS: Plain paragraph with dash separators after round header
+   Format: <p class="tiptap-paragraph">12 Goblet Squats - 12 Upright Row - 24 Jump Squats</p>
+
+5. SECTION SEPARATORS: Empty paragraph between sections
+   Format: <p class="tiptap-paragraph"></p>
+
+6. THREE SECTIONS REQUIRED in main_workout: Warm Up, Main Workout, Cool Down
+
+GOLD STANDARD TEMPLATE (FOLLOW THIS EXACTLY):
+<p class="tiptap-paragraph"><strong><u>Warm Up 15'</u></strong></p>
+<ul class="tiptap-bullet-list">
+<li class="tiptap-list-item"><p class="tiptap-paragraph">Run 5 minutes</p></li>
+<li class="tiptap-list-item"><p class="tiptap-paragraph">Jumping Rope 5 Minutes</p></li>
+<li class="tiptap-list-item"><p class="tiptap-paragraph">Hip Circles - Arm Circles 5 minutes</p></li>
+</ul>
+<p class="tiptap-paragraph"></p>
+<p class="tiptap-paragraph"><strong><u>Main Workout</u></strong></p>
+<p class="tiptap-paragraph"></p>
+<ul class="tiptap-bullet-list">
+<li class="tiptap-list-item"><p class="tiptap-paragraph"><strong>8 Rounds of:</strong></p></li>
+</ul>
+<p class="tiptap-paragraph">12 Goblet Squats - 12 Upright Row - 24 Jump Squats</p>
+<p class="tiptap-paragraph"></p>
+<p class="tiptap-paragraph"><strong><u>Cool Down:</u></strong></p>
+<ul class="tiptap-bullet-list">
+<li class="tiptap-list-item"><p class="tiptap-paragraph">Foam Rolling & Stretching</p></li>
+</ul>
+
+TIPS FORMAT: Separate paragraphs OR single paragraph with <br> line breaks
+<p class="tiptap-paragraph">Pace yourself early. Five minutes is longer than it sounds.</p>
+<p class="tiptap-paragraph">Prioritize perfect form over speed.</p>
+
+INSTRUCTIONS FORMAT: Plain paragraphs with clear guidance
+<p class="tiptap-paragraph">Complete each exercise for the prescribed time. Rest as needed between exercises.</p>
+
 {
   "name": "Creative, motivating workout name (3-5 words, unique)",
   "description": "2-3 sentence HTML description with <p class='tiptap-paragraph'> tags",
-  "main_workout": "Complete workout with exercises, sets, reps, rest in HTML format",
-  "instructions": "Step-by-step guidance for the workout in HTML format",
-  "tips": "2-3 coaching tips for optimal performance in HTML format"
+  "main_workout": "MUST follow the gold standard template above with Warm Up, Main Workout, Cool Down sections using bullet lists",
+  "instructions": "Step-by-step guidance in <p class='tiptap-paragraph'> tags",
+  "tips": "2-4 coaching tips as separate paragraphs or with <br> line breaks"
 }`;
 
       // Retry mechanism: 3 attempts with 2-second delays
