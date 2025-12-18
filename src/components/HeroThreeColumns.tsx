@@ -173,7 +173,7 @@ export const HeroThreeColumns = () => {
       {/* Column 2: Who is SmartyGym For? */}
       <div className="pt-8">
         <h3 className="text-lg font-bold text-foreground mb-4">
-          Who is <span className="text-primary">SmartyGym</span> For?
+          Who is <span className="text-primary">SmartyGym</span> For
         </h3>
         <div className="space-y-1.5">
           {whoIsFor.map((item, index) => (
