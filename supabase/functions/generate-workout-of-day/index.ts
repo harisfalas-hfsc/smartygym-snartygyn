@@ -230,18 +230,41 @@ serve(async (req) => {
       // No body or invalid JSON - use defaults
     }
     
-    const today = new Date();
-    const todayStr = today.toISOString().split('T')[0];
+    // ═══════════════════════════════════════════════════════════════════════════════
+    // CRITICAL: Use Cyprus timezone (Europe/Athens, UTC+2/+3) for date calculation
+    // The cron runs at 22:00 UTC which is midnight in Cyprus - we need the NEW day's date
+    // ═══════════════════════════════════════════════════════════════════════════════
+    const now = new Date();
+    
+    // Calculate Cyprus time (UTC+2 in winter, UTC+3 in summer)
+    // Cyprus is in EET/EEST timezone
+    const cyprusOffset = 2; // Base offset (winter). In summer it's +3
+    const cyprusTime = new Date(now.getTime() + cyprusOffset * 60 * 60 * 1000);
+    
+    // Check if daylight saving time applies (rough check for EET/EEST)
+    const month = cyprusTime.getUTCMonth();
+    const isDST = month >= 2 && month <= 9; // March-October roughly
+    const actualOffset = isDST ? 3 : 2;
+    
+    const cyprusDate = new Date(now.getTime() + actualOffset * 60 * 60 * 1000);
+    const cyprusDateStr = cyprusDate.toISOString().split('T')[0];
+    
+    logStep("Timezone calculation", {
+      utcNow: now.toISOString(),
+      cyprusOffset: actualOffset,
+      cyprusDateStr,
+      isDST
+    });
     
     // Determine the effective date for generation
-    const effectiveDate = targetDate || todayStr;
-    const isPreGeneration = targetDate && targetDate !== todayStr;
+    const effectiveDate = targetDate || cyprusDateStr;
+    const isPreGeneration = targetDate && targetDate !== cyprusDateStr;
     
     logStep("Starting WOD generation", { 
       effectiveDate, 
       isPreGeneration,
       targetDate,
-      todayStr
+      cyprusDateStr
     });
 
     const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
@@ -289,7 +312,7 @@ serve(async (req) => {
       const { data: preGenForToday } = await supabase
         .from("admin_workouts")
         .select("id, name, category")
-        .eq("generated_for_date", todayStr)
+        .eq("generated_for_date", cyprusDateStr)
         .eq("is_workout_of_day", true);
       
       if (preGenForToday && preGenForToday.length >= 2) {
@@ -338,9 +361,10 @@ serve(async (req) => {
         );
       }
       
-      // Then check for same-day created WODs
-      const todayStart = new Date(today.getFullYear(), today.getMonth(), today.getDate()).toISOString();
-      const todayEnd = new Date(today.getFullYear(), today.getMonth(), today.getDate() + 1).toISOString();
+      // Then check for same-day created WODs (using Cyprus date boundaries)
+      const cyprusDateObj = new Date(cyprusDateStr + 'T00:00:00Z');
+      const todayStart = cyprusDateObj.toISOString();
+      const todayEnd = new Date(cyprusDateObj.getTime() + 24 * 60 * 60 * 1000).toISOString();
       
       const { data: existingTodayWODs } = await supabase
         .from("admin_workouts")
@@ -476,7 +500,7 @@ serve(async (req) => {
     });
 
     // Check for manual override for today
-    const override = checkManualOverride(todayStr, manualOverrides);
+    const override = checkManualOverride(effectiveDate, manualOverrides);
     
     let category: string;
     let selectedDifficulty: { name: string; stars: number };
@@ -918,7 +942,6 @@ RESPONSE FORMAT (JSON ONLY - NO MARKDOWN):
       current_category: getCategoryForDay(getDayInCycle(state.day_count + 1)),
       last_equipment: "BOTH",
       last_difficulty: selectedDifficulty.name,
-      last_difficulty_stars: selectedDifficulty.stars,
       format_usage: updatedUsage,
       equipment_bodyweight_count: (state.equipment_bodyweight_count || 0) + 1,
       equipment_with_count: (state.equipment_with_count || 0) + 1,
