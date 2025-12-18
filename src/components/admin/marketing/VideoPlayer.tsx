@@ -8,6 +8,7 @@ import { useToast } from "@/hooks/use-toast";
 
 interface VideoPlayerProps {
   day: number | null;
+  autoDownload?: boolean;
   onClose: () => void;
 }
 
@@ -16,7 +17,7 @@ const videoDurations: Record<number, number> = {
   2: 20000, // 20 seconds
 };
 
-export const VideoPlayer = ({ day, onClose }: VideoPlayerProps) => {
+export const VideoPlayer = ({ day, autoDownload, onClose }: VideoPlayerProps) => {
   const [isPlaying, setIsPlaying] = useState(false);
   const [progress, setProgress] = useState(0);
   const [currentTime, setCurrentTime] = useState(0);
@@ -166,10 +167,24 @@ export const VideoPlayer = ({ day, onClose }: VideoPlayerProps) => {
     }
   };
 
+  useEffect(() => {
+    if (!day || !autoDownload) return;
+
+    const t = window.setTimeout(() => {
+      // Trigger recording/download automatically from the gallery button
+      if (!isRecording) void handleDownload();
+    }, 350);
+
+    return () => window.clearTimeout(t);
+    // Intentionally omit handleDownload to avoid effect loops while recording.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [day, autoDownload, isRecording]);
+
   const formatTime = (ms: number) => {
     const seconds = Math.floor(ms / 1000);
     return `0:${seconds.toString().padStart(2, '0')}`;
   };
+
 
   const renderVideo = () => {
     if (!day) return null;

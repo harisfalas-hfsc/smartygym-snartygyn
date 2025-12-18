@@ -1,5 +1,5 @@
-import { cn } from "@/lib/utils";
 import { VideoBrandingOverlay } from "./VideoBrandingOverlay";
+import { PhoneMockup } from "./PhoneMockup";
 
 interface Day1VideoProps {
   currentTime: number;
@@ -16,172 +16,125 @@ export const Day1Video = ({ currentTime }: Day1VideoProps) => {
     cta: { start: 18000, end: 20000 },
   };
 
-  const isInScene = (scene: { start: number; end: number }) =>
-    currentTime >= scene.start && currentTime < scene.end;
-
   const getProgress = (scene: { start: number; end: number }) => {
     if (currentTime < scene.start) return 0;
     if (currentTime >= scene.end) return 1;
     return (currentTime - scene.start) / (scene.end - scene.start);
   };
 
+  const activeKey = (Object.keys(scenes) as Array<keyof typeof scenes>).find((k) => {
+    const s = scenes[k];
+    return currentTime >= s.start && currentTime < s.end;
+  }) ?? "cta";
+
+  const activeScene = scenes[activeKey];
+  const p = getProgress(activeScene);
+
+  const bulletStyle = (i: number) => {
+    const threshold = i * 0.22;
+    const visible = p >= threshold;
+    return {
+      opacity: visible ? 1 : 0,
+      transform: visible ? "translateX(0)" : "translateX(48px)",
+      transition: `all 520ms cubic-bezier(0.16, 1, 0.3, 1) ${i * 120}ms`,
+    } as const;
+  };
+
+  const data: Record<keyof typeof scenes, { headline: string; sub?: string; bullets: string[] }> = {
+    tagline: {
+      headline: "What is SmartyGym?",
+      sub: "Your personal training platform",
+      bullets: ["Anywhere, anytime", "Built by real coaches", "Simple. Effective."],
+    },
+    features: {
+      headline: "Everything you need",
+      sub: "All in one app",
+      bullets: ["500+ Workouts", "Training Programs", "Daily Rituals"],
+    },
+    human: {
+      headline: "No AI workouts",
+      sub: "Real expertise only",
+      bullets: ["100% Human programming", "Coaches you can trust", "Results that last"],
+    },
+    categories: {
+      headline: "Train your way",
+      sub: "7 workout categories",
+      bullets: ["Strength", "Cardio", "Mobility"],
+    },
+    cta: {
+      headline: "Start today",
+      sub: "Your gym—re-imagined",
+      bullets: ["Download SmartyGym", "Train anywhere", "Stay consistent"],
+    },
+  };
+
+  const scene = data[activeKey];
+
   return (
     <VideoBrandingOverlay tagline="Your Gym Re-imagined. Anywhere, Anytime.">
-      <div className="w-full h-full flex items-center justify-center overflow-hidden px-4">
-        {/* Scene 1: Tagline emphasis (0-4s) */}
+      <div className="relative w-full h-full flex items-center justify-center">
         <div
-          className={cn(
-            "absolute flex flex-col items-center justify-center transition-all duration-700",
-            isInScene(scenes.tagline) 
-              ? "opacity-100 translate-y-0" 
-              : "opacity-0 translate-y-8"
-          )}
+          key={activeKey}
+          className="w-full h-full flex flex-col items-center justify-center gap-4 px-2 animate-fade-in"
         >
+          {/* Headline */}
           <div className="text-center">
-            <p 
-              className="text-lg font-bold text-foreground mb-2"
-              style={{
-                animationDelay: '0.1s',
-                opacity: isInScene(scenes.tagline) ? 1 : 0,
-                transform: isInScene(scenes.tagline) ? 'translateY(0)' : 'translateY(20px)',
-                transition: 'all 0.6s cubic-bezier(0.16, 1, 0.3, 1)'
-              }}
-            >
-              What is SmartyGym?
+            <p className="text-lg font-extrabold text-foreground tracking-tight">
+              {scene.headline}
             </p>
-            <p 
-              className="text-base text-primary font-semibold"
-              style={{
-                opacity: getProgress(scenes.tagline) > 0.3 ? 1 : 0,
-                transform: getProgress(scenes.tagline) > 0.3 ? 'translateY(0)' : 'translateY(20px)',
-                transition: 'all 0.6s cubic-bezier(0.16, 1, 0.3, 1) 0.2s'
-              }}
-            >
-              Your Personal Training Platform
-            </p>
+            {scene.sub ? (
+              <p className="mt-1 text-sm font-semibold text-primary">{scene.sub}</p>
+            ) : null}
           </div>
-        </div>
 
-        {/* Scene 2: Features (4-9s) */}
-        <div
-          className={cn(
-            "absolute flex flex-col items-center justify-center gap-2 transition-all duration-500",
-            isInScene(scenes.features) ? "opacity-100" : "opacity-0"
-          )}
-        >
-          {['500+ Workouts', 'Training Programs', 'Daily Rituals'].map((feature, i) => (
-            <div
-              key={feature}
-              className="bg-primary/10 border-2 border-primary/60 rounded-xl px-5 py-2.5 shadow-lg"
-              style={{
-                opacity: getProgress(scenes.features) > (i * 0.25) ? 1 : 0,
-                transform: getProgress(scenes.features) > (i * 0.25) 
-                  ? 'translateX(0) scale(1)' 
-                  : 'translateX(-40px) scale(0.9)',
-                transition: `all 0.5s cubic-bezier(0.16, 1, 0.3, 1) ${i * 0.15}s`
-              }}
-            >
-              <p className="text-foreground font-bold text-center text-sm">{feature}</p>
+          {/* Phone */}
+          <PhoneMockup>
+            <div className="h-full w-full bg-gradient-to-b from-primary/15 to-background flex flex-col items-center justify-center p-5">
+              <div className="text-center">
+                <p className="text-sm font-bold text-foreground">SmartyGym</p>
+                <p className="mt-1 text-xs text-muted-foreground">Day {activeKey === "cta" ? "1" : "1"}</p>
+              </div>
+              <div className="mt-4 w-full rounded-xl border border-primary/30 bg-primary/10 p-3">
+                <div className="h-2 w-24 rounded-full bg-primary/30" />
+                <div className="mt-2 h-2 w-16 rounded-full bg-primary/20" />
+                <div className="mt-4 grid grid-cols-2 gap-2">
+                  <div className="h-10 rounded-lg bg-primary/10 border border-primary/20" />
+                  <div className="h-10 rounded-lg bg-primary/10 border border-primary/20" />
+                </div>
+              </div>
             </div>
-          ))}
-        </div>
+          </PhoneMockup>
 
-        {/* Scene 3: 100% Human (9-14s) */}
-        <div
-          className={cn(
-            "absolute flex flex-col items-center justify-center transition-all duration-700",
-            isInScene(scenes.human) ? "opacity-100" : "opacity-0"
-          )}
-        >
-          <div className="text-center">
-            <p 
-              className="text-2xl font-black text-foreground"
-              style={{
-                opacity: isInScene(scenes.human) ? 1 : 0,
-                transform: isInScene(scenes.human) ? 'scale(1)' : 'scale(0.5)',
-                transition: 'all 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55)'
-              }}
-            >
-              100% Human.
-            </p>
-            <p 
-              className="text-2xl font-black text-primary"
-              style={{
-                opacity: getProgress(scenes.human) > 0.2 ? 1 : 0,
-                transform: getProgress(scenes.human) > 0.2 ? 'scale(1)' : 'scale(0.5)',
-                transition: 'all 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55) 0.15s'
-              }}
-            >
-              0% AI.
-            </p>
-            <div 
-              className="mt-3 w-12 h-12 mx-auto rounded-full border-3 border-primary bg-primary/20 flex items-center justify-center shadow-lg"
-              style={{
-                opacity: getProgress(scenes.human) > 0.4 ? 1 : 0,
-                transform: getProgress(scenes.human) > 0.4 ? 'scale(1)' : 'scale(0)',
-                transition: 'all 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55) 0.3s'
-              }}
-            >
-              <span className="text-xl text-primary">✓</span>
-            </div>
-          </div>
-        </div>
-
-        {/* Scene 4: Categories (14-18s) */}
-        <div
-          className={cn(
-            "absolute flex flex-col items-center justify-center gap-2 transition-all duration-500",
-            isInScene(scenes.categories) ? "opacity-100" : "opacity-0"
-          )}
-        >
-          <p 
-            className="text-foreground font-bold text-sm mb-1"
-            style={{
-              opacity: isInScene(scenes.categories) ? 1 : 0,
-              transform: isInScene(scenes.categories) ? 'translateY(0)' : 'translateY(-15px)',
-              transition: 'all 0.5s ease'
-            }}
-          >
-            7 Workout Categories
-          </p>
-          <div className="flex flex-wrap gap-2 justify-center max-w-[220px]">
-            {['Strength', 'Cardio', 'Metabolic', 'Mobility', 'Challenge', 'Calorie', 'WOD'].map((cat, i) => (
-              <span
-                key={cat}
-                className="bg-primary/15 border-2 border-primary/50 text-foreground text-xs px-3 py-1 rounded-full font-semibold"
-                style={{
-                  opacity: getProgress(scenes.categories) > (i * 0.12) ? 1 : 0,
-                  transform: getProgress(scenes.categories) > (i * 0.12) 
-                    ? 'scale(1)' 
-                    : 'scale(0)',
-                  transition: `all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55) ${i * 0.08}s`
-                }}
+          {/* Sliding bullets (like your example) */}
+          <div className="w-full max-w-[260px] space-y-2">
+            {scene.bullets.map((text, i) => (
+              <div
+                key={text}
+                className="flex items-center gap-3 rounded-xl border border-primary/40 bg-primary/10 px-4 py-2 shadow-sm"
+                style={bulletStyle(i)}
               >
-                {cat}
-              </span>
+                <span className="h-2 w-2 rounded-full bg-primary" />
+                <p className="text-sm font-semibold text-foreground">{text}</p>
+              </div>
             ))}
           </div>
-        </div>
 
-        {/* Scene 5: CTA (18-20s) */}
-        <div
-          className={cn(
-            "absolute flex flex-col items-center justify-center transition-all duration-500",
-            isInScene(scenes.cta) ? "opacity-100" : "opacity-0"
-          )}
-        >
-          <div 
-            className="bg-primary text-primary-foreground px-6 py-3 rounded-full text-sm font-bold shadow-lg animate-pulse-glow"
-            style={{
-              opacity: isInScene(scenes.cta) ? 1 : 0,
-              transform: isInScene(scenes.cta) ? 'scale(1)' : 'scale(0.5)',
-              transition: 'all 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55)'
-            }}
-          >
-            Start Your Journey 💪
-          </div>
+          {/* CTA pill */}
+          {activeKey === "cta" ? (
+            <div
+              className="mt-1 bg-primary text-primary-foreground px-6 py-2.5 rounded-full text-sm font-extrabold shadow-lg animate-pulse-glow"
+              style={{
+                opacity: p > 0.3 ? 1 : 0,
+                transform: p > 0.3 ? "scale(1)" : "scale(0.92)",
+                transition: "all 420ms cubic-bezier(0.16, 1, 0.3, 1)",
+              }}
+            >
+              Start Your Journey
+            </div>
+          ) : null}
         </div>
       </div>
     </VideoBrandingOverlay>
   );
 };
+
