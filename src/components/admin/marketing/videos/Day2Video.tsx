@@ -1,5 +1,6 @@
 import { cn } from "@/lib/utils";
 import { VideoBrandingOverlay } from "./VideoBrandingOverlay";
+import harisPhoto from "@/assets/haris-falas-coach.png";
 
 interface Day2VideoProps {
   currentTime: number;
@@ -7,14 +8,13 @@ interface Day2VideoProps {
 }
 
 export const Day2Video = ({ currentTime }: Day2VideoProps) => {
-  // Scene timings in milliseconds
+  // Scene timings in milliseconds - 20 seconds total
   const scenes = {
-    intro: { start: 0, end: 4000 },
-    coachCard: { start: 4000, end: 10000 },
-    credentials: { start: 10000, end: 16000 },
-    quote: { start: 16000, end: 22000 },
-    brandPromise: { start: 22000, end: 27000 },
-    cta: { start: 27000, end: 30000 },
+    intro: { start: 0, end: 3000 },
+    coachCard: { start: 3000, end: 8000 },
+    credentials: { start: 8000, end: 13000 },
+    brandPromise: { start: 13000, end: 17000 },
+    cta: { start: 17000, end: 20000 },
   };
 
   const isInScene = (scene: { start: number; end: number }) =>
@@ -28,17 +28,17 @@ export const Day2Video = ({ currentTime }: Day2VideoProps) => {
 
   return (
     <VideoBrandingOverlay tagline="Meet the Expert Behind Every Workout">
-      <div className="w-full h-full flex items-center justify-center overflow-hidden px-4">
-        {/* Scene 1: Intro (0-4s) */}
+      <div className="w-full h-full flex items-center justify-center overflow-hidden px-3">
+        {/* Scene 1: Intro (0-3s) */}
         <div
           className={cn(
             "absolute flex flex-col items-center justify-center transition-all duration-500",
             isInScene(scenes.intro) ? "opacity-100 scale-100" : "opacity-0 scale-90"
           )}
         >
-          <p className="text-base font-bold text-foreground mb-1">Meet Your Coach</p>
+          <p className="text-sm font-bold text-foreground mb-1">Meet Your Coach</p>
           <div 
-            className="w-20 h-1 bg-primary rounded-full"
+            className="w-16 h-0.5 bg-primary rounded-full"
             style={{ 
               transform: `scaleX(${getProgress(scenes.intro)})`,
               transformOrigin: 'center'
@@ -46,36 +46,40 @@ export const Day2Video = ({ currentTime }: Day2VideoProps) => {
           />
         </div>
 
-        {/* Scene 2: Coach Card (4-10s) */}
+        {/* Scene 2: Coach Card (3-8s) */}
         <div
           className={cn(
-            "absolute flex flex-col items-center justify-center p-4 transition-all duration-500",
+            "absolute flex flex-col items-center justify-center p-3 transition-all duration-500",
             isInScene(scenes.coachCard) ? "opacity-100" : "opacity-0"
           )}
         >
           <div 
-            className="bg-gradient-to-b from-primary/20 to-transparent border border-primary/40 rounded-xl p-4 w-full max-w-[180px]"
+            className="bg-primary/10 border border-primary/50 rounded-xl p-3 w-full max-w-[150px]"
             style={{
-              transform: isInScene(scenes.coachCard) ? 'translateY(0)' : 'translateY(20px)',
+              transform: isInScene(scenes.coachCard) ? 'translateY(0)' : 'translateY(15px)',
               transition: 'all 0.5s ease'
             }}
           >
-            <div className="w-12 h-12 rounded-full bg-primary/30 mx-auto mb-2 flex items-center justify-center">
-              <span className="text-2xl">👨‍🏫</span>
+            <div className="w-12 h-12 rounded-full mx-auto mb-2 overflow-hidden border-2 border-primary">
+              <img 
+                src={harisPhoto} 
+                alt="Coach Haris" 
+                className="w-full h-full object-cover"
+              />
             </div>
-            <h2 className="text-sm font-bold text-foreground text-center">Haris Falas</h2>
-            <p className="text-primary text-center text-xs mt-0.5">Sports Scientist</p>
-            <div className="flex justify-center gap-1 mt-2">
-              <span className="bg-primary/30 text-foreground text-[10px] px-1.5 py-0.5 rounded-full">CSCS</span>
-              <span className="bg-primary/30 text-foreground text-[10px] px-1.5 py-0.5 rounded-full">20+ Years</span>
+            <h2 className="text-xs font-bold text-foreground text-center">Haris Falas</h2>
+            <p className="text-primary text-center text-[10px] mt-0.5 font-medium">Sports Scientist</p>
+            <div className="flex justify-center gap-1 mt-1.5">
+              <span className="bg-primary/25 border border-primary/40 text-foreground text-[8px] px-1.5 py-0.5 rounded-full">CSCS</span>
+              <span className="bg-primary/25 border border-primary/40 text-foreground text-[8px] px-1.5 py-0.5 rounded-full">20+ Years</span>
             </div>
           </div>
         </div>
 
-        {/* Scene 3: Credentials (10-16s) */}
+        {/* Scene 3: Credentials (8-13s) */}
         <div
           className={cn(
-            "absolute flex flex-col items-center justify-center gap-2 p-4 transition-all duration-500",
+            "absolute flex flex-col items-center justify-center gap-1.5 p-3 transition-all duration-500",
             isInScene(scenes.credentials) ? "opacity-100" : "opacity-0"
           )}
         >
@@ -86,51 +90,25 @@ export const Day2Video = ({ currentTime }: Day2VideoProps) => {
           ].map((item, i) => (
             <div
               key={item.text}
-              className="flex items-center gap-2 bg-muted/80 rounded-lg px-3 py-2 w-full max-w-[160px]"
+              className="flex items-center gap-2 bg-primary/15 border border-primary/40 rounded-lg px-2.5 py-1.5 w-full max-w-[145px]"
               style={{
                 opacity: getProgress(scenes.credentials) > (i * 0.3) ? 1 : 0,
                 transform: getProgress(scenes.credentials) > (i * 0.3) 
                   ? 'translateX(0)' 
-                  : 'translateX(30px)',
+                  : 'translateX(20px)',
                 transition: 'all 0.4s ease'
               }}
             >
-              <span className="text-base">{item.icon}</span>
-              <p className="text-foreground font-semibold text-xs">{item.text}</p>
+              <span className="text-sm">{item.icon}</span>
+              <p className="text-foreground font-semibold text-[10px]">{item.text}</p>
             </div>
           ))}
         </div>
 
-        {/* Scene 4: Quote (16-22s) */}
+        {/* Scene 4: Brand Promise (13-17s) */}
         <div
           className={cn(
-            "absolute flex flex-col items-center justify-center p-4 transition-all duration-500",
-            isInScene(scenes.quote) ? "opacity-100" : "opacity-0"
-          )}
-        >
-          <div 
-            className="text-center"
-            style={{
-              transform: isInScene(scenes.quote) ? 'scale(1)' : 'scale(0.9)',
-              transition: 'all 0.5s ease'
-            }}
-          >
-            <span className="text-2xl text-primary/50">"</span>
-            <p className="text-xs text-foreground italic leading-relaxed">
-              Every workout designed with purpose.
-            </p>
-            <p className="text-xs text-foreground italic leading-relaxed">
-              Every rep counts.
-            </p>
-            <span className="text-2xl text-primary/50">"</span>
-            <p className="text-primary font-semibold text-xs mt-1">— Coach Haris</p>
-          </div>
-        </div>
-
-        {/* Scene 5: Brand Promise (22-27s) */}
-        <div
-          className={cn(
-            "absolute flex flex-col items-center justify-center p-4 transition-all duration-500",
+            "absolute flex flex-col items-center justify-center p-3 transition-all duration-500",
             isInScene(scenes.brandPromise) ? "opacity-100" : "opacity-0"
           )}
         >
@@ -141,25 +119,25 @@ export const Day2Video = ({ currentTime }: Day2VideoProps) => {
               transition: 'all 0.5s ease'
             }}
           >
-            <p className="text-lg font-bold text-foreground mb-0.5">100% Human.</p>
-            <p className="text-lg font-bold text-primary mb-2">0% AI.</p>
-            <div className="bg-primary/20 border border-primary/40 rounded-lg px-3 py-2">
-              <p className="text-foreground text-xs">
+            <p className="text-base font-bold text-foreground mb-0.5">100% Human.</p>
+            <p className="text-base font-bold text-primary mb-2">0% AI.</p>
+            <div className="bg-primary/15 border border-primary/50 rounded-lg px-2.5 py-1.5">
+              <p className="text-foreground text-[10px] font-medium">
                 Real expertise. Real results.
               </p>
             </div>
           </div>
         </div>
 
-        {/* Scene 6: CTA (27-30s) */}
+        {/* Scene 5: CTA (17-20s) */}
         <div
           className={cn(
             "absolute flex flex-col items-center justify-center transition-all duration-500",
             isInScene(scenes.cta) ? "opacity-100" : "opacity-0"
           )}
         >
-          <p className="text-foreground font-semibold text-xs mb-2">Train with Haris</p>
-          <div className="bg-primary text-primary-foreground px-3 py-1.5 rounded-full text-xs font-semibold animate-pulse">
+          <p className="text-foreground font-semibold text-[11px] mb-1.5">Train with Haris</p>
+          <div className="bg-primary text-primary-foreground px-3 py-1.5 rounded-full text-[11px] font-semibold animate-pulse">
             Start Training 💪
           </div>
         </div>

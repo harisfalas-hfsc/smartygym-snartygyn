@@ -17,14 +17,14 @@ const videos: VideoItem[] = [
     id: 1,
     day: 1,
     title: "What is SmartyGym?",
-    duration: "25 sec",
+    duration: "20 sec",
     description: "Brand introduction with logo, tagline, and key features"
   },
   {
     id: 2,
     day: 2,
     title: "Meet Coach Haris Falas",
-    duration: "30 sec",
+    duration: "20 sec",
     description: "Coach credentials, expertise, and brand promise"
   }
 ];
@@ -38,21 +38,21 @@ export const VideosGallery = () => {
         <div>
           <h3 className="text-lg font-semibold">TikTok/Reels Videos</h3>
           <p className="text-sm text-muted-foreground">
-            Animated video previews - screen record to create actual videos
+            Preview and download animated videos for social media
           </p>
         </div>
       </div>
 
       <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-3">
         {videos.map((video) => (
-          <Card key={video.id} className="overflow-hidden">
-            <div className="aspect-square bg-gradient-to-b from-background to-muted flex items-center justify-center relative">
+          <Card key={video.id} className="overflow-hidden border-primary/30">
+            <div className="aspect-square bg-gradient-to-b from-primary/10 to-primary/5 flex items-center justify-center relative">
               <div className="text-center p-2">
-                <div className="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center mx-auto mb-2">
+                <div className="w-10 h-10 rounded-full bg-primary/20 border border-primary/40 flex items-center justify-center mx-auto mb-2">
                   <Play className="h-5 w-5 text-primary" />
                 </div>
                 <p className="font-semibold text-sm">Day {video.day}</p>
-                <p className="text-xs text-muted-foreground">{video.duration}</p>
+                <p className="text-xs text-primary font-medium">{video.duration}</p>
               </div>
             </div>
             <CardContent className="p-2">
