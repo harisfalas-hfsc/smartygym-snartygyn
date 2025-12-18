@@ -2,10 +2,20 @@ import { useState, useRef, useEffect, useCallback } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
-import { Download, Loader2, X, RefreshCw } from "lucide-react";
+import { Download, Loader2, X, RefreshCw, AlertTriangle } from "lucide-react";
 import { SampleVideo, SampleVideoRef } from "./videos/SampleVideo";
 import html2canvas from "html2canvas";
 import { useToast } from "@/hooks/use-toast";
+
+// Get the best supported MIME type for video recording
+const getSupportedMimeType = (): string | null => {
+  const types = [
+    'video/webm;codecs=vp8,opus',
+    'video/webm;codecs=vp8',
+    'video/webm',
+  ];
+  return types.find(type => MediaRecorder.isTypeSupported(type)) || null;
+};
 
 interface VideoGeneratorDialogProps {
   open: boolean;
@@ -23,12 +33,20 @@ export const VideoGeneratorDialog = ({
   const [progress, setProgress] = useState(0);
   const [downloadUrl, setDownloadUrl] = useState<string | null>(null);
   const [isPlaying, setIsPlaying] = useState(false);
+  const [browserSupported, setBrowserSupported] = useState(true);
   
   const videoRef = useRef<SampleVideoRef>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const chunksRef = useRef<Blob[]>([]);
+  const isGeneratingRef = useRef(false); // Fix stale closure
   const { toast } = useToast();
+  
+  // Check browser support on mount
+  useEffect(() => {
+    const mimeType = getSupportedMimeType();
+    setBrowserSupported(mimeType !== null);
+  }, []);
 
   // Reset state when dialog opens
   useEffect(() => {
@@ -39,13 +57,25 @@ export const VideoGeneratorDialog = ({
       setDownloadUrl(null);
       setIsPlaying(false);
       chunksRef.current = [];
+      isGeneratingRef.current = false;
     }
   }, [open]);
 
   const startGeneration = useCallback(async () => {
     if (!containerRef.current) return;
     
+    const mimeType = getSupportedMimeType();
+    if (!mimeType) {
+      toast({
+        title: "Browser not supported",
+        description: "Your browser doesn't support video recording. Try Chrome or Firefox.",
+        variant: "destructive",
+      });
+      return;
+    }
+    
     setIsGenerating(true);
+    isGeneratingRef.current = true;
     setProgress(0);
     setIsComplete(false);
     chunksRef.current = [];
@@ -64,9 +94,9 @@ export const VideoGeneratorDialog = ({
       // Create stream from canvas
       const stream = canvas.captureStream(30);
       
-      // Setup MediaRecorder
+      // Setup MediaRecorder with compatible codec
       const mediaRecorder = new MediaRecorder(stream, {
-        mimeType: "video/webm;codecs=vp9",
+        mimeType,
         videoBitsPerSecond: 5000000,
       });
       
@@ -79,11 +109,12 @@ export const VideoGeneratorDialog = ({
       };
       
       mediaRecorder.onstop = () => {
-        const blob = new Blob(chunksRef.current, { type: "video/webm" });
+        const blob = new Blob(chunksRef.current, { type: mimeType });
         const url = URL.createObjectURL(blob);
         setDownloadUrl(url);
         setIsComplete(true);
         setIsGenerating(false);
+        isGeneratingRef.current = false;
         setProgress(100);
         
         toast({
@@ -103,7 +134,8 @@ export const VideoGeneratorDialog = ({
       const startTime = Date.now();
       
       const captureFrame = async () => {
-        if (!containerRef.current || !isGenerating) return;
+        // Use ref to avoid stale closure
+        if (!containerRef.current || !isGeneratingRef.current) return;
         
         const elapsed = Date.now() - startTime;
         const currentProgress = Math.min((elapsed / totalDuration) * 100, 99);
@@ -124,7 +156,7 @@ export const VideoGeneratorDialog = ({
           console.error("Frame capture error:", err);
         }
         
-        if (elapsed < totalDuration) {
+        if (elapsed < totalDuration && isGeneratingRef.current) {
           requestAnimationFrame(captureFrame);
         }
       };
@@ -134,6 +166,7 @@ export const VideoGeneratorDialog = ({
     } catch (error) {
       console.error("Video generation error:", error);
       setIsGenerating(false);
+      isGeneratingRef.current = false;
       toast({
         title: "Generation failed",
         description: "Could not generate video. Please try again.",
@@ -183,6 +216,14 @@ export const VideoGeneratorDialog = ({
         </DialogHeader>
         
         <div className="space-y-4">
+          {/* Browser support warning */}
+          {!browserSupported && (
+            <div className="flex items-center gap-2 p-3 bg-destructive/10 text-destructive rounded-lg">
+              <AlertTriangle className="h-5 w-5" />
+              <span className="text-sm">Your browser doesn't support video recording. Try Chrome or Firefox.</span>
+            </div>
+          )}
+          
           {/* Video container */}
           <div 
             ref={containerRef}
@@ -213,7 +254,7 @@ export const VideoGeneratorDialog = ({
           {/* Actions */}
           <div className="flex justify-center gap-2">
             {!isGenerating && !isComplete && (
-              <Button onClick={startGeneration} className="gap-2">
+              <Button onClick={startGeneration} disabled={!browserSupported} className="gap-2">
                 <Loader2 className="h-4 w-4" />
                 Generate Video
               </Button>
