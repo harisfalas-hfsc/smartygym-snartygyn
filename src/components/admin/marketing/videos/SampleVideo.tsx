@@ -326,7 +326,7 @@ export const SampleVideo = forwardRef<SampleVideoRef, SampleVideoProps>(
               className="h-24 w-auto mb-4 drop-shadow-[0_0_25px_rgba(100,181,246,0.6)]"
             />
             <p className="text-lg" style={{ color: "rgba(255,255,255,0.8)" }}>
-              Train smart. Train human.
+              Your Gym Re-imagined. Anywhere, Anytime.
             </p>
           </div>
         )}
