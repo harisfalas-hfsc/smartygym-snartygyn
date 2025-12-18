@@ -4,7 +4,7 @@ import { Helmet } from "react-helmet";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { ArrowLeft, Eye, Check, Heart, Crown, ShoppingCart, Clock, Dumbbell, Flame, Star, Home, TrendingUp } from "lucide-react";
+import { ArrowLeft, Eye, Check, Heart, Crown, ShoppingCart, Clock, Dumbbell, Flame, Star, Home, TrendingUp, Brain, RefreshCw, Target, CheckCircle, Shield, Shuffle } from "lucide-react";
 import { PageBreadcrumbs } from "@/components/PageBreadcrumbs";
 import { ContentLoadingSkeleton } from "@/components/ContentLoadingSkeleton";
 import { useAllWorkouts } from "@/hooks/useWorkoutData";
@@ -246,6 +246,74 @@ const WODCategory = () => {
                     </p>
                   </CardContent>
                 </Card>)}
+
+              {/* The Science Behind Your Daily Workout */}
+              <Card className="mt-8 bg-gradient-to-br from-primary/5 via-background to-primary/5 border-2 border-primary/40">
+                <CardContent className="p-4 sm:p-6">
+                  <div className="flex items-center justify-center gap-2 mb-4">
+                    <Brain className="w-6 h-6 text-primary" />
+                    <h2 className="text-xl sm:text-2xl font-bold text-center">The Science Behind Your Daily Workout</h2>
+                  </div>
+                  
+                  <p className="text-sm sm:text-base text-center text-muted-foreground mb-6 max-w-3xl mx-auto">
+                    Following SmartyGym's Workout of the Day is like having a personal trainer monitoring your training day by day — 
+                    tracking your training load, recovery needs, and energy systems to deliver the perfect workout every single day.
+                  </p>
+                  
+                  <div className="grid gap-4 sm:gap-6">
+                    {/* Strategic Recovery */}
+                    <div className="bg-background/50 rounded-lg p-4 border border-primary/20">
+                      <div className="flex items-center gap-2 mb-2">
+                        <RefreshCw className="w-5 h-5 text-primary" />
+                        <h3 className="font-semibold">Strategic Recovery</h3>
+                      </div>
+                      <p className="text-sm text-muted-foreground">
+                        You'll never do two strength days in a row. While your muscles recover, you'll focus on 
+                        cardio or metabolic training. When your endurance systems need rest, it's the perfect 
+                        opportunity for mobility and stability work — and then you elevate again.
+                      </p>
+                    </div>
+                    
+                    {/* Intelligent Sequencing */}
+                    <div className="bg-background/50 rounded-lg p-4 border border-primary/20">
+                      <div className="flex items-center gap-2 mb-2">
+                        <Target className="w-5 h-5 text-primary" />
+                        <h3 className="font-semibold">Intelligent Sequencing</h3>
+                      </div>
+                      <p className="text-sm text-muted-foreground">
+                        Each workout is carefully designed to complement what you did yesterday and prepare you 
+                        for tomorrow. No conflicts, no overtraining — just smart progression that keeps you 
+                        moving forward while respecting your body's recovery needs.
+                      </p>
+                    </div>
+                    
+                    {/* Three Benefits */}
+                    <div className="bg-background/50 rounded-lg p-4 border border-primary/20">
+                      <div className="flex items-center gap-2 mb-3">
+                        <CheckCircle className="w-5 h-5 text-primary" />
+                        <h3 className="font-semibold">Three Guaranteed Benefits</h3>
+                      </div>
+                      <div className="grid sm:grid-cols-3 gap-3">
+                        <div className="text-center p-3 rounded-lg bg-primary/5 border border-primary/10">
+                          <Shield className="w-6 h-6 text-primary mx-auto mb-2" />
+                          <span className="font-medium text-sm block">Safety</span>
+                          <p className="text-xs text-muted-foreground mt-1">Proper recovery prevents injury</p>
+                        </div>
+                        <div className="text-center p-3 rounded-lg bg-primary/5 border border-primary/10">
+                          <Shuffle className="w-6 h-6 text-primary mx-auto mb-2" />
+                          <span className="font-medium text-sm block">Variety</span>
+                          <p className="text-xs text-muted-foreground mt-1">Different challenges every day</p>
+                        </div>
+                        <div className="text-center p-3 rounded-lg bg-primary/5 border border-primary/10">
+                          <TrendingUp className="w-6 h-6 text-primary mx-auto mb-2" />
+                          <span className="font-medium text-sm block">Results</span>
+                          <p className="text-xs text-muted-foreground mt-1">Systematic improvement guaranteed</p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
 
             </div>
           </div>
