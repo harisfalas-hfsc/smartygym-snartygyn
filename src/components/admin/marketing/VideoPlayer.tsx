@@ -84,7 +84,7 @@ export const VideoPlayer = ({ day, onClose }: VideoPlayerProps) => {
 
   return (
     <Dialog open={day !== null} onOpenChange={() => onClose()}>
-      <DialogContent className="max-w-[400px] p-0 bg-black overflow-hidden">
+      <DialogContent className="max-w-[280px] max-h-[85vh] p-0 bg-black overflow-hidden">
         <div className="relative aspect-[9/16] bg-background">
           {renderVideo()}
           
@@ -92,16 +92,16 @@ export const VideoPlayer = ({ day, onClose }: VideoPlayerProps) => {
           <Button
             variant="ghost"
             size="icon"
-            className="absolute top-2 right-2 z-50 bg-black/50 hover:bg-black/70 text-white"
+            className="absolute top-2 right-2 z-50 bg-black/50 hover:bg-black/70 text-white h-6 w-6"
             onClick={onClose}
           >
-            <X className="h-4 w-4" />
+            <X className="h-3 w-3" />
           </Button>
 
           {/* Controls overlay */}
-          <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-4">
+          <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-2">
             {/* Progress bar */}
-            <div className="h-1 bg-white/30 rounded-full mb-3 overflow-hidden">
+            <div className="h-0.5 bg-white/30 rounded-full mb-2 overflow-hidden">
               <div 
                 className="h-full bg-primary transition-all duration-100"
                 style={{ width: `${progress}%` }}
@@ -110,35 +110,29 @@ export const VideoPlayer = ({ day, onClose }: VideoPlayerProps) => {
             
             {/* Controls */}
             <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-1">
                 <Button
                   variant="ghost"
                   size="icon"
-                  className="text-white hover:bg-white/20"
+                  className="text-white hover:bg-white/20 h-6 w-6"
                   onClick={handlePlayPause}
                 >
-                  {isPlaying ? <Pause className="h-5 w-5" /> : <Play className="h-5 w-5" />}
+                  {isPlaying ? <Pause className="h-3 w-3" /> : <Play className="h-3 w-3" />}
                 </Button>
                 <Button
                   variant="ghost"
                   size="icon"
-                  className="text-white hover:bg-white/20"
+                  className="text-white hover:bg-white/20 h-6 w-6"
                   onClick={handleRestart}
                 >
-                  <RotateCcw className="h-4 w-4" />
+                  <RotateCcw className="h-3 w-3" />
                 </Button>
               </div>
-              <span className="text-white text-sm">
+              <span className="text-white text-xs">
                 {formatTime(currentTime)} / {formatTime(duration)}
               </span>
             </div>
           </div>
-        </div>
-        
-        <div className="p-4 bg-card">
-          <p className="text-xs text-muted-foreground text-center">
-            💡 Use screen recording to capture this animation as a video file
-          </p>
         </div>
       </DialogContent>
     </Dialog>
