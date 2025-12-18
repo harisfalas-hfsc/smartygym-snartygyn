@@ -305,7 +305,7 @@ export const VideosGallery = () => {
           video={{
             id: selectedVideo.id,
             name: selectedVideo.name,
-            component: "sample",
+            component: selectedVideo.component_name || "sample",
           }}
           onClose={() => setSelectedVideo(null)}
         />
