@@ -39,8 +39,17 @@ export const VideoGeneratorDialog = ({
   const containerRef = useRef<HTMLDivElement>(null);
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const chunksRef = useRef<Blob[]>([]);
-  const isGeneratingRef = useRef(false); // Fix stale closure
+  const isGeneratingRef = useRef(false);
+  const captureIntervalRef = useRef<NodeJS.Timeout | null>(null);
+  const isCapturingRef = useRef(false); // Prevent overlapping captures
+  const startTimeRef = useRef<number>(0);
+  const canvasRef = useRef<HTMLCanvasElement | null>(null);
+  const ctxRef = useRef<CanvasRenderingContext2D | null>(null);
   const { toast } = useToast();
+  
+  // Fixed capture settings - 10fps is realistic for html2canvas
+  const CAPTURE_INTERVAL_MS = 100; // 10fps
+  const TOTAL_DURATION_MS = 25000; // 25 seconds
   
   // Check browser support on mount
   useEffect(() => {
@@ -48,7 +57,17 @@ export const VideoGeneratorDialog = ({
     setBrowserSupported(mimeType !== null);
   }, []);
 
-  // Reset state when dialog opens
+  // Cleanup function
+  const cleanup = useCallback(() => {
+    if (captureIntervalRef.current) {
+      clearInterval(captureIntervalRef.current);
+      captureIntervalRef.current = null;
+    }
+    isGeneratingRef.current = false;
+    isCapturingRef.current = false;
+  }, []);
+
+  // Reset state when dialog opens/closes
   useEffect(() => {
     if (open) {
       setIsGenerating(false);
@@ -57,9 +76,60 @@ export const VideoGeneratorDialog = ({
       setDownloadUrl(null);
       setIsPlaying(false);
       chunksRef.current = [];
-      isGeneratingRef.current = false;
+      cleanup();
+    } else {
+      cleanup();
     }
-  }, [open]);
+  }, [open, cleanup]);
+
+  // Cleanup on unmount
+  useEffect(() => {
+    return () => cleanup();
+  }, [cleanup]);
+
+  const captureFrame = useCallback(async () => {
+    // Skip if already capturing or not generating
+    if (isCapturingRef.current || !isGeneratingRef.current) return;
+    if (!containerRef.current || !ctxRef.current || !canvasRef.current) return;
+    
+    const elapsed = Date.now() - startTimeRef.current;
+    
+    // Check if we should stop
+    if (elapsed >= TOTAL_DURATION_MS) {
+      cleanup();
+      if (mediaRecorderRef.current?.state === "recording") {
+        mediaRecorderRef.current.stop();
+      }
+      return;
+    }
+    
+    // Update progress
+    const currentProgress = Math.min((elapsed / TOTAL_DURATION_MS) * 100, 99);
+    setProgress(currentProgress);
+    
+    // Lock - prevent overlapping captures
+    isCapturingRef.current = true;
+    
+    try {
+      const capturedCanvas = await html2canvas(containerRef.current, {
+        width: 360,
+        height: 640,
+        scale: 3, // Output: 1080x1920
+        useCORS: true,
+        backgroundColor: "#0a0a0a",
+        logging: false,
+      });
+      
+      // Only draw if still generating
+      if (isGeneratingRef.current && ctxRef.current) {
+        ctxRef.current.drawImage(capturedCanvas, 0, 0, 1080, 1920);
+      }
+    } catch (err) {
+      console.error("Frame capture error:", err);
+    } finally {
+      isCapturingRef.current = false;
+    }
+  }, [cleanup]);
 
   const startGeneration = useCallback(async () => {
     if (!containerRef.current) return;
@@ -74,6 +144,8 @@ export const VideoGeneratorDialog = ({
       return;
     }
     
+    // Reset everything
+    cleanup();
     setIsGenerating(true);
     isGeneratingRef.current = true;
     setProgress(0);
@@ -81,7 +153,7 @@ export const VideoGeneratorDialog = ({
     chunksRef.current = [];
 
     try {
-      // Create a canvas to capture frames
+      // Create canvas for video output
       const canvas = document.createElement("canvas");
       canvas.width = 1080;
       canvas.height = 1920;
@@ -90,11 +162,19 @@ export const VideoGeneratorDialog = ({
       if (!ctx) {
         throw new Error("Could not get canvas context");
       }
-
-      // Create stream from canvas
-      const stream = canvas.captureStream(30);
       
-      // Setup MediaRecorder with compatible codec
+      // Store refs for use in capture loop
+      canvasRef.current = canvas;
+      ctxRef.current = ctx;
+      
+      // Fill with black initially
+      ctx.fillStyle = "#0a0a0a";
+      ctx.fillRect(0, 0, 1080, 1920);
+
+      // Create stream from canvas at 10fps (matches our capture rate)
+      const stream = canvas.captureStream(10);
+      
+      // Setup MediaRecorder
       const mediaRecorder = new MediaRecorder(stream, {
         mimeType,
         videoBitsPerSecond: 5000000,
@@ -109,12 +189,23 @@ export const VideoGeneratorDialog = ({
       };
       
       mediaRecorder.onstop = () => {
+        cleanup();
+        
+        if (chunksRef.current.length === 0) {
+          toast({
+            title: "Generation failed",
+            description: "No video data was captured.",
+            variant: "destructive",
+          });
+          setIsGenerating(false);
+          return;
+        }
+        
         const blob = new Blob(chunksRef.current, { type: mimeType });
         const url = URL.createObjectURL(blob);
         setDownloadUrl(url);
         setIsComplete(true);
         setIsGenerating(false);
-        isGeneratingRef.current = false;
         setProgress(100);
         
         toast({
@@ -123,64 +214,44 @@ export const VideoGeneratorDialog = ({
         });
       };
       
-      mediaRecorder.start(100);
+      // Request data every 500ms
+      mediaRecorder.start(500);
       
-      // Start playing the video
+      // Record start time
+      startTimeRef.current = Date.now();
+      
+      // Start the video animation
       setIsPlaying(true);
       videoRef.current?.restart();
       
-      // Capture frames every 33ms (30fps)
-      const totalDuration = 25000; // 25 seconds
-      const startTime = Date.now();
+      // Start fixed-interval capture loop
+      // Using setInterval for consistent timing
+      captureIntervalRef.current = setInterval(() => {
+        captureFrame();
+      }, CAPTURE_INTERVAL_MS);
       
-      const captureFrame = async () => {
-        // Use ref to avoid stale closure
-        if (!containerRef.current || !isGeneratingRef.current) return;
-        
-        const elapsed = Date.now() - startTime;
-        const currentProgress = Math.min((elapsed / totalDuration) * 100, 99);
-        setProgress(currentProgress);
-        
-        try {
-          const capturedCanvas = await html2canvas(containerRef.current, {
-            width: 360,
-            height: 640,
-            scale: 3,
-            useCORS: true,
-            backgroundColor: "#0a0a0a",
-            logging: false,
-          });
-          
-          ctx.drawImage(capturedCanvas, 0, 0, 1080, 1920);
-        } catch (err) {
-          console.error("Frame capture error:", err);
-        }
-        
-        if (elapsed < totalDuration && isGeneratingRef.current) {
-          requestAnimationFrame(captureFrame);
-        }
-      };
-      
+      // Also capture first frame immediately
       captureFrame();
       
     } catch (error) {
       console.error("Video generation error:", error);
+      cleanup();
       setIsGenerating(false);
-      isGeneratingRef.current = false;
       toast({
         title: "Generation failed",
         description: "Could not generate video. Please try again.",
         variant: "destructive",
       });
     }
-  }, [toast]);
+  }, [toast, cleanup, captureFrame]);
 
   const handleVideoComplete = useCallback(() => {
     setIsPlaying(false);
-    if (mediaRecorderRef.current && mediaRecorderRef.current.state === "recording") {
+    cleanup();
+    if (mediaRecorderRef.current?.state === "recording") {
       mediaRecorderRef.current.stop();
     }
-  }, []);
+  }, [cleanup]);
 
   const handleDownload = () => {
     if (downloadUrl) {
@@ -200,11 +271,11 @@ export const VideoGeneratorDialog = ({
 
   const handleRetry = () => {
     setIsComplete(false);
-    setDownloadUrl(null);
-    setProgress(0);
     if (downloadUrl) {
       URL.revokeObjectURL(downloadUrl);
     }
+    setDownloadUrl(null);
+    setProgress(0);
     startGeneration();
   };
 
