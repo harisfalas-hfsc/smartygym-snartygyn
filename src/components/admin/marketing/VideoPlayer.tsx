@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef } from "react";
 import {
   Dialog,
   DialogContent,
@@ -8,6 +8,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Play, Pause, RotateCcw } from "lucide-react";
 import { SampleVideo, SampleVideoRef } from "./videos/SampleVideo";
+import { SocialMediaVideo, SocialMediaVideoRef } from "./videos/SocialMediaVideo";
 
 interface VideoPlayerProps {
   video: {
@@ -21,7 +22,13 @@ interface VideoPlayerProps {
 export const VideoPlayer = ({ video, onClose }: VideoPlayerProps) => {
   const [isPlaying, setIsPlaying] = useState(true);
   const [isComplete, setIsComplete] = useState(false);
-  const videoRef = useRef<SampleVideoRef>(null);
+  const sampleVideoRef = useRef<SampleVideoRef>(null);
+  const socialMediaVideoRef = useRef<SocialMediaVideoRef>(null);
+
+  const isSocialMediaVideo = video.component?.startsWith("social-media-day-");
+  const dayNumber = isSocialMediaVideo 
+    ? parseInt(video.component.replace("social-media-day-", ""), 10) 
+    : 0;
 
   const handlePlayPause = () => {
     if (isComplete) {
@@ -34,7 +41,11 @@ export const VideoPlayer = ({ video, onClose }: VideoPlayerProps) => {
   const handleRestart = () => {
     setIsComplete(false);
     setIsPlaying(true);
-    videoRef.current?.restart();
+    if (isSocialMediaVideo) {
+      socialMediaVideoRef.current?.restart();
+    } else {
+      sampleVideoRef.current?.restart();
+    }
   };
 
   const handleComplete = () => {
@@ -52,11 +63,20 @@ export const VideoPlayer = ({ video, onClose }: VideoPlayerProps) => {
         <div className="relative">
           {/* Video Container - 9:16 aspect ratio */}
           <div className="relative w-full" style={{ aspectRatio: "9/16", maxHeight: "70vh" }}>
-            <SampleVideo
-              ref={videoRef}
-              isPlaying={isPlaying}
-              onComplete={handleComplete}
-            />
+            {isSocialMediaVideo ? (
+              <SocialMediaVideo
+                ref={socialMediaVideoRef}
+                isPlaying={isPlaying}
+                onComplete={handleComplete}
+                dayNumber={dayNumber}
+              />
+            ) : (
+              <SampleVideo
+                ref={sampleVideoRef}
+                isPlaying={isPlaying}
+                onComplete={handleComplete}
+              />
+            )}
           </div>
 
           {/* Controls overlay */}
