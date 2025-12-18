@@ -28,8 +28,9 @@ const DIFFICULTY_PATTERN_BASE = [
   { level: "Advanced", range: [5, 6] }
 ];
 
-const getDayInCycle = (dayCount: number): number => ((dayCount - 1) % 7) + 1 || 7;
-const getWeekNumber = (dayCount: number): number => Math.floor((dayCount - 1) / 7) + 1;
+// Match backend formula exactly
+const getDayInCycle = (dayCount: number): number => (dayCount % 7) + 1;
+const getWeekNumber = (dayCount: number): number => Math.floor(dayCount / 7) + 1;
 
 const getCategoryForDay = (dayInCycle: number): string => CATEGORY_CYCLE_7DAY[dayInCycle - 1];
 
@@ -119,6 +120,9 @@ export const WODScheduleInfo = () => {
     );
   }
 
+  // CRITICAL: day_count represents AFTER today's generation
+  // So currentDayCount maps to TOMORROW's position in the cycle
+  // Today = currentDayCount - 1, Yesterday = currentDayCount - 2
   const currentDayCount = wodState.day_count;
   const today = new Date();
   const yesterday = subDays(today, 1);
@@ -128,10 +132,14 @@ export const WODScheduleInfo = () => {
   const yesterdayStr = format(yesterday, "yyyy-MM-dd");
 
   // Calculate schedule data for each day
+  // day_count is incremented AFTER generation, so:
+  // - currentDayCount = tomorrow's cycle position
+  // - currentDayCount - 1 = today's cycle position  
+  // - currentDayCount - 2 = yesterday's cycle position
   const days = [
-    { label: "Yesterday", dayCount: currentDayCount - 1, dateStr: yesterdayStr },
-    { label: "Today", dayCount: currentDayCount, dateStr: todayStr },
-    { label: "Tomorrow", dayCount: currentDayCount + 1, dateStr: null } // Tomorrow not generated yet
+    { label: "Yesterday", dayCount: currentDayCount - 2, dateStr: yesterdayStr },
+    { label: "Today", dayCount: currentDayCount - 1, dateStr: todayStr },
+    { label: "Tomorrow", dayCount: currentDayCount, dateStr: null } // Tomorrow not generated yet
   ];
 
   // Get card styling based on day

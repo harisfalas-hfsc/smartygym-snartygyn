@@ -36,7 +36,8 @@ const FORMATS_BY_CATEGORY: Record<string, string[]> = {
   "CHALLENGE": ["CIRCUIT", "TABATA", "AMRAP", "EMOM", "FOR TIME", "MIX"]
 };
 
-const getDayInCycle = (dayCount: number): number => ((dayCount - 1) % 7) + 1 || 7;
+// Match backend formula: (dayCount % 7) + 1, where dayCount starts at 0
+const getDayInCycle = (dayCount: number): number => (dayCount % 7) + 1;
 
 const getCategoryForDay = (dayInCycle: number): string => CATEGORY_CYCLE_7DAY[dayInCycle - 1];
 
@@ -114,16 +115,15 @@ export const WODTimeline = () => {
   });
 
   // Calculate tomorrow's WOD info - always returns data
+  // CRITICAL: day_count in state represents AFTER today's generation was completed
+  // So for tomorrow, we use the CURRENT day_count (which will be tomorrow's day)
   const getTomorrowInfo = () => {
-    // Default fallback calculation using day 1 of cycle
-    const defaultDayCount = 0;
-    const defaultWeekNumber = 1;
+    const dayCount = wodState?.day_count ?? 0;
+    const weekNumber = wodState?.week_number ?? 1;
     
-    const dayCount = wodState?.day_count ?? defaultDayCount;
-    const weekNumber = wodState?.week_number ?? defaultWeekNumber;
-    
-    const tomorrowDayCount = dayCount + 1;
-    const tomorrowDayInCycle = getDayInCycle(tomorrowDayCount);
+    // day_count is already incremented after today's generation
+    // So day_count represents tomorrow's position in the cycle
+    const tomorrowDayInCycle = getDayInCycle(dayCount);
     const tomorrowWeekNumber = tomorrowDayInCycle === 1 
       ? weekNumber + 1 
       : weekNumber;
