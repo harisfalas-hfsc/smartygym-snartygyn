@@ -206,7 +206,7 @@ export class CanvasVideoRenderer {
     ctx.scale(scale, scale);
     ctx.globalAlpha = alpha;
 
-    ctx.font = "800 84px Arial, sans-serif";
+    ctx.font = "800 56px Arial, sans-serif";
     const metrics = ctx.measureText(text);
     const paddingX = 90;
     const paddingY = 70;
@@ -270,7 +270,7 @@ export class CanvasVideoRenderer {
     ctx.globalAlpha = a;
     ctx.textAlign = "center";
     ctx.textBaseline = "middle";
-    ctx.font = "900 140px Arial, sans-serif";
+    ctx.font = "900 90px Arial, sans-serif";
 
     ctx.fillStyle = RED;
     ctx.fillText("0% AI", 0, -80);
@@ -377,7 +377,7 @@ export class CanvasVideoRenderer {
     const revealed = Math.min(subWords.length, Math.floor(holdMs / 400) + 1);
 
     ctx.fillStyle = MUTED_WHITE;
-    ctx.font = "600 42px Arial, sans-serif";
+    ctx.font = "600 32px Arial, sans-serif";
     ctx.fillText(subWords.slice(0, revealed).join(" "), VIDEO_WIDTH / 2, VIDEO_HEIGHT * 0.62);
 
     ctx.restore();
@@ -420,7 +420,7 @@ export class CanvasVideoRenderer {
     ctx.textAlign = "center";
     ctx.textBaseline = "middle";
     ctx.fillStyle = MUTED_WHITE_80;
-    ctx.font = "600 54px Arial, sans-serif";
+    ctx.font = "600 36px Arial, sans-serif";
     ctx.fillText("Your Gym Re-imagined. Anywhere, Anytime.", VIDEO_WIDTH / 2, VIDEO_HEIGHT * 0.58);
 
     ctx.restore();
