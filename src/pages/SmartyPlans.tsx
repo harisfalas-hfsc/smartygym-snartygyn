@@ -460,7 +460,7 @@ export default function SmartyPlans() {
                   </p>
                   <Button 
                     variant="outline" 
-                    className="border-blue-500 text-blue-600 hover:bg-blue-50 dark:border-blue-400 dark:text-blue-400 dark:hover:bg-blue-950"
+                    className="border-blue-500 text-blue-600 hover:bg-blue-600 hover:text-white dark:border-blue-400 dark:text-blue-400 dark:hover:bg-blue-600"
                     onClick={() => navigate('/corporate')}
                   >
                     View Corporate Plans
