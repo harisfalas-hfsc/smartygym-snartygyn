@@ -8,33 +8,30 @@ interface VideoBrandingOverlayProps {
 
 export const VideoBrandingOverlay = ({ tagline, children }: VideoBrandingOverlayProps) => {
   return (
-    <div className="relative w-full h-full bg-gradient-to-b from-primary/5 via-background to-primary/10">
-      {/* Card wrapper with light blue border */}
-      <div className="absolute inset-2 border-2 border-primary/60 rounded-2xl overflow-hidden bg-background/95">
-        {/* Persistent Top Branding - Logo */}
-        <div className="absolute top-3 left-0 right-0 z-40 flex flex-col items-center">
-          <img 
-            src={smartyGymLogo} 
-            alt="SmartyGym Logo" 
-            className="h-10 w-auto object-contain"
-          />
-          {/* Tagline below logo */}
-          <p className="mt-1.5 text-xs font-semibold text-primary tracking-wide text-center px-3 leading-tight">
-            {tagline}
-          </p>
-        </div>
+    <div className="relative w-full h-full border-3 border-primary rounded-2xl overflow-hidden bg-gradient-to-b from-background via-primary/5 to-background">
+      {/* Top Branding - Large Logo */}
+      <div className="absolute top-4 left-0 right-0 z-40 flex flex-col items-center">
+        <img 
+          src={smartyGymLogo} 
+          alt="SmartyGym Logo" 
+          className="h-16 w-auto object-contain drop-shadow-lg"
+        />
+        {/* Tagline below logo */}
+        <p className="mt-2 text-sm font-bold text-primary tracking-wider text-center px-4 uppercase">
+          {tagline}
+        </p>
+      </div>
 
-        {/* Scene Content Area - Middle section for animations */}
-        <div className="absolute inset-0 pt-20 pb-10 flex items-center justify-center">
-          {children}
-        </div>
+      {/* Scene Content Area - Middle section for animations */}
+      <div className="absolute inset-0 pt-28 pb-12 flex items-center justify-center px-4">
+        {children}
+      </div>
 
-        {/* Persistent Bottom Branding - Website */}
-        <div className="absolute bottom-3 left-0 right-0 z-40 flex justify-center">
-          <span className="text-[10px] font-bold text-primary tracking-widest uppercase">
-            smartygym.com
-          </span>
-        </div>
+      {/* Bottom Branding - Website */}
+      <div className="absolute bottom-4 left-0 right-0 z-40 flex justify-center">
+        <span className="text-sm font-bold text-primary tracking-widest uppercase">
+          smartygym.com
+        </span>
       </div>
     </div>
   );
