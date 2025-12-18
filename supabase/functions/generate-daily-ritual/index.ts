@@ -1,8 +1,5 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.57.2";
-import { Resend } from "https://esm.sh/resend@2.0.0";
-import { getEmailHeaders, getEmailFooter } from "../_shared/email-utils.ts";
-import { MESSAGE_TYPES } from "../_shared/notification-types.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -29,8 +26,6 @@ function logStep(step: string, details?: any) {
   console.log(`[GENERATE-RITUAL] ${step}${detailsStr}`);
 }
 
-// ICS generation removed - users now sync via Google Calendar integration
-
 serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
@@ -38,23 +33,6 @@ serve(async (req) => {
 
   try {
     logStep("Starting Daily Smarty Ritual generation");
-
-    // Parse request body for flags
-    let resendNotifications = false;
-    let skipNotifications = false;
-    try {
-      const body = await req.json();
-      resendNotifications = body?.resend_notifications === true;
-      skipNotifications = body?.skipNotifications === true;
-      if (resendNotifications) {
-        logStep("Resend notifications mode enabled");
-      }
-      if (skipNotifications) {
-        logStep("Skip notifications mode enabled - notifications will be sent separately at 7AM");
-      }
-    } catch (e) {
-      // No body or invalid JSON, continue normally
-    }
 
     const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
     const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
@@ -77,22 +55,13 @@ serve(async (req) => {
       .single();
 
     if (existingRitual) {
-      // If resend_notifications is true, send notifications for existing ritual
-      if (resendNotifications) {
-        logStep("Resending notifications for existing ritual", { date: today, dayNumber: existingRitual.day_number });
-        await sendRitualNotifications(supabase, existingRitual.day_number, today);
-        return new Response(JSON.stringify({ 
-          success: true, 
-          message: "Notifications resent for existing ritual",
-          dayNumber: existingRitual.day_number,
-          date: today
-        }), {
-          headers: { ...corsHeaders, "Content-Type": "application/json" },
-        });
-      }
-      
-      logStep("Ritual already exists for today", { date: today });
-      return new Response(JSON.stringify({ success: true, message: "Ritual already exists" }), {
+      logStep("Ritual already exists for today", { date: today, dayNumber: existingRitual.day_number });
+      return new Response(JSON.stringify({ 
+        success: true, 
+        message: "Ritual already exists",
+        dayNumber: existingRitual.day_number,
+        date: today
+      }), {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
@@ -215,18 +184,13 @@ Use <p class="tiptap-paragraph"> for paragraphs and proper HTML formatting.`;
     }
 
     logStep("Ritual saved to database", { dayNumber, date: today });
-
-    // Send notifications to all users (unless skipNotifications is true)
-    if (!skipNotifications) {
-      await sendRitualNotifications(supabase, dayNumber, today);
-    } else {
-      logStep("Skipping notifications (skipNotifications=true) - will be sent separately at 7AM");
-    }
+    logStep("Notifications will be sent separately at 7AM Cyprus time by send-morning-notifications");
 
     return new Response(JSON.stringify({ 
       success: true, 
       dayNumber,
-      date: today 
+      date: today,
+      message: "Ritual generated successfully. Notifications will be sent at 7AM."
     }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
@@ -240,176 +204,3 @@ Use <p class="tiptap-paragraph"> for paragraphs and proper HTML formatting.`;
     });
   }
 });
-
-async function sendRitualNotifications(supabase: any, dayNumber: number, date: string) {
-  logStep("Starting sendRitualNotifications", { dayNumber, date });
-  
-  try {
-    const resendApiKey = Deno.env.get('RESEND_API_KEY');
-    if (!resendApiKey) {
-      logStep("ERROR: RESEND_API_KEY not configured");
-      return;
-    }
-    
-    const resend = new Resend(resendApiKey);
-    logStep("Resend client initialized");
-    
-    // Get all users
-    const { data: users, error: usersError } = await supabase.auth.admin.listUsers();
-    
-    if (usersError) {
-      logStep("ERROR fetching users", { error: usersError.message || usersError });
-      return;
-    }
-
-    if (!users || !users.users || users.users.length === 0) {
-      logStep("No users found to notify");
-      return;
-    }
-
-    logStep("Users fetched successfully", { count: users.users.length });
-
-const subject = "☀️ Your all day game – plan is ready";
-    
-    const googleCalendarUrl = 'https://calendar.google.com/calendar/render?action=TEMPLATE&text=%E2%98%80%EF%B8%8F+Daily+Smarty+Ritual&recur=RRULE:FREQ%3DDAILY&details=Time+for+your+Smarty+Ritual!+View+your+personalized+ritual+at+https://smartygym.com/daily-ritual';
-
-    let sentCount = 0;
-    let failedCount = 0;
-
-    for (const user of users.users) {
-      const userId = user.id;
-      const userEmail = user.email;
-
-      // Check if user has ritual calendar sync active
-      const { data: calendarConnection } = await supabase
-        .from('user_calendar_connections')
-        .select('ritual_reminder_event_ids')
-        .eq('user_id', userId)
-        .eq('is_active', true)
-        .single();
-
-      const hasRitualCalendarSync = calendarConnection?.ritual_reminder_event_ids && 
-        Array.isArray(calendarConnection.ritual_reminder_event_ids) && 
-        calendarConnection.ritual_reminder_event_ids.length > 0;
-
-      // Build content conditionally based on calendar sync status
-      const content = `<p class="tiptap-paragraph"><strong>Your Smarty Ritual is here!</strong></p>
-<p class="tiptap-paragraph">Your personalized daily ritual is ready. Start with the Morning Ritual to energize your day, reset at Midday, and unwind in the Evening.</p>
-<p class="tiptap-paragraph">Three simple phases. Maximum impact. Your daily game plan for movement, recovery, and performance.</p>
-<p class="tiptap-paragraph"><a href="https://smartygym.com/daily-ritual" style="color: #29B6D2; font-weight: bold;">View Your Smarty Ritual →</a></p>
-${!hasRitualCalendarSync ? `<p class="tiptap-paragraph"><a href="${googleCalendarUrl}" target="_blank" style="color: #22c55e; font-weight: bold;">📅 Add Ritual Reminders to Google Calendar</a></p>` : ''}
-<p class="tiptap-paragraph">💡 <strong>Don't forget to track your progress!</strong> Complete your <a href="https://smartygym.com/userdashboard?tab=checkins" style="color: #29B6D2; font-weight: bold;">Smarty Check-ins</a> (morning & evening) to monitor your sleep, mood, recovery, and build your consistency streak.</p>`;
-
-      // Send dashboard notification
-      try {
-        const { error: insertError } = await supabase.from('user_system_messages').insert({
-          user_id: userId,
-          message_type: MESSAGE_TYPES.DAILY_RITUAL,
-          subject: subject,
-          content: content,
-          is_read: false,
-        });
-        
-        if (insertError) {
-          logStep("ERROR inserting dashboard notification", { userId, error: insertError.message });
-          failedCount++;
-          continue;
-        }
-      } catch (err: any) {
-        logStep("ERROR sending dashboard notification", { userId, error: err.message || err });
-        failedCount++;
-        continue;
-      }
-
-      // Check email preferences
-      const { data: profile } = await supabase
-        .from('profiles')
-        .select('notification_preferences')
-        .eq('user_id', userId)
-        .single();
-
-      const prefs = (profile?.notification_preferences as Record<string, any>) || {};
-      
-      // Check if user has opted out of ritual emails
-      if (prefs.opt_out_all === true || prefs.email_ritual === false || prefs.opt_out_newsletter === true) {
-        sentCount++;
-        continue;
-      }
-
-      if (userEmail) {
-        try {
-const emailResult = await resend.emails.send({
-            from: 'SmartyGym <notifications@smartygym.com>',
-            to: [userEmail],
-            subject: subject,
-            headers: getEmailHeaders(userEmail, 'ritual'),
-            html: `
-              <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
-                <h1 style="color: #29B6D2; margin-bottom: 20px;">☀️ Your Smarty Ritual is Ready!</h1>
-                <p style="font-size: 16px; line-height: 1.6; margin-bottom: 16px;">Your <strong>Smarty Ritual</strong> is here!</p>
-                <p style="font-size: 16px; line-height: 1.6; margin-bottom: 16px;">Your personalized daily ritual is ready. Start with the Morning Ritual to energize your day, reset at Midday, and unwind in the Evening.</p>
-                <p style="font-size: 16px; line-height: 1.6; margin-bottom: 24px;">Three simple phases. Maximum impact. Your daily game plan for movement, recovery, and performance.</p>
-                <div style="margin: 24px 0; text-align: center;">
-                  <a href="https://smartygym.com/daily-ritual" style="display: inline-block; background: #29B6D2; color: white; padding: 14px 28px; text-decoration: none; border-radius: 4px; font-weight: bold; font-size: 16px;">View Your Smarty Ritual →</a>
-                </div>
-                ${!hasRitualCalendarSync ? `
-                <div style="margin: 16px 0; text-align: center;">
-                  <a href="${googleCalendarUrl}" target="_blank" style="display: inline-block; background: #22c55e; color: white; padding: 12px 24px; text-decoration: none; border-radius: 4px; font-weight: bold; font-size: 14px;">📅 Add to Google Calendar</a>
-                </div>
-                ` : ''}
-                <div style="margin: 24px 0; padding: 16px; background: #e6f7fa; border-radius: 8px; border-left: 4px solid #29B6D2;">
-                  <p style="font-size: 14px; color: #333; margin: 0;">💡 <strong>Track Your Progress!</strong></p>
-                  <p style="font-size: 14px; color: #666; margin: 8px 0 0 0;">Complete your <a href="https://smartygym.com/userdashboard?tab=checkins" style="color: #29B6D2; font-weight: bold;">Smarty Check-ins</a> (morning & evening) to monitor your sleep, mood, recovery, and build your consistency streak.</p>
-                </div>
-                <hr style="margin: 32px 0; border: none; border-top: 1px solid #eee;">
-                <p style="font-size: 12px; color: #999; text-align: center;">Designed by Haris Falas</p>
-                ${getEmailFooter(userEmail, 'ritual')}
-              </div>
-            `,
-          });
-          
-          if (emailResult.error) {
-            logStep("ERROR sending email", { email: userEmail, error: emailResult.error });
-            failedCount++;
-          } else {
-            logStep("Email sent successfully", { email: userEmail, emailId: emailResult.data?.id });
-            sentCount++;
-          }
-          
-          // Rate limiting: wait 600ms between emails to stay under Resend's 2 req/sec limit
-          await new Promise(resolve => setTimeout(resolve, 600));
-        } catch (emailErr: any) {
-          logStep("ERROR sending email", { email: userEmail, error: emailErr.message || emailErr, fullError: JSON.stringify(emailErr) });
-          failedCount++;
-        }
-      } else {
-        sentCount++;
-      }
-    }
-
-    // Log to audit (using generic content since actual content varies per user based on calendar sync status)
-    const auditContent = `Daily Smarty Ritual notification sent. Google Calendar button conditionally shown based on user's ritual_reminder_event_ids status.`;
-    try {
-      const { error: auditError } = await supabase.from('notification_audit_log').insert({
-        notification_type: 'daily_ritual',
-        message_type: MESSAGE_TYPES.DAILY_RITUAL,
-        subject: subject,
-        content: auditContent,
-        recipient_filter: 'all',
-        recipient_count: users.users.length,
-        success_count: sentCount,
-        failed_count: failedCount,
-      });
-      
-      if (auditError) {
-        logStep("ERROR inserting audit log", { error: auditError.message });
-      }
-    } catch (auditErr: any) {
-      logStep("ERROR in audit logging", { error: auditErr.message || auditErr });
-    }
-
-    logStep("Notifications completed", { sent: sentCount, failed: failedCount, total: users.users.length });
-  } catch (error: any) {
-    logStep("CRITICAL ERROR in sendRitualNotifications", { error: error.message || error, stack: error.stack });
-  }
-}
