@@ -443,18 +443,18 @@ export default function SmartyPlans() {
                       </div>
                     </div>
                   </div>
-                </CardContent>
-              </Card>
-
-              {/* Smart Investment Card */}
-              <Card className="mb-6 bg-gradient-to-r from-green-50 to-emerald-50 dark:from-green-950/20 dark:to-emerald-950/20 border-green-200 dark:border-green-800">
-                <CardContent className="p-4 text-center">
-                  <h3 className="text-base font-bold mb-1 text-green-700 dark:text-green-400">
-                    💰 Smart Investment: Lock in Recurring Payments & Save!
-                  </h3>
-                  <p className="text-sm text-green-600 dark:text-green-300">
-                    Choose a subscription plan that auto-renews and you'll save compared to one-time purchases. The yearly plan saves you 25% - that's €29.89 in your pocket!
-                  </p>
+                  
+                  {/* Smart Investment Banner */}
+                  <div className="mt-4 pt-4 border-t border-primary/20">
+                    <div className="bg-gradient-to-r from-green-50 to-emerald-50 dark:from-green-950/20 dark:to-emerald-950/20 rounded-lg p-3 text-center">
+                      <h4 className="text-sm font-bold text-green-700 dark:text-green-400 mb-1">
+                        💰 Smart Investment: Lock in Recurring Payments & Save!
+                      </h4>
+                      <p className="text-xs text-green-600 dark:text-green-300">
+                        Choose a subscription plan that auto-renews and you'll save compared to one-time purchases. The yearly plan saves you 25% - that's €29.89 in your pocket!
+                      </p>
+                    </div>
+                  </div>
                 </CardContent>
               </Card>
 
