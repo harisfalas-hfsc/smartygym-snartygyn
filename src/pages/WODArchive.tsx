@@ -129,11 +129,11 @@ const WODArchive = () => {
   const getDifficultyColor = (difficulty: string | null) => {
     switch (difficulty?.toLowerCase()) {
       case "beginner":
-        return "bg-green-500/20 text-green-400 border-green-500/30";
+        return "bg-yellow-500/20 text-yellow-400 border-yellow-500/30"; // Beginner = YELLOW
       case "intermediate":
-        return "bg-yellow-500/20 text-yellow-400 border-yellow-500/30";
+        return "bg-green-500/20 text-green-400 border-green-500/30"; // Intermediate = GREEN
       case "advanced":
-        return "bg-red-500/20 text-red-400 border-red-500/30";
+        return "bg-red-500/20 text-red-400 border-red-500/30"; // Advanced = RED
       default:
         return "bg-muted text-muted-foreground";
     }

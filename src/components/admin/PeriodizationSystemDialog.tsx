@@ -201,9 +201,9 @@ export const PeriodizationSystemDialog = ({
   };
 
   const getDifficultyColor = (level: string) => {
-    if (level === "Beginner") return "bg-green-500/20 text-green-400 border-green-500/30";
-    if (level === "Intermediate") return "bg-yellow-500/20 text-yellow-400 border-yellow-500/30";
-    return "bg-red-500/20 text-red-400 border-red-500/30";
+    if (level === "Beginner") return "bg-yellow-500/20 text-yellow-400 border-yellow-500/30"; // Beginner = YELLOW
+    if (level === "Intermediate") return "bg-green-500/20 text-green-400 border-green-500/30"; // Intermediate = GREEN
+    return "bg-red-500/20 text-red-400 border-red-500/30"; // Advanced = RED
   };
 
   return (

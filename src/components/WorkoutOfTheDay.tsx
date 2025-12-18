@@ -38,9 +38,9 @@ export const WorkoutOfTheDay = () => {
 
   const getDifficultyColor = (stars: number | null) => {
     if (!stars) return "bg-gray-500/20 text-gray-600 border-gray-500/40";
-    if (stars <= 2) return "bg-green-500/20 text-green-700 dark:text-green-400 border-green-500/40";
-    if (stars <= 4) return "bg-yellow-500/20 text-yellow-700 dark:text-yellow-400 border-yellow-500/40";
-    return "bg-red-500/20 text-red-700 dark:text-red-400 border-red-500/40";
+    if (stars <= 2) return "bg-yellow-500/20 text-yellow-700 dark:text-yellow-400 border-yellow-500/40"; // Beginner = YELLOW
+    if (stars <= 4) return "bg-green-500/20 text-green-700 dark:text-green-400 border-green-500/40"; // Intermediate = GREEN
+    return "bg-red-500/20 text-red-700 dark:text-red-400 border-red-500/40"; // Advanced = RED
   };
 
   const renderStars = (count: number | null) => {
