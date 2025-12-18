@@ -5,6 +5,7 @@ import { Play, Download, Eye, Film, Upload, Pencil, History, Trash2, Loader2 } f
 import { VideoPlayer } from "./VideoPlayer";
 import { VideoEditDialog } from "./VideoEditDialog";
 import { VideoRevertDialog } from "./VideoRevertDialog";
+import { VideoGeneratorDialog } from "./VideoGeneratorDialog";
 import { useToast } from "@/hooks/use-toast";
 import { Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
@@ -39,6 +40,7 @@ export const VideosGallery = () => {
   const [editingVideo, setEditingVideo] = useState<VideoItem | null>(null);
   const [revertingVideo, setRevertingVideo] = useState<VideoItem | null>(null);
   const [deletingVideo, setDeletingVideo] = useState<VideoItem | null>(null);
+  const [generatingVideo, setGeneratingVideo] = useState<VideoItem | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
   const { toast } = useToast();
 
@@ -73,6 +75,7 @@ export const VideosGallery = () => {
 
   const handleDownload = useCallback(async (video: VideoItem) => {
     if (video.video_url) {
+      // Direct download if video file exists
       const link = document.createElement("a");
       link.href = video.video_url;
       link.download = `${video.name.toLowerCase().replace(/\s+/g, "-")}-promo.mp4`;
@@ -86,11 +89,8 @@ export const VideosGallery = () => {
         description: "Your video is downloading.",
       });
     } else {
-      toast({
-        title: "No video file available",
-        description: "Please record and upload the video first using the Export Video page.",
-        variant: "destructive",
-      });
+      // Generate video on-the-fly
+      setGeneratingVideo(video);
     }
   }, [toast]);
 
@@ -330,6 +330,13 @@ export const VideosGallery = () => {
           onSuccess={fetchVideos}
         />
       )}
+
+      {/* Video Generator Dialog */}
+      <VideoGeneratorDialog
+        open={!!generatingVideo}
+        onOpenChange={(open) => !open && setGeneratingVideo(null)}
+        videoName={generatingVideo?.name || "Sample"}
+      />
 
       {/* Delete Confirmation */}
       <AlertDialog open={!!deletingVideo} onOpenChange={(open) => !open && setDeletingVideo(null)}>
