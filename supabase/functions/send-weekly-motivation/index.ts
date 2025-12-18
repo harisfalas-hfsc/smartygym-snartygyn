@@ -14,13 +14,127 @@ const logStep = (step: string, details?: any) => {
   console.log(`[SEND-WEEKLY-MOTIVATION] ${step}${detailsStr}`);
 };
 
+// Calculate progress towards a goal
+const calculateProgress = (current: number | undefined, target: number | null, isDecrease: boolean = false): number | null => {
+  if (!current || !target) return null;
+  if (isDecrease) {
+    const diff = current - target;
+    if (diff <= 0) return 100;
+    const startingPoint = target + 10;
+    return Math.max(0, Math.min(100, ((startingPoint - current) / (startingPoint - target)) * 100));
+  } else {
+    if (current >= target) return 100;
+    const startingPoint = target - 10;
+    return Math.max(0, Math.min(100, ((current - startingPoint) / (target - startingPoint)) * 100));
+  }
+};
+
+// Get days remaining until target date
+const getDaysRemaining = (targetDate: string | null): number | null => {
+  if (!targetDate) return null;
+  const target = new Date(targetDate);
+  const today = new Date();
+  const diffTime = target.getTime() - today.getTime();
+  const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+  return diffDays > 0 ? diffDays : 0;
+};
+
+// Generate personalized content based on user's goals
+const generatePersonalizedContent = (
+  userName: string,
+  hasGoals: boolean,
+  goals: any,
+  latestMeasurement: any,
+  templateContent: string
+): { content: string; ctaUrl: string; ctaText: string } => {
+  const greeting = userName ? `Hi ${userName}!` : "Hi Smarty!";
+  const baseUrl = "https://smartygym.com";
+  
+  if (!hasGoals) {
+    // User has NO goals set
+    return {
+      content: `
+        <p class="tiptap-paragraph">${greeting}</p>
+        <p class="tiptap-paragraph">&nbsp;</p>
+        <h3><strong>💪 Don't Forget to Set Your Goals!</strong></h3>
+        <p class="tiptap-paragraph">&nbsp;</p>
+        <p class="tiptap-paragraph">Setting clear fitness goals helps keep you motivated and on track. Let us help you achieve your dream physique!</p>
+        <p class="tiptap-paragraph">&nbsp;</p>
+        <p class="tiptap-paragraph">Define your targets for weight, body fat, or muscle mass, and we'll track your progress every step of the way. When you reach your goals, we'll celebrate together! 🎉</p>
+        <p class="tiptap-paragraph">&nbsp;</p>
+        <p class="tiptap-paragraph">Start your journey today and watch yourself transform!</p>
+      `,
+      ctaUrl: `${baseUrl}/calculator-history?tab=measurements`,
+      ctaText: "Set Your Goals Now"
+    };
+  }
+
+  // User HAS goals set - generate progress report
+  const progressItems: string[] = [];
+  const daysRemaining = getDaysRemaining(goals.target_date);
+  
+  // Weight goal
+  if (goals.target_weight) {
+    const currentWeight = latestMeasurement?.weight;
+    const isDecrease = currentWeight ? currentWeight > goals.target_weight : false;
+    const progress = calculateProgress(currentWeight, goals.target_weight, isDecrease);
+    const progressText = progress !== null ? `${Math.round(progress)}% complete` : "No measurements yet";
+    const currentText = currentWeight ? `${currentWeight} kg` : "Not measured";
+    progressItems.push(`<li class="tiptap-list-item"><p class="tiptap-paragraph">🎯 <strong>Weight:</strong> ${currentText} → ${goals.target_weight} kg (${progressText})</p></li>`);
+  }
+  
+  // Body fat goal
+  if (goals.target_body_fat) {
+    const currentBodyFat = latestMeasurement?.body_fat;
+    const progress = calculateProgress(currentBodyFat, goals.target_body_fat, true); // Usually want to decrease
+    const progressText = progress !== null ? `${Math.round(progress)}% complete` : "No measurements yet";
+    const currentText = currentBodyFat ? `${currentBodyFat}%` : "Not measured";
+    progressItems.push(`<li class="tiptap-list-item"><p class="tiptap-paragraph">🎯 <strong>Body Fat:</strong> ${currentText} → ${goals.target_body_fat}% (${progressText})</p></li>`);
+  }
+  
+  // Muscle mass goal
+  if (goals.target_muscle_mass) {
+    const currentMuscleMass = latestMeasurement?.muscle_mass;
+    const progress = calculateProgress(currentMuscleMass, goals.target_muscle_mass, false); // Want to increase
+    const progressText = progress !== null ? `${Math.round(progress)}% complete` : "No measurements yet";
+    const currentText = currentMuscleMass ? `${currentMuscleMass} kg` : "Not measured";
+    progressItems.push(`<li class="tiptap-list-item"><p class="tiptap-paragraph">🎯 <strong>Muscle Mass:</strong> ${currentText} → ${goals.target_muscle_mass} kg (${progressText})</p></li>`);
+  }
+
+  const daysText = daysRemaining !== null 
+    ? `<p class="tiptap-paragraph">📅 <strong>${daysRemaining} days remaining</strong> until your target date!</p>`
+    : "";
+
+  const progressList = progressItems.length > 0 
+    ? `<ul class="tiptap-bullet-list">${progressItems.join("")}</ul>`
+    : `<p class="tiptap-paragraph">You've set goals but haven't logged any measurements yet. Start tracking to see your progress!</p>`;
+
+  return {
+    content: `
+      <p class="tiptap-paragraph">${greeting}</p>
+      <p class="tiptap-paragraph">&nbsp;</p>
+      <h3><strong>📊 Your Weekly Goal Progress</strong></h3>
+      <p class="tiptap-paragraph">&nbsp;</p>
+      <p class="tiptap-paragraph">Here's how you're doing on your fitness journey:</p>
+      <p class="tiptap-paragraph">&nbsp;</p>
+      ${progressList}
+      <p class="tiptap-paragraph">&nbsp;</p>
+      ${daysText}
+      <p class="tiptap-paragraph">&nbsp;</p>
+      <p class="tiptap-paragraph">Keep pushing, Smarty! Every workout brings you closer to your goals. 💪</p>
+    `,
+    ctaUrl: `${baseUrl}/calculator-history?tab=measurements`,
+    ctaText: "View Your Progress"
+  };
+};
+
 serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
   }
 
   try {
-    logStep("Function invoked - starting Monday motivational messages");
+    logStep("Function invoked - starting Monday motivational messages with personalized goals");
     logStep("Current time", { now: new Date().toISOString(), dayOfWeek: new Date().getDay() });
 
     const supabaseAdmin = createClient(
@@ -58,8 +172,8 @@ serve(async (req) => {
       totalExecutions: automationRule.total_executions
     });
 
-    // Get the motivational template
-    logStep("Fetching motivational_weekly template");
+    // Get the motivational template (fallback only)
+    logStep("Fetching motivational_weekly template for fallback");
     const { data: template, error: templateError } = await supabaseAdmin
       .from("automated_message_templates")
       .select("subject, content")
@@ -71,15 +185,8 @@ serve(async (req) => {
       logStep("Error fetching template", { error: templateError.message });
     }
 
-    if (!template) {
-      logStep("No active motivational template found");
-      return new Response(
-        JSON.stringify({ success: false, reason: "No template configured" }),
-        { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-      );
-    }
-
-    logStep("Template found", { subject: template.subject });
+    // Use a default subject if no template
+    const defaultSubject = "💪 Your Monday Motivation & Goal Progress";
 
     // Get ALL users
     logStep("Fetching all users");
@@ -105,6 +212,8 @@ serve(async (req) => {
     let emailsSent = 0;
     let skipped = 0;
     let failed = 0;
+    let usersWithGoals = 0;
+    let usersWithoutGoals = 0;
     const emailErrors: string[] = [];
 
     // Check for duplicates - don't send if already sent today
@@ -145,6 +254,70 @@ serve(async (req) => {
       }
 
       try {
+        // Fetch user's goals
+        const { data: userGoals, error: goalsError } = await supabaseAdmin
+          .from("user_measurement_goals")
+          .select("target_weight, target_body_fat, target_muscle_mass, target_date")
+          .eq("user_id", user.user_id)
+          .order("created_at", { ascending: false })
+          .limit(1)
+          .maybeSingle();
+
+        if (goalsError) {
+          logStep("Error fetching user goals", { userId: user.user_id, error: goalsError.message });
+        }
+
+        // Fetch latest measurement from user_activity_log
+        const { data: latestActivity, error: activityError } = await supabaseAdmin
+          .from("user_activity_log")
+          .select("tool_result")
+          .eq("user_id", user.user_id)
+          .eq("content_type", "measurement")
+          .order("created_at", { ascending: false })
+          .limit(1)
+          .maybeSingle();
+
+        if (activityError) {
+          logStep("Error fetching latest measurement", { userId: user.user_id, error: activityError.message });
+        }
+
+        // Parse the latest measurement from tool_result
+        let latestMeasurement: any = null;
+        if (latestActivity?.tool_result) {
+          const toolResult = latestActivity.tool_result as any;
+          latestMeasurement = {
+            weight: toolResult.weight,
+            body_fat: toolResult.bodyFat || toolResult.body_fat,
+            muscle_mass: toolResult.muscleMass || toolResult.muscle_mass
+          };
+        }
+
+        // Determine if user has any goals set
+        const hasGoals = userGoals && (
+          userGoals.target_weight || 
+          userGoals.target_body_fat || 
+          userGoals.target_muscle_mass
+        );
+
+        if (hasGoals) {
+          usersWithGoals++;
+        } else {
+          usersWithoutGoals++;
+        }
+
+        // Generate personalized content
+        const { content, ctaUrl, ctaText } = generatePersonalizedContent(
+          user.full_name || "",
+          !!hasGoals,
+          userGoals,
+          latestMeasurement,
+          template?.content || ""
+        );
+
+        const subject = hasGoals 
+          ? "📊 Your Monday Goal Progress Report" 
+          : "💪 Set Your Goals & Transform Your Fitness";
+
         // Send dashboard message
         if (automationRule.sends_dashboard_message) {
           const { error: msgError } = await supabaseAdmin
@@ -152,8 +325,8 @@ serve(async (req) => {
             .insert({
               user_id: user.user_id,
               message_type: MESSAGE_TYPES.MONDAY_MOTIVATION,
-              subject: template.subject,
-              content: template.content,
+              subject: subject,
+              content: content,
               is_read: false,
             });
 
@@ -178,7 +351,7 @@ serve(async (req) => {
 
           if (userEmail) {
             try {
-              // Check notification preferences
+              // Check notification preferences - FIXED to use correct preference
               const { data: profile } = await supabaseAdmin
                 .from("profiles")
                 .select("notification_preferences")
@@ -186,27 +359,28 @@ serve(async (req) => {
                 .single();
 
               const prefs = profile?.notification_preferences as any;
-              const emailEnabled = prefs?.email_notifications !== false && prefs?.newsletter !== false && prefs?.opt_out_all !== true;
+              // Fixed: Check email_monday_motivation preference specifically
+              const emailEnabled = prefs?.email_monday_motivation !== false && prefs?.opt_out_all !== true;
 
               if (!emailEnabled) {
-                logStep("Email disabled for user", { userId: user.user_id });
+                logStep("Monday motivation email disabled for user", { userId: user.user_id });
                 continue;
               }
 
-              // Use the email utility to convert tiptap HTML to email-compatible HTML
+              // Use the email utility with personalized CTA
               const emailHtml = wrapInEmailTemplateWithFooter(
-                template.subject,
-                template.content,
+                subject,
+                content,
                 userEmail,
-                "https://smartygym.com/workout",
-                "Browse Workouts"
+                ctaUrl,
+                ctaText
               );
 
               const emailResult = await resend.emails.send({
                 from: "SmartyGym <notifications@smartygym.com>",
-                reply_to: "support@smartygym.com",
+                reply_to: "admin@smartygym.com",
                 to: [userEmail],
-                subject: template.subject,
+                subject: subject,
                 headers: getEmailHeaders(userEmail),
                 html: emailHtml,
               });
@@ -250,15 +424,17 @@ serve(async (req) => {
     logStep("Logging to audit");
     await supabaseAdmin.from('notification_audit_log').insert({
       notification_type: 'monday_motivation',
-      message_type: 'motivational_weekly',
+      message_type: MESSAGE_TYPES.MONDAY_MOTIVATION,
       recipient_count: users.length,
       success_count: dashboardSent,
       failed_count: failed,
-      subject: template.subject,
-      content: template.content,
+      subject: defaultSubject,
+      content: 'Personalized goal-based content',
       metadata: {
         emails_sent: emailsSent,
         skipped_already_sent: skipped,
+        users_with_goals: usersWithGoals,
+        users_without_goals: usersWithoutGoals,
         email_errors: emailErrors.length > 0 ? emailErrors : undefined
       }
     });
@@ -269,6 +445,8 @@ serve(async (req) => {
       emailsSent, 
       skipped,
       failed,
+      usersWithGoals,
+      usersWithoutGoals,
       emailErrors: emailErrors.length
     });
 
@@ -280,6 +458,8 @@ serve(async (req) => {
         emailsSent,
         skipped,
         failed,
+        usersWithGoals,
+        usersWithoutGoals,
         emailErrors: emailErrors.length > 0 ? emailErrors : undefined
       }),
       { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } }
