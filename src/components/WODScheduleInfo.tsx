@@ -43,29 +43,32 @@ const getDifficultyForDay = (dayInCycle: number, weekNumber: number): { level: s
   };
 };
 
-const getDifficultyColor = (level: string) => {
-  switch (level) {
+// Get card border color based on difficulty level
+const getCardBorderColor = (difficultyLevel: string) => {
+  switch (difficultyLevel) {
     case "Beginner":
-      return "bg-green-500/20 text-green-600 border-green-500/30";
+      return "border-yellow-500";
     case "Intermediate":
-      return "bg-yellow-500/20 text-yellow-600 border-yellow-500/30";
+      return "border-green-500";
     case "Advanced":
-      return "bg-red-500/20 text-red-600 border-red-500/30";
+      return "border-red-500";
     default:
-      return "bg-muted text-muted-foreground";
+      return "border-border";
   }
 };
 
-const getCategoryColor = (category: string) => {
-  const colors: Record<string, string> = {
-    "STRENGTH": "bg-blue-500/90 text-white",
-    "CARDIO": "bg-red-500/90 text-white",
-    "CHALLENGE": "bg-purple-500/90 text-white",
-    "MOBILITY & STABILITY": "bg-green-500/90 text-white",
-    "METABOLIC": "bg-orange-500/90 text-white",
-    "CALORIE BURNING": "bg-pink-500/90 text-white"
-  };
-  return colors[category] || "bg-primary/90 text-primary-foreground";
+// Get category badge color based on difficulty level
+const getCategoryBadgeColor = (difficultyLevel: string) => {
+  switch (difficultyLevel) {
+    case "Beginner":
+      return "bg-yellow-500/90 text-white";
+    case "Intermediate":
+      return "bg-green-500/90 text-white";
+    case "Advanced":
+      return "bg-red-500/90 text-white";
+    default:
+      return "bg-primary/90 text-primary-foreground";
+  }
 };
 
 export const WODScheduleInfo = () => {
@@ -142,29 +145,15 @@ export const WODScheduleInfo = () => {
     { label: "Tomorrow", dayCount: currentDayCount, dateStr: null } // Tomorrow not generated yet
   ];
 
-  // Get card styling based on day
-  const getDayCardStyle = (label: string) => {
-    switch (label) {
-      case "Yesterday":
-        return "bg-green-500/10 dark:bg-green-500/20 border-2 border-green-500 shadow-md";
-      case "Today":
-        return "bg-primary/10 dark:bg-primary/20 border-2 border-primary shadow-md";
-      case "Tomorrow":
-        return "bg-amber-500/10 dark:bg-amber-500/20 border-2 border-amber-500 shadow-md";
-      default:
-        return "bg-muted/30 border border-border/50";
-    }
-  };
-
-  // Get day label text color based on day
-  const getDayLabelColor = (label: string) => {
-    switch (label) {
-      case "Yesterday":
+  // Get difficulty text color
+  const getDifficultyTextColor = (level: string) => {
+    switch (level) {
+      case "Beginner":
+        return "text-yellow-600 dark:text-yellow-400";
+      case "Intermediate":
         return "text-green-600 dark:text-green-400";
-      case "Today":
-        return "text-primary";
-      case "Tomorrow":
-        return "text-amber-600 dark:text-amber-400";
+      case "Advanced":
+        return "text-red-600 dark:text-red-400";
       default:
         return "text-muted-foreground";
     }
@@ -192,32 +181,28 @@ export const WODScheduleInfo = () => {
             return (
               <div
                 key={day.label}
-                className={`rounded-lg p-3 text-center transition-all ${getDayCardStyle(day.label)}`}
+                className={`rounded-lg p-3 text-center transition-all bg-primary/10 dark:bg-primary/20 border-2 shadow-md ${getCardBorderColor(difficultyLevel)}`}
               >
                 {/* Day Label + Difficulty + Stars on one line */}
-                <div className={`text-xs font-medium mb-1.5 ${getDayLabelColor(day.label)}`}>
-                  <span className="font-semibold">{day.label}</span>
-                  <span className="mx-1">•</span>
-                  <span className={`${
-                    difficultyLevel === "Beginner" ? "text-green-600 dark:text-green-400" :
-                    difficultyLevel === "Intermediate" ? "text-yellow-600 dark:text-yellow-400" :
-                    difficultyLevel === "Advanced" ? "text-red-600 dark:text-red-400" : ""
-                  }`}>
+                <div className="text-xs font-medium mb-1.5">
+                  <span className="font-semibold text-foreground">{day.label}</span>
+                  <span className="mx-1 text-muted-foreground">•</span>
+                  <span className={getDifficultyTextColor(difficultyLevel)}>
                     {difficultyLevel}
                   </span>
                   <span className="ml-1">
                     {isTomorrow ? (
                       <span className="text-muted-foreground">({scheduledDifficulty.range[0]}-{scheduledDifficulty.range[1]}★)</span>
                     ) : exactStars ? (
-                      <span className={getDayLabelColor(day.label)}>{exactStars}★</span>
+                      <span className={getDifficultyTextColor(difficultyLevel)}>{exactStars}★</span>
                     ) : (
                       <span className="text-muted-foreground">({scheduledDifficulty.range[0]}-{scheduledDifficulty.range[1]}★)</span>
                     )}
                   </span>
                 </div>
 
-                {/* Category Badge */}
-                <Badge className={`${getCategoryColor(category)} text-xs px-2 py-0.5`}>
+                {/* Category Badge - colored by difficulty */}
+                <Badge className={`${getCategoryBadgeColor(difficultyLevel)} text-xs px-2 py-0.5`}>
                   {category}
                 </Badge>
               </div>
