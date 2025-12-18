@@ -51,9 +51,16 @@ const getDifficultyForDay = (dayInCycle: number, weekNumber: number): { level: s
 };
 
 const getDifficultyBadgeClass = (level: string) => {
-  if (level === "Beginner") return "bg-green-500/20 text-green-700 dark:text-green-400 border-green-500/30";
-  if (level === "Intermediate") return "bg-yellow-500/20 text-yellow-700 dark:text-yellow-400 border-yellow-500/30";
+  if (level === "Beginner") return "bg-yellow-500/20 text-yellow-700 dark:text-yellow-400 border-yellow-500/30";
+  if (level === "Intermediate") return "bg-green-500/20 text-green-700 dark:text-green-400 border-green-500/30";
   return "bg-red-500/20 text-red-700 dark:text-red-400 border-red-500/30";
+};
+
+// Get border color based on difficulty
+const getDifficultyBorderClass = (level: string) => {
+  if (level === "Beginner") return "border-yellow-500";
+  if (level === "Intermediate") return "border-green-500";
+  return "border-red-500";
 };
 
 export const WODTimeline = () => {
@@ -161,11 +168,15 @@ export const WODTimeline = () => {
     );
   }
 
+  // Get yesterday's difficulty for border color
+  const yesterdayDifficulty = yesterdayWOD?.difficulty || "Intermediate";
+  const todayDifficulty = todayWODs?.difficulty || "Intermediate";
+
   return (
     <div className="mb-4 rounded-lg border border-border bg-muted/30 overflow-hidden">
       <div className="grid grid-cols-3">
         {/* Yesterday */}
-        <div className="p-2 md:p-3 border-r border-border/50 opacity-70">
+        <div className={`p-2 md:p-3 bg-primary/10 dark:bg-primary/20 border-2 ${getDifficultyBorderClass(yesterdayDifficulty)} opacity-80`}>
           <div className="flex items-center gap-1 mb-1 text-muted-foreground">
             <ChevronLeft className="h-3 w-3" />
             <span className="text-[10px] md:text-xs uppercase tracking-wide">Yesterday ({format(yesterday, "MMM d")})</span>
@@ -187,8 +198,8 @@ export const WODTimeline = () => {
           )}
         </div>
 
-        {/* Today - Highlighted with proper contrast */}
-        <div className="p-2 md:p-3 bg-card border-x-2 border-primary shadow-sm">
+        {/* Today - Highlighted */}
+        <div className={`p-2 md:p-3 bg-primary/10 dark:bg-primary/20 border-2 shadow-sm ${getDifficultyBorderClass(todayDifficulty)}`}>
           <div className="flex items-center justify-center gap-1 mb-1">
             <Star className="h-3 w-3 text-primary fill-primary" />
             <span className="text-[10px] md:text-xs uppercase tracking-wide font-bold text-primary">Today</span>
@@ -212,7 +223,7 @@ export const WODTimeline = () => {
         </div>
 
         {/* Tomorrow */}
-        <div className="p-2 md:p-3 border-l border-border/50 opacity-70">
+        <div className={`p-2 md:p-3 bg-primary/10 dark:bg-primary/20 border-2 opacity-80 ${getDifficultyBorderClass(tomorrowInfo.difficultyLevel)}`}>
           <div className="flex items-center justify-end gap-1 mb-1 text-muted-foreground">
             <span className="text-[10px] md:text-xs uppercase tracking-wide">Tomorrow</span>
             <ChevronRight className="h-3 w-3" />
