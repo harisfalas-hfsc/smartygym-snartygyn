@@ -76,10 +76,15 @@ export const AdminDocumentationManager = () => {
     }
   };
 
-  const openBrochure = (type: 'individual' | 'corporate') => {
-    const path = type === 'individual' ? '/admin/brochure-individual' : '/admin/brochure-corporate';
+  const openBrochure = (type: 'individual' | 'corporate' | 'cron-jobs') => {
+    const pathMap = {
+      'individual': '/admin/brochure-individual',
+      'corporate': '/admin/brochure-corporate',
+      'cron-jobs': '/admin/brochure-cron-jobs'
+    };
+    const path = pathMap[type];
     window.open(path, '_blank');
-    toast.success(`Opening ${type} brochure in new tab`);
+    toast.success(`Opening ${type} document in new tab`);
   };
 
   // App Store Submission Checklist
@@ -653,6 +658,25 @@ Contact: corporate@smartygym.com`;
               >
                 <Download className="h-4 w-4" />
                 Download TXT
+              </Button>
+            </div>
+          </div>
+
+          {/* Cron Jobs Documentation */}
+          <div className="border rounded-lg p-4 space-y-3">
+            <div>
+              <h3 className="font-semibold text-lg">Cron Jobs & Notifications</h3>
+              <p className="text-sm text-muted-foreground">Complete documentation of all automated messages and emails</p>
+            </div>
+            <div className="flex flex-wrap gap-2">
+              <Button
+                variant="default"
+                size="sm"
+                onClick={() => openBrochure('cron-jobs')}
+                className="gap-2"
+              >
+                <ExternalLink className="h-4 w-4" />
+                Open Documentation
               </Button>
             </div>
           </div>

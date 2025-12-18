@@ -127,11 +127,16 @@ export const CorporateBrochure = () => {
 
         {/* Expert */}
         <div className="bg-[#1a1a1a] text-white rounded-xl p-6 flex items-center gap-6">
-          <img 
-            src="/lovable-uploads/5b15e21a-12fa-49ff-8a45-6d7b5fa49c55.png"
-            alt="Haris Falas - Sports Scientist"
-            className="h-24 w-24 rounded-full object-cover border-2 border-[#29B6D2]"
-          />
+          <div className="h-24 w-24 flex-shrink-0 rounded-full bg-[#29B6D2]/20 border-2 border-[#29B6D2] overflow-hidden">
+            <img 
+              src="/lovable-uploads/5b15e21a-12fa-49ff-8a45-6d7b5fa49c55.png"
+              alt="Haris Falas - Sports Scientist"
+              className="h-full w-full object-cover"
+              onError={(e) => {
+                e.currentTarget.style.display = 'none';
+              }}
+            />
+          </div>
           <div>
             <p className="text-[#29B6D2] font-bold text-lg">Designed by Haris Falas</p>
             <p className="text-gray-400 mb-2">Sports Scientist | CSCS Certified | 20+ Years Experience</p>
