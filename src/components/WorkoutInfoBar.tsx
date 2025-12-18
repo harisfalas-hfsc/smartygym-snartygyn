@@ -11,9 +11,9 @@ interface WorkoutInfoBarProps {
 export const WorkoutInfoBar = ({ duration, equipment, difficulty, focus }: WorkoutInfoBarProps) => {
   const getDifficultyColor = (diff: string) => {
     const lower = diff.toLowerCase();
-    if (lower.includes("beginner")) return "bg-green-500/10 text-green-700 dark:text-green-400 border-green-500/20";
-    if (lower.includes("intermediate")) return "bg-yellow-500/10 text-yellow-700 dark:text-yellow-400 border-yellow-500/20";
-    if (lower.includes("advanced")) return "bg-red-500/10 text-red-700 dark:text-red-400 border-red-500/20";
+    if (lower.includes("beginner")) return "bg-yellow-500/10 text-yellow-700 dark:text-yellow-400 border-yellow-500/20"; // Beginner = YELLOW
+    if (lower.includes("intermediate")) return "bg-green-500/10 text-green-700 dark:text-green-400 border-green-500/20"; // Intermediate = GREEN
+    if (lower.includes("advanced")) return "bg-red-500/10 text-red-700 dark:text-red-400 border-red-500/20"; // Advanced = RED
     return "bg-muted text-muted-foreground border-border";
   };
 
