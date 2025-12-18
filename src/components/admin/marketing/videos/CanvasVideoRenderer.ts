@@ -292,15 +292,15 @@ export class CanvasVideoRenderer {
     ctx.textBaseline = "alphabetic";
 
     ctx.fillStyle = WHITE;
-    ctx.font = "900 120px Arial, sans-serif";
+    ctx.font = "900 72px Arial, sans-serif";
     ctx.fillText("Workout of the Day", x, VIDEO_HEIGHT * 0.40);
 
     ctx.fillStyle = LIGHT_BLUE;
-    ctx.font = "800 96px Arial, sans-serif";
+    ctx.font = "800 64px Arial, sans-serif";
     ctx.fillText("Every single day", x, VIDEO_HEIGHT * 0.48);
 
     ctx.fillStyle = MUTED_WHITE;
-    ctx.font = "600 56px Arial, sans-serif";
+    ctx.font = "600 48px Arial, sans-serif";
     ctx.fillText("No guessing", x, VIDEO_HEIGHT * 0.60);
     ctx.fillText("No random training", x, VIDEO_HEIGHT * 0.66);
 
@@ -317,7 +317,7 @@ export class CanvasVideoRenderer {
     ctx.textAlign = "center";
 
     ctx.fillStyle = WHITE;
-    ctx.font = "900 120px Arial, sans-serif";
+    ctx.font = "900 68px Arial, sans-serif";
     ctx.fillText("2 Workouts. Every Day.", x, VIDEO_HEIGHT * 0.42);
 
     const baseY = VIDEO_HEIGHT * 0.55;
@@ -326,7 +326,7 @@ export class CanvasVideoRenderer {
     const line2Alpha = clamp01((tHold - 500) / 350);
 
     ctx.fillStyle = LIGHT_BLUE;
-    ctx.font = "800 80px Arial, sans-serif";
+    ctx.font = "800 60px Arial, sans-serif";
 
     ctx.globalAlpha = a * line1Alpha;
     ctx.fillText("1 Bodyweight", x, baseY);
@@ -365,11 +365,11 @@ export class CanvasVideoRenderer {
     ctx.textAlign = "center";
 
     ctx.fillStyle = WHITE;
-    ctx.font = "900 104px Arial, sans-serif";
+    ctx.font = "900 68px Arial, sans-serif";
     ctx.fillText("Different difficulty", VIDEO_WIDTH / 2, VIDEO_HEIGHT * 0.40);
 
     ctx.fillStyle = LIGHT_BLUE;
-    ctx.font = "800 96px Arial, sans-serif";
+    ctx.font = "800 64px Arial, sans-serif";
     ctx.fillText("Every day", VIDEO_WIDTH / 2, VIDEO_HEIGHT * 0.48);
 
     const subWords = ["Safe.", "Professional.", "Science based periodization."];
@@ -377,7 +377,7 @@ export class CanvasVideoRenderer {
     const revealed = Math.min(subWords.length, Math.floor(holdMs / 400) + 1);
 
     ctx.fillStyle = MUTED_WHITE;
-    ctx.font = "600 56px Arial, sans-serif";
+    ctx.font = "600 42px Arial, sans-serif";
     ctx.fillText(subWords.slice(0, revealed).join(" "), VIDEO_WIDTH / 2, VIDEO_HEIGHT * 0.62);
 
     ctx.restore();
@@ -396,14 +396,14 @@ export class CanvasVideoRenderer {
     ctx.textBaseline = "middle";
 
     ctx.fillStyle = WHITE;
-    ctx.font = "900 96px Arial, sans-serif";
-    ctx.fillText("It's like having", 0, -140);
+    ctx.font = "900 64px Arial, sans-serif";
+    ctx.fillText("It's like having", 0, -100);
 
     ctx.fillStyle = LIGHT_BLUE;
     ctx.fillText("your personal trainer", 0, 0);
 
     ctx.fillStyle = WHITE;
-    ctx.fillText("ready every day", 0, 140);
+    ctx.fillText("ready every day", 0, 100);
 
     ctx.restore();
   }
