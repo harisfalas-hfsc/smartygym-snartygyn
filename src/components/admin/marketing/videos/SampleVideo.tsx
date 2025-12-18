@@ -1,3 +1,37 @@
+/**
+ * ============================================================================
+ * SAMPLE VIDEO - REFERENCE TEMPLATE FOR ALL PROMOTIONAL VIDEOS
+ * ============================================================================
+ * 
+ * This file serves as the master template for SmartyGym promotional videos.
+ * All future marketing videos should follow this structure and style.
+ * 
+ * STRUCTURE (8 Scenes, ~25 seconds total):
+ * - Scene 1: Logo intro with glow animation
+ * - Scene 2: Key value proposition (0% AI / 100% Human)
+ * - Scene 3: Feature highlight (Workout of the Day)
+ * - Scene 4: Specific benefit (2 Workouts daily)
+ * - Scene 5: Quick category showcase (6 cards in rapid succession)
+ * - Scene 6: Quality statement (Different difficulty + sub-points)
+ * - Scene 7: Emotional appeal (Personal trainer message)
+ * - Scene 8: Logo outro with tagline
+ * 
+ * BRAND COLORS:
+ * - Primary Blue: #64B5F6
+ * - Accent Red: #EF4444
+ * - White: #FFFFFF
+ * - Dark Background: #0a0a0a
+ * 
+ * ANIMATION PATTERNS:
+ * - Use slide-in animations for scene transitions
+ * - Apply glow effects to logos and key elements
+ * - Keep consistent timing: 2-4 seconds per scene
+ * 
+ * TAGLINE: "Your Gym Re-imagined. Anywhere, Anytime."
+ * 
+ * ============================================================================
+ */
+
 import { useEffect, useState, forwardRef, useImperativeHandle } from "react";
 import smartyGymLogo from "@/assets/smarty-gym-logo.png";
 
