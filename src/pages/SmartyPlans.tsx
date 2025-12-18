@@ -336,56 +336,11 @@ export default function SmartyPlans() {
             </CardContent>
           </Card>
 
-          {/* Why Choose Yearly */}
-          <Card className="mb-8 border-2 border-primary">
-            <CardHeader className="bg-primary/5">
-              <div className="flex items-center justify-between">
-                <CardTitle className="text-2xl">Why Choose the Yearly Plan?</CardTitle>
-                <Badge className="bg-green-600 text-white">BEST VALUE</Badge>
-              </div>
-            </CardHeader>
-            <CardContent className="pt-6">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                <div>
-                  <h3 className="text-xl font-bold mb-4">Save Big with Annual Membership</h3>
-                  <div className="space-y-3">
-                    {yearlyBenefits.map((benefit, index) => (
-                      <div key={index} className="flex items-start gap-2">
-                        <Check className="h-5 w-5 text-green-600 shrink-0 mt-0.5" />
-                        <span className="text-sm">{benefit}</span>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-                <div className="bg-primary/5 rounded-lg p-6 flex flex-col justify-center">
-                  <div className="text-center">
-                    <p className="text-sm text-muted-foreground mb-2">Monthly Plan</p>
-                    <div className="text-2xl font-bold line-through text-muted-foreground mb-2">€9.99 × 12 = €119.88</div>
-                    <p className="text-sm text-muted-foreground mb-4">per year</p>
-                    <p className="text-sm text-muted-foreground mb-2 mt-4">Annual Plan (Save 25%)</p>
-                    <div className="text-4xl font-bold text-primary mb-2">€89.99</div>
-                    <p className="text-sm text-green-600 font-semibold">You save €29.89!</p>
-                  </div>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
           {/* Pricing Plans - Hidden for premium users */}
           {!isPremium && (
             <>
-              <Card className="mb-8 bg-gradient-to-r from-green-50 to-emerald-50 dark:from-green-950/20 dark:to-emerald-950/20 border-green-200 dark:border-green-800">
-                <CardContent className="p-6 text-center">
-                  <h3 className="text-lg font-bold mb-2 text-green-700 dark:text-green-400">
-                    💰 Smart Investment: Lock in Recurring Payments & Save!
-                  </h3>
-                  <p className="text-sm text-green-600 dark:text-green-300">
-                    Choose a subscription plan that auto-renews and you'll save compared to one-time purchases. The yearly plan saves you 25% - that's €29.89 in your pocket!
-                  </p>
-                </CardContent>
-              </Card>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-4xl mx-auto mb-8">
+              {/* Pricing Cards - Full width to align with Compare Access Levels */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
                 {/* Gold Plan */}
                 <Card className="relative border-2 border-[#D4AF37] shadow-lg flex flex-col">
                   <CardHeader className="text-center pb-2 sm:pb-4">
@@ -456,7 +411,54 @@ export default function SmartyPlans() {
                 </Card>
               </div>
 
-              <div className="text-center mb-8">
+              {/* Why Choose Yearly - Compact */}
+              <Card className="mb-6 border-2 border-primary">
+                <CardHeader className="bg-primary/5 py-3">
+                  <div className="flex items-center justify-between">
+                    <CardTitle className="text-xl">Why Choose the Yearly Plan?</CardTitle>
+                    <Badge className="bg-green-600 text-white">BEST VALUE</Badge>
+                  </div>
+                </CardHeader>
+                <CardContent className="pt-4 pb-4">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <h3 className="text-lg font-bold mb-3">Save Big with Annual Membership</h3>
+                      <div className="space-y-2">
+                        {yearlyBenefits.map((benefit, index) => (
+                          <div key={index} className="flex items-start gap-2">
+                            <Check className="h-4 w-4 text-green-600 shrink-0 mt-0.5" />
+                            <span className="text-sm">{benefit}</span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                    <div className="bg-primary/5 rounded-lg p-4 flex flex-col justify-center">
+                      <div className="text-center">
+                        <p className="text-xs text-muted-foreground mb-1">Monthly Plan</p>
+                        <div className="text-lg font-bold line-through text-muted-foreground mb-1">€9.99 × 12 = €119.88</div>
+                        <p className="text-xs text-muted-foreground mb-2">per year</p>
+                        <p className="text-xs text-muted-foreground mb-1">Annual Plan (Save 25%)</p>
+                        <div className="text-2xl font-bold text-primary mb-1">€89.99</div>
+                        <p className="text-sm text-green-600 font-semibold">You save €29.89!</p>
+                      </div>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Smart Investment Card */}
+              <Card className="mb-6 bg-gradient-to-r from-green-50 to-emerald-50 dark:from-green-950/20 dark:to-emerald-950/20 border-green-200 dark:border-green-800">
+                <CardContent className="p-4 text-center">
+                  <h3 className="text-base font-bold mb-1 text-green-700 dark:text-green-400">
+                    💰 Smart Investment: Lock in Recurring Payments & Save!
+                  </h3>
+                  <p className="text-sm text-green-600 dark:text-green-300">
+                    Choose a subscription plan that auto-renews and you'll save compared to one-time purchases. The yearly plan saves you 25% - that's €29.89 in your pocket!
+                  </p>
+                </CardContent>
+              </Card>
+
+              <div className="text-center mb-6">
                 <p className="text-xs text-muted-foreground">🔄 All plans are recurring subscriptions</p>
               </div>
 
