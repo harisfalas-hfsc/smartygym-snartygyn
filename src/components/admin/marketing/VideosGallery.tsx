@@ -275,8 +275,7 @@ export const VideosGallery = () => {
                         e.stopPropagation();
                         handleDownload(video);
                       }}
-                      disabled={!video.video_url}
-                      title={video.video_url ? "Download MP4" : "No video file"}
+                      title="Download MP4"
                     >
                       <Download className="h-3.5 w-3.5" />
                     </Button>
