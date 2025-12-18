@@ -43,8 +43,9 @@ const FORMATS_BY_CATEGORY: Record<string, string[]> = {
   "CHALLENGE": ["CIRCUIT", "TABATA", "AMRAP", "EMOM", "FOR TIME", "MIX"]
 };
 
-const getDayInCycle = (dayCount: number): number => ((dayCount - 1) % 7) + 1 || 7;
-const getWeekNumber = (dayCount: number): number => Math.floor((dayCount - 1) / 7) + 1;
+// Match backend formula exactly
+const getDayInCycle = (dayCount: number): number => (dayCount % 7) + 1;
+const getWeekNumber = (dayCount: number): number => Math.floor(dayCount / 7) + 1;
 
 const getCategoryForDay = (dayInCycle: number): string => CATEGORY_CYCLE_7DAY[dayInCycle - 1];
 
@@ -81,6 +82,8 @@ export const WODSchedulePreview = () => {
   });
 
   // Calculate next 7 days schedule
+  // CRITICAL: day_count represents AFTER today's generation
+  // So day_count already points to tomorrow's position in the cycle
   const getUpcomingSchedule = () => {
     if (!wodState) return [];
     
@@ -89,12 +92,14 @@ export const WODSchedulePreview = () => {
     const currentWeekNumber = wodState.week_number || getWeekNumber(currentDayCount);
     const manualOverrides = (wodState.manual_overrides as Record<string, any>) || {};
     
-    for (let i = 1; i <= 7; i++) {
+    for (let i = 0; i < 7; i++) {
+      // i=0 is tomorrow (uses currentDayCount directly)
+      // i=1 is day after tomorrow (currentDayCount + 1), etc.
       const futureDayCount = currentDayCount + i;
       const futureDayInCycle = getDayInCycle(futureDayCount);
       const futureWeekNumber = futureDayInCycle === 1 && i > 0 ? currentWeekNumber + 1 : currentWeekNumber;
       
-      const futureDate = addDays(new Date(), i);
+      const futureDate = addDays(new Date(), i + 1); // i+1 because i=0 is tomorrow
       const dateStr = format(futureDate, "yyyy-MM-dd");
       
       const override = manualOverrides[dateStr];
