@@ -908,7 +908,30 @@ RESPONSE FORMAT (JSON ONLY - NO MARKDOWN):
         throw new Error(`Failed to insert ${equipment} WOD: ${insertError.message}`);
       }
 
-      logStep(`${equipment} WOD inserted`, { id: workoutId, name: workoutContent.name });
+      // ═══════════════════════════════════════════════════════════════════════════════
+      // CRITICAL SAFETY CHECK: Verify workout was actually inserted into database
+      // ═══════════════════════════════════════════════════════════════════════════════
+      const { data: verifyWorkout, error: verifyError } = await supabase
+        .from("admin_workouts")
+        .select("id, name, equipment, generated_for_date")
+        .eq("id", workoutId)
+        .single();
+      
+      if (verifyError || !verifyWorkout) {
+        logStep(`CRITICAL: ${equipment} WOD verification failed`, { 
+          workoutId, 
+          verifyError: verifyError?.message,
+          verifyWorkout 
+        });
+        throw new Error(`${equipment} WOD verification failed - workout not found in database after insert`);
+      }
+      
+      logStep(`✅ ${equipment} WOD verified in database`, { 
+        id: verifyWorkout.id, 
+        name: verifyWorkout.name,
+        equipment: verifyWorkout.equipment,
+        generated_for_date: verifyWorkout.generated_for_date
+      });
 
       generatedWorkouts.push({
         id: workoutId,
@@ -917,6 +940,49 @@ RESPONSE FORMAT (JSON ONLY - NO MARKDOWN):
         image_url: imageUrl
       });
     }
+
+    // ═══════════════════════════════════════════════════════════════════════════════
+    // CRITICAL FINAL VERIFICATION: Ensure BOTH workouts exist before updating state
+    // This prevents state corruption if one workout fails
+    // ═══════════════════════════════════════════════════════════════════════════════
+    const { data: finalVerification, error: finalVerifyError } = await supabase
+      .from("admin_workouts")
+      .select("id, name, equipment, generated_for_date")
+      .eq("generated_for_date", effectiveDate)
+      .eq("is_workout_of_day", true);
+    
+    const bodyweightExists = finalVerification?.some(w => w.equipment === "BODYWEIGHT");
+    const equipmentExists = finalVerification?.some(w => w.equipment === "EQUIPMENT");
+    
+    logStep("Final verification before state update", {
+      effectiveDate,
+      totalFound: finalVerification?.length || 0,
+      bodyweightExists,
+      equipmentExists,
+      workouts: finalVerification?.map(w => ({ id: w.id, name: w.name, equipment: w.equipment }))
+    });
+    
+    if (!bodyweightExists || !equipmentExists) {
+      const missing = [];
+      if (!bodyweightExists) missing.push("BODYWEIGHT");
+      if (!equipmentExists) missing.push("EQUIPMENT");
+      
+      logStep("CRITICAL ERROR: Not all workouts generated", { 
+        missing, 
+        generated: generatedWorkouts.map(w => w.equipment)
+      });
+      
+      return new Response(
+        JSON.stringify({
+          success: false,
+          error: `Failed to generate all WODs. Missing: ${missing.join(", ")}`,
+          generated: generatedWorkouts.map(w => ({ name: w.name, equipment: w.equipment }))
+        }),
+        { headers: { ...corsHeaders, "Content-Type": "application/json" }, status: 500 }
+      );
+    }
+    
+    logStep("✅ BOTH workouts verified - proceeding with state update");
 
     // ═══════════════════════════════════════════════════════════════════════════════
     // UPDATE STATE - Track used stars, remove override if used
