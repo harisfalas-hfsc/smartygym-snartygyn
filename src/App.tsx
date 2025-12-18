@@ -73,6 +73,7 @@ import AppSubmission from "./pages/AppSubmission";
 import AppSubmissionPrintable from "./pages/AppSubmissionPrintable";
 import BrochureIndividual from "./pages/BrochureIndividual";
 import BrochureCorporate from "./pages/BrochureCorporate";
+import BrochureCronJobs from "./pages/BrochureCronJobs";
 import { AccessGate } from "./components/AccessGate";
 
 import { InstallPWA } from "./components/InstallPWA";
@@ -187,6 +188,11 @@ const AppContent = () => {
                 <Route path="/admin/brochure-corporate" element={
                   <AdminRoute>
                     <BrochureCorporate />
+                  </AdminRoute>
+                } />
+                <Route path="/admin/brochure-cron-jobs" element={
+                  <AdminRoute>
+                    <BrochureCronJobs />
                   </AdminRoute>
                 } />
                 

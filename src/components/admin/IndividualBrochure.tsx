@@ -39,11 +39,16 @@ export const IndividualBrochure = () => {
             Every workout, every program, every detail is crafted by a real expert with 20+ years of coaching experience.
           </p>
           <div className="flex items-center gap-4 mt-6">
-            <img 
-              src="/lovable-uploads/5b15e21a-12fa-49ff-8a45-6d7b5fa49c55.png"
-              alt="Haris Falas - Sports Scientist"
-              className="h-20 w-20 rounded-full object-cover border-2 border-[#29B6D2]"
-            />
+            <div className="h-20 w-20 flex-shrink-0 rounded-full bg-[#29B6D2]/20 border-2 border-[#29B6D2] overflow-hidden">
+              <img 
+                src="/lovable-uploads/5b15e21a-12fa-49ff-8a45-6d7b5fa49c55.png"
+                alt="Haris Falas - Sports Scientist"
+                className="h-full w-full object-cover"
+                onError={(e) => {
+                  e.currentTarget.style.display = 'none';
+                }}
+              />
+            </div>
             <div>
               <p className="font-bold text-[#29B6D2]">Haris Falas</p>
               <p className="text-sm text-gray-400">Sports Scientist | CSCS Certified</p>
