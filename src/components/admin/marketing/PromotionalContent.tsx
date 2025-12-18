@@ -2,15 +2,16 @@ import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Download, Eye, Calendar, Instagram, Facebook } from "lucide-react";
+import { Download, Eye, Calendar, Instagram, Facebook, Video } from "lucide-react";
 import { toast } from "sonner";
 import { Document, Packer, Paragraph, TextRun, Table, TableRow, TableCell, WidthType, BorderStyle, AlignmentType } from 'docx';
 import { saveAs } from 'file-saver';
 import { socialMediaStrategy } from "@/utils/socialMediaContent";
 import { ScrollArea } from "@/components/ui/scroll-area";
-
+import { SocialMediaVideoGenerator } from "./SocialMediaVideoGenerator";
 export const PromotionalContent = () => {
   const [previewOpen, setPreviewOpen] = useState(false);
+  const [videoGeneratorOpen, setVideoGeneratorOpen] = useState(false);
 
   const generateStrategyDocument = async () => {
     toast.loading("Generating 30-Day Strategy...", { id: "strategy-download" });
@@ -203,6 +204,46 @@ export const PromotionalContent = () => {
           </div>
         </DialogContent>
       </Dialog>
+
+      {/* Video Generator Card */}
+      <Card className="border-2 border-primary/20">
+        <CardHeader>
+          <div className="flex items-center gap-3">
+            <div className="p-3 bg-primary/10 rounded-lg">
+              <Video className="h-6 w-6 text-primary" />
+            </div>
+            <div>
+              <CardTitle>Generate TikTok/Reels Videos</CardTitle>
+              <p className="text-sm text-muted-foreground mt-1">
+                Create all 30 days of video content automatically
+              </p>
+            </div>
+          </div>
+        </CardHeader>
+        <CardContent>
+          <div className="space-y-4">
+            <div className="text-sm text-muted-foreground">
+              <p>Each video follows the brand guidelines:</p>
+              <ul className="mt-2 space-y-1 list-disc list-inside">
+                <li>25 seconds exactly</li>
+                <li>Logo intro and outro</li>
+                <li>4 animated content cards</li>
+                <li>Brand colors and fonts</li>
+              </ul>
+            </div>
+            <Button onClick={() => setVideoGeneratorOpen(true)} className="w-full gap-2">
+              <Video className="w-4 h-4" />
+              Open Video Generator
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Video Generator Dialog */}
+      <SocialMediaVideoGenerator 
+        open={videoGeneratorOpen} 
+        onOpenChange={setVideoGeneratorOpen} 
+      />
 
       <Card className="bg-muted/50">
         <CardContent className="p-4">
