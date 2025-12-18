@@ -23,7 +23,8 @@ import {
   ClipboardCheck,
   LayoutDashboard,
   MessageCircle,
-  Flame
+  Flame,
+  Building2
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { User } from "@supabase/supabase-js";
@@ -458,6 +459,28 @@ export default function SmartyPlans() {
               <div className="text-center mb-8">
                 <p className="text-xs text-muted-foreground">🔄 All plans are recurring subscriptions</p>
               </div>
+
+              {/* Corporate Plans Promotion */}
+              <Card className="mb-8 bg-gradient-to-r from-blue-50 to-sky-50 dark:from-blue-950/20 dark:to-sky-950/20 border-blue-200 dark:border-blue-800">
+                <CardContent className="p-6 text-center">
+                  <div className="flex items-center justify-center gap-2 mb-2">
+                    <Building2 className="h-6 w-6 text-blue-600 dark:text-blue-400" />
+                    <h3 className="text-lg font-bold text-blue-700 dark:text-blue-400">
+                      Looking for Corporate Plans?
+                    </h3>
+                  </div>
+                  <p className="text-sm text-blue-600 dark:text-blue-300 mb-4">
+                    Empower your team with group fitness subscriptions. Choose from flexible plans for organizations of any size - from small teams to enterprises.
+                  </p>
+                  <Button 
+                    variant="outline" 
+                    className="border-blue-500 text-blue-600 hover:bg-blue-50 dark:border-blue-400 dark:text-blue-400 dark:hover:bg-blue-950"
+                    onClick={() => navigate('/corporate')}
+                  >
+                    View Corporate Plans
+                  </Button>
+                </CardContent>
+              </Card>
             </>
           )}
 
