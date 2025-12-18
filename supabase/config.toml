@@ -158,3 +158,6 @@ verify_jwt = false
 
 [functions.sync-google-calendar]
 verify_jwt = true
+
+[functions.edit-video]
+verify_jwt = true
