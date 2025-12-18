@@ -1,5 +1,3 @@
-import smartyGymLogo from "@/assets/smarty-gym-logo.png";
-
 export const VIDEO_WIDTH = 1080;
 export const VIDEO_HEIGHT = 1920;
 export const VIDEO_FPS = 30;
@@ -41,24 +39,34 @@ const totalScenesDurationMs = sceneTimings.reduce((acc, s) => acc + sceneTotal(s
 export class CanvasVideoRenderer {
   private readonly logo: HTMLImageElement;
   private readonly readyPromise: Promise<void>;
+  private logoLoaded = false;
 
-  constructor() {
+  constructor(logoUrl: string) {
     this.logo = new Image();
+    this.logo.crossOrigin = "anonymous";
     this.logo.decoding = "async";
-    this.logo.src = smartyGymLogo;
 
     this.readyPromise = new Promise((resolve) => {
-      if (this.logo.complete) {
+      this.logo.onload = () => {
+        this.logoLoaded = true;
+        console.log("Logo loaded successfully:", this.logo.naturalWidth, "x", this.logo.naturalHeight);
         resolve();
-        return;
-      }
-      this.logo.onload = () => resolve();
-      this.logo.onerror = () => resolve();
+      };
+      this.logo.onerror = (err) => {
+        console.error("Logo failed to load:", err);
+        resolve();
+      };
+      // Set src AFTER attaching handlers
+      this.logo.src = logoUrl;
     });
   }
 
   ready() {
     return this.readyPromise;
+  }
+
+  isLogoLoaded() {
+    return this.logoLoaded && this.logo.naturalWidth > 0;
   }
 
   drawFrame(ctx: CanvasRenderingContext2D, tMs: number) {

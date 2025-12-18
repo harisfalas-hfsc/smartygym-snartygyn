@@ -11,6 +11,7 @@ import {
   VIDEO_HEIGHT,
   VIDEO_WIDTH,
 } from "./videos/CanvasVideoRenderer";
+import smartyGymLogo from "@/assets/smarty-gym-logo.png";
 
 // Get the best supported MIME type for video recording
 const getSupportedMimeType = (): string | null => {
@@ -74,20 +75,23 @@ export const VideoGeneratorDialog = ({
       setDownloadUrl(null);
       cleanup();
 
-      rendererRef.current = new CanvasVideoRenderer();
+      // Pass logo URL from Vite import (works in React component context)
+      rendererRef.current = new CanvasVideoRenderer(smartyGymLogo);
 
-      // Ensure preview canvas is configured
-      if (previewCanvasRef.current) {
-        previewCanvasRef.current.width = VIDEO_WIDTH;
-        previewCanvasRef.current.height = VIDEO_HEIGHT;
+      // Wait for logo to load before drawing preview
+      rendererRef.current.ready().then(() => {
+        if (previewCanvasRef.current && rendererRef.current) {
+          previewCanvasRef.current.width = VIDEO_WIDTH;
+          previewCanvasRef.current.height = VIDEO_HEIGHT;
 
-        const ctx = previewCanvasRef.current.getContext("2d");
-        if (ctx) {
-          ctx.fillStyle = "hsl(0, 0%, 4%)";
-          ctx.fillRect(0, 0, VIDEO_WIDTH, VIDEO_HEIGHT);
-          rendererRef.current.drawFrame(ctx, 0);
+          const ctx = previewCanvasRef.current.getContext("2d");
+          if (ctx) {
+            ctx.fillStyle = "hsl(0, 0%, 4%)";
+            ctx.fillRect(0, 0, VIDEO_WIDTH, VIDEO_HEIGHT);
+            rendererRef.current.drawFrame(ctx, 0);
+          }
         }
-      }
+      });
     } else {
       cleanup();
     }
@@ -113,7 +117,8 @@ export const VideoGeneratorDialog = ({
       return;
     }
 
-    const renderer = rendererRef.current ?? new CanvasVideoRenderer();
+    // Create renderer with logo URL from Vite import
+    const renderer = rendererRef.current ?? new CanvasVideoRenderer(smartyGymLogo);
     rendererRef.current = renderer;
 
     // Reset everything
