@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Play } from "lucide-react";
+import { Download, Play } from "lucide-react";
 import { VideoPlayer } from "./VideoPlayer";
 
 interface VideoItem {
@@ -18,28 +18,27 @@ const videos: VideoItem[] = [
     day: 1,
     title: "What is SmartyGym?",
     duration: "20 sec",
-    description: "Brand introduction with logo, tagline, and key features"
+    description: "Brand introduction with logo, tagline, and key features",
   },
   {
     id: 2,
     day: 2,
     title: "Meet Coach Haris Falas",
     duration: "20 sec",
-    description: "Coach credentials, expertise, and brand promise"
-  }
+    description: "Coach credentials, expertise, and brand promise",
+  },
 ];
 
 export const VideosGallery = () => {
   const [selectedVideo, setSelectedVideo] = useState<number | null>(null);
+  const [autoDownload, setAutoDownload] = useState(false);
 
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
           <h3 className="text-lg font-semibold">TikTok/Reels Videos</h3>
-          <p className="text-sm text-muted-foreground">
-            Preview and download animated videos for social media
-          </p>
+          <p className="text-sm text-muted-foreground">Preview and download animated videos for social media</p>
         </div>
       </div>
 
@@ -55,25 +54,48 @@ export const VideosGallery = () => {
                 <p className="text-xs text-primary font-medium">{video.duration}</p>
               </div>
             </div>
-            <CardContent className="p-2">
-              <h4 className="font-semibold text-xs mb-1 line-clamp-1">{video.title}</h4>
-              <Button 
-                size="sm" 
-                className="w-full h-7 text-xs"
-                onClick={() => setSelectedVideo(video.day)}
-              >
-                <Play className="h-3 w-3 mr-1" />
-                Preview
-              </Button>
+            <CardContent className="p-2 space-y-2">
+              <h4 className="font-semibold text-xs line-clamp-1">{video.title}</h4>
+
+              <div className="grid grid-cols-2 gap-2">
+                <Button
+                  size="sm"
+                  className="h-7 text-xs"
+                  onClick={() => {
+                    setSelectedVideo(video.day);
+                    setAutoDownload(false);
+                  }}
+                >
+                  <Play className="h-3 w-3 mr-1" />
+                  Preview
+                </Button>
+                <Button
+                  size="sm"
+                  variant="outline"
+                  className="h-7 text-xs"
+                  onClick={() => {
+                    setSelectedVideo(video.day);
+                    setAutoDownload(true);
+                  }}
+                >
+                  <Download className="h-3 w-3 mr-1" />
+                  Download
+                </Button>
+              </div>
             </CardContent>
           </Card>
         ))}
       </div>
 
-      <VideoPlayer 
-        day={selectedVideo} 
-        onClose={() => setSelectedVideo(null)} 
+      <VideoPlayer
+        day={selectedVideo}
+        autoDownload={autoDownload}
+        onClose={() => {
+          setSelectedVideo(null);
+          setAutoDownload(false);
+        }}
       />
     </div>
   );
 };
+
