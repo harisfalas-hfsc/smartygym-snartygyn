@@ -5,14 +5,14 @@ export const VIDEO_HEIGHT = 1920;
 export const VIDEO_FPS = 30;
 export const VIDEO_DURATION_MS = 25_000;
 
-// Brand colors (HSL only)
-const BRAND_DARK = "hsl(0 0% 4%)"; // ~ #0a0a0a
-const BRAND_WHITE = "hsl(0 0% 100%)";
-const BRAND_LIGHT_BLUE = "hsl(206 89% 68%)"; // ~ #64B5F6
-const BRAND_RED = "hsl(0 84% 58%)"; // ~ #EF4444
+// Brand colors (HSL only; comma syntax for Canvas 2D compatibility)
+const BRAND_DARK = "hsl(0, 0%, 4%)"; // ~ #0a0a0a
+const BRAND_WHITE = "hsl(0, 0%, 100%)";
+const BRAND_LIGHT_BLUE = "hsl(206, 89%, 68%)"; // ~ #64B5F6
+const BRAND_RED = "hsl(0, 84%, 58%)"; // ~ #EF4444
 
-const MUTED_WHITE = "hsl(0 0% 100% / 0.7)";
-const MUTED_WHITE_80 = "hsl(0 0% 100% / 0.8)";
+const MUTED_WHITE = "hsla(0, 0%, 100%, 0.7)";
+const MUTED_WHITE_80 = "hsla(0, 0%, 100%, 0.8)";
 
 const clamp01 = (v: number) => Math.min(1, Math.max(0, v));
 const lerp = (a: number, b: number, t: number) => a + (b - a) * t;
@@ -171,7 +171,7 @@ export class CanvasVideoRenderer {
     ctx.translate(x, y);
 
     // Glow
-    ctx.shadowColor = `hsl(206 89% 68% / ${clamp01(glowStrength)})`;
+    ctx.shadowColor = `hsla(206, 89%, 68%, ${clamp01(glowStrength)})`;
     ctx.shadowBlur = lerp(8, 40, clamp01(glowStrength));
 
     ctx.drawImage(img, -w / 2, -h / 2, w, h);
@@ -198,7 +198,7 @@ export class CanvasVideoRenderer {
     ctx.globalAlpha = alpha;
 
     // Background
-    ctx.fillStyle = "hsl(206 89% 68% / 0.15)";
+    ctx.fillStyle = "hsla(206, 89%, 68%, 0.15)";
     this.roundRect(ctx, -w / 2, -h / 2, w, h, 44);
     ctx.fill();
 
