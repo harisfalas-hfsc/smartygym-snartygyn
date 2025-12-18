@@ -1,4 +1,5 @@
 import { useEffect, useState, forwardRef, useImperativeHandle } from "react";
+import smartyGymLogo from "@/assets/smarty-gym-logo.png";
 
 interface SampleVideoProps {
   isPlaying?: boolean;
@@ -153,14 +154,11 @@ export const SampleVideo = forwardRef<SampleVideoRef, SampleVideoProps>(
                 : "animate-glow-pulse"
             }`}
           >
-            <div className="text-center">
-              <h1
-                className="text-4xl font-bold tracking-tight"
-                style={{ color: BRAND_LIGHT_BLUE }}
-              >
-                SmartyGym
-              </h1>
-            </div>
+            <img 
+              src={smartyGymLogo} 
+              alt="SmartyGym" 
+              className="h-20 w-auto drop-shadow-[0_0_20px_rgba(100,181,246,0.5)]"
+            />
           </div>
         )}
 
@@ -322,12 +320,11 @@ export const SampleVideo = forwardRef<SampleVideoRef, SampleVideoProps>(
                 : "animate-glow-pulse"
             }`}
           >
-            <h1
-              className="text-5xl font-bold tracking-tight mb-4"
-              style={{ color: BRAND_LIGHT_BLUE }}
-            >
-              SmartyGym
-            </h1>
+            <img 
+              src={smartyGymLogo} 
+              alt="SmartyGym" 
+              className="h-24 w-auto mb-4 drop-shadow-[0_0_25px_rgba(100,181,246,0.6)]"
+            />
             <p className="text-lg" style={{ color: "rgba(255,255,255,0.8)" }}>
               Train smart. Train human.
             </p>
