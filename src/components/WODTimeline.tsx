@@ -87,7 +87,6 @@ export const WODTimeline = () => {
         .from("admin_workouts")
         .select("category, format, difficulty, difficulty_stars")
         .eq("generated_for_date", todayDateStr)
-        .eq("is_workout_of_day", true)
         .limit(1);
       
       if (error) throw error;
