@@ -83,7 +83,7 @@ export const VideoGeneratorDialog = ({
 
         const ctx = previewCanvasRef.current.getContext("2d");
         if (ctx) {
-          ctx.fillStyle = "hsl(0 0% 4%)";
+          ctx.fillStyle = "hsl(0, 0%, 4%)";
           ctx.fillRect(0, 0, VIDEO_WIDTH, VIDEO_HEIGHT);
           rendererRef.current.drawFrame(ctx, 0);
         }
