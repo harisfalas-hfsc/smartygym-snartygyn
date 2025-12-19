@@ -54,7 +54,7 @@ const Index = () => {
     queryFn: async () => {
       const { data } = await supabase
         .from("admin_workouts")
-        .select("id, name, category, focus, difficulty_stars, duration")
+        .select("id, name, category, format, difficulty_stars, duration")
         .eq("is_workout_of_day", true)
         .limit(2);
       return data || [];
@@ -511,10 +511,10 @@ const Index = () => {
                   {currentMobileWod.category && (
                     <span className="text-red-600 dark:text-red-400 font-medium">{currentMobileWod.category}</span>
                   )}
-                  {currentMobileWod.focus && (
+                  {currentMobileWod.format && (
                     <>
                       <span className="text-muted-foreground">•</span>
-                      <span className="text-blue-600 dark:text-blue-400 font-medium">{currentMobileWod.focus}</span>
+                      <span className="text-blue-600 dark:text-blue-400 font-medium">{currentMobileWod.format}</span>
                     </>
                   )}
                   {currentMobileWod.difficulty_stars && (

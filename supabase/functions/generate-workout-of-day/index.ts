@@ -931,7 +931,7 @@ INSTRUCTIONS FORMAT: Plain paragraphs with clear guidance
         .insert({
           id: workoutId,
           name: workoutContent.name,
-          type: "wod",
+          type: format,
           category: category,
           format: format,
           equipment: equipment,

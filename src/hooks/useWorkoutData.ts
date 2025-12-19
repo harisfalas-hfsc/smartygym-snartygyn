@@ -10,7 +10,6 @@ export interface WorkoutData {
   equipment: string | null;
   duration: string | null;
   format: string | null;
-  focus: string | null;
   image_url: string | null;
   description: string | null;
   instructions: string | null;

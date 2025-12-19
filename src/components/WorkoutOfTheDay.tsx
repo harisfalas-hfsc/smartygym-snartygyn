@@ -111,7 +111,7 @@ export const WorkoutOfTheDay = () => {
           )}
           <div className="flex items-center gap-1">
             <Target className="w-2.5 h-2.5 text-primary" />
-            <span className="text-blue-600 dark:text-blue-400 font-medium">{wod.focus || wod.format || "General"}</span>
+            <span className="text-blue-600 dark:text-blue-400 font-medium">{wod.format || "General"}</span>
           </div>
           <span className="text-muted-foreground/50">•</span>
           <div className="flex items-center gap-1">
