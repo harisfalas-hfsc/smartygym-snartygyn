@@ -96,7 +96,7 @@ export const HeroThreeColumns = () => {
     queryFn: async () => {
       const { data } = await supabase
         .from("admin_workouts")
-        .select("id, name, category, difficulty_stars, format, duration")
+        .select("id, name, category, focus, difficulty_stars, duration")
         .eq("is_workout_of_day", true)
         .limit(2);
       return data || [];
@@ -250,9 +250,14 @@ export const HeroThreeColumns = () => {
               className="mt-2 text-center space-y-1 animate-fade-in h-[70px]"
             >
               <p className="text-sm font-semibold text-foreground line-clamp-2 max-w-[200px] leading-tight h-[36px]">{currentWod.name}</p>
-              <p className="text-xs text-red-600 dark:text-red-400 font-medium">{currentWod.category}</p>
-              <div className="flex items-center justify-center gap-1.5 text-xs text-muted-foreground truncate">
-                {currentWod.format && <span className="text-emerald-600 dark:text-emerald-400 font-medium">{currentWod.format}</span>}
+              <div className="flex items-center justify-center gap-1 text-[10px] text-muted-foreground flex-wrap">
+                {currentWod.category && <span className="text-red-600 dark:text-red-400 font-medium">{currentWod.category}</span>}
+                {currentWod.focus && (
+                  <>
+                    <span>•</span>
+                    <span className="text-blue-600 dark:text-blue-400 font-medium">{currentWod.focus}</span>
+                  </>
+                )}
                 {currentWod.difficulty_stars && (
                   <>
                     <span>•</span>

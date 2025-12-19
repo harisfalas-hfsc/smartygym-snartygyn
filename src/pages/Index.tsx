@@ -54,7 +54,7 @@ const Index = () => {
     queryFn: async () => {
       const { data } = await supabase
         .from("admin_workouts")
-        .select("id, name, category, difficulty_stars, format, duration")
+        .select("id, name, category, focus, difficulty_stars, duration")
         .eq("is_workout_of_day", true)
         .limit(2);
       return data || [];
@@ -507,19 +507,31 @@ const Index = () => {
               >
                 <span className="text-sm font-bold text-foreground">Your Workout of the Day</span>
                 <p className="text-base font-semibold text-foreground">{currentMobileWod.name}</p>
-                <div className="flex items-center gap-2 text-xs mt-0.5">
-                  {currentMobileWod.format && (
-                    <span className="text-emerald-600 dark:text-emerald-400 font-medium">{currentMobileWod.format}</span>
-                  )}
-                  {currentMobileWod.difficulty_stars && (
-                    <span className="flex items-center gap-0.5">
-                      {Array.from({ length: currentMobileWod.difficulty_stars }, (_, i) => (
-                        <Star key={i} className="w-3 h-3 fill-primary text-primary" />
-                      ))}
-                    </span>
-                  )}
+                <div className="flex items-center gap-1 text-[10px] mt-0.5 flex-wrap">
                   {currentMobileWod.category && (
                     <span className="text-red-600 dark:text-red-400 font-medium">{currentMobileWod.category}</span>
+                  )}
+                  {currentMobileWod.focus && (
+                    <>
+                      <span className="text-muted-foreground">•</span>
+                      <span className="text-blue-600 dark:text-blue-400 font-medium">{currentMobileWod.focus}</span>
+                    </>
+                  )}
+                  {currentMobileWod.difficulty_stars && (
+                    <>
+                      <span className="text-muted-foreground">•</span>
+                      <span className="flex items-center gap-0.5">
+                        {Array.from({ length: currentMobileWod.difficulty_stars }, (_, i) => (
+                          <Star key={i} className="w-2.5 h-2.5 fill-primary text-primary" />
+                        ))}
+                      </span>
+                    </>
+                  )}
+                  {currentMobileWod.duration && (
+                    <>
+                      <span className="text-muted-foreground">•</span>
+                      <span className="text-muted-foreground">{currentMobileWod.duration}</span>
+                    </>
                   )}
                 </div>
               </div>
