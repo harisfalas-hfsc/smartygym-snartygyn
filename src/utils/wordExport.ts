@@ -559,3 +559,119 @@ export const smartyGymConceptContent: ContentSection[] = [
   { type: 'paragraph', content: 'SmartyGym — Your Gym Re-imagined. Anywhere, Anytime.' },
   { type: 'paragraph', content: 'www.smartygym.com' },
 ];
+
+// App Publishing Cost & Checklist Guide
+export const appPublishingCostChecklistContent: ContentSection[] = [
+  { type: 'heading', content: '📱 APP PUBLISHING COST & CHECKLIST GUIDE', level: 1 },
+  { type: 'paragraph', content: 'Complete guide for publishing SmartyGym to the Apple App Store and Google Play Store, including all costs and step-by-step checklist.' },
+
+  { type: 'heading', content: '💰 COST BREAKDOWN', level: 1 },
+  
+  { type: 'heading', content: '1. BuildNatively Subscription', level: 2 },
+  { type: 'paragraph', content: 'BuildNatively converts your web app to native iOS and Android apps.' },
+  { type: 'bullet', content: 'Monthly Plan: $32/month (billed annually)' },
+  { type: 'bullet', content: 'Lifetime Plan: $699 one-time payment' },
+  { type: 'paragraph', content: 'Website: https://app.buildnatively.com/' },
+  { type: 'paragraph', content: 'Includes: App conversion, binary builds, push notification integration, iOS auto-upload to App Store Connect.' },
+  { type: 'paragraph', content: 'Does NOT include: Apple/Google developer accounts, website hosting (Lovable handles this).' },
+
+  { type: 'heading', content: '2. Apple Developer Program (Required for iOS)', level: 2 },
+  { type: 'bullet', content: 'Cost: $99/year (mandatory annual fee)' },
+  { type: 'bullet', content: 'Enrollment: https://developer.apple.com/programs/enroll/' },
+  { type: 'bullet', content: 'Requirements: Apple ID, personal or business verification' },
+  { type: 'paragraph', content: 'This is required to publish ANY app to the Apple App Store.' },
+
+  { type: 'heading', content: '3. Google Play Console (Required for Android)', level: 2 },
+  { type: 'bullet', content: 'Cost: $25 one-time fee (lifetime access)' },
+  { type: 'bullet', content: 'Enrollment: https://play.google.com/console/signup' },
+  { type: 'bullet', content: 'Requirements: Google account, payment verification' },
+  { type: 'paragraph', content: 'This is required to publish ANY app to the Google Play Store.' },
+
+  { type: 'heading', content: '📊 TOTAL COST SUMMARY', level: 1 },
+  
+  { type: 'heading', content: 'Option A: Monthly BuildNatively', level: 2 },
+  { type: 'bullet', content: 'Year 1: $384 (BuildNatively) + $99 (Apple) + $25 (Google) = $508' },
+  { type: 'bullet', content: 'Year 2+: $384 (BuildNatively) + $99 (Apple) = $483/year' },
+  
+  { type: 'heading', content: 'Option B: Lifetime BuildNatively (Recommended)', level: 2 },
+  { type: 'bullet', content: 'Year 1: $699 (BuildNatively) + $99 (Apple) + $25 (Google) = $823' },
+  { type: 'bullet', content: 'Year 2+: $99 (Apple only) = $99/year' },
+  { type: 'paragraph', content: '💡 Lifetime plan saves money if you plan to maintain the app for 2+ years.' },
+
+  { type: 'heading', content: '✅ PRE-PUBLISHING CHECKLIST', level: 1 },
+
+  { type: 'heading', content: 'Step 1: Developer Account Setup', level: 2 },
+  { type: 'bullet', content: '☐ Create Apple Developer account ($99/year)' },
+  { type: 'bullet', content: '☐ Complete Apple identity verification (can take 24-48 hours)' },
+  { type: 'bullet', content: '☐ Create Google Play Console account ($25 one-time)' },
+  { type: 'bullet', content: '☐ Complete Google payment verification' },
+
+  { type: 'heading', content: 'Step 2: BuildNatively Setup', level: 2 },
+  { type: 'bullet', content: '☐ Subscribe to BuildNatively plan' },
+  { type: 'bullet', content: '☐ Create new app project in BuildNatively' },
+  { type: 'bullet', content: '☐ Enter app details (name: SmartyGym, bundle ID: app.lovable.f0bf7ae7990c4724b9e4b9150ef73d37)' },
+
+  { type: 'heading', content: 'Step 3: Firebase Configuration', level: 2 },
+  { type: 'bullet', content: '☐ Create Firebase project at https://console.firebase.google.com' },
+  { type: 'bullet', content: '☐ Add Android app and download google-services.json' },
+  { type: 'bullet', content: '☐ Add iOS app and download GoogleService-Info.plist' },
+  { type: 'bullet', content: '☐ Enable Cloud Messaging API and copy Server Key' },
+  { type: 'bullet', content: '☐ Upload config files to BuildNatively' },
+  { type: 'bullet', content: '☐ Store FCM_SERVER_KEY in Lovable Cloud secrets' },
+
+  { type: 'heading', content: 'Step 4: App Assets', level: 2 },
+  { type: 'bullet', content: '☐ Upload App Icon (1024x1024 PNG, no transparency for iOS)' },
+  { type: 'bullet', content: '☐ Upload Splash Screen image' },
+  { type: 'bullet', content: '☐ Set iOS permission description for push notifications' },
+  { type: 'paragraph', content: 'Suggested text: "SmartyGym would like to send you notifications about your workouts, appointments, and important updates."' },
+
+  { type: 'heading', content: 'Step 5: Store Listings Preparation', level: 2 },
+  { type: 'bullet', content: '☐ Prepare app description (see App Store Text Content in admin docs)' },
+  { type: 'bullet', content: '☐ Prepare keywords/tags for discoverability' },
+  { type: 'bullet', content: '☐ Capture screenshots for all required device sizes' },
+  { type: 'bullet', content: '☐ Create feature graphic (Google Play: 1024x500)' },
+  { type: 'bullet', content: '☐ Prepare privacy policy URL' },
+  { type: 'bullet', content: '☐ Prepare support URL and email' },
+
+  { type: 'heading', content: '🚀 PUBLISHING PROCESS', level: 1 },
+
+  { type: 'heading', content: 'iOS Publishing', level: 2 },
+  { type: 'bullet', content: '1. BuildNatively generates iOS build (IPA file)' },
+  { type: 'bullet', content: '2. Auto-uploads to App Store Connect (via BuildNatively)' },
+  { type: 'bullet', content: '3. Complete app listing in App Store Connect' },
+  { type: 'bullet', content: '4. Submit for Apple review (typically 1-3 days)' },
+  { type: 'bullet', content: '5. App goes live after approval' },
+
+  { type: 'heading', content: 'Android Publishing', level: 2 },
+  { type: 'bullet', content: '1. BuildNatively generates Android build (AAB file)' },
+  { type: 'bullet', content: '2. Download AAB from BuildNatively' },
+  { type: 'bullet', content: '3. Upload AAB to Google Play Console manually' },
+  { type: 'bullet', content: '4. Complete store listing in Play Console' },
+  { type: 'bullet', content: '5. Submit for Google review (typically 1-7 days for new apps)' },
+  { type: 'bullet', content: '6. App goes live after approval' },
+
+  { type: 'heading', content: '⏱️ TIMELINE ESTIMATES', level: 1 },
+  { type: 'bullet', content: 'Developer account setup: 1-3 days (Apple verification can take time)' },
+  { type: 'bullet', content: 'BuildNatively & Firebase setup: 1-2 hours' },
+  { type: 'bullet', content: 'Asset preparation: 2-4 hours' },
+  { type: 'bullet', content: 'Store listing completion: 1-2 hours per platform' },
+  { type: 'bullet', content: 'Apple review: 1-3 days (can be longer for first submission)' },
+  { type: 'bullet', content: 'Google review: 1-7 days (new apps take longer)' },
+  { type: 'paragraph', content: 'Total estimated time: 1-2 weeks from start to live on both stores.' },
+
+  { type: 'heading', content: '🔧 OPTIONAL SERVICES', level: 1 },
+  { type: 'bullet', content: 'BuildNatively "App Store Release" service: $600 - They handle the entire submission process for you' },
+  { type: 'paragraph', content: 'This is optional but useful if you want hands-off publishing.' },
+
+  { type: 'heading', content: '📝 IMPORTANT NOTES', level: 1 },
+  { type: 'bullet', content: 'Lovable hosts your website - no separate hosting needed' },
+  { type: 'bullet', content: 'BuildNatively does NOT host your app - it converts and builds only' },
+  { type: 'bullet', content: 'You must maintain Apple Developer membership annually to keep iOS app live' },
+  { type: 'bullet', content: 'Google Play is one-time fee - no annual renewal needed' },
+  { type: 'bullet', content: 'App updates require new builds through BuildNatively' },
+
+  { type: 'paragraph', content: '' },
+  { type: 'paragraph', content: '---' },
+  { type: 'paragraph', content: 'SmartyGym — Your Gym Re-imagined. Anywhere, Anytime.' },
+  { type: 'paragraph', content: 'www.smartygym.com' },
+];

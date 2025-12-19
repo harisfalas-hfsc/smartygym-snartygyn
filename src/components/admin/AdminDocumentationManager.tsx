@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Download, Printer, Copy, FileText, ExternalLink, Apple, Smartphone, CheckCircle } from "lucide-react";
 import { toast } from "sonner";
-import { generateWordDocument, nativePushNotificationsContent, firebaseConsoleSetupContent } from "@/utils/wordExport";
+import { generateWordDocument, nativePushNotificationsContent, firebaseConsoleSetupContent, appPublishingCostChecklistContent } from "@/utils/wordExport";
 import { IndividualBrochure } from "./IndividualBrochure";
 import { CorporateBrochure } from "./CorporateBrochure";
 import { AppStoreTextContent } from "./app-store/AppStoreTextContent";
@@ -797,6 +797,64 @@ Contact: corporate@smartygym.com`;
                   'Firebase Console Setup Guide',
                   firebaseConsoleSetupContent,
                   'Firebase-Console-Setup-Guide'
+                )}
+                className="gap-2"
+              >
+                <Download className="h-4 w-4" />
+                Download DOCX
+              </Button>
+            </div>
+          </div>
+
+          {/* App Publishing Cost & Checklist Guide */}
+          <div className="border rounded-lg p-4 space-y-3 border-green-500/30 bg-gradient-to-r from-green-500/5 to-transparent">
+            <div>
+              <h3 className="font-semibold text-lg flex items-center gap-2">
+                💰 App Publishing Cost & Checklist Guide
+              </h3>
+              <p className="text-sm text-muted-foreground">Complete cost breakdown and step-by-step checklist for app store publishing</p>
+            </div>
+            <div className="flex flex-wrap gap-2">
+              <Dialog>
+                <DialogTrigger asChild>
+                  <Button variant="default" size="sm" className="gap-2">
+                    <ExternalLink className="h-4 w-4" />
+                    View Guide
+                  </Button>
+                </DialogTrigger>
+                <DialogContent className="max-w-4xl max-h-[80vh]">
+                  <DialogHeader>
+                    <DialogTitle>💰 App Publishing Cost & Checklist Guide</DialogTitle>
+                  </DialogHeader>
+                  <ScrollArea className="h-[60vh] pr-4">
+                    <div className="space-y-4 text-sm">
+                      {appPublishingCostChecklistContent.map((section, index) => {
+                        if (section.type === 'heading') {
+                          const HeadingTag = section.level === 1 ? 'h2' : section.level === 2 ? 'h3' : 'h4';
+                          const headingClass = section.level === 1 
+                            ? 'text-xl font-bold mt-6 mb-2 text-primary' 
+                            : section.level === 2 
+                            ? 'text-lg font-semibold mt-4 mb-2' 
+                            : 'text-base font-medium mt-3 mb-1';
+                          return <HeadingTag key={index} className={headingClass}>{section.content}</HeadingTag>;
+                        } else if (section.type === 'paragraph') {
+                          return <p key={index} className="text-muted-foreground leading-relaxed">{section.content}</p>;
+                        } else if (section.type === 'bullet') {
+                          return <p key={index} className="text-muted-foreground pl-4">• {section.content}</p>;
+                        }
+                        return null;
+                      })}
+                    </div>
+                  </ScrollArea>
+                </DialogContent>
+              </Dialog>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => generateWordDocument(
+                  'App Publishing Cost & Checklist Guide',
+                  appPublishingCostChecklistContent,
+                  'App-Publishing-Cost-Checklist-Guide'
                 )}
                 className="gap-2"
               >
