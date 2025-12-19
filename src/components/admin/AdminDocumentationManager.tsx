@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Download, Printer, Copy, FileText, ExternalLink, Apple, Smartphone, CheckCircle } from "lucide-react";
 import { toast } from "sonner";
+import { generateWordDocument, nativePushNotificationsContent } from "@/utils/wordExport";
 import { IndividualBrochure } from "./IndividualBrochure";
 import { CorporateBrochure } from "./CorporateBrochure";
 import { AppStoreTextContent } from "./app-store/AppStoreTextContent";
@@ -11,7 +12,9 @@ import { ScreenshotCaptureGuide } from "./app-store/ScreenshotCaptureGuide";
 import { QuickLinks } from "./app-store/QuickLinks";
 import { useState } from "react";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
-import { ChevronDown } from "lucide-react";
+import { ChevronDown, Bell } from "lucide-react";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
 export const AdminDocumentationManager = () => {
   const [openSections, setOpenSections] = useState<Record<string, boolean>>({
@@ -587,6 +590,70 @@ Contact: corporate@smartygym.com`;
               >
                 <Printer className="h-4 w-4" />
                 Print/PDF
+              </Button>
+            </div>
+          </div>
+
+          {/* Native Push Notifications Guide */}
+          <div className="border rounded-lg p-4 space-y-3">
+            <div>
+              <h3 className="font-semibold text-lg flex items-center gap-2">
+                <Bell className="h-5 w-5 text-primary" />
+                Native Push Notifications Guide
+              </h3>
+              <p className="text-sm text-muted-foreground">Complete setup guide for iOS APNs and Android FCM push notifications</p>
+            </div>
+            <div className="flex flex-wrap gap-2">
+              <Dialog>
+                <DialogTrigger asChild>
+                  <Button variant="outline" size="sm" className="gap-2">
+                    <ExternalLink className="h-4 w-4" />
+                    View Guide
+                  </Button>
+                </DialogTrigger>
+                <DialogContent className="max-w-4xl max-h-[80vh]">
+                  <DialogHeader>
+                    <DialogTitle className="flex items-center gap-2">
+                      <Bell className="h-5 w-5 text-primary" />
+                      Native Push Notifications Implementation Guide
+                    </DialogTitle>
+                  </DialogHeader>
+                  <ScrollArea className="h-[60vh] pr-4">
+                    <div className="space-y-4">
+                      {nativePushNotificationsContent.map((section, index) => (
+                        <div key={index}>
+                          {section.type === 'heading' && (
+                            <h2 className={`font-bold ${
+                              section.level === 1 ? 'text-xl mt-6 mb-3 text-primary' : 
+                              section.level === 2 ? 'text-lg mt-4 mb-2' : 'text-base mt-3 mb-1'
+                            }`}>
+                              {section.content}
+                            </h2>
+                          )}
+                          {section.type === 'paragraph' && (
+                            <p className="text-sm text-muted-foreground mb-2">{section.content}</p>
+                          )}
+                          {section.type === 'bullet' && (
+                            <p className="text-sm pl-4 mb-1">• {section.content}</p>
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                  </ScrollArea>
+                </DialogContent>
+              </Dialog>
+              <Button
+                variant="default"
+                size="sm"
+                onClick={() => generateWordDocument(
+                  'Native Push Notifications Guide',
+                  nativePushNotificationsContent,
+                  'SmartyGym-Native-Push-Notifications-Guide'
+                )}
+                className="gap-2"
+              >
+                <Download className="h-4 w-4" />
+                Download DOCX
               </Button>
             </div>
           </div>

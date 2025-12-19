@@ -106,6 +106,154 @@ export const generateWordDocument = async (
   saveAs(blob, `${filename}.docx`);
 };
 
+// Native Push Notifications Implementation Guide content
+export const nativePushNotificationsContent: ContentSection[] = [
+  { type: 'heading', content: 'Native Push Notifications Implementation Guide', level: 1 },
+  { type: 'paragraph', content: 'This guide covers the complete setup for native push notifications in iOS and Android apps built with Capacitor. Native push notifications use different systems than web push: iOS uses Apple Push Notification service (APNs), and Android uses Firebase Cloud Messaging (FCM). Both are integrated via the Capacitor Push Notifications Plugin.' },
+  
+  { type: 'heading', content: 'Prerequisites', level: 1 },
+  { type: 'bullet', content: 'Apple Developer Account ($99/year) - https://developer.apple.com' },
+  { type: 'bullet', content: 'Google/Firebase Account (Free) - https://console.firebase.google.com' },
+  { type: 'bullet', content: 'Xcode installed (Mac required for iOS)' },
+  { type: 'bullet', content: 'Android Studio installed' },
+  { type: 'bullet', content: 'Capacitor already set up in your project' },
+  
+  { type: 'heading', content: 'Apple APNs Setup (iOS)', level: 1 },
+  
+  { type: 'heading', content: 'Step 1: Create an App ID', level: 2 },
+  { type: 'bullet', content: 'Go to Apple Developer Portal (https://developer.apple.com/account)' },
+  { type: 'bullet', content: 'Navigate to Certificates, Identifiers & Profiles' },
+  { type: 'bullet', content: 'Click Identifiers → + button' },
+  { type: 'bullet', content: 'Select App IDs → Continue' },
+  { type: 'bullet', content: 'Fill in: Description: SmartyGym, Bundle ID: com.smartygym.app' },
+  { type: 'bullet', content: 'Scroll down to Capabilities and check Push Notifications' },
+  { type: 'bullet', content: 'Click Continue → Register' },
+  
+  { type: 'heading', content: 'Step 2: Create an APNs Key', level: 2 },
+  { type: 'bullet', content: 'In Apple Developer Portal, go to Keys' },
+  { type: 'bullet', content: 'Click + to create a new key' },
+  { type: 'bullet', content: 'Enter Key Name: SmartyGym Push Key' },
+  { type: 'bullet', content: 'Check Apple Push Notifications service (APNs)' },
+  { type: 'bullet', content: 'Click Continue → Register' },
+  { type: 'bullet', content: 'IMPORTANT: Download the .p8 file immediately (you can only download it once!)' },
+  { type: 'bullet', content: 'Note down: Key ID and Team ID' },
+  
+  { type: 'heading', content: 'Step 3: Store APNs Credentials', level: 2 },
+  { type: 'paragraph', content: 'You\'ll need these values for your backend:' },
+  { type: 'bullet', content: 'APNS_KEY_ID=ABC123DEFG' },
+  { type: 'bullet', content: 'APNS_TEAM_ID=TEAMID1234' },
+  { type: 'bullet', content: 'APNS_KEY_CONTENT=(contents of the .p8 file)' },
+  { type: 'bullet', content: 'APNS_BUNDLE_ID=com.smartygym.app' },
+  
+  { type: 'heading', content: 'Step 4: Configure Xcode Project', level: 2 },
+  { type: 'paragraph', content: 'After running "npx cap add ios":' },
+  { type: 'bullet', content: 'Open the iOS project: npx cap open ios' },
+  { type: 'bullet', content: 'Select your project in the navigator' },
+  { type: 'bullet', content: 'Go to Signing & Capabilities tab' },
+  { type: 'bullet', content: 'Click + Capability' },
+  { type: 'bullet', content: 'Add Push Notifications' },
+  { type: 'bullet', content: 'Add Background Modes and check: Remote notifications, Background fetch' },
+  
+  { type: 'heading', content: 'Firebase FCM Setup (Android)', level: 1 },
+  
+  { type: 'heading', content: 'Step 1: Create Firebase Project', level: 2 },
+  { type: 'bullet', content: 'Go to Firebase Console (https://console.firebase.google.com)' },
+  { type: 'bullet', content: 'Click Add project' },
+  { type: 'bullet', content: 'Enter project name: SmartyGym' },
+  { type: 'bullet', content: 'Disable Google Analytics (optional)' },
+  { type: 'bullet', content: 'Click Create project' },
+  
+  { type: 'heading', content: 'Step 2: Add Android App to Firebase', level: 2 },
+  { type: 'bullet', content: 'In your Firebase project, click the Android icon to add an app' },
+  { type: 'bullet', content: 'Enter Android package name: com.smartygym.app' },
+  { type: 'bullet', content: 'App nickname: SmartyGym (optional)' },
+  { type: 'bullet', content: 'Click Register app' },
+  
+  { type: 'heading', content: 'Step 3: Download Configuration File', level: 2 },
+  { type: 'bullet', content: 'Download google-services.json' },
+  { type: 'bullet', content: 'Place it in your project at: android/app/google-services.json' },
+  
+  { type: 'heading', content: 'Step 4: Get FCM Server Key', level: 2 },
+  { type: 'bullet', content: 'In Firebase Console, go to Project Settings (gear icon)' },
+  { type: 'bullet', content: 'Go to Cloud Messaging tab' },
+  { type: 'bullet', content: 'Note down the Server key (or create a new one)' },
+  
+  { type: 'heading', content: 'Step 5: Store FCM Credentials', level: 2 },
+  { type: 'paragraph', content: 'You\'ll need this for your backend:' },
+  { type: 'bullet', content: 'FCM_SERVER_KEY=AAAA...' },
+  
+  { type: 'heading', content: 'Capacitor Plugin Integration', level: 1 },
+  
+  { type: 'heading', content: 'Step 1: Install the Plugin', level: 2 },
+  { type: 'paragraph', content: 'Run: npm install @capacitor/push-notifications && npx cap sync' },
+  
+  { type: 'heading', content: 'Step 2: Android Configuration', level: 2 },
+  { type: 'paragraph', content: 'Edit android/app/build.gradle, ensure these are present:' },
+  { type: 'bullet', content: 'implementation platform("com.google.firebase:firebase-bom:32.7.0")' },
+  { type: 'bullet', content: 'implementation "com.google.firebase:firebase-messaging"' },
+  { type: 'bullet', content: 'Add: apply plugin: "com.google.gms.google-services" at the end' },
+  
+  { type: 'heading', content: 'Database Schema Updates', level: 1 },
+  { type: 'paragraph', content: 'Run migration to create native_push_tokens table with columns: id, user_id, device_token, platform (ios/android), is_active, created_at, updated_at.' },
+  
+  { type: 'heading', content: 'Required Secrets', level: 1 },
+  
+  { type: 'heading', content: 'For iOS (APNs)', level: 2 },
+  { type: 'bullet', content: 'APNS_KEY_ID - Key ID from Apple Developer Portal' },
+  { type: 'bullet', content: 'APNS_TEAM_ID - Your Apple Developer Team ID' },
+  { type: 'bullet', content: 'APNS_KEY_CONTENT - Contents of the .p8 key file' },
+  { type: 'bullet', content: 'APNS_BUNDLE_ID - App bundle ID (com.smartygym.app)' },
+  { type: 'bullet', content: 'APNS_PRODUCTION - Set to "true" for production, empty for sandbox' },
+  
+  { type: 'heading', content: 'For Android (FCM)', level: 2 },
+  { type: 'bullet', content: 'FCM_SERVER_KEY - Firebase Cloud Messaging server key' },
+  
+  { type: 'heading', content: 'Testing Guide', level: 1 },
+  { type: 'bullet', content: 'iOS: Build and run on a physical iOS device (simulators don\'t support push)' },
+  { type: 'bullet', content: 'Android: Build and run on Android device or emulator' },
+  { type: 'bullet', content: 'Test scenarios: App in foreground, background, closed; Tap notification; Multiple devices' },
+  
+  { type: 'heading', content: 'Implementation Checklist', level: 1 },
+  
+  { type: 'heading', content: 'Phase 1: Setup', level: 2 },
+  { type: 'bullet', content: 'Create Apple Developer account' },
+  { type: 'bullet', content: 'Create Firebase project' },
+  { type: 'bullet', content: 'Generate APNs key (.p8 file)' },
+  { type: 'bullet', content: 'Download google-services.json' },
+  { type: 'bullet', content: 'Add secrets to backend' },
+  
+  { type: 'heading', content: 'Phase 2: Code Integration', level: 2 },
+  { type: 'bullet', content: 'Install @capacitor/push-notifications' },
+  { type: 'bullet', content: 'Add google-services.json to android/app/' },
+  { type: 'bullet', content: 'Configure Android gradle files' },
+  { type: 'bullet', content: 'Add Push Notifications capability in Xcode' },
+  { type: 'bullet', content: 'Create useNativePushNotifications hook' },
+  { type: 'bullet', content: 'Create NativePushProvider component' },
+  { type: 'bullet', content: 'Run database migration' },
+  
+  { type: 'heading', content: 'Phase 3: Backend', level: 2 },
+  { type: 'bullet', content: 'Create/update send-native-push edge function' },
+  { type: 'bullet', content: 'Test APNs integration' },
+  { type: 'bullet', content: 'Test FCM integration' },
+  
+  { type: 'heading', content: 'Phase 4: Testing', level: 2 },
+  { type: 'bullet', content: 'Test on iOS physical device' },
+  { type: 'bullet', content: 'Test on Android device/emulator' },
+  { type: 'bullet', content: 'Test all notification scenarios' },
+  { type: 'bullet', content: 'Verify token cleanup for invalid tokens' },
+  
+  { type: 'heading', content: 'Phase 5: Production', level: 2 },
+  { type: 'bullet', content: 'Switch APNs to production endpoint' },
+  { type: 'bullet', content: 'Submit app to App Store' },
+  { type: 'bullet', content: 'Submit app to Google Play Store' },
+  
+  { type: 'heading', content: 'Cost Summary', level: 1 },
+  { type: 'bullet', content: 'Apple Developer Program: $99/year' },
+  { type: 'bullet', content: 'Firebase (FCM): Free' },
+  { type: 'bullet', content: 'APNs: Free' },
+  { type: 'bullet', content: 'Google Play Developer: $25 one-time' },
+];
+
 // Why Invest in SmartyGym content
 export const whyInvestContent: ContentSection[] = [
   { type: 'heading', content: '💪 Your Body, Your Greatest Asset', level: 1 },
