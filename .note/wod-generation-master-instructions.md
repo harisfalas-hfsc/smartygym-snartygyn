@@ -168,3 +168,43 @@ All generated workouts must be:
 - Suitable for adults
 - Compatible with SmartyGym's identity
 - Without unnecessary complexity
+
+## Value-for-Money Standards (Critical)
+
+Every workout must deliver SUBSTANTIAL training value. People PAY for these workouts.
+
+### Minimum Volume Guidelines:
+- **Beginner (1-2 stars)**: 100-150 total reps/movements minimum
+- **Intermediate (3-4 stars)**: 150-250 total reps/movements
+- **Advanced (5-6 stars)**: 200-350+ total reps/movements
+
+### Format-Specific Requirements:
+- **Circuit/AMRAP/EMOM**: Minimum 150-200+ total movements
+- **TABATA**: 8 rounds = 4 minutes per exercise, include 3-5 exercises minimum
+- **3 Rounds**: Each round MUST have meaningful volume (minimum 6 exercises OR high rep counts)
+- **5 Rounds**: Can have slightly fewer exercises per round
+
+### Examples:
+❌ WEAK: "10 burpees, 20 squats, 10 push-ups x3 rounds" = 120 total reps = UNACCEPTABLE
+✅ STRONG: "20 burpees, 40 KB swings, 60 box steps, 80 jumping jacks, 100 mountain climbers" = 300 total
+✅ STRONG: "5 rounds of: 15 burpees, 20 squats, 15 push-ups, 20 lunges, 15 mountain climbers" = 425 total
+
+## Periodization Context
+
+The AI system receives context about:
+- **Yesterday's workout**: Category, difficulty, equipment, format
+- **Tomorrow's preview**: Expected category and difficulty
+
+### Scaling Rules:
+- After advanced (5-6 stars) → Next should be recovery-focused
+- Two advanced days in a row → MUST hit different muscle groups
+- Same category consecutive days → Emphasize DIFFERENT movement patterns
+- Before intense day → Can include more recovery/mobility in warm-up
+
+### Programming Principles:
+1. Each workout must have PURPOSE within the weekly cycle
+2. Loading → Recovery → Loading pattern (not random high-intensity every day)
+3. Movement pattern variety across days (push/pull/squat/hinge/carry/core)
+4. Progressive overload: Increase volume OR intensity, not always both
+5. NEVER waste user's time - every minute should deliver training value
+6. Workouts should feel COMPLETE - user should feel accomplished
