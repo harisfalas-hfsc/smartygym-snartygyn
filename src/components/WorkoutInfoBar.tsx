@@ -37,9 +37,9 @@ export const WorkoutInfoBar = ({ duration, difficulty, focus, category }: Workou
           <span className="text-[10px] font-medium">{category}</span>
         </Badge>
       )}
-      <Badge variant="outline" className="flex items-center gap-1 px-2 py-1">
+      <Badge variant="outline" className="flex items-center gap-1 px-2 py-1 bg-blue-500/10 text-blue-700 dark:text-blue-400 border-blue-500/20">
         <Target className="h-3 w-3" />
-        <span className="text-[10px] font-medium">{focus}</span>
+        <span className="text-[10px] font-medium">{focus || "General"}</span>
       </Badge>
       <Badge variant="outline" className={`flex items-center gap-1 px-2 py-1 ${getDifficultyColor(difficulty)}`}>
         <TrendingUp className="h-3 w-3" />

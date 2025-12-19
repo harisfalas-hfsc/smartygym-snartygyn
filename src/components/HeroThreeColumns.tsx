@@ -252,12 +252,8 @@ export const HeroThreeColumns = () => {
               <p className="text-sm font-semibold text-foreground line-clamp-2 max-w-[200px] leading-tight h-[36px]">{currentWod.name}</p>
               <div className="flex items-center justify-center gap-1 text-[10px] text-muted-foreground flex-wrap">
                 {currentWod.category && <span className="text-red-600 dark:text-red-400 font-medium">{currentWod.category}</span>}
-                {currentWod.focus && (
-                  <>
-                    <span>•</span>
-                    <span className="text-blue-600 dark:text-blue-400 font-medium">{currentWod.focus}</span>
-                  </>
-                )}
+                <span>•</span>
+                <span className="text-blue-600 dark:text-blue-400 font-medium">{currentWod.focus || "General"}</span>
                 {currentWod.difficulty_stars && (
                   <>
                     <span>•</span>
