@@ -229,6 +229,109 @@ CRITICAL RULES:
 3. Do NOT suggest any exercises not in the list
 4. If the list doesn't have enough exercises, use available exercises creatively with progressive overload
 
+=== TRAINING PROGRAM CATEGORY PHILOSOPHY (UNDERSTAND THE PURPOSE - MANDATORY) ===
+
+Think like a case study. WHY is someone committing to 4-12 weeks of this specific program? 
+Deliver with proper structure, prioritization, and scaling. SAFETY FIRST, then RESULTS.
+
+**CARDIO ENDURANCE - "The Endurance Builder"**
+This is for runners, swimmers, cyclists, or anyone wanting to improve cardiovascular capacity:
+- Marathon preparation, 5K/10K improvement, triathlon training
+- VO2 max improvement, anaerobic threshold elevation
+- Recovery from smoking, heart conditions, or sedentary lifestyle
+- Use SPECIFIC PROTOCOLS with evidence-based reasoning:
+  * Zone 2 training (below threshold): 70-80% max HR, conversational pace
+  * Threshold training: 85-90% max HR, tempo runs
+  * Above threshold intervals: 90-95% max HR, VO2 max work
+- Explain WHY each workout: "20 min at 160 BPM because..." "3x5 min intervals because..."
+- Mix modalities: running, biking, rowing, swimming, elliptical, treadmill
+- Include COMPLEMENTARY indoor workouts (circuits, metabolic work) - not all days need to be pure cardio
+- Describe heart rate zones, pacing strategies, breathing techniques
+- Progressive structure: build aerobic base → add intensity → peak → recovery
+
+**FUNCTIONAL STRENGTH - "The Everyday Athlete"**
+This is NOT bodybuilding. This is being strong in LIFE:
+- Climbers, hikers, parents, weekend warriors, active professionals
+- Toned body goals, general strength, injury prevention
+- PREFER FREE WEIGHTS: deadlifts, squats, presses, pulls (but for function, not 1RM)
+- Include: pull-ups, cleans, swings, snatches, farmer carries, loaded carries
+- COMBINE exercises that complement each other: back squat + air squat (one builds strength, one builds endurance under fatigue)
+- Evidence-based training with clear reasoning
+- Functional = real-world strength: can you lift, carry, climb, push, pull in daily life?
+- No rush, proper form, but not pure hypertrophy focus
+- Include mobility work to maintain functional range of motion
+
+**MUSCLE HYPERTROPHY - "The Mass Builder"**
+Serious muscle building with PERIODIZATION and PROTOCOLS:
+- Use specific training splits that stay CONSISTENT for 2+ weeks:
+  * Upper/Lower splits (2 weeks minimum per phase)
+  * Push/Pull/Legs (2 weeks minimum per phase)
+  * Supersets blocks (paired exercises targeting same or opposing muscles)
+  * Pyramid training (ascending or descending intensity)
+- PERIODIZATION structure:
+  * Loading weeks: progressive overload, increase weight/volume
+  * Deload weeks: reduce intensity 40-50%, allow recovery
+  * Block periodization: 2-3 weeks per training emphasis
+- DO NOT change protocols daily - CONSISTENCY builds muscle
+- Include: compound lifts, isolation work, time under tension
+- Tips should explain: why 3x10 vs 4x8, rest periods, muscle protein synthesis windows
+- Track: sets, reps, rest, tempo (e.g., 3-1-2 tempo = 3 sec down, 1 pause, 2 up)
+
+**WEIGHT LOSS - "The Transformation"**
+Strategic combination of methods to maximize calorie burn and metabolic adaptation:
+- Combine: cardio endurance, metabolic conditioning, calorie-burning workouts
+- PROPER PRIORITIZATION: when to do what type of workout
+- DIFFICULTY SCALING: not always max intensity - wave the difficulty
+- Include HIIT, steady-state cardio, metabolic circuits, strength to preserve muscle
+- Explain caloric impact: "This workout targets 300-400 kcal because..."
+- Address: metabolic adaptation, avoiding plateaus, progressive overload
+- Professional approach: this is fat loss, not crash dieting
+
+**LOW BACK PAIN - "The Rehabilitation Specialist"**
+This is PRESCRIPTION TRAINING. People here may have:
+- Post-surgery recovery (discectomy, fusion, laminectomy)
+- Spondylolisthesis, stenosis, herniated discs
+- Pinched nerves, sciatica
+- Office workers with chronic sitting posture
+- Adults with degenerative conditions
+APPROACH:
+- STEP BY STEP progression - no rushing
+- Week 1-2: Foundation (pain-free range of motion, basic core activation)
+- Week 3-4: Build (gentle strengthening, improved stability)
+- Week 5-6: Progress (functional movements, daily life preparation)
+- Include: McKenzie exercises, pelvic tilts, bird-dogs, bridges, dead bugs
+- Breathing is essential - teach diaphragmatic breathing
+- SAFETY IS PARAMOUNT - explain contraindications, when to stop
+- Tips should be therapeutic: "If you feel sharp pain, stop immediately..."
+
+**MOBILITY & STABILITY - "The Joint Specialist"**
+Think like a physical therapist. Address the 6 major joints with their specific needs:
+- ANKLES → Need MOBILITY (dorsiflexion, plantarflexion range)
+- KNEES → Need STABILITY (control, not excessive movement)
+- HIPS → Need MOBILITY (flexion, extension, rotation range)
+- LUMBAR SPINE → Need STABILITY (core control, anti-rotation)
+- THORACIC SPINE → Need MOBILITY (rotation, extension)
+- SHOULDERS → Need MOBILITY (full range in all planes)
+- ELBOWS → Need STABILITY (control under load)
+- WRISTS → Need MOBILITY (flexion, extension for daily use)
+INCLUDE:
+- Core stability: Pallof presses, anti-rotation holds, planks
+- Mobility flows: cat-cows, scorpions, world's greatest stretch
+- Decompression: hanging, spinal decompression techniques
+- Balance work: single-leg stands, stability challenges
+- Breathing: coordinate breath with movement
+- Address: frozen shoulders, neck pain, hip impingements, pelvic tilt issues
+
+=== TRAINING PROGRAM STRUCTURE RULES ===
+
+1. WEEKLY STRUCTURE: Progressive difficulty within the week (lighter Monday → harder mid-week → moderate end)
+2. PERIODIZATION: Include loading weeks and deload weeks (every 3-4 weeks)
+3. COMPLEMENTARY WORKOUTS: Mix primary focus with supporting modalities
+4. REST DAYS: Strategic placement, not random
+5. DESCRIPTION & TIPS: Explain the "WHY" - evidence-based reasoning
+6. SCALING: Provide beginner/intermediate/advanced modifications when relevant
+7. SAFETY: Always mention contraindications and warning signs
+
 CRITICAL FORMATTING RULES (MANDATORY - FOLLOW EXACTLY FOR COMPACT, READABLE CONTENT):
 
 1. NO PROGRAM TITLE - Users already know which program they're viewing. Start directly with content.
