@@ -79,6 +79,78 @@ EXAMPLE FORMATS: "100 Burpees for Time", "Descending Ladder 10-1", "Death by Pus
 ALLOWED: Any high-intensity exercise, mental toughness tests, benchmark workouts
 FORBIDDEN: Mobility exercises, slow technical lifts, low-intensity movements
 
+=== CATEGORY PHILOSOPHY & MINDSET (UNDERSTAND THE PURPOSE) ===
+
+**STRENGTH - "We Mean Business"**
+Don't rush. This is serious work requiring focus and precision. Think about:
+- Loading/unloading bars, 1RM calculations, proper weight selection
+- Muscle hypertrophy is the goal - quality over speed
+- Technique is everything: how we start, how we finish, proper form throughout
+- Rest is productive time - muscles need recovery between sets
+- Tips should explain: why we do these sets, proper form cues, how to progress weight safely
+- Instructions should be detailed: stance, grip, breathing, range of motion
+- This applies to BOTH bodyweight and equipment strength workouts
+
+**CALORIE BURNING - "Sweat Factory"**
+High intensity, burn calories, elevate heart rate. This is HIIT-style training:
+- Focus on exercises that are safe and don't require extreme technical focus
+- No dangerous or weird movements - people need to move fast without injury risk
+- Many rounds, many repetitions, minimal rest (15-30 seconds max)
+- Heart rate elevation is the goal - keep people sweating
+- Good technique matters, but speed and intensity come first
+- Think: exercises you can do when exhausted without hurting yourself
+
+**METABOLIC - "Power Engine"**
+Increase metabolic rate by combining cardio + strength + power simultaneously:
+- Powerful exercises: plyometrics, explosive movements
+- Equipment is allowed but NOT heavy loads - think swings, ground-to-overhead with moderate weight
+- Everything should be safe for high-rep, high-intensity execution
+- No 32kg kettlebell swings here - use manageable weights for power output
+- The goal is metabolic adaptation through varied stimulus
+- Must feel like both a strength AND cardio workout combined
+
+**CARDIO - "Endurance Engine"**
+Heart rate and cardiovascular development. Think like a coach for runners/swimmers/track athletes:
+- Running, elliptical, spinning bikes, rowing - classic cardio modalities
+- Focus on aerobic and anaerobic threshold training
+- Mention protocols: below threshold (Zone 2), at threshold, above threshold intervals
+- Tips should include: pacing strategies, breathing techniques, heart rate zones
+- Description should explain the physiological purpose
+- This is for people building endurance capacity
+
+**MOBILITY & STABILITY - "The Healer"**
+Don't rush. Breathe. Think like a Pilates instructor or physical therapist:
+- Flexibility, mobility, core strengthening, controlled movements
+- Address common issues: pelvic tilt, low back pain, neck tension, frozen shoulders, hip impingements
+- Instructions should be therapeutic and professional
+- Tips should explain the "why" - what muscle is being stretched, what posture is being corrected
+- Breathing cues are essential for every exercise
+- Hold times, transition speeds, and mindfulness matter
+- This is rehabilitation and prevention, not just stretching
+
+**CHALLENGE - "The Gamification King"**
+Make people question themselves: "Can I accomplish this?" This is NOT a normal workout:
+- GAMIFICATION is mandatory - make it creative, unusual, memorable
+- Examples of challenge concepts:
+  * "Take your age, divide by 2 = that many burpees. Age × 2 = jumping lunges. Age ÷ 3 = jump squats. 2 rounds for time."
+  * "150 burpees for time"
+  * "Run 2km, 10 burpees, run 1km, 5 burpees, repeat 2x"
+  * "Descending ladder: 100 squats, 90 sit-ups, 80 push-ups, 70 rows, 60 jumping jacks, 50 mountain climbers, then reverse back up"
+  * "Death by burpees: Minute 1 = 1 burpee, Minute 2 = 2 burpees... continue until failure"
+- People should TALK about these workouts
+- Equipment should be safe - NO heavy deadlifts (80kg), NO heavy swings in challenges
+- Use free weights, bodyweight, exercises that won't cause injury when fatigued
+- Push mental and physical limits, but safely
+
+=== EQUIPMENT SAFETY BY CATEGORY ===
+
+- **Strength**: Heavy loads ARE allowed and expected (bench press, squats, deadlifts with proper weight)
+- **Metabolic**: Equipment allowed but MODERATE loads only (swings, thrusters with manageable weight)
+- **Calorie Burning**: Light equipment or bodyweight - nothing that requires technical focus when fatigued
+- **Challenge**: Safe equipment only - no heavy barbell work, use exercises that stay safe under fatigue
+- **Cardio**: Cardio machines, jump ropes, bodyweight locomotion
+- **Mobility**: No equipment or light props (foam rollers, bands for assisted stretches)
+
 === FORMAT DEFINITIONS ===
 
 - **Tabata**: 20 seconds work / 10 seconds rest / 8 rounds per exercise (4 minutes total per exercise)
