@@ -5,7 +5,20 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
-import { ArrowLeft, Calendar, Eye, CheckCircle, Search, X, Sparkles, Star, Crown, ShoppingCart, Check, Home, Dumbbell, TrendingUp } from "lucide-react";
+import { ArrowLeft, Calendar, Eye, CheckCircle, Search, X, Sparkles, Star, Crown, ShoppingCart, Check, Home, Dumbbell, TrendingUp, Layers } from "lucide-react";
+
+// Helper function to get category color
+const getCategoryColor = (category: string): string => {
+  const colors: Record<string, string> = {
+    "CARDIO ENDURANCE": "text-blue-600 dark:text-blue-400",
+    "FUNCTIONAL STRENGTH": "text-orange-600 dark:text-orange-400",
+    "MUSCLE HYPERTROPHY": "text-red-600 dark:text-red-400",
+    "WEIGHT LOSS": "text-green-600 dark:text-green-400",
+    "LOW BACK PAIN": "text-purple-600 dark:text-purple-400",
+    "MOBILITY & STABILITY": "text-teal-600 dark:text-teal-400",
+  };
+  return colors[category?.toUpperCase()] || "text-primary";
+};
 import { AccessGate } from "@/components/AccessGate";
 import { CompactFilters } from "@/components/CompactFilters";
 import { PageBreadcrumbs } from "@/components/PageBreadcrumbs";
@@ -485,23 +498,31 @@ const TrainingProgramDetail = () => {
                   <h3 className="font-semibold text-base sm:text-lg">{program.name}</h3>
                   <p className="text-xs sm:text-sm text-muted-foreground line-clamp-2">{stripHtmlTags(program.description || "")}</p>
                   
-                  {/* Details Row - Difficulty, Duration */}
-                  <div className="flex items-center gap-2 flex-wrap text-xs text-muted-foreground">
-                    {program.difficulty && (
-                      <>
-                        <div className="flex items-center gap-1">
-                          <TrendingUp className="h-3 w-3 shrink-0 text-primary" />
-                          <span className="capitalize">{program.difficulty}</span>
-                          {program.difficulty_stars && (
-                            <span className="text-yellow-500">({program.difficulty_stars}★)</span>
-                          )}
-                        </div>
-                        <span>•</span>
-                      </>
-                    )}
+                  {/* Details Row - Category, Difficulty, Duration */}
+                  <div className="flex items-center gap-2 flex-wrap text-[10px] text-muted-foreground">
+                    {/* Category */}
                     <div className="flex items-center gap-1">
-                      <Calendar className="h-3 w-3 shrink-0" />
-                      <span>{program.weeks} Weeks / {program.days_per_week} Days per Week</span>
+                      <Layers className="h-2.5 w-2.5 shrink-0 text-primary" />
+                      <span className={`font-medium ${getCategoryColor(program.category)}`}>
+                        {program.category}
+                      </span>
+                    </div>
+                    <span>•</span>
+                    
+                    {/* Difficulty - Always show with fallback */}
+                    <div className="flex items-center gap-1">
+                      <TrendingUp className="h-2.5 w-2.5 shrink-0 text-primary" />
+                      <span className="capitalize">{program.difficulty || "All Levels"}</span>
+                      {program.difficulty_stars && (
+                        <span className="text-yellow-500">({program.difficulty_stars}★)</span>
+                      )}
+                    </div>
+                    <span>•</span>
+                    
+                    {/* Duration - Weeks and Days per Week */}
+                    <div className="flex items-center gap-1">
+                      <Calendar className="h-2.5 w-2.5 shrink-0 text-primary" />
+                      <span>{program.weeks} Weeks / {program.days_per_week} Days/Week</span>
                     </div>
                   </div>
                   
