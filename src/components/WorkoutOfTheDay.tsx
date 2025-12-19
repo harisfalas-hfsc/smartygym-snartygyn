@@ -5,7 +5,7 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
-import { CalendarCheck, Clock, Dumbbell, Star, Crown, ShoppingBag, Archive, Home, Flame, TrendingUp, Layers } from "lucide-react";
+import { CalendarCheck, Clock, Dumbbell, Star, Crown, ShoppingBag, Archive, Home, TrendingUp, Layers, Target } from "lucide-react";
 
 export const WorkoutOfTheDay = () => {
   const navigate = useNavigate();
@@ -98,8 +98,8 @@ export const WorkoutOfTheDay = () => {
           {wod.name}
         </h4>
 
-        {/* Row 1: Category + Format + Difficulty + Duration */}
-        <div className="flex flex-wrap items-center gap-x-2 gap-y-1 text-xs mb-1.5">
+        {/* Row 1: Category + Focus + Difficulty + Duration */}
+        <div className="flex flex-wrap items-center gap-x-2 gap-y-1 text-[10px] mb-1.5">
           {wod.category && (
             <>
               <div className="flex items-center gap-1">
@@ -109,11 +109,15 @@ export const WorkoutOfTheDay = () => {
               <span className="text-muted-foreground/50">•</span>
             </>
           )}
-          <div className="flex items-center gap-1">
-            <Flame className="w-2.5 h-2.5 text-primary" />
-            <span className="text-muted-foreground">{wod.format || "Standard"}</span>
-          </div>
-          <span className="text-muted-foreground/50">•</span>
+          {wod.focus && (
+            <>
+              <div className="flex items-center gap-1">
+                <Target className="w-2.5 h-2.5 text-primary" />
+                <span className="text-muted-foreground">{wod.focus}</span>
+              </div>
+              <span className="text-muted-foreground/50">•</span>
+            </>
+          )}
           <div className="flex items-center gap-1">
             <TrendingUp className="w-2.5 h-2.5 text-primary" />
             <span className="text-muted-foreground">{wod.difficulty_stars}⭐</span>

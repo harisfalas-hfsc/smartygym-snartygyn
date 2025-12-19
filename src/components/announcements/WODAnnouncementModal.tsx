@@ -5,7 +5,7 @@ import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Checkbox } from "@/components/ui/checkbox";
-import { CalendarCheck, Clock, Dumbbell, Flame, Home, Crown, ShoppingBag, X, TrendingUp, Layers } from "lucide-react";
+import { CalendarCheck, Clock, Dumbbell, Home, Crown, ShoppingBag, X, TrendingUp, Layers, Target } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 
 interface WODAnnouncementModalProps {
@@ -113,29 +113,33 @@ export const WODAnnouncementModal = ({ open, onClose }: WODAnnouncementModalProp
           {wod.name}
         </h4>
 
-        {/* Info Row */}
-        <div className="flex flex-wrap items-center gap-x-2 gap-y-1 text-xs mb-2">
+        {/* Info Row: Category + Focus + Difficulty + Duration */}
+        <div className="flex flex-wrap items-center gap-x-2 gap-y-1 text-[10px] mb-2">
           {wod.category && (
             <>
               <div className="flex items-center gap-1">
-                <Layers className="w-3 h-3 text-primary" />
+                <Layers className="w-2.5 h-2.5 text-primary" />
                 <span className={`font-medium ${getCategoryColor(wod.category)}`}>{wod.category}</span>
               </div>
               <span className="text-muted-foreground/50">•</span>
             </>
           )}
+          {wod.focus && (
+            <>
+              <div className="flex items-center gap-1">
+                <Target className="w-2.5 h-2.5 text-primary" />
+                <span className="text-muted-foreground">{wod.focus}</span>
+              </div>
+              <span className="text-muted-foreground/50">•</span>
+            </>
+          )}
           <div className="flex items-center gap-1">
-            <Flame className="w-3 h-3 text-primary" />
-            <span className="text-muted-foreground">{wod.format || "Standard"}</span>
-          </div>
-          <span className="text-muted-foreground/50">•</span>
-          <div className="flex items-center gap-1">
-            <TrendingUp className="w-3 h-3 text-primary" />
+            <TrendingUp className="w-2.5 h-2.5 text-primary" />
             <span className="text-muted-foreground">{wod.difficulty_stars}⭐</span>
           </div>
           <span className="text-muted-foreground/50">•</span>
           <div className="flex items-center gap-1">
-            <Clock className="w-3 h-3 text-primary" />
+            <Clock className="w-2.5 h-2.5 text-primary" />
             <span className="text-muted-foreground">{wod.duration || "45 min"}</span>
           </div>
         </div>
