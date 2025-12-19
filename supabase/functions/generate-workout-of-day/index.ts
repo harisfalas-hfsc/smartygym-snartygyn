@@ -569,6 +569,56 @@ serve(async (req) => {
     const prefix = categoryPrefixes[category] || "W";
     const timestamp = Date.now();
 
+    // ═══════════════════════════════════════════════════════════════════════════════
+    // PERIODIZATION CONTEXT: Fetch yesterday's WOD and calculate tomorrow's specs
+    // ═══════════════════════════════════════════════════════════════════════════════
+    const yesterdayDate = new Date(new Date(effectiveDate).getTime() - 86400000).toISOString().split('T')[0];
+    
+    const { data: yesterdayWods } = await supabase
+      .from("admin_workouts")
+      .select("name, category, difficulty_stars, equipment, format")
+      .eq("is_workout_of_day", true)
+      .eq("generated_for_date", yesterdayDate)
+      .limit(2);
+    
+    const yesterdayWod = yesterdayWods?.[0];
+    const yesterdayCategory = yesterdayWod?.category || "Unknown";
+    const yesterdayDifficulty = yesterdayWod?.difficulty_stars || 0;
+    const yesterdayEquipment = yesterdayWod?.equipment || "Unknown";
+    const yesterdayFormat = yesterdayWod?.format || "Unknown";
+    
+    // Calculate tomorrow's expected specs
+    const tomorrowDayCount = state.day_count + 1;
+    const tomorrowDayInCycle = getDayInCycle(tomorrowDayCount);
+    const tomorrowWeekNumber = tomorrowDayInCycle === 1 ? weekNumber + 1 : weekNumber;
+    const tomorrowCategory = getCategoryForDay(tomorrowDayInCycle);
+    const tomorrowUsedStars = tomorrowDayInCycle === 1 ? {} : { ...usedStarsInWeek, [String(selectedDifficulty.stars)]: true };
+    const tomorrowDifficulty = getDifficultyForDay(tomorrowDayInCycle, tomorrowWeekNumber, tomorrowUsedStars);
+    
+    // Generate scaling advice based on yesterday vs today
+    let scalingAdvice = "";
+    if (yesterdayDifficulty >= 5 && selectedDifficulty.stars >= 5) {
+      scalingAdvice = "Two advanced days in a row - emphasize DIFFERENT muscle groups and movement patterns. Ensure today's workout hits fresh muscles.";
+    } else if (yesterdayDifficulty >= 5 && selectedDifficulty.stars <= 2) {
+      scalingAdvice = "Recovery day after intense work - focus on movement quality, controlled tempo, active recovery principles.";
+    } else if (yesterdayDifficulty <= 2 && selectedDifficulty.stars >= 5) {
+      scalingAdvice = "Fresh after recovery - athletes are ready to push intensity and volume hard today.";
+    } else if (yesterdayDifficulty >= 3 && selectedDifficulty.stars >= 3) {
+      scalingAdvice = "Moderate-to-moderate progression - balance work and recovery, vary movement patterns from yesterday.";
+    } else {
+      scalingAdvice = "Standard progression - maintain training consistency with appropriate loading.";
+    }
+    
+    logStep("Periodization context", {
+      yesterdayDate,
+      yesterdayCategory,
+      yesterdayDifficulty,
+      yesterdayFormat,
+      tomorrowCategory,
+      tomorrowDifficulty: tomorrowDifficulty.stars,
+      scalingAdvice
+    });
+
     // Generate TWO workouts - one BODYWEIGHT, one EQUIPMENT
     const equipmentTypes = ["BODYWEIGHT", "EQUIPMENT"];
     const generatedWorkouts: any[] = [];
@@ -697,6 +747,51 @@ INTENSITY: Maximum effort, minimal rest, benchmark-style workout.
 ✅ ALLOWED: Any exercise that challenges the athlete - compound movements, high-rep work, time-based challenges, chipper-style workouts.
 
 FOCUS: Mental fortitude, work capacity, competitive spirit.` : ""}
+
+═══════════════════════════════════════════════════════════════════════════════
+PERIODIZATION CONTEXT & QUALITY STANDARDS (CRITICAL - READ THIS)
+═══════════════════════════════════════════════════════════════════════════════
+
+📅 YESTERDAY'S WORKOUT:
+- Category: ${yesterdayCategory}
+- Difficulty: ${yesterdayDifficulty} stars
+- Equipment: ${yesterdayEquipment}
+- Format: ${yesterdayFormat}
+
+📅 TOMORROW'S PREVIEW:
+- Category: ${tomorrowCategory}
+- Expected Difficulty: ${tomorrowDifficulty.stars} stars (${tomorrowDifficulty.name})
+
+💰 VALUE-FOR-MONEY RULE (NON-NEGOTIABLE):
+People PAY for these workouts. Every WOD must deliver SUBSTANTIAL training value:
+- Minimum 150-200+ total reps/movements for circuit/AMRAP/EMOM workouts
+- For TABATA: 8 rounds = 4 minutes per exercise, include 3-5 exercises minimum
+- If 3 rounds, each round MUST have meaningful volume (minimum 6 exercises OR high rep counts)
+- If 5 rounds, can have slightly fewer exercises per round
+
+❌ WEAK EXAMPLE: "10 burpees, 20 squats, 10 push-ups x3 rounds" = 120 total reps = UNACCEPTABLE
+✅ STRONG EXAMPLE: "20 burpees, 40 KB swings, 60 box steps, 80 jumping jacks, 100 mountain climbers" = 300 total = SUBSTANTIAL
+✅ STRONG EXAMPLE: "5 rounds of: 15 burpees, 20 squats, 15 push-ups, 20 lunges, 15 mountain climbers" = 425 total = EXCELLENT
+
+Beginners (1-2 stars): Slightly less volume but NEVER trivial - minimum 100-150 total movements
+Intermediate (3-4 stars): Solid volume - 150-250 total movements
+Advanced (5-6 stars): High volume OR high intensity - 200-350+ total movements
+
+📊 SCIENTIFIC SCALING & RECOVERY:
+${scalingAdvice}
+
+- If yesterday was same category → emphasize DIFFERENT movement patterns today
+- If tomorrow is intense (5-6 stars) → today can include more recovery/mobility work in warm-up
+- Progressive overload: Increase volume OR intensity, not always both
+- Consider: What muscles worked hard yesterday? What needs recovery?
+
+🎯 PROFESSIONAL PROGRAMMING RULES:
+1. Each workout must have PURPOSE within the weekly cycle
+2. Loading → Recovery → Loading pattern (not random high-intensity every day)
+3. Movement pattern variety across days (push/pull/squat/hinge/carry/core)
+4. If consecutive high-intensity days: MUST hit different muscle groups
+5. NEVER waste the user's time - every minute should deliver training value
+6. The workout should feel COMPLETE - user should feel accomplished, not "that's it?"
 
 ═══════════════════════════════════════════════════════════════════════════════
 RESPONSE FORMAT (JSON ONLY - NO MARKDOWN):
