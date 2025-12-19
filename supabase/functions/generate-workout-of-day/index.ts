@@ -872,7 +872,7 @@ INSTRUCTIONS FORMAT: Plain paragraphs with clear guidance
               "Content-Type": "application/json",
             },
             body: JSON.stringify({
-              model: "google/gemini-2.5-flash",
+              model: "openai/gpt-5",
               messages: [
                 { role: "system", content: "You are an expert fitness coach. Return ONLY valid JSON, no markdown." },
                 { role: "user", content: workoutPrompt }
