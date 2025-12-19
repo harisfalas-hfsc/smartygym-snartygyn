@@ -5,7 +5,7 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
-import { CalendarCheck, Clock, Dumbbell, Star, Crown, ShoppingBag, Archive, Home, Flame, TrendingUp } from "lucide-react";
+import { CalendarCheck, Clock, Dumbbell, Star, Crown, ShoppingBag, Archive, Home, Flame, TrendingUp, Layers } from "lucide-react";
 
 export const WorkoutOfTheDay = () => {
   const navigate = useNavigate();
@@ -54,6 +54,17 @@ export const WorkoutOfTheDay = () => {
     );
   };
 
+  const getCategoryColor = (cat: string) => {
+    const lower = cat.toLowerCase();
+    if (lower.includes("strength")) return "bg-orange-500/20 text-orange-700 dark:text-orange-400 border-orange-500/40";
+    if (lower.includes("cardio")) return "bg-blue-500/20 text-blue-700 dark:text-blue-400 border-blue-500/40";
+    if (lower.includes("mobility")) return "bg-purple-500/20 text-purple-700 dark:text-purple-400 border-purple-500/40";
+    if (lower.includes("challenge")) return "bg-pink-500/20 text-pink-700 dark:text-pink-400 border-pink-500/40";
+    if (lower.includes("stability")) return "bg-teal-500/20 text-teal-700 dark:text-teal-400 border-teal-500/40";
+    if (lower.includes("metabolic")) return "bg-amber-500/20 text-amber-700 dark:text-amber-400 border-amber-500/40";
+    return "bg-muted text-muted-foreground border-border";
+  };
+
   const renderMiniCard = (wod: typeof bodyweightWOD, isBodyweight: boolean) => {
     if (!wod) return null;
     
@@ -87,8 +98,17 @@ export const WorkoutOfTheDay = () => {
           {wod.name}
         </h4>
 
-        {/* Row 1: Format + Difficulty + Duration */}
+        {/* Row 1: Category + Format + Difficulty + Duration */}
         <div className="flex flex-wrap items-center gap-x-2 gap-y-1 text-xs mb-1.5">
+          {wod.category && (
+            <>
+              <div className="flex items-center gap-1">
+                <Layers className="w-2.5 h-2.5 text-primary" />
+                <span className={`font-medium ${getCategoryColor(wod.category).split(' ')[1]}`}>{wod.category}</span>
+              </div>
+              <span className="text-muted-foreground/50">•</span>
+            </>
+          )}
           <div className="flex items-center gap-1">
             <Flame className="w-2.5 h-2.5 text-primary" />
             <span className="text-muted-foreground">{wod.format || "Standard"}</span>

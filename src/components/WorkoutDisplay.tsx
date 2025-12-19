@@ -250,6 +250,7 @@ export const WorkoutDisplay = ({
             equipment={equipment}
             difficulty={getDifficultyText(difficulty)}
             focus={focus}
+            category={workoutCategory}
           />
         )}
 

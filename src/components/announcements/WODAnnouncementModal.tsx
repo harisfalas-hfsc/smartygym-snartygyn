@@ -5,7 +5,7 @@ import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Checkbox } from "@/components/ui/checkbox";
-import { CalendarCheck, Clock, Dumbbell, Flame, Home, Crown, ShoppingBag, X, TrendingUp } from "lucide-react";
+import { CalendarCheck, Clock, Dumbbell, Flame, Home, Crown, ShoppingBag, X, TrendingUp, Layers } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 
 interface WODAnnouncementModalProps {
@@ -70,6 +70,17 @@ export const WODAnnouncementModal = ({ open, onClose }: WODAnnouncementModalProp
     navigate(`/workout/wod/${workoutId}`);
   };
 
+  const getCategoryColor = (cat: string) => {
+    const lower = cat.toLowerCase();
+    if (lower.includes("strength")) return "text-orange-700 dark:text-orange-400";
+    if (lower.includes("cardio")) return "text-blue-700 dark:text-blue-400";
+    if (lower.includes("mobility")) return "text-purple-700 dark:text-purple-400";
+    if (lower.includes("challenge")) return "text-pink-700 dark:text-pink-400";
+    if (lower.includes("stability")) return "text-teal-700 dark:text-teal-400";
+    if (lower.includes("metabolic")) return "text-amber-700 dark:text-amber-400";
+    return "text-muted-foreground";
+  };
+
   const renderWODCard = (wod: typeof bodyweightWOD, isBodyweight: boolean) => {
     if (!wod) return null;
     
@@ -104,6 +115,15 @@ export const WODAnnouncementModal = ({ open, onClose }: WODAnnouncementModalProp
 
         {/* Info Row */}
         <div className="flex flex-wrap items-center gap-x-2 gap-y-1 text-xs mb-2">
+          {wod.category && (
+            <>
+              <div className="flex items-center gap-1">
+                <Layers className="w-3 h-3 text-primary" />
+                <span className={`font-medium ${getCategoryColor(wod.category)}`}>{wod.category}</span>
+              </div>
+              <span className="text-muted-foreground/50">•</span>
+            </>
+          )}
           <div className="flex items-center gap-1">
             <Flame className="w-3 h-3 text-primary" />
             <span className="text-muted-foreground">{wod.format || "Standard"}</span>
