@@ -150,16 +150,38 @@ const handler = async (req: Request): Promise<Response> => {
     const today = new Date().toISOString().split('T')[0];
     const yesterday = new Date(Date.now() - 86400000).toISOString().split('T')[0];
 
-    // Today's WODs
-    const { data: todayWods, count: todayWodCount } = await supabase
+    // Active WODs (do NOT filter by date; generation timezones can differ from audit time)
+    const {
+      data: todayWods,
+      count: todayWodCount,
+      error: todayWodsError,
+    } = await supabase
       .from('admin_workouts')
       .select('id, name, image_url, category, difficulty_stars, equipment, generated_for_date', { count: 'exact' })
-      .eq('is_workout_of_day', true)
-      .eq('generated_for_date', today);
+      .eq('is_workout_of_day', true);
 
-    addCheck('WOD System', "Today's WODs Exist", `${todayWodCount || 0} WODs generated for ${today}`, 
+    if (todayWodsError) {
+      addCheck('WOD System', 'Active WOD Query', 'Fetch active WODs', 'fail', todayWodsError.message);
+    }
+
+    const activeWodDates = Array.from(
+      new Set((todayWods ?? []).map((w) => w.generated_for_date).filter(Boolean))
+    );
+
+    console.log('🏋️ Active WOD snapshot:', {
+      today,
+      activeWodCount: todayWodCount ?? 0,
+      activeWodDates,
+    });
+
+    addCheck(
+      'WOD System',
+      'Active WODs Exist',
+      `${todayWodCount || 0} active WODs (today: ${today})`,
       todayWodCount === 2 ? 'pass' : todayWodCount === 0 ? 'fail' : 'warning',
-      todayWodCount === 2 ? 'Both equipment and bodyweight versions exist' : `Expected 2, found ${todayWodCount || 0}`
+      todayWodCount === 2
+        ? `Both variants exist. generated_for_date: ${activeWodDates.join(', ') || 'n/a'}`
+        : `Expected 2 active WODs, found ${todayWodCount || 0}. generated_for_date: ${activeWodDates.join(', ') || 'n/a'}`
     );
 
     // Check WODs have unique images
@@ -195,19 +217,35 @@ const handler = async (req: Request): Promise<Response> => {
     if (wodState) {
       addCheck('WOD System', 'WOD State Tracking', `Day ${wodState.day_count}, Category: ${wodState.current_category}`, 'pass');
       
-      // Periodization check - compare ACTUAL WOD category (not state table which stores NEXT category)
+      // Periodization check - compare ACTUAL active WOD category (state table stores NEXT category)
       const expectedCategories = ['Challenge', 'Strength', 'Cardio', 'Mobility & Stability', 'Strength', 'Metabolic', 'Calorie Burning'];
       const dayIndex = ((wodState.day_count - 1) % 7);
       const expectedCategory = expectedCategories[dayIndex];
-      
-      // Use actual today's WOD category, not state table (which may have rotated to next)
-      const actualTodayCategory = todayWods?.[0]?.category || wodState.current_category;
-      const categoryMatch = actualTodayCategory?.toLowerCase().includes(expectedCategory.toLowerCase().split(' ')[0]);
-      
-      addCheck('WOD System', 'Periodization Cycle', `Day ${wodState.day_count} should be ${expectedCategory}`, 
-        categoryMatch ? 'pass' : 'warning',
-        categoryMatch ? `Actual WOD category matches: ${actualTodayCategory}` : `Expected ${expectedCategory}, actual WOD: ${actualTodayCategory}`
-      );
+
+      const actualWodCategory = todayWods?.[0]?.category;
+      if (!actualWodCategory) {
+        addCheck(
+          'WOD System',
+          'Periodization Cycle',
+          `Day ${wodState.day_count} should be ${expectedCategory}`,
+          'skip',
+          'Cannot determine active WOD category'
+        );
+      } else {
+        const categoryMatch = actualWodCategory
+          .toLowerCase()
+          .includes(expectedCategory.toLowerCase().split(' ')[0]);
+
+        addCheck(
+          'WOD System',
+          'Periodization Cycle',
+          `Day ${wodState.day_count} should be ${expectedCategory}`,
+          categoryMatch ? 'pass' : 'warning',
+          categoryMatch
+            ? `Actual WOD category matches: ${actualWodCategory}`
+            : `Expected ${expectedCategory}, actual WOD: ${actualWodCategory}`
+        );
+      }
 
       addCheck('WOD System', 'Last Generation Time', wodState.last_generated_at ? `Last generated: ${wodState.last_generated_at}` : 'Never generated', 
         wodState.last_generated_at ? 'pass' : 'warning'
