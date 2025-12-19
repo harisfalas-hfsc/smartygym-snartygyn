@@ -19,6 +19,15 @@ const getCategoryColor = (category: string): string => {
   };
   return colors[category?.toUpperCase()] || "text-primary";
 };
+
+// Helper function to derive difficulty from stars if missing
+const getDifficultyFromStars = (difficulty: string | null, stars: number | null): string => {
+  if (difficulty) return difficulty;
+  if (!stars) return "Beginner";
+  if (stars <= 2) return "Beginner";
+  if (stars <= 4) return "Intermediate";
+  return "Advanced";
+};
 import { AccessGate } from "@/components/AccessGate";
 import { CompactFilters } from "@/components/CompactFilters";
 import { PageBreadcrumbs } from "@/components/PageBreadcrumbs";
@@ -509,10 +518,10 @@ const TrainingProgramDetail = () => {
                     </div>
                     <span>•</span>
                     
-                    {/* Difficulty - Always show with fallback */}
+                    {/* Difficulty */}
                     <div className="flex items-center gap-1">
                       <TrendingUp className="h-2.5 w-2.5 shrink-0 text-primary" />
-                      <span className="capitalize">{program.difficulty || "All Levels"}</span>
+                      <span className="capitalize">{getDifficultyFromStars(program.difficulty, program.difficulty_stars)}</span>
                       {program.difficulty_stars && (
                         <span className="text-yellow-500">({program.difficulty_stars}★)</span>
                       )}
