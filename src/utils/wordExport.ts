@@ -106,6 +106,104 @@ export const generateWordDocument = async (
   saveAs(blob, `${filename}.docx`);
 };
 
+// Firebase Console Setup Guide content
+export const firebaseConsoleSetupContent: ContentSection[] = [
+  { type: 'heading', content: 'Firebase Console Setup Guide', level: 1 },
+  { type: 'paragraph', content: 'This guide walks you through setting up Firebase for push notifications in your SmartyGym native app. Follow each step carefully and download the required files.' },
+  
+  { type: 'heading', content: 'What You Need Before Starting', level: 1 },
+  { type: 'bullet', content: 'A Google account' },
+  { type: 'bullet', content: 'Your SmartyGym Bundle ID: app.lovable.f0bf7ae7990c4724b9e4b9150ef73d37' },
+  { type: 'bullet', content: 'Access to BuildNatively dashboard' },
+  
+  { type: 'heading', content: 'Step 1: Create a Firebase Project', level: 1 },
+  { type: 'bullet', content: 'Go to https://console.firebase.google.com' },
+  { type: 'bullet', content: 'Click "Create a project" or "Add project"' },
+  { type: 'bullet', content: 'Enter project name: SmartyGym' },
+  { type: 'bullet', content: 'Click Continue' },
+  { type: 'bullet', content: 'Google Analytics: You can disable this (optional, not needed for push notifications)' },
+  { type: 'bullet', content: 'Click "Create project" and wait for it to complete' },
+  { type: 'bullet', content: 'Click "Continue" when done' },
+  { type: 'paragraph', content: '[Screenshot: Firebase Console homepage showing "Create a project" button]' },
+  
+  { type: 'heading', content: 'Step 2: Add Android App', level: 1 },
+  { type: 'bullet', content: 'In your Firebase project dashboard, click the Android icon (robot icon)' },
+  { type: 'bullet', content: 'Enter Android package name: app.lovable.f0bf7ae7990c4724b9e4b9150ef73d37' },
+  { type: 'bullet', content: 'Enter App nickname: SmartyGym Android (optional but helpful)' },
+  { type: 'bullet', content: 'Leave Debug signing certificate SHA-1 empty for now' },
+  { type: 'bullet', content: 'Click "Register app"' },
+  { type: 'paragraph', content: '[Screenshot: Add Android app dialog with package name field]' },
+  
+  { type: 'heading', content: 'Step 3: Download google-services.json (CRITICAL)', level: 2 },
+  { type: 'paragraph', content: 'This is your Android Config file for BuildNatively!' },
+  { type: 'bullet', content: 'Click "Download google-services.json"' },
+  { type: 'bullet', content: 'Save this file somewhere safe - you will upload it to BuildNatively' },
+  { type: 'bullet', content: 'Click "Next" through the remaining steps (you can skip the SDK setup steps)' },
+  { type: 'bullet', content: 'Click "Continue to console"' },
+  { type: 'paragraph', content: '[Screenshot: Download button for google-services.json highlighted]' },
+  
+  { type: 'heading', content: 'Step 4: Add iOS App', level: 1 },
+  { type: 'bullet', content: 'Back in the Firebase project dashboard, click "Add app" → iOS icon (Apple logo)' },
+  { type: 'bullet', content: 'Enter iOS Bundle ID: app.lovable.f0bf7ae7990c4724b9e4b9150ef73d37' },
+  { type: 'bullet', content: 'Enter App nickname: SmartyGym iOS (optional)' },
+  { type: 'bullet', content: 'Leave App Store ID empty for now' },
+  { type: 'bullet', content: 'Click "Register app"' },
+  { type: 'paragraph', content: '[Screenshot: Add iOS app dialog with Bundle ID field]' },
+  
+  { type: 'heading', content: 'Step 5: Download GoogleService-Info.plist (CRITICAL)', level: 2 },
+  { type: 'paragraph', content: 'This is your iOS Config file for BuildNatively!' },
+  { type: 'bullet', content: 'Click "Download GoogleService-Info.plist"' },
+  { type: 'bullet', content: 'Save this file somewhere safe - you will upload it to BuildNatively' },
+  { type: 'bullet', content: 'Click "Next" through the remaining steps (skip the SDK setup)' },
+  { type: 'bullet', content: 'Click "Continue to console"' },
+  { type: 'paragraph', content: '[Screenshot: Download button for GoogleService-Info.plist highlighted]' },
+  
+  { type: 'heading', content: 'Step 6: Get FCM Server Key (For Backend)', level: 1 },
+  { type: 'bullet', content: 'In Firebase Console, click the gear icon (⚙️) next to "Project Overview"' },
+  { type: 'bullet', content: 'Select "Project settings"' },
+  { type: 'bullet', content: 'Go to the "Cloud Messaging" tab' },
+  { type: 'bullet', content: 'Look for "Cloud Messaging API (Legacy)" section' },
+  { type: 'bullet', content: 'If you see "Cloud Messaging API (Legacy) Disabled", click the three dots → "Manage API in Google Cloud Console" → Enable it' },
+  { type: 'bullet', content: 'Copy the "Server key" - this is your FCM_SERVER_KEY for the backend' },
+  { type: 'paragraph', content: '[Screenshot: Cloud Messaging tab showing Server key location]' },
+  
+  { type: 'heading', content: 'Step 7: Upload Files to BuildNatively', level: 1 },
+  { type: 'paragraph', content: 'Now go to your BuildNatively dashboard and complete the Firebase section:' },
+  { type: 'bullet', content: 'Enable Firebase Notification: Yes' },
+  { type: 'bullet', content: 'Android Config: Upload the google-services.json file' },
+  { type: 'bullet', content: 'iOS Config: Upload the GoogleService-Info.plist file' },
+  { type: 'paragraph', content: '[Screenshot: BuildNatively Firebase settings section]' },
+  
+  { type: 'heading', content: 'Step 8: Set iOS Permission Description', level: 1 },
+  { type: 'paragraph', content: 'In BuildNatively, set the "Permission description for iOS" to:' },
+  { type: 'paragraph', content: '"SmartyGym would like to send you notifications about your workouts, new programs, and important updates to help you stay on track with your fitness goals."' },
+  
+  { type: 'heading', content: 'Step 9: Store Backend Secret', level: 1 },
+  { type: 'paragraph', content: 'The FCM Server Key from Step 6 needs to be added to your Lovable Cloud secrets:' },
+  { type: 'bullet', content: 'Secret Name: FCM_SERVER_KEY' },
+  { type: 'bullet', content: 'Value: The server key you copied from Firebase Cloud Messaging tab' },
+  
+  { type: 'heading', content: 'Summary: Files You Should Have', level: 1 },
+  { type: 'bullet', content: 'google-services.json → Upload to BuildNatively (Android Config)' },
+  { type: 'bullet', content: 'GoogleService-Info.plist → Upload to BuildNatively (iOS Config)' },
+  { type: 'bullet', content: 'FCM Server Key → Add to Lovable Cloud secrets as FCM_SERVER_KEY' },
+  
+  { type: 'heading', content: 'Troubleshooting', level: 1 },
+  { type: 'heading', content: 'Notifications not arriving?', level: 2 },
+  { type: 'bullet', content: 'Verify the Bundle ID matches exactly: app.lovable.f0bf7ae7990c4724b9e4b9150ef73d37' },
+  { type: 'bullet', content: 'Make sure you uploaded the correct config files (Android file for Android, iOS file for iOS)' },
+  { type: 'bullet', content: 'Check that Cloud Messaging API (Legacy) is enabled in Firebase' },
+  { type: 'bullet', content: 'Ensure the FCM_SERVER_KEY secret is correctly set in Lovable Cloud' },
+  
+  { type: 'heading', content: 'Can\'t find the Server Key?', level: 2 },
+  { type: 'bullet', content: 'Go to Firebase Console → Project Settings → Cloud Messaging' },
+  { type: 'bullet', content: 'If Legacy API is disabled, enable it via Google Cloud Console link' },
+  { type: 'bullet', content: 'The Server Key appears under "Cloud Messaging API (Legacy)" section' },
+  
+  { type: 'heading', content: 'Need Help?', level: 1 },
+  { type: 'paragraph', content: 'If you encounter any issues, contact support with screenshots of your Firebase Console and BuildNatively settings.' },
+];
+
 // Native Push Notifications Implementation Guide content
 export const nativePushNotificationsContent: ContentSection[] = [
   { type: 'heading', content: 'Native Push Notifications Implementation Guide', level: 1 },
