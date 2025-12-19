@@ -4,7 +4,7 @@ import { Helmet } from "react-helmet";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { ArrowLeft, Eye, Check, Heart, Crown, ShoppingCart, Clock, Dumbbell, Flame, Star, Home, TrendingUp, Brain, RefreshCw, Target, CheckCircle, Shield, Shuffle } from "lucide-react";
+import { ArrowLeft, Eye, Check, Heart, Crown, ShoppingCart, Clock, Dumbbell, Star, Home, TrendingUp, Brain, RefreshCw, Target, CheckCircle, Shield, Shuffle, Layers } from "lucide-react";
 import { PageBreadcrumbs } from "@/components/PageBreadcrumbs";
 import { ContentLoadingSkeleton } from "@/components/ContentLoadingSkeleton";
 import { useAllWorkouts } from "@/hooks/useWorkoutData";
@@ -127,22 +127,35 @@ const WODCategory = () => {
 
           {/* Compact Metadata Display - Horizontal Layout */}
           <div className="space-y-1.5 mb-2 text-sm">
-            {/* Row 1: Format + Difficulty + Duration */}
-            <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs sm:text-sm">
+            {/* Row 1: Category + Focus + Difficulty + Duration */}
+            <div className="flex flex-wrap items-center gap-x-2 gap-y-1 text-[10px] sm:text-xs">
+              {wod.category && (
+                <>
+                  <div className="flex items-center gap-1">
+                    <Layers className="w-2.5 h-2.5 text-primary" />
+                    <span className="text-muted-foreground font-medium">{wod.category}</span>
+                  </div>
+                  <span className="text-muted-foreground/50">•</span>
+                </>
+              )}
+              {wod.focus && (
+                <>
+                  <div className="flex items-center gap-1">
+                    <Target className="w-2.5 h-2.5 text-primary" />
+                    <span className="text-muted-foreground">{wod.focus}</span>
+                  </div>
+                  <span className="text-muted-foreground/50">•</span>
+                </>
+              )}
               <div className="flex items-center gap-1">
-                <Flame className="w-3 h-3 text-primary" />
-                <span className="text-muted-foreground">{wod.format || "Standard"}</span>
-              </div>
-              <span className="text-muted-foreground/50">•</span>
-              <div className="flex items-center gap-1">
-                <TrendingUp className="w-3 h-3 text-primary" />
+                <TrendingUp className="w-2.5 h-2.5 text-primary" />
                 <span className="text-muted-foreground">
                   {wod.difficulty || "All Levels"} {wod.difficulty_stars && `(${wod.difficulty_stars}⭐)`}
                 </span>
               </div>
               <span className="text-muted-foreground/50">•</span>
               <div className="flex items-center gap-1">
-                <Clock className="w-3 h-3 text-primary" />
+                <Clock className="w-2.5 h-2.5 text-primary" />
                 <span className="text-muted-foreground">{wod.duration || "45-60 min"}</span>
               </div>
             </div>
