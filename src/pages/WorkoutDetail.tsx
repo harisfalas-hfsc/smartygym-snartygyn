@@ -532,26 +532,26 @@ const WorkoutDetail = () => {
                   <p className="text-xs sm:text-sm text-muted-foreground line-clamp-2">{stripHtmlTags(workout.description || "")}</p>
                   
                   {/* Details Row - Category, Focus, Difficulty, Duration */}
-                  <div className="flex items-center gap-1.5 flex-wrap text-[10px] text-muted-foreground">
+                  <div className="flex items-center gap-1.5 flex-wrap text-xs text-muted-foreground">
                     {workout.category && (
                       <>
                         <div className="flex items-center gap-1">
-                          <Layers className="h-2.5 w-2.5 shrink-0 text-primary" />
+                          <Layers className="h-3 w-3 shrink-0 text-primary" />
                           <span className={`font-medium ${getCategoryColor(workout.category)}`}>{workout.category}</span>
                         </div>
                         <span>•</span>
                       </>
                     )}
                     <div className="flex items-center gap-1">
-                      <Target className="h-2.5 w-2.5 shrink-0 text-primary" />
+                      <Target className="h-3 w-3 shrink-0 text-primary" />
                       <span className="text-blue-600 dark:text-blue-400 font-medium">{workout.focus || workout.format || "General"}</span>
                     </div>
                     <span>•</span>
                     {workout.difficulty && (
                       <>
                         <div className="flex items-center gap-1">
-                          <TrendingUp className="h-2.5 w-2.5 shrink-0 text-primary" />
-                          <span className="capitalize">{workout.difficulty}</span>
+                          <TrendingUp className="h-3 w-3 shrink-0 text-green-600 dark:text-green-400" />
+                          <span className="capitalize text-green-600 dark:text-green-400 font-medium">{workout.difficulty}</span>
                           {workout.difficulty_stars && (
                             <span className="text-yellow-500">({workout.difficulty_stars}★)</span>
                           )}
@@ -560,8 +560,8 @@ const WorkoutDetail = () => {
                       </>
                     )}
                     <div className="flex items-center gap-1">
-                      <Clock className="h-2.5 w-2.5 shrink-0 text-primary" />
-                      <span>{workout.duration}</span>
+                      <Clock className="h-3 w-3 shrink-0 text-purple-600 dark:text-purple-400" />
+                      <span className="text-purple-600 dark:text-purple-400 font-medium">{workout.duration}</span>
                     </div>
                   </div>
                   
