@@ -508,10 +508,10 @@ const TrainingProgramDetail = () => {
                   <p className="text-xs sm:text-sm text-muted-foreground line-clamp-2">{stripHtmlTags(program.description || "")}</p>
                   
                   {/* Details Row - Category, Difficulty, Duration */}
-                  <div className="flex items-center gap-2 flex-wrap text-[10px] text-muted-foreground">
+                  <div className="flex items-center gap-2 flex-wrap text-xs text-muted-foreground">
                     {/* Category */}
                     <div className="flex items-center gap-1">
-                      <Layers className="h-2.5 w-2.5 shrink-0 text-primary" />
+                      <Layers className="h-3 w-3 shrink-0 text-primary" />
                       <span className={`font-medium ${getCategoryColor(program.category)}`}>
                         {program.category}
                       </span>
@@ -520,8 +520,8 @@ const TrainingProgramDetail = () => {
                     
                     {/* Difficulty */}
                     <div className="flex items-center gap-1">
-                      <TrendingUp className="h-2.5 w-2.5 shrink-0 text-primary" />
-                      <span className="capitalize">{getDifficultyFromStars(program.difficulty, program.difficulty_stars)}</span>
+                      <TrendingUp className="h-3 w-3 shrink-0 text-green-600 dark:text-green-400" />
+                      <span className="capitalize text-green-600 dark:text-green-400 font-medium">{getDifficultyFromStars(program.difficulty, program.difficulty_stars)}</span>
                       {program.difficulty_stars && (
                         <span className="text-yellow-500">({program.difficulty_stars}★)</span>
                       )}
@@ -530,8 +530,8 @@ const TrainingProgramDetail = () => {
                     
                     {/* Duration - Weeks and Days per Week */}
                     <div className="flex items-center gap-1">
-                      <Calendar className="h-2.5 w-2.5 shrink-0 text-primary" />
-                      <span>{program.weeks} Weeks / {program.days_per_week} Days/Week</span>
+                      <Calendar className="h-3 w-3 shrink-0 text-purple-600 dark:text-purple-400" />
+                      <span className="text-purple-600 dark:text-purple-400 font-medium">{program.weeks} Weeks / {program.days_per_week} Days/Week</span>
                     </div>
                   </div>
                   

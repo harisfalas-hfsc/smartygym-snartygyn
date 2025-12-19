@@ -250,20 +250,20 @@ export const HeroThreeColumns = () => {
               className="mt-2 text-center space-y-1 animate-fade-in h-[70px]"
             >
               <p className="text-sm font-semibold text-foreground line-clamp-2 max-w-[200px] leading-tight h-[36px]">{currentWod.name}</p>
-              <div className="flex items-center justify-center gap-1 text-[10px] text-muted-foreground flex-wrap">
+              <div className="flex items-center justify-center gap-1 text-xs text-muted-foreground flex-wrap">
                 {currentWod.category && <span className="text-red-600 dark:text-red-400 font-medium">{currentWod.category}</span>}
                 <span>•</span>
                 <span className="text-blue-600 dark:text-blue-400 font-medium">{currentWod.focus || "General"}</span>
                 {currentWod.difficulty_stars && (
                   <>
                     <span>•</span>
-                    <span className="flex items-center gap-0.5">{renderStars(currentWod.difficulty_stars)}</span>
+                    <span className="flex items-center gap-0.5 text-green-600 dark:text-green-400 font-medium">{renderStars(currentWod.difficulty_stars)}</span>
                   </>
                 )}
                 {currentWod.duration && (
                   <>
                     <span>•</span>
-                    <span>{currentWod.duration}</span>
+                    <span className="text-purple-600 dark:text-purple-400 font-medium">{currentWod.duration}</span>
                   </>
                 )}
               </div>

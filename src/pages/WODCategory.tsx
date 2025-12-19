@@ -128,31 +128,31 @@ const WODCategory = () => {
           {/* Compact Metadata Display - Horizontal Layout */}
           <div className="space-y-1.5 mb-2 text-sm">
             {/* Row 1: Category + Focus + Difficulty + Duration */}
-            <div className="flex flex-wrap items-center gap-x-2 gap-y-1 text-[10px] sm:text-xs">
+            <div className="flex flex-wrap items-center gap-x-2 gap-y-1 text-xs">
               {wod.category && (
                 <>
                   <div className="flex items-center gap-1">
-                    <Layers className="w-2.5 h-2.5 text-primary" />
+                    <Layers className="w-3 h-3 text-primary" />
                     <span className="text-muted-foreground font-medium">{wod.category}</span>
                   </div>
                   <span className="text-muted-foreground/50">•</span>
                 </>
               )}
               <div className="flex items-center gap-1">
-                <Target className="w-2.5 h-2.5 text-primary" />
+                <Target className="w-3 h-3 text-primary" />
                 <span className="text-blue-600 dark:text-blue-400 font-medium">{wod.focus || wod.format || "General"}</span>
               </div>
               <span className="text-muted-foreground/50">•</span>
               <div className="flex items-center gap-1">
-                <TrendingUp className="w-2.5 h-2.5 text-primary" />
-                <span className="text-muted-foreground">
-                  {wod.difficulty || "All Levels"} {wod.difficulty_stars && `(${wod.difficulty_stars}⭐)`}
+                <TrendingUp className="w-3 h-3 text-green-600 dark:text-green-400" />
+                <span className="text-green-600 dark:text-green-400 font-medium capitalize">
+                  {wod.difficulty || (wod.difficulty_stars ? (wod.difficulty_stars <= 2 ? "Beginner" : wod.difficulty_stars <= 4 ? "Intermediate" : "Advanced") : "Beginner")} {wod.difficulty_stars && `(${wod.difficulty_stars}★)`}
                 </span>
               </div>
               <span className="text-muted-foreground/50">•</span>
               <div className="flex items-center gap-1">
-                <Clock className="w-2.5 h-2.5 text-primary" />
-                <span className="text-muted-foreground">{wod.duration || "45-60 min"}</span>
+                <Clock className="w-3 h-3 text-purple-600 dark:text-purple-400" />
+                <span className="text-purple-600 dark:text-purple-400 font-medium">{wod.duration || "45-60 min"}</span>
               </div>
             </div>
             {/* Row 2: Premium + BUY badges only */}
