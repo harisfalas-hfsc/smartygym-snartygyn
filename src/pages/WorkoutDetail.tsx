@@ -542,15 +542,11 @@ const WorkoutDetail = () => {
                         <span>•</span>
                       </>
                     )}
-                    {workout.focus && (
-                      <>
-                        <div className="flex items-center gap-1">
-                          <Target className="h-2.5 w-2.5 shrink-0 text-primary" />
-                          <span className="text-blue-600 dark:text-blue-400 font-medium">{workout.focus}</span>
-                        </div>
-                        <span>•</span>
-                      </>
-                    )}
+                    <div className="flex items-center gap-1">
+                      <Target className="h-2.5 w-2.5 shrink-0 text-primary" />
+                      <span className="text-blue-600 dark:text-blue-400 font-medium">{workout.focus || workout.format || "General"}</span>
+                    </div>
+                    <span>•</span>
                     {workout.difficulty && (
                       <>
                         <div className="flex items-center gap-1">
