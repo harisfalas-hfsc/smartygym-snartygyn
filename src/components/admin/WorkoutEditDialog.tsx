@@ -56,7 +56,6 @@ export const WorkoutEditDialog = ({ workout, open, onOpenChange, onSave }: Worko
     serial_number: 0,
     name: '',
     category: '',
-    focus: '',
     difficulty_stars: 3,
     equipment: '',
     format: '',
@@ -107,7 +106,6 @@ export const WorkoutEditDialog = ({ workout, open, onOpenChange, onSave }: Worko
         serial_number: 0,
         name: '',
         category: '',
-        focus: '',
         difficulty_stars: 3,
         equipment: '',
         format: '',
@@ -457,7 +455,7 @@ export const WorkoutEditDialog = ({ workout, open, onOpenChange, onSave }: Worko
             <Label htmlFor="category">1. Category *</Label>
             <Select 
               value={formData.category} 
-              onValueChange={(value) => setFormData({ ...formData, category: value, focus: value })}
+              onValueChange={(value) => setFormData({ ...formData, category: value })}
             >
               <SelectTrigger>
                 <SelectValue placeholder="Select category" />
@@ -503,18 +501,7 @@ export const WorkoutEditDialog = ({ workout, open, onOpenChange, onSave }: Worko
             />
           </div>
 
-          {/* 4. Focus (auto-filled from category) */}
-          <div className="space-y-2">
-            <Label htmlFor="focus">4. Focus (Auto-filled from Category)</Label>
-            <Input
-              id="focus"
-              value={formData.focus}
-              disabled
-              className="bg-muted"
-            />
-          </div>
-
-          {/* 5. Difficulty Level (Stars) */}
+          {/* 4. Difficulty Level (Stars) */}
           <div className="space-y-2">
             <Label>5. Difficulty Level *</Label>
             <div className="flex items-center gap-4">
