@@ -392,7 +392,6 @@ const handler = async (req: Request): Promise<Response> => {
     let failCount = 0;
     let dashboardSent = 0;
     let emailsSent = 0;
-    let pushSent = 0;
     let skippedNoActivity = 0;
     let skippedPrefs = 0;
 
@@ -518,12 +517,11 @@ const handler = async (req: Request): Promise<Response> => {
       success_count: successCount,
       failed_count: failCount,
       subject: `📊 Your Weekly Activity Report`,
-      content: `Weekly activity report sent - ${emailsSent} emails, ${dashboardSent} dashboard, ${pushSent} push`,
+      content: `Weekly activity report sent - ${emailsSent} emails, ${dashboardSent} dashboard messages`,
       metadata: {
         period: `${weekStart} - ${weekEnd}`,
         emailsSent,
         dashboardSent,
-        pushSent,
         skippedNoActivity,
         skippedPrefs,
       }
@@ -534,7 +532,6 @@ const handler = async (req: Request): Promise<Response> => {
       failCount, 
       dashboardSent, 
       emailsSent, 
-      pushSent,
       skippedNoActivity, 
       skippedPrefs 
     });
@@ -546,7 +543,6 @@ const handler = async (req: Request): Promise<Response> => {
         period: `${weekStart} - ${weekEnd}`,
         dashboardSent,
         emailsSent,
-        pushSent,
         skippedNoActivity,
         skippedPrefs,
       }),
