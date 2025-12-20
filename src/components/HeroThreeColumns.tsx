@@ -20,7 +20,9 @@ import {
   ChevronRight,
   Star,
   CircleDollarSign,
-  Crown
+  Crown,
+  Flame,
+  Clock
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useAccessControl } from "@/contexts/AccessControlContext";
@@ -246,87 +248,102 @@ export const HeroThreeColumns = () => {
             <span className="text-xs font-bold text-primary uppercase tracking-wide">Workout of the Day</span>
           </div>
           
-          {/* WOD Card Content - rotates between WODs */}
-          {currentWod && (
-            <div 
-              key={currentWod.id}
-              className="flex-1 flex flex-col animate-fade-in"
-            >
-              {/* Image Section */}
-              <div className="relative h-[100px] overflow-hidden bg-muted">
-                {currentWod.image_url ? (
-                  <img 
-                    src={currentWod.image_url} 
-                    alt={currentWod.name}
-                    className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
-                    onError={(e) => {
-                      e.currentTarget.style.display = 'none';
-                    }}
-                  />
-                ) : (
-                  <div className="w-full h-full flex items-center justify-center">
-                    <Dumbbell className="w-8 h-8 text-muted-foreground/50" />
-                  </div>
+          {/* WOD Card Content - smooth crossfade between WODs */}
+          <div className="flex-1 relative overflow-hidden">
+            {wods?.slice(0, 2).map((wod, index) => (
+              <div 
+                key={wod.id}
+                className={cn(
+                  "absolute inset-0 flex flex-col transition-opacity duration-700 ease-in-out",
+                  index === currentWodIndex ? "opacity-100 z-10" : "opacity-0 z-0"
                 )}
-                {/* Equipment Badge */}
-                <div className="absolute top-2 left-2">
-                  <span className={cn(
-                    "text-[10px] font-bold px-1.5 py-0.5 rounded-full",
-                    currentWod.equipment?.toLowerCase().includes("none") || currentWod.equipment?.toLowerCase().includes("bodyweight")
-                      ? "bg-emerald-500 text-white"
-                      : "bg-blue-500 text-white"
-                  )}>
-                    {currentWod.equipment?.toLowerCase().includes("none") || currentWod.equipment?.toLowerCase().includes("bodyweight") 
-                      ? "Bodyweight" 
-                      : "Equipment"}
-                  </span>
-                </div>
-                {/* Premium Badge */}
-                {currentWod.is_premium && (
-                  <div className="absolute top-2 right-2">
-                    <span className="text-[10px] font-bold px-1.5 py-0.5 rounded-full bg-amber-500 text-white flex items-center gap-0.5">
-                      <Crown className="w-2.5 h-2.5" />
-                      Premium
+              >
+                {/* Image Section */}
+                <div className="relative h-[100px] overflow-hidden bg-muted">
+                  {wod.image_url ? (
+                    <img 
+                      src={wod.image_url} 
+                      alt={wod.name}
+                      className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                      onError={(e) => {
+                        e.currentTarget.style.display = 'none';
+                      }}
+                    />
+                  ) : (
+                    <div className="w-full h-full flex items-center justify-center">
+                      <Dumbbell className="w-8 h-8 text-muted-foreground/50" />
+                    </div>
+                  )}
+                  {/* Equipment Badge */}
+                  <div className="absolute top-2 left-2">
+                    <span className={cn(
+                      "text-[10px] font-bold px-1.5 py-0.5 rounded-full",
+                      wod.equipment?.toLowerCase().includes("none") || wod.equipment?.toLowerCase().includes("bodyweight")
+                        ? "bg-emerald-500 text-white"
+                        : "bg-blue-500 text-white"
+                    )}>
+                      {wod.equipment?.toLowerCase().includes("none") || wod.equipment?.toLowerCase().includes("bodyweight") 
+                        ? "Bodyweight" 
+                        : "Equipment"}
                     </span>
                   </div>
-                )}
+                  {/* Premium Badge */}
+                  {wod.is_premium && (
+                    <div className="absolute top-2 right-2">
+                      <span className="text-[10px] font-bold px-1.5 py-0.5 rounded-full bg-amber-500 text-white flex items-center gap-0.5">
+                        <Crown className="w-2.5 h-2.5" />
+                        Premium
+                      </span>
+                    </div>
+                  )}
+                </div>
+                
+                {/* Content Section */}
+                <div className="flex-1 p-2 flex flex-col justify-between">
+                  {/* Workout Name */}
+                  <p className="text-xs font-bold text-foreground line-clamp-1">{wod.name}</p>
+                  
+                  {/* Type with icon */}
+                  {wod.type && (
+                    <div className="flex items-center gap-1.5 text-[10px]">
+                      <Target className="w-3 h-3 text-primary" />
+                      <span className="text-primary font-semibold uppercase">{wod.type}</span>
+                    </div>
+                  )}
+                  
+                  {/* Category with icon */}
+                  {wod.category && (
+                    <div className="flex items-center gap-1.5 text-[10px]">
+                      <Flame className="w-3 h-3 text-orange-500" />
+                      <span className="text-orange-600 dark:text-orange-400 font-medium">{wod.category}</span>
+                    </div>
+                  )}
+                  
+                  {/* Difficulty Stars */}
+                  {wod.difficulty_stars && (
+                    <div className="flex items-center gap-1.5 text-[10px]">
+                      <span className="flex items-center">{renderStars(wod.difficulty_stars)}</span>
+                    </div>
+                  )}
+                  
+                  {/* Duration with icon */}
+                  {wod.duration && (
+                    <div className="flex items-center gap-1.5 text-[10px]">
+                      <Clock className="w-3 h-3 text-purple-500" />
+                      <span className="text-purple-600 dark:text-purple-400 font-medium">{wod.duration}</span>
+                    </div>
+                  )}
+                  
+                  {/* CTA */}
+                  <div className="flex items-center justify-center gap-1 text-primary text-[10px] font-medium 
+                                  group-hover:gap-2 transition-all mt-1">
+                    View Today's WOD
+                    <ChevronRight className="w-3 h-3" />
+                  </div>
+                </div>
               </div>
-              
-              {/* Content Section */}
-              <div className="flex-1 p-2 flex flex-col justify-between">
-                <p className="text-xs font-bold text-foreground line-clamp-1">{currentWod.name}</p>
-                
-                {/* Row 1: Type • Category */}
-                <div className="flex items-center gap-1 text-[10px] text-muted-foreground">
-                  {currentWod.type && (
-                    <span className="text-primary font-semibold uppercase">{currentWod.type}</span>
-                  )}
-                  {currentWod.type && currentWod.category && <span>•</span>}
-                  {currentWod.category && (
-                    <span className="text-red-600 dark:text-red-400 font-medium">{currentWod.category}</span>
-                  )}
-                </div>
-                
-                {/* Row 2: Difficulty Stars • Duration */}
-                <div className="flex items-center gap-1 text-[10px] text-muted-foreground">
-                  {currentWod.difficulty_stars && (
-                    <span className="flex items-center gap-0.5">{renderStars(currentWod.difficulty_stars)}</span>
-                  )}
-                  {currentWod.difficulty_stars && currentWod.duration && <span>•</span>}
-                  {currentWod.duration && (
-                    <span className="text-purple-600 dark:text-purple-400 font-medium">{currentWod.duration}</span>
-                  )}
-                </div>
-                
-                {/* CTA */}
-                <div className="flex items-center justify-center gap-1 text-primary text-[10px] font-medium 
-                                group-hover:gap-2 transition-all mt-1">
-                  View Today's WOD
-                  <ChevronRight className="w-3 h-3" />
-                </div>
-              </div>
-            </div>
-          )}
+            ))}
+          </div>
         </div>
       </div>
     </div>
