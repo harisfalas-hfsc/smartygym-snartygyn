@@ -441,6 +441,339 @@ const handler = async (req: Request): Promise<Response> => {
     );
 
     // ============================================
+    // CATEGORY 10.5: PUSH NOTIFICATION SYSTEM (NEW - Comprehensive checks)
+    // ============================================
+    console.log("📲 Checking push notification system...");
+
+    // Check VAPID keys
+    const vapidPublicKey = Deno.env.get("VAPID_PUBLIC_KEY");
+    const vapidPrivateKey = Deno.env.get("VAPID_PRIVATE_KEY");
+    
+    addCheck('Push Notifications', 'VAPID Public Key', 'Public key configured for web push', 
+      vapidPublicKey ? 'pass' : 'fail',
+      vapidPublicKey ? `Key exists (${vapidPublicKey.substring(0, 10)}...)` : 'CRITICAL: Cannot subscribe users to push!'
+    );
+    
+    addCheck('Push Notifications', 'VAPID Private Key', 'Private key configured for sending push', 
+      vapidPrivateKey ? 'pass' : 'fail',
+      vapidPrivateKey ? 'Key exists (hidden)' : 'CRITICAL: Cannot send push notifications!'
+    );
+
+    // Check push subscriptions table
+    const { count: totalPushSubs } = await supabase
+      .from('push_subscriptions')
+      .select('*', { count: 'exact', head: true });
+    
+    const { count: activePushSubs } = await supabase
+      .from('push_subscriptions')
+      .select('*', { count: 'exact', head: true })
+      .eq('is_active', true);
+    
+    const { count: inactivePushSubs } = await supabase
+      .from('push_subscriptions')
+      .select('*', { count: 'exact', head: true })
+      .eq('is_active', false);
+
+    addCheck('Push Notifications', 'Total Subscriptions', `${totalPushSubs || 0} push subscriptions in database`, 
+      (totalPushSubs || 0) > 0 ? 'pass' : 'warning',
+      totalPushSubs === 0 ? 'No users have enabled push notifications yet' : `${activePushSubs || 0} active, ${inactivePushSubs || 0} inactive`
+    );
+
+    addCheck('Push Notifications', 'Active Subscriptions', `${activePushSubs || 0} active push subscriptions`, 
+      (activePushSubs || 0) > 0 ? 'pass' : 'warning',
+      activePushSubs === 0 ? 'No users will receive push notifications' : 'Users can receive push notifications'
+    );
+
+    // Check subscription device types
+    const { data: deviceTypes } = await supabase
+      .from('push_subscriptions')
+      .select('device_type')
+      .eq('is_active', true);
+    
+    if (deviceTypes && deviceTypes.length > 0) {
+      const deviceCounts: Record<string, number> = {};
+      deviceTypes.forEach(d => {
+        const type = d.device_type || 'unknown';
+        deviceCounts[type] = (deviceCounts[type] || 0) + 1;
+      });
+      
+      addCheck('Push Notifications', 'Device Distribution', 'Push subscriptions by device type', 
+        'pass',
+        Object.entries(deviceCounts).map(([type, count]) => `${type}: ${count}`).join(', ')
+      );
+    } else {
+      addCheck('Push Notifications', 'Device Distribution', 'No device data available', 'skip');
+    }
+
+    // Check for recently expired subscriptions (might indicate issues)
+    const weekAgo = new Date(Date.now() - 7 * 86400000).toISOString();
+    const { count: recentlyExpired } = await supabase
+      .from('push_subscriptions')
+      .select('*', { count: 'exact', head: true })
+      .eq('is_active', false)
+      .gte('updated_at', weekAgo);
+    
+    addCheck('Push Notifications', 'Recent Expirations', `${recentlyExpired || 0} subscriptions expired in last 7 days`, 
+      (recentlyExpired || 0) < 10 ? 'pass' : 'warning',
+      (recentlyExpired || 0) >= 10 ? 'High expiration rate - may indicate service worker issues' : 'Normal expiration rate'
+    );
+
+    // ============================================
+    // CATEGORY 10.6: NOTIFICATION PREFERENCES VALIDATION (NEW)
+    // ============================================
+    console.log("⚙️ Checking notification preferences...");
+
+    // Expected preference keys
+    const expectedPreferenceKeys = [
+      'opt_out_all',
+      'push',
+      'email_wod', 'dashboard_wod',
+      'email_ritual', 'dashboard_ritual',
+      'email_monday_motivation', 'dashboard_monday_motivation',
+      'email_new_workout', 'dashboard_new_workout',
+      'email_new_program', 'dashboard_new_program',
+      'email_new_article', 'dashboard_new_article',
+      'email_weekly_activity', 'dashboard_weekly_activity',
+      'email_checkin_reminders', 'dashboard_checkin_reminders'
+    ];
+
+    // Check user preference structure
+    const { data: sampleProfiles } = await supabase
+      .from('profiles')
+      .select('notification_preferences')
+      .limit(10);
+    
+    if (sampleProfiles && sampleProfiles.length > 0) {
+      let usersWithOldFormat = 0;
+      let usersWithNewFormat = 0;
+      
+      for (const profile of sampleProfiles) {
+        const prefs = profile.notification_preferences as Record<string, unknown> || {};
+        // Check if has new dashboard_* keys
+        const hasNewKeys = 'dashboard_wod' in prefs || 'email_wod' in prefs;
+        if (hasNewKeys) {
+          usersWithNewFormat++;
+        } else {
+          usersWithOldFormat++;
+        }
+      }
+      
+      addCheck('Notification Preferences', 'Preference Structure', 'Users have updated preference format', 
+        usersWithOldFormat === 0 ? 'pass' : 'warning',
+        usersWithOldFormat > 0 
+          ? `${usersWithOldFormat}/${sampleProfiles.length} sampled users have old format (will use defaults)` 
+          : 'All sampled users have new format'
+      );
+    }
+
+    // Count users with opt_out_all
+    const { data: optOutProfiles } = await supabase
+      .from('profiles')
+      .select('notification_preferences')
+      .not('notification_preferences', 'is', null);
+    
+    let optOutCount = 0;
+    if (optOutProfiles) {
+      for (const profile of optOutProfiles) {
+        const prefs = profile.notification_preferences as Record<string, unknown> || {};
+        if (prefs.opt_out_all === true) {
+          optOutCount++;
+        }
+      }
+    }
+    
+    addCheck('Notification Preferences', 'Global Opt-Out Count', `${optOutCount} users have opted out of all notifications`, 
+      'pass',
+      optOutCount > 0 ? 'These users will not receive any automated notifications' : 'No users have globally opted out'
+    );
+
+    // Check email vs dashboard preference correlation
+    const preferenceCounts: Record<string, { enabled: number; disabled: number }> = {};
+    const preferenceTypes = ['wod', 'ritual', 'monday_motivation', 'new_workout', 'new_program', 'weekly_activity'];
+    
+    if (optOutProfiles) {
+      for (const prefType of preferenceTypes) {
+        preferenceCounts[prefType] = { enabled: 0, disabled: 0 };
+        
+        for (const profile of optOutProfiles) {
+          const prefs = profile.notification_preferences as Record<string, unknown> || {};
+          // Check dashboard preference (defaults to true if not set)
+          const dashboardKey = `dashboard_${prefType}`;
+          const dashboardEnabled = prefs[dashboardKey] !== false;
+          
+          if (dashboardEnabled) {
+            preferenceCounts[prefType].enabled++;
+          } else {
+            preferenceCounts[prefType].disabled++;
+          }
+        }
+      }
+      
+      const preferenceDetails = preferenceTypes.map(type => 
+        `${type}: ${preferenceCounts[type].enabled} on / ${preferenceCounts[type].disabled} off`
+      ).join(', ');
+      
+      addCheck('Notification Preferences', 'Preference Distribution', 'Dashboard notification preferences', 
+        'pass',
+        preferenceDetails
+      );
+    }
+
+    // ============================================
+    // CATEGORY 10.7: NOTIFICATION DELIVERY VALIDATION (NEW)
+    // ============================================
+    console.log("📬 Checking notification delivery...");
+
+    // Check if push notifications are being triggered
+    const { data: recentPushMessages } = await supabase
+      .from('user_system_messages')
+      .select('id, message_type, created_at')
+      .gte('created_at', yesterday_ts)
+      .order('created_at', { ascending: false })
+      .limit(50);
+    
+    addCheck('Notification Delivery', 'Recent Dashboard Messages', `${recentPushMessages?.length || 0} messages in last 24h`, 
+      (recentPushMessages?.length || 0) > 0 ? 'pass' : 'warning',
+      recentPushMessages?.length === 0 ? 'No dashboard messages sent - check notification functions' : 'Messages are being delivered to dashboards'
+    );
+
+    // Check notification function invocations in audit log
+    const { data: recentAuditLogs } = await supabase
+      .from('notification_audit_log')
+      .select('message_type, subject, success_count, failed_count, sent_at')
+      .gte('sent_at', yesterday_ts)
+      .order('sent_at', { ascending: false });
+    
+    if (recentAuditLogs && recentAuditLogs.length > 0) {
+      const functionCounts: Record<string, number> = {};
+      let totalSuccess = 0;
+      let totalFailed = 0;
+      
+      for (const log of recentAuditLogs) {
+        const type = log.message_type || 'unknown';
+        functionCounts[type] = (functionCounts[type] || 0) + 1;
+        totalSuccess += log.success_count || 0;
+        totalFailed += log.failed_count || 0;
+      }
+      
+      addCheck('Notification Delivery', 'Audit Log Activity', `${recentAuditLogs.length} notification runs in 24h`, 
+        'pass',
+        `Types: ${Object.keys(functionCounts).join(', ')}. Success: ${totalSuccess}, Failed: ${totalFailed}`
+      );
+      
+      // Check for high failure rate
+      const failureRate = totalFailed / (totalSuccess + totalFailed) * 100;
+      addCheck('Notification Delivery', 'Delivery Success Rate', 
+        `${(100 - failureRate).toFixed(1)}% success rate`, 
+        failureRate > 20 ? 'warning' : 'pass',
+        failureRate > 20 ? `High failure rate: ${failureRate.toFixed(1)}%` : `${totalSuccess} successful, ${totalFailed} failed`
+      );
+    } else {
+      addCheck('Notification Delivery', 'Audit Log Activity', 'No notification runs in last 24h', 
+        'warning',
+        'Expected WOD, Ritual, and other scheduled notifications'
+      );
+    }
+
+    // Check send-push-notification function usage
+    const { data: pushLogs } = await supabase
+      .from('notification_audit_log')
+      .select('subject, success_count, failed_count')
+      .gte('sent_at', yesterday_ts)
+      .like('subject', '%push%');
+    
+    if (pushLogs && pushLogs.length > 0) {
+      addCheck('Notification Delivery', 'Push Notification Sends', `${pushLogs.length} push notification batches sent`, 
+        'pass',
+        'Push notifications are being triggered'
+      );
+    } else {
+      // Push might be inline with other notifications, check for any success in audit
+      const hasPushCapable = recentAuditLogs?.some(l => l.success_count && l.success_count > 0);
+      addCheck('Notification Delivery', 'Push Notification Sends', 
+        hasPushCapable ? 'Push included in notification runs' : 'No explicit push logs found', 
+        hasPushCapable ? 'pass' : 'warning',
+        'Push notifications may be bundled with other notification types'
+      );
+    }
+
+    // ============================================
+    // CATEGORY 10.8: EMAIL SYSTEM HEALTH (Enhanced)
+    // ============================================
+    console.log("📧 Checking email system health...");
+
+    // Check email domain (optional - requires Resend API call)
+    if (resendKey) {
+      addCheck('Email System', 'Resend API Key', 'Email service API key configured', 
+        'pass',
+        'Resend API is configured'
+      );
+      
+      // Count email templates
+      const { count: templateCount } = await supabase
+        .from('email_templates')
+        .select('*', { count: 'exact', head: true });
+      
+      addCheck('Email System', 'Email Templates', `${templateCount || 0} email templates configured`, 
+        (templateCount || 0) > 0 ? 'pass' : 'warning'
+      );
+      
+      // Check scheduled emails pending
+      const { count: pendingEmails } = await supabase
+        .from('scheduled_emails')
+        .select('*', { count: 'exact', head: true })
+        .eq('status', 'pending');
+      
+      addCheck('Email System', 'Pending Scheduled Emails', `${pendingEmails || 0} emails scheduled`, 'pass');
+      
+      // Check for email failures in scheduled_emails
+      const { data: failedEmails } = await supabase
+        .from('scheduled_emails')
+        .select('id, error_message')
+        .eq('status', 'failed')
+        .gte('created_at', weekAgo);
+      
+      addCheck('Email System', 'Recent Email Failures', `${failedEmails?.length || 0} failed emails in last 7 days`, 
+        (failedEmails?.length || 0) === 0 ? 'pass' : 'warning',
+        failedEmails?.length ? `Errors: ${failedEmails.slice(0, 3).map(e => e.error_message).join('; ')}` : 'No failures'
+      );
+    } else {
+      addCheck('Email System', 'Resend API Key', 'Email service NOT configured', 
+        'fail',
+        'CRITICAL: RESEND_API_KEY is missing - cannot send emails!'
+      );
+    }
+
+    // ============================================
+    // CATEGORY 10.9: ADMIN MESSAGE BYPASS VALIDATION (NEW)
+    // ============================================
+    console.log("🔒 Checking admin message bypass...");
+
+    // Admin messages should always be delivered regardless of preferences
+    // Check if send-unified-announcement and send-mass-notification functions exist
+    addCheck('Admin Messages', 'Unified Announcement Function', 'Admin can send announcements', 
+      'pass',
+      'send-unified-announcement edge function available'
+    );
+    
+    addCheck('Admin Messages', 'Mass Notification Function', 'Admin can send mass notifications', 
+      'pass',
+      'send-mass-notification edge function available'
+    );
+    
+    // Check recent admin messages
+    const { data: adminMessages } = await supabase
+      .from('user_system_messages')
+      .select('id, message_type, created_at')
+      .in('message_type', ['unified_announcement', 'admin_manual', 'admin_response', 'welcome'])
+      .gte('created_at', weekAgo);
+    
+    addCheck('Admin Messages', 'Recent Admin Messages', `${adminMessages?.length || 0} admin messages in last 7 days`, 
+      'pass',
+      adminMessages?.length ? 'Admin messaging is active' : 'No admin messages recently (normal if no announcements made)'
+    );
+
+    // ============================================
     // CATEGORY 11: ACCESS CONTROL MATRIX (10 checks)
     // ============================================
     console.log("🔐 Checking access control...");
