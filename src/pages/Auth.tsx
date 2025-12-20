@@ -34,7 +34,7 @@ export default function Auth() {
     // Check current session
     supabase.auth.getSession().then(({ data: { session } }) => {
       if (session) {
-        navigate("/userdashboard");
+        navigate("/");
       }
     });
 
@@ -47,7 +47,7 @@ export default function Auth() {
         }
       } else if (session) {
         // User signed in
-        navigate("/userdashboard");
+        navigate("/");
       }
     });
 
@@ -203,7 +203,7 @@ export default function Auth() {
           title: "Success!",
           description: rememberMe ? "Logged in successfully. You'll stay logged in for 30 days." : "Logged in successfully. Redirecting...",
         });
-        setTimeout(() => navigate("/userdashboard"), 1500);
+        setTimeout(() => navigate("/"), 1500);
       }
     } catch (error: any) {
       toast({
@@ -225,7 +225,7 @@ export default function Auth() {
           onOpenChange={(open) => {
             setShowAvatarSetup(open);
             if (!open) {
-              setTimeout(() => navigate("/userdashboard"), 500);
+              setTimeout(() => navigate("/take-a-tour"), 500);
             }
           }}
           userId={newUserId}
