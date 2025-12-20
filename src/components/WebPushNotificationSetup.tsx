@@ -18,45 +18,76 @@ export const WebPushNotificationSetup = () => {
   }, []);
 
   const checkNotificationStatus = async () => {
+    console.log("[WebPush] Starting notification status check...");
+    
     // Check if browser supports notifications
-    if (!("Notification" in window) || !("serviceWorker" in navigator)) {
+    if (!("Notification" in window)) {
+      console.log("[WebPush] ❌ Browser does not support Notification API");
       return;
     }
+    
+    if (!("serviceWorker" in navigator)) {
+      console.log("[WebPush] ❌ Browser does not support Service Workers");
+      return;
+    }
+    
+    console.log("[WebPush] ✅ Browser supports notifications and service workers");
 
     const permission = Notification.permission;
     setPermissionState(permission);
+    console.log("[WebPush] Current permission state:", permission);
 
     // If permission already denied, don't show prompt
     if (permission === "denied") {
+      console.log("[WebPush] ⚠️ Permission denied by user, not showing prompt");
       return;
     }
 
     // Check if user is logged in
     const { data: { user } } = await supabase.auth.getUser();
-    if (!user) return;
+    if (!user) {
+      console.log("[WebPush] ⚠️ No user logged in, not showing prompt");
+      return;
+    }
+    console.log("[WebPush] ✅ User logged in:", user.id);
 
     // Check if already subscribed
-    const { data: existingSubscription } = await supabase
+    const { data: existingSubscription, error: subError } = await supabase
       .from("push_subscriptions")
       .select("id")
       .eq("user_id", user.id)
       .eq("is_active", true)
       .maybeSingle();
 
+    if (subError) {
+      console.log("[WebPush] ⚠️ Error checking subscription:", subError.message);
+    }
+
     if (existingSubscription) {
+      console.log("[WebPush] ✅ User already has active subscription:", existingSubscription.id);
       setIsSubscribed(true);
       return;
     }
+    console.log("[WebPush] ℹ️ No active subscription found");
 
     // Show prompt if permission is default (not yet asked)
     if (permission === "default") {
       // Check if user dismissed prompt today
       const dismissedKey = `push_prompt_dismissed_${new Date().toISOString().split('T')[0]}`;
       if (localStorage.getItem(dismissedKey) === "true") {
+        console.log("[WebPush] ⚠️ User dismissed prompt today, not showing");
         return;
       }
       
+      console.log("[WebPush] ✅ Will show prompt in 5 seconds...");
       // Delay showing prompt
+      setTimeout(() => {
+        console.log("[WebPush] 🔔 Showing push notification prompt now");
+        setShowPrompt(true);
+      }, 5000);
+    } else if (permission === "granted") {
+      // Permission granted but no subscription - try to subscribe
+      console.log("[WebPush] ℹ️ Permission granted but no subscription, will show prompt to complete setup");
       setTimeout(() => setShowPrompt(true), 5000);
     }
   };
