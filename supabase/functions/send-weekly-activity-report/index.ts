@@ -12,6 +12,11 @@ const corsHeaders = {
 const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
 const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
 
+function logStep(step: string, details?: any) {
+  const detailsStr = details ? ` - ${JSON.stringify(details)}` : '';
+  console.log(`[SEND-WEEKLY-ACTIVITY-REPORT] ${step}${detailsStr}`);
+}
+
 interface UserActivityData {
   userId: string;
   email: string;
@@ -348,7 +353,7 @@ function generateDashboardMessage(data: UserActivityData, weekStart: string, wee
 }
 
 const handler = async (req: Request): Promise<Response> => {
-  console.log("Starting weekly activity report generation...");
+  logStep("Starting weekly activity report generation");
 
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
@@ -370,32 +375,46 @@ const handler = async (req: Request): Promise<Response> => {
     const weekStart = startDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
     const weekEnd = endDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
 
-    console.log(`Generating reports for week: ${weekStart} - ${weekEnd}`);
+    logStep(`Generating reports for week: ${weekStart} - ${weekEnd}`);
 
     // Get all users with active subscriptions or any activity
     const { data: authUsers, error: authError } = await supabase.auth.admin.listUsers();
     
     if (authError) {
-      console.error("Error fetching users:", authError);
+      logStep("Error fetching users", { error: authError });
       throw authError;
     }
 
     const users = authUsers.users || [];
-    console.log(`Found ${users.length} total users`);
+    logStep(`Found ${users.length} total users`);
 
     let successCount = 0;
     let failCount = 0;
+    let dashboardSent = 0;
+    let emailsSent = 0;
+    let pushSent = 0;
+    let skippedNoActivity = 0;
+    let skippedPrefs = 0;
 
     for (const user of users) {
       if (!user.email) continue;
 
       try {
-        // Get user profile
+        // Get user profile with preferences
         const { data: profile } = await supabase
           .from("profiles")
-          .select("full_name")
+          .select("full_name, notification_preferences")
           .eq("user_id", user.id)
           .single();
+
+        const prefs = (profile?.notification_preferences as Record<string, any>) || {};
+
+        // Check if user has opted out of all notifications
+        if (prefs.opt_out_all === true) {
+          logStep(`Skipping ${user.email} - opted out of all notifications`);
+          skippedPrefs++;
+          continue;
+        }
 
         // Fetch user activity
         const activity = await fetchUserActivity(supabase, user.id, startDate, endDate);
@@ -412,7 +431,8 @@ const handler = async (req: Request): Promise<Response> => {
           activity.calculators.calories > 0;
 
         if (!hasActivity) {
-          console.log(`Skipping ${user.email} - no activity`);
+          logStep(`Skipping ${user.email} - no activity`);
+          skippedNoActivity++;
           continue;
         }
 
@@ -423,71 +443,130 @@ const handler = async (req: Request): Promise<Response> => {
           ...activity,
         };
 
-        // Generate and send email
-        const emailHtml = generateEmailHtml(userData, weekStart, weekEnd);
-        
-        const emailResponse = await fetch("https://api.resend.com/emails", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            "Authorization": `Bearer ${RESEND_API_KEY}`,
-          },
-          body: JSON.stringify({
-            from: "SmartyGym <notifications@smartygym.com>",
-            to: [user.email],
-            subject: "📊 Your Weekly Activity Report - SmartyGym",
-            html: emailHtml,
-            headers: {
-              "List-Unsubscribe": `<https://smartygym.com/unsubscribe?email=${encodeURIComponent(user.email)}>`,
-              "List-Unsubscribe-Post": "List-Unsubscribe=One-Click",
-              "Reply-To": "admin@smartygym.com",
-            },
-          }),
-        });
+        const subject = `📊 Your Weekly Activity Report (${weekStart} - ${weekEnd})`;
 
-        if (!emailResponse.ok) {
-          const errorData = await emailResponse.text();
-          console.error(`Email error for ${user.email}:`, errorData);
-          failCount++;
-          continue;
+        // Check dashboard preference (default: true)
+        if (prefs.dashboard_weekly_activity !== false) {
+          const dashboardContent = generateDashboardMessage(userData, weekStart, weekEnd);
+          
+          const { error: messageError } = await supabase
+            .from("user_system_messages")
+            .insert({
+              user_id: user.id,
+              message_type: MESSAGE_TYPES.WEEKLY_ACTIVITY_REPORT,
+              subject: subject,
+              content: dashboardContent,
+              is_read: false,
+            });
+
+          if (messageError) {
+            logStep(`Dashboard message error for ${user.email}`, { error: messageError });
+          } else {
+            dashboardSent++;
+          }
         }
 
-        // Insert dashboard notification
-        const dashboardContent = generateDashboardMessage(userData, weekStart, weekEnd);
-        
-        const { error: messageError } = await supabase
-          .from("user_system_messages")
-          .insert({
-            user_id: user.id,
-            message_type: MESSAGE_TYPES.WEEKLY_ACTIVITY_REPORT,
-            subject: `📊 Your Weekly Activity Report (${weekStart} - ${weekEnd})`,
-            content: dashboardContent,
-            is_read: false,
+        // Check email preference (default: true)
+        if (prefs.email_weekly_activity !== false) {
+          const emailHtml = generateEmailHtml(userData, weekStart, weekEnd);
+          
+          const emailResponse = await fetch("https://api.resend.com/emails", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              "Authorization": `Bearer ${RESEND_API_KEY}`,
+            },
+            body: JSON.stringify({
+              from: "SmartyGym <notifications@smartygym.com>",
+              to: [user.email],
+              subject: `📊 Your Weekly Activity Report - SmartyGym`,
+              html: emailHtml,
+              headers: {
+                "List-Unsubscribe": `<https://smartygym.com/unsubscribe?email=${encodeURIComponent(user.email)}>`,
+                "List-Unsubscribe-Post": "List-Unsubscribe=One-Click",
+                "Reply-To": "admin@smartygym.com",
+              },
+            }),
           });
 
-        if (messageError) {
-          console.error(`Dashboard message error for ${user.email}:`, messageError);
+          if (!emailResponse.ok) {
+            const errorData = await emailResponse.text();
+            logStep(`Email error for ${user.email}`, { error: errorData });
+            failCount++;
+          } else {
+            emailsSent++;
+          }
+        }
+
+        // Send push notification if user has dashboard enabled
+        if (prefs.dashboard_weekly_activity !== false && prefs.push !== false) {
+          try {
+            await supabase.functions.invoke('send-push-notification', {
+              body: {
+                user_id: user.id,
+                title: "📊 Your Weekly Activity Report",
+                body: `Review your fitness progress for ${weekStart} - ${weekEnd}!`,
+                url: '/userdashboard?tab=logbook',
+                is_admin_message: false,
+              }
+            });
+            pushSent++;
+          } catch (e) {
+            logStep("Push notification error", { userId: user.id, error: e });
+          }
         }
 
         successCount++;
-        console.log(`Report sent to ${user.email}`);
+        logStep(`Report sent to ${user.email}`);
 
         // Rate limiting: 600ms between emails
         await new Promise(resolve => setTimeout(resolve, 600));
 
       } catch (userError) {
-        console.error(`Error processing user ${user.email}:`, userError);
+        logStep(`Error processing user ${user.email}`, { error: userError });
         failCount++;
       }
     }
 
-    console.log(`Weekly reports completed. Success: ${successCount}, Failed: ${failCount}`);
+    // Log to audit
+    await supabase.from('notification_audit_log').insert({
+      notification_type: MESSAGE_TYPES.WEEKLY_ACTIVITY_REPORT,
+      message_type: MESSAGE_TYPES.WEEKLY_ACTIVITY_REPORT,
+      recipient_count: users.length,
+      success_count: successCount,
+      failed_count: failCount,
+      subject: `📊 Your Weekly Activity Report`,
+      content: `Weekly activity report sent - ${emailsSent} emails, ${dashboardSent} dashboard, ${pushSent} push`,
+      metadata: {
+        period: `${weekStart} - ${weekEnd}`,
+        emailsSent,
+        dashboardSent,
+        pushSent,
+        skippedNoActivity,
+        skippedPrefs,
+      }
+    });
+
+    logStep(`Weekly reports completed`, { 
+      successCount, 
+      failCount, 
+      dashboardSent, 
+      emailsSent, 
+      pushSent,
+      skippedNoActivity, 
+      skippedPrefs 
+    });
 
     return new Response(
       JSON.stringify({ 
         success: true, 
         message: `Sent ${successCount} weekly reports, ${failCount} failed`,
         period: `${weekStart} - ${weekEnd}`,
+        dashboardSent,
+        emailsSent,
+        pushSent,
+        skippedNoActivity,
+        skippedPrefs,
       }),
       {
         status: 200,
@@ -496,7 +575,7 @@ const handler = async (req: Request): Promise<Response> => {
     );
 
   } catch (error: any) {
-    console.error("Weekly report error:", error);
+    logStep("Weekly report error", { error: error.message });
     return new Response(
       JSON.stringify({ error: error.message }),
       {

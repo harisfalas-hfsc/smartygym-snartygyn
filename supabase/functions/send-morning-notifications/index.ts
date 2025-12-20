@@ -127,12 +127,13 @@ serve(async (req) => {
     }
 
     // ============================================
-    // GET ALL USERS
+    // GET ALL USERS WITH PREFERENCES
     // ============================================
-    const { data: allUsers } = await supabase.from('profiles').select('user_id');
-    const userIds = allUsers?.map(u => u.user_id) || [];
+    const { data: allProfiles } = await supabase
+      .from('profiles')
+      .select('user_id, notification_preferences');
 
-    if (userIds.length === 0) {
+    if (!allProfiles || allProfiles.length === 0) {
       logStep("No users to notify");
       return new Response(
         JSON.stringify({ success: true, sent: false, reason: "No users" }),
@@ -140,21 +141,19 @@ serve(async (req) => {
       );
     }
 
-    logStep(`Sending morning notifications to ${userIds.length} users`);
+    logStep(`Processing morning notifications for ${allProfiles.length} users`);
 
     // ============================================
     // BUILD NOTIFICATION CONTENT
     // ============================================
     const notificationTitle = `🌅 Good Morning, Smarty! Today's Workouts & Ritual Are Ready`;
     
-    // Build dashboard notification content
-    let dashboardContent = `<p class="tiptap-paragraph"><strong>🌅 Good Morning, Smarty!</strong></p>
+    // Build dashboard notification content for WOD
+    const wodDashboardContent = `<p class="tiptap-paragraph"><strong>🌅 Good Morning, Smarty!</strong></p>
 <p class="tiptap-paragraph"></p>
 <p class="tiptap-paragraph">Your daily fitness content is ready!</p>
-<p class="tiptap-paragraph"></p>`;
-
-    if (hasWods) {
-      dashboardContent += `<p class="tiptap-paragraph"><strong>━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━</strong></p>
+<p class="tiptap-paragraph"></p>
+<p class="tiptap-paragraph"><strong>━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━</strong></p>
 <p class="tiptap-paragraph"><strong>🏆 TODAY'S WORKOUTS OF THE DAY</strong></p>
 <p class="tiptap-paragraph"><strong>━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━</strong></p>
 <p class="tiptap-paragraph"></p>
@@ -165,16 +164,16 @@ serve(async (req) => {
 <p class="tiptap-paragraph"></p>
 <p class="tiptap-paragraph">${format} | ${difficulty} (${difficultyStars}⭐)</p>
 <p class="tiptap-paragraph"></p>
-<p class="tiptap-paragraph"><a href="https://smartygym.com/workout/wod">View Today's Workouts →</a></p>
-<p class="tiptap-paragraph"></p>`;
-    }
+<p class="tiptap-paragraph"><a href="https://smartygym.com/workout/wod">View Today's Workouts →</a></p>`;
 
-    if (hasRitual) {
-      dashboardContent += `<p class="tiptap-paragraph"><strong>━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━</strong></p>
+    // Build dashboard notification content for Ritual
+    const ritualDashboardContent = `<p class="tiptap-paragraph"><strong>🌅 Good Morning, Smarty!</strong></p>
+<p class="tiptap-paragraph"></p>
+<p class="tiptap-paragraph"><strong>━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━</strong></p>
 <p class="tiptap-paragraph"><strong>🌅 YOUR DAILY SMARTY RITUAL</strong></p>
 <p class="tiptap-paragraph"><strong>━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━</strong></p>
 <p class="tiptap-paragraph"></p>
-<p class="tiptap-paragraph">Your <strong>Day ${todaysRitual.day_number}</strong> Smarty Ritual is ready!</p>
+<p class="tiptap-paragraph">Your <strong>Day ${todaysRitual?.day_number}</strong> Smarty Ritual is ready!</p>
 <p class="tiptap-paragraph"></p>
 <p class="tiptap-paragraph">Start your day with intention through our three wellness rituals:</p>
 <p class="tiptap-paragraph">☀️ <strong>Morning</strong> - Energize your start</p>
@@ -182,45 +181,130 @@ serve(async (req) => {
 <p class="tiptap-paragraph">🌙 <strong>Evening</strong> - Wind down peacefully</p>
 <p class="tiptap-paragraph"></p>
 <p class="tiptap-paragraph"><a href="https://smartygym.com/daily-ritual">View Today's Ritual →</a></p>`;
+
+    // ============================================
+    // INSERT DASHBOARD NOTIFICATIONS (PREFERENCE-AWARE)
+    // ============================================
+    let wodDashboardSent = 0;
+    let ritualDashboardSent = 0;
+    let dashboardSkipped = 0;
+
+    const dashboardInserts: { user_id: string; message_type: string; subject: string; content: string; is_read: boolean }[] = [];
+
+    for (const profile of allProfiles) {
+      const prefs = (profile.notification_preferences as Record<string, any>) || {};
+      
+      // Check if user has opted out of all notifications
+      if (prefs.opt_out_all === true) {
+        dashboardSkipped++;
+        continue;
+      }
+
+      // Check WOD dashboard preference (default: true)
+      if (hasWods && prefs.dashboard_wod !== false) {
+        dashboardInserts.push({
+          user_id: profile.user_id,
+          message_type: MESSAGE_TYPES.WOD_NOTIFICATION,
+          subject: `🏆 Today's Workout of the Day: ${category}`,
+          content: wodDashboardContent,
+          is_read: false,
+        });
+        wodDashboardSent++;
+      }
+
+      // Check Ritual dashboard preference (default: true)
+      if (hasRitual && prefs.dashboard_ritual !== false) {
+        dashboardInserts.push({
+          user_id: profile.user_id,
+          message_type: MESSAGE_TYPES.DAILY_RITUAL,
+          subject: `🌅 Day ${todaysRitual.day_number} Smarty Ritual`,
+          content: ritualDashboardContent,
+          is_read: false,
+        });
+        ritualDashboardSent++;
+      }
     }
 
-    // ============================================
-    // INSERT DASHBOARD NOTIFICATIONS
-    // ============================================
-    await supabase.from('user_system_messages').insert(userIds.map(userId => ({
-      user_id: userId,
-      message_type: MESSAGE_TYPES.MORNING_NOTIFICATION,
-      subject: notificationTitle,
-      content: dashboardContent,
-      is_read: false,
-    })));
+    // Batch insert dashboard notifications
+    if (dashboardInserts.length > 0) {
+      await supabase.from('user_system_messages').insert(dashboardInserts);
+    }
 
-    logStep("Dashboard notifications inserted");
+    logStep("Dashboard notifications inserted", { 
+      wodDashboardSent, 
+      ritualDashboardSent, 
+      dashboardSkipped 
+    });
 
     // ============================================
-    // SEND EMAILS
+    // SEND PUSH NOTIFICATIONS (PREFERENCE-AWARE)
+    // ============================================
+    let pushSent = 0;
+    let pushSkipped = 0;
+
+    for (const profile of allProfiles) {
+      const prefs = (profile.notification_preferences as Record<string, any>) || {};
+      
+      // Check if user wants push notifications
+      if (prefs.opt_out_all === true || prefs.push === false) {
+        pushSkipped++;
+        continue;
+      }
+
+      // Only send push if user wants either WOD or Ritual dashboard notifications
+      const wantsWodPush = hasWods && prefs.dashboard_wod !== false;
+      const wantsRitualPush = hasRitual && prefs.dashboard_ritual !== false;
+
+      if (wantsWodPush || wantsRitualPush) {
+        try {
+          await supabase.functions.invoke('send-push-notification', {
+            body: {
+              user_id: profile.user_id,
+              title: "🌅 Good Morning, Smarty!",
+              body: hasWods && hasRitual 
+                ? `Today's ${category} workouts and Day ${todaysRitual.day_number} ritual are ready!`
+                : hasWods 
+                  ? `Today's ${category} workouts are ready!`
+                  : `Day ${todaysRitual.day_number} ritual is ready!`,
+              url: hasWods ? '/workout/wod' : '/daily-ritual',
+              is_admin_message: false, // Respects preferences
+            }
+          });
+          pushSent++;
+        } catch (e) {
+          logStep("Push notification error", { userId: profile.user_id, error: e });
+        }
+      }
+    }
+
+    logStep("Push notifications sent", { pushSent, pushSkipped });
+
+    // ============================================
+    // SEND EMAILS (PREFERENCE-AWARE)
     // ============================================
     const { data: usersData } = await supabase.auth.admin.listUsers();
-    const { data: allProfiles } = await supabase
-      .from('profiles')
-      .select('user_id, notification_preferences');
-
     const profilesMap = new Map(allProfiles?.map(p => [p.user_id, p.notification_preferences]) || []);
 
     let emailsSent = 0;
     let emailsSkipped = 0;
 
     for (const authUser of usersData?.users || []) {
-      if (!authUser.email || !userIds.includes(authUser.id)) continue;
+      if (!authUser.email) continue;
 
       const prefs = (profilesMap.get(authUser.id) as Record<string, any>) || {};
 
-      // Check if user has opted out of both WOD and Ritual emails
+      // Check if user has opted out of all emails
+      if (prefs.opt_out_all === true) {
+        emailsSkipped++;
+        continue;
+      }
+
+      // Check if user wants WOD or Ritual emails
       const wantsWodEmail = prefs.email_wod !== false && hasWods;
       const wantsRitualEmail = prefs.email_ritual !== false && hasRitual;
       
-      if (prefs.opt_out_all === true || (!wantsWodEmail && !wantsRitualEmail)) {
-        logStep(`Skipping morning email for ${authUser.email} (opted out or no relevant content)`);
+      if (!wantsWodEmail && !wantsRitualEmail) {
+        logStep(`Skipping morning email for ${authUser.email} (preferences disabled)`);
         emailsSkipped++;
         continue;
       }
@@ -294,28 +378,39 @@ ${getEmailFooter(authUser.email, 'wod')}
     await supabase.from('notification_audit_log').insert({
       notification_type: MESSAGE_TYPES.MORNING_NOTIFICATION,
       message_type: MESSAGE_TYPES.MORNING_NOTIFICATION,
-      recipient_count: userIds.length,
+      recipient_count: allProfiles.length,
       success_count: emailsSent,
       failed_count: emailsSkipped,
       subject: notificationTitle,
-      content: `Morning notification sent - ${emailsSent} emails, ${userIds.length} dashboard messages. WODs: ${hasWods}, Ritual: ${hasRitual}`,
+      content: `Morning notification sent - ${emailsSent} emails, ${wodDashboardSent} WOD dashboard, ${ritualDashboardSent} Ritual dashboard. Push: ${pushSent}`,
       sent_at: new Date().toISOString(),
       metadata: {
         hasWods,
         hasRitual,
         wodCategory: category,
-        ritualDay: todaysRitual?.day_number
+        ritualDay: todaysRitual?.day_number,
+        wodDashboardSent,
+        ritualDashboardSent,
+        dashboardSkipped,
+        pushSent,
+        pushSkipped,
       }
     });
 
-    logStep(`✅ Morning notifications complete: ${userIds.length} dashboard, ${emailsSent} emails sent, ${emailsSkipped} skipped`);
+    logStep(`✅ Morning notifications complete: ${wodDashboardSent + ritualDashboardSent} dashboard, ${emailsSent} emails, ${pushSent} push`);
 
     return new Response(
       JSON.stringify({
         success: true,
-        dashboardNotifications: userIds.length,
+        dashboardNotifications: {
+          wod: wodDashboardSent,
+          ritual: ritualDashboardSent,
+          skipped: dashboardSkipped,
+        },
         emailsSent,
         emailsSkipped,
+        pushSent,
+        pushSkipped,
         content: {
           hasWods,
           hasRitual,
