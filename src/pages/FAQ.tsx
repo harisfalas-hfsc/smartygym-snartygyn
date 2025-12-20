@@ -279,7 +279,7 @@ const FAQ = () => {
                   <AccordionItem value="item-7c">
                     <AccordionTrigger className="text-left">How can I track my progress and stay accountable?</AccordionTrigger>
                     <AccordionContent className="py-2 leading-relaxed">
-                      SmartyGym offers a complete fitness tracking ecosystem through your personal <a href="/logbook" className="text-primary hover:underline font-medium">LogBook</a> and Goals system.<br/><br/>
+                      SmartyGym offers a complete fitness tracking ecosystem through your personal <a href="/userdashboard?tab=logbook" className="text-primary hover:underline font-medium">LogBook</a> and Goals system.<br/><br/>
                       
                       <strong>🎯 Set Your Goals:</strong> Define personal targets — weight, body fat percentage, muscle mass — with optional target dates. 
                       Track your progress visually with intuitive progress bars and see how close you are to achieving your goals.<br/><br/>
