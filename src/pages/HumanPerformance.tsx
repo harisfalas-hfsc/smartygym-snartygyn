@@ -15,7 +15,8 @@ import {
   BookOpen,
   BarChart3,
   TrendingUp,
-  ArrowRight
+  ArrowRight,
+  UserCheck
 } from "lucide-react";
 import { useShowBackButton } from "@/hooks/useShowBackButton";
 import { SEOEnhancer } from "@/components/SEOEnhancer";
@@ -98,6 +99,22 @@ export default function HumanPerformance() {
               </p>
               
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {/* 100% Human Card - First in grid */}
+                <div className="flex items-start gap-3 p-4 bg-background/50 rounded-lg border border-red-500/30 md:col-span-2">
+                  <div className="p-2 bg-red-500/20 rounded-full flex-shrink-0">
+                    <UserCheck className="h-5 w-5 text-red-500" />
+                  </div>
+                  <div>
+                    <h3 className="font-semibold text-red-500">100% Human. 0% AI.</h3>
+                    <p className="text-sm text-muted-foreground">
+                      Unlike other fitness apps, <span className="text-primary font-bold">SmartyGym</span> workouts and training programs are crafted and designed by{" "}
+                      <Link to="/coach-profile" className="text-primary font-bold hover:underline">
+                        Haris Falas
+                      </Link>, a certified fitness trainer and wellness coach.
+                    </p>
+                  </div>
+                </div>
+
                 <div className="flex items-start gap-3 p-4 bg-background/50 rounded-lg border border-primary/20">
                   <div className="p-2 bg-primary/20 rounded-full flex-shrink-0">
                     <Dumbbell className="h-5 w-5 text-primary" />
