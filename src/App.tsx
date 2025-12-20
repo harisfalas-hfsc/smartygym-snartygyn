@@ -58,6 +58,7 @@ import JoinPremium from "./pages/JoinPremium";
 import SmartyCorporate from "./pages/SmartyCorporate";
 import CorporateWellness from "./pages/CorporateWellness";
 import HumanPerformance from "./pages/HumanPerformance";
+import WhyInvestInSmartyGym from "./pages/WhyInvestInSmartyGym";
 import PremiumBenefits from "./pages/PremiumBenefits";
 import PremiumComparison from "./pages/PremiumComparison";
 import SmartyPlans from "./pages/SmartyPlans";
@@ -139,6 +140,7 @@ const AppContent = () => {
                 <Route path="/corporate" element={<SmartyCorporate />} />
                 <Route path="/corporate-wellness" element={<CorporateWellness />} />
                 <Route path="/human-performance" element={<HumanPerformance />} />
+                <Route path="/why-invest-in-smartygym" element={<WhyInvestInSmartyGym />} />
                 <Route path="/corporate-admin" element={<ProtectedRoute><CorporateAdmin /></ProtectedRoute>} />
                 
                 {/* Exercise library is public */}
