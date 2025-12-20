@@ -590,41 +590,35 @@ const Index = () => {
             What We <span className="text-primary">Stand For</span>
           </h2>
           
-        <div className="space-y-4">
+        <div className="space-y-3">
+          {/* 100% Human, 0% AI */}
+          <div className="flex items-center gap-3">
+            <UserCheck className="w-6 h-6 text-cyan-500 flex-shrink-0" />
+            <span className="text-sm font-semibold">100% Human, 0% AI</span>
+          </div>
+          
           {/* Built for Real Life */}
-          <div className="flex flex-col gap-1">
-            <div className="flex items-center gap-3">
-              <Heart className="w-6 h-6 text-orange-500 flex-shrink-0" />
-              <span className="text-sm font-semibold">Built for Real Life</span>
-            </div>
-            <p className="text-xs text-muted-foreground ml-9">Flexible training that fits your schedule, location, and lifestyle — not the other way around.</p>
+          <div className="flex items-center gap-3">
+            <Heart className="w-6 h-6 text-orange-500 flex-shrink-0" />
+            <span className="text-sm font-semibold">Built for Real Life</span>
           </div>
           
           {/* Science-Based Approach */}
-          <div className="flex flex-col gap-1">
-            <div className="flex items-center gap-3">
-              <Award className="w-6 h-6 text-purple-500 flex-shrink-0" />
-              <span className="text-sm font-semibold">Science-Based Approach</span>
-            </div>
-            <p className="text-xs text-muted-foreground ml-9">Every workout is designed using evidence-based training principles, not trends or fads.</p>
+          <div className="flex items-center gap-3">
+            <Award className="w-6 h-6 text-purple-500 flex-shrink-0" />
+            <span className="text-sm font-semibold">Science-Based Approach</span>
           </div>
           
           {/* Accessible to Everyone */}
-          <div className="flex flex-col gap-1">
-            <div className="flex items-center gap-3">
-              <Users className="w-6 h-6 text-emerald-500 flex-shrink-0" />
-              <span className="text-sm font-semibold">Accessible to Everyone</span>
-            </div>
-            <p className="text-xs text-muted-foreground ml-9">From beginners to advanced athletes, everyone deserves access to quality fitness guidance.</p>
+          <div className="flex items-center gap-3">
+            <Users className="w-6 h-6 text-emerald-500 flex-shrink-0" />
+            <span className="text-sm font-semibold">Accessible to Everyone</span>
           </div>
           
           {/* Safe and Effective */}
-          <div className="flex flex-col gap-1">
-            <div className="flex items-center gap-3">
-              <Shield className="w-6 h-6 text-blue-500 flex-shrink-0" />
-              <span className="text-sm font-semibold">Safe and Effective</span>
-            </div>
-            <p className="text-xs text-muted-foreground ml-9">Proper technique, realistic progressions, and injury prevention are at the core of everything we do.</p>
+          <div className="flex items-center gap-3">
+            <Shield className="w-6 h-6 text-blue-500 flex-shrink-0" />
+            <span className="text-sm font-semibold">Safe and Effective</span>
           </div>
         </div>
         </div>
