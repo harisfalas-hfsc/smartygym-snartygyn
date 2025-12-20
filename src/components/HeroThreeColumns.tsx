@@ -108,12 +108,12 @@ export const HeroThreeColumns = () => {
     staleTime: 1000 * 60 * 5,
   });
 
-  // Rotate between WODs every 5 seconds
+  // Rotate between WODs every 2 seconds
   useEffect(() => {
     if (wods && wods.length > 1) {
       const interval = setInterval(() => {
         setCurrentWodIndex((prev) => (prev === 0 ? 1 : 0));
-      }, 5000);
+      }, 2000);
       return () => clearInterval(interval);
     }
   }, [wods]);
