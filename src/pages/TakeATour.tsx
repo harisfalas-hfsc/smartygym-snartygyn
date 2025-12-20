@@ -20,13 +20,13 @@ import {
   Moon,
   Crown,
   Zap,
-  Users,
   Brain,
   TrendingUp,
   Timer,
   Flame,
   Activity,
-  User
+  User,
+  Trophy
 } from "lucide-react";
 import { useShowBackButton } from "@/hooks/useShowBackButton";
 import { SEOEnhancer } from "@/components/SEOEnhancer";
@@ -36,12 +36,12 @@ export default function TakeATour() {
   const { canGoBack, goBack } = useShowBackButton();
 
   const workoutCategories = [
-    { name: "Strength Training", icon: <Dumbbell className="h-4 w-4" /> },
-    { name: "Cardio Endurance", icon: <Activity className="h-4 w-4" /> },
-    { name: "Metabolic Conditioning", icon: <Flame className="h-4 w-4" /> },
-    { name: "Functional Movement", icon: <Users className="h-4 w-4" /> },
-    { name: "Core & Stability", icon: <Target className="h-4 w-4" /> },
-    { name: "Recovery & Mobility", icon: <Sparkles className="h-4 w-4" /> },
+    { name: "Strength", icon: <Dumbbell className="h-4 w-4" /> },
+    { name: "Calorie Burning", icon: <Flame className="h-4 w-4" /> },
+    { name: "Metabolic", icon: <Zap className="h-4 w-4" /> },
+    { name: "Cardio", icon: <Activity className="h-4 w-4" /> },
+    { name: "Mobility & Stability", icon: <Target className="h-4 w-4" /> },
+    { name: "Challenge", icon: <Trophy className="h-4 w-4" /> },
   ];
 
   const programCategories = [
@@ -221,7 +221,7 @@ export default function TakeATour() {
                 <div className="flex items-center gap-2 p-3 bg-muted/30 rounded-lg">
                   <Zap className="h-4 w-4 text-primary" />
                   <div>
-                    <div className="text-xs text-muted-foreground">Formats</div>
+                    <div className="text-xs text-muted-foreground">Types</div>
                     <div className="text-sm font-medium">AMRAP, EMOM, etc.</div>
                   </div>
                 </div>
