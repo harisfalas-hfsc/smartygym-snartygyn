@@ -85,19 +85,8 @@ serve(async (req) => {
           continue;
         }
 
-        // Check user notification preferences
-        const { data: preferences } = await supabaseAdmin
-          .from("notification_preferences")
-          .select("newsletter")
-          .eq("user_id", userId)
-          .single();
-
-        // Skip email if user has disabled newsletter emails
-        if (preferences && !preferences.newsletter) {
-          logStep("User has disabled newsletter emails, skipping email", { userId });
-          sentCount++; // Still count as sent (dashboard message was sent)
-          continue;
-        }
+        // Admin messages ALWAYS get delivered - no preference checking
+        // This is a high-priority system message from admin
 
         // Send email with properly formatted HTML, headers, and footer
         try {
@@ -119,8 +108,22 @@ serve(async (req) => {
           logStep("ERROR sending email", { userId, error: emailError });
         }
 
+        // Trigger push notification for admin message (bypasses preferences)
+        try {
+          await supabaseAdmin.functions.invoke('send-push-notification', {
+            body: {
+              user_id: userId,
+              title: subject,
+              body: content.substring(0, 200),
+              is_admin_message: true, // High priority - bypasses all preferences
+            }
+          });
+        } catch (pushError) {
+          logStep("Push notification error (non-blocking)", { userId, error: pushError });
+        }
+
         sentCount++;
-        logStep("Announcement sent (dashboard + email)", { userId });
+        logStep("Announcement sent (dashboard + email + push)", { userId });
       } catch (error) {
         failedCount++;
         logStep("Error sending to user", { userId, error: error instanceof Error ? error.message : String(error) });

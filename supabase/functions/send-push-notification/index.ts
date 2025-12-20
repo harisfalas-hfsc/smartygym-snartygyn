@@ -77,7 +77,7 @@ serve(async (req) => {
       );
     }
 
-    const { user_id, title, body, url, tag } = await req.json();
+    const { user_id, title, body, url, tag, is_admin_message } = await req.json();
 
     if (!user_id) {
       return new Response(
@@ -86,22 +86,27 @@ serve(async (req) => {
       );
     }
 
-    // Check user's notification preferences - only send push if they have push enabled
-    const { data: profile } = await supabaseClient
-      .from("profiles")
-      .select("notification_preferences")
-      .eq("user_id", user_id)
-      .single();
+    // Admin messages ALWAYS get delivered - bypass all preference checking
+    if (!is_admin_message) {
+      // Check user's notification preferences - only for non-admin messages
+      const { data: profile } = await supabaseClient
+        .from("profiles")
+        .select("notification_preferences")
+        .eq("user_id", user_id)
+        .single();
 
-    const prefs = profile?.notification_preferences as Record<string, any> || {};
-    
-    // Check if user has opted out of push notifications
-    if (prefs.push === false || prefs.opt_out_all === true) {
-      console.log(`[PUSH] User ${user_id} has disabled push notifications`);
-      return new Response(
-        JSON.stringify({ message: "User has disabled push notifications", sent: 0 }),
-        { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-      );
+      const prefs = profile?.notification_preferences as Record<string, any> || {};
+      
+      // Check if user has opted out of push notifications
+      if (prefs.push === false || prefs.opt_out_all === true) {
+        console.log(`[PUSH] User ${user_id} has disabled push notifications`);
+        return new Response(
+          JSON.stringify({ message: "User has disabled push notifications", sent: 0 }),
+          { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        );
+      }
+    } else {
+      console.log(`[PUSH] Admin message - bypassing preference checks for user ${user_id}`);
     }
 
     // Get user's active push subscriptions

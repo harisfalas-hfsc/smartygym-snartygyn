@@ -185,8 +185,11 @@ export const DashboardNotificationSubscriptionManager = () => {
       <CardHeader>
         <CardTitle className="text-lg">Dashboard Notifications</CardTitle>
         <CardDescription>
-          Control which messages you receive in your dashboard inbox. When enabled, you'll also receive a browser push notification.
+          Control which automated messages you receive in your dashboard inbox. When enabled, you'll also receive a browser push notification.
         </CardDescription>
+        <p className="text-xs text-muted-foreground mt-2 italic">
+          Note: Messages sent directly from Smarty Gym admin are always delivered and cannot be disabled.
+        </p>
       </CardHeader>
       <CardContent className="space-y-1">
         {NOTIFICATION_OPTIONS.map((option) => {
