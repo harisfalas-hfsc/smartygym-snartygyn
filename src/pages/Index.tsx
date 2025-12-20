@@ -113,7 +113,7 @@ const Index = () => {
     route: "/tools"
   }, {
     id: "blog",
-    title: "Blog & Expert Articles",
+    title: "Blog & Insights",
     description: "Evidence-based fitness articles and expert insights from professional coaches",
     buttonText: "Read Articles",
     icon: FileText,
