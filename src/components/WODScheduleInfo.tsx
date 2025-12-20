@@ -162,7 +162,10 @@ export const WODScheduleInfo = () => {
   return (
     <Card className="mb-8 bg-gradient-to-br from-primary/5 via-background to-primary/5 border-2 border-primary/40">
       <CardContent className="p-4">
-        <h2 className="text-lg font-bold text-center mb-3">WOD Schedule</h2>
+        <h2 className="text-lg font-bold text-center mb-1">WOD Schedule</h2>
+        <p className="text-xs text-muted-foreground text-center mb-3">
+          {format(today, "EEEE, MMMM d, yyyy")}
+        </p>
         {/* Stack on mobile, 3 columns on sm+ */}
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
           {days.map((day) => {
