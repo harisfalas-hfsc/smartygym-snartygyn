@@ -156,7 +156,7 @@ export default function TakeATour() {
                 <ul className="space-y-2 text-sm text-muted-foreground">
                   <li className="flex items-start gap-2">
                     <CheckCircle2 className="h-4 w-4 text-primary mt-0.5 shrink-0" />
-                    <span><strong>7-Day Category Rotation:</strong> Strength → Cardio → Metabolic → Functional → Core → Recovery → Repeat</span>
+                    <span><strong>Smart Periodization:</strong> Science-based category rotation designed for optimal results and balanced fitness development</span>
                   </li>
                   <li className="flex items-start gap-2">
                     <CheckCircle2 className="h-4 w-4 text-primary mt-0.5 shrink-0" />
@@ -164,7 +164,7 @@ export default function TakeATour() {
                   </li>
                   <li className="flex items-start gap-2">
                     <CheckCircle2 className="h-4 w-4 text-primary mt-0.5 shrink-0" />
-                    <span><strong>Smart Scheduling:</strong> Never two strength days back-to-back for optimal recovery</span>
+                    <span><strong>Smart Scheduling:</strong> Strategic training that targets different energy systems for structured, science-based progress and proper recovery</span>
                   </li>
                   <li className="flex items-start gap-2">
                     <CheckCircle2 className="h-4 w-4 text-primary mt-0.5 shrink-0" />
