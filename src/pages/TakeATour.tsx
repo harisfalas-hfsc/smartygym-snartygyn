@@ -2,6 +2,7 @@ import { Helmet } from "react-helmet";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
 import { 
   ArrowLeft, 
   Heart, 
@@ -11,6 +12,7 @@ import {
   BookOpen,
   BarChart3,
   CheckCircle2,
+  Check,
   Clock,
   Target,
   Sunrise,
@@ -407,70 +409,74 @@ export default function TakeATour() {
                 individual workouts or programs if you want to give us a try.
               </p>
 
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                {/* Free Plan */}
-                <div className="p-4 bg-muted/30 rounded-lg border border-border">
-                  <h4 className="font-bold text-lg mb-1">Free</h4>
-                  <p className="text-2xl font-bold text-primary mb-2">€0<span className="text-sm font-normal text-muted-foreground">/month</span></p>
-                  <ul className="space-y-1 text-sm text-muted-foreground">
-                    <li className="flex items-center gap-2">
-                      <CheckCircle2 className="h-3 w-3 text-primary" />
-                      Access to free workouts
-                    </li>
-                    <li className="flex items-center gap-2">
-                      <CheckCircle2 className="h-3 w-3 text-primary" />
-                      Exercise library
-                    </li>
-                    <li className="flex items-center gap-2">
-                      <CheckCircle2 className="h-3 w-3 text-primary" />
-                      Basic tools
-                    </li>
-                  </ul>
-                </div>
-
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-3xl mx-auto">
                 {/* Gold Plan */}
-                <div className="p-4 bg-amber-500/10 rounded-lg border border-amber-500/30">
-                  <h4 className="font-bold text-lg mb-1 text-amber-600">Gold</h4>
-                  <p className="text-2xl font-bold text-amber-600 mb-2">€6.99<span className="text-sm font-normal text-muted-foreground">/month</span></p>
-                  <ul className="space-y-1 text-sm text-muted-foreground">
+                <div className="p-5 rounded-lg border-2 border-[#D4AF37] shadow-lg">
+                  <div className="text-center mb-3">
+                    <h4 className="text-xl font-bold text-[#D4AF37] mb-2">Gold Plan</h4>
+                    <Badge className="bg-[#D4AF37] text-white mb-3">MONTHLY</Badge>
+                    <p className="text-2xl font-bold">€9.99<span className="text-sm font-normal text-muted-foreground">/month</span></p>
+                    <p className="text-xs text-[#D4AF37] font-semibold mt-2">🔄 Auto-renews monthly</p>
+                  </div>
+                  <ul className="space-y-2 text-sm text-muted-foreground">
                     <li className="flex items-center gap-2">
-                      <CheckCircle2 className="h-3 w-3 text-amber-600" />
-                      All workouts & programs
+                      <Check className="h-4 w-4 text-green-500 shrink-0" />
+                      Full access to all Smarty Workouts
                     </li>
                     <li className="flex items-center gap-2">
-                      <CheckCircle2 className="h-3 w-3 text-amber-600" />
-                      Logbook & tracking
+                      <Check className="h-4 w-4 text-green-500 shrink-0" />
+                      Full access to all Smarty Programs
                     </li>
                     <li className="flex items-center gap-2">
-                      <CheckCircle2 className="h-3 w-3 text-amber-600" />
-                      All fitness tools
+                      <Check className="h-4 w-4 text-green-500 shrink-0" />
+                      Full access to Smarty Ritual
+                    </li>
+                    <li className="flex items-center gap-2">
+                      <Check className="h-4 w-4 text-green-500 shrink-0" />
+                      Full access to Smarty Tools
+                    </li>
+                    <li className="flex items-center gap-2">
+                      <Check className="h-4 w-4 text-green-500 shrink-0" />
+                      Flexible monthly billing
                     </li>
                   </ul>
                 </div>
 
                 {/* Platinum Plan */}
-                <div className="p-4 bg-primary/10 rounded-lg border-2 border-primary/50 relative">
-                  <div className="absolute -top-2 left-1/2 -translate-x-1/2 bg-primary text-primary-foreground text-xs px-2 py-0.5 rounded-full">
-                    Best Value
+                <div className="p-5 rounded-lg border-2 border-[#A8A9AD] shadow-lg bg-gradient-to-br from-[#A8A9AD]/5 to-[#C0C0C0]/10 relative">
+                  <Badge className="absolute -top-2 right-2 bg-green-600 text-white px-3 py-1 text-xs shadow-md z-10">
+                    BEST VALUE
+                  </Badge>
+                  <div className="text-center mb-3 pt-2">
+                    <div className="flex items-center justify-center gap-2 mb-2">
+                      <Crown className="h-5 w-5 text-[#A8A9AD]" />
+                      <h4 className="text-xl font-bold text-[#A8A9AD]">Platinum</h4>
+                    </div>
+                    <Badge className="bg-[#A8A9AD] text-white mb-3">YEARLY</Badge>
+                    <p className="text-2xl font-bold">€89.99<span className="text-sm font-normal text-muted-foreground">/year</span></p>
+                    <p className="text-sm text-green-600 font-bold mt-1">Save €29.89!</p>
+                    <p className="text-xs text-muted-foreground">Just €7.50/month • 🔄 Auto-renews yearly</p>
                   </div>
-                  <h4 className="font-bold text-lg mb-1 text-primary">Platinum</h4>
-                  <p className="text-2xl font-bold text-primary mb-2">€59.99<span className="text-sm font-normal text-muted-foreground">/year</span></p>
-                  <ul className="space-y-1 text-sm text-muted-foreground">
+                  <ul className="space-y-2 text-sm text-muted-foreground">
                     <li className="flex items-center gap-2">
-                      <CheckCircle2 className="h-3 w-3 text-primary" />
-                      Everything in Gold
+                      <Check className="h-4 w-4 text-green-500 shrink-0" />
+                      Full access to all Smarty Workouts
                     </li>
                     <li className="flex items-center gap-2">
-                      <CheckCircle2 className="h-3 w-3 text-primary" />
-                      Smarty Rituals
+                      <Check className="h-4 w-4 text-green-500 shrink-0" />
+                      Full access to all Smarty Programs
                     </li>
                     <li className="flex items-center gap-2">
-                      <CheckCircle2 className="h-3 w-3 text-primary" />
-                      Smarty Check-ins
+                      <Check className="h-4 w-4 text-green-500 shrink-0" />
+                      Full access to Smarty Ritual
                     </li>
                     <li className="flex items-center gap-2">
-                      <CheckCircle2 className="h-3 w-3 text-primary" />
-                      Premium features
+                      <Check className="h-4 w-4 text-green-500 shrink-0" />
+                      Full access to Smarty Tools
+                    </li>
+                    <li className="flex items-center gap-2">
+                      <Check className="h-4 w-4 text-green-500 shrink-0" />
+                      Best value - save 25%
                     </li>
                   </ul>
                 </div>
@@ -490,7 +496,7 @@ export default function TakeATour() {
                   <Link to="/trainingprogram">
                     <Button variant="outline" size="sm">Browse Programs</Button>
                   </Link>
-                  <Link to="/smarty-plans">
+                  <Link to="/joinpremium">
                     <Button size="sm">View All Plans</Button>
                   </Link>
                 </div>
