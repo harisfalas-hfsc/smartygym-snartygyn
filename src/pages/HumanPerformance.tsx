@@ -177,32 +177,28 @@ export default function HumanPerformance() {
             </CardContent>
           </Card>
 
-          {/* Why Invest Card */}
-          <Card className="mb-8 border-2 border-primary/30">
-            <CardHeader className="text-center">
-              <CardTitle className="flex items-center justify-center gap-2">
+          {/* Why Invest Card - Compact */}
+          <Card className="mb-8 border border-border">
+            <CardContent className="p-6">
+              <div className="flex items-center justify-center gap-2 mb-4">
                 <Heart className="h-5 w-5 text-primary" />
-                Why Invest in <span className="text-primary font-bold ml-1">SmartyGym</span>?
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="prose prose-sm dark:prose-invert max-w-none">
-              <p className="text-center text-muted-foreground">
-                In a world of endless fitness advice on YouTube, conflicting information on social media, and generic gym memberships 
-                that lead nowhere, finding a structured path to real results has never been harder. This research explores why 
-                expert-designed, human-crafted fitness programs deliver transformative results—and how <span className="text-primary font-bold">SmartyGym</span> provides the 
-                ecosystem you need to elevate every aspect of your performance.
+                <h3 className="text-lg font-semibold">
+                  Why Invest in <span className="text-primary font-bold">SmartyGym</span>?
+                </h3>
+              </div>
+              <p className="text-center text-muted-foreground text-sm">
+                In a world of endless fitness advice, finding a structured path to real results has never been harder. 
+                Discover why expert-designed, human-crafted fitness programs deliver transformative results—and how{" "}
+                <span className="text-primary font-bold">SmartyGym</span> provides the ecosystem you need to elevate every aspect of your performance.
               </p>
-              
-              {/* Read More Section */}
-              <div className="text-center mt-6 pt-6 border-t border-border">
-                <p className="text-sm text-muted-foreground mb-4">Read more</p>
-                <Button asChild size="lg" className="gap-2">
-                  <Link to="/why-invest-in-smartygym">
-                    <TrendingUp className="h-5 w-5" />
-                    Why Invest in <span className="text-primary-foreground font-bold">SmartyGym</span>
-                    <ArrowRight className="h-4 w-4" />
-                  </Link>
-                </Button>
+              <div className="text-center mt-4">
+                <Link 
+                  to="/why-invest-in-smartygym" 
+                  className="inline-flex items-center gap-2 text-primary hover:text-primary/80 font-medium text-sm transition-colors"
+                >
+                  Read more
+                  <ArrowRight className="h-4 w-4" />
+                </Link>
               </div>
             </CardContent>
           </Card>
