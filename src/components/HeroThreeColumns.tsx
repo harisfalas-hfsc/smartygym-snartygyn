@@ -85,6 +85,13 @@ const AnimatedBullet = ({ icon, text, delay, onClick, isLink, isVisible, highlig
   );
 };
 
+// Helper to convert star count to difficulty label
+const getDifficultyLabel = (stars: number): string => {
+  if (stars <= 2) return "Beginner";
+  if (stars <= 4) return "Intermediate";
+  return "Advanced"; // 5-6 stars
+};
+
 export const HeroThreeColumns = () => {
   const navigate = useNavigate();
   const [isVisible, setIsVisible] = useState(false);
@@ -319,10 +326,13 @@ export const HeroThreeColumns = () => {
                     </div>
                   )}
                   
-                  {/* Difficulty Stars */}
+                  {/* Difficulty Level with icon and text label */}
                   {wod.difficulty_stars && (
                     <div className="flex items-center gap-1.5 text-[10px]">
-                      <span className="flex items-center">{renderStars(wod.difficulty_stars)}</span>
+                      <Star className="w-3 h-3 text-yellow-500 fill-yellow-500" />
+                      <span className="text-yellow-600 dark:text-yellow-400 font-medium">
+                        {getDifficultyLabel(wod.difficulty_stars)}
+                      </span>
                     </div>
                   )}
                   
