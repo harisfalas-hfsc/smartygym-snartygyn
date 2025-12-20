@@ -19,9 +19,11 @@ import {
   CalendarCheck,
   ChevronRight,
   Star,
-  CircleDollarSign
+  CircleDollarSign,
+  Crown
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useAccessControl } from "@/contexts/AccessControlContext";
 
 interface AnimatedBulletProps {
   icon: React.ReactNode;
@@ -85,6 +87,8 @@ export const HeroThreeColumns = () => {
   const navigate = useNavigate();
   const [isVisible, setIsVisible] = useState(false);
   const [currentWodIndex, setCurrentWodIndex] = useState(0);
+  const { userTier } = useAccessControl();
+  const isPremium = userTier === "premium";
 
   useEffect(() => {
     setIsVisible(true);
@@ -214,6 +218,17 @@ export const HeroThreeColumns = () => {
           <CircleDollarSign className="w-4 h-4 text-green-500 flex-shrink-0" />
           <span className="text-sm font-bold text-green-500 group-hover:text-primary transition-colors">Why SmartyGym?</span>
         </div>
+        
+        {/* Join SmartyGym Now - Only for non-premium users */}
+        {!isPremium && (
+          <div 
+            onClick={() => navigate("/joinpremium")}
+            className="mt-1.5 flex items-center gap-2 cursor-pointer group hover:text-primary transition-colors rounded-md px-2 py-1 -mx-2 hover:bg-primary/10"
+          >
+            <Crown className="w-4 h-4 text-sky-500 flex-shrink-0" />
+            <span className="text-sm font-bold text-sky-500 group-hover:text-primary transition-colors">Join SmartyGym Now</span>
+          </div>
+        )}
       </div>
 
       {/* Column 4: WOD Promotional Banner */}
