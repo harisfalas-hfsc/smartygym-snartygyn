@@ -81,6 +81,7 @@ import { InstallPWA } from "./components/InstallPWA";
 import { PageTransition } from "./components/PageTransition";
 import { LoadingBar } from "./components/LoadingBar";
 import { AnnouncementManager } from "./components/announcements/AnnouncementManager";
+import { WebPushNotificationSetup } from "./components/WebPushNotificationSetup";
 
 const queryClient = new QueryClient();
 
@@ -98,6 +99,7 @@ const AppContent = () => {
       <LoadingBar />
       <CookieConsent />
       <InstallPWA />
+      <WebPushNotificationSetup />
       <AccessControlProvider>
         <AnnouncementManager />
         <ScrollToTop />

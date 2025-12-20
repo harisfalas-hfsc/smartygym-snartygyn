@@ -11,6 +11,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast } from "sonner";
 import { Checkbox } from "@/components/ui/checkbox";
 import { EmailSubscriptionManager } from "@/components/EmailSubscriptionManager";
+import { DashboardNotificationSubscriptionManager } from "@/components/DashboardNotificationSubscriptionManager";
 import {
   Select,
   SelectContent,
@@ -724,7 +725,7 @@ export const UserMessagesPanel = () => {
             <TabsTrigger value="contact">My Requests ({contactMessages.length})</TabsTrigger>
             <TabsTrigger value="subscriptions" className="gap-1">
               <Settings2 className="h-3 w-3" />
-              <span className="hidden sm:inline">Subscriptions</span>
+              <span className="hidden sm:inline">Settings</span>
             </TabsTrigger>
           </TabsList>
           
@@ -852,8 +853,9 @@ export const UserMessagesPanel = () => {
           )}
         </TabsContent>
 
-        <TabsContent value="subscriptions" className="mt-0">
+        <TabsContent value="subscriptions" className="mt-0 space-y-6">
           <EmailSubscriptionManager />
+          <DashboardNotificationSubscriptionManager />
         </TabsContent>
       </Tabs>
 

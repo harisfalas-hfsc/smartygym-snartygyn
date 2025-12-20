@@ -157,7 +157,7 @@ export const WODAnnouncementModal = ({ open, onClose }: WODAnnouncementModalProp
 
   return (
     <Dialog open={open} onOpenChange={(isOpen) => !isOpen && handleClose()}>
-      <DialogContent className="max-w-lg border-2 border-primary/60 bg-gradient-to-br from-primary/5 via-background to-primary/5 shadow-[0_0_40px_rgba(212,175,55,0.15)] p-0 gap-0 animate-scale-in">
+      <DialogContent className="max-w-lg w-[95vw] sm:w-full max-h-[90vh] border-2 border-primary/60 bg-gradient-to-br from-primary/5 via-background to-primary/5 shadow-[0_0_40px_rgba(212,175,55,0.15)] p-0 gap-0 animate-scale-in overflow-hidden">
         {/* Header */}
         <div className="relative p-4 pb-2">
           {/* Close button */}
@@ -190,9 +190,9 @@ export const WODAnnouncementModal = ({ open, onClose }: WODAnnouncementModalProp
         </div>
 
         {/* WOD Cards */}
-        <div className="px-4 pb-4">
+        <div className="px-4 pb-4 max-h-[60vh] overflow-y-auto">
           {(bodyweightWOD || equipmentWOD) ? (
-            <div className="grid grid-cols-2 gap-3 mb-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-4">
               {renderWODCard(bodyweightWOD, true)}
               {renderWODCard(equipmentWOD, false)}
             </div>
