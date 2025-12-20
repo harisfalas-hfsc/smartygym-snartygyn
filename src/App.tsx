@@ -236,7 +236,7 @@ const App = () => (
   <QueryClientProvider client={queryClient}>
     <ThemeProvider 
       attribute="class" 
-      defaultTheme="light" 
+      defaultTheme="dark" 
       storageKey="smartygym-theme"
       enableSystem={false}
     >
