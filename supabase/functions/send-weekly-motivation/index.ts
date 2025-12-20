@@ -415,22 +415,6 @@ serve(async (req) => {
           }
         }
 
-        // Send push notification if dashboard message was sent and user wants push
-        if (automationRule.sends_dashboard_message && userPrefs.dashboard_monday_motivation !== false && userPrefs.push !== false) {
-          try {
-            await supabaseAdmin.functions.invoke('send-push-notification', {
-              body: {
-                user_id: user.user_id,
-                title: hasGoals ? "📊 Your Monday Goal Progress" : "💪 Set Your Goals Today!",
-                body: hasGoals ? "Check your weekly goal progress report!" : "Start tracking your fitness journey with personalized goals.",
-                url: '/calculator-history?tab=measurements',
-                is_admin_message: false,
-              }
-            });
-          } catch (e) {
-            logStep("Push notification error", { userId: user.user_id, error: e });
-          }
-        }
         }
       } catch (error: any) {
         failed++;

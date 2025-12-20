@@ -97,36 +97,6 @@ serve(async (req) => {
 
     console.log('[SEND-SYSTEM-MESSAGE] Dashboard message sent successfully to user:', userId);
 
-    // Send web push notification
-    let pushSent = false;
-    try {
-      const pushResponse = await fetch(
-        `${Deno.env.get("SUPABASE_URL")}/functions/v1/send-push-notification`,
-        {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")}`,
-          },
-          body: JSON.stringify({
-            user_id: userId,
-            title: "Smarty Gym",
-            body: "You have a new message in your dashboard",
-            url: "/userdashboard?tab=messages",
-            tag: "new-dashboard-message",
-          }),
-        }
-      );
-      
-      if (pushResponse.ok) {
-        const pushResult = await pushResponse.json();
-        console.log('[SEND-SYSTEM-MESSAGE] Push notification result:', pushResult);
-        pushSent = pushResult.sent > 0;
-      }
-    } catch (pushError) {
-      console.error('[SEND-SYSTEM-MESSAGE] Push notification failed:', pushError);
-    }
-
     // Send email as well
     let emailSent = false;
     try {
@@ -192,14 +162,14 @@ serve(async (req) => {
           failed_count: 0,
           subject: subject,
           content: content,
-          metadata: { userId, template_id: template.id, email_sent: emailSent, push_sent: pushSent }
+          metadata: { userId, template_id: template.id, email_sent: emailSent }
         });
     } catch (auditError) {
       console.error('[SEND-SYSTEM-MESSAGE] Failed to log audit:', auditError);
     }
 
     return new Response(
-      JSON.stringify({ success: true, message: "System message sent successfully", emailSent, pushSent }),
+      JSON.stringify({ success: true, message: "System message sent successfully", emailSent }),
       {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
         status: 200,

@@ -237,49 +237,6 @@ serve(async (req) => {
     });
 
     // ============================================
-    // SEND PUSH NOTIFICATIONS (PREFERENCE-AWARE)
-    // ============================================
-    let pushSent = 0;
-    let pushSkipped = 0;
-
-    for (const profile of allProfiles) {
-      const prefs = (profile.notification_preferences as Record<string, any>) || {};
-      
-      // Check if user wants push notifications
-      if (prefs.opt_out_all === true || prefs.push === false) {
-        pushSkipped++;
-        continue;
-      }
-
-      // Only send push if user wants either WOD or Ritual dashboard notifications
-      const wantsWodPush = hasWods && prefs.dashboard_wod !== false;
-      const wantsRitualPush = hasRitual && prefs.dashboard_ritual !== false;
-
-      if (wantsWodPush || wantsRitualPush) {
-        try {
-          await supabase.functions.invoke('send-push-notification', {
-            body: {
-              user_id: profile.user_id,
-              title: "🌅 Good Morning, Smarty!",
-              body: hasWods && hasRitual 
-                ? `Today's ${category} workouts and Day ${todaysRitual.day_number} ritual are ready!`
-                : hasWods 
-                  ? `Today's ${category} workouts are ready!`
-                  : `Day ${todaysRitual.day_number} ritual is ready!`,
-              url: hasWods ? '/workout/wod' : '/daily-ritual',
-              is_admin_message: false, // Respects preferences
-            }
-          });
-          pushSent++;
-        } catch (e) {
-          logStep("Push notification error", { userId: profile.user_id, error: e });
-        }
-      }
-    }
-
-    logStep("Push notifications sent", { pushSent, pushSkipped });
-
-    // ============================================
     // SEND EMAILS (PREFERENCE-AWARE)
     // ============================================
     const { data: usersData } = await supabase.auth.admin.listUsers();
@@ -382,7 +339,7 @@ ${getEmailFooter(authUser.email, 'wod')}
       success_count: emailsSent,
       failed_count: emailsSkipped,
       subject: notificationTitle,
-      content: `Morning notification sent - ${emailsSent} emails, ${wodDashboardSent} WOD dashboard, ${ritualDashboardSent} Ritual dashboard. Push: ${pushSent}`,
+      content: `Morning notification sent - ${emailsSent} emails, ${wodDashboardSent} WOD dashboard, ${ritualDashboardSent} Ritual dashboard`,
       sent_at: new Date().toISOString(),
       metadata: {
         hasWods,
@@ -392,12 +349,10 @@ ${getEmailFooter(authUser.email, 'wod')}
         wodDashboardSent,
         ritualDashboardSent,
         dashboardSkipped,
-        pushSent,
-        pushSkipped,
       }
     });
 
-    logStep(`✅ Morning notifications complete: ${wodDashboardSent + ritualDashboardSent} dashboard, ${emailsSent} emails, ${pushSent} push`);
+    logStep(`✅ Morning notifications complete: ${wodDashboardSent + ritualDashboardSent} dashboard, ${emailsSent} emails`);
 
     return new Response(
       JSON.stringify({
@@ -409,8 +364,6 @@ ${getEmailFooter(authUser.email, 'wod')}
         },
         emailsSent,
         emailsSkipped,
-        pushSent,
-        pushSkipped,
         content: {
           hasWods,
           hasRitual,

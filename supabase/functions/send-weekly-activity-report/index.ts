@@ -498,24 +498,6 @@ const handler = async (req: Request): Promise<Response> => {
           }
         }
 
-        // Send push notification if user has dashboard enabled
-        if (prefs.dashboard_weekly_activity !== false && prefs.push !== false) {
-          try {
-            await supabase.functions.invoke('send-push-notification', {
-              body: {
-                user_id: user.id,
-                title: "📊 Your Weekly Activity Report",
-                body: `Review your fitness progress for ${weekStart} - ${weekEnd}!`,
-                url: '/userdashboard?tab=logbook',
-                is_admin_message: false,
-              }
-            });
-            pushSent++;
-          } catch (e) {
-            logStep("Push notification error", { userId: user.id, error: e });
-          }
-        }
-
         successCount++;
         logStep(`Report sent to ${user.email}`);
 

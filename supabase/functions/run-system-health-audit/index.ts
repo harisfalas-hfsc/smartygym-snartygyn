@@ -441,84 +441,6 @@ const handler = async (req: Request): Promise<Response> => {
     );
 
     // ============================================
-    // CATEGORY 10.5: PUSH NOTIFICATION SYSTEM (NEW - Comprehensive checks)
-    // ============================================
-    console.log("📲 Checking push notification system...");
-
-    // Check VAPID keys
-    const vapidPublicKey = Deno.env.get("VAPID_PUBLIC_KEY");
-    const vapidPrivateKey = Deno.env.get("VAPID_PRIVATE_KEY");
-    
-    addCheck('Push Notifications', 'VAPID Public Key', 'Public key configured for web push', 
-      vapidPublicKey ? 'pass' : 'fail',
-      vapidPublicKey ? `Key exists (${vapidPublicKey.substring(0, 10)}...)` : 'CRITICAL: Cannot subscribe users to push!'
-    );
-    
-    addCheck('Push Notifications', 'VAPID Private Key', 'Private key configured for sending push', 
-      vapidPrivateKey ? 'pass' : 'fail',
-      vapidPrivateKey ? 'Key exists (hidden)' : 'CRITICAL: Cannot send push notifications!'
-    );
-
-    // Check push subscriptions table
-    const { count: totalPushSubs } = await supabase
-      .from('push_subscriptions')
-      .select('*', { count: 'exact', head: true });
-    
-    const { count: activePushSubs } = await supabase
-      .from('push_subscriptions')
-      .select('*', { count: 'exact', head: true })
-      .eq('is_active', true);
-    
-    const { count: inactivePushSubs } = await supabase
-      .from('push_subscriptions')
-      .select('*', { count: 'exact', head: true })
-      .eq('is_active', false);
-
-    addCheck('Push Notifications', 'Total Subscriptions', `${totalPushSubs || 0} push subscriptions in database`, 
-      (totalPushSubs || 0) > 0 ? 'pass' : 'warning',
-      totalPushSubs === 0 ? 'No users have enabled push notifications yet' : `${activePushSubs || 0} active, ${inactivePushSubs || 0} inactive`
-    );
-
-    addCheck('Push Notifications', 'Active Subscriptions', `${activePushSubs || 0} active push subscriptions`, 
-      (activePushSubs || 0) > 0 ? 'pass' : 'warning',
-      activePushSubs === 0 ? 'No users will receive push notifications' : 'Users can receive push notifications'
-    );
-
-    // Check subscription device types
-    const { data: deviceTypes } = await supabase
-      .from('push_subscriptions')
-      .select('device_type')
-      .eq('is_active', true);
-    
-    if (deviceTypes && deviceTypes.length > 0) {
-      const deviceCounts: Record<string, number> = {};
-      deviceTypes.forEach(d => {
-        const type = d.device_type || 'unknown';
-        deviceCounts[type] = (deviceCounts[type] || 0) + 1;
-      });
-      
-      addCheck('Push Notifications', 'Device Distribution', 'Push subscriptions by device type', 
-        'pass',
-        Object.entries(deviceCounts).map(([type, count]) => `${type}: ${count}`).join(', ')
-      );
-    } else {
-      addCheck('Push Notifications', 'Device Distribution', 'No device data available', 'skip');
-    }
-
-    // Check for recently expired subscriptions (might indicate issues)
-    const weekAgo = new Date(Date.now() - 7 * 86400000).toISOString();
-    const { count: recentlyExpired } = await supabase
-      .from('push_subscriptions')
-      .select('*', { count: 'exact', head: true })
-      .eq('is_active', false)
-      .gte('updated_at', weekAgo);
-    
-    addCheck('Push Notifications', 'Recent Expirations', `${recentlyExpired || 0} subscriptions expired in last 7 days`, 
-      (recentlyExpired || 0) < 10 ? 'pass' : 'warning',
-      (recentlyExpired || 0) >= 10 ? 'High expiration rate - may indicate service worker issues' : 'Normal expiration rate'
-    );
-
-    // ============================================
     // CATEGORY 10.6: NOTIFICATION PREFERENCES VALIDATION (NEW)
     // ============================================
     console.log("⚙️ Checking notification preferences...");
@@ -526,7 +448,6 @@ const handler = async (req: Request): Promise<Response> => {
     // Expected preference keys
     const expectedPreferenceKeys = [
       'opt_out_all',
-      'push',
       'email_wod', 'dashboard_wod',
       'email_ritual', 'dashboard_ritual',
       'email_monday_motivation', 'dashboard_monday_motivation',
@@ -676,31 +597,12 @@ const handler = async (req: Request): Promise<Response> => {
     }
 
     // Check send-push-notification function usage
-    const { data: pushLogs } = await supabase
-      .from('notification_audit_log')
-      .select('subject, success_count, failed_count')
-      .gte('sent_at', yesterday_ts)
-      .like('subject', '%push%');
-    
-    if (pushLogs && pushLogs.length > 0) {
-      addCheck('Notification Delivery', 'Push Notification Sends', `${pushLogs.length} push notification batches sent`, 
-        'pass',
-        'Push notifications are being triggered'
-      );
-    } else {
-      // Push might be inline with other notifications, check for any success in audit
-      const hasPushCapable = recentAuditLogs?.some(l => l.success_count && l.success_count > 0);
-      addCheck('Notification Delivery', 'Push Notification Sends', 
-        hasPushCapable ? 'Push included in notification runs' : 'No explicit push logs found', 
-        hasPushCapable ? 'pass' : 'warning',
-        'Push notifications may be bundled with other notification types'
-      );
-    }
-
     // ============================================
     // CATEGORY 10.8: EMAIL SYSTEM HEALTH (Enhanced)
     // ============================================
     console.log("📧 Checking email system health...");
+
+    const weekAgo = new Date(Date.now() - 7 * 86400000).toISOString();
 
     // Check email domain (optional - requires Resend API call)
     if (resendKey) {

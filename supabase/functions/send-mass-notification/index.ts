@@ -226,19 +226,6 @@ serve(async (req) => {
           await new Promise(resolve => setTimeout(resolve, 600));
         }
 
-        // Trigger push notification for admin message (bypasses preferences)
-        try {
-          await supabaseAdmin.functions.invoke('send-push-notification', {
-            body: {
-              user_id: recipient.user_id,
-              title: finalSubject,
-              body: finalContent.substring(0, 200),
-              is_admin_message: true, // High priority - bypasses all preferences
-            }
-          });
-        } catch (pushError) {
-          console.error('[MASS-NOTIFICATION] Push notification error (non-blocking):', pushError);
-        }
       } catch (emailError) {
         console.error('[MASS-NOTIFICATION] Email send error:', emailError);
         emailsFailed++;
