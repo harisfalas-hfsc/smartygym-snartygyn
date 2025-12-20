@@ -318,8 +318,23 @@ serve(async (req) => {
           ? "📊 Your Monday Goal Progress Report" 
           : "💪 Set Your Goals & Transform Your Fitness";
 
-        // Send dashboard message
-        if (automationRule.sends_dashboard_message) {
+        // Get user notification preferences
+        const { data: prefProfile } = await supabaseAdmin
+          .from("profiles")
+          .select("notification_preferences")
+          .eq("user_id", user.user_id)
+          .single();
+
+        const userPrefs = (prefProfile?.notification_preferences as Record<string, any>) || {};
+
+        // Check if user has opted out of all notifications
+        if (userPrefs.opt_out_all === true) {
+          skipped++;
+          continue;
+        }
+
+        // Send dashboard message - check dashboard_monday_motivation preference (default: true)
+        if (automationRule.sends_dashboard_message && userPrefs.dashboard_monday_motivation !== false) {
           const { error: msgError } = await supabaseAdmin
             .from("user_system_messages")
             .insert({
@@ -397,8 +412,25 @@ serve(async (req) => {
               const errorMsg = emailError.message || String(emailError);
               logStep("Email send error", { userId: user.user_id, email: userEmail, error: errorMsg });
               emailErrors.push(`${userEmail}: ${errorMsg}`);
-            }
           }
+        }
+
+        // Send push notification if dashboard message was sent and user wants push
+        if (automationRule.sends_dashboard_message && userPrefs.dashboard_monday_motivation !== false && userPrefs.push !== false) {
+          try {
+            await supabaseAdmin.functions.invoke('send-push-notification', {
+              body: {
+                user_id: user.user_id,
+                title: hasGoals ? "📊 Your Monday Goal Progress" : "💪 Set Your Goals Today!",
+                body: hasGoals ? "Check your weekly goal progress report!" : "Start tracking your fitness journey with personalized goals.",
+                url: '/calculator-history?tab=measurements',
+                is_admin_message: false,
+              }
+            });
+          } catch (e) {
+            logStep("Push notification error", { userId: user.user_id, error: e });
+          }
+        }
         }
       } catch (error: any) {
         failed++;
