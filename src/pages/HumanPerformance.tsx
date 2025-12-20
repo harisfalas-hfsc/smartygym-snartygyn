@@ -107,8 +107,8 @@ export default function HumanPerformance() {
     
     try {
       await exportToPDF(contentRef.current, {
-        title: "Why Invest in SmartyGym?",
-        filename: "Why-Invest-in-SmartyGym",
+        title: "Why SmartyGym",
+        filename: "Why-SmartyGym",
         accentColor: "#29B6D2"
       });
       
@@ -169,12 +169,12 @@ export default function HumanPerformance() {
   return (
     <>
       <Helmet>
-        <title>Why Invest in SmartyGym? | Human Performance Research | SmartyGym</title>
-        <meta name="description" content="Discover the science behind why structured fitness programs transform your performance as an employee, parent, and person. Research-backed insights on exercise, mental health, and the SmartyGym ecosystem." />
-        <meta name="keywords" content="human performance, fitness research, exercise benefits, mental health fitness, structured workout programs, consistency training, SmartyGym" />
+        <title>Why SmartyGym | Your Complete Fitness Ecosystem | SmartyGym</title>
+        <meta name="description" content="Discover why SmartyGym provides a complete ecosystem to succeed with daily workouts, structured programs, Smarty Rituals, and expert guidance. Research-backed insights on how structured fitness transforms your life." />
+        <meta name="keywords" content="why SmartyGym, fitness ecosystem, daily workouts, structured workout programs, Smarty Rituals, personal trainer app, SmartyGym" />
         
-        <meta property="og:title" content="Why Invest in SmartyGym? | Human Performance | SmartyGym" />
-        <meta property="og:description" content="Research-backed insights on how structured fitness elevates your performance in every aspect of life - work, family, hobbies, and mental wellbeing." />
+        <meta property="og:title" content="Why SmartyGym | Your Complete Fitness Ecosystem" />
+        <meta property="og:description" content="SmartyGym provides a complete ecosystem to succeed with daily workouts, structured programs, and expert guidance. Like having a personal trainer in your pocket." />
         <meta property="og:type" content="article" />
         <meta property="og:url" content="https://smartygym.com/human-performance" />
         
@@ -182,14 +182,14 @@ export default function HumanPerformance() {
       </Helmet>
 
       <SEOEnhancer
-        entities={["Human Performance", "Fitness Science", "Mental Health"]}
-        topics={["exercise benefits", "structured training", "fitness consistency", "mental wellbeing"]}
-        expertise={["fitness research", "human performance optimization", "exercise psychology"]}
-        contentType="Research Article"
-        aiSummary="Comprehensive research on why structured fitness programs improve human performance across all life domains. Covers mental health benefits, consistency science, and the advantages of expert-designed training."
-        aiKeywords={["human performance", "fitness", "exercise", "mental health", "structured training", "SmartyGym"]}
-        relatedContent={["Smarty Workouts", "Smarty Programs", "Premium Benefits"]}
-        targetAudience="fitness-minded individuals seeking structured, expert-designed training programs"
+        entities={["SmartyGym Ecosystem", "Fitness Platform", "Personal Training"]}
+        topics={["fitness ecosystem", "daily workouts", "structured training", "Smarty Rituals", "fitness accountability"]}
+        expertise={["fitness coaching", "workout programming", "fitness technology"]}
+        contentType="Landing Page"
+        aiSummary="Why SmartyGym is your complete fitness ecosystem - daily workouts, structured programs, Smarty Rituals, check-ins, and expert guidance all in one platform."
+        aiKeywords={["SmartyGym", "fitness ecosystem", "daily workouts", "personal trainer app", "structured training"]}
+        relatedContent={["Smarty Workouts", "Smarty Programs", "Smarty Rituals", "Premium Benefits"]}
+        targetAudience="individuals seeking a complete, structured fitness solution with daily guidance"
         pageType="Article"
       />
 
@@ -209,17 +209,17 @@ export default function HumanPerformance() {
 
           <PageBreadcrumbs items={[
             { label: "Home", href: "/" },
-            { label: "Why Invest in SmartyGym?" }
+            { label: "Why SmartyGym" }
           ]} />
 
           {/* Header */}
           <div className="text-center mb-8">
             <div className="flex items-center justify-center gap-3 mb-2">
-              <TrendingUp className="h-8 w-8 text-primary" />
-              <h1 className="text-3xl sm:text-4xl font-bold">Why Invest in SmartyGym?</h1>
+              <Sparkles className="h-8 w-8 text-primary" />
+              <h1 className="text-3xl sm:text-4xl font-bold">Why SmartyGym</h1>
             </div>
             <p className="text-muted-foreground max-w-2xl mx-auto">
-              The science of how structured training transforms your performance in work, family, and life
+              Your complete fitness ecosystem for lasting transformation
             </p>
             
             {/* Reader Mode & PDF Export Buttons */}
@@ -248,12 +248,118 @@ export default function HumanPerformance() {
           {/* Content wrapper for PDF export */}
           <div ref={contentRef} className="bg-background">
 
+          {/* NEW: Complete Ecosystem Hero Card */}
+          <Card data-pdf-section className="mb-8 border-2 border-primary bg-gradient-to-br from-primary/10 via-primary/5 to-background">
+            <CardHeader className="text-center pb-2">
+              <CardTitle className="flex items-center justify-center gap-2 text-2xl sm:text-3xl">
+                <Crown className="h-7 w-7 text-primary" />
+                Your Complete Fitness Ecosystem
+              </CardTitle>
+              <p className="text-muted-foreground mt-2">
+                Everything you need to succeed, all in one place
+              </p>
+            </CardHeader>
+            <CardContent className="space-y-6">
+              <p className="text-center text-lg font-medium">
+                SmartyGym provides you with a <span className="text-primary font-bold">complete ecosystem</span> to succeed.
+              </p>
+              
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="flex items-start gap-3 p-4 bg-background/50 rounded-lg border border-primary/20">
+                  <div className="p-2 bg-primary/20 rounded-full flex-shrink-0">
+                    <Dumbbell className="h-5 w-5 text-primary" />
+                  </div>
+                  <div>
+                    <h3 className="font-semibold">Daily Fresh Workouts</h3>
+                    <p className="text-sm text-muted-foreground">Every single day, you receive two fresh workouts designed by a certified coach.</p>
+                  </div>
+                </div>
+                
+                <div className="flex items-start gap-3 p-4 bg-background/50 rounded-lg border border-primary/20">
+                  <div className="p-2 bg-primary/20 rounded-full flex-shrink-0">
+                    <Calendar className="h-5 w-5 text-primary" />
+                  </div>
+                  <div>
+                    <h3 className="font-semibold">Structured Training Programs</h3>
+                    <p className="text-sm text-muted-foreground">Multi-week programs tailored to every goal and fitness level.</p>
+                  </div>
+                </div>
+                
+                <div className="flex items-start gap-3 p-4 bg-background/50 rounded-lg border border-primary/20">
+                  <div className="p-2 bg-primary/20 rounded-full flex-shrink-0">
+                    <Sparkles className="h-5 w-5 text-primary" />
+                  </div>
+                  <div>
+                    <h3 className="font-semibold">Daily Smarty Rituals</h3>
+                    <p className="text-sm text-muted-foreground">Movement and recovery protocols for morning, midday, and evening.</p>
+                  </div>
+                </div>
+                
+                <div className="flex items-start gap-3 p-4 bg-background/50 rounded-lg border border-primary/20">
+                  <div className="p-2 bg-primary/20 rounded-full flex-shrink-0">
+                    <CheckCircle2 className="h-5 w-5 text-primary" />
+                  </div>
+                  <div>
+                    <h3 className="font-semibold">Smarty Check-ins</h3>
+                    <p className="text-sm text-muted-foreground">Daily accountability to keep you on track and measure your readiness.</p>
+                  </div>
+                </div>
+                
+                <div className="flex items-start gap-3 p-4 bg-background/50 rounded-lg border border-primary/20">
+                  <div className="p-2 bg-primary/20 rounded-full flex-shrink-0">
+                    <BookOpen className="h-5 w-5 text-primary" />
+                  </div>
+                  <div>
+                    <h3 className="font-semibold">Expert Blog Articles</h3>
+                    <p className="text-sm text-muted-foreground">Knowledge from fitness experts to help you train smarter.</p>
+                  </div>
+                </div>
+                
+                <div className="flex items-start gap-3 p-4 bg-background/50 rounded-lg border border-primary/20">
+                  <div className="p-2 bg-primary/20 rounded-full flex-shrink-0">
+                    <Users className="h-5 w-5 text-primary" />
+                  </div>
+                  <div>
+                    <h3 className="font-semibold">Supportive Community</h3>
+                    <p className="text-sm text-muted-foreground">Connect with like-minded people for motivation and support.</p>
+                  </div>
+                </div>
+                
+                <div className="flex items-start gap-3 p-4 bg-background/50 rounded-lg border border-primary/20 md:col-span-2">
+                  <div className="p-2 bg-primary/20 rounded-full flex-shrink-0">
+                    <BarChart3 className="h-5 w-5 text-primary" />
+                  </div>
+                  <div>
+                    <h3 className="font-semibold">Personal LogBook</h3>
+                    <p className="text-sm text-muted-foreground">Visual analytics and weekly progress reports to track your journey.</p>
+                  </div>
+                </div>
+              </div>
+              
+              <div className="text-center p-4 bg-primary/10 rounded-lg border border-primary/30">
+                <p className="text-base font-medium">
+                  It's like having a <span className="text-primary font-bold">complete personal trainer in your pocket</span> — one that keeps you accountable, motivated, and constantly improving.
+                </p>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Section Divider: Why Invest in SmartyGym? */}
+          <div className="flex items-center gap-4 mb-6">
+            <div className="flex-1 h-px bg-border"></div>
+            <div className="flex items-center gap-2 px-4 py-2 bg-muted rounded-full">
+              <TrendingUp className="h-5 w-5 text-primary" />
+              <span className="font-semibold text-sm">The Science Behind It</span>
+            </div>
+            <div className="flex-1 h-px bg-border"></div>
+          </div>
+
           {/* Description Card */}
           <Card data-pdf-section className="mb-8 border-2 border-primary/30">
             <CardHeader className="text-center">
               <CardTitle className="flex items-center justify-center gap-2">
                 <Heart className="h-5 w-5 text-primary" />
-                Your Body, Your Greatest Asset
+                Why Invest in SmartyGym?
               </CardTitle>
             </CardHeader>
             <CardContent className="prose prose-sm dark:prose-invert max-w-none">
@@ -795,11 +901,11 @@ export default function HumanPerformance() {
       <ReaderModeDialog
         open={readerModeOpen}
         onOpenChange={setReaderModeOpen}
-        title="Why Invest in SmartyGym?"
+        title="Why SmartyGym"
         content={getReaderContent()}
         metadata={{
           author: "SmartyGym Research",
-          category: "Fitness Science"
+          category: "Fitness Ecosystem"
         }}
       />
     </>
