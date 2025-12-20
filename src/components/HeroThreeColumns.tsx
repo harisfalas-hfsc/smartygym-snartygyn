@@ -134,7 +134,7 @@ export const HeroThreeColumns = () => {
     { text: "Smarty Programs", subtitle: "structured long-term plans", icon: <Calendar className="w-4 h-4 text-blue-500" />, route: "/trainingprogram" },
     { text: "Smarty Ritual", subtitle: "daily wellness guide", icon: <Sparkles className="w-4 h-4 text-purple-500" />, route: "/daily-ritual" },
     { text: "Smarty Tools", subtitle: "fitness calculators", icon: <Calculator className="w-4 h-4 text-orange-500" />, route: "/tools" },
-    { text: "Blog & Expert Articles", subtitle: "designed by Haris Falas", icon: <FileText className="w-4 h-4 text-red-500" />, route: "/blog" },
+    { text: "Blog & Insights", subtitle: "designed by Haris Falas", icon: <FileText className="w-4 h-4 text-red-500" />, route: "/blog" },
     { text: "Exercise Library", subtitle: "demonstration videos", icon: <Video className="w-4 h-4 text-emerald-500" />, route: "/exerciselibrary" },
   ];
 
