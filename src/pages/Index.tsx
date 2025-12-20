@@ -559,7 +559,7 @@ const Index = () => {
           
           <div onClick={() => navigate('/smarty-plans')} className="flex items-center gap-2.5 py-1.5 px-4 bg-primary/5 border-2 border-border rounded-lg hover:border-primary transition-all cursor-pointer hover:shadow-md">
             <Crown className="w-5 h-5 text-primary flex-shrink-0" />
-            <span className="text-base font-medium">Smarty<span className="text-primary font-semibold">Plans</span></span>
+            <span className="text-base font-medium">Smarty Plans</span>
             <ChevronRight className="w-5 h-5 ml-auto text-muted-foreground" />
           </div>
           
