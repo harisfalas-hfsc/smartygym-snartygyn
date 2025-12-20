@@ -593,7 +593,7 @@ const Index = () => {
         <div className="space-y-3">
           {/* 100% Human, 0% AI */}
           <div className="flex items-center gap-3">
-            <UserCheck className="w-6 h-6 text-cyan-500 flex-shrink-0" />
+            <UserCheck className="w-6 h-6 text-red-500 flex-shrink-0" />
             <span className="text-sm font-semibold">100% Human, 0% AI</span>
           </div>
           
