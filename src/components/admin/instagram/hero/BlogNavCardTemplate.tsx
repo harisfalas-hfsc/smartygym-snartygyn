@@ -10,7 +10,7 @@ export const BlogNavCardTemplate = () => {
             <FileText className="w-32 h-32 text-primary" />
           </div>
           <div className="text-center space-y-4">
-            <h3 className="text-6xl font-bold">Blog & Expert Articles</h3>
+            <h3 className="text-6xl font-bold">Blog & Insights</h3>
             <p className="text-2xl text-muted-foreground leading-relaxed">
               Evidence-based fitness articles and expert insights from professional coaches
             </p>
