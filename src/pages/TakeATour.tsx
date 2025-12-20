@@ -164,7 +164,7 @@ export default function TakeATour() {
                   </li>
                   <li className="flex items-start gap-2">
                     <CheckCircle2 className="h-4 w-4 text-primary mt-0.5 shrink-0" />
-                    <span><strong>Smart Scheduling:</strong> Strategic training that targets different energy systems for structured, science-based progress and proper recovery</span>
+                    <span><strong>Smart Scheduling:</strong> Strategic training that targets different energy systems for structured and science-based progress.</span>
                   </li>
                   <li className="flex items-start gap-2">
                     <CheckCircle2 className="h-4 w-4 text-primary mt-0.5 shrink-0" />
