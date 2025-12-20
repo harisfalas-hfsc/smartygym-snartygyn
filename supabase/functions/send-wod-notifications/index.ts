@@ -106,19 +106,24 @@ serve(async (req) => {
       );
     }
 
-    // Get all users
-    const { data: allUsers } = await supabase.from('profiles').select('user_id');
-    const userIds = allUsers?.map(u => u.user_id) || [];
+    // Get all users with their preferences
+    const { data: allProfiles } = await supabase
+      .from('profiles')
+      .select('user_id, notification_preferences');
 
-    if (userIds.length === 0) {
-      logStep("No users to notify");
-      return new Response(
-        JSON.stringify({ success: true, sent: false, reason: "No users" }),
-        { headers: { ...corsHeaders, "Content-Type": "application/json" }, status: 200 }
-      );
+    const profilesMap = new Map(allProfiles?.map(p => [p.user_id, p.notification_preferences as Record<string, any>]) || []);
+
+    // Filter users who have dashboard_wod enabled (default true)
+    const usersForDashboard = allProfiles?.filter(p => {
+      const prefs = p.notification_preferences as Record<string, any> || {};
+      return prefs.opt_out_all !== true && prefs.dashboard_wod !== false;
+    }).map(p => p.user_id) || [];
+
+    if (usersForDashboard.length === 0) {
+      logStep("No users subscribed to WOD dashboard notifications");
+    } else {
+      logStep(`Sending WOD dashboard notifications to ${usersForDashboard.length} users`);
     }
-
-    logStep(`Sending WOD notifications to ${userIds.length} users`);
 
     const notificationTitle = `🏆 Today's Workouts: Choose Your Style!`;
     const notificationContent = `<p class="tiptap-paragraph"><strong>🏆 Today's Workouts of the Day</strong></p>
@@ -136,33 +141,31 @@ serve(async (req) => {
 <p class="tiptap-paragraph"></p>
 <p class="tiptap-paragraph"><a href="https://smartygym.com/workout/wod">View Today's Workouts →</a></p>`;
 
-    // Insert dashboard notifications
-    await supabase.from('user_system_messages').insert(userIds.map(userId => ({
-      user_id: userId,
-      message_type: MESSAGE_TYPES.WOD_NOTIFICATION,
-      subject: notificationTitle,
-      content: notificationContent,
-      is_read: false,
-    })));
+    // Insert dashboard notifications only for subscribed users
+    if (usersForDashboard.length > 0) {
+      await supabase.from('user_system_messages').insert(usersForDashboard.map(userId => ({
+        user_id: userId,
+        message_type: MESSAGE_TYPES.WOD_NOTIFICATION,
+        subject: notificationTitle,
+        content: notificationContent,
+        is_read: false,
+      })));
 
-    logStep("Dashboard notifications inserted");
+      logStep("Dashboard notifications inserted", { count: usersForDashboard.length });
+    }
 
-    // Get user emails and preferences
+    // Get user emails for email notifications
     const { data: usersData } = await supabase.auth.admin.listUsers();
-    const { data: allProfiles } = await supabase
-      .from('profiles')
-      .select('user_id, notification_preferences');
-
-    const profilesMap = new Map(allProfiles?.map(p => [p.user_id, p.notification_preferences]) || []);
 
     let emailsSent = 0;
     let emailsSkipped = 0;
 
     for (const authUser of usersData?.users || []) {
-      if (!authUser.email || !userIds.includes(authUser.id)) continue;
+      if (!authUser.email) continue;
 
-      const prefs = (profilesMap.get(authUser.id) as Record<string, any>) || {};
+      const prefs = profilesMap.get(authUser.id) || {};
 
+      // Check if user has opted out or disabled WOD emails
       if (prefs.opt_out_all === true || prefs.email_wod === false) {
         logStep(`Skipping WOD email for ${authUser.email} (opted out)`);
         emailsSkipped++;
@@ -206,20 +209,20 @@ ${getEmailFooter(authUser.email, 'wod')}
     await supabase.from('notification_audit_log').insert({
       notification_type: MESSAGE_TYPES.WOD_NOTIFICATION,
       message_type: MESSAGE_TYPES.WOD_NOTIFICATION,
-      recipient_count: userIds.length,
+      recipient_count: usersForDashboard.length,
       success_count: emailsSent,
       failed_count: emailsSkipped,
       subject: notificationTitle,
-      content: `WOD notification sent - ${emailsSent} emails, ${userIds.length} dashboard messages`,
+      content: `WOD notification sent - ${emailsSent} emails, ${usersForDashboard.length} dashboard messages`,
       sent_at: new Date().toISOString(),
     });
 
-    logStep(`✅ Notifications complete: ${userIds.length} dashboard, ${emailsSent} emails sent, ${emailsSkipped} skipped`);
+    logStep(`✅ Notifications complete: ${usersForDashboard.length} dashboard, ${emailsSent} emails sent, ${emailsSkipped} skipped`);
 
     return new Response(
       JSON.stringify({
         success: true,
-        dashboardNotifications: userIds.length,
+        dashboardNotifications: usersForDashboard.length,
         emailsSent,
         emailsSkipped,
         wods: {

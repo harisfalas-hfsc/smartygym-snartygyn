@@ -138,15 +138,20 @@ serve(async (req) => {
       } else {
         const userEmail = userData.user.email;
         
-        // Check notification preferences
-        const { data: preferences } = await supabaseAdmin
-          .from('notification_preferences')
-          .select('promotional_emails')
+        // Check notification preferences from profiles table
+        const { data: profile } = await supabaseAdmin
+          .from('profiles')
+          .select('notification_preferences')
           .eq('user_id', userId)
           .single();
         
-        if (preferences && !preferences.promotional_emails) {
-          console.log('[SEND-SYSTEM-MESSAGE] User has disabled promotional emails, skipping email');
+        const prefs = profile?.notification_preferences as Record<string, any> || {};
+        
+        // Check if user has opted out
+        if (prefs.opt_out_all === true) {
+          console.log('[SEND-SYSTEM-MESSAGE] User has opted out of all notifications, skipping email');
+        } else if (prefs.email === false) {
+          console.log('[SEND-SYSTEM-MESSAGE] User has disabled email notifications, skipping email');
         } else {
           // Send email with headers and footer
           const emailHtml = wrapInEmailTemplateWithFooter(

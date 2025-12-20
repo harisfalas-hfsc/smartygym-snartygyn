@@ -86,6 +86,24 @@ serve(async (req) => {
       );
     }
 
+    // Check user's notification preferences - only send push if they have push enabled
+    const { data: profile } = await supabaseClient
+      .from("profiles")
+      .select("notification_preferences")
+      .eq("user_id", user_id)
+      .single();
+
+    const prefs = profile?.notification_preferences as Record<string, any> || {};
+    
+    // Check if user has opted out of push notifications
+    if (prefs.push === false || prefs.opt_out_all === true) {
+      console.log(`[PUSH] User ${user_id} has disabled push notifications`);
+      return new Response(
+        JSON.stringify({ message: "User has disabled push notifications", sent: 0 }),
+        { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
     // Get user's active push subscriptions
     const { data: subscriptions, error: subError } = await supabaseClient
       .from("push_subscriptions")

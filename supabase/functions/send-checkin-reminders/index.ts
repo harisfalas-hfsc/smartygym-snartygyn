@@ -35,26 +35,30 @@ serve(async (req: Request) => {
     
     console.log(`Sending ${reminderType} check-in reminders at Cyprus hour ${hour}`);
 
-    // Get all users with checkin_reminders enabled
+    // Get all users with their preferences
     const { data: profiles, error: profilesError } = await supabase
       .from('profiles')
-      .select('user_id, full_name, notification_preferences')
-      .not('notification_preferences', 'is', null);
+      .select('user_id, full_name, notification_preferences');
 
     if (profilesError) {
       console.error('Error fetching profiles:', profilesError);
       throw profilesError;
     }
 
-    // Filter users with checkin_reminders enabled (check both old and new preference keys)
-    const subscribedUsers = profiles?.filter(p => {
-      const prefs = p.notification_preferences as Record<string, boolean>;
-      return prefs?.checkin_reminders === true || prefs?.email_checkin_reminders === true;
+    // Filter users with checkin_reminders enabled for email AND dashboard
+    const usersForEmail = profiles?.filter(p => {
+      const prefs = p.notification_preferences as Record<string, any> || {};
+      return prefs.opt_out_all !== true && (prefs.email_checkin_reminders === true || prefs.checkin_reminders === true);
     }) || [];
 
-    console.log(`Found ${subscribedUsers.length} users subscribed to check-in reminders`);
+    const usersForDashboard = profiles?.filter(p => {
+      const prefs = p.notification_preferences as Record<string, any> || {};
+      return prefs.opt_out_all !== true && prefs.dashboard_checkin_reminders !== false;
+    }) || [];
 
-    if (subscribedUsers.length === 0) {
+    console.log(`Found ${usersForEmail.length} users for email, ${usersForDashboard.length} for dashboard`);
+
+    if (usersForDashboard.length === 0 && usersForEmail.length === 0) {
       return new Response(JSON.stringify({ success: true, message: 'No subscribers' }), {
         status: 200,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
@@ -62,7 +66,6 @@ serve(async (req: Request) => {
     }
 
     // Get user emails from auth.users
-    const userIds = subscribedUsers.map(u => u.user_id);
     const { data: { users }, error: usersError } = await supabase.auth.admin.listUsers();
     
     if (usersError) {
@@ -71,17 +74,16 @@ serve(async (req: Request) => {
     }
 
     const userMap = new Map(users?.map(u => [u.id, u.email]) || []);
+    const profileMap = new Map(profiles?.map(p => [p.user_id, p]) || []);
 
     let sentCount = 0;
+    let dashboardCount = 0;
     let failedCount = 0;
 
-    for (const profile of subscribedUsers) {
-      const email = userMap.get(profile.user_id);
-      if (!email) continue;
-
+    // Send dashboard notifications
+    for (const profile of usersForDashboard) {
       const userName = profile.full_name || 'Smarty';
       
-      // Create dashboard notification
       const dashboardMessage = {
         user_id: profile.user_id,
         message_type: MESSAGE_TYPES.CHECKIN_REMINDER,
@@ -100,10 +102,19 @@ serve(async (req: Request) => {
         .insert(dashboardMessage);
 
       if (msgError) {
-        console.error(`Failed to create dashboard message for ${email}:`, msgError);
+        console.error(`Failed to create dashboard message for ${profile.user_id}:`, msgError);
+      } else {
+        dashboardCount++;
       }
+    }
 
-      // Send email
+    // Send emails only to users who have email enabled
+    for (const profile of usersForEmail) {
+      const email = userMap.get(profile.user_id);
+      if (!email) continue;
+
+      const userName = profile.full_name || 'Smarty';
+
       try {
         await resend.emails.send({
           from: "SmartyGym <notifications@smartygym.com>",
@@ -167,11 +178,12 @@ serve(async (req: Request) => {
       }
     }
 
-    console.log(`Check-in reminders complete: ${sentCount} sent, ${failedCount} failed`);
+    console.log(`Check-in reminders complete: ${dashboardCount} dashboard, ${sentCount} emails sent, ${failedCount} failed`);
 
     return new Response(JSON.stringify({ 
       success: true, 
       reminderType,
+      dashboardCount,
       sentCount,
       failedCount 
     }), {

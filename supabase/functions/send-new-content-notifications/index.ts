@@ -192,8 +192,8 @@ serve(async (req) => {
       }
     }
 
-    // Get all users to notify
-    logStep("🔍 Fetching all users");
+    // Get all users with their preferences
+    logStep("🔍 Fetching all users with preferences");
     const { data: authUsers, error: authError } = await supabase.auth.admin.listUsers();
     
     if (authError) {
@@ -202,45 +202,78 @@ serve(async (req) => {
     }
 
     const users = authUsers?.users || [];
+    
+    // Get all user preferences from profiles
+    const { data: allProfiles } = await supabase
+      .from('profiles')
+      .select('user_id, notification_preferences');
+    
+    const prefsMap = new Map(allProfiles?.map(p => [p.user_id, p.notification_preferences as Record<string, any>]) || []);
+    
     logStep("👥 Found users to notify", { count: users.length });
 
     let dashboardSuccess = 0;
     let emailSuccess = 0;
     let dashboardFailed = 0;
+    let dashboardSkipped = 0;
     let emailFailed = 0;
+    let emailSkipped = 0;
     const emailErrors: { email: string; error: string }[] = [];
+
+    // Determine which dashboard preference to check
+    const dashboardPrefKey = workoutCount > 0 && programCount > 0 
+      ? ['dashboard_new_workout', 'dashboard_new_program'] // Check either
+      : workoutCount > 0 
+        ? ['dashboard_new_workout']
+        : ['dashboard_new_program'];
+    
+    // Determine which email preference to check
+    const emailPrefKey = workoutCount > 0 && programCount > 0 
+      ? ['email_new_workout', 'email_new_program']
+      : workoutCount > 0 
+        ? ['email_new_workout']
+        : ['email_new_program'];
 
     // Send notifications to all users
     for (const user of users) {
-      // Dashboard message
-      const { error: msgError } = await supabase
-        .from("user_system_messages")
-        .insert({
-          user_id: user.id,
-          message_type: messageType,
-          subject: subject,
-          content: dashboardContent,
-          is_read: false,
-        });
-
-      if (msgError) {
-        logStep("❌ Dashboard message failed", { userId: user.id, error: msgError.message });
-        dashboardFailed++;
-      } else {
-        dashboardSuccess++;
+      const prefs = prefsMap.get(user.id) || {};
+      
+      // Check if user has opted out of all notifications
+      if (prefs.opt_out_all === true) {
+        logStep("⏭️ User opted out of all notifications", { userId: user.id });
+        dashboardSkipped++;
+        emailSkipped++;
+        continue;
       }
 
-      // Email
-      if (user.email) {
-        // Check notification preferences
-        const { data: profile } = await supabase
-          .from("profiles")
-          .select("notification_preferences")
-          .eq("user_id", user.id)
-          .single();
+      // Check dashboard preferences - if ANY of the relevant prefs are enabled (default true)
+      const dashboardEnabled = dashboardPrefKey.some(key => prefs[key] !== false);
+      
+      if (dashboardEnabled) {
+        const { error: msgError } = await supabase
+          .from("user_system_messages")
+          .insert({
+            user_id: user.id,
+            message_type: messageType,
+            subject: subject,
+            content: dashboardContent,
+            is_read: false,
+          });
 
-        const prefs = profile?.notification_preferences as any;
-        const emailEnabled = prefs?.email_notifications !== false && prefs?.newsletter !== false;
+        if (msgError) {
+          logStep("❌ Dashboard message failed", { userId: user.id, error: msgError.message });
+          dashboardFailed++;
+        } else {
+          dashboardSuccess++;
+        }
+      } else {
+        logStep("⏭️ Dashboard disabled for user", { userId: user.id, prefs: dashboardPrefKey });
+        dashboardSkipped++;
+      }
+
+      // Check email preferences
+      if (user.email) {
+        const emailEnabled = emailPrefKey.some(key => prefs[key] !== false);
 
         if (emailEnabled) {
           const result = await sendEmail(user.email, subject, emailHtml);
@@ -254,7 +287,8 @@ serve(async (req) => {
             logStep("❌ Email failed", { email: user.email, error: result.error });
           }
         } else {
-          logStep("⏭️ Email disabled for user", { userId: user.id });
+          logStep("⏭️ Email disabled for user", { userId: user.id, prefs: emailPrefKey });
+          emailSkipped++;
         }
       }
     }
@@ -285,8 +319,10 @@ serve(async (req) => {
       metadata: {
         workouts_count: workoutCount,
         programs_count: programCount,
+        dashboard_skipped: dashboardSkipped,
         email_success: emailSuccess,
         email_failed: emailFailed,
+        email_skipped: emailSkipped,
         email_errors: emailErrors.length > 0 ? emailErrors : undefined,
       },
     });
@@ -295,9 +331,10 @@ serve(async (req) => {
       totalUsers: users.length,
       dashboardSuccess,
       dashboardFailed,
+      dashboardSkipped,
       emailSuccess,
       emailFailed,
-      emailErrorCount: emailErrors.length
+      emailSkipped
     });
 
     return new Response(
@@ -308,9 +345,10 @@ serve(async (req) => {
         programs: programCount,
         dashboardSent: dashboardSuccess,
         dashboardFailed,
+        dashboardSkipped,
         emailsSent: emailSuccess,
         emailsFailed: emailFailed,
-        emailErrors: emailErrors.length > 0 ? emailErrors : undefined,
+        emailsSkipped: emailSkipped,
       }),
       { headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
