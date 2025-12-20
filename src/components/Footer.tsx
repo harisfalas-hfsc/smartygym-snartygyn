@@ -30,13 +30,7 @@ export const Footer = () => {
           </div>
           
           {/* Legal Links */}
-          <div className="flex flex-wrap items-center justify-center gap-4 text-sm text-muted-foreground">
-            <button onClick={() => navigate("/human-performance")} className="hover:text-primary transition-colors">
-              Why SmartyGym
-            </button>
-            <button onClick={() => navigate("/corporate-wellness")} className="hover:text-primary transition-colors">
-              Why Smarty Corporate
-            </button>
+          <div className="flex flex-col items-center gap-3 md:flex-row md:flex-wrap md:justify-center md:gap-4 text-sm text-muted-foreground">
             <button onClick={() => navigate("/smarty-plans")} className="hover:text-primary transition-colors">
               Smarty Plans
             </button>
