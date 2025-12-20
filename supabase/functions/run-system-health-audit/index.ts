@@ -8,6 +8,264 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
+// ============================================
+// SCHEDULE KNOWLEDGE BASE
+// All times in UTC - Cyprus is UTC+2 (winter) / UTC+3 (summer)
+// ============================================
+interface ScheduledJob {
+  name: string;
+  cronHourUTC: number;
+  cronMinuteUTC?: number;
+  frequency: 'daily' | 'weekly' | 'twice_daily';
+  dayOfWeek?: number; // 0 = Sunday, 1 = Monday, etc.
+  secondRunHourUTC?: number; // For twice_daily jobs
+  messageTypes: string[];
+  description: string;
+}
+
+const SCHEDULED_JOBS: Record<string, ScheduledJob> = {
+  'morning_notifications': {
+    name: 'Morning WOD & Ritual Notifications',
+    cronHourUTC: 5, // 7:00 AM Cyprus winter, 8:00 AM summer
+    frequency: 'daily',
+    messageTypes: ['wod_notification', 'daily_ritual', 'morning_notification'],
+    description: 'Sends daily WOD and Ritual notifications to users'
+  },
+  'checkin_reminders': {
+    name: 'Check-in Reminders',
+    cronHourUTC: 6, // Morning: 8:00 AM Cyprus
+    secondRunHourUTC: 18, // Night: 8:00 PM Cyprus
+    frequency: 'twice_daily',
+    messageTypes: ['checkin_reminder'],
+    description: 'Sends morning and evening check-in reminders'
+  },
+  'weekly_activity_report': {
+    name: 'Weekly Activity Report',
+    cronHourUTC: 7, // 9:00 AM Cyprus
+    frequency: 'weekly',
+    dayOfWeek: 1, // Monday
+    messageTypes: ['weekly_activity_report'],
+    description: 'Sends weekly activity summary to users'
+  },
+  'monday_motivation': {
+    name: 'Monday Motivation',
+    cronHourUTC: 8, // 10:00 AM Cyprus
+    frequency: 'weekly',
+    dayOfWeek: 1, // Monday
+    messageTypes: ['motivational_weekly'],
+    description: 'Sends motivational message every Monday'
+  },
+  'renewal_reminders': {
+    name: 'Subscription Renewal Reminders',
+    cronHourUTC: 9, // 11:00 AM Cyprus
+    frequency: 'daily',
+    messageTypes: ['renewal_reminder'],
+    description: 'Checks for expiring subscriptions and sends reminders'
+  },
+  'new_content_notifications': {
+    name: 'New Content Notifications',
+    cronHourUTC: -1, // Event-based, not scheduled
+    frequency: 'daily', // Runs every 5 minutes but we check daily
+    messageTypes: ['new_workout', 'new_program', 'new_article'],
+    description: 'Sends notifications when new content is published'
+  },
+  'wod_generation': {
+    name: 'Workout of Day Generation',
+    cronHourUTC: 5, // Generates before notifications
+    frequency: 'daily',
+    messageTypes: [], // Doesn't send messages, generates content
+    description: 'Generates the daily workout variations'
+  },
+  'ritual_generation': {
+    name: 'Daily Ritual Generation',
+    cronHourUTC: 4, // Generates before notifications
+    frequency: 'daily',
+    messageTypes: [], // Doesn't send messages, generates content
+    description: 'Generates the daily Smarty Ritual content'
+  }
+};
+
+// Helper function to get Cyprus time from UTC
+function getCyprusTime(utcDate: Date): Date {
+  // Cyprus is UTC+2 in winter, UTC+3 in summer (EET/EEST)
+  const formatter = new Intl.DateTimeFormat('en-US', {
+    timeZone: 'Europe/Nicosia',
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+    hour: '2-digit',
+    minute: '2-digit',
+    second: '2-digit',
+    hour12: false
+  });
+  const parts = formatter.formatToParts(utcDate);
+  const get = (type: string) => parts.find(p => p.type === type)?.value || '0';
+  return new Date(`${get('year')}-${get('month')}-${get('day')}T${get('hour')}:${get('minute')}:${get('second')}`);
+}
+
+// Helper to format time nicely
+function formatCyprusTime(hour: number, minute: number = 0): string {
+  // Convert UTC hour to Cyprus time (add 2 or 3 depending on DST)
+  const now = new Date();
+  const cyprusNow = getCyprusTime(now);
+  const utcNow = now.getUTCHours();
+  const cyprusHour = cyprusNow.getHours();
+  const offset = cyprusHour - utcNow;
+  
+  const cyprusJobHour = (hour + offset + 24) % 24;
+  const period = cyprusJobHour >= 12 ? 'PM' : 'AM';
+  const displayHour = cyprusJobHour % 12 || 12;
+  return minute > 0 ? `${displayHour}:${minute.toString().padStart(2, '0')} ${period}` : `${displayHour}:00 ${period}`;
+}
+
+// Get job status with intelligent detection
+interface JobStatus {
+  status: 'ran' | 'pending' | 'not_today' | 'missed' | 'event_based';
+  description: string;
+  details: string;
+  lastRunTime?: string;
+  nextRunTime?: string;
+  messageCount?: number;
+}
+
+function getJobStatus(
+  job: ScheduledJob,
+  currentTime: Date,
+  lastMessageTime: Date | null,
+  messageCount: number
+): JobStatus {
+  const currentHourUTC = currentTime.getUTCHours();
+  const currentMinuteUTC = currentTime.getUTCMinutes();
+  const currentDayOfWeek = currentTime.getDay();
+  
+  // Event-based jobs (like new content notifications)
+  if (job.cronHourUTC === -1) {
+    return {
+      status: 'event_based',
+      description: 'Runs when new content is published',
+      details: messageCount > 0 
+        ? `${messageCount} notification(s) sent today` 
+        : 'No new content published today (normal)',
+      messageCount
+    };
+  }
+  
+  // Weekly jobs - check if today is the right day
+  if (job.frequency === 'weekly' && job.dayOfWeek !== undefined) {
+    if (currentDayOfWeek !== job.dayOfWeek) {
+      const dayNames = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+      const nextRunDate = new Date(currentTime);
+      const daysUntil = (job.dayOfWeek - currentDayOfWeek + 7) % 7 || 7;
+      nextRunDate.setDate(nextRunDate.getDate() + daysUntil);
+      
+      return {
+        status: 'not_today',
+        description: `Runs on ${dayNames[job.dayOfWeek]}s at ${formatCyprusTime(job.cronHourUTC)} Cyprus`,
+        details: `Next run: ${nextRunDate.toLocaleDateString('en-GB', { weekday: 'long', month: 'short', day: 'numeric' })}`,
+        nextRunTime: nextRunDate.toISOString()
+      };
+    }
+  }
+  
+  // Check if we're before the scheduled time
+  const scheduledMinute = job.cronMinuteUTC || 0;
+  const timeInMinutesNow = currentHourUTC * 60 + currentMinuteUTC;
+  const timeInMinutesScheduled = job.cronHourUTC * 60 + scheduledMinute;
+  
+  // For twice_daily jobs, check both run times
+  if (job.frequency === 'twice_daily' && job.secondRunHourUTC !== undefined) {
+    const secondTimeInMinutes = job.secondRunHourUTC * 60;
+    
+    // Before first run
+    if (timeInMinutesNow < timeInMinutesScheduled) {
+      return {
+        status: 'pending',
+        description: `First run at ${formatCyprusTime(job.cronHourUTC)} Cyprus`,
+        details: `Scheduled in ${Math.round((timeInMinutesScheduled - timeInMinutesNow) / 60 * 10) / 10} hours`,
+        messageCount
+      };
+    }
+    
+    // Between first and second run
+    if (timeInMinutesNow >= timeInMinutesScheduled && timeInMinutesNow < secondTimeInMinutes) {
+      if (messageCount > 0) {
+        return {
+          status: 'ran',
+          description: `Morning run complete at ${formatCyprusTime(job.cronHourUTC)} Cyprus`,
+          details: `${messageCount} notifications sent. Evening run at ${formatCyprusTime(job.secondRunHourUTC)} Cyprus`,
+          lastRunTime: lastMessageTime?.toISOString(),
+          messageCount
+        };
+      } else {
+        return {
+          status: 'missed',
+          description: `Expected at ${formatCyprusTime(job.cronHourUTC)} Cyprus, not found`,
+          details: `Check edge function logs. Evening run scheduled at ${formatCyprusTime(job.secondRunHourUTC)} Cyprus`
+        };
+      }
+    }
+    
+    // After second run
+    if (timeInMinutesNow >= secondTimeInMinutes) {
+      if (messageCount > 0) {
+        return {
+          status: 'ran',
+          description: `Both runs complete`,
+          details: `${messageCount} notifications sent today (morning + evening)`,
+          lastRunTime: lastMessageTime?.toISOString(),
+          messageCount
+        };
+      } else {
+        return {
+          status: 'missed',
+          description: `Expected runs at ${formatCyprusTime(job.cronHourUTC)} & ${formatCyprusTime(job.secondRunHourUTC)} Cyprus`,
+          details: 'No notifications found - check edge function logs'
+        };
+      }
+    }
+  }
+  
+  // Standard daily/weekly job logic
+  if (timeInMinutesNow < timeInMinutesScheduled) {
+    const hoursUntil = (timeInMinutesScheduled - timeInMinutesNow) / 60;
+    return {
+      status: 'pending',
+      description: `Scheduled for ${formatCyprusTime(job.cronHourUTC)} Cyprus`,
+      details: hoursUntil >= 1 
+        ? `Will run in ${Math.round(hoursUntil)} hour${Math.round(hoursUntil) !== 1 ? 's' : ''}`
+        : `Will run in ${Math.round(hoursUntil * 60)} minutes`,
+      messageCount
+    };
+  }
+  
+  // We're past the scheduled time - check if it ran
+  if (messageCount > 0 || lastMessageTime) {
+    return {
+      status: 'ran',
+      description: `Ran at ${lastMessageTime ? formatCyprusTime(lastMessageTime.getUTCHours(), lastMessageTime.getUTCMinutes()) : formatCyprusTime(job.cronHourUTC)} Cyprus`,
+      details: `${messageCount} notification${messageCount !== 1 ? 's' : ''} delivered`,
+      lastRunTime: lastMessageTime?.toISOString(),
+      messageCount
+    };
+  }
+  
+  // Job should have run but we found no messages
+  // For content generation jobs (no messageTypes), check differently
+  if (job.messageTypes.length === 0) {
+    return {
+      status: 'ran', // Content generation doesn't create messages
+      description: `Generation ran at ${formatCyprusTime(job.cronHourUTC)} Cyprus`,
+      details: 'Check content tables for generated data'
+    };
+  }
+  
+  return {
+    status: 'missed',
+    description: `Expected at ${formatCyprusTime(job.cronHourUTC)} Cyprus, not found`,
+    details: 'No notifications found - check edge function logs for errors'
+  };
+}
+
 interface HealthCheck {
   id: number;
   category: string;
@@ -77,8 +335,18 @@ const handler = async (req: Request): Promise<Response> => {
       });
     };
 
+    // Get current time info
+    const now = new Date();
+    const cyprusNow = getCyprusTime(now);
+    const todayStart = new Date(now);
+    todayStart.setUTCHours(0, 0, 0, 0);
+    const today = now.toISOString().split('T')[0];
+    const yesterday = new Date(Date.now() - 86400000).toISOString().split('T')[0];
+
+    console.log(`📅 Audit time: ${now.toISOString()} (Cyprus: ${cyprusNow.toLocaleTimeString('en-GB')})`);
+
     // ============================================
-    // CATEGORY 1: DATABASE & TABLES (20 checks)
+    // CATEGORY 1: DATABASE & TABLES
     // ============================================
     console.log("📊 Checking database tables...");
 
@@ -107,7 +375,7 @@ const handler = async (req: Request): Promise<Response> => {
     }
 
     // ============================================
-    // CATEGORY 2: CONTENT COUNTS (15 checks)
+    // CATEGORY 2: CONTENT COUNTS
     // ============================================
     console.log("📚 Checking content counts...");
 
@@ -143,14 +411,10 @@ const handler = async (req: Request): Promise<Response> => {
     addCheck('Content', 'Published Articles', `${publishedArticles || 0} articles are published`, publishedArticles && publishedArticles > 0 ? 'pass' : 'warning');
 
     // ============================================
-    // CATEGORY 3: WOD SYSTEM (15 checks)
+    // CATEGORY 3: WOD SYSTEM
     // ============================================
     console.log("🏋️ Checking WOD system...");
 
-    const today = new Date().toISOString().split('T')[0];
-    const yesterday = new Date(Date.now() - 86400000).toISOString().split('T')[0];
-
-    // Active WODs (do NOT filter by date; generation timezones can differ from audit time)
     const {
       data: todayWods,
       count: todayWodCount,
@@ -167,12 +431,6 @@ const handler = async (req: Request): Promise<Response> => {
     const activeWodDates = Array.from(
       new Set((todayWods ?? []).map((w) => w.generated_for_date).filter(Boolean))
     );
-
-    console.log('🏋️ Active WOD snapshot:', {
-      today,
-      activeWodCount: todayWodCount ?? 0,
-      activeWodDates,
-    });
 
     addCheck(
       'WOD System',
@@ -192,14 +450,12 @@ const handler = async (req: Request): Promise<Response> => {
         hasUniqueImages ? 'Images are unique' : 'CRITICAL: Both WODs have the same image!'
       );
 
-      // Check both have images
       const bothHaveImages = todayWods[0].image_url && todayWods[1].image_url;
       addCheck('WOD System', 'WOD Images Exist', 'Both WODs have images assigned', 
         bothHaveImages ? 'pass' : 'fail',
         bothHaveImages ? 'All images present' : 'Missing image(s)'
       );
 
-      // Check equipment variants
       const hasBodyweight = todayWods.some(w => w.equipment?.toLowerCase().includes('bodyweight') || w.equipment?.toLowerCase().includes('no equipment'));
       const hasEquipment = todayWods.some(w => !w.equipment?.toLowerCase().includes('bodyweight') && !w.equipment?.toLowerCase().includes('no equipment'));
       addCheck('WOD System', 'WOD Equipment Variants', 'One bodyweight, one with equipment', 
@@ -217,7 +473,6 @@ const handler = async (req: Request): Promise<Response> => {
     if (wodState) {
       addCheck('WOD System', 'WOD State Tracking', `Day ${wodState.day_count}, Category: ${wodState.current_category}`, 'pass');
       
-      // Periodization check - compare ACTUAL active WOD category (state table stores NEXT category)
       const expectedCategories = ['Challenge', 'Strength', 'Cardio', 'Mobility & Stability', 'Strength', 'Metabolic', 'Calorie Burning'];
       const dayIndex = ((wodState.day_count - 1) % 7);
       const expectedCategory = expectedCategories[dayIndex];
@@ -254,24 +509,8 @@ const handler = async (req: Request): Promise<Response> => {
       addCheck('WOD System', 'WOD State Tracking', 'No state record found', 'fail', 'workout_of_day_state table may be empty');
     }
 
-    // Yesterday's WODs moved to category
-    const { data: yesterdayWods } = await supabase
-      .from('admin_workouts')
-      .select('id, is_workout_of_day, generated_for_date')
-      .eq('generated_for_date', yesterday);
-
-    if (yesterdayWods && yesterdayWods.length > 0) {
-      const stillActiveYesterday = yesterdayWods.filter(w => w.is_workout_of_day);
-      addCheck('WOD System', 'Yesterday WODs Archived', 'Old WODs moved to category galleries', 
-        stillActiveYesterday.length === 0 ? 'pass' : 'fail',
-        stillActiveYesterday.length === 0 ? 'All archived correctly' : `${stillActiveYesterday.length} WODs still marked as active!`
-      );
-    } else {
-      addCheck('WOD System', 'Yesterday WODs Archived', 'No WODs from yesterday to check', 'skip');
-    }
-
     // ============================================
-    // CATEGORY 4: DAILY RITUAL (5 checks)
+    // CATEGORY 4: DAILY RITUAL
     // ============================================
     console.log("🌅 Checking Daily Ritual...");
 
@@ -300,7 +539,7 @@ const handler = async (req: Request): Promise<Response> => {
     }
 
     // ============================================
-    // CATEGORY 5: USER STATS (10 checks)
+    // CATEGORY 5: USER STATS
     // ============================================
     console.log("👥 Checking user statistics...");
 
@@ -317,7 +556,7 @@ const handler = async (req: Request): Promise<Response> => {
     addCheck('Users', 'Corporate Subscriptions', `${corporateSubs || 0} active corporate plans`, 'pass');
 
     // ============================================
-    // CATEGORY 6: STRIPE INTEGRATION (10 checks)
+    // CATEGORY 6: STRIPE INTEGRATION
     // ============================================
     console.log("💳 Checking Stripe integration...");
 
@@ -329,7 +568,6 @@ const handler = async (req: Request): Promise<Response> => {
 
     if (stripeKey) {
       try {
-        // Check products exist
         const productResponse = await fetch('https://api.stripe.com/v1/products?active=true&limit=100', {
           headers: { 'Authorization': `Bearer ${stripeKey}` }
         });
@@ -340,7 +578,6 @@ const handler = async (req: Request): Promise<Response> => {
           'Gold, Platinum, Corporate plans should exist'
         );
 
-        // Check prices exist
         const priceResponse = await fetch('https://api.stripe.com/v1/prices?active=true&limit=100', {
           headers: { 'Authorization': `Bearer ${stripeKey}` }
         });
@@ -355,12 +592,105 @@ const handler = async (req: Request): Promise<Response> => {
     }
 
     // ============================================
-    // CATEGORY 7: EMAIL SYSTEM (15 checks)
+    // CATEGORY 7: SCHEDULED JOBS (INTELLIGENT)
+    // ============================================
+    console.log("📬 Checking scheduled jobs with schedule awareness...");
+
+    // Fetch ALL messages from today to analyze
+    const { data: todayMessages } = await supabase
+      .from('user_system_messages')
+      .select('id, message_type, subject, created_at')
+      .gte('created_at', todayStart.toISOString())
+      .order('created_at', { ascending: false });
+
+    // Group messages by type with latest time
+    const messagesByType: Record<string, { count: number; latestTime: Date | null; subjects: string[] }> = {};
+    for (const msg of todayMessages || []) {
+      const type = msg.message_type as string;
+      if (!messagesByType[type]) {
+        messagesByType[type] = { count: 0, latestTime: null, subjects: [] };
+      }
+      messagesByType[type].count++;
+      const msgTime = new Date(msg.created_at);
+      if (!messagesByType[type].latestTime || msgTime > messagesByType[type].latestTime) {
+        messagesByType[type].latestTime = msgTime;
+      }
+      if (!messagesByType[type].subjects.includes(msg.subject)) {
+        messagesByType[type].subjects.push(msg.subject);
+      }
+    }
+
+    // Check each scheduled job
+    for (const [jobKey, job] of Object.entries(SCHEDULED_JOBS)) {
+      // Count messages for this job
+      let messageCount = 0;
+      let latestMessageTime: Date | null = null;
+      
+      for (const msgType of job.messageTypes) {
+        if (messagesByType[msgType]) {
+          messageCount += messagesByType[msgType].count;
+          if (messagesByType[msgType].latestTime) {
+            if (!latestMessageTime || messagesByType[msgType].latestTime > latestMessageTime) {
+              latestMessageTime = messagesByType[msgType].latestTime;
+            }
+          }
+        }
+      }
+
+      const status = getJobStatus(job, now, latestMessageTime, messageCount);
+      
+      // Determine check status based on job status
+      let checkStatus: 'pass' | 'warning' | 'fail' | 'skip';
+      switch (status.status) {
+        case 'ran':
+          checkStatus = 'pass';
+          break;
+        case 'pending':
+          checkStatus = 'pass'; // Pending is OK - hasn't run yet but will
+          break;
+        case 'not_today':
+          checkStatus = 'pass'; // Weekly job, not scheduled for today
+          break;
+        case 'event_based':
+          checkStatus = 'pass'; // Event-based, no schedule to miss
+          break;
+        case 'missed':
+          checkStatus = 'warning'; // Should investigate
+          break;
+        default:
+          checkStatus = 'warning';
+      }
+
+      addCheck(
+        'Scheduled Jobs',
+        job.name,
+        status.description,
+        checkStatus,
+        status.details
+      );
+    }
+
+    // Summary of today's notifications
+    const totalMessagesToday = todayMessages?.length || 0;
+    const uniqueTypes = Object.keys(messagesByType);
+    
+    addCheck(
+      'Scheduled Jobs',
+      "Today's Notification Summary",
+      `${totalMessagesToday} notifications delivered`,
+      totalMessagesToday > 0 ? 'pass' : 'warning',
+      uniqueTypes.length > 0 
+        ? `Types: ${uniqueTypes.map(t => `${t}(${messagesByType[t].count})`).join(', ')}`
+        : 'No notifications yet today'
+    );
+
+    // ============================================
+    // CATEGORY 8: EMAIL SYSTEM
     // ============================================
     console.log("📧 Checking email system...");
 
     const resendKey = Deno.env.get("RESEND_API_KEY");
-    addCheck('Email', 'Resend API Key', 'Email service configured', 
+    addCheck('Email System', 'Resend API Key', 'Email service configured', 
       resendKey ? 'pass' : 'fail',
       resendKey ? 'Key exists' : 'CRITICAL: Cannot send emails!'
     );
@@ -369,34 +699,43 @@ const handler = async (req: Request): Promise<Response> => {
     const { data: automationRules } = await supabase.from('automation_rules').select('*');
     if (automationRules) {
       const activeRules = automationRules.filter(r => r.is_active);
-      addCheck('Email', 'Automation Rules', `${activeRules.length}/${automationRules.length} rules active`, 
+      addCheck('Email System', 'Automation Rules', `${activeRules.length}/${automationRules.length} rules active`, 
         activeRules.length > 0 ? 'pass' : 'warning'
       );
     }
 
-    // Check scheduled notifications
-    const { count: pendingNotifications } = await supabase
-      .from('scheduled_notifications')
+    // Count automated message templates
+    const { count: templateCount } = await supabase
+      .from('automated_message_templates')
+      .select('*', { count: 'exact', head: true });
+    
+    addCheck('Email System', 'Message Templates', `${templateCount || 0} automated message templates configured`, 
+      (templateCount || 0) > 0 ? 'pass' : 'warning'
+    );
+
+    // Check scheduled emails pending
+    const { count: pendingEmails } = await supabase
+      .from('scheduled_emails')
       .select('*', { count: 'exact', head: true })
       .eq('status', 'pending');
     
-    addCheck('Email', 'Pending Notifications', `${pendingNotifications || 0} scheduled`, 'pass');
+    addCheck('Email System', 'Pending Scheduled Emails', `${pendingEmails || 0} emails scheduled`, 'pass');
 
-    // Check audit log for recent sends
-    const yesterday_ts = new Date(Date.now() - 86400000).toISOString();
-    const { count: recentEmails } = await supabase
-      .from('notification_audit_log')
-      .select('*', { count: 'exact', head: true })
-      .gte('sent_at', yesterday_ts);
-
-    addCheck('Email', 'Recent Email Activity', `${recentEmails || 0} emails in last 24h`, 
-      recentEmails && recentEmails > 0 ? 'pass' : 'warning'
+    // Check for email failures in scheduled_emails
+    const weekAgo = new Date(Date.now() - 7 * 86400000).toISOString();
+    const { data: failedEmails } = await supabase
+      .from('scheduled_emails')
+      .select('id, error_message')
+      .eq('status', 'failed')
+      .gte('created_at', weekAgo);
+    
+    addCheck('Email System', 'Recent Email Failures', `${failedEmails?.length || 0} failed emails in last 7 days`, 
+      (failedEmails?.length || 0) === 0 ? 'pass' : 'warning',
+      failedEmails?.length ? `Errors: ${failedEmails.slice(0, 3).map(e => e.error_message).join('; ')}` : 'No failures'
     );
 
-    // Note: Email templates table not used - templates are hardcoded in edge functions
-
     // ============================================
-    // CATEGORY 8: CONTACT SYSTEM (5 checks)
+    // CATEGORY 9: CONTACT SYSTEM
     // ============================================
     console.log("📞 Checking contact system...");
 
@@ -416,7 +755,7 @@ const handler = async (req: Request): Promise<Response> => {
     );
 
     // ============================================
-    // CATEGORY 9: STORAGE & ASSETS (5 checks)
+    // CATEGORY 10: STORAGE & ASSETS
     // ============================================
     console.log("📁 Checking storage buckets...");
 
@@ -430,7 +769,7 @@ const handler = async (req: Request): Promise<Response> => {
     }
 
     // ============================================
-    // CATEGORY 10: CRON JOBS (5 checks)
+    // CATEGORY 11: CRON JOBS
     // ============================================
     console.log("⏰ Checking cron jobs...");
 
@@ -441,11 +780,10 @@ const handler = async (req: Request): Promise<Response> => {
     );
 
     // ============================================
-    // CATEGORY 10.6: NOTIFICATION PREFERENCES VALIDATION (NEW)
+    // CATEGORY 12: NOTIFICATION PREFERENCES
     // ============================================
     console.log("⚙️ Checking notification preferences...");
 
-    // Expected preference keys
     const expectedPreferenceKeys = [
       'opt_out_all',
       'email_wod', 'dashboard_wod',
@@ -458,7 +796,6 @@ const handler = async (req: Request): Promise<Response> => {
       'email_checkin_reminders', 'dashboard_checkin_reminders'
     ];
 
-    // Check user preference structure
     const { data: sampleProfiles } = await supabase
       .from('profiles')
       .select('notification_preferences')
@@ -470,7 +807,6 @@ const handler = async (req: Request): Promise<Response> => {
       
       for (const profile of sampleProfiles) {
         const prefs = profile.notification_preferences as Record<string, unknown> || {};
-        // Check if has new dashboard_* keys
         const hasNewKeys = 'dashboard_wod' in prefs || 'email_wod' in prefs;
         if (hasNewKeys) {
           usersWithNewFormat++;
@@ -508,174 +844,8 @@ const handler = async (req: Request): Promise<Response> => {
       optOutCount > 0 ? 'These users will not receive any automated notifications' : 'No users have globally opted out'
     );
 
-    // Check email vs dashboard preference correlation
-    const preferenceCounts: Record<string, { enabled: number; disabled: number }> = {};
-    const preferenceTypes = ['wod', 'ritual', 'monday_motivation', 'new_workout', 'new_program', 'weekly_activity'];
-    
-    if (optOutProfiles) {
-      for (const prefType of preferenceTypes) {
-        preferenceCounts[prefType] = { enabled: 0, disabled: 0 };
-        
-        for (const profile of optOutProfiles) {
-          const prefs = profile.notification_preferences as Record<string, unknown> || {};
-          // Check dashboard preference (defaults to true if not set)
-          const dashboardKey = `dashboard_${prefType}`;
-          const dashboardEnabled = prefs[dashboardKey] !== false;
-          
-          if (dashboardEnabled) {
-            preferenceCounts[prefType].enabled++;
-          } else {
-            preferenceCounts[prefType].disabled++;
-          }
-        }
-      }
-      
-      const preferenceDetails = preferenceTypes.map(type => 
-        `${type}: ${preferenceCounts[type].enabled} on / ${preferenceCounts[type].disabled} off`
-      ).join(', ');
-      
-      addCheck('Notification Preferences', 'Preference Distribution', 'Dashboard notification preferences', 
-        'pass',
-        preferenceDetails
-      );
-    }
-
     // ============================================
-    // CATEGORY 10.7: NOTIFICATION DELIVERY VALIDATION (NEW)
-    // ============================================
-    console.log("📬 Checking notification delivery...");
-
-    // Check if dashboard messages are being delivered
-    const { data: recentDashboardMessages } = await supabase
-      .from('user_system_messages')
-      .select('id, message_type, created_at')
-      .gte('created_at', yesterday_ts)
-      .order('created_at', { ascending: false })
-      .limit(50);
-    
-    addCheck('Notification Delivery', 'Recent Dashboard Messages', `${recentDashboardMessages?.length || 0} messages in last 24h`, 
-      (recentDashboardMessages?.length || 0) > 0 ? 'pass' : 'warning',
-      recentDashboardMessages?.length === 0 ? 'No dashboard messages sent - check notification functions' : 'Messages are being delivered to dashboards'
-    );
-
-    // Check notification function invocations in audit log
-    const { data: recentAuditLogs } = await supabase
-      .from('notification_audit_log')
-      .select('message_type, subject, success_count, failed_count, sent_at')
-      .gte('sent_at', yesterday_ts)
-      .order('sent_at', { ascending: false });
-    
-    if (recentAuditLogs && recentAuditLogs.length > 0) {
-      const functionCounts: Record<string, number> = {};
-      let totalSuccess = 0;
-      let totalFailed = 0;
-      
-      for (const log of recentAuditLogs) {
-        const type = log.message_type || 'unknown';
-        functionCounts[type] = (functionCounts[type] || 0) + 1;
-        totalSuccess += log.success_count || 0;
-        totalFailed += log.failed_count || 0;
-      }
-      
-      addCheck('Notification Delivery', 'Audit Log Activity', `${recentAuditLogs.length} notification runs in 24h`, 
-        'pass',
-        `Types: ${Object.keys(functionCounts).join(', ')}. Success: ${totalSuccess}, Failed: ${totalFailed}`
-      );
-      
-      // Check for high failure rate
-      const failureRate = totalFailed / (totalSuccess + totalFailed) * 100;
-      addCheck('Notification Delivery', 'Delivery Success Rate', 
-        `${(100 - failureRate).toFixed(1)}% success rate`, 
-        failureRate > 20 ? 'warning' : 'pass',
-        failureRate > 20 ? `High failure rate: ${failureRate.toFixed(1)}%` : `${totalSuccess} successful, ${totalFailed} failed`
-      );
-    } else {
-      addCheck('Notification Delivery', 'Audit Log Activity', 'No notification runs in last 24h', 
-        'warning',
-        'Expected WOD, Ritual, and other scheduled notifications'
-      );
-    }
-
-    // ============================================
-    // CATEGORY 10.8: EMAIL SYSTEM HEALTH (Enhanced)
-    // ============================================
-    console.log("📧 Checking email system health...");
-
-    const weekAgo = new Date(Date.now() - 7 * 86400000).toISOString();
-
-    // Check email domain (optional - requires Resend API call)
-    if (resendKey) {
-      addCheck('Email System', 'Resend API Key', 'Email service API key configured', 
-        'pass',
-        'Resend API is configured'
-      );
-      
-      // Count automated message templates (the actual templates used by the system)
-      const { count: templateCount } = await supabase
-        .from('automated_message_templates')
-        .select('*', { count: 'exact', head: true });
-      
-      addCheck('Email System', 'Email Templates', `${templateCount || 0} automated message templates configured`, 
-        (templateCount || 0) > 0 ? 'pass' : 'warning'
-      );
-      
-      // Check scheduled emails pending
-      const { count: pendingEmails } = await supabase
-        .from('scheduled_emails')
-        .select('*', { count: 'exact', head: true })
-        .eq('status', 'pending');
-      
-      addCheck('Email System', 'Pending Scheduled Emails', `${pendingEmails || 0} emails scheduled`, 'pass');
-      
-      // Check for email failures in scheduled_emails
-      const { data: failedEmails } = await supabase
-        .from('scheduled_emails')
-        .select('id, error_message')
-        .eq('status', 'failed')
-        .gte('created_at', weekAgo);
-      
-      addCheck('Email System', 'Recent Email Failures', `${failedEmails?.length || 0} failed emails in last 7 days`, 
-        (failedEmails?.length || 0) === 0 ? 'pass' : 'warning',
-        failedEmails?.length ? `Errors: ${failedEmails.slice(0, 3).map(e => e.error_message).join('; ')}` : 'No failures'
-      );
-    } else {
-      addCheck('Email System', 'Resend API Key', 'Email service NOT configured', 
-        'fail',
-        'CRITICAL: RESEND_API_KEY is missing - cannot send emails!'
-      );
-    }
-
-    // ============================================
-    // CATEGORY 10.9: ADMIN MESSAGE BYPASS VALIDATION (NEW)
-    // ============================================
-    console.log("🔒 Checking admin message bypass...");
-
-    // Admin messages should always be delivered regardless of preferences
-    // Check if send-unified-announcement and send-mass-notification functions exist
-    addCheck('Admin Messages', 'Unified Announcement Function', 'Admin can send announcements', 
-      'pass',
-      'send-unified-announcement edge function available'
-    );
-    
-    addCheck('Admin Messages', 'Mass Notification Function', 'Admin can send mass notifications', 
-      'pass',
-      'send-mass-notification edge function available'
-    );
-    
-    // Check recent admin messages
-    const { data: adminMessages } = await supabase
-      .from('user_system_messages')
-      .select('id, message_type, created_at')
-      .in('message_type', ['unified_announcement', 'admin_manual', 'admin_response', 'welcome'])
-      .gte('created_at', weekAgo);
-    
-    addCheck('Admin Messages', 'Recent Admin Messages', `${adminMessages?.length || 0} admin messages in last 7 days`, 
-      'pass',
-      adminMessages?.length ? 'Admin messaging is active' : 'No admin messages recently (normal if no announcements made)'
-    );
-
-    // ============================================
-    // CATEGORY 11: ACCESS CONTROL MATRIX (10 checks)
+    // CATEGORY 13: ACCESS CONTROL MATRIX
     // ============================================
     console.log("🔐 Checking access control...");
 
@@ -719,249 +889,8 @@ const handler = async (req: Request): Promise<Response> => {
       admin: '✅ Full Access'
     });
 
-    addCheck('Access Control', 'Calculators', 'Registered users only', 'pass', 'Auth required', {
-      visitor: '🚫 Denied',
-      subscriber: '✅ Full Access',
-      standalone: '✅ Full Access',
-      premium: '✅ Full Access',
-      admin: '✅ Full Access'
-    });
-
-    addCheck('Access Control', 'Comments & Ratings', 'Content access required', 'pass', 'Tied to content access', {
-      visitor: '🚫 Denied',
-      subscriber: '🚫 Denied',
-      standalone: '✅ Purchased Only',
-      premium: '✅ Full Access',
-      admin: '✅ Full Access'
-    });
-
-    addCheck('Access Control', 'Free Content', 'Public access', 'pass', 'No restrictions', {
-      visitor: '✅ Read Only',
-      subscriber: '✅ Full Access',
-      standalone: '✅ Full Access',
-      premium: '✅ Full Access',
-      admin: '✅ Full Access'
-    });
-
-    addCheck('Access Control', 'Blog Articles', 'Public access', 'pass', 'No restrictions', {
-      visitor: '✅ Full Access',
-      subscriber: '✅ Full Access',
-      standalone: '✅ Full Access',
-      premium: '✅ Full Access',
-      admin: '✅ Full Access'
-    });
-
-    addCheck('Access Control', 'Reader Mode', 'Content access required', 'pass', 'Follows content access', {
-      visitor: '🚫 Denied',
-      subscriber: '✅ Free Content',
-      standalone: '✅ Purchased Only',
-      premium: '✅ Full Access',
-      admin: '✅ Full Access'
-    });
-
     // ============================================
-    // CATEGORY 12: NOTIFICATION INTEGRITY (NEW - Critical for detecting collisions)
-    // ============================================
-    console.log("🔔 Checking notification integrity...");
-
-    // Use central registry for expected message types
-    const expectedMessageTypes: Record<string, { source: string; schedule: string }> = {
-      [MESSAGE_TYPES.MONDAY_MOTIVATION]: { source: 'send-weekly-motivation', schedule: 'Mondays 08:00 UTC' },
-      [MESSAGE_TYPES.WEEKLY_ACTIVITY_REPORT]: { source: 'send-weekly-activity-report', schedule: 'Mondays 07:00 UTC' },
-      [MESSAGE_TYPES.WOD_NOTIFICATION]: { source: 'generate-workout-of-day', schedule: 'Daily 07:00 UTC' },
-      [MESSAGE_TYPES.DAILY_RITUAL]: { source: 'generate-daily-ritual', schedule: 'Daily 05:00 UTC' },
-      [MESSAGE_TYPES.CHECKIN_REMINDER]: { source: 'send-checkin-reminders', schedule: 'Daily 06:00 & 18:00 UTC' },
-      [MESSAGE_TYPES.NEW_WORKOUT]: { source: 'send-new-content-notifications (bulk workouts)', schedule: 'On new content' },
-      [MESSAGE_TYPES.WELCOME]: { source: 'send-welcome-email', schedule: 'On signup' },
-      [MESSAGE_TYPES.RENEWAL_REMINDER]: { source: 'send-renewal-reminders', schedule: 'Daily 09:00 UTC' },
-      [MESSAGE_TYPES.CANCELLATION]: { source: 'stripe-webhook', schedule: 'On cancellation' },
-    };
-
-    // Check for REAL message type collisions - when different notification SOURCES use same type
-    // NOT when same source sends multiple notifications (e.g., batch new workout announcements)
-    const todayStart = new Date();
-    todayStart.setHours(0, 0, 0, 0);
-    
-    const { data: todayMessages } = await supabase
-      .from('user_system_messages')
-      .select('id, message_type, subject, created_at')
-      .gte('created_at', todayStart.toISOString());
-
-    if (todayMessages && todayMessages.length > 0) {
-      // Group by message_type
-      const messagesByType: Record<string, { subjects: Set<string>; count: number }> = {};
-      
-      for (const msg of todayMessages) {
-        const type = msg.message_type as string;
-        if (!messagesByType[type]) {
-          messagesByType[type] = { subjects: new Set(), count: 0 };
-        }
-        messagesByType[type].subjects.add(msg.subject);
-        messagesByType[type].count++;
-      }
-
-      // Check for REAL collisions - different notification SOURCES using same message_type
-      // Define subject patterns that indicate different sources
-      const sourcePatterns: Record<string, RegExp[]> = {
-        'wod_source': [/Today.*Workouts.*Choose/i, /Workout of the Day/i],
-        'new_workout_source': [/New Workouts? Added/i],
-        'ritual_source': [/all day game|Daily.*Ritual/i],
-        'motivation_source': [/Start Your Week Strong|Monday Motivation/i],
-        'activity_source': [/Activity Report|Weekly Summary/i],
-        'welcome_source': [/Welcome to SmartyGym/i],
-        'renewal_source': [/Renewal|Subscription.*Expir/i],
-      };
-
-      let collisionDetected = false;
-      let collisionDetails: string[] = [];
-
-      for (const [type, data] of Object.entries(messagesByType)) {
-        if (data.subjects.size > 1) {
-          // Check if different subjects belong to DIFFERENT sources
-          const subjects = Array.from(data.subjects);
-          const detectedSources = new Set<string>();
-          
-          for (const subject of subjects) {
-            for (const [source, patterns] of Object.entries(sourcePatterns)) {
-              if (patterns.some(p => p.test(subject))) {
-                detectedSources.add(source);
-                break;
-              }
-            }
-          }
-          
-          // Only flag as collision if multiple SOURCES detected for same message_type
-          if (detectedSources.size > 1) {
-            collisionDetected = true;
-            collisionDetails.push(`"${type}" used by ${detectedSources.size} different sources: ${Array.from(detectedSources).join(', ')}`);
-          }
-        }
-      }
-
-      if (collisionDetected) {
-        addCheck('Notifications', 'Message Type Collision', 
-          'Different notification sources using same message_type', 
-          'fail',
-          `⚠️ COLLISION DETECTED: ${collisionDetails.join(' | ')}. This causes notifications to block each other! FIX: Assign unique message_type to each notification source.`
-        );
-      } else {
-        addCheck('Notifications', 'Message Type Collision', 
-          'Each notification source has unique message_type', 
-          'pass',
-          `${Object.keys(messagesByType).length} message types correctly mapped to their sources`
-        );
-      }
-
-      addCheck('Notifications', 'Today Message Count', 
-        `${todayMessages.length} notifications sent today`, 
-        todayMessages.length > 0 ? 'pass' : 'warning',
-        `Message types: ${Object.keys(messagesByType).join(', ')}`
-      );
-    } else {
-      addCheck('Notifications', 'Message Type Collision', 
-        'No messages today to check for collisions', 
-        'skip'
-      );
-      addCheck('Notifications', 'Today Message Count', 
-        'No notifications sent today', 
-        'warning',
-        'Expected at least WOD and Daily Ritual notifications'
-      );
-    }
-
-    // Check notification audit log for today's function executions
-    const { data: auditLogs } = await supabase
-      .from('notification_audit_log')
-      .select('*')
-      .gte('sent_at', todayStart.toISOString())
-      .order('sent_at', { ascending: false });
-
-    if (auditLogs && auditLogs.length > 0) {
-      // Expected daily notifications with UNIQUE message_type identifiers
-      const expectedDaily = [
-        { key: 'wod_notification', patterns: ['WOD', 'Workout of the Day', 'wod_notification'] },
-        { key: 'daily_ritual', patterns: ['Ritual', 'Daily Smarty Ritual', 'daily_ritual'] },
-      ];
-
-      // Check if today is Monday for weekly motivation
-      const isMonday = new Date().getDay() === 1;
-      if (isMonday) {
-        expectedDaily.push({ key: 'motivational_weekly', patterns: ['Monday Motivation', 'Motivational', 'motivational_weekly'] });
-        expectedDaily.push({ key: 'weekly_activity_report', patterns: ['Weekly Activity', 'Activity Report', 'weekly_activity_report'] });
-      }
-
-      for (const expected of expectedDaily) {
-        // Check both message_type and subject patterns, including 'morning_notification' as alt type for WOD
-        const found = auditLogs.some(log => {
-          // Direct message_type match
-          if (log.message_type?.toLowerCase() === expected.key.toLowerCase()) return true;
-          
-          // Check alternate types (WOD can be 'morning_notification' with new architecture)
-          if (expected.key === 'wod_notification' && log.message_type === 'morning_notification') return true;
-          
-          // Subject pattern match
-          return expected.patterns.some(pattern => 
-            log.subject?.toLowerCase().includes(pattern.toLowerCase())
-          );
-        });
-
-        if (expected.key === 'motivational_weekly' && isMonday) {
-          addCheck('Notifications', 'Monday Motivation Sent', 
-            'Weekly motivation should be sent on Mondays', 
-            found ? 'pass' : 'fail',
-            found ? 'Sent successfully' : 'NOT SENT! Check if another notification blocked it with same message_type'
-          );
-        } else if (expected.key === 'weekly_activity_report' && isMonday) {
-          addCheck('Notifications', 'Weekly Activity Report Sent', 
-            'Activity reports should be sent on Mondays', 
-            found ? 'pass' : 'warning',
-            found ? 'Sent successfully' : 'Not sent yet (scheduled at 07:00 UTC)'
-          );
-        } else if (expected.key === 'wod_notification') {
-          addCheck('Notifications', 'WOD Notification Sent', 
-            'Daily WOD notification should be sent', 
-            found ? 'pass' : 'fail',
-            found ? 'Found in audit log (wod_notification or morning_notification)' : 'NOT FOUND in audit log! Check morning notification schedule.'
-          );
-        } else if (expected.key === 'daily_ritual') {
-          addCheck('Notifications', 'Daily Ritual Notification Sent', 
-            'Daily Ritual notification should be sent', 
-            found ? 'pass' : 'warning',
-            found ? 'Found in audit log' : 'Not found in audit log'
-          );
-        }
-      }
-
-      // Check for dual-channel delivery - count dashboard messages separately from emails
-      // Dashboard = user_system_messages created today
-      // Email = audit log entries with recipient_count > 0 (indicates emails were sent)
-      const dashboardMessageCount = todayMessages?.length || 0;
-      const emailsSentCount = auditLogs.filter(l => (l.recipient_count || 0) > 0).length;
-
-      addCheck('Notifications', 'Dual-Channel Delivery', 
-        'Notifications sent via both dashboard and email', 
-        dashboardMessageCount > 0 && emailsSentCount > 0 ? 'pass' : 'warning',
-        `Dashboard messages: ${dashboardMessageCount}, Email sends in audit: ${emailsSentCount}`
-      );
-
-      // Check for failed sends
-      const failedSends = auditLogs.filter(l => l.failed_count && l.failed_count > 0);
-      addCheck('Notifications', 'Send Failures', 
-        'Check for failed notification sends', 
-        failedSends.length === 0 ? 'pass' : 'warning',
-        failedSends.length === 0 ? 'No failures today' : `${failedSends.length} notifications had failures`
-      );
-
-    } else {
-      addCheck('Notifications', 'Audit Log Activity', 
-        'No notification audit logs today', 
-        'warning',
-        'Expected logs from WOD, Ritual, and other scheduled notifications'
-      );
-    }
-
-    // ============================================
-    // CATEGORY 13: EDGE FUNCTIONS (10 checks)
+    // CATEGORY 14: EDGE FUNCTIONS
     // ============================================
     console.log("⚡ Checking edge functions...");
 
@@ -1169,11 +1098,8 @@ const handler = async (req: Request): Promise<Response> => {
         await resend.emails.send({
           from: "SmartyGym System <notifications@smartygym.com>",
           to: [adminEmail],
-          subject: `🏥 Your Website Daily Audit - ${new Date().toLocaleDateString('en-GB')} ${statusEmoji}`,
+          subject: `${statusEmoji} SmartyGym Health Audit: ${statusText}`,
           html: emailHtml,
-          headers: {
-            "Reply-To": "admin@smartygym.com"
-          }
         });
 
         console.log(`📧 Audit email sent to ${adminEmail}`);
@@ -1184,14 +1110,14 @@ const handler = async (req: Request): Promise<Response> => {
 
     return new Response(JSON.stringify(result), {
       status: 200,
-      headers: { "Content-Type": "application/json", ...corsHeaders },
+      headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
 
   } catch (error) {
     console.error("❌ Audit failed:", error);
     return new Response(JSON.stringify({ error: String(error) }), {
       status: 500,
-      headers: { "Content-Type": "application/json", ...corsHeaders },
+      headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
   }
 };
