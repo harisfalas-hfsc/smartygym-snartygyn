@@ -237,7 +237,7 @@ const App = () => (
     <ThemeProvider 
       attribute="class" 
       defaultTheme="dark" 
-      storageKey="smartygym-theme"
+      storageKey=""
       enableSystem={false}
     >
       <DeviceThemeDefault />
