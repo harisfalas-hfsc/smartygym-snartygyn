@@ -104,7 +104,7 @@ export const LogBookCharts = ({ userId, filter }: LogBookChartsProps) => {
                       <Cell key={`cell-${index}`} fill={COLORS[entry.name as keyof typeof COLORS] || '#9CA3AF'} />
                     ))}
                   </Pie>
-                  <Tooltip />
+                  <Tooltip contentStyle={{ backgroundColor: 'hsl(var(--card))', border: '1px solid hsl(var(--border))', borderRadius: '8px', color: 'hsl(var(--card-foreground))' }} />
                 </PieChart>
               </ResponsiveContainer>
               
@@ -153,7 +153,7 @@ export const LogBookCharts = ({ userId, filter }: LogBookChartsProps) => {
                   height={50}
                 />
                 <YAxis tick={{ fontSize: 10 }} />
-                <Tooltip />
+                <Tooltip contentStyle={{ backgroundColor: 'hsl(var(--card))', border: '1px solid hsl(var(--border))', borderRadius: '8px', color: 'hsl(var(--card-foreground))' }} />
                 <Bar dataKey="count" fill="hsl(var(--primary))" name="Activities" />
               </BarChart>
             </ResponsiveContainer>

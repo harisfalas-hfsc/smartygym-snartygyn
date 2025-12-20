@@ -886,7 +886,7 @@ export default function CalculatorHistory() {
                     <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
                     <XAxis dataKey="date" className="text-xs" />
                     <YAxis className="text-xs" />
-                    <Tooltip />
+                    <Tooltip contentStyle={{ backgroundColor: 'hsl(var(--card))', border: '1px solid hsl(var(--border))', borderRadius: '8px', color: 'hsl(var(--card-foreground))' }} />
                     <Legend />
                     <Line type="monotone" dataKey="bmr" stroke="hsl(var(--primary))" strokeWidth={2.5} name="BMR (cal)" dot={{ r: 3 }} activeDot={{ r: 5 }} />
                     <Line type="monotone" dataKey="weight" stroke="hsl(var(--muted-foreground))" strokeWidth={2.5} strokeDasharray="8 4" name="Weight (kg)" dot={{ r: 3 }} activeDot={{ r: 5 }} />
@@ -1245,7 +1245,7 @@ export default function CalculatorHistory() {
                     <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
                     <XAxis dataKey="date" className="text-xs" />
                     <YAxis className="text-xs" />
-                    <Tooltip />
+                    <Tooltip contentStyle={{ backgroundColor: 'hsl(var(--card))', border: '1px solid hsl(var(--border))', borderRadius: '8px', color: 'hsl(var(--card-foreground))' }} />
                     <Legend />
                     {(selectedMeasurementTypes.length === 0 || selectedMeasurementTypes.includes("Weight")) && (
                       <Line type="monotone" dataKey="weight" stroke="hsl(var(--primary))" strokeWidth={2.5} name="Weight (kg)" dot={{ r: 3 }} activeDot={{ r: 5 }} />

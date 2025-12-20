@@ -489,7 +489,7 @@ export function MyRecordsReport({ userId }: MyRecordsReportProps) {
       </div>
 
       {/* Report Content */}
-      <div ref={reportRef} className="bg-white p-6 rounded-lg">
+      <div ref={reportRef} className={`p-6 rounded-lg ${exporting ? 'bg-white' : 'bg-card'}`}>
         {/* Header with Logo - Only visible during export */}
         <div className={`text-center mb-8 ${exporting ? '' : 'hidden'}`} id="export-header">
           <img 

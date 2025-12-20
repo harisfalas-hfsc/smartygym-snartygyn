@@ -719,11 +719,11 @@ export const UserMessagesPanel = () => {
       <Tabs defaultValue="all" className="w-full" onValueChange={setActiveTab}>
         {/* Header row with tabs, filter, and bulk actions */}
         <div className="flex flex-col sm:flex-row sm:items-center gap-3 mb-4">
-          <TabsList className="w-full sm:w-auto grid grid-cols-4">
-            <TabsTrigger value="all">All ({contactMessages.length + systemMessages.length})</TabsTrigger>
-            <TabsTrigger value="system">System ({systemMessages.length})</TabsTrigger>
-            <TabsTrigger value="contact">My Requests ({contactMessages.length})</TabsTrigger>
-            <TabsTrigger value="subscriptions" className="gap-1">
+          <TabsList className="w-full sm:w-auto grid grid-cols-4 gap-1">
+            <TabsTrigger value="all" className="text-xs sm:text-sm px-2 sm:px-3">All ({contactMessages.length + systemMessages.length})</TabsTrigger>
+            <TabsTrigger value="system" className="text-xs sm:text-sm px-2 sm:px-3">System ({systemMessages.length})</TabsTrigger>
+            <TabsTrigger value="contact" className="text-xs sm:text-sm px-1.5 sm:px-3">Requests ({contactMessages.length})</TabsTrigger>
+            <TabsTrigger value="subscriptions" className="text-xs sm:text-sm px-2 sm:px-3 gap-1">
               <Settings2 className="h-3 w-3" />
               <span className="hidden sm:inline">Settings</span>
             </TabsTrigger>
