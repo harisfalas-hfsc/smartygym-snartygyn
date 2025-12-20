@@ -31,6 +31,12 @@ export const Footer = () => {
           
           {/* Legal Links */}
           <div className="flex flex-wrap items-center justify-center gap-x-3 gap-y-2 md:gap-4 text-sm text-muted-foreground">
+            <button onClick={() => navigate("/human-performance")} className="hidden md:block hover:text-primary transition-colors">
+              Why SmartyGym
+            </button>
+            <button onClick={() => navigate("/corporate-wellness")} className="hidden md:block hover:text-primary transition-colors">
+              Why Smarty Corporate
+            </button>
             <button onClick={() => navigate("/smarty-plans")} className="hidden md:block hover:text-primary transition-colors">
               Smarty Plans
             </button>
@@ -43,7 +49,7 @@ export const Footer = () => {
             <button onClick={() => navigate("/disclaimer")} className="hover:text-primary transition-colors">
               Disclaimer
             </button>
-            <button onClick={() => navigate("/contact")} className="hover:text-primary transition-colors">
+            <button onClick={() => navigate("/contact")} className="hidden md:block hover:text-primary transition-colors">
               Contact
             </button>
           </div>
