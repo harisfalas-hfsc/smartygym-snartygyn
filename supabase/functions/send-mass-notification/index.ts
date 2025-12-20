@@ -205,17 +205,8 @@ serve(async (req) => {
           continue;
         }
 
-        // Check notification preferences
-        const { data: preferences } = await supabaseAdmin
-          .from('notification_preferences')
-          .select('newsletter')
-          .eq('user_id', recipient.user_id)
-          .single();
-
-        if (preferences && !preferences.newsletter) {
-          console.log('[MASS-NOTIFICATION] User opted out of emails:', recipient.user_id);
-          continue;
-        }
+        // Admin messages ALWAYS get delivered - no preference checking
+        // This is a high-priority system message from admin
 
         // Send email with headers and footer
         const emailResult = await resend.emails.send({
@@ -233,6 +224,20 @@ serve(async (req) => {
           emailsSent++;
           // Rate limiting: 600ms delay to respect Resend's 2 requests/second limit
           await new Promise(resolve => setTimeout(resolve, 600));
+        }
+
+        // Trigger push notification for admin message (bypasses preferences)
+        try {
+          await supabaseAdmin.functions.invoke('send-push-notification', {
+            body: {
+              user_id: recipient.user_id,
+              title: finalSubject,
+              body: finalContent.substring(0, 200),
+              is_admin_message: true, // High priority - bypasses all preferences
+            }
+          });
+        } catch (pushError) {
+          console.error('[MASS-NOTIFICATION] Push notification error (non-blocking):', pushError);
         }
       } catch (emailError) {
         console.error('[MASS-NOTIFICATION] Email send error:', emailError);
