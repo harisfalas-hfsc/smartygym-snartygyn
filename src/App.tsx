@@ -48,6 +48,7 @@ import FAQ from "./pages/FAQ";
 import CoachProfile from "./pages/CoachProfile";
 import CoachCV from "./pages/CoachCV";
 import Contact from "./pages/Contact";
+import TakeATour from "./pages/TakeATour";
 import Shop from "./pages/Shop";
 import TableTest from "./pages/TableTest";
 import PrivacyPolicy from "./pages/PrivacyPolicy";
@@ -208,6 +209,7 @@ const AppContent = () => {
                 {/* Public routes */}
                 
                 <Route path="/community" element={<Community />} />
+                <Route path="/takeatour" element={<TakeATour />} />
                 <Route path="/contact" element={<Contact />} />
                 <Route path="/payment-success" element={<PaymentSuccess />} />
                 <Route path="/privacy-policy" element={<PrivacyPolicy />} />
