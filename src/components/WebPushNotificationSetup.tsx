@@ -1,9 +1,10 @@
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { Bell, BellOff, X } from "lucide-react";
+import { Bell, BellOff, X, AlertTriangle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import { useNavigate } from "react-router-dom";
 
 const VAPID_PUBLIC_KEY = "BPOeA3m7ZLLZ3gwvMVPpU7t-0dUoH0YQ3F8CJ4j8d2YKxBgN9xQZY8P5U_g9M0XKm7zHvLJC1pwKL8yLH7kKH6o";
 
@@ -12,6 +13,8 @@ export const WebPushNotificationSetup = () => {
   const [isSubscribed, setIsSubscribed] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [permissionState, setPermissionState] = useState<NotificationPermission | null>(null);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const navigate = useNavigate();
 
   useEffect(() => {
     checkNotificationStatus();
@@ -37,62 +40,69 @@ export const WebPushNotificationSetup = () => {
     setPermissionState(permission);
     console.log("[WebPush] Current permission state:", permission);
 
-    // If permission already denied, don't show prompt
-    if (permission === "denied") {
-      console.log("[WebPush] ⚠️ Permission denied by user, not showing prompt");
+    // Check if user dismissed prompt today
+    const dismissedKey = `push_prompt_dismissed_${new Date().toISOString().split('T')[0]}`;
+    if (localStorage.getItem(dismissedKey) === "true") {
+      console.log("[WebPush] ⚠️ User dismissed prompt today, not showing");
+      dispatchPushComplete();
       return;
     }
 
     // Check if user is logged in
     const { data: { user } } = await supabase.auth.getUser();
-    if (!user) {
-      console.log("[WebPush] ⚠️ No user logged in, not showing prompt");
-      return;
-    }
-    console.log("[WebPush] ✅ User logged in:", user.id);
+    setIsLoggedIn(!!user);
+    
+    if (user) {
+      console.log("[WebPush] ✅ User logged in:", user.id);
 
-    // Check if already subscribed
-    const { data: existingSubscription, error: subError } = await supabase
-      .from("push_subscriptions")
-      .select("id")
-      .eq("user_id", user.id)
-      .eq("is_active", true)
-      .maybeSingle();
+      // Check if already subscribed
+      const { data: existingSubscription, error: subError } = await supabase
+        .from("push_subscriptions")
+        .select("id")
+        .eq("user_id", user.id)
+        .eq("is_active", true)
+        .maybeSingle();
 
-    if (subError) {
-      console.log("[WebPush] ⚠️ Error checking subscription:", subError.message);
-    }
+      if (subError) {
+        console.log("[WebPush] ⚠️ Error checking subscription:", subError.message);
+      }
 
-    if (existingSubscription) {
-      console.log("[WebPush] ✅ User already has active subscription:", existingSubscription.id);
-      setIsSubscribed(true);
-      return;
-    }
-    console.log("[WebPush] ℹ️ No active subscription found");
-
-    // Show prompt if permission is default (not yet asked)
-    if (permission === "default") {
-      // Check if user dismissed prompt today
-      const dismissedKey = `push_prompt_dismissed_${new Date().toISOString().split('T')[0]}`;
-      if (localStorage.getItem(dismissedKey) === "true") {
-        console.log("[WebPush] ⚠️ User dismissed prompt today, not showing");
+      if (existingSubscription) {
+        console.log("[WebPush] ✅ User already has active subscription:", existingSubscription.id);
+        setIsSubscribed(true);
+        dispatchPushComplete();
         return;
       }
-      
-      console.log("[WebPush] ✅ Will show prompt in 5 seconds...");
-      // Delay showing prompt
-      setTimeout(() => {
-        console.log("[WebPush] 🔔 Showing push notification prompt now");
-        setShowPrompt(true);
-      }, 5000);
-    } else if (permission === "granted") {
-      // Permission granted but no subscription - try to subscribe
-      console.log("[WebPush] ℹ️ Permission granted but no subscription, will show prompt to complete setup");
-      setTimeout(() => setShowPrompt(true), 5000);
+      console.log("[WebPush] ℹ️ No active subscription found");
+    } else {
+      console.log("[WebPush] ⚠️ No user logged in - will show prompt with login nudge");
     }
+
+    // Show prompt immediately (for denied state, logged out, or default permission)
+    console.log("[WebPush] 🔔 Showing push notification prompt now");
+    setShowPrompt(true);
+  };
+
+  const dispatchPushComplete = () => {
+    // Dispatch event to let PWA install prompt know it can show
+    window.dispatchEvent(new CustomEvent('push-prompt-complete'));
   };
 
   const handleEnableNotifications = async () => {
+    // If not logged in, redirect to auth
+    if (!isLoggedIn) {
+      toast.info("Please log in to enable push notifications");
+      handleDismiss();
+      navigate("/auth");
+      return;
+    }
+
+    // If permission denied, show instructions
+    if (permissionState === "denied") {
+      toast.info("Click the lock/info icon in your browser's address bar to allow notifications");
+      return;
+    }
+
     setIsLoading(true);
     console.log("[WebPush] 🔔 User clicked Enable Notifications");
     
@@ -116,6 +126,7 @@ export const WebPushNotificationSetup = () => {
       if (permission !== "granted") {
         toast.error("Notification permission denied");
         setShowPrompt(false);
+        dispatchPushComplete();
         return;
       }
 
@@ -155,6 +166,7 @@ export const WebPushNotificationSetup = () => {
 
       setIsSubscribed(true);
       setShowPrompt(false);
+      dispatchPushComplete();
       toast.success("Notifications enabled! You'll be notified when you have new messages.");
     } catch (error) {
       console.error("Error enabling notifications:", error);
@@ -168,14 +180,52 @@ export const WebPushNotificationSetup = () => {
     const dismissedKey = `push_prompt_dismissed_${new Date().toISOString().split('T')[0]}`;
     localStorage.setItem(dismissedKey, "true");
     setShowPrompt(false);
+    dispatchPushComplete();
   };
 
   if (!showPrompt || isSubscribed) {
     return null;
   }
 
+  // Show denied state with instructions
+  if (permissionState === "denied") {
+    return (
+      <div className="fixed bottom-4 left-4 right-4 sm:left-auto sm:right-4 sm:max-w-sm z-[100] animate-fade-in">
+        <Card className="border-destructive/40 shadow-lg">
+          <CardContent className="p-4">
+            <div className="flex items-start gap-3">
+              <div className="p-2 rounded-full bg-destructive/10 shrink-0">
+                <BellOff className="h-5 w-5 text-destructive" />
+              </div>
+              <div className="flex-1 min-w-0">
+                <h4 className="font-semibold text-sm mb-1">Notifications Blocked</h4>
+                <p className="text-xs text-muted-foreground mb-3">
+                  To enable notifications, click the lock/info icon in your browser's address bar and allow notifications for this site.
+                </p>
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={handleDismiss}
+                  className="text-xs"
+                >
+                  Got it
+                </Button>
+              </div>
+              <button
+                onClick={handleDismiss}
+                className="p-1 hover:bg-muted rounded-full transition-colors shrink-0"
+              >
+                <X className="h-4 w-4 text-muted-foreground" />
+              </button>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
   return (
-    <div className="fixed bottom-4 left-4 right-4 sm:left-auto sm:right-4 sm:max-w-sm z-50 animate-slide-up">
+    <div className="fixed bottom-4 left-4 right-4 sm:left-auto sm:right-4 sm:max-w-sm z-[100] animate-fade-in">
       <Card className="border-primary/40 shadow-lg">
         <CardContent className="p-4">
           <div className="flex items-start gap-3">
@@ -185,7 +235,9 @@ export const WebPushNotificationSetup = () => {
             <div className="flex-1 min-w-0">
               <h4 className="font-semibold text-sm mb-1">Enable Notifications</h4>
               <p className="text-xs text-muted-foreground mb-3">
-                Get notified when you have new messages in your dashboard.
+                {isLoggedIn 
+                  ? "Get notified when you have new messages in your dashboard."
+                  : "Log in to receive workout reminders and important updates."}
               </p>
               <div className="flex gap-2">
                 <Button
@@ -194,7 +246,7 @@ export const WebPushNotificationSetup = () => {
                   disabled={isLoading}
                   className="text-xs"
                 >
-                  {isLoading ? "Enabling..." : "Enable"}
+                  {isLoading ? "Enabling..." : isLoggedIn ? "Enable" : "Log in to Enable"}
                 </Button>
                 <Button
                   size="sm"

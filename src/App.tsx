@@ -98,8 +98,8 @@ const AppContent = () => {
     <>
       <LoadingBar />
       <CookieConsent />
-      <InstallPWA />
       <WebPushNotificationSetup />
+      <InstallPWA waitForPushPrompt={true} />
       <AccessControlProvider>
         <AnnouncementManager />
         <ScrollToTop />
