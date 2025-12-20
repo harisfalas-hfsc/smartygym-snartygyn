@@ -108,6 +108,14 @@ const FAQ = () => {
                   "@type": "Answer",
                   "text": "Smarty Check-ins is a daily self-assessment feature helping you track wellness and stay accountable. Complete Morning Check-ins (6-9 AM) rating sleep, energy, and motivation, and Night Check-ins (6-9 PM) reflecting on nutrition, hydration, and stress. Each generates a Daily Smarty Score (0-100) to track progress, build streaks, and earn badges."
                 }
+              },
+              {
+                "@type": "Question",
+                "name": "How can I track my progress and stay accountable?",
+                "acceptedAnswer": {
+                  "@type": "Answer",
+                  "text": "SmartyGym offers a complete fitness tracking ecosystem through your personal LogBook and Goals system. Set personal targets for weight, body fat, and muscle mass with visual progress indicators. Your LogBook automatically tracks workouts, training programs, favorites, calculator records, and body measurements. View activity trends through interactive charts, export your data, and receive automated weekly progress reports. Your daily Smarty Check-in scores appear on the LogBook calendar, helping you see the connection between daily habits and training results."
+                }
               }
             ]
           })}
@@ -265,6 +273,32 @@ const FAQ = () => {
                       Absolutely. Results come from consistency, proper programming, and progressive overload — not from expensive equipment or gym memberships. 
                       Our home-based workouts are designed using the same science-based principles as gym-based training. Whether you're using bodyweight, 
                       resistance bands, or a pair of dumbbells, you can build strength, lose fat, improve fitness, and reach your goals with the right guidance.
+                    </AccordionContent>
+                  </AccordionItem>
+
+                  <AccordionItem value="item-7c">
+                    <AccordionTrigger className="text-left">How can I track my progress and stay accountable?</AccordionTrigger>
+                    <AccordionContent className="py-2 leading-relaxed">
+                      SmartyGym offers a complete fitness tracking ecosystem through your personal <a href="/logbook" className="text-primary hover:underline font-medium">LogBook</a> and Goals system.<br/><br/>
+                      
+                      <strong>🎯 Set Your Goals:</strong> Define personal targets — weight, body fat percentage, muscle mass — with optional target dates. 
+                      Track your progress visually with intuitive progress bars and see how close you are to achieving your goals.<br/><br/>
+                      
+                      <strong>📓 Your Personal LogBook:</strong> Your LogBook automatically tracks everything: workouts completed, training programs in progress, 
+                      favorited content, calculator records (1RM, BMR, Macros), and body measurements. It's your complete fitness journal — all in one place.<br/><br/>
+                      
+                      <strong>📊 Visual Analytics & Export:</strong> View activity trends and distribution through interactive charts. Filter by activity type, 
+                      time period, or specific categories. Export your data and charts for deeper analysis or to share with your coach.<br/><br/>
+                      
+                      <strong>📧 Weekly Progress Reports:</strong> Receive automated weekly summaries of your training activity, consistency, and progress 
+                      directly to your inbox — keeping you informed and motivated.<br/><br/>
+                      
+                      <strong>✅ Integrated Check-ins:</strong> Your daily <a href="/userdashboard?tab=checkins" className="text-primary hover:underline font-medium">Smarty Check-in</a> scores 
+                      appear on the LogBook calendar with color-coded indicators, helping you see the connection between your daily habits (sleep, nutrition, stress) 
+                      and your training results.<br/><br/>
+                      
+                      The LogBook ecosystem is designed to keep you motivated, accountable, and fully aware of your progress — not just during workouts, 
+                      but throughout your entire health and fitness journey.
                     </AccordionContent>
                   </AccordionItem>
 
