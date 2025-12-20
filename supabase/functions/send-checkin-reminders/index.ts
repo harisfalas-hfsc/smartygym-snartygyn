@@ -180,6 +180,24 @@ serve(async (req: Request) => {
 
     console.log(`Check-in reminders complete: ${dashboardCount} dashboard, ${sentCount} emails sent, ${failedCount} failed`);
 
+    // Log to notification_audit_log for health audit tracking
+    await supabase.from('notification_audit_log').insert({
+      notification_type: MESSAGE_TYPES.CHECKIN_REMINDER,
+      message_type: MESSAGE_TYPES.CHECKIN_REMINDER,
+      recipient_count: usersForDashboard.length + usersForEmail.length,
+      success_count: dashboardCount + sentCount,
+      failed_count: failedCount,
+      subject: `${reminderIcon} ${reminderType === 'morning' ? 'Morning' : 'Night'} Check-in Reminder`,
+      content: `Check-in reminders sent - ${sentCount} emails, ${dashboardCount} dashboard messages`,
+      sent_at: new Date().toISOString(),
+      metadata: {
+        reminderType,
+        dashboardCount,
+        sentCount,
+        failedCount,
+      }
+    });
+
     return new Response(JSON.stringify({ 
       success: true, 
       reminderType,

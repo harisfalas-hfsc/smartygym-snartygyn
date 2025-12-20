@@ -610,12 +610,12 @@ const handler = async (req: Request): Promise<Response> => {
         'Resend API is configured'
       );
       
-      // Count email templates
+      // Count automated message templates (the actual templates used by the system)
       const { count: templateCount } = await supabase
-        .from('email_templates')
+        .from('automated_message_templates')
         .select('*', { count: 'exact', head: true });
       
-      addCheck('Email System', 'Email Templates', `${templateCount || 0} email templates configured`, 
+      addCheck('Email System', 'Email Templates', `${templateCount || 0} automated message templates configured`, 
         (templateCount || 0) > 0 ? 'pass' : 'warning'
       );
       
