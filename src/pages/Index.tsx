@@ -54,13 +54,17 @@ const Index = () => {
     queryFn: async () => {
       const { data } = await supabase
         .from("admin_workouts")
-        .select("id, name, category, format, difficulty_stars, duration")
+        .select("id, name, category, format, difficulty_stars, duration, image_url, equipment")
         .eq("is_workout_of_day", true)
         .limit(2);
       return data || [];
     },
     staleTime: 1000 * 60 * 5,
   });
+
+  // Separate bodyweight and equipment WODs
+  const bodyweightWod = mobileWods?.find(w => w.equipment?.toLowerCase() === 'none' || w.equipment?.toLowerCase() === 'bodyweight');
+  const equipmentWod = mobileWods?.find(w => w.equipment?.toLowerCase() !== 'none' && w.equipment?.toLowerCase() !== 'bodyweight');
 
   // Rotate mobile WOD every 3 seconds
   useEffect(() => {
@@ -494,48 +498,79 @@ const Index = () => {
 
         {/* Quick Access Menu */}
         <div className="mt-8 space-y-3">
-          {/* WOD Card - rotates every 3 seconds */}
-          {currentMobileWod && (
+          {/* WOD Card - Double size with both workout images */}
+          {mobileWods && mobileWods.length > 0 && (
             <div 
               onClick={() => navigate('/workout/wod')} 
-              className="flex items-center gap-2.5 py-2 px-4 bg-primary/5 border-2 border-emerald-400 dark:border-emerald-500 rounded-lg hover:border-emerald-500 dark:hover:border-emerald-400 transition-all cursor-pointer hover:shadow-md"
+              className="py-3 px-4 bg-primary/5 border-2 border-emerald-400 dark:border-emerald-500 rounded-lg hover:border-emerald-500 dark:hover:border-emerald-400 transition-all cursor-pointer hover:shadow-md"
             >
-              <Dumbbell className="w-5 h-5 text-primary flex-shrink-0" />
-              <div 
-                key={currentMobileWod.id} 
-                className="flex-1 animate-fade-in"
-              >
+              {/* Header */}
+              <div className="flex items-center gap-2 mb-3">
+                <Dumbbell className="w-5 h-5 text-primary flex-shrink-0" />
                 <span className="text-sm font-bold text-foreground">Your Workout of the Day</span>
-                <p className="text-base font-semibold text-foreground">{currentMobileWod.name}</p>
-                <div className="flex items-center gap-1 text-[10px] mt-0.5 flex-wrap">
-                  {currentMobileWod.category && (
-                    <span className="text-red-600 dark:text-red-400 font-medium">{currentMobileWod.category}</span>
-                  )}
-                  {currentMobileWod.format && (
-                    <>
-                      <span className="text-muted-foreground">•</span>
-                      <span className="text-blue-600 dark:text-blue-400 font-medium">{currentMobileWod.format}</span>
-                    </>
-                  )}
-                  {currentMobileWod.difficulty_stars && (
-                    <>
-                      <span className="text-muted-foreground">•</span>
-                      <span className="flex items-center gap-0.5">
-                        {Array.from({ length: currentMobileWod.difficulty_stars }, (_, i) => (
-                          <Star key={i} className="w-2.5 h-2.5 fill-primary text-primary" />
-                        ))}
-                      </span>
-                    </>
-                  )}
-                  {currentMobileWod.duration && (
-                    <>
-                      <span className="text-muted-foreground">•</span>
-                      <span className="text-muted-foreground">{currentMobileWod.duration}</span>
-                    </>
-                  )}
-                </div>
+                <ChevronRight className="w-5 h-5 ml-auto text-muted-foreground" />
               </div>
-              <ChevronRight className="w-5 h-5 ml-auto text-muted-foreground" />
+              
+              {/* Two workout images side by side */}
+              <div className="grid grid-cols-2 gap-3">
+                {/* Bodyweight workout */}
+                {bodyweightWod && (
+                  <div 
+                    className={cn(
+                      "relative rounded-lg overflow-hidden transition-all duration-300",
+                      mobileWodIndex === 0 && "ring-2 ring-primary scale-[1.02]"
+                    )}
+                  >
+                    <img 
+                      src={bodyweightWod.image_url || '/placeholder.svg'} 
+                      alt={bodyweightWod.name}
+                      className="w-full h-24 object-cover"
+                    />
+                    <Badge className="absolute top-1 left-1 bg-green-500 hover:bg-green-500 text-white text-[10px] px-1.5 py-0.5">No Equipment</Badge>
+                    <div className="p-2 bg-background/90">
+                      <p className="text-xs font-semibold line-clamp-1">{bodyweightWod.name}</p>
+                      <div className="flex items-center gap-1 text-[9px] text-muted-foreground">
+                        <span className="text-red-500">{bodyweightWod.category}</span>
+                        {bodyweightWod.format && (
+                          <>
+                            <span>•</span>
+                            <span>{bodyweightWod.format}</span>
+                          </>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                )}
+                
+                {/* Equipment workout */}
+                {equipmentWod && (
+                  <div 
+                    className={cn(
+                      "relative rounded-lg overflow-hidden transition-all duration-300",
+                      mobileWodIndex === 1 && "ring-2 ring-primary scale-[1.02]"
+                    )}
+                  >
+                    <img 
+                      src={equipmentWod.image_url || '/placeholder.svg'} 
+                      alt={equipmentWod.name}
+                      className="w-full h-24 object-cover"
+                    />
+                    <Badge className="absolute top-1 left-1 bg-orange-500 hover:bg-orange-500 text-white text-[10px] px-1.5 py-0.5">With Equipment</Badge>
+                    <div className="p-2 bg-background/90">
+                      <p className="text-xs font-semibold line-clamp-1">{equipmentWod.name}</p>
+                      <div className="flex items-center gap-1 text-[9px] text-muted-foreground">
+                        <span className="text-red-500">{equipmentWod.category}</span>
+                        {equipmentWod.format && (
+                          <>
+                            <span>•</span>
+                            <span>{equipmentWod.format}</span>
+                          </>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </div>
             </div>
           )}
 
