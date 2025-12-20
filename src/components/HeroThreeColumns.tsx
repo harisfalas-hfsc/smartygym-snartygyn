@@ -94,13 +94,13 @@ export const HeroThreeColumns = () => {
     setIsVisible(true);
   }, []);
 
-  // Fetch both WODs for the banner
+  // Fetch both WODs for the banner with full card data
   const { data: wods } = useQuery({
     queryKey: ["wod-hero-banner"],
     queryFn: async () => {
       const { data } = await supabase
         .from("admin_workouts")
-        .select("id, name, category, focus, difficulty_stars, duration")
+        .select("id, name, category, focus, difficulty_stars, duration, image_url, equipment, is_premium")
         .eq("is_workout_of_day", true)
         .limit(2);
       return data || [];
@@ -108,12 +108,12 @@ export const HeroThreeColumns = () => {
     staleTime: 1000 * 60 * 5,
   });
 
-  // Rotate between WODs every 2 seconds
+  // Rotate between WODs every 2.5 seconds
   useEffect(() => {
     if (wods && wods.length > 1) {
       const interval = setInterval(() => {
         setCurrentWodIndex((prev) => (prev === 0 ? 1 : 0));
-      }, 2000);
+      }, 2500);
       return () => clearInterval(interval);
     }
   }, [wods]);
@@ -235,62 +235,81 @@ export const HeroThreeColumns = () => {
       <div className="pt-8">
         <div 
           onClick={() => navigate("/workout/wod")}
-          className="cursor-pointer group border-2 border-green-500 rounded-xl p-4 
+          className="cursor-pointer group border-2 border-green-500 rounded-xl 
                      hover:border-primary hover:shadow-xl hover:scale-105 hover:-translate-y-1 
                      transition-all duration-300
-                     flex flex-col items-center h-[220px] w-[250px] overflow-hidden"
+                     flex flex-col h-[220px] w-[250px] overflow-hidden"
         >
-          {/* Gold Circle with Dumbbell */}
-          <div className="relative">
-            <div className="w-14 h-14 rounded-full 
-                            flex items-center justify-center shadow-md
-                            group-hover:scale-110 transition-transform duration-300
-                            ring-2 ring-red-500 dark:ring-red-400 ring-offset-2 ring-offset-background">
-              <Dumbbell className="w-7 h-7 text-primary" />
-            </div>
-            
-            {/* Glow effect */}
-            <div className="absolute inset-0 w-14 h-14 rounded-full bg-primary/10 blur-xl -z-10" />
+          {/* Header: Workout of the Day with icon */}
+          <div className="flex items-center justify-center gap-2 py-2 bg-gradient-to-r from-green-500/10 to-primary/10 border-b border-green-500/30">
+            <Dumbbell className="w-4 h-4 text-primary" />
+            <span className="text-xs font-bold text-primary uppercase tracking-wide">Workout of the Day</span>
           </div>
           
-          {/* Title */}
-          <h3 className="text-base font-bold text-primary text-center mt-3 group-hover:underline transition-all">
-            Workout of the Day
-          </h3>
-          
-          {/* WOD Details - rotates between WODs */}
+          {/* WOD Card Content - rotates between WODs */}
           {currentWod && (
             <div 
               key={currentWod.id}
-              className="mt-2 text-center space-y-1 animate-fade-in h-[70px]"
+              className="flex-1 flex flex-col animate-fade-in"
             >
-              <p className="text-sm font-semibold text-foreground line-clamp-2 max-w-[200px] leading-tight h-[36px]">{currentWod.name}</p>
-              <div className="flex items-center justify-center gap-1 text-xs text-muted-foreground flex-wrap">
-                {currentWod.category && <span className="text-red-600 dark:text-red-400 font-medium">{currentWod.category}</span>}
-                <span>•</span>
-                <span className="text-blue-600 dark:text-blue-400 font-medium">{currentWod.focus || "General"}</span>
-                {currentWod.difficulty_stars && (
-                  <>
-                    <span>•</span>
-                    <span className="flex items-center gap-0.5 text-green-600 dark:text-green-400 font-medium">{renderStars(currentWod.difficulty_stars)}</span>
-                  </>
+              {/* Image Section */}
+              <div className="relative h-[100px] overflow-hidden">
+                <img 
+                  src={currentWod.image_url || "/placeholder.svg"} 
+                  alt={currentWod.name}
+                  className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                />
+                {/* Equipment Badge */}
+                <div className="absolute top-2 left-2">
+                  <span className={cn(
+                    "text-[10px] font-bold px-1.5 py-0.5 rounded-full",
+                    currentWod.equipment?.toLowerCase().includes("none") || currentWod.equipment?.toLowerCase().includes("bodyweight")
+                      ? "bg-emerald-500 text-white"
+                      : "bg-blue-500 text-white"
+                  )}>
+                    {currentWod.equipment?.toLowerCase().includes("none") || currentWod.equipment?.toLowerCase().includes("bodyweight") 
+                      ? "Bodyweight" 
+                      : "Equipment"}
+                  </span>
+                </div>
+                {/* Premium Badge */}
+                {currentWod.is_premium && (
+                  <div className="absolute top-2 right-2">
+                    <span className="text-[10px] font-bold px-1.5 py-0.5 rounded-full bg-amber-500 text-white flex items-center gap-0.5">
+                      <Crown className="w-2.5 h-2.5" />
+                      Premium
+                    </span>
+                  </div>
                 )}
-                {currentWod.duration && (
-                  <>
-                    <span>•</span>
-                    <span className="text-purple-600 dark:text-purple-400 font-medium">{currentWod.duration}</span>
-                  </>
-                )}
+              </div>
+              
+              {/* Content Section */}
+              <div className="flex-1 p-2 flex flex-col justify-between">
+                <p className="text-xs font-bold text-foreground line-clamp-1">{currentWod.name}</p>
+                <div className="flex items-center gap-1 text-[10px] text-muted-foreground flex-wrap">
+                  {currentWod.category && <span className="text-red-600 dark:text-red-400 font-medium">{currentWod.category}</span>}
+                  {currentWod.focus && (
+                    <>
+                      <span>•</span>
+                      <span className="text-blue-600 dark:text-blue-400 font-medium">{currentWod.focus}</span>
+                    </>
+                  )}
+                  {currentWod.difficulty_stars && (
+                    <>
+                      <span>•</span>
+                      <span className="flex items-center gap-0.5">{renderStars(currentWod.difficulty_stars)}</span>
+                    </>
+                  )}
+                </div>
+                {/* CTA */}
+                <div className="flex items-center justify-center gap-1 text-primary text-[10px] font-medium 
+                                group-hover:gap-2 transition-all mt-1">
+                  View Today's WOD
+                  <ChevronRight className="w-3 h-3" />
+                </div>
               </div>
             </div>
           )}
-          
-          {/* CTA */}
-          <div className="flex items-center justify-center gap-1 mt-2 text-primary text-sm font-medium 
-                          group-hover:gap-2 transition-all">
-            View Today's WOD
-            <ChevronRight className="w-4 h-4" />
-          </div>
         </div>
       </div>
     </div>
