@@ -49,9 +49,10 @@ export const Footer = () => {
           </div>
           
           {/* Copyright */}
-          <p className="text-center text-sm text-muted-foreground">
-            © 2025 <span className="text-primary font-semibold">SmartyGym</span> - Your Gym Re-imagined. Anywhere, Anytime.
-          </p>
+          <div className="text-center text-sm text-muted-foreground">
+            <p>© 2025 <span className="text-primary font-semibold">SmartyGym</span><span className="hidden md:inline"> - Your Gym Re-imagined. Anywhere, Anytime.</span></p>
+            <p className="md:hidden whitespace-nowrap">Your Gym Re-imagined. Anywhere, Anytime.</p>
+          </div>
         </div>
       </div>
 
