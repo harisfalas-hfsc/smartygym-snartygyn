@@ -266,7 +266,7 @@ export const HeroThreeColumns = () => {
                 )}
               >
                 {/* Image Section */}
-                <div className="relative h-[100px] overflow-hidden bg-muted">
+                <div className="relative h-[130px] overflow-hidden bg-muted">
                   {wod.image_url ? (
                     <img 
                       src={wod.image_url} 
@@ -310,39 +310,38 @@ export const HeroThreeColumns = () => {
                   {/* Workout Name */}
                   <p className="text-xs font-bold text-foreground line-clamp-1">{wod.name}</p>
                   
-                  {/* Type with icon */}
-                  {wod.type && (
-                    <div className="flex items-center gap-1.5 text-[10px]">
-                      <Target className="w-3 h-3 text-primary" />
-                      <span className="text-primary font-semibold uppercase">{wod.type}</span>
-                    </div>
-                  )}
-                  
-                  {/* Category with icon */}
-                  {wod.category && (
-                    <div className="flex items-center gap-1.5 text-[10px]">
-                      <Flame className="w-3 h-3 text-orange-500" />
-                      <span className="text-orange-600 dark:text-orange-400 font-semibold uppercase">{wod.category}</span>
-                    </div>
-                  )}
-                  
-                  {/* Difficulty Level with icon and text label */}
-                  {wod.difficulty_stars && (
-                    <div className="flex items-center gap-1.5 text-[10px]">
-                      <Star className="w-3 h-3 text-yellow-500 fill-yellow-500" />
-                      <span className="text-yellow-600 dark:text-yellow-400 font-semibold uppercase">
-                        {getDifficultyLabel(wod.difficulty_stars)}
-                      </span>
-                    </div>
-                  )}
-                  
-                  {/* Duration with icon */}
-                  {wod.duration && (
-                    <div className="flex items-center gap-1.5 text-[10px]">
-                      <Clock className="w-3 h-3 text-purple-500" />
-                      <span className="text-purple-600 dark:text-purple-400 font-semibold uppercase">{wod.duration}</span>
-                    </div>
-                  )}
+                  {/* Metadata Grid - 2 columns */}
+                  <div className="grid grid-cols-2 gap-x-3 gap-y-0.5">
+                    {/* Row 1: Type + Category */}
+                    {wod.type && (
+                      <div className="flex items-center gap-1 text-[10px]">
+                        <Target className="w-3 h-3 text-primary" />
+                        <span className="text-primary font-semibold uppercase">{wod.type}</span>
+                      </div>
+                    )}
+                    {wod.category && (
+                      <div className="flex items-center gap-1 text-[10px]">
+                        <Flame className="w-3 h-3 text-orange-500" />
+                        <span className="text-orange-600 dark:text-orange-400 font-semibold uppercase">{wod.category}</span>
+                      </div>
+                    )}
+                    
+                    {/* Row 2: Difficulty + Duration */}
+                    {wod.difficulty_stars && (
+                      <div className="flex items-center gap-1 text-[10px]">
+                        <Star className="w-3 h-3 text-yellow-500 fill-yellow-500" />
+                        <span className="text-yellow-600 dark:text-yellow-400 font-semibold uppercase">
+                          {getDifficultyLabel(wod.difficulty_stars)}
+                        </span>
+                      </div>
+                    )}
+                    {wod.duration && (
+                      <div className="flex items-center gap-1 text-[10px]">
+                        <Clock className="w-3 h-3 text-purple-500" />
+                        <span className="text-purple-600 dark:text-purple-400 font-semibold uppercase">{wod.duration}</span>
+                      </div>
+                    )}
+                  </div>
                   
                   {/* CTA */}
                   <div className="flex items-center justify-center gap-1 text-primary text-[10px] font-medium 
