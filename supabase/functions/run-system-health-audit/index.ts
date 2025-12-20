@@ -545,17 +545,17 @@ const handler = async (req: Request): Promise<Response> => {
     // ============================================
     console.log("📬 Checking notification delivery...");
 
-    // Check if push notifications are being triggered
-    const { data: recentPushMessages } = await supabase
+    // Check if dashboard messages are being delivered
+    const { data: recentDashboardMessages } = await supabase
       .from('user_system_messages')
       .select('id, message_type, created_at')
       .gte('created_at', yesterday_ts)
       .order('created_at', { ascending: false })
       .limit(50);
     
-    addCheck('Notification Delivery', 'Recent Dashboard Messages', `${recentPushMessages?.length || 0} messages in last 24h`, 
-      (recentPushMessages?.length || 0) > 0 ? 'pass' : 'warning',
-      recentPushMessages?.length === 0 ? 'No dashboard messages sent - check notification functions' : 'Messages are being delivered to dashboards'
+    addCheck('Notification Delivery', 'Recent Dashboard Messages', `${recentDashboardMessages?.length || 0} messages in last 24h`, 
+      (recentDashboardMessages?.length || 0) > 0 ? 'pass' : 'warning',
+      recentDashboardMessages?.length === 0 ? 'No dashboard messages sent - check notification functions' : 'Messages are being delivered to dashboards'
     );
 
     // Check notification function invocations in audit log
@@ -596,7 +596,6 @@ const handler = async (req: Request): Promise<Response> => {
       );
     }
 
-    // Check send-push-notification function usage
     // ============================================
     // CATEGORY 10.8: EMAIL SYSTEM HEALTH (Enhanced)
     // ============================================
