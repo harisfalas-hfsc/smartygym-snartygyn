@@ -1,5 +1,6 @@
 import { Toaster } from "@/components/ui/toaster";
-import { lazy, Suspense, useEffect } from "react";
+import { useEffect } from "react";
+import { DeviceThemeDefault } from "./components/DeviceThemeDefault";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
@@ -239,6 +240,7 @@ const App = () => (
       storageKey="smartygym-theme"
       enableSystem={false}
     >
+      <DeviceThemeDefault />
       <TooltipProvider>
         <Toaster />
         <Sonner />
