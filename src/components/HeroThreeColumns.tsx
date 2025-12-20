@@ -322,7 +322,7 @@ export const HeroThreeColumns = () => {
                   {wod.category && (
                     <div className="flex items-center gap-1.5 text-[10px]">
                       <Flame className="w-3 h-3 text-orange-500" />
-                      <span className="text-orange-600 dark:text-orange-400 font-medium">{wod.category}</span>
+                      <span className="text-orange-600 dark:text-orange-400 font-semibold uppercase">{wod.category}</span>
                     </div>
                   )}
                   
@@ -330,7 +330,7 @@ export const HeroThreeColumns = () => {
                   {wod.difficulty_stars && (
                     <div className="flex items-center gap-1.5 text-[10px]">
                       <Star className="w-3 h-3 text-yellow-500 fill-yellow-500" />
-                      <span className="text-yellow-600 dark:text-yellow-400 font-medium">
+                      <span className="text-yellow-600 dark:text-yellow-400 font-semibold uppercase">
                         {getDifficultyLabel(wod.difficulty_stars)}
                       </span>
                     </div>
@@ -340,7 +340,7 @@ export const HeroThreeColumns = () => {
                   {wod.duration && (
                     <div className="flex items-center gap-1.5 text-[10px]">
                       <Clock className="w-3 h-3 text-purple-500" />
-                      <span className="text-purple-600 dark:text-purple-400 font-medium">{wod.duration}</span>
+                      <span className="text-purple-600 dark:text-purple-400 font-semibold uppercase">{wod.duration}</span>
                     </div>
                   )}
                   
