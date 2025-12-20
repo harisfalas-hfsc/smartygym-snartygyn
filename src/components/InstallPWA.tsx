@@ -9,11 +9,7 @@ interface BeforeInstallPromptEvent extends Event {
   userChoice: Promise<{ outcome: "accepted" | "dismissed" }>;
 }
 
-interface InstallPWAProps {
-  waitForPushPrompt?: boolean;
-}
-
-export const InstallPWA = ({ waitForPushPrompt = false }: InstallPWAProps) => {
+export const InstallPWA = () => {
   const [deferredPrompt, setDeferredPrompt] = useState<BeforeInstallPromptEvent | null>(null);
   const [showPrompt, setShowPrompt] = useState(false);
   const { toast } = useToast();
@@ -40,41 +36,22 @@ export const InstallPWA = ({ waitForPushPrompt = false }: InstallPWAProps) => {
     const handler = (e: Event) => {
       e.preventDefault();
       setDeferredPrompt(e as BeforeInstallPromptEvent);
-      
-      // Show immediately if not waiting for push prompt
-      if (!waitForPushPrompt) {
-        setShowPrompt(true);
-      }
+      // Show after a small delay to not overwhelm user on page load
+      setTimeout(() => setShowPrompt(true), 2000);
     };
 
     window.addEventListener("beforeinstallprompt", handler);
 
     // For iOS devices where beforeinstallprompt doesn't fire
     const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
-    if (isIOS && !isInstalled && !waitForPushPrompt) {
-      setShowPrompt(true);
+    if (isIOS && !isInstalled) {
+      setTimeout(() => setShowPrompt(true), 2000);
     }
 
     return () => {
       window.removeEventListener("beforeinstallprompt", handler);
     };
-  }, [waitForPushPrompt]);
-
-  // Listen for push prompt completion to show PWA prompt
-  useEffect(() => {
-    if (!waitForPushPrompt) return;
-
-    const handlePushComplete = () => {
-      const isInstalled = window.matchMedia('(display-mode: standalone)').matches || 
-                         (window.navigator as any).standalone === true;
-      if (!isInstalled && (deferredPrompt || /iPad|iPhone|iPod/.test(navigator.userAgent))) {
-        setShowPrompt(true);
-      }
-    };
-
-    window.addEventListener('push-prompt-complete', handlePushComplete);
-    return () => window.removeEventListener('push-prompt-complete', handlePushComplete);
-  }, [waitForPushPrompt, deferredPrompt]);
+  }, []);
 
   const handleInstall = async () => {
     if (!deferredPrompt) {

@@ -1173,45 +1173,6 @@ export type Database = {
           },
         ]
       }
-      push_subscriptions: {
-        Row: {
-          auth: string
-          created_at: string | null
-          device_type: string | null
-          endpoint: string
-          id: string
-          is_active: boolean | null
-          p256dh: string
-          updated_at: string | null
-          user_agent: string | null
-          user_id: string
-        }
-        Insert: {
-          auth: string
-          created_at?: string | null
-          device_type?: string | null
-          endpoint: string
-          id?: string
-          is_active?: boolean | null
-          p256dh: string
-          updated_at?: string | null
-          user_agent?: string | null
-          user_id: string
-        }
-        Update: {
-          auth?: string
-          created_at?: string | null
-          device_type?: string | null
-          endpoint?: string
-          id?: string
-          is_active?: boolean | null
-          p256dh?: string
-          updated_at?: string | null
-          user_agent?: string | null
-          user_id?: string
-        }
-        Relationships: []
-      }
       rate_limits: {
         Row: {
           created_at: string

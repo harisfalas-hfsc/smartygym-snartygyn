@@ -108,22 +108,8 @@ serve(async (req) => {
           logStep("ERROR sending email", { userId, error: emailError });
         }
 
-        // Trigger push notification for admin message (bypasses preferences)
-        try {
-          await supabaseAdmin.functions.invoke('send-push-notification', {
-            body: {
-              user_id: userId,
-              title: subject,
-              body: content.substring(0, 200),
-              is_admin_message: true, // High priority - bypasses all preferences
-            }
-          });
-        } catch (pushError) {
-          logStep("Push notification error (non-blocking)", { userId, error: pushError });
-        }
-
         sentCount++;
-        logStep("Announcement sent (dashboard + email + push)", { userId });
+        logStep("Announcement sent (dashboard + email)", { userId });
       } catch (error) {
         failedCount++;
         logStep("Error sending to user", { userId, error: error instanceof Error ? error.message : String(error) });
