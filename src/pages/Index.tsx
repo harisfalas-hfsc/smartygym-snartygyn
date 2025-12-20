@@ -436,14 +436,14 @@ const Index = () => {
             </p>
             </div>
 
-            <Carousel className="w-full px-6" opts={{
+            <Carousel className="w-full px-4" opts={{
           align: "center",
           loop: true
         }} setApi={setCarouselApi}>
-              <CarouselContent className="-ml-4">
+              <CarouselContent className="-ml-2">
                 {heroCards.map(card => {
               const Icon = card.icon;
-              return <CarouselItem key={card.id} className="pl-4 basis-[70%]">
+              return <CarouselItem key={card.id} className="pl-2 basis-[80%]">
                       <Card onClick={() => navigate(card.route)} className="h-[160px] border-[3px] border-primary/40 hover:border-primary hover:scale-[1.02] hover:shadow-xl hover:bg-primary/5 transition-all duration-300 cursor-pointer">
                         <CardContent className="h-full flex flex-row items-center p-4 gap-4">
                           
@@ -586,41 +586,43 @@ const Index = () => {
 
         {/* Mobile Only: What We Stand For */}
         <div className="mt-8 mb-2 px-4">
-          <h2 className="text-2xl font-bold text-center mb-6">
-            What We <span className="text-primary">Stand For</span>
-          </h2>
-          
-        <div className="space-y-3">
-          {/* 100% Human, 0% AI */}
-          <div className="flex items-center gap-3">
-            <UserCheck className="w-6 h-6 text-red-500 flex-shrink-0" />
-            <span className="text-sm font-semibold">100% Human, 0% AI</span>
-          </div>
-          
-          {/* Built for Real Life */}
-          <div className="flex items-center gap-3">
-            <Heart className="w-6 h-6 text-orange-500 flex-shrink-0" />
-            <span className="text-sm font-semibold">Built for Real Life</span>
-          </div>
-          
-          {/* Science-Based Approach */}
-          <div className="flex items-center gap-3">
-            <Award className="w-6 h-6 text-purple-500 flex-shrink-0" />
-            <span className="text-sm font-semibold">Science-Based Approach</span>
-          </div>
-          
-          {/* Accessible to Everyone */}
-          <div className="flex items-center gap-3">
-            <Users className="w-6 h-6 text-emerald-500 flex-shrink-0" />
-            <span className="text-sm font-semibold">Accessible to Everyone</span>
-          </div>
-          
-          {/* Safe and Effective */}
-          <div className="flex items-center gap-3">
-            <Shield className="w-6 h-6 text-blue-500 flex-shrink-0" />
-            <span className="text-sm font-semibold">Safe and Effective</span>
-          </div>
-        </div>
+          <Card className="border-[3px] border-primary/40 p-4">
+            <h2 className="text-2xl font-bold text-center mb-6">
+              What We <span className="text-primary">Stand For</span>
+            </h2>
+            
+            <div className="space-y-3">
+              {/* 100% Human, 0% AI */}
+              <div className="flex items-center gap-3">
+                <UserCheck className="w-6 h-6 text-red-500 flex-shrink-0" />
+                <span className="text-sm font-semibold">100% Human, 0% AI</span>
+              </div>
+              
+              {/* Built for Real Life */}
+              <div className="flex items-center gap-3">
+                <Heart className="w-6 h-6 text-orange-500 flex-shrink-0" />
+                <span className="text-sm font-semibold">Built for Real Life</span>
+              </div>
+              
+              {/* Science-Based Approach */}
+              <div className="flex items-center gap-3">
+                <Award className="w-6 h-6 text-purple-500 flex-shrink-0" />
+                <span className="text-sm font-semibold">Science-Based Approach</span>
+              </div>
+              
+              {/* Accessible to Everyone */}
+              <div className="flex items-center gap-3">
+                <Users className="w-6 h-6 text-emerald-500 flex-shrink-0" />
+                <span className="text-sm font-semibold">Accessible to Everyone</span>
+              </div>
+              
+              {/* Safe and Effective */}
+              <div className="flex items-center gap-3">
+                <Shield className="w-6 h-6 text-blue-500 flex-shrink-0" />
+                <span className="text-sm font-semibold">Safe and Effective</span>
+              </div>
+            </div>
+          </Card>
         </div>
           </section> : <>
             {/* Desktop: Hero Section */}
