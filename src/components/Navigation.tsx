@@ -227,15 +227,15 @@ export const Navigation = () => {
   };
 
   return (
-    <header className="fixed top-0 left-0 right-0 z-50 bg-background border-b border-border py-1 px-2">
-      <div className="container mx-auto max-w-7xl">
+    <header className="fixed top-0 left-0 right-0 z-50 bg-background border-b border-border py-1 px-4">
+      <div className="mx-auto max-w-7xl">
         <div className="flex justify-between items-center gap-4">
           {/* LEFT SECTION - Hamburger Menu + Social Media Icons */}
           <div className="flex items-center gap-2">
             {/* Hamburger Menu - pushed to far left */}
             <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
               <SheetTrigger asChild>
-              <Button variant="ghost" size="icon" className="h-14 w-14 -ml-2">
+                <Button variant="ghost" size="icon" className="h-14 w-14">
                   <svg className="h-10 w-10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
                     <line x1="3" y1="4" x2="21" y2="4" />
                     <line x1="3" y1="12" x2="21" y2="12" />
