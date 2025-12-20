@@ -94,11 +94,24 @@ export const WebPushNotificationSetup = () => {
 
   const handleEnableNotifications = async () => {
     setIsLoading(true);
+    console.log("[WebPush] 🔔 User clicked Enable Notifications");
     
     try {
+      // Register the custom push service worker first
+      console.log("[WebPush] Registering custom service worker for push...");
+      const swRegistration = await navigator.serviceWorker.register('/service-worker.js', {
+        scope: '/'
+      });
+      console.log("[WebPush] ✅ Custom service worker registered:", swRegistration.scope);
+      
+      // Wait for service worker to be ready
+      await navigator.serviceWorker.ready;
+      console.log("[WebPush] ✅ Service worker is ready");
+      
       // Request permission
       const permission = await Notification.requestPermission();
       setPermissionState(permission);
+      console.log("[WebPush] Permission result:", permission);
 
       if (permission !== "granted") {
         toast.error("Notification permission denied");
@@ -106,11 +119,8 @@ export const WebPushNotificationSetup = () => {
         return;
       }
 
-      // Register service worker if not already
-      const registration = await navigator.serviceWorker.ready;
-
       // Subscribe to push
-      const subscription = await registration.pushManager.subscribe({
+      const subscription = await swRegistration.pushManager.subscribe({
         userVisibleOnly: true,
         applicationServerKey: urlBase64ToUint8Array(VAPID_PUBLIC_KEY) as BufferSource,
       });
