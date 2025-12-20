@@ -679,6 +679,12 @@ All colors MUST be HSL.
     box-sizing: border-box;
   }
 
+  /* Dark mode support for A4 page */
+  .dark .a4-page {
+    background: hsl(var(--card));
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+  }
+
   .a4-page-break {
     page-break-after: always;
     break-after: page;
