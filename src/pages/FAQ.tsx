@@ -268,11 +268,15 @@ const FAQ = () => {
                   </AccordionItem>
 
               <AccordionItem value="item-7">
-                    <AccordionTrigger className="text-left">Can I really get results training from home?</AccordionTrigger>
+                    <AccordionTrigger className="text-left">Can I really get results training with SmartyGym?</AccordionTrigger>
                     <AccordionContent className="py-2 leading-relaxed">
-                      Absolutely. Results come from consistency, proper programming, and progressive overload — not from expensive equipment or gym memberships. 
-                      Our home-based workouts are designed using the same science-based principles as gym-based training. Whether you're using bodyweight, 
-                      resistance bands, or a pair of dumbbells, you can build strength, lose fat, improve fitness, and reach your goals with the right guidance.
+                      Let's be honest — simply subscribing to SmartyGym won't automatically transform your body. That's like owning a Ferrari but never getting behind the wheel.<br/><br/>
+                      
+                      <strong>However</strong>, SmartyGym provides you with the <strong>complete ecosystem</strong> to succeed. Every single day, you receive <strong>two fresh workouts</strong> designed by a certified coach, plus access to structured <a href="/programs" className="text-primary hover:underline font-medium">training programs</a> for every goal and level. Add to that daily <a href="/rituals" className="text-primary hover:underline font-medium">Smarty Rituals</a> for movement and recovery, <a href="/userdashboard?tab=checkins" className="text-primary hover:underline font-medium">Smarty Check-ins</a> for accountability, <a href="/blog" className="text-primary hover:underline font-medium">blog articles</a> with expert knowledge, and a supportive <a href="/community" className="text-primary hover:underline font-medium">community</a> that keeps you motivated.<br/><br/>
+                      
+                      Your personal <a href="/userdashboard?tab=logbook" className="text-primary hover:underline font-medium">LogBook</a> tracks every workout, program, and measurement — with visual analytics and <strong>weekly progress reports</strong> delivered straight to your inbox.<br/><br/>
+                      
+                      It's like having a <strong>complete personal trainer in your pocket</strong> — one that keeps you accountable, motivated, and constantly improving. Use it the way it's designed, and SmartyGym won't just help you reach your goals — <strong>it can change your entire life</strong>.
                     </AccordionContent>
                   </AccordionItem>
 
