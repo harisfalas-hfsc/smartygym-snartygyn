@@ -45,9 +45,6 @@ const Index = () => {
   const [highlightedCardIndex, setHighlightedCardIndex] = useState(0);
   const [isHoveringTablet, setIsHoveringTablet] = useState(false);
 
-  // Mobile WOD card rotation state
-  const [mobileWodIndex, setMobileWodIndex] = useState(0);
-
   // Fetch WODs for mobile card
   const { data: mobileWods } = useQuery({
     queryKey: ["wod-mobile-banner"],
@@ -65,18 +62,6 @@ const Index = () => {
   // Separate bodyweight and equipment WODs
   const bodyweightWod = mobileWods?.find(w => w.equipment?.toLowerCase() === 'none' || w.equipment?.toLowerCase() === 'bodyweight');
   const equipmentWod = mobileWods?.find(w => w.equipment?.toLowerCase() !== 'none' && w.equipment?.toLowerCase() !== 'bodyweight');
-
-  // Rotate mobile WOD every 3 seconds
-  useEffect(() => {
-    if (mobileWods && mobileWods.length > 1) {
-      const interval = setInterval(() => {
-        setMobileWodIndex((prev) => (prev === 0 ? 1 : 0));
-      }, 3000);
-      return () => clearInterval(interval);
-    }
-  }, [mobileWods]);
-
-  const currentMobileWod = mobileWods?.[mobileWodIndex] || mobileWods?.[0];
   useEffect(() => {
     if (!carouselApi) return;
     const onSelect = () => {
@@ -515,16 +500,12 @@ const Index = () => {
               <div className="grid grid-cols-2 gap-3">
                 {/* Bodyweight workout */}
                 {bodyweightWod && (
-                  <div 
-                    className={cn(
-                      "relative rounded-lg overflow-hidden transition-all duration-300",
-                      mobileWodIndex === 0 && "ring-2 ring-primary scale-[1.02]"
-                    )}
-                  >
+                  <div className="relative rounded-lg overflow-hidden border border-border">
                     <img 
                       src={bodyweightWod.image_url || '/placeholder.svg'} 
                       alt={bodyweightWod.name}
-                      className="w-full h-24 object-cover"
+                      className="w-full h-28 object-cover"
+                      onError={(e) => { (e.target as HTMLImageElement).src = '/placeholder.svg'; }}
                     />
                     <Badge className="absolute top-1 left-1 bg-green-500 hover:bg-green-500 text-white text-[10px] px-1.5 py-0.5">No Equipment</Badge>
                     <div className="p-2 bg-background/90">
@@ -544,16 +525,12 @@ const Index = () => {
                 
                 {/* Equipment workout */}
                 {equipmentWod && (
-                  <div 
-                    className={cn(
-                      "relative rounded-lg overflow-hidden transition-all duration-300",
-                      mobileWodIndex === 1 && "ring-2 ring-primary scale-[1.02]"
-                    )}
-                  >
+                  <div className="relative rounded-lg overflow-hidden border border-border">
                     <img 
                       src={equipmentWod.image_url || '/placeholder.svg'} 
                       alt={equipmentWod.name}
-                      className="w-full h-24 object-cover"
+                      className="w-full h-28 object-cover"
+                      onError={(e) => { (e.target as HTMLImageElement).src = '/placeholder.svg'; }}
                     />
                     <Badge className="absolute top-1 left-1 bg-orange-500 hover:bg-orange-500 text-white text-[10px] px-1.5 py-0.5">With Equipment</Badge>
                     <div className="p-2 bg-background/90">
