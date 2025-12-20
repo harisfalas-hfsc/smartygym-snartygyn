@@ -152,6 +152,49 @@ serve(async (req) => {
       })));
 
       logStep("Dashboard notifications inserted", { count: usersForDashboard.length });
+
+      // Trigger push notifications for users who have push subscriptions
+      // Filter to only users with push enabled
+      const usersWithPushEnabled = allProfiles?.filter(p => {
+        const prefs = p.notification_preferences as Record<string, any> || {};
+        return prefs.opt_out_all !== true && prefs.push !== false;
+      }).map(p => p.user_id) || [];
+
+      logStep("Sending push notifications", { eligibleUsers: usersWithPushEnabled.length });
+
+      let pushSent = 0;
+      let pushFailed = 0;
+
+      for (const userId of usersWithPushEnabled) {
+        try {
+          const pushResponse = await fetch(`${supabaseUrl}/functions/v1/send-push-notification`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${supabaseServiceKey}`,
+            },
+            body: JSON.stringify({
+              user_id: userId,
+              title: '🏆 Today\'s WOD is Ready!',
+              body: `${category} day: ${bodyweightWod?.name || "Workout"} or ${equipmentWod?.name || "Equipment Workout"}`,
+              url: '/workout/wod',
+              tag: 'wod-notification',
+            }),
+          });
+
+          if (pushResponse.ok) {
+            const result = await pushResponse.json();
+            if (result.sent > 0) pushSent++;
+          } else {
+            pushFailed++;
+          }
+        } catch (e) {
+          logStep("Push notification error", { userId, error: e });
+          pushFailed++;
+        }
+      }
+
+      logStep("Push notifications complete", { sent: pushSent, failed: pushFailed });
     }
 
     // Get user emails for email notifications
