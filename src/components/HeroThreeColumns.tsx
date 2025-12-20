@@ -100,7 +100,7 @@ export const HeroThreeColumns = () => {
     queryFn: async () => {
       const { data } = await supabase
         .from("admin_workouts")
-        .select("id, name, category, focus, difficulty_stars, duration, image_url, equipment, is_premium")
+        .select("id, name, category, focus, difficulty_stars, duration, image_url, equipment, is_premium, type")
         .eq("is_workout_of_day", true)
         .limit(2);
       return data || [];
@@ -108,12 +108,12 @@ export const HeroThreeColumns = () => {
     staleTime: 1000 * 60 * 5,
   });
 
-  // Rotate between WODs every 2.5 seconds
+  // Rotate between WODs every 4 seconds
   useEffect(() => {
     if (wods && wods.length > 1) {
       const interval = setInterval(() => {
         setCurrentWodIndex((prev) => (prev === 0 ? 1 : 0));
-      }, 2500);
+      }, 4000);
       return () => clearInterval(interval);
     }
   }, [wods]);
@@ -253,12 +253,21 @@ export const HeroThreeColumns = () => {
               className="flex-1 flex flex-col animate-fade-in"
             >
               {/* Image Section */}
-              <div className="relative h-[100px] overflow-hidden">
-                <img 
-                  src={currentWod.image_url || "/placeholder.svg"} 
-                  alt={currentWod.name}
-                  className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
-                />
+              <div className="relative h-[100px] overflow-hidden bg-muted">
+                {currentWod.image_url ? (
+                  <img 
+                    src={currentWod.image_url} 
+                    alt={currentWod.name}
+                    className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                    onError={(e) => {
+                      e.currentTarget.style.display = 'none';
+                    }}
+                  />
+                ) : (
+                  <div className="w-full h-full flex items-center justify-center">
+                    <Dumbbell className="w-8 h-8 text-muted-foreground/50" />
+                  </div>
+                )}
                 {/* Equipment Badge */}
                 <div className="absolute top-2 left-2">
                   <span className={cn(
@@ -286,21 +295,29 @@ export const HeroThreeColumns = () => {
               {/* Content Section */}
               <div className="flex-1 p-2 flex flex-col justify-between">
                 <p className="text-xs font-bold text-foreground line-clamp-1">{currentWod.name}</p>
-                <div className="flex items-center gap-1 text-[10px] text-muted-foreground flex-wrap">
-                  {currentWod.category && <span className="text-red-600 dark:text-red-400 font-medium">{currentWod.category}</span>}
-                  {currentWod.focus && (
-                    <>
-                      <span>•</span>
-                      <span className="text-blue-600 dark:text-blue-400 font-medium">{currentWod.focus}</span>
-                    </>
+                
+                {/* Row 1: Type • Category */}
+                <div className="flex items-center gap-1 text-[10px] text-muted-foreground">
+                  {currentWod.type && (
+                    <span className="text-primary font-semibold uppercase">{currentWod.type}</span>
                   )}
-                  {currentWod.difficulty_stars && (
-                    <>
-                      <span>•</span>
-                      <span className="flex items-center gap-0.5">{renderStars(currentWod.difficulty_stars)}</span>
-                    </>
+                  {currentWod.type && currentWod.category && <span>•</span>}
+                  {currentWod.category && (
+                    <span className="text-red-600 dark:text-red-400 font-medium">{currentWod.category}</span>
                   )}
                 </div>
+                
+                {/* Row 2: Difficulty Stars • Duration */}
+                <div className="flex items-center gap-1 text-[10px] text-muted-foreground">
+                  {currentWod.difficulty_stars && (
+                    <span className="flex items-center gap-0.5">{renderStars(currentWod.difficulty_stars)}</span>
+                  )}
+                  {currentWod.difficulty_stars && currentWod.duration && <span>•</span>}
+                  {currentWod.duration && (
+                    <span className="text-purple-600 dark:text-purple-400 font-medium">{currentWod.duration}</span>
+                  )}
+                </div>
+                
                 {/* CTA */}
                 <div className="flex items-center justify-center gap-1 text-primary text-[10px] font-medium 
                                 group-hover:gap-2 transition-all mt-1">
