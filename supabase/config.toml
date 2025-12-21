@@ -1,5 +1,8 @@
 project_id = "cvccrvyimyzrxcwzmxwk"
 
+[functions.auto-generate-workout-image]
+verify_jwt = false
+
 [functions.run-system-health-audit]
 verify_jwt = false
 
