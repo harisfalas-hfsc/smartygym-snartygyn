@@ -60,7 +60,7 @@ const TrainingProgramFlow = () => {
   }, {
     id: "low-back-pain",
     title: "Low Back Pain",
-    description: "Structured program to strengthen and rehabilitate",
+    description: "Structured program for pain relief",
     icon: User,
     level: "Beginner-Advanced",
     equipment: "Equipment/No Equipment"
