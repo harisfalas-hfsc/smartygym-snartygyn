@@ -246,7 +246,7 @@ const WorkoutFlow = () => {
                     )}
                     
                     <div className={`flex flex-col items-center text-center space-y-4 ${isWodCard && wodImages.length > 0 ? 'relative z-10' : ''}`}>
-                      <div className={`w-16 h-16 rounded-full flex items-center justify-center transition-transform duration-300 group-hover:scale-110 ${isWodCard && wodImages.length > 0 ? 'bg-primary/30' : 'bg-primary/10'}`} aria-hidden="true">
+                      <div className="w-16 h-16 rounded-full flex items-center justify-center transition-transform duration-300 group-hover:scale-110 bg-primary/10" aria-hidden="true">
                         <Icon className="w-8 h-8 transition-transform duration-300 group-hover:rotate-3 text-primary" />
                       </div>
                       <div>
