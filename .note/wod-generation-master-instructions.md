@@ -9,27 +9,45 @@ Every day the system creates 2 workouts:
 2. **1 Equipment** workout
 
 Both workouts share the same:
-- Category
-- Difficulty level
-- Format
+- **Category** (ALWAYS identical)
+- **Difficulty level** (ALWAYS identical)
 
-## 6-Day Category Cycle
+Format and Duration can DIFFER between workouts:
+- **Format** (can be different per workout, EXCEPT STRENGTH and MOBILITY & STABILITY which are always REPS & SETS for both)
+- **Duration** (varies based on each workout's format)
 
-Across 6 days, all 6 categories must be completed:
-1. Strength
-2. Calorie Burning
-3. Metabolic
-4. Cardio
-5. Mobility & Stability
-6. Challenge
+## 7-Day Category Cycle
 
-After the 6 categories are completed, the cycle restarts.
+The categories follow a 7-day rotation:
+1. Challenge
+2. Strength (REPS & SETS only)
+3. Cardio
+4. Mobility & Stability (REPS & SETS only)
+5. Strength (REPS & SETS only)
+6. Metabolic
+7. Calorie Burning
+
+After 7 days, the cycle restarts.
 
 ## Critical Rules
 
 - **Never mix categories** - each workout must strictly follow its category's training philosophy
 - **Never add exercises that don't fit** the category's purpose
 - **Always respect** training logic, intensity, and movement patterns
+- **Category and Difficulty MUST match** between BODYWEIGHT and EQUIPMENT workouts
+- **Format can differ** (except STRENGTH and MOBILITY & STABILITY = always REPS & SETS)
+
+## Format Rules by Category
+
+### Categories that MUST use REPS & SETS for BOTH workouts:
+- **STRENGTH**: Both bodyweight and equipment workouts = REPS & SETS
+- **MOBILITY & STABILITY**: Both bodyweight and equipment workouts = REPS & SETS
+
+### Categories where format can VARY between workouts:
+- **CARDIO**: CIRCUIT, EMOM, FOR TIME, AMRAP, TABATA (bodyweight might be TABATA, equipment might be CIRCUIT)
+- **METABOLIC**: CIRCUIT, AMRAP, EMOM, FOR TIME, TABATA
+- **CALORIE BURNING**: CIRCUIT, TABATA, AMRAP, FOR TIME, EMOM
+- **CHALLENGE**: CIRCUIT, TABATA, AMRAP, EMOM, FOR TIME, MIX
 
 ## Difficulty Rotation Logic
 
@@ -62,6 +80,8 @@ Available durations: **15 min, 20 min, 30 min, 45 min, 60 min, or Various**
 - For Time → Various
 - EMOM → 15-30 min
 
+**Note**: Equipment workouts may have longer durations than bodyweight due to equipment setup and heavier loads.
+
 ## Format Definitions (Must Follow Exactly)
 
 - **Tabata**: 20 seconds work, 10 seconds rest, 8 rounds per exercise
@@ -77,7 +97,7 @@ Available durations: **15 min, 20 min, 30 min, 45 min, 60 min, or Various**
 ### CATEGORY 1: STRENGTH
 **Goal**: Build muscle, increase force production, improve functional strength
 **Intensity**: Controlled tempo, structured sets, progressive overload
-**Format**: REPS & SETS ONLY
+**Format**: REPS & SETS ONLY (for BOTH bodyweight and equipment)
 
 **Equipment Allowed**: Goblet squats, Kettlebell deadlifts, Romanian deadlifts, Front squats, Bench press variations, Dumbbell row, Bent-over row, Push press, Landmine press, Split squats, Hip hinges, Weighted carries
 
@@ -87,7 +107,7 @@ Available durations: **15 min, 20 min, 30 min, 45 min, 60 min, or Various**
 
 ### CATEGORY 2: CARDIO
 **Goal**: Improve heart rate capacity, aerobic and anaerobic conditioning
-**Format**: Circuits, AMRAP, EMOM, Tabata, For Time
+**Format**: Circuits, AMRAP, EMOM, Tabata, For Time (can differ between workouts)
 **Intensity**: Minimal load, fast pace
 
 **Allowed**: Jogging, Running, Jump rope, Treadmill runs, Rowing machine, Assault bike, High knees, Skipping, Jumping jacks, Burpees, Mountain climbers, Butt kicks, Lateral shuffles, Step-ups (fast), Shadow boxing, Bear crawls, Crab walks
@@ -96,7 +116,7 @@ Available durations: **15 min, 20 min, 30 min, 45 min, 60 min, or Various**
 
 ### CATEGORY 3: METABOLIC
 **Goal**: High-intensity, full-body conditioning using strength tools and bodyweight
-**Format**: Circuits, AMRAP, EMOM, Tabata, For Time
+**Format**: Circuits, AMRAP, EMOM, Tabata, For Time (can differ between workouts)
 **Key**: More power, more muscular demand than cardio
 
 **Equipment Allowed**: Kettlebell swings, Battle ropes, Sandbags, Medicine ball slams, Box jumps, Kettlebell clean and press, Thrusters, Rowing intervals
@@ -107,7 +127,7 @@ Available durations: **15 min, 20 min, 30 min, 45 min, 60 min, or Various**
 
 ### CATEGORY 4: CALORIE BURNING
 **Goal**: High-effort, simple, non-technical exercises that maintain high output
-**Format**: Circuit, AMRAP, Tabata, For Time
+**Format**: Circuit, AMRAP, Tabata, For Time (can differ between workouts)
 **Key**: Always keep heart rate HIGH
 
 **Equipment Allowed**: Kettlebell swings, Battle ropes, Rower, Bike, Slam ball, Light dumbbells
@@ -118,7 +138,7 @@ Available durations: **15 min, 20 min, 30 min, 45 min, 60 min, or Various**
 
 ### CATEGORY 5: MOBILITY & STABILITY
 **Goal**: Increase joint mobility, core stability, flexibility, controlled movement
-**Format**: Circuits, Reps & Sets, Flow, Time-based mobility
+**Format**: REPS & SETS ONLY (for BOTH bodyweight and equipment)
 **Intensity**: Low to moderate - quality over speed
 
 **Allowed**: Cat-cow, Thoracic rotations, World's greatest stretch, 90/90 hip rotation, Dead bug, Bird dog, Glute bridges, Pallof press, Side planks, Copenhagen holds, Ankle/Shoulder/Hip CARs, Breathing protocols, Pigeon pose, Hip flexor stretches
@@ -127,7 +147,7 @@ Available durations: **15 min, 20 min, 30 min, 45 min, 60 min, or Various**
 
 ### CATEGORY 6: CHALLENGE
 **Goal**: Tough session testing endurance, strength, or mental toughness
-**Format**: EVERY FORMAT ALLOWED
+**Format**: EVERY FORMAT ALLOWED (can differ between workouts)
 **Intensity**: VERY HIGH
 
 **Examples**: 100 burpees challenge, 10-min AMRAP, Descending ladders, Bodyweight chippers, EMOM increasing reps, Kettlebell complexes, Rowing distance challenges, Weighted vest challenges
@@ -153,6 +173,25 @@ The exercise banks listed above are **EXAMPLES and GUIDELINES**, NOT strict limi
 - Deviate from the category's training philosophy
 
 **Goal**: Create VARIETY while respecting each category's PURPOSE, INTENSITY, and MOVEMENT PATTERNS.
+
+## Naming Guidelines (Critical for Variety)
+
+### AVOID OVERUSED WORDS - Do NOT start workout names with:
+❌ Inferno, Blaze, Fire, Burn, Fury, Storm, Thunder, Power, Beast, Warrior, Elite, Ultimate, Extreme, Sprint
+
+### MATCH NAMES TO CATEGORIES:
+- **STRENGTH**: Iron, Foundation, Forge, Builder, Anchor, Pillar, Solid
+- **CARDIO**: Pulse, Rush, Flow, Motion, Surge, Stride, Tempo
+- **METABOLIC**: Engine, Drive, Catalyst, Ignite, Reactor, Fuel
+- **CALORIE BURNING**: Torch, Melt, Shred, Scorch, Heat, Sweat
+- **MOBILITY & STABILITY**: Balance, Flow, Restore, Align, Ground, Ease
+- **CHALLENGE**: Gauntlet, Test, Summit, Peak, Crucible, Apex
+
+### NAME REQUIREMENTS:
+- Keep names 2-4 words
+- Be creative and memorable
+- Reflect the workout's purpose
+- NEVER repeat names between BODYWEIGHT and EQUIPMENT workouts
 
 ## Bodyweight vs Equipment Logic
 

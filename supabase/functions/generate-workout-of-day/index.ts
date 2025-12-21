@@ -301,21 +301,25 @@ serve(async (req) => {
     );
 
     // ═══════════════════════════════════════════════════════════════════════════════
-    // CRITICAL FIX: When retryMissing and one workout exists, use ITS parameters
-    // This ensures both workouts have the same category/difficulty/format
+    // CRITICAL FIX: When retryMissing and one workout exists, use ITS category/difficulty
+    // Format is ONLY forced for STRENGTH and MOBILITY & STABILITY (both must be REPS & SETS)
+    // Other categories can have different formats between BODYWEIGHT and EQUIPMENT
     // ═══════════════════════════════════════════════════════════════════════════════
-    let forcedParameters: { category: string; difficulty: { name: string; stars: number }; format: string } | null = null;
+    let forcedParameters: { category: string; difficulty: { name: string; stars: number }; format: string | null } | null = null;
     
     if (retryMissing && existingWODsForDate && existingWODsForDate.length === 1) {
       const existingWOD = existingWODsForDate[0];
-      if (existingWOD.category && existingWOD.difficulty_stars && existingWOD.format) {
+      if (existingWOD.category && existingWOD.difficulty_stars) {
+        // Only force format for STRENGTH and MOBILITY & STABILITY (must be REPS & SETS)
+        const forceFormat = existingWOD.category === "STRENGTH" || existingWOD.category === "MOBILITY & STABILITY";
+        
         forcedParameters = {
           category: existingWOD.category,
           difficulty: {
             name: existingWOD.difficulty || (existingWOD.difficulty_stars <= 2 ? "Beginner" : existingWOD.difficulty_stars <= 4 ? "Intermediate" : "Advanced"),
             stars: existingWOD.difficulty_stars
           },
-          format: existingWOD.format
+          format: forceFormat ? existingWOD.format : null // Only force format for STRENGTH/MOBILITY
         };
         logStep("FORCING PARAMETERS FROM EXISTING WORKOUT", {
           existingWorkoutId: existingWOD.id,
@@ -323,7 +327,8 @@ serve(async (req) => {
           existingEquipment: existingWOD.equipment,
           forcedCategory: forcedParameters.category,
           forcedDifficulty: forcedParameters.difficulty,
-          forcedFormat: forcedParameters.format
+          forcedFormat: forcedParameters.format,
+          formatForced: forceFormat
         });
       }
     }
@@ -452,21 +457,20 @@ serve(async (req) => {
     // Check for manual override for today
     const override = checkManualOverride(effectiveDate, manualOverrides);
     
+    // ═══════════════════════════════════════════════════════════════════════════════
+    // CATEGORY AND DIFFICULTY: Must be the SAME for both workouts
+    // FORMAT AND DURATION: Can be DIFFERENT for each workout (except STRENGTH/MOBILITY)
+    // ═══════════════════════════════════════════════════════════════════════════════
     let category: string;
     let selectedDifficulty: { name: string; stars: number };
-    let format: string;
-    let updatedUsage: Record<string, string[]>;
+    let updatedUsage: Record<string, string[]> = state.format_usage || {};
     
-    // ═══════════════════════════════════════════════════════════════════════════════
-    // PRIORITY ORDER: 1. Forced parameters (from existing workout on retry), 2. Manual override, 3. Normal calculation
-    // ═══════════════════════════════════════════════════════════════════════════════
+    // Category and difficulty are determined ONCE for both workouts
     if (forcedParameters) {
-      // CRITICAL: When retrying, ALWAYS match the existing workout's parameters
+      // When retrying, ALWAYS match the existing workout's category and difficulty
       logStep("USING FORCED PARAMETERS FROM EXISTING WORKOUT", forcedParameters);
       category = forcedParameters.category;
       selectedDifficulty = forcedParameters.difficulty;
-      format = forcedParameters.format;
-      updatedUsage = state.format_usage || {};
     } else if (override) {
       logStep("USING MANUAL OVERRIDE", override);
       category = override.category || getCategoryForDay(dayInCycle);
@@ -476,25 +480,20 @@ serve(async (req) => {
             stars: override.difficulty 
           }
         : getDifficultyForDay(dayInCycle, weekNumber, usedStarsInWeek);
-      format = override.format || getFormatForCategory(category, state.format_usage || {}).format;
-      updatedUsage = state.format_usage || {};
     } else {
       // Normal calculation
       category = getCategoryForDay(dayInCycle);
       selectedDifficulty = getDifficultyForDay(dayInCycle, weekNumber, usedStarsInWeek);
-      const formatResult = getFormatForCategory(category, state.format_usage || {});
-      format = formatResult.format;
-      updatedUsage = formatResult.updatedUsage;
     }
     
-    logStep("Today's WOD specs", { 
+    logStep("Today's WOD specs (shared)", { 
       category, 
-      difficulty: selectedDifficulty, 
-      format,
-      isOverride: !!override
+      difficulty: selectedDifficulty,
+      isOverride: !!override,
+      hasForcedParameters: !!forcedParameters
     });
 
-    // Duration based on format and difficulty
+    // Duration calculation function (called per-workout now)
     const getDuration = (fmt: string, stars: number): string => {
       const baseDurations: Record<string, number[]> = {
         "REPS & SETS": [45, 50, 60],
@@ -515,7 +514,42 @@ serve(async (req) => {
       return `${maxDuration} min`;
     };
     
-    const duration = getDuration(format, selectedDifficulty.stars);
+    // ═══════════════════════════════════════════════════════════════════════════════
+    // FORMAT SELECTION: STRENGTH and MOBILITY & STABILITY = always REPS & SETS
+    // Other categories can have different formats per equipment type
+    // ═══════════════════════════════════════════════════════════════════════════════
+    const getFormatForWorkout = (cat: string, equipType: string): { format: string; duration: string } => {
+      // STRENGTH and MOBILITY & STABILITY: MUST be REPS & SETS for both workouts
+      if (cat === "STRENGTH" || cat === "MOBILITY & STABILITY") {
+        const fmt = "REPS & SETS";
+        return { format: fmt, duration: getDuration(fmt, selectedDifficulty.stars) };
+      }
+      
+      // For retry with forced parameters and format is specified (should only happen for STRENGTH/MOBILITY)
+      if (forcedParameters?.format) {
+        return { format: forcedParameters.format, duration: getDuration(forcedParameters.format, selectedDifficulty.stars) };
+      }
+      
+      // For manual override format
+      if (override?.format) {
+        return { format: override.format, duration: getDuration(override.format, selectedDifficulty.stars) };
+      }
+      
+      // Normal calculation - each workout gets its own format from valid options
+      const formatResult = getFormatForCategory(cat, updatedUsage);
+      updatedUsage = formatResult.updatedUsage; // Update for next workout
+      
+      logStep(`Format selected for ${equipType}`, { 
+        category: cat, 
+        format: formatResult.format,
+        equipType 
+      });
+      
+      return { 
+        format: formatResult.format, 
+        duration: getDuration(formatResult.format, selectedDifficulty.stars) 
+      };
+    };
 
     // Category prefixes for IDs
     const categoryPrefixes: Record<string, string> = {
@@ -585,14 +619,49 @@ serve(async (req) => {
     let firstWorkoutName = "";
 
     for (const equipment of equipmentTypes) {
-      logStep(`Generating ${equipment} workout`);
+      // ═══════════════════════════════════════════════════════════════════════════════
+      // GET FORMAT AND DURATION FOR THIS SPECIFIC WORKOUT
+      // STRENGTH and MOBILITY & STABILITY = always REPS & SETS (both workouts same)
+      // Other categories = each workout can have its own format and duration
+      // ═══════════════════════════════════════════════════════════════════════════════
+      const { format, duration } = getFormatForWorkout(category, equipment);
+      
+      logStep(`Generating ${equipment} workout`, { 
+        format, 
+        duration,
+        categoryRequiresMatchingFormat: category === "STRENGTH" || category === "MOBILITY & STABILITY"
+      });
 
       const bannedNameInstruction = firstWorkoutName 
         ? `\n\nCRITICAL - AVOID DUPLICATE NAME: The bodyweight workout for today is named "${firstWorkoutName}". You MUST create a COMPLETELY DIFFERENT name. DO NOT use "${firstWorkoutName}" or any variation of it.`
         : "";
 
+      // ═══════════════════════════════════════════════════════════════════════════════
+      // NAMING VARIETY INSTRUCTIONS - Avoid repetitive and mismatched names
+      // ═══════════════════════════════════════════════════════════════════════════════
+      const namingInstructions = `
+═══════════════════════════════════════════════════════════════════════════════
+NAMING RULES (CRITICAL - MUST FOLLOW):
+═══════════════════════════════════════════════════════════════════════════════
+
+1. AVOID OVERUSED WORDS - DO NOT START with these words (they're overused):
+   ❌ Inferno, Blaze, Fire, Burn, Fury, Storm, Thunder, Power, Beast, Warrior, Elite, Ultimate, Extreme
+
+2. MATCH THE NAME TO THE CATEGORY:
+   - STRENGTH: Use words like "Iron", "Foundation", "Forge", "Builder", "Anchor", "Pillar"
+   - CARDIO: Use words like "Pulse", "Rush", "Flow", "Motion", "Surge", "Stride"
+   - METABOLIC: Use words like "Engine", "Drive", "Catalyst", "Ignite", "Reactor"
+   - CALORIE BURNING: Use words like "Torch", "Melt", "Shred", "Scorch", "Heat"
+   - MOBILITY & STABILITY: Use words like "Balance", "Flow", "Restore", "Align", "Ground"
+   - CHALLENGE: Use words like "Gauntlet", "Test", "Summit", "Peak", "Crucible"
+
+3. BE CREATIVE: Each workout should have a unique, memorable name that reflects its purpose
+4. KEEP IT SHORT: 2-4 words maximum
+`;
+
       // Generate workout content using Lovable AI
       const workoutPrompt = `You are Haris Falas, a Sports Scientist with 20+ years of coaching experience (CSCS Certified), creating a premium Workout of the Day for SmartyGym members worldwide.${bannedNameInstruction}
+${namingInstructions}
 
 Generate a complete workout with these specifications:
 - Category: ${category}
@@ -1201,7 +1270,7 @@ INSTRUCTIONS FORMAT: Plain paragraphs with clear guidance
           weekNumber: weekNumber,
           difficulty: selectedDifficulty.name,
           difficulty_stars: selectedDifficulty.stars,
-          format: format
+          note: "Format and duration now vary per equipment type (except STRENGTH and MOBILITY & STABILITY which are always REPS & SETS)"
         }
       }),
       {
