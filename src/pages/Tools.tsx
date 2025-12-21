@@ -88,24 +88,24 @@ const Tools = () => {
             <h2 className="text-2xl font-bold mb-3 text-center">About Smarty Tools</h2>
             <div className="space-y-2 text-muted-foreground max-w-3xl mx-auto">
               <p>
-                Smarty Tools are fitness calculators designed to help you understand your body and optimize your training. 
+                <span className="text-primary font-semibold">Smarty Tools</span> are fitness calculators designed to help you understand your body and optimize your training. 
                 All tools use scientifically validated formulas and equations.
               </p>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
                 <div>
-                  <h3 className="font-semibold text-foreground mb-2">1RM Calculator</h3>
+                  <h3 className="font-semibold text-foreground mb-2"><span className="text-primary font-semibold">1RM Calculator</span></h3>
                   <p className="text-sm">
                     Uses the Brzycki formula to estimate your one-rep maximum. Essential for programming strength training.
                   </p>
                 </div>
                 <div>
-                  <h3 className="font-semibold text-foreground mb-2">BMR Calculator</h3>
+                  <h3 className="font-semibold text-foreground mb-2"><span className="text-primary font-semibold">BMR Calculator</span></h3>
                   <p className="text-sm">
                     Uses the Mifflin-St Jeor equation to calculate your basal metabolic rate — the calories you burn at rest.
                   </p>
                 </div>
                 <div>
-                  <h3 className="font-semibold text-foreground mb-2">Macro Tracking Calculator</h3>
+                  <h3 className="font-semibold text-foreground mb-2"><span className="text-primary font-semibold">Macro Tracking Calculator</span></h3>
                   <p className="text-sm">
                     Get complete nutrition recommendations including calories, macros, fiber, water, and meal frequency.
                   </p>

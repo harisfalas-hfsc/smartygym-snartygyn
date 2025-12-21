@@ -162,12 +162,12 @@ const WorkoutFlow = () => {
               <div className="space-y-2 text-muted-foreground max-w-3xl mx-auto">
                 {isMobile ? (
                   <p className="text-sm text-center">
-                    Smarty Workouts are single-session training routines designed to fit your lifestyle and goals. Hit the gym without a plan? In the home? On the go? Smarty Workouts are designed to deliver results in any setting. Unlock all workouts with a Premium plan, or grab one standalone session whenever you need it.
+                    <span className="text-primary font-semibold">Smarty Workouts</span> are single-session training routines designed to fit your lifestyle and goals. Hit the gym without a plan? In the home? On the go? <span className="text-primary font-semibold">Smarty Workouts</span> are designed to deliver results in any setting. Unlock all workouts with a Premium plan, or grab one standalone session whenever you need it.
                   </p>
                 ) : (
                   <>
                     <p className="text-sm sm:text-base text-center">
-                      Smarty Workouts are single-session training routines designed to fit your lifestyle and goals. Whether you're targeting strength, calorie burning, metabolic conditioning, cardio endurance, mobility & stability, or looking for a challenge — we have you covered. Hit the gym without a plan? In the home? On the go? Smarty Workouts are designed to deliver results in any setting.
+                      <span className="text-primary font-semibold">Smarty Workouts</span> are single-session training routines designed to fit your lifestyle and goals. Whether you're targeting strength, calorie burning, metabolic conditioning, cardio endurance, mobility & stability, or looking for a challenge — we have you covered. Hit the gym without a plan? In the home? On the go? <span className="text-primary font-semibold">Smarty Workouts</span> are designed to deliver results in any setting.
                     </p>
                     
                     <p className="text-sm sm:text-base font-semibold text-foreground text-center mt-6">

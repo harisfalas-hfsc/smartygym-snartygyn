@@ -200,9 +200,9 @@ export default function SmartyCorporate() {
             </CardHeader>
             <CardContent className="prose prose-sm dark:prose-invert max-w-none">
               <p>
-                Smarty Corporate is designed for teams, businesses, and organizations that want to provide premium fitness access to their members. 
+                <span className="text-primary font-semibold">Smarty Corporate</span> is designed for teams, businesses, and organizations that want to provide premium fitness access to their members. 
                 With one master account, an administrator can create and manage multiple user accounts, each receiving full Platinum-level access 
-                to all SmartyGym features including workouts, training programs, daily rituals, and fitness tools.
+                to all <span className="text-primary font-semibold">SmartyGym</span> features including workouts, training programs, daily rituals, and fitness tools.
               </p>
               <p>
                 All team members enjoy the same benefits as individual Platinum subscribers for the duration of the subscription. 
