@@ -15,10 +15,10 @@ export const TimedPopup = () => {
     // Don't show popup to premium users
     if (isPremium) return;
     
-    // Show popup after 27 seconds
+    // Show popup after 20 seconds
     const timer = setTimeout(() => {
       setIsOpen(true);
-    }, 27000);
+    }, 20000);
 
     return () => clearTimeout(timer);
   }, [isPremium]);
