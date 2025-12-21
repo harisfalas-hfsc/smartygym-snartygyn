@@ -256,7 +256,7 @@ const WorkoutFlow = () => {
                         )}
                       >
                         {/* Image Section */}
-                        <div className="relative h-[100px] overflow-hidden bg-muted">
+                        <div className="relative h-[120px] overflow-hidden bg-muted">
                           {wod.image_url ? (
                             <img 
                               src={wod.image_url} 
@@ -296,48 +296,27 @@ const WorkoutFlow = () => {
                         </div>
                         
                         {/* Content Section */}
-                        <div className="flex-1 p-3 flex flex-col justify-between">
+                        <div className="flex-1 p-3 flex flex-col">
                           {/* Workout Name */}
                           <p className="text-sm font-bold text-foreground line-clamp-1">{wod.name}</p>
                           
-                          {/* Metadata Grid - 2 columns */}
-                          <div className="grid grid-cols-2 gap-x-3 gap-y-1 mt-2">
-                            {/* Row 1: Type + Category */}
+                          {/* Badge-style metadata pills - matching other cards */}
+                          <div className="flex flex-wrap gap-1 text-[10px] mt-2">
                             {wod.type && (
-                              <div className="flex items-center gap-1 text-[10px]">
-                                <Target className="w-3 h-3 text-primary" />
-                                <span className="text-primary font-semibold uppercase">{wod.type}</span>
-                              </div>
+                              <span className="bg-primary/20 text-primary border border-primary/40 px-1.5 py-0.5 rounded-full uppercase font-medium">
+                                {wod.type}
+                              </span>
+                            )}
+                            {wod.difficulty_stars && (
+                              <span className="bg-green-500/20 text-green-700 dark:text-green-400 border border-green-500/40 px-1.5 py-0.5 rounded-full uppercase font-medium">
+                                {getDifficultyLabel(wod.difficulty_stars)}
+                              </span>
                             )}
                             {wod.category && (
-                              <div className="flex items-center gap-1 text-[10px]">
-                                <Flame className="w-3 h-3 text-orange-500" />
-                                <span className="text-orange-600 dark:text-orange-400 font-semibold uppercase">{wod.category}</span>
-                              </div>
+                              <span className="bg-orange-500/20 text-orange-700 dark:text-orange-400 border border-orange-500/40 px-1.5 py-0.5 rounded-full uppercase font-medium">
+                                {wod.category}
+                              </span>
                             )}
-                            
-                            {/* Row 2: Difficulty + Duration */}
-                            {wod.difficulty_stars && (
-                              <div className="flex items-center gap-1 text-[10px]">
-                                <Star className="w-3 h-3 text-yellow-500 fill-yellow-500" />
-                                <span className="text-yellow-600 dark:text-yellow-400 font-semibold uppercase">
-                                  {getDifficultyLabel(wod.difficulty_stars)}
-                                </span>
-                              </div>
-                            )}
-                            {wod.duration && (
-                              <div className="flex items-center gap-1 text-[10px]">
-                                <Clock className="w-3 h-3 text-purple-500" />
-                                <span className="text-purple-600 dark:text-purple-400 font-semibold uppercase">{wod.duration}</span>
-                              </div>
-                            )}
-                          </div>
-                          
-                          {/* CTA */}
-                          <div className="flex items-center justify-center gap-1 text-primary text-[10px] font-medium 
-                                          group-hover:gap-2 transition-all mt-2">
-                            View Today's WOD
-                            <ChevronRight className="w-3 h-3" />
                           </div>
                         </div>
                       </div>
