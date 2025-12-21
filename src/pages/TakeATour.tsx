@@ -127,7 +127,7 @@ export default function TakeATour() {
                 ecosystem you need to elevate every aspect of your performance—anywhere, anytime.
               </p>
               <p className="text-center text-muted-foreground mt-4">
-                Your body is your greatest asset. <span className="text-primary font-bold">SmartyGym is your Gym Reimagined</span>: expert-designed workouts, 
+                Your body is your greatest asset. <span className="text-primary font-bold whitespace-nowrap">SmartyGym is your Gym Re-imagined</span>: expert-designed workouts, 
                 structured training programs, and a complete wellness ecosystem that keeps you consistent and motivated.
               </p>
             </CardContent>
