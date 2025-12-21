@@ -40,16 +40,40 @@ serve(async (req) => {
     if (difficulty_stars > 4) difficultyLabel = "advanced";
     else if (difficulty_stars > 2) difficultyLabel = "intermediate";
 
+    // Check if this is a Pilates workout for specialized imagery
+    const isPilates = category?.toUpperCase() === "PILATES";
+
+    // Create category-specific visual direction
+    let visualDirection: string;
+    
+    if (isPilates) {
+      // Pilates-specific imagery: stretching, flexibility, reformer, mat, balance, breathing
+      visualDirection = `
+- Show a ${difficultyLabel}-level Pilates scene that captures the essence of "${name}"
+- Pilates-specific imagery: controlled stretching, flexibility exercises, graceful movements
+- Include appropriate Pilates elements: reformer machine, Pilates mat, resistance bands, Pilates ball, or ring
+- Emphasize: balance, core engagement, breathing focus, mindful movement, body alignment
+- Light, airy Pilates studio setting with natural light, wooden floors, mirrors, or peaceful outdoor setting
+- Peaceful, calming, mindful atmosphere - NOT intense gym energy
+- Clean, soft, neutral colors (white, beige, light grey, soft pastels)
+- NO heavy weights, NO cardio machines, NO intense gym equipment, NO sweaty high-intensity scenes
+- Show elegant, controlled Pilates poses: planks, leg lifts, spine stretches, reformer exercises`;
+    } else {
+      // Standard fitness imagery for other categories
+      visualDirection = `
+- Show a dynamic ${difficultyLabel}-level fitness scene that captures the energy of "${name}"
+- The exercise style should visually reflect ${category.toLowerCase()} training with ${format.toLowerCase()} workout energy
+- High-energy, professional fitness photography in a gym, outdoor, or home workout setting
+- Clean, vibrant colors with excellent lighting`;
+    }
+
     // Create a prompt that prevents text overlays - NO metadata as key:value pairs
     const imagePrompt = `Create a professional fitness workout cover image.
 
 CRITICAL REQUIREMENT: Generate ONLY a photograph with NO TEXT whatsoever. Absolutely NO words, NO labels, NO titles, NO overlays, NO watermarks, NO captions of any kind. Pure photography only.
 
 Visual Direction:
-- Show a dynamic ${difficultyLabel}-level fitness scene that captures the energy of "${name}"
-- The exercise style should visually reflect ${category.toLowerCase()} training with ${format.toLowerCase()} workout energy
-- High-energy, professional fitness photography in a gym, outdoor, or home workout setting
-- Clean, vibrant colors with excellent lighting
+${visualDirection}
 - 16:9 landscape aspect ratio suitable for a cover image
 - Completely unique composition, different from: ${existingImagePrompts.slice(0, 10).join(", ")}
 
