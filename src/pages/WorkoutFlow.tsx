@@ -265,13 +265,13 @@ const WorkoutFlow = () => {
                         </p>
                         
                         <div className="flex gap-1 text-[10px] mt-2">
-                          <span className={`px-1.5 py-0.5 rounded-full whitespace-nowrap ${isWodCard && wodImages.length > 0 ? 'bg-white/20 text-white border border-white/40' : 'bg-primary/20 text-primary border border-primary/40'}`}>
+                          <span className="px-1.5 py-0.5 rounded-full whitespace-nowrap bg-primary/20 text-primary border border-primary/40">
                             Single Session
                           </span>
-                          <span className={`px-1.5 py-0.5 rounded-full whitespace-nowrap ${isWodCard && wodImages.length > 0 ? 'bg-white/20 text-white border border-white/40' : 'bg-green-500/20 text-green-700 dark:text-green-400 border border-green-500/40'}`}>
+                          <span className="px-1.5 py-0.5 rounded-full whitespace-nowrap bg-green-500/20 text-green-700 dark:text-green-400 border border-green-500/40">
                             {workout.level}
                           </span>
-                          <span className={`px-1.5 py-0.5 rounded-full whitespace-nowrap ${isWodCard && wodImages.length > 0 ? 'bg-white/20 text-white border border-white/40' : 'bg-orange-500/20 text-orange-700 dark:text-orange-400 border border-orange-500/40'}`}>
+                          <span className="px-1.5 py-0.5 rounded-full whitespace-nowrap bg-orange-500/20 text-orange-700 dark:text-orange-400 border border-orange-500/40">
                             {workout.equipment}
                           </span>
                         </div>
