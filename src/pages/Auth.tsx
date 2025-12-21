@@ -9,12 +9,13 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
 import { useToast } from "@/hooks/use-toast";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, AlertTriangle } from "lucide-react";
 import smartyGymLogo from "@/assets/smarty-gym-logo.png";
 import { AvatarSetupDialog } from "@/components/AvatarSetupDialog";
 import { ForgotPasswordDialog } from "@/components/auth/ForgotPasswordDialog";
 import { trackSocialMediaEvent } from "@/utils/socialMediaTracking";
 import { useShowBackButton } from "@/hooks/useShowBackButton";
+import { checkPasswordBreach } from "@/utils/passwordBreachCheck";
 
 export default function Auth() {
   const navigate = useNavigate();
@@ -101,6 +102,28 @@ export default function Auth() {
     }
 
     setLoading(true);
+
+    // Check if password has been found in data breaches
+    const breachResult = await checkPasswordBreach(signUpData.password);
+    
+    if (breachResult.isBreached) {
+      setLoading(false);
+      toast({
+        title: "Compromised Password Detected",
+        description: (
+          <div className="flex items-start gap-2">
+            <AlertTriangle className="h-5 w-5 text-destructive shrink-0 mt-0.5" />
+            <div>
+              <p>This password has been found in {breachResult.count.toLocaleString()} data breaches.</p>
+              <p className="mt-1 text-sm">Please choose a different, unique password for your security.</p>
+            </div>
+          </div>
+        ),
+        variant: "destructive",
+        duration: 8000,
+      });
+      return;
+    }
 
     try {
       const { data, error } = await supabase.auth.signUp({
