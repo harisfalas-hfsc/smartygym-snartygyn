@@ -11,7 +11,7 @@ import { AuthenticatedLayout } from "./components/AuthenticatedLayout";
 import { AdminRoute } from "./components/AdminRoute";
 import { trackPageVisit } from "./utils/socialMediaTracking";
 import { ScrollToTop } from "./components/ScrollToTop";
-import { CookieConsent } from "./components/CookieConsent";
+
 import { ErrorBoundary } from "./components/ErrorBoundary";
 import { useSessionExpiry } from "./hooks/useSessionExpiry";
 
@@ -99,7 +99,7 @@ const AppContent = () => {
   return (
     <>
       <LoadingBar />
-      <CookieConsent />
+      
       <InstallPWA />
       <AccessControlProvider>
         <AnnouncementManager />
