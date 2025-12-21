@@ -11,18 +11,19 @@ import { toast } from "sonner";
 import { Calendar, Edit2, Clock, Star, Flame, Save, Dumbbell, User } from "lucide-react";
 import { format, addDays } from "date-fns";
 
-// 7-DAY CATEGORY CYCLE
-const CATEGORY_CYCLE_7DAY = [
-  "CHALLENGE",
-  "STRENGTH", 
-  "CARDIO",
-  "MOBILITY & STABILITY",
-  "STRENGTH",
-  "METABOLIC",
-  "CALORIE BURNING"
+// 8-DAY CATEGORY CYCLE (with PILATES as Day 8)
+const CATEGORY_CYCLE_8DAY = [
+  "CHALLENGE",            // Day 1
+  "STRENGTH",             // Day 2
+  "CARDIO",               // Day 3
+  "MOBILITY & STABILITY", // Day 4
+  "STRENGTH",             // Day 5
+  "METABOLIC",            // Day 6
+  "CALORIE BURNING",      // Day 7
+  "PILATES"               // Day 8
 ];
 
-// DIFFICULTY PATTERN BASE
+// DIFFICULTY PATTERN BASE (7-day pattern that shifts weekly)
 const DIFFICULTY_PATTERN_BASE = [
   { level: "Intermediate", range: [3, 4] },
   { level: "Advanced", range: [5, 6] },
@@ -30,28 +31,30 @@ const DIFFICULTY_PATTERN_BASE = [
   { level: "Advanced", range: [5, 6] },
   { level: "Intermediate", range: [3, 4] },
   { level: "Beginner", range: [1, 2] },
-  { level: "Advanced", range: [5, 6] }
+  { level: "Advanced", range: [5, 6] },
+  { level: "Intermediate", range: [3, 4] }  // Day 8 pattern
 ];
 
 // FORMAT RULES BY CATEGORY
 const FORMATS_BY_CATEGORY: Record<string, string[]> = {
   "STRENGTH": ["REPS & SETS"],
   "MOBILITY & STABILITY": ["REPS & SETS"],
+  "PILATES": ["REPS & SETS"],  // Pilates uses controlled movements only
   "CARDIO": ["CIRCUIT", "EMOM", "FOR TIME", "AMRAP", "TABATA"],
   "METABOLIC": ["CIRCUIT", "AMRAP", "EMOM", "FOR TIME", "TABATA"],
   "CALORIE BURNING": ["CIRCUIT", "TABATA", "AMRAP", "FOR TIME", "EMOM"],
   "CHALLENGE": ["CIRCUIT", "TABATA", "AMRAP", "EMOM", "FOR TIME", "MIX"]
 };
 
-// Match backend formula exactly
-const getDayInCycle = (dayCount: number): number => (dayCount % 7) + 1;
-const getWeekNumber = (dayCount: number): number => Math.floor(dayCount / 7) + 1;
+// Match backend formula exactly - 8-day cycle
+const getDayInCycle = (dayCount: number): number => (dayCount % 8) + 1;
+const getWeekNumber = (dayCount: number): number => Math.floor(dayCount / 8) + 1;
 
-const getCategoryForDay = (dayInCycle: number): string => CATEGORY_CYCLE_7DAY[dayInCycle - 1];
+const getCategoryForDay = (dayInCycle: number): string => CATEGORY_CYCLE_8DAY[dayInCycle - 1];
 
 const getDifficultyForDay = (dayInCycle: number, weekNumber: number): { level: string; range: [number, number] } => {
-  const shiftAmount = (weekNumber - 1) % 7;
-  const shiftedIndex = ((dayInCycle - 1) + shiftAmount) % 7;
+  const shiftAmount = (weekNumber - 1) % 8;
+  const shiftedIndex = ((dayInCycle - 1) + shiftAmount) % 8;
   return {
     level: DIFFICULTY_PATTERN_BASE[shiftedIndex].level,
     range: DIFFICULTY_PATTERN_BASE[shiftedIndex].range as [number, number]
@@ -81,7 +84,7 @@ export const WODSchedulePreview = () => {
     },
   });
 
-  // Calculate next 7 days schedule
+  // Calculate next 8 days schedule
   // CRITICAL: day_count represents AFTER today's generation
   // So day_count already points to tomorrow's position in the cycle
   const getUpcomingSchedule = () => {
@@ -92,7 +95,7 @@ export const WODSchedulePreview = () => {
     const currentWeekNumber = wodState.week_number || getWeekNumber(currentDayCount);
     const manualOverrides = (wodState.manual_overrides as Record<string, any>) || {};
     
-    for (let i = 0; i < 7; i++) {
+    for (let i = 0; i < 8; i++) {
       // i=0 is tomorrow (uses currentDayCount directly)
       // i=1 is day after tomorrow (currentDayCount + 1), etc.
       const futureDayCount = currentDayCount + i;
@@ -209,13 +212,13 @@ export const WODSchedulePreview = () => {
     <>
       <Card>
         <CardHeader>
-          <CardTitle className="flex items-center gap-2 text-sm">
+        <CardTitle className="flex items-center gap-2 text-sm">
             <Calendar className="h-4 w-4 text-primary" />
-            Upcoming WOD Schedule (Next 7 Days)
+            Upcoming WOD Schedule (Next 8 Days)
           </CardTitle>
           <CardDescription>
-            <span className="block">Preview future WODs and set overrides. The "Day X/7" shows position in the 7-day category rotation cycle (not calendar days).</span>
-            <span className="block mt-1 text-xs">💡 <strong>What is Day 1/7?</strong> The system rotates through 7 workout categories. Day 1 = Challenge, Day 2 = Strength, etc. This cycle repeats continuously.</span>
+            <span className="block">Preview future WODs and set overrides. The "Day X/8" shows position in the 8-day category rotation cycle (not calendar days).</span>
+            <span className="block mt-1 text-xs">💡 <strong>What is Day 1/8?</strong> The system rotates through 8 workout categories. Day 1 = Challenge, Day 8 = Pilates. This cycle repeats continuously.</span>
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-3">
@@ -231,7 +234,7 @@ export const WODSchedulePreview = () => {
                       {format(day.date, "EEEE, MMM d")}
                     </span>
                     <Badge variant="outline" className="text-xs">
-                      Day {day.dayInCycle}/7
+                      Day {day.dayInCycle}/8
                     </Badge>
                     {day.hasOverride && (
                       <Badge className="bg-primary/20 text-primary border-primary/30 text-xs">
@@ -319,7 +322,7 @@ export const WODSchedulePreview = () => {
                   <SelectValue placeholder="Select category" />
                 </SelectTrigger>
                 <SelectContent>
-                  {CATEGORY_CYCLE_7DAY.filter((v, i, a) => a.indexOf(v) === i).map(cat => (
+                  {CATEGORY_CYCLE_8DAY.filter((v, i, a) => a.indexOf(v) === i).map(cat => (
                     <SelectItem key={cat} value={cat}>{cat}</SelectItem>
                   ))}
                 </SelectContent>

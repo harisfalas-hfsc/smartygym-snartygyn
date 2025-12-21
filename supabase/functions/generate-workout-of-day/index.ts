@@ -11,24 +11,25 @@ const corsHeaders = {
 };
 
 // ═══════════════════════════════════════════════════════════════════════════════
-// NEW 7-DAY CATEGORY CYCLE (User's exact specification)
+// NEW 8-DAY CATEGORY CYCLE (with PILATES as Day 8)
 // ═══════════════════════════════════════════════════════════════════════════════
-const CATEGORY_CYCLE_7DAY = [
+const CATEGORY_CYCLE_8DAY = [
   "CHALLENGE",            // Day 1
   "STRENGTH",             // Day 2 (REPS & SETS only)
   "CARDIO",               // Day 3
   "MOBILITY & STABILITY", // Day 4 (REPS & SETS only)
   "STRENGTH",             // Day 5 (REPS & SETS only)
   "METABOLIC",            // Day 6
-  "CALORIE BURNING"       // Day 7
+  "CALORIE BURNING",      // Day 7
+  "PILATES"               // Day 8 (REPS & SETS only - Reformer or Mat)
 ];
 
 // ═══════════════════════════════════════════════════════════════════════════════
 // DIFFICULTY PATTERN - Rotates weekly to prevent category-difficulty pairing
 // ═══════════════════════════════════════════════════════════════════════════════
-// Week 1: [3-4, 5-6, 1-2, 5-6, 3-4, 1-2, 5-6] -> Day 1 Intermediate, Day 2 Advanced...
-// Week 2: [5-6, 3-4, 5-6, 1-2, 5-6, 3-4, 1-2] -> Shifts by 1
-// Week 3: [1-2, 5-6, 3-4, 5-6, 1-2, 5-6, 3-4] -> Shifts by 1 again...
+// Week 1: [3-4, 5-6, 1-2, 5-6, 3-4, 1-2, 5-6, 3-4] -> Day 1 Intermediate, Day 2 Advanced...
+// Week 2: [5-6, 3-4, 5-6, 1-2, 5-6, 3-4, 1-2, 5-6] -> Shifts by 1
+// Week 3: Continues shifting...
 const DIFFICULTY_PATTERN_BASE = [
   { level: "Intermediate", range: [3, 4] }, // Day 1
   { level: "Advanced", range: [5, 6] },     // Day 2
@@ -36,7 +37,8 @@ const DIFFICULTY_PATTERN_BASE = [
   { level: "Advanced", range: [5, 6] },     // Day 4
   { level: "Intermediate", range: [3, 4] }, // Day 5
   { level: "Beginner", range: [1, 2] },     // Day 6
-  { level: "Advanced", range: [5, 6] }      // Day 7
+  { level: "Advanced", range: [5, 6] },     // Day 7
+  { level: "Intermediate", range: [3, 4] }  // Day 8
 ];
 
 // ═══════════════════════════════════════════════════════════════════════════════
@@ -45,6 +47,7 @@ const DIFFICULTY_PATTERN_BASE = [
 const FORMATS_BY_CATEGORY: Record<string, string[]> = {
   "STRENGTH": ["REPS & SETS"], // ONLY Reps & Sets
   "MOBILITY & STABILITY": ["REPS & SETS"], // ONLY Reps & Sets
+  "PILATES": ["REPS & SETS"], // ONLY Reps & Sets - controlled Pilates movements
   "CARDIO": ["CIRCUIT", "EMOM", "FOR TIME", "AMRAP", "TABATA"], // NO Reps & Sets
   "METABOLIC": ["CIRCUIT", "AMRAP", "EMOM", "FOR TIME", "TABATA"], // NO Reps & Sets
   "CALORIE BURNING": ["CIRCUIT", "TABATA", "AMRAP", "FOR TIME", "EMOM"], // NO Reps & Sets
@@ -67,22 +70,22 @@ function logStep(step: string, details?: any) {
 }
 
 // ═══════════════════════════════════════════════════════════════════════════════
-// NEW ROTATION LOGIC FUNCTIONS
+// NEW ROTATION LOGIC FUNCTIONS (8-DAY CYCLE)
 // ═══════════════════════════════════════════════════════════════════════════════
 
-// Get day 1-7 in current 7-day cycle
+// Get day 1-8 in current 8-day cycle
 function getDayInCycle(dayCount: number): number {
-  return (dayCount % 7) + 1;
+  return (dayCount % 8) + 1;
 }
 
 // Get week number (for difficulty rotation shift)
 function getWeekNumber(dayCount: number): number {
-  return Math.floor(dayCount / 7) + 1;
+  return Math.floor(dayCount / 8) + 1;
 }
 
-// Get category for a specific day in cycle (1-7)
+// Get category for a specific day in cycle (1-8)
 function getCategoryForDay(dayInCycle: number): string {
-  return CATEGORY_CYCLE_7DAY[dayInCycle - 1];
+  return CATEGORY_CYCLE_8DAY[dayInCycle - 1];
 }
 
 // Get difficulty for day with weekly rotation shift and star alternation
@@ -92,8 +95,8 @@ function getDifficultyForDay(
   usedStarsInWeek: Record<string, boolean>
 ): { name: string; stars: number } {
   // Shift the difficulty pattern by (weekNumber - 1) positions
-  const shiftAmount = (weekNumber - 1) % 7;
-  const shiftedIndex = ((dayInCycle - 1) + shiftAmount) % 7;
+  const shiftAmount = (weekNumber - 1) % 8;
+  const shiftedIndex = ((dayInCycle - 1) + shiftAmount) % 8;
   const pattern = DIFFICULTY_PATTERN_BASE[shiftedIndex];
   
   const [star1, star2] = pattern.range;
@@ -181,7 +184,7 @@ export function calculateFutureWODSchedule(
   currentWeekNumber: number,
   usedStarsInWeek: Record<string, boolean>,
   formatUsage: Record<string, string[]>,
-  daysAhead: number = 3
+  daysAhead: number = 8
 ): Array<{ date: string; dayInCycle: number; category: string; difficulty: { name: string; stars: number }; formats: string[] }> {
   const schedule = [];
   
@@ -515,12 +518,12 @@ serve(async (req) => {
     };
     
     // ═══════════════════════════════════════════════════════════════════════════════
-    // FORMAT SELECTION: STRENGTH and MOBILITY & STABILITY = always REPS & SETS
+    // FORMAT SELECTION: STRENGTH, MOBILITY & STABILITY, and PILATES = always REPS & SETS
     // Other categories can have different formats per equipment type
     // ═══════════════════════════════════════════════════════════════════════════════
     const getFormatForWorkout = (cat: string, equipType: string): { format: string; duration: string } => {
-      // STRENGTH and MOBILITY & STABILITY: MUST be REPS & SETS for both workouts
-      if (cat === "STRENGTH" || cat === "MOBILITY & STABILITY") {
+      // STRENGTH, MOBILITY & STABILITY, and PILATES: MUST be REPS & SETS for both workouts
+      if (cat === "STRENGTH" || cat === "MOBILITY & STABILITY" || cat === "PILATES") {
         const fmt = "REPS & SETS";
         return { format: fmt, duration: getDuration(fmt, selectedDifficulty.stars) };
       }
@@ -558,7 +561,8 @@ serve(async (req) => {
       "METABOLIC": "M",
       "CARDIO": "CA",
       "MOBILITY & STABILITY": "MS",
-      "CHALLENGE": "CH"
+      "CHALLENGE": "CH",
+      "PILATES": "PIL"
     };
     const prefix = categoryPrefixes[category] || "W";
     const timestamp = Date.now();
@@ -621,7 +625,7 @@ serve(async (req) => {
     for (const equipment of equipmentTypes) {
       // ═══════════════════════════════════════════════════════════════════════════════
       // GET FORMAT AND DURATION FOR THIS SPECIFIC WORKOUT
-      // STRENGTH and MOBILITY & STABILITY = always REPS & SETS (both workouts same)
+      // STRENGTH, MOBILITY & STABILITY, and PILATES = always REPS & SETS (both workouts same)
       // Other categories = each workout can have its own format and duration
       // ═══════════════════════════════════════════════════════════════════════════════
       const { format, duration } = getFormatForWorkout(category, equipment);
@@ -629,7 +633,7 @@ serve(async (req) => {
       logStep(`Generating ${equipment} workout`, { 
         format, 
         duration,
-        categoryRequiresMatchingFormat: category === "STRENGTH" || category === "MOBILITY & STABILITY"
+        categoryRequiresMatchingFormat: category === "STRENGTH" || category === "MOBILITY & STABILITY" || category === "PILATES"
       });
 
       const bannedNameInstruction = firstWorkoutName 
@@ -1103,6 +1107,101 @@ GOLD STANDARD EXAMPLE - "Challenge me UP!" (CH-008):
 
 KEY INSIGHT: The FORMAT is "FOR TIME" because the main workout is 100 burpees for time.
 The finisher's reps don't change this classification - they are a consequence of the main workout.
+` : ""}
+
+${category === "PILATES" ? `
+═══════════════════════════════════════════════════════════════════════════════
+PILATES CATEGORY - CONTROLLED MOVEMENT EXCELLENCE
+═══════════════════════════════════════════════════════════════════════════════
+
+PHILOSOPHY:
+Pilates is about controlled, precise movements that build core strength, flexibility, 
+and body awareness. Every exercise should emphasize quality over quantity, breath control,
+and mind-body connection.
+
+FORMAT: REPS & SETS ONLY (controlled movements require this structure)
+DURATION: 30-45 minutes depending on difficulty
+
+${equipment === "EQUIPMENT" ? `
+REFORMER PILATES (EQUIPMENT VERSION):
+Your workout must use Pilates reformer-style movements with gym equipment alternatives.
+
+ALLOWED EQUIPMENT & EXERCISES:
+• Resistance bands/cables: Footwork variations, Leg presses, Arm circles, Rowing preps
+• Stability ball: Spine articulation, Bridging, Hamstring curls, Pike rolls
+• Foam roller: Rolling like a ball adaptations, Spine stretches, Mermaid stretches
+• Light dumbbells (2-5kg): Arm series, Chest expansion, Hug a tree
+• Gliders/towels: Lunges, Pikes, Mountain climbers (slow & controlled)
+• TRX/Suspension: Teaser variations, Plank to pike, Pull-through
+• Box/bench: Long box series, Short box series, Swan on box
+
+REFORMER-INSPIRED SEQUENCES:
+• Footwork Series: Parallel, V-position, Wide V (using cables/resistance bands)
+• Long Stretch Series: Plank, Up stretch, Elephant (using gliders)
+• Short Spine & Overhead: Spinal articulation with stability ball
+• Rowing Series: Rowing front, Rowing back (with light resistance)
+• Arm Work: Biceps, Triceps, Circles (with bands or light weights)
+• Side Splits/Standing: Balance work with resistance
+
+KEY PRINCIPLES:
+• Smooth, flowing transitions between exercises
+• Constant engagement of the powerhouse (core)
+• Controlled eccentric and concentric phases (3-4 second tempo)
+• Breath coordination: Exhale on exertion
+` : `
+MAT PILATES (BODYWEIGHT VERSION):
+Classical mat Pilates with optional props (fit ball, ring, mini bands allowed).
+
+ALLOWED EXERCISES & PROPS:
+• Classical Mat Sequence: The Hundred, Roll Up, Roll Over, Single Leg Circles
+• Pilates Ring exercises: Inner thigh squeezes, Chest presses, Arm circles
+• Fit Ball (Swiss Ball): Spine articulation, Bridging, Teaser variations
+• Mini Bands: Clamshells, Leg circles, Side-lying series
+• Resistance Loop: Monster walks, Glute activation
+
+CLASSICAL PILATES ORDER (Can adapt but respect the flow):
+1. The Hundred (warm-up)
+2. Roll Up / Roll Down
+3. Single Leg Circles
+4. Rolling Like a Ball
+5. Single Leg Stretch
+6. Double Leg Stretch
+7. Spine Stretch Forward
+8. Open Leg Rocker
+9. Corkscrew
+10. Saw
+11. Swan
+12. Single Leg Kicks
+13. Double Leg Kicks
+14. Neck Pull
+15. Shoulder Bridge
+16. Side Kicks Series
+17. Teaser
+18. Swimming
+19. Leg Pull Front/Back
+20. Seal / Crab
+
+MODIFICATION LEVELS:
+• Beginner (1-2★): Basic versions, more rest, fewer reps
+• Intermediate (3-4★): Full classical movements, moderate reps
+• Advanced (5-6★): Advanced variations, longer holds, flowing sequences
+`}
+
+FINISHER FOR PILATES:
+• Keep REPS & SETS format (category rule)
+• Focus on stretching and core endurance
+• Examples: 3x30 sec Side Plank each side, 3x20 Swimming pulses, Deep stretching series
+
+❌ FORBIDDEN IN PILATES:
+• Explosive movements (no jumping, no burpees)
+• Heavy weights (maximum 5kg dumbbells)
+• High-intensity intervals
+• Speed-based exercises
+• Any cardiovascular spikes
+
+NAMING SUGGESTIONS FOR PILATES:
+• Flow, Balance, Core, Align, Center, Lengthen, Stabilize, Ground, Breathe
+• Examples: "Core Flow", "Balance Point", "Center Alignment", "Lengthen & Strengthen"
 ` : ""}
 
 ═══════════════════════════════════════════════════════════════════════════════

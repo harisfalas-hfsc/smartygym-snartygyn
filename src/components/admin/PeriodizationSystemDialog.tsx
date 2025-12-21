@@ -12,18 +12,19 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { useQueryClient } from "@tanstack/react-query";
 
-// 7-DAY CATEGORY CYCLE
-const CATEGORY_CYCLE_7DAY = [
-  "CHALLENGE",
-  "STRENGTH", 
-  "CARDIO",
-  "MOBILITY & STABILITY",
-  "STRENGTH",
-  "METABOLIC",
-  "CALORIE BURNING"
+// 8-DAY CATEGORY CYCLE (with PILATES as Day 8)
+const CATEGORY_CYCLE_8DAY = [
+  "CHALLENGE",            // Day 1
+  "STRENGTH",             // Day 2
+  "CARDIO",               // Day 3
+  "MOBILITY & STABILITY", // Day 4
+  "STRENGTH",             // Day 5
+  "METABOLIC",            // Day 6
+  "CALORIE BURNING",      // Day 7
+  "PILATES"               // Day 8
 ];
 
-// Difficulty pattern
+// Difficulty pattern (8-day to match category cycle)
 const DIFFICULTY_PATTERN_BASE = [
   { level: "Intermediate", range: "3-4★" },
   { level: "Advanced", range: "5-6★" },
@@ -31,13 +32,15 @@ const DIFFICULTY_PATTERN_BASE = [
   { level: "Advanced", range: "5-6★" },
   { level: "Intermediate", range: "3-4★" },
   { level: "Beginner", range: "1-2★" },
-  { level: "Advanced", range: "5-6★" }
+  { level: "Advanced", range: "5-6★" },
+  { level: "Intermediate", range: "3-4★" }  // Day 8
 ];
 
 // Format rules by category
 const FORMATS_BY_CATEGORY: Record<string, string[]> = {
   "STRENGTH": ["REPS & SETS"],
   "MOBILITY & STABILITY": ["REPS & SETS"],
+  "PILATES": ["REPS & SETS"],  // Pilates uses controlled movements only
   "CARDIO": ["CIRCUIT", "EMOM", "FOR TIME", "AMRAP", "TABATA"],
   "METABOLIC": ["CIRCUIT", "AMRAP", "EMOM", "FOR TIME", "TABATA"],
   "CALORIE BURNING": ["CIRCUIT", "TABATA", "AMRAP", "FOR TIME", "EMOM"],
@@ -70,8 +73,8 @@ export const PeriodizationSystemDialog = ({
   const [editWeekNumber, setEditWeekNumber] = useState<number>(1);
   const [isSaving, setIsSaving] = useState(false);
 
-  const dayInCycle = wodState ? (wodState.day_count % 7) + 1 : 1;
-  const weekNumber = wodState?.week_number || Math.floor((wodState?.day_count || 0) / 7) + 1;
+  const dayInCycle = wodState ? (wodState.day_count % 8) + 1 : 1;
+  const weekNumber = wodState?.week_number || Math.floor((wodState?.day_count || 0) / 8) + 1;
 
   const handleStartEdit = () => {
     setEditDayCount(wodState?.day_count || 0);
@@ -130,7 +133,7 @@ export const PeriodizationSystemDialog = ({
       if (error) throw error;
 
       toast.success(`Reset to Day ${targetDay}`, {
-        description: `Next WOD will be ${CATEGORY_CYCLE_7DAY[newDayCount % 7]}`
+        description: `Next WOD will be ${CATEGORY_CYCLE_8DAY[newDayCount % 8]}`
       });
       
       queryClient.invalidateQueries({ queryKey: ["wod-state"] });
@@ -190,13 +193,13 @@ export const PeriodizationSystemDialog = ({
   };
 
   // Preview what the new settings would result in
-  const previewDayInCycle = (editDayCount % 7) + 1;
-  const previewCategory = CATEGORY_CYCLE_7DAY[editDayCount % 7];
+  const previewDayInCycle = (editDayCount % 8) + 1;
+  const previewCategory = CATEGORY_CYCLE_8DAY[editDayCount % 8];
   
   // Calculate shifted pattern for current week
-  const shiftAmount = (weekNumber - 1) % 7;
+  const shiftAmount = (weekNumber - 1) % 8;
   const getShiftedDifficulty = (dayIndex: number) => {
-    const shiftedIndex = (dayIndex + shiftAmount) % 7;
+    const shiftedIndex = (dayIndex + shiftAmount) % 8;
     return DIFFICULTY_PATTERN_BASE[shiftedIndex];
   };
 
@@ -234,7 +237,7 @@ export const PeriodizationSystemDialog = ({
               <CardHeader className="pb-2">
                 <CardTitle className="text-sm flex items-center gap-2">
                   <Calendar className="h-4 w-4" />
-                  7-Day Category Cycle
+                  8-Day Category Cycle
                 </CardTitle>
               </CardHeader>
               <CardContent>
@@ -247,7 +250,7 @@ export const PeriodizationSystemDialog = ({
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {CATEGORY_CYCLE_7DAY.map((category, index) => (
+                    {CATEGORY_CYCLE_8DAY.map((category, index) => (
                       <TableRow 
                         key={index} 
                         className={index + 1 === dayInCycle ? "bg-primary/10" : ""}
@@ -272,7 +275,7 @@ export const PeriodizationSystemDialog = ({
                   </TableBody>
                 </Table>
                 <p className="text-sm text-muted-foreground mt-4">
-                  The cycle repeats every 7 days. After Day 7 (CALORIE BURNING), it returns to Day 1 (CHALLENGE).
+                  The cycle repeats every 8 days. After Day 8 (PILATES), it returns to Day 1 (CHALLENGE).
                 </p>
               </CardContent>
             </Card>
@@ -382,7 +385,7 @@ export const PeriodizationSystemDialog = ({
                 <div className="p-3 bg-muted/30 rounded-lg mt-4 space-y-2">
                   <p className="text-sm font-medium">Format Rules:</p>
                   <ul className="text-sm text-muted-foreground list-disc list-inside space-y-1">
-                    <li><strong>STRENGTH</strong> and <strong>MOBILITY & STABILITY</strong> use ONLY "Reps & Sets" format</li>
+                    <li><strong>STRENGTH</strong>, <strong>MOBILITY & STABILITY</strong>, and <strong>PILATES</strong> use ONLY "Reps & Sets" format</li>
                     <li>Other categories rotate through multiple formats daily</li>
                     <li>Format usage is tracked to ensure variety</li>
                   </ul>
@@ -472,7 +475,7 @@ export const PeriodizationSystemDialog = ({
                     <div className="p-3 bg-muted/30 rounded-lg">
                       <p className="text-xs text-muted-foreground">Next Category</p>
                       <Badge variant="secondary" className="mt-1">
-                        {CATEGORY_CYCLE_7DAY[(wodState?.day_count || 0) % 7]}
+                        {CATEGORY_CYCLE_8DAY[(wodState?.day_count || 0) % 8]}
                       </Badge>
                     </div>
                   </div>

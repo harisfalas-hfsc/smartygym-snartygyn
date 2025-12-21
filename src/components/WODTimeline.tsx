@@ -5,15 +5,16 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { ChevronLeft, ChevronRight, Star } from "lucide-react";
 import { format, subDays, addDays } from "date-fns";
 
-// 7-DAY CATEGORY CYCLE
-const CATEGORY_CYCLE_7DAY = [
+// 8-DAY CATEGORY CYCLE (with PILATES as Day 8)
+const CATEGORY_CYCLE_8DAY = [
   "CHALLENGE",
   "STRENGTH", 
   "CARDIO",
   "MOBILITY & STABILITY",
   "STRENGTH",
   "METABOLIC",
-  "CALORIE BURNING"
+  "CALORIE BURNING",
+  "PILATES"
 ];
 
 // DIFFICULTY PATTERN BASE
@@ -24,26 +25,28 @@ const DIFFICULTY_PATTERN_BASE = [
   { level: "Advanced", range: [5, 6] },
   { level: "Intermediate", range: [3, 4] },
   { level: "Beginner", range: [1, 2] },
-  { level: "Advanced", range: [5, 6] }
+  { level: "Advanced", range: [5, 6] },
+  { level: "Intermediate", range: [3, 4] }
 ];
 
 const FORMATS_BY_CATEGORY: Record<string, string[]> = {
   "STRENGTH": ["REPS & SETS"],
   "MOBILITY & STABILITY": ["REPS & SETS"],
+  "PILATES": ["REPS & SETS"],
   "CARDIO": ["CIRCUIT", "EMOM", "FOR TIME", "AMRAP", "TABATA"],
   "METABOLIC": ["CIRCUIT", "AMRAP", "EMOM", "FOR TIME", "TABATA"],
   "CALORIE BURNING": ["CIRCUIT", "TABATA", "AMRAP", "FOR TIME", "EMOM"],
   "CHALLENGE": ["CIRCUIT", "TABATA", "AMRAP", "EMOM", "FOR TIME", "MIX"]
 };
 
-// Match backend formula: (dayCount % 7) + 1, where dayCount starts at 0
-const getDayInCycle = (dayCount: number): number => (dayCount % 7) + 1;
+// Match backend formula: (dayCount % 8) + 1, where dayCount starts at 0
+const getDayInCycle = (dayCount: number): number => (dayCount % 8) + 1;
 
-const getCategoryForDay = (dayInCycle: number): string => CATEGORY_CYCLE_7DAY[dayInCycle - 1];
+const getCategoryForDay = (dayInCycle: number): string => CATEGORY_CYCLE_8DAY[dayInCycle - 1];
 
 const getDifficultyForDay = (dayInCycle: number, weekNumber: number): { level: string; range: [number, number] } => {
-  const shiftAmount = (weekNumber - 1) % 7;
-  const shiftedIndex = ((dayInCycle - 1) + shiftAmount) % 7;
+  const shiftAmount = (weekNumber - 1) % 8;
+  const shiftedIndex = ((dayInCycle - 1) + shiftAmount) % 8;
   return {
     level: DIFFICULTY_PATTERN_BASE[shiftedIndex].level,
     range: DIFFICULTY_PATTERN_BASE[shiftedIndex].range as [number, number]
