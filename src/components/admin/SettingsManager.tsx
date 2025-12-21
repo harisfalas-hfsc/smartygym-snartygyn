@@ -8,7 +8,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
-import { Settings, Bell, Mail, Database, Shield, Download, HeartPulse, Wrench } from "lucide-react";
+import { Settings, Bell, Mail, Database, Shield, Download, HeartPulse, Wrench, Image, RefreshCw, Search, ImagePlus, Send, Trash2 } from "lucide-react";
 import { SystemHealthAudit } from "./SystemHealthAudit";
 
 export const SettingsManager = () => {
@@ -40,6 +40,20 @@ export const SettingsManager = () => {
   // Stripe Cleanup
   const [cleanupLoading, setCleanupLoading] = useState(false);
   const [cleanupResult, setCleanupResult] = useState<{ updated: number; message: string } | null>(null);
+
+  // Admin Tools Loading States
+  const [syncImagesLoading, setSyncImagesLoading] = useState(false);
+  const [syncImagesResult, setSyncImagesResult] = useState<string | null>(null);
+  const [regenerateWodLoading, setRegenerateWodLoading] = useState(false);
+  const [regenerateWodResult, setRegenerateWodResult] = useState<string | null>(null);
+  const [refreshSeoLoading, setRefreshSeoLoading] = useState(false);
+  const [refreshSeoResult, setRefreshSeoResult] = useState<string | null>(null);
+  const [generateImagesLoading, setGenerateImagesLoading] = useState(false);
+  const [generateImagesResult, setGenerateImagesResult] = useState<string | null>(null);
+  const [reengagementLoading, setReengagementLoading] = useState(false);
+  const [reengagementResult, setReengagementResult] = useState<string | null>(null);
+  const [cleanupRateLimitsLoading, setCleanupRateLimitsLoading] = useState(false);
+  const [cleanupRateLimitsResult, setCleanupRateLimitsResult] = useState<string | null>(null);
 
   // Load inactivity timeout on mount
   useEffect(() => {
@@ -252,6 +266,219 @@ export const SettingsManager = () => {
     }
   };
 
+  const handleSyncStripeImages = async () => {
+    if (!confirm("This will sync all workout/program images to their Stripe products. Continue?")) {
+      return;
+    }
+    
+    setSyncImagesLoading(true);
+    setSyncImagesResult(null);
+    try {
+      const { data, error } = await supabase.functions.invoke('sync-stripe-images');
+      
+      if (error) throw error;
+
+      setSyncImagesResult(`Synced ${data.synced || 0} images to Stripe`);
+      toast({
+        title: "Sync Complete",
+        description: `Successfully synced ${data.synced || 0} images to Stripe products.`,
+      });
+    } catch (error: any) {
+      toast({
+        title: "Sync Failed",
+        description: error.message || "Failed to sync images to Stripe.",
+        variant: "destructive",
+      });
+    } finally {
+      setSyncImagesLoading(false);
+    }
+  };
+
+  const handleRegenerateWod = async () => {
+    if (!confirm("This will regenerate today's Workout of the Day. Continue?")) {
+      return;
+    }
+    
+    setRegenerateWodLoading(true);
+    setRegenerateWodResult(null);
+    try {
+      const { data, error } = await supabase.functions.invoke('generate-workout-of-day');
+      
+      if (error) throw error;
+
+      setRegenerateWodResult(`Generated: ${data.workout?.name || 'New WOD'}`);
+      toast({
+        title: "WOD Generated",
+        description: `Successfully generated: ${data.workout?.name || 'New Workout of the Day'}`,
+      });
+    } catch (error: any) {
+      toast({
+        title: "Generation Failed",
+        description: error.message || "Failed to generate WOD.",
+        variant: "destructive",
+      });
+    } finally {
+      setRegenerateWodLoading(false);
+    }
+  };
+
+  const handleRefreshSeo = async () => {
+    if (!confirm("This will refresh SEO metadata for all content. This may take a while. Continue?")) {
+      return;
+    }
+    
+    setRefreshSeoLoading(true);
+    setRefreshSeoResult(null);
+    try {
+      const { data, error } = await supabase.functions.invoke('refresh-seo-metadata');
+      
+      if (error) throw error;
+
+      setRefreshSeoResult(`Updated ${data.updated || 0} items`);
+      toast({
+        title: "SEO Refresh Complete",
+        description: `Successfully updated SEO metadata for ${data.updated || 0} items.`,
+      });
+    } catch (error: any) {
+      toast({
+        title: "Refresh Failed",
+        description: error.message || "Failed to refresh SEO metadata.",
+        variant: "destructive",
+      });
+    } finally {
+      setRefreshSeoLoading(false);
+    }
+  };
+
+  const handleGenerateMissingImages = async () => {
+    if (!confirm("This will generate AI images for workouts that don't have one. This may take several minutes. Continue?")) {
+      return;
+    }
+    
+    setGenerateImagesLoading(true);
+    setGenerateImagesResult(null);
+    try {
+      // First, find workouts without images
+      const { data: workoutsWithoutImages, error: fetchError } = await supabase
+        .from('admin_workouts')
+        .select('id, name, category, format, difficulty_stars')
+        .is('image_url', null)
+        .limit(5); // Process 5 at a time to avoid timeouts
+      
+      if (fetchError) throw fetchError;
+
+      if (!workoutsWithoutImages || workoutsWithoutImages.length === 0) {
+        setGenerateImagesResult("All workouts already have images!");
+        toast({
+          title: "No Images Needed",
+          description: "All workouts already have images.",
+        });
+        return;
+      }
+
+      let generated = 0;
+      for (const workout of workoutsWithoutImages) {
+        try {
+          const { data, error } = await supabase.functions.invoke('generate-workout-image', {
+            body: {
+              name: workout.name,
+              category: workout.category,
+              format: workout.format,
+              difficulty_stars: workout.difficulty_stars,
+            },
+          });
+          
+          if (!error && data?.imageUrl) {
+            await supabase
+              .from('admin_workouts')
+              .update({ image_url: data.imageUrl })
+              .eq('id', workout.id);
+            generated++;
+          }
+        } catch (e) {
+          console.error(`Failed to generate image for ${workout.name}:`, e);
+        }
+      }
+
+      setGenerateImagesResult(`Generated ${generated} of ${workoutsWithoutImages.length} images`);
+      toast({
+        title: "Image Generation Complete",
+        description: `Generated ${generated} images. ${workoutsWithoutImages.length - generated > 0 ? `${workoutsWithoutImages.length - generated} failed.` : ''}`,
+      });
+    } catch (error: any) {
+      toast({
+        title: "Generation Failed",
+        description: error.message || "Failed to generate workout images.",
+        variant: "destructive",
+      });
+    } finally {
+      setGenerateImagesLoading(false);
+    }
+  };
+
+  const handleSendReengagementEmails = async () => {
+    if (!confirm("This will send re-engagement emails to users with expired subscriptions. Continue?")) {
+      return;
+    }
+    
+    setReengagementLoading(true);
+    setReengagementResult(null);
+    try {
+      const { data, error } = await supabase.functions.invoke('send-reengagement-emails');
+      
+      if (error) throw error;
+
+      setReengagementResult(`Sent ${data.sent || 0} emails`);
+      toast({
+        title: "Emails Sent",
+        description: `Successfully sent ${data.sent || 0} re-engagement emails.`,
+      });
+    } catch (error: any) {
+      toast({
+        title: "Send Failed",
+        description: error.message || "Failed to send re-engagement emails.",
+        variant: "destructive",
+      });
+    } finally {
+      setReengagementLoading(false);
+    }
+  };
+
+  const handleCleanupRateLimits = async () => {
+    if (!confirm("This will delete expired rate limit records from the database. Continue?")) {
+      return;
+    }
+    
+    setCleanupRateLimitsLoading(true);
+    setCleanupRateLimitsResult(null);
+    try {
+      const oneHourAgo = new Date(Date.now() - 60 * 60 * 1000).toISOString();
+      
+      const { data, error } = await supabase
+        .from('rate_limits')
+        .delete()
+        .lt('window_start', oneHourAgo)
+        .select();
+      
+      if (error) throw error;
+
+      const deletedCount = data?.length || 0;
+      setCleanupRateLimitsResult(`Deleted ${deletedCount} old records`);
+      toast({
+        title: "Cleanup Complete",
+        description: `Deleted ${deletedCount} expired rate limit records.`,
+      });
+    } catch (error: any) {
+      toast({
+        title: "Cleanup Failed",
+        description: error.message || "Failed to cleanup rate limits.",
+        variant: "destructive",
+      });
+    } finally {
+      setCleanupRateLimitsLoading(false);
+    }
+  };
+
   return (
     <div className="pt-6 space-y-6 w-full overflow-x-hidden">
       <Tabs defaultValue="general" className="w-full">
@@ -429,6 +656,160 @@ export const SettingsManager = () => {
                     ✅ {cleanupResult.message} ({cleanupResult.updated} products updated)
                   </p>
                 )}
+              </CardContent>
+            </Card>
+
+            {/* Admin Tools Grid */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Wrench className="h-5 w-5" />
+                  Admin Tools
+                </CardTitle>
+                <CardDescription>
+                  Quick actions for common administrative tasks
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                  {/* Sync Stripe Images */}
+                  <div className="p-4 border rounded-lg space-y-3">
+                    <div className="flex items-center gap-2">
+                      <Image className="h-5 w-5 text-blue-500" />
+                      <h4 className="font-medium text-sm">Sync Stripe Images</h4>
+                    </div>
+                    <p className="text-xs text-muted-foreground">
+                      Sync workout images to their Stripe products
+                    </p>
+                    <Button 
+                      onClick={handleSyncStripeImages} 
+                      disabled={syncImagesLoading}
+                      variant="outline"
+                      size="sm"
+                      className="w-full"
+                    >
+                      {syncImagesLoading ? "Syncing..." : "Sync Images"}
+                    </Button>
+                    {syncImagesResult && (
+                      <p className="text-xs text-green-600">✅ {syncImagesResult}</p>
+                    )}
+                  </div>
+
+                  {/* Regenerate WOD */}
+                  <div className="p-4 border rounded-lg space-y-3">
+                    <div className="flex items-center gap-2">
+                      <RefreshCw className="h-5 w-5 text-orange-500" />
+                      <h4 className="font-medium text-sm">Regenerate WOD</h4>
+                    </div>
+                    <p className="text-xs text-muted-foreground">
+                      Manually trigger today's Workout of the Day
+                    </p>
+                    <Button 
+                      onClick={handleRegenerateWod} 
+                      disabled={regenerateWodLoading}
+                      variant="outline"
+                      size="sm"
+                      className="w-full"
+                    >
+                      {regenerateWodLoading ? "Generating..." : "Regenerate WOD"}
+                    </Button>
+                    {regenerateWodResult && (
+                      <p className="text-xs text-green-600">✅ {regenerateWodResult}</p>
+                    )}
+                  </div>
+
+                  {/* Refresh SEO */}
+                  <div className="p-4 border rounded-lg space-y-3">
+                    <div className="flex items-center gap-2">
+                      <Search className="h-5 w-5 text-purple-500" />
+                      <h4 className="font-medium text-sm">Refresh SEO</h4>
+                    </div>
+                    <p className="text-xs text-muted-foreground">
+                      Regenerate SEO metadata for all content
+                    </p>
+                    <Button 
+                      onClick={handleRefreshSeo} 
+                      disabled={refreshSeoLoading}
+                      variant="outline"
+                      size="sm"
+                      className="w-full"
+                    >
+                      {refreshSeoLoading ? "Refreshing..." : "Refresh SEO"}
+                    </Button>
+                    {refreshSeoResult && (
+                      <p className="text-xs text-green-600">✅ {refreshSeoResult}</p>
+                    )}
+                  </div>
+
+                  {/* Generate Missing Images */}
+                  <div className="p-4 border rounded-lg space-y-3">
+                    <div className="flex items-center gap-2">
+                      <ImagePlus className="h-5 w-5 text-green-500" />
+                      <h4 className="font-medium text-sm">Generate Images</h4>
+                    </div>
+                    <p className="text-xs text-muted-foreground">
+                      Generate AI images for workouts missing them
+                    </p>
+                    <Button 
+                      onClick={handleGenerateMissingImages} 
+                      disabled={generateImagesLoading}
+                      variant="outline"
+                      size="sm"
+                      className="w-full"
+                    >
+                      {generateImagesLoading ? "Generating..." : "Generate Images"}
+                    </Button>
+                    {generateImagesResult && (
+                      <p className="text-xs text-green-600">✅ {generateImagesResult}</p>
+                    )}
+                  </div>
+
+                  {/* Send Re-engagement Emails */}
+                  <div className="p-4 border rounded-lg space-y-3">
+                    <div className="flex items-center gap-2">
+                      <Send className="h-5 w-5 text-pink-500" />
+                      <h4 className="font-medium text-sm">Re-engagement</h4>
+                    </div>
+                    <p className="text-xs text-muted-foreground">
+                      Send emails to users with expired subscriptions
+                    </p>
+                    <Button 
+                      onClick={handleSendReengagementEmails} 
+                      disabled={reengagementLoading}
+                      variant="outline"
+                      size="sm"
+                      className="w-full"
+                    >
+                      {reengagementLoading ? "Sending..." : "Send Emails"}
+                    </Button>
+                    {reengagementResult && (
+                      <p className="text-xs text-green-600">✅ {reengagementResult}</p>
+                    )}
+                  </div>
+
+                  {/* Cleanup Rate Limits */}
+                  <div className="p-4 border rounded-lg space-y-3">
+                    <div className="flex items-center gap-2">
+                      <Trash2 className="h-5 w-5 text-red-500" />
+                      <h4 className="font-medium text-sm">Cleanup Rate Limits</h4>
+                    </div>
+                    <p className="text-xs text-muted-foreground">
+                      Delete expired rate limit records
+                    </p>
+                    <Button 
+                      onClick={handleCleanupRateLimits} 
+                      disabled={cleanupRateLimitsLoading}
+                      variant="outline"
+                      size="sm"
+                      className="w-full"
+                    >
+                      {cleanupRateLimitsLoading ? "Cleaning..." : "Cleanup"}
+                    </Button>
+                    {cleanupRateLimitsResult && (
+                      <p className="text-xs text-green-600">✅ {cleanupRateLimitsResult}</p>
+                    )}
+                  </div>
+                </div>
               </CardContent>
             </Card>
 
