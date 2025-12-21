@@ -221,62 +221,135 @@ const WorkoutFlow = () => {
           </Card>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
-            {/* Rotating WOD Card - Same structure as other cards */}
+            {/* WOD Card - Matches homepage banner exactly */}
             <ScrollReveal>
-              <Card 
-                onClick={() => navigate("/workout/wod")} 
-                className="group p-6 cursor-pointer transition-all duration-500 ease-out transform-gpu hover:scale-110 hover:-translate-y-3 hover:shadow-2xl hover:shadow-primary/40 hover:border-primary/60 bg-card border-2 border-primary/60 relative overflow-hidden" 
-                role="button" 
+              <div 
+                onClick={() => navigate("/workout/wod")}
+                className="cursor-pointer group border-2 border-primary/60 rounded-xl 
+                           hover:border-primary hover:shadow-2xl hover:shadow-primary/40 hover:scale-110 hover:-translate-y-3 
+                           transition-all duration-500 ease-out transform-gpu
+                           flex flex-col h-full overflow-hidden bg-card"
+                role="button"
                 aria-label="Workout of the Day - Today's featured workouts at SmartyGym"
               >
-                <div className="flex flex-col items-center text-center space-y-4">
-                  {/* Centered Icon - Same size as other cards */}
-                  <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center transition-transform duration-300 group-hover:scale-110">
-                    <CalendarCheck className="w-8 h-8 text-primary transition-transform duration-300 group-hover:rotate-3" />
-                  </div>
-                  
-                  <div>
-                    {/* Title */}
-                    <h3 className="font-semibold text-lg mb-2">Workout of the Day</h3>
-                    
-                    {/* Rotating Workout Name */}
-                    <div className="relative h-12">
-                      {wodsLoading ? (
-                        <Skeleton className="h-4 w-3/4 mx-auto" />
-                      ) : wods && wods.length > 0 ? (
-                        wods.map((wod, index) => (
-                          <p
-                            key={wod.id}
-                            className={cn(
-                              "absolute inset-x-0 text-sm text-muted-foreground transition-opacity duration-700 ease-in-out line-clamp-2",
-                              currentWodIndex === index ? "opacity-100" : "opacity-0"
-                            )}
-                          >
-                            {wod.name}
-                          </p>
-                        ))
-                      ) : (
-                        <p className="text-sm text-muted-foreground">Fresh workouts coming soon!</p>
-                      )}
-                    </div>
-                    
-                    {/* Rotation Indicator Dots */}
-                    {wods && wods.length === 2 && (
-                      <div className="flex justify-center gap-1.5 mt-1">
-                        {[0, 1].map((i) => (
-                          <div
-                            key={i}
-                            className={cn(
-                              "w-2 h-2 rounded-full transition-all duration-300",
-                              currentWodIndex === i ? "bg-primary scale-125" : "bg-muted-foreground/30"
-                            )}
-                          />
-                        ))}
-                      </div>
-                    )}
-                  </div>
+                {/* Header: Workout of the Day with icon */}
+                <div className="flex items-center justify-center gap-2 py-2 bg-gradient-to-r from-green-500/10 to-primary/10 border-b border-green-500/30">
+                  <Dumbbell className="w-4 h-4 text-primary" />
+                  <span className="text-xs font-bold text-primary uppercase tracking-wide">Workout of the Day</span>
                 </div>
-              </Card>
+                
+                {/* WOD Card Content - smooth crossfade between WODs */}
+                <div className="flex-1 relative overflow-hidden min-h-[200px]">
+                  {wodsLoading ? (
+                    <div className="p-4 space-y-2">
+                      <Skeleton className="h-24 w-full" />
+                      <Skeleton className="h-4 w-3/4" />
+                      <Skeleton className="h-3 w-1/2" />
+                    </div>
+                  ) : wods && wods.length > 0 ? (
+                    wods.slice(0, 2).map((wod, index) => (
+                      <div 
+                        key={wod.id}
+                        className={cn(
+                          "absolute inset-0 flex flex-col transition-opacity duration-700 ease-in-out",
+                          index === currentWodIndex ? "opacity-100 z-10" : "opacity-0 z-0"
+                        )}
+                      >
+                        {/* Image Section */}
+                        <div className="relative h-[100px] overflow-hidden bg-muted">
+                          {wod.image_url ? (
+                            <img 
+                              src={wod.image_url} 
+                              alt={wod.name}
+                              className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                              onError={(e) => {
+                                e.currentTarget.style.display = 'none';
+                              }}
+                            />
+                          ) : (
+                            <div className="w-full h-full flex items-center justify-center">
+                              <Dumbbell className="w-8 h-8 text-muted-foreground/50" />
+                            </div>
+                          )}
+                          {/* Equipment Badge */}
+                          <div className="absolute top-2 left-2">
+                            <span className={cn(
+                              "text-[10px] font-bold px-1.5 py-0.5 rounded-full",
+                              wod.equipment?.toLowerCase().includes("none") || wod.equipment?.toLowerCase().includes("bodyweight")
+                                ? "bg-emerald-500 text-white"
+                                : "bg-blue-500 text-white"
+                            )}>
+                              {wod.equipment?.toLowerCase().includes("none") || wod.equipment?.toLowerCase().includes("bodyweight") 
+                                ? "Bodyweight" 
+                                : "Equipment"}
+                            </span>
+                          </div>
+                          {/* Premium Badge */}
+                          {wod.is_premium && (
+                            <div className="absolute top-2 right-2">
+                              <span className="text-[10px] font-bold px-1.5 py-0.5 rounded-full bg-amber-500 text-white flex items-center gap-0.5">
+                                <Crown className="w-2.5 h-2.5" />
+                                Premium
+                              </span>
+                            </div>
+                          )}
+                        </div>
+                        
+                        {/* Content Section */}
+                        <div className="flex-1 p-3 flex flex-col justify-between">
+                          {/* Workout Name */}
+                          <p className="text-sm font-bold text-foreground line-clamp-1">{wod.name}</p>
+                          
+                          {/* Metadata Grid - 2 columns */}
+                          <div className="grid grid-cols-2 gap-x-3 gap-y-1 mt-2">
+                            {/* Row 1: Type + Category */}
+                            {wod.type && (
+                              <div className="flex items-center gap-1 text-[10px]">
+                                <Target className="w-3 h-3 text-primary" />
+                                <span className="text-primary font-semibold uppercase">{wod.type}</span>
+                              </div>
+                            )}
+                            {wod.category && (
+                              <div className="flex items-center gap-1 text-[10px]">
+                                <Flame className="w-3 h-3 text-orange-500" />
+                                <span className="text-orange-600 dark:text-orange-400 font-semibold uppercase">{wod.category}</span>
+                              </div>
+                            )}
+                            
+                            {/* Row 2: Difficulty + Duration */}
+                            {wod.difficulty_stars && (
+                              <div className="flex items-center gap-1 text-[10px]">
+                                <Star className="w-3 h-3 text-yellow-500 fill-yellow-500" />
+                                <span className="text-yellow-600 dark:text-yellow-400 font-semibold uppercase">
+                                  {getDifficultyLabel(wod.difficulty_stars)}
+                                </span>
+                              </div>
+                            )}
+                            {wod.duration && (
+                              <div className="flex items-center gap-1 text-[10px]">
+                                <Clock className="w-3 h-3 text-purple-500" />
+                                <span className="text-purple-600 dark:text-purple-400 font-semibold uppercase">{wod.duration}</span>
+                              </div>
+                            )}
+                          </div>
+                          
+                          {/* CTA */}
+                          <div className="flex items-center justify-center gap-1 text-primary text-[10px] font-medium 
+                                          group-hover:gap-2 transition-all mt-2">
+                            View Today's WOD
+                            <ChevronRight className="w-3 h-3" />
+                          </div>
+                        </div>
+                      </div>
+                    ))
+                  ) : (
+                    <div className="flex flex-col items-center justify-center h-full p-4">
+                      <Dumbbell className="w-8 h-8 text-muted-foreground/50 mb-2" />
+                      <p className="text-sm text-muted-foreground">Fresh workouts coming soon!</p>
+                    </div>
+                  )}
+                </div>
+              </div>
             </ScrollReveal>
 
             {/* Static Workout Cards */}
