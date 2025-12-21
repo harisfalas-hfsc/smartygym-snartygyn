@@ -868,6 +868,201 @@ Contact: corporate@smartygym.com`;
         </CardContent>
       </Card>
 
+      {/* Workouts & Training Programs Philosophy Section */}
+      <Card className="border-orange-500/30 bg-gradient-to-r from-orange-500/5 to-transparent">
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2 text-xl">
+            🏋️ Workouts & Training Programs Philosophy
+          </CardTitle>
+          <CardDescription>
+            Complete AI generation rules, instructions, and philosophy documents - the exact instructions the AI follows when creating content
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          
+          {/* WOD (Workout of the Day) */}
+          <div className="border rounded-lg p-4 space-y-3 border-orange-500/30 bg-gradient-to-r from-orange-500/5 to-transparent">
+            <div>
+              <h3 className="font-semibold text-lg flex items-center gap-2">
+                ⚡ WOD (Workout of the Day) Generation Philosophy
+              </h3>
+              <p className="text-sm text-muted-foreground">7-day category cycle, difficulty rotation, format rules, equipment lists, naming guidelines, periodization, and value-for-money standards</p>
+            </div>
+            <div className="flex flex-wrap gap-2">
+              <Dialog>
+                <DialogTrigger asChild>
+                  <Button variant="default" size="sm" className="gap-2">
+                    <ExternalLink className="h-4 w-4" />
+                    View Guide
+                  </Button>
+                </DialogTrigger>
+                <DialogContent className="max-w-4xl max-h-[80vh]">
+                  <DialogHeader>
+                    <DialogTitle>⚡ WOD (Workout of the Day) Generation Philosophy</DialogTitle>
+                  </DialogHeader>
+                  <ScrollArea className="h-[60vh] pr-4">
+                    <div className="space-y-4 text-sm">
+                      {wodPhilosophyContent.map((section, index) => {
+                        if (section.type === 'heading') {
+                          const HeadingTag = section.level === 1 ? 'h2' : section.level === 2 ? 'h3' : 'h4';
+                          const headingClass = section.level === 1 
+                            ? 'text-xl font-bold mt-6 mb-2 text-primary' 
+                            : section.level === 2 
+                            ? 'text-lg font-semibold mt-4 mb-2' 
+                            : 'text-base font-medium mt-3 mb-1';
+                          return <HeadingTag key={index} className={headingClass}>{section.content}</HeadingTag>;
+                        } else if (section.type === 'paragraph') {
+                          return <p key={index} className="text-muted-foreground leading-relaxed whitespace-pre-wrap">{section.content}</p>;
+                        } else if (section.type === 'bullet') {
+                          return <p key={index} className="text-muted-foreground pl-4">• {section.content}</p>;
+                        } else if (section.type === 'code') {
+                          return <pre key={index} className="bg-muted p-3 rounded text-xs overflow-x-auto">{section.content}</pre>;
+                        }
+                        return null;
+                      })}
+                    </div>
+                  </ScrollArea>
+                </DialogContent>
+              </Dialog>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => generateWordDocument(
+                  'WOD (Workout of the Day) Generation Philosophy',
+                  wodPhilosophyContent,
+                  'WOD-Generation-Philosophy'
+                )}
+                className="gap-2"
+              >
+                <Download className="h-4 w-4" />
+                Download DOCX
+              </Button>
+            </div>
+          </div>
+
+          {/* Workouts */}
+          <div className="border rounded-lg p-4 space-y-3 border-blue-500/30 bg-gradient-to-r from-blue-500/5 to-transparent">
+            <div>
+              <h3 className="font-semibold text-lg flex items-center gap-2">
+                💪 Workouts Generation Philosophy
+              </h3>
+              <p className="text-sm text-muted-foreground">Category philosophies (Strength, Cardio, Metabolic, etc.), exercise variety, equipment safety, format definitions, and HTML formatting</p>
+            </div>
+            <div className="flex flex-wrap gap-2">
+              <Dialog>
+                <DialogTrigger asChild>
+                  <Button variant="default" size="sm" className="gap-2">
+                    <ExternalLink className="h-4 w-4" />
+                    View Guide
+                  </Button>
+                </DialogTrigger>
+                <DialogContent className="max-w-4xl max-h-[80vh]">
+                  <DialogHeader>
+                    <DialogTitle>💪 Workouts Generation Philosophy</DialogTitle>
+                  </DialogHeader>
+                  <ScrollArea className="h-[60vh] pr-4">
+                    <div className="space-y-4 text-sm">
+                      {workoutsPhilosophyContent.map((section, index) => {
+                        if (section.type === 'heading') {
+                          const HeadingTag = section.level === 1 ? 'h2' : section.level === 2 ? 'h3' : 'h4';
+                          const headingClass = section.level === 1 
+                            ? 'text-xl font-bold mt-6 mb-2 text-primary' 
+                            : section.level === 2 
+                            ? 'text-lg font-semibold mt-4 mb-2' 
+                            : 'text-base font-medium mt-3 mb-1';
+                          return <HeadingTag key={index} className={headingClass}>{section.content}</HeadingTag>;
+                        } else if (section.type === 'paragraph') {
+                          return <p key={index} className="text-muted-foreground leading-relaxed whitespace-pre-wrap">{section.content}</p>;
+                        } else if (section.type === 'bullet') {
+                          return <p key={index} className="text-muted-foreground pl-4">• {section.content}</p>;
+                        } else if (section.type === 'code') {
+                          return <pre key={index} className="bg-muted p-3 rounded text-xs overflow-x-auto">{section.content}</pre>;
+                        }
+                        return null;
+                      })}
+                    </div>
+                  </ScrollArea>
+                </DialogContent>
+              </Dialog>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => generateWordDocument(
+                  'Workouts Generation Philosophy',
+                  workoutsPhilosophyContent,
+                  'Workouts-Generation-Philosophy'
+                )}
+                className="gap-2"
+              >
+                <Download className="h-4 w-4" />
+                Download DOCX
+              </Button>
+            </div>
+          </div>
+
+          {/* Training Programs */}
+          <div className="border rounded-lg p-4 space-y-3 border-purple-500/30 bg-gradient-to-r from-purple-500/5 to-transparent">
+            <div>
+              <h3 className="font-semibold text-lg flex items-center gap-2">
+                📋 Training Programs Generation Philosophy
+              </h3>
+              <p className="text-sm text-muted-foreground">6 program categories (Cardio Endurance, Functional Strength, Hypertrophy, Weight Loss, Low Back Pain, Mobility), structure rules, and periodization</p>
+            </div>
+            <div className="flex flex-wrap gap-2">
+              <Dialog>
+                <DialogTrigger asChild>
+                  <Button variant="default" size="sm" className="gap-2">
+                    <ExternalLink className="h-4 w-4" />
+                    View Guide
+                  </Button>
+                </DialogTrigger>
+                <DialogContent className="max-w-4xl max-h-[80vh]">
+                  <DialogHeader>
+                    <DialogTitle>📋 Training Programs Generation Philosophy</DialogTitle>
+                  </DialogHeader>
+                  <ScrollArea className="h-[60vh] pr-4">
+                    <div className="space-y-4 text-sm">
+                      {trainingProgramsPhilosophyContent.map((section, index) => {
+                        if (section.type === 'heading') {
+                          const HeadingTag = section.level === 1 ? 'h2' : section.level === 2 ? 'h3' : 'h4';
+                          const headingClass = section.level === 1 
+                            ? 'text-xl font-bold mt-6 mb-2 text-primary' 
+                            : section.level === 2 
+                            ? 'text-lg font-semibold mt-4 mb-2' 
+                            : 'text-base font-medium mt-3 mb-1';
+                          return <HeadingTag key={index} className={headingClass}>{section.content}</HeadingTag>;
+                        } else if (section.type === 'paragraph') {
+                          return <p key={index} className="text-muted-foreground leading-relaxed whitespace-pre-wrap">{section.content}</p>;
+                        } else if (section.type === 'bullet') {
+                          return <p key={index} className="text-muted-foreground pl-4">• {section.content}</p>;
+                        } else if (section.type === 'code') {
+                          return <pre key={index} className="bg-muted p-3 rounded text-xs overflow-x-auto">{section.content}</pre>;
+                        }
+                        return null;
+                      })}
+                    </div>
+                  </ScrollArea>
+                </DialogContent>
+              </Dialog>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => generateWordDocument(
+                  'Training Programs Generation Philosophy',
+                  trainingProgramsPhilosophyContent,
+                  'Training-Programs-Generation-Philosophy'
+                )}
+                className="gap-2"
+              >
+                <Download className="h-4 w-4" />
+                Download DOCX
+              </Button>
+            </div>
+          </div>
+
+        </CardContent>
+      </Card>
+
     </div>
   );
 };
