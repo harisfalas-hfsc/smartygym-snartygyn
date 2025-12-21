@@ -22,6 +22,34 @@ interface NotificationRequest {
   };
 }
 
+// Helper function to verify admin role
+async function verifyAdminRole(req: Request, supabase: any): Promise<{ isAdmin: boolean; userId: string | null; error?: string }> {
+  const authHeader = req.headers.get("Authorization");
+  if (!authHeader) {
+    return { isAdmin: false, userId: null, error: "No authorization header" };
+  }
+
+  const token = authHeader.replace("Bearer ", "");
+  const { data: { user }, error: authError } = await supabase.auth.getUser(token);
+  
+  if (authError || !user) {
+    return { isAdmin: false, userId: null, error: "Invalid token" };
+  }
+
+  const { data: roleData, error: roleError } = await supabase
+    .from("user_roles")
+    .select("role")
+    .eq("user_id", user.id)
+    .eq("role", "admin")
+    .single();
+
+  if (roleError || !roleData) {
+    return { isAdmin: false, userId: user.id, error: "User is not an admin" };
+  }
+
+  return { isAdmin: true, userId: user.id };
+}
+
 serve(async (req: Request) => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
@@ -34,6 +62,16 @@ serve(async (req: Request) => {
 
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
     const resend = new Resend(resendApiKey);
+
+    // Verify admin role before proceeding
+    const { isAdmin, error: authError } = await verifyAdminRole(req, supabase);
+    if (!isAdmin) {
+      console.error("[SEND-NOTIFICATION] Authorization failed:", authError);
+      return new Response(
+        JSON.stringify({ error: authError || "Unauthorized" }),
+        { headers: { ...corsHeaders, "Content-Type": "application/json" }, status: 403 }
+      );
+    }
 
     const body: NotificationRequest = await req.json();
     console.log(`[SEND-NOTIFICATION] Processing ${body.type} notification`);
