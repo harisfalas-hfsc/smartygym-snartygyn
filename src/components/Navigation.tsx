@@ -295,14 +295,6 @@ export const Navigation = () => {
                   </Button>
                   <Button
                     variant="ghost"
-                    onClick={() => handleNavigate("/shop")}
-                    className={`justify-start font-semibold transition-all duration-200 ${location.pathname === '/shop' ? 'text-primary underline underline-offset-4 bg-primary/10' : 'text-foreground hover:bg-primary/10 hover:text-foreground'}`}
-                  >
-                    <ShoppingBag className="mr-2 h-4 w-4 text-pink-500" />
-                    Shop
-                  </Button>
-                  <Button
-                    variant="ghost"
                     onClick={() => handleNavigate("/community")}
                     className={`justify-start font-semibold transition-all duration-200 ${location.pathname === '/community' ? 'text-primary underline underline-offset-4 bg-primary/10' : 'text-foreground hover:bg-primary/10 hover:text-foreground'}`}
                   >
