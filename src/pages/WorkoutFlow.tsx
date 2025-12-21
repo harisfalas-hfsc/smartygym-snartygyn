@@ -100,7 +100,7 @@ const WorkoutFlow = () => {
   }, {
     id: "pilates",
     title: "Pilates",
-    description: "Controlled movements for core strength and flexibility",
+    description: "Controlled movements and alignment",
     icon: Flower2,
     level: "Beginner-Advanced",
     equipment: "Reformer/Mat"
