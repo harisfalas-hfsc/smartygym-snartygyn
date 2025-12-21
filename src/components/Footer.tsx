@@ -8,7 +8,7 @@ export const Footer = () => {
   const [emailDialogOpen, setEmailDialogOpen] = useState(false);
 
   return (
-    <footer className="bg-background border-t border-border mt-auto py-8 px-4">
+    <footer className="bg-background mt-auto py-8 px-4">
       <div className="container mx-auto max-w-7xl">
         <div className="flex flex-col items-center gap-6">
           {/* Social Media Links */}

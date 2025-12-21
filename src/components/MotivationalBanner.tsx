@@ -76,7 +76,7 @@ export const MotivationalBanner = ({ userName }: MotivationalBannerProps) => {
   const currentMessage = messages[currentMessageIndex];
 
   return (
-    <div className="relative overflow-hidden border-b border-primary/30 bg-gradient-to-r from-primary/5 via-sky-500/10 to-primary/5 animate-gradient-xy">
+    <div className="relative overflow-hidden bg-gradient-to-r from-primary/5 via-sky-500/10 to-primary/5 animate-gradient-xy">
       <style>{`
         @keyframes gradient-x {
           0%, 100% {
