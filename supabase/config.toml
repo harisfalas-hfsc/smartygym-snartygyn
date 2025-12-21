@@ -161,3 +161,6 @@ verify_jwt = true
 
 [functions.edit-video]
 verify_jwt = true
+
+[functions.update-stripe-product-image]
+verify_jwt = false
