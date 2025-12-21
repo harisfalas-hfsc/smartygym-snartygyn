@@ -723,16 +723,34 @@ INTENSITY: Fast pace, minimal load, sustained heart rate elevation.
 
 ${equipment === "EQUIPMENT" ? `
 ✅ EQUIPMENT WORKOUTS - ALLOWED EXERCISES (PICK FROM THESE):
-• Treadmill running/sprints, Spin bike intervals, Elliptical training
-• Rowing machine sprints/intervals, Jump rope (speed rope or weighted)
-• Ski erg, Assault/Air bike intervals, Stair climber
+
+CARDIO MACHINES:
+• Treadmill running/sprints/incline walks
+• Assault bike / Air bike intervals
+• Spin bike / Stationary bike intervals
+• Elliptical training
+• Ski erg sprints
+• Rowing machine sprints/intervals
+• Stair climber / Stepper
+• Jump rope (speed rope or weighted)
+
+GYM EQUIPMENT FOR CARDIO CONDITIONING:
+• Wall balls, Med ball slams, Med ball cleans
+• Kettlebell swings (for metabolic conditioning)
+• Weight vest (for weighted running, burpees, box jumps)
 • Battle ropes, Sled pushes/pulls
+• Box jumps (with or without weight)
+• Dumbbell thrusters, Dumbbell snatches
+
+EXAMPLE COMBO: 10 Wall balls + 10 Burpees + 200m Run
+
+⚠️ IMPORTANT: All equipment must be gym-based. NO swimming, outdoor-only activities, or non-gym equipment.
 ` : `
 ✅ BODYWEIGHT ONLY - ALLOWED EXERCISES (PICK FROM THESE):
 • Jogging in place, High knees, Butt kicks, Jumping jacks
 • Burpees, Mountain climbers, Box jumps (no equipment)
 • Skaters, Bear crawls, Lateral shuffles, Star jumps
-• Tuck jumps, Broad jumps, Squat jumps
+• Tuck jumps, Broad jumps, Squat jumps, Frog jumps
 `}
 
 ❌ FORBIDDEN: Heavy lifting, slow strength exercises, Reps & Sets format.` : ""}
@@ -774,10 +792,29 @@ INTENSITY: Sustained effort, compound movements, elevated heart rate throughout.
 
 ${equipment === "EQUIPMENT" ? `
 ✅ EQUIPMENT WORKOUTS - ALLOWED EXERCISES (PICK FROM THESE):
-• Treadmill sprints/incline walks, Rowing machine intervals
-• Spin bike sprints, Elliptical HIIT, Jump rope circuits
-• Assault bike calories, Ski erg sprints, Stair climber intervals
-• Kettlebell swings, Battle ropes, Sled pushes/pulls
+
+CARDIO MACHINES:
+• Treadmill sprints/incline walks
+• Assault bike / Air bike calories
+• Rowing machine intervals
+• Ski erg sprints
+• Spin bike sprints
+• Elliptical HIIT
+• Stair climber intervals
+• Jump rope circuits
+
+GYM EQUIPMENT FOR CALORIE BURN:
+• Wall balls, Med ball slams, Med ball throws
+• Kettlebell swings, Kettlebell snatches
+• Dumbbell thrusters, Dumbbell clean & jerks
+• Weight vest (for weighted burpees, box jumps, lunges)
+• Battle ropes, Sled pushes/pulls
+• Box jumps (with or without weight)
+• Sandbag carries, Farmer carries
+
+EXAMPLE COMBO: 10 Wall balls + 10 Burpees + 200m Run
+
+⚠️ IMPORTANT: All equipment must be gym-based. NO swimming, outdoor-only activities, or non-gym equipment.
 ` : `
 ✅ BODYWEIGHT ONLY - ALLOWED EXERCISES (PICK FROM THESE):
 • Mountain climbers, Burpees, Jump squats, High knees
