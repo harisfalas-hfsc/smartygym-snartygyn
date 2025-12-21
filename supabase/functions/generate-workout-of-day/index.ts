@@ -721,7 +721,19 @@ GOAL: Improve heart rate capacity, aerobic and anaerobic conditioning.
 FORMAT: ${format} (NOT Reps & Sets)
 INTENSITY: Fast pace, minimal load, sustained heart rate elevation.
 
-✅ ALLOWED EXERCISES: Jogging, Jump rope, High knees, Butt kicks, Jumping jacks, Burpees, Mountain climbers, Box jumps, Skaters, Bear crawls.
+${equipment === "EQUIPMENT" ? `
+✅ EQUIPMENT WORKOUTS - ALLOWED EXERCISES (PICK FROM THESE):
+• Treadmill running/sprints, Spin bike intervals, Elliptical training
+• Rowing machine sprints/intervals, Jump rope (speed rope or weighted)
+• Ski erg, Assault/Air bike intervals, Stair climber
+• Battle ropes, Sled pushes/pulls
+` : `
+✅ BODYWEIGHT ONLY - ALLOWED EXERCISES (PICK FROM THESE):
+• Jogging in place, High knees, Butt kicks, Jumping jacks
+• Burpees, Mountain climbers, Box jumps (no equipment)
+• Skaters, Bear crawls, Lateral shuffles, Star jumps
+• Tuck jumps, Broad jumps, Squat jumps
+`}
 
 ❌ FORBIDDEN: Heavy lifting, slow strength exercises, Reps & Sets format.` : ""}
 
@@ -760,7 +772,19 @@ GOAL: Maximize calorie expenditure through sustained high-output work.
 FORMAT: ${format}
 INTENSITY: Sustained effort, compound movements, elevated heart rate throughout.
 
-✅ ALLOWED EXERCISES: Mountain climbers, Burpees, Jump squats, High knees, Jumping lunges, Speed skaters, Tuck jumps, Plank jacks.
+${equipment === "EQUIPMENT" ? `
+✅ EQUIPMENT WORKOUTS - ALLOWED EXERCISES (PICK FROM THESE):
+• Treadmill sprints/incline walks, Rowing machine intervals
+• Spin bike sprints, Elliptical HIIT, Jump rope circuits
+• Assault bike calories, Ski erg sprints, Stair climber intervals
+• Kettlebell swings, Battle ropes, Sled pushes/pulls
+` : `
+✅ BODYWEIGHT ONLY - ALLOWED EXERCISES (PICK FROM THESE):
+• Mountain climbers, Burpees, Jump squats, High knees
+• Jumping lunges, Speed skaters, Tuck jumps, Plank jacks
+• Bear crawls, Lateral shuffles, Squat jumps, Star jumps
+• Broad jumps, Frog jumps, Crab walks
+`}
 
 ❌ FORBIDDEN: Reps & Sets format, long rest periods, isolated strength work.` : ""}
 
@@ -901,7 +925,7 @@ INSTRUCTIONS FORMAT: Plain paragraphs with clear guidance
               "Content-Type": "application/json",
             },
             body: JSON.stringify({
-              model: "openai/gpt-5",
+              model: "google/gemini-2.5-flash",
               messages: [
                 { role: "system", content: "You are an expert fitness coach. Return ONLY valid JSON, no markdown." },
                 { role: "user", content: workoutPrompt }
