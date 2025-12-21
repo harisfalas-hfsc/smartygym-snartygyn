@@ -1410,8 +1410,8 @@ INSTRUCTIONS FORMAT: Plain paragraphs with clear guidance
       });
       
       const stripeProduct = await stripe.products.create({
-        name: `WOD: ${workoutContent.name}`,
-        description: `Workout of the Day - ${category} (${equipment})`,
+        name: workoutContent.name,
+        description: `${category} Workout (${equipment})`,
         images: imageUrl ? [imageUrl] : [],
         metadata: { workout_id: workoutId, type: "wod", category: category, equipment: equipment }
       });
