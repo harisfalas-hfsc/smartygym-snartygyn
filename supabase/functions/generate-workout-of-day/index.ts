@@ -779,6 +779,44 @@ Rules:
 • Never mix maximal strength loading with metabolic density
 
 ═══════════════════════════════════════════════════════════════════════════════
+WORKOUT STRUCTURE WITH FINISHER (MANDATORY):
+═══════════════════════════════════════════════════════════════════════════════
+
+Every workout MUST include four sequential parts inside the workout content:
+
+1. WARM-UP
+   Standard preparation phase
+
+2. MAIN WORKOUT
+   The core training block that defines the workout's FORMAT label
+
+3. FINISHER
+   A complementary workout block that completes the session
+
+4. COOL DOWN
+   Recovery and stretching phase
+
+FINISHER RULES BY CATEGORY:
+
+STRENGTH and MOBILITY & STABILITY:
+• Format: REPS & SETS ONLY (respecting category format rule)
+• Load: Reduced compared to main workout
+• Reps: Increased compared to main workout
+• Purpose: Volume completion without heavy loading
+• Example: If main workout uses 4x6 at heavy load, finisher uses 3x12 at lighter load
+
+CARDIO, METABOLIC, CALORIE BURNING, CHALLENGE:
+• Format: Any allowed format (Circuit, Tabata, EMOM, AMRAP, For Time, single exercise)
+• Can differ from main workout format
+• Purpose: Metabolic completion or targeted burn
+• Example: Main workout is AMRAP, finisher can be Tabata or "100 burpees for time"
+
+FORMAT DETERMINATION RULE (CRITICAL):
+The FORMAT label of the entire workout is determined ONLY by the Main Workout.
+The Finisher format does NOT affect the workout's FORMAT classification.
+Example: Main Workout = AMRAP, Finisher = Tabata → Workout FORMAT = AMRAP
+
+═══════════════════════════════════════════════════════════════════════════════
 LOAD AND INTENSITY GOVERNANCE:
 ═══════════════════════════════════════════════════════════════════════════════
 
@@ -1032,7 +1070,7 @@ CRITICAL HTML FORMATTING RULES (FOLLOW EXACTLY - THIS IS NON-NEGOTIABLE):
 5. SECTION SEPARATORS: Empty paragraph between sections
    Format: <p class="tiptap-paragraph"></p>
 
-6. THREE SECTIONS REQUIRED in main_workout: Warm Up, Main Workout, Cool Down
+6. FOUR SECTIONS REQUIRED in main_workout: Warm Up, Main Workout, Finisher, Cool Down
 
 GOLD STANDARD TEMPLATE (FOLLOW THIS EXACTLY):
 <p class="tiptap-paragraph"><strong><u>Warm Up 15'</u></strong></p>
@@ -1048,6 +1086,13 @@ GOLD STANDARD TEMPLATE (FOLLOW THIS EXACTLY):
 <li class="tiptap-list-item"><p class="tiptap-paragraph"><strong>8 Rounds of:</strong></p></li>
 </ul>
 <p class="tiptap-paragraph">12 Goblet Squats - 12 Upright Row - 24 Jump Squats</p>
+<p class="tiptap-paragraph"></p>
+<p class="tiptap-paragraph"><strong><u>Finisher</u></strong></p>
+<p class="tiptap-paragraph"></p>
+<ul class="tiptap-bullet-list">
+<li class="tiptap-list-item"><p class="tiptap-paragraph"><strong>Tabata:</strong></p></li>
+</ul>
+<p class="tiptap-paragraph">Burpees - 20 sec work / 10 sec rest x 8 rounds</p>
 <p class="tiptap-paragraph"></p>
 <p class="tiptap-paragraph"><strong><u>Cool Down:</u></strong></p>
 <ul class="tiptap-bullet-list">
