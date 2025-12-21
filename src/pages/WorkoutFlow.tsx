@@ -256,7 +256,7 @@ const WorkoutFlow = () => {
                         )}
                       >
                         {/* Image Section */}
-                        <div className="relative h-[140px] overflow-hidden bg-muted">
+                        <div className="relative h-[130px] overflow-hidden bg-muted">
                           {wod.image_url ? (
                             <img 
                               src={wod.image_url} 
@@ -296,7 +296,7 @@ const WorkoutFlow = () => {
                         </div>
                         
                         {/* Content Section */}
-                        <div className="flex-1 p-3 flex flex-col justify-between">
+                        <div className="flex-1 p-3 flex flex-col justify-between min-h-[130px]">
                           {/* Workout Name */}
                           <p className="text-sm font-bold text-foreground line-clamp-1">{wod.name}</p>
                           
