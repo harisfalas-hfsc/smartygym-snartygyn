@@ -8,7 +8,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
-import { Settings, Bell, Mail, Database, Shield, Download, HeartPulse } from "lucide-react";
+import { Settings, Bell, Mail, Database, Shield, Download, HeartPulse, Wrench } from "lucide-react";
 import { SystemHealthAudit } from "./SystemHealthAudit";
 
 export const SettingsManager = () => {
@@ -36,6 +36,10 @@ export const SettingsManager = () => {
   const [autoApprovePurchases, setAutoApprovePurchases] = useState(true);
   const [sessionTimeout, setSessionTimeout] = useState("24");
   const [inactivityTimeout, setInactivityTimeout] = useState("30");
+
+  // Stripe Cleanup
+  const [cleanupLoading, setCleanupLoading] = useState(false);
+  const [cleanupResult, setCleanupResult] = useState<{ updated: number; message: string } | null>(null);
 
   // Load inactivity timeout on mount
   useEffect(() => {
@@ -216,6 +220,38 @@ export const SettingsManager = () => {
     }
   };
 
+  const handleCleanupStripeProducts = async () => {
+    if (!confirm("This will remove the 'WOD:' prefix from all Stripe product names. Continue?")) {
+      return;
+    }
+    
+    setCleanupLoading(true);
+    setCleanupResult(null);
+    try {
+      const { data, error } = await supabase.functions.invoke('cleanup-stripe-wod-names');
+      
+      if (error) throw error;
+
+      if (data.success) {
+        setCleanupResult({ updated: data.updated?.length || 0, message: data.message });
+        toast({
+          title: "Cleanup Complete",
+          description: data.message,
+        });
+      } else {
+        throw new Error(data.error || "Unknown error");
+      }
+    } catch (error: any) {
+      toast({
+        title: "Cleanup Failed",
+        description: error.message || "Failed to cleanup Stripe products.",
+        variant: "destructive",
+      });
+    } finally {
+      setCleanupLoading(false);
+    }
+  };
+
   return (
     <div className="pt-6 space-y-6 w-full overflow-x-hidden">
       <Tabs defaultValue="general" className="w-full">
@@ -368,6 +404,33 @@ export const SettingsManager = () => {
           <div className="space-y-6">
             {/* System Health Audit */}
             <SystemHealthAudit />
+
+            {/* Stripe Product Cleanup */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Wrench className="h-5 w-5" />
+                  Stripe Product Cleanup
+                </CardTitle>
+                <CardDescription>
+                  Remove "WOD:" prefix from Stripe product names. This is a one-time cleanup that won't affect prices, images, or purchase history.
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <Button 
+                  onClick={handleCleanupStripeProducts} 
+                  disabled={cleanupLoading}
+                  variant="outline"
+                >
+                  {cleanupLoading ? "Running Cleanup..." : "Run Stripe Product Cleanup"}
+                </Button>
+                {cleanupResult && (
+                  <p className="text-sm text-muted-foreground">
+                    ✅ {cleanupResult.message} ({cleanupResult.updated} products updated)
+                  </p>
+                )}
+              </CardContent>
+            </Card>
 
             <Card>
               <CardHeader>
