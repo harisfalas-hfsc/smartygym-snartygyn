@@ -218,18 +218,20 @@ serve(async (req) => {
   }
 
   try {
-    // Parse request body for targetDate parameter (for pre-generation)
+    // Parse request body
     let targetDate: string | null = null;
     let skipNotifications = false;
+    let retryMissing = false;
     
     try {
       const body = await req.json();
       targetDate = body?.targetDate || null;
       skipNotifications = body?.skipNotifications || false;
+      retryMissing = body?.retryMissing || false;
     } catch {
       // No body or invalid JSON - use defaults
     }
-    
+
     // ═══════════════════════════════════════════════════════════════════════════════
     // CRITICAL: Use Cyprus timezone (Europe/Athens, UTC+2/+3) for date calculation
     // The cron runs at 22:00 UTC which is midnight in Cyprus - we need the NEW day's date
@@ -278,115 +280,33 @@ serve(async (req) => {
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
     const stripe = new Stripe(stripeKey, { apiVersion: "2025-08-27.basil" });
 
-    // Check if WODs already exist for the effective date
-    // For pre-generated WODs, check generated_for_date column
-    // For same-day generation, check created_at date range
-    
-    if (isPreGeneration) {
-      // Check for pre-generated WODs for this future date
-      const { data: existingPreGenWODs } = await supabase
-        .from("admin_workouts")
-        .select("id, name, category")
-        .eq("generated_for_date", effectiveDate)
-        .eq("is_workout_of_day", true);
-      
-      if (existingPreGenWODs && existingPreGenWODs.length >= 2) {
-        logStep("SKIPPING: WODs already pre-generated for this date", { 
-          date: effectiveDate, 
-          count: existingPreGenWODs.length, 
-          wods: existingPreGenWODs 
-        });
-        return new Response(
-          JSON.stringify({ 
-            success: true, 
-            skipped: true, 
-            message: `WODs already pre-generated for ${effectiveDate}`,
-            existingWODs: existingPreGenWODs 
-          }),
-          { headers: { ...corsHeaders, "Content-Type": "application/json" }, status: 200 }
-        );
-      }
-    } else {
-      // SAME-DAY GENERATION GUARD: Check if today's WOD already exists
-      // First check for pre-generated WODs for today
-      const { data: preGenForToday } = await supabase
-        .from("admin_workouts")
-        .select("id, name, category")
-        .eq("generated_for_date", cyprusDateStr)
-        .eq("is_workout_of_day", true);
-      
-      if (preGenForToday && preGenForToday.length >= 2) {
-        logStep("SKIPPING: WODs were pre-generated for today", { 
-          count: preGenForToday.length, 
-          wods: preGenForToday 
-        });
-        
-        // Still increment day_count to maintain periodization!
-        const { data: stateData } = await supabase
-          .from("workout_of_day_state")
-          .select("*")
-          .limit(1)
-          .single();
-        
-        if (stateData) {
-          const newDayCount = (stateData.day_count || 0) + 1;
-          const newDayInCycle = (newDayCount % 7) + 1;
-          const newWeekNumber = newDayInCycle === 1 ? (stateData.week_number || 1) + 1 : stateData.week_number;
-          
-          await supabase
-            .from("workout_of_day_state")
-            .update({ 
-              day_count: newDayCount,
-              week_number: newWeekNumber,
-              used_stars_in_week: newDayInCycle === 1 ? {} : stateData.used_stars_in_week,
-              last_generated_at: new Date().toISOString(),
-              current_category: CATEGORY_CYCLE_7DAY[newDayInCycle - 1]
-            })
-            .eq("id", stateData.id);
-          
-          logStep("Day count incremented despite skip (pre-gen)", { 
-            oldDayCount: stateData.day_count, 
-            newDayCount 
-          });
-        }
-        
-        return new Response(
-          JSON.stringify({ 
-            success: true, 
-            skipped: true, 
-            message: "WODs were pre-generated for today, day_count incremented",
-            existingWODs: preGenForToday 
-          }),
-          { headers: { ...corsHeaders, "Content-Type": "application/json" }, status: 200 }
-        );
-      }
-      
-      // Then check for same-day created WODs (using Cyprus date boundaries)
-      const cyprusDateObj = new Date(cyprusDateStr + 'T00:00:00Z');
-      const todayStart = cyprusDateObj.toISOString();
-      const todayEnd = new Date(cyprusDateObj.getTime() + 24 * 60 * 60 * 1000).toISOString();
-      
-      const { data: existingTodayWODs } = await supabase
-        .from("admin_workouts")
-        .select("id, name, category")
-        .eq("is_workout_of_day", true)
-        .is("generated_for_date", null) // Only check non-pre-generated WODs
-        .gte("created_at", todayStart)
-        .lt("created_at", todayEnd);
-      
-      if (existingTodayWODs && existingTodayWODs.length >= 2) {
-        logStep("SKIPPING: Today's WODs already exist", { count: existingTodayWODs.length, wods: existingTodayWODs });
-        return new Response(
-          JSON.stringify({ 
-            success: true, 
-            skipped: true, 
-            message: "Today's WODs already generated",
-            existingWODs: existingTodayWODs 
-          }),
-          { headers: { ...corsHeaders, "Content-Type": "application/json" }, status: 200 }
-        );
-      }
+    // Check what already exists for this date (idempotent + supports retryMissing)
+    const { data: existingWODsForDate, error: existingWODsError } = await supabase
+      .from("admin_workouts")
+      .select("id, name, equipment, generated_for_date")
+      .eq("generated_for_date", effectiveDate)
+      .eq("is_workout_of_day", true);
+
+    if (existingWODsError) {
+      logStep("ERROR checking existing WODs", { error: existingWODsError.message, effectiveDate });
     }
+
+    const bodyweightAlreadyExists = existingWODsForDate?.some((w) => w.equipment === "BODYWEIGHT") ?? false;
+    const equipmentAlreadyExists = existingWODsForDate?.some((w) => w.equipment === "EQUIPMENT") ?? false;
+
+    const allEquipmentTypes = ["BODYWEIGHT", "EQUIPMENT"] as const;
+    const equipmentTypesToGenerate = allEquipmentTypes.filter((e) =>
+      e === "BODYWEIGHT" ? !bodyweightAlreadyExists : !equipmentAlreadyExists
+    );
+
+    logStep("Existing WOD check", {
+      effectiveDate,
+      existingCount: existingWODsForDate?.length || 0,
+      bodyweightAlreadyExists,
+      equipmentAlreadyExists,
+      retryMissing,
+      equipmentTypesToGenerate,
+    });
 
     // Get current state
     const { data: stateData, error: stateError } = await supabase
@@ -619,8 +539,8 @@ serve(async (req) => {
       scalingAdvice
     });
 
-    // Generate TWO workouts - one BODYWEIGHT, one EQUIPMENT
-    const equipmentTypes = ["BODYWEIGHT", "EQUIPMENT"];
+    // Generate workouts - only what is missing for this date
+    const equipmentTypes = equipmentTypesToGenerate;
     const generatedWorkouts: any[] = [];
     let firstWorkoutName = "";
 
@@ -1130,10 +1050,38 @@ INSTRUCTIONS FORMAT: Plain paragraphs with clear guidance
     
     logStep("✅ BOTH workouts verified - proceeding with state update");
 
+    const toCyprusDateStr = (dateUtc: Date): string => {
+      const m = dateUtc.getUTCMonth();
+      const dst = m >= 2 && m <= 9;
+      const offset = dst ? 3 : 2;
+      return new Date(dateUtc.getTime() + offset * 60 * 60 * 1000).toISOString().split("T")[0];
+    };
+
+    const lastGeneratedAt = stateData?.last_generated_at ? new Date(stateData.last_generated_at) : null;
+    const lastGeneratedForDate = lastGeneratedAt ? toCyprusDateStr(lastGeneratedAt) : null;
+    const stateAlreadyUpdatedForDate = lastGeneratedForDate === effectiveDate;
+
+    if (stateAlreadyUpdatedForDate) {
+      logStep("State already updated for this date - skipping state increment", {
+        effectiveDate,
+        last_generated_at: stateData?.last_generated_at,
+      });
+
+      return new Response(
+        JSON.stringify({
+          success: true,
+          skipped: true,
+          message: `WODs already generated and state already updated for ${effectiveDate}`,
+          workouts: finalVerification?.map((w) => ({ id: w.id, name: w.name, equipment: w.equipment })) || [],
+        }),
+        { headers: { ...corsHeaders, "Content-Type": "application/json" }, status: 200 }
+      );
+    }
+
     // ═══════════════════════════════════════════════════════════════════════════════
     // UPDATE STATE - Track used stars, remove override if used
     // ═══════════════════════════════════════════════════════════════════════════════
-    
+
     // Update used stars tracking
     const newUsedStarsInWeek = { ...usedStarsInWeek, [String(selectedDifficulty.stars)]: true };
     

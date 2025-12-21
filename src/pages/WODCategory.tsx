@@ -11,7 +11,6 @@ import { useAllWorkouts } from "@/hooks/useWorkoutData";
 import { useWorkoutInteractions } from "@/hooks/useWorkoutInteractions";
 import { supabase } from "@/integrations/supabase/client";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
-import { WODScheduleInfo } from "@/components/WODScheduleInfo";
 
 const WODCategory = () => {
   const navigate = useNavigate();
@@ -235,9 +234,6 @@ const WODCategory = () => {
                   </p>
                 </div>
               </Card>
-
-              {/* WOD Schedule Info - Yesterday/Today/Tomorrow */}
-              <WODScheduleInfo />
 
               {/* Two WOD Cards Side by Side */}
               {bodyweightWOD || equipmentWOD ? <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
