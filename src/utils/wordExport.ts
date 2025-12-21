@@ -675,3 +675,67 @@ export const appPublishingCostChecklistContent: ContentSection[] = [
   { type: 'paragraph', content: 'SmartyGym — Your Gym Re-imagined. Anywhere, Anytime.' },
   { type: 'paragraph', content: 'www.smartygym.com' },
 ];
+
+// WOD Philosophy Content - Complete AI Instructions
+export const wodPhilosophyContent: ContentSection[] = [
+  { type: 'heading', content: 'WOD (WORKOUT OF THE DAY) GENERATION PHILOSOPHY', level: 1 },
+  { type: 'paragraph', content: 'Complete AI instructions for generating Workout of the Day content.' },
+  { type: 'heading', content: '7-DAY CATEGORY CYCLE', level: 1 },
+  { type: 'bullet', content: 'Day 1: CHALLENGE | Day 2: STRENGTH (REPS & SETS only) | Day 3: CARDIO' },
+  { type: 'bullet', content: 'Day 4: MOBILITY & STABILITY (REPS & SETS only) | Day 5: STRENGTH | Day 6: METABOLIC | Day 7: CALORIE BURNING' },
+  { type: 'heading', content: 'DIFFICULTY PATTERN (6-STAR SYSTEM)', level: 1 },
+  { type: 'bullet', content: 'Beginner: 1-2 stars | Intermediate: 3-4 stars | Advanced: 5-6 stars' },
+  { type: 'bullet', content: 'Weekly Rotation: Pattern shifts by 1 position each week. Star Alternation prevents duplicates.' },
+  { type: 'heading', content: 'FORMAT RULES BY CATEGORY (STRICT)', level: 1 },
+  { type: 'bullet', content: 'STRENGTH: REPS & SETS ONLY | MOBILITY & STABILITY: REPS & SETS ONLY' },
+  { type: 'bullet', content: 'CARDIO/METABOLIC/CALORIE BURNING: CIRCUIT, EMOM, FOR TIME, AMRAP, TABATA - NO Reps & Sets' },
+  { type: 'bullet', content: 'CHALLENGE: Any format except Reps & Sets' },
+  { type: 'heading', content: 'CARDIO EQUIPMENT (Updated Dec 2024)', level: 1 },
+  { type: 'bullet', content: 'CARDIO MACHINES: Treadmill, Assault bike, Spin bike, Elliptical, Ski erg, Rowing machine, Stair climber, Jump rope' },
+  { type: 'bullet', content: 'GYM EQUIPMENT: Wall balls, Med ball slams, Kettlebell swings, Weight vest, Battle ropes, Sled pushes/pulls, Box jumps, Dumbbell thrusters/snatches' },
+  { type: 'bullet', content: '⚠️ All equipment must be gym-based. NO swimming, outdoor-only activities.' },
+  { type: 'heading', content: 'CALORIE BURNING EQUIPMENT (Updated Dec 2024)', level: 1 },
+  { type: 'bullet', content: 'CARDIO MACHINES: Treadmill, Assault bike, Rowing, Ski erg, Spin bike, Elliptical, Stair climber, Jump rope' },
+  { type: 'bullet', content: 'GYM EQUIPMENT: Wall balls, Med ball slams, Kettlebell swings/snatches, Dumbbell thrusters/clean & jerks, Weight vest, Battle ropes, Sled, Box jumps, Sandbag/Farmer carries' },
+  { type: 'heading', content: 'NAMING RULES', level: 1 },
+  { type: 'bullet', content: 'AVOID: Inferno, Blaze, Fire, Burn, Fury, Storm, Thunder, Power, Beast, Warrior, Elite, Ultimate, Extreme' },
+  { type: 'bullet', content: 'MATCH TO CATEGORY: STRENGTH→Iron,Forge | CARDIO→Pulse,Rush | METABOLIC→Engine,Drive | CALORIE BURNING→Torch,Melt | MOBILITY→Balance,Flow | CHALLENGE→Gauntlet,Test' },
+  { type: 'heading', content: 'VALUE-FOR-MONEY STANDARDS', level: 1 },
+  { type: 'bullet', content: 'Beginner: 100-150 movements | Intermediate: 150-250 movements | Advanced: 200-350+ movements' },
+  { type: 'heading', content: 'AI MODEL: google/gemini-2.5-flash', level: 1 },
+];
+
+// Workouts Philosophy Content
+export const workoutsPhilosophyContent: ContentSection[] = [
+  { type: 'heading', content: 'WORKOUTS GENERATION PHILOSOPHY', level: 1 },
+  { type: 'paragraph', content: 'Complete AI instructions for generating workout content.' },
+  { type: 'heading', content: 'CATEGORY PHILOSOPHY', level: 1 },
+  { type: 'bullet', content: 'STRENGTH: "We Mean Business" - Focus, precision, muscle hypertrophy, 60-120s rest' },
+  { type: 'bullet', content: 'CALORIE BURNING: "Sweat Factory" - HIIT-style, safe exercises, minimal rest 15-30s' },
+  { type: 'bullet', content: 'METABOLIC: "Power Engine" - Cardio+Strength+Power combined, moderate loads' },
+  { type: 'bullet', content: 'CARDIO: "Endurance Engine" - Heart rate zones, pacing strategies, aerobic/anaerobic' },
+  { type: 'bullet', content: 'MOBILITY & STABILITY: "The Healer" - Therapeutic, controlled, breathing cues' },
+  { type: 'bullet', content: 'CHALLENGE: "Gamification King" - Creative, unusual, memorable, mental toughness' },
+  { type: 'heading', content: 'EQUIPMENT SAFETY BY CATEGORY', level: 1 },
+  { type: 'bullet', content: 'Strength: Heavy loads allowed | Metabolic: Moderate loads | Calorie Burning: Light/bodyweight' },
+  { type: 'bullet', content: 'Challenge: Safe equipment only | Cardio: Cardio machines | Mobility: No/light equipment' },
+  { type: 'heading', content: 'AI MODEL: google/gemini-2.5-flash', level: 1 },
+];
+
+// Training Programs Philosophy Content
+export const trainingProgramsPhilosophyContent: ContentSection[] = [
+  { type: 'heading', content: 'TRAINING PROGRAMS GENERATION PHILOSOPHY', level: 1 },
+  { type: 'paragraph', content: 'Complete AI instructions for multi-week training programs.' },
+  { type: 'heading', content: 'PROGRAM CATEGORIES', level: 1 },
+  { type: 'bullet', content: 'CARDIO ENDURANCE: Zone 2, threshold, VO2 max protocols, heart rate zones' },
+  { type: 'bullet', content: 'FUNCTIONAL STRENGTH: Free weights for real-world strength, not bodybuilding' },
+  { type: 'bullet', content: 'MUSCLE HYPERTROPHY: Periodization, splits (Upper/Lower, PPL), loading/deload weeks' },
+  { type: 'bullet', content: 'WEIGHT LOSS: Strategic cardio+metabolic+strength, caloric impact explanation' },
+  { type: 'bullet', content: 'LOW BACK PAIN: Step-by-step rehabilitation, safety first, therapeutic approach' },
+  { type: 'bullet', content: 'MOBILITY & STABILITY: 6 major joints, specific needs (mobility vs stability)' },
+  { type: 'heading', content: 'STRUCTURE RULES', level: 1 },
+  { type: 'bullet', content: 'Weekly: Progressive difficulty (lighter Monday → harder mid-week → moderate end)' },
+  { type: 'bullet', content: 'Periodization: Loading weeks + deload weeks every 3-4 weeks' },
+  { type: 'bullet', content: 'Rest Days: Strategic placement, complementary workouts' },
+  { type: 'heading', content: 'AI MODEL: google/gemini-2.5-flash', level: 1 },
+];
