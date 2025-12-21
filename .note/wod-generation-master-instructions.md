@@ -92,6 +92,42 @@ Available durations: **15 min, 20 min, 30 min, 45 min, 60 min, or Various**
 - **Reps & Sets**: Classic strength format (e.g., 4 sets x 8 reps) with defined rest
 - **Mix**: Combination of two or more formats
 
+## Workout Structure with Finisher (MANDATORY)
+
+Every workout MUST include four sequential parts inside the workout content:
+
+### 1. WARM-UP
+Standard preparation phase
+
+### 2. MAIN WORKOUT
+The core training block that defines the workout's FORMAT label
+
+### 3. FINISHER
+A complementary workout block that completes the session
+
+### 4. COOL DOWN
+Recovery and stretching phase
+
+### Finisher Rules by Category
+
+**STRENGTH and MOBILITY & STABILITY:**
+- Format: REPS & SETS ONLY (respecting category format rule)
+- Load: Reduced compared to main workout
+- Reps: Increased compared to main workout
+- Purpose: Volume completion without heavy loading
+- Example: If main workout uses 4x6 at heavy load, finisher uses 3x12 at lighter load
+
+**CARDIO, METABOLIC, CALORIE BURNING, CHALLENGE:**
+- Format: Any allowed format (Circuit, Tabata, EMOM, AMRAP, For Time, single exercise)
+- Can differ from main workout format
+- Purpose: Metabolic completion or targeted burn
+- Example: Main workout is AMRAP, finisher can be Tabata or "100 burpees for time"
+
+### FORMAT DETERMINATION RULE (CRITICAL)
+The FORMAT label of the entire workout is determined ONLY by the Main Workout.
+The Finisher format does NOT affect the workout's FORMAT classification.
+Example: Main Workout = AMRAP, Finisher = Tabata → Workout FORMAT = AMRAP
+
 ## Category-Specific Rules
 
 ### CATEGORY 1: STRENGTH
