@@ -281,9 +281,10 @@ serve(async (req) => {
     const stripe = new Stripe(stripeKey, { apiVersion: "2025-08-27.basil" });
 
     // Check what already exists for this date (idempotent + supports retryMissing)
+    // CRITICAL: Fetch FULL workout details so we can match parameters when retrying
     const { data: existingWODsForDate, error: existingWODsError } = await supabase
       .from("admin_workouts")
-      .select("id, name, equipment, generated_for_date")
+      .select("id, name, equipment, generated_for_date, category, difficulty, difficulty_stars, format")
       .eq("generated_for_date", effectiveDate)
       .eq("is_workout_of_day", true);
 
@@ -299,6 +300,34 @@ serve(async (req) => {
       e === "BODYWEIGHT" ? !bodyweightAlreadyExists : !equipmentAlreadyExists
     );
 
+    // ═══════════════════════════════════════════════════════════════════════════════
+    // CRITICAL FIX: When retryMissing and one workout exists, use ITS parameters
+    // This ensures both workouts have the same category/difficulty/format
+    // ═══════════════════════════════════════════════════════════════════════════════
+    let forcedParameters: { category: string; difficulty: { name: string; stars: number }; format: string } | null = null;
+    
+    if (retryMissing && existingWODsForDate && existingWODsForDate.length === 1) {
+      const existingWOD = existingWODsForDate[0];
+      if (existingWOD.category && existingWOD.difficulty_stars && existingWOD.format) {
+        forcedParameters = {
+          category: existingWOD.category,
+          difficulty: {
+            name: existingWOD.difficulty || (existingWOD.difficulty_stars <= 2 ? "Beginner" : existingWOD.difficulty_stars <= 4 ? "Intermediate" : "Advanced"),
+            stars: existingWOD.difficulty_stars
+          },
+          format: existingWOD.format
+        };
+        logStep("FORCING PARAMETERS FROM EXISTING WORKOUT", {
+          existingWorkoutId: existingWOD.id,
+          existingWorkoutName: existingWOD.name,
+          existingEquipment: existingWOD.equipment,
+          forcedCategory: forcedParameters.category,
+          forcedDifficulty: forcedParameters.difficulty,
+          forcedFormat: forcedParameters.format
+        });
+      }
+    }
+
     logStep("Existing WOD check", {
       effectiveDate,
       existingCount: existingWODsForDate?.length || 0,
@@ -306,6 +335,7 @@ serve(async (req) => {
       equipmentAlreadyExists,
       retryMissing,
       equipmentTypesToGenerate,
+      hasForcedParameters: !!forcedParameters,
     });
 
     // Get current state
@@ -427,7 +457,17 @@ serve(async (req) => {
     let format: string;
     let updatedUsage: Record<string, string[]>;
     
-    if (override) {
+    // ═══════════════════════════════════════════════════════════════════════════════
+    // PRIORITY ORDER: 1. Forced parameters (from existing workout on retry), 2. Manual override, 3. Normal calculation
+    // ═══════════════════════════════════════════════════════════════════════════════
+    if (forcedParameters) {
+      // CRITICAL: When retrying, ALWAYS match the existing workout's parameters
+      logStep("USING FORCED PARAMETERS FROM EXISTING WORKOUT", forcedParameters);
+      category = forcedParameters.category;
+      selectedDifficulty = forcedParameters.difficulty;
+      format = forcedParameters.format;
+      updatedUsage = state.format_usage || {};
+    } else if (override) {
       logStep("USING MANUAL OVERRIDE", override);
       category = override.category || getCategoryForDay(dayInCycle);
       selectedDifficulty = override.difficulty 
