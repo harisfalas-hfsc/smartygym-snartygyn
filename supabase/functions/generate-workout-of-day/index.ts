@@ -684,204 +684,328 @@ YOUR FORMAT TODAY: ${format}
 - You MUST structure the workout using the ${format} format rules defined above
 
 ═══════════════════════════════════════════════════════════════════════════════
-CATEGORY-SPECIFIC TRAINING PHILOSOPHY (CRITICAL - MUST FOLLOW EXACTLY):
+WOD (WORKOUT OF THE DAY) GENERATION PHILOSOPHY
+Science based operational rules for daily workout generation.
 ═══════════════════════════════════════════════════════════════════════════════
 
-${category === "STRENGTH" ? `
-╔══════════════════════════════════════════════════════════════════════════════╗
-║ CATEGORY: STRENGTH - BUILD MUSCLE, INCREASE FORCE, IMPROVE FUNCTIONAL STRENGTH ║
-╚══════════════════════════════════════════════════════════════════════════════╝
+CORE PRINCIPLE:
+The Workout of the Day system is designed to balance performance, recovery, variety, and adherence over long-term use.
+Each workout must respect physiology, training principles, and accumulated fatigue from previous days.
 
-GOAL: Build muscle, increase force production, improve functional strength.
-INTENSITY: Controlled tempo, structured sets, progressive overload.
-FORMAT: MUST BE REPS & SETS - Classic strength format with defined rest (60-120 seconds).
-
-${equipment === "EQUIPMENT" ? `
-✅ EQUIPMENT WORKOUTS - ALLOWED EXERCISES (PICK FROM THESE):
-• Goblet squats, Kettlebell deadlifts, Romanian deadlifts, Front squats
-• Bench press variations, Dumbbell row, Bent-over row
-• Push press, Landmine press, Split squats, Hip hinges, Weighted carries` : `
-✅ BODYWEIGHT ONLY - ALLOWED EXERCISES (PICK FROM THESE):
-• Push-up variations (diamond, archer, decline, incline)
-• Slow tempo squats (3-4 second eccentric)
-• Pistol squat regressions (assisted, box pistols)
-• Glute bridges and hip thrusts (single-leg progressions)
-• Plank variations (RKC plank, side plank with rotation)
-• Pull-ups, Dips, Isometrics, Slow tempo lunges, Handstand progressions`}
-
-❌ FORBIDDEN: Burpees, Mountain climbers, Jumping jacks, Sprints, any cardio exercise.
-FOCUS: Muscle hypertrophy, maximal strength, progressive overload with adequate rest.` : ""}
-
-${category === "CARDIO" ? `
-╔══════════════════════════════════════════════════════════════════════════════╗
-║ CATEGORY: CARDIO - IMPROVE HEART RATE CAPACITY, AEROBIC & ANAEROBIC          ║
-╚══════════════════════════════════════════════════════════════════════════════╝
-
-GOAL: Improve heart rate capacity, aerobic and anaerobic conditioning.
-FORMAT: ${format} (NOT Reps & Sets)
-INTENSITY: Fast pace, minimal load, sustained heart rate elevation.
-
-${equipment === "EQUIPMENT" ? `
-✅ EQUIPMENT WORKOUTS - ALLOWED EXERCISES (PICK FROM THESE):
-
-CARDIO MACHINES:
-• Treadmill running/sprints/incline walks
-• Assault bike / Air bike intervals
-• Spin bike / Stationary bike intervals
-• Elliptical training
-• Ski erg sprints
-• Rowing machine sprints/intervals
-• Stair climber / Stepper
-• Jump rope (speed rope or weighted)
-
-GYM EQUIPMENT FOR CARDIO CONDITIONING:
-• Wall balls, Med ball slams, Med ball cleans
-• Kettlebell swings (for metabolic conditioning)
-• Weight vest (for weighted running, burpees, box jumps)
-• Battle ropes, Sled pushes/pulls
-• Box jumps (with or without weight)
-• Dumbbell thrusters, Dumbbell snatches
-
-EXAMPLE COMBO: 10 Wall balls + 10 Burpees + 200m Run
-
-⚠️ IMPORTANT: All equipment must be gym-based. NO swimming, outdoor-only activities, or non-gym equipment.
-` : `
-✅ BODYWEIGHT ONLY - ALLOWED EXERCISES (PICK FROM THESE):
-• Jogging in place, High knees, Butt kicks, Jumping jacks
-• Burpees, Mountain climbers, Box jumps (no equipment)
-• Skaters, Bear crawls, Lateral shuffles, Star jumps
-• Tuck jumps, Broad jumps, Squat jumps, Frog jumps
-`}
-
-❌ FORBIDDEN: Heavy lifting, slow strength exercises, Reps & Sets format.` : ""}
-
-${category === "MOBILITY & STABILITY" ? `
-╔══════════════════════════════════════════════════════════════════════════════╗
-║ CATEGORY: MOBILITY & STABILITY - FLEXIBILITY, CONTROL, INJURY PREVENTION     ║
-╚══════════════════════════════════════════════════════════════════════════════╝
-
-GOAL: Improve flexibility, joint mobility, core stability, injury prevention.
-FORMAT: MUST BE REPS & SETS - Controlled movements with focus on form and range.
-INTENSITY: Slow, controlled, deliberate movement patterns.
-
-✅ ALLOWED EXERCISES: World's greatest stretch, Cat-cow, Thread the needle, Hip circles, Shoulder CARs, Deep squats, Yoga flows, Core stability holds, Balance work.
-
-❌ FORBIDDEN: High-intensity intervals, explosive movements, speed work.` : ""}
-
-${category === "METABOLIC" ? `
-╔══════════════════════════════════════════════════════════════════════════════╗
-║ CATEGORY: METABOLIC - BURN CALORIES, BOOST METABOLISM, HIIT CONDITIONING     ║
-╚══════════════════════════════════════════════════════════════════════════════╝
-
-GOAL: Maximize calorie burn, boost metabolism, improve work capacity.
-FORMAT: ${format} (High-intensity intervals)
-INTENSITY: High effort, minimal rest, full-body movements.
-
-✅ ALLOWED EXERCISES: Burpees, Thrusters, Kettlebell swings, Box jumps, Battle ropes, Sled work, Rowing sprints, Assault bike intervals.
-
-❌ FORBIDDEN: Reps & Sets format, long rest periods, isolation exercises.` : ""}
-
-${category === "CALORIE BURNING" ? `
-╔══════════════════════════════════════════════════════════════════════════════╗
-║ CATEGORY: CALORIE BURNING - MAXIMUM CALORIE EXPENDITURE, FAT LOSS FOCUS      ║
-╚══════════════════════════════════════════════════════════════════════════════╝
-
-GOAL: Maximize calorie expenditure through sustained high-output work.
-FORMAT: ${format}
-INTENSITY: Sustained effort, compound movements, elevated heart rate throughout.
-
-${equipment === "EQUIPMENT" ? `
-✅ EQUIPMENT WORKOUTS - ALLOWED EXERCISES (PICK FROM THESE):
-
-CARDIO MACHINES:
-• Treadmill sprints/incline walks
-• Assault bike / Air bike calories
-• Rowing machine intervals
-• Ski erg sprints
-• Spin bike sprints
-• Elliptical HIIT
-• Stair climber intervals
-• Jump rope circuits
-
-GYM EQUIPMENT FOR CALORIE BURN:
-• Wall balls, Med ball slams, Med ball throws
-• Kettlebell swings, Kettlebell snatches
-• Dumbbell thrusters, Dumbbell clean & jerks
-• Weight vest (for weighted burpees, box jumps, lunges)
-• Battle ropes, Sled pushes/pulls
-• Box jumps (with or without weight)
-• Sandbag carries, Farmer carries
-
-EXAMPLE COMBO: 10 Wall balls + 10 Burpees + 200m Run
-
-⚠️ IMPORTANT: All equipment must be gym-based. NO swimming, outdoor-only activities, or non-gym equipment.
-` : `
-✅ BODYWEIGHT ONLY - ALLOWED EXERCISES (PICK FROM THESE):
-• Mountain climbers, Burpees, Jump squats, High knees
-• Jumping lunges, Speed skaters, Tuck jumps, Plank jacks
-• Bear crawls, Lateral shuffles, Squat jumps, Star jumps
-• Broad jumps, Frog jumps, Crab walks
-`}
-
-❌ FORBIDDEN: Reps & Sets format, long rest periods, isolated strength work.` : ""}
-
-${category === "CHALLENGE" ? `
-╔══════════════════════════════════════════════════════════════════════════════╗
-║ CATEGORY: CHALLENGE - TEST YOUR LIMITS, MENTAL TOUGHNESS, FULL-BODY EFFORT   ║
-╚══════════════════════════════════════════════════════════════════════════════╝
-
-GOAL: Push physical and mental limits with demanding full-body challenges.
-FORMAT: ${format}
-INTENSITY: Maximum effort, minimal rest, benchmark-style workout.
-
-✅ ALLOWED: Any exercise that challenges the athlete - compound movements, high-rep work, time-based challenges, chipper-style workouts.
-
-FOCUS: Mental fortitude, work capacity, competitive spirit.` : ""}
+The system prioritizes:
+• Progressive overload over weeks
+• Neuromuscular recovery
+• Metabolic and cardiovascular balance
+• Joint health and injury prevention
+• User engagement without randomness
 
 ═══════════════════════════════════════════════════════════════════════════════
-PERIODIZATION CONTEXT & QUALITY STANDARDS (CRITICAL - READ THIS)
+DAILY WORKOUT OUTPUT REQUIREMENTS:
+═══════════════════════════════════════════════════════════════════════════════
+
+For every Workout of the Day, the system must generate:
+• One Bodyweight version
+• One Equipment based version
+
+Both versions must:
+• Follow the same category, difficulty, and format logic
+• Deliver equivalent physiological stress
+• Differ only in tools, not in intent
+
+═══════════════════════════════════════════════════════════════════════════════
+DIFFICULTY SYSTEM (6-STAR MODEL):
+═══════════════════════════════════════════════════════════════════════════════
+
+Difficulty reflects: Volume, Intensity, Density, Coordination demand, Cognitive load
+
+Star classification:
+• 1–2 Stars: Beginner
+• 3–4 Stars: Intermediate
+• 5–6 Stars: Advanced
+
+BASE WEEKLY DIFFICULTY PATTERN:
+Intermediate → Advanced → Beginner → Advanced → Intermediate → Beginner → Advanced
+
+This pattern ensures:
+• No accumulation of high fatigue days
+• Advanced days are buffered by lower stress sessions
+
+WEEKLY ROTATION RULE:
+Each new week, the difficulty pattern shifts forward by one position.
+No category is always Beginner or always Advanced.
+The same star rating must not appear on the same category in consecutive weeks.
+
+═══════════════════════════════════════════════════════════════════════════════
+FORMAT RULES BY CATEGORY (STRICT BUT INTELLIGENT):
+═══════════════════════════════════════════════════════════════════════════════
+
+STRENGTH:
+• Format: REPS & SETS ONLY
+• Rest between sets is mandatory
+• Focus on load, tempo, and technical quality
+
+MOBILITY & STABILITY:
+• Format: REPS & SETS ONLY
+• Slow tempo
+• Controlled ranges of motion
+• No time pressure
+
+CARDIO, METABOLIC, CALORIE BURNING:
+• Primary formats: Circuit, EMOM, For Time, AMRAP, Tabata
+• Reps & Sets may appear ONLY as: Low load, Submaximal, Part of a larger continuous structure
+• Never as classic strength loading
+
+CHALLENGE:
+• Any format except classic Reps & Sets
+• Mix formats are encouraged
+
+IMPORTANT: Reps & Sets is a pacing and control tool. It is exclusive as a main structure only in Strength and Mobility.
+Other categories may include reps based blocks ONLY if they preserve continuous activity.
+
+═══════════════════════════════════════════════════════════════════════════════
+FORMAT MIXING LOGIC (ADVANCED RULE):
+═══════════════════════════════════════════════════════════════════════════════
+
+In non-strength categories, workouts may combine formats.
+
+Examples:
+• Tabata followed by AMRAP
+• Circuit finishing with For Time
+• EMOM transitioning into Tabata
+
+Rules:
+• Only one dominant stimulus per workout
+• Mixing must increase engagement, not confusion
+• Never mix maximal strength loading with metabolic density
+
+═══════════════════════════════════════════════════════════════════════════════
+LOAD AND INTENSITY GOVERNANCE:
+═══════════════════════════════════════════════════════════════════════════════
+
+STRENGTH:
+• 60–90 percent of estimated 1RM depending on stars
+• Longer rest
+• Low movement count
+
+METABOLIC and CARDIO:
+• 30–50 percent of strength capacity
+• Never above moderate load
+• Continuous movement priority
+
+CALORIE BURNING:
+• Light to moderate loads
+• High repetition
+• Sustainable pacing
+
+ABSOLUTE RULE: No metabolic or calorie workout may prescribe heavy percentages of 1RM.
+
+═══════════════════════════════════════════════════════════════════════════════
+EQUIPMENT GOVERNANCE:
+═══════════════════════════════════════════════════════════════════════════════
+
+All workouts must use gym based equipment only.
+
+Allowed cardio machines:
+• Treadmill, Assault bike, Spin bike, Elliptical, Ski erg, Rowing machine, Stair climber, Jump rope
+
+Allowed gym tools:
+• Wall balls, Medicine balls, Kettlebells, Dumbbells, Battle ropes, Weight vest, Sled pushes/pulls, Box jumps, Sandbags, Farmer carries
+
+PROHIBITED: Swimming, Outdoor only activities, Terrain dependent movements
+
+Equipment selection must:
+• Match category intent
+• Scale correctly with difficulty
+• Never dominate technique at the expense of movement quality
+
+═══════════════════════════════════════════════════════════════════════════════
+VOLUME AND VALUE-FOR-MONEY STANDARDS:
+═══════════════════════════════════════════════════════════════════════════════
+
+Beginner (1-2 stars): 100–150 total movements
+Intermediate (3-4 stars): 150–250 total movements
+Advanced (5-6 stars): 200–350 or more movements
+
+Movement count reflects: Total reps, Total steps, Total calories, Total strokes
+The goal is perceived value without unnecessary fatigue.
+
+❌ WEAK EXAMPLE: "10 burpees, 20 squats, 10 push-ups x3 rounds" = 120 total reps = UNACCEPTABLE
+✅ STRONG EXAMPLE: "5 rounds of: 15 burpees, 20 squats, 15 push-ups, 20 lunges, 15 mountain climbers" = 425 total = EXCELLENT
+
+═══════════════════════════════════════════════════════════════════════════════
+CHALLENGE CATEGORY SPECIAL RULES:
+═══════════════════════════════════════════════════════════════════════════════
+
+Challenge workouts test: Mental resilience, Coordination, Work capacity, Decision making under fatigue
+
+They may:
+• Combine multiple formats
+• Use non linear structures
+• Increase cognitive demand
+
+They must still:
+• Respect safety
+• Avoid maximal strength loading
+• Remain scalable
+
+═══════════════════════════════════════════════════════════════════════════════
+RECOVERY AND FATIGUE AWARENESS:
+═══════════════════════════════════════════════════════════════════════════════
+
+The AI must always evaluate:
+• Previous day category
+• Previous day difficulty
+• Cumulative stress
+
+Advanced days following advanced days must:
+• Reduce volume
+• Reduce impact
+• Or shift stimulus focus
+
+═══════════════════════════════════════════════════════════════════════════════
+CONSISTENCY OVER NOVELTY:
+═══════════════════════════════════════════════════════════════════════════════
+
+The system favors: Smart variation, Rotating structures, Predictable logic
+Over: Random exercise selection, Extreme fatigue chasing, Unstructured creativity
+
+═══════════════════════════════════════════════════════════════════════════════
+PERIODIZATION CONTEXT FOR TODAY'S WORKOUT:
 ═══════════════════════════════════════════════════════════════════════════════
 
 📅 YESTERDAY'S WORKOUT:
-- Category: ${yesterdayCategory}
-- Difficulty: ${yesterdayDifficulty} stars
-- Equipment: ${yesterdayEquipment}
-- Format: ${yesterdayFormat}
+• Category: ${yesterdayCategory}
+• Difficulty: ${yesterdayDifficulty} stars
+• Equipment: ${yesterdayEquipment}
+• Format: ${yesterdayFormat}
 
 📅 TOMORROW'S PREVIEW:
-- Category: ${tomorrowCategory}
-- Expected Difficulty: ${tomorrowDifficulty.stars} stars (${tomorrowDifficulty.name})
-
-💰 VALUE-FOR-MONEY RULE (NON-NEGOTIABLE):
-People PAY for these workouts. Every WOD must deliver SUBSTANTIAL training value:
-- Minimum 150-200+ total reps/movements for circuit/AMRAP/EMOM workouts
-- For TABATA: 8 rounds = 4 minutes per exercise, include 3-5 exercises minimum
-- If 3 rounds, each round MUST have meaningful volume (minimum 6 exercises OR high rep counts)
-- If 5 rounds, can have slightly fewer exercises per round
-
-❌ WEAK EXAMPLE: "10 burpees, 20 squats, 10 push-ups x3 rounds" = 120 total reps = UNACCEPTABLE
-✅ STRONG EXAMPLE: "20 burpees, 40 KB swings, 60 box steps, 80 jumping jacks, 100 mountain climbers" = 300 total = SUBSTANTIAL
-✅ STRONG EXAMPLE: "5 rounds of: 15 burpees, 20 squats, 15 push-ups, 20 lunges, 15 mountain climbers" = 425 total = EXCELLENT
-
-Beginners (1-2 stars): Slightly less volume but NEVER trivial - minimum 100-150 total movements
-Intermediate (3-4 stars): Solid volume - 150-250 total movements
-Advanced (5-6 stars): High volume OR high intensity - 200-350+ total movements
+• Category: ${tomorrowCategory}
+• Expected Difficulty: ${tomorrowDifficulty.stars} stars (${tomorrowDifficulty.name})
 
 📊 SCIENTIFIC SCALING & RECOVERY:
 ${scalingAdvice}
 
-- If yesterday was same category → emphasize DIFFERENT movement patterns today
-- If tomorrow is intense (5-6 stars) → today can include more recovery/mobility work in warm-up
-- Progressive overload: Increase volume OR intensity, not always both
-- Consider: What muscles worked hard yesterday? What needs recovery?
+═══════════════════════════════════════════════════════════════════════════════
+GENERAL SYSTEM RULES - NON NEGOTIABLE:
+═══════════════════════════════════════════════════════════════════════════════
 
-🎯 PROFESSIONAL PROGRAMMING RULES:
-1. Each workout must have PURPOSE within the weekly cycle
-2. Loading → Recovery → Loading pattern (not random high-intensity every day)
-3. Movement pattern variety across days (push/pull/squat/hinge/carry/core)
-4. If consecutive high-intensity days: MUST hit different muscle groups
-5. NEVER waste the user's time - every minute should deliver training value
-6. The workout should feel COMPLETE - user should feel accomplished, not "that's it?"
+1. FORMATTING, DESIGN & STRUCTURE ARE UNTOUCHABLE
+   The system must NEVER change the existing formatting, layout, or visual logic.
+
+2. CATEGORIES, SUBCATEGORIES & LOGIC ARE FIXED
+   The six categories, difficulty system, weekly sequence, and format rules are FINAL.
+
+3. EVERY WORKOUT MUST HAVE CLEAR PURPOSE
+   Each workout must clearly express what it trains and why it exists in the weekly sequence.
+
+4. DESCRIPTION, INSTRUCTIONS & TIPS ARE MANDATORY
+   Every workout must include: Clear description, Step by step instructions, Practical tips
+
+5. VALUE FOR MONEY IS A CORE FILTER
+   These workouts are sold products. Every WOD must deliver substantial training value.
+
+6. INTELLIGENT VARIATION, NOT REPETITION
+   Rotate exercises, movement patterns, equipment usage, format combinations where allowed.
+
+7. EXAMPLES DO NOT LIMIT CREATIVITY
+   The system is encouraged to explore new but logical progressions within rules.
+
+8. LOAD, SPEED & FATIGUE MUST MATCH THE CATEGORY
+   No heavy 1RM percentages in metabolic work. No rushed balance work in mobility sessions.
+
+9. PROFESSIONAL TONE, NEVER CIRCUS
+   Workout names and structures must remain serious, professional, and coach driven.
+
+10. LONG TERM USAGE MENTALITY
+    Every workout must respect recovery, joint health, nervous system fatigue, motivation sustainability.
+
+═══════════════════════════════════════════════════════════════════════════════
+YOUR WORKOUT SPECIFICATIONS FOR THIS GENERATION:
+═══════════════════════════════════════════════════════════════════════════════
+
+• Category: ${category}
+• Equipment: ${equipment}
+• Difficulty: ${selectedDifficulty.name} (${selectedDifficulty.stars} stars out of 6)
+• Format: ${format}
+
+${category === "STRENGTH" ? `
+STRENGTH CATEGORY - ALLOWED EXERCISES:
+${equipment === "EQUIPMENT" ? `
+• Goblet squats, Kettlebell deadlifts, Romanian deadlifts, Front squats
+• Bench press variations, Dumbbell row, Bent-over row
+• Push press, Landmine press, Split squats, Hip hinges, Weighted carries` : `
+• Push-up variations (diamond, archer, decline, incline)
+• Slow tempo squats (3-4 second eccentric)
+• Pistol squat regressions (assisted, box pistols)
+• Glute bridges and hip thrusts (single-leg progressions)
+• Plank variations, Pull-ups, Dips, Isometrics, Handstand progressions`}
+❌ FORBIDDEN: Burpees, Mountain climbers, Jumping jacks, Sprints, any cardio exercise.
+` : ""}
+
+${category === "CARDIO" ? `
+CARDIO CATEGORY - ALLOWED EXERCISES:
+${equipment === "EQUIPMENT" ? `
+• Treadmill running/sprints/incline walks
+• Assault bike / Air bike intervals
+• Spin bike / Stationary bike intervals
+• Elliptical, Ski erg sprints, Rowing machine sprints/intervals
+• Stair climber / Stepper, Jump rope
+• Wall balls, Med ball slams, Kettlebell swings, Battle ropes, Sled pushes/pulls` : `
+• Jogging in place, High knees, Butt kicks, Jumping jacks
+• Burpees, Mountain climbers, Box jumps
+• Skaters, Bear crawls, Lateral shuffles, Star jumps
+• Tuck jumps, Broad jumps, Squat jumps, Frog jumps`}
+❌ FORBIDDEN: Heavy lifting, slow strength exercises, Reps & Sets format.
+` : ""}
+
+${category === "MOBILITY & STABILITY" ? `
+MOBILITY & STABILITY CATEGORY - ALLOWED EXERCISES:
+• World's greatest stretch, Cat-cow, Thread the needle, Hip circles
+• Shoulder CARs, Deep squats, Yoga flows, Core stability holds, Balance work
+❌ FORBIDDEN: High-intensity intervals, explosive movements, speed work.
+` : ""}
+
+${category === "METABOLIC" ? `
+METABOLIC CATEGORY - ALLOWED EXERCISES:
+• Burpees, Thrusters, Kettlebell swings, Box jumps
+• Battle ropes, Sled work, Rowing sprints, Assault bike intervals
+❌ FORBIDDEN: Reps & Sets format, long rest periods, isolation exercises.
+` : ""}
+
+${category === "CALORIE BURNING" ? `
+CALORIE BURNING CATEGORY - ALLOWED EXERCISES:
+${equipment === "EQUIPMENT" ? `
+• Treadmill sprints/incline walks, Assault bike calories, Rowing machine intervals
+• Ski erg sprints, Spin bike sprints, Elliptical HIIT, Stair climber intervals
+• Wall balls, Med ball slams, Kettlebell swings/snatches, Dumbbell thrusters
+• Weight vest exercises, Battle ropes, Sled pushes/pulls, Box jumps, Farmer carries` : `
+• Mountain climbers, Burpees, Jump squats, High knees
+• Jumping lunges, Speed skaters, Tuck jumps, Plank jacks
+• Bear crawls, Lateral shuffles, Squat jumps, Star jumps`}
+❌ FORBIDDEN: Reps & Sets format, long rest periods, isolated strength work.
+` : ""}
+
+${category === "CHALLENGE" ? `
+CHALLENGE CATEGORY:
+• Any exercise that challenges the athlete - compound movements, high-rep work, time-based challenges
+• May combine multiple formats, use non-linear structures
+• Focus on mental fortitude, work capacity, competitive spirit
+` : ""}
+
+═══════════════════════════════════════════════════════════════════════════════
+FORMAT DEFINITIONS (MUST FOLLOW EXACTLY):
+═══════════════════════════════════════════════════════════════════════════════
+• Tabata: 20 seconds work, 10 seconds rest, 8 rounds per exercise
+• Circuit: 4-6 exercises repeated 3-5 rounds with minimal rest between exercises
+• AMRAP: As Many Rounds As Possible in a given time (e.g., 15 min AMRAP)
+• For Time: Complete all exercises as fast as possible (record time)
+• EMOM: Every Minute On the Minute - perform set at start of each minute, rest remainder
+• Reps & Sets: Classic strength format (e.g., 4 sets x 8 reps) with defined rest
+• Mix: Combination of two or more formats (e.g., EMOM warm-up + Tabata finisher)
+
+YOUR FORMAT TODAY: ${format}
+You MUST structure the workout using the ${format} format rules defined above.
 
 ═══════════════════════════════════════════════════════════════════════════════
 RESPONSE FORMAT (JSON ONLY - NO MARKDOWN):
@@ -938,7 +1062,7 @@ INSTRUCTIONS FORMAT: Plain paragraphs with clear guidance
 <p class="tiptap-paragraph">Complete each exercise for the prescribed time. Rest as needed between exercises.</p>
 
 {
-  "name": "Creative, motivating workout name (3-5 words, unique)",
+  "name": "Creative, motivating workout name (2-4 words, unique)",
   "description": "2-3 sentence HTML description with <p class='tiptap-paragraph'> tags",
   "main_workout": "MUST follow the gold standard template above with Warm Up, Main Workout, Cool Down sections using bullet lists",
   "instructions": "Step-by-step guidance in <p class='tiptap-paragraph'> tags",
