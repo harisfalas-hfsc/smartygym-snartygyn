@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { PageBreadcrumbs } from "@/components/PageBreadcrumbs";
 import { InfoRibbon } from "@/components/InfoRibbon";
-import { ArrowLeft, Dumbbell, Flame, Zap, Heart, Move, Activity, CalendarCheck } from "lucide-react";
+import { ArrowLeft, Dumbbell, Flame, Zap, Heart, Move, Activity, CalendarCheck, Flower2 } from "lucide-react";
 import { SEOEnhancer } from "@/components/SEOEnhancer";
 import { generateBreadcrumbSchema } from "@/utils/seoHelpers";
 import { useAccessControl } from "@/hooks/useAccessControl";
@@ -97,6 +97,13 @@ const WorkoutFlow = () => {
     icon: Activity,
     level: "Beginner-Advanced",
     equipment: "Equipment/No Equipment"
+  }, {
+    id: "pilates",
+    title: "Pilates",
+    description: "Controlled movements for core strength and flexibility",
+    icon: Flower2,
+    level: "Beginner-Advanced",
+    equipment: "Reformer/Mat"
   }];
 
   const handleWorkoutSelect = (workoutId: string) => {
@@ -108,7 +115,7 @@ const WorkoutFlow = () => {
       <Helmet>
         <title>Online Workouts | AMRAP TABATA HIIT Strength Cardio | Haris Falas | SmartyGym</title>
         <meta name="description" content="500+ online gym workouts at smartygym.com. AMRAP, TABATA, HIIT, circuit training, strength, cardio, metabolic, mobility workouts by Sports Scientist Haris Falas. Home workouts, bodyweight training, equipment workouts. Train anywhere, anytime." />
-        <meta name="keywords" content="online gym, online workouts, gym workouts, home workouts, online fitness, HFSC, Haris Falas, Sports Scientist, AMRAP workouts, TABATA training, HIIT workouts, circuit training, strength training workouts, cardio workouts, bodyweight training, metabolic training, mobility training, calorie burning workouts, challenge workouts, smartygym.com, workout of the day, WOD" />
+        <meta name="keywords" content="online gym, online workouts, gym workouts, home workouts, online fitness, HFSC, Haris Falas, Sports Scientist, AMRAP workouts, TABATA training, HIIT workouts, circuit training, strength training workouts, cardio workouts, bodyweight training, metabolic training, mobility training, calorie burning workouts, challenge workouts, Pilates, Reformer Pilates, Mat Pilates, smartygym.com, workout of the day, WOD" />
         
         <link rel="alternate" hrefLang="el" href="https://smartygym.com/workout" />
         <link rel="alternate" hrefLang="en-GB" href="https://smartygym.com/workout" />
@@ -143,7 +150,8 @@ const WorkoutFlow = () => {
                 { "@type": "ListItem", "position": 4, "name": "Metabolic Workouts", "url": "https://smartygym.com/workout/metabolic" },
                 { "@type": "ListItem", "position": 5, "name": "Cardio Workouts", "url": "https://smartygym.com/workout/cardio" },
                 { "@type": "ListItem", "position": 6, "name": "Mobility & Stability", "url": "https://smartygym.com/workout/mobility" },
-                { "@type": "ListItem", "position": 7, "name": "Challenge Workouts", "url": "https://smartygym.com/workout/challenge" }
+                { "@type": "ListItem", "position": 7, "name": "Challenge Workouts", "url": "https://smartygym.com/workout/challenge" },
+                { "@type": "ListItem", "position": 8, "name": "Pilates Workouts", "url": "https://smartygym.com/workout/pilates" }
               ]
             },
             "author": { "@type": "Person", "name": "Haris Falas", "jobTitle": "Sports Scientist" },
