@@ -1,16 +1,21 @@
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Helmet } from "react-helmet";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { PageBreadcrumbs } from "@/components/PageBreadcrumbs";
-import { InfoRibbon } from "@/components/InfoRibbon";
-import { ArrowLeft, Dumbbell, Flame, Zap, Heart, Move, Activity, CalendarCheck } from "lucide-react";
+import { ArrowLeft, Dumbbell, Flame, Zap, Heart, Move, Activity, CalendarCheck, Star, Clock, Crown, ChevronRight, Target } from "lucide-react";
 import { SEOEnhancer } from "@/components/SEOEnhancer";
 import { generateBreadcrumbSchema } from "@/utils/seoHelpers";
 import { useAccessControl } from "@/hooks/useAccessControl";
 import { useShowBackButton } from "@/hooks/useShowBackButton";
 import { ScrollReveal } from "@/components/ScrollReveal";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
+import { cn } from "@/lib/utils";
+import { Badge } from "@/components/ui/badge";
+import { Skeleton } from "@/components/ui/skeleton";
 
 const WorkoutFlow = () => {
   const navigate = useNavigate();
@@ -18,15 +23,51 @@ const WorkoutFlow = () => {
   const { userTier } = useAccessControl();
   const isPremium = userTier === "premium";
   const isMobile = useIsMobile();
+  const [currentWodIndex, setCurrentWodIndex] = useState(0);
 
+  // Fetch WODs from Supabase
+  const { data: wods, isLoading: wodsLoading } = useQuery({
+    queryKey: ["wod-workout-page-banner"],
+    queryFn: async () => {
+      const today = new Date().toISOString().split('T')[0];
+      const { data } = await supabase
+        .from("admin_workouts")
+        .select("id, name, category, focus, difficulty_stars, duration, image_url, equipment, is_premium, type")
+        .eq("is_workout_of_day", true)
+        .eq("generated_for_date", today)
+        .limit(2);
+      return data || [];
+    },
+    staleTime: 1000 * 60 * 5,
+    refetchOnWindowFocus: false,
+  });
+
+  // Rotate WODs every 4 seconds
+  useEffect(() => {
+    if (!wods || wods.length < 2) return;
+    const interval = setInterval(() => {
+      setCurrentWodIndex((prev) => (prev === 0 ? 1 : 0));
+    }, 4000);
+    return () => clearInterval(interval);
+  }, [wods]);
+
+  // Helper functions
+  const getDifficultyLabel = (stars: number | null) => {
+    if (!stars) return "Beginner";
+    if (stars <= 2) return "Beginner";
+    if (stars <= 4) return "Intermediate";
+    return "Advanced";
+  };
+
+  const renderStars = (count: number | null) => {
+    const starCount = count || 1;
+    return Array.from({ length: Math.min(starCount, 6) }).map((_, i) => (
+      <Star key={i} className="w-3 h-3 fill-yellow-400 text-yellow-400" />
+    ));
+  };
+
+  // Static workout types (excluding WOD since we have the rotating card)
   const workoutTypes = [{
-    id: "wod",
-    title: "WOD",
-    description: "Workout of the Day",
-    icon: CalendarCheck,
-    level: "Beginner-Advanced",
-    equipment: "Equipment/No Equipment"
-  }, {
     id: "strength",
     title: "Strength",
     description: "Build muscle and power with resistance training",
@@ -180,6 +221,142 @@ const WorkoutFlow = () => {
           </Card>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+            {/* Rotating WOD Card */}
+            <ScrollReveal>
+              <Card 
+                onClick={() => navigate("/workout/wod")} 
+                className="group p-6 cursor-pointer transition-all duration-500 ease-out transform-gpu hover:scale-110 hover:-translate-y-3 hover:shadow-2xl hover:shadow-primary/40 hover:border-primary/60 bg-card border-2 border-primary/60 relative overflow-hidden min-h-[280px]" 
+                role="button" 
+                aria-label="Workout of the Day - Today's featured workouts at SmartyGym"
+              >
+                {/* Header */}
+                <div className="flex items-center justify-between mb-4">
+                  <div className="flex items-center gap-2">
+                    <div className="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center">
+                      <CalendarCheck className="w-5 h-5 text-primary" />
+                    </div>
+                    <div>
+                      <h3 className="font-semibold text-lg">WOD</h3>
+                      <p className="text-xs text-muted-foreground">Workout of the Day</p>
+                    </div>
+                  </div>
+                  {wods && wods.length === 2 && (
+                    <div className="flex gap-1">
+                      {[0, 1].map((i) => (
+                        <div
+                          key={i}
+                          className={cn(
+                            "w-2 h-2 rounded-full transition-all duration-300",
+                            currentWodIndex === i ? "bg-primary scale-125" : "bg-muted-foreground/30"
+                          )}
+                        />
+                      ))}
+                    </div>
+                  )}
+                </div>
+
+                {/* Rotating Content */}
+                <div className="relative h-[160px]">
+                  {wodsLoading ? (
+                    <div className="space-y-3">
+                      <Skeleton className="h-4 w-3/4" />
+                      <Skeleton className="h-3 w-1/2" />
+                      <Skeleton className="h-3 w-2/3" />
+                    </div>
+                  ) : wods && wods.length > 0 ? (
+                    wods.map((wod, index) => (
+                      <div
+                        key={wod.id}
+                        className={cn(
+                          "absolute inset-0 transition-opacity duration-700 ease-in-out",
+                          currentWodIndex === index ? "opacity-100 z-10" : "opacity-0 z-0"
+                        )}
+                      >
+                        {/* Workout Image or Fallback */}
+                        {wod.image_url ? (
+                          <div className="w-full h-20 rounded-lg overflow-hidden mb-3">
+                            <img 
+                              src={wod.image_url} 
+                              alt={wod.name} 
+                              className="w-full h-full object-cover"
+                            />
+                          </div>
+                        ) : (
+                          <div className="w-full h-20 rounded-lg bg-gradient-to-br from-primary/20 to-primary/5 flex items-center justify-center mb-3">
+                            <Target className="w-8 h-8 text-primary/60" />
+                          </div>
+                        )}
+
+                        {/* Workout Details */}
+                        <h4 className="font-semibold text-sm mb-1 line-clamp-1">{wod.name}</h4>
+                        
+                        <div className="flex flex-wrap items-center gap-1.5 mb-2">
+                          {/* Type Badge */}
+                          <Badge variant="outline" className="text-[10px] px-1.5 py-0 h-5 bg-primary/10 border-primary/30 text-primary">
+                            {wod.type}
+                          </Badge>
+                          
+                          {/* Category Badge */}
+                          {wod.category && (
+                            <Badge variant="outline" className="text-[10px] px-1.5 py-0 h-5 bg-blue-500/10 border-blue-500/30 text-blue-600 dark:text-blue-400">
+                              {wod.category}
+                            </Badge>
+                          )}
+                          
+                          {/* Equipment Badge */}
+                          <Badge 
+                            variant="outline" 
+                            className={cn(
+                              "text-[10px] px-1.5 py-0 h-5",
+                              wod.equipment?.toLowerCase() === "bodyweight" 
+                                ? "bg-green-500/10 border-green-500/30 text-green-600 dark:text-green-400"
+                                : "bg-orange-500/10 border-orange-500/30 text-orange-600 dark:text-orange-400"
+                            )}
+                          >
+                            {wod.equipment?.toLowerCase() === "bodyweight" ? "Bodyweight" : "Equipment"}
+                          </Badge>
+                        </div>
+
+                        <div className="flex items-center justify-between text-xs text-muted-foreground">
+                          <div className="flex items-center gap-1">
+                            {renderStars(wod.difficulty_stars)}
+                            <span className="ml-1">{getDifficultyLabel(wod.difficulty_stars)}</span>
+                          </div>
+                          {wod.duration && (
+                            <div className="flex items-center gap-1">
+                              <Clock className="w-3 h-3" />
+                              <span>{wod.duration}</span>
+                            </div>
+                          )}
+                        </div>
+
+                        {/* Premium Badge */}
+                        {wod.is_premium && (
+                          <div className="absolute top-0 right-0">
+                            <Badge className="bg-gradient-to-r from-yellow-500 to-amber-500 text-white text-[10px] px-1.5 py-0 h-5">
+                              <Crown className="w-3 h-3 mr-0.5" />
+                              Premium
+                            </Badge>
+                          </div>
+                        )}
+                      </div>
+                    ))
+                  ) : (
+                    <div className="flex flex-col items-center justify-center h-full text-center">
+                      <CalendarCheck className="w-12 h-12 text-muted-foreground/40 mb-2" />
+                      <p className="text-sm text-muted-foreground">Today's WODs coming soon</p>
+                    </div>
+                  )}
+                </div>
+
+                {/* Footer */}
+                <div className="flex items-center justify-center text-xs text-primary mt-2 group-hover:underline">
+                  View Today's WOD <ChevronRight className="w-3 h-3 ml-1" />
+                </div>
+              </Card>
+            </ScrollReveal>
+
+            {/* Static Workout Cards */}
             {workoutTypes.map(workout => {
               const Icon = workout.icon;
               return (
