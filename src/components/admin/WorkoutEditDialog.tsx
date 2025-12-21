@@ -16,7 +16,8 @@ const CATEGORIES = [
   "METABOLIC",
   "CARDIO",
   "MOBILITY & STABILITY",
-  "CHALLENGE"
+  "CHALLENGE",
+  "PILATES"
 ];
 
 const FORMATS = [
@@ -87,6 +88,7 @@ export const WorkoutEditDialog = ({ workout, open, onOpenChange, onSave }: Worko
       'CARDIO': 'C',
       'MOBILITY & STABILITY': 'M',
       'CHALLENGE': 'CH',
+      'PILATES': 'PIL',
       // Legacy support for old values still in DB
       'MOBILITY': 'M',
       'CALORIE_BURNING': 'CB',

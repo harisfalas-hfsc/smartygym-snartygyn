@@ -78,6 +78,7 @@ export const WODAnnouncementModal = ({ open, onClose }: WODAnnouncementModalProp
     if (lower.includes("challenge")) return "text-pink-700 dark:text-pink-400";
     if (lower.includes("stability")) return "text-teal-700 dark:text-teal-400";
     if (lower.includes("metabolic")) return "text-amber-700 dark:text-amber-400";
+    if (lower.includes("pilates")) return "text-rose-700 dark:text-rose-400";
     return "text-muted-foreground";
   };
 
