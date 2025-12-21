@@ -2371,7 +2371,39 @@ export type Database = {
       }
     }
     Views: {
-      [_ in never]: never
+      leaderboard_stats: {
+        Row: {
+          avatar_url: string | null
+          avg_score: number | null
+          best_score: number | null
+          complete_days: number | null
+          display_name: string | null
+          streak_days: number | null
+          total_checkins: number | null
+        }
+        Relationships: []
+      }
+      program_activity_summary: {
+        Row: {
+          avg_rating: number | null
+          favorites_count: number | null
+          program_name: string | null
+          program_type: string | null
+          times_completed: number | null
+          times_started: number | null
+        }
+        Relationships: []
+      }
+      workout_activity_summary: {
+        Row: {
+          avg_rating: number | null
+          favorites_count: number | null
+          times_completed: number | null
+          workout_name: string | null
+          workout_type: string | null
+        }
+        Relationships: []
+      }
     }
     Functions: {
       check_rate_limit: {
