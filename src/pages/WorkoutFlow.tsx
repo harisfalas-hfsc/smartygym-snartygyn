@@ -48,6 +48,17 @@ const WorkoutFlow = () => {
     return () => clearInterval(interval);
   }, [wodImages.length]);
 
+  // Category background images (excluding WOD which has rotating images)
+  const categoryBackgrounds: Record<string, string> = {
+    "strength": "/images/workouts/strength-category-bg.jpg",
+    "calorie-burning": "/images/workouts/calorie-burning-category-bg.jpg",
+    "metabolic": "/images/workouts/metabolic-category-bg.jpg",
+    "cardio": "/images/workouts/cardio-category-bg.jpg",
+    "mobility": "/images/workouts/mobility-category-bg.jpg",
+    "challenge": "/images/workouts/challenge-category-bg.jpg",
+    "pilates": "/images/workouts/pilates-category-bg.jpg",
+  };
+
   const workoutTypes = [{
     id: "wod",
     title: "WOD",
@@ -220,6 +231,8 @@ const WorkoutFlow = () => {
             {workoutTypes.map(workout => {
               const Icon = workout.icon;
               const isWodCard = workout.id === "wod";
+              const hasBackground = isWodCard ? wodImages.length > 0 : !!categoryBackgrounds[workout.id];
+              const backgroundImage = isWodCard ? null : categoryBackgrounds[workout.id];
               
               return (
                 <ScrollReveal key={workout.id}>
@@ -227,7 +240,7 @@ const WorkoutFlow = () => {
                     itemScope 
                     itemType="https://schema.org/ExercisePlan" 
                     onClick={() => handleWorkoutSelect(workout.id)} 
-                    className={`group p-6 cursor-pointer transition-all duration-500 ease-out transform-gpu hover:scale-110 hover:-translate-y-3 hover:shadow-2xl hover:shadow-primary/40 hover:border-primary/60 border-2 border-border ${isWodCard && wodImages.length > 0 ? 'relative overflow-hidden' : 'bg-card'}`}
+                    className={`group p-6 cursor-pointer transition-all duration-500 ease-out transform-gpu hover:scale-110 hover:-translate-y-3 hover:shadow-2xl hover:shadow-primary/40 hover:border-primary/60 border-2 border-border ${hasBackground ? 'relative overflow-hidden' : 'bg-card'}`}
                     role="button" 
                     aria-label={`${workout.title} workouts - Online gym category at SmartyGym - smartygym.com by Haris Falas`} 
                     data-workout-category={workout.id} 
@@ -254,7 +267,22 @@ const WorkoutFlow = () => {
                       </>
                     )}
                     
-                    <div className={`flex flex-col items-center text-center space-y-4 ${isWodCard && wodImages.length > 0 ? 'relative z-10' : ''}`}>
+                    {/* Non-WOD Card Background Images */}
+                    {!isWodCard && backgroundImage && (
+                      <>
+                        <div className="absolute inset-0">
+                          <img
+                            src={backgroundImage}
+                            alt=""
+                            className="w-full h-full object-cover"
+                          />
+                        </div>
+                        {/* Dark overlay for readability */}
+                        <div className="absolute inset-0 bg-black/60" />
+                      </>
+                    )}
+                    
+                    <div className={`flex flex-col items-center text-center space-y-4 ${hasBackground ? 'relative z-10' : ''}`}>
                       <div
                         className="relative w-16 h-16 rounded-full flex items-center justify-center transition-transform duration-300 group-hover:scale-110 bg-card"
                         aria-hidden="true"
@@ -263,13 +291,13 @@ const WorkoutFlow = () => {
                         <Icon className="relative w-8 h-8 transition-transform duration-300 group-hover:rotate-3 text-primary" />
                       </div>
                       <div>
-                        <h3 className={`font-semibold text-lg mb-2 ${isWodCard && wodImages.length > 0 ? 'text-white' : ''}`} itemProp="name">
+                        <h3 className={`font-semibold text-lg mb-2 ${hasBackground ? 'text-white' : ''}`} itemProp="name">
                           {workout.title}
                         </h3>
-                        <p className={`text-sm mb-3 ${isWodCard && wodImages.length > 0 ? 'text-white/90' : 'text-muted-foreground'}`} itemProp="description">
+                        <p className={`text-sm mb-3 ${hasBackground ? 'text-white/90' : 'text-muted-foreground'}`} itemProp="description">
                           {workout.description}
                         </p>
-                        <p className={`text-xs italic ${isWodCard && wodImages.length > 0 ? 'text-white/80' : 'text-muted-foreground/80'}`}>
+                        <p className={`text-xs italic ${hasBackground ? 'text-white/80' : 'text-muted-foreground/80'}`}>
                           Crafted by{" "}
                           <a href="/coach-profile" className="hover:underline font-medium whitespace-nowrap text-primary" onClick={e => e.stopPropagation()}>
                             Haris Falas
