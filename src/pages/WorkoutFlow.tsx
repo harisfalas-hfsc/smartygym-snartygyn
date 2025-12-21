@@ -256,7 +256,7 @@ const WorkoutFlow = () => {
                         )}
                       >
                         {/* Image Section */}
-                        <div className="relative h-[120px] overflow-hidden bg-muted">
+                        <div className="relative h-[140px] overflow-hidden bg-muted">
                           {wod.image_url ? (
                             <img 
                               src={wod.image_url} 
@@ -296,12 +296,12 @@ const WorkoutFlow = () => {
                         </div>
                         
                         {/* Content Section */}
-                        <div className="flex-1 p-3 flex flex-col">
+                        <div className="flex-1 p-3 flex flex-col justify-between">
                           {/* Workout Name */}
                           <p className="text-sm font-bold text-foreground line-clamp-1">{wod.name}</p>
                           
                           {/* Badge-style metadata pills - matching other cards */}
-                          <div className="flex flex-wrap gap-1 text-[10px] mt-2">
+                          <div className="flex flex-wrap gap-1 text-[10px] mt-auto">
                             {wod.type && (
                               <span className="bg-primary/20 text-primary border border-primary/40 px-1.5 py-0.5 rounded-full uppercase font-medium">
                                 {wod.type}
