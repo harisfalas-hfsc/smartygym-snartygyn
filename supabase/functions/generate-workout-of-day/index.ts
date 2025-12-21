@@ -653,7 +653,7 @@ NAMING RULES (CRITICAL - MUST FOLLOW):
    - METABOLIC: Use words like "Engine", "Drive", "Catalyst", "Ignite", "Reactor"
    - CALORIE BURNING: Use words like "Torch", "Melt", "Shred", "Scorch", "Heat"
    - MOBILITY & STABILITY: Use words like "Balance", "Flow", "Restore", "Align", "Ground"
-   - CHALLENGE: Use words like "Gauntlet", "Test", "Summit", "Peak", "Crucible"
+   - CHALLENGE: Use words like "Gauntlet", "Test", "Summit", "Peak", "Crucible", "Forge", "Trial", "Proving Ground", "Benchmark", "The [Number]", "Death By", "Grind", "Endure"
 
 3. BE CREATIVE: Each workout should have a unique, memorable name that reflects its purpose
 4. KEEP IT SHORT: 2-4 words maximum
@@ -871,20 +871,31 @@ The goal is perceived value without unnecessary fatigue.
 ✅ STRONG EXAMPLE: "5 rounds of: 15 burpees, 20 squats, 15 push-ups, 20 lunges, 15 mountain climbers" = 425 total = EXCELLENT
 
 ═══════════════════════════════════════════════════════════════════════════════
-CHALLENGE CATEGORY SPECIAL RULES:
+CHALLENGE CATEGORY SPECIAL RULES (EXPANDED):
 ═══════════════════════════════════════════════════════════════════════════════
 
 Challenge workouts test: Mental resilience, Coordination, Work capacity, Decision making under fatigue
 
+CORE IDENTITY: "The Gamification King"
+• Make users question: "Can I accomplish this?"
+• Create workouts people will talk about and share
+• Use performance-based calculations (e.g., time → reps conversion)
+
 They may:
-• Combine multiple formats
-• Use non linear structures
-• Increase cognitive demand
+• Combine multiple formats in creative ways
+• Use non-linear structures and progressive reveals
+• Include gamification elements (time-to-reps, ladder formats, death-by structures)
+• Link performance in one section to work in another section
+• Run the clock continuously across all sections
 
 They must still:
-• Respect safety
+• Respect safety (no heavy loads under fatigue)
 • Avoid maximal strength loading
-• Remain scalable
+• Remain scalable for all fitness levels
+• Include clear beginner modifications
+
+FORMAT NOTE: CHALLENGE workouts are labeled by their MAIN WORKOUT format.
+Even if finisher has reps, the main workout's format determines the classification.
 
 ═══════════════════════════════════════════════════════════════════════════════
 RECOVERY AND FATIGUE AWARENESS:
@@ -1025,10 +1036,73 @@ ${equipment === "EQUIPMENT" ? `
 ` : ""}
 
 ${category === "CHALLENGE" ? `
-CHALLENGE CATEGORY:
-• Any exercise that challenges the athlete - compound movements, high-rep work, time-based challenges
-• May combine multiple formats, use non-linear structures
-• Focus on mental fortitude, work capacity, competitive spirit
+═══════════════════════════════════════════════════════════════════════════════
+CHALLENGE CATEGORY - "THE GAMIFICATION KING"
+═══════════════════════════════════════════════════════════════════════════════
+
+PHILOSOPHY: 
+Make people question themselves: "Can I accomplish this?"
+This is NOT a normal workout. It's a TEST of mental and physical fortitude.
+Challenge workouts should inspire users to talk about them, share them, and come back to beat their times.
+
+STRUCTURE (MANDATORY - 4 SECTIONS):
+1. WARM-UP: Standard preparation (2-5 min movement + activation circuit)
+2. MAIN WORKOUT: The core challenge that defines the workout's FORMAT label
+3. FINISHER: Additional work tied to main workout performance OR separate challenge
+4. COOL DOWN: Recovery + optional final challenge element (like a run for time)
+
+GAMIFICATION CONCEPTS (USE THESE CREATIVE IDEAS):
+• "Take your burpee time in minutes, multiply by 3 = your reps for next exercises"
+• "150 burpees for time - clock never stops"
+• "Run 2km, 10 burpees, run 1km, 5 burpees, repeat 2x"
+• "Descending ladder: 100 squats, 90 sit-ups, 80 push-ups, 70 rows..."
+• "Death by burpees: Minute 1 = 1 burpee, Minute 2 = 2 burpees... until failure"
+• "Complete 100 [exercise], but every time you break, run 200m"
+• Age-based calculations: "Your age × 2 = burpees, your age = push-ups"
+• Time-to-reps conversion: Use performance on one exercise to calculate work for the next
+• "The clock runs from start to finish - including all transitions"
+
+FORMAT DETERMINATION (CRITICAL):
+• The FORMAT label is determined by the MAIN WORKOUT only
+• Example: Main = "100 Burpees for time" → FORMAT = FOR TIME
+• Even if finisher has classic reps (squats, push-ups), the main workout's format wins
+• MIX format is for when the main workout truly combines multiple formats (e.g., EMOM + Tabata)
+• Never label as REPS & SETS even if finisher uses rep counts
+
+ALLOWED FORMATS: FOR TIME, AMRAP, EMOM, CIRCUIT, TABATA, MIX
+FORBIDDEN: Classic REPS & SETS (this is not a strength session)
+
+EQUIPMENT RULES:
+• BODYWEIGHT: Use burpees, squats, push-ups, sit-ups, running in place, jumping, lunges
+• EQUIPMENT: Can add kettlebells, dumbbells, wall balls, but at safe weights for fatigue
+• NO heavy deadlifts or Olympic lifts - safety under fatigue is paramount
+• Cardio machines allowed: treadmill, assault bike, rower (for distance/calorie challenges)
+
+DESCRIPTION TONE:
+• Challenge the reader: "This is not a 'pretty' workout"
+• Set expectations: "The goal is simple: finish as fast as possible"
+• Professional but intense: "There is no pacing comfort zone here"
+• Create intrigue: Describe what makes this challenge unique
+
+TIPS MUST INCLUDE:
+• Pacing strategy for the main challenge
+• Breathing guidance for high-rep work
+• When and how to break reps strategically
+• Movement quality reminders under fatigue
+• Beginner scaling options (e.g., "Reduce burpees to 50-70")
+• Mental cues for pushing through
+
+GOLD STANDARD EXAMPLE - "Challenge me UP!" (CH-008):
+• Warm-Up: 5 min run, 5 min jump rope, 5 min hip/arm circles
+• Main Workout: 100 Burpees for time
+• GAMIFICATION: Burpee time (in minutes) × 3 = reps for squats, push-ups, AND sit-ups
+• Finisher: Complete the calculated reps for all three exercises
+• Cool Down: 1K run as fast as possible (still timed!)
+• Total: Clock runs from first burpee to end of final run
+• This creates urgency: faster burpees = fewer finisher reps, but you're more fatigued
+
+KEY INSIGHT: The FORMAT is "FOR TIME" because the main workout is 100 burpees for time.
+The finisher's reps don't change this classification - they are a consequence of the main workout.
 ` : ""}
 
 ═══════════════════════════════════════════════════════════════════════════════
