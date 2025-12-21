@@ -4,7 +4,6 @@ import { Helmet } from "react-helmet";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Separator } from "@/components/ui/separator";
 import { ArrowLeft, Sunrise, Sun, Moon, Share2, Lock, Crown, Loader2, BookOpen, Clock } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAccessControl } from "@/hooks/useAccessControl";
@@ -293,8 +292,6 @@ const DailySmartyRitual = () => {
                 {/* Calendar Integration - Google Calendar sync */}
                 <RitualCalendarSync />
 
-                <Separator />
-
                 {/* Morning Ritual */}
                 <div className="space-y-4">
                   <div className="flex items-center gap-3">
@@ -311,8 +308,6 @@ const DailySmartyRitual = () => {
                   </div>
                 </div>
 
-                <Separator />
-
                 {/* Midday Ritual */}
                 <div className="space-y-4">
                   <div className="flex items-center gap-3">
@@ -328,8 +323,6 @@ const DailySmartyRitual = () => {
                     <HTMLContent content={ritual.midday_content} />
                   </div>
                 </div>
-
-                <Separator />
 
                 {/* Evening Ritual */}
                 <div className="space-y-4">
