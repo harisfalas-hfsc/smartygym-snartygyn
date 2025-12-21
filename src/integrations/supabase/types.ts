@@ -1179,6 +1179,7 @@ export type Database = {
           endpoint: string
           id: string
           identifier: string
+          last_request_at: string | null
           request_count: number
           window_start: string
         }
@@ -1187,6 +1188,7 @@ export type Database = {
           endpoint: string
           id?: string
           identifier: string
+          last_request_at?: string | null
           request_count?: number
           window_start?: string
         }
@@ -1195,6 +1197,7 @@ export type Database = {
           endpoint?: string
           id?: string
           identifier?: string
+          last_request_at?: string | null
           request_count?: number
           window_start?: string
         }
@@ -2371,6 +2374,15 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      check_rate_limit: {
+        Args: {
+          p_endpoint: string
+          p_identifier: string
+          p_max_requests?: number
+          p_window_minutes?: number
+        }
+        Returns: boolean
+      }
       ensure_cron_jobs: { Args: never; Returns: Json }
       has_role: {
         Args: {

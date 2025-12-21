@@ -34,7 +34,7 @@ verify_jwt = false
 verify_jwt = false
 
 [functions.delete-stripe-product]
-verify_jwt = false
+verify_jwt = true
 
 [functions.send-weekly-motivation]
 verify_jwt = false
@@ -67,13 +67,13 @@ verify_jwt = false
 verify_jwt = false
 
 [functions.create-stripe-product]
-verify_jwt = false
+verify_jwt = true
 
 [functions.update-stripe-product]
-verify_jwt = false
+verify_jwt = true
 
 [functions.send-notification]
-verify_jwt = false
+verify_jwt = true
 
 [functions.send-new-content-notifications]
 verify_jwt = false
