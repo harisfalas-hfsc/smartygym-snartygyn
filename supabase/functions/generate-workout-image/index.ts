@@ -40,14 +40,11 @@ serve(async (req) => {
     if (difficulty_stars > 4) difficultyLabel = "advanced";
     else if (difficulty_stars > 2) difficultyLabel = "intermediate";
 
-    // Check if this is a Pilates workout for specialized imagery
-    const isPilates = category?.toUpperCase() === "PILATES";
-
-    // Create category-specific visual direction
+    // Create category-specific visual direction based on workout type
+    const categoryUpper = category?.toUpperCase() || "";
     let visualDirection: string;
     
-    if (isPilates) {
-      // Pilates-specific imagery: stretching, flexibility, reformer, mat, balance, breathing
+    if (categoryUpper === "PILATES") {
       visualDirection = `
 - Show a ${difficultyLabel}-level Pilates scene that captures the essence of "${name}"
 - Pilates-specific imagery: controlled stretching, flexibility exercises, graceful movements
@@ -58,13 +55,70 @@ serve(async (req) => {
 - Clean, soft, neutral colors (white, beige, light grey, soft pastels)
 - NO heavy weights, NO cardio machines, NO intense gym equipment, NO sweaty high-intensity scenes
 - Show elegant, controlled Pilates poses: planks, leg lifts, spine stretches, reformer exercises`;
+    } else if (categoryUpper === "STRENGTH") {
+      visualDirection = `
+- Show a ${difficultyLabel}-level strength training scene that captures the power of "${name}"
+- Strength-specific imagery: weightlifting, dumbbells, barbells, weight plates, resistance machines
+- Muscle building exercises: squats, deadlifts, bench press, rows, curls, overhead press
+- Professional gym setting with weight racks, mirrors, lifting platforms, iron weights
+- Strong, powerful poses showing muscle engagement and proper lifting form
+- Bold, intense atmosphere with focused determination
+- NO running, NO cardio machines, NO jumping exercises, NO treadmills, NO cycling`;
+    } else if (categoryUpper === "CARDIO") {
+      visualDirection = `
+- Show a ${difficultyLabel}-level cardio scene that captures the energy of "${name}"
+- Cardio-specific imagery: running, jumping, cycling, rowing, high-intensity movement
+- Cardio equipment: treadmill, elliptical, rowing machine, jump rope, stationary bike, stair climber
+- Outdoor running trails, track, or bright modern cardio studio setting
+- Dynamic movement showing elevated heart rate activities, motion blur effect
+- Energetic, fast-paced, heart-pumping atmosphere
+- NO heavy weights, NO barbells, NO static poses, NO slow controlled movements`;
+    } else if (categoryUpper === "CALORIE BURNING") {
+      visualDirection = `
+- Show a ${difficultyLabel}-level calorie burning scene that captures the intensity of "${name}"
+- High-intensity activities: burpees, jumping jacks, mountain climbers, box jumps, kettlebell swings
+- Sweating, fat-burning exercises, explosive full-body movements
+- Mix of bodyweight exercises and light functional equipment
+- Energetic, fast-paced workout atmosphere with visible effort and sweat
+- Bright, motivating gym or outdoor bootcamp setting
+- NO rest poses, NO static stretching, NO slow movements, NO meditation`;
+    } else if (categoryUpper === "METABOLIC") {
+      visualDirection = `
+- Show a ${difficultyLabel}-level metabolic conditioning scene that captures the intensity of "${name}"
+- Circuit training imagery: kettlebells, battle ropes, medicine balls, compound movements
+- Functional fitness equipment: kettlebells, sandbags, TRX suspension, sleds, tires
+- CrossFit-style gym or functional training area with raw industrial aesthetic
+- Multi-joint exercises, metabolic conditioning, functional fitness
+- Mix of strength and cardio elements in the same scene
+- Intense, gritty, athletic atmosphere
+- NO isolated exercises, NO machines, NO calm relaxed poses`;
+    } else if (categoryUpper === "MOBILITY & STABILITY" || categoryUpper === "MOBILITY" || categoryUpper === "STABILITY") {
+      visualDirection = `
+- Show a ${difficultyLabel}-level mobility and stability scene that captures the focus of "${name}"
+- Stretching, flexibility work, foam rolling, balance exercises, joint mobility
+- Equipment: yoga mats, foam rollers, stability balls, resistance bands, balance boards
+- Calm, focused atmosphere with soft natural lighting
+- Joint mobility work, muscle lengthening, balance poses, controlled movements
+- Peaceful yoga studio or wellness center setting
+- NO heavy weights, NO intense cardio, NO high-impact jumping, NO sweating`;
+    } else if (categoryUpper === "CHALLENGE") {
+      visualDirection = `
+- Show a ${difficultyLabel}-level challenge workout scene that captures the extreme intensity of "${name}"
+- Intense, demanding athletic exercises at peak performance
+- Advanced movements: muscle-ups, handstand walks, heavy Olympic lifts, athletic feats
+- Competition-style or elite athletic training environment
+- Impressive feats of strength, endurance, speed, or skill
+- High difficulty, elite fitness imagery with dramatic lighting
+- Gritty, powerful, champion athlete atmosphere
+- NO beginner exercises, NO simple movements, NO relaxed poses`;
     } else {
-      // Standard fitness imagery for other categories
+      // Default fallback for any other categories
       visualDirection = `
 - Show a dynamic ${difficultyLabel}-level fitness scene that captures the energy of "${name}"
-- The exercise style should visually reflect ${category.toLowerCase()} training with ${format.toLowerCase()} workout energy
+- The exercise style should visually reflect ${category?.toLowerCase() || 'general fitness'} training with ${format?.toLowerCase() || 'structured'} workout energy
 - High-energy, professional fitness photography in a gym, outdoor, or home workout setting
-- Clean, vibrant colors with excellent lighting`;
+- Clean, vibrant colors with excellent lighting
+- Athletic, motivating atmosphere appropriate for the workout type`;
     }
 
     // Create a prompt that prevents text overlays - NO metadata as key:value pairs
