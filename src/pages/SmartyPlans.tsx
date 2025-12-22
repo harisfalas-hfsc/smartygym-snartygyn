@@ -24,7 +24,8 @@ import {
   LayoutDashboard,
   MessageCircle,
   Flame,
-  Building2
+  Building2,
+  Minus
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { User } from "@supabase/supabase-js";
@@ -102,23 +103,24 @@ export default function SmartyPlans() {
   };
 
   const comparisonFeatures = [
-    { category: "Workouts", icon: Dumbbell, visitor: false, subscriber: "Free workouts", premium: "All workouts" },
-    { category: "Training Programs", icon: Flame, visitor: false, subscriber: "Free programs", premium: "Full access" },
-    { category: "Daily Smarty Ritual", icon: Sparkles, visitor: false, subscriber: "Full access", premium: "Full access" },
-    { category: "Smarty Check-ins", icon: ClipboardCheck, visitor: false, subscriber: false, premium: "Full access" },
-    { category: "Dashboard", icon: LayoutDashboard, visitor: false, subscriber: "Limited access", premium: "Full access" },
-    { category: "Exercise Library", icon: BookOpen, visitor: "Full access", subscriber: "Full access", premium: "Full access" },
-    { category: "Calculators (1RM, BMR, Macro)", icon: Calculator, visitor: false, subscriber: "Full access", premium: "Full access" },
-    { category: "Blog", icon: BookOpen, visitor: "Full access", subscriber: "Full access", premium: "Full access" },
-    { category: "Workout Interactions", icon: Heart, visitor: false, subscriber: "Favorites, ratings, history (free only)", premium: "Full favorites, ratings, history" },
-    { category: "Program Interactions", icon: Heart, visitor: false, subscriber: "Favorites, ratings, history (free only)", premium: "Full favorites, ratings, history" },
-    { category: "WhatsApp Interaction with Coach", icon: MessageCircle, visitor: false, subscriber: false, premium: "Full customer support" }
+    { category: "Workouts", icon: Dumbbell, visitor: false, subscriber: true, premium: true },
+    { category: "Training Programs", icon: Flame, visitor: false, subscriber: true, premium: true },
+    { category: "Daily Smarty Ritual", icon: Sparkles, visitor: false, subscriber: true, premium: true },
+    { category: "Smarty Check-ins", icon: ClipboardCheck, visitor: false, subscriber: false, premium: true },
+    { category: "Dashboard", icon: LayoutDashboard, visitor: false, subscriber: "limited", premium: true },
+    { category: "Exercise Library", icon: BookOpen, visitor: true, subscriber: true, premium: true },
+    { category: "Calculators (1RM, BMR, Macro)", icon: Calculator, visitor: false, subscriber: true, premium: true },
+    { category: "Blog", icon: BookOpen, visitor: true, subscriber: true, premium: true },
+    { category: "Workout Interactions", icon: Heart, visitor: false, subscriber: "limited", premium: true },
+    { category: "Program Interactions", icon: Heart, visitor: false, subscriber: "limited", premium: true },
+    { category: "WhatsApp Interaction with Coach", icon: MessageCircle, visitor: false, subscriber: false, premium: true }
   ];
 
   const renderFeatureValue = (value: string | boolean) => {
-    if (value === false) return <X className="w-5 h-5 text-destructive mx-auto" />;
-    if (value === true) return <Check className="w-5 h-5 text-primary mx-auto" />;
-    return <span className="text-sm text-center">{value}</span>;
+    if (value === false) return <X className="w-5 h-5 text-destructive ml-auto" />;
+    if (value === true) return <Check className="w-5 h-5 text-green-600 ml-auto" />;
+    if (value === "limited") return <Minus className="w-5 h-5 text-amber-500 ml-auto" />;
+    return <span className="text-sm text-right">{value}</span>;
   };
 
   const benefits = [
@@ -324,9 +326,9 @@ export default function SmartyPlans() {
                               <span>{feature.category}</span>
                             </div>
                           </td>
-                          <td className="p-4">{renderFeatureValue(feature.visitor)}</td>
-                          <td className="p-4">{renderFeatureValue(feature.subscriber)}</td>
-                          <td className="p-4">{renderFeatureValue(feature.premium)}</td>
+                          <td className="p-4 text-right">{renderFeatureValue(feature.visitor)}</td>
+                          <td className="p-4 text-right">{renderFeatureValue(feature.subscriber)}</td>
+                          <td className="p-4 text-right">{renderFeatureValue(feature.premium)}</td>
                         </tr>
                       );
                     })}
