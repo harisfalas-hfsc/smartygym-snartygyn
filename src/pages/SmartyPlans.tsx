@@ -25,7 +25,7 @@ import {
   MessageCircle,
   Flame,
   Building2,
-  Minus
+  CircleMinus
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { User } from "@supabase/supabase-js";
@@ -119,7 +119,7 @@ export default function SmartyPlans() {
   const renderFeatureValue = (value: string | boolean) => {
     if (value === false) return <X className="w-5 h-5 text-destructive ml-auto" />;
     if (value === true) return <Check className="w-5 h-5 text-green-600 ml-auto" />;
-    if (value === "limited") return <Minus className="w-5 h-5 text-amber-500 ml-auto" />;
+    if (value === "limited") return <CircleMinus className="w-5 h-5 text-sky-500 ml-auto" />;
     return <span className="text-sm text-right">{value}</span>;
   };
 
