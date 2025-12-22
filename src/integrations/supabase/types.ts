@@ -28,6 +28,7 @@ export type Database = {
           id: string
           image_url: string | null
           is_ai_generated: boolean | null
+          is_free: boolean | null
           is_premium: boolean | null
           is_standalone_purchase: boolean | null
           is_visible: boolean | null
@@ -59,6 +60,7 @@ export type Database = {
           id: string
           image_url?: string | null
           is_ai_generated?: boolean | null
+          is_free?: boolean | null
           is_premium?: boolean | null
           is_standalone_purchase?: boolean | null
           is_visible?: boolean | null
@@ -90,6 +92,7 @@ export type Database = {
           id?: string
           image_url?: string | null
           is_ai_generated?: boolean | null
+          is_free?: boolean | null
           is_premium?: boolean | null
           is_standalone_purchase?: boolean | null
           is_visible?: boolean | null
@@ -129,6 +132,7 @@ export type Database = {
           image_url: string | null
           instructions: string | null
           is_ai_generated: boolean | null
+          is_free: boolean | null
           is_premium: boolean | null
           is_standalone_purchase: boolean | null
           is_visible: boolean | null
@@ -164,6 +168,7 @@ export type Database = {
           image_url?: string | null
           instructions?: string | null
           is_ai_generated?: boolean | null
+          is_free?: boolean | null
           is_premium?: boolean | null
           is_standalone_purchase?: boolean | null
           is_visible?: boolean | null
@@ -199,6 +204,7 @@ export type Database = {
           image_url?: string | null
           instructions?: string | null
           is_ai_generated?: boolean | null
+          is_free?: boolean | null
           is_premium?: boolean | null
           is_standalone_purchase?: boolean | null
           is_visible?: boolean | null

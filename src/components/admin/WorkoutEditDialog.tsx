@@ -72,6 +72,7 @@ export const WorkoutEditDialog = ({ workout, open, onOpenChange, onSave }: Worko
     tips: '',
     image_url: '',
     generate_unique_image: false,
+    is_free: false,
     is_premium: false,
     tier_required: '',
     is_standalone_purchase: false,
@@ -123,6 +124,7 @@ export const WorkoutEditDialog = ({ workout, open, onOpenChange, onSave }: Worko
         tips: '',
         image_url: '',
         generate_unique_image: false,
+        is_free: false,
         is_premium: false,
         tier_required: '',
         is_standalone_purchase: false,
@@ -658,85 +660,117 @@ export const WorkoutEditDialog = ({ workout, open, onOpenChange, onSave }: Worko
             )}
           </div>
 
-          {/* 13. Free or Premium */}
+          {/* 13. Free Content Toggle */}
           <div className="space-y-4 pt-4 border-t">
-            <Label>13. Access Level *</Label>
+            <Label>13. Content Type *</Label>
             <div className="flex items-center space-x-2">
               <Switch
-                id="is_premium"
-                checked={formData.is_premium}
+                id="is_free"
+                checked={formData.is_free}
                 onCheckedChange={(checked) => setFormData({ 
                   ...formData, 
-                  is_premium: checked,
-                  // Reset standalone when switching to free
-                  is_standalone_purchase: checked ? formData.is_standalone_purchase : false,
-                  price: checked ? formData.price : '',
-                  tier_required: checked ? 'premium' : null
+                  is_free: checked,
+                  // If marking as free, disable premium and standalone purchase
+                  is_premium: checked ? false : formData.is_premium,
+                  is_standalone_purchase: checked ? false : formData.is_standalone_purchase,
+                  price: checked ? '' : formData.price,
+                  tier_required: checked ? null : formData.tier_required
                 })}
               />
-              <Label htmlFor="is_premium" className="cursor-pointer">
-                {formData.is_premium ? 'Premium Content' : 'Free Content'}
+              <Label htmlFor="is_free" className="cursor-pointer">
+                {formData.is_free ? '🆓 Free Content (no Stripe product)' : 'Paid Content'}
               </Label>
             </div>
-            <p className="text-sm text-muted-foreground">
-              {formData.is_premium 
-                ? 'This workout will be available to Gold and Platinum subscribers' 
-                : 'This workout will be free for all visitors'}
-            </p>
-          </div>
-
-          {/* 14. Standalone Purchase */}
-          <div className="space-y-4 pt-4 border-t">
-            <Label>14. Standalone Purchase Options</Label>
-            <div className="flex items-center space-x-2">
-              <Switch
-                id="is_standalone_purchase"
-                checked={formData.is_standalone_purchase}
-                onCheckedChange={(checked) => setFormData({ ...formData, is_standalone_purchase: checked })}
-                disabled={!formData.is_premium}
-              />
-              <Label 
-                htmlFor="is_standalone_purchase" 
-                className={`cursor-pointer ${!formData.is_premium ? 'opacity-50' : ''}`}
-              >
-                Available as Standalone Purchase
-              </Label>
-            </div>
-            <p className="text-sm text-muted-foreground">
-              {!formData.is_premium 
-                ? 'Only premium content can be sold as standalone purchases. Switch to Premium first.' 
-                : 'Enable this to allow users to buy this workout individually without a subscription'}
-            </p>
-
-            {formData.is_standalone_purchase && (
-              <div className="space-y-2 ml-6">
-                <Label htmlFor="price">Price (€) *</Label>
-                <Input
-                  id="price"
-                  type="number"
-                  step="0.01"
-                  min="0"
-                  value={formData.price}
-                  onChange={(e) => setFormData({ ...formData, price: e.target.value })}
-                  placeholder="e.g., 9.99"
-                />
-                {!formData.stripe_product_id ? (
-                  <p className="text-sm text-muted-foreground">
-                    This will automatically create a Stripe product when you save.
-                  </p>
-                ) : (
-                  <p className="text-sm text-muted-foreground">
-                    Stripe product already created for this workout.
-                  </p>
-                )}
-                {formData.stripe_product_id && (
-                  <p className="text-xs text-green-600">
-                    ✓ Stripe Product ID: {formData.stripe_product_id}
-                  </p>
-                )}
-              </div>
+            {formData.is_free && (
+              <p className="text-sm text-green-600 bg-green-50 p-2 rounded">
+                ✓ This workout is marked as FREE. It will be accessible to all users and will not require a Stripe product.
+              </p>
             )}
           </div>
+
+          {/* 14. Premium Toggle - Only show if not free */}
+          {!formData.is_free && (
+            <div className="space-y-4 pt-4 border-t">
+              <Label>14. Access Level *</Label>
+              <div className="flex items-center space-x-2">
+                <Switch
+                  id="is_premium"
+                  checked={formData.is_premium}
+                  onCheckedChange={(checked) => setFormData({ 
+                    ...formData, 
+                    is_premium: checked,
+                    // Reset standalone when switching to free
+                    is_standalone_purchase: checked ? formData.is_standalone_purchase : false,
+                    price: checked ? formData.price : '',
+                    tier_required: checked ? 'premium' : null
+                  })}
+                />
+                <Label htmlFor="is_premium" className="cursor-pointer">
+                  {formData.is_premium ? '🔒 Premium Content' : '🆓 Free Content'}
+                </Label>
+              </div>
+              <p className="text-sm text-muted-foreground">
+                {formData.is_premium 
+                  ? 'This workout will be available to Gold and Platinum subscribers' 
+                  : 'This workout will be free for all visitors'}
+              </p>
+            </div>
+          )}
+
+          {/* 15. Standalone Purchase - Only show if premium and not free */}
+          {!formData.is_free && (
+            <div className="space-y-4 pt-4 border-t">
+              <Label>15. Standalone Purchase Options</Label>
+              <div className="flex items-center space-x-2">
+                <Switch
+                  id="is_standalone_purchase"
+                  checked={formData.is_standalone_purchase}
+                  onCheckedChange={(checked) => setFormData({ ...formData, is_standalone_purchase: checked })}
+                  disabled={!formData.is_premium}
+                />
+                <Label 
+                  htmlFor="is_standalone_purchase" 
+                  className={`cursor-pointer ${!formData.is_premium ? 'opacity-50' : ''}`}
+                >
+                  Available as Standalone Purchase
+                </Label>
+              </div>
+              <p className="text-sm text-muted-foreground">
+                {!formData.is_premium 
+                  ? 'Only premium content can be sold as standalone purchases. Switch to Premium first.' 
+                  : 'Enable this to allow users to buy this workout individually without a subscription'}
+              </p>
+
+              {formData.is_standalone_purchase && (
+                <div className="space-y-2 ml-6">
+                  <Label htmlFor="price">Price (€) *</Label>
+                  <Input
+                    id="price"
+                    type="number"
+                    step="0.01"
+                    min="0"
+                    value={formData.price}
+                    onChange={(e) => setFormData({ ...formData, price: e.target.value })}
+                    placeholder="e.g., 9.99"
+                  />
+                  {!formData.stripe_product_id ? (
+                    <p className="text-sm text-muted-foreground">
+                      This will automatically create a Stripe product when you save.
+                    </p>
+                  ) : (
+                    <p className="text-sm text-muted-foreground">
+                      Stripe product already created for this workout.
+                    </p>
+                  )}
+                  {formData.stripe_product_id && (
+                    <p className="text-xs text-green-600">
+                      ✓ Stripe Product ID: {formData.stripe_product_id}
+                    </p>
+                  )}
+                </div>
+              )}
+            </div>
+          )}
 
           <div className="flex justify-end gap-2 pt-4">
             <Button variant="outline" onClick={() => onOpenChange(false)} disabled={isGeneratingImage}>
