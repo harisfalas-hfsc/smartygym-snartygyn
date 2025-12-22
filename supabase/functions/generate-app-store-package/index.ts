@@ -33,7 +33,7 @@ serve(async (req) => {
     // Use settings from database or defaults
     const settings = settingsData || {
       app_name: "SmartyGym",
-      subtitle: "Your gym reimagined anywhere, anytime",
+      subtitle: "Your Gym Re-Imagined Anywhere, Anytime",
       short_description: "Professional fitness coaching with expert-designed workouts and training programs.",
       keywords: "fitness,workout,gym,training,exercise,strength,personal trainer,HIIT,muscle,weight loss",
       full_description: "SmartyGym - Professional fitness coaching",
@@ -66,9 +66,10 @@ serve(async (req) => {
       screenshots: assets?.filter(a => a.asset_type === "screenshot" && a.storage_url) || [],
     };
 
-    // Generate Word document content as XML (Office Open XML format)
-    const generateWordXml = () => {
+    // Generate a clean, properly formatted Word document
+    const generateWordDocument = () => {
       const escapeXml = (str: string) => {
+        if (!str) return '';
         return str
           .replace(/&/g, '&amp;')
           .replace(/</g, '&lt;')
@@ -77,115 +78,164 @@ serve(async (req) => {
           .replace(/'/g, '&apos;');
       };
 
-      const addParagraph = (text: string, style: string = "Normal") => {
-        return `<w:p><w:pPr><w:pStyle w:val="${style}"/></w:pPr><w:r><w:t xml:space="preserve">${escapeXml(text)}</w:t></w:r></w:p>`;
+      const createParagraph = (text: string, bold = false, fontSize = 24) => {
+        const boldTag = bold ? '<w:b/>' : '';
+        return `
+          <w:p>
+            <w:pPr><w:spacing w:after="200"/></w:pPr>
+            <w:r>
+              <w:rPr>${boldTag}<w:sz w:val="${fontSize}"/></w:rPr>
+              <w:t xml:space="preserve">${escapeXml(text)}</w:t>
+            </w:r>
+          </w:p>`;
       };
 
-      const addHeading = (text: string, level: number = 1) => {
-        return `<w:p><w:pPr><w:pStyle w:val="Heading${level}"/></w:pPr><w:r><w:rPr><w:b/></w:rPr><w:t>${escapeXml(text)}</w:t></w:r></w:p>`;
+      const createHeading = (text: string, level = 1) => {
+        const fontSize = level === 1 ? 48 : level === 2 ? 36 : 28;
+        return `
+          <w:p>
+            <w:pPr><w:spacing w:before="400" w:after="200"/></w:pPr>
+            <w:r>
+              <w:rPr><w:b/><w:sz w:val="${fontSize}"/><w:color w:val="0EA5E9"/></w:rPr>
+              <w:t>${escapeXml(text)}</w:t>
+            </w:r>
+          </w:p>`;
       };
 
-      const addLink = (text: string, url: string) => {
-        return `<w:p><w:r><w:t>${escapeXml(text)}: </w:t></w:r><w:hyperlink r:id="rId1"><w:r><w:rPr><w:color w:val="0000FF"/><w:u w:val="single"/></w:rPr><w:t>${escapeXml(url)}</w:t></w:r></w:hyperlink></w:p>`;
+      const createField = (label: string, value: string) => {
+        return `
+          <w:p>
+            <w:pPr><w:spacing w:after="100"/></w:pPr>
+            <w:r>
+              <w:rPr><w:b/><w:sz w:val="22"/></w:rPr>
+              <w:t xml:space="preserve">${escapeXml(label)}: </w:t>
+            </w:r>
+            <w:r>
+              <w:rPr><w:sz w:val="22"/></w:rPr>
+              <w:t xml:space="preserve">${escapeXml(value)}</w:t>
+            </w:r>
+          </w:p>`;
       };
 
-      const documentContent = `
-        ${addHeading("SMARTYGYM - APP STORE SUBMISSION PACKAGE")}
-        ${addParagraph("Generated: " + new Date().toISOString())}
-        ${addParagraph("")}
+      const createMultilineField = (label: string, value: string) => {
+        const lines = value.split('\n').filter(l => l.trim());
+        let content = `
+          <w:p>
+            <w:pPr><w:spacing w:before="200" w:after="100"/></w:pPr>
+            <w:r>
+              <w:rPr><w:b/><w:sz w:val="22"/></w:rPr>
+              <w:t>${escapeXml(label)}:</w:t>
+            </w:r>
+          </w:p>`;
         
-        ${addHeading("BASIC INFORMATION", 2)}
-        ${addParagraph("App Name: " + settings.app_name)}
-        ${addParagraph("Subtitle (iOS): " + settings.subtitle)}
-        ${addParagraph("Short Description (Android): " + settings.short_description)}
-        ${addParagraph("Category: " + settings.category)}
-        ${addParagraph("Content Rating: " + settings.content_rating)}
-        ${addParagraph("")}
+        lines.forEach(line => {
+          content += `
+            <w:p>
+              <w:pPr><w:ind w:left="360"/><w:spacing w:after="60"/></w:pPr>
+              <w:r>
+                <w:rPr><w:sz w:val="22"/></w:rPr>
+                <w:t xml:space="preserve">${escapeXml(line)}</w:t>
+              </w:r>
+            </w:p>`;
+        });
         
-        ${addHeading("KEYWORDS", 2)}
-        ${addParagraph(settings.keywords)}
-        ${addParagraph("")}
-        
-        ${addHeading("FULL DESCRIPTION", 2)}
-        ${settings.full_description.split('\n').map((line: string) => addParagraph(line)).join('')}
-        ${addParagraph("")}
-        
-        ${addHeading("WHAT'S NEW", 2)}
-        ${settings.whats_new.split('\n').map((line: string) => addParagraph(line)).join('')}
-        ${addParagraph("")}
-        
-        ${addHeading("PROMOTIONAL TEXT", 2)}
-        ${addParagraph(settings.promotional_text)}
-        ${addParagraph("")}
-        
-        ${addHeading("LINKS & CONTACT", 2)}
-        ${addParagraph("Privacy Policy URL: " + settings.privacy_policy_url)}
-        ${addParagraph("Terms of Service URL: " + settings.terms_of_service_url)}
-        ${addParagraph("Support URL: " + settings.support_url)}
-        ${addParagraph("Marketing URL: " + settings.marketing_url)}
-        ${addParagraph("Support Email: " + settings.support_email)}
-        ${addParagraph("")}
-        
-        ${addHeading("GENERATED ASSETS", 2)}
-        ${addParagraph("APP ICONS:")}
-        ${organizedAssets.icons.length > 0 
-          ? organizedAssets.icons.map(a => addParagraph(`  • ${a.file_name} (${a.width}x${a.height}) - ${a.storage_url}`)).join('')
-          : addParagraph("  ⚠️ No icons generated yet. Run 'Generate App Icons' first.")}
-        ${addParagraph("")}
-        ${addParagraph("FEATURE GRAPHIC (Android):")}
-        ${organizedAssets.featureGraphics.length > 0
-          ? organizedAssets.featureGraphics.map(a => addParagraph(`  • ${a.file_name} (${a.width}x${a.height}) - ${a.storage_url}`)).join('')
-          : addParagraph("  ⚠️ No feature graphic generated yet. Run 'Generate Feature Graphic' first.")}
-        ${addParagraph("")}
-        
-        ${addHeading("SUBMISSION CHECKLIST", 2)}
-        ${addParagraph("iOS App Store:")}
-        ${addParagraph("□ App icon 1024x1024")}
-        ${addParagraph("□ Screenshots for iPhone 6.7\" (1290x2796)")}
-        ${addParagraph("□ Screenshots for iPhone 6.5\" (1284x2778)")}
-        ${addParagraph("□ Screenshots for iPhone 5.5\" (1242x2208)")}
-        ${addParagraph("□ App name, subtitle, keywords entered")}
-        ${addParagraph("□ Full description entered")}
-        ${addParagraph("□ Privacy policy URL added")}
-        ${addParagraph("")}
-        ${addParagraph("Google Play Store:")}
-        ${addParagraph("□ App icon 512x512")}
-        ${addParagraph("□ Feature graphic 1024x500")}
-        ${addParagraph("□ Phone screenshots (1080x1920)")}
-        ${addParagraph("□ Short description (80 chars max)")}
-        ${addParagraph("□ Full description entered")}
-        ${addParagraph("□ Privacy policy URL added")}
-        ${addParagraph("")}
-        
-        ${addHeading("NOTES FOR APPY PIE", 2)}
-        ${addParagraph("1. All text content above is ready to copy-paste into app store listings.")}
-        ${addParagraph("2. Download assets from the URLs provided above.")}
-        ${addParagraph("3. For resizing icons to all required sizes, use https://appicon.co/")}
-        ${addParagraph("4. Contact support@smartygym.com for any questions.")}
-      `;
+        return content;
+      };
 
-      return documentContent;
-    };
+      const dateStr = new Date().toLocaleDateString('en-US', { 
+        year: 'numeric', month: 'long', day: 'numeric' 
+      });
 
-    // Create the DOCX package (simplified - single file XML)
-    const wordXmlContent = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+      return `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <?mso-application progid="Word.Document"?>
 <w:wordDocument xmlns:w="http://schemas.microsoft.com/office/word/2003/wordml"
                 xmlns:v="urn:schemas-microsoft-com:vml"
-                xmlns:w10="urn:schemas-microsoft-com:office:word"
-                xmlns:sl="http://schemas.microsoft.com/schemaLibrary/2003/core"
-                xmlns:aml="http://schemas.microsoft.com/aml/2001/core"
                 xmlns:wx="http://schemas.microsoft.com/office/word/2003/auxHint"
-                xmlns:o="urn:schemas-microsoft-com:office:office"
-                xmlns:dt="uuid:C2F41010-65B3-11d1-A29F-00AA00C14882">
+                xmlns:o="urn:schemas-microsoft-com:office:office">
   <w:body>
-    ${generateWordXml()}
+    ${createHeading("SMARTYGYM")}
+    ${createHeading("App Store Submission Package", 2)}
+    ${createParagraph("Generated: " + dateStr)}
+    ${createParagraph("")}
+    
+    ${createHeading("Basic Information", 2)}
+    ${createField("App Name", settings.app_name)}
+    ${createField("Subtitle (iOS)", settings.subtitle)}
+    ${createField("Short Description (Android, max 80 chars)", settings.short_description)}
+    ${createField("Category", settings.category)}
+    ${createField("Content Rating", settings.content_rating)}
+    ${createParagraph("")}
+    
+    ${createHeading("Keywords", 2)}
+    ${createParagraph(settings.keywords)}
+    ${createParagraph("")}
+    
+    ${createHeading("Full Description", 2)}
+    ${createMultilineField("Description", settings.full_description)}
+    ${createParagraph("")}
+    
+    ${createHeading("What's New", 2)}
+    ${createMultilineField("Release Notes", settings.whats_new)}
+    ${createParagraph("")}
+    
+    ${createHeading("Promotional Text", 2)}
+    ${createParagraph(settings.promotional_text)}
+    ${createParagraph("")}
+    
+    ${createHeading("Links & Contact", 2)}
+    ${createField("Privacy Policy URL", settings.privacy_policy_url)}
+    ${createField("Terms of Service URL", settings.terms_of_service_url)}
+    ${createField("Support URL", settings.support_url)}
+    ${createField("Marketing URL", settings.marketing_url)}
+    ${createField("Support Email", settings.support_email)}
+    ${createParagraph("")}
+    
+    ${createHeading("Generated Assets", 2)}
+    ${createParagraph("APP ICONS:", true)}
+    ${organizedAssets.icons.length > 0 
+      ? organizedAssets.icons.map(a => createParagraph(`• ${a.file_name} (${a.width}x${a.height})`)).join('')
+      : createParagraph("⚠️ No icons generated yet. Run 'Generate App Icons' first.")}
+    ${createParagraph("")}
+    
+    ${createParagraph("FEATURE GRAPHIC (Android):", true)}
+    ${organizedAssets.featureGraphics.length > 0
+      ? organizedAssets.featureGraphics.map(a => createParagraph(`• ${a.file_name} (${a.width}x${a.height})`)).join('')
+      : createParagraph("⚠️ No feature graphic yet. Run 'Generate Feature Graphic' first.")}
+    ${createParagraph("")}
+    
+    ${createHeading("Submission Checklist", 2)}
+    ${createParagraph("iOS App Store:", true)}
+    ${createParagraph("□ App icon 1024x1024")}
+    ${createParagraph("□ Screenshots for iPhone 6.7\" (1290x2796)")}
+    ${createParagraph("□ Screenshots for iPhone 6.5\" (1284x2778)")}
+    ${createParagraph("□ Screenshots for iPhone 5.5\" (1242x2208)")}
+    ${createParagraph("□ App name, subtitle, keywords entered")}
+    ${createParagraph("□ Full description entered")}
+    ${createParagraph("□ Privacy policy URL added")}
+    ${createParagraph("")}
+    
+    ${createParagraph("Google Play Store:", true)}
+    ${createParagraph("□ App icon 512x512")}
+    ${createParagraph("□ Feature graphic 1024x500")}
+    ${createParagraph("□ Phone screenshots (1080x1920)")}
+    ${createParagraph("□ Short description (80 chars max)")}
+    ${createParagraph("□ Full description entered")}
+    ${createParagraph("□ Privacy policy URL added")}
+    ${createParagraph("")}
+    
+    ${createHeading("Notes for Appy Pie", 2)}
+    ${createParagraph("1. All text content above is ready to copy-paste into app store listings.")}
+    ${createParagraph("2. Download assets from the Admin panel.")}
+    ${createParagraph("3. For resizing icons to all required sizes, use https://appicon.co/")}
+    ${createParagraph("4. Contact support@smartygym.com for any questions.")}
   </w:body>
 </w:wordDocument>`;
+    };
 
     // Upload as Word XML document
+    const documentContent = generateWordDocument();
     const textEncoder = new TextEncoder();
-    const documentData = textEncoder.encode(wordXmlContent);
+    const documentData = textEncoder.encode(documentContent);
     const fileName = `SmartyGym-AppyPie-Submission-${new Date().toISOString().split('T')[0]}.doc`;
 
     const { data: uploadData, error: uploadError } = await supabase.storage

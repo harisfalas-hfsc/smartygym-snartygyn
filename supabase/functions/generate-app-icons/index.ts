@@ -26,13 +26,16 @@ const ICON_SIZES = {
   ],
 };
 
+// The actual SmartyGym logo URL from the website
+const SMARTYGYM_LOGO_URL = "https://smartygym.com/smarty-gym-logo.png";
+
 serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
   }
 
   try {
-    console.log("[GENERATE-APP-ICONS] Starting icon generation...");
+    console.log("[GENERATE-APP-ICONS] Starting icon generation using actual SmartyGym logo...");
 
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     if (!LOVABLE_API_KEY) {
@@ -44,9 +47,21 @@ serve(async (req) => {
       Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? ""
     );
 
-    // Generate master icon using AI
-    console.log("[GENERATE-APP-ICONS] Calling Lovable AI to generate master icon...");
+    // Fetch the actual SmartyGym logo
+    console.log("[GENERATE-APP-ICONS] Fetching actual SmartyGym logo from:", SMARTYGYM_LOGO_URL);
     
+    const logoResponse = await fetch(SMARTYGYM_LOGO_URL);
+    if (!logoResponse.ok) {
+      throw new Error(`Failed to fetch logo: ${logoResponse.status}`);
+    }
+    
+    const logoBlob = await logoResponse.blob();
+    const logoArrayBuffer = await logoBlob.arrayBuffer();
+    const logoBase64 = btoa(String.fromCharCode(...new Uint8Array(logoArrayBuffer)));
+    
+    console.log("[GENERATE-APP-ICONS] Logo fetched, now generating app icon variant using AI...");
+
+    // Use AI to create a proper app icon from the logo (with solid background, centered, etc.)
     const aiResponse = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
       headers: {
@@ -58,20 +73,28 @@ serve(async (req) => {
         messages: [
           {
             role: "user",
-            content: `Generate a professional mobile app icon for a fitness app called "SmartyGym". 
+            content: [
+              {
+                type: "text",
+                text: `Take this SmartyGym logo and create a professional app store icon from it.
 
 Requirements:
-- Square format, perfect for app stores (will be resized to various sizes)
-- Clean, modern design with bold colors
-- Should feature a stylized "S" or "SG" monogram, or a fitness-related icon (dumbbell, person exercising)
-- Primary colors: vibrant blue/cyan (#0ea5e9) with accents of white or gold
-- Solid background (no transparency) - this is CRITICAL for app stores
-- No text - just the icon/symbol
-- Professional, recognizable at small sizes
-- Gradient or solid fill, no complex details that get lost when small
-- Style: modern, energetic, premium fitness brand
+- KEEP the exact same logo design - DO NOT change it
+- Center the logo on a solid cyan/blue background (#0ea5e9)
+- Add appropriate padding around the logo (about 15% on each side)
+- Make sure the background is completely solid (no transparency) - CRITICAL for app stores
+- Output size: 1024x1024 pixels
+- The logo should be clearly visible and recognizable at small sizes
 
-Create a high-quality 1024x1024 app icon suitable for iOS App Store and Google Play Store.`
+Just reformat the logo as an app icon with proper background and padding. Do NOT redesign it.`
+              },
+              {
+                type: "image_url",
+                image_url: {
+                  url: `data:image/png;base64,${logoBase64}`
+                }
+              }
+            ]
           }
         ],
         modalities: ["image", "text"]
@@ -184,7 +207,7 @@ Create a high-quality 1024x1024 app icon suitable for iOS App Store and Google P
         success: true,
         masterIcon: masterUrl,
         generatedAssets,
-        message: "Master icon generated! Download it and use appicon.co to generate all required sizes.",
+        message: "Master icon generated from your actual SmartyGym logo! Download it and use appicon.co to generate all required sizes.",
         requiredSizes: {
           ios: ICON_SIZES.ios,
           android: ICON_SIZES.android
