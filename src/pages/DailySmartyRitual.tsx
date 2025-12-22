@@ -160,7 +160,7 @@ const DailySmartyRitual = () => {
               </Button>
             )}
             <div className="flex items-center gap-2">
-              {isPremium && ritual && (
+              {isAuthenticated && ritual && (
                 <>
                   <Button variant="outline" size="sm" onClick={() => setShowReaderMode(true)}>
                     <BookOpen className="mr-2 h-4 w-4" />
@@ -236,41 +236,31 @@ const DailySmartyRitual = () => {
               </div>
             </div>
 
-            {/* Access Gate for non-premium */}
-            {!isPremium && (
+          {/* Access Gate for guests (non-authenticated users) */}
+            {!isAuthenticated && (
               <div className="p-6 bg-muted/50">
                 <div className="flex flex-col items-center justify-center gap-4 text-center">
                   <Lock className="h-12 w-12 text-muted-foreground" />
                   <div>
-                    <h3 className="text-xl font-semibold mb-2">Premium Exclusive Feature</h3>
+                    <h3 className="text-xl font-semibold mb-2">Sign In Required</h3>
                     <p className="text-muted-foreground mb-4 max-w-md">
-                      The Daily Smarty Ritual is exclusively available for Premium members. Upgrade now to unlock daily movement rituals designed for optimal health and performance.
+                      The Daily Smarty Ritual is available to all members. Sign in to access daily movement rituals designed for optimal health and performance.
                     </p>
                     <div className="flex flex-col sm:flex-row gap-3 justify-center">
-                      {!isAuthenticated ? (
-                        <>
-                          <Button onClick={() => navigate("/auth")}>
-                            Sign In
-                          </Button>
-                          <Button variant="outline" onClick={() => navigate("/joinpremium")}>
-                            <Crown className="mr-2 h-4 w-4" />
-                            View Premium Plans
-                          </Button>
-                        </>
-                      ) : (
-                        <Button onClick={() => navigate("/joinpremium")}>
-                          <Crown className="mr-2 h-4 w-4" />
-                          Upgrade to Premium
-                        </Button>
-                      )}
+                      <Button onClick={() => navigate("/auth")}>
+                        Sign In
+                      </Button>
+                      <Button variant="outline" onClick={() => navigate("/auth")}>
+                        Create Account
+                      </Button>
                     </div>
                   </div>
                 </div>
               </div>
             )}
 
-            {/* Empty state for premium users when ritual not yet generated */}
-            {isPremium && !ritual && (
+            {/* Empty state for authenticated users when ritual not yet generated */}
+            {isAuthenticated && !ritual && (
               <div className="p-6 bg-muted/50">
                 <div className="flex flex-col items-center justify-center gap-4 text-center">
                   <Clock className="h-12 w-12 text-muted-foreground" />
@@ -288,7 +278,7 @@ const DailySmartyRitual = () => {
             )}
 
             {/* Ritual Content */}
-            {isPremium && ritual && (
+            {isAuthenticated && ritual && (
               <CardContent className="p-6 space-y-8">
                 {/* Calendar Integration - Google Calendar sync */}
                 <RitualCalendarSync />
@@ -355,7 +345,7 @@ const DailySmartyRitual = () => {
       </div>
 
       {/* Share Dialog */}
-      {isPremium && ritual && (
+      {isAuthenticated && ritual && (
         <RitualShareDialog 
           open={showShareDialog} 
           onOpenChange={setShowShareDialog}
@@ -364,8 +354,8 @@ const DailySmartyRitual = () => {
         />
       )}
 
-      {/* Reader Mode Dialog - only for premium users with access */}
-      {isPremium && ritual && (
+      {/* Reader Mode Dialog - for authenticated users with access */}
+      {isAuthenticated && ritual && (
         <ReaderModeDialog
           open={showReaderMode}
           onOpenChange={setShowReaderMode}

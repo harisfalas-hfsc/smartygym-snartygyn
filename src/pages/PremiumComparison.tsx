@@ -49,7 +49,7 @@ const PremiumComparison = () => {
       category: "Daily Smarty Ritual",
       icon: Sparkles,
       visitor: false,
-      subscriber: false,
+      subscriber: "Full access",
       premium: "Full access"
     },
     {
