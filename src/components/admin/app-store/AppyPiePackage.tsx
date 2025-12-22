@@ -166,17 +166,19 @@ export const AppyPiePackage = () => {
                 ].map((item) => (
                   <div
                     key={item.label}
-                    className="flex items-center justify-between p-2 bg-background border rounded-lg text-sm"
+                    className="flex items-start justify-between p-3 bg-background border rounded-lg text-sm gap-2"
                   >
-                    <div className="flex-1 min-w-0">
-                      <span className="text-muted-foreground">{item.label}:</span>
-                      <span className="ml-2 font-medium truncate">{item.value}</span>
+                    <div className="flex-1 min-w-0 overflow-hidden">
+                      <span className="text-muted-foreground block mb-1">{item.label}:</span>
+                      <span className="font-medium break-words whitespace-pre-wrap block max-h-24 overflow-y-auto">
+                        {item.value}
+                      </span>
                     </div>
                     <Button
                       variant="ghost"
                       size="sm"
                       onClick={() => copyToClipboard(item.value, item.label)}
-                      className="ml-2 shrink-0"
+                      className="shrink-0 mt-1"
                     >
                       <Copy className="h-3 w-3" />
                     </Button>

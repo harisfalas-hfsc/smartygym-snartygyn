@@ -6,13 +6,16 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
+// The actual SmartyGym logo URL from the website
+const SMARTYGYM_LOGO_URL = "https://smartygym.com/smarty-gym-logo.png";
+
 serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
   }
 
   try {
-    console.log("[GENERATE-FEATURE-GRAPHIC] Starting feature graphic generation...");
+    console.log("[GENERATE-FEATURE-GRAPHIC] Starting feature graphic generation with SmartyGym branding...");
 
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     if (!LOVABLE_API_KEY) {
@@ -24,8 +27,20 @@ serve(async (req) => {
       Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? ""
     );
 
-    // Generate feature graphic using AI (1024x500 for Android Play Store)
-    console.log("[GENERATE-FEATURE-GRAPHIC] Calling Lovable AI...");
+    // Fetch the actual SmartyGym logo
+    console.log("[GENERATE-FEATURE-GRAPHIC] Fetching actual SmartyGym logo...");
+    
+    const logoResponse = await fetch(SMARTYGYM_LOGO_URL);
+    if (!logoResponse.ok) {
+      throw new Error(`Failed to fetch logo: ${logoResponse.status}`);
+    }
+    
+    const logoBlob = await logoResponse.blob();
+    const logoArrayBuffer = await logoBlob.arrayBuffer();
+    const logoBase64 = btoa(String.fromCharCode(...new Uint8Array(logoArrayBuffer)));
+
+    // Generate feature graphic using AI with the actual logo
+    console.log("[GENERATE-FEATURE-GRAPHIC] Calling Lovable AI with actual SmartyGym logo...");
     
     const aiResponse = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
@@ -38,21 +53,31 @@ serve(async (req) => {
         messages: [
           {
             role: "user",
-            content: `Generate a professional Google Play Store feature graphic (promotional banner) for a fitness app called "SmartyGym".
+            content: [
+              {
+                type: "text",
+                text: `Create a Google Play Store feature graphic (promotional banner) using this SmartyGym logo.
 
-Requirements:
-- Exact dimensions: 1024x500 pixels (wide banner format, approximately 2:1 aspect ratio)
-- Eye-catching, premium fitness brand aesthetic
-- Include the text "SmartyGym" prominently in the center
-- Tagline: "Your gym reimagined anywhere, anytime"
-- Background: Dynamic gradient with fitness imagery (abstract gym equipment, energy, motion)
-- Primary colors: Vibrant blue/cyan (#0ea5e9) with white text
-- Professional, modern, energetic design
+CRITICAL REQUIREMENTS:
+- Exact dimensions: 1024x500 pixels (wide banner format, 2:1 aspect ratio)
+- INCLUDE this exact logo prominently in the design - place it on the left or center
+- Add the text "SmartyGym" next to or below the logo if not already visible
+- Tagline below the name: "Your Gym Re-Imagined Anywhere, Anytime"
+- Background: Professional gradient using the brand color cyan/blue (#0ea5e9) - can fade to darker blue or black
+- Professional, modern, energetic fitness brand aesthetic
 - Text must be clearly readable
-- No photos of people (use abstract fitness elements instead)
+- Use abstract fitness elements (geometric shapes, energy lines, motion effects) - NO photos of people
 - Safe zone: Keep important content in the center 50% (edges may be cropped)
 
-Create a high-quality 1024x500 feature graphic suitable for Google Play Store.`
+Create a 1024x500 feature graphic that prominently features the SmartyGym logo and brand identity.`
+              },
+              {
+                type: "image_url",
+                image_url: {
+                  url: `data:image/png;base64,${logoBase64}`
+                }
+              }
+            ]
           }
         ],
         modalities: ["image", "text"]
@@ -153,7 +178,7 @@ Create a high-quality 1024x500 feature graphic suitable for Google Play Store.`
         success: true,
         featureGraphic: publicUrl,
         fileName,
-        message: "Feature graphic generated successfully!"
+        message: "Feature graphic generated with your actual SmartyGym branding!"
       }),
       {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
