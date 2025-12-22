@@ -8,7 +8,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
-import { Settings, Bell, Mail, Database, Shield, Download, HeartPulse, Wrench, Image, RefreshCw, Search, ImagePlus, Send, Trash2, ShoppingCart, HelpCircle } from "lucide-react";
+import { Settings, Bell, Mail, Database, Shield, Download, HeartPulse, Wrench, Image, RefreshCw, Search, ImagePlus, Send, Trash2, ShoppingCart, HelpCircle, ClipboardCheck } from "lucide-react";
 import { SystemHealthAudit } from "./SystemHealthAudit";
 
 export const SettingsManager = () => {
@@ -58,6 +58,8 @@ export const SettingsManager = () => {
   const [auditStripeImagesResult, setAuditStripeImagesResult] = useState<string | null>(null);
   const [pullStripeImagesLoading, setPullStripeImagesLoading] = useState(false);
   const [pullStripeImagesResult, setPullStripeImagesResult] = useState<string | null>(null);
+  const [checkImageStatusLoading, setCheckImageStatusLoading] = useState(false);
+  const [checkImageStatusResult, setCheckImageStatusResult] = useState<any | null>(null);
 
   // Load inactivity timeout on mount
   useEffect(() => {
@@ -355,34 +357,27 @@ export const SettingsManager = () => {
   };
 
   const handleGenerateMissingImages = async () => {
-    if (!confirm("This will generate AI images for workouts that don't have one and sync them to Stripe. This may take several minutes. Continue?")) {
+    if (!confirm("This will generate AI images for workouts AND programs that don't have one. This may take several minutes. Continue?")) {
       return;
     }
     
     setGenerateImagesLoading(true);
     setGenerateImagesResult(null);
     try {
-      // First, find workouts without images (include stripe_product_id for syncing)
-      const { data: workoutsWithoutImages, error: fetchError } = await supabase
+      let workoutsGenerated = 0;
+      let programsGenerated = 0;
+
+      // First, find workouts without images
+      const { data: workoutsWithoutImages, error: workoutsFetchError } = await supabase
         .from('admin_workouts')
         .select('id, name, category, format, difficulty_stars, stripe_product_id')
-        .is('image_url', null)
-        .limit(5); // Process 5 at a time to avoid timeouts
+        .or('image_url.is.null,image_url.eq.')
+        .limit(5);
       
-      if (fetchError) throw fetchError;
+      if (workoutsFetchError) throw workoutsFetchError;
 
-      if (!workoutsWithoutImages || workoutsWithoutImages.length === 0) {
-        setGenerateImagesResult("All workouts already have images!");
-        toast({
-          title: "No Images Needed",
-          description: "All workouts already have images.",
-        });
-        return;
-      }
-
-      let generated = 0;
-      let synced = 0;
-      for (const workout of workoutsWithoutImages) {
+      // Generate images for workouts
+      for (const workout of workoutsWithoutImages || []) {
         try {
           const { data, error } = await supabase.functions.invoke('generate-workout-image', {
             body: {
@@ -398,37 +393,96 @@ export const SettingsManager = () => {
               .from('admin_workouts')
               .update({ image_url: data.image_url })
               .eq('id', workout.id);
-            generated++;
-            
-            // If workout has a Stripe product, sync the image to Stripe
-            if (workout.stripe_product_id) {
-              try {
-                await supabase.functions.invoke('sync-stripe-images');
-                synced++;
-              } catch (syncErr) {
-                console.error(`Failed to sync image to Stripe for ${workout.name}:`, syncErr);
-              }
-            }
+            workoutsGenerated++;
           }
         } catch (e) {
-          console.error(`Failed to generate image for ${workout.name}:`, e);
+          console.error(`Failed to generate image for workout ${workout.name}:`, e);
         }
       }
 
-      const stripeMsg = synced > 0 ? ` Synced ${synced} to Stripe.` : '';
-      setGenerateImagesResult(`Generated ${generated} of ${workoutsWithoutImages.length} images.${stripeMsg}`);
+      // Find programs without images
+      const { data: programsWithoutImages, error: programsFetchError } = await supabase
+        .from('admin_training_programs')
+        .select('id, name, category, difficulty_stars, weeks, stripe_product_id')
+        .or('image_url.is.null,image_url.eq.')
+        .limit(5);
+      
+      if (programsFetchError) throw programsFetchError;
+
+      // Generate images for programs
+      for (const program of programsWithoutImages || []) {
+        try {
+          const { data, error } = await supabase.functions.invoke('generate-program-image', {
+            body: {
+              name: program.name,
+              category: program.category,
+              difficulty_stars: program.difficulty_stars || 3,
+              weeks: program.weeks || 6,
+            },
+          });
+          
+          if (!error && (data?.imageUrl || data?.image_url)) {
+            const imageUrl = data.imageUrl || data.image_url;
+            await supabase
+              .from('admin_training_programs')
+              .update({ image_url: imageUrl })
+              .eq('id', program.id);
+            programsGenerated++;
+          }
+        } catch (e) {
+          console.error(`Failed to generate image for program ${program.name}:`, e);
+        }
+      }
+
+      const totalWorkouts = workoutsWithoutImages?.length || 0;
+      const totalPrograms = programsWithoutImages?.length || 0;
+
+      if (totalWorkouts === 0 && totalPrograms === 0) {
+        setGenerateImagesResult("All items already have images!");
+        toast({
+          title: "No Images Needed",
+          description: "All workouts and programs already have images.",
+        });
+        return;
+      }
+
+      setGenerateImagesResult(`Generated ${workoutsGenerated} workout, ${programsGenerated} program images`);
       toast({
         title: "Image Generation Complete",
-        description: `Generated ${generated} images.${stripeMsg}${workoutsWithoutImages.length - generated > 0 ? ` ${workoutsWithoutImages.length - generated} failed.` : ''}`,
+        description: `Generated ${workoutsGenerated} workout and ${programsGenerated} program images. Run "Audit Stripe" to sync to Stripe.`,
       });
     } catch (error: any) {
       toast({
         title: "Generation Failed",
-        description: error.message || "Failed to generate workout images.",
+        description: error.message || "Failed to generate images.",
         variant: "destructive",
       });
     } finally {
       setGenerateImagesLoading(false);
+    }
+  };
+
+  const handleCheckImageStatus = async () => {
+    setCheckImageStatusLoading(true);
+    setCheckImageStatusResult(null);
+    try {
+      const { data, error } = await supabase.functions.invoke('check-image-status');
+      
+      if (error) throw error;
+
+      setCheckImageStatusResult(data);
+      toast({
+        title: "Status Check Complete",
+        description: `${data.summary.fullySynced}/${data.summary.totalItems} items fully synced`,
+      });
+    } catch (error: any) {
+      toast({
+        title: "Check Failed",
+        description: error.message || "Failed to check image status.",
+        variant: "destructive",
+      });
+    } finally {
+      setCheckImageStatusLoading(false);
     }
   };
 
@@ -845,7 +899,7 @@ export const SettingsManager = () => {
                       <h4 className="font-medium text-sm">Generate Images</h4>
                     </div>
                     <p className="text-xs text-muted-foreground">
-                      Generate AI images for workouts missing them
+                      Generate AI images for workouts & programs missing them
                     </p>
                     <Button 
                       onClick={handleGenerateMissingImages} 
@@ -930,6 +984,59 @@ export const SettingsManager = () => {
                     )}
                   </div>
 
+                  {/* Check Image Status */}
+                  <div className="p-4 border rounded-lg space-y-3 border-cyan-200 bg-cyan-50/50 dark:bg-cyan-950/20 dark:border-cyan-800">
+                    <div className="flex items-center gap-2">
+                      <ClipboardCheck className="h-5 w-5 text-cyan-600" />
+                      <h4 className="font-medium text-sm">Check Image Status</h4>
+                    </div>
+                    <p className="text-xs text-muted-foreground">
+                      See current sync state for all workouts & programs
+                    </p>
+                    <Button 
+                      onClick={handleCheckImageStatus} 
+                      disabled={checkImageStatusLoading}
+                      variant="outline"
+                      size="sm"
+                      className="w-full border-cyan-300 hover:bg-cyan-100 dark:border-cyan-700 dark:hover:bg-cyan-900"
+                    >
+                      {checkImageStatusLoading ? "Checking..." : "Check Status"}
+                    </Button>
+                    {checkImageStatusResult && (
+                      <div className="text-xs space-y-2 pt-2 border-t border-cyan-200 dark:border-cyan-800">
+                        <div className="font-medium">📊 STATUS REPORT</div>
+                        <div className="space-y-1">
+                          <div><strong>Workouts ({checkImageStatusResult.workouts?.total}):</strong></div>
+                          <ul className="pl-3 space-y-0.5 text-muted-foreground">
+                            <li>✅ Both synced: {checkImageStatusResult.workouts?.withBoth}</li>
+                            <li>⚠️ Website only: {checkImageStatusResult.workouts?.websiteOnly}</li>
+                            <li>⚠️ Stripe only: {checkImageStatusResult.workouts?.stripeOnly}</li>
+                            <li>❌ No image: {checkImageStatusResult.workouts?.withNeither}</li>
+                          </ul>
+                        </div>
+                        <div className="space-y-1">
+                          <div><strong>Programs ({checkImageStatusResult.programs?.total}):</strong></div>
+                          <ul className="pl-3 space-y-0.5 text-muted-foreground">
+                            <li>✅ Both synced: {checkImageStatusResult.programs?.withBoth}</li>
+                            <li>⚠️ Website only: {checkImageStatusResult.programs?.websiteOnly}</li>
+                            <li>⚠️ Stripe only: {checkImageStatusResult.programs?.stripeOnly}</li>
+                            <li>❌ No image: {checkImageStatusResult.programs?.withNeither}</li>
+                          </ul>
+                        </div>
+                        {checkImageStatusResult.recommendations?.length > 0 && (
+                          <div className="pt-1 border-t border-cyan-200 dark:border-cyan-800">
+                            <div className="font-medium">💡 RECOMMENDATIONS:</div>
+                            <ul className="pl-3 text-muted-foreground">
+                              {checkImageStatusResult.recommendations.map((rec: string, i: number) => (
+                                <li key={i}>• {rec}</li>
+                              ))}
+                            </ul>
+                          </div>
+                        )}
+                      </div>
+                    )}
+                  </div>
+
                   {/* Image Sync Guide - spans 2 columns */}
                   <div className="p-4 border rounded-lg space-y-3 sm:col-span-2 bg-muted/30">
                     <div className="flex items-center gap-2">
@@ -939,8 +1046,9 @@ export const SettingsManager = () => {
                     
                     <div className="text-xs space-y-3">
                       <div>
-                        <div className="font-medium text-muted-foreground mb-1">🔧 BUTTONS:</div>
+                        <div className="font-medium text-muted-foreground mb-1">🔧 BUTTONS (works for both Workouts & Programs):</div>
                         <ul className="space-y-0.5 text-muted-foreground">
+                          <li>• <strong>Check Status</strong> → See current sync state before any operations</li>
                           <li>• <strong>Generate Images</strong> → Creates AI images for website (missing only)</li>
                           <li>• <strong>Audit Stripe</strong> → Copies website images TO Stripe</li>
                           <li>• <strong>Pull from Stripe</strong> → Downloads Stripe images TO website</li>
@@ -958,8 +1066,9 @@ export const SettingsManager = () => {
                       </div>
                       
                       <div>
-                        <div className="font-medium text-muted-foreground mb-1">📌 RECOMMENDED ORDER:</div>
+                        <div className="font-medium text-muted-foreground mb-1">📌 RECOMMENDED WORKFLOW:</div>
                         <ol className="list-decimal list-inside space-y-0.5 text-muted-foreground">
+                          <li><strong>Check Status</strong> (see what needs action)</li>
                           <li>Generate Images (creates missing website images)</li>
                           <li>Audit Stripe (website → Stripe)</li>
                           <li>Pull from Stripe (Stripe → website)</li>
