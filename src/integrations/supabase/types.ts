@@ -326,6 +326,42 @@ export type Database = {
         }
         Relationships: []
       }
+      app_vault_data: {
+        Row: {
+          created_at: string | null
+          display_order: number | null
+          field_key: string
+          field_type: string | null
+          field_value: string | null
+          id: string
+          notes: string | null
+          section: string
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          display_order?: number | null
+          field_key: string
+          field_type?: string | null
+          field_value?: string | null
+          id?: string
+          notes?: string | null
+          section: string
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          display_order?: number | null
+          field_key?: string
+          field_type?: string | null
+          field_value?: string | null
+          id?: string
+          notes?: string | null
+          section?: string
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       automated_message_templates: {
         Row: {
           content: string
