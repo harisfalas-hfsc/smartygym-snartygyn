@@ -8,7 +8,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
-import { Settings, Bell, Mail, Database, Shield, Download, HeartPulse, Wrench, Image, RefreshCw, Search, ImagePlus, Send, Trash2, ShoppingCart } from "lucide-react";
+import { Settings, Bell, Mail, Database, Shield, Download, HeartPulse, Wrench, Image, RefreshCw, Search, ImagePlus, Send, Trash2, ShoppingCart, HelpCircle } from "lucide-react";
 import { SystemHealthAudit } from "./SystemHealthAudit";
 
 export const SettingsManager = () => {
@@ -56,6 +56,8 @@ export const SettingsManager = () => {
   const [cleanupRateLimitsResult, setCleanupRateLimitsResult] = useState<string | null>(null);
   const [auditStripeImagesLoading, setAuditStripeImagesLoading] = useState(false);
   const [auditStripeImagesResult, setAuditStripeImagesResult] = useState<string | null>(null);
+  const [pullStripeImagesLoading, setPullStripeImagesLoading] = useState(false);
+  const [pullStripeImagesResult, setPullStripeImagesResult] = useState<string | null>(null);
 
   // Load inactivity timeout on mount
   useEffect(() => {
@@ -522,6 +524,35 @@ export const SettingsManager = () => {
     }
   };
 
+  const handlePullStripeImages = async () => {
+    if (!confirm("This will download images from Stripe to your website for items that are missing website images but have Stripe images. Continue?")) {
+      return;
+    }
+    
+    setPullStripeImagesLoading(true);
+    setPullStripeImagesResult(null);
+    try {
+      const { data, error } = await supabase.functions.invoke('pull-stripe-images');
+      
+      if (error) throw error;
+
+      const result = `Pulled ${data.workouts_pulled} workout images, ${data.programs_pulled} program images from Stripe`;
+      setPullStripeImagesResult(result);
+      toast({
+        title: "Pull from Stripe Complete",
+        description: result,
+      });
+    } catch (error: any) {
+      toast({
+        title: "Pull Failed",
+        description: error.message || "Failed to pull images from Stripe.",
+        variant: "destructive",
+      });
+    } finally {
+      setPullStripeImagesLoading(false);
+    }
+  };
+
   return (
     <div className="pt-6 space-y-6 w-full overflow-x-hidden">
       <Tabs defaultValue="general" className="w-full">
@@ -874,6 +905,71 @@ export const SettingsManager = () => {
                     {cleanupRateLimitsResult && (
                       <p className="text-xs text-green-600">✅ {cleanupRateLimitsResult}</p>
                     )}
+                  </div>
+
+                  {/* Pull from Stripe */}
+                  <div className="p-4 border rounded-lg space-y-3">
+                    <div className="flex items-center gap-2">
+                      <Download className="h-5 w-5 text-teal-500" />
+                      <h4 className="font-medium text-sm">Pull from Stripe</h4>
+                    </div>
+                    <p className="text-xs text-muted-foreground">
+                      Download Stripe images to website when website is missing
+                    </p>
+                    <Button 
+                      onClick={handlePullStripeImages} 
+                      disabled={pullStripeImagesLoading}
+                      variant="outline"
+                      size="sm"
+                      className="w-full"
+                    >
+                      {pullStripeImagesLoading ? "Pulling..." : "Pull Images"}
+                    </Button>
+                    {pullStripeImagesResult && (
+                      <p className="text-xs text-green-600">✅ {pullStripeImagesResult}</p>
+                    )}
+                  </div>
+
+                  {/* Image Sync Guide - spans 2 columns */}
+                  <div className="p-4 border rounded-lg space-y-3 sm:col-span-2 bg-muted/30">
+                    <div className="flex items-center gap-2">
+                      <HelpCircle className="h-5 w-5 text-amber-500" />
+                      <h4 className="font-medium text-sm">Image Sync Guide</h4>
+                    </div>
+                    
+                    <div className="text-xs space-y-3">
+                      <div>
+                        <div className="font-medium text-muted-foreground mb-1">🔧 BUTTONS:</div>
+                        <ul className="space-y-0.5 text-muted-foreground">
+                          <li>• <strong>Generate Images</strong> → Creates AI images for website (missing only)</li>
+                          <li>• <strong>Audit Stripe</strong> → Copies website images TO Stripe</li>
+                          <li>• <strong>Pull from Stripe</strong> → Downloads Stripe images TO website</li>
+                        </ul>
+                      </div>
+                      
+                      <div>
+                        <div className="font-medium text-muted-foreground mb-1">🔍 SCENARIOS:</div>
+                        <ul className="space-y-0.5 text-muted-foreground">
+                          <li>• <strong>Website ✅ / Stripe ❌:</strong> Press "Audit Stripe Images"</li>
+                          <li>• <strong>Website ❌ / Stripe ✅:</strong> Press "Pull from Stripe"</li>
+                          <li>• <strong>Website ❌ / Stripe ❌:</strong> Press "Generate Images" → then "Audit Stripe"</li>
+                          <li>• <strong>Both ✅:</strong> No action needed</li>
+                        </ul>
+                      </div>
+                      
+                      <div>
+                        <div className="font-medium text-muted-foreground mb-1">📌 RECOMMENDED ORDER:</div>
+                        <ol className="list-decimal list-inside space-y-0.5 text-muted-foreground">
+                          <li>Generate Images (creates missing website images)</li>
+                          <li>Audit Stripe (website → Stripe)</li>
+                          <li>Pull from Stripe (Stripe → website)</li>
+                        </ol>
+                      </div>
+                      
+                      <div className="text-amber-600 pt-1 border-t border-amber-200">
+                        ⚠️ Safe to run multiple times - only updates missing images
+                      </div>
+                    </div>
                   </div>
                 </div>
               </CardContent>
