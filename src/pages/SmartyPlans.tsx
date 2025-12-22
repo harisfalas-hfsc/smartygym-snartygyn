@@ -104,7 +104,7 @@ export default function SmartyPlans() {
   const comparisonFeatures = [
     { category: "Workouts", icon: Dumbbell, visitor: false, subscriber: "Free workouts", premium: "All workouts" },
     { category: "Training Programs", icon: Flame, visitor: false, subscriber: "Free programs", premium: "Full access" },
-    { category: "Daily Smarty Ritual", icon: Sparkles, visitor: false, subscriber: false, premium: "Full access" },
+    { category: "Daily Smarty Ritual", icon: Sparkles, visitor: false, subscriber: "Full access", premium: "Full access" },
     { category: "Smarty Check-ins", icon: ClipboardCheck, visitor: false, subscriber: false, premium: "Full access" },
     { category: "Dashboard", icon: LayoutDashboard, visitor: false, subscriber: "Limited access", premium: "Full access" },
     { category: "Exercise Library", icon: BookOpen, visitor: "Full access", subscriber: "Full access", premium: "Full access" },
