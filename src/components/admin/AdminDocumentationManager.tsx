@@ -13,6 +13,7 @@ import { ScreenshotCaptureGuide } from "./app-store/ScreenshotCaptureGuide";
 import { QuickLinks } from "./app-store/QuickLinks";
 import { AppStoreAssetGenerator } from "./app-store/AppStoreAssetGenerator";
 import { AppyPiePackage } from "./app-store/AppyPiePackage";
+import { AppStoreSettingsEditor } from "./app-store/AppStoreSettingsEditor";
 import { useState } from "react";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { ChevronDown, Bell } from "lucide-react";
@@ -292,6 +293,9 @@ Contact: corporate@smartygym.com`;
         <AppStoreAssetGenerator />
         <AppyPiePackage />
       </div>
+
+      {/* App Store Settings Editor */}
+      <AppStoreSettingsEditor />
 
       {/* Main Tabs: Apple vs Google */}
       <Tabs defaultValue="apple" className="w-full">

@@ -44,7 +44,7 @@ Requirements:
 - Exact dimensions: 1024x500 pixels (wide banner format, approximately 2:1 aspect ratio)
 - Eye-catching, premium fitness brand aesthetic
 - Include the text "SmartyGym" prominently in the center
-- Tagline: "Expert Fitness. Real Results."
+- Tagline: "Your gym reimagined anywhere, anytime"
 - Background: Dynamic gradient with fitness imagery (abstract gym equipment, energy, motion)
 - Primary colors: Vibrant blue/cyan (#0ea5e9) with white text
 - Professional, modern, energetic design
@@ -90,9 +90,11 @@ Create a high-quality 1024x500 feature graphic suitable for Google Play Store.`
 
     // Upload feature graphic
     const fileName = `feature-graphic-1024x500.png`;
+    const filePath = `graphics/${fileName}`;
+    
     const { data: uploadData, error: uploadError } = await supabase.storage
       .from("app-store-assets")
-      .upload(`graphics/${fileName}`, imageData, {
+      .upload(filePath, imageData, {
         contentType: "image/png",
         upsert: true
       });
@@ -107,25 +109,49 @@ Create a high-quality 1024x500 feature graphic suitable for Google Play Store.`
     // Get public URL
     const { data: urlData } = supabase.storage
       .from("app-store-assets")
-      .getPublicUrl(`graphics/${fileName}`);
+      .getPublicUrl(filePath);
 
-    // Store in database
-    await supabase.from("app_store_assets").upsert({
+    const publicUrl = urlData.publicUrl;
+    console.log("[GENERATE-FEATURE-GRAPHIC] Feature graphic URL:", publicUrl);
+
+    // Delete existing record first, then insert fresh
+    await supabase.from("app_store_assets").delete().eq("file_path", filePath);
+    
+    const { error: insertError } = await supabase.from("app_store_assets").insert({
       asset_type: "feature-graphic",
       platform: "android",
       file_name: fileName,
-      file_path: `graphics/${fileName}`,
+      file_path: filePath,
       width: 1024,
       height: 500,
-      storage_url: urlData.publicUrl
-    }, { onConflict: "file_path" });
+      storage_url: publicUrl
+    });
 
+    if (insertError) {
+      console.error("[GENERATE-FEATURE-GRAPHIC] Database insert error:", insertError);
+      // Try upsert as fallback
+      const { error: upsertError } = await supabase.from("app_store_assets").upsert({
+        asset_type: "feature-graphic",
+        platform: "android",
+        file_name: fileName,
+        file_path: filePath,
+        width: 1024,
+        height: 500,
+        storage_url: publicUrl
+      }, { onConflict: "file_path" });
+      
+      if (upsertError) {
+        console.error("[GENERATE-FEATURE-GRAPHIC] Upsert also failed:", upsertError);
+      }
+    }
+
+    console.log("[GENERATE-FEATURE-GRAPHIC] Feature graphic saved to database");
     console.log("[GENERATE-FEATURE-GRAPHIC] Feature graphic generation complete!");
 
     return new Response(
       JSON.stringify({
         success: true,
-        featureGraphic: urlData.publicUrl,
+        featureGraphic: publicUrl,
         fileName,
         message: "Feature graphic generated successfully!"
       }),

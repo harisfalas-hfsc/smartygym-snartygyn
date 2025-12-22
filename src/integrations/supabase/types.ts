@@ -266,6 +266,66 @@ export type Database = {
         }
         Relationships: []
       }
+      app_store_settings: {
+        Row: {
+          app_name: string
+          category: string
+          content_rating: string
+          created_at: string
+          full_description: string
+          id: string
+          keywords: string
+          marketing_url: string
+          privacy_policy_url: string
+          promotional_text: string
+          short_description: string
+          subtitle: string
+          support_email: string
+          support_url: string
+          terms_of_service_url: string
+          updated_at: string
+          whats_new: string
+        }
+        Insert: {
+          app_name?: string
+          category?: string
+          content_rating?: string
+          created_at?: string
+          full_description?: string
+          id?: string
+          keywords?: string
+          marketing_url?: string
+          privacy_policy_url?: string
+          promotional_text?: string
+          short_description?: string
+          subtitle?: string
+          support_email?: string
+          support_url?: string
+          terms_of_service_url?: string
+          updated_at?: string
+          whats_new?: string
+        }
+        Update: {
+          app_name?: string
+          category?: string
+          content_rating?: string
+          created_at?: string
+          full_description?: string
+          id?: string
+          keywords?: string
+          marketing_url?: string
+          privacy_policy_url?: string
+          promotional_text?: string
+          short_description?: string
+          subtitle?: string
+          support_email?: string
+          support_url?: string
+          terms_of_service_url?: string
+          updated_at?: string
+          whats_new?: string
+        }
+        Relationships: []
+      }
       automated_message_templates: {
         Row: {
           content: string

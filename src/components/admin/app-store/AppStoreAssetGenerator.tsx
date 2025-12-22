@@ -1,8 +1,8 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Loader2, Sparkles, Download, CheckCircle2, XCircle, AlertCircle, Image, Monitor, RefreshCw } from "lucide-react";
+import { Loader2, Sparkles, Download, CheckCircle2, XCircle, Image, Monitor, RefreshCw } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -24,11 +24,13 @@ export const AppStoreAssetGenerator = () => {
   const [assets, setAssets] = useState<Asset[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
-  const fetchAssets = async () => {
+  const fetchAssets = useCallback(async () => {
     try {
+      setIsLoading(true);
       const { data, error } = await supabase
         .from("app_store_assets")
         .select("*")
+        .not("storage_url", "is", null)
         .order("created_at", { ascending: false });
 
       if (error) throw error;
@@ -38,11 +40,11 @@ export const AppStoreAssetGenerator = () => {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, []);
 
   useEffect(() => {
     fetchAssets();
-  }, []);
+  }, [fetchAssets]);
 
   const generateAppIcons = async () => {
     setIsGeneratingIcons(true);
@@ -55,7 +57,8 @@ export const AppStoreAssetGenerator = () => {
         toast.success("App icon generated!", {
           description: "Download the master icon and use appicon.co for all sizes."
         });
-        fetchAssets();
+        // Refresh assets after a short delay to ensure database is updated
+        setTimeout(() => fetchAssets(), 1000);
       } else {
         throw new Error(data.error || "Failed to generate icons");
       }
@@ -80,7 +83,8 @@ export const AppStoreAssetGenerator = () => {
         toast.success("Feature graphic generated!", {
           description: "Ready for Google Play Store submission."
         });
-        fetchAssets();
+        // Refresh assets after a short delay to ensure database is updated
+        setTimeout(() => fetchAssets(), 1000);
       } else {
         throw new Error(data.error || "Failed to generate feature graphic");
       }
@@ -94,8 +98,9 @@ export const AppStoreAssetGenerator = () => {
     }
   };
 
-  const masterIcon = assets.find(a => a.asset_type === "icon" && a.file_name.includes("master"));
-  const featureGraphic = assets.find(a => a.asset_type === "feature-graphic");
+  // Find assets with valid storage URLs
+  const masterIcon = assets.find(a => a.asset_type === "icon" && a.storage_url);
+  const featureGraphic = assets.find(a => a.asset_type === "feature-graphic" && a.storage_url);
 
   const downloadAsset = (url: string, fileName: string) => {
     const a = document.createElement("a");
@@ -297,9 +302,10 @@ export const AppStoreAssetGenerator = () => {
             variant="ghost"
             size="sm"
             onClick={fetchAssets}
+            disabled={isLoading}
             className="gap-2"
           >
-            <RefreshCw className="h-4 w-4" />
+            <RefreshCw className={`h-4 w-4 ${isLoading ? "animate-spin" : ""}`} />
             Refresh Assets
           </Button>
         </div>
