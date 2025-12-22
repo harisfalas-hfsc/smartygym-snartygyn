@@ -210,7 +210,7 @@ export const AppStoreAssetGenerator = () => {
             <div className="mt-3 p-3 bg-muted/50 rounded-lg">
               <div className="flex items-start gap-4">
                 <img
-                  src={masterIcon.storage_url}
+                  src={`${masterIcon.storage_url}?t=${Date.now()}`}
                   alt="App Icon"
                   className="w-20 h-20 rounded-xl shadow-md"
                 />
@@ -285,7 +285,7 @@ export const AppStoreAssetGenerator = () => {
           {featureGraphic?.storage_url && (
             <div className="mt-3 p-3 bg-muted/50 rounded-lg">
               <img
-                src={featureGraphic.storage_url}
+                src={`${featureGraphic.storage_url}?t=${Date.now()}`}
                 alt="Feature Graphic"
                 className="w-full max-w-md rounded-lg shadow-md"
               />
