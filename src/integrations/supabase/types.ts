@@ -224,6 +224,48 @@ export type Database = {
         }
         Relationships: []
       }
+      app_store_assets: {
+        Row: {
+          asset_type: string
+          created_at: string
+          file_name: string
+          file_path: string
+          file_size: number | null
+          height: number | null
+          id: string
+          platform: string
+          storage_url: string | null
+          updated_at: string
+          width: number | null
+        }
+        Insert: {
+          asset_type: string
+          created_at?: string
+          file_name: string
+          file_path: string
+          file_size?: number | null
+          height?: number | null
+          id?: string
+          platform: string
+          storage_url?: string | null
+          updated_at?: string
+          width?: number | null
+        }
+        Update: {
+          asset_type?: string
+          created_at?: string
+          file_name?: string
+          file_path?: string
+          file_size?: number | null
+          height?: number | null
+          id?: string
+          platform?: string
+          storage_url?: string | null
+          updated_at?: string
+          width?: number | null
+        }
+        Relationships: []
+      }
       automated_message_templates: {
         Row: {
           content: string

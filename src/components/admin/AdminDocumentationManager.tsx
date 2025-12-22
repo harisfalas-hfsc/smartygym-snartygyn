@@ -11,6 +11,8 @@ import { AppStoreTextContent } from "./app-store/AppStoreTextContent";
 import { AssetSpecifications } from "./app-store/AssetSpecifications";
 import { ScreenshotCaptureGuide } from "./app-store/ScreenshotCaptureGuide";
 import { QuickLinks } from "./app-store/QuickLinks";
+import { AppStoreAssetGenerator } from "./app-store/AppStoreAssetGenerator";
+import { AppyPiePackage } from "./app-store/AppyPiePackage";
 import { useState } from "react";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { ChevronDown, Bell } from "lucide-react";
@@ -283,6 +285,12 @@ Contact: corporate@smartygym.com`;
           <h2 className="text-3xl font-bold">App Store Asset Center</h2>
           <p className="text-muted-foreground">Everything you need to publish SmartyGym on iOS App Store and Google Play Store</p>
         </div>
+      </div>
+
+      {/* AI Asset Generator & Appy Pie Package */}
+      <div className="grid gap-6 md:grid-cols-2">
+        <AppStoreAssetGenerator />
+        <AppyPiePackage />
       </div>
 
       {/* Main Tabs: Apple vs Google */}
