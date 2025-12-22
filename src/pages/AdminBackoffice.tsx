@@ -6,7 +6,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
-import { ArrowLeft, Folder, Users, Mail, FileText, Settings, BarChart3, BookOpen, MessageSquare, Inbox, Megaphone, TrendingUp, Plus, Dumbbell, Calendar, Bell, ShoppingBag, Sparkles, Building2, Video } from "lucide-react";
+import { ArrowLeft, Folder, Users, Mail, FileText, Settings, BarChart3, BookOpen, MessageSquare, Inbox, Megaphone, TrendingUp, Plus, Dumbbell, Calendar, Bell, ShoppingBag, Sparkles, Building2, Video, Smartphone } from "lucide-react";
 import { ContentManager } from "@/components/admin/ContentManager";
 import { CommunicationsManager } from "@/components/admin/CommunicationsManager";
 import { EmailManager } from "@/components/admin/EmailManager";
@@ -25,6 +25,7 @@ import { NotificationHistoryManager } from "@/components/admin/NotificationHisto
 import { AdminDocumentationManager } from "@/components/admin/AdminDocumentationManager";
 import { CorporateDashboard } from "@/components/admin/CorporateDashboard";
 import ExerciseLibraryManager from "@/components/admin/ExerciseLibraryManager";
+import SmartyGymAppVault from "@/pages/admin/SmartyGymAppVault";
 import { supabase } from "@/integrations/supabase/client";
 
 export default function AdminBackoffice() {
