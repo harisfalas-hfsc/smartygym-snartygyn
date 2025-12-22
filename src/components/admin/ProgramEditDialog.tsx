@@ -59,6 +59,7 @@ export const ProgramEditDialog = ({ program, open, onOpenChange, onSave }: Progr
     final_tips: '',
     image_url: '',
     generate_unique_image: false,
+    is_free: false,
     is_premium: false,
     is_standalone_purchase: false,
     price: '',
@@ -116,6 +117,7 @@ export const ProgramEditDialog = ({ program, open, onOpenChange, onSave }: Progr
         final_tips: program.nutrition_tips || '',
         image_url: program.image_url || '',
         generate_unique_image: false,
+        is_free: program.is_free || false,
         is_premium: program.is_premium || false,
         is_standalone_purchase: program.is_standalone_purchase || false,
         price: program.price ? program.price.toString() : '',
@@ -148,6 +150,7 @@ export const ProgramEditDialog = ({ program, open, onOpenChange, onSave }: Progr
         final_tips: '',
         image_url: '',
         generate_unique_image: false,
+        is_free: false,
         is_premium: false,
         is_standalone_purchase: false,
         price: '',
@@ -726,32 +729,62 @@ export const ProgramEditDialog = ({ program, open, onOpenChange, onSave }: Progr
             )}
           </div>
 
-          {/* Premium/Free and Standalone Purchase */}
+          {/* Free Content Toggle */}
           <div className="space-y-2">
-            <Label htmlFor="is_premium" className="text-base font-semibold">Premium or Free</Label>
+            <Label htmlFor="is_free" className="text-base font-semibold">Free Content</Label>
             <div className="flex items-center space-x-3 p-3 border rounded-lg">
               <Switch
-                id="is_premium"
-                checked={formData.is_premium}
+                id="is_free"
+                checked={formData.is_free}
                 onCheckedChange={(checked) => setFormData({ 
                   ...formData, 
-                  is_premium: checked,
-                  is_standalone_purchase: checked ? formData.is_standalone_purchase : false,
-                  price: checked ? formData.price : ''
+                  is_free: checked,
+                  is_premium: checked ? false : formData.is_premium,
+                  is_standalone_purchase: checked ? false : formData.is_standalone_purchase,
+                  price: checked ? '' : formData.price
                 })}
               />
               <div className="flex-1">
                 <span className="text-sm font-medium">
-                  {formData.is_premium ? '🔒 Premium Content' : '🆓 Free Content'}
+                  {formData.is_free ? '🆓 Free Content (no Stripe product needed)' : 'Paid Content'}
                 </span>
               </div>
             </div>
-            <p className="text-xs text-muted-foreground">
-              Toggle ON for Premium (requires subscription), toggle OFF for Free (accessible to all)
-            </p>
+            {formData.is_free && (
+              <p className="text-sm text-green-600 bg-green-50 p-2 rounded">
+                ✓ This program is marked as FREE. No Stripe product will be created.
+              </p>
+            )}
           </div>
 
-          {formData.is_premium && (
+          {/* Premium/Free and Standalone Purchase - only show if not free */}
+          {!formData.is_free && (
+            <div className="space-y-2">
+              <Label htmlFor="is_premium" className="text-base font-semibold">Premium or Free</Label>
+              <div className="flex items-center space-x-3 p-3 border rounded-lg">
+                <Switch
+                  id="is_premium"
+                  checked={formData.is_premium}
+                  onCheckedChange={(checked) => setFormData({ 
+                    ...formData, 
+                    is_premium: checked,
+                    is_standalone_purchase: checked ? formData.is_standalone_purchase : false,
+                    price: checked ? formData.price : ''
+                  })}
+                />
+                <div className="flex-1">
+                  <span className="text-sm font-medium">
+                    {formData.is_premium ? '🔒 Premium Content' : '🆓 Free Content'}
+                  </span>
+                </div>
+              </div>
+              <p className="text-xs text-muted-foreground">
+                Toggle ON for Premium (requires subscription), toggle OFF for Free (accessible to all)
+              </p>
+            </div>
+          )}
+
+          {formData.is_premium && !formData.is_free && (
             <div className="space-y-4 pt-4 border-t">
               <div className="flex items-center space-x-2">
                 <Switch

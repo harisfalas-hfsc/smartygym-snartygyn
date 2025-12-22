@@ -25,35 +25,43 @@ serve(async (req) => {
 
     console.log("[AUDIT-STRIPE-IMAGES] Starting audit...");
 
-    // Fetch workouts with stripe_product_id and image_url
+    // Fetch workouts with stripe_product_id, image_url, and is_free
     const { data: workouts, error: workoutsError } = await supabase
       .from("admin_workouts")
-      .select("id, name, stripe_product_id, image_url")
+      .select("id, name, stripe_product_id, image_url, is_free")
       .not("stripe_product_id", "is", null);
 
     if (workoutsError) {
       throw new Error(`Failed to fetch workouts: ${workoutsError.message}`);
     }
 
-    // Fetch programs with stripe_product_id and image_url
+    // Fetch programs with stripe_product_id, image_url, and is_free
     const { data: programs, error: programsError } = await supabase
       .from("admin_training_programs")
-      .select("id, name, stripe_product_id, image_url")
+      .select("id, name, stripe_product_id, image_url, is_free")
       .not("stripe_product_id", "is", null);
 
     if (programsError) {
       throw new Error(`Failed to fetch programs: ${programsError.message}`);
     }
 
+    // Filter out free items - they don't need Stripe products
+    const paidWorkouts = (workouts || []).filter(w => !w.is_free);
+    const paidPrograms = (programs || []).filter(p => !p.is_free);
+
     const allItems = [
-      ...(workouts || []).map(w => ({ ...w, type: "workout" })),
-      ...(programs || []).map(p => ({ ...p, type: "program" })),
+      ...paidWorkouts.map(w => ({ ...w, type: "workout" })),
+      ...paidPrograms.map(p => ({ ...p, type: "program" })),
     ];
 
-    console.log(`[AUDIT-STRIPE-IMAGES] Found ${allItems.length} items with Stripe products`);
+    const skippedFreeItems = (workouts?.length || 0) - paidWorkouts.length + 
+                             (programs?.length || 0) - paidPrograms.length;
+
+    console.log(`[AUDIT-STRIPE-IMAGES] Found ${allItems.length} paid items with Stripe products (skipped ${skippedFreeItems} free items)`);
 
     const results = {
       total: allItems.length,
+      skipped_free: skippedFreeItems,
       missing_stripe_image: 0,
       synced: 0,
       skipped_no_website_image: 0,

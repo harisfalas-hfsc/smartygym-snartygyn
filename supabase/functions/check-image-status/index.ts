@@ -27,9 +27,11 @@ interface CategoryStats {
   withNeither: number;
   websiteOnly: number;
   stripeOnly: number;
+  freeItems: number;
   noImageItems: ItemDetail[];
   websiteOnlyItems: ItemDetail[];
   stripeOnlyItems: ItemDetail[];
+  freeItemsList: ItemDetail[];
 }
 
 serve(async (req) => {
@@ -49,18 +51,18 @@ serve(async (req) => {
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
     const stripe = new Stripe(stripeKey, { apiVersion: "2025-08-27.basil" });
 
-    // Fetch all visible workouts
+    // Fetch all visible workouts - now including is_free
     const { data: workouts, error: workoutsError } = await supabase
       .from("admin_workouts")
-      .select("id, name, image_url, stripe_product_id, is_visible, category")
+      .select("id, name, image_url, stripe_product_id, is_visible, category, is_free, is_premium, price, is_standalone_purchase")
       .eq("is_visible", true);
 
     if (workoutsError) throw new Error(`Failed to fetch workouts: ${workoutsError.message}`);
 
-    // Fetch all visible programs
+    // Fetch all visible programs - now including is_free
     const { data: programs, error: programsError } = await supabase
       .from("admin_training_programs")
-      .select("id, name, image_url, stripe_product_id, is_visible, category")
+      .select("id, name, image_url, stripe_product_id, is_visible, category, is_free, is_premium, price, is_standalone_purchase")
       .eq("is_visible", true);
 
     if (programsError) throw new Error(`Failed to fetch programs: ${programsError.message}`);
@@ -90,6 +92,23 @@ serve(async (req) => {
       }
     };
 
+    // Helper to check if image_url is valid (supports full URLs and relative paths)
+    const hasValidImageUrl = (url: string | null): boolean => {
+      if (!url) return false;
+      return url.startsWith("http") || url.startsWith("/");
+    };
+
+    // Helper to check if item should have a Stripe product
+    const shouldHaveStripe = (item: any): boolean => {
+      // Free items don't need Stripe products
+      if (item.is_free) return false;
+      // Items with standalone purchase enabled should have Stripe
+      if (item.is_standalone_purchase && item.price && item.price > 0) return true;
+      // Premium items with price should have Stripe
+      if (item.is_premium && item.price && item.price > 0) return true;
+      return false;
+    };
+
     // Process workouts
     const workoutStats: CategoryStats = {
       total: workouts?.length || 0,
@@ -99,24 +118,14 @@ serve(async (req) => {
       withNeither: 0,
       websiteOnly: 0,
       stripeOnly: 0,
+      freeItems: 0,
       noImageItems: [],
       websiteOnlyItems: [],
       stripeOnlyItems: [],
-    };
-
-    // Helper to check if image_url is valid (supports full URLs and relative paths)
-    const hasValidImageUrl = (url: string | null): boolean => {
-      if (!url) return false;
-      return url.startsWith("http") || url.startsWith("/");
+      freeItemsList: [],
     };
 
     for (const workout of workouts || []) {
-      const hasWebsite = hasValidImageUrl(workout.image_url);
-      const hasStripe = await checkStripeImage(workout.stripe_product_id);
-
-      if (hasWebsite) workoutStats.withWebsite++;
-      if (hasStripe) workoutStats.withStripe++;
-      
       const itemDetail: ItemDetail = {
         name: workout.name,
         id: workout.id,
@@ -124,14 +133,34 @@ serve(async (req) => {
         stripeProductId: workout.stripe_product_id || undefined,
       };
 
+      // Check if this is a free item
+      if (workout.is_free) {
+        workoutStats.freeItems++;
+        workoutStats.freeItemsList.push(itemDetail);
+        continue; // Skip Stripe check for free items
+      }
+
+      const hasWebsite = hasValidImageUrl(workout.image_url);
+      const hasStripe = await checkStripeImage(workout.stripe_product_id);
+      const needsStripe = shouldHaveStripe(workout);
+
+      if (hasWebsite) workoutStats.withWebsite++;
+      if (hasStripe) workoutStats.withStripe++;
+
       if (hasWebsite && hasStripe) {
         workoutStats.withBoth++;
       } else if (!hasWebsite && !hasStripe) {
         workoutStats.withNeither++;
         workoutStats.noImageItems.push(itemDetail);
       } else if (hasWebsite && !hasStripe) {
-        workoutStats.websiteOnly++;
-        workoutStats.websiteOnlyItems.push(itemDetail);
+        // Only count as "website only" if item SHOULD have Stripe
+        if (needsStripe) {
+          workoutStats.websiteOnly++;
+          workoutStats.websiteOnlyItems.push(itemDetail);
+        } else {
+          // Has website image but doesn't need Stripe (free or no price)
+          workoutStats.withBoth++; // Count as synced since it doesn't need Stripe
+        }
       } else if (!hasWebsite && hasStripe) {
         workoutStats.stripeOnly++;
         workoutStats.stripeOnlyItems.push(itemDetail);
@@ -147,18 +176,14 @@ serve(async (req) => {
       withNeither: 0,
       websiteOnly: 0,
       stripeOnly: 0,
+      freeItems: 0,
       noImageItems: [],
       websiteOnlyItems: [],
       stripeOnlyItems: [],
+      freeItemsList: [],
     };
 
     for (const program of programs || []) {
-      const hasWebsite = hasValidImageUrl(program.image_url);
-      const hasStripe = await checkStripeImage(program.stripe_product_id);
-
-      if (hasWebsite) programStats.withWebsite++;
-      if (hasStripe) programStats.withStripe++;
-
       const itemDetail: ItemDetail = {
         name: program.name,
         id: program.id,
@@ -166,14 +191,34 @@ serve(async (req) => {
         stripeProductId: program.stripe_product_id || undefined,
       };
 
+      // Check if this is a free item
+      if (program.is_free) {
+        programStats.freeItems++;
+        programStats.freeItemsList.push(itemDetail);
+        continue; // Skip Stripe check for free items
+      }
+
+      const hasWebsite = hasValidImageUrl(program.image_url);
+      const hasStripe = await checkStripeImage(program.stripe_product_id);
+      const needsStripe = shouldHaveStripe(program);
+
+      if (hasWebsite) programStats.withWebsite++;
+      if (hasStripe) programStats.withStripe++;
+
       if (hasWebsite && hasStripe) {
         programStats.withBoth++;
       } else if (!hasWebsite && !hasStripe) {
         programStats.withNeither++;
         programStats.noImageItems.push(itemDetail);
       } else if (hasWebsite && !hasStripe) {
-        programStats.websiteOnly++;
-        programStats.websiteOnlyItems.push(itemDetail);
+        // Only count as "website only" if item SHOULD have Stripe
+        if (needsStripe) {
+          programStats.websiteOnly++;
+          programStats.websiteOnlyItems.push(itemDetail);
+        } else {
+          // Has website image but doesn't need Stripe (free or no price)
+          programStats.withBoth++; // Count as synced since it doesn't need Stripe
+        }
       } else if (!hasWebsite && hasStripe) {
         programStats.stripeOnly++;
         programStats.stripeOnlyItems.push(itemDetail);
@@ -244,9 +289,15 @@ serve(async (req) => {
       recommendations.push("All images are synced! No action needed.");
     }
 
+    // Add info about free items
+    const totalFreeItems = workoutStats.freeItems + programStats.freeItems;
+    if (totalFreeItems > 0) {
+      recommendations.push(`ℹ️ ${totalFreeItems} free item(s) excluded from Stripe sync (no Stripe product needed)`);
+    }
+
     logStep("Check complete", { 
-      workouts: { ...workoutStats, noImageItems: workoutStats.noImageItems.length },
-      programs: { ...programStats, noImageItems: programStats.noImageItems.length },
+      workouts: { ...workoutStats, noImageItems: workoutStats.noImageItems.length, freeItemsList: workoutStats.freeItemsList.length },
+      programs: { ...programStats, noImageItems: programStats.noImageItems.length, freeItemsList: programStats.freeItemsList.length },
       orphanedProducts: orphanedProducts.length,
       recommendations 
     });
@@ -261,6 +312,7 @@ serve(async (req) => {
         summary: {
           totalItems: workoutStats.total + programStats.total,
           fullySynced: workoutStats.withBoth + programStats.withBoth,
+          freeItems: totalFreeItems,
           needsAction: (workoutStats.withNeither + workoutStats.websiteOnly + workoutStats.stripeOnly) + 
                        (programStats.withNeither + programStats.websiteOnly + programStats.stripeOnly)
         }
