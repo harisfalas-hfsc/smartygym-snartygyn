@@ -2,13 +2,14 @@ import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Loader2, Package, Download, CheckCircle2, ExternalLink, FileText, Copy } from "lucide-react";
+import { Loader2, Package, Download, FileText, Copy, ExternalLink, FileType } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 
 interface PackageData {
   packageUrl: string;
   fileName: string;
+  fileType: string;
   content: {
     appName: string;
     subtitle: string;
@@ -46,7 +47,7 @@ export const AppyPiePackage = () => {
       if (data.success) {
         setPackageData(data);
         toast.success("Appy Pie package generated!", {
-          description: "Download the complete submission sheet."
+          description: "Download the Word document with all your app store content."
         });
       } else {
         throw new Error(data.error || "Failed to generate package");
@@ -79,7 +80,7 @@ export const AppyPiePackage = () => {
       document.body.appendChild(a);
       a.click();
       document.body.removeChild(a);
-      toast.success("Downloading submission sheet...");
+      toast.success("Downloading Word document...");
     }
   };
 
@@ -91,7 +92,7 @@ export const AppyPiePackage = () => {
           Download Package for Appy Pie
         </CardTitle>
         <CardDescription>
-          Generate a complete submission sheet with all text content, links, and asset URLs ready for Appy Pie submission.
+          Generate a complete Word document with all text content, links, and asset URLs ready for Appy Pie submission.
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
@@ -132,7 +133,7 @@ export const AppyPiePackage = () => {
               </div>
               {(!packageData.assetStatus.hasIcons || !packageData.assetStatus.hasFeatureGraphic) && (
                 <p className="text-xs text-amber-600 mt-2">
-                  ⚠️ Generate missing assets using the AI Asset Generator above before downloading.
+                  ⚠️ Generate missing assets using the AI Asset Generator above before submitting.
                 </p>
               )}
             </div>
@@ -143,8 +144,8 @@ export const AppyPiePackage = () => {
               variant="outline"
               className="w-full gap-2"
             >
-              <Download className="h-4 w-4" />
-              Download Submission Sheet (.txt)
+              <FileType className="h-4 w-4" />
+              Download Word Document (.doc)
             </Button>
 
             {/* Quick Copy Section */}
@@ -192,7 +193,7 @@ export const AppyPiePackage = () => {
                   className="gap-2"
                 >
                   <Copy className="h-4 w-4" />
-                  Copy Full Description (4000 chars)
+                  Copy Full Description
                 </Button>
               </div>
             </div>

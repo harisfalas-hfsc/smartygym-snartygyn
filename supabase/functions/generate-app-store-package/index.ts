@@ -6,91 +6,6 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
-// App Store text content
-const APP_CONTENT = {
-  appName: "SmartyGym - Expert Fitness",
-  subtitle: "Expert Workouts & Training",
-  shortDescription: "Professional fitness coaching with expert-designed workouts and training programs",
-  keywords: "fitness,workout,gym,training,exercise,strength,personal trainer,HIIT,muscle,weight loss",
-  fullDescription: `🏋️ TRANSFORM YOUR FITNESS WITH EXPERT GUIDANCE
-
-SmartyGym brings professional-grade fitness coaching directly to your device. Created by Sports Scientist Haris Falas, every workout is designed with scientific precision to maximize your results.
-
-▸ WHY SMARTYGYM?
-
-✓ 500+ Expert-Designed Workouts
-Every exercise is crafted by certified fitness professionals—not AI. Real expertise, real results.
-
-✓ Structured Training Programs
-Follow 4-12 week programs designed for progressive overload and measurable improvements.
-
-✓ Workout Generator
-Get personalized workouts tailored to your available equipment, time, and fitness goals.
-
-✓ Complete Exercise Library
-Video demonstrations and detailed instructions for every movement.
-
-✓ Professional Fitness Tools
-• Calorie Calculator
-• BMR Calculator  
-• One Rep Max Calculator
-• Progress Tracking
-
-✓ Workout Logbook
-Track every session, monitor progress, and stay accountable.
-
-▸ MEMBERSHIP OPTIONS
-
-FREE TIER
-• Workout of the Day
-• Basic fitness tools
-• Exercise library access
-
-GOLD MEMBERSHIP
-• All 500+ premium workouts
-• All training programs
-• Advanced progress tracking
-• €9.99/month
-
-PLATINUM MEMBERSHIP  
-• Everything in Gold
-• Exclusive content
-• Priority support
-• €89.89/year (save 25%)
-
-▸ ABOUT THE CREATOR
-
-Haris Falas, Sports Scientist and certified fitness professional, brings over a decade of experience in strength training, athletic performance, and body transformation. Every program in SmartyGym reflects his commitment to evidence-based training.
-
-▸ START TODAY
-
-Download SmartyGym and experience the difference that expert coaching makes. Your transformation begins now.
-
-Questions? Contact us at support@smartygym.com
-
----
-Privacy Policy: https://smartygym.com/privacy-policy
-Terms of Service: https://smartygym.com/terms-of-service`,
-  whatsNew: `Version 1.0.0 - Initial Release
-
-• 500+ expert-designed workouts
-• 20+ structured training programs
-• Workout generator with AI assistance
-• Complete exercise library with videos
-• Fitness calculators (BMR, Calories, 1RM)
-• Workout logbook and progress tracking
-• Daily Workout of the Day
-• Gold & Platinum membership options`,
-  promotionalText: "Professional workouts designed by Sports Scientist Haris Falas. 500+ expert programs. Real coaching, real results.",
-  supportUrl: "https://smartygym.com/contact",
-  marketingUrl: "https://smartygym.com",
-  privacyPolicyUrl: "https://smartygym.com/privacy-policy",
-  termsOfServiceUrl: "https://smartygym.com/terms-of-service",
-  supportEmail: "support@smartygym.com",
-  category: "Health & Fitness",
-  contentRating: "4+ (Apple) / Everyone (Google)",
-};
-
 serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
@@ -104,10 +19,40 @@ serve(async (req) => {
       Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? ""
     );
 
+    // Fetch app store settings from database
+    const { data: settingsData, error: settingsError } = await supabase
+      .from("app_store_settings")
+      .select("*")
+      .limit(1)
+      .maybeSingle();
+
+    if (settingsError) {
+      console.error("[GENERATE-APP-STORE-PACKAGE] Error fetching settings:", settingsError);
+    }
+
+    // Use settings from database or defaults
+    const settings = settingsData || {
+      app_name: "SmartyGym",
+      subtitle: "Your gym reimagined anywhere, anytime",
+      short_description: "Professional fitness coaching with expert-designed workouts and training programs.",
+      keywords: "fitness,workout,gym,training,exercise,strength,personal trainer,HIIT,muscle,weight loss",
+      full_description: "SmartyGym - Professional fitness coaching",
+      whats_new: "Version 1.0.0 - Initial Release",
+      promotional_text: "Professional workouts designed by Sports Scientist Haris Falas.",
+      support_url: "https://smartygym.com/contact",
+      marketing_url: "https://smartygym.com",
+      privacy_policy_url: "https://smartygym.com/privacy-policy",
+      terms_of_service_url: "https://smartygym.com/terms-of-service",
+      support_email: "support@smartygym.com",
+      category: "Health & Fitness",
+      content_rating: "4+ (Apple) / Everyone (Google)",
+    };
+
     // Fetch all generated assets
     const { data: assets, error: assetsError } = await supabase
       .from("app_store_assets")
       .select("*")
+      .not("storage_url", "is", null)
       .order("created_at", { ascending: false });
 
     if (assetsError) {
@@ -121,126 +66,132 @@ serve(async (req) => {
       screenshots: assets?.filter(a => a.asset_type === "screenshot" && a.storage_url) || [],
     };
 
-    // Generate comprehensive text file for Appy Pie
-    const submissionSheet = `
-╔════════════════════════════════════════════════════════════════════════════╗
-║                    SMARTYGYM - APP STORE SUBMISSION SHEET                   ║
-║                         For Appy Pie Submission                             ║
-╚════════════════════════════════════════════════════════════════════════════╝
+    // Generate Word document content as XML (Office Open XML format)
+    const generateWordXml = () => {
+      const escapeXml = (str: string) => {
+        return str
+          .replace(/&/g, '&amp;')
+          .replace(/</g, '&lt;')
+          .replace(/>/g, '&gt;')
+          .replace(/"/g, '&quot;')
+          .replace(/'/g, '&apos;');
+      };
 
-Generated: ${new Date().toISOString()}
+      const addParagraph = (text: string, style: string = "Normal") => {
+        return `<w:p><w:pPr><w:pStyle w:val="${style}"/></w:pPr><w:r><w:t xml:space="preserve">${escapeXml(text)}</w:t></w:r></w:p>`;
+      };
 
-═══════════════════════════════════════════════════════════════════════════════
-                              BASIC INFORMATION
-═══════════════════════════════════════════════════════════════════════════════
+      const addHeading = (text: string, level: number = 1) => {
+        return `<w:p><w:pPr><w:pStyle w:val="Heading${level}"/></w:pPr><w:r><w:rPr><w:b/></w:rPr><w:t>${escapeXml(text)}</w:t></w:r></w:p>`;
+      };
 
-App Name: ${APP_CONTENT.appName}
-Subtitle (iOS): ${APP_CONTENT.subtitle}
-Short Description (Android): ${APP_CONTENT.shortDescription}
-Category: ${APP_CONTENT.category}
-Content Rating: ${APP_CONTENT.contentRating}
+      const addLink = (text: string, url: string) => {
+        return `<w:p><w:r><w:t>${escapeXml(text)}: </w:t></w:r><w:hyperlink r:id="rId1"><w:r><w:rPr><w:color w:val="0000FF"/><w:u w:val="single"/></w:rPr><w:t>${escapeXml(url)}</w:t></w:r></w:hyperlink></w:p>`;
+      };
 
-═══════════════════════════════════════════════════════════════════════════════
-                                  KEYWORDS
-═══════════════════════════════════════════════════════════════════════════════
+      const documentContent = `
+        ${addHeading("SMARTYGYM - APP STORE SUBMISSION PACKAGE")}
+        ${addParagraph("Generated: " + new Date().toISOString())}
+        ${addParagraph("")}
+        
+        ${addHeading("BASIC INFORMATION", 2)}
+        ${addParagraph("App Name: " + settings.app_name)}
+        ${addParagraph("Subtitle (iOS): " + settings.subtitle)}
+        ${addParagraph("Short Description (Android): " + settings.short_description)}
+        ${addParagraph("Category: " + settings.category)}
+        ${addParagraph("Content Rating: " + settings.content_rating)}
+        ${addParagraph("")}
+        
+        ${addHeading("KEYWORDS", 2)}
+        ${addParagraph(settings.keywords)}
+        ${addParagraph("")}
+        
+        ${addHeading("FULL DESCRIPTION", 2)}
+        ${settings.full_description.split('\n').map((line: string) => addParagraph(line)).join('')}
+        ${addParagraph("")}
+        
+        ${addHeading("WHAT'S NEW", 2)}
+        ${settings.whats_new.split('\n').map((line: string) => addParagraph(line)).join('')}
+        ${addParagraph("")}
+        
+        ${addHeading("PROMOTIONAL TEXT", 2)}
+        ${addParagraph(settings.promotional_text)}
+        ${addParagraph("")}
+        
+        ${addHeading("LINKS & CONTACT", 2)}
+        ${addParagraph("Privacy Policy URL: " + settings.privacy_policy_url)}
+        ${addParagraph("Terms of Service URL: " + settings.terms_of_service_url)}
+        ${addParagraph("Support URL: " + settings.support_url)}
+        ${addParagraph("Marketing URL: " + settings.marketing_url)}
+        ${addParagraph("Support Email: " + settings.support_email)}
+        ${addParagraph("")}
+        
+        ${addHeading("GENERATED ASSETS", 2)}
+        ${addParagraph("APP ICONS:")}
+        ${organizedAssets.icons.length > 0 
+          ? organizedAssets.icons.map(a => addParagraph(`  • ${a.file_name} (${a.width}x${a.height}) - ${a.storage_url}`)).join('')
+          : addParagraph("  ⚠️ No icons generated yet. Run 'Generate App Icons' first.")}
+        ${addParagraph("")}
+        ${addParagraph("FEATURE GRAPHIC (Android):")}
+        ${organizedAssets.featureGraphics.length > 0
+          ? organizedAssets.featureGraphics.map(a => addParagraph(`  • ${a.file_name} (${a.width}x${a.height}) - ${a.storage_url}`)).join('')
+          : addParagraph("  ⚠️ No feature graphic generated yet. Run 'Generate Feature Graphic' first.")}
+        ${addParagraph("")}
+        
+        ${addHeading("SUBMISSION CHECKLIST", 2)}
+        ${addParagraph("iOS App Store:")}
+        ${addParagraph("□ App icon 1024x1024")}
+        ${addParagraph("□ Screenshots for iPhone 6.7\" (1290x2796)")}
+        ${addParagraph("□ Screenshots for iPhone 6.5\" (1284x2778)")}
+        ${addParagraph("□ Screenshots for iPhone 5.5\" (1242x2208)")}
+        ${addParagraph("□ App name, subtitle, keywords entered")}
+        ${addParagraph("□ Full description entered")}
+        ${addParagraph("□ Privacy policy URL added")}
+        ${addParagraph("")}
+        ${addParagraph("Google Play Store:")}
+        ${addParagraph("□ App icon 512x512")}
+        ${addParagraph("□ Feature graphic 1024x500")}
+        ${addParagraph("□ Phone screenshots (1080x1920)")}
+        ${addParagraph("□ Short description (80 chars max)")}
+        ${addParagraph("□ Full description entered")}
+        ${addParagraph("□ Privacy policy URL added")}
+        ${addParagraph("")}
+        
+        ${addHeading("NOTES FOR APPY PIE", 2)}
+        ${addParagraph("1. All text content above is ready to copy-paste into app store listings.")}
+        ${addParagraph("2. Download assets from the URLs provided above.")}
+        ${addParagraph("3. For resizing icons to all required sizes, use https://appicon.co/")}
+        ${addParagraph("4. Contact support@smartygym.com for any questions.")}
+      `;
 
-${APP_CONTENT.keywords}
+      return documentContent;
+    };
 
-═══════════════════════════════════════════════════════════════════════════════
-                              FULL DESCRIPTION
-═══════════════════════════════════════════════════════════════════════════════
+    // Create the DOCX package (simplified - single file XML)
+    const wordXmlContent = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<?mso-application progid="Word.Document"?>
+<w:wordDocument xmlns:w="http://schemas.microsoft.com/office/word/2003/wordml"
+                xmlns:v="urn:schemas-microsoft-com:vml"
+                xmlns:w10="urn:schemas-microsoft-com:office:word"
+                xmlns:sl="http://schemas.microsoft.com/schemaLibrary/2003/core"
+                xmlns:aml="http://schemas.microsoft.com/aml/2001/core"
+                xmlns:wx="http://schemas.microsoft.com/office/word/2003/auxHint"
+                xmlns:o="urn:schemas-microsoft-com:office:office"
+                xmlns:dt="uuid:C2F41010-65B3-11d1-A29F-00AA00C14882">
+  <w:body>
+    ${generateWordXml()}
+  </w:body>
+</w:wordDocument>`;
 
-${APP_CONTENT.fullDescription}
-
-═══════════════════════════════════════════════════════════════════════════════
-                               WHAT'S NEW
-═══════════════════════════════════════════════════════════════════════════════
-
-${APP_CONTENT.whatsNew}
-
-═══════════════════════════════════════════════════════════════════════════════
-                            PROMOTIONAL TEXT
-═══════════════════════════════════════════════════════════════════════════════
-
-${APP_CONTENT.promotionalText}
-
-═══════════════════════════════════════════════════════════════════════════════
-                               LINKS & CONTACT
-═══════════════════════════════════════════════════════════════════════════════
-
-Privacy Policy URL: ${APP_CONTENT.privacyPolicyUrl}
-Terms of Service URL: ${APP_CONTENT.termsOfServiceUrl}
-Support URL: ${APP_CONTENT.supportUrl}
-Marketing URL: ${APP_CONTENT.marketingUrl}
-Support Email: ${APP_CONTENT.supportEmail}
-
-═══════════════════════════════════════════════════════════════════════════════
-                              GENERATED ASSETS
-═══════════════════════════════════════════════════════════════════════════════
-
-APP ICONS:
-${organizedAssets.icons.length > 0 
-  ? organizedAssets.icons.map(a => `  • ${a.file_name} (${a.width}x${a.height})\n    URL: ${a.storage_url}`).join('\n')
-  : '  ⚠️ No icons generated yet. Run "Generate App Icons" first.'}
-
-FEATURE GRAPHIC (Android):
-${organizedAssets.featureGraphics.length > 0
-  ? organizedAssets.featureGraphics.map(a => `  • ${a.file_name} (${a.width}x${a.height})\n    URL: ${a.storage_url}`).join('\n')
-  : '  ⚠️ No feature graphic generated yet. Run "Generate Feature Graphic" first.'}
-
-SCREENSHOTS:
-${organizedAssets.screenshots.length > 0
-  ? organizedAssets.screenshots.map(a => `  • ${a.file_name} (${a.width}x${a.height})\n    URL: ${a.storage_url}`).join('\n')
-  : '  ℹ️ Screenshots need to be captured manually from the app.'}
-
-═══════════════════════════════════════════════════════════════════════════════
-                           SUBMISSION CHECKLIST
-═══════════════════════════════════════════════════════════════════════════════
-
-iOS App Store:
-□ App icon 1024x1024
-□ Screenshots for iPhone 6.7" (1290x2796)
-□ Screenshots for iPhone 6.5" (1284x2778)  
-□ Screenshots for iPhone 5.5" (1242x2208)
-□ App name, subtitle, keywords entered
-□ Full description entered
-□ Privacy policy URL added
-□ Support URL added
-□ Content rating questionnaire completed
-
-Google Play Store:
-□ App icon 512x512
-□ Feature graphic 1024x500
-□ Phone screenshots (1080x1920)
-□ Short description (80 chars max)
-□ Full description entered
-□ Privacy policy URL added
-□ Content rating questionnaire completed
-
-═══════════════════════════════════════════════════════════════════════════════
-                              NOTES FOR APPY PIE
-═══════════════════════════════════════════════════════════════════════════════
-
-1. All text content above is ready to copy-paste into app store listings.
-2. Download assets from the URLs provided above.
-3. If any assets are missing, generate them from the SmartyGym admin panel.
-4. For resizing icons to all required sizes, use https://appicon.co/
-5. Contact support@smartygym.com for any questions.
-
-═══════════════════════════════════════════════════════════════════════════════
-                               END OF DOCUMENT
-═══════════════════════════════════════════════════════════════════════════════
-`;
-
-    // Upload the submission sheet as a text file
+    // Upload as Word XML document
     const textEncoder = new TextEncoder();
-    const submissionData = textEncoder.encode(submissionSheet);
-    const fileName = `smartygym-appy-pie-submission-${Date.now()}.txt`;
+    const documentData = textEncoder.encode(wordXmlContent);
+    const fileName = `SmartyGym-AppyPie-Submission-${new Date().toISOString().split('T')[0]}.doc`;
 
     const { data: uploadData, error: uploadError } = await supabase.storage
       .from("app-store-assets")
-      .upload(`packages/${fileName}`, submissionData, {
-        contentType: "text/plain",
+      .upload(`packages/${fileName}`, documentData, {
+        contentType: "application/msword",
         upsert: true
       });
 
@@ -261,7 +212,23 @@ Google Play Store:
         success: true,
         packageUrl: urlData.publicUrl,
         fileName,
-        content: APP_CONTENT,
+        fileType: "doc",
+        content: {
+          appName: settings.app_name,
+          subtitle: settings.subtitle,
+          shortDescription: settings.short_description,
+          keywords: settings.keywords,
+          fullDescription: settings.full_description,
+          whatsNew: settings.whats_new,
+          promotionalText: settings.promotional_text,
+          supportUrl: settings.support_url,
+          marketingUrl: settings.marketing_url,
+          privacyPolicyUrl: settings.privacy_policy_url,
+          termsOfServiceUrl: settings.terms_of_service_url,
+          supportEmail: settings.support_email,
+          category: settings.category,
+          contentRating: settings.content_rating,
+        },
         assets: organizedAssets,
         assetStatus: {
           hasIcons: organizedAssets.icons.length > 0,

@@ -109,9 +109,11 @@ Create a high-quality 1024x1024 app icon suitable for iOS App Store and Google P
 
     // Upload master icon
     const masterFileName = `master-icon-1024.png`;
+    const masterFilePath = `icons/${masterFileName}`;
+    
     const { data: masterUpload, error: masterError } = await supabase.storage
       .from("app-store-assets")
-      .upload(`icons/${masterFileName}`, masterImageData, {
+      .upload(masterFilePath, masterImageData, {
         contentType: "image/png",
         upsert: true
       });
@@ -126,52 +128,61 @@ Create a high-quality 1024x1024 app icon suitable for iOS App Store and Google P
     // Get master icon public URL
     const { data: masterUrlData } = supabase.storage
       .from("app-store-assets")
-      .getPublicUrl(`icons/${masterFileName}`);
+      .getPublicUrl(masterFilePath);
 
-    // Store master icon in database
-    await supabase.from("app_store_assets").upsert({
+    const masterUrl = masterUrlData.publicUrl;
+    console.log("[GENERATE-APP-ICONS] Master icon URL:", masterUrl);
+
+    // Delete existing master icon record first, then insert fresh
+    await supabase.from("app_store_assets").delete().eq("file_path", masterFilePath);
+    
+    const { error: insertError } = await supabase.from("app_store_assets").insert({
       asset_type: "icon",
       platform: "both",
       file_name: masterFileName,
-      file_path: `icons/${masterFileName}`,
+      file_path: masterFilePath,
       width: 1024,
       height: 1024,
-      storage_url: masterUrlData.publicUrl
-    }, { onConflict: "file_path" });
+      storage_url: masterUrl
+    });
+
+    if (insertError) {
+      console.error("[GENERATE-APP-ICONS] Database insert error:", insertError);
+      // Try upsert as fallback
+      const { error: upsertError } = await supabase.from("app_store_assets").upsert({
+        asset_type: "icon",
+        platform: "both",
+        file_name: masterFileName,
+        file_path: masterFilePath,
+        width: 1024,
+        height: 1024,
+        storage_url: masterUrl
+      }, { onConflict: "file_path" });
+      
+      if (upsertError) {
+        console.error("[GENERATE-APP-ICONS] Upsert also failed:", upsertError);
+      }
+    }
+
+    console.log("[GENERATE-APP-ICONS] Master icon saved to database");
 
     // For resizing, we'll store the master and note that external tools can resize
-    // The master 1024x1024 can be used with appicon.co or similar for all sizes
     const generatedAssets = [
       {
         platform: "both",
         size: 1024,
         name: masterFileName,
-        url: masterUrlData.publicUrl,
+        url: masterUrl,
         use: "Master Icon (use appicon.co to generate all sizes)"
       }
     ];
-
-    // Store records for all required sizes (users will use appicon.co to generate)
-    const allSizes = [...ICON_SIZES.ios, ...ICON_SIZES.android];
-    for (const iconSpec of allSizes) {
-      const platform = ICON_SIZES.ios.includes(iconSpec) ? "ios" : "android";
-      await supabase.from("app_store_assets").upsert({
-        asset_type: "icon",
-        platform,
-        file_name: iconSpec.name,
-        file_path: `icons/${iconSpec.name}`,
-        width: iconSpec.size,
-        height: iconSpec.size,
-        storage_url: null // Will be populated when user uploads resized versions
-      }, { onConflict: "file_path" });
-    }
 
     console.log("[GENERATE-APP-ICONS] Icon generation complete!");
 
     return new Response(
       JSON.stringify({
         success: true,
-        masterIcon: masterUrlData.publicUrl,
+        masterIcon: masterUrl,
         generatedAssets,
         message: "Master icon generated! Download it and use appicon.co to generate all required sizes.",
         requiredSizes: {
