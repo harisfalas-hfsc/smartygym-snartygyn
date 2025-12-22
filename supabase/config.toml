@@ -170,3 +170,6 @@ verify_jwt = false
 
 [functions.audit-stripe-images]
 verify_jwt = false
+
+[functions.pull-stripe-images]
+verify_jwt = false
