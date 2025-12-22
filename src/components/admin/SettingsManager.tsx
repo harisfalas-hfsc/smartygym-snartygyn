@@ -389,10 +389,10 @@ export const SettingsManager = () => {
             },
           });
           
-          if (!error && data?.imageUrl) {
+          if (!error && data?.image_url) {
             await supabase
               .from('admin_workouts')
-              .update({ image_url: data.imageUrl })
+              .update({ image_url: data.image_url })
               .eq('id', workout.id);
             generated++;
             
