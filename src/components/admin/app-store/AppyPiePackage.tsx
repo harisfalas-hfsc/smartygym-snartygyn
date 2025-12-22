@@ -166,11 +166,14 @@ export const AppyPiePackage = () => {
                 ].map((item) => (
                   <div
                     key={item.label}
-                    className="flex items-start justify-between p-3 bg-background border rounded-lg text-sm gap-2"
+                    className="flex items-start justify-between p-3 bg-background border rounded-lg text-sm gap-2 w-full overflow-hidden"
                   >
-                    <div className="flex-1 min-w-0 overflow-hidden">
+                    <div className="flex-1 min-w-0 overflow-hidden" style={{ maxWidth: 'calc(100% - 50px)' }}>
                       <span className="text-muted-foreground block mb-1">{item.label}:</span>
-                      <span className="font-medium break-words whitespace-pre-wrap block max-h-24 overflow-y-auto">
+                      <span 
+                        className="font-medium block max-h-24 overflow-y-auto overflow-x-hidden"
+                        style={{ wordBreak: 'break-word', overflowWrap: 'anywhere' }}
+                      >
                         {item.value}
                       </span>
                     </div>

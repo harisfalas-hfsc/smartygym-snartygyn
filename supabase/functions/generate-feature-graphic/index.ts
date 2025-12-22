@@ -37,7 +37,22 @@ serve(async (req) => {
     
     const logoBlob = await logoResponse.blob();
     const logoArrayBuffer = await logoBlob.arrayBuffer();
-    const logoBase64 = btoa(String.fromCharCode(...new Uint8Array(logoArrayBuffer)));
+    
+    // Safe base64 conversion for large images (avoids stack overflow)
+    function arrayBufferToBase64(buffer: ArrayBuffer): string {
+      const bytes = new Uint8Array(buffer);
+      let binary = '';
+      const chunkSize = 8192;
+      for (let i = 0; i < bytes.length; i += chunkSize) {
+        const chunk = bytes.subarray(i, Math.min(i + chunkSize, bytes.length));
+        for (let j = 0; j < chunk.length; j++) {
+          binary += String.fromCharCode(chunk[j]);
+        }
+      }
+      return btoa(binary);
+    }
+    
+    const logoBase64 = arrayBufferToBase64(logoArrayBuffer);
 
     // Generate feature graphic using AI with the actual logo
     console.log("[GENERATE-FEATURE-GRAPHIC] Calling Lovable AI with actual SmartyGym logo...");
