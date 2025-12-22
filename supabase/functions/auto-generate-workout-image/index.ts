@@ -81,16 +81,20 @@ serve(async (req) => {
 - NO heavy weights, NO cardio machines, NO intense gym equipment, NO sweaty high-intensity scenes
 - Show elegant, controlled Pilates poses: planks, leg lifts, spine stretches, reformer exercises`;
     } else if (isRecovery) {
+      // NOTE: Recovery workouts have NO difficulty level - suitable for everyone
       visualDirection = `
-- Show a ${difficultyLabel}-level recovery/regeneration scene that captures the essence of "${workout.name}"
-- Recovery-specific imagery: gentle stretching, breathing exercises, light jogging, mobility work, foam rolling
-- Include appropriate recovery elements: yoga mat, foam roller, stretching bands, peaceful outdoor setting, nature
-- Emphasize: relaxation, mindful movement, gentle stretching, hip mobility, breathing focus, regeneration
+- Show a gentle recovery/regeneration scene that captures the essence of "${workout.name}"
+- PRIMARY FOCUS: Stretching and flexibility - this should be the dominant visual element
+- Recovery-specific imagery: deep stretching poses, breathing exercises, gentle mobility work, foam rolling
+- Light aerobic elements (when shown): easy cycling, light swimming, gentle elliptical, walking outdoors, treadmill walking
+- Include appropriate recovery elements: yoga mat, foam roller, stretching bands, fit ball, peaceful outdoor setting
+- Emphasize: relaxation, mindful stretching, hip mobility, spinal decompression, breathing focus, regeneration
 - Calm, peaceful setting: soft natural light, outdoor nature scene (park, beach, forest), or serene studio
-- Show regenerative activities: light aerobic movement, static stretching, CARs, cat-cow, hip openers, walking
+- Show regenerative activities: static stretching (primary), CARs, cat-cow, hip openers, light movement
 - Soft, calming colors (blues, greens, earth tones, soft neutrals)
+- NO difficulty indicators (Recovery is for everyone, no beginner/intermediate/advanced)
 - NO intense exercises, NO heavy weights, NO high-intensity scenes, NO sweaty or strenuous imagery
-- Show controlled, mindful recovery poses: stretching, breathing, light movement, relaxation`;
+- Show controlled, mindful recovery poses: deep stretches, breathing, gentle mobility`;
     } else {
       visualDirection = `
 - Show a dynamic ${difficultyLabel}-level fitness scene that captures the energy of "${workout.name}"

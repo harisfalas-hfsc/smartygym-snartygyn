@@ -195,20 +195,49 @@ Example: Main Workout = AMRAP, Finisher = Tabata → Workout FORMAT = AMRAP
 ### CATEGORY 7: RECOVERY (NOT IN WOD ROTATION)
 **Goal**: Active recovery, regeneration, restore and prepare the body for future training
 **Format**: MIX ONLY (combination of different modalities)
-**Intensity**: Very low to low - quality and relaxation over effort
+**Intensity**: ALWAYS LOW - suitable for everyone
+**Difficulty**: NOT APPLICABLE - Recovery is ONE workout type suitable for ALL levels (no Beginner/Intermediate/Advanced distinctions)
 
-**Allowed**: 
-- Light aerobic: Easy walking, light jogging, indoor/outdoor cycling at very low intensity
-- Stretching: Static stretches, PNF stretching, passive stretches
-- Mobility: Cat-cow, CARs (Controlled Articular Rotations), scorpions, reverse scorpions
-- Hip work: Hip circles, hip openers, pigeon pose, hip flexor stretches, 90/90 stretches
-- Breathing: Diaphragmatic breathing, box breathing, relaxation protocols
-- Light stability: Dead bugs, bird dogs, gentle core work
-- Self-massage concepts: Foam rolling suggestions, trigger point guidance
+**EQUIPMENT NOTE**: Recovery workouts do NOT follow the "Equipment/No Equipment" distinction. 
+Recovery sessions may use various tools (bicycle, treadmill, fit ball, foam roller, elliptical) but these are NOT traditional gym equipment requirements.
+
+**PRIMARY FOCUS - STRETCHING & MOBILIZATION (ALWAYS FIRST)**:
+- Stretching is the MAIN component of Recovery workouts (but not 100%)
+- Every Recovery session should prioritize stretching and mobilization as the first/primary part
+- Include: Static stretches, PNF stretching, passive stretches, muscle-specific stretching
+- Decompression exercises: spine decompression, hip decompression, hanging variations
+
+**Allowed (EXAMPLES - NOT LIMITED TO)**: 
+- **Light Aerobic (examples, not limited to)**:
+  - Walking, light jogging, indoor/outdoor cycling at very low intensity
+  - Elliptical at low pace, swimming (easy laps), light rowing
+  - Treadmill walking, outdoor walking, any similar low-intensity aerobic activity
+- **Stretching (PRIMARY - always included)**:
+  - Static stretches for all major muscle groups
+  - PNF stretching, passive stretches
+  - Muscle-specific stretching protocols
+- **Mobility (always included)**: 
+  - Cat-cow, CARs (Controlled Articular Rotations)
+  - Scorpions, reverse scorpions, world's greatest stretch
+  - Hip circles, hip openers, 90/90 stretches
+- **Decompression**: 
+  - Spine decompression, hanging, hip decompression exercises
+- **Hip Work**: 
+  - Hip circles, hip openers, pigeon pose, hip flexor stretches
+- **Breathing**: 
+  - Diaphragmatic breathing, box breathing, relaxation protocols
+- **Light Stability**: 
+  - Dead bugs, bird dogs, gentle core work
+- **Self-Massage Concepts**: 
+  - Foam rolling suggestions, trigger point guidance
 
 **FORBIDDEN**: Burpees, Jumps, Sprints, Heavy weights, High-intensity anything, Time pressure, Competitive elements
 
-**Philosophy**: This is like a "Smarty Ritual" or "three phases in one" - combining gentle aerobic, stretching, and mobility in a regenerative flow. Recovery workouts are NOT part of the 7-day WOD rotation cycle.
+**Philosophy**: 
+- This is like a "Smarty Ritual" or "three phases in one" - combining gentle aerobic, stretching, and mobility in a regenerative flow
+- Recovery workouts are NOT part of the 7-day WOD rotation cycle
+- Exercises listed are EXAMPLES - similar low-intensity activities are allowed
+- STRETCHING is the core/primary element of every Recovery session
 
 ## Exercise Variety Rule (Critical)
 
