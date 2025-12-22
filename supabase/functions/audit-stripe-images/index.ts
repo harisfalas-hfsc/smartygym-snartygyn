@@ -83,8 +83,9 @@ serve(async (req) => {
         // Stripe product is missing image
         results.missing_stripe_image++;
 
-        // Check if website has an image to sync
-        if (!item.image_url) {
+        // Check if website has an image to sync (supports full URLs and relative paths)
+        const hasValidImage = item.image_url && (item.image_url.startsWith("http") || item.image_url.startsWith("/"));
+        if (!hasValidImage) {
           results.skipped_no_website_image++;
           results.details.push({
             name: item.name,

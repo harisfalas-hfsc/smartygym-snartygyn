@@ -104,8 +104,14 @@ serve(async (req) => {
       stripeOnlyItems: [],
     };
 
+    // Helper to check if image_url is valid (supports full URLs and relative paths)
+    const hasValidImageUrl = (url: string | null): boolean => {
+      if (!url) return false;
+      return url.startsWith("http") || url.startsWith("/");
+    };
+
     for (const workout of workouts || []) {
-      const hasWebsite = !!workout.image_url && workout.image_url.startsWith("http");
+      const hasWebsite = hasValidImageUrl(workout.image_url);
       const hasStripe = await checkStripeImage(workout.stripe_product_id);
 
       if (hasWebsite) workoutStats.withWebsite++;
@@ -147,7 +153,7 @@ serve(async (req) => {
     };
 
     for (const program of programs || []) {
-      const hasWebsite = !!program.image_url && program.image_url.startsWith("http");
+      const hasWebsite = hasValidImageUrl(program.image_url);
       const hasStripe = await checkStripeImage(program.stripe_product_id);
 
       if (hasWebsite) programStats.withWebsite++;
