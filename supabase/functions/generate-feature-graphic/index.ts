@@ -54,8 +54,8 @@ serve(async (req) => {
     
     const logoBase64 = arrayBufferToBase64(logoArrayBuffer);
 
-    // Generate feature graphic using AI with the actual logo
-    console.log("[GENERATE-FEATURE-GRAPHIC] Calling Lovable AI with actual SmartyGym logo...");
+    // Generate feature graphic using AI - STRICT prompt, no creativity allowed
+    console.log("[GENERATE-FEATURE-GRAPHIC] Calling Lovable AI with STRICT instructions...");
     
     const aiResponse = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
@@ -71,20 +71,22 @@ serve(async (req) => {
             content: [
               {
                 type: "text",
-                text: `Create a Google Play Store feature graphic (promotional banner) using this SmartyGym logo.
+                text: `Create a 1024x500 pixel banner image. Follow these EXACT instructions with NO creative interpretation:
 
-CRITICAL REQUIREMENTS:
-- Exact dimensions: 1024x500 pixels (wide banner format, 2:1 aspect ratio)
-- INCLUDE this exact logo prominently in the design - place it on the left or center
-- Add the text "SmartyGym" next to or below the logo if not already visible
-- Tagline below the name: "Your Gym Re-Imagined Anywhere, Anytime"
-- Background: Professional gradient using the brand color cyan/blue (#0ea5e9) - can fade to darker blue or black
-- Professional, modern, energetic fitness brand aesthetic
-- Text must be clearly readable
-- Use abstract fitness elements (geometric shapes, energy lines, motion effects) - NO photos of people
-- Safe zone: Keep important content in the center 50% (edges may be cropped)
+MANDATORY - DO NOT DEVIATE:
+1. Background: Simple gradient from #0ea5e9 (cyan) on the left to #1e3a5f (dark blue) on the right
+2. Place the PROVIDED logo image EXACTLY as-is in the center-left area - DO NOT redraw, redesign, or modify the logo in ANY way
+3. To the right of the logo, add text "SMARTY GYM" in white, bold, clean sans-serif font
+4. Below that, add "Your Gym Re-Imagined Anywhere, Anytime" in smaller white text
 
-Create a 1024x500 feature graphic that prominently features the SmartyGym logo and brand identity.`
+STRICTLY FORBIDDEN:
+- DO NOT redesign or redraw the logo
+- DO NOT add any abstract elements, shapes, or decorations
+- DO NOT add people, equipment, or fitness imagery
+- DO NOT add gradients, glows, or effects to the logo
+- DO NOT be creative - follow instructions EXACTLY
+
+The logo I'm providing must appear UNCHANGED in the final image. Just place it on the gradient background with the text.`
               },
               {
                 type: "image_url",
