@@ -1003,8 +1003,10 @@ export const SettingsManager = () => {
                       {checkImageStatusLoading ? "Checking..." : "Check Status"}
                     </Button>
                     {checkImageStatusResult && (
-                      <div className="text-xs space-y-2 pt-2 border-t border-cyan-200 dark:border-cyan-800">
+                      <div className="text-xs space-y-2 pt-2 border-t border-cyan-200 dark:border-cyan-800 max-h-96 overflow-y-auto">
                         <div className="font-medium">📊 STATUS REPORT</div>
+                        
+                        {/* Workouts Section */}
                         <div className="space-y-1">
                           <div><strong>Workouts ({checkImageStatusResult.workouts?.total}):</strong></div>
                           <ul className="pl-3 space-y-0.5 text-muted-foreground">
@@ -1013,7 +1015,41 @@ export const SettingsManager = () => {
                             <li>⚠️ Stripe only: {checkImageStatusResult.workouts?.stripeOnly}</li>
                             <li>❌ No image: {checkImageStatusResult.workouts?.withNeither}</li>
                           </ul>
+                          
+                          {/* Workout Details */}
+                          {checkImageStatusResult.workouts?.noImageItems?.length > 0 && (
+                            <details className="pl-3 mt-1">
+                              <summary className="cursor-pointer text-red-600 font-medium">❌ Missing images ({checkImageStatusResult.workouts.noImageItems.length}):</summary>
+                              <ul className="pl-3 mt-1 space-y-0.5">
+                                {checkImageStatusResult.workouts.noImageItems.map((item: any, i: number) => (
+                                  <li key={i} className="text-red-600/80">• {item.name} <span className="text-muted-foreground">({item.category})</span></li>
+                                ))}
+                              </ul>
+                            </details>
+                          )}
+                          {checkImageStatusResult.workouts?.websiteOnlyItems?.length > 0 && (
+                            <details className="pl-3 mt-1">
+                              <summary className="cursor-pointer text-amber-600 font-medium">⚠️ Website only ({checkImageStatusResult.workouts.websiteOnlyItems.length}):</summary>
+                              <ul className="pl-3 mt-1 space-y-0.5">
+                                {checkImageStatusResult.workouts.websiteOnlyItems.map((item: any, i: number) => (
+                                  <li key={i} className="text-amber-600/80">• {item.name} <span className="text-muted-foreground">({item.category})</span></li>
+                                ))}
+                              </ul>
+                            </details>
+                          )}
+                          {checkImageStatusResult.workouts?.stripeOnlyItems?.length > 0 && (
+                            <details className="pl-3 mt-1">
+                              <summary className="cursor-pointer text-amber-600 font-medium">⚠️ Stripe only ({checkImageStatusResult.workouts.stripeOnlyItems.length}):</summary>
+                              <ul className="pl-3 mt-1 space-y-0.5">
+                                {checkImageStatusResult.workouts.stripeOnlyItems.map((item: any, i: number) => (
+                                  <li key={i} className="text-amber-600/80">• {item.name} <span className="text-muted-foreground">({item.category})</span></li>
+                                ))}
+                              </ul>
+                            </details>
+                          )}
                         </div>
+                        
+                        {/* Programs Section */}
                         <div className="space-y-1">
                           <div><strong>Programs ({checkImageStatusResult.programs?.total}):</strong></div>
                           <ul className="pl-3 space-y-0.5 text-muted-foreground">
@@ -1022,7 +1058,55 @@ export const SettingsManager = () => {
                             <li>⚠️ Stripe only: {checkImageStatusResult.programs?.stripeOnly}</li>
                             <li>❌ No image: {checkImageStatusResult.programs?.withNeither}</li>
                           </ul>
+                          
+                          {/* Program Details */}
+                          {checkImageStatusResult.programs?.noImageItems?.length > 0 && (
+                            <details className="pl-3 mt-1">
+                              <summary className="cursor-pointer text-red-600 font-medium">❌ Missing images ({checkImageStatusResult.programs.noImageItems.length}):</summary>
+                              <ul className="pl-3 mt-1 space-y-0.5">
+                                {checkImageStatusResult.programs.noImageItems.map((item: any, i: number) => (
+                                  <li key={i} className="text-red-600/80">• {item.name} <span className="text-muted-foreground">({item.category})</span></li>
+                                ))}
+                              </ul>
+                            </details>
+                          )}
+                          {checkImageStatusResult.programs?.websiteOnlyItems?.length > 0 && (
+                            <details className="pl-3 mt-1">
+                              <summary className="cursor-pointer text-amber-600 font-medium">⚠️ Website only ({checkImageStatusResult.programs.websiteOnlyItems.length}):</summary>
+                              <ul className="pl-3 mt-1 space-y-0.5">
+                                {checkImageStatusResult.programs.websiteOnlyItems.map((item: any, i: number) => (
+                                  <li key={i} className="text-amber-600/80">• {item.name} <span className="text-muted-foreground">({item.category})</span></li>
+                                ))}
+                              </ul>
+                            </details>
+                          )}
+                          {checkImageStatusResult.programs?.stripeOnlyItems?.length > 0 && (
+                            <details className="pl-3 mt-1">
+                              <summary className="cursor-pointer text-amber-600 font-medium">⚠️ Stripe only ({checkImageStatusResult.programs.stripeOnlyItems.length}):</summary>
+                              <ul className="pl-3 mt-1 space-y-0.5">
+                                {checkImageStatusResult.programs.stripeOnlyItems.map((item: any, i: number) => (
+                                  <li key={i} className="text-amber-600/80">• {item.name} <span className="text-muted-foreground">({item.category})</span></li>
+                                ))}
+                              </ul>
+                            </details>
+                          )}
                         </div>
+                        
+                        {/* Orphaned Stripe Products */}
+                        {checkImageStatusResult.orphanedProducts?.length > 0 && (
+                          <div className="space-y-1 pt-1 border-t border-cyan-200 dark:border-cyan-800">
+                            <details>
+                              <summary className="cursor-pointer text-purple-600 font-medium">🔮 Orphaned Stripe Products ({checkImageStatusResult.orphanedProducts.length}):</summary>
+                              <ul className="pl-3 mt-1 space-y-0.5">
+                                {checkImageStatusResult.orphanedProducts.map((item: any, i: number) => (
+                                  <li key={i} className="text-purple-600/80">• {item.name} <span className="text-muted-foreground">({item.id})</span></li>
+                                ))}
+                              </ul>
+                            </details>
+                          </div>
+                        )}
+                        
+                        {/* Recommendations */}
                         {checkImageStatusResult.recommendations?.length > 0 && (
                           <div className="pt-1 border-t border-cyan-200 dark:border-cyan-800">
                             <div className="font-medium">💡 RECOMMENDATIONS:</div>

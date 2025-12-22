@@ -12,6 +12,26 @@ function logStep(step: string, details?: any) {
   console.log(`[CHECK-IMAGE-STATUS] ${step}${detailsStr}`);
 }
 
+interface ItemDetail {
+  name: string;
+  id: string;
+  category: string;
+  stripeProductId?: string;
+}
+
+interface CategoryStats {
+  total: number;
+  withWebsite: number;
+  withStripe: number;
+  withBoth: number;
+  withNeither: number;
+  websiteOnly: number;
+  stripeOnly: number;
+  noImageItems: ItemDetail[];
+  websiteOnlyItems: ItemDetail[];
+  stripeOnlyItems: ItemDetail[];
+}
+
 serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
@@ -32,7 +52,7 @@ serve(async (req) => {
     // Fetch all visible workouts
     const { data: workouts, error: workoutsError } = await supabase
       .from("admin_workouts")
-      .select("id, name, image_url, stripe_product_id, is_visible")
+      .select("id, name, image_url, stripe_product_id, is_visible, category")
       .eq("is_visible", true);
 
     if (workoutsError) throw new Error(`Failed to fetch workouts: ${workoutsError.message}`);
@@ -40,27 +60,38 @@ serve(async (req) => {
     // Fetch all visible programs
     const { data: programs, error: programsError } = await supabase
       .from("admin_training_programs")
-      .select("id, name, image_url, stripe_product_id, is_visible")
+      .select("id, name, image_url, stripe_product_id, is_visible, category")
       .eq("is_visible", true);
 
     if (programsError) throw new Error(`Failed to fetch programs: ${programsError.message}`);
 
     logStep("Fetched data", { workouts: workouts?.length || 0, programs: programs?.length || 0 });
 
-    // Check Stripe images for each item
+    // Cache Stripe product image status to reduce API calls
+    const stripeImageCache: Map<string, boolean> = new Map();
+    
     const checkStripeImage = async (stripeProductId: string | null): Promise<boolean> => {
       if (!stripeProductId) return false;
+      
+      // Check cache first
+      if (stripeImageCache.has(stripeProductId)) {
+        return stripeImageCache.get(stripeProductId)!;
+      }
+      
       try {
         const product = await stripe.products.retrieve(stripeProductId);
-        return product.images && product.images.length > 0;
+        const hasImage = product.images && product.images.length > 0;
+        stripeImageCache.set(stripeProductId, hasImage);
+        return hasImage;
       } catch (e) {
         console.error(`Failed to check Stripe product ${stripeProductId}:`, e);
+        stripeImageCache.set(stripeProductId, false);
         return false;
       }
     };
 
     // Process workouts
-    const workoutStats = {
+    const workoutStats: CategoryStats = {
       total: workouts?.length || 0,
       withWebsite: 0,
       withStripe: 0,
@@ -68,7 +99,9 @@ serve(async (req) => {
       withNeither: 0,
       websiteOnly: 0,
       stripeOnly: 0,
-      missingDetails: [] as { name: string; hasWebsite: boolean; hasStripe: boolean }[]
+      noImageItems: [],
+      websiteOnlyItems: [],
+      stripeOnlyItems: [],
     };
 
     for (const workout of workouts || []) {
@@ -77,23 +110,30 @@ serve(async (req) => {
 
       if (hasWebsite) workoutStats.withWebsite++;
       if (hasStripe) workoutStats.withStripe++;
-      if (hasWebsite && hasStripe) workoutStats.withBoth++;
-      if (!hasWebsite && !hasStripe) {
+      
+      const itemDetail: ItemDetail = {
+        name: workout.name,
+        id: workout.id,
+        category: workout.category || 'Unknown',
+        stripeProductId: workout.stripe_product_id || undefined,
+      };
+
+      if (hasWebsite && hasStripe) {
+        workoutStats.withBoth++;
+      } else if (!hasWebsite && !hasStripe) {
         workoutStats.withNeither++;
-        workoutStats.missingDetails.push({ name: workout.name, hasWebsite, hasStripe });
-      }
-      if (hasWebsite && !hasStripe) {
+        workoutStats.noImageItems.push(itemDetail);
+      } else if (hasWebsite && !hasStripe) {
         workoutStats.websiteOnly++;
-        workoutStats.missingDetails.push({ name: workout.name, hasWebsite, hasStripe });
-      }
-      if (!hasWebsite && hasStripe) {
+        workoutStats.websiteOnlyItems.push(itemDetail);
+      } else if (!hasWebsite && hasStripe) {
         workoutStats.stripeOnly++;
-        workoutStats.missingDetails.push({ name: workout.name, hasWebsite, hasStripe });
+        workoutStats.stripeOnlyItems.push(itemDetail);
       }
     }
 
     // Process programs
-    const programStats = {
+    const programStats: CategoryStats = {
       total: programs?.length || 0,
       withWebsite: 0,
       withStripe: 0,
@@ -101,7 +141,9 @@ serve(async (req) => {
       withNeither: 0,
       websiteOnly: 0,
       stripeOnly: 0,
-      missingDetails: [] as { name: string; hasWebsite: boolean; hasStripe: boolean }[]
+      noImageItems: [],
+      websiteOnlyItems: [],
+      stripeOnlyItems: [],
     };
 
     for (const program of programs || []) {
@@ -110,19 +152,64 @@ serve(async (req) => {
 
       if (hasWebsite) programStats.withWebsite++;
       if (hasStripe) programStats.withStripe++;
-      if (hasWebsite && hasStripe) programStats.withBoth++;
-      if (!hasWebsite && !hasStripe) {
+
+      const itemDetail: ItemDetail = {
+        name: program.name,
+        id: program.id,
+        category: program.category || 'Unknown',
+        stripeProductId: program.stripe_product_id || undefined,
+      };
+
+      if (hasWebsite && hasStripe) {
+        programStats.withBoth++;
+      } else if (!hasWebsite && !hasStripe) {
         programStats.withNeither++;
-        programStats.missingDetails.push({ name: program.name, hasWebsite, hasStripe });
-      }
-      if (hasWebsite && !hasStripe) {
+        programStats.noImageItems.push(itemDetail);
+      } else if (hasWebsite && !hasStripe) {
         programStats.websiteOnly++;
-        programStats.missingDetails.push({ name: program.name, hasWebsite, hasStripe });
-      }
-      if (!hasWebsite && hasStripe) {
+        programStats.websiteOnlyItems.push(itemDetail);
+      } else if (!hasWebsite && hasStripe) {
         programStats.stripeOnly++;
-        programStats.missingDetails.push({ name: program.name, hasWebsite, hasStripe });
+        programStats.stripeOnlyItems.push(itemDetail);
       }
+    }
+
+    // Check for orphaned Stripe products (products in Stripe but not in database)
+    logStep("Checking for orphaned Stripe products");
+    const orphanedProducts: { id: string; name: string; type: string }[] = [];
+    
+    try {
+      // Get all Stripe products with our metadata
+      const stripeProducts = await stripe.products.list({ 
+        limit: 100,
+        active: true 
+      });
+      
+      // Get all database IDs
+      const workoutIds = new Set((workouts || []).map(w => w.stripe_product_id).filter(Boolean));
+      const programIds = new Set((programs || []).map(p => p.stripe_product_id).filter(Boolean));
+      const allDbStripeIds = new Set([...workoutIds, ...programIds]);
+      
+      // Find orphaned products (in Stripe but not in DB)
+      for (const product of stripeProducts.data) {
+        // Check if product looks like one of ours (has workout/program naming pattern)
+        const isLikelyOurs = product.metadata?.type === 'workout' || 
+                            product.metadata?.type === 'program' ||
+                            product.name.toLowerCase().includes('workout') ||
+                            product.name.toLowerCase().includes('program');
+        
+        if (isLikelyOurs && !allDbStripeIds.has(product.id)) {
+          orphanedProducts.push({
+            id: product.id,
+            name: product.name,
+            type: product.metadata?.type || 'unknown'
+          });
+        }
+      }
+      
+      logStep("Orphaned products check complete", { found: orphanedProducts.length });
+    } catch (e) {
+      console.error("Failed to check for orphaned Stripe products:", e);
     }
 
     // Generate recommendations
@@ -143,13 +230,18 @@ serve(async (req) => {
       recommendations.push(`Run "Pull from Stripe" to download ${count} image(s) to website`);
     }
 
+    if (orphanedProducts.length > 0) {
+      recommendations.push(`Found ${orphanedProducts.length} orphaned Stripe product(s) - may need cleanup`);
+    }
+
     if (recommendations.length === 0) {
       recommendations.push("All images are synced! No action needed.");
     }
 
     logStep("Check complete", { 
-      workouts: workoutStats, 
-      programs: programStats,
+      workouts: { ...workoutStats, noImageItems: workoutStats.noImageItems.length },
+      programs: { ...programStats, noImageItems: programStats.noImageItems.length },
+      orphanedProducts: orphanedProducts.length,
       recommendations 
     });
 
@@ -158,6 +250,7 @@ serve(async (req) => {
         success: true,
         workouts: workoutStats,
         programs: programStats,
+        orphanedProducts,
         recommendations,
         summary: {
           totalItems: workoutStats.total + programStats.total,
