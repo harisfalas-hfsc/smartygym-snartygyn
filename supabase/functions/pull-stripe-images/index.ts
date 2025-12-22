@@ -35,33 +35,43 @@ serve(async (req) => {
     const stripe = new Stripe(stripeKey, { apiVersion: "2023-10-16" });
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
-    // Fetch workouts with stripe_product_id but NO image_url
+    // Fetch workouts with stripe_product_id
     const { data: workouts, error: workoutsError } = await supabase
       .from("admin_workouts")
       .select("id, name, stripe_product_id, image_url")
-      .not("stripe_product_id", "is", null)
-      .or("image_url.is.null,image_url.eq.");
+      .not("stripe_product_id", "is", null);
+    
+    // Helper to check if image_url is valid (supports full URLs and relative paths)
+    const hasValidImageUrl = (url: string | null): boolean => {
+      if (!url) return false;
+      return url.startsWith("http") || url.startsWith("/");
+    };
+    
+    // Filter to only items missing valid website images
+    const workoutsMissingImages = (workouts || []).filter(w => !hasValidImageUrl(w.image_url));
 
     if (workoutsError) {
       logStep("Error fetching workouts", { error: workoutsError });
       throw workoutsError;
     }
 
-    // Fetch programs with stripe_product_id but NO image_url
+    // Fetch programs with stripe_product_id
     const { data: programs, error: programsError } = await supabase
       .from("admin_training_programs")
       .select("id, name, stripe_product_id, image_url")
-      .not("stripe_product_id", "is", null)
-      .or("image_url.is.null,image_url.eq.");
+      .not("stripe_product_id", "is", null);
 
     if (programsError) {
       logStep("Error fetching programs", { error: programsError });
       throw programsError;
     }
+    
+    // Filter to only items missing valid website images
+    const programsMissingImages = (programs || []).filter(p => !hasValidImageUrl(p.image_url));
 
     logStep("Found items missing website images", {
-      workouts: workouts?.length || 0,
-      programs: programs?.length || 0,
+      workouts: workoutsMissingImages.length,
+      programs: programsMissingImages.length,
     });
 
     const results = {
@@ -70,8 +80,8 @@ serve(async (req) => {
       errors: [] as string[],
     };
 
-    // Process workouts
-    for (const workout of workouts || []) {
+    // Process workouts missing images
+    for (const workout of workoutsMissingImages) {
       if (!workout.stripe_product_id) continue;
       
       try {
@@ -139,8 +149,8 @@ serve(async (req) => {
       }
     }
 
-    // Process programs
-    for (const program of programs || []) {
+    // Process programs missing images
+    for (const program of programsMissingImages) {
       if (!program.stripe_product_id) continue;
       
       try {
