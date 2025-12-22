@@ -351,17 +351,17 @@ export const SettingsManager = () => {
   };
 
   const handleGenerateMissingImages = async () => {
-    if (!confirm("This will generate AI images for workouts that don't have one. This may take several minutes. Continue?")) {
+    if (!confirm("This will generate AI images for workouts that don't have one and sync them to Stripe. This may take several minutes. Continue?")) {
       return;
     }
     
     setGenerateImagesLoading(true);
     setGenerateImagesResult(null);
     try {
-      // First, find workouts without images
+      // First, find workouts without images (include stripe_product_id for syncing)
       const { data: workoutsWithoutImages, error: fetchError } = await supabase
         .from('admin_workouts')
-        .select('id, name, category, format, difficulty_stars')
+        .select('id, name, category, format, difficulty_stars, stripe_product_id')
         .is('image_url', null)
         .limit(5); // Process 5 at a time to avoid timeouts
       
@@ -377,6 +377,7 @@ export const SettingsManager = () => {
       }
 
       let generated = 0;
+      let synced = 0;
       for (const workout of workoutsWithoutImages) {
         try {
           const { data, error } = await supabase.functions.invoke('generate-workout-image', {
@@ -394,16 +395,27 @@ export const SettingsManager = () => {
               .update({ image_url: data.imageUrl })
               .eq('id', workout.id);
             generated++;
+            
+            // If workout has a Stripe product, sync the image to Stripe
+            if (workout.stripe_product_id) {
+              try {
+                await supabase.functions.invoke('sync-stripe-images');
+                synced++;
+              } catch (syncErr) {
+                console.error(`Failed to sync image to Stripe for ${workout.name}:`, syncErr);
+              }
+            }
           }
         } catch (e) {
           console.error(`Failed to generate image for ${workout.name}:`, e);
         }
       }
 
-      setGenerateImagesResult(`Generated ${generated} of ${workoutsWithoutImages.length} images`);
+      const stripeMsg = synced > 0 ? ` Synced ${synced} to Stripe.` : '';
+      setGenerateImagesResult(`Generated ${generated} of ${workoutsWithoutImages.length} images.${stripeMsg}`);
       toast({
         title: "Image Generation Complete",
-        description: `Generated ${generated} images. ${workoutsWithoutImages.length - generated > 0 ? `${workoutsWithoutImages.length - generated} failed.` : ''}`,
+        description: `Generated ${generated} images.${stripeMsg}${workoutsWithoutImages.length - generated > 0 ? ` ${workoutsWithoutImages.length - generated} failed.` : ''}`,
       });
     } catch (error: any) {
       toast({
