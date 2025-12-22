@@ -18,6 +18,7 @@ const getCategoryColor = (category: string | null) => {
   if (cat.includes("stability")) return "text-teal-600 dark:text-teal-400";
   if (cat.includes("metabolic")) return "text-amber-600 dark:text-amber-400";
   if (cat.includes("pilates")) return "text-rose-500 dark:text-rose-400";
+  if (cat.includes("recovery")) return "text-cyan-600 dark:text-cyan-400";
   return "text-red-600 dark:text-red-400";
 };
 import { AccessGate } from "@/components/AccessGate";
@@ -124,7 +125,8 @@ const WorkoutDetail = () => {
     "cardio": "CARDIO",
     "mobility": "MOBILITY & STABILITY",
     "challenge": "CHALLENGE",
-    "pilates": "PILATES"
+    "pilates": "PILATES",
+    "recovery": "RECOVERY"
   };
 
   const workoutTitles: { [key: string]: string } = {
@@ -134,7 +136,8 @@ const WorkoutDetail = () => {
     "cardio": "Cardio Workouts",
     "mobility": "Mobility & Stability Workouts",
     "challenge": "Challenge Workouts",
-    "pilates": "Pilates Workouts"
+    "pilates": "Pilates Workouts",
+    "recovery": "Recovery Workouts"
   };
 
   const handleWorkoutClick = (workoutId: string) => {

@@ -64,6 +64,7 @@ serve(async (req) => {
 
     // Check if this is a Pilates workout for specialized imagery
     const isPilates = workout.category?.toUpperCase() === "PILATES";
+    const isRecovery = workout.category?.toUpperCase() === "RECOVERY";
 
     // Create category-specific visual direction
     let visualDirection: string;
@@ -79,6 +80,17 @@ serve(async (req) => {
 - Clean, soft, neutral colors (white, beige, light grey, soft pastels)
 - NO heavy weights, NO cardio machines, NO intense gym equipment, NO sweaty high-intensity scenes
 - Show elegant, controlled Pilates poses: planks, leg lifts, spine stretches, reformer exercises`;
+    } else if (isRecovery) {
+      visualDirection = `
+- Show a ${difficultyLabel}-level recovery/regeneration scene that captures the essence of "${workout.name}"
+- Recovery-specific imagery: gentle stretching, breathing exercises, light jogging, mobility work, foam rolling
+- Include appropriate recovery elements: yoga mat, foam roller, stretching bands, peaceful outdoor setting, nature
+- Emphasize: relaxation, mindful movement, gentle stretching, hip mobility, breathing focus, regeneration
+- Calm, peaceful setting: soft natural light, outdoor nature scene (park, beach, forest), or serene studio
+- Show regenerative activities: light aerobic movement, static stretching, CARs, cat-cow, hip openers, walking
+- Soft, calming colors (blues, greens, earth tones, soft neutrals)
+- NO intense exercises, NO heavy weights, NO high-intensity scenes, NO sweaty or strenuous imagery
+- Show controlled, mindful recovery poses: stretching, breathing, light movement, relaxation`;
     } else {
       visualDirection = `
 - Show a dynamic ${difficultyLabel}-level fitness scene that captures the energy of "${workout.name}"

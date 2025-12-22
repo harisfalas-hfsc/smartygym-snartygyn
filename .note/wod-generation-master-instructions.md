@@ -192,6 +192,24 @@ Example: Main Workout = AMRAP, Finisher = Tabata → Workout FORMAT = AMRAP
 
 **FORBIDDEN**: Mobility exercises, Slow technical lifts, Low-intensity movements
 
+### CATEGORY 7: RECOVERY (NOT IN WOD ROTATION)
+**Goal**: Active recovery, regeneration, restore and prepare the body for future training
+**Format**: MIX ONLY (combination of different modalities)
+**Intensity**: Very low to low - quality and relaxation over effort
+
+**Allowed**: 
+- Light aerobic: Easy walking, light jogging, indoor/outdoor cycling at very low intensity
+- Stretching: Static stretches, PNF stretching, passive stretches
+- Mobility: Cat-cow, CARs (Controlled Articular Rotations), scorpions, reverse scorpions
+- Hip work: Hip circles, hip openers, pigeon pose, hip flexor stretches, 90/90 stretches
+- Breathing: Diaphragmatic breathing, box breathing, relaxation protocols
+- Light stability: Dead bugs, bird dogs, gentle core work
+- Self-massage concepts: Foam rolling suggestions, trigger point guidance
+
+**FORBIDDEN**: Burpees, Jumps, Sprints, Heavy weights, High-intensity anything, Time pressure, Competitive elements
+
+**Philosophy**: This is like a "Smarty Ritual" or "three phases in one" - combining gentle aerobic, stretching, and mobility in a regenerative flow. Recovery workouts are NOT part of the 7-day WOD rotation cycle.
+
 ## Exercise Variety Rule (Critical)
 
 The exercise banks listed above are **EXAMPLES and GUIDELINES**, NOT strict limitations.
