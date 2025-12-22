@@ -8,7 +8,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
-import { Settings, Bell, Mail, Database, Shield, Download, HeartPulse, Wrench, Image, RefreshCw, Search, ImagePlus, Send, Trash2 } from "lucide-react";
+import { Settings, Bell, Mail, Database, Shield, Download, HeartPulse, Wrench, Image, RefreshCw, Search, ImagePlus, Send, Trash2, ShoppingCart } from "lucide-react";
 import { SystemHealthAudit } from "./SystemHealthAudit";
 
 export const SettingsManager = () => {
@@ -54,6 +54,8 @@ export const SettingsManager = () => {
   const [reengagementResult, setReengagementResult] = useState<string | null>(null);
   const [cleanupRateLimitsLoading, setCleanupRateLimitsLoading] = useState(false);
   const [cleanupRateLimitsResult, setCleanupRateLimitsResult] = useState<string | null>(null);
+  const [auditStripeImagesLoading, setAuditStripeImagesLoading] = useState(false);
+  const [auditStripeImagesResult, setAuditStripeImagesResult] = useState<string | null>(null);
 
   // Load inactivity timeout on mount
   useEffect(() => {
@@ -491,6 +493,35 @@ export const SettingsManager = () => {
     }
   };
 
+  const handleAuditStripeImages = async () => {
+    if (!confirm("This will check all Stripe products for missing images and automatically sync website images to Stripe. Continue?")) {
+      return;
+    }
+    
+    setAuditStripeImagesLoading(true);
+    setAuditStripeImagesResult(null);
+    try {
+      const { data, error } = await supabase.functions.invoke('audit-stripe-images');
+      
+      if (error) throw error;
+
+      const result = `${data.total} products checked: ${data.synced} synced, ${data.already_has_image} already had images, ${data.skipped_no_website_image} skipped (no website image)`;
+      setAuditStripeImagesResult(result);
+      toast({
+        title: "Stripe Image Audit Complete",
+        description: `Synced ${data.synced} images to Stripe.`,
+      });
+    } catch (error: any) {
+      toast({
+        title: "Audit Failed",
+        description: error.message || "Failed to audit Stripe images.",
+        variant: "destructive",
+      });
+    } finally {
+      setAuditStripeImagesLoading(false);
+    }
+  };
+
   return (
     <div className="pt-6 space-y-6 w-full overflow-x-hidden">
       <Tabs defaultValue="general" className="w-full">
@@ -704,6 +735,29 @@ export const SettingsManager = () => {
                     </Button>
                     {syncImagesResult && (
                       <p className="text-xs text-green-600">✅ {syncImagesResult}</p>
+                    )}
+                  </div>
+
+                  {/* Audit Stripe Images */}
+                  <div className="p-4 border rounded-lg space-y-3">
+                    <div className="flex items-center gap-2">
+                      <ShoppingCart className="h-5 w-5 text-indigo-500" />
+                      <h4 className="font-medium text-sm">Audit Stripe Images</h4>
+                    </div>
+                    <p className="text-xs text-muted-foreground">
+                      Find Stripe products missing images & auto-sync from website
+                    </p>
+                    <Button 
+                      onClick={handleAuditStripeImages} 
+                      disabled={auditStripeImagesLoading}
+                      variant="outline"
+                      size="sm"
+                      className="w-full"
+                    >
+                      {auditStripeImagesLoading ? "Auditing..." : "Audit & Sync"}
+                    </Button>
+                    {auditStripeImagesResult && (
+                      <p className="text-xs text-green-600">✅ {auditStripeImagesResult}</p>
                     )}
                   </div>
 
