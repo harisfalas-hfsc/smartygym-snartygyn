@@ -128,8 +128,9 @@ Create a 1024x500 feature graphic that prominently features the SmartyGym logo a
     const base64Data = base64Match[1];
     const imageData = Uint8Array.from(atob(base64Data), c => c.charCodeAt(0));
 
-    // Upload feature graphic
-    const fileName = `feature-graphic-1024x500.png`;
+    // Upload feature graphic with timestamp to bust cache
+    const timestamp = Date.now();
+    const fileName = `feature-graphic-1024x500-${timestamp}.png`;
     const filePath = `graphics/${fileName}`;
     
     const { data: uploadData, error: uploadError } = await supabase.storage

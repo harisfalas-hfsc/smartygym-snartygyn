@@ -145,8 +145,9 @@ Just reformat the logo as an app icon with proper background and padding. Do NOT
     const base64Data = base64Match[1];
     const masterImageData = Uint8Array.from(atob(base64Data), c => c.charCodeAt(0));
 
-    // Upload master icon
-    const masterFileName = `master-icon-1024.png`;
+    // Upload master icon with timestamp to bust cache
+    const timestamp = Date.now();
+    const masterFileName = `master-icon-1024-${timestamp}.png`;
     const masterFilePath = `icons/${masterFileName}`;
     
     const { data: masterUpload, error: masterError } = await supabase.storage
