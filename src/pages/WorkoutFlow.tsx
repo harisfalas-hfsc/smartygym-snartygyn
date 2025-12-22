@@ -121,8 +121,8 @@ const WorkoutFlow = () => {
     title: "Recovery",
     description: "Regeneration and active recovery workouts",
     icon: RefreshCw,
-    level: "Beginner-Intermediate",
-    equipment: "Minimal/No Equipment"
+    level: "All Levels",
+    equipment: "Various"
   }];
 
   const handleWorkoutSelect = (workoutId: string) => {
