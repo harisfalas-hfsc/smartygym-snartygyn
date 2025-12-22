@@ -1,0 +1,198 @@
+import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2.57.2";
+
+const corsHeaders = {
+  "Access-Control-Allow-Origin": "*",
+  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
+};
+
+// Icon sizes for iOS and Android
+const ICON_SIZES = {
+  ios: [
+    { size: 1024, name: "ios-app-store-1024.png", use: "App Store" },
+    { size: 180, name: "ios-iphone-3x-180.png", use: "iPhone @3x" },
+    { size: 120, name: "ios-iphone-2x-120.png", use: "iPhone @2x" },
+    { size: 167, name: "ios-ipad-pro-167.png", use: "iPad Pro" },
+    { size: 152, name: "ios-ipad-2x-152.png", use: "iPad @2x" },
+    { size: 76, name: "ios-ipad-1x-76.png", use: "iPad @1x" },
+  ],
+  android: [
+    { size: 512, name: "android-play-store-512.png", use: "Play Store" },
+    { size: 192, name: "android-xxxhdpi-192.png", use: "xxxhdpi" },
+    { size: 144, name: "android-xxhdpi-144.png", use: "xxhdpi" },
+    { size: 96, name: "android-xhdpi-96.png", use: "xhdpi" },
+    { size: 72, name: "android-hdpi-72.png", use: "hdpi" },
+    { size: 48, name: "android-mdpi-48.png", use: "mdpi" },
+  ],
+};
+
+serve(async (req) => {
+  if (req.method === "OPTIONS") {
+    return new Response(null, { headers: corsHeaders });
+  }
+
+  try {
+    console.log("[GENERATE-APP-ICONS] Starting icon generation...");
+
+    const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
+    if (!LOVABLE_API_KEY) {
+      throw new Error("LOVABLE_API_KEY is not configured");
+    }
+
+    const supabase = createClient(
+      Deno.env.get("SUPABASE_URL") ?? "",
+      Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? ""
+    );
+
+    // Generate master icon using AI
+    console.log("[GENERATE-APP-ICONS] Calling Lovable AI to generate master icon...");
+    
+    const aiResponse = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${LOVABLE_API_KEY}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        model: "google/gemini-2.5-flash-image-preview",
+        messages: [
+          {
+            role: "user",
+            content: `Generate a professional mobile app icon for a fitness app called "SmartyGym". 
+
+Requirements:
+- Square format, perfect for app stores (will be resized to various sizes)
+- Clean, modern design with bold colors
+- Should feature a stylized "S" or "SG" monogram, or a fitness-related icon (dumbbell, person exercising)
+- Primary colors: vibrant blue/cyan (#0ea5e9) with accents of white or gold
+- Solid background (no transparency) - this is CRITICAL for app stores
+- No text - just the icon/symbol
+- Professional, recognizable at small sizes
+- Gradient or solid fill, no complex details that get lost when small
+- Style: modern, energetic, premium fitness brand
+
+Create a high-quality 1024x1024 app icon suitable for iOS App Store and Google Play Store.`
+          }
+        ],
+        modalities: ["image", "text"]
+      }),
+    });
+
+    if (!aiResponse.ok) {
+      const errorText = await aiResponse.text();
+      console.error("[GENERATE-APP-ICONS] AI API error:", errorText);
+      
+      if (aiResponse.status === 429) {
+        throw new Error("Rate limit exceeded. Please try again in a few minutes.");
+      }
+      if (aiResponse.status === 402) {
+        throw new Error("AI credits required. Please add credits to continue.");
+      }
+      throw new Error(`AI generation failed: ${aiResponse.status}`);
+    }
+
+    const aiData = await aiResponse.json();
+    console.log("[GENERATE-APP-ICONS] AI response received");
+
+    const imageUrl = aiData.choices?.[0]?.message?.images?.[0]?.image_url?.url;
+    if (!imageUrl) {
+      throw new Error("No image generated from AI");
+    }
+
+    // Extract base64 data
+    const base64Match = imageUrl.match(/^data:image\/\w+;base64,(.+)$/);
+    if (!base64Match) {
+      throw new Error("Invalid image format from AI");
+    }
+    const base64Data = base64Match[1];
+    const masterImageData = Uint8Array.from(atob(base64Data), c => c.charCodeAt(0));
+
+    // Upload master icon
+    const masterFileName = `master-icon-1024.png`;
+    const { data: masterUpload, error: masterError } = await supabase.storage
+      .from("app-store-assets")
+      .upload(`icons/${masterFileName}`, masterImageData, {
+        contentType: "image/png",
+        upsert: true
+      });
+
+    if (masterError) {
+      console.error("[GENERATE-APP-ICONS] Master upload error:", masterError);
+      throw new Error(`Failed to upload master icon: ${masterError.message}`);
+    }
+
+    console.log("[GENERATE-APP-ICONS] Master icon uploaded:", masterUpload.path);
+
+    // Get master icon public URL
+    const { data: masterUrlData } = supabase.storage
+      .from("app-store-assets")
+      .getPublicUrl(`icons/${masterFileName}`);
+
+    // Store master icon in database
+    await supabase.from("app_store_assets").upsert({
+      asset_type: "icon",
+      platform: "both",
+      file_name: masterFileName,
+      file_path: `icons/${masterFileName}`,
+      width: 1024,
+      height: 1024,
+      storage_url: masterUrlData.publicUrl
+    }, { onConflict: "file_path" });
+
+    // For resizing, we'll store the master and note that external tools can resize
+    // The master 1024x1024 can be used with appicon.co or similar for all sizes
+    const generatedAssets = [
+      {
+        platform: "both",
+        size: 1024,
+        name: masterFileName,
+        url: masterUrlData.publicUrl,
+        use: "Master Icon (use appicon.co to generate all sizes)"
+      }
+    ];
+
+    // Store records for all required sizes (users will use appicon.co to generate)
+    const allSizes = [...ICON_SIZES.ios, ...ICON_SIZES.android];
+    for (const iconSpec of allSizes) {
+      const platform = ICON_SIZES.ios.includes(iconSpec) ? "ios" : "android";
+      await supabase.from("app_store_assets").upsert({
+        asset_type: "icon",
+        platform,
+        file_name: iconSpec.name,
+        file_path: `icons/${iconSpec.name}`,
+        width: iconSpec.size,
+        height: iconSpec.size,
+        storage_url: null // Will be populated when user uploads resized versions
+      }, { onConflict: "file_path" });
+    }
+
+    console.log("[GENERATE-APP-ICONS] Icon generation complete!");
+
+    return new Response(
+      JSON.stringify({
+        success: true,
+        masterIcon: masterUrlData.publicUrl,
+        generatedAssets,
+        message: "Master icon generated! Download it and use appicon.co to generate all required sizes.",
+        requiredSizes: {
+          ios: ICON_SIZES.ios,
+          android: ICON_SIZES.android
+        }
+      }),
+      {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+        status: 200,
+      }
+    );
+  } catch (error) {
+    console.error("[GENERATE-APP-ICONS] Error:", error);
+    const errorMessage = error instanceof Error ? error.message : "Unknown error";
+    return new Response(
+      JSON.stringify({ error: errorMessage }),
+      {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+        status: 500,
+      }
+    );
+  }
+});

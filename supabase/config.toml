@@ -176,3 +176,12 @@ verify_jwt = false
 
 [functions.check-image-status]
 verify_jwt = false
+
+[functions.generate-app-icons]
+verify_jwt = true
+
+[functions.generate-feature-graphic]
+verify_jwt = true
+
+[functions.generate-app-store-package]
+verify_jwt = true
