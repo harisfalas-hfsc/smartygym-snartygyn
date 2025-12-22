@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { PageBreadcrumbs } from "@/components/PageBreadcrumbs";
 import { InfoRibbon } from "@/components/InfoRibbon";
-import { ArrowLeft, Dumbbell, Flame, Zap, Heart, Move, Activity, CalendarCheck, Flower2 } from "lucide-react";
+import { ArrowLeft, Dumbbell, Flame, Zap, Heart, Move, Activity, CalendarCheck, Flower2, RefreshCw } from "lucide-react";
 import { SEOEnhancer } from "@/components/SEOEnhancer";
 import { generateBreadcrumbSchema } from "@/utils/seoHelpers";
 import { useAccessControl } from "@/hooks/useAccessControl";
@@ -57,6 +57,7 @@ const WorkoutFlow = () => {
     "mobility": "/images/workouts/mobility-category-bg.jpg",
     "challenge": "/images/workouts/challenge-category-bg.jpg",
     "pilates": "/images/workouts/pilates-category-bg.jpg",
+    "recovery": "/images/workouts/recovery-category-bg.jpg",
   };
 
   const workoutTypes = [{
@@ -115,6 +116,13 @@ const WorkoutFlow = () => {
     icon: Flower2,
     level: "Beginner-Advanced",
     equipment: "Reformer/Mat"
+  }, {
+    id: "recovery",
+    title: "Recovery",
+    description: "Regeneration and active recovery workouts",
+    icon: RefreshCw,
+    level: "Beginner-Intermediate",
+    equipment: "Minimal/No Equipment"
   }];
 
   const handleWorkoutSelect = (workoutId: string) => {

@@ -1,4 +1,4 @@
-import { Dumbbell, Heart, Flame, Zap, Trophy, Waves } from "lucide-react";
+import { Dumbbell, Heart, Flame, Zap, Trophy, Waves, RefreshCw } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 
 export const WorkoutCategoriesCompositeTemplate = () => {
@@ -9,6 +9,7 @@ export const WorkoutCategoriesCompositeTemplate = () => {
     { icon: Zap, name: "Metabolic" },
     { icon: Waves, name: "Mobility" },
     { icon: Trophy, name: "Challenge" },
+    { icon: RefreshCw, name: "Recovery" },
   ];
 
   return (

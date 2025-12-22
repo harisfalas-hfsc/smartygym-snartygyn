@@ -17,7 +17,8 @@ const CATEGORIES = [
   "CARDIO",
   "MOBILITY & STABILITY",
   "CHALLENGE",
-  "PILATES"
+  "PILATES",
+  "RECOVERY"
 ];
 
 const FORMATS = [
@@ -89,12 +90,12 @@ export const WorkoutEditDialog = ({ workout, open, onOpenChange, onSave }: Worko
       'MOBILITY & STABILITY': 'M',
       'CHALLENGE': 'CH',
       'PILATES': 'PIL',
+      'RECOVERY': 'REC',
       // Legacy support for old values still in DB
       'MOBILITY': 'M',
       'CALORIE_BURNING': 'CB',
       'CONDITIONING': 'ME',
       'POWER': 'S',
-      'RECOVERY': 'M',
     };
     return prefixMap[category] || 'W';
   };

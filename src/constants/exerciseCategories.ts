@@ -45,7 +45,8 @@ export const WORKOUT_CATEGORIES = [
   'Metabolic',
   'Cardio',
   'Mobility and Stability',
-  'Challenge'
+  'Challenge',
+  'Recovery'
 ] as const;
 
 export const PROGRAM_CATEGORIES = [
