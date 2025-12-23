@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -10,7 +10,9 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Plus, Pencil, Trash2, Video, ExternalLink } from "lucide-react";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Progress } from "@/components/ui/progress";
+import { Plus, Pencil, Trash2, Video, ExternalLink, Upload, Database, Image, FileSpreadsheet, Search } from "lucide-react";
 import { toast } from "sonner";
 import { extractYouTubeId, getYouTubeThumbnail, isValidYouTubeUrl, getRestrictedEmbedUrl } from "@/utils/youtube";
 import { MUSCLE_CATEGORIES, MUSCLE_GROUPS, WORKOUT_CATEGORIES, PROGRAM_CATEGORIES, WORKOUT_PHASES } from "@/constants/exerciseCategories";
@@ -34,13 +36,72 @@ interface ExerciseVideo {
   created_at: string;
 }
 
+interface Exercise {
+  id: string;
+  name: string;
+  body_part: string;
+  equipment: string;
+  target: string;
+  secondary_muscles: string[] | null;
+  instructions: string[] | null;
+  gif_url: string | null;
+}
+
+// CSV parsing helper
+function parseCSVLine(line: string): string[] {
+  const result: string[] = [];
+  let current = "";
+  let inQuotes = false;
+  
+  for (let i = 0; i < line.length; i++) {
+    const char = line[i];
+    
+    if (char === '"') {
+      if (inQuotes && line[i + 1] === '"') {
+        current += '"';
+        i++;
+      } else {
+        inQuotes = !inQuotes;
+      }
+    } else if (char === "," && !inQuotes) {
+      result.push(current);
+      current = "";
+    } else {
+      current += char;
+    }
+  }
+  
+  result.push(current);
+  return result;
+}
+
 const ExerciseLibraryManager = () => {
   const queryClient = useQueryClient();
+  const [activeTab, setActiveTab] = useState("database");
+  
+  // Video management state
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingVideo, setEditingVideo] = useState<ExerciseVideo | null>(null);
   const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null);
   
-  // Form state
+  // CSV import state
+  const [isImporting, setIsImporting] = useState(false);
+  const [importProgress, setImportProgress] = useState(0);
+  const [importStatus, setImportStatus] = useState("");
+  const csvInputRef = useRef<HTMLInputElement>(null);
+  const gifInputRef = useRef<HTMLInputElement>(null);
+  
+  // GIF upload state
+  const [isUploadingGifs, setIsUploadingGifs] = useState(false);
+  const [gifUploadProgress, setGifUploadProgress] = useState(0);
+  const [gifUploadStatus, setGifUploadStatus] = useState("");
+  
+  // Exercise filter state
+  const [exerciseSearch, setExerciseSearch] = useState("");
+  const [bodyPartFilter, setBodyPartFilter] = useState("all");
+  const [equipmentFilter, setEquipmentFilter] = useState("all");
+  
+  // Form state for videos
   const [formData, setFormData] = useState({
     title: '',
     description: '',
@@ -56,7 +117,36 @@ const ExerciseLibraryManager = () => {
   });
   const [previewVideoId, setPreviewVideoId] = useState<string | null>(null);
 
-  const { data: videos, isLoading } = useQuery({
+  // Fetch exercises
+  const { data: exercises, isLoading: exercisesLoading } = useQuery({
+    queryKey: ['admin-exercises'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('exercises')
+        .select('*')
+        .order('name', { ascending: true });
+
+      if (error) throw error;
+      return data as Exercise[];
+    }
+  });
+
+  // Get unique body parts and equipment for filters
+  const bodyParts = [...new Set(exercises?.map(e => e.body_part) || [])].sort();
+  const equipmentList = [...new Set(exercises?.map(e => e.equipment) || [])].sort();
+  const exercisesWithGifs = exercises?.filter(e => e.gif_url)?.length || 0;
+
+  // Filter exercises
+  const filteredExercises = exercises?.filter(exercise => {
+    const matchesSearch = exercise.name.toLowerCase().includes(exerciseSearch.toLowerCase()) ||
+                         exercise.target.toLowerCase().includes(exerciseSearch.toLowerCase());
+    const matchesBodyPart = bodyPartFilter === "all" || exercise.body_part === bodyPartFilter;
+    const matchesEquipment = equipmentFilter === "all" || exercise.equipment === equipmentFilter;
+    return matchesSearch && matchesBodyPart && matchesEquipment;
+  }) || [];
+
+  // Fetch videos
+  const { data: videos, isLoading: videosLoading } = useQuery({
     queryKey: ['admin-exercise-library-videos'],
     queryFn: async () => {
       const { data, error } = await supabase
@@ -70,6 +160,193 @@ const ExerciseLibraryManager = () => {
     }
   });
 
+  // CSV Import handler
+  const handleCSVUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    setIsImporting(true);
+    setImportProgress(0);
+    setImportStatus("Reading CSV file...");
+
+    try {
+      const text = await file.text();
+      const lines = text.trim().split("\n");
+      const headers = lines[0].split(",");
+      
+      // Find column indices
+      const colIndex: { [key: string]: number } = {};
+      headers.forEach((h, i) => {
+        colIndex[h.trim()] = i;
+      });
+
+      setImportStatus(`Parsing ${lines.length - 1} exercises...`);
+      setImportProgress(10);
+
+      const exercisesToInsert: any[] = [];
+
+      for (let i = 1; i < lines.length; i++) {
+        const line = lines[i];
+        if (!line.trim()) continue;
+        
+        const values = parseCSVLine(line);
+        
+        // Collect secondary muscles
+        const secondaryMuscles: string[] = [];
+        for (let j = 0; j <= 5; j++) {
+          const key = `secondaryMuscles/${j}`;
+          if (colIndex[key] !== undefined) {
+            const val = values[colIndex[key]]?.trim();
+            if (val) secondaryMuscles.push(val);
+          }
+        }
+        
+        // Collect instructions
+        const instructions: string[] = [];
+        for (let j = 0; j <= 10; j++) {
+          const key = `instructions/${j}`;
+          if (colIndex[key] !== undefined) {
+            const val = values[colIndex[key]]?.trim();
+            if (val) instructions.push(val);
+          }
+        }
+        
+        const exercise = {
+          id: values[colIndex["id"]]?.trim(),
+          name: values[colIndex["name"]]?.trim(),
+          body_part: values[colIndex["bodyPart"]]?.trim(),
+          equipment: values[colIndex["equipment"]]?.trim(),
+          target: values[colIndex["target"]]?.trim(),
+          secondary_muscles: secondaryMuscles,
+          instructions: instructions,
+          gif_url: null,
+        };
+        
+        if (exercise.id && exercise.name) {
+          exercisesToInsert.push(exercise);
+        }
+      }
+
+      setImportStatus(`Parsed ${exercisesToInsert.length} exercises. Clearing existing data...`);
+      setImportProgress(30);
+
+      // Clear existing exercises
+      const { error: deleteError } = await supabase
+        .from("exercises")
+        .delete()
+        .neq("id", "");
+
+      if (deleteError) throw deleteError;
+
+      setImportStatus("Inserting exercises in batches...");
+      
+      // Insert in batches of 50
+      const batchSize = 50;
+      let inserted = 0;
+      
+      for (let i = 0; i < exercisesToInsert.length; i += batchSize) {
+        const batch = exercisesToInsert.slice(i, i + batchSize);
+        const { error } = await supabase.from("exercises").insert(batch);
+        
+        if (error) {
+          console.error(`Batch error at ${i}:`, error);
+        } else {
+          inserted += batch.length;
+        }
+        
+        const progress = 30 + Math.round((i / exercisesToInsert.length) * 70);
+        setImportProgress(progress);
+        setImportStatus(`Inserted ${inserted} of ${exercisesToInsert.length} exercises...`);
+      }
+
+      setImportProgress(100);
+      setImportStatus(`Successfully imported ${inserted} exercises!`);
+      toast.success(`Imported ${inserted} exercises successfully!`);
+      
+      // Refresh the exercises list
+      queryClient.invalidateQueries({ queryKey: ['admin-exercises'] });
+      
+    } catch (error) {
+      console.error("Import error:", error);
+      toast.error(`Import failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
+      setImportStatus("Import failed. Please try again.");
+    } finally {
+      setIsImporting(false);
+      if (csvInputRef.current) {
+        csvInputRef.current.value = "";
+      }
+    }
+  };
+
+  // GIF Upload handler
+  const handleGIFUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const files = event.target.files;
+    if (!files || files.length === 0) return;
+
+    setIsUploadingGifs(true);
+    setGifUploadProgress(0);
+    setGifUploadStatus(`Uploading ${files.length} GIF files...`);
+
+    try {
+      let uploaded = 0;
+      let matched = 0;
+
+      for (let i = 0; i < files.length; i++) {
+        const file = files[i];
+        const filename = file.name.replace('.gif', '').trim();
+        
+        // Upload to storage
+        const { error: uploadError } = await supabase.storage
+          .from('exercise-gifs')
+          .upload(file.name, file, { upsert: true });
+
+        if (uploadError) {
+          console.error(`Failed to upload ${file.name}:`, uploadError);
+          continue;
+        }
+
+        uploaded++;
+
+        // Get public URL
+        const { data: urlData } = supabase.storage
+          .from('exercise-gifs')
+          .getPublicUrl(file.name);
+
+        // Update exercise with matching ID
+        const { error: updateError } = await supabase
+          .from('exercises')
+          .update({ gif_url: urlData.publicUrl })
+          .eq('id', filename);
+
+        if (!updateError) {
+          matched++;
+        }
+
+        const progress = Math.round(((i + 1) / files.length) * 100);
+        setGifUploadProgress(progress);
+        setGifUploadStatus(`Uploaded ${uploaded} files, matched ${matched} exercises...`);
+      }
+
+      setGifUploadProgress(100);
+      setGifUploadStatus(`Uploaded ${uploaded} GIFs, matched ${matched} exercises!`);
+      toast.success(`Uploaded ${uploaded} GIFs, matched ${matched} exercises!`);
+      
+      // Refresh the exercises list
+      queryClient.invalidateQueries({ queryKey: ['admin-exercises'] });
+
+    } catch (error) {
+      console.error("GIF upload error:", error);
+      toast.error(`Upload failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
+      setGifUploadStatus("Upload failed. Please try again.");
+    } finally {
+      setIsUploadingGifs(false);
+      if (gifInputRef.current) {
+        gifInputRef.current.value = "";
+      }
+    }
+  };
+
+  // Video mutations (keeping existing functionality)
   const createMutation = useMutation({
     mutationFn: async (data: typeof formData) => {
       const videoId = extractYouTubeId(data.youtube_url);
@@ -228,7 +505,7 @@ const ExerciseLibraryManager = () => {
     setFormData(prev => ({ 
       ...prev, 
       muscle_group: value === 'none' ? '' : value,
-      target_muscle: '' // Reset target muscle when group changes
+      target_muscle: ''
     }));
   };
 
@@ -255,141 +532,354 @@ const ExerciseLibraryManager = () => {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <div>
-          <h2 className="text-2xl font-bold">Exercise Library Videos</h2>
-          <p className="text-muted-foreground">Manage YouTube videos for workout demonstrations</p>
-        </div>
-        <Button onClick={() => setIsDialogOpen(true)}>
-          <Plus className="h-4 w-4 mr-2" />
-          Add Video
-        </Button>
+      <div>
+        <h2 className="text-2xl font-bold">Exercise Library</h2>
+        <p className="text-muted-foreground">Manage exercise database and video demonstrations</p>
       </div>
 
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Video className="h-5 w-5" />
-            Videos ({videos?.length || 0})
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          {isLoading ? (
-            <div className="text-center py-8 text-muted-foreground">Loading videos...</div>
-          ) : !videos || videos.length === 0 ? (
-            <div className="text-center py-8 text-muted-foreground">
-              <Video className="h-12 w-12 mx-auto mb-4 opacity-50" />
-              <p>No videos added yet.</p>
-              <p className="text-sm">Click "Add Video" to get started.</p>
-            </div>
-          ) : (
-            <div className="overflow-x-auto">
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Thumbnail</TableHead>
-                    <TableHead>Title</TableHead>
-                    <TableHead>Muscle</TableHead>
-                    <TableHead>Phase</TableHead>
-                    <TableHead>Workout</TableHead>
-                    <TableHead>Program</TableHead>
-                    <TableHead>Promo</TableHead>
-                    <TableHead>Order</TableHead>
-                    <TableHead>Visible</TableHead>
-                    <TableHead className="text-right">Actions</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {videos.map((video) => (
-                    <TableRow key={video.id}>
-                      <TableCell>
-                        <img
-                          src={getYouTubeThumbnail(video.youtube_video_id, 'default')}
-                          alt={video.title}
-                          className="w-24 h-auto rounded"
-                        />
-                      </TableCell>
-                      <TableCell className="font-medium max-w-[200px]">
-                        <p className="line-clamp-2">{video.title}</p>
-                        <p className="text-xs text-muted-foreground mt-1">
-                          {new Date(video.created_at).toLocaleDateString()}
-                        </p>
-                      </TableCell>
-                      <TableCell>
-                        <div className="text-sm">
-                          {video.muscle_group && (
-                            <p className="font-medium">{video.muscle_group}</p>
-                          )}
-                          {video.target_muscle && (
-                            <p className="text-xs text-muted-foreground">{video.target_muscle}</p>
-                          )}
-                          {!video.muscle_group && <span className="text-muted-foreground">-</span>}
-                        </div>
-                      </TableCell>
-                      <TableCell>
-                        <span className="text-sm">{video.workout_phase || '-'}</span>
-                      </TableCell>
-                      <TableCell>
-                        <span className="text-sm">{video.workout_category || '-'}</span>
-                      </TableCell>
-                      <TableCell>
-                        <span className="text-sm">{video.program_category || '-'}</span>
-                      </TableCell>
-                      <TableCell>
-                        {video.is_promotional ? (
-                          <span className="text-xs bg-pink-100 text-pink-800 dark:bg-pink-900 dark:text-pink-200 px-2 py-0.5 rounded">
-                            Yes
-                          </span>
-                        ) : (
-                          <span className="text-muted-foreground">-</span>
-                        )}
-                      </TableCell>
-                      <TableCell>{video.display_order}</TableCell>
-                      <TableCell>
-                        <Switch
-                          checked={video.is_visible}
-                          onCheckedChange={(checked) => 
-                            toggleVisibilityMutation.mutate({ id: video.id, is_visible: checked })
-                          }
-                        />
-                      </TableCell>
-                      <TableCell className="text-right">
-                        <div className="flex items-center justify-end gap-2">
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            onClick={() => window.open(video.youtube_url, '_blank')}
-                            title="View on YouTube"
-                          >
-                            <ExternalLink className="h-4 w-4" />
-                          </Button>
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            onClick={() => openEditDialog(video)}
-                          >
-                            <Pencil className="h-4 w-4" />
-                          </Button>
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            className="text-destructive hover:text-destructive"
-                            onClick={() => setDeleteConfirmId(video.id)}
-                          >
-                            <Trash2 className="h-4 w-4" />
-                          </Button>
-                        </div>
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </div>
-          )}
-        </CardContent>
-      </Card>
+      <Tabs value={activeTab} onValueChange={setActiveTab}>
+        <TabsList className="grid w-full grid-cols-2">
+          <TabsTrigger value="database" className="flex items-center gap-2">
+            <Database className="h-4 w-4" />
+            Exercise Database
+          </TabsTrigger>
+          <TabsTrigger value="videos" className="flex items-center gap-2">
+            <Video className="h-4 w-4" />
+            Exercise Videos
+          </TabsTrigger>
+        </TabsList>
 
-      {/* Add/Edit Dialog */}
+        {/* Exercise Database Tab */}
+        <TabsContent value="database" className="space-y-6">
+          {/* Import Tools Card */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Upload className="h-5 w-5" />
+                Import Tools
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-6">
+              {/* Stats */}
+              <div className="flex items-center gap-6 text-sm text-muted-foreground">
+                <span className="flex items-center gap-2">
+                  <Database className="h-4 w-4" />
+                  {exercises?.length || 0} exercises
+                </span>
+                <span className="flex items-center gap-2">
+                  <Image className="h-4 w-4" />
+                  {exercisesWithGifs} with images
+                </span>
+              </div>
+
+              {/* Upload Buttons */}
+              <div className="flex flex-wrap gap-4">
+                <div>
+                  <input
+                    ref={csvInputRef}
+                    type="file"
+                    accept=".csv"
+                    onChange={handleCSVUpload}
+                    className="hidden"
+                    disabled={isImporting}
+                  />
+                  <Button
+                    onClick={() => csvInputRef.current?.click()}
+                    disabled={isImporting}
+                    variant="outline"
+                    className="flex items-center gap-2"
+                  >
+                    <FileSpreadsheet className="h-4 w-4" />
+                    Upload CSV File
+                  </Button>
+                </div>
+
+                <div>
+                  <input
+                    ref={gifInputRef}
+                    type="file"
+                    accept=".gif"
+                    multiple
+                    onChange={handleGIFUpload}
+                    className="hidden"
+                    disabled={isUploadingGifs}
+                  />
+                  <Button
+                    onClick={() => gifInputRef.current?.click()}
+                    disabled={isUploadingGifs}
+                    variant="outline"
+                    className="flex items-center gap-2"
+                  >
+                    <Image className="h-4 w-4" />
+                    Upload GIF Files
+                  </Button>
+                </div>
+              </div>
+
+              {/* CSV Import Progress */}
+              {isImporting && (
+                <div className="space-y-2">
+                  <Progress value={importProgress} className="h-2" />
+                  <p className="text-sm text-muted-foreground">{importStatus}</p>
+                </div>
+              )}
+
+              {/* GIF Upload Progress */}
+              {isUploadingGifs && (
+                <div className="space-y-2">
+                  <Progress value={gifUploadProgress} className="h-2" />
+                  <p className="text-sm text-muted-foreground">{gifUploadStatus}</p>
+                </div>
+              )}
+
+              {/* Import Instructions */}
+              <div className="text-xs text-muted-foreground border-t pt-4 space-y-1">
+                <p><strong>CSV Format:</strong> Must include columns: id, name, bodyPart, equipment, target, secondaryMuscles/0-5, instructions/0-10</p>
+                <p><strong>GIF Files:</strong> Name files by exercise ID (e.g., 0001.gif matches exercise id "0001")</p>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Exercises List Card */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Database className="h-5 w-5" />
+                Exercises ({filteredExercises.length} of {exercises?.length || 0})
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              {/* Filters */}
+              <div className="flex flex-wrap gap-4 mb-4">
+                <div className="flex-1 min-w-[200px]">
+                  <div className="relative">
+                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                    <Input
+                      placeholder="Search exercises..."
+                      value={exerciseSearch}
+                      onChange={(e) => setExerciseSearch(e.target.value)}
+                      className="pl-10"
+                    />
+                  </div>
+                </div>
+                <Select value={bodyPartFilter} onValueChange={setBodyPartFilter}>
+                  <SelectTrigger className="w-[180px]">
+                    <SelectValue placeholder="Body Part" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All Body Parts</SelectItem>
+                    {bodyParts.map(bp => (
+                      <SelectItem key={bp} value={bp}>{bp}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                <Select value={equipmentFilter} onValueChange={setEquipmentFilter}>
+                  <SelectTrigger className="w-[180px]">
+                    <SelectValue placeholder="Equipment" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All Equipment</SelectItem>
+                    {equipmentList.map(eq => (
+                      <SelectItem key={eq} value={eq}>{eq}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              {exercisesLoading ? (
+                <div className="text-center py-8 text-muted-foreground">Loading exercises...</div>
+              ) : !exercises || exercises.length === 0 ? (
+                <div className="text-center py-8 text-muted-foreground">
+                  <Database className="h-12 w-12 mx-auto mb-4 opacity-50" />
+                  <p>No exercises in database.</p>
+                  <p className="text-sm">Upload a CSV file to get started.</p>
+                </div>
+              ) : (
+                <div className="overflow-x-auto max-h-[500px] overflow-y-auto">
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead>GIF</TableHead>
+                        <TableHead>Name</TableHead>
+                        <TableHead>Body Part</TableHead>
+                        <TableHead>Target</TableHead>
+                        <TableHead>Equipment</TableHead>
+                        <TableHead>ID</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {filteredExercises.slice(0, 100).map((exercise) => (
+                        <TableRow key={exercise.id}>
+                          <TableCell>
+                            {exercise.gif_url ? (
+                              <img
+                                src={exercise.gif_url}
+                                alt={exercise.name}
+                                className="w-16 h-16 object-cover rounded"
+                              />
+                            ) : (
+                              <div className="w-16 h-16 bg-muted rounded flex items-center justify-center">
+                                <Image className="h-6 w-6 text-muted-foreground" />
+                              </div>
+                            )}
+                          </TableCell>
+                          <TableCell className="font-medium max-w-[200px]">
+                            <p className="line-clamp-2">{exercise.name}</p>
+                          </TableCell>
+                          <TableCell className="capitalize">{exercise.body_part}</TableCell>
+                          <TableCell className="capitalize">{exercise.target}</TableCell>
+                          <TableCell className="capitalize">{exercise.equipment}</TableCell>
+                          <TableCell className="font-mono text-xs text-muted-foreground">{exercise.id}</TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                  {filteredExercises.length > 100 && (
+                    <p className="text-sm text-muted-foreground text-center py-4">
+                      Showing first 100 of {filteredExercises.length} exercises. Use search to narrow results.
+                    </p>
+                  )}
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        {/* Exercise Videos Tab */}
+        <TabsContent value="videos" className="space-y-6">
+          <div className="flex items-center justify-end">
+            <Button onClick={() => setIsDialogOpen(true)}>
+              <Plus className="h-4 w-4 mr-2" />
+              Add Video
+            </Button>
+          </div>
+
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Video className="h-5 w-5" />
+                Videos ({videos?.length || 0})
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              {videosLoading ? (
+                <div className="text-center py-8 text-muted-foreground">Loading videos...</div>
+              ) : !videos || videos.length === 0 ? (
+                <div className="text-center py-8 text-muted-foreground">
+                  <Video className="h-12 w-12 mx-auto mb-4 opacity-50" />
+                  <p>No videos added yet.</p>
+                  <p className="text-sm">Click "Add Video" to get started.</p>
+                </div>
+              ) : (
+                <div className="overflow-x-auto">
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead>Thumbnail</TableHead>
+                        <TableHead>Title</TableHead>
+                        <TableHead>Muscle</TableHead>
+                        <TableHead>Phase</TableHead>
+                        <TableHead>Workout</TableHead>
+                        <TableHead>Program</TableHead>
+                        <TableHead>Promo</TableHead>
+                        <TableHead>Order</TableHead>
+                        <TableHead>Visible</TableHead>
+                        <TableHead className="text-right">Actions</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {videos.map((video) => (
+                        <TableRow key={video.id}>
+                          <TableCell>
+                            <img
+                              src={getYouTubeThumbnail(video.youtube_video_id, 'default')}
+                              alt={video.title}
+                              className="w-24 h-auto rounded"
+                            />
+                          </TableCell>
+                          <TableCell className="font-medium max-w-[200px]">
+                            <p className="line-clamp-2">{video.title}</p>
+                            <p className="text-xs text-muted-foreground mt-1">
+                              {new Date(video.created_at).toLocaleDateString()}
+                            </p>
+                          </TableCell>
+                          <TableCell>
+                            <div className="text-sm">
+                              {video.muscle_group && (
+                                <p className="font-medium">{video.muscle_group}</p>
+                              )}
+                              {video.target_muscle && (
+                                <p className="text-xs text-muted-foreground">{video.target_muscle}</p>
+                              )}
+                              {!video.muscle_group && <span className="text-muted-foreground">-</span>}
+                            </div>
+                          </TableCell>
+                          <TableCell>
+                            <span className="text-sm">{video.workout_phase || '-'}</span>
+                          </TableCell>
+                          <TableCell>
+                            <span className="text-sm">{video.workout_category || '-'}</span>
+                          </TableCell>
+                          <TableCell>
+                            <span className="text-sm">{video.program_category || '-'}</span>
+                          </TableCell>
+                          <TableCell>
+                            {video.is_promotional ? (
+                              <span className="text-xs bg-pink-100 text-pink-800 dark:bg-pink-900 dark:text-pink-200 px-2 py-0.5 rounded">
+                                Yes
+                              </span>
+                            ) : (
+                              <span className="text-muted-foreground">-</span>
+                            )}
+                          </TableCell>
+                          <TableCell>{video.display_order}</TableCell>
+                          <TableCell>
+                            <Switch
+                              checked={video.is_visible}
+                              onCheckedChange={(checked) => 
+                                toggleVisibilityMutation.mutate({ id: video.id, is_visible: checked })
+                              }
+                            />
+                          </TableCell>
+                          <TableCell className="text-right">
+                            <div className="flex items-center justify-end gap-2">
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                onClick={() => window.open(video.youtube_url, '_blank')}
+                                title="View on YouTube"
+                              >
+                                <ExternalLink className="h-4 w-4" />
+                              </Button>
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                onClick={() => openEditDialog(video)}
+                              >
+                                <Pencil className="h-4 w-4" />
+                              </Button>
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                className="text-destructive hover:text-destructive"
+                                onClick={() => setDeleteConfirmId(video.id)}
+                              >
+                                <Trash2 className="h-4 w-4" />
+                              </Button>
+                            </div>
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        </TabsContent>
+      </Tabs>
+
+      {/* Add/Edit Video Dialog */}
       <Dialog open={isDialogOpen} onOpenChange={(open) => !open && closeDialog()}>
         <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
