@@ -1099,6 +1099,16 @@ YOUR WORKOUT SPECIFICATIONS FOR THIS GENERATION:
 ${category === "STRENGTH" ? (() => {
   const strengthFocus = STRENGTH_DAY_FOCUS[dayInCycle];
   if (strengthFocus) {
+    const focusNamingExamples: Record<string, string[]> = {
+      "LOWER BODY": ["Lower Body Iron Foundation", "Leg Day Power Builder", "Lower Body Forge", "Quad & Ham Strength"],
+      "UPPER BODY": ["Upper Body Forge", "Press & Pull Power", "Upper Iron Builder", "Chest & Back Strength"],
+      "FULL BODY": ["Total Body Foundation", "Full Body Strength Flow", "Complete Power Builder", "Total Iron Session"],
+      "LOW PUSH & UPPER PULL": ["Push Pull Hybrid Power", "Low Push Upper Pull Builder", "Squat & Row Strength"],
+      "LOW PULL & UPPER PUSH": ["Hinge & Press Builder", "Pull Push Strength Flow", "Deadlift & Press Power"],
+      "CORE & GLUTES": ["Core & Glute Stabilizer", "Glutes & Core Power", "Hip & Core Foundation", "Stability Strength"]
+    };
+    const namingExamples = focusNamingExamples[strengthFocus.focus] || ["Strength Builder", "Power Session"];
+    
     return `
 ═══════════════════════════════════════════════════════════════════════════════
 STRENGTH DAY FOCUS: ${strengthFocus.focus} (Day ${dayInCycle})
@@ -1108,6 +1118,49 @@ STRENGTH DAY FOCUS: ${strengthFocus.focus} (Day ${dayInCycle})
 📝 DESCRIPTION: ${strengthFocus.description}
 ✅ MOVEMENT PATTERNS TO INCLUDE: ${strengthFocus.movementPatterns.join(", ")}
 ${strengthFocus.forbiddenPatterns.length > 0 ? `❌ FORBIDDEN ON THIS DAY: ${strengthFocus.forbiddenPatterns.join(", ")}` : ""}
+
+═══════════════════════════════════════════════════════════════════════════════
+WORKOUT NAMING RULE (MANDATORY)
+═══════════════════════════════════════════════════════════════════════════════
+The workout name MUST clearly reflect the "${strengthFocus.focus}" focus.
+Good naming examples for ${strengthFocus.focus}: ${namingExamples.join(", ")}
+The name should be professional, motivating, and immediately indicate the body area being trained.
+
+═══════════════════════════════════════════════════════════════════════════════
+STRENGTH TRAINING PROTOCOLS FOR ${strengthFocus.focus}
+═══════════════════════════════════════════════════════════════════════════════
+
+LOAD GUIDELINES (Based on Estimated 1RM):
+• Beginner (1-2 stars): 50-65% of 1RM - Focus on form and muscle connection
+• Intermediate (3-4 stars): 65-80% of 1RM - Progressive challenge with solid technique
+• Advanced (5-6 stars): 75-90% of 1RM - Heavy loads, strength-focused intensity
+
+REST PERIODS:
+• Compound movements (squats, deadlifts, presses): 90-180 seconds between sets
+• Isolation movements (curls, extensions, raises): 60-90 seconds between sets
+• Include rest period guidance in the workout instructions (e.g., "Rest 90 seconds between sets")
+
+TEMPO GUIDELINES:
+• Eccentric (lowering): 3-4 seconds - Control the weight down
+• Pause at bottom: 1 second - Eliminate momentum
+• Concentric (lifting): 1-2 seconds - Explosive but controlled
+• Example tempo notation: "3-1-1-0" (3 sec down, 1 sec pause, 1 sec up, no pause at top)
+
+SET & REP SCHEMES BY DIFFICULTY:
+• Beginner: 3 sets × 10-12 reps (technique focus, moderate loads)
+• Intermediate: 4 sets × 8-10 reps (progressive overload, challenging loads)
+• Advanced: 4-5 sets × 5-8 reps (heavy loads, strength maximization)
+
+PROGRESSIVE OVERLOAD PRINCIPLES:
+• Include guidance on adding weight each week or session when reps are completed with good form
+• Suggest tracking weights used to progressively increase load
+• For bodyweight: progress by adding reps, slowing tempo, or advancing to harder variations
+
+WORKOUT INSTRUCTIONS MUST INCLUDE:
+1. Specific load recommendations (e.g., "Use a challenging weight for 8-10 reps")
+2. Rest periods for each section (e.g., "Rest 90 seconds between sets")
+3. Tempo cues where applicable (e.g., "Lower for 3 seconds, pause, then drive up")
+4. Form tips for key exercises (e.g., "Keep core braced, chest up throughout")
 
 CRITICAL STRENGTH FOCUS RULES:
 1. Use ANY and ALL exercises that fit this focus - gym equipment, free weights, cables, bands, machines, bodyweight
