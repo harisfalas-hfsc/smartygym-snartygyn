@@ -393,8 +393,17 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({
                           key={exercise.id}
                           className="flex items-center justify-between p-2 rounded-md hover:bg-accent cursor-pointer group"
                           onClick={() => {
-                            const markup = `<strong>{{exercise:${exercise.id}:${exercise.name}}}</strong>`;
-                            editor.chain().focus().insertContent(markup).run();
+                            editor
+                              .chain()
+                              .focus()
+                              .insertContent([
+                                {
+                                  type: 'text',
+                                  text: `{{exercise:${exercise.id}:${exercise.name}}}`,
+                                  marks: [{ type: 'bold' }]
+                                }
+                              ])
+                              .run();
                             setExerciseSearchQuery('');
                             toast.success(`Added: ${exercise.name}`);
                           }}
