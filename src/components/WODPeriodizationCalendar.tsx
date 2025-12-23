@@ -103,7 +103,7 @@ const WODPeriodizationCalendar = () => {
             <span className="text-muted-foreground">Advanced</span>
           </div>
           <div className="flex items-center gap-0.5">
-            <div className="w-1.5 h-1.5 rounded-full bg-gray-400" />
+            <div className="w-1.5 h-1.5 rounded-full bg-blue-500" />
             <span className="text-muted-foreground">Recovery</span>
           </div>
         </div>

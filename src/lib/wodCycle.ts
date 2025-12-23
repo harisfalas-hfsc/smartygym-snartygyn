@@ -184,7 +184,7 @@ export const getWODInfoForDate = (dateStr: string): {
  * Get difficulty badge class based on level
  */
 export const getDifficultyBadgeClass = (level: string | null): string => {
-  if (!level) return "bg-gray-500/20 text-gray-400 border-gray-500/30";
+  if (!level) return "bg-blue-500/20 text-blue-400 border-blue-500/30";
   if (level === "Beginner") return "bg-yellow-500/20 text-yellow-700 dark:text-yellow-400 border-yellow-500/30";
   if (level === "Intermediate") return "bg-green-500/20 text-green-700 dark:text-green-400 border-green-500/30";
   return "bg-red-500/20 text-red-700 dark:text-red-400 border-red-500/30";
@@ -194,7 +194,7 @@ export const getDifficultyBadgeClass = (level: string | null): string => {
  * Get difficulty border class based on level
  */
 export const getDifficultyBorderClass = (level: string | null): string => {
-  if (!level) return "border-gray-500";
+  if (!level) return "border-blue-500";
   if (level === "Beginner") return "border-yellow-500";
   if (level === "Intermediate") return "border-green-500";
   return "border-red-500";
