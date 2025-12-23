@@ -132,7 +132,8 @@ function getJobStatus(
   job: ScheduledJob,
   currentTime: Date,
   lastMessageTime: Date | null,
-  messageCount: number
+  messageCount: number,
+  hasExpiringSubs?: boolean // Optional: for renewal_reminders, whether there are expiring subs
 ): JobStatus {
   const currentHourUTC = currentTime.getUTCHours();
   const currentMinuteUTC = currentTime.getUTCMinutes();
@@ -256,6 +257,16 @@ function getJobStatus(
       status: 'ran', // Content generation doesn't create messages
       description: `Generation ran at ${formatCyprusTime(job.cronHourUTC)} Cyprus`,
       details: 'Check content tables for generated data'
+    };
+  }
+  
+  // Special case: renewal_reminders with no expiring subscriptions is NOT a miss
+  if (job.messageTypes.includes('renewal_reminder') && hasExpiringSubs === false) {
+    return {
+      status: 'ran',
+      description: `Ran at ${formatCyprusTime(job.cronHourUTC)} Cyprus`,
+      details: 'No expiring subscriptions to notify (expected behavior)',
+      messageCount: 0
     };
   }
   
@@ -468,66 +479,100 @@ const handler = async (req: Request): Promise<Response> => {
       addCheck('WOD System', 'WOD Equipment Variants', 'Cannot check - WODs missing', 'skip');
     }
 
-    // WOD State - using 28-day fixed periodization anchored to Dec 24, 2024
+    // WOD State - using 84-day super-cycle (3x28-day cycles with Strength rotation)
     const { data: wodState } = await supabase.from('workout_of_day_state').select('*').single();
     
-    // 28-day periodization cycle (matching src/lib/wodCycle.ts)
+    // 28-day periodization base cycle (matching src/lib/wodCycle.ts)
     const CYCLE_START_DATE = '2024-12-24';
     const PERIODIZATION_28DAY = [
       { day: 1, category: 'CARDIO', difficulty: 'Beginner' },
-      { day: 2, category: 'STRENGTH', difficulty: 'Beginner' },
+      { day: 2, category: 'STRENGTH', difficulty: 'Advanced' }, // Rotates in 84-day
       { day: 3, category: 'CARDIO', difficulty: 'Intermediate' },
-      { day: 4, category: 'STRENGTH', difficulty: 'Intermediate' },
-      { day: 5, category: 'CARDIO', difficulty: 'Advanced' },
-      { day: 6, category: 'STRENGTH', difficulty: 'Advanced' },
+      { day: 4, category: 'PILATES', difficulty: 'Beginner' },
+      { day: 5, category: 'STRENGTH', difficulty: 'Intermediate' }, // Rotates in 84-day
+      { day: 6, category: 'METABOLIC', difficulty: 'Intermediate' },
       { day: 7, category: 'CHALLENGE', difficulty: 'Intermediate' },
       { day: 8, category: 'CALORIE BURNING', difficulty: 'Beginner' },
-      { day: 9, category: 'METABOLIC', difficulty: 'Beginner' },
+      { day: 9, category: 'MOBILITY & STABILITY', difficulty: 'Beginner' },
       { day: 10, category: 'RECOVERY', difficulty: null },
       { day: 11, category: 'CARDIO', difficulty: 'Intermediate' },
-      { day: 12, category: 'STRENGTH', difficulty: 'Intermediate' },
-      { day: 13, category: 'CARDIO', difficulty: 'Advanced' },
-      { day: 14, category: 'STRENGTH', difficulty: 'Advanced' },
-      { day: 15, category: 'CALORIE BURNING', difficulty: 'Intermediate' },
+      { day: 12, category: 'STRENGTH', difficulty: 'Advanced' }, // Rotates in 84-day
+      { day: 13, category: 'CALORIE BURNING', difficulty: 'Intermediate' },
+      { day: 14, category: 'PILATES', difficulty: 'Intermediate' },
+      { day: 15, category: 'STRENGTH', difficulty: 'Beginner' }, // Rotates in 84-day
       { day: 16, category: 'METABOLIC', difficulty: 'Intermediate' },
       { day: 17, category: 'CARDIO', difficulty: 'Advanced' },
-      { day: 18, category: 'STRENGTH', difficulty: 'Advanced' },
-      { day: 19, category: 'CARDIO', difficulty: 'Beginner' },
-      { day: 20, category: 'STRENGTH', difficulty: 'Beginner' },
+      { day: 18, category: 'MOBILITY & STABILITY', difficulty: 'Intermediate' },
+      { day: 19, category: 'CALORIE BURNING', difficulty: 'Beginner' },
+      { day: 20, category: 'STRENGTH', difficulty: 'Intermediate' }, // Rotates in 84-day
       { day: 21, category: 'CHALLENGE', difficulty: 'Advanced' },
-      { day: 22, category: 'CALORIE BURNING', difficulty: 'Advanced' },
-      { day: 23, category: 'METABOLIC', difficulty: 'Advanced' },
+      { day: 22, category: 'PILATES', difficulty: 'Advanced' },
+      { day: 23, category: 'STRENGTH', difficulty: 'Advanced' }, // Rotates in 84-day
       { day: 24, category: 'CARDIO', difficulty: 'Intermediate' },
-      { day: 25, category: 'STRENGTH', difficulty: 'Intermediate' },
+      { day: 25, category: 'METABOLIC', difficulty: 'Advanced' },
       { day: 26, category: 'CALORIE BURNING', difficulty: 'Beginner' },
-      { day: 27, category: 'METABOLIC', difficulty: 'Beginner' },
+      { day: 27, category: 'MOBILITY & STABILITY', difficulty: 'Advanced' },
       { day: 28, category: 'RECOVERY', difficulty: null }
     ];
+
+    // 84-day Strength rotation (days 2, 5, 12, 15, 20, 23 rotate difficulty across 3 cycles)
+    const STRENGTH_84DAY_ROTATION: Record<number, Array<{ difficulty: string; stars: [number, number] }>> = {
+      2:  [{ difficulty: 'Advanced', stars: [5, 6] }, { difficulty: 'Intermediate', stars: [3, 4] }, { difficulty: 'Beginner', stars: [1, 2] }],
+      5:  [{ difficulty: 'Intermediate', stars: [3, 4] }, { difficulty: 'Beginner', stars: [1, 2] }, { difficulty: 'Advanced', stars: [5, 6] }],
+      12: [{ difficulty: 'Advanced', stars: [5, 6] }, { difficulty: 'Beginner', stars: [1, 2] }, { difficulty: 'Intermediate', stars: [3, 4] }],
+      15: [{ difficulty: 'Beginner', stars: [1, 2] }, { difficulty: 'Advanced', stars: [5, 6] }, { difficulty: 'Intermediate', stars: [3, 4] }],
+      20: [{ difficulty: 'Intermediate', stars: [3, 4] }, { difficulty: 'Beginner', stars: [1, 2] }, { difficulty: 'Advanced', stars: [5, 6] }],
+      23: [{ difficulty: 'Advanced', stars: [5, 6] }, { difficulty: 'Intermediate', stars: [3, 4] }, { difficulty: 'Beginner', stars: [1, 2] }]
+    };
     
-    // Calculate day in 28-day cycle from date (calendar-anchored)
-    const getDayInCycleFromDate = (dateStr: string): number => {
+    // Calculate day in 28-day cycle and cycle number from date
+    const getDayInCycleFromDate = (dateStr: string): { dayInCycle: number; cycleNumber: number } => {
       const cycleStart = new Date(CYCLE_START_DATE + 'T00:00:00Z');
       const targetDate = new Date(dateStr + 'T00:00:00Z');
       const diffTime = targetDate.getTime() - cycleStart.getTime();
       const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
       const dayInCycle = ((diffDays % 28) + 28) % 28;
-      return dayInCycle === 0 ? 28 : dayInCycle;
+      const cycleNumber = Math.floor(diffDays / 28) + 1;
+      return { 
+        dayInCycle: dayInCycle === 0 ? 28 : dayInCycle,
+        cycleNumber: cycleNumber > 0 ? cycleNumber : 1
+      };
+    };
+
+    // Get expected difficulty for Strength days using 84-day rotation
+    const getExpectedDifficulty = (dayInCycle: number, cycleNumber: number): string | null => {
+      const base = PERIODIZATION_28DAY.find(p => p.day === dayInCycle);
+      if (!base) return null;
+      
+      // For Strength days, apply 84-day rotation
+      if (base.category === 'STRENGTH' && STRENGTH_84DAY_ROTATION[dayInCycle]) {
+        const rotationIndex = ((cycleNumber - 1) % 3);
+        return STRENGTH_84DAY_ROTATION[dayInCycle][rotationIndex].difficulty;
+      }
+      
+      return base.difficulty;
     };
     
-    const dayInCycle = getDayInCycleFromDate(today);
+    const { dayInCycle, cycleNumber } = getDayInCycleFromDate(today);
     const periodization = PERIODIZATION_28DAY.find(p => p.day === dayInCycle);
     const expectedCategory = periodization?.category || 'UNKNOWN';
+    const expectedDifficulty = getExpectedDifficulty(dayInCycle, cycleNumber);
     const isRecoveryDay = expectedCategory === 'RECOVERY';
+    const isStrengthDay = expectedCategory === 'STRENGTH';
+    const rotationPhase = ((cycleNumber - 1) % 3) + 1; // 1, 2, or 3
     
     if (wodState) {
-      addCheck('WOD System', 'WOD State Tracking', `Day ${dayInCycle}/28 (28-day cycle), Category: ${wodState.current_category}`, 'pass');
+      addCheck('WOD System', 'WOD State Tracking', 
+        `Day ${dayInCycle}/28 (Cycle ${cycleNumber}, Phase ${rotationPhase}/3), Category: ${wodState.current_category}`, 
+        'pass'
+      );
 
       const actualWodCategory = todayWods?.[0]?.category;
       if (!actualWodCategory) {
         addCheck(
           'WOD System',
-          'Periodization Cycle (28-Day)',
-          `Day ${dayInCycle}/28 should be ${expectedCategory}${isRecoveryDay ? ' (rest day)' : ''}`,
+          'Periodization Cycle (84-Day Super-Cycle)',
+          `Day ${dayInCycle}/28 should be ${expectedCategory}${isRecoveryDay ? ' (rest day)' : ''}${isStrengthDay ? ` (${expectedDifficulty})` : ''}`,
           isRecoveryDay ? 'pass' : 'skip',
           isRecoveryDay ? 'Recovery day - no WOD required' : 'Cannot determine active WOD category'
         );
@@ -538,11 +583,11 @@ const handler = async (req: Request): Promise<Response> => {
 
         addCheck(
           'WOD System',
-          'Periodization Cycle (28-Day)',
-          `Day ${dayInCycle}/28 should be ${expectedCategory}`,
+          'Periodization Cycle (84-Day Super-Cycle)',
+          `Day ${dayInCycle}/28 (Phase ${rotationPhase}/3) should be ${expectedCategory}${isStrengthDay ? ` [${expectedDifficulty}]` : ''}`,
           categoryMatch ? 'pass' : 'warning',
           categoryMatch
-            ? `Actual WOD category matches: ${actualWodCategory}`
+            ? `Actual WOD category matches: ${actualWodCategory}${isStrengthDay ? ` (expected ${expectedDifficulty} per 84-day rotation)` : ''}`
             : `Expected ${expectedCategory}, actual WOD: ${actualWodCategory} (may be from previous system)`
         );
       }
@@ -665,6 +710,18 @@ const handler = async (req: Request): Promise<Response> => {
       }
     }
 
+    // Check for expiring subscriptions (for renewal_reminders check)
+    const threeDaysFromNow = new Date(now);
+    threeDaysFromNow.setDate(threeDaysFromNow.getDate() + 3);
+    const { count: expiringSubsCount } = await supabase
+      .from('user_subscriptions')
+      .select('*', { count: 'exact', head: true })
+      .eq('status', 'active')
+      .gte('current_period_end', today)
+      .lte('current_period_end', threeDaysFromNow.toISOString().split('T')[0]);
+    
+    const hasExpiringSubs = (expiringSubsCount || 0) > 0;
+
     // Check each scheduled job
     for (const [jobKey, job] of Object.entries(SCHEDULED_JOBS)) {
       // Count messages for this job
@@ -682,7 +739,9 @@ const handler = async (req: Request): Promise<Response> => {
         }
       }
 
-      const status = getJobStatus(job, now, latestMessageTime, messageCount);
+      // Pass hasExpiringSubs for renewal_reminders job
+      const isRenewalJob = job.messageTypes.includes('renewal_reminder');
+      const status = getJobStatus(job, now, latestMessageTime, messageCount, isRenewalJob ? hasExpiringSubs : undefined);
       
       // Determine check status based on job status
       let checkStatus: 'pass' | 'warning' | 'fail' | 'skip';
