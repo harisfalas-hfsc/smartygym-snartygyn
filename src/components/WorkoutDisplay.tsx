@@ -13,6 +13,7 @@ import { WorkoutInteractions } from "@/components/WorkoutInteractions";
 import { ProgramInteractions } from "@/components/ProgramInteractions";
 import { useAccessControl } from "@/hooks/useAccessControl";
 import { HTMLContent } from "@/components/ui/html-content";
+import { ExerciseHTMLContent } from "@/components/ExerciseHTMLContent";
 import { A4Container } from "@/components/ui/a4-container";
 
 interface Exercise {
@@ -403,19 +404,19 @@ export const WorkoutDisplay = ({
               <A4Container>
                 <div className="space-y-6">
                   {activation && (
-                    <HTMLContent content={activation} className="text-base" />
+                    <ExerciseHTMLContent content={activation} className="text-base" enableExerciseLinking />
                   )}
                   {warm_up && (
-                    <HTMLContent content={warm_up} className="text-base" />
+                    <ExerciseHTMLContent content={warm_up} className="text-base" enableExerciseLinking />
                   )}
                   {main_workout && (
-                    <HTMLContent content={main_workout} className="text-base" />
+                    <ExerciseHTMLContent content={main_workout} className="text-base" enableExerciseLinking />
                   )}
                   {finisher && (
-                    <HTMLContent content={finisher} className="text-base" />
+                    <ExerciseHTMLContent content={finisher} className="text-base" enableExerciseLinking />
                   )}
                   {cool_down && (
-                    <HTMLContent content={cool_down} className="text-base" />
+                    <ExerciseHTMLContent content={cool_down} className="text-base" enableExerciseLinking />
                   )}
                 </div>
               </A4Container>
@@ -433,7 +434,7 @@ export const WorkoutDisplay = ({
             </CardHeader>
             <CardContent className="content-container pt-6">
               <A4Container>
-                <HTMLContent content={weekly_schedule} className="text-base" />
+                <ExerciseHTMLContent content={weekly_schedule} className="text-base" enableExerciseLinking />
               </A4Container>
             </CardContent>
           </Card>
@@ -449,7 +450,7 @@ export const WorkoutDisplay = ({
             </CardHeader>
             <CardContent className="content-container pt-6">
               <A4Container>
-                <HTMLContent content={programContent} className="text-base" />
+                <ExerciseHTMLContent content={programContent} className="text-base" enableExerciseLinking />
               </A4Container>
             </CardContent>
           </Card>

@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
@@ -9,6 +9,7 @@ import { Switch } from "@/components/ui/switch";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
 import { A4Container } from "@/components/ui/a4-container";
+import { ExerciseSearchPanel } from "@/components/admin/ExerciseSearchPanel";
 
 const CATEGORIES = [
   "STRENGTH",
@@ -576,9 +577,19 @@ export const WorkoutEditDialog = ({ workout, open, onOpenChange, onSave }: Worko
             </Select>
           </div>
 
-          {/* 9. Workout Content - Single Box */}
+          {/* 9. Workout Content - Single Box with Exercise Search */}
           <div className="space-y-2 pt-4 border-t">
             <Label htmlFor="main_workout">9. Workout Content *</Label>
+            <ExerciseSearchPanel
+              onInsertExercise={(id, name) => {
+                const markup = `<strong>{{exercise:${id}:${name}}}</strong>`;
+                setFormData(prev => ({
+                  ...prev,
+                  main_workout: prev.main_workout + markup
+                }));
+              }}
+              className="mb-2"
+            />
             <A4Container>
               <RichTextEditor
                 value={formData.main_workout}
@@ -588,7 +599,7 @@ export const WorkoutEditDialog = ({ workout, open, onOpenChange, onSave }: Worko
               />
             </A4Container>
             <p className="text-xs text-muted-foreground">
-              Use the toolbar to format your content with headings, bold text, lists, tables, and more
+              Use the Exercise Search to add exercises with View buttons, or format manually with the toolbar
             </p>
           </div>
 
