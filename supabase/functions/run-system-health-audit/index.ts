@@ -711,12 +711,14 @@ const handler = async (req: Request): Promise<Response> => {
     }
 
     // Check for expiring subscriptions (for renewal_reminders check)
+    // Exclude subscriptions with cancel_at_period_end = true (user already cancelled, no reminder needed)
     const threeDaysFromNow = new Date(now);
     threeDaysFromNow.setDate(threeDaysFromNow.getDate() + 3);
     const { count: expiringSubsCount } = await supabase
       .from('user_subscriptions')
       .select('*', { count: 'exact', head: true })
       .eq('status', 'active')
+      .eq('cancel_at_period_end', false)
       .gte('current_period_end', today)
       .lte('current_period_end', threeDaysFromNow.toISOString().split('T')[0]);
     
