@@ -3,7 +3,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
-import { Loader2, Search, X, Dumbbell, Activity, Target } from "lucide-react";
+import { Loader2, Search, X, Dumbbell, Activity, Target, Gauge, FolderOpen } from "lucide-react";
 import ExerciseDetailModal from "./ExerciseDetailModal";
 import { useToast } from "@/hooks/use-toast";
 import {
@@ -36,6 +36,8 @@ const ExerciseDatabase = () => {
   const [bodyPartFilter, setBodyPartFilter] = useState("");
   const [equipmentFilter, setEquipmentFilter] = useState("");
   const [targetFilter, setTargetFilter] = useState("");
+  const [difficultyFilter, setDifficultyFilter] = useState("");
+  const [categoryFilter, setCategoryFilter] = useState("");
   const [selectedExercise, setSelectedExercise] = useState<Exercise | null>(null);
   const [modalOpen, setModalOpen] = useState(false);
   const [hasSearched, setHasSearched] = useState(false);
@@ -44,6 +46,8 @@ const ExerciseDatabase = () => {
   const [bodyParts, setBodyParts] = useState<string[]>([]);
   const [equipmentOptions, setEquipmentOptions] = useState<string[]>([]);
   const [targetOptions, setTargetOptions] = useState<string[]>([]);
+  const [difficultyOptions, setDifficultyOptions] = useState<string[]>([]);
+  const [categoryOptions, setCategoryOptions] = useState<string[]>([]);
   
   const { toast } = useToast();
 
@@ -51,35 +55,34 @@ const ExerciseDatabase = () => {
   useEffect(() => {
     const loadFilterOptions = async () => {
       try {
-        // Fetch distinct body parts
-        const { data: bodyPartData } = await supabase
-          .from('exercises')
-          .select('body_part')
-          .order('body_part');
-        
-        // Fetch distinct equipment
-        const { data: equipmentData } = await supabase
-          .from('exercises')
-          .select('equipment')
-          .order('equipment');
-        
-        // Fetch distinct targets
-        const { data: targetData } = await supabase
-          .from('exercises')
-          .select('target')
-          .order('target');
+        // Fetch all distinct values in parallel
+        const [bodyPartRes, equipmentRes, targetRes, difficultyRes, categoryRes] = await Promise.all([
+          supabase.from('exercises').select('body_part').order('body_part'),
+          supabase.from('exercises').select('equipment').order('equipment'),
+          supabase.from('exercises').select('target').order('target'),
+          supabase.from('exercises').select('difficulty').order('difficulty'),
+          supabase.from('exercises').select('category').order('category'),
+        ]);
 
-        if (bodyPartData) {
-          const uniqueBodyParts = [...new Set(bodyPartData.map(d => d.body_part))];
-          setBodyParts(uniqueBodyParts);
+        if (bodyPartRes.data) {
+          const unique = [...new Set(bodyPartRes.data.map(d => d.body_part).filter(Boolean))];
+          setBodyParts(unique);
         }
-        if (equipmentData) {
-          const uniqueEquipment = [...new Set(equipmentData.map(d => d.equipment))];
-          setEquipmentOptions(uniqueEquipment);
+        if (equipmentRes.data) {
+          const unique = [...new Set(equipmentRes.data.map(d => d.equipment).filter(Boolean))];
+          setEquipmentOptions(unique);
         }
-        if (targetData) {
-          const uniqueTargets = [...new Set(targetData.map(d => d.target))];
-          setTargetOptions(uniqueTargets);
+        if (targetRes.data) {
+          const unique = [...new Set(targetRes.data.map(d => d.target).filter(Boolean))];
+          setTargetOptions(unique);
+        }
+        if (difficultyRes.data) {
+          const unique = [...new Set(difficultyRes.data.map(d => d.difficulty).filter(Boolean))];
+          setDifficultyOptions(unique);
+        }
+        if (categoryRes.data) {
+          const unique = [...new Set(categoryRes.data.map(d => d.category).filter(Boolean))];
+          setCategoryOptions(unique);
         }
       } catch (error) {
         console.error('Error loading filter options:', error);
@@ -103,6 +106,12 @@ const ExerciseDatabase = () => {
       }
       if (targetFilter && targetFilter !== "all") {
         query = query.eq('target', targetFilter);
+      }
+      if (difficultyFilter && difficultyFilter !== "all") {
+        query = query.eq('difficulty', difficultyFilter);
+      }
+      if (categoryFilter && categoryFilter !== "all") {
+        query = query.eq('category', categoryFilter);
       }
       if (nameSearch.trim()) {
         query = query.ilike('name', `%${nameSearch.trim()}%`);
@@ -138,6 +147,8 @@ const ExerciseDatabase = () => {
     setBodyPartFilter("");
     setEquipmentFilter("");
     setTargetFilter("");
+    setDifficultyFilter("");
+    setCategoryFilter("");
     setExercises([]);
     setHasSearched(false);
   };
@@ -150,7 +161,9 @@ const ExerciseDatabase = () => {
   const hasFilters = nameSearch.trim() ||
                      (bodyPartFilter && bodyPartFilter !== "all") || 
                      (equipmentFilter && equipmentFilter !== "all") || 
-                     (targetFilter && targetFilter !== "all");
+                     (targetFilter && targetFilter !== "all") ||
+                     (difficultyFilter && difficultyFilter !== "all") ||
+                     (categoryFilter && categoryFilter !== "all");
 
   // Capitalize first letter of each word
   const formatLabel = (str: string) => {
@@ -177,9 +190,9 @@ const ExerciseDatabase = () => {
         />
       </div>
 
-      {/* Filters - Dropdown selects with dynamic values from database */}
+      {/* Filters - 5 column grid */}
       <div className="flex flex-col gap-4">
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3">
           {/* Body Part Filter */}
           <div className="space-y-1">
             <label className="text-xs text-muted-foreground flex items-center gap-1">
@@ -218,7 +231,7 @@ const ExerciseDatabase = () => {
             </Select>
           </div>
 
-          {/* Target Muscle Filter (replaces Type) */}
+          {/* Target Muscle Filter */}
           <div className="space-y-1">
             <label className="text-xs text-muted-foreground flex items-center gap-1">
               <Target className="h-3 w-3 text-orange-500" />
@@ -232,6 +245,44 @@ const ExerciseDatabase = () => {
                 <SelectItem value="all">All Targets</SelectItem>
                 {targetOptions.map((target) => (
                   <SelectItem key={target} value={target}>{formatLabel(target)}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+
+          {/* Difficulty Filter */}
+          <div className="space-y-1">
+            <label className="text-xs text-muted-foreground flex items-center gap-1">
+              <Gauge className="h-3 w-3 text-red-500" />
+              Difficulty
+            </label>
+            <Select value={difficultyFilter} onValueChange={setDifficultyFilter}>
+              <SelectTrigger className="border-red-500/50">
+                <SelectValue placeholder="All Levels" />
+              </SelectTrigger>
+              <SelectContent side="bottom">
+                <SelectItem value="all">All Levels</SelectItem>
+                {difficultyOptions.map((diff) => (
+                  <SelectItem key={diff} value={diff}>{formatLabel(diff)}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+
+          {/* Category Filter */}
+          <div className="space-y-1">
+            <label className="text-xs text-muted-foreground flex items-center gap-1">
+              <FolderOpen className="h-3 w-3 text-blue-500" />
+              Category
+            </label>
+            <Select value={categoryFilter} onValueChange={setCategoryFilter}>
+              <SelectTrigger className="border-blue-500/50">
+                <SelectValue placeholder="All Categories" />
+              </SelectTrigger>
+              <SelectContent side="bottom">
+                <SelectItem value="all">All Categories</SelectItem>
+                {categoryOptions.map((cat) => (
+                  <SelectItem key={cat} value={cat}>{formatLabel(cat)}</SelectItem>
                 ))}
               </SelectContent>
             </Select>
@@ -280,6 +331,18 @@ const ExerciseDatabase = () => {
               {formatLabel(targetFilter)}
             </Badge>
           )}
+          {difficultyFilter && difficultyFilter !== "all" && (
+            <Badge variant="outline" className="border-red-500 text-red-600 dark:text-red-400">
+              <Gauge className="h-3 w-3 mr-1" />
+              {formatLabel(difficultyFilter)}
+            </Badge>
+          )}
+          {categoryFilter && categoryFilter !== "all" && (
+            <Badge variant="outline" className="border-blue-500 text-blue-600 dark:text-blue-400">
+              <FolderOpen className="h-3 w-3 mr-1" />
+              {formatLabel(categoryFilter)}
+            </Badge>
+          )}
         </div>
       )}
 
@@ -323,6 +386,16 @@ const ExerciseDatabase = () => {
                     <Target className="h-3 w-3 mr-1" />
                     {formatLabel(exercise.target)}
                   </Badge>
+                  {exercise.difficulty && (
+                    <Badge variant="outline" className="text-xs border-red-500/50 text-red-600 dark:text-red-400">
+                      {formatLabel(exercise.difficulty)}
+                    </Badge>
+                  )}
+                  {exercise.category && (
+                    <Badge variant="outline" className="text-xs border-blue-500/50 text-blue-600 dark:text-blue-400">
+                      {formatLabel(exercise.category)}
+                    </Badge>
+                  )}
                 </div>
               </div>
             </div>
