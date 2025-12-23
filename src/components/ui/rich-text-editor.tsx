@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { useEditor, EditorContent } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
 import { Table } from '@tiptap/extension-table';
@@ -105,7 +105,9 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({
   const [exerciseSearchQuery, setExerciseSearchQuery] = useState('');
 
   const { exercises, isLoading: exercisesLoading, searchExercises } = useExerciseLibrary();
-
+  
+  // Track the last known cursor position to ensure correct inline insertion
+  const lastSelectionRef = useRef<{ from: number; to: number } | null>(null);
   
   const exerciseResults = exerciseSearchQuery.length >= 2 
     ? searchExercises(exerciseSearchQuery, 10) 
@@ -248,6 +250,24 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({
       },
     },
   });
+
+  // Track selection changes to preserve cursor position for exercise insertion
+  useEffect(() => {
+    if (!editor) return;
+    
+    const updateSelection = () => {
+      const { from, to } = editor.state.selection;
+      lastSelectionRef.current = { from, to };
+    };
+    
+    editor.on('selectionUpdate', updateSelection);
+    // Also capture initial selection
+    updateSelection();
+    
+    return () => {
+      editor.off('selectionUpdate', updateSelection);
+    };
+  }, [editor]);
 
   if (!editor) {
     return null;
@@ -392,18 +412,39 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({
                         <div
                           key={exercise.id}
                           className="flex items-center justify-between p-2 rounded-md hover:bg-accent cursor-pointer group"
+                          onMouseDown={(e) => {
+                            // Prevent focus loss from editor - keeps cursor position
+                            e.preventDefault();
+                          }}
                           onClick={() => {
-                            editor
-                              .chain()
-                              .focus()
-                              .insertContent([
-                                {
-                                  type: 'text',
-                                  text: `{{exercise:${exercise.id}:${exercise.name}}}`,
-                                  marks: [{ type: 'bold' }]
-                                }
-                              ])
-                              .run();
+                            const pos = lastSelectionRef.current;
+                            if (pos) {
+                              // Insert at the exact stored cursor position
+                              editor
+                                .chain()
+                                .focus()
+                                .insertContentAt(pos.from, [
+                                  {
+                                    type: 'text',
+                                    text: `{{exercise:${exercise.id}:${exercise.name}}}`,
+                                    marks: [{ type: 'bold' }]
+                                  }
+                                ])
+                                .run();
+                            } else {
+                              // Fallback: insert at current position
+                              editor
+                                .chain()
+                                .focus()
+                                .insertContent([
+                                  {
+                                    type: 'text',
+                                    text: `{{exercise:${exercise.id}:${exercise.name}}}`,
+                                    marks: [{ type: 'bold' }]
+                                  }
+                                ])
+                                .run();
+                            }
                             setExerciseSearchQuery('');
                             toast.success(`Added: ${exercise.name}`);
                           }}
@@ -423,6 +464,7 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({
                             size="sm"
                             variant="ghost"
                             className="h-7 px-2 shrink-0 opacity-0 group-hover:opacity-100"
+                            onMouseDown={(e) => e.preventDefault()}
                           >
                             <Plus className="h-3 w-3 mr-1" />
                             Add
