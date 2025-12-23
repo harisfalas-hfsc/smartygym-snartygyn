@@ -19,16 +19,31 @@ interface GenerateWODDialogProps {
   dayInCycle: number;
 }
 
-// 7-DAY CATEGORY CYCLE for preview
-const CATEGORY_CYCLE_7DAY = [
-  "CHALLENGE",
-  "STRENGTH",
-  "CARDIO",
-  "MOBILITY & STABILITY",
-  "STRENGTH",
-  "METABOLIC",
-  "CALORIE BURNING"
+// 8-DAY CATEGORY CYCLE for preview (matches backend exactly)
+const CATEGORY_CYCLE_8DAY = [
+  "CHALLENGE",            // Day 1
+  "STRENGTH",             // Day 2
+  "CARDIO",               // Day 3
+  "MOBILITY & STABILITY", // Day 4
+  "STRENGTH",             // Day 5
+  "METABOLIC",            // Day 6
+  "CALORIE BURNING",      // Day 7
+  "PILATES"               // Day 8
 ];
+
+// Reference date: December 14, 2025 = Day 1 (CHALLENGE)
+const CYCLE_START_DATE = '2025-12-14';
+
+// DATE-BASED calculation - always gives correct category for calendar day
+const getDayInCycleFromDate = (dateStr: string): number => {
+  const startDate = new Date(CYCLE_START_DATE + 'T00:00:00Z');
+  const targetDate = new Date(dateStr + 'T00:00:00Z');
+  const daysDiff = Math.floor((targetDate.getTime() - startDate.getTime()) / (24 * 60 * 60 * 1000));
+  const normalizedDays = ((daysDiff % 8) + 8) % 8;
+  return normalizedDays + 1; // 1-8
+};
+
+const getCategoryForDay = (dayInCycle: number): string => CATEGORY_CYCLE_8DAY[dayInCycle - 1];
 
 export const GenerateWODDialog = ({
   open,
@@ -44,11 +59,11 @@ export const GenerateWODDialog = ({
   const today = new Date();
   const maxDate = addDays(today, 7);
   
-  // Calculate category for selected future date
+  // Calculate category for selected future date using DATE-BASED calculation
   const getPreviewCategory = (date: Date): string => {
-    const daysFromToday = Math.floor((date.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
-    const futureDayInCycle = ((dayInCycle - 1 + daysFromToday) % 7);
-    return CATEGORY_CYCLE_7DAY[futureDayInCycle];
+    const dateStr = format(date, "yyyy-MM-dd");
+    const futureDayInCycle = getDayInCycleFromDate(dateStr);
+    return getCategoryForDay(futureDayInCycle);
   };
   
   const previewCategory = dateMode === "future" && selectedDate 
