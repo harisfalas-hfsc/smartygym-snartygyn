@@ -219,7 +219,10 @@ const WorkoutFlow = () => {
                 {isMobile ? (
                   <>
                     <p className="text-sm text-center">
-                      <span className="text-primary font-semibold">Smarty Workouts</span> are single-session training routines designed to fit your lifestyle and goals. Hit the gym without a plan? In the home? On the go? <span className="text-primary font-semibold">Smarty Workouts</span> are designed to deliver results in any setting. Unlock all workouts with a Premium plan, or grab one standalone session whenever you need it. Our coach, <Link to="/coach-profile" className="text-primary font-semibold hover:underline">Haris Falas</Link>, suggests following the <span className="text-primary font-semibold">WOD</span> for science-based periodization, ensuring safety and optimal results.
+                      <span className="text-primary font-semibold">Smarty Workouts</span> are single-session training routines designed to fit your lifestyle and goals. Hit the gym without a plan? In the home? On the go? <span className="text-primary font-semibold">Smarty Workouts</span> are designed to deliver results in any setting. Unlock all workouts with a Premium plan, or grab one standalone session whenever you need it.
+                    </p>
+                    <p className="text-sm text-center mt-4 text-muted-foreground">
+                      Our coach, <Link to="/coach-profile" className="text-primary font-semibold hover:underline">Haris Falas</Link>, suggests following the <span className="text-primary font-semibold">WOD</span> for science-based periodization, ensuring safety and optimal results.
                     </p>
                   </>
                 ) : (
@@ -229,7 +232,11 @@ const WorkoutFlow = () => {
                     </p>
                     
                     <p className="text-sm sm:text-base font-semibold text-foreground text-center mt-6">
-                      Unlock all workouts with a Premium plan or grab one standalone session whenever you need it. Our coach, <Link to="/coach-profile" className="text-primary hover:underline">Haris Falas</Link>, suggests following the <span className="text-primary">WOD</span> for science-based periodization, ensuring safety and optimal results.
+                      Unlock all workouts with a Premium plan or grab one standalone session whenever you need it.
+                    </p>
+                    
+                    <p className="text-sm sm:text-base text-muted-foreground text-center mt-4">
+                      Our coach, <Link to="/coach-profile" className="text-primary font-semibold hover:underline">Haris Falas</Link>, suggests following the <span className="text-primary font-semibold">WOD</span> for science-based periodization, ensuring safety and optimal results.
                     </p>
                   </>
                 )}
