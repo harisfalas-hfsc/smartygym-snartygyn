@@ -1,4 +1,4 @@
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { Helmet } from "react-helmet";
 import { useState, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
@@ -217,9 +217,14 @@ const WorkoutFlow = () => {
               <h2 className="text-xl sm:text-2xl font-bold mb-3 text-center">About Smarty Workouts</h2>
               <div className="space-y-2 text-muted-foreground max-w-3xl mx-auto">
                 {isMobile ? (
-                  <p className="text-sm text-center">
-                    <span className="text-primary font-semibold">Smarty Workouts</span> are single-session training routines designed to fit your lifestyle and goals. Hit the gym without a plan? In the home? On the go? <span className="text-primary font-semibold">Smarty Workouts</span> are designed to deliver results in any setting. Unlock all workouts with a Premium plan, or grab one standalone session whenever you need it.
-                  </p>
+                  <>
+                    <p className="text-sm text-center">
+                      <span className="text-primary font-semibold">Smarty Workouts</span> are single-session training routines designed to fit your lifestyle and goals. Hit the gym without a plan? In the home? On the go? <span className="text-primary font-semibold">Smarty Workouts</span> are designed to deliver results in any setting. Unlock all workouts with a Premium plan, or grab one standalone session whenever you need it.
+                    </p>
+                    <p className="text-sm text-center mt-4 text-muted-foreground">
+                      Our coach suggests following the <Link to="/workout/wod" className="text-primary font-semibold hover:underline">Workout of the Day</Link> for science-based periodization, ensuring safety and optimal results.
+                    </p>
+                  </>
                 ) : (
                   <>
                     <p className="text-sm sm:text-base text-center">
@@ -228,6 +233,10 @@ const WorkoutFlow = () => {
                     
                     <p className="text-sm sm:text-base font-semibold text-foreground text-center mt-6">
                       Unlock all workouts with a Premium plan or grab one standalone session whenever you need it.
+                    </p>
+                    
+                    <p className="text-sm sm:text-base text-muted-foreground text-center mt-4">
+                      Our coach suggests following the <Link to="/workout/wod" className="text-primary font-semibold hover:underline">Workout of the Day</Link> for science-based periodization of your fitness journey, ensuring safety and optimal results.
                     </p>
                   </>
                 )}
