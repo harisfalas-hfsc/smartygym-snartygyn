@@ -184,37 +184,33 @@ function checkManualOverride(
   return null;
 }
 
-// Calculate future WOD schedule for admin preview
+// Calculate future WOD schedule for admin preview (28-day fixed cycle)
 export function calculateFutureWODSchedule(
-  currentDayCount: number,
-  currentWeekNumber: number,
-  usedStarsInWeek: Record<string, boolean>,
-  formatUsage: Record<string, string[]>,
-  daysAhead: number = 8
-): Array<{ date: string; dayInCycle: number; category: string; difficulty: { name: string; stars: number }; formats: string[] }> {
+  daysAhead: number = 28
+): Array<{ date: string; dayInCycle: number; category: string; difficulty: { name: string | null; stars: number | null }; formats: string[]; isRecoveryDay: boolean }> {
   const schedule = [];
   
   for (let i = 1; i <= daysAhead; i++) {
-    const futureDayCount = currentDayCount + i;
-    const futureDayInCycle = getDayInCycle(futureDayCount);
-    const futureWeekNumber = getWeekNumber(futureDayCount);
-    
-    // Reset used stars if entering new week
-    const futureUsedStars = futureDayInCycle === 1 ? {} : usedStarsInWeek;
-    
-    const category = getCategoryForDay(futureDayInCycle);
-    const difficulty = getDifficultyForDay(futureDayInCycle, futureWeekNumber, futureUsedStars);
-    const formats = FORMATS_BY_CATEGORY[category] || ["CIRCUIT"];
-    
     const futureDate = new Date();
     futureDate.setDate(futureDate.getDate() + i);
+    const futureDateStr = futureDate.toISOString().split('T')[0];
+    
+    const futureDayInCycle = getDayInCycleFromDate(futureDateStr);
+    const periodization = getPeriodizationForDay(futureDayInCycle);
+    const category = periodization.category;
+    const isRecoveryDay = category === "RECOVERY";
+    
+    // Get difficulty (null for RECOVERY days)
+    const difficulty = getDifficultyForDay(futureDayInCycle);
+    const formats = FORMATS_BY_CATEGORY[category] || ["CIRCUIT"];
     
     schedule.push({
-      date: futureDate.toISOString().split('T')[0],
+      date: futureDateStr,
       dayInCycle: futureDayInCycle,
       category,
-      difficulty,
-      formats
+      difficulty: { name: difficulty.name, stars: difficulty.stars },
+      formats,
+      isRecoveryDay
     });
   }
   
@@ -442,28 +438,24 @@ serve(async (req) => {
     }
 
     // ═══════════════════════════════════════════════════════════════════════════════
-    // CALCULATE TODAY'S WOD PARAMETERS (8-DAY CYCLE - DATE-BASED)
-    // CRITICAL: Now uses calendar date instead of counter to prevent desync
+    // CALCULATE TODAY'S WOD PARAMETERS (28-DAY FIXED CYCLE - DATE-BASED)
+    // CRITICAL: Categories and difficulties are FIXED per day - no shifts, just repeats
     // ═══════════════════════════════════════════════════════════════════════════════
     
     // Use DATE-BASED calculation - this always gives correct category for the calendar day
     const dayInCycle = getDayInCycleFromDate(effectiveDate);
-    const weekNumber = getWeekNumberFromDate(effectiveDate);
-    let usedStarsInWeek = state.used_stars_in_week || {};
+    const periodization = getPeriodizationForDay(dayInCycle);
     const manualOverrides = state.manual_overrides || {};
     
-    // Check if we're starting a new 8-day cycle (day 1) - reset used stars
-    if (dayInCycle === 1) {
-      usedStarsInWeek = {};
-      logStep("New 8-day cycle started (Day 1), resetting used stars");
-    }
+    // Check if this is a RECOVERY day (days 10 & 28)
+    const isRecoveryDay = periodization.category === "RECOVERY";
     
-    logStep("8-Day Cycle Parameters (DATE-BASED)", { 
+    logStep("28-Day Fixed Cycle Parameters (DATE-BASED)", { 
       effectiveDate,
       dayInCycle,
-      weekNumber,
-      expectedCategory: getCategoryForDay(dayInCycle),
-      usedStarsInWeek,
+      expectedCategory: periodization.category,
+      expectedDifficulty: periodization.difficulty,
+      isRecoveryDay,
       legacyDayCount: state.day_count // Keep for debugging comparison
     });
 
@@ -487,16 +479,28 @@ serve(async (req) => {
     } else if (override) {
       logStep("USING MANUAL OVERRIDE", override);
       category = override.category || getCategoryForDay(dayInCycle);
-      selectedDifficulty = override.difficulty 
-        ? { 
-            name: override.difficulty <= 2 ? "Beginner" : override.difficulty <= 4 ? "Intermediate" : "Advanced",
-            stars: override.difficulty 
-          }
-        : getDifficultyForDay(dayInCycle, weekNumber, usedStarsInWeek);
+      if (override.difficulty) {
+        selectedDifficulty = { 
+          name: override.difficulty <= 2 ? "Beginner" : override.difficulty <= 4 ? "Intermediate" : "Advanced",
+          stars: override.difficulty 
+        };
+      } else {
+        const diffResult = getDifficultyForDay(dayInCycle);
+        selectedDifficulty = {
+          name: diffResult.name || "Beginner",
+          stars: diffResult.stars || 1
+        };
+      }
     } else {
-      // Normal calculation
+      // Normal calculation from 28-day fixed periodization
       category = getCategoryForDay(dayInCycle);
-      selectedDifficulty = getDifficultyForDay(dayInCycle, weekNumber, usedStarsInWeek);
+      const diffResult = getDifficultyForDay(dayInCycle);
+      // Handle RECOVERY days (null difficulty)
+      if (isRecoveryDay || !diffResult.name || !diffResult.stars) {
+        selectedDifficulty = { name: "Recovery", stars: 0 };
+      } else {
+        selectedDifficulty = { name: diffResult.name, stars: diffResult.stars };
+      }
     }
     
     logStep("Today's WOD specs (shared)", { 
@@ -595,13 +599,17 @@ serve(async (req) => {
     const yesterdayEquipment = yesterdayWod?.equipment || "Unknown";
     const yesterdayFormat = yesterdayWod?.format || "Unknown";
     
-    // Calculate tomorrow's expected specs
-    const tomorrowDayCount = state.day_count + 1;
-    const tomorrowDayInCycle = getDayInCycle(tomorrowDayCount);
-    const tomorrowWeekNumber = tomorrowDayInCycle === 1 ? weekNumber + 1 : weekNumber;
+    // Calculate tomorrow's expected specs (28-day fixed cycle - date-based)
+    const tomorrow = new Date(effectiveDate + 'T00:00:00Z');
+    tomorrow.setDate(tomorrow.getDate() + 1);
+    const tomorrowDateStr = tomorrow.toISOString().split('T')[0];
+    const tomorrowDayInCycle = getDayInCycleFromDate(tomorrowDateStr);
     const tomorrowCategory = getCategoryForDay(tomorrowDayInCycle);
-    const tomorrowUsedStars = tomorrowDayInCycle === 1 ? {} : { ...usedStarsInWeek, [String(selectedDifficulty.stars)]: true };
-    const tomorrowDifficulty = getDifficultyForDay(tomorrowDayInCycle, tomorrowWeekNumber, tomorrowUsedStars);
+    const tomorrowDiffResult = getDifficultyForDay(tomorrowDayInCycle);
+    const tomorrowDifficulty = { 
+      name: tomorrowDiffResult.name || "Recovery", 
+      stars: tomorrowDiffResult.stars || 0 
+    };
     
     // Generate scaling advice based on yesterday vs today
     let scalingAdvice = "";
@@ -1604,24 +1612,24 @@ INSTRUCTIONS FORMAT: Plain paragraphs with clear guidance
     // UPDATE STATE - Track used stars, remove override if used
     // ═══════════════════════════════════════════════════════════════════════════════
 
-    // Update used stars tracking
-    const newUsedStarsInWeek = { ...usedStarsInWeek, [String(selectedDifficulty.stars)]: true };
-    
     // Remove used override if any (for the effective date, not just today)
     const newManualOverrides = { ...manualOverrides };
     if (newManualOverrides[effectiveDate]) {
       delete newManualOverrides[effectiveDate];
     }
     
-    // Calculate new week number (increment if completing day 7)
-    const newWeekNumber = dayInCycle === 7 ? weekNumber + 1 : weekNumber;
+    // Calculate next day's info for state (28-day fixed cycle)
+    const nextDayDate = new Date(effectiveDate + 'T00:00:00Z');
+    nextDayDate.setDate(nextDayDate.getDate() + 1);
+    const nextDayDateStr = nextDayDate.toISOString().split('T')[0];
+    const nextDayInCycle = getDayInCycleFromDate(nextDayDateStr);
     
     const newState = {
-      day_count: state.day_count + 1,
-      week_number: newWeekNumber,
-      used_stars_in_week: dayInCycle === 7 ? {} : newUsedStarsInWeek,
+      day_count: state.day_count + 1, // Legacy counter for stats
+      week_number: Math.ceil(dayInCycle / 7), // Legacy - approximate week in cycle
+      used_stars_in_week: {}, // No longer used - stars are fixed per day
       manual_overrides: newManualOverrides,
-      current_category: getCategoryForDay(getDayInCycle(state.day_count + 1)),
+      current_category: getCategoryForDay(nextDayInCycle),
       last_equipment: "BOTH",
       last_difficulty: selectedDifficulty.name,
       format_usage: updatedUsage,
@@ -1651,9 +1659,9 @@ INSTRUCTIONS FORMAT: Plain paragraphs with clear guidance
         } else {
           logStep("State updated BEFORE notifications", { 
             newDayCount: newState.day_count,
-            nextDayInCycle: getDayInCycle(newState.day_count),
+            nextDayInCycle,
             nextCategory: newState.current_category,
-            weekNumber: newState.week_number
+            cycleDay: dayInCycle
           });
         }
       } else {
@@ -1680,10 +1688,11 @@ INSTRUCTIONS FORMAT: Plain paragraphs with clear guidance
         shared: {
           category: category,
           dayInCycle: dayInCycle,
-          weekNumber: weekNumber,
+          cycleNumber: Math.floor((dayInCycle - 1) / 28) + 1,
           difficulty: selectedDifficulty.name,
           difficulty_stars: selectedDifficulty.stars,
-          note: "Format and duration now vary per equipment type (except STRENGTH and MOBILITY & STABILITY which are always REPS & SETS)"
+          isRecoveryDay,
+          note: "28-day fixed periodization - Format and duration vary per equipment type (except STRENGTH, MOBILITY & STABILITY, and PILATES which are always REPS & SETS)"
         }
       }),
       {
