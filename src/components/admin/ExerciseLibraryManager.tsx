@@ -45,35 +45,11 @@ interface Exercise {
   secondary_muscles: string[] | null;
   instructions: string[] | null;
   gif_url: string | null;
+  description: string | null;
+  difficulty: string | null;
+  category: string | null;
 }
 
-// CSV parsing helper
-function parseCSVLine(line: string): string[] {
-  const result: string[] = [];
-  let current = "";
-  let inQuotes = false;
-  
-  for (let i = 0; i < line.length; i++) {
-    const char = line[i];
-    
-    if (char === '"') {
-      if (inQuotes && line[i + 1] === '"') {
-        current += '"';
-        i++;
-      } else {
-        inQuotes = !inQuotes;
-      }
-    } else if (char === "," && !inQuotes) {
-      result.push(current);
-      current = "";
-    } else {
-      current += char;
-    }
-  }
-  
-  result.push(current);
-  return result;
-}
 
 const ExerciseLibraryManager = () => {
   const queryClient = useQueryClient();
@@ -84,11 +60,11 @@ const ExerciseLibraryManager = () => {
   const [editingVideo, setEditingVideo] = useState<ExerciseVideo | null>(null);
   const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null);
   
-  // CSV import state
+  // Import state
   const [isImporting, setIsImporting] = useState(false);
   const [importProgress, setImportProgress] = useState(0);
   const [importStatus, setImportStatus] = useState("");
-  const csvInputRef = useRef<HTMLInputElement>(null);
+  const jsonInputRef = useRef<HTMLInputElement>(null);
   const gifInputRef = useRef<HTMLInputElement>(null);
   
   // GIF upload state
@@ -160,66 +136,44 @@ const ExerciseLibraryManager = () => {
     }
   });
 
-  // CSV Import handler
-  const handleCSVUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+  // JSON Import handler
+  const handleJSONUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (!file) return;
 
     setIsImporting(true);
     setImportProgress(0);
-    setImportStatus("Reading CSV file...");
+    setImportStatus("Reading JSON file...");
 
     try {
       const text = await file.text();
-      const lines = text.trim().split("\n");
-      const headers = lines[0].split(",");
+      const jsonData = JSON.parse(text);
       
-      // Find column indices
-      const colIndex: { [key: string]: number } = {};
-      headers.forEach((h, i) => {
-        colIndex[h.trim()] = i;
-      });
+      // Handle both array format and object with exercises array
+      const exercisesArray = Array.isArray(jsonData) ? jsonData : (jsonData.exercises || []);
+      
+      if (!exercisesArray.length) {
+        throw new Error("No exercises found in JSON file");
+      }
 
-      setImportStatus(`Parsing ${lines.length - 1} exercises...`);
+      setImportStatus(`Parsing ${exercisesArray.length} exercises...`);
       setImportProgress(10);
 
       const exercisesToInsert: any[] = [];
 
-      for (let i = 1; i < lines.length; i++) {
-        const line = lines[i];
-        if (!line.trim()) continue;
-        
-        const values = parseCSVLine(line);
-        
-        // Collect secondary muscles
-        const secondaryMuscles: string[] = [];
-        for (let j = 0; j <= 5; j++) {
-          const key = `secondaryMuscles/${j}`;
-          if (colIndex[key] !== undefined) {
-            const val = values[colIndex[key]]?.trim();
-            if (val) secondaryMuscles.push(val);
-          }
-        }
-        
-        // Collect instructions
-        const instructions: string[] = [];
-        for (let j = 0; j <= 10; j++) {
-          const key = `instructions/${j}`;
-          if (colIndex[key] !== undefined) {
-            const val = values[colIndex[key]]?.trim();
-            if (val) instructions.push(val);
-          }
-        }
-        
+      for (const item of exercisesArray) {
         const exercise = {
-          id: values[colIndex["id"]]?.trim(),
-          name: values[colIndex["name"]]?.trim(),
-          body_part: values[colIndex["bodyPart"]]?.trim(),
-          equipment: values[colIndex["equipment"]]?.trim(),
-          target: values[colIndex["target"]]?.trim(),
-          secondary_muscles: secondaryMuscles,
-          instructions: instructions,
-          gif_url: null,
+          id: item.id?.toString() || '',
+          name: item.name?.trim() || '',
+          body_part: item.bodyPart?.trim() || '',
+          equipment: item.equipment?.trim() || '',
+          target: item.target?.trim() || '',
+          secondary_muscles: Array.isArray(item.secondaryMuscles) ? item.secondaryMuscles : [],
+          instructions: Array.isArray(item.instructions) ? item.instructions : [],
+          description: item.description?.trim() || null,
+          difficulty: item.difficulty?.trim() || null,
+          category: item.category?.trim() || null,
+          gif_url: null, // GIFs are uploaded separately
         };
         
         if (exercise.id && exercise.name) {
@@ -272,8 +226,8 @@ const ExerciseLibraryManager = () => {
       setImportStatus("Import failed. Please try again.");
     } finally {
       setIsImporting(false);
-      if (csvInputRef.current) {
-        csvInputRef.current.value = "";
+      if (jsonInputRef.current) {
+        jsonInputRef.current.value = "";
       }
     }
   };
@@ -576,21 +530,21 @@ const ExerciseLibraryManager = () => {
               <div className="flex flex-wrap gap-4">
                 <div>
                   <input
-                    ref={csvInputRef}
+                    ref={jsonInputRef}
                     type="file"
-                    accept=".csv"
-                    onChange={handleCSVUpload}
+                    accept=".json"
+                    onChange={handleJSONUpload}
                     className="hidden"
                     disabled={isImporting}
                   />
                   <Button
-                    onClick={() => csvInputRef.current?.click()}
+                    onClick={() => jsonInputRef.current?.click()}
                     disabled={isImporting}
                     variant="outline"
                     className="flex items-center gap-2"
                   >
                     <FileSpreadsheet className="h-4 w-4" />
-                    Upload CSV File
+                    Upload JSON File
                   </Button>
                 </div>
 
@@ -634,7 +588,7 @@ const ExerciseLibraryManager = () => {
 
               {/* Import Instructions */}
               <div className="text-xs text-muted-foreground border-t pt-4 space-y-1">
-                <p><strong>CSV Format:</strong> Must include columns: id, name, bodyPart, equipment, target, secondaryMuscles/0-5, instructions/0-10</p>
+                <p><strong>JSON Format:</strong> ExerciseDB format with fields: id, name, bodyPart, equipment, target, secondaryMuscles[], instructions[], description, difficulty, category</p>
                 <p><strong>GIF Files:</strong> Name files by exercise ID (e.g., 0001.gif matches exercise id "0001")</p>
               </div>
             </CardContent>
@@ -704,6 +658,7 @@ const ExerciseLibraryManager = () => {
                         <TableHead>Body Part</TableHead>
                         <TableHead>Target</TableHead>
                         <TableHead>Equipment</TableHead>
+                        <TableHead>Difficulty</TableHead>
                         <TableHead>ID</TableHead>
                       </TableRow>
                     </TableHeader>
@@ -729,6 +684,7 @@ const ExerciseLibraryManager = () => {
                           <TableCell className="capitalize">{exercise.body_part}</TableCell>
                           <TableCell className="capitalize">{exercise.target}</TableCell>
                           <TableCell className="capitalize">{exercise.equipment}</TableCell>
+                          <TableCell className="capitalize text-xs">{exercise.difficulty || '-'}</TableCell>
                           <TableCell className="font-mono text-xs text-muted-foreground">{exercise.id}</TableCell>
                         </TableRow>
                       ))}

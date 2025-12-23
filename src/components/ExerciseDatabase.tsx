@@ -24,6 +24,9 @@ interface Exercise {
   secondary_muscles: string[];
   instructions: string[];
   gif_url: string | null;
+  description: string | null;
+  difficulty: string | null;
+  category: string | null;
 }
 
 const ExerciseDatabase = () => {

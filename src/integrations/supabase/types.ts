@@ -970,7 +970,10 @@ export type Database = {
       exercises: {
         Row: {
           body_part: string
+          category: string | null
           created_at: string | null
+          description: string | null
+          difficulty: string | null
           equipment: string
           gif_url: string | null
           id: string
@@ -981,7 +984,10 @@ export type Database = {
         }
         Insert: {
           body_part: string
+          category?: string | null
           created_at?: string | null
+          description?: string | null
+          difficulty?: string | null
           equipment: string
           gif_url?: string | null
           id: string
@@ -992,7 +998,10 @@ export type Database = {
         }
         Update: {
           body_part?: string
+          category?: string | null
           created_at?: string | null
+          description?: string | null
+          difficulty?: string | null
           equipment?: string
           gif_url?: string | null
           id?: string
