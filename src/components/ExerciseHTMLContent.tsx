@@ -21,6 +21,43 @@ const ALLOWED_TAGS = ['p', 'br', 'strong', 'b', 'em', 'i', 'u', 'h1', 'h2', 'h3'
 const ALLOWED_ATTR = ['href', 'target', 'rel', 'class', 'id', 'style', 'src', 'alt', 'width', 'height', 'colspan', 'rowspan'];
 
 /**
+ * Escape special regex characters in a string
+ */
+function escapeRegExp(str: string): string {
+  return str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+
+/**
+ * Extract exercise name from plain text like "Jumping Jacks - 1 minute" or "Burpees x 10"
+ * Returns null if text doesn't look like an exercise mention
+ */
+function extractExerciseCandidate(text: string): string | null {
+  // Common patterns: "Exercise Name - duration", "Exercise Name x reps", "Exercise Name (notes)"
+  const patterns = [
+    /^([A-Za-z][A-Za-z\s'-]+?)\s*[-–—]\s*\d/i,   // "Jumping Jacks - 1 minute"
+    /^([A-Za-z][A-Za-z\s'-]+?)\s*[x×]\s*\d/i,     // "Burpees x 10"
+    /^([A-Za-z][A-Za-z\s'-]+?)\s*\(\d/i,          // "Mountain Climbers (30 sec)"
+    /^([A-Za-z][A-Za-z\s'-]+?)\s*:\s*\d/i,        // "Push-ups: 20 reps"
+  ];
+
+  for (const pattern of patterns) {
+    const match = text.match(pattern);
+    if (match && match[1]) {
+      const candidate = match[1].trim();
+      // Skip structural words
+      if (/^(warm|cool|rest|set|rep|round|block|station|circuit|phase|day|week)/i.test(candidate)) {
+        return null;
+      }
+      if (candidate.length >= 4 && candidate.length <= 50) {
+        return candidate;
+      }
+    }
+  }
+  return null;
+}
+
+
+/**
  * Convert a DOM node to React elements, replacing __EXERCISE_n__ placeholders with ExerciseLinkButton
  */
 function domToReact(
