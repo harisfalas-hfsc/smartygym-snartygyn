@@ -1836,35 +1836,56 @@ INSTRUCTIONS FORMAT: Plain paragraphs with clear guidance
         // Continue without matching - non-fatal error
       }
 
-      // Generate image using the correct generate-workout-image function
+      // ═══════════════════════════════════════════════════════════════════════════════
+      // IMAGE GENERATION WITH RETRY LOGIC - CRITICAL FOR WOD INTEGRITY
+      // Try up to 3 times with delays to ensure every WOD gets an image
+      // ═══════════════════════════════════════════════════════════════════════════════
       logStep(`Generating image for ${equipment} workout`, { name: workoutContent.name, category, format });
       
       let imageUrl: string | null = null;
-      try {
-        const { data: imageData, error: imageError } = await supabase.functions.invoke("generate-workout-image", {
-          body: { 
-            name: workoutContent.name, 
-            category: category, 
-            format: format, 
-            difficulty_stars: selectedDifficulty.stars 
-          }
-        });
+      const imageMaxRetries = 3;
+      const imageRetryDelayMs = 3000;
 
-        if (imageError) {
-          logStep(`Image generation error for ${equipment}`, { error: imageError.message });
-        } else {
-          imageUrl = imageData?.image_url || null;
+      for (let imageAttempt = 1; imageAttempt <= imageMaxRetries; imageAttempt++) {
+        try {
+          logStep(`Image generation attempt ${imageAttempt}/${imageMaxRetries}`, { equipment, workout: workoutContent.name });
+          
+          const { data: imageData, error: imageError } = await supabase.functions.invoke("generate-workout-image", {
+            body: { 
+              name: workoutContent.name, 
+              category: category, 
+              format: format, 
+              difficulty_stars: selectedDifficulty.stars 
+            }
+          });
+
+          if (imageError) {
+            logStep(`Image generation error on attempt ${imageAttempt}`, { error: imageError.message, equipment });
+          } else if (imageData?.image_url) {
+            imageUrl = imageData.image_url;
+            logStep(`✅ Image generated successfully on attempt ${imageAttempt}`, { equipment, imageUrl: imageUrl!.substring(0, 80) });
+            break; // Success, exit retry loop
+          } else {
+            logStep(`Image generation returned no URL on attempt ${imageAttempt}`, { equipment, imageData });
+          }
+        } catch (imgErr: any) {
+          logStep(`Image generation exception on attempt ${imageAttempt}`, { error: imgErr.message, equipment });
         }
-      } catch (imgErr: any) {
-        logStep(`Image generation failed for ${equipment}`, { error: imgErr.message });
+
+        // Wait before retry (except on last attempt)
+        if (imageAttempt < imageMaxRetries && !imageUrl) {
+          logStep(`Waiting ${imageRetryDelayMs}ms before image retry...`);
+          await new Promise(resolve => setTimeout(resolve, imageRetryDelayMs));
+        }
       }
       
-      logStep(`${equipment} image generated`, { hasImage: !!imageUrl, imageUrl });
+      logStep(`${equipment} image generation complete`, { hasImage: !!imageUrl, attempts: imageMaxRetries });
 
       // CRITICAL: Validate image before Stripe product creation
       if (!imageUrl) {
-        console.error(`[WOD-GENERATION] ⚠️ CRITICAL WARNING: No image URL for ${equipment} workout "${workoutContent.name}". Stripe product will be created WITHOUT an image!`);
-        logStep(`⚠️ WARNING: Creating Stripe product WITHOUT image`, { workout: workoutContent.name, equipment });
+        console.error(`[WOD-GENERATION] ❌ CRITICAL ERROR: No image URL for ${equipment} workout "${workoutContent.name}" after ${imageMaxRetries} attempts!`);
+        logStep(`❌ CRITICAL: All image generation attempts failed`, { workout: workoutContent.name, equipment, attempts: imageMaxRetries });
+        // Continue but log prominently - the workout will be created without image
       } else {
         logStep(`✅ Image validated for Stripe`, { imageUrl: imageUrl.substring(0, 80) });
       }

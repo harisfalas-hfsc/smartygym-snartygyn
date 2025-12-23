@@ -155,17 +155,41 @@ export const WorkoutsManager = ({ externalDialog, setExternalDialog }: WorkoutsM
   };
 
   const handleDelete = async (id: string) => {
-    if (!confirm('Are you sure you want to delete this workout?')) return;
-
     try {
-      // Get workout details to find Stripe product ID
+      // Get workout details to check if it's a WOD with standalone purchase
       const { data: workout, error: fetchError } = await supabase
         .from('admin_workouts')
-        .select('stripe_product_id')
+        .select('stripe_product_id, is_workout_of_day, is_standalone_purchase, name')
         .eq('id', id)
         .single();
 
       if (fetchError) throw fetchError;
+
+      // If it's a WOD with Stripe product, move to gallery instead of deleting
+      if (workout?.is_workout_of_day && workout?.is_standalone_purchase && workout?.stripe_product_id) {
+        if (!confirm(`"${workout.name}" is a purchasable WOD. Instead of deleting, it will be moved to the gallery (WOD status removed). Continue?`)) return;
+
+        // Move to gallery - keep Stripe product, just remove WOD status
+        const { error: updateError } = await supabase
+          .from('admin_workouts')
+          .update({ 
+            is_workout_of_day: false, 
+            generated_for_date: null 
+          })
+          .eq('id', id);
+
+        if (updateError) throw updateError;
+
+        toast({
+          title: "Moved to Gallery",
+          description: `"${workout.name}" is now a regular workout (purchasable). Stripe product preserved.`,
+        });
+        loadWorkouts();
+        return;
+      }
+
+      // Regular delete for non-WOD or non-purchasable workouts
+      if (!confirm('Are you sure you want to permanently delete this workout?')) return;
 
       // Delete from Stripe first if product exists
       if (workout?.stripe_product_id) {
@@ -356,16 +380,33 @@ export const WorkoutsManager = ({ externalDialog, setExternalDialog }: WorkoutsM
     if (!confirm(`Delete ${selectedWorkouts.length} selected workouts?`)) return;
 
     try {
-      // Get all workouts to find Stripe product IDs
+      // Get all workouts to check for WODs with Stripe products
       const { data: workoutsToDelete, error: fetchError } = await supabase
         .from('admin_workouts')
-        .select('id, stripe_product_id')
+        .select('id, stripe_product_id, is_workout_of_day, is_standalone_purchase, name')
         .in('id', selectedWorkouts);
 
       if (fetchError) throw fetchError;
 
-      // Delete from Stripe for each workout that has a product
-      for (const workout of workoutsToDelete || []) {
+      // Separate WODs that should be moved to gallery vs regular deletes
+      const wodsToMove = (workoutsToDelete || []).filter(w => 
+        w.is_workout_of_day && w.is_standalone_purchase && w.stripe_product_id
+      );
+      const regularDeletes = (workoutsToDelete || []).filter(w => 
+        !w.is_workout_of_day || !w.is_standalone_purchase || !w.stripe_product_id
+      );
+
+      // Move WODs to gallery (preserve Stripe products)
+      if (wodsToMove.length > 0) {
+        const wodIds = wodsToMove.map(w => w.id);
+        await supabase
+          .from('admin_workouts')
+          .update({ is_workout_of_day: false, generated_for_date: null })
+          .in('id', wodIds);
+      }
+
+      // Delete Stripe products for regular deletes only
+      for (const workout of regularDeletes) {
         if (workout.stripe_product_id) {
           await supabase.functions.invoke('delete-stripe-product', {
             body: { productId: workout.stripe_product_id }
@@ -373,26 +414,36 @@ export const WorkoutsManager = ({ externalDialog, setExternalDialog }: WorkoutsM
         }
       }
 
-      // Soft-delete related purchases for all selected workouts (preserve for accounting)
-      for (const workoutId of selectedWorkouts) {
+      // Soft-delete related purchases for regular deletes
+      for (const workout of regularDeletes) {
         await supabase
           .from('user_purchases')
           .update({ content_deleted: true })
-          .eq('content_id', workoutId)
+          .eq('content_id', workout.id)
           .eq('content_type', 'workout');
       }
 
-      // Delete from database
-      const { error } = await supabase
-        .from('admin_workouts')
-        .delete()
-        .in('id', selectedWorkouts);
+      // Delete from database only regular deletes
+      if (regularDeletes.length > 0) {
+        const regularIds = regularDeletes.map(w => w.id);
+        const { error } = await supabase
+          .from('admin_workouts')
+          .delete()
+          .in('id', regularIds);
 
-      if (error) throw error;
+        if (error) throw error;
+      }
 
+      const movedCount = wodsToMove.length;
+      const deletedCount = regularDeletes.length;
+      
       toast({
         title: "Success",
-        description: `Deleted ${selectedWorkouts.length} workouts from database and Stripe`,
+        description: movedCount > 0 && deletedCount > 0 
+          ? `Moved ${movedCount} WOD(s) to gallery, deleted ${deletedCount} workout(s)`
+          : movedCount > 0 
+            ? `Moved ${movedCount} WOD(s) to gallery (Stripe products preserved)`
+            : `Deleted ${deletedCount} workout(s) from database and Stripe`,
       });
       setSelectedWorkouts([]);
       loadWorkouts();
