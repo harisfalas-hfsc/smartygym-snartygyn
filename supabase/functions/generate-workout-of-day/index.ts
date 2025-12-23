@@ -11,34 +11,42 @@ const corsHeaders = {
 };
 
 // ═══════════════════════════════════════════════════════════════════════════════
-// NEW 8-DAY CATEGORY CYCLE (with PILATES as Day 8)
+// FIXED 28-DAY PERIODIZATION SYSTEM - NO SHIFTS, JUST REPEATS
 // ═══════════════════════════════════════════════════════════════════════════════
-const CATEGORY_CYCLE_8DAY = [
-  "CHALLENGE",            // Day 1
-  "STRENGTH",             // Day 2 (REPS & SETS only)
-  "CARDIO",               // Day 3
-  "MOBILITY & STABILITY", // Day 4 (REPS & SETS only)
-  "STRENGTH",             // Day 5 (REPS & SETS only)
-  "METABOLIC",            // Day 6
-  "CALORIE BURNING",      // Day 7
-  "PILATES"               // Day 8 (REPS & SETS only - Reformer or Mat)
-];
-
-// ═══════════════════════════════════════════════════════════════════════════════
-// DIFFICULTY PATTERN - Rotates weekly to prevent category-difficulty pairing
-// ═══════════════════════════════════════════════════════════════════════════════
-// Week 1: [3-4, 5-6, 1-2, 5-6, 3-4, 1-2, 5-6, 3-4] -> Day 1 Intermediate, Day 2 Advanced...
-// Week 2: [5-6, 3-4, 5-6, 1-2, 5-6, 3-4, 1-2, 5-6] -> Shifts by 1
-// Week 3: Continues shifting...
-const DIFFICULTY_PATTERN_BASE = [
-  { level: "Intermediate", range: [3, 4] }, // Day 1
-  { level: "Advanced", range: [5, 6] },     // Day 2
-  { level: "Beginner", range: [1, 2] },     // Day 3
-  { level: "Advanced", range: [5, 6] },     // Day 4
-  { level: "Intermediate", range: [3, 4] }, // Day 5
-  { level: "Beginner", range: [1, 2] },     // Day 6
-  { level: "Advanced", range: [5, 6] },     // Day 7
-  { level: "Intermediate", range: [3, 4] }  // Day 8
+const PERIODIZATION_28DAY: Array<{
+  day: number;
+  category: string;
+  difficulty: "Beginner" | "Intermediate" | "Advanced" | null;
+  difficultyStars: [number, number] | null;
+}> = [
+  { day: 1,  category: "CARDIO",              difficulty: "Beginner",     difficultyStars: [1, 2] },
+  { day: 2,  category: "STRENGTH",            difficulty: "Advanced",     difficultyStars: [5, 6] },
+  { day: 3,  category: "MOBILITY & STABILITY", difficulty: "Intermediate", difficultyStars: [3, 4] },
+  { day: 4,  category: "CHALLENGE",           difficulty: "Advanced",     difficultyStars: [5, 6] },
+  { day: 5,  category: "STRENGTH",            difficulty: "Intermediate", difficultyStars: [3, 4] },
+  { day: 6,  category: "PILATES",             difficulty: "Advanced",     difficultyStars: [5, 6] },
+  { day: 7,  category: "CALORIE BURNING",     difficulty: "Intermediate", difficultyStars: [3, 4] },
+  { day: 8,  category: "METABOLIC",           difficulty: "Beginner",     difficultyStars: [1, 2] },
+  { day: 9,  category: "CHALLENGE",           difficulty: "Advanced",     difficultyStars: [5, 6] },
+  { day: 10, category: "RECOVERY",            difficulty: null,           difficultyStars: null },
+  { day: 11, category: "CARDIO",              difficulty: "Intermediate", difficultyStars: [3, 4] },
+  { day: 12, category: "STRENGTH",            difficulty: "Intermediate", difficultyStars: [3, 4] },
+  { day: 13, category: "MOBILITY & STABILITY", difficulty: "Advanced",     difficultyStars: [5, 6] },
+  { day: 14, category: "CHALLENGE",           difficulty: "Intermediate", difficultyStars: [3, 4] },
+  { day: 15, category: "STRENGTH",            difficulty: "Intermediate", difficultyStars: [3, 4] },
+  { day: 16, category: "PILATES",             difficulty: "Beginner",     difficultyStars: [1, 2] },
+  { day: 17, category: "CALORIE BURNING",     difficulty: "Advanced",     difficultyStars: [5, 6] },
+  { day: 18, category: "METABOLIC",           difficulty: "Intermediate", difficultyStars: [3, 4] },
+  { day: 19, category: "CARDIO",              difficulty: "Advanced",     difficultyStars: [5, 6] },
+  { day: 20, category: "STRENGTH",            difficulty: "Beginner",     difficultyStars: [1, 2] },
+  { day: 21, category: "MOBILITY & STABILITY", difficulty: "Beginner",     difficultyStars: [1, 2] },
+  { day: 22, category: "CHALLENGE",           difficulty: "Intermediate", difficultyStars: [3, 4] },
+  { day: 23, category: "STRENGTH",            difficulty: "Advanced",     difficultyStars: [5, 6] },
+  { day: 24, category: "PILATES",             difficulty: "Intermediate", difficultyStars: [3, 4] },
+  { day: 25, category: "CALORIE BURNING",     difficulty: "Beginner",     difficultyStars: [1, 2] },
+  { day: 26, category: "METABOLIC",           difficulty: "Advanced",     difficultyStars: [5, 6] },
+  { day: 27, category: "CHALLENGE",           difficulty: "Intermediate", difficultyStars: [3, 4] },
+  { day: 28, category: "RECOVERY",            difficulty: null,           difficultyStars: null },
 ];
 
 // ═══════════════════════════════════════════════════════════════════════════════
@@ -51,7 +59,8 @@ const FORMATS_BY_CATEGORY: Record<string, string[]> = {
   "CARDIO": ["CIRCUIT", "EMOM", "FOR TIME", "AMRAP", "TABATA"], // NO Reps & Sets
   "METABOLIC": ["CIRCUIT", "AMRAP", "EMOM", "FOR TIME", "TABATA"], // NO Reps & Sets
   "CALORIE BURNING": ["CIRCUIT", "TABATA", "AMRAP", "FOR TIME", "EMOM"], // NO Reps & Sets
-  "CHALLENGE": ["CIRCUIT", "TABATA", "AMRAP", "EMOM", "FOR TIME", "MIX"] // Any except Reps & Sets
+  "CHALLENGE": ["CIRCUIT", "TABATA", "AMRAP", "EMOM", "FOR TIME", "MIX"], // Any except Reps & Sets
+  "RECOVERY": ["CIRCUIT", "REPS & SETS"] // Light stretching and mobility
 };
 
 // All difficulty levels available (6 levels)
@@ -70,84 +79,58 @@ function logStep(step: string, details?: any) {
 }
 
 // ═══════════════════════════════════════════════════════════════════════════════
-// DATE-BASED ROTATION LOGIC (8-DAY CYCLE)
-// CRITICAL FIX: Categories now calculated from calendar date, not a counter
-// This prevents desync when cron jobs are missed or manual generation occurs
+// DATE-BASED ROTATION LOGIC (28-DAY FIXED CYCLE)
+// CRITICAL: Categories and difficulties are FIXED per day - no shifts
 // ═══════════════════════════════════════════════════════════════════════════════
 
-// Reference date: December 14, 2025 = Day 1 (CHALLENGE)
-// This anchors the 8-day cycle to the calendar
-const CYCLE_START_DATE = '2025-12-14';
+// Reference date: December 24, 2024 = Day 1 (CARDIO/Beginner)
+const CYCLE_START_DATE = '2024-12-24';
 
-// Get day 1-8 in cycle based on calendar date (NOT a counter)
+// Get day 1-28 in cycle based on calendar date
 function getDayInCycleFromDate(dateStr: string): number {
   const startDate = new Date(CYCLE_START_DATE + 'T00:00:00Z');
   const targetDate = new Date(dateStr + 'T00:00:00Z');
   const daysDiff = Math.floor((targetDate.getTime() - startDate.getTime()) / (24 * 60 * 60 * 1000));
-  // Handle negative days (dates before reference) properly with modulo
-  const normalizedDays = ((daysDiff % 8) + 8) % 8;
-  return normalizedDays + 1; // 1-8
+  const normalizedDays = ((daysDiff % 28) + 28) % 28;
+  return normalizedDays + 1; // 1-28
 }
 
-// Get week number based on calendar date (for difficulty rotation shift)
-function getWeekNumberFromDate(dateStr: string): number {
-  const startDate = new Date(CYCLE_START_DATE + 'T00:00:00Z');
-  const targetDate = new Date(dateStr + 'T00:00:00Z');
-  const daysDiff = Math.floor((targetDate.getTime() - startDate.getTime()) / (24 * 60 * 60 * 1000));
-  return Math.floor(daysDiff / 8) + 1;
+// Get periodization for a specific day (1-28)
+function getPeriodizationForDay(dayInCycle: number): typeof PERIODIZATION_28DAY[0] {
+  const index = Math.max(0, Math.min(27, dayInCycle - 1));
+  return PERIODIZATION_28DAY[index];
 }
 
-// Legacy functions kept for backward compatibility with preview calculations
-function getDayInCycle(dayCount: number): number {
-  return (dayCount % 8) + 1;
-}
-
-function getWeekNumber(dayCount: number): number {
-  return Math.floor(dayCount / 8) + 1;
-}
-
-// Get category for a specific day in cycle (1-8)
+// Get category for a specific day in cycle (1-28)
 function getCategoryForDay(dayInCycle: number): string {
-  return CATEGORY_CYCLE_8DAY[dayInCycle - 1];
+  return getPeriodizationForDay(dayInCycle).category;
 }
 
-// Get difficulty for day with weekly rotation shift and star alternation
-function getDifficultyForDay(
-  dayInCycle: number, 
-  weekNumber: number, 
-  usedStarsInWeek: Record<string, boolean>
-): { name: string; stars: number } {
-  // Shift the difficulty pattern by (weekNumber - 1) positions
-  const shiftAmount = (weekNumber - 1) % 8;
-  const shiftedIndex = ((dayInCycle - 1) + shiftAmount) % 8;
-  const pattern = DIFFICULTY_PATTERN_BASE[shiftedIndex];
+// Get difficulty for day - FIXED, no shifting
+function getDifficultyForDay(dayInCycle: number): { name: string | null; stars: number | null; range: [number, number] | null } {
+  const periodization = getPeriodizationForDay(dayInCycle);
   
-  const [star1, star2] = pattern.range;
-  
-  // Alternate stars: if star1 used this week, use star2
-  // This prevents duplicate stars in the 7-day period
-  let selectedStars: number;
-  if (usedStarsInWeek[String(star1)]) {
-    selectedStars = star2;
-  } else if (usedStarsInWeek[String(star2)]) {
-    selectedStars = star1;
-  } else {
-    // Neither used, pick star1 first
-    selectedStars = star1;
+  if (!periodization.difficulty || !periodization.difficultyStars) {
+    return { name: null, stars: null, range: null };
   }
   
-  logStep("Difficulty calculation", {
+  // Randomly pick one star from the range
+  const [star1, star2] = periodization.difficultyStars;
+  const selectedStars = Math.random() < 0.5 ? star1 : star2;
+  
+  logStep("Difficulty calculation (28-day fixed)", {
     dayInCycle,
-    weekNumber,
-    shiftAmount,
-    shiftedIndex,
-    pattern: pattern.level,
-    range: pattern.range,
-    usedStars: Object.keys(usedStarsInWeek),
+    category: periodization.category,
+    difficulty: periodization.difficulty,
+    range: periodization.difficultyStars,
     selectedStars
   });
   
-  return { name: pattern.level, stars: selectedStars };
+  return { 
+    name: periodization.difficulty, 
+    stars: selectedStars,
+    range: periodization.difficultyStars
+  };
 }
 
 // Get format for category with rotation and validation
