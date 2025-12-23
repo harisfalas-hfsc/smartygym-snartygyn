@@ -428,7 +428,55 @@ Available exercises: ${exerciseList}`;
     }
 
     const planData = await response.json();
-    const generatedPlan = planData.choices[0].message.content;
+    let generatedPlan = planData.choices[0].message.content;
+
+    // ═══════════════════════════════════════════════════════════════════════════════
+    // EXERCISE LIBRARY MATCHING - Post-process AI content to link exercises
+    // ═══════════════════════════════════════════════════════════════════════════════
+    try {
+      const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
+      const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
+      const supabase = createClient(supabaseUrl, supabaseServiceKey);
+      
+      // Fetch exercise library for matching
+      const { data: exerciseLibrary, error: exerciseError } = await supabase
+        .from('exercises')
+        .select('id, name, body_part, equipment, target');
+      
+      if (exerciseLibrary && exerciseLibrary.length > 0) {
+        console.log(`[EXERCISE-MATCHING] Library loaded: ${exerciseLibrary.length} exercises`);
+        
+        const exercisesForMatching: ExerciseBasic[] = exerciseLibrary.map(e => ({
+          id: e.id,
+          name: e.name,
+          body_part: e.body_part,
+          equipment: e.equipment,
+          target: e.target
+        }));
+        
+        const { processedContent, matched, unmatched } = 
+          processContentWithExerciseMatching(generatedPlan, exercisesForMatching);
+        
+        generatedPlan = processedContent;
+        
+        console.log(`[EXERCISE-MATCHING] Matched: ${matched.length}, Unmatched: ${unmatched.length}`);
+        
+        // Log unmatched exercises to database for admin review
+        if (unmatched.length > 0) {
+          await logUnmatchedExercises(
+            supabase,
+            unmatched,
+            type === 'workout' ? 'workout' : 'program',
+            null,
+            `Generated ${type}`
+          );
+          console.log(`[EXERCISE-MATCHING] Logged ${unmatched.length} unmatched to database`);
+        }
+      }
+    } catch (matchError: any) {
+      console.error(`[EXERCISE-MATCHING] Error (non-fatal):`, matchError.message);
+      // Continue without matching - non-fatal error
+    }
 
     // Return plan without exercises data
     return new Response(JSON.stringify({ 
