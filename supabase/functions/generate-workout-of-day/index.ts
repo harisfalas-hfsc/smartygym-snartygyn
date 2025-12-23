@@ -60,7 +60,7 @@ const FORMATS_BY_CATEGORY: Record<string, string[]> = {
   "METABOLIC": ["CIRCUIT", "AMRAP", "EMOM", "FOR TIME", "TABATA"], // NO Reps & Sets
   "CALORIE BURNING": ["CIRCUIT", "TABATA", "AMRAP", "FOR TIME", "EMOM"], // NO Reps & Sets
   "CHALLENGE": ["CIRCUIT", "TABATA", "AMRAP", "EMOM", "FOR TIME", "MIX"], // Any except Reps & Sets
-  "RECOVERY": ["CIRCUIT", "REPS & SETS"] // Light stretching and mobility
+  "RECOVERY": ["FLOW"] // RECOVERY uses FLOW format - one mixed workout, no difficulty level
 };
 
 // All difficulty levels available (6 levels)
@@ -285,6 +285,13 @@ serve(async (req) => {
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
     const stripe = new Stripe(stripeKey, { apiVersion: "2025-08-27.basil" });
 
+    // ═══════════════════════════════════════════════════════════════════════════════
+    // EARLY RECOVERY DAY CHECK: Needed for determining equipment types to generate
+    // ═══════════════════════════════════════════════════════════════════════════════
+    const earlyDayInCycle = getDayInCycleFromDate(effectiveDate);
+    const earlyPeriodization = getPeriodizationForDay(earlyDayInCycle);
+    const isRecoveryDayEarly = earlyPeriodization.category === "RECOVERY";
+    
     // Check what already exists for this date (idempotent + supports retryMissing)
     // CRITICAL: Fetch FULL workout details so we can match parameters when retrying
     const { data: existingWODsForDate, error: existingWODsError } = await supabase
@@ -297,13 +304,26 @@ serve(async (req) => {
       logStep("ERROR checking existing WODs", { error: existingWODsError.message, effectiveDate });
     }
 
+    // ═══════════════════════════════════════════════════════════════════════════════
+    // RECOVERY: Only ONE MIXED workout / Other categories: BODYWEIGHT + EQUIPMENT
+    // ═══════════════════════════════════════════════════════════════════════════════
     const bodyweightAlreadyExists = existingWODsForDate?.some((w) => w.equipment === "BODYWEIGHT") ?? false;
     const equipmentAlreadyExists = existingWODsForDate?.some((w) => w.equipment === "EQUIPMENT") ?? false;
+    const mixedAlreadyExists = existingWODsForDate?.some((w) => w.equipment === "MIXED") ?? false;
 
+    // For non-recovery days, determine what needs to be generated
     const allEquipmentTypes = ["BODYWEIGHT", "EQUIPMENT"] as const;
     const equipmentTypesToGenerate = allEquipmentTypes.filter((e) =>
       e === "BODYWEIGHT" ? !bodyweightAlreadyExists : !equipmentAlreadyExists
     );
+    
+    logStep("Equipment check", {
+      isRecoveryDayEarly,
+      bodyweightAlreadyExists,
+      equipmentAlreadyExists,
+      mixedAlreadyExists,
+      equipmentTypesToGenerate
+    });
 
     // ═══════════════════════════════════════════════════════════════════════════════
     // CRITICAL FIX: When retryMissing and one workout exists, use ITS category/difficulty
@@ -443,12 +463,13 @@ serve(async (req) => {
     // ═══════════════════════════════════════════════════════════════════════════════
     
     // Use DATE-BASED calculation - this always gives correct category for the calendar day
-    const dayInCycle = getDayInCycleFromDate(effectiveDate);
-    const periodization = getPeriodizationForDay(dayInCycle);
+    // Note: dayInCycle and periodization were calculated earlier for early recovery check
+    const dayInCycle = earlyDayInCycle;
+    const periodization = earlyPeriodization;
     const manualOverrides = state.manual_overrides || {};
     
-    // Check if this is a RECOVERY day (days 10 & 28)
-    const isRecoveryDay = periodization.category === "RECOVERY";
+    // Check if this is a RECOVERY day (days 10 & 28) - reuse early check
+    const isRecoveryDay = isRecoveryDayEarly;
     
     logStep("28-Day Fixed Cycle Parameters (DATE-BASED)", { 
       effectiveDate,
@@ -533,9 +554,15 @@ serve(async (req) => {
     
     // ═══════════════════════════════════════════════════════════════════════════════
     // FORMAT SELECTION: STRENGTH, MOBILITY & STABILITY, and PILATES = always REPS & SETS
+    // RECOVERY = always FLOW format (one mixed workout)
     // Other categories can have different formats per equipment type
     // ═══════════════════════════════════════════════════════════════════════════════
     const getFormatForWorkout = (cat: string, equipType: string): { format: string; duration: string } => {
+      // RECOVERY: Always FLOW format, 30-45 min duration (no difficulty stars)
+      if (cat === "RECOVERY") {
+        return { format: "FLOW", duration: "30-45 min" };
+      }
+      
       // STRENGTH, MOBILITY & STABILITY, and PILATES: MUST be REPS & SETS for both workouts
       if (cat === "STRENGTH" || cat === "MOBILITY & STABILITY" || cat === "PILATES") {
         const fmt = "REPS & SETS";
@@ -576,7 +603,8 @@ serve(async (req) => {
       "CARDIO": "CA",
       "MOBILITY & STABILITY": "MS",
       "CHALLENGE": "CH",
-      "PILATES": "PIL"
+      "PILATES": "PIL",
+      "RECOVERY": "REC"
     };
     const prefix = categoryPrefixes[category] || "W";
     const timestamp = Date.now();
@@ -635,8 +663,21 @@ serve(async (req) => {
       scalingAdvice
     });
 
-    // Generate workouts - only what is missing for this date
-    const equipmentTypes = equipmentTypesToGenerate;
+    // ═══════════════════════════════════════════════════════════════════════════════
+    // RECOVERY DAYS: Generate only ONE MIXED workout (not BODYWEIGHT + EQUIPMENT)
+    // Other categories: Generate both BODYWEIGHT and EQUIPMENT versions
+    // ═══════════════════════════════════════════════════════════════════════════════
+    let equipmentTypes: string[];
+    
+    if (isRecoveryDay) {
+      // RECOVERY: Only generate ONE mixed workout (use early check from line ~312)
+      equipmentTypes = mixedAlreadyExists ? [] : ["MIXED"];
+      logStep("RECOVERY day - generating single MIXED workout", { mixedAlreadyExists, equipmentTypes });
+    } else {
+      // Normal days: Generate BODYWEIGHT and EQUIPMENT versions
+      equipmentTypes = equipmentTypesToGenerate;
+    }
+    
     const generatedWorkouts: any[] = [];
     let firstWorkoutName = "";
 
@@ -1222,6 +1263,141 @@ NAMING SUGGESTIONS FOR PILATES:
 • Examples: "Core Flow", "Balance Point", "Center Alignment", "Lengthen & Strengthen"
 ` : ""}
 
+${category === "RECOVERY" ? `
+═══════════════════════════════════════════════════════════════════════════════
+RECOVERY CATEGORY - RESTORE, REGENERATE, RECOVER
+═══════════════════════════════════════════════════════════════════════════════
+
+PHILOSOPHY:
+Recovery days are about active recovery, regeneration, and restoring the body.
+The focus is on stretching, mobilization, decompression, and light activity.
+Recovery is NOT about intensity - it's about healing and preparing for future workouts.
+
+FORMAT: FLOW (combination of modalities, not classic CIRCUIT or REPS & SETS)
+DURATION: 30-45 minutes
+EQUIPMENT: MIXED (may use bicycle, treadmill, fit ball, foam roller - these are TOOLS, not "gym equipment")
+
+═══════════════════════════════════════════════════════════════════════════════
+CRITICAL - NO DIFFICULTY LEVEL:
+═══════════════════════════════════════════════════════════════════════════════
+Recovery does NOT have a difficulty level. There are no stars (1-6).
+Recovery is ONE workout suitable for EVERYONE - beginners to advanced.
+The intensity is ALWAYS LOW - suitable for anyone.
+
+═══════════════════════════════════════════════════════════════════════════════
+CRITICAL - ONE MIXED WORKOUT:
+═══════════════════════════════════════════════════════════════════════════════
+Recovery does NOT follow the "Equipment/No Equipment" distinction.
+We generate ONE MIXED workout that may include:
+• Bicycle (indoor or outdoor), elliptical, treadmill (walking)
+• Fit ball, foam roller, yoga mat
+• No equipment at all (just body movement)
+These are TOOLS for recovery, not "gym equipment" in the traditional sense.
+
+═══════════════════════════════════════════════════════════════════════════════
+PRIMARY FOCUS (ALWAYS FIRST AND PRIMARY):
+═══════════════════════════════════════════════════════════════════════════════
+• STRETCHING - Always included, always the first and primary focus
+  - Static stretches (hold 30-60 seconds)
+  - PNF stretching
+  - Passive stretches
+  - Full body stretching covering all major muscle groups
+  
+• MOBILIZATION - Second priority
+  - Cat-cow, scorpions, hip circles
+  - Shoulder CARs (Controlled Articular Rotations)
+  - Worlds greatest stretch
+  - Hip openers, thoracic rotations
+
+• DECOMPRESSION - Third priority
+  - Spine decompression (hanging, childs pose, extensions)
+  - Hip decompression (figure 4, piriformis stretches)
+  - Shoulders and neck release
+
+═══════════════════════════════════════════════════════════════════════════════
+ALLOWED EXERCISES (NOT LIMITED TO THESE - FIND SIMILAR):
+═══════════════════════════════════════════════════════════════════════════════
+LIGHT AEROBIC (warm-up only, low intensity):
+• Walking (outdoor or treadmill at low speed)
+• Light jogging (very easy pace)
+• Cycling (indoor or outdoor at low resistance)
+• Elliptical at low intensity
+• Swimming (gentle laps)
+
+STRETCHING:
+• Static stretches for all major muscle groups
+• Hamstring stretches, quad stretches, hip flexor stretches
+• Chest openers, lat stretches, shoulder stretches
+• Calf stretches, glute stretches, IT band stretches
+• Neck stretches, back stretches
+
+MOBILITY:
+• Cat-cow, thread the needle
+• Hip circles, hip CARs
+• Shoulder CARs, wrist circles
+• Thoracic rotations, spinal twists
+• Worlds greatest stretch, deep squats (mobility, not strength)
+
+DECOMPRESSION:
+• Childs pose, prone extensions
+• Hanging (passive, if bar available)
+• Supine twists, happy baby
+• Pigeon pose, figure 4 stretch
+
+BREATHING:
+• Diaphragmatic breathing (belly breathing)
+• Box breathing (4-4-4-4)
+• 4-7-8 breathing for relaxation
+• Breathwork integrated with stretches
+
+LIGHT STABILITY (optional, gentle):
+• Dead bugs (slow, controlled)
+• Bird dogs (gentle, no speed)
+• Gentle core engagement
+• Balance work (single leg stands)
+
+═══════════════════════════════════════════════════════════════════════════════
+❌ FORBIDDEN IN RECOVERY (ABSOLUTE NO):
+═══════════════════════════════════════════════════════════════════════════════
+• Burpees - NEVER
+• Jumping of any kind (no jump squats, no box jumps, no tuck jumps)
+• Sprints or fast running
+• Heavy weights or any weighted exercises
+• High-intensity anything
+• Time pressure or competition elements
+• Circuits with minimal rest
+• Any exercise that elevates heart rate significantly
+• Strength training movements
+• Explosive movements
+• AMRAP, EMOM, FOR TIME, TABATA formats
+
+═══════════════════════════════════════════════════════════════════════════════
+STRUCTURE FOR RECOVERY WORKOUT:
+═══════════════════════════════════════════════════════════════════════════════
+1. WARM-UP (5-10 min):
+   • Very light aerobic activity (walking, light cycling)
+   • Gentle joint mobilization
+   
+2. MAIN WORKOUT (15-25 min):
+   • Focus on STRETCHING as the primary component
+   • Include mobilization work for major joints
+   • Include decompression exercises for spine and hips
+   • Flow from one stretch to the next
+   
+3. COOL DOWN (5-10 min):
+   • Deep breathing exercises
+   • Final relaxation stretches
+   • Mindfulness or meditation moment (optional)
+
+═══════════════════════════════════════════════════════════════════════════════
+NAMING SUGGESTIONS FOR RECOVERY:
+═══════════════════════════════════════════════════════════════════════════════
+• Restore, Recover, Renew, Reset, Refresh
+• Unwind, Ease, Release, Breathe, Flow
+• Decompress, Realign, Rebalance, Rejuvenate
+• Examples: "Deep Restore", "Body Reset", "Breathe & Release", "Full Flow Recovery"
+` : ""}
+
 ═══════════════════════════════════════════════════════════════════════════════
 FORMAT DEFINITIONS (MUST FOLLOW EXACTLY):
 ═══════════════════════════════════════════════════════════════════════════════
@@ -1232,6 +1408,7 @@ FORMAT DEFINITIONS (MUST FOLLOW EXACTLY):
 • EMOM: Every Minute On the Minute - perform set at start of each minute, rest remainder
 • Reps & Sets: Classic strength format (e.g., 4 sets x 8 reps) with defined rest
 • Mix: Combination of two or more formats (e.g., EMOM warm-up + Tabata finisher)
+• Flow: Gentle, continuous movement from one exercise to the next (for RECOVERY only)
 
 YOUR FORMAT TODAY: ${format}
 You MUST structure the workout using the ${format} format rules defined above.
@@ -1538,8 +1715,9 @@ INSTRUCTIONS FORMAT: Plain paragraphs with clear guidance
     }
 
     // ═══════════════════════════════════════════════════════════════════════════════
-    // CRITICAL FINAL VERIFICATION: Ensure BOTH workouts exist before updating state
-    // This prevents state corruption if one workout fails
+    // CRITICAL FINAL VERIFICATION: Ensure all required workouts exist before updating state
+    // RECOVERY: Requires ONE MIXED workout
+    // Other categories: Require BOTH BODYWEIGHT and EQUIPMENT workouts
     // ═══════════════════════════════════════════════════════════════════════════════
     const { data: finalVerification, error: finalVerifyError } = await supabase
       .from("admin_workouts")
@@ -1547,38 +1725,68 @@ INSTRUCTIONS FORMAT: Plain paragraphs with clear guidance
       .eq("generated_for_date", effectiveDate)
       .eq("is_workout_of_day", true);
     
-    const bodyweightExists = finalVerification?.some(w => w.equipment === "BODYWEIGHT");
-    const equipmentExists = finalVerification?.some(w => w.equipment === "EQUIPMENT");
-    
-    logStep("Final verification before state update", {
-      effectiveDate,
-      totalFound: finalVerification?.length || 0,
-      bodyweightExists,
-      equipmentExists,
-      workouts: finalVerification?.map(w => ({ id: w.id, name: w.name, equipment: w.equipment }))
-    });
-    
-    if (!bodyweightExists || !equipmentExists) {
-      const missing = [];
-      if (!bodyweightExists) missing.push("BODYWEIGHT");
-      if (!equipmentExists) missing.push("EQUIPMENT");
+    if (isRecoveryDay) {
+      // RECOVERY: Check for single MIXED workout
+      const mixedExists = finalVerification?.some(w => w.equipment === "MIXED");
       
-      logStep("CRITICAL ERROR: Not all workouts generated", { 
-        missing, 
-        generated: generatedWorkouts.map(w => w.equipment)
+      logStep("Final verification before state update (RECOVERY)", {
+        effectiveDate,
+        totalFound: finalVerification?.length || 0,
+        mixedExists,
+        workouts: finalVerification?.map(w => ({ id: w.id, name: w.name, equipment: w.equipment }))
       });
       
-      return new Response(
-        JSON.stringify({
-          success: false,
-          error: `Failed to generate all WODs. Missing: ${missing.join(", ")}`,
-          generated: generatedWorkouts.map(w => ({ name: w.name, equipment: w.equipment }))
-        }),
-        { headers: { ...corsHeaders, "Content-Type": "application/json" }, status: 500 }
-      );
+      if (!mixedExists) {
+        logStep("CRITICAL ERROR: RECOVERY MIXED workout not generated", { 
+          generated: generatedWorkouts.map(w => w.equipment)
+        });
+        
+        return new Response(
+          JSON.stringify({
+            success: false,
+            error: `Failed to generate RECOVERY WOD. Missing: MIXED`,
+            generated: generatedWorkouts.map(w => ({ name: w.name, equipment: w.equipment }))
+          }),
+          { headers: { ...corsHeaders, "Content-Type": "application/json" }, status: 500 }
+        );
+      }
+      
+      logStep("✅ RECOVERY MIXED workout verified - proceeding with state update");
+    } else {
+      // Normal days: Check for BOTH BODYWEIGHT and EQUIPMENT
+      const bodyweightExists = finalVerification?.some(w => w.equipment === "BODYWEIGHT");
+      const equipmentExists = finalVerification?.some(w => w.equipment === "EQUIPMENT");
+      
+      logStep("Final verification before state update", {
+        effectiveDate,
+        totalFound: finalVerification?.length || 0,
+        bodyweightExists,
+        equipmentExists,
+        workouts: finalVerification?.map(w => ({ id: w.id, name: w.name, equipment: w.equipment }))
+      });
+      
+      if (!bodyweightExists || !equipmentExists) {
+        const missing = [];
+        if (!bodyweightExists) missing.push("BODYWEIGHT");
+        if (!equipmentExists) missing.push("EQUIPMENT");
+        
+        logStep("CRITICAL ERROR: Not all workouts generated", { 
+          missing, 
+          generated: generatedWorkouts.map(w => w.equipment)
+        });
+        
+        return new Response(
+          JSON.stringify({
+            success: false,
+            error: `Failed to generate all WODs. Missing: ${missing.join(", ")}`,
+            generated: generatedWorkouts.map(w => ({ name: w.name, equipment: w.equipment }))
+          }),
+          { headers: { ...corsHeaders, "Content-Type": "application/json" }, status: 500 }
+        );
+      }
+      
+      logStep("✅ BOTH workouts verified - proceeding with state update");
     }
-    
-    logStep("✅ BOTH workouts verified - proceeding with state update");
 
     const toCyprusDateStr = (dateUtc: Date): string => {
       const m = dateUtc.getUTCMonth();
