@@ -835,7 +835,7 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({
                   </TooltipTrigger>
                   <TooltipContent>Search Exercises</TooltipContent>
                 </Tooltip>
-                <PopoverContent className="w-80 p-0" align="end" side="bottom">
+                <PopoverContent className="w-[400px] p-0" align="end" side="bottom">
                   <div className="p-3 border-b">
                     <div className="relative">
                       <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
@@ -848,7 +848,7 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({
                       />
                     </div>
                   </div>
-                  <ScrollArea className="h-[250px]">
+                  <div className="h-[300px] overflow-y-auto">
                     {exercisesLoading ? (
                       <div className="p-4 text-center text-sm text-muted-foreground">
                         Loading exercises...
@@ -876,7 +876,7 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({
                             }}
                           >
                             <div className="flex-1 min-w-0">
-                              <p className="text-sm font-medium truncate">{exercise.name}</p>
+                              <p className="text-sm font-medium">{exercise.name}</p>
                               <div className="flex gap-1 mt-0.5">
                                 <Badge variant="secondary" className="text-[10px] px-1 py-0">
                                   {exercise.body_part}
@@ -897,7 +897,7 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({
                         ))}
                       </div>
                     )}
-                  </ScrollArea>
+                  </div>
                 </PopoverContent>
               </Popover>
             </>
