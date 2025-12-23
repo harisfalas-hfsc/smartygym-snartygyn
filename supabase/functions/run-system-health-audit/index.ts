@@ -468,37 +468,82 @@ const handler = async (req: Request): Promise<Response> => {
       addCheck('WOD System', 'WOD Equipment Variants', 'Cannot check - WODs missing', 'skip');
     }
 
-    // WOD State
+    // WOD State - using 28-day fixed periodization anchored to Dec 24, 2024
     const { data: wodState } = await supabase.from('workout_of_day_state').select('*').single();
+    
+    // 28-day periodization cycle (matching src/lib/wodCycle.ts)
+    const CYCLE_START_DATE = '2024-12-24';
+    const PERIODIZATION_28DAY = [
+      { day: 1, category: 'CARDIO', difficulty: 'Beginner' },
+      { day: 2, category: 'STRENGTH', difficulty: 'Beginner' },
+      { day: 3, category: 'CARDIO', difficulty: 'Intermediate' },
+      { day: 4, category: 'STRENGTH', difficulty: 'Intermediate' },
+      { day: 5, category: 'CARDIO', difficulty: 'Advanced' },
+      { day: 6, category: 'STRENGTH', difficulty: 'Advanced' },
+      { day: 7, category: 'CHALLENGE', difficulty: 'Intermediate' },
+      { day: 8, category: 'CALORIE BURNING', difficulty: 'Beginner' },
+      { day: 9, category: 'METABOLIC', difficulty: 'Beginner' },
+      { day: 10, category: 'RECOVERY', difficulty: null },
+      { day: 11, category: 'CARDIO', difficulty: 'Intermediate' },
+      { day: 12, category: 'STRENGTH', difficulty: 'Intermediate' },
+      { day: 13, category: 'CARDIO', difficulty: 'Advanced' },
+      { day: 14, category: 'STRENGTH', difficulty: 'Advanced' },
+      { day: 15, category: 'CALORIE BURNING', difficulty: 'Intermediate' },
+      { day: 16, category: 'METABOLIC', difficulty: 'Intermediate' },
+      { day: 17, category: 'CARDIO', difficulty: 'Advanced' },
+      { day: 18, category: 'STRENGTH', difficulty: 'Advanced' },
+      { day: 19, category: 'CARDIO', difficulty: 'Beginner' },
+      { day: 20, category: 'STRENGTH', difficulty: 'Beginner' },
+      { day: 21, category: 'CHALLENGE', difficulty: 'Advanced' },
+      { day: 22, category: 'CALORIE BURNING', difficulty: 'Advanced' },
+      { day: 23, category: 'METABOLIC', difficulty: 'Advanced' },
+      { day: 24, category: 'CARDIO', difficulty: 'Intermediate' },
+      { day: 25, category: 'STRENGTH', difficulty: 'Intermediate' },
+      { day: 26, category: 'CALORIE BURNING', difficulty: 'Beginner' },
+      { day: 27, category: 'METABOLIC', difficulty: 'Beginner' },
+      { day: 28, category: 'RECOVERY', difficulty: null }
+    ];
+    
+    // Calculate day in 28-day cycle from date (calendar-anchored)
+    const getDayInCycleFromDate = (dateStr: string): number => {
+      const cycleStart = new Date(CYCLE_START_DATE + 'T00:00:00Z');
+      const targetDate = new Date(dateStr + 'T00:00:00Z');
+      const diffTime = targetDate.getTime() - cycleStart.getTime();
+      const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+      const dayInCycle = ((diffDays % 28) + 28) % 28;
+      return dayInCycle === 0 ? 28 : dayInCycle;
+    };
+    
+    const dayInCycle = getDayInCycleFromDate(today);
+    const periodization = PERIODIZATION_28DAY.find(p => p.day === dayInCycle);
+    const expectedCategory = periodization?.category || 'UNKNOWN';
+    const isRecoveryDay = expectedCategory === 'RECOVERY';
+    
     if (wodState) {
-      addCheck('WOD System', 'WOD State Tracking', `Day ${wodState.day_count}, Category: ${wodState.current_category}`, 'pass');
-      
-      const expectedCategories = ['Challenge', 'Strength', 'Cardio', 'Mobility & Stability', 'Strength', 'Metabolic', 'Calorie Burning'];
-      const dayIndex = ((wodState.day_count - 1) % 7);
-      const expectedCategory = expectedCategories[dayIndex];
+      addCheck('WOD System', 'WOD State Tracking', `Day ${dayInCycle}/28 (28-day cycle), Category: ${wodState.current_category}`, 'pass');
 
       const actualWodCategory = todayWods?.[0]?.category;
       if (!actualWodCategory) {
         addCheck(
           'WOD System',
-          'Periodization Cycle',
-          `Day ${wodState.day_count} should be ${expectedCategory}`,
-          'skip',
-          'Cannot determine active WOD category'
+          'Periodization Cycle (28-Day)',
+          `Day ${dayInCycle}/28 should be ${expectedCategory}${isRecoveryDay ? ' (rest day)' : ''}`,
+          isRecoveryDay ? 'pass' : 'skip',
+          isRecoveryDay ? 'Recovery day - no WOD required' : 'Cannot determine active WOD category'
         );
       } else {
         const categoryMatch = actualWodCategory
-          .toLowerCase()
-          .includes(expectedCategory.toLowerCase().split(' ')[0]);
+          .toUpperCase()
+          .includes(expectedCategory.toUpperCase().split(' ')[0]);
 
         addCheck(
           'WOD System',
-          'Periodization Cycle',
-          `Day ${wodState.day_count} should be ${expectedCategory}`,
+          'Periodization Cycle (28-Day)',
+          `Day ${dayInCycle}/28 should be ${expectedCategory}`,
           categoryMatch ? 'pass' : 'warning',
           categoryMatch
             ? `Actual WOD category matches: ${actualWodCategory}`
-            : `Expected ${expectedCategory}, actual WOD: ${actualWodCategory}`
+            : `Expected ${expectedCategory}, actual WOD: ${actualWodCategory} (may be from previous system)`
         );
       }
 
