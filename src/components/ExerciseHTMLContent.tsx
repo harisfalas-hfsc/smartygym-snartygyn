@@ -189,11 +189,61 @@ export const ExerciseHTMLContent: React.FC<ExerciseHTMLContentProps> = ({
           processedHtml = processedHtml.replace(fullMatch, `<${tag}>${placeholder}</${tag}>`);
         }
       });
+
+      // Step 3: Match plain-text exercise mentions (e.g. list items: "Jumping Jacks - 1 minute")
+      // We do this by rewriting text nodes to include __EXERCISE_n__ placeholders.
+      try {
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(`<div>${processedHtml}</div>`, 'text/html');
+        const root = doc.body.firstElementChild as HTMLElement | null;
+
+        if (root) {
+          const walker = doc.createTreeWalker(root, NodeFilter.SHOW_TEXT);
+          const textNodes: Text[] = [];
+
+          let node = walker.nextNode();
+          while (node) {
+            textNodes.push(node as Text);
+            node = walker.nextNode();
+          }
+
+          textNodes.forEach((textNode) => {
+            const parentTag = textNode.parentElement?.tagName?.toLowerCase();
+            if (!parentTag) return;
+            if (parentTag === 'script' || parentTag === 'style') return;
+
+            const raw = textNode.textContent ?? '';
+            if (!raw.trim()) return;
+            if (raw.includes('__EXERCISE_')) return;
+            if (raw.toLowerCase().includes('{{exercise:')) return;
+
+            const candidate = extractExerciseCandidate(raw);
+            if (!candidate) return;
+
+            const matchResult = findMatchingExercise(candidate, 0.82);
+            if (!matchResult) return;
+
+            const placeholder = `__EXERCISE_${exercisesToRender.length}__`;
+            exercisesToRender.push({
+              name: candidate,
+              id: matchResult.exercise.id,
+              originalText: candidate,
+            });
+
+            const re = new RegExp(escapeRegExp(candidate), 'gi');
+            textNode.textContent = raw.replace(re, placeholder);
+          });
+
+          processedHtml = root.innerHTML;
+        }
+      } catch {
+        // If DOM parsing fails for any reason, keep the existing processedHtml.
+      }
     }
 
     return { html: processedHtml, exercises: exercisesToRender };
   }, [content, enableExerciseLinking, findMatchingExercise, exercises, isLoading]);
-  
+
   // Fallback: render without exercise linking
   if (!processedContent) {
     const sanitizedContent = DOMPurify.sanitize(content, {
