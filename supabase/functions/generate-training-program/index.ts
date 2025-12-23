@@ -38,7 +38,7 @@ serve(async (req) => {
     
     const exerciseList = fallbackExercises.join(', ');
     
-    console.log(`Available exercises (${fallbackExercises.length}):`, exerciseList);
+    console.log(`[TrainingProgram] Available exercises (${fallbackExercises.length}):`, exerciseList);
 
     let systemPrompt = '';
     let userPrompt = '';
@@ -325,73 +325,75 @@ INCLUDE:
 - Decompression: hanging, spinal decompression techniques
 - Balance work: single-leg stands, stability challenges
 - Breathing: coordinate breath with movement
-- Address: frozen shoulders, neck pain, hip impingements, pelvic tilt issues
 
-=== TRAINING PROGRAM STRUCTURE RULES ===
+=== WEEKLY STRUCTURE REQUIREMENTS ===
 
-1. WEEKLY STRUCTURE: Progressive difficulty within the week (lighter Monday → harder mid-week → moderate end)
-2. PERIODIZATION: Include loading weeks and deload weeks (every 3-4 weeks)
-3. COMPLEMENTARY WORKOUTS: Mix primary focus with supporting modalities
-4. REST DAYS: Strategic placement, not random
-5. DESCRIPTION & TIPS: Explain the "WHY" - evidence-based reasoning
-6. SCALING: Provide beginner/intermediate/advanced modifications when relevant
-7. SAFETY: Always mention contraindications and warning signs
+1. Include REST DAYS - training programs need recovery built in
+2. Progressive overload across weeks (more reps, more weight, less rest, or more volume)
+3. Vary intensity: not every day is max effort
+4. Include deload weeks for programs 6+ weeks (reduce volume by 40-50%)
 
-CRITICAL FORMATTING RULES (MANDATORY - FOLLOW EXACTLY FOR COMPACT, READABLE CONTENT):
+=== OUTPUT FORMAT (CRITICAL - FOLLOW EXACTLY) ===
 
-1. NO PROGRAM TITLE - Users already know which program they're viewing. Start directly with content.
+Structure the output as follows:
 
-2. SECTION TITLES (Week 1, Day 1, Overview, etc.):
-   <p class="tiptap-paragraph"><strong><u>Section Title</u></strong></p>
-   <p class="tiptap-paragraph"></p>
-   [Content starts immediately after ONE empty line]
+<p class="tiptap-paragraph"><strong><u>Program Overview</u></strong></p>
+<p class="tiptap-paragraph"></p>
+<p class="tiptap-paragraph">[1-2 sentences describing the program philosophy and expected outcomes]</p>
 
-3. SUB-HEADERS (Block 1, Block 2, Circuit, etc.):
-   <p class="tiptap-paragraph"></p>
-   <p class="tiptap-paragraph"><strong>Sub-header Name</strong></p>
-   [Exercises start immediately - NO empty line after sub-header]
+<p class="tiptap-paragraph"></p>
+<p class="tiptap-paragraph"><strong><u>Week 1: [Theme Name]</u></strong></p>
+<p class="tiptap-paragraph"></p>
 
-4. EXERCISES (Numbered list with exercise NAME in bold - NO gaps between items):
-   <ul class="tiptap-bullet-list">
-   <li class="tiptap-list-item"><p class="tiptap-paragraph"><strong>1. Exercise Name</strong> – description – sets x reps</p></li>
-   <li class="tiptap-list-item"><p class="tiptap-paragraph"><strong>2. Exercise Name</strong> – description – sets x reps</p></li>
-   <li class="tiptap-list-item"><p class="tiptap-paragraph"><strong>3. Exercise Name</strong> – description – sets x reps</p></li>
-   </ul>
+<p class="tiptap-paragraph"><strong>Day 1: [Workout Type]</strong></p>
+<ul class="tiptap-bullet-list">
+<li class="tiptap-list-item"><p class="tiptap-paragraph"><strong>Warm-Up (5-10 min):</strong> [exercises]</p></li>
+<li class="tiptap-list-item"><p class="tiptap-paragraph"><strong>Main Workout:</strong></p></li>
+</ul>
+<ul class="tiptap-bullet-list">
+<li class="tiptap-list-item"><p class="tiptap-paragraph"><strong>1. Exercise Name</strong> – 3x10 reps – rest 60s</p></li>
+<li class="tiptap-list-item"><p class="tiptap-paragraph"><strong>2. Exercise Name</strong> – 3x12 reps – rest 60s</p></li>
+</ul>
+<ul class="tiptap-bullet-list">
+<li class="tiptap-list-item"><p class="tiptap-paragraph"><strong>Cool-Down (5 min):</strong> [exercises]</p></li>
+</ul>
 
-5. REST INSTRUCTIONS (inline paragraph after exercises):
-   <p class="tiptap-paragraph">Rest: 60-90 seconds between sets.</p>
+[Continue for each day of the week]
+[Continue for each week of the program]
 
-SPACING RULES (CRITICAL - KEEP CONTENT COMPACT):
-- ONE empty paragraph after section title ONLY
-- ONE empty paragraph BEFORE next section or sub-header ONLY
-- NEVER put empty paragraphs between exercises in a list
-- NEVER put empty paragraphs after bullet/numbered lists
-- NEVER end content with empty paragraphs
-- NEVER start content with empty paragraphs
-- Goal: User sees content overview quickly WITHOUT excessive scrolling
+<p class="tiptap-paragraph"></p>
+<p class="tiptap-paragraph"><strong><u>Progression Tips</u></strong></p>
+<p class="tiptap-paragraph"></p>
+<ul class="tiptap-bullet-list">
+<li class="tiptap-list-item"><p class="tiptap-paragraph">[Tip 1 about progression]</p></li>
+<li class="tiptap-list-item"><p class="tiptap-paragraph">[Tip 2 about when to increase weight/intensity]</p></li>
+<li class="tiptap-list-item"><p class="tiptap-paragraph">[Tip 3 about recovery and nutrition]</p></li>
+</ul>
 
-Format as a comprehensive program with:
-- Weekly breakdowns
-- Progressive overload principles
-- Each exercise name must match the list EXACTLY`;
+SPACING RULES:
+- ONE empty paragraph after section titles
+- NO empty paragraphs between exercises in a list
+- ONE empty paragraph before new sections
+- Keep content scannable and compact`;
       
-       userPrompt = `Create a training program for:
-        - Age: ${data.age}
-        - Height: ${data.height} cm
-        - Weight: ${data.weight} kg
-        - Goal: ${data.goal}
-        - Duration: ${data.programLength} weeks
-        - Training days per week: ${data.daysPerWeek}
-        - Experience level: ${data.experienceLevel}
-        - Equipment: ${Array.isArray(data.equipment) ? data.equipment.join(", ") : data.equipment}
-        ${data.limitations ? `- Physical limitations: ${data.limitations}` : ''}
-        
+      userPrompt = `Create a ${data.weeks}-week training program for:
+      - Age: ${data.age}
+      - Height: ${data.height} cm
+      - Weight: ${data.weight} kg
+      - Goal: ${data.goal}
+      - Days per week: ${data.daysPerWeek}
+      - Session length: ${data.sessionLength} minutes
+      - Equipment: ${data.equipment}
+      ${data.limitations ? `- Physical limitations: ${data.limitations}` : ''}
+      
 Available exercises: ${exerciseList}`;
+    } else {
+      throw new Error('Invalid type. Must be "workout" or "training-program"');
     }
 
-    console.log('Generating plan for type:', type);
+    console.log(`[TrainingProgram] Generating ${type} with AI...`);
 
-    const response = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
+    const response = await fetch('https://api.lovable.dev/v1/chat/completions', {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${LOVABLE_API_KEY}`,
@@ -403,90 +405,84 @@ Available exercises: ${exerciseList}`;
           { role: 'system', content: systemPrompt },
           { role: 'user', content: userPrompt }
         ],
+        temperature: 0.7,
+        max_tokens: 4000,
       }),
     });
 
     if (!response.ok) {
-      if (response.status === 429) {
-        return new Response(JSON.stringify({ error: "Rate limits exceeded, please try again later." }), {
-          status: 429,
-          headers: { ...corsHeaders, "Content-Type": "application/json" },
-        });
-      }
-      if (response.status === 402) {
-        return new Response(JSON.stringify({ error: "Service unavailable. Please contact support." }), {
-          status: 402,
-          headers: { ...corsHeaders, "Content-Type": "application/json" },
-        });
-      }
       const errorText = await response.text();
-      console.error('Service gateway error:', response.status, errorText);
-      return new Response(JSON.stringify({ error: "Service temporarily unavailable. Please try again." }), {
-        status: 500,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-      });
+      console.error('[TrainingProgram] AI API Error:', errorText);
+      
+      if (response.status === 429) {
+        throw new Error('AI service is currently busy. Please try again in a few minutes.');
+      }
+      if (response.status === 503 || response.status === 502) {
+        throw new Error('AI service is temporarily unavailable. Please try again shortly.');
+      }
+      throw new Error(`AI API error: ${response.status}`);
     }
 
-    const planData = await response.json();
-    let generatedPlan = planData.choices[0].message.content;
+    const result = await response.json();
+    let generatedPlan = result.choices?.[0]?.message?.content;
 
-    // ═══════════════════════════════════════════════════════════════════════════════
-    // EXERCISE LIBRARY MATCHING - Post-process AI content to link exercises
-    // ═══════════════════════════════════════════════════════════════════════════════
+    if (!generatedPlan) {
+      throw new Error('No content generated');
+    }
+
+    console.log(`[TrainingProgram] Generated ${type} successfully (${generatedPlan.length} chars)`);
+
+    // Exercise matching - process the generated content
     try {
       const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
-      const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
-      const supabase = createClient(supabaseUrl, supabaseServiceKey);
-      
+      const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
+      const supabaseClient = createClient(supabaseUrl, supabaseKey);
+
       // Fetch exercise library for matching
-      const { data: exerciseLibrary, error: exerciseError } = await supabase
+      const { data: exerciseLibrary, error: exError } = await supabaseClient
         .from('exercises')
         .select('id, name, body_part, equipment, target');
-      
-      if (exerciseLibrary && exerciseLibrary.length > 0) {
-        console.log(`[EXERCISE-MATCHING] Library loaded: ${exerciseLibrary.length} exercises`);
+
+      if (exError) {
+        console.error('[TrainingProgram] Error fetching exercise library:', exError);
+      } else if (exerciseLibrary && exerciseLibrary.length > 0) {
+        console.log(`[TrainingProgram] Loaded ${exerciseLibrary.length} exercises for matching`);
         
-        const exercisesForMatching: ExerciseBasic[] = exerciseLibrary.map(e => ({
-          id: e.id,
-          name: e.name,
-          body_part: e.body_part,
-          equipment: e.equipment,
-          target: e.target
-        }));
-        
-        const { processedContent, matched, unmatched } = 
-          processContentWithExerciseMatching(generatedPlan, exercisesForMatching);
+        // Process content with exercise matching
+        const { processedContent, matched, unmatched } = processContentWithExerciseMatching(
+          generatedPlan,
+          exerciseLibrary as ExerciseBasic[],
+          '[TrainingProgram]'
+        );
         
         generatedPlan = processedContent;
         
-        console.log(`[EXERCISE-MATCHING] Matched: ${matched.length}, Unmatched: ${unmatched.length}`);
+        console.log(`[TrainingProgram] Matched ${matched.length} exercises, ${unmatched.length} unmatched`);
         
         // Log unmatched exercises to database for admin review
         if (unmatched.length > 0) {
           await logUnmatchedExercises(
-            supabase,
+            supabaseClient,
             unmatched,
             type === 'workout' ? 'workout' : 'program',
             null,
-            `Generated ${type}`
+            `AI Generated ${type}`,
+            '[TrainingProgram]'
           );
-          console.log(`[EXERCISE-MATCHING] Logged ${unmatched.length} unmatched to database`);
         }
       }
-    } catch (matchError: any) {
-      console.error(`[EXERCISE-MATCHING] Error (non-fatal):`, matchError.message);
-      // Continue without matching - non-fatal error
+    } catch (matchError) {
+      console.error('[TrainingProgram] Exercise matching error (non-fatal):', matchError);
+      // Continue with unprocessed content if matching fails
     }
 
-    // Return plan without exercises data
-    return new Response(JSON.stringify({ 
-      plan: generatedPlan
-    }), {
+    return new Response(JSON.stringify({ plan: generatedPlan }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     });
-  } catch (error) {
-    console.error('Error in generate-fitness-plan function:', error);
-    return new Response(JSON.stringify({ error: error instanceof Error ? error.message : 'Unknown error' }), {
+  } catch (error: unknown) {
+    console.error('[TrainingProgram] Error:', error);
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+    return new Response(JSON.stringify({ error: errorMessage }), {
       status: 500,
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     });

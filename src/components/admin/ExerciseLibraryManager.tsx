@@ -12,7 +12,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Progress } from "@/components/ui/progress";
-import { Plus, Pencil, Trash2, Video, ExternalLink, Upload, Database, Image, FileSpreadsheet, Search } from "lucide-react";
+import { Plus, Pencil, Trash2, Video, ExternalLink, Upload, Database, Image, FileSpreadsheet, Search, AlertTriangle } from "lucide-react";
+import MismatchedExercises from "./MismatchedExercises";
 import { toast } from "sonner";
 import { extractYouTubeId, getYouTubeThumbnail, isValidYouTubeUrl, getRestrictedEmbedUrl } from "@/utils/youtube";
 import { MUSCLE_CATEGORIES, MUSCLE_GROUPS, WORKOUT_CATEGORIES, PROGRAM_CATEGORIES, WORKOUT_PHASES } from "@/constants/exerciseCategories";
@@ -509,16 +510,25 @@ const ExerciseLibraryManager = () => {
       </div>
 
       <Tabs value={activeTab} onValueChange={setActiveTab}>
-        <TabsList className="grid w-full grid-cols-2">
+        <TabsList className="grid w-full grid-cols-3">
           <TabsTrigger value="database" className="flex items-center gap-2">
             <Database className="h-4 w-4" />
             Exercise Database
+          </TabsTrigger>
+          <TabsTrigger value="mismatched" className="flex items-center gap-2">
+            <AlertTriangle className="h-4 w-4" />
+            Mismatched Exercises
           </TabsTrigger>
           <TabsTrigger value="videos" className="flex items-center gap-2">
             <Video className="h-4 w-4" />
             Exercise Videos
           </TabsTrigger>
         </TabsList>
+
+        {/* Mismatched Exercises Tab */}
+        <TabsContent value="mismatched" className="space-y-6">
+          <MismatchedExercises />
+        </TabsContent>
 
         {/* Exercise Database Tab */}
         <TabsContent value="database" className="space-y-6">
