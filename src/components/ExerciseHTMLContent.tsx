@@ -34,11 +34,16 @@ export const ExerciseHTMLContent: React.FC<ExerciseHTMLContentProps> = ({
       return null;
     }
     
-    let processedHtml = content;
+    // Normalize common typos before processing
+    let processedHtml = content
+      .replace(/\{\{exrcise:/gi, '{{exercise:')
+      .replace(/\{\{excersize:/gi, '{{exercise:')
+      .replace(/\{\{excercise:/gi, '{{exercise:');
+    
     const exercisesToRender: ProcessedExercise[] = [];
     
     // Step 1: Parse admin-added exercise markup {{exercise:id:name}}
-    const markupExercises = parseExerciseMarkup(content);
+    const markupExercises = parseExerciseMarkup(processedHtml);
     markupExercises.forEach(({ fullMatch, id, name }) => {
       const placeholder = `__EXERCISE_${exercisesToRender.length}__`;
       exercisesToRender.push({ name, id, originalText: fullMatch });
