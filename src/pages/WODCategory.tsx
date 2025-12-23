@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { Helmet } from "react-helmet";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -265,21 +265,22 @@ const WODCategory = () => {
                   </div>
                   
                   <p className="text-sm sm:text-base text-center text-muted-foreground mb-6 max-w-3xl mx-auto">
-                    Following SmartyGym's Workout of the Day is like having a personal trainer monitoring your training day by day — 
+                    Following Ms. SmartyGenes and <Link to="/coach-profile" className="text-primary font-bold hover:underline">Haris Falas</Link>' Workout of the Day is like having a personal trainer monitoring your training day by day — 
                     tracking your training load, recovery needs, and energy systems to deliver the perfect workout every single day.
                   </p>
                   
                   <div className="grid gap-4 sm:gap-6">
-                    {/* Strategic Recovery */}
+                    {/* Strategic Loading */}
                     <div className="bg-background/50 rounded-lg p-4 border border-primary/20">
                       <div className="flex items-center gap-2 mb-2">
                         <RefreshCw className="w-5 h-5 text-primary" />
-                        <h3 className="font-semibold">Strategic Recovery</h3>
+                        <h3 className="font-semibold">Strategic Loading</h3>
                       </div>
                       <p className="text-sm text-muted-foreground">
-                        You'll never do two strength days in a row. While your muscles recover, you'll focus on 
-                        cardio or metabolic training. When your endurance systems need rest, it's the perfect 
-                        opportunity for mobility and stability work — and then you elevate again.
+                        Your coach delivers each Workout of the Day according to science-based periodization, 
+                        designed to respect proven training protocols. This intelligent programming determines 
+                        when to load, when to deload, and when recovery is needed — ensuring correct and safe 
+                        management of your energy systems throughout your fitness journey.
                       </p>
                     </div>
                     
