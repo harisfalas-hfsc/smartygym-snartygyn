@@ -642,11 +642,11 @@ export const ProgramEditDialog = ({ program, open, onOpenChange, onSave }: Progr
             </Select>
           </div>
 
-          {/* 7. Training Program Content - Single Box */}
+          {/* 7. Training Program Content - Single Box with Exercise Search */}
           <div className="space-y-2">
             <Label htmlFor="training_program">7. Training Program</Label>
             <p className="text-sm text-muted-foreground">
-              Enter the complete training program content. Use the toolbar to format with bold, headings, lists, tables, etc.
+              Enter the complete training program content. Use the Exercises button in toolbar to add linked exercises.
             </p>
             <A4Container>
               <RichTextEditor
@@ -654,6 +654,7 @@ export const ProgramEditDialog = ({ program, open, onOpenChange, onSave }: Progr
                 onChange={(value) => setFormData({ ...formData, training_program: value })}
                 placeholder="Enter your complete training program content here..."
                 minHeight="300px"
+                showExerciseSearch={true}
               />
             </A4Container>
           </div>
