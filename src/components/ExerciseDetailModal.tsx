@@ -5,7 +5,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
-import { Dumbbell, Target, Activity, ListOrdered } from "lucide-react";
+import { Dumbbell, Target, Activity, ListOrdered, Info, Gauge } from "lucide-react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
 
@@ -19,6 +19,9 @@ interface Exercise {
   secondary_muscles: string[];
   instructions: string[];
   gif_url: string | null;
+  description: string | null;
+  difficulty: string | null;
+  category: string | null;
 }
 
 interface ExerciseDetailModalProps {
@@ -71,7 +74,29 @@ const ExerciseDetailModal = ({ exercise, open, onOpenChange }: ExerciseDetailMod
                 <Target className="h-3 w-3 mr-1" />
                 {formatLabel(exercise.target)}
               </Badge>
+              {exercise.difficulty && (
+                <Badge variant="outline" className="border-blue-500 text-blue-600 dark:text-blue-400">
+                  <Gauge className="h-3 w-3 mr-1" />
+                  {formatLabel(exercise.difficulty)}
+                </Badge>
+              )}
+              {exercise.category && (
+                <Badge variant="outline" className="border-cyan-500 text-cyan-600 dark:text-cyan-400">
+                  {formatLabel(exercise.category)}
+                </Badge>
+              )}
             </div>
+
+            {/* Description */}
+            {exercise.description && (
+              <div>
+                <h4 className="font-semibold mb-2 text-sm text-muted-foreground flex items-center gap-2">
+                  <Info className="h-4 w-4" />
+                  Description
+                </h4>
+                <p className="text-sm text-muted-foreground">{exercise.description}</p>
+              </div>
+            )}
 
             {/* Secondary Muscles */}
             {exercise.secondary_muscles && exercise.secondary_muscles.length > 0 && (
