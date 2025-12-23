@@ -179,3 +179,6 @@ verify_jwt = true
 
 [functions.generate-app-store-package]
 verify_jwt = true
+
+[functions.generate-test-workout]
+verify_jwt = false
