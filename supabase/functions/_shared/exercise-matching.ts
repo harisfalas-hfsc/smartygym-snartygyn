@@ -113,8 +113,48 @@ export function findBestMatch(
   return bestMatch;
 }
 
+// Common structural headers that are NOT exercises
+const STRUCTURAL_HEADERS = [
+  'warm up', 'warmup', 'warm-up',
+  'cool down', 'cooldown', 'cool-down',
+  'main workout', 'finisher', 'activation',
+  'notes', 'tips', 'instructions', 'description',
+  'rounds', 'sets', 'reps', 'rest', 'recovery',
+  'block', 'circuit', 'station', 'phase',
+  'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday',
+  'day 1', 'day 2', 'day 3', 'day 4', 'day 5', 'day 6', 'day 7',
+  'week 1', 'week 2', 'week 3', 'week 4'
+];
+
+// Prefix patterns that indicate a header with exercise after colon
+const PREFIX_PATTERNS = [
+  /^tabata\s*\d*:\s*/i,           // "Tabata 1: High Knees" → "High Knees"
+  /^\d+\s*rounds?\s*(?:of)?:\s*/i, // "3 Rounds of: Burpees" → "Burpees"
+  /^for\s*time:\s*/i,              // "For Time: ..." → skip
+  /^amrap\s*(?:\d+)?:\s*/i,        // "AMRAP 10: ..." → skip  
+  /^emom\s*(?:\d+)?:\s*/i,         // "EMOM 12: ..." → skip
+  /^accumulation\s*challenge:\s*/i, // "Accumulation Challenge: ..." → skip
+  /^station\s*\d*:\s*/i,           // "Station 1: ..." → extract after
+  /^exercise\s*\d*:\s*/i,          // "Exercise 1: ..." → extract after
+  /^movement\s*\d*:\s*/i,          // "Movement 1: ..." → extract after
+  /^block\s*\d*:\s*/i,             // "Block 1: ..." → extract after
+];
+
+// Patterns that are purely structural (no exercise follows)
+const PURE_STRUCTURAL_PATTERNS = [
+  /^for\s*time$/i,
+  /^amrap\s*\d*$/i,
+  /^emom\s*\d*$/i,
+  /^\d+\s*rounds?$/i,
+  /^\d+\s*sets?$/i,
+  /^\d+\s*reps?$/i,
+  /^rest\s*\d*/i,
+  /^recovery$/i,
+];
+
 /**
  * Extract exercise names from HTML content (bold text patterns)
+ * Handles headers like "Tabata 1: High Knees" by extracting just "High Knees"
  */
 export function extractExerciseNames(htmlContent: string): string[] {
   const exercises: string[] = [];
@@ -123,20 +163,59 @@ export function extractExerciseNames(htmlContent: string): string[] {
   const boldPattern = /<(?:strong|b)>([^<]+)<\/(?:strong|b)>/gi;
   let match;
   while ((match = boldPattern.exec(htmlContent)) !== null) {
-    const text = match[1].trim();
-    // Filter out non-exercise bold text (headers, numbers, formatting)
-    if (
-      text.length >= 3 && 
-      !/^\d+\.?\s*$/.test(text) && // Not just numbers
-      !/^(set|rep|rest|round|min|sec|x\s|×\s|block|circuit|warm|cool|notes?|tip|instruction)/i.test(text) &&
-      !/minutes?$/i.test(text) && // Not duration like "5 minutes"
-      !/^\d+\s*(x|×)/i.test(text) // Not "3 x 10" format
-    ) {
-      // Clean up any trailing/leading punctuation or numbers
-      const cleaned = text.replace(/^\d+\.\s*/, '').replace(/\s*[-–—]\s*$/, '').trim();
-      if (cleaned.length >= 3) {
-        exercises.push(cleaned);
+    let text = match[1].trim();
+    
+    // Skip if too short or just numbers
+    if (text.length < 3 || /^\d+\.?\s*$/.test(text)) {
+      continue;
+    }
+    
+    // Skip pure structural patterns
+    if (PURE_STRUCTURAL_PATTERNS.some(pattern => pattern.test(text))) {
+      continue;
+    }
+    
+    // Check if text is a structural header
+    const normalizedText = text.toLowerCase().replace(/[-_]/g, ' ').trim();
+    if (STRUCTURAL_HEADERS.some(header => normalizedText === header || normalizedText.startsWith(header + ' '))) {
+      continue;
+    }
+    
+    // Handle prefix patterns - extract exercise name after colon
+    let extractedFromPrefix = false;
+    for (const prefixPattern of PREFIX_PATTERNS) {
+      const prefixMatch = text.match(prefixPattern);
+      if (prefixMatch) {
+        const afterPrefix = text.substring(prefixMatch[0].length).trim();
+        if (afterPrefix.length >= 3) {
+          text = afterPrefix;
+          extractedFromPrefix = true;
+          break;
+        } else {
+          // Prefix with nothing useful after - skip this entry
+          extractedFromPrefix = true;
+          text = '';
+          break;
+        }
       }
+    }
+    
+    // Skip if empty after prefix extraction
+    if (!text) continue;
+    
+    // Additional filters
+    if (
+      /^(set|rep|rest|round|min|sec|x\s|×\s)/i.test(text) ||
+      /minutes?$/i.test(text) ||
+      /^\d+\s*(x|×)/i.test(text)
+    ) {
+      continue;
+    }
+    
+    // Clean up any trailing/leading punctuation or numbers
+    const cleaned = text.replace(/^\d+\.\s*/, '').replace(/\s*[-–—]\s*$/, '').trim();
+    if (cleaned.length >= 3) {
+      exercises.push(cleaned);
     }
   }
   
@@ -146,6 +225,36 @@ export function extractExerciseNames(htmlContent: string): string[] {
 
 function escapeRegExp(string: string): string {
   return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+
+/**
+ * Build replacement patterns for exercise name in bold tags
+ * Handles both direct "Exercise Name" and prefixed "Tabata 1: Exercise Name"
+ */
+function buildReplacementPatterns(exerciseName: string): RegExp[] {
+  const escaped = escapeRegExp(exerciseName);
+  return [
+    // Direct match: <strong>Exercise Name</strong>
+    new RegExp(`(<strong>)(\\d+\\.\\s*)?${escaped}(</strong>)`, 'gi'),
+    
+    // Match with Tabata prefix: <strong>Tabata N: Exercise Name</strong>
+    new RegExp(`(<strong>)(Tabata\\s*\\d*:\\s*)${escaped}(</strong>)`, 'gi'),
+    
+    // Match with Station prefix: <strong>Station N: Exercise Name</strong>
+    new RegExp(`(<strong>)(Station\\s*\\d*:\\s*)${escaped}(</strong>)`, 'gi'),
+    
+    // Match with Exercise prefix: <strong>Exercise N: Exercise Name</strong>
+    new RegExp(`(<strong>)(Exercise\\s*\\d*:\\s*)${escaped}(</strong>)`, 'gi'),
+    
+    // Match with Movement prefix: <strong>Movement N: Exercise Name</strong>
+    new RegExp(`(<strong>)(Movement\\s*\\d*:\\s*)${escaped}(</strong>)`, 'gi'),
+    
+    // Match with Block prefix: <strong>Block N: Exercise Name</strong>
+    new RegExp(`(<strong>)(Block\\s*\\d*:\\s*)${escaped}(</strong>)`, 'gi'),
+    
+    // Match inside list item without bold: <li><p>Exercise Name
+    new RegExp(`(<li[^>]*><p[^>]*>)(\\d+\\.\\s*)?${escaped}(?=\\s*[-–—]|\\s*<|$)`, 'gi'),
+  ];
 }
 
 /**
@@ -177,14 +286,16 @@ export function processContentWithExerciseMatching(
       // Replace the exercise name with markup (inside bold tags)
       const markup = `{{exercise:${matchResult.exercise.id}:${matchResult.exercise.name}}}`;
       
-      // Replace within bold tags - use word boundaries to avoid partial matches
-      const originalPattern = new RegExp(
-        `(<strong>)(\\d+\\.\\s*)?${escapeRegExp(exerciseName)}(</strong>)`,
-        'gi'
-      );
-      
+      // Try multiple replacement patterns
+      const patterns = buildReplacementPatterns(exerciseName);
       const beforeReplace = processedContent;
-      processedContent = processedContent.replace(originalPattern, `$1$2${markup}$3`);
+      
+      for (const pattern of patterns) {
+        processedContent = processedContent.replace(pattern, `$1$2${markup}$3`);
+        if (processedContent !== beforeReplace) {
+          break; // Stop once we've made a replacement
+        }
+      }
       
       // Only count as matched if we actually replaced something
       if (beforeReplace !== processedContent) {
