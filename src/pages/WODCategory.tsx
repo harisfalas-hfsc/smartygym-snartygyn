@@ -265,7 +265,7 @@ const WODCategory = () => {
                   </div>
                   
                   <p className="text-sm sm:text-base text-center text-muted-foreground mb-6 max-w-3xl mx-auto">
-                    Following Ms. SmartyGenes and <Link to="/coach-profile" className="text-primary font-bold hover:underline">Haris Falas</Link>' Workout of the Day is like having a personal trainer monitoring your training day by day — 
+                    Following <span className="text-primary font-bold">SmartyGym's</span> and <Link to="/coach-profile" className="text-primary font-bold hover:underline">Haris Falas</Link>' Workout of the Day is like having a personal trainer monitoring your training day by day — 
                     tracking your training load, recovery needs, and energy systems to deliver the perfect workout every single day.
                   </p>
                   
