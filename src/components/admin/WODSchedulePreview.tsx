@@ -8,17 +8,14 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
-import { Calendar, Edit2, Clock, Star, Flame, Save, Dumbbell, User } from "lucide-react";
+import { Calendar, Edit2, Clock, Star, Flame, Save, Dumbbell, User, Heart } from "lucide-react";
 import { format, addDays } from "date-fns";
 import {
-  CATEGORY_CYCLE_8DAY,
+  ALL_CATEGORIES,
   FORMATS_BY_CATEGORY,
-  getWODInfoForDate,
   getDayInCycleFromDate,
-  getWeekNumberFromDate,
-  getCategoryForDay,
-  getDifficultyForDay,
-  starsToLevel
+  getPeriodizationForDay,
+  getDifficultyBadgeClass
 } from "@/lib/wodCycle";
 
 export const WODSchedulePreview = () => {
@@ -44,40 +41,42 @@ export const WODSchedulePreview = () => {
     },
   });
 
-  // Calculate next 8 days schedule using DATE-BASED calculation
-  // CRITICAL FIX: Now uses calendar date instead of counter to prevent desync
+  // Calculate next 28 days schedule using DATE-BASED 28-day fixed periodization
   const getUpcomingSchedule = () => {
     if (!wodState) return [];
     
     const schedule = [];
     const manualOverrides = (wodState.manual_overrides as Record<string, any>) || {};
     
-    for (let i = 0; i < 8; i++) {
+    for (let i = 0; i < 28; i++) {
       const futureDate = addDays(new Date(), i + 1); // i+1 because i=0 is tomorrow
       const dateStr = format(futureDate, "yyyy-MM-dd");
       
-      // DATE-BASED calculation - always correct regardless of counter state
+      // DATE-BASED calculation - 28-day fixed cycle
       const futureDayInCycle = getDayInCycleFromDate(dateStr);
-      const futureWeekNumber = getWeekNumberFromDate(dateStr);
+      const periodization = getPeriodizationForDay(futureDayInCycle);
       
       const override = manualOverrides[dateStr];
       
-      const category = override?.category || getCategoryForDay(futureDayInCycle);
-      const difficultyInfo = getDifficultyForDay(futureDayInCycle, futureWeekNumber);
+      const category = override?.category || periodization.category;
+      const difficultyLevel = override?.difficulty 
+        ? (override.difficulty <= 2 ? "Beginner" : override.difficulty <= 4 ? "Intermediate" : "Advanced")
+        : periodization.difficulty;
+      const difficultyRange = periodization.difficultyStars;
       const formats = FORMATS_BY_CATEGORY[category] || ["CIRCUIT"];
+      const isRecoveryDay = category === "RECOVERY";
       
       schedule.push({
         date: futureDate,
         dateStr,
         dayInCycle: futureDayInCycle,
         category,
-        difficultyLevel: override?.difficulty 
-          ? (override.difficulty <= 2 ? "Beginner" : override.difficulty <= 4 ? "Intermediate" : "Advanced")
-          : difficultyInfo.level,
-        difficultyRange: difficultyInfo.range,
+        difficultyLevel,
+        difficultyRange,
         formats,
         selectedFormat: override?.format || null,
-        hasOverride: !!override
+        hasOverride: !!override,
+        isRecoveryDay
       });
     }
     
@@ -151,12 +150,6 @@ export const WODSchedulePreview = () => {
     }
   };
 
-  const getDifficultyColor = (level: string) => {
-    if (level === "Beginner") return "bg-yellow-500/20 text-yellow-400 border-yellow-500/30"; // Beginner = YELLOW
-    if (level === "Intermediate") return "bg-green-500/20 text-green-400 border-green-500/30"; // Intermediate = GREEN
-    return "bg-red-500/20 text-red-400 border-red-500/30"; // Advanced = RED
-  };
-
   const availableFormats = overrideCategory ? FORMATS_BY_CATEGORY[overrideCategory] || ["CIRCUIT"] : [];
 
   if (isLoading) {
@@ -169,18 +162,18 @@ export const WODSchedulePreview = () => {
         <CardHeader>
         <CardTitle className="flex items-center gap-2 text-sm">
             <Calendar className="h-4 w-4 text-primary" />
-            Upcoming WOD Schedule (Next 8 Days)
+            Upcoming WOD Schedule (28-Day Cycle)
           </CardTitle>
           <CardDescription>
-            <span className="block">Preview future WODs and set overrides. The "Day X/8" shows position in the 8-day category rotation cycle (not calendar days).</span>
-            <span className="block mt-1 text-xs">💡 <strong>What is Day 1/8?</strong> The system rotates through 8 workout categories. Day 1 = Challenge, Day 8 = Pilates. This cycle repeats continuously.</span>
+            <span className="block">Preview future WODs and set overrides. Fixed 28-day periodization - no shifts, just repeats.</span>
+            <span className="block mt-1 text-xs">💡 <strong>Days 10 & 28 are RECOVERY days</strong> with no difficulty level.</span>
           </CardDescription>
         </CardHeader>
-        <CardContent className="space-y-3">
-          {upcomingSchedule.map((day, index) => (
+        <CardContent className="space-y-3 max-h-[600px] overflow-y-auto">
+          {upcomingSchedule.slice(0, 14).map((day) => (
             <div 
               key={day.dateStr}
-              className={`p-4 rounded-lg border ${day.hasOverride ? 'border-primary/50 bg-primary/5' : 'border-border'}`}
+              className={`p-4 rounded-lg border ${day.hasOverride ? 'border-primary/50 bg-primary/5' : day.isRecoveryDay ? 'border-green-500/30 bg-green-500/5' : 'border-border'}`}
             >
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                 <div className="space-y-2">
@@ -189,11 +182,17 @@ export const WODSchedulePreview = () => {
                       {format(day.date, "EEEE, MMM d")}
                     </span>
                     <Badge variant="outline" className="text-xs">
-                      Day {day.dayInCycle}/8
+                      Day {day.dayInCycle}/28
                     </Badge>
                     {day.hasOverride && (
                       <Badge className="bg-primary/20 text-primary border-primary/30 text-xs">
                         Override Set
+                      </Badge>
+                    )}
+                    {day.isRecoveryDay && (
+                      <Badge className="bg-green-500/20 text-green-400 border-green-500/30 text-xs">
+                        <Heart className="h-3 w-3 mr-1" />
+                        Recovery
                       </Badge>
                     )}
                   </div>
@@ -204,12 +203,18 @@ export const WODSchedulePreview = () => {
                       {day.category}
                     </Badge>
                     <Badge variant="outline">
-                      {day.selectedFormat || day.formats[0]} {!day.selectedFormat && day.formats.length > 1 && "(rotating)"}
+                      {day.selectedFormat || day.formats[0]} {!day.selectedFormat && day.formats.length > 1 && "(AI selected)"}
                     </Badge>
-                    <Badge className={getDifficultyColor(day.difficultyLevel)}>
-                      <Star className="h-3 w-3 mr-1" />
-                      {day.difficultyLevel} ({day.difficultyRange[0]}-{day.difficultyRange[1]}★)
-                    </Badge>
+                    {day.difficultyLevel && day.difficultyRange ? (
+                      <Badge className={getDifficultyBadgeClass(day.difficultyLevel)}>
+                        <Star className="h-3 w-3 mr-1" />
+                        {day.difficultyLevel} ({day.difficultyRange[0]}-{day.difficultyRange[1]}★)
+                      </Badge>
+                    ) : (
+                      <Badge className="bg-gray-500/20 text-gray-400 border-gray-500/30">
+                        No Difficulty
+                      </Badge>
+                    )}
                   </div>
                   
                   {/* Equipment/Bodyweight versions indicator */}
@@ -223,7 +228,7 @@ export const WODSchedulePreview = () => {
                       <span>Bodyweight</span>
                     </div>
                     <span className="text-xs text-muted-foreground/70 italic">
-                      — Same settings for both versions
+                      — Same category & difficulty for both
                     </span>
                   </div>
                 </div>
@@ -255,7 +260,7 @@ export const WODSchedulePreview = () => {
           
           <p className="text-xs text-muted-foreground pt-2">
             <Clock className="h-3 w-3 inline mr-1" />
-            WODs generate daily at 7:00 AM UTC. Overrides are applied during generation.
+            WODs generate daily at 7:00 AM UTC. Overrides are applied during generation. Showing first 14 of 28 days.
           </p>
         </CardContent>
       </Card>
@@ -265,7 +270,7 @@ export const WODSchedulePreview = () => {
           <DialogHeader>
             <DialogTitle>Override WOD for {selectedDate}</DialogTitle>
             <DialogDescription>
-              Customize the WOD settings for this day. This override will NOT affect the normal rotation sequence.
+              Customize the WOD settings for this day. This override will NOT affect the fixed 28-day rotation.
             </DialogDescription>
           </DialogHeader>
           
@@ -277,7 +282,7 @@ export const WODSchedulePreview = () => {
                   <SelectValue placeholder="Select category" />
                 </SelectTrigger>
                 <SelectContent>
-                  {CATEGORY_CYCLE_8DAY.filter((v, i, a) => a.indexOf(v) === i).map(cat => (
+                  {ALL_CATEGORIES.map(cat => (
                     <SelectItem key={cat} value={cat}>{cat}</SelectItem>
                   ))}
                 </SelectContent>
@@ -288,7 +293,7 @@ export const WODSchedulePreview = () => {
               <Label>Format</Label>
               <Select value={overrideFormat} onValueChange={setOverrideFormat} disabled={!overrideCategory}>
                 <SelectTrigger>
-                  <SelectValue placeholder="Select format (or leave for rotation)" />
+                  <SelectValue placeholder="Select format (or leave for AI selection)" />
                 </SelectTrigger>
                 <SelectContent>
                   {availableFormats.map(fmt => (
@@ -305,7 +310,7 @@ export const WODSchedulePreview = () => {
               <Label>Difficulty (Stars)</Label>
               <Select value={overrideDifficulty} onValueChange={setOverrideDifficulty}>
                 <SelectTrigger>
-                  <SelectValue placeholder="Select difficulty (or leave for rotation)" />
+                  <SelectValue placeholder="Select difficulty (or leave for default)" />
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="1">1★ - Beginner</SelectItem>
