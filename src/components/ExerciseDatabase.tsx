@@ -105,12 +105,36 @@ const ExerciseDatabase = () => {
     loadFilterOptions();
   }, []);
 
+  // Normalize search term to handle common variations
+  const normalizeSearchTerm = (term: string): string[] => {
+    const normalized = term.toLowerCase().trim();
+    const variations = [normalized];
+    
+    // Handle "body weight" vs "bodyweight"
+    if (normalized.includes('body weight')) {
+      variations.push(normalized.replace('body weight', 'bodyweight'));
+    }
+    if (normalized.includes('bodyweight')) {
+      variations.push(normalized.replace('bodyweight', 'body weight'));
+    }
+    
+    // Handle "dumbbell" vs "dumbell" (common typo)
+    if (normalized.includes('dumbell')) {
+      variations.push(normalized.replace('dumbell', 'dumbbell'));
+    }
+    if (normalized.includes('dumbbell')) {
+      variations.push(normalized.replace('dumbbell', 'dumbell'));
+    }
+    
+    return [...new Set(variations)];
+  };
+
   const fetchExercises = async () => {
     setLoading(true);
     try {
       let query = supabase.from('exercises').select('*');
 
-      // Apply filters
+      // Apply dropdown filters
       if (bodyPartFilter && bodyPartFilter !== "all") {
         query = query.eq('body_part', bodyPartFilter);
       }
@@ -126,11 +150,24 @@ const ExerciseDatabase = () => {
       if (categoryFilter && categoryFilter !== "all") {
         query = query.eq('category', categoryFilter);
       }
+      
+      // Smart search: search across multiple fields
       if (nameSearch.trim()) {
-        query = query.ilike('name', `%${nameSearch.trim()}%`);
+        const searchVariations = normalizeSearchTerm(nameSearch);
+        
+        // Build OR conditions for each search variation across multiple columns
+        const orConditions = searchVariations.flatMap(term => [
+          `name.ilike.%${term}%`,
+          `target.ilike.%${term}%`,
+          `body_part.ilike.%${term}%`,
+          `equipment.ilike.%${term}%`,
+          `category.ilike.%${term}%`
+        ]).join(',');
+        
+        query = query.or(orConditions);
       }
 
-      query = query.order('name').limit(50);
+      query = query.order('name').limit(100);
 
       const { data, error } = await query;
 
@@ -187,15 +224,15 @@ const ExerciseDatabase = () => {
 
   return (
     <div className="space-y-6">
-      {/* Search Bar */}
+      {/* Smart Search Bar */}
       <div className="space-y-1">
         <label className="text-xs text-muted-foreground flex items-center gap-1">
           <Search className="h-3 w-3 text-primary" />
-          Search by Name
+          Smart Search (name, muscle, body part, equipment, category)
         </label>
         <Input
           type="text"
-          placeholder="Search exercise by name (e.g., Sit-up, Air Bike)"
+          placeholder='Try "squat", "quads", "body weight", "chest", "dumbbell"...'
           value={nameSearch}
           onChange={(e) => setNameSearch(e.target.value)}
           onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
@@ -415,9 +452,17 @@ const ExerciseDatabase = () => {
           ))}
         </div>
       ) : hasSearched ? (
-        <div className="text-center py-12 text-muted-foreground">
+        <div className="text-center py-12 text-muted-foreground space-y-3">
           <Dumbbell className="h-12 w-12 mx-auto mb-4 opacity-50" />
-          <p>No exercises found with those filters.</p>
+          <p className="font-medium">No exercises found with those filters.</p>
+          <div className="text-sm space-y-1">
+            <p>💡 Tips:</p>
+            <ul className="list-disc list-inside text-left max-w-md mx-auto">
+              <li>Try using the dropdown filters (Target Muscle, Equipment, etc.)</li>
+              <li>Search works across: name, target muscle, body part, equipment, category</li>
+              <li>Try simpler terms: "squat", "push", "pull", "chest", "legs"</li>
+            </ul>
+          </div>
         </div>
       ) : (
         <div className="text-center py-12 text-muted-foreground">
