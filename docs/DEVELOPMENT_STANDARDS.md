@@ -219,12 +219,13 @@ All scheduled functions must be registered in pg_cron:
 
 | Function | Schedule | Description |
 |----------|----------|-------------|
-| generate-workout-of-day | 0 7 * * * | Daily WOD at 07:00 UTC |
-| generate-daily-ritual | 0 5 * * * | Daily Ritual at 05:00 UTC |
+| generate-workout-of-day | 30 0 * * * | Daily WOD at 00:30 UTC (02:30 Cyprus winter) |
+| verify-wod-generation | 0 1 * * * | WOD verification at 01:00 UTC |
+| generate-daily-ritual | 5 22 * * * | Daily Ritual at 22:05 UTC (00:05 Cyprus winter) |
 | send-checkin-reminders | 0 6,18 * * * | Check-ins at 06:00 & 18:00 UTC |
 | send-weekly-motivation | 0 8 * * 1 | Mondays at 08:00 UTC |
 | send-weekly-activity-report | 0 7 * * 1 | Mondays at 07:00 UTC |
-| send-renewal-reminders | 0 9 * * * | Daily at 09:00 UTC |
+| send-renewal-reminders | 0 7 * * * | Daily at 07:00 UTC |
 | send-new-content-notifications | */5 * * * * | Every 5 minutes |
 | send-scheduled-notifications | */5 * * * * | Every 5 minutes |
 | send-scheduled-emails | */5 * * * * | Every 5 minutes |

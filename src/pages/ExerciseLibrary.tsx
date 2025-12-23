@@ -8,13 +8,10 @@ import { useShowBackButton } from "@/hooks/useShowBackButton";
 import { SEOEnhancer } from "@/components/SEOEnhancer";
 import ExerciseVideoGrid from "@/components/ExerciseVideoGrid";
 import ExerciseDatabase from "@/components/ExerciseDatabase";
-import { MismatchedExercises } from "@/components/admin/MismatchedExercises";
-import { useAdminRole } from "@/hooks/useAdminRole";
 
 const ExerciseLibrary = () => {
   const navigate = useNavigate();
   const { canGoBack, goBack } = useShowBackButton();
-  const { isAdmin } = useAdminRole();
 
   return (
     <>
@@ -117,13 +114,6 @@ const ExerciseLibrary = () => {
               <ExerciseDatabase />
             </CardContent>
           </Card>
-
-          {/* Admin: Mismatched Exercises */}
-          {isAdmin && (
-            <div className="mb-6">
-              <MismatchedExercises />
-            </div>
-          )}
 
           {/* SmartyGym Video Gallery Card */}
           <Card className="border-2 border-primary/30 shadow-lg mb-6">

@@ -57,7 +57,7 @@ const SCHEDULED_JOBS: Record<string, ScheduledJob> = {
   },
   'renewal_reminders': {
     name: 'Subscription Renewal Reminders',
-    cronHourUTC: 9, // 11:00 AM Cyprus
+    cronHourUTC: 7, // 9:00 AM Cyprus winter, 10:00 AM summer
     frequency: 'daily',
     messageTypes: ['renewal_reminder'],
     description: 'Checks for expiring subscriptions and sends reminders'
@@ -71,14 +71,16 @@ const SCHEDULED_JOBS: Record<string, ScheduledJob> = {
   },
   'wod_generation': {
     name: 'Workout of Day Generation',
-    cronHourUTC: 5, // Generates before notifications
+    cronHourUTC: 0, // 00:30 UTC → 02:30 Cyprus winter, 03:30 summer
+    cronMinuteUTC: 30,
     frequency: 'daily',
     messageTypes: [], // Doesn't send messages, generates content
-    description: 'Generates the daily workout variations'
+    description: 'Generates the daily workout variations (with retry at 01:00 UTC)'
   },
   'ritual_generation': {
     name: 'Daily Ritual Generation',
-    cronHourUTC: 4, // Generates before notifications
+    cronHourUTC: 22, // 22:05 UTC (previous day) → 00:05 Cyprus winter
+    cronMinuteUTC: 5,
     frequency: 'daily',
     messageTypes: [], // Doesn't send messages, generates content
     description: 'Generates the daily Smarty Ritual content'
