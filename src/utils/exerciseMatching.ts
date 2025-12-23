@@ -146,8 +146,8 @@ export const extractExerciseNames = (htmlContent: string): string[] => {
     }
   }
   
-  // Pattern 3: Exercise markup {{exercise:id:name}}
-  const markupPattern = /\{\{exercise:([^:]+):([^}]+)\}\}/gi;
+  // Pattern 3: Exercise markup {{exercise:id:name}} (tolerant of typos like exrcise, excersize)
+  const markupPattern = /\{\{(?:exercise|exrcise|excersize|excercise):([^:]+):([^}]+)\}\}/gi;
   while ((match = markupPattern.exec(htmlContent)) !== null) {
     exercises.push(match[2]); // Push the name
   }
@@ -165,7 +165,8 @@ export const parseExerciseMarkup = (content: string): Array<{
   name: string;
 }> => {
   const results: Array<{ fullMatch: string; id: string; name: string }> = [];
-  const markupPattern = /\{\{exercise:([^:]+):([^}]+)\}\}/g;
+  // Tolerant pattern: accepts exercise, exrcise, excersize, excercise (case-insensitive)
+  const markupPattern = /\{\{(?:exercise|exrcise|excersize|excercise):([^:]+):([^}]+)\}\}/gi;
   let match;
   
   while ((match = markupPattern.exec(content)) !== null) {
