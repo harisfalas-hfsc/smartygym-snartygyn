@@ -134,12 +134,59 @@ function logStep(step: string, details?: any) {
 }
 
 // ═══════════════════════════════════════════════════════════════════════════════
-// DATE-BASED ROTATION LOGIC (28-DAY FIXED CYCLE)
-// CRITICAL: Categories and difficulties are FIXED per day - no shifts
+// DATE-BASED ROTATION LOGIC (28-DAY FIXED CYCLE + 84-DAY STRENGTH ROTATION)
+// CRITICAL: Categories are FIXED per day - no shifts
+// STRENGTH days use 84-day rotation for difficulty variation
 // ═══════════════════════════════════════════════════════════════════════════════
 
 // Reference date: December 24, 2024 = Day 1 (CARDIO/Beginner)
 const CYCLE_START_DATE = '2024-12-24';
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// 84-DAY STRENGTH DIFFICULTY ROTATION (3 x 28-day cycles)
+// Only affects Strength days - all other categories use base periodization
+// ═══════════════════════════════════════════════════════════════════════════════
+const STRENGTH_84DAY_ROTATION: Record<number, Array<{
+  difficulty: "Beginner" | "Intermediate" | "Advanced";
+  stars: [number, number];
+}>> = {
+  // Day 2 - LOWER BODY: Advanced → Intermediate → Beginner
+  2: [
+    { difficulty: "Advanced", stars: [5, 6] },
+    { difficulty: "Intermediate", stars: [3, 4] },
+    { difficulty: "Beginner", stars: [1, 2] }
+  ],
+  // Day 5 - UPPER BODY: Intermediate → Beginner → Advanced
+  5: [
+    { difficulty: "Intermediate", stars: [3, 4] },
+    { difficulty: "Beginner", stars: [1, 2] },
+    { difficulty: "Advanced", stars: [5, 6] }
+  ],
+  // Day 12 - FULL BODY: Advanced → Beginner → Intermediate
+  12: [
+    { difficulty: "Advanced", stars: [5, 6] },
+    { difficulty: "Beginner", stars: [1, 2] },
+    { difficulty: "Intermediate", stars: [3, 4] }
+  ],
+  // Day 15 - LOW PUSH & UPPER PULL: Beginner → Advanced → Intermediate
+  15: [
+    { difficulty: "Beginner", stars: [1, 2] },
+    { difficulty: "Advanced", stars: [5, 6] },
+    { difficulty: "Intermediate", stars: [3, 4] }
+  ],
+  // Day 20 - LOW PULL & UPPER PUSH: Intermediate → Beginner → Advanced
+  20: [
+    { difficulty: "Intermediate", stars: [3, 4] },
+    { difficulty: "Beginner", stars: [1, 2] },
+    { difficulty: "Advanced", stars: [5, 6] }
+  ],
+  // Day 23 - CORE & GLUTES: Advanced → Intermediate → Beginner
+  23: [
+    { difficulty: "Advanced", stars: [5, 6] },
+    { difficulty: "Intermediate", stars: [3, 4] },
+    { difficulty: "Beginner", stars: [1, 2] }
+  ]
+};
 
 // Get day 1-28 in cycle based on calendar date
 function getDayInCycleFromDate(dateStr: string): number {
@@ -148,6 +195,14 @@ function getDayInCycleFromDate(dateStr: string): number {
   const daysDiff = Math.floor((targetDate.getTime() - startDate.getTime()) / (24 * 60 * 60 * 1000));
   const normalizedDays = ((daysDiff % 28) + 28) % 28;
   return normalizedDays + 1; // 1-28
+}
+
+// Get cycle number from a date string (1, 2, 3, 4, ...)
+function getCycleNumberFromDate(dateStr: string): number {
+  const startDate = new Date(CYCLE_START_DATE + 'T00:00:00Z');
+  const targetDate = new Date(dateStr + 'T00:00:00Z');
+  const daysDiff = Math.floor((targetDate.getTime() - startDate.getTime()) / (24 * 60 * 60 * 1000));
+  return Math.floor(daysDiff / 28) + 1;
 }
 
 // Get periodization for a specific day (1-28)
@@ -161,30 +216,53 @@ function getCategoryForDay(dayInCycle: number): string {
   return getPeriodizationForDay(dayInCycle).category;
 }
 
-// Get difficulty for day - FIXED, no shifting
-function getDifficultyForDay(dayInCycle: number): { name: string | null; stars: number | null; range: [number, number] | null } {
+// Get difficulty for day - applies 84-day rotation for STRENGTH days
+function getDifficultyForDay(dayInCycle: number, cycleNumber: number): { name: string | null; stars: number | null; range: [number, number] | null } {
   const periodization = getPeriodizationForDay(dayInCycle);
   
   if (!periodization.difficulty || !periodization.difficultyStars) {
     return { name: null, stars: null, range: null };
   }
   
+  let difficulty = periodization.difficulty;
+  let difficultyRange = periodization.difficultyStars;
+  
+  // Apply 84-day rotation for STRENGTH days only
+  if (periodization.category === "STRENGTH" && STRENGTH_84DAY_ROTATION[dayInCycle]) {
+    const rotationIndex = (cycleNumber - 1) % 3; // 0, 1, or 2
+    const rotation = STRENGTH_84DAY_ROTATION[dayInCycle][rotationIndex];
+    difficulty = rotation.difficulty;
+    difficultyRange = rotation.stars;
+    
+    logStep("Strength 84-day rotation applied", {
+      dayInCycle,
+      cycleNumber,
+      rotationIndex,
+      focus: STRENGTH_DAY_FOCUS[dayInCycle]?.focus,
+      baseDifficulty: periodization.difficulty,
+      rotatedDifficulty: difficulty,
+      rotatedRange: difficultyRange
+    });
+  }
+  
   // Randomly pick one star from the range
-  const [star1, star2] = periodization.difficultyStars;
+  const [star1, star2] = difficultyRange;
   const selectedStars = Math.random() < 0.5 ? star1 : star2;
   
-  logStep("Difficulty calculation (28-day fixed)", {
+  logStep("Difficulty calculation", {
     dayInCycle,
+    cycleNumber,
     category: periodization.category,
-    difficulty: periodization.difficulty,
-    range: periodization.difficultyStars,
-    selectedStars
+    difficulty,
+    range: difficultyRange,
+    selectedStars,
+    isStrengthRotation: periodization.category === "STRENGTH"
   });
   
   return { 
-    name: periodization.difficulty, 
+    name: difficulty, 
     stars: selectedStars,
-    range: periodization.difficultyStars
+    range: difficultyRange
   };
 }
 
@@ -251,12 +329,13 @@ export function calculateFutureWODSchedule(
     const futureDateStr = futureDate.toISOString().split('T')[0];
     
     const futureDayInCycle = getDayInCycleFromDate(futureDateStr);
+    const futureCycleNumber = getCycleNumberFromDate(futureDateStr);
     const periodization = getPeriodizationForDay(futureDayInCycle);
     const category = periodization.category;
     const isRecoveryDay = category === "RECOVERY";
     
-    // Get difficulty (null for RECOVERY days)
-    const difficulty = getDifficultyForDay(futureDayInCycle);
+    // Get difficulty (null for RECOVERY days) - uses 84-day rotation for Strength
+    const difficulty = getDifficultyForDay(futureDayInCycle, futureCycleNumber);
     const formats = FORMATS_BY_CATEGORY[category] || ["CIRCUIT"];
     
     schedule.push({
@@ -561,16 +640,18 @@ serve(async (req) => {
           stars: override.difficulty 
         };
       } else {
-        const diffResult = getDifficultyForDay(dayInCycle);
+        const cycleNum = getCycleNumberFromDate(effectiveDate);
+        const diffResult = getDifficultyForDay(dayInCycle, cycleNum);
         selectedDifficulty = {
           name: diffResult.name || "Beginner",
           stars: diffResult.stars || 1
         };
       }
     } else {
-      // Normal calculation from 28-day fixed periodization
+      // Normal calculation from 28-day fixed periodization + 84-day Strength rotation
       category = getCategoryForDay(dayInCycle);
-      const diffResult = getDifficultyForDay(dayInCycle);
+      const cycleNum = getCycleNumberFromDate(effectiveDate);
+      const diffResult = getDifficultyForDay(dayInCycle, cycleNum);
       // Handle RECOVERY days (null difficulty)
       if (isRecoveryDay || !diffResult.name || !diffResult.stars) {
         selectedDifficulty = { name: "Recovery", stars: 0 };
@@ -682,13 +763,14 @@ serve(async (req) => {
     const yesterdayEquipment = yesterdayWod?.equipment || "Unknown";
     const yesterdayFormat = yesterdayWod?.format || "Unknown";
     
-    // Calculate tomorrow's expected specs (28-day fixed cycle - date-based)
+    // Calculate tomorrow's expected specs (28-day fixed cycle + 84-day Strength rotation)
     const tomorrow = new Date(effectiveDate + 'T00:00:00Z');
     tomorrow.setDate(tomorrow.getDate() + 1);
     const tomorrowDateStr = tomorrow.toISOString().split('T')[0];
     const tomorrowDayInCycle = getDayInCycleFromDate(tomorrowDateStr);
+    const tomorrowCycleNumber = getCycleNumberFromDate(tomorrowDateStr);
     const tomorrowCategory = getCategoryForDay(tomorrowDayInCycle);
-    const tomorrowDiffResult = getDifficultyForDay(tomorrowDayInCycle);
+    const tomorrowDiffResult = getDifficultyForDay(tomorrowDayInCycle, tomorrowCycleNumber);
     const tomorrowDifficulty = { 
       name: tomorrowDiffResult.name || "Recovery", 
       stars: tomorrowDiffResult.stars || 0 

@@ -1,5 +1,5 @@
 /**
- * WOD Cycle Utilities - 28-Day Fixed Periodization System
+ * WOD Cycle Utilities - 28-Day Fixed Periodization System with 84-Day Strength Rotation
  * 
  * CRITICAL: This file is the SINGLE SOURCE OF TRUTH for WOD cycle calculations.
  * Both frontend and backend use identical logic anchored to CYCLE_START_DATE.
@@ -8,14 +8,65 @@
  * - 28-day cycle with predefined category + difficulty for each day
  * - NO shifts, NO weekly rotations - just repeat after 28 days
  * - Recovery days (10 and 28) have no difficulty level
+ * 
+ * STRENGTH DAYS (2, 5, 12, 15, 20, 23) use an 84-day super-cycle:
+ * - Every 28-day cycle, the difficulty rotates for Strength days only
+ * - Over 3 cycles (84 days), each Strength focus experiences all difficulty levels
+ * - Non-Strength categories remain fixed with their base difficulty
  */
 
 // Reference date: December 24, 2024 = Day 1 (CARDIO/BEGINNER)
 // This anchors the 28-day cycle to the calendar
 export const CYCLE_START_DATE = '2024-12-24';
 
-// 28-DAY FIXED PERIODIZATION (from WOD_PERIODIZATION.docx)
-// Each entry: { category, difficulty: "Beginner" | "Intermediate" | "Advanced" | null }
+// ═══════════════════════════════════════════════════════════════════════════════
+// 84-DAY STRENGTH DIFFICULTY ROTATION (3 x 28-day cycles)
+// Only affects Strength days - all other categories use base periodization
+// ═══════════════════════════════════════════════════════════════════════════════
+export const STRENGTH_84DAY_ROTATION: Record<number, Array<{
+  difficulty: "Beginner" | "Intermediate" | "Advanced";
+  stars: [number, number];
+}>> = {
+  // Day 2 - LOWER BODY: Advanced → Intermediate → Beginner
+  2: [
+    { difficulty: "Advanced", stars: [5, 6] },
+    { difficulty: "Intermediate", stars: [3, 4] },
+    { difficulty: "Beginner", stars: [1, 2] }
+  ],
+  // Day 5 - UPPER BODY: Intermediate → Beginner → Advanced
+  5: [
+    { difficulty: "Intermediate", stars: [3, 4] },
+    { difficulty: "Beginner", stars: [1, 2] },
+    { difficulty: "Advanced", stars: [5, 6] }
+  ],
+  // Day 12 - FULL BODY: Advanced → Beginner → Intermediate
+  12: [
+    { difficulty: "Advanced", stars: [5, 6] },
+    { difficulty: "Beginner", stars: [1, 2] },
+    { difficulty: "Intermediate", stars: [3, 4] }
+  ],
+  // Day 15 - LOW PUSH & UPPER PULL: Beginner → Advanced → Intermediate
+  15: [
+    { difficulty: "Beginner", stars: [1, 2] },
+    { difficulty: "Advanced", stars: [5, 6] },
+    { difficulty: "Intermediate", stars: [3, 4] }
+  ],
+  // Day 20 - LOW PULL & UPPER PUSH: Intermediate → Beginner → Advanced
+  20: [
+    { difficulty: "Intermediate", stars: [3, 4] },
+    { difficulty: "Beginner", stars: [1, 2] },
+    { difficulty: "Advanced", stars: [5, 6] }
+  ],
+  // Day 23 - CORE & GLUTES: Advanced → Intermediate → Beginner
+  23: [
+    { difficulty: "Advanced", stars: [5, 6] },
+    { difficulty: "Intermediate", stars: [3, 4] },
+    { difficulty: "Beginner", stars: [1, 2] }
+  ]
+};
+
+// 28-DAY BASE PERIODIZATION (from WOD_PERIODIZATION.docx)
+// NOTE: For Strength days, the difficulty is overridden by STRENGTH_84DAY_ROTATION
 export const PERIODIZATION_28DAY: Array<{
   day: number;
   category: string;
@@ -23,28 +74,28 @@ export const PERIODIZATION_28DAY: Array<{
   difficultyStars: [number, number] | null; // Star range for this difficulty
 }> = [
   { day: 1,  category: "CARDIO",              difficulty: "Beginner",     difficultyStars: [1, 2] },
-  { day: 2,  category: "STRENGTH",            difficulty: "Advanced",     difficultyStars: [5, 6] },
+  { day: 2,  category: "STRENGTH",            difficulty: "Advanced",     difficultyStars: [5, 6] }, // Overridden by 84-day rotation
   { day: 3,  category: "MOBILITY & STABILITY", difficulty: "Intermediate", difficultyStars: [3, 4] },
   { day: 4,  category: "CHALLENGE",           difficulty: "Advanced",     difficultyStars: [5, 6] },
-  { day: 5,  category: "STRENGTH",            difficulty: "Intermediate", difficultyStars: [3, 4] },
+  { day: 5,  category: "STRENGTH",            difficulty: "Intermediate", difficultyStars: [3, 4] }, // Overridden by 84-day rotation
   { day: 6,  category: "PILATES",             difficulty: "Advanced",     difficultyStars: [5, 6] },
   { day: 7,  category: "CALORIE BURNING",     difficulty: "Intermediate", difficultyStars: [3, 4] },
   { day: 8,  category: "METABOLIC",           difficulty: "Beginner",     difficultyStars: [1, 2] },
   { day: 9,  category: "CHALLENGE",           difficulty: "Advanced",     difficultyStars: [5, 6] },
   { day: 10, category: "RECOVERY",            difficulty: null,           difficultyStars: null },
   { day: 11, category: "CARDIO",              difficulty: "Intermediate", difficultyStars: [3, 4] },
-  { day: 12, category: "STRENGTH",            difficulty: "Intermediate", difficultyStars: [3, 4] },
+  { day: 12, category: "STRENGTH",            difficulty: "Intermediate", difficultyStars: [3, 4] }, // Overridden by 84-day rotation
   { day: 13, category: "MOBILITY & STABILITY", difficulty: "Advanced",     difficultyStars: [5, 6] },
   { day: 14, category: "CHALLENGE",           difficulty: "Intermediate", difficultyStars: [3, 4] },
-  { day: 15, category: "STRENGTH",            difficulty: "Intermediate", difficultyStars: [3, 4] },
+  { day: 15, category: "STRENGTH",            difficulty: "Intermediate", difficultyStars: [3, 4] }, // Overridden by 84-day rotation
   { day: 16, category: "PILATES",             difficulty: "Beginner",     difficultyStars: [1, 2] },
   { day: 17, category: "CALORIE BURNING",     difficulty: "Advanced",     difficultyStars: [5, 6] },
   { day: 18, category: "METABOLIC",           difficulty: "Intermediate", difficultyStars: [3, 4] },
   { day: 19, category: "CARDIO",              difficulty: "Advanced",     difficultyStars: [5, 6] },
-  { day: 20, category: "STRENGTH",            difficulty: "Beginner",     difficultyStars: [1, 2] },
+  { day: 20, category: "STRENGTH",            difficulty: "Beginner",     difficultyStars: [1, 2] }, // Overridden by 84-day rotation
   { day: 21, category: "MOBILITY & STABILITY", difficulty: "Beginner",     difficultyStars: [1, 2] },
   { day: 22, category: "CHALLENGE",           difficulty: "Intermediate", difficultyStars: [3, 4] },
-  { day: 23, category: "STRENGTH",            difficulty: "Advanced",     difficultyStars: [5, 6] },
+  { day: 23, category: "STRENGTH",            difficulty: "Advanced",     difficultyStars: [5, 6] }, // Overridden by 84-day rotation
   { day: 24, category: "PILATES",             difficulty: "Intermediate", difficultyStars: [3, 4] },
   { day: 25, category: "CALORIE BURNING",     difficulty: "Beginner",     difficultyStars: [1, 2] },
   { day: 26, category: "METABOLIC",           difficulty: "Advanced",     difficultyStars: [5, 6] },
@@ -173,13 +224,24 @@ export const getCategoryForDate = (dateStr: string): string => {
 };
 
 /**
- * Get difficulty info for a specific day in cycle (fixed, no shifting)
+ * Get difficulty info for a specific day in cycle
+ * For STRENGTH days, uses the 84-day rotation based on cycle number
+ * For all other categories, uses the fixed base periodization
  */
-export const getDifficultyForDay = (dayInCycle: number): { 
+export const getDifficultyForDay = (dayInCycle: number, cycleNumber?: number): { 
   level: string | null; 
   range: [number, number] | null;
 } => {
   const periodization = getPeriodizationForDay(dayInCycle);
+  
+  // Apply 84-day rotation for STRENGTH days only
+  if (periodization.category === "STRENGTH" && cycleNumber !== undefined && STRENGTH_84DAY_ROTATION[dayInCycle]) {
+    const rotationIndex = (cycleNumber - 1) % 3; // 0, 1, or 2
+    const rotation = STRENGTH_84DAY_ROTATION[dayInCycle][rotationIndex];
+    return { level: rotation.difficulty, range: rotation.stars };
+  }
+  
+  // For non-Strength days, use the fixed base periodization
   return {
     level: periodization.difficulty,
     range: periodization.difficultyStars
@@ -188,17 +250,20 @@ export const getDifficultyForDay = (dayInCycle: number): {
 
 /**
  * Get difficulty info directly from a date string
+ * Automatically calculates cycle number for Strength day rotation
  */
 export const getDifficultyForDate = (dateStr: string): { 
   level: string | null; 
   range: [number, number] | null;
 } => {
   const dayInCycle = getDayInCycleFromDate(dateStr);
-  return getDifficultyForDay(dayInCycle);
+  const cycleNumber = getCycleNumberFromDate(dateStr);
+  return getDifficultyForDay(dayInCycle, cycleNumber);
 };
 
 /**
  * Get full WOD info for a date
+ * Uses 84-day rotation for Strength day difficulties
  */
 export const getWODInfoForDate = (dateStr: string): {
   dayInCycle: number;
@@ -212,10 +277,10 @@ export const getWODInfoForDate = (dateStr: string): {
   const cycleNumber = getCycleNumberFromDate(dateStr);
   const periodization = getPeriodizationForDay(dayInCycle);
   const category = periodization.category;
-  const difficulty = {
-    level: periodization.difficulty,
-    range: periodization.difficultyStars
-  };
+  
+  // Use the updated getDifficultyForDay that handles 84-day Strength rotation
+  const difficulty = getDifficultyForDay(dayInCycle, cycleNumber);
+  
   const formats = FORMATS_BY_CATEGORY[category] || ["CIRCUIT"];
   const isRecoveryDay = category === "RECOVERY";
   
