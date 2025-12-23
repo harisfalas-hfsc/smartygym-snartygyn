@@ -9,7 +9,7 @@ verify_jwt = false
 [functions.smarty-coach]
 verify_jwt = false
 
-[functions.generate-fitness-plan]
+[functions.generate-training-program]
 verify_jwt = true
 
 [functions.send-contact-email]
