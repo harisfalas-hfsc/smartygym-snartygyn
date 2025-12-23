@@ -70,15 +70,38 @@ function logStep(step: string, details?: any) {
 }
 
 // ═══════════════════════════════════════════════════════════════════════════════
-// NEW ROTATION LOGIC FUNCTIONS (8-DAY CYCLE)
+// DATE-BASED ROTATION LOGIC (8-DAY CYCLE)
+// CRITICAL FIX: Categories now calculated from calendar date, not a counter
+// This prevents desync when cron jobs are missed or manual generation occurs
 // ═══════════════════════════════════════════════════════════════════════════════
 
-// Get day 1-8 in current 8-day cycle
+// Reference date: December 14, 2025 = Day 1 (CHALLENGE)
+// This anchors the 8-day cycle to the calendar
+const CYCLE_START_DATE = '2025-12-14';
+
+// Get day 1-8 in cycle based on calendar date (NOT a counter)
+function getDayInCycleFromDate(dateStr: string): number {
+  const startDate = new Date(CYCLE_START_DATE + 'T00:00:00Z');
+  const targetDate = new Date(dateStr + 'T00:00:00Z');
+  const daysDiff = Math.floor((targetDate.getTime() - startDate.getTime()) / (24 * 60 * 60 * 1000));
+  // Handle negative days (dates before reference) properly with modulo
+  const normalizedDays = ((daysDiff % 8) + 8) % 8;
+  return normalizedDays + 1; // 1-8
+}
+
+// Get week number based on calendar date (for difficulty rotation shift)
+function getWeekNumberFromDate(dateStr: string): number {
+  const startDate = new Date(CYCLE_START_DATE + 'T00:00:00Z');
+  const targetDate = new Date(dateStr + 'T00:00:00Z');
+  const daysDiff = Math.floor((targetDate.getTime() - startDate.getTime()) / (24 * 60 * 60 * 1000));
+  return Math.floor(daysDiff / 8) + 1;
+}
+
+// Legacy functions kept for backward compatibility with preview calculations
 function getDayInCycle(dayCount: number): number {
   return (dayCount % 8) + 1;
 }
 
-// Get week number (for difficulty rotation shift)
 function getWeekNumber(dayCount: number): number {
   return Math.floor(dayCount / 8) + 1;
 }
@@ -436,25 +459,29 @@ serve(async (req) => {
     }
 
     // ═══════════════════════════════════════════════════════════════════════════════
-    // CALCULATE TODAY'S WOD PARAMETERS (7-DAY CYCLE)
+    // CALCULATE TODAY'S WOD PARAMETERS (8-DAY CYCLE - DATE-BASED)
+    // CRITICAL: Now uses calendar date instead of counter to prevent desync
     // ═══════════════════════════════════════════════════════════════════════════════
     
-    const dayInCycle = getDayInCycle(state.day_count);
-    const weekNumber = state.week_number || getWeekNumber(state.day_count);
+    // Use DATE-BASED calculation - this always gives correct category for the calendar day
+    const dayInCycle = getDayInCycleFromDate(effectiveDate);
+    const weekNumber = getWeekNumberFromDate(effectiveDate);
     let usedStarsInWeek = state.used_stars_in_week || {};
     const manualOverrides = state.manual_overrides || {};
     
-    // Check if we're starting a new week (day 1) - reset used stars
+    // Check if we're starting a new 8-day cycle (day 1) - reset used stars
     if (dayInCycle === 1) {
       usedStarsInWeek = {};
-      logStep("New 7-day cycle started, resetting used stars");
+      logStep("New 8-day cycle started (Day 1), resetting used stars");
     }
     
-    logStep("7-Day Cycle Parameters", { 
-      dayCount: state.day_count, 
-      dayInCycle, 
+    logStep("8-Day Cycle Parameters (DATE-BASED)", { 
+      effectiveDate,
+      dayInCycle,
       weekNumber,
-      usedStarsInWeek 
+      expectedCategory: getCategoryForDay(dayInCycle),
+      usedStarsInWeek,
+      legacyDayCount: state.day_count // Keep for debugging comparison
     });
 
     // Check for manual override for today

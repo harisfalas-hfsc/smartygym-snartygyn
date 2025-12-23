@@ -23,7 +23,7 @@ const CATEGORY_CYCLE_8DAY = [
   "PILATES"               // Day 8
 ];
 
-// DIFFICULTY PATTERN BASE (7-day pattern that shifts weekly)
+// DIFFICULTY PATTERN BASE (8-day pattern that shifts weekly)
 const DIFFICULTY_PATTERN_BASE = [
   { level: "Intermediate", range: [3, 4] },
   { level: "Advanced", range: [5, 6] },
@@ -46,9 +46,25 @@ const FORMATS_BY_CATEGORY: Record<string, string[]> = {
   "CHALLENGE": ["CIRCUIT", "TABATA", "AMRAP", "EMOM", "FOR TIME", "MIX"]
 };
 
-// Match backend formula exactly - 8-day cycle
-const getDayInCycle = (dayCount: number): number => (dayCount % 8) + 1;
-const getWeekNumber = (dayCount: number): number => Math.floor(dayCount / 8) + 1;
+// Reference date: December 14, 2025 = Day 1 (CHALLENGE)
+// This anchors the 8-day cycle to the calendar - matches backend exactly
+const CYCLE_START_DATE = '2025-12-14';
+
+// DATE-BASED calculation - always gives correct category for calendar day
+const getDayInCycleFromDate = (dateStr: string): number => {
+  const startDate = new Date(CYCLE_START_DATE + 'T00:00:00Z');
+  const targetDate = new Date(dateStr + 'T00:00:00Z');
+  const daysDiff = Math.floor((targetDate.getTime() - startDate.getTime()) / (24 * 60 * 60 * 1000));
+  const normalizedDays = ((daysDiff % 8) + 8) % 8;
+  return normalizedDays + 1; // 1-8
+};
+
+const getWeekNumberFromDate = (dateStr: string): number => {
+  const startDate = new Date(CYCLE_START_DATE + 'T00:00:00Z');
+  const targetDate = new Date(dateStr + 'T00:00:00Z');
+  const daysDiff = Math.floor((targetDate.getTime() - startDate.getTime()) / (24 * 60 * 60 * 1000));
+  return Math.floor(daysDiff / 8) + 1;
+};
 
 const getCategoryForDay = (dayInCycle: number): string => CATEGORY_CYCLE_8DAY[dayInCycle - 1];
 
@@ -84,26 +100,21 @@ export const WODSchedulePreview = () => {
     },
   });
 
-  // Calculate next 8 days schedule
-  // CRITICAL: day_count represents AFTER today's generation
-  // So day_count already points to tomorrow's position in the cycle
+  // Calculate next 8 days schedule using DATE-BASED calculation
+  // CRITICAL FIX: Now uses calendar date instead of counter to prevent desync
   const getUpcomingSchedule = () => {
     if (!wodState) return [];
     
     const schedule = [];
-    const currentDayCount = wodState.day_count || 0;
-    const currentWeekNumber = wodState.week_number || getWeekNumber(currentDayCount);
     const manualOverrides = (wodState.manual_overrides as Record<string, any>) || {};
     
     for (let i = 0; i < 8; i++) {
-      // i=0 is tomorrow (uses currentDayCount directly)
-      // i=1 is day after tomorrow (currentDayCount + 1), etc.
-      const futureDayCount = currentDayCount + i;
-      const futureDayInCycle = getDayInCycle(futureDayCount);
-      const futureWeekNumber = futureDayInCycle === 1 && i > 0 ? currentWeekNumber + 1 : currentWeekNumber;
-      
       const futureDate = addDays(new Date(), i + 1); // i+1 because i=0 is tomorrow
       const dateStr = format(futureDate, "yyyy-MM-dd");
+      
+      // DATE-BASED calculation - always correct regardless of counter state
+      const futureDayInCycle = getDayInCycleFromDate(dateStr);
+      const futureWeekNumber = getWeekNumberFromDate(dateStr);
       
       const override = manualOverrides[dateStr];
       
