@@ -1,9 +1,9 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
-import { Loader2, Search, X, Dumbbell, Activity } from "lucide-react";
+import { Loader2, Search, X, Dumbbell, Activity, Target } from "lucide-react";
 import ExerciseDetailModal from "./ExerciseDetailModal";
 import { useToast } from "@/hooks/use-toast";
 import {
@@ -14,132 +14,115 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 
-// Exact valid API values
-const BODY_PARTS = ['Legs', 'Back', 'Chest', 'Shoulders', 'Arms', 'Core'];
-const EQUIPMENT = [
-  'Barbell', 'Dumbbell', 'Machine', 'Bodyweight', 'Kettlebell', 
-  'ResistanceBand', 'BattleRope', 'MedicineBall', 'BosuBall', 
-  'PowerSled', 'SmithMachine', 'StabilityBall', 'TrapBar', 
-  'Stepper', 'WheelRoller', 'Towel', 'Landmine', 'Cable'
-];
-const TYPES = ['Compound', 'Isolation'];
-
-// Interface matching exact Gym Fit API search response
-interface ExerciseSearchResult {
+// Interface matching ExerciseDB schema in database
+interface Exercise {
   id: string;
   name: string;
-  bodyPart: string;
-}
-
-// Interface for full exercise detail from API
-interface ExerciseDetail {
-  name: string;
-  bodyPart: string;
-  muscles: {
-    role: string;
-    name: string;
-    group: string;
-  }[];
-  instructions: {
-    order: number;
-    description: string;
-  }[];
-  alternatives: {
-    id: string;
-    name: string;
-  }[];
-  variations: {
-    id: string;
-    name: string;
-  }[];
+  body_part: string;
+  equipment: string;
+  target: string;
+  secondary_muscles: string[];
+  instructions: string[];
+  gif_url: string | null;
 }
 
 const ExerciseDatabase = () => {
-  const [exercises, setExercises] = useState<ExerciseSearchResult[]>([]);
+  const [exercises, setExercises] = useState<Exercise[]>([]);
   const [loading, setLoading] = useState(false);
-  const [detailLoading, setDetailLoading] = useState(false);
   const [nameSearch, setNameSearch] = useState("");
   const [bodyPartFilter, setBodyPartFilter] = useState("");
   const [equipmentFilter, setEquipmentFilter] = useState("");
-  const [typeFilter, setTypeFilter] = useState("");
-  const [selectedExercise, setSelectedExercise] = useState<ExerciseDetail | null>(null);
+  const [targetFilter, setTargetFilter] = useState("");
+  const [selectedExercise, setSelectedExercise] = useState<Exercise | null>(null);
   const [modalOpen, setModalOpen] = useState(false);
   const [hasSearched, setHasSearched] = useState(false);
+  
+  // Dynamic filter options from database
+  const [bodyParts, setBodyParts] = useState<string[]>([]);
+  const [equipmentOptions, setEquipmentOptions] = useState<string[]>([]);
+  const [targetOptions, setTargetOptions] = useState<string[]>([]);
+  
   const { toast } = useToast();
+
+  // Load filter options from database on mount
+  useEffect(() => {
+    const loadFilterOptions = async () => {
+      try {
+        // Fetch distinct body parts
+        const { data: bodyPartData } = await supabase
+          .from('exercises')
+          .select('body_part')
+          .order('body_part');
+        
+        // Fetch distinct equipment
+        const { data: equipmentData } = await supabase
+          .from('exercises')
+          .select('equipment')
+          .order('equipment');
+        
+        // Fetch distinct targets
+        const { data: targetData } = await supabase
+          .from('exercises')
+          .select('target')
+          .order('target');
+
+        if (bodyPartData) {
+          const uniqueBodyParts = [...new Set(bodyPartData.map(d => d.body_part))];
+          setBodyParts(uniqueBodyParts);
+        }
+        if (equipmentData) {
+          const uniqueEquipment = [...new Set(equipmentData.map(d => d.equipment))];
+          setEquipmentOptions(uniqueEquipment);
+        }
+        if (targetData) {
+          const uniqueTargets = [...new Set(targetData.map(d => d.target))];
+          setTargetOptions(uniqueTargets);
+        }
+      } catch (error) {
+        console.error('Error loading filter options:', error);
+      }
+    };
+
+    loadFilterOptions();
+  }, []);
 
   const fetchExercises = async () => {
     setLoading(true);
     try {
-      const params: Record<string, string | number> = { limit: 50, offset: 0 };
-      
-      // Only send supported filters to API (not name - it's not supported)
-      if (bodyPartFilter && bodyPartFilter !== "all") params.bodyPart = bodyPartFilter;
-      if (equipmentFilter && equipmentFilter !== "all") params.equipment = equipmentFilter;
-      if (typeFilter && typeFilter !== "all") params.type = typeFilter;
+      let query = supabase.from('exercises').select('*');
 
-      const { data, error } = await supabase.functions.invoke('fetch-gym-fit-exercises', {
-        body: { endpoint: 'searchExercises', params }
-      });
+      // Apply filters
+      if (bodyPartFilter && bodyPartFilter !== "all") {
+        query = query.eq('body_part', bodyPartFilter);
+      }
+      if (equipmentFilter && equipmentFilter !== "all") {
+        query = query.eq('equipment', equipmentFilter);
+      }
+      if (targetFilter && targetFilter !== "all") {
+        query = query.eq('target', targetFilter);
+      }
+      if (nameSearch.trim()) {
+        query = query.ilike('name', `%${nameSearch.trim()}%`);
+      }
+
+      query = query.order('name').limit(50);
+
+      const { data, error } = await query;
 
       if (error) throw error;
-      
-      if (data.error) {
-        throw new Error(data.error);
-      }
 
-      let results = Array.isArray(data?.results) ? data.results : [];
-      
-      // Client-side filtering fallback if API doesn't support name search
-      if (nameSearch.trim() && results.length > 0) {
-        const searchLower = nameSearch.trim().toLowerCase();
-        const filtered = results.filter((ex: ExerciseSearchResult) => 
-          ex.name.toLowerCase().includes(searchLower)
-        );
-        // Only use filtered if it found matches (otherwise API might have handled it)
-        if (filtered.length > 0 || results.length === 0) {
-          results = filtered;
-        }
-      }
-
-      setExercises(results);
+      setExercises(data || []);
       setHasSearched(true);
     } catch (error: any) {
       console.error('Error fetching exercises:', error);
       toast({
         title: "Error loading exercises",
-        description: error.message || "Failed to fetch exercises from API",
+        description: error.message || "Failed to fetch exercises from database",
         variant: "destructive",
       });
       setExercises([]);
     } finally {
       setLoading(false);
-    }
-  };
-
-  const fetchExerciseDetail = async (exerciseId: string) => {
-    setDetailLoading(true);
-    try {
-      const { data, error } = await supabase.functions.invoke('fetch-gym-fit-exercises', {
-        body: { endpoint: 'getExercise', params: { id: exerciseId } }
-      });
-
-      if (error) throw error;
-      
-      if (data.error) {
-        throw new Error(data.error);
-      }
-
-      setSelectedExercise(data);
-      setModalOpen(true);
-    } catch (error: any) {
-      console.error('Error fetching exercise detail:', error);
-      toast({
-        title: "Error loading exercise details",
-        description: error.message || "Failed to fetch exercise details",
-        variant: "destructive",
-      });
-    } finally {
-      setDetailLoading(false);
     }
   };
 
@@ -151,19 +134,27 @@ const ExerciseDatabase = () => {
     setNameSearch("");
     setBodyPartFilter("");
     setEquipmentFilter("");
-    setTypeFilter("");
+    setTargetFilter("");
     setExercises([]);
     setHasSearched(false);
   };
 
-  const handleExerciseClick = (exercise: ExerciseSearchResult) => {
-    fetchExerciseDetail(exercise.id);
+  const handleExerciseClick = (exercise: Exercise) => {
+    setSelectedExercise(exercise);
+    setModalOpen(true);
   };
 
   const hasFilters = nameSearch.trim() ||
                      (bodyPartFilter && bodyPartFilter !== "all") || 
                      (equipmentFilter && equipmentFilter !== "all") || 
-                     (typeFilter && typeFilter !== "all");
+                     (targetFilter && targetFilter !== "all");
+
+  // Capitalize first letter of each word
+  const formatLabel = (str: string) => {
+    return str.split(' ').map(word => 
+      word.charAt(0).toUpperCase() + word.slice(1)
+    ).join(' ');
+  };
 
   return (
     <div className="space-y-6">
@@ -175,7 +166,7 @@ const ExerciseDatabase = () => {
         </label>
         <Input
           type="text"
-          placeholder="Search exercise by name (e.g., Squat, Bench Press)"
+          placeholder="Search exercise by name (e.g., Sit-up, Air Bike)"
           value={nameSearch}
           onChange={(e) => setNameSearch(e.target.value)}
           onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
@@ -183,7 +174,7 @@ const ExerciseDatabase = () => {
         />
       </div>
 
-      {/* Filters - Dropdown selects with exact API values */}
+      {/* Filters - Dropdown selects with dynamic values from database */}
       <div className="flex flex-col gap-4">
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
           {/* Body Part Filter */}
@@ -198,8 +189,8 @@ const ExerciseDatabase = () => {
               </SelectTrigger>
               <SelectContent side="bottom">
                 <SelectItem value="all">All Body Parts</SelectItem>
-                {BODY_PARTS.map((part) => (
-                  <SelectItem key={part} value={part}>{part}</SelectItem>
+                {bodyParts.map((part) => (
+                  <SelectItem key={part} value={part}>{formatLabel(part)}</SelectItem>
                 ))}
               </SelectContent>
             </Select>
@@ -217,27 +208,27 @@ const ExerciseDatabase = () => {
               </SelectTrigger>
               <SelectContent side="bottom">
                 <SelectItem value="all">All Equipment</SelectItem>
-                {EQUIPMENT.map((eq) => (
-                  <SelectItem key={eq} value={eq}>{eq}</SelectItem>
+                {equipmentOptions.map((eq) => (
+                  <SelectItem key={eq} value={eq}>{formatLabel(eq)}</SelectItem>
                 ))}
               </SelectContent>
             </Select>
           </div>
 
-          {/* Type Filter */}
+          {/* Target Muscle Filter (replaces Type) */}
           <div className="space-y-1">
             <label className="text-xs text-muted-foreground flex items-center gap-1">
-              <Search className="h-3 w-3 text-orange-500" />
-              Type
+              <Target className="h-3 w-3 text-orange-500" />
+              Target Muscle
             </label>
-            <Select value={typeFilter} onValueChange={setTypeFilter}>
+            <Select value={targetFilter} onValueChange={setTargetFilter}>
               <SelectTrigger className="border-orange-500/50">
-                <SelectValue placeholder="All Types" />
+                <SelectValue placeholder="All Targets" />
               </SelectTrigger>
               <SelectContent side="bottom">
-                <SelectItem value="all">All Types</SelectItem>
-                {TYPES.map((type) => (
-                  <SelectItem key={type} value={type}>{type}</SelectItem>
+                <SelectItem value="all">All Targets</SelectItem>
+                {targetOptions.map((target) => (
+                  <SelectItem key={target} value={target}>{formatLabel(target)}</SelectItem>
                 ))}
               </SelectContent>
             </Select>
@@ -271,19 +262,19 @@ const ExerciseDatabase = () => {
           {bodyPartFilter && bodyPartFilter !== "all" && (
             <Badge variant="outline" className="border-green-500 text-green-600 dark:text-green-400">
               <Activity className="h-3 w-3 mr-1" />
-              {bodyPartFilter}
+              {formatLabel(bodyPartFilter)}
             </Badge>
           )}
           {equipmentFilter && equipmentFilter !== "all" && (
             <Badge variant="outline" className="border-purple-500 text-purple-600 dark:text-purple-400">
               <Dumbbell className="h-3 w-3 mr-1" />
-              {equipmentFilter}
+              {formatLabel(equipmentFilter)}
             </Badge>
           )}
-          {typeFilter && typeFilter !== "all" && (
+          {targetFilter && targetFilter !== "all" && (
             <Badge variant="outline" className="border-orange-500 text-orange-600 dark:text-orange-400">
-              <Search className="h-3 w-3 mr-1" />
-              {typeFilter}
+              <Target className="h-3 w-3 mr-1" />
+              {formatLabel(targetFilter)}
             </Badge>
           )}
         </div>
@@ -296,16 +287,22 @@ const ExerciseDatabase = () => {
           <span className="ml-2 text-muted-foreground">Loading exercises...</span>
         </div>
       ) : exercises.length > 0 ? (
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 max-h-[300px] overflow-y-auto pr-2">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 max-h-[400px] overflow-y-auto pr-2">
           {exercises.map((exercise) => (
             <div
               key={exercise.id}
               onClick={() => handleExerciseClick(exercise)}
               className="group cursor-pointer bg-card border border-border rounded-lg p-4 hover:border-primary/50 hover:shadow-lg transition-all duration-200"
             >
-              {detailLoading && (
-                <div className="absolute inset-0 bg-background/50 flex items-center justify-center rounded-lg">
-                  <Loader2 className="h-6 w-6 animate-spin text-primary" />
+              {/* GIF Preview if available */}
+              {exercise.gif_url && (
+                <div className="w-full aspect-square rounded-md overflow-hidden bg-muted mb-3">
+                  <img 
+                    src={exercise.gif_url} 
+                    alt={exercise.name}
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-200"
+                    loading="lazy"
+                  />
                 </div>
               )}
               
@@ -314,10 +311,16 @@ const ExerciseDatabase = () => {
                 <h3 className="font-medium text-sm group-hover:text-primary transition-colors line-clamp-2">
                   {exercise.name}
                 </h3>
-                <Badge variant="secondary" className="text-xs">
-                  <Activity className="h-3 w-3 mr-1" />
-                  {exercise.bodyPart}
-                </Badge>
+                <div className="flex flex-wrap gap-1">
+                  <Badge variant="secondary" className="text-xs">
+                    <Activity className="h-3 w-3 mr-1" />
+                    {formatLabel(exercise.body_part)}
+                  </Badge>
+                  <Badge variant="outline" className="text-xs">
+                    <Target className="h-3 w-3 mr-1" />
+                    {formatLabel(exercise.target)}
+                  </Badge>
+                </div>
               </div>
             </div>
           ))}

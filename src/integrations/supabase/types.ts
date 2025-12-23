@@ -967,6 +967,42 @@ export type Database = {
         }
         Relationships: []
       }
+      exercises: {
+        Row: {
+          body_part: string
+          created_at: string | null
+          equipment: string
+          gif_url: string | null
+          id: string
+          instructions: string[] | null
+          name: string
+          secondary_muscles: string[] | null
+          target: string
+        }
+        Insert: {
+          body_part: string
+          created_at?: string | null
+          equipment: string
+          gif_url?: string | null
+          id: string
+          instructions?: string[] | null
+          name: string
+          secondary_muscles?: string[] | null
+          target: string
+        }
+        Update: {
+          body_part?: string
+          created_at?: string | null
+          equipment?: string
+          gif_url?: string | null
+          id?: string
+          instructions?: string[] | null
+          name?: string
+          secondary_muscles?: string[] | null
+          target?: string
+        }
+        Relationships: []
+      }
       moderation_actions: {
         Row: {
           action_type: string
