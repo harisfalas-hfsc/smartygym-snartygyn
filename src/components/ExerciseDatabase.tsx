@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Loader2, Search, X, Dumbbell, Activity, Target, Gauge, FolderOpen } from "lucide-react";
 import ExerciseDetailModal from "./ExerciseDetailModal";
 import { useToast } from "@/hooks/use-toast";
+import { ScrollArea } from "@/components/ui/scroll-area";
 import {
   Select,
   SelectContent,
@@ -41,6 +42,7 @@ const ExerciseDatabase = () => {
   const [selectedExercise, setSelectedExercise] = useState<Exercise | null>(null);
   const [modalOpen, setModalOpen] = useState(false);
   const [hasSearched, setHasSearched] = useState(false);
+  const [resultCount, setResultCount] = useState(0);
   
   // Dynamic filter options from database
   const [bodyParts, setBodyParts] = useState<string[]>([]);
@@ -50,6 +52,7 @@ const ExerciseDatabase = () => {
   const [categoryOptions, setCategoryOptions] = useState<string[]>([]);
   
   const { toast } = useToast();
+  const debounceTimer = useRef<NodeJS.Timeout | null>(null);
 
   // Helper function to fetch all rows with pagination (overcomes 1000 row limit)
   const fetchAllRows = async (column: string) => {
@@ -92,11 +95,11 @@ const ExerciseDatabase = () => {
           fetchAllRows('category'),
         ]);
 
-        setBodyParts([...new Set(bodyPartData.map(d => d.body_part).filter(Boolean))]);
-        setEquipmentOptions([...new Set(equipmentData.map(d => d.equipment).filter(Boolean))]);
-        setTargetOptions([...new Set(targetData.map(d => d.target).filter(Boolean))]);
-        setDifficultyOptions([...new Set(difficultyData.map(d => d.difficulty).filter(Boolean))]);
-        setCategoryOptions([...new Set(categoryData.map(d => d.category).filter(Boolean))]);
+        setBodyParts([...new Set(bodyPartData.map(d => d.body_part).filter(Boolean))].sort());
+        setEquipmentOptions([...new Set(equipmentData.map(d => d.equipment).filter(Boolean))].sort());
+        setTargetOptions([...new Set(targetData.map(d => d.target).filter(Boolean))].sort());
+        setDifficultyOptions([...new Set(difficultyData.map(d => d.difficulty).filter(Boolean))].sort());
+        setCategoryOptions([...new Set(categoryData.map(d => d.category).filter(Boolean))].sort());
       } catch (error) {
         console.error('Error loading filter options:', error);
       }
@@ -105,31 +108,80 @@ const ExerciseDatabase = () => {
     loadFilterOptions();
   }, []);
 
-  // Normalize search term to handle common variations
+  // Enhanced search term normalization - handles plurals, hyphens, and common variations
   const normalizeSearchTerm = (term: string): string[] => {
     const normalized = term.toLowerCase().trim();
-    const variations = [normalized];
+    if (!normalized) return [];
+    
+    const variations = new Set<string>([normalized]);
     
     // Handle "body weight" vs "bodyweight"
     if (normalized.includes('body weight')) {
-      variations.push(normalized.replace('body weight', 'bodyweight'));
+      variations.add(normalized.replace('body weight', 'bodyweight'));
     }
     if (normalized.includes('bodyweight')) {
-      variations.push(normalized.replace('bodyweight', 'body weight'));
+      variations.add(normalized.replace('bodyweight', 'body weight'));
     }
     
     // Handle "dumbbell" vs "dumbell" (common typo)
     if (normalized.includes('dumbell')) {
-      variations.push(normalized.replace('dumbell', 'dumbbell'));
+      variations.add(normalized.replace('dumbell', 'dumbbell'));
     }
     if (normalized.includes('dumbbell')) {
-      variations.push(normalized.replace('dumbbell', 'dumbell'));
+      variations.add(normalized.replace('dumbbell', 'dumbell'));
     }
     
-    return [...new Set(variations)];
+    // Handle hyphens vs spaces (e.g., "push-up" vs "push up")
+    if (normalized.includes('-')) {
+      variations.add(normalized.replace(/-/g, ' '));
+      variations.add(normalized.replace(/-/g, ''));
+    }
+    if (normalized.includes(' ')) {
+      variations.add(normalized.replace(/ /g, '-'));
+      variations.add(normalized.replace(/ /g, ''));
+    }
+    
+    // Handle plural forms - remove trailing 's' or 'es'
+    if (normalized.endsWith('s')) {
+      const withoutS = normalized.slice(0, -1);
+      variations.add(withoutS);
+      // Also apply hyphen/space logic to singular form
+      if (withoutS.includes('-')) {
+        variations.add(withoutS.replace(/-/g, ' '));
+      }
+    }
+    if (normalized.endsWith('es')) {
+      variations.add(normalized.slice(0, -2));
+    }
+    
+    // Add common exercise name variations
+    const exerciseAliases: Record<string, string[]> = {
+      'pushup': ['push-up', 'push up'],
+      'push-up': ['pushup', 'push up'],
+      'push up': ['push-up', 'pushup'],
+      'pullup': ['pull-up', 'pull up'],
+      'pull-up': ['pullup', 'pull up'],
+      'pull up': ['pull-up', 'pullup'],
+      'situp': ['sit-up', 'sit up'],
+      'sit-up': ['situp', 'sit up'],
+      'sit up': ['sit-up', 'situp'],
+      'chinup': ['chin-up', 'chin up'],
+      'chin-up': ['chinup', 'chin up'],
+      'chin up': ['chin-up', 'chinup'],
+    };
+    
+    for (const [key, aliases] of Object.entries(exerciseAliases)) {
+      if (normalized.includes(key)) {
+        aliases.forEach(alias => {
+          variations.add(normalized.replace(key, alias));
+        });
+      }
+    }
+    
+    return [...variations];
   };
 
-  const fetchExercises = async () => {
+  const fetchExercises = useCallback(async () => {
     setLoading(true);
     try {
       let query = supabase.from('exercises').select('*');
@@ -144,27 +196,33 @@ const ExerciseDatabase = () => {
       if (targetFilter && targetFilter !== "all") {
         query = query.eq('target', targetFilter);
       }
+      
+      // Handle NULL values for difficulty filter
       if (difficultyFilter && difficultyFilter !== "all") {
         query = query.eq('difficulty', difficultyFilter);
       }
+      
+      // Handle NULL values for category filter
       if (categoryFilter && categoryFilter !== "all") {
         query = query.eq('category', categoryFilter);
       }
       
-      // Smart search: search across multiple fields
+      // Smart search: search across multiple fields with enhanced normalization
       if (nameSearch.trim()) {
         const searchVariations = normalizeSearchTerm(nameSearch);
         
-        // Build OR conditions for each search variation across multiple columns
-        const orConditions = searchVariations.flatMap(term => [
-          `name.ilike.%${term}%`,
-          `target.ilike.%${term}%`,
-          `body_part.ilike.%${term}%`,
-          `equipment.ilike.%${term}%`,
-          `category.ilike.%${term}%`
-        ]).join(',');
-        
-        query = query.or(orConditions);
+        if (searchVariations.length > 0) {
+          // Build OR conditions for each search variation across multiple columns
+          const orConditions = searchVariations.flatMap(term => [
+            `name.ilike.%${term}%`,
+            `target.ilike.%${term}%`,
+            `body_part.ilike.%${term}%`,
+            `equipment.ilike.%${term}%`,
+            `category.ilike.%${term}%`
+          ]).join(',');
+          
+          query = query.or(orConditions);
+        }
       }
 
       query = query.order('name').limit(100);
@@ -174,6 +232,7 @@ const ExerciseDatabase = () => {
       if (error) throw error;
 
       setExercises(data || []);
+      setResultCount(data?.length || 0);
       setHasSearched(true);
     } catch (error: any) {
       console.error('Error fetching exercises:', error);
@@ -183,10 +242,38 @@ const ExerciseDatabase = () => {
         variant: "destructive",
       });
       setExercises([]);
+      setResultCount(0);
     } finally {
       setLoading(false);
     }
-  };
+  }, [nameSearch, bodyPartFilter, equipmentFilter, targetFilter, difficultyFilter, categoryFilter, toast]);
+
+  // Debounced live search - triggers 500ms after user stops typing
+  useEffect(() => {
+    if (debounceTimer.current) {
+      clearTimeout(debounceTimer.current);
+    }
+    
+    // Only auto-search if there's a search term or any filter is set
+    const hasAnyFilter = nameSearch.trim() || 
+      (bodyPartFilter && bodyPartFilter !== "all") ||
+      (equipmentFilter && equipmentFilter !== "all") ||
+      (targetFilter && targetFilter !== "all") ||
+      (difficultyFilter && difficultyFilter !== "all") ||
+      (categoryFilter && categoryFilter !== "all");
+    
+    if (hasAnyFilter) {
+      debounceTimer.current = setTimeout(() => {
+        fetchExercises();
+      }, 500);
+    }
+    
+    return () => {
+      if (debounceTimer.current) {
+        clearTimeout(debounceTimer.current);
+      }
+    };
+  }, [nameSearch, bodyPartFilter, equipmentFilter, targetFilter, difficultyFilter, categoryFilter, fetchExercises]);
 
   const handleSearch = () => {
     fetchExercises();
@@ -201,6 +288,7 @@ const ExerciseDatabase = () => {
     setCategoryFilter("");
     setExercises([]);
     setHasSearched(false);
+    setResultCount(0);
   };
 
   const handleExerciseClick = (exercise: Exercise) => {
@@ -230,14 +318,24 @@ const ExerciseDatabase = () => {
           <Search className="h-3 w-3 text-primary" />
           Smart Search (name, muscle, body part, equipment, category)
         </label>
-        <Input
-          type="text"
-          placeholder='Try "squat", "quads", "body weight", "chest", "dumbbell"...'
-          value={nameSearch}
-          onChange={(e) => setNameSearch(e.target.value)}
-          onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
-          className="border-primary/50"
-        />
+        <div className="relative">
+          <Input
+            type="text"
+            placeholder='Try "push-ups", "quads", "body weight", "chest", "dumbbell"...'
+            value={nameSearch}
+            onChange={(e) => setNameSearch(e.target.value)}
+            onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
+            className="border-primary/50 pr-10"
+          />
+          {loading && (
+            <Loader2 className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 animate-spin text-muted-foreground" />
+          )}
+        </div>
+        {hasSearched && !loading && (
+          <p className="text-xs text-muted-foreground">
+            Found {resultCount} exercise{resultCount !== 1 ? 's' : ''}
+          </p>
+        )}
       </div>
 
       {/* Filters - 5 column grid */}
@@ -253,7 +351,13 @@ const ExerciseDatabase = () => {
               <SelectTrigger className="border-green-500/50">
                 <SelectValue placeholder="All Body Parts" />
               </SelectTrigger>
-              <SelectContent side="bottom">
+              <SelectContent 
+                position="popper" 
+                side="bottom" 
+                align="start"
+                sideOffset={4}
+                className="max-h-60 overflow-y-auto z-[100] bg-popover"
+              >
                 <SelectItem value="all">All Body Parts</SelectItem>
                 {bodyParts.map((part) => (
                   <SelectItem key={part} value={part}>{formatLabel(part)}</SelectItem>
@@ -272,7 +376,13 @@ const ExerciseDatabase = () => {
               <SelectTrigger className="border-purple-500/50">
                 <SelectValue placeholder="All Equipment" />
               </SelectTrigger>
-              <SelectContent side="bottom">
+              <SelectContent 
+                position="popper" 
+                side="bottom" 
+                align="start"
+                sideOffset={4}
+                className="max-h-60 overflow-y-auto z-[100] bg-popover"
+              >
                 <SelectItem value="all">All Equipment</SelectItem>
                 {equipmentOptions.map((eq) => (
                   <SelectItem key={eq} value={eq}>{formatLabel(eq)}</SelectItem>
@@ -291,7 +401,13 @@ const ExerciseDatabase = () => {
               <SelectTrigger className="border-orange-500/50">
                 <SelectValue placeholder="All Targets" />
               </SelectTrigger>
-              <SelectContent side="bottom">
+              <SelectContent 
+                position="popper" 
+                side="bottom" 
+                align="start"
+                sideOffset={4}
+                className="max-h-60 overflow-y-auto z-[100] bg-popover"
+              >
                 <SelectItem value="all">All Targets</SelectItem>
                 {targetOptions.map((target) => (
                   <SelectItem key={target} value={target}>{formatLabel(target)}</SelectItem>
@@ -310,7 +426,13 @@ const ExerciseDatabase = () => {
               <SelectTrigger className="border-red-500/50">
                 <SelectValue placeholder="All Levels" />
               </SelectTrigger>
-              <SelectContent side="bottom">
+              <SelectContent 
+                position="popper" 
+                side="bottom" 
+                align="start"
+                sideOffset={4}
+                className="max-h-60 overflow-y-auto z-[100] bg-popover"
+              >
                 <SelectItem value="all">All Levels</SelectItem>
                 {difficultyOptions.map((diff) => (
                   <SelectItem key={diff} value={diff}>{formatLabel(diff)}</SelectItem>
@@ -329,7 +451,13 @@ const ExerciseDatabase = () => {
               <SelectTrigger className="border-blue-500/50">
                 <SelectValue placeholder="All Categories" />
               </SelectTrigger>
-              <SelectContent side="bottom">
+              <SelectContent 
+                position="popper" 
+                side="bottom" 
+                align="start"
+                sideOffset={4}
+                className="max-h-60 overflow-y-auto z-[100] bg-popover"
+              >
                 <SelectItem value="all">All Categories</SelectItem>
                 {categoryOptions.map((cat) => (
                   <SelectItem key={cat} value={cat}>{formatLabel(cat)}</SelectItem>
@@ -397,7 +525,7 @@ const ExerciseDatabase = () => {
       )}
 
       {/* Results */}
-      {loading ? (
+      {loading && !exercises.length ? (
         <div className="flex items-center justify-center py-12">
           <Loader2 className="h-8 w-8 animate-spin text-primary" />
           <span className="ml-2 text-muted-foreground">Loading exercises...</span>
@@ -461,17 +589,19 @@ const ExerciseDatabase = () => {
               <li>Try using the dropdown filters (Target Muscle, Equipment, etc.)</li>
               <li>Search works across: name, target muscle, body part, equipment, category</li>
               <li>Try simpler terms: "squat", "push", "pull", "chest", "legs"</li>
+              <li>Singular forms work better: "push-up" instead of "push-ups"</li>
             </ul>
           </div>
         </div>
       ) : (
         <div className="text-center py-12 text-muted-foreground">
-          <Dumbbell className="h-12 w-12 mx-auto mb-4 opacity-50" />
-          <p>Select filters and click Search to browse exercises</p>
+          <Search className="h-12 w-12 mx-auto mb-4 opacity-50" />
+          <p>Start typing to search or use filters above</p>
+          <p className="text-sm mt-1">Results appear automatically as you type</p>
         </div>
       )}
 
-      {/* Detail Modal */}
+      {/* Exercise Detail Modal */}
       <ExerciseDetailModal
         exercise={selectedExercise}
         open={modalOpen}
