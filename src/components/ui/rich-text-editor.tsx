@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useEditor, EditorContent } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
 import { Table } from '@tiptap/extension-table';
@@ -79,8 +79,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
-import { ScrollArea } from "@/components/ui/scroll-area";
 import { useExerciseLibrary } from "@/hooks/useExerciseLibrary";
+
 
 interface RichTextEditorProps {
   value: string;
@@ -108,8 +108,26 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({
   const [tableBgColor, setTableBgColor] = useState('none');
   const [exerciseSearchOpen, setExerciseSearchOpen] = useState(false);
   const [exerciseSearchQuery, setExerciseSearchQuery] = useState('');
-  
+
+  const exerciseResultsRef = useRef<HTMLDivElement | null>(null);
+
+  useEffect(() => {
+    const el = exerciseResultsRef.current;
+    if (!exerciseSearchOpen || !el) return;
+
+    const onWheel = (e: WheelEvent) => {
+      // Always scroll the results list (never the page behind) while the popover is open.
+      e.preventDefault();
+      e.stopPropagation();
+      el.scrollTop += e.deltaY;
+    };
+
+    el.addEventListener('wheel', onWheel, { passive: false });
+    return () => el.removeEventListener('wheel', onWheel);
+  }, [exerciseSearchOpen]);
+
   const { exercises, isLoading: exercisesLoading, searchExercises } = useExerciseLibrary();
+
   
   const exerciseResults = exerciseSearchQuery.length >= 2 
     ? searchExercises(exerciseSearchQuery, 10) 
@@ -835,7 +853,12 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({
                   </TooltipTrigger>
                   <TooltipContent>Search Exercises</TooltipContent>
                 </Tooltip>
-                <PopoverContent className="w-[400px] p-0" align="end" side="bottom">
+                <PopoverContent
+                  className="w-[400px] p-0"
+                  align="end"
+                  side="bottom"
+                  onInteractOutside={(e) => e.preventDefault()}
+                >
                   <div className="p-3 border-b">
                     <div className="relative">
                       <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
@@ -848,7 +871,10 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({
                       />
                     </div>
                   </div>
-                  <div className="h-[300px] overflow-y-auto">
+                  <div
+                    ref={exerciseResultsRef}
+                    className="h-[300px] overflow-y-auto overscroll-contain"
+                  >
                     {exercisesLoading ? (
                       <div className="p-4 text-center text-sm text-muted-foreground">
                         Loading exercises...
