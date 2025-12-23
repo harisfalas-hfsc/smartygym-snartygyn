@@ -63,7 +63,7 @@ const WODPeriodizationCalendar = () => {
 
         {/* Difficulty Badge */}
         {info.isRecoveryDay ? (
-          <Badge variant="outline" className="mt-1 text-[9px] px-1.5 py-0 bg-gray-500/10 text-gray-500 border-gray-400/30">
+          <Badge variant="outline" className="mt-1 text-[9px] px-1.5 py-0 bg-blue-500/10 text-blue-500 border-blue-400/30">
             Rest
           </Badge>
         ) : (
