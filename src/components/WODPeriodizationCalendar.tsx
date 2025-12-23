@@ -30,8 +30,7 @@ const WODPeriodizationCalendar = () => {
     info: ReturnType<typeof getWODInfoForDate>,
     isToday: boolean = false
   ) => {
-    const dayOfWeek = format(new Date(dateStr), "EEE");
-    const dayNumber = format(new Date(dateStr), "d");
+    const fullDate = format(new Date(dateStr), "EEEE, MMMM d");
     const borderColor = getDifficultyBorderClass(info.difficulty.level);
 
     return (
@@ -52,8 +51,8 @@ const WODPeriodizationCalendar = () => {
         </div>
 
         {/* Date */}
-        <div className={`text-xs font-semibold ${isToday ? "text-primary" : "text-foreground"}`}>
-          {dayOfWeek} {dayNumber}
+        <div className={`text-[9px] sm:text-xs font-semibold ${isToday ? "text-primary" : "text-foreground"}`}>
+          {fullDate}
         </div>
 
         {/* Category */}
@@ -64,7 +63,7 @@ const WODPeriodizationCalendar = () => {
         {/* Difficulty Badge */}
         {info.isRecoveryDay ? (
           <Badge variant="outline" className="mt-1 text-[9px] px-1.5 py-0 bg-blue-500/10 text-blue-500 border-blue-400/30">
-            Rest
+            All Levels
           </Badge>
         ) : (
           <Badge
