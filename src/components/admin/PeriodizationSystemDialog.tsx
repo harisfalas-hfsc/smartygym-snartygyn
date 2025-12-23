@@ -1,11 +1,11 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Calendar, Star, Dumbbell, Info, Settings, CalendarDays, Heart } from "lucide-react";
+import { Calendar, Dumbbell, Info, Settings, CalendarDays, Heart } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { useQueryClient } from "@tanstack/react-query";
@@ -17,7 +17,8 @@ import {
   CYCLE_START_DATE,
   getWODInfoForDate,
   getDifficultyBadgeClass,
-  STRENGTH_DAY_FOCUS
+  STRENGTH_DAY_FOCUS,
+  STRENGTH_84DAY_ROTATION
 } from "@/lib/wodCycle";
 
 interface PeriodizationSystemDialogProps {
@@ -46,6 +47,52 @@ export const PeriodizationSystemDialog = ({
   const tomorrowDateStr = format(addDays(new Date(), 1), "yyyy-MM-dd");
   const todayInfo = getWODInfoForDate(todayDateStr);
   const tomorrowInfo = getWODInfoForDate(tomorrowDateStr);
+
+  // Generate full 84-day super-cycle with Strength rotation
+  const PERIODIZATION_84DAY = useMemo(() => {
+    const fullCycle: Array<{
+      globalDay: number;
+      dayInCycle: number;
+      cycle: number;
+      category: string;
+      difficulty: string | null;
+      difficultyStars: [number, number] | null;
+      focus?: string;
+    }> = [];
+
+    for (let cycle = 1; cycle <= 3; cycle++) {
+      for (let day = 1; day <= 28; day++) {
+        const base = PERIODIZATION_28DAY[day - 1];
+        const globalDay = (cycle - 1) * 28 + day;
+
+        // For Strength days, apply the 84-day rotation
+        let difficulty = base.difficulty;
+        let difficultyStars = base.difficultyStars;
+
+        if (base.category === "STRENGTH" && STRENGTH_84DAY_ROTATION[day]) {
+          const rotationIndex = (cycle - 1) % 3;
+          const rotation = STRENGTH_84DAY_ROTATION[day][rotationIndex];
+          difficulty = rotation.difficulty;
+          difficultyStars = rotation.stars;
+        }
+
+        fullCycle.push({
+          globalDay,
+          dayInCycle: day,
+          cycle,
+          category: base.category,
+          difficulty,
+          difficultyStars,
+          focus: base.category === "STRENGTH" ? STRENGTH_DAY_FOCUS[day]?.focus : undefined
+        });
+      }
+    }
+    return fullCycle;
+  }, []);
+
+  // Calculate global day for today and tomorrow
+  const todayGlobalDay = ((todayInfo.cycleNumber - 1) % 3) * 28 + todayInfo.dayInCycle;
+  const tomorrowGlobalDay = ((tomorrowInfo.cycleNumber - 1) % 3) * 28 + tomorrowInfo.dayInCycle;
 
   const handleClearFormatUsage = async () => {
     if (!wodState?.id) return;
@@ -77,45 +124,68 @@ export const PeriodizationSystemDialog = ({
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <Settings className="h-5 w-5 text-primary" />
-            WOD Periodization System (28-Day Fixed Cycle)
+            WOD Periodization System (84-Day Super-Cycle)
           </DialogTitle>
           <DialogDescription>
-            Complete view of the fixed 28-day workout rotation with predefined categories and difficulties
+            Complete 84-day super-cycle with Strength difficulty rotation across 3 cycles
           </DialogDescription>
         </DialogHeader>
 
         <Tabs defaultValue="periodization" className="mt-4">
           <TabsList className="grid w-full grid-cols-4">
-            <TabsTrigger value="periodization">28-Day Cycle</TabsTrigger>
+            <TabsTrigger value="periodization">84-Day Cycle</TabsTrigger>
             <TabsTrigger value="formats">Formats</TabsTrigger>
             <TabsTrigger value="state">Current State</TabsTrigger>
             <TabsTrigger value="overrides">Overrides</TabsTrigger>
           </TabsList>
 
-          {/* 28-Day Periodization Tab */}
+          {/* 84-Day Super-Cycle Tab */}
           <TabsContent value="periodization" className="space-y-4">
             <Card>
               <CardHeader className="pb-2">
                 <CardTitle className="text-sm flex items-center gap-2">
                   <Calendar className="h-4 w-4" />
-                  Fixed 28-Day Periodization Cycle
+                  84-Day Super-Cycle Periodization
                 </CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="p-3 bg-green-500/10 border border-green-500/30 rounded-lg mb-4">
                   <p className="text-sm text-green-400">
-                    <strong>✓ Fixed Calendar-Anchored System:</strong> Categories and difficulties are predetermined for each of the 28 days. 
-                    No shifts, no rotations - just repeats after day 28.
+                    <strong>✓ 84-Day Super-Cycle:</strong> 3 × 28-day cycles with Strength difficulty rotation.
+                    <br />
+                    <span className="text-yellow-400">★ Strength Days (2, 5, 12, 15, 20, 23):</span> Difficulty rotates every 28 days through Beginner → Intermediate → Advanced.
                     <br />
                     Reference: <code className="bg-muted px-1 rounded">{CYCLE_START_DATE}</code> = Day 1 (CARDIO/Beginner)
                   </p>
                 </div>
+
+                {/* Legend */}
+                <div className="flex flex-wrap gap-3 mb-4 text-xs">
+                  <div className="flex items-center gap-1">
+                    <div className="w-3 h-3 rounded bg-yellow-500/30 border border-yellow-500/50"></div>
+                    <span>Strength Day (rotating difficulty)</span>
+                  </div>
+                  <div className="flex items-center gap-1">
+                    <div className="w-3 h-3 rounded bg-green-500/30 border border-green-500/50"></div>
+                    <span>Recovery Day</span>
+                  </div>
+                  <div className="flex items-center gap-1">
+                    <div className="w-3 h-3 rounded bg-blue-500/30 border border-blue-500/50"></div>
+                    <span>Today</span>
+                  </div>
+                  <div className="flex items-center gap-1">
+                    <div className="w-3 h-3 rounded bg-primary/30 border border-primary/50"></div>
+                    <span>Tomorrow</span>
+                  </div>
+                </div>
                 
-                <div className="max-h-[400px] overflow-y-auto">
+                <div className="max-h-[500px] overflow-y-auto">
                   <Table>
-                    <TableHeader>
+                    <TableHeader className="sticky top-0 bg-background z-10">
                       <TableRow>
                         <TableHead className="w-16">Day</TableHead>
+                        <TableHead className="w-16">Cycle</TableHead>
+                        <TableHead className="w-20">Day 1-28</TableHead>
                         <TableHead>Category</TableHead>
                         <TableHead>Focus</TableHead>
                         <TableHead>Difficulty</TableHead>
@@ -123,31 +193,44 @@ export const PeriodizationSystemDialog = ({
                       </TableRow>
                     </TableHeader>
                     <TableBody>
-                      {PERIODIZATION_28DAY.map((entry) => {
-                        const isToday = entry.day === todayInfo.dayInCycle;
-                        const isTomorrow = entry.day === tomorrowInfo.dayInCycle;
+                      {PERIODIZATION_84DAY.map((entry) => {
+                        const isToday = entry.globalDay === todayGlobalDay;
+                        const isTomorrow = entry.globalDay === tomorrowGlobalDay;
                         const isRecovery = entry.category === "RECOVERY";
+                        const isStrength = entry.category === "STRENGTH";
                         
                         return (
                           <TableRow 
-                            key={entry.day} 
+                            key={entry.globalDay} 
                             className={`
                               ${isTomorrow ? "bg-primary/10" : ""}
                               ${isToday ? "bg-blue-500/10" : ""}
                               ${isRecovery ? "bg-green-500/5" : ""}
+                              ${isStrength && !isToday && !isTomorrow ? "bg-yellow-500/5" : ""}
                             `}
                           >
-                            <TableCell className="font-medium">Day {entry.day}</TableCell>
+                            <TableCell className="font-bold text-primary">Day {entry.globalDay}</TableCell>
                             <TableCell>
-                              <Badge variant="secondary" className="flex items-center gap-1 w-fit">
+                              <Badge variant="outline" className="text-xs">
+                                C{entry.cycle}
+                              </Badge>
+                            </TableCell>
+                            <TableCell className="text-muted-foreground text-sm">
+                              {entry.dayInCycle}
+                            </TableCell>
+                            <TableCell>
+                              <Badge 
+                                variant="secondary" 
+                                className={`flex items-center gap-1 w-fit ${isStrength ? "bg-yellow-500/20 text-yellow-400 border-yellow-500/30" : ""}`}
+                              >
                                 {isRecovery && <Heart className="h-3 w-3" />}
                                 {entry.category}
                               </Badge>
                             </TableCell>
                             <TableCell>
-                              {entry.category === "STRENGTH" && STRENGTH_DAY_FOCUS[entry.day] ? (
+                              {entry.focus ? (
                                 <Badge variant="outline" className="text-xs bg-primary/10 text-primary border-primary/30">
-                                  {STRENGTH_DAY_FOCUS[entry.day].focus}
+                                  {entry.focus}
                                 </Badge>
                               ) : (
                                 <span className="text-muted-foreground text-sm">—</span>
@@ -171,7 +254,7 @@ export const PeriodizationSystemDialog = ({
                                 </Badge>
                               ) : isTomorrow ? (
                                 <Badge className="bg-primary/20 text-primary border-primary/30">
-                                  Tomorrow's WOD
+                                  Tomorrow
                                 </Badge>
                               ) : (
                                 <span className="text-muted-foreground text-sm">—</span>
@@ -184,9 +267,21 @@ export const PeriodizationSystemDialog = ({
                   </Table>
                 </div>
                 
-                <p className="text-sm text-muted-foreground mt-4">
-                  The cycle repeats every 28 days. After Day 28 (RECOVERY), it returns to Day 1 (CARDIO/Beginner).
-                  Days 10 and 28 are recovery days with no difficulty level.
+                <div className="mt-4 p-3 bg-muted/30 rounded-lg space-y-2">
+                  <p className="text-sm font-medium">Strength Day Rotation Pattern:</p>
+                  <div className="grid grid-cols-2 md:grid-cols-3 gap-2 text-xs">
+                    <div><strong>Day 2 (Lower Body):</strong> Adv → Int → Beg</div>
+                    <div><strong>Day 5 (Upper Body):</strong> Int → Beg → Adv</div>
+                    <div><strong>Day 12 (Full Body):</strong> Adv → Beg → Int</div>
+                    <div><strong>Day 15 (Push/Pull):</strong> Beg → Adv → Int</div>
+                    <div><strong>Day 20 (Pull/Push):</strong> Int → Beg → Adv</div>
+                    <div><strong>Day 23 (Core/Glutes):</strong> Adv → Int → Beg</div>
+                  </div>
+                </div>
+
+                <p className="text-sm text-muted-foreground mt-3">
+                  The super-cycle repeats every 84 days. Non-Strength categories maintain fixed difficulty.
+                  Days 10, 28, 38, 56, 66, and 84 are recovery days.
                 </p>
               </CardContent>
             </Card>
