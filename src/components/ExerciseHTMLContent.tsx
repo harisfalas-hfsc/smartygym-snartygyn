@@ -30,69 +30,80 @@ export const ExerciseHTMLContent: React.FC<ExerciseHTMLContentProps> = ({
   const { findMatchingExercise, exercises, isLoading } = useExerciseLibrary();
   
   const processedContent = useMemo(() => {
-    if (!content || !enableExerciseLinking || isLoading || !exercises.length) {
+    if (!content || !enableExerciseLinking) {
       return null;
     }
-    
+
     // Normalize common typos before processing
     let processedHtml = content
       .replace(/\{\{exrcise:/gi, '{{exercise:')
       .replace(/\{\{excersize:/gi, '{{exercise:')
       .replace(/\{\{excercise:/gi, '{{exercise:');
-    
+
     const exercisesToRender: ProcessedExercise[] = [];
-    
-    // Step 1: Parse admin-added exercise markup {{exercise:id:name}}
+
+    // Step 1: Parse admin-added exercise markup {{exercise:id:name}} (does NOT depend on library loading)
     const markupExercises = parseExerciseMarkup(processedHtml);
+
+    if (import.meta.env.DEV) {
+      const hasExerciseMarkup = processedHtml.toLowerCase().includes('{{exercise:');
+      if (hasExerciseMarkup && markupExercises.length === 0) {
+        // eslint-disable-next-line no-console
+        console.warn('ExerciseHTMLContent: found exercise markup but parsed 0 tags');
+      }
+    }
+
     markupExercises.forEach(({ fullMatch, id, name }) => {
       const placeholder = `__EXERCISE_${exercisesToRender.length}__`;
       exercisesToRender.push({ name, id, originalText: fullMatch });
       processedHtml = processedHtml.replace(fullMatch, placeholder);
     });
-    
-    // Step 2: Find bold text and try to match to exercises
-    const boldPattern = /<(strong|b)>([^<]+)<\/(strong|b)>/gi;
-    let match;
-    const boldMatches: Array<{ fullMatch: string; text: string; tag: string }> = [];
-    
-    while ((match = boldPattern.exec(processedHtml)) !== null) {
-      // Skip if already a placeholder
-      if (match[2].includes('__EXERCISE_')) continue;
-      
-      boldMatches.push({
-        fullMatch: match[0],
-        text: match[2].trim(),
-        tag: match[1]
+
+    // Step 2: Find bold text and try to match to exercises (depends on library loading)
+    if (!isLoading && exercises.length) {
+      const boldPattern = /<(strong|b)>([^<]+)<\/(strong|b)>/gi;
+      let match;
+      const boldMatches: Array<{ fullMatch: string; text: string; tag: string }> = [];
+
+      while ((match = boldPattern.exec(processedHtml)) !== null) {
+        // Skip if already a placeholder
+        if (match[2].includes('__EXERCISE_')) continue;
+
+        boldMatches.push({
+          fullMatch: match[0],
+          text: match[2].trim(),
+          tag: match[1],
+        });
+      }
+
+      // Process bold matches
+      boldMatches.forEach(({ fullMatch, text, tag }) => {
+        // Skip short text, numbers-only, or common non-exercise terms
+        if (
+          text.length < 3 ||
+          /^\d+$/.test(text) ||
+          /^(set|rep|rest|round|min|sec|x\d|warm|cool|note|tip)/i.test(text) ||
+          /^(monday|tuesday|wednesday|thursday|friday|saturday|sunday)/i.test(text) ||
+          /^(week|day|phase)/i.test(text)
+        ) {
+          return;
+        }
+
+        // Try to find a matching exercise
+        const matchResult = findMatchingExercise(text, 0.8);
+
+        if (matchResult) {
+          const placeholder = `__EXERCISE_${exercisesToRender.length}__`;
+          exercisesToRender.push({
+            name: text, // Keep original text for display
+            id: matchResult.exercise.id,
+            originalText: fullMatch,
+          });
+          processedHtml = processedHtml.replace(fullMatch, `<${tag}>${placeholder}</${tag}>`);
+        }
       });
     }
-    
-    // Process bold matches
-    boldMatches.forEach(({ fullMatch, text, tag }) => {
-      // Skip short text, numbers-only, or common non-exercise terms
-      if (
-        text.length < 3 || 
-        /^\d+$/.test(text) ||
-        /^(set|rep|rest|round|min|sec|x\d|warm|cool|note|tip)/i.test(text) ||
-        /^(monday|tuesday|wednesday|thursday|friday|saturday|sunday)/i.test(text) ||
-        /^(week|day|phase)/i.test(text)
-      ) {
-        return;
-      }
-      
-      // Try to find a matching exercise
-      const matchResult = findMatchingExercise(text, 0.8);
-      
-      if (matchResult) {
-        const placeholder = `__EXERCISE_${exercisesToRender.length}__`;
-        exercisesToRender.push({ 
-          name: text, // Keep original text for display
-          id: matchResult.exercise.id, 
-          originalText: fullMatch 
-        });
-        processedHtml = processedHtml.replace(fullMatch, `<${tag}>${placeholder}</${tag}>`);
-      }
-    });
-    
+
     return { html: processedHtml, exercises: exercisesToRender };
   }, [content, enableExerciseLinking, findMatchingExercise, exercises, isLoading]);
   
