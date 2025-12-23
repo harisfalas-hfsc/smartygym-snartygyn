@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useState } from 'react';
 import { useEditor, EditorContent } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
 import { Table } from '@tiptap/extension-table';
@@ -45,8 +45,9 @@ import {
   Code,
   Subscript as SubscriptIcon,
   Superscript as SuperscriptIcon,
-  Dumbbell,
   Search,
+  X,
+  Plus,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import {
@@ -68,11 +69,6 @@ import {
   DialogTitle,
   DialogFooter,
 } from "@/components/ui/dialog";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { supabase } from "@/integrations/supabase/client";
@@ -106,25 +102,7 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({
   const [showTableStyleDialog, setShowTableStyleDialog] = useState(false);
   const [tableBorderColor, setTableBorderColor] = useState('default');
   const [tableBgColor, setTableBgColor] = useState('none');
-  const [exerciseSearchOpen, setExerciseSearchOpen] = useState(false);
   const [exerciseSearchQuery, setExerciseSearchQuery] = useState('');
-
-  const exerciseResultsRef = useRef<HTMLDivElement | null>(null);
-
-  useEffect(() => {
-    const el = exerciseResultsRef.current;
-    if (!exerciseSearchOpen || !el) return;
-
-    const onWheel = (e: WheelEvent) => {
-      // Always scroll the results list (never the page behind) while the popover is open.
-      e.preventDefault();
-      e.stopPropagation();
-      el.scrollTop += e.deltaY;
-    };
-
-    el.addEventListener('wheel', onWheel, { passive: false });
-    return () => el.removeEventListener('wheel', onWheel);
-  }, [exerciseSearchOpen]);
 
   const { exercises, isLoading: exercisesLoading, searchExercises } = useExerciseLibrary();
 
@@ -373,8 +351,84 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({
   return (
     <div className="w-full">
       <div className="border rounded-md">
-        {/* Sticky Toolbar */}
-        <div className="sticky top-0 z-30 flex flex-wrap gap-1 p-2 border-b border-input bg-background shadow-sm">
+        {/* Sticky Header: Exercise Search + Toolbar */}
+        <div className="sticky top-0 z-30 bg-background border-b border-input shadow-sm">
+          {/* Exercise Search Panel - above toolbar */}
+          {showExerciseSearch && (
+            <div className="border-b border-input">
+              <div className="p-2">
+                <div className="relative">
+                  <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+                  <Input
+                    placeholder="Search exercises to add..."
+                    value={exerciseSearchQuery}
+                    onChange={(e) => setExerciseSearchQuery(e.target.value)}
+                    className="pl-8 pr-8"
+                  />
+                  {exerciseSearchQuery && (
+                    <button
+                      onClick={() => setExerciseSearchQuery('')}
+                      className="absolute right-2.5 top-2.5 text-muted-foreground hover:text-foreground"
+                    >
+                      <X className="h-4 w-4" />
+                    </button>
+                  )}
+                </div>
+              </div>
+              {/* Results list - only show when there's a query */}
+              {exerciseSearchQuery.length >= 2 && (
+                <div className="max-h-[200px] overflow-y-auto border-t border-input">
+                  {exercisesLoading ? (
+                    <div className="p-3 text-center text-sm text-muted-foreground">
+                      Loading exercises...
+                    </div>
+                  ) : exerciseResults.length === 0 ? (
+                    <div className="p-3 text-center text-sm text-muted-foreground">
+                      No exercises found for "{exerciseSearchQuery}"
+                    </div>
+                  ) : (
+                    <div className="p-1">
+                      {exerciseResults.map((exercise) => (
+                        <div
+                          key={exercise.id}
+                          className="flex items-center justify-between p-2 rounded-md hover:bg-accent cursor-pointer group"
+                          onClick={() => {
+                            const markup = `<strong>{{exercise:${exercise.id}:${exercise.name}}}</strong>`;
+                            editor.chain().focus().insertContent(markup).run();
+                            setExerciseSearchQuery('');
+                            toast.success(`Added: ${exercise.name}`);
+                          }}
+                        >
+                          <div className="flex-1 min-w-0 mr-2">
+                            <p className="text-sm font-medium whitespace-normal break-words">{exercise.name}</p>
+                            <div className="flex flex-wrap gap-1 mt-0.5">
+                              <Badge variant="secondary" className="text-[10px] px-1 py-0">
+                                {exercise.body_part}
+                              </Badge>
+                              <Badge variant="outline" className="text-[10px] px-1 py-0">
+                                {exercise.equipment}
+                              </Badge>
+                            </div>
+                          </div>
+                          <Button
+                            size="sm"
+                            variant="ghost"
+                            className="h-7 px-2 shrink-0 opacity-0 group-hover:opacity-100"
+                          >
+                            <Plus className="h-3 w-3 mr-1" />
+                            Add
+                          </Button>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* Toolbar */}
+          <div className="flex flex-wrap gap-1 p-2">
           {/* Text Formatting */}
           <Tooltip>
             <TooltipTrigger asChild>
@@ -837,97 +891,7 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({
             <TooltipContent>Redo</TooltipContent>
           </Tooltip>
 
-          {/* Exercise Search - only show when enabled */}
-          {showExerciseSearch && (
-            <>
-              <Separator orientation="vertical" className="h-8" />
-              <Popover open={exerciseSearchOpen} onOpenChange={setExerciseSearchOpen}>
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <PopoverTrigger asChild>
-                      <Button variant="ghost" size="sm" className="gap-1">
-                        <Dumbbell className="h-4 w-4" />
-                        <span className="hidden sm:inline text-xs">Exercises</span>
-                      </Button>
-                    </PopoverTrigger>
-                  </TooltipTrigger>
-                  <TooltipContent>Search Exercises</TooltipContent>
-                </Tooltip>
-                <PopoverContent
-                  className="w-[400px] p-0"
-                  align="end"
-                  side="bottom"
-                  onInteractOutside={(e) => e.preventDefault()}
-                >
-                  <div className="p-3 border-b">
-                    <div className="relative">
-                      <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-                      <Input
-                        placeholder="Search exercises..."
-                        value={exerciseSearchQuery}
-                        onChange={(e) => setExerciseSearchQuery(e.target.value)}
-                        className="pl-8"
-                        autoFocus
-                      />
-                    </div>
-                  </div>
-                  <div
-                    ref={exerciseResultsRef}
-                    className="h-[300px] overflow-y-auto overscroll-contain"
-                  >
-                    {exercisesLoading ? (
-                      <div className="p-4 text-center text-sm text-muted-foreground">
-                        Loading exercises...
-                      </div>
-                    ) : exerciseSearchQuery.length < 2 ? (
-                      <div className="p-4 text-center text-sm text-muted-foreground">
-                        Type at least 2 characters to search
-                      </div>
-                    ) : exerciseResults.length === 0 ? (
-                      <div className="p-4 text-center text-sm text-muted-foreground">
-                        No exercises found
-                      </div>
-                    ) : (
-                      <div className="p-2 space-y-1">
-                        {exerciseResults.map((exercise) => (
-                          <div
-                            key={exercise.id}
-                            className="flex items-center justify-between p-2 rounded-md hover:bg-accent cursor-pointer group"
-                            onClick={() => {
-                              const markup = `<strong>{{exercise:${exercise.id}:${exercise.name}}}</strong>`;
-                              editor.chain().focus().insertContent(markup).run();
-                              setExerciseSearchQuery('');
-                              setExerciseSearchOpen(false);
-                              toast.success(`Added: ${exercise.name}`);
-                            }}
-                          >
-                            <div className="flex-1 min-w-0">
-                              <p className="text-sm font-medium">{exercise.name}</p>
-                              <div className="flex gap-1 mt-0.5">
-                                <Badge variant="secondary" className="text-[10px] px-1 py-0">
-                                  {exercise.body_part}
-                                </Badge>
-                                <Badge variant="outline" className="text-[10px] px-1 py-0">
-                                  {exercise.equipment}
-                                </Badge>
-                              </div>
-                            </div>
-                            <Button
-                              size="sm"
-                              variant="ghost"
-                              className="h-7 px-2 opacity-0 group-hover:opacity-100"
-                            >
-                              Add
-                            </Button>
-                          </div>
-                        ))}
-                      </div>
-                    )}
-                  </div>
-                </PopoverContent>
-              </Popover>
-            </>
-          )}
+          </div>
         </div>
 
         {/* Editor Content */}
