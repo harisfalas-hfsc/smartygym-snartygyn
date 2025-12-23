@@ -9,7 +9,6 @@ import { Switch } from "@/components/ui/switch";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
 import { A4Container } from "@/components/ui/a4-container";
-import { ExerciseSearchPanel } from "@/components/admin/ExerciseSearchPanel";
 
 const CATEGORIES = [
   "STRENGTH",
@@ -577,29 +576,20 @@ export const WorkoutEditDialog = ({ workout, open, onOpenChange, onSave }: Worko
             </Select>
           </div>
 
-          {/* 9. Workout Content - Single Box with Exercise Search */}
+          {/* 9. Workout Content - Single Box with Exercise Search in toolbar */}
           <div className="space-y-2 pt-4 border-t">
             <Label htmlFor="main_workout">9. Workout Content *</Label>
-            <ExerciseSearchPanel
-              onInsertExercise={(id, name) => {
-                const markup = `<strong>{{exercise:${id}:${name}}}</strong>`;
-                setFormData(prev => ({
-                  ...prev,
-                  main_workout: prev.main_workout + markup
-                }));
-              }}
-              className="mb-2"
-            />
             <A4Container>
               <RichTextEditor
                 value={formData.main_workout}
                 onChange={(value) => setFormData({ ...formData, main_workout: value })}
                 placeholder="Enter the complete workout content here - format with bold, bullets, headings, tables, etc..."
                 minHeight="300px"
+                showExerciseSearch={true}
               />
             </A4Container>
             <p className="text-xs text-muted-foreground">
-              Use the Exercise Search to add exercises with View buttons, or format manually with the toolbar
+              Use the Exercises button in the toolbar to add exercises with View buttons
             </p>
           </div>
 
