@@ -1,5 +1,6 @@
-import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+import { Resend } from "https://esm.sh/resend@2.0.0";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -9,6 +10,8 @@ const corsHeaders = {
 const LOVABLE_API_KEY = Deno.env.get('LOVABLE_API_KEY');
 const SUPABASE_URL = Deno.env.get('SUPABASE_URL')!;
 const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
+const RESEND_API_KEY = Deno.env.get('RESEND_API_KEY');
+const ADMIN_EMAIL = 'info@smartygym.com';
 
 const KEYWORD_FAMILY = [
   'online fitness platform', 'fitness', 'online gym', 'workouts', 'training programs',
@@ -23,6 +26,13 @@ interface ContentItem {
   category?: string;
   type?: string;
   content_type: 'workout' | 'program' | 'blog' | 'ritual';
+}
+
+interface OptimizedItem {
+  name: string;
+  content_type: string;
+  meta_title: string;
+  category?: string;
 }
 
 async function generateSEOMetadata(item: ContentItem): Promise<{
@@ -157,7 +167,7 @@ function generateJsonLD(item: ContentItem): object {
   return baseSchema;
 }
 
-async function generateSitemap(supabase: any): Promise<string> {
+async function generateSitemap(supabase: any): Promise<{ xml: string; totalUrls: number; staticUrls: number; dynamicUrls: number }> {
   const baseUrl = 'https://smartygym.com';
   const now = new Date().toISOString().split('T')[0];
 
@@ -195,6 +205,8 @@ async function generateSitemap(supabase: any): Promise<string> {
     <priority>${page.priority}</priority>
   </url>`);
 
+  let dynamicCount = 0;
+
   // Add workouts
   if (workoutsResult.data) {
     workoutsResult.data.forEach((w: any) => {
@@ -206,6 +218,7 @@ async function generateSitemap(supabase: any): Promise<string> {
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>`);
+      dynamicCount++;
     });
   }
 
@@ -220,6 +233,7 @@ async function generateSitemap(supabase: any): Promise<string> {
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>`);
+      dynamicCount++;
     });
   }
 
@@ -234,6 +248,7 @@ async function generateSitemap(supabase: any): Promise<string> {
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>`);
+      dynamicCount++;
     });
   }
 
@@ -247,13 +262,332 @@ async function generateSitemap(supabase: any): Promise<string> {
     <changefreq>never</changefreq>
     <priority>0.5</priority>
   </url>`);
+      dynamicCount++;
     });
   }
 
-  return `<?xml version="1.0" encoding="UTF-8"?>
+  const xml = `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 ${urls.join('')}
 </urlset>`;
+
+  return {
+    xml,
+    totalUrls: staticPages.length + dynamicCount,
+    staticUrls: staticPages.length,
+    dynamicUrls: dynamicCount
+  };
+}
+
+function generateEmailReport(data: {
+  runDate: string;
+  durationSeconds: number;
+  totalScanned: number;
+  alreadyOptimized: number;
+  newItemsOptimized: number;
+  optimizedItems: OptimizedItem[];
+  unchangedByType: { workouts: number; programs: number; blogs: number; rituals: number };
+  sitemapStats: { totalUrls: number; staticUrls: number; dynamicUrls: number };
+}): { subject: string; html: string; downloadableHtml: string } {
+  const { runDate, durationSeconds, totalScanned, alreadyOptimized, newItemsOptimized, optimizedItems, unchangedByType, sitemapStats } = data;
+  
+  const statusEmoji = newItemsOptimized > 0 ? '✨' : '✅';
+  const subject = `${statusEmoji} SEO Report - ${runDate} | ${newItemsOptimized} New Items Optimized`;
+
+  const optimizedItemsHtml = optimizedItems.length > 0 
+    ? optimizedItems.map(item => `
+      <tr>
+        <td style="padding: 8px; border-bottom: 1px solid #e5e7eb;">${item.content_type.charAt(0).toUpperCase() + item.content_type.slice(1)}</td>
+        <td style="padding: 8px; border-bottom: 1px solid #e5e7eb; font-weight: 500;">${item.name}</td>
+        <td style="padding: 8px; border-bottom: 1px solid #e5e7eb; color: #059669;">${item.meta_title}</td>
+        <td style="padding: 8px; border-bottom: 1px solid #e5e7eb;">${item.category || '-'}</td>
+      </tr>
+    `).join('')
+    : `<tr><td colspan="4" style="padding: 16px; text-align: center; color: #6b7280;">No new items to optimize this week</td></tr>`;
+
+  const emailHtml = `
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SmartyGym SEO Report - ${runDate}</title>
+</head>
+<body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background-color: #f9fafb; margin: 0; padding: 20px;">
+  <div style="max-width: 800px; margin: 0 auto; background: white; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);">
+    
+    <!-- Header -->
+    <div style="background: linear-gradient(135deg, #10b981 0%, #059669 100%); padding: 32px; color: white;">
+      <h1 style="margin: 0 0 8px 0; font-size: 24px;">📊 SmartyGym SEO Optimization Report</h1>
+      <p style="margin: 0; opacity: 0.9;">Weekly Automated SEO Refresh Complete</p>
+    </div>
+    
+    <!-- Summary Cards -->
+    <div style="padding: 24px;">
+      <div style="display: grid; gap: 16px; margin-bottom: 24px;">
+        <div style="background: #f0fdf4; border-radius: 8px; padding: 16px; border-left: 4px solid #10b981;">
+          <p style="margin: 0 0 8px 0; color: #6b7280; font-size: 14px;">📅 Run Date</p>
+          <p style="margin: 0; font-size: 18px; font-weight: 600; color: #111827;">${runDate}</p>
+        </div>
+        <div style="background: #eff6ff; border-radius: 8px; padding: 16px; border-left: 4px solid #3b82f6;">
+          <p style="margin: 0 0 8px 0; color: #6b7280; font-size: 14px;">⏱️ Duration</p>
+          <p style="margin: 0; font-size: 18px; font-weight: 600; color: #111827;">${durationSeconds} seconds</p>
+        </div>
+      </div>
+
+      <!-- Metrics -->
+      <h2 style="color: #111827; font-size: 18px; margin: 24px 0 16px 0; border-bottom: 2px solid #e5e7eb; padding-bottom: 8px;">📈 Summary Metrics</h2>
+      <table style="width: 100%; border-collapse: collapse; margin-bottom: 24px;">
+        <tr>
+          <td style="padding: 12px; background: #f9fafb; border-radius: 6px 0 0 0; font-weight: 500;">Total Items Scanned</td>
+          <td style="padding: 12px; background: #f9fafb; border-radius: 0 6px 0 0; text-align: right; font-weight: 600; color: #3b82f6;">${totalScanned}</td>
+        </tr>
+        <tr>
+          <td style="padding: 12px; font-weight: 500;">Already Optimized (Unchanged)</td>
+          <td style="padding: 12px; text-align: right; font-weight: 600; color: #6b7280;">${alreadyOptimized}</td>
+        </tr>
+        <tr>
+          <td style="padding: 12px; background: #f0fdf4; border-radius: 0 0 0 6px; font-weight: 500;">New Items Optimized</td>
+          <td style="padding: 12px; background: #f0fdf4; border-radius: 0 0 6px 0; text-align: right; font-weight: 600; color: #059669;">${newItemsOptimized}</td>
+        </tr>
+      </table>
+
+      <!-- New Optimized Items -->
+      <h2 style="color: #111827; font-size: 18px; margin: 24px 0 16px 0; border-bottom: 2px solid #e5e7eb; padding-bottom: 8px;">✨ New Content Optimized</h2>
+      <div style="overflow-x: auto;">
+        <table style="width: 100%; border-collapse: collapse; font-size: 14px;">
+          <thead>
+            <tr style="background: #f9fafb;">
+              <th style="padding: 12px; text-align: left; border-bottom: 2px solid #e5e7eb;">Type</th>
+              <th style="padding: 12px; text-align: left; border-bottom: 2px solid #e5e7eb;">Name</th>
+              <th style="padding: 12px; text-align: left; border-bottom: 2px solid #e5e7eb;">Generated Title</th>
+              <th style="padding: 12px; text-align: left; border-bottom: 2px solid #e5e7eb;">Category</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${optimizedItemsHtml}
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Unchanged Items Breakdown -->
+      <h2 style="color: #111827; font-size: 18px; margin: 24px 0 16px 0; border-bottom: 2px solid #e5e7eb; padding-bottom: 8px;">📋 Unchanged Items Breakdown</h2>
+      <table style="width: 100%; border-collapse: collapse; margin-bottom: 24px;">
+        <tr>
+          <td style="padding: 12px; background: #fef3c7; border-radius: 6px 0 0 6px;">🏋️ Workouts</td>
+          <td style="padding: 12px; background: #fef3c7; text-align: right; font-weight: 600;">${unchangedByType.workouts}</td>
+        </tr>
+        <tr>
+          <td style="padding: 12px;">📚 Programs</td>
+          <td style="padding: 12px; text-align: right; font-weight: 600;">${unchangedByType.programs}</td>
+        </tr>
+        <tr>
+          <td style="padding: 12px; background: #fef3c7;">📝 Blogs</td>
+          <td style="padding: 12px; background: #fef3c7; text-align: right; font-weight: 600;">${unchangedByType.blogs}</td>
+        </tr>
+        <tr>
+          <td style="padding: 12px; border-radius: 0 0 0 6px;">🧘 Rituals</td>
+          <td style="padding: 12px; border-radius: 0 0 6px 0; text-align: right; font-weight: 600;">${unchangedByType.rituals}</td>
+        </tr>
+      </table>
+
+      <!-- Sitemap Status -->
+      <h2 style="color: #111827; font-size: 18px; margin: 24px 0 16px 0; border-bottom: 2px solid #e5e7eb; padding-bottom: 8px;">🗺️ Sitemap Status</h2>
+      <div style="background: #f0fdf4; border-radius: 8px; padding: 16px; border: 1px solid #bbf7d0;">
+        <p style="margin: 0 0 8px 0;"><strong>✅ Generated:</strong> Yes</p>
+        <p style="margin: 0 0 8px 0;"><strong>📊 Total URLs:</strong> ${sitemapStats.totalUrls}</p>
+        <p style="margin: 0 0 8px 0;"><strong>📄 Static Pages:</strong> ${sitemapStats.staticUrls}</p>
+        <p style="margin: 0;"><strong>🔄 Dynamic Content:</strong> ${sitemapStats.dynamicUrls}</p>
+      </div>
+    </div>
+    
+    <!-- Footer -->
+    <div style="background: #f9fafb; padding: 24px; text-align: center; border-top: 1px solid #e5e7eb;">
+      <p style="margin: 0 0 8px 0; color: #6b7280; font-size: 14px;">This is an automated report from SmartyGym SEO System</p>
+      <p style="margin: 0; color: #9ca3af; font-size: 12px;">© ${new Date().getFullYear()} SmartyGym. All rights reserved.</p>
+    </div>
+  </div>
+</body>
+</html>
+  `;
+
+  // Downloadable version with print styles
+  const downloadableHtml = `
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SmartyGym SEO Report - ${runDate}</title>
+  <style>
+    @media print {
+      body { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+      .no-print { display: none !important; }
+    }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background-color: #f9fafb; margin: 0; padding: 20px; }
+    .container { max-width: 800px; margin: 0 auto; background: white; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); }
+    .header { background: linear-gradient(135deg, #10b981 0%, #059669 100%); padding: 32px; color: white; }
+    .header h1 { margin: 0 0 8px 0; font-size: 24px; }
+    .header p { margin: 0; opacity: 0.9; }
+    .content { padding: 24px; }
+    .card { background: #f0fdf4; border-radius: 8px; padding: 16px; border-left: 4px solid #10b981; margin-bottom: 16px; }
+    .card.blue { background: #eff6ff; border-left-color: #3b82f6; }
+    .card label { margin: 0 0 8px 0; color: #6b7280; font-size: 14px; display: block; }
+    .card value { margin: 0; font-size: 18px; font-weight: 600; color: #111827; }
+    h2 { color: #111827; font-size: 18px; margin: 24px 0 16px 0; border-bottom: 2px solid #e5e7eb; padding-bottom: 8px; }
+    table { width: 100%; border-collapse: collapse; margin-bottom: 24px; }
+    th, td { padding: 12px; text-align: left; border-bottom: 1px solid #e5e7eb; }
+    th { background: #f9fafb; font-weight: 600; }
+    .metric-row:nth-child(odd) { background: #f9fafb; }
+    .highlight { color: #059669; font-weight: 600; }
+    .footer { background: #f9fafb; padding: 24px; text-align: center; border-top: 1px solid #e5e7eb; }
+    .download-btn { display: inline-block; background: #10b981; color: white; padding: 12px 24px; border-radius: 8px; text-decoration: none; font-weight: 600; margin: 16px 0; cursor: pointer; border: none; font-size: 14px; }
+    .download-btn:hover { background: #059669; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>📊 SmartyGym SEO Optimization Report</h1>
+      <p>Weekly Automated SEO Refresh Complete</p>
+    </div>
+    
+    <div class="content">
+      <div class="no-print" style="text-align: center; margin-bottom: 24px;">
+        <button class="download-btn" onclick="window.print()">📥 Download / Print Report</button>
+      </div>
+
+      <div style="display: flex; gap: 16px; flex-wrap: wrap;">
+        <div class="card" style="flex: 1; min-width: 200px;">
+          <label>📅 Run Date</label>
+          <value>${runDate}</value>
+        </div>
+        <div class="card blue" style="flex: 1; min-width: 200px;">
+          <label>⏱️ Duration</label>
+          <value>${durationSeconds} seconds</value>
+        </div>
+      </div>
+
+      <h2>📈 Summary Metrics</h2>
+      <table>
+        <tr class="metric-row">
+          <td>Total Items Scanned</td>
+          <td style="text-align: right; font-weight: 600; color: #3b82f6;">${totalScanned}</td>
+        </tr>
+        <tr class="metric-row">
+          <td>Already Optimized (Unchanged)</td>
+          <td style="text-align: right; font-weight: 600; color: #6b7280;">${alreadyOptimized}</td>
+        </tr>
+        <tr class="metric-row">
+          <td>New Items Optimized</td>
+          <td style="text-align: right; font-weight: 600; color: #059669;">${newItemsOptimized}</td>
+        </tr>
+      </table>
+
+      <h2>✨ New Content Optimized</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>Type</th>
+            <th>Name</th>
+            <th>Generated Title</th>
+            <th>Category</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${optimizedItemsHtml}
+        </tbody>
+      </table>
+
+      <h2>📋 Unchanged Items Breakdown</h2>
+      <table>
+        <tr class="metric-row">
+          <td>🏋️ Workouts</td>
+          <td style="text-align: right; font-weight: 600;">${unchangedByType.workouts}</td>
+        </tr>
+        <tr class="metric-row">
+          <td>📚 Programs</td>
+          <td style="text-align: right; font-weight: 600;">${unchangedByType.programs}</td>
+        </tr>
+        <tr class="metric-row">
+          <td>📝 Blogs</td>
+          <td style="text-align: right; font-weight: 600;">${unchangedByType.blogs}</td>
+        </tr>
+        <tr class="metric-row">
+          <td>🧘 Rituals</td>
+          <td style="text-align: right; font-weight: 600;">${unchangedByType.rituals}</td>
+        </tr>
+      </table>
+
+      <h2>🗺️ Sitemap Status</h2>
+      <div class="card">
+        <p style="margin: 0 0 8px 0;"><strong>✅ Generated:</strong> Yes</p>
+        <p style="margin: 0 0 8px 0;"><strong>📊 Total URLs:</strong> ${sitemapStats.totalUrls}</p>
+        <p style="margin: 0 0 8px 0;"><strong>📄 Static Pages:</strong> ${sitemapStats.staticUrls}</p>
+        <p style="margin: 0;"><strong>🔄 Dynamic Content:</strong> ${sitemapStats.dynamicUrls}</p>
+      </div>
+    </div>
+    
+    <div class="footer">
+      <p style="margin: 0 0 8px 0; color: #6b7280; font-size: 14px;">This is an automated report from SmartyGym SEO System</p>
+      <p style="margin: 0; color: #9ca3af; font-size: 12px;">© ${new Date().getFullYear()} SmartyGym. All rights reserved.</p>
+    </div>
+  </div>
+</body>
+</html>
+  `;
+
+  return { subject, html: emailHtml, downloadableHtml };
+}
+
+async function sendEmailReport(reportData: {
+  runDate: string;
+  durationSeconds: number;
+  totalScanned: number;
+  alreadyOptimized: number;
+  newItemsOptimized: number;
+  optimizedItems: OptimizedItem[];
+  unchangedByType: { workouts: number; programs: number; blogs: number; rituals: number };
+  sitemapStats: { totalUrls: number; staticUrls: number; dynamicUrls: number };
+}): Promise<boolean> {
+  if (!RESEND_API_KEY) {
+    console.log('RESEND_API_KEY not configured, skipping email report');
+    return false;
+  }
+
+  try {
+    const resend = new Resend(RESEND_API_KEY);
+    const { subject, html, downloadableHtml } = generateEmailReport(reportData);
+
+    // Create a base64 encoded HTML attachment
+    const encoder = new TextEncoder();
+    const htmlBytes = encoder.encode(downloadableHtml);
+    const base64Html = btoa(String.fromCharCode(...htmlBytes));
+
+    const { error } = await resend.emails.send({
+      from: 'SmartyGym SEO <info@smartygym.com>',
+      to: [ADMIN_EMAIL],
+      subject: subject,
+      html: html,
+      attachments: [
+        {
+          filename: `seo-report-${reportData.runDate.replace(/[^\d]/g, '-')}.html`,
+          content: base64Html
+        }
+      ]
+    });
+
+    if (error) {
+      console.error('Failed to send email report:', error);
+      return false;
+    }
+
+    console.log('✅ Email report sent successfully to', ADMIN_EMAIL);
+    return true;
+  } catch (error) {
+    console.error('Error sending email report:', error);
+    return false;
+  }
 }
 
 serve(async (req) => {
@@ -262,6 +596,7 @@ serve(async (req) => {
   }
 
   const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
+  const startTime = Date.now();
 
   try {
     console.log('Starting weekly SEO refresh...');
@@ -282,6 +617,7 @@ serve(async (req) => {
 
     let itemsScanned = 0;
     let itemsUpdated = 0;
+    const optimizedItems: OptimizedItem[] = [];
 
     // Fetch all content that needs SEO metadata
     const [workouts, programs, blogs, rituals] = await Promise.all([
@@ -292,6 +628,12 @@ serve(async (req) => {
     ]);
 
     const allContent: ContentItem[] = [];
+    const contentCounts = {
+      workouts: workouts.data?.length || 0,
+      programs: programs.data?.length || 0,
+      blogs: blogs.data?.length || 0,
+      rituals: rituals.data?.length || 0
+    };
 
     // Map workouts
     if (workouts.data) {
@@ -362,6 +704,23 @@ serve(async (req) => {
       (existingSEO || []).map(e => `${e.content_type}:${e.content_id}`)
     );
 
+    // Count unchanged items by type
+    const unchangedByType = {
+      workouts: 0,
+      programs: 0,
+      blogs: 0,
+      rituals: 0
+    };
+
+    allContent.forEach(item => {
+      if (existingKeys.has(`${item.content_type}:${item.id}`)) {
+        if (item.content_type === 'workout') unchangedByType.workouts++;
+        else if (item.content_type === 'program') unchangedByType.programs++;
+        else if (item.content_type === 'blog') unchangedByType.blogs++;
+        else if (item.content_type === 'ritual') unchangedByType.rituals++;
+      }
+    });
+
     const alreadyOptimized = existingKeys.size;
     console.log(`Found ${alreadyOptimized} items already optimized`);
 
@@ -393,6 +752,12 @@ serve(async (req) => {
 
         if (!insertError) {
           itemsUpdated++;
+          optimizedItems.push({
+            name: item.name,
+            content_type: item.content_type,
+            meta_title: seoData.meta_title,
+            category: item.category
+          });
           console.log(`✓ Optimized NEW item: ${item.name}`);
         } else {
           console.error(`Failed to insert SEO for ${item.name}:`, insertError);
@@ -407,7 +772,15 @@ serve(async (req) => {
 
     // Generate sitemap
     console.log('Generating sitemap...');
-    const sitemapXml = await generateSitemap(supabase);
+    const sitemapResult = await generateSitemap(supabase);
+
+    const endTime = Date.now();
+    const durationSeconds = Math.round((endTime - startTime) / 1000);
+    const runDate = new Date().toLocaleString('en-US', { 
+      dateStyle: 'full', 
+      timeStyle: 'short',
+      timeZone: 'UTC'
+    }) + ' UTC';
 
     // Update log entry
     if (logEntry) {
@@ -419,15 +792,34 @@ serve(async (req) => {
           items_updated: itemsUpdated,
           sitemap_generated: true,
           metadata: {
-            sitemap_urls_count: (sitemapXml.match(/<url>/g) || []).length,
+            sitemap_urls_count: sitemapResult.totalUrls,
             already_optimized: alreadyOptimized,
-            new_items_found: newContent.length
+            new_items_found: newContent.length,
+            duration_seconds: durationSeconds,
+            email_sent: RESEND_API_KEY ? true : false
           }
         })
         .eq('id', logEntry.id);
     }
 
+    // Send email report
+    const emailSent = await sendEmailReport({
+      runDate,
+      durationSeconds,
+      totalScanned: itemsScanned,
+      alreadyOptimized,
+      newItemsOptimized: itemsUpdated,
+      optimizedItems,
+      unchangedByType,
+      sitemapStats: {
+        totalUrls: sitemapResult.totalUrls,
+        staticUrls: sitemapResult.staticUrls,
+        dynamicUrls: sitemapResult.dynamicUrls
+      }
+    });
+
     console.log(`SEO refresh complete: ${itemsScanned} total, ${alreadyOptimized} already optimized, ${itemsUpdated} NEW items processed`);
+    console.log(`Email report ${emailSent ? 'sent' : 'skipped'}`);
 
     return new Response(JSON.stringify({
       success: true,
@@ -436,7 +828,10 @@ serve(async (req) => {
       new_items_found: newContent.length,
       items_updated: itemsUpdated,
       sitemap_generated: true,
-      sitemap_preview: sitemapXml.substring(0, 500) + '...'
+      sitemap_urls: sitemapResult.totalUrls,
+      duration_seconds: durationSeconds,
+      email_sent: emailSent,
+      sitemap_preview: sitemapResult.xml.substring(0, 500) + '...'
     }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' }
     });
