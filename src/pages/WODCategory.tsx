@@ -10,6 +10,7 @@ import { ContentLoadingSkeleton } from "@/components/ContentLoadingSkeleton";
 import { useAllWorkouts } from "@/hooks/useWorkoutData";
 import { useWorkoutInteractions } from "@/hooks/useWorkoutInteractions";
 import { supabase } from "@/integrations/supabase/client";
+import WODPeriodizationCalendar from "@/components/WODPeriodizationCalendar";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 
 const WODCategory = () => {
@@ -234,6 +235,9 @@ const WODCategory = () => {
                   </p>
                 </div>
               </Card>
+
+              {/* Periodization Calendar - Pure Calendar-Based */}
+              <WODPeriodizationCalendar />
 
               {/* Two WOD Cards Side by Side */}
               {bodyweightWOD || equipmentWOD ? <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
