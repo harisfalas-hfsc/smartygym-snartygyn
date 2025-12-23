@@ -91,8 +91,12 @@ export const PeriodizationSystemDialog = ({
   }, []);
 
   // Calculate global day for today and tomorrow
-  const todayGlobalDay = ((todayInfo.cycleNumber - 1) % 3) * 28 + todayInfo.dayInCycle;
-  const tomorrowGlobalDay = ((tomorrowInfo.cycleNumber - 1) % 3) * 28 + tomorrowInfo.dayInCycle;
+  // The table shows cycles 1, 2, 3 with globalDay = (cycle-1)*28 + dayInCycle
+  // We need to map the actual cycleNumber to the rotation phase (1, 2, or 3)
+  const todayRotationPhase = ((todayInfo.cycleNumber - 1) % 3) + 1; // Maps to 1, 2, or 3
+  const tomorrowRotationPhase = ((tomorrowInfo.cycleNumber - 1) % 3) + 1;
+  const todayGlobalDay = (todayRotationPhase - 1) * 28 + todayInfo.dayInCycle;
+  const tomorrowGlobalDay = (tomorrowRotationPhase - 1) * 28 + tomorrowInfo.dayInCycle;
 
   const handleClearFormatUsage = async () => {
     if (!wodState?.id) return;
