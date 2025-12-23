@@ -93,17 +93,34 @@ const ExerciseLibraryManager = () => {
   });
   const [previewVideoId, setPreviewVideoId] = useState<string | null>(null);
 
-  // Fetch exercises
+  // Fetch ALL exercises using pagination to overcome 1000 row limit
   const { data: exercises, isLoading: exercisesLoading } = useQuery({
     queryKey: ['admin-exercises'],
     queryFn: async () => {
-      const { data, error } = await supabase
-        .from('exercises')
-        .select('*')
-        .order('name', { ascending: true });
+      const allExercises: Exercise[] = [];
+      let page = 0;
+      const pageSize = 1000;
+      let hasMore = true;
 
-      if (error) throw error;
-      return data as Exercise[];
+      while (hasMore) {
+        const { data, error } = await supabase
+          .from('exercises')
+          .select('*')
+          .order('name', { ascending: true })
+          .range(page * pageSize, (page + 1) * pageSize - 1);
+
+        if (error) throw error;
+        
+        if (data && data.length > 0) {
+          allExercises.push(...data);
+          hasMore = data.length === pageSize;
+          page++;
+        } else {
+          hasMore = false;
+        }
+      }
+
+      return allExercises;
     }
   });
 

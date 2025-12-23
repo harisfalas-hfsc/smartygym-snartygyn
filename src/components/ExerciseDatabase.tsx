@@ -51,39 +51,52 @@ const ExerciseDatabase = () => {
   
   const { toast } = useToast();
 
+  // Helper function to fetch all rows with pagination (overcomes 1000 row limit)
+  const fetchAllRows = async (column: string) => {
+    const allData: any[] = [];
+    let page = 0;
+    const pageSize = 1000;
+    let hasMore = true;
+
+    while (hasMore) {
+      const { data, error } = await supabase
+        .from('exercises')
+        .select(column)
+        .order(column)
+        .range(page * pageSize, (page + 1) * pageSize - 1);
+
+      if (error) throw error;
+      
+      if (data && data.length > 0) {
+        allData.push(...data);
+        hasMore = data.length === pageSize;
+        page++;
+      } else {
+        hasMore = false;
+      }
+    }
+
+    return allData;
+  };
+
   // Load filter options from database on mount
   useEffect(() => {
     const loadFilterOptions = async () => {
       try {
-        // Fetch all distinct values in parallel
-        const [bodyPartRes, equipmentRes, targetRes, difficultyRes, categoryRes] = await Promise.all([
-          supabase.from('exercises').select('body_part').order('body_part'),
-          supabase.from('exercises').select('equipment').order('equipment'),
-          supabase.from('exercises').select('target').order('target'),
-          supabase.from('exercises').select('difficulty').order('difficulty'),
-          supabase.from('exercises').select('category').order('category'),
+        // Fetch all distinct values in parallel with pagination
+        const [bodyPartData, equipmentData, targetData, difficultyData, categoryData] = await Promise.all([
+          fetchAllRows('body_part'),
+          fetchAllRows('equipment'),
+          fetchAllRows('target'),
+          fetchAllRows('difficulty'),
+          fetchAllRows('category'),
         ]);
 
-        if (bodyPartRes.data) {
-          const unique = [...new Set(bodyPartRes.data.map(d => d.body_part).filter(Boolean))];
-          setBodyParts(unique);
-        }
-        if (equipmentRes.data) {
-          const unique = [...new Set(equipmentRes.data.map(d => d.equipment).filter(Boolean))];
-          setEquipmentOptions(unique);
-        }
-        if (targetRes.data) {
-          const unique = [...new Set(targetRes.data.map(d => d.target).filter(Boolean))];
-          setTargetOptions(unique);
-        }
-        if (difficultyRes.data) {
-          const unique = [...new Set(difficultyRes.data.map(d => d.difficulty).filter(Boolean))];
-          setDifficultyOptions(unique);
-        }
-        if (categoryRes.data) {
-          const unique = [...new Set(categoryRes.data.map(d => d.category).filter(Boolean))];
-          setCategoryOptions(unique);
-        }
+        setBodyParts([...new Set(bodyPartData.map(d => d.body_part).filter(Boolean))]);
+        setEquipmentOptions([...new Set(equipmentData.map(d => d.equipment).filter(Boolean))]);
+        setTargetOptions([...new Set(targetData.map(d => d.target).filter(Boolean))]);
+        setDifficultyOptions([...new Set(difficultyData.map(d => d.difficulty).filter(Boolean))]);
+        setCategoryOptions([...new Set(categoryData.map(d => d.category).filter(Boolean))]);
       } catch (error) {
         console.error('Error loading filter options:', error);
       }
