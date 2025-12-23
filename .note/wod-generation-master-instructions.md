@@ -141,6 +141,66 @@ Example: Main Workout = AMRAP, Finisher = Tabata → Workout FORMAT = AMRAP
 
 **FORBIDDEN**: High knees, Skipping, Burpees, Mountain climbers, Jumping jacks, Sprints, Any cardio-based exercise, EMOM/Tabata/AMRAP formats
 
+═══════════════════════════════════════════════════════════════════════════════
+## STRENGTH CATEGORY FOCUS BY CYCLE DAY (28-DAY PERIODIZATION)
+═══════════════════════════════════════════════════════════════════════════════
+
+Each STRENGTH day within the 28-day cycle has a **specific focus area**. The AI **MUST** generate workouts targeting ONLY the specified focus for that day.
+
+| Day | Focus | Description |
+|-----|-------|-------------|
+| 2   | LOWER BODY | Quads, hamstrings, calves, glutes, adductors, abductors |
+| 5   | UPPER BODY | Chest, back, shoulders, biceps, triceps |
+| 12  | FULL BODY | Upper + Lower + Core combination |
+| 15  | LOW PUSH & UPPER PULL | Lower pushing patterns + Upper pulling patterns |
+| 20  | LOW PULL & UPPER PUSH | Lower pulling patterns + Upper pushing patterns |
+| 23  | CORE & GLUTES | Core stability + Glute-focused exercises |
+
+### Movement Pattern Definitions (EXAMPLES - Use Intelligent Pattern Recognition)
+
+The AI should use ALL available exercises (gym equipment, free weights, cables, bands, machines, bodyweight) that fit the focus. The examples below are NOT exhaustive - use intelligent pattern recognition:
+
+**LOWER BODY (Day 2)**: Any exercise targeting quads, hamstrings, calves, glutes, adductors, abductors
+- Movement patterns: Squats (all variations), lunges (all variations), leg press, hip thrusts, step-ups, calf raises, leg curls, leg extensions, Bulgarian splits, pistol progressions
+- Equipment examples: Back squat, front squat, goblet squat, hack squat, leg press, leg curl machine, leg extension machine, Smith machine squats
+- Bodyweight examples: Bodyweight squats, lunges, pistol progressions, step-ups, glute bridges, wall sits, calf raises
+
+**UPPER BODY (Day 5)**: Any exercise targeting chest, back, shoulders, biceps, triceps
+- Movement patterns: Pressing (horizontal/vertical), pulling (horizontal/vertical), curls, extensions, flys, rows
+- Equipment examples: Bench press (all variations), shoulder press, lat pulldown, cable rows, pec deck, bicep curls, tricep pushdowns
+- Bodyweight examples: Push-ups (all variations), pull-ups, dips, inverted rows, pike push-ups, diamond push-ups
+
+**FULL BODY (Day 12)**: Combination of upper body, lower body, and core exercises
+- Include: Upper push + Upper pull + Lower push + Lower pull + Core
+- Can use compound movements that hit multiple muscle groups
+- Balance volume across body parts
+
+**LOW PUSH & UPPER PULL (Day 15)**:
+- **Lower Push**: Any lower body pushing pattern (squat patterns, lunges, leg press, hip thrusts, step-ups, Bulgarian splits)
+- **Upper Pull**: Any upper body pulling pattern (rows, pull-ups, lat pulldowns, bicep curls, face pulls, rear delt work)
+- Muscles targeted: Quads, glutes (push) + Back, biceps, rear delts (pull)
+
+**LOW PULL & UPPER PUSH (Day 20)**:
+- **Lower Pull**: Any lower body pulling pattern (deadlifts, Romanian deadlifts, sumo deadlifts, leg curls, hip hinges, glute-ham raises)
+- **Upper Push**: Any upper body pushing pattern (bench press, shoulder press, push-ups, tricep extensions, dips, flys)
+- Muscles targeted: Hamstrings, glutes (pull) + Chest, shoulders, triceps (push)
+
+**CORE & GLUTES (Day 23)**: Core stability + Glute isolation focus
+- **Core**: Anti-rotation (Pallof press), anti-extension (planks, dead bugs), anti-flexion (bird dogs), rotational work
+- **Glutes**: Hip thrusts, glute bridges, banded work, cable pull-throughs, kickbacks, clamshells
+- Focus on stability, activation, and mind-muscle connection
+
+### CRITICAL STRENGTH FOCUS RULES:
+
+1. **Use ALL available exercises** - gym equipment, free weights, cables, bands, machines, bodyweight - that fit the day's focus
+2. The exercise examples are **NOT exhaustive** - use intelligent pattern recognition to identify exercises that match the movement pattern
+3. **FORBIDDEN**: Using exercises from a DIFFERENT focus on the wrong day
+   - Example: On LOWER BODY day (Day 2), NO chest presses, NO rows, NO shoulder work
+   - Example: On UPPER BODY day (Day 5), NO squats, NO lunges, NO leg work
+   - Example: On LOW PUSH & UPPER PULL day (Day 15), NO deadlifts (lower pull), NO bench press (upper push)
+4. Both BODYWEIGHT and EQUIPMENT workouts must follow the same focus
+5. Maintain variety across the 28-day cycle - different focus = different exercises each time
+
 ### CATEGORY 2: CARDIO
 **Goal**: Improve heart rate capacity, aerobic and anaerobic conditioning
 **Format**: Circuits, AMRAP, EMOM, Tabata, For Time (can differ between workouts)

@@ -50,6 +50,61 @@ const PERIODIZATION_28DAY: Array<{
 ];
 
 // ═══════════════════════════════════════════════════════════════════════════════
+// STRENGTH CATEGORY FOCUS BY CYCLE DAY
+// Each strength day has a specific muscle group/movement pattern focus
+// ═══════════════════════════════════════════════════════════════════════════════
+const STRENGTH_DAY_FOCUS: Record<number, {
+  focus: string;
+  description: string;
+  muscleGroups: string[];
+  movementPatterns: string[];
+  forbiddenPatterns: string[];
+}> = {
+  2: {
+    focus: "LOWER BODY",
+    description: "Quads, hamstrings, calves, glutes, adductors, abductors",
+    muscleGroups: ["quads", "hamstrings", "calves", "glutes", "adductors", "abductors"],
+    movementPatterns: ["squats", "lunges", "leg press", "hip thrusts", "leg curls", "leg extensions", "calf raises", "step-ups", "Bulgarian splits"],
+    forbiddenPatterns: ["chest press", "bench press", "shoulder press", "rows", "pull-ups", "bicep curls", "tricep extensions", "any upper body exercise"]
+  },
+  5: {
+    focus: "UPPER BODY",
+    description: "Chest, back, shoulders, biceps, triceps",
+    muscleGroups: ["chest", "back", "shoulders", "biceps", "triceps"],
+    movementPatterns: ["pressing", "pulling", "curls", "extensions", "rows", "flys", "pulldowns", "push-ups", "dips"],
+    forbiddenPatterns: ["squats", "lunges", "leg press", "deadlifts", "hip thrusts", "leg curls", "calf raises", "any lower body exercise"]
+  },
+  12: {
+    focus: "FULL BODY",
+    description: "Upper + Lower + Core combination - balanced across all muscle groups",
+    muscleGroups: ["full body", "compound movements"],
+    movementPatterns: ["upper push", "upper pull", "lower push", "lower pull", "core stability"],
+    forbiddenPatterns: []
+  },
+  15: {
+    focus: "LOW PUSH & UPPER PULL",
+    description: "Lower body pushing patterns + Upper body pulling patterns",
+    muscleGroups: ["quads", "glutes", "back", "biceps", "rear delts"],
+    movementPatterns: ["squats", "lunges", "leg press", "step-ups", "hip thrusts", "rows", "pull-ups", "pulldowns", "curls", "face pulls"],
+    forbiddenPatterns: ["deadlifts", "RDLs", "leg curls", "bench press", "shoulder press", "push-ups", "tricep work", "chest exercises"]
+  },
+  20: {
+    focus: "LOW PULL & UPPER PUSH",
+    description: "Lower body pulling patterns + Upper body pushing patterns",
+    muscleGroups: ["hamstrings", "glutes", "chest", "shoulders", "triceps"],
+    movementPatterns: ["deadlifts", "RDLs", "leg curls", "hip hinges", "glute-ham raises", "bench press", "shoulder press", "push-ups", "tricep work", "dips", "flys"],
+    forbiddenPatterns: ["squats", "lunges", "leg press", "step-ups", "rows", "pull-ups", "bicep curls", "back exercises"]
+  },
+  23: {
+    focus: "CORE & GLUTES",
+    description: "Core stability + Glute-focused exercises",
+    muscleGroups: ["core", "glutes", "hip stabilizers"],
+    movementPatterns: ["anti-rotation", "planks", "dead bugs", "pallof press", "bird dogs", "hip thrusts", "glute bridges", "banded work", "kickbacks", "clamshells"],
+    forbiddenPatterns: ["squats", "bench press", "rows", "shoulder press", "any compound lift", "arm isolation"]
+  }
+};
+
+// ═══════════════════════════════════════════════════════════════════════════════
 // FORMAT RULES BY CATEGORY (STRICT)
 // ═══════════════════════════════════════════════════════════════════════════════
 const FORMATS_BY_CATEGORY: Record<string, string[]> = {
@@ -1041,19 +1096,44 @@ YOUR WORKOUT SPECIFICATIONS FOR THIS GENERATION:
 • Difficulty: ${selectedDifficulty.name} (${selectedDifficulty.stars} stars out of 6)
 • Format: ${format}
 
-${category === "STRENGTH" ? `
-STRENGTH CATEGORY - ALLOWED EXERCISES:
+${category === "STRENGTH" ? (() => {
+  const strengthFocus = STRENGTH_DAY_FOCUS[dayInCycle];
+  if (strengthFocus) {
+    return `
+═══════════════════════════════════════════════════════════════════════════════
+STRENGTH DAY FOCUS: ${strengthFocus.focus} (Day ${dayInCycle})
+═══════════════════════════════════════════════════════════════════════════════
+
+🎯 TARGET MUSCLE GROUPS: ${strengthFocus.muscleGroups.join(", ")}
+📝 DESCRIPTION: ${strengthFocus.description}
+✅ MOVEMENT PATTERNS TO INCLUDE: ${strengthFocus.movementPatterns.join(", ")}
+${strengthFocus.forbiddenPatterns.length > 0 ? `❌ FORBIDDEN ON THIS DAY: ${strengthFocus.forbiddenPatterns.join(", ")}` : ""}
+
+CRITICAL STRENGTH FOCUS RULES:
+1. Use ANY and ALL exercises that fit this focus - gym equipment, free weights, cables, bands, machines, bodyweight
+2. The movement patterns listed are EXAMPLES - use intelligent pattern recognition for variety
+3. FORBIDDEN: Do NOT include exercises from other focus areas on this day
+4. Both BODYWEIGHT and EQUIPMENT workouts must follow the same "${strengthFocus.focus}" focus
+5. Maintain Smarty Gym's strength training philosophy: proper rest periods, progressive overload, appropriate tempo
+
 ${equipment === "EQUIPMENT" ? `
-• Goblet squats, Kettlebell deadlifts, Romanian deadlifts, Front squats
-• Bench press variations, Dumbbell row, Bent-over row
-• Push press, Landmine press, Split squats, Hip hinges, Weighted carries` : `
-• Push-up variations (diamond, archer, decline, incline)
-• Slow tempo squats (3-4 second eccentric)
-• Pistol squat regressions (assisted, box pistols)
-• Glute bridges and hip thrusts (single-leg progressions)
-• Plank variations, Pull-ups, Dips, Isometrics, Handstand progressions`}
+EQUIPMENT EXERCISES FOR ${strengthFocus.focus}:
+Use all available gym equipment, free weights, cables, bands, and machines that target: ${strengthFocus.muscleGroups.join(", ")}` : `
+BODYWEIGHT EXERCISES FOR ${strengthFocus.focus}:
+Use all bodyweight exercises and progressions that target: ${strengthFocus.muscleGroups.join(", ")}`}
+
+❌ ABSOLUTELY FORBIDDEN: Burpees, Mountain climbers, Jumping jacks, Sprints, any cardio exercise, EMOM/Tabata/AMRAP formats.
+`;
+  } else {
+    return `
+STRENGTH CATEGORY - GENERAL:
+${equipment === "EQUIPMENT" ? `
+• Use all available strength equipment: barbells, dumbbells, kettlebells, cables, machines` : `
+• Use bodyweight strength exercises: push-ups, pull-ups, dips, squats, lunges, planks`}
 ❌ FORBIDDEN: Burpees, Mountain climbers, Jumping jacks, Sprints, any cardio exercise.
-` : ""}
+`;
+  }
+})() : ""}
 
 ${category === "CARDIO" ? `
 CARDIO CATEGORY - ALLOWED EXERCISES:
