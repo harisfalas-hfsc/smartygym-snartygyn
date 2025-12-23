@@ -71,6 +71,7 @@ import Unsubscribe from "./pages/Unsubscribe";
 import Community from "./pages/Community";
 import AdminBackoffice from "./pages/AdminBackoffice";
 import ExportVideoPage from "./pages/admin/ExportVideoPage";
+import ImportExercises from "./pages/admin/ImportExercises";
 import MigrateContent from "./pages/MigrateContent";
 import ProcessLogo from "./pages/ProcessLogo";
 import AppSubmission from "./pages/AppSubmission";
@@ -203,6 +204,11 @@ const AppContent = () => {
                 <Route path="/admin/export-video" element={
                   <AdminRoute>
                     <ExportVideoPage />
+                  </AdminRoute>
+                } />
+                <Route path="/admin/import-exercises" element={
+                  <AdminRoute>
+                    <ImportExercises />
                   </AdminRoute>
                 } />
                 
