@@ -1012,6 +1012,39 @@ export type Database = {
         }
         Relationships: []
       }
+      mismatched_exercises: {
+        Row: {
+          created_at: string | null
+          exercise_name: string
+          id: string
+          resolved_at: string | null
+          resolved_exercise_id: string | null
+          source_id: string | null
+          source_name: string | null
+          source_type: string
+        }
+        Insert: {
+          created_at?: string | null
+          exercise_name: string
+          id?: string
+          resolved_at?: string | null
+          resolved_exercise_id?: string | null
+          source_id?: string | null
+          source_name?: string | null
+          source_type: string
+        }
+        Update: {
+          created_at?: string | null
+          exercise_name?: string
+          id?: string
+          resolved_at?: string | null
+          resolved_exercise_id?: string | null
+          source_id?: string | null
+          source_name?: string | null
+          source_type?: string
+        }
+        Relationships: []
+      }
       moderation_actions: {
         Row: {
           action_type: string

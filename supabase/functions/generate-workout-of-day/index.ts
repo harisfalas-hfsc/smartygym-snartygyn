@@ -4,6 +4,11 @@ import Stripe from "https://esm.sh/stripe@18.5.0";
 import { Resend } from "https://esm.sh/resend@2.0.0";
 import { getEmailHeaders, getEmailFooter } from "../_shared/email-utils.ts";
 import { MESSAGE_TYPES } from "../_shared/notification-types.ts";
+import { 
+  processContentWithExerciseMatching, 
+  logUnmatchedExercises,
+  type ExerciseBasic 
+} from "../_shared/exercise-matching.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
