@@ -77,6 +77,55 @@ export const ALL_CATEGORIES = [
 ] as const;
 
 /**
+ * STRENGTH CATEGORY FOCUS BY CYCLE DAY
+ * Each strength day has a specific muscle group/movement pattern focus
+ * The AI uses intelligent pattern recognition - examples are NOT exhaustive
+ */
+export const STRENGTH_DAY_FOCUS: Record<number, {
+  focus: string;
+  description: string;
+  muscleGroups: string[];
+  movementPatterns: string[];
+}> = {
+  2: {
+    focus: "LOWER BODY",
+    description: "Quads, hamstrings, calves, glutes, adductors, abductors",
+    muscleGroups: ["quads", "hamstrings", "calves", "glutes", "adductors", "abductors"],
+    movementPatterns: ["squats", "lunges", "leg press", "hip thrusts", "leg curls", "leg extensions", "calf work", "step-ups"]
+  },
+  5: {
+    focus: "UPPER BODY",
+    description: "Chest, back, shoulders, biceps, triceps",
+    muscleGroups: ["chest", "back", "shoulders", "biceps", "triceps"],
+    movementPatterns: ["pressing", "pulling", "curls", "extensions", "rows", "flys", "pulldowns"]
+  },
+  12: {
+    focus: "FULL BODY",
+    description: "Upper + Lower + Core combination",
+    muscleGroups: ["full body", "compound movements"],
+    movementPatterns: ["upper push", "upper pull", "lower push", "lower pull", "core"]
+  },
+  15: {
+    focus: "LOW PUSH & UPPER PULL",
+    description: "Lower body pushing patterns + Upper body pulling patterns",
+    muscleGroups: ["quads", "glutes", "back", "biceps", "rear delts"],
+    movementPatterns: ["squats", "lunges", "leg press", "step-ups", "rows", "pull-ups", "pulldowns", "curls", "face pulls"]
+  },
+  20: {
+    focus: "LOW PULL & UPPER PUSH",
+    description: "Lower body pulling patterns + Upper body pushing patterns",
+    muscleGroups: ["hamstrings", "glutes", "chest", "shoulders", "triceps"],
+    movementPatterns: ["deadlifts", "RDLs", "leg curls", "hip hinges", "bench press", "shoulder press", "push-ups", "tricep work", "dips"]
+  },
+  23: {
+    focus: "CORE & GLUTES",
+    description: "Core stability + Glute-focused exercises",
+    muscleGroups: ["core", "glutes", "hip stabilizers"],
+    movementPatterns: ["anti-rotation", "planks", "dead bugs", "pallof press", "hip thrusts", "glute bridges", "banded work", "kickbacks"]
+  }
+};
+
+/**
  * Get day in cycle (1-28) from a date string
  * Uses calendar-anchored calculation - always correct regardless of any state
  */

@@ -16,7 +16,8 @@ import {
   FORMATS_BY_CATEGORY,
   CYCLE_START_DATE,
   getWODInfoForDate,
-  getDifficultyBadgeClass
+  getDifficultyBadgeClass,
+  STRENGTH_DAY_FOCUS
 } from "@/lib/wodCycle";
 
 interface PeriodizationSystemDialogProps {
@@ -116,6 +117,7 @@ export const PeriodizationSystemDialog = ({
                       <TableRow>
                         <TableHead className="w-16">Day</TableHead>
                         <TableHead>Category</TableHead>
+                        <TableHead>Focus</TableHead>
                         <TableHead>Difficulty</TableHead>
                         <TableHead>Status</TableHead>
                       </TableRow>
@@ -141,6 +143,15 @@ export const PeriodizationSystemDialog = ({
                                 {isRecovery && <Heart className="h-3 w-3" />}
                                 {entry.category}
                               </Badge>
+                            </TableCell>
+                            <TableCell>
+                              {entry.category === "STRENGTH" && STRENGTH_DAY_FOCUS[entry.day] ? (
+                                <Badge variant="outline" className="text-xs bg-primary/10 text-primary border-primary/30">
+                                  {STRENGTH_DAY_FOCUS[entry.day].focus}
+                                </Badge>
+                              ) : (
+                                <span className="text-muted-foreground text-sm">—</span>
+                              )}
                             </TableCell>
                             <TableCell>
                               {entry.difficulty ? (
