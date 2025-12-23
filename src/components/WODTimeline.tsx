@@ -4,73 +4,20 @@ import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ChevronLeft, ChevronRight, Star } from "lucide-react";
 import { format, subDays, addDays } from "date-fns";
-
-// 8-DAY CATEGORY CYCLE (with PILATES as Day 8)
-const CATEGORY_CYCLE_8DAY = [
-  "CHALLENGE",
-  "STRENGTH", 
-  "CARDIO",
-  "MOBILITY & STABILITY",
-  "STRENGTH",
-  "METABOLIC",
-  "CALORIE BURNING",
-  "PILATES"
-];
-
-// DIFFICULTY PATTERN BASE
-const DIFFICULTY_PATTERN_BASE = [
-  { level: "Intermediate", range: [3, 4] },
-  { level: "Advanced", range: [5, 6] },
-  { level: "Beginner", range: [1, 2] },
-  { level: "Advanced", range: [5, 6] },
-  { level: "Intermediate", range: [3, 4] },
-  { level: "Beginner", range: [1, 2] },
-  { level: "Advanced", range: [5, 6] },
-  { level: "Intermediate", range: [3, 4] }
-];
-
-const FORMATS_BY_CATEGORY: Record<string, string[]> = {
-  "STRENGTH": ["REPS & SETS"],
-  "MOBILITY & STABILITY": ["REPS & SETS"],
-  "PILATES": ["REPS & SETS"],
-  "CARDIO": ["CIRCUIT", "EMOM", "FOR TIME", "AMRAP", "TABATA"],
-  "METABOLIC": ["CIRCUIT", "AMRAP", "EMOM", "FOR TIME", "TABATA"],
-  "CALORIE BURNING": ["CIRCUIT", "TABATA", "AMRAP", "FOR TIME", "EMOM"],
-  "CHALLENGE": ["CIRCUIT", "TABATA", "AMRAP", "EMOM", "FOR TIME", "MIX"]
-};
-
-// Match backend formula: (dayCount % 8) + 1, where dayCount starts at 0
-const getDayInCycle = (dayCount: number): number => (dayCount % 8) + 1;
-
-const getCategoryForDay = (dayInCycle: number): string => CATEGORY_CYCLE_8DAY[dayInCycle - 1];
-
-const getDifficultyForDay = (dayInCycle: number, weekNumber: number): { level: string; range: [number, number] } => {
-  const shiftAmount = (weekNumber - 1) % 8;
-  const shiftedIndex = ((dayInCycle - 1) + shiftAmount) % 8;
-  return {
-    level: DIFFICULTY_PATTERN_BASE[shiftedIndex].level,
-    range: DIFFICULTY_PATTERN_BASE[shiftedIndex].range as [number, number]
-  };
-};
-
-const getDifficultyBadgeClass = (level: string) => {
-  if (level === "Beginner") return "bg-yellow-500/20 text-yellow-700 dark:text-yellow-400 border-yellow-500/30";
-  if (level === "Intermediate") return "bg-green-500/20 text-green-700 dark:text-green-400 border-green-500/30";
-  return "bg-red-500/20 text-red-700 dark:text-red-400 border-red-500/30";
-};
-
-// Get border color based on difficulty
-const getDifficultyBorderClass = (level: string) => {
-  if (level === "Beginner") return "border-yellow-500";
-  if (level === "Intermediate") return "border-green-500";
-  return "border-red-500";
-};
+import {
+  getWODInfoForDate,
+  getDifficultyBadgeClass,
+  getDifficultyBorderClass,
+  starsToLevel,
+  FORMATS_BY_CATEGORY
+} from "@/lib/wodCycle";
 
 export const WODTimeline = () => {
   const yesterday = subDays(new Date(), 1);
   const tomorrow = addDays(new Date(), 1);
+  const tomorrowDateStr = format(tomorrow, "yyyy-MM-dd");
   
-  // Fetch yesterday's WOD using generated_for_date (no is_workout_of_day filter since past WODs get flag cleared)
+  // Fetch yesterday's WOD using generated_for_date
   const { data: yesterdayWOD, isLoading: loadingYesterday } = useQuery({
     queryKey: ["yesterday-wod", format(yesterday, "yyyy-MM-dd")],
     queryFn: async () => {
@@ -85,11 +32,11 @@ export const WODTimeline = () => {
       if (error) throw error;
       return data?.[0] || null;
     },
-    staleTime: 5 * 60 * 1000, // 5 minutes cache
+    staleTime: 5 * 60 * 1000,
     refetchOnWindowFocus: false,
   });
 
-  // Fetch current WODs (today) with longer cache - FILTER BY generated_for_date
+  // Fetch current WODs (today) - FILTER BY generated_for_date
   const { data: todayWODs, isLoading: loadingToday } = useQuery({
     queryKey: ["today-wods-timeline", format(new Date(), "yyyy-MM-dd")],
     queryFn: async () => {
@@ -103,55 +50,45 @@ export const WODTimeline = () => {
       if (error) throw error;
       return data?.[0] || null;
     },
-    staleTime: 5 * 60 * 1000, // 5 minutes cache
+    staleTime: 5 * 60 * 1000,
     refetchOnWindowFocus: false,
   });
 
-  // Fetch WOD state for tomorrow calculation with longer cache
+  // Fetch manual overrides for tomorrow
   const { data: wodState, isLoading: loadingState } = useQuery({
     queryKey: ["wod-state-timeline"],
     queryFn: async () => {
       const { data, error } = await supabase
         .from("workout_of_day_state")
-        .select("day_count, week_number, manual_overrides")
+        .select("manual_overrides")
         .limit(1)
         .single();
       
       if (error) throw error;
       return data;
     },
-    staleTime: 5 * 60 * 1000, // 5 minutes cache
+    staleTime: 5 * 60 * 1000,
     refetchOnWindowFocus: false,
   });
 
-  // Calculate tomorrow's WOD info - always returns data
-  // CRITICAL: day_count in state represents AFTER today's generation was completed
-  // So for tomorrow, we use the CURRENT day_count (which will be tomorrow's day)
+  // Calculate tomorrow's WOD info using DATE-BASED calculation
   const getTomorrowInfo = () => {
-    const dayCount = wodState?.day_count ?? 0;
-    const weekNumber = wodState?.week_number ?? 1;
+    // Use date-based calculation - always correct
+    const wodInfo = getWODInfoForDate(tomorrowDateStr);
     
-    // day_count is already incremented after today's generation
-    // So day_count represents tomorrow's position in the cycle
-    const tomorrowDayInCycle = getDayInCycle(dayCount);
-    const tomorrowWeekNumber = tomorrowDayInCycle === 1 
-      ? weekNumber + 1 
-      : weekNumber;
-    
-    const tomorrowDateStr = format(tomorrow, "yyyy-MM-dd");
+    // Check for manual overrides
     const overrides = (wodState?.manual_overrides as Record<string, any>) || {};
     const override = overrides[tomorrowDateStr];
     
-    const category = override?.category || getCategoryForDay(tomorrowDayInCycle);
-    const difficultyInfo = getDifficultyForDay(tomorrowDayInCycle, tomorrowWeekNumber);
+    const category = override?.category || wodInfo.category;
     const formats = FORMATS_BY_CATEGORY[category] || ["CIRCUIT"];
     
     return {
       category,
       difficultyLevel: override?.difficulty 
-        ? (override.difficulty <= 2 ? "Beginner" : override.difficulty <= 4 ? "Intermediate" : "Advanced")
-        : difficultyInfo.level,
-      difficultyRange: difficultyInfo.range,
+        ? starsToLevel(override.difficulty)
+        : wodInfo.difficulty.level,
+      difficultyRange: wodInfo.difficulty.range,
       format: override?.format || formats[0]
     };
   };
@@ -171,7 +108,7 @@ export const WODTimeline = () => {
     );
   }
 
-  // Get yesterday's difficulty for border color
+  // Get difficulty for border color
   const yesterdayDifficulty = yesterdayWOD?.difficulty || "Intermediate";
   const todayDifficulty = todayWODs?.difficulty || "Intermediate";
 

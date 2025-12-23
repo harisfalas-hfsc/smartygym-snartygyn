@@ -9,6 +9,10 @@ import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
+import {
+  getDayInCycleFromDate,
+  getCategoryForDay
+} from "@/lib/wodCycle";
 
 interface GenerateWODDialogProps {
   open: boolean;
@@ -18,32 +22,6 @@ interface GenerateWODDialogProps {
   nextCategory: string;
   dayInCycle: number;
 }
-
-// 8-DAY CATEGORY CYCLE for preview (matches backend exactly)
-const CATEGORY_CYCLE_8DAY = [
-  "CHALLENGE",            // Day 1
-  "STRENGTH",             // Day 2
-  "CARDIO",               // Day 3
-  "MOBILITY & STABILITY", // Day 4
-  "STRENGTH",             // Day 5
-  "METABOLIC",            // Day 6
-  "CALORIE BURNING",      // Day 7
-  "PILATES"               // Day 8
-];
-
-// Reference date: December 14, 2025 = Day 1 (CHALLENGE)
-const CYCLE_START_DATE = '2025-12-14';
-
-// DATE-BASED calculation - always gives correct category for calendar day
-const getDayInCycleFromDate = (dateStr: string): number => {
-  const startDate = new Date(CYCLE_START_DATE + 'T00:00:00Z');
-  const targetDate = new Date(dateStr + 'T00:00:00Z');
-  const daysDiff = Math.floor((targetDate.getTime() - startDate.getTime()) / (24 * 60 * 60 * 1000));
-  const normalizedDays = ((daysDiff % 8) + 8) % 8;
-  return normalizedDays + 1; // 1-8
-};
-
-const getCategoryForDay = (dayInCycle: number): string => CATEGORY_CYCLE_8DAY[dayInCycle - 1];
 
 export const GenerateWODDialog = ({
   open,

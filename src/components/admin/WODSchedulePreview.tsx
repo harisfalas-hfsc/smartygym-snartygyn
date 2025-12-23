@@ -10,72 +10,16 @@ import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
 import { Calendar, Edit2, Clock, Star, Flame, Save, Dumbbell, User } from "lucide-react";
 import { format, addDays } from "date-fns";
-
-// 8-DAY CATEGORY CYCLE (with PILATES as Day 8)
-const CATEGORY_CYCLE_8DAY = [
-  "CHALLENGE",            // Day 1
-  "STRENGTH",             // Day 2
-  "CARDIO",               // Day 3
-  "MOBILITY & STABILITY", // Day 4
-  "STRENGTH",             // Day 5
-  "METABOLIC",            // Day 6
-  "CALORIE BURNING",      // Day 7
-  "PILATES"               // Day 8
-];
-
-// DIFFICULTY PATTERN BASE (8-day pattern that shifts weekly)
-const DIFFICULTY_PATTERN_BASE = [
-  { level: "Intermediate", range: [3, 4] },
-  { level: "Advanced", range: [5, 6] },
-  { level: "Beginner", range: [1, 2] },
-  { level: "Advanced", range: [5, 6] },
-  { level: "Intermediate", range: [3, 4] },
-  { level: "Beginner", range: [1, 2] },
-  { level: "Advanced", range: [5, 6] },
-  { level: "Intermediate", range: [3, 4] }  // Day 8 pattern
-];
-
-// FORMAT RULES BY CATEGORY
-const FORMATS_BY_CATEGORY: Record<string, string[]> = {
-  "STRENGTH": ["REPS & SETS"],
-  "MOBILITY & STABILITY": ["REPS & SETS"],
-  "PILATES": ["REPS & SETS"],  // Pilates uses controlled movements only
-  "CARDIO": ["CIRCUIT", "EMOM", "FOR TIME", "AMRAP", "TABATA"],
-  "METABOLIC": ["CIRCUIT", "AMRAP", "EMOM", "FOR TIME", "TABATA"],
-  "CALORIE BURNING": ["CIRCUIT", "TABATA", "AMRAP", "FOR TIME", "EMOM"],
-  "CHALLENGE": ["CIRCUIT", "TABATA", "AMRAP", "EMOM", "FOR TIME", "MIX"]
-};
-
-// Reference date: December 14, 2025 = Day 1 (CHALLENGE)
-// This anchors the 8-day cycle to the calendar - matches backend exactly
-const CYCLE_START_DATE = '2025-12-14';
-
-// DATE-BASED calculation - always gives correct category for calendar day
-const getDayInCycleFromDate = (dateStr: string): number => {
-  const startDate = new Date(CYCLE_START_DATE + 'T00:00:00Z');
-  const targetDate = new Date(dateStr + 'T00:00:00Z');
-  const daysDiff = Math.floor((targetDate.getTime() - startDate.getTime()) / (24 * 60 * 60 * 1000));
-  const normalizedDays = ((daysDiff % 8) + 8) % 8;
-  return normalizedDays + 1; // 1-8
-};
-
-const getWeekNumberFromDate = (dateStr: string): number => {
-  const startDate = new Date(CYCLE_START_DATE + 'T00:00:00Z');
-  const targetDate = new Date(dateStr + 'T00:00:00Z');
-  const daysDiff = Math.floor((targetDate.getTime() - startDate.getTime()) / (24 * 60 * 60 * 1000));
-  return Math.floor(daysDiff / 8) + 1;
-};
-
-const getCategoryForDay = (dayInCycle: number): string => CATEGORY_CYCLE_8DAY[dayInCycle - 1];
-
-const getDifficultyForDay = (dayInCycle: number, weekNumber: number): { level: string; range: [number, number] } => {
-  const shiftAmount = (weekNumber - 1) % 8;
-  const shiftedIndex = ((dayInCycle - 1) + shiftAmount) % 8;
-  return {
-    level: DIFFICULTY_PATTERN_BASE[shiftedIndex].level,
-    range: DIFFICULTY_PATTERN_BASE[shiftedIndex].range as [number, number]
-  };
-};
+import {
+  CATEGORY_CYCLE_8DAY,
+  FORMATS_BY_CATEGORY,
+  getWODInfoForDate,
+  getDayInCycleFromDate,
+  getWeekNumberFromDate,
+  getCategoryForDay,
+  getDifficultyForDay,
+  starsToLevel
+} from "@/lib/wodCycle";
 
 export const WODSchedulePreview = () => {
   const queryClient = useQueryClient();

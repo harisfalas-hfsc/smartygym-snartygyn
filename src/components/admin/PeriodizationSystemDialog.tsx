@@ -7,47 +7,20 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Calendar, Star, Dumbbell, Info, Settings, RotateCcw, Save, AlertTriangle } from "lucide-react";
+import { Calendar, Star, Dumbbell, Info, Settings, RotateCcw, Save, AlertTriangle, CalendarDays } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { useQueryClient } from "@tanstack/react-query";
-
-// 8-DAY CATEGORY CYCLE (with PILATES as Day 8)
-const CATEGORY_CYCLE_8DAY = [
-  "CHALLENGE",            // Day 1
-  "STRENGTH",             // Day 2
-  "CARDIO",               // Day 3
-  "MOBILITY & STABILITY", // Day 4
-  "STRENGTH",             // Day 5
-  "METABOLIC",            // Day 6
-  "CALORIE BURNING",      // Day 7
-  "PILATES"               // Day 8
-];
-
-// Difficulty pattern (8-day to match category cycle)
-const DIFFICULTY_PATTERN_BASE = [
-  { level: "Intermediate", range: "3-4★" },
-  { level: "Advanced", range: "5-6★" },
-  { level: "Beginner", range: "1-2★" },
-  { level: "Advanced", range: "5-6★" },
-  { level: "Intermediate", range: "3-4★" },
-  { level: "Beginner", range: "1-2★" },
-  { level: "Advanced", range: "5-6★" },
-  { level: "Intermediate", range: "3-4★" }  // Day 8
-];
-
-// Format rules by category
-const FORMATS_BY_CATEGORY: Record<string, string[]> = {
-  "STRENGTH": ["REPS & SETS"],
-  "MOBILITY & STABILITY": ["REPS & SETS"],
-  "PILATES": ["REPS & SETS"],  // Pilates uses controlled movements only
-  "CARDIO": ["CIRCUIT", "EMOM", "FOR TIME", "AMRAP", "TABATA"],
-  "METABOLIC": ["CIRCUIT", "AMRAP", "EMOM", "FOR TIME", "TABATA"],
-  "CALORIE BURNING": ["CIRCUIT", "TABATA", "AMRAP", "FOR TIME", "EMOM"],
-  "CHALLENGE": ["CIRCUIT", "TABATA", "AMRAP", "EMOM", "FOR TIME", "MIX"]
-};
-
+import { format, addDays } from "date-fns";
 import type { Json } from "@/integrations/supabase/types";
+import {
+  CATEGORY_CYCLE_8DAY,
+  DIFFICULTY_PATTERN_BASE,
+  FORMATS_BY_CATEGORY,
+  CYCLE_START_DATE,
+  getWODInfoForDate,
+  getDifficultyForDay
+} from "@/lib/wodCycle";
 
 interface PeriodizationSystemDialogProps {
   open: boolean;
@@ -73,8 +46,15 @@ export const PeriodizationSystemDialog = ({
   const [editWeekNumber, setEditWeekNumber] = useState<number>(1);
   const [isSaving, setIsSaving] = useState(false);
 
-  const dayInCycle = wodState ? (wodState.day_count % 8) + 1 : 1;
-  const weekNumber = wodState?.week_number || Math.floor((wodState?.day_count || 0) / 8) + 1;
+  // Get today's and tomorrow's date-based info (source of truth)
+  const todayDateStr = format(new Date(), "yyyy-MM-dd");
+  const tomorrowDateStr = format(addDays(new Date(), 1), "yyyy-MM-dd");
+  const todayInfo = getWODInfoForDate(todayDateStr);
+  const tomorrowInfo = getWODInfoForDate(tomorrowDateStr);
+
+  // Legacy counter-based values (for display only, not used for generation)
+  const legacyDayInCycle = wodState ? (wodState.day_count % 8) + 1 : 1;
+  const legacyWeekNumber = wodState?.week_number || Math.floor((wodState?.day_count || 0) / 8) + 1;
 
   const handleStartEdit = () => {
     setEditDayCount(wodState?.day_count || 0);
@@ -102,7 +82,7 @@ export const PeriodizationSystemDialog = ({
 
       if (error) throw error;
 
-      toast.success("Periodization updated", {
+      toast.success("Legacy counters updated", {
         description: `Day count: ${editDayCount}, Week: ${editWeekNumber}`
       });
       
@@ -110,35 +90,6 @@ export const PeriodizationSystemDialog = ({
       setIsEditing(false);
     } catch (error: any) {
       toast.error("Failed to update", { description: error.message });
-    } finally {
-      setIsSaving(false);
-    }
-  };
-
-  const handleResetToDay = async (targetDay: number) => {
-    if (!wodState?.id) return;
-    
-    const newDayCount = targetDay - 1; // Day 1 = day_count 0
-    
-    setIsSaving(true);
-    try {
-      const { error } = await supabase
-        .from("workout_of_day_state")
-        .update({
-          day_count: newDayCount,
-          updated_at: new Date().toISOString()
-        })
-        .eq("id", wodState.id);
-
-      if (error) throw error;
-
-      toast.success(`Reset to Day ${targetDay}`, {
-        description: `Next WOD will be ${CATEGORY_CYCLE_8DAY[newDayCount % 8]}`
-      });
-      
-      queryClient.invalidateQueries({ queryKey: ["wod-state"] });
-    } catch (error: any) {
-      toast.error("Failed to reset", { description: error.message });
     } finally {
       setIsSaving(false);
     }
@@ -196,17 +147,17 @@ export const PeriodizationSystemDialog = ({
   const previewDayInCycle = (editDayCount % 8) + 1;
   const previewCategory = CATEGORY_CYCLE_8DAY[editDayCount % 8];
   
-  // Calculate shifted pattern for current week
-  const shiftAmount = (weekNumber - 1) % 8;
+  // Calculate shifted pattern for current week using calendar-based week
+  const shiftAmount = (tomorrowInfo.weekNumber - 1) % 8;
   const getShiftedDifficulty = (dayIndex: number) => {
     const shiftedIndex = (dayIndex + shiftAmount) % 8;
     return DIFFICULTY_PATTERN_BASE[shiftedIndex];
   };
 
   const getDifficultyColor = (level: string) => {
-    if (level === "Beginner") return "bg-yellow-500/20 text-yellow-400 border-yellow-500/30"; // Beginner = YELLOW
-    if (level === "Intermediate") return "bg-green-500/20 text-green-400 border-green-500/30"; // Intermediate = GREEN
-    return "bg-red-500/20 text-red-400 border-red-500/30"; // Advanced = RED
+    if (level === "Beginner") return "bg-yellow-500/20 text-yellow-400 border-yellow-500/30";
+    if (level === "Intermediate") return "bg-green-500/20 text-green-400 border-green-500/30";
+    return "bg-red-500/20 text-red-400 border-red-500/30";
   };
 
   return (
@@ -237,10 +188,16 @@ export const PeriodizationSystemDialog = ({
               <CardHeader className="pb-2">
                 <CardTitle className="text-sm flex items-center gap-2">
                   <Calendar className="h-4 w-4" />
-                  8-Day Category Cycle
+                  8-Day Category Cycle (Calendar-Anchored)
                 </CardTitle>
               </CardHeader>
               <CardContent>
+                <div className="p-3 bg-green-500/10 border border-green-500/30 rounded-lg mb-4">
+                  <p className="text-sm text-green-400">
+                    <strong>✓ Calendar-Anchored System:</strong> Categories are now determined by the calendar date, not counters. 
+                    Reference: <code className="bg-muted px-1 rounded">{CYCLE_START_DATE}</code> = Day 1 (CHALLENGE)
+                  </p>
+                </div>
                 <Table>
                   <TableHeader>
                     <TableRow>
@@ -253,21 +210,23 @@ export const PeriodizationSystemDialog = ({
                     {CATEGORY_CYCLE_8DAY.map((category, index) => (
                       <TableRow 
                         key={index} 
-                        className={index + 1 === dayInCycle ? "bg-primary/10" : ""}
+                        className={index + 1 === tomorrowInfo.dayInCycle ? "bg-primary/10" : ""}
                       >
                         <TableCell className="font-medium">Day {index + 1}</TableCell>
                         <TableCell>
                           <Badge variant="secondary">{category}</Badge>
                         </TableCell>
                         <TableCell>
-                          {index + 1 === dayInCycle ? (
-                            <Badge className="bg-primary/20 text-primary border-primary/30">
-                              Next WOD
+                          {index + 1 === todayInfo.dayInCycle ? (
+                            <Badge className="bg-blue-500/20 text-blue-400 border-blue-500/30">
+                              Today
                             </Badge>
-                          ) : index + 1 < dayInCycle ? (
-                            <span className="text-muted-foreground text-sm">Completed</span>
+                          ) : index + 1 === tomorrowInfo.dayInCycle ? (
+                            <Badge className="bg-primary/20 text-primary border-primary/30">
+                              Tomorrow's WOD
+                            </Badge>
                           ) : (
-                            <span className="text-muted-foreground text-sm">Upcoming</span>
+                            <span className="text-muted-foreground text-sm">—</span>
                           )}
                         </TableCell>
                       </TableRow>
@@ -292,7 +251,7 @@ export const PeriodizationSystemDialog = ({
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="p-3 bg-muted/50 rounded-lg">
-                  <p className="text-sm font-medium">Week {weekNumber} Pattern (shifted by {shiftAmount} positions)</p>
+                  <p className="text-sm font-medium">Week {tomorrowInfo.weekNumber} Pattern (shifted by {shiftAmount} positions)</p>
                 </div>
                 
                 <Table>
@@ -309,17 +268,17 @@ export const PeriodizationSystemDialog = ({
                       return (
                         <TableRow 
                           key={index}
-                          className={index + 1 === dayInCycle ? "bg-primary/10" : ""}
+                          className={index + 1 === tomorrowInfo.dayInCycle ? "bg-primary/10" : ""}
                         >
                           <TableCell className="font-medium">Day {index + 1}</TableCell>
                           <TableCell>
                             <Badge variant="outline" className={getDifficultyColor(pattern.level)}>
-                              {pattern.level} ({pattern.range})
+                              {pattern.level} ({pattern.range[0]}-{pattern.range[1]}★)
                             </Badge>
                           </TableCell>
                           <TableCell>
                             <Badge variant="outline" className={getDifficultyColor(shifted.level)}>
-                              {shifted.level} ({shifted.range})
+                              {shifted.level} ({shifted.range[0]}-{shifted.range[1]}★)
                             </Badge>
                           </TableCell>
                         </TableRow>
@@ -331,7 +290,7 @@ export const PeriodizationSystemDialog = ({
                 <div className="p-3 bg-muted/30 rounded-lg space-y-2">
                   <p className="text-sm font-medium">How Difficulty Rotation Works:</p>
                   <ul className="text-sm text-muted-foreground list-disc list-inside space-y-1">
-                    <li>Base pattern: Intermediate → Advanced → Beginner → Advanced → Intermediate → Beginner → Advanced</li>
+                    <li>Base pattern: Intermediate → Advanced → Beginner → Advanced → Intermediate → Beginner → Advanced → Intermediate</li>
                     <li>Each week, the pattern shifts by 1 position</li>
                     <li>This ensures categories don't always get the same difficulty</li>
                     <li>Within each range (e.g., 3-4★), stars alternate to prevent repetition</li>
@@ -406,7 +365,7 @@ export const PeriodizationSystemDialog = ({
                   {!isEditing ? (
                     <Button variant="outline" size="sm" onClick={handleStartEdit}>
                       <Settings className="h-3 w-3 mr-1" />
-                      Edit
+                      Edit Legacy Counters
                     </Button>
                   ) : (
                     <div className="flex gap-2">
@@ -422,18 +381,48 @@ export const PeriodizationSystemDialog = ({
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
+                {/* Calendar-derived source of truth */}
+                <div className="p-4 bg-green-500/10 border border-green-500/30 rounded-lg space-y-3">
+                  <div className="flex items-center gap-2">
+                    <CalendarDays className="h-5 w-5 text-green-400" />
+                    <p className="text-sm font-medium text-green-400">Calendar-Derived (Source of Truth)</p>
+                  </div>
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                    <div className="p-2 bg-background/50 rounded">
+                      <p className="text-xs text-muted-foreground">Today ({todayDateStr})</p>
+                      <p className="font-bold">Day {todayInfo.dayInCycle}/8</p>
+                      <Badge variant="secondary" className="mt-1 text-xs">{todayInfo.category}</Badge>
+                    </div>
+                    <div className="p-2 bg-background/50 rounded">
+                      <p className="text-xs text-muted-foreground">Tomorrow ({tomorrowDateStr})</p>
+                      <p className="font-bold">Day {tomorrowInfo.dayInCycle}/8</p>
+                      <Badge variant="secondary" className="mt-1 text-xs">{tomorrowInfo.category}</Badge>
+                    </div>
+                    <div className="p-2 bg-background/50 rounded">
+                      <p className="text-xs text-muted-foreground">Current Week</p>
+                      <p className="font-bold">Week {tomorrowInfo.weekNumber}</p>
+                    </div>
+                    <div className="p-2 bg-background/50 rounded">
+                      <p className="text-xs text-muted-foreground">Difficulty</p>
+                      <Badge className={`mt-1 text-xs ${getDifficultyColor(tomorrowInfo.difficulty.level)}`}>
+                        {tomorrowInfo.difficulty.level} ({tomorrowInfo.difficulty.range[0]}-{tomorrowInfo.difficulty.range[1]}★)
+                      </Badge>
+                    </div>
+                  </div>
+                </div>
+
                 {isEditing ? (
                   <>
                     <div className="p-3 bg-yellow-500/10 border border-yellow-500/30 rounded-lg flex items-start gap-2">
                       <AlertTriangle className="h-4 w-4 text-yellow-500 mt-0.5" />
                       <p className="text-sm text-yellow-400">
-                        Changing these values will affect the WOD rotation. Use with caution.
+                        These are legacy counters. Categories are now determined by calendar date, not these values.
                       </p>
                     </div>
                     
                     <div className="grid grid-cols-2 gap-4">
                       <div className="space-y-2">
-                        <Label>Total Day Count</Label>
+                        <Label>Total Day Count (Legacy)</Label>
                         <Input
                           type="number"
                           min={0}
@@ -441,11 +430,11 @@ export const PeriodizationSystemDialog = ({
                           onChange={(e) => setEditDayCount(parseInt(e.target.value) || 0)}
                         />
                         <p className="text-xs text-muted-foreground">
-                          Day in cycle: {previewDayInCycle}/7 → {previewCategory}
+                          Legacy value: Day {previewDayInCycle}/8 → {previewCategory}
                         </p>
                       </div>
                       <div className="space-y-2">
-                        <Label>Week Number</Label>
+                        <Label>Week Number (Legacy)</Label>
                         <Input
                           type="number"
                           min={1}
@@ -453,53 +442,35 @@ export const PeriodizationSystemDialog = ({
                           onChange={(e) => setEditWeekNumber(parseInt(e.target.value) || 1)}
                         />
                         <p className="text-xs text-muted-foreground">
-                          Affects difficulty pattern shift
+                          Used for internal tracking only
                         </p>
                       </div>
                     </div>
                   </>
                 ) : (
-                  <div className="grid grid-cols-2 gap-4">
-                    <div className="p-3 bg-muted/30 rounded-lg">
-                      <p className="text-xs text-muted-foreground">Total Day Count</p>
-                      <p className="text-xl font-bold">{wodState?.day_count || 0}</p>
-                    </div>
-                    <div className="p-3 bg-muted/30 rounded-lg">
-                      <p className="text-xs text-muted-foreground">Day in Cycle</p>
-                      <p className="text-xl font-bold">{dayInCycle} / 7</p>
-                    </div>
-                    <div className="p-3 bg-muted/30 rounded-lg">
-                      <p className="text-xs text-muted-foreground">Week Number</p>
-                      <p className="text-xl font-bold">{weekNumber}</p>
-                    </div>
-                    <div className="p-3 bg-muted/30 rounded-lg">
-                      <p className="text-xs text-muted-foreground">Next Category</p>
-                      <Badge variant="secondary" className="mt-1">
-                        {CATEGORY_CYCLE_8DAY[(wodState?.day_count || 0) % 8]}
-                      </Badge>
+                  <div className="p-3 bg-muted/30 rounded-lg">
+                    <p className="text-sm font-medium mb-2 text-muted-foreground">Legacy Counters (for reference only):</p>
+                    <div className="grid grid-cols-3 gap-3">
+                      <div className="p-2 bg-background/50 rounded">
+                        <p className="text-xs text-muted-foreground">Day Count</p>
+                        <p className="text-lg font-bold text-muted-foreground">{wodState?.day_count || 0}</p>
+                      </div>
+                      <div className="p-2 bg-background/50 rounded">
+                        <p className="text-xs text-muted-foreground">Legacy Day in Cycle</p>
+                        <p className="text-lg font-bold text-muted-foreground">{legacyDayInCycle}/8</p>
+                      </div>
+                      <div className="p-2 bg-background/50 rounded">
+                        <p className="text-xs text-muted-foreground">Legacy Week</p>
+                        <p className="text-lg font-bold text-muted-foreground">{legacyWeekNumber}</p>
+                      </div>
                     </div>
                   </div>
                 )}
 
-                {/* Quick Reset Buttons */}
+                {/* Quick Actions */}
                 <div className="p-3 bg-muted/30 rounded-lg space-y-3">
                   <p className="text-sm font-medium">Quick Actions:</p>
-                  <div className="flex flex-wrap gap-2">
-                    {[1, 2, 3, 4, 5, 6, 7].map((day) => (
-                      <Button
-                        key={day}
-                        variant="outline"
-                        size="sm"
-                        onClick={() => handleResetToDay(day)}
-                        disabled={isSaving}
-                        className="text-xs"
-                      >
-                        <RotateCcw className="h-3 w-3 mr-1" />
-                        Reset to Day {day}
-                      </Button>
-                    ))}
-                  </div>
-                  <div className="flex gap-2 pt-2 border-t border-border/50">
+                  <div className="flex gap-2 pt-2">
                     <Button
                       variant="outline"
                       size="sm"
@@ -568,9 +539,8 @@ export const PeriodizationSystemDialog = ({
                   <p className="text-sm font-medium text-blue-400 mb-2">How Manual Overrides Work:</p>
                   <ul className="text-sm text-muted-foreground list-disc list-inside space-y-1">
                     <li>Overrides only affect specific dates</li>
-                    <li>They do NOT break the rotation system</li>
-                    <li>The day count continues to increment normally</li>
-                    <li>After an override, the next day resumes normal rotation</li>
+                    <li>They do NOT break the calendar-based rotation</li>
+                    <li>After an override, the next day resumes normal calendar-based rotation</li>
                     <li>Use overrides for special occasions or theme days</li>
                   </ul>
                 </div>
@@ -605,9 +575,8 @@ export const PeriodizationSystemDialog = ({
 
                 <div className="p-3 bg-yellow-500/10 border border-yellow-500/30 rounded-lg">
                   <p className="text-sm text-yellow-400">
-                    To add a manual override, update the <code className="bg-muted px-1 rounded">manual_overrides</code> field 
-                    in the <code className="bg-muted px-1 rounded">workout_of_day_state</code> table with a date key 
-                    (YYYY-MM-DD format) and override settings.
+                    To add a manual override, use the "Upcoming WOD Schedule" section in the WOD Manager 
+                    or update the <code className="bg-muted px-1 rounded">manual_overrides</code> field directly.
                   </p>
                 </div>
               </CardContent>
