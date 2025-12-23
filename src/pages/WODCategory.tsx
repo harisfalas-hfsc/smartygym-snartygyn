@@ -230,7 +230,7 @@ const WODCategory = () => {
                     <a href="/coach-profile" className="text-primary hover:underline font-semibold">
                       Coach Haris Falas
                     </a>
-                    , ensuring that within each weekly cycle, you train all fitness parameters — strength, endurance, mobility, cardio and metabolic conditioning. Unlike random workouts you find on YouTube or Instagram, following{" "}
+                    , ensuring that within each weekly cycle, you train all fitness parameters. Unlike random workouts you find on YouTube or Instagram, following{" "}
                     <span className="text-primary font-semibold">SmartyGym</span>'s structured program means you can rest assured that your training is reliable, professionally organized, and designed to systematically improve all aspects of your fitness.
                   </p>
                 </div>
