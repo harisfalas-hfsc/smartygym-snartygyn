@@ -2,7 +2,7 @@ import { format, subDays, addDays } from "date-fns";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { ChevronLeft, ChevronRight } from "lucide-react";
-import { getWODInfoForDate, getDifficultyBadgeClass } from "@/lib/wodCycle";
+import { getWODInfoForDate, getDifficultyBadgeClass, getDifficultyBorderClass } from "@/lib/wodCycle";
 
 /**
  * Compact Periodization Calendar - Pure Calendar-Based (NO Database)
@@ -32,13 +32,14 @@ const WODPeriodizationCalendar = () => {
   ) => {
     const dayOfWeek = format(new Date(dateStr), "EEE");
     const dayNumber = format(new Date(dateStr), "d");
+    const borderColor = getDifficultyBorderClass(info.difficulty.level);
 
     return (
       <div
-        className={`flex flex-col items-center p-2 rounded-md transition-all ${
+        className={`flex flex-col items-center p-2 rounded-md transition-all ${borderColor} ${
           isToday
-            ? "bg-primary/10 border-2 border-primary"
-            : "bg-muted/30 border border-border/50"
+            ? "bg-primary/10 border-2"
+            : "bg-muted/30 border"
         }`}
       >
         {/* Day Label */}
