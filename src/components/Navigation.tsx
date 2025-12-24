@@ -279,14 +279,6 @@ export const Navigation = () => {
                   </Button>
                   <Button
                     variant="ghost"
-                    onClick={() => handleNavigate("/corporate")}
-                    className={`justify-start font-semibold transition-all duration-200 ${location.pathname === '/corporate' ? 'text-primary underline underline-offset-4 bg-primary/10' : 'text-foreground hover:bg-primary/10 hover:text-foreground'}`}
-                  >
-                    <Building2 className="mr-2 h-4 w-4 text-sky-500" />
-                    Smarty Corporate
-                  </Button>
-                  <Button
-                    variant="ghost"
                     onClick={() => handleNavigate("/exerciselibrary")}
                     className={`justify-start font-semibold transition-all duration-200 ${location.pathname === '/exerciselibrary' ? 'text-primary underline underline-offset-4 bg-primary/10' : 'text-foreground hover:bg-primary/10 hover:text-foreground'}`}
                   >
@@ -324,6 +316,14 @@ export const Navigation = () => {
                   >
                     <Info className="mr-2 h-4 w-4 text-teal-500" />
                     Take a Tour
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    onClick={() => handleNavigate("/corporate")}
+                    className={`justify-start font-semibold transition-all duration-200 ${location.pathname === '/corporate' ? 'text-primary underline underline-offset-4 bg-primary/10' : 'text-foreground hover:bg-primary/10 hover:text-foreground'}`}
+                  >
+                    <Building2 className="mr-2 h-4 w-4 text-sky-500" />
+                    Smarty Corporate
                   </Button>
                   <Button
                     variant="ghost"
