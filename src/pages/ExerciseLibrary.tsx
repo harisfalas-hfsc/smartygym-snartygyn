@@ -91,7 +91,12 @@ const ExerciseLibrary = () => {
             <CardContent className="p-4 sm:p-5">
               <h2 className="text-xl sm:text-2xl font-bold mb-3 text-center">About Exercise Library</h2>
               <div className="space-y-2 text-muted-foreground max-w-3xl mx-auto">
-                <p className="text-sm sm:text-base text-center">
+                {/* Mobile: Short description only */}
+                <p className="md:hidden text-sm text-center">
+                  Your comprehensive resource for learning exercises through video demonstrations and detailed instructions.
+                </p>
+                {/* Desktop: Full description */}
+                <p className="hidden md:block text-base text-center">
                   Your comprehensive resource for learning exercises through video demonstrations and detailed instructions. 
                   Browse the Exercise Database with hundreds of movements, watch curated videos in the <span className="text-primary font-semibold">SmartyGym</span> Video Gallery, 
                   and explore The <span className="text-primary font-semibold">SmartyGym</span> YouTube channel for expert tutorials by Sports Scientist <a href="/coach-profile" className="text-primary hover:underline font-semibold whitespace-nowrap">Haris Falas</a>. 
@@ -115,8 +120,8 @@ const ExerciseLibrary = () => {
             </CardContent>
           </Card>
 
-          {/* SmartyGym Video Gallery Card */}
-          <Card className="border-2 border-primary/30 shadow-lg mb-6">
+          {/* SmartyGym Video Gallery Card - Hidden on mobile */}
+          <Card className="hidden md:block border-2 border-primary/30 shadow-lg mb-6">
             <CardContent className="p-6">
               <div className="flex items-center gap-3 mb-4">
                 <Video className="h-6 w-6 text-primary" />
@@ -128,8 +133,8 @@ const ExerciseLibrary = () => {
             </CardContent>
           </Card>
 
-          {/* YouTube Channel Card */}
-          <Card className="border-2 border-primary/30 shadow-lg">
+          {/* YouTube Channel Card - Hidden on mobile */}
+          <Card className="hidden md:block border-2 border-primary/30 shadow-lg">
             <CardContent className="p-6">
               <div className="bg-gradient-to-r from-primary/10 to-primary/5 p-6 rounded-lg border border-primary/20 mb-6">
                 <div className="flex flex-col sm:flex-row items-center gap-2 sm:gap-3 justify-center mb-3">
