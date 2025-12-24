@@ -1,121 +1,29 @@
 /**
- * WOD Cycle Utilities - 28-Day Fixed Periodization System with 84-Day Strength Rotation
+ * WOD Cycle Utilities - Simple 84-Day Periodization Cycle
  * 
  * CRITICAL: This file is the SINGLE SOURCE OF TRUTH for WOD cycle calculations.
- * Both frontend and backend use identical logic anchored to CYCLE_START_DATE.
  * 
- * The cycle is CALENDAR-ANCHORED and FIXED:
- * - 28-day cycle with predefined category + difficulty for each day
- * - NO shifts, NO weekly rotations - just repeat after 28 days
- * - Recovery days (10 and 28) have no difficulty level
- * 
- * STRENGTH DAYS (2, 5, 12, 15, 20, 23) use an 84-day super-cycle:
- * - Every 28-day cycle, the difficulty rotates for Strength days only
- * - Over 3 cycles (84 days), each Strength focus experiences all difficulty levels
- * - Non-Strength categories remain fixed with their base difficulty
+ * Simple 84-day cycle: Day 1 to Day 84, then restart.
+ * Each day has a fixed category AND difficulty - no complex rotation logic.
+ * Reference date: December 24, 2024 = Day 1 (CARDIO/Beginner)
  */
 
-// Reference date: December 24, 2024 = Day 1 (CARDIO/BEGINNER)
-// This anchors the 28-day cycle to the calendar
+// Reference date: December 24, 2024 = Day 1
 export const CYCLE_START_DATE = '2024-12-24';
 
-// ═══════════════════════════════════════════════════════════════════════════════
-// 84-DAY STRENGTH DIFFICULTY ROTATION (3 x 28-day cycles)
-// Only affects Strength days - all other categories use base periodization
-// ═══════════════════════════════════════════════════════════════════════════════
-export const STRENGTH_84DAY_ROTATION: Record<number, Array<{
-  difficulty: "Beginner" | "Intermediate" | "Advanced";
-  stars: [number, number];
-}>> = {
-  // Day 2 - LOWER BODY: Advanced → Intermediate → Beginner
-  2: [
-    { difficulty: "Advanced", stars: [5, 6] },
-    { difficulty: "Intermediate", stars: [3, 4] },
-    { difficulty: "Beginner", stars: [1, 2] }
-  ],
-  // Day 5 - UPPER BODY: Intermediate → Beginner → Advanced
-  5: [
-    { difficulty: "Intermediate", stars: [3, 4] },
-    { difficulty: "Beginner", stars: [1, 2] },
-    { difficulty: "Advanced", stars: [5, 6] }
-  ],
-  // Day 12 - FULL BODY: Advanced → Beginner → Intermediate
-  12: [
-    { difficulty: "Advanced", stars: [5, 6] },
-    { difficulty: "Beginner", stars: [1, 2] },
-    { difficulty: "Intermediate", stars: [3, 4] }
-  ],
-  // Day 15 - LOW PUSH & UPPER PULL: Beginner → Advanced → Intermediate
-  15: [
-    { difficulty: "Beginner", stars: [1, 2] },
-    { difficulty: "Advanced", stars: [5, 6] },
-    { difficulty: "Intermediate", stars: [3, 4] }
-  ],
-  // Day 20 - LOW PULL & UPPER PUSH: Intermediate → Beginner → Advanced
-  20: [
-    { difficulty: "Intermediate", stars: [3, 4] },
-    { difficulty: "Beginner", stars: [1, 2] },
-    { difficulty: "Advanced", stars: [5, 6] }
-  ],
-  // Day 23 - CORE & GLUTES: Advanced → Intermediate → Beginner
-  23: [
-    { difficulty: "Advanced", stars: [5, 6] },
-    { difficulty: "Intermediate", stars: [3, 4] },
-    { difficulty: "Beginner", stars: [1, 2] }
-  ]
-};
-
-// 28-DAY BASE PERIODIZATION (from WOD_PERIODIZATION.docx)
-// NOTE: For Strength days, the difficulty is overridden by STRENGTH_84DAY_ROTATION
-export const PERIODIZATION_28DAY: Array<{
-  day: number;
-  category: string;
-  difficulty: "Beginner" | "Intermediate" | "Advanced" | null;
-  difficultyStars: [number, number] | null; // Star range for this difficulty
-}> = [
-  { day: 1,  category: "CARDIO",              difficulty: "Beginner",     difficultyStars: [1, 2] },
-  { day: 2,  category: "STRENGTH",            difficulty: "Advanced",     difficultyStars: [5, 6] }, // Overridden by 84-day rotation
-  { day: 3,  category: "MOBILITY & STABILITY", difficulty: "Intermediate", difficultyStars: [3, 4] },
-  { day: 4,  category: "CHALLENGE",           difficulty: "Advanced",     difficultyStars: [5, 6] },
-  { day: 5,  category: "STRENGTH",            difficulty: "Intermediate", difficultyStars: [3, 4] }, // Overridden by 84-day rotation
-  { day: 6,  category: "PILATES",             difficulty: "Advanced",     difficultyStars: [5, 6] },
-  { day: 7,  category: "CALORIE BURNING",     difficulty: "Intermediate", difficultyStars: [3, 4] },
-  { day: 8,  category: "METABOLIC",           difficulty: "Beginner",     difficultyStars: [1, 2] },
-  { day: 9,  category: "CHALLENGE",           difficulty: "Advanced",     difficultyStars: [5, 6] },
-  { day: 10, category: "RECOVERY",            difficulty: null,           difficultyStars: null },
-  { day: 11, category: "CARDIO",              difficulty: "Intermediate", difficultyStars: [3, 4] },
-  { day: 12, category: "STRENGTH",            difficulty: "Intermediate", difficultyStars: [3, 4] }, // Overridden by 84-day rotation
-  { day: 13, category: "MOBILITY & STABILITY", difficulty: "Advanced",     difficultyStars: [5, 6] },
-  { day: 14, category: "CHALLENGE",           difficulty: "Intermediate", difficultyStars: [3, 4] },
-  { day: 15, category: "STRENGTH",            difficulty: "Intermediate", difficultyStars: [3, 4] }, // Overridden by 84-day rotation
-  { day: 16, category: "PILATES",             difficulty: "Beginner",     difficultyStars: [1, 2] },
-  { day: 17, category: "CALORIE BURNING",     difficulty: "Advanced",     difficultyStars: [5, 6] },
-  { day: 18, category: "METABOLIC",           difficulty: "Intermediate", difficultyStars: [3, 4] },
-  { day: 19, category: "CARDIO",              difficulty: "Advanced",     difficultyStars: [5, 6] },
-  { day: 20, category: "STRENGTH",            difficulty: "Beginner",     difficultyStars: [1, 2] }, // Overridden by 84-day rotation
-  { day: 21, category: "MOBILITY & STABILITY", difficulty: "Beginner",     difficultyStars: [1, 2] },
-  { day: 22, category: "CHALLENGE",           difficulty: "Intermediate", difficultyStars: [3, 4] },
-  { day: 23, category: "STRENGTH",            difficulty: "Advanced",     difficultyStars: [5, 6] }, // Overridden by 84-day rotation
-  { day: 24, category: "PILATES",             difficulty: "Intermediate", difficultyStars: [3, 4] },
-  { day: 25, category: "CALORIE BURNING",     difficulty: "Beginner",     difficultyStars: [1, 2] },
-  { day: 26, category: "METABOLIC",           difficulty: "Advanced",     difficultyStars: [5, 6] },
-  { day: 27, category: "CHALLENGE",           difficulty: "Intermediate", difficultyStars: [3, 4] },
-  { day: 28, category: "RECOVERY",            difficulty: null,           difficultyStars: null },
-];
-
-// FORMAT RULES BY CATEGORY (STRICT - unchanged from original)
+// FORMAT RULES BY CATEGORY (STRICT)
 export const FORMATS_BY_CATEGORY: Record<string, string[]> = {
-  "STRENGTH": ["REPS & SETS"], // ONLY Reps & Sets
-  "MOBILITY & STABILITY": ["REPS & SETS"], // ONLY Reps & Sets
-  "PILATES": ["REPS & SETS"], // ONLY Reps & Sets
+  "STRENGTH": ["REPS & SETS"],
+  "MOBILITY & STABILITY": ["REPS & SETS"],
+  "PILATES": ["REPS & SETS"],
   "CARDIO": ["CIRCUIT", "EMOM", "FOR TIME", "AMRAP", "TABATA"],
   "METABOLIC": ["CIRCUIT", "AMRAP", "EMOM", "FOR TIME", "TABATA"],
   "CALORIE BURNING": ["CIRCUIT", "TABATA", "AMRAP", "FOR TIME", "EMOM"],
   "CHALLENGE": ["CIRCUIT", "TABATA", "AMRAP", "EMOM", "FOR TIME", "MIX"],
-  "RECOVERY": ["CIRCUIT", "REPS & SETS"] // Light stretching and mobility
+  "RECOVERY": ["CIRCUIT", "REPS & SETS"]
 };
 
-// All valid categories in the system
+// All valid categories
 export const ALL_CATEGORIES = [
   "CARDIO",
   "STRENGTH", 
@@ -128,9 +36,7 @@ export const ALL_CATEGORIES = [
 ] as const;
 
 /**
- * STRENGTH CATEGORY FOCUS BY CYCLE DAY
- * Each strength day has a specific muscle group/movement pattern focus
- * The AI uses intelligent pattern recognition - examples are NOT exhaustive
+ * STRENGTH CATEGORY FOCUS BY CYCLE DAY (within each 28-day block)
  */
 export const STRENGTH_DAY_FOCUS: Record<number, {
   focus: string;
@@ -176,72 +82,150 @@ export const STRENGTH_DAY_FOCUS: Record<number, {
   }
 };
 
+// ═══════════════════════════════════════════════════════════════════════════════
+// COMPLETE 84-DAY PERIODIZATION - Pre-computed, no rotation logic needed
+// Days 1-28 = Cycle 1, Days 29-56 = Cycle 2, Days 57-84 = Cycle 3
+// ═══════════════════════════════════════════════════════════════════════════════
+export const PERIODIZATION_84DAY: Array<{
+  day: number; // 1-84
+  category: string;
+  difficulty: "Beginner" | "Intermediate" | "Advanced" | null;
+  difficultyStars: [number, number] | null;
+  strengthFocus?: string;
+}> = [
+  // ═══ CYCLE 1 (Days 1-28) ═══
+  { day: 1,  category: "CARDIO",              difficulty: "Beginner",     difficultyStars: [1, 2] },
+  { day: 2,  category: "STRENGTH",            difficulty: "Advanced",     difficultyStars: [5, 6], strengthFocus: "LOWER BODY" },
+  { day: 3,  category: "MOBILITY & STABILITY", difficulty: "Intermediate", difficultyStars: [3, 4] },
+  { day: 4,  category: "CHALLENGE",           difficulty: "Advanced",     difficultyStars: [5, 6] },
+  { day: 5,  category: "STRENGTH",            difficulty: "Intermediate", difficultyStars: [3, 4], strengthFocus: "UPPER BODY" },
+  { day: 6,  category: "PILATES",             difficulty: "Advanced",     difficultyStars: [5, 6] },
+  { day: 7,  category: "CALORIE BURNING",     difficulty: "Intermediate", difficultyStars: [3, 4] },
+  { day: 8,  category: "METABOLIC",           difficulty: "Beginner",     difficultyStars: [1, 2] },
+  { day: 9,  category: "CHALLENGE",           difficulty: "Advanced",     difficultyStars: [5, 6] },
+  { day: 10, category: "RECOVERY",            difficulty: null,           difficultyStars: null },
+  { day: 11, category: "CARDIO",              difficulty: "Intermediate", difficultyStars: [3, 4] },
+  { day: 12, category: "STRENGTH",            difficulty: "Advanced",     difficultyStars: [5, 6], strengthFocus: "FULL BODY" },
+  { day: 13, category: "MOBILITY & STABILITY", difficulty: "Advanced",     difficultyStars: [5, 6] },
+  { day: 14, category: "CHALLENGE",           difficulty: "Intermediate", difficultyStars: [3, 4] },
+  { day: 15, category: "STRENGTH",            difficulty: "Beginner",     difficultyStars: [1, 2], strengthFocus: "LOW PUSH & UPPER PULL" },
+  { day: 16, category: "PILATES",             difficulty: "Beginner",     difficultyStars: [1, 2] },
+  { day: 17, category: "CALORIE BURNING",     difficulty: "Advanced",     difficultyStars: [5, 6] },
+  { day: 18, category: "METABOLIC",           difficulty: "Intermediate", difficultyStars: [3, 4] },
+  { day: 19, category: "CARDIO",              difficulty: "Advanced",     difficultyStars: [5, 6] },
+  { day: 20, category: "STRENGTH",            difficulty: "Intermediate", difficultyStars: [3, 4], strengthFocus: "LOW PULL & UPPER PUSH" },
+  { day: 21, category: "MOBILITY & STABILITY", difficulty: "Beginner",     difficultyStars: [1, 2] },
+  { day: 22, category: "CHALLENGE",           difficulty: "Intermediate", difficultyStars: [3, 4] },
+  { day: 23, category: "STRENGTH",            difficulty: "Advanced",     difficultyStars: [5, 6], strengthFocus: "CORE & GLUTES" },
+  { day: 24, category: "PILATES",             difficulty: "Intermediate", difficultyStars: [3, 4] },
+  { day: 25, category: "CALORIE BURNING",     difficulty: "Beginner",     difficultyStars: [1, 2] },
+  { day: 26, category: "METABOLIC",           difficulty: "Advanced",     difficultyStars: [5, 6] },
+  { day: 27, category: "CHALLENGE",           difficulty: "Intermediate", difficultyStars: [3, 4] },
+  { day: 28, category: "RECOVERY",            difficulty: null,           difficultyStars: null },
+
+  // ═══ CYCLE 2 (Days 29-56) - Strength days rotate difficulty ═══
+  { day: 29, category: "CARDIO",              difficulty: "Beginner",     difficultyStars: [1, 2] },
+  { day: 30, category: "STRENGTH",            difficulty: "Intermediate", difficultyStars: [3, 4], strengthFocus: "LOWER BODY" },
+  { day: 31, category: "MOBILITY & STABILITY", difficulty: "Intermediate", difficultyStars: [3, 4] },
+  { day: 32, category: "CHALLENGE",           difficulty: "Advanced",     difficultyStars: [5, 6] },
+  { day: 33, category: "STRENGTH",            difficulty: "Beginner",     difficultyStars: [1, 2], strengthFocus: "UPPER BODY" },
+  { day: 34, category: "PILATES",             difficulty: "Advanced",     difficultyStars: [5, 6] },
+  { day: 35, category: "CALORIE BURNING",     difficulty: "Intermediate", difficultyStars: [3, 4] },
+  { day: 36, category: "METABOLIC",           difficulty: "Beginner",     difficultyStars: [1, 2] },
+  { day: 37, category: "CHALLENGE",           difficulty: "Advanced",     difficultyStars: [5, 6] },
+  { day: 38, category: "RECOVERY",            difficulty: null,           difficultyStars: null },
+  { day: 39, category: "CARDIO",              difficulty: "Intermediate", difficultyStars: [3, 4] },
+  { day: 40, category: "STRENGTH",            difficulty: "Beginner",     difficultyStars: [1, 2], strengthFocus: "FULL BODY" },
+  { day: 41, category: "MOBILITY & STABILITY", difficulty: "Advanced",     difficultyStars: [5, 6] },
+  { day: 42, category: "CHALLENGE",           difficulty: "Intermediate", difficultyStars: [3, 4] },
+  { day: 43, category: "STRENGTH",            difficulty: "Advanced",     difficultyStars: [5, 6], strengthFocus: "LOW PUSH & UPPER PULL" },
+  { day: 44, category: "PILATES",             difficulty: "Beginner",     difficultyStars: [1, 2] },
+  { day: 45, category: "CALORIE BURNING",     difficulty: "Advanced",     difficultyStars: [5, 6] },
+  { day: 46, category: "METABOLIC",           difficulty: "Intermediate", difficultyStars: [3, 4] },
+  { day: 47, category: "CARDIO",              difficulty: "Advanced",     difficultyStars: [5, 6] },
+  { day: 48, category: "STRENGTH",            difficulty: "Beginner",     difficultyStars: [1, 2], strengthFocus: "LOW PULL & UPPER PUSH" },
+  { day: 49, category: "MOBILITY & STABILITY", difficulty: "Beginner",     difficultyStars: [1, 2] },
+  { day: 50, category: "CHALLENGE",           difficulty: "Intermediate", difficultyStars: [3, 4] },
+  { day: 51, category: "STRENGTH",            difficulty: "Intermediate", difficultyStars: [3, 4], strengthFocus: "CORE & GLUTES" },
+  { day: 52, category: "PILATES",             difficulty: "Intermediate", difficultyStars: [3, 4] },
+  { day: 53, category: "CALORIE BURNING",     difficulty: "Beginner",     difficultyStars: [1, 2] },
+  { day: 54, category: "METABOLIC",           difficulty: "Advanced",     difficultyStars: [5, 6] },
+  { day: 55, category: "CHALLENGE",           difficulty: "Intermediate", difficultyStars: [3, 4] },
+  { day: 56, category: "RECOVERY",            difficulty: null,           difficultyStars: null },
+
+  // ═══ CYCLE 3 (Days 57-84) - Strength days rotate difficulty again ═══
+  { day: 57, category: "CARDIO",              difficulty: "Beginner",     difficultyStars: [1, 2] },
+  { day: 58, category: "STRENGTH",            difficulty: "Beginner",     difficultyStars: [1, 2], strengthFocus: "LOWER BODY" },
+  { day: 59, category: "MOBILITY & STABILITY", difficulty: "Intermediate", difficultyStars: [3, 4] },
+  { day: 60, category: "CHALLENGE",           difficulty: "Advanced",     difficultyStars: [5, 6] },
+  { day: 61, category: "STRENGTH",            difficulty: "Advanced",     difficultyStars: [5, 6], strengthFocus: "UPPER BODY" },
+  { day: 62, category: "PILATES",             difficulty: "Advanced",     difficultyStars: [5, 6] },
+  { day: 63, category: "CALORIE BURNING",     difficulty: "Intermediate", difficultyStars: [3, 4] },
+  { day: 64, category: "METABOLIC",           difficulty: "Beginner",     difficultyStars: [1, 2] },
+  { day: 65, category: "CHALLENGE",           difficulty: "Advanced",     difficultyStars: [5, 6] },
+  { day: 66, category: "RECOVERY",            difficulty: null,           difficultyStars: null },
+  { day: 67, category: "CARDIO",              difficulty: "Intermediate", difficultyStars: [3, 4] },
+  { day: 68, category: "STRENGTH",            difficulty: "Intermediate", difficultyStars: [3, 4], strengthFocus: "FULL BODY" },
+  { day: 69, category: "MOBILITY & STABILITY", difficulty: "Advanced",     difficultyStars: [5, 6] },
+  { day: 70, category: "CHALLENGE",           difficulty: "Intermediate", difficultyStars: [3, 4] },
+  { day: 71, category: "STRENGTH",            difficulty: "Intermediate", difficultyStars: [3, 4], strengthFocus: "LOW PUSH & UPPER PULL" },
+  { day: 72, category: "PILATES",             difficulty: "Beginner",     difficultyStars: [1, 2] },
+  { day: 73, category: "CALORIE BURNING",     difficulty: "Advanced",     difficultyStars: [5, 6] },
+  { day: 74, category: "METABOLIC",           difficulty: "Intermediate", difficultyStars: [3, 4] },
+  { day: 75, category: "CARDIO",              difficulty: "Advanced",     difficultyStars: [5, 6] },
+  { day: 76, category: "STRENGTH",            difficulty: "Advanced",     difficultyStars: [5, 6], strengthFocus: "LOW PULL & UPPER PUSH" },
+  { day: 77, category: "MOBILITY & STABILITY", difficulty: "Beginner",     difficultyStars: [1, 2] },
+  { day: 78, category: "CHALLENGE",           difficulty: "Intermediate", difficultyStars: [3, 4] },
+  { day: 79, category: "STRENGTH",            difficulty: "Beginner",     difficultyStars: [1, 2], strengthFocus: "CORE & GLUTES" },
+  { day: 80, category: "PILATES",             difficulty: "Intermediate", difficultyStars: [3, 4] },
+  { day: 81, category: "CALORIE BURNING",     difficulty: "Beginner",     difficultyStars: [1, 2] },
+  { day: 82, category: "METABOLIC",           difficulty: "Advanced",     difficultyStars: [5, 6] },
+  { day: 83, category: "CHALLENGE",           difficulty: "Intermediate", difficultyStars: [3, 4] },
+  { day: 84, category: "RECOVERY",            difficulty: null,           difficultyStars: null },
+];
+
 /**
- * Get day in cycle (1-28) from a date string
- * Uses calendar-anchored calculation - always correct regardless of any state
+ * Get day in 84-day cycle (1-84) from a date string
  */
-export const getDayInCycleFromDate = (dateStr: string): number => {
+export const getDayIn84Cycle = (dateStr: string): number => {
   const startDate = new Date(CYCLE_START_DATE + 'T00:00:00Z');
   const targetDate = new Date(dateStr + 'T00:00:00Z');
   const daysDiff = Math.floor((targetDate.getTime() - startDate.getTime()) / (24 * 60 * 60 * 1000));
-  // Handle negative numbers (dates before reference) properly with modulo
-  const normalizedDays = ((daysDiff % 28) + 28) % 28;
-  return normalizedDays + 1; // 1-28
+  const normalizedDays = ((daysDiff % 84) + 84) % 84;
+  return normalizedDays + 1; // 1-84
 };
 
 /**
- * Get cycle number from a date string
- * Cycle 1 starts on CYCLE_START_DATE, increments every 28 days
+ * Get periodization info for a specific day (1-84)
  */
-export const getCycleNumberFromDate = (dateStr: string): number => {
-  const startDate = new Date(CYCLE_START_DATE + 'T00:00:00Z');
-  const targetDate = new Date(dateStr + 'T00:00:00Z');
-  const daysDiff = Math.floor((targetDate.getTime() - startDate.getTime()) / (24 * 60 * 60 * 1000));
-  return Math.floor(daysDiff / 28) + 1;
+export const getPeriodizationForDay = (dayIn84: number): typeof PERIODIZATION_84DAY[0] => {
+  const index = Math.max(0, Math.min(83, dayIn84 - 1));
+  return PERIODIZATION_84DAY[index];
 };
 
 /**
- * Get periodization info for a specific day in cycle (1-28)
+ * Get category for a specific day (1-84)
  */
-export const getPeriodizationForDay = (dayInCycle: number): typeof PERIODIZATION_28DAY[0] => {
-  const index = Math.max(0, Math.min(27, dayInCycle - 1));
-  return PERIODIZATION_28DAY[index];
-};
-
-/**
- * Get category for a specific day in cycle (1-28)
- */
-export const getCategoryForDay = (dayInCycle: number): string => {
-  return getPeriodizationForDay(dayInCycle).category;
+export const getCategoryForDay = (dayIn84: number): string => {
+  return getPeriodizationForDay(dayIn84).category;
 };
 
 /**
  * Get category directly from a date string
  */
 export const getCategoryForDate = (dateStr: string): string => {
-  const dayInCycle = getDayInCycleFromDate(dateStr);
-  return getCategoryForDay(dayInCycle);
+  const dayIn84 = getDayIn84Cycle(dateStr);
+  return getCategoryForDay(dayIn84);
 };
 
 /**
- * Get difficulty info for a specific day in cycle
- * For STRENGTH days, uses the 84-day rotation based on cycle number
- * For all other categories, uses the fixed base periodization
+ * Get difficulty info for a specific day (1-84)
  */
-export const getDifficultyForDay = (dayInCycle: number, cycleNumber?: number): { 
+export const getDifficultyForDay = (dayIn84: number): { 
   level: string | null; 
   range: [number, number] | null;
 } => {
-  const periodization = getPeriodizationForDay(dayInCycle);
-  
-  // Apply 84-day rotation for STRENGTH days only
-  if (periodization.category === "STRENGTH" && cycleNumber !== undefined && STRENGTH_84DAY_ROTATION[dayInCycle]) {
-    const rotationIndex = (cycleNumber - 1) % 3; // 0, 1, or 2
-    const rotation = STRENGTH_84DAY_ROTATION[dayInCycle][rotationIndex];
-    return { level: rotation.difficulty, range: rotation.stars };
-  }
-  
-  // For non-Strength days, use the fixed base periodization
+  const periodization = getPeriodizationForDay(dayIn84);
   return {
     level: periodization.difficulty,
     range: periodization.difficultyStars
@@ -250,47 +234,40 @@ export const getDifficultyForDay = (dayInCycle: number, cycleNumber?: number): {
 
 /**
  * Get difficulty info directly from a date string
- * Automatically calculates cycle number for Strength day rotation
  */
 export const getDifficultyForDate = (dateStr: string): { 
   level: string | null; 
   range: [number, number] | null;
 } => {
-  const dayInCycle = getDayInCycleFromDate(dateStr);
-  const cycleNumber = getCycleNumberFromDate(dateStr);
-  return getDifficultyForDay(dayInCycle, cycleNumber);
+  const dayIn84 = getDayIn84Cycle(dateStr);
+  return getDifficultyForDay(dayIn84);
 };
 
 /**
- * Get full WOD info for a date
- * Uses 84-day rotation for Strength day difficulties
+ * Get full WOD info for a date - Simple 84-day lookup
  */
 export const getWODInfoForDate = (dateStr: string): {
-  dayInCycle: number;
-  cycleNumber: number;
+  dayIn84: number;
   category: string;
   difficulty: { level: string | null; range: [number, number] | null };
   formats: string[];
   isRecoveryDay: boolean;
+  strengthFocus?: string;
 } => {
-  const dayInCycle = getDayInCycleFromDate(dateStr);
-  const cycleNumber = getCycleNumberFromDate(dateStr);
-  const periodization = getPeriodizationForDay(dayInCycle);
+  const dayIn84 = getDayIn84Cycle(dateStr);
+  const periodization = getPeriodizationForDay(dayIn84);
   const category = periodization.category;
-  
-  // Use the updated getDifficultyForDay that handles 84-day Strength rotation
-  const difficulty = getDifficultyForDay(dayInCycle, cycleNumber);
-  
+  const difficulty = getDifficultyForDay(dayIn84);
   const formats = FORMATS_BY_CATEGORY[category] || ["CIRCUIT"];
   const isRecoveryDay = category === "RECOVERY";
   
   return {
-    dayInCycle,
-    cycleNumber,
+    dayIn84,
     category,
     difficulty,
     formats,
-    isRecoveryDay
+    isRecoveryDay,
+    strengthFocus: periodization.strengthFocus
   };
 };
 
@@ -334,13 +311,14 @@ export const getRandomStarFromRange = (range: [number, number] | null): number =
 /**
  * Calculate upcoming schedule for preview (N days)
  */
-export const getUpcomingSchedule = (startDate: string, daysAhead: number = 28): Array<{
+export const getUpcomingSchedule = (startDate: string, daysAhead: number = 84): Array<{
   date: string;
-  dayInCycle: number;
+  dayIn84: number;
   category: string;
   difficulty: { level: string | null; range: [number, number] | null };
   formats: string[];
   isRecoveryDay: boolean;
+  strengthFocus?: string;
 }> => {
   const schedule = [];
   const start = new Date(startDate + 'T00:00:00Z');
@@ -348,12 +326,16 @@ export const getUpcomingSchedule = (startDate: string, daysAhead: number = 28): 
   for (let i = 0; i < daysAhead; i++) {
     const date = new Date(start.getTime() + i * 24 * 60 * 60 * 1000);
     const dateStr = date.toISOString().split('T')[0];
-    schedule.push(getWODInfoForDate(dateStr));
-    schedule[schedule.length - 1] = { 
-      ...schedule[schedule.length - 1], 
-      date: dateStr 
-    } as any;
+    const info = getWODInfoForDate(dateStr);
+    schedule.push({ ...info, date: dateStr });
   }
   
   return schedule;
+};
+
+// Legacy compatibility - kept for any code still using 28-day references
+export const getDayInCycleFromDate = getDayIn84Cycle;
+export const getCycleNumberFromDate = (dateStr: string): number => {
+  const dayIn84 = getDayIn84Cycle(dateStr);
+  return Math.ceil(dayIn84 / 28); // Returns 1, 2, or 3
 };

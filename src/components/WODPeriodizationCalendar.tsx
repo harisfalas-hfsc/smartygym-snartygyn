@@ -5,16 +5,14 @@ import { ChevronLeft, ChevronRight } from "lucide-react";
 import { getWODInfoForDate, getDifficultyBadgeClass, getDifficultyBorderClass } from "@/lib/wodCycle";
 
 /**
- * Compact Periodization Calendar - Pure Calendar-Based (NO Database)
+ * Compact Periodization Calendar - 84-Day Cycle
  * Shows Yesterday, Today, Tomorrow with category and difficulty level
- * Uses the 28-day fixed periodization cycle from wodCycle.ts
  */
 const WODPeriodizationCalendar = () => {
   const today = new Date();
   const yesterday = subDays(today, 1);
   const tomorrow = addDays(today, 1);
 
-  // Get WOD info for each day (pure calculation, no DB)
   const yesterdayStr = format(yesterday, "yyyy-MM-dd");
   const todayStr = format(today, "yyyy-MM-dd");
   const tomorrowStr = format(tomorrow, "yyyy-MM-dd");
@@ -23,7 +21,6 @@ const WODPeriodizationCalendar = () => {
   const todayInfo = getWODInfoForDate(todayStr);
   const tomorrowInfo = getWODInfoForDate(tomorrowStr);
 
-  // Render a single day cell
   const renderDayCell = (
     label: string,
     dateStr: string,
@@ -55,10 +52,22 @@ const WODPeriodizationCalendar = () => {
           {fullDate}
         </div>
 
+        {/* Day in 84-day cycle */}
+        <div className="text-[9px] text-muted-foreground mt-0.5">
+          Day {info.dayIn84}/84
+        </div>
+
         {/* Category */}
         <div className={`text-[10px] font-bold mt-1 text-center ${isToday ? "text-foreground" : "text-muted-foreground"}`}>
           {info.category}
         </div>
+
+        {/* Strength Focus if applicable */}
+        {info.strengthFocus && (
+          <div className="text-[8px] text-primary/80 mt-0.5">
+            {info.strengthFocus}
+          </div>
+        )}
 
         {/* Difficulty Badge */}
         {info.isRecoveryDay ? (
