@@ -12,6 +12,7 @@ import { toast } from "sonner";
 import { Checkbox } from "@/components/ui/checkbox";
 import { EmailSubscriptionManager } from "@/components/EmailSubscriptionManager";
 import { DashboardNotificationSubscriptionManager } from "@/components/DashboardNotificationSubscriptionManager";
+import { MobilePushNotificationManager } from "@/components/MobilePushNotificationManager";
 import {
   Select,
   SelectContent,
@@ -856,6 +857,7 @@ export const UserMessagesPanel = () => {
         <TabsContent value="subscriptions" className="mt-0 space-y-6">
           <EmailSubscriptionManager />
           <DashboardNotificationSubscriptionManager />
+          <MobilePushNotificationManager />
         </TabsContent>
       </Tabs>
 
