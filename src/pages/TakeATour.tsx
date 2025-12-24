@@ -233,6 +233,14 @@ export default function TakeATour() {
                   </div>
                 </div>
               </div>
+
+              <div className="text-center">
+                <Link to="/workouts">
+                  <Button variant="outline" size="sm">
+                    Explore Smarty Workouts
+                  </Button>
+                </Link>
+              </div>
             </CardContent>
           </Card>
 
@@ -241,7 +249,7 @@ export default function TakeATour() {
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <Calendar className="h-5 w-5 text-primary" />
-                Smarty Programs (Training Programs)
+                Smarty Programs
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
@@ -274,7 +282,7 @@ export default function TakeATour() {
               <div className="text-center">
                 <Link to="/trainingprogram">
                   <Button variant="outline" size="sm">
-                    Explore Training Programs
+                    Explore Smarty Programs
                   </Button>
                 </Link>
               </div>
