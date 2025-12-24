@@ -1,5 +1,6 @@
 import { useNavigate } from "react-router-dom";
 import { Helmet } from "react-helmet";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { PageBreadcrumbs } from "@/components/PageBreadcrumbs";
@@ -7,12 +8,23 @@ import { ArrowLeft, Calculator, Activity, Flame } from "lucide-react";
 import { useShowBackButton } from "@/hooks/useShowBackButton";
 import { useAccessControl } from "@/hooks/useAccessControl";
 import { SEOEnhancer } from "@/components/SEOEnhancer";
+import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious, type CarouselApi } from "@/components/ui/carousel";
 
 const Tools = () => {
   const navigate = useNavigate();
   const { canGoBack, goBack } = useShowBackButton();
   const { userTier } = useAccessControl();
   const isPremium = userTier === "premium";
+
+  const [toolsCarouselApi, setToolsCarouselApi] = useState<CarouselApi>();
+  const [toolsCurrentSlide, setToolsCurrentSlide] = useState(0);
+
+  useEffect(() => {
+    if (!toolsCarouselApi) return;
+    const onSelect = () => setToolsCurrentSlide(toolsCarouselApi.selectedScrollSnap());
+    toolsCarouselApi.on('select', onSelect);
+    return () => { toolsCarouselApi.off('select', onSelect); };
+  }, [toolsCarouselApi]);
 
   const tools = [
     {
@@ -86,12 +98,13 @@ const Tools = () => {
         <Card className="mb-8 bg-gradient-to-br from-primary/5 via-background to-primary/5 border-2 border-primary/40 shadow-primary">
           <div className="p-5">
             <h2 className="text-2xl font-bold mb-3 text-center">About Smarty Tools</h2>
-            <div className="space-y-2 text-muted-foreground max-w-3xl mx-auto">
+            <div className="text-muted-foreground max-w-3xl mx-auto">
               <p>
                 <span className="text-primary font-semibold">Smarty Tools</span> are fitness calculators designed to help you understand your body and optimize your training. 
                 All tools use scientifically validated formulas and equations.
               </p>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
+              {/* Desktop only - detailed calculator descriptions */}
+              <div className="hidden md:grid md:grid-cols-3 gap-4 mt-4">
                 <div>
                   <h3 className="font-semibold text-foreground mb-2"><span className="text-primary font-semibold">1RM Calculator</span></h3>
                   <p className="text-sm">
@@ -115,7 +128,46 @@ const Tools = () => {
           </div>
         </Card>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        {/* Mobile Carousel - Title only */}
+        <div className="md:hidden">
+          <Carousel 
+            setApi={setToolsCarouselApi}
+            opts={{ align: "center", loop: true, startIndex: 0 }}
+            className="w-full"
+          >
+            <CarouselContent className="-ml-2">
+              {tools.map((tool) => (
+                <CarouselItem key={tool.id} className="pl-2 basis-[85%]">
+                  <Card
+                    onClick={() => navigate(tool.route)}
+                    className="group p-6 cursor-pointer transition-all duration-300 hover:border-primary/60 bg-card border-2 border-border"
+                  >
+                    <h3 className="font-semibold text-lg text-center whitespace-nowrap">
+                      {tool.title}
+                    </h3>
+                  </Card>
+                </CarouselItem>
+              ))}
+            </CarouselContent>
+            <CarouselPrevious className="left-2 h-8 w-8 bg-background/80 border-primary/20" />
+            <CarouselNext className="right-2 h-8 w-8 bg-background/80 border-primary/20" />
+          </Carousel>
+          {/* Navigation dots */}
+          <div className="flex justify-center gap-2 mt-4">
+            {tools.map((_, index) => (
+              <button
+                key={index}
+                onClick={() => toolsCarouselApi?.scrollTo(index)}
+                className={`w-2 h-2 rounded-full transition-colors ${
+                  toolsCurrentSlide === index ? 'bg-primary' : 'bg-muted-foreground/30'
+                }`}
+              />
+            ))}
+          </div>
+        </div>
+
+        {/* Desktop Grid - Full cards */}
+        <div className="hidden md:grid md:grid-cols-3 gap-6">
           {tools.map((tool) => {
             const Icon = tool.icon;
             return (
