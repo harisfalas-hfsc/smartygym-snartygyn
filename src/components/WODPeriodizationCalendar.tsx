@@ -59,22 +59,10 @@ const WODPeriodizationCalendar = () => {
           {fullDate}
         </div>
 
-        {/* Day in 84-day cycle */}
-        <div className="text-[9px] text-muted-foreground mt-0.5">
-          Day {info.dayIn84}/84
-        </div>
-
         {/* Category */}
         <div className={`text-[10px] font-bold mt-1 text-center ${isToday ? "text-foreground" : "text-muted-foreground"}`}>
           {info.category}
         </div>
-
-        {/* Strength Focus if applicable */}
-        {info.strengthFocus && (
-          <div className="text-[8px] text-primary/80 mt-0.5">
-            {info.strengthFocus}
-          </div>
-        )}
 
         {/* Difficulty Badge */}
         {info.isRecoveryDay ? (
@@ -97,7 +85,7 @@ const WODPeriodizationCalendar = () => {
     <Card className="mb-4 border-border/50 bg-gradient-to-r from-muted/20 via-background to-muted/20">
       <CardContent className="p-2 sm:p-3">
         {/* 3-Column Grid */}
-        <div className="grid grid-cols-3 gap-1.5 sm:gap-2">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-1.5 sm:gap-2">
           {renderDayCell("Yesterday", yesterdayStr, yesterdayInfo)}
           {renderDayCell("Today", todayStr, todayInfo, true)}
           {renderDayCell("Tomorrow", tomorrowStr, tomorrowInfo)}
