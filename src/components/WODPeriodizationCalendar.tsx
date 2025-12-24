@@ -5,7 +5,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { getWODInfoForDate, getDifficultyBadgeClass, getDifficultyBorderClass } from "@/lib/wodCycle";
-import { Carousel, CarouselContent, CarouselItem, type CarouselApi } from "@/components/ui/carousel";
+import { Carousel, CarouselContent, CarouselItem, CarouselPrevious, CarouselNext, type CarouselApi } from "@/components/ui/carousel";
 import { cn } from "@/lib/utils";
 
 const TIMEZONE = "Europe/Athens";
@@ -119,8 +119,8 @@ const WODPeriodizationCalendar = () => {
           {renderDayCell("Tomorrow", tomorrowStr, tomorrowInfo)}
         </div>
 
-        {/* Mobile: Carousel */}
-        <div className="md:hidden">
+        {/* Mobile: Carousel - full bleed to card edges */}
+        <div className="md:hidden -mx-2 sm:-mx-3">
           <Carousel
             className="w-full"
             opts={{
@@ -137,6 +137,8 @@ const WODPeriodizationCalendar = () => {
                 </CarouselItem>
               ))}
             </CarouselContent>
+            <CarouselPrevious className="left-1 h-8 w-8 rounded-full bg-background/80 border border-border/50 shadow-sm" />
+            <CarouselNext className="right-1 h-8 w-8 rounded-full bg-background/80 border border-border/50 shadow-sm" />
           </Carousel>
 
           {/* Navigation Dots */}
