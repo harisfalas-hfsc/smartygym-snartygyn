@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { Helmet } from "react-helmet";
 import { Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
@@ -24,7 +24,13 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { Trophy, MessageSquare, Star, User, Calendar, ClipboardCheck, ArrowLeft, Eye, Award } from "lucide-react";
+import {
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+  type CarouselApi,
+} from "@/components/ui/carousel";
+import { Trophy, MessageSquare, Star, User, Calendar, ClipboardCheck, ArrowLeft, Eye, Award, Quote } from "lucide-react";
 import { TestimonialsSection } from "@/components/community/TestimonialsSection";
 import { formatDistanceToNow } from "date-fns";
 import { CompactFilters } from "@/components/CompactFilters";
@@ -89,6 +95,26 @@ const Community = () => {
   
   // Modal state for comments only (Leaderboard and Ratings are top 6 competitions)
   const [showCommentsModal, setShowCommentsModal] = useState(false);
+  
+  // Mobile carousel state
+  const [carouselApi, setCarouselApi] = useState<CarouselApi>();
+  const [selectedSlide, setSelectedSlide] = useState(0);
+
+  // Update selected slide when carousel changes
+  useEffect(() => {
+    if (!carouselApi) return;
+    
+    const onSelect = () => {
+      setSelectedSlide(carouselApi.selectedScrollSnap());
+    };
+    
+    carouselApi.on("select", onSelect);
+    onSelect();
+    
+    return () => {
+      carouselApi.off("select", onSelect);
+    };
+  }, [carouselApi]);
 
 
   useEffect(() => {
@@ -525,11 +551,18 @@ programEntries.sort((a, b) => b.total_completions - a.total_completions);
           />
 
           {/* About Community */}
-          <Card className="mb-8 bg-gradient-to-br from-primary/5 via-background to-primary/5 border-2 border-primary/40 shadow-primary">
+          <Card className="mb-6 md:mb-8 bg-gradient-to-br from-primary/5 via-background to-primary/5 border-2 border-primary/40 shadow-primary">
             <CardContent className="p-4 sm:p-5">
               <h2 className="text-xl sm:text-2xl font-bold mb-3 text-center">About Community</h2>
               <div className="space-y-2 text-muted-foreground max-w-3xl mx-auto">
-                <p className="text-sm sm:text-base text-center">
+                {/* Mobile: Short description (4 lines max) */}
+                <p className="md:hidden text-sm text-center">
+                  Welcome to the <span className="text-primary font-semibold">SmartyGym</span> Community! 
+                  Our community is our greatest asset – <span className="font-medium text-foreground">you</span> are what makes this special. 
+                  Connect, compete, and interact through leaderboards, ratings, and shared experiences.
+                </p>
+                {/* Desktop: Full description */}
+                <p className="hidden md:block text-sm sm:text-base text-center">
                   Welcome to the <span className="text-primary font-semibold">SmartyGym</span> Community! Track your progress on leaderboards for workout completions, 
                   training programs, and daily check-ins. Discover top-rated content through member ratings, 
                   read community comments and testimonials, and get inspired by fellow members' achievements. 
@@ -539,7 +572,253 @@ programEntries.sort((a, b) => b.total_completions - a.total_completions);
             </CardContent>
           </Card>
 
-          {/* Unified Leaderboard Section */}
+          {/* Mobile: Carousel of all community cards */}
+          <div className="md:hidden mb-6">
+            <Carousel setApi={setCarouselApi} className="w-full">
+              <CarouselContent>
+                {/* Slide 1: Leaderboard */}
+                <CarouselItem>
+                  <Card className="border-2 border-primary/30 shadow-lg h-full">
+                    <CardHeader className="bg-gradient-to-r from-primary/10 to-primary/5 p-4">
+                      <CardTitle className="flex items-center gap-2 text-lg">
+                        <Trophy className="h-5 w-5 text-primary" />
+                        Community Leaderboard
+                      </CardTitle>
+                      <CompactFilters
+                        filters={[
+                          {
+                            name: "Type",
+                            value: leaderboardFilter,
+                            onChange: (value) => setLeaderboardFilter(value as "workouts" | "programs" | "checkins"),
+                            options: [
+                              { value: "workouts", label: "Workouts" },
+                              { value: "programs", label: "Programs" },
+                              { value: "checkins", label: "Check-ins" }
+                            ],
+                            placeholder: "Select type"
+                          }
+                        ]}
+                      />
+                    </CardHeader>
+                    <CardContent className="p-3">
+                      {isLoadingLeaderboard ? (
+                        <div className="space-y-2">
+                          {[...Array(6)].map((_, i) => (
+                            <Skeleton key={i} className="h-10 w-full" />
+                          ))}
+                        </div>
+                      ) : (
+                        <Table>
+                          <TableHeader>
+                            <TableRow className="border-primary/30">
+                              <TableHead className="w-10 text-xs p-2">Rank</TableHead>
+                              <TableHead className="text-xs p-2">Member</TableHead>
+                              <TableHead className="text-right text-xs p-2">{leaderboardFilter === "checkins" ? "Score" : "Done"}</TableHead>
+                            </TableRow>
+                          </TableHeader>
+                          <TableBody>
+                            {getLeaderboardWithPlaceholders().map((entry, index) => (
+                              <TableRow key={entry?.user_id || `empty-${index}`} className="border-primary/20">
+                                <TableCell className="p-2">
+                                  <span className="text-sm">{getMedalIcon(index)}</span>
+                                </TableCell>
+                                <TableCell className="p-2">
+                                  {entry ? (
+                                    <div className="flex items-center gap-1">
+                                      <User className="h-3 w-3 text-muted-foreground flex-shrink-0" />
+                                      <span className="text-xs truncate max-w-[100px]">{entry.display_name}</span>
+                                    </div>
+                                  ) : (
+                                    <span className="text-muted-foreground italic text-xs">Awaiting...</span>
+                                  )}
+                                </TableCell>
+                                <TableCell className="text-right p-2">
+                                  {entry ? (
+                                    <span className="inline-flex px-2 py-0.5 rounded-full bg-primary/10 text-primary font-semibold text-xs">
+                                      {entry.total_completions}
+                                    </span>
+                                  ) : (
+                                    <span className="text-muted-foreground">---</span>
+                                  )}
+                                </TableCell>
+                              </TableRow>
+                            ))}
+                          </TableBody>
+                        </Table>
+                      )}
+                    </CardContent>
+                  </Card>
+                </CarouselItem>
+
+                {/* Slide 2: Ratings */}
+                <CarouselItem>
+                  <Card className="border-2 border-primary/30 shadow-lg h-full">
+                    <CardHeader className="bg-gradient-to-r from-primary/10 to-primary/5 p-4">
+                      <CardTitle className="flex items-center gap-2 text-lg">
+                        <Star className="h-5 w-5 text-primary" />
+                        Community Ratings
+                      </CardTitle>
+                      <CompactFilters
+                        filters={[
+                          {
+                            name: "Type",
+                            value: ratingsFilter,
+                            onChange: (value) => setRatingsFilter(value as "workouts" | "programs"),
+                            options: [
+                              { value: "workouts", label: "Workouts" },
+                              { value: "programs", label: "Programs" }
+                            ],
+                            placeholder: "Select type"
+                          }
+                        ]}
+                      />
+                    </CardHeader>
+                    <CardContent className="p-3">
+                      {isLoadingRatings ? (
+                        <div className="space-y-2">
+                          {[...Array(6)].map((_, i) => (
+                            <Skeleton key={i} className="h-10 w-full" />
+                          ))}
+                        </div>
+                      ) : (
+                        <Table>
+                          <TableHeader>
+                            <TableRow className="border-primary/30">
+                              <TableHead className="w-10 text-xs p-2">Rank</TableHead>
+                              <TableHead className="text-xs p-2">Name</TableHead>
+                              <TableHead className="text-center text-xs p-2">Rating</TableHead>
+                            </TableRow>
+                          </TableHeader>
+                          <TableBody>
+                            {getRatingsWithPlaceholders().map((item, index) => (
+                              <TableRow key={item?.content_id || `empty-${index}`} className="border-primary/20">
+                                <TableCell className="p-2">
+                                  <span className="text-sm">{getMedalIcon(index)}</span>
+                                </TableCell>
+                                <TableCell className="p-2">
+                                  {item ? (
+                                    <Link 
+                                      to={item.content_type === "workout" 
+                                        ? `/workout/${item.workout_type}/${item.content_id}`
+                                        : `/trainingprogram/${item.program_type}/${item.content_id}`
+                                      }
+                                      className="text-xs truncate text-primary hover:underline max-w-[100px] block"
+                                    >
+                                      {item.content_name}
+                                    </Link>
+                                  ) : (
+                                    <span className="text-muted-foreground italic text-xs">Awaiting...</span>
+                                  )}
+                                </TableCell>
+                                <TableCell className="text-center p-2">
+                                  {item ? (
+                                    <div className="flex items-center justify-center gap-1">
+                                      <Star className="h-3 w-3 fill-primary text-primary" />
+                                      <span className="font-semibold text-xs">{item.average_rating.toFixed(1)}</span>
+                                    </div>
+                                  ) : (
+                                    <span className="text-muted-foreground">---</span>
+                                  )}
+                                </TableCell>
+                              </TableRow>
+                            ))}
+                          </TableBody>
+                        </Table>
+                      )}
+                    </CardContent>
+                  </Card>
+                </CarouselItem>
+
+                {/* Slide 3: Comments */}
+                <CarouselItem>
+                  <Card className="border-2 border-primary/30 shadow-lg h-full">
+                    <CardHeader className="bg-gradient-to-r from-primary/10 to-primary/5 p-4">
+                      <CardTitle className="flex items-center gap-2 text-lg">
+                        <MessageSquare className="h-5 w-5 text-primary" />
+                        Community Comments
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent className="p-3">
+                      {isLoadingComments ? (
+                        <div className="space-y-2">
+                          {[...Array(6)].map((_, i) => (
+                            <Skeleton key={i} className="h-16 w-full" />
+                          ))}
+                        </div>
+                      ) : comments.length === 0 ? (
+                        <div className="text-center py-8 text-muted-foreground">
+                          <MessageSquare className="h-8 w-8 mx-auto mb-2 opacity-30" />
+                          <p className="text-sm">No comments yet</p>
+                        </div>
+                      ) : (
+                        <>
+                          <div className="space-y-2">
+                            {getTopComments().map((comment) => (
+                              <div
+                                key={comment.id}
+                                className="p-2 rounded-lg border border-primary/20 bg-gradient-to-r from-background to-primary/5"
+                              >
+                                <div className="flex items-center justify-between mb-1">
+                                  <div className="flex items-center gap-1">
+                                    <User className="h-3 w-3 text-primary flex-shrink-0" />
+                                    <span className="font-semibold text-xs truncate max-w-[100px]">
+                                      {comment.display_name}
+                                    </span>
+                                  </div>
+                                  <span className="text-[10px] text-muted-foreground">
+                                    {formatDistanceToNow(new Date(comment.created_at), { addSuffix: true })}
+                                  </span>
+                                </div>
+                                <p className="text-xs leading-relaxed line-clamp-2">{comment.comment_text}</p>
+                              </div>
+                            ))}
+                          </div>
+                          {comments.length > 6 && (
+                            <div className="mt-3 text-center">
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={() => setShowCommentsModal(true)}
+                                className="gap-1 text-xs h-8"
+                              >
+                                <Eye className="h-3 w-3" />
+                                View All ({comments.length})
+                              </Button>
+                            </div>
+                          )}
+                        </>
+                      )}
+                    </CardContent>
+                  </Card>
+                </CarouselItem>
+
+                {/* Slide 4: Testimonials */}
+                <CarouselItem>
+                  <TestimonialsSection compact />
+                </CarouselItem>
+              </CarouselContent>
+            </Carousel>
+            
+            {/* Dot navigation indicators */}
+            <div className="flex justify-center gap-2 mt-4">
+              {[0, 1, 2, 3].map((index) => (
+                <button
+                  key={index}
+                  onClick={() => carouselApi?.scrollTo(index)}
+                  className={`h-2.5 w-2.5 rounded-full transition-all duration-200 ${
+                    selectedSlide === index 
+                      ? "bg-primary scale-110" 
+                      : "bg-muted-foreground/30 hover:bg-muted-foreground/50"
+                  }`}
+                  aria-label={`Go to slide ${index + 1}`}
+                />
+              ))}
+            </div>
+          </div>
+
+          {/* Desktop: Original stacked layout */}
+          <div className="hidden md:block">
+            {/* Unified Leaderboard Section */}
           <Card 
             itemScope
             itemType="https://schema.org/ItemList"
@@ -846,6 +1125,7 @@ programEntries.sort((a, b) => b.total_completions - a.total_completions);
           {/* Testimonials Section */}
           <div className="mt-6 md:mt-8">
             <TestimonialsSection />
+          </div>
           </div>
         </div>
       </div>
