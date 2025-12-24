@@ -555,18 +555,10 @@ programEntries.sort((a, b) => b.total_completions - a.total_completions);
             <CardContent className="p-4 sm:p-5">
               <h2 className="text-xl sm:text-2xl font-bold mb-3 text-center">About Community</h2>
               <div className="space-y-2 text-muted-foreground max-w-3xl mx-auto">
-                {/* Mobile: Short description (4 lines max) */}
-                <p className="md:hidden text-sm text-center">
+                <p className="text-sm sm:text-base text-center">
                   Welcome to the <span className="text-primary font-semibold">SmartyGym</span> Community! 
                   Our community is our greatest asset – <span className="font-medium text-foreground">you</span> are what makes this special. 
                   Connect, compete, and interact through leaderboards, ratings, and shared experiences.
-                </p>
-                {/* Desktop: Full description */}
-                <p className="hidden md:block text-sm sm:text-base text-center">
-                  Welcome to the <span className="text-primary font-semibold">SmartyGym</span> Community! Track your progress on leaderboards for workout completions, 
-                  training programs, and daily check-ins. Discover top-rated content through member ratings, 
-                  read community comments and testimonials, and get inspired by fellow members' achievements. 
-                  Connect, compete, and celebrate your fitness journey together.
                 </p>
               </div>
             </CardContent>
