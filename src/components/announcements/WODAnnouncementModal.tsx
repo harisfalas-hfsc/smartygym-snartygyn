@@ -39,6 +39,13 @@ export const WODAnnouncementModal = ({ open, onClose }: WODAnnouncementModalProp
   const bodyweightWOD = wods?.find(w => w.equipment === "BODYWEIGHT");
   const equipmentWOD = wods?.find(w => w.equipment === "EQUIPMENT");
 
+  // Close modal immediately if no WODs exist
+  useEffect(() => {
+    if (open && wods !== undefined && wods.length === 0) {
+      onClose();
+    }
+  }, [open, wods, onClose]);
+
   // Countdown timer - auto close after 15 seconds
   useEffect(() => {
     if (!open) {
@@ -197,13 +204,7 @@ export const WODAnnouncementModal = ({ open, onClose }: WODAnnouncementModalProp
               {renderWODCard(bodyweightWOD, true)}
               {renderWODCard(equipmentWOD, false)}
             </div>
-          ) : (
-            <div className="bg-background/80 rounded-xl p-4 border border-primary/30 text-center mb-4">
-              <p className="text-muted-foreground text-sm">
-                No Workouts of the Day available yet. Check back at <span className="text-primary font-semibold">midnight (00:00)</span>!
-              </p>
-            </div>
-          )}
+          ) : null}
 
           {/* CTA Button */}
           <Button 
