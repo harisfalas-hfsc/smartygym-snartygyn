@@ -211,135 +211,197 @@ const DailySmartyRitual = () => {
             </div>
           </Card>
 
-          {/* Main Card */}
-          <Card className="overflow-hidden">
-            {/* Header Section - Elegant Centered Layout */}
-            <div className="bg-gradient-to-r from-primary/10 to-primary/5 p-8 relative">
-              <div className="flex flex-col items-center text-center">
-                {/* Haris Photo - centered above title */}
-                <div className="mb-3">
-                  <img 
-                    src={harisPhoto} 
-                    alt="Haris Falas" 
-                    className="w-20 h-20 md:w-24 md:h-24 rounded-full object-cover border-4 border-primary/20 shadow-lg"
-                  />
-                </div>
-                <p className="text-sm text-muted-foreground mb-3">
-                  Designed by <a href="/coach-profile" className="text-primary font-semibold hover:underline">Haris Falas</a>
-                </p>
-                <h1 className="text-2xl md:text-3xl font-bold mb-3">
-                  Daily <span className="text-primary">Smarty</span> Ritual
-                </h1>
-                <p className="text-muted-foreground max-w-md">
-                  Your all-day game plan for movement, recovery, and performance
-                </p>
-              </div>
-            </div>
-
-          {/* Access Gate for guests (non-authenticated users) */}
-            {!isAuthenticated && (
-              <div className="p-6 bg-muted/50">
-                <div className="flex flex-col items-center justify-center gap-4 text-center">
-                  <Lock className="h-12 w-12 text-muted-foreground" />
-                  <div>
-                    <h3 className="text-xl font-semibold mb-2">Sign In Required</h3>
-                    <p className="text-muted-foreground mb-4 max-w-md">
-                      The Daily Smarty Ritual is available to all members. Sign in to access daily movement rituals designed for optimal health and performance.
-                    </p>
-                    <div className="flex flex-col sm:flex-row gap-3 justify-center">
-                      <Button onClick={() => navigate("/auth")}>
+          {/* Mobile: Simplified Card with "See the Ritual" button */}
+          <div className="md:hidden">
+            <Card className="overflow-hidden">
+              <div className="bg-gradient-to-r from-primary/10 to-primary/5 p-6">
+                <div className="flex flex-col items-center text-center">
+                  <div className="mb-3">
+                    <img 
+                      src={harisPhoto} 
+                      alt="Haris Falas" 
+                      className="w-20 h-20 rounded-full object-cover border-4 border-primary/20 shadow-lg"
+                    />
+                  </div>
+                  <p className="text-sm text-muted-foreground mb-2">
+                    Designed by <a href="/coach-profile" className="text-primary font-semibold hover:underline">Haris Falas</a>
+                  </p>
+                  <h1 className="text-2xl font-bold mb-2">
+                    Daily <span className="text-primary">Smarty</span> Ritual
+                  </h1>
+                  <p className="text-muted-foreground text-sm mb-4">
+                    Your all-day game plan for movement, recovery, and performance
+                  </p>
+                  
+                  {/* Mobile Access States */}
+                  {!isAuthenticated && (
+                    <div className="w-full pt-4 border-t border-primary/20">
+                      <Lock className="h-8 w-8 text-muted-foreground mx-auto mb-2" />
+                      <p className="text-sm text-muted-foreground mb-3">Sign in to access</p>
+                      <Button onClick={() => navigate("/auth")} className="w-full">
                         Sign In
                       </Button>
-                      <Button variant="outline" onClick={() => navigate("/auth")}>
-                        Create Account
-                      </Button>
                     </div>
-                  </div>
+                  )}
+                  
+                  {isAuthenticated && !ritual && (
+                    <div className="w-full pt-4 border-t border-primary/20">
+                      <Clock className="h-8 w-8 text-muted-foreground mx-auto mb-2" />
+                      <p className="text-sm text-muted-foreground">
+                        Available at <span className="text-primary font-semibold">00:05 AM</span> Cyprus time
+                      </p>
+                    </div>
+                  )}
+                  
+                  {isAuthenticated && ritual && (
+                    <Button onClick={() => setShowReaderMode(true)} className="w-full">
+                      <BookOpen className="mr-2 h-4 w-4" />
+                      See the Ritual
+                    </Button>
+                  )}
                 </div>
               </div>
-            )}
-
-            {/* Empty state for authenticated users when ritual not yet generated */}
-            {isAuthenticated && !ritual && (
-              <div className="p-6 bg-muted/50">
-                <div className="flex flex-col items-center justify-center gap-4 text-center">
-                  <Clock className="h-12 w-12 text-muted-foreground" />
-                  <div>
-                    <h3 className="text-xl font-semibold mb-2">Today's Ritual is Being Prepared</h3>
-                    <p className="text-muted-foreground max-w-md">
-                      Your Daily Smarty Ritual will be available at <span className="text-primary font-semibold">00:05 AM</span> Cyprus time.
-                    </p>
-                    <p className="text-sm text-muted-foreground/70 mt-2">
-                      Check back shortly!
-                    </p>
-                  </div>
-                </div>
-              </div>
-            )}
-
-            {/* Ritual Content */}
+            </Card>
+            
+            {/* Mobile: Compact Calendar Sync button outside main card */}
             {isAuthenticated && ritual && (
-              <CardContent className="p-6 space-y-8">
-                {/* Calendar Integration - Google Calendar sync */}
-                <RitualCalendarSync />
-
-                <Separator />
-
-                {/* Morning Ritual */}
-                <div className="space-y-4">
-                  <div className="flex items-center gap-3">
-                    <div className="p-2 rounded-full bg-orange-100 dark:bg-orange-900/20">
-                      <Sunrise className="h-6 w-6 text-orange-500" />
-                    </div>
-                    <div>
-                      <h2 className="text-xl font-bold">Morning Ritual</h2>
-                      <p className="text-sm text-muted-foreground">~8:00 AM • Start Strong</p>
-                    </div>
-                  </div>
-                  <div className="pl-12">
-                    <HTMLContent content={ritual.morning_content} />
-                  </div>
-                </div>
-
-                <Separator />
-
-                {/* Midday Ritual */}
-                <div className="space-y-4">
-                  <div className="flex items-center gap-3">
-                    <div className="p-2 rounded-full bg-yellow-100 dark:bg-yellow-900/20">
-                      <Sun className="h-6 w-6 text-yellow-600" />
-                    </div>
-                    <div>
-                      <h2 className="text-xl font-bold">Midday Ritual</h2>
-                      <p className="text-sm text-muted-foreground">~1:00 PM • Reset & Reload</p>
-                    </div>
-                  </div>
-                  <div className="pl-12">
-                    <HTMLContent content={ritual.midday_content} />
-                  </div>
-                </div>
-
-                <Separator />
-
-                {/* Evening Ritual */}
-                <div className="space-y-4">
-                  <div className="flex items-center gap-3">
-                    <div className="p-2 rounded-full bg-purple-100 dark:bg-purple-900/20">
-                      <Moon className="h-6 w-6 text-purple-600" />
-                    </div>
-                    <div>
-                      <h2 className="text-xl font-bold">Evening Ritual</h2>
-                      <p className="text-sm text-muted-foreground">~5:00 PM • Unwind</p>
-                    </div>
-                  </div>
-                  <div className="pl-12">
-                    <HTMLContent content={ritual.evening_content} />
-                  </div>
-                </div>
-
-              </CardContent>
+              <div className="mt-4 flex justify-center">
+                <RitualCalendarSync compact />
+              </div>
             )}
-          </Card>
+          </div>
+
+          {/* Desktop: Full Card with all content */}
+          <div className="hidden md:block">
+            <Card className="overflow-hidden">
+              {/* Header Section - Elegant Centered Layout */}
+              <div className="bg-gradient-to-r from-primary/10 to-primary/5 p-8 relative">
+                <div className="flex flex-col items-center text-center">
+                  {/* Haris Photo - centered above title */}
+                  <div className="mb-3">
+                    <img 
+                      src={harisPhoto} 
+                      alt="Haris Falas" 
+                      className="w-24 h-24 rounded-full object-cover border-4 border-primary/20 shadow-lg"
+                    />
+                  </div>
+                  <p className="text-sm text-muted-foreground mb-3">
+                    Designed by <a href="/coach-profile" className="text-primary font-semibold hover:underline">Haris Falas</a>
+                  </p>
+                  <h1 className="text-3xl font-bold mb-3">
+                    Daily <span className="text-primary">Smarty</span> Ritual
+                  </h1>
+                  <p className="text-muted-foreground max-w-md">
+                    Your all-day game plan for movement, recovery, and performance
+                  </p>
+                </div>
+              </div>
+
+              {/* Access Gate for guests (non-authenticated users) */}
+              {!isAuthenticated && (
+                <div className="p-6 bg-muted/50">
+                  <div className="flex flex-col items-center justify-center gap-4 text-center">
+                    <Lock className="h-12 w-12 text-muted-foreground" />
+                    <div>
+                      <h3 className="text-xl font-semibold mb-2">Sign In Required</h3>
+                      <p className="text-muted-foreground mb-4 max-w-md">
+                        The Daily Smarty Ritual is available to all members. Sign in to access daily movement rituals designed for optimal health and performance.
+                      </p>
+                      <div className="flex flex-col sm:flex-row gap-3 justify-center">
+                        <Button onClick={() => navigate("/auth")}>
+                          Sign In
+                        </Button>
+                        <Button variant="outline" onClick={() => navigate("/auth")}>
+                          Create Account
+                        </Button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* Empty state for authenticated users when ritual not yet generated */}
+              {isAuthenticated && !ritual && (
+                <div className="p-6 bg-muted/50">
+                  <div className="flex flex-col items-center justify-center gap-4 text-center">
+                    <Clock className="h-12 w-12 text-muted-foreground" />
+                    <div>
+                      <h3 className="text-xl font-semibold mb-2">Today's Ritual is Being Prepared</h3>
+                      <p className="text-muted-foreground max-w-md">
+                        Your Daily Smarty Ritual will be available at <span className="text-primary font-semibold">00:05 AM</span> Cyprus time.
+                      </p>
+                      <p className="text-sm text-muted-foreground/70 mt-2">
+                        Check back shortly!
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* Ritual Content */}
+              {isAuthenticated && ritual && (
+                <CardContent className="p-6 space-y-8">
+                  {/* Calendar Integration - Google Calendar sync */}
+                  <RitualCalendarSync />
+
+                  <Separator />
+
+                  {/* Morning Ritual */}
+                  <div className="space-y-4">
+                    <div className="flex items-center gap-3">
+                      <div className="p-2 rounded-full bg-orange-100 dark:bg-orange-900/20">
+                        <Sunrise className="h-6 w-6 text-orange-500" />
+                      </div>
+                      <div>
+                        <h2 className="text-xl font-bold">Morning Ritual</h2>
+                        <p className="text-sm text-muted-foreground">~8:00 AM • Start Strong</p>
+                      </div>
+                    </div>
+                    <div className="pl-12">
+                      <HTMLContent content={ritual.morning_content} />
+                    </div>
+                  </div>
+
+                  <Separator />
+
+                  {/* Midday Ritual */}
+                  <div className="space-y-4">
+                    <div className="flex items-center gap-3">
+                      <div className="p-2 rounded-full bg-yellow-100 dark:bg-yellow-900/20">
+                        <Sun className="h-6 w-6 text-yellow-600" />
+                      </div>
+                      <div>
+                        <h2 className="text-xl font-bold">Midday Ritual</h2>
+                        <p className="text-sm text-muted-foreground">~1:00 PM • Reset & Reload</p>
+                      </div>
+                    </div>
+                    <div className="pl-12">
+                      <HTMLContent content={ritual.midday_content} />
+                    </div>
+                  </div>
+
+                  <Separator />
+
+                  {/* Evening Ritual */}
+                  <div className="space-y-4">
+                    <div className="flex items-center gap-3">
+                      <div className="p-2 rounded-full bg-purple-100 dark:bg-purple-900/20">
+                        <Moon className="h-6 w-6 text-purple-600" />
+                      </div>
+                      <div>
+                        <h2 className="text-xl font-bold">Evening Ritual</h2>
+                        <p className="text-sm text-muted-foreground">~5:00 PM • Unwind</p>
+                      </div>
+                    </div>
+                    <div className="pl-12">
+                      <HTMLContent content={ritual.evening_content} />
+                    </div>
+                  </div>
+
+                </CardContent>
+              )}
+            </Card>
+          </div>
 
         </div>
       </div>
