@@ -1,5 +1,6 @@
 import { useNavigate } from "react-router-dom";
 import { Helmet } from "react-helmet";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { PageBreadcrumbs } from "@/components/PageBreadcrumbs";
@@ -11,6 +12,8 @@ import { useAccessControl } from "@/hooks/useAccessControl";
 import { useShowBackButton } from "@/hooks/useShowBackButton";
 import { ScrollReveal } from "@/components/ScrollReveal";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { Carousel, CarouselContent, CarouselItem, CarouselPrevious, CarouselNext, type CarouselApi } from "@/components/ui/carousel";
+import { cn } from "@/lib/utils";
 
 const TrainingProgramFlow = () => {
   const navigate = useNavigate();
@@ -18,6 +21,21 @@ const TrainingProgramFlow = () => {
   const { userTier } = useAccessControl();
   const isPremium = userTier === "premium";
   const isMobile = useIsMobile();
+  const [carouselApi, setCarouselApi] = useState<CarouselApi>();
+  const [currentSlide, setCurrentSlide] = useState(0);
+
+  // Track carousel slide changes
+  useEffect(() => {
+    if (!carouselApi) return;
+    const onSelect = () => {
+      setCurrentSlide(carouselApi.selectedScrollSnap());
+    };
+    carouselApi.on("select", onSelect);
+    onSelect();
+    return () => {
+      carouselApi.off("select", onSelect);
+    };
+  }, [carouselApi]);
 
   // Category background images for programs
   const programBackgrounds: Record<string, string> = {
@@ -187,7 +205,8 @@ const TrainingProgramFlow = () => {
           </div>
         </Card>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+        {/* Desktop: Grid Layout */}
+        <div className="hidden md:grid md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
           {programTypes.map(program => {
             const Icon = program.icon;
             const backgroundImage = programBackgrounds[program.id];
@@ -259,6 +278,108 @@ const TrainingProgramFlow = () => {
               </ScrollReveal>
             );
           })}
+        </div>
+
+        {/* Mobile: Carousel Layout */}
+        <div className="md:hidden relative">
+          <Carousel
+            className="w-full"
+            opts={{
+              align: "center",
+              loop: true,
+              startIndex: 0,
+            }}
+            setApi={setCarouselApi}
+          >
+            <CarouselContent className="-ml-2">
+              {programTypes.map((program) => {
+                const Icon = program.icon;
+                const backgroundImage = programBackgrounds[program.id];
+                const hasBackground = !!backgroundImage;
+                
+                return (
+                  <CarouselItem key={program.id} className="pl-2 basis-[80%]">
+                    <Card 
+                      itemScope 
+                      itemType="https://schema.org/Course" 
+                      onClick={() => handleProgramSelect(program.id)} 
+                      className={`group p-6 cursor-pointer transition-all duration-300 border-2 border-border ${hasBackground ? 'relative overflow-hidden' : 'bg-card'}`}
+                      role="button" 
+                      aria-label={`${program.title} training program`}
+                    >
+                      {/* Background Image */}
+                      {hasBackground && (
+                        <>
+                          <div className="absolute inset-0">
+                            <img
+                              src={backgroundImage}
+                              alt=""
+                              className="w-full h-full object-cover"
+                            />
+                          </div>
+                          <div className="absolute inset-0 bg-black/60" />
+                        </>
+                      )}
+                      
+                      <div className={`flex flex-col items-center text-center space-y-4 ${hasBackground ? 'relative z-10' : ''}`}>
+                        <div className="relative w-16 h-16 rounded-full flex items-center justify-center bg-card" aria-hidden="true">
+                          <div className="absolute inset-0 rounded-full bg-primary/10 pointer-events-none" aria-hidden="true" />
+                          <Icon className="relative w-8 h-8 text-primary" />
+                        </div>
+                        <div>
+                          <h3 className={`font-semibold text-lg mb-2 ${hasBackground ? 'text-white' : ''}`} itemProp="name">
+                            {program.title}
+                          </h3>
+                          <p className={`text-sm mb-3 ${hasBackground ? 'text-white/90' : 'text-muted-foreground'}`} itemProp="description">
+                            {program.description}
+                          </p>
+                          <p className={`text-xs italic mb-3 ${hasBackground ? 'text-white/80' : 'text-muted-foreground/80'}`}>
+                            Crafted by{" "}
+                            <a href="/coach-profile" className="text-primary hover:underline font-medium whitespace-nowrap" onClick={e => e.stopPropagation()}>
+                              Haris Falas
+                            </a>
+                            {" "}BSc Sports Science, EXOS Specialist, CSCS
+                          </p>
+                          <div className="flex gap-1 text-[10px] mt-2">
+                            <span className="bg-primary/20 text-primary border border-primary/40 px-1.5 py-0.5 rounded-full whitespace-nowrap">
+                              4-8 weeks
+                            </span>
+                            <span className="bg-green-500/20 text-green-700 dark:text-green-400 border border-green-500/40 px-1.5 py-0.5 rounded-full whitespace-nowrap">
+                              {program.level}
+                            </span>
+                            <span className="bg-orange-500/20 text-orange-700 dark:text-orange-400 border border-orange-500/40 px-1.5 py-0.5 rounded-full whitespace-nowrap">
+                              {program.equipment}
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+                    </Card>
+                  </CarouselItem>
+                );
+              })}
+            </CarouselContent>
+            
+            {/* Permanently visible arrows inside the carousel */}
+            <CarouselPrevious className="left-2 h-8 w-8 rounded-full bg-background/80 border border-border/50 shadow-sm" />
+            <CarouselNext className="right-2 h-8 w-8 rounded-full bg-background/80 border border-border/50 shadow-sm" />
+          </Carousel>
+          
+          {/* Navigation Dots */}
+          <div className="flex justify-center gap-2 mt-4">
+            {programTypes.map((_, index) => (
+              <button
+                key={index}
+                onClick={() => carouselApi?.scrollTo(index)}
+                className={cn(
+                  "w-2.5 h-2.5 rounded-full border-2 transition-all duration-300",
+                  currentSlide === index
+                    ? "border-primary bg-transparent scale-125"
+                    : "border-primary/40 bg-transparent hover:border-primary/60"
+                )}
+                aria-label={`Go to slide ${index + 1}`}
+              />
+            ))}
+          </div>
         </div>
 
         {/* Bottom Premium Banner */}

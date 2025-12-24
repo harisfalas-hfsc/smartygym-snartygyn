@@ -14,6 +14,8 @@ import { useShowBackButton } from "@/hooks/useShowBackButton";
 import { ScrollReveal } from "@/components/ScrollReveal";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { supabase } from "@/integrations/supabase/client";
+import { Carousel, CarouselContent, CarouselItem, CarouselPrevious, CarouselNext, type CarouselApi } from "@/components/ui/carousel";
+import { cn } from "@/lib/utils";
 
 const WorkoutFlow = () => {
   const navigate = useNavigate();
@@ -22,6 +24,8 @@ const WorkoutFlow = () => {
   const isPremium = userTier === "premium";
   const isMobile = useIsMobile();
   const [currentWodImageIndex, setCurrentWodImageIndex] = useState(0);
+  const [carouselApi, setCarouselApi] = useState<CarouselApi>();
+  const [currentSlide, setCurrentSlide] = useState(0);
 
   // Fetch today's WOD images for the card background
   const { data: wodImages = [] } = useQuery({
@@ -47,6 +51,19 @@ const WorkoutFlow = () => {
     }, 3500);
     return () => clearInterval(interval);
   }, [wodImages.length]);
+
+  // Track carousel slide changes
+  useEffect(() => {
+    if (!carouselApi) return;
+    const onSelect = () => {
+      setCurrentSlide(carouselApi.selectedScrollSnap());
+    };
+    carouselApi.on("select", onSelect);
+    onSelect();
+    return () => {
+      carouselApi.off("select", onSelect);
+    };
+  }, [carouselApi]);
 
   // Category background images (excluding WOD which has rotating images)
   const categoryBackgrounds: Record<string, string> = {
@@ -244,7 +261,8 @@ const WorkoutFlow = () => {
             </div>
           </Card>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+          {/* Desktop: Grid Layout */}
+          <div className="hidden md:grid md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
             {workoutTypes.map(workout => {
               const Icon = workout.icon;
               const isWodCard = workout.id === "wod";
@@ -343,6 +361,133 @@ const WorkoutFlow = () => {
                 </ScrollReveal>
               );
             })}
+          </div>
+
+          {/* Mobile: Carousel Layout */}
+          <div className="md:hidden relative">
+            <Carousel
+              className="w-full"
+              opts={{
+                align: "center",
+                loop: true,
+                startIndex: 0,
+              }}
+              setApi={setCarouselApi}
+            >
+              <CarouselContent className="-ml-2">
+                {workoutTypes.map((workout) => {
+                  const Icon = workout.icon;
+                  const isWodCard = workout.id === "wod";
+                  const hasBackground = isWodCard ? wodImages.length > 0 : !!categoryBackgrounds[workout.id];
+                  const backgroundImage = isWodCard ? null : categoryBackgrounds[workout.id];
+                  
+                  return (
+                    <CarouselItem key={workout.id} className="pl-2 basis-[80%]">
+                      <Card 
+                        itemScope 
+                        itemType="https://schema.org/ExercisePlan" 
+                        onClick={() => handleWorkoutSelect(workout.id)} 
+                        className={`group p-6 cursor-pointer transition-all duration-300 border-2 border-border ${hasBackground ? 'relative overflow-hidden' : 'bg-card'}`}
+                        role="button" 
+                        aria-label={`${workout.title} workouts`}
+                      >
+                        {/* WOD Card Background Images with Crossfade */}
+                        {isWodCard && wodImages.length > 0 && (
+                          <>
+                            {wodImages.map((imageUrl, index) => (
+                              <div
+                                key={index}
+                                className="absolute inset-0 transition-opacity duration-1000 ease-in-out"
+                                style={{ opacity: currentWodImageIndex === index ? 1 : 0 }}
+                              >
+                                <img
+                                  src={imageUrl}
+                                  alt=""
+                                  className="w-full h-full object-cover"
+                                />
+                              </div>
+                            ))}
+                            <div className="absolute inset-0 bg-black/60" />
+                          </>
+                        )}
+                        
+                        {/* Non-WOD Card Background Images */}
+                        {!isWodCard && backgroundImage && (
+                          <>
+                            <div className="absolute inset-0">
+                              <img
+                                src={backgroundImage}
+                                alt=""
+                                className="w-full h-full object-cover"
+                              />
+                            </div>
+                            <div className="absolute inset-0 bg-black/60" />
+                          </>
+                        )}
+                        
+                        <div className={`flex flex-col items-center text-center space-y-4 ${hasBackground ? 'relative z-10' : ''}`}>
+                          <div
+                            className="relative w-16 h-16 rounded-full flex items-center justify-center bg-card"
+                            aria-hidden="true"
+                          >
+                            <div className="absolute inset-0 rounded-full bg-primary/10 pointer-events-none" aria-hidden="true" />
+                            <Icon className="relative w-8 h-8 text-primary" />
+                          </div>
+                          <div>
+                            <h3 className={`font-semibold text-lg mb-2 ${hasBackground ? 'text-white' : ''}`} itemProp="name">
+                              {workout.title}
+                            </h3>
+                            <p className={`text-sm mb-3 ${hasBackground ? 'text-white/90' : 'text-muted-foreground'}`} itemProp="description">
+                              {workout.description}
+                            </p>
+                            <p className={`text-xs italic ${hasBackground ? 'text-white/80' : 'text-muted-foreground/80'}`}>
+                              Crafted by{" "}
+                              <a href="/coach-profile" className="hover:underline font-medium whitespace-nowrap text-primary" onClick={e => e.stopPropagation()}>
+                                Haris Falas
+                              </a>
+                              {" "}BSc Sports Science, EXOS Specialist, CSCS
+                            </p>
+                            
+                            <div className="flex gap-1 text-[10px] mt-2">
+                              <span className="px-1.5 py-0.5 rounded-full whitespace-nowrap bg-primary/20 text-primary border border-primary/40">
+                                Single Session
+                              </span>
+                              <span className="px-1.5 py-0.5 rounded-full whitespace-nowrap bg-green-500/20 text-green-700 dark:text-green-400 border border-green-500/40">
+                                {workout.level}
+                              </span>
+                              <span className="px-1.5 py-0.5 rounded-full whitespace-nowrap bg-orange-500/20 text-orange-700 dark:text-orange-400 border border-orange-500/40">
+                                {workout.equipment}
+                              </span>
+                            </div>
+                          </div>
+                        </div>
+                      </Card>
+                    </CarouselItem>
+                  );
+                })}
+              </CarouselContent>
+              
+              {/* Permanently visible arrows inside the carousel */}
+              <CarouselPrevious className="left-2 h-8 w-8 rounded-full bg-background/80 border border-border/50 shadow-sm" />
+              <CarouselNext className="right-2 h-8 w-8 rounded-full bg-background/80 border border-border/50 shadow-sm" />
+            </Carousel>
+            
+            {/* Navigation Dots */}
+            <div className="flex justify-center gap-2 mt-4">
+              {workoutTypes.map((_, index) => (
+                <button
+                  key={index}
+                  onClick={() => carouselApi?.scrollTo(index)}
+                  className={cn(
+                    "w-2.5 h-2.5 rounded-full border-2 transition-all duration-300",
+                    currentSlide === index
+                      ? "border-primary bg-transparent scale-125"
+                      : "border-primary/40 bg-transparent hover:border-primary/60"
+                  )}
+                  aria-label={`Go to slide ${index + 1}`}
+                />
+              ))}
+            </div>
           </div>
 
           {/* Bottom Premium Banner */}
