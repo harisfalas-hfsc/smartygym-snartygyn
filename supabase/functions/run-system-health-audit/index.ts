@@ -484,37 +484,37 @@ const handler = async (req: Request): Promise<Response> => {
     // WOD State - using 84-day super-cycle (3x28-day cycles with Strength rotation)
     const { data: wodState } = await supabase.from('workout_of_day_state').select('*').single();
     
-    // 28-day periodization base cycle (matching src/lib/wodCycle.ts)
+    // 28-day periodization base cycle (MUST match src/lib/wodCycle.ts EXACTLY)
     const CYCLE_START_DATE = '2024-12-24';
     const PERIODIZATION_28DAY = [
-      { day: 1, category: 'CARDIO', difficulty: 'Beginner' },
-      { day: 2, category: 'STRENGTH', difficulty: 'Advanced' }, // Rotates in 84-day
-      { day: 3, category: 'CARDIO', difficulty: 'Intermediate' },
-      { day: 4, category: 'PILATES', difficulty: 'Beginner' },
-      { day: 5, category: 'STRENGTH', difficulty: 'Intermediate' }, // Rotates in 84-day
-      { day: 6, category: 'METABOLIC', difficulty: 'Intermediate' },
-      { day: 7, category: 'CHALLENGE', difficulty: 'Intermediate' },
-      { day: 8, category: 'CALORIE BURNING', difficulty: 'Beginner' },
-      { day: 9, category: 'MOBILITY & STABILITY', difficulty: 'Beginner' },
-      { day: 10, category: 'RECOVERY', difficulty: null },
-      { day: 11, category: 'CARDIO', difficulty: 'Intermediate' },
-      { day: 12, category: 'STRENGTH', difficulty: 'Advanced' }, // Rotates in 84-day
-      { day: 13, category: 'CALORIE BURNING', difficulty: 'Intermediate' },
-      { day: 14, category: 'PILATES', difficulty: 'Intermediate' },
-      { day: 15, category: 'STRENGTH', difficulty: 'Beginner' }, // Rotates in 84-day
-      { day: 16, category: 'METABOLIC', difficulty: 'Intermediate' },
-      { day: 17, category: 'CARDIO', difficulty: 'Advanced' },
-      { day: 18, category: 'MOBILITY & STABILITY', difficulty: 'Intermediate' },
-      { day: 19, category: 'CALORIE BURNING', difficulty: 'Beginner' },
-      { day: 20, category: 'STRENGTH', difficulty: 'Intermediate' }, // Rotates in 84-day
-      { day: 21, category: 'CHALLENGE', difficulty: 'Advanced' },
-      { day: 22, category: 'PILATES', difficulty: 'Advanced' },
-      { day: 23, category: 'STRENGTH', difficulty: 'Advanced' }, // Rotates in 84-day
-      { day: 24, category: 'CARDIO', difficulty: 'Intermediate' },
-      { day: 25, category: 'METABOLIC', difficulty: 'Advanced' },
-      { day: 26, category: 'CALORIE BURNING', difficulty: 'Beginner' },
-      { day: 27, category: 'MOBILITY & STABILITY', difficulty: 'Advanced' },
-      { day: 28, category: 'RECOVERY', difficulty: null }
+      { day: 1,  category: 'CARDIO',              difficulty: 'Beginner' },
+      { day: 2,  category: 'STRENGTH',            difficulty: 'Advanced' },      // Rotates in 84-day
+      { day: 3,  category: 'MOBILITY & STABILITY', difficulty: 'Intermediate' },
+      { day: 4,  category: 'CHALLENGE',           difficulty: 'Advanced' },
+      { day: 5,  category: 'STRENGTH',            difficulty: 'Intermediate' },  // Rotates in 84-day
+      { day: 6,  category: 'PILATES',             difficulty: 'Advanced' },
+      { day: 7,  category: 'CALORIE BURNING',     difficulty: 'Intermediate' },
+      { day: 8,  category: 'METABOLIC',           difficulty: 'Beginner' },
+      { day: 9,  category: 'CHALLENGE',           difficulty: 'Advanced' },
+      { day: 10, category: 'RECOVERY',            difficulty: null },
+      { day: 11, category: 'CARDIO',              difficulty: 'Intermediate' },
+      { day: 12, category: 'STRENGTH',            difficulty: 'Intermediate' },  // Rotates in 84-day
+      { day: 13, category: 'MOBILITY & STABILITY', difficulty: 'Advanced' },
+      { day: 14, category: 'CHALLENGE',           difficulty: 'Intermediate' },
+      { day: 15, category: 'STRENGTH',            difficulty: 'Intermediate' },  // Rotates in 84-day
+      { day: 16, category: 'PILATES',             difficulty: 'Beginner' },
+      { day: 17, category: 'CALORIE BURNING',     difficulty: 'Advanced' },
+      { day: 18, category: 'METABOLIC',           difficulty: 'Intermediate' },
+      { day: 19, category: 'CARDIO',              difficulty: 'Advanced' },
+      { day: 20, category: 'STRENGTH',            difficulty: 'Beginner' },      // Rotates in 84-day
+      { day: 21, category: 'MOBILITY & STABILITY', difficulty: 'Beginner' },
+      { day: 22, category: 'CHALLENGE',           difficulty: 'Intermediate' },
+      { day: 23, category: 'STRENGTH',            difficulty: 'Advanced' },      // Rotates in 84-day
+      { day: 24, category: 'PILATES',             difficulty: 'Intermediate' },
+      { day: 25, category: 'CALORIE BURNING',     difficulty: 'Beginner' },
+      { day: 26, category: 'METABOLIC',           difficulty: 'Advanced' },
+      { day: 27, category: 'CHALLENGE',           difficulty: 'Intermediate' },
+      { day: 28, category: 'RECOVERY',            difficulty: null }
     ];
 
     // 84-day Strength rotation (days 2, 5, 12, 15, 20, 23 rotate difficulty across 3 cycles)
