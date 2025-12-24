@@ -5,7 +5,8 @@ import { ServiceCard } from "@/components/ServiceCard";
 import { Button } from "@/components/ui/button";
 import { Card, CardHeader, CardTitle, CardContent, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Dumbbell, Calendar, BookOpen, Calculator, Activity, Flame, Instagram, Facebook, Youtube, UserCheck, Wrench, Video, FileText, Smartphone, Users, Target, Heart, Zap, Plane, GraduationCap, Check, Crown, ChevronDown, ChevronRight, Move, Ban, Brain, CheckCircle2, Award, Shield, Compass, Sparkles, Info, User, HelpCircle, ShoppingBag, Star, TrendingUp } from "lucide-react";
+import { Dumbbell, Calendar, BookOpen, Calculator, Activity, Flame, Instagram, Facebook, Youtube, UserCheck, Wrench, Video, FileText, Smartphone, Users, Target, Heart, Zap, Plane, GraduationCap, Check, Crown, ChevronDown, ChevronRight, Move, Ban, Brain, CheckCircle2, Award, Shield, Compass, Sparkles, Info, User, HelpCircle, ShoppingBag, Star, TrendingUp, Clock } from "lucide-react";
+import { getCyprusTodayStr } from "@/lib/cyprusDate";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { User as SupabaseUser } from "@supabase/supabase-js";
@@ -57,14 +58,16 @@ const Index = () => {
   const isIOS = typeof navigator !== 'undefined' && /iPad|iPhone|iPod/.test(navigator.userAgent);
   const isAndroid = typeof navigator !== 'undefined' && /Android/.test(navigator.userAgent);
 
-  // Fetch WODs for mobile card
+  // Fetch WODs for mobile card - using Cyprus date filter
   const { data: mobileWods } = useQuery({
-    queryKey: ["wod-mobile-banner"],
+    queryKey: ["wod-mobile-banner", getCyprusTodayStr()],
     queryFn: async () => {
+      const cyprusToday = getCyprusTodayStr();
       const { data } = await supabase
         .from("admin_workouts")
         .select("id, name, category, format, difficulty_stars, duration, image_url, equipment")
         .eq("is_workout_of_day", true)
+        .eq("generated_for_date", cyprusToday)
         .limit(2);
       return data || [];
     },
@@ -551,20 +554,20 @@ const Index = () => {
 
         {/* Quick Access Menu */}
         <div className="mt-8 space-y-3">
-          {/* WOD Card - Double size with both workout images */}
-          {mobileWods && mobileWods.length > 0 && (
-            <div 
-              onClick={() => navigate('/workout/wod')} 
-              className="py-3 px-4 bg-primary/5 border-2 border-emerald-400 dark:border-emerald-500 rounded-lg hover:border-emerald-500 dark:hover:border-emerald-400 transition-all cursor-pointer hover:shadow-md"
-            >
-              {/* Header */}
-              <div className="flex items-center gap-2 mb-3">
-                <Dumbbell className="w-5 h-5 text-primary flex-shrink-0" />
-                <span className="text-sm font-bold text-foreground">Your Workout of the Day</span>
-                <ChevronRight className="w-5 h-5 ml-auto text-muted-foreground" />
-              </div>
-              
-              {/* Two workout images side by side */}
+          {/* WOD Card - Always visible with "Being Prepared" fallback */}
+          <div 
+            onClick={() => navigate('/workout/wod')} 
+            className="py-3 px-4 bg-primary/5 border-2 border-emerald-400 dark:border-emerald-500 rounded-lg hover:border-emerald-500 dark:hover:border-emerald-400 transition-all cursor-pointer hover:shadow-md"
+          >
+            {/* Header */}
+            <div className="flex items-center gap-2 mb-3">
+              <Dumbbell className="w-5 h-5 text-primary flex-shrink-0" />
+              <span className="text-sm font-bold text-foreground">Your Workout of the Day</span>
+              <ChevronRight className="w-5 h-5 ml-auto text-muted-foreground" />
+            </div>
+            
+            {mobileWods && mobileWods.length > 0 ? (
+              /* Two workout images side by side */
               <div className="grid grid-cols-2 gap-3">
                 {/* Bodyweight workout */}
                 {bodyweightWod && (
@@ -616,8 +619,17 @@ const Index = () => {
                   </div>
                 )}
               </div>
-            </div>
-          )}
+            ) : (
+              /* Being Prepared fallback */
+              <div className="text-center py-4">
+                <Clock className="w-10 h-10 text-primary/50 mx-auto mb-2" />
+                <p className="text-sm font-semibold text-foreground">Today's Workouts are Being Prepared</p>
+                <p className="text-xs text-muted-foreground">
+                  Check back <span className="text-primary font-semibold">soon</span> for your fresh Workouts of the Day!
+                </p>
+              </div>
+            )}
+          </div>
 
           <div onClick={() => navigate('/about')} className="flex items-center gap-2.5 py-1.5 px-4 bg-primary/5 border-2 border-border rounded-lg hover:border-primary transition-all cursor-pointer hover:shadow-md">
             <Info className="w-5 h-5 text-primary flex-shrink-0" />
