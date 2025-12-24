@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { CalendarCheck, Clock, Dumbbell, Star, Crown, ShoppingBag, Archive, Home, TrendingUp, Layers, Target } from "lucide-react";
+import { getCyprusTodayStr } from "@/lib/cyprusDate";
 
 export const WorkoutOfTheDay = () => {
   const navigate = useNavigate();
@@ -13,14 +14,14 @@ export const WorkoutOfTheDay = () => {
   const { data: wods, isLoading } = useQuery({
     queryKey: ["workout-of-the-day-dual"],
     queryFn: async () => {
-      // Get today's date in YYYY-MM-DD format for defensive filtering
-      const today = new Date().toISOString().split('T')[0];
+      // Get today's date in Cyprus timezone for consistent filtering
+      const cyprusToday = getCyprusTodayStr();
       
       const { data, error } = await supabase
         .from("admin_workouts")
         .select("*")
         .eq("is_workout_of_day", true)
-        .eq("generated_for_date", today); // DEFENSIVE: Only show today's WODs
+        .eq("generated_for_date", cyprusToday); // Only show Cyprus today's WODs
       
       if (error && error.code !== "PGRST116") {
         console.error("Error fetching WODs:", error);
@@ -173,7 +174,7 @@ export const WorkoutOfTheDay = () => {
           
           {/* Description */}
           <p className="text-xs sm:text-sm text-muted-foreground max-w-2xl mx-auto mb-4">
-            Every day at midnight, <span className="text-primary font-semibold">SmartyGym</span> delivers <strong>TWO</strong> fresh workouts — one with equipment, one without. Choose based on where you are!
+            Every day, <span className="text-primary font-semibold">SmartyGym</span> delivers <strong>TWO</strong> fresh workouts — one with equipment, one without. Choose based on where you are!
           </p>
         </div>
 
@@ -201,12 +202,13 @@ export const WorkoutOfTheDay = () => {
             {renderMiniCard(equipmentWOD, false)}
           </div>
         ) : (
-          <div className="bg-background/80 backdrop-blur-sm rounded-xl p-6 border border-primary/30 max-w-md mx-auto text-center mb-4">
-            <p className="text-muted-foreground mb-2">
-              No Workouts of the Day available yet.
-            </p>
-            <p className="text-sm text-muted-foreground/70">
-              Check back <span className="text-primary font-semibold">soon</span> for today's fresh workouts!
+          <div className="bg-background/80 backdrop-blur-sm rounded-xl p-6 border-2 border-dashed border-primary/30 max-w-md mx-auto text-center mb-4">
+            <Clock className="w-12 h-12 text-primary/50 mx-auto mb-3" />
+            <h3 className="text-lg font-bold text-foreground mb-1">
+              Today's Workouts are Being Prepared
+            </h3>
+            <p className="text-sm text-muted-foreground">
+              Check back <span className="text-primary font-semibold">soon</span> for your fresh Workouts of the Day!
             </p>
           </div>
         )}
