@@ -32,7 +32,7 @@ export const ReaderModeDialog = ({
 
   const [isDarkMode, setIsDarkMode] = useState(() => {
     const saved = localStorage.getItem("readerModeDarkMode");
-    return saved === "true";
+    return saved !== "false"; // Default to dark mode
   });
 
   useEffect(() => {

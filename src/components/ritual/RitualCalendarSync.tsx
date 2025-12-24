@@ -5,7 +5,11 @@ import { Calendar, CalendarOff, Check, Loader2 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 
-export function RitualCalendarSync() {
+interface RitualCalendarSyncProps {
+  compact?: boolean;
+}
+
+export function RitualCalendarSync({ compact = false }: RitualCalendarSyncProps) {
   const [isConnected, setIsConnected] = useState(false);
   const [isSynced, setIsSynced] = useState(false);
   const [loading, setLoading] = useState(true);
@@ -106,6 +110,28 @@ export function RitualCalendarSync() {
   // Don't show if still loading or not connected to Google Calendar
   if (loading || !isConnected) {
     return null;
+  }
+
+  // Compact mode: Simple toggle button
+  if (compact) {
+    return (
+      <Button
+        variant={isSynced ? "outline" : "ghost"}
+        size="sm"
+        onClick={toggleSync}
+        disabled={updating}
+        className="flex items-center gap-2"
+      >
+        {updating ? (
+          <Loader2 className="h-4 w-4 animate-spin" />
+        ) : isSynced ? (
+          <Check className="h-4 w-4 text-primary" />
+        ) : (
+          <Calendar className="h-4 w-4" />
+        )}
+        Calendar {isSynced ? "On" : "Off"}
+      </Button>
+    );
   }
 
   return (
