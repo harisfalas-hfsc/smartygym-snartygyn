@@ -237,11 +237,11 @@ const WODCategory = () => {
                   
                   {/* Mobile description - shorter version */}
                   <p className="block sm:hidden text-sm text-center text-muted-foreground max-w-3xl mx-auto">
-                    Our WOD's follow a science-based periodization approach designed by{" "}
+                    Our WOD's follow a science-based periodization approach designed by Coach{" "}
                     <a href="/coach-profile" className="text-primary hover:underline font-semibold">
-                      Coach Haris Falas
+                      Haris Falas
                     </a>
-                    , ensuring that within each weekly cycle, you train all fitness parameters. Unlike random workouts you find on YouTube or Instagram, following{" "}
+                    , ensuring that within each weekly cycle, you train all fitness parameters. Following{" "}
                     <span className="text-primary font-semibold">SmartyGym</span>'s structured program means you can rest assured that your training is reliable, professionally organized, and designed to systematically improve all aspects of your fitness.
                   </p>
                 </div>
