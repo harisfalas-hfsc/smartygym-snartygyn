@@ -675,6 +675,9 @@ export const ProgramEditDialog = ({ program, open, onOpenChange, onSave }: Progr
           {/* 9. Instructions */}
           <div className="space-y-2">
             <Label htmlFor="construction">9. Instructions</Label>
+            <p className="text-sm text-muted-foreground italic">
+              Note: A link to the Exercise Library will automatically appear above your instructions when displayed to users.
+            </p>
             <A4Container>
               <RichTextEditor
                 value={formData.construction}

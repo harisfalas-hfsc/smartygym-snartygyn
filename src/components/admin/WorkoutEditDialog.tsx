@@ -609,6 +609,9 @@ export const WorkoutEditDialog = ({ workout, open, onOpenChange, onSave }: Worko
           {/* 11. Instructions */}
           <div className="space-y-2">
             <Label htmlFor="instructions">11. Instructions</Label>
+            <p className="text-sm text-muted-foreground italic">
+              Note: A link to the Exercise Library will automatically appear above your instructions when displayed to users.
+            </p>
             <A4Container>
               <RichTextEditor
                 value={formData.instructions}

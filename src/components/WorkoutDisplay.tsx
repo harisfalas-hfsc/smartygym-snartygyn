@@ -15,6 +15,7 @@ import { useAccessControl } from "@/hooks/useAccessControl";
 import { HTMLContent } from "@/components/ui/html-content";
 import { ExerciseHTMLContent } from "@/components/ExerciseHTMLContent";
 import { A4Container } from "@/components/ui/a4-container";
+import { ExerciseLibraryBanner } from "@/components/ExerciseLibraryBanner";
 
 interface Exercise {
   name: string;
@@ -465,6 +466,7 @@ export const WorkoutDisplay = ({
               </CardTitle>
             </CardHeader>
             <CardContent className="content-container pt-6">
+              <ExerciseLibraryBanner />
               <A4Container>
                 <HTMLContent content={instructions || program_structure || ''} className="text-base" />
               </A4Container>
